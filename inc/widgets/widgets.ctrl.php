@@ -37,7 +37,7 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 		/**
 		 * @var Blog
 		 */
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	}
 
 	/**
@@ -121,7 +121,7 @@ switch( $action )
 		/**
 		* @var Blog
 		*/
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		break;
 
@@ -149,6 +149,8 @@ switch( $display_mode )
 	case 'normal':
 	default : // take usual approach
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		// Initialize JS for color picker field on the edit plugin settings form:
+		init_colorpicker_js();
 }
 
 // Get Skin used by current Blog:
@@ -269,23 +271,29 @@ switch( $action )
 							$edited_ComponentWidget->get_cache_status( true )
 						);
 					if( $action == 'update' )
-					{ // Close window after update, and don't close it when user wants continue editing after updating
-						$methods['closeWidgetSettings'] = array();
+					{	// Close window after update, and don't close it when user wants continue editing after updating:
+						$methods['closeWidgetSettings'] = array( $action );
 					}
 					else
-					{ // Scroll to messages after update
-						$methods['showMessagesWidgetSettings'] = array();
+					{	// Scroll to messages after update:
+						$methods['showMessagesWidgetSettings'] = array( 'success' );
 					}
 					send_javascript_message( $methods, true );
 					break;
 			}
-			$action = 'list';
-			$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
-			header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+			if( $action == 'update_edit' )
+			{	// Stay on edit widget form:
+				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&action=edit&wi_ID='.$edited_ComponentWidget->ID, 303 );
+			}
+			else
+			{	// Redirect to widgets list:
+				$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
+				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+			}
 		}
 		elseif( $display_mode == 'js' )
-		{ // send errors back as js
-			send_javascript_message( array( 'showMessagesWidgetSettings' => array() ), true );
+		{	// Send errors back as js:
+			send_javascript_message( array( 'showMessagesWidgetSettings' => array( 'failed' ) ), true );
 		}
 		break;
 
@@ -594,8 +602,6 @@ if( $display_mode == 'normal' )
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery
-	require_js( 'communication.js' ); // auto requires jQuery
-	require_js( 'blog_widgets.js' );
 	require_css( 'blog_widgets.css' );
 
 
@@ -644,7 +650,10 @@ switch( $action )
 				// Display VIEW:
 				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
 				$output = ob_get_clean();
-				send_javascript_message( array( 'widgetSettings' => $output ) );
+				send_javascript_message( array(
+						'widgetSettings' => array( $output, $edited_ComponentWidget->get( 'type' ), $edited_ComponentWidget->get( 'code' ) ),
+						'evo_initialize_colorpicker_inputs' => array(),
+					) );
 				break;
 
 			case 'normal' :

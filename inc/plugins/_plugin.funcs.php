@@ -35,7 +35,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
 {
 	global $debug;
-	global $htsrv_url;
 	static $has_array_type;
 
 	if( ! is_array( $parmeta ) )
@@ -63,7 +62,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	// Passthrough some attributes to elements:
 	foreach( $parmeta as $k => $v )
 	{
-		if( in_array( $k, array( 'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength' ) ) )
+		if( in_array( $k, array( 'id', 'class', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength' ) ) )
 		{
 			$params[$k] = $v;
 		}
@@ -265,7 +264,13 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$meta_option_checked = $set_value === NULL ?
 					/* default value */ $meta_option[2] :
 					/* saved value */   ! empty( $set_value[ $meta_option[0] ] );
-				$options[] = array( $input_name.'['.$meta_option[0].']', 1, $meta_option[1], $meta_option_checked );
+
+				$meta_option_disabled = isset( $meta_option[4] ) ? $meta_option[4] : NULL;
+				$meta_option_note = isset( $meta_option[5] ) ? $meta_option[5] : NULL;
+				$meta_option_class = isset( $meta_option[6] ) ? $meta_option[6] : NULL;
+				$meta_option_hidden = isset( $meta_option[7] ) ? $meta_option[7] : NULL;
+				$meta_option_label_attribs = isset( $meta_option[8] ) ? $meta_option[8] : NULL;
+				$options[] = array( $input_name.'['.$meta_option[0].']', 1, $meta_option[1], $meta_option_checked, $meta_option_disabled, $meta_option_note, $meta_option_class, $meta_option_hidden, $meta_option_label_attribs );
 			}
 			$Form->checklist( $options, $input_name, $set_label, false, false, $params );
 			break;
@@ -411,7 +416,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
 					array('onclick'=>"
 						var oThis = this;
-						jQuery.get('{$htsrv_url}async.php', {
+						jQuery.get('".get_htsrv_url()."async.php', {
 								action: 'add_plugin_sett_set',
 								plugin_ID: '{$Obj->ID}',
 								set_type: '$set_type',
@@ -472,6 +477,22 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		case 'color':
 			$Form->color_input( $input_name, $set_value, $set_label, '', $params );
+			break;
+
+		case 'fileselect':
+			if( isset( $parmeta['size'] ) )
+			{
+				$params['max_file_num'] = $parmeta['size'];
+			}
+
+			$params['root'] = isset( $parmeta['root'] ) ? $parmeta['root'] : '';
+			$params['path'] = isset( $parmeta['path'] ) ? $parmeta['path'] : '';
+			$params['size_name'] = isset( $parmeta['thumbnail_size'] ) ? $parmeta['thumbnail_size'] : 'crop-64x64';
+			$params['max_file_num'] = isset( $parmeta['max_file_num'] ) ? $parmeta['max_file_num'] : 1;
+			$params['initialize_with'] = isset( $parmeta['initialize_with'] ) ? $parmeta['initialize_with'] : '';
+			$params['note'] = isset( $parmeta['note'] ) ? $parmeta['note'] : '';
+
+			$Form->fileselect( $input_name, $set_value, $set_label, $params['note'], $params );
 			break;
 
 		default:
@@ -776,6 +797,17 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 		case 'Widget':
 			$error_value = NULL;
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'checklist' && $parname == 'renderers' )
+			{	// Save "stealth" and "always" plugin render options:
+				// (they are hidden or disabled checkboxes of the form and cannot be submitted automatically)
+				global $Plugins;
+				$widget_Blog = & $Obj->get_Blog();
+				$l_value = $Plugins->validate_renderer_list( array_keys( $l_value ), array(
+						'Blog'         => & $widget_Blog,
+						'setting_name' => 'coll_apply_rendering',
+					) );
+				$l_value = array_fill_keys( $l_value, 1 );
+			}
 			$Obj->set( $parname, $l_value );
 			break;
 

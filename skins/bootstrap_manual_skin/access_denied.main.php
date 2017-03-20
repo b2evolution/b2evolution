@@ -11,7 +11,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Skin, $Settings, $Blog;
+global $app_version, $disp, $Skin, $Settings, $Collection, $Blog;
 
 if( evo_version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
@@ -41,7 +41,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 		<?php
-		if( $Skin->is_visible_container( 'page_top' ) )
+		if( $Skin->show_container_when_access_denied( 'page_top' ) )
 		{ // Display 'Page Top' widget container
 		?>
 		<div class="evo_container evo_container__page_top">
@@ -50,7 +50,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Page Top'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'         => '<div class="widget $wi_class$">',
+					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
 					'list_start'          => '<ul>',
@@ -66,7 +66,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<?php
-		if( $Skin->is_visible_container( 'header' ) )
+		if( $Skin->show_container_when_access_denied( 'header' ) )
 		{ // Display 'Header' widget container
 		?>
 		<div class="evo_container evo_container__header">
@@ -75,7 +75,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Header'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="widget $wi_class$">',
+					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
 					'block_title_start' => '<h1>',
 					'block_title_end'   => '</h1>',
@@ -89,7 +89,7 @@ siteskin_include( '_site_body_header.inc.php' );
 </header><!-- .row -->
 
 <?php
-if( $Skin->is_visible_container( 'menu' ) )
+if( $Skin->show_container_when_access_denied( 'menu' ) )
 { // Display this widget container only when it is not disabled
 ?>
 <nav class="row">
@@ -204,7 +204,7 @@ skin_include( '_access_denied.disp.php' );
 			<div id="evo_container__sidebar">
 
 				<?php
-				if( $Skin->is_visible_container( 'sidebar' ) )
+				if( $Skin->show_container_when_access_denied( 'sidebar' ) )
 				{ // Display 'Sidebar' widget container
 				?>
 				<div class="evo_container evo_container__sidebar">
@@ -246,7 +246,7 @@ skin_include( '_access_denied.disp.php' );
 				<?php } ?>
 
 				<?php
-				if( $Skin->is_visible_container( 'sidebar2' ) )
+				if( $Skin->show_container_when_access_denied( 'sidebar2' ) )
 				{ // Display 'Sidebar 2' widget container
 				?>
 				<div class="evo_container evo_container__sidebar2">
@@ -313,13 +313,13 @@ skin_include( '_access_denied.disp.php' );
 	<div class="col-md-12 center">
 
 		<?php
-		if( $Skin->is_visible_container( 'footer' ) )
+		if( $Skin->show_container_when_access_denied( 'footer' ) )
 		{ // Display 'Footer' widget container
 		?>
 		<div class="evo_container evo_container__footer">
 		<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',

@@ -22,7 +22,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'regional/model/_country.class.php', 'Country' );
 
-global $Blog, $Session, $Messages, $inc_path;
+global $Collection, $Blog, $Session, $Messages, $inc_path;
 global $action, $user_profile_only, $edited_User, $form_action;
 
 if( ! is_logged_in() )
@@ -47,7 +47,7 @@ $params = array_merge( array(
 			'item_selected_end'   => '</div>',
 			'block_end'           => '</div><div class="clear"></div>',
 		),
-	'form_action' => get_secure_htsrv_url().'profile_update.php',
+	'form_action' => get_htsrv_url( true ).'profile_update.php',
 	'form_class_user_avatar'   => 'evo_form',
 	'form_class_user_identity' => 'evo_form',
 	'form_class_user_pass'     => 'evo_form',
@@ -129,6 +129,9 @@ switch( $disp )
 		break;
 	case 'subs':
 		require $inc_path.'users/views/_user_subscriptions.form.php';
+		break;
+	case 'visits':
+		require $inc_path.'users/views/_user_profile_visits.view.php';
 		break;
 	default:
 		debug_die( "Unknown user tab" );

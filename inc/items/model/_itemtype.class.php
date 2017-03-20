@@ -51,6 +51,8 @@ class ItemType extends DataObject
 	var $use_coordinates = 'never';
 	var $use_custom_fields = 1;
 	var $use_comments = 1;
+	var $comment_form_msg = '';
+	var $allow_comment_form_msg = 0;
 	var $allow_closing_comments = 1;
 	var $allow_disabling_comments = 0;
 	var $use_comment_expiration = 'optional';
@@ -118,6 +120,8 @@ class ItemType extends DataObject
 			$this->use_coordinates = $db_row->ityp_use_coordinates;
 			$this->use_custom_fields = $db_row->ityp_use_custom_fields;
 			$this->use_comments = $db_row->ityp_use_comments;
+			$this->comment_form_msg = $db_row->ityp_comment_form_msg;
+			$this->allow_comment_form_msg = $db_row->ityp_allow_comment_form_msg;
 			$this->allow_closing_comments = $db_row->ityp_allow_closing_comments;
 			$this->allow_disabling_comments = $db_row->ityp_allow_disabling_comments;
 			$this->use_comment_expiration = $db_row->ityp_use_comment_expiration;
@@ -149,6 +153,7 @@ class ItemType extends DataObject
 		return array(
 				array( 'table' => 'T_items__type_coll', 'fk' => 'itc_ityp_ID', 'msg' => T_('%d Post type associations with collections') ),
 				array( 'table' => 'T_items__type_custom_field', 'fk' => 'itcf_ityp_ID', 'msg' => T_('%d Custom field definitions') ),
+				array( 'table' => 'T_items__status_type', 'fk' => 'its_ityp_ID', 'msg' => T_('%d Item status associations') )
 			);
 	}
 
@@ -287,6 +292,14 @@ class ItemType extends DataObject
 		param( 'ityp_use_comments', 'integer', 0 );
 		$this->set_from_Request( 'use_comments' );
 
+		// Message before comment form:
+		param( 'ityp_comment_form_msg', 'text' );
+		$this->set_from_Request( 'comment_form_msg', NULL, true );
+
+		// Allow custom message for each post
+		param( 'ityp_allow_comment_form_msg', 'integer', 0 );
+		$this->set_from_Request( 'allow_comment_form_msg' );
+
 		// Allow closing comments
 		param( 'ityp_allow_closing_comments', 'integer', 0 );
 		$this->set_from_Request( 'allow_closing_comments' );
@@ -325,7 +338,8 @@ class ItemType extends DataObject
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
-		foreach( array( 'double', 'varchar' ) as $type )
+		$types = array( 'double', 'varchar', 'text', 'html' );
+		foreach( $types as $type )
 		{
 			$empty_title_error = false; // use this to display empty title fields error message only ones
 			$custom_field_count = param( 'count_custom_'.$type, 'integer', 0 ); // all custom fields count ( contains even deleted fields )
@@ -417,7 +431,7 @@ class ItemType extends DataObject
 
 		if( parent::dbinsert() )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 
 			// Update/Insert/Delete custom fields:
 			$this->dbsave_custom_fields();
@@ -562,7 +576,7 @@ class ItemType extends DataObject
 	/**
 	 * Get the custom feilds
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double'
+	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html'. Use comma separator to get several types
 	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order'
 	 * @return array Custom fields
 	 */
@@ -589,7 +603,7 @@ class ItemType extends DataObject
 		$custom_fields = array();
 		foreach( $this->custom_fields as $custom_field )
 		{
-			if( $type == 'all' || $type == $custom_field['type'] )
+			if( $type == 'all' || strpos( $type, $custom_field['type'] ) !== false )
 			{
 				switch( $array_key )
 				{
@@ -615,6 +629,91 @@ class ItemType extends DataObject
 		}
 
 		return $custom_fields;
+	}
+
+
+	/**
+	 * Get associated post status
+	 *
+	 * @return array IDs of associated post status
+	 */
+	function get_applicable_post_status()
+	{
+		global $DB;
+
+		$sql = 'SELECT its_pst_ID FROM T_items__status_type WHERE its_ityp_ID = '.$this->ID;
+		$item_status_array = $DB->get_col( $sql );
+		$item_status_array = array_map( 'intval', $item_status_array );
+
+		return $item_status_array;
+	}
+
+
+	/**
+	 * Get post status not associated with current item type
+	 *
+	 * @return array IDs of post status not valid for current item type
+	 */
+	function get_ignored_post_status( )
+	{
+		global $DB;
+
+		$sql = 'SELECT pst_ID FROM T_items__status WHERE pst_ID NOT IN ( SELECT its_pst_ID FROM T_items__status_type WHERE its_ityp_ID = '.$this->ID.' )';
+		/*
+		$sql = 'SELECT pst_ID
+							FROM T_items__status
+							JOIN T_items__type
+							LEFT JOIN T_items__status_type ON its_ityp_ID = ityp_ID AND its_pst_ID = pst_ID
+							WHERE ityp_ID = '.$this->ID.'	AND its_pst_ID IS NULL';
+		*/
+		$item_status_array = $DB->get_col( $sql );
+		$item_status_array = array_map( 'intval', $item_status_array );
+
+		return $item_status_array;
+	}
+
+
+	/**
+	 * Update item statuses associated with this item type
+	 */
+	function update_item_statuses_from_Request()
+	{
+		global $DB;
+
+		$allowed_values = array();
+		$remove_values = array();
+
+		// Item Types
+		$item_status_IDs = param( 'item_status_IDs', 'string', true );
+		$item_status_IDs = explode( ',', $item_status_IDs );
+
+		foreach( $item_status_IDs as $loop_status_ID )
+		{
+			$loop_status_ID = intval( $loop_status_ID );
+			$item_status = param( 'status_'.$loop_status_ID, 'integer', 0 );
+
+			if( $item_status )
+			{
+				$allowed_values[] = "( $this->ID, $loop_status_ID )";
+			}
+			else
+			{
+				$remove_values[] = $loop_status_ID;
+			}
+		}
+
+		if( $allowed_values )
+		{
+			$DB->query( 'REPLACE INTO T_items__status_type( its_ityp_ID, its_pst_ID )
+					VALUES '.implode( ', ', $allowed_values ) );
+		}
+
+		if( $remove_values )
+		{
+			$DB->query( 'DELETE FROM T_items__status_type
+					WHERE its_ityp_ID = '.$this->ID.'
+					AND its_pst_ID IN ('.implode( ',', $remove_values ).')' );
+		}
 	}
 }
 

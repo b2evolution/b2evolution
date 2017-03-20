@@ -21,11 +21,11 @@ global $Comment;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var CommentList
  */
-global $CommentList, $show_statuses;
+global $CommentList;
 
 global $current_User, $admin_url, $tab3;
 

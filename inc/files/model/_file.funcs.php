@@ -411,7 +411,7 @@ function no_leading_slash( $path )
  */
 function get_canonical_path( $ads_path )
 {
-	// Remove windows backslashes:
+	// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 	$ads_path = str_replace( '\\', '/', $ads_path );
 
 	$is_absolute = is_absolute_pathname($ads_path);
@@ -894,7 +894,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 		}
 
 		// Folder Icon + Name:
-		$url = regenerate_url( 'root,path', 'root='.$Root->ID.'&amp;path='.$rds_rel_path );
+		$url = regenerate_url( 'root,path', 'root='.$Root->ID.'&amp;path='.rawurlencode( $rds_rel_path ) );
 		$label = action_icon( T_('Open this directory in the file manager'), 'folder', $url )
 			.'<a href="'.$url.'"
 			title="'.T_('Open this directory in the file manager').'">'
@@ -1384,7 +1384,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 	$uploadfile_desc = param( 'uploadfile_desc', 'array:string', array() );
 	$uploadfile_name = param( 'uploadfile_name', 'array:string', array() );
 
-	// LOOP THROUGH ALL UPLOADED FILES AND PROCCESS EACH ONE:
+	// LOOP THROUGH ALL UPLOADED FILES AND PROCESS EACH ONE:
 	foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
 	{
 		if( empty( $lName ) )
@@ -1396,6 +1396,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 				 || !empty( $uploadfile_name[$lKey] ) )
 			{ // User specified params but NO file! Warn the user:
 				$failedFiles[$lKey] = T_( 'Please select a local file to upload.' );
+				param_error( 'uploadfile[]', NULL, $failedFiles[$lKey] );
 			}
 			// Abort upload for this file:
 			continue;
@@ -1709,10 +1710,12 @@ function prepare_uploaded_image( $File, $mimetype )
 function report_user_upload( $File )
 {
 	global $current_User;
+
 	load_funcs( 'files/model/_file.funcs.php' );
 
-	syslog_insert( sprintf( T_('User %s has uploaded the file %s -- Size: %s'),
-			$current_User->login, '[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
+	syslog_insert( sprintf( '%s has uploaded the file %s -- Size: %s',
+		( is_logged_in() ? 'User #'.$current_User->ID.'([['.$current_User->login.']])' : 'Anonymous user' ),
+		'[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
 }
 
 
@@ -1812,6 +1815,9 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 	$FileCache = & get_FileCache();
 	$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
 
+	// Unset this flag to check for each file even if it is the same from cache:
+	unset( $newFile->_exists );
+
 	$num_ext = 0;
 	$oldName = $newName;
 
@@ -1822,17 +1828,17 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 		$ext_pos = strrpos( $newName, '.');
 		if( $num_ext == 1 )
 		{
-			if( $image_info == NULL )
-			{
+			if( $newFile->is_image() && $image_info == NULL )
+			{	// Get image info only for real image files:
 				$image_info = getimagesize( $newFile->get_full_path() );
 			}
 			$newName = substr_replace( $newName, '-'.$num_ext.'.', $ext_pos, 1 );
 			if( $image_info )
-			{
+			{	// Get thumbnail of old image:
 				$oldFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
 			}
 			else
-			{
+			{	// Get formatted file of not image file:
 				$oldFile_thumb = $newFile->get_size_formatted();
 			}
 		}
@@ -1990,7 +1996,7 @@ function get_available_filetype_icons()
  */
 function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 {
-	global $current_User;
+	global $current_User, $force_upload_forbiddenext;
 
 	$FileRootCache = & get_FileRootCache();
 	$fm_FileRoot = & $FileRootCache->get_by_ID($root_ID, true);
@@ -2043,7 +2049,8 @@ function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 		if( $correct_Filetype && $correct_Filetype->is_allowed() )
 		{	// A FileType with the given mime type exists in database and it is an allowed file type for current User
 			// The "correct" extension is a plausible one, proceed...
-			$correct_extension = array_shift($correct_Filetype->get_extensions());
+			$correct_extensions = $correct_Filetype->get_extensions();
+			$correct_extension = array_shift( $correct_extensions );
 			$path_info = pathinfo($newName);
 			$current_extension = $path_info['extension'];
 
@@ -2214,7 +2221,7 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $htsrv_url, $blog, $Settings, $current_User;
+	global $blog, $Settings, $current_User, $b2evo_icons_type;
 
 	$params = array_merge( array(
 			'before'           => '',
@@ -2247,6 +2254,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'conflict_file_format'   => 'simple', // 'simple' - file name text, 'full_path_link' - a link with text as full file path
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
+			'filename_select'        => '', // Append this text before file name on success uploading of new file
 		), $params );
 
 	$FileRootCache = & get_FileRootCache();
@@ -2258,9 +2266,16 @@ function display_dragdrop_upload_button( $params = array() )
 	}
 
 	$root_and_path = $params['fileroot_ID'].'::'.$params['path'];
-	$quick_upload_url = $htsrv_url.'quick_upload.php?upload=true'.( empty( $blog ) ? '' : '&blog='.$blog );
+	$quick_upload_url = get_htsrv_url().'quick_upload.php?upload=true'
+		.( empty( $blog ) ? '' : '&blog='.$blog )
+		.'&b2evo_icons_type='.$b2evo_icons_type;
 
 	echo $params['before'];
+
+	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp() )
+	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
+		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$params['LinkOwner']->get_ID().'" />';
+	}
 
 	?>
 	<div id="file-uploader" style="width:100%">
@@ -2293,11 +2308,8 @@ function display_dragdrop_upload_button( $params = array() )
 
 		<?php
 		if( $params['LinkOwner'] !== NULL )
-		{ // Add params to link a file right after uploading
-			global $b2evo_icons_type;
-			$link_owner_type = $params['LinkOwner']->type;
-			$link_owner_ID = ( $link_owner_type == 'item' ? $params['LinkOwner']->Item->ID : $params['LinkOwner']->Comment->ID );
-			echo 'url += "&link_owner='.$link_owner_type.'_'.$link_owner_ID.'&b2evo_icons_type='.$b2evo_icons_type.'"';
+		{	// Add params to link a file right after uploading:
+			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'"';
 		}
 		?>
 
@@ -2311,12 +2323,12 @@ function display_dragdrop_upload_button( $params = array() )
 				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				action: url,
 				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
-				debug: true,
+				debug: false,
 				messages: {
-					typeError: '<?php echo TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
-					sizeError: '<?php echo TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
-					minSizeError: '<?php echo TS_('{file} is too small. The minimum file size is {minSizeLimit}.'); ?>',
-					emptyError: '<?php echo TS_('{file} is empty. Please select non-empty files.'); ?>',
+					typeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
+					sizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
+					minSizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is too small. The minimum file size is {minSizeLimit}.'); ?>',
+					emptyError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is empty. Please select non-empty files.'); ?>',
 					onLeave: '<?php echo TS_('Files are currently being uploaded. If you leave this page now, the upload will be cancelled.'); ?>'
 				},
 				onSubmit: function( id, fileName )
@@ -2328,7 +2340,7 @@ function display_dragdrop_upload_button( $params = array() )
 						if( $params['table_headers'] != '' )
 						{ // Append table headers if they are defined
 						?>
-						noresults_row.parent().parent().prepend( '<?php echo str_replace( array( "'", "\n" ), array( "\'", '' ), $params['table_headers'] ); ?>' );
+						noresults_row.parent().parent().prepend( '<?php echo format_to_js( $params['table_headers'] ); ?>' );
 						<?php } ?>
 						noresults_row.remove();
 					}
@@ -2375,16 +2387,29 @@ function display_dragdrop_upload_button( $params = array() )
 							text = '<?php echo TS_('Server dropped the connection.'); ?>';
 						}
 						this_row.find( '.qq-upload-file' ).append( ' <span class="result_error">' + text + '</span>' );
-						this_row.find( '.qq-upload-image, td.size' ).prepend( '<?php echo get_icon( 'warning_yellow' ); ?>' );
+						this_row.find( '.qq-upload-image, td.size' ).prepend( '<?php echo format_to_js( get_icon( 'warning_yellow' ) ); ?>' );
 					}
 					else
 					{ // Success/Conflict
 						var table_view = typeof( responseJSON.success.link_ID ) != 'undefined' ? 'link' : 'file';
 
-						var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
+						var filename_before = '<?php echo format_to_js( $params['filename_before'] ); ?>';
+						var filename_select = '<?php echo format_to_js( $params['filename_select'] ); ?>';
 						if( filename_before != '' )
 						{
-							filename_before = filename_before.replace( '$file_path$', responseJSON.success.path );
+							filename_before = filename_before.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
+						}
+
+						if( filename_select != '' )
+						{
+							if( responseJSON.success.filetype == 'image' )
+							{
+								filename_select = filename_select.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
+							}
+							else
+							{
+								filename_select = '';
+							}
 						}
 
 						var warning = '';
@@ -2409,7 +2434,7 @@ function display_dragdrop_upload_button( $params = array() )
 							this_row.find( '.qq-upload-status' ).html( '' );
 							<?php } ?>
 							this_row.find( '.qq-upload-image' ).html( text );
-							this_row.find( '.qq-upload-file' ).html( filename_before
+							this_row.find( '.qq-upload-file' ).html( filename_before + filename_select
 								+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
 								+ '<span class="fname">' + file_name + '</span>' + warning );
 						}
@@ -2430,9 +2455,9 @@ function display_dragdrop_upload_button( $params = array() )
 								+ '<span class="fname">' + file_name + '</span>'
 								<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
 								+ ' - <a href="#" '
-								+ 'class="<?php echo button_class( 'text' ); ?> roundbutton_text_noicon qq-conflict-replace" '
-								+ 'old="' + responseJSON.success.oldpath + '" '
-								+ 'new="' + responseJSON.success.newpath + '">'
+								+ 'class="<?php echo button_class( 'text_warning' ); ?> btn-sm roundbutton_text_noicon qq-conflict-replace" '
+								+ 'old="' + responseJSON.success.oldname + '" '
+								+ 'new="' + responseJSON.success.newname + '">'
 								+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
 								+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
 								+ '</a>'
@@ -2449,7 +2474,10 @@ function display_dragdrop_upload_button( $params = array() )
 							this_row.find( '.qq-upload-link-id' ).html( responseJSON.success.link_ID );
 							this_row.find( '.qq-upload-image' ).html( responseJSON.success.link_preview );
 							this_row.find( '.qq-upload-link-actions' ).prepend( responseJSON.success.link_actions );
-							this_row.find( '.qq-upload-link-position' ).html( responseJSON.success.link_position );
+							if( typeof( responseJSON.success.link_position ) != 'undefined' )
+							{
+								this_row.find( '.qq-upload-link-position' ).html( responseJSON.success.link_position );
+							}
 							init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 						}
 					}
@@ -2485,8 +2513,8 @@ function display_dragdrop_upload_button( $params = array() )
 		?>
 		function update_iframe_height()
 		{
-			var wrapper_height = jQuery( 'body' ).height();
-			jQuery( 'div#attachmentframe_wrapper', window.parent.document ).css( { 'height': wrapper_height, 'max-height': wrapper_height } );
+			var table_height = jQuery( '#attachments_fieldset_table' ).height();
+			jQuery( '#attachments_fieldset_wrapper' ).css( { 'height': table_height, 'max-height': table_height } );
 		}
 		<?php } ?>
 
@@ -2520,7 +2548,7 @@ function display_dragdrop_upload_button( $params = array() )
 			jQuery.ajax(
 			{ // Replace old file name with new
 				type: 'POST',
-				url: '<?php echo get_secure_htsrv_url(); ?>async.php',
+				url: '<?php echo get_htsrv_url(); ?>async.php',
 				data:
 				{
 					action: 'conflict_files',
@@ -2822,5 +2850,145 @@ function echo_file_properties()
 	//]]>
 </script>
 <?php
+}
+
+
+/**
+ * Get root and relative file path by absolute path
+ *
+ * @param string Absolute path
+ * @param boolean TRUE - to extract data from cache path like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg'
+ * @return boolean|array FALSE - if root and path are not detected, Array with keys 'root' and 'path'
+ *
+ * Examples:
+ * get_root_path_by_abspath( 'shared/global/sunset/sunset.jpg' ) => array( root => 'shared_0', path => 'sunset/sunset.jpg' )
+ * get_root_path_by_abspath( 'users/admin/admin.jpg' ) => array( root => 'user_1', path => 'admin.jpg' )
+ * get_root_path_by_abspath( 'blogs/home/backgrounds/background1.jpg' ) => array( root => 'collection_1', path => 'backgrounds/background1.jpg' )
+ * get_root_path_by_abspath( 'skins/bootstrap_main_skin/skinshot.png' ) => array( root => 'skins_0', path => 'bootstrap_main_skin/skinshot.png' )
+ * - for cache paths (used to restored missing cached images which are loaded with old url):
+ * get_root_path_by_abspath( 'shared/global/sunset/_evocache/sunset.jpg/fit-80x80.jpg?mtime=1486119491', true ) => array( root => 'shared_0', path => 'sunset/sunset.jpg' )
+ * get_root_path_by_abspath( 'users/admin/_evocache/admin.jpg/crop-top-320x320.jpg?mtime=1486119491', true ) => array( root => 'user_1', path => 'admin.jpg' )
+ * get_root_path_by_abspath( 'blogs/home/_evocache/image.jpg/fit-80x80.jpg?mtime=1486969646', true ) => array( root => 'collection_1', path => 'image.jpg' )
+ * get_root_path_by_abspath( 'skins/bootstrap_main_skin/_evocache/skinshot.png/fit-80x80.png?mtime=1486969005', true ) => array( root => 'skins_0', path => 'bootstrap_main_skin/skinshot.png' )
+ *
+ */
+function get_root_path_by_abspath( $abspath, $is_cache_path = false )
+{
+	if( empty( $abspath ) )
+	{	// If absolute path is empty do NOT try to decode it:
+		return false;
+	}
+
+	load_class( 'files/model/_fileroot.class.php', 'FileRoot' );
+
+	$abspath = explode( DIRECTORY_SEPARATOR, $abspath );
+
+	switch( $abspath[0] )
+	{
+		case 'users':
+			// User media dir:
+			$UserCache = & get_UserCache();
+			if( $file_User = & $UserCache->get_by_login( $abspath[1] ) )
+			{	// User is found by login:
+				$root = FileRoot::gen_ID( 'user', $file_User->ID );
+				$start_relpath = 2;
+			}
+			break;
+
+		case 'blogs':
+			// Collection media dir:
+			$BlogCache = & get_BlogCache();
+			if( $file_Blog = & $BlogCache->get_by_urlname( $abspath[1], false ) )
+			{	// Blog is found by urlname:
+				$root = FileRoot::gen_ID( 'collection', $file_Blog->ID );
+				$start_relpath = 2;
+			}
+			break;
+
+		case 'skins':
+			// Skins dir:
+			$root = FileRoot::gen_ID( 'skins', 0 );
+			$start_relpath = 1;
+			break;
+
+		case 'shared':
+			// Shared media dir:
+			$root = FileRoot::gen_ID( 'shared', 0 );
+			$start_relpath = 2;
+			break;
+
+		case 'import':
+			// Import media dir:
+			$root = FileRoot::gen_ID( 'import', 0 );
+			$start_relpath = 1;
+			break;
+
+		case 'emailcampaign':
+			// Email campaign media dir:
+			$EmailCampaignCache = & get_EmailCampaignCache();
+			if( $file_EmailCampaign = & $EmailCampaignCache->get_by_ID( $abspath[1], false ) )
+			{	// Email campaign is found by ID:
+				$root = FileRoot::gen_ID( 'emailcampaign', $file_EmailCampaign->ID );
+				$start_relpath = 1;
+			}
+			break;
+	}
+
+	if( ! empty( $root ) )
+	{	// Get relative path only if root is detected:
+		$relpath = '';
+		$abspath_length = count( $abspath );
+		// For cache path like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg' exclude the last because it is a not path part and just a size info:
+		$last_path_index = ( $is_cache_path ? $abspath_length - 1 : $abspath_length );
+
+		for( $f = $start_relpath; $f < $last_path_index; $f++ )
+		{
+			if( $is_cache_path && $f == $abspath_length - 3 )
+			{	// Skip this because it is a evocache folder in the abspath like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg':
+				continue;
+			}
+			$relpath .= $abspath[ $f ].( $f < $last_path_index - 1 ? DIRECTORY_SEPARATOR : '' );
+		}
+
+		if( ! empty( $relpath ) )
+		{	// Return data only if they both are detected:
+			return array(
+					'root' => $root,
+					'path' => $relpath,
+				);
+		}
+	}
+
+	// Data are not found correctly:
+	return false;
+}
+
+
+/**
+ * Get a File object or create one given an absolute path
+ *
+ * @param string Absolute path of file
+ * @param boolean create meta data in DB if it doesn't exist yet? (generates a $File->ID)
+ * @return mixed File a {@link File} object OR NULL if file does not exist
+ */
+function & get_file_by_abspath( $abspath, $force_create_meta = false )
+{
+	$root_path = get_root_path_by_abspath( $abspath );
+	if( $root_path )
+	{
+		$FileRootCache = & get_FileRootCache();
+		if( $FileRoot = $FileRootCache->get_by_ID( $root_path['root'] ) )
+		{
+			$FileCache = & get_FileCache();
+			if( $File = & $FileCache->get_by_root_and_path( $FileRoot->type, $FileRoot->in_type_ID, $root_path['path'] ) && $File->exists() )
+			{
+				$File->load_meta( $force_create_meta );
+				return $File;
+			}
+		}
+	}
+
+	$r = NULL;
+	return $r;
 }
 ?>

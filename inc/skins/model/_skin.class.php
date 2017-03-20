@@ -132,7 +132,7 @@ class Skin extends DataObject
 
 
 	/**
-	 * Get default type for the skin.
+	 * Get default skin type for the skin.
 	 */
 	function get_default_type()
 	{
@@ -162,6 +162,47 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'maybe',
+				'std' => 'maybe',		// Blog
+				'photo' => 'maybe',
+				'forum' => 'no',
+				'manual' => 'no',
+				'group' => 'maybe',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	final public function supports_coll_kind( $kind )
+	{
+		$supported_kinds = $this->get_supported_coll_kinds();
+
+		if( isset($supported_kinds[$kind]) )
+		{
+			return $supported_kinds[$kind];
+		}
+
+		// When the skin doesn't say... consider it a "maybe":
+		return 'maybe';
+	}
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -170,7 +211,6 @@ class Skin extends DataObject
 	{
 		return '';	// Other possibilities: 'bootstrap', 'foundation'... (maybe 'bootstrap4' later...)
 	}
-
 
 
 	/**
@@ -230,7 +270,7 @@ class Skin extends DataObject
 		 * Blog currently displayed
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 		global $admin_url, $rsc_url;
 		global $Timer, $Session;
 
@@ -330,14 +370,14 @@ class Skin extends DataObject
 
 			if( ! is_readable( $af_main_path ) )
 			{ // Cannot open PHP file:
-				$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
+				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
 				continue;
 			}
 
 			$file_contents = @file_get_contents( $af_main_path );
 			if( ! is_string( $file_contents ) )
 			{ // Cannot get contents:
-				$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
+				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
 				continue;
 			}
 
@@ -374,7 +414,7 @@ class Skin extends DataObject
 
 			if( $c )
 			{
-				$Messages->add( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $rf_main_subpath ), 'success' );
+				$Messages->add_to_group( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $rf_main_subpath ), 'success', sprintf( T_('Containers found in skin "%s":'), $folder ) );
 			}
 		}
 
@@ -562,7 +602,6 @@ class Skin extends DataObject
 
 		// Display skinshot:
 		echo '<div class="'.$disp_params['skinshot_class'].'"'.( $disp_params['highlighted'] ? ' id="fadeout-'.$skin_folder : '' ).'">';
-		echo '<div class="skinshot">';
 		echo '<div class="skinshot_placeholder';
 		if( $disp_params[ 'selected' ] )
 		{
@@ -592,7 +631,7 @@ class Skin extends DataObject
 			echo '<div class="skinshot_noshot">'.T_('No skinshot available for').'</div>';
 			echo '<div class="skinshot_name">'.$select_a_begin.$skin_folder.$select_a_end.'</div>';
 		}
-		echo '</div></div>';
+		echo '</div>';
 
 		//
 		echo '<div class="legend">';
@@ -688,7 +727,7 @@ class Skin extends DataObject
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
@@ -700,6 +739,18 @@ class Skin extends DataObject
 			return $value;
 		}
 
+		return $this->get_setting_default_value( $parname );
+	}
+
+
+	/**
+	 * Get a skin specific param default value
+	 *
+	 * @param string Setting name
+	 * @return string|array|NULL
+	 */
+	function get_setting_default_value( $parname )
+	{
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
 		if( isset( $params[ $parname ]['defaultvalue'] ) )
@@ -719,6 +770,13 @@ class Skin extends DataObject
 				}
 			}
 			return $options;
+		}
+		elseif( isset( $params[ $parname ]['type'] ) &&
+						$params[ $parname ]['type'] == 'fileselect' &&
+						! empty( $params[ $parname ]['initialize_with'] ) &&
+						$default_File = & get_file_by_abspath( $params[ $parname ]['initialize_with'], true ) )
+		{ // Get default value for fileselect
+			return $default_File->ID;
 		}
 
 		return NULL;
@@ -776,7 +834,7 @@ class Skin extends DataObject
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
@@ -793,7 +851,7 @@ class Skin extends DataObject
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		$Blog->dbupdate();
 	}
@@ -844,7 +902,7 @@ class Skin extends DataObject
 
 				case 'font_awesome':
 					// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
-					init_fontawesome_icons( 'fontawesome-glyphicons' );
+					init_fontawesome_icons( 'fontawesome-glyphicons', 'blog' );
 					break;
 
 				case 'bootstrap':
@@ -915,11 +973,11 @@ class Skin extends DataObject
 						|| $debug
 						|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
 					{	// Use readable CSS:
-						require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.css' );
 					}
 					else
 					{	// Use minified CSS:
-						require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.min.css' );
 					}
 					break;
 
@@ -941,13 +999,13 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Blog, $current_User;
-
-					// Used to init functions for AJAX forms to add a comment:
-					init_ajax_forms( 'blog' );
+					global $Collection, $Blog, $current_User;
 
 					// Used to set rating for a new comment:
 					init_ratings_js( 'blog' );
+
+					// Used to vote on an item:
+					init_voting_item_js( 'blog' );
 
 					// Used to vote on the comments:
 					init_voting_comment_js( 'blog' );
@@ -1057,12 +1115,12 @@ class Skin extends DataObject
 					break;
 
 				case 'disp_login':
-					// Specific features for disp=threads:
+				case 'disp_access_requires_login':
+					// Specific features for disp=login and disp=access_requires_login:
 
 					global $Settings, $Plugins;
 
-					$transmit_hashed_password = (bool)$Settings->get( 'js_passwd_hashing' ) && !(bool)$Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
-					if( $transmit_hashed_password )
+					if( can_use_hashed_password() )
 					{ // Include JS for client-side password hashing:
 						require_js( 'build/sha1_md5.bmin.js', 'blog' );
 					}
@@ -1146,6 +1204,13 @@ class Skin extends DataObject
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
 					}
+
+					// Require File Uploader js and css:
+					require_js( 'multiupload/fileuploader.js', 'blog' );
+					require_css( 'fileuploader.css', 'blog' );
+					// Load JS files to make the links table sortable:
+					require_js( '#jquery#' );
+					require_js( 'jquery/jquery.sortable.min.js' );
 					break;
 
 				case 'disp_edit_comment':
@@ -1187,6 +1252,32 @@ class Skin extends DataObject
 					// Include this file to expand/collapse the filters panel when JavaScript is disabled
 					global $inc_path;
 					require_once $inc_path.'_filters.inc.php';
+					break;
+
+				case 'disp_download':
+					// Specific features for disp=download:
+					global $Collection, $Blog;
+
+					require_js( '#jquery#', 'blog' );
+
+					// Initialize JavaScript to download file after X seconds
+					add_js_headline( '
+jQuery( document ).ready( function ()
+{
+	jQuery( "#download_timer_js" ).show();
+} );
+
+var b2evo_download_timer = '.intval( $Blog->get_setting( 'download_delay' ) ).';
+var downloadInterval = setInterval( function()
+{
+	jQuery( "#download_timer" ).html( b2evo_download_timer );
+	if( b2evo_download_timer == 0 )
+	{	// Stop timer and download a file:
+		clearInterval( downloadInterval );
+		jQuery( "#download_help_url" ).show();
+	}
+	b2evo_download_timer--;
+}, 1000 );' );
 					break;
 
 				default:
@@ -1267,8 +1358,9 @@ class Skin extends DataObject
 				switch( $name )
 				{
 					case 'Results':
+					case 'compact_results':
 						// Results list (Used to view the lists of the users, messages, contacts and etc.):
-						return array(
+						$results_template = array(
 							'page_url' => '', // All generated links will refer to the current page
 							'before' => '<div class="results panel panel-default">',
 							'content_start' => '<div id="$prefix$ajax_content">',
@@ -1311,9 +1403,9 @@ class Skin extends DataObject
 									'line_start_odd' => '<tr class="odd">'."\n",
 									'line_start_last' => '<tr class="even lastline">'."\n",
 									'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-										'col_start' => '<td $class_attrib$>',
-										'col_start_first' => '<td class="firstcol $class$">',
-										'col_start_last' => '<td class="lastcol $class$">',
+										'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+										'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+										'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 										'col_end' => "</td>\n",
 									'line_end' => "</tr>\n\n",
 									'grp_line_start' => '<tr class="group">'."\n",
@@ -1362,6 +1454,18 @@ class Skin extends DataObject
 							'after' => '</div>',
 							'sort_type' => 'basic'
 						);
+						if( $name == 'compact_results' )
+						{	// Use a little different template for compact results table:
+							$results_template = array_merge( $results_template, array(
+									'before' => '<div class="results">',
+									'head_title' => '',
+									'no_results_start' => '<div class="table_scroll">'."\n"
+																				.'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0"><tbody>'."\n",
+									'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
+																				.'</tbody></table></div>'."\n\n",
+								) );
+						}
+						return $results_template;
 
 					case 'blockspan_form':
 						// Form settings for filter area:
@@ -1599,6 +1703,10 @@ class Skin extends DataObject
 					case 'modal_window_js_func':
 						// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 						return 'echo_modalwindow_js_bootstrap';
+
+					case 'colorbox_css_file':
+						// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+						return 'colorbox-bootstrap.min.css';
 				}
 				break;
 		}
@@ -1607,6 +1715,7 @@ class Skin extends DataObject
 		switch( $name )
 		{
 			case 'Results':
+			case 'compact_results':
 				// Results list:
 				return array(
 					'page_url' => '', // All generated links will refer to the current page
@@ -1646,9 +1755,9 @@ class Skin extends DataObject
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -1733,6 +1842,10 @@ class Skin extends DataObject
 				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
 				return 'children';
 
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-regular.min.css';
+
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'
 				return 'hintbox';
@@ -1740,6 +1853,134 @@ class Skin extends DataObject
 
 		return array();
 	}
+
+
+	/**
+	 * Memorize that a specific css that file will be required by the current page.
+	 * @see require_css() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of CSS file relative to <base> tag (current skin folder)
+	 */
+	function require_css( $css_file )
+	{
+		global $app_version_long;
+		require_css( $css_file, 'relative', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long );
+	}
+
+
+	/**
+	 * Memorize that a specific javascript file will be required by the current page.
+	 * @see require_js() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 */
+	function require_js( $js_file )
+	{
+		global $app_version_long;
+		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
+	}
+
+
+    /**
+     * Web safe fonts for default skin usage
+     *
+     * Used for font customization
+     */
+    private $font_definitions = array(
+        'system_arial' => array( 'Arial', 'Arial, Helvetica, sans-serif' ),
+        'system_arialblack' => array( 'Arial Black', '\'Arial Black\', Gadget, sans-serif' ),
+        'system_arialnarrow' => array( 'Arial Narrow', '\'Arial Narrow\', sans-serif' ),
+        'system_centrygothic' => array( 'Century Gothic', 'Century Gothic, sans-serif' ),
+        'system_copperplategothiclight' => array( 'Copperplate Gothic Light', 'Copperplate Gothic Light, sans-serif' ),
+        'system_couriernew' => array( 'Courier New', '\'Courier New\', Courier, monospace' ),
+        'system_georgia' => array( 'Georgia', 'Georgia, Serif' ),
+        'system_helveticaneue' => array( 'Helvetica Neue', '\'Helvetica Neue\',Helvetica,Arial,sans-serif' ),
+        'system_impact' => array( 'Impact', 'Impact, Charcoal, sans-serif' ),
+        'system_lucidaconsole' => array( 'Lucida Console', '\'Lucida Console\', Monaco, monospace' ),
+        'system_lucidasansunicode' => array( 'Lucida Sans Unicode', '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif' ),
+        'system_palatinolinotype' => array( 'Palatino Linotype', '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif' ),
+        'system_tahoma' => array( 'Tahoma', 'Tahoma, Geneva, sans-serif' ),
+        'system_timesnewroman' => array( 'Times New Roman', '\'Times New Roman\', Times, serif' ),
+        'system_trebuchetms' => array( 'Trebuchet MS', '\'Trebuchet MS\', Helvetica, sans-serif' ),
+        'system_verdana' => array( 'Verdana', 'Verdana, Geneva, sans-serif' ),
+    );
+
+
+    /**
+     * Returns an option list for font customization
+     *
+     * Uses: $this->font_definitions
+     */
+    function get_font_definitions()
+    {
+        // Pull font array keys
+        $font_options = array_keys($this->font_definitions);
+
+        // Pull first value from each array key
+        $font_names = array();
+        foreach ($this->font_definitions as $f) {
+            $font_names[] = current($f);
+        }
+
+        // Create array in format: 'system_arial' => 'arial', etc.
+        $dropdown_option_list = array_combine($font_options, $font_names);
+
+        return $dropdown_option_list;
+    }
+
+
+    /**
+     * Returns a CSS code for font customization
+     *
+     * Uses: $this->font_definitions
+     */
+    function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL, $font_weight_param = NULL )
+    {
+		$font_css = array();
+
+		// Get default font family and font-weight
+		$default_font_family = $this->get_setting_default_value( $font_family_param );
+		$default_font_weight = $this->get_setting_default_value( $font_weight_param );
+
+        // Select the font family CSS string
+		$selected_font_family = $this->get_setting( $font_family_param );
+		if( $selected_font_family != $default_font_family )
+		{
+			$selected_font_css = $this->font_definitions[$selected_font_family][1];
+			$font_css[] = "font-family: $selected_font_css;";
+		}
+
+		// If $text_size_param is passed, add font-size property
+		if( ! is_null( $text_size_param ) )
+		{
+			$selected_text_size = $this->get_setting( $text_size_param );
+			$font_css[] = 'font-size: '.$selected_text_size.';';
+		}
+
+		// If $font_weight_param is passed, add font-weight property
+		if( ! is_null( $font_weight_param ) )
+		{
+			$selected_font_weight = $this->get_setting( $font_weight_param );
+			if( $selected_font_weight != $default_font_weight )
+			{
+				$font_css[] = 'font-weight: '.$selected_font_weight.';';
+			}
+		}
+
+        // Prepare the complete CSS for font customization
+		if( ! empty( $font_css ) )
+		{
+        	$custom_css = "$target_element { ".implode( ' ', $font_css )." }\n";
+		}
+		else
+		{
+			$custom_css = '';
+		}
+
+		return $custom_css;
+    }
 }
 
 ?>

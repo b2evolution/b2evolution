@@ -33,6 +33,79 @@ $GLOBALS['debug_params'] = false;
 
 
 /**
+ * Format param value to valid value depending on type
+ *
+ * @param mixed Param value
+ * @param string Force value type to one of:
+ * - integer
+ * - float, double
+ * - string (strips (HTML-)Tags, trims whitespace)
+ * - text like string but allows multiple lines
+ * - html (does nothing, for now)
+ * - raw (does nothing)
+ * - boolean (will force type to boolean, but you can't use 'true' as a default since it has special meaning. There is no real reason to pass booleans on a URL though. Passing 0 and 1 as integers seems to be best practice).
+ * - url (like string but dies on illegal urls)
+ * - htmlspecialchars (convert all html to special characters)
+ * @return mixed Formated param value
+ */
+function param_format( $value, $type = 'raw' )
+{
+	switch( $type )
+	{
+		case 'html': // Technically does the same as "raw", but may do more in the future.
+		case 'raw':
+			// Clean utf8:
+			return utf8_clean( $value );
+
+		case 'htmlspecialchars':
+			global $evo_charset;
+			// convert all html to special characters:
+			$value = utf8_trim( htmlspecialchars( $value, ENT_COMPAT, $evo_charset ) );
+			// cross-platform newlines:
+			return preg_replace( "~(\r\n|\r)~", "\n", $value );
+
+		case 'text':
+			// strip out any html:
+			$value = utf8_trim( utf8_strip_tags( $value ) );
+			// cross-platform newlines:
+			return preg_replace( "~(\r\n|\r)~", "\n", $value );
+
+		case 'string':
+			// Make sure the string is a single line
+			$value = preg_replace( '~\r|\n~', '', $value );
+			// strip out any html:
+			$value = utf8_strip_tags( $value );
+			return utf8_trim( $value );
+
+		case 'url':
+			// strip out any html:
+			$value = utf8_trim( utf8_strip_tags( $value ) );
+			// Remove new line chars and double quote from url
+			return preg_replace( '~\r|\n|"~', '', $value );
+
+		case 'filepath':
+			// Fiel path must be a string:
+			$value = param_format( $value, 'string' );
+			// Replace windows backslashes:
+			return str_replace( '\\', '/', $value );
+
+		case 'boolean':
+			return (bool)$value;
+
+		case 'integer':
+			return intval( $value );
+
+		case 'float':
+		case 'double':
+			return floatval( $value );
+
+		default:
+			// Unknown format type:
+			return $value;
+	}
+}
+
+/**
  * Sets a parameter with values from the request or to provided default,
  * except if param is already set!
  *
@@ -49,18 +122,22 @@ $GLOBALS['debug_params'] = false;
  * - float, double
  * - string (strips (HTML-)Tags, trims whitespace)
  * - text like string but allows multiple lines
+ * - filepath like string but die execution if it contains unsecure string like "../"
  * - array (it may contains arbitrary array elements) NOTE: If there is one way to avoid and use some other array type then it should not be used
  * - array:integer (elements of array must be integer)
  * - array:string (strips (HTML-)Tags, trims whitespace of array's elements)
+ * - array:filepath (elements of array must be allowed file paths)
  * - array:/regexp/ (elements of array must match to the given regular expression) e.g. 'array:/^[a-z]*$/'
  * - array:array:integer (two dimensional array and the elements must be integers)
  * - array:array:string (strips (HTML-)Tags, trims whitespace of the two dimensional array's elements)
+ * - array:array:filepath (elements of array must be allowed file paths)
  * - html (does nothing, for now)
  * - raw (does nothing)
  * - '' (does nothing) -- DEPRECATED, use "raw" instead
  * - '/^...$/' check regexp pattern match (string)
  * - boolean (will force type to boolean, but you can't use 'true' as a default since it has special meaning. There is no real reason to pass booleans on a URL though. Passing 0 and 1 as integers seems to be best practice).
  * - url (like string but dies on illegal urls)
+ * - htmlspecialchars (convert all html to special characters)
  * Value type will be forced only if resulting value (probably from default then) is !== NULL
  * @param mixed Default value or TRUE if user input required
  * @param boolean Do we need to memorize this to regenerate the URL for this page?
@@ -159,8 +236,8 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
-				// Clean utf8:
-				$GLOBALS[$var] = utf8_clean( $GLOBALS[$var] );
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
 
 				// do nothing
 				if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> as RAW Unsecure HTML', 'params' );
@@ -172,10 +249,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
-				// convert all html to special characters:
-				$GLOBALS[$var] = utf8_trim( htmlspecialchars( $GLOBALS[$var], ENT_COMPAT, $evo_charset ) );
-				// cross-platform newlines:
-				$GLOBALS[$var] = preg_replace( "~(\r\n|\r)~", "\n", $GLOBALS[$var] );
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
+
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as text with html special chars', 'params' );
 				break;
 
@@ -185,10 +261,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
-				// strip out any html:
-				$GLOBALS[$var] = utf8_trim( utf8_strip_tags($GLOBALS[$var]) );
-				// cross-platform newlines:
-				$GLOBALS[$var] = preg_replace( "~(\r\n|\r)~", "\n", $GLOBALS[$var] );
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
+
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as text', 'params' );
 				break;
 
@@ -198,16 +273,8 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
-				// echo $var, '=', $GLOBALS[$var], '<br />';
-				// Make sure the string is a single line
-				$GLOBALS[$var] = preg_replace( '~\r|\n~', '', $GLOBALS[$var] );
-
-				// strip out any html:
-				$GLOBALS[$var] = utf8_strip_tags($GLOBALS[$var]);
-
-				// echo "param $var=".$GLOBALS[$var]."<br />\n";
-				$GLOBALS[$var] = utf8_trim($GLOBALS[$var]);
-				// echo "param $var=".$GLOBALS[$var]."<br />\n";
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
 
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
 				break;
@@ -218,12 +285,8 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
-				// Decode url:
-				$GLOBALS[$var] = urldecode( $GLOBALS[$var] );
-				// strip out any html:
-				$GLOBALS[$var] = utf8_trim( utf8_strip_tags( $GLOBALS[$var] ) );
-				// Remove new line chars and double quote from url
-				$GLOBALS[$var] = preg_replace( '~\r|\n|"~', '', $GLOBALS[$var] );
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
 
 				if( ! empty( $GLOBALS[$var] ) && ! preg_match( '#^(/|\?|https?://)#i', $GLOBALS[$var] ) )
 				{ // We cannot accept this MISMATCH:
@@ -233,6 +296,23 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as url', 'params' );
 				break;
 
+			case 'filepath':
+				if( ! is_scalar( $GLOBALS[$var] ) )
+				{	// This happens if someone uses "foo[]=x" where "foo" is expected as string
+					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
+				}
+
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], 'filepath' );
+
+				if( ! is_safe_filepath( $GLOBALS[$var] ) )
+				{	// We cannot accept this unsecure file path:
+					bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+				}
+
+				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as filepath', 'params' );
+				break;
+
 			case 'array:integer':
 			case 'array:array:integer':
 				// Set elements type to integer, and set the corresponding regular expression
@@ -240,19 +320,21 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				$elements_regexp = '/^(\+|-)?[0-9]+$/';
 			case 'array':
 			case 'array:string':
+			case 'array:filepath':
 			case 'array:regexp':
 			case 'array:array:string':
+			case 'array:array:filepath':
 				if( ! is_array( $GLOBALS[$var] ) )
 				{ // This param must be array
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not array!' );
 				}
 
-				// Store current array in temp var for checking and preparing
+				// Store current array in temp var for checking and preparing:
 				$globals_var = $GLOBALS[$var];
-				// Check if the given array type is one dimensional array
-				$one_dimensional = ( ( $type == 'array' ) || ( $type == 'array:integer' ) || ( $type == 'array:string' ) || ( $type == 'array:regexp' ) );
-				// Check if the given array type should contains string elements
-				$contains_strings = ( ( $type == 'array:string' ) || ( $type == 'array:array:string' ) );
+				// Check if the given array type is one dimensional array:
+				$one_dimensional = ( ( $type == 'array' ) || ( $type == 'array:integer' ) || ( $type == 'array:string' ) || ( $type == 'array:filepath' ) || ( $type == 'array:regexp' ) );
+				// Check if the given array type should contains string elements:
+				$contains_strings = ( ( $type == 'array:string' ) || ( $type == 'array:array:string' ) || ( $type == 'array:filepath' ) || ( $type == 'array:array:filepath' ) );
 				if( $one_dimensional )
 				{ // Convert to a two dimensional array to handle one and two dimensional arrays the same way
 					$globals_var = array( $globals_var );
@@ -280,11 +362,20 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 						}
 
 						if( $contains_strings )
-						{ // Prepare string elements of array
-							// Make sure the string is a single line
-							$var_value = preg_replace( '~\r|\n~', '', $var_value );
-							// strip out any html:
-							$globals_var[$i][$j] = utf8_trim( utf8_strip_tags( $var_value ) );
+						{	// Prepare string elements of array:
+							if( $type == 'array:filepath' || $type == 'array:array:filepath' )
+							{	// Special verifying for file path params:
+								// Format param to valid file path value:
+								$globals_var[$i][$j] = param_format( $var_value, 'filepath' );
+								if( ! is_safe_filepath( $globals_var[$i][$j] ) )
+								{	// We cannot accept this unsecure file path:
+									bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+								}
+							}
+							else
+							{	// Format param to valid string value:
+								$globals_var[$i][$j] = param_format( $var_value, 'string' );
+							}
 							continue;
 						}
 
@@ -976,8 +1067,8 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 	}
 
 	if( empty( $date_format ) )
-	{	// Use locale date format:
-		$date_format = locale_datefmt();
+	{	// Use locale input date format:
+		$date_format = locale_input_datefmt();
 	}
 
 	// Convert PHP date format to regexp pattern:
@@ -991,7 +1082,7 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 			case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
 			case "e": // b2evo extension!
 				return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
-			case "S": return "(st|nd|rd|th)"; // english suffix for day
+			case "S": return "(st|nd|rd|th)?"; // english suffix for day. Made optional as jQuery formatDate does not support this format.
 
 			case "m": return "([0-1]\\d)"; // month, 01-12
 			case "n": return "(1?\\d)"; // month, 1-12
@@ -1259,6 +1350,10 @@ function param_extend_list( $var, $var_ext_array, $save_prefix = true )
 /**
  * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
  * and keeps those values available for future reference (category widget)
+ *
+ * @param integer Colection ID to restrict chapters only from this collection
+ * @param integer Default category ID
+ * @param array Default categories IDs
  */
 function param_compile_cat_array( $restrict_to_blog = 0, $cat_default = NULL, $catsel_default = array() )
 {
@@ -1430,26 +1525,26 @@ function param_check_passwords( $var1, $var2, $required = false, $min_length = 6
 
 	if( ! strlen( $pass1 ) )
 	{
-		param_error( $var1, $params['msg_pass_new'] );
-		param_error( $var2, $params['msg_pass_twice'] );
+		param_error( $var1, '<span class="pass_check_new">'.$params['msg_pass_new'].'</span>' );
+		param_error( $var2, '<span class="pass_check_twice">'.$params['msg_pass_twice'].'</span>' );
 		return false;
 	}
 	if( ! strlen( $pass2 ) )
 	{
-		param_error( $var2, $params['msg_pass_twice'] );
+		param_error( $var2, '<span class="pass_check_twice">'.$params['msg_pass_twice'].'</span>' );
 		return false;
 	}
 
 	// checking the password has been typed twice the same:
 	if( $pass1 != $pass2 )
 	{
-		param_error_multiple( array( $var1, $var2 ), $params['msg_pass_diff'] );
+		param_error_multiple( array( $var1, $var2 ), '<span class="pass_check_diff">'.$params['msg_pass_diff'].'</span>' );
 		return false;
 	}
 
 	if( utf8_strlen( $pass1 ) < $min_length )
 	{ // Checking min length
-		param_error_multiple( array( $var1, $var2 ), sprintf( $params['msg_pass_min'], $min_length ) );
+		param_error_multiple( array( $var1, $var2 ), '<span class="pass_check_min">'.sprintf( $params['msg_pass_min'], $min_length ).'</span>' );
 		return false;
 	}
 
@@ -1528,10 +1623,16 @@ function param_get_error_msg( $var )
  * @param string param name
  * @param string|NULL error message (by using NULL you can only add an error to the field, but not the $Message object)
  * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ * @param string|NULL error message
  */
-function param_error( $var, $err_msg, $field_err_msg = NULL )
+function param_error( $var, $err_msg, $field_err_msg = NULL, $group_header = NULL )
 {
 	global $param_input_err_messages;
+
+	if( is_null( $group_header ) )
+	{
+		$group_header = T_('Validation errors:');
+	}
 
 	if( ! isset( $param_input_err_messages[$var] ) )
 	{ // We haven't already recorded an error for this field:
@@ -1543,7 +1644,7 @@ function param_error( $var, $err_msg, $field_err_msg = NULL )
 
 		if( isset($err_msg) )
 		{
-			param_add_message_to_Log( $var, $err_msg, 'error' );
+			param_add_message_to_Log( $var, $err_msg, 'error', $group_header );
 		}
 	}
 }
@@ -1589,7 +1690,7 @@ function param_error_multiple( $vars, $err_msg, $field_err_msg = NULL )
  * @param string param name
  * @param string error message
  */
-function param_add_message_to_Log( $var, $err_msg, $log_category = 'error' )
+function param_add_message_to_Log( $var, $err_msg, $log_category = 'error', $group_header = NULL )
 {
 	global $link_param_err_messages_to_field_IDs;
 	global $Messages;
@@ -1606,16 +1707,37 @@ function param_add_message_to_Log( $var, $err_msg, $log_category = 'error' )
 
 		if( substr($err_msg, 0, 4) == '</a>' )
 		{ // There was a link at the beginning of $err_msg: we do not prepend an emtpy link before it
-			$Messages->add( substr( $err_msg, 4 ).'</a>', $log_category );
+			if( empty( $group_header ) )
+			{
+				$Messages->add( substr( $err_msg, 4 ).'</a>', $log_category );
+			}
+			else
+			{
+				$Messages->add_to_group( substr( $err_msg, 4 ).'</a>', $log_category, $group_header );
+			}
 		}
 		else
 		{
-			$Messages->add( $start_link.$err_msg.'</a>', $log_category );
+			if( empty( $group_header ) )
+			{
+				$Messages->add( $start_link.$err_msg.'</a>', $log_category );
+			}
+			else
+			{
+				$Messages->add_to_group( $start_link.$err_msg.'</a>', $log_category, $group_header );
+			}
 		}
 	}
 	else
 	{
-		$Messages->add( $err_msg, $log_category );
+		if( empty( $group_header ) )
+		{
+			$Messages->add( $err_msg, $log_category );
+		}
+		else
+		{
+			$Messages->add_to_group( $err_msg, $log_category, $group_header );
+		}
 	}
 }
 
@@ -1950,15 +2072,15 @@ function get_param_urlencoded($var, $value, $glue = '&amp;')
  */
 function is_regexp( $reg_exp, $includes_delim = false )
 {
-	$sPREVIOUSHANDLER = set_error_handler( '_trapError' );
+	set_error_handler( '_trapError' );
 	if( ! $includes_delim )
 	{
 		$reg_exp = '#'.str_replace( '#', '\#', $reg_exp ).'#';
 	}
 	preg_match( $reg_exp, '' );
-	restore_error_handler( $sPREVIOUSHANDLER );
+	restore_error_handler();
 
-	return !_traperror();
+	return !_trapError();
 }
 
 
@@ -2336,7 +2458,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			default:
 				$object_type = NULL;
 		}
-		syslog_insert( sprintf( T_('Antispam: Illegal content found. Content contains blacklisted word "%s".'), $block ), 'error', $object_type );
+		syslog_insert( sprintf( 'Antispam: Illegal content found. Content contains blacklisted word "%s".', $block ), 'error', $object_type );
 	}
 
 	if( $error && $verbose )
@@ -2354,7 +2476,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), htmlspecialchars($block) );
 		}
 
-		$Messages->add(	$errmsg, 'error' );
+		$Messages->add_to_group(	$errmsg, 'error', T_('Validation errors:') );
 	}
 
 	$content = trim( $content );
@@ -2398,7 +2520,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		$css_tweaks_error = ( ( ! $allow_css_tweaks ) && preg_match( '#\s((style|class|id)\s*=)#i', $check, $matches ) );
 		if( $css_tweaks_error && $verbose )
 		{
-			$Messages->add( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add_to_group( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// CHECK JAVASCRIPT:
@@ -2409,21 +2531,21 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 				|| preg_match( '#=["\'\s]*((javascript|vbscript|about):)#i', $check, $matches ) ) );
 		if( $javascript_error && $verbose )
 		{
-			$Messages->add( T_('Illegal javascript markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add_to_group( T_('Illegal javascript markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// CHECK IFRAMES:
 		$iframe_error = ( ( ! $allow_iframes ) && preg_match( '~( < \s* //? \s* (frame|iframe) )~xi', $check, $matches ) );
 		if( $iframe_error && $verbose )
 		{
-			$Messages->add( T_('Illegal frame markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add_to_group( T_('Illegal frame markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// CHECK OBJECTS:
 		$object_error = ( ( ! $allow_objects ) && preg_match( '~( < \s* //? \s* (applet|object|param|embed) )~xi', $check, $matches ) );
 		if( $object_error && $verbose )
 		{
-			$Messages->add( T_('Illegal object markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add_to_group( T_('Illegal object markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// Set the final error value based on all of the results
@@ -2436,8 +2558,8 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			&& ( ! empty( $Group ) ) // This one will basically prevent this case from happening when commenting
 			&& $User->check_perm( 'users', 'edit', false ) )
 		{
-			$Messages->add( sprintf( T_('(Note: To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.)'),
-										'href="'.$admin_url.'?ctrl=groups&amp;grp_ID='.$Group->ID.'"' ), 'error' );
+			$Messages->add_to_group( sprintf( T_('To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.'),
+										'href="'.$admin_url.'?ctrl=groups&amp;grp_ID='.$Group->ID.'"' ), 'error', T_('Validation errors:') );
 		}
 		return false;
 	}
@@ -2515,10 +2637,10 @@ function balance_tags( $text )
 
 			// Tag Cleaning
 
-			// Push if not img, br, hr, param or input
-			if($tag != 'br' && $tag != 'img' && $tag != 'hr' && $tag != 'param' && $tag != 'input')
+			// Push if not void HTML tags:
+			if( ! in_array( $tag, array( 'br', 'img', 'hr', 'param', 'input', 'link', 'meta', 'base', 'area', 'col', 'command', 'embed', 'keygen', 'source', 'track', 'wbr' ) ) )
 			{
-				$stacksize = array_push ($tagstack, $tag);
+				$stacksize = array_push( $tagstack, $tag );
 				$closing = '>';
 			}
 			else
@@ -2570,6 +2692,94 @@ function balance_tags( $text )
 function isset_param( $var )
 {
 	return isset($_POST[$var]) || isset($_GET[$var]);
+}
+
+
+/**
+ * Check if a serialized data is an array and doesn't contain any object inside
+ *
+ * @param string Param name from request
+ * @return boolean TRUE on expected data
+ */
+function param_check_serialized_array( $param_name )
+{
+	$param_value = get_param( $param_name );
+
+	if( ! is_string( $param_value ) )
+	{	// A serialized data must be a string:
+		return false;
+	}
+
+	// Search all string items in the serialized array:
+	preg_match_all( '/[{;]s:(\d+):"/', $param_value, $matches, PREG_OFFSET_CAPTURE );
+	foreach( $matches[0] as $m => $match )
+	{	// And replace its values with spaces in order to don't decide below the following string values as object structures:
+		//    a:2:{s:1:"a";s:1:"b";i:123;O:8:"stdClass":1:{s:1:"a";s:1:"b";}}
+		$param_value = substr_replace( $param_value, str_repeat( ' ', (int)$matches[1][ $m ][0] ), $match[1] + strlen( $match[0] ), (int)$matches[1][ $m ][0] );
+	}
+
+	if(
+		// Allow to unserialize only arrays, main reason is an excluding of object structure like:
+		//     - O:7:"Results":1:{s:3:"sql";s:21:"SELECT * FROM T_users";}
+		( substr( $param_value, 0, 2 ) == 'a:' ) &&
+		// + Check there is no Object in the array (We NEVER want to unserialize an object):
+		//     a:1:{s:3:"key";O:8:"stdClass":1:{s:1:"x";i:1;}}
+		//     a:1:{i:123;O:8:"stdClass":1:{s:1:"x";i:1;}}
+		//     a:1:{s:3:"key";a:1:{s:3:"sub";O:8:"stdClass":1:{s:1:"x";i:1;}}}
+		//     a:1:{s:3:"key";a:1:{i:456;O:8:"stdClass":1:{s:1:"x";i:1;}}}
+		//   This checking exclude real string with object structure value like ';O:8:':
+		//     a:1:{s:3:"key";s:5:";O:8:";}
+		( ! preg_match( '/(s:\d+:"[^"]*"|i:\d+);O:\+?[0-9]+:"/', $param_value ) )
+	)
+	{	// Correct data:
+		return true;
+	}
+	else
+	{	// Wrong data:
+		return false;
+	}
+}
+
+
+/**
+ * Check if the file path is safe
+ *
+ * @param string File path
+ * @return boolean
+ */
+function is_safe_filepath( $filepath )
+{
+	global $filemanager_allow_dotdot_in_filenames;
+
+	if( ! isset( $filemanager_allow_dotdot_in_filenames ) )
+	{	// This config var is required:
+		debug_die( 'The var <strong>$filemanager_allow_dotdot_in_filenames</strong> must be defined in config file.' );
+	}
+
+	if( empty( $filepath ) )
+	{	// Allow empty file path:
+		return true;
+	}
+
+	if( ! $filemanager_allow_dotdot_in_filenames &&
+	    strpos( $filepath, '..' ) !== false )
+	{	// Don't allow .. in file path because it is disable by config:
+		return false;
+	}
+
+	do
+	{	// Decode file path while it is possible:
+		$orig_filepath = $filepath;
+		$filepath = urldecode( $filepath );
+
+		if( strpos( $filepath, '../' ) !== false || strpos( $filepath, '..\\' ) !== false )
+		{	// Don't allow a traversal directory:
+			return false;
+		}
+	}
+	while( $filepath != $orig_filepath );
+
+	return true;
 }
 
 ?>

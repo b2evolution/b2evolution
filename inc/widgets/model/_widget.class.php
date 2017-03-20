@@ -319,9 +319,12 @@ class ComponentWidget extends DataObject
 
 		if( ! isset( $r['allow_blockcache'] ) )
 		{
+			$widget_Blog = & $this->get_Blog();
 			$r['allow_blockcache'] = array(
 					'label' => T_( 'Allow caching' ),
-					'note' => T_( 'Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.' ),
+					'note' => ( $widget_Blog && $widget_Blog->get_setting( 'cache_enabled_widgets' ) ) ?
+							T_('Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.') :
+							T_('Block caching is disabled for this collection.'),
 					'type' => 'checkbox',
 					'defaultvalue' => true,
 				);
@@ -429,7 +432,7 @@ class ComponentWidget extends DataObject
 			return;
 		}
 
-		// Generate widget defaults array:
+		// Generate widget defaults (editable params) array:
 		$widget_defaults = array();
 		$defs = $this->get_param_definitions( array() );
 		foreach( $defs as $parname => $parmeta )
@@ -451,9 +454,11 @@ class ComponentWidget extends DataObject
 		// Load DB configuration:
 		$this->load_param_array();
 
-		// Merge basic defaults < widget defaults < container params < DB params
+		// DEFAULT CONTAINER PARAMS:
+		// Merge basic defaults < widget defaults (editable params) < container params < DB params
 		// note: when called with skin_widget it falls back to basic defaults < widget defaults < calltime params < array()
 		$params = array_merge( array(
+					'widget_context' => 'general',		// general | item
 					'block_start' => '<div class="evo_widget widget $wi_class$">',
 					'block_end' => '</div>',
 					'block_display_title' => true,
@@ -469,14 +474,21 @@ class ComponentWidget extends DataObject
 					'list_end' => '</ul>',
 					'item_start' => '<li>',
 					'item_end' => '</li>',
-					'link_default_class' => 'default',
-					'link_selected_class' => 'selected',
-					'item_text_start' => '',
-					'item_text_end' => '',
-					'item_text' => '%s',
+						'link_default_class' => 'default',
+						'link_selected_class' => 'selected',
+						'item_text_start' => '',
+						'item_text_end' => '',
+						'item_text' => '%s',
 					'item_selected_start' => '<li class="selected">',
 					'item_selected_end' => '</li>',
 					'item_selected_text' => '%s',
+
+					// Automatically detect whether we are displaying menu links as list elements or as standalone buttons:
+					'inlist' => 'auto',		// may alose be true or false
+					// Button styles used for Menu Links / Buttons widgets:
+					'button_default_class' => 'btn btn-default',
+					'button_selected_class' => 'btn btn-default active',
+
 					'grid_start' => '<table cellspacing="1" class="widget_grid">',
 						'grid_colstart' => '<tr>',
 							'grid_cellstart' => '<td>',
@@ -500,8 +512,6 @@ class ComponentWidget extends DataObject
 					'group_end' => '</ul>',
 					'group_item_start' => '<li>',
 					'group_item_end' => '</li>',
-					'group_item_selected_start' => '<li class="selected">',
-					'group_item_selected_end' => '</li>',
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
 					'tag_cloud_start' => '<p class="tag_cloud">',
@@ -569,7 +579,7 @@ class ComponentWidget extends DataObject
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 		global $Plugins;
 		global $rsc_url;
 
@@ -579,6 +589,8 @@ class ComponentWidget extends DataObject
 		switch( $this->type )
 		{
 			case 'plugin':
+				// Set widget ID param to make it available in plugin function SkinTag():
+				$this->disp_params['wi_ID'] = $this->ID;
 				// Call plugin (will return false if Plugin is not enabled):
 				if( $Plugins->call_by_code( $this->code, $this->disp_params ) )
 				{
@@ -602,7 +614,7 @@ class ComponentWidget extends DataObject
 	 */
 	function display_with_cache( $params, $keys = array() )
 	{
-		global $Blog, $Timer, $debug, $admin_url, $Session;
+		global $Collection, $Blog, $Timer, $debug, $admin_url, $Session;
 
 		$this->init_display( $params );
 
@@ -693,7 +705,7 @@ class ComponentWidget extends DataObject
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $this->type == 'plugin' && $this->get_Plugin() )
 		{	// Get widget cache keys from plugin:
@@ -728,8 +740,8 @@ class ComponentWidget extends DataObject
 			if( $check_blog_restriction )
 			{ // Check blog restriction for widget caching
 				$widget_Blog = & $this->get_Blog();
-				if( ! $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
-				{ // Widget/block cache is not allowed by blog setting
+				if( $widget_Blog && ! $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
+				{	// Widget/block cache is not allowed by collection setting:
 					return 'denied';
 				}
 			}
@@ -784,7 +796,7 @@ class ComponentWidget extends DataObject
 		/**
 		 * @var Blog
 		 */
-		global $Blog, $baseurl;
+		global $Collection, $Blog, $baseurl;
 
 		echo $this->disp_params['block_start'];
 
@@ -936,7 +948,7 @@ class ComponentWidget extends DataObject
 		if( $this->Blog === NULL )
 		{ // Get blog only first time
 			$BlogCache = & get_BlogCache();
-			$this->Blog = & $BlogCache->get_by_ID( $this->coll_ID );
+			$this->Blog = & $BlogCache->get_by_ID( $this->coll_ID, false, false );
 		}
 
 		return $this->Blog;
@@ -1119,6 +1131,161 @@ class ComponentWidget extends DataObject
 					return $this->disp_params[$disp_param_prefix.'item_end'];
 				}
 		}
+	}
+
+
+	/**
+	 * Get a layout for menu link
+	 *
+	 * @param string Link URL
+	 * @param string Link text
+	 * @param boolean Is active menu link?
+	 * @param string Link template, possible masks: $link_url$, $link_class$, $link_text$
+	 * @return string
+	 */
+	function get_layout_menu_link( $link_url, $link_text, $is_active_link, $link_template = '<a href="$link_url$" class="$link_class$">$link_text$</a>' )
+	{
+		$r = $this->disp_params['block_start'];
+		$r .= $this->disp_params['block_body_start'];
+
+		// Are we displaying a link in a list or a standalone button?
+		// "Menu" Containers are 'inlist'. Some sub-containers will also be 'inlist' (displaying a local menu).
+		// fp> Maybe this should be moved up to container level? 
+		$inlist = $this->disp_params['inlist'];
+		if( $inlist == 'auto' )
+		{
+			if( empty( $this->disp_params['list_start'] ) )
+			{	// We're not starting a list. This means (very high probability) that we are already in a list:
+				$inlist = true;
+			}
+			else
+			{	// We have no override for list start. This means (very high probability) that we are displaying a standalone link -> we want a button for this widget
+				$inlist = false;
+			}
+		}
+
+		if( $inlist )
+		{	// Classic menu link display:
+
+			// It's debatable whether of not we want 'list_start' here but it doesn't hurt to keep it (will be empty under typical circumstances):
+			$r .= $this->disp_params['list_start'];
+
+			if( $is_active_link )
+			{	// Use template and class to highlight current menu item:
+				$r .= $this->disp_params['item_selected_start'];
+				$link_class = $this->disp_params['link_selected_class'];
+			}
+			else
+			{	// Use normal template:
+				$r .= $this->disp_params['item_start'];
+				$link_class = $this->disp_params['link_default_class'];
+			}
+
+			// Get a link from template:
+			$r .= str_replace(
+				array( '$link_url$', '$link_class$', '$link_text$' ),
+				array( $link_url, $link_class, $link_text ),
+				$link_template );
+
+			if( $is_active_link )
+			{	// Use template to highlight current menu item:
+				$r .= $this->disp_params['item_selected_end'];
+			}
+			else
+			{	// Use normal template:
+				$r .= $this->disp_params['item_end'];
+			}
+
+			$r .= $this->disp_params['list_end'];
+		}
+		else
+		{	// "out-of list" button display:
+
+			if( $is_active_link )
+			{	// Use template and class to highlight current menu item:
+				$button_class = $this->disp_params['button_selected_class'];
+			}
+			else
+			{	// Use normal template:
+				$button_class = $this->disp_params['button_default_class'];
+			}
+
+			// Get a button from template:
+			$r .= str_replace(
+				array( '$link_url$', '$link_class$', '$link_text$' ),
+				array( $link_url, $button_class, $link_text ),
+				$link_template );
+		}
+
+		$r .= $this->disp_params['block_body_end'];
+		$r .= $this->disp_params['block_end'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Get the list of validated renderers for this Widget. This includes stealth plugins etc.
+	 *
+	 * @return array List of validated renderer codes
+	 */
+	function get_renderers_validated()
+	{
+		if( ! isset( $this->renderers_validated ) )
+		{
+			global $Plugins;
+
+			$widget_Blog = & $this->get_Blog();
+
+			// Convert active renderers options for plugin functions below:
+			$widget_renderers = array_keys( $this->disp_params['renderers'] );
+
+			$this->renderers_validated = $Plugins->validate_renderer_list( $widget_renderers, array(
+					'Blog'         => & $widget_Blog,
+					'setting_name' => 'coll_apply_rendering'
+				) );
+		}
+
+		return $this->renderers_validated;
+	}
+
+
+	/**
+	 * Get content which is rendered with plugins
+	 *
+	 * @param string Source content
+	 * @return string Rendered content
+	 */
+	function get_rendered_content( $content )
+	{
+		if( ! isset( $this->disp_params['renderers'] ) )
+		{	// This widget has no render settings, Return original content:
+			return $content;
+		}
+
+		global $Plugins;
+
+		$widget_Blog = & $this->get_Blog();
+		$widget_renderers = $this->get_renderers_validated();
+
+		// Do some optional filtering on the content
+		// Typically stuff that will help the content to validate
+		// Useful for code display.
+		// Will probably be used for validation also.
+		$Plugins_admin = & get_Plugins_admin();
+		$params = array(
+				'object_type' => 'Widget',
+				'object'      => & $this,
+				'object_Blog' => & $widget_Blog
+			);
+		$fake_title = '';
+		$Plugins_admin->filter_contents( $fake_title /* by ref */, $content /* by ref */, $widget_renderers, $params /* by ref */ );
+
+		// Render block content with selected plugins:
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Render' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Display' );
+
+		return $content;
 	}
 }
 ?>

@@ -18,6 +18,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class bootstrap_manual_Skin extends Skin
 {
 	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = '6.9.1';
+
+	/**
 	 * Do we want to use style.min.css instead of style.css ?
 	 */
 	var $use_min_css = 'true';  // true|false|'check' Set this to true for better optimization
@@ -37,7 +43,7 @@ class bootstrap_manual_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -54,6 +60,34 @@ class bootstrap_manual_Skin extends Skin
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'no',
+				'std' => 'no',		// Blog
+				'photo' => 'no',
+				'forum' => 'no',
+				'manual' => 'yes',
+				'group' => 'no',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -79,9 +113,10 @@ class bootstrap_manual_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
+						'size' => '7',
 						'allow_empty' => true,
 					),
 					'page_navigation' => array(
@@ -257,7 +292,7 @@ class bootstrap_manual_Skin extends Skin
 
 		if( $this->is_left_navigation_visible() )
 		{ // Include JS code for left navigation panel only when it is displayed:
-			require_js( $this->get_url().'left_navigation.js' );
+			$this->require_js( 'left_navigation.js' );
 		}
 	}
 
@@ -340,7 +375,7 @@ class bootstrap_manual_Skin extends Skin
 					'featured_intro_before' => '<div class="jumbotron">',
 					'featured_intro_after'  => '</div>',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				);
 
 			default:
@@ -361,23 +396,23 @@ class bootstrap_manual_Skin extends Skin
 
 		if( in_array( $disp, array( 'access_requires_login', 'access_denied' ) ) )
 		{ // Display left navigation column on this page when at least one sidebar container is visible:
-			return $this->is_visible_container( 'sidebar' ) || $this->is_visible_container( 'sidebar2' );
+			return $this->show_container_when_access_denied( 'sidebar' ) || $this->show_container_when_access_denied( 'sidebar2' );
 		}
 
 		// Display left navigation column only on these pages:
-		return in_array( $disp, array( 'front', 'posts', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
+		return in_array( $disp, array( 'front', 'posts', 'flagged', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
 	}
 
 
 	/**
-	 * Check if we can display a widget container
+	 * Check if we can display a widget container when access is denied to collection by current user
 	 *
 	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
 	 * @return boolean TRUE to display
 	 */
-	function is_visible_container( $container_key )
+	function show_container_when_access_denied( $container_key )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $Blog->has_access() )
 		{	// If current user has an access to this collection then don't restrict containers:

@@ -24,13 +24,13 @@ load_funcs( 'dashboard/model/_dashboard.funcs.php' );
  */
 global $current_User;
 
-global $dispatcher, $allow_evo_stats, $blog;
+global $dispatcher, $blog;
 
 
 if( empty( $_GET['blog'] ) )
 { // Use dashboard for selected blog only from GET request
 	$blog = 0;
-	unset( $Blog );
+	unset( $Blog, $Collection );
 }
 
 // Site dashboard
@@ -46,7 +46,6 @@ $AdminUI->set_page_manual_link( 'site-dashboard' );
 // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
 require_js( '#jqueryUI#' );
 
-require_js( 'communication.js' ); // auto requires jQuery
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:

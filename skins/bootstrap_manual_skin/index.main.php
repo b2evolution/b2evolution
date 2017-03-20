@@ -33,6 +33,7 @@ skin_init( $disp );
 skin_include( '_html_header.inc.php', array(
 	'front_text' => '',
 	'posts_text' => isset( $bootstrap_manual_posts_text ) ? $bootstrap_manual_posts_text : '',
+	'flagged_text' => T_('Flagged pages'),
 ) );
 // -------------------------------- END OF HEADER --------------------------------
 
@@ -54,7 +55,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Page Top'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'         => '<div class="widget $wi_class$">',
+					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
 					'list_start'          => '<ul>',
@@ -74,7 +75,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Header'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="widget $wi_class$">',
+					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
 					'block_title_start' => '<h1>',
 					'block_title_end'   => '</h1>',
@@ -161,6 +162,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'catdir_text'       => '',
 					'front_text'        => '',
 					'posts_text'        => '',
+					'flagged_text'      => '',
 					'register_text'     => '',
 					'login_text'        => '',
 					'lostpassword_text' => '',
@@ -298,7 +300,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<div class="evo_container evo_container__footer">
 		<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',

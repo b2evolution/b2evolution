@@ -129,11 +129,14 @@ if( $Item->can_see_comments( true ) )
 		if( $Item->can_see_comments() )
 		{	// User can see a comments
 			$type_list[] = 'comment';
+			$Item->load_Blog();
+			$comment_inskin_statuses = explode( ',', $Item->Blog->get_setting( 'comment_inskin_statuses' ) );
+
 			if( !empty( $params['comments_title_text'] ) )
 			{
 				$disp_title[] = $params['comments_title_text'];
 			}
-			else if( $title = $Item->get_feedback_title( 'comments' ) )
+			else if( $title = $Item->get_feedback_title( 'comments', '#', '#', '#', $comment_inskin_statuses ) )
 			{
 				$disp_title[] = $title;
 			}
@@ -191,7 +194,7 @@ if( $Item->can_see_comments( true ) )
 	{
 		if( empty($disp_title) )
 		{	// No title yet
-			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), array( 'review', 'draft' ), false ) )
+			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), '#moderation#', false ) )
 			{ // We have some feedback awaiting moderation: we'll want to show that in the title
 				$disp_title[] = $title;
 			}
@@ -254,7 +257,7 @@ if( $Item->can_see_comments( true ) )
 			global $CommentReplies;
 			$CommentReplies = array();
 
-			if( $Comment = $Session->get('core.preview_Comment') )
+			if( $Comment = get_comment_from_session( 'preview' ) )
 			{	// Init PREVIEW comment
 				if( $Comment->item_ID == $Item->ID )
 				{
@@ -356,9 +359,11 @@ if( $Item->can_see_comments( true ) )
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $params['disp_comment_form'] )
-{
-	if( $Blog->get_ajax_form_enabled() && ( $Blog->get_setting( 'allow_comments' ) != 'never' ) )
+if( $params['disp_comment_form'] && // if enabled by skin param
+    $Blog->get_setting( 'allow_comments' ) != 'never' && // if enabled by collection setting
+    $Item->get_type_setting( 'use_comments' ) ) // if enabled by item type setting
+{	// Display a comment form only if it is enabled:
+	if( $Blog->get_ajax_form_enabled() )
 	{
 		// The following params will be piped through the AJAX request...
 		$json_params = array(
@@ -381,16 +386,65 @@ if( $params['disp_comment_form'] )
 // ----------- Register for item's comment notification -----------
 if( is_logged_in() && $Item->can_comment( NULL ) )
 {
-	global $DB, $htsrv_url;
+	global $DB;
 	global $UserSettings;
 
 	$not_subscribed = true;
 	$creator_User = $Item->get_creator_User();
 
-	if( $Blog->get_setting( 'allow_subscriptions' ) )
+	if( $Blog->get_setting( 'allow_comment_subscriptions' ) )
 	{
-		$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
-					WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
+		$sql = 'SELECT count( sub_user_ID )
+							FROM (
+								SELECT DISTINCT sub_user_ID
+								FROM T_subscriptions
+								WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0
+
+								UNION
+
+								SELECT user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+								LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_comment_subscription"
+									AND opt.cset_value = 1
+									AND user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+
+								UNION
+
+								SELECT sug_user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+								LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_comment_subscription"
+									AND opt.cset_value = 1
+									AND sug_user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+
+								UNION
+
+								SELECT bloguser_user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_comment_subscription"
+									AND opt.cset_value = 1
+									AND bloguser_user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+							) AS users';
+
 		if( $DB->get_var( $sql ) > 0 )
 		{
 			echo '<p>'.T_( 'You are receiving notifications when anyone comments on any post.' );
@@ -416,11 +470,11 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 			if( get_user_isubscription( $current_User->ID, $Item->ID ) )
 			{
 				echo '<p>'.$notification_icon.' <span>'.$params['notification_text2'];
-				echo ' <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
+				echo ' <a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
 			}
 			else
 			{
-				echo '<p>'.$notification_icon.' <span><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.$params['notification_text3'].'</a></span></p>';
+				echo '<p>'.$notification_icon.' <span><a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.$params['notification_text3'].'</a></span></p>';
 			}
 		}
 

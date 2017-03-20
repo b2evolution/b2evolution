@@ -39,10 +39,13 @@ $blog = NULL;
 param( 'action', 'string', '' );
 
 // Check global permission:
-if( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' ) )
-{	// No permission to access admin...
+if( $action != 'test_api' && ( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' ) ) )
+{	// No permission to access admin... (Exclude action of API testing in order to make a quick request without logging in)
 	require $adminskins_path.'_access_denied.main.php';
 }
+
+// Send the predefined cookies:
+evo_sendcookies();
 
 // Make sure the async responses are never cached:
 header_nocache();
@@ -57,6 +60,10 @@ $debug = false;
 
 // Do not append Debug JSlog to response!
 $debug_jslog = false;
+
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
 
 // Init AJAX log
 $Ajaxlog = new Log();
@@ -75,6 +82,105 @@ $add_response_end_comment = true;
 //     output only a small part of what the "real controller" does..
 switch( $action )
 {
+	case 'get_whois_info':
+		param( 'query', 'string' );
+		param( 'window_height', 'integer' );
+
+		load_class('_ext/phpwhois/whois.main.php', 'whois' );
+
+		$whois = new Whois();
+
+		// Set to true if you want to allow proxy requests
+		$allowproxy = false;
+
+		// get faster but less acurate results
+		$whois->deep_whois = empty( $_GET['fast'] );
+
+		// To use special whois servers (see README)
+		//$whois->UseServer( 'uk', 'whois.nic.uk:1043?{hname} {ip} {query}' );
+		//$whois->UseServer( 'au', 'whois-check.ausregistry.net.au' );
+
+		// Comment the following line to disable support for non ICANN tld's
+		$whois->non_icann = true;
+
+		$result = $whois->Lookup( $query );
+
+		$winfo = '<pre style="height: '.( $window_height - 200 ).'px; overflow: auto;">';
+		if( ! empty( $result['rawdata'] ) )
+		{
+			for( $i = 0; $i < count( $result['rawdata'] ); $i++ )
+			{
+				// Highlight lines starting with orgname: or org-name: (case insensitive)
+				if( preg_match( '/^(orgname:|org-name:|descr:)/i', $result['rawdata'][$i] ) )
+				{
+					$result['rawdata'][$i] = '<span style="font-weight: bold; background-color: yellow;">'.$result['rawdata'][$i].'</span>';
+				}
+
+				// Make URLs and emails clickable
+				if( preg_match_all( '#[-a-zA-Z0-9@:%_\+.~\#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~\#?&//=;]*)?#si', $result['rawdata'][$i], $matches ) )
+				{
+					foreach( $matches as $match )
+					{
+						if( filter_var( $match[0], FILTER_VALIDATE_EMAIL ) )
+						{ // check if valid email
+							$href_string = 'mailto:'.$match[0];
+							$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'">'.$match[0].'</a>', $result['rawdata'][$i] );
+						}
+						else
+						{ // check if valid URL
+							$href_string = ( ! preg_match( '#^(ht|f)tps?://#', $match[0] ) ) // check if protocol not present
+									? 'http://' . $match[0] // temporarily add one
+									: $match[0]; // use current
+							if( filter_var( $href_string, FILTER_VALIDATE_URL ) )
+							{
+								$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'" target="_blank">'.$match[0].'</a>', $result['rawdata'][$i] );
+							}
+						}
+					}
+				}
+
+				// Make IP ranges clickable
+				if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) &&
+						preg_match_all( '#(?<=\:)(\s*)(\b(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\s?-\s?(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\b)#', $result['rawdata'][$i], $matches ) )
+				{
+					if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+					{
+						$aipr_status_titles = aipr_status_titles();
+						$IPRangeCache = & get_IPRangeCache();
+						if( $IPRange = & $IPRangeCache->get_by_ip( $query ) )
+						{ // IP range exists in DB
+							$iprange_status = $IPRange->get( 'status' );
+						}
+						else
+						{ // There is no IP range in DB
+							$iprange_status = '';
+						}
+					}
+
+					if( $IPRange )
+					{
+						if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) )
+						{
+							$result['rawdata'][$i] = str_replace( $matches[2][0],  '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'.$matches[2][0].'</a> <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[$iprange_status], $result['rawdata'][$i] );
+						}
+					}
+					else
+					{
+						$result['rawdata'][$i] = str_replace( $matches[2][0],  '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_new&amp;ip='.$query.'">'.$matches[2][0].'</a> <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[$iprange_status], $result['rawdata'][$i] );
+					}
+				}
+			}
+			$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
+		}
+		else
+		{
+			$winfo = format_to_output( implode( $whois->Query['errstr'], "\n" ) )."<br></br>";
+		}
+		$winfo .= '</pre>';
+
+		echo $winfo;
+		break;
+
 	case 'add_plugin_sett_set':
 		// Dislay a new Plugin(User)Settings set ( it's used only from plugins with "array" type settings):
 
@@ -115,107 +221,6 @@ switch( $action )
 		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $Plugin, NULL, $r['set_node'] );
 		break;
 
-	case 'set_object_link_position':
-		// Change a position of a link on the edit item screen (fieldset "Images & Attachments")
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'link' );
-
-		// Check item/comment edit permission below after we have the $LinkOwner object ( we call LinkOwner->check_perm ... )
-
-		param('link_ID', 'integer', true);
-		param('link_position', 'string', true);
-
-		$LinkCache = & get_LinkCache();
-		if( ( $Link = & $LinkCache->get_by_ID( $link_ID ) ) === false )
-		{	// Bad request with incorrect link ID
-			echo '';
-			exit(0);
-		}
-		$LinkOwner = & $Link->get_LinkOwner();
-
-		// Check permission:
-		$LinkOwner->check_perm( 'edit', true );
-
-		if( $Link->set( 'position', $link_position ) && $Link->dbupdate() )
-		{ // update was successful
-			echo 'OK';
-
-			// Update last touched date of Owners
-			$LinkOwner->update_last_touched_date();
-
-			if( $link_position == 'cover' && $LinkOwner->type == 'item' )
-			{ // Position "Cover" can be used only by one link
-			  // Replace previous position with "Inline"
-				$DB->query( 'UPDATE T_links
-						SET link_position = "aftermore"
-					WHERE link_ID != '.$DB->quote( $link_ID ).'
-						AND link_itm_ID = '.$DB->quote( $LinkOwner->Item->ID ).'
-						AND link_position = "cover"' );
-			}
-		}
-		else
-		{ // return the current value on failure
-			echo $Link->get( 'position' );
-		}
-		break;
-
-	case 'update_links_order':
-		// Update the order of all links at one time:
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'link' );
-
-		$link_IDs = param( 'links', 'string' );
-
-		if( empty( $link_IDs ) )
-		{ // No links to update, wrong request, exit here:
-			break;
-		}
-
-		$link_IDs = explode( ',', $link_IDs );
-
-		// Check permission by first link:
-		$LinkCache = & get_LinkCache();
-		if( ( $Link = & $LinkCache->get_by_ID( $link_IDs[0] ) ) === false )
-		{ // Bad request with incorrect link ID
-			exit(0);
-		}
-		$LinkOwner = & $Link->get_LinkOwner();
-		// Check permission:
-		$LinkOwner->check_perm( 'edit', true );
-
-		$DB->begin( 'SERIALIZABLE' );
-
-		// Get max order value of the links:
-		$max_link_order = intval( $DB->get_var( 'SELECT MAX( link_order )
-			 FROM T_links
-			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' ) );
-
-		// Initialize parts of sql queries to update the links order:
-		$fake_sql_update_strings = '';
-		$real_sql_update_strings = '';
-		$real_link_order = 0;
-		foreach( $link_IDs as $link_ID )
-		{
-			$max_link_order++;
-			$fake_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$max_link_order;
-			$real_link_order++;
-			$real_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$real_link_order;
-		}
-
-		// Do firstly fake ordering start with max order, to avoid duplicate entry error:
-		$DB->query( 'UPDATE T_links
-			  SET link_order = CASE '.$fake_sql_update_strings.' ELSE link_order END
-			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
-		// Do real ordering start with number 1:
-		$DB->query( 'UPDATE T_links
-			  SET link_order = CASE '.$real_sql_update_strings.' ELSE link_order END
-			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
-
-		$DB->commit();
-		break;
-
 	case 'edit_comment':
 		// Used to edit a comment from back-office (Note: Only for meta comments now!)
 
@@ -234,7 +239,7 @@ switch( $action )
 		$current_User->check_perm( 'meta_comment', 'edit', true, $edited_Comment );
 
 		// Load Blog of the Item
-		$Blog = & $edited_Comment_Item->get_Blog();
+		$Collection = $Blog = & $edited_Comment_Item->get_Blog();
 
 		$comment_action = param( 'comment_action', 'string' );
 
@@ -362,23 +367,14 @@ switch( $action )
 		}
 
 		if( in_array( $request_from, array( 'items', 'comments' ) ) )
-		{ // AJAX request goes from backoffice and ctrl = items or comments
-			if( strlen($statuses) > 2 )
-			{
-				$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-			}
-			$status_list = explode( ',', $statuses );
-			if( $status_list == NULL )
-			{
-				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-			}
+		{	// AJAX request goes from backoffice and ctrl = items or comments:
 
 			// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
 			// If $item_ID is not valid, then this requests came from the comments_fullview
 			// TODO: asimo> This should be handled with a better solution
 			$filterset_name = /*'';*/( $item_ID > 0 ) ? '' : 'fullview';
 
-			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status, $comment_type );
+			echo_item_comments( $blog, $item_ID, $statuses, $currentpage, $limit, array(), $filterset_name, $expiry_status, $comment_type );
 		}
 		break;
 
@@ -429,18 +425,8 @@ switch( $action )
 		$AdminUI = new AdminUI();
 
 		if( in_array( $request_from, array( 'items', 'comments' ) ) )
-		{ // AJAX request goes from backoffice and ctrl = items or comments
-			if( strlen($statuses) > 2 )
-			{
-				$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-			}
-			$status_list = explode( ',', $statuses );
-			if( $status_list == NULL )
-			{ // init statuses
-				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-			}
-
-			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, NULL, array(), '', $expiry_status, $comment_type );
+		{	// AJAX request goes from backoffice and ctrl = items or comments
+			echo_item_comments( $blog, $item_ID, $statuses, $currentpage, NULL, array(), '', $expiry_status, $comment_type );
 		}
 		elseif( $request_from == 'dashboard' || $request_from == 'coll_settings' )
 		{ // AJAX request goes from backoffice dashboard
@@ -677,6 +663,37 @@ switch( $action )
 		echo '<a href="#" rel="'.$new_value.'"'.$new_attrs.'>'.$new_title.'</a>';
 		break;
 
+	case 'item_order_edit':
+		// Update an order of Item from list screen by clicking on the cell:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemorder' );
+
+		$item_order = param( 'new_item_order', 'string' );
+		$post_ID = param( 'post_ID', 'integer' );
+
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $post_ID );
+
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
+
+		if( $item_order === '-' || $item_order === '' )
+		{	// Set NULL for these values:
+			$item_order = NULL;
+		}
+		else
+		{	// Make an order to integer:
+			$item_order = intval( $item_order );
+		}
+
+		$Item->set( 'order', $item_order, true );
+		$Item->dbupdate();
+
+		// Return a link to make the cell editable on next time:
+		echo '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';
+		break;
+
 	case 'cat_order_edit':
 		// Update order of a chapter from list screen by clicking on the order column
 
@@ -750,9 +767,9 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'files', 'add', true, $fileroot_ID );
 
-		param( 'path', 'string' );
-		param( 'oldfile', 'string' );
-		param( 'newfile', 'string' );
+		param( 'path', 'filepath' );
+		param( 'oldfile', 'filepath' );
+		param( 'newfile', 'filepath' );
 		param( 'format', 'string' );
 
 		$fileroot = explode( '_', $fileroot_ID );
@@ -797,7 +814,7 @@ switch( $action )
 		param( 'link_owner_ID', 'integer', true );
 		// Additional params, Used to highlight file/folder
 		param( 'root', 'string', '' );
-		param( 'path', 'string', '' );
+		param( 'path', 'filepath', '' );
 		param( 'fm_highlight', 'string', '' );
 
 		$additional_params = empty( $root ) ? '' : '&amp;root='.$root;
@@ -807,6 +824,37 @@ switch( $action )
 		echo '<div style="background:#FFF;height:90%">'
 				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
 				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$link_owner_type.'&amp;link_object_ID='.$link_owner_ID.$additional_params.'"'
+					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
+					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>'
+			.'</div>';
+
+		break;
+
+	case 'file_attachment':
+		// The content for popup window to link the files to the items/comments
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
+
+		// Check permission:
+		$current_User->check_perm( 'files', 'view' );
+
+		param( 'iframe_name', 'string', '' );
+		param( 'field_name', 'string', '' );
+		param( 'file_type', 'string', 'image' );
+		// Additional params, Used to highlight file/folder
+		param( 'root', 'string', '' );
+		param( 'path', 'string', '' );
+		param( 'fm_highlight', 'string', '' );
+
+		$additional_params = empty( $root ) ? '' : '&amp;root='.$root;
+		$additional_params .= empty( $path ) ? '' : '&amp;path='.$path;
+		$additional_params .= empty( $fm_highlight ) ? '' : '&amp;fm_highlight='.$fm_highlight;
+		//$additional_params .= empty( $field_name ) ? '' : '&amp;field_name='.$field_name;
+
+		echo '<div style="background:#FFF;height:90%">'
+				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
+				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;field_name='.$field_name.'&amp;file_type='.$file_type.'&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=file_select'.$additional_params.'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
 					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>'
 			.'</div>';
@@ -832,6 +880,11 @@ switch( $action )
 					.' onload="document.getElementById(\'import_files_loader\').style.display=\'none\'">loading</iframe>'
 			.'</div>';
 
+		break;
+
+	case 'test_api':
+		// Spec action to test API from ctrl=system:
+		echo 'ok';
 		break;
 
 	default:

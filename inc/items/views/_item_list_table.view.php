@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var ItemList2
  */
@@ -91,3 +91,27 @@ $postIDarray = $ItemList->get_page_ID_array();
 $ItemList->display( NULL, $result_fadeout );
 
 ?>
+<script type="text/javascript">
+jQuery(document).ready( function()
+{
+	jQuery( '.item_order_edit' ).each( function()
+	{
+		if( jQuery( this ).find( 'a' ).length == 0 )
+		{	// To remove editable action from item which are not allowed to edit for current user:
+			jQuery( this ).removeClass( 'item_order_edit' );
+		}
+	} );
+<?php
+// Print JS to edit an item order:
+echo_editable_column_js( array(
+	'column_selector' => '.item_order_edit',
+	'ajax_url'        => get_htsrv_url().'async.php?action=item_order_edit&'.url_crumb( 'itemorder' ),
+	'field_type'      => 'text',
+	'new_field_name'  => 'new_item_order',
+	'ID_value'        => 'jQuery( this ).attr( "rel" )',
+	'ID_name'         => 'post_ID',
+	'print_init_tags' => false
+) );
+?>
+});
+</script>

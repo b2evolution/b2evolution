@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $baseurl, $htsrv_url;
+global $admin_url, $baseurl;
 
 // Default params:
 $params = array_merge( array(
@@ -28,18 +28,18 @@ $params = array_merge( array(
 
 $recipient_User = $params['recipient_User'];
 $Item = $params['Item'];
-$Blog = & $Item->get_Blog();
+$Collection = $Blog = & $Item->get_Blog();
 
 if( $params['notify_full'] )
 {	/* Full notification */
 	// Calculate length for str_pad to align labels:
 	$pad_len = max( utf8_strlen( T_('Collection') ), utf8_strlen( T_('Author') ), utf8_strlen( T_('Title') ), utf8_strlen( T_('Url') ), utf8_strlen( T_('Content') ) );
 
-	echo str_pad( T_('Collection'), $pad_len ).': '.$Blog->get('shortname').' ( '.str_replace( '&amp;', '&', $Blog->gen_blogurl() ).' )'."\n";
+	echo str_pad( T_('Collection'), $pad_len ).': '.$Blog->get( 'shortname' ).' ( '.str_replace( '&amp;', '&', $Blog->gen_blogurl() ).' )'."\n";
 
-	echo str_pad( T_('Author'), $pad_len ).': '.$Item->creator_User->get('preferredname').' ('.$Item->creator_User->get('login').")\n";
+	echo str_pad( T_('Author'), $pad_len ).': '.$Item->creator_User->get( 'preferredname' ).' ('.$Item->creator_User->get('login').")\n";
 
-	echo str_pad( T_('Title'), $pad_len ).': '.$Item->get('title')."\n";
+	echo str_pad( T_('Title'), $pad_len ).': '.$Item->get( 'title' )."\n";
 
 	// linked URL or "-" if empty:
 	echo str_pad( T_('Url'), $pad_len ).': '.( empty( $Item->url ) ? '-' : str_replace( '&amp;', '&', $Item->get('url') ) )."\n";
@@ -79,7 +79,7 @@ if( $params['notify_full'] )
 }
 else
 {	/* Short notification */
-	echo sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get( 'login' ), '"'.$Blog->get('shortname').'"', '"'.$Item->get('title').'"' );
+	echo sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_username(), '"'.$Blog->get('shortname').'"', '"'.$Item->get('title').'"' );
 	echo "\n\n";
 	echo T_( 'To read the full content of the post click here:' ).' ';
 	echo $Item->get_permanent_url( '', '', '&' );
@@ -109,12 +109,12 @@ if( $params['notify_type'] == 'moderator' )
 	}
 	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' )."\n";
 	$params['unsubscribe_text'] .= $unsubscribe_text.': '
-			.$htsrv_url.'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$';
+			.get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$';
 }
 else
 { // subscription email
 	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new posts on this blog, click here:' ).' '.
-			$htsrv_url.'quick_unsubscribe.php?type=coll_post&user_ID=$user_ID$&coll_ID='.$Blog->ID.'&key=$unsubscribe_key$';
+			get_htsrv_url().'quick_unsubscribe.php?type=coll_post&user_ID=$user_ID$&coll_ID='.$Blog->ID.'&key=$unsubscribe_key$';
 }
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

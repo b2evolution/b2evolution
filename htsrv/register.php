@@ -64,7 +64,7 @@ param( 'source', 'string', '' );
 param( 'redirect_to', 'url', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
 param( 'inskin', 'boolean', false, true );
 
-global $Blog;
+global $Collection, $Blog;
 if( $inskin && empty( $Blog ) )
 {
 	param( 'blog', 'integer', 0 );
@@ -72,7 +72,7 @@ if( $inskin && empty( $Blog ) )
 	if( isset( $blog) && $blog > 0 )
 	{
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 }
 
@@ -105,6 +105,9 @@ switch( $action )
 	case 'quick_register':
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
+
+		// Stop a request from the blocked email address or its domain:
+		antispam_block_by_email( $email );
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'regform' );
@@ -354,7 +357,7 @@ switch( $action )
 		$DB->commit();
 		$UserCache->add( $new_User );
 
-		$initial_hit = $new_User->get_first_session_hit_params( $Session->ID );
+		$initial_hit = $Session->get_first_hit_params();
 		if( ! empty ( $initial_hit ) )
 		{	// Save User Settings
 			$UserSettings->set( 'initial_blog_ID' , $initial_hit->hit_coll_ID, $new_User->ID );
@@ -366,7 +369,8 @@ switch( $action )
 			$UserSettings->set( 'registration_trigger_url' , $session_registration_trigger_url, $new_User->ID );
 		}
 		$UserSettings->set( 'created_fromIPv4', ip2int( $Hit->IP ), $new_User->ID );
-		$UserSettings->set( 'user_domain', $Hit->get_remote_host( true ), $new_User->ID );
+		$user_domain = $Hit->get_remote_host( true );
+		$UserSettings->set( 'user_registered_from_domain', $user_domain, $new_User->ID );
 		$UserSettings->set( 'user_browser', substr( $Hit->get_user_agent(), 0 , 200 ), $new_User->ID );
 		$UserSettings->dbupdate();
 
@@ -377,10 +381,18 @@ switch( $action )
 					VALUES ( '.$DB->quote( $Blog->ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
 		}
 
+		// Get user domain status:
+		load_funcs( 'sessions/model/_hitlog.funcs.php' );
+		$DomainCache = & get_DomainCache();
+		$Domain = & get_Domain_by_subdomain( $user_domain );
+		$dom_status_titles = stats_dom_status_titles();
+		$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
+
 		// Send notification email about new user registrations to users with edit users permission
 		$email_template_params = array(
 				'country'     => $new_User->get( 'ctry_ID' ),
 				'reg_country' => $new_User->get( 'reg_ctry_ID' ),
+				'reg_domain'  => $user_domain.' ('.$dom_status.')',
 				'firstname'   => $firstname,
 				'lastname'    => $lastname,
 				'fullname'    => $new_User->get( 'fullname' ),
@@ -398,8 +410,10 @@ switch( $action )
 		send_admin_notification( NT_('New user registration'), 'account_new', $email_template_params );
 
 		$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
-		// Move user to suspect group by IP address. Make this move even if during the registration it was added to a trusted group.
+		// Move user to suspect group by IP address and reverse DNS domain:
+		// Make this move even if during the registration it was added to a trusted group:
 		antispam_suspect_user_by_IP( '', $new_User->ID, false );
+		antispam_suspect_user_by_reverse_dns_domain( $new_User->ID, false );
 
 		if( $Settings->get('newusers_mustvalidate') )
 		{ // We want that the user validates his email address:
@@ -496,10 +510,6 @@ if( $inskin && !empty( $Blog ) )
 	// already exited here
 	exit(0);
 }
-
-// Load jQuery library and functions to work with ajax response
-require_js( '#jquery#' );
-require_js( 'ajax.js' );
 
 // Display reg form:
 require $adminskins_path.'login/_reg_form.main.php';

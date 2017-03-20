@@ -30,7 +30,7 @@ class generic_ping_plugin extends Plugin
 	 */
 	var $code = 'b2evGPing';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -166,6 +166,12 @@ class generic_ping_plugin extends Plugin
 	{
 		global $debug;
 		global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
+
+		if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+		{	// Could not use xmlrpc client because server has no the requested extensions:
+			$params['xmlrpcresp'] = CANUSEXMLRPC;
+			return false;
+		}
 
 		$url = $this->parse_ping_url( $this->Settings->get( 'ping_service_url' ) );
 

@@ -107,7 +107,7 @@ class breadcrumb_path_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $cat, $disp;
+		global $Collection, $Blog, $cat, $disp;
 
 		$params = array_merge( array(
 				'item_mask'        => '<a href="$url$">$title$</a>',

@@ -127,6 +127,24 @@ class item_small_print_Widget extends ComponentWidget
 
 
 	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		global $preview;
+
+		parent::init_display( $params );
+
+		if( $preview )
+		{	// Disable block caching for this widget when item is previewed currently:
+			$this->disp_params['allow_blockcache'] = 0;
+		}
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array $params MUST contain at least the basic display params
@@ -154,7 +172,7 @@ class item_small_print_Widget extends ComponentWidget
 				'widget_item_small_print_separator' => ' &bull; ',
 			), $this->disp_params );
 
-		echo $this->disp_params['block_start'];
+		echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 		echo $this->disp_params['widget_item_small_print_before'];
@@ -173,18 +191,20 @@ class item_small_print_Widget extends ComponentWidget
 					'thumb_class' => 'leftmargin',
 				) );
 
+			$Item->flag();
+
 			if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
 			{ // We want to display the post date:
 				$Item->issue_time( array(
 						'before'      => /* TRANS: date */ T_('This entry was posted on').' ',
-						'time_format' => 'F jS, Y',
+						'time_format' => locale_extdatefmt(),
 					) );
 				$Item->issue_time( array(
 						'before'      => /* TRANS: time */ T_('at').' ',
 						'time_format' => '#short_time',
 					) );
 				$Item->author( array(
-						'before'    => T_('by').' ',
+						'before'    => /* TRANS: author name */ T_('by').' ',
 						'link_text' => 'auto',
 					) );
 			}
@@ -219,6 +239,8 @@ class item_small_print_Widget extends ComponentWidget
 		}
 		else
 		{ // Revisions
+			$Item->flag();
+
 			$Item->author( array(
 					'before'    => T_('Created by').' ',
 					'after'     => $this->disp_params['widget_item_small_print_separator'],
@@ -227,7 +249,7 @@ class item_small_print_Widget extends ComponentWidget
 
 			$Item->lastedit_user( array(
 					'before'    => T_('Last edit by').' ',
-					'after'     => ' '.T_('on').' '.$Item->get_mod_date( 'F jS, Y' ),
+					'after'     => /* TRANS: "on" is followed by a date here */ ' '.T_('on').' '.$Item->get_mod_date( locale_extdatefmt() ),
 					'link_text' => 'auto',
 				) );
 
@@ -252,7 +274,7 @@ class item_small_print_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User, $Item;
+		global $Collection, $Blog, $current_User, $Item;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?

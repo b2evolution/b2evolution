@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Blog, $download_Item, $download_Link;
+global $Collection, $Blog, $download_Item, $download_Link;
 
 // Default params:
 $params = array_merge( array(

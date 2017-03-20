@@ -41,12 +41,12 @@ $user_status_icons = get_user_status_icons();
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
-$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 
 echo_user_actions( $Form, $edited_User, 'edit' );
 
 $form_text_title = T_( 'User admin settings' ); // used for js confirmation message on leave the changed form
-$form_title = get_usertab_header( $edited_User, 'admin', T_( 'User admin settings' ).get_manual_link( 'user-admin-tab' ) );
+$form_title = get_usertab_header( $edited_User, 'admin', '<span class="nowrap">'.T_( 'User admin settings' ).'</span>'.get_manual_link( 'user-admin-tab' ) );
 
 $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
@@ -77,10 +77,7 @@ if( $edited_User->ID == 1 )
 {	// This is Admin user, Don't allow to change status, primary group:
 	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->grp_ID.'" />';
 	$Form->info( T_('Account status'), $status_icon.' '.T_( 'Autoactivated' ) );
-	$Form->info(
-		// TRANS: Type: Primary user group, Secondary user group
-		sprintf( T_('%s user group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) )
-		, $edited_User->Group->dget('name') );
+	$Form->info( sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ), $edited_User->Group->dget('name') );
 }
 else
 {	// Allow to change status and primary group for non-admin users:
@@ -89,9 +86,7 @@ else
 		.' ( grp_usage = "primary" OR grp_ID = '.$edited_User->grp_ID.' )' );
 	$GroupCache->all_loaded = true;
 	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
-	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache,
-		// TRANS: Type: Primary user group, Secondary user group
-		sprintf( T_('%s user group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ) );
+	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
 }
 
 // Reload secondary group cache for the selects below to exclude groups that are not available for current user:
@@ -106,15 +101,7 @@ $GroupCache->load_where( ( empty( $group_where_sql ) ? '' : $group_where_sql.' A
 $GroupCache->all_loaded = true;
 foreach( $user_secondary_groups as $s => $user_secondary_Group )
 {
-	if( $s == 0 )
-	{	// TRANS: Type: Primary user group, Secondary user group
-		$field_title = sprintf( T_('%s user groups'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) );
-	}
-	else
-	{
-		$field_title = '';
-	}
-
+	$field_title = ( $s == 0 ? sprintf( T_('<span %s>Secondary</span> user groups'), 'class="label label-info"' ) : '' );
 	$field_add_icon = get_icon( 'add', 'imgtag', array( 'class' => 'add_secondary_group', 'style' => 'cursor:pointer' ) );
 
 	if( empty( $user_secondary_Group ) || $user_secondary_Group->can_be_assigned() )
@@ -170,6 +157,8 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 			$Form->info( '<b class="evo_label_inline">'.T_('Status').': </b>', $email_status_icon.$email_status_titles[ $email_status ] );
 		}
 	$Form->end_line();
+
+	user_domain_info_display( T_('Email Domain'), 'email_domain_status', $edited_User->get_email_domain(), '', $Form );
 
 	global $UserSettings;
 
@@ -383,7 +372,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 
 $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-registration') );
 	$Form->begin_line( T_('Account registered on'), NULL, 'info' );
-		$Form->info_field( '', $edited_User->dget('datecreated'), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
+		$Form->info_field( '', mysql2localedatetime( $edited_User->dget('datecreated') ), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
 		$Form->info_field( '<b class="evo_label_inline">'.T_('From IP').': </b>', format_to_output( int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ) ) );
 	$Form->end_line( NULL, 'info' );
 
@@ -422,38 +411,9 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 
 	$Form->info_field( T_('From Country'), $from_country, array( 'field_suffix' => $user_from_country_suffix ) );
 
-	$user_domain = $UserSettings->get( 'user_domain', $edited_User->ID );
-	$user_domain_formatted = format_to_output( $user_domain );
-	$display_user_domain = ( ! empty( $user_domain ) && $current_User->check_perm( 'stats', 'list' ) );
-	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
-	if( $display_user_domain )
-	{	// Get Domain:
-		$DomainCache = & get_DomainCache();
-		if( $Domain = & get_Domain_by_subdomain( $user_domain ) && $perm_stat_edit )
-		{	// Set a link to edit a top existing domain:
-			$user_domain_formatted = preg_replace( '#'.preg_quote( $Domain->get( 'name' ) ).'$#',
-				'<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'">'.$Domain->get( 'name' ).'</a>',
-				$user_domain_formatted );
-		}
-	}
-	$Form->begin_line( T_('From Domain'), NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
-		$Form->info_field( '', $user_domain_formatted );
-		if( $display_user_domain )
-		{	// Display status of Domain if current user has a permission:
-			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
-			$domain_status_icon = '<div id="domain_status_icon" class="status_icon">'.stats_dom_status_icon( $domain_status ).'</div>';
-			if( $perm_stat_edit )
-			{ // User can edit Domain
-				// Link to create a new domain
-				$domain_status_action = action_icon( sprintf( T_('Add domain %s'), $user_domain ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$user_domain.'&amp;dom_status='.$domain_status );
-				$Form->select_input_array( 'edited_domain_status', $domain_status, stats_dom_status_titles(), '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_action ) );
-			}
-			else
-			{ // Only view status of Domain
-				$Form->info( '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, stats_dom_status_title( $domain_status ) );
-			}
-		}
-	$Form->end_line( NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
+	$user_domain = $UserSettings->get( 'user_registered_from_domain', $edited_User->ID );
+	$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) );
+	user_domain_info_display( T_('From Domain'), 'domain_status', $user_domain, $user_ip_address, $Form );
 
 	$Form->info_field( T_('With Browser'), format_to_output( $UserSettings->get( 'user_browser', $edited_User->ID ) ) );
 
@@ -466,6 +426,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		$Form->info_field( '<b class="evo_label_inline">'.T_('Initial URI').': </b>', $UserSettings->get( 'initial_URI', $edited_User->ID ) );
 	$Form->end_line( NULL, 'info' );
 
+	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
 	$initial_referer = $UserSettings->get( 'initial_referer', $edited_User->ID );
 	$display_initial_referer = ( ! empty( $initial_referer ) && $current_User->check_perm( 'stats', 'list' ) );
 	$Form->begin_line( T_('Initial referer'), NULL, ( $display_initial_referer && $perm_stat_edit ? '' : 'info' ) );
@@ -473,11 +434,12 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		$initial_referer_formatted = format_to_output( $initial_referer );
 		if( $Domain && $perm_stat_edit )
 		{
-			$initial_referer_formatted = '<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'" '
-					.'title="'.format_to_output( sprintf( T_('Edit domain %s'), $Domain->get( 'name' ) ), 'htmlattr' ).'">'
-				.$initial_referer_formatted.'</a>';
+			$initial_referer_formatted = preg_replace( '#^(.+)('.preg_quote( trim( $Domain->get( 'name' ), '.' ) ).')(/(.+)?|$)#i',
+				'$1<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'" '
+					.'title="'.format_to_output( sprintf( T_('Edit domain %s'), $Domain->get( 'name' ) ), 'htmlattr' ).'">$2</a>$3',
+				$initial_referer_formatted );
 		}
-		$Form->info_field( '', $initial_referer_formatted );
+		$Form->info_field( '', '<a href="'.$initial_referer.'" target="_blank">'.get_icon( 'permalink' ).'</a> '.$initial_referer_formatted );
 		if( $display_initial_referer )
 		{ // User can view Domains
 			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
@@ -489,7 +451,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 				$domain_status_action = '';
 				if( !$Domain || $initial_referer_domain != $Domain->get( 'name' ) )
 				{ // Link to create a new domain
-					$domain_status_action .= action_icon( sprintf( T_('Add domain %s'), $initial_referer_domain ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$initial_referer_domain.'&amp;dom_status=blocked' );
+					$domain_status_action .= action_icon( sprintf( T_('Add domain %s'), $initial_referer_domain ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$initial_referer_domain.'&amp;dom_status=blocked&amp;dom_type=normal' );
 				}
 				if( $Domain )
 				{ // Link to edit existing domain
@@ -543,7 +505,7 @@ var user_status_icons = new Array;
 foreach( $user_status_icons as $status => $icon )
 {	// Init js array with user status icons
 ?>
-user_status_icons['<?php echo $status; ?>'] = '<?php echo $icon; ?>';
+user_status_icons['<?php echo $status; ?>'] = '<?php echo format_to_js( $icon ); ?>';
 <?php } ?>
 
 jQuery( '#edited_user_status' ).change( function()
@@ -582,7 +544,7 @@ $email_status_icons = emadr_get_status_icons();
 foreach( $email_status_icons as $status => $icon )
 {	// Init js array with email status icons
 ?>
-email_status_icons['<?php echo $status; ?>'] = '<?php echo $icon; ?>';
+email_status_icons['<?php echo $status; ?>'] = '<?php echo format_to_js( $icon ); ?>';
 <?php } ?>
 
 jQuery( '#edited_email_status' ).change( function()
@@ -597,7 +559,7 @@ jQuery( '#edited_email_status' ).change( function()
 	}
 } );
 
-var current_email = '<?php echo $edited_User->get( 'email' ); ?>';
+var current_email = '<?php echo format_to_js( $edited_User->get( 'email' ) ); ?>';
 jQuery( 'input#edited_user_email' ).keyup( function()
 {	// Disable/Enable to select email status when email address is changed
 	if( current_email != jQuery( this ).val() )
@@ -632,7 +594,7 @@ $iprange_status_icons = aipr_status_icons();
 foreach( $iprange_status_icons as $status => $icon )
 { // Init js array with IP range status icons
 ?>
-iprange_status_icons['<?php echo $status; ?>'] = '<?php echo $icon; ?>';
+iprange_status_icons['<?php echo $status; ?>'] = '<?php echo format_to_js( $icon ); ?>';
 <?php } ?>
 
 jQuery( '#edited_iprange_status' ).change( function()
@@ -658,10 +620,10 @@ $domain_status_icons = stats_dom_status_icons();
 foreach( $domain_status_icons as $status => $icon )
 { // Init js array with Domain status icons
 ?>
-domain_status_icons['<?php echo $status; ?>'] = '<?php echo $icon; ?>';
+domain_status_icons['<?php echo $status; ?>'] = '<?php echo format_to_js( $icon ); ?>';
 <?php } ?>
 
-jQuery( '#edited_domain_status, #edited_initial_referer_status' ).change( function()
+jQuery( '#edited_domain_status, #edited_initial_referer_status, #edited_email_domain_status' ).change( function()
 { // Change icon of the domain status
 	if( typeof domain_status_icons[ jQuery( this ).val() ] != 'undefined' )
 	{
@@ -673,4 +635,37 @@ jQuery( '#edited_domain_status, #edited_initial_referer_status' ).change( functi
 	}
 } );
 <?php } ?>
+
+function get_whois_info( ip_address )
+{
+	var window_height = jQuery( window ).height();
+	var margin_size_height = 20;
+	var modal_height = window_height - ( margin_size_height * 2 );
+
+	openModalWindow(
+			'<span id="spinner" class="loader_img loader_user_report absolute_center" title="<?php echo T_('Querying WHOIS server...');?>"></span>',
+			'90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true, true );
+
+	jQuery.ajax(
+	{
+		type: 'GET',
+		url: '<?php echo get_htsrv_url().'async.php';?>',
+		data: {
+			action: 'get_whois_info',
+			query: ip_address,
+			window_height: modal_height
+		},
+		success: function( result )
+		{
+			if( ajax_response_is_correct( result ) )
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true );
+			}
+		}
+	} );
+
+	return false;
+}
+
 </script>

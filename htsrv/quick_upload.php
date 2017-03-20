@@ -221,10 +221,14 @@ $debug = false;
 // Do not append Debug JSlog to response!
 $debug_jslog = false;
 
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
+
 global $current_User;
 
 param( 'upload', 'boolean', true );
-param( 'root_and_path', 'string', true );
+param( 'root_and_path', 'filepath', true );
 param( 'blog', 'integer' );
 param( 'link_owner', 'string' );
 // Use the glyph or font-awesome icons if requested by skin
@@ -341,19 +345,26 @@ if( $upload )
 		prepare_uploaded_files( array( $newFile ) );
 
 		if( ! empty( $link_owner ) )
-		{ // Try to link the uploaded file to the object Item/Comment
-			list( $link_owner_type, $link_owner_ID ) = explode( '_', $link_owner, 2 );
+		{	// Try to link the uploaded file to the object Item/Comment/EmailCampaign:
+			list( $link_owner_type, $link_owner_ID, $link_owner_is_temp ) = explode( '_', $link_owner, 3 );
 			$link_owner_ID = intval( $link_owner_ID );
 			if( $link_owner_ID > 0 )
 			{
 				switch( $link_owner_type )
 				{
 					case 'item':
-						// Get LinkOwner object of the Item
-						$ItemCache = & get_ItemCache();
-						if( $linked_Item = & $ItemCache->get_by_ID( $link_owner_ID, false, false ) )
-						{
-							$LinkOwner = new LinkItem( $linked_Item );
+						if( $link_owner_is_temp )
+						{	// Get LinkOwner object of the Temporary ID for new creating Item:
+							load_class( 'items/model/_item.class.php', 'Item' );
+							$LinkOwner = new LinkItem( new Item(), $link_owner_ID );
+						}
+						else
+						{	// Get LinkOwner object of the Item:
+							$ItemCache = & get_ItemCache();
+							if( $linked_Item = & $ItemCache->get_by_ID( $link_owner_ID, false, false ) )
+							{
+								$LinkOwner = new LinkItem( $linked_Item );
+							}
 						}
 						break;
 
@@ -364,6 +375,21 @@ if( $upload )
 						{
 							$LinkOwner = new LinkComment( $linked_Comment );
 						}
+						break;
+
+					case 'emailcampaign':
+						// Get LinkOwner object of the EmailCampaign:
+						$EmailCampaignCache = & get_EmailCampaignCache();
+						if( $linked_EmailCampaign = & $EmailCampaignCache->get_by_ID( $link_owner_ID, false, false ) )
+						{
+							$LinkOwner = new LinkEmailCampaign( $linked_EmailCampaign );
+						}
+						break;
+
+					case 'message':
+						// Get LinkOwner object of the Message:
+						load_class( 'messaging/model/_message.class.php', 'Message' );
+						$LinkOwner = new LinkMessage( new Message(), $link_owner_ID );
 						break;
 				}
 			}
@@ -435,14 +461,14 @@ if( $upload )
 			$message['status'] = 'success';
 			report_user_upload( $newFile );
 		}
-
+		$message['filetype'] = $newFile->get( 'type' );
 		$message['newname'] = $newName;
 		$message['newpath'] = $newFile->get_root_and_rel_path();
 		$message['warning'] = $warning;
 		$message['path'] = rawurlencode( $newFile->get_rdfp_rel_path() );
 		$message['checkbox'] = '<span name="surround_check" class="checkbox_surround_init">'
 				.'<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"'
-					.' name="fm_selected[]" value="'.rawurlencode( $newFile->get_rdfp_rel_path() ).'" id="cb_filename_u'.$newFile->ID.'" />'
+					.' name="fm_selected[]" value="'.format_to_output( $newFile->get_rdfp_rel_path(), 'formvalue' ).'" id="cb_filename_u'.$newFile->ID.'" />'
 			.'</span>'
 			.'<input type="hidden" name="img_tag_u'.$newFile->ID.'" id="img_tag_u'.$newFile->ID.'"'
 				.' value="'.format_to_output( $newFile->get_tag(), 'formvalue' ).'" />';
@@ -456,6 +482,7 @@ if( $upload )
 			$mask_row = (object) array(
 					'link_ID'       => $new_Link->ID,
 					'file_ID'       => $newFile->ID,
+					'file_type'     => $newFile->get_file_type(),
 					'link_position' => $new_Link->get( 'position' ),
 				);
 			$message['link_position'] = display_link_position( $mask_row );

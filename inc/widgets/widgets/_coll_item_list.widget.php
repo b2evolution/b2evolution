@@ -117,12 +117,18 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_('Featured'),
 					'note' => T_('Do you want to restrict to featured contents?'),
 					'type' => 'radio',
-					'options' => array( 
+					'options' => array(
 							array ('all', T_('All posts') ),
 							array ('featured', T_('Only featured') ),
 							array ('other', T_('Only NOT featured') ),
 						),
 					'defaultvalue' => 'all',
+				),
+				'flagged' => array(
+					'label' => T_('Flagged'),
+					'note' => T_('Do you want to restrict only to flagged contents?'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
 				),
 				'follow_mainlist' => array(
 					'label' => T_('Follow Main List'),
@@ -178,6 +184,16 @@ class coll_item_list_Widget extends ComponentWidget
 					'size' => 4,
 					'defaultvalue' => 10,
 				),
+				'disp_cat' => array(
+					'label' => T_('Category'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'no',   T_('No display') ),
+							array( 'main', T_('Display main category') ),
+							array( 'all',  T_('Display all categories') ) ),
+					'defaultvalue' => 'no',
+				),
 				'disp_title' => array(
 					'label' => T_( 'Titles' ),
 					'note' => T_( 'Display title.' ),
@@ -202,8 +218,9 @@ class coll_item_list_Widget extends ComponentWidget
 					'type' => 'radio',
 					'options' => array(
 							array( 'none', T_('None') ),
-							array( 'first', T_('Display first picture') ),
-							array( 'all', T_('Display all pictures') ) ),
+							array( 'category', T_('Display main category picture' ) ),
+							array( 'first', T_('Display first post picture') ),
+							array( 'all', T_('Display all post pictures') ) ),
 					'defaultvalue' => 'none',
 				),
 				'disp_first_image' => array(
@@ -322,7 +339,7 @@ class coll_item_list_Widget extends ComponentWidget
 		 * @var ItemList2
 		 */
 		global $MainList;
-		global $BlogCache, $Blog;
+		global $BlogCache, $Collection, $Blog;
 		global $Item, $Settings;
 
 		$this->init_display( $params );
@@ -346,6 +363,9 @@ class coll_item_list_Widget extends ComponentWidget
 				'item_first_image_before'      => '<div class="item_first_image">',
 				'item_first_image_after'       => '</div>',
 				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"><a href="$item_permaurl$"></a></div>',
+				'item_categories_before'       => '<div class="item_categories">',
+				'item_categories_after'        => '</div>',
+				'item_categories_separator'    => ', ',
 				'item_title_before'            => '<div class="item_title">',
 				'item_title_after'             => '</div>',
 				'item_title_single_before'     => '',
@@ -354,6 +374,8 @@ class coll_item_list_Widget extends ComponentWidget
 				'item_excerpt_after'           => '</div>',
 				'item_content_before'          => '<div class="item_content">',
 				'item_content_after'           => '</div>',
+				'item_readmore_text'           => '&hellip;',
+				'item_readmore_class'          => 'btn btn-default',
 				'item_images_before'           => '<div class="item_images">',
 				'item_images_after'            => '</div>',
 			), $this->disp_params );
@@ -408,11 +430,16 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $this->disp_params['featured'] == 'featured' )
 		{	// Restrict to featured Items:
-			$filters['featured'] = true; 
+			$filters['featured'] = true;
 		}
 		elseif( $this->disp_params['featured'] == 'other' )
 		{	// Restrict to NOT featured Items:
-			$filters['featured'] = false; 
+			$filters['featured'] = false;
+		}
+
+		if( $this->disp_params['flagged'] == 1 )
+		{	// Restrict to flagged Items:
+			$filters['flagged'] = true;
 		}
 
 
@@ -475,12 +502,16 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Check if the widget displays only single title
 		$this->disp_params['disp_only_title'] = ! (
+				( $this->disp_params['disp_cat'] != 'no' ) || // display categories
 				( $this->disp_params['attached_pics'] != 'none' ) || // display first and other images
 				( $this->disp_params['disp_excerpt'] ) || // display excerpt
 				( $this->disp_params['disp_teaser'] ) // display teaser
 			);
 
-		// Start to capture display content here in order to solve the issue to don't display empty widget
+
+		// DISPLAY START:
+
+		// Start to capture display content here in order to be able to detect if the whole widget must not be displayed
 		ob_start();
 		// This variable used to display widget. Will be set to true when content is displayed
 		$content_is_displayed = false;
@@ -504,6 +535,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $chapter_mode )
 		{	// List grouped by chapter/category:
+
 			$items_map_by_chapter = array();
 			$chapters_of_loaded_items = array();
 			$group_by_blogs = false;
@@ -553,7 +585,9 @@ class coll_item_list_Widget extends ComponentWidget
 					echo $this->get_layout_start();
 					$displayed_blog_ID = $Chapter->blog_ID;
 				}
+				// -------------
 				$content_is_displayed = $this->disp_chapter( $Chapter, $items_map_by_chapter, $item_index ) || $content_is_displayed;
+				// -------------
 			}
 
 			if( $content_is_displayed )
@@ -565,9 +599,11 @@ class coll_item_list_Widget extends ComponentWidget
 			{ // End of blog list
 				echo $this->disp_params['collist_end'];
 			}
+
 		}
 		else
-		{ // Plain list:
+		{ // Plain list: (not grouped by category)
+
 			echo $this->get_layout_start();
 
 			$item_index = 0;
@@ -575,8 +611,11 @@ class coll_item_list_Widget extends ComponentWidget
 			 * @var ItemLight (or Item)
 			 */
 			while( $Item = & $ItemList->get_item() )
-			{ // Display contents of the Item depending on widget params:
-				$content_is_displayed = $this->disp_contents( $Item, false, $item_index ) || $content_is_displayed;
+			{
+				// -------------
+				// DISPLAY CONTENT of the Item depending on widget params:
+				$content_is_displayed = $this->disp_item_contents( $Item, false, $item_index ) || $content_is_displayed;
+				// -------------
 			}
 
 			if( isset( $this->disp_params['page'] ) )
@@ -591,6 +630,7 @@ class coll_item_list_Widget extends ComponentWidget
 			echo $this->get_layout_end( $item_index );
 		}
 
+
 		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
@@ -603,6 +643,7 @@ class coll_item_list_Widget extends ComponentWidget
 		{ // No content, Don't display widget
 			ob_end_clean();
 		}
+
 	}
 
 
@@ -629,7 +670,7 @@ class coll_item_list_Widget extends ComponentWidget
 			$item_index = 0;
 			foreach( $items_map_by_chapter[$Chapter->ID] as $iterator_Item )
 			{ // Display contents of the Item depending on widget params:
-				$content_is_displayed = $this->disp_contents( $iterator_Item, true, $item_index ) || $content_is_displayed;
+				$content_is_displayed = $this->disp_item_contents( $iterator_Item, true, $item_index ) || $content_is_displayed;
 			}
 
 			// Close cat group
@@ -648,9 +689,11 @@ class coll_item_list_Widget extends ComponentWidget
 	 * @param integer Item index
 	 * @return boolean TRUE - if content is displayed
 	 */
-	function disp_contents( & $disp_Item, $chapter_mode = false, & $item_index )
+	function disp_item_contents( & $disp_Item, $chapter_mode = false, & $item_index )
 	{
 		global $disp, $Item;
+
+		// INIT:
 
 		// Set this var to TRUE when some content(title, excerpt or picture) is displayed
 		$content_is_displayed = false;
@@ -671,7 +714,27 @@ class coll_item_list_Widget extends ComponentWidget
 
 		$item_is_selected = ( $link_class == $this->disp_params['link_selected_class'] );
 
+		// DISPLAY START:
+
+		// Start of Item block (Grid / flow / RWD)
 		echo $this->get_layout_item_start( $item_index, $item_is_selected, $disp_param_prefix );
+
+		// DISPLAY CATEGORY:
+
+		if( $this->disp_params['disp_cat'] != 'no' )
+		{	// Display categories:
+			$disp_Item->categories( array(
+					'before'           => $this->disp_params['item_categories_before'],
+					'after'            => $this->disp_params['item_categories_after'],
+					'separator'        => $this->disp_params['item_categories_separator'],
+					'include_main'     => true,
+					'include_other'    => ( $this->disp_params['disp_cat'] == 'all' ),
+					'include_external' => ( $this->disp_params['disp_cat'] == 'all' ),
+					'link_categories'  => true,
+				) );
+		}
+
+		// SPECIAL FIRST IMAGE:
 
 		if( $this->disp_params['disp_first_image'] == 'special' )
 		{	// If we should display first picture before title then get "Cover" images and order them at top:
@@ -696,7 +759,7 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 		if( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] == 'special' )
-		{ // We want to display first image separately before the title
+		{	// We want to display first image separately before the title
 			// Display before/after even if there is no image so we can use it as a placeholder.
 			$this->disp_images( array_merge( array(
 					'before'      => $this->disp_params['item_first_image_before'],
@@ -709,6 +772,8 @@ class coll_item_list_Widget extends ComponentWidget
 				$content_is_displayed );
 		}
 
+		// DISPLAY ITEM TITLE:
+
 		if( $this->disp_params['disp_title'] )
 		{ // Display title
 			$disp_Item->title( array(
@@ -720,9 +785,17 @@ class coll_item_list_Widget extends ComponentWidget
 			$content_is_displayed = true;
 		}
 
+		// DISPLAY EXCERPT:
+
 		if( $this->disp_params['disp_excerpt'] )
 		{ // Display excerpt
-			$excerpt = $disp_Item->dget( 'excerpt', 'htmlbody' );
+			$excerpt = $disp_Item->get_excerpt();
+
+			if( ! $this->disp_params['disp_teaser'] )
+			{ // only display if there is no teaser to display
+				$excerpt .= ' <a href="'.$disp_Item->get_permanent_url().'" class="'.$this->disp_params['item_readmore_class'].'">'.$this->disp_params['item_readmore_text'].'</a>';
+			}
+
 			if( !empty($excerpt) )
 			{	// Note: Excerpts are plain text -- no html (at least for now)
 				echo $this->disp_params['item_excerpt_before'].$excerpt.$this->disp_params['item_excerpt_after'];
@@ -730,34 +803,34 @@ class coll_item_list_Widget extends ComponentWidget
 			}
 		}
 
+		// DISPLAY TEASER:
+
 		if( $this->disp_params['disp_teaser'] )
 		{ // we want to show some or all of the post content
 			$content = $disp_Item->get_content_teaser( 1, false, 'htmlbody' );
 
 			if( $words = $this->disp_params['disp_teaser_maxwords'] )
-			{ // limit number of words
+			{ // limit number of words:
+
 				$content = strmaxwords( $content, $words, array(
-						'continued_link' => $disp_Item->get_permanent_url(),
-						'continued_text' => '&hellip;',
+						'continued_link'  => $disp_Item->get_permanent_url(),
+						'continued_text'  => $this->disp_params['item_readmore_text'],
+						'continued_class' => $this->disp_params['item_readmore_class'],
+						'always_continue' => true, // Because Item::has_content_parts() is not optimized, we cannot be sure if the content has been cut because of max words or becaus eof [teaserbreak], so in doubt, we display a read more link all the time. Additionally: if there are images "after more", we also need the "more "link.
 					 ) );
 			}
+			
 			echo $this->disp_params['item_content_before'].$content.$this->disp_params['item_content_after'];
 			$content_is_displayed = true;
-
-			/* fp> does that really make sense?
-				we're no longer in a linkblog/linkroll use case here, are we?
-			$disp_Item->more_link( array(
-					'before'    => '',
-					'after'     => '',
-					'link_text' => T_('more').' &raquo;',
-				) );
-				*/
 		}
 
+		// DISPLAY PICTURES:
+
 		if( $this->disp_params['attached_pics'] == 'all' ||
-		   ( $this->disp_params['attached_pics'] == 'first' && $this->disp_params['disp_first_image'] == 'normal' ) )
+		   ( $this->disp_params['attached_pics'] == 'first' && $this->disp_params['disp_first_image'] == 'normal' ) ||
+			 ( $this->disp_params['attached_pics'] == 'category' && $this->disp_params['disp_first_image'] == 'normal' ) )
 		{ // Display attached pictures
-			if( $this->disp_params['attached_pics'] == 'first' )
+			if( $this->disp_params['attached_pics'] == 'first' || $this->disp_params['attached_pics'] == 'category' )
 			{	// Display only one first image:
 				$picture_limit = 1;
 			}
@@ -789,6 +862,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 		++$item_index;
 
+		// End of Item block (Grid / flow / RWD)
 		echo $this->get_layout_item_end( $item_index, $item_is_selected, $disp_param_prefix );
 
 		return $content_is_displayed;
@@ -821,61 +895,84 @@ class coll_item_list_Widget extends ComponentWidget
 			);
 
 		$disp_Item = & $params['Item'];
+		switch( $this->disp_params[ 'item_pic_link_type' ] )
+		{	// Set url for picture link
+			case 'none':
+				$pic_url = NULL;
+				break;
 
-		// Get list of ALL attached files:
-		$LinkOwner = new LinkItem( $disp_Item );
+			case 'permalink':
+				$pic_url = $disp_Item->get_permanent_url();
+				break;
 
-		$images = '';
+			case 'linkto_url':
+				$pic_url = $disp_Item->url;
+				break;
 
-		if( $LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], $params['restrict_to_image_position'], 'image', $links_params ) )
-		{	// Get list of attached files
-			$image_num = 1;
-			while( $Link = & $LinkList->get_next() )
-			{
-				if( ( $File = & $Link->get_File() ) && $File->is_image() )
-				{	// Get only images
-					if( $image_num < $params['start'] )
-					{ // Skip these first images
+			case 'auto':
+			default:
+				$pic_url = ( empty( $disp_Item->url ) ? $disp_Item->get_permanent_url() : $disp_Item->url );
+				break;
+		}
+
+		if( $this->disp_params['attached_pics'] != 'category' )
+		{
+			// Get list of ALL attached files:
+			$LinkOwner = new LinkItem( $disp_Item );
+
+			$images = '';
+
+			if( $LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], $params['restrict_to_image_position'], 'image', $links_params ) )
+			{	// Get list of attached files
+				$image_num = 1;
+				while( $Link = & $LinkList->get_next() )
+				{
+					if( ( $File = & $Link->get_File() ) && $File->is_image() )
+					{	// Get only images
+						if( $image_num < $params['start'] )
+						{ // Skip these first images
+							$image_num++;
+							continue;
+						}
+
+						// Print attached picture
+						$images .= $File->get_tag( '', '', '', '', $this->disp_params['thumb_size'], $pic_url );
+
+						$content_is_displayed = true;
+
 						$image_num++;
-						continue;
 					}
-					switch( $this->disp_params[ 'item_pic_link_type' ] )
-					{	// Set url for picture link
-						case 'none':
-							$pic_url = NULL;
-							break;
-
-						case 'permalink':
-							$pic_url = $disp_Item->get_permanent_url();
-							break;
-
-						case 'linkto_url':
-							$pic_url = $disp_Item->url;
-							break;
-
-						case 'auto':
-						default:
-							$pic_url = ( empty( $disp_Item->url ) ? $disp_Item->get_permanent_url() : $disp_Item->url );
-							break;
-					}
-
-					// Print attached picture
-					$images .= $File->get_tag( '', '', '', '', $this->disp_params['thumb_size'], $pic_url );
-
-					$content_is_displayed = true;
-
-					$image_num++;
 				}
 			}
 		}
 
+		$display_placeholder = true;
 		if( ! empty( $images ) )
-		{ // Print out images only when at least one exists
+		{	// Print out images only when at least one exists:
 			echo $params['before'];
 			echo $images;
 			echo $params['after'];
+			$display_placeholder = false;
 		}
-		else
+		elseif( $params['limit'] == 1 )
+		{	// First picture is empty, fallback to category picture:
+			if( $main_Chapter = & $disp_Item->get_main_Chapter() )
+			{	// If item has a main chapter:
+				$main_chapter_image_tag = $main_Chapter->get_image_tag( array(
+						'before'  => $params['before'],
+						'after'   => $params['after'],
+						'size'    => $this->disp_params['thumb_size'],
+						'link_to' => $pic_url,
+					) );
+				if( ! empty( $main_chapter_image_tag ) )
+				{	// If main chapter has a correct image file:
+					echo $main_chapter_image_tag;
+					$display_placeholder = false;
+				}
+			}
+		}
+
+		if( $display_placeholder )
 		{	// Display placeholder if no images:
 			// Replace mask $item_permaurl$ with the item permanent URL:
 			echo str_replace( '$item_permaurl$', $disp_Item->get_permanent_url(), $params['placeholder'] );
@@ -973,7 +1070,7 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 

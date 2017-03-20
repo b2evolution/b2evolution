@@ -80,7 +80,7 @@ function hits_results( & $Results, $params = array() )
 			'order' => 'hit_ID',
 			'default_dir' => 'D',
 			'td_class' => 'timestamp compact_data',
-			'td' => '%mysql2localedatetime_spans( #hit_datetime#, "M-d" )%',
+			'td' => '%mysql2localedatetime_spans( #hit_datetime# )%',
 		);
 
 	$Results->cols[] = array(
@@ -221,7 +221,7 @@ function filter_hits( & $Form )
 
 	$Form->date_input( 'datestartinput', $datestart, T_( 'From date' ) );
 	$Form->date_input( 'datestopinput', $datestop, T_( 'To date' ) );
-	
+
 	if( !isset( $preset_agent_type ) )
 	{
 		$Form->select_input_array( 'agent_type', get_param( 'agent_type' ), $agent_type_array, T_( 'Agent type' ), '', array( 'force_keys_as_values' => true, 'background_color' => $agent_type_color ) );

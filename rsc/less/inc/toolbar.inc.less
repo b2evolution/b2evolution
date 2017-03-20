@@ -5,10 +5,10 @@
 @evobar-bg-color-hover: #bfbfbf;
 @evobar-text-color: #4f4f4f;
 @evobar-text-color-disabled: #999;
+@evobar-text-color-active: #ffc;
 @evobar-border-color: #aeaeae;
 div#evo_toolbar {
 	background-color: @evobar-bg-color;
-	color: ButtonText;
 	border-bottom: 1px solid @evobar-border-color;
 	text-align: left;
 	margin: 0;
@@ -145,6 +145,13 @@ div#evo_toolbar {
 		}
 		&.disabled, &.disabled:hover {
 			color: @evobar-text-color-disabled;
+		}
+		&.active, &.active:hover {
+			background-color: @evobar-text-color-active;
+			border-radius: 4px;
+			padding-top: 5px;
+			padding-bottom: 5px;
+			margin: 1px 0;
 		}
 	}
 	// .evobar-icon-down, .evobar-icon-right, .evobar-icon-left

@@ -35,7 +35,7 @@ class archives_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
@@ -66,7 +66,7 @@ class archives_plugin extends Plugin
 	 */
 	function get_widget_cache_keys( $widget_ID = 0 )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		return array(
 				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
@@ -111,7 +111,7 @@ class archives_plugin extends Plugin
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( empty($Blog) )
 		{
@@ -394,7 +394,7 @@ class ArchiveList extends Results
 	{
 		global $DB;
 		global $blog, $cat, $catsel;
-		global $Blog;
+		global $Collection, $Blog;
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
 		global $s, $sentence, $exact;

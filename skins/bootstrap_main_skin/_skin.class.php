@@ -18,6 +18,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class bootstrap_main_Skin extends Skin
 {
 	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = '6.9.1';
+
+	/**
 	 * Do we want to use style.min.css instead of style.css ?
 	 */
 	var $use_min_css = true;  // true|false|'check' Set this to true for better optimization
@@ -37,7 +43,7 @@ class bootstrap_main_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -54,6 +60,34 @@ class bootstrap_main_Skin extends Skin
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'yes',
+				'std' => 'no',		// Blog
+				'photo' => 'no',
+				'forum' => 'no',
+				'manual' => 'no',
+				'group' => 'maybe',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -79,9 +113,10 @@ class bootstrap_main_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
+						'size' => '7',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -92,28 +127,34 @@ class bootstrap_main_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Image section')
 				),
-					'front_bg_image' => array(
+					'front_bg_image_file_ID' => array(
 						'label' => T_('Background image'),
-						'defaultvalue' => 'shared/global/sunset/sunset.jpg',
-						'type' => 'text',
-						'size' => '50'
+						'type' => 'fileselect',
+						'initialize_with' => 'shared/global/sunset/sunset.jpg',
+						'thumbnail_size' => 'fit-320x320'
+					),
+					'front_bg_color' => array(
+						'label' => T_('Background color'),
+						'note' => T_('This color will be used if Background image is not set or does not exist.'),
+						'defaultvalue' => '#333333',
+						'type' => 'color',
 					),
 				'1_end' => array(
 					'layout' => 'end_fieldset',
 				),
 				'2_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Front Page Main Area Overlay')
+					'label'  => T_('Front Page Main Area Settings')
 				),
 					'front_width' => array(
 						'label' => T_('Width'),
-						'note' => '',
+						'note' => T_('Adjust width of the Main Area container.'),
 						'size' => '7',
 						'defaultvalue' => '450px',
 					),
 					'front_position' => array(
 						'label' => T_('Position'),
-						'note' => '',
+						'note' => T_('Select the position of Main Area container.'),
 						'defaultvalue' => 'left',
 						'options' => array(
 								'left'   => T_('Left'),
@@ -122,16 +163,16 @@ class bootstrap_main_Skin extends Skin
 							),
 						'type' => 'select',
 					),
-					'front_bg_color' => array(
+					'front_bg_cont_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('E-g: #ff0000 for red'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#000000',
 						'type' => 'color',
 					),
 					'front_bg_opacity' => array(
 						'label' => T_('Background opacity'),
-						'note' => '%',
-						'size' => '2',
+						'note' => '%. ' . T_('Adjust the background transparency level.'),
+						'size' => '7',
 						'maxlength' => '3',
 						'defaultvalue' => '10',
 						'type' => 'integer',
@@ -142,31 +183,31 @@ class bootstrap_main_Skin extends Skin
 					),
 					'pict_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('E-g: #ff0000 for red'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
 					'front_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('E-g: #00ff00 for green'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'front_link_color' => array(
 						'label' => T_('Link color'),
-						'note' => T_('E-g: #0000ff for blue'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'pict_muted_color' => array(
 						'label' => T_('Muted text color'),
-						'note' => T_('E-g: #ff0000 for red'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
 					'front_icon_color' => array(
 						'label' => T_('Inverse icon color'),
-						'note' => T_('E-g: #00ff00 for green'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#CCCCCC',
 						'type' => 'color',
 					),
@@ -175,11 +216,17 @@ class bootstrap_main_Skin extends Skin
 				),
 				'3_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Front Page Secondary Area Overlay')
+					'label'  => T_('Front Page Secondary Area Settings')
 				),
+					'secondary_bg_color' => array(
+						'label' => T_('Background color'),
+						'note' => T_('Click to select a color.'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
 					'secondary_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('E-g: #00ff00 for green'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
@@ -187,6 +234,31 @@ class bootstrap_main_Skin extends Skin
 					'layout' => 'end_fieldset',
 				),
 				'4_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Featured posts Settings')
+				),
+					'bgimg_text_color' => array(
+						'label' => T_('Text color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'bgimg_link_color' => array(
+						'label' => T_('Link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+					'bgimg_hover_link_color' => array(
+						'label' => T_('Hover link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+				'4_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				'section_colorbox_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Colorbox Image Zoom')
 				),
@@ -232,10 +304,12 @@ class bootstrap_main_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				'4_end' => array(
+				'section_colorbox_end' => array(
 					'layout' => 'end_fieldset',
 				),
-				'5_start' => array(
+
+
+				'section_username_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Username options')
 				),
@@ -257,7 +331,7 @@ class bootstrap_main_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				'5_end' => array(
+				'section_username_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
@@ -317,17 +391,26 @@ class bootstrap_main_Skin extends Skin
 			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
 		}
 
+		// Add custom CSS:
+		$custom_css = '';
+
 		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
 		{
-			global $media_url, $media_path;
+			$FileCache = & get_FileCache();
 
-			// Add custom CSS:
-			$custom_css = '';
+			if( $this->get_setting( 'front_bg_image_file_ID' ) )
+			{
+				$bg_image_File = & $FileCache->get_by_ID( $this->get_setting( 'front_bg_image_file_ID' ), false, false );
+			}
 
-			$bg_image = $this->get_setting( 'front_bg_image' );
-			if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
+			if( !empty( $bg_image_File ) && $bg_image_File->exists() )
 			{ // Custom body background image:
-				$custom_css .= '#bg_picture { background-image: url('.$media_url.$bg_image.") }\n";
+				$custom_css .= '.evo_pictured_layout { background-image: url('.$bg_image_File->get_url().") }\n";
+			}
+			else
+			{
+				$color = $this->get_setting( 'front_bg_color' );
+				$custom_css .= '.evo_pictured_layout { background: '.$color." }\n";
 			}
 
 			if( $color = $this->get_setting( 'pict_title_color' ) )
@@ -340,7 +423,7 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= 'body.pictured .main_page_wrapper .text-muted { color: '.$color." }\n";
 			}
 
-			if( $color = $this->get_setting( 'front_bg_color' ) )
+			if( $color = $this->get_setting( 'front_bg_cont_color' ) )
 			{ // Custom body background color:
 				$color_transparency = floatval( $this->get_setting( 'front_bg_opacity' ) / 100 );
 				$color = substr( $color, 1 );
@@ -368,8 +451,10 @@ class bootstrap_main_Skin extends Skin
 			$icon_color = $this->get_setting( 'front_icon_color' );
 			if( $link_color )
 			{ // Custom link color:
-				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a,
-				body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: '.$link_color." }\n";
+				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a:not(.btn),
+				body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: '.$link_color.' }
+				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,
+				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a { color: '.$link_color." }\n";
 			}
 			if( $link_color && $icon_color )
 			{ // Custom icon color:
@@ -396,40 +481,58 @@ class bootstrap_main_Skin extends Skin
 				}
 			}
 
+			if( $color = $this->get_setting( 'secondary_bg_color' ) )
+			{ // Custom text color on secondary area:
+				$custom_css .= 'section.secondary_area { background-color: '.$color." }\n";
+			}
 			if( $color = $this->get_setting( 'secondary_text_color' ) )
 			{ // Custom text color on secondary area:
 				$custom_css .= 'section.secondary_area, .widget_core_org_members { color: '.$color." !important }\n";
 			}
+		}
 
-			if( ! empty( $custom_css ) )
-			{
-				if( $disp == 'front' )
-				{ // Use standard bootstrap style on width <= 640px only for disp=front
-					$custom_css = '@media only screen and (min-width: 641px)
-						{
-							'.$custom_css.'
-						}';
-				}
-				$custom_css = '<style type="text/css">
-	<!--
-		'.$custom_css.'
-	-->
-	</style>';
-				add_headline( $custom_css );
+
+		if( $color = $this->get_setting( 'bgimg_text_color' ) )
+		{	// Custom text color on background image:
+			$custom_css .= '.evo_hasbgimg { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_link_color' ) )
+		{	// Custom link color on background image:
+			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
+		{	// Custom link hover color on background image:
+			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
+		}
+
+		if( ! empty( $custom_css ) )
+		{
+			if( $disp == 'front' )
+			{ // Use standard bootstrap style on width <= 640px only for disp=front
+				$custom_css = '@media only screen and (min-width: 641px)
+					{
+						'.$custom_css.'
+					}';
 			}
+			$custom_css = '<style type="text/css">
+<!--
+'.$custom_css.'
+-->
+</style>';
+		add_headline( $custom_css );
 		}
 	}
 
 
 	/**
-	 * Check if we can display a widget container
+	 * Check if we can display a widget container when access is denied to collection by current user
 	 *
 	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
 	 * @return boolean TRUE to display
 	 */
-	function is_visible_container( $container_key )
+	function show_container_when_access_denied( $container_key )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $Blog->has_access() )
 		{	// If current user has an access to this collection then don't restrict containers:

@@ -17,7 +17,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for sessions module to function properly
  */
-$required_php_version[ 'sessions' ] = '5.0';
+$required_php_version[ 'sessions' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for sessions module to function properly
@@ -33,6 +33,8 @@ $required_mysql_version[ 'sessions' ] = '5.0.3';
  */
 $db_config['aliases']['T_basedomains'] = $tableprefix.'basedomains';
 $db_config['aliases']['T_hitlog'] = $tableprefix.'hitlog';
+$db_config['aliases']['T_hits__aggregate'] = $tableprefix.'hits__aggregate';
+$db_config['aliases']['T_hits__aggregate_sessions'] = $tableprefix.'hits__aggregate_sessions';
 $db_config['aliases']['T_sessions'] = $tableprefix.'sessions';
 $db_config['aliases']['T_track__goal'] = $tableprefix.'track__goal';
 $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
@@ -130,14 +132,14 @@ class sessions_Module extends Module
 		global $topleft_Menu;
 		global $current_User;
 		global $admin_url;
-		global $Blog, $activate_collection_toolbar;
+		global $Collection, $Blog, $activate_collection_toolbar;
 
 		if( !$current_User->check_perm( 'admin', 'normal' ) )
 		{
 			return;
 		}
 
-		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) && $current_User->check_perm( 'stats', 'list' ) )
+		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) && $current_User->check_perm( 'stats', 'list', false, $Blog->ID ) )
 		{ // Permission to view stats for user's blogs:
 			$entries = array(
 				'stats_separator' => array( 'separator' => true ),
@@ -171,10 +173,6 @@ class sessions_Module extends Module
 
 		if( $current_User->check_perm( 'stats', 'view' ) )
 		{	// We have permission to view all stats
-
-			// TODO: this is hackish and would require a proper function call
-			$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
-
 			$entries = array(
 				'stats_separator' => array( 'separator' => true ),
 				'stats' => array(
@@ -212,16 +210,21 @@ class sessions_Module extends Module
 						)
 				) );
 
-			if( !is_admin_page() )
-			{
-				$blog_ID = empty( $Blog ) ? 0 : $Blog->ID;
-				$entries['stats_page'] = array(
-						'text' => T_('Page stats').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&tab=hits&blog='.$blog_ID.'&reqURI='.rawurlencode( $_SERVER['REQUEST_URI'] ),
-					);
-			}
+			$topleft_Menu->add_menu_entries( 'site', $entries );
 
-			$topleft_Menu->add_menu_entries( 'tools', $entries );
+			if( !is_admin_page() )
+			{	// Only for front-office:
+				$page_menus = array();
+				if( $topleft_Menu->get_node_by_path( array( 'page', 'edit' ) ) )
+				{
+					$page_menus['stats_sep'] = array( 'separator' => true );
+				}
+				$page_menus['stats_page'] = array(
+					'text' => T_('Page Analytics').'&hellip;',
+					'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.( empty( $Blog ) ? 0 : $Blog->ID ).'&amp;reqURI='.rawurlencode( $_SERVER['REQUEST_URI'] ),
+				);
+				$topleft_Menu->add_menu_entries( 'page', $page_menus );
+			}
 		}
 	}
 
@@ -236,7 +239,7 @@ class sessions_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */

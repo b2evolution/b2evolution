@@ -99,10 +99,10 @@ class Session
 	{
 		global $DB, $Debuglog, $current_User, $localtimenow, $Messages, $Settings, $UserSettings;
 		global $Hit;
-		global $cookie_session, $cookie_expires, $cookie_path, $cookie_domain;
+		global $cookie_session, $cookie_expires;
 
-		$Debuglog->add( 'Session: cookie_domain='.$cookie_domain, 'request' );
-		$Debuglog->add( 'Session: cookie_path='.$cookie_path, 'request' );
+		$Debuglog->add( 'Session: cookie_domain='.get_cookie_domain(), 'request' );
+		$Debuglog->add( 'Session: cookie_path='.get_cookie_path(), 'request' );
 
 		$session_cookie = param_cookie( $cookie_session, 'string', '' );
 		if( empty( $session_cookie ) )
@@ -248,7 +248,7 @@ class Session
 			$this->ID = $DB->insert_id;
 
 			// Set a cookie valid for ~ 10 years:
-			evo_setcookie( $cookie_session, $this->ID.'_'.$this->key, time()+315360000, $cookie_path, $cookie_domain, false, true );
+			evo_setcookie( $cookie_session, $this->ID.'_'.$this->key, time()+315360000, '', '', false, true );
 
 			$Debuglog->add( 'Session: ID (generated): '.$this->ID, 'request' );
 			$Debuglog->add( 'Session: Cookie sent.', 'request' );
@@ -374,7 +374,13 @@ class Session
 	 */
 	function logout()
 	{
-		global $Debuglog, $cookie_session, $cookie_path, $cookie_domain;
+		global $Debuglog, $cookie_session, $Settings;
+
+		if( $Settings->get( 'http_auth_accept' ) && isset( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ) )
+		{	// Don't log out when user is logged in by HTTP basic authentication because it is possible only after browser closing:
+			// (to avoid infinite redirection after logout to $baseurl)
+			return;
+		}
 
 		// Invalidate the session key (no one will be able to use this session again)
 		$this->key = NULL;
@@ -385,7 +391,7 @@ class Session
 		$this->user_ID = NULL; // Unset user_ID after invalidating/saving the session above, to keep the user info attached to the old session.
 
 		// clean up the session cookie:
-		evo_setcookie( $cookie_session, '', 200000000, $cookie_path, $cookie_domain, false, true );
+		evo_setcookie( $cookie_session, '', 200000000, '', '', false, true );
 	}
 
 
@@ -660,6 +666,12 @@ class Session
 
 		// ERROR MESSAGE, with form/button to bypass and enough warning hopefully.
 		// TODO: dh> please review carefully!
+		global $io_charset;
+		// erhsatingin > Most browsers will output this is in the <head> section. Either this or possibility of multiple <head> declarations.
+		// echo '<head>';
+		echo '<meta http-equiv="Content-Type" content="text/html; charset='.$io_charset.'" />';
+		// echo '</head>';
+
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').' ['.$crumb_name.']</h3>';
 		echo '<p>'.T_('Your request was stopped for security reasons.').'</p>';
@@ -720,6 +732,31 @@ class Session
 		global $pc_user_devices;
 
 		return array_key_exists( $this->sess_device, $pc_user_devices );
+	}
+
+
+	/**
+	 * Get first hit params of this session
+	 *
+	 * @return object Params, array, keys are names of T_hitlog fields: hit_ID, hit_sess_ID, hit_uri, hit_referer, hit_referer_dom_ID and etc.
+	 */
+	function get_first_hit_params()
+	{
+		if( ! isset( $this->first_hit_params ) )
+		{	// Get the params from DB only first time and then cache them:
+			global $DB;
+
+			$SQL = new SQL( 'Get first hit params of the session #'.$this->ID );
+			$SQL->SELECT( '*' );
+			$SQL->FROM( 'T_hitlog' );
+			$SQL->WHERE( 'hit_sess_ID = '.$DB->quote( $this->ID ) );
+			$SQL->ORDER_BY( 'hit_ID ASC' );
+			$SQL->LIMIT( '1' );
+
+			$this->first_hit_params = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+		}
+
+		return $this->first_hit_params;
 	}
 }
 

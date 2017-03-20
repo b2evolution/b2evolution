@@ -174,7 +174,7 @@ class coll_common_links_Widget extends ComponentWidget
 		/**
 		* @var Blog
 		*/
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 

@@ -242,6 +242,7 @@ class File extends DataObject
 		// If there's a valid file root, handle extra stuff. This should not get done when the FileRoot is invalid.
 		if( $this->_FileRoot )
 		{
+			// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 			$this->_rdfp_rel_path = trim( str_replace( '\\', '/', $rdfp_rel_path ), '/' );
 			$this->_adfp_full_path = $this->_FileRoot->ads_path.$this->_rdfp_rel_path;
 			$this->_name = basename( $this->_adfp_full_path );
@@ -747,7 +748,7 @@ class File extends DataObject
 	 */
 	function get_url()
 	{
-		global $public_access_to_media, $htsrv_url;
+		global $public_access_to_media;
 
 		if( $this->is_dir() )
 		{ // Directory
@@ -1662,8 +1663,8 @@ class File extends DataObject
 	function move_to( $root_type, $root_ID, $rdfp_rel_path )
 	{
 		$old_file_name = $this->get_name();
-		// echo "relpath= $rel_path ";
 
+		// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 		$rdfp_rel_path = str_replace( '\\', '/', $rdfp_rel_path );
 		$FileRootCache = & get_FileRootCache();
 
@@ -1880,7 +1881,7 @@ class File extends DataObject
 	 *
 	 * @return boolean true on success, false on failure
 	 */
-	function dbinsert( )
+	function dbinsert()
 	{
 		global $Debuglog, $current_User;
 
@@ -1897,7 +1898,14 @@ class File extends DataObject
 		$Debuglog->add( 'Inserting meta data for new file into db', 'files' );
 
 		// Let's make sure the bare minimum gets saved to DB:
-		$this->set_param( 'creator_user_ID', 'integer', $current_User->ID );
+		if( is_logged_in() )
+		{	// Use ID of current logged in user:
+			$this->set_param( 'creator_user_ID', 'integer', $current_User->ID );
+		}
+		elseif( $this->_FileRoot->type == 'user' )
+		{	// Try to use ID of root user:
+			$this->set_param( 'creator_user_ID', 'integer', $this->_FileRoot->in_type_ID );
+		}
 		$this->set_param( 'root_type', 'string', $this->_FileRoot->type );
 		$this->set_param( 'root_ID', 'number', $this->_FileRoot->in_type_ID );
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
@@ -1948,8 +1956,9 @@ class File extends DataObject
 			{
 				$LinkOwner = & $Link->get_LinkOwner();
 				if( $LinkOwner != NULL )
-				{
+				{	// Update last touched date content last updated date of the Owner:
 					$LinkOwner->update_last_touched_date();
+					$LinkOwner->update_contents_last_updated_ts();
 				}
 			}
 
@@ -1969,7 +1978,7 @@ class File extends DataObject
 	 */
 	function get_view_url( $always_open_dirs_in_fm = true )
 	{
-		global $htsrv_url, $public_access_to_media;
+		global $public_access_to_media;
 
 		// Get root code
 		$root_ID = $this->_FileRoot->ID;
@@ -1979,7 +1988,7 @@ class File extends DataObject
 			if( $always_open_dirs_in_fm || ! $public_access_to_media )
 			{ // open the dir in the filemanager:
 				// fp>> Note: we MUST NOT clear mode, especially when mode=upload, or else the IMG button disappears when entering a subdir
-				return regenerate_url( 'root,path', 'root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
+				return regenerate_url( 'root,path', 'root='.$root_ID.'&amp;path='.rawurlencode( $this->get_rdfs_rel_path() ) );
 			}
 			else
 			{ // Public access: direct link to folder:
@@ -1996,10 +2005,10 @@ class File extends DataObject
 			switch( $Filetype->viewtype )
 			{
 				case 'image':
-					return  $htsrv_url.'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=image';
+					return  get_htsrv_url().'viewfile.php?root='.$root_ID.'&amp;path='.rawurlencode( $this->_rdfp_rel_path ).'&amp;viewtype=image';
 
 				case 'text':
-					return $htsrv_url.'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=text';
+					return get_htsrv_url().'viewfile.php?root='.$root_ID.'&amp;path='.rawurlencode( $this->_rdfp_rel_path ).'&amp;viewtype=text';
 
 				case 'download':	 // will NOT open a popup and will insert a Content-disposition: attachment; header
 					return $this->get_getfile_url();
@@ -2026,7 +2035,7 @@ class File extends DataObject
 	 */
 	function get_view_link( $text = NULL, $title = NULL, $no_access_text = NULL, $format = '$text$', $class = '', $url = NULL )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( is_null( $text ) )
 		{ // Use file root+relpath+name by default
@@ -2161,7 +2170,7 @@ class File extends DataObject
 			$rdfp_path = dirname( $this->get_rdfp_rel_path() );
 		}
 
-		$url_params = 'root='.$this->get_FileRoot()->ID.'&amp;path='.$rdfp_path.'/';
+		$url_params = 'root='.$this->get_FileRoot()->ID.'&amp;path='.rawurlencode( $rdfp_path .'/' );
 
 		if( ! is_null($link_obj_ID) )
 		{ // We want to open the filemanager in link mode:
@@ -2187,7 +2196,7 @@ class File extends DataObject
 	 */
 	function get_thumb_url( $size_name = 'fit-80x80', $glue = '&amp;', $size_x = 1 )
 	{
-		global $public_access_to_media, $htsrv_url;
+		global $public_access_to_media;
 
 		if( ! $this->is_image() )
 		{ // Not an image
@@ -2226,12 +2235,11 @@ class File extends DataObject
 	 */
 	function get_getfile_url( $glue = '&amp;' )
 	{
-		global $htsrv_url;
-		return $htsrv_url.'getfile.php/'
+		return get_htsrv_url().'getfile.php/'
 			// This is for clean 'save as':
 			.rawurlencode( $this->_name )
 			// This is for locating the file:
-			.'?root='.$this->_FileRoot->ID.$glue.'path='.$this->_rdfp_rel_path
+			.'?root='.$this->_FileRoot->ID.$glue.'path='.rawurlencode( $this->_rdfp_rel_path )
 			.$glue.'mtime='.$this->get_lastmod_ts(); // TODO: dh> use salt here?!
 	}
 
@@ -3052,7 +3060,7 @@ class File extends DataObject
 				$UserCache = & get_UserCache();
 				$User = & $UserCache->get_by_ID( $file_root_ID, false, false );
 
-				$link_text = $User ? $User->get_colored_login( array( 'use_style' => $params['use_style'] ) ) : T_('Deleted user');
+				$link_text = $User ? $User->get_colored_login( array( 'use_style' => $params['use_style'], 'login_text' => 'name' ) ) : T_('Deleted user');
 				$link_class = $User ? $User->get_gender_class() : 'user';
 				$link_url = $admin_url.'?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$file_root_ID;
 

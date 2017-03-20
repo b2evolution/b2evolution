@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
 * @var Blog
 */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var GeneralSettings
  */
@@ -221,7 +221,7 @@ echo '<div class="profile_column_left">';
 		}
 
 		$buttons['group'] = array();
-		$contact_block_url = get_samedomain_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$user_ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
+		$contact_block_url = get_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$user_ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
 		if( $is_contact === NULL || $is_contact === true )
 		{ // Display a button to block user
 			$buttons['group'][] = '<a href="'.$contact_block_url.'&action=block" class="btn btn-warning">'
@@ -384,6 +384,13 @@ echo '<div class="profile_column_right">';
 	}
 
 	$profileForm->begin_fieldset( T_( 'Reputation' ) );
+
+		$profileForm->info( T_('Registration date'), mysql2localedate( $User->datecreated ) );
+
+		if( $Blog->get_setting( 'userdir_lastseen' ) )
+		{	// Display last visit only if it is enabled by current collection:
+			$profileForm->info( T_('Last seen on'), get_lastseen_date( $User->get( 'lastseen_ts' ), $Blog->get_setting( 'userdir_lastseen_view' ), $Blog->get_setting( 'userdir_lastseen_cheat' ) ) );
+		}
 
 		$profileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
 

@@ -17,7 +17,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $current_User, $display_mode;
+global $Settings, $current_User, $display_mode, $antispamsrv_host, $antispamsrv_tos_url;
 global $keyword;
 
 global $row_stats;	// for hit functions
@@ -31,7 +31,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Add a banned keywor
 	$Form->hidden( 'display_mode', $display_mode );
 	$Form->hidden( 'mode', get_param( 'mode' ) );
 
-	$button = array( 'submit', 'submit', T_('Check & ban...'), 'SaveButton' );
+	$button = array( 'submit', 'submit', T_('Check & ban...'), 'SaveButton', 'addSpinner( this )' );
 	if( $display_mode == 'js' )
 	{
 		$Form->output = false;
@@ -43,7 +43,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Add a banned keywor
 		$button_html = '';
 	}
 
-	$Form->text_input( 'keyword', $keyword, 50, T_('Keyword/phrase to ban'), '', array( 'maxlength' => 80, 'input_suffix' => $button_html ) ); // TODO: add note
+	$Form->text_input( 'keyword', $keyword, 50, T_('Keyword/phrase to ban'), '', array( 'maxlength' => 80, 'input_suffix' => ' '.$button_html ) ); // TODO: add note
 	/*
 	 * TODO: explicitly add a domain?
 	 * $add_Form->text( 'domain', $domain, 30, T_('Add a banned domain'), 'note..', 80 ); // TODO: add note
@@ -87,7 +87,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 	$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
 	if( $DB->num_rows == 0 )
 	{ // No matching hits.
-		printf( '<p>'.T_('No <strong>log-hits</strong> match the keyword [%s].').'</p>', htmlspecialchars($keyword) );
+		printf( '<p>'.T_('No <strong>log-hits</strong> match the keyword %s.').'</p>', '<code>'.htmlspecialchars($keyword).'</code>' );
 	}
 	else
 	{
@@ -142,7 +142,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 	$res_affected_comments = $DB->get_results( $sql, OBJECT, 'Find matching comments' );
 	if( $DB->num_rows == 0 )
 	{ // No matching hits.
-		printf( '<p>'.T_('No <strong>comments</strong> match the keyword [%s].').'</p>', htmlspecialchars($keyword) );
+		printf( '<p>'.T_('No <strong>comments</strong> match the keyword %s.').'</p>', '<code>'.htmlspecialchars($keyword).'</code>' );
 	}
 	else
 	{ // create comment arrays
@@ -175,7 +175,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 	// Check for potentially affected comments:
 	$quoted_keyword = $DB->quote('%'.$keyword.'%');
 	$sql = 'SELECT DISTINCT T_users.*
-				FROM T_users 
+				FROM T_users
 					LEFT JOIN T_users__fields ON user_ID = uf_user_ID
 					LEFT JOIN T_users__usersettings user_domain_setting ON user_ID = user_domain_setting.uset_user_ID AND user_domain_setting.uset_name = "user_domain"
 			 WHERE user_url LIKE '.$quoted_keyword.'
@@ -243,7 +243,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 	}
 	else
 	{ // There is no affected users
-		printf( '<p>'.T_('No <strong>users</strong> match the keyword [%s]').'</p>', $keyword );
+		printf( '<p>'.T_('No <strong>users</strong> match the keyword %s').'</p>', '<code>'.$keyword.'</code>' );
 	}
 
 	// Check if the string is already in the blacklist:
@@ -257,7 +257,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 		<p>
 		<input type="checkbox" name="blacklist_locally" id="blacklist_locally_cb" value="1" checked="checked" />
 		<label for="blacklist_locally_cb">
-			<?php printf ( T_('<strong>Blacklist</strong> the keyword [%s] locally.'), htmlspecialchars($keyword) ) ?>
+			<?php printf ( T_('<strong>Blacklist</strong> the keyword %s locally.'), '<code>'.htmlspecialchars($keyword).'</code>' ) ?>
 		</label>
 		</p>
 
@@ -268,15 +268,15 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 			<p>
 			<input type="checkbox" name="report" id="report_cb" value="1" checked="checked" />
 			<label for="report_cb">
-				<?php printf ( T_('<strong>Report</strong> the keyword [%s] as abuse to b2evolution.net.'), htmlspecialchars($keyword) ) ?>
+				<?php printf ( T_('<strong>Report</strong> the keyword %s as abuse to Central Antispam Server (%s).'), '<code>'.htmlspecialchars( $keyword ).'</code>', $antispamsrv_host ) ?>
 			</label>
-			[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
+			[<a href="<?php echo $antispamsrv_tos_url; ?>"><?php echo T_('Terms of service') ?></a>]
 			</p>
 			<?php
 		}
 	}
 
-	$button = array( '', 'actionArray[ban]', T_('Perform selected operations'), 'DeleteButton btn-danger' );
+	$button = array( '', 'actionArray[ban]', T_('Perform selected operations'), 'DeleteButton btn-danger', 'addSpinner( this )' );
 	if( $display_mode == 'js' )
 	{
 		$Form->button( $button );
@@ -289,3 +289,13 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 $Form->end_form();
 
 ?>
+<script type="text/javascript">
+jQuery( document ).ready( function() {
+	jQuery( document ).on( 'keypress', function( e ) {
+		if( e.key == "Enter" )
+		{
+			jQuery( '#antispam_add input:submit' ).click();
+		}
+	});
+});
+</script>

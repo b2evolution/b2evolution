@@ -55,7 +55,7 @@ if( ! empty( $thrd_ID ) )
 		forget_param( 'thrd_ID' );
 		if( ! $error_messages_exist )
 		{ // Display this error only when no error above
-			$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
+			$Messages->add( T_('The private conversation you are trying to access does not exist any longer.'), 'error' );
 		}
 		$thread_is_missed = true;
 	}
@@ -98,7 +98,7 @@ if( !isset( $params ) )
 }
 $params = array_merge( array(
 	'form_class_msg' => 'evo_form evo_form__private_messages',
-	'form_action' => $samedomain_htsrv_url.'action.php?mname=messaging',
+	'form_action' => get_htsrv_url().'action.php?mname=messaging',
 	'form_name' => '',
 	'form_layout' => NULL,
 	'cols' => 35,

@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $admin_url;
+global $Collection, $Blog, $admin_url;
 
 global $container_Widget_array;
 
@@ -37,7 +37,7 @@ $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID );
  */
 function display_container( $container, $legend_suffix = '' )
 {
-	global $Blog, $admin_url;
+	global $Collection, $Blog, $admin_url;
 	global $Session;
 
 	$Table = new Table();

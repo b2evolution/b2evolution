@@ -28,7 +28,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 63;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -445,12 +445,9 @@ class autolinks_plugin extends Plugin
 	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
-		$Item = & $params['Item'];
-		/**
-		 * @var Blog
-		 * Also it is used to build link for tag links
-		 */
-		$this->current_Blog = & $params['Item']->get_Blog();
+
+		// Get collection from given params (also it is used to build link for tag links):
+		$this->current_Blog = $this->get_Blog_from_params( $params );
 
 		// Define the setting names depending on what is rendering now
 		if( !empty( $params['Comment'] ) )
@@ -646,6 +643,8 @@ class autolinks_plugin extends Plugin
 	 */
 	function replace_callback( $matches )
 	{
+		global $disp, $Item;
+
 		$link_attrs = '';
 		if( $this->setting_nofollow_auto )
 		{	// Add attribute rel="nofollow" for auto-links:
@@ -692,6 +691,13 @@ class autolinks_plugin extends Plugin
 				$this->previous_word = $word.$after_word;
 				$this->previous_lword = $lword.$after_word;
 				$this->previous_used = false;
+				return $r;
+			}
+
+			if( ( $disp == 'single' || $disp == 'page' ) &&
+			    isset( $Item ) &&
+			    $Item->get_permanent_url() == $url )
+			{	// Do not make a link to same permalink URL of the current Item:
 				return $r;
 			}
 

@@ -123,7 +123,7 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 						</div></div>',
 			), $params );
 
-		global $ReqURI, $Session, $Blog;
+		global $ReqURI, $Session, $Collection, $Blog;
 
 		if( empty( $Blog ) )
 		{ // Blog must be defined

@@ -1,6 +1,6 @@
 /*
  * Obviously, this file no longer contains only basic styles.
- * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
+ * It now also contains all sorts of base styles like the toolbar and debug for backward compatibility with older skins... :/
  */
 
 // CSS to show containers, widgets and includes:
@@ -34,27 +34,6 @@ a[rel~=nofollow]:not([class~=btn]):hover {
 }
 
 // Image styles:
-img {
-	border:none;
-}
-img.icon {
-	vertical-align:bottom;
-}
-
-img.flag {
-	vertical-align:middle;
-	border:1px solid #000;
-}
-img.flagtop {
-	vertical-align:top;
-	border:1px solid #000;
-}
-img.loadimg {
-	display: inline-block;
-	min-width: 64px;
-	min-height: 64px;
-	background: url(../img/ajax-loader/fff.gif) no-repeat center;
-}
 
 div.single_image_zone {
 	overflow: hidden;
@@ -78,6 +57,7 @@ div.multi_image_zone div.image_block {
 	margin: 1ex;
 	float: left;
 }
+
 // Used to limit max width of the replied comments,
 // because width of the replied comment can be very small
 // (Each level of the replied comments has additional 20px margin left)
@@ -85,6 +65,7 @@ div.multi_image_zone div.image_block {
 	max-width: 100%;
 	height: auto;
 }
+
 // Description text under image
 div.image_legend {
 	font-size: 84%;
@@ -94,6 +75,7 @@ div.image_legend {
 div.image_block.noinlinecaption div.image_legend {
 	display: none;
 }
+
 // Avatar images
 img.avatar_before_login {
 	margin-right: 2px;
@@ -107,6 +89,7 @@ img.avatar_above_login {
 	display: block;
 	margin: 0 auto;
 }
+
 // ---------------- //
 
 // Limit width of the table cells to text length without new line breaks
@@ -225,6 +208,9 @@ div.avatartag {
 // ---------------- //
 
 // Window to crop profile image:
+#user_crop_content {
+	padding: 10px;
+}
 #image_crop_block {
 	display: table;
 }
@@ -394,6 +380,34 @@ label.radiooption {
 }
 // ---------------- //
 
+// File Select custom control
+.file_select_wrapper {
+	display: flex;
+	flex-flow: row wrap;
+	align-items: flex-start;
+
+	.file_select_item {
+		//display: block;
+		//float: left;
+		display: flex;
+		flex-flow: row wrap;
+		margin-right: 8px;
+		text-align: center;
+
+		.item_actions {
+			display: flex;
+			flex-shrink: 1;
+			flex-flow: column wrap;
+			justify-content: flex-start;
+			align-content: center;
+			justify-content: center;
+			text-align: left;
+			margin-left: 8px;
+		}
+	}
+}
+// ---------------- //
+
 // Enhanced form
 .eform label {
 	font-weight:bold;
@@ -472,6 +486,12 @@ input.invisible{
 div.log_container,
 div.action_messages {
 	margin:1ex;
+	ul.message_group {
+		li {
+			margin-left: 25px;
+			list-style: disc;
+		}
+	}
 }
 div.log_container ul,
 div.action_messages ul,
@@ -601,7 +621,7 @@ table.widget_grid .note {
 // ---------------- //
 
 
-// Badge that display how much the unread messages user has
+// Badge that display how many the unread messages a user has
 .badge {
 	position: relative;
 	top: -1px;

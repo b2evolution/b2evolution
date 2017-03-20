@@ -1,59 +1,18 @@
 // Media index widget:
 
 div.widget_core_coll_media_index {
-	
-	// List layout - first image + title
-	&.evo_layout_list ul li img {
-		margin: 0 6px 6px 0;
-	}
 
-	// RWD blocks and Flowing blocks layout
-	&.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
-	&.evo_layout_flow .widget_flow_blocks > div {
-	// Inner blocks div style
-		padding: 8px;
-		margin: 14px 0;
-		overflow: hidden;
-		background-color: #fafafa;
-		border-radius: 4px;
-	}
-	&.evo_layout_flow .widget_flow_blocks {
-		display: inline-block;
-		text-align: center;
-		> div {
-			margin-left: 14px;
-			margin-right: 14px;
-			text-align: left;
-			width: 250px; // Fixed widget for flowing blocks
-		}
-	}
+	// RWD layout
+	&.evo_layout_rwd {
 
-	// RWD blocks and Flowing blocks layout
-	&.evo_layout_rwd .widget_rwd_blocks,
-	&.evo_layout_flow .widget_flow_blocks {
-		// Inner divs style
-		> div {
-			display: inline-block;
-			float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
-			vertical-align: top;
+		.widget_rwd_content {
+			margin: 14px 0;
 		}
-	}
-	
-	// RWD blocks and Flowing blocks layout
-	&.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
-	&.evo_layout_flow .widget_flow_blocks > div {
-		// Important for limiting the max image size to it's parent's max width
+
 		img {
-			max-width: 100%;
-			max-height: 380px;
-			width:auto;
-			height:auto;
-			margin: auto;
-			display: block; // We need this to center the image with margin: auto, because there is no wrapper to the images that we could text-align: center
-			border-radius: 3px;
-		}
-		span.note {
-			display: block; // We need this in order to keep the title below the image
+			width: 100%;
+			height: auto;
 		}
 	}
+
 }

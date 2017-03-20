@@ -296,7 +296,7 @@ function leave_thread( $thread_ID, $user_ID, $close_thread = false )
  */
 function get_messaging_url( $disp = 'threads' )
 {
-	global $admin_url, $is_admin_page, $Blog;
+	global $admin_url, $is_admin_page, $Collection, $Blog;
 	if( $is_admin_page || empty( $Blog ) )
 	{
 		return $admin_url.'?ctrl='.$disp;
@@ -368,7 +368,7 @@ function get_messages_link_to( $thread_ID = NULL, $user_ID = NULL )
  */
 function get_messaging_sub_entries( $is_admin )
 {
-	global $Blog, $current_User;
+	global $Collection, $Blog, $current_User;
 
 	if( $is_admin )
 	{
@@ -451,61 +451,63 @@ function get_message_params_from_session()
 
 
 /**
- * Get threads recipients SQL
+ * Get status icons to get what recipients read, unread and left the thread
  *
  * @param integer Thread ID
- * @return SQL object
+ * @param string Status: 'read', 'unread', 'left'
+ * @return string HTML code of the status icons
  */
-function get_threads_recipients_sql( $thread_ID = 0 )
+function get_thread_recipient_status_icons( $thread_ID, $status )
 {
-	global $perm_abuse_management, $current_User;
+	global $DB, $perm_abuse_management, $current_User;
 
-	$read_user_sql_limit = '';
-	$unread_user_sql_limit = '';
-	$left_user_sql_limit = '';
+	$result = '';
+
+	switch( $status )
+	{
+		case 'read':
+			// Get "READ" recipients:
+			$sql_title = 'Get list of users who read the last message in the thread #'.$thread_ID;
+			$sql_status_condition = 'tsr.tsta_thread_leave_msg_ID IS NULL AND tsr.tsta_first_unread_msg_ID IS NULL';
+			$imgtag_status = true;
+			break;
+		case 'unread':
+			// Get "UNREAD" recipients:
+			$sql_title = 'Get list of users who have not read the last message in the thread #'.$thread_ID;
+			$sql_status_condition = 'tsr.tsta_thread_leave_msg_ID IS NULL AND tsr.tsta_first_unread_msg_ID IS NOT NULL';
+			$imgtag_status = false;
+			break;
+		case 'left':
+			// Get "LEFT" recipients:
+			$sql_title = 'Get list of users who left the thread #'.$thread_ID;
+			$sql_status_condition = 'tsr.tsta_thread_leave_msg_ID IS NOT NULL';
+			$imgtag_status = 'left';
+			break;
+		default:
+			// Die on wrong request:
+			die( 'Wrong status for get_thread_recipient_status_icons()' );
+	}
+
+	$SQL = new SQL( $sql_title );
+	$SQL->SELECT( 'DISTINCT user_login' );
+	$SQL->FROM( 'T_messaging__threadstatus ts' );
+	$SQL->FROM_add( 'INNER JOIN T_messaging__threadstatus tsr ON ts.tsta_thread_ID = tsr.tsta_thread_ID AND '.$sql_status_condition );
+	$SQL->WHERE( 'ts.tsta_thread_ID = '.$thread_ID );
+	$SQL->FROM_add( 'INNER JOIN T_users ON tsr.tsta_user_ID = user_ID' );
 	if( ! $perm_abuse_management )
-	{	// Non abuse management
-		$read_user_sql_limit = ' AND ur.user_ID <> '.$current_User->ID;
-		$unread_user_sql_limit = ' AND uu.user_ID <> '.$current_User->ID;
-		$left_user_sql_limit = ' AND ul.user_ID <> '.$current_User->ID;
+	{	// If non abuse management
+		// Exclude current user from list:
+		$SQL->FROM_add( 'AND user_ID <> '.$current_User->ID );
+		// Get messages only of current user:
+		$SQL->WHERE_and( 'ts.tsta_user_ID = '.$current_User->ID );
+	}
+	$user_logins = $DB->get_col( $SQL->get(), 0, $SQL->title );
+	if( ! empty( $user_logins ) )
+	{	// Display status icons if at least one user is found for the requested status:
+		$result .= get_avatar_imgtags( $user_logins, false, false, 'crop-top-15x15', '', '', $imgtag_status, false );
 	}
 
-	$recipients_SQL = new SQL();
-
-	$recipients_SQL->SELECT( 'ts.tsta_thread_ID AS thr_ID,
-								GROUP_CONCAT(DISTINCT ur.user_login ORDER BY ur.user_login SEPARATOR \', \') AS thr_read,
-								GROUP_CONCAT(DISTINCT uu.user_login ORDER BY uu.user_login SEPARATOR \', \') AS thr_unread,
-								GROUP_CONCAT(DISTINCT ul.user_login ORDER BY ul.user_login SEPARATOR \', \') AS thr_left' );
-
-	$recipients_SQL->FROM( 'T_messaging__threadstatus ts
-								LEFT OUTER JOIN T_messaging__threadstatus tsr
-									ON ts.tsta_thread_ID = tsr.tsta_thread_ID AND tsr.tsta_first_unread_msg_ID IS NULL
-										AND tsr.tsta_thread_leave_msg_ID IS NULL
-								LEFT OUTER JOIN T_users ur
-									ON tsr.tsta_user_ID = ur.user_ID'.$read_user_sql_limit.'
-								LEFT OUTER JOIN T_messaging__threadstatus tsu
-									ON ts.tsta_thread_ID = tsu.tsta_thread_ID AND tsu.tsta_first_unread_msg_ID IS NOT NULL
-										AND tsu.tsta_thread_leave_msg_ID IS NULL
-								LEFT OUTER JOIN T_users uu
-									ON tsu.tsta_user_ID = uu.user_ID'.$unread_user_sql_limit.'
-								LEFT OUTER JOIN T_messaging__threadstatus tsl
-									ON ts.tsta_thread_ID = tsl.tsta_thread_ID AND tsl.tsta_thread_leave_msg_ID IS NOT NULL
-								LEFT OUTER JOIN T_users ul
-									ON tsl.tsta_user_ID = ul.user_ID'.$left_user_sql_limit );
-
-	if( $thread_ID > 0 )
-	{	// Limit with thread ID
-		$recipients_SQL->WHERE( 'ts.tsta_thread_ID = '.$thread_ID );
-	}
-
-	if( ! $perm_abuse_management )
-	{	// Get a messages only of current user
-		$recipients_SQL->WHERE_and( 'ts.tsta_user_ID ='.$current_User->ID );
-	}
-
-	$recipients_SQL->GROUP_BY( 'ts.tsta_thread_ID' );
-
-	return $recipients_SQL;
+	return $result;
 }
 
 
@@ -1284,7 +1286,7 @@ function get_contacts_groups_options( $selected_group_ID = NULL, $value_null = t
  */
 function get_contacts_groups_list( $user_ID, $params = array() )
 {
-	global $DB, $current_User, $Blog;
+	global $DB, $current_User, $Collection, $Blog;
 
 	$params = array_merge( array(
 			'list_start'  => '<table cellspacing="0" class="user_contacts_groups">',
@@ -2104,7 +2106,7 @@ function threads_results( & $threads_Results, $params = array() )
  */
 function col_thread_recipients( $thread_ID, $abuse_management )
 {
-	global $DB, $Blog;
+	global $DB, $Collection, $Blog;
 
 	$SQL = new SQL();
 	$SQL->SELECT( 'user_login' );
@@ -2211,40 +2213,26 @@ function col_thread_date( $date, $show_only_date )
  */
 function col_thread_read_by( $thread_ID )
 {
-	global $DB;
+	// Get "READ" recipients:
+	$result = get_thread_recipient_status_icons( $thread_ID, 'read' );
 
-	// Select read/unread users for this thread
-	$recipients_SQL = get_threads_recipients_sql( $thread_ID );
+	if( ! empty( $result ) )
+	{	// Separator
+		$result .= '<br />';
+	}
+	
+	// Get "UNREAD" recipients:
+	$result .= get_thread_recipient_status_icons( $thread_ID, 'unread' );
 
-	$read_by = '';
-
-	if( $row = $DB->get_row( $recipients_SQL->get() ) )
-	{
-		if( !empty( $row->thr_read ) )
-		{
-			$read_by .= get_avatar_imgtags( $row->thr_read, false, false, 'crop-top-15x15', '', '', true, false );
-		}
-
-		if( !empty( $row->thr_unread ) )
-		{
-			if( !empty( $read_by ) )
-			{
-				$read_by .= '<br />';
-			}
-			$read_by .= get_avatar_imgtags( $row->thr_unread, false, false, 'crop-top-15x15', '', '', false, false );
-		}
-
-		if( !empty( $row->thr_left ) )
-		{
-			if( !empty( $read_by ) )
-			{
-				$read_by .= '<br />';
-			}
-			$read_by .= get_avatar_imgtags( $row->thr_left, false, false, 'crop-top-15x15', '', '', 'left', false );
-		}
+	if( ! empty( $result ) )
+	{	// Separator
+		$result .= '<br />';
 	}
 
-	return $read_by;
+	// Get "LEFT" recipients:
+	$result .= get_thread_recipient_status_icons( $thread_ID, 'left' );
+
+	return $result;
 }
 
 
@@ -2256,7 +2244,7 @@ function col_thread_read_by( $thread_ID )
  */
 function col_thread_delete_action( $thread_ID )
 {
-	global $Blog, $samedomain_htsrv_url, $admin_url;
+	global $Collection, $Blog, $admin_url;
 
 	if( is_admin_page() )
 	{
@@ -2265,8 +2253,8 @@ function col_thread_delete_action( $thread_ID )
 	}
 	else
 	{
-		$redirect_to = get_dispctrl_url( 'threads' );
-		return action_icon( T_( 'Delete'), 'delete', $samedomain_htsrv_url.'action.php?mname=messaging&thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' ) );
+		$redirect_to = rawurlencode( get_dispctrl_url( 'threads' ) );
+		return action_icon( T_( 'Delete'), 'delete', get_htsrv_url().'action.php?mname=messaging&thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' ) );
 	}
 }
 
@@ -2288,41 +2276,6 @@ function col_msg_author( $user_ID, $datetime )
 
 
 /**
- * Get formatted message text
- *
- * @param integer Message ID
- * @param string Thread title
- * @return string Formatted message text
- */
-function col_msg_format_text( $msg_ID, $msg_text )
-{
-	$MessageCache = & get_MessageCache();
-	if( $Message = & $MessageCache->get_by_ID( $msg_ID, false, false ) )
-	{ // Get the prerendered content
-		$msg_text = $Message->get_content();
-	}
-
-	if( empty( $msg_text ) )
-	{
-		return format_to_output( $msg_text, 'htmlspecialchars' );
-	}
-
-	/**** yura> This below code is moved to the Plugins and to $Message->get_content() :
-
-	// WARNING: the messages may contain MALICIOUS HTML and javascript snippets. They must ALWAYS be ESCAPED prior to display!
-	$msg_text = htmlentities( $msg_text, ENT_COMPAT, $evo_charset );
-
-	$msg_text = make_clickable( $msg_text );
-	$msg_text = preg_replace( '#<a #i', '<a rel="nofollow" target="_blank"', $msg_text );
-	$msg_text = nl2br( $msg_text );
-
-	****/
-
-	return $msg_text;
-}
-
-
-/**
  * Get authors list to display who already had read current message
  *
  * @param integer Message ID
@@ -2330,7 +2283,7 @@ function col_msg_format_text( $msg_ID, $msg_text )
  */
 function col_msg_read_by( $message_ID )
 {
-	global $read_status_list, $leave_status_list, $Blog, $current_User, $perm_abuse_management;
+	global $read_status_list, $leave_status_list, $Collection, $Blog, $current_User, $perm_abuse_management;
 
 	$UserCache = & get_UserCache();
 
@@ -2417,7 +2370,7 @@ function col_msg_read_by( $message_ID )
  */
 function col_msg_actions( $thrd_ID, $msg_ID )
 {
-	global $Blog, $samedomain_htsrv_url, $perm_abuse_management;
+	global $Collection, $Blog, $perm_abuse_management;
 
 	if( $msg_ID < 1 )
 	{ // Don't display actions in preview mode
@@ -2435,7 +2388,7 @@ function col_msg_actions( $thrd_ID, $msg_ID )
 	else
 	{
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=messages&thrd_ID='.$thrd_ID );
-		$action_url = $samedomain_htsrv_url.'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&blog='.$Blog->ID;
+		$action_url = get_htsrv_url().'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&blog='.$Blog->ID;
 		$action_url = url_add_param( $action_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' );
 		return action_icon( T_( 'Delete'), 'delete', $action_url.'&'.url_crumb( 'messaging_messages' ) );
 	}

@@ -188,6 +188,7 @@ class Userfield extends DataObject
 		// Code
 		$code = param( 'ufdf_code', 'string' );
 		param_check_not_empty( 'ufdf_code', T_('Please provide a code to uniquely identify this field.') );
+		// Code MUST be lowercase ASCII only:
 		param_check_regexp( 'ufdf_code', '#^[a-z0-9_]{1,20}$#', T_('The field code must contain only lowercase letters, digits or the "_" sign. 20 characters max.') );
 		$this->set_from_Request( 'code' );
 

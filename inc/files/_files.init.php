@@ -13,7 +13,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for files module to function properly
  */
-$required_php_version[ 'files' ] = '5.0';
+$required_php_version[ 'files' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for files module to function properly
@@ -147,21 +147,25 @@ class files_Module extends Module
 				$permfiles = 'all'; // Files permissions
 				$permshared = 'edit'; // Access to shared root
 				$permimport = 'edit'; // Access to import root
+				$permskins = 'edit'; // Access to skins root
 				break;
 			case 2: // Moderators group equals 2
 				$permfiles = 'add';
 				$permshared = 'add';
 				$permimport = 'none';
+				$permskins = 'none';
 				break;
 			case 3: // Editors (group ID 3) have permission by default:
 				$permfiles = 'edit_allowed';
 				$permshared = 'view';
 				$permimport = 'none';
+				$permskins = 'none';
 				break;
 			default: // Other groups
 				$permfiles = 'none';
 				$permshared = 'none';
 				$permimport = 'none';
+				$permskins = 'none';
 				break;
 		}
 
@@ -171,6 +175,7 @@ class files_Module extends Module
 				'perm_files' => $permfiles,
 				'perm_shared_root' => $permshared,
 				'perm_import_root' => $permimport,
+				'perm_skins_root' => $permskins
 			);
 	}
 
@@ -181,7 +186,7 @@ class files_Module extends Module
 	 */
 	function get_available_group_permissions()
 	{
-		global $current_User, $admin_url;
+		global $current_User, $admin_url, $Settings;
 
 		$filetypes_allowed_icon = get_icon( 'file_allowed' );
 		$filetypes_not_allowed_icon = get_icon( 'file_not_allowed' );
@@ -197,10 +202,10 @@ class files_Module extends Module
 		// 'options' is permission options
 		$permissions = array(
 			'perm_files' => array(
-				'label' => T_('Files'),
+				'label' => T_('General file access'),
 				'user_func'  => 'check_files_user_perm',
 				'group_func' => 'check_files_group_perm',
-				'perm_block' => 'additional',
+				'perm_block' => 'file',
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'none', T_('No Access') ),
@@ -217,7 +222,23 @@ class files_Module extends Module
 				'label' => T_('Access to shared root'),
 				'user_func'  => 'check_sharedroot_user_perm',
 				'group_func' => 'check_sharedroot_group_perm',
-				'perm_block' => 'additional',
+				'perm_block' => 'file',
+				'options'  => array(
+						// format: array( radio_button_value, radio_button_label, radio_button_note )
+						array( 'none', T_('No Access') ),
+						array( 'view', T_('Read only') ),
+						array( 'add', T_('Add/Upload') ),
+						array( 'edit', T_('Edit') ),
+					),
+				// Show this perm group setting as radiobox ONLY if the shared dir is enabled by general settings:
+				'perm_type' => ( $Settings->get( 'fm_enable_roots_shared' ) ? 'radiobox' : 'hidden' ),
+				'field_lines' => false,
+				),
+			'perm_import_root' => array(
+				'label' => T_('Access to import root'),
+				'user_func'  => 'check_importroot_user_perm',
+				'group_func' => 'check_importroot_group_perm',
+				'perm_block' => 'file',
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'none', T_('No Access') ),
@@ -228,20 +249,20 @@ class files_Module extends Module
 				'perm_type' => 'radiobox',
 				'field_lines' => false,
 				),
-			'perm_import_root' => array(
-				'label' => T_('Access to import root'),
-				'user_func'  => 'check_importroot_user_perm',
-				'group_func' => 'check_importroot_group_perm',
-				'perm_block' => 'additional',
-				'options'  => array(
+			'perm_skins_root' => array(
+				'label' => T_('Access to skins root'),
+				'user_func' => 'check_skinsroot_user_perm',
+				'group_func' => 'check_skinsroot_group_perm',
+				'perm_block' => 'file',
+				'options' => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'none', T_('No Access') ),
 						array( 'view', T_('Read only') ),
 						array( 'add', T_('Add/Upload') ),
 						array( 'edit', T_('Edit') ),
 					),
-				'perm_type' => 'radiobox',
-				'field_lines' => false,
+					'perm_type' => ( $Settings->get( 'fm_enable_roots_skins' ) ? 'radiobox' : 'hidden' ),
+					'field_lines' => false,
 				),
 		);
 		// We can return as many permissions as we want.
@@ -333,6 +354,12 @@ class files_Module extends Module
 						$permlevel = 'edit';
 					}
 					return $current_User->check_perm( 'import_root', $permlevel );
+				case 'skins':
+					if( $permlevel == 'edit_allowed' )
+					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
+						$permlevel = 'edit';
+					}
+					return $current_User->check_perm( 'skins_root', $permlevel );
 				case 'user':
 					if( $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) )
 					{ // Current user can edits all files of other users
@@ -356,9 +383,9 @@ class files_Module extends Module
 							return $perm;
 						}
 						$perm = $current_User->check_perm_blogusers( 'files', $permlevel, $permtarget->in_type_ID );
-						if ( ! $perm )
-						{ // Check groups for permissions for this specific blog:
-							$perm = $current_User->Group->check_perm_bloggroups( 'files', $permlevel, $permtarget->in_type_ID );
+						if( ! $perm )
+						{	// Check primary and secondary groups for permissions for this specific collection:
+							$perm = $current_User->check_perm_bloggroups( 'files', $permlevel, $permtarget->in_type_ID );
 						}
 						return $perm;
 					}
@@ -447,6 +474,46 @@ class files_Module extends Module
 	}
 
 	/**
+	 * Callback function to check a group permission for skins root. ( see 'group_func' in get_available_group_permissions() function )
+	 *
+	 * @param string Permission level: 'edit', 'add', 'view'
+	 * @param string Permission value: 'edit', 'add', 'view'
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_skinsroot_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+		switch( $permvalue )
+		{
+			case 'edit':
+				// User can ask for normal edit perm...
+				if( $permlevel == 'edit' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'add':
+				// User can ask for normal add perm...
+				if( $permlevel == 'add' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'view':
+				// User can ask for normal view perm...
+				if( $permlevel == 'view' )
+				{
+					$perm = true;
+					break;
+				}
+		}
+		return $perm;
+	}
+
+	/**
 	 * Build the evobar menu
 	 */
 	function build_evobar_menu()
@@ -457,7 +524,7 @@ class files_Module extends Module
 		global $topleft_Menu;
 		global $current_User;
 		global $admin_url;
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $current_User->check_perm( 'admin', 'standard' ) )
 		{
@@ -482,16 +549,13 @@ class files_Module extends Module
 			if( $current_User->check_perm( 'files', 'view', false, NULL ) )
 			{	// Manage files generally:
 
-				// TODO: this is hackish and would require a proper function call
-				$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
-
 				// FM enabled and permission to view files:
 				$entries['files'] = array(
 						'text' => T_('Files').'&hellip;',
 						'href' => $admin_url.'?ctrl=files',
 					);
 
-				$topleft_Menu->add_menu_entries( 'tools', $entries );
+				$topleft_Menu->add_menu_entries( 'site', $entries );
 			}
 		}
 	}
@@ -507,7 +571,7 @@ class files_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		global $Settings;
 		/**
 		 * @var AdminUI_general

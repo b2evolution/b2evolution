@@ -8,39 +8,11 @@
 .widget_core_org_members {
 	margin: 5em 0 30px;
 	color: @widget_core_org_members-color;
-	// RWD blocks and Flowing blocks layout
-	&.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
-	&.evo_layout_flow .widget_flow_blocks > div {
-		// Inner blocks div style
+	div.widget_rwd_content {
 		text-align: center;
 		margin-top: 20px;
 		margin-bottom: 30px;
-		padding: 8px;
-		overflow: hidden;
-		background-color: #fafafa;
-		border-radius: 4px;
 	}
-	// Flowing blocks Layout
-	&.evo_layout_flow {
-		// Wrapper div
-		.widget_flow_blocks {
-		display: inline-block;
-		text-align: center;
-			// Inner divs
-			> div {
-				display: inline-block;
-				float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
-				margin-left: 14px;
-				margin-right: 14px;
-				vertical-align: top;
-				width: 250px; // Fixed widget for flowing blocks
-				img {
-					border-radius: 50%;
-				}
-			}
-		}
-	}
-	
 	img {
 		display: inline-block;
 	}

@@ -139,7 +139,7 @@ class AdminUI extends AdminUI_general
 							 <span class="icon-bar"></span>
 						</button>
 						<a class="navbar-brand" href="'.$admin_url.'?ctrl=dashboard"'
-								.( $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '' ).'>'
+								.( $Settings->get( 'site_color' ) != '' ? ' style="color:'.$Settings->get( 'site_color' ).'"' : '' ).'>'
 							.$Settings->get( 'site_code' )
 						.'</a>
 				 </div>
@@ -365,9 +365,9 @@ class AdminUI extends AdminUI_general
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -428,18 +428,6 @@ class AdminUI extends AdminUI_general
 						) );
 				}
 				return $results_template;
-
-			case 'compact_results':
-				// Compact Results list:
-				return array_merge( $this->get_template( 'Results' ), array(
-						'before'           => '<div class="results results_compact panel panel-default">',
-						'header_text'      => '',
-						'head_title'       => '',
-						'no_results_start' => '<div class="table_scroll">'."\n"
-								.'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0"><tbody>'."\n\n",
-						'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
-								.'</tbody></table></div>'."\n\n",
-					) );
 
 			case 'blockspan_form':
 				// Form settings for filter area:
@@ -679,6 +667,7 @@ class AdminUI extends AdminUI_general
 					'text_primary' => 'btn btn-primary',
 					'text_success' => 'btn btn-success',
 					'text_danger'  => 'btn btn-danger',
+					'text_warning' => 'btn btn-warning',
 					'group'        => 'btn-group',
 				);
 
@@ -697,17 +686,14 @@ class AdminUI extends AdminUI_general
 			case 'tooltip_plugin':
 				// Plugin name for tooltips: 'bubbletip' or 'popover'
 				return 'popover';
-				break;
 
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete the fields: 'hintbox', 'typeahead'
 				return 'typeahead';
-				break;
 
 			case 'modal_window_js_func':
 				// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 				return 'echo_modalwindow_js_bootstrap';
-				break;
 
 			case 'plugin_template':
 				// Template for plugins
@@ -734,12 +720,14 @@ class AdminUI extends AdminUI_general
 						'page_current_before' => '<li class="active"><span>',
 						'page_current_after'  => '</span></li>',
 					);
-				break;
 
 			case 'blog_base.css':
 				// File name of blog_base.css that are used on several back-office pages
 				return 'bootstrap-blog_base.css';
-				break;
+
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-bootstrap.min.css';
 
 			default:
 				// Delegate to parent class:

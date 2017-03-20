@@ -1,5 +1,10 @@
 /**
  * Server communication functions - widgets javascript interface
+ * This file contains JS code to work with collection widgets in back-office:
+ *    - Add new widget in list
+ *    - Sort widgets in list by drag and drop
+ *    - Edit widget in modal window
+ *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
@@ -57,12 +62,20 @@ var crumb_url = '';
  */
 jQuery(document).ready( function()
 {
+	if( jQuery( '#current_widgets' ).length == 0 )
+	{	// Initialize widgets list only if we really are there:
+		return;
+	}
+
 	// grab some constants -- fp> TODO: this is flawed. Fails when starting with an empty blog having ZERO widgets. Init that in .php
 	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
 	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
 	//get crumb url from delete url and then add it in toggleWidget
 	crumb_url = jQuery( '.delete_icon_hook' ).find( 'a' ).attr('href');
-	crumb_url = crumb_url.match(/crumb_.*?$/);
+	if( typeof( crumb_url ) != 'undefined' )
+	{
+		crumb_url = crumb_url.match(/crumb_.*?$/);
+	}
 	// Modify the current widgets screen
 	// remove the "no widgets yet" placeholder:
 	jQuery( ".new_widget" ).parent().parent().remove();
@@ -174,6 +187,16 @@ jQuery(document).ready( function()
 		jQuery( this ).closest( 'form' ).find( '.widget_checkbox.widget_checkbox_enabled input[type=checkbox]' ).prop( 'checked', false );
 		jQuery( this ).closest( 'form' ).find( '.widget_checkbox:not(.widget_checkbox_enabled) input[type=checkbox]' ).prop( 'checked', true );
 	} );
+
+	// Close widget settings or available widgets popup windows if Escape key is pressed:
+	jQuery( document ).keyup( function(e)
+	{
+		if( e.keyCode == 27 )
+		{
+			closeWidgetSettings();
+			closeAvailableWidgets();
+		}
+	});
 } );
 
 
@@ -203,7 +226,16 @@ function makeDraggable( selector )
 		scrollSensitivity: 100, // distance from edge before scoll occurs
 		zIndex: 999, // z-index whilst dragging
 		opacity: .8, // opacity whilst dragging
-		cursor: "move" // change the cursor whilst dragging
+		cursor: "move", // change the cursor whilst dragging
+		cancel: 'input,textarea,button,select,option,a,span.fa,span.widget_checkbox', // prevents dragging from starting on specified elements
+		start: function()
+		{	// Hide original row during dragging:
+			jQuery( this ).hide();
+		},
+		stop: function()
+		{	// Show original row after dragging:
+			jQuery( this ).show();
+		},
 	}).addClass( "draggable_widget" ); // add our css class
 }
 
@@ -350,7 +382,7 @@ function getWidgetOrder()
 		containers_list += container+',';
 	}
 
-	var r = 'blog='+blog+'&'+query_string+'container_list='+containers_list;
+	var r = ( typeof( blog ) != 'undefined' ? 'blog='+blog : '' ) +'&'+query_string+'container_list='+containers_list;
 
 	// console.log( r );
 
@@ -401,14 +433,14 @@ function editWidget( widget )
 /*
  * This is called when we get the response from the server:
  */
-function widgetSettings( the_html )
+function widgetSettings( the_html, wi_type, wi_code )
 {
 	// add placeholder for widgets settings form:
 	jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeWidgetSettings()"></div><div id="widget_settings" class="modal-content"></div>' );
 	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
-	jQuery( '#widget_settings' ).html( the_html ).addClass( 'widget_settings_active' );
+	jQuery( '#widget_settings' ).html( the_html ).addClass( 'widget_settings_active edit_widget_' + wi_type + '_' + wi_code );
 	jQuery( '#widget_settings' ).prepend( jQuery( '#server_messages' ) );
-	AttachServerRequest( 'form' ); // send form via hidden iframe
+	AttachServerRequest( 'widget_checkchanges' ); // send form via hidden iframe
 
 	// Create modal header for bootstrap skin
 	var page_title = jQuery( '#widget_settings' ).find( 'h2.page-title:first' );
@@ -428,16 +460,6 @@ function widgetSettings( the_html )
 	}
 
 	jQuery( '#widget_settings a.close_link' ).bind( 'click', closeWidgetSettings );
-
-	// Close widget Settings if Escape key is pressed:
-	var keycode_esc = 27;
-	jQuery(document).keyup(function(e)
-	{
-		if( e.keyCode == keycode_esc )
-		{
-			closeWidgetSettings();
-		}
-	});
 }
 
 function widgetSettingsCallback( wi_ID, wi_name, wi_cache_status )
@@ -446,8 +468,27 @@ function widgetSettingsCallback( wi_ID, wi_name, wi_cache_status )
 	jQuery( '#wi_ID_' + wi_ID + ' .widget_cache_status' ).html( getWidgetCacheIcon( 'wi_ID_'+wi_ID, wi_cache_status ) );
 }
 
-function closeWidgetSettings()
+function closeWidgetSettings( action )
 {
+	if( ! jQuery( '#widget_settings' ).is( ':visible' ) )
+	{	// Close popup window with widget settings only if it is really opened,
+		// in order to don't hide #screen_mask when available widgets popup is opened currently:
+		return false;
+	}
+
+	if( typeof( bozo ) != 'undefined' &&
+	    ( typeof( action ) == 'undefined' || action != 'update' ) ) // Don't use bozo validator when form is updating
+	{	// Display a confirmation of bozo validator before closing a modified widget edit form:
+		if( bozo.validate_close() && ! confirm( bozo.validate_close() ) )
+		{	// Don't close a modified widget edit form without confirmation:
+			return false;
+		}
+		else
+		{	// After confirmation we should reset bozo validator modification counter to don't display a confirmation twice on page closing/refreshing:
+			bozo.reset_changes();
+		}
+	}
+
 	jQuery( '#widget_settings' ).hide(); // removeClass( 'widget_settings_active' );
 	jQuery( '#server_messages' ).insertBefore( '.available_widgets' );
 	jQuery( '#widget_settings' ).remove();
@@ -455,8 +496,14 @@ function closeWidgetSettings()
 	return false;
 }
 
-function showMessagesWidgetSettings()
+function showMessagesWidgetSettings( result )
 {
+	if( typeof( result ) != 'undefined' && result == 'success' && typeof( bozo ) != 'undefined' )
+	{	// Reset bozo validator modification counter on successful updating widget settings,
+		// in order to allow close widget settings form popup without unexpected JS confirmation:
+		bozo.reset_changes();
+	}
+
 	jQuery( '#widget_settings' ).animate( {
 			scrollTop: jQuery( '#widget_settings' ).scrollTop() +  + jQuery( '#server_messages' ).position().top - 20
 		}, 100 );
@@ -508,17 +555,6 @@ function convertAvailableList()
 		return false;
 	});
 
-	// Close Overlay if Escape key is pressed:
-	var keycode_esc = 27;
-	jQuery(document).keyup(function(e)
-	{
-		if( e.keyCode == keycode_esc )
-		{
-			closeAvailableWidgets();
-			return false;
-		}
-	});
-
 	jQuery( ".available_widgets li" ).each( function()
 	{ // shuffle things around
 		jQuery( this ).addClass( "new_widget" ); // add hook for detecting new widgets
@@ -540,7 +576,13 @@ function convertAvailableList()
  */
 function closeAvailableWidgets()
 {
-	jQuery('.available_widgets').removeClass( 'available_widgets_active' );
+	if( ! jQuery( '.available_widgets' ).is( ':visible' ) )
+	{	// Close popup window with available widgets only if it is really opened,
+		// in order to don't hide #screen_mask when widget edit form is opened currently:
+		return false;
+	}
+
+	jQuery( '.available_widgets' ).removeClass( 'available_widgets_active' );
 	jQuery( '#screen_mask' ).remove();
 }
 

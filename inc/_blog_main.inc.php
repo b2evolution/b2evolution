@@ -49,7 +49,7 @@ $BlogCache = & get_BlogCache();
 /**
  * @var Blog
  */
-$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 if( empty( $Blog ) )
 {
 	require $siteskins_path.'_404_blog_not_found.main.php'; // error & exit
@@ -109,7 +109,7 @@ if( init_charsets( $current_charset ) )
 	// Reload Blog(s) (for encoding of name, tagline etc):
 	$BlogCache->clear();
 
-	$Blog = & $BlogCache->get_by_ID( $blog );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	if( is_logged_in() )
 	{ // We also need to reload the current User with the new final charset
 		$UserCache = & get_UserCache();
@@ -521,6 +521,11 @@ elseif( !empty($preview) )
 	// Consider this as an admin hit!
 	$Hit->hit_type = 'admin';
 }
+elseif( ( $disp == 'visits' ) && ( ( $Settings->get( 'enable_visit_tracking' ) != 1 ) || ! is_logged_in() ) )
+{ // Check if visit tracking is enabled and the user is logged in before allowing profile visit display
+	$disp = '403';
+	$disp_detail = '403-visit-tracking-disabled';
+}
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post
@@ -561,7 +566,7 @@ elseif( $disp == '-' )
 			|| $Blog->get_setting( 'relcanonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
-		if( ! is_same_url($ReqURL, $canonical_url) )
+		if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 		{	// We are not on the canonicial blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
@@ -612,6 +617,12 @@ elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
 	$disp_detail = '404-post_not_found';
 }
 
+param( 'user_ID', 'integer', NULL );
+if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID != $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
+{ // add or increment to user profile visit
+	add_user_profile_visit( $user_ID, $current_User->ID );
+}
+
 
 if( $disp == 'terms' )
 {	// Display a page of terms & conditions:
@@ -657,6 +668,7 @@ if( is_logged_in() && // Only for logged in users
 		// EXIT HERE
 	}
 }
+
 
 
 /*

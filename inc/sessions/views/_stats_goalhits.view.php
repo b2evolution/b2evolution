@@ -162,7 +162,7 @@ $Results->cols[] = array(
 		'order' => 'ghit_ID',
 		'default_dir' => 'D',
 		'td_class' => 'timestamp',
-		'td' => '%mysql2localedatetime_spans( #hit_datetime#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #hit_datetime# )%',
  	);
 
 $Results->cols[] = array(

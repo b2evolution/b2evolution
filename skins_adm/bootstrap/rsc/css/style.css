@@ -54,7 +54,7 @@ div.status_icon {
 .widget_actions a,
 .no_icon {
   font-weight: bold;
-  margin: 0 2px;
+  margin: 2px;
 }
 .btn-group .action_icon {
   margin-left: 0;
@@ -265,14 +265,14 @@ div.delete_messages ul li {
   border-radius: 4px;
 }
 .evo_post__comments .evo_form__comment.form-horizontal.evo_form__comment_meta {
-  border: 2px solid #5133ab;
-  background-color: #f7f4ff;
+  border: 2px solid #5bc0de;
+  background-color: #d9edf7;
 }
 .evo_post__comments .evo_form__comment.form-horizontal .form_info {
   display: block;
   text-align: center;
   padding: 10px;
-  color: #5133ab;
+  color: #5bc0de;
 }
 #comment_filter_form fieldset {
   margin-bottom: 20px;
@@ -307,15 +307,15 @@ div.delete_messages ul li {
   color: #888;
 }
 .evo_comments_container .evo_comment.evo_comment__status_meta {
-  border: 2px solid #5133ab;
+  border: 2px solid #5bc0de;
 }
 .evo_comments_container .evo_comment.evo_comment__status_meta .panel-heading,
 .evo_comments_container .evo_comment.evo_comment__status_meta .panel-footer {
-  background-color: #f7f4ff;
-  border-bottom: 1px solid #5133ab;
+  background-color: #d9edf7;
+  border-bottom: 1px solid #5bc0de;
 }
 .evo_comments_container .evo_comment.evo_comment__status_meta .panel-footer {
-  border-top: 1px solid #5133ab;
+  border-top: 1px solid #5bc0de;
   border-bottom: none;
 }
 .evo_comments_container .evo_comment.evo_comment__status_trash {
@@ -356,7 +356,7 @@ div.delete_messages ul li {
 .vote_spam {
   float: left;
   padding-left: 10px;
-  line-height: 33px;
+  line-height: 34px;
 }
 .vote_spam a.action_icon {
   font-size: inherit;
@@ -369,6 +369,12 @@ div.delete_messages ul li {
 }
 .dashboard_action_area .vote_spam a.action_icon {
   font-size: 12px;
+}
+.comment_reply {
+  float: left;
+  display: inline-block;
+  margin-left: 10px;
+  line-height: 34px;
 }
 .evo_content_block span[class*="status_"] {
   left: 8px;
@@ -596,7 +602,7 @@ fieldset ul {
   margin-top: 1px;
 }
 .dashboard_comments_block__meta .panel-body {
-  background-color: #f7f4ff;
+  background-color: #d9edf7;
 }
 .chart .label {
   color: #000;
@@ -615,17 +621,20 @@ fieldset ul {
 #itemform_content .panel-title > a.post_type_link:hover {
   color: #23527c;
 }
-#itemform_extra input {
+#itemform_extra input:not( #item_issue_date ) {
   max-width: 80px;
 }
 #itemform_extra > div.fieldset > label {
   display: block;
 }
 #itemform_adv_props div.tile,
-#itemform_adv_props div.controls {
+#itemform_custom_fields div.tile,
+#itemform_adv_props div.controls,
+#itemform_custom_fields div.controls {
   width: 100%;
 }
-#itemform_adv_props td.label {
+#itemform_adv_props td.label,
+#itemform_custom_fields td.label {
   background: none;
   color: #000;
   text-shadow: none;
@@ -633,7 +642,8 @@ fieldset ul {
   vertical-align: top;
   padding: 9px 10px 0 0;
 }
-#itemform_adv_props .help-inline label {
+#itemform_adv_props .help-inline label,
+#itemform_custom_fields .help-inline label {
   font-weight: normal;
   display: block;
 }
@@ -654,30 +664,40 @@ fieldset ul {
   display: inline-block;
 }
 #itemform_links .panel,
-#cmntform_links .panel {
+#cmntform_links .panel,
+#ecmpform_links .panel,
+#msgform_links .panel {
   overflow: hidden;
 }
 #itemform_links .panel-body,
-#cmntform_links .panel-body {
+#cmntform_links .panel-body,
+#ecmpform_links .panel-body,
+#msgform_links .panel-body {
   padding: 0;
+}
+#msgform_links {
+  margin-bottom: 20px;
 }
 #itemform_goals td {
   padding-bottom: 2px;
 }
-#attachmentframe_wrapper {
+#attachments_fieldset_wrapper {
   width: 100%;
   height: 160px;
   position: relative;
-  overflow: hidden;
   padding-bottom: 6px;
   box-sizing: content-box;
 }
-#attachmentframe_wrapper .ui-resizable-s {
+#attachments_fieldset_wrapper #attachments_fieldset_block {
+  overflow: auto;
+  height: 100%;
+}
+#attachments_fieldset_wrapper .ui-resizable-s {
   background: #c0c0c0;
   height: 6px;
   bottom: 0;
 }
-#attachmentframe_wrapper .ui-resizable-s:after {
+#attachments_fieldset_wrapper .ui-resizable-s:after {
   content: "...";
   font-size: 10px;
   top: -7px;
@@ -685,12 +705,20 @@ fieldset ul {
   text-align: center;
   display: block;
 }
-#attachmentframe_wrapper #attachmentframe_disabler {
+#attachments_fieldset_wrapper .table_scroll {
+  position: relative;
+}
+#attachments_fieldset_wrapper div.results,
+#attachments_fieldset_wrapper div.table_scroll {
+  overflow: initial;
+}
+#attachments_fieldset_wrapper table tbody .dragged {
+  opacity: 0.8;
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  z-index: 1000;
+}
+#attachments_fieldset_wrapper table tbody td {
+  cursor: move;
 }
 #filelist_tbody tr:first-child .action_icon_link_move_up,
 #filelist_tbody tr:last-child .action_icon_link_move_down {
@@ -837,7 +865,11 @@ tr#fileuploader_form td {
   margin-top: 10px;
 }
 h2.user_title {
+  margin-top: 0;
   margin-bottom: 18px;
+}
+h2.user_title::first-line {
+  line-height: 52px;
 }
 .tool_steps {
   text-align: center;
@@ -845,6 +877,7 @@ h2.user_title {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
@@ -1103,10 +1136,14 @@ div.level2 {
 nav.level1 {
   z-index: 1;
 }
+div.level3 nav .nav > li {
+  margin-right: 3px;
+  margin-bottom: 3px;
+}
 div.level3 nav .nav > li > a {
   padding: 4px 10px;
   font-size: 92%;
-  background-color: #eee;
+  background-color: #f6f6f6;
 }
 div.level3 nav .nav > li.active a,
 div.level3 nav .nav > li.active a:hover,
@@ -1118,6 +1155,9 @@ div.level3 nav .nav > li.active a:focus {
 }
 .user_header_content .user_title .login {
   margin-left: 10px;
+}
+div.level3 nav .nav > li + li {
+  margin-left: 0px;
 }
 .footer {
   background-color: #f5f5f5;
@@ -1193,7 +1233,7 @@ div.level3 nav .nav > li.active a:focus {
   border-radius: 4px;
   padding: 5px;
   float: left;
-  margin: 15px;
+  margin: 5px;
 }
 .skinshot .skinshot_placeholder {
   width: 240px;
@@ -1212,17 +1252,19 @@ div.level3 nav .nav > li.active a:focus {
 }
 .skinshot .legend {
   margin: 0 1ex;
+  width: 240px;
+  height: 50px;
+  overflow: hidden;
+}
+.skinshot .legend label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .coll_settings_skinshot .skinshot {
   padding: 0;
   float: none;
   margin: -1ex -1ex 1ex -1ex;
-}
-.skin_selector_block {
-  margin: -15px 0 0 -15px;
-}
-.skin_selector_block .skinshot {
-  margin: 15px 0 0 15px;
 }
 .skinshot_new {
   text-align: center;
@@ -1300,7 +1342,8 @@ form#thread_checkchanges ul.token-input-list-facebook {
 .global_icons.no_title {
   margin-bottom: 22px;
 }
-input[name=new_cat_order] {
+input[name=new_cat_order],
+input[name=new_item_order] {
   width: 100%;
 }
 .filters_item_list_table {
@@ -1405,44 +1448,20 @@ table.diff td.diff-title-addedline {
   margin: 0 0 10px 25px;
   list-style: disc;
 }
-.evo_poll__table {
-  margin-bottom: 14px;
-  width: 100%;
-}
-.evo_poll__table td {
-  padding: 2px 10px 2px 0;
-  vertical-align: top;
-}
-.evo_poll__table tr td:last-child {
-  padding-right: 0;
-}
-.evo_poll__table input[type=radio],
-.evo_poll__table label {
-  margin: 0;
-}
-.evo_poll__table .evo_poll__percent_bar {
+.evo_poll__percent_bar {
   width: 100%;
   min-width: 40px;
   padding-right: 6px;
 }
-.evo_poll__table .evo_poll__percent_bar > div {
+.evo_poll__percent_bar > div {
   width: 100%;
   vertical-align: middle;
   display: inline-block;
 }
-.evo_poll__table .evo_poll__percent_bar > div > div {
+.evo_poll__percent_bar > div > div {
   background: #ffcc66;
   height: 12px;
   min-width: 1px;
-}
-.evo_poll__table .evo_poll__selector {
-  width: 5px;
-}
-.evo_poll__table .evo_poll__title {
-  white-space: nowrap;
-}
-.evo_poll__table .evo_poll_percentage {
-  max-width: 50px;
 }
 .status_color_draft {
   color: #ffff99;
@@ -1472,7 +1491,7 @@ table.diff td.diff-title-addedline {
   color: #ff6666;
 }
 .status_color_meta {
-  color: #5133ab;
+  color: #5bc0de;
 }
 .btn[class*=btn-status-] {
   border: 1px solid #ccc;
@@ -1589,5 +1608,17 @@ table.diff td.diff-title-addedline {
   background-color: #ff6666;
 }
 .evo_checkbox_status__meta {
-  background-color: #5133ab;
+  background-color: #5bc0de;
+}
+.evo_aggregate_filter {
+  white-space: nowrap;
+}
+.evo_aggregate_filter label {
+  padding-top: 5px;
+  padding-right: 5px;
+  width: auto;
+}
+.evo_aggregate_filter select {
+  display: inline;
+  width: auto;
 }
