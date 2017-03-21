@@ -207,7 +207,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 					skin_container( NT_('Sidebar'), array(
 							// The following (optional) params will be used as defaults for widgets included in this container:
 							// This will enclose each widget in a block:
-							'block_start' => '<div class="panel panel-default widget $wi_class$">',
+							'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
 							'block_end'   => '</div>',
 							// This will enclose the title of each widget:
 							'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
@@ -249,7 +249,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 					skin_container( NT_('Sidebar 2'), array(
 							// The following (optional) params will be used as defaults for widgets included in this container:
 							// This will enclose each widget in a block:
-							'block_start' => '<div class="panel panel-default widget $wi_class$">',
+							'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
 							'block_end'   => '</div>',
 							// This will enclose the title of each widget:
 							'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
