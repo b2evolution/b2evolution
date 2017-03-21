@@ -396,7 +396,7 @@ if( $disp == 'front' )
 		// Display container and contents:
 		skin_container( NT_('Forum Front Secondary Area'), array(
 				// The following params will be used as defaults for widgets included in this container:
-				'block_start'       => '<div class="widget $wi_class$">',
+				'block_start'       => '<div class="evo_widget $wi_class$">',
 				'block_end'         => '</div>',
 				'block_title_start' => '<h2 class="page-header">',
 				'block_title_end'   => '</h2>',
