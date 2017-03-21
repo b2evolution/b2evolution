@@ -1378,42 +1378,46 @@ function wpxml_check_xml_file( $file, $halt = false )
 {
 	$internal_errors = libxml_use_internal_errors( true );
 	$xml = simplexml_load_file( $file );
-	if( !$xml )
-	{ // halt/display if loading produces an error
+	if( ! $xml )
+	{	// Halt/Display if loading produces an error:
+		$errors = array();
 		if( $halt )
-		{
-			debug_die( 'There was an error when reading this XML file.' );
+		{	// Halt on error:
+			foreach( libxml_get_errors() as $error )
+			{
+				$errors[] = 'Line '.$error->line.' - "'.$error->message.'"';
+			}
+			debug_die( 'There was an error when reading XML file "'.$file.'".'
+				.' Error: '.implode( ', ', $errors ) );
 		}
 		else
-		{
-			echo '<p class="text-danger">'.T_('There was an error when reading this XML file.').'</p>';
+		{	// Display error:
+			foreach( libxml_get_errors() as $error )
+			{
+				$errors[] = sprintf( T_('Line %s'), '<code>'.$error->line.'</code>' ).' - '.'"'.$error->message.'"';
+			}
+			echo '<p class="text-danger">'.sprintf( T_('There was an error when reading XML file %s.'), '<code>'.$file.'</code>' ).'<br />'
+				.sprintf( T_('Error: %s'), implode( ',<br />', $errors ) ).'</p>';
 			return false;
 		}
 	}
 
-	$wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' );
-	if( !$wxr_version )
+	// Check WXR version for correct format:
+	$r = false;
+	if( $wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' ) )
 	{
-		if( $halt )
-		{
-			debug_die( 'This does not appear to be a XML file, missing/invalid WXR version number.' );
-		}
-		else
-		{
-			echo '<p class="text-danger">'.T_('This does not appear to be a XML file, missing/invalid WXR version number.').'</p>';
-			return false;
-		}
+		$wxr_version = (string) trim( $wxr_version[0] );
+		$r = preg_match( '/^\d+\.\d+$/', $wxr_version );
 	}
 
-	$wxr_version = (string) trim( $wxr_version[0] );
-	if( !preg_match( '/^\d+\.\d+$/', $wxr_version ) )
-	{ // confirm that we are dealing with the correct file format
+	if( ! $r )
+	{	// If file format is wrong:
 		if( $halt )
-		{
+		{	// Halt on error:
 			debug_die( 'This does not appear to be a XML file, missing/invalid WXR version number.' );
 		}
 		else
-		{
+		{	// Display error:
 			echo '<p class="text-danger">'.T_('This does not appear to be a XML file, missing/invalid WXR version number.').'</p>';
 			return false;
 		}
