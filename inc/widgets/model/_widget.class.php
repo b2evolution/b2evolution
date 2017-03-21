@@ -621,8 +621,21 @@ class ComponentWidget extends DataObject
 		// Display the debug containers when $debug = 2 OR when it is turned on from evo menu under "Collection" -> "Show/Hide containers"
 		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
+		$after_widget = '';
+
 		// Enable the desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode"
-		$enable_designer_mode = $Session->get( 'designer_mode_'.$Blog->ID ) == 1;
+		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+		{	// Print this data div, Used for JavaScript code:
+			$widget_data = array(
+				'class'   => 'evo_widget__data',
+				'data-id' => $this->ID,
+			);
+			if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Display a link to edit this widget only if current user has a permission:
+				$widget_data['data-edit-url'] = $admin_url.'?ctrl=widgets&action=edit&wi_ID='.$this->ID;
+			}
+			$after_widget = '<div'.get_field_attribs_as_string( $widget_data, 'htmlattr' ).'></div>';
+		}
 
 		if( ! $Blog->get_setting('cache_enabled_widgets')
 		    || ! $this->disp_params['allow_blockcache']
@@ -640,17 +653,9 @@ class ComponentWidget extends DataObject
 				echo 'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
 			}
 
-			if( $enable_designer_mode )
-			{	// Display the designer overlay:
-				echo '<span class="dev-blocks dev-blocks--design">';
-			}
-
 			$this->display( $params );
 
-			if( $enable_designer_mode )
-			{	// End of the designer overlay:
-				echo '</span>';
-			}
+			echo $after_widget;
 
 			if( $display_containers )
 			{ // DEBUG:
@@ -682,17 +687,9 @@ class ComponentWidget extends DataObject
 					echo 'Widget: <b>'.$this->get_name().'</b> - FROM cache <i class="fa fa-info">?</i></div>'."\n";
 				}
 
-				if( $enable_designer_mode )
-				{	// Display the designer overlay:
-					echo '<span class="dev-blocks dev-blocks--design">';
-				}
-
 				echo $content;
 
-				if( $enable_designer_mode )
-				{	// End of the designer overlay:
-					echo '</span>';
-				}
+				echo $after_widget;
 
 				if( $display_containers )
 				{ // DEBUG:
@@ -713,11 +710,6 @@ class ComponentWidget extends DataObject
 					echo 'Widget: <b>'.$this->get_name().'</b> - NOT in cache <i class="fa fa-info">?</i></div>'."\n";
 				}
 
-				if( $enable_designer_mode )
-				{	// Display the designer overlay:
-					echo '<span class="dev-blocks dev-blocks--design">';
-				}
-
 				$this->BlockCache->start_collect();
 
 				$this->display( $params );
@@ -725,10 +717,7 @@ class ComponentWidget extends DataObject
 				// Save collected cached data if needed:
 				$this->BlockCache->end_collect();
 
-				if( $enable_designer_mode )
-				{	// End of the designer overlay:
-					echo '</span>';
-				}
+				echo $after_widget;
 
 				if( $display_containers )
 				{ // DEBUG:

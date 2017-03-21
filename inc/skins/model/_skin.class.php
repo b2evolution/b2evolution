@@ -927,7 +927,7 @@ class Skin extends DataObject
 	 */
 	function display_init( /*optional: $features = array() */ )
 	{
-		global $debug, $Messages, $disp, $UserSettings, $Blog;
+		global $debug, $Messages, $disp, $UserSettings, $Blog, $Session;
 
 		// We get the optional arg this way for PHP7 comaptibility:
 		@list( $features ) = func_get_args();
@@ -1366,6 +1366,12 @@ var downloadInterval = setInterval( function()
 		else
 		{ // Standard skin
 			require_js( 'build/evo_frontoffice.bmin.js', 'blog' );
+		}
+
+		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+		{	// If desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode":
+			require_js( '#jquery#', 'blog' );
+			require_js( 'src/evo_widget_designer.js', 'blog' );
 		}
 
 		// Skin v7 specific initializations for kind of current collection:

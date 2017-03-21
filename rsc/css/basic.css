@@ -66,9 +66,13 @@ div.dev-blocks--widget--notincache > .dev-blocks-name {
 div.dev-blocks--belowtoolbar {
   margin: 27px 0 -27px 0;
 }
-.dev-blocks--design:hover {
-  display: inline-block;
-  box-shadow: 0px 0px 0px 2px #666;
+.evo_widget__data {
+  display: none;
+}
+.evo_widget__designer_block {
+  position: absolute;
+  border: 3px solid #666;
+  border-radius: 4px;
 }
 .results_ajax_loading {
   position: absolute;
