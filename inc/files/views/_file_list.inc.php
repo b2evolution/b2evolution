@@ -743,6 +743,41 @@ $Form->begin_form();
 				<?php
 			}
 			*/
+			
+
+			/*
+			 * CREATE FILE/FOLDER CREATE PANEL:
+			 */
+			if( ( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ) )
+						&& $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+			{	// dir or file creation is enabled and we're allowed to add files:
+				global $create_type;
+
+				echo '<div class="evo_file_folder_creator">';
+					if( ! $Settings->get( 'fm_enable_create_dir' ) )
+					{	// We can create files only:
+						echo '<label for="fm_createname" class="tooltitle">'.T_('New file:').'</label>';
+						$Form->hidden( 'create_type', 'file' );
+					}
+					elseif( ! $Settings->get( 'fm_enable_create_file' ) )
+					{	// We can create directories only:
+						echo '<label for="fm_createname" class="tooltitle">'.T_('New folder:').'</label>';
+						$Form->hidden( 'create_type', 'dir' );
+					}
+					else
+					{	// We can create both files and directories:
+						echo T_('New').': ';
+						echo '<select name="create_type" class="form-control">';
+						echo '<option value="dir"'.( isset($create_type) &&  $create_type == 'dir' ? ' selected="selected"' : '' ).'>'.T_('folder').'</option>';
+						echo '<option value="file"'.( isset($create_type) && $create_type == 'file' ? ' selected="selected"' : '' ).'>'.T_('file').'</option>';
+						echo '</select>:';
+					}
+				?>
+				<input type="text" name="create_name" id="fm_createname" value="<?php echo isset( $create_name ) ? $create_name : ''; ?>" size="15" class="form-control" />
+				<input class="ActionButton btn btn-default" type="submit" name="actionArray[createnew]" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
+				<?php
+				echo '</div>';
+			}
 			?>
 			</td>
 		</tr>

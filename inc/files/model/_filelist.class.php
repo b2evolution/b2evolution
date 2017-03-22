@@ -415,8 +415,10 @@ class Filelist
 			$this->_total_files++;
 		}
 
-		// Count total bytes in this dir
-		$this->_total_bytes += $this->get_File_size($File);
+		if( ! $File->is_dir() )
+		{	// Count total bytes of files in this dir:
+			$this->_total_bytes += $this->get_File_size($File);
+		}
 
 		return true;
 	}
