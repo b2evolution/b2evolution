@@ -10,11 +10,17 @@ jQuery( document ).on( 'mouseover', '.evo_widget', function()
 	// To be sure all previous designer blocks are closed before open new one:
 	jQuery( '.evo_widget__designer_block' ).hide();
 
+	var current_widget_position = {
+		'top': jQuery( this ).offset().top - 3,
+		'left': jQuery( this ).offset().left - 3,
+		'width': jQuery( this ).width() + 6,
+		'height': jQuery( this ).height() + 6,
+	};
 	var current_designer_block_id = jQuery( this ).data( 'block-id' );
 	var designer_block_id = 'evo_widget__designer_block_' + ( typeof( current_designer_block_id ) != 'undefined' ? current_designer_block_id : evo_widget_designer_num );
 	if( jQuery( '#' + designer_block_id ).length )
 	{	// Just display a designer block if it already has been initialized on previous time:
-		jQuery( '#' + designer_block_id ).show();
+		jQuery( '#' + designer_block_id ).css( current_widget_position ).show();
 		return;
 	}
 
@@ -28,13 +34,7 @@ jQuery( document ).on( 'mouseover', '.evo_widget', function()
 	var widget_data = jQuery( this ).next( '.evo_widget__data' );
 	var widget_ID_attr = ( widget_data.length && widget_data.data( 'id' ) ) ? ' data-id="' + widget_data.data( 'id' ) + '"': '';
 	jQuery( '.evo_widget__designer_blocks' ).append( '<div id="' + designer_block_id + '" class="evo_widget__designer_block"' + widget_ID_attr + '></div>' );
-	var designer_block_obj = jQuery( '#' + designer_block_id );
-	designer_block_obj.css( {
-		'top': jQuery( this ).offset().top - 3,
-		'left': jQuery( this ).offset().left - 3,
-		'width': jQuery( this ).width() + 6,
-		'height': jQuery( this ).height() + 6,
-	} );
+	jQuery( '#' + designer_block_id ).css( current_widget_position );
 
 	// Increase a number for next block:
 	evo_widget_designer_num++;

@@ -1163,6 +1163,7 @@ div.dev-blocks--belowtoolbar {
   position: absolute;
   border: 3px solid #666;
   border-radius: 4px;
+  z-index: 10000;
 }
 .results_ajax_loading {
   position: absolute;
