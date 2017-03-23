@@ -194,6 +194,7 @@ class profile_menu_link_Widget extends generic_menu_link_Widget
 		// Display a layout with menu link:
 		$menu_link_template = $current_User->get_identity_link( array(
 				'display_bubbletip' => false,
+				'thumb_class'       => 'avatar_before_login_middle',
 				'thumb_size'        => $this->disp_params['profile_picture_size'],
 				'link_class'        => '$link_class$',
 				'blog_ID'           => $current_Blog->ID,
