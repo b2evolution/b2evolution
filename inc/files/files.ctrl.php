@@ -844,7 +844,7 @@ switch( $action )
 						if( ! $loop_src_File->rename_to( $new_name ) )
 						{
 							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
-								$old_name, $new_name ), 'error', T_('Renaming files') );
+								$old_name, $new_name ), 'error', T_('Renaming files:') );
 							continue 2;
 						}
 
