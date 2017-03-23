@@ -2355,7 +2355,7 @@ function display_dragdrop_upload_button( $params = array() )
 						}
 						else
 						{
-							var text = base64_decode( responseJSON.success.text );
+							var text = b64DecodeUnicode( responseJSON.success.text );
 							if( responseJSON.success.specialchars == 1 )
 							{
 								text = htmlspecialchars_decode( text );
