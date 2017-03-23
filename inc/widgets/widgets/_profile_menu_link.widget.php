@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_Widget' );
 
 /**
  * ComponentWidget Class
@@ -22,7 +22,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class profile_menu_link_Widget extends ComponentWidget
+class profile_menu_link_Widget extends generic_menu_link_Widget
 {
 	/**
 	 * Constructor
@@ -194,6 +194,7 @@ class profile_menu_link_Widget extends ComponentWidget
 		// Display a layout with menu link:
 		$menu_link_template = $current_User->get_identity_link( array(
 				'display_bubbletip' => false,
+				'thumb_class'       => 'avatar_before_login_middle',
 				'thumb_size'        => $this->disp_params['profile_picture_size'],
 				'link_class'        => '$link_class$',
 				'blog_ID'           => $current_Blog->ID,

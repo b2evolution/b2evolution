@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_Widget' );
 
 global $msg_menu_link_widget_link_types;
 $msg_menu_link_widget_link_types = array(
@@ -28,7 +28,7 @@ $msg_menu_link_widget_link_types = array(
  *
  * @package evocore
  */
-class msg_menu_link_Widget extends ComponentWidget
+class msg_menu_link_Widget extends generic_menu_link_Widget
 {
 	/**
 	 * Constructor

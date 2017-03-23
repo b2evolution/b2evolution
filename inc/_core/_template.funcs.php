@@ -2318,17 +2318,32 @@ function display_ajax_form( $params )
 	<script type="text/javascript">
 		var ajax_form_offset_<?php echo $ajax_form_number; ?> = jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').offset().top;
 		var request_sent_<?php echo $ajax_form_number; ?> = false;
+		var ajax_form_loading_number_<?php echo $ajax_form_number; ?> = 0;
 
 		function get_form_<?php echo $ajax_form_number; ?>()
 		{
+			var form_id = '#ajax_form_number_<?php echo $ajax_form_number; ?>';
+			ajax_form_loading_number_<?php echo $ajax_form_number; ?>++;
 			jQuery.ajax({
 				url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 				type: 'POST',
 				data: <?php echo $json_params; ?>,
 				success: function(result)
-					{
-						jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').html( ajax_debug_clear( result ) );
+				{
+					jQuery( form_id ).html( ajax_debug_clear( result ) );
+				},
+				error: function( jqXHR, textStatus, errorThrown )
+				{
+					jQuery( '.loader_ajax_form', form_id ).after( '<div class="red center">' + errorThrown + ': ' + jqXHR.responseText + '</div>' );
+					if( ajax_form_loading_number_<?php echo $ajax_form_number; ?> < 3 )
+					{	// Try to load 3 times this ajax form if error occurs:
+						setTimeout( function()
+						{	// After 1 second delaying:
+							jQuery( '.loader_ajax_form', form_id ).next().remove();
+							get_form_<?php echo $ajax_form_number; ?>();
+						}, 1000 );
 					}
+				}
 			});
 		}
 
