@@ -9,10 +9,11 @@
 @import "inc/debug.inc.less";
 
 // MILOS> Prevents from scrolling right on all Bootstrap skins
-html, body {
-	width: auto !important;
-	overflow-x: hidden !important;
-}
+// MILOS> Yura will fix the evo_toolbar layout, this this won't be needed no more
+// html, body {
+	// width: auto !important;
+	// overflow-x: hidden !important;
+// }
 
 // CSS to show containers, widgets and includes:
 @import "_dev-blocks.module.less";
@@ -394,6 +395,9 @@ label.radiooption {
 			justify-content: center;
 			text-align: left;
 			margin-left: 8px;
+			a.btn {
+				margin-bottom: 5px;
+			}
 		}
 	}
 }

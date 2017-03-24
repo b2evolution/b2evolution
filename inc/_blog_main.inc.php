@@ -57,26 +57,30 @@ if( empty( $Blog ) )
 }
 
 
-// Show/Hide the containers:
-$display_containers = param( 'display_containers', 'string' );
-if( $display_containers == 'show' )
-{
-	$Session->set( 'display_containers_'.$blog, 1 );
-}
-elseif( $display_containers == 'hide' )
-{
-	$Session->delete( 'display_containers_'.$blog );
-}
+if( $debug == 2 || is_logged_in() )
+{	// Allow debug info only for logged-in users OR when debug == 2:
 
-// Show/Hide the includes:
-$display_includes = param( 'display_includes', 'string' );
-if( $display_includes == 'show' )
-{
-	$Session->set( 'display_includes_'.$blog, 1 );
-}
-elseif( $display_includes == 'hide' )
-{
-	$Session->delete( 'display_includes_'.$blog );
+	// Show/Hide the containers:
+	$display_containers = param( 'display_containers', 'string' );
+	if( $display_containers == 'show' )
+	{
+		$Session->set( 'display_containers_'.$blog, 1 );
+	}
+	elseif( $display_containers == 'hide' )
+	{
+		$Session->delete( 'display_containers_'.$blog );
+	}
+
+	// Show/Hide the includes:
+	$display_includes = param( 'display_includes', 'string' );
+	if( $display_includes == 'show' )
+	{
+		$Session->set( 'display_includes_'.$blog, 1 );
+	}
+	elseif( $display_includes == 'hide' )
+	{
+		$Session->delete( 'display_includes_'.$blog );
+	}
 }
 
 

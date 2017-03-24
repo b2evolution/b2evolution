@@ -50,7 +50,7 @@ class social_links_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Social links');
+		return T_('Free Social Links');
 	}
 
 
@@ -68,7 +68,7 @@ class social_links_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display social links.');
+		return T_('Display social link icons of your choice.');
 	}
 
 

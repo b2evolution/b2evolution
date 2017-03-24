@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url, $media_path;
+global $admin_url, $media_subdir, $media_path;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
@@ -37,7 +37,7 @@ $Table->cols = array(
 	array( 'th' => T_('Date'), 'td_class' => 'shrinkwrap' ),
 );
 
-$Table->title = T_('Potential files to be imported').get_manual_link('file-importer');
+$Table->title = T_('Potential files to be imported').get_manual_link( 'xml-importer' );
 $Table->title .= ' - '.action_icon( T_('Refresh'), 'refresh', $admin_url.'?ctrl=wpimportxml', T_('Refresh'), 3, 4 );
 
 $FileRootCache = & get_FileRootCache();
@@ -63,30 +63,36 @@ if( $import_perm_view )
 		).' <span class="note">(popup)</span>';
 }
 $Table->display_init();
-// TABLE START:
-$Table->display_list_start();
+
+echo $Table->params['before'];
+
 // TITLE:
 $Table->display_head();
 
 if( empty( $import_files ) )
-{ // No files to import
+{	// No files to import:
+	$Table->total_pages = 0;
+	$Table->no_results_text = '<div class="center">'.T_('We have not found any suitable file to perform the blog import. Please read the details at the manual page.').get_manual_link( 'xml-importer' ).'</div>';
 
 	// BODY START:
 	$Table->display_body_start();
-
-	$Table->display_line_start();
-	$Table->display_col_start();
-	echo '<p class="center">'.T_('We have not found any suitable file to perform the blog import. Please read the details at the manual page.').get_manual_link('file-importer').'</p>';
-	$Table->display_col_end();
-	$Table->display_line_end();
+	$Table->display_list_start();
+	$Table->display_list_end();
+	// BODY END:
+	$Table->display_body_end();
 }
 else
-{ // Display the files to import in table
+{	// Display the files to import in table:
+
+	// TABLE START:
+	$Table->display_list_start();
 
 	// COLUMN HEADERS:
 	$Table->display_col_headers();
 	// BODY START:
 	$Table->display_body_start();
+
+	$media_path_length = strlen( $media_path.'import/' );
 
 	foreach( $import_files as $import_file )
 	{
@@ -99,7 +105,7 @@ else
 
 		// File
 		$Table->display_col_start();
-		echo basename( $import_file['path'] );
+		echo substr( $import_file['path'], $media_path_length );
 		$Table->display_col_end();
 
 		// Type
@@ -116,12 +122,15 @@ else
 
 		evo_flush();
 	}
+
+	// BODY END:
+	$Table->display_body_end();
+
+	// TABLE END:
+	$Table->display_list_end();
 }
 
-// BODY END / TABLE END:
-$Table->display_body_end();
-$Table->display_list_end();
-
+echo $Table->params['after'];
 
 if( ! empty( $import_files ) )
 {
@@ -129,7 +138,7 @@ if( ! empty( $import_files ) )
 
 	$BlogCache = & get_BlogCache();
 	$BlogCache->load_all( 'shortname,name', 'ASC' );
-	$BlogCache->none_option_text = '&nbsp;';
+	$BlogCache->none_option_text = T_('Please select...');
 
 	$Form->select_input_object( 'wp_blog_ID', param( 'wp_blog_ID', 'integer', 0 ), $BlogCache, T_('Destination collection'), array(
 			'note' => T_('This blog will be used for import.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
@@ -142,13 +151,13 @@ if( ! empty( $import_files ) )
 				array(
 					'value' => 'replace',
 					'label' => T_('Replace existing contents'),
-					'note'  => T_('WARNING: this option will permanently remove existing Posts, comments, categories and tags from the selected blog.'),
+					'note'  => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.'),
 					'id'    => 'import_type_replace' ),
 			), '', array( 'lines' => true ) );
 
 	echo '<div id="checkbox_delete_files"'.( $import_type == 'replace' ? '' : ' style="display:none"' ).'>';
 	$Form->checkbox_input( 'delete_files', param( 'delete_files', 'integer', 0 ), '', array(
-		'input_suffix' => '<label for="delete_files">'.T_(' Also delete files that will no longer be referenced in the target blog after replacing its contents').'</label>',
+		'input_suffix' => '<label for="delete_files">'.T_(' Also delete files that will no longer be referenced in the destination collection after replacing its contents').'</label>',
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
@@ -158,6 +167,8 @@ if( ! empty( $import_files ) )
 					'label' => T_('Append to existing contents'),
 					'id'    => 'import_type_append' ),
 			), '', array( 'lines' => true ) );
+
+	$Form->checkbox_input( 'import_img', 1, '', array( 'input_suffix' => T_('Try to match any remaining <code>&lt;img&gt;</code> tags with imported attachments based on filename') ) );
 
 	$Form->end_fieldset();
 
@@ -203,6 +214,11 @@ function import_files_window()
 	} );
 	return false;
 }
+
+jQuery( document ).on( 'click', '#modal_window button[data-dismiss=modal]', function()
+{	// Reload page on closing modal window to display new uploaded files:
+	location.reload();
+} );
 <?php
 }
 ?>

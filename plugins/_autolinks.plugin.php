@@ -445,12 +445,9 @@ class autolinks_plugin extends Plugin
 	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
-		$Item = & $params['Item'];
-		/**
-		 * @var Blog
-		 * Also it is used to build link for tag links
-		 */
-		$this->current_Blog = & $params['Item']->get_Blog();
+
+		// Get collection from given params (also it is used to build link for tag links):
+		$this->current_Blog = $this->get_Blog_from_params( $params );
 
 		// Define the setting names depending on what is rendering now
 		if( !empty( $params['Comment'] ) )

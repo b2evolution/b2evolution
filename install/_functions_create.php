@@ -266,6 +266,7 @@ function create_default_data()
 			'usage'          => 'page',
 			'template_name'  => 'page',
 			'perm_level'     => 'restricted',
+			'use_comments'   => 0,
 		);
 	$post_types[] = array(
 			'name'           => 'Intro-Front',

@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.0';
+	var $version = '6.9.1';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -45,7 +45,7 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -135,9 +135,16 @@ class bootstrap_blog_Skin extends Skin
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
+					'font_family' => array(
+						'label' => T_('Font Family'),
+						'note' => '',
+						'defaultvalue' => 'system_helveticaneue',
+						'options' => $this->get_font_definitions(),
+						'type' => 'select',
+					),
 					'font_size' => array(
-						'label' => T_('Font size'),
-						'note' => T_('Select content font size.'),
+						'label' => T_('Default font size'),
+						'note' => T_('Select default font size.'),
 						'defaultvalue' => 'default',
 						'options' => array(
 								'default'        => T_('Default (14px)'),
@@ -145,6 +152,23 @@ class bootstrap_blog_Skin extends Skin
 								'medium'         => T_('Medium (18px)'),
 								'large'          => T_('Large (20px)'),
 								'very_large'     => T_('Very large (22px)'),
+							),
+						'type' => 'select',
+					),
+					'font_weight' => array(
+						'label' => T_('Default font weight'),
+						'note' => T_('Select default font weight.'),
+						'defaultvalue' => '400',
+						'options' => array(
+								'100' => '100',
+								'200' => '200',
+								'300' => '300',
+								'400' => '400 ('.T_('Normal').')',
+								'500' => '500',
+								'600' => '600',
+								'700' => '700 ('.T_('Bold').')',
+								'800' => '800',
+								'900' => '900',
 							),
 						'type' => 'select',
 					),
@@ -504,6 +528,9 @@ class bootstrap_blog_Skin extends Skin
 					break;
 			}
 		}
+
+		// Font family customization
+		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight' );
 
 		if( ! empty( $custom_css ) )
 		{	// Function for custom_css:

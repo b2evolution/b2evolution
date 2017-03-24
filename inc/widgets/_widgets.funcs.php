@@ -62,8 +62,8 @@ function add_basic_widget( $blog_ID, $container_name, $code, $type, $order, $par
  *
  * @param integer should never be 0
  * @param boolean should be true only when it's called after initial install
- * fp> TODO: $initial_install is used to know if we want to trust globals like $blog_photoblog_ID and $blog_forums_ID. We don't want that. 
- *           We should pass a $context array with values like 'photo_source_coll_ID' => 4. 
+ * fp> TODO: $initial_install is used to know if we want to trust globals like $blog_photoblog_ID and $blog_forums_ID. We don't want that.
+ *           We should pass a $context array with values like 'photo_source_coll_ID' => 4.
  *           Also, checking $blog_forums_ID is unnecessary complexity. We can check the colleciton kind == forum
  * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
  */
@@ -100,20 +100,20 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	if( $kind != 'main' )
 	{ // Don't add widgets to Menu container for Main collections
 		// Home page
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 5, array( 'link_type' => 'home' ) );
+		add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 5, array( 'link_type' => 'home' ) );
 		if( $blog_id == $blog_b_ID )
 		{ // Recent Posts
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 10, array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 10, array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) );
 		}
 		if( $kind == 'forum' )
 		{ // Latest Topics and Replies ONLY for forum
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 13, array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) );
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 15, array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 13, array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 15, array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) );
 		}
 		if( $kind == 'manual' )
 		{ // Latest Topics and Replies ONLY for forum
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 13, array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) );
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 15, array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 13, array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 15, array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) );
 		}
 		if( $kind == 'forum' || $kind == 'manual' )
 		{	// Add menu with flagged items:
@@ -121,32 +121,32 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		}
 		if( $kind == 'photo' )
 		{ // Add menu with Photo index
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 18, array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 18, array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );
 		}
 		if( $kind == 'forum' )
 		{ // Add menu with User Directory
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 20, array( 'link_type' => 'users' ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 20, array( 'link_type' => 'users' ) );
 		}
 		// Pages list:
 		add_basic_widget( $blog_id, 'Menu', 'coll_page_list', 'core', 25 );
 		if( $kind == 'forum' )
 		{ // My Profile
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 30, array( 'link_type' => 'myprofile' ), 0 );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 30, array( 'link_type' => 'myprofile' ), 0 );
 		}
 		if( $kind == 'std' )
 		{ // Categories
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 33, array( 'link_type' => 'catdir' ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 33, array( 'link_type' => 'catdir' ) );
 			// Archives
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 35, array( 'link_type' => 'arcdir' ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 35, array( 'link_type' => 'arcdir' ) );
 			// Latest comments
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 37, array( 'link_type' => 'latestcomments' ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 37, array( 'link_type' => 'latestcomments' ) );
 		}
 		add_basic_widget( $blog_id, 'Menu', 'msg_menu_link', 'core', 50, array( 'link_type' => 'messages' ), 0 );
 		add_basic_widget( $blog_id, 'Menu', 'msg_menu_link', 'core', 60, array( 'link_type' => 'contacts', 'show_badge' => 0 ), 0 );
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 70, array( 'link_type' => 'login' ), 0 );
+		add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 70, array( 'link_type' => 'login' ), 0 );
 		if( $kind == 'forum' )
 		{ // Register
-			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 80, array( 'link_type' => 'register' ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 80, array( 'link_type' => 'register' ) );
 		}
 	}
 
@@ -190,6 +190,11 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		add_basic_widget( $blog_id, 'Item Single', 'item_vote', 'core', 60 );
 	}
 
+	/* Item Page */
+	add_basic_widget( $blog_id, 'Item Page', 'item_content', 'core', 10 );
+	add_basic_widget( $blog_id, 'Item Page', 'item_attachments', 'core', 15 );
+	add_basic_widget( $blog_id, 'Item Page', 'item_seen_by', 'core', 50 );
+	add_basic_widget( $blog_id, 'Item Page', 'item_vote', 'core', 60 );
 
 	/* Sidebar Single */
 	if( $kind == 'forum' )
@@ -352,6 +357,13 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'coll_flagged_list', 'core', 20 );
 
 
+	/* Forum Front Secondary Area */
+	if( $kind == 'forum' )
+	{
+		add_basic_widget( $blog_id, 'Forum Front Secondary Area', 'coll_activity_stats', 'core', 10 );
+	}
+
+
 	/* 404 Page */
 	add_basic_widget( $blog_id, '404 Page', 'page_404_not_found', 'core', 10 );
 	add_basic_widget( $blog_id, '404 Page', 'coll_search_form', 'core', 20 );
@@ -365,19 +377,19 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 	/* Mobile Navigation Menu */
 	add_basic_widget( $blog_id, 'Mobile: Navigation Menu', 'coll_page_list', 'core', 10 );
-	add_basic_widget( $blog_id, 'Mobile: Navigation Menu', 'menu_link', 'core', 20, array( 'link_type' => 'ownercontact' ) );
-	add_basic_widget( $blog_id, 'Mobile: Navigation Menu', 'menu_link', 'core', 30, array( 'link_type' => 'home' ) );
+	add_basic_widget( $blog_id, 'Mobile: Navigation Menu', 'basic_menu_link', 'core', 20, array( 'link_type' => 'ownercontact' ) );
+	add_basic_widget( $blog_id, 'Mobile: Navigation Menu', 'basic_menu_link', 'core', 30, array( 'link_type' => 'home' ) );
 	if( $kind == 'forum' )
 	{ // Add menu with User Directory
-		add_basic_widget( $blog_id, 'Mobile: Navigation Menu', 'menu_link', 'core', 40, array( 'link_type' => 'users' ) );
+		add_basic_widget( $blog_id, 'Mobile: Navigation Menu', 'basic_menu_link', 'core', 40, array( 'link_type' => 'users' ) );
 	}
 
 
 	/* Mobile Tools Menu */
-	add_basic_widget( $blog_id, 'Mobile: Tools Menu', 'menu_link', 'core', 10, array( 'link_type' => 'login' ) );
+	add_basic_widget( $blog_id, 'Mobile: Tools Menu', 'basic_menu_link', 'core', 10, array( 'link_type' => 'login' ) );
 	add_basic_widget( $blog_id, 'Mobile: Tools Menu', 'msg_menu_link', 'core', 20, array( 'link_type' => 'messages' ) );
 	add_basic_widget( $blog_id, 'Mobile: Tools Menu', 'msg_menu_link', 'core', 30, array( 'link_type' => 'contacts', 'show_badge' => 0 ) );
-	add_basic_widget( $blog_id, 'Mobile: Tools Menu', 'menu_link', 'core', 50, array( 'link_type' => 'logout' ) );
+	add_basic_widget( $blog_id, 'Mobile: Tools Menu', 'basic_menu_link', 'core', 50, array( 'link_type' => 'logout' ) );
 
 
 	// Check if there are widgets to create

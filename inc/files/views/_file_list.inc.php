@@ -58,7 +58,7 @@ global $fm_mode, $fm_hide_dirtree, $create_name, $ads_list_path, $mode;
 global $linkctrl, $linkdata;
 
 // Name of the iframe we want some actions to come back to:
-global $iframe_name, $field_name;
+global $iframe_name, $field_name, $file_type;
 
 $Form = new Form( NULL, 'FilesForm', 'post', 'none' );
 $Form->begin_form();
@@ -331,7 +331,7 @@ $Form->begin_form();
 					echo ' ';
 				}
 
-				if( $fm_mode == 'file_select' && !empty( $field_name )  && !$lFile->is_dir() && $lFile->is_image() )
+				if( $fm_mode == 'file_select' && !empty( $field_name )  && !$lFile->is_dir() && $lFile->get( 'type' ) == $file_type )
 				{
 					$sfile_root = FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() );
 					$sfile_path = $lFile->get_rdfp_rel_path();
@@ -594,7 +594,7 @@ $Form->begin_form();
 
 			$template_filerow = '<table><tr>'
 				.'<td class="checkbox firstcol qq-upload-checkbox">&nbsp;</td>'
-				.'<td class="icon_type qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>';
+				.'<td class="icon_type text-nowrap qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>';
 			if( $fm_flatmode )
 			{
 				$template_filerow .= '<td class="filepath">'.( empty( $path ) ? './' : $path ).'</td>';
@@ -743,6 +743,41 @@ $Form->begin_form();
 				<?php
 			}
 			*/
+			
+
+			/*
+			 * CREATE FILE/FOLDER CREATE PANEL:
+			 */
+			if( ( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ) )
+						&& $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+			{	// dir or file creation is enabled and we're allowed to add files:
+				global $create_type;
+
+				echo '<div class="evo_file_folder_creator">';
+					if( ! $Settings->get( 'fm_enable_create_dir' ) )
+					{	// We can create files only:
+						echo '<label for="fm_createname" class="tooltitle">'.T_('New file:').'</label>';
+						$Form->hidden( 'create_type', 'file' );
+					}
+					elseif( ! $Settings->get( 'fm_enable_create_file' ) )
+					{	// We can create directories only:
+						echo '<label for="fm_createname" class="tooltitle">'.T_('New folder:').'</label>';
+						$Form->hidden( 'create_type', 'dir' );
+					}
+					else
+					{	// We can create both files and directories:
+						echo T_('New').': ';
+						echo '<select name="create_type" class="form-control">';
+						echo '<option value="dir"'.( isset($create_type) &&  $create_type == 'dir' ? ' selected="selected"' : '' ).'>'.T_('folder').'</option>';
+						echo '<option value="file"'.( isset($create_type) && $create_type == 'file' ? ' selected="selected"' : '' ).'>'.T_('file').'</option>';
+						echo '</select>:';
+					}
+				?>
+				<input type="text" name="create_name" id="fm_createname" value="<?php echo isset( $create_name ) ? $create_name : ''; ?>" size="15" class="form-control" />
+				<input class="ActionButton btn btn-default" type="submit" name="actionArray[createnew]" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
+				<?php
+				echo '</div>';
+			}
 			?>
 			</td>
 		</tr>

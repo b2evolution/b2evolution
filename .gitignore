@@ -21,3 +21,4 @@ plugins/geoip_plugin/GeoIP.dat
 media/blogs/b
 npm-debug.log
 /media/users/admin/private_message
+/media/import

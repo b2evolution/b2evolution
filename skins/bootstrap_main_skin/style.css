@@ -20,10 +20,12 @@
   margin-top: 0;
 }
 .evo_container__front_page_primary .evo_widget div > p:last-child,
-.evo_container__front_page_primary .evo_widget:last-child > h2,
 .evo_container__front_page_primary .evo_widget:last-child > ul,
 .evo_container__front_page_primary .evo_widget > ul li:last-child {
   margin-bottom: 0 !important;
+}
+.evo_container__front_page_primary .evo_widget[class$=_menu_link] {
+  text-align: center;
 }
 .evo_container__front_page_secondary {
   padding-top: 30px;

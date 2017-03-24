@@ -29,7 +29,7 @@ if( $action == 'new-selskin' )
 	$skins = array();
 	while( ( $skin = & $SkinCache->get_next() ) != NULL )
 	{
-		if( $skin->type != 'normal' )
+		if( $skin->type != 'normal' && $skin->type != 'rwd' )
 		{	// This skin cannot be used here...
 			continue;
 		}

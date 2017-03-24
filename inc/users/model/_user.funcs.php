@@ -1880,21 +1880,20 @@ function get_default_avatar_url( $gender = '', $size = NULL )
 			break;
 	}
 
-	if( $size !== NULL )
-	{ // Get a thumbnail url
-		$FileCache = & get_FileCache();
-		if( $File = & $FileCache->get_by_root_and_path( 'shared', 0, $avatar_url ) )
-		{
-			if( $File->is_image() )
-			{ // Check if the default avatar files are real images and not broken by some reason
-				return $File->get_thumb_url( $size, '&' );
-			}
-		}
+	$FileCache = & get_FileCache();
+	if( ! ( $File = & $FileCache->get_by_root_and_path( 'shared', 0, $avatar_url ) ) )
+	{	// Return the full size image URL without further ado if the requested file doesn't exist:
+		global $media_url;
+		return $media_url.'shared/global'.$avatar_url;
 	}
 
-	// We couldn't get a thumbnail url OR access the folder, Return the full size image URL without further ado:
-	global $media_url;
-	return $media_url.'shared/global'.$avatar_url;
+	if( $size !== NULL && $File->is_image() )
+	{	// Get a thumbnail url only if the default avatar file is a real image:
+		return $File->get_thumb_url( $size, '&' );
+	}
+
+	// Return original file URL if we don't want or couldn't get a thumbnail url:
+	return $File->get_url();
 }
 
 
@@ -2524,9 +2523,57 @@ function get_user_sub_entries( $is_admin, $user_ID )
 function get_user_isubscription( $user_ID, $item_ID )
 {
 	global $DB;
+	$ItemCache = & get_ItemCache();
+	$Item = $ItemCache->get_by_ID( $item_ID );
+	$blog_ID = $Item->get_blog_ID();
+
 	$result = $DB->get_var( 'SELECT count( isub_user_ID )
-								FROM T_items__subscriptions
-								WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$item_ID.' AND isub_comments <> 0' );
+								FROM (
+									SELECT DISTINCT isub_user_ID
+									FROM T_items__subscriptions
+									WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$item_ID.' AND isub_comments <> 0
+
+									UNION
+
+									SELECT user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+									LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$item_ID.' AND isub_user_ID = user_ID )
+									WHERE opt.cset_coll_ID = '.$blog_ID.'
+										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_value = 1
+										AND  user_ID = '.$user_ID.'
+										AND ( isub_comments IS NULL OR isub_comments = 1 )
+
+									UNION
+
+									SELECT sug_user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+									LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$item_ID.' AND isub_user_ID = sug_user_ID )
+									WHERE opt.cset_coll_ID = '.$blog_ID.'
+										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_value = 1
+										AND sug_user_ID = '.$user_ID.'
+										AND ( isub_comments IS NULL OR isub_comments = 1 )
+
+									UNION
+
+									SELECT bloguser_user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
+									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$item_ID.' AND isub_user_ID = bloguser_user_ID )
+									WHERE opt.cset_coll_ID = '.$blog_ID.'
+										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_value = 1
+										AND bloguser_user_ID = '.$user_ID.'
+										AND ( isub_comments IS NULL OR isub_comments = 1 )
+								) AS users' );
 	return $result > 0;
 }
 
@@ -3933,15 +3980,18 @@ function display_voting_form( $params = array() )
 
 	$params_like = array(
 			'id' => 'votingLike',
-			'title' => $params['title_like']
+			'title' => $params['title_like'],
+			'class' => 'voting_btn'
 		);
 	$params_noopinion = array(
 			'id' => 'votingNoopinion',
-			'title' => $params['title_noopinion']
+			'title' => $params['title_noopinion'],
+			'class' => 'voting_btn'
 		);
 	$params_dontlike = array(
 			'id' => 'votingDontlike',
-			'title' => $params['title_dontlike']
+			'title' => $params['title_dontlike'],
+			'class' => 'voting_btn'
 		);
 	$params_inappropriate = array(
 			'id' => 'votingInappropriate',
@@ -4061,7 +4111,7 @@ function display_voting_form( $params = array() )
 				// Don't like
 				$type_voted = 'dontlike';
 				$icon_dontlike = 'thumb_down';
-				$params_dontlike['class'] = 'voted';
+				$params_dontlike['class'] .= ' voted';
 				$params_dontlike['title'] = $params['title_dontlike_voted'];
 				break;
 
@@ -4069,7 +4119,7 @@ function display_voting_form( $params = array() )
 				// No opinion
 				$type_voted = 'noopinion';
 				$icon_noopinion = 'ban';
-				$params_noopinion['class'] = 'voted';
+				$params_noopinion['class'] .= ' voted';
 				$params_noopinion['title'] = $params['title_noopinion_voted'];
 				break;
 
@@ -4077,7 +4127,7 @@ function display_voting_form( $params = array() )
 				// Like
 				$type_voted = 'like';
 				$icon_like = 'thumb_up';
-				$params_like['class'] = 'voted';
+				$params_like['class'] .= ' voted';
 				$params_like['title'] = $params['title_like_voted'];
 				break;
 		}
@@ -4097,8 +4147,10 @@ function display_voting_form( $params = array() )
 		}
 	}
 
-	echo '<span class="vote_title">'.$vote_numbers.'<span class="vote_title_text">'.$params['title_text'].'</span></span>';
+	echo '<span class="voting_wrapper">';
 
+	echo '<span class="vote_title_panel">';
+	echo '<span class="vote_title">'.$vote_numbers.'<span class="vote_title_text">'.$params['title_text'].'</span></span>';
 	$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 	// Set this url for case when JavaScript is not enabled:
 	$url = get_htsrv_url().'anon_async.php?action=voting&vote_type='.$params['vote_type'].'&vote_ID='.$params['vote_ID'].$blog_param.'&'.url_crumb( 'voting' );
@@ -4109,7 +4161,9 @@ function display_voting_form( $params = array() )
 	{	// Append a redirect param:
 		$url .= '&redirect_to='.$redirect_to;
 	}
+	echo '</span>';// END OF <span class="vote_title_panel">
 
+	echo '<span class="btn-group">';
 	if( ! empty( $params['widget_ID'] ) )
 	{	// Append widget ID for action URL:
 		$url .= '&widget_ID='.intval( $params['widget_ID'] );
@@ -4134,7 +4188,9 @@ function display_voting_form( $params = array() )
 	{	// Display 'Dont like' icon:
 		echo action_icon( '', $icon_dontlike, $url.'&vote_action=dontlike', '', 0, 0, array(), $params_dontlike );
 	}
+	echo '</span>';// END OF <span class="btn-group">
 
+	echo '<span class="vote_others">';
 	if( $params['display_inappropriate'] || $params['display_spam'] )
 	{	// Display separator between icons and checkboxes:
 		echo '<span class="separator">&nbsp;</span>';
@@ -4168,6 +4224,9 @@ function display_voting_form( $params = array() )
 	{	// Create a hidden input with skin ID:
 		echo '<input type="hidden" id="skinID" value="'.$params['skin_ID'].'" />';
 	}
+	echo '</span>';// END OF <span class="vote_others">
+
+	echo '</span>';// END OF <span class="voting_wrapper">
 }
 
 
@@ -6234,7 +6293,7 @@ function get_PasswordDriver( $driver_code = '' )
 	// Get password drivers config:
 	$config_password_drivers = get_password_drivers();
 
-	// 
+	//
 	$allowed_password_drivers = $enabled_password_drivers;
 
 	if( ! empty( $driver_code )

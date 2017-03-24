@@ -242,7 +242,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'widget_context' => 'item',	// Signal that we are displaying within an Item
 					// The following (optional) params will be used as defaults for widgets included in this container:
 					// This will enclose each widget in a block:
-					'block_start' => '<div class="$wi_class$">',
+					'block_start' => '<div class="evo_widget $wi_class$">',
 					'block_end' => '</div>',
 					// This will enclose the title of each widget:
 					'block_title_start' => '<h3>',
@@ -333,17 +333,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'         => '<span class="evo_widget $wi_class$">',
-					'block_end'           => '</span> ',
-					'block_display_title' => false,
-					'list_start'          => '',
-					'list_end'            => '',
-					'item_start'          => '',
-					'item_end'            => '',
-					'item_selected_start' => '',
-					'item_selected_end'   => '',
-					'link_default_class'  => 'btn btn-default btn-sm',
-					'link_selected_class' => 'btn btn-default btn-sm active',
+					'block_start'       => '<div class="evo_widget $wi_class$">',
+					'block_end'         => '</div>',
 				) );
 			// Note: Double quotes have been used around "Footer" only for test purposes.
 		?>

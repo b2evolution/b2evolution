@@ -488,7 +488,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$params['root'] = isset( $parmeta['root'] ) ? $parmeta['root'] : '';
 			$params['path'] = isset( $parmeta['path'] ) ? $parmeta['path'] : '';
 			$params['size_name'] = isset( $parmeta['thumbnail_size'] ) ? $parmeta['thumbnail_size'] : 'crop-64x64';
-			$Form->fileselect( $input_name, $set_value, $set_label, '', $params );
+			$params['max_file_num'] = isset( $parmeta['max_file_num'] ) ? $parmeta['max_file_num'] : 1;
+			$params['initialize_with'] = isset( $parmeta['initialize_with'] ) ? $parmeta['initialize_with'] : '';
+			$params['note'] = isset( $parmeta['note'] ) ? $parmeta['note'] : '';
+
+			$Form->fileselect( $input_name, $set_value, $set_label, $params['note'], $params );
 			break;
 
 		default:
@@ -793,6 +797,17 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 		case 'Widget':
 			$error_value = NULL;
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'checklist' && $parname == 'renderers' )
+			{	// Save "stealth" and "always" plugin render options:
+				// (they are hidden or disabled checkboxes of the form and cannot be submitted automatically)
+				global $Plugins;
+				$widget_Blog = & $Obj->get_Blog();
+				$l_value = $Plugins->validate_renderer_list( array_keys( $l_value ), array(
+						'Blog'         => & $widget_Blog,
+						'setting_name' => 'coll_apply_rendering',
+					) );
+				$l_value = array_fill_keys( $l_value, 1 );
+			}
 			$Obj->set( $parname, $l_value );
 			break;
 

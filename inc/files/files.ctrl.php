@@ -158,6 +158,7 @@ param( 'linkdata', 'string', '', true );
 // Name of the iframe we want some actions to come back to:
 param( 'iframe_name', 'string', '', true );
 param( 'field_name', 'string', '', true );
+param( 'file_type', 'string', '', true );
 
 // Get root:
 $ads_list_path = false; // false by default, gets set if we have a valid root
@@ -844,7 +845,7 @@ switch( $action )
 						if( ! $loop_src_File->rename_to( $new_name ) )
 						{
 							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
-								$old_name, $new_name ), 'error', T_('Renaming files') );
+								$old_name, $new_name ), 'error', T_('Renaming files:') );
 							continue 2;
 						}
 

@@ -48,7 +48,7 @@ class EmailAddressCache extends DataObjectCache
 	 * @param integer ID of object to load
 	 * @param boolean true if function should die on error
 	 * @param boolean true if function should die on empty/null
-	 * @return reference on cached object
+	 * @return object|NULL|boolean Reference on cached object, NULL - if request with empty or wrong email address, FALSE - if requested object does not exist
 	 */
 	function & get_by_name( $req_name, $halt_on_error = true, $halt_on_empty = true )
 	{

@@ -297,25 +297,6 @@ function skin_init( $disp )
 			// Save global $Item to $download_Item, because $Item can be rewritten by function get_featured_Item() in some skins
 			$GLOBALS['download_Item'] = & $Item;
 
-			// Initialize JavaScript to download file after X seconds
-			add_js_headline( '
-jQuery( document ).ready( function ()
-{
-	jQuery( "#download_timer_js" ).show();
-} );
-
-var b2evo_download_timer = '.intval( $Blog->get_setting( 'download_delay' ) ).';
-var downloadInterval = setInterval( function()
-{
-	jQuery( "#download_timer" ).html( b2evo_download_timer );
-	if( b2evo_download_timer == 0 )
-	{ // Stop timer and download a file
-		clearInterval( downloadInterval );
-		jQuery( "#download_help_url" ).show();
-	}
-	b2evo_download_timer--;
-}, 1000 );' );
-
 			// Use meta tag to download file when JavaScript is NOT enabled
 			add_headline( '<meta http-equiv="refresh" content="'.intval( $Blog->get_setting( 'download_delay' ) )
 				.'; url='.$download_Link->get_download_url( array( 'type' => 'action' ) ).'" />' );
@@ -1698,7 +1679,7 @@ function skin_include( $template_name, $params = array() )
 	// Globals that may be needed by the template:
 	global $Collection, $Blog, $MainList, $Item;
 	global $Plugins, $Skin;
-	global $current_User, $Hit, $Session, $Settings;
+	global $current_User, $Hit, $Session, $Settings, $debug;
 	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
@@ -1849,7 +1830,7 @@ function skin_include( $template_name, $params = array() )
 	}
 	else
 	{	// We may wrap with a <div>:
-		$display_includes = $Session->get( 'display_includes_'.$Blog->ID ) == 1;
+		$display_includes = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_includes_'.$Blog->ID ) );
 	}
 	if( $display_includes )
 	{ // Wrap the include with a visible div:
@@ -1983,7 +1964,7 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	}
 
 	// Globals that may be needed by the template:
-	global $current_User, $Hit, $Session, $Settings;
+	global $current_User, $Hit, $Session, $Settings, $debug;
 	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
@@ -2020,7 +2001,7 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	}
 	elseif( isset( $Session ) )
 	{	// We may wrap with a <div>:
-		$display_includes = $Session->get( 'display_includes_'.( empty( $Blog ) ? 0 : $Blog->ID ) ) == 1;
+		$display_includes = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_includes_'.( empty( $Blog ) ? 0 : $Blog->ID ) ) );
 	}
 	else
 	{	// Request without defined $Session, Don't display the includes:
@@ -2683,7 +2664,7 @@ function skin_body_attrs( $params = array() )
 	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User;
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
-	global $Session;
+	global $Session, $debug;
 
 	$classes = array();
 
@@ -2737,7 +2718,7 @@ function skin_body_attrs( $params = array() )
 	$classes[] = 'usergroup_'.( ! is_logged_in() && empty( $current_User->grp_ID ) ? 'none' : $current_User->grp_ID );
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
-	if ( ! empty($Blog) )
+	if( ( $debug == 2 || is_logged_in() ) && ! empty( $Blog ) )
 	{
 		if( $Session->get( 'display_includes_'.$Blog->ID ) )
 		{

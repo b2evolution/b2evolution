@@ -487,6 +487,8 @@ class Plugin
 	 *        'root': default root
 	 *		  'path': default path
 	 *        'thumbnail_size': thumbnail size
+	 *        'max_file_num': maximum number of files
+	 *        'initialize_with': initial value
 	 *     'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
 	 *     'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
 	 * 'note' (gets displayed as a note to the param field),
@@ -3815,6 +3817,35 @@ class Plugin
 	/*
 	 * Interface methods }}}
 	 */
+
+	/**
+	 * Get collection from given params
+	 *
+	 * @param array Params: 'Item', 'Comment', 'Blog'
+	 * @return object|false Collection object or FALSE with wrong params
+	 */
+	function & get_Blog_from_params( $params )
+	{
+		$setting_Blog = false;
+
+		if( ! empty( $params['Item'] ) )
+		{	// Get Blog from given Item:
+			$Item = & $params['Item'];
+			$setting_Blog = & $Item->get_Blog();
+		}
+		elseif( ! empty( $params['Comment'] ) )
+		{	// Get Blog from given Comment:
+			$Comment = & $params['Comment'];
+			$Item = & $Comment->get_Item();
+			$setting_Blog = & $Item->get_Blog();
+		}
+		elseif( ! empty( $params['Blog'] ) )
+		{	// Get Blog from params:
+			$setting_Blog = & $params['Blog'];
+		}
+
+		return $setting_Blog;
+	}
 
 	/**
 	 * Get a skin specific param value from current Blog

@@ -61,12 +61,29 @@ ul, ol {
 
 // Custom styles for buttons
 .btn {
+	margin-top: 3px;
+	margin-bottom: 3px;
 	&.btn-success, &.btn-danger {
 		.fa {
 			// Use only white icons in color buttons
 			color: #FFF !important;
 		}
 	}
+}
+.evo_widget{
+	.btn { // we need this to give space to buttons on successive widget lines
+		margin-top: 4px;
+		margin-bottom: 4px;
+	}
+	.input-group .btn { // In this case we need to cancel the previous -- eg: search form widget
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+}
+
+.input-group .btn {
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 // Keep almost same style for active disabled buttons (used by TinyMCE plugin)
@@ -587,11 +604,23 @@ select:focus:invalid:focus {
 		position: relative;
 		top: -4px;
 	}
-	.btn {
-		margin: -6px 0 0 6px;
-	}
 	.btn-group {
 		margin-left: 6px;
+	}
+	.panel_heading_action_icons {
+		margin-top: -6px;
+		.btn {
+			margin: 0 3px 3px 0;
+		}
+		.btn:last-child {
+			margin: 0 0 3px 0;
+		}
+		.btn-group {
+			margin: 0 6px 0 0;
+			.btn {
+				margin: 0 0 3px 0;
+			}
+		}
 	}
 }
 legend.panel-heading {
@@ -918,4 +947,21 @@ div.edit_toolbars, div.message_toolbars {
 	background-size: 14px 14px;
 	background-repeat: no-repeat;
 	background-position: left 5px center;
+}
+
+// Widgets container "Page Top":
+.evo_container__page_top {
+	// Align right all text on top-right widget container (useful for buttons of menu linkwidgets):
+	text-align: right;
+}
+
+// Widgets containers "Sidebar" and "Sidebar 2":
+.evo_container__sidebar, .evo_container__sidebar2 {
+	// .widget_core_menu_link
+	// .widget_core_msg_menu_link
+	// .widget_core_profile_menu_link
+	// .widget_core_flag_menu_link
+	.evo_widget[class$=_menu_link] a.btn {
+		width: 100%;
+	}
 }

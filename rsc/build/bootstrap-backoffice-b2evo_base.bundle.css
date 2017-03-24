@@ -35,6 +35,9 @@
 .right {
   text-align: right;
 }
+.justify {
+  text-align: justify;
+}
 .nobr,
 .nowrap,
 .line {
@@ -829,6 +832,14 @@ div#evo_toolbar .actions_right {
 .evobar-menu a.disabled:hover {
   color: #999999;
 }
+.evobar-menu a.active,
+.evobar-menu a.active:hover {
+  background-color: #ffffcc;
+  border-radius: 4px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin: 1px 0;
+}
 .evobar-menu [class^=evobar-icon-] {
   margin-left: 6px;
   float: right;
@@ -1080,11 +1091,6 @@ ul.jslog_error {
   -webkit-border-radius: 3px;
   -khtml-border-radius: 3px;
   z-index: 11000;
-}
-html,
-body {
-  width: auto !important;
-  overflow-x: hidden !important;
 }
 div.dev-blocks {
   border: 1px solid #f00;
@@ -1496,6 +1502,9 @@ label.radiooption {
   text-align: left;
   margin-left: 8px;
 }
+.file_select_wrapper .file_select_item .item_actions a.btn {
+  margin-bottom: 5px;
+}
 div.log_container ul,
 div.action_messages ul,
 div.log_container ol,
@@ -1788,9 +1797,25 @@ ol {
 .table-hover > tbody > tr:hover {
   background-color: #ffc;
 }
+.btn {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
 .btn.btn-success .fa,
 .btn.btn-danger .fa {
   color: #FFF !important;
+}
+.evo_widget .btn {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+.evo_widget .input-group .btn {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.input-group .btn {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 .btn.active[disabled] {
   opacity: 1;
@@ -2262,11 +2287,23 @@ select:focus:invalid:focus {
   position: relative;
   top: -4px;
 }
-.panel-heading .btn {
-  margin: -6px 0 0 6px;
-}
 .panel-heading .btn-group {
   margin-left: 6px;
+}
+.panel-heading .panel_heading_action_icons {
+  margin-top: -6px;
+}
+.panel-heading .panel_heading_action_icons .btn {
+  margin: 0 3px 3px 0;
+}
+.panel-heading .panel_heading_action_icons .btn:last-child {
+  margin: 0 0 3px 0;
+}
+.panel-heading .panel_heading_action_icons .btn-group {
+  margin: 0 6px 0 0;
+}
+.panel-heading .panel_heading_action_icons .btn-group .btn {
+  margin: 0 0 3px 0;
 }
 legend.panel-heading {
   font-size: 16px;
@@ -2561,4 +2598,11 @@ div.message_toolbars {
   background-size: 14px 14px;
   background-repeat: no-repeat;
   background-position: left 5px center;
+}
+.evo_container__page_top {
+  text-align: right;
+}
+.evo_container__sidebar .evo_widget[class$=_menu_link] a.btn,
+.evo_container__sidebar2 .evo_widget[class$=_menu_link] a.btn {
+  width: 100%;
 }

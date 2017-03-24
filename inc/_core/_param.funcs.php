@@ -1067,8 +1067,8 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 	}
 
 	if( empty( $date_format ) )
-	{	// Use locale date format:
-		$date_format = locale_datefmt();
+	{	// Use locale input date format:
+		$date_format = locale_input_datefmt();
 	}
 
 	// Convert PHP date format to regexp pattern:

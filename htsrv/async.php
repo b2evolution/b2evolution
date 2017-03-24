@@ -116,6 +116,7 @@ switch( $action )
 					$result['rawdata'][$i] = '<span style="font-weight: bold; background-color: yellow;">'.$result['rawdata'][$i].'</span>';
 				}
 
+				// Make URLs and emails clickable
 				if( preg_match_all( '#[-a-zA-Z0-9@:%_\+.~\#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~\#?&//=;]*)?#si', $result['rawdata'][$i], $matches ) )
 				{
 					foreach( $matches as $match )
@@ -135,6 +136,37 @@ switch( $action )
 								$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'" target="_blank">'.$match[0].'</a>', $result['rawdata'][$i] );
 							}
 						}
+					}
+				}
+
+				// Make IP ranges clickable
+				if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) &&
+						preg_match_all( '#(?<=\:)(\s*)(\b(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\s?-\s?(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\b)#', $result['rawdata'][$i], $matches ) )
+				{
+					if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+					{
+						$aipr_status_titles = aipr_status_titles();
+						$IPRangeCache = & get_IPRangeCache();
+						if( $IPRange = & $IPRangeCache->get_by_ip( $query ) )
+						{ // IP range exists in DB
+							$iprange_status = $IPRange->get( 'status' );
+						}
+						else
+						{ // There is no IP range in DB
+							$iprange_status = '';
+						}
+					}
+
+					if( $IPRange )
+					{
+						if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) )
+						{
+							$result['rawdata'][$i] = str_replace( $matches[2][0],  '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'.$matches[2][0].'</a> <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[$iprange_status], $result['rawdata'][$i] );
+						}
+					}
+					else
+					{
+						$result['rawdata'][$i] = str_replace( $matches[2][0],  '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_new&amp;ip='.$query.'">'.$matches[2][0].'</a> <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[$iprange_status], $result['rawdata'][$i] );
 					}
 				}
 			}
@@ -809,6 +841,7 @@ switch( $action )
 
 		param( 'iframe_name', 'string', '' );
 		param( 'field_name', 'string', '' );
+		param( 'file_type', 'string', 'image' );
 		// Additional params, Used to highlight file/folder
 		param( 'root', 'string', '' );
 		param( 'path', 'string', '' );
@@ -821,7 +854,7 @@ switch( $action )
 
 		echo '<div style="background:#FFF;height:90%">'
 				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
-				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;field_name='.$field_name.'&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=file_select'.$additional_params.'"'
+				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;field_name='.$field_name.'&amp;file_type='.$file_type.'&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=file_select'.$additional_params.'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
 					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>'
 			.'</div>';
