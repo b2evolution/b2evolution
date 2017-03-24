@@ -70,7 +70,7 @@ $core_componentwidget_defs = array(
 			'user_links',		// Social links of coll owner
 		),
 	'menu_item' => array(
-			'menu_link',
+			'basic_menu_link',
 			'msg_menu_link',
 			'flag_menu_link',
 			'profile_menu_link',

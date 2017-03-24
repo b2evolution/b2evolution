@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the menu_link_Widget class.
+ * This file implements the basic_menu_link_Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -58,7 +58,7 @@ $menu_link_widget_link_types = array(
  *
  * @package evocore
  */
-class menu_link_Widget extends generic_menu_link_Widget
+class basic_menu_link_Widget extends generic_menu_link_Widget
 {
 	/**
 	 * Constructor
@@ -66,7 +66,7 @@ class menu_link_Widget extends generic_menu_link_Widget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'menu_link' );
+		parent::__construct( $db_row, 'core', 'basic_menu_link' );
 	}
 
 

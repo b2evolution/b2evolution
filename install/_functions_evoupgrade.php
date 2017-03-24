@@ -8333,6 +8333,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12230, 'Update menu link widget...' ) )
+	{	// part of 6.9.1-beta
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "basic_menu_link"
+			WHERE wi_code = "menu_link"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
