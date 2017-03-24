@@ -66,7 +66,7 @@ $params = array_merge( array(
 		'gallery_colls'            => 5,
 		'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 
-		'before_url_link'          => '<p class="post_link">'.T_('Link:').' ',
+		'before_url_link'          => '<p class="post_link">'.T_('Link').': ',
 		'after_url_link'           => '</p>',
 		'url_link_text_template'   => '$url$', // If evaluates to empty, nothing will be displayed (except player if podcast)
 		'url_link_url_template'    => '$url$', // $url$ will be replaced with saved URL address
@@ -78,7 +78,7 @@ $params = array_merge( array(
 		'more_link_to'             => 'single#anchor', // Can be 'single' or 'single#anchor' which is permalink + "#more55" where 55 is item ID
 		'anchor_text'              => '<p class="bMore">...</p>', // Text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 
-		'page_links_start'         => '<p class="right">'.T_('Pages:').' ',
+		'page_links_start'         => '<p class="right">'.T_('Pages').': ',
 		'page_links_end'           => '</p>',
 		'page_links_separator'     => '&middot; ',
 		'page_links_single'        => '',
@@ -226,16 +226,6 @@ switch( $content_mode )
 		{	// We want to display text, not just images:
 
 			echo '<div class="bText">';
-
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => $params['before_url_link'],
-					'after'         => $params['after_url_link'],
-					'text_template' => $params['url_link_text_template'],
-					'url_template'  => $params['url_link_url_template'],
-					'target'        => $params['url_link_target'],
-					'podcast'       => '#', // Auto display mp3 player if post type is podcast (=> false, to disable)
-				) );
 
 			// Display CONTENT:
 			$Item->content_teaser( array(
