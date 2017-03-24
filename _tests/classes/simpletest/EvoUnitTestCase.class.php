@@ -68,7 +68,7 @@ class EvoUnitTestCase extends UnitTestCase
 		$Plugins = new Plugins_admin_no_DB();
 
 		$db_params = $db_config;
-		$db_params['new_link'] = true; // needed to not interfere with the DB connection to the test DB (setup in EvoDbUnitTestCase).
+		$db_params['use_persistent'] = false; // needed to not interfere with the DB connection to the test DB (setup in EvoDbUnitTestCase).
 		$DB = new DB( $db_params );
 
 		/*

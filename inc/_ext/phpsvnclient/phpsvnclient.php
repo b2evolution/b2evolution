@@ -134,11 +134,6 @@ class phpsvnclient {
     private $mime_array;
 
     public function __construct($url = 'http://phpsvnclient.googlecode.com/svn/', $user = false, $pass = false) {
-        $this->__construct($url, $user, $pass);
-        register_shutdown_function(array(&$this, '__destruct'));
-    }
-
-    public function __construct($url = 'http://phpsvnclient.googlecode.com/svn/', $user = false, $pass = false) {
         $http = & $this->_http;
         $http = new http_class;
         $http->user_agent = "phpsvnclient (http://phpsvnclient.googlecode.com/)";
@@ -148,6 +143,7 @@ class phpsvnclient {
         $this->pass = $pass;
 
         $this->actVersion = $this->getVersion();
+        register_shutdown_function(array(&$this, '__destruct'));
     }
 
     /**

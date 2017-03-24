@@ -57,7 +57,7 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 					$subscription_name = ( ( $type == 'coll_comment' ) ? 'sub_comments' : 'sub_items' );
 
 					// Get previous setting
-					$sub_values = $DB->get_row( 'SELECT sub_items, sub_comments FROM T_subscriptions WHERE sub_coll_ID = '.$coll_ID.' AND sub_user_ID = '.$user_ID, 'ARRAY_A' );
+					$sub_values = $DB->get_row( 'SELECT sub_items, sub_comments FROM T_subscriptions WHERE sub_coll_ID = '.$coll_ID.' AND sub_user_ID = '.$user_ID, ARRAY_A );
 
 					$Blog = & $BlogCache->get_by_ID( $coll_ID );
 

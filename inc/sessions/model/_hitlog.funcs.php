@@ -709,7 +709,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 					  FROM T_users
 					  WHERE user_status = "activated" OR user_status= "autoactivated"
 					  LIMIT 10'
-					, 'ARRAY_A');
+					, ARRAY_A );
 
 	$users_count = count( $users_array );
 	$devices_count = count( $devices );
