@@ -487,7 +487,7 @@ class DB
 			$this->get_version();
 			return $this->version_long;
 		}
-		elseif (property_exists($this, $this->{$name}))
+		elseif (property_exists($this, $name))
 			return $this->{$name};
 		else
 			throw new Exception("Property $name doesn't exist");
@@ -501,7 +501,7 @@ class DB
 		elseif ('dbhandle' == $name || 'result' == $name || 'use_persistent' == $name ||
 			'version' == $name || 'version_long' == $name)
 				throw new Exception("You're not allowed to access property $name");
-		elseif (property_exists($this, $this->{$name}))
+		elseif (property_exists($this, $name))
 			$this->{$name} = $value;
 		else
 			throw new Exception("Property $name doesn't exist");

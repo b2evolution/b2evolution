@@ -1362,7 +1362,7 @@ function phpbb_import_topics()
 			$DB->query( 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID ) VALUES
 					( '.$DB->quote( $canonical_slug ).', '.$DB->quote( 'item' ).', '.$DB->quote( $item_ID ).' ),
 					( '.$DB->quote( $second_slug ).', '.$DB->quote( 'item' ).', '.$DB->quote( $item_ID ).' )' );
-			$canonical_slug_ID = $DB->last_id;
+			$canonical_slug_ID = $DB->insert_id;
 
 			// Insert a tiny slug for the post
 			/*
@@ -1899,7 +1899,7 @@ function phpbb_import_messages()
 			$DB->query( 'INSERT INTO '.$tableprefix.'messaging__thread ( thrd_title, thrd_datemodified )
 					VALUES ( '.$DB->quote( $message->subject ).', '.$DB->quote( date( 'Y-m-d H:i:s', $message->time ) ).' )' );
 
-			$thread_ID = $DB->last_id;
+			$thread_ID = $DB->insert_id;
 
 			// Import all messages from this thread
 			$count_messages = phpbb_import_messages_texts( $thread_ID, $message );
@@ -2608,10 +2608,6 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 		$author_ID = $users_IDs[ (string) $attachment->poster_id ];
 
 		$FileRootCache = & get_FileRootCache();
-			$DB->query( 'INSERT INTO '.$tableprefix.'links
-				       ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_usr_ID, link_file_ID, link_position, link_order )
-				VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $imported_file_ID ).', "aftermore", 1 )' );
-
 		if( $target_type == 'msg' )
 		{	// Get root for private messages:
 			$object_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $author_ID );
