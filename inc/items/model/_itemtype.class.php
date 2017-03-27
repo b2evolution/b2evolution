@@ -355,6 +355,7 @@ class ItemType extends DataObject
 				$custom_field_label = param( 'custom_'.$type.'_'.$i, 'string', NULL );
 				$custom_field_name = param( 'custom_'.$type.'_fname'.$i, '/^[a-z0-9\-_]+$/', NULL );
 				$custom_field_order = param( 'custom_'.$type.'_order'.$i, 'integer', NULL );
+				$custom_field_note = param( 'custom_'.$type.'_note'.$i, 'string', NULL );
 				$custom_field_is_new = param( 'custom_'.$type.'_new'.$i, 'integer', 0 );
 
 				// Add each new/existing custom field in this array
@@ -367,6 +368,7 @@ class ItemType extends DataObject
 						'name'    => $custom_field_name,
 						'type'    => $type,
 						'order'   => $custom_field_order,
+						'note'    => $custom_field_note,
 					);
 
 				if( empty( $custom_field_label ) )
@@ -395,7 +397,9 @@ class ItemType extends DataObject
 						'type'  => $type,
 						'name'  => $custom_field_name,
 						'label' => $custom_field_label,
-						'order' => $custom_field_order );
+						'order' => $custom_field_order,
+						'note'  => $custom_field_note,
+					);
 				}
 				else
 				{ // Update custom field
@@ -403,7 +407,9 @@ class ItemType extends DataObject
 						'type'  => $type,
 						'name'  => $custom_field_name,
 						'label' => $custom_field_label,
-						'order' => $custom_field_order );
+						'order' => $custom_field_order,
+						'note'  => $custom_field_note,
+					);
 				}
 			}
 		}
@@ -500,12 +506,13 @@ class ItemType extends DataObject
 			$sql_data = array();
 			foreach( $this->insert_custom_fields as $itcf_ID => $custom_field )
 			{
-				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order )
+				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note )
 					VALUES ( '.$DB->quote( $this->ID ).', '
 						.$DB->quote( $custom_field['label'] ).', '
 						.$DB->quote( $custom_field['name'] ).', '
 						.$DB->quote( $custom_field['type'] ).', '
-						.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).' )' );
+						.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).', '
+						.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).' )' );
 			}
 		}
 
@@ -517,7 +524,8 @@ class ItemType extends DataObject
 					SET
 						itcf_label = '.$DB->quote( $custom_field['label'] ).',
 						itcf_name = '.$DB->quote( $custom_field['name'] ).',
-						itcf_order = '.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).'
+						itcf_order = '.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).',
+						itcf_note = '.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).'
 					WHERE itcf_ityp_ID = '.$DB->quote( $this->ID ).'
 						AND itcf_ID = '.$DB->quote( $itcf_ID ).'
 						AND itcf_type = '.$DB->quote( $custom_field['type'] ) );
@@ -592,7 +600,7 @@ class ItemType extends DataObject
 			{ // Get the custom fields from DB
 				global $DB;
 				$SQL = new SQL();
-				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`' );
+				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );
 				$SQL->ORDER_BY( 'itcf_order, itcf_ID' );

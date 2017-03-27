@@ -8396,6 +8396,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12250, 'Upgrading table of post type custom fields...' ) )
+	{	// part of 6.9.1-beta
+		db_add_col( 'T_items__type_custom_field', 'itcf_note', 'VARCHAR(255) NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
