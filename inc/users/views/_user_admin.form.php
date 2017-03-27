@@ -158,7 +158,7 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 		}
 	$Form->end_line();
 
-	user_domain_info_display( T_('Email Domain'), 'email_domain_status', $edited_User->get_email_domain(), '', $Form );
+	user_domain_info_display( T_('Email domain'), 'email_domain_status', $edited_User->get_email_domain(), '', $Form );
 
 	global $UserSettings;
 
