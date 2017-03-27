@@ -441,7 +441,7 @@ class tinymce_plugin extends Plugin
 									+ '</form>',
 									'500px', '', true,
 									'<span class="text-danger"><?php echo TS_('WARNING');?></span>',
-									[ '<?php echo TS_('OK');?>', 'btn-primary' ] );
+									[ '<?php echo TS_('OK');?>', 'btn-primary' ], true );
 							}
 							else
 							{
@@ -529,6 +529,7 @@ class tinymce_plugin extends Plugin
 					var tmce_init={<?php echo $tmce_init; ?>};
 					var tinymce_plugin_displayed_error = false;
 					var tinymce_plugin_init_done = false;
+					window.evo = {};
 
 					</script>
 
@@ -538,6 +539,8 @@ class tinymce_plugin extends Plugin
 					// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
 					require_js( '#tinymce#', 'blog', false, true );
 					require_js( '#tinymce_jquery#', 'blog', false, true );
+					require_js( '#shortcodes#', 'blog', false, true );
+					require_js( '#evo_view#', 'blog', false, true );
 					?>
 
 					<script type="text/javascript">
@@ -627,7 +630,7 @@ class tinymce_plugin extends Plugin
 								ed.on( 'init', tmce_init.oninit );
 							}
 
-							jQuery( 'textarea#<?php echo $params['content_id']; ?>' ).tinymce( tmce_init );
+							tinymce.init( tmce_init );
 						}
 					}
 
@@ -711,8 +714,10 @@ class tinymce_plugin extends Plugin
 			'table',
 			'searchreplace',
 			'autocomplete',
-			'b2evo_shorttags',
-			'b2evo_attachments' );
+			'evo_view'
+			//'b2evo_shorttags',
+			//'b2evo_attachments'
+		);
 
 		if( function_exists( 'enchant_broker_init' ) )
 		{ // Requires Enchant spelling library
@@ -824,7 +829,7 @@ class tinymce_plugin extends Plugin
 			}
 
 			$tmce_theme_advanced_buttons3_array[] = 'code';
-			$tmce_theme_advanced_buttons3_array[] = 'evo_image evo_thumbnail evo_inline';
+			$tmce_theme_advanced_buttons3_array[] = 'evo_image';
 
 			/* ----------- button row 4 ------------ */
 
@@ -953,6 +958,9 @@ class tinymce_plugin extends Plugin
 
 		// Load the content css files from 3rd party code, e.g. other plugins:
 		global $tinymce_content_css, $app_version_long;
+
+		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'evo_view.css', true, 'css', $this->version.'+'.$app_version_long );
+
 		if( is_array( $tinymce_content_css ) && count( $tinymce_content_css ) )
 		{
 			$content_css .= ','.implode( ',', $tinymce_content_css );
@@ -1092,7 +1100,8 @@ class tinymce_plugin extends Plugin
 			$LinkOwner = new LinkItem( $edited_Item );
 
 			// Set a different dragand drop button ID
-			global $dragdropbutton_ID;
+			global $dragdropbutton_ID, $fm_mode;
+			$fm_mode = 'file_select';
 			$dragdropbutton_ID = 'file-uploader-modal';
 			$AdminUI->disp_view( 'links/views/_link_list.view.php' );
 		}

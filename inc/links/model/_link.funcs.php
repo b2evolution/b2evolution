@@ -462,17 +462,18 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
  * Display link position edit action
  *
  * @param $row
+ * @param boolean Show additional link actions
  */
-function display_link_position( & $row )
+function display_link_position( & $row, $show_actions = true )
 {
 	global $LinkOwner, $blog;
 	global $current_File;
 
-	$r = '<select id="display_position_'.$row->link_ID.'">'
+	$r = '<select id="display_position_'.$row->link_ID.'" class="link_position_select" data-link-id='.$row->link_ID.'>'
 			.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true)
 		.'</select>';
 
-	if( $current_File )
+	if( $show_actions && $current_File )
 	{ // Display icon to insert image|video into post inline
 		$type = $current_File->get_file_type();
 

@@ -195,16 +195,19 @@ function evo_link_change_order( event_object, link_ID, action )
 	function( data )
 	{
 		// Change an order in the attachments table
-		var row = jQuery( event_object ).closest( 'tr' );
-		if( action == 'move_up' )
-		{	// Move up:
-			row.prev().before( row );
-		}
-		else
-		{	// Move down:
-			row.next().after( row );
-		}
-		evoFadeSuccess( row );
+		var rows = jQuery( 'a[data-link-id=' + link_ID + ']' ).closest( 'tr' );
+		jQuery.each( rows, function( i, row ) {
+			var row = jQuery( row );
+			if( action == 'move_up' )
+			{	// Move up:
+				row.prev().before( row );
+			}
+			else
+			{	// Move down:
+				row.next().after( row );
+			}
+			evoFadeSuccess( row );
+		} );
 	},
 	'POST' );
 

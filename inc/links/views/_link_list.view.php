@@ -27,7 +27,7 @@ global $LinkOwner;
 global $AdminUI, $Skin, $current_User;
 
 // Override $dragdropbutton_ID to enable multiple drag and buton
-global $dragdropbutton_ID;
+global $dragdropbutton_ID, $fm_mode;
 
 if( empty( $Blog ) )
 {
@@ -44,6 +44,31 @@ $Results = new Results( $SQL->get(), '', '', 1000 );
 
 $Results->title = T_('Attachments');
 
+
+function select_file( $link_destination, $link_ID, $file_type = NULL )
+{
+	global $Blog, $LinkOwner, $current_File, $iframe_name, $link_type, $fm_mode, $tag_type;
+
+	if( empty( $Blog ) )
+	{
+		$Blog = & $LinkOwner->get_Blog();
+	}
+
+	$link_attribs = array();
+	$link_attribs['target'] = '_parent';
+	$link_attribs['class'] = 'action_icon select_file btn btn-primary btn-xs';
+	$link_attribs['onclick'] = 'return evo_item_image_insert( '.$Blog->ID.', \'image\', '.$link_ID.' )';
+
+	$r = '';
+
+	if( $fm_mode == 'file_select' && $current_File->is_image() )
+	{
+		$r .= action_icon( T_('Select file'), '', '#', ' '.T_('Select'), NULL, 5, $link_attribs );
+		$r .= ' ';
+	}
+
+	return $r.link_add_iframe( $link_destination );
+}
 
 function link_add_iframe( $link_destination )
 {
@@ -76,6 +101,7 @@ function display_subtype( $link_ID )
 
 	return $Link->get_preview_thumb();
 }
+
 $Results->cols[] = array(
 						'th' => T_('Icon/Type'),
 						'td_class' => 'shrinkwrap',
@@ -84,7 +110,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th' => T_('Destination'),
-						'td' => '%link_add_iframe( link_destination() )%',
+						'td' => '%select_file( link_destination(), #link_ID# )%',
 						'td_class' => 'fm_filename',
 					);
 
@@ -109,14 +135,14 @@ if( count( $LinkOwner->get_positions() ) > 1 )
 	$Results->cols[] = array(
 						'th' => T_('Position'),
 						'td_class' => 'shrinkwrap left',
-						'td' => '%display_link_position( {row} )%',
+						'td' => '%display_link_position( {row}, '.( $fm_mode == 'file_select' ? 'false' : 'true' ).' )%',
 					);
 }
 
 // Add attr "id" to handle quick uploader
 $compact_results_params = is_admin_page() ? $AdminUI->get_template( 'compact_results' ) : $Skin->get_template( 'compact_results' );
-$compact_results_params['body_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['body_start'] );
-$compact_results_params['no_results_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['no_results_start'] );
+$compact_results_params['body_start'] = str_replace( '<tbody', '<tbody class="filelist_tbody"', $compact_results_params['body_start'] );
+$compact_results_params['no_results_start'] = str_replace( '<tbody', '<tbody class="filelist_tbody"', $compact_results_params['no_results_start'] );
 
 $Results->display( $compact_results_params );
 

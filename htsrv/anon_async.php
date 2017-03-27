@@ -1391,8 +1391,8 @@ switch( $action )
 				'after_image'              => '</figure>',
 				'after_images'             => '</div>',
 				'image_class'              => 'img-responsive',
-				'image_size'               => 'fit-1280x720',
-				'image_limit'              =>  1000,
+				'image_size'               => param( 'image_size', 'string', 'fit-256x256' ),
+				'image_limit'              => 1000,
 				'image_link_to'            => 'original', // Can be 'original', 'single' or empty
 			);
 

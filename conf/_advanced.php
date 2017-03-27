@@ -942,6 +942,8 @@ $library_local_urls = array(
 		'#jcrop#' => array( 'jquery/jquery.jcrop.min.js', 'jquery/jquery.jcrop.js' ),
 		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
 		'#fontawesome#' => array('font-awesome.min.css', 'font-awesome.min.css'),
+		'#shortcodes#' => array( 'shortcodes.js' ),
+		'#evo_view#' => array( 'evo_view.js' ),
 	);
 
 

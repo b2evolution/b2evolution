@@ -7585,6 +7585,9 @@ function echo_modalwindow_js_bootstrap()
 	echo '<script type="text/javascript">
 		var evo_js_lang_close = \''.TS_('Close').'\'
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_edit_image = \''.TS_('Insert or edit inline image').'\';
+		var evo_js_lang_select_image_insert = \''.TS_('Select image to insert').'\';
+		var evo_js_lang_alert_before_insert = \''.TS_('Save post to start uploading files').'\';
 	</script>';
 }
 
