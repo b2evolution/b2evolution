@@ -67,29 +67,33 @@ function evo_link_change_position( selectInput, url, crumb )
 {
 	var oThis = selectInput;
 	var new_position = selectInput.value;
-	jQuery.get( url + 'anon_async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + new_position + '&crumb_link=' + crumb, {
+	var link_ID = selectInput.id.substr(17);
+
+	jQuery.get( url + 'anon_async.php?action=set_object_link_position&link_ID=' + link_ID + '&link_position=' + new_position + '&crumb_link=' + crumb, {
 	}, function(r, status) {
 		r = ajax_debug_clear( r );
+		var select_inputs = jQuery( 'select[data-link-id=' + link_ID + ']' );
 		if( r == "OK" ) {
-			evoFadeSuccess( jQuery(oThis).closest('tr') );
-			jQuery(oThis).closest('td').removeClass('error');
-			if( new_position == 'cover' )
-			{ // Position "Cover" can be used only by one link
-				jQuery( 'select[name=link_position][id!=' + selectInput.id + '] option[value=cover]:selected' ).each( function()
-				{ // Replace previous position with "Inline"
-					jQuery( this ).parent().val( 'aftermore' );
-					evoFadeSuccess( jQuery( this ).closest('tr') );
-				} );
-			}
+			var select_cols = select_inputs.closest( 'td' );
+			jQuery.each( select_cols, function( i, col ) {
+				evoFadeSuccess( jQuery( 'col' ).parent() );
+				jQuery( col ).removeClass( 'error' );
+				if( new_position == 'cover' )
+				{
+					jQuery( 'select.link_position_select[data-link-id!=' + link_ID + '] option[value=cover]:selected' ).each( function() {
+						var thisOption = jQuery( this );
+						thisOption.parent().val( 'aftermore' );
+						evoFadeSuccess( thisOption.closest( 'tr' ) );
+					} );
+				}
+			});
 		} else {
-			jQuery(oThis).val(r);
-			evoFadeFailure( jQuery(oThis).closest('tr') );
-			jQuery(oThis.form).closest('td').addClass('error');
+			jQuery.each( select_inputs, function( i, select_input ) {
+				jQuery( select_input ).val( r );
+				evoFadeFailure( select_input.closest( 'tr' ) );
+				jQuery( select_input.form ).closest( 'td' ).addClass( 'error' );
+			} );
 		}
-
-		// Fire file attached event for editor plugin
-		var event = new Event( 'b2evoAttachmentsChanged' );
-		document.dispatchEvent( event );
 	} );
 	return false;
 }
@@ -121,7 +125,7 @@ function evo_link_insert_inline( type, link_ID, options, replace )
 		insert_tag += ']';
 
 		// Change the position to inline first before inserting so that the image|thumbnail|inline will be rendered
-		var $position_selector = jQuery( '#display_position_' + link_ID );
+		var $position_selector = jQuery( 'select.link_position_select[data-link-id=' + link_ID + ']' );
 		if( $position_selector.length != 0 )
 		{ // Change the position to 'Inline'
 			if( $position_selector.val() != 'inline' )
@@ -163,14 +167,13 @@ function evo_link_delete( event_object, type, link_ID, action )
 				var regexp = new RegExp( '\\\[(image|file|inline|video|audio|thumbnail):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
 				textarea_str_replace( b2evoCanvas, regexp, '', window.document );
 			}
-
-			// Fire file attached event for editor plugin
-			var event = new Event( 'b2evoAttachmentsChanged' );
-			document.dispatchEvent( event );
 		}
 
 		// Remove attachment row from table:
-		jQuery( event_object ).closest( 'tr' ).remove();
+		var rows = jQuery( 'a[data-link-id=' + link_ID + ']' ).closest( 'tr' );
+		jQuery.each( rows, function( i, row ) {
+			jQuery( row ).remove();
+		} );
 
 		// Update the attachment block height after deleting row:
 		evo_link_fix_wrapper_height();
