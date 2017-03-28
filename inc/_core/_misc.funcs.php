@@ -8139,7 +8139,7 @@ function can_use_hashed_password()
  * Convert inline file tags like [image|file:123:link title:.css_class_name] or [inline:123:.css_class_name] into HTML tags
  *
  * @param string Source content
- * @param object Source object
+ * @param object Source object: Item, Comment, EmailCampaign, Message
  * @param array Params
  * @return string Content
  */
@@ -8182,7 +8182,7 @@ function render_inline_files( $content, $Object, $params = array() )
 /**
  * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:] into HTML tags
  *
- * @param object Source object: Item, EmailCampaign
+ * @param object Source object: Item, Comment, EmailCampaign, Message
  * @param array Inline tags
  * @param array Params
  * @return array Associative array of rendered HTML tags with inline tags as key
@@ -8225,6 +8225,12 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				$render_plugin_event_name = 'RenderItemAttachment';
 				break;
 
+			case 'Comment':
+				$LinkOwner = new LinkComment( $Object, empty( $Object->temp_link_owner_ID ) ? $temp_link_owner_ID : $Object->temp_link_owner_ID );
+				$prepare_plugin_event_name = 'PrepareForRenderCommentAttachment';
+				$render_plugin_event_name = 'RenderCommentAttachment';
+				break;
+
 			case 'EmailCampaign':
 				$LinkOwner = new LinkEmailCampaign( $Object );
 				$prepare_plugin_event_name = 'PrepareForRenderEmailAttachment';
@@ -8245,7 +8251,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	}
 
 	if( empty( $LinkList ) )
-	{ // This Item has no attached files for 'inline' position, Exit here
+	{	// This Object has no attached files for 'inline' position, Exit here:
 		return false;
 	}
 
@@ -8358,7 +8364,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_image_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_image_params['data']):
 						if( ! $current_image_params['get_rendered_attachments'] )
-						{	// Restore $r value and mark this item has the rendered attachments:
+						{	// Restore $r value and mark this Object has the rendered attachments:
 							$r = $temp_r;
 							$plugin_render_attachments = true;
 						}

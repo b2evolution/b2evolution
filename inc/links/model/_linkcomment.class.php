@@ -103,8 +103,9 @@ class LinkComment extends LinkOwner
 	{
 		// Should be ordered like the ENUM.
 		return array(
-			'teaser' => T_( 'Above comment' ),
-			'aftermore' => T_( 'Below comment' ),
+			'teaser'    => T_('Above comment'),
+			'aftermore' => T_('Below comment'),
+			'inline'    => T_('Inline')
 			);
 	}
 

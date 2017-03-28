@@ -2706,15 +2706,28 @@ class Comment extends DataObject
 	 * Template function: get content of comment
 	 *
 	 * @param string Output format, see {@link format_to_output()}
+	 * @param array Params
 	 * @return string
 	 */
-	function get_content( $format = 'htmlbody' )
+	function get_content( $format = 'htmlbody', $params = array() )
 	{
+		$params = array_merge( array(
+				'image_link_rel' => 'lightbox[c'.$this->ID.']', // Activate colorbox to open inline images full screen
+			), $params );
+
 		if( $format == 'raw_text' )
 		{
-			return format_to_output( $this->content, 'text' );
+			$content = format_to_output( $this->content, 'text' );
 		}
-		return $this->get_prerendered_content( $format );
+		else
+		{
+			$content = $this->get_prerendered_content( $format );
+		}
+
+		// Render inline file tags like [image:123:caption] or [file:123:caption] :
+		$content = render_inline_files( $content, $this, $params );
+
+		return $content;
 	}
 
 
@@ -2792,6 +2805,11 @@ class Comment extends DataObject
 				$link_position = $Link->get( 'position' );
 				$params['Link'] = $Link;
 				$attachment = $attachment->get_File();
+				if( $link_position == 'inline' )
+				{	// Skip inline attachments because they are rendered in content by spec function:
+					unset( $attachments[ $index ] );
+					continue;
+				}
 			}
 			else
 			{	// Set default position for preview files:
@@ -2835,7 +2853,7 @@ class Comment extends DataObject
 				{ // Image should be displayed above content
 					$images_above_content .= $r;
 				}
-				else
+				elseif( $link_position == 'aftermore' )
 				{ // Image should be displayed below content
 					$images_below_content .= $r;
 				}
@@ -2873,7 +2891,7 @@ class Comment extends DataObject
 				{ // Image should be displayed above content
 					$images_above_content .= $r;
 				}
-				else
+				elseif( $link_position == 'aftermore' )
 				{ // Image should be displayed below content
 					$images_below_content .= $r;
 				}
@@ -2899,11 +2917,11 @@ class Comment extends DataObject
 
 		if( $ban_urls )
 		{ // ban urls and user has permission
-			echo add_ban_icons( $this->get_content( $format ) );
+			echo add_ban_icons( $this->get_content( $format, $params ) );
 		}
 		else
 		{ // don't ban urls
-			echo $this->get_content( $format );
+			echo $this->get_content( $format, $params );
 		}
 
 		if( ! empty( $images_below_content ) )
@@ -2926,8 +2944,9 @@ class Comment extends DataObject
 			}
 			foreach( $attachments as $attachment )
 			{
-				// $attachment is a File in preview mode, but it is a Link in normal mode
-				$doc_File = empty( $this->ID ) ? $attachment : $attachment->get_File();
+				// $attachment is a File in preview mode and when multiuploader is disable because of no JS,
+				// but it is a Link in normal mode or when multiuploader is enabled and we can link new attachments to temp object:
+				$doc_File = ( empty( $this->ID ) && empty( $this->temp_link_owner_ID ) ) ? $attachment : $attachment->get_File();
 				echo '<li>';
 				if( empty( $doc_File ) )
 				{ // Broken File object
