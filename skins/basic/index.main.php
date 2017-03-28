@@ -194,6 +194,9 @@ siteskin_include( '_site_body_header.inc.php' );
 						'block_title_end' => '</h3>',
 						// Params for skin file "_item_content.inc.php"
 						'widget_item_content_params' => array( 'image_size' => 'fit-400x320' ),
+						// Template params for "Item Link" widget
+						'widget_item_link_before'    => '<p class="evo_post_link">',
+						'widget_item_link_after'     => '</p>',
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 				}

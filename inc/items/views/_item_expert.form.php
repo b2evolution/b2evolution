@@ -304,16 +304,16 @@ $Form->begin_form( '', '', $params );
 				switch( $custom_field['type'] )
 				{
 					case 'double':
-						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, '', T_('can be decimal') );
+						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, '', $custom_field['note'] );
 						break;
 					case 'varchar':
-						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, '', ( empty( $custom_field['note'] ) ? '' : '<br />'.$custom_field['note'] ), array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 						break;
 					case 'text':
-						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, '' );
+						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, '', array( 'note' => $custom_field['note'] ) );
 						break;
 					case 'html':
-						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, '', array( 'note' => T_('This field allows HTML code') ) );
+						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, '', array( 'note' => $custom_field['note'] ) );
 						break;
 				}
 				echo '</td></tr>';

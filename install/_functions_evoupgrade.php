@@ -8341,6 +8341,67 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12240, 'Create new widget "Item Link"...' ) )
+	{ // part of 6.9.1-beta
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_order, wi_enabled, wi_code, wi_params, blog_type' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON blog_id = wi_coll_ID' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$collections = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+
+		$item_single_rows = array();
+		foreach( $collections as $collection )
+		{	// Insert new widget "Collection Activity Stats" to each forum collection
+			if( ! isset( $item_single_rows[$collection['wi_coll_ID']] ) )
+			{
+				$item_single_rows[$collection['wi_coll_ID']] = 15; // default item_attachments widget order
+			}
+
+			if( in_array( $collection['wi_code'], array( 'item_content', 'item_attachments' ) ) )
+			{
+				$item_single_rows[$collection['wi_coll_ID']] = $collection['wi_order'] + 1;
+			}
+		}
+
+		$item_link_widget_rows = array();
+		foreach( $item_single_rows as $coll_ID => $wi_order )
+		{
+			$item_link_widget_rows[] = '( '.$coll_ID.', "Item Single", '.$wi_order.', "item_link" )';
+			// Check and update not unique widget orders just to make sure:
+			$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+				FROM T_widget
+				WHERE wi_coll_ID = '.$coll_ID.'
+					AND wi_sco_name = "Item Single"
+					AND wi_order = '.$wi_order );
+
+			if( $not_unique_widget_ID > 0 )
+			{	// The collection has no unique widget order, move all widget order >= to current order:
+				$DB->query( 'UPDATE T_widget
+						SET wi_order = wi_order + 1
+						WHERE wi_coll_ID = '.$coll_ID.'
+						AND wi_sco_name = "Item Single"
+						AND wi_order >= '.$wi_order.'
+						ORDER BY wi_order DESC');
+			}
+		}
+
+		if( count( $item_link_widget_rows ) )
+		{	// Insert new widgets "Item Link" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_link_widget_rows ) );
+		}
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12250, 'Upgrading table of post type custom fields...' ) )
+	{	// part of 6.9.1-beta
+		db_add_col( 'T_items__type_custom_field', 'itcf_note', 'VARCHAR(255) NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_section', '

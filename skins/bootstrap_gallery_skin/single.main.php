@@ -264,6 +264,9 @@ siteskin_include( '_site_body_header.inc.php' );
 							'before_attach_size' => ' <span class="evo_file_size">(',
 							'after_attach_size'  => ')</span>',
 						),
+					// Template params for "Item Link" widget
+					'widget_item_link_before'    => '<p class="evo_post_link">',
+					'widget_item_link_after'     => '</p>',
 				) );
 				// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 				?>

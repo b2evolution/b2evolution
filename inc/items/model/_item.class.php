@@ -2213,13 +2213,21 @@ class Item extends ItemLight
 
 		$content_parts = $this->get_content_parts( $params );
 
-		// Output everything after [teaserbreak]
-		array_shift($content_parts);
-		$output = implode('', $content_parts);
+		// Output everything after [teaserbreak]:
+		array_shift( $content_parts );
+		$output = implode( '', $content_parts );
 
 		// Render inline file tags like [image:123:caption] or [file:123:caption] :
 		$params['check_code_block'] = true;
+
+		// Render inline file tags like [image:123:caption] or [file:123:caption] :
 		$output = render_inline_files( $output, $this, $params );
+
+		// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
+		$output = $this->render_custom_fields( $output, $params );
+
+		// Render Parent Data [parent], [parent:fields] and etc.:
+		$output = $this->render_parent_data( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2514,7 +2522,7 @@ class Item extends ItemLight
 	function render_parent_data( $content, $params = array() )
 	{
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
-		{	// Call $this->render_custom_fields() on everything outside code/pre:
+		{	// Call $this->render_parent_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
@@ -2919,7 +2927,7 @@ class Item extends ItemLight
 		}
 		else
 		{	// Deprecated since v5, left for compatibility with old skins
-			$params['before']		= isset($args[0]) ? $args[0] : '<p class="evo_post_pagination">'.T_('Pages:').' ';
+			$params['before']		= isset($args[0]) ? $args[0] : '<p class="evo_post_pagination">'.T_('Pages').': ';
 			$params['after']		= isset($args[1]) ? $args[1] : '</p>';
 			$params['separator']	= isset($args[2]) ? $args[2] : ' ';
 			$params['single']		= isset($args[3]) ? $args[3] : '';
@@ -2949,7 +2957,7 @@ class Item extends ItemLight
 	function get_page_links( $params = array(), $format = 'htmlbody' )
 	{
 		$params = array_merge( array(
-					'before'       => '<p class="evo_post_pagination">'.T_('Pages:').' ',
+					'before'       => '<p class="evo_post_pagination">'.T_('Pages').': ',
 					'after'        => '</p>',
 					'separator'    => ' ',
 					'single'       => '',
@@ -5263,6 +5271,7 @@ class Item extends ItemLight
 				'podcast'       => '#',						// handle as podcast. # means depending on post type
 				'before_podplayer' => '<div class="podplayer">',
 				'after_podplayer'  => '</div>',
+				'link_class'     => ''
 			), $params );
 
 		if( $params['podcast'] == '#' )
@@ -5292,6 +5301,11 @@ class Item extends ItemLight
 			$r = $params['before'];
 
 			$r .= '<a href="'.str_replace( '$url$', $this->url, $params['url_template'] ).'"';
+
+			if( !empty( $params['link_class'] ) )
+			{
+				$r .= ' class="'.$params['link_class'].'"';
+			}
 
 			if( !empty( $params['target'] ) )
 			{

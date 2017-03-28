@@ -497,7 +497,7 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 		$NL_end = '';
 		if( $ignore_NL )
 		{
-			while( $block{0} == "\n" )
+			while( isset( $block{0} ) && $block{0} == "\n" )
 			{
 				$NL_start .= $block{0};
 				$block = substr($block, 1);

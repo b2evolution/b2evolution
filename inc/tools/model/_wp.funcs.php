@@ -772,9 +772,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 							break;
 
 						case 'post_tag':
-							if( isset( $tags[ (string) $term['slug'] ] ) )
+							if( isset( $tags[ (string) $term['name'] ] ) )
 							{ // Set tag
-								$post_tags[] = $term['slug'];
+								$post_tags[] = $term['name'];
 							}
 							break;
 					}

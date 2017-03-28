@@ -99,6 +99,7 @@ $core_componentwidget_defs = array(
 			'item_info_line',
 			'item_content',
 			'item_attachments',
+			'item_link',
 			'item_location',
 			'item_small_print',
 			'item_tags',
