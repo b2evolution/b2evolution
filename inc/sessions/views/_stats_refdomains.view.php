@@ -62,7 +62,7 @@ if( $dtyp_searcheng ) $selected_agnt_types[] = "'searcheng'";
 if( $dtyp_aggregator ) $selected_agnt_types[] = "'aggregator'";
 if( $dtyp_email ) $selected_agnt_types[] = "'email'";
 if( $dtyp_unknown ) $selected_agnt_types[] = "'unknown'";
-$SQL->WHERE( 'dom_type IN ( ' . implode( ', ', $selected_agnt_types ) . ' )' );
+$SQL->WHERE( 'dom_type IN ( '.implode( ', ', $selected_agnt_types ).' )' );
 if( count( $selected_agnt_types ) != 5 ) $list_is_filtered = true;
 
 if( ! empty( $dname ) )

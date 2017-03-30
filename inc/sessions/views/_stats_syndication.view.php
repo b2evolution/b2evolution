@@ -77,7 +77,7 @@ $res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 /*
  * Chart
  */
-if( count($res_hits) )
+if( count( $res_hits ) )
 {
 	// Initialize params to filter by selected collection and/or group:
 	$section_params = empty( $blog ) ? '' : '&blog='.$blog;

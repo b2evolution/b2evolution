@@ -3298,8 +3298,11 @@ div.podplayer {
 	font-weight: bold;
 }
 */
-span.NonExistentWikiWord {
-  border-bottom: 1px dotted #ccc;
+.evo_shortlink_broken {
+  border-bottom: 1px dotted #F00;
+}
+.evo_shortlink_broken.btn {
+  border: 1px dotted #F00;
 }
 
 /* This file is used to fix the style issues on all bootstrap skins of b2evolution */

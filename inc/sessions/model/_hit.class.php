@@ -467,7 +467,7 @@ class Hit
 			{ // In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
 				siteskin_init();
 				siteskin_include( '_403_referer_spam.main.php' ); // error
-				exit(0); // just in case.
+				exit( 0 ); // just in case.
 				// THIS IS THE END!!
 			}
 
@@ -854,7 +854,7 @@ class Hit
 
 		if( empty( $keyphrase ) )
 		{	// No search hit
-			if ( ! empty( $this->test_mode ) && ! empty( $this->test_uri['s'] ) )
+			if( ! empty( $this->test_mode ) && ! empty( $this->test_uri['s'] ) )
 			{
 				$s = $this->test_uri['s'];
 			}

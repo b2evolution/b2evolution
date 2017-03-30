@@ -336,14 +336,14 @@ if( count( $res_hits ) )
 
 			// Increment hitcounter:
 
-			if ( $row_stats['hit_type'] == 'ajax' )
+			if( $row_stats['hit_type'] == 'ajax' )
 			{
 				$hits['ajax'] += $row_stats['hits'];
 				$hits_total['ajax'] += $row_stats['hits'];
 			}
 			else
 			{
-				if ( $row_stats['hit_type'] == 'admin' )
+				if( $row_stats['hit_type'] == 'admin' )
 				{
 					$hits['admin'] += $row_stats['hits'];
 					$hits_total['admin'] += $row_stats['hits'];

@@ -70,20 +70,20 @@ else
 	$SQL_count->SELECT( 'COUNT(ghit_ID)' );
 	$SQL_count->FROM( 'T_track__goalhit LEFT JOIN T_hitlog ON ghit_hit_ID = hit_ID' );
 
-	if( !empty($datestart) )
+	if( ! empty( $datestart ) )
 	{
-		$SQL->WHERE_and( 'hit_datetime >= '.$DB->quote($datestart.' 00:00:00') );
-		$SQL_count->WHERE_and( 'hit_datetime >= '.$DB->quote($datestart.' 00:00:00') );
+		$SQL->WHERE_and( 'hit_datetime >= '.$DB->quote( $datestart.' 00:00:00' ) );
+		$SQL_count->WHERE_and( 'hit_datetime >= '.$DB->quote( $datestart.' 00:00:00' ) );
 	}
-	if( !empty($datestop) )
+	if( ! empty( $datestop ) )
 	{
-		$SQL->WHERE_and( 'hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
-		$SQL_count->WHERE_and( 'hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
+		$SQL->WHERE_and( 'hit_datetime <= '.$DB->quote( $datestop.' 23:59:59' ) );
+		$SQL_count->WHERE_and( 'hit_datetime <= '.$DB->quote( $datestop.' 23:59:59' ) );
 	}
 
-	if( !empty($sess_ID) )
+	if( ! empty( $sess_ID ) )
 	{	// We want to filter on the session ID:
-		$operator = ($exclude ? ' <> ' : ' = ' );
+		$operator = ( $exclude ? ' <> ' : ' = ' );
 		$SQL->WHERE_and( 'hit_sess_ID'.$operator.$sess_ID );
 		$SQL_count->FROM_add( 'LEFT JOIN T_sessions ON hit_sess_ID = sess_ID' );
 		$SQL_count->WHERE_and( 'hit_sess_ID'.$operator.$sess_ID );
@@ -94,14 +94,14 @@ else
 		$SQL_count->FROM_add( 'LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID' );
 		if( ! empty( $goal_name ) ) // TODO: allow combine
 		{ // We want to filter on the goal name:
-			$operator = ($exclude ? ' NOT LIKE ' : ' LIKE ' );
-			$SQL->WHERE_and( 'goal_name'.$operator.$DB->quote($goal_name.'%') );
-			$SQL_count->WHERE_and( 'goal_name'.$operator.$DB->quote($goal_name.'%') );
+			$operator = ( $exclude ? ' NOT LIKE ' : ' LIKE ' );
+			$SQL->WHERE_and( 'goal_name'.$operator.$DB->quote( $goal_name.'%' ) );
+			$SQL_count->WHERE_and( 'goal_name'.$operator.$DB->quote( $goal_name.'%' ) );
 		}
 
 		if( ! empty( $goal_cat ) )
 		{ // We want to filter on the goal category:
-			$operator = ($exclude ? ' != ' : ' = ' );
+			$operator = ( $exclude ? ' != ' : ' = ' );
 			$SQL->WHERE_and( 'goal_gcat_ID'.$operator.$DB->quote( $goal_cat ) );
 			$SQL_count->WHERE_and( 'goal_gcat_ID'.$operator.$DB->quote( $goal_cat ) );
 		}
