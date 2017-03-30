@@ -267,7 +267,7 @@ function stats_search_keywords( $keyphrase, $length = 45 )
 	// Save original string
 	$keyphrase_orig = $keyphrase;
 
-	$keyphrase = strmaxlen($keyphrase, $length, '...', 'raw');
+	$keyphrase = strmaxlen( $keyphrase, $length, '...', 'raw' );
 
 	// Convert keyword encoding, some charsets are supported only in PHP 4.3.2 and later.
 	// This fixes encoding problem for Cyrillic keywords
@@ -285,7 +285,7 @@ function stats_search_keywords( $keyphrase, $length = 45 )
  */
 function generate_random_ip()
 {
-	return mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255);
+	return mt_rand( 0, 255 ).'.'.mt_rand( 0, 255 ).'.'.mt_rand( 0, 255 ).'.'.mt_rand( 0, 255 );
 }
 
 
@@ -302,8 +302,8 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 {
 	global $baseurlroot, $admin_url, $user_agents, $DB, $htsrv_url, $is_api_request;
 
-	load_class('items/model/_itemlistlight.class.php', 'ItemListLight');
-	load_class('sessions/model/_hit.class.php', 'Hit');
+	load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
+	load_class( 'sessions/model/_hit.class.php', 'Hit' );
 
 	$links = array();
 
@@ -339,7 +339,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 		$filters['cat_modifier'] = $linkblog_cat_modifier;
 
 
-		$ItemList->set_default_filters($filters);
+		$ItemList->set_default_filters( $filters );
 
 		// Get the items list of current blog
 		$ItemList->query();
@@ -355,50 +355,62 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			$Chapter = & $Item->get_main_Chapter();
 			while( $Item = & $ItemList->get_item() )
 			{
-				$links[] = array('link' => '/' . $listBlog->siteurl . '/' . $Chapter->get_url_path() . $Item->urltitle, // trim($Chapter->get_permanent_url(NULL ,' ')).
-					'blog_id' => $blog_id);
+				$links[] = array(
+					'link' => '/'.$listBlog->siteurl.'/'.$Chapter->get_url_path().$Item->urltitle, // trim( $Chapter->get_permanent_url( NULL ,' ' ) ).
+					'blog_id' => $blog_id
+				);
 			}
 		}
 
 		// add search links for all blogs
-		$links[] = array('link' => url_add_param( '/' . $listBlog->siteurl, 's=$keywords$&disp=search&submit=Search', '&' ),
-			'blog_id' => $blog_id);
-
-		$links[] = array('link' => url_add_param( '/' . $listBlog->siteurl, 'disp=users', '&' ),
-			'blog_id' => $blog_id,
-			'disp' => 'users');
-
-		$links[] = array('link' => url_add_param( '/'.$listBlog->siteurl, 'disp=user&user_ID=1', '&' ),
-			'blog_id' => $blog_id,
-			'disp' => 'users');
-
-		$links[] = array('link' => url_add_param( '/' . $listBlog->siteurl, 'disp=threads', '&' ),
-			'blog_id' => $blog_id,
-			'disp' => 'threads');
-
-		$links[] = array('link' => url_add_param( '/' . $listBlog->siteurl, 'disp=profile', '&' ),
-			'blog_id' => $blog_id,
-			'disp' => 'profile');
+		$links[] = array(
+			'link' => url_add_param( '/'.$listBlog->siteurl, 's=$keywords$&disp=search&submit=Search', '&' ),
+			'blog_id' => $blog_id
+		);
 
 		$links[] = array(
-				'link' => $htsrv_url.'anon_async.php',
-				'blog_id' => $blog_id
-			);
+			'link' => url_add_param( '/'.$listBlog->siteurl, 'disp=users', '&' ),
+			'blog_id' => $blog_id,
+			'disp' => 'users'
+		);
 
 		$links[] = array(
-				'link' => '/api/v1/collections/'.$listBlog->urlname.'/posts',
-				'blog_id' => $blog_id
-			);
+			'link' => url_add_param( '/'.$listBlog->siteurl, 'disp=user&user_ID=1', '&' ),
+			'blog_id' => $blog_id,
+			'disp' => 'users'
+		);
 
 		$links[] = array(
-				'link' => '/api/v1/collections/'.$listBlog->urlname.'/search/post',
-				'blog_id' => $blog_id
-			);
+			'link' => url_add_param( '/'.$listBlog->siteurl, 'disp=threads', '&' ),
+			'blog_id' => $blog_id,
+			'disp' => 'threads'
+		);
 
 		$links[] = array(
-				'link' => '/xmlsrv/xmlrpc.php?blog='.$listBlog->ID,
-				'blog_id' => $blog_id
-			);
+			'link' => url_add_param( '/'.$listBlog->siteurl, 'disp=profile', '&' ),
+			'blog_id' => $blog_id,
+			'disp' => 'profile'
+		);
+
+		$links[] = array(
+			'link' => $htsrv_url.'anon_async.php',
+			'blog_id' => $blog_id
+		);
+
+		$links[] = array(
+			'link' => '/api/v1/collections/'.$listBlog->urlname.'/posts',
+			'blog_id' => $blog_id
+		);
+
+		$links[] = array(
+			'link' => '/api/v1/collections/'.$listBlog->urlname.'/search/post',
+			'blog_id' => $blog_id
+		);
+
+		$links[] = array(
+			'link' => '/xmlsrv/xmlrpc.php?blog='.$listBlog->ID,
+			'blog_id' => $blog_id
+		);
 	}
 
 	$links[] = array(
@@ -448,7 +460,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 	$robots = array();
 	foreach( $user_agents as $lUserAgent )
 	{
-		if ($lUserAgent[0] == 'robot')
+		if( $lUserAgent[0] == 'robot' )
 		{
 			$robots[] = $lUserAgent[1];
 		}
@@ -492,19 +504,19 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 
 	// Calculate the period of testing
 	$cur_time = time();
-	$past_time = mktime(date("H"), date("i"), date("s"), date("m"), date("d") - $days, date("Y"));
+	$past_time = mktime( date( 'H' ), date( 'i' ), date( 's' ), date( 'm' ), date( 'd' ) - $days, date( 'Y' ) );
 
 	$insert_data = '';
 	$insert_data_count = 0;
 
 	// create session array for testing
 	$sessions = array();
-	mt_srand(crc32(microtime()));
-	for ($i = 0; $i <= $users_count - 1; $i++)
+	mt_srand( crc32( microtime() ) );
+	for( $i = 0; $i <= $users_count - 1; $i++ )
 	{
 		$sessions[] = array(
 				'sess_ID'          => -1,
-				'sess_key'         => generate_random_key(32),
+				'sess_key'         => generate_random_key( 32 ),
 				'sess_start_ts'    => 0,
 				'sess_lastseen_ts' => 0,
 				'sess_ipaddress'   => generate_random_ip(),
@@ -517,116 +529,113 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 
 	// main cycle of generation
 	//mt_srand(crc32(microtime()));
-	for ($time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand($min_interval, $max_interval))
+	for( $time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand( $min_interval, $max_interval ) )
 	{
 		//mt_srand(crc32(microtime()));
 		$insert_data_count = $insert_data_count + 1;
 
-		$rand_i = mt_rand(0, $users_count - 1);
-		$rand_link = mt_rand(0, $links_count - 1);
-		$cur_seesion = $sessions[$rand_i];
+		$rand_i = mt_rand( 0, $users_count - 1 );
+		$rand_link = mt_rand( 0, $links_count - 1 );
+		$cur_session = $sessions[$rand_i];
 		$rand_request_method = $request_methods[ mt_rand( 0, $request_methods_count - 1 ) ];
 
 
-		if (strstr($links[$rand_link]['link'], '$keywords$'))
+		if( strstr( $links[$rand_link]['link'], '$keywords$' ) )
 		{ // check if the current search link is selected randomly.
 			// If yes, generate search link and add it to DB
 			//mt_srand(crc32(microtime()+ $time_shift));
-			$keywords = 'fake search ' . mt_rand(0, 9);
-			$links[$rand_link]['link'] = str_replace('$keywords$', urlencode($keywords), $links[$rand_link]['link']);
-			if (strstr($links[$rand_link]['link'], 's='))
+			$keywords = 'fake search '.mt_rand( 0, 9 );
+			$links[$rand_link]['link'] = str_replace( '$keywords$', urlencode( $keywords ), $links[$rand_link]['link'] );
+			if( strstr( $links[$rand_link]['link'], 's=' ) )
 			{
 				$links[$rand_link]['s'] = $keywords;
 			}
 		}
 
-		if ($cur_seesion['sess_ID'] == -1)
+		if( $cur_session['sess_ID'] == -1 )
 		{ // This session needs initialization:
-			$cur_seesion['sess_start_ts'] = $time_shift - 1;
-			$cur_seesion['sess_lastseen_ts'] = $time_shift;
+			$cur_session['sess_start_ts'] = $time_shift - 1;
+			$cur_session['sess_lastseen_ts'] = $time_shift;
 
-			$DB->query("
-					INSERT INTO T_sessions ( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_user_ID, sess_device )
+			$DB->query( 'INSERT INTO T_sessions ( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_user_ID, sess_device )
 					VALUES (
-						'" . $cur_seesion['sess_key'] . "',
-						'" . date('Y-m-d H:i:s', $cur_seesion['sess_start_ts']) . "',
-						'" . date('Y-m-d H:i:s', $cur_seesion['sess_lastseen_ts']) . "',
-						" . $DB->quote( $cur_seesion['sess_ipaddress'] ) . ",
-						" . $cur_seesion['sess_user_ID'] . ",
-						" . $DB->quote( $cur_seesion['sess_device'] ) . "
-					)");
+						'.$DB->quote( $cur_session['sess_key'] ).',
+						'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_start_ts'] ) ).',
+						'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_lastseen_ts'] ) ).',
+						'.$DB->quote( $cur_session['sess_ipaddress'] ).',
+						'.$DB->quote( $cur_session['sess_user_ID'] ).',
+						'.$DB->quote( $cur_session['sess_device'] ).'
+					)' );
 
-			$cur_seesion['sess_ID'] = $DB->insert_id;
-			$sessions[$rand_i] = $cur_seesion;
+			$cur_session['sess_ID'] = $DB->insert_id;
+			$sessions[$rand_i] = $cur_session;
 
 			// Check if current url is api request:
 			$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
 
-			$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+			$Test_hit = new Hit( '', $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $links[$rand_link] );
 			$Test_hit->method = $rand_request_method;
 			$Test_hit->log();
 		}
 		else
 		{
-			if (($time_shift - $cur_seesion['sess_lastseen_ts']) > 3000 || !empty($cur_seesion['robot']))
+			if( ( $time_shift - $cur_session['sess_lastseen_ts'] ) > 3000 || ! empty( $cur_session['robot'] ) )
 			{ // This session last updated more than 3000 sec ago. Instead of this session create a new session.
-				$cur_seesion = array(
+				$cur_session = array(
 					'sess_ID'          => -1,
-					'sess_key'         => generate_random_key(32),
+					'sess_key'         => generate_random_key( 32 ),
 					'sess_start_ts'    => 0,
 					'sess_lastseen_ts' => 0,
 					'sess_ipaddress'   => generate_random_ip(),
-					'sess_user_ID'     => $users_array[mt_rand(0, $users_count - 1)]['user_ID'],
+					'sess_user_ID'     => $users_array[ mt_rand( 0, $users_count - 1 ) ]['user_ID'],
 					'sess_device'      => $devices[ mt_rand( 0, $devices_count - 1 ) ],
 					'pervios_link'     => '',
 					'robot'            => ''
 				);
 
-				$cur_seesion['sess_start_ts'] = $time_shift - 1;
-				$cur_seesion['sess_lastseen_ts'] = $time_shift;
-				$r_num = mt_rand(0, 100);
-				if ($r_num > 40)
+				$cur_session['sess_start_ts'] = $time_shift - 1;
+				$cur_session['sess_lastseen_ts'] = $time_shift;
+				$r_num = mt_rand( 0, 100 );
+				if( $r_num > 40 )
 				{ // Create anonymous user and make double insert into hits.
-					$cur_seesion['sess_user_ID'] = -1;
-					$DB->query("
-							INSERT INTO T_sessions ( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_device )
+					$cur_session['sess_user_ID'] = -1;
+					$DB->query( 'INSERT INTO T_sessions ( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_device )
 							VALUES (
-								'" . $cur_seesion['sess_key'] . "',
-								'" . date('Y-m-d H:i:s', $cur_seesion['sess_start_ts']) . "',
-								'" . date('Y-m-d H:i:s', $cur_seesion['sess_lastseen_ts']) . "',
-								" . $DB->quote( $cur_seesion['sess_ipaddress'] ) . ",
-								" . $DB->quote( $cur_seesion['sess_device'] ) . "
-							)");
+								'.$DB->quote( $cur_session['sess_key'] ).',
+								'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_start_ts'] ) ).',
+								'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_lastseen_ts'] ) ).',
+								'.$DB->quote( $cur_session['sess_ipaddress'] ).',
+								'.$DB->quote( $cur_session['sess_device'] ).'
+							)' );
 
-					if ($r_num >= 80)
+					if( $r_num >= 80 )
 					{ // Create robot hit
-						$cur_seesion['robot'] = $robots[mt_rand(0, $robots_count)];
+						$cur_session['robot'] = $robots[ mt_rand( 0, $robots_count ) ];
 					}
 				}
 				else
 				{
-					$DB->query("
-							INSERT INTO T_sessions( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_user_ID, sess_device )
+					$DB->query(	'INSERT INTO T_sessions( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_user_ID, sess_device )
 							VALUES (
-								'" . $cur_seesion['sess_key'] . "',
-								'" . date('Y-m-d H:i:s', $cur_seesion['sess_start_ts']) . "',
-								'" . date('Y-m-d H:i:s', $cur_seesion['sess_lastseen_ts']) . "',
-								" . $DB->quote($cur_seesion['sess_ipaddress']) . ",
-								" . $cur_seesion['sess_user_ID'] . ",
-								" . $DB->quote( $cur_seesion['sess_device'] ) . "
-							)");
+								'.$DB->quote( $cur_session['sess_key'] ).',
+								'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_start_ts'] ) ).',
+								'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_lastseen_ts'] ) ).',
+								'.$DB->quote( $cur_session['sess_ipaddress'] ).',
+								'.$DB->quote( $cur_session['sess_user_ID'] ).',
+								'.$DB->quote( $cur_session['sess_device'] ).'
+							)' );
 				}
 
-				$cur_seesion['sess_ID'] = $DB->insert_id;
+				$cur_session['sess_ID'] = $DB->insert_id;
 
-				if (mt_rand(0, 100) > 20)
+				if( mt_rand( 0, 100 ) > 20 )
 				{
 					//$ref_count
-					$ref_link = $referes[mt_rand(0, $ref_count)];
-					if (strstr($ref_link, '$keywords$'))
+					$ref_link = $referes[ mt_rand( 0, $ref_count ) ];
+					if( strstr( $ref_link, '$keywords$' ) )
 					{ // check if the current search link is selected randomly.
-						$keywords = 'fake search ' . mt_rand(0, 9);
-						$ref_link = str_replace('$keywords$', urlencode($keywords), $ref_link);
+						$keywords = 'fake search '.mt_rand( 0, 9 );
+						$ref_link = str_replace( '$keywords$', urlencode( $keywords ), $ref_link );
 					}
 				}
 				else
@@ -634,45 +643,49 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 					$ref_link = '';
 				}
 
-				if ($cur_seesion['sess_user_ID'] == -1)
+				if( $cur_session['sess_user_ID'] == -1 )
 				{
-					if (empty($cur_seesion['robot']))
+					if( empty( $cur_session['robot'] ) )
 					{
-						$link = array('link' => '/htsrv/login.php',
-							'blog_id' => 1);
+						$link = array(
+							'link'    => '/htsrv/login.php',
+							'blog_id' => 1
+						);
 
 						// This is NOT api request:
 						$is_api_request = false;
 
-						$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $link);
+						$Test_hit = new Hit( $ref_link, $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $link );
 
 						$Test_hit->method = $rand_request_method;
 
 						$Test_hit->log();
 
-						$link = array('link' => '/htsrv/login.php?redirect_to=fake_stat',
-							'blog_id' => 1);
+						$link = array(
+							'link'    => '/htsrv/login.php?redirect_to=fake_stat',
+							'blog_id' => 1
+						);
 
-						$Test_hit = new Hit($baseurlroot, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'] + 3, 1, $link);
+						$Test_hit = new Hit( $baseurlroot, $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'] + 3, 1, $link );
 
 						$Test_hit->method = $rand_request_method;
 
 						$Test_hit->log();
 
-						$cur_seesion['pervios_link'] = $baseurlroot . $link['link'];
+						$cur_session['pervios_link'] = $baseurlroot.$link['link'];
 					}
 					else
 					{
 						// Check if current url is api request:
 						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
 
-						if (mt_rand(0, 100) < 50)
+						if( mt_rand( 0, 100 ) < 50 )
 						{ // robot hit
-							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link], $cur_seesion['robot']);
+							$Test_hit = new Hit( '', $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $links[$rand_link], $cur_session['robot'] );
 						}
 						else
 						{ // rss/atom hit
-							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link], NULL, NULL, 1);
+							$Test_hit = new Hit( '', $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $links[$rand_link], NULL, NULL, 1 );
 						}
 						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
@@ -680,56 +693,53 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 				}
 				else
 				{
-					if (mt_rand(0, 100) < 10)
-					{ // Test hit to admin page
+					if( mt_rand( 0, 100 ) < 10 )
+					{	// Test hit to admin page:
 
 						// This is NOT api request:
 						$is_api_request = false;
 
-						$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $admin_link, NULL, 1);
+						$Test_hit = new Hit( '', $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $admin_link, NULL, 1 );
 						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
-						$cur_seesion['pervios_link'] = $admin_url;
+						$cur_session['pervios_link'] = $admin_url;
 					}
 					else
 					{
 						// Check if current url is api request:
 						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
 
-						$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+						$Test_hit = new Hit( $ref_link, $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $links[$rand_link] );
 						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
-						$cur_seesion['pervios_link'] = $baseurlroot . $links[$rand_link]['link'];
+						$cur_session['pervios_link'] = $baseurlroot.$links[$rand_link]['link'];
 					}
 				}
 			}
 			else
 			{
 				// Update session
-				$cur_seesion['sess_lastseen_ts'] = $time_shift;
+				$cur_session['sess_lastseen_ts'] = $time_shift;
 
 				// Check if current url is api request:
 				$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
 
-				$Test_hit = new Hit($cur_seesion['pervios_link'], $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+				$Test_hit = new Hit( $cur_session['pervios_link'], $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $links[$rand_link] );
 				$Test_hit->method = $rand_request_method;
 				$Test_hit->log();
 
+				$DB->query( 'UPDATE T_sessions
+					  SET sess_lastseen_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_lastseen_ts'] ) ).'
+					WHERE sess_ID = '.$DB->quote( $cur_session['sess_ID'] ),
+					'Update session' );
 
+				$cur_session['pervios_link'] = $baseurlroot.$links[$rand_link]['link'];
 
-				$sql = "UPDATE T_sessions SET
-								sess_lastseen_ts = '" . date('Y-m-d H:i:s', $cur_seesion['sess_lastseen_ts']) . "'
-								WHERE sess_ID = {$cur_seesion['sess_ID']}";
-
-				$DB->query($sql, 'Update session');
-
-				$cur_seesion['pervios_link'] = $baseurlroot . $links[$rand_link]['link'];
-
-				$sessions[$rand_i] = $cur_seesion;
+				$sessions[$rand_i] = $cur_session;
 			}
 		}
 
-		$sessions[$rand_i] = $cur_seesion;
+		$sessions[$rand_i] = $cur_session;
 
 		if( $display_process )
 		{
@@ -964,10 +974,10 @@ function extract_keyphrase_from_hitlogs()
 				FROM T_hitlog as h
 				WHERE h.hit_keyphrase IS NOT NULL
 					AND h.hit_keyphrase_keyp_ID IS NULL';
-	$ids = $DB->get_row( $sql, "ARRAY_A", NULL, ' Get max/min hits ids of unextracted keyphrases' );
+	$ids = $DB->get_row( $sql, ARRAY_A, NULL, ' Get max/min hits ids of unextracted keyphrases' );
 
-	if ( ! empty ( $ids['min'] ) && ! empty ( $ids['max'] ) )
-	{ // Extract keyphrases if needed:
+	if( ! empty ( $ids['min'] ) && ! empty ( $ids['max'] ) )
+	{	// Extract keyphrases if needed:
 
 		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_refered_searches)
 					SELECT h.hit_keyphrase, 1

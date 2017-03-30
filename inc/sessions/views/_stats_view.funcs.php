@@ -284,14 +284,14 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 		$full_url = $hit_uri;
 	}
 
-	$int_search_uri = urldecode($hit_uri);
+	$int_search_uri = urldecode( $hit_uri );
 	if( ( utf8_strpos( $int_search_uri , '?s=' ) !== false )
 	 || ( utf8_strpos( $int_search_uri , '&s=' ) !== false ) )
 	{ // This is an internal search:
 		preg_match( '~[?&]s=([^&#]*)~', $int_search_uri, $res );
 		$hit_uri = sprintf( T_( 'Internal search: %s' ), $res[1] );
 	}
-	elseif( utf8_strlen($hit_uri) > $max_len )
+	elseif( utf8_strlen( $hit_uri ) > $max_len )
 	{
 		$hit_uri = '...'.utf8_substr( $hit_uri, -$max_len );
 	}
@@ -326,7 +326,7 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
  */
 function stat_session_login( $login )
 {
-	if( empty($login) )
+	if( empty( $login ) )
 	{
 		return '<span class="note">'.T_('Anon.').'</span>';
 	}
@@ -389,7 +389,7 @@ function disp_clickable_log_IP( $hit_remote_addr )
 function disp_color_referer( $hit_referer_type )
 {
 	global $referer_type_color;
-	if(!empty ($referer_type_color[$hit_referer_type]))
+	if( ! empty( $referer_type_color[$hit_referer_type] ) )
 	{
 		return '<span style="background-color: #'.$referer_type_color[$hit_referer_type].'">'.$hit_referer_type.'</span>';
 	}
@@ -399,6 +399,7 @@ function disp_color_referer( $hit_referer_type )
 	}
 }
 
+
 /**
  * Display color agent type
  *
@@ -407,7 +408,7 @@ function disp_color_referer( $hit_referer_type )
 function disp_color_agent( $hit_agent_type )
 {
 	global $agent_type_color;
-	if(!empty ($agent_type_color[$hit_agent_type]))
+	if( ! empty( $agent_type_color[$hit_agent_type] ) )
 	{
 		return '<span style="background-color: #'.$agent_type_color[$hit_agent_type].'">'.$hit_agent_type.'</span>';
 	}
@@ -417,39 +418,38 @@ function disp_color_agent( $hit_agent_type )
 	}
 }
 
+
 /**
  * Generate html response code class
  *
  * @param integer response code
  * @return string class
  */
-function hit_response_code_class($hit_response_code)
+function hit_response_code_class( $hit_response_code )
 {
 	$class = '';
 
-	if($hit_response_code >= 200 && $hit_response_code < 300)
+	if( $hit_response_code >= 200 && $hit_response_code < 300 )
 	{
 		$class =  "code_2xx";
 	}
-	if($hit_response_code >= 300 && $hit_response_code < 400)
+	if( $hit_response_code >= 300 && $hit_response_code < 400 )
 	{
 		$class =  "code_3xx";
 	}
 
-	if($hit_response_code == 304)
+	if( $hit_response_code == 304 )
 	{
 		$class =  "code_304";
 	}
 
-	if ($hit_response_code >= 400)
+	if( $hit_response_code >= 400 )
 	{
 		$class =  "code_4xx";
 	}
 
-
 	return $class;
 }
-
 
 
 /**
@@ -463,7 +463,7 @@ function hit_type_color( $hit_type )
 	global $hit_type_color;
 	$color = '#FFFFFF';
 
-	if( ! empty ( $hit_type_color[$hit_type] ) )
+	if( ! empty( $hit_type_color[$hit_type] ) )
 	{
 		$color ='#'.$hit_type_color[$hit_type];
 	}
@@ -483,7 +483,7 @@ function hit_agent_type_color( $hit_agent_type )
 	global $agent_type_color;
 	$color = '#FFFFFF';
 
-	if( ! empty ( $agent_type_color[$hit_agent_type] ) )
+	if( ! empty( $agent_type_color[$hit_agent_type] ) )
 	{
 		$color ='#'.$agent_type_color[$hit_agent_type];
 	}

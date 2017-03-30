@@ -466,7 +466,7 @@ class Hit
 			if( $Settings->get( 'antispam_block_spam_referers' ) )
 			{ // In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
 				require $siteskins_path.'_403_referer_spam.main.php';	// error & exit
-				exit(0); // just in case.
+				exit( 0 ); // just in case.
 				// THIS IS THE END!!
 			}
 
@@ -853,7 +853,7 @@ class Hit
 
 		if( empty( $keyphrase ) )
 		{	// No search hit
-			if ( ! empty( $this->test_mode ) && ! empty( $this->test_uri['s'] ) )
+			if( ! empty( $this->test_mode ) && ! empty( $this->test_uri['s'] ) )
 			{
 				$s = $this->test_uri['s'];
 			}

@@ -38,13 +38,13 @@ $SQL = new SQL();
 $SQL->SELECT( 'goal_ID, goal_name, gcat_color' );
 $SQL->FROM( 'T_track__goal' );
 $SQL->FROM_add( 'LEFT JOIN T_track__goalcat ON gcat_ID = goal_gcat_ID' );
-if( !empty($final) )
+if( ! empty( $final ) )
 {	// We want to filter on final goals only:
 	$SQL->WHERE_and( 'goal_redir_url IS NULL' );
 }
-if( !empty($goal_name) ) // TODO: allow combine
+if( ! empty( $goal_name ) ) // TODO: allow combine
 { // We want to filter on the goal name:
-	$SQL->WHERE_and( 'goal_name LIKE '.$DB->quote($goal_name.'%') );
+	$SQL->WHERE_and( 'goal_name LIKE '.$DB->quote( $goal_name.'%' ) );
 }
 if( ! empty( $goal_cat ) )
 { // We want to filter on the goal category:
@@ -107,7 +107,7 @@ if( count( $goal_rows ) && count( $hitgroup_array ) )
 
 	// Print out chart
 	echo '<div class="center">';
-	load_funcs('_ext/_canvascharts.php');
+	load_funcs( '_ext/_canvascharts.php' );
 	CanvasBarsChart( $chart );
 	echo '</div>';
 }

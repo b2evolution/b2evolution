@@ -63,7 +63,7 @@ if( ! empty( $final ) )
 if( ! empty( $s ) )
 { // We want to filter on search keyword:
 	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
-	$SQL->WHERE_and( 'CONCAT_WS( " ", goal_name, goal_key, goal_redir_url ) LIKE "%'.$DB->escape($s).'%"' );
+	$SQL->WHERE_and( 'CONCAT_WS( " ", goal_name, goal_key, goal_redir_url ) LIKE "%'.$DB->escape( $s ).'%"' );
 }
 if( ! empty( $cat ) )
 { // We want to filter on category:

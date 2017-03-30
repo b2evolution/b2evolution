@@ -303,7 +303,7 @@ switch( $action )
 		break;
 }
 
-if( isset($collections_Module) && $tab_from != 'antispam' )
+if( isset( $collections_Module ) && $tab_from != 'antispam' )
 { // Display list of blogs:
 	if( $perm_view_all )
 	{
@@ -335,7 +335,7 @@ switch( $tab )
 
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Summary'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
-		if( empty($tab3) )
+		if( empty( $tab3 ) )
 		{
 			$tab3 = 'global';
 		}
@@ -407,7 +407,7 @@ switch( $tab )
 	case 'refsearches':
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Incoming searches'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
-		if( empty($tab3) )
+		if( empty( $tab3 ) )
 		{
 			$tab3 = 'hits';
 		}
@@ -531,7 +531,7 @@ $AdminUI->disp_payload_begin();
 
 evo_flush();
 
-switch( $AdminUI->get_path(1) )
+switch( $AdminUI->get_path( 1 ) )
 {
 	case 'summary':
 		// Display VIEW:
