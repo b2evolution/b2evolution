@@ -374,7 +374,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 									)
 								).'</span>';
 					}
-					$Form->begin_fieldset( '#'.$k_nb.$remove_action, array( 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) );
+					$fieldset_title = empty( $parmeta['entries_label'] ) ? '' : $parmeta['entries_label'].' ';
+					$fieldset_title .= '#'.($k_nb + 1).$remove_action;
+					$Form->begin_fieldset( $fieldset_title, array( 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) );
 
 					if( isset($parmeta['key']) )
 					{ // KEY FOR THIS ENTRY:
