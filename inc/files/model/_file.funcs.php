@@ -2307,7 +2307,11 @@ function display_dragdrop_upload_button( $params = array() )
 		<?php
 		if( $params['LinkOwner'] !== NULL )
 		{	// Add params to link a file right after uploading:
-			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'"';
+			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'";';
+		}
+		if( ! empty( $params['fm_mode'] ) && $params['fm_mode'] == 'file_select' )
+		{
+			echo 'url += "&fm_mode='.$params['fm_mode'].'";';
 		}
 		?>
 
@@ -2375,110 +2379,119 @@ function display_dragdrop_upload_button( $params = array() )
 					if( $params['list_style'] == 'table' )
 					{ // Table view
 					?>
-					var this_row = jQuery( 'tr[rel=file_upload_' + id + ']' );
+					var this_rows = jQuery( 'tr[rel=file_upload_' + id + ']' );
 
-					if( responseJSON.success == undefined || responseJSON.success.status == 'error' || responseJSON.success.status == 'fatal' )
-					{ // Failed
-						this_row.find( '.qq-upload-status' ).html( '<span class="red"><?php echo TS_('Upload ERROR'); ?></span>' );
-						if( typeof( text ) == 'undefined' || text == '' )
-						{ // Message for unknown error
-							text = '<?php echo TS_('Server dropped the connection.'); ?>';
-						}
-						this_row.find( '.qq-upload-file' ).append( ' <span class="result_error">' + text + '</span>' );
-						this_row.find( '.qq-upload-image, td.size' ).prepend( '<?php echo format_to_js( get_icon( 'warning_yellow' ) ); ?>' );
-					}
-					else
-					{ // Success/Conflict
-						var table_view = typeof( responseJSON.success.link_ID ) != 'undefined' ? 'link' : 'file';
-
-						var filename_before = '<?php echo format_to_js( $params['filename_before'] ); ?>';
-						var filename_select = '<?php echo format_to_js( $params['filename_select'] ); ?>';
-						if( filename_before != '' )
-						{
-							filename_before = filename_before.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
-						}
-
-						if( filename_select != '' )
-						{
-							if( responseJSON.success.filetype == 'image' )
-							{
-								filename_select = filename_select.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
+					jQuery.each( this_rows, function( index, this_row ) {
+						this_row = jQuery( this_row );
+						if( responseJSON.success == undefined || responseJSON.success.status == 'error' || responseJSON.success.status == 'fatal' )
+						{ // Failed
+							this_row.find( '.qq-upload-status' ).html( '<span class="red"><?php echo TS_('Upload ERROR'); ?></span>' );
+							if( typeof( text ) == 'undefined' || text == '' )
+							{ // Message for unknown error
+								text = '<?php echo TS_('Server dropped the connection.'); ?>';
 							}
-							else
+							this_row.find( '.qq-upload-file' ).append( ' <span class="result_error">' + text + '</span>' );
+							this_row.find( '.qq-upload-image, td.size' ).prepend( '<?php echo format_to_js( get_icon( 'warning_yellow' ) ); ?>' );
+						}
+						else
+						{ // Success/Conflict
+							var table_view = typeof( responseJSON.success.link_ID ) != 'undefined' ? 'link' : 'file';
+
+							var filename_before = '<?php echo format_to_js( $params['filename_before'] ); ?>';
+							var filename_select = '<?php echo format_to_js( $params['filename_select'] ); ?>';
+							if( filename_before != '' )
 							{
-								filename_select = '';
+								filename_before = filename_before.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
 							}
-						}
 
-						var warning = '';
-						if( responseJSON.success.warning != '' )
-						{
-							warning = '<div class="orange">' + responseJSON.success.warning + '</div>';
-						}
-
-						// File name or url to view file
-						var file_name = ( typeof( responseJSON.success.link_url ) != 'undefined' ) ? responseJSON.success.link_url : responseJSON.success.newname;
-
-						this_row.find( '.qq-upload-checkbox' ).html( responseJSON.success.checkbox );
-
-						if( responseJSON.success.status == 'success' )
-						{ // Success upload
-							<?php
-							if( $params['display_status_success'] )
-							{ // Display this message only if it is enabled
-							?>
-							this_row.find( '.qq-upload-status' ).html( '<span class="green"><?php echo TS_('Upload OK'); ?></span>' );
-							<?php } else { ?>
-							this_row.find( '.qq-upload-status' ).html( '' );
-							<?php } ?>
-							this_row.find( '.qq-upload-image' ).html( text );
-							this_row.find( '.qq-upload-file' ).html( filename_before + filename_select
-								+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
-								+ '<span class="fname">' + file_name + '</span>' + warning );
-						}
-						else if( responseJSON.success.status == 'rename' )
-						{ // Conflict on upload
-							<?php
-							$status_conflict_message = '<span class="orange">'.TS_('Upload Conflict').'</span>';
-							if( $params['status_conflict_place'] == 'default' )
-							{ // Default place for a conflict message
-							?>
-							this_row.find( '.qq-upload-status' ).html( '<?php echo $status_conflict_message; ?>' );
-							<?php } else { ?>
-							this_row.find( '.qq-upload-status' ).html( '' );
-							<?php } ?>
-							this_row.find( '.qq-upload-image' ).append( htmlspecialchars_decode( responseJSON.success.file ) );
-							this_row.find( '.qq-upload-file' ).html( filename_before
-								+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
-								+ '<span class="fname">' + file_name + '</span>'
-								<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
-								+ ' - <a href="#" '
-								+ 'class="<?php echo button_class( 'text_warning' ); ?> btn-sm roundbutton_text_noicon qq-conflict-replace" '
-								+ 'old="' + responseJSON.success.oldname + '" '
-								+ 'new="' + responseJSON.success.newname + '">'
-								+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
-								+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
-								+ '</a>'
-								+ warning );
-							var old_file_obj = jQuery( 'input[type=hidden][value="' + responseJSON.success.oldpath + '"]' );
-							if( old_file_obj.length > 0 )
+							if( filename_select != '' )
 							{
-								old_file_obj.parent().append( ' <span class="orange"><?php echo TS_('(Old File)'); ?></span>' );
+								if( responseJSON.success.filetype == 'image' )
+								{
+									filename_select = filename_select.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
+								}
+								else
+								{
+									filename_select = '';
+								}
 							}
-						}
 
-						if( table_view == 'link' )
-						{ // Update the cells for link view, because these data exist in response
-							this_row.find( '.qq-upload-link-id' ).html( responseJSON.success.link_ID );
-							this_row.find( '.qq-upload-image' ).html( responseJSON.success.link_preview );
-							this_row.find( '.qq-upload-link-actions' ).prepend( responseJSON.success.link_actions );
-							if( typeof( responseJSON.success.link_position ) != 'undefined' )
+							var warning = '';
+							if( responseJSON.success.warning != '' )
 							{
-								this_row.find( '.qq-upload-link-position' ).html( responseJSON.success.link_position );
+								warning = '<div class="orange">' + responseJSON.success.warning + '</div>';
+							}
+
+							// File name or url to view file
+							var file_name = ( typeof( responseJSON.success.link_url ) != 'undefined' ) ? responseJSON.success.link_url : responseJSON.success.newname;
+
+							this_row.find( '.qq-upload-checkbox' ).html( responseJSON.success.checkbox );
+
+							var tbody = this_row.closest( 'tbody.filelist_tbody' );
+							if( tbody[0].getAttribute( 'data-file-select' ) ) {
+								file_name = responseJSON.success.select_link_button + ' ' + file_name;
+							}
+
+							if( responseJSON.success.status == 'success' )
+							{ // Success upload
+								<?php
+								if( $params['display_status_success'] )
+								{ // Display this message only if it is enabled
+								?>
+								this_row.find( '.qq-upload-status' ).html( '<span class="green"><?php echo TS_('Upload OK'); ?></span>' );
+								<?php } else { ?>
+								this_row.find( '.qq-upload-status' ).html( '' );
+								<?php } ?>
+								this_row.find( '.qq-upload-image' ).html( text );
+								this_row.find( '.qq-upload-file' ).html( filename_before + filename_select
+									+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
+									+ '<span class="fname">' + file_name + '</span>' + warning );
+							}
+							else if( responseJSON.success.status == 'rename' )
+							{ // Conflict on upload
+								<?php
+								$status_conflict_message = '<span class="orange">'.TS_('Upload Conflict').'</span>';
+								if( $params['status_conflict_place'] == 'default' )
+								{ // Default place for a conflict message
+								?>
+								this_row.find( '.qq-upload-status' ).html( '<?php echo $status_conflict_message; ?>' );
+								<?php } else { ?>
+								this_row.find( '.qq-upload-status' ).html( '' );
+								<?php } ?>
+								this_row.find( '.qq-upload-image' ).append( htmlspecialchars_decode( responseJSON.success.file ) );
+								this_row.find( '.qq-upload-file' ).html( filename_before
+									+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
+									+ '<span class="fname">' + file_name + '</span>'
+									<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
+									+ ' - <a href="#" '
+									+ 'class="<?php echo button_class( 'text_warning' ); ?> btn-sm roundbutton_text_noicon qq-conflict-replace" '
+									+ 'old="' + responseJSON.success.oldname + '" '
+									+ 'new="' + responseJSON.success.newname + '">'
+									+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
+									+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
+									+ '</a>'
+									+ warning );
+								var old_file_obj = jQuery( 'input[type=hidden][value="' + responseJSON.success.oldpath + '"]' );
+								if( old_file_obj.length > 0 )
+								{
+									old_file_obj.parent().append( ' <span class="orange"><?php echo TS_('(Old File)'); ?></span>' );
+								}
+							}
+
+							if( table_view == 'link' )
+							{ // Update the cells for link view, because these data exist in response
+								this_row.find( '.qq-upload-link-id' ).html( responseJSON.success.link_ID );
+								this_row.find( '.qq-upload-image' ).html( responseJSON.success.link_preview );
+								this_row.find( '.qq-upload-link-actions' ).prepend( responseJSON.success.link_actions );
+								if( typeof( responseJSON.success.link_position ) != 'undefined' )
+								{
+									this_row.find( '.qq-upload-link-position' ).html( responseJSON.success.link_position );
+								}
+								init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 							}
 							init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 						}
-					}
+					} );
 					<?php
 					}
 					else

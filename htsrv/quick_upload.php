@@ -231,6 +231,7 @@ param( 'upload', 'boolean', true );
 param( 'root_and_path', 'filepath', true );
 param( 'blog', 'integer' );
 param( 'link_owner', 'string' );
+param( 'fm_mode', 'string' );
 // Use the glyph or font-awesome icons if requested by skin
 param( 'b2evo_icons_type', 'string', '' );
 
@@ -479,6 +480,10 @@ if( $upload )
 			$message['link_url'] = $newFile->get_view_link();
 			$message['link_preview'] = $new_Link->get_preview_thumb();
 			$message['link_actions'] = link_actions( $new_Link->ID, 'last', $link_owner_type );
+			if( isset( $fm_mode ) && $fm_mode == 'file_select' )
+			{
+				$message['select_link_button'] = select_link_button( $new_Link->ID );
+			}
 			$mask_row = (object) array(
 					'link_ID'       => $new_Link->ID,
 					'file_ID'       => $newFile->ID,

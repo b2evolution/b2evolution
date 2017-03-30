@@ -320,7 +320,7 @@ function display_attachments( & $LinkOwner, $params = array() )
 }
 
 
-/*
+/**
  * Get a link destination
  *
  * @return string
@@ -362,6 +362,43 @@ function link_destination()
 	if( $title !== '' )
 	{
 		$r .= '<span class="filemeta"> - '.$title.'</span>';
+	}
+
+	return $r;
+}
+
+
+/**
+ * Get select button for link in link list view
+ *
+ * @param integer Link ID
+ * @return string
+ */
+function select_link_button( $link_ID, $file_type = 'image' )
+{
+	global $Blog, $LinkOwner, $current_File;
+
+	$LinkCache = & get_LinkCache();
+	$current_Link = & $LinkCache->get_by_ID( $link_ID );
+	$linked_File = & $current_Link->get_File();
+
+
+	if( empty( $Blog ) )
+	{
+		$Blog = & $LinkOwner->get_Blog();
+	}
+
+	$link_attribs = array();
+	$link_attribs['target'] = '_parent';
+	$link_attribs['class'] = 'action_icon select_file btn btn-primary btn-xs';
+	$link_attribs['onclick'] = 'return evo_item_image_insert( '.$Blog->ID.', \'image\', '.$link_ID.' )';
+
+	$r = '';
+
+	if( $linked_File->get_file_type() == $file_type )
+	{
+		$r .= action_icon( T_('Select file'), '', '#', ' '.T_('Select'), NULL, 5, $link_attribs );
+		$r .= ' ';
 	}
 
 	return $r;
