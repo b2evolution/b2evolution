@@ -478,6 +478,12 @@ class shortlinks_plugin extends Plugin
 
 		$class = empty( $class ) ? '' : $class.' ';
 
+		if( is_numeric( $post_slug ) && ! is_numeric( $text ) )
+		{	// Try to use custom text if it is provided instead of post ID to suggest a link to create new post:
+			$post_slug = preg_replace( array( '*([^\p{Lu}#_])([\p{Lu}#])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1-$2', utf8_strtolower( $text ) );
+			$post_title = $text;
+		}
+
 		if( isset( $blog ) && ! is_numeric( $post_slug ) )
 		{	// Suggest to create new post from given word:
 			$post_title = preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1 $2', $post_title );
