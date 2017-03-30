@@ -236,29 +236,22 @@ class shortlinks_plugin extends Plugin
 					// WikiWord
 					$search_wikiwords[] = '/
 						(?<= \s | ^ ) 						# Lookbehind for whitespace or start
-						(?<! <span\ class="NonExistentWikiWord"> )
+						(?<! evo_shortlink_broken">)
 						'.$WikiWord.'							# Specific WikiWord to replace
 						(?= [\.,:;!\?] \s | \s | $ )							# Lookahead for whitespace or end of string
 						/sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
 
 
 					// Find matching Item:
-					if( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
-					{ // Item Found
-						$permalink = $Item->get_permanent_url();
-
+					if( ( $Item = & $ItemCache->get_by_urltitle( $wiki_word, false ) ) !== false )
+					{	// Item Found
 						// WikiWord
-						$replace_links[] = '<a href="'.$permalink.'">'.$Item->get( 'title' ).'</a>';
-
+						$replace_links[] = '<a href="'.$Item->get_permanent_url().'">'.$Item->get( 'title' ).'</a>';
 					}
 					else
-					{ // Item not found
-
-						$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
-
+					{	// Item not found
 						// WikiWord
-						$replace_links[] = '<span class="NonExistentWikiWord">'.$WikiWord.$create_link.'</span>';
-
+						$replace_links[] = $this->get_broken_link( $WikiWord, $wiki_word, $WikiWord );
 					}
 				}
 			}
@@ -440,11 +433,11 @@ class shortlinks_plugin extends Plugin
 		// Clear custom link text:
 		$custom_link_text = utf8_trim( $m[3] );
 
+		// Clear custom link style classes:
+		$custom_link_class = utf8_trim( str_replace( '.', ' ', $m[2] ) );
+
 		if( ! empty( $permalink ) )
 		{	// Chapter or Item are found in DB
-
-			// Clear custom link style classes:
-			$custom_link_class = utf8_trim( str_replace( '.', ' ', $m[2] ) );
 			$custom_link_class = empty( $custom_link_class ) ? '' : ' class="'.$custom_link_class.'"';
 
 			if( ! empty( $custom_link_text ) )
@@ -462,19 +455,47 @@ class shortlinks_plugin extends Plugin
 		}
 		else
 		{	// Chapter and Item are not found in DB
-			$create_link = isset( $blog ) && ! is_numeric( $this->current_wiki_word )
-				? '<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$this->current_wiki_word.'" title="'.format_to_output( T_('Create').'...', 'htmlattr' ).'">?</a>'
-				: '';
-
-			if( ! empty( $custom_link_text ) )
-			{	// [[WikiWord custom link text]] or ((WikiWord custom link text))
-				return '<span class="NonExistentWikiWord">'.$custom_link_text.$create_link.'</span>';
-			}
-			else
-			{	// [[Wikiword]] or ((Wikiword))
-				return '<span class="NonExistentWikiWord">'.$link_text.$create_link.'</span>';
-			}
+			return $this->get_broken_link( $WikiWord, $this->current_wiki_word, ( empty( $custom_link_text ) ? $link_text : $custom_link_text ), $custom_link_class );
 		}
+	}
+
+
+	/**
+	 * Get HTML code for broken link
+	 *
+	 * @param string Post title
+	 * @param string Post slug
+	 * @param string Link/Span text
+	 * @param string Link/Span class
+	 * @return string
+	 */
+	function get_broken_link( $post_title, $post_slug, $text, $class = '' )
+	{
+		global $blog, $admin_url, $evo_charset;
+
+		// Add regexp modifier 'u' to work with UTF-8 strings correctly:
+		$regexp_modifier = ( $evo_charset == 'utf-8' ) ? 'u' : '';
+
+		$class = empty( $class ) ? '' : $class.' ';
+
+		if( isset( $blog ) && ! is_numeric( $post_slug ) )
+		{	// Suggest to create new post from given word:
+			$post_title = preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1 $2', $post_title );
+			$post_title = ucfirst( str_replace( '-', ' ', $post_title ) );
+
+			$before_wikiword = '<a'
+				.' href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.urlencode( $post_title ).'&amp;post_urltitle='.urlencode( $post_slug ).'"'
+				.' title="'.format_to_output( T_('Create').'...', 'htmlattr' ).'"'
+				.' class="'.$class.'evo_shortlink_broken">';
+			$after_wikiword = '</a>';
+		}
+		else
+		{	// Don't allow to create new post from numeric wiki word:
+			$before_wikiword = '<span class="'.$class.'evo_shortlink_broken">';
+			$after_wikiword = '</span>';
+		}
+
+		return $before_wikiword.$text.$after_wikiword;
 	}
 
 
