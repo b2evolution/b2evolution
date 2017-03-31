@@ -1080,7 +1080,11 @@ function wpxml_parser( $file )
 	$terms = array();
 	$files = array();
 
-	$xml = simplexml_load_file( $file );
+	// Register filter to avoid wrong chars in XML content:
+	stream_filter_register( 'xmlutf8', 'ValidUTF8XMLFilter' );
+
+	// Load XML content from file with xmlutf8 filter:
+	$xml = simplexml_load_file( 'php://filter/read=xmlutf8/resource='.$file );
 
 	// Get WXR version
 	$wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' );
@@ -1376,8 +1380,18 @@ function wpxml_parser( $file )
  */
 function wpxml_check_xml_file( $file, $halt = false )
 {
+	// Enable XML error handling:
 	$internal_errors = libxml_use_internal_errors( true );
-	$xml = simplexml_load_file( $file );
+
+	// Clear error of previous XML file (e.g. when ZIP archive has several XML files):
+	libxml_clear_errors();
+
+	// Register filter to avoid wrong chars in XML content:
+	stream_filter_register( 'xmlutf8', 'ValidUTF8XMLFilter' );
+
+	// Load XML content from file with xmlutf8 filter:
+	$xml = simplexml_load_file( 'php://filter/read=xmlutf8/resource='.$file );
+
 	if( ! $xml )
 	{	// Halt/Display if loading produces an error:
 		$errors = array();
@@ -1385,7 +1399,7 @@ function wpxml_check_xml_file( $file, $halt = false )
 		{	// Halt on error:
 			foreach( libxml_get_errors() as $error )
 			{
-				$errors[] = 'Line '.$error->line.' - "'.$error->message.'"';
+				$errors[] = 'Line '.$error->line.' - "'.format_to_output( $error->message, 'htmlspecialchars' ).'"';
 			}
 			debug_die( 'There was an error when reading XML file "'.$file.'".'
 				.' Error: '.implode( ', ', $errors ) );
@@ -1394,7 +1408,7 @@ function wpxml_check_xml_file( $file, $halt = false )
 		{	// Display error:
 			foreach( libxml_get_errors() as $error )
 			{
-				$errors[] = sprintf( T_('Line %s'), '<code>'.$error->line.'</code>' ).' - '.'"'.$error->message.'"';
+				$errors[] = sprintf( T_('Line %s'), '<code>'.$error->line.'</code>' ).' - '.'"'.format_to_output( $error->message, 'htmlspecialchars' ).'"';
 			}
 			echo '<p class="text-danger">'.sprintf( T_('There was an error when reading XML file %s.'), '<code>'.$file.'</code>' ).'<br />'
 				.sprintf( T_('Error: %s'), implode( ',<br />', $errors ) ).'</p>';
@@ -1768,6 +1782,29 @@ function wpxml_get_attachments_folder( $file_path, $first_folder = false )
 
 	// File has no attachments folder
 	return false;
+}
+
+
+/**
+ * This class is used to avoid wrong chars in XML files on import
+ *
+ * @see wpxml_parser()
+ * @see wpxml_check_xml_file()
+ */
+class ValidUTF8XMLFilter extends php_user_filter
+{
+	protected static $pattern = '/[^\x{0009}\x{000a}\x{000d}\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}]+/u';
+
+	function filter( $in, $out, & $consumed, $closing )
+	{
+		while( $bucket = stream_bucket_make_writeable( $in ) )
+		{
+			$bucket->data = preg_replace( self::$pattern, '', $bucket->data );
+			$consumed += $bucket->datalen;
+			stream_bucket_append( $out, $bucket );
+		}
+		return PSFS_PASS_ON;
+	}
 }
 
 ?>

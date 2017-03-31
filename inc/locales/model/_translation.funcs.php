@@ -415,7 +415,7 @@ function translation_find_T_strings( $file, & $translation_strings )
 			continue;
 		}
 
-		for( $l = 0; $l <= strlen( $line_string ); $l++ )
+		for( $l = 0; $l < strlen( $line_string ); $l++ )
 		{
 			$char = $line_string[ $l ];
 

@@ -2698,13 +2698,26 @@ class Item extends ItemLight
 				'format'   => 'htmlbody',
 			), $params );
 
-		$content_page = $this->get_content_page( $params['disppage'], $params['format'] );
+		if( ! isset( $this->cache_has_content_parts ) )
+		{	// Initialize an array for cache results:
+			$this->cache_has_content_parts = array();
+		}
 
-		// Replace <code> and <pre> blocks from content because we're not interested in [teaserbreak] in there
-		$content_page = preg_replace( '~<(code|pre)[^>]*>.*?</\1>~is', '*', $content_page );
+		if( ! isset( $this->cache_has_content_parts[ $params['disppage'].$params['format'] ] ) )
+		{	// Initialize result only first time and store in cache in order to don't execute a heavy operation twice:
+			$content_page = $this->get_content_page( $params['disppage'], $params['format'] );
 
-		return strpos( $content_page, '[teaserbreak]' ) !== false
-			|| $this->get_images( array( 'restrict_to_image_position' => 'aftermore' ) );
+			// Replace <code> and <pre> blocks from content because we're not interested in [teaserbreak] in there
+			$content_page = preg_replace( '~<(code|pre)[^>]*>.*?</\1>~is', '*', $content_page );
+
+			// Store result in cache for requested page and format:
+			$this->cache_has_content_parts[ $params['disppage'].$params['format'] ] =
+				   strpos( $content_page, '[teaserbreak]' ) !== false
+				|| $this->get_images( array( 'restrict_to_image_position' => 'aftermore' ) );
+		}
+
+		// Get a result from cache or from recently initialized var above:
+		return $this->cache_has_content_parts[ $params['disppage'].$params['format'] ];
 	}
 
 
