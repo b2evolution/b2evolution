@@ -243,7 +243,7 @@ class shortlinks_plugin extends Plugin
 
 
 					// Find matching Item:
-					if( ( $Item = & $ItemCache->get_by_urltitle( $wiki_word, false ) ) !== false )
+					if( $Item = & $ItemCache->get_by_urltitle( $wiki_word, false, false ) )
 					{	// Item Found
 						// WikiWord
 						$replace_links[] = '<a href="'.$Item->get_permanent_url().'">'.$Item->get( 'title' ).'</a>';
@@ -407,22 +407,22 @@ class shortlinks_plugin extends Plugin
 		$link_text = preg_replace( array( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1 $2', $WikiWord );
 		$link_text = ucwords( str_replace( '-', ' ', $link_text ) );
 
-		if( is_numeric( $this->current_wiki_word ) && ( $Item = & $ItemCache->get_by_ID( $this->current_wiki_word, false ) ) !== false )
+		if( is_numeric( $this->current_wiki_word ) && ( $Item = & $ItemCache->get_by_ID( $this->current_wiki_word, false, false ) ) )
 		{	// Item is found
 			$permalink = $Item->get_permanent_url();
 			$existing_link_text = $Item->get( 'title' );
 		}
-		elseif( ( $Chapter = & $ChapterCache->get_by_urlname( $this->current_wiki_word, false ) ) !== false )
+		elseif( $Chapter = & $ChapterCache->get_by_urlname( $this->current_wiki_word, false, false ) )
 		{	// Chapter is found
 			$permalink = $Chapter->get_permanent_url();
 			$existing_link_text = $Chapter->get( 'name' );
 		}
-		elseif( ( $Item = & $ItemCache->get_by_urltitle( $this->current_wiki_word, false ) ) !== false )
+		elseif( $Item = & $ItemCache->get_by_urltitle( $this->current_wiki_word, false, false ) )
 		{	// Item is found
 			$permalink = $Item->get_permanent_url();
 			$existing_link_text = $Item->get( 'title' );
 		}
-		elseif( isset( $anchor ) && ( $Item = & $ItemCache->get_by_ID( $ItemCache->ID_array[0], false ) ) !== false )
+		elseif( isset( $anchor ) && ( $Item = & $ItemCache->get_by_ID( $ItemCache->ID_array[0], false, false ) ) )
 		{	// Item is found
 			$permalink = $Item->get_permanent_url();
 			$permalink = $url_params == '' ? $permalink.$anchor : $url_params;
