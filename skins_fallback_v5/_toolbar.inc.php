@@ -14,18 +14,20 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( ! is_logged_in() )
-{
-	return;
-}
-
 /**
  * @var User
  */
 global $current_User;
 
-if( !$current_User->check_perm( 'admin', 'toolbar' ) )
-{ // don't show toolbar for current User
+if( ! is_logged_in() || ! $current_User->check_perm( 'admin', 'toolbar' ) )
+{	// Don't show toolbar if current User is not logged in or has no permission for it:
+	return;
+}
+
+global $disp, $preview;
+
+if( ( $disp == 'single' || $disp == 'page' ) && ( ! empty( $preview ) || param( 'preview_mode', 'integer', 0 ) ) )
+{	// Don't show toolbar on preview post mode:
 	return;
 }
 

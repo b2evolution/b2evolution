@@ -117,7 +117,7 @@ div#evo_toolbar {
     margin-top: 0;
   }
 }
-div.skin_wrapper_loggedin {
+div#evo_toolbar + div.skin_wrapper_loggedin {
   margin-top: 26px;
   padding-top: 1px;
 }
