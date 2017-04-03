@@ -1800,7 +1800,7 @@ class _core_Module extends Module
 		$entries['userprefs']['entries'][] = array( 'separator' => true );
 
 		$entries['userprefs']['entries']['logout'] = array(
-				'text' => T_('Log out!'),
+				'text' => T_('Log out').'!',
 				'href' => get_user_logout_url(),
 			);
 
