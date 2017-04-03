@@ -84,6 +84,7 @@ if( ! empty( $original_string ) )
 
 // Create result set:
 $Results = new Results( $SQL->get(), 'itst_', '-A'/*, NULL, $count_SQL->get()*/ );
+$Results->Form = & $Form;
 
 $Results->title = sprintf( T_('Translation editor for locale "%s"'), $edit_locale );
 
@@ -97,6 +98,7 @@ $Results->global_icon( T_('Add new translated string...'), 'new', regenerate_url
  */
 function filter_translation( & $Form )
 {
+	$Form->switch_layout( 'blockspan' );
 	$Form->text( 'original', get_param( 'original' ), 20, T_('Original string') );
 	if( get_param( 'untranslated_only' ) )
 	{
@@ -107,6 +109,7 @@ function filter_translation( & $Form )
 		$Form->text_input( 'translated', get_param( 'translated' ), 20, T_('Translated string') );
 	}
 	$Form->checkbox( 'untranslated_only', get_param( 'untranslated_only' ), T_('Show only untranslated strings') );
+	$Form->switch_layout( NULL );
 }
 
 $Results->filter_area = array(
