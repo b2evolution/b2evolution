@@ -63,7 +63,7 @@ if( $redirect_to == NULL )
 	$redirect_to = regenerate_url( 'action' );
 }
 
-$Form->global_icon( T_('Cancel!'), 'close', $redirect_to, '', 3, 2, array( 'class'=>'action_icon', 'id'=>'close_button' ) );
+$Form->global_icon( T_('Cancel').'!', 'close', $redirect_to, '', 3, 2, array( 'class'=>'action_icon', 'id'=>'close_button' ) );
 
 $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delete') );
 

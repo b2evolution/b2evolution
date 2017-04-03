@@ -177,7 +177,7 @@ $Results->title = $params['messages_list_title'].( is_admin_page() ? get_manual_
 
 if( is_admin_page() )
 {
-	$Results->global_icon( T_('Cancel!'), 'close', '?ctrl=threads' );
+	$Results->global_icon( T_('Cancel').'!', 'close', '?ctrl=threads' );
 }
 
 /**

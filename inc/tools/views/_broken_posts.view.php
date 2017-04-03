@@ -23,7 +23,7 @@ $SQL->WHERE( 'post_main_cat_ID NOT IN (SELECT cat_ID FROM T_categories )' );
 $Results = new Results( $SQL->get(), 'broken_posts_' );
 
 $Results->title = T_( 'Broken items with no matching category' );
-$Results->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
+$Results->global_icon( T_('Cancel').'!', 'close', regenerate_url( 'action' ) );
 
 $Results->cols[] = array(
 	'th' => T_('Item ID'),
