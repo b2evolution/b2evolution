@@ -709,6 +709,10 @@ fieldset ul {
 #filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
 }
+#item_checkchanges .left_col .ui-resizable-handle:hover,
+#item_checkchanges .left_col .ui-resizable-handle.active_handler {
+  border-left: 2px dashed #c0c0c0;
+}
 #iframe_item_preview_wrapper {
   width: 100%;
   height: 600px;

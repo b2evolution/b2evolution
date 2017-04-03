@@ -525,9 +525,54 @@ function b2edit_confirm( msg, newaction, submit_action )
 	return b2edit_reload( document.getElementById( 'item_checkchanges' ), newaction, null, { action: submit_action }, false );
 }
 
-// Code to resize height of item preview frame:
+// Code to resize widths of left and right columns on item/post edit form:
 jQuery( document ).ready( function()
 {
+	if( jQuery( '#item_checkchanges' ).length == 0 )
+	{	// Initialize the code below only when preview iframe exists on current page:
+		return;
+	}
+
+	var b2evo_item_edit_column_width;
+	jQuery( '#item_checkchanges .left_col' ).resizable(
+	{
+		minWidth: 320,
+		handles: 'e',
+		start: function( e, ui )
+		{
+			b2evo_item_edit_column_width = ui.element.width() + ui.element.next().width();
+			ui.element.resizable( 'option', 'maxWidth', ( b2evo_item_edit_column_width - 320 ) );
+			// Display the resize handler as active during all resizing time:
+			ui.element.find( '.ui-resizable-handle' ).addClass( 'active_handler' );
+			// Create div over preview iframe, because the resizing action is broken when mouse pointer is over iframe:
+			jQuery( '#iframe_item_preview_wrapper' ).append( '<div id="iframe_item_preview_disabler"></div>' );
+		},
+		resize: function( e, ui )
+		{
+			// Resize right column on left column resizing:
+			ui.element.next().width( b2evo_item_edit_column_width - ui.element.width() );
+		},
+		stop: function( e, ui )
+		{
+			// Hide the resize handler:
+			ui.element.find( '.ui-resizable-handle' ).removeClass( 'active_handler' );
+			// Remove a helper to fix iframe issue:
+			jQuery( '#iframe_item_preview_disabler' ).remove();
+			// Save percent width in cookie:
+			var percent_width = ui.element.width() / ( ui.element.width() + ui.element.next().width() ) * 100;
+			jQuery.cookie( 'b2evo_item_edit_column_width'+ ( typeof( blog_id ) == 'undefined' ? '' : '_' + blog_id ), percent_width.toFixed(3), { path: '/', expires: 3650 } );
+		}
+	} );
+} );
+
+// Code to resize height of item preview frame on edit form:
+jQuery( document ).ready( function()
+{
+	if( jQuery( '#iframe_item_preview_wrapper' ).length == 0 )
+	{	// Initialize the code below only when preview iframe exists on current page:
+		return;
+	}
+
 	function update_item_preview_frame_height()
 	{
 		var body_height = jQuery( '#iframe_item_preview' ).contents().find( 'body' ).height();

@@ -99,10 +99,14 @@ $Form->begin_form( '', '', $params );
 
 	// Post type
 	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );
+
+	// Get width of left and right columns from cookie or default:
+	$left_column_width = isset( $_COOKIE['b2evo_item_edit_column_width_'.$Blog->ID] ) ? $_COOKIE['b2evo_item_edit_column_width_'.$Blog->ID] : 50;
+	$right_column_width = 100 - $left_column_width;
 ?>
 <div class="row">
 
-<div class="left_col col-lg-6">
+<div class="left_col col-lg-6" style="width:<?php echo $left_column_width.'%'; ?>">
 
 	<?php
 	// ############################ INSTRUCTIONS ##############################
@@ -852,7 +856,7 @@ $Form->begin_form( '', '', $params );
 
 </div><?php /* END OF <div class="left_col col-lg-6">*/ ?>
 
-<div class="right_col col-lg-6">
+<div class="right_col col-lg-6" style="width:<?php echo $right_column_width.'%'; ?>">
 
 	<?php
 
