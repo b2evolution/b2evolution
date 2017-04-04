@@ -700,11 +700,11 @@ class User extends DataObject
 				$country_is_required = ( $Settings->get( 'location_country' ) == 'required' && countries_exist() );
 				if( $country_is_required && $can_edit_users && $country_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_ctry_ID', T_('Please select a country.'), 'note' );
+					param_add_message_to_Log( 'edited_user_ctry_ID', T_('Please select a country').'.', 'note' );
 				}
 				else
 				{ // Display an error message
-					param_check_number( 'edited_user_ctry_ID', T_('Please select a country.'), $country_is_required );
+					param_check_number( 'edited_user_ctry_ID', T_('Please select a country').'.', $country_is_required );
 				}
 				$this->set_from_Request( 'ctry_ID', 'edited_user_ctry_ID', true );
 			}

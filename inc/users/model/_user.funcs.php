@@ -1486,7 +1486,7 @@ function profile_check_params( $params, $User = NULL )
 	// Checking country
 	if( isset( $params['country'] ) && empty( $params['country'][0] ) )
 	{
-		param_error( $params['country'][1], T_('Please select country.') );
+		param_error( $params['country'][1], T_('Please select a country').'.' );
 	}
 
 	// Checking first name
