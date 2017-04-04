@@ -745,11 +745,11 @@ class User extends DataObject
 				$city_is_required = ( $Settings->get( 'location_city' ) == 'required' && cities_exist( $country_ID, $region_ID, $subregion_ID ) );
 				if( $city_is_required && $can_edit_users && $city_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_city_ID', T_('Please select a city.'), 'note' );
+					param_add_message_to_Log( 'edited_user_city_ID', T_('Please select a city').'.', 'note' );
 				}
 				else
 				{ // Display an error message
-					param_check_number( 'edited_user_city_ID', T_('Please select a city.'), $city_is_required );
+					param_check_number( 'edited_user_city_ID', T_('Please select a city').'.', $city_is_required );
 				}
 				$this->set_from_Request( 'city_ID', 'edited_user_city_ID', true );
 			}
