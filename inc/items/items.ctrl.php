@@ -1697,7 +1697,7 @@ switch( $action )
 				) );
 			}
 
-			$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('Cancel'), 4, 2 );
+			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
 
 			init_tokeninput_js();
 		}

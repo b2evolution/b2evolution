@@ -27,7 +27,7 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'region_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this region!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('region') ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', ( $creating ?  T_('New region') : T_('Region') ).get_manual_link( 'regions-editing' ) );
 

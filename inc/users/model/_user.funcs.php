@@ -2415,7 +2415,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 	{
 		$redirect_to = regenerate_url( 'user_ID,action,ctrl,user_tab', 'ctrl=users' );
 	}
-	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1, $link_attribs );
+	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing').'!' : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1, $link_attribs );
 }
 
 

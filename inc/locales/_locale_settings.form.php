@@ -31,7 +31,7 @@ if( $action == 'edit' )
 { // Edit a locale:
 	$Form = new Form( NULL, 'loc_checkchanges', 'post', 'compact' );
 
-	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,template' ) );
+	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,template' ) );
 
 	$Form->begin_form( 'fform', T_('Locale settings').get_manual_link('locale-form') );
 
