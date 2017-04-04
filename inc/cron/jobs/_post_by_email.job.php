@@ -60,7 +60,7 @@ if( isset($GLOBALS['files_Module']) )
 
 if( $Settings->get('eblog_test_mode') )
 {
-	pbm_msg( T_('This is just a test run. Nothing will be posted to the database nor will your inbox be altered.'), true );
+	pbm_msg( T_('This is just a test run. Nothing will be posted to the database nor will your inbox be altered').'.', true );
 }
 
 if( ! $mbox = pbm_connect() )

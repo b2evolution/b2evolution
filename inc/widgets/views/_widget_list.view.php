@@ -298,7 +298,7 @@ $Form->button( array(
 		'type'  => 'submit'
 	) );
 $Form->button( array(
-		'value' => get_icon( 'bullet_empty_grey' ).' '.T_('De-activate'),
+		'value' => get_icon( 'bullet_empty_grey' ).' '.T_('Deactivate'),
 		'name'  => 'actionArray[deactivate]',
 		'tag'   => 'button',
 		'type'  => 'submit'
