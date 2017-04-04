@@ -19,7 +19,7 @@ $Form = new Form( NULL, 'cronlog' );
 
 if( empty( $cjob_row->clog_status ) && $current_User->check_perm( 'options', 'edit', false, NULL ) )
 { // User can edit this job:
-	$Form->global_icon( T_('Edit this job'), 'edit', $admin_url.'?ctrl=crontab&amp;action=edit&amp;ctsk_ID='.$cjob_row->ctsk_ID, T_('Edit this job...'), 3, 3 );
+	$Form->global_icon( T_('Edit this job'), 'edit', $admin_url.'?ctrl=crontab&amp;action=edit&amp;ctsk_ID='.$cjob_row->ctsk_ID, T_('Edit this job').'...', 3, 3 );
 }
 
 $Form->global_icon( T_('Close sheet'), 'close', regenerate_url( 'action,cjob_ID' ) );

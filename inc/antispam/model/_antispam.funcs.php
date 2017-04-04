@@ -296,7 +296,7 @@ function antispam_poll_abuse()
 					$Settings->set( 'antispam_last_update', $endedat );
 					$Settings->dbupdate();
 				}
-				$Messages->add( T_('Done.'), 'success' );
+				$Messages->add( T_('Done').'.', 'success' );
 			}
 		}
 		else
