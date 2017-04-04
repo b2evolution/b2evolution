@@ -170,7 +170,7 @@ class user_tools_Widget extends ComponentWidget
 				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
-				'defaultvalue' => T_( 'Notifications &amp; Subscriptions' ),
+				'defaultvalue' => T_( 'Notifications & Subscriptions' ),
 			),
 			// Admin
 			'user_admin_link_show' => array(
