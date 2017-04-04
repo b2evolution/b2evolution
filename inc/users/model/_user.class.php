@@ -715,7 +715,7 @@ class User extends DataObject
 				$region_is_required = ( $Settings->get( 'location_region' ) == 'required' && regions_exist( $country_ID ) );
 				if( $region_is_required && $can_edit_users && $region_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_rgn_ID', T_('Please select a region.'), 'note' );
+					param_add_message_to_Log( 'edited_user_rgn_ID', T_('Please select a region').'.', 'note' );
 				}
 				else
 				{ // Display an error message
@@ -730,11 +730,11 @@ class User extends DataObject
 				$subregion_is_required = ( $Settings->get( 'location_subregion' ) == 'required' && subregions_exist( $region_ID ) );
 				if( $subregion_is_required && $can_edit_users && $subregion_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_subrg_ID', T_('Please select a sub-region.'), 'note' );
+					param_add_message_to_Log( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', 'note' );
 				}
 				else
 				{ // Display an error message
-					param_check_number( 'edited_user_subrg_ID', T_('Please select a sub-region.'), $subregion_is_required );
+					param_check_number( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', $subregion_is_required );
 				}
 				$this->set_from_Request( 'subrg_ID', 'edited_user_subrg_ID', true );
 			}
