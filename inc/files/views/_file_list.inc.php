@@ -743,7 +743,7 @@ $Form->begin_form();
 				<?php
 			}
 			*/
-			
+
 
 			/*
 			 * CREATE FILE/FOLDER CREATE PANEL:
@@ -774,7 +774,7 @@ $Form->begin_form();
 					}
 				?>
 				<input type="text" name="create_name" id="fm_createname" value="<?php echo isset( $create_name ) ? $create_name : ''; ?>" size="15" class="form-control" />
-				<input class="ActionButton btn btn-default" type="submit" name="actionArray[createnew]" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
+				<input class="ActionButton btn btn-default" type="submit" name="actionArray[createnew]" value="<?php echo format_to_output( T_('Create').'!', 'formvalue' ) ?>" />
 				<?php
 				echo '</div>';
 			}

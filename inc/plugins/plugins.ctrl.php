@@ -931,7 +931,7 @@ switch( $action )
 			}
 
 			echo '<div class="center">';
-			$Form->submit( array( '', T_('Install!'), 'ActionButton btn-primary' ) );
+			$Form->submit( array( '', T_('Install').'!', 'ActionButton btn-primary' ) );
 			echo '</div>';
 			$Form->end_form();
 			?>

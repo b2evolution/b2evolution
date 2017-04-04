@@ -107,7 +107,7 @@ $Form->begin_fieldset( T_('Select the forums which will be imported') );
 
 $Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' ),
+$Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' ),
 											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$dispatcher.'?ctrl=phpbbimport\'' ) ) );
 
 $Form->end_form();

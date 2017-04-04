@@ -61,7 +61,7 @@ $Form->begin_fieldset( T_('Destination collection') );
 
 $Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' ) ) );
+$Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' ) ) );
 
 $Form->end_form();
 

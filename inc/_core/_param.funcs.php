@@ -2472,7 +2472,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		else
 		{
 			$errmsg = ($context == 'commenting')
-				? T_('Illegal content found (spam?).')
+				? T_('Illegal content found (spam?)').'.'
 				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), htmlspecialchars($block) );
 		}
 
