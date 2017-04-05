@@ -140,7 +140,7 @@ $Form->end_fieldset();
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	$Form->buttons_input( array(
-		array( 'type' => 'submit', 'name' => 'actionArray[update_edit_settings]', 'value' => T_('Save & Edit...') ),
+		array( 'type' => 'submit', 'name' => 'actionArray[update_edit_settings]', 'value' => T_('Save & edit').'...' ),
 		array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save Changes!'), 'class' => 'SaveButton' ),
 		) );
 }

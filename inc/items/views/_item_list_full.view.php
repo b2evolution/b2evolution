@@ -146,7 +146,7 @@ while( $Item = & $ItemList->get_item() )
 				global $admin_url;
 				if( $current_User->check_perm( 'slugs', 'view' ) )
 				{ // user has permission to view slugs:
-					echo '&nbsp;'.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
+					echo '&nbsp;'.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 						NULL, NULL, NULL, array( 'class' => 'small' ) );
 				}
 				If( !empty( $Item->order ) )

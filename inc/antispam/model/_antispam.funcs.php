@@ -280,7 +280,7 @@ function antispam_poll_abuse()
 						if( antispam_create( $banned_string, 'central' ) )
 						{ // Creation successed
 							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('OK.'), 'note', T_('Adding strings to local blacklist:') );
+								.T_('OK').'.', 'note', T_('Adding strings to local blacklist:') );
 						}
 						else
 						{ // Was already handled
@@ -301,7 +301,7 @@ function antispam_poll_abuse()
 		}
 		else
 		{
-			$Messages->add( T_('Invalid response.'), 'error' );
+			$Messages->add( T_('Invalid response').'.', 'error' );
 			$ret = false;
 		}
 	}

@@ -594,7 +594,7 @@ switch( $action )
 			}
 			elseif( $edit_Plugin->Settings->dbupdate() )
 			{
-				$Messages->add( T_('Plugin settings have been updated.'), 'success' );
+				$Messages->add( T_('Plugin settings have been updated').'.', 'success' );
 			}
 		}
 
