@@ -33,7 +33,7 @@ if( ! $creating )
 {
 	$Form->global_icon( T_('Delete this organization!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('organization') ) );
 }
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,org_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,org_ID' ) );
 
 $Form->begin_form( 'fform', ( $creating ? T_('New organization') : T_('Organization') ).get_manual_link( 'organization-form' ) );
 

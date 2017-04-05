@@ -76,7 +76,7 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Mobile Skin Switcher.');
+		return T_('Mobile Skin Switcher').'.';
 	}
 
 

@@ -102,7 +102,7 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 				T_('Body Terminator'), T_('Starting from any of these strings, everything will be ignored, including these strings.'), 50 );
 
 	$Form->textarea( 'repath_errtype', $Settings->get( 'repath_errtype' ), 15, T_('Error message decoding configuration'),
-				T_('The first letter means one of the following:<br />S: Spam suspicion<br />P: Permament error<br />T: Temporary error<br />C: Configuration error<br />U: Unknown error (default)<br />The string after the space is a case-insensitive error text.'), 50 );
+				T_('The first letter means one of the following:<br />S: Spam suspicion<br />P: Permanent error<br />T: Temporary error<br />C: Configuration error<br />U: Unknown error (default)<br />The string after the space is a case-insensitive error text.'), 50 );
 
 $Form->end_fieldset();
 

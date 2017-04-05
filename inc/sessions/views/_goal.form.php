@@ -32,7 +32,7 @@ if( ! $creating )
 {
 	$Form->global_icon( T_('Delete this goal!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb( 'goal' ) ) );
 }
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New goal') : T_('Goal') );
 

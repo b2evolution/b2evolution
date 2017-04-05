@@ -159,7 +159,7 @@ class code_highlight_plugin extends Plugin
 					'label' => T_( 'Display code toolbar' ),
 					'defaultvalue' => $this->Settings->get('toolbar_default'),
 					'type' => 'checkbox',
-					'note' => $this->T_( 'Display the code toolbar' ),
+					'note' => $this->T_( 'Display code toolbar' ),
 				),
 			);
 	}

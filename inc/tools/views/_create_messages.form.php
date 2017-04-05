@@ -18,7 +18,7 @@ global $threads_count;
 
 $Form = new Form( NULL, 'create_messages', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform',  T_('Create sample messages for testing moderation') );
 

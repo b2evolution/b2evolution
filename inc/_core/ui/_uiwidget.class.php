@@ -353,7 +353,7 @@ class Table extends Widget
 
 		$this->param_prefix = $param_prefix;
 
-		$this->no_results_text = T_('No results.');
+		$this->no_results_text = T_('No results').'.';
 	}
 
 

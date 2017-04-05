@@ -44,7 +44,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'itemtag_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', ( $return_to ? $return_to : $admin_url.'?ctrl=itemtags' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', ( $return_to ? $return_to : $admin_url.'?ctrl=itemtags' ) );
 
 $Form->begin_form( 'fform', ( $creating ?  T_('New Tag') : T_('Tag') ).get_manual_link( 'item-tag-form' ) );
 

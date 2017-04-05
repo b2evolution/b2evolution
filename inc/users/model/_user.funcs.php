@@ -1486,7 +1486,7 @@ function profile_check_params( $params, $User = NULL )
 	// Checking country
 	if( isset( $params['country'] ) && empty( $params['country'][0] ) )
 	{
-		param_error( $params['country'][1], T_('Please select country.') );
+		param_error( $params['country'][1], T_('Please select a country').'.' );
 	}
 
 	// Checking first name
@@ -2415,7 +2415,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 	{
 		$redirect_to = regenerate_url( 'user_ID,action,ctrl,user_tab', 'ctrl=users' );
 	}
-	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1, $link_attribs );
+	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing').'!' : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1, $link_attribs );
 }
 
 
@@ -3357,7 +3357,7 @@ function callback_filter_userlist( & $Form )
 		$Form->output = true;
 
 		global $user_fields_empty_name;
-		$user_fields_empty_name = T_('Select...');
+		$user_fields_empty_name = T_('Select').'...';
 
 		$Form->select( 'criteria_type[]', $type, 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
 	}
@@ -5831,7 +5831,7 @@ function user_td_grp_actions( & $row )
 
 		if( ($row->grp_ID != 1) && ($row->grp_ID != $Settings->get('newusers_grp_ID')) && !in_array( $row->grp_ID, $usedgroups ) )
 		{ // delete
-			$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID.'&amp;'.url_crumb('group') ) );
+			$r .= action_icon( T_('Delete this group').'!', 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID.'&amp;'.url_crumb('group') ) );
 		}
 		else
 		{
@@ -6111,7 +6111,7 @@ function user_td_org_actions( $org_ID, $user_ID )
 		$link_params = array(
 				'onclick' => 'return user_edit( '.$org_ID.', '.$user_ID.' );'
 			);
-		$r .= action_icon( T_('Edit membership...'), 'edit', '#', NULL, NULL, NULL, $link_params );
+		$r .= action_icon( T_('Edit membership').'...', 'edit', '#', NULL, NULL, NULL, $link_params );
 		$link_params = array(
 				'onclick' => 'return user_remove( '.$org_ID.', '.$user_ID.' );'
 			);

@@ -35,7 +35,7 @@ if( $edited_Itemtype->ID > 0 )
 		$Form->global_icon( T_('Delete this Post Type!'), 'delete', regenerate_url( 'action', 'action=delete&amp;crumb_itemtype='.get_crumb( 'itemtype' ) ) );
 	}
 }
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,ityp_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,ityp_ID' ) );
 
 $Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit post type') : T_('New post type') ) );
 

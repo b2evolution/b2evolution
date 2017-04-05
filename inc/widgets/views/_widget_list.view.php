@@ -22,7 +22,7 @@ global $container_list;
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	echo '<div class="pull-right" style="margin-bottom:10px">';
-	echo action_icon( TS_('Reload containers!'), 'reload',
+	echo action_icon( TS_('Reload containers').'!', 'reload',
 	                        '?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Reload containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 	echo '</div>';
 }
@@ -298,7 +298,7 @@ $Form->button( array(
 		'type'  => 'submit'
 	) );
 $Form->button( array(
-		'value' => get_icon( 'bullet_empty_grey' ).' '.T_('De-activate'),
+		'value' => get_icon( 'bullet_empty_grey' ).' '.T_('Deactivate'),
 		'name'  => 'actionArray[deactivate]',
 		'tag'   => 'button',
 		'type'  => 'submit'

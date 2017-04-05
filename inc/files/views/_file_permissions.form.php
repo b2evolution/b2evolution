@@ -25,7 +25,7 @@ global $more_than_one_selected_file, $perms_read_readonly, $field_options_read_r
 
 $Form = new Form( NULL, 'fm_perms_checkchanges' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url() );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', T_('Change permissions') );
 

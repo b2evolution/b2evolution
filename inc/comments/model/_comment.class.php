@@ -1562,7 +1562,7 @@ class Comment extends DataObject
 
 		if( $text == '#' )
 		{ // Use icon+text as default, if not displayed as button (otherwise just the text)
-			$text = ( $this->status == 'trash' || $this->is_meta() ) ? T_('Delete!') : T_('Recycle!');
+			$text = ( $this->status == 'trash' || $this->is_meta() ) ? T_('Delete').'!' : T_('Recycle').'!';
 			if( ! $button )
 			{ // Append icon before text
 				$text = ( $this->status == 'trash' || $this->is_meta() ? get_icon( 'delete' ) : get_icon( 'recycle' ) ).' '.$text;
@@ -1674,7 +1674,7 @@ class Comment extends DataObject
 		$params = array(
 			'before' => $before,
 			'after'  => $after,
-			'text'   => ( ( $text == '#' ) ?  get_icon( 'move_down_'.$status_icon_color ).' '.T_('Deprecate!') : $text ),
+			'text'   => ( ( $text == '#' ) ?  get_icon( 'move_down_'.$status_icon_color ).' '.T_('Deprecate').'!' : $text ),
 			'title'  => $title,
 			'class'  => $class,
 			'glue'   => $glue,
@@ -2892,7 +2892,7 @@ class Comment extends DataObject
 			$after_docs = '';
 			if( count( $attachments ) > 0 )
 			{
-				echo '<br /><b>'.T_( 'Attachments:' ).'</b>';
+				echo '<br /><b>'.T_( 'Attachments' ).':</b>';
 				echo '<ul class="bFiles">';
 				$after_docs = '</ul>';
 			}

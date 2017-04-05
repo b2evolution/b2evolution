@@ -107,7 +107,7 @@ function display_pluggable_permissions( &$Form, $perm_block )
 
 $Form = new Form( NULL, 'group_checkchanges' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'ctrl,grp_ID,action', 'ctrl=groups' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'ctrl,grp_ID,action', 'ctrl=groups' ) );
 
 if( $edited_Group->ID == 0 )
 {

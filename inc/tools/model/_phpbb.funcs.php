@@ -2226,7 +2226,7 @@ function phpbb_subforums_list( & $Form, $cat_id, $forum_parent_id = 0 )
 function phpbb_get_config( $name )
 {
 	global $phpbb_DB, $phpbb_config;
-	
+
 	if( ! is_array( $phpbb_config ) )
 	{	// Initialize config array only first time:
 		$phpbb_config = array();
@@ -2702,7 +2702,7 @@ function phpbb_check_step( $step_name )
 	{	// User tries open previous step that already been processed
 		phpbb_log( T_('This import step has already been processed.'), 'error', ' ' );
 		// Continue button
-		// echo '<input type="submit" class="SaveButton" value="'.( $steps_levels[ $step_name ] < max( $steps_levels ) ? T_('Continue!') : T_('Go to Forum') ).'" name="submit" />';
+		// echo '<input type="submit" class="SaveButton" value="'.( $steps_levels[ $step_name ] < max( $steps_levels ) ? T_('Continue').'!' : T_('Go to Forum') ).'" name="submit" />';
 		return false;
 	}*/
 

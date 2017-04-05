@@ -30,7 +30,7 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'ftyp_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this filetype!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') );
 

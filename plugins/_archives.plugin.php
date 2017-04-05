@@ -150,7 +150,7 @@ class archives_plugin extends Plugin
 				// Number of archive entries to display:
 				'limit'             => 12,
 				// More link text:
-				'more_link'         => T_('More...'),
+				'more_link'         => T_('More').'...',
 			), $params );
 
 		// Sort order (used only in postbypost mode):

@@ -25,7 +25,7 @@ $creating = $action == 'iprange_new';
 
 $Form = new Form( NULL, 'iprange_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,iprange_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,iprange_ID' ) );
 
 $Form->begin_form( 'fform', ( $creating ?  T_('New IP Range') : T_('IP Range') ).get_manual_link( 'ip-range-editing' ) );
 

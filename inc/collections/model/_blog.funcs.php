@@ -1202,7 +1202,7 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 
 		case 'ordered-array': // indexed array, ordered from the lowest to the highest public level
 			$r = array(
-				0 => array( 'deprecated', '', T_('Deprecate!'), 'grey' ),
+				0 => array( 'deprecated', '', T_('Deprecate').'!', 'grey' ),
 				1 => array( 'review', T_('Open to moderators!'), T_('Restrict to moderators!'), 'magenta' ),
 				2 => array( 'protected', T_('Open to members!'), T_('Restrict to members!'), 'orange' ),
 				3 => array( 'community', T_('Open to community!'), T_('Restrict to community!'), 'blue' ),
