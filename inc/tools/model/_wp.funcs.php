@@ -634,8 +634,10 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 		// Get post types
 		$SQL = new SQL();
-		$SQL->SELECT( 'LOWER( ityp_name ), ityp_ID' );
+		$SQL->SELECT( 'LOWER( ityp_usage ), ityp_ID' );
 		$SQL->FROM( 'T_items__type' );
+		$SQL->GROUP_BY( 'ityp_usage' );
+		$SQL->ORDER_BY( 'ityp_ID' );
 		$post_types = $DB->get_assoc( $SQL->get() );
 
 		echo T_('Importing the files from attachment posts... ');
