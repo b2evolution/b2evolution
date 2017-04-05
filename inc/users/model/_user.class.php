@@ -4696,7 +4696,7 @@ class User extends DataObject
 
 		$idx = $this->userfields_by_type[$type_ID][0];
 
-		return $this->userfields[$idx][1];
+		return $this->userfields[$idx]->uf_varchar;
 	}
 
 
