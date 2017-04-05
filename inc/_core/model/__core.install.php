@@ -231,7 +231,8 @@ $schema_queries = array(
 			itst_standard varchar(10000) NOT NULL default '',
 			itst_custom   varchar(10000) NULL,
 			itst_inpofile tinyint(1) NOT NULL DEFAULT 0,
-			PRIMARY KEY (itst_ID)
+			PRIMARY KEY (itst_ID),
+			INDEX itst_iost_ID_locale ( itst_iost_ID, itst_locale )
 		) ENGINE = innodb DEFAULT CHARSET = utf8" ),
 
 	'T_locales' => array(
