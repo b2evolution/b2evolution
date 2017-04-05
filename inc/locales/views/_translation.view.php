@@ -34,37 +34,26 @@ $Form->add_crumb( 'translation' );
 $Form->hidden( 'ctrl', 'translation' );
 $Form->hidden( 'edit_locale', $edit_locale );
 
+// Create query
+$SQL = new SQL();
+$SQL->SELECT( 'iost_ID, iost_string, itst_ID, itst_standard' );
+$SQL->FROM( 'T_i18n_original_string' );
+$SQL->FROM_add( 'LEFT JOIN T_i18n_translated_string ON iost_ID = itst_iost_ID AND itst_locale = '.$DB->quote( $edit_locale ) );
+$SQL->ORDER_BY( '*, itst_standard' );
+
+// Create a count sql
+$count_SQL = new SQL();
+$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( iost_ID )' );
+$count_SQL->FROM( 'T_i18n_original_string' );
+$count_SQL->FROM_add( 'LEFT JOIN T_i18n_translated_string ON iost_ID = itst_iost_ID AND itst_locale = '.$DB->quote( $edit_locale ) );
+
 if( $untranslated_only )
 {
-	// Create query
-	$SQL = new SQL();
-	$SQL->SELECT( ' NULL as itst_ID, iost_string' );
-	$SQL->FROM( 'T_i18n_original_string' );
-	$SQL->WHERE( 'NOT EXISTS ( SELECT 1 FROM T_i18n_translated_string WHERE itst_iost_ID = iost_ID AND itst_locale = '.$DB->quote( $edit_locale ).')' );
-	$SQL->ORDER_BY( 'iost_string' );
-
-	// Create a count sql
-	$count_SQL = new SQL();
-	$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( itst_ID )' );
-	$count_SQL->FROM( 'T_i18n_translated_string' );
-	$count_SQL->WHERE( 'NOT EXISTS ( SELECT 1 FROM T_i18n_translated_string WHERE itst_iost_ID = iost_ID AND itst_locale = '.$DB->quote( $edit_locale ).')' );
+	$SQL->WHERE( 'itst_ID IS NULL' );
+	$count_SQL->WHERE( 'itst_ID IS NULL' );
 }
 else
 {
-	// Create query
-	$SQL = new SQL();
-	$SQL->SELECT( 'itst_ID, iost_string, itst_standard' );
-	$SQL->FROM( 'T_i18n_original_string' );
-	$SQL->FROM_add( 'RIGHT OUTER JOIN T_i18n_translated_string ON iost_ID = itst_iost_ID' );
-	$SQL->WHERE( 'itst_locale = '.$DB->quote( $edit_locale ) );
-	$SQL->ORDER_BY( '*, iost_string' );
-
-	// Create a count sql
-	$count_SQL = new SQL();
-	$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( itst_ID )' );
-	$count_SQL->FROM( 'T_i18n_translated_string' );
-	$count_SQL->WHERE( 'itst_locale = '.$DB->quote( $edit_locale ) );
-
 	if( ! empty( $translated_string ) )
 	{
 		$SQL->add_search_field( 'itst_standard' );
@@ -83,12 +72,10 @@ if( ! empty( $original_string ) )
 }
 
 // Create result set:
-$Results = new Results( $SQL->get(), 'itst_', '-A'/*, NULL, $count_SQL->get()*/ );
+$Results = new Results( $SQL->get(), 'itst_', 'A'/*, NULL, $count_SQL->get()*/ );
 $Results->Form = & $Form;
 
 $Results->title = sprintf( T_('Translation editor for locale "%s"'), $edit_locale );
-
-$Results->global_icon( T_('Add new translated string...'), 'new', regenerate_url( '', 'action=new_strings' ), T_('Add new translated string').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 
 /**
@@ -116,6 +103,7 @@ $Results->filter_area = array(
 	'callback' => 'filter_translation',
 	'presets' => array(
 		'all' => array( T_('All'), $admin_url.'?ctrl=translation&edit_locale='.$edit_locale ),
+		'untranslated' => array( T_('Untranslated strings'), $admin_url.'?ctrl=translation&edit_locale='.$edit_locale.'&untranslated_only=1' ),
 		)
 	);
 
@@ -134,19 +122,19 @@ if( ! $untranslated_only )
 		);
 }
 
-function iost_td_actions( $translated_string_ID )
+function iost_td_actions( $row )
 {
-	if( is_null( $translated_string_ID ) )
+	if( is_null( $row->itst_ID ) )
 	{
 		$r = action_icon( T_('Translate this string...'), 'add',
-										regenerate_url( 'action', 'iost_ID='.$translated_string_ID.'&amp;action=new' ) );
+										regenerate_url( 'action', 'iost_ID='.$row->iost_ID.'&amp;action=new' ) );
 	}
 	else
 	{
 		$r = action_icon( T_('Edit this string...'), 'edit',
-											regenerate_url( 'action', 'itst_ID='.$translated_string_ID.'&amp;action=edit' ) );
+											regenerate_url( 'action', 'itst_ID='.$row->itst_ID.'&amp;action=edit' ) );
 		$r .= action_icon( T_('Delete this string!'), 'delete',
-											regenerate_url( 'action', 'itst_ID='.$translated_string_ID.'&amp;action=delete&amp;'.url_crumb('translation') ) );
+											regenerate_url( 'action', 'itst_ID='.$row->itst_ID.'&amp;action=delete&amp;'.url_crumb('translation') ) );
 	}
 
 	return $r;
@@ -154,7 +142,7 @@ function iost_td_actions( $translated_string_ID )
 
 $Results->cols[] = array(
 		'th' => T_('Actions'),
-		'td' => '%iost_td_actions( #itst_ID# )%',
+		'td' => '%iost_td_actions( {row} )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap'
 	);

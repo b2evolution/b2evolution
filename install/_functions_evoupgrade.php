@@ -8402,6 +8402,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12260, 'Upgrading table for a latest versions of the PO files...' ) )
+	{
+		db_add_index( 'T_i18n_translated_string', 'itst_iost_ID_locale', 'itst_iost_ID, itst_locale' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
