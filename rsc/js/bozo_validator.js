@@ -138,4 +138,4 @@ var bozo = {
 // Init Bozo validator when the window is loaded:
 jQuery( document ).bind( 'ready', bozo.init );
 // Note: beforeunload is a "very special" event and cannot be added with addEvent:
-window.onbeforeunload = bozo.validate_close;
+jQuery( window ).bind( 'beforeunload', bozo.validate_close );
