@@ -60,7 +60,7 @@ if( isset( $edited_User ) )
 
 	if( ! $ajax_request && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{
-		$Widget->global_icon( /* TRANS: verb */ T_('Advanced Upload...'), '', regenerate_url( 'ctrl', 'ctrl=upload' ), /* TRANS: verb */ T_('Advanced Upload').' &raquo;', 1, 5 );
+		$Widget->global_icon( /* TRANS: verb */ T_('Advanced Upload').'...', '', regenerate_url( 'ctrl', 'ctrl=upload' ), /* TRANS: verb */ T_('Advanced Upload').' &raquo;', 1, 5 );
 	}
 
 	$close_link_params = array();
