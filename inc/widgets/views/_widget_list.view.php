@@ -170,7 +170,7 @@ function display_container( $container, $legend_suffix = '' )
 			//echo $ComponentWidget->order.' ';
 			if( $widget_count > 1 )
 			{
-				echo action_icon( T_('Move up!'), 'move_up', regenerate_url( 'blog', 'action=move_up&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
+				echo action_icon( T_('Move up').'!', 'move_up', regenerate_url( 'blog', 'action=move_up&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
 			else
 			{
@@ -178,7 +178,7 @@ function display_container( $container, $legend_suffix = '' )
 			}
 			if( $widget_count < count($Widget_array))
 			{
-				echo action_icon( T_('Move down!'), 'move_down', regenerate_url( 'blog', 'action=move_down&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
+				echo action_icon( T_('Move down').'!', 'move_down', regenerate_url( 'blog', 'action=move_down&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
 			else
 			{

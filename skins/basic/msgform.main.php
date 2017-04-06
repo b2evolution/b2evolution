@@ -71,7 +71,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'block_start' => '<div>',
 				'block_end' => '</div>',
 				'block_display_title' => false,
-				'list_start' =>  T_('Select blog:').' ',
+				'list_start' =>  T_('Select blog').': ',
 				'list_end' => '',
 				'item_start' => ' [',
 				'item_end' => '] ',

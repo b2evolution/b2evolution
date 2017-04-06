@@ -1580,7 +1580,7 @@ function comment_edit_actions( $Comment )
 			{
 				$edit_url = $admin_url.'?ctrl=comments&amp;comment_ID='.$Comment->ID.'&amp;action=edit&amp;redirect_to='.$redirect_to;
 			}
-			$r .= action_icon( TS_('Edit this comment...'), 'properties', $edit_url );
+			$r .= action_icon( TS_('Edit this comment').'...', 'properties', $edit_url );
 		}
 
 		if( $user_has_delete_perm )
@@ -1588,7 +1588,7 @@ function comment_edit_actions( $Comment )
 			$params = array();
 			if( $Comment->status == 'trash' )
 			{ // Comment is already in the recycle bin, display delete action and add js confirm
-				$title = T_('Delete this comment!');
+				$title = T_('Delete this comment').'!';
 				$params['onclick'] = "return confirm('".TS_('You are about to delete this comment!\\nThis cannot be undone!')."')";
 			}
 			else

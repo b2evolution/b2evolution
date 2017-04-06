@@ -39,7 +39,7 @@ class LinkComment extends LinkOwner
 			'The file will be linked for download at the end of the xxx' => NT_( 'The file will be linked for download at the end of the comment.' ),
 			'Insert the following code snippet into your xxx' => NT_( 'Insert the following code snippet into your comment.' ),
 			'View this xxx...' => NT_( 'View this comment...' ),
-			'Edit this xxx...' => NT_( 'Edit this comment...' ),
+			'Edit this xxx...' => NT_( 'Edit this comment' ).'...',
 			'Link files to current xxx' => NT_( 'Link files to current comment' ),
 			'Selected files have been linked to xxx.' => NT_( 'Selected files have been linked to comment.' ),
 			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from the &laquo;Comment&raquo;.' ),

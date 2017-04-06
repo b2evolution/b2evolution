@@ -64,7 +64,7 @@ echo $params['comment_start'];
 if( $params['comment_post_display'] )
 {
 	echo $params['comment_post_before'];
-	echo T_('In response to:').' ';
+	echo T_('In response to').': ';
 	$Comment->Item->title( array(
 			'link_type' => 'permalink',
 		) );
