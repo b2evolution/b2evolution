@@ -102,11 +102,18 @@ $Form->begin_form( '', '', $params );
 
 	// Get width of left and right columns from cookie or default:
 	$left_column_width = isset( $_COOKIE['b2evo_item_edit_column_width_'.$Blog->ID] ) ? $_COOKIE['b2evo_item_edit_column_width_'.$Blog->ID] : 50;
-	$right_column_width = 100 - $left_column_width;
+	if( $left_column_width == 100 )
+	{	// Full width mode and the right column is located under left:
+		$right_column_width = 100;
+		$additional_column_class = ' evo_item_form__full_width_col';
+	}
+	else
+	{	// Normal mode, Calculate width for the right column:
+		$right_column_width = 100 - $left_column_width;
+		$additional_column_class = '';
+	}
 ?>
-<div class="row">
-
-<div class="left_col col-lg-6" style="width:<?php echo $left_column_width.'%'; ?>">
+<div class="evo_item_form__left_col<?php echo $additional_column_class; ?>" style="width:<?php echo $left_column_width.'%'; ?>">
 
 	<?php
 	// ############################ INSTRUCTIONS ##############################
@@ -854,9 +861,9 @@ $Form->begin_form( '', '', $params );
 
 	</div>
 
-</div><?php /* END OF <div class="left_col col-lg-6">*/ ?>
+</div><?php /* END OF <div class="evo_item_form__left_col">*/ ?>
 
-<div class="right_col col-lg-6" style="width:<?php echo $right_column_width.'%'; ?>">
+<div class="evo_item_form__right_col<?php echo $additional_column_class; ?>" style="width:<?php echo $right_column_width.'%'; ?>">
 
 	<?php
 
@@ -927,11 +934,9 @@ $Form->begin_form( '', '', $params );
 	}
 	?>
 
-</div><?php /* END OF <div class="right_col col-lg-6">*/ ?>
+</div><?php /* END OF <div class="evo_item_form__right_col">*/ ?>
 
 <div class="clearfix"></div>
-
-</div>
 
 <?php
 // ================================== END OF EDIT FORM ==================================

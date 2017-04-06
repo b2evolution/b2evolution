@@ -709,9 +709,41 @@ fieldset ul {
 #filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
 }
-#item_checkchanges .left_col .ui-resizable-handle:hover,
-#item_checkchanges .left_col .ui-resizable-handle.active_handler {
+.evo_item_form__left_col {
+  float: left;
+  padding-right: 15px;
+}
+.evo_item_form__left_col .ui-resizable-handle:hover,
+.evo_item_form__left_col .ui-resizable-handle.active_handler {
   border-left: 2px dashed #c0c0c0;
+}
+.evo_item_form__left_col.evo_item_form__full_width_col .ui-resizable-handle {
+  border-right: 2px dashed #c0c0c0;
+}
+.evo_item_form__left_col.evo_item_form__full_width_col .ui-resizable-handle:hover,
+.evo_item_form__left_col.evo_item_form__full_width_col .ui-resizable-handle.active_handler {
+  border-left: none;
+}
+.evo_item_form__right_col {
+  float: left;
+  padding-left: 15px;
+}
+.evo_item_form__full_width_col {
+  float: none;
+  clear: both;
+  padding: 0 0 15px 0;
+  width: 100% !important;
+}
+@media (max-width: 960px) {
+  .evo_item_form__left_col,
+  .evo_item_form__right_col {
+    float: none;
+    padding: 0 0 15px 0;
+    width: 100% !important;
+  }
+  .evo_item_form__left_col .ui-resizable-handle {
+    display: none !important;
+  }
 }
 #iframe_item_preview_wrapper {
   width: 100%;

@@ -533,15 +533,20 @@ jQuery( document ).ready( function()
 		return;
 	}
 
-	var b2evo_item_edit_column_width;
-	jQuery( '#item_checkchanges .left_col' ).resizable(
+	var b2evo_item_edit_full_width;
+	var b2evo_item_edit_min_width = 320;
+	jQuery( '.evo_item_form__left_col' ).resizable(
 	{
-		minWidth: 320,
+		minWidth: b2evo_item_edit_min_width,
 		handles: 'e',
 		start: function( e, ui )
 		{
-			b2evo_item_edit_column_width = ui.element.width() + ui.element.next().width();
-			ui.element.resizable( 'option', 'maxWidth', ( b2evo_item_edit_column_width - 320 ) );
+			// Get full width of two columns depending on view(two columns per line or right under left col):
+			b2evo_item_edit_full_width = ui.element.hasClass( 'evo_item_form__full_width_col' )
+				? ui.element.width()
+				: ui.element.width() + ui.element.next().width();
+			// Remove full width style from left col to resize it:
+			ui.element.removeClass( 'evo_item_form__full_width_col' );
 			// Display the resize handler as active during all resizing time:
 			ui.element.find( '.ui-resizable-handle' ).addClass( 'active_handler' );
 			// Create div over preview iframe, because the resizing action is broken when mouse pointer is over iframe:
@@ -549,8 +554,20 @@ jQuery( document ).ready( function()
 		},
 		resize: function( e, ui )
 		{
-			// Resize right column on left column resizing:
-			ui.element.next().width( b2evo_item_edit_column_width - ui.element.width() );
+			if( b2evo_item_edit_full_width - ui.element.width() < b2evo_item_edit_min_width )
+			{	// If right col width became less 320px then expand this to full width and move under left col:
+				ui.element.next().addClass( 'evo_item_form__full_width_col' );
+			}
+			else
+			{	// If normal two columns view:
+				// Resize right column on left column resizing:
+				ui.element.next().width( b2evo_item_edit_full_width - ui.element.width() )
+					.removeClass( 'evo_item_form__full_width_col' );
+				// Convert widths to percent values in order to keep ratio on window resize:
+				var percent_width = ( ui.element.width() / ( ui.element.width() + ui.element.next().width() ) * 100 ).toFixed(3);
+				ui.element.css( 'width', percent_width + '%' );
+				ui.element.next().css( 'width', ( 100 - percent_width ) + '%' );
+			}
 		},
 		stop: function( e, ui )
 		{
@@ -558,9 +575,57 @@ jQuery( document ).ready( function()
 			ui.element.find( '.ui-resizable-handle' ).removeClass( 'active_handler' );
 			// Remove a helper to fix iframe issue:
 			jQuery( '#iframe_item_preview_disabler' ).remove();
-			// Save percent width in cookie:
-			var percent_width = ui.element.width() / ( ui.element.width() + ui.element.next().width() ) * 100;
-			jQuery.cookie( 'b2evo_item_edit_column_width'+ ( typeof( blog_id ) == 'undefined' ? '' : '_' + blog_id ), percent_width.toFixed(3), { path: '/', expires: 3650 } );
+			// Save column width in cookie:
+			b2evo_item_edit_save_cookie();
+		}
+	} );
+
+	function b2evo_item_edit_save_cookie()
+	{
+		if( jQuery( '.evo_item_form__right_col' ).hasClass( 'evo_item_form__full_width_col' ) )
+		{	// If right col has been moved under left col and expanded to full width then left col must be full width too:
+			jQuery( '.evo_item_form__left_col' ).addClass( 'evo_item_form__full_width_col' );
+			var percent_width = '100';
+		}
+		else
+		{	// Calculate left col width in percents for normal two columns mode:
+			var percent_width = ( jQuery( '.evo_item_form__left_col' ).width() / ( jQuery( '.evo_item_form__left_col' ).width() + jQuery( '.evo_item_form__right_col' ).width() ) * 100 ).toFixed(3);
+		}
+		// Save percent width in cookie:
+		jQuery.cookie( 'b2evo_item_edit_column_width'+ ( typeof( blog_id ) == 'undefined' ? '' : '_' + blog_id ), percent_width, { path: '/', expires: 3650 } );
+	}
+
+	jQuery( window ).on( 'resize', function( handler )
+	{
+		if( handler.target !== window )
+		{	// Exclude resizing event of left column:
+			return;
+		}
+
+		if( jQuery( window ).width() < 960 )
+		{	// Switch columns to full width view if window width less than 960px:
+			jQuery( '.evo_item_form__left_col, .evo_item_form__right_col' ).addClass( 'evo_item_form__full_width_col' );
+		}
+
+		if( jQuery( '.evo_item_form__left_col' ).width() < b2evo_item_edit_min_width ||
+		    jQuery( '.evo_item_form__right_col' ).width() < b2evo_item_edit_min_width )
+		{	// Decrease only max column if at least one column width is less minimum 320px:
+			if( jQuery( '.evo_item_form__left_col' ).width() < jQuery( '.evo_item_form__right_col' ).width() )
+			{
+				var min_column = jQuery( '.evo_item_form__left_col' );
+				var max_column = jQuery( '.evo_item_form__right_col' );
+			}
+			else
+			{
+				var min_column = jQuery( '.evo_item_form__right_col' );
+				var max_column = jQuery( '.evo_item_form__left_col' );
+			}
+			var percent_width = ( b2evo_item_edit_min_width / jQuery( window ).width() * 100 ).toFixed(3);
+			min_column.css( 'width', percent_width + '%' );
+			max_column.css( 'width', ( 100 - percent_width ) + '%' );
+
+			// Save column width in cookie:
+			b2evo_item_edit_save_cookie();
 		}
 	} );
 } );
