@@ -62,6 +62,7 @@ $core_componentwidget_defs = array(
 	'free_content' => array(
 			'free_text',
 			'free_html',
+			'spacer',
 			'image',
 			'social_links',
 		),
