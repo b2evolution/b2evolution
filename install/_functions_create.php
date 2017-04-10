@@ -323,6 +323,14 @@ function create_default_data()
 			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
+			'name'           => 'Content Block',
+			'usage'          => 'content-block',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'use_comments'   => 0,
+		);
+	$post_types[] = array(
 			'name'           => 'Sidebar link',
 			'usage'          => 'special',
 			'template_name'  => NULL,
