@@ -107,7 +107,7 @@ class spacer_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
-		$styles = array( 'display:inline-block' );
+		$styles = array();
 
 		// Width:
 		$width = trim( $this->disp_params['width'] );
@@ -131,15 +131,40 @@ class spacer_Widget extends ComponentWidget
 			$styles[] = 'height:'.$height;
 		}
 
-		echo $this->disp_params['block_start'];
+		$wrapper_html_tags = array(
+			array( 'block_start', 'block_end' ),
+			array( 'block_body_start', 'block_body_end' ),
+			array( 'list_start', 'list_end' ),
+			array( 'item_start', 'item_end' ),
+		);
 
-		echo $this->disp_params['block_body_start'];
+		// Print out wrapper start html tags:
+		$wrapper_end_html_tags = '';
+		$start_tag_is_detected = false;
+		foreach( $wrapper_html_tags as $wrapper_html_tag )
+		{
+			$wrapper_start = $this->disp_params[ $wrapper_html_tag[0] ];
+			if( strpos( $wrapper_start, '<' ) !== false )
+			{	// Find first wrapper with html tag and append style attribute for it:
+				$wrapper_start = update_html_tag_attribs( $wrapper_start, array( 'style' => implode( ';', $styles ) ) );
+				$start_tag_is_detected = true;
+			}
+			echo $wrapper_start;
+			$wrapper_end_html_tags = $this->disp_params[ $wrapper_html_tag[1] ].$wrapper_end_html_tags;
+			if( $start_tag_is_detected )
+			{	// If first html tag has been detected then don't touch others:
+				break;
+			}
+		}
 
-		echo '<div style="'.implode( ';', $styles ).'"></div>';
+		if( ! $start_tag_is_detected )
+		{	// If no html tag has been detected then use simple <div> instead:
+			$styles[] = 'display:inline-block';
+			echo '<div style="'.implode( ';', $styles ).'"></div>';
+		}
 
-		echo $this->disp_params['block_body_end'];
-
-		echo $this->disp_params['block_end'];
+		// Print out wrapper end html tags:
+		echo $wrapper_end_html_tags;
 
 		return true;
 	}
