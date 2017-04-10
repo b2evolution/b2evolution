@@ -1026,7 +1026,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	{
 		// =======================================================================================================
 		case 'main':
-			$post_count = 12;
+			$post_count = 13;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1153,6 +1153,16 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
  				$Settings->dbupdate();
  			}
 			$item_IDs[] = array( $edited_Item->ID, $now );
+
+			// Insert a post:
+			$post_count--;
+			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+			$edited_Item = new Item();
+			$edited_Item->set_tags_from_string( 'demo' );
+			$edited_Item->insert( $owner_ID, T_('This is a Content Block'), T_('<p>This is a Post/Item of type "Content Block".</p>
+
+<p>A content block can be included in several places.</p>'),
+					$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Content Block' );
 			break;
 
 		// =======================================================================================================
