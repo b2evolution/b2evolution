@@ -192,9 +192,9 @@ class content_block_Widget extends ComponentWidget
 	{
 		$ItemCache = & get_ItemCache();
 
-		if( ! ( $widget_Item = & $ItemCache->get_by_ID( intval( $this->disp_params['item_ID'] ), false, false ) ) )
+		if( ! ( $widget_Item = & $ItemCache->get_by_ID( $this->disp_params['item_ID'], false, false ) ) )
 		{	// Try to get item by slug if it is not found by ID:
-			$widget_Item = & $ItemCache->get_by_urltitle( $this->disp_params['item_slug'], false, false );
+			$widget_Item = & $ItemCache->get_by_urltitle( trim( $this->disp_params['item_slug'] ), false, false );
 		}
 
 		return $widget_Item;
