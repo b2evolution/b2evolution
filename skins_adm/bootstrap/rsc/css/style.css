@@ -1624,3 +1624,10 @@ table.diff td.diff-title-addedline {
   display: inline;
   width: auto;
 }
+.jeditable_cell {
+  white-space: nowrap;
+}
+.jeditable_cell select,
+.jeditable_cell input {
+  max-width: 100%;
+}

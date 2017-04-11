@@ -59,7 +59,7 @@ $Results->cols[] = array(
 		'th' => T_('Status'),
 		'order' => 'casrc_status',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'casource_status_edit',
+		'td_class' => 'jeditable_cell casource_status_edit',
 		'td' => /* Check permission: */$current_User->check_perm( 'centralantispam', 'edit' ) ?
 			/* Current user can edit source */'<a href="#" rel="$casrc_status$" style="color:#FFF">%ca_get_source_status_title( #casrc_status# )%</a>' :
 			/* No edit, only view the status */'%ca_get_keyword_status_title( #cakw_status# )%',
