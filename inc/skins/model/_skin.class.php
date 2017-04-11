@@ -249,7 +249,22 @@ class Skin extends DataObject
 						'error'   => T_('Invalid color code.')
 					);
 			}
-			autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'input_group' )
+			{
+				if( ! empty( $parmeta['inputs'] ) )
+				{
+					foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
+					{
+						$l_parmeta['group'] = $parname; // inject group into meta
+						autoform_set_param_from_request( $l_parname, $l_parmeta, $this, 'Skin' );
+					}
+				}
+			}
+			else
+			{
+				autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+			}
 		}
 	}
 
@@ -723,17 +738,23 @@ class Skin extends DataObject
 	 * Get a skin specific param value from current Blog
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string|array|NULL
 	 */
-	function get_setting( $parname )
+	function get_setting( $parname, $group = NULL )
 	{
 		/**
 		 * @var Blog
 		 */
 		global $Collection, $Blog;
 
+		if( ! empty( $group ) )
+		{ // $parname is prefixed with $group, we'll remove the group prefix
+			$parname = str_replace( $group, '', $parname );
+		}
+
 		// Name of the setting in the blog settings:
-		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+		$blog_setting_name = 'skin'.$this->ID.'_'.$group.$parname;
 
 		$value = $Blog->get_setting( $blog_setting_name );
 
@@ -742,7 +763,7 @@ class Skin extends DataObject
 			return $value;
 		}
 
-		return $this->get_setting_default_value( $parname );
+		return $this->get_setting_default_value( $parname, $group );
 	}
 
 
@@ -750,9 +771,10 @@ class Skin extends DataObject
 	 * Get a skin specific param default value
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string|array|NULL
 	 */
-	function get_setting_default_value( $parname )
+	function get_setting_default_value( $parname, $group = NULL )
 	{
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
@@ -780,6 +802,14 @@ class Skin extends DataObject
 						$default_File = & get_file_by_abspath( $params[ $parname ]['initialize_with'], true ) )
 		{ // Get default value for fileselect
 			return $default_File->ID;
+		}
+		elseif( ! empty( $group ) &&
+						isset( $params[ $group ]['type'] ) &&
+						$params[ $group ]['type'] == 'input_group' &&
+						! empty( $params[ $group ]['inputs'] ) &&
+						isset( $params[ $group ]['inputs'][ $parname ] ) )
+		{
+			return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
 		}
 
 		return NULL;
