@@ -64,7 +64,10 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 	$Form->hidden( 'comment_id', $comment_id );
 	$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_htsrv_url() ) );
 
-	$Form->info( T_('To'), $recipient_link );
+	if( $Blog->get_setting( 'msgform_display_recipient' ) )
+	{
+		$Form->info( T_('Message to'), $recipient_link );
+	}
 
 	// Note: we use funky field names in order to defeat the most basic guestbook spam bots:
 	// email form

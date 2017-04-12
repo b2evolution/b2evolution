@@ -22,7 +22,7 @@ $creating = $action == 'domain_new';
 
 $Form = new Form( NULL, 'domain_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,domain_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,domain_ID' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New Domain') : T_('Domain') );
 

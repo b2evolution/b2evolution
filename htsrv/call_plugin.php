@@ -22,6 +22,10 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
+
 
 param( 'plugin_ID', 'integer', true );
 // fp> it is probably unnecessary complexity to handle a method here
@@ -29,6 +33,12 @@ param( 'plugin_ID', 'integer', true );
 // and letting the plugin deal with its methods internally.
 param( 'method', 'string', '' );
 param( 'params', 'string', null ); // serialized
+
+if( $plugin_ID === -1 & $method == 'test_api' )
+{	// Use this case to test API from ctrl=system:
+	echo 'ok';
+	exit(0);
+}
 
 if( is_null( $params ) )
 {	// Use empty array by default if params are not sent by request:

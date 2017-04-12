@@ -236,7 +236,7 @@ switch( $action )
 
 		$FileRootCache = & get_FileRootCache();
 		// getting root
-		$root = param( 'root' );
+		$root = param( 'root', 'string' );
 
 		$fm_FileRoot = & $FileRootCache->get_by_ID( $root, true );
 
@@ -262,10 +262,10 @@ switch( $action )
 
 		load_class( 'files/model/_filelist.class.php', 'FileList' );
 		$selected_Filelist = new Filelist( $fm_FileRoot, false );
-		$fm_selected = param( "fm_selected" , "array" );
+		$fm_selected = param( 'fm_selected', 'array:filepath' );
 		foreach( $fm_selected as $l_source_path )
 		{
-			$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
+			$selected_Filelist->add_by_subpath( $l_source_path, true );
 		}
 		// make sure we have loaded metas for all files in selection!
 		$selected_Filelist->load_meta();
@@ -1690,14 +1690,14 @@ switch( $action )
 			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
 				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
 				$mode_inskin_action = get_htsrv_url().'item_edit.php';
-				$AdminUI->global_icon( T_('In skin editing'), 'edit', $mode_inskin_url,
-						' '.T_('In skin editing'), 4, 3, array(
+				$AdminUI->global_icon( T_('In-skin editing'), 'edit', $mode_inskin_url,
+						' '.T_('In-skin editing'), 4, 3, array(
 						'style' => 'margin-right: 3ex',
 						'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$mode_inskin_action.'\' );'
 				) );
 			}
 
-			$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('Cancel'), 4, 2 );
+			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
 
 			init_tokeninput_js();
 		}

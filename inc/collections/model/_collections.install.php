@@ -28,7 +28,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_skins__skin (
 				skin_ID      int(10) unsigned NOT NULL auto_increment,
 				skin_name    varchar(32) NOT NULL,
-				skin_type    enum('normal','feed','sitemap','mobile','tablet') COLLATE ascii_general_ci NOT NULL default 'normal',
+				skin_type    enum('normal','feed','sitemap','mobile','tablet','rwd') COLLATE ascii_general_ci NOT NULL default 'normal',
 				skin_folder  varchar(32) NOT NULL,
 				PRIMARY KEY skin_ID (skin_ID),
 				UNIQUE skin_folder( skin_folder ),
@@ -108,6 +108,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cat_name            varchar(255) NOT NULL,
 			cat_urlname         varchar(255) COLLATE ascii_general_ci NOT NULL,
 			cat_blog_ID         int(10) unsigned NOT NULL default 2,
+			cat_image_file_ID   int(10) unsigned NULL,
 			cat_description     varchar(255) NULL DEFAULT NULL,
 			cat_order           int(11) NULL DEFAULT NULL,
 			cat_subcat_ordering enum('parent', 'alpha', 'manual') COLLATE ascii_general_ci NULL DEFAULT NULL,
@@ -135,6 +136,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_datecreated            TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_datemodified           TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_last_touched_ts        TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			post_contents_last_updated_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_status                 ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NOT NULL DEFAULT 'draft',
 			post_pst_ID                 int(11) unsigned NULL,
 			post_ityp_ID                int(10) unsigned NOT NULL DEFAULT 1,
@@ -330,6 +332,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_name    VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
 			itcf_type    ENUM( 'double', 'varchar', 'text', 'html' ) COLLATE ascii_general_ci NOT NULL,
 			itcf_order   INT NULL,
+			itcf_note    VARCHAR(255) NULL DEFAULT NULL,
 			PRIMARY KEY ( itcf_ID ),
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -514,10 +517,11 @@ $schema_queries = array_merge( $schema_queries, array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_temporary_ID' => array(
-		'Creating table for temporary ID',
+		'Creating table for temporary IDs (used for uploads on new posts or messages)',
 		"CREATE TABLE T_temporary_ID (
-			tmp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			tmp_type VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
+			tmp_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			tmp_type    VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
+			tmp_coll_ID INT(11) UNSIGNED NULL,
 			PRIMARY KEY (tmp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

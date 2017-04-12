@@ -160,7 +160,7 @@ class user_register_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog, $Settings, $Session, $redirect_to, $dummy_fields;
+		global $Collection, $Blog, $Settings, $Session, $redirect_to, $dummy_fields, $PageCache;
 
 		if( is_logged_in() )
 		{	// No display when user is already registered
@@ -187,6 +187,11 @@ class user_register_Widget extends ComponentWidget
 		$Session->dbsave();
 
 		$this->init_display( $params );
+
+		if( ! empty( $PageCache ) )
+		{	// Do NOT cache current rendered page, because we need new salt for form action:
+			$PageCache->abort_collect();
+		}
 
 		if( isset( $this->BlockCache ) )
 		{	// Do NOT cache some of these links are using a redirect_to param, which makes it page dependent.

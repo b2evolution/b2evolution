@@ -249,7 +249,22 @@ class Skin extends DataObject
 						'error'   => T_('Invalid color code.')
 					);
 			}
-			autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'input_group' )
+			{
+				if( ! empty( $parmeta['inputs'] ) )
+				{
+					foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
+					{
+						$l_parmeta['group'] = $parname; // inject group into meta
+						autoform_set_param_from_request( $l_parname, $l_parmeta, $this, 'Skin' );
+					}
+				}
+			}
+			else
+			{
+				autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+			}
 		}
 	}
 
@@ -272,18 +287,21 @@ class Skin extends DataObject
 		 */
 		global $Collection, $Blog;
 		global $admin_url, $rsc_url;
-		global $Timer, $Session;
+		global $Timer, $Session, $debug, $current_User;
 
 		$timer_name = 'skin_container('.$sco_name.')';
 		$Timer->start( $timer_name );
 
-		$display_containers = $Session->get( 'display_containers_'.$Blog->ID ) == 1;
+		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
 		if( $display_containers )
 		{ // Wrap container in visible container:
-			echo '<div class="dev-blocks dev-blocks--container">';
-			echo '<div class="dev-blocks-name"><span class="dev-blocks-action"><a href="'
-						.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>Container: <b>'.$sco_name.'</b></div>';
+			echo '<div class="dev-blocks dev-blocks--container"><div class="dev-blocks-name">';
+			if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Display a link to edit this widget only if current user has a permission:
+				echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>';
+			}
+			echo 'Container: <b>'.$sco_name.'</b></div>';
 		}
 
 		/**
@@ -720,17 +738,23 @@ class Skin extends DataObject
 	 * Get a skin specific param value from current Blog
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string|array|NULL
 	 */
-	function get_setting( $parname )
+	function get_setting( $parname, $group = NULL )
 	{
 		/**
 		 * @var Blog
 		 */
 		global $Collection, $Blog;
 
+		if( ! empty( $group ) )
+		{ // $parname is prefixed with $group, we'll remove the group prefix
+			$parname = str_replace( $group, '', $parname );
+		}
+
 		// Name of the setting in the blog settings:
-		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+		$blog_setting_name = 'skin'.$this->ID.'_'.$group.$parname;
 
 		$value = $Blog->get_setting( $blog_setting_name );
 
@@ -739,6 +763,19 @@ class Skin extends DataObject
 			return $value;
 		}
 
+		return $this->get_setting_default_value( $parname, $group );
+	}
+
+
+	/**
+	 * Get a skin specific param default value
+	 *
+	 * @param string Setting name
+	 * @param string Input group name
+	 * @return string|array|NULL
+	 */
+	function get_setting_default_value( $parname, $group = NULL )
+	{
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
 		if( isset( $params[ $parname ]['defaultvalue'] ) )
@@ -758,6 +795,21 @@ class Skin extends DataObject
 				}
 			}
 			return $options;
+		}
+		elseif( isset( $params[ $parname ]['type'] ) &&
+						$params[ $parname ]['type'] == 'fileselect' &&
+						! empty( $params[ $parname ]['initialize_with'] ) &&
+						$default_File = & get_file_by_abspath( $params[ $parname ]['initialize_with'], true ) )
+		{ // Get default value for fileselect
+			return $default_File->ID;
+		}
+		elseif( ! empty( $group ) &&
+						isset( $params[ $group ]['type'] ) &&
+						$params[ $group ]['type'] == 'input_group' &&
+						! empty( $params[ $group ]['inputs'] ) &&
+						isset( $params[ $group ]['inputs'][ $parname ] ) )
+		{
+			return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
 		}
 
 		return NULL;
@@ -1185,6 +1237,13 @@ class Skin extends DataObject
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
 					}
+
+					// Require File Uploader js and css:
+					require_js( 'multiupload/fileuploader.js', 'blog' );
+					require_css( 'fileuploader.css', 'blog' );
+					// Load JS files to make the links table sortable:
+					require_js( '#jquery#' );
+					require_js( 'jquery/jquery.sortable.min.js' );
 					break;
 
 				case 'disp_edit_comment':
@@ -1226,6 +1285,32 @@ class Skin extends DataObject
 					// Include this file to expand/collapse the filters panel when JavaScript is disabled
 					global $inc_path;
 					require_once $inc_path.'_filters.inc.php';
+					break;
+
+				case 'disp_download':
+					// Specific features for disp=download:
+					global $Collection, $Blog;
+
+					require_js( '#jquery#', 'blog' );
+
+					// Initialize JavaScript to download file after X seconds
+					add_js_headline( '
+jQuery( document ).ready( function ()
+{
+	jQuery( "#download_timer_js" ).show();
+} );
+
+var b2evo_download_timer = '.intval( $Blog->get_setting( 'download_delay' ) ).';
+var downloadInterval = setInterval( function()
+{
+	jQuery( "#download_timer" ).html( b2evo_download_timer );
+	if( b2evo_download_timer == 0 )
+	{	// Stop timer and download a file:
+		clearInterval( downloadInterval );
+		jQuery( "#download_help_url" ).show();
+	}
+	b2evo_download_timer--;
+}, 1000 );' );
 					break;
 
 				default:
@@ -1306,8 +1391,9 @@ class Skin extends DataObject
 				switch( $name )
 				{
 					case 'Results':
+					case 'compact_results':
 						// Results list (Used to view the lists of the users, messages, contacts and etc.):
-						return array(
+						$results_template = array(
 							'page_url' => '', // All generated links will refer to the current page
 							'before' => '<div class="results panel panel-default">',
 							'content_start' => '<div id="$prefix$ajax_content">',
@@ -1317,7 +1403,7 @@ class Skin extends DataObject
 									.'</ul></div>',
 								'header_text_single' => '',
 							'header_end' => '',
-							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
+							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 							'global_icons_class' => 'btn btn-default btn-sm',
 							'filters_start'        => '<div class="filters panel-body">',
 							'filters_end'          => '</div>',
@@ -1401,6 +1487,18 @@ class Skin extends DataObject
 							'after' => '</div>',
 							'sort_type' => 'basic'
 						);
+						if( $name == 'compact_results' )
+						{	// Use a little different template for compact results table:
+							$results_template = array_merge( $results_template, array(
+									'before' => '<div class="results">',
+									'head_title' => '',
+									'no_results_start' => '<div class="table_scroll">'."\n"
+																				.'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0"><tbody>'."\n",
+									'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
+																				.'</tbody></table></div>'."\n\n",
+								) );
+						}
+						return $results_template;
 
 					case 'blockspan_form':
 						// Form settings for filter area:
@@ -1638,6 +1736,10 @@ class Skin extends DataObject
 					case 'modal_window_js_func':
 						// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 						return 'echo_modalwindow_js_bootstrap';
+
+					case 'colorbox_css_file':
+						// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+						return 'colorbox-bootstrap.min.css';
 				}
 				break;
 		}
@@ -1646,6 +1748,7 @@ class Skin extends DataObject
 		switch( $name )
 		{
 			case 'Results':
+			case 'compact_results':
 				// Results list:
 				return array(
 					'page_url' => '', // All generated links will refer to the current page
@@ -1772,6 +1875,10 @@ class Skin extends DataObject
 				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
 				return 'children';
 
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-regular.min.css';
+
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'
 				return 'hintbox';
@@ -1807,6 +1914,106 @@ class Skin extends DataObject
 		global $app_version_long;
 		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
+
+
+    /**
+     * Web safe fonts for default skin usage
+     *
+     * Used for font customization
+     */
+    private $font_definitions = array(
+        'system_arial' => array( 'Arial', 'Arial, Helvetica, sans-serif' ),
+        'system_arialblack' => array( 'Arial Black', '\'Arial Black\', Gadget, sans-serif' ),
+        'system_arialnarrow' => array( 'Arial Narrow', '\'Arial Narrow\', sans-serif' ),
+        'system_centrygothic' => array( 'Century Gothic', 'Century Gothic, sans-serif' ),
+        'system_copperplategothiclight' => array( 'Copperplate Gothic Light', 'Copperplate Gothic Light, sans-serif' ),
+        'system_couriernew' => array( 'Courier New', '\'Courier New\', Courier, monospace' ),
+        'system_georgia' => array( 'Georgia', 'Georgia, Serif' ),
+        'system_helveticaneue' => array( 'Helvetica Neue', '\'Helvetica Neue\',Helvetica,Arial,sans-serif' ),
+        'system_impact' => array( 'Impact', 'Impact, Charcoal, sans-serif' ),
+        'system_lucidaconsole' => array( 'Lucida Console', '\'Lucida Console\', Monaco, monospace' ),
+        'system_lucidasansunicode' => array( 'Lucida Sans Unicode', '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif' ),
+        'system_palatinolinotype' => array( 'Palatino Linotype', '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif' ),
+        'system_tahoma' => array( 'Tahoma', 'Tahoma, Geneva, sans-serif' ),
+        'system_timesnewroman' => array( 'Times New Roman', '\'Times New Roman\', Times, serif' ),
+        'system_trebuchetms' => array( 'Trebuchet MS', '\'Trebuchet MS\', Helvetica, sans-serif' ),
+        'system_verdana' => array( 'Verdana', 'Verdana, Geneva, sans-serif' ),
+    );
+
+
+    /**
+     * Returns an option list for font customization
+     *
+     * Uses: $this->font_definitions
+     */
+    function get_font_definitions()
+    {
+        // Pull font array keys
+        $font_options = array_keys($this->font_definitions);
+
+        // Pull first value from each array key
+        $font_names = array();
+        foreach ($this->font_definitions as $f) {
+            $font_names[] = current($f);
+        }
+
+        // Create array in format: 'system_arial' => 'arial', etc.
+        $dropdown_option_list = array_combine($font_options, $font_names);
+
+        return $dropdown_option_list;
+    }
+
+
+    /**
+     * Returns a CSS code for font customization
+     *
+     * Uses: $this->font_definitions
+     */
+    function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL, $font_weight_param = NULL )
+    {
+		$font_css = array();
+
+		// Get default font family and font-weight
+		$default_font_family = $this->get_setting_default_value( $font_family_param );
+		$default_font_weight = $this->get_setting_default_value( $font_weight_param );
+
+        // Select the font family CSS string
+		$selected_font_family = $this->get_setting( $font_family_param );
+		if( $selected_font_family != $default_font_family )
+		{
+			$selected_font_css = $this->font_definitions[$selected_font_family][1];
+			$font_css[] = "font-family: $selected_font_css;";
+		}
+
+		// If $text_size_param is passed, add font-size property
+		if( ! is_null( $text_size_param ) )
+		{
+			$selected_text_size = $this->get_setting( $text_size_param );
+			$font_css[] = 'font-size: '.$selected_text_size.';';
+		}
+
+		// If $font_weight_param is passed, add font-weight property
+		if( ! is_null( $font_weight_param ) )
+		{
+			$selected_font_weight = $this->get_setting( $font_weight_param );
+			if( $selected_font_weight != $default_font_weight )
+			{
+				$font_css[] = 'font-weight: '.$selected_font_weight.';';
+			}
+		}
+
+        // Prepare the complete CSS for font customization
+		if( ! empty( $font_css ) )
+		{
+        	$custom_css = "$target_element { ".implode( ' ', $font_css )." }\n";
+		}
+		else
+		{
+			$custom_css = '';
+		}
+
+		return $custom_css;
+    }
 }
 
 ?>

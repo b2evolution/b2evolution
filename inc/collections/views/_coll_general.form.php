@@ -145,11 +145,11 @@ $Form->end_fieldset();
 if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' )
 { // Only show demo content option when creating a new collection
 	$Form->begin_fieldset( T_( 'Demo contents' ).get_manual_link( 'collection-demo-content' ) );
-		$Form->radio( 'create_demo_contents', param( 'create_demo_contents', 'integer', 1 ),
+		$Form->radio( 'create_demo_contents', param( 'create_demo_contents', 'integer', -1 ),
 					array(
 						array( 1, T_('Initialize this collection with some demo contents') ),
 						array( 0, T_('Create an empty collection') ),
-					), T_('New contents'), true );
+					), T_('New contents'), true, '', true );
 		if( $current_User->check_perm( 'orgs', 'create', false ) )
 		{ // Permission to create organizations
 			$Form->checkbox( 'create_demo_org', param( 'create_demo_org', 'integer', 1 ),
@@ -296,9 +296,9 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Description').get_manual_link( 'collection-description' ) );
 
-	$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is displayed under the blog name on the blog template.'), 250 );
+	$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is typically displayed by a widget right under the collection name in the front-office.'), 250 );
 
-	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This is displayed on the blog template.'), 50 );
+	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This may be displayed in several places of the front-office. This may also be included in the XML feeds. You may use HTML markup here.'), 50 );
 
 $Form->end_fieldset();
 

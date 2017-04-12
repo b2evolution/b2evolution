@@ -59,6 +59,17 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		$outer_most = false;
 	}
 
+	// Set input group
+	if( isset( $parmeta['group'] ) )
+	{
+		$group = $parmeta['group'];
+		$parname = $group.$parname;
+	}
+	else
+	{
+		$group = NULL;
+	}
+
 	// Passthrough some attributes to elements:
 	foreach( $parmeta as $k => $v )
 	{
@@ -182,7 +193,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				break;
 
 			case 'Skin':
-				$set_value = $Obj->get_setting( $parname );
+				$set_value = $Obj->get_setting( $parname, $group );
 				$error_value = NULL;
 				break;
 
@@ -479,6 +490,36 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$Form->color_input( $input_name, $set_value, $set_label, '', $params );
 			break;
 
+		case 'fileselect':
+			if( isset( $parmeta['size'] ) )
+			{
+				$params['max_file_num'] = $parmeta['size'];
+			}
+
+			$params['root'] = isset( $parmeta['root'] ) ? $parmeta['root'] : '';
+			$params['path'] = isset( $parmeta['path'] ) ? $parmeta['path'] : '';
+			$params['size_name'] = isset( $parmeta['thumbnail_size'] ) ? $parmeta['thumbnail_size'] : 'crop-64x64';
+			$params['max_file_num'] = isset( $parmeta['max_file_num'] ) ? $parmeta['max_file_num'] : 1;
+			$params['initialize_with'] = isset( $parmeta['initialize_with'] ) ? $parmeta['initialize_with'] : '';
+			$params['note'] = isset( $parmeta['note'] ) ? $parmeta['note'] : '';
+
+			$Form->fileselect( $input_name, $set_value, $set_label, $params['note'], $params );
+			break;
+
+		case 'input_group':
+			if( ! empty( $parmeta['inputs'] ) && is_array( $parmeta['inputs'] ) )
+			{
+				$Form->begin_line( $parmeta['label'], $input_name );
+				foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
+				{
+					$l_parmeta['group'] = $parname; // inject group
+					autoform_display_field( $l_parname, $l_parmeta, $Form, $set_type, $Obj, $set_target, $use_value );
+				}
+				$Form->end_line();
+			}
+			break;
+
+
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
 	}
@@ -708,6 +749,12 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		return;
 	}
 
+	// set input group
+	if( isset( $parmeta['group'] ) )
+	{
+		$parname = $parmeta['group'].$parname;
+	}
+
 	$l_param_type = 'string';
 	$l_param_default = '';
 	if( isset($parmeta['type']) )
@@ -781,6 +828,17 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 		case 'Widget':
 			$error_value = NULL;
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'checklist' && $parname == 'renderers' )
+			{	// Save "stealth" and "always" plugin render options:
+				// (they are hidden or disabled checkboxes of the form and cannot be submitted automatically)
+				global $Plugins;
+				$widget_Blog = & $Obj->get_Blog();
+				$l_value = $Plugins->validate_renderer_list( array_keys( $l_value ), array(
+						'Blog'         => & $widget_Blog,
+						'setting_name' => 'coll_apply_rendering',
+					) );
+				$l_value = array_fill_keys( $l_value, 1 );
+			}
 			$Obj->set( $parname, $l_value );
 			break;
 
@@ -863,14 +921,14 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 		return;
 	}
 
-	if( is_array($value) && isset($meta['entries']) )
+	if( is_array( $value ) && isset( $meta['entries'] ) )
 	{
 		$r = true;
-		if(isset($meta['key']))
+		if( isset( $meta['key'] ) )
 		{ // validate keys:
-			foreach( array_keys($value) as $k )
+			foreach( array_keys( $value ) as $k )
 			{
-				if( ! autoform_validate_param_value($param_name.'['.$k.'][__key__]', $k, $meta['key']) )
+				if( ! autoform_validate_param_value( $param_name.'['.$k.'][__key__]', $k, $meta['key'] ) )
 				{
 					$r = false;
 				}
@@ -879,16 +937,16 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 
 		// Check max_count/min_count
 		// dh> TODO: find a way to link it to the form's fieldset (and add an "error" class to it)
-		if( isset($meta['max_count']) && count($value) > $meta['max_count'] )
+		if( isset( $meta['max_count'] ) && count( $value ) > $meta['max_count'] )
 		{
 			$r = false;
-			$label = isset($meta['label']) ? $meta['label'] : $param_name;
+			$label = isset( $meta['label'] ) ? $meta['label'] : $param_name;
 			$Messages->add( sprintf( T_('Too many entries in the "%s" set. It must have %d at most.'), $label, $meta['max_count'] ), 'error' );
 		}
-		elseif( isset($meta['min_count']) && count($value) < $meta['min_count'] )
+		elseif( isset( $meta['min_count'] ) && count( $value ) < $meta['min_count'] )
 		{
 			$r = false;
-			$label = isset($meta['label']) ? $meta['label'] : $param_name;
+			$label = isset( $meta['label'] ) ? $meta['label'] : $param_name;
 			$Messages->add( sprintf( T_('Too few entries in the "%s" set. It must have %d at least.'), $label, $meta['min_count'] ), 'error' );
 		}
 
@@ -896,10 +954,10 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 		{
 			foreach( $value as $vk => $vv )
 			{
-				if( ! isset($vv[$mk]) )
+				if( ! isset( $vv[$mk] ) )
 					continue;
 
-				if( ! autoform_validate_param_value($param_name.'['.$vk.']['.$mk.']', $vv[$mk], $mv) )
+				if( ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.']', $vv[$mk], $mv ) )
 				{
 					$r = false;
 				}
@@ -1053,12 +1111,12 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 	}
 
 	// Check valid pattern:
-	if( isset($meta['valid_pattern']) )
+	if( isset( $meta['valid_pattern'] ) )
 	{
-		$param_pattern = is_array($meta['valid_pattern']) ? $meta['valid_pattern']['pattern'] : $meta['valid_pattern'];
+		$param_pattern = is_array( $meta['valid_pattern'] ) ? $meta['valid_pattern']['pattern'] : $meta['valid_pattern'];
 		if( ! preg_match( $param_pattern, $value ) )
 		{
-			$param_error = is_array($meta['valid_pattern']) ? $meta['valid_pattern']['error'] : sprintf(T_('The value is invalid. It must match the regular expression &laquo;%s&raquo;.'), $param_pattern);
+			$param_error = is_array( $meta['valid_pattern'] ) ? $meta['valid_pattern']['error'] : sprintf( T_('The value is invalid. It must match the regular expression &laquo;%s&raquo;.'), $param_pattern );
 			param_error( $param_name, $param_error );
 			return false;
 		}
@@ -1079,26 +1137,26 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 			$meta['valid_range']['error'] = $meta['valid_range'][2];
 		}
 
-		if( (isset($meta['valid_range']['min']) && $value < $meta['valid_range']['min'])
-				|| (isset($meta['valid_range']['max']) && $value > $meta['valid_range']['max']) )
+		if( ( isset( $meta['valid_range']['min'] ) && $value < $meta['valid_range']['min'] )
+				|| ( isset( $meta['valid_range']['max'] ) && $value > $meta['valid_range']['max'] ) )
 		{
-			if( isset($meta['valid_range']['error']) )
+			if( isset( $meta['valid_range']['error'] ) )
 			{
 				$param_error = $meta['valid_range']['error'];
 			}
 			else
 			{
-				if( isset($meta['valid_range']['min']) && isset($meta['valid_range']['max']) )
+				if( isset( $meta['valid_range']['min'] ) && isset( $meta['valid_range']['max'] ) )
 				{
-					$param_error = sprintf(T_('The value is invalid. It must be in the range from %s to %s.'), $meta['valid_range']['min'], $meta['valid_range']['max']);
+					$param_error = sprintf( T_('The value is invalid. It must be in the range from %s to %s.'), $meta['valid_range']['min'], $meta['valid_range']['max'] );
 				}
-				elseif( isset($meta['valid_range']['max']) )
+				elseif( isset( $meta['valid_range']['max'] ) )
 				{
-					$param_error = sprintf(T_('The value is invalid. It must be smaller than or equal to %s.'), $meta['valid_range']['max']);
+					$param_error = sprintf( T_('The value is invalid. It must be smaller than or equal to %s.'), $meta['valid_range']['max'] );
 				}
 				else
 				{
-					$param_error = sprintf(T_('The value is invalid. It must be greater than or equal to %s.'), $meta['valid_range']['min']);
+					$param_error = sprintf( T_('The value is invalid. It must be greater than or equal to %s.'), $meta['valid_range']['min'] );
 				}
 			}
 
@@ -1119,34 +1177,34 @@ function autoform_validate_param_value( $param_name, $value, $meta )
  */
 function handle_array_keys_in_plugin_settings( & $a )
 {
-	if( ! is_array($a) )
+	if( ! is_array( $a ) )
 	{
 		return;
 	}
 
 	$new_arr = array(); // use a new array to maintain order, also for "numeric" keys
 
-	foreach( array_keys($a) as $k )
+	foreach( array_keys( $a ) as $k )
 	{
 		$v = & $a[$k];
 
-		if( is_array($v) && isset($v['__key__']) )
+		if( is_array( $v ) && isset( $v['__key__'] ) )
 		{
 			if( $k != $v['__key__'] )
 			{
 				$k = $v['__key__'];
-				if( ! strlen($k) || isset($a[ $k ]) )
+				if( ! strlen( $k ) || isset($a[ $k ]) )
 				{ // key already exists (or is empty):
 					$c = 1;
 
-					while( isset($a[ $k.'_'.$c ]) )
+					while( isset( $a[ $k.'_'.$c ] ) )
 					{
 						$c++;
 					}
 					$k = $k.'_'.$c;
 				}
 			}
-			unset($v['__key__']);
+			unset( $v['__key__'] );
 
 			$new_arr[$k] = $v;
 		}
@@ -1156,9 +1214,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 		}
 
 		// Recurse:
-		foreach( array_keys($v) as $rk )
+		foreach( array_keys( $v ) as $rk )
 		{
-			if( is_array($v[$rk]) )
+			if( is_array( $v[$rk] ) )
 			{
 				handle_array_keys_in_plugin_settings($v[$rk]);
 			}
@@ -1187,12 +1245,12 @@ function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = 
 	$install_db_deltas = array(); // This holds changes to make, if any (just all queries)
 	//pre_dump( $db_layout );
 
-	if( ! empty($db_layout) )
+	if( ! empty( $db_layout ) )
 	{ // The plugin has a DB layout attached
 		load_funcs('_core/model/db/_upgrade.funcs.php');
 
 		// Get the queries to make:
-		foreach( db_delta($db_layout) as $table => $queries )
+		foreach( db_delta( $db_layout ) as $table => $queries )
 		{
 			foreach( $queries as $query_info )
 			{
@@ -1203,13 +1261,13 @@ function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = 
 			}
 		}
 
-		if( ! empty($install_db_deltas) )
+		if( ! empty( $install_db_deltas ) )
 		{ // delta queries to make
-			if( empty($install_db_deltas_confirm_md5) && !$force_install_db_deltas )
+			if( empty( $install_db_deltas_confirm_md5 ) && !$force_install_db_deltas )
 			{ // delta queries have to be confirmed in payload
 				return false;
 			}
-			elseif( $install_db_deltas_confirm_md5 == md5( implode('', $install_db_deltas) ) || $force_install_db_deltas )
+			elseif( $install_db_deltas_confirm_md5 == md5( implode( '', $install_db_deltas ) ) || $force_install_db_deltas )
 			{ // Confirmed in first step:
 				foreach( $install_db_deltas as $query )
 				{

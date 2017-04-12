@@ -29,7 +29,7 @@ $SkinCache->load_all();
 $skins = array();
 while( ( $skin = & $SkinCache->get_next() ) != NULL )
 {
-	if( $skin->type != $skin_type )
+	if( $skin->type != $skin_type && $skin->type != 'rwd' )
 	{	// This skin cannot be used here...
 		continue;
 	}
@@ -65,7 +65,7 @@ $current_skin_ID = $edited_Blog->get_setting( $skin_type.'_skin_ID', true );
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
-	$block_item_Widget->global_icon( T_('Install new skin...'), 'new', $admin_url.'?ctrl=skins&amp;tab=current_skin&amp;blog='.$edited_Blog->ID.'&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','skinpage=selection','','&'), $admin_url)), T_('Install new').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+	$block_item_Widget->global_icon( T_('Install new skin...'), 'new', $admin_url.'?ctrl=skins&amp;tab=current_skin&amp;blog='.$edited_Blog->ID.'&amp;action=new&amp;skin_type='.$skin_type.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','skinpage=selection','','&'), $admin_url)), T_('Install new').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	$block_item_Widget->global_icon( T_('Keep current skin!'), 'close', regenerate_url( 'skinpage' ), ' '.T_('Don\'t change'), 3, 4 );
 }
 
@@ -75,7 +75,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 	if( $current_User->check_perm( 'options', 'edit', false ) )
 	{ // A link to install new skin:
-		echo '<a href="'.$admin_url.'?ctrl=skins&amp;tab=current_skin&amp;action=new&amp;redirect_to='.rawurlencode( url_rel_to_same_host( regenerate_url( '','skinpage=selection','','&' ), $admin_url ) ).'" class="skinshot skinshot_new">'
+		echo '<a href="'.$admin_url.'?ctrl=skins&amp;tab=current_skin&amp;action=new&amp;skin_type='.$skin_type.'&amp;redirect_to='.rawurlencode( url_rel_to_same_host( regenerate_url( '','skinpage=selection','','&' ), $admin_url ) ).'" class="skinshot skinshot_new">'
 				.get_icon( 'new' )
 				.T_('Install New').' &raquo;'
 			.'</a>';

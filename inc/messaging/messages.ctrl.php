@@ -80,6 +80,10 @@ if( param( 'msg_ID', 'integer', '', true ) )
 		$action = 'nil';
 	}
 }
+else
+{	// Create new Message:
+	$edited_Message = new Message();
+}
 
 if( ! $Messages->has_errors() && ( empty( $thrd_ID ) || empty( $edited_Thread ) ) )
 { // Display this error only when no error above

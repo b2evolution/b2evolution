@@ -62,16 +62,22 @@ class ping_b2evonet_plugin extends Plugin
 	 */
 	function ItemSendPing( & $params )
 	{
-		global $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
+		global $evonetsrv_protocol, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
 		global $debug, $baseurl, $instance_name, $evo_charset;
 		global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
+
+		if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+		{	// Could not use xmlrpc client because server has no the requested extensions:
+			$params['xmlrpcresp'] = CANUSEXMLRPC;
+			return false;
+		}
 
 		/**
 		 * @var Blog
 		 */
 		$item_Blog = $params['Item']->get_Blog();
 
-		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
+		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port, $evonetsrv_protocol );
 		$client->debug = ( $debug == 2 );
 
 		// Set proxy for outgoing connections:

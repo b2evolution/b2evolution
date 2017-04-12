@@ -76,7 +76,7 @@ class generic_ping_plugin extends Plugin
 					'defaultvalue' => '',
 					'type' => 'text',
 					'size' => 50,
-					'note' => T_('The URL of the ping service.').' '.sprintf('E.g. &laquo;%s&raquo;', 'rpc.weblogs.com/RPC2 or rpc.foobar.com:8080'),
+					'note' => T_('The URL of the ping service.').' '.sprintf( T_('E.g. %s'), '<code>rpc.weblogs.com/RPC2</code>, <code>rpc.foobar.com:8080</code> '.T_('or').' <code>https://rpc.foobar.com:8080</code>'),
 				),
 			'ping_service_extended' => array(
 					'label' => T_('Extended ping?'),
@@ -144,18 +144,27 @@ class generic_ping_plugin extends Plugin
 	 */
 	function parse_ping_url( $url )
 	{
-		if( ! preg_match( '~^([^/:]+)(:\d+)?(/.*)?$~', $url, $match ) )
-		{
+		if( empty( $url ) )
+		{	// Wrong URL is provided:
 			return false;
 		}
 
-		$r = array(
-				'host' => $match[1],
-				'port' => empty($match[2]) ? 80 : $match[2],
-				'path' => empty($match[3]) ? '/' : $match[3],
-			);
+		if( ! preg_match( '#^(https?:)?//#', $url ) )
+		{	// Prepend protocol "http" automatically:
+			$url = 'http://'.$url;
+		}
 
-		return $r;
+		if( ! ( $url_data = parse_url( $url ) ) || empty( $url_data['host'] ) )
+		{	// Wrong URL is provided:
+			return false;
+		}
+
+		return array(
+				'protocol' => isset( $url_data['scheme'] ) ? $url_data['scheme'] : 'http',
+				'host'     => $url_data['host'],
+				'port'     => isset( $url_data['port'] ) ? $url_data['port'] : 80,
+				'path'     => isset( $url_data['path'] ) ? $url_data['path'] : '',
+			);
 	}
 
 
@@ -167,12 +176,25 @@ class generic_ping_plugin extends Plugin
 		global $debug;
 		global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
+		if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+		{	// Could not use xmlrpc client because server has no the requested extensions:
+			$params['xmlrpcresp'] = CANUSEXMLRPC;
+			return false;
+		}
+
+		// Parse ping URL to initialize XMLRPC client:
 		$url = $this->parse_ping_url( $this->Settings->get( 'ping_service_url' ) );
+
+		if( ! $url )
+		{	// Wrong URL of the plugin settings:
+			$params['xmlrpcresp'] = T_('The ping service URL is invalid.');
+			return false;
+		}
 
 		$Item = $params['Item'];
 		$item_Blog = $Item->get_Blog();
 
-		$client = new xmlrpc_client( $url['path'], $url['host'], $url['port'] );
+		$client = new xmlrpc_client( $url['path'], $url['host'], $url['port'], $url['protocol'] );
 		$client->debug = ($debug && $params['display']);
 
 		// Set proxy for outgoing connections:

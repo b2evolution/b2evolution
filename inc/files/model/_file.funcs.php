@@ -451,7 +451,7 @@ function no_leading_slash( $path )
  */
 function get_canonical_path( $ads_path )
 {
-	// Remove windows backslashes:
+	// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 	$ads_path = str_replace( '\\', '/', $ads_path );
 
 	$is_absolute = is_absolute_pathname($ads_path);
@@ -934,7 +934,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 		}
 
 		// Folder Icon + Name:
-		$url = regenerate_url( 'root,path', 'root='.$Root->ID.'&amp;path='.$rds_rel_path );
+		$url = regenerate_url( 'root,path', 'root='.$Root->ID.'&amp;path='.rawurlencode( $rds_rel_path ) );
 		$label = action_icon( T_('Open this directory in the file manager'), 'folder', $url )
 			.'<a href="'.$url.'"
 			title="'.T_('Open this directory in the file manager').'">'
@@ -1750,10 +1750,12 @@ function prepare_uploaded_image( $File, $mimetype )
 function report_user_upload( $File )
 {
 	global $current_User;
+
 	load_funcs( 'files/model/_file.funcs.php' );
 
-	syslog_insert( sprintf( 'User %s has uploaded the file %s -- Size: %s',
-			$current_User->login, '[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
+	syslog_insert( sprintf( '%s has uploaded the file %s -- Size: %s',
+		( is_logged_in() ? 'User #'.$current_User->ID.'([['.$current_User->login.']])' : 'Anonymous user' ),
+		'[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
 }
 
 
@@ -1852,6 +1854,9 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 	// Get File object for requested target location:
 	$FileCache = & get_FileCache();
 	$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
+
+	// Unset this flag to check for each file even if it is the same from cache:
+	unset( $newFile->_exists );
 
 	$num_ext = 0;
 	$oldName = $newName;
@@ -2031,7 +2036,7 @@ function get_available_filetype_icons()
  */
 function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 {
-	global $current_User;
+	global $current_User, $force_upload_forbiddenext;
 
 	$FileRootCache = & get_FileRootCache();
 	$fm_FileRoot = & $FileRootCache->get_by_ID($root_ID, true);
@@ -2333,7 +2338,8 @@ function display_dragdrop_upload_button( $params = array() )
 			'conflict_file_format'   => 'simple', // 'simple' - file name text, 'full_path_link' - a link with text as full file path
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
-			'noresults'              => ''
+			'noresults'              => '',
+			'filename_select'        => '', // Append this text before file name on success uploading of new file
 		), $params );
 
 	$FileRootCache = & get_FileRootCache();
@@ -2351,7 +2357,7 @@ function display_dragdrop_upload_button( $params = array() )
 
 	echo $params['before'];
 
-	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp )
+	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp() )
 	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
 		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$params['LinkOwner']->get_ID().'" />';
 	}
@@ -2407,8 +2413,7 @@ function display_dragdrop_upload_button( $params = array() )
 		<?php
 		if( $params['LinkOwner'] !== NULL )
 		{	// Add params to link a file right after uploading:
-			$link_owner_type = $params['LinkOwner']->type;
-			echo 'url += "&link_owner='.$link_owner_type.'_'.$params['LinkOwner']->get_ID().'"';
+			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'"';
 		}
 		?>
 
@@ -2426,17 +2431,35 @@ function display_dragdrop_upload_button( $params = array() )
 				dragAndDrop: {
 					extraDropzones: <?php echo $params['additional_dropzone'];?>
 				},
+				list_style: '<?php echo $params['list_style']; ?>',
+				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
+				action: url,
+				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
 				debug: false,
 				messages: {
-					typeError: '<?php echo TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
-					sizeError: '<?php echo TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
-					minSizeError: '<?php echo TS_('{file} is too small. The minimum file size is {minSizeLimit}.'); ?>',
-					emptyError: '<?php echo TS_('{file} is empty. Please select non-empty files.'); ?>',
+					typeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
+					sizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
+					minSizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is too small. The minimum file size is {minSizeLimit}.'); ?>',
+					emptyError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is empty. Please select non-empty files.'); ?>',
 					onLeave: '<?php echo TS_('Files are currently being uploaded. If you leave this page now, the upload will be cancelled.'); ?>'
 				},
 				validation: {
 					sizeLimit: <?php echo min( array( return_bytes( ini_get('post_max_size') ), return_bytes( ini_get('upload_max_filesize') ), $Settings->get( 'upload_maxkb') * 1024 ) );?>,
 					allowedExtensions: <?php echo json_encode( $allowed_extensions );?>
+				},
+				onSubmit: function( id, fileName )
+				{
+					var noresults_row = jQuery( 'tr.noresults' );
+					if( noresults_row.length )
+					{ // Add table headers and remove "No results" row
+						<?php
+						if( $params['table_headers'] != '' )
+						{ // Append table headers if they are defined
+						?>
+						noresults_row.parent().parent().prepend( '<?php echo format_to_js( $params['table_headers'] ); ?>' );
+						<?php } ?>
+						noresults_row.remove();
+					}
 				},
 				callbacks: {
 					onSubmit: function( id, fileName )
@@ -3018,9 +3041,22 @@ function echo_file_properties()
  * Get root and relative file path by absolute path
  *
  * @param string Absolute path
+ * @param boolean TRUE - to extract data from cache path like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg'
  * @return boolean|array FALSE - if root and path are not detected, Array with keys 'root' and 'path'
+ *
+ * Examples:
+ * get_root_path_by_abspath( 'shared/global/sunset/sunset.jpg' ) => array( root => 'shared_0', path => 'sunset/sunset.jpg' )
+ * get_root_path_by_abspath( 'users/admin/admin.jpg' ) => array( root => 'user_1', path => 'admin.jpg' )
+ * get_root_path_by_abspath( 'blogs/home/backgrounds/background1.jpg' ) => array( root => 'collection_1', path => 'backgrounds/background1.jpg' )
+ * get_root_path_by_abspath( 'skins/bootstrap_main_skin/skinshot.png' ) => array( root => 'skins_0', path => 'bootstrap_main_skin/skinshot.png' )
+ * - for cache paths (used to restored missing cached images which are loaded with old url):
+ * get_root_path_by_abspath( 'shared/global/sunset/_evocache/sunset.jpg/fit-80x80.jpg?mtime=1486119491', true ) => array( root => 'shared_0', path => 'sunset/sunset.jpg' )
+ * get_root_path_by_abspath( 'users/admin/_evocache/admin.jpg/crop-top-320x320.jpg?mtime=1486119491', true ) => array( root => 'user_1', path => 'admin.jpg' )
+ * get_root_path_by_abspath( 'blogs/home/_evocache/image.jpg/fit-80x80.jpg?mtime=1486969646', true ) => array( root => 'collection_1', path => 'image.jpg' )
+ * get_root_path_by_abspath( 'skins/bootstrap_main_skin/_evocache/skinshot.png/fit-80x80.png?mtime=1486969005', true ) => array( root => 'skins_0', path => 'bootstrap_main_skin/skinshot.png' )
+ *
  */
-function get_root_path_by_abspath( $abspath )
+function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 {
 	if( empty( $abspath ) )
 	{	// If absolute path is empty do NOT try to decode it:
@@ -3053,6 +3089,12 @@ function get_root_path_by_abspath( $abspath )
 			}
 			break;
 
+		case 'skins':
+			// Skins dir:
+			$root = FileRoot::gen_ID( 'skins', 0 );
+			$start_relpath = 1;
+			break;
+
 		case 'shared':
 			// Shared media dir:
 			$root = FileRoot::gen_ID( 'shared', 0 );
@@ -3080,13 +3122,16 @@ function get_root_path_by_abspath( $abspath )
 	{	// Get relative path only if root is detected:
 		$relpath = '';
 		$abspath_length = count( $abspath );
-		for( $f = $start_relpath; $f < $abspath_length - 1; $f++ )
+		// For cache path like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg' exclude the last because it is a not path part and just a size info:
+		$last_path_index = ( $is_cache_path ? $abspath_length - 1 : $abspath_length );
+
+		for( $f = $start_relpath; $f < $last_path_index; $f++ )
 		{
-			if( $f == $abspath_length - 3 )
-			{	// Skip this because it is a evocache folder:
+			if( $is_cache_path && $f == $abspath_length - 3 )
+			{	// Skip this because it is a evocache folder in the abspath like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg':
 				continue;
 			}
-			$relpath .= $abspath[ $f ].( $f < $abspath_length - 2 ? DIRECTORY_SEPARATOR : '' );
+			$relpath .= $abspath[ $f ].( $f < $last_path_index - 1 ? DIRECTORY_SEPARATOR : '' );
 		}
 
 		if( ! empty( $relpath ) )
@@ -3100,5 +3145,34 @@ function get_root_path_by_abspath( $abspath )
 
 	// Data are not found correctly:
 	return false;
+}
+
+
+/**
+ * Get a File object or create one given an absolute path
+ *
+ * @param string Absolute path of file
+ * @param boolean create meta data in DB if it doesn't exist yet? (generates a $File->ID)
+ * @return mixed File a {@link File} object OR NULL if file does not exist
+ */
+function & get_file_by_abspath( $abspath, $force_create_meta = false )
+{
+	$root_path = get_root_path_by_abspath( $abspath );
+	if( $root_path )
+	{
+		$FileRootCache = & get_FileRootCache();
+		if( $FileRoot = $FileRootCache->get_by_ID( $root_path['root'] ) )
+		{
+			$FileCache = & get_FileCache();
+			if( $File = & $FileCache->get_by_root_and_path( $FileRoot->type, $FileRoot->in_type_ID, $root_path['path'] ) && $File->exists() )
+			{
+				$File->load_meta( $force_create_meta );
+				return $File;
+			}
+		}
+	}
+
+	$r = NULL;
+	return $r;
 }
 ?>

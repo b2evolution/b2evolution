@@ -668,6 +668,13 @@ $dirpath_max_length = ( ( ( strtoupper( substr( PHP_OS, 0, 3 ) ) ) === 'WIN' ) ?
 
 
 /**
+ * Allow double dots in file names
+ * Use TRUE if you want to allow ".." in file and directory names like "..filename" or "dir..name"
+ */
+$filemanager_allow_dotdot_in_filenames = false;
+
+
+/**
  * XMLRPC logging. Set this to 1 to log XMLRPC calls received by this server (into /xmlsrv/xmlrpc.log).
  *
  * Default: 0
@@ -687,6 +694,29 @@ $cron_timeout_delay = 1800; // 30 minutes
  * Password change request delay in seconds. Only one email can be requested for one login or email address in each x seconds defined below.
  */
 $pwdchange_request_delay = 300; // 5 minutes
+
+
+/**
+ * Enabled password drivers.
+ * List what drivers must be enabled on your server.
+ * By default only first driver(which is support by server configuration) will be used to store new updated passwords in DB.
+ *
+ *   possible driver valuse:
+ *     - evo_salted
+ *     - bcrypt_2y
+ *     - bcrypt
+ *     - salted_md5
+ *     - phpass
+ *     - evo_md5 // Use this driver as last choice only.
+ */
+$enabled_password_drivers = array(
+		'evo_salted',
+		'bcrypt_2y',
+		'bcrypt',
+		'salted_md5',
+		'phpass',
+		'evo_md5', // Use this driver as last choice only.
+	);
 
 
 /**
@@ -841,9 +871,9 @@ $library_cdn_urls = array(
 		// jqueryUI is commented out because b2evo uses only a subset... ?
 		//'#jqueryUI#' => array( '//code.jquery.com/ui/1.10.4/jquery-ui.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js' ),
 		//'#jqueryUI_css#' => array( '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css' ),
-		'#bootstrap#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.js' ),
-		'#bootstrap_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.css' ),
-		'#bootstrap_theme_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.css' ),
+		'#bootstrap#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.js' ),
+		'#bootstrap_css#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css' ),
+		'#bootstrap_theme_css#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.css' ),
 		// The following are other possible public shared CDNs we are aware of
 		// but it is not clear whether or not they are:
 		// - Future proof (will they continue to serve old versions of the library in the future?)
@@ -852,16 +882,16 @@ $library_cdn_urls = array(
 		//'#easypiechart#' => array( '//cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.1/jquery.easypiechart.min.js', '//cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.1/jquery.easypiechart.js' ),
 		//'#scrollto#' => array( '//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/1.4.2/jquery.scrollTo.min.js' ),
 		//'#touchswipe#' => array( '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.min.js', '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.js' ),
-		/*'#jqplot#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.js' ),
-			'#jqplot_barRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.barRenderer.min.js' ),
-			'#jqplot_canvasAxisTickRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasAxisTickRenderer.min.js' ),
-			'#jqplot_canvasTextRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasTextRenderer.min.js' ),
-			'#jqplot_categoryAxisRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.categoryAxisRenderer.min.js' ),
-			'#jqplot_enhancedLegendRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.enhancedLegendRenderer.min.js' ),
-			'#jqplot_highlighter#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.highlighter.min.js' ),
-			'#jqplot_canvasOverlay#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasOverlay.min.js' ),
-			'#jqplot_donutRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.donutRenderer.min.js' ),
-			'#jqplot_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.css' ),*/
+		/*'#jqplot#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.js' ),
+			'#jqplot_barRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.barRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.barRenderer.js' ),
+			'#jqplot_canvasAxisTickRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasAxisTickRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasAxisTickRenderer.js' ),
+			'#jqplot_canvasTextRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasTextRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasTextRenderer.js' ),
+			'#jqplot_categoryAxisRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.categoryAxisRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.categoryAxisRenderer.js' ),
+			'#jqplot_enhancedLegendRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.enhancedLegendRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.enhancedLegendRenderer.js' ),
+			'#jqplot_highlighter#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.highlighter.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.highlighter.js' ),
+			'#jqplot_canvasOverlay#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasOverlay.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasOverlay.js' ),
+			'#jqplot_donutRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.donutRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.donutRenderer.js' ),
+			'#jqplot_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.css' ),*/
 		//'#tinymce#' => array( '//cdn.tinymce.com/4/tinymce.min.js' ),
 		//'#tinymce_jquery#' => array( '//cdn.tinymce.com/4/jquery.tinymce.min.js' ),
 		//'#flowplayer#' => array( '//releases.flowplayer.org/5.4.4/flowplayer.min.js', '//releases.flowplayer.org/5.4.4/flowplayer.js' ),
@@ -892,15 +922,15 @@ $library_local_urls = array(
 		'#easypiechart#' => array( 'jquery/jquery.easy-pie-chart.min.js', 'jquery/jquery.easy-pie-chart.js' ),
 		'#scrollto#' => array( 'jquery/jquery.scrollto.min.js', 'jquery/jquery.scrollto.js' ),
 		'#touchswipe#' => array( 'jquery/jquery.touchswipe.min.js', 'jquery/jquery.touchswipe.js' ),
-		'#jqplot#' => array( 'jquery/jqplot/jquery.jqplot.min.js' ),
-		'#jqplot_barRenderer#' => array( 'jquery/jqplot/jqplot.barRenderer.min.js' ),
-		'#jqplot_canvasAxisTickRenderer#' => array( 'jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js' ),
-		'#jqplot_canvasTextRenderer#' => array( 'jquery/jqplot/jqplot.canvasTextRenderer.min.js' ),
-		'#jqplot_categoryAxisRenderer#' => array( 'jquery/jqplot/jqplot.categoryAxisRenderer.min.js' ),
-		'#jqplot_enhancedLegendRenderer#' => array( 'jquery/jqplot/jqplot.enhancedLegendRenderer.min.js' ),
-		'#jqplot_highlighter#' => array( 'jquery/jqplot/jqplot.highlighter.min.js' ),
-		'#jqplot_canvasOverlay#' => array( 'jquery/jqplot/jqplot.canvasOverlay.min.js' ),
-		'#jqplot_donutRenderer#' => array( 'jquery/jqplot/jqplot.donutRenderer.min.js' ),
+		'#jqplot#' => array( 'jquery/jqplot/jquery.jqplot.min.js', 'jquery/jqplot/jquery.jqplot.js' ),
+		'#jqplot_barRenderer#' => array( 'jquery/jqplot/jqplot.barRenderer.min.js', 'jquery/jqplot/jqplot.barRenderer.js' ),
+		'#jqplot_canvasAxisTickRenderer#' => array( 'jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js', 'jquery/jqplot/jqplot.canvasAxisTickRenderer.js' ),
+		'#jqplot_canvasTextRenderer#' => array( 'jquery/jqplot/jqplot.canvasTextRenderer.min.js', 'jquery/jqplot/jqplot.canvasTextRenderer.js' ),
+		'#jqplot_categoryAxisRenderer#' => array( 'jquery/jqplot/jqplot.categoryAxisRenderer.min.js', 'jquery/jqplot/jqplot.categoryAxisRenderer.js' ),
+		'#jqplot_enhancedLegendRenderer#' => array( 'jquery/jqplot/jqplot.enhancedLegendRenderer.min.js', 'jquery/jqplot/jqplot.enhancedLegendRenderer.js' ),
+		'#jqplot_highlighter#' => array( 'jquery/jqplot/jqplot.highlighter.min.js', 'jquery/jqplot/jqplot.highlighter.js' ),
+		'#jqplot_canvasOverlay#' => array( 'jquery/jqplot/jqplot.canvasOverlay.min.js', 'jquery/jqplot/jqplot.canvasOverlay.js' ),
+		'#jqplot_donutRenderer#' => array( 'jquery/jqplot/jqplot.donutRenderer.min.js', 'jquery/jqplot/jqplot.donutRenderer.js' ),
 		'#jqplot_css#' => array( 'jquery/jquery.jqplot.min.css', 'jquery/jquery.jqplot.css' ),
 		'#tinymce#' => array( 'tiny_mce/tinymce.min.js' ),
 		'#tinymce_jquery#' => array( 'tiny_mce/jquery.tinymce.min.js' ),
@@ -941,10 +971,12 @@ $check_browser_version = false;
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
+$evonetsrv_protocol = 'http';
 $evonetsrv_host = 'rpc.b2evo.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 
+$antispamsrv_protocol = 'http';
 $antispamsrv_host = 'antispam.b2evo.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';

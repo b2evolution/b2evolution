@@ -147,7 +147,7 @@ if( $disp != 'front' && $disp != 'download' && $disp != 'terms' )
 {
 	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 	mainlist_page_links( array(
-			'block_start' => '<p class="center">'.T_('Pages:').' <strong>',
+			'block_start' => '<p class="center">'.T_('Pages').': <strong>',
 			'block_end' => '</strong></p>',
 		) );
 	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
@@ -177,7 +177,7 @@ if( $disp != 'front' && $disp != 'download' && $disp != 'terms' )
 	<?php
 	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 	mainlist_page_links( array(
-			'block_start' => '<p class="center">'.T_('Pages:').' <strong>',
+			'block_start' => '<p class="center">'.T_('Pages').': <strong>',
 			'block_end' => '</strong></p>',
 		) );
 	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
@@ -251,7 +251,7 @@ if( $disp != 'front' && $disp != 'download' && $disp != 'terms' )
 <div id="pageFooter">
 	<?php
 		// Display container and contents:
-		skin_container( NT_("Footer"), array(
+		skin_container( NT_('Footer'), array(
 				// The following params will be used as defaults for widgets included in this container:
 			) );
 		// Note: Double quotes have been used around "Footer" only for test purposes.

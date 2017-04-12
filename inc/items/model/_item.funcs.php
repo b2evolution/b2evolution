@@ -296,6 +296,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 			switch( $disp_detail )
 			{
 				case 'posts-cat':
+				case 'posts-topcat':
 				case 'posts-subcat':
 					// The competing intro-* types are: 'cat' and 'all':
 					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
@@ -414,17 +415,17 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	{ // this should only happen when the slug is auto generated
 		global $Collection, $Blog;
 		if( isset( $Blog ) )
-		{ // Get max length of slug from current blog setting
+		{	// Get max length of slug from current blog setting:
 			$count_of_words = $Blog->get_setting('slug_limit');
 		}
 		if( empty( $count_of_words ) )
-		{ // Use 5 words to limit slug by default
+		{	// Use 5 words to limit slug by default:
 			$count_of_words = 5;
 		}
 
-		$title_words = array();
+		// Limit slug with max count of words:
 		$title_words = explode( '-', $urltitle );
-		if( count($title_words) > $count_of_words )
+		if( count( $title_words ) > $count_of_words )
 		{
 			$urltitle = '';
 			for( $i = 0; $i < $count_of_words; $i++ )
@@ -432,20 +433,18 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 				$urltitle .= $title_words[$i].'-';
 			}
 			//delete last '-'
-			$urltitle = substr( $urltitle, 0, strlen($urltitle) - 1 );
+			$urltitle = substr( $urltitle, 0, strlen( $urltitle ) - 1 );
 		}
-
-		// echo 'leaving 5 words: '.$urltitle.'<br />';
 	}
 
-	// Normalize to 200 chars + a number
+	// Normalize to 200 chars + a number:
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 200 );
 	// strip a possible dash at the end of the URL title:
 	$urlbase = rtrim( $urlbase, '-' );
 	$urltitle = $urlbase;
-	if( ! empty( $matches[4] ) )
-	{
+	if( isset( $matches[4] ) && $matches[4] !== '' )
+	{	// Append only NOT empty string after last dash:
 		$urltitle .= '-'.$matches[4];
 	}
 
@@ -520,7 +519,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
  */
 function get_postdata($postid)
 {
-	global $DB, $postdata, $show_statuses;
+	global $DB, $postdata;
 
 	if( !empty($postdata) && $postdata['ID'] == $postid )
 	{ // We are asking for postdata of current post in memory! (we're in the b2 loop)
@@ -1874,7 +1873,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		{ // Use dropdown for bootstrap skin
 			$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 			$Form->hidden( 'post_status', $edited_Item->status );
-			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
+			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
 			echo '<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 							.'<span>'.$status_options[ $edited_Item->status ].'</span>'
 						.' <span class="caret"></span></button>';
@@ -1933,7 +1932,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 
 		$Form->submit( array(
 			'actionArray['.$next_action.'_publish]',
-			/* TRANS: This is the value of an input submit button */ T_('Publish!'),
+			/* TRANS: This is the value of an input submit button */ T_('Publish').'!',
 			'SaveButton btn-status-published quick-publish',
 			'',
 			$publish_style
@@ -2665,7 +2664,7 @@ function echo_slug_filler()
 		{
 			if(!slug_changed)
 			{
-				jQuery( '#post_urltitle' ).val( jQuery( '#post_title' ).val() );
+				jQuery( '#post_urltitle' ).val( jQuery( '#post_title' ).val().replace( /,/g, ' ' ) );
 			}
 		} );
 
@@ -2848,7 +2847,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * Display a comment corresponding the given comment id
  *
  * @param object Comment object
- * @param string where to redirect after comment edit
+ * @param string where to redirect after comment edit. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
  * @param boolean true to set the new redirect param, false otherwise
  * @param integer Comment index in the current list, FALSE - to don't display a comment index
  * @param integer A reply level (Used on mode "Threaded comments" to shift a comment block to right)
@@ -3739,6 +3738,10 @@ function items_manual_results_block( $params = array() )
 							'th' => T_('Name'),
 						);
 	$Table->cols[] = array(
+							'th' => T_('Image'),
+							'th_class' => 'shrinkwrap',
+						);
+	$Table->cols[] = array(
 							'th' => T_('URL "slug"'),
 						);
 	$Table->cols[] = array(
@@ -4234,7 +4237,7 @@ function items_results( & $items_Results, $params = array() )
 				'th' => T_('Ord'),
 				'th_class' => 'shrinkwrap',
 				'order' => $params['field_prefix'].'order',
-				'td_class' => 'right item_order_edit',
+				'td_class' => 'right jeditable_cell item_order_edit',
 				'td' => '%item_row_order( {Obj} )%',
 				'extra' => array( 'rel' => '#post_ID#' ),
 			);
@@ -4301,7 +4304,7 @@ function item_type_global_icons( $object_Widget )
 				$icon_group_create_mass = NULL;
 			}
 
-			$object_Widget->global_icon( T_('Mass edit the current post list...'), 'edit', $admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&' ), T_('Mass edit'), 3, 4 );
+			$object_Widget->global_icon( T_('Mass edit the current post list').'...', 'edit', $admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ), T_('Mass edit'), 3, 4 );
 
 			foreach( $item_types as $item_type )
 			{
@@ -4651,6 +4654,9 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	}
 	$r .= '</strong></td>';
 
+	// Category image:
+	$r .= '<td>'.$Chapter->get_image_tag().'</td>';
+
 	// URL "slug"
 	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
@@ -4753,12 +4759,20 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	$r .= !empty( $item_edit_url ) ? '</a>' : '';
 	$r .= '</strong></td>';
 
+	// Category image
+	$cat_thumb = '';
+	if( $main_item_Chapter = & $Item->get_main_Chapter() )
+	{	// Get image tag of main chapter of the Item:
+		$cat_thumb = $main_item_Chapter->get_image_tag();
+	}
+	$r .= '<td>'.$cat_thumb.'</td>';
+
 	// URL "slug"
 	$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Item->ID.'&amp;action=edit' );
 	$r .= '<td>'.$Item->get_title( $params );
 	if( $current_User->check_perm( 'slugs', 'view', false ) )
 	{ // Display icon to view all slugs of this item if current user has permission
-		$r .= ' '.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
+		$r .= ' '.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
 	}
 	$r .= '</td>';
 

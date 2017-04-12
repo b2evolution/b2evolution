@@ -44,7 +44,6 @@ class UserSettings extends AbstractSettings
 		'pref_browse_tab' => 'full',
 
 		// Folding settings, 1 - Hide, 0 - Show
-		'fold_itemform_links' => 1,
 		'fold_itemform_custom_fields' => 1,
 		'fold_itemform_googlemap' => 1,
 		'fold_itemform_meta_cmnt' => 1,
@@ -52,7 +51,6 @@ class UserSettings extends AbstractSettings
 		'fold_itemform_comments' => 1,
 		'fold_itemform_goals' => 1,
 		'fold_itemform_notifications' => 1,
-		'fold_cmntform_links' => 1,
 		'fold_cmntform_datetime' => 1,
 		'fold_cmntform_html' => 1,
 		'fold_cmntform_info' => 1,
@@ -90,6 +88,7 @@ class UserSettings extends AbstractSettings
 		// admin user notifications
 		'send_cmt_moderation_reminder' => 1, // Send reminders about comments awaiting moderation
 		'send_pst_moderation_reminder' => 1, // Send reminders about posts awaiting moderation
+		'send_pst_stale_alert' => 1, // Send alert about stale posts
 		'notify_new_user_registration' => 1, // Notify admin user when a new user has registered
 		'notify_activated_account' => 1, // Notify admin user when an account has been activated by email
 		'notify_closed_account' => 1, // Notify admin user when an account has been closed by the account owner
@@ -104,7 +103,7 @@ class UserSettings extends AbstractSettings
 		'new_thread_count' => 0, // How many new thread was created by this user TODAY!
 
 		'show_online' => 1,     // Show if user is online or not
-		'user_domain' => NULL,  // User domain
+		'user_registered_from_domain' => NULL, // Reverse DNS of IP address on user registration
 		'user_browser' => NULL, // User browser
 
 		'email_format' => 'auto', // Email format: auto | html | text

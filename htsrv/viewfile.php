@@ -51,12 +51,7 @@ $current_User->check_perm( 'files', 'view', true, $perm_blog );
 
 // Load the other params:
 param( 'viewtype', 'string', true, true );
-param( 'path', 'string', true, true );
-
-if ( false !== strpos( urldecode( $path ), '..' ) )
-{
-	debug_die( 'Relative pathnames not allowed!' );
-}
+param( 'path', 'filepath', true, true );
 
 // Load fileroot infos
 $FileRootCache = & get_FileRootCache();
@@ -199,7 +194,7 @@ switch( $viewtype )
 
 			if( !$buffer_lines )
 			{
-				echo '<p>** '.T_('Empty file!').' ** </p></div>';
+				echo '<p>** '.T_('Empty file').'! ** </p></div>';
 			}
 			else
 			{

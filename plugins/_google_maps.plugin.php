@@ -400,7 +400,7 @@ class google_maps_plugin extends Plugin
 			?>
 
 			var geocoder = new google.maps.Geocoder();
-			geocoder.geocode( {'address': '<?php echo $search_location; ?>'}, function(results, status)
+			geocoder.geocode( {'address': '<?php echo format_to_js( $search_location ); ?>'}, function(results, status)
 			{
 				if (status == google.maps.GeocoderStatus.OK)
 				{

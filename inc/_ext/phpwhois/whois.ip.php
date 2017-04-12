@@ -23,7 +23,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
+
+erhsatingin > Added fix for empty ip range
+*/
 
 if (!defined('__IP_HANDLER__'))
 	define('__IP_HANDLER__', 1);
@@ -100,25 +102,34 @@ class ip_handler extends WhoisClient
 				if ($p !== false)
 					{
 					$net = strtok(substr($line,$p+1),') ');
-					list($low,$high) = explode('-',str_replace(' ','',substr($line,$p+strlen($net)+3)));
-
-					if (!isset($done[$net]) && $ip >= ip2long($low) && $ip <= ip2long($high))
+					$iprange = substr($line,$p+strlen($net)+3);
+					if( $iprange )
 						{
-						$owner = substr($line,0,$p-1);
+						list($low,$high) = explode('-',str_replace(' ','',substr($line,$p+strlen($net)+3)));
 
-						if (!empty($this->REGISTRARS['owner']))
+
+						if (!isset($done[$net]) && $ip >= ip2long($low) && $ip <= ip2long($high))
 							{
-							$this->handle_rwhois($this->REGISTRARS['owner'],$query);
-							break 2;
+							$owner = substr($line,0,$p-1);
+
+							if (!empty($this->REGISTRARS['owner']))
+								{
+								$this->handle_rwhois($this->REGISTRARS['owner'],$query);
+								break 2;
+								}
+							else
+								{
+								$this->Query['args'] = 'n '.$net;
+								$presults[] = $this->GetRawData($net);
+								$done[$net] = 1;
+								}
 							}
-						else
-							{
-							$this->Query['args'] = 'n '.$net;
-							$presults[] = $this->GetRawData($net);
-							$done[$net] = 1;
-							}
+						$found = true;
 						}
-					$found = true;
+						else
+						{
+							$found = false;
+						}
 					}
 				}
 

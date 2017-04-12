@@ -364,7 +364,7 @@ class tinymce_plugin extends Plugin
 				<script type="text/javascript">
 					var quicksetting_switch = jQuery( '#<?php echo $params['quicksetting_item_id'];?>' );
 					jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
-							quicksetting_switch.html( state ? '<?php echo $activate_warning_link;?>' : '<?php echo $deactivate_warning_link;?>' );
+							quicksetting_switch.html( state ? '<?php echo format_to_js( $activate_warning_link );?>' : '<?php echo format_to_js( $deactivate_warning_link ); ?>' );
 						} );
 				</script>
 				<?php
@@ -528,9 +528,7 @@ class tinymce_plugin extends Plugin
 						{
 							if( ! tinymce_plugin_displayed_error )
 							{
-								alert( '<?php echo str_replace("'", "\'",
-									sprintf( $this->T_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'),
-									$this->T_('URL to TinyMCE') ) ) ?>' );
+								alert( '<?php echo sprintf( $this->TS_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'), $this->TS_('URL to TinyMCE') ); ?>' );
 								tinymce_plugin_displayed_error = true;
 							}
 						}

@@ -75,6 +75,11 @@ class CaKeyword extends DataObject
 	 */
 	function load_from_Request()
 	{
+		// Keyword
+		param( 'cakw_keyword', 'string' );
+		param_check_not_empty( 'cakw_keyword', T_('You must provide a keyword!') );
+		$this->set_from_Request( 'keyword' );
+
 		// Status
 		param( 'cakw_status', 'string' );
 		$this->set_from_Request( 'status' );

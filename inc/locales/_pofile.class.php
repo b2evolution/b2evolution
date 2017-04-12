@@ -24,6 +24,7 @@ class POFile
 
 	function __construct($filename=null)
 	{
+		// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 		$this->filename = str_replace( '\\', '/', $filename );
 	}
 

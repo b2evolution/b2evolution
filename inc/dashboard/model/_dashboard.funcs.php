@@ -23,7 +23,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function b2evonet_get_updates( $force_short_delay = false )
 {
 	global $allow_evo_stats; // Possible values: true, false, 'anonymous'
-	global $DB, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
+	global $DB, $debug, $evonetsrv_protocol, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 	global $Debuglog;
 	global $Timer;
@@ -36,6 +36,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 	if( $allow_evo_stats === false )
 	{ // Get outta here:
 		return NULL;
+	}
+
+	if( $Settings->get( 'evonet_last_error' ) > $servertimenow - 5400 )
+	{	// The previous error was less than 90 minutes ago, skip this:
+		return false;
 	}
 
 	if( $debug == 2 )
@@ -90,8 +95,12 @@ function b2evonet_get_updates( $force_short_delay = false )
 	$Settings->dbupdate();
 
 	// Construct XML-RPC client:
-	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
-	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port );
+	load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
+	if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+	{	// Could not use xmlrpc client because server has no the requested extensions:
+		return false;
+	}
+	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port, $evonetsrv_protocol );
 	if( $debug > 1 )
 	{
 		$client->debug = 1;
@@ -192,6 +201,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 			$Messages->add( T_('Invalid updates received'), 'error' );
 		}
 	}
+
+	// Response is an error,
+	// Save current server time of this error to don't repeat it during 90 minutes:
+	$Settings->set( 'evonet_last_error', $servertimenow );
+	$Settings->dbupdate();
 
 	$Timer->pause('evonet: check for updates');
 	return false;
@@ -500,10 +514,9 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		$Item->edit_link( array( // Link to backoffice for editing
 				'before'    => ' ',
 				'after'     => ' ',
-				'class'     => 'ActionButton btn btn-primary',
+				'class'     => 'ActionButton btn btn-primary btn-sm w80px',
 				'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 			) );
-		$Item->publish_link( '', '', '#', '#', 'PublishButton btn btn-status-published' );
 		echo get_icon( 'pixel' );
 		echo '</div>';
 
@@ -511,6 +524,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		{ // Display Item permalink icon
 			echo '<span style="float: left; padding-right: 5px; margin-top: 4px">'.$Item->get_permanent_link( '#icon#' ).'</span>';
 		}
+		echo '<div class="dashboard_content">';
 		echo '<h3 class="dashboard_post_title">';
 		$item_title = $Item->dget('title');
 		if( ! strlen($item_title) )
@@ -522,7 +536,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		echo '</span>';
 		echo '</h3>';
 
-		echo '</div>';
+		echo '</div></div>';
 	}
 
 	$block_item_Widget->disp_template_raw( 'block_end' );
@@ -559,7 +573,7 @@ function display_charts( $chart_data )
 		return;
 	}
 
-	echo '<div class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
+	echo '<div style="display: flex; flex-flow: row nowrap;" class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
 
 	foreach( $chart_data as $chart_item )
 	{
@@ -583,7 +597,7 @@ function display_charts( $chart_data )
 		// Display chart
 		if( $ctrl == 'coll_settings' )
 		{ // in collection dashboard
-			echo '<div class="center col-xs-4 col-sm-4 col-md-12 col-lg-4"><div class="chart">
+			echo '<div class="center"><div class="chart">
 					<div class="'.$chart_item['type'].'" data-percent="'.$chart_percent.'"><b style="color:'.$chart_color.'">'.$chart_item['value'].'</b></div>
 					<div class="label">'.$chart_item['title'].'</div>
 					</div></div>';

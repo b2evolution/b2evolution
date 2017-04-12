@@ -151,7 +151,7 @@ function antispam_check( $haystack )
  */
 function antispam_report_abuse( $abuse_string )
 {
-	global $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri, $antispam_test_for_real;
+	global $debug, $antispamsrv_protocol, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri, $antispam_test_for_real;
 	global $baseurl, $Messages, $Settings;
 	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
@@ -169,7 +169,11 @@ function antispam_report_abuse( $abuse_string )
 
 	// Construct XML-RPC client:
 	load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
-	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port );
+	if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+	{	// Could not use xmlrpc client because server has no the requested extensions:
+		return false;
+	}
+	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port, $antispamsrv_protocol );
 	// yura: I commented this because xmlrpc_client prints the debug info on screen and it breaks header_redirect()
 	// $client->debug = $debug;
 
@@ -213,12 +217,12 @@ function antispam_report_abuse( $abuse_string )
  */
 function antispam_poll_abuse()
 {
-	global $Messages, $Settings, $baseurl, $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
+	global $Messages, $Settings, $baseurl, $debug, $antispamsrv_protocol, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
 	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
 	// Construct XML-RPC client:
 	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
-	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port );
+	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port, $antispamsrv_protocol );
 	// yura: I commented this because xmlrpc_client prints the debug info on screen and it breaks header_redirect()
 	// $client->debug = $debug;
 
@@ -276,7 +280,7 @@ function antispam_poll_abuse()
 						if( antispam_create( $banned_string, 'central' ) )
 						{ // Creation successed
 							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('OK.'), 'note', T_('Adding strings to local blacklist:') );
+								.T_('OK').'.', 'note', T_('Adding strings to local blacklist:') );
 						}
 						else
 						{ // Was already handled
@@ -292,12 +296,12 @@ function antispam_poll_abuse()
 					$Settings->set( 'antispam_last_update', $endedat );
 					$Settings->dbupdate();
 				}
-				$Messages->add( T_('Done.'), 'success' );
+				$Messages->add( T_('Done').'.', 'success' );
 			}
 		}
 		else
 		{
-			$Messages->add( T_('Invalid response.'), 'error' );
+			$Messages->add( T_('Invalid response').'.', 'error' );
 			$ret = false;
 		}
 	}
@@ -641,6 +645,32 @@ function antispam_block_by_country( $country_ID, $assert = true )
 
 
 /**
+ * Block request by email address and its domain
+ */
+function antispam_block_by_email( $email_address )
+{
+	if( mail_is_blocked( $email_address ) )
+	{	// Email address is blocked completely
+		$log_message = sprintf( 'A request was blocked because of the email address \'%s\' is blocked.', $email_address );
+		exit_blocked_request( 'Email address', $log_message );
+		// WILL exit();
+	}
+
+	// Extract a domain from the email address:
+	$email_domain = preg_replace( '#^[^@]+@#', '', $email_address );
+
+	if( ! empty( $email_domain ) &&
+			$Domain = & get_Domain_by_subdomain( $email_domain ) &&
+			$Domain->get( 'status' ) == 'blocked' )
+	{	// The request from domain of the email address must be blocked:
+		$log_message = sprintf( 'A request was blocked because of the domain \'%s\' of the email address \'%s\' is blocked.', $Domain->get( 'name' ), $email_address );
+		exit_blocked_request( 'Domain of email address', $log_message );
+		// WILL exit();
+	}
+}
+
+
+/**
  * Check if we can move current user to suspect group
  *
  * @param integer|NULL User ID, NULL = $current_User
@@ -700,27 +730,30 @@ function antispam_suspect_check( $user_ID = NULL, $check_trust_group = true )
 /**
  * Move user to suspect group by IP address
  *
- * @param string IP address
+ * @param string IP address, Empty value to use current IP address
  * @param integer|NULL User ID, NULL = $current_User
  * @param boolean TRUE to check if user is in trust group
  */
 function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_trust_group = true )
 {
-	global $DB, $Settings;
+	global $DB, $Settings, $Timer;
+
+	$Timer->start( 'suspect_user_by_IP' );
 
 	if( empty( $user_ID ) )
-	{ // If user_ID was not set, use the current_User
+	{	// If user_ID was not set, use the current_User:
 		global $current_User;
 		$User = $current_User;
 	}
 	else
-	{ // get User
+	{	// Get User by given ID:
 		$UserCache = & get_UserCache();
 		$User = $UserCache->get_by_ID( $user_ID, false, false );
 	}
 
 	if( !antispam_suspect_check( $user_ID, $check_trust_group ) )
-	{ // Current user cannot be moved to suspect group
+	{	// Current user cannot be moved to suspect group
+		$Timer->stop( 'suspect_user_by_IP' );
 		return;
 	}
 
@@ -729,25 +762,84 @@ function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_
 		$IP_address = $_SERVER['REMOTE_ADDR'];
 	}
 
-	$IP_address = ip2int( $IP_address );
+	// Check by IP address:
+	$IP_address_int = ip2int( $IP_address );
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get IP range by address "'.$IP_address.'" to check if user #'.$user_ID.' must be suspected.' );
 	$SQL->SELECT( 'aipr_ID' );
 	$SQL->FROM( 'T_antispam__iprange' );
-	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $IP_address ) );
-	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $IP_address ) );
+	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $IP_address_int ) );
+	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $IP_address_int ) );
 	$SQL->WHERE_and( 'aipr_status = \'suspect\'' );
-	$ip_range_ID = $DB->get_row( $SQL->get() );
+	$ip_range_ID = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
 
-	if( !is_null( $ip_range_ID ) )
-	{ // Move current user to suspicious group because current IP address is suspected
+	if( ! is_null( $ip_range_ID ) )
+	{	// Move the user to suspicious group because current IP address is suspected:
 		$GroupCache = & get_GroupCache();
-		if( $suspicious_Group = & $GroupCache->get_by_ID( (int)$Settings->get('antispam_suspicious_group'), false, false ) )
-		{ // Group exists in DB and we can change user's group
+		if( $suspicious_Group = & $GroupCache->get_by_ID( intval( $Settings->get( 'antispam_suspicious_group' ) ), false, false ) )
+		{	// Group exists in DB and we can change user's group:
 			$User->set_Group( $suspicious_Group );
 			$User->dbupdate();
 		}
 	}
+
+	$Timer->stop( 'suspect_user_by_IP' );
+}
+
+
+/**
+ * Move user to suspect group by reverse DNS domain(that is generated from IP address on user's registration)
+ *
+ * @param integer|NULL User ID, NULL = $current_User
+ * @param boolean TRUE to check if user is in trust group
+ */
+function antispam_suspect_user_by_reverse_dns_domain( $user_ID = NULL, $check_trust_group = true )
+{
+	global $Settings, $UserSettings, $Timer;
+
+	$Timer->start( 'suspect_user_by_reverse_dns_domain' );
+
+	if( empty( $user_ID ) )
+	{	// If user_ID was not set, use the current_User:
+		global $current_User;
+		$User = $current_User;
+	}
+	else
+	{	// Get User by given ID:
+		$UserCache = & get_UserCache();
+		$User = $UserCache->get_by_ID( $user_ID, false, false );
+	}
+
+	if( ! antispam_suspect_check( $user_ID, $check_trust_group ) )
+	{	// Current user cannot be moved to suspect group:
+		$Timer->stop( 'suspect_user_by_reverse_dns_domain' );
+		return;
+	}
+
+	// Get user's reverse DNS domain that was generated from IP address on registration by function gethostbyaddr()
+	$reverse_dns_domain = $UserSettings->get( 'user_registered_from_domain', $User->ID );
+
+	if( empty( $reverse_dns_domain ) )
+	{	// Domain must be not empty:
+		$Timer->stop( 'suspect_user_by_reverse_dns_domain' );
+		return;
+	}
+
+	// Try to get a top existing domain of reverse DNS subdomain from DB:
+	load_funcs( 'sessions/model/_hitlog.funcs.php' );
+	$Domain = & get_Domain_by_subdomain( $reverse_dns_domain );
+
+	if( $Domain && $Domain->get( 'status' ) == 'suspect' )
+	{	// Move the user to suspicious group because the reverse DNS has a suspect status:
+		$GroupCache = & get_GroupCache();
+		if( $suspicious_Group = & $GroupCache->get_by_ID( intval( $Settings->get( 'antispam_suspicious_group' ) ), false, false ) )
+		{	// Group exists in DB and we can change user's group:
+			$User->set_Group( $suspicious_Group );
+			$User->dbupdate();
+		}
+	}
+
+	$Timer->stop( 'suspect_user_by_reverse_dns_domain' );
 }
 
 

@@ -34,6 +34,7 @@ class User extends DataObject
 	var $login;
 	var $pass;
 	var $salt;
+	var $pass_driver;
 	var $firstname;
 	var $lastname;
 	var $nickname;
@@ -158,6 +159,12 @@ class User extends DataObject
 	var $is_collection_owner;
 
 	/**
+	 * Password driver
+	 * @var object
+	 */
+	var $PasswordDriver;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -217,6 +224,7 @@ class User extends DataObject
 			$this->login = $db_row->user_login;
 			$this->pass = $db_row->user_pass;
 			$this->salt = $db_row->user_salt;
+			$this->pass_driver = $db_row->user_pass_driver;
 			$this->firstname = $db_row->user_firstname;
 			$this->lastname = $db_row->user_lastname;
 			$this->nickname = $db_row->user_nickname;
@@ -556,9 +564,24 @@ class User extends DataObject
 
 					load_funcs('sessions/model/_hitlog.funcs.php');
 
-					// Update status of Domain in DB
+					// Update status of email Domain in DB:
+					$edited_email_domain_status = param( 'edited_email_domain_status', 'string' );
+					$email_domain = $this->get_email_domain();
+					$Domain = & get_Domain_by_subdomain( $email_domain );
+					if( ! $Domain && $edited_email_domain_status != 'unknown' && ! empty( $email_domain ) )
+					{	// Domain doesn't exist in DB, Create new record:
+						$Domain = new Domain();
+						$Domain->set( 'name', $email_domain );
+					}
+					if( $Domain )
+					{	// Save status of Domain:
+						$Domain->set( 'status', $edited_email_domain_status, true );
+						$Domain->dbsave();
+					}
+
+					// Update status of user Domain in DB:
 					$edited_domain_status = param( 'edited_domain_status', 'string' );
-					$user_domain = $UserSettings->get( 'user_domain', $this->ID );
+					$user_domain = $UserSettings->get( 'user_registered_from_domain', $this->ID );
 					$Domain = & get_Domain_by_subdomain( $user_domain );
 					if( ! $Domain && $edited_domain_status != 'unknown' && ! empty( $user_domain ) )
 					{ // Domain doesn't exist in DB, Create new record
@@ -677,11 +700,11 @@ class User extends DataObject
 				$country_is_required = ( $Settings->get( 'location_country' ) == 'required' && countries_exist() );
 				if( $country_is_required && $can_edit_users && $country_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_ctry_ID', T_('Please select a country.'), 'note' );
+					param_add_message_to_Log( 'edited_user_ctry_ID', T_('Please select a country').'.', 'note' );
 				}
 				else
 				{ // Display an error message
-					param_check_number( 'edited_user_ctry_ID', T_('Please select a country.'), $country_is_required );
+					param_check_number( 'edited_user_ctry_ID', T_('Please select a country').'.', $country_is_required );
 				}
 				$this->set_from_Request( 'ctry_ID', 'edited_user_ctry_ID', true );
 			}
@@ -692,7 +715,7 @@ class User extends DataObject
 				$region_is_required = ( $Settings->get( 'location_region' ) == 'required' && regions_exist( $country_ID ) );
 				if( $region_is_required && $can_edit_users && $region_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_rgn_ID', T_('Please select a region.'), 'note' );
+					param_add_message_to_Log( 'edited_user_rgn_ID', T_('Please select a region').'.', 'note' );
 				}
 				else
 				{ // Display an error message
@@ -707,11 +730,11 @@ class User extends DataObject
 				$subregion_is_required = ( $Settings->get( 'location_subregion' ) == 'required' && subregions_exist( $region_ID ) );
 				if( $subregion_is_required && $can_edit_users && $subregion_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_subrg_ID', T_('Please select a sub-region.'), 'note' );
+					param_add_message_to_Log( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', 'note' );
 				}
 				else
 				{ // Display an error message
-					param_check_number( 'edited_user_subrg_ID', T_('Please select a sub-region.'), $subregion_is_required );
+					param_check_number( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', $subregion_is_required );
 				}
 				$this->set_from_Request( 'subrg_ID', 'edited_user_subrg_ID', true );
 			}
@@ -722,11 +745,11 @@ class User extends DataObject
 				$city_is_required = ( $Settings->get( 'location_city' ) == 'required' && cities_exist( $country_ID, $region_ID, $subregion_ID ) );
 				if( $city_is_required && $can_edit_users && $city_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_city_ID', T_('Please select a city.'), 'note' );
+					param_add_message_to_Log( 'edited_user_city_ID', T_('Please select a city').'.', 'note' );
 				}
 				else
 				{ // Display an error message
-					param_check_number( 'edited_user_city_ID', T_('Please select a city.'), $city_is_required );
+					param_check_number( 'edited_user_city_ID', T_('Please select a city').'.', $city_is_required );
 				}
 				$this->set_from_Request( 'city_ID', 'edited_user_city_ID', true );
 			}
@@ -1072,16 +1095,14 @@ class User extends DataObject
 				else
 				{
 					if( $has_full_access && $this->ID != $current_User->ID )
-					{ // Admin is changing a password of other user, Check a password of current admin
-						$pass_to_check = $current_User->pass;
-						$current_user_salt = $current_User->salt;
+					{	// Admin is changing a password of other user, Check a password of current admin
+						$pass_User = $current_User;
 					}
 					else
-					{ // User is changing own pasword
-						$pass_to_check = $this->pass;
-						$current_user_salt = $this->salt;
+					{	// User is changing own password
+						$pass_User = $this;
 					}
-					if( $pass_to_check == md5( $current_user_salt.$current_user_pass, true ) )
+					if( $pass_User->check_password( $current_user_pass ) )
 					{
 						if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen'), $checkpwd_params ) )
 						{ // We can set password
@@ -1231,6 +1252,7 @@ class User extends DataObject
 					$UserSettings->set( 'notify_post_moderation', param( 'edited_user_notify_post_moderation', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_edit_pst_moderation', param( 'edited_user_notify_edit_pst_moderation', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_moderation_reminder', param( 'edited_user_send_pst_moderation_reminder', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'send_pst_stale_alert', param( 'edited_user_send_pst_stale_alert', 'integer', 0 ), $this->ID );
 				}
 				if( $this->grp_ID == 1 )
 				{
@@ -1266,31 +1288,52 @@ class User extends DataObject
 				if( $notifications_mode != 'off' )
 				{
 					/**
-					* Update the subscriptions:
-					*/
+					 * Update the subscriptions:
+					 */
 					$subs_blog_IDs = param( 'subs_blog_IDs', 'string', true );
 					$subs_item_IDs = param( 'subs_item_IDs', 'string', true );
 
 					// Work the blogs:
+					$BlogCache = & get_BlogCache();
 					$subscription_values = array();
+					$opt_out_values = array();
 					$unsubscribed = array();
-					$subs_blog_IDs = explode( ',', $subs_blog_IDs );
-					foreach( $subs_blog_IDs as $loop_blog_ID )
+					if( $subs_blog_IDs )
 					{
-						// Make sure no dirty hack is coming in here:
-						$loop_blog_ID = intval( $loop_blog_ID );
+						$subs_blog_IDs = explode( ',', $subs_blog_IDs );
 
-						// Get checkbox values:
-						$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
-						$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
+						foreach( $subs_blog_IDs as $loop_blog_ID )
+						{
+							// Make sure no dirty hack is coming in here:
+							$loop_blog_ID = intval( $loop_blog_ID );
 
-						if( $sub_items || $sub_comments )
-						{	// We have a subscription for this blog
-							$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
-						}
-						else
-						{	// No subscription here:
-							$unsubscribed[] = $loop_blog_ID;
+							// Get checkbox values:
+							$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
+							$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
+
+							if( $sub_items || $sub_comments )
+							{	// We have a subscription for this blog
+								$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
+							}
+							else
+							{	// No subscription here:
+
+								// Check if opt-out and user is a member
+								$Blog = & $BlogCache->get_by_ID( $loop_blog_ID );
+
+								if( $Blog->get( 'advanced_perms' )
+										&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) || ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
+										&& $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
+								{
+									$opt_item = $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ? $sub_items : 0;
+									$opt_comment = $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ? $sub_comments : 0;
+									$opt_out_values[] = "( $loop_blog_ID, $this->ID, $opt_item, $opt_comment )";
+								}
+								else
+								{
+									$unsubscribed[] = $loop_blog_ID;
+								}
+							}
 						}
 					}
 
@@ -1299,6 +1342,12 @@ class User extends DataObject
 					{	// We need to record values:
 						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
 													VALUES '.implode( ', ', $subscription_values ) );
+					}
+
+					if( count( $opt_out_values ) )
+					{
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+													VALUES '.implode( ', ', $opt_out_values ) );
 					}
 
 					if( count( $unsubscribed ) )
@@ -1311,15 +1360,40 @@ class User extends DataObject
 					// Individual post subscriptions
 					if( !empty( $subs_item_IDs ) )
 					{ // user was subscribed to at least one post update notification
+						$ItemCache = & get_ItemCache();
 						$subs_item_IDs = explode( ',', $subs_item_IDs );
+						$opt_out_values = array();
 						$unsubscribed = array();
 						foreach( $subs_item_IDs as $loop_item_ID )
 						{
+							$isub_comments = param( 'items_subs_'.$loop_item_ID, 'integer', 0 );
+
 							if( !param( 'item_sub_'.$loop_item_ID, 'integer', 0 ) )
 							{ // user wants to unsubscribe from this post notifications
-								$unsubscribed[] = $loop_item_ID;
+								$Item = $ItemCache->get_by_ID( $loop_item_ID );
+								$blog_ID = $Item->get_blog_ID();
+								$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+								if( $Blog->get( 'advanced_perms' )
+										&& $Blog->get_setting( 'allow_item_subscriptions' )
+										&& $Blog->get_setting( 'opt_out_item_subscription' )
+										&& $this->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+								{
+									$opt_out_values[] = "( $loop_item_ID, $this->ID, $isub_comments )";
+								}
+								else
+								{
+									$unsubscribed[] = $loop_item_ID;
+								}
+
 							}
 						}
+						if( !empty( $opt_out_values ) )
+						{
+							$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+													VALUES '.implode( ', ', $opt_out_values ) );
+						}
+
 						if( !empty( $unsubscribed ) )
 						{ // unsubscribe list is not empty, delete not wanted subscriptions
 							$DB->query( 'DELETE FROM T_items__subscriptions
@@ -1915,27 +1989,29 @@ class User extends DataObject
 	/*
 	 * Get the total size of files uploaded by the user
 	 *
+	 * @param string File type: 'image', 'video', 'audio', 'other'; NULL - for all file types
 	 * @return integer total size in bytes
 	 */
 	function get_total_upload( $type = NULL )
 	{
-		global $DB;
-
-		$files_SQL = new SQL();
-		$files_SQL->SELECT( 'file_ID' );
-		$files_SQL->FROM( 'T_files' );
-		$files_SQL->WHERE( 'file_creator_user_ID = '.$this->ID );
-		if( ! is_null( $type ) )
-		{
-			$files_SQL->WHERE_and( 'file_type = '.$DB->quote( $type ) );
+		if( empty( $this->ID ) )
+		{	// User must be saved in DB:
+			return 0;
 		}
-		$files = $DB->get_col( $files_SQL->get() );
 
 		$FileCache = & get_FileCache();
+		$FileCache->clear();
+		$files_sql_where = 'file_creator_user_ID = '.$this->ID;
+		if( $type !== NULL )
+		{	// Restrict files by type:
+			global $DB;
+			$files_sql_where .= ' AND file_type = '.$DB->quote( $type );
+		}
+		$FileCache->load_where( $files_sql_where );
+
 		$total_upload_size = 0;
-		foreach( $files as $file_ID )
+		foreach( $FileCache->cache as $user_File )
 		{
-			$user_File = $FileCache->get_by_ID( $file_ID );
 			$total_upload_size += $user_File->get_size();
 		}
 
@@ -2080,14 +2156,15 @@ class User extends DataObject
 		global $Collection, $Blog;
 
 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
-		{ // User directories are disabled:
+		{	// User directories are disabled:
 			$Debuglog->add( 'Attempt to access user media URL, but this feature is disabled', 'files' );
 			return false;
 		}
 
-		if( ! empty( $Blog ) )
-		{ // We are currently looking at a blog. We are going to consider (for now) that we want the users and their files
-			// to appear as being part of that blog.
+		if( ! empty( $Blog ) && ! is_admin_page() )
+		{	// We are currently looking at a collection on front-office.
+			// We are going to consider (for now) that we want the users and their files
+			// to appear as being part of that collection.
 			return $Blog->get_local_media_url().$this->get_media_subpath();
 		}
 
@@ -2285,11 +2362,12 @@ class User extends DataObject
 	 */
 	function set_password( $raw_password )
 	{
-		// Generate new salt to save a password
-		$new_pass_salt = generate_random_key( 8 );
+		// Use first password driver from config array for new password updating:
+		$PasswordDriver = get_PasswordDriver();
 
-		$this->set( 'pass', md5( $new_pass_salt.$raw_password, true ) );
-		$this->set( 'salt', $new_pass_salt );
+		$this->set( 'pass', $PasswordDriver->hash( $raw_password ) );
+		$this->set( 'salt', $PasswordDriver->get_last_generated_salt() );
+		$this->set( 'pass_driver', $PasswordDriver->get_code() );
 	}
 
 
@@ -2410,18 +2488,22 @@ class User extends DataObject
   /**
 	 * Check password
 	 *
-	 * @param string password
-	 * @param boolean Is the password parameter already MD5()'ed?
+	 * @param string Password
+	 * @param boolean Is the password parameter already hashed?
 	 * @return boolean
 	 */
-	function check_password( $pass, $pass_is_md5 = false )
+	function check_password( $pass, $pass_is_hashed = false )
 	{
-		if( !$pass_is_md5 )
-		{
-			$pass = md5( $this->salt.$pass, true );
+		// Get password driver for this user:
+		$user_PasswordDriver = $this->get_PasswordDriver();
+
+		if( ! $user_PasswordDriver )
+		{	// Password driver cannot be detected for this user, so it cannot be checked:
+			return false;
 		}
 
-		return ( $pass == $this->pass );
+		// Check the requested password against the user's password hash:
+		return $user_PasswordDriver->check( $pass, $this->salt, $this->pass, $pass_is_hashed );
 	}
 
 
@@ -4677,7 +4759,7 @@ class User extends DataObject
 
 		$idx = $this->userfields_by_type[$type_ID][0];
 
-		return $this->userfields[$idx][1];
+		return $this->userfields[$idx]->uf_varchar;
 	}
 
 
@@ -6210,6 +6292,18 @@ class User extends DataObject
 
 
 	/**
+	 * Get domain of user email
+	 *
+	 * @return string Domain
+	 */
+	function get_email_domain()
+	{
+		// Extract domain from email address:
+		return preg_replace( '#^[^@]+@#', '', $this->get( 'email' ) );
+	}
+
+
+	/**
 	 * Check if user has a permission to moderate the user
 	 *
 	 * @param integer User ID
@@ -6738,6 +6832,22 @@ class User extends DataObject
 		}
 
 		return $this->flagged_items_count;
+	}
+
+
+	/**
+	 * Get password driver
+	 *
+	 * @return object|FALSE Password driver OR FALSE if password driver is not detected for this user
+	 */
+	function get_PasswordDriver()
+	{
+		if( $this->PasswordDriver === NULL )
+		{	// Initialize password driver:
+			$this->PasswordDriver = get_PasswordDriver( $this->pass_driver );
+		}
+
+		return $this->PasswordDriver;
 	}
 }
 

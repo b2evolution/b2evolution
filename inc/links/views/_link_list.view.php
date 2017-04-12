@@ -24,7 +24,7 @@ global $Collection, $Blog;
  */
 global $LinkOwner;
 
-global $AdminUI, $current_User;
+global $AdminUI, $Skin, $current_User;
 
 if( empty( $Blog ) )
 {
@@ -101,17 +101,15 @@ if( $current_User->check_perm( 'files', 'view' ) )
 						);
 }
 
-if( count( $LinkOwner->get_positions() ) > 1 )
-{	// Don't display a position column for email campaign because it always has only one position 'inline':
-	$Results->cols[] = array(
-						'th' => T_('Position'),
-						'td_class' => 'shrinkwrap left',
-						'td' => '%display_link_position( {row} )%',
-					);
-}
+$Results->cols[] = array(
+					'th' => T_('Position'),
+					'th_class' => 'shrinkwrap',
+					'td_class' => 'nowrap '.( count( $LinkOwner->get_positions() ) > 1 ? 'left' : 'center' ),
+					'td' => '%display_link_position( {row} )%',
+				);
 
 // Add attr "id" to handle quick uploader
-$compact_results_params = $AdminUI->get_template( 'compact_results' );
+$compact_results_params = is_admin_page() ? $AdminUI->get_template( 'compact_results' ) : $Skin->get_template( 'compact_results' );
 $compact_results_params['body_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['body_start'] );
 $compact_results_params['no_results_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['no_results_start'] );
 
@@ -136,11 +134,13 @@ else
 // Load FileRoot class to get fileroot ID of collection below:
 load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
 
-switch( $LinkOwner->type )
+$link_owner_type = ( $LinkOwner->type == 'temporary' ) ? $LinkOwner->link_Object->type : $LinkOwner->type;
+
+switch( $link_owner_type )
 {
 	case 'item':
-		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
-		$upload_path = '/quick-uploads/p'.$LinkOwner->get_ID().'/';
+		$upload_fileroot = FileRoot::gen_ID( 'collection', ( $LinkOwner->is_temp() ? $LinkOwner->link_Object->tmp_coll_ID : $Blog->ID ) );
+		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'p' ).$LinkOwner->get_ID().'/';
 		break;
 
 	case 'comment':
@@ -155,7 +155,7 @@ switch( $LinkOwner->type )
 
 	case 'message':
 		$upload_fileroot = FileRoot::gen_ID( 'user', $current_User->ID );
-		$upload_path = '/private_message/'.( $LinkOwner->is_temp ? 'tmp' : 'pm' ).$LinkOwner->get_ID().'/';
+		$upload_path = '/private_message/'.( $LinkOwner->is_temp() ? 'tmp' : 'pm' ).$LinkOwner->get_ID().'/';
 		break;
 }
 
@@ -193,6 +193,20 @@ display_dragdrop_upload_button( array(
 							.'</td>'
 							.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
 						.'</tr>',
+		'template_filerow' => '<table><tr>'
+					.'<td class="firstcol shrinkwrap qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>'
+					.'<td class="qq-upload-file fm_filename">&nbsp;</td>'
+					.'<td class="qq-upload-link-id shrinkwrap link_id_cell">&nbsp;</td>'
+					.'<td class="qq-upload-link-actions shrinkwrap">'
+						.'<div class="qq-upload-status">'
+							.TS_('Uploading...')
+							.'<span class="qq-upload-spinner"></span>'
+							.'<span class="qq-upload-size"></span>'
+							.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
+						.'</div>'
+					.'</td>'
+					.'<td class="qq-upload-link-position lastcol nowrap '.( count( $LinkOwner->get_positions() ) > 1 ? 'left' : 'center' ).'"></td>'
+				.'</tr></table>',
 		'display_support_msg'    => false,
 		'additional_dropzone'    => '[ document.getElementById( "filelist_tbody" ) ]',
 		'filename_before'        => '',

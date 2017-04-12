@@ -25,7 +25,7 @@ global $Collection, $Blog;
 /**
  * @var CommentList
  */
-global $CommentList, $show_statuses;
+global $CommentList;
 
 global $current_User, $admin_url, $tab3;
 
@@ -57,7 +57,7 @@ if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
 	{
-		$block_item_Widget->global_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;blog='.$CommentList->Blog->ID.'&amp;action=emptytrash', T_('Empty recycle bin...'), 5, 3 );
+		$block_item_Widget->global_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;blog='.$CommentList->Blog->ID.'&amp;action=emptytrash', T_('Empty recycle bin').'...', 5, 3 );
 	}
 	else
 	{

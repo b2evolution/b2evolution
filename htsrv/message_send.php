@@ -255,8 +255,8 @@ if( empty( $redirect_to ) && empty( $Blog ) )
 }
 if( $success_message )
 {
-	// Never say to whom we sent the email -- prevent user enumeration.
-	$Messages->add( T_('Your message has been sent by email.'), 'success' );
+	$Messages->add( sprintf( T_('You have successfully sent an email to %s.'),
+		( empty( $recipient_User ) ? $recipient_name : $recipient_User->get_username() ) ), 'success' );
 	if( empty( $redirect_to ) )
 	{
 		$redirect_to = $Blog->gen_blogurl();

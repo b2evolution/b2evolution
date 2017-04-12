@@ -22,7 +22,7 @@ $creating = $action == 'blocked_new';
 
 $Form = new Form( NULL, 'slug_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,emadr_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,emadr_ID' ) );
 
 $Form->begin_form( 'fform', ( $creating ?  T_('New email address') : T_('Email address') ).get_manual_link( 'email-addresses' ) );
 
@@ -61,7 +61,7 @@ $email_status_icons = emadr_get_status_icons();
 foreach( $email_status_icons as $status => $icon )
 {	// Init js array with email status icons
 ?>
-email_status_icons['<?php echo $status; ?>'] = '<?php echo $icon; ?>';
+email_status_icons['<?php echo $status; ?>'] = '<?php echo format_to_js( $icon ); ?>';
 <?php } ?>
 
 jQuery( '#emadr_status' ).change( function()

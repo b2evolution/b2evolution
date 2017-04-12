@@ -66,7 +66,7 @@ echo $params['comment_start'];
 if( $params['comment_post_display'] )
 {
 	echo $params['comment_post_before'];
-	echo T_('In response to:').' ';
+	echo T_('In response to').': ';
 	$Comment->Item->title( array(
 			'link_type' => 'permalink',
 		) );
@@ -168,8 +168,8 @@ echo $params['comment_text_after'];
 echo $params['comment_info_before'];
 
 $commented_Item = & $Comment->get_Item();
-$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); /* Link to backoffice for editing */
-$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
+$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, $Comment->get_permanent_url() ); /* Link to backoffice for editing */
+$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', $commented_Item->get_permanent_url() ); /* Link to backoffice for deleting */
 
 $Comment->reply_link(); /* Link for replying to the Comment */
 $Comment->vote_helpful( '', '', '&amp;', true, true );

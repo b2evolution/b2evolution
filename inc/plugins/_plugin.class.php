@@ -483,8 +483,16 @@ class Plugin
 	 *              (with label, note etc). (optional, default is numeric keys, which are not editable)
 	 *        'max_count': maximum count of sets (optional, default is no restriction)
 	 *        'min_count': minimum count of sets (optional, default is no restriction)
-	 *      'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
-	 *      'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
+	 *	   'fileselect': opens a modal window to select file. The following can be set for this type:
+	 *        'root': default root
+	 *		  'path': default path
+	 *        'thumbnail_size': thumbnail size
+	 *        'max_file_num': maximum number of files
+	 *        'initialize_with': initial value
+	 *     'input_group': a subset of settings arranged in a line, you must specify 'inputs' for it:
+	 *        'inputs': an array of setting parameters
+	 *     'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
+	 *     'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
 	 * 'note' (gets displayed as a note to the param field),
 	 * 'info': Text for param with type 'info'
 	 * 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
@@ -3811,6 +3819,35 @@ class Plugin
 	/*
 	 * Interface methods }}}
 	 */
+
+	/**
+	 * Get collection from given params
+	 *
+	 * @param array Params: 'Item', 'Comment', 'Blog'
+	 * @return object|false Collection object or FALSE with wrong params
+	 */
+	function & get_Blog_from_params( $params )
+	{
+		$setting_Blog = false;
+
+		if( ! empty( $params['Item'] ) )
+		{	// Get Blog from given Item:
+			$Item = & $params['Item'];
+			$setting_Blog = & $Item->get_Blog();
+		}
+		elseif( ! empty( $params['Comment'] ) )
+		{	// Get Blog from given Comment:
+			$Comment = & $params['Comment'];
+			$Item = & $Comment->get_Item();
+			$setting_Blog = & $Item->get_Blog();
+		}
+		elseif( ! empty( $params['Blog'] ) )
+		{	// Get Blog from params:
+			$setting_Blog = & $params['Blog'];
+		}
+
+		return $setting_Blog;
+	}
 
 	/**
 	 * Get a skin specific param value from current Blog

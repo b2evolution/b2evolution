@@ -9,10 +9,11 @@
 @import "inc/debug.inc.less";
 
 // MILOS> Prevents from scrolling right on all Bootstrap skins
-html, body {
-	width: auto !important;
-	overflow-x: hidden !important;
-}
+// MILOS> Yura will fix the evo_toolbar layout, this this won't be needed no more
+// html, body {
+	// width: auto !important;
+	// overflow-x: hidden !important;
+// }
 
 // CSS to show containers, widgets and includes:
 @import "_dev-blocks.module.less";
@@ -368,6 +369,37 @@ textarea.form_textarea_input {
 // Space between radio option lable and note text
 label.radiooption {
 	margin-right: 1em;
+}
+// ---------------- //
+
+// File Select custom control
+.file_select_wrapper {
+	display: flex;
+	flex-flow: row wrap;
+	align-items: flex-start;
+
+	.file_select_item {
+		//display: block;
+		//float: left;
+		display: flex;
+		flex-flow: row wrap;
+		margin-right: 8px;
+		text-align: center;
+
+		.item_actions {
+			display: flex;
+			flex-shrink: 1;
+			flex-flow: column wrap;
+			justify-content: flex-start;
+			align-content: center;
+			justify-content: center;
+			text-align: left;
+			margin-left: 8px;
+			a.btn {
+				margin-bottom: 5px;
+			}
+		}
+	}
 }
 // ---------------- //
 

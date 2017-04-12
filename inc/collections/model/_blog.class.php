@@ -373,7 +373,7 @@ class Blog extends DataObject
 				$this->set_setting( 'in_skin_editing', '1' );
 				$this->set_setting( 'posts_per_page', 30 );
 				$this->set_setting( 'allow_html_comment', 0 );
-				$this->set_setting( 'orderby', 'last_touched_ts' );
+				$this->set_setting( 'orderby', 'contents_last_updated_ts' );
 				$this->set_setting( 'orderdir', 'DESC' );
 				$this->set_setting( 'enable_goto_blog', 'post' );
 				$this->set_setting( 'front_disp', 'front' );
@@ -818,6 +818,10 @@ class Blog extends DataObject
 
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
 
+			param( 'old_content_alert', 'integer', NULL );
+			param_check_range( 'old_content_alert', 1, 12, T_('Stale content alert must be a number of months.').'(1 - 12)', false );
+			$this->set_setting( 'old_content_alert', get_param( 'old_content_alert' ), true );
+
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
 
 			if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
@@ -958,6 +962,10 @@ class Blog extends DataObject
 
 			// Archive pages:
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
+
+			// Contact form:
+			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
+			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
 		}
 
 		if( in_array( 'more', $groups ) )
@@ -972,8 +980,11 @@ class Blog extends DataObject
 			{
 				// Subscriptions:
 				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_subscription', param( 'opt_out_subscription', 'integer', 0 ) );
 				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_comment_subscription', param( 'opt_out_comment_subscription', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_item_subscription', param( 'opt_out_item_subscription', 'integer', 0 ) );
 			}
 
 			// Sitemaps:
@@ -1242,6 +1253,7 @@ class Blog extends DataObject
 					'media_assets_url_type'   => array( 'url' => 'media_assets_absolute_url',   'folder' => '/media/' ),
 					'skins_assets_url_type'   => array( 'url' => 'skins_assets_absolute_url',   'folder' => '/skins/' ),
 					'plugins_assets_url_type' => array( 'url' => 'plugins_assets_absolute_url', 'folder' => '/plugins/' ),
+					'htsrv_assets_url_type'   => array( 'url' => 'htsrv_assets_absolute_url',   'folder' => '/htsrv/' ),
 				);
 
 				foreach( $assets_url_data as $asset_url_type => $asset_url_data )
@@ -1830,6 +1842,13 @@ class Blog extends DataObject
 				.( empty( $htsrv_url_parts['port'] ) ? '' : ':'.$htsrv_url_parts['port'] )
 				.( empty( $htsrv_url_parts['path'] ) ? '' : $htsrv_url_parts['path'] );
 
+			if( isset( $coll_url_parts['scheme'], $htsrv_url_parts['scheme'] ) &&
+			    $coll_url_parts['scheme'] != $htsrv_url_parts['scheme'] )
+			{	// If this collection uses an url with scheme like "https://" then
+				// htsrv url must also uses the same url scheme to avoid restriction by secure reason:
+				$required_htsrv_url = $coll_url_parts['scheme'].substr( $required_htsrv_url, strlen( $htsrv_url_parts['scheme'] ) );
+			}
+
 			// Replace domain + path of htsrv URL with current request:
 			$this->htsrv_urls[ $force_https ] = substr_replace( $required_htsrv_url, $coll_domain, strpos( $required_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
 
@@ -1838,6 +1857,33 @@ class Blog extends DataObject
 		}
 
 		return $this->htsrv_urls[ $force_https ];
+	}
+
+
+	/**
+	 * Get the URL of the htsrv folder, on the current collection's domain (which is NOT always the same as the $baseurl domain!).
+	 *
+	 * @param string NULL to use current htsrv_assets_url_type setting. Use 'basic', 'relative' or 'absolute' to force.
+	 * @param boolean TRUE to use https URL
+	 * @return string URL to /htsrv/ folder
+	 */
+	function get_local_htsrv_url( $url_type = NULL, $force_https = false )
+	{
+		$url_type = is_null( $url_type ) ? $this->get_setting( 'htsrv_assets_url_type' ) : $url_type;
+
+		if( $url_type == 'relative' )
+		{	// Relative URL:
+			return $this->get_htsrv_url( $force_https );
+		}
+		elseif( $url_type == 'absolute' )
+		{	// Absolute URL:
+			return $this->get_setting( 'htsrv_assets_absolute_url' );
+		}
+		else// == 'basic'
+		{	// Basic Config URL from config:
+			global $htsrv_url_sensitive, $htsrv_url;
+			return $force_https ? $htsrv_url_sensitive : $htsrv_url;
+		}
 	}
 
 
@@ -2952,8 +2998,8 @@ class Blog extends DataObject
 		}
 
 		$set_default_blog_ID = isset( $Settings );
-		if( get_setting_Blog( 'default_blog_ID' ) )
-		{ // Don't set a default blog if it is already defined and the blog exists in DB
+		if( $Settings->get( 'default_blog_ID' ) == -1 || get_setting_Blog( 'default_blog_ID' ) )
+		{	// Don't set a default collection if it is already defined and the collection exists in DB OR back-office page is used for this:
 			$set_default_blog_ID = false;
 		}
 

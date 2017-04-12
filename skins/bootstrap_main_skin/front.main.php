@@ -33,15 +33,19 @@ siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 
 // Display a picture from skin setting as background image
-global $media_path, $media_url;
-$bg_image = $Skin->get_setting( 'front_bg_image' );
-echo '<div id="bg_picture">';
-if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-{ // If it exists in media folder
-	echo '<img src="'.$media_url.$bg_image.'" />';
+$FileCache = & get_FileCache();
+$bg_File = NULL;
+if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
+{
+	$bg_File = & $FileCache->get_by_ID( $bg_File_ID, false, false );
 }
-echo '</div>';
+echo '<div class="evo_pictured_layout">';
+if( ! empty( $bg_File ) && $bg_File->exists() )
+{ // If it exists in media folder
+	echo '<img class="evo_pictured__image" src="'.$bg_File->get_url().'" />';
+}
 ?>
+
 
 <div class="container main_page_wrapper">
 
@@ -187,7 +191,7 @@ echo '</div>';
 					'front_block_title_start'       => '<h2>',
 					'front_block_title_end'         => '</h2>',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
@@ -204,11 +208,14 @@ echo '</div>';
 	</div><!-- .col -->
 
 	<!-- "Slide down" button -->
-	<div class="slide_button_wrap"><i class="fa fa-angle-down" id="slide_button"></i></div>
+	<div class="slide_button_wrap"><a href="#" id="slide_button"><i class="fa fa-angle-down" ></i></a></div>
 
 </div><!-- .row -->
 
 </div><!-- .container -->
+
+</div><!-- .evo_pictured_layout -->
+
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
 <section class="secondary_area" id="slide_destination"><!-- white background, ID is used to slide here from "slide_button" -->
@@ -223,7 +230,7 @@ echo '</div>';
 				// Display container and contents:
 				skin_container( NT_('Front Page Secondary Area'), array(
 						// The following params will be used as defaults for widgets included in this container:
-						'block_start'       => '<div class="widget $wi_class$">',
+						'block_start'       => '<div class="evo_widget $wi_class$">',
 						'block_end'         => '</div>',
 						'block_title_start' => '<h2 class="page-header">',
 						'block_title_end'   => '</h2>',
@@ -306,6 +313,19 @@ echo '</div>';
 </div><!-- .container -->
 
 </section><!-- .secondary_area -->
+
+<script>
+// Scroll Down to content
+// ======================================================================== /
+$slide_down = $( "#slide_button" );
+// Smooth scroll to top
+$slide_down.on( "click", function(event) {
+	event.preventDefault();
+	$( "body, html, #skin_wrapper" ).animate({
+		scrollTop: $("#slide_destination").offset().top +26
+	}, 1000);
+});
+</script>
 
 <?php
 // ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------

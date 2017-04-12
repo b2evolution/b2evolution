@@ -60,7 +60,7 @@ else
 }
 $Form->global_icon( $delete_title, 'recycle', $delete_url, $delete_text, 4, 3, $link_attribs );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1, $link_attribs );
+$Form->global_icon( T_('Cancel editing').'!', 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1, $link_attribs );
 
 $Form->begin_form( 'eform' );
 
@@ -180,11 +180,13 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->end_fieldset();
 
 	// -------------------------- ATTACHMENTS/LINKS --------------------------
-	if( isset($GLOBALS['files_Module']) )
-	{
+	if( $current_User->check_perm( 'files', 'view' ) )
+	{	// If current user has a permission to view the files:
 		load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
-		global $LinkOwner; // Initialize this object as global because this is used in many link functions
+		// Initialize this object as global because this is used in many link functions:
+		global $LinkOwner;
 		$LinkOwner = new LinkComment( $edited_Comment );
+		// Display attachments fieldset:
 		display_attachments_fieldset( $Form, $LinkOwner, false, true );
 	}
 

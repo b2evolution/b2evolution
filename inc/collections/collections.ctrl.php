@@ -26,7 +26,7 @@ if( strpos( $action, 'new' ) !== false )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
+if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
 {
 	if( valid_blog_requested() )
 	{
@@ -124,7 +124,14 @@ switch( $action )
 		param( 'skin_ID', 'integer', true );
 		$edited_Blog->set_setting( 'normal_skin_ID', $skin_ID );
 
-		if( $edited_Blog->load_from_Request( array() ) )
+		// Check how new content should be created for new collection:
+		param( 'create_demo_contents', 'boolean', NULL );
+		if( $create_demo_contents === NULL )
+		{
+			param_error( 'create_demo_contents', T_('Please select option of "New contents"') );
+		}
+
+		if( $edited_Blog->load_from_Request() )
 		{
 			// create the new blog
 			$edited_Blog->create( $kind );
@@ -149,9 +156,7 @@ switch( $action )
 			}
 			$Settings->dbupdate();
 
-			// create demo contents for the new blog
-			param( 'create_demo_contents', 'boolean' );
-			param( 'blog_locale', 'string' );
+			// Create demo contents for the new collection:
 			if( $create_demo_contents )
 			{
 				global $user_org_IDs;
@@ -171,7 +176,7 @@ switch( $action )
 				}
 
 				// Switch locale to translate content
-				locale_temp_switch( $blog_locale );
+				locale_temp_switch( param( 'blog_locale', 'string' ) );
 				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID, $create_demo_users );
 				locale_restore_previous();
 			}
@@ -346,10 +351,9 @@ switch( $action )
 		// Site long name
 		$Settings->set( 'notification_long_name', param( 'notification_long_name', 'string', '' ) );
 
-		// Small site logo url
-		param( 'notification_logo', 'url', '' );
-		param_check_url( 'notification_logo', 'http-https' );
-		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
+		// Small site logo
+		param( 'notification_logo_file_ID', 'integer', NULL );
+		$Settings->set( 'notification_logo_file_ID', get_param( 'notification_logo_file_ID' ) );
 
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );

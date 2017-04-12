@@ -86,7 +86,10 @@ skin_widget( array(
 	?>
 
 <div class="forums_list single_topic evo_content_block">
-	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
+	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */
+	if( $disp != 'page' )
+	{
+	?>
 
 	<div class="single_page_title">
 		<?php
@@ -103,7 +106,7 @@ skin_widget( array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
 			// This will enclose each widget in a block:
-			'block_start' => '<div class="$wi_class$">',
+			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
 			// This will enclose the title of each widget:
 			'block_title_start' => '<h3>',
@@ -112,6 +115,8 @@ skin_widget( array(
 			'author_link_text' => $params['author_link_text'],
 		) );
 		// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
+
+		}
 		?>
 	</div>
 
@@ -171,11 +176,14 @@ skin_widget( array(
 						'widget_context' => 'item',	// Signal that we are displaying within an Item
 						// The following (optional) params will be used as defaults for widgets included in this container:
 						// This will enclose each widget in a block:
-						'block_start' => '<div class="$wi_class$">',
+						'block_start' => '<div class="evo_widget $wi_class$">',
 						'block_end' => '</div>',
 						// This will enclose the title of each widget:
 						'block_title_start' => '<h3>',
 						'block_title_end' => '</h3>',
+						// Template params for "Item Link" widget
+						'widget_item_link_before'    => '<p class="evo_post_link">',
+						'widget_item_link_after'     => '</p>',
 						// Template params for "Item Tags" widget
 						'widget_item_tags_before'    => '<nav class="small post_tags">',
 						'widget_item_tags_after'     => '</nav>',
@@ -197,6 +205,40 @@ skin_widget( array(
 						'widget_item_tags_after'     => '</nav>',
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+					?>
+					</div>
+					<?php
+				}
+				elseif( $disp == 'page' )
+				{
+					?>
+					<div class="evo_container evo_container__item_page">
+					<?php
+					// ------------------------- "Item Page" CONTAINER EMBEDDED HERE --------------------------
+					// Display container contents:
+					skin_container( /* TRANS: Widget container name */ NT_('Item Page'), array(
+						'widget_context' => 'item',	// Signal that we are displaying within an Item
+						// The following (optional) params will be used as defaults for widgets included in this container:
+						// This will enclose each widget in a block:
+						'block_start' => '<div class="evo_widget $wi_class$">',
+						'block_end' => '</div>',
+						// This will enclose the title of each widget:
+						'block_title_start' => '<h3>',
+						'block_title_end' => '</h3>',
+						// Params for skin file "_item_content.inc.php"
+						'widget_item_content_params' => $params,
+						// Template params for "Item Attachments" widget:
+						'widget_item_attachments_params' => array(
+								'limit_attach'       => 1000,
+								'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+								'after'              => '</ul></div>',
+								'before_attach'      => '<li class="evo_file">',
+								'after_attach'       => '</li>',
+								'before_attach_size' => ' <span class="evo_file_size">(',
+								'after_attach_size'  => ')</span>',
+							),
+					) );
+					// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
 					?>
 					</div>
 					<?php

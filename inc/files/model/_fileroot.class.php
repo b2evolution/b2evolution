@@ -99,13 +99,13 @@ class FileRoot
 
 			case 'collection':
 				$BlogCache = & get_BlogCache();
-				if( ! ( $Collection = $Blog = & $BlogCache->get_by_ID( $root_in_type_ID, false, false ) ) )
-				{	// Blog not found
+				if( ! ( $fileroot_Blog = & $BlogCache->get_by_ID( $root_in_type_ID, false, false ) ) )
+				{	// Collection not found
 					return false;
 				}
-				$this->name = $Blog->get( 'shortname' ); //.' ('. /* TRANS: short for "blog" */ T_('b').')';
-				$this->ads_path = $Blog->get_media_dir( $create );
-				$this->ads_url = $Blog->get_media_url();
+				$this->name = $fileroot_Blog->get( 'shortname' ); //.' ('. /* TRANS: short for "blog" */ T_('b').')';
+				$this->ads_path = $fileroot_Blog->get_media_dir( $create );
+				$this->ads_url = $fileroot_Blog->get_media_url();
 				return;
 
 			case 'shared':
@@ -133,13 +133,13 @@ class FileRoot
 				{
 					$this->name = T_('Shared');
 					$this->ads_path = $ads_shared_dir;
-					if( isset($Blog) )
-					{	// (for now) Let's make shared files appear as being part of the currently displayed blog:
-						$this->ads_url = $Blog->get_local_media_url().'shared/global/';
+					if( isset( $Blog ) && ! is_admin_page() )
+					{	// (for now) Let's make shared files appear as being part of the currently displayed collection:
+						$this->ads_url = $Blog->get_local_media_url().$rds_shared_subdir;
 					}
 					else
-					{
-						$this->ads_url = $media_url.'shared/global/';
+					{	// If back-office or current collection is not defined:
+						$this->ads_url = $media_url.$rds_shared_subdir;
 					}
 				}
 				return;
@@ -150,7 +150,7 @@ class FileRoot
 				{ // Skins root is disabled:
 					$Debuglog->add( 'Attempt to access skins dir, but this feature is globally disabled', 'files' );
 				}
-				elseif( empty( $current_User ) || ( ! $current_User->check_perm( 'templates' ) ) )
+				elseif( empty( $current_User ) || ( ! $current_User->check_perm( 'skins_root', 'view' ) ) )
 				{ // No perm to access templates:
 					$Debuglog->add( 'Attempt to access skins dir, but no permission', 'files' );
 				}
@@ -159,12 +159,12 @@ class FileRoot
 					global $skins_path, $skins_url;
 					$this->name = T_('Skins');
 					$this->ads_path = $skins_path;
-					if( isset($Blog) )
-					{ // (for now) Let's make skin files appear as being part of the currently displayed blog:
+					if( isset( $Blog ) && ! is_admin_page() )
+					{	// (for now) Let's make skin files appear as being part of the currently displayed collection:
 						$this->ads_url = $Blog->get_local_skins_url();
 					}
 					else
-					{
+					{	// If back-office or current collection is not defined:
 						$this->ads_url = $skins_url;
 					}
 				}
@@ -258,6 +258,26 @@ class FileRoot
 		debug_die( "Invalid root type" );
 	}
 
+
+	/**
+	 * Check if this file root contains a file/folder with given relative path
+	 *
+	 * @param string Subpath for file/folder, relative the associated root, including trailing slash (if directory)
+	 * @return boolean
+	 */
+	function contains( $rel_path )
+	{
+		// Convert a path from "/dir1/dir2/../dir3/file.txt" to "/dir1/dir3/file.txt":
+		$real_abs_path = get_canonical_path( $this->ads_path.$rel_path );
+
+		// Check if the given file/folder is realy contained in this root:
+		if( ! empty( $real_abs_path ) && strpos( $real_abs_path, $this->ads_path ) !== 0 )
+		{	// Deny access from another file root:
+			debug_die( 'Denied access to files from another root!' );
+		}
+
+		return true;
+	}
 }
 
 ?>

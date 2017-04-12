@@ -297,25 +297,6 @@ function skin_init( $disp )
 			// Save global $Item to $download_Item, because $Item can be rewritten by function get_featured_Item() in some skins
 			$GLOBALS['download_Item'] = & $Item;
 
-			// Initialize JavaScript to download file after X seconds
-			add_js_headline( '
-jQuery( document ).ready( function ()
-{
-	jQuery( "#download_timer_js" ).show();
-} );
-
-var b2evo_download_timer = '.intval( $Blog->get_setting( 'download_delay' ) ).';
-var downloadInterval = setInterval( function()
-{
-	jQuery( "#download_timer" ).html( b2evo_download_timer );
-	if( b2evo_download_timer == 0 )
-	{ // Stop timer and download a file
-		clearInterval( downloadInterval );
-		jQuery( "#download_help_url" ).show();
-	}
-	b2evo_download_timer--;
-}, 1000 );' );
-
 			// Use meta tag to download file when JavaScript is NOT enabled
 			add_headline( '<meta http-equiv="refresh" content="'.intval( $Blog->get_setting( 'download_delay' ) )
 				.'; url='.$download_Link->get_download_url( array( 'type' => 'action' ) ).'" />' );
@@ -347,7 +328,7 @@ var downloadInterval = setInterval( function()
 						$robots_index = false;
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
+				elseif( array_diff( $active_filters, array( 'cat_single', 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
 				{ // This is a category page
 					$disp_detail = 'posts-cat';
 					$seo_page_type = 'Category page';
@@ -364,7 +345,7 @@ var downloadInterval = setInterval( function()
 						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
 
 						// echo 'SINGLE CAT PAGE';
-						// fp> add this?: $disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
+						$disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
 
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
@@ -1128,7 +1109,7 @@ var downloadInterval = setInterval( function()
 				}
 
 				// User is already logged in, redirect to "redirect_to" page
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				$redirect_to = param( 'redirect_to', 'url', NULL );
 				if( empty( $redirect_to ) )
 				{ // If empty redirect to referer page
@@ -1161,7 +1142,7 @@ var downloadInterval = setInterval( function()
 		case 'register':
 			if( is_logged_in() )
 			{ // If user is logged in the register form should not be displayed. In this case redirect to the blog home page.
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
@@ -1181,7 +1162,7 @@ var downloadInterval = setInterval( function()
 		case 'lostpassword':
 			if( is_logged_in() )
 			{ // If user is logged in the lost password form should not be displayed. In this case redirect to the blog home page.
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
@@ -1698,7 +1679,7 @@ function skin_include( $template_name, $params = array() )
 	// Globals that may be needed by the template:
 	global $Collection, $Blog, $MainList, $Item;
 	global $Plugins, $Skin;
-	global $current_User, $Hit, $Session, $Settings;
+	global $current_User, $Hit, $Session, $Settings, $debug;
 	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
@@ -1849,7 +1830,7 @@ function skin_include( $template_name, $params = array() )
 	}
 	else
 	{	// We may wrap with a <div>:
-		$display_includes = $Session->get( 'display_includes_'.$Blog->ID ) == 1;
+		$display_includes = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_includes_'.$Blog->ID ) );
 	}
 	if( $display_includes )
 	{ // Wrap the include with a visible div:
@@ -1983,7 +1964,7 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	}
 
 	// Globals that may be needed by the template:
-	global $current_User, $Hit, $Session, $Settings;
+	global $current_User, $Hit, $Session, $Settings, $debug;
 	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
@@ -2020,7 +2001,7 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	}
 	elseif( isset( $Session ) )
 	{	// We may wrap with a <div>:
-		$display_includes = $Session->get( 'display_includes_'.( empty( $Blog ) ? 0 : $Blog->ID ) ) == 1;
+		$display_includes = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_includes_'.( empty( $Blog ) ? 0 : $Blog->ID ) ) );
 	}
 	else
 	{	// Request without defined $Session, Don't display the includes:
@@ -2113,7 +2094,7 @@ function skin_description_tag()
 			$r = $Blog->get( 'shortdesc' );
 		}
 	}
-	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-subcat' )
+	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
 	{
 		if( $Blog->get_setting( 'categories_meta_description' ) && ( ! empty( $Chapter ) ) )
 		{
@@ -2212,7 +2193,9 @@ function skin_opengraph_tags()
 		}
 
 		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
+				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has no linked files
 			while( $Link = & $LinkList->get_next() )
 			{
@@ -2275,7 +2258,9 @@ function skin_twitter_tags()
 		}
 
 		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser', 'image', array( 'sql_order_by' => 'link_position ASC' ) ) )
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
+				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has no linked files
 			while( $Link = & $LinkList->get_next() )
 			{
@@ -2297,6 +2282,19 @@ function skin_twitter_tags()
 				{ // Use only image files for og:image tag
 					$twitter_image = $File->get_url();
 					break;
+				}
+			}
+		}
+
+		// Get author's Twitter username
+		if( $creator_User = & $Item->get_creator_User() )
+		{
+			if( $twitter_links = $creator_User->userfield_values_by_code( 'twitter' ) )
+			{
+				preg_match( '/https?:\/\/(www\.)?twitter\.com\/(#!\/)?@?([^\/\?]*)/', $twitter_links[0], $matches );
+				if( isset( $matches[3] ) )
+				{
+					echo '<meta property="twitter:creator" content="@'.$matches[3].'" />'."\n";
 				}
 			}
 		}
@@ -2558,7 +2556,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
-		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin.').'</div>';
+		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin').'.</div>';
 	}
 	else
 	{
@@ -2666,7 +2664,7 @@ function skin_body_attrs( $params = array() )
 	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User;
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
-	global $Session;
+	global $Session, $debug;
 
 	$classes = array();
 
@@ -2720,7 +2718,7 @@ function skin_body_attrs( $params = array() )
 	$classes[] = 'usergroup_'.( ! is_logged_in() && empty( $current_User->grp_ID ) ? 'none' : $current_User->grp_ID );
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
-	if ( ! empty($Blog) )
+	if( ( $debug == 2 || is_logged_in() ) && ! empty( $Blog ) )
 	{
 		if( $Session->get( 'display_includes_'.$Blog->ID ) )
 		{

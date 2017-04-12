@@ -67,6 +67,13 @@ class Item extends ItemLight
 	 */
 	var $last_touched_ts;
 
+	/**
+	 * Date when contents were updated for this Item last time (timestamp)
+	 * @see Item::update_last_touched_date()
+	 * @var integer
+	 */
+	var $contents_last_updated_ts;
+
 
 	/**
 	 * The latest Comment on this Item (lazy-filled).
@@ -710,7 +717,7 @@ class Item extends ItemLight
 
 				if( $editing || $this->dateset == 1 )
 				{ // We can use user date:
-					if( param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true )
+					if( param_date( 'item_issue_date', sprintf( T_('Please enter a valid issue date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), true )
 						&& param_time( 'item_issue_time' ) )
 					{ // only set it, if a (valid) date and time was given:
 						$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
@@ -724,7 +731,8 @@ class Item extends ItemLight
 		}
 
 		// SLUG:
-		if( param( 'post_urltitle', 'string', NULL ) !== NULL ) {
+		if( param( 'post_urltitle', 'string', NULL ) !== NULL )
+		{
 			$this->set_from_Request( 'urltitle' );
 		}
 
@@ -1043,6 +1051,73 @@ class Item extends ItemLight
 		}
 
 		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * Link attachments from temporary object to new created Item
+	 */
+	function link_from_Request()
+	{
+		global $DB;
+
+		if( $this->ID == 0 )
+		{	// The item must be stored in DB:
+			return;
+		}
+
+		$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+
+		$TemporaryIDCache = & get_TemporaryIDCache();
+		if( ! ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $temp_link_owner_ID, false, false ) ) )
+		{	// No temporary object of attachments:
+			return;
+		}
+
+		if( $TemporaryID->type != 'item' )
+		{	// Wrong temporary object:
+			return;
+		}
+
+		// Load all links:
+		$LinkOwner = new LinkItem( new Item(), $TemporaryID->ID );
+		$LinkOwner->load_Links();
+
+		if( empty( $LinkOwner->Links ) )
+		{	// No links:
+			return;
+		}
+
+		// Change link owner from temporary to message object:
+		$DB->query( 'UPDATE T_links
+			  SET link_itm_ID = '.$this->ID.',
+			      link_tmp_ID = NULL
+			WHERE link_tmp_ID = '.$TemporaryID->ID );
+
+		// Move all temporary files to folder of new created message:
+		foreach( $LinkOwner->Links as $item_Link )
+		{
+			if( $item_File = & $item_Link->get_File() &&
+			    $item_FileRoot = & $item_File->get_FileRoot() )
+			{
+				if( ! file_exists( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
+				{	// Create if folder doesn't exist for files of new created message:
+					if( mkdir_r( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
+					{
+						$tmp_folder_path = $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/';
+					}
+				}
+				$item_File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, 'quick-uploads/p'.$this->ID.'/'.$item_File->get_name() );
+			}
+		}
+
+		if( isset( $tmp_folder_path ) && file_exists( $tmp_folder_path ) )
+		{	// Remove temp folder from disk completely:
+			rmdir_r( $tmp_folder_path );
+		}
+
+		// Delete temporary object from DB:
+		$TemporaryID->dbdelete();
 	}
 
 
@@ -1485,7 +1560,7 @@ class Item extends ItemLight
 	 */
 	function check_and_clear_inline_files( $content )
 	{
-		preg_match_all( '/\[(image|file):(\d+):?[^\]]*\]/i', $content, $inline_images );
+		preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+):?[^\]]*\]/i', $content, $inline_images );
 
 		if( empty( $inline_images[1] ) )
 		{ // There are no inline image placeholders in the post content
@@ -2138,13 +2213,21 @@ class Item extends ItemLight
 
 		$content_parts = $this->get_content_parts( $params );
 
-		// Output everything after [teaserbreak]
-		array_shift($content_parts);
-		$output = implode('', $content_parts);
+		// Output everything after [teaserbreak]:
+		array_shift( $content_parts );
+		$output = implode( '', $content_parts );
 
 		// Render inline file tags like [image:123:caption] or [file:123:caption] :
 		$params['check_code_block'] = true;
+
+		// Render inline file tags like [image:123:caption] or [file:123:caption] :
 		$output = render_inline_files( $output, $this, $params );
+
+		// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
+		$output = $this->render_custom_fields( $output, $params );
+
+		// Render Parent Data [parent], [parent:fields] and etc.:
+		$output = $this->render_parent_data( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2439,7 +2522,7 @@ class Item extends ItemLight
 	function render_parent_data( $content, $params = array() )
 	{
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
-		{	// Call $this->render_custom_fields() on everything outside code/pre:
+		{	// Call $this->render_parent_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
@@ -2599,6 +2682,11 @@ class Item extends ItemLight
 	 * Does the post have different content parts (teaser/extension, divided by "[teaserbreak]")?
 	 * This is also true for posts that have images with "aftermore" position.
 	 *
+	 * @todo fp> This is a heavy operation! We should probably store the presence of `[teaserbreak]` in a var so that future cals do not rexecute again.
+	 *           BUT first we need to know why we're interested in $params['disppage'], $params['format']  (or better said: in wgat case are we using different values for this?)
+	 *           ALSO we should probably store the position of [teaserbreak] for even better performance
+	 *           ALSO we may want to store that at UPDATE time, into the DB, so we have super fast access to it.
+	 *
 	 * @access public
 	 * @return boolean
 	 */
@@ -2610,13 +2698,26 @@ class Item extends ItemLight
 				'format'   => 'htmlbody',
 			), $params );
 
-		$content_page = $this->get_content_page( $params['disppage'], $params['format'] );
+		if( ! isset( $this->cache_has_content_parts ) )
+		{	// Initialize an array for cache results:
+			$this->cache_has_content_parts = array();
+		}
 
-		// Remove <code> and <pre> blocks from content to don't check [teaserbreak] there
-		$content_page = preg_replace( '~<(code|pre)[^>]*>.*?</\1>~is', '', $content_page );
+		if( ! isset( $this->cache_has_content_parts[ $params['disppage'].$params['format'] ] ) )
+		{	// Initialize result only first time and store in cache in order to don't execute a heavy operation twice:
+			$content_page = $this->get_content_page( $params['disppage'], $params['format'] );
 
-		return strpos( $content_page, '[teaserbreak]' ) !== false
-			|| $this->get_images( array( 'restrict_to_image_position' => 'aftermore' ) );
+			// Replace <code> and <pre> blocks from content because we're not interested in [teaserbreak] in there
+			$content_page = preg_replace( '~<(code|pre)[^>]*>.*?</\1>~is', '*', $content_page );
+
+			// Store result in cache for requested page and format:
+			$this->cache_has_content_parts[ $params['disppage'].$params['format'] ] =
+				   strpos( $content_page, '[teaserbreak]' ) !== false
+				|| $this->get_images( array( 'restrict_to_image_position' => 'aftermore' ) );
+		}
+
+		// Get a result from cache or from recently initialized var above:
+		return $this->cache_has_content_parts[ $params['disppage'].$params['format'] ];
 	}
 
 
@@ -2839,7 +2940,7 @@ class Item extends ItemLight
 		}
 		else
 		{	// Deprecated since v5, left for compatibility with old skins
-			$params['before']		= isset($args[0]) ? $args[0] : '<p class="evo_post_pagination">'.T_('Pages:').' ';
+			$params['before']		= isset($args[0]) ? $args[0] : '<p class="evo_post_pagination">'.T_('Pages').': ';
 			$params['after']		= isset($args[1]) ? $args[1] : '</p>';
 			$params['separator']	= isset($args[2]) ? $args[2] : ' ';
 			$params['single']		= isset($args[3]) ? $args[3] : '';
@@ -2869,7 +2970,7 @@ class Item extends ItemLight
 	function get_page_links( $params = array(), $format = 'htmlbody' )
 	{
 		$params = array_merge( array(
-					'before'       => '<p class="evo_post_pagination">'.T_('Pages:').' ',
+					'before'       => '<p class="evo_post_pagination">'.T_('Pages').': ',
 					'after'        => '</p>',
 					'separator'    => ' ',
 					'single'       => '',
@@ -3007,7 +3108,7 @@ class Item extends ItemLight
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : '';
 		}
 		else
-		{ // We're linking to the original image, let lighbox (or clone) quick in:
+		{ // We're linking to the original image, let lightbox (or clone) kick in:
 			$link_title =  ( empty( $params['image_link_title'] ) && !isset( $params['hide_image_link_title'] ) ) ? '#desc#' : $params['image_link_title'];	// This title will be used by lightbox (colorbox for instance)
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : 'lightbox[p'.$this->ID.']';	// Make one "gallery" per post.
 		}
@@ -3076,7 +3177,17 @@ class Item extends ItemLight
 				'sql_select_add' => $params['links_sql_select'],
 				'sql_order_by'   => $params['links_sql_orderby']
 			);
-		$LinkOwner = new LinkItem( $this );
+
+		if( empty( $this->ID ) )
+		{	// Preview mode for new creating item:
+			$tmp_object_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+		}
+		else
+		{	// Normal mode for existing Item in DB:
+			$tmp_object_ID = NULL;
+		}
+
+		$LinkOwner = new LinkItem( $this, $tmp_object_ID );
 		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000, $params['restrict_to_image_position'], NULL, $links_params ) )
 		{
 			return '';
@@ -4037,7 +4148,7 @@ class Item extends ItemLight
 			if( $edit_comments_link == '#' )
 			{	// Use default link:
 				global $admin_url;
-				$edit_comments_link = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID.'#comments" title="'.T_('Moderate these feedbacks').'">'.get_icon( 'edit' ).' '.T_('Moderate...').'</a>';
+				$edit_comments_link = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID.'#comments" title="'.T_('Moderate these feedbacks').'">'.get_icon( 'edit' ).' '.T_('Moderate').'...</a>';
 			}
 		}
 		else
@@ -4735,7 +4846,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( $text == '#' ) $text = get_icon( 'deprecate', 'imgtag' ).' '.T_('Deprecate!');
+		if( $text == '#' ) $text = get_icon( 'deprecate', 'imgtag' ).' '.T_('Deprecate').'!';
 		if( $title == '#' ) $title = T_('Deprecate this post!');
 
 		if( !empty( $redirect_to ) )
@@ -5173,6 +5284,7 @@ class Item extends ItemLight
 				'podcast'       => '#',						// handle as podcast. # means depending on post type
 				'before_podplayer' => '<div class="podplayer">',
 				'after_podplayer'  => '</div>',
+				'link_class'     => ''
 			), $params );
 
 		if( $params['podcast'] == '#' )
@@ -5202,6 +5314,11 @@ class Item extends ItemLight
 			$r = $params['before'];
 
 			$r .= '<a href="'.str_replace( '$url$', $this->url, $params['url_template'] ).'"';
+
+			if( !empty( $params['link_class'] ) )
+			{
+				$r .= ' class="'.$params['link_class'].'"';
+			}
 
 			if( !empty( $params['target'] ) )
 			{
@@ -5588,6 +5705,7 @@ class Item extends ItemLight
 		}
 
 		$this->set_last_touched_ts();
+		$this->set_contents_last_updated_ts();
 
 		// Check which locale we can use for this item:
 		$item_Blog = & $this->get_Blog();
@@ -5601,6 +5719,9 @@ class Item extends ItemLight
 
 		if( $result = parent::dbinsert() )
 		{ // We could insert the item object..
+
+			// Link attachments from temporary object to new created Item:
+			$this->link_from_Request();
 
 			// Let's handle the extracats:
 			$result = $this->insert_update_extracats( 'insert' );
@@ -5697,6 +5818,7 @@ class Item extends ItemLight
 		global $DB, $localtimenow;
 
 		$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
+		$this->set_param( 'contents_last_updated_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
 
 		$DB->begin( 'SERIALIZABLE' );
 
@@ -5835,9 +5957,19 @@ class Item extends ItemLight
 			$db_changed = true;
 		}
 
-		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) && ( !isset( $dbchanges['last_touched_ts'] ) ) )
-		{ // Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure.
-			$this->set_last_touched_ts();
+		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) )
+		{
+			if( ! isset( $dbchanges['last_touched_ts'] ) )
+			{	// Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure:
+				$this->set_last_touched_ts();
+			}
+			if( ! isset( $dbchanges['contents_last_updated_ts'] ) &&
+			  ( isset( $dbchanges['post_title'] ) ||
+			    isset( $dbchanges['post_content'] ) ||
+			    isset( $dbchanges['post_url'] ) ) )
+			{	// If at least one of those fields has been updated then it means a content of this item has been updated:
+				$this->set_contents_last_updated_ts();
+			}
 		}
 
 		$parent_update = $this->dbupdate_worker( $auto_track_modification );
@@ -6702,20 +6834,69 @@ class Item extends ItemLight
 
 		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
-		$SQL = new SQL( 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
-		$SQL->SELECT( 'DISTINCT sub_user_ID' );
-		$SQL->FROM( 'T_subscriptions' );
-		$SQL->WHERE( 'sub_coll_ID = '.$this->get_blog_ID() );
-		$SQL->WHERE_and( 'sub_items <> 0' );
+		$sql = 'SELECT user_ID
+				FROM (
+					SELECT DISTINCT sub_user_ID AS user_ID
+					FROM T_subscriptions
+					WHERE sub_coll_ID = '.$this->get_blog_ID().'
+					AND sub_items <> 0
+
+					UNION
+
+					SELECT user_ID
+					FROM T_coll_settings AS opt
+					INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+					INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+					LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+					LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = user_ID )
+					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
+						AND opt.cset_name = "opt_out_subscription"
+						AND opt.cset_value = 1
+						AND NOT user_ID IS NULL
+						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+
+					UNION
+
+					SELECT sug_user_ID
+					FROM T_coll_settings AS opt
+					INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+					INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+					LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+					LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
+					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
+						AND opt.cset_name = "opt_out_subscription"
+						AND opt.cset_value = 1
+						AND NOT sug_user_ID IS NULL
+						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+
+					UNION
+
+					SELECT bloguser_user_ID
+					FROM T_coll_settings AS opt
+					INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+					INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+					LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
+					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
+						AND opt.cset_name = "opt_out_subscription"
+						AND opt.cset_value = 1
+						AND NOT bloguser_user_ID IS NULL
+						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+				) AS users
+				WHERE NOT user_ID IS NULL';
+
 		if( ! empty( $already_notified_user_IDs ) )
-		{	// Create condition to not select already notified moderator users:
-			$SQL->WHERE_and( 'sub_user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )' );
+		{
+			$sql .= ' AND user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )';
 		}
 		if( $executed_by_userid !== NULL )
-		{	// Don't notify the user who just created/updated this post:
-			$SQL->WHERE_and( 'sub_user_ID != '.$DB->quote( $executed_by_userid ) );
+		{
+			$sql .= ' AND user_ID != '.$DB->quote( $executed_by_userid );
 		}
-		$notify_users = $DB->get_col( $SQL->get(), 0, $SQL->title );
+
+		$notify_users = $DB->get_col( $sql, 0, 'Get users to be notified', 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
 
 		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
 		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
@@ -6941,7 +7122,7 @@ class Item extends ItemLight
 					$ping_messages[] = sprintf( T_('Pinging %s...'), $Plugin->ping_service_name );
 					$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
-					$r = $r && ( $Plugin->ItemSendPing( $params ) );
+					$r = $Plugin->ItemSendPing( $params ) && $r;
 
 					if( ! empty( $params['xmlrpcresp'] ) )
 					{
@@ -7423,17 +7604,18 @@ class Item extends ItemLight
 		global $DB, $localtimenow;
 
 		$this->load_Blog();
-		$comment_inskin_statuses = explode( ',', $this->Blog->get_setting( 'comment_inskin_statuses' ) );
 
-		// Count each published comments rating grouped by active/expired status and by rating value
-		$sql = 'SELECT comment_rating, count( comment_ID ) AS cnt,
-					IF( iset_value IS NULL OR iset_value = "" OR TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $localtimenow ) ).') < iset_value, "active", "expired" ) as expiry_status
-						FROM T_comments
-						LEFT JOIN T_items__item_settings ON iset_item_ID = comment_item_ID AND iset_name = "comment_expiry_delay"
-						WHERE comment_item_ID = '.$this->ID.' AND comment_status IN ("'.implode('","', $comment_inskin_statuses) .'")
-						GROUP BY expiry_status, comment_rating
-						ORDER BY comment_rating DESC';
-		$results = $DB->get_results( $sql );
+		// Count each published comments rating grouped by active/expired status and by rating value:
+		$SQL = new SQL( 'Count each published comments rating grouped by active/expired status and by rating value' );
+		$SQL->SELECT( 'comment_rating, count( comment_ID ) AS cnt,' );
+		$SQL->SELECT_add( 'IF( iset_value IS NULL OR iset_value = "" OR TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $localtimenow ) ).') < iset_value, "active", "expired" ) as expiry_status' );
+		$SQL->FROM( 'T_comments' );
+		$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON iset_item_ID = comment_item_ID AND iset_name = "comment_expiry_delay"' );
+		$SQL->WHERE( 'comment_item_ID = '.$this->ID );
+		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->Blog->ID, 'comment' ), 'comment_', $this->Blog->ID, 'blog_comment!' ) );
+		$SQL->GROUP_BY( 'expiry_status, comment_rating' );
+		$SQL->ORDER_BY( 'comment_rating DESC' );
+		$results = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 
 		// init rating arrays
 		$ratings = array();
@@ -7460,7 +7642,7 @@ class Item extends ItemLight
 		}
 
 		// Count active and overall rating values
-		foreach($results as $rating)
+		foreach( $results as $rating )
 		{
 			$index = ( $rating->comment_rating == 0 ) ? 'unrated' : $rating->comment_rating;
 			$ratings[$index] += $rating->cnt;
@@ -7787,25 +7969,41 @@ class Item extends ItemLight
 	}
 
 
+	/**
+	 * Set field last_touched_ts
+	 */
 	function set_last_touched_ts()
 	{
-		global $localtimenow, $current_User;
+		global $localtimenow;
 
 		if( is_logged_in() )
 		{
 			$this->load_content_read_status();
 		}
+
 		$this->set_param( 'last_touched_ts', 'date', date2mysql( $localtimenow ) );
 	}
 
 
 	/**
-	 * Update field last_touched_ts
+	 * Set field contents_last_updated_ts
+	 */
+	function set_contents_last_updated_ts()
+	{
+		global $localtimenow;
+
+		$this->set_param( 'contents_last_updated_ts', 'date', date2mysql( $localtimenow ) );
+	}
+
+
+	/**
+	 * Update field last_touched_ts and parent categories
 	 *
 	 * @param boolean Use transaction
-	 * @param boolean Use FALSE to update only the categories
+	 * @param boolean Use TRUE to update item field last_touched_ts
+	 * @param boolean Use TRUE to update item field contents_last_updated_ts
 	 */
-	function update_last_touched_date( $use_transaction = true, $update_item_date = true )
+	function update_last_touched_date( $use_transaction = true, $update_last_touched_ts = true, $update_contents_last_updated_ts = false )
 	{
 		if( $use_transaction )
 		{
@@ -7813,9 +8011,16 @@ class Item extends ItemLight
 			$DB->begin();
 		}
 
-		if( $update_item_date )
-		{
-			$this->set_last_touched_ts();
+		if( $update_last_touched_ts || $update_contents_last_updated_ts )
+		{	// If at least one date field should be updated
+			if( $update_last_touched_ts )
+			{	// Update field last_touched_ts:
+				$this->set_last_touched_ts();
+			}
+			if( $update_contents_last_updated_ts )
+			{	// Update field contents_last_updated_ts:
+				$this->set_contents_last_updated_ts();
+			}
 			$this->dbupdate( false, false, false );
 		}
 
@@ -7986,9 +8191,9 @@ class Item extends ItemLight
 		}
 
 		// In theory, it would be more safe to use this comparison:
-		// if( $read_date > $this->last_touched_ts )
+		// if( $read_date > $this->contents_last_updated_ts )
 		// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
-		if( $read_date >= $this->last_touched_ts )
+		if( $read_date >= $this->contents_last_updated_ts )
 		{	// This post was read by current user
 			return 'read';
 		}

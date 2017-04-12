@@ -27,7 +27,7 @@ echo '<p class="well">'.T_('User generated content containing keywords from the 
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 {
 	global $antispamsrv_tos_url;
-	echo '<br />'.sprintf( T_('You can share your keywords with and retrive keywords from the Central Antispam Blacklist service <a %s>Terms of service</a>'), 'href="'.$antispamsrv_tos_url.'"' );
+	echo '<br />'.sprintf( T_('You can share your keywords with and retrieve keywords from the Central Antispam Blacklist service <a %s>Terms of service</a>'), 'href="'.$antispamsrv_tos_url.'"' );
 }
 echo '</p>';
 

@@ -602,62 +602,74 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw', $cut_at_w
 function strmaxwords( $str, $maxwords = 50, $params = array() )
 {
 	$params = array_merge( array(
-			'continued_link' => '',
-			'continued_text' => '&hellip;',
+			'cutting_mark'    => '&hellip;',
+			'continued_link'  => '',
+			'continued_text'  => '&hellip;',
+			'continued_class' => '',
 			'always_continue' => false,
 		), $params );
-	$open = false;
+
+	// STATE MACHINE:
+	$in_tag = false;
 	$have_seen_non_whitespace = false;
-	$end = utf8_strlen( $str );
+	$end = strlen( $str );  // If we use utf8_strlen here(), we also need to access UTF chars below
 	for( $i = 0; $i < $end; $i++ )
 	{
-		switch( $char = $str[$i] )
+		switch( $char = $str[$i] )		// This is NOT UTF-8
 		{
 			case '<' :	// start of a tag
-				$open = true;
-				break;
-			case '>' : // end of a tag
-				$open = false;
+				$in_tag = true;
 				break;
 
-			case ctype_space($char):
-				if( ! $open )
-				{ // it's a word gap
-					// Eat any other whitespace.
+			case '>' : // end of a tag
+				$in_tag = false;
+				break;
+
+			case ctype_space($char): // This is a whitespace char...
+				if( ! $in_tag )
+				{	// it's a word gap:
+					// Eat any additional whitespace:
 					while( isset($str[$i+1]) && ctype_space($str[$i+1]) )
 					{
 						$i++;
 					}
 					if( isset($str[$i+1]) && $have_seen_non_whitespace )
-					{ // only decrement words, if there's a non-space char left.
+					{ // only decrement words, if there's been at least one non-space char before.
 						--$maxwords;
 					}
 				}
+				// ignore white space in a tag...
 				break;
 
 			default:
 				$have_seen_non_whitespace = true;
 				break;
 		}
-		if( $maxwords < 1 ) break;
+
+		if( $maxwords < 1 )
+		{	// We have reached the cutting point:
+			break;
+		} 
 	}
 
-	// restrict content to required number of words and balance the tags out
-	$str = balance_tags( utf8_substr( $str, 0, $i ) );
+	if( $maxwords < 1 )
+	{	// Cutting is necessary:
+		// restrict content to required number of words:
+		$str = utf8_substr( $str, 0, $i );
 
-	if( $params['always_continue'] || $maxwords == false )
+		// Add a cutting mark:
+		$str .= $params['cutting_mark'];
+
+		// balance the tags out:
+		$str = balance_tags( $str );
+		// remove empty tags:
+		$str = preg_replace( '~<([\s]+?)[^>]*?></\1>~is', '', $str );
+	}
+
+	if( $params['always_continue'] || $maxwords < 1 )
 	{ // we want a continued text
-		if( $params['continued_link'] )
-		{ // we have a url
-			$str .= ' <a href="'.$params['continued_link'].'">'.$params['continued_text'].'</a>';
-		}
-		else
-		{ // we don't have a url
-			$str .= ' '.$params['continued_text'];
-		}
+		$str .= ' <a href="'.$params['continued_link'].'" class="'.$params['continued_class'].'">'.$params['continued_text'].'</a>';
 	}
-	// remove empty tags
-	$str = preg_replace( '~<([\s]+?)[^>]*?></\1>~is', '', $str );
 
 	return $str;
 }
@@ -964,7 +976,7 @@ function preg_match_outcode_callback( $content, $search, & $matches )
  * @param array|string Replace list or Callback function
  * @param string Source content
  * @param string Callback function name
- * @param string Type of callback function: 'preg' -> preg_replace(), 'str' -> str_replace() (@see replace_content())
+ * @param string Type of callback function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace() (@see replace_content())
  * @return string Replaced content
  */
 function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
@@ -993,7 +1005,7 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
  * @param string Source content
  * @param array|string Search list
  * @param array|string Replace list
- * @param string Type of function: 'preg' -> preg_replace(), 'str' -> str_replace()
+ * @param string Type of function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace()
  * @param string The maximum possible replacements for each pattern in each subject string. Defaults to -1 (no limit).
  * @return string Replaced content
  */
@@ -1029,6 +1041,9 @@ function replace_content( $content, $search, $replace, $type = 'preg', $limit = 
 				}
 				return $content;
 			}
+
+		case 'preg_callback':
+			return preg_replace_callback( $search, $replace, $content, $limit );
 
 		default: // 'preg'
 			return preg_replace( $search, $replace, $content, $limit );
@@ -5811,6 +5826,7 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 		foreach( $methods as $method => $param_list )
 		{	// loop through each requested method
 			$params = array();
+			$internal_scripts = array();
 			if( !is_array( $param_list ) )
 			{	// lets make it an array
 				$param_list = array( $param_list );
@@ -5822,13 +5838,24 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 					$param = json_encode( $param );
 				}
 				elseif( !is_numeric( $param ) )
-				{	// this is a string, quote it:
+				{	// This is a string
+					if( preg_match_all( '#<script[^>]*>(.+?)</script>#is', $param, $match_scripts ) )
+					{	// Extract internal scripts from content:
+						$param = preg_replace( '#<script[^>]*>(.+?)</script>#is', '', $param );
+						$internal_scripts = array_merge( $internal_scripts, $match_scripts[1] );
+					}
+					// Quote the string to javascript format:
 					$param = '\''.format_to_js( $param ).'\'';
 				}
 				$params[] = $param;// add param to the list
 			}
-			// add method and parameters
+			// Add method and parameters:
 			$output .= $target.$method.'('.implode( ',', $params ).');'."\n";
+			// Append all internal scripts from content on order to execute this properly:
+			foreach( $internal_scripts as $internal_script )
+			{
+				$output .= "\n// Internal script from {$target}{$method}():\n".$internal_script;
+			}
 		}
 	}
 
@@ -5896,17 +5923,18 @@ function format_to_js( $unformatted )
 function get_available_sort_options()
 {
 	return array(
-		'datestart'       => T_('Date issued (Default)'),
-		'order'           => T_('Order (as explicitly specified)'),
-		//'datedeadline' => T_('Deadline'),
-		'title'           => T_('Title'),
-		'datecreated'     => T_('Date created'),
-		'datemodified'    => T_('Date last modified'),
-		'last_touched_ts' => T_('Date last touched'),
-		'urltitle'        => T_('URL "filename"'),
-		'priority'        => T_('Priority'),
-		'numviews'        => T_('Number of members who have viewed the post (If tracking enabled)'),
-		'RAND'            => T_('Random order!'),
+		'datestart'                => T_('Date issued (Default)'),
+		'order'                    => T_('Order (as explicitly specified)'),
+		//'datedeadline'           => T_('Deadline'),
+		'title'                    => T_('Title'),
+		'datecreated'              => T_('Date created'),
+		'datemodified'             => T_('Date last modified'),
+		'last_touched_ts'          => T_('Date last touched'),
+		'contents_last_updated_ts' => T_('Contents last updated'),
+		'urltitle'                 => T_('URL "filename"'),
+		'priority'                 => T_('Priority'),
+		'numviews'                 => T_('Number of members who have viewed the post (If tracking enabled)'),
+		'RAND'                     => T_('Random order!'),
 	);
 }
 
@@ -6389,7 +6417,7 @@ function get_htsrv_url( $force_https = false )
 	}
 	else
 	{	// For current collection:
-		return $Blog->get_htsrv_url( $force_https );
+		return $Blog->get_local_htsrv_url( NULL, $force_https );
 	}
 }
 
@@ -7014,6 +7042,22 @@ if( !function_exists( 'array_walk_recursive' ) )
 
 
 /**
+ * Provide hex2bin for older versions of PHP (< 5.4)
+ *
+ * Decodes a hexadecimally encoded binary string
+ * @param string Hexadecimal representation of data
+ * @return string The binary representation of the given data or FALSE on failure
+ */
+if( !function_exists( 'hex2bin' ) )
+{
+	function hex2bin( $hex )
+	{
+		return pack( 'H*', $hex );
+	}
+}
+
+
+/**
  * Save text data to file, create target file if it doesn't exist
  *
  * @param string data to be written
@@ -7409,6 +7453,12 @@ jQuery( document ).ready( function()
 		tooltip    : '<?php echo $params['tooltip']; ?>',
 		event      : 'click',
 		onblur     : '<?php echo $onblur_action; ?>',
+		onedit     : function ( settings, original )
+		{
+			// Set width to fix value to don't change it on selector displaying:
+			var wrapper_width = jQuery( original ).width();
+			jQuery( original ).css( { 'width': wrapper_width, 'max-width': wrapper_width } );
+		},
 		callback   : function ( settings, original )
 		{
 			<?php
@@ -7434,7 +7484,6 @@ jQuery( document ).ready( function()
 			echo $params['callback_code'];
 			?>
 		},
-		onsubmit: function( settings, original ) {},
 		submitdata : function( value, settings )
 		{
 			return { <?php echo $params['ID_name']; ?>: <?php echo $params['ID_value']; ?> }
@@ -8150,10 +8199,13 @@ function render_inline_files( $content, $Object, $params = array() )
 	{	// There are inline tags in the content...
 
 		$rendered_tags = render_inline_tags( $Object, $inlines[0], $params );
-		foreach( $rendered_tags as $current_link_tag => $rendered_link_tag )
-		{
-			$content = str_replace( $current_link_tag, $rendered_link_tag, $content );
-		}
+		if( $rendered_tags )
+		{	// Do replacing if the object really contains inline attached tags:
+			foreach( $rendered_tags as $current_link_tag => $rendered_link_tag )
+			{
+				$content = str_replace( $current_link_tag, $rendered_link_tag, $content );
+			}
+		}	
 	}
 
 	return $content;
@@ -8201,7 +8253,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		switch( $object_class )
 		{
 			case 'Item':
-				$LinkOwner = new LinkItem( $Object );
+				$LinkOwner = new LinkItem( $Object, $temp_link_owner_ID );
 				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
 				$render_plugin_event_name = 'RenderItemAttachment';
 				break;

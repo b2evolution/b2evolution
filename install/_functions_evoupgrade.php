@@ -7795,7 +7795,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12070, 'Create table for temporary ID...' ) )
+	if( upg_task_start( 12070, 'Create table for temporary IDs...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_temporary_ID', '
 			tmp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -8088,17 +8088,340 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12140, 'Updating file types table...' ) )
+	{	// part of 6.7.10-stable moved here so it also applies to 6.8.3 -> 6.8.4 upgrades
+		$DB->query( 'UPDATE T_filetypes
+				SET ftyp_allowed = "admin"
+			WHERE ftyp_extensions REGEXP "[[:<:]]swf[[:>:]]"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12145, 'Upgrade Temporary IDs table...' ) )
+	{	// part of 6.8.4-stable
+		$DB->query( 'ALTER TABLE T_temporary_ID
+			ADD tmp_coll_ID INT(11) UNSIGNED NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12150, 'Upgrade categories table...' ) )
+	{	// part of 6.8.4-alpha
+		db_add_col( 'T_categories', 'cat_image_file_ID', 'int(10) unsigned  NULL AFTER cat_blog_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12155, 'Renaming notification logo setting...' ) )
+	{ // part of 6.8.5-stable
+		$notification_logo = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "notification_logo"' );
+		if( !empty( $notification_logo ) )
+		{
+			if( is_numeric( $notification_logo ) )
+			{ // We have a numeric value, it's possible that this is already a file_ID.
+			  // Make sure that the integer is a valid file ID and an image file before setting it as the notification_logo_file_ID.
+				$notification_logo = intval( $notification_logo );
+				$file_type = $DB->get_var( 'SELECT file_type FROM T_files WHERE file_ID = '.$notification_logo );
+				if( $file_type && $file_type == 'image' )
+				{
+					$DB->query( 'INSERT INTO T_settings ( set_name, set_value ) VALUES ( "notification_logo_file_ID", '.$notification_logo.' )' );
+				}
+			}
+
+			// Remove previous notification logo setting
+			$DB->query( 'DELETE FROM T_settings WHERE set_name = "notification_logo"' );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12160, 'Renaming user setting...' ) )
+	{	// part of 6.8.6-stable
+		$DB->query( 'UPDATE T_users__usersettings
+			  SET uset_name = "user_registered_from_domain"
+			WHERE uset_name = "user_domain"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12161, 'Updating attachment positions...' ) )
+	{	// part of 6.8.7-stable
+		$DB->query( 'UPDATE T_links
+			INNER JOIN T_files ON file_ID = link_file_ID
+			       AND file_type NOT IN ( "image", "audio", "video" )
+			  SET link_position = "attachment"
+			WHERE link_position = "aftermore"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12165, 'Upgrade table of users...' ) )
+	{	// part of 6.9.0-beta
+		db_add_col( 'T_users', 'user_pass_driver', 'VARCHAR(16) NOT NULL default "evo$md5" AFTER user_salt' );
+		$DB->query( 'UPDATE T_users
+			  SET user_pass_driver = "evo$salted"
+			WHERE user_salt != ""' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12170, 'Updating users pass storage...' ) )
+	{	// part of 6.9.0-beta
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARBINARY(32)' );
+		$DB->query( 'UPDATE T_users SET user_pass = LOWER( HEX( user_pass ) )' );
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARCHAR(64) NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12175, 'Upgrade table of users...' ) )
+	{	// part of 6.9.0-beta
+		$DB->query( 'ALTER TABLE T_users
+			MODIFY user_salt VARCHAR(32) NOT NULL default ""' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12180, 'Updating base domains table...' ) )
+	{ // part of 6.9.0-beta
+		$sql = 'SHOW INDEX FROM T_basedomains WHERE KEY_NAME = "dom_type_name"';
+		$indexes = $DB->get_results( $sql, ARRAY_A );
+		if( $DB->num_rows > 0 )
+		{
+			$DB->query( 'ALTER TABLE T_basedomains DROP INDEX dom_type_name' );
+		}
+
+		// update user email domains IDs that will deleted to use related domain IDs that will be retained
+		$DB->query( 'UPDATE T_users a
+				LEFT JOIN (
+					SELECT a.dom_ID, b.dom_ID AS subst_dom_ID
+					FROM T_basedomains a
+					LEFT JOIN T_basedomains b
+						ON a.dom_name = b.dom_name
+							AND ( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
+					WHERE NOT b.dom_ID IS NULL
+				) c
+					ON c.dom_ID = a.user_email_dom_ID
+				SET a.user_email_dom_ID = c.subst_dom_ID
+				WHERE
+					NOT c.dom_ID IS NULL' );
+
+		// update hitlist log
+		$DB->query( 'UPDATE T_hitlog a
+				LEFT JOIN (
+					SELECT a.dom_ID, b.dom_ID AS subst_dom_ID
+					FROM T_basedomains a
+					LEFT JOIN T_basedomains b
+						ON a.dom_name = b.dom_name
+							AND ( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
+					WHERE NOT b.dom_ID IS NULL
+				) c
+					ON c.dom_ID = a.hit_referer_dom_ID
+				SET a.hit_referer_dom_ID = c.subst_dom_ID
+				WHERE
+					NOT c.dom_ID IS NULL' );
+
+		// delete duplicate entries, order by status: blocked > suspect > unknown > trusted, keep the first one
+		$DB->query( 'DELETE a
+				FROM T_basedomains a
+				LEFT JOIN T_basedomains b
+					ON a.dom_name = b.dom_name
+						AND (
+							( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
+							OR ( a.dom_status = b.dom_status AND a.dom_ID > b.dom_ID )
+						)
+				WHERE NOT b.dom_ID IS NULL;' );
+
+		// Add index
+		$DB->query( 'ALTER TABLE T_basedomains ADD UNIQUE INDEX `dom_name` (`dom_name`)' );
+
+		// add comment to user_email_dom_ID
+		$DB->query( 'ALTER TABLE T_users MODIFY user_email_dom_ID int(10) unsigned NULL COMMENT "Used for email statistics"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12185, 'Upgrading posts table...' ) )
+	{	// part of 6.9.0-beta
+		db_add_col( 'T_items__item', 'post_contents_last_updated_ts', 'TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\' AFTER post_last_touched_ts' );
+		$DB->query( 'UPDATE T_items__item
+			SET post_contents_last_updated_ts = post_last_touched_ts' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12186, 'Updating attachment positions...' ) )
+	{	// part of 6.9.0-stable (This is a duplicated 12161 block from 6.8.7-stable)
+		$DB->query( 'UPDATE T_links
+			INNER JOIN T_files ON file_ID = link_file_ID
+			       AND file_type NOT IN ( "image", "audio", "video" )
+			  SET link_position = "attachment"
+			WHERE link_position = "aftermore"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12190, 'Upgrade skins table...' ) )
+	{	// part of 6.9.0-beta
+		$DB->query( 'ALTER TABLE T_skins__skin
+			MODIFY skin_type enum("normal","feed","sitemap","mobile","tablet","rwd") COLLATE ascii_general_ci NOT NULL default "normal"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12200, 'Updating group permissions...' ) )
+	{ // part of 6.9.0-beta
+		$DB->query( 'UPDATE T_groups__groupsettings
+			SET gset_name = "perm_skins_root",
+				gset_value = CASE gset_value WHEN "allowed" THEN "edit" ELSE "none" END
+			WHERE gset_name = "perm_templates"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12210, 'Create new widget container "Forum Front Secondary Area" for forums...' ) )
+	{ // part of 6.9.1-beta
+		$DB->begin();
+		$SQL = new SQL( 'Get all "forum" collections' );
+		$SQL->SELECT( 'blog_ID' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->WHERE( 'blog_type = "forum"' );
+		$forum_collections = $DB->get_col( $SQL->get() );
+
+		$item_tags_widget_rows = array();
+		foreach( $forum_collections as $coll_ID )
+		{	// Insert new widget "Collection Activity Stats" to each forum collection
+			$widget_order = 10;
+			$item_tags_widget_rows[] = '( '.$coll_ID.', "Forum Front Secondary Area", '.$widget_order.', "coll_activity_stats" )';
+			// Check and update not unique widget orders just to make sure:
+			$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+				FROM T_widget
+				WHERE wi_coll_ID = '.$coll_ID.'
+					AND wi_sco_name = "Forum Front Secondary Area"
+					AND wi_order = '.$widget_order );
+			if( $not_unique_widget_ID > 0 )
+			{	// The collection has no unique widget order, move all widgets with wi_order >= 10:
+				$DB->query( 'UPDATE T_widget
+						SET wi_order = wi_order + 1
+						WHERE wi_coll_ID ='.$coll_ID.'
+						AND wi_sco_name = "Forum Front Secondary Area"
+						AND wi_order >= '.$widget_order );
+			}
+		}
+		if( count( $item_tags_widget_rows ) )
+		{	// Insert new widgets "Item Tags" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_tags_widget_rows ) );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12220, 'Create new widget container "Item Page"...' ) )
+	{ // part of 6.9.1-beta
+		// Get all collections
+		$collections = $DB->get_col( 'SELECT blog_ID FROM T_blogs ORDER BY blog_ID ASC' );
+		$coll_widgets = array();
+
+		// Default widget for Item Page
+		$item_page_widgets = array(
+				'item_content' => 10,
+				'item_attachments' => 15,
+				'item_seen_by' => 50,
+				'item_vote' => 60
+			);
+
+		foreach( $collections as $collection_ID )
+		{
+			foreach( $item_page_widgets as $page_widget => $widget_order )
+			{
+				$coll_widgets[] = '( '.$collection_ID.', "Item Page", '.$widget_order.', "'.$page_widget.'" )';
+			}
+		}
+
+		if( count( $coll_widgets ) )
+		{	// Insert new widgets into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $coll_widgets ) );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12230, 'Update menu link widget...' ) )
+	{	// part of 6.9.1-beta
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "basic_menu_link"
+			WHERE wi_code = "menu_link"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12240, 'Create new widget "Item Link"...' ) )
+	{ // part of 6.9.1-beta
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_order, wi_enabled, wi_code, wi_params, blog_type' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON blog_id = wi_coll_ID' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$collections = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+
+		$item_single_rows = array();
+		foreach( $collections as $collection )
+		{	// Insert new widget "Collection Activity Stats" to each forum collection
+			if( ! isset( $item_single_rows[$collection['wi_coll_ID']] ) )
+			{
+				$item_single_rows[$collection['wi_coll_ID']] = 15; // default item_attachments widget order
+			}
+
+			if( in_array( $collection['wi_code'], array( 'item_content', 'item_attachments' ) ) )
+			{
+				$item_single_rows[$collection['wi_coll_ID']] = $collection['wi_order'] + 1;
+			}
+		}
+
+		$item_link_widget_rows = array();
+		foreach( $item_single_rows as $coll_ID => $wi_order )
+		{
+			$item_link_widget_rows[] = '( '.$coll_ID.', "Item Single", '.$wi_order.', "item_link" )';
+			// Check and update not unique widget orders just to make sure:
+			$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+				FROM T_widget
+				WHERE wi_coll_ID = '.$coll_ID.'
+					AND wi_sco_name = "Item Single"
+					AND wi_order = '.$wi_order );
+
+			if( $not_unique_widget_ID > 0 )
+			{	// The collection has no unique widget order, move all widget order >= to current order:
+				$DB->query( 'UPDATE T_widget
+						SET wi_order = wi_order + 1
+						WHERE wi_coll_ID = '.$coll_ID.'
+						AND wi_sco_name = "Item Single"
+						AND wi_order >= '.$wi_order.'
+						ORDER BY wi_order DESC');
+			}
+		}
+
+		if( count( $item_link_widget_rows ) )
+		{	// Insert new widgets "Item Link" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_link_widget_rows ) );
+		}
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12250, 'Upgrading table of post type custom fields...' ) )
+	{	// part of 6.9.1-beta
+		db_add_col( 'T_items__type_custom_field', 'itcf_note', 'VARCHAR(255) NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12260, 'Upgrading table for a latest versions of the PO files...' ) )
+	{
+		db_add_index( 'T_i18n_translated_string', 'itst_iost_ID_locale', 'itst_iost_ID, itst_locale' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
 	 * YOU MUST USE:
-	 * task_begin( 'Descriptive text about action...' );
-	 * task_end();
+	 * if( upg_task_start( 12160, 'Descriptive text about action...' ) )
+	 * {	// part of 6.8.6-stable
+	 *  	// Write new upgrade code here.
+	 *  	upg_task_end();
+	 * }
 	 *
 	 * ALL DB CHANGES MUST BE EXPLICITLY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
 	 * Schema updates do not survive after several incremental changes.
 	 *
-	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100).
+	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 10).
 	 */
 
 	// Execute general upgrade tasks.

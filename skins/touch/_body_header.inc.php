@@ -72,7 +72,7 @@ global $dummy_fields;
 					) );
 				// ----------------------------- END OF "Tools Menu" CONTAINER -----------------------------
 			?>
-	
+
 			<?php
 				// --------------------------------- START OF BLOG LIST --------------------------------
 				// Call widget directly (without container):
@@ -133,12 +133,12 @@ global $dummy_fields;
 </div>
 
 <!-- #start The Search Overlay -->
-<div id="wptouch-search"> 
+<div id="wptouch-search">
 	<div id="wptouch-search-inner">
 		<form method="get" id="searchform" action="<?php echo $Blog->gen_blogurl(); ?>">
 			<input type="hidden" name="disp" value="search" />
-			<input type="text" placeholder="<?php echo T_( 'Search...' ); ?>" name="s" id="search-input" /> 
-			<input name="submit" type="submit" tabindex="1" id="search-submit" placeholder="<?php echo T_( 'Search...' ); ?>"  />
+			<input type="text" placeholder="<?php echo T_('Search').'...'; ?>" name="s" id="search-input" />
+			<input name="submit" type="submit" tabindex="1" id="search-submit" placeholder="<?php echo T_('Search').'...'; ?>"  />
 			<a href="javascript:return false;"><img class="head-close" src="<?php echo $Skin->get_url(); ?>img/head-close.png" alt="close" /></a>
 		</form>
 	</div>

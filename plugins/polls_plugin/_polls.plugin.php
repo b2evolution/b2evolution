@@ -282,12 +282,12 @@ class polls_plugin extends Plugin
 		//<![CDATA[
 		function polls_toolbar( title, prefix )
 		{
-			var r = '<?php echo $this->get_template( 'toolbar_title_before' );?>'	+ title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
-					+ '<?php echo $this->get_template( 'toolbar_group_before' );?>'
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>'	+ title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+					+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>'
 					+ '<input type="button" title="<?php echo TS_('Insert a Poll');?>"'
 					+ ' class="<?php echo $this->get_template( 'toolbar_button_class' );?>"'
 					+ ' data-func="polls_load_window|' + prefix + '" value="<?php echo TS_('Insert a Poll');?>" />'
-					+ '<?php echo $this->get_template( 'toolbar_group_after' );?>';
+					+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
 			jQuery( '.' + prefix + '<?php echo $this->code;?>_toolbar' ).html( r );
 		}
@@ -392,7 +392,7 @@ class polls_plugin extends Plugin
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
 		?>
-		<script type="text/javascript">polls_toolbar( '<?php echo TS_('Polls:');?>', '<?php echo $params['js_prefix']; ?>' );</script>
+		<script type="text/javascript">polls_toolbar( '<?php echo TS_('Polls').':';?>', '<?php echo $params['js_prefix']; ?>' );</script>
 		<?php
 
 		return true;

@@ -28,7 +28,7 @@ if( ! $creating )
 {
 	$Form->global_icon( T_('Delete this goal category!'), 'delete', regenerate_url( 'action', 'action=cat_delete&amp;'.url_crumb( 'goalcat' ) ) );
 }
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,gcat_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,gcat_ID' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New goal category') : T_('Goal category') );
 

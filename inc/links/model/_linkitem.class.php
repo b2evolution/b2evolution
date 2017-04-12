@@ -27,11 +27,14 @@ class LinkItem extends LinkOwner
 
 	/**
 	 * Constructor
+	 *
+	 * @param object Item
+	 * @param integer ID of temporary object from table T_temporary_ID (used for uploads on new items)
 	 */
-	function __construct( $Item )
+	function __construct( $Item, $tmp_ID = NULL )
 	{
 		// call parent contsructor
-		parent::__construct( $Item, 'item', 'itm_ID' );
+		parent::__construct( $Item, 'item', 'itm_ID', $tmp_ID );
 		$this->Item = & $this->link_Object;
 
 		$this->_trans = array(
@@ -56,7 +59,15 @@ class LinkItem extends LinkOwner
 	function check_perm( $permlevel, $assert = false )
 	{
 		global $current_User;
-		return $current_User->check_perm( 'item_post!CURSTATUS', $permlevel, $assert, $this->Item );
+
+		if( $this->is_temp() )
+		{	// Check permission for new creating item:
+			return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->link_Object->tmp_coll_ID );
+		}
+		else
+		{	// Check permission for existing item in DB:
+			return $current_User->check_perm( 'item_post!CURSTATUS', $permlevel, $assert, $this->Item );
+		}
 	}
 
 	/**
@@ -129,9 +140,13 @@ class LinkItem extends LinkOwner
 				return 'teaser';
 			}
 		}
-		else
-		{ // If file is not image then always use "aftermore"
+		elseif( $File->is_video() || $File->is_audio() )
+		{	// If file is video or audio then always use "aftermore":
 			return 'aftermore';
+		}
+		else
+		{	// All other file types must use "attachment" position by default:
+			return 'attachment';
 		}
 	}
 
@@ -143,7 +158,14 @@ class LinkItem extends LinkOwner
 		if( is_null( $this->Links ) )
 		{ // Links have not been loaded yet:
 			$LinkCache = & get_LinkCache();
-			$this->Links = $LinkCache->get_by_item_ID( $this->Item->ID );
+			if( $this->is_temp() )
+			{
+				$this->Links = $LinkCache->get_by_temporary_ID( $this->get_ID() );
+			}
+			else
+			{
+				$this->Links = $LinkCache->get_by_item_ID( $this->Item->ID );
+			}
 		}
 	}
 
@@ -170,18 +192,21 @@ class LinkItem extends LinkOwner
 		$edited_Link->set( 'order', $order );
 		if( $edited_Link->dbinsert() )
 		{
-			// New link was added to the item, invalidate blog's media BlockCache
-			BlockCache::invalidate_key( 'media_coll_ID', $this->Item->get_blog_ID() );
+			if( ! $this->is_temp() )
+			{	// New link was added to the item, invalidate blog's media BlockCache:
+				BlockCache::invalidate_key( 'media_coll_ID', $this->Item->get_blog_ID() );
+			}
 
 			$FileCache = & get_FileCache();
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
-			$file_dir = $File->dir_or_file();
-			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s',  ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
+			$file_dir = $File->dir_or_file( 'Directory', 'File' );
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', $file_dir, '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
-			if( $update_owner )
-			{ // Update last touched date of the Item
+			if( ! $this->is_temp() && $update_owner )
+			{	// Update last touched date and content last updated date of the Item:
 				$this->update_last_touched_date();
+				$this->update_contents_last_updated_ts();
 			}
 
 			// Reset the Links
@@ -201,7 +226,17 @@ class LinkItem extends LinkOwner
 	{
 		if( is_null( $this->Blog ) )
 		{
-			$this->Blog = & $this->Item->get_Blog();
+			$Item = $this->Item;
+			if( $Item->ID == 0 )
+			{	// This is a request of new creating Item (for example, preview mode),
+				// We should use current collection, because new Item has no category ID yet here to load Collection:
+				global $Blog;
+				$this->Blog = $Blog;
+			}
+			else
+			{	// Use Collection of the existing Item:
+				$this->Blog = & $this->Item->get_Blog();
+			}
 		}
 	}
 
@@ -223,11 +258,36 @@ class LinkItem extends LinkOwner
 
 	/**
 	 * Get Item edit url
+	 *
+	 * @return string URL
 	 */
 	function get_edit_url()
 	{
-		$this->load_Blog();
-		return '?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;p='.$this->Item->ID;
+		if( is_admin_page() )
+		{	// Back-office:
+			global $admin_url;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				return $admin_url.'?ctrl=items&amp;blog='.$this->link_Object->tmp_coll_ID.'&amp;action=new';
+			}
+			else
+			{	// The edited Item:
+				$this->load_Blog();
+				return $admin_url.'?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;p='.$this->Item->ID;
+			}
+		}
+		else
+		{	// Front-office:
+			global $Blog;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+			}
+			else
+			{	// The edited Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;p='.$this->Item->ID );
+			}
+		}
 	}
 
 	/**
@@ -235,8 +295,31 @@ class LinkItem extends LinkOwner
 	 */
 	function get_view_url()
 	{
-		$this->load_Blog();
-		return '?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;p='.$this->Item->ID;
+		if( is_admin_page() )
+		{	// Back-office:
+			global $admin_url;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				return $admin_url.'?ctrl=items&amp;blog='.$this->link_Object->tmp_coll_ID.'&amp;action=new';
+			}
+			else
+			{	// The edited Item:
+				$this->load_Blog();
+				return $admin_url.'?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;p='.$this->Item->ID;
+			}
+		}
+		else
+		{	// Front-office:
+			global $Blog;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+			}
+			else
+			{	// The edited Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;p='.$this->Item->ID );
+			}
+		}
 	}
 
 
@@ -245,11 +328,24 @@ class LinkItem extends LinkOwner
 	 */
 	function update_last_touched_date()
 	{
-		if( !empty( $this->Item ) )
+		if( ! empty( $this->Item ) && ! $this->is_temp() )
 		{	// Update Item if it exists
 			$this->Item->update_last_touched_date();
 		}
 	}
+
+
+	/**
+	 * Update field contents_last_updated_ts of Item
+	 */
+	function update_contents_last_updated_ts()
+	{
+		if( ! empty( $this->Item ) && ! $this->is_temp() )
+		{	// Update Item if it exists:
+			$this->Item->update_last_touched_date( true, false, true );
+		}
+	}
+
 
 	/**
 	 * This function is called after when some file was unlinked from item
@@ -265,7 +361,7 @@ class LinkItem extends LinkOwner
 
 		if( ! empty( $link_ID ) )
 		{ // Find inline image placeholders if link ID is defined
-			preg_match_all( '/\[(image|file|inline|video|audio):'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
+			preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
 			if( ! empty( $inline_images[0] ) )
 			{ // There are inline image placeholders in the post content
 				$this->Item->set( 'content', str_replace( $inline_images[0], '', $this->Item->content ) );
@@ -274,8 +370,11 @@ class LinkItem extends LinkOwner
 			}
 		}
 
-		// Update last touched date of the Item
-		$this->update_last_touched_date();
+		if( ! $this->is_temp() )
+		{	// Update last touched date and content last updated date of the Item:
+			$this->update_last_touched_date();
+			$this->update_contents_last_updated_ts();
+		}
 	}
 }
 
