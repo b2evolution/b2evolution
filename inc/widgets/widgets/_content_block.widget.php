@@ -83,7 +83,6 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		// Demo data:
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
@@ -102,7 +101,23 @@ class content_block_Widget extends ComponentWidget
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
+	}
 
+
+	/**
+	 * Load params
+	 */
+	function load_from_Request()
+	{
+		parent::load_from_Request();
+
+		$prefix = 'edit_plugin_'.$this->ID.'_set_';
+
+		if( get_param( $prefix.'item_ID' ) != '' && get_param( $prefix.'item_slug' ) != '' )
+		{	// Don't allow both entered fields:
+			param_error( $prefix.'item_ID', NULL );
+			param_error( $prefix.'item_slug', T_('Please fill only either "Item ID" or "Item Slug".') );
+		}
 	}
 
 
