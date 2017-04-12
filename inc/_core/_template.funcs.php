@@ -2639,12 +2639,14 @@ function display_login_js_handler( $params )
 			error: function( jqXHR, textStatus, errorThrown )
 			{	// Display error text on error request:
 				requestSent = false;
-				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')' );
+				var wrong_response_code = typeof( jqXHR.status ) != 'undefined' && jqXHR.status != 200 ? '\nHTTP Response code: ' + jqXHR.status : '';
+				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')'
+					+ wrong_response_code );
 			}
 		});
 
-	    // You must return false to prevent the default form behavior
-	    return false;
+		// You must return false to prevent the default form behavior
+		return false;
 	}
 
 	<?php
