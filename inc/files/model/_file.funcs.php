@@ -2226,10 +2226,13 @@ function display_dragdrop_upload_button( $params = array() )
 	$params = array_merge( array(
 			'before'           => '',
 			'after'            => '',
+			'button_text_full' => TS_('Drag & Drop files to upload here <br /><span>or click to manually select files...</span>'),
+			'button_text_man'  => TS_('Click to manually select files...'),
 			'fileroot_ID'      => 0, // Root type and ID, e.g. collection_1
 			'path'             => '', // Subpath for the file/folder
 			'listElement'      => 'null',
 			'list_style'       => 'list',  // 'list' or 'table'
+			'extensions'       => array(), // Allowed extensions
 			'template_button'  => '<div class="qq-uploader">'
 					.'<div class="qq-upload-drop-area"><span>'.TS_('Drop files here to upload').'</span></div>'
 					.'<div class="qq-upload-button">#button_text#</div>'
@@ -2255,6 +2258,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
 			'filename_select'        => '', // Append this text before file name on success uploading of new file
+			'auto_extract_zip'       => false, // Auto extract ZIP archive
 		), $params );
 
 	$FileRootCache = & get_FileRootCache();
@@ -2287,12 +2291,12 @@ function display_dragdrop_upload_button( $params = array() )
 	<script type="text/javascript">
 		if( 'draggable' in document.createElement('span') )
 		{
-			var button_text = '<?php echo TS_('Drag & Drop files to upload here <br /><span>or click to manually select files...</span>') ?>';
+			var button_text = '<?php echo $params['button_text_full'] ?>';
 			var file_uploader_note_text = '<?php echo TS_('Your browser supports full upload functionality.') ?>';
 		}
 		else
 		{
-			var button_text = '<?php echo TS_('Click to manually select files...') ?>';
+			var button_text = '<?php echo $params['button_text_man'] ?>';
 			var file_uploader_note_text = '<?php echo TS_('Your browser does not support full upload functionality: You can only upload files one by one and you cannot use Drag & Drop.') ?>';
 		}
 
@@ -2309,7 +2313,12 @@ function display_dragdrop_upload_button( $params = array() )
 		<?php
 		if( $params['LinkOwner'] !== NULL )
 		{	// Add params to link a file right after uploading:
-			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'"';
+			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'";';
+		}
+
+		if( $params['auto_extract_zip'] )
+		{	// Send param to auto extract ZIP archive right after upload:
+			echo 'url += "&auto_extract_zip=1";';
 		}
 		?>
 
@@ -2324,6 +2333,7 @@ function display_dragdrop_upload_button( $params = array() )
 				action: url,
 				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
 				debug: false,
+				allowedExtensions: [<?php echo empty( $params['extensions'] ) ? '' : '\''.implode( '\', \'', $params['extensions'] ).'\''; ?>],
 				messages: {
 					typeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
 					sizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',

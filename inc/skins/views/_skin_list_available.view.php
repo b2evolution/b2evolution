@@ -216,8 +216,31 @@ foreach( $skin_folders as $skin_folder )
 	$skins_exist = true;
 }
 
-echo '<div class="clear"></div>';
 echo '</div>';
+echo '<div class="clear"></div>';
+
+// Display a button to quick upload the files by drag&drop method
+display_dragdrop_upload_button( array(
+		'button_text_full' => TS_('Drag & Drop skins to upload here <br /><span>or click to manually *_skin.zip files...</span>'),
+		'button_text_man'  => TS_('Click to manually *_skin.zip files...'),
+		'fileroot_ID'         => FileRoot::gen_ID( 'skins', 0 ),
+		'path'                => '',
+		'listElement'         => 'jQuery( ".skin_selector_block" ).get(0)',
+		//'extensions'          => array( 'zip' ),
+		//'list_style'          => 'table',
+		'template_filerow' => '<div class="skinshot">'
+				.'<span class="qq-upload-file"></span>'
+				.'<span class="qq-upload-spinner"></span>'
+				.'<span class="qq-upload-size"></span>'
+				.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
+				.'<span class="qq-upload-failed-text">'.TS_('Failed').'</span>'
+			.'</div>',
+		'display_support_msg' => false,
+		'additional_dropzone' => '.skin_selector_block',
+		'auto_extract_zip'    => true,
+		//'filename_before'     => $icon_to_link_files,
+		//'filename_select'     => $icon_to_select_files,
+	) );
 
 if( $skins_exist && empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
 {	// Display form buttons only when at least one skin exists for installation:

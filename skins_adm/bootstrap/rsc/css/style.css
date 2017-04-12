@@ -1230,6 +1230,8 @@ div.level3 nav .nav > li + li {
   width: 100%;
 }
 .skinshot {
+  width: 266px;
+  max-width: 266px;
   background-color: #F5F5F5;
   border: 1px solid #E3E3E3;
   border-radius: 4px;

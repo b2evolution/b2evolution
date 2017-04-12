@@ -295,6 +295,12 @@ switch( $action )
 	case 'update':
 		$AdminUI->set_page_manual_link( 'skin-system-settings' );
 		break;
+	case 'new':
+		$AdminUI->set_page_manual_link( 'installing-skins' );
+		// Require File Uploader js and css:
+		require_js( 'multiupload/fileuploader.js' );
+		require_css( 'fileuploader.css' );
+		break;
 	default:
 		$AdminUI->set_page_manual_link( 'manage-skins' );
 		break;

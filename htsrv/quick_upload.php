@@ -231,6 +231,7 @@ param( 'upload', 'boolean', true );
 param( 'root_and_path', 'filepath', true );
 param( 'blog', 'integer' );
 param( 'link_owner', 'string' );
+param( 'auto_extract_zip', 'boolean', false );
 // Use the glyph or font-awesome icons if requested by skin
 param( 'b2evo_icons_type', 'string', '' );
 
@@ -486,6 +487,34 @@ if( $upload )
 					'link_position' => $new_Link->get( 'position' ),
 				);
 			$message['link_position'] = display_link_position( $mask_row );
+		}
+
+		if( $auto_extract_zip && strtolower( $newFile->get_ext() ) == 'zip' )
+		{	// Auto extract ZIP archive:
+			$extract_dir = substr( $newFile->get_full_path(), 0, ( -1 - strlen( $newFile->get_ext() ) ) );
+			$message['111'] = ' |'.$extract_dir.'|';
+
+			if( ! file_exists( $extract_dir ) && ! mkdir_r( $extract_dir ) )
+			{	// We cannot create directory:
+				$message['text'] = sprintf( T_( 'Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.' ), $extract_dir );
+				$message['status'] = 'error';
+				return false;
+			}
+
+			load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
+
+			$PclZip = new PclZip( $newFile->get_full_path() );
+
+			if( $PclZip->extract( PCLZIP_OPT_PATH, $extract_dir ) )
+			{	// Remove zip archive if it has been extracted successfully:
+				unlink( $newFile->get_full_path() );
+			}
+			else
+			{	// Error on unzip:
+				$message['text'] = sprintf( T_( 'Error: %s' ), $PclZip->errorInfo( true ) ).'<br />'
+					.sprintf( T_( 'Unable to decompress &laquo;%s&raquo; ZIP archive.' ), $newFile->get_full_path() );
+				$message['status'] = 'error';
+			}
 		}
 
 		out_echo( $message, $specialchars );
