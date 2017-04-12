@@ -105,7 +105,7 @@ function cat_line( $Chapter, $level )
 	// Order
 	if( $Chapter->get_parent_subcat_ordering() == 'manual' )
 	{ // Manual ordering
-		$r .= '<td class="center cat_order_edit" rel="'.$Chapter->ID.'">'
+		$r .= '<td class="center jeditable_cell cat_order_edit" rel="'.$Chapter->ID.'">'
 						.'<a href="#">'.( $Chapter->get( 'order' ) === NULL ? '-' : $Chapter->dget( 'order' ) ).'</a>'
 					.'</td>';
 	}

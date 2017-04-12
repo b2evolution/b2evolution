@@ -4237,7 +4237,7 @@ function items_results( & $items_Results, $params = array() )
 				'th' => T_('Ord'),
 				'th_class' => 'shrinkwrap',
 				'order' => $params['field_prefix'].'order',
-				'td_class' => 'right item_order_edit',
+				'td_class' => 'right jeditable_cell item_order_edit',
 				'td' => '%item_row_order( {Obj} )%',
 				'extra' => array( 'rel' => '#post_ID#' ),
 			);
@@ -4772,7 +4772,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	$r .= '<td>'.$Item->get_title( $params );
 	if( $current_User->check_perm( 'slugs', 'view', false ) )
 	{ // Display icon to view all slugs of this item if current user has permission
-		$r .= ' '.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
+		$r .= ' '.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
 	}
 	$r .= '</td>';
 

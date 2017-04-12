@@ -126,7 +126,7 @@ switch( $Comment->get( 'type' ) )
 		if( $params['comment_post_display'] )
 		{
 			echo $params['comment_post_before'];
-			echo ' '.T_('in response to:').' ';
+			echo ' '.T_('in response to').': ';
 			$Comment->Item->title( array(
 					'link_type' => 'permalink',
 				) );

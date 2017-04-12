@@ -74,7 +74,7 @@ $Results->cols[] = array(
 		'td' => /* Check permission: */$current_User->check_perm( 'spamblacklist', 'edit' ) ?
 			/* Current user can edit IP ranges */'<a href="#" rel="$aipr_status$">%aipr_status_title( #aipr_status# )%</a>' :
 			/* No edit, only view the status */'%aipr_status_title( #aipr_status# )%',
-		'td_class' => 'iprange_status_edit',
+		'td_class' => 'jeditable_cell iprange_status_edit',
 		'order' => 'aipr_status',
 		'extra' => array ( 'style' => 'background-color: %aipr_status_color( "#aipr_status#" )%;', 'format_to_output' => false )
 	);

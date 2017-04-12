@@ -117,7 +117,7 @@ $Results->cols[] = array(
 			/* Current user can edit emails */'<a href="#" rel="$emadr_status$">%emadr_get_status_title( #emadr_status# )%</a>' :
 			/* No edit, only view the status */'%emadr_get_status_title( #emadr_status# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap emadr_status_edit',
+		'td_class' => 'shrinkwrap jeditable_cell emadr_status_edit',
 		'extra' => array ( 'style' => 'background-color: %emadr_get_status_color( "#emadr_status#" )%;', 'format_to_output' => false )
 	);
 

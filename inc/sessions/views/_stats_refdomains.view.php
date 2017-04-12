@@ -185,7 +185,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Type'),
 		'order' => 'dom_type',
-		'td_class' => 'dom_type_edit',
+		'td_class' => 'jeditable_cell dom_type_edit',
 		'td' => /* Check permission: */$current_User->check_perm( 'stats', 'edit' ) ?
 			/* Current user can edit Domains */'<a href="#" rel="$dom_type$">%stats_dom_type_title( #dom_type# )%</a>' :
 			/* No edit */'%stats_dom_type_title( #dom_type# )%',
@@ -195,7 +195,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Status'),
 		'order' => 'dom_status',
-		'td_class' => 'dom_status_edit',
+		'td_class' => 'jeditable_cell dom_status_edit',
 		'td' => /* Check permission: */$current_User->check_perm( 'stats', 'edit' ) ?
 			/* Current user can edit Domains */'<a href="#" rel="$dom_status$">%stats_dom_status_title( #dom_status# )%</a>' :
 			/* No edit */'%stats_dom_status_title( #dom_status# )%',
