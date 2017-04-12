@@ -198,7 +198,7 @@ class user_login_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog, $PageCache;
+		global $Collection, $Blog;
 
 		if( get_param( 'disp' ) == 'login' )
 		{	// No display a duplicate form for inskin login mode
@@ -206,11 +206,6 @@ class user_login_Widget extends ComponentWidget
 		}
 
 		$this->init_display( $params );
-
-		if( ! empty( $PageCache ) )
-		{	// Do NOT cache current rendered page, because we need new salt for form action:
-			$PageCache->abort_collect();
-		}
 
 		if( isset( $this->BlockCache ) )
 		{	// Do NOT cache some of these links are using a redirect_to param, which makes it page dependent.
