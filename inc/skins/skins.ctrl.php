@@ -99,6 +99,11 @@ switch( $action )
 			// We want to highlight the edited object on next list display:
 			$Session->set( 'fadeout_array', array( 'skin_ID' => array( $edited_Skin->ID ) ) );
 
+			if( empty( $redirect_to ) )
+			{	// Set default redirect page after skin installing:
+				$redirect_to = $admin_url.'?ctrl=skins&tab=system';
+			}
+
 			// Replace a mask by value. Used for install skin on creating of new blog
 			$redirect_to = str_replace( '$skin_ID$', $edited_Skin->ID, $redirect_to );
 		}

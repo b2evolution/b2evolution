@@ -704,6 +704,94 @@ class Skin extends DataObject
 
 
 	/**
+	 * Display skinshot for new skin(not installed yet)
+	 *
+	 * @param string Skin folder
+	 * @param array Params
+	 */
+	static function disp_skinshot_new( $skin_folder, $params = array() )
+	{
+		global $skins_path, $admin_url, $blog, $skin_type;
+
+		$params = array_merge( array(
+				'kind'        => '',
+				'redirect_to' => '',
+			), $params );
+
+		$SkinCache = & get_SkinCache();
+
+		// What xxx_Skin class name do we expect from this skin?
+		// (remove optional "_skin" and always append "_Skin"):
+		$skin_class_name = preg_replace( '/_skin$/', '', $skin_folder ).'_Skin';
+
+		// Check if we already have such a skin:
+		if( class_exists( $skin_class_name ) )
+		{	// This class already exists!
+			$disp_params = array(
+					'function' => 'broken',
+					'msg'      => T_('DUPLICATE SKIN NAME'),
+				);
+		}
+		elseif( ! @$skin_class_file_contents = file_get_contents( $skins_path.$skin_folder.'/_skin.class.php' ) )
+		{	// Could not load the contents of the skin file:
+			$disp_params = array(
+					'function' => 'broken',
+					'msg'      => T_('_skin.class.php NOT FOUND!'),
+				);
+		}
+		elseif( strpos( $skin_class_file_contents, 'class '.$skin_class_name.' extends Skin' ) === false )
+		{
+			$disp_params = array(
+					'function' => 'broken',
+					'msg'      => T_('MALFORMED _skin.class.php'),
+				);
+		}
+		elseif( ! $folder_Skin = & $SkinCache->new_obj( NULL, $skin_folder ) )
+		{ // We could not load the Skin class:
+			$disp_params = array(
+					'function' => 'broken',
+					'msg'      => T_('_skin.class.php could not be loaded!'),
+				);
+		}
+		else
+		{	// Skin class seems fine...
+			if( $params['kind'] != '' && $folder_Skin->supports_coll_kind( $params['kind'] ) != 'yes' )
+			{	// Filter skin by support for collection type
+				return;
+			}
+
+			if( ! empty( $sel_skin_type ) && $folder_Skin->type != $sel_skin_type &&
+					( $folder_Skin->type != 'rwd' || ! in_array( $sel_skin_type, array( 'normal', 'mobile', 'tablet' ) ) ) )
+			{	// Filter skin by selected type;
+				// For normal, mobile, tablet skins also displays rwd skins:
+				return;
+			}
+
+			$redirect_to_after_install = $params['redirect_to'];
+			$skin_compatible = ( empty( $params['kind'] ) || $folder_Skin->type == 'normal' || $folder_Skin->type == 'rwd' );
+			if( ! empty( $params['kind'] ) && $skin_compatible )
+			{ // If we are installing skin for a new collection we're currently creating:
+				$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$params['kind'].'&skin_ID=$skin_ID$';
+			}
+
+			$disp_params = array(
+				'function'        => 'install',
+				'function_url'    => $admin_url.'?ctrl=skins&amp;action=create&amp;tab='.get_param( 'tab' )
+														 .( empty( $blog ) ? '' : '&amp;blog='.$blog )
+														 .( empty( $skin_type ) ? '' : '&amp;skin_type='.$skin_type )
+														 .'&amp;skin_folder='.rawurlencode( $skin_folder )
+														 .'&amp;redirect_to='.rawurlencode( $redirect_to_after_install )
+														 .'&amp;'.url_crumb( 'skin' ),
+				'skin_compatible' => $skin_compatible,
+			);
+		}
+
+		// Display skinshot:
+		Skin::disp_skinshot( $skin_folder, $skin_folder, $disp_params );
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @todo this is destined to be overridden by derived Skin classes

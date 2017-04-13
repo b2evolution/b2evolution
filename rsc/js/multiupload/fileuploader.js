@@ -604,7 +604,9 @@ qq.FileUploaderBasic.prototype = {
 			bytes = bytes / 1024;
 		}
 
-		return bytes.toFixed( Math.max( 0, ( 1 - Math.floor( Math.log( bytes ) / Math.log( 10 ) ) ) ) ) + ' ' + ['B.', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'][i];
+		var fixed_num = Math.max( 0, ( 1 - Math.floor( Math.log( bytes ) / Math.log( 10 ) ) ) );
+		fixed_num = fixed_num < 0 ? 0 : ( fixed_num > 20 ? 20 : fixed_num );
+		return bytes.toFixed( fixed_num ) + ' ' + ['B.', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'][i];
 	}
 };
 

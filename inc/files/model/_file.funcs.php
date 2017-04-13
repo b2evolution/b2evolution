@@ -2258,7 +2258,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
 			'filename_select'        => '', // Append this text before file name on success uploading of new file
-			'auto_extract_zip'       => false, // Auto extract ZIP archive
+			'upload_type'            => '', // Upload type: 'skin'
 		), $params );
 
 	$FileRootCache = & get_FileRootCache();
@@ -2316,9 +2316,19 @@ function display_dragdrop_upload_button( $params = array() )
 			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'";';
 		}
 
-		if( $params['auto_extract_zip'] )
-		{	// Send param to auto extract ZIP archive right after upload:
-			echo 'url += "&auto_extract_zip=1";';
+		if( ! empty( $params['upload_type'] ) )
+		{	// Send param to mark upload type:
+			echo 'url += "&type='.$params['upload_type'].'";';
+		}
+
+		if( ! empty( $params['tab'] ) )
+		{	// Send param for current tab:
+			echo 'url += "&tab='.$params['tab'].'";';
+		}
+
+		if( ! empty( $params['skin_type'] ) )
+		{	// Send param for skin type:
+			echo 'url += "&skin_type='.$params['skin_type'].'";';
 		}
 		?>
 
@@ -2491,6 +2501,16 @@ function display_dragdrop_upload_button( $params = array() )
 							init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 						}
 					}
+					<?php
+					}
+					elseif( $params['upload_type'] == 'skin' )
+					{	// Skin view:
+					?>
+						if( responseJSON.success.skinshot != undefined )
+						{
+							var skinshot = jQuery( responseJSON.success.skinshot );
+							jQuery( uploader._getItemByFileId( id ) ).html( skinshot.html() );
+						}
 					<?php
 					}
 					else

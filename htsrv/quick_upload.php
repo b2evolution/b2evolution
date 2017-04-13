@@ -231,7 +231,9 @@ param( 'upload', 'boolean', true );
 param( 'root_and_path', 'filepath', true );
 param( 'blog', 'integer' );
 param( 'link_owner', 'string' );
-param( 'auto_extract_zip', 'boolean', false );
+param( 'type', 'string' );
+param( 'tab', 'string' );
+param( 'skin_type', 'string' );
 // Use the glyph or font-awesome icons if requested by skin
 param( 'b2evo_icons_type', 'string', '' );
 
@@ -489,10 +491,9 @@ if( $upload )
 			$message['link_position'] = display_link_position( $mask_row );
 		}
 
-		if( $auto_extract_zip && strtolower( $newFile->get_ext() ) == 'zip' )
-		{	// Auto extract ZIP archive:
+		if( $type == 'skin' && strtolower( $newFile->get_ext() ) == 'zip' )
+		{	// Auto extract ZIP archive on upload skin zip:
 			$extract_dir = substr( $newFile->get_full_path(), 0, ( -1 - strlen( $newFile->get_ext() ) ) );
-			$message['111'] = ' |'.$extract_dir.'|';
 
 			if( ! file_exists( $extract_dir ) && ! mkdir_r( $extract_dir ) )
 			{	// We cannot create directory:
@@ -506,8 +507,69 @@ if( $upload )
 			$PclZip = new PclZip( $newFile->get_full_path() );
 
 			if( $PclZip->extract( PCLZIP_OPT_PATH, $extract_dir ) )
-			{	// Remove zip archive if it has been extracted successfully:
-				unlink( $newFile->get_full_path() );
+			{	// If successful extracting:
+
+				// Remove zip archive:
+				$newFile->unlink();
+
+				// If archive contains single folder in the root then move all files of the single folder to the root:
+				$archive_single_dirs = 0;
+				$last_full_dir_path = $extract_dir;
+				while( 1 )
+				{
+					$archive_files = scandir( $last_full_dir_path );
+					$root_files_count = 0;
+					foreach( $archive_files as $archive_file )
+					{
+						if( $archive_file == '.' || $archive_file == '..' )
+						{	// Skip reserved dir names of the current path:
+							continue;
+						}
+						$root_files_count++;
+						if( $root_files_count > 1 )
+						{	// This folder contains more then 1 folder/file:
+							break 2;
+						}
+						elseif( is_dir( $last_full_dir_path.'/'.$archive_file ) )
+						{	// Store this first found folder, probably it is alone in current folder:
+							$archive_single_dirs++;
+							$last_full_dir_path = $last_full_dir_path.'/'.$archive_file;
+							$last_full_dir_name = $archive_file;
+						}
+					}
+					if( $root_files_count == 0 )
+					{	// The scanned folder is empty, Stop it:
+						break;
+					}
+				}
+
+				if( $archive_single_dirs > 0 )
+				{	// Try to move all files of the single folder to the root:
+					$extract_dir_root_path = preg_replace( '#[\\/][^\\/]+$#', '', $extract_dir );
+					$new_extract_dir_path = $extract_dir_root_path.'/'.$last_full_dir_name;
+					$dir_num = 0;
+					while( file_exists( $new_extract_dir_path ) )
+					{	// Find not existent folder:
+						$dir_num++;
+						$new_extract_dir_path = $extract_dir_root_path.'/'.$last_full_dir_name.'_'.$dir_num;
+					}
+					@rename( $last_full_dir_path, $new_extract_dir_path );
+					if( $extract_dir_root_path != $extract_dir )
+					{	// Remove original zip folder after moving single folder to the root:
+						rmdir_r( $extract_dir );
+					}
+					$skin_folder = $last_full_dir_name.( $dir_num ? '_'.$dir_num : '' );
+				}
+				else
+				{	// Set skin folder from original path because all files are located in zip root(without subfolder):
+					$skin_folder = preg_replace( '#^.+/([^/]+)$#', '$1', $extract_dir );
+				}
+
+				// Get skin shot html code to display after uploading:
+				load_class( 'skins/model/_skin.class.php', 'Skin' );
+				ob_start();
+				Skin::disp_skinshot_new( $skin_folder );
+				$message['skinshot'] = ob_get_clean();
 			}
 			else
 			{	// Error on unzip:
