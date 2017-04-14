@@ -2506,10 +2506,19 @@ function display_dragdrop_upload_button( $params = array() )
 					elseif( $params['upload_type'] == 'skin' )
 					{	// Skin view:
 					?>
-						if( responseJSON.success.skinshot != undefined )
-						{
-							var skinshot = jQuery( responseJSON.success.skinshot );
-							jQuery( uploader._getItemByFileId( id ) ).html( skinshot.html() );
+						var skin_wrapper = jQuery( uploader._getItemByFileId( id ) );
+						console.log( responseJSON );
+						if( responseJSON.success == undefined || responseJSON.success.status == 'error' || responseJSON.success.status == 'fatal' )
+						{	// Failed
+							if( typeof( text ) == 'undefined' || text == '' )
+							{	// Message for unknown error:
+								text = '<?php echo TS_('Server dropped the connection.'); ?>';
+							}
+							skin_wrapper.append( ' <?php echo format_to_js( get_icon( 'warning_yellow' ) ); ?> <span class="result_error">' + text + '</span>' );
+						}
+						else if( responseJSON.success.skinshot != undefined )
+						{	// Success
+							skin_wrapper.html( jQuery( responseJSON.success.skinshot ).html() );
 						}
 					<?php
 					}

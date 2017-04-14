@@ -766,7 +766,8 @@ ul.qq-upload-list {
 td.fm_filename {
   width: 100%;
 }
-td.fm_filename .result_error {
+td.fm_filename .result_error,
+.skinshot .result_error {
   border: none;
 }
 .evo_file_folder_creator {

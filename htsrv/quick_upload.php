@@ -412,8 +412,8 @@ if( $upload )
 		}
 
 		$message = '';
-		if( ! empty( $oldFile_thumb ) )
-		{
+		if( $type != 'skin' && ! empty( $oldFile_thumb ) )
+		{	// Suggest to rename files (Exclude on skin zip uploading because it is auto extracted):
 			$image_info = getimagesize( $newFile->get_full_path() );
 			if( $image_info )
 			{
@@ -493,13 +493,22 @@ if( $upload )
 
 		if( $type == 'skin' && strtolower( $newFile->get_ext() ) == 'zip' )
 		{	// Auto extract ZIP archive on upload skin zip:
+			if( ! function_exists( 'gzopen' ) )
+			{	// Display error if current server has no php extension 'zlib':
+				$message['text'] = 'Unable to decompress the file because there is no \'zip\' or \'zlib\' extension installed in your PHP!';
+				$message['status'] = 'error';
+				out_echo( $message, $specialchars );
+				exit();
+			}
+
 			$extract_dir = substr( $newFile->get_full_path(), 0, ( -1 - strlen( $newFile->get_ext() ) ) );
 
 			if( ! file_exists( $extract_dir ) && ! mkdir_r( $extract_dir ) )
 			{	// We cannot create directory:
 				$message['text'] = sprintf( T_( 'Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.' ), $extract_dir );
 				$message['status'] = 'error';
-				return false;
+				out_echo( $message, $specialchars );
+				exit();
 			}
 
 			load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
@@ -518,28 +527,30 @@ if( $upload )
 				while( 1 )
 				{
 					$archive_files = scandir( $last_full_dir_path );
-					$root_files_count = 0;
-					foreach( $archive_files as $archive_file )
+					foreach( $archive_files as $a => $archive_file )
 					{
 						if( $archive_file == '.' || $archive_file == '..' )
 						{	// Skip reserved dir names of the current path:
-							continue;
-						}
-						$root_files_count++;
-						if( $root_files_count > 1 )
-						{	// This folder contains more then 1 folder/file:
-							break 2;
-						}
-						elseif( is_dir( $last_full_dir_path.'/'.$archive_file ) )
-						{	// Store this first found folder, probably it is alone in current folder:
-							$archive_single_dirs++;
-							$last_full_dir_path = $last_full_dir_path.'/'.$archive_file;
-							$last_full_dir_name = $archive_file;
+							unset( $archive_files[ $a ] );
 						}
 					}
-					if( $root_files_count == 0 )
-					{	// The scanned folder is empty, Stop it:
+					if( count( $archive_files ) > 1 )
+					{	// This folder contains more then 1 folder/file:
 						break;
+					}
+					else
+					{	// Get first alone folder in teh current path:
+						$single_folder = array_shift( $archive_files );
+						if( $single_folder !== NULL && is_dir( $last_full_dir_path.'/'.$archive_file ) )
+						{	// If folder is not empty and it is a dir really:
+							$archive_single_dirs++;
+							$last_full_dir_path = $last_full_dir_path.'/'.$single_folder;
+							$last_full_dir_name = $single_folder;
+						}
+						else
+						{	// The scanned path has no single folder, Stop recursive scanning:
+							break;
+						}
 					}
 				}
 
@@ -548,13 +559,19 @@ if( $upload )
 					$extract_dir_root_path = preg_replace( '#[\\/][^\\/]+$#', '', $extract_dir );
 					$new_extract_dir_path = $extract_dir_root_path.'/'.$last_full_dir_name;
 					$dir_num = 0;
-					while( file_exists( $new_extract_dir_path ) )
+					while( $extract_dir != $new_extract_dir_path && file_exists( $new_extract_dir_path ) )
 					{	// Find not existent folder:
 						$dir_num++;
 						$new_extract_dir_path = $extract_dir_root_path.'/'.$last_full_dir_name.'_'.$dir_num;
 					}
-					@rename( $last_full_dir_path, $new_extract_dir_path );
-					if( $extract_dir_root_path != $extract_dir )
+					if( ! @rename( $last_full_dir_path, $new_extract_dir_path ) )
+					{	// Display error if single subfolder cannot be moved to top root for proper skin working:
+						$message['text'] = sprintf( 'Folder %s could not be moved to %s', '[['.$last_full_dir_path.']]', '[['.$new_extract_dir_path.']]' );
+						$message['status'] = 'error';
+						out_echo( $message, $specialchars );
+						exit();
+					}
+					if( $extract_dir_root_path != $extract_dir && $new_extract_dir_path != $extract_dir )
 					{	// Remove original zip folder after moving single folder to the root:
 						rmdir_r( $extract_dir );
 					}
