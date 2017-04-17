@@ -111,12 +111,10 @@ class content_block_Widget extends ComponentWidget
 	{
 		parent::load_from_Request();
 
-		$prefix = 'edit_plugin_'.$this->ID.'_set_';
-
-		if( get_param( $prefix.'item_ID' ) != '' && get_param( $prefix.'item_slug' ) != '' )
+		if( get_param( $this->get_param_prefix().'item_ID' ) != '' && get_param( $this->get_param_prefix().'item_slug' ) != '' )
 		{	// Don't allow both entered fields:
-			param_error( $prefix.'item_ID', NULL );
-			param_error( $prefix.'item_slug', T_('Please fill only either "Item ID" or "Item Slug".') );
+			param_error( $this->get_param_prefix().'item_ID', NULL );
+			param_error( $this->get_param_prefix().'item_slug', T_('Please fill only either "Item ID" or "Item Slug".') );
 		}
 	}
 
