@@ -15,6 +15,102 @@
  */
 if( ! defined( 'EVO_MAIN_INIT' ) ) die( 'Please, do not access this page directly.' );
 
+
+/**
+ * Draw the canvas bars chart.
+ *
+ * @param array Chart bars data
+ */
+function draw_canvas_bars_chart( $chart )
+{
+	$labels = array();
+	foreach( $chart['chart_data'][0] as $l => $label )
+	{
+		if( $l == 0 )
+		{
+			continue;
+		}
+		$labels[] = '"'.format_to_js( $label ).'"';
+	}
+
+	$datasets = array();
+	foreach( $chart['chart_data'] as $c => $data )
+	{
+		if( $c == 0 )
+		{
+			continue;
+		}
+		$data_label = $data[0];
+		unset( $data[0] );
+		$datasets[] = '{
+				type: "bar",
+				label: "'.format_to_js( $data_label ).'",
+				backgroundColor: "#'.$chart['series_color'][ $c - 1 ].'",
+				data: ['.implode( ',', $data ).']
+			}';
+	}
+
+	/*$datasets[] = '{
+			type: "line",
+			backgroundColor: "rgba(0,0,0,0.05)",
+			data: [{x:-1,y:60},{x:1,y:60}]
+		}';
+	$datasets[] = '{
+			type: "line",
+			backgroundColor: "rgba(0,0,0,0.05)",
+			data: [{x:10,y:60},{x:20,y:60}]
+		}';*/
+?>
+	<canvas id="canvas_bars_chart" height="80"></canvas>
+	<script type="text/javascript">
+	jQuery( document ).ready( function()
+	{
+		var ctx = document.getElementById( 'canvas_bars_chart' ).getContext( '2d' );
+		new Chart( ctx,
+		{
+			type: 'bar',
+			data: {
+				labels: [<?php echo implode( ',', $labels ); ?>],
+				datasets: [<?php echo implode( ',', $datasets );?>]
+			},
+			options: {
+				height: <?php echo $chart['canvas_bg']['height']; ?>,
+				legend: {
+					position: 'bottom',
+					labels: {
+						boxWidth: 12
+					}
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false
+				},
+				scales: {
+					xAxes: [{
+						barPercentage: 1,
+						categoryPercentage: 0.95,
+						gridLines: {
+							display: false
+						},
+						ticks: {
+							fontSize: 13
+						}
+					}],
+					yAxes: [{
+						stacked: true,
+						ticks: {
+							fontSize: 11,
+							fontStyle: 'bold'
+						}
+					}]
+				}
+			}
+		} );
+	} );
+	</script>
+<?php
+}
+
 /**
  * Draw the canvas bars chart.
  *
