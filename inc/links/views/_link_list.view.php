@@ -188,25 +188,14 @@ display_dragdrop_upload_button( array(
 								.'<div class="qq-upload-status-text-selector qq-upload-status-text">'
 									.TS_('Uploading...')
 									.'<span class="qq-upload-size-selector"></span>'
-									.'<a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
+									.( count( $LinkOwner->get_positions() ) > 1 ? '' : ' <a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>' )
+								.'</div>'
+								.'<div class="qq-progress-bar-container-selector">'
+    							.'<div class="qq-progress-bar-selector qq-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>'
 								.'</div>'
 							.'</td>'
-							.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
+							.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"><a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a></td>' : '' )
 						.'</tr>',
-		'template_filerow' => '<table><tr>'
-					.'<td class="firstcol shrinkwrap qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>'
-					.'<td class="qq-upload-file fm_filename">&nbsp;</td>'
-					.'<td class="qq-upload-link-id shrinkwrap link_id_cell">&nbsp;</td>'
-					.'<td class="qq-upload-link-actions shrinkwrap">'
-						.'<div class="qq-upload-status">'
-							.TS_('Uploading...')
-							.'<span class="qq-upload-spinner"></span>'
-							.'<span class="qq-upload-size"></span>'
-							.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
-						.'</div>'
-					.'</td>'
-					.'<td class="qq-upload-link-position lastcol nowrap '.( count( $LinkOwner->get_positions() ) > 1 ? 'left' : 'center' ).'"></td>'
-				.'</tr></table>',
 		'display_support_msg'    => false,
 		'additional_dropzone'    => '[ document.getElementById( "filelist_tbody" ) ]',
 		'filename_before'        => '',

@@ -633,7 +633,9 @@ $Form->begin_form();
 			{
 				$template .= '<td class="center qq-upload-downloads">&nbsp;</td>';
 			}
-			$template .= '<td class="size"><span class="qq-upload-size-selector">&nbsp;</span></td>';
+			$template .= '<td class="size"><span class="qq-upload-size-selector">&nbsp;</span>';
+			$template .= '<div class="qq-progress-bar-selector qq-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>';
+			$template .= '</td>';
 			if( $UserSettings->get('fm_showdate') != 'no' )
 			{
 				$template .= '<td class="qq-upload-status-text-selector qq-upload-status-text timestamp">'.TS_('Uploading...').'</td>';

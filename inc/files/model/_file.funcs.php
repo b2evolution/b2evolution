@@ -2488,6 +2488,10 @@ function display_dragdrop_upload_button( $params = array() )
 								<?php } ?>
 							}, 10 );
 					},
+					onProgress: function( id, fileName, uploadedBytes, totalBytes )
+					{
+						update_iframe_height();
+					},
 					onComplete: function( id, fileName, responseJSON )
 					{
 						if( responseJSON != undefined )
