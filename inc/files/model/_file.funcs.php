@@ -2490,7 +2490,16 @@ function display_dragdrop_upload_button( $params = array() )
 					},
 					onProgress: function( id, fileName, uploadedBytes, totalBytes )
 					{
-						update_iframe_height();
+						var progressbar = jQuery( 'tr[qq-file-id=' + id + '] .progress-bar' );
+						var percentCompleted = Math.round( uploadedBytes / totalBytes * 100 ) + '%';
+
+						progressbar.css( 'width', percentCompleted );
+						<?php
+						if( $params['resize_frame'] )
+						{
+							echo 'update_iframe_height();';
+						}
+						?>
 					},
 					onComplete: function( id, fileName, responseJSON )
 					{

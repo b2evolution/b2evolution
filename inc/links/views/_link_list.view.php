@@ -190,8 +190,8 @@ display_dragdrop_upload_button( array(
 									.'<span class="qq-upload-size-selector"></span>'
 									.( count( $LinkOwner->get_positions() ) > 1 ? '' : ' <a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>' )
 								.'</div>'
-								.'<div class="qq-progress-bar-container-selector">'
-    							.'<div class="qq-progress-bar-selector qq-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>'
+								.'<div class="qq-progress-bar-container-selector progress" style="margin-bottom: 0;">'
+    							.'<div class="qq-progress-bar-selector progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>'
 								.'</div>'
 							.'</td>'
 							.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"><a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a></td>' : '' )
