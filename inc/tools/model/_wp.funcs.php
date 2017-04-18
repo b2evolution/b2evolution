@@ -748,6 +748,17 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			{	// Skip attachment post because it shoul be imported above:
 				continue;
 			}
+			elseif( $post['post_type'] == 'page' && ! isset( $categories['standalone-pages'] ) )
+			{	// Try to create special category "Standalone Pages" for pages only it doesn't exist:
+				$page_Chapter = new Chapter( NULL, $wp_blog_ID );
+				$page_Chapter->set( 'name', T_('Standalone Pages') );
+				$page_Chapter->set( 'urlname', 'standalone-pages' );
+				$page_Chapter->dbinsert();
+				$categories['standalone-pages'] = $page_Chapter->ID;
+				// Add new created chapter to cache to avoid error when this cache loaded all elements before:
+				$ChapterCache = & get_ChapterCache();
+				$ChapterCache->add( $page_Chapter );
+			}
 
 			echo '<p>'.sprintf( T_('Importing post: %s'), '#'.$post['post_id'].' - "'.$post['post_title'].'"' );
 
@@ -783,6 +794,12 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 							break;
 					}
 				}
+			}
+
+			if( $post['post_type'] == 'page' )
+			{	// Set static category "Standalone Pages" for pages because they have no categories in wordpress DB:
+				$post_main_cat_ID = $categories['standalone-pages'];
+				$post_extra_cat_IDs[] = $categories['standalone-pages'];
 			}
 
 			// Set post type ID
