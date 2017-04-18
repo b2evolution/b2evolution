@@ -248,7 +248,7 @@ if( $action != 'view' )
 		$Form->info( T_('Profile picture'), $user_pictures );
 	}
 
-	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', array( 'maxlength' => 60, 'required' => true ) );
+	$Form->text_input( 'edited_user_login', $edited_User->login, 20, /* TRANS: noun */ T_('Login'), '', array( 'maxlength' => 60, 'required' => true ) );
 
 	$firstname_editing = $Settings->get( 'firstname_editing' );
 	if( ( in_array( $firstname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $has_full_access ) )
@@ -459,7 +459,7 @@ else
 		$Form->info( T_('Profile picture'), $edited_User->get_avatar_imgtag( 'crop-top-64x64', 'avatar', '', true ) );
 	}
 
-	$Form->info( T_('Login'), $edited_User->get('login') );
+	$Form->info( /* TRANS: noun */ T_('Login'), $edited_User->get('login') );
 	$Form->info( T_('First name'), $edited_User->get('firstname') );
 	$Form->info( T_('Last name'), $edited_User->get('lastname') );
 	$Form->info( T_('Nickname'), $edited_User->get('nickname') );

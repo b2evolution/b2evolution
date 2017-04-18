@@ -733,10 +733,10 @@ function search_result_block( $params = array() )
 	// Make sure we are not missing any display params:
 	$params = array_merge( array(
 			'no_match_message'      =>  '<p class="alert alert-info msg_nothing" style="margin: 2em 0">'.T_('Sorry, we could not find anything matching your request, please try to broaden your search.').'<p>',
-			'title_suffix_post'     => ' ('.T_('Post').')',
-			'title_suffix_comment'  => ' ('.T_('Comment').')',
-			'title_suffix_category' => ' ('.T_('Category').')',
-			'title_suffix_tag'      => ' ('.T_('Tag').')',
+			'title_suffix_post'     => ' ('./* TRANS: noun */ T_('Post').')',
+			'title_suffix_comment'  => ' ('./* TRANS: noun */ T_('Comment').')',
+			'title_suffix_category' => ' ('./* TRANS: noun */ T_('Category').')',
+			'title_suffix_tag'      => ' ('./* TRANS: noun */ T_('Tag').')',
 			'block_start'           => '',
 			'block_end'             => '',
 			'pagination'            => array(),
@@ -858,7 +858,7 @@ function search_result_block( $params = array() )
 				$display_params = array(
 					'title'   => $Item->get_title( array( 'link_type' => 'permalink' ) ).$params['title_suffix_post'],
 					'excerpt' => $Item->get_excerpt(),
-					'chapter' => sprintf( T_('In %s'), $Item->get_chapter_links() ),
+					'chapter' => sprintf( /* TRANS: %s gets replaced by chapter links */ T_('In %s'), $Item->get_chapter_links() ),
 				);
 
 				if( $params['use_editor'] )

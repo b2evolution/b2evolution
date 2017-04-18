@@ -3357,7 +3357,7 @@ function callback_filter_userlist( & $Form )
 		$Form->output = true;
 
 		global $user_fields_empty_name;
-		$user_fields_empty_name = T_('Select').'...';
+		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
 
 		$Form->select( 'criteria_type[]', $type, 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
 	}
@@ -5457,7 +5457,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_login'] )
 	{ // Display login
 		$UserList->cols[] = array(
-				'th' => T_('Login'),
+				'th' => /* TRANS: noun */ T_('Login'),
 				'th_class' => $params['th_class_login'],
 				'td_class' => $params['td_class_login'],
 				'order' => 'user_login',

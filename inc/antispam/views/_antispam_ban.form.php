@@ -201,7 +201,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 			<p><label><strong><?php echo( T_('Affected users').':' )?></strong></label></p>
 			<table class="grouped" cellspacing="0">
 				<thead><tr>
-				<th class="firstcol"><?php printf( T_('Login') )?></th>
+				<th class="firstcol"><?php printf( /* TRANS: noun */ T_('Login') )?></th>
 				<th><?php echo( T_('First name') )?></th>
 				<th><?php echo( T_('Last name') )?></th>
 				<th><?php echo( T_('Nickname') )?></th>
