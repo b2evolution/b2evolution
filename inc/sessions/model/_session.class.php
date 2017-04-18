@@ -138,7 +138,7 @@ class Session
 					  FROM T_sessions
 					 WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
 					   AND sess_key = '.$DB->quote($session_key_by_cookie).'
-					   AND UNIX_TIMESTAMP(sess_lastseen_ts) > '.( $localtimenow - $timeout_sessions ) );
+					   AND UNIX_TIMESTAMP( sess_lastseen_ts ) + TIME_TO_SEC( TIMEDIFF( NOW(), "'.date( 'Y-m-d H:i:s' ).'") ) > '.( $localtimenow - $timeout_sessions ) );
 				if( empty( $row ) )
 				{
 					$Debuglog->add( 'Session: Session ID/key combination is invalid!', 'request' );
