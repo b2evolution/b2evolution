@@ -636,6 +636,8 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		$SQL = new SQL();
 		$SQL->SELECT( 'LOWER( ityp_usage ), ityp_ID' );
 		$SQL->FROM( 'T_items__type' );
+		$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID' );
+		$SQL->WHERE( 'itc_coll_ID = '.$DB->quote( $wp_blog_ID ) );
 		$SQL->GROUP_BY( 'ityp_usage' );
 		$SQL->ORDER_BY( 'ityp_ID' );
 		$post_types = $DB->get_assoc( $SQL->get() );
