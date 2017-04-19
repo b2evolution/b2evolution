@@ -1198,6 +1198,12 @@ switch( $action )
 
 		break;
 
+	case 'get_crumb':
+		// Get crumb value by name:
+		$crumb = param( 'crumb', 'string' );
+		echo get_crumb( $crumb );
+		break;
+
 	case 'get_user_salt':
 		// Get the salt of the user from the given login info
 		// Note: If there are more users with the received login then give at most 3 salt values for the 3 most recently active users
