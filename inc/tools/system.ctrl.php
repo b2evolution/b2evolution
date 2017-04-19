@@ -344,6 +344,30 @@ else
 	disp_system_check( 'ok' );
 }
 
+// Timezone support:
+$supported_timezones = 0;
+$not_supported_timezones = 0;
+$timezone_identifiers_list = timezone_identifiers_list();
+if( count( $timezone_identifiers_list ) )
+{	// Test PHP timezones by MySQL only if at least one is detected in PHP:
+	$sql_before = 'CONVERT_TZ( NOW(), "+0:00", "';
+	$sql_after = '" )';
+	$test_timezones = $DB->get_row( 'SELECT '.$sql_before.implode( $sql_after.', '.$sql_before, $timezone_identifiers_list ).$sql_after, ARRAY_N );
+	foreach( $test_timezones as $test_timezone )
+	{
+		if( $test_timezone === NULL )
+		{	// This PHP timezone is NOT supported by MySQL:
+			$not_supported_timezones++;
+		}
+		else
+		{	// This PHP timezone is supported by MySQL:
+			$supported_timezones++;
+		}
+	}
+}
+init_system_check( T_('Timezone support'), sprintf( T_('%d PHP timezones could be used in MySQL and %d PHP timzeones could NOT be used in MYSQL.'), $supported_timezones, $not_supported_timezones ) );
+disp_system_check( 'note' );
+
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 
