@@ -593,7 +593,7 @@ $Form->begin_form();
 				.'<tr>';
 
 			$template .= '<td class="checkbox firstcol qq-upload-checkbox">&nbsp;</td>';
-			$template .= '<td class="icon_type qq-upload-image"><span class="qq-upload-spinner-selector qq-upload-spinner">&nbsp;</span></td>';
+			$template .= '<td class="icon_type qq-upload-image shrinkwrap"><span class="qq-upload-spinner-selector qq-upload-spinner">&nbsp;</span></td>';
 
 			if( $fm_mode == 'file_select' && !empty( $field_name ) )
 			{
@@ -612,15 +612,16 @@ $Form->begin_form();
 				$icon_to_select_files = '';
 			}
 
-
-			$template_filerow = '<table><tr>'
-				.'<td class="checkbox firstcol qq-upload-checkbox">&nbsp;</td>'
-				.'<td class="icon_type text-nowrap qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>';
 			if( $fm_flatmode )
 			{
 				$template .= '<td class="filepath">'.( empty( $path ) ? './' : $path ).'</td>';
 			}
-			$template .= '<td class="fm_filename qq-upload-file-selector">&nbsp;</td>';
+			$template .= '<td class="fm_filename">';
+			$template .= '<div class="qq-upload-file-selector"></div>';
+			$template .= '<div class="qq-progress-bar-container-selector progress" style="margin-bottom: 0;">';
+			$template .= '<div class="qq-progressbar-selector progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;"></div>';
+			$template .= '</div>';
+			$template .= '</td>';
 			if( $UserSettings->get('fm_showtypes') )
 			{
 				$template .= '<td class="type qq-upload-file-type">&nbsp;</td>';
@@ -634,13 +635,10 @@ $Form->begin_form();
 				$template .= '<td class="center qq-upload-downloads">&nbsp;</td>';
 			}
 			$template .= '<td class="size"><span class="qq-upload-size-selector">&nbsp;</span>';
-			$template .= '<div class="qq-progress-bar-container-selector progress" style="margin-bottom: 0;">';
-			$template .= '<div class="qq-progressbar-selector progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>';
-			$template .= '</div>';
 			$template .= '</td>';
 			if( $UserSettings->get('fm_showdate') != 'no' )
 			{
-				$template .= '<td class="qq-upload-status-text-selector qq-upload-status-text timestamp">'.TS_('Uploading...').'</td>';
+				$template .= '<td class="qq-upload-status-text-selector qq-upload-status-text timestamp"></td>';
 			}
 			if( $UserSettings->get('fm_showfsperms') )
 			{
@@ -654,10 +652,10 @@ $Form->begin_form();
 			{
 				$template .= '<td class="fsgroup">&nbsp;</td>';
 			}
-			$template .= '<td class="actions lastcol">';
+			$template .= '<td class="actions lastcol shrinkwrap">';
 			if( $UserSettings->get('fm_showdate') == 'no' )
 			{ // Display status in the last column if column with datetime is hidden
-				$template .= '<span class="qq-upload-status-text-selector qq-upload-status-text">'.TS_('Uploading...').'</span> ';
+				$template .= '<span class="qq-upload-status-text-selector qq-upload-status-text"></span> ';
 			}
 			$template .= '<a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'.'</td>';
 

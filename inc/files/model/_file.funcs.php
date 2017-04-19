@@ -2443,6 +2443,9 @@ function display_dragdrop_upload_button( $params = array() )
 					emptyError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is empty. Please select non-empty files.'); ?>',
 					onLeave: '<?php echo TS_('Files are currently being uploaded. If you leave this page now, the upload will be cancelled.'); ?>'
 				},
+				text: {
+					formatProgress: '<?php echo /* TRANS: strings in {] must NOT be translated */ TS_('Uploading {total_size}...');?>',
+				},
 				validation: {
 					sizeLimit: <?php echo min( array( return_bytes( ini_get('post_max_size') ), return_bytes( ini_get('upload_max_filesize') ), $Settings->get( 'upload_maxkb') * 1024 ) );?>,
 					allowedExtensions: <?php echo json_encode( $allowed_extensions );?>
@@ -2494,6 +2497,7 @@ function display_dragdrop_upload_button( $params = array() )
 						var percentCompleted = Math.round( uploadedBytes / totalBytes * 100 ) + '%';
 
 						progressbar.css( 'width', percentCompleted );
+						progressbar.text( percentCompleted );
 						<?php
 						if( $params['resize_frame'] )
 						{

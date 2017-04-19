@@ -1730,7 +1730,7 @@ function htmlspecialchars_decode (string, quote_style) {
                     bytes = bytes / 1e3;
                     i++;
                 } while (bytes > 999);
-                return Math.max(bytes, .1).toFixed(1) + this._options.text.sizeSymbols[i];
+                return Math.max(bytes, .1).toFixed(1) + '\xa0' +this._options.text.sizeSymbols[i];
             },
             _generateExtraButtonSpecs: function() {
                 var self = this;

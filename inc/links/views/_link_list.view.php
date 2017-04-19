@@ -182,16 +182,17 @@ display_dragdrop_upload_button( array(
 					.'<tbody class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">'
 						.'<tr>'
 							.'<td class="firstcol shrinkwrap qq-upload-image"><span class="qq-upload-spinner-selector qq-upload-spinner">&nbsp;</span></td>'
-							.'<td class="qq-upload-file-selector fm_filename">&nbsp;</td>'
+							.'<td class="fm_filename">'
+								.'<div class="qq-upload-file-selector"></div>'
+								.'<div class="qq-progress-bar-container-selector progress" style="margin-bottom: 0;">'
+									.'<div class="qq-progress-bar-selector progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;"></div>'
+								.'</div>'
+							.'</td>'
 							.'<td class="qq-upload-link-id shrinkwrap link_id_cell">&nbsp;</td>'
 							.'<td class="qq-upload-link-actions shrinkwrap">'
 								.'<div class="qq-upload-status-text-selector qq-upload-status-text">'
-									.TS_('Uploading...')
 									.'<span class="qq-upload-size-selector"></span>'
 									.( count( $LinkOwner->get_positions() ) > 1 ? '' : ' <a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>' )
-								.'</div>'
-								.'<div class="qq-progress-bar-container-selector progress" style="margin-bottom: 0;">'
-    							.'<div class="qq-progress-bar-selector progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>'
 								.'</div>'
 							.'</td>'
 							.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"><a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a></td>' : '' )

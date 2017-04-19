@@ -69,7 +69,7 @@
 .qq-upload-file, .qq-upload-spinner, .qq-upload-size,
 .qq-upload-cancel, .qq-upload-retry, .qq-upload-failed-text,
 .qq-upload-delete, .qq-upload-pause, .qq-upload-continue {
-    margin-right: 12px;
+    /*margin-right: 12px;*/
     display: inline;
 }
 .qq-upload-file {
