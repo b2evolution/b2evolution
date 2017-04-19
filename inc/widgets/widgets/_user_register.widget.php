@@ -269,7 +269,7 @@ class user_register_Widget extends ComponentWidget
 		$Form->end_form();
 
 		if( ! is_logged_in() )
-		{
+		{	// JS code to get crumb from AJAX request when page caching is enabled:
 			echo '<script type="text/javascript">
 var user_reg_widget_request_sent = false;
 jQuery( ".widget_register_form" ).submit( function()
@@ -286,10 +286,7 @@ jQuery( ".widget_register_form" ).submit( function()
 	{
 		type: "POST",
 		url: "'.get_htsrv_url().'anon_async.php",
-		data: {
-			"action": "get_crumb",
-			"crumb": "regform",
-		},
+		data: { "action": "get_regform_crumb" },
 		success: function( result )
 		{
 			result = ajax_debug_clear( result );
