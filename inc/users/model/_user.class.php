@@ -6365,7 +6365,7 @@ class User extends DataObject
 				'user_ID' => $this->ID,
 				'login'   => $this->login,
 				'fields'  => array(
-					'login'     => array( 'title' => NT_('Login') ),
+					'login'     => array( 'title' => /* TRANS: noun */ NT_('Login') ),
 					'grp_ID'  => array( 'title' => NT_('Group'), 'className' => 'Group' ),
 					'nickname'  => array( 'title' => NT_('Nickname') ),
 					'firstname' => array( 'title' => NT_('First name') ),

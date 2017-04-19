@@ -342,7 +342,7 @@ $Form->begin_form();
 					$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \''.$sfile_path.'\' );';
 					echo action_icon( T_('Select file'), 'link',
 							regenerate_url( 'fm_selected', 'action=file_select&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
-							' '.T_('Select'), NULL, 5, $link_attribs );
+							' './* TRANS: verb */ T_('Select'), NULL, 5, $link_attribs );
 					echo ' ';
 				}
 			}
@@ -584,7 +584,7 @@ $Form->begin_form();
 				$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \''.'$file_path$'.'\' );';
 				$icon_to_select_files = action_icon( T_('Select file'), 'link',
 						regenerate_url( 'fm_selected', 'action=file_select&amp;fm_selected[]='.'$file_path$'.'&amp;'.url_crumb('file') ),
-						' '.T_('Select'), NULL, 5, $link_attribs ).' ';
+						' './* TRANS: verb */ T_('Select'), NULL, 5, $link_attribs ).' ';
 			}
 			else
 			{

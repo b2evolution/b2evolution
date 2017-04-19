@@ -112,7 +112,7 @@ $Results->grp_cols[] = array(
  * Colmun definitions:
  */
 $Results->cols[] = array(
-						'th' => T_('Login'),
+						'th' => /* TRANS: noun */ T_('Login'),
 						'order' => 'user_login',
 						'td' => '%coll_perm_login( #user_ID#, #user_login# )%',
 					);

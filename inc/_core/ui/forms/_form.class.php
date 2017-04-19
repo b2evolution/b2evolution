@@ -3753,7 +3753,7 @@ class Form extends Widget
 			$thumb_width = $thumbnail_sizes[ $field_params['size_name'] ][1];
 			$thumb_height = $thumbnail_sizes[ $field_params['size_name'] ][2];
 
-			$button_label = ( $counter === 0 ? T_('Select') : get_icon( 'new' ).' '.T_('Add') );
+			$button_label = ( $counter === 0 ? /* TRANS: verb */ T_('Select') : get_icon( 'new' ).' '.T_('Add') );
 
 			$r .= '<button class="btn btn-sm btn-info file_select_item" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
 
@@ -3882,7 +3882,7 @@ class Form extends Widget
 										lastItem = items.last();
 
 										// Toggle add button
-										addButton.html( items.length === 0 ? "'.T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
+										addButton.html( items.length === 0 ? "'./* TRANS: verb */ T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
 										if( maxLength > items.length )
 										{
 											addButton.show();
@@ -3928,7 +3928,7 @@ class Form extends Widget
 							var lastItem = items.last();
 
 							// Toggle add button
-							addButton.html( items.length === 0 ? "'.T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
+							addButton.html( items.length === 0 ? "'./* TRANS: verb */ T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
 							if( maxLength > items.length )
 							{
 								addButton.show();

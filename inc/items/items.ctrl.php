@@ -615,7 +615,7 @@ switch( $action )
 		// Page title:
 		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d: %s'), $edited_Item->ID, $Blog->get('name') );
 
-		$AdminUI->breadcrumbpath_add( sprintf( T_('Post #%s'), $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
+		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 		$AdminUI->breadcrumbpath_add( T_('Edit'), '?ctrl=items&amp;action=edit&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 
 		// Params we need for tab switching:
@@ -712,7 +712,7 @@ switch( $action )
 		// Page title:
 		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d: %s'), $edited_Item->ID, $Blog->get('name') );
 
-		$AdminUI->breadcrumbpath_add( sprintf( T_('Post #%s'), $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
+		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 		$AdminUI->breadcrumbpath_add( T_('Edit'), '?ctrl=items&amp;action=edit&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 
 		// Params we need for tab switching:
@@ -1733,7 +1733,7 @@ switch( $action )
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'tab' => $tab, 'filter' => 'restore' ) );
 
-		$AdminUI->breadcrumbpath_add( sprintf( T_('Post #%s'), $item_ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$item_ID );
+		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $item_ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$item_ID );
 		$AdminUI->breadcrumbpath_add( T_('View post & comments'), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$item_ID );
 		break;
 

@@ -37,7 +37,7 @@ if( param( 'tag_ID', 'integer', '', true) )
 	{ // We could not find the goal to edit:
 		unset( $edited_ItemTag );
 		forget_param( 'tag_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Tag') ), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), /* TRANS: noun */ T_('Tag') ), 'error' );
 		$action = 'nil';
 	}
 }

@@ -1208,7 +1208,7 @@ class _core_Module extends Module
 			if( $perm_admin_normal )
 			{	// Only for normal access display a menu item to create new:
 				$entries['post'] = array(
-						'text' => get_icon( 'new' ).' '.T_('Post'),
+						'text' => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
 						'title' => T_('No blog is currently selected'),
 						'disabled' => true,
 						'entry_class' => 'rwdhide',
@@ -1264,7 +1264,7 @@ class _core_Module extends Module
 					if( ! $perm_admin_normal )
 					{	// Initialize this menu item when user has no back-office access but can create new post:
 						$entries['post'] = array(
-							'text'        => get_icon( 'new' ).' '.T_('Post'),
+							'text'        => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
 							'entry_class' => 'rwdhide',
 						);
 					}

@@ -464,7 +464,7 @@ class bootstrap_forums_Skin extends Skin
 			}
 			else
 			{ // Display button to post a reply
-				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'" class="btn btn-default '.$params['button_class'].'" title="'.T_('Reply to topic').'"><i class="fa fa-reply"></i> '.T_('Reply').'</a>';
+				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'" class="btn btn-default '.$params['button_class'].'" title="'.T_('Reply to topic').'"><i class="fa fa-reply"></i> './* TRANS: verb */ T_('Reply').'</a>';
 			}
 		}
 

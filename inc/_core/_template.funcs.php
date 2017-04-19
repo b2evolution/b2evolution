@@ -2536,7 +2536,7 @@ function display_login_form( $params )
 	if( $inskin )
 	{
 		$Form->begin_field();
-		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, T_('Login'), $separator.T_('Enter your username (or email address).'),
+		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, /* TRANS: noun */ T_('Login'), $separator.T_('Enter your username (or email address).'),
 					array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true ) );
 		$Form->end_field();
 	}
@@ -2774,7 +2774,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	if( $params['inskin'] )
 	{
-		$Form->text( $dummy_fields[ 'login' ], $login, 30, T_('Login'), '', 255, 'input_text' );
+		$Form->text( $dummy_fields[ 'login' ], $login, 30, /* TRANS: noun */ T_('Login'), '', 255, 'input_text' );
 	}
 	else
 	{

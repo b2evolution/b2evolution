@@ -780,7 +780,7 @@ switch( $action )
 		$Form->output = true;
 
 		global $user_fields_empty_name;
-		$user_fields_empty_name = T_('Select').'...';
+		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
 
 		$Form->select( 'criteria_type[]', '', 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
 
@@ -1196,6 +1196,12 @@ switch( $action )
 		// Display icon with new status
 		echo $accept_icon;
 
+		break;
+
+	case 'get_crumb':
+		// Get crumb value by name:
+		$crumb = param( 'crumb', 'string' );
+		echo get_crumb( $crumb );
 		break;
 
 	case 'get_user_salt':

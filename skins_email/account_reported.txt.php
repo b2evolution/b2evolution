@@ -30,7 +30,7 @@ echo sprintf( T_('A user account was reported by %s'), $params['reported_by'] );
 
 echo "\n\n";
 
-echo T_('Login').": ".$params['login']."\n";
+echo /* TRANS: noun */ T_('Login').": ".$params['login']."\n";
 echo T_('Email').": ".$params['email']."\n";
 echo T_('Reported as').": ".$params['report_status']."\n";
 echo T_('Extra info').": ".$params['report_info'];

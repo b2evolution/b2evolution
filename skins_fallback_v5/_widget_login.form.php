@@ -35,7 +35,7 @@ $Form->hidden( 'source', $source );
 $Form->hidden( 'inskin', true );
 $Form->hidden( 'redirect_to', $redirect_to );
 
-$Form->text_input( $dummy_fields[ 'login' ], '', 18, T_('Login'), '', array( 'maxlength' => 255, 'class' => 'input_text', 'required'=>true ) );
+$Form->text_input( $dummy_fields[ 'login' ], '', 18, /* TRANS: noun */ T_('Login'), '', array( 'maxlength' => 255, 'class' => 'input_text', 'required'=>true ) );
 $Form->password_input( $dummy_fields[ 'pwd' ], '', 18, T_('Password'), array( 'maxlength' => 70, 'class' => 'input_text', 'required'=>true ) );
 
 // Add container for the hashed passwords
