@@ -50,28 +50,51 @@ function draw_canvas_bars_chart( $chart )
 			}';
 	}
 
-	/*$datasets[] = '{
-			type: "line",
-			backgroundColor: "rgba(0,0,0,0.05)",
-			data: [{x:-1,y:60},{x:1,y:60}]
-		}';
-	$datasets[] = '{
-			type: "line",
-			backgroundColor: "rgba(0,0,0,0.05)",
-			data: [{x:10,y:60},{x:20,y:60}]
-		}';*/
+	$weekends = array();
+	foreach( $chart['dates'] as $d => $date )
+	{
+		$week_day = date( 'w', $date );
+		if( $week_day == 0 || $week_day == 6 )
+		{
+			$weekends[] = $d;
+		}
+	}
 ?>
 	<canvas id="canvas_bars_chart" height="80"></canvas>
 	<script type="text/javascript">
 	jQuery( document ).ready( function()
 	{
+		Chart.pluginService.register(
+		{	// Register plugin event to mark x axis, e-g for weekend days:
+			beforeDraw: function ( chart )
+			{
+				if( typeof( chart.config.data.marked_xaxis ) == 'undefined' || chart.config.data.marked_xaxis.length == 0 )
+				{	// No marked x axis config:
+					return;
+				}
+
+				// Calculate width of one x axis value:
+				var x_unit_width = ( chart.chartArea.right - chart.chartArea.left ) / ( chart.scales['x-axis-0'].maxIndex + 1 );
+
+				for( var x = 0; x <= chart.config.data.marked_xaxis.length; x++ )
+				{	// Draw rect for each marked x axis value:
+					var x_index = chart.config.data.marked_xaxis[x];
+					chart.chart.ctx.save();
+					chart.chart.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+					chart.chart.ctx.fillRect( chart.chartArea.left + ( x_index * x_unit_width ), chart.chartArea.top, x_unit_width, chart.chartArea.bottom - chart.chartArea.top );
+					chart.chart.ctx.restore();
+				}
+			}
+		} );
+
 		var ctx = document.getElementById( 'canvas_bars_chart' ).getContext( '2d' );
 		new Chart( ctx,
 		{
 			type: 'bar',
 			data: {
 				labels: [<?php echo implode( ',', $labels ); ?>],
-				datasets: [<?php echo implode( ',', $datasets );?>]
+				datasets: [<?php echo implode( ',', $datasets );?>],
+				marked_xaxis: [<?php echo implode( ',', $weekends );?>],
 			},
 			options: {
 				height: <?php echo $chart['canvas_bg']['height']; ?>,
