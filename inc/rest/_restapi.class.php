@@ -121,7 +121,7 @@ class RestApi
 			}
 		}
 
-		if( $User->pass != md5( $User->salt.$entered_password, true ) )
+		if( ! $User->check_password( $entered_password ) )
 		{	// The entered password is not right for requested user
 			// Save new login attempt into DB:
 			if( count( $login_attempts ) == 9 )
@@ -239,6 +239,7 @@ class RestApi
 		$message_types = explode( ',', $message_types );
 
 		$halt_messages = array();
+		$Messages->close_group(); // Make sure any open message group are closed
 		foreach( $Messages->messages_text as $m => $message_text )
 		{
 			if( in_array( $Messages->messages_type[ $m ], $message_types ) )
@@ -997,6 +998,8 @@ class RestApi
 	/**
 	 * Call collection controller to toggle favorite status
 	 *
+	 * Request scheme: "<baseurl>/api/v1/collections/<collname>/favorite
+	 *
 	 */
 	private function controller_coll_favorite()
 	{
@@ -1372,11 +1375,13 @@ class RestApi
 		$result = $edited_User->update_from_request( $is_new_user );
 		if( $result !== true )
 		{	// There are errors on update the requested user:
+			$Messages->close_group(); // Make sure any open message group are closed
 			$this->halt( $Messages->messages_text[0], 'update_failed', 403 );
 			// Exit here.
 		}
 		else
 		{	// The requested user has been updated successfully
+			$Messages->close_group(); // Make sure any open message group are closed
 			$this->halt( $Messages->messages_text[0], 'update_success', 200 );
 			// Exit here.
 		}
@@ -1425,6 +1430,7 @@ class RestApi
 
 		if( ! $User->check_delete( sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $User->get( 'login' ) ) ) )
 		{	// There are restrictions on delete the requested user:
+			$Messages->close_group(); // Make sure any open message group are closed
 			$this->halt( strip_tags( $Messages->messages_text[0] ), 'delete_restriction', 403 );
 			// Exit here.
 		}
