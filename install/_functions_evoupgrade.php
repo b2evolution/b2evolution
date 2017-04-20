@@ -8174,7 +8174,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12180, 'Updating base domains table...' ) )
-	{ // part of 6.9.0-beta
+	{	// part of 6.9.0-beta
 		$sql = 'SHOW INDEX FROM T_basedomains WHERE KEY_NAME = "dom_type_name"';
 		$indexes = $DB->get_results( $sql, ARRAY_A );
 		if( $DB->num_rows > 0 )
@@ -8257,7 +8257,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12200, 'Updating group permissions...' ) )
-	{ // part of 6.9.0-beta
+	{	// part of 6.9.0-beta
 		$DB->query( 'UPDATE T_groups__groupsettings
 			SET gset_name = "perm_skins_root",
 				gset_value = CASE gset_value WHEN "allowed" THEN "edit" ELSE "none" END
@@ -8266,7 +8266,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12210, 'Create new widget container "Forum Front Secondary Area" for forums...' ) )
-	{ // part of 6.9.1-beta
+	{	// part of 6.9.1-beta
 		$DB->begin();
 		$SQL = new SQL( 'Get all "forum" collections' );
 		$SQL->SELECT( 'blog_ID' );
@@ -8342,7 +8342,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12240, 'Create new widget "Item Link"...' ) )
-	{ // part of 6.9.1-beta
+	{	// part of 6.9.1-beta
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_order, wi_enabled, wi_code, wi_params, blog_type' );
 		$SQL->FROM( 'T_widget' );
@@ -8403,8 +8403,35 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12260, 'Upgrading table for a latest versions of the PO files...' ) )
-	{
+	{	// part of 6.9.1-beta
 		db_add_index( 'T_i18n_translated_string', 'itst_iost_ID_locale', 'itst_iost_ID, itst_locale' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12270, 'Upgrade datetime fields to timestamp type...' ) )
+	{	// part of 6.9.1-beta
+		$DB->query( 'ALTER TABLE T_users
+			MODIFY user_created_datetime   TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+			MODIFY user_profileupdate_date TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_cron__task
+			MODIFY ctsk_start_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_cron__log
+			MODIFY clog_realstart_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+			MODIFY clog_realstop_datetime  TIMESTAMP NULL' );
+		$DB->query( 'ALTER TABLE T_items__item
+			MODIFY post_datestart    TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+			MODIFY post_datedeadline TIMESTAMP NULL' );
+		$DB->query( 'ALTER TABLE T_comments
+			MODIFY comment_date TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_items__version
+			MODIFY iver_edit_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_links
+			MODIFY link_datecreated  TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+			MODIFY link_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__thread
+			MODIFY thrd_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__message
+			MODIFY msg_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		upg_task_end();
 	}
 
