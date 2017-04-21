@@ -75,7 +75,7 @@ $schema_queries['T_messaging__contact'] = array(
 			mct_from_user_ID int(10) unsigned NOT NULL,
 			mct_to_user_ID int(10) unsigned NOT NULL,
 			mct_blocked tinyint(1) default 0,
-			mct_last_contact_datetime datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
+			mct_last_contact_datetime TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY mct_PK (mct_from_user_ID, mct_to_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 

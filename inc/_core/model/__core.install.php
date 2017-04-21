@@ -156,7 +156,7 @@ $schema_queries = array(
 			urep_reporter_ID    int(11) unsigned NOT NULL,
 			urep_status         enum( 'fake', 'guidelines', 'harass', 'spam', 'other' ) COLLATE ascii_general_ci,
 			urep_info           varchar(240),
-			urep_datetime       datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
+			urep_datetime       TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY ( urep_target_user_ID, urep_reporter_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

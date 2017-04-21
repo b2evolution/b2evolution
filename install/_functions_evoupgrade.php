@@ -8435,6 +8435,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12280, 'Upgrade datetime fields to timestamp type...' ) )
+	{	// part of 6.9.1-beta
+		$DB->query( 'ALTER TABLE T_users__reports
+			MODIFY urep_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__contact
+			MODIFY mct_last_contact_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
