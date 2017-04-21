@@ -191,12 +191,12 @@ class User extends DataObject
 			if( isset($localtimenow) )
 			{
 				$this->set_datecreated( $localtimenow );
-				$this->set( 'profileupdate_date', date( 'Y-m-d', $localtimenow ) );
+				$this->set( 'profileupdate_date', date( 'Y-m-d H:i:s', $localtimenow ) );
 			}
 			else
 			{ // We don't know local time here!
 				$this->set_datecreated( time() );
-				$this->set( 'profileupdate_date', date( 'Y-m-d', time() ) );
+				$this->set( 'profileupdate_date', date( 'Y-m-d H:i:s' ) );
 			}
 
 			if( isset( $Settings ) )
@@ -5056,7 +5056,7 @@ class User extends DataObject
 		global $current_User, $localtimenow;
 		if( ( !empty( $current_User ) ) && ( $this->ID == $current_User->ID ) )
 		{
-			$this->set( 'profileupdate_date', date( 'Y-m-d', $localtimenow ) );
+			$this->set( 'profileupdate_date', date( 'Y-m-d H:i:s', $localtimenow ) );
 		}
 	}
 

@@ -654,7 +654,7 @@ function phpbb_import_users()
 					'user_login'              => $user_login,
 					'user_email'              => $phpbb_user->user_email,
 					'user_created_datetime'   => date( 'Y-m-d H:i:s', $phpbb_user->user_regdate ),
-					'user_profileupdate_date' => date( 'Y-m-d', $phpbb_user->user_regdate ),
+					'user_profileupdate_date' => date( 'Y-m-d H:i:s', $phpbb_user->user_regdate ),
 					'user_locale'             => 'en-US'
 				);
 			if( $phpbb_version == 3 )

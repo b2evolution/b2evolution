@@ -1198,10 +1198,10 @@ switch( $action )
 
 		break;
 
-	case 'get_crumb':
-		// Get crumb value by name:
-		$crumb = param( 'crumb', 'string' );
-		echo get_crumb( $crumb );
+	case 'get_regform_crumb':
+		// Get crumb value for register form:
+		// (Used for widget "Email capture / Quick registration" when page caching is enabled)
+		echo get_crumb( 'regform' );
 		break;
 
 	case 'get_user_salt':
