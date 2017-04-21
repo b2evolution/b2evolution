@@ -107,7 +107,7 @@ function draw_canvas_bars_chart( $chart )
 		} );
 
 		var ctx = document.getElementById( 'canvas_bars_chart' ).getContext( '2d' );
-		new Chart( ctx,
+		b2evo_chartjs_bar = new Chart( ctx,
 		{
 			type: 'bar',
 			data: {
@@ -124,7 +124,7 @@ function draw_canvas_bars_chart( $chart )
 					}
 				},
 				tooltips: {
-					mode: 'index',
+					mode: 'point',
 					intersect: false
 				},
 				scales: {
@@ -148,6 +148,49 @@ function draw_canvas_bars_chart( $chart )
 				}
 			}
 		} );
+
+		<?php
+		if( isset( $chart['link_data'] ) )
+		{	// Initialize URLs on click to bar:
+			$chart_link_dates = array();
+			foreach( $chart['dates'] as $date )
+			{
+				$chart_link_dates[] = "'".urlencode( date( locale_datefmt(), $date ) )."'";
+			}
+			$chart_link_params = array();
+			foreach( $chart['link_data']['params'] as $types )
+			{
+				$chart_link_params[] = "['".implode( "','", $types )."']";
+			}
+		?>
+		var b2evo_chartjs_link_url = '<?php echo $chart['link_data']['url']; ?>';
+		var b2evo_chartjs_link_dates = [<?php echo implode( ',', $chart_link_dates ); ?>];
+		var b2evo_chartjs_link_params = [<?php echo implode( ',', $chart_link_params ); ?>];
+		// Open an url on click on bar:
+		jQuery( '#canvas_bars_chart' ).on( 'click', function( e )
+		{
+			var activePoints = b2evo_chartjs_bar.getElementsAtEvent( e );
+			var activeDatasets = b2evo_chartjs_bar.getDatasetAtEvent( e );
+
+			if( typeof( activePoints[0] ) == 'undefined' )
+			{
+				return false;
+			}
+
+			var pointIndex = activePoints[0]._index;
+			var datasetIndex = activeDatasets[0]._datasetIndex - <?php echo empty( $chart['draw_last_line'] ) ? 0 : 1; ?>;
+
+			if( typeof( b2evo_chartjs_link_params[ datasetIndex ] ) == 'undefined' )
+			{
+				return false;
+			}
+
+			location.href = b2evo_chartjs_link_url
+				.replace( /\$date\$/g, b2evo_chartjs_link_dates[ pointIndex ] )
+				.replace( '$param1$', b2evo_chartjs_link_params[ datasetIndex ][0] )
+				.replace( '$param2$', b2evo_chartjs_link_params[ datasetIndex ][1] );
+		} );
+		<?php } ?>
 	} );
 	</script>
 <?php
