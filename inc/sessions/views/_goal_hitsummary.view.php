@@ -106,10 +106,8 @@ if( count( $goal_rows ) && count( $hitgroup_array ) )
 	$chart['canvas_bg'] = array( 'width' => '100%', 'height' => 355 );
 
 	// Print out chart
-	echo '<div class="center">';
 	load_funcs( '_ext/_canvascharts.php' );
-	CanvasBarsChart( $chart );
-	echo '</div>';
+	draw_canvas_bars_chart( $chart );
 }
 
 /*

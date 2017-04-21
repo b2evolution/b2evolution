@@ -79,7 +79,7 @@ function draw_canvas_bars_chart( $chart )
 		}
 	}
 ?>
-	<canvas id="canvas_bars_chart" style="height:<?php echo $chart['canvas_bg']['height']; ?>px;max-height:<?php echo $chart['canvas_bg']['height']; ?>px"></canvas>
+	<canvas id="canvas_bars_chart" style="width:<?php echo $chart['canvas_bg']['width']; ?>px;max-width:<?php echo $chart['canvas_bg']['width']; ?>px;height:<?php echo $chart['canvas_bg']['height']; ?>px;max-height:<?php echo $chart['canvas_bg']['height']; ?>px;margin:auto auto 35px;"></canvas>
 	<script type="text/javascript">
 	jQuery( document ).ready( function()
 	{

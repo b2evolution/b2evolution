@@ -111,10 +111,8 @@ if( count( $res_hits ) )
 
 	$chart[ 'canvas_bg' ] = array( 'width'  => '100%', 'height' => 355 );
 
-	echo '<div class="center">';
 	load_funcs('_ext/_canvascharts.php');
 	draw_canvas_bars_chart( $chart );
-	echo '</div>';
 
 
 	/*

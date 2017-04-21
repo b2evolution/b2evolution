@@ -466,13 +466,11 @@ ONE COLOR for user_gender = NULL AND status NOT IN ( activated, autoactivated )
 	array_unshift( $chart[ 'chart_data' ][ 8 ], T_('Unknown (Inactive)') );
 	array_unshift( $chart[ 'chart_data' ][ 9 ], T_('Unknown (Closed)') );
 
-	$chart[ 'series_color' ] = $user_gender_color;
+	$chart[ 'series_color' ] = array_values( $user_gender_color );
 
 	$chart[ 'canvas_bg' ] = array( 'width'  => 780, 'height' => 355 );
 
-	echo '<div class="center" style="margin-bottom:70px">';
-	CanvasBarsChart( $chart );
-	echo '</div>';
+	draw_canvas_bars_chart( $chart );
 }
 
 ?>
