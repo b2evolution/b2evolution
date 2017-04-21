@@ -60,7 +60,7 @@ function draw_canvas_bars_chart( $chart )
 		}
 	}
 ?>
-	<canvas id="canvas_bars_chart" height="80"></canvas>
+	<canvas id="canvas_bars_chart" style="max-height:<?php echo $chart['canvas_bg']['height']; ?>px"></canvas>
 	<script type="text/javascript">
 	jQuery( document ).ready( function()
 	{
@@ -97,7 +97,7 @@ function draw_canvas_bars_chart( $chart )
 				marked_xaxis: [<?php echo implode( ',', $weekends );?>],
 			},
 			options: {
-				height: <?php echo $chart['canvas_bg']['height']; ?>,
+				maintainAspectRatio: false,
 				legend: {
 					position: 'bottom',
 					labels: {
