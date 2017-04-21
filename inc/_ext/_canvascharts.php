@@ -81,7 +81,7 @@ function draw_canvas_bars_chart( $chart )
 ?>
 	<canvas id="canvas_bars_chart" style="width:<?php echo $chart['canvas_bg']['width']; ?>px;max-width:<?php echo $chart['canvas_bg']['width']; ?>px;height:<?php echo $chart['canvas_bg']['height']; ?>px;max-height:<?php echo $chart['canvas_bg']['height']; ?>px;margin:auto auto 35px;"></canvas>
 	<script type="text/javascript">
-	jQuery( document ).ready( function()
+	jQuery( window ).load( function()
 	{
 		Chart.pluginService.register(
 		{	// Register plugin event to mark x axis, e-g for weekend days:

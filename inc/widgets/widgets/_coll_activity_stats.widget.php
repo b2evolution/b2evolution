@@ -14,7 +14,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
-init_jqplot_js();
 
 /**
  * coll_activity_stats_Widget Class.
@@ -127,6 +126,15 @@ class coll_activity_stats_Widget extends ComponentWidget
 
 
 	/**
+	 * Request all required css and js files for this widget
+	 */
+	function request_required_files()
+	{
+		init_jqplot_js();
+	}
+
+
+	/**
 	 * Prepare display params
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -135,7 +143,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 	{
 		parent::init_display( $params );
 
-		$this->disp_params['block_body_start'] = '<div">';
+		$this->disp_params['block_body_start'] = '<div>';
 		$this->disp_params['block_body_end'] = '</div>';
 	}
 
@@ -266,7 +274,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		CanvasBarsChart( $chart );
+		draw_canvas_bars_chart( $chart );
 
 		echo $this->disp_params['block_body_end'];
 
