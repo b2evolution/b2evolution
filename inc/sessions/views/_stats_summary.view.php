@@ -193,7 +193,6 @@ if( count( $res_hits ) )
 	echo '<div class="center">';
 	load_funcs('_ext/_canvascharts.php');
 	draw_canvas_bars_chart( $chart );
-	CanvasBarsChart( $chart );
 	echo '</div>';
 
 

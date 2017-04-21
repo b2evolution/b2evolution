@@ -34,6 +34,7 @@ function draw_canvas_bars_chart( $chart )
 	}
 
 	$datasets = array();
+	$chart_data_length = count( $chart['chart_data'] );
 	foreach( $chart['chart_data'] as $c => $data )
 	{
 		if( $c == 0 )
@@ -42,12 +43,30 @@ function draw_canvas_bars_chart( $chart )
 		}
 		$data_label = $data[0];
 		unset( $data[0] );
-		$datasets[] = '{
-				type: "bar",
-				label: "'.format_to_js( $data_label ).'",
-				backgroundColor: "#'.$chart['series_color'][ $c - 1 ].'",
-				data: ['.implode( ',', $data ).']
-			}';
+
+		if( $c == $chart_data_length - 1 && ! empty( $chart['draw_last_line'] ) )
+		{	// Draw a line from last data:
+			array_unshift( $datasets, '{
+					type: "line",
+					fill: false,
+					borderColor: "#'.$chart['series_color'][ $c - 1 ].'",
+					borderWidth: 3,
+					pointRadius: 3.5,
+					lineTension: 0,
+					label: "'.format_to_js( $data_label ).'",
+					backgroundColor: "#'.$chart['series_color'][ $c - 1 ].'",
+					data: ['.implode( ',', $data ).']
+				}' );
+		}
+		else
+		{	// Draw  a bar:
+			$datasets[] = '{
+					type: "bar",
+					label: "'.format_to_js( $data_label ).'",
+					backgroundColor: "#'.$chart['series_color'][ $c - 1 ].'",
+					data: ['.implode( ',', $data ).']
+				}';
+		}
 	}
 
 	$weekends = array();
@@ -60,7 +79,7 @@ function draw_canvas_bars_chart( $chart )
 		}
 	}
 ?>
-	<canvas id="canvas_bars_chart" style="max-height:<?php echo $chart['canvas_bg']['height']; ?>px"></canvas>
+	<canvas id="canvas_bars_chart" style="height:<?php echo $chart['canvas_bg']['height']; ?>px;max-height:<?php echo $chart['canvas_bg']['height']; ?>px"></canvas>
 	<script type="text/javascript">
 	jQuery( document ).ready( function()
 	{
