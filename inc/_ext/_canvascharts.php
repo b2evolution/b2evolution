@@ -78,36 +78,47 @@ function draw_canvas_bars_chart( $chart )
 			$weekends[] = $d;
 		}
 	}
+
+	if( empty( $chart['canvas_bg']['id'] ) )
+	{	// Set default canvas id:
+		// (Must be unique if several charts are used on same page)
+		$chart['canvas_bg']['id'] = 'canvas_bars_chart';
+	}
 ?>
-	<canvas id="canvas_bars_chart" style="width:<?php echo $chart['canvas_bg']['width']; ?>px;max-width:<?php echo $chart['canvas_bg']['width']; ?>px;height:<?php echo $chart['canvas_bg']['height']; ?>px;max-height:<?php echo $chart['canvas_bg']['height']; ?>px;margin:auto auto 35px;"></canvas>
+	<canvas id="<?php echo $chart['canvas_bg']['id']; ?>" style="width:<?php echo $chart['canvas_bg']['width']; ?>px;max-width:<?php echo $chart['canvas_bg']['width']; ?>px;height:<?php echo $chart['canvas_bg']['height']; ?>px;max-height:<?php echo $chart['canvas_bg']['height']; ?>px;margin:auto auto 35px;"></canvas>
 	<script type="text/javascript">
 	jQuery( window ).load( function()
 	{
-		Chart.pluginService.register(
-		{	// Register plugin event to mark x axis, e-g for weekend days:
-			beforeDraw: function ( chart )
-			{
-				if( typeof( chart.config.data.marked_xaxis ) == 'undefined' || chart.config.data.marked_xaxis.length == 0 )
-				{	// No marked x axis config:
-					return;
+		if( typeof( chartjs_plugin_marked_xaxis_is_loaded ) == 'undefined' )
+		{	// Initialize plugin only once:
+			Chart.pluginService.register(
+			{	// Register plugin event to mark x axis, e-g for weekend days:
+				beforeDraw: function ( chart )
+				{
+					if( typeof( chart.config.data.marked_xaxis ) == 'undefined' || chart.config.data.marked_xaxis.length == 0 )
+					{	// No marked x axis config:
+						return;
+					}
+
+					// Calculate width of one x axis value:
+					var x_unit_width = ( chart.chartArea.right - chart.chartArea.left ) / ( chart.scales['x-axis-0'].maxIndex + 1 );
+
+					for( var x = 0; x <= chart.config.data.marked_xaxis.length; x++ )
+					{	// Draw rect for each marked x axis value:
+						var x_index = chart.config.data.marked_xaxis[x];
+						chart.chart.ctx.save();
+						chart.chart.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+						chart.chart.ctx.fillRect( chart.chartArea.left + ( x_index * x_unit_width ), chart.chartArea.top, x_unit_width, chart.chartArea.bottom - chart.chartArea.top );
+						chart.chart.ctx.restore();
+					}
 				}
+			} );
+			// Set flag to don't initialize this plugin twice:
+			chartjs_plugin_marked_xaxis_is_loaded = true;
+		}
 
-				// Calculate width of one x axis value:
-				var x_unit_width = ( chart.chartArea.right - chart.chartArea.left ) / ( chart.scales['x-axis-0'].maxIndex + 1 );
-
-				for( var x = 0; x <= chart.config.data.marked_xaxis.length; x++ )
-				{	// Draw rect for each marked x axis value:
-					var x_index = chart.config.data.marked_xaxis[x];
-					chart.chart.ctx.save();
-					chart.chart.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-					chart.chart.ctx.fillRect( chart.chartArea.left + ( x_index * x_unit_width ), chart.chartArea.top, x_unit_width, chart.chartArea.bottom - chart.chartArea.top );
-					chart.chart.ctx.restore();
-				}
-			}
-		} );
-
-		var ctx = document.getElementById( 'canvas_bars_chart' ).getContext( '2d' );
-		b2evo_chartjs_bar = new Chart( ctx,
+		var ctx = document.getElementById( '<?php echo $chart['canvas_bg']['id']; ?>' ).getContext( '2d' );
+		<?php echo $chart['canvas_bg']['id']; ?> = new Chart( ctx,
 		{
 			type: 'bar',
 			data: {
@@ -163,32 +174,33 @@ function draw_canvas_bars_chart( $chart )
 				$chart_link_params[] = "['".implode( "','", $types )."']";
 			}
 		?>
-		var b2evo_chartjs_link_url = '<?php echo $chart['link_data']['url']; ?>';
-		var b2evo_chartjs_link_dates = [<?php echo implode( ',', $chart_link_dates ); ?>];
-		var b2evo_chartjs_link_params = [<?php echo implode( ',', $chart_link_params ); ?>];
 		// Open an url on click on bar:
-		jQuery( '#canvas_bars_chart' ).on( 'click', function( e )
+		jQuery( '#<?php echo $chart['canvas_bg']['id']; ?>' ).on( 'click', function( e )
 		{
-			var activePoints = b2evo_chartjs_bar.getElementsAtEvent( e );
-			var activeDatasets = b2evo_chartjs_bar.getDatasetAtEvent( e );
+			var activePoints = <?php echo $chart['canvas_bg']['id']; ?>.getElementsAtEvent( e );
+			var activeDatasets = <?php echo $chart['canvas_bg']['id']; ?>.getDatasetAtEvent( e );
 
 			if( typeof( activePoints[0] ) == 'undefined' )
 			{
 				return false;
 			}
 
+			var link_url = '<?php echo $chart['link_data']['url']; ?>';
+			var link_dates = [<?php echo implode( ',', $chart_link_dates ); ?>];
+			var link_params = [<?php echo implode( ',', $chart_link_params ); ?>];
+
 			var pointIndex = activePoints[0]._index;
 			var datasetIndex = activeDatasets[0]._datasetIndex - <?php echo empty( $chart['draw_last_line'] ) ? 0 : 1; ?>;
 
-			if( typeof( b2evo_chartjs_link_params[ datasetIndex ] ) == 'undefined' )
+			if( typeof( link_params[ datasetIndex ] ) == 'undefined' )
 			{
 				return false;
 			}
 
-			location.href = b2evo_chartjs_link_url
-				.replace( /\$date\$/g, b2evo_chartjs_link_dates[ pointIndex ] )
-				.replace( '$param1$', b2evo_chartjs_link_params[ datasetIndex ][0] )
-				.replace( '$param2$', b2evo_chartjs_link_params[ datasetIndex ][1] );
+			location.href = link_url
+				.replace( /\$date\$/g, link_dates[ pointIndex ] )
+				.replace( '$param1$', link_params[ datasetIndex ][0] )
+				.replace( '$param2$', link_params[ datasetIndex ][1] );
 		} );
 		<?php } ?>
 	} );

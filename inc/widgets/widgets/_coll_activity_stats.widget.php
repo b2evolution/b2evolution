@@ -249,7 +249,12 @@ class coll_activity_stats_Widget extends ComponentWidget
 		array_unshift( $chart['chart_data'][2], T_('New topics') );
 		array_unshift( $chart['chart_data'][3], T_('New replies') );
 
-		$chart[ 'canvas_bg' ] = array( 'width'  => '100%', 'height' => $this->disp_params['height'] );
+		$chart['canvas_bg'] = array(
+				'width'  => '100%',
+				'height' => $this->disp_params['height'],
+				// Use unique ID for each widget:
+				'id'     => 'canvas_bars_chart_widget_'.$this->ID,
+			);
 
 		return $chart;
 	}
