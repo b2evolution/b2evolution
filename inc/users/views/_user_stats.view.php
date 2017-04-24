@@ -149,24 +149,43 @@ foreach( $user_gender_color as $color )
 // Legend titles:
 $donut_chart['legend_numrows'] = 9;
 $donut_chart['legends'] = array(
-	T_('Women / Active / With Photo'),
-	T_('Women / Active / No Photo'),
-	T_('Women / Inactive / With Photo'),
-	T_('Women / Inactive / No Photo'),
-	T_('Women / Closed / With Photo'),
-	T_('Women / Closed / No Photo'),
-	T_('Men / Active / With Photo'),
-	T_('Men / Active / No Photo'),
-	T_('Men / Inactive / With Photo'),
-	T_('Men / Inactive / No Photo'),
-	T_('Men / Closed / With Photo'),
-	T_('Men / Closed / No Photo'),
-	T_('Unknown / Active / With Photo'),
-	T_('Unknown / Active / No Photo'),
-	T_('Unknown / Inactive / With Photo'),
-	T_('Unknown / Inactive / No Photo'),
-	T_('Unknown / Closed / With Photo'),
-	T_('Unknown / Closed / No Photo') );
+	array(
+		T_('Women / Active / With Photo'),
+		T_('Women / Active / No Photo'),
+		T_('Women / Inactive / With Photo'),
+		T_('Women / Inactive / No Photo'),
+		T_('Women / Closed / With Photo'),
+		T_('Women / Closed / No Photo'),
+		T_('Men / Active / With Photo'),
+		T_('Men / Active / No Photo'),
+		T_('Men / Inactive / With Photo'),
+		T_('Men / Inactive / No Photo'),
+		T_('Men / Closed / With Photo'),
+		T_('Men / Closed / No Photo'),
+		T_('Unknown / Active / With Photo'),
+		T_('Unknown / Active / No Photo'),
+		T_('Unknown / Inactive / With Photo'),
+		T_('Unknown / Inactive / No Photo'),
+		T_('Unknown / Closed / With Photo'),
+		T_('Unknown / Closed / No Photo'),
+	),
+	array(
+		T_('Women / Active'),
+		T_('Women / Inactive'),
+		T_('Women / Closed'),
+		T_('Men / Active'),
+		T_('Men / Inactive'),
+		T_('Men / Closed'),
+		T_('Unknown / Active'),
+		T_('Unknown / Inactive'),
+		T_('Unknown / Closed'),
+	),
+	array(
+		T_('Women'),
+		T_('Men'),
+		T_('Unknown'),
+	)
+);
 
 // Data:
 $donut_chart['data'] = array();
@@ -244,6 +263,7 @@ foreach( $donut_data as $donut_data_row )
 
 load_funcs('_ext/_canvascharts.php');
 echo '<div style="width:690px;margin:auto;">';
+draw_canvas_doughnut_chart( $donut_chart );
 CanvasDonutChart( $donut_chart );
 echo '</div>';
 // ---- The data for donut chart: END ---- //

@@ -85,7 +85,7 @@ function draw_canvas_bars_chart( $chart )
 		$chart['canvas_bg']['id'] = 'canvas_bars_chart';
 	}
 ?>
-	<canvas id="<?php echo $chart['canvas_bg']['id']; ?>" style="width:<?php echo $chart['canvas_bg']['width']; ?>px;max-width:<?php echo $chart['canvas_bg']['width']; ?>px;height:<?php echo $chart['canvas_bg']['height']; ?>px;max-height:<?php echo $chart['canvas_bg']['height']; ?>px;margin:auto auto 35px;"></canvas>
+	<canvas id="<?php echo $chart['canvas_bg']['id']; ?>" style="width:<?php echo $chart['canvas_bg']['width']; ?>px;max-width:<?php echo $chart['canvas_bg']['width']; ?>px;height:<?php echo $chart['canvas_bg']['height']; ?>px;max-height:<?php echo $chart['canvas_bg']['height']; ?>px;margin:auto;"></canvas>
 	<script type="text/javascript">
 	jQuery( window ).load( function()
 	{
@@ -131,7 +131,10 @@ function draw_canvas_bars_chart( $chart )
 				legend: {
 					position: 'bottom',
 					labels: {
-						boxWidth: 12
+						boxWidth: 12,
+						fontColor: '#000',
+						fontStyle: 'bold',
+						fontSize: 11,
 					}
 				},
 				tooltips: {
@@ -207,6 +210,110 @@ function draw_canvas_bars_chart( $chart )
 	</script>
 <?php
 }
+
+
+/**
+ * Draw the canvas doughnut chart.
+ *
+ * @param array Chart doughnut data
+ */
+function draw_canvas_doughnut_chart( $chart )
+{
+	$legends = array();
+	foreach( $chart['legends'][0] as $legend )
+	{
+		$legends[] = '"'.format_to_js( $legend ).'"';
+	}
+
+	$datasets = array();
+	foreach( $chart['data'] as $c => $data )
+	{
+		$tooltips = array();
+		foreach( $chart['legends'][ $c ] as $label )
+		{
+			$tooltips[] = '"'.format_to_js( $label ).'"';
+		}
+		$datasets[] = '{
+				backgroundColor: ["#'.implode( '", "#', $chart['series_color'][ $c ] ).'"],
+				data: ['.implode( ',', $data ).'],
+				tooltips: ['.implode( ',', $tooltips ).'],
+			}';
+	}
+
+	if( empty( $chart['canvas_bg']['id'] ) )
+	{	// Set default canvas id:
+		// (Must be unique if several charts are used on same page)
+		$chart['canvas_bg']['id'] = 'canvas_doughnut_chart';
+	}
+
+	$chart['canvas_bg']['width'] = 690;
+	$chart['canvas_bg']['height'] = 220;
+?>
+	<canvas id="<?php echo $chart['canvas_bg']['id']; ?>" style="width:<?php echo $chart['canvas_bg']['width']; ?>px;max-width:<?php echo $chart['canvas_bg']['width']; ?>px;height:<?php echo $chart['canvas_bg']['height']; ?>px;max-height:<?php echo $chart['canvas_bg']['height']; ?>px;margin:auto"></canvas>
+	<script type="text/javascript">
+	jQuery( window ).load( function()
+	{
+		var ctx = document.getElementById( '<?php echo $chart['canvas_bg']['id']; ?>' ).getContext( '2d' );
+		<?php echo $chart['canvas_bg']['id']; ?> = new Chart( ctx,
+		{
+			type: 'doughnut',
+			data: {
+				labels: [<?php echo implode( ',', $legends ); ?>],
+				datasets: [<?php echo implode( ',', $datasets );?>],
+			},
+			options: {
+				intersect: true,
+				legend: {
+					position: 'right',
+					labels: {
+						boxWidth: 12,
+						fontColor: '#000',
+						fontStyle: 'bold',
+						fontSize: 11,
+						generateLabels: function(chart) {
+							var data = chart.data;
+							if (data.labels.length && data.datasets.length) {
+								var helpers = Chart.helpers;
+								return data.labels.map(function(label, i) {
+									var meta = chart.getDatasetMeta(0);
+									var ds = data.datasets[0];
+									var arc = meta.data[i];
+									var custom = arc && arc.custom || {};
+									var getValueAtIndexOrDefault = helpers.getValueAtIndexOrDefault;
+									var arcOpts = chart.options.elements.arc;
+									var fill = custom.backgroundColor ? custom.backgroundColor : getValueAtIndexOrDefault(ds.backgroundColor, i, arcOpts.backgroundColor);
+
+									return {
+										text: label,
+										fillStyle: fill,
+										strokeStyle: '#CCC',
+										lineWidth: 1,
+										hidden: isNaN(ds.data[i]) || meta.data[i].hidden,
+
+										// Extra data used for toggling the correct item
+										index: i
+									};
+								});
+							}
+							return [];
+						}
+					}
+				},
+				tooltips: {
+					callbacks: {
+						label: function(item, data) {
+							return data.datasets[item.datasetIndex].tooltips[item.index]
+								+ ": " + data.datasets[item.datasetIndex].data[item.index];
+						}
+					}
+				}
+			}
+		} );
+	} );
+	</script>
+<?php
+}
+
 
 /**
  * Draw the canvas bars chart.
@@ -472,7 +579,7 @@ jQuery( window ).load( function()
 			rendererOptions: {
 				numberRows: <?php echo ( isset( $chart['legend_numrows'] ) ? $chart['legend_numrows'] : '1' ); ?>
 			},
-			labels: ['<?php echo implode( "','", $chart['legends'] ); ?>'],
+			labels: ['<?php echo implode( "','", $chart['legends'][0] ); ?>'],
 			show: true,
 			predraw: true,
 			location: 'e',
