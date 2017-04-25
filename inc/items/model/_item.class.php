@@ -660,7 +660,12 @@ class Item extends ItemLight
 		}
 
 		// URL associated with Item:
-		$post_url = param( 'post_url', 'url', NULL );
+		$post_url = param( 'post_url', 'string', NULL );
+		$url_error = validate_url( $post_url, 'http-https' );
+		if( $url_error !== false )
+		{
+			param_error( 'post_url', $url_error );
+		}
 		if( $post_url !== NULL )
 		{
 			param_check_url( 'post_url', 'posting', '' );
