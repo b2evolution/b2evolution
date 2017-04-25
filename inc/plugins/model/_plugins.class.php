@@ -1247,6 +1247,11 @@ class Plugins
 			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( )', 'plugins' );
 		}
 
+		if( $method == 'CacheObjects' )
+		{	// Deny plugins with deprecated event:
+			debug_die( 'The plugin event CacheObjects is deprecated' );
+		}
+
 		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 		$r = $Plugin->$method( $params );
 		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
