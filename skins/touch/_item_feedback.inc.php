@@ -168,6 +168,8 @@ if( $Item->can_see_comments( true ) )
 			$disp_title[] = T_('No feedback yet');
 		}
 
+		global $CommentList;
+
 		$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
 		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', 'c_' );
 

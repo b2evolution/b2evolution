@@ -121,6 +121,8 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks )
 <h4><?php echo implode( ", ", $disp_title) ?>:</h4>
 
 <?php
+global $CommentList;
+
 $comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
 $CommentList = new CommentList2( $Blog, $comments_per_page );
 

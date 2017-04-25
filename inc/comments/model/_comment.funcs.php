@@ -851,7 +851,6 @@ function echo_comment_replies( $comment_ID, $params, $level = 1 )
 	$params = array_merge( array(
 			'redirect_to'        => NULL,
 			'save_context'       => false,
-			'comment_index'      => NULL,
 			'display_meta_title' => false,
 		), $params );
 
@@ -859,11 +858,7 @@ function echo_comment_replies( $comment_ID, $params, $level = 1 )
 	{	// Loop through the replies:
 
 		// Display a comment:
-		echo_comment( $Comment, $params['redirect_to'], $params['save_context'], $params['comment_index'], $params['display_meta_title'], $level );
-		if( $params['comment_index'] !== false )
-		{	// Decrease a comment index only when it is requested:
-			$params['comment_index']--;
-		}
+		echo_comment( $Comment, $params['redirect_to'], $params['save_context'], $Comment->get_inlist_order(), $params['display_meta_title'], $level );
 
 		// Display the rest replies recursively:
 		echo_comment_replies( $Comment->ID, $params, $level + 1 );
