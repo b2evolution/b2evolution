@@ -818,8 +818,11 @@ class Item extends ItemLight
 			}
 
 			// DEADLINE:
-			if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
-				$this->set_from_Request( 'datedeadline', 'item_deadline', true );
+			if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL )
+			{
+				param_time( 'item_deadline_time', '', false, false, true, true );
+				$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
+				$this->set( 'datedeadline', trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) ), true );
 			}
 		}
 
@@ -2750,7 +2753,7 @@ class Item extends ItemLight
 	function deadline_time( $format = '', $useGM = false )
 	{
 		if( empty($format) )
-			echo mysql2date( locale_timefmt(), $this->datedeadline, $useGM );
+			echo mysql2date( locale_shorttimefmt(), $this->datedeadline, $useGM );
 		else
 			echo mysql2date( $format, $this->datedeadline, $useGM );
 	}

@@ -185,6 +185,8 @@ while( $Item = & $ItemList->get_item() )
 					{ // Display deadline date
 						echo T_('Deadline').': <span class="bDate">';
 						$Item->deadline_date();
+						echo ' ';
+						$Item->deadline_time();
 						echo '</span>';
 					}
 				}

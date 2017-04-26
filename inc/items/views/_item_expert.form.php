@@ -636,7 +636,15 @@ $Form->begin_form( '', '', $params );
 
 			echo ' '; // allow wrapping!
 
-			$Form->date( 'item_deadline', $edited_Item->get('datedeadline'), T_('Deadline') );
+			$Form->begin_line( T_('Deadline'), 'item_deadline' );
+
+				$datedeadline = $edited_Item->get( 'datedeadline' );
+				$Form->date( 'item_deadline', $datedeadline, '' );
+
+				$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+				$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+
+			$Form->end_line();
 
 			$Form->switch_layout( NULL );
 			echo '</div>';
