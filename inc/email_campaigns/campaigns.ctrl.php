@@ -339,6 +339,7 @@ if( $action == 'edit' )
 	{	// Require colorbox js:
 		require_js_helper( 'colorbox' );
 		// Require File Uploader js and css:
+		init_fileuploader_js_lang_strings();
 		require_js( 'multiupload/fileuploader.js' );
 		require_css( 'fileuploader.css' );
 		// Load JS files to make the links table sortable:

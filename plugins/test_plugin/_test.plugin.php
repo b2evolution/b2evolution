@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '6.7.9';
+	var $version = '6.9.2';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -2415,46 +2415,6 @@ class test_plugin extends Plugin
 
 
 	// Caching events: {{{
-
-	/**
-	 * Event handler: called to cache object data.
-	 *
-	 * @see Plugin::CacheObjects()
-	 * @param array Associative array of parameters
-	 *   - 'action': 'delete', 'set', 'get'
-	 *   - 'key': The key to refer to 'data'
-	 *   - 'data': The actual data. This must be set by the plugin.
-	 * @return boolean True if action was successful, false otherwise.
-	 */
-	function CacheObjects( & $params )
-	{
-		switch( $params['action'] )
-		{
-			case 'get':
-				// Get cache object:
-				if( $params['key'] == 'object_GroupCache' )
-				{	// Initialize group cache object with custom params:
-					$allow_none_text = NT_('No group').' - TEST plugin';
-					$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_name DESC', $allow_none_text );
-
-					// Set data param and return true to don't use core initialization for group cache object:
-					$params['data'] = & $GroupCache;
-					return true;
-				}
-				break;
-
-			case 'set':
-				// Set cache object:
-				if( $params['key'] == 'object_ItemTypeCache' )
-				{
-					$ItemTypeCache = & $params['data'];
-
-					// Force to load all item type by this plugin:
-					$ItemTypeCache->load_all();
-				}
-				break;
-		}
-	}
 
 
 	/**

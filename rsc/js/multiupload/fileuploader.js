@@ -71,13 +71,6 @@ function base64_decode (data) {
 }
 
 
-function b64DecodeUnicode( str ) {
-	return decodeURIComponent(atob(str).split('').map(function(c) {
-		return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-	}).join(''));
-}
-
-
 function htmlspecialchars_decode (string, quote_style) {
 	// http://kevin.vanzonneveld.net
 	// +   original by: Mirek Slugen
@@ -604,7 +597,9 @@ qq.FileUploaderBasic.prototype = {
 			bytes = bytes / 1024;
 		}
 
-		return bytes.toFixed( Math.max( 0, ( 1 - Math.floor( Math.log( bytes ) / Math.log( 10 ) ) ) ) ) + ' ' + ['B.', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'][i];
+		var file_size_titles = typeof( evo_js_lang_file_sizes ) == 'undefined' ? ['B.', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'] : evo_js_lang_file_sizes;
+
+		return bytes.toFixed( Math.max( 0, ( 1 - Math.floor( Math.log( bytes ) / Math.log( 10 ) ) ) ) ) + ' ' + file_size_titles[i];
 	}
 };
 

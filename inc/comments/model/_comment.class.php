@@ -4868,6 +4868,36 @@ class Comment extends DataObject
 
 		return can_be_displayed_with_status( $this->get( 'status' ), 'comment', $Item->get_blog_ID(), $this->author_user_ID );
 	}
+
+
+	/**
+	 * Get comment order numbers for current filtered list (global $CommentList)
+	 *
+	 * @return integer|NULL
+	 */
+	function get_inlist_order()
+	{
+		if( empty( $this->ID ) )
+		{	// This comment must exist in DB
+			return NULL;
+		}
+
+		global $CommentList;
+
+		if( empty( $CommentList ) )
+		{	// Comment list must be initialized globally
+			return NULL;
+		}
+
+		if( ! isset( $CommentList->inlist_orders[ $this->ID ] ) )
+		{	// Order number is not found in list for this comment:
+			return NULL;
+		}
+
+		$inlist_order = intval( $CommentList->inlist_orders[ $this->ID ] );
+
+		return $inlist_order < 0 ? 0 : $inlist_order;
+	}
 }
 
 ?>

@@ -38,10 +38,6 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 			) ) );
 	}
 
-	// Unset a comment counter to set new for meta comments:
-	global $comment_template_counter;
-	$comment_template_counter = NULL;
-
 	// ------------------ FEEDBACK INCLUDED HERE ------------------
 	skin_include( '_item_feedback.inc.php', array_merge( array(
 		'disp_comments'         => false,

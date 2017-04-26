@@ -2830,7 +2830,9 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	}
 
 	// Get ready for display (runs the query):
-	$CommentList->display_init();
+	$CommentList->display_init( array(
+			'init_order_numbers_mode' => ( $comment_type == 'meta' ? 'date' : false )
+		) );
 
 	$CommentList->display_if_empty( array(
 		'before'    => '<div class="evo_comment"><p>',
@@ -2849,11 +2851,11 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * @param object Comment object
  * @param string where to redirect after comment edit. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
  * @param boolean true to set the new redirect param, false otherwise
- * @param integer Comment index in the current list, FALSE - to don't display a comment index
+ * @param integer Comment order number in the current list, FALSE - to don't display a comment order
  * @param integer A reply level (Used on mode "Threaded comments" to shift a comment block to right)
  * @param boolean TRUE to display info for meta comment
  */
-function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false, $reply_level = 0 )
+function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $inlist_order = NULL, $display_meta_title = false, $reply_level = 0 )
 {
 	global $current_User, $localtimenow;
 
@@ -2895,9 +2897,9 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 
 		if( $Comment->is_meta() )
 		{ // Meta comment
-			if( $comment_index !== false )
-			{	// Display ID for each meta comment
-				echo '<span class="badge badge-info">'.$comment_index.'</span> ';
+			if( $inlist_order !== false )
+			{	// Display order of meta comment in current list:
+				echo '<span class="badge badge-info">'.$inlist_order.'</span> ';
 			}
 
 			if( $display_meta_title )

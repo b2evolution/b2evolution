@@ -138,7 +138,7 @@ class Session
 					  FROM T_sessions
 					 WHERE sess_ID  = '.$DB->quote( $session_id_by_cookie ).'
 					   AND sess_key = '.$DB->quote( $session_key_by_cookie ).'
-					   AND UNIX_TIMESTAMP( sess_lastseen_ts ) + TIME_TO_SEC( TIMEDIFF( NOW(), "'.date( 'Y-m-d H:i:s' ).'") ) > '.( $localtimenow - $timeout_sessions ) );
+					   AND UNIX_TIMESTAMP(sess_lastseen_ts) > '.( $localtimenow - $timeout_sessions ) );
 				if( empty( $row ) )
 				{
 					$Debuglog->add( 'Session: Session ID/key combination is invalid!', 'request' );
@@ -238,8 +238,8 @@ class Session
 			$DB->query( 'INSERT INTO T_sessions( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_device )
 				VALUES (
 					'.$DB->quote( $this->key ).',
-					FROM_UNIXTIME( UNIX_TIMESTAMP( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).' ) ),
-					FROM_UNIXTIME( UNIX_TIMESTAMP( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).' ) ),
+					FROM_UNIXTIME('.$localtimenow.'),
+					FROM_UNIXTIME('.$localtimenow.'),
 					'.$DB->quote( $Hit->IP ).',
 					'.$DB->quote( $this->sess_device ).'
 				)' );
@@ -526,7 +526,7 @@ class Session
 	 	// Note: we increase the hitcoutn every time. That assumes that there will be no 2 calls for a single hit.
 	 	//       Anyway it is not a big problem if this number is approximate.
 		$sql = "UPDATE T_sessions SET
-				sess_lastseen_ts = FROM_UNIXTIME( UNIX_TIMESTAMP('".date( 'Y-m-d H:i:s', $localtimenow )."') ),
+				sess_lastseen_ts = FROM_UNIXTIME(".$localtimenow."),
 				sess_data = ".$DB->quote( $sess_data ).",
 				sess_ipaddress = '".$Hit->IP."',
 				sess_key = ".$DB->quote( $this->key );
