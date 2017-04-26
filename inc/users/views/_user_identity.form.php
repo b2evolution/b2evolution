@@ -618,7 +618,7 @@ $Plugins->trigger_event( 'DisplayProfileFormFieldset', array(
 
 if( $action != 'view' )
 { // Edit buttons
-	$action_buttons = array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
+	$action_buttons = array( array( '', 'actionArray[update]', $new_user_creating ? T_('Create User!') : T_('Save Changes!'), 'SaveButton' ) );
 	if( $is_admin )
 	{
 		// dh> TODO: Non-Javascript-confirm before trashing all settings with a misplaced click.
