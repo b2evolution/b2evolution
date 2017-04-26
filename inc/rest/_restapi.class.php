@@ -143,7 +143,7 @@ class RestApi
 		}
 		elseif( $Settings->get( 'system_lock' ) && ! $User->check_perm( 'users', 'edit' ) )
 		{ // System is locked for maintenance and current user has no permission to log in this mode
-			$this->halt( T_('You cannot log in at this time because the system is under maintenance. Please try again in a few moments.'), 'system_maintenance', '403' );
+			$this->halt( T_('You cannot log in at this time because the system is under maintenance. Please try again in a few moments.'), 'system_maintenance', '503' );
 			// Exit here.
 		}
 
@@ -319,17 +319,34 @@ class RestApi
 	{
 		global $Collection, $Blog;
 
-		// Collection controller ('list' by default):
-		$coll_controller = isset( $this->args[2] ) ? $this->args[2] : 'list';
+		switch( $_SERVER['REQUEST_METHOD'] )
+		{
+			case 'GET':
+				// List of valid resources
+				$valid_resources = array( '', 'view', 'items', 'posts', 'search', 'assignees' );
+				break;
 
-		if( $coll_controller != 'list' )
+			case 'POST':
+				// List of valid resources
+				$valid_resources = array( 'favorite', 'items_flag' );
+				break;
+
+			default:
+				$this->halt( 'Request method not supported for the requested resource', 'wrong_request', 405 );
+				// Exit here
+		}
+
+		if( ! empty( $this->args[1] ) )
+		{
+			$coll_controller = ! empty( $this->args[2] ) ? $this->args[2] : 'view';
+		}
+		else
+		{
+			$coll_controller = '';
+		}
+
+		if( ! empty( $coll_controller ) )
 		{	// Initialize data for request of the selected collection:
-
-			if( ! isset( $this->args[1] ) )
-			{	// Wrong request because collection name is not defined:
-				$this->halt( 'Collection name is not defined' );
-				// Exit here.
-			}
 
 			// Collection urlname:
 			$coll_urlname = $this->args[1];
@@ -380,15 +397,22 @@ class RestApi
 			// Exit here.
 		}
 
+		if( ! in_array( $coll_controller, $valid_resources, true ) )
+		{ // Invalid request method:
+			$this->halt( 'Request method not supported for the requested resource', 'wrong_request', 405 );
+			// Exit here.
+		}
+
 		// Call collection controller to prepare current request:
 		call_user_func_array( array( $this, 'controller_coll_'.$coll_controller ), $coll_controller_params );
 	}
 
 
 	/**
-	 * Call collection controller to list the collections
+	 * Default controller/handler
+	 * erhsatingin > function name is a bit wonky, perhaps there's a better way to go around this.
 	 */
-	private function controller_coll_list()
+	private function controller_coll_()
 	{
 		global $DB, $Settings, $current_User;
 
@@ -538,6 +562,31 @@ class RestApi
 					'desc'      => $Blog->get( 'longdesc' ),
 				), 'array' );
 		}
+	}
+
+
+	/**
+	 * Call collection controller to view collection information
+	 */
+	private function controller_coll_view()
+	{
+		global $current_User;
+
+		$coll_urlname = empty( $this->args[1] ) ? 0 : $this->args[1];
+
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_urlname( $coll_urlname, false );
+
+		$collection_data = array(
+			'id'        => intval( $Blog->ID ),
+			'urlname'   => $Blog->get( 'urlname' ),
+			'kind'      => $Blog->get( 'type' ),
+			'shortname' => $Blog->get( 'shortname' ),
+			'name'      => $Blog->get( 'name' ),
+			'tagline'   => $Blog->get( 'tagline' ),
+			'desc'      => $Blog->get( 'longdesc' ) );
+
+		$this->response = $collection_data;
 	}
 
 
@@ -722,7 +771,7 @@ class RestApi
 		$search_result = $Session->get( 'search_result' );
 		if( empty( $search_result ) )
 		{	// Nothing found:
-			$this->halt( T_('Sorry, we could not find anything matching your request, please try to broaden your search.'), 'no_search_results', 404 );
+			$this->halt( T_('Sorry, we could not find anything matching your request, please try to broaden your search.'), 'no_search_results', 200 );
 			// Exit here.
 		}
 
@@ -1073,49 +1122,81 @@ class RestApi
 	 */
 	private function module_users()
 	{
-		// Set user controller 'list' by default:
-		$user_controller = 'list';
-
-		// Get user ID:
-		$user_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
-
-		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : 'GET';
-		switch( $request_method )
+		switch( $_SERVER['REQUEST_METHOD'] )
 		{
+			case 'GET':
+				// Check for valid controllers
+				$user_controller = '';
+				$user_ID = NULL;
+
+				if( ! empty( $this->args[1] ) )
+				{
+					if( ! empty( $this->args[2] ) )
+					{
+						$user_controller = $this->args[2];
+					}
+					else
+					{
+						if( preg_match( '/^\d+$/', $this->args[1] ) )
+						{ // args[1] should be a positive integer and not just any number:
+							$user_ID = intval( $this->args[1] );
+							$user_controller = 'view';
+						}
+						else
+						{
+							$user_controller = $this->args[1];
+						}
+					}
+				}
+				else
+				{ // default handler
+					$user_controller = '';
+				}
+
+				$valid_resources = array( '', 'view', 'recipients', 'autocomplete', 'logins', 'search' );
+				if( isset( $user_ID ) )
+				{ // Set controller to view the requested user profile:
+					$default_controller = 'view';
+				}
+				else
+				{
+					$default_controller = $user_controller;
+				}
+				break;
+
 			case 'POST':
-				// Set controller to update the requested user OR create one new:
-				$user_controller = 'save';
+				// check for valid controllers
+				$valid_resources = array( 'save' );
+				$default_controller = 'save';
 				break;
 
 			case 'DELETE':
-				// Set controller to delete the requested user:
-				if( $user_ID > 0 )
-				{	// Only if user ID is defined:
-					$user_controller = 'delete';
+				if( empty( $this->args[1] ) )
+				{
+					$this->halt( 'Missing user ID', 'user_missing_id', 400 );
+					// Exit here
 				}
-				else
-				{	// Wrong user request:
-					$this->halt( 'Invalid user ID', 'user_invalid_id' );
-					// Exit here.
-				}
+
+				$valid_resources = array( 'delete' );
+				$default_controller = 'delete';
 				break;
 
-			case 'GET':
 			default:
-				if( $user_ID > 0 )
-				{	// Set controller to view the requested user profile:
-					$user_controller = 'view';
-				}
-				else
-				{	// Set controller to view all users by default or call the requested controller:
-					$user_controller = empty( $this->args[1] ) ? 'list' : $this->args[1];
-				}
-				break;
+				$this->halt( 'Request method not supported for the requested resource', 'wrong_request', 405 );
+				// Exit here
 		}
+
+		$user_controller = $default_controller;
 
 		if( ! method_exists( $this, 'controller_user_'.$user_controller ) )
 		{	// Unknown controller:
 			$this->halt( 'Unknown user controller "'.$user_controller.'"', 'unknown_controller' );
+			// Exit here.
+		}
+
+		if( ! in_array( $user_controller, $valid_resources, true ) )
+		{ // Invalid request method:
+			$this->halt( 'Request method not supported for the requested resource', 'wrong_request', 405 );
 			// Exit here.
 		}
 
@@ -1125,9 +1206,9 @@ class RestApi
 
 
 	/**
-	 * Call user controller to list the users
+	 * Default controller/handler
 	 */
-	private function controller_user_list()
+	private function controller_user_()
 	{
 		global $Settings;
 
@@ -1244,7 +1325,7 @@ class RestApi
 
 		if( ! $User )
 		{	// Wrong user request:
-			$this->halt( 'Invalid user ID', 'user_invalid_id' );
+			$this->halt( 'Invalid user ID', 'user_invalid_id', 404 );
 			// Exit here.
 		}
 
@@ -1360,6 +1441,9 @@ class RestApi
 				$this->halt( T_('You have no permission to edit other users!'), 'no_access', 403 );
 				// Exit here.
 			}
+
+			// We already have a user, set login param
+			set_param( 'edited_user_login', $edited_User->login );
 		}
 		else
 		{ // Initialize User object to create new one:
@@ -1382,7 +1466,7 @@ class RestApi
 		else
 		{	// The requested user has been updated successfully
 			$Messages->close_group(); // Make sure any open message group are closed
-			$this->halt( $Messages->messages_text[0], 'update_success', 200 );
+			$this->halt( $Messages->messages_text[0], 'update_success', ( $is_new_user ? 201 : 200 ) );
 			// Exit here.
 		}
 	}
@@ -1402,14 +1486,14 @@ class RestApi
 		}
 
 		// Get an user ID for request "DELETE <baseurl>/api/v1/users/<id>":
-		$user_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+		$user_ID = intval( $this->args[1] );
 
 		$UserCache = & get_UserCache();
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
 
 		if( ! $User )
 		{	// Wrong user request:
-			$this->halt( 'Invalid user ID', 'user_invalid_id' );
+			$this->halt( 'Invalid user ID', 'user_invalid_id', 404 );
 			// Exit here.
 		}
 
