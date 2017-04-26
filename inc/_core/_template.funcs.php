@@ -3342,4 +3342,19 @@ function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rs
 	require_css( '#fontawesome#', $relative_to );
 }
 
+
+/**
+ * Initialize JavaScript variables for fileuploader.js
+ */
+function init_fileuploader_js_lang_strings()
+{
+	// Initialize variables for the file "fileuploader.js":
+	add_js_headline( 'var evo_js_lang_file_sizes = [\''
+		/* TRANS: Abbr. for "Bytes" */.TS_('B.').'\', \''
+		/* TRANS: Abbr. for "Kilobytes" */.TS_('KB').'\', \''
+		/* TRANS: Abbr. for Megabytes */.TS_('MB').'\', \''
+		/* TRANS: Abbr. for Gigabytes */.TS_('GB').'\', \''
+		/* TRANS: Abbr. for Terabytes */.TS_('TB').'\'];' );
+}
+
 ?>
