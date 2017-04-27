@@ -2104,6 +2104,9 @@ class Item extends ItemLight
 		// Render Parent Data [parent], [parent:fields] and etc.:
 		$output = $this->render_parent_data( $output, $params );
 
+		// Render Collection Data [coll:name], [coll:shortname]:
+		$output = $this->render_collection_data( $output, $params );
+
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
 				'Item' => $this,
@@ -2236,6 +2239,9 @@ class Item extends ItemLight
 
 		// Render Parent Data [parent], [parent:fields] and etc.:
 		$output = $this->render_parent_data( $output, $params );
+
+		// Render Collection Data [coll:name], [coll:shortname]:
+		$output = $this->render_collection_data( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2589,6 +2595,54 @@ class Item extends ItemLight
 					case 'url':
 						// Render parent URL:
 						$content = str_replace( $source_tag, $parent_Item->get_permanent_url(), $content );
+						break;
+				}
+			}
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Convert inline collection tags into HTML tags like:
+	 *    [coll:name]
+	 *    [coll:shortname]
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_collection_data( $content, $params = array() )
+	{
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_collection_data() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_collection_data' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of collection data:
+		preg_match_all( '/\[coll:([a-z]+)\]/i', $content, $tags );
+
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one collection tag is found in content:
+			$item_Blog = & $this->get_Blog();
+
+			foreach( $tags[0] as $t => $source_tag )
+			{
+				switch( $tags[1][ $t ] )
+				{
+					case 'name':
+						// Render collection name:
+						$content = str_replace( $source_tag, $item_Blog->get( 'name' ), $content );
+						break;
+
+					case 'shortname':
+						// Render collection short name:
+						$content = str_replace( $source_tag, $item_Blog->get( 'shortname' ), $content );
 						break;
 				}
 			}

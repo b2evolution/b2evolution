@@ -1192,7 +1192,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('First Post'), T_('<p>This is the first post.</p>
+			$edited_Item->insert( $owner_ID, T_('First Post'), T_('<p>This is the first post in the "[coll:shortname]" collection.</p>
 
 <p>It appears in a single category.</p>'), $now, $cat_ann_a );
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1201,7 +1201,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('Second post'), T_('<p>This is the second post.</p>
+			$edited_Item->insert( $owner_ID, T_('Second post'), T_('<p>This is the second post in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a ) );
 			$item_IDs[] = array( $edited_Item->ID, $now );
