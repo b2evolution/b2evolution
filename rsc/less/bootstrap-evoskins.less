@@ -212,6 +212,9 @@ a.btn.action_icon {
 			padding: 0 2px 2px 0;
 			vertical-align: middle;
 		}
+		tr:last-child td {
+			padding-bottom: 0;
+		}
 		th.label, td.label {
 			display: table-cell;
 			color: #333;
@@ -222,6 +225,11 @@ a.btn.action_icon {
 		}
 		td.input div.tile label.control-label {
 			display: none;
+		}
+	}
+	#itemform_custom_fields {
+		.panel-body .form-group:last-child {
+			margin-bottom: 0;
 		}
 	}
 	// Select category table on edit post form

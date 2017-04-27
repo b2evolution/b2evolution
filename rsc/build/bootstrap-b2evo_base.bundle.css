@@ -3477,6 +3477,9 @@ a.btn.action_icon.hoverlink {
   padding: 0 2px 2px 0;
   vertical-align: middle;
 }
+.form-horizontal .compose_layout tr:last-child td {
+  padding-bottom: 0;
+}
 .form-horizontal .compose_layout th.label,
 .form-horizontal .compose_layout td.label {
   display: table-cell;
@@ -3489,6 +3492,9 @@ a.btn.action_icon.hoverlink {
 }
 .form-horizontal .compose_layout td.input div.tile label.control-label {
   display: none;
+}
+.form-horizontal #itemform_custom_fields .panel-body .form-group:last-child {
+  margin-bottom: 0;
 }
 .form-horizontal #itemform_categories .panel-body.extracats {
   padding: 0;
