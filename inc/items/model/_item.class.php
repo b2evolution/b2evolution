@@ -885,6 +885,9 @@ class Item extends ItemLight
 					case 'text': // Keep html tags for text fields, they will be escaped at display
 						$param_type = 'html';
 						break;
+					case 'url':
+						$param_type = 'url';
+						break;
 					case 'varchar':
 					default:
 						$param_type = 'string';
@@ -8487,7 +8490,7 @@ class Item extends ItemLight
 	/**
 	 * Get custom fields of post type
 	 *
-	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html'. Use comma separator to get several types
+	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url'. Use comma separator to get several types
 	 * @return array
 	 */
 	function get_type_custom_fields( $type = 'all' )
@@ -8640,7 +8643,7 @@ class Item extends ItemLight
 			.$this->get_setting( 'metadesc' ).' '
 			.$this->get_setting( 'metakeywords' ).' ';
 		// + all text custom fields:
-		$text_custom_fields = $this->get_type_custom_fields( 'varchar' );
+		$text_custom_fields = $this->get_type_custom_fields( 'varchar,text,html' );
 		foreach( $text_custom_fields as $field_index => $text_custom_field )
 		{
 			$search_string .= $this->get_custom_field_value( $field_index ).' ';

@@ -8444,6 +8444,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12290, 'Add new type "URL" for custom fields of item types...' ) )
+	{	// part of 6.9.2-beta
+		$DB->query( 'ALTER TABLE T_items__type_custom_field
+			MODIFY COLUMN itcf_type ENUM( "double", "varchar", "text", "html", "url" ) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

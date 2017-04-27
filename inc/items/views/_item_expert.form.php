@@ -315,6 +315,9 @@ $Form->begin_form( '', '', $params );
 					case 'html':
 						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, '', array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
 						break;
+					case 'url':
+						$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_url_'.$custom_field['ID'] ), 20, '', '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						break;
 				}
 				echo '</td></tr>';
 			}

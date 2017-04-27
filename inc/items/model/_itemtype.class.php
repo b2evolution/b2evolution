@@ -329,7 +329,12 @@ class ItemType extends DataObject
 		// Initialize the arrays
 		$this->update_custom_fields = array();
 		$this->insert_custom_fields = array();
-		$this->delete_custom_fields = trim( param( 'deleted_custom_double', 'string', '' ).','.param( 'deleted_custom_varchar', 'string', '' ), ',' );
+		$this->delete_custom_fields = trim(
+			param( 'deleted_custom_double', 'string', '' ).','.
+			param( 'deleted_custom_varchar', 'string', '' ).','.
+			param( 'deleted_custom_text', 'string', '' ).','.
+			param( 'deleted_custom_html', 'string', '' ).','.
+			param( 'deleted_custom_url', 'string', '' ), ',' );
 		$this->delete_custom_fields = empty( $this->delete_custom_fields ) ? array() : explode( ',', $this->delete_custom_fields );
 
 		// Field names array is used to check the diplicates
@@ -338,7 +343,7 @@ class ItemType extends DataObject
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
-		$types = array( 'double', 'varchar', 'text', 'html' );
+		$types = array( 'double', 'varchar', 'text', 'html', 'url' );
 		foreach( $types as $type )
 		{
 			$empty_title_error = false; // use this to display empty title fields error message only ones
@@ -584,7 +589,7 @@ class ItemType extends DataObject
 	/**
 	 * Get the custom feilds
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html'. Use comma separator to get several types
+	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url'. Use comma separator to get several types
 	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order'
 	 * @return array Custom fields
 	 */

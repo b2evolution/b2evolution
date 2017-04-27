@@ -403,7 +403,8 @@ function create_default_data()
 						 ( 3, "First string field", "first_string_field", "varchar", 2, "Enter a string" ),
 						 ( 3, "Define you own labels", "define_you_own_labels", "varchar", 4, "Define your own notes" ),
 						 ( 3, "Multiline plain text field", "multiline_plain_text_field", "text", 6, "Enter multiple lines" ),
-						 ( 3, "Multiline HTML field", "multiline_html_field", "html", 5, "Enter HTML code" )' );
+						 ( 3, "Multiline HTML field", "multiline_html_field", "html", 5, "Enter HTML code" ),
+						 ( 3, "URL field", "url_field", "url", 7, "Enter an URL (absolute or relative)" )' );
 	task_end();
 
 

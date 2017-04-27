@@ -149,7 +149,14 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 					'note'      => T_('Ex: Content, Description... &ndash; will be stored as a varchar(10000) field.'),
 					'size'      => 30,
 					'maxlength' => 60
-				)
+				),
+			'url' => array(
+					'label'     => T_('URL'),
+					'title'     => T_('Add new URL custom field'),
+					'note'      => T_('Ex: Website, Twitter... &ndash; will be stored as a varchar(10000) field.'),
+					'size'      => 30,
+					'maxlength' => 60
+				),
 	);
 
 	$custom_fields_names = array();
@@ -367,6 +374,11 @@ jQuery( '#add_new_text_custom_field' ).click( function()
 jQuery( '#add_new_html_custom_field' ).click( function()
 {
 	add_new_custom_field( 'html', 'HTML', 30 );
+} );
+
+jQuery( '#add_new_url_custom_field' ).click( function()
+{
+	add_new_custom_field( 'url', '<?php echo TS_('URL'); ?>', 30 );
 } );
 
 jQuery( '[id^="delete_custom_"]' ).click( function()
