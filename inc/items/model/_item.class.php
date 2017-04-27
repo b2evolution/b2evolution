@@ -2101,6 +2101,9 @@ class Item extends ItemLight
 		// Render inline file tags like [image:123:caption] or [file:123:caption] :
 		$output = render_inline_files( $output, $this, $params );
 
+		// Render Collection Data [link:url_field], [link:url_field]title[/link] and etc.:
+		$output = $this->render_link_data( $output, $params );
+
 		// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
 		$output = $this->render_custom_fields( $output, $params );
 
@@ -2237,6 +2240,9 @@ class Item extends ItemLight
 		// Render inline file tags like [image:123:caption] or [file:123:caption] :
 		$output = render_inline_files( $output, $this, $params );
 
+		// Render Collection Data [link:url_field], [link:url_field]title[/link] and etc.:
+		$output = $this->render_link_data( $output, $params );
+
 		// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
 		$output = $this->render_custom_fields( $output, $params );
 
@@ -2302,13 +2308,19 @@ class Item extends ItemLight
 	/**
 	 * Get item custom field value by index
 	 *
-	 * @param String field index which by default is the field name, see {@link load_custom_field_value()}
+	 * @param string Field index which by default is the field name, see {@link load_custom_field_value()}
+	 * @param string Restring field by type, FALSE - to don't restrict
 	 * @return mixed false if the field doesn't exist Double/String otherwise depending from the custom field type
 	 */
-	function get_custom_field_value( $field_index )
+	function get_custom_field_value( $field_index, $restrict_type = false )
 	{
 		if( $this->load_custom_field_value( $field_index ) )
 		{
+			if( $restrict_type !== false && $this->custom_fields[ $field_index ]['type'] != $restrict_type )
+			{	// The requested field is detected but it has another type:
+				return false;
+			}
+
 			$custom_field_value = utf8_trim( $this->custom_fields[ $field_index ]['value'] );
 			if( $this->custom_fields[ $field_index ]['type'] == 'text' )
 			{	// Escape html tags and convert new lines to html <br> for text fields:
@@ -2648,6 +2660,66 @@ class Item extends ItemLight
 						$content = str_replace( $source_tag, $item_Blog->get( 'shortname' ), $content );
 						break;
 				}
+			}
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Convert inline link tags into HTML tags like:
+	 *    [link:url_field]
+	 *    [link:url_field]title[/link]
+	 *    [link:url_field:.class1.class2]title[/link]
+	 * url_field is code of custom item field with type "URL"
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_link_data( $content, $params = array() )
+	{
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_link_data() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_link_data' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of link data:
+		preg_match_all( '/\[(parent:)?link:([^\]]+)\]((.*?)\[\/link\])?/i', $content, $tags );
+
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one link tag is found in content:
+			foreach( $tags[0] as $t => $source_tag )
+			{	// Render URL custom field as html:
+				$field_Item = $this;
+				if( $tags[1][ $t ] == 'parent:' && ! ( $field_Item = & $this->get_parent_Item() ) )
+				{	// If parent doesn't exist:
+					$content = substr_replace( $content, '<span class="text-danger">'.T_('This item has no parent.').'</span>', strpos( $content, $source_tag ), strlen( $source_tag ) );
+					continue;
+				}
+
+				$link_data = explode( ':', $tags[2][ $t ] );
+
+				// Get field code:
+				$url_field_code = trim( $link_data[0] );
+
+				$field_value = $field_Item->get_custom_field_value( $url_field_code, 'url' );
+				if( $field_value === false )
+				{	// Wrong field request, display error:
+					$link_html = '<span class="text-danger">'.sprintf( T_('The URL field "%s" does not exist'), $url_field_code ).'</span>';
+				}
+				else
+				{	// Display URL field as html link:
+					$link_class = empty( $link_data[1] ) ? '' : ' class="'.trim( str_replace( '.', ' ', $link_data[1] ) ).'"';
+					$link_text = empty( $tags[4][ $t ] ) ? $field_value : $tags[4][ $t ];
+					$link_html = '<a href="'.$field_value.'"'.$link_class.'>'.$link_text.'</a>';
+				}
+				$content = substr_replace( $content, $link_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
 			}
 		}
 
