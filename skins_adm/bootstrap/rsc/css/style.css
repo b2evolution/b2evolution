@@ -608,6 +608,28 @@ fieldset ul {
   color: #000;
   font-weight: normal;
 }
+#canvas_doughnut_chart_wrapper canvas {
+  float: left;
+}
+#canvas_doughnut_chart_wrapper #canvas_doughnut_chart_legend {
+  border: 1px solid #cccccc;
+  float: left;
+  margin-top: 40px;
+}
+#canvas_doughnut_chart_wrapper #canvas_doughnut_chart_legend td {
+  padding: 2px 3px;
+  font-size: 0.75em;
+  font-weight: bold;
+}
+#canvas_doughnut_chart_wrapper #canvas_doughnut_chart_legend td span {
+  border: 1px solid #cccccc;
+  padding: 1px;
+  margin-right: 10px;
+  width: 16px;
+  line-height: 10px;
+  height: 14px;
+  display: inline-block;
+}
 #item_locations label {
   width: auto;
   float: right;

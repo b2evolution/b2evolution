@@ -251,10 +251,12 @@ function draw_canvas_doughnut_chart( $chart )
 		$chart['canvas_bg']['id'] = 'canvas_doughnut_chart';
 	}
 
-	$chart['canvas_bg']['width'] = 690;
-	$chart['canvas_bg']['height'] = 220;
+	$chart['canvas_bg']['width'] = 250;
+	$chart['canvas_bg']['height'] = 250;
 ?>
-	<canvas id="<?php echo $chart['canvas_bg']['id']; ?>" style="width:<?php echo $chart['canvas_bg']['width']; ?>px;max-width:<?php echo $chart['canvas_bg']['width']; ?>px;height:<?php echo $chart['canvas_bg']['height']; ?>px;max-height:<?php echo $chart['canvas_bg']['height']; ?>px;margin:auto"></canvas>
+	<div id="<?php echo $chart['canvas_bg']['id']; ?>_wrapper">
+		<canvas id="<?php echo $chart['canvas_bg']['id']; ?>" style="width:<?php echo $chart['canvas_bg']['width']; ?>px;max-width:<?php echo $chart['canvas_bg']['width']; ?>px;height:<?php echo $chart['canvas_bg']['height']; ?>px;max-height:<?php echo $chart['canvas_bg']['height']; ?>px"></canvas>
+	</div>
 	<script type="text/javascript">
 	jQuery( window ).load( function()
 	{
@@ -268,41 +270,34 @@ function draw_canvas_doughnut_chart( $chart )
 			},
 			options: {
 				intersect: true,
+				layout: {
+					padding: 15
+				},
 				legend: {
-					position: 'right',
-					labels: {
-						boxWidth: 12,
-						fontColor: '#000',
-						fontStyle: 'bold',
-						fontSize: 11,
-						generateLabels: function(chart) {
-							var data = chart.data;
-							if (data.labels.length && data.datasets.length) {
-								var helpers = Chart.helpers;
-								return data.labels.map(function(label, i) {
-									var meta = chart.getDatasetMeta(0);
-									var ds = data.datasets[0];
-									var arc = meta.data[i];
-									var custom = arc && arc.custom || {};
-									var getValueAtIndexOrDefault = helpers.getValueAtIndexOrDefault;
-									var arcOpts = chart.options.elements.arc;
-									var fill = custom.backgroundColor ? custom.backgroundColor : getValueAtIndexOrDefault(ds.backgroundColor, i, arcOpts.backgroundColor);
-
-									return {
-										text: label,
-										fillStyle: fill,
-										strokeStyle: '#CCC',
-										lineWidth: 1,
-										hidden: isNaN(ds.data[i]) || meta.data[i].hidden,
-
-										// Extra data used for toggling the correct item
-										index: i
-									};
-								});
-							}
-							return [];
+					display: false
+				},
+				legendCallback: function( chart ) {
+					var legend = '<table id="<?php echo $chart['canvas_bg']['id']; ?>_legend">';
+					for( var i = 0; i < chart.data.datasets[0].data.length; i++ )
+					{
+						if( i % 2 == 0 )
+						{
+							legend += '<tr>';
+						}
+						legend += '<td>';
+						legend += '<span><div style="background-color:' + chart.data.datasets[0].backgroundColor[i] + '">&nbsp;</div></span>';
+						if( chart.data.labels[i] )
+						{
+							legend += chart.data.labels[i];
+						}
+						legend += '</td>';
+						if( i % 2 == 1 )
+						{
+							legend += '</tr>';
 						}
 					}
+					legend += '</table>';
+					return legend;
 				},
 				tooltips: {
 					callbacks: {
@@ -314,6 +309,9 @@ function draw_canvas_doughnut_chart( $chart )
 				}
 			}
 		} );
+
+		var legend = <?php echo $chart['canvas_bg']['id']; ?>.generateLegend();
+		jQuery( '#<?php echo $chart['canvas_bg']['id']; ?>_wrapper' ).append(legend);
 	} );
 	</script>
 <?php

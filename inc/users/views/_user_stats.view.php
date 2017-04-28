@@ -264,6 +264,7 @@ foreach( $donut_data as $donut_data_row )
 load_funcs('_ext/_canvascharts.php');
 echo '<div style="width:690px;margin:auto;">';
 draw_canvas_doughnut_chart( $donut_chart );
+echo '<div class="clearfix"></div>';
 CanvasDonutChart( $donut_chart );
 echo '</div>';
 // ---- The data for donut chart: END ---- //
