@@ -175,6 +175,10 @@ h2 .glyphicon {
   white-space: nowrap;
   vertical-align: middle;
 }
+#itemform_custom_fields .compose_layout,
+#itemform_adv_props .compose_layout {
+  margin-bottom: 0;
+}
 div.log_container {
   margin: 0;
 }

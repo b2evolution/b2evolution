@@ -1209,7 +1209,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('First Post'), T_('<p>This is the first post.</p>
+			$edited_Item->insert( $owner_ID, T_('First Post'), T_('<p>This is the first post in the "[coll:shortname]" collection.</p>
 
 <p>It appears in a single category.</p>'), $now, $cat_ann_a );
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1218,7 +1218,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('Second post'), T_('<p>This is the second post.</p>
+			$edited_Item->insert( $owner_ID, T_('Second post'), T_('<p>This is the second post in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a ) );
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1301,6 +1301,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
  It can have multiple lines.' );
  			$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
+			$edited_Item->set_setting( 'custom_url_7', 'http://b2evolution.net/' );
 			$post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with custom fields".').'</p>'.
 
@@ -1312,7 +1313,9 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 '<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
 
-'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[field:first_string_field]' ).'</p>',
+'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[field:first_string_field]' ).'</p>'.
+
+'<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
 			$item_IDs[] = array( $edited_Item->ID, $now );
 
@@ -1334,7 +1337,9 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 <p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>
 
-<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[parent:field: first_string_field]' ).'</p>',
+<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[parent:field: first_string_field]' ).'</p>
+
+<p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
 			$item_IDs[] = array( $edited_Item->ID, $now );
 
@@ -1668,7 +1673,7 @@ a school bus stop where you wouldn\'t really expect it!
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $user_1, T_('First Topic'), T_('<p>This is the first topic.</p>
+			$edited_Item->insert( $user_1, T_('First Topic'), T_('<p>This is the first topic in the "[coll:shortname]" collection.</p>
 
 <p>It appears in a single category.</p>').get_filler_text( 'lorem_2more'), $now, $cat_forums_ann );
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1677,7 +1682,7 @@ a school bus stop where you wouldn\'t really expect it!
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $user_2, T_('Second topic'), T_('<p>This is the second topic.</p>
+			$edited_Item->insert( $user_2, T_('Second topic'), T_('<p>This is the second topic in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>').get_filler_text( 'lorem_2more'), $now, $cat_forums_news, array( $cat_forums_ann ) );
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1844,7 +1849,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('First Page'), T_('<p>This is the first page.</p>
+			$edited_Item->insert( $owner_ID, T_('First Page'), T_('<p>This is the first page in the "[coll:shortname]" collection.</p>
 
 <p>It appears in a single category.</p>'), $now, $cat_manual_intro, array(),
 'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 10 );
@@ -1854,7 +1859,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('Second Page'), T_('<p>This is the second page.</p>
+			$edited_Item->insert( $owner_ID, T_('Second Page'), T_('<p>This is the second page in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>'), $now, $cat_manual_intro, array( $cat_manual_getstarted ),
 'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 20 );
