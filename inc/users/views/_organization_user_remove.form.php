@@ -17,24 +17,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Organization;
 
+$UserCache = & get_UserCache();
+$edited_User = & $UserCache->get_by_ID( param( 'user_ID', 'integer' ) );
+
 $Form = new Form( NULL, 'orguser_removemembership' );
 
 $Form->begin_form( 'fform' );
 
 	$Form->add_crumb( 'organization' );
-
 	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
+	$Form->hidden( 'user_login', $edited_User->get( 'login' ) );
 
-	$user_ID = param( 'user_ID', 'integer' );
-	$UserCache = & get_UserCache();
-	$edited_User = & $UserCache->get_by_ID( $user_ID );
-	$org_data = $edited_User->get_organizations_data();
-
-	?>
-	<p>This will remove <?php echo $edited_User->get( 'preferredname' );?> from the organization. Would you like to continue?</p>
-	<?php
-
-	$Form->hidden( 'user_login', $edited_User->get('login') );
+	echo '<p>'.sprintf( T_('This will remove %s from the organization. Would you like to continue?'), $edited_User->get( 'preferredname' ) ).'</p>';
 
 $buttons = array();
 if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
