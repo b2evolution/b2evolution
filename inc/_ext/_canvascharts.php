@@ -306,6 +306,39 @@ function draw_canvas_doughnut_chart( $chart )
 								+ ": " + data.datasets[item.datasetIndex].data[item.index];
 						}
 					}
+				},
+				hover: {
+					onHover: function( e ) {
+						// Highlight legend on hover mouse cursor:
+						var legend_table = jQuery( '#<?php echo $chart['canvas_bg']['id']; ?>_legend' );
+						jQuery( 'td', legend_table ).removeClass( 'chart_legend_highlighted' );
+
+						var activePoints = <?php echo $chart['canvas_bg']['id']; ?>.getElementsAtEvent( e );
+						var activeDatasets = <?php echo $chart['canvas_bg']['id']; ?>.getDatasetAtEvent( e );
+
+						if( typeof( activePoints[0] ) == 'undefined' )
+						{
+							return false;
+						}
+
+						var pointIndex = activePoints[0]._index;
+						var datasetIndex = activeDatasets[0]._datasetIndex;
+
+						switch( datasetIndex )
+						{
+							case 2:
+								jQuery( 'tr:eq( ' + ( pointIndex * 3 ) + ' ) td, tr:eq( ' + ( pointIndex * 3 + 1 ) + ' ) td, tr:eq( ' + ( pointIndex * 3 + 2 ) + ' ) td', legend_table ).addClass( 'chart_legend_highlighted' );
+								break;
+
+							case 1:
+								jQuery( 'tr:eq( ' + pointIndex + ' ) td', legend_table ).addClass( 'chart_legend_highlighted' );
+								break;
+
+							case 0:
+								jQuery( 'td:eq( ' + pointIndex + ' )', legend_table ).addClass( 'chart_legend_highlighted' );
+								break;
+						}
+					}
 				}
 			}
 		} );
