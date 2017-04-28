@@ -1656,7 +1656,7 @@ a school bus stop where you wouldn\'t really expect it!
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $user_1, T_('First Topic'), T_('<p>This is the first topic.</p>
+			$edited_Item->insert( $user_1, T_('First Topic'), T_('<p>This is the first topic in the "[coll:shortname]" collection.</p>
 
 <p>It appears in a single category.</p>').get_filler_text( 'lorem_2more'), $now, $cat_forums_ann );
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1665,7 +1665,7 @@ a school bus stop where you wouldn\'t really expect it!
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $user_2, T_('Second topic'), T_('<p>This is the second topic.</p>
+			$edited_Item->insert( $user_2, T_('Second topic'), T_('<p>This is the second topic in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>').get_filler_text( 'lorem_2more'), $now, $cat_forums_news, array( $cat_forums_ann ) );
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1832,7 +1832,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('First Page'), T_('<p>This is the first page.</p>
+			$edited_Item->insert( $owner_ID, T_('First Page'), T_('<p>This is the first page in the "[coll:shortname]" collection.</p>
 
 <p>It appears in a single category.</p>'), $now, $cat_manual_intro, array(),
 'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 10 );
@@ -1842,7 +1842,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('Second Page'), T_('<p>This is the second page.</p>
+			$edited_Item->insert( $owner_ID, T_('Second Page'), T_('<p>This is the second page in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>'), $now, $cat_manual_intro, array( $cat_manual_getstarted ),
 'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 20 );
