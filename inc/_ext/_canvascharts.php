@@ -89,8 +89,8 @@ function draw_canvas_bars_chart( $chart )
 	<script type="text/javascript">
 	jQuery( window ).load( function()
 	{
-		if( typeof( chartjs_plugin_marked_xaxis_is_loaded ) == 'undefined' )
-		{	// Initialize plugin only once:
+		if( typeof( chartjs_additional_plugins_are_loaded ) == 'undefined' )
+		{	// Initialize plugins only once:
 			Chart.pluginService.register(
 			{	// Register plugin event to mark x axis, e-g for weekend days:
 				beforeDraw: function ( chart )
@@ -113,8 +113,12 @@ function draw_canvas_bars_chart( $chart )
 					}
 				}
 			} );
-			// Set flag to don't initialize this plugin twice:
-			chartjs_plugin_marked_xaxis_is_loaded = true;
+			Chart.Tooltip.positioners.cursor = function( chartElements, coordinates )
+			{	// Set coordinates of tooltip depending on mouse cursor position:
+				return coordinates;
+			};
+			// Set flag to don't initialize additional plugins twice:
+			chartjs_additional_plugins_are_loaded = true;
 		}
 
 		var ctx = document.getElementById( '<?php echo $chart['canvas_bg']['id']; ?>' ).getContext( '2d' );
@@ -138,7 +142,8 @@ function draw_canvas_bars_chart( $chart )
 					}
 				},
 				tooltips: {
-					mode: 'point',
+					mode: 'index',
+					position: 'cursor',
 					intersect: false
 				},
 				scales: {
