@@ -8451,6 +8451,27 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12300, 'Clear invalid values of item type custom fields...' ) )
+	{	// part of 6.9.2-beta
+		$SQL = new SQL( 'Get all item types with custom fields' );
+		$SQL->SELECT( 'GROUP_CONCAT( DISTINCT "\"custom_", itcf_type, "_", itcf_ID, "\"" ) AS valid_setting_names, ' );
+		$SQL->SELECT_add( 'GROUP_CONCAT( DISTINCT post_ID ) AS post_IDs' );
+		$SQL->FROM( 'T_items__type_custom_field' );
+		$SQL->FROM_add( 'INNER JOIN T_items__item ON itcf_ityp_ID = post_ityp_ID' );
+		$SQL->GROUP_BY( 'itcf_ityp_ID' );
+		$custom_fields = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+
+		foreach( $custom_fields as $custom_field )
+		{	// Delete all invalid/obsolete values of each item type with custom fields:
+			$DB->query( 'DELETE FROM T_items__item_settings
+				WHERE iset_item_ID IN ( '.$custom_field->post_IDs.' )
+					AND iset_name LIKE "custom\_%"
+					AND iset_name NOT IN ( '.$custom_field->valid_setting_names.' )',
+				'Clear invalid/obsolete values of item type custom fields' );
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

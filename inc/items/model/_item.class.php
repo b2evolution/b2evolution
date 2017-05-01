@@ -6039,8 +6039,19 @@ class Item extends ItemLight
 			$this->set( 'dateset', 1 );
 		}
 
+		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
+
 		// Check whether any db change has been executed
 		$db_changed = false;
+
+		if( ! empty( $dbchanges['post_ityp_ID'] ) )
+		{	// If item type has been changed to another,
+			// Clear all custom fields values of previous item type:
+			// NOTE: Call this before item settings updating in order to don't remove values of new selected item type:
+			$DB->query( 'DELETE FROM T_items__item_settings
+				WHERE iset_item_ID = '.$this->ID.'
+					AND iset_name LIKE "custom\_%"' );
+		}
 
 		// save Item settings
 		if( isset( $this->ItemSettings ) )
@@ -6067,8 +6078,6 @@ class Item extends ItemLight
 
 		// TODO: dh> allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemUpdateTransact', $params = array( 'Item' => & $this ) );
-
-		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 
 		$result = true;
 		// fp> note that dbchanges isn't actually 100% accurate. At this time it does include variables that actually haven't changed.
