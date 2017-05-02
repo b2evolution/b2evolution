@@ -1158,7 +1158,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 		// =======================================================================================================
 		case 'std':
 		case 'blog_a':
-			$post_count = 11;
+			$post_count = 12;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1296,9 +1296,23 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 '<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
 
-'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[field:first_string_field]' ).'</p>'.
+'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>'.
 
 '<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
+					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
+			$item_IDs[] = array( $edited_Item->ID, $now );
+
+			// Insert a post:
+			$post_count--;
+			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+			$edited_Item = new Item();
+			$edited_Item->set_tags_from_string( 'demo' );
+			$edited_Item->set_setting( 'custom:first_numeric_field', '789' );
+			$edited_Item->set_setting( 'custom:first_string_field', 'def' );
+			$another_post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Another Post with Custom fields'),
+'<p>'.T_('This post has a few other custom field values:').'</p>'.
+
+'<p>[fields]</p>',
 					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
 			$item_IDs[] = array( $edited_Item->ID, $now );
 
@@ -1320,7 +1334,9 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 <p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>
 
-<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[parent:field: first_string_field]' ).'</p>
+<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field: first_string_field]' ).'</p>
+
+<p>'.sprintf( T_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-post-with-custom-fields:field:first_string_field]', '[item:'.$another_post_custom_fields_ID.':field:first_string_field]' ).'</p>
 
 <p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
