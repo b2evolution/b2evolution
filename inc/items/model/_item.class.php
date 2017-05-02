@@ -2343,7 +2343,7 @@ class Item extends ItemLight
 				'render_inline_files'  => true,
 				'render_links'         => true,
 				'render_custom_fields' => true,
-				'render_parent'        => true,
+				'render_other_item'    => true,
 				'render_collection'    => true,
 			), $params );
 
@@ -2362,9 +2362,9 @@ class Item extends ItemLight
 			$content = $this->render_custom_fields( $content, $params );
 		}
 
-		if( $params['render_parent'] )
-		{	// Render Parent Data [parent], [parent:fields] and etc.:
-			$content = $this->render_parent_data( $content, $params );
+		if( $params['render_other_item'] )
+		{	// Render parent/other item data [parent], [parent:fields], [item:123:fields], [item:slug-title:fields] and etc.:
+			$content = $this->render_other_item_data( $content, $params );
 		}
 
 		if( $params['render_collection'] )
@@ -2436,7 +2436,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline parent tags into HTML tags like:
+	 * Convert inline parent/other item tags into HTML tags like:
 	 *    [parent]
 	 *    [parent:titlelink]
 	 *    [parent:url]
@@ -2447,36 +2447,59 @@ class Item extends ItemLight
 	 * @param array Params
 	 * @return string Content
 	 */
-	function render_parent_data( $content, $params = array() )
+	function render_other_item_data( $content, $params = array() )
 	{
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
-		{	// Call $this->render_parent_data() on everything outside code/pre:
+		{	// Call $this->render_other_item_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
-				array( $this, 'render_parent_data' ), array( $params ) );
+				array( $this, 'render_other_item_data' ), array( $params ) );
 			return $content;
 		}
 
 		// Find all matches with tags of parent data:
-		preg_match_all( '/\[parent:([a-z]+):?([^\]]*)?\]/i', $content, $tags );
+		preg_match_all( '/\[(parent|item:[^:]+):([a-z]+):?([^\]]*)?\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
-		{	// If at least one parent tag is found in content:
-			if( empty( $this->parent_ID ) || $this->get_type_setting( 'use_parent' ) == 'never' )
-			{	// If parent doesn't exist:
-				$content = str_replace( $tags[0], '<span class="text-danger">'.T_('This item has no parent.').'</span>', $content );
-				return $content;
-			}
-
+		{	// If at least one other item tag is found in content:
 			foreach( $tags[0] as $t => $source_tag )
 			{
-				switch( $tags[1][ $t ] )
+				if( $tags[1][ $t ] == 'parent' )
+				{	// Get data of item parent:
+					if( empty( $this->parent_ID ) || $this->get_type_setting( 'use_parent' ) == 'never' )
+					{	// If parent doesn't exist:
+						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.T_('This item has no parent.').'</span>', $content );
+						continue;
+					}
+					$other_item_ID = $this->parent_ID;
+					$other_Item = & $this->get_parent_Item();
+				}
+				else
+				{	// Get data of other item by ID or slug:
+					$other_item_data = explode( ':', $tags[1][ $t ] );
+					$ItemCache = & get_ItemCache();
+					if( is_number( $other_item_data[1] ) && $other_Item = & $ItemCache->get_by_ID( intval( $other_item_data[1] ), false, false ) )
+					{	// If item is found by ID:
+						$other_item_ID = $other_Item->ID;
+					}
+					elseif( $other_Item = & $ItemCache->get_by_urltitle( $other_item_data[1], false, false ) )
+					{	// If item is found by slug:
+						$other_item_ID = $other_Item->ID;
+					}
+					else
+					{	// If other item doesn't exist:
+						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The item %s doesn\'t exist.'), '<code>'.$other_item_data[1].'</code>' ).'</span>', $content );
+						continue;
+					}
+				}
+
+				switch( $tags[2][ $t ] )
 				{
 					case 'fields':
 						// Render several parent custom fields as HTML table:
-						$custom_fields_params = array( 'fields' => trim( $tags[2][ $t ] ) );
-						$field_value = render_item_custom_fields( $this->parent_ID, $custom_fields_params );
+						$custom_fields_params = array( 'fields' => trim( $tags[3][ $t ] ) );
+						$field_value = render_item_custom_fields( $other_item_ID, $custom_fields_params );
 						if( empty( $field_value ) )
 						{	// Fields don't exist:
 							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent item has no custom fields').'</span>', $content );
@@ -2489,8 +2512,8 @@ class Item extends ItemLight
 
 					case 'field':
 						// Render single parent custom field as text:
-						$field_index = trim( $tags[2][ $t ] );
-						$field_value = get_item_custom_field_value( $this->parent_ID, $field_index );
+						$field_index = trim( $tags[3][ $t ] );
+						$field_value = get_item_custom_field_value( $other_item_ID, $field_index );
 						if( $field_value === false )
 						{	// Wrong field request, display error:
 							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_index ).'</span>', $content );
@@ -2503,14 +2526,12 @@ class Item extends ItemLight
 
 					case 'titlelink':
 						// Render parent title with link:
-						$parent_Item = & $this->get_parent_Item();
-						$content = str_replace( $source_tag, $parent_Item->get_title(), $content );
+						$content = str_replace( $source_tag, $other_Item->get_title(), $content );
 						break;
 
 					case 'url':
 						// Render parent URL:
-						$parent_Item = & $this->get_parent_Item();
-						$content = str_replace( $source_tag, $parent_Item->get_permanent_url(), $content );
+						$content = str_replace( $source_tag, $other_Item->get_permanent_url(), $content );
 						break;
 				}
 			}
@@ -2591,7 +2612,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of link data:
-		preg_match_all( '/\[(parent:)?link:([^\]]+)\]((.*?)\[\/link\])?/i', $content, $tags );
+		preg_match_all( '/\[(parent:|item:[^:]+:)?link:([^\]]+)\]((.*?)\[\/link\])?/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one link tag is found in content:
@@ -2605,9 +2626,24 @@ class Item extends ItemLight
 						$content = substr_replace( $content, '<span class="text-danger">'.T_('This item has no parent.').'</span>', strpos( $content, $source_tag ), strlen( $source_tag ) );
 						continue;
 					}
+					$field_item_ID = $this->parent_ID;
+				}
+				elseif( ! empty( $tags[1][ $t ] ) )
+				{	// Try to use other item by ID or slug:
+					$other_item_data = explode( ':', $tags[1][ $t ] );
+					$ItemCache = & get_ItemCache();
+					if( is_number( $other_item_data[1] ) && $other_Item = & $ItemCache->get_by_ID( intval( $other_item_data[1] ), false, false ) )
+					{	// If item is found by ID:
+						$field_item_ID = $other_Item->ID;
+					}
+					elseif( $other_Item = & $ItemCache->get_by_urltitle( $other_item_data[1], false, false ) )
+					{	// If item is found by slug:
+						$field_item_ID = $other_Item->ID;
+					}
 					else
-					{	// Use parent ID to render data:
-						$field_item_ID = $this->parent_ID;
+					{	// If other item doesn't exist:
+						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The item %s doesn\'t exist.'), '<code>'.$other_item_data[1].'</code>' ).'</span>', $content );
+						continue;
 					}
 				}
 
