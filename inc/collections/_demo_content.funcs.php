@@ -1277,14 +1277,14 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'demo' );
-			$edited_Item->set_setting( 'custom_double_1', '123' );
-			$edited_Item->set_setting( 'custom_double_2', '456' );
-			$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
-			$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
-			$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
+			$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
+			$edited_Item->set_setting( 'custom:second_numeric_field', '456' );
+			$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
+			$edited_Item->set_setting( 'custom:define_your_own_labels', 'Enter your own values' );
+			$edited_Item->set_setting( 'custom:multiline_plain_text_field', 'This is a sample text field.
  It can have multiple lines.' );
- 			$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
-			$edited_Item->set_setting( 'custom_url_7', 'http://b2evolution.net/' );
+ 			$edited_Item->set_setting( 'custom:multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
+			$edited_Item->set_setting( 'custom:url_field', 'http://b2evolution.net/' );
 			$post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with custom fields".').'</p>'.
 

@@ -522,7 +522,9 @@ class ItemType extends DataObject
 		}
 
 		if( ! empty( $this->update_custom_fields ) )
-		{ // Update custom fields
+		{	// Update custom fields:
+			unset( $this->custom_fields );
+			$old_custom_fields = $this->get_custom_fields( 'all', 'ID' );
 			foreach( $this->update_custom_fields as $itcf_ID => $custom_field )
 			{
 				$DB->query( 'UPDATE T_items__type_custom_field
@@ -534,6 +536,12 @@ class ItemType extends DataObject
 					WHERE itcf_ityp_ID = '.$DB->quote( $this->ID ).'
 						AND itcf_ID = '.$DB->quote( $itcf_ID ).'
 						AND itcf_type = '.$DB->quote( $custom_field['type'] ) );
+				if( isset( $old_custom_fields[ $itcf_ID ] ) )
+				{	// Update item setting names of custom field to use new field name:
+					$DB->query( 'UPDATE T_items__item_settings
+						  SET iset_name = '.$DB->quote( 'custom:'.$custom_field['name'] ).'
+						WHERE iset_name = '.$DB->quote( 'custom:'.$old_custom_fields[ $itcf_ID ]['name'] ) );
+				}
 			}
 		}
 

@@ -229,7 +229,7 @@ class ItemList2 extends ItemListLight
 		foreach( $custom_fields as $custom_field )
 		{ // For each custom double field:
 			$param_type = ( $custom_field['type'] == 'varchar' ) ? 'string' : $custom_field['type'];
-			$Item->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], param( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $param_type, NULL ) );
+			$Item->set_setting( 'custom:'.$custom_field['name'], param( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $param_type, NULL ) );
 		}
 
 		// Trigger plugin event, allowing to manipulate or validate the item before it gets previewed

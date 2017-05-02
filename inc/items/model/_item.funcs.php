@@ -3443,7 +3443,7 @@ function display_hidden_custom_fields( & $Form, & $edited_Item )
 	$custom_fields = $edited_Item->get_type_custom_fields();
 	foreach( $custom_fields as $custom_field )
 	{ // For each custom field with type $type:
-		$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] ) );
+		$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
 	}
 }
 

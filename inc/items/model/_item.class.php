@@ -895,7 +895,7 @@ class Item extends ItemLight
 				}
 				param( $param_name, $param_type, NULL ); // get par value
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
-				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], get_param( $param_name ), $custom_field_make_null );
+				$this->set_setting( 'custom:'.$custom_field['name'], get_param( $param_name ), $custom_field_make_null );
 			}
 		}
 
@@ -2269,7 +2269,7 @@ class Item extends ItemLight
 
 		if( empty( $this->custom_fields[$field_index]['value'] ) )
 		{ // get custom item field value from the item setting
-			$this->custom_fields[$field_index]['value'] = $this->get_setting( 'custom_'.$this->custom_fields[$field_index]['type'].'_'.$this->custom_fields[$field_index]['ID'] );
+			$this->custom_fields[$field_index]['value'] = $this->get_setting( 'custom:'.$field_index );
 		}
 		return true;
 	}
@@ -2420,7 +2420,7 @@ class Item extends ItemLight
 			}
 
 			$field = $this->custom_fields[ $field_name ];
-			$custom_field_value = utf8_trim( $this->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ) );
+			$custom_field_value = utf8_trim( $this->get_setting( 'custom:'.$field_name ) );
 			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
 			{	// Display only the filled field AND also numeric field with '0' value:
@@ -6067,7 +6067,7 @@ class Item extends ItemLight
 			// NOTE: Call this before item settings updating in order to don't remove values of new selected item type:
 			$DB->query( 'DELETE FROM T_items__item_settings
 				WHERE iset_item_ID = '.$this->ID.'
-					AND iset_name LIKE "custom\_%"' );
+					AND iset_name LIKE "custom:%"' );
 		}
 
 		// save Item settings

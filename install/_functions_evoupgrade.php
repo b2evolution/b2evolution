@@ -8472,6 +8472,37 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12310, 'Update setting names of item custom fields...' ) )
+	{	// part of 6.9.2-beta
+		$SQL = new SQL( 'Get all item custom field settings' );
+		$SQL->SELECT( 'iset_item_ID, iset_name' );
+		$SQL->FROM( 'T_items__item_settings' );
+		$SQL->WHERE( 'iset_name LIKE "custom\_%"' );
+		$custom_field_settings = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+
+		if( count( $custom_field_settings ) )
+		{	// If at least one item has a filled custom field:
+			$SQL = new SQL( 'Get all custom fields of all item types' );
+			$SQL->SELECT( 'itcf_ID, itcf_name' );
+			$SQL->FROM( 'T_items__type_custom_field' );
+			$custom_fields = $DB->get_assoc( $SQL->get(), $SQL->title );
+
+			foreach( $custom_field_settings as $custom_field_setting )
+			{	// Update each old custom field setting name like 'custom_double_1' to new 'custom:field_code'
+				$custom_field_ID = preg_replace( '#^custom_[a-z]+_(\d+)$#', '$1', $custom_field_setting->iset_name );
+				if( isset( $custom_fields[ $custom_field_ID ] ) )
+				{	// If custom field is detected
+					$DB->query( 'UPDATE T_items__item_settings
+						  SET iset_name = '.$DB->quote( 'custom:'.$custom_fields[ $custom_field_ID ] ).'
+						WHERE iset_item_ID = '.$custom_field_setting->iset_item_ID.'
+						  AND iset_name = '.$DB->quote( $custom_field_setting->iset_name ),
+						'Update setting name of item type custom field' );
+				}
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
