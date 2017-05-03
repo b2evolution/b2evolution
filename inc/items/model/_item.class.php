@@ -739,6 +739,11 @@ class Item extends ItemLight
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL )
 		{
 			$this->set_from_Request( 'urltitle' );
+			// Added in May 2017; but old slugs are not converted yet.
+			if( preg_match( '#(^|,+)[^a-z\d_]*\d+[^a-z\d_]*($|,+)#i', get_param( 'post_urltitle' ) ) )
+			{	// Display error if item slugs contain only digits:
+				param_error( 'post_urltitle', T_('All slugs must contain at least one letter.') );
+			}
 		}
 
 		// <title> TAG:
