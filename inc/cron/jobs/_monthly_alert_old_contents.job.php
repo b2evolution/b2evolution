@@ -148,6 +148,7 @@ $SQL->SELECT( '*' );
 $SQL->FROM( 'T_users' );
 $SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "send_pst_stale_alert"' );
 $SQL->WHERE( 'user_ID IN ('.implode( ',', $all_required_user_IDs ).')' );
+$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 $SQL->WHERE_and( 'LENGTH( TRIM( user_email ) ) > 0' );
 // Set notify moderation condition:
 if( $UserSettings->get( 'send_pst_stale_alert' ) )
