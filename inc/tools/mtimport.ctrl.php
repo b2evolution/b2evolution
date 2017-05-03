@@ -1157,12 +1157,12 @@ param( 'import_mode', 'string', 'normal' );
 					{
 						foreach( $value as $key2 => $value2 )
 						{
-							echo '<input type="hidden" name="'.$key.'['.$key2.']" value="'.format_to_output( $value2, 'formvalue' ).'" />';
+							echo '<input type="hidden" name="'.format_to_output( $key.'['.$key2.']', 'htmlattr' ).'" value="'.format_to_output( $value2, 'formvalue' ).'" />';
 						}
 					}
 					else
 					{
-						echo '<input type="hidden" name="'.$key.'" value="'.format_to_output( $value, 'formvalue' ).'" />';
+						echo '<input type="hidden" name="'.format_to_output( $key, 'htmlattr' ).'" value="'.format_to_output( $value, 'formvalue' ).'" />';
 					}
 				}
 			}
@@ -1275,7 +1275,7 @@ function fieldset_cats()
 
 			if( get_allow_cross_posting() >= 1 )
 			{ // We allow cross posting, display checkbox:
-				$r .= '<input type="checkbox" name="post_extracats[]" class="checkbox" title="'.T_('Select as an additionnal category').'" value="'.$Chapter->ID.'"';
+				$r .= '<input type="checkbox" name="post_extracats[]" class="checkbox" title="'.format_to_output( T_('Select as an additionnal category'), 'htmlattr' ).'" value="'.$Chapter->ID.'"';
 				$r .= ' />';
 			}
 
@@ -1286,7 +1286,7 @@ function fieldset_cats()
 				{	// Assign default cat for new post
 					$default_main_cat = $Chapter->ID;
 				}
-				$r .= ' <input type="radio" name="post_category" class="checkbox" title="'.T_('Select as MAIN category').'" value="'.$Chapter->ID.'"';
+				$r .= ' <input type="radio" name="post_category" class="checkbox" title="'.format_to_output( T_('Select as MAIN category'), 'htmlattr' ).'" value="'.$Chapter->ID.'"';
 				if( ($Chapter->ID == $postdata["Category"]) || ($Chapter->ID == $default_main_cat))
 					$r .= ' checked="checked"';
 				$r .= ' />';
