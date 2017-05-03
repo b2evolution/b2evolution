@@ -451,7 +451,7 @@ function zeroise( $number, $threshold )
 function excerpt( $str, $maxlen = 254, $tail = '&hellip;' )
 {
 	// Add spaces
-	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
+	$str = str_replace( array( '<p>', '<br', '</tr><tr', '</th><th', '</td><td' ), array( ' <p>', ' <br', '</tr> <tr', '</th> <th', '</td> <td' ), $str );
 
 	// Remove <code>
 	$str = preg_replace( '#<code>(.+)</code>#is', '', $str );

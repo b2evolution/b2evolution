@@ -720,7 +720,7 @@ class RestApi
 	private function controller_coll_posts()
 	{
 		$this->controller_coll_items( array(
-				'itemtype_usage' => NULL, // Keep content post types, Exclude pages, intros, sidebar links and ads
+				'itemtype_usage' => 'post', // Keep content post types, Exclude pages, intros, sidebar links and ads
 			) );
 	}
 
@@ -771,166 +771,171 @@ class RestApi
 		$search_result = $Session->get( 'search_result' );
 		if( empty( $search_result ) )
 		{	// Nothing found:
-			$this->halt( T_('Sorry, we could not find anything matching your request, please try to broaden your search.'), 'no_search_results', 200 );
-			// Exit here.
-		}
-
-		// Prepare pagination:
-		$result_count = count( $search_result );
-		$result_per_page = $api_per_page;
-		if( $result_count > $result_per_page )
-		{	// We will have multiple search result pages:
-			$current_page = $api_page;
-			if( $current_page < 1 )
-			{
-				$current_page = 1;
-			}
-			$total_pages = ceil( $result_count / $result_per_page );
-			if( $api_page > $total_pages )
-			{
-				$current_page = $total_pages;
-			}
+			$this->add_response( 'found', 0, 'integer' );
+			$this->add_response( 'page', $api_page, 'integer' );
+			$this->add_response( 'page_size', $api_per_page, 'integer' );
+			$this->add_response( 'pages_total', 0, 'integer' );
+			$this->add_response( 'results', array() );
 		}
 		else
-		{	// Only one page of results:
-			$current_page = 1;
-			$total_pages = 1;
-		}
+		{
+			// Prepare pagination:
+			$result_count = count( $search_result );
+			$result_per_page = $api_per_page;
+			if( $result_count > $result_per_page )
+			{	// We will have multiple search result pages:
+				$current_page = $api_page;
+				if( $current_page < 1 )
+				{
+					$current_page = 1;
+				}
+				$total_pages = ceil( $result_count / $result_per_page );
+				if( $api_page > $total_pages )
+				{
+					$current_page = $total_pages;
+				}
+			}
+			else
+			{	// Only one page of results:
+				$current_page = 1;
+				$total_pages = 1;
+			}
 
-		// Set current page indexes:
-		$from = ( ( $current_page -1 ) * $result_per_page );
-		$to = ( $current_page < $total_pages ) ? ( $from + $result_per_page ) : ( $result_count );
+			// Set current page indexes:
+			$from = ( ( $current_page -1 ) * $result_per_page );
+			$to = ( $current_page < $total_pages ) ? ( $from + $result_per_page ) : ( $result_count );
 
-		// Init caches
-		$ItemCache = & get_ItemCache();
-		$CommentCache = & get_CommentCache();
-		$ChapterCache = & get_ChapterCache();
+			// Init caches
+			$ItemCache = & get_ItemCache();
+			$CommentCache = & get_CommentCache();
+			$ChapterCache = & get_ChapterCache();
 
-		if( ! $search_result_loaded )
-		{	// Search result objects are not loaded into memory yet, load them:
-			// Group required object ids by type:
-			$required_ids = array();
+			if( ! $search_result_loaded )
+			{	// Search result objects are not loaded into memory yet, load them:
+				// Group required object ids by type:
+				$required_ids = array();
+				for( $index = $from; $index < $to; $index++ )
+				{
+					$row = $search_result[ $index ];
+					if( isset( $required_ids[ $row['type'] ] ) )
+					{
+						$required_ids[ $row['type'] ][] = $row['ID'];
+					}
+					else
+					{
+						$required_ids[ $row['type'] ] = array( $row['ID'] );
+					}
+				}
+
+				// Load each required object into the corresponding cache:
+				foreach( $required_ids as $type => $object_ids )
+				{
+					switch( $type )
+					{
+						case 'item':
+							$ItemCache->load_list( $object_ids );
+							break;
+
+						case 'comment':
+							$CommentCache->load_list( $object_ids );
+							break;
+
+						case 'category':
+							$ChapterCache->load_list( $object_ids );
+							break;
+
+						// TODO: we'll probably load "tag" objects once we support tag-synonyms.
+
+						default: // Not handled search result type
+							break;
+					}
+				}
+			}
+
+			$this->add_response( 'found', $result_count, 'integer' );
+			$this->add_response( 'page', $current_page, 'integer' );
+			$this->add_response( 'page_size', $result_per_page, 'integer' );
+			$this->add_response( 'pages_total', $total_pages, 'integer' );
+
+			// Get results for current page:
 			for( $index = $from; $index < $to; $index++ )
 			{
 				$row = $search_result[ $index ];
-				if( isset( $required_ids[ $row['type'] ] ) )
-				{
-					$required_ids[ $row['type'] ][] = $row['ID'];
-				}
-				else
-				{
-					$required_ids[ $row['type'] ] = array( $row['ID'] );
-				}
-			}
 
-			// Load each required object into the corresponding cache:
-			foreach( $required_ids as $type => $object_ids )
-			{
-				switch( $type )
+				$result_data = array(
+						'kind' => $row['type'],
+						'id'   => intval( $row['ID'] ),
+					);
+
+				switch( $row['type'] )
 				{
 					case 'item':
-						$ItemCache->load_list( $object_ids );
+						// Prepare to display an Item:
+
+						$Item = $ItemCache->get_by_ID( $row['ID'], false );
+
+						if( empty( $Item ) )
+						{ // This Item was deleted, since the search process was executed
+							continue 2; // skip from switch and skip to the next item in loop
+						}
+
+						$result_data['title'] = $Item->get_title( array( 'link_type' => 'none' ) );
+						$result_data['desc'] = $Item->get_excerpt();
+						$result_data['permalink'] = $Item->get_permanent_url( '', '', '&' );
 						break;
 
 					case 'comment':
-						$CommentCache->load_list( $object_ids );
+						// Prepare to display a Comment:
+
+						$Comment = $CommentCache->get_by_ID( $row['ID'], false );
+
+						if( empty( $Comment ) || ( $Comment->status == 'trash' ) )
+						{ // This Comment was deleted, since the search process was executed
+							continue 2; // skip from switch and skip to the next item in loop
+						}
+
+						$comment_Item = & $Comment->get_Item();
+						$result_data['title'] = $comment_Item->get_title( array( 'link_type' => 'none' ) );
+						$result_data['desc'] = excerpt( $Comment->content );
+						$result_data['permalink'] = $Comment->get_permanent_url( '&' );
 						break;
 
 					case 'category':
-						$ChapterCache->load_list( $object_ids );
+						// Prepare to display a Category:
+
+						$Chapter = $ChapterCache->get_by_ID( $row['ID'], false );
+
+						if( empty( $Chapter ) )
+						{ // This Chapter was deleted, since the search process was executed
+							continue 2; // skip from switch and skip to the next item in loop
+						}
+
+						$result_data['title'] = $Chapter->get_name();
+						$result_data['desc'] = excerpt( $Chapter->get( 'description' ) );
+						$result_data['permalink'] = $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' );
 						break;
 
-					// TODO: we'll probably load "tag" objects once we support tag-synonyms.
+					case 'tag':
+						// Prepare to display a Tag:
 
-					default: // Not handled search result type
+						list( $tag_name, $post_count ) = explode( ',', $row['name'] );
+
+						$result_data['title'] = $tag_name;
+						$result_data['desc'] = sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name );
+						$result_data['permalink'] = url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name, '&' );
 						break;
+
+					default:
+						// Other type of result is not implemented
+
+						// TODO: maybe find collections (especially in case of aggregation)? users? files?
+
+						continue 2;
 				}
+
+				// Add data of the searched thing to response:
+				$this->add_response( 'results', $result_data, 'array' );
 			}
-		}
-
-		$this->add_response( 'found', $result_count, 'integer' );
-		$this->add_response( 'page', $current_page, 'integer' );
-		$this->add_response( 'page_size', $result_per_page, 'integer' );
-		$this->add_response( 'pages_total', $total_pages, 'integer' );
-
-		// Get results for current page:
-		for( $index = $from; $index < $to; $index++ )
-		{
-			$row = $search_result[ $index ];
-
-			$result_data = array(
-					'kind' => $row['type'],
-					'id'   => intval( $row['ID'] ),
-				);
-
-			switch( $row['type'] )
-			{
-				case 'item':
-					// Prepare to display an Item:
-
-					$Item = $ItemCache->get_by_ID( $row['ID'], false );
-
-					if( empty( $Item ) )
-					{ // This Item was deleted, since the search process was executed
-						continue 2; // skip from switch and skip to the next item in loop
-					}
-
-					$result_data['title'] = $Item->get_title( array( 'link_type' => 'none' ) );
-					$result_data['desc'] = $Item->get_excerpt();
-					$result_data['permalink'] = $Item->get_permanent_url( '', '', '&' );
-					break;
-
-				case 'comment':
-					// Prepare to display a Comment:
-
-					$Comment = $CommentCache->get_by_ID( $row['ID'], false );
-
-					if( empty( $Comment ) || ( $Comment->status == 'trash' ) )
-					{ // This Comment was deleted, since the search process was executed
-						continue 2; // skip from switch and skip to the next item in loop
-					}
-
-					$comment_Item = & $Comment->get_Item();
-					$result_data['title'] = $comment_Item->get_title( array( 'link_type' => 'none' ) );
-					$result_data['desc'] = excerpt( $Comment->content );
-					$result_data['permalink'] = $Comment->get_permanent_url( '&' );
-					break;
-
-				case 'category':
-					// Prepare to display a Category:
-
-					$Chapter = $ChapterCache->get_by_ID( $row['ID'], false );
-
-					if( empty( $Chapter ) )
-					{ // This Chapter was deleted, since the search process was executed
-						continue 2; // skip from switch and skip to the next item in loop
-					}
-
-					$result_data['title'] = $Chapter->get_name();
-					$result_data['desc'] = excerpt( $Chapter->get( 'description' ) );
-					$result_data['permalink'] = $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' );
-					break;
-
-				case 'tag':
-					// Prepare to display a Tag:
-
-					list( $tag_name, $post_count ) = explode( ',', $row['name'] );
-
-					$result_data['title'] = $tag_name;
-					$result_data['desc'] = sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name );
-					$result_data['permalink'] = url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name, '&' );
-					break;
-
-				default:
-					// Other type of result is not implemented
-
-					// TODO: maybe find collections (especially in case of aggregation)? users? files?
-
-					continue 2;
-			}
-
-			// Add data of the searched thing to response:
-			$this->add_response( 'results', $result_data, 'array' );
 		}
 	}
 

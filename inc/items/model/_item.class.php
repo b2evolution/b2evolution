@@ -739,6 +739,11 @@ class Item extends ItemLight
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL )
 		{
 			$this->set_from_Request( 'urltitle' );
+			// Added in May 2017; but old slugs are not converted yet.
+			if( preg_match( '#(^|,+)[^a-z\d_]*\d+[^a-z\d_]*($|,+)#i', get_param( 'post_urltitle' ) ) )
+			{	// Display error if item slugs contain only digits:
+				param_error( 'post_urltitle', T_('All slugs must contain at least one letter.') );
+			}
 		}
 
 		// <title> TAG:
@@ -2095,23 +2100,8 @@ class Item extends ItemLight
 		$content_parts = $this->get_content_parts( $params );
 		$output = array_shift( $content_parts );
 
-		// Set this flag to check inline tags outside of codeblocks:
-		$params['check_code_block'] = true;
-
-		// Render inline file tags like [image:123:caption] or [file:123:caption] :
-		$output = render_inline_files( $output, $this, $params );
-
-		// Render Collection Data [link:url_field], [link:url_field]title[/link] and etc.:
-		$output = $this->render_link_data( $output, $params );
-
-		// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
-		$output = $this->render_custom_fields( $output, $params );
-
-		// Render Parent Data [parent], [parent:fields] and etc.:
-		$output = $this->render_parent_data( $output, $params );
-
-		// Render Collection Data [coll:name], [coll:shortname]:
-		$output = $this->render_collection_data( $output, $params );
+		// Render all inline tags to HTML code:
+		$output = $this->render_inline_tags( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2234,23 +2224,8 @@ class Item extends ItemLight
 		array_shift( $content_parts );
 		$output = implode( '', $content_parts );
 
-		// Render inline file tags like [image:123:caption] or [file:123:caption] :
-		$params['check_code_block'] = true;
-
-		// Render inline file tags like [image:123:caption] or [file:123:caption] :
-		$output = render_inline_files( $output, $this, $params );
-
-		// Render Collection Data [link:url_field], [link:url_field]title[/link] and etc.:
-		$output = $this->render_link_data( $output, $params );
-
-		// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
-		$output = $this->render_custom_fields( $output, $params );
-
-		// Render Parent Data [parent], [parent:fields] and etc.:
-		$output = $this->render_parent_data( $output, $params );
-
-		// Render Collection Data [coll:name], [coll:shortname]:
-		$output = $this->render_collection_data( $output, $params );
+		// Render all inline tags to HTML code:
+		$output = $this->render_inline_tags( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2474,6 +2449,53 @@ class Item extends ItemLight
 		{
 			return '';
 		}
+	}
+
+
+	/**
+	 * Convert all inline tags to HTML code
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_inline_tags( $content, $params = array() )
+	{
+		$params = array_merge( array(
+				'check_code_block'     => true, // TRUE to find inline tags only outside of codeblocks
+				'render_inline_files'  => true,
+				'render_links'         => true,
+				'render_custom_fields' => true,
+				'render_parent'        => true,
+				'render_collection'    => true,
+			), $params );
+
+		if( $params['render_inline_files'] )
+		{	// Render inline file tags like [image:123:caption] or [file:123:caption]:
+			$content = render_inline_files( $content, $this, $params );
+		}
+
+		if( $params['render_links'] )
+		{	// Render Collection Data [link:url_field], [link:url_field]title[/link] and etc.:
+			$content = $this->render_link_data( $content, $params );
+		}
+
+		if( $params['render_custom_fields'] )
+		{	// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
+			$content = $this->render_custom_fields( $content, $params );
+		}
+
+		if( $params['render_parent'] )
+		{	// Render Parent Data [parent], [parent:fields] and etc.:
+			$content = $this->render_parent_data( $content, $params );
+		}
+
+		if( $params['render_collection'] )
+		{	// Render Collection Data [coll:name], [coll:shortname]:
+			$content = $this->render_collection_data( $content, $params );
+		}
+
+		return $content;
 	}
 
 
@@ -6039,8 +6061,19 @@ class Item extends ItemLight
 			$this->set( 'dateset', 1 );
 		}
 
+		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
+
 		// Check whether any db change has been executed
 		$db_changed = false;
+
+		if( ! empty( $dbchanges['post_ityp_ID'] ) )
+		{	// If item type has been changed to another,
+			// Clear all custom fields values of previous item type:
+			// NOTE: Call this before item settings updating in order to don't remove values of new selected item type:
+			$DB->query( 'DELETE FROM T_items__item_settings
+				WHERE iset_item_ID = '.$this->ID.'
+					AND iset_name LIKE "custom\_%"' );
+		}
 
 		// save Item settings
 		if( isset( $this->ItemSettings ) )
@@ -6067,8 +6100,6 @@ class Item extends ItemLight
 
 		// TODO: dh> allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemUpdateTransact', $params = array( 'Item' => & $this ) );
-
-		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 
 		$result = true;
 		// fp> note that dbchanges isn't actually 100% accurate. At this time it does include variables that actually haven't changed.
@@ -6378,6 +6409,11 @@ class Item extends ItemLight
 		// Autogenerated excerpts should NEVER show anything after [teaserbreak] or after [pagebreak]
 		$content_parts = $this->get_content_parts( array( 'disppage' => 1 ) );
 		$first_content_part = array_shift( $content_parts );
+
+		// Render inline tags to HTML code, except of inline file tags because they are removed below:
+		$first_content_part = $this->render_inline_tags( $first_content_part, array(
+				'render_inline_files' => false
+			) );
 
 		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
 		$first_content_part = preg_replace( '/\[[a-z]+\]:[^\]]*\]/i', '', $first_content_part );
@@ -6747,6 +6783,7 @@ class Item extends ItemLight
 		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_moderation_setting_name.'"' );
 		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 		$SQL->WHERE( $notify_condition );
+		$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 		$SQL->WHERE_and( '( bloguser_perm_edit IS NOT NULL AND bloguser_perm_edit <> "no" AND bloguser_perm_edit <> "own" )
 				OR ( bloggroup_perm_edit IS NOT NULL AND bloggroup_perm_edit <> "no" AND bloggroup_perm_edit <> "own" )
 				OR ( grp_perm_blogs = "editall" ) OR ( user_ID = blog_owner_user_ID )' );
@@ -6975,8 +7012,10 @@ class Item extends ItemLight
 				FROM (
 					SELECT DISTINCT sub_user_ID AS user_ID
 					FROM T_subscriptions
+					INNER JOIN T_users ON user_ID = sub_user_ID
 					WHERE sub_coll_ID = '.$this->get_blog_ID().'
 					AND sub_items <> 0
+					AND user_status IN ( "activated", "autoactivated" )
 
 					UNION
 
@@ -6992,6 +7031,7 @@ class Item extends ItemLight
 						AND opt.cset_value = 1
 						AND NOT user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+						AND user_status IN ( "activated", "autoactivated" )
 
 					UNION
 
@@ -7002,11 +7042,13 @@ class Item extends ItemLight
 					LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 					LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
 					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
+					LEFT JOIN T_users ON ( user_ID = sub_user_ID )
 					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
 						AND opt.cset_name = "opt_out_subscription"
 						AND opt.cset_value = 1
 						AND NOT sug_user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+						AND user_status IN ( "activated", "autoactivated" )
 
 					UNION
 
@@ -7016,11 +7058,13 @@ class Item extends ItemLight
 					INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
 					LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
 					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+					LEFT JOIN T_users ON ( user_ID = sub_user_ID )
 					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
 						AND opt.cset_name = "opt_out_subscription"
 						AND opt.cset_value = 1
 						AND NOT bloguser_user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+						AND user_status IN ( "activated", "autoactivated" )
 				) AS users
 				WHERE NOT user_ID IS NULL';
 
