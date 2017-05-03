@@ -2407,7 +2407,7 @@ class Item extends ItemLight
 						$field_value = render_item_custom_fields( $this->ID, $custom_fields_params );
 						if( empty( $field_value ) )
 						{	// Fields don't exist:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The item has no custom fields').'</span>', $content );
+							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The Item has no custom fields').'</span>', $content );
 						}
 						else
 						{	// Display fields:
@@ -2469,7 +2469,7 @@ class Item extends ItemLight
 				{	// Get data of item parent:
 					if( empty( $this->parent_ID ) || $this->get_type_setting( 'use_parent' ) == 'never' )
 					{	// If parent doesn't exist:
-						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.T_('This item has no parent.').'</span>', $content );
+						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.T_('This Item has no parent.').'</span>', $content );
 						continue;
 					}
 					$other_item_ID = $this->parent_ID;
@@ -2489,7 +2489,7 @@ class Item extends ItemLight
 					}
 					else
 					{	// If other item doesn't exist:
-						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The item %s doesn\'t exist.'), '<code>'.$other_item_data[1].'</code>' ).'</span>', $content );
+						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_data[1].'</code>' ).'</span>', $content );
 						continue;
 					}
 				}
@@ -2502,7 +2502,7 @@ class Item extends ItemLight
 						$field_value = render_item_custom_fields( $other_item_ID, $custom_fields_params );
 						if( empty( $field_value ) )
 						{	// Fields don't exist:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent item has no custom fields').'</span>', $content );
+							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent Item has no custom fields').'</span>', $content );
 						}
 						else
 						{	// Display fields:
@@ -2623,7 +2623,7 @@ class Item extends ItemLight
 				{	// Try to use parent:
 					if( empty( $this->parent_ID ) || $this->get_type_setting( 'use_parent' ) == 'never' )
 					{	// Display error message if parent doesn't exist:
-						$content = substr_replace( $content, '<span class="text-danger">'.T_('This item has no parent.').'</span>', strpos( $content, $source_tag ), strlen( $source_tag ) );
+						$content = substr_replace( $content, '<span class="text-danger">'.T_('This Item has no parent.').'</span>', strpos( $content, $source_tag ), strlen( $source_tag ) );
 						continue;
 					}
 					$field_item_ID = $this->parent_ID;
@@ -2642,7 +2642,7 @@ class Item extends ItemLight
 					}
 					else
 					{	// If other item doesn't exist:
-						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The item %s doesn\'t exist.'), '<code>'.$other_item_data[1].'</code>' ).'</span>', $content );
+						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_data[1].'</code>' ).'</span>', $content );
 						continue;
 					}
 				}
