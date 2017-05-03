@@ -6572,6 +6572,7 @@ class Item extends ItemLight
 		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_moderation_setting_name.'"' );
 		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 		$SQL->WHERE( $notify_condition );
+		$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 		$SQL->WHERE_and( '( bloguser_perm_edit IS NOT NULL AND bloguser_perm_edit <> "no" AND bloguser_perm_edit <> "own" )
 				OR ( bloggroup_perm_edit IS NOT NULL AND bloggroup_perm_edit <> "no" AND bloggroup_perm_edit <> "own" )
 				OR ( grp_perm_blogs = "editall" ) OR ( user_ID = blog_owner_user_ID )' );
@@ -6799,7 +6800,9 @@ class Item extends ItemLight
 		$SQL = new SQL( 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
 		$SQL->SELECT( 'DISTINCT sub_user_ID' );
 		$SQL->FROM( 'T_subscriptions' );
-		$SQL->WHERE( 'sub_coll_ID = '.$this->get_blog_ID() );
+		$SQL->FROM_add( 'INNER JOIN T_users ON user_ID = sub_user_ID' );
+		$SQL->WHERE( 'user_status IN ( "activated", "autoactivated" )' );
+		$SQL->WHERE_and( 'sub_coll_ID = '.$this->get_blog_ID() );
 		$SQL->WHERE_and( 'sub_items <> 0' );
 		if( ! empty( $already_notified_user_IDs ) )
 		{	// Create condition to not select already notified moderator users:

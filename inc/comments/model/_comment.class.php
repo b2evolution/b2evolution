@@ -3710,11 +3710,13 @@ class Comment extends DataObject
 
 		if( ! $this->is_meta() )
 		{	// Get the notify users for NORMAL comments:
-			$except_condition = '';
+
+			// Send only for active users:
+			$except_condition = ' AND user_status IN ( "activated", "autoactivated" )';
 
 			if( ! empty( $already_notified_user_IDs ) )
 			{	// Set except moderators condition. Exclude moderators who already got a notification email:
-				$except_condition = ' AND user_ID NOT IN ( "'.implode( '", "', $already_notified_user_IDs ).'" )';
+				$except_condition .= ' AND user_ID NOT IN ( "'.implode( '", "', $already_notified_user_IDs ).'" )';
 			}
 
 			// Check if we need to include the item creator user:
@@ -3781,6 +3783,8 @@ class Comment extends DataObject
 			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
 			// Check if the users would like to receive notifications about new meta comments:
 			$meta_SQL->WHERE_and( 'uset_value = "1"'.( $Settings->get( 'def_notify_meta_comments' ) ? ' OR uset_value IS NULL' : '' ) );
+			// Check if users are activated:
+			$meta_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 			// Check if the users have permission to edit this Item:
 			$users_with_item_edit_perms = '( user_ID = '.$DB->quote( $comment_item_Blog->owner_user_ID ).' )';
 			$users_with_item_edit_perms .= ' OR ( grp_perm_blogs = "editall" )';
