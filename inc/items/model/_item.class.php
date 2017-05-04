@@ -2284,7 +2284,7 @@ class Item extends ItemLight
 	 * Get item custom field value by field index
 	 *
 	 * @param string Field index which by default is the field name, see {@link Item::get_custom_fields_defs()}
-	 * @param string Restring field by type, FALSE - to don't restrict
+	 * @param string Restrict field by type(double, varchar, html, text, url), FALSE - to don't restrict
 	 * @return string|boolean FALSE if the field doesn't exist Double/String otherwise depending from the custom field type
 	 */
 	function get_custom_field_value( $field_index, $restrict_type = false )
