@@ -2250,6 +2250,69 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get all custom fields definitions of this Item with once loading them into cache array $this->custom_fields
+	 *
+	 * @return array Custom fields, each array item is array with keys: ID, ityp_ID, label, name, type, order, note, value.
+	 */
+	function get_custom_fields_defs()
+	{
+		if( ! isset( $this->custom_fields ) )
+		{	// Load item custom fields only once:
+			global $DB;
+
+			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
+			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value' );
+			$SQL->FROM( 'T_items__type_custom_field' );
+			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON itcf_name = SUBSTRING( iset_name, 8 )' );
+			$SQL->WHERE( 'iset_item_ID = '.$this->ID );
+			$SQL->WHERE_and( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
+			$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
+			$custom_fields = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+
+			$this->custom_fields = array();
+			foreach( $custom_fields as $c => $custom_field )
+			{	// Use field name/code as key/index of array:
+				$this->custom_fields[ $custom_field['name'] ] = $custom_field;
+			}
+		}
+
+		return $this->custom_fields;
+	}
+
+
+	/**
+	 * Get item custom field value by field index
+	 *
+	 * @param string Field index which by default is the field name, see {@link Item::get_custom_fields_defs()}
+	 * @param string Restring field by type, FALSE - to don't restrict
+	 * @return string|boolean FALSE if the field doesn't exist Double/String otherwise depending from the custom field type
+	 */
+	function get_custom_field_value( $field_index, $restrict_type = false )
+	{
+		// Get all custom fields by item ID:
+		$custom_fields = $this->get_custom_fields_defs();
+
+		if( isset( $custom_fields[ $field_index ] ) )
+		{
+			if( $restrict_type !== false && $custom_fields[ $field_index ]['type'] != $restrict_type )
+			{	// The requested field is detected but it has another type:
+				return false;
+			}
+
+			$custom_field_value = utf8_trim( $custom_fields[ $field_index ]['value'] );
+			if( $custom_fields[ $field_index ]['type'] == 'text' )
+			{	// Escape html tags and convert new lines to html <br> for text fields:
+				$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+			}
+
+			return $custom_field_value;
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * Display custom field
 	 *
 	 * @param array Params
@@ -2272,7 +2335,7 @@ class Item extends ItemLight
 		}
 
 		// Load custom field by index:
-		$custom_fields = get_item_custom_fields( $this->ID );
+		$custom_fields = $this->get_custom_fields_defs();
 		$field_index = $params['field'];
 		if( ! isset( $custom_fields[ $field_index ] ) )
 		{ // Custom field with this index doesn't exist
@@ -2318,14 +2381,80 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get all custom fields of current Item
+	 * Get all custom fields of this Item as HTML code
 	 *
 	 * @param array Params
 	 * @return string
 	 */
 	function get_custom_fields( $params = array() )
 	{
-		return render_item_custom_fields( $this->ID, $params );
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'       => '<table class="item_custom_fields">',
+				'field_format' => '<tr><th>$title$:</th><td>$value$</td></tr>', // $title$ $value$
+				'after'        => '</table>',
+				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
+			), $params );
+
+		// Get all custom fields by item ID:
+		$custom_fields = $this->get_custom_fields_defs();
+
+		$fields_exist = false;
+
+		if( empty( $params['fields'] ) )
+		{	// Display all fields:
+			$display_fields = array_keys( $custom_fields );
+		}
+		else
+		{	// Display only the requested fields:
+			$display_fields = explode( ',', $params['fields'] );
+			$fields_exist = true;
+		}
+
+		if( ! $fields_exist && count( $custom_fields ) == 0 )
+		{	// No custom fields:
+			return '';
+		}
+
+		$html = $params['before'];
+
+		$mask = array( '$title$', '$value$' );
+		foreach( $display_fields as $field_name )
+		{
+			$field_name = trim( $field_name );
+			if( ! isset( $custom_fields[ $field_name ] ) )
+			{	// Wrong field:
+				$values = array( $field_name, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_name ).'</span>' );
+				$html .= str_replace( $mask, $values, $params['field_format'] );
+				$fields_exist = true;
+				continue;
+			}
+
+			$field = $custom_fields[ $field_name ];
+			$custom_field_value = utf8_trim( $field['value'] );
+			if( ! empty( $custom_field_value ) ||
+					( $field['type'] == 'double' && $custom_field_value == '0' ) )
+			{	// Display only the filled field AND also numeric field with '0' value:
+				if( $field['type'] == 'text' )
+				{	// Escape html tags and convert new lines to html <br> for text fields:
+					$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+				}
+				$values = array( $field['label'], $custom_field_value );
+				$html .= str_replace( $mask, $values, $params['field_format'] );
+				$fields_exist = true;
+			}
+		}
+
+		$html .= $params['after'];
+
+		if( $fields_exist )
+		{	// Print out if at least one field is filled for this item
+			return $html;
+		}
+		else
+		{
+			return '';
+		}
 	}
 
 
@@ -2404,7 +2533,7 @@ class Item extends ItemLight
 				case 'fields':
 					// Render several fields as HTML table:
 					$custom_fields_params = array( 'fields' => trim( $tags[2][ $t ] ) );
-						$field_value = render_item_custom_fields( $this->ID, $custom_fields_params );
+						$field_value = $this->get_custom_fields( $custom_fields_params );
 						if( empty( $field_value ) )
 						{	// Fields don't exist:
 							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The Item has no custom fields').'</span>', $content );
@@ -2418,7 +2547,7 @@ class Item extends ItemLight
 				case 'field':
 					// Render single field as text:
 					$field_index = trim( $tags[2][ $t ] );
-					$field_value = get_item_custom_field_value( $this->ID, $field_index );
+					$field_value = $this->get_custom_field_value( $field_index );
 					if( $field_value === false )
 					{	// Wrong field request, display error:
 						$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_index ).'</span>', $content );
@@ -2467,29 +2596,21 @@ class Item extends ItemLight
 			{
 				if( $tags[1][ $t ] == 'parent' )
 				{	// Get data of item parent:
-					if( empty( $this->parent_ID ) || $this->get_type_setting( 'use_parent' ) == 'never' )
-					{	// If parent doesn't exist:
+					if( ! ( $other_Item = & $this->get_parent_Item() ) )
+					{	// Display error message if parent doesn't exist:
 						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.T_('This Item has no parent.').'</span>', $content );
 						continue;
 					}
-					$other_item_ID = $this->parent_ID;
-					$other_Item = & $this->get_parent_Item();
 				}
 				else
-				{	// Get data of other item by ID or slug:
-					$other_item_data = explode( ':', $tags[1][ $t ] );
+				{	// Try to use other item by ID or slug:
+					$other_item_ID_slug = substr( $tags[1][ $t ], 5 );
+					$other_item_data_is_number = is_number( $other_item_ID_slug );
 					$ItemCache = & get_ItemCache();
-					if( is_number( $other_item_data[1] ) && $other_Item = & $ItemCache->get_by_ID( intval( $other_item_data[1] ), false, false ) )
-					{	// If item is found by ID:
-						$other_item_ID = $other_Item->ID;
-					}
-					elseif( $other_Item = & $ItemCache->get_by_urltitle( $other_item_data[1], false, false ) )
-					{	// If item is found by slug:
-						$other_item_ID = $other_Item->ID;
-					}
-					else
-					{	// If other item doesn't exist:
-						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_data[1].'</code>' ).'</span>', $content );
+					if( ! ( $other_item_data_is_number && $other_Item = & $ItemCache->get_by_ID( $other_item_ID_slug, false, false ) ) &&
+					    ! ( ! $other_item_data_is_number && $other_Item = & $ItemCache->get_by_urltitle( $other_item_ID_slug, false, false ) ) )
+					{	// Display error message if other item is not found by ID and slug:
+						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ).'</span>', $content );
 						continue;
 					}
 				}
@@ -2498,8 +2619,9 @@ class Item extends ItemLight
 				{
 					case 'fields':
 						// Render several parent custom fields as HTML table:
-						$custom_fields_params = array( 'fields' => trim( $tags[3][ $t ] ) );
-						$field_value = render_item_custom_fields( $other_item_ID, $custom_fields_params );
+						$field_value = $other_Item->get_custom_fields( array(
+								'fields' => trim( $tags[3][ $t ] )
+							) );
 						if( empty( $field_value ) )
 						{	// Fields don't exist:
 							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent Item has no custom fields').'</span>', $content );
@@ -2513,7 +2635,7 @@ class Item extends ItemLight
 					case 'field':
 						// Render single parent custom field as text:
 						$field_index = trim( $tags[3][ $t ] );
-						$field_value = get_item_custom_field_value( $other_item_ID, $field_index );
+						$field_value = $other_Item->get_custom_field_value( $field_index );
 						if( $field_value === false )
 						{	// Wrong field request, display error:
 							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_index ).'</span>', $content );
@@ -2618,33 +2740,29 @@ class Item extends ItemLight
 		{	// If at least one link tag is found in content:
 			foreach( $tags[0] as $t => $source_tag )
 			{	// Render URL custom field as html:
-				$field_item_ID = $this->ID;
 				if( $tags[1][ $t ] == 'parent:' )
 				{	// Try to use parent:
-					if( empty( $this->parent_ID ) || $this->get_type_setting( 'use_parent' ) == 'never' )
+					if( ! ( $other_Item = & $this->get_parent_Item() ) )
 					{	// Display error message if parent doesn't exist:
 						$content = substr_replace( $content, '<span class="text-danger">'.T_('This Item has no parent.').'</span>', strpos( $content, $source_tag ), strlen( $source_tag ) );
 						continue;
 					}
-					$field_item_ID = $this->parent_ID;
 				}
 				elseif( ! empty( $tags[1][ $t ] ) )
 				{	// Try to use other item by ID or slug:
-					$other_item_data = explode( ':', $tags[1][ $t ] );
+					$other_item_ID_slug = rtrim( substr( $tags[1][ $t ], 5 ), ':' );
+					$other_item_data_is_number = is_number( $other_item_ID_slug );
 					$ItemCache = & get_ItemCache();
-					if( is_number( $other_item_data[1] ) && $other_Item = & $ItemCache->get_by_ID( intval( $other_item_data[1] ), false, false ) )
-					{	// If item is found by ID:
-						$field_item_ID = $other_Item->ID;
-					}
-					elseif( $other_Item = & $ItemCache->get_by_urltitle( $other_item_data[1], false, false ) )
-					{	// If item is found by slug:
-						$field_item_ID = $other_Item->ID;
-					}
-					else
-					{	// If other item doesn't exist:
-						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_data[1].'</code>' ).'</span>', $content );
+					if( ! ( $other_item_data_is_number && $other_Item = & $ItemCache->get_by_ID( $other_item_ID_slug, false, false ) ) &&
+					    ! ( ! $other_item_data_is_number && $other_Item = & $ItemCache->get_by_urltitle( $other_item_ID_slug, false, false ) ) )
+					{	// Display error message if other item is not found by ID and slug:
+						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ).'</span>', $content );
 						continue;
 					}
+				}
+				else
+				{	// Use this Item:
+					$other_Item = $this;
 				}
 
 				$link_data = explode( ':', $tags[2][ $t ] );
@@ -2652,7 +2770,7 @@ class Item extends ItemLight
 				// Get field code:
 				$url_field_code = trim( $link_data[0] );
 
-				$field_value = get_item_custom_field_value( $field_item_ID, $url_field_code, 'url' );
+				$field_value = $other_Item->get_custom_field_value( $url_field_code, 'url' );
 				if( $field_value === false )
 				{	// Wrong field request, display error:
 					$link_html = '<span class="text-danger">'.sprintf( T_('The URL field "%s" does not exist'), $url_field_code ).'</span>';
@@ -8680,7 +8798,7 @@ class Item extends ItemLight
 		$text_custom_fields = $this->get_type_custom_fields( 'varchar,text,html' );
 		foreach( $text_custom_fields as $field_index => $text_custom_field )
 		{
-			$search_string .= get_item_custom_field_value( $this->ID, $field_index ).' ';
+			$search_string .= $this->get_custom_field_value( $field_index ).' ';
 		}
 
 		// Clear spaces:
