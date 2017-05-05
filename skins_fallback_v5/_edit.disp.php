@@ -329,7 +329,7 @@ else
 
 	if( count( $custom_fields ) > 0 )
 	{
-		$Form->begin_fieldset( T_('Properties') );
+		$Form->begin_fieldset( T_('Additional fields') );
 
 		$Form->switch_layout( 'table' );
 		$Form->labelstart = '<td class="right"><strong>';
