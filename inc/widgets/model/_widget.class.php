@@ -621,23 +621,22 @@ class ComponentWidget extends DataObject
 		// Display the debug containers when $debug = 2 OR when it is turned on from evo menu under "Collection" -> "Show/Hide containers"
 		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
-		$after_widget = '';
+		$force_nocaching = false;
 
 		// Enable the desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode"
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
-		{	// Print this data div, Used for JavaScript code:
-			$widget_data = array(
-				'class'   => 'evo_widget__data',
-				'data-id' => $this->ID,
-			);
-			if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-			{	// Display a link to edit this widget only if current user has a permission:
-				$widget_data['data-edit-url'] = $admin_url.'?ctrl=widgets&action=edit&wi_ID='.$this->ID;
+		{	// Initialize data which is used by JavaScript to build overlay designer mode html elements:
+			$designer_mode_data = array( 'data-id' => $this->ID );
+			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Set data to know current user has a permission to edit this widget:
+				$designer_mode_data['data-can-edit'] = 1;
 			}
-			$after_widget = '<div'.get_field_attribs_as_string( $widget_data, 'htmlattr' ).'></div>';
+			// Don't load a widget content from cache when designer mode is enabled:
+			$force_nocaching = true;
 		}
 
-		if( ! $Blog->get_setting('cache_enabled_widgets')
+		if( $force_nocaching
+		    || ! $Blog->get_setting( 'cache_enabled_widgets' )
 		    || ! $this->disp_params['allow_blockcache']
 		    || $this->get_cache_status() == 'disallowed' )
 		{ // NO CACHING - We do NOT want caching for this collection or for this specific widget:
@@ -653,9 +652,31 @@ class ComponentWidget extends DataObject
 				echo 'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
 			}
 
-			$this->display( $params );
+			if( ! empty( $designer_mode_data ) )
+			{	// Append designer mode html tag attributes to first not empty widget wrapper/container:
+				$widget_wrappers = array(
+						'block_start',
+						'block_body_start',
+						'list_start',
+						'item_start'
+					);
+				foreach( $widget_wrappers as $widget_wrapper )
+				{
+					if( ! empty( $params[ $widget_wrapper ] ) )
+					{	// If this wrapper is filled and used with current widget,
+						// Append new data for widget wrapper:
+						$params[ $widget_wrapper ] = update_html_tag_attribs( $params[ $widget_wrapper ], $designer_mode_data );
+						if( isset( $this->disp_params[ $widget_wrapper ] ) )
+						{	// Also update params if they already have been initialized before:
+							$this->disp_params[ $widget_wrapper ] = $params[ $widget_wrapper ];
+						}
+						// Stop search other wrapper in order to use only first filled wrapper:
+						break;
+					}
+				}
+			}
 
-			echo $after_widget;
+			$this->display( $params );
 
 			if( $display_containers )
 			{ // DEBUG:
@@ -689,8 +710,6 @@ class ComponentWidget extends DataObject
 
 				echo $content;
 
-				echo $after_widget;
-
 				if( $display_containers )
 				{ // DEBUG:
 					echo "</div>\n";
@@ -716,8 +735,6 @@ class ComponentWidget extends DataObject
 
 				// Save collected cached data if needed:
 				$this->BlockCache->end_collect();
-
-				echo $after_widget;
 
 				if( $display_containers )
 				{ // DEBUG:

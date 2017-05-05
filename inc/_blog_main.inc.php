@@ -62,26 +62,31 @@ if( empty( $Blog ) )
 if( $debug == 2 || is_logged_in() )
 {	// Allow debug info only for logged-in users OR when debug == 2:
 
-	// Show/Hide the containers:
-	$display_containers = param( 'display_containers', 'string' );
-	if( $display_containers == 'show' )
-	{
-		$Session->set( 'display_containers_'.$blog, 1 );
-	}
-	elseif( $display_containers == 'hide' )
-	{
-		$Session->delete( 'display_containers_'.$blog );
-	}
-
 	// Enable/Disable designer mode:
 	$designer_mode = param( 'designer_mode', 'string' );
 	if( $designer_mode == 'enable' )
 	{
 		$Session->set( 'designer_mode_'.$blog, 1 );
+		// Force to disable debug widget containers and file includes when user enables designer mode:
+		set_param( 'display_containers', 'hide' );
+		set_param( 'display_includes', 'hide' );
 	}
 	elseif( $designer_mode == 'disable' )
 	{
 		$Session->delete( 'designer_mode_'.$blog );
+	}
+
+	// Show/Hide the containers:
+	$display_containers = param( 'display_containers', 'string' );
+	if( $display_containers == 'show' )
+	{
+		$Session->set( 'display_containers_'.$blog, 1 );
+		// Force to disable designer mode when user enable to show widget containers:
+		$Session->delete( 'designer_mode_'.$blog );
+	}
+	elseif( $display_containers == 'hide' )
+	{
+		$Session->delete( 'display_containers_'.$blog );
 	}
 
 	// Show/Hide the includes:
@@ -89,6 +94,8 @@ if( $debug == 2 || is_logged_in() )
 	if( $display_includes == 'show' )
 	{
 		$Session->set( 'display_includes_'.$blog, 1 );
+		// Force to disable designer mode when user enable to show file includes:
+		$Session->delete( 'designer_mode_'.$blog );
 	}
 	elseif( $display_includes == 'hide' )
 	{

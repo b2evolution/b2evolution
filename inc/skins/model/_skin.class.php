@@ -1370,7 +1370,13 @@ var downloadInterval = setInterval( function()
 
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
 		{	// If desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode":
+			global $current_User;
 			require_js( '#jquery#', 'blog' );
+			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Initialize this url var only when current user has a permission to edit widgets:
+				global $admin_url;
+				add_js_headline( 'var b2evo_widget_edit_url = "'.$admin_url.'?ctrl=widgets&action=edit&wi_ID=$wi_ID$"' );
+			}
 			require_js( 'src/evo_widget_designer.js', 'blog' );
 		}
 
