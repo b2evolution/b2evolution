@@ -882,6 +882,63 @@ switch( $action )
 
 		break;
 
+	case 'widget_order':
+		// Order widget from designer mode:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
+
+		param( 'blog', 'integer', 0 );
+
+		// Check permission:
+		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+
+		param( 'wi_ID', 'integer' );
+		param( 'order_type', 'string' );
+
+		$WidgetCache = & get_WidgetCache();
+		$current_ComponentWidget = & $WidgetCache->get_by_ID( $wi_ID );
+
+		$current_order = $current_ComponentWidget->get( 'order' );
+
+		$DB->begin();
+		// Get the previous/next widget:
+		$SQL = new SQL();
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->WHERE( 'wi_coll_ID = '.$blog );
+		$SQL->WHERE_and( 'wi_sco_name = '.$DB->quote( $current_ComponentWidget->get( 'sco_name' ) ) );
+		if( $order_type == 'up' )
+		{	// Find previous widget:
+			$SQL->WHERE_and( 'wi_order < '.$current_order );
+			$SQL->ORDER_BY( 'wi_order DESC' );
+		}
+		else
+		{	// Find next widget:
+			$SQL->WHERE_and( 'wi_order > '.$current_order );
+			$SQL->ORDER_BY( 'wi_order ASC' );
+		}
+		$SQL->LIMIT( '1' );
+		$widget_row = $DB->get_row( $SQL->get() );
+
+		if( ! empty( $widget_row ) )
+		{	// Change an order only if near widget is found:
+			$near_ComponentWidget = new ComponentWidget( $widget_row );
+			$near_order = $near_ComponentWidget->get( 'order' );
+
+			// Set temporary order to 0 because we cannot have same order values in one time per container:
+			$current_ComponentWidget->set( 'order', 0 );
+			$current_ComponentWidget->dbupdate();
+
+			$near_ComponentWidget->set( 'order', $current_order );
+			$near_ComponentWidget->dbupdate();
+
+			$current_ComponentWidget->set( 'order', $near_order );
+			$current_ComponentWidget->dbupdate();
+		}
+		$DB->commit();
+		break;
+
 	case 'test_api':
 		// Spec action to test API from ctrl=system:
 		echo 'ok';

@@ -661,19 +661,30 @@ class ComponentWidget extends DataObject
 						'block_start',
 						'block_body_start',
 						'list_start',
-						'item_start'
+						array( 'item_start', 'item_selected_start' ),
 					);
-				foreach( $widget_wrappers as $widget_wrapper )
+				foreach( $widget_wrappers as $widget_wrapper_items )
 				{
-					if( ! empty( $params[ $widget_wrapper ] ) )
-					{	// If this wrapper is filled and used with current widget,
-						// Append new data for widget wrapper:
-						$params[ $widget_wrapper ] = update_html_tag_attribs( $params[ $widget_wrapper ], $designer_mode_data );
-						if( isset( $this->disp_params[ $widget_wrapper ] ) )
-						{	// Also update params if they already have been initialized before:
-							$this->disp_params[ $widget_wrapper ] = $params[ $widget_wrapper ];
+					if( ! is_array( $widget_wrapper_items ) )
+					{
+						$widget_wrapper_items = array( $widget_wrapper_items );
+					}
+					$wrapper_is_found = false;
+					foreach( $widget_wrapper_items as $widget_wrapper )
+					{
+						if( ! empty( $params[ $widget_wrapper ] ) )
+						{	// If this wrapper is filled and used with current widget,
+							// Append new data for widget wrapper:
+							$params[ $widget_wrapper ] = update_html_tag_attribs( $params[ $widget_wrapper ], $designer_mode_data );
+							if( isset( $this->disp_params[ $widget_wrapper ] ) )
+							{	// Also update params if they already have been initialized before:
+								$this->disp_params[ $widget_wrapper ] = $params[ $widget_wrapper ];
+							}
+							$wrapper_is_found = true;
 						}
-						// Stop search other wrapper in order to use only first filled wrapper:
+					}
+					if( $wrapper_is_found )
+					{	// Stop search other wrapper in order to use only first filled wrapper:
 						break;
 					}
 				}

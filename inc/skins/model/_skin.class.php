@@ -1375,7 +1375,11 @@ var downloadInterval = setInterval( function()
 			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// Initialize this url var only when current user has a permission to edit widgets:
 				global $admin_url;
-				add_js_headline( 'var b2evo_widget_edit_url = "'.$admin_url.'?ctrl=widgets&action=edit&wi_ID=$wi_ID$"' );
+				add_js_headline( 'var b2evo_widget_edit_url = "'.$admin_url.'?ctrl=widgets&action=edit&wi_ID=$wi_ID$";'
+					.'var b2evo_widget_blog = \''.$Blog->ID.'\';'
+					.'var b2evo_widget_crumb = \''.get_crumb( 'widget' ).'\';'
+					.'var b2evo_widget_icon_up = \''.format_to_js( get_icon( 'move_up', 'imgtag', array( 'class' => 'evo_widget__designer_move_up' ) ) ).'\';'
+					.'var b2evo_widget_icon_down = \''.format_to_js( get_icon( 'move_down', 'imgtag', array( 'class' => 'evo_widget__designer_move_down' ) ) ).'\';' );
 			}
 			require_js( 'src/evo_widget_designer.js', 'blog' );
 		}
