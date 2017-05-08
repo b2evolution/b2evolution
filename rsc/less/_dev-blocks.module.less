@@ -72,12 +72,23 @@ div.dev-blocks--belowtoolbar {
 }
 
 // Widget designer mode:
-.evo_widget__data {
-	display: none;
-}
 .evo_widget__designer_block {
 	position: absolute;
 	border: 3px solid #666;
 	border-radius: 4px;
 	z-index: 10000;
+	> div {
+		position: relative;
+		.evo_widget__designer_type {
+			position: absolute;
+			top: 0;
+			right: 0;
+			padding: 0 5px 2px 7px;
+			border-bottom-left-radius: 4px;
+			background: #666;
+			color: #FFF;
+			font-size: 11px;
+			text-align: right;
+		}
+	}
 }

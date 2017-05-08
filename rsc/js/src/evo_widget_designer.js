@@ -29,7 +29,9 @@ jQuery( document ).on( 'mouseover', '.evo_widget', function()
 
 	// Initialize a designer block only first time:
 	jQuery( '.evo_widget__designer_blocks' ).append( '<div class="evo_widget__designer_block" data-id="' + widget.data( 'id' ) + '"></div>' );
-	jQuery( designer_block_selector ).css( current_widget_position );
+	jQuery( designer_block_selector )
+		.html( '<div><div class="evo_widget__designer_type">' + widget.data( 'type' ) + '</div></div>' )
+		.css( current_widget_position );
 } );
 
 jQuery( document ).on( 'click', '.evo_widget__designer_block', function()

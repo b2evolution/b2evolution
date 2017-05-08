@@ -626,7 +626,10 @@ class ComponentWidget extends DataObject
 		// Enable the desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode"
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
 		{	// Initialize data which is used by JavaScript to build overlay designer mode html elements:
-			$designer_mode_data = array( 'data-id' => $this->ID );
+			$designer_mode_data = array(
+					'data-id'   => $this->ID,
+					'data-type' => $this->get_name(),
+				);
 			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// Set data to know current user has a permission to edit this widget:
 				$designer_mode_data['data-can-edit'] = 1;
