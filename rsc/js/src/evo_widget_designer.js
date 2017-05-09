@@ -5,20 +5,15 @@
 jQuery( document ).on( 'mouseover', '.evo_widget', function()
 {	// Initialize and Show widget designer block:
 
-	// To be sure all previous designer blocks are hidden before show new one:
-	jQuery( '.evo_widget__designer_block' ).hide();
+	// To be sure all previous designer blocks are hidden before show new one except of processing widgets:
+	jQuery( '.evo_widget__designer_block:not(.wdb_process):not(.wdb_failed)' ).hide();
 
 	var widget = jQuery( this );
-	var current_widget_position = {
-		'top': widget.offset().top - 3,
-		'left': widget.offset().left - 3,
-		'width': widget.width() + 6,
-		'height': widget.height() + 6,
-	};
-	var designer_block_selector = '.evo_widget__designer_block[data-id=' + widget.data( 'id' ) + ']';
+	var designer_block_selector = evo_widget_designer_block_selector( widget );
 	if( jQuery( designer_block_selector ).length )
 	{	// Just display a designer block if it already has been initialized on previous time:
-		jQuery( designer_block_selector ).css( current_widget_position ).show();
+		jQuery( designer_block_selector ).show();
+		evo_widget_update_designer_position( widget );
 		return;
 	}
 
@@ -29,9 +24,8 @@ jQuery( document ).on( 'mouseover', '.evo_widget', function()
 
 	// Initialize a designer block only first time:
 	jQuery( '.evo_widget__designer_blocks' ).append( '<div class="evo_widget__designer_block" data-id="' + widget.data( 'id' ) + '"></div>' );
-	jQuery( designer_block_selector )
-		.html( '<div><div class="evo_widget__designer_type">' + widget.data( 'type' ) + '</div></div>' )
-		.css( current_widget_position );
+	jQuery( designer_block_selector ).html( '<div><div class="evo_widget__designer_type">' + widget.data( 'type' ) + '</div></div>' );
+	evo_widget_update_designer_position( widget );
 	if( widget.data( 'can-edit' ) == '1' &&
 	    ( widget.next( '.evo_widget' ).length || widget.prev( '.evo_widget' ).length ) )
 	{	// Display a panel with actions if current user has a permission to edit widget:
@@ -70,8 +64,9 @@ jQuery( document ).on( 'click', '.evo_widget__designer_block', function( e )
 
 jQuery( document ).on( 'mouseout', '.evo_widget__designer_block', function( e )
 {	// Hide widget designer block:
-	if( ! jQuery( e.toElement ).closest( '.evo_widget__designer_block' ) )
-	{	// Hide it only when cursor is realy out of designer block:
+	if( ! jQuery( this ).hasClass( 'wdb_process' ) && ! jQuery( this ).hasClass( 'wdb_failed' ) &&
+	    ! jQuery( e.toElement ).closest( '.evo_widget__designer_block' ).length )
+	{	// Hide it only when cursor is really out of designer block and this widget is not in process:
 		jQuery( this ).hide();
 	}
 } );
@@ -83,7 +78,18 @@ jQuery( document ).on( 'click', '.evo_widget__designer_move_up, .evo_widget__des
 	var widget = jQuery( '.evo_widget[data-id=' + widget_ID + ']' );
 	var order_type = jQuery( this ).hasClass( 'evo_widget__designer_move_up' ) ? 'up' : 'down';
 
-	designer_block.addClass( 'wdb_process' );
+	// Mark current widget with process class:
+	designer_block.removeClass( 'wdb_failed' ).addClass( 'wdb_process' );
+
+	// Change an order of the widget with near widget:
+	evo_widget_reorder( widget, order_type );
+
+	var widgets_ids = [];
+	widget.parent().find( '.evo_widget[data-id]' ).each( function()
+	{
+		widgets_ids.push( jQuery( this ).data( 'id' ) );
+	} );
+	console.log( widgets_ids );
 
 	jQuery.ajax(
 	{
@@ -92,56 +98,122 @@ jQuery( document ).on( 'click', '.evo_widget__designer_move_up, .evo_widget__des
 		data: {
 			'blog': b2evo_widget_blog,
 			'crumb_widget': b2evo_widget_crumb,
-			'action': 'widget_order',
-			'order_type': order_type,
-			'wi_ID': widget_ID,
+			'action': 'reorder_widgets',
+			//'order_type': order_type,
+			//'wi_ID': widget_ID,
+			'container': widget.data( 'container' ),
+			'widgets': widgets_ids,
 		},
-		success: function()
+		success: function( result )
 		{	// If order has been updated successfully:
-			if( order_type == 'up' )
-			{	// Move HTML of the widget before previous widget:
-				widget.prev().before( widget );
+			result = ajax_debug_clear( result );
+			if( result != '' )
+			{	// Error:
+				evo_widget_display_order_error( result, widget, order_type );
 			}
 			else
-			{	// Move HTML of the widget after next widget:
-				widget.next().after( widget );
+			{	// Success:
+				designer_block.removeClass( 'wdb_process wdb_failed' ).addClass( 'wdb_success' );
+				evo_widget_update_designer_position( widget );
+				setTimeout( function()
+				{
+					jQuery( '.evo_widget__designer_block:not(.wdb_process):not(.wdb_failed)' ).hide();
+					designer_block.removeClass( 'wdb_success' );
+				}, 500 );
 			}
-			// Update visibility of up/down action icons of first/last widgets:
-			var container_widgets = widget.parent().find( '.evo_widget' );
-			var widget_num = 1;
-			container_widgets.each( function()
-			{
-				var designer_block = jQuery( '.evo_widget__designer_block[data-id=' + jQuery( this ).data( 'id' ) + ']' );
-				if( designer_block.length )
-				{	// If designer block is initialized:
-					designer_block.find( '.evo_widget__designer_move_up, .evo_widget__designer_move_down' ).show();
-					if( widget_num == 1 )
-					{	// Hide action icon to move widget up for the first widget in container:
-						designer_block.find( '.evo_widget__designer_move_up' ).hide();
-					}
-					else if( widget_num == container_widgets.length )
-					{	// Hide action icon to move widget up for the last widget in container:
-						designer_block.find( '.evo_widget__designer_move_down' ).hide();
-					}
-				}
-				widget_num++;
-			} );
-			designer_block.removeClass( 'wdb_process wdb_failed' ).addClass( 'wdb_success' ).css( {
-					'top': widget.offset().top - 3,
-					'left': widget.offset().left - 3,
-					'width': widget.width() + 6,
-					'height': widget.height() + 6,
-				} );
-			setTimeout( function()
-			{
-				jQuery( '.evo_widget__designer_block' ).hide();
-				designer_block.removeClass( 'wdb_success' );
-			}, 500 );
 		},
 		error: function( jqXHR, textStatus, errorThrown )
 		{	// Display error text on error request:
-			designer_block.removeClass( 'wdb_process' ).addClass( 'wdb_failed' );
-			alert( 'Error: could not change order of the widget. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')' );
+			evo_widget_display_order_error( 'There was an error communicating with the server. Please reload the page to be in sync with the server. (' + textStatus + ': ' + errorThrown + ')', widget, order_type );
 		}
 	} );
 } );
+
+
+/**
+ * Get jQuery selector for designer block of the widget
+ *
+ * @param object Widget
+ * @returns string
+ */
+function evo_widget_designer_block_selector( widget )
+{
+	return '.evo_widget__designer_block[data-id=' + widget.data( 'id' ) + ']';
+}
+
+
+/**
+ * Display an error after failed widget reorder action
+ * 
+ * @param string Error message
+ * @param object Widget
+ * @param string Order direction: 'up', 'down'
+ */
+function evo_widget_display_order_error( error, widget, order_type )
+{
+	jQuery( evo_widget_designer_block_selector( widget ) ).removeClass( 'wdb_process' ).addClass( 'wdb_failed' );
+	alert( error );
+	// Revert widget order back:
+	evo_widget_reorder( widget, order_type == 'up' ? 'down' : 'up' );
+}
+
+
+/**
+ * Change an order of the widget with near widget in same container
+ *
+ * @param object Widget
+ * @param string Order direction: 'up', 'down'
+ */
+function evo_widget_reorder( widget, direction )
+{
+	if( direction == 'up' )
+	{	// Move HTML of the widget before previous widget:
+		var near_widget = widget.prev();
+		near_widget.before( widget );
+	}
+	else
+	{	// Move HTML of the widget after next widget:
+		var near_widget = widget.next();
+		near_widget.after( widget );
+	}
+
+	// Update visibility of up/down action icons of first/last widgets:
+	var container_widgets = widget.parent().find( '.evo_widget' );
+	var widget_num = 1;
+	container_widgets.each( function()
+	{
+		var designer_block = jQuery( '.evo_widget__designer_block[data-id=' + jQuery( this ).data( 'id' ) + ']' );
+		if( designer_block.length )
+		{	// If designer block is initialized:
+			designer_block.find( '.evo_widget__designer_move_up, .evo_widget__designer_move_down' ).show();
+			if( widget_num == 1 )
+			{	// Hide action icon to move widget up for the first widget in container:
+				designer_block.find( '.evo_widget__designer_move_up' ).hide();
+			}
+			else if( widget_num == container_widgets.length )
+			{	// Hide action icon to move widget up for the last widget in container:
+				designer_block.find( '.evo_widget__designer_move_down' ).hide();
+			}
+		}
+		widget_num++;
+	} );
+
+	evo_widget_update_designer_position( widget );
+	evo_widget_update_designer_position( near_widget );
+}
+
+
+/**
+ * Update position of widget designer block
+ *
+ * @param object Widget
+ */
+function evo_widget_update_designer_position( widget )
+{
+	jQuery( evo_widget_designer_block_selector( widget ) ).css( {
+			'top': widget.offset().top - 3,
+			'left': widget.offset().left - 3,
+			'width': widget.width() + 6,
+			'height': widget.height() + 6,
+		} );
+}

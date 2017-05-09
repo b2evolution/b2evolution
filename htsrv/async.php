@@ -882,8 +882,8 @@ switch( $action )
 
 		break;
 
-	case 'widget_order':
-		// Order widget from designer mode:
+	case 'reorder_widgets':
+		// Reorder widgets in container (Designer Mode):
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
@@ -893,50 +893,48 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
-		param( 'wi_ID', 'integer' );
-		param( 'order_type', 'string' );
+		param( 'container', 'string' );
+		param( 'widgets', 'array:integer' );
 
-		$WidgetCache = & get_WidgetCache();
-		$current_ComponentWidget = & $WidgetCache->get_by_ID( $wi_ID );
-
-		$current_order = $current_ComponentWidget->get( 'order' );
-
-		$DB->begin();
-		// Get the previous/next widget:
-		$SQL = new SQL();
-		$SQL->SELECT( '*' );
+		$SQL = new SQL( 'Get all widgets of container "'.$container.'" before reordering (Designer Mode)' );
+		$SQL->SELECT( 'wi_ID, wi_order' );
 		$SQL->FROM( 'T_widget' );
-		$SQL->WHERE( 'wi_coll_ID = '.$blog );
-		$SQL->WHERE_and( 'wi_sco_name = '.$DB->quote( $current_ComponentWidget->get( 'sco_name' ) ) );
-		if( $order_type == 'up' )
-		{	// Find previous widget:
-			$SQL->WHERE_and( 'wi_order < '.$current_order );
-			$SQL->ORDER_BY( 'wi_order DESC' );
+		$SQL->WHERE( 'wi_coll_ID = '.$DB->quote( $blog ) );
+		$SQL->WHERE_and( 'wi_sco_name = '.$DB->quote( $container ) );
+		$container_widgets = $DB->get_assoc( $SQL->get(), $SQL->title );
+
+		foreach( $widgets as $widget_ID )
+		{
+			if( ! isset( $container_widgets[ $widget_ID ] ) )
+			{	// It means some widget was removed from the container:
+				echo T_('The widgets have been changed since you last loaded this page. Please reload the page to be in sync with the server.');
+				break 2;
+			}
 		}
-		else
-		{	// Find next widget:
-			$SQL->WHERE_and( 'wi_order > '.$current_order );
-			$SQL->ORDER_BY( 'wi_order ASC' );
+
+		// Get what widgets are disabled or hidden on current view but exist in DB:
+		$disabled_widgets = array_diff( array_keys( $container_widgets ), $widgets );
+
+		// Append the disabled/hidden widgets at the end of list(so they will be ordered at the end):
+		$widgets = array_merge( $widgets, $disabled_widgets );
+
+		// Run reordering two times:
+		// - first is used to set orders starting with max order of the existing widgets,
+		// - second is starting orders with 1.
+		// Such complex is required to avoid error of duplicate entry of unique index (wi_coll_ID, wi_sco_name, wi_order).
+		$wi_start_orders = array( max( $container_widgets ) + 1, 1 );
+		foreach( $wi_start_orders as $wi_order )
+		{
+			$update_conditions = array();
+			foreach( $widgets as $widget_ID )
+			{
+				$update_conditions[] = 'WHEN wi_ID = '.$widget_ID.' THEN '.( $wi_order++ );
+			}
+			$DB->query( 'UPDATE T_widget
+				  SET wi_order = CASE '.implode( ' ', $update_conditions ).' ELSE 0 END
+				WHERE wi_coll_ID = '.$DB->quote( $blog ).'
+				  AND wi_sco_name = '.$DB->quote( $container ) );
 		}
-		$SQL->LIMIT( '1' );
-		$widget_row = $DB->get_row( $SQL->get() );
-
-		if( ! empty( $widget_row ) )
-		{	// Change an order only if near widget is found:
-			$near_ComponentWidget = new ComponentWidget( $widget_row );
-			$near_order = $near_ComponentWidget->get( 'order' );
-
-			// Set temporary order to 0 because we cannot have same order values in one time per container:
-			$current_ComponentWidget->set( 'order', 0 );
-			$current_ComponentWidget->dbupdate();
-
-			$near_ComponentWidget->set( 'order', $current_order );
-			$near_ComponentWidget->dbupdate();
-
-			$current_ComponentWidget->set( 'order', $near_order );
-			$current_ComponentWidget->dbupdate();
-		}
-		$DB->commit();
 		break;
 
 	case 'test_api':
