@@ -6,16 +6,14 @@ jQuery( document ).on( 'mouseover', '.evo_widget', function()
 {	// Initialize and Show widget designer block:
 
 	// To be sure all previous designer blocks are hidden before show new one except of processing widgets:
-	jQuery( '.evo_widget__designer_block:not(.wdb_process):not(.wdb_failed)' ).hide();
+	jQuery( '.evo_container__designer_block, .evo_widget__designer_block:not(.wdb_process):not(.wdb_failed)' ).hide();
 
 	var widget = jQuery( this );
 	var designer_block_selector = evo_widget_designer_block_selector( widget );
-	var conatainer_block_selector = evo_widget_container_block_selector( widget );
+	var container_block_selector = evo_widget_container_block_selector( widget );
 	if( jQuery( designer_block_selector ).length )
 	{	// Just display a designer block if it already has been initialized on previous time:
-		jQuery( designer_block_selector ).show();
 		evo_widget_update_designer_position( widget );
-		jQuery( conatainer_block_selector ).show();
 		return;
 	}
 
@@ -25,21 +23,17 @@ jQuery( document ).on( 'mouseover', '.evo_widget', function()
 	}
 
 	// Initialize a container designer block only first time:
-	if( ! jQuery( conatainer_block_selector ).length )
-	{
-		jQuery( '.evo_widget__designer_blocks' ).append( '<div class="evo_container__designer_block" data-name="' + widget.data( 'container' ) + '"></div>' );
-		var container = widget.closest( '.evo_container' );
-		jQuery( conatainer_block_selector ).css( {
-				'top': container.offset().top - 6,
-				'left': container.offset().left - 6,
-				'width': container.width() + 13,
-				'height': container.height() + 13,
-			} );
+	if( ! jQuery( container_block_selector ).length )
+	{	// Only if it was not create for another widget from the same container:
+		jQuery( '.evo_widget__designer_blocks' ).append( '<div class="evo_container__designer_block" data-name="' + widget.data( 'container' ) + '">' +
+				'<div><div class="evo_container__designer_name">' + widget.data( 'container' ) + '</div></div>' +
+			'</div>' );
 	}
 
 	// Initialize a widget designer block only first time:
-	jQuery( '.evo_widget__designer_blocks' ).append( '<div class="evo_widget__designer_block" data-id="' + widget.data( 'id' ) + '"></div>' );
-	jQuery( designer_block_selector ).html( '<div><div class="evo_widget__designer_type">' + widget.data( 'type' ) + '</div></div>' );
+	jQuery( '.evo_widget__designer_blocks' ).append( '<div class="evo_widget__designer_block" data-id="' + widget.data( 'id' ) + '" data-container="' + widget.data( 'container' ) + '">' +
+			'<div><div class="evo_widget__designer_type">' + widget.data( 'type' ) + '</div></div>' +
+		'</div>' );
 	evo_widget_update_designer_position( widget );
 	if( widget.data( 'can-edit' ) == '1' &&
 	    ( widget.next( '.evo_widget' ).length || widget.prev( '.evo_widget' ).length ) )
@@ -56,6 +50,16 @@ jQuery( document ).on( 'mouseover', '.evo_widget', function()
 		{	// Hide action icon to move widget up if it is the first widget in container:
 			jQuery( designer_block_selector ).find( '.evo_widget__designer_move_up' ).hide();
 		}
+	}
+} );
+
+jQuery( document ).on( 'mouseover', '.evo_widget__designer_block', function()
+{	// Show container designer block:
+	var widget = jQuery( evo_widget_selector( jQuery( this ) ) );
+	var container_block = jQuery( evo_widget_container_block_selector( widget ) );
+	if( ! container_block.is( ':visible' ) )
+	{
+		container_block.show();
 	}
 } );
 
@@ -79,13 +83,9 @@ jQuery( document ).on( 'click', '.evo_widget__designer_block', function( e )
 
 jQuery( document ).on( 'mouseout', '.evo_widget__designer_block', function( e )
 {	// Hide widget designer block:
-	if( ! jQuery( this ).hasClass( 'wdb_process' ) && ! jQuery( this ).hasClass( 'wdb_failed' ) &&
-	    ! jQuery( e.toElement ).closest( '.evo_widget__designer_block' ).length )
-	{	// Hide it only when cursor is really out of designer block and this widget is not in process:
-		jQuery( this ).hide();
-		// Also hide container designer block:
-		var widget = jQuery( evo_widget_selector( jQuery( this ) ) );
-		jQuery( evo_widget_container_block_selector( widget ) ).hide();
+	if( ! jQuery( e.toElement ).closest( '.evo_widget__designer_block' ).length )
+	{	// Hide it only when cursor is really out of designer block:
+		evo_widget_hide_designer_block( jQuery( this ) );
 	}
 } );
 
@@ -131,7 +131,7 @@ jQuery( document ).on( 'click', '.evo_widget__designer_move_up, .evo_widget__des
 				evo_widget_update_designer_position( widget );
 				setTimeout( function()
 				{
-					jQuery( '.evo_widget__designer_block:not(.wdb_process):not(.wdb_failed)' ).hide();
+					evo_widget_hide_designer_block( designer_block );
 					designer_block.removeClass( 'wdb_success' );
 				}, 500 );
 			}
@@ -257,10 +257,47 @@ function evo_widget_reorder( widget, direction )
  */
 function evo_widget_update_designer_position( widget )
 {
-	jQuery( evo_widget_designer_block_selector( widget ) ).css( {
+	jQuery( evo_widget_designer_block_selector( widget ) )
+		.css( {
 			'top': widget.offset().top - 3,
 			'left': widget.offset().left - 3,
 			'width': widget.width() + 6,
 			'height': widget.height() + 6,
-		} );
+		} )
+		.show();
+
+	// Also update container position:
+	var container = widget.closest( '.evo_container' );
+	jQuery( evo_widget_container_block_selector( widget ) )
+		.css( {
+			'top': container.offset().top - 6,
+			'left': container.offset().left - 6,
+			'width': container.width() + 13,
+			'height': container.height() + 13,
+		} )
+		.show();
+}
+
+
+/**
+ * Hide widget designer block
+ *
+ * @param object Designer block
+ */
+function evo_widget_hide_designer_block( designer_block )
+{
+	if( ! designer_block.hasClass( 'wdb_process' ) )
+	{	// Hide only when widget is not in process:
+		if( ! designer_block.hasClass( 'wdb_failed' ) )
+		{
+			designer_block.hide();
+		}
+		// Also hide container designer block:
+		if( ! jQuery( '.evo_widget__designer_block[data-container="' + designer_block.data( 'container' ) + '"]:not(.wdb_failed):visible' ).length )
+		{	// If it has no visible other designer blocks:
+			var widget = jQuery( evo_widget_selector( designer_block ) );
+			var container_block = jQuery( evo_widget_container_block_selector( widget ) );
+			container_block.hide();
+		}
+	}
 }
