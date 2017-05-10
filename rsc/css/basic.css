@@ -66,6 +66,12 @@ div.dev-blocks--widget--notincache > .dev-blocks-name {
 div.dev-blocks--belowtoolbar {
   margin: 27px 0 -27px 0;
 }
+.evo_container__designer_block {
+  position: absolute;
+  border: 2px solid #DDD;
+  border-radius: 4px;
+  z-index: 9999;
+}
 .evo_widget__designer_block {
   position: absolute;
   border: 3px solid #666;

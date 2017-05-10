@@ -10,10 +10,12 @@ jQuery( document ).on( 'mouseover', '.evo_widget', function()
 
 	var widget = jQuery( this );
 	var designer_block_selector = evo_widget_designer_block_selector( widget );
+	var conatainer_block_selector = evo_widget_container_block_selector( widget );
 	if( jQuery( designer_block_selector ).length )
 	{	// Just display a designer block if it already has been initialized on previous time:
 		jQuery( designer_block_selector ).show();
 		evo_widget_update_designer_position( widget );
+		jQuery( conatainer_block_selector ).show();
 		return;
 	}
 
@@ -22,7 +24,20 @@ jQuery( document ).on( 'mouseover', '.evo_widget', function()
 		jQuery( 'body' ).append( '<div class="evo_widget__designer_blocks"></div>' );
 	}
 
-	// Initialize a designer block only first time:
+	// Initialize a container designer block only first time:
+	if( ! jQuery( conatainer_block_selector ).length )
+	{
+		jQuery( '.evo_widget__designer_blocks' ).append( '<div class="evo_container__designer_block" data-name="' + widget.data( 'container' ) + '"></div>' );
+		var container = widget.closest( '.evo_container' );
+		jQuery( conatainer_block_selector ).css( {
+				'top': container.offset().top - 6,
+				'left': container.offset().left - 6,
+				'width': container.width() + 13,
+				'height': container.height() + 13,
+			} );
+	}
+
+	// Initialize a widget designer block only first time:
 	jQuery( '.evo_widget__designer_blocks' ).append( '<div class="evo_widget__designer_block" data-id="' + widget.data( 'id' ) + '"></div>' );
 	jQuery( designer_block_selector ).html( '<div><div class="evo_widget__designer_type">' + widget.data( 'type' ) + '</div></div>' );
 	evo_widget_update_designer_position( widget );
@@ -54,7 +69,7 @@ jQuery( document ).on( 'click', '.evo_widget__designer_block', function( e )
 	if( typeof( b2evo_widget_edit_url ) != 'undefined' )
 	{	// If global widget edit form url is defined:
 		var widget_ID = jQuery( this ).data( 'id' );
-		var widget = jQuery( '.evo_widget[data-id=' + widget_ID + ']' );
+		var widget = jQuery( evo_widget_selector( jQuery( this ) ) );
 		if( widget.length && widget.data( 'can-edit' ) == '1' )
 		{	// Redirect to widget edit form only if it is allowed for current user:
 			location.href = b2evo_widget_edit_url.replace( '$wi_ID$', widget_ID );
@@ -68,14 +83,16 @@ jQuery( document ).on( 'mouseout', '.evo_widget__designer_block', function( e )
 	    ! jQuery( e.toElement ).closest( '.evo_widget__designer_block' ).length )
 	{	// Hide it only when cursor is really out of designer block and this widget is not in process:
 		jQuery( this ).hide();
+		// Also hide container designer block:
+		var widget = jQuery( evo_widget_selector( jQuery( this ) ) );
+		jQuery( evo_widget_container_block_selector( widget ) ).hide();
 	}
 } );
 
 jQuery( document ).on( 'click', '.evo_widget__designer_move_up, .evo_widget__designer_move_down', function()
 {	// Change an order of widget:
 	var designer_block = jQuery( this ).closest( '.evo_widget__designer_block' );
-	var widget_ID = designer_block.data( 'id' );
-	var widget = jQuery( '.evo_widget[data-id=' + widget_ID + ']' );
+	var widget = jQuery( evo_widget_selector( designer_block ) );
 	var order_type = jQuery( this ).hasClass( 'evo_widget__designer_move_up' ) ? 'up' : 'down';
 
 	// Mark current widget with process class:
@@ -89,7 +106,6 @@ jQuery( document ).on( 'click', '.evo_widget__designer_move_up, .evo_widget__des
 	{
 		widgets_ids.push( jQuery( this ).data( 'id' ) );
 	} );
-	console.log( widgets_ids );
 
 	jQuery.ajax(
 	{
@@ -99,8 +115,6 @@ jQuery( document ).on( 'click', '.evo_widget__designer_move_up, .evo_widget__des
 			'blog': b2evo_widget_blog,
 			'crumb_widget': b2evo_widget_crumb,
 			'action': 'reorder_widgets',
-			//'order_type': order_type,
-			//'wi_ID': widget_ID,
 			'container': widget.data( 'container' ),
 			'widgets': widgets_ids,
 		},
@@ -130,8 +144,29 @@ jQuery( document ).on( 'click', '.evo_widget__designer_move_up, .evo_widget__des
 } );
 
 
+/*jQuery( window ).scroll( function()
+{	// Update position of designer block
+	jQuery( '.evo_widget__designer_block[data-id]:visible' ).each( function()
+	{
+		evo_widget_update_designer_position( jQuery( evo_widget_selector( jQuery( this ) ) ) );
+	} );
+} );*/
+
+
 /**
- * Get jQuery selector for designer block of the widget
+ * Get jQuery selector for widget by designer block
+ *
+ * @param object Designer block
+ * @returns string
+ */
+function evo_widget_selector( designer_block )
+{
+	return '.evo_widget[data-id=' + designer_block.data( 'id' ) + ']';
+}
+
+
+/**
+ * Get jQuery selector for designer block by widget
  *
  * @param object Widget
  * @returns string
@@ -139,6 +174,18 @@ jQuery( document ).on( 'click', '.evo_widget__designer_move_up, .evo_widget__des
 function evo_widget_designer_block_selector( widget )
 {
 	return '.evo_widget__designer_block[data-id=' + widget.data( 'id' ) + ']';
+}
+
+
+/**
+ * Get jQuery selector for container designer block by widget
+ *
+ * @param object Widget
+ * @returns string
+ */
+function evo_widget_container_block_selector( widget )
+{
+	return '.evo_container__designer_block[data-name="' + widget.data( 'container' ) + '"]';
 }
 
 
