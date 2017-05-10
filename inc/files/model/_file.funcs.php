@@ -2643,7 +2643,7 @@ function replace_old_file_with_new( $root_type, $root_in_type_ID, $path, $new_na
 	{
 		$error_message = T_( 'The new file name is empty!' );
 	}
-	elseif( empty( $new_name ) )
+	elseif( empty( $old_name ) )
 	{
 		$error_message = T_( 'The old file name is empty!' );
 	}
