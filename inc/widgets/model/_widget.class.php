@@ -657,29 +657,38 @@ class ComponentWidget extends DataObject
 			}
 
 			if( ! empty( $designer_mode_data ) )
-			{	// Append designer mode html tag attributes to first not empty widget wrapper/container:
+			{	// Designer mode:
+
+				// Append designer mode html tag attributes to first not empty widget wrapper/container:
 				$widget_wrappers = array(
-						'block_start',
-						'block_body_start',
-						'list_start',
-						array( 'item_start', 'item_selected_start' ),
+						'block_end'      => 'block_start',
+						'block_body_end' => 'block_body_start',
+						'list_end'       => 'list_start',
+						'item_end'       => array( 'item_start', 'item_selected_start' ),
 					);
-				foreach( $widget_wrappers as $widget_wrapper_items )
+				$wrapper_is_found = false;
+				$active_wrapper_start = '';
+				$active_wrapper_end = '';
+				foreach( $widget_wrappers as $widget_wrapper_end_item => $widget_wrapper_start_items )
 				{
-					if( ! is_array( $widget_wrapper_items ) )
+					if( ! is_array( $widget_wrapper_start_items ) )
 					{
-						$widget_wrapper_items = array( $widget_wrapper_items );
+						$widget_wrapper_start_items = array( $widget_wrapper_start_items );
 					}
-					$wrapper_is_found = false;
-					foreach( $widget_wrapper_items as $widget_wrapper )
+					foreach( $widget_wrapper_start_items as $widget_wrapper_start )
 					{
-						if( ! empty( $params[ $widget_wrapper ] ) )
+						if( ! empty( $params[ $widget_wrapper_start ] ) )
 						{	// If this wrapper is filled and used with current widget,
 							// Append new data for widget wrapper:
-							$params[ $widget_wrapper ] = update_html_tag_attribs( $params[ $widget_wrapper ], $designer_mode_data );
-							if( isset( $this->disp_params[ $widget_wrapper ] ) )
+							$params[ $widget_wrapper_start ] = update_html_tag_attribs( $params[ $widget_wrapper_start ], $designer_mode_data );
+							if( isset( $this->disp_params[ $widget_wrapper_start ] ) )
 							{	// Also update params if they already have been initialized before:
-								$this->disp_params[ $widget_wrapper ] = $params[ $widget_wrapper ];
+								$this->disp_params[ $widget_wrapper_start ] = $params[ $widget_wrapper_start ];
+							}
+							if( ! $wrapper_is_found )
+							{	// Use these first found wrappers for debug message of empty content case:
+								$active_wrapper_start = $widget_wrapper_start;
+								$active_wrapper_end = $widget_wrapper_end_item;
 							}
 							$wrapper_is_found = true;
 						}
@@ -689,9 +698,24 @@ class ComponentWidget extends DataObject
 						break;
 					}
 				}
-			}
 
-			$this->display( $params );
+				// Check if widget content is empty and force to display a widget wrapper with debug message for designer mode:
+				ob_start();
+				$this->display( $params );
+				$widget_content = ob_get_clean();
+				if( empty( $widget_content ) )
+				{	// Display debug message in order to see this widget if it generates an empty content for current case:
+					$widget_content = $this->disp_params[ $active_wrapper_start ];
+					$widget_content .= sprintf( T_('Widget "%s" is hidden because there is nothing to display.'), $this->get_name() );
+					$widget_content .= $this->disp_params[ $active_wrapper_end ];
+				}
+
+				echo $widget_content;
+			}
+			else
+			{	// Normal mode:
+				$this->display( $params );
+			}
 
 			if( $display_containers )
 			{ // DEBUG:
