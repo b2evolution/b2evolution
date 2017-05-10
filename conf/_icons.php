@@ -1244,6 +1244,21 @@ function get_icon_info( $name )
 			'fa' => 'comments',
 			'color' => '#F90'
 		);
+
+		case 'designer_widget_up': return array(
+			'alt'  => T_('Up'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 96, 80 ),
+			'glyph' => 'circle-arrow-up',
+			'fa' => 'arrow-circle-up',
+		);
+		case 'designer_widget_down': return array(
+			'alt'  => T_('Down'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 64, 80 ),
+			'glyph' => 'circle-arrow-down',
+			'fa' => 'arrow-circle-down',
+		);
 	}
 }
 ?>

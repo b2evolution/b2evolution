@@ -1170,6 +1170,7 @@ div.dev-blocks--belowtoolbar {
   color: #FFF !important;
   padding: 5px;
   cursor: pointer;
+  font-size: 18px;
 }
 .evo_widget__designer_block.wdb_process {
   border-color: #F60;
