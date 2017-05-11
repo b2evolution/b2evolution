@@ -192,13 +192,16 @@ jQuery( document ).on( 'click', '.evo_widget__designer_disable', function()
 } );
 
 
-/*jQuery( window ).scroll( function()
-{	// Update position of designer block
-	jQuery( '.evo_widget__designer_block[data-id]:visible' ).each( function()
-	{
-		evo_widget_update_designer_position( jQuery( evo_widget_selector( jQuery( this ) ) ) );
+jQuery( document ).on( 'ready', function()
+{
+	jQuery( 'div' ).scroll( function()
+	{	// Update position of all visible designer blocks on scroll all divs with enabled css overflow scroll property:
+		jQuery( '.evo_widget__designer_block[data-id]:visible' ).each( function()
+		{
+			evo_widget_update_designer_position( jQuery( evo_widget_selector( jQuery( this ) ) ) );
+		} );
 	} );
-} );*/
+} );
 
 
 /**
