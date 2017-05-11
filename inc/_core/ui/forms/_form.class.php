@@ -3780,7 +3780,7 @@ class Form extends Widget
 								data:
 								{
 									"action": "file_attachment",
-									"crumb_file": "'.get_crumb( 'file' ).'",
+									"crumb_file_attachment": "'.get_crumb( 'file_attachment' )/* We use a different crumb name ('file_attachment' vs 'file') for extra security. */.'",
 									"root": typeof( root ) == "undefined" ? "" : root,
 									"path": typeof( path ) == "undefined" ? "" : path,
 									"fm_highlight": typeof( fm_highlight ) == "undefined" ? "" : fm_highlight,

@@ -802,7 +802,7 @@ switch( $action )
 		// The content for popup window to link the files to the items/comments
 
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'file' );
+		$Session->assert_received_crumb( 'file_attachment' );
 
 		// Check permission:
 		$current_User->check_perm( 'files', 'view' );
