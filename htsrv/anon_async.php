@@ -1542,19 +1542,27 @@ switch( $action )
 		param( 'widgets', 'array:integer' );
 
 		$SQL = new SQL( 'Get all widgets of container "'.$container.'" before reordering (Designer Mode)' );
-		$SQL->SELECT( 'wi_ID, wi_order' );
+		$SQL->SELECT( 'wi_ID, wi_order, wi_enabled' );
 		$SQL->FROM( 'T_widget' );
 		$SQL->WHERE( 'wi_coll_ID = '.$DB->quote( $blog ) );
 		$SQL->WHERE_and( 'wi_sco_name = '.$DB->quote( $container ) );
-		$container_widgets = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$all_widgets = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 
-		foreach( $widgets as $widget_ID )
+		$container_widgets = array();
+		$enabled_widgets = array();
+		foreach( $all_widgets as $widget )
 		{
-			if( ! isset( $container_widgets[ $widget_ID ] ) )
-			{	// It means some widget was removed from the container:
-				echo T_('The widgets have been changed since you last loaded this page. Please reload the page to be in sync with the server.');
-				break 2;
+			$container_widgets[ $widget->wi_ID ] = $widget->wi_order;
+			if( $widget->wi_enabled )
+			{	// Store in this array only enabled widgets:
+				$enabled_widgets[] = $widget->wi_ID;
 			}
+		}
+
+		if( count( array_diff( $widgets, $enabled_widgets ) ) || count( array_diff( $enabled_widgets, $widgets ) ) )
+		{	// Display error if at least one widget was added or deleted in the container:
+			echo T_('The widgets have been changed since you last loaded this page. Please reload the page to be in sync with the server.');
+			break;
 		}
 
 		// Get what widgets are disabled or hidden on current view but exist in DB:
