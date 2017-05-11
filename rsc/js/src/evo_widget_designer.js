@@ -35,12 +35,12 @@ jQuery( document ).on( 'mouseover', '.evo_widget', function()
 			'<div><div class="evo_widget__designer_type">' + widget.data( 'type' ) + '</div></div>' +
 		'</div>' );
 	evo_widget_update_designer_position( widget );
-	if( widget.data( 'can-edit' ) == '1' &&
-	    ( widget.next( '.evo_widget' ).length || widget.prev( '.evo_widget' ).length ) )
+	if( widget.data( 'can-edit' ) == '1' )
 	{	// Display a panel with actions if current user has a permission to edit widget:
 		jQuery( '>div', designer_block_selector ).append( '<div class="evo_widget__designer_actions">' +
 				b2evo_widget_icon_up +
 				b2evo_widget_icon_down +
+				b2evo_widget_icon_disable +
 			'</div>' );
 		if( widget.next( '.evo_widget' ).length == 0 )
 		{	// Hide action icon to move widget down if it is the last widget in container:
@@ -65,9 +65,8 @@ jQuery( document ).on( 'mouseover', '.evo_widget__designer_block', function()
 
 jQuery( document ).on( 'click', '.evo_widget__designer_block', function( e )
 {	// Link to edit widget:
-	if( jQuery( e.target ).hasClass( 'evo_widget__designer_move_up' ) ||
-	    jQuery( e.target ).hasClass( 'evo_widget__designer_move_down' ) )
-	{	// Ignore if click is on order action icons:
+	if( jQuery( e.target ).is( '.evo_widget__designer_move_up, .evo_widget__designer_move_down, .evo_widget__designer_disable' )  )
+	{	// Ignore if click is on action icons:
 		return;
 	}
 	if( typeof( b2evo_widget_edit_url ) != 'undefined' )
@@ -110,7 +109,7 @@ jQuery( document ).on( 'click', '.evo_widget__designer_move_up, .evo_widget__des
 	jQuery.ajax(
 	{
 		type: 'POST',
-		url: htsrv_url + 'async.php',
+		url: htsrv_url + 'anon_async.php',
 		data: {
 			'blog': b2evo_widget_blog,
 			'crumb_widget': b2evo_widget_crumb,
@@ -123,7 +122,7 @@ jQuery( document ).on( 'click', '.evo_widget__designer_move_up, .evo_widget__des
 			result = ajax_debug_clear( result );
 			if( result != '' )
 			{	// Error:
-				evo_widget_display_order_error( result, widget, order_type );
+				evo_widget_display_error( result, widget, order_type );
 			}
 			else
 			{	// Success:
@@ -138,7 +137,56 @@ jQuery( document ).on( 'click', '.evo_widget__designer_move_up, .evo_widget__des
 		},
 		error: function( jqXHR, textStatus, errorThrown )
 		{	// Display error text on error request:
-			evo_widget_display_order_error( 'There was an error communicating with the server. Please reload the page to be in sync with the server. (' + textStatus + ': ' + errorThrown + ')', widget, order_type );
+			evo_widget_display_error( 'There was an error communicating with the server. Please reload the page to be in sync with the server. (' + textStatus + ': ' + errorThrown + ')', widget, order_type );
+		}
+	} );
+} );
+
+jQuery( document ).on( 'click', '.evo_widget__designer_disable', function()
+{	// Disable widget:
+	var designer_block = jQuery( this ).closest( '.evo_widget__designer_block' );
+	var widget = jQuery( evo_widget_selector( designer_block ) );
+
+	// Mark current widget with process class:
+	designer_block.removeClass( 'wdb_failed' ).addClass( 'wdb_process' );
+
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: htsrv_url + 'anon_async.php',
+		data: {
+			'blog': b2evo_widget_blog,
+			'crumb_widget': b2evo_widget_crumb,
+			'action': 'disable_widget',
+			'wi_ID': widget.data( 'id' ),
+		},
+		success: function( result )
+		{	// If order has been updated successfully:
+			result = ajax_debug_clear( result );
+			if( result != '' )
+			{	// Error:
+				evo_widget_display_error( result, widget, 'disable' );
+			}
+			else
+			{	// Success:
+				designer_block.removeClass( 'wdb_process wdb_failed' ).addClass( 'wdb_success' );
+				setTimeout( function()
+				{
+					var container = widget.parent();
+					evo_widget_hide_designer_block( designer_block );
+					widget.slideUp( 400, function()
+					{	// Remove widget and designer block from page completely after animation:
+						widget.remove();
+						designer_block.remove();
+						// Update visibility of up/down action icons of first/last widgets:
+						evo_widget_update_order_actions( container );
+					} );
+				}, 500 );
+			}
+		},
+		error: function( jqXHR, textStatus, errorThrown )
+		{	// Display error text on error request:
+			evo_widget_display_error( 'There was an error communicating with the server. Please reload the page to be in sync with the server. (' + textStatus + ': ' + errorThrown + ')', widget, 'disable' );
 		}
 	} );
 } );
@@ -190,18 +238,20 @@ function evo_widget_container_block_selector( widget )
 
 
 /**
- * Display an error after failed widget reorder action
+ * Display an error after failed widget action
  * 
  * @param string Error message
  * @param object Widget
- * @param string Order direction: 'up', 'down'
+ * @param string Action: 'up', 'down', 'disable'
  */
-function evo_widget_display_order_error( error, widget, order_type )
+function evo_widget_display_error( error, widget, action )
 {
 	jQuery( evo_widget_designer_block_selector( widget ) ).removeClass( 'wdb_process' ).addClass( 'wdb_failed' );
 	alert( error );
-	// Revert widget order back:
-	evo_widget_reorder( widget, order_type == 'up' ? 'down' : 'up' );
+	if( action == 'up' || action == 'down' )
+	{	// Revert widget order back:
+		evo_widget_reorder( widget, action == 'up' ? 'down' : 'up' );
+	}
 }
 
 
@@ -225,7 +275,21 @@ function evo_widget_reorder( widget, direction )
 	}
 
 	// Update visibility of up/down action icons of first/last widgets:
-	var container_widgets = widget.parent().find( '.evo_widget' );
+	evo_widget_update_order_actions( widget.parent() );
+
+	evo_widget_update_designer_position( widget );
+	evo_widget_update_designer_position( near_widget );
+}
+
+
+/**
+ * Update visibility of up/down action icons of first/last widgets:
+ *
+ * @param object Widget
+ */
+function evo_widget_update_order_actions( container )
+{
+	var container_widgets = container.find( '.evo_widget' );
 	var widget_num = 1;
 	container_widgets.each( function()
 	{
@@ -237,16 +301,13 @@ function evo_widget_reorder( widget, direction )
 			{	// Hide action icon to move widget up for the first widget in container:
 				designer_block.find( '.evo_widget__designer_move_up' ).hide();
 			}
-			else if( widget_num == container_widgets.length )
+			if( widget_num == container_widgets.length )
 			{	// Hide action icon to move widget up for the last widget in container:
 				designer_block.find( '.evo_widget__designer_move_down' ).hide();
 			}
 		}
 		widget_num++;
 	} );
-
-	evo_widget_update_designer_position( widget );
-	evo_widget_update_designer_position( near_widget );
 }
 
 
@@ -267,7 +328,7 @@ function evo_widget_update_designer_position( widget )
 		.show();
 
 	// Also update container position:
-	var container = widget.closest( '.evo_container' );
+	var container = widget.parent();
 	jQuery( evo_widget_container_block_selector( widget ) )
 		.css( {
 			'top': container.offset().top - 6,

@@ -1521,6 +1521,102 @@ switch( $action )
 			) );
 		break;
 
+	case 'reorder_widgets':
+		// Reorder widgets in container (Designer Mode):
+
+		if( ! is_logged_in() )
+		{	// Only the logged in users can edit widgets:
+			echo T_('You must be logged in to edit widgets.');
+			break;
+		}
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
+
+		param( 'blog', 'integer', 0 );
+
+		// Check permission:
+		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+
+		param( 'container', 'string' );
+		param( 'widgets', 'array:integer' );
+
+		$SQL = new SQL( 'Get all widgets of container "'.$container.'" before reordering (Designer Mode)' );
+		$SQL->SELECT( 'wi_ID, wi_order' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->WHERE( 'wi_coll_ID = '.$DB->quote( $blog ) );
+		$SQL->WHERE_and( 'wi_sco_name = '.$DB->quote( $container ) );
+		$container_widgets = $DB->get_assoc( $SQL->get(), $SQL->title );
+
+		foreach( $widgets as $widget_ID )
+		{
+			if( ! isset( $container_widgets[ $widget_ID ] ) )
+			{	// It means some widget was removed from the container:
+				echo T_('The widgets have been changed since you last loaded this page. Please reload the page to be in sync with the server.');
+				break 2;
+			}
+		}
+
+		// Get what widgets are disabled or hidden on current view but exist in DB:
+		$disabled_widgets = array_diff( array_keys( $container_widgets ), $widgets );
+
+		// Append the disabled/hidden widgets at the end of list(so they will be ordered at the end):
+		$widgets = array_merge( $widgets, $disabled_widgets );
+
+		// Run reordering two times:
+		// - first is used to set orders starting with max order of the existing widgets,
+		// - second is starting orders with 1.
+		// Such complex is required to avoid error of duplicate entry of unique index (wi_coll_ID, wi_sco_name, wi_order).
+		$wi_start_orders = array( max( $container_widgets ) + 1, 1 );
+		foreach( $wi_start_orders as $wi_order )
+		{
+			$update_conditions = array();
+			foreach( $widgets as $widget_ID )
+			{
+				$update_conditions[] = 'WHEN wi_ID = '.$widget_ID.' THEN '.( $wi_order++ );
+			}
+			$DB->query( 'UPDATE T_widget
+				  SET wi_order = CASE '.implode( ' ', $update_conditions ).' ELSE 0 END
+				WHERE wi_coll_ID = '.$DB->quote( $blog ).'
+				  AND wi_sco_name = '.$DB->quote( $container ) );
+		}
+		break;
+
+	case 'disable_widget':
+		// Disable widget (Designer Mode):
+
+		if( ! is_logged_in() )
+		{	// Only the logged in users can edit widgets:
+			echo T_('You must be logged in to edit widgets.');
+			break;
+		}
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
+
+		param( 'blog', 'integer', 0 );
+		// Colection initialization is required for some widgets:
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $blog );
+
+		// Check permission:
+		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+
+		param( 'wi_ID', 'integer' );
+
+		$WidgetCache = & get_WidgetCache();
+		$disabled_Widget = & $WidgetCache->get_by_ID( $wi_ID, false, false );
+		if( ! $disabled_Widget || ! $disabled_Widget->get( 'enabled' ) )
+		{	// Display error if widget doesn't exist or it is already disabled:
+			echo T_('The widgets have been changed since you last loaded this page. Please reload the page to be in sync with the server.');
+			break;
+		}
+
+		// Disable widget:
+		$disabled_Widget->set( 'enabled', 0 );
+		$disabled_Widget->dbupdate();
+		break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;

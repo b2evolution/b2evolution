@@ -1168,7 +1168,7 @@ div.dev-blocks--belowtoolbar {
 }
 .evo_widget__designer_block > div .evo_widget__designer_actions span {
   color: #FFF !important;
-  padding: 5px;
+  padding: 1px 5px;
   cursor: pointer;
   font-size: 18px;
 }
