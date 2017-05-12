@@ -879,12 +879,19 @@ class Item extends ItemLight
 		foreach( $custom_fields as $custom_field )
 		{ // update each custom field
 			$param_name = 'item_'.$custom_field['type'].'_'.$custom_field['ID'];
+			$param_error = false;
 			if( isset_param( $param_name ) )
 			{ // param is set
 				switch( $custom_field['type'] )
 				{
 					case 'double':
 						$param_type = 'double';
+						$field_value = param( $param_name, 'string', NULL );
+						if( ! preg_match( '/^(\+|-)?[0-9]+(.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
+						{
+							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
+							$param_error = true;
+						}
 						break;
 					case 'html':
 					case 'text': // Keep html tags for text fields, they will be escaped at display
@@ -892,13 +899,23 @@ class Item extends ItemLight
 						break;
 					case 'url':
 						$param_type = 'url';
+						$field_value = param( $param_name, 'string', NULL );
+						$url_error = validate_url( $field_value, 'http-https' );
+						if( $url_error !== false )
+						{
+							param_error( $param_name, $url_error );
+							$param_error = true;
+						}
 						break;
 					case 'varchar':
 					default:
 						$param_type = 'string';
 						break;
 				}
-				param( $param_name, $param_type, NULL ); // get par value
+				if( ! $param_error )
+				{
+					param( $param_name, $param_type, NULL ); // get par value
+				}
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], get_param( $param_name ), $custom_field_make_null );
 			}
