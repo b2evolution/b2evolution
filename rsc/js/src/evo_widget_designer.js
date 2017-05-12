@@ -74,8 +74,20 @@ jQuery( document ).on( 'click', '.evo_widget__designer_block', function( e )
 		var widget_ID = jQuery( this ).data( 'id' );
 		var widget = jQuery( evo_widget_selector( jQuery( this ) ) );
 		if( widget.length && widget.data( 'can-edit' ) == '1' )
-		{	// Redirect to widget edit form only if it is allowed for current user:
-			location.href = b2evo_widget_edit_url.replace( '$wi_ID$', widget_ID );
+		{	// Open modal window with widget edit form only if it is allowed for current user:
+			openModalWindow( '<span class="loader_img loader_widget_designer absolute_center" title="' + evo_js_lang_loading + '"></span>' +
+				'<iframe id="modal_window_frame_widget_designer" src="' + b2evo_widget_edit_url.replace( '$wi_ID$', widget_ID ) + '&display_mode=iframe" width="100%" height="100%" frameborder="0"></iframe>',
+				'90%', '90%', true );
+			jQuery( '#modal_window_frame_widget_designer' ).on( 'load', function()
+			{	// Remove loader after iframe is loaded:
+				jQuery( '.loader_widget_designer' ).remove();
+				// Append div to display messages after save widget settings:
+				widget.parent().prepend( '<div id="server_messages" class="evo_widget__designer_messages"></div>' );
+			} );
+			jQuery( '#modal_window' ).on( 'hidden.bs.modal', function ()
+			{	// Remove temp div of messages on hidding of modal window:
+				jQuery( '.evo_widget__designer_messages' ).remove();
+			} );
 		}
 	}
 } );

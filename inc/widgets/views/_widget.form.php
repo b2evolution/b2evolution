@@ -43,6 +43,7 @@ $Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
 	$Form->add_crumb( 'widget' );
 	$Form->hidden( 'action', $creating ? 'create' : 'update' );
 	$Form->hidden( 'wi_ID', $edited_ComponentWidget->ID );
+	$Form->hidden( 'display_mode', $display_mode );
 	$Form->hiddens_by_key( get_memorized( 'action' ) );
 
 // Display properties:

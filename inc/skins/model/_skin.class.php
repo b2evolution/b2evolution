@@ -1411,9 +1411,12 @@ var downloadInterval = setInterval( function()
 					.'var b2evo_widget_crumb = \''.get_crumb( 'widget' ).'\';'
 					.'var b2evo_widget_icon_up = \''.format_to_js( get_icon( 'designer_widget_up', 'imgtag', array( 'class' => 'evo_widget__designer_move_up' ) ) ).'\';'
 					.'var b2evo_widget_icon_down = \''.format_to_js( get_icon( 'designer_widget_down', 'imgtag', array( 'class' => 'evo_widget__designer_move_down' ) ) ).'\';'
-					.'var b2evo_widget_icon_disable = \''.format_to_js( get_icon( 'minus', 'imgtag', array( 'class' => 'evo_widget__designer_disable', 'title' => T_('Disable') ) ) ).'\';' );
+					.'var b2evo_widget_icon_disable = \''.format_to_js( get_icon( 'minus', 'imgtag', array( 'class' => 'evo_widget__designer_disable', 'title' => T_('Disable') ) ) ).'\';'
+					.'var evo_js_lang_close = \''.TS_('Close').'\';'
+					.'var evo_js_lang_loading = \''.TS_('Loading...').'\';' );
 			}
 			require_js( 'src/evo_widget_designer.js', 'blog' );
+			require_js( 'communication.js', 'blog' );
 		}
 
 		// Skin v7 specific initializations for kind of current collection:
