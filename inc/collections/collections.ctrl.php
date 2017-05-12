@@ -176,7 +176,7 @@ switch( $action )
 		param( 'create_demo_contents', 'boolean', NULL );
 		if( $create_demo_contents === NULL )
 		{
-			param_error( 'create_demo_contents', T_('Please select option of "New contents"') );
+			param_error( 'create_demo_contents', T_('Please select an option for "New contents"') );
 		}
 
 		if( $edited_Blog->load_from_Request() )

@@ -425,7 +425,7 @@ function deleteWidget( widget )
 function editWidget( widget )
 {
 	jQuery( '#server_messages' ).html( '' );
-	msg = "wi_ID="+widget.substr( 6, widget.length );
+	msg = "wi_ID="+widget.substr( 6, widget.length ) + '&' + crumb_url;
 	SendAdminRequest( "widgets", "edit", msg, true );
 	return false;
 }
