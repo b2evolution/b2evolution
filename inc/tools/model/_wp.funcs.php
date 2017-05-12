@@ -18,23 +18,27 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Get data to start import from wordpress XML/ZIP file
  *
  * @param string Path of XML/ZIP file
- * @return array|boolean Data array: ( 'XML_file_path', 'attached_files_path', 'temp_zip_folder_path' ) OR FALSE on failed request
+ * @return array Data array:
+ *                 'error' - FALSE on success OR error message ,
+ *                 'XML_file_path' - Path to XML file,
+ *                 'attached_files_path' - Path to attachments folder,
+ *                 'temp_zip_folder_path' - Path to temp extracted ZIP files
  */
 function wpxml_get_import_data( $XML_file_path )
 {
+	// Start to collect all printed errors from buffer:
+	ob_start();
+
 	$XML_file_name = basename( $XML_file_path );
 	$ZIP_folder_path = NULL;
+
+	// Do NOT use first found folder for attachments:
+	$use_first_folder_for_attachments = false;
 
 	if( preg_match( '/\.(xml|txt)$/i', $XML_file_name ) )
 	{	// XML format
 		// Check WordPress XML file:
-		if( ! wpxml_check_xml_file( $XML_file_path ) )
-		{	// Errors are in XML file
-			return false;
-		}
-
-		// Do NOT use first found folder for attachments:
-		$use_first_folder_for_attachments = false;
+		wpxml_check_xml_file( $XML_file_path );
 	}
 	else if( preg_match( '/\.zip$/i', $XML_file_name ) )
 	{	// ZIP format
@@ -44,54 +48,55 @@ function wpxml_get_import_data( $XML_file_path )
 		// $ZIP_folder_path must be deleted after import!
 		$ZIP_folder_path = $media_path.'import/temp-'.md5( rand() );
 
-		if( ! unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
-		{	// Errors on unpack ZIP file:
-			return false;
-		}
+		if( unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
+		{	// If ZIP archive is unpacked successfully:
 
-		// Find valid XML file in ZIP package:
-		$ZIP_files_list = scandir( $ZIP_folder_path );
-		$xml_exists_in_zip = false;
-		for( $i = 1; $i <= 2; $i++ )
-		{	// Run searcher 1st time to find XML file in a root of ZIP archive
-			// and 2nd time to find XML file in 1 level subfolders of the root:
-			foreach( $ZIP_files_list as $ZIP_file )
-			{
-				if( $ZIP_file == '.' || $ZIP_file == '..' )
-				{	// Skip reserved dir names of the current path:
-					continue;
-				}
-				if( $i == 2 && is_dir( $ZIP_folder_path.'/'.$ZIP_file ) )
-				{	// This is a subfolder, Scan it to find XML files inside:
-					$ZIP_folder_current_path = $ZIP_folder_path.'/'.$ZIP_file;
-					$ZIP_folder_files = scandir( $ZIP_folder_current_path );
-				}
-				else
-				{	// This is a single file or folder:
-					$ZIP_folder_files = array( $ZIP_file );
-					$ZIP_folder_current_path = $ZIP_folder_path;
-				}
-				foreach( $ZIP_folder_files as $ZIP_file )
+			// 
+			$XML_file_path = false;
+
+			// Find valid XML file in ZIP package:
+			$ZIP_files_list = scandir( $ZIP_folder_path );
+			$xml_exists_in_zip = false;
+			for( $i = 1; $i <= 2; $i++ )
+			{	// Run searcher 1st time to find XML file in a root of ZIP archive
+				// and 2nd time to find XML file in 1 level subfolders of the root:
+				foreach( $ZIP_files_list as $ZIP_file )
 				{
-					if( preg_match( '/\.(xml|txt)$/i', $ZIP_file ) )
-					{	// XML file is found in ZIP package:
-						if( wpxml_check_xml_file( $ZIP_folder_current_path.'/'.$ZIP_file ) )
-						{	// XML file is valid:
+					if( $ZIP_file == '.' || $ZIP_file == '..' )
+					{	// Skip reserved dir names of the current path:
+						continue;
+					}
+					if( $i == 2 )
+					{	// This is 2nd time to find XML file in 1 level subfolders of the root:
+						if( is_dir( $ZIP_folder_path.'/'.$ZIP_file ) )
+						{	// This is a subfolder, Scan it to find XML files inside:
+							$ZIP_folder_current_path = $ZIP_folder_path.'/'.$ZIP_file;
+							$ZIP_folder_files = scandir( $ZIP_folder_current_path );
+						}
+						else
+						{	// Skip files:
+							continue;
+						}
+					}
+					else
+					{	// This is a single file or folder:
+						$ZIP_folder_files = array( $ZIP_file );
+						$ZIP_folder_current_path = $ZIP_folder_path;
+					}
+					foreach( $ZIP_folder_files as $ZIP_file )
+					{
+						if( preg_match( '/\.(xml|txt)$/i', $ZIP_file ) )
+						{	// XML file is found in ZIP package:
 							$XML_file_path = $ZIP_folder_current_path.'/'.$ZIP_file;
-							$xml_exists_in_zip = true;
-							break 3;
+							if( wpxml_check_xml_file( $XML_file_path ) )
+							{	// XML file is valid:
+								$xml_exists_in_zip = true;
+								break 3;
+							}
 						}
 					}
 				}
 			}
-		}
-
-		if( ! $xml_exists_in_zip )
-		{	// No XML is detected in ZIP package:
-			echo '<p class="text-danger">'.T_( 'XML file is not detected in your ZIP package.' ).'</p>';
-			// Delete temporary folder that contains the files from extracted ZIP package:
-			rmdir_r( $ZIP_folder_path );
-			return false;
 		}
 
 		// Use first found folder for attachments when no reserved folders not found in ZIP before:
@@ -100,13 +105,29 @@ function wpxml_get_import_data( $XML_file_path )
 	else
 	{	// Unrecognized extension:
 		echo '<p class="text-danger">'.sprintf( T_( '%s has an unrecognized extension.' ), '<code>'.$xml_file['name'].'</code>' ).'</p>';
-		return false;
 	}
 
-	// Get a path with attached files for the XML file:
-	$attached_files_path = wpxml_get_attachments_folder( $XML_file_path, $use_first_folder_for_attachments );
+	if( $XML_file_path )
+	{	// Get a path with attached files for the XML file:
+		$attached_files_path = wpxml_get_attachments_folder( $XML_file_path, $use_first_folder_for_attachments );
+	}
+	else
+	{	// Wrong source file:
+		$attached_files_path = false;
+	}
+
+	if( isset( $xml_exists_in_zip ) && $xml_exists_in_zip === false && file_exists( $ZIP_folder_path ) )
+	{	// No XML is detected in ZIP package:
+		echo '<p class="text-danger">'.T_( 'Correct XML file is not detected in your ZIP package.' ).'</p>';
+		// Delete temporary folder that contains the files from extracted ZIP package:
+		rmdir_r( $ZIP_folder_path );
+	}
+
+	// Get all printed errors:
+	$errors = ob_get_clean();
 
 	return array(
+			'errors'               => empty( $errors ) ? false : $errors,
 			'XML_file_path'        => $XML_file_path,
 			'attached_files_path'  => $attached_files_path,
 			'temp_zip_folder_path' => $ZIP_folder_path,
@@ -400,7 +421,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$User->set( 'source', $author['author_source'] );
 				$User->set_datecreated( empty( $author['author_created_ts'] ) ? time() : intval( $author['author_created_ts'] ) );
 				$User->set( 'lastseen_ts', ( empty( $author['author_lastseen_ts'] ) ? NULL : $author['author_lastseen_ts'] ), true );
-				$User->set( 'profileupdate_date', empty( $author['author_profileupdate_date'] ) ? date( 'Y-m-d', time() ): $author['author_profileupdate_date'] );
+				$User->set( 'profileupdate_date', empty( $author['author_profileupdate_date'] ) ? date( 'Y-m-d H:i:s' ): $author['author_profileupdate_date'] );
 				$User->dbinsert();
 				$user_ID = $User->ID;
 				if( !empty( $user_ID ) && !empty( $author['author_created_fromIPv4'] ) )
@@ -574,9 +595,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		{
 			if( empty( $tags[ (string) $tag['tag_name'] ] ) )
 			{	// Insert new tag into DB if tag doesn't exist with current name
-				mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'items__tag ( tag_name )
+				$DB->query( 'INSERT INTO '.$tableprefix.'items__tag ( tag_name )
 					VALUES ( '.$DB->quote( $tag['tag_name'] ).' )' );
-				$tag_ID = mysqli_insert_id( $DB->dbhandle );
+				$tag_ID = $DB->insert_id;
 				// Save new tag
 				$tags[ $tag['tag_name'] ] = (string) $tag_ID;
 				$tags_count++;
@@ -613,8 +634,12 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 		// Get post types
 		$SQL = new SQL();
-		$SQL->SELECT( 'LOWER( ityp_name ), ityp_ID' );
+		$SQL->SELECT( 'LOWER( ityp_usage ), ityp_ID' );
 		$SQL->FROM( 'T_items__type' );
+		$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID' );
+		$SQL->WHERE( 'itc_coll_ID = '.$DB->quote( $wp_blog_ID ) );
+		$SQL->GROUP_BY( 'ityp_usage' );
+		$SQL->ORDER_BY( 'ityp_ID' );
 		$post_types = $DB->get_assoc( $SQL->get() );
 
 		echo T_('Importing the files from attachment posts... ');
@@ -723,6 +748,17 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			{	// Skip attachment post because it shoul be imported above:
 				continue;
 			}
+			elseif( $post['post_type'] == 'page' && ! isset( $categories['standalone-pages'] ) )
+			{	// Try to create special category "Standalone Pages" for pages only it doesn't exist:
+				$page_Chapter = new Chapter( NULL, $wp_blog_ID );
+				$page_Chapter->set( 'name', T_('Standalone Pages') );
+				$page_Chapter->set( 'urlname', 'standalone-pages' );
+				$page_Chapter->dbinsert();
+				$categories['standalone-pages'] = $page_Chapter->ID;
+				// Add new created chapter to cache to avoid error when this cache loaded all elements before:
+				$ChapterCache = & get_ChapterCache();
+				$ChapterCache->add( $page_Chapter );
+			}
 
 			echo '<p>'.sprintf( T_('Importing post: %s'), '#'.$post['post_id'].' - "'.$post['post_title'].'"' );
 
@@ -751,13 +787,19 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 							break;
 
 						case 'post_tag':
-							if( isset( $tags[ (string) $term['slug'] ] ) )
+							if( isset( $tags[ (string) $term['name'] ] ) )
 							{ // Set tag
-								$post_tags[] = $term['slug'];
+								$post_tags[] = $term['name'];
 							}
 							break;
 					}
 				}
+			}
+
+			if( $post['post_type'] == 'page' )
+			{	// Set static category "Standalone Pages" for pages because they have no categories in wordpress DB:
+				$post_main_cat_ID = $categories['standalone-pages'];
+				$post_extra_cat_IDs[] = $categories['standalone-pages'];
 			}
 
 			// Set post type ID
@@ -774,7 +816,6 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			$Item->set( 'lastedit_user_ID', $last_edit_user_ID );
 			$Item->set( 'title', $post['post_title'] );
 			$Item->set( 'content', $post_content );
-			$Item->set( 'excerpt', $post['post_excerpt'] );
 			$Item->set( 'datestart', $post['post_date'] );
 			$Item->set( 'datecreated', !empty( $post['post_datecreated'] ) ? $post['post_datecreated'] : $post['post_date'] );
 			$Item->set( 'datemodified', !empty( $post['post_datemodified'] ) ? $post['post_datemodified'] : $post['post_date'] );
@@ -784,10 +825,17 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			// If 'comment_status' has the unappropriate value set it to 'open'
 			$Item->set( 'comment_status', ( in_array( $post['comment_status'], array( 'open', 'closed', 'disabled' ) ) ? $post['comment_status'] : 'open' ) );
 			$Item->set( 'ityp_ID', $post_type_ID );
-			if( empty( $post['post_excerpt'] ) && !empty( $post_content ) )
-			{	// Generate excerpt
-				$Item->set( 'excerpt', excerpt( $post_content ) );
-				$Item->set( 'excerpt_autogenerated', '1' );
+			if( empty( $post['post_excerpt'] ) )
+			{	// If excerpt is not provided:
+				if( ! empty( $post_content ) )
+				{	// Generate excerpt from content:
+					$Item->set_param( 'excerpt', 'string', excerpt( $post_content ), true );
+					$Item->set( 'excerpt_autogenerated', 1 );
+				}
+			}
+			else
+			{	// Set excerpt from given value:
+				$Item->set_param( 'excerpt', 'string', $post['post_excerpt'], true );
 			}
 			$Item->set( 'extra_cat_IDs', $post_extra_cat_IDs );
 			$Item->set( 'dateset', $post['post_date_mode'] == 'set' ? 1 : 0 );
@@ -929,7 +977,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		{	// Set post parents
 			if( !empty( $post['post_parent'] ) && isset( $posts[ (string) $post['post_parent'] ], $posts[ (string) $post['post_id'] ] ) )
 			{
-				mysqli_query($DB->dbhandle, 'UPDATE '.$tableprefix.'items__item
+				$DB->query( 'UPDATE '.$tableprefix.'items__item
 						  SET post_parent_ID = '.$DB->quote( $posts[ (string) $post['post_parent'] ] ).'
 						WHERE post_ID = '.$DB->quote( $posts[ (string) $post['post_id'] ] ) );
 			}
@@ -1059,7 +1107,11 @@ function wpxml_parser( $file )
 	$terms = array();
 	$files = array();
 
-	$xml = simplexml_load_file( $file );
+	// Register filter to avoid wrong chars in XML content:
+	stream_filter_register( 'xmlutf8', 'ValidUTF8XMLFilter' );
+
+	// Load XML content from file with xmlutf8 filter:
+	$xml = simplexml_load_file( 'php://filter/read=xmlutf8/resource='.$file );
 
 	// Get WXR version
 	$wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' );
@@ -1355,44 +1407,58 @@ function wpxml_parser( $file )
  */
 function wpxml_check_xml_file( $file, $halt = false )
 {
+	// Enable XML error handling:
 	$internal_errors = libxml_use_internal_errors( true );
-	$xml = simplexml_load_file( $file );
-	if( !$xml )
-	{ // halt/display if loading produces an error
+
+	// Clear error of previous XML file (e.g. when ZIP archive has several XML files):
+	libxml_clear_errors();
+
+	// Register filter to avoid wrong chars in XML content:
+	stream_filter_register( 'xmlutf8', 'ValidUTF8XMLFilter' );
+
+	// Load XML content from file with xmlutf8 filter:
+	$xml = simplexml_load_file( 'php://filter/read=xmlutf8/resource='.$file );
+
+	if( ! $xml )
+	{	// Halt/Display if loading produces an error:
+		$errors = array();
 		if( $halt )
-		{
-			debug_die( 'There was an error when reading this XML file.' );
+		{	// Halt on error:
+			foreach( libxml_get_errors() as $error )
+			{
+				$errors[] = 'Line '.$error->line.' - "'.format_to_output( $error->message, 'htmlspecialchars' ).'"';
+			}
+			debug_die( 'There was an error when reading XML file "'.$file.'".'
+				.' Error: '.implode( ', ', $errors ) );
 		}
 		else
-		{
-			echo '<p class="text-danger">'.T_('There was an error when reading this XML file.').'</p>';
+		{	// Display error:
+			foreach( libxml_get_errors() as $error )
+			{
+				$errors[] = sprintf( T_('Line %s'), '<code>'.$error->line.'</code>' ).' - '.'"'.format_to_output( $error->message, 'htmlspecialchars' ).'"';
+			}
+			echo '<p class="text-danger">'.sprintf( T_('There was an error when reading XML file %s.'), '<code>'.$file.'</code>' ).'<br />'
+				.sprintf( T_('Error: %s'), implode( ',<br />', $errors ) ).'</p>';
 			return false;
 		}
 	}
 
-	$wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' );
-	if( !$wxr_version )
+	// Check WXR version for correct format:
+	$r = false;
+	if( $wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' ) )
 	{
-		if( $halt )
-		{
-			debug_die( 'This does not appear to be a XML file, missing/invalid WXR version number.' );
-		}
-		else
-		{
-			echo '<p class="text-danger">'.T_('This does not appear to be a XML file, missing/invalid WXR version number.').'</p>';
-			return false;
-		}
+		$wxr_version = (string) trim( $wxr_version[0] );
+		$r = preg_match( '/^\d+\.\d+$/', $wxr_version );
 	}
 
-	$wxr_version = (string) trim( $wxr_version[0] );
-	if( !preg_match( '/^\d+\.\d+$/', $wxr_version ) )
-	{ // confirm that we are dealing with the correct file format
+	if( ! $r )
+	{	// If file format is wrong:
 		if( $halt )
-		{
+		{	// Halt on error:
 			debug_die( 'This does not appear to be a XML file, missing/invalid WXR version number.' );
 		}
 		else
-		{
+		{	// Display error:
 			echo '<p class="text-danger">'.T_('This does not appear to be a XML file, missing/invalid WXR version number.').'</p>';
 			return false;
 		}
@@ -1743,6 +1809,29 @@ function wpxml_get_attachments_folder( $file_path, $first_folder = false )
 
 	// File has no attachments folder
 	return false;
+}
+
+
+/**
+ * This class is used to avoid wrong chars in XML files on import
+ *
+ * @see wpxml_parser()
+ * @see wpxml_check_xml_file()
+ */
+class ValidUTF8XMLFilter extends php_user_filter
+{
+	protected static $pattern = '/[^\x{0009}\x{000a}\x{000d}\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}]+/u';
+
+	function filter( $in, $out, & $consumed, $closing )
+	{
+		while( $bucket = stream_bucket_make_writeable( $in ) )
+		{
+			$bucket->data = preg_replace( self::$pattern, '', $bucket->data );
+			$consumed += $bucket->datalen;
+			stream_bucket_append( $out, $bucket );
+		}
+		return PSFS_PASS_ON;
+	}
 }
 
 ?>

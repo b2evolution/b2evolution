@@ -83,7 +83,7 @@ $res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 /*
  * Chart
  */
-if( count($res_hits) )
+if( count( $res_hits ) )
 {
 	// Initialize params to filter by selected collection and/or group:
 	$section_params = empty( $blog ) ? '' : '&blog='.$blog;
@@ -195,7 +195,7 @@ $SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hit_count, agnt_signature' );
 $SQL->FROM( 'T_hitlog' );
 $SQL->WHERE( 'hit_agent_type = "robot"' );
 if( ! empty( $blog ) )
-	$SQL->WHERE_and( 'hit_coll_ID = ' . $blog );
+	$SQL->WHERE_and( 'hit_coll_ID = '.$blog );
 $SQL->GROUP_BY( 'agnt_signature' );
 
 $count_SQL = new SQL();
@@ -221,11 +221,11 @@ function translate_user_agent( $agnt_signature )
 	$html_signature = htmlspecialchars( $agnt_signature );
 	$format = '<span title="'.$html_signature.'">%s</span>';
 
-	foreach ($user_agents as $curr_user_agent)
+	foreach( $user_agents as $curr_user_agent )
 	{
-		if( strpos($agnt_signature, $curr_user_agent[1]) !== false )
+		if( strpos( $agnt_signature, $curr_user_agent[1] ) !== false )
 		{
-			return sprintf( $format, htmlspecialchars($curr_user_agent[2]) );
+			return sprintf( $format, htmlspecialchars( $curr_user_agent[2] ) );
 		}
 	}
 

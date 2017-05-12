@@ -350,7 +350,7 @@ switch( $action )
 		}
 
 		$block_item_Widget = new Widget( 'block_item' );
-		$block_item_Widget->title = T_('Ready to upgrade...');
+		$block_item_Widget->title = T_('Ready to upgrade').'...';
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		evo_flush();
 

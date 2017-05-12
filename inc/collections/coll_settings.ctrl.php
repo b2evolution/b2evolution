@@ -538,7 +538,7 @@ if( $action == 'dashboard' )
 			echo '<div class="col-xs-12 col-sm-2 col-sm-push-10 text-right">';
 			echo action_icon( TS_('View in Front-Office'), '', $Blog->get( 'url' ), T_('View in Front-Office'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 			echo '</div>';
-			echo '<h2 class="col-xs-12 col-sm-10 col-sm-pull-2 page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).' <span class="text-muted" style="font-size: 0.6em;">('./* TRANS: abbr. for "Collection" */ T_('Coll').' #'.$Blog->ID.')</span>'.'</h2>';
+			echo '<h2 class="col-xs-12 col-sm-10 col-sm-pull-2 page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).' <span class="text-muted" style="font-size: 0.6em;">('./* TRANS: abbr. for "Collection" */ T_('Collection').' #'.$Blog->ID.')</span>'.'</h2>';
 		echo '</div>';
 		load_funcs( 'collections/model/_blog_js.funcs.php' );
 		echo '<div class="row browse">';
@@ -613,7 +613,7 @@ if( $action == 'dashboard' )
 				$opentrash_link = get_opentrash_link( true, false, array(
 						'class' => 'btn btn-default'
 					) );
-				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \'dashboard\' ); return false;', 'class' => 'btn btn-default' ) ).'</span> ';
+				$refresh_link = '<span class="pull-right panel_heading_action_icons">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \'dashboard\' ); return false;', 'class' => 'btn btn-default btn-sm' ) ).'</span> ';
 
 				$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
 				$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
@@ -757,7 +757,7 @@ if( $action == 'dashboard' )
 			echo '<!-- Start of Recently Edited Post Block-->';
 			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 			{	// We have permission to add a post with at least one status:
-				$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+				$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary btn-sm' ) );
 			}
 			echo '<div class="items_container evo_content_block">';
 
@@ -786,7 +786,7 @@ if( $action == 'dashboard' )
 				$Item->edit_link( array( // Link to backoffice for editing
 						'before'    => ' ',
 						'after'     => ' ',
-						'class'     => 'ActionButton btn btn-primary w80px',
+						'class'     => 'ActionButton btn btn-primary btn-sm w80px',
 						'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 					) );
 

@@ -115,7 +115,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'td_class' => 'shrinkwrap',
 							'td' => action_icon( TS_('Edit skin properties...'), 'properties',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
-	                    .action_icon( TS_('Reload containers!'), 'reload',
+	                    .action_icon( TS_('Reload containers').'!', 'reload',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload&amp;'.url_crumb('skin').'\')%' )
 											.'~conditional( #nb_blogs# < 1 && ! in_array( #skin_ID#, array( '.implode( ',', $site_skin_IDs ).' ) ), \''
 											.action_icon( TS_('Uninstall this skin!'), 'delete',

@@ -16,6 +16,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+global $CommentList;
+
 $CommentList = new CommentList2( $Blog );
 
 // Filter list:

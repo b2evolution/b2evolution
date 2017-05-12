@@ -50,7 +50,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'item_checkchanges', 'post' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ), 4, 2 );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ), 4, 2 );
 
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";

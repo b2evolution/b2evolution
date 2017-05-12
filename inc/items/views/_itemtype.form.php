@@ -35,7 +35,7 @@ if( $edited_Itemtype->ID > 0 )
 		$Form->global_icon( T_('Delete this Post Type!'), 'delete', regenerate_url( 'action', 'action=delete&amp;crumb_itemtype='.get_crumb( 'itemtype' ) ) );
 	}
 }
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,ityp_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,ityp_ID' ) );
 
 $Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit post type') : T_('New post type') ) );
 
@@ -149,7 +149,14 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 					'note'      => T_('Ex: Content, Description... &ndash; will be stored as a varchar(10000) field.'),
 					'size'      => 30,
 					'maxlength' => 60
-				)
+				),
+			'url' => array(
+					'label'     => T_('URL'),
+					'title'     => T_('Add new URL custom field'),
+					'note'      => T_('Ex: Website, Twitter... &ndash; will be stored as a varchar(10000) field.'),
+					'size'      => 30,
+					'maxlength' => 60
+				),
 	);
 
 	$custom_fields_names = array();
@@ -203,6 +210,7 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 			}
 			$custom_field_name = ' '.T_('Name').' <input type="text" name="custom_'.$type.'_fname'.$i.'" value="'.$custom_field_name.'" class="form_text_input form-control custom_field_name '.$custom_field_name_class.'" maxlength="36" />';
 			$custom_field_name .= ' '.T_('Order').' <input type="text" name="custom_'.$type.'_order'.$i.'" value="'.$custom_field['order'].'" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />';
+			$custom_field_name .= ' '.T_('Note').' <input type="text" name="custom_'.$type.'_note'.$i.'" value="'.$custom_field['note'].'" class="form_text_input form-control custom_field_note" size="30" maxlength="255" />';
 			$Form->text_input( $field_id_suffix, $custom_field_label, $data[ 'size' ], $data[ 'label' ], $action_delete, array(
 					'maxlength'    => $data[ 'maxlength' ],
 					'input_prefix' => T_('Title').' ',
@@ -343,6 +351,7 @@ function add_new_custom_field( type, title, title_size )
 				'<?php echo TS_('Title'); ?> <input type="text" id="custom_' + type + '_' + count_custom + '" name="custom_' + type + '_' + count_custom + '" class="form_text_input form-control new_custom_field_title" maxlength="255" size="' + title_size + '" />' +
 				' <?php echo TS_('Name'); ?> <input type="text" name="custom_' + type + '_fname' + count_custom + '" value="" class="form_text_input form-control custom_field_name" maxlength="255" />' +
 				' <?php echo TS_('Order'); ?> <input type="text" name="custom_' + type + '_order' + count_custom + '" value="" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />' +
+				' <?php echo TS_('Note'); ?> <input type="text" name="custom_' + type + '_note' + count_custom + '" value="" class="form_text_input form-control custom_field_note" maxlength="255" size="30" />' +
 			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>' );
 	jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value', count_custom );
 }
@@ -365,6 +374,11 @@ jQuery( '#add_new_text_custom_field' ).click( function()
 jQuery( '#add_new_html_custom_field' ).click( function()
 {
 	add_new_custom_field( 'html', 'HTML', 30 );
+} );
+
+jQuery( '#add_new_url_custom_field' ).click( function()
+{
+	add_new_custom_field( 'url', '<?php echo TS_('URL'); ?>', 30 );
 } );
 
 jQuery( '[id^="delete_custom_"]' ).click( function()

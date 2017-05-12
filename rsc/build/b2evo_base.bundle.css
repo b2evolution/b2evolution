@@ -3897,6 +3897,6 @@ div.podplayer {
 .bMore a {
   font-weight: bold;
 }
-span.NonExistentWikiWord {
-  border-bottom: 1px dotted #ccc;
+.evo_shortlink_broken {
+  border-bottom: 1px dotted #F00;
 }

@@ -11,7 +11,7 @@
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-global $comment_template_counter, $cat;
+global $cat;
 
 // Default params:
 $params = array_merge( array(
@@ -55,14 +55,8 @@ if( $current_cat == 0 )
 	$current_cat = $Item->main_cat_ID;
 }
 
-if( ! isset( $comment_template_counter ) )
-{	// Initialize global comment counter:
-	$comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
-	if( $disp == 'single' || $disp == 'post' )
-	{	// Increase a number, because Item has 1st number:
-		$comment_template_counter++;
-	}
-}
+// Increase a number, because Item has 1st number:
+$comment_order_shift = ( $disp == 'single' || $disp == 'page' ) ? 1 : 0;
 
 /**
  * @var Comment
@@ -92,7 +86,7 @@ switch( $Comment->get( 'type' ) )
 {
 	// ON *DISP = COMMENTS* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case $disp == 'comments': // Display a comment:
-	?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $comment_template_counter; ?></a> <?php
+	?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $Comment->get_inlist_order() + $comment_order_shift; ?></a> <?php
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
 			echo '<span class="evo_comment_type_preview">'.T_('PREVIEW Comment from:').'</span> ';
@@ -126,7 +120,7 @@ switch( $Comment->get( 'type' ) )
 		if( $params['comment_post_display'] )
 		{
 			echo $params['comment_post_before'];
-			echo ' '.T_('in response to:').' ';
+			echo ' '.T_('in response to').': ';
 			$Comment->Item->title( array(
 					'link_type' => 'permalink',
 				) );
@@ -142,14 +136,13 @@ switch( $Comment->get( 'type' ) )
 	// ON *DISP = SINGLE* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case 'comment': // Display a comment:
 	case 'meta': // Display a meta comment:
-
 		if( $Comment->is_meta() )
 		{	// Meta comment:
-			?><span class="badge badge-info"><?php echo $comment_template_counter; ?></span> <?php
+			?><span class="badge badge-info"><?php echo $Comment->get_inlist_order(); ?></span> <?php
 		}
 		else
 		{	// Normal comment:
-			?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $comment_template_counter; ?></a> <?php
+			?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $Comment->get_inlist_order() + $comment_order_shift; ?></a> <?php
 		}
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
@@ -312,13 +305,4 @@ echo $params['comment_body_after'];
 </div>
 
 <?php echo $params['comment_end'];
-
-if( $Comment->is_meta() )
-{	// Decrease a counter for meta comments:
-	$comment_template_counter--;
-}
-else
-{	// Increase a counter for normal comments:
-	$comment_template_counter++;
-}
 ?>

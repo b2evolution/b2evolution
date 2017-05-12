@@ -1932,7 +1932,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 
 		$Form->submit( array(
 			'actionArray['.$next_action.'_publish]',
-			/* TRANS: This is the value of an input submit button */ T_('Publish!'),
+			/* TRANS: This is the value of an input submit button */ T_('Publish').'!',
 			'SaveButton btn-status-published quick-publish',
 			'',
 			$publish_style
@@ -2830,7 +2830,9 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	}
 
 	// Get ready for display (runs the query):
-	$CommentList->display_init();
+	$CommentList->display_init( array(
+			'init_order_numbers_mode' => ( $comment_type == 'meta' ? 'date' : false )
+		) );
 
 	$CommentList->display_if_empty( array(
 		'before'    => '<div class="evo_comment"><p>',
@@ -2849,11 +2851,11 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * @param object Comment object
  * @param string where to redirect after comment edit. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
  * @param boolean true to set the new redirect param, false otherwise
- * @param integer Comment index in the current list, FALSE - to don't display a comment index
+ * @param integer Comment order number in the current list, FALSE - to don't display a comment order
  * @param integer A reply level (Used on mode "Threaded comments" to shift a comment block to right)
  * @param boolean TRUE to display info for meta comment
  */
-function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false, $reply_level = 0 )
+function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $inlist_order = NULL, $display_meta_title = false, $reply_level = 0 )
 {
 	global $current_User, $localtimenow;
 
@@ -2895,9 +2897,9 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 
 		if( $Comment->is_meta() )
 		{ // Meta comment
-			if( $comment_index !== false )
-			{	// Display ID for each meta comment
-				echo '<span class="badge badge-info">'.$comment_index.'</span> ';
+			if( $inlist_order !== false )
+			{	// Display order of meta comment in current list:
+				echo '<span class="badge badge-info">'.$inlist_order.'</span> ';
 			}
 
 			if( $display_meta_title )
@@ -4237,7 +4239,7 @@ function items_results( & $items_Results, $params = array() )
 				'th' => T_('Ord'),
 				'th_class' => 'shrinkwrap',
 				'order' => $params['field_prefix'].'order',
-				'td_class' => 'right item_order_edit',
+				'td_class' => 'right jeditable_cell item_order_edit',
 				'td' => '%item_row_order( {Obj} )%',
 				'extra' => array( 'rel' => '#post_ID#' ),
 			);
@@ -4304,7 +4306,7 @@ function item_type_global_icons( $object_Widget )
 				$icon_group_create_mass = NULL;
 			}
 
-			$object_Widget->global_icon( T_('Mass edit the current post list...'), 'edit', $admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ), T_('Mass edit'), 3, 4 );
+			$object_Widget->global_icon( T_('Mass edit the current post list').'...', 'edit', $admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ), T_('Mass edit'), 3, 4 );
 
 			foreach( $item_types as $item_type )
 			{
@@ -4772,7 +4774,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	$r .= '<td>'.$Item->get_title( $params );
 	if( $current_User->check_perm( 'slugs', 'view', false ) )
 	{ // Display icon to view all slugs of this item if current user has permission
-		$r .= ' '.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
+		$r .= ' '.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
 	}
 	$r .= '</td>';
 

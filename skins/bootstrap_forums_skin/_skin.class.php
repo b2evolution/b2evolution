@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.1';
+	var $version = '6.9.2';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -439,7 +439,7 @@ class bootstrap_forums_Skin extends Skin
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
 		{ // Display button to write a new post
-			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
+			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
 		}
 		else
 		{ // If a creating of new post is unavailable
@@ -464,7 +464,7 @@ class bootstrap_forums_Skin extends Skin
 			}
 			else
 			{ // Display button to post a reply
-				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'" class="btn btn-default '.$params['button_class'].'" title="'.T_('Reply to topic').'"><i class="fa fa-reply"></i> '.T_('Reply').'</a>';
+				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'" class="btn btn-default '.$params['button_class'].'" title="'.T_('Reply to topic').'"><i class="fa fa-reply"></i> './* TRANS: verb */ T_('Reply').'</a>';
 			}
 		}
 

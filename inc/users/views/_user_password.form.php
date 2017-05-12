@@ -142,7 +142,7 @@ if( $action != 'view' )
 
 if( $action != 'view' )
 { // Edit buttons
-	$Form->buttons( array( array( '', 'actionArray['.$params['form_button_action'].']', T_('Change password!'), 'SaveButton'.$params['button_class'] ) ) );
+	$Form->buttons( array( array( '', 'actionArray['.$params['form_button_action'].']', T_('Change password').'!', 'SaveButton'.$params['button_class'] ) ) );
 }
 
 if( $params['display_abandon_link'] )

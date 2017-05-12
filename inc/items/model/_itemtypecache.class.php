@@ -55,9 +55,9 @@ class ItemTypeCache extends DataObjectCache
 	 * post types, the current blog must grant the blog_page, blog_intro,
 	 * blog_podcast and blog_sidebar permission, respectively (see blog
 	 * user/group permissions).
-	 * 
+	 *
 	 * @deprecated
-	 * 
+	 *
 	 * @param integer The selected ID.
 	 * @param boolean Provide a choice for "none" with ID ''
 	 * @param string  Callback method name.
@@ -90,7 +90,7 @@ class ItemTypeCache extends DataObjectCache
 	{
 		return array(
 				T_('In content flow') => array(
-						'post' => T_('Post')
+						'post' => /* TRANS: noun */ T_('Post')
 					),
 				T_('Out of content flow') => array(
 						'page'    => T_('Page'),

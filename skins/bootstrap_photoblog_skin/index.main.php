@@ -210,7 +210,6 @@ siteskin_include( '_site_body_header.inc.php' );
 						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
 					// Item content:
-					'url_link_position'     => 'top',
 					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
 					'skin_form_before'      => '<div class="panel panel-default skin-form">'
 																				.'<div class="panel-heading">'
@@ -333,7 +332,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

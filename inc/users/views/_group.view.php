@@ -75,7 +75,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Level'),
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap '.( $has_perm_users_edit ? ' group_level_edit' : '' ),
+		'td_class' => 'shrinkwrap '.( $has_perm_users_edit ? ' jeditable_cell group_level_edit' : '' ),
 		'order' => 'grp_level',
 		'default_dir' => 'D',
 		'td' => $has_perm_users_edit ?
@@ -160,7 +160,7 @@ function grp_actions( & $row )
 
 		if( ($row->grp_ID != 1) && ($row->grp_ID != $Settings->get('newusers_grp_ID')) && !in_array( $row->grp_ID, $usedgroups ) )
 		{ // delete
-			$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID.'&amp;'.url_crumb('group') ) );
+			$r .= action_icon( T_('Delete this group').'!', 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID.'&amp;'.url_crumb('group') ) );
 		}
 		else
 		{

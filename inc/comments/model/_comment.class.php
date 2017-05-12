@@ -1562,7 +1562,7 @@ class Comment extends DataObject
 
 		if( $text == '#' )
 		{ // Use icon+text as default, if not displayed as button (otherwise just the text)
-			$text = ( $this->status == 'trash' || $this->is_meta() ) ? T_('Delete!') : T_('Recycle!');
+			$text = ( $this->status == 'trash' || $this->is_meta() ) ? T_('Delete').'!' : T_('Recycle').'!';
 			if( ! $button )
 			{ // Append icon before text
 				$text = ( $this->status == 'trash' || $this->is_meta() ? get_icon( 'delete' ) : get_icon( 'recycle' ) ).' '.$text;
@@ -1674,7 +1674,7 @@ class Comment extends DataObject
 		$params = array(
 			'before' => $before,
 			'after'  => $after,
-			'text'   => ( ( $text == '#' ) ?  get_icon( 'move_down_'.$status_icon_color ).' '.T_('Deprecate!') : $text ),
+			'text'   => ( ( $text == '#' ) ?  get_icon( 'move_down_'.$status_icon_color ).' '.T_('Deprecate').'!' : $text ),
 			'title'  => $title,
 			'class'  => $class,
 			'glue'   => $glue,
@@ -2892,7 +2892,7 @@ class Comment extends DataObject
 			$after_docs = '';
 			if( count( $attachments ) > 0 )
 			{
-				echo '<br /><b>'.T_( 'Attachments:' ).'</b>';
+				echo '<br /><b>'.T_( 'Attachments' ).':</b>';
 				echo '<ul class="bFiles">';
 				$after_docs = '</ul>';
 			}
@@ -3710,11 +3710,13 @@ class Comment extends DataObject
 
 		if( ! $this->is_meta() )
 		{	// Get the notify users for NORMAL comments:
-			$except_condition = '';
+
+			// Send only for active users:
+			$except_condition = ' AND user_status IN ( "activated", "autoactivated" )';
 
 			if( ! empty( $already_notified_user_IDs ) )
 			{	// Set except moderators condition. Exclude moderators who already got a notification email:
-				$except_condition = ' AND user_ID NOT IN ( "'.implode( '", "', $already_notified_user_IDs ).'" )';
+				$except_condition .= ' AND user_ID NOT IN ( "'.implode( '", "', $already_notified_user_IDs ).'" )';
 			}
 
 			// Check if we need to include the item creator user:
@@ -3874,6 +3876,8 @@ class Comment extends DataObject
 			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
 			// Check if the users would like to receive notifications about new meta comments:
 			$meta_SQL->WHERE_and( 'uset_value = "1"'.( $Settings->get( 'def_notify_meta_comments' ) ? ' OR uset_value IS NULL' : '' ) );
+			// Check if users are activated:
+			$meta_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 			// Check if the users have permission to edit this Item:
 			$users_with_item_edit_perms = '( user_ID = '.$DB->quote( $comment_item_Blog->owner_user_ID ).' )';
 			$users_with_item_edit_perms .= ' OR ( grp_perm_blogs = "editall" )';
@@ -4867,6 +4871,36 @@ class Comment extends DataObject
 		$Item = & $this->get_Item();
 
 		return can_be_displayed_with_status( $this->get( 'status' ), 'comment', $Item->get_blog_ID(), $this->author_user_ID );
+	}
+
+
+	/**
+	 * Get comment order numbers for current filtered list (global $CommentList)
+	 *
+	 * @return integer|NULL
+	 */
+	function get_inlist_order()
+	{
+		if( empty( $this->ID ) )
+		{	// This comment must exist in DB
+			return NULL;
+		}
+
+		global $CommentList;
+
+		if( empty( $CommentList ) )
+		{	// Comment list must be initialized globally
+			return NULL;
+		}
+
+		if( ! isset( $CommentList->inlist_orders[ $this->ID ] ) )
+		{	// Order number is not found in list for this comment:
+			return NULL;
+		}
+
+		$inlist_order = intval( $CommentList->inlist_orders[ $this->ID ] );
+
+		return $inlist_order < 0 ? 0 : $inlist_order;
 	}
 }
 

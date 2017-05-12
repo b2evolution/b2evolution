@@ -615,7 +615,7 @@ switch( $action )
 		// Page title:
 		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d: %s'), $edited_Item->ID, $Blog->get('name') );
 
-		$AdminUI->breadcrumbpath_add( sprintf( T_('Post #%s'), $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
+		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 		$AdminUI->breadcrumbpath_add( T_('Edit'), '?ctrl=items&amp;action=edit&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 
 		// Params we need for tab switching:
@@ -712,7 +712,7 @@ switch( $action )
 		// Page title:
 		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d: %s'), $edited_Item->ID, $Blog->get('name') );
 
-		$AdminUI->breadcrumbpath_add( sprintf( T_('Post #%s'), $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
+		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 		$AdminUI->breadcrumbpath_add( T_('Edit'), '?ctrl=items&amp;action=edit&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 
 		// Params we need for tab switching:
@@ -1690,14 +1690,14 @@ switch( $action )
 			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
 				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
 				$mode_inskin_action = get_htsrv_url().'item_edit.php';
-				$AdminUI->global_icon( T_('In skin editing'), 'edit', $mode_inskin_url,
-						' '.T_('In skin editing'), 4, 3, array(
+				$AdminUI->global_icon( T_('In-skin editing'), 'edit', $mode_inskin_url,
+						' '.T_('In-skin editing'), 4, 3, array(
 						'style' => 'margin-right: 3ex',
 						'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$mode_inskin_action.'\' );'
 				) );
 			}
 
-			$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('Cancel'), 4, 2 );
+			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
 
 			init_tokeninput_js();
 		}
@@ -1733,7 +1733,7 @@ switch( $action )
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'tab' => $tab, 'filter' => 'restore' ) );
 
-		$AdminUI->breadcrumbpath_add( sprintf( T_('Post #%s'), $item_ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$item_ID );
+		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $item_ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$item_ID );
 		$AdminUI->breadcrumbpath_add( T_('View post & comments'), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$item_ID );
 		break;
 
@@ -1813,6 +1813,7 @@ if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action,
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
 	// Require File Uploader js and css:
+	init_fileuploader_js_lang_strings();
 	require_js( 'multiupload/fileuploader.js' );
 	require_css( 'fileuploader.css' );
 	// Load JS files to make the links table sortable:

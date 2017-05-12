@@ -451,7 +451,7 @@ function zeroise( $number, $threshold )
 function excerpt( $str, $maxlen = 254, $tail = '&hellip;' )
 {
 	// Add spaces
-	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
+	$str = str_replace( array( '<p>', '<br', '</tr><tr', '</th><th', '</td><td' ), array( ' <p>', ' <br', '</tr> <tr', '</th> <th', '</td> <td' ), $str );
 
 	// Remove <code>
 	$str = preg_replace( '#<code>(.+)</code>#is', '', $str );
@@ -976,7 +976,7 @@ function preg_match_outcode_callback( $content, $search, & $matches )
  * @param array|string Replace list or Callback function
  * @param string Source content
  * @param string Callback function name
- * @param string Type of callback function: 'preg' -> preg_replace(), 'str' -> str_replace() (@see replace_content())
+ * @param string Type of callback function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace() (@see replace_content())
  * @return string Replaced content
  */
 function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
@@ -1005,7 +1005,7 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
  * @param string Source content
  * @param array|string Search list
  * @param array|string Replace list
- * @param string Type of function: 'preg' -> preg_replace(), 'str' -> str_replace()
+ * @param string Type of function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace()
  * @param string The maximum possible replacements for each pattern in each subject string. Defaults to -1 (no limit).
  * @return string Replaced content
  */
@@ -1041,6 +1041,9 @@ function replace_content( $content, $search, $replace, $type = 'preg', $limit = 
 				}
 				return $content;
 			}
+
+		case 'preg_callback':
+			return preg_replace_callback( $search, $replace, $content, $limit );
 
 		default: // 'preg'
 			return preg_replace( $search, $replace, $content, $limit );
@@ -7450,6 +7453,12 @@ jQuery( document ).ready( function()
 		tooltip    : '<?php echo $params['tooltip']; ?>',
 		event      : 'click',
 		onblur     : '<?php echo $onblur_action; ?>',
+		onedit     : function ( settings, original )
+		{
+			// Set width to fix value to don't change it on selector displaying:
+			var wrapper_width = jQuery( original ).width();
+			jQuery( original ).css( { 'width': wrapper_width, 'max-width': wrapper_width } );
+		},
 		callback   : function ( settings, original )
 		{
 			<?php
@@ -7475,7 +7484,6 @@ jQuery( document ).ready( function()
 			echo $params['callback_code'];
 			?>
 		},
-		onsubmit: function( settings, original ) {},
 		submitdata : function( value, settings )
 		{
 			return { <?php echo $params['ID_name']; ?>: <?php echo $params['ID_value']; ?> }

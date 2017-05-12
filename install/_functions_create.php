@@ -397,13 +397,14 @@ function create_default_data()
 	// Insert item types:
 	$DB->query( $post_types_sql );
 
-	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
-			VALUES ( 3, "First numeric field", "first_numeric_field", "double" ),
-						 ( 3, "Second numeric field", "second_numeric_field", "double" ),
-						 ( 3, "First string field", "first_string_field", "varchar" ),
-						 ( 3, "Define you own labels", "define_you_own_labels", "varchar" ),
-						 ( 3, "Multiline plain text field", "multiline_plain_text_field", "text" ),
-						 ( 3, "Multiline HTML field", "multiline_html_field", "html" )' );
+	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note )
+			VALUES ( 3, '.$DB->quote( T_('First numeric field') ).', "first_numeric_field", "double", 1, '.$DB->quote( T_('Enter a number') ).' ),
+						 ( 3, '.$DB->quote( T_('Second numeric field') ).', "second_numeric_field", "double", 3, '.$DB->quote( T_('Enter a number') ).' ),
+						 ( 3, '.$DB->quote( T_('First string field') ).', "first_string_field", "varchar", 2, '.$DB->quote( T_('Enter a string') ).' ),
+						 ( 3, '.$DB->quote( T_('Define your own labels') ).', "define_your_own_labels", "varchar", 4, '.$DB->quote( T_('Define your own notes') ).' ),
+						 ( 3, '.$DB->quote( T_('Multiline plain text field') ).', "multiline_plain_text_field", "text", 6, '.$DB->quote( T_('Enter multiple lines') ).' ),
+						 ( 3, '.$DB->quote( T_('Multiline HTML field') ).', "multiline_html_field", "html", 5, '.$DB->quote( T_('Enter HTML code') ).' ),
+						 ( 3, '.$DB->quote( T_('URL field') ).', "url_field", "url", 7, '.$DB->quote( T_('Enter an URL (absolute or relative)') ).' )' );
 	task_end();
 
 

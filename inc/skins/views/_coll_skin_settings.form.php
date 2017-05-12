@@ -62,7 +62,7 @@ $Form->begin_form( 'fform' );
 			debug_die( 'Wrong skin type: '.$skin_type );
 	}
 
-	$fieldset_title_links = '<span class="floatright">&nbsp;'.action_icon( T_('Select another skin...'), 'choose', regenerate_url( 'action', 'skinpage=selection&amp;skin_type='.$skin_type ), ' '.T_('Choose a different skin').' &raquo;', 3, 4, array( 'class' => 'action_icon btn btn-info btn-sm' ) );
+	$fieldset_title_links = '<span class="floatright panel_heading_action_icons">&nbsp;'.action_icon( T_('Select another skin...'), 'choose', regenerate_url( 'action', 'skinpage=selection&amp;skin_type='.$skin_type ), ' '.T_('Choose a different skin').' &raquo;', 3, 4, array( 'class' => 'action_icon btn btn-info btn-sm' ) );
 	if( $skin_ID && $current_User->check_perm( 'options', 'view' ) )
 	{	// Display "Reset params" button only when skin ID has a real value ( when $skin_ID = 0 means it must be the same as the normal skin value ):
 		$fieldset_title_links .= action_icon( T_('Reset params'), 'reload',

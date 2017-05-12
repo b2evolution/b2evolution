@@ -8174,7 +8174,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12180, 'Updating base domains table...' ) )
-	{ // part of 6.9.0-beta
+	{	// part of 6.9.0-beta
 		$sql = 'SHOW INDEX FROM T_basedomains WHERE KEY_NAME = "dom_type_name"';
 		$indexes = $DB->get_results( $sql, ARRAY_A );
 		if( $DB->num_rows > 0 )
@@ -8257,7 +8257,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12200, 'Updating group permissions...' ) )
-	{ // part of 6.9.0-beta
+	{	// part of 6.9.0-beta
 		$DB->query( 'UPDATE T_groups__groupsettings
 			SET gset_name = "perm_skins_root",
 				gset_value = CASE gset_value WHEN "allowed" THEN "edit" ELSE "none" END
@@ -8266,7 +8266,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12210, 'Create new widget container "Forum Front Secondary Area" for forums...' ) )
-	{ // part of 6.9.1-beta
+	{	// part of 6.9.1-beta
 		$DB->begin();
 		$SQL = new SQL( 'Get all "forum" collections' );
 		$SQL->SELECT( 'blog_ID' );
@@ -8329,6 +8329,145 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		{	// Insert new widgets into DB:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
 			  VALUES '.implode( ', ', $coll_widgets ) );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12230, 'Update menu link widget...' ) )
+	{	// part of 6.9.1-beta
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "basic_menu_link"
+			WHERE wi_code = "menu_link"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12240, 'Create new widget "Item Link"...' ) )
+	{	// part of 6.9.1-beta
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_order, wi_enabled, wi_code, wi_params, blog_type' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON blog_id = wi_coll_ID' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$collections = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+
+		$item_single_rows = array();
+		foreach( $collections as $collection )
+		{	// Insert new widget "Collection Activity Stats" to each forum collection
+			if( ! isset( $item_single_rows[$collection['wi_coll_ID']] ) )
+			{
+				$item_single_rows[$collection['wi_coll_ID']] = 15; // default item_attachments widget order
+			}
+
+			if( in_array( $collection['wi_code'], array( 'item_content', 'item_attachments' ) ) )
+			{
+				$item_single_rows[$collection['wi_coll_ID']] = $collection['wi_order'] + 1;
+			}
+		}
+
+		$item_link_widget_rows = array();
+		foreach( $item_single_rows as $coll_ID => $wi_order )
+		{
+			$item_link_widget_rows[] = '( '.$coll_ID.', "Item Single", '.$wi_order.', "item_link" )';
+			// Check and update not unique widget orders just to make sure:
+			$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+				FROM T_widget
+				WHERE wi_coll_ID = '.$coll_ID.'
+					AND wi_sco_name = "Item Single"
+					AND wi_order = '.$wi_order );
+
+			if( $not_unique_widget_ID > 0 )
+			{	// The collection has no unique widget order, move all widget order >= to current order:
+				$DB->query( 'UPDATE T_widget
+						SET wi_order = wi_order + 1
+						WHERE wi_coll_ID = '.$coll_ID.'
+						AND wi_sco_name = "Item Single"
+						AND wi_order >= '.$wi_order.'
+						ORDER BY wi_order DESC');
+			}
+		}
+
+		if( count( $item_link_widget_rows ) )
+		{	// Insert new widgets "Item Link" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_link_widget_rows ) );
+		}
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12250, 'Upgrading table of post type custom fields...' ) )
+	{	// part of 6.9.1-beta
+		db_add_col( 'T_items__type_custom_field', 'itcf_note', 'VARCHAR(255) NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12260, 'Upgrading table for a latest versions of the PO files...' ) )
+	{	// part of 6.9.1-beta
+		db_add_index( 'T_i18n_translated_string', 'itst_iost_ID_locale', 'itst_iost_ID, itst_locale' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12270, 'Upgrade datetime fields to timestamp type...' ) )
+	{	// part of 6.9.1-beta
+		$DB->query( 'ALTER TABLE T_users
+			MODIFY user_created_datetime   TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+			MODIFY user_profileupdate_date TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_cron__task
+			MODIFY ctsk_start_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_cron__log
+			MODIFY clog_realstart_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+			MODIFY clog_realstop_datetime  TIMESTAMP NULL' );
+		$DB->query( 'ALTER TABLE T_items__item
+			MODIFY post_datestart    TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+			MODIFY post_datedeadline TIMESTAMP NULL' );
+		$DB->query( 'ALTER TABLE T_comments
+			MODIFY comment_date TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_items__version
+			MODIFY iver_edit_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_links
+			MODIFY link_datecreated  TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+			MODIFY link_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__thread
+			MODIFY thrd_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__message
+			MODIFY msg_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12280, 'Upgrade datetime fields to timestamp type...' ) )
+	{	// part of 6.9.1-beta
+		$DB->query( 'ALTER TABLE T_users__reports
+			MODIFY urep_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__contact
+			MODIFY mct_last_contact_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12290, 'Add new type "URL" for custom fields of item types...' ) )
+	{	// part of 6.9.2-beta
+		$DB->query( 'ALTER TABLE T_items__type_custom_field
+			MODIFY COLUMN itcf_type ENUM( "double", "varchar", "text", "html", "url" ) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12300, 'Clear invalid values of item type custom fields...' ) )
+	{	// part of 6.9.2-beta
+		$SQL = new SQL( 'Get all item types with custom fields' );
+		$SQL->SELECT( 'GROUP_CONCAT( DISTINCT "\"custom_", itcf_type, "_", itcf_ID, "\"" ) AS valid_setting_names, ' );
+		$SQL->SELECT_add( 'GROUP_CONCAT( DISTINCT post_ID ) AS post_IDs' );
+		$SQL->FROM( 'T_items__type_custom_field' );
+		$SQL->FROM_add( 'INNER JOIN T_items__item ON itcf_ityp_ID = post_ityp_ID' );
+		$SQL->GROUP_BY( 'itcf_ityp_ID' );
+		$custom_fields = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+
+		foreach( $custom_fields as $custom_field )
+		{	// Delete all invalid/obsolete values of each item type with custom fields:
+			$DB->query( 'DELETE FROM T_items__item_settings
+				WHERE iset_item_ID IN ( '.$custom_field->post_IDs.' )
+					AND iset_name LIKE "custom\_%"
+					AND iset_name NOT IN ( '.$custom_field->valid_setting_names.' )',
+				'Clear invalid/obsolete values of item type custom fields' );
 		}
 		upg_task_end();
 	}

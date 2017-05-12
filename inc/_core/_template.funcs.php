@@ -2318,17 +2318,32 @@ function display_ajax_form( $params )
 	<script type="text/javascript">
 		var ajax_form_offset_<?php echo $ajax_form_number; ?> = jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').offset().top;
 		var request_sent_<?php echo $ajax_form_number; ?> = false;
+		var ajax_form_loading_number_<?php echo $ajax_form_number; ?> = 0;
 
 		function get_form_<?php echo $ajax_form_number; ?>()
 		{
+			var form_id = '#ajax_form_number_<?php echo $ajax_form_number; ?>';
+			ajax_form_loading_number_<?php echo $ajax_form_number; ?>++;
 			jQuery.ajax({
 				url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 				type: 'POST',
 				data: <?php echo $json_params; ?>,
 				success: function(result)
-					{
-						jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').html( ajax_debug_clear( result ) );
+				{
+					jQuery( form_id ).html( ajax_debug_clear( result ) );
+				},
+				error: function( jqXHR, textStatus, errorThrown )
+				{
+					jQuery( '.loader_ajax_form', form_id ).after( '<div class="red center">' + errorThrown + ': ' + jqXHR.responseText + '</div>' );
+					if( ajax_form_loading_number_<?php echo $ajax_form_number; ?> < 3 )
+					{	// Try to load 3 times this ajax form if error occurs:
+						setTimeout( function()
+						{	// After 1 second delaying:
+							jQuery( '.loader_ajax_form', form_id ).next().remove();
+							get_form_<?php echo $ajax_form_number; ?>();
+						}, 1000 );
 					}
+				}
 			});
 		}
 
@@ -2521,7 +2536,7 @@ function display_login_form( $params )
 	if( $inskin )
 	{
 		$Form->begin_field();
-		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, T_('Login'), $separator.T_('Enter your username (or email address).'),
+		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, /* TRANS: noun */ T_('Login'), $separator.T_('Enter your username (or email address).'),
 					array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true ) );
 		$Form->end_field();
 	}
@@ -2671,12 +2686,14 @@ function display_login_js_handler( $params )
 			error: function( jqXHR, textStatus, errorThrown )
 			{	// Display error text on error request:
 				requestSent = false;
-				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')' );
+				var wrong_response_code = typeof( jqXHR.status ) != 'undefined' && jqXHR.status != 200 ? '\nHTTP Response code: ' + jqXHR.status : '';
+				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')'
+					+ wrong_response_code );
 			}
 		});
 
-	    // You must return false to prevent the default form behavior
-	    return false;
+		// You must return false to prevent the default form behavior
+		return false;
 	}
 
 	<?php
@@ -2757,7 +2774,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	if( $params['inskin'] )
 	{
-		$Form->text( $dummy_fields[ 'login' ], $login, 30, T_('Login'), '', 255, 'input_text' );
+		$Form->text( $dummy_fields[ 'login' ], $login, 30, /* TRANS: noun */ T_('Login'), '', 255, 'input_text' );
 	}
 	else
 	{
@@ -3139,7 +3156,7 @@ function display_login_validator( $params = array() )
 	var login_icon_available = \''.get_icon( 'allowback', 'imgtag', array( 'title' => TS_('This username is available.') ) ).'\';
 	var login_icon_exists = \''.get_icon( 'xross', 'imgtag', array( 'title' => TS_('This username is already in use. Please choose another one.') ) ).'\';
 
-	var login_text_empty = \''.TS_('Choose an username.').'\';
+	var login_text_empty = \''.TS_('Choose an username').'.\';
 	var login_text_available = \''.TS_('This username is available.').'\';
 	var login_text_exists = \''.TS_('This username is already in use. Please choose another one.').'\';
 
@@ -3370,6 +3387,21 @@ function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rs
 
 	// Load main CSS file of font-awesome icons
 	require_css( '#fontawesome#', $relative_to );
+}
+
+
+/**
+ * Initialize JavaScript variables for fileuploader.js
+ */
+function init_fileuploader_js_lang_strings()
+{
+	// Initialize variables for the file "fileuploader.js":
+	add_js_headline( 'var evo_js_lang_file_sizes = [\''
+		/* TRANS: Abbr. for "Bytes" */.TS_('B.').'\', \''
+		/* TRANS: Abbr. for "Kilobytes" */.TS_('KB').'\', \''
+		/* TRANS: Abbr. for Megabytes */.TS_('MB').'\', \''
+		/* TRANS: Abbr. for Gigabytes */.TS_('GB').'\', \''
+		/* TRANS: Abbr. for Terabytes */.TS_('TB').'\'];' );
 }
 
 ?>

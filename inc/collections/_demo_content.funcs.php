@@ -938,7 +938,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			$blog_shortname = 'Photos';
 			$blog_stub = 'photos';
 			$blog_more_longdesc = '<br /><br />
-					<strong>'.T_("This is a photoblog, optimized for displaying photos.").'</strong>';
+					<strong>'.T_('This is a photoblog, optimized for displaying photos.').'</strong>';
 
 			$blog_photoblog_ID = create_blog(
 					'Photos',
@@ -1131,13 +1131,13 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'photo' );
-			$edited_Item->insert( $owner_ID, T_("About this site"), T_("<p>This blog platform is powered by b2evolution.</p>
+			$edited_Item->insert( $owner_ID, T_('About this site'), T_('<p>This blog platform is powered by b2evolution.</p>
 
 <p>You are currently looking at an info page about this site.</p>
 
 <p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>
 
-<p>If needed, skins can format info pages differently from regular posts.</p>"), $now, $cat_home_b2evo,
+<p>If needed, skins can format info pages differently from regular posts.</p>'), $now, $cat_home_b2evo,
 					array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 			$edit_File = new File( 'shared', 1, 'logos/b2evolution_1016x208_wbg.png' );
 			$LinkOwner = new LinkItem( $edited_Item );
@@ -1209,7 +1209,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('First Post'), T_('<p>This is the first post.</p>
+			$edited_Item->insert( $owner_ID, T_('First Post'), T_('<p>This is the first post in the "[coll:shortname]" collection.</p>
 
 <p>It appears in a single category.</p>'), $now, $cat_ann_a );
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1218,7 +1218,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('Second post'), T_('<p>This is the second post.</p>
+			$edited_Item->insert( $owner_ID, T_('Second post'), T_('<p>This is the second post in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a ) );
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1227,7 +1227,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_("About Blog A"), sprintf( get_filler_text( 'info_page'), T_('Blog A') ), $now, $cat_ann_a,
+			$edited_Item->insert( $owner_ID, T_('About Blog A'), sprintf( get_filler_text( 'info_page' ), T_('Blog A') ), $now, $cat_ann_a,
 					array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 			$item_IDs[] = array( $edited_Item->ID, $now );
 
@@ -1244,17 +1244,17 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 2 ).get_filler_text( 'lorem_2more').'
+<p>'.sprintf( T_('This is page %d.'), 2 ).'</p>'.get_filler_text( 'lorem_2more' ).'
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 3 ).get_filler_text( 'lorem_1paragraph').'
+<p>'.sprintf( T_('This is page %d.'), 3 ).'</p>'.get_filler_text( 'lorem_1paragraph' ).'
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 4 ).'
+<p>'.sprintf( T_('This is page %d.'), 4 ).'</p>
 
-'.T_('<p>It is the last page.</p>'), $now, $cat_bg );
+<p>'.T_('It is the last page.').'</p>', $now, $cat_bg );
 			$item_IDs[] = array( $edited_Item->ID, $now );
 
 			// Insert a post:
@@ -1262,10 +1262,10 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'demo' );
-			$edited_Item->insert( $owner_ID, T_('Extended post with no teaser'), T_('<p>This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>').get_filler_text( 'lorem_1paragraph')
+			$edited_Item->insert( $owner_ID, T_('Extended post with no teaser'), '<p>'.T_('This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.').'</p>'.get_filler_text( 'lorem_1paragraph' )
 .'[teaserbreak]
 
-'.T_('<p>This is the extended text. You only see it when you have clicked the "more" link.</p>').get_filler_text( 'lorem_2more'), $now, $cat_bg );
+<p>'.T_('This is the extended text. You only see it when you have clicked the "more" link.').'</p>'.get_filler_text( 'lorem_2more' ), $now, $cat_bg );
 			$edited_Item->set_setting( 'hide_teaser', '1' );
 			$edited_Item->dbsave();
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1276,10 +1276,10 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$edited_Item = new Item();
 			$edited_Item->set( 'featured', 1 );
 			$edited_Item->set_tags_from_string( 'photo,demo' );
-			$edited_Item->insert( $owner_ID, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>').get_filler_text( 'lorem_1paragraph')
+			$edited_Item->insert( $owner_ID, T_('Extended post'), '<p>'.T_('This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.').'</p>'.get_filler_text( 'lorem_1paragraph' )
 .'[teaserbreak]
 
-'.T_('<p>This is the extended text. You only see it when you have clicked the "more" link.</p>').get_filler_text( 'lorem_2more'), $now, $cat_bg );
+<p>'.T_('This is the extended text. You only see it when you have clicked the "more" link.').'</p>'.get_filler_text( 'lorem_2more' ), $now, $cat_bg );
 			$LinkOwner = new LinkItem( $edited_Item );
 			$edit_File = new File( 'shared', 0, 'monument-valley/john-ford-point.jpg' );
 			$edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
@@ -1301,6 +1301,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
  It can have multiple lines.' );
  			$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
+			$edited_Item->set_setting( 'custom_url_7', 'http://b2evolution.net/' );
 			$post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with custom fields".').'</p>'.
 
@@ -1312,7 +1313,9 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 '<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
 
-'<p>'.T_('Finally, we can also display just the value of a specific field, like this [field: first_string_field].').'</p>',
+'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[field:first_string_field]' ).'</p>'.
+
+'<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
 			$item_IDs[] = array( $edited_Item->ID, $now );
 
@@ -1334,7 +1337,9 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 <p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>
 
-<p>'.T_('Finally, we can also display just the value of a specific field, like this [parent:field: first_string_field].').'</p>',
+<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[parent:field: first_string_field]' ).'</p>
+
+<p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
 			$item_IDs[] = array( $edited_Item->ID, $now );
 
@@ -1363,7 +1368,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'photo' );
-			$additional_comments_item_IDs[] = $edited_Item->insert( $owner_ID, T_("Welcome to your b2evolution-powered website!"),
+			$additional_comments_item_IDs[] = $edited_Item->insert( $owner_ID, T_('Welcome to your b2evolution-powered website!'),
 T_("<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>
 
 <ul>
@@ -1415,7 +1420,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_("About Blog B"), sprintf( get_filler_text( 'info_page'), T_('Blog B') ), $now, $cat_ann_b,
+			$edited_Item->insert( $owner_ID, T_('About Blog B'), sprintf( get_filler_text( 'info_page'), T_('Blog B') ), $now, $cat_ann_b,
 				array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 			// Insert a post:
@@ -1439,7 +1444,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'intro' );
-			$edited_Item->insert( $owner_ID, T_("b2evolution tips category &ndash; Sub Intro post"), T_("This uses post type \"Intro-Cat\" and is attached to the desired Category(ies)."),
+			$edited_Item->insert( $owner_ID, T_('b2evolution tips category &ndash; Sub Intro post'), T_('This uses post type "Intro-Cat" and is attached to the desired Category(ies).'),
 					$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Cat' );
 			$item_IDs[] = array( $edited_Item->ID, $now );
 
@@ -1448,7 +1453,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'widgets,intro' );
-			$edited_Item->insert( $owner_ID, T_("Widgets tag &ndash; Sub Intro post"), T_("This uses post type \"Intro-Tag\" and is tagged with the desired Tag(s)."),
+			$edited_Item->insert( $owner_ID, T_('Widgets tag &ndash; Sub Intro post'), T_('This uses post type "Intro-Tag" and is tagged with the desired Tag(s).'),
 					$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Tag' );
 			$item_IDs[] = array( $edited_Item->ID, $now );
 
@@ -1457,11 +1462,11 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_("Featured post"), T_("<p>This is a demo of a featured post.</p>
+			$edited_Item->insert( $owner_ID, T_('Featured post'), T_('<p>This is a demo of a featured post.</p>
 
-<p>It will be featured whenever we have no specific \"Intro\" post to display for the current request. To see it in action, try displaying the \"Announcements\" category.</p>
+<p>It will be featured whenever we have no specific "Intro" post to display for the current request. To see it in action, try displaying the "Announcements" category.</p>
 
-<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>").get_filler_text( 'lorem_1paragraph'),
+<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>').get_filler_text( 'lorem_1paragraph' ),
 					$now, $cat_b2evo, array( $cat_ann_b ) );
 			$edited_Item->set( 'featured', 1 );
 			$edited_Item->dbsave();
@@ -1471,9 +1476,9 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_("Apache optimization..."), sprintf( T_("<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please se the man page about <a %s>Tricky Stuff</a> for more information.</p>
+			$edited_Item->insert( $owner_ID, T_('Apache optimization...'), sprintf( T_('<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please se the man page about <a %s>Tricky Stuff</a> for more information.</p>
 
-<p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>"),
+<p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>'),
 'href="'.get_manual_url( 'tricky-stuff' ).'"',
 'href="'.get_manual_url( 'performance-optimization' ).'"',
 'href="http://b2evolution.net/web-hosting/"' ),
@@ -1485,7 +1490,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'skins' );
-			$edited_Item->insert( $owner_ID, T_("Skins, Stubs, Templates &amp; website integration..."), T_("<p>By default, blogs are displayed using an evoskin. (More on skins in another post.)</p>
+			$edited_Item->insert( $owner_ID, T_('Skins, Stubs, Templates &amp; website integration...'), T_("<p>By default, blogs are displayed using an evoskin. (More on skins in another post.)</p>
 
 <p>This means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.</p>
 
@@ -1505,7 +1510,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'widgets' );
-			$edited_Item->insert( $owner_ID, T_("About widgets..."), T_('<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>
+			$edited_Item->insert( $owner_ID, T_('About widgets...'), T_('<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>
 
 <p>You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.</p>
 
@@ -1517,7 +1522,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'skins' );
-			$edited_Item->insert( $owner_ID, T_("About skins..."), sprintf( T_('<p>By default, b2evolution blogs are displayed using an evoskin.</p>
+			$edited_Item->insert( $owner_ID, T_('About skins...'), sprintf( T_('<p>By default, b2evolution blogs are displayed using an evoskin.</p>
 
 <p>You can change the skin used by any blog by editing the blog settings in the admin interface.</p>
 
@@ -1661,14 +1666,14 @@ a school bus stop where you wouldn\'t really expect it!
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( 1, T_("About Forums"), sprintf( get_filler_text( 'info_page'), T_('Forums') ), $now, $cat_forums_ann,
+			$edited_Item->insert( 1, T_('About Forums'), sprintf( get_filler_text( 'info_page' ), T_('Forums') ), $now, $cat_forums_ann,
 				array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 			// Insert a post:
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $user_1, T_('First Topic'), T_('<p>This is the first topic.</p>
+			$edited_Item->insert( $user_1, T_('First Topic'), T_('<p>This is the first topic in the "[coll:shortname]" collection.</p>
 
 <p>It appears in a single category.</p>').get_filler_text( 'lorem_2more'), $now, $cat_forums_ann );
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1677,7 +1682,7 @@ a school bus stop where you wouldn\'t really expect it!
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $user_2, T_('Second topic'), T_('<p>This is the second topic.</p>
+			$edited_Item->insert( $user_2, T_('Second topic'), T_('<p>This is the second topic in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>').get_filler_text( 'lorem_2more'), $now, $cat_forums_news, array( $cat_forums_ann ) );
 			$item_IDs[] = array( $edited_Item->ID, $now );
@@ -1708,17 +1713,17 @@ a school bus stop where you wouldn\'t really expect it!
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 2 ).get_filler_text( 'lorem_2more').'
+<p>'.sprintf( T_('This is page %d.'), 2 ).'</p>'.get_filler_text( 'lorem_2more' ).'
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 3 ).get_filler_text( 'lorem_1paragraph').'
+<p>'.sprintf( T_('This is page %d.'), 3 ).'</p>'.get_filler_text( 'lorem_1paragraph' ).'
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 4 ).'
+<p>'.sprintf( T_('This is page %d.'), 4 ).'</p>
 
-'.T_('<p>It is the last page.</p>'), $now, $cat_forums_bg );
+<p>'.T_('It is the last page.').'</p>', $now, $cat_forums_bg );
 
 			// Insert a post:
 			$post_count--;
@@ -1750,7 +1755,7 @@ a school bus stop where you wouldn\'t really expect it!
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'photo' );
-			$additional_comments_item_IDs[] = $edited_Item->insert( 1, T_("Welcome to your b2evolution-powered website!"),
+			$additional_comments_item_IDs[] = $edited_Item->insert( 1, T_('Welcome to your b2evolution-powered website!'),
 T_("<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>
 
 <ul>
@@ -1809,7 +1814,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'intro' );
-			$edited_Item->insert( $owner_ID, T_("Welcome here!"), T_('This is the main introduction for this demo online manual. It is a post using the type "Intro-Front". It will only appear on the front page of the manual.
+			$edited_Item->insert( $owner_ID, T_('Welcome here!'), T_('This is the main introduction for this demo online manual. It is a post using the type "Intro-Front". It will only appear on the front page of the manual.
 
 You may delete this post if you don\'t want such an introduction.
 
@@ -1821,7 +1826,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'intro' );
-			$edited_Item->insert( $owner_ID, T_("Chapter Intro"), T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.'), $now, $cat_manual_intro,
+			$edited_Item->insert( $owner_ID, T_('Chapter Intro'), T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.'), $now, $cat_manual_intro,
 					array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Cat' );
 
 			// Insert a cat intro:
@@ -1829,7 +1834,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'intro' );
-			$edited_Item->insert( $owner_ID, T_("Chapter Intro"), T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.')
+			$edited_Item->insert( $owner_ID, T_('Chapter Intro'), T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.')
 ."\n\n".T_('Contrary to the other sections which are explictely sorted by default, this section is sorted alphabetically by default.'), $now, $cat_manual_reference,
 					array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Cat' );
 
@@ -1837,14 +1842,14 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_("About this manual"), sprintf( get_filler_text( 'info_page'), T_('Manual') ), $now, $cat_manual_intro,
+			$edited_Item->insert( $owner_ID, T_('About this manual'), sprintf( get_filler_text( 'info_page' ), T_('Manual') ), $now, $cat_manual_intro,
 					array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 			// Insert a post:
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('First Page'), T_('<p>This is the first page.</p>
+			$edited_Item->insert( $owner_ID, T_('First Page'), T_('<p>This is the first page in the "[coll:shortname]" collection.</p>
 
 <p>It appears in a single category.</p>'), $now, $cat_manual_intro, array(),
 'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 10 );
@@ -1854,7 +1859,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$post_count--;
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('Second Page'), T_('<p>This is the second page.</p>
+			$edited_Item->insert( $owner_ID, T_('Second Page'), T_('<p>This is the second page in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>'), $now, $cat_manual_intro, array( $cat_manual_getstarted ),
 'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 20 );
@@ -2134,17 +2139,17 @@ Hello
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 2 ).get_filler_text( 'lorem_2more').'
+<p>'.sprintf( T_('This is page %d.'), 2 ).'</p>'.get_filler_text( 'lorem_2more' ).'
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 3 ).get_filler_text( 'lorem_1paragraph').'
+<p>'.sprintf( T_('This is page %d.'), 3 ).'</p>'.get_filler_text( 'lorem_1paragraph' ).'
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 4 ).'
+<p>'.sprintf( T_('This is page %d.'), 4 ).'</p>
 
-'.T_('<p>It is the last page.</p>'), $now, $cat_manual_userguide, array(),
+<p>'.T_('It is the last page.').'</p>', $now, $cat_manual_userguide, array(),
 'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 30 );
 
 			// Insert a post:
@@ -2179,7 +2184,7 @@ Hello
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'photo' );
-			$additional_comments_item_IDs[] = $edited_Item->insert( $owner_ID, T_("Welcome to your b2evolution-powered website!"),
+			$additional_comments_item_IDs[] = $edited_Item->insert( $owner_ID, T_('Welcome to your b2evolution-powered website!'),
 		T_("<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>
 
 <ul>
@@ -2272,7 +2277,7 @@ Hello
 
 				// Insert item first before setting task status
 				$edited_Item->insert( $owner_ID, sprintf( T_('Task %s'), $tasks[$i] ),
-						sprintf( T_('<p>This is a demo task description for Task %s.</p>'), $tasks[$i] ),	$now, $cat_group_bugs );
+						'<p>'.sprintf( T_('This is a demo task description for Task %s.'), $tasks[$i] ).'</p>', $now, $cat_group_bugs );
 
 				// Now we can set the post status
 				$edited_Item->set( 'pst_ID', $task_status[$k] );

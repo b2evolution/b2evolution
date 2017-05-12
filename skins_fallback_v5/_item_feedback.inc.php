@@ -213,6 +213,8 @@ if( $Item->can_see_comments( true ) )
 		}
 		echo $rating_summary;
 
+		global $CommentList;
+
 		$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
 		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', 'c_' );
 
@@ -271,9 +273,6 @@ if( $Item->can_see_comments( true ) )
 			echo $params['comment_list_start'];
 		}
 
-		// Set number of comment depending on current page
-		$comment_number = ( ( $CommentList->page - 1 ) * $CommentList->limit ) + 1;
-
 		/**
 		 * @var Comment
 		 */
@@ -308,7 +307,6 @@ if( $Item->can_see_comments( true ) )
 					'author_link_text'      => $params['author_link_text'],
 					'link_to'               => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 					'author_link_text'      => $params['author_link_text'],
-					'comment_number'        => $comment_number,
 					'image_size'            => $params['comment_image_size'],
 				) );
 			// Note: You can customize the default item comment by copying the generic
@@ -319,8 +317,6 @@ if( $Item->can_see_comments( true ) )
 			{	// Display the comment replies
 				display_comment_replies( $Comment->ID, $params );
 			}
-
-			$comment_number++;
 		}	// End of comment list loop.
 
 		if( ! $params['nav_bottom_inside'] )

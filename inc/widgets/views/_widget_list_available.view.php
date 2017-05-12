@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $container;
 
-echo '<h2><span class="right_icons">'.action_icon( T_('Cancel!'), 'close', regenerate_url( 'container' ) ).'</span>'
+echo '<h2><span class="right_icons">'.action_icon( T_('Cancel').'!', 'close', regenerate_url( 'container' ) ).'</span>'
 	.sprintf(T_('Widgets available for insertion into &laquo;%s&raquo;'), $container ).'</h2>';
 
 
@@ -62,6 +62,7 @@ $core_componentwidget_defs = array(
 	'free_content' => array(
 			'free_text',
 			'free_html',
+			'spacer',
 			'image',
 			'social_links',
 		),
@@ -70,7 +71,7 @@ $core_componentwidget_defs = array(
 			'user_links',		// Social links of coll owner
 		),
 	'menu_item' => array(
-			'menu_link',
+			'basic_menu_link',
 			'msg_menu_link',
 			'flag_menu_link',
 			'profile_menu_link',
@@ -99,6 +100,7 @@ $core_componentwidget_defs = array(
 			'item_info_line',
 			'item_content',
 			'item_attachments',
+			'item_link',
 			'item_location',
 			'item_small_print',
 			'item_tags',

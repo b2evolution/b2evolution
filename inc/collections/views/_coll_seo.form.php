@@ -315,9 +315,9 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
 	$Form->radio( '404_response', $edited_Blog->get_setting('404_response'),
 		array(
 				array( '200', T_('200 "OK" response') ),
-				array( '301', T_('301 redirect to main page') ),
-				array( '302', T_('302 redirect to main page') ),
-				array( '303', T_('303 redirect to main page') ),
+				array( '301', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '301' ) ),
+				array( '302', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '302' ) ),
+				array( '303', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '303' ) ),
 				array( '404', T_('404 "Not found" response') ),
 				array( '410', T_('410 "Gone" response') ),
 			), T_('404 "Not Found" response'), true );

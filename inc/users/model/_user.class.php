@@ -191,12 +191,12 @@ class User extends DataObject
 			if( isset($localtimenow) )
 			{
 				$this->set_datecreated( $localtimenow );
-				$this->set( 'profileupdate_date', date( 'Y-m-d', $localtimenow ) );
+				$this->set( 'profileupdate_date', date( 'Y-m-d H:i:s', $localtimenow ) );
 			}
 			else
 			{ // We don't know local time here!
 				$this->set_datecreated( time() );
-				$this->set( 'profileupdate_date', date( 'Y-m-d', time() ) );
+				$this->set( 'profileupdate_date', date( 'Y-m-d H:i:s' ) );
 			}
 
 			if( isset( $Settings ) )
@@ -700,11 +700,11 @@ class User extends DataObject
 				$country_is_required = ( $Settings->get( 'location_country' ) == 'required' && countries_exist() );
 				if( $country_is_required && $can_edit_users && $country_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_ctry_ID', T_('Please select a country.'), 'note' );
+					param_add_message_to_Log( 'edited_user_ctry_ID', T_('Please select a country').'.', 'note' );
 				}
 				else
 				{ // Display an error message
-					param_check_number( 'edited_user_ctry_ID', T_('Please select a country.'), $country_is_required );
+					param_check_number( 'edited_user_ctry_ID', T_('Please select a country').'.', $country_is_required );
 				}
 				$this->set_from_Request( 'ctry_ID', 'edited_user_ctry_ID', true );
 			}
@@ -715,7 +715,7 @@ class User extends DataObject
 				$region_is_required = ( $Settings->get( 'location_region' ) == 'required' && regions_exist( $country_ID ) );
 				if( $region_is_required && $can_edit_users && $region_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_rgn_ID', T_('Please select a region.'), 'note' );
+					param_add_message_to_Log( 'edited_user_rgn_ID', T_('Please select a region').'.', 'note' );
 				}
 				else
 				{ // Display an error message
@@ -730,11 +730,11 @@ class User extends DataObject
 				$subregion_is_required = ( $Settings->get( 'location_subregion' ) == 'required' && subregions_exist( $region_ID ) );
 				if( $subregion_is_required && $can_edit_users && $subregion_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_subrg_ID', T_('Please select a sub-region.'), 'note' );
+					param_add_message_to_Log( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', 'note' );
 				}
 				else
 				{ // Display an error message
-					param_check_number( 'edited_user_subrg_ID', T_('Please select a sub-region.'), $subregion_is_required );
+					param_check_number( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', $subregion_is_required );
 				}
 				$this->set_from_Request( 'subrg_ID', 'edited_user_subrg_ID', true );
 			}
@@ -745,11 +745,11 @@ class User extends DataObject
 				$city_is_required = ( $Settings->get( 'location_city' ) == 'required' && cities_exist( $country_ID, $region_ID, $subregion_ID ) );
 				if( $city_is_required && $can_edit_users && $city_ID == 0 )
 				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_city_ID', T_('Please select a city.'), 'note' );
+					param_add_message_to_Log( 'edited_user_city_ID', T_('Please select a city').'.', 'note' );
 				}
 				else
 				{ // Display an error message
-					param_check_number( 'edited_user_city_ID', T_('Please select a city.'), $city_is_required );
+					param_check_number( 'edited_user_city_ID', T_('Please select a city').'.', $city_is_required );
 				}
 				$this->set_from_Request( 'city_ID', 'edited_user_city_ID', true );
 			}
@@ -4760,7 +4760,7 @@ class User extends DataObject
 
 		$idx = $this->userfields_by_type[$type_ID][0];
 
-		return $this->userfields[$idx][1];
+		return $this->userfields[$idx]->uf_varchar;
 	}
 
 
@@ -5056,7 +5056,7 @@ class User extends DataObject
 		global $current_User, $localtimenow;
 		if( ( !empty( $current_User ) ) && ( $this->ID == $current_User->ID ) )
 		{
-			$this->set( 'profileupdate_date', date( 'Y-m-d', $localtimenow ) );
+			$this->set( 'profileupdate_date', date( 'Y-m-d H:i:s', $localtimenow ) );
 		}
 	}
 
@@ -6365,7 +6365,7 @@ class User extends DataObject
 				'user_ID' => $this->ID,
 				'login'   => $this->login,
 				'fields'  => array(
-					'login'     => array( 'title' => NT_('Login') ),
+					'login'     => array( 'title' => /* TRANS: noun */ NT_('Login') ),
 					'grp_ID'  => array( 'title' => NT_('Group'), 'className' => 'Group' ),
 					'nickname'  => array( 'title' => NT_('Nickname') ),
 					'firstname' => array( 'title' => NT_('First name') ),

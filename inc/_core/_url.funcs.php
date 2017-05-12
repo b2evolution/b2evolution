@@ -392,7 +392,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		$s = fgets( $fp );
 		if( ! preg_match( '~^HTTP/\d+\.\d+ (\d+)~', $s, $match ) )
 		{
-			$info['error'] = NT_( 'Invalid response.' );
+			$info['error'] = NT_( 'Invalid response' ).'.';
 			fclose( $fp );
 			return false;
 		}

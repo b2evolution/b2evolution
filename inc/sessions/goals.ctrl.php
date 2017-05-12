@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'sessions/model/_goal.class.php', 'Goal' );
 load_class( 'sessions/model/_goalcat.class.php', 'GoalCategory' );
-load_funcs('sessions/model/_hitlog.funcs.php');
+load_funcs( 'sessions/model/_hitlog.funcs.php' );
 
 /**
  * @var User
@@ -80,7 +80,7 @@ $current_User->check_perm( 'stats', 'list', true, $blog );
 if( param( 'goal_ID', 'integer', '', true) )
 { // Load goal:
 	$GoalCache = & get_GoalCache();
-	if( ($edited_Goal = & $GoalCache->get_by_ID( $goal_ID, false )) === false )
+	if( ( $edited_Goal = & $GoalCache->get_by_ID( $goal_ID, false ) ) === false )
 	{ // We could not find the goal to edit:
 		unset( $edited_Goal );
 		forget_param( 'goal_ID' );
@@ -92,7 +92,7 @@ if( param( 'goal_ID', 'integer', '', true) )
 if( param( 'gcat_ID', 'integer', '', true) )
 { // Load goal category:
 	$GoalCategoryCache = & get_GoalCategoryCache();
-	if( ($edited_GoalCategory = & $GoalCategoryCache->get_by_ID( $gcat_ID, false )) === false )
+	if( ( $edited_GoalCategory = & $GoalCategoryCache->get_by_ID( $gcat_ID, false ) ) === false )
 	{ // We could not find the goal category to edit:
 		unset( $edited_GoalCategory );
 		forget_param( 'gcat_ID' );
@@ -109,7 +109,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'stats', 'edit', true );
 
-		if( ! isset($edited_Goal) )
+		if( ! isset( $edited_Goal ) )
 		{	// We don't have a model to use, start with blank object:
 			$edited_Goal = new Goal();
 		}
@@ -215,7 +215,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Goal &laquo;%s&raquo; deleted.'), $edited_Goal->dget('name') );
+			$msg = sprintf( T_('Goal &laquo;%s&raquo; deleted.'), $edited_Goal->dget( 'name' ) );
 			$edited_Goal->dbdelete();
 			unset( $edited_Goal );
 			forget_param( 'goal_ID' );
@@ -226,7 +226,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Goal->check_delete( sprintf( T_('Cannot delete goal &laquo;%s&raquo;'), $edited_Goal->dget('name') ) ) )
+			if( ! $edited_Goal->check_delete( sprintf( T_('Cannot delete goal &laquo;%s&raquo;'), $edited_Goal->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -350,14 +350,14 @@ switch( $action )
 
 		if( $gcat_ID == 1 )
 		{ // Deny to delete "Default" category
-			$Messages->add( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget('name') ), 'error' );
+			$Messages->add( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget( 'name' ) ), 'error' );
 			$action = 'view';
 			break;
 		}
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Goal category &laquo;%s&raquo; deleted.'), $edited_GoalCategory->dget('name') );
+			$msg = sprintf( T_('Goal category &laquo;%s&raquo; deleted.'), $edited_GoalCategory->dget( 'name' ) );
 			$edited_GoalCategory->dbdelete();
 			unset( $edited_GoalCategory );
 			forget_param( 'gcat_ID' );
@@ -368,7 +368,7 @@ switch( $action )
 		}
 		else
 		{ // not confirmed, Check for restrictions:
-			if( ! $edited_GoalCategory->check_delete( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget('name') ) ) )
+			if( ! $edited_GoalCategory->check_delete( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget( 'name' ) ) ) )
 			{ // There are restrictions:
 				$action = 'view';
 			}
@@ -428,7 +428,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Goal->confirm_delete(
-				sprintf( T_('Delete goal &laquo;%s&raquo;?'), $edited_Goal->dget('name') ),
+				sprintf( T_('Delete goal &laquo;%s&raquo;?'), $edited_Goal->dget( 'name' ) ),
 				'goal', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
@@ -444,7 +444,7 @@ switch( $action )
 	case 'cat_delete':
 		// We need to ask for confirmation:
 		$edited_GoalCategory->confirm_delete(
-				sprintf( T_('Delete goal category &laquo;%s&raquo;?'), $edited_GoalCategory->dget('name') ),
+				sprintf( T_('Delete goal category &laquo;%s&raquo;?'), $edited_GoalCategory->dget( 'name' ) ),
 				'goalcat', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'cat_new':

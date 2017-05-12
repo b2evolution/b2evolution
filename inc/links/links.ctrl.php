@@ -281,7 +281,8 @@ switch( $action )
 
 // require colorbox js
 require_js_helper( 'colorbox' );
-// require File Uploader js and css
+// require File Uploader js and css:
+init_fileuploader_js_lang_strings();
 require_js( 'multiupload/fileuploader.js' );
 require_css( 'fileuploader.css' );
 if( $action == 'edit_links' )

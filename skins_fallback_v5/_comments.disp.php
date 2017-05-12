@@ -41,6 +41,8 @@ $params = array_merge( array(
 	), $params );
 
 
+global $CommentList;
+
 $CommentList = new CommentList2( $Blog );
 
 // Filter list:

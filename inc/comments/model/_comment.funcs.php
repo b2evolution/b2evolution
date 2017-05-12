@@ -851,7 +851,6 @@ function echo_comment_replies( $comment_ID, $params, $level = 1 )
 	$params = array_merge( array(
 			'redirect_to'        => NULL,
 			'save_context'       => false,
-			'comment_index'      => NULL,
 			'display_meta_title' => false,
 		), $params );
 
@@ -859,11 +858,7 @@ function echo_comment_replies( $comment_ID, $params, $level = 1 )
 	{	// Loop through the replies:
 
 		// Display a comment:
-		echo_comment( $Comment, $params['redirect_to'], $params['save_context'], $params['comment_index'], $params['display_meta_title'], $level );
-		if( $params['comment_index'] !== false )
-		{	// Decrease a comment index only when it is requested:
-			$params['comment_index']--;
-		}
+		echo_comment( $Comment, $params['redirect_to'], $params['save_context'], $Comment->get_inlist_order(), $params['display_meta_title'], $level );
 
 		// Display the rest replies recursively:
 		echo_comment_replies( $Comment->ID, $params, $level + 1 );
@@ -1580,7 +1575,7 @@ function comment_edit_actions( $Comment )
 			{
 				$edit_url = $admin_url.'?ctrl=comments&amp;comment_ID='.$Comment->ID.'&amp;action=edit&amp;redirect_to='.$redirect_to;
 			}
-			$r .= action_icon( TS_('Edit this comment...'), 'properties', $edit_url );
+			$r .= action_icon( TS_('Edit this comment').'...', 'properties', $edit_url );
 		}
 
 		if( $user_has_delete_perm )
@@ -1588,7 +1583,7 @@ function comment_edit_actions( $Comment )
 			$params = array();
 			if( $Comment->status == 'trash' )
 			{ // Comment is already in the recycle bin, display delete action and add js confirm
-				$title = T_('Delete this comment!');
+				$title = T_('Delete this comment').'!';
 				$params['onclick'] = "return confirm('".TS_('You are about to delete this comment!\\nThis cannot be undone!')."')";
 			}
 			else

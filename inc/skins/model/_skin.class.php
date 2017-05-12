@@ -276,7 +276,22 @@ class Skin extends DataObject
 						'error'   => T_('Invalid color code.')
 					);
 			}
-			autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'input_group' )
+			{
+				if( ! empty( $parmeta['inputs'] ) )
+				{
+					foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
+					{
+						$l_parmeta['group'] = $parname; // inject group into meta
+						autoform_set_param_from_request( $l_parname, $l_parmeta, $this, 'Skin' );
+					}
+				}
+			}
+			else
+			{
+				autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+			}
 		}
 	}
 
@@ -760,14 +775,20 @@ class Skin extends DataObject
 	 * Get a skin specific param value from current Blog
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string|array|NULL
 	 */
-	function get_setting( $parname )
+	function get_setting( $parname, $group = NULL )
 	{
 		global $Collection, $Blog, $Settings;
 
-		// Name of the setting in the settings:
-		$setting_name = 'skin'.$this->ID.'_'.$parname;
+		if( ! empty( $group ) )
+		{ // $parname is prefixed with $group, we'll remove the group prefix
+			$parname = str_replace( $group, '', $parname );
+		}
+
+		// Name of the setting in the blog settings:
+		$setting_name = 'skin'.$this->ID.'_'.$group.$parname;
 
 		if( isset( $Blog ) && $this->provides_collection_skin() )
 		{	// Get skin settings of the current collection only if skin is provided for collections:
@@ -787,7 +808,7 @@ class Skin extends DataObject
 			return $value;
 		}
 
-		return $this->get_setting_default_value( $parname );
+		return $this->get_setting_default_value( $parname, $group );
 	}
 
 
@@ -795,9 +816,10 @@ class Skin extends DataObject
 	 * Get a skin specific param default value
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string|array|NULL
 	 */
-	function get_setting_default_value( $parname )
+	function get_setting_default_value( $parname, $group = NULL )
 	{
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
@@ -825,6 +847,14 @@ class Skin extends DataObject
 						$default_File = & get_file_by_abspath( $params[ $parname ]['initialize_with'], true ) )
 		{ // Get default value for fileselect
 			return $default_File->ID;
+		}
+		elseif( ! empty( $group ) &&
+						isset( $params[ $group ]['type'] ) &&
+						$params[ $group ]['type'] == 'input_group' &&
+						! empty( $params[ $group ]['inputs'] ) &&
+						isset( $params[ $group ]['inputs'][ $parname ] ) )
+		{
+			return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
 		}
 
 		return NULL;
@@ -1278,6 +1308,7 @@ class Skin extends DataObject
 					}
 
 					// Require File Uploader js and css:
+					init_fileuploader_js_lang_strings();
 					require_js( 'multiupload/fileuploader.js', 'blog' );
 					require_css( 'fileuploader.css', 'blog' );
 					// Load JS files to make the links table sortable:
@@ -1480,7 +1511,7 @@ var downloadInterval = setInterval( function()
 									.'</ul></div>',
 								'header_text_single' => '',
 							'header_end' => '',
-							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
+							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 							'global_icons_class' => 'btn btn-default btn-sm',
 							'filters_start'        => '<div class="filters panel-body">',
 							'filters_end'          => '</div>',
@@ -1553,8 +1584,8 @@ var downloadInterval = setInterval( function()
 								'next_text' => T_('Next'),
 								'no_prev_text' => '',
 								'no_next_text' => '',
-								'list_prev_text' => T_('...'),
-								'list_next_text' => T_('...'),
+								'list_prev_text' => '...',
+								'list_next_text' => '...',
 								'list_span' => 11,
 								'scroll_list_range' => 5,
 							'footer_end' => "\n\n",
@@ -1898,8 +1929,8 @@ var downloadInterval = setInterval( function()
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",

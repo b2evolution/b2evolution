@@ -142,8 +142,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_lastedit_user_ID       int(11) unsigned NULL,
 			post_assigned_user_ID       int(11) unsigned NULL,
 			post_dateset                tinyint(1) NOT NULL DEFAULT 1,
-			post_datestart              DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
-			post_datedeadline           datetime NULL,
+			post_datestart              TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			post_datedeadline           TIMESTAMP NULL,
 			post_datecreated            TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_datemodified           TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_last_touched_ts        TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
@@ -213,7 +213,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_author_url         varchar(255) NULL,
 			comment_author_IP          varchar(45) COLLATE ascii_general_ci NOT NULL default '',"/* IPv4 mapped IPv6 addresses maximum length is 45 chars: ex. ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190 */."
 			comment_IP_ctry_ID         int(10) unsigned NULL,
-			comment_date               datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
+			comment_date               TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			comment_last_touched_ts    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			comment_content            text NOT NULL,
 			comment_renderers          VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
@@ -278,7 +278,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			iver_ID            INT UNSIGNED NOT NULL,
 			iver_itm_ID        INT UNSIGNED NOT NULL,
 			iver_edit_user_ID  INT UNSIGNED NULL,
-			iver_edit_datetime DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
+			iver_edit_datetime TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			iver_status        ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NULL,
 			iver_title         VARCHAR(255) NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			iver_content       MEDIUMTEXT NULL,
@@ -341,8 +341,9 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_ityp_ID INT(11) UNSIGNED NOT NULL,
 			itcf_label   VARCHAR(255) NOT NULL,
 			itcf_name    VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
-			itcf_type    ENUM( 'double', 'varchar', 'text', 'html' ) COLLATE ascii_general_ci NOT NULL,
+			itcf_type    ENUM( 'double', 'varchar', 'text', 'html', 'url' ) COLLATE ascii_general_ci NOT NULL,
 			itcf_order   INT NULL,
+			itcf_note    VARCHAR(255) NULL DEFAULT NULL,
 			PRIMARY KEY ( itcf_ID ),
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -504,8 +505,8 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for Links',
 		"CREATE TABLE T_links (
 			link_ID               int(11) unsigned  not null AUTO_INCREMENT,
-			link_datecreated      datetime          not null DEFAULT '2000-01-01 00:00:00',
-			link_datemodified     datetime          not null DEFAULT '2000-01-01 00:00:00',
+			link_datecreated      TIMESTAMP         NOT NULL DEFAULT '2000-01-01 00:00:00',
+			link_datemodified     TIMESTAMP         NOT NULL DEFAULT '2000-01-01 00:00:00',
 			link_creator_user_ID  int(11) unsigned  NULL,
 			link_lastedit_user_ID int(11) unsigned  NULL,
 			link_itm_ID           int(11) unsigned  NULL,

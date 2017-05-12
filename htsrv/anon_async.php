@@ -780,7 +780,7 @@ switch( $action )
 		$Form->output = true;
 
 		global $user_fields_empty_name;
-		$user_fields_empty_name = T_('Select...');
+		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
 
 		$Form->select( 'criteria_type[]', '', 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
 
@@ -1196,6 +1196,12 @@ switch( $action )
 		// Display icon with new status
 		echo $accept_icon;
 
+		break;
+
+	case 'get_regform_crumb':
+		// Get crumb value for register form:
+		// (Used for widget "Email capture / Quick registration" when page caching is enabled)
+		echo get_crumb( 'regform' );
 		break;
 
 	case 'get_user_salt':

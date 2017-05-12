@@ -188,7 +188,7 @@ class qqUploadedFileForm
 
 function out_echo( $message ,$specialchars )
 {
-	$message['text'] = base64_encode( $message['text'] );
+	$message['text'] = $message['text'];
 	if( $specialchars == 1 )
 	{
 		$message['specialchars'] = 1;

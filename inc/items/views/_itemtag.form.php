@@ -44,15 +44,15 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'itemtag_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', ( $return_to ? $return_to : $admin_url.'?ctrl=itemtags' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', ( $return_to ? $return_to : $admin_url.'?ctrl=itemtags' ) );
 
-$Form->begin_form( 'fform', ( $creating ?  T_('New Tag') : T_('Tag') ).get_manual_link( 'item-tag-form' ) );
+$Form->begin_form( 'fform', ( $creating ?  T_('New Tag') : /* TRANS: noun */ T_('Tag') ).get_manual_link( 'item-tag-form' ) );
 
 	$Form->add_crumb( 'tag' );
 	$Form->hidden( 'action',  $creating ? 'create' : 'update' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',tag_ID' : '' ) ) );
 
-	$Form->text_input( 'tag_name', $edited_ItemTag->get( 'name' ), 50, T_('Tag'), '', array( 'maxlength' => 255, 'required' => true ) );
+	$Form->text_input( 'tag_name', $edited_ItemTag->get( 'name' ), 50, /* TRANS: noun */ T_('Tag'), '', array( 'maxlength' => 255, 'required' => true ) );
 
 $Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 

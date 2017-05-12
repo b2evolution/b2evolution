@@ -27,7 +27,7 @@ class adsense_plugin extends Plugin
 	var $help_url = 'http://b2evolution.net/blog-ads/adsense-plugin.php';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.7.9';
+	var $version = '6.9.2';
 	var $number_of_installs = 1;
 
 	/**
@@ -82,7 +82,7 @@ class adsense_plugin extends Plugin
 					'label' => 'Auto blocks',
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
-					'note' => T_('Automatically add an ad block in the middle of any post that has no [adsense:] tag yet.'),
+					'note' => T_('Automatically add an ad block in the middle of any post that has no <code>[adsense:]</code> tag yet.'),
 				),
 			);
 

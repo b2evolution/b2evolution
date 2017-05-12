@@ -69,7 +69,7 @@ class item_info_line_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		return format_to_output( T_('Item info line') );
+		return format_to_output( T_('Item Info Line') );
 	}
 
 
@@ -319,7 +319,7 @@ class item_info_line_Widget extends ComponentWidget
 		if( $this->disp_params['last_touched'] )
 		{
 			echo '<span class="text-muted"> &ndash; '
-				.T_('Last touched:').' '
+				.T_('Last touched').': '
 				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) )
 				.'</span>';
 		}
