@@ -683,7 +683,7 @@ class ComponentWidget extends DataObject
 							$params[ $widget_wrapper_start ] = update_html_tag_attribs( $params[ $widget_wrapper_start ], $designer_mode_data );
 							if( isset( $this->disp_params[ $widget_wrapper_start ] ) )
 							{	// Also update params if they already have been initialized before:
-								$this->disp_params[ $widget_wrapper_start ] = $params[ $widget_wrapper_start ];
+								$this->disp_params[ $widget_wrapper_start ] = update_html_tag_attribs( $this->disp_params[ $widget_wrapper_start ], $designer_mode_data );
 							}
 							if( ! $wrapper_is_found )
 							{	// Use these first found wrappers for debug message of empty content case:

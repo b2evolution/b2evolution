@@ -26,7 +26,7 @@ jQuery( document ).on( 'mouseover', '.evo_widget', function()
 	if( ! jQuery( container_block_selector ).length )
 	{	// Only if it was not create for another widget from the same container:
 		jQuery( '.evo_widget__designer_blocks' ).append( '<div class="evo_container__designer_block" data-name="' + widget.data( 'container' ) + '">' +
-				'<div><div class="evo_container__designer_name">' + widget.data( 'container' ) + '</div></div>' +
+				'<div><div class="evo_container__designer_name">Container: ' + widget.data( 'container' ) + '</div></div>' +
 			'</div>' );
 	}
 
@@ -346,10 +346,10 @@ function evo_widget_update_designer_position( widget )
 	var container = widget.parent();
 	jQuery( evo_widget_container_block_selector( widget ) )
 		.css( {
-			'top': container.offset().top - 6,
-			'left': container.offset().left - 6,
-			'width': container.width() + 13,
-			'height': container.height() + 13,
+			'top': container.offset().top - 3,
+			'left': container.offset().left - 3,
+			'width': container.width() + 6,
+			'height': container.height() + 6,
 		} )
 		.show();
 }
