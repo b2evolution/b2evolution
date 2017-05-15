@@ -325,6 +325,28 @@ $slide_down.on( "click", function(event) {
 		scrollTop: $("#slide_destination").offset().top +26
 	}, 1000);
 });
+
+jQuery( document ).ready( function()
+{
+	// Check if .slide-top div exists (used to name back-to-top button)
+	if( $( '.slide-top' )[0] ) {
+		// Scroll to Top
+		// This skin needs to override the default scroll-top script because the `height: 100%` and `overflow: hidden` both exist on disp=front
+		// ======================================================================== /
+		// hide or show the "scroll to top" link
+		$( "body, html, #skin_wrapper" ).scroll( function() {
+			( $(this).scrollTop() > offset ) ? $slide_top.addClass("slide-top-visible") : $slide_top.removeClass("slide-top-visible");
+		});
+
+		-// Smooth scroll to top
+		$( ".slide-top" ).on( "click", function(event) {
+			event.preventDefault();
+			$( "body, html, #skin_wrapper" ).animate({
+				scrollTop: 0,
+			}, scroll_top_duration );
+		});
+	}
+} );
 </script>
 
 <?php
