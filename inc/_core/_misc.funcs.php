@@ -5884,7 +5884,7 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 		    ! ( $baseurl_info = parse_url( $baseurl ) ) || empty( $baseurl_info['host'] ) ||
 		    ( $baseurl_info['host'] != $referer_url['host'] ) )
 		{	// Deny request from other server:
-			echo 'alert( \''.sprintf( T_('This action can only be performed with HTTP_REFERER = %s'), $baseurl ).' \');';
+			echo 'alert( \''.sprintf( TS_('This action can only be performed with HTTP_REFERER = %s'), $baseurl ).' \');';
 		}
 		else
 		{	// Send JS content only for allowed referer:
