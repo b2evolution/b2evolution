@@ -157,6 +157,7 @@ class flag_menu_link_Widget extends generic_menu_link_Widget
 
 		if( ! is_logged_in() )
 		{	// Only logged in user can flag items:
+			$this->display_debug_message( 'Hidden(Not logged in)' );
 			return false;
 		}
 
@@ -178,16 +179,19 @@ class flag_menu_link_Widget extends generic_menu_link_Widget
 
 		if( empty( $current_Blog ) )
 		{	// Don't use this widget without current collection:
+			$this->display_debug_message( 'Hidden(No collection)' );
 			return false;
 		}
 
 		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
 		{	// Don't use this widget because current user has no access to the collection:
+			$this->display_debug_message( 'Hidden(No access)' );
 			return false;
 		}
 
 		if( $this->disp_params['hide_empty'] && $current_User->get_flagged_items_count() == 0 )
 		{	// Hide this menu if current user has no flagged posts yet:
+			$this->display_debug_message( 'Hidden(No flagged posts)' );
 			return false;
 		}
 

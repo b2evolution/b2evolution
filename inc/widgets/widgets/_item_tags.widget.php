@@ -138,12 +138,13 @@ class item_tags_Widget extends ComponentWidget
 	{
 		global $Item;
 
+		$this->init_display( $params );
+
 		if( empty( $Item ) )
 		{ // Don't display this widget when no Item object
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item object.' );
+			return false;
 		}
-
-		$this->init_display( $params );
 
 		// We renamed some params; older skin may use the old names; let's convert those params now:
 		$this->convert_legacy_param( 'widget_coll_item_tags_before', 'widget_item_tags_before' );

@@ -233,8 +233,9 @@ class social_links_Widget extends ComponentWidget
 		}
 
 		if( empty( $r ) )
-		{ // Nothing to display
-			return true;
+		{	// Nothing to display
+			$this->display_debug_message();
+			return false;
 		}
 
 		echo $this->disp_params['block_start'];

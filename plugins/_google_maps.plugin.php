@@ -927,8 +927,27 @@ function locate()
 	{
 		global $Collection, $Blog, $Item;
 
+		/**
+		 * Default params:
+		 */
+		$params = array_merge( array(
+				// This is what will enclose the block in the skin:
+				'block_start'       => '<div class="evo_widget widget $wi_class$">',
+				'block_end'         => "</div>\n",
+				// Title:
+				'block_title_start' => '<h4>',
+				'block_title_end'   => '</h4>',
+				// This is what will enclose the body:
+				'block_body_start'  => '',
+				'block_body_end'    => '',
+			), $params );
+
+		$widget_title = $this->get_widget_setting( 'map_title', $params );
+		$params['title'] = $widget_title;
+
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because there is no Item.', $params );
 			return;
 		}
 
@@ -936,6 +955,7 @@ function locate()
 
 		if( $Item->get_type_setting( 'use_coordinates' ) == 'never' )
 		{	// Coordinates are not allowed for the item type:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because coordinates are not allowed for the item type.', $params );
 			return;
 		}
 
@@ -943,6 +963,7 @@ function locate()
 		$lng = $Item->get_setting( 'longitude' );
 		if( empty( $lat ) && empty( $lng ) )
 		{	// Coordinates must be defined for the viewed Item:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because coordinates must be defined for the viewed Item.', $params );
 			return;
 		}
 
@@ -952,6 +973,16 @@ function locate()
 		$height = $this->display_param($this->get_widget_setting('height_front', $params));
 		$height = 'height:'.$height;
 
+		echo $params['block_start'];
+
+		if( ! empty( $widget_title ) )
+		{
+			echo $params['block_title_start'];
+			echo $widget_title;
+			echo $params['block_title_end'];
+		}
+
+		echo $params['block_body_start'];
 		?>
 		<div class="map_title"><?php echo $this->get_widget_setting('map_title_coll'.$Blog->ID, $params); ?></div>
 		<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
@@ -1000,6 +1031,9 @@ function locate()
 				});
 			</script>
 			<?php
+
+		echo $params['block_body_end'];
+		echo $params['block_end'];
 	}
 
 	/**

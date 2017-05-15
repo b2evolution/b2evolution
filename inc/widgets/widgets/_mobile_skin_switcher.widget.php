@@ -125,26 +125,22 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 
 		global $ReqURI, $Session, $Collection, $Blog;
 
-		if( empty( $Blog ) )
-		{ // Blog must be defined
-			return;
-		}
+		$this->init_display( $params );
 
 		$is_mobile_session = $Session->is_mobile_session();
 		$is_tablet_session = $Session->is_tablet_session();
 
-		if( ( ! $is_mobile_session && ! $is_tablet_session )
+		if( empty( $Blog )
+		 || ( ! $is_mobile_session && ! $is_tablet_session )
 		 || ( $is_mobile_session && $Blog->get_setting( 'mobile_skin_ID', true ) < 1 )
 		 || ( $is_tablet_session && $Blog->get_setting( 'tablet_skin_ID', true ) < 1 ) )
-		{ // Display the switcher only for mobile/tablet devices and when the mobile/tablet skins are defined
-			return;
+		{	// Display the switcher only for mobile/tablet devices and when the mobile/tablet skins are defined:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is disabled because it is only for mobile/tablet devices and when the mobile/tablet skins are defined.' );
+			return false;
 		}
 
 		$force_skin = $Session->get( 'force_skin' );
 
-		$this->init_display( $params );
-
-		// Collection common links:
 		echo $this->disp_params['block_start'];
 
 		if( empty( $force_skin ) || $force_skin == 'mobile' || $force_skin == 'tablet' )

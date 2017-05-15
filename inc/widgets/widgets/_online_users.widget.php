@@ -101,9 +101,10 @@ class online_users_Widget extends ComponentWidget
 	{
 		global $DB, $Settings, $UserSettings, $localtimenow;
 
-		if( ( !$this->get_param( 'allow_anonymous' ) ) && ( !is_logged_in() ) )
-		{ // display only for logged in users
-			return;
+		if( ! $this->get_param( 'allow_anonymous' ) && ! is_logged_in() )
+		{	// Display only for logged in users:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because you have no access.' );
+			return false;
 		}
 
 		// load online Users

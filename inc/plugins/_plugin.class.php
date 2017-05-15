@@ -3774,6 +3774,48 @@ class Plugin
 
 
 	/**
+	 * Display widget debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_widget_debug_message( $message = NULL, $params = array() )
+	{
+		/**
+		 * Default params:
+		 */
+		$params = array_merge( array(
+				// This is what will enclose the block in the skin:
+				'block_start'       => '<div class="evo_widget widget $wi_class$">',
+				'block_end'         => "</div>\n",
+				// Title:
+				'block_title_start' => '<h4>',
+				'title'             => '',
+				'block_title_end'   => '</h4>',
+				// This is what will enclose the body:
+				'block_body_start'  => '',
+				'block_body_end'    => '',
+				// Widget debug mode: 'normal', 'designer'
+				'debug_mode'        => 'normal',
+			), $params );
+
+		if( $params['debug_mode'] == 'designer' )
+		{	// Display message on designer mode:
+			echo $params['block_start'];
+			if( ! empty( $params['title'] ) )
+			{	// Display title:
+				echo $params['block_title_start'];
+				echo $params['title'];
+				echo $params['block_title_end'];
+			}
+			echo $params['block_body_start'];
+			echo $message;
+			echo $params['block_body_end'];
+			echo $params['block_end'];
+		}
+	}
+
+
+	/**
 	 * PHP5 overloading of get method to lazy-load (User)Settings, when they get
 	 * accessed.
 	 *

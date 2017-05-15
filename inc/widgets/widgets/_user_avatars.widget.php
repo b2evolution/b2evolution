@@ -382,8 +382,11 @@ class user_avatars_Widget extends ComponentWidget
 			$r .= $this->get_layout_item_end( $count );
 		}
 
-		// Exit if no files found
-		if( empty($r) ) return;
+		if( empty( $r ) )
+		{	// Exit if no files found:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there no users found with avatars.' );
+			return;
+		}
 
 		echo $this->disp_params[ 'block_start'];
 

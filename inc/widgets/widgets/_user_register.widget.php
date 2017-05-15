@@ -164,6 +164,7 @@ class user_register_Widget extends ComponentWidget
 
 		if( is_logged_in() )
 		{	// No display when user is already registered
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because you are already registered.' );
 			return false;
 		}
 

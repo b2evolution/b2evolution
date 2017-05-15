@@ -220,8 +220,13 @@ class coll_featured_intro_Widget extends ComponentWidget
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
 			// ----------------------------END ITEM BLOCK  ----------------------------
+			return true;
 		}
-
+		else
+		{	// No featured Item:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no featured/intro post to display' );
+			return false;
+		}
 	}
 
 
@@ -240,6 +245,26 @@ class coll_featured_intro_Widget extends ComponentWidget
 				'user_ID' => (is_logged_in() ? $current_User->ID : 0), // Has the current User changed?
 				'intro_feat_coll_ID' => empty($this->disp_params['blog_ID']) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the intro/featured post changed ?
 			);
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			echo $this->disp_params['block_body_start'];
+			echo $this->disp_params['featured_intro_before'];
+			echo $message;
+			echo $this->disp_params['featured_intro_after'];
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 ?>

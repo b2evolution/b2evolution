@@ -231,12 +231,14 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 		}
 
 		if( empty( $current_Blog ) )
-		{ // Don't use this widget without current collection:
+		{	// Don't use this widget without current collection:
+			$this->display_debug_message( 'Hidden(No collection)' );
 			return false;
 		}
 
 		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
 		{	// Don't use this widget because current user has no access to the collection:
+			$this->display_debug_message( 'Hidden(No access)' );
 			return false;
 		}
 
@@ -247,12 +249,14 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 			case 'loggedin':
 				if( !is_logged_in() )
 				{
+					$this->display_debug_message( 'Hidden(Not logged in)' );
 					return false;
 				}
 				break;
 			case 'perms':
 				if( !is_logged_in() || !$current_User->check_perm( 'perm_messaging', 'reply', false ) )
 				{
+					$this->display_debug_message( 'Hidden(No access)' );
 					return false;
 				}
 				break; // display

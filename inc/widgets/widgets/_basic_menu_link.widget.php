@@ -254,12 +254,14 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		}
 
 		if( empty( $current_Blog ) )
-		{ // We cannot use this widget without a current collection:
+		{	// We cannot use this widget without a current collection:
+			$this->display_debug_message();
 			return false;
 		}
 
 		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
 		{	// Don't use this widget because current user has no access to the collection:
+			$this->display_debug_message();
 			return false;
 		}
 
@@ -280,7 +282,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 						{
 							$Widget->init_display( $params );
 							if( isset( $Widget->param_array, $Widget->param_array['link_type'] ) && $Widget->param_array['link_type'] == 'home' )
-							{ // Don't display this menu if 'Blog home' menu item exists with the same url
+							{	// Don't display this menu if 'Blog home' menu item exists with the same url:
+								$this->display_debug_message();
 								return false;
 							}
 						}
@@ -342,8 +345,9 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				break;
 
 			case 'latestcomments':
-				if( !$current_Blog->get_setting( 'comments_latest' ) )
-				{ // This page is disabled
+				if( ! $current_Blog->get_setting( 'comments_latest' ) )
+				{	// This page is disabled:
+					$this->display_debug_message();
 					return false;
 				}
 				$url = $current_Blog->get( 'lastcommentsurl' );
@@ -362,8 +366,9 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 			case 'ownercontact':
 				if( ! $url = $current_Blog->get_contact_url( true ) )
-				{ // user does not allow contact form:
-					return;
+				{	// Current user does not allow contact form:
+					$this->display_debug_message();
+					return false;
 				}
 				$text = T_('Contact');
 				// Check if current menu item must be highlighted:
@@ -375,6 +380,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'login':
 				if( is_logged_in() )
 				{ // Don't display this link for already logged in users
+					$this->display_debug_message();
 					return false;
 				}
 				global $Settings;
@@ -392,7 +398,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 			case 'logout':
 				if( ! is_logged_in() )
-				{
+				{	// Current user must be logged in:
+					$this->display_debug_message();
 					return false;
 				}
 				$url = get_user_logout_url( $current_Blog->ID );
@@ -403,7 +410,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 			case 'register':
 				if( ! $url = get_user_register_url( NULL, 'menu link', false, '&amp;', $current_Blog->ID ) )
-				{
+				{	// If registration is not allowed:
+					$this->display_debug_message();
 					return false;
 				}
 				if( isset( $this->BlockCache ) )
@@ -419,7 +427,11 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				break;
 
 			case 'profile':
-				if( ! is_logged_in() ) return false;
+				if( ! is_logged_in() )
+				{	// Current user must be logged in:
+					$this->display_debug_message();
+					return false;
+				}
 				$url = get_user_profile_url( $current_Blog->ID );
 				$text = T_('Edit profile');
 				// Check if current menu item must be highlighted:
@@ -427,7 +439,11 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				break;
 
 			case 'avatar':
-				if( ! is_logged_in() ) return false;
+				if( ! is_logged_in() )
+				{	// Current user must be logged in:
+					$this->display_debug_message();
+					return false;
+				}
 				$url = get_user_avatar_url( $current_Blog->ID );
 				$text = T_('Profile picture');
 				// Note: we never highlight this, it will always highlight 'profile' instead:
@@ -437,7 +453,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'users':
 				global $Settings, $user_ID;
 				if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) )
-				{	// Don't allow anonymous users to see users list
+				{	// Don't allow anonymous users to see users list:
+					$this->display_debug_message();
 					return false;
 				}
 				$url = $current_Blog->get( 'usersurl' );
@@ -456,7 +473,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				$item_ID = intval( $this->disp_params['item_ID'] );
 				$disp_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 				if( empty( $disp_Item ) )
-				{ // Item not found
+				{	// Item not found:
+					$this->display_debug_message();
 					return false;
 				}
 				$url = $disp_Item->get_permanent_url();
@@ -467,7 +485,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 			case 'url':
 				if( empty( $this->disp_params['link_href'] ) )
-				{ // Don't display a link if url is empty
+				{	// Don't display a link if url is empty:
+					$this->display_debug_message();
 					return false;
 				}
 				$url = $this->disp_params['link_href'];
@@ -479,6 +498,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'postnew':
 				if( ! check_item_perm_create( $current_Blog ) )
 				{	// Don't allow users to create a new post:
+					$this->display_debug_message();
 					return false;
 				}
 				$url = url_add_param( $current_Blog->get( 'url' ), 'disp=edit' );
@@ -490,7 +510,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'myprofile':
 				global $user_ID;
 				if( ! is_logged_in() )
-				{	// Don't show this link for not logged in users
+				{	// Don't show this link for not logged in users:
+					$this->display_debug_message();
 					return false;
 				}
 				$url = $current_Blog->get( 'userurl' );
@@ -504,7 +525,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'admin':
 				global $current_User;
 				if( ! ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_status( 'can_access_admin' ) ) )
-				{ // Don't allow admin url for users who have no access to backoffice
+				{	// Don't allow admin url for users who have no access to backoffice:
+					$this->display_debug_message();
 					return false;
 				}
 				global $admin_url;

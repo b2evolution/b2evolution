@@ -2,7 +2,7 @@
  * This file is used for widgets designer mode
  */
 
-jQuery( document ).on( 'mouseover', '.evo_widget', function()
+jQuery( document ).on( 'mouseover', '.evo_widget[data-id]', function()
 {	// Initialize and Show widget designer block:
 
 	// To be sure all previous designer blocks are hidden before show new one except of processing widgets:

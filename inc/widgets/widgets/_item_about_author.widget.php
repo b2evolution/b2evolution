@@ -172,14 +172,16 @@ class item_about_author_Widget extends ComponentWidget
 		global $Item;
 
 		if( empty( $Item ) )
-		{ // Don't display this widget when no Item object
+		{	// Don't display this widget when no Item object:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is disabled because there is no Item object.' );
 			return false;
 		}
 
 		$this->init_display( $params );
 
 		if( empty( $this->disp_params['user_field'] ) )
-		{ // Not defined user field in the widget settings
+		{	// Not defined user field in the widget settings:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is disabled because there is no defined widget param "user_field".' );
 			return false;
 		}
 
@@ -187,7 +189,8 @@ class item_about_author_Widget extends ComponentWidget
 		$creator_User = & $Item->get_creator_User();
 		$creator_User->userfields_load();
 		if( empty( $creator_User->userfields_by_type[ $this->disp_params['user_field'] ] ) )
-		{ // No user field by ID for current author
+		{	// No user field by ID for current author:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is disabled because there is no defined widget param "user_field".' );
 			return false;
 		}
 
@@ -198,7 +201,8 @@ class item_about_author_Widget extends ComponentWidget
 		$user_info .= '</div>';
 
 		if( empty( $user_info ) )
-		{ // No user info
+		{	// No user info:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no user info.' );
 			return false;
 		}
 

@@ -142,7 +142,8 @@ class item_vote_Widget extends ComponentWidget
 
 		if( empty( $widget_Item ) || ! $widget_Item->can_vote() )
 		{	// Don't display the voting panel if a voting on the item is not allowed by some reason:
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because a voting on the item is not allowed by some reason.' );
+			return false;
 		}
 
 		echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );

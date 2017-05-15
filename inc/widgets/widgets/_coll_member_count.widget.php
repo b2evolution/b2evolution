@@ -72,17 +72,18 @@ class coll_member_count_Widget extends ComponentWidget
 	{
 		global $Collection, $Blog;
 
-		if( empty( $Blog ) || $Blog->get_setting( 'allow_access' ) != 'members' )
-		{ // Use this widget only when blog is allowed only for members
-			return;
-		}
-
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( array(
 				'before'    => ' ',
 				'after'     => ' ',
 			), $this->disp_params );
+
+		if( empty( $Blog ) || $Blog->get_setting( 'allow_access' ) != 'members' )
+		{	// Use this widget only when blog is allowed only for members:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because of collection restriction.' );
+			return false;
+		}
 
 		echo $this->disp_params['before'];
 
@@ -150,5 +151,21 @@ class coll_member_count_Widget extends ComponentWidget
 				'wi_ID'       => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID' => 'any',     // Have the settings of ANY blog changed ? (ex: new skin here, new name on another)
 			);
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['before'];
+			echo $message;
+			echo $this->disp_params['after'];
+		}
 	}
 }

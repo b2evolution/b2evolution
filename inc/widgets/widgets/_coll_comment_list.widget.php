@@ -253,8 +253,31 @@ class coll_comment_list_Widget extends ComponentWidget
 			return true;
 		}
 		else
-		{ // there are no comments to display
+		{	// If there are no comments to display:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no comments to display.' );
 			return false;
+		}
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			echo $this->disp_params['block_body_start'];
+			echo $this->disp_params['list_start'];
+			echo $this->disp_params['item_start'];
+			echo $message;
+			echo $this->disp_params['item_end'];
+			echo $this->disp_params['list_end'];
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
 		}
 	}
 }

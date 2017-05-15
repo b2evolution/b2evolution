@@ -76,6 +76,11 @@ class ComponentWidget extends DataObject
 	*/
 	var $Blog = NULL;
 
+	/**
+	 * @var Mode: 'designer' or 'normal'
+	 */
+	var $mode = 'normal';
+
 
 	/**
 	 * Constructor
@@ -637,6 +642,10 @@ class ComponentWidget extends DataObject
 			}
 			// Don't load a widget content from cache when designer mode is enabled:
 			$force_nocaching = true;
+			// Set designer mode:
+			$this->mode = 'designer';
+			// Set this param for plugin widgets:
+			$this->disp_params['debug_mode'] = $this->mode;
 		}
 
 		if( $force_nocaching
@@ -1259,6 +1268,30 @@ class ComponentWidget extends DataObject
 		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Display' );
 
 		return $content;
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			if( $message === NULL )
+			{	// Set default message:
+				$message = 'Widget "'.$this->get_name().'" is hidden because there is nothing to display.';
+			}
+
+			echo $this->disp_params['block_start'];
+			$this->disp_title();
+			echo $this->disp_params['block_body_start'];
+			echo $message;
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 ?>

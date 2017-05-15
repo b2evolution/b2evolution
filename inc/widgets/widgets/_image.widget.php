@@ -225,8 +225,9 @@ class image_Widget extends ComponentWidget
 
 
 		if( $this->disp_params['check_file'] && empty( $image_url ) )
-		{ // Logo file doesn't exist, Exit here because of widget setting requires this
-			return true;
+		{	// Logo file doesn't exist, Exit here because of widget setting requires this:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no image to display.' );
+			return false;
 		}
 
 		$this->init_display( $params );
@@ -252,6 +253,22 @@ class image_Widget extends ComponentWidget
 		echo $this->disp_params['block_end'];
 
 		return true;
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			echo $message;
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 
