@@ -31,8 +31,16 @@ if( ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name
 	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
 }
 
-$Form->begin_form( 'fform', sprintf( $creating ?  T_('New widget "%s" in container "%s"') : T_('Edit widget "%s" in container "%s"'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get( 'sco_name' ) )
-		.' '.action_icon( T_('Open relevant page in online manual'), 'manual', $edited_ComponentWidget->get_help_url(), NULL, 5, NULL, array( 'target' => '_blank' ) ) );
+if( $display_mode == 'iframe' )
+{	// Don't display this title because it is displayed on modal window header:
+	$form_title = '';
+}
+else
+{	// Set form title for all other display modes:
+	$form_title = sprintf( $creating ?  T_('New widget "%s" in container "%s"') : T_('Edit widget "%s" in container "%s"'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get( 'sco_name' ) )
+		.' '.action_icon( T_('Open relevant page in online manual'), 'manual', $edited_ComponentWidget->get_help_url(), NULL, 5, NULL, array( 'target' => '_blank' ) );
+}
+$Form->begin_form( 'fform', $form_title );
 
 // Plugin widget form event:
 $Plugins->trigger_event( 'WidgetBeginSettingsForm', array(

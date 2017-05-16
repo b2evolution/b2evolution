@@ -13,10 +13,13 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $container;
+global $container, $display_mode;
 
-echo '<h2><span class="right_icons">'.action_icon( T_('Cancel').'!', 'close', regenerate_url( 'container' ) ).'</span>'
-	.sprintf(T_('Widgets available for insertion into &laquo;%s&raquo;'), $container ).'</h2>';
+if( $display_mode != 'iframe' )
+{	// Don't display this title because it is displayed on modal window header:
+	echo '<h2><span class="right_icons">'.action_icon( T_('Cancel').'!', 'close', regenerate_url( 'container' ) ).'</span>'
+		.sprintf(T_('Widgets available for insertion into &laquo;%s&raquo;'), $container ).'</h2>';
+}
 
 
 /**
@@ -135,6 +138,8 @@ $core_componentwidget_defs = array(
 		),
 );
 
+// Set additional param to add new widget:
+$display_mode_url_param = $display_mode == 'iframe' ? '&amp;display_mode=iframe' : '';
 
 foreach( $widget_groups as $widget_group_code => $widget_group_title )
 {
@@ -159,7 +164,7 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 			$ComponentWidget = new $classname( NULL, 'core', $widget_code );
 
 			echo '<li>';
-			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
+			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.$display_mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
 			echo get_icon( 'new' ).' <strong>'.$ComponentWidget->get_name().'</strong>';
 			echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span> '.$ComponentWidget->get_help_link( 'manual', false );
 			echo '</li>';
@@ -172,7 +177,7 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 		foreach( $Plugin_array_grouped[ $widget_group_code ] as $Plugin )
 		{
 			echo '<li>';
-			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
+			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.$display_mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
 			echo get_icon( 'puzzle' ).' <strong>'.$Plugin->name.'</strong>';
 			echo '</a> <span class="notes">'.$Plugin->short_desc.'</span> '.$Plugin->get_help_link( '$widget_url', 'manual', false );
 			echo '</li>';

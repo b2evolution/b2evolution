@@ -89,6 +89,7 @@ switch( $action )
 		param( 'type', 'string', true );
 		param( 'code', 'string', true );
 	case 'new':
+	case 'add_list':
 		param( 'container', 'string', true, true );	// memorize
 		// Change the symbols back to normal view as they are stored in DB
 		$container = str_replace( array( '_', '-' ), array( ' ', ':' ), $container );
@@ -174,6 +175,7 @@ switch( $action )
 	case 'nil':
 	case 'new':
 	case 'edit':
+	case 'add_list':
 		// Do nothing
 		break;
 
@@ -246,7 +248,7 @@ switch( $action )
 
 			case 'normal' :
 			default : // take usual action
-				header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID );
+				header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID.( $display_mode == 'iframe' ? '&display_mode=iframe' : '' ) );
 				break;
 		}
 		break;
@@ -695,6 +697,19 @@ switch( $action )
 
 				// End payload block:
 				$AdminUI->disp_payload_end();
+				break;
+		}
+		break;
+
+
+	case 'add_list':
+		// A list of widgets which can be added:
+		switch( $display_mode )
+		{
+			case 'iframe':
+				echo '<div class="available_widgets">'."\n";
+				$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
+				echo '</div>'."\n";
 				break;
 		}
 		break;

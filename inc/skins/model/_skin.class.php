@@ -319,6 +319,21 @@ class Skin extends DataObject
 		$timer_name = 'skin_container('.$sco_name.')';
 		$Timer->start( $timer_name );
 
+		// Enable the desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode"
+		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+		{	// Initialize hidden element with data which are used by JavaScript to build overlay designer mode html elements:
+			$designer_mode_data = array(
+					'style'     => 'display:none',
+					'class'     => 'evo_designer__container_data',
+					'data-name' => $sco_name,
+				);
+			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Set data to know current user has a permission to edit this widget:
+				$designer_mode_data['data-can-edit'] = 1;
+			}
+			echo '<div'.get_field_attribs_as_string( $designer_mode_data ).'></div>';
+		}
+
 		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
 		if( $display_containers )
@@ -1407,13 +1422,18 @@ var downloadInterval = setInterval( function()
 			{	// Initialize this url var only when current user has a permission to edit widgets:
 				global $admin_url;
 				add_js_headline( 'var b2evo_widget_edit_url = "'.$admin_url.'?ctrl=widgets&action=edit&wi_ID=$wi_ID$";'
+					.'var b2evo_widget_add_url = "'.$admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&action=add_list&container=$container$";'
 					.'var b2evo_widget_blog = \''.$Blog->ID.'\';'
 					.'var b2evo_widget_crumb = \''.get_crumb( 'widget' ).'\';'
-					.'var b2evo_widget_icon_up = \''.format_to_js( get_icon( 'designer_widget_up', 'imgtag', array( 'class' => 'evo_widget__designer_move_up' ) ) ).'\';'
-					.'var b2evo_widget_icon_down = \''.format_to_js( get_icon( 'designer_widget_down', 'imgtag', array( 'class' => 'evo_widget__designer_move_down' ) ) ).'\';'
-					.'var b2evo_widget_icon_disable = \''.format_to_js( get_icon( 'minus', 'imgtag', array( 'class' => 'evo_widget__designer_disable', 'title' => T_('Disable') ) ) ).'\';'
+					.'var b2evo_widget_icon_up = \''.format_to_js( get_icon( 'designer_widget_up', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_up' ) ) ).'\';'
+					.'var b2evo_widget_icon_down = \''.format_to_js( get_icon( 'designer_widget_down', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_down' ) ) ).'\';'
+					.'var b2evo_widget_icon_disable = \''.format_to_js( get_icon( 'minus', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_disable', 'title' => T_('Disable') ) ) ).'\';'
+					.'var b2evo_widget_icon_add = \''.format_to_js( get_icon( 'add', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_add', 'title' => T_('Add Widget to container') ) ) ).'\';'
 					.'var evo_js_lang_close = \''.TS_('Close').'\';'
-					.'var evo_js_lang_loading = \''.TS_('Loading...').'\';' );
+					.'var evo_js_lang_loading = \''.TS_('Loading...').'\';'
+					.'var evo_js_lang_title_available_widgets = \''.sprintf( TS_('Widgets available for insertion into &laquo;%s&raquo;'), '$container_name$' ).'\';'
+					.'var evo_js_lang_title_edit_widget = \''.sprintf( TS_('Edit widget "%s" in container "%s"'), '$widget_name$', '$container_name$' ).'\';'
+					.'var evo_js_lang_confirm_reload_new_widget_changes = \''.TS_('Please confirm to reload current page to view widget changes.').'\';' );
 			}
 			require_js( 'src/evo_widget_designer.js', 'blog' );
 			require_js( 'communication.js', 'blog' );
