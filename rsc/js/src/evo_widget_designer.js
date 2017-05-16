@@ -21,7 +21,7 @@ jQuery( document ).on( 'ready', function()
 	} );
 } );
 
-jQuery( document ).on( 'mouseover', '.evo_container', function()
+jQuery( document ).on( 'mouseover', '.evo_container[data-name]', function()
 {	// Initialize and Show container designer block:
 	var container = jQuery( this );
 
@@ -101,6 +101,7 @@ jQuery( document ).on( 'mouseover', '.evo_designer__widget', function()
  * Open modal window with iframe
  *
  * @param string Frame url
+ * @param string Frame title
  * @param object Container
  */
 function evo_widget_open_modal_iframe( iframe_url, iframe_title, container )
@@ -179,7 +180,7 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__
 {	// Change an order of widget:
 	var designer_block = jQuery( this ).closest( '.evo_designer__widget' );
 	var widget = jQuery( evo_widget_selector( designer_block ) );
-	var order_type = jQuery( this ).hasClass( 'evo_widget__designer_move_up' ) ? 'up' : 'down';
+	var order_type = jQuery( this ).hasClass( 'evo_designer__action_order_up' ) ? 'up' : 'down';
 
 	// Mark current widget with process class:
 	designer_block.removeClass( 'evo_designer__status_failed' ).addClass( 'evo_designer__status_process' );

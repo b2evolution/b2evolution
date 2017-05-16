@@ -168,6 +168,7 @@ div.dev-blocks--belowtoolbar {
 }
 .evo_widget[data-id] {
   z-index: 10002;
+  position: relative;
 }
 .evo_designer__widget {
   z-index: 10003;
