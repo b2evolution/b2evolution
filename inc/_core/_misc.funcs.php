@@ -5878,7 +5878,18 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 		{	// Send headers only when they are not send yet to avoid an error:
 			headers_content_mightcache( 'text/javascript', 0 );		// Do NOT cache interactive communications.
 		}
-		echo $output;
+		global $baseurl;
+		if( empty( $_SERVER['HTTP_REFERER'] ) ||
+		    ! ( $referer_url = parse_url( $_SERVER['HTTP_REFERER'] ) ) || empty( $referer_url['host'] ) ||
+		    ! ( $baseurl_info = parse_url( $baseurl ) ) || empty( $baseurl_info['host'] ) ||
+		    ( $baseurl_info['host'] != $referer_url['host'] ) )
+		{	// Deny request from other server:
+			echo 'alert( \''.sprintf( TS_('This action can only be performed with HTTP_REFERER = %s'), $baseurl ).' \');';
+		}
+		else
+		{	// Send JS content only for allowed referer:
+			echo $output;
+		}
 	}
 
 	exit(0);
