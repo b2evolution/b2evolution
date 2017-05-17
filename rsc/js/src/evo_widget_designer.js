@@ -51,11 +51,17 @@ jQuery( document ).on( 'mouseover', '.evo_container[data-name]', function()
 
 jQuery( document ).on( 'mouseover', '.evo_widget[data-id]', function()
 {	// Initialize and Show widget designer block:
-
-	// To be sure all previous designer blocks are hidden before show new one except of processing widgets:
-	jQuery( '.evo_designer__container, .evo_designer__widget:not(.evo_designer__status_process):not(.evo_designer__status_failed)' ).hide();
-
 	var widget = jQuery( this );
+
+	if( jQuery( '.evo_designer.evo_designer__status_process[data-container="' + widget.data( 'container' ) + '"]' ).length ||
+	    jQuery( '.evo_designer.evo_designer__status_success[data-container="' + widget.data( 'container' ) + '"]' ).length )
+	{	// Don't show other widget designer block from the same container while previous one in process:
+		return;
+	}
+
+	// To be sure all previous designer blocks are hidden before show new one:
+	jQuery( '.evo_designer' ).hide();
+
 	var designer_block_selector = evo_widget_designer_block_selector( widget );
 	if( jQuery( designer_block_selector ).length )
 	{	// Just display a designer block if it already has been initialized previous time:
@@ -109,7 +115,8 @@ function evo_widget_open_modal_iframe( iframe_url, iframe_title, container )
 	openModalWindow( '<span class="loader_img loader_widget_designer absolute_center" title="' + evo_js_lang_loading + '"></span>' +
 		'<iframe id="evo_designer__iframe" src="' + iframe_url + '&display_mode=iframe" width="100%" height="90%" frameborder="0"></iframe>',
 		'90%', '90%', true, iframe_title, false, true );
-	jQuery( '#evo_designer__iframe' ).closest( '#modal_window' ).addClass( 'evo_designer__modal_window' );
+	jQuery( '#evo_designer__iframe' ).closest( '#modal_window' ).addClass( 'evo_designer__modal_window' )
+		.next( '.modal-backdrop' ).addClass( 'evo_designer__modal_backdrop' );
 	jQuery( '#evo_designer__iframe' ).on( 'load', function()
 	{	// Remove loader after iframe is loaded:
 		jQuery( '.loader_widget_designer' ).remove();
@@ -176,6 +183,17 @@ jQuery( document ).on( 'mouseout', '.evo_designer__container', function( e )
 	}
 } );
 
+jQuery( document ).on( 'mousemove', function( e )
+{	// Detect if mouse cursor was out designer blocks:
+	if( jQuery( '.evo_designer' ).is( ':visible' ) &&
+	    ! jQuery( e.target ).hasClass( 'evo_designer' ) &&
+	    ! jQuery( e.target ).closest( '.evo_designer' ).length &&
+	    ! jQuery( e.target ).closest( '.evo_widget[data-id]' ).length )
+	{	// Hide all designer blocks if mouse cursor was out them but they were not hidden by some wrong reason:
+		jQuery( '.evo_designer' ).hide();
+	}
+} );
+
 jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__action_order_down', function()
 {	// Change an order of widget:
 	var designer_block = jQuery( this ).closest( '.evo_designer__widget' );
@@ -225,7 +243,7 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__
 		},
 		error: function( jqXHR, textStatus, errorThrown )
 		{	// Display error text on error request:
-			evo_widget_display_error( 'There was an error communicating with the server. Please reload the page to be in sync with the server. (' + textStatus + ': ' + errorThrown + ')', widget, order_type );
+			evo_widget_display_error( evo_js_lang_error_communicating + ' (' + textStatus + ': ' + errorThrown + ')', widget, order_type );
 		}
 	} );
 } );
@@ -274,7 +292,7 @@ jQuery( document ).on( 'click', '.evo_designer__action_disable', function()
 		},
 		error: function( jqXHR, textStatus, errorThrown )
 		{	// Display error text on error request:
-			evo_widget_display_error( 'There was an error communicating with the server. Please reload the page to be in sync with the server. (' + textStatus + ': ' + errorThrown + ')', widget, 'disable' );
+			evo_widget_display_error( evo_js_lang_error_communicating + ' (' + textStatus + ': ' + errorThrown + ')', widget, 'disable' );
 		}
 	} );
 } );
@@ -369,7 +387,7 @@ function evo_widget_reorder( widget, direction )
 	evo_widget_update_order_actions( widget.parent() );
 
 	evo_widget_update_designer_position( widget );
-	evo_widget_update_designer_position( near_widget );
+	evo_widget_update_designer_position( near_widget, false );
 }
 
 
@@ -406,17 +424,21 @@ function evo_widget_update_order_actions( container )
  * Update position of widget designer block
  *
  * @param object Widget
+ * @param boolean Show widget desginer block, TRUE by default
  */
-function evo_widget_update_designer_position( widget )
+function evo_widget_update_designer_position( widget, show )
 {
-	jQuery( evo_widget_designer_block_selector( widget ) )
-		.css( {
+	var designer_block = jQuery( evo_widget_designer_block_selector( widget ) );
+	designer_block.css( {
 			'top': widget.offset().top - 3,
 			'left': widget.offset().left - 3,
-			'width': widget.width() + 6,
-			'height': widget.height() + 6,
+			'width': widget.outerWidth() + 5,
+			'height': widget.outerHeight() + 5,
 		} )
-		.show();
+	if( typeof( show ) == 'undefined' || show )
+	{	// Show widget desginer block:
+		designer_block.show();
+	}
 
 	// Also update container position:
 	evo_widget_update_container_position( widget.parent() );
@@ -434,8 +456,8 @@ function evo_widget_update_container_position( container )
 		.css( {
 			'top': container.offset().top - 3,
 			'left': container.offset().left - 3,
-			'width': container.width() + 6,
-			'height': container.height() + 6,
+			'width': container.outerWidth() + 5,
+			'height': container.outerHeight() + 5,
 		} )
 		.show();
 }
