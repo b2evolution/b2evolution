@@ -14,6 +14,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+?>
+<div class="evo_container evo_container__404_page">
+<?php
 // ------------------------- "404 Page" CONTAINER EMBEDDED HERE --------------------------
 skin_container( /* TRANS: Widget container name */ NT_('404 Page'), array(
 	// The following params will be used as defaults for widgets included in this container:
@@ -31,3 +34,4 @@ skin_container( /* TRANS: Widget container name */ NT_('404 Page'), array(
 ) );
 // ----------------------------- END OF "404 Page" CONTAINER -----------------------------
 ?>
+</div>
