@@ -4282,6 +4282,10 @@ class Blog extends DataObject
 						$url = url_add_param( $url, 'cat='.$cat_ID );
 					}
 				}
+				else
+				{ // User does not have any means to edit the post!
+					return '';
+				}
 
 				if( !empty( $post_title ) )
 				{ // Append a post title

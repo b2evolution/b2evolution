@@ -504,30 +504,6 @@ class bootstrap_main_Skin extends Skin
 		{	// Custom link hover color on background image:
 			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
 		}
-
-		if( $disp == 'front' )
-		{ // Initialize script to scroll down to widget container with users team:
-			add_js_headline( '
-jQuery( document ).ready( function()
-{
-// Scroll to Top
-// This skin needs to override the default scroll-top script because the `height: 100%` and `overflow: hidden` both exist on disp=front
-// ======================================================================== /
-// hide or show the "scroll to top" link
-$( "body, html, #skin_wrapper" ).scroll( function() {
-	( $(this).scrollTop() > offset ) ? $slide_top.addClass("slide-top-visible") : $slide_top.removeClass("slide-top-visible");
-});
-
-// Smooth scroll to top
-$slide_top.on( "click", function(event) {
-	event.preventDefault();
-	$( "body, html, #skin_wrapper" ).animate({
-		scrollTop: 0,
-	}, scroll_top_duration );
-});
-	
-} );' );
-		}
 		
 		if( ! empty( $custom_css ) )
 		{
