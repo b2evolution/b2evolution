@@ -1635,3 +1635,27 @@ table.diff td.diff-title-addedline {
 .jeditable_cell input {
   max-width: 100%;
 }
+#customizer_wrapper .page-content {
+  margin: 0;
+  padding: 0;
+}
+#customizer_wrapper .panel {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  margin: 0;
+  box-shadow: none;
+}
+#customizer_wrapper .panel .panel-heading {
+  border-radius: 0;
+}
+#customizer_wrapper .panel .panel-body .form-group:last-child {
+  margin-bottom: 0;
+}
+#customizer_wrapper .control-buttons {
+  text-align: center;
+  margin: 0;
+  padding: 0 15px;
+  margin-top: 15px;
+}

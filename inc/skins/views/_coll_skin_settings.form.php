@@ -16,7 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Collection, $Blog, $Settings, $current_User, $skin_type;
+global $Collection, $Blog, $Settings, $current_User, $skin_type, $mode;
 
 $Form = new Form( NULL, 'skin_settings_checkchanges' );
 
@@ -31,6 +31,7 @@ $Form->begin_form( 'fform' );
 		$Form->hidden( 'skin_type', $skin_type );
 		$Form->hidden( 'action', 'update' );
 		$Form->hidden( 'blog', $Blog->ID );
+		$Form->hidden( 'mode', $mode );
 	}
 	else
 	{

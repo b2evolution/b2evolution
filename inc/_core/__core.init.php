@@ -125,6 +125,7 @@ $ctrl_mappings = array(
 		'email'            => 'tools/email.ctrl.php',
 		'campaigns'        => 'email_campaigns/campaigns.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
+		'customize'        => 'customize/customize.ctrl.php',
 	);
 
 
@@ -1515,10 +1516,23 @@ class _core_Module extends Module
 
 			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// If current user has an access to back-office and to edit collection properties:
+				global $customizer_url, $mode;
+				if( isset( $mode ) && $mode == 'customizer' )
+				{	// If skin customizer mode is enabled:
+					$menu_entry_skin_href = get_param( 'customizing_url' );
+					$menu_entry_skin_class = 'active';
+				}
+				else
+				{	// If skin customizer mode is disabled:
+					$current_url = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://' ).$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+					$menu_entry_skin_href = $customizer_url.'?view=skin&amp;blog='.$Blog->ID.'&amp;customizing_url='.urlencode( $current_url );
+					$menu_entry_skin_class = '';
+				}
 				$entries['skin'] = array(
-					'text' => '<span class="fa fa-sliders"></span> '.T_('Skin'),
-					'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID,
+					'text'        => '<span class="fa fa-sliders"></span> '.T_('Skin'),
+					'href'        => $menu_entry_skin_href,
 					'entry_class' => 'rwdhide',
+					'class'       => $menu_entry_skin_class,
 				);
 
 				// Display menu item "Features" with depending on $disp:

@@ -498,6 +498,11 @@ $emailskins_path = $basepath.$emailskins_subdir;   // You should not need to cha
 $emailskins_url = $assets_baseurl.$emailskins_subdir;     // You should not need to change this
 
 /**
+ * Location of the customizer mode interface
+ */
+$customizer_url = $baseurl.'customize.php';
+
+/**
  * Location of the admin interface dispatcher
  */
 $dispatcher = 'admin.php'; // DEPRECATED

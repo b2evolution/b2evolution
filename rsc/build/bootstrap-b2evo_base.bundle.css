@@ -838,7 +838,7 @@ div#evo_toolbar .actions_right {
   border-radius: 4px;
   padding-top: 5px;
   padding-bottom: 5px;
-  margin: 1px 0;
+  margin: 1px 1px 1px 0;
 }
 .evobar-menu [class^=evobar-icon-] {
   margin-left: 6px;
@@ -1263,6 +1263,27 @@ div.dev-blocks--belowtoolbar {
 }
 .evo_designer__modal_window.modal {
   z-index: 10005;
+}
+.evo_customizer__html,
+.evo_customizer__html body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+.evo_customizer__wrapper {
+  height: 100%;
+  padding-top: 27px;
+}
+.evo_customizer__left {
+  float: left;
+  width: 320px;
+  height: 100%;
+  border-right: 1px solid #DDD;
+  box-sizing: border-box;
+}
+.evo_customizer__right {
+  margin-left: 320px;
+  height: 100%;
 }
 .results_ajax_loading {
   position: absolute;

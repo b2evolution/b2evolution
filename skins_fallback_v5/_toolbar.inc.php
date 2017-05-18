@@ -24,8 +24,8 @@ if( ! is_logged_in() )
  */
 global $current_User;
 
-if( !$current_User->check_perm( 'admin', 'toolbar' ) )
-{ // don't show toolbar for current User
+if( ! show_toolbar() )
+{	// Don't show toolbar if it is disabled for ccurrent page or current User:
 	return;
 }
 

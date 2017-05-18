@@ -569,7 +569,7 @@ class AdminUI_general extends Menu
 		}
 
 		$skin_wrapper_class = 'skin_wrapper';
-		if( is_logged_in() )
+		if( show_toolbar() )
 		{ // user is logged in
 			if( $this->get_show_evobar() )
 			{ // show evobar options is enabled for this admin skin
@@ -627,6 +627,12 @@ class AdminUI_general extends Menu
 	{
 		if( is_ajax_content() )
 		{	// Don't display this content on AJAX request
+			return;
+		}
+
+		global $mode;
+		if( $mode == 'customizer' )
+		{	// Don't display this content on skin customizer mode:
 			return;
 		}
 
