@@ -34,7 +34,7 @@ require_once $inc_path.'_main.inc.php';
 $Timer->start( 'customize.php' );
 
 // Enable customizer mode:
-$mode = 'customizer';
+set_param( 'customizer_mode', 'enable' );
 
 param( 'customizing_url', 'url', NULL, true );
 param( 'blog', 'integer', true, true );
@@ -93,7 +93,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 			<iframe src="<?php echo $admin_url.'?ctrl=customize&amp;view='.$view.'&amp;blog='.$blog; ?>" width="100%" height="100%" frameborder="0"></iframe>
 		</div>
 		<div class="evo_customizer__right">
-			<iframe src="<?php echo url_add_param( $customizing_url, 'show_evo_toolbar=0&amp;redir=no' ); ?>" width="100%" height="100%" frameborder="0"></iframe>
+			<iframe src="<?php echo url_add_param( $customizing_url, 'show_evo_toolbar=0&amp;redir=no' ); ?>" data-coll-url="<?php echo format_to_output( $Blog->get( 'url' ), 'htmlattr' ); ?>" width="100%" height="100%" frameborder="0"></iframe>
 		</div>
 	</div>
 </body>

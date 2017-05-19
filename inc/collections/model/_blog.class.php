@@ -2618,6 +2618,10 @@ class Blog extends DataObject
 			case 'baseurl':
 				return $this->gen_baseurl();
 
+			case 'customizer_url':
+				global $customizer_url;
+				return $customizer_url.'?view=skin'.$params['glue'].'blog='.$this->ID.''.$params['glue'].'customizing_url='.urlencode( get_current_url() );
+
 			case 'baseurlroot':
 				return $this->get_baseurl_root();
 

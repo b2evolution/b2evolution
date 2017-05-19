@@ -8727,6 +8727,17 @@ function initialize_debug_modes()
 	{	// Allow debug info only for logged-in users OR when debug == 2:
 		global $blog, $Session;
 
+		// Enable/Disable customizer mode:
+		$customizer_mode = param( 'customizer_mode', 'string' );
+		if( $customizer_mode == 'enable' )
+		{
+			$Session->set( 'customizer_mode_'.$blog, 1 );
+		}
+		elseif( $customizer_mode == 'disable' )
+		{
+			$Session->delete( 'customizer_mode_'.$blog );
+		}
+
 		// Enable/Disable designer mode:
 		$designer_mode = param( 'designer_mode', 'string' );
 		if( $designer_mode == 'enable' )

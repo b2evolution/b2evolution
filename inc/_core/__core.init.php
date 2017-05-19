@@ -1516,16 +1516,16 @@ class _core_Module extends Module
 
 			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// If current user has an access to back-office and to edit collection properties:
-				global $customizer_url, $mode;
-				if( isset( $mode ) && $mode == 'customizer' )
+				global $customizer_url, $Session;
+				if( $Session->get( 'customizer_mode_'.$Blog->ID ) )
 				{	// If skin customizer mode is enabled:
-					$menu_entry_skin_href = get_param( 'customizing_url' );
+					$customizing_url = get_param( 'customizing_url' );
+					$menu_entry_skin_href = url_add_param( ( empty( $customizing_url ) ? get_current_url() : $customizing_url ), 'customizer_mode=disable' );
 					$menu_entry_skin_class = 'active';
 				}
 				else
 				{	// If skin customizer mode is disabled:
-					$current_url = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://' ).$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-					$menu_entry_skin_href = $customizer_url.'?view=skin&amp;blog='.$Blog->ID.'&amp;customizing_url='.urlencode( $current_url );
+					$menu_entry_skin_href = $Blog->get( 'customizer_url' );
 					$menu_entry_skin_class = '';
 				}
 				$entries['skin'] = array(

@@ -59,8 +59,16 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
+// Do we allow redirection to canonical URL? (allows to force a 'single post' URL for commenting)
+param( 'redir', 'string', 'yes', false );
+
 // Initialize modes to debug collection settings:
 initialize_debug_modes();
+
+if( $Session->get( 'customizer_mode_'.$Blog->ID ) && $redir != 'no' )
+{	// Redirect to customize collection if such mode is enabled:
+	header_redirect( $Blog->get( 'customizer_url', array( 'glue' => '&' ) ) );
+}
 
 // Init $disp
 $default_disp = '-'; // '-' means we have no explicit disp request yet... this may change with extraptah info or by detecting front page later
@@ -319,7 +327,6 @@ if( $resolve_extra_path )
  */
 param( 'p', 'integer', '', true );              // Specific post number to display
 param( 'title', 'string', '', true );						// urtitle of post to display
-param( 'redir', 'string', 'yes', false );				// Do we allow redirection to canonical URL? (allows to force a 'single post' URL for commenting)
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 param( 'stats', 'integer', 0 );									// Deprecated but might still be used by spambots
 

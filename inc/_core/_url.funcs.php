@@ -1009,4 +1009,17 @@ function url_check_same_domain( $main_url, $check_url )
 	// Check subdomain
 	return $same_domain || ( substr( $check_url_host, - ( strlen( $main_url_host ) + 1 ) ) == '.'.$main_url_host );
 }
+
+
+/**
+ * Get current URL
+ *
+ * @return string
+ */
+function get_current_url()
+{
+	return ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://' )
+		.$_SERVER['HTTP_HOST']
+		.$_SERVER['REQUEST_URI'];
+}
 ?>
