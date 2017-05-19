@@ -78,6 +78,7 @@ $Form->begin_form( 'fform' );
 				' '.T_('Reset params'), 3, 4, array(
 					'class'   => $mode == 'customizer' ? 'small' : 'action_icon btn btn-default btn-sm',
 					'onclick' => 'return confirm( \''.TS_( 'This will reset all the params to the defaults recommended by the skin.\nYou will lose your custom settings.\nAre you sure?' ).'\' )',
+					'target' => $mode == 'customizer' ? 'evo_customizer__updater' : '',
 			) );
 		$fieldset_title_links .= $link_reset_params;
 	}
