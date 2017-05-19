@@ -1653,9 +1653,23 @@ table.diff td.diff-title-addedline {
 #customizer_wrapper .panel .panel-body .form-group:last-child {
   margin-bottom: 0;
 }
-#customizer_wrapper .control-buttons {
+.evo_customizer__buttons {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 15px;
   text-align: center;
+  border-top: 1px solid #DDD;
+  background: #FFF;
+}
+.evo_customizer__buttons .form-group,
+.evo_customizer__buttons .control-buttons {
   margin: 0;
-  padding: 0 15px;
-  margin-top: 15px;
+  padding: 0;
+}
+.evo_customizer__buttons .evo_customizer__links {
+  margin-top: 10px;
+}
+.evo_customizer__buttons .evo_customizer__links a {
+  margin: 0 10px;
 }

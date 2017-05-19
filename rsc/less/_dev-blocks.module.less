@@ -196,6 +196,13 @@ div.dev-blocks--belowtoolbar {
 .evo_customizer__wrapper {
 	height: 100%;
 	padding-top: 27px;
+	box-sizing: border-box;
+	iframe {
+		width: 100%;
+		height: 100%;
+		border: none;
+		display: block; // to remove unwanted 5px space at the bottom
+	}
 }
 .evo_customizer__left {
 	float: left;

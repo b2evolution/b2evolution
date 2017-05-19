@@ -285,7 +285,7 @@ switch( $action )
 				  AND cset_name REGEXP "^skin'.$skin_ID.'_"' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$blog.'&skin_type='.$skin_type, 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$blog.'&skin_type='.$skin_type.( empty( $mode ) ? '' : '&mode='.$mode ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else

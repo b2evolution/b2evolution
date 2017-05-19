@@ -10,6 +10,10 @@ jQuery( document ).on( 'ready', function()
 		{	// Reload iframe with collection preview if the settings iframe has a message about success updating:
 			jQuery( '.evo_customizer__right iframe' ).get(0).contentDocument.location.reload();
 		}
+		if( jQuery( this ).contents().find( '.evo_customizer__buttons' ).length )
+		{	// Set proper bottom margin because buttons block has a fixed position at the bottom:
+			jQuery( this ).contents().find( 'body' ).css( 'margin-bottom', jQuery( this ).contents().find( '.evo_customizer__buttons' ).outerHeight() - 1 );
+		}
 	} );
 
 	jQuery( '.evo_customizer__right iframe' ).on( 'load', function()
