@@ -62,6 +62,7 @@ load_funcs( 'skins/_skin.funcs.php' );
 // Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 init_fontawesome_icons( 'fontawesome-glyphicons' );
 
+add_js_headline( 'var customizer_url = "'.$customizer_url.'";' );
 require_css( 'bootstrap-b2evo_base.bmin.css' );
 require_js( '#jquery#' );
 require_js( 'src/evo_customizer.js' );
@@ -79,7 +80,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="robots" content="noindex, follow" />
-	<title><?php printf( T_('Skin customizer mode for %s'), $Blog->get( 'shortname' ) ); ?></title>
+	<title><?php printf( T_('Customizing Collection: %s'), $Blog->dget( 'shortname', 'htmlhead' ) ); ?></title>
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 </head>
 <body<?php skin_body_attrs(); ?>>
@@ -90,7 +91,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	?>
 	<div class="evo_customizer__wrapper">
 		<div class="evo_customizer__left">
-			<iframe id="evo_customizer__backoffice" src="<?php echo $admin_url.'?ctrl=customize&amp;view='.$view.'&amp;blog='.$blog; ?>"></iframe>
+			<iframe id="evo_customizer__backoffice" src="<?php echo $admin_url.'?ctrl=customize&amp;view='.$view.'&amp;blog='.$blog; ?>" data-coll-id="<?php echo $Blog->ID; ?>"></iframe>
 		</div>
 		<div class="evo_customizer__right">
 			<iframe id="evo_customizer__frontoffice" src="<?php echo url_add_param( $customizing_url, 'show_evo_toolbar=0&amp;redir=no' ); ?>" data-coll-url="<?php echo format_to_output( $Blog->get( 'url' ), 'htmlattr' ); ?>"></iframe>

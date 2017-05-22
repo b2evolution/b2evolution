@@ -88,7 +88,7 @@ $Form->begin_form( 'fform' );
 $buttons = array();
 if( $skin_ID )
 {	// Allow to update skin params only when it is really selected (Don't display this button to case "Same as normal skin."):
-	$buttons[] = array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'submit', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
 }
 
 if( $mode == 'customizer' )

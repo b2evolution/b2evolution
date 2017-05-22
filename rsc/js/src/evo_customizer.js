@@ -41,6 +41,16 @@ jQuery( document ).on( 'ready', function()
 
 	jQuery( '#evo_customizer__frontoffice' ).on( 'load', function()
 	{	// If iframe with collection preview has been loaded
+		jQuery( this ).contents().find( 'body[class*=coll_]' ).each( function()
+		{	// Check if iframe really loads current collection:
+			var coll_data = jQuery( this ).attr( 'class' ).match( /(^| )coll_(\d+)( |$)/ )
+			if( jQuery( '#evo_customizer__backoffice' ).data( 'coll-id' ) != coll_data[2] )
+			{	// Redirect to customize current loaded collection if it is a different than in left/back-office iframe:
+				location.href = customizer_url + '?view=skin&blog=' + coll_data[2] +
+					'&customizing_url=' + jQuery( '#evo_customizer__frontoffice' ).get( 0 ).contentWindow.location.href;
+			}
+		} );
+
 		jQuery( this ).contents().find( 'a' ).each( function()
 		{
 			var link_url = jQuery( this ).attr( 'href' );

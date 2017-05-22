@@ -1653,6 +1653,12 @@ table.diff td.diff-title-addedline {
 #customizer_wrapper .panel .panel-body .form-group:last-child {
   margin-bottom: 0;
 }
+#customizer_wrapper .row {
+  margin: 0;
+}
+#customizer_wrapper .row .col-md-12 {
+  padding: 0;
+}
 .evo_customizer__buttons {
   position: fixed;
   bottom: 0;
