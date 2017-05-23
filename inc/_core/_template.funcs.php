@@ -1844,6 +1844,13 @@ function include_headlines()
 
 	if( $headlines )
 	{
+		if( isset( $headlines['#nogroup#'] ) )
+		{	// Move no group head lines to the end in order to print them after files,
+			// because Safari and Firefox rewrite css of <style> with css of loaded files if they are printed after <style> in <head>:
+			$headlines_nogroup = $headlines['#nogroup#'];
+			unset( $headlines['#nogroup#'] );
+			$headlines['#nogroup#'] = $headlines_nogroup;
+		}
 		$all_headlines = array();
 		foreach( $headlines as $group_headlines )
 		{	// Go through each group to include all headlines:
