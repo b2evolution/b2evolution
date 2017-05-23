@@ -48,6 +48,7 @@ $BlogCache = & get_BlogCache();
 $Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 if( empty( $Blog ) )
 {
+	load_funcs( 'skins/_skin.funcs.php' );
 	siteskin_init();
 	siteskin_include( '_404_blog_not_found.main.php' ); // error
 	exit(0);

@@ -2014,7 +2014,7 @@ function skin_template_path( $template_name )
  */
 function siteskin_include( $template_name, $params = array() )
 {
-	global $Settings, $skins_path, $Collection, $Blog;
+	global $Settings, $skins_path, $Collection, $Blog, $baseurl;
 
 	if( ! $Settings->get( 'site_skins_enabled' ) )
 	{	// Site skins are not enabled:
