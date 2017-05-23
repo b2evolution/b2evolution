@@ -1446,9 +1446,6 @@ class RestApi
 				$this->halt( T_('You have no permission to edit other users!'), 'no_access', 403 );
 				// Exit here.
 			}
-
-			// We already have a user, set login param
-			set_param( 'edited_user_login', $edited_User->login );
 		}
 		else
 		{ // Initialize User object to create new one:

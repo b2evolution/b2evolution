@@ -424,12 +424,20 @@ class User extends DataObject
 		$request_password_confirmation = ! ( $is_api_request && $is_new_user );
 
 		// ---- Login checking / START ----
-		$edited_user_login = param( 'edited_user_login', 'string' );
-		if( empty( $edited_user_login ) )
-		{	// Empty login
-			param_error( 'edited_user_login', T_('Please enter your login.') );
+		$edited_user_login = param( 'edited_user_login', 'string', NULL );
+		if( ! $is_api_request || ( $is_api_request && ( isset( $edited_user_login ) || $is_new_user ) ) )
+		{ // login specifically included in API request
+			if( empty( $edited_user_login ) )
+			{	// Empty login
+				param_error( 'edited_user_login', T_('Please enter your login.') );
+			}
+			param_check_valid_login( 'edited_user_login' );
 		}
-		param_check_valid_login( 'edited_user_login' );
+		else
+		{
+			set_param( 'edited_user_login', $this->login );
+			$edited_user_login = $this->login;
+		}
 
 		$UserCache = & get_UserCache();
 		$UserLogin = $UserCache->get_by_login( $edited_user_login );
@@ -458,17 +466,25 @@ class User extends DataObject
 
 		// ******* Admin form or new user create ******* //
 		// In both cases current user must have users edit permission!
-		if( ( $is_admin_form || ( $is_identity_form && $is_new_user ) ) && $has_moderate_access )
+		if( ( $is_admin_form || ( $is_identity_form && $is_new_user ) || ( $is_api_request && $is_new_user ) ) && $has_moderate_access )
 		{ // level/group and email options are displayed on identity form only when creating a new user.
 			if( $this->ID != 1 )
 			{ // the admin user group can't be changed
-				param_integer_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.') );
-				$this->set_from_Request( 'level', 'edited_user_level', true );
+				$edited_user_level = param( 'edited_user_level', 'integer', ! $is_api_request ? true : NULL );
+				if( isset( $edited_user_level ) )
+				{
+					param_integer_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.'), true );
+					$this->set_from_Request( 'level', 'edited_user_level', true );
+				}
 
-				$edited_user_Group = $GroupCache->get_by_ID( param( 'edited_user_grp_ID', 'integer' ) );
-				if( $edited_user_Group->can_be_assigned() )
-				{	// Update group only if current user has a permission for this:
-					$this->set_Group( $edited_user_Group );
+				$edited_user_Group = param( 'edited_user_grp_ID', 'integer' );
+				if( isset( $edited_user_Group ) )
+				{
+					$edited_user_Group = $GroupCache->get_by_ID( $edited_user_Group );
+					if( $edited_user_Group->can_be_assigned() )
+					{	// Update group only if current user has a permission for this:
+						$this->set_Group( $edited_user_Group );
+					}
 				}
 			}
 
@@ -478,36 +494,50 @@ class User extends DataObject
 				$this->update_secondary_groups( $edited_user_secondary_grp_IDs );
 			}
 
-			param( 'edited_user_source', 'string', true );
-			$this->set_from_Request('source', 'edited_user_source', true);
+			$edited_user_source = param( 'edited_user_source', 'string', ! $is_api_request ? true : NULL );
+			if( isset( $edited_user_source ) )
+			{
+				$this->set_from_Request('source', 'edited_user_source', true);
+			}
 
 			// set email, without changing the user status
-			$edited_user_email = utf8_strtolower( param( 'edited_user_email', 'string', true ) );
-			param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
-			param_check_email( 'edited_user_email', true );
-			$this->set_email( $edited_user_email, false );
+			$edited_user_email = param( 'edited_user_email', 'string', ( ( ! $is_api_request ) || ( $is_api_request && $is_new_user ) ) ? true : NULL );
+			if( isset( $edited_user_email ) )
+			{
+				$edited_user_email = utf8_strtolower( $edited_user_email );
+				param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
+				param_check_email( 'edited_user_email', true );
+				$this->set_email( $edited_user_email, false );
+			}
 
 			if( $is_admin_form )
 			{	// Admin form
-				$notification_sender_email = utf8_strtolower( param( 'notification_sender_email', 'string', true ) );
-				param_check_email( 'notification_sender_email' );
-				if( ! empty( $notification_sender_email ) )
-				{ // Change a value of setting
-					$UserSettings->set( 'notification_sender_email', $notification_sender_email, $this->ID );
-				}
-				elseif( $UserSettings->get( 'notification_sender_email' , $this->ID ) != '' )
-				{ // Delete a setting record from DB
-					$UserSettings->delete( 'notification_sender_email', $this->ID );
+				$notification_sender_email = param( 'notification_sender_email', 'string', ! $is_api_request ? true : NULL );
+				if( isset( $notification_sender_email ) )
+				{
+					$notification_sender_email = utf8_strtolower( $notification_sender_email );
+					param_check_email( 'notification_sender_email' );
+					if( ! empty( $notification_sender_email ) )
+					{ // Change a value of setting
+						$UserSettings->set( 'notification_sender_email', $notification_sender_email, $this->ID );
+					}
+					elseif( $UserSettings->get( 'notification_sender_email' , $this->ID ) != '' )
+					{ // Delete a setting record from DB
+						$UserSettings->delete( 'notification_sender_email', $this->ID );
+					}
 				}
 
-				$notification_sender_name = param( 'notification_sender_name', 'string', true );
-				if( ! empty( $notification_sender_name ) )
-				{ // Change a value of setting
-					$UserSettings->set( 'notification_sender_name', $notification_sender_name, $this->ID );
-				}
-				elseif( $UserSettings->get( 'notification_sender_name' , $this->ID ) != '' )
-				{ // Delete a setting record from DB
-					$UserSettings->delete( 'notification_sender_name', $this->ID );
+				$notification_sender_name = param( 'notification_sender_name', 'string', ! $is_api_request ? true : NULL );
+				if( isset( $notification_sender_name ) )
+				{
+					if( ! empty( $notification_sender_name ) )
+					{ // Change a value of setting
+						$UserSettings->set( 'notification_sender_name', $notification_sender_name, $this->ID );
+					}
+					elseif( $UserSettings->get( 'notification_sender_name' , $this->ID ) != '' )
+					{ // Delete a setting record from DB
+						$UserSettings->delete( 'notification_sender_name', $this->ID );
+					}
 				}
 
 				if( $has_full_access && !isset( $this->dbchanges['user_email'] ) )
@@ -614,80 +644,77 @@ class User extends DataObject
 		}
 
 		// ******* Identity form ******* //
-		if( $is_identity_form )
+		if( $is_identity_form || ( $is_api_request && $is_new_user ) )
 		{
 			$can_edit_users = $current_User->check_perm( 'users', 'edit' );
 			$edited_user_perms = array( 'edited-user', 'edited-user-required' );
 
 			global $edited_user_age_min, $edited_user_age_max;
-			param( 'edited_user_age_min', 'string', true );
-			param( 'edited_user_age_max', 'string', true );
-			param_check_interval( 'edited_user_age_min', 'edited_user_age_max', T_('Age must be a number.'), T_('The first age must be lower than (or equal to) the second.') );
-			if( !param_has_error( 'edited_user_age_min' ) && $Settings->get( 'minimum_age' ) > 0 &&
-			    !empty( $edited_user_age_min ) && $edited_user_age_min < $Settings->get( 'minimum_age' ) )
-			{	// Limit user by minimum age
-				param_error( 'edited_user_age_min', sprintf( T_('You must be at least %d years old to use this service.'), $Settings->get( 'minimum_age' ) ) );
+			$age_min = param( 'edited_user_age_min', 'string', ! $is_api_request ? true : NULL );
+			$age_max = param( 'edited_user_age_max', 'string', ! $is_api_request ? true : NULL );
+
+			if( isset( $age_min ) && isset( $age_max ) )
+			{
+				param_check_interval( 'edited_user_age_min', 'edited_user_age_max', T_('Age must be a number.'), T_('The first age must be lower than (or equal to) the second.') );
+				if( !param_has_error( 'edited_user_age_min' ) && $Settings->get( 'minimum_age' ) > 0 &&
+						!empty( $edited_user_age_min ) && $edited_user_age_min < $Settings->get( 'minimum_age' ) )
+				{	// Limit user by minimum age
+					param_error( 'edited_user_age_min', sprintf( T_('You must be at least %d years old to use this service.'), $Settings->get( 'minimum_age' ) ) );
+				}
+				$this->set_from_Request( 'age_min', 'edited_user_age_min', true );
+				$this->set_from_Request( 'age_max', 'edited_user_age_max', true );
 			}
-			$this->set_from_Request( 'age_min', 'edited_user_age_min', true );
-			$this->set_from_Request( 'age_max', 'edited_user_age_max', true );
 
 			$firstname_editing = $Settings->get( 'firstname_editing' );
 			if( ( in_array( $firstname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $can_edit_users ) )
 			{	// User has a permissions to save Firstname
-				param( 'edited_user_firstname', 'string', true );
-				if( $firstname_editing == 'edited-user-required' )
-				{	// First name is required
-					if( $can_edit_users )
-					{	// Display a note message if user can edit all users
-						param_add_message_to_Log( 'edited_user_firstname', T_('Please enter your first name.'), 'note' );
-					}
-					else
-					{	// Display an error message
+				$edited_user_firstname = param( 'edited_user_firstname', 'string', ! $is_api_request || $firstname_editing == 'edited-user-required' ? true : NULL );
+				if( isset( $edited_user_firstname ) )
+				{
+					if( $firstname_editing == 'edited-user-required' )
+					{	// First name is required
 						param_check_not_empty( 'edited_user_firstname', T_('Please enter your first name.') );
 					}
+					$this->set_from_Request('firstname', 'edited_user_firstname', true);
 				}
-				$this->set_from_Request('firstname', 'edited_user_firstname', true);
 			}
 
 			$lastname_editing = $Settings->get( 'lastname_editing' );
 			if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $can_edit_users ) )
 			{	// User has a permissions to save Lastname
-				param( 'edited_user_lastname', 'string', true );
-				if( $lastname_editing == 'edited-user-required' )
-				{	// Last name is required
-					if( $can_edit_users )
-					{	// Display a note message if user can edit all users
-						param_add_message_to_Log( 'edited_user_lastname', T_('Please enter last name.'), 'note' );
-					}
-					else
-					{	// Display an error message
+				$edited_user_lastname = param( 'edited_user_lastname', 'string', ! $is_api_request || $lastname_editing == 'edited-user-required' ? true : NULL );
+				if( isset( $edited_user_lastname ) )
+				{
+					if( $lastname_editing == 'edited-user-required' )
+					{	// Last name is required
 						param_check_not_empty( 'edited_user_lastname', T_('Please enter last name.') );
 					}
+					$this->set_from_Request('lastname', 'edited_user_lastname', true);
 				}
-				$this->set_from_Request('lastname', 'edited_user_lastname', true);
 			}
 
 			$nickname_editing = $Settings->get( 'nickname_editing' );
 			if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $can_edit_users ) )
 			{	// User has a permissions to save Nickname
-				param( 'edited_user_nickname', 'string', true );
-				if( $nickname_editing == 'edited-user-required' )
-				{	// Nickname is required
-					if( $can_edit_users )
-					{	// Display a note message if user can edit all users
-						param_add_message_to_Log( 'edited_user_nickname', T_('Please enter your nickname.'), 'note' );
-					}
-					else
-					{	// Display an error message
+				$edited_user_nickname = param( 'edited_user_nickname', 'string', ! $is_api_request || $nickname_editing == 'edited-user-required' ? true : NULL );
+				if( isset( $edited_user_nickname ) )
+				{
+					if( $nickname_editing == 'edited-user-required' )
+					{	// Nickname is required
 						param_check_not_empty( 'edited_user_nickname', T_('Please enter your nickname.') );
 					}
+					$this->set_from_Request('nickname', 'edited_user_nickname', true);
 				}
-				$this->set_from_Request('nickname', 'edited_user_nickname', true);
 			}
 
-			param( 'edited_user_gender', 'string', '' );
-			if( param_check_gender( 'edited_user_gender', $Settings->get( 'registration_require_gender' ) == 'required' ) )
+			$gender_editing = $Settings->get( 'registration_require_gender' );
+			if( $this->ID == $current_User->ID || ( $gender_editing != 'hidden' && $can_edit_users ) )
 			{
+				$edited_user_gender = param( 'edited_user_gender', 'string' );
+				if( isset( $edited_user_gender ) )
+				{
+					param_check_gender( 'edited_user_gender', $gender_editing == 'required' );
+				}
 				$this->set_from_Request('gender', 'edited_user_gender', true);
 			}
 
@@ -696,62 +723,74 @@ class User extends DataObject
 
 			if( user_country_visible() )
 			{ // Save country
-				$country_ID = param( 'edited_user_ctry_ID', 'integer', true );
 				$country_is_required = ( $Settings->get( 'location_country' ) == 'required' && countries_exist() );
-				if( $country_is_required && $can_edit_users && $country_ID == 0 )
-				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_ctry_ID', T_('Please select a country').'.', 'note' );
+				$edited_user_ctry_ID = param( 'edited_user_ctry_ID', 'integer', ! $is_api_request || $country_is_required ? true : NULL);
+				if( isset( $edited_user_ctry_ID ) )
+				{
+					if( $country_is_required && $can_edit_users && $edited_user_ctry_ID == 0 )
+					{ // Display a note message if user can edit all users
+						param_add_message_to_Log( 'edited_user_ctry_ID', T_('Please select a country').'.', 'note' );
+					}
+					else
+					{ // Display an error message
+						param_check_number( 'edited_user_ctry_ID', T_('Please select a country').'.', $country_is_required );
+					}
+					$this->set_from_Request( 'ctry_ID', 'edited_user_ctry_ID', true );
 				}
-				else
-				{ // Display an error message
-					param_check_number( 'edited_user_ctry_ID', T_('Please select a country').'.', $country_is_required );
-				}
-				$this->set_from_Request( 'ctry_ID', 'edited_user_ctry_ID', true );
 			}
 
 			if( user_region_visible() )
 			{ // Save region
-				$region_ID = param( 'edited_user_rgn_ID', 'integer', true );
 				$region_is_required = ( $Settings->get( 'location_region' ) == 'required' && regions_exist( $country_ID ) );
-				if( $region_is_required && $can_edit_users && $region_ID == 0 )
-				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_rgn_ID', T_('Please select a region').'.', 'note' );
+				$edited_user_rgn_ID = param( 'edited_user_rgn_ID', 'integer', ! $is_api_request || $region_is_required ? true : NULL );
+				if( isset( $edited_user_rgn_ID ) )
+				{
+					if( $region_is_required && $can_edit_users && $edited_user_rgn_ID == 0 )
+					{ // Display a note message if user can edit all users
+						param_add_message_to_Log( 'edited_user_rgn_ID', T_('Please select a region').'.', 'note' );
+					}
+					else
+					{ // Display an error message
+						param_check_number( 'edited_user_rgn_ID', T_('Please select a region'), $region_is_required );
+					}
+					$this->set_from_Request( 'rgn_ID', 'edited_user_rgn_ID', true );
 				}
-				else
-				{ // Display an error message
-					param_check_number( 'edited_user_rgn_ID', T_('Please select a region'), $region_is_required );
-				}
-				$this->set_from_Request( 'rgn_ID', 'edited_user_rgn_ID', true );
 			}
 
 			if( user_subregion_visible() )
 			{ // Save subregion
-				$subregion_ID = param( 'edited_user_subrg_ID', 'integer', true );
 				$subregion_is_required = ( $Settings->get( 'location_subregion' ) == 'required' && subregions_exist( $region_ID ) );
-				if( $subregion_is_required && $can_edit_users && $subregion_ID == 0 )
-				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', 'note' );
+				$edited_user_subrg_ID = param( 'edited_user_subrg_ID', 'integer', ! $is_api_request || $subregion_is_required ? true : NULL );
+				if( isset( $edited_user_subrg_ID ) )
+				{
+					if( $subregion_is_required && $can_edit_users && $edited_user_subrg_ID == 0 )
+					{ // Display a note message if user can edit all users
+						param_add_message_to_Log( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', 'note' );
+					}
+					else
+					{ // Display an error message
+						param_check_number( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', $subregion_is_required );
+					}
+					$this->set_from_Request( 'subrg_ID', 'edited_user_subrg_ID', true );
 				}
-				else
-				{ // Display an error message
-					param_check_number( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', $subregion_is_required );
-				}
-				$this->set_from_Request( 'subrg_ID', 'edited_user_subrg_ID', true );
 			}
 
 			if( user_city_visible() )
 			{ // Save city
-				$city_ID = param( 'edited_user_city_ID', 'integer', true );
 				$city_is_required = ( $Settings->get( 'location_city' ) == 'required' && cities_exist( $country_ID, $region_ID, $subregion_ID ) );
-				if( $city_is_required && $can_edit_users && $city_ID == 0 )
-				{ // Display a note message if user can edit all users
-					param_add_message_to_Log( 'edited_user_city_ID', T_('Please select a city').'.', 'note' );
+				$edited_user_city_ID = param( 'edited_user_city_ID', 'integer', ! $is_api_request || $city_is_required ? true : NULL );
+				if( isset( $edited_user_city_ID ) )
+				{
+					if( $city_is_required && $can_edit_users && $edited_user_city_ID == 0 )
+					{ // Display a note message if user can edit all users
+						param_add_message_to_Log( 'edited_user_city_ID', T_('Please select a city').'.', 'note' );
+					}
+					else
+					{ // Display an error message
+						param_check_number( 'edited_user_city_ID', T_('Please select a city').'.', $city_is_required );
+					}
+					$this->set_from_Request( 'city_ID', 'edited_user_city_ID', true );
 				}
-				else
-				{ // Display an error message
-					param_check_number( 'edited_user_city_ID', T_('Please select a city').'.', $city_is_required );
-				}
-				$this->set_from_Request( 'city_ID', 'edited_user_city_ID', true );
 			}
 			// ---- Locations / END ----
 
@@ -1136,8 +1175,11 @@ class User extends DataObject
 		if( $is_preferences_form )
 		{
 			// Other preferences
-			param( 'edited_user_locale', 'string', true );
-			$this->set_from_Request('locale', 'edited_user_locale', true);
+			$preferred_locale = param( 'edited_user_locale', 'string', ! $is_api_request );
+			if( isset( $preferred_locale ) )
+			{
+				$this->set_from_Request('locale', 'edited_user_locale', true);
+			}
 
 			// Session timeout
 			$edited_user_timeout_sessions = param( 'edited_user_timeout_sessions', 'string', NULL );
@@ -1154,7 +1196,11 @@ class User extends DataObject
 				}
 			}
 
-			$UserSettings->set( 'show_online', param( 'edited_user_showonline', 'integer', 0 ), $this->ID );
+			$edited_user_showonline = param( 'edited_user_showonline', 'integer', ! $is_api_request ? 0 : NULL );
+			if( isset( $edited_user_showonline ) )
+			{
+				$UserSettings->set( 'show_online', $edited_user_showonline, $this->ID );
+			}
 		}
 
 		// ******* Notifications form ******* //
@@ -1203,15 +1249,20 @@ class User extends DataObject
 			{ // Update user's settings
 
 				// Email communication
-				$edited_user_email = utf8_strtolower( param( 'edited_user_email', 'string', true ) );
-				param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
-				param_check_email( 'edited_user_email', true );
-				$this->set_email( $edited_user_email );
+				$edited_user_email = param( 'edited_user_email', 'string', ! $is_api_request ? true : NULL );
+				if( isset( $edited_user_email ) )
+				{
+					$edited_user_email = utf8_strtolower( $edited_user_email );
+					param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
+					param_check_email( 'edited_user_email', true );
+					$this->set_email( $edited_user_email );
+				}
 
 				// set messaging options
-				if( $has_messaging_perm )
+				$enable_PM = param( 'PM', 'integer', ! $is_api_request ? 0 : NULL );
+				if( isset( $enable_PM ) && $has_messaging_perm )
 				{
-					$UserSettings->set( 'enable_PM', param( 'PM', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'enable_PM', $enable_PM, $this->ID );
 				}
 				$emails_msgform = $Settings->get( 'emails_msgform' );
 				if( ( $emails_msgform == 'userset' ) || ( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
@@ -1278,9 +1329,9 @@ class User extends DataObject
 				$UserSettings->set( 'newsletter_ads', param( 'edited_user_newsletter_ads', 'integer', 0 ), $this->ID );
 
 				// Emails limit per day
-				param_integer_range( 'edited_user_notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.') );
+				param_integer_range( 'edited_user_notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.'), ! $is_api_request );
 				$UserSettings->set( 'notification_email_limit', param( 'edited_user_notification_email_limit', 'integer', 0 ), $this->ID );
-				param_integer_range( 'edited_user_newsletter_limit', 0, 999, T_('Newsletter limit must be between %d and %d.') );
+				param_integer_range( 'edited_user_newsletter_limit', 0, 999, T_('Newsletter limit must be between %d and %d.'), ! $is_api_request );
 				$UserSettings->set( 'newsletter_limit', param( 'edited_user_newsletter_limit', 'integer', 0 ), $this->ID );
 
 				// If notifications are temporarily disabled, no subscription options should be lost when user saves.
@@ -1290,8 +1341,8 @@ class User extends DataObject
 					/**
 					 * Update the subscriptions:
 					 */
-					$subs_blog_IDs = param( 'subs_blog_IDs', 'string', true );
-					$subs_item_IDs = param( 'subs_item_IDs', 'string', true );
+					$subs_blog_IDs = param( 'subs_blog_IDs', 'string', ! $is_api_request ? true : NULL );
+					$subs_item_IDs = param( 'subs_item_IDs', 'string', ! $is_api_request ? true : NULL );
 
 					// Work the blogs:
 					$BlogCache = & get_BlogCache();
@@ -1443,7 +1494,11 @@ class User extends DataObject
 			$multiple_sessions = $Settings->get( 'multiple_sessions' );
 			if( ( $multiple_sessions != 'adminset_default_no' && $multiple_sessions != 'adminset_default_yes' ) || $current_User->check_perm( 'users', 'edit' ) )
 			{
-				$UserSettings->set( 'login_multiple_sessions', param( 'edited_user_set_login_multiple_sessions', 'integer', 0 ), $this->ID );
+				$login_multiple_sessions = param( 'edited_user_set_login_multiple_sessions', 'integer' );
+				if( ! $is_api_request || ( $is_api_request && isset( $login_multiple_sessions ) ) )
+				{
+					$UserSettings->set( 'login_multiple_sessions', param( 'edited_user_set_login_multiple_sessions', 'integer', 0 ), $this->ID );
+				}
 			}
 		}
 
@@ -4772,6 +4827,7 @@ class User extends DataObject
 	function update_from_request( $is_new_user = false )
 	{
 		global $current_User, $DB, $Messages, $UserSettings, $Settings, $blog, $admin_url;
+		global $is_api_request;
 
 		if( ! $current_User->can_moderate_user( $this->ID ) && $this->ID != $current_User->ID )
 		{ // user is only allowed to update him/herself
@@ -4946,101 +5002,106 @@ class User extends DataObject
 	function update_status_from_Request( $dbsave, $new_status = NULL )
 	{
 		global $DB, $UserSettings, $current_User, $servertimenow;
+		global $is_api_request;
 
 		if( $dbsave )
 		{ // save required
 			$DB->begin();
 		}
 
-		if( empty( $new_status ) )
+		$edited_user_status = param( 'edited_user_status', 'string' );
+		if( ! $is_api_request || ( $is_api_request && isset( $edited_user_status ) ) )
 		{
-			$new_status = param( 'edited_user_status', 'string', true );
-		}
+			if( empty( $new_status ) )
+			{
+				$new_status = param( 'edited_user_status', 'string', true );
+			}
 
-		// a close reason type thst is selected from list
-		$account_close_type = param( 'account_close_type', 'string', '' );
-		// a close reason text - max 255 characters
-		$account_close_reason = substr( param( 'account_close_reason', 'text', '' ), 0, 255 );
-		if( ( !$this->check_status( 'is_closed' ) ) && ( $new_status == 'closed' ) )
-		{ // account was not closed yet
-			if( empty( $account_close_reason ) && empty( $account_close_type ) )
-			{ // Default value of reason
-				$account_close_reason = T_( 'Other' );
-			}
-			$this->set( 'status', 'closed' );
-			$UserSettings->set( 'account_close_ts', $servertimenow, $this->ID );
-			$UserSettings->set( 'account_close_reason', trim( $account_close_type.' '.$account_close_reason ), $this->ID );
-			// delete last activation email data, this user must not be allowed to reactivate the account ( only admin users may change the status again )
-			$UserSettings->delete( 'last_activation_reminder_key', $this->ID );
-			$UserSettings->delete( 'last_activation_email', $this->ID );
-			// create query to clear all session's of the user
-			$clear_sessions_query = 'UPDATE T_sessions
-								SET sess_key = NULL
-								WHERE sess_user_ID = '.$DB->quote( $this->ID );
-			if( $dbsave && $this->dbupdate() && $UserSettings->dbupdate() && ( $DB->query( $clear_sessions_query ) !== false ) )
-			{ // all db modification was successful
-				$DB->commit();
-				if( $current_User->ID != $this->ID )
-				{	// If admin closed some user account
-					// Send notification email about closed account to users with edit users permission
-					$email_template_params = array(
-							'login'           => $this->login,
-							'email'           => $this->email,
-							'reason'          => $account_close_reason,
-							'user_ID'         => $this->ID,
-							'closed_by_admin' => $current_User->get_username(),
-							'days_count'      => $this->get_days_count_close()
-						);
-					send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
+			// a close reason type thst is selected from list
+			$account_close_type = param( 'account_close_type', 'string', '' );
+			// a close reason text - max 255 characters
+			$account_close_reason = substr( param( 'account_close_reason', 'text', '' ), 0, 255 );
+			if( ( !$this->check_status( 'is_closed' ) ) && ( $new_status == 'closed' ) )
+			{ // account was not closed yet
+				if( empty( $account_close_reason ) && empty( $account_close_type ) )
+				{ // Default value of reason
+					$account_close_reason = T_( 'Other' );
 				}
-				return true;
-			}
-		}
-		else
-		{
-			$new_status_is_active = ( $new_status == 'activated' || $new_status == 'autoactivated' );
-			$old_status_is_not_active = false;
-			if( $this->check_status( 'can_be_validated' ) && $new_status_is_active )
-			{ // User was activated
-				$old_status_is_not_active = true;
-				// clear activation specific settings
+				$this->set( 'status', 'closed' );
+				$UserSettings->set( 'account_close_ts', $servertimenow, $this->ID );
+				$UserSettings->set( 'account_close_reason', trim( $account_close_type.' '.$account_close_reason ), $this->ID );
+				// delete last activation email data, this user must not be allowed to reactivate the account ( only admin users may change the status again )
 				$UserSettings->delete( 'last_activation_reminder_key', $this->ID );
 				$UserSettings->delete( 'last_activation_email', $this->ID );
-				$UserSettings->delete( 'activation_reminder_count', $this->ID );
-				$UserSettings->delete( 'send_activation_reminder', $this->ID );
-			}
-			$old_status_is_not_active = ( $old_status_is_not_active || $this->check_status( 'is_closed' ) );
-
-			// set status
-			$this->set( 'status', $new_status );
-			$UserSettings->set( 'account_close_reason', $account_close_reason, $this->ID );
-			if( $dbsave && $this->dbupdate() )
-			{ // db update
-				$UserSettings->dbupdate();
-				$DB->commit();
-				if( $old_status_is_not_active && $new_status_is_active )
-				{ // User was activated, create a welcome private message
-					$this->send_welcome_message();
-
+				// create query to clear all session's of the user
+				$clear_sessions_query = 'UPDATE T_sessions
+									SET sess_key = NULL
+									WHERE sess_user_ID = '.$DB->quote( $this->ID );
+				if( $dbsave && $this->dbupdate() && $UserSettings->dbupdate() && ( $DB->query( $clear_sessions_query ) !== false ) )
+				{ // all db modification was successful
+					$DB->commit();
 					if( $current_User->ID != $this->ID )
-					{	// If admin activated some user account
-						// Send notification email about activated account to users with edit users permission
+					{	// If admin closed some user account
+						// Send notification email about closed account to users with edit users permission
 						$email_template_params = array(
-							'User' => $this,
-							'login' => $this->login, // this is required in the send_admin_notification
-							'activated_by_admin' => $current_User->get_username(),
-						);
-						send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
+								'login'           => $this->login,
+								'email'           => $this->email,
+								'reason'          => $account_close_reason,
+								'user_ID'         => $this->ID,
+								'closed_by_admin' => $current_User->get_username(),
+								'days_count'      => $this->get_days_count_close()
+							);
+						send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
 					}
+					return true;
 				}
-				return true;
 			}
-		}
+			else
+			{
+				$new_status_is_active = ( $new_status == 'activated' || $new_status == 'autoactivated' );
+				$old_status_is_not_active = false;
+				if( $this->check_status( 'can_be_validated' ) && $new_status_is_active )
+				{ // User was activated
+					$old_status_is_not_active = true;
+					// clear activation specific settings
+					$UserSettings->delete( 'last_activation_reminder_key', $this->ID );
+					$UserSettings->delete( 'last_activation_email', $this->ID );
+					$UserSettings->delete( 'activation_reminder_count', $this->ID );
+					$UserSettings->delete( 'send_activation_reminder', $this->ID );
+				}
+				$old_status_is_not_active = ( $old_status_is_not_active || $this->check_status( 'is_closed' ) );
 
-		if( $dbsave )
-		{ // save was required, but wasn't successful
-			$DB->rollback();
-			return false;
+				// set status
+				$this->set( 'status', $new_status );
+				$UserSettings->set( 'account_close_reason', $account_close_reason, $this->ID );
+				if( $dbsave && $this->dbupdate() )
+				{ // db update
+					$UserSettings->dbupdate();
+					$DB->commit();
+					if( $old_status_is_not_active && $new_status_is_active )
+					{ // User was activated, create a welcome private message
+						$this->send_welcome_message();
+
+						if( $current_User->ID != $this->ID )
+						{	// If admin activated some user account
+							// Send notification email about activated account to users with edit users permission
+							$email_template_params = array(
+								'User' => $this,
+								'login' => $this->login, // this is required in the send_admin_notification
+								'activated_by_admin' => $current_User->get_username(),
+							);
+							send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
+						}
+					}
+					return true;
+				}
+			}
+
+			if( $dbsave )
+			{ // save was required, but wasn't successful
+				$DB->rollback();
+				return false;
+			}
 		}
 
 		return true;
