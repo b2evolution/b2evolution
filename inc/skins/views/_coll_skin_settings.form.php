@@ -73,11 +73,12 @@ $Form->begin_form( 'fform' );
 	$fieldset_title_links = '<span class="floatright panel_heading_action_icons">&nbsp;'.$link_select_skin;
 	if( $skin_ID && $current_User->check_perm( 'options', 'view' ) )
 	{	// Display "Reset params" button only when skin ID has a real value ( when $skin_ID = 0 means it must be the same as the normal skin value ):
+		$link_reset_url = regenerate_url( 'ctrl,action', 'ctrl=skins&amp;skin_ID='.$skin_ID.'&amp;skin_type='.$skin_type.'&amp;blog='.( isset( $Blog ) ? $Blog->ID : '0' ).'&amp;action=reset&amp;'.url_crumb( 'skin' ) );
 		$link_reset_params = action_icon( T_('Reset params'), 'reload',
-				regenerate_url( 'ctrl,action', 'ctrl=skins&amp;skin_ID='.$skin_ID.'&amp;skin_type='.$skin_type.'&amp;blog='.( isset( $Blog ) ? $Blog->ID : '0' ).'&amp;action=reset&amp;'.url_crumb( 'skin' ) ),
+				$link_reset_url,
 				' '.T_('Reset params'), 3, 4, array(
 					'class'   => $mode == 'customizer' ? 'small' : 'action_icon btn btn-default btn-sm',
-					'onclick' => 'return confirm( \''.TS_( 'This will reset all the params to the defaults recommended by the skin.\nYou will lose your custom settings.\nAre you sure?' ).'\' )',
+					'onclick' => 'return evo_confirm_skin_reset()',
 					'target' => $mode == 'customizer' ? 'evo_customizer__updater' : '',
 			) );
 		$fieldset_title_links .= $link_reset_params;
@@ -103,4 +104,34 @@ if( $mode == 'customizer' )
 
 $Form->end_form( $buttons );
 
+if( isset( $link_reset_url ) )
+{	// Initialize JS to confirm skin reset action if current user has a permission:
+	$skin_reset_confirmation_msg = TS_( 'This will reset all the params to the defaults recommended by the skin.\nYou will lose your custom settings.\nAre you sure?' );
+?>
+<script type="text/javascript">
+function evo_confirm_skin_reset()
+{
+<?php
+if( $mode == 'customizer' )
+{	// If skin customizer mode:
+?>
+	window.parent.openModalWindow( '<form action="<?php echo str_replace( '&amp;', '&', $link_reset_url ); ?>" method="post" target="evo_customizer__updater" onsubmit="closeModalWindow()">' +
+				'<span class="text-danger"><?php echo $skin_reset_confirmation_msg; ?></span>' +
+				'<input type="submit" value="<?php echo TS_('Reset params'); ?>" />' +
+			'</form>',
+		'500px', '100px', true, '<?php echo TS_('Reset params'); ?>', [ '<?php echo TS_('Reset params'); ?>', 'btn btn-danger' ] );
+	return false;
+<?php
+}
+else
+{	// Normal back-office mode:
+?>
+	return confirm( '<?php echo $skin_reset_confirmation_msg; ?>' );
+<?php
+}
+?>
+}
+</script>
+<?php
+}
 ?>

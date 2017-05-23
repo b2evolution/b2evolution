@@ -67,6 +67,9 @@ add_js_headline( 'var customizer_url = "'.$customizer_url.'";' );
 require_css( 'bootstrap-b2evo_base.bmin.css' );
 require_js( '#jquery#' );
 require_js( 'src/evo_customizer.js' );
+require_js( '#bootstrap#' );
+require_css( '#bootstrap_css#' );
+require_js( 'build/bootstrap-evo_frontoffice.bmin.js' );
 
 // Send the predefined cookies:
 evo_sendcookies();
@@ -83,6 +86,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	<meta name="robots" content="noindex, follow" />
 	<title><?php printf( T_('Customizing Collection: %s'), $Blog->dget( 'shortname', 'htmlhead' ) ); ?></title>
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
+	<?php echo_modalwindow_js(); /* Initialize JavaScript to build and open window */ ?>
 </head>
 <body<?php skin_body_attrs(); ?>>
 	<?php
