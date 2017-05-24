@@ -1281,6 +1281,12 @@ div.dev-blocks--belowtoolbar {
   border: none;
   display: block;
 }
+.evo_customizer__wrapper.evo_customizer__collapsed .evo_customizer__left {
+  display: none;
+}
+.evo_customizer__wrapper.evo_customizer__collapsed .evo_customizer__right {
+  margin-left: 0;
+}
 .evo_customizer__left {
   float: left;
   width: 320px;
@@ -1291,6 +1297,24 @@ div.dev-blocks--belowtoolbar {
 .evo_customizer__right {
   margin-left: 320px;
   height: 100%;
+  position: relative;
+}
+.evo_customizer__right .evo_customizer__collapser,
+.evo_customizer__right .evo_customizer__expander {
+  position: absolute;
+  top: 50px;
+  left: 7px;
+  cursor: pointer;
+  font-size: 30px;
+  line-height: 30px;
+  width: 30px;
+  text-align: center;
+  border-radius: 50%;
+  background: #FFF;
+  color: #000;
+}
+.evo_customizer__right .evo_customizer__expander {
+  display: none;
 }
 .results_ajax_loading {
   position: absolute;

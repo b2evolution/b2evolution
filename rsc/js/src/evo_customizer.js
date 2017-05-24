@@ -43,11 +43,23 @@ jQuery( document ).on( 'ready', function()
 	{	// If iframe with collection preview has been loaded
 		jQuery( this ).contents().find( 'body[class*=coll_]' ).each( function()
 		{	// Check if iframe really loads current collection:
-			var coll_data = jQuery( this ).attr( 'class' ).match( /(^| )coll_(\d+)( |$)/ )
-			if( jQuery( '#evo_customizer__backoffice' ).data( 'coll-id' ) != coll_data[2] )
-			{	// Redirect to customize current loaded collection if it is a different than in left/back-office iframe:
-				location.href = customizer_url + '?view=skin&blog=' + coll_data[2] +
-					'&customizing_url=' + jQuery( '#evo_customizer__frontoffice' ).get( 0 ).contentWindow.location.href;
+			var backoffice_iframe = jQuery( '#evo_customizer__backoffice' );
+			var body_class = jQuery( this ).attr( 'class' );
+			var instance_name = body_class.match( /(^| )instance_([a-z\d]+)( |$)/i );
+			instance_name = ( typeof( instance_name[2] ) == 'undefined' ? false : instance_name[2] );
+			if( instance_name === false || backoffice_iframe.data( 'instance' ) != instance_name )
+			{	// If page of other site is loaded in front-office iframe:
+				alert( evo_js_lang_not_controlled_page );
+				location.href = jQuery( '#evo_customizer__frontoffice' ).get( 0 ).contentWindow.location.href.replace( 'show_evo_toolbar=0&redir=no', '' );
+				return;
+			}
+			var coll_id = body_class.match( /(^| )coll_(\d+)( |$)/ );
+			coll_id = ( typeof( coll_id[2] ) == 'undefined' ? 0 : coll_id[2] );
+			if( coll_id && backoffice_iframe.data( 'coll-id' ) != coll_id )
+			{	// Reload left/back-office iframe to customize current loaded collection if different collection has been loaded to the right/front-office iframe:
+				backoffice_iframe.get( 0 ).contentWindow.location.href = backoffice_iframe.get( 0 ).contentWindow.location.href.replace( /([\?&]blog=)\d+(&|$)/, '$1' + coll_id + '$2' );
+				backoffice_iframe.data( 'coll-id', coll_id );
+				return;
 			}
 		} );
 
@@ -64,5 +76,19 @@ jQuery( document ).on( 'ready', function()
 				jQuery( this ).attr( 'target', '_top' );
 			}
 		} );
+	} );
+
+	jQuery( '.evo_customizer__collapser' ).click( function()
+	{	// Collapse customizer iframe:
+		jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
+		jQuery( this ).hide();
+		jQuery( '.evo_customizer__expander' ).show();
+	} );
+
+	jQuery( '.evo_customizer__expander' ).click( function()
+	{	// Expand customizer iframe:
+		jQuery( '.evo_customizer__wrapper' ).removeClass( 'evo_customizer__collapsed' );
+		jQuery( this ).hide();
+		jQuery( '.evo_customizer__collapser' ).show();
 	} );
 } );

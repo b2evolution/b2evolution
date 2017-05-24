@@ -63,7 +63,8 @@ load_funcs( 'skins/_skin.funcs.php' );
 // Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 init_fontawesome_icons( 'fontawesome-glyphicons' );
 
-add_js_headline( 'var customizer_url = "'.$customizer_url.'";' );
+add_js_headline( 'var customizer_url = "'.$customizer_url.'";'
+	.'var evo_js_lang_not_controlled_page = \''.TS_('This page is not controlled by b2evolution.').'\'' );
 require_css( 'bootstrap-b2evo_base.bmin.css' );
 require_js( '#jquery#' );
 require_js( 'src/evo_customizer.js' );
@@ -96,9 +97,11 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	?>
 	<div class="evo_customizer__wrapper">
 		<div class="evo_customizer__left">
-			<iframe id="evo_customizer__backoffice" src="<?php echo $admin_url.'?ctrl=customize&amp;view='.$view.'&amp;blog='.$blog; ?>" data-coll-id="<?php echo $Blog->ID; ?>"></iframe>
+			<iframe id="evo_customizer__backoffice" src="<?php echo $admin_url.'?ctrl=customize&amp;view='.$view.'&amp;blog='.$blog; ?>" data-instance="<?php echo $instance_name; ?>" data-coll-id="<?php echo $Blog->ID; ?>"></iframe>
 		</div>
 		<div class="evo_customizer__right">
+			<?php echo get_icon( 'customizer_collapse', 'imgtag', array( 'class' => 'evo_customizer__collapser' ) ); ?>
+			<?php echo get_icon( 'customizer_expand', 'imgtag', array( 'class' => 'evo_customizer__expander' ) ); ?>
 			<iframe id="evo_customizer__frontoffice" src="<?php echo url_add_param( $customizing_url, 'show_evo_toolbar=0&amp;redir=no' ); ?>" data-coll-url="<?php echo format_to_output( $Blog->get( 'url' ), 'htmlattr' ); ?>"></iframe>
 		</div>
 		<iframe id="evo_customizer__updater" name="evo_customizer__updater" style="display:none"></iframe>
