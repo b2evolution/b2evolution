@@ -2748,7 +2748,7 @@ function skin_body_attrs( $params = array() )
 			'class' => NULL
 		), $params );
 
-	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User;
+	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User, $instance_name;
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
 	global $Session, $debug;
@@ -2785,6 +2785,9 @@ function skin_body_attrs( $params = array() )
 			$classes[] = 'page_notcached';
 		}
 	}
+
+	// Instance class:
+	$classes[] = 'instance_'.$instance_name;
 
 	// Blog class:
 	$classes[] = 'coll_'.( empty( $Blog ) ? 'none' : $Blog->ID );
