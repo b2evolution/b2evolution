@@ -200,21 +200,21 @@ module.exports = function(grunt) {
 			// Bubbletip
 			bubbletip: {
 				options: {
-					banner: '/* This includes 4 files: bubbletip.js, plugins.js, userfields.js, colorpicker.js */\n'
+					banner: '/* This includes 4 files: bubbletip.js, plugins.js, userfields.js */\n'
 				},
 				nonull: true, // Display missing files
 				// fp>yura: why isn't jquery.bubbletip.js bundled into this?
 				// if plugins.js is used only for editing we should probably move it to a textedit.bundle
-				src: ['rsc/js/bubbletip.js', 'rsc/js/plugins.js', 'rsc/js/userfields.js', 'rsc/js/colorpicker.js'],
+				src: ['rsc/js/bubbletip.js', 'rsc/js/plugins.js', 'rsc/js/userfields.js'],
 				dest: 'rsc/js/build/bubbletip.bmin.js'
 			},
 			// Popover (Analog of bubbletip on bootstrap skins)
 			popover: {
 				options: {
-					banner: '/* This includes 5 files: bootstrap/usernames.js, bootstrap/plugins.js, bootstrap/userfields.js, bootstrap/colorpicker.js, bootstrap/formfields.js */\n'
+					banner: '/* This includes 5 files: bootstrap/usernames.js, bootstrap/plugins.js, bootstrap/userfields.js, bootstrap/formfields.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/bootstrap/usernames.js', 'rsc/js/bootstrap/plugins.js', 'rsc/js/bootstrap/userfields.js', 'rsc/js/bootstrap/colorpicker.js', 'rsc/js/bootstrap/formfields.js'],
+				src: ['rsc/js/bootstrap/usernames.js', 'rsc/js/bootstrap/plugins.js', 'rsc/js/bootstrap/userfields.js', 'rsc/js/bootstrap/formfields.js'],
 				dest: 'rsc/js/build/popover.bmin.js'
 			},
 			// Textcomplete plugin to suggest user names in textareas with '@username'

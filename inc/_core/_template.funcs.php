@@ -1647,26 +1647,37 @@ function init_voting_item_js( $relative_to = 'rsc_url' )
  */
 function init_colorpicker_js( $relative_to = 'rsc_url' )
 {
-	// Inititialize bubbletip plugin
-	global $Skin, $AdminUI;
-	if( ! empty( $AdminUI ) )
-	{ // Get library of tooltip for current back-office skin
-		$tooltip_plugin = $AdminUI->get_template( 'tooltip_plugin' );
-	}
-	elseif( ! empty( $Skin ) )
-	{ // Get library of tooltip for current front-office skin
-		$tooltip_plugin = $Skin->get_template( 'tooltip_plugin' );
-	}
-	else
-	{ // Use bubbletip library by default for unknown skins
-		$tooltip_plugin = 'bubbletip';
-	}
-	init_bubbletip_js( $relative_to, $tooltip_plugin );
-
-	// Initialize farbastic colorpicker
 	require_js( '#jquery#', $relative_to );
-	require_js( 'jquery/jquery.farbtastic.min.js', $relative_to );
-	require_css( 'jquery/farbtastic/farbtastic.css', $relative_to );
+	require_js( 'bootstrap/colorpicker/bootstrap-colorpicker.min.js', $relative_to );
+	require_css( 'bootstrap-colorpicker.min.css', $relative_to );
+
+	$default_colors = array(
+			'black'   => '#000000',
+			'grey'    => '#999999',
+			'white'   => '#ffffff',
+			'red'     => '#FF0000',
+			'default' => '#777777',
+			'primary' => '#337ab7',
+			'success' => '#5cb85c',
+			'info'    => '#5bc0de',
+			'warning' => '#f0ad4e',
+			'danger'  => '#d9534f'
+		);
+	$user_colors_config = array();
+	foreach( $default_colors as $color_name => $color_value )
+	{
+		$user_colors_config[] = '"'.$color_name.'": "'.$color_value.'"';
+	}
+
+	add_js_headline( 'jQuery( document ).ready( function()
+{
+jQuery( ".form_color_input" ).colorpicker( {
+	colorSelectors: { '.implode( ',', $user_colors_config ).' }
+} ).on( "hidePicker", function( e )
+{
+	console.log( jQuery( ".form_color_input" ).colorpicker( "getValue", "colorSelectors" ), jQuery( e.target ).val() );
+} );
+} );' );
 }
 
 

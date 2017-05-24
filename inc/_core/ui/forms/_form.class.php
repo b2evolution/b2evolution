@@ -1066,8 +1066,8 @@ class Form extends Widget
 				'type'      => 'text',
 				'value'     => $field_value,
 				'note'      => $field_note,
-				'size'      => 7,
-				'maxlength' => 7,
+				'size'      => 18,
+				'maxlength' => 22,
 				'name'      => $field_name,
 				'label'     => $field_label,
 				'class'     => '', // default class 'form_text_input form-control form_color_input'
@@ -1085,6 +1085,9 @@ class Form extends Widget
 
 		// Give it a class, so it can be selected for CSS in IE6
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_text_input form-control form_color_input';
+
+		//$field_params['input_prefix'] = '<span class="input-group colorpicker-component colorpicker-element">';
+		//$field_params['input_suffix'] = '<span class="input-group-addon"><i></i></span></span>';
 
 		return $this->input_field( $field_params );
 	}
