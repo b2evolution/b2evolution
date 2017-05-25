@@ -1666,38 +1666,14 @@ function prepare_uploaded_image( $File, $mimetype )
 	$resized_imh = null;
 	if( $do_resize )
 	{ // Resize image
-		list( $err, $src_imh ) = load_image( $File->get_full_path(), $mimetype );
-		if( empty( $err ) )
-		{
-			list( $err, $resized_imh ) = generate_thumb( $src_imh, 'fit', $thumb_width, $thumb_height );
-		}
-
-		if( empty( $err ) )
-		{ // Image was rezised successfully
-			$Messages->add( sprintf( T_( '%s was resized to %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', imagesx( $resized_imh ), imagesy( $resized_imh ) ), 'success' );
-		}
-		else
-		{ // Image was not rezised
-			$Messages->add( sprintf( T_( '%s could not be resized to target resolution of %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', $thumb_width, $thumb_height ), 'error' );
-			// Error exists, exit here
-			return;
-		}
+		resize_image( $File, $thumb_width, $thumb_height, $mimetype, $thumb_quality );
 	}
-
-	if( $mimetype == 'image/jpeg' )
-	{	// JPEG, do autorotate if EXIF Orientation tag is defined
-		$save_image = !$do_resize; // If image was be resized, we should save file only in the end of this function
-		exif_orientation( $File->get_full_path(), $resized_imh, $save_image );
-	}
-
-	if( !$resized_imh )
-	{	// Image resource is incorrect
-		return;
-	}
-
-	if( $do_resize && empty( $err ) )
-	{	// Save resized image ( and also rotated image if this operation was done )
-		save_image( $resized_imh, $File->get_full_path(), $mimetype, $thumb_quality );
+	else
+	{
+		if( $mimetype == 'image/jpeg' )
+		{	// JPEG, do autorotate if EXIF Orientation tag is defined
+			exif_orientation( $File->get_full_path(), $resized_imh, true );
+		}
 	}
 }
 
