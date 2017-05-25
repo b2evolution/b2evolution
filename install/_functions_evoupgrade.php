@@ -8472,6 +8472,77 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12310, 'Update skin color settings with transparency to new format...' ) )
+	{	// part of 6.9.2-beta
+		$SQL = new SQL( 'Get skins with transparent colors' );
+		$SQL->SELECT( 'skin_ID, skin_folder' );
+		$SQL->FROM( 'T_skins__skin' );
+		$SQL->WHERE( 'skin_folder IN ( "bootstrap_main_skin", "horizon_main_skin" )' );
+		$skins = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$color_transparency_settings = array();
+		foreach( $skins as $skin_ID => $skin_folder )
+		{
+			$color_set_name = ( $skin_folder == 'bootstrap_main_skin' ? 'front_bg_cont_color' : 'front_bg_color' );
+			$color_transparency_settings[ $color_set_name ] = array( $skin_ID, 'front_bg_opacity' );
+		}
+
+		$SQL = new SQL( 'Get all skin color settings with transparency which must be updated from hex to rgba format' );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_coll_settings' );
+		foreach( $color_transparency_settings as $color_set_name => $color_data )
+		{
+			$skin_ID = $color_data[0];
+			$transparency_set_name = $color_data[1];
+			$SQL->WHERE_or( 'cset_name LIKE "skin'.$skin_ID.'\_'.str_replace( '_', '\_', $color_set_name ).'"' );
+			$SQL->WHERE_or( 'cset_name LIKE "skin'.$skin_ID.'\_'.str_replace( '_', '\_', $transparency_set_name ).'"' );
+		}
+		$SQL->ORDER_BY( 'cset_coll_ID, cset_name' );
+		$color_settings = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		foreach( $color_settings as $color_setting )
+		{
+			$color_set_name = preg_replace( '/^skin\d+_/', '', $color_setting->cset_name );
+			if( ! isset( $color_transparency_settings[ $color_set_name ] ) )
+			{	// Skip not color setting:
+				continue;
+			}
+			$transparency_set_name = $color_transparency_settings[ $color_set_name ][1];
+			foreach( $color_settings as $transparency_setting )
+			{
+				if( $color_setting->cset_coll_ID == $transparency_setting->cset_coll_ID &&
+				    $transparency_setting->cset_name == str_replace( $color_set_name, '', $color_setting->cset_name ).$transparency_set_name )
+				{	// We found transparency value for the same color setting,
+					// Convert color from format #FFFFFF to rgba(255,255,255,1):
+					$transparency = floatval( $transparency_setting->cset_value / 100 );
+					$color = substr( $color_setting->cset_value, 1 );
+					if( strlen( $color ) == '6' )
+					{	// Color value in format #FFFFFF
+						$color = str_split( $color, 2 );
+					}
+					else
+					{	// Color value in format #FFF
+						$color = str_split( $color, 1 );
+						foreach( $color as $c => $v )
+						{
+							$color[ $c ] = $v.$v;
+						}
+					}
+					// Update color setting to new format:
+					$rgba_color = 'rgba('.implode( ',', array_map( 'hexdec', $color ) ).','.$transparency.')';
+					$DB->query( 'UPDATE T_coll_settings
+						  SET cset_value = '.$DB->quote( $rgba_color ).'
+						WHERE cset_coll_ID = '.$color_setting->cset_coll_ID.'
+						  AND cset_name = "'.$color_setting->cset_name.'"' );
+					// Remove old setting with transparency value:
+					$DB->query( 'DELETE FROM T_coll_settings
+						WHERE cset_coll_ID = '.$transparency_setting->cset_coll_ID.'
+						  AND cset_name = "'.$transparency_setting->cset_name.'"' );
+					break;
+				}
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -138,6 +138,7 @@ class bootstrap_main_Skin extends Skin
 						'note' => T_('This color will be used if Background image is not set or does not exist.'),
 						'defaultvalue' => '#333333',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'1_end' => array(
 					'layout' => 'end_fieldset',
@@ -166,20 +167,9 @@ class bootstrap_main_Skin extends Skin
 					'front_bg_cont_color' => array(
 						'label' => T_('Background color'),
 						'note' => T_('Click to select a color.'),
-						'defaultvalue' => '#000000',
+						'defaultvalue' => 'rgba(0,0,0,0.1)',
 						'type' => 'color',
-					),
-					'front_bg_opacity' => array(
-						'label' => T_('Background opacity'),
-						'note' => '%. ' . T_('Adjust the background transparency level.'),
-						'size' => '7',
-						'maxlength' => '3',
-						'defaultvalue' => '10',
-						'type' => 'integer',
-						'valid_range' => array(
-							'min' => 0, // from 0%
-							'max' => 100, // to 100%
-						),
+						'transparency' => true,
 					),
 					'pict_title_color' => array(
 						'label' => T_('Title color'),
@@ -223,6 +213,7 @@ class bootstrap_main_Skin extends Skin
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'secondary_text_color' => array(
 						'label' => T_('Text color'),
@@ -425,21 +416,7 @@ class bootstrap_main_Skin extends Skin
 
 			if( $color = $this->get_setting( 'front_bg_cont_color' ) )
 			{ // Custom body background color:
-				$color_transparency = floatval( $this->get_setting( 'front_bg_opacity' ) / 100 );
-				$color = substr( $color, 1 );
-				if( strlen( $color ) == '6' )
-				{ // Color value in format #FFFFFF
-					$color = str_split( $color, 2 );
-				}
-				else
-				{ // Color value in format #FFF
-					$color = str_split( $color, 1 );
-					foreach( $color as $c => $v )
-					{
-						$color[ $c ] = $v.$v;
-					}
-				}
-				$custom_css .= '.front_main_content { background-color: rgba('.implode( ',', array_map( 'hexdec', $color ) ).','.$color_transparency.')'." }\n";
+				$custom_css .= '.front_main_content { background-color: '.$color." }\n";
 			}
 
 			if( $color = $this->get_setting( 'front_text_color' ) )

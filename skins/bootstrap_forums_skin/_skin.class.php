@@ -205,6 +205,7 @@ class bootstrap_forums_Skin extends Skin
 						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'section_page_end' => array(
 					'layout' => 'end_fieldset',

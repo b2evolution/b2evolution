@@ -1671,12 +1671,16 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 
 	add_js_headline( 'jQuery( document ).ready( function()
 {
-jQuery( ".form_color_input" ).colorpicker( {
-	colorSelectors: { '.implode( ',', $user_colors_config ).' }
-} ).on( "hidePicker", function( e )
-{
-	console.log( jQuery( ".form_color_input" ).colorpicker( "getValue", "colorSelectors" ), jQuery( e.target ).val() );
-} );
+	jQuery( ".form_color_input" ).each( function()
+	{
+		jQuery( this ).colorpicker( {
+			format: jQuery( this ).hasClass( "form_color_transparent" ) ? false : "hex",
+			colorSelectors: { '.implode( ',', $user_colors_config ).' }
+		} ).on( "hidePicker", function( e )
+		{
+			console.log( jQuery( ".form_color_input" ).colorpicker( "getValue", "colorSelectors" ), jQuery( e.target ).val() );
+		} );
+	} );
 } );' );
 }
 

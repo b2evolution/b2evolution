@@ -188,6 +188,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'section_page_end' => array(
 					'layout' => 'end_fieldset',

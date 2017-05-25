@@ -340,7 +340,7 @@ switch( $action )
 
 		// Site color
 		$site_color = param( 'site_color', 'string', '' );
-		param_check_regexp( 'site_color', '~^(#([a-f0-9]{3}){1,2})?$~i', T_('Invalid color code.'), NULL, false );
+		param_check_color( 'site_color', T_('Invalid color code.') );
 		$Settings->set( 'site_color', $site_color );
 
 		// Site short name

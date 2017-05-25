@@ -2190,13 +2190,14 @@ function is_valid_login( $login, $force_strict_logins = false )
 
 /**
  * Checks if the color is valid
+ * Allowed formats: #09ABEF, rgba(100,200,255,0.99)
  *
  * @param string color to check
  * @return boolean true if OK
  */
 function is_color( $color )
 {
-	return preg_match( '~^(#([a-f0-9]{3}){1,2})?$~i', $color );
+	return preg_match( '~^(#([a-f0-9]{3}){1,2}|rgba\(\d{1,3},\d{1,3},\d{1,3},(1|0(\.\d{1,2})?)\))$~i', $color );
 }
 
 

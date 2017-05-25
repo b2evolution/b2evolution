@@ -242,14 +242,6 @@ class Skin extends DataObject
 		// Loop through all widget params:
 		foreach( $this->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
 		{
-			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'color' && empty( $parmeta['valid_pattern'] ) )
-			{ // Set default validation for color fields
-				$parmeta['valid_pattern'] = array(
-						'pattern' => '~^(#([a-f0-9]{3}){1,2})?$~i',
-						'error'   => T_('Invalid color code.')
-					);
-			}
-
 			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'input_group' )
 			{
 				if( ! empty( $parmeta['inputs'] ) )
