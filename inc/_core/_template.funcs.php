@@ -1647,11 +1647,22 @@ function init_voting_item_js( $relative_to = 'rsc_url' )
  */
 function init_colorpicker_js( $relative_to = 'rsc_url' )
 {
+	if( ! is_logged_in() )
+	{	// Colorpicker is initialized only for logged in users:
+		return;
+	}
+
+	global $current_User, $UserSettings;
+
 	require_js( '#jquery#', $relative_to );
 	require_js( 'bootstrap/colorpicker/bootstrap-colorpicker.min.js', $relative_to );
 	require_css( 'bootstrap-colorpicker.min.css', $relative_to );
 
-	$default_colors = array(
+	// Get preselected colors from settings of current User:
+	$user_colors = $UserSettings->get( 'colorpicker', $current_User->ID );
+	if( empty( $user_colors ) )
+	{	// Use these default colors if user didn't selected any color yet:
+		$user_colors = array(
 			'black'   => '#000000',
 			'grey'    => '#999999',
 			'white'   => '#ffffff',
@@ -1663,22 +1674,59 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 			'warning' => '#f0ad4e',
 			'danger'  => '#d9534f'
 		);
-	$user_colors_config = array();
-	foreach( $default_colors as $color_name => $color_value )
-	{
-		$user_colors_config[] = '"'.$color_name.'": "'.$color_value.'"';
+	}
+	else
+	{	// Convert user colors to array:
+		$user_colors = explode( ';', $user_colors );
 	}
 
 	add_js_headline( 'jQuery( document ).ready( function()
 {
 	jQuery( ".form_color_input" ).each( function()
 	{
+		var predefined_colors = ["'.implode( '","', $user_colors ).'"];
 		jQuery( this ).colorpicker( {
 			format: jQuery( this ).hasClass( "form_color_transparent" ) ? false : "hex",
-			colorSelectors: { '.implode( ',', $user_colors_config ).' }
+			colorSelectors: predefined_colors
 		} ).on( "hidePicker", function( e )
-		{
-			console.log( jQuery( ".form_color_input" ).colorpicker( "getValue", "colorSelectors" ), jQuery( e.target ).val() );
+		{	// Update predefined colors with new last selected:
+			var current_colors = e.color.predefinedColors;
+			var new_colors = current_colors.slice();
+			var new_color = e.color.toString();
+			var new_color_index = new_colors.indexOf( new_color );
+			if( new_color_index > -1 )
+			{	// Remove a duplicated color:
+				new_colors.splice( new_color_index, 1 );
+			}
+			new_colors.unshift( new_color );
+			new_colors.splice( 16, 1 );
+
+			if( new_colors.join( "" ) == current_colors.join( "" ) )
+			{	// Dont update if colors is not changed:
+				return;
+			}
+
+			// Reinitialize colorpickers with new preselected colors:
+			jQuery( ".form_color_input" ).colorpicker( "destroy" );
+			jQuery( ".form_color_input" ).each( function()
+			{
+				jQuery( this ).colorpicker( {
+					format: jQuery( this ).hasClass( "form_color_transparent" ) ? false : "hex",
+					colorSelectors: new_colors
+				} );
+			} );
+
+			// Save new colors in settings for current User:
+			jQuery.ajax(
+			{
+				type: "POST",
+				url: htsrv_url + "anon_async.php",
+				data: {
+					"action": "colorpicker",
+					"colors": new_colors.join( ";" ),
+					"crumb_colorpicker": "'.get_crumb( 'colorpicker' ).'"
+				}
+			} );
 		} );
 	} );
 } );' );

@@ -1527,6 +1527,23 @@ switch( $action )
 			) );
 		break;
 
+	case "colorpicker":
+		// Save last selected colors in bootstrap colorpicker per User:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'colorpicker' );
+
+		if( ! is_logged_in() )
+		{	// User must be loggedin for this action:
+			break;
+		}
+
+		param( 'colors', 'string' );
+
+		$UserSettings->set( 'colorpicker', $colors, $current_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;
