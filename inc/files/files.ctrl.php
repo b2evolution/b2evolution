@@ -1203,6 +1203,17 @@ switch( $action )
 		$edited_File->set( 'alt', param( 'alt', 'string', '' ) );
 		$edited_File->set( 'desc', param( 'desc', 'text', '' ) );
 
+		$resize_image = param( 'resize_image', 'boolean', false );
+		if( $resize_image )
+		{
+			load_funcs( 'files/model/_image.funcs.php' );
+
+			$current_dimensions = $edited_File->get_image_size('widthheight_assoc');
+			$new_dimensions = fit_into_constraint( $current_dimensions['width'], $current_dimensions['height'],
+					$Settings->get( 'fm_resize_width' ), $Settings->get( 'fm_resize_height' ));
+			resize_image( $edited_File, (int)$new_dimensions[0], (int)$new_dimensions[1] );
+		}
+
 		// Store File object into DB:
 		if( $edited_File->dbsave() )
 		{
