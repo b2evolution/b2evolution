@@ -16,8 +16,8 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-// Hide evo toolbar for this controller because it is called from iframe:
-$show_evo_toolbar = false;
+// Don't print out evo toolbar for this controller because it is called from iframe:
+$show_toolbar = false;
 
 // Enable customizer mode to disable all headers, menus and footers:
 $mode = 'customizer';

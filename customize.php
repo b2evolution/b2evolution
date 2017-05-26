@@ -102,7 +102,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		<div class="evo_customizer__right">
 			<?php echo get_icon( 'customizer_collapse', 'imgtag', array( 'class' => 'evo_customizer__collapser' ) ); ?>
 			<?php echo get_icon( 'customizer_expand', 'imgtag', array( 'class' => 'evo_customizer__expander' ) ); ?>
-			<iframe id="evo_customizer__frontoffice" src="<?php echo url_add_param( $customizing_url, 'show_evo_toolbar=0&amp;redir=no' ); ?>" data-coll-url="<?php echo format_to_output( $Blog->get( 'url' ), 'htmlattr' ); ?>"></iframe>
+			<iframe id="evo_customizer__frontoffice" src="<?php echo url_add_param( $customizing_url, 'customizer_mode=enable&amp;show_toolbar=hidden&amp;redir=no' ); ?>" data-coll-url="<?php echo format_to_output( $Blog->get( 'url' ), 'htmlattr' ); ?>"></iframe>
 		</div>
 		<iframe id="evo_customizer__updater" name="evo_customizer__updater" style="display:none"></iframe>
 	</div>

@@ -24,8 +24,9 @@ if( ! is_logged_in() )
  */
 global $current_User;
 
-if( ! show_toolbar() )
-{	// Don't show toolbar if it is disabled for ccurrent page or current User:
+global $show_toolbar;
+if( $show_toolbar !== 'hidden' && ! show_toolbar() )
+{	// Don't show toolbar if it is disabled for current page or current User:
 	return;
 }
 
@@ -79,7 +80,7 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 
 ?>
 
-<div id="evo_toolbar" class="evo_toolbar_<?php echo $Hit->get_agent_name(); ?>">
+<div id="evo_toolbar" class="evo_toolbar_<?php echo $Hit->get_agent_name(); ?>"<?php echo $show_toolbar === 'hidden' ? ' style="display:none"' : ''; ?>>
 	<div class="actions_right">
 		<?php
 			// Display evobar menu:

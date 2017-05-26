@@ -50,7 +50,7 @@ jQuery( document ).on( 'ready', function()
 			if( instance_name === false || backoffice_iframe.data( 'instance' ) != instance_name )
 			{	// If page of other site is loaded in front-office iframe:
 				alert( evo_js_lang_not_controlled_page );
-				location.href = jQuery( '#evo_customizer__frontoffice' ).get( 0 ).contentWindow.location.href.replace( 'show_evo_toolbar=0&redir=no', '' );
+				location.href = jQuery( '#evo_customizer__frontoffice' ).get( 0 ).contentWindow.location.href.replace( 'customizer_mode=enable&show_toolbar=hidden&redir=no', '' );
 				return;
 			}
 			var coll_id = body_class.match( /(^| )coll_(\d+)( |$)/ );
@@ -59,23 +59,32 @@ jQuery( document ).on( 'ready', function()
 			{	// Reload left/back-office iframe to customize current loaded collection if different collection has been loaded to the right/front-office iframe:
 				backoffice_iframe.get( 0 ).contentWindow.location.href = backoffice_iframe.get( 0 ).contentWindow.location.href.replace( /([\?&]blog=)\d+(&|$)/, '$1' + coll_id + '$2' );
 				backoffice_iframe.data( 'coll-id', coll_id );
-				return;
 			}
 		} );
 
 		jQuery( this ).contents().find( 'a' ).each( function()
-		{
+		{	// Prepare links of new loaded content of front-office iframe:
+			if( jQuery( this ).closest( '#evo_toolbar' ).length )
+			{	// Skip links of evo toolbar:
+				return;
+			}
 			var link_url = jQuery( this ).attr( 'href' );
 			var collection_url = jQuery( '#evo_customizer__frontoffice' ).data( 'coll-url' );
 			if( typeof( link_url ) != 'undefined' && link_url.indexOf( collection_url ) === 0 )
 			{	// Append param to hide evo toolbar and don't redirect for links of the current collection:
-				jQuery( this ).attr( 'href', link_url + ( link_url.indexOf( '?' ) === -1 ? '?' : '&' ) + 'show_evo_toolbar=0&redir=no' );
+				jQuery( this ).attr( 'href', link_url + ( link_url.indexOf( '?' ) === -1 ? '?' : '&' ) + 'customizer_mode=enable&show_toolbar=hidden&redir=no' );
 			}
 			else
 			{	// Open all links of other collections and side sites on top window in order to update settings frame or close it:
 				jQuery( this ).attr( 'target', '_top' );
 			}
 		} );
+
+		var evo_toolbar = jQuery( this ).contents().find( '#evo_toolbar' );
+		if( evo_toolbar.length )
+		{	// Grab evo toolbar from front-office iframe with actual data for current loaded page:
+			jQuery( '#evo_toolbar' ).html( evo_toolbar.html() );
+		}
 	} );
 
 	jQuery( '.evo_customizer__collapser' ).click( function()

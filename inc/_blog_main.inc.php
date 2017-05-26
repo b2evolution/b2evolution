@@ -30,7 +30,16 @@ load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 //$dummy = new Blog();
 $Timer->start( '_BLOG_MAIN.inc' );
 
-param( 'show_evo_toolbar', 'integer', NULL );
+// Evo toolbar visibility:
+// true   - (Default) Visible if current user has a permission to view toolbar,
+// false  - Hidden and it is not printed at all,
+// 'hidden' - Toolbar is printed out but it is hidden with css property.
+//            (Used for customizer mode when we should grab toolbar from iframe to main window)
+param( 'show_toolbar', 'string', NULL );
+if( $show_toolbar !== NULL && $show_toolbar !== 'hidden' )
+{	// Convert all not string possible values to boolean type:
+	$show_toolbar = (boolean)$show_toolbar;
+}
 
 /*
  * blog ID. This is a little bit special.

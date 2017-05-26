@@ -534,11 +534,11 @@ function use_in_skin_login()
  */
 function show_toolbar()
 {
-	global $current_User, $show_evo_toolbar, $customizer_url;
+	global $current_User, $show_toolbar, $customizer_url;
 
 	return (
 		// If evo toolbar is not disabled for specific page:
-		( ! isset( $show_evo_toolbar ) || $show_evo_toolbar ) &&
+		( ! isset( $show_toolbar ) || $show_toolbar === true ) &&
 		// If current user has a permisssion to view toolbar:
 		is_logged_in() && ( $current_User->check_perm( 'admin', 'toolbar' ) ) );
 }
