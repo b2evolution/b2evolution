@@ -84,6 +84,7 @@ class ItemList2 extends ItemListLight
 		}
 
 		global $DB, $localtimenow, $Messages, $BlogCache;
+        global $Item;
 		global $Plugins;
 
 		$item_typ_ID = param( 'item_typ_ID', 'integer', NULL );
@@ -101,6 +102,7 @@ class ItemList2 extends ItemListLight
 		}
 
 		$preview_userid = param( 'preview_userid', 'integer', true );
+        $creator_user_ID = $Item->creator_user_ID;
 		$post_status = param( 'post_status', 'string', true );
 		$post_locale = param( 'post_locale', 'string', $current_User->locale );
 		$content = param( 'content', $text_format, true );
@@ -171,7 +173,7 @@ class ItemList2 extends ItemListLight
 		$this->sql = "SELECT
 			$post_ID AS post_ID,
 			$post_parent_ID AS post_parent_ID,
-			$preview_userid AS post_creator_user_ID,
+			$creator_user_ID AS post_creator_user_ID,
 			$preview_userid AS post_lastedit_user_ID,
 			'$item_issue_date' AS post_datestart,
 			'$item_issue_date' AS post_datecreated,
