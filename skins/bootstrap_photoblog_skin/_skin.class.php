@@ -427,19 +427,19 @@ class bootstrap_photoblog_Skin extends Skin
 
 		// Page background color
 		if ( $background_color = $this->get_setting( 'background_color' ) ) {
-			$custom_css .= 'body, .nav li.active a { background-color: '.$background_color."; }\n";
+			$custom_css .= '#skin_wrapper, .nav li.active a { background-color: '.$background_color."; }\n";
 		}
 		// Page text color
 		if ( $page_text_color = $this->get_setting( 'page_text_color' ) ) {
-			$custom_css .= 'body { color: '.$page_text_color."; }\n";
+			$custom_css .= '#skin_wrapper { color: '.$page_text_color."; }\n";
 		}
 		// Page link color
 		if ( $page_link_color = $this->get_setting( 'page_link_color' ) ) {
-			$custom_css .= 'body a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+			$custom_css .= '#skin_wrapper a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
 		}
 		// Page link hover color
 		if ( $page_link_h_color = $this->get_setting( 'page_link_h_color' ) ) {
-			$custom_css .= 'body a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+			$custom_css .= '#skin_wrapper a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
 		}
 		// Posts background color
 		if ( $well_color = $this->get_setting( 'well_color' ) ) {

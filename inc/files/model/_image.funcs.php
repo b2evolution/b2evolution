@@ -729,4 +729,67 @@ if( !function_exists( 'imagerotate' ) )
 	}
 }
 
+
+/**
+ * Scale image to dimensions specified.
+ * The scaling only happens if the source is larger than the constraint.
+ *
+ * @param object File
+ * @param integer constrained width
+ * @param integer constrained height
+ * @param string mimetype of File
+ * @param integer image quality
+ */
+function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_quality = NULL)
+{
+	global $Settings, $Messages;
+
+	if( empty( $mimetype ) )
+	{
+		$Filetype = $File->get_Filetype();
+		$mimetype = $Filetype->mimetype;
+	}
+
+	if( empty( $image_quality ) )
+	{
+		$image_quality = $Settings->get( 'fm_resize_quality' );
+	}
+
+	$resized_imh = null;
+
+	list( $err, $src_imh ) = load_image( $File->get_full_path(), $mimetype );
+	if( empty( $err ) )
+	{
+		list( $err, $resized_imh ) = generate_thumb( $src_imh, 'fit', $new_width, $new_height );
+	}
+
+	if( empty( $err ) )
+	{ // Image was resized successfully
+		$Messages->add_to_group( sprintf( T_( '%s was resized to %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', imagesx( $resized_imh ), imagesy( $resized_imh ) ),
+				'success', T_('The following images were resized:') );
+	}
+	else
+	{ // Image was not resized
+		$Messages->add_to_group( sprintf( T_( '%s could not be resized to target resolution of %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', $new_width, $new_height ),
+				'error', T_('Unable to resize the following images:') );
+		// Error exists, exit here
+		return;
+	}
+
+	if( $mimetype == 'image/jpeg' )
+	{	// JPEG, do autorotate if EXIF Orientation tag is defined
+		exif_orientation( $File->get_full_path(), $resized_imh );
+	}
+
+	if( !$resized_imh )
+	{	// Image resource is incorrect
+		return;
+	}
+
+	if( empty( $err ) )
+	{	// Save resized image ( and also rotated image if this operation was done )
+		save_image( $resized_imh, $File->get_full_path(), $mimetype, $image_quality );
+	}
+}
+
 ?>
