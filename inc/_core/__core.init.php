@@ -1520,7 +1520,7 @@ class _core_Module extends Module
 				if( $Session->get( 'customizer_mode_'.$Blog->ID ) )
 				{	// If skin customizer mode is enabled:
 					$customizing_url = get_param( 'customizing_url' );
-					$menu_entry_skin_href = url_add_param( ( empty( $customizing_url ) ? get_current_url() : $customizing_url ), 'customizer_mode=disable' );
+					$menu_entry_skin_href = url_add_param( ( empty( $customizing_url ) ? get_current_url( 'customizer_mode,show_toolbar,redir' ) : $customizing_url ), 'customizer_mode=disable' );
 					$menu_entry_skin_class = 'active';
 				}
 				else
