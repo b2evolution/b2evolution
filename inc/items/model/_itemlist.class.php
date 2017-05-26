@@ -100,6 +100,15 @@ class ItemList2 extends ItemListLight
 			$text_format = 'htmlspecialchars';
 		}
 
+        $UserCache = & get_UserCache();
+        if( ( $creator_User = &$UserCache->get_by_login( param( 'item_owner_login', 'string', true ) ) ) !== false )
+        {
+            $creator_user_ID = $creator_User->ID;
+        }
+        else {
+            $creator_user_ID = param( 'preview_userid', 'integer', true );
+        }
+
 		$preview_userid = param( 'preview_userid', 'integer', true );
 		$post_status = param( 'post_status', 'string', true );
 		$post_locale = param( 'post_locale', 'string', $current_User->locale );
@@ -171,7 +180,7 @@ class ItemList2 extends ItemListLight
 		$this->sql = "SELECT
 			$post_ID AS post_ID,
 			$post_parent_ID AS post_parent_ID,
-			$preview_userid AS post_creator_user_ID,
+			$creator_user_ID AS post_creator_user_ID,
 			$preview_userid AS post_lastedit_user_ID,
 			'$item_issue_date' AS post_datestart,
 			'$item_issue_date' AS post_datecreated,
