@@ -765,11 +765,13 @@ function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_
 
 	if( empty( $err ) )
 	{ // Image was resized successfully
-		$Messages->add( sprintf( T_( '%s was resized to %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', imagesx( $resized_imh ), imagesy( $resized_imh ) ), 'success' );
+		$Messages->add_to_group( sprintf( T_( '%s was resized to %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', imagesx( $resized_imh ), imagesy( $resized_imh ) ),
+				'success', T_('The following images were resized:') );
 	}
 	else
 	{ // Image was not resized
-		$Messages->add( sprintf( T_( '%s could not be resized to target resolution of %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', $new_width, $new_height ), 'error' );
+		$Messages->add_to_group( sprintf( T_( '%s could not be resized to target resolution of %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', $new_width, $new_height ),
+				'error', T_('Unable to resize the following images:') );
 		// Error exists, exit here
 		return;
 	}
