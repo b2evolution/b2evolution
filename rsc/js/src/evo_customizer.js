@@ -11,6 +11,20 @@ jQuery( document ).on( 'ready', function()
 		{	// Set proper bottom margin because buttons block has a fixed position at the bottom:
 			jQuery( this ).contents().find( 'body' ).css( 'margin-bottom', jQuery( this ).contents().find( '.evo_customizer__buttons' ).outerHeight() - 1 );
 		}
+
+		if( jQuery( this ).contents().find( '.alert.alert-success' ).length )
+		{	// Reload front-office iframe with collection preview if the back-office iframe has a message about success updating:
+			jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.reload();
+		}
+
+		// Remove the message of successful action:
+		var success_messages = jQuery( this ).contents().find( '.alert.alert-success' );
+		var messages_wrapper = success_messages.parent();
+		success_messages.remove();
+		if( ! messages_wrapper.find( '.alert' ).length )
+		{	// Remove messages wrapper completely if it had only successful messages:
+			messages_wrapper.closest( '.action_messages' ).remove();
+		}
 	} );
 
 	jQuery( '#evo_customizer__updater' ).on( 'load', function()
@@ -24,18 +38,8 @@ jQuery( document ).on( 'ready', function()
 		if( jQuery( this ).contents().find( '.alert:not(.alert-success)' ).length || 
 		// OR if the settings iframe has the error message from previous updating:
 			jQuery( '#evo_customizer__backoffice' ).contents().find( '.alert' ).length )
-		{	// Update settings iframe with new content from updataer iframe:
-			jQuery( '#evo_customizer__backoffice' ).contents()
-				.find( 'body' ).html( jQuery( this ).contents().find( 'body' ).html() )
-				.find( 'form' ).attr( 'target', 'evo_customizer__updater' );
-			// Remove the message of successful action:
-			var success_messages = jQuery( '#evo_customizer__backoffice' ).contents().find( '.alert.alert-success' );
-			var messages_wrapper = success_messages.parent();
-			success_messages.remove();
-			if( ! messages_wrapper.find( '.alert' ).length )
-			{	// Remove messages wrapper completely if it had only successful messages:
-				messages_wrapper.closest( '.action_messages' ).remove();
-			}
+		{	// Update settings/back-office iframe with new content what we have in updater iframe currently:
+			jQuery( '#evo_customizer__backoffice' ).contents().find( 'form' ).removeAttr( 'target' ).submit();
 		}
 	} );
 

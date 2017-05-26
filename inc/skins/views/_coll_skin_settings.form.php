@@ -79,7 +79,7 @@ $Form->begin_form( 'fform' );
 				' '.T_('Reset params'), 3, 4, array(
 					'class'   => $mode == 'customizer' ? 'small' : 'action_icon btn btn-default btn-sm',
 					'onclick' => 'return evo_confirm_skin_reset()',
-					'target' => $mode == 'customizer' ? 'evo_customizer__updater' : '',
+					'target' => $mode == 'customizer' ? 'evo_customizer__backoffice' : '',
 			) );
 		$fieldset_title_links .= $link_reset_params;
 	}
@@ -89,7 +89,7 @@ $Form->begin_form( 'fform' );
 $buttons = array();
 if( $skin_ID )
 {	// Allow to update skin params only when it is really selected (Don't display this button to case "Same as normal skin."):
-	$buttons[] = array( 'submit', 'submit', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
+	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
 }
 
 if( $mode == 'customizer' )
@@ -115,7 +115,7 @@ function evo_confirm_skin_reset()
 if( $mode == 'customizer' )
 {	// If skin customizer mode:
 ?>
-	window.parent.openModalWindow( '<form action="<?php echo str_replace( '&amp;', '&', $link_reset_url ); ?>" method="post" target="evo_customizer__updater" onsubmit="closeModalWindow()">' +
+	window.parent.openModalWindow( '<form action="<?php echo str_replace( '&amp;', '&', $link_reset_url ); ?>" method="post" target="evo_customizer__backoffice" onsubmit="closeModalWindow()">' +
 				'<span class="text-danger"><?php echo $skin_reset_confirmation_msg; ?></span>' +
 				'<input type="submit" value="<?php echo TS_('Reset params'); ?>" />' +
 			'</form>',
