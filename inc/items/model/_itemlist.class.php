@@ -86,6 +86,7 @@ class ItemList2 extends ItemListLight
 		global $DB, $localtimenow, $Messages, $BlogCache;
 		global $Plugins;
 
+		$post_ID = param( 'post_ID', 'integer', 0 );
 		$item_typ_ID = param( 'item_typ_ID', 'integer', NULL );
 
 		$ItemTypeCache = & get_ItemTypeCache();
@@ -100,7 +101,22 @@ class ItemList2 extends ItemListLight
 			$text_format = 'htmlspecialchars';
 		}
 
-		$preview_userid = param( 'preview_userid', 'integer', true );
+		$UserCache = & get_UserCache();
+		if( $creator_User = & $UserCache->get_by_login( param( 'item_owner_login', 'string', NULL ) ) )
+		{	// Initialize creator user ID from submitted input:
+			$creator_user_ID = $creator_User->ID;
+		}
+		else
+		{	// Get creator user ID from the creating/editing Item:
+			$ItemCache = & get_ItemCache();
+			if( ! ( $Item = & $ItemCache->get_by_ID( $post_ID, false, false ) ) )
+			{	// Initialize new creating Item:
+				$Item = new Item();
+			}
+			$creator_user_ID = $Item->creator_user_ID;
+		}
+
+		$preview_user_ID = param( 'preview_userid', 'integer', true );
 		$post_status = param( 'post_status', 'string', true );
 		$post_locale = param( 'post_locale', 'string', $current_User->locale );
 		$content = param( 'content', $text_format, true );
@@ -165,14 +181,13 @@ class ItemList2 extends ItemListLight
 		$post_title = format_to_post( $post_title );
 		$content = format_to_post( $content );
 
-		$post_ID = param( 'post_ID', 'integer', 0 );
 		$post_parent_ID = intval( param( 'post_parent_ID', 'integer', 0 ) );
 
 		$this->sql = "SELECT
 			$post_ID AS post_ID,
 			$post_parent_ID AS post_parent_ID,
-			$preview_userid AS post_creator_user_ID,
-			$preview_userid AS post_lastedit_user_ID,
+			$creator_user_ID AS post_creator_user_ID,
+			$preview_user_ID AS post_lastedit_user_ID,
 			'$item_issue_date' AS post_datestart,
 			'$item_issue_date' AS post_datecreated,
 			'$item_issue_date' AS post_datemodified,
