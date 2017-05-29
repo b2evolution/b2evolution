@@ -1072,6 +1072,8 @@ class Form extends Widget
 				'label'     => $field_label,
 				'class'     => '', // default class 'form_text_input form-control form_color_input'
 				'transparency' => false, // TRUE to allow select transparent color
+				'input_prefix' => '',
+				'input_suffix' => '',
 			), $field_params );
 
 		if( isset( $field_params['force_to'] ) )
@@ -1093,8 +1095,9 @@ class Form extends Widget
 			unset( $field_params['transparency'] );
 		}
 
-		//$field_params['input_prefix'] = '<span class="input-group colorpicker-component colorpicker-element">';
-		//$field_params['input_suffix'] = '<span class="input-group-addon"><i></i></span></span>';
+		// Initialize colorpicker wrappers to display a color selector box after color input field:
+		$field_params['input_prefix'] = $field_params['input_prefix'].'<span class="input-group colorpicker-component">';
+		$field_params['input_suffix'] = '<span class="input-group-addon"><i></i></span></span>'.$field_params['input_suffix'];
 
 		return $this->input_field( $field_params );
 	}

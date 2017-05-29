@@ -1685,7 +1685,8 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 	jQuery( ".form_color_input" ).each( function()
 	{
 		var predefined_colors = ["'.implode( '","', $user_colors ).'"];
-		jQuery( this ).colorpicker( {
+		var colored_input = jQuery( this ).parent();
+		colored_input.colorpicker( {
 			format: jQuery( this ).hasClass( "form_color_transparent" ) ? false : "hex",
 			colorSelectors: predefined_colors
 		} ).on( "hidePicker", function( e )
@@ -1699,7 +1700,7 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 				new_colors.splice( new_color_index, 1 );
 			}
 			new_colors.unshift( new_color );
-			new_colors.splice( 16, 1 );
+			new_colors.splice( 10, 1 );
 
 			if( new_colors.join( "" ) == current_colors.join( "" ) )
 			{	// Dont update if colors is not changed:
@@ -1707,10 +1708,11 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 			}
 
 			// Reinitialize colorpickers with new preselected colors:
-			jQuery( ".form_color_input" ).colorpicker( "destroy" );
 			jQuery( ".form_color_input" ).each( function()
 			{
-				jQuery( this ).colorpicker( {
+				var colored_input = jQuery( this ).parent();
+				colored_input.colorpicker( "destroy" );
+				colored_input.colorpicker( {
 					format: jQuery( this ).hasClass( "form_color_transparent" ) ? false : "hex",
 					colorSelectors: new_colors
 				} );

@@ -686,6 +686,9 @@ div.filters .filter_item div {
   margin-right: 4px;
   margin-left: 2px;
 }
+.input-group.colorpicker-component {
+  width: 100px;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
