@@ -5836,10 +5836,17 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 				}
 				elseif( !is_numeric( $param ) )
 				{	// This is a string
-					if( preg_match_all( '#<script[^>]*>(.+?)</script>#is', $param, $match_scripts ) )
+					if( preg_match_all( '#<script(.*?)?>(.*?)</script>#is', $param, $match_scripts ) )
 					{	// Extract internal scripts from content:
-						$param = preg_replace( '#<script[^>]*>(.+?)</script>#is', '', $param );
-						$internal_scripts = array_merge( $internal_scripts, $match_scripts[1] );
+						$param = str_replace( $match_scripts[0], '', $param );
+						foreach( $match_scripts[2] as $i => $internal_script_code )
+						{
+							if( $internal_script_code === '' && strpos( $match_scripts[1][ $i ], 'src=' ) !== false )
+							{	// Append external JS file to <head> to execute code:
+								$internal_script_code = 'jQuery( \'head\' ).append( \''.format_to_js( $match_scripts[0][ $i ] ).'\' );';
+							}
+							$internal_scripts[] = $internal_script_code;
+						}
 					}
 					// Quote the string to javascript format:
 					$param = '\''.format_to_js( $param ).'\'';
