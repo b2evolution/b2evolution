@@ -845,15 +845,10 @@ class Hit
 			$ReqURI = $this->test_uri['link'];
 		}
 
-		$hit_uri = substr( $ReqURI, 0, 250 ); // VARCHAR(250) and likely to be longer
-		$hit_referer = substr( $this->referer, 0, 250 ); // VARCHAR(250) and likely to be longer
-
 		// Extract the keyphrase from search referers:
 		$keyphrase = $this->get_keyphrase();
 
-		$keyp_ID = NULL;
-
-		if ( empty( $keyphrase ) )
+		if( empty( $keyphrase ) )
 		{	// No search hit
 			if ( ! empty( $this->test_mode ) && ! empty( $this->test_uri['s'] ) )
 			{
@@ -917,16 +912,16 @@ class Hit
 		// Insert a hit into DB table:
 		$sql_insert_fields = array(
 				'hit_datetime'          => 'FROM_UNIXTIME( '.$localtimenow.' )',
-				'hit_uri'               => $DB->quote( $hit_uri ),
-				'hit_disp'              => $DB->quote( $disp ),
-				'hit_ctrl'              => $DB->quote( $ctrl ),
-				'hit_action'            => $DB->quote( $this->action ),
+				'hit_uri'               => $DB->quote( substr( $ReqURI, 0, 250 ) ), // VARCHAR(250) and likely to be longer
+				'hit_disp'              => $DB->quote( substr( $disp, 0, 30 ) ), // VARCHAR(30) and likely to be longer
+				'hit_ctrl'              => $DB->quote( substr( $ctrl, 0, 30 ) ), // VARCHAR(30) and likely to be longer
+				'hit_action'            => $DB->quote( substr( $this->action, 0, 30 ) ), // VARCHAR(30) and likely to be longer
 				'hit_type'              => $DB->quote( $this->hit_type ),
 				'hit_referer_type'      => $DB->quote( $this->referer_type ),
-				'hit_referer'           => $DB->quote( $hit_referer ),
+				'hit_referer'           => $DB->quote( substr( $this->referer, 0, 250 ) ), // VARCHAR(250) and likely to be longer
 				'hit_referer_dom_ID'    => $DB->quote( $this->get_referer_domain_ID() ),
-				'hit_keyphrase_keyp_ID' => $DB->quote( $keyp_ID ),
-				'hit_keyphrase'         => $DB->quote( $keyphrase ),
+				'hit_keyphrase_keyp_ID' => $DB->quote( NULL ),
+				'hit_keyphrase'         => $DB->quote( substr( $keyphrase, 0, 255 ) ), // VARCHAR(255) and likely to be longer
 				'hit_serprank'          => $DB->quote( $serprank ),
 				'hit_coll_ID'           => $DB->quote( $blog_ID ),
 				'hit_remote_addr'       => $DB->quote( $this->IP ),

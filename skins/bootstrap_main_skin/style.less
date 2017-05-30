@@ -18,11 +18,11 @@
 		div, h1, h2, p {
 			margin-top: 0;
 		}
-		div > p:last-child,
-		&:last-child > h2,
-		&:last-child > ul,
+		div > p:last-child, // When it's the last <p> of the each div, no martgin-bottom, because of regular widget margin-bottom
+		//&:last-child > h2,
+		&:last-child > ul, // When it's the last <ul> of the each div, no martgin-bottom, because of regular widget margin-bottom
 		& > ul li:last-child {
-			margin-bottom: 0 !important;
+			margin-bottom: 0 !important; // When it's the last <li> of last <ul> of the each div, no martgin-bottom, because of regular widget margin-bottom
 		}
 	}
 }

@@ -111,7 +111,7 @@ switch( $action )
 
 		if( empty( $import_keywords ) )
 		{	// No selected keywords to import:
-			$Messages->add( T_('Please select what keywords should be imported.'), 'error' );
+			$Messages->add( T_('Please select keywords to import.'), 'error' );
 			$action = 'import';
 			break;
 		}

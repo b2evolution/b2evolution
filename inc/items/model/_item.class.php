@@ -2206,13 +2206,21 @@ class Item extends ItemLight
 
 		$content_parts = $this->get_content_parts( $params );
 
-		// Output everything after [teaserbreak]
-		array_shift($content_parts);
-		$output = implode('', $content_parts);
+		// Output everything after [teaserbreak]:
+		array_shift( $content_parts );
+		$output = implode( '', $content_parts );
 
 		// Render inline file tags like [image:123:caption] or [file:123:caption] :
 		$params['check_code_block'] = true;
+
+		// Render inline file tags like [image:123:caption] or [file:123:caption] :
 		$output = render_inline_files( $output, $this, $params );
+
+		// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
+		$output = $this->render_custom_fields( $output, $params );
+
+		// Render Parent Data [parent], [parent:fields] and etc.:
+		$output = $this->render_parent_data( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2507,7 +2515,7 @@ class Item extends ItemLight
 	function render_parent_data( $content, $params = array() )
 	{
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
-		{	// Call $this->render_custom_fields() on everything outside code/pre:
+		{	// Call $this->render_parent_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
@@ -2667,6 +2675,11 @@ class Item extends ItemLight
 	 * Does the post have different content parts (teaser/extension, divided by "[teaserbreak]")?
 	 * This is also true for posts that have images with "aftermore" position.
 	 *
+	 * @todo fp> This is a heavy operation! We should probably store the presence of `[teaserbreak]` in a var so that future cals do not rexecute again.
+	 *           BUT first we need to know why we're interested in $params['disppage'], $params['format']  (or better said: in wgat case are we using different values for this?)
+	 *           ALSO we should probably store the position of [teaserbreak] for even better performance
+	 *           ALSO we may want to store that at UPDATE time, into the DB, so we have super fast access to it.
+	 *
 	 * @access public
 	 * @return boolean
 	 */
@@ -2680,8 +2693,8 @@ class Item extends ItemLight
 
 		$content_page = $this->get_content_page( $params['disppage'], $params['format'] );
 
-		// Remove <code> and <pre> blocks from content to don't check [teaserbreak] there
-		$content_page = preg_replace( '~<(code|pre)[^>]*>.*?</\1>~is', '', $content_page );
+		// Replace <code> and <pre> blocks from content because we're not interested in [teaserbreak] in there
+		$content_page = preg_replace( '~<(code|pre)[^>]*>.*?</\1>~is', '*', $content_page );
 
 		return strpos( $content_page, '[teaserbreak]' ) !== false
 			|| $this->get_images( array( 'restrict_to_image_position' => 'aftermore' ) );
@@ -6559,6 +6572,7 @@ class Item extends ItemLight
 		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_moderation_setting_name.'"' );
 		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 		$SQL->WHERE( $notify_condition );
+		$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 		$SQL->WHERE_and( '( bloguser_perm_edit IS NOT NULL AND bloguser_perm_edit <> "no" AND bloguser_perm_edit <> "own" )
 				OR ( bloggroup_perm_edit IS NOT NULL AND bloggroup_perm_edit <> "no" AND bloggroup_perm_edit <> "own" )
 				OR ( grp_perm_blogs = "editall" ) OR ( user_ID = blog_owner_user_ID )' );
@@ -6786,7 +6800,9 @@ class Item extends ItemLight
 		$SQL = new SQL( 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
 		$SQL->SELECT( 'DISTINCT sub_user_ID' );
 		$SQL->FROM( 'T_subscriptions' );
-		$SQL->WHERE( 'sub_coll_ID = '.$this->get_blog_ID() );
+		$SQL->FROM_add( 'INNER JOIN T_users ON user_ID = sub_user_ID' );
+		$SQL->WHERE( 'user_status IN ( "activated", "autoactivated" )' );
+		$SQL->WHERE_and( 'sub_coll_ID = '.$this->get_blog_ID() );
 		$SQL->WHERE_and( 'sub_items <> 0' );
 		if( ! empty( $already_notified_user_IDs ) )
 		{	// Create condition to not select already notified moderator users:
@@ -7022,7 +7038,7 @@ class Item extends ItemLight
 					$ping_messages[] = sprintf( T_('Pinging %s...'), $Plugin->ping_service_name );
 					$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
-					$r = $r && ( $Plugin->ItemSendPing( $params ) );
+					$r = $Plugin->ItemSendPing( $params ) && $r;
 
 					if( ! empty( $params['xmlrpcresp'] ) )
 					{

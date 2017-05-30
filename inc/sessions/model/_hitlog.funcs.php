@@ -1301,8 +1301,8 @@ function display_hits_summary_panel()
 		$Form->begin_form();
 
 		$Form->select_input_array( 'agg_period', $UserSettings->get( 'agg_period' ), array(
-				'last_30_days'   => T_( 'Last 30 days' ),
-				'last_60_days'   => T_( 'Last 60 days' ),
+				'last_30_days'   => sprintf( T_('Last %d days'), 30 ),
+				'last_60_days'   => sprintf( T_('Last %d days'), 60 ),
 				'current_month'  => T_( 'Current Month to date' ),
 				'specific_month' => T_( 'Specific Month:' ),
 			), T_('Show') );

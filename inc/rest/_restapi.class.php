@@ -670,7 +670,7 @@ class RestApi
 	private function controller_coll_posts()
 	{
 		$this->controller_coll_items( array(
-				'itemtype_usage' => NULL, // Keep content post types, Exclude pages, intros, sidebar links and ads
+				'itemtype_usage' => 'post', // Keep content post types, Exclude pages, intros, sidebar links and ads
 			) );
 	}
 

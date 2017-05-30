@@ -82,7 +82,7 @@ class adsense_plugin extends Plugin
 					'label' => 'Auto blocks',
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
-					'note' => T_('Automatically add an ad block in the middle of any post that has no [adsense:] tag yet.'),
+					'note' => T_('Automatically add an ad block in the middle of any post that has no <code>[adsense:]</code> tag yet.'),
 				),
 			);
 

@@ -165,36 +165,30 @@
 	// Slideshow functionality
 	function slideshow() {
 		var
-		timeOut,
+		interval_ID,
 		className = prefix + "Slideshow_",
 		click = "click." + prefix,
 		start,
-		stop,
-		clear;
+		stop;
 		
 		if (settings.slideshow && $related[1]) {
 			start = function () {
 				$slideshow
 					.text(settings.slideshowStop)
-					.unbind(click)
-					.bind(event_complete, function () {
-						if (index < $related.length - 1 || settings.loop) {
-							timeOut = setTimeout(publicMethod.next, settings.slideshowSpeed);
-						}
-					})
-					.bind(event_load, function () {
-						clearTimeout(timeOut);
-					})
-					.one(click + ' ' + event_cleanup, stop);
+					.one(click, stop);
 				$box.removeClass(className + "off").addClass(className + "on");
-				timeOut = setTimeout(publicMethod.next, settings.slideshowSpeed);
+				interval_ID = setInterval( function() {
+					if( ! open || ( ! settings.loop && index == $related.length - 1 ) ) {
+						stop();
+					}
+					publicMethod.next();
+				}, settings.slideshowSpeed);
 			};
 			
 			stop = function () {
-				clearTimeout(timeOut);
+				clearInterval(interval_ID);
 				$slideshow
 					.text(settings.slideshowStart)
-					.unbind([event_complete, event_load, event_cleanup, click].join(' '))
 					.one(click, start);
 				$box.removeClass(className + "on").addClass(className + "off");
 			};
@@ -266,6 +260,8 @@
 				$groupControls.add($title).hide();
 
 				$close.html(settings.close).show();
+
+				slideshow();
 			}
 
 			publicMethod.load(true);
@@ -326,7 +322,7 @@
 			$current = $div("Current"),
 			$next = $div("Next"),
 			$prev = $div("Previous"),
-			$slideshow = $div("Slideshow").bind(event_open, slideshow),
+			$slideshow = $div("Slideshow"),
 			$close = $div("Close"),
 			$open = $div("Open")
 		);

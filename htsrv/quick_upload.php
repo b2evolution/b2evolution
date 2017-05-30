@@ -246,8 +246,11 @@ if( strpos( $root_and_path, '::' ) )
 	list( $root, $path ) = explode( '::', $root_and_path, 2 );
 	$FileRootCache = & get_FileRootCache();
 	$fm_FileRoot = $FileRootCache->get_by_ID( $root );
-	$non_canonical_list_path = $fm_FileRoot->ads_path.$path;
-	$upload_path = get_canonical_path( $non_canonical_list_path );
+	if( $fm_FileRoot )
+	{
+		$non_canonical_list_path = $fm_FileRoot->ads_path.$path;
+		$upload_path = get_canonical_path( $non_canonical_list_path );
+	}
 }
 
 if( $upload_path === false )
