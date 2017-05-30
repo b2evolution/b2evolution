@@ -1194,7 +1194,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 '<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
 
-'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[field: first_string_field]' ).'</p>',
+'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field: first_string_field]' ).'</p>',
 					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
 			$item_IDs[] = $edited_Item->ID;
 
@@ -1215,7 +1215,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 <p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>
 
-<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[parent:field: first_string_field]' ).'</p>',
+<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field: first_string_field]' ).'</p>',
 					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
 			$item_IDs[] = $edited_Item->ID;
 
