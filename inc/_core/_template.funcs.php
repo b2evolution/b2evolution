@@ -2496,7 +2496,8 @@ function display_login_form( $params )
 	else
 	{
 		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, '', '',
-					array( 'maxlength' => 255, 'class' => 'input_text', 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
+					array( 'maxlength' => 255, 'class' => 'input_text', 'input_required' => 'required', 'placeholder' => T_('Username (or email address)'),
+								 'autocapitalize' => 'off', 'autocorrect' => 'off' ) );
 	}
 
 	$lost_password_url = get_lostpassword_url( $redirect_to, '&amp;', $return_to );
