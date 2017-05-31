@@ -20,7 +20,7 @@
 /**
  * @global boolean Are we running on Command Line Interface instead of a web request?
  */
-$is_cli = empty($_SERVER['SERVER_SOFTWARE']) ? true : false;
+$is_cli = 'cli' == PHP_SAPI;
 
 if( $is_cli )
 {	// Initialize params from CLI mode request:
