@@ -41,7 +41,7 @@ else
 	$Form->info( T_( 'Description' ), $update['description'] );
 	$Form->info( T_( 'Version' ), $update['version'] );
 
-	$Form->text_input( 'upd_url', ( get_param( 'upd_url' ) != '' ? get_param( 'upd_url' ) : $update['url'] ), 80,
+	$Form->text_input( 'upd_url', ( get_param( 'upd_url' ) != '' ? get_param( 'upd_url' ) : $update['url'] ), 90,
 		T_('URL'), '<br/><span class="note">'.T_( 'You <i>might</i> replace this with a different URL in case you want to upgrade to a custom version.' ).'</span>', array( 'maxlength' => 300, 'required' => true ) );
 
 	$Form->add_crumb( 'upgrade_started' );
