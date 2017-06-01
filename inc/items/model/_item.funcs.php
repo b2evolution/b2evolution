@@ -1639,7 +1639,7 @@ function get_tab_by_item_type_usage( $type_usage )
 			$type_tab = array( 'intro', NT_('Intros') );
 			break;
 		case 'content-block':
-			$type_tab = array( 'content-block', NT_('Content Block') );
+			$type_tab = array( 'content-block', NT_('Content Blocks') );
 			break;
 
 		default:
