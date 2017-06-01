@@ -4022,6 +4022,9 @@ div.message_toolbars {
 .modal-dialog {
   margin: 30px auto;
 }
+.modal-footer .btn + .btn {
+  margin-bottom: 3px;
+}
 .tt-dropdown-menu {
   background-color: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.2);
