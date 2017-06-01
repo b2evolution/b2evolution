@@ -114,7 +114,7 @@ class content_block_Widget extends ComponentWidget
 		if( get_param( $this->get_param_prefix().'item_ID' ) != '' && get_param( $this->get_param_prefix().'item_slug' ) != '' )
 		{	// Don't allow both entered fields:
 			param_error( $this->get_param_prefix().'item_ID', NULL );
-			param_error( $this->get_param_prefix().'item_slug', T_('Please fill only either "Item ID" or "Item Slug".') );
+			param_error( $this->get_param_prefix().'item_slug', T_('Please enter either an Item ID or an Item Slug, but not both.') );
 		}
 	}
 
