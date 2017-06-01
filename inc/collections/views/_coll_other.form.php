@@ -33,7 +33,7 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 
 
 $Form->begin_fieldset( T_('Search results').get_manual_link( 'search-results-other' ) );
-	$Form->text( 'search_per_page', $edited_Blog->get_setting( 'search_per_page' ), 4, T_('Number of results per page'), '', 4 );
+	$Form->text( 'search_per_page', $edited_Blog->get_setting( 'search_per_page' ), 4, T_('Results per page'), '', 4 );
 	$Form->radio( 'search_sort_by', $edited_Blog->get_setting( 'search_sort_by' ), array(
 			array( 'score', T_('Score') ),
 			array( 'date', T_('Date'), T_('If sorted by date, everything without a date will be sorted last.') ),
@@ -48,7 +48,7 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Latest comments').get_manual_link( 'latest-comments-other' ) );
-	$Form->text( 'latest_comments_num', $edited_Blog->get_setting( 'latest_comments_num' ), 4, T_('Number of comments shown'), '', 4 );
+	$Form->text( 'latest_comments_num', $edited_Blog->get_setting( 'latest_comments_num' ), 4, T_('Comments shown'), '', 4 );
 $Form->end_fieldset();
 
 

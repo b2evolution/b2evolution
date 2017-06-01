@@ -333,7 +333,7 @@ $Form->end_fieldset(); // Usage info
 
 $Form->begin_fieldset( T_('Reputation').get_manual_link('user-admin-reputaion') );
 
-	$Form->info( T_('Number of posts'), $edited_User->get_reputation_posts() );
+	$Form->info( T_('Posts'), $edited_User->get_reputation_posts() );
 
 	$Form->info( T_('Comments'), '<span class="reputation_message">'.$edited_User->get_reputation_comments( array( 'view_type' => 'extended' ) ).'</span>' );
 
