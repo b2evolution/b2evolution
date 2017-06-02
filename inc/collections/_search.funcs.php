@@ -279,7 +279,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	$search_ItemList->query_init();
 
 	// Make a custom search query:
-	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content,'
+	$search_query = 'SELECT DISTINCT post_ID, post_datestart, post_datemodified, post_title, post_content,'
 		.' user_login as creator_login, tag_name, post_excerpt, post_titletag'
 		.$search_ItemList->ItemQuery->get_from()
 		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
@@ -319,7 +319,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 		$search_result[] = array(
 			'type' => 'item',
 			'score' => $final_score,
-			'date' => $row->post_datemodified,
+			'date' => $row->post_datestart,
 			'ID' => $row->post_ID,
 			'scores_map' => $scores_map,
 		);
@@ -934,7 +934,7 @@ function search_result_block( $params = array() )
 					$creator_User = & $Item->get_creator_User();
 					$display_params = array_merge( array(
 							'author'        => $creator_User->get_identity_link( array( 'link_text' => $params['author_format'] ) ),
-							'creation_date' => mysql2date( $params['date_format'], $Item->datecreated ),
+							'creation_date' => mysql2date( $params['date_format'], $Item->datestart ),
 							'lastedit_date' => mysql2date( $params['date_format'], $Item->datemodified ),
 						), $display_params );
 				}
@@ -1313,7 +1313,7 @@ function display_search_result( $params = array() )
 		if( ! empty( $params['author'] ) )
 		{ // Display author if it is defined
 			$lastedit_date = ( isset( $params['lastedit_date'] ) ) ? ', '.T_('last edited on').' '.$params['lastedit_date'] : '';
-			printf( T_('Created by %s on %s'), $params['author'], $params['creation_date'] ).$lastedit_date;
+			printf( T_('Published by %s on %s'), $params['author'], $params['creation_date'] ).$lastedit_date;
 		}
 		elseif( ! empty( $params['editor'] ) )
 		{ // Display editor if it is defined
