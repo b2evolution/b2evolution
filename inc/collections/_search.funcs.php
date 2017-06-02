@@ -892,8 +892,8 @@ function search_result_block( $params = array() )
 	echo $params['block_start'];
 
 	// Memorize best scores:
-	$max_percentage = $search_result[0]['max_percentage'];
-	$max_score = $search_result[0]['max_score'];
+	$max_percentage = isset( $search_result[0]['max_percentage'] ) ? $search_result[0]['max_percentage'] : 100;
+	$max_score = isset( $search_result[0]['max_score'] ) ? $search_result[0]['max_score'] : $search_result[0]['score'];
 
 	// Display results for current page:
 	for( $index = $from; $index < $to; $index++ )
@@ -998,7 +998,7 @@ function search_result_block( $params = array() )
 		// Common display params for all types:
 		$display_params['score_date'] = isset( $row['date'] ) ? $row['date'] : 0;
 		$display_params['score'] = $row['score'];
-		$display_params['percentage'] = isset( $row['percentage'] ) ? $row['percentage'] : round( $row['score'] * $max_percentage / $max_score );
+		$display_params['percentage'] = round( $row['score'] * $max_percentage / $max_score );
 		$display_params['scores_map'] = $row['scores_map'];
 		$display_params['type'] = $row['type'];
 		$display_params['best_result'] = $index == 0;
