@@ -44,6 +44,48 @@ $Form->begin_fieldset( T_('Search results').get_manual_link( 'search-results-oth
 			array( 'search_include_cats',  1, T_('Categories'), $edited_Blog->get_setting( 'search_include_cats' ) ),
 			array( 'search_include_tags',  1, T_('Tags'), $edited_Blog->get_setting( 'search_include_tags' ) ),
 		), 'search_include', T_('Include') );
+	// Scoring:
+	$score_settings = array(
+		T_('Scoring for posts') => array(
+			'post_title'          => T_('weight multiplier for keywords found in post title'),
+			'post_content'        => T_('weight multiplier for keywords found in post content'),
+			'post_tags'           => T_('weight multiplier for keywords found in post tags'),
+			'post_excerpt'        => T_('weight multiplier for keywords found in post excerpt'),
+			'post_titletag'       => T_('weight multiplier for keywords found in post &lt;title&gt; tag'),
+			'post_author'         => T_('weight multiplier for keywords found in post author login'),
+			'post_date_future'    => T_('weight multiplier for posts from future'),
+			'post_date_moremonth' => T_('weight multiplier for posts older month'),
+			'post_date_lastmonth' => T_('weight multiplier for posts from the last month'),
+			'post_date_twoweeks'  => T_('weight multiplier for posts from the last two weeks'),
+			'post_date_lastweek'  => T_('weight multiplier for posts from the last week, depending on the days passed since modification date, and it is restricted with min value as weight multiplier of last two weeks'),
+		),
+		T_('Scoring for comments') => array(
+			'cmnt_post_title'     => T_('weight multiplier for keywords found in title of the comment\'s post'),
+			'cmnt_content'        => T_('weight multiplier for keywords found in comment content'),
+			'cmnt_author'         => T_('weight multiplier for keywords found in comment author name'),
+			'cmnt_date_future'    => T_('weight multiplier for comments from future'),
+			'cmnt_date_moremonth' => T_('weight multiplier for comments older month'),
+			'cmnt_date_lastmonth' => T_('weight multiplier for comments from the last month'),
+			'cmnt_date_twoweeks'  => T_('weight multiplier for comments from the last two weeks'),
+			'cmnt_date_lastweek'  => T_('weight multiplier for comments from the last week, depending on the days passed since modification date, and it is restricted with min value as weight multiplier of last two weeks'),
+		),
+		T_('Scoring for categories') => array(
+			'cat_name'            => T_('weight multiplier for keywords found in category name'),
+			'cat_desc'            => T_('weight multiplier for keywords found in category description'),
+		),
+		T_('Scoring for tags') => array(
+			'tag_name'            => T_('weight multiplier for keywords found in tag name'),
+		),
+	);
+	foreach( $score_settings as $score_group_title => $score_settings_data )
+	{
+		$s = 0;
+		foreach( $score_settings_data as $score_name => $score_description )
+		{
+			$Form->text( 'search_score_'.$score_name, $edited_Blog->get_setting( 'search_score_'.$score_name ), 1, $s == 0 ? $score_group_title : '', $score_description, 10 );
+			$s = 1;
+		}
+	}
 $Form->end_fieldset();
 
 
