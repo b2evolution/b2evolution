@@ -533,7 +533,11 @@ elseif( ( $disp == 'visits' ) && ( ( $Settings->get( 'enable_visit_tracking' ) !
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post
-	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
+	if( $Item->get_type_setting( 'usage' ) == 'content-block' )
+	{	// Display 404 page for all "Content Blocks" items intead of normal single page:
+		$disp = '404';
+	}
+	elseif( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
 	{
 		$disp = 'download';
 

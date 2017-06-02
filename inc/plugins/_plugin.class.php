@@ -326,6 +326,17 @@ class Plugin
 
 
 	/**
+	 * Get param prefix with is used on edit forms and submit data
+	 *
+	 * @return string
+	 */
+	function get_param_prefix()
+	{
+		return 'edit_plugin_'.( empty( $this->ID ) ? '0' : $this->ID ).'_set_';
+	}
+
+
+	/**
 	 * Load template params from current skin
 	 */
 	function load_template()

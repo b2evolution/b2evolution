@@ -356,6 +356,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
 	}
 	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'coll_flagged_list', 'core', 20 );
+	if( $kind == 'main' )
+	{	// Install the "Content Block" widget only for Main collections:
+		add_basic_widget( $blog_id, 'Front Page Secondary Area', 'content_block', 'core', 30, array( 'item_slug' => 'this-is-a-content-block' ) );
+	}
 
 
 	/* Forum Front Secondary Area */

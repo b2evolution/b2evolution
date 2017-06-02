@@ -1238,7 +1238,7 @@ class _core_Module extends Module
 				elseif(
 				  // Front-office post view page:
 				  ( ( $disp == 'single' || $disp == 'page' ) &&
-				    isset( $Item ) &&
+				    ! empty( $Item ) &&
 				    $edit_item_url = $Item->get_edit_url() ) ||
 				  // Back-office post view page:
 				  ( $ctrl == 'items' && $action == 'view' &&

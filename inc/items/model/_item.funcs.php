@@ -1638,6 +1638,9 @@ function get_tab_by_item_type_usage( $type_usage )
 		case 'intro-all':
 			$type_tab = array( 'intro', NT_('Intros') );
 			break;
+		case 'content-block':
+			$type_tab = array( 'content-block', NT_('Content Blocks') );
+			break;
 
 		default:
 			// Unknown item type usage:
@@ -1665,6 +1668,9 @@ function get_item_type_usage_by_tab( $tab_name )
 			break;
 		case 'intro':
 			$type_usages = array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' );
+			break;
+		case 'content-block':
+			$type_usages = array( 'content-block' );
 			break;
 		case 'post':
 		default:
