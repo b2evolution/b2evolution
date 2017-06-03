@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-06-02 23:19+0200\n"
+"POT-Creation-Date: 2017-06-03 21:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -10770,7 +10770,7 @@ msgid "Open Graph"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_seo.form.php:126
-msgid "Open Graph tags (og:title, og:url, og:description, og:type and og:image)"
+msgid "Open Graph tags"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_seo.form.php:129
