@@ -465,18 +465,8 @@ function search_and_score_chapters( $search_term, $keywords, $quoted_parts )
 		$scores_map['name'] = score_text( $iterator_Chapter->get( 'name' ), $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_cat_name' ) );
 		$scores_map['description'] = score_text( $iterator_Chapter->get( 'description' ), $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_cat_desc' ) );
 
-		$post_count = get_postcount_in_category( $iterator_Chapter->ID, $Blog->ID );
-		$post_score = intval( $post_count / 3 );
-		$scores_map['post_count'] = ( $post_score > 10 ) ? 10 : $post_score;
-
-		$comment_count = get_commentcount_in_category( $iterator_Chapter->ID, $Blog->ID );
-		$comment_score = intval( $comment_count / 6 );
-		$scores_map['comment_count'] =  ( $comment_score > 10 ) ? 10 : $comment_score;
-
 		$final_score = $scores_map['name']['score']
-			+ $scores_map['description']['score']
-			+ $scores_map['post_count']
-			+ $scores_map['comment_count'];
+			+ $scores_map['description']['score'];
 
 		$search_result[] = array(
 			'type'       => 'category',
@@ -535,8 +525,7 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 
 		$scores_map = array();
 		$scores_map['name'] = score_text( $tag->tag_name, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_tag_name' ) );
-		$scores_map['post_count'] = $tag->post_count;
-		$final_score = $scores_map['name']['score'] * $tag->post_count;
+		$final_score = $scores_map['name']['score'];
 
 		$search_result[] = array(
 			'type'       => 'tag',
@@ -1403,18 +1392,6 @@ function display_score_map( $params )
 						echo '<li>when days_passed >= 8: ( days_passed < 15 ? '.$Blog->get_setting( 'search_score_post_date_twoweeks' ).' : ( days_passed < 31 ? '.$Blog->get_setting( 'search_score_post_date_lastmonth' ).' : '.$Blog->get_setting( 'search_score_post_date_moremonth' ).' ) )</li>';
 						echo '</ul>';
 						break;
-
-					case 'post_count':
-						if( $params['type'] == 'category' )
-						{
-							echo '<li>'.sprintf( '%d points for the amount of posts in this category. Rule: number_of_posts > 30 ? 10 : intval( number_of_posts / 3 )', $score_map ).'</li>';
-							break;
-						}
-						elseif( $params['type'] == 'tag' )
-						{
-							echo '<li>'.sprintf( '%d posts in this tag. Total points = sum( points ) * number_of_posts.', $score_map ).'</li>';
-							break;
-						}
 
 					default:
 						echo '<li>'.sprintf( '%d points for [%s]', $score_map, $result_part ).'</li>';
