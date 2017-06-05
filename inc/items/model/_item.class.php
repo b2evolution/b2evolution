@@ -972,6 +972,16 @@ class Item extends ItemLight
 			$renderers = $this->get_renderers();
 		}
 
+		// Short title:
+		if( $this->get_type_setting( 'use_short_title' ) )
+		{	// If allowed by item type:
+			$short_title = param( 'post_short_title', 'htmlspecialchars', NULL );
+			if( $short_title !== NULL )
+			{	// If entered on the edit form:
+				$this->set_from_Request( 'short_title' );
+			}
+		}
+
 		// CONTENT + TITLE:
 		if( $this->get_type_setting( 'allow_html' ) )
 		{	// HTML is allowed for this post, we'll accept HTML tags:

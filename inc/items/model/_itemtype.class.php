@@ -30,6 +30,7 @@ class ItemType extends DataObject
 	var $front_instruction = 0;
 	var $back_instruction = 0;
 	var $instruction = '';
+	var $use_short_title = 0;
 	var $use_title = 'required';
 	var $use_url = 'optional';
 	var $podcast = 0;
@@ -99,6 +100,7 @@ class ItemType extends DataObject
 			$this->front_instruction = $db_row->ityp_front_instruction;
 			$this->back_instruction = $db_row->ityp_back_instruction;
 			$this->instruction = $db_row->ityp_instruction;
+			$this->use_short_title = $db_row->ityp_use_short_title;
 			$this->use_title = $db_row->ityp_use_title;
 			$this->use_url = $db_row->ityp_use_url;
 			$this->podcast = $db_row->ityp_podcast;
@@ -201,6 +203,10 @@ class ItemType extends DataObject
 			param_check_html( 'ityp_instruction', sprintf( T_('Invalid instruction format. You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'posting' );
 			$this->set_from_Request( 'instruction', NULL, true );
 		}
+
+		// Use short title
+		param( 'ityp_use_short_title', 'integer', 0 );
+		$this->set_from_Request( 'use_short_title' );
 
 		// Use title
 		param( 'ityp_use_title', 'string' );

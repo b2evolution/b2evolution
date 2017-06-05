@@ -81,6 +81,7 @@ $intro_type_disabled = $edited_Itemtype->is_intro();
 $intro_type_note = $intro_type_disabled ? T_('This feature is not compatible with Intro posts.') : '';
 
 $Form->begin_fieldset( T_('Features').get_manual_link( 'item-type-features' ), array( 'id' => 'itemtype_features' ) );
+	$Form->checkbox( 'ityp_use_short_title', $edited_Itemtype->use_short_title, T_('Use short title') );
 	$Form->radio( 'ityp_use_title', $edited_Itemtype->use_title, $options, T_('Use title') );
 	$Form->radio( 'ityp_use_text', $edited_Itemtype->use_text, $options, T_('Use text') );
 	$Form->checkbox( 'ityp_allow_html', $edited_Itemtype->allow_html, T_('Allow HTML'), T_( 'Check to allow HTML in posts.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );

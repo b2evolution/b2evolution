@@ -44,6 +44,8 @@ class ItemLight extends DataObject
 	 */
 	var $datemodified;
 
+	var $short_title;
+
 	var $title;
 
 	var $excerpt;
@@ -150,6 +152,7 @@ class ItemLight extends DataObject
 			$this->urltitle = $db_row->post_urltitle;
 			$this->canonical_slug_ID = $db_row->post_canonical_slug_ID;
 			$this->tiny_slug_ID = $db_row->post_tiny_slug_ID;
+			$this->short_title = isset( $db_row->post_short_title ) ? $db_row->post_short_title : '';
 			$this->title = $db_row->post_title;
 			$this->excerpt = $db_row->post_excerpt;
 			$this->ityp_ID = $db_row->post_ityp_ID;

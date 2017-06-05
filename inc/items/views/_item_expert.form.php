@@ -142,22 +142,11 @@ $Form->begin_form( '', '', $params );
 
 	$Form->switch_layout( 'none' );
 
-	echo '<table cellspacing="0" class="compose_layout" align="center"><tr>';
-	$display_title_field = $edited_Item->get_type_setting( 'use_title' ) != 'never';
-	if( $display_title_field )
-	{ // Display title
-		$field_required = ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ? $required_star : '';
-		echo '<td width="1%" class="label">'.$field_required.'<strong>'.T_('Title').':</strong></td>';
-		echo '<td width="97%" class="input">';
-		$Form->text_input( 'post_title', $item_title, 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-		echo '</td>';
-	}
-	else
-	{ // Hide title
-		$Form->hidden( 'post_title', $item_title );
-	}
-
-	// -- Language chooser BEGIN --
+	// Check if short title field is displayed:
+	$display_short_title_field = $edited_Item->get_type_setting( 'use_short_title' );
+	// Check if title field is displayed:
+	$display_title_field = ( $edited_Item->get_type_setting( 'use_title' ) != 'never' );
+	// Check if locale field is displayed:
 	if( $Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
 	    $edited_Item->get( 'locale' ) == $Blog->get( 'locale' ) &&
 	    isset( $locales[ $edited_Item->get( 'locale' ) ] ) )
@@ -168,27 +157,68 @@ $Form->begin_form( '', '', $params );
 	{	// Allow to select a locale:
 		$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
 	}
+	$display_locale_field = ! is_array( $locale_options );
 
-	if( is_array( $locale_options ) )
-	{ // We've only one enabled locale.
-		// Tblue> The locale name is not really needed here, but maybe we
-		//        want to display the name of the only locale?
-		$Form->hidden( 'post_locale', $locale_options[0] );
-	}
-	else
-	{ // More than one locale => select field.
-		echo '<td width="1%" class="label">';
-		if( $display_title_field )
-		{
-			echo '&nbsp;&nbsp;';
+	if( $display_short_title_field || $display_title_field || $display_locale_field )
+	{
+		echo '<table cellspacing="0" class="compose_layout" align="center">';
+
+		// Short title field:
+		if( $display_short_title_field )
+		{	// Display short title:
+			echo '<tr>';
+			echo '<td class="label"><strong>'.T_('Short title').':</strong></td>';
+			echo '<td width="97%" class="input"'.( $display_title_field && $display_locale_field ? ' colspan="3"' : '' ).'>';
+			$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, '', '', array( 'maxlength' => 50, 'style' => 'width: 100%;' ) );
+			echo '</td>';
+			echo '</tr>';
 		}
-		echo '<strong>'.T_('Language').':</strong></td>';
-		echo '<td width="1%" class="select">';
-		$Form->select_options( 'post_locale', $locale_options, '' );
-		echo '</td>';
+		else
+		{	// Hide short title:
+			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+		}
+
+		if( $display_title_field || $display_locale_field )
+		{
+			echo '<tr>';
+
+			// Title field:
+			if( $display_title_field )
+			{	// Display title:
+				$field_required = ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ? $required_star : '';
+				echo '<td width="1%" class="label">'.$field_required.'<strong>'.T_('Title').':</strong></td>';
+				echo '<td width="97%" class="input">';
+				$Form->text_input( 'post_title', $item_title, 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+				echo '</td>';
+			}
+			else
+			{	// Hide title:
+				$Form->hidden( 'post_title', $item_title );
+			}
+
+			// Language chooser:
+			if( $display_locale_field )
+			{	// Display locale:
+				echo '<td width="1%" class="label">';
+				if( $display_title_field )
+				{
+					echo '&nbsp;&nbsp;';
+				}
+				echo '<strong>'.T_('Language').':</strong></td>';
+				echo '<td width="1%" class="select">';
+				$Form->select_options( 'post_locale', $locale_options, '' );
+				echo '</td>';
+			}
+			else
+			{	// Hide locale:
+				$Form->hidden( 'post_locale', $locale_options[0] );
+			}
+
+			echo '</tr>';
+		}
+
+		echo '</table>';
 	}
-	// -- Language chooser END --
-	echo '</tr></table>';
 
 	$Form->switch_layout( NULL );
 

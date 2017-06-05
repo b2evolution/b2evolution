@@ -241,7 +241,7 @@ class coll_media_index_Widget extends ComponentWidget
 		// Note: We use ItemQuery to get attachments from all posts which should be visible ( even in case of aggregate blogs )
 		$ItemQuery = new ItemQuery( $ItemCache->dbtablename, $ItemCache->dbprefix, $ItemCache->dbIDname );
 		$ItemQuery->SELECT( 'post_ID, post_datestart, post_datemodified, post_main_cat_ID, post_urltitle, post_canonical_slug_ID,
-									post_tiny_slug_ID, post_ityp_ID, post_title, post_excerpt, post_url, file_ID, file_creator_user_ID, file_type,
+									post_tiny_slug_ID, post_ityp_ID, post_title, post_short_title, post_excerpt, post_url, file_ID, file_creator_user_ID, file_type,
 									file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
 		$ItemQuery->FROM_add( 'INNER JOIN T_links ON post_ID = link_itm_ID' );
 		$ItemQuery->FROM_add( 'INNER JOIN T_files ON link_file_ID = file_ID' );
