@@ -1192,17 +1192,19 @@ class _core_Module extends Module
 				);
 			}
 
-			// ---- "Page" MENU ----
-			$entries['page'] = array(
-					'text' => T_('Page'),
-					'entries' => array(
-						// PLACE HOLDER FOR ENTRY "Edit contents":
-						'edit'       => NULL,
-						// PLACE HOLDERS FOR SESSIONS MODULE:
-						'stats_sep'  => NULL,
-						'stats_page' => NULL,
-					)
-				);
+			if( ! is_admin_page() )
+			{	// ---- "Page" MENU ----
+				$entries['page'] = array(
+						'text' => T_('Page'),
+						'entries' => array(
+							// PLACE HOLDER FOR ENTRY "Edit contents":
+							'edit'       => NULL,
+							// PLACE HOLDERS FOR SESSIONS MODULE:
+							'stats_sep'  => NULL,
+							'stats_page' => NULL,
+						)
+					);
+			}
 
 			// ---- "Post"/"Edit" MENU ----
 			if( $perm_admin_normal )
@@ -1235,17 +1237,10 @@ class _core_Module extends Module
 							'entry_class' => 'rwdhide',
 						);
 				}
-				elseif(
-				  // Front-office post view page:
-				  ( ( $disp == 'single' || $disp == 'page' ) &&
-				    ! empty( $Item ) &&
-				    $edit_item_url = $Item->get_edit_url() ) ||
-				  // Back-office post view page:
-				  ( $ctrl == 'items' && $action == 'view' &&
-				    get_param( 'p' ) > 0 &&
-				    $ItemCache = & get_ItemCache() &&
-				    $Item = & $ItemCache->get_by_ID( get_param( 'p' ), false, false ) &&
-				   $edit_item_url = $Item->get_edit_url() ) )
+				elseif( ! is_admin_page() &&
+				  ( $disp == 'single' || $disp == 'page' ) &&
+				  ! empty( $Item ) &&
+				  $edit_item_url = $Item->get_edit_url() )
 				{	// If curent user has a permission to edit a current viewing post:
 					$entries['post'] = array(
 							'text'        => '<span class="fa fa-pencil-square"></span> '.T_('Edit'),
@@ -1601,7 +1596,7 @@ class _core_Module extends Module
 					);
 			}
 
-			if( ! empty( $dev_entries ) )
+			if( ! is_admin_page() && ! empty( $dev_entries ) )
 			{	// Use the same dev entries in "Page" menu:
 				if( empty( $entries['page']['entries'] ) )
 				{
