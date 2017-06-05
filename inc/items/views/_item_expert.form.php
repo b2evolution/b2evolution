@@ -173,10 +173,6 @@ $Form->begin_form( '', '', $params );
 			echo '</td>';
 			echo '</tr>';
 		}
-		else
-		{	// Hide short title:
-			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
-		}
 
 		if( $display_title_field || $display_locale_field )
 		{

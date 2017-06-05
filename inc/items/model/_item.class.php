@@ -973,14 +973,8 @@ class Item extends ItemLight
 		}
 
 		// Short title:
-		if( $this->get_type_setting( 'use_short_title' ) )
-		{	// If allowed by item type:
-			$short_title = param( 'post_short_title', 'htmlspecialchars', NULL );
-			if( $short_title !== NULL )
-			{	// If entered on the edit form:
-				$this->set_from_Request( 'short_title' );
-			}
-		}
+		$post_short_title = param( 'post_short_title', 'htmlspecialchars', NULL );
+		$this->set_from_Request( 'short_title', 'post_short_title', true );
 
 		// CONTENT + TITLE:
 		if( $this->get_type_setting( 'allow_html' ) )
