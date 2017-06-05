@@ -453,7 +453,7 @@ class ItemLight extends DataObject
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'front';
 			}
-			elseif( in_array( $item_type_usage, array( 'special' ) ) )
+			elseif( in_array( $item_type_usage, array( 'special', 'content-block' ) ) )
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'none';
 			}
