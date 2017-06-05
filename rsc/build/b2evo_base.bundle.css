@@ -1283,6 +1283,9 @@ div#evo_toolbar .actions_right {
   margin-left: 6px;
   float: right;
 }
+.evobar-menu .evobar-entry-new-post span.icon {
+  margin-top: -3px;
+}
 @media (max-width: 800px) {
   .evobar-menu li.rwdhide,
   .evobar-menu li u {
