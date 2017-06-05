@@ -1710,7 +1710,7 @@ class Comment extends DataObject
 				'title_ok'            => T_('Cast an OK vote!'),
 				'title_ok_voted'      => T_('You sent an OK vote.'),
 				'title_yes'           => T_('Cast a helpful vote!'),
-				'title_yes_voted'     => T_('You sent helpful vote.'),
+				'title_yes_voted'     => T_('You sent a "helpful" vote.'),
 				'title_no'            => T_('Cast a "not helpful" vote!'),
 				'title_no_voted'      => T_('You sent a "not helpful" vote.'),
 			), $params );
@@ -1913,7 +1913,7 @@ class Comment extends DataObject
 				'skin_ID'               => 0,
 				'helpful_text'          => T_('Is this comment helpful?'),
 				'title_yes'             => T_('Cast a helpful vote!'),
-				'title_yes_voted'       => T_('You sent helpful vote.'),
+				'title_yes_voted'       => T_('You sent a "helpful" vote.'),
 				'title_noopinion'       => T_('Cast a "no opinion" vote!'),
 				'title_noopinion_voted' => T_('You sent a "no opinion" vote.'),
 				'title_no'              => T_('Cast a "not helpful" vote!'),

@@ -1211,7 +1211,7 @@ class _core_Module extends Module
 						'text' => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
 						'title' => T_('No blog is currently selected'),
 						'disabled' => true,
-						'entry_class' => 'rwdhide',
+						'entry_class' => 'rwdhide evobar-entry-new-post',
 					);
 			}
 		}
@@ -1265,7 +1265,7 @@ class _core_Module extends Module
 					{	// Initialize this menu item when user has no back-office access but can create new post:
 						$entries['post'] = array(
 							'text'        => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
-							'entry_class' => 'rwdhide',
+							'entry_class' => 'rwdhide evobar-entry-new-post',
 						);
 					}
 					$entries['post']['href'] = $write_item_url;

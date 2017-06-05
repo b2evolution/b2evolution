@@ -727,12 +727,14 @@ function search_result_block( $params = array() )
 	global $Collection, $Blog, $Session, $debug;
 
 	$search_keywords = param( 's', 'string', '', true );
+	$allow_cache = param( 'allow_cache', 'boolean', false );
 
 	// Try to load existing search results from Session:
 	$search_params = $Session->get( 'search_params' );
 	$search_result = $Session->get( 'search_result' );
 	$search_result_loaded = false;
-	if( empty( $search_params )
+	if( ! $allow_cache	// Force to load new search results, e-g when form is submitted, but don't force on page switching
+		|| empty( $search_params )	// We have no saved search params
 		|| ( $search_params['search_keywords'] != $search_keywords )	// We had saved search results but for a different search string
 		|| ( $search_params['search_blog'] != $Blog->ID ) 		// We had saved search results but for a different collection
 		|| ( $search_result === NULL ) )
@@ -1071,7 +1073,7 @@ function search_page_links( $params = array() )
 	$page_list_span = $params['list_span'];
 	$total_pages = $params['total_pages'];
 	$current_page = isset( $params['current_page'] ) ? $params['current_page'] : 1;
-	$page_url = regenerate_url( 'page', '' );
+	$page_url = regenerate_url( 'page', 'allow_cache=1' );
 
 	// Initialize a start of pages list:
 	if( $current_page <= intval( $page_list_span / 2 ) )
