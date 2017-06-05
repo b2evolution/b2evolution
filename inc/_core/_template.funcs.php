@@ -1237,7 +1237,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				$colorbox_voting_params = '{'.$colorbox_strings_params.'
 					displayVoting: true,
 					votingUrl: "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.$blog_param.'",
-					minWidth: 305}';
+					minWidth: 320}';
 				// Colorbox params without voting panel:
 				$colorbox_no_voting_params = '{'.$colorbox_strings_params.'
 					minWidth: 255}';
