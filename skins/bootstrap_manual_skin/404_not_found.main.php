@@ -230,6 +230,14 @@ siteskin_include( '_site_body_header.inc.php' );
 				'search_input_after'   => '',
 				'search_submit_before' => '<span class="input-group-btn">',
 				'search_submit_after'  => '</span></div>',
+				'search_author'             => true,
+				'search_content_age'        => true,
+				'search_group_before'       => '<div class="form-inline">',
+				'search_group_after'        => '</div>',
+				'search_group_label_before' => '<div class="form-group"><label for="$for$">',
+				'search_group_label_after'  => ':</label> ',
+				'search_group_field_before' => '',
+				'search_group_field_after'  => '</div> ',
 			) );
 		// ---------------------------------- END OF SEARCH FORM ---------------------------------
 

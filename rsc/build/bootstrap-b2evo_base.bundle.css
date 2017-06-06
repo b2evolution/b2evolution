@@ -4170,3 +4170,6 @@ div.message_toolbars {
 .evo_container__sidebar2 .evo_widget[class$=_menu_link] a.btn {
   width: 100%;
 }
+input.autocomplete_login {
+  vertical-align: initial !important;
+}

@@ -3293,8 +3293,8 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 		{ // Skin disables to autocomplete usernames
 			return;
 		}
-		if( $disp != 'edit' && $disp != 'edit_comment' && ( empty( $Item ) || ! $Item->can_comment( NULL ) ) )
-		{ // It is not the edit post/comment form and No form to comment of this post
+		if( $disp != 'search' && $disp != 'edit' && $disp != 'edit_comment' && ( empty( $Item ) || ! $Item->can_comment( NULL ) ) )
+		{ // It is not a search form and not an edit post/comment form and No form to comment of this post
 			return;
 		}
 	}

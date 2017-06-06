@@ -1325,6 +1325,12 @@ var downloadInterval = setInterval( function()
 }, 1000 );' );
 					break;
 
+				case 'disp_search':
+					// Specific features for disp=search:
+					// Initialize JS to autcomplete user logins and date picker to edit workflow properties:
+					init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
+					break;
+
 				default:
 					// We no longer want to do this because of 'disp_auto':
 					// debug_die( 'This skin has requested an unknown feature: \''.$feature.'\'. Maybe this skin requires a more recent version of b2evolution.' );

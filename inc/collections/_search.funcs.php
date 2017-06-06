@@ -704,6 +704,8 @@ function search_result_block( $params = array() )
 	global $Collection, $Blog, $Session, $debug;
 
 	$search_keywords = param( 's', 'string', '', true );
+	$search_author = param( 'search_author', 'string', '', true );
+	$search_content_age = param( 'search_content_age', 'string', '', true );
 	$allow_cache = param( 'allow_cache', 'boolean', false );
 
 	// Try to load existing search results from Session:

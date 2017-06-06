@@ -131,6 +131,8 @@ function skin_init( $disp )
 			load_funcs( 'collections/_search.funcs.php' );
 			// Check previous search keywords so it can be displayed in the search input box
 			param( 's', 'string', '', true );
+			param( 'search_author', 'string', '', true );
+			param( 'search_content_age', 'string', '', true );
 			break;
 	}
 

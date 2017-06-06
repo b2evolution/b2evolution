@@ -29,7 +29,15 @@ skin_widget( array(
 		'disp_search_options' => 0,
 		'search_class' => 'extended_search_form',
 		'use_search_disp' => 1,
-		'button' => T_('Search')
+		'button' => T_('Search'),
+		'search_author'             => true,
+		'search_content_age'        => true,
+		'search_group_before'       => '<div class="form-inline">',
+		'search_group_after'        => '</div>',
+		'search_group_label_before' => '<div class="form-group"><label for="$for$">',
+		'search_group_label_after'  => ':</label> ',
+		'search_group_field_before' => '',
+		'search_group_field_after'  => '</div> ',
 	) );
 // ---------------------------------- END OF COMMON LINKS ---------------------------------
 
