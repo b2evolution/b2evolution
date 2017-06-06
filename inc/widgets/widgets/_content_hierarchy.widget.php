@@ -138,6 +138,7 @@ class content_hierarchy_Widget extends ComponentWidget
 		$this->display_hierarchy( array_merge( array(
 				'display_blog_title'   => $this->disp_params['display_blog_title'],
 				'open_children_levels' => $this->disp_params['open_children_levels'],
+				'item_title_fields'    => isset( $this->disp_params['item_title_fields'] ) ? $this->disp_params['item_title_fields'] : 'title',
 				'sorted' => true
 			), $params ) );
 
@@ -224,6 +225,11 @@ class content_hierarchy_Widget extends ComponentWidget
 			'after_level'  => array( $this, 'cat_after_level' ),
 			'posts' => array( $this, 'display_post_row' ),
 		);
+
+		if( strpos( $params['item_title_fields'], 'short_title' ) !== false )
+		{	// Use function to order items/posts by short title if this field is used to display instead of default title field:
+			$params['items_order_alpha_func'] = 'compare_items_by_short_title';
+		}
 
 		echo $ChapterCache->recurse( $callbacks, $this->Blog->ID, NULL, 0, 0, $params );
 
@@ -318,6 +324,7 @@ class content_hierarchy_Widget extends ComponentWidget
 				'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
 				'link_type'       => 'permalink',
 				'link_class'      => 'link',
+				'title_field'     => $params['item_title_fields'],
 			), $params );
 
 		if( $Item->main_cat_ID != $params['chapter_ID'] )

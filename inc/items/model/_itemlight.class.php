@@ -1248,7 +1248,7 @@ class ItemLight extends DataObject
 				'target_blog'     => '',
 				'nav_target'      => NULL,
 				'post_navigation' => $def_post_navigation,
-				'title_field'     => 'title',
+				'title_field'     => 'title', // May be several fields separated by comma. Only first not empty field is displayed. E-g: 'short_title,title'
 			), $params );
 
 		// Set post navigation target
@@ -1260,16 +1260,28 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
-
-		if( $params['max_length'] != '' )
-		{	// Crop long title
-			$title = strmaxlen( $title, intval($params['max_length']) );
+		$title_fields = explode( ',', $params['title_field'] );
+		foreach( $title_fields as $title_field )
+		{
+			if( $title_field == 'short_title' && ! $this->get_type_setting( 'use_short_title' ) )
+			{	// Allow to use short title only if it is enabled by item type:
+				continue;
+			}
+			$title = format_to_output( $this->$title_field, $params['format'] );
+			if( ! empty( $title ) )
+			{	// Use first not empty field:
+				break;
+			}
 		}
 
 		if( empty( $title ) )
 		{
 			return;
+		}
+
+		if( $params['max_length'] != '' )
+		{	// Crop long title:
+			$title = strmaxlen( $title, intval($params['max_length']) );
 		}
 
 		if( $params['link_type'] == '#' )

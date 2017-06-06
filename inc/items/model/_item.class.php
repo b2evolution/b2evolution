@@ -446,6 +446,42 @@ class Item extends ItemLight
 
 
 	/**
+	 * Compare two Items based on the short title if this field is not empty otherwise use title to compare
+	 *
+	 * @param Item A
+	 * @param Item B
+	 * @return number -1 if A->short_title < B->short_title, 1 if A->short_title > B->short_title, 0 if A->short_title == B->short_title
+	 */
+	static function compare_items_by_short_title( $a_Item, $b_Item )
+	{
+		if( $a_Item == NULL || $b_Item == NULL )
+		{
+			debug_die('Invalid item objects received to compare.');
+		}
+
+		if( ! empty( $a_Item->short_title ) && $a_Item->get_type_setting( 'use_short_title' ) )
+		{	// Use short title only if it is not empty and allowed by item type:
+			$a_title_value =  $a_Item->short_title;
+		}
+		else
+		{	// Otherwise use title:
+			$a_title_value =  $a_Item->title;
+		}
+
+		if( ! empty( $b_Item->short_title ) && $b_Item->get_type_setting( 'use_short_title' ) )
+		{	// Use short title only if it is not empty and allowed by item type:
+			$b_title_value =  $b_Item->short_title;
+		}
+		else
+		{	// Otherwise use title:
+			$b_title_value =  $b_Item->title;
+		}
+
+		return strcmp( $a_title_value, $b_title_value );
+	}
+
+
+	/**
 	 * Compare two Items based on the order field
 	 *
 	 * @param Item A
