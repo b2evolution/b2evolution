@@ -1248,6 +1248,8 @@ class Form extends Widget
 		$field_params = array_merge( array(
 				'note' => $field_note,
 				'size' => 20,
+				'autocapitalize' => 'off',
+				'autocorrect' => 'off'
 			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
