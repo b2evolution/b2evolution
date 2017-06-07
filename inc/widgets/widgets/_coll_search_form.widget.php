@@ -134,6 +134,7 @@ class coll_search_form_Widget extends ComponentWidget
 	function init_display( $params )
 	{
 		$params = array_merge( array(
+				'search_template'            => '$input_keyword$$button_search$$input_author$$input_age$',
 				'search_input_before'        => '',
 				'search_input_after'         => '',
 				'search_submit_before'       => '',
@@ -190,25 +191,30 @@ class coll_search_form_Widget extends ComponentWidget
 		echo '<div class="'.$search_form_class.'">';
 
 		// Search keyword input field:
-		echo $this->disp_params['search_input_before'];
-		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars( get_param( 's' ) ).'" class="search_field SearchField form-control" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
-		echo $this->disp_params['search_input_after'];
+		$search_input_keyword = $this->disp_params['search_input_before']
+			.'<input type="text" name="s" size="25" value="'.htmlspecialchars( get_param( 's' ) ).'" class="search_field SearchField form-control" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />'
+			.$this->disp_params['search_input_after'];
 
 		// Search submit button:
-		echo $this->disp_params['search_submit_before'];
-		echo '<input type="submit" name="submit" class="search_submit submit btn btn-primary" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />';
-		echo $this->disp_params['search_submit_after'];
+		$search_button_search = $this->disp_params['search_submit_before']
+			.'<input type="submit" name="submit" class="search_submit submit btn btn-primary" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />'
+			.$this->disp_params['search_submit_after'];
 
+		// Search author input field:
 		if( $this->disp_params['search_author'] )
-		{	// Display a field to search by author name:
-			echo str_replace( array( '$for$', '$label$' ), array( 'search_author', T_('Author') ), $this->disp_params['search_input_author_before'] );
-			echo '<input type="text" id="search_author" name="search_author" value="'.htmlspecialchars( get_param( 'search_author' ) ).'" class="search_field_author form-control autocomplete_login" title="'.format_to_output( T_('Enter text to search by author name'), 'htmlattr' ).'" />';
-			echo $this->disp_params['search_input_author_after'];
+		{	// If enabled by widget setting:
+			$search_input_author = str_replace( array( '$for$', '$label$' ), array( 'search_author', T_('Author') ), $this->disp_params['search_input_author_before'] )
+				.'<input type="text" id="search_author" name="search_author" value="'.htmlspecialchars( get_param( 'search_author' ) ).'" class="search_field_author form-control autocomplete_login" title="'.format_to_output( T_('Enter text to search by author name'), 'htmlattr' ).'" />'
+				.$this->disp_params['search_input_author_after'];
+		}
+		else
+		{	// If disabled by widget setting:
+			$search_input_author = '';
 		}
 
+		// Search content age input field:
 		if( $this->disp_params['search_age'] )
-		{	// Display a field to search by content age:
-			echo str_replace( array( '$for$', '$label$' ), array( 'search_age', T_('Content age') ), $this->disp_params['search_input_age_before'] );
+		{	// If enabled by widget setting:
 			$content_age_options = array(
 					''     => 'All',
 					'hour' => 'Last hour',
@@ -218,17 +224,27 @@ class coll_search_form_Widget extends ComponentWidget
 					'90d'  => 'Last 90 days',
 					'year' => 'Last year',
 				);
-			echo '<select id="search_age" name="search_age" class="form-control">';
+			$search_input_age = str_replace( array( '$for$', '$label$' ), array( 'search_age', T_('Content age') ), $this->disp_params['search_input_age_before'] )
+				.'<select id="search_age" name="search_age" class="form-control">';
 			foreach( $content_age_options as $content_age_option_value => $content_age_option_title )
 			{
-				echo '<option value="'.format_to_output( $content_age_option_value, 'htmlattr' ).'"'
+				$search_input_age .= '<option value="'.format_to_output( $content_age_option_value, 'htmlattr' ).'"'
 						.( $content_age_option_value == get_param( 'search_age' ) ? ' selected="selected"' : '' ).'>'
 						.format_to_output( $content_age_option_title, 'htmlbody' )
 					.'</option>';
 			}
-			echo '</select>';
-			echo $this->disp_params['search_input_age_after'];
+			$search_input_age .= '</select>'
+				.$this->disp_params['search_input_age_after'];
 		}
+		else
+		{	// If disabled by widget setting:
+			$search_input_age = '';
+		}
+
+		// Print the search form elements depending on template:
+		echo str_replace( array( '$input_keyword$', '$button_search$', '$input_author$', '$input_age$' ),
+			array( $search_input_keyword, $search_button_search, $search_input_author, $search_input_age ),
+			$this->disp_params['search_template'] );
 
 		echo '</div>';
 

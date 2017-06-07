@@ -16,6 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $params = array_merge( array(
 		'pagination'                 => array(),
 		'search_class'               => 'extended_search_form',
+		'search_template'            => '$input_keyword$$button_search$$input_author$$input_age$',
 		'search_input_before'        => '',
 		'search_input_after'         => '',
 		'search_submit_before'       => '',
@@ -43,6 +44,7 @@ skin_widget( array(
 		'block_display_title'        => false,
 		'disp_search_options'        => 0,
 		'search_class'               => $params['search_class'],
+		'search_template'            => $params['search_template'],
 		'search_input_before'        => $params['search_input_before'],
 		'search_input_after'         => $params['search_input_after'],
 		'search_submit_before'       => $params['search_submit_before'],
