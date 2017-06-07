@@ -27,6 +27,7 @@ class CommentQuery extends SQL
 	var $cl;
 	var $post;
 	var $author;
+	var $author_login;
 	var $author_email;
 	var $author_url;
 	var $url_match;
@@ -221,6 +222,42 @@ class CommentQuery extends SQL
 		}
 
 		$this->WHERE_and( $this->dbprefix.'author_user_ID '.$eq.' ('.$author_list.')' );
+	}
+
+
+	/**
+	 * Restrict to specific authors by users logins
+	 *
+	 * @param string List of authors logins to restrict to (must have been previously validated)
+	 */
+	function where_author_logins( $author_logins )
+	{
+		$this->author_login = $author_logins;
+
+		if( empty( $this->author_login ) )
+		{
+			return;
+		}
+
+		if( substr( $this->author_login, 0, 1 ) == '-' )
+		{	// Exclude the users IF a list starts with MINUS sign:
+			$eq = 'NOT IN';
+			$users_IDs = get_users_IDs_by_logins( substr( $this->author_login, 1 ) );
+		}
+		else
+		{	// Include the users:
+			$eq = 'IN';
+			$users_IDs = get_users_IDs_by_logins( $this->author_login );
+			if( empty( $users_IDs ) )
+			{	// If users are not found with login, we should not allow selection with all users:
+				$users_IDs = '-1';
+			}
+		}
+
+		if( ! empty( $users_IDs ) )
+		{
+			$this->WHERE_and( $this->dbprefix.'author_user_ID '.$eq.' ( '.$users_IDs.' )' );
+		}
 	}
 
 
@@ -623,6 +660,43 @@ class CommentQuery extends SQL
 		}
 
 		$this->WHERE_and( $condition );
+	}
+
+
+	/**
+	 * Restrict by min and max dates
+	 *
+	 * @param string Date in format YYYYMMDDHHMMSS to start at
+	 * @param string Date in format YYYYMMDDHHMMSS to stop at
+	 */
+	function where_dates( $ymdhms_min, $ymdhms_max )
+	{
+		global $DB;
+
+		$this->ymdhms_min = $ymdhms_min;
+		$this->ymdhms_max = $ymdhms_max;
+
+		if( ! empty( $this->ymdhms_min ) )
+		{	// Restrict by min date:
+			$dstart0 = $this->ymdhms_min.substr( '00000101000000', strlen( $this->ymdhms_min ) );
+
+			// Start date in MySQL format: seconds get omitted (rounded to lower to minute for caching purposes):
+			$dstart_mysql = substr( $dstart0, 0, 4 ).'-'.substr( $dstart0, 4, 2 ).'-'.substr( $dstart0, 6, 2 ).' '
+											.substr( $dstart0, 8, 2 ).':'.substr( $dstart0, 10, 2 );
+
+			$this->WHERE_and( $this->dbprefix.'date >= '.$DB->quote( $dstart_mysql ) );
+		}
+
+		if( ! empty( $this->ymdhms_max ) )
+		{	// Restrict by max date:
+			$dstart0 = $this->ymdhms_max.substr( '00001231235959', strlen( $this->ymdhms_max ) );
+
+			// Start date in MySQL format: seconds get omitted (rounded to lower to minute for caching purposes):
+			$dstart_mysql = substr( $dstart0, 0, 4 ).'-'.substr( $dstart0, 4, 2 ).'-'.substr( $dstart0, 6, 2 ).' '
+											.substr( $dstart0, 8, 2 ).':'.substr( $dstart0, 10, 2 );
+
+			$this->WHERE_and( $this->dbprefix.'date <= '.$DB->quote( $dstart_mysql ) );
+		}
 	}
 }
 

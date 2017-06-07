@@ -94,6 +94,7 @@ class CommentList2 extends DataObjectList2
 				'filter_preset' => NULL,
 				'author_IDs' => NULL,
 				'author' => NULL,
+				'authors_login' => NULL,
 				'author_email' => NULL,
 				'author_url' => NULL,
 				'url_match' => '=',
@@ -121,6 +122,8 @@ class CommentList2 extends DataObjectList2
 				'timestamp_max' => NULL, // Do not show comments from posts after this timestamp
 				'threaded_comments' => false, // Mode to display the comment replies
 				'user_perm' => NULL,
+				'ymdhms_min' => NULL,
+				'ymdhms_max' => NULL,
 		) );
 	}
 
@@ -186,12 +189,20 @@ class CommentList2 extends DataObjectList2
 			 */
 			memorize_param( $this->param_prefix.'author_IDs', 'string', $this->default_filters['author_IDs'], $this->filters['author_IDs'] );  // List of authors ID to restrict to
 			memorize_param( $this->param_prefix.'author', 'string', $this->default_filters['author'], $this->filters['author'] );  // List of authors ID to restrict to
+			memorize_param( $this->param_prefix.'author_login', 'string', $this->default_filters['authors_login'], $this->filters['authors_login'] ); // List of authors users logins to restrict to
 			memorize_param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], $this->filters['author_email'] );  // List of authors email to restrict to
 			memorize_param( $this->param_prefix.'author_url', 'string', $this->default_filters['author_url'], $this->filters['author_url'] );  // List of authors url to restrict to
 			memorize_param( $this->param_prefix.'url_match', 'string', $this->default_filters['url_match'], $this->filters['url_match'] );  // List of authors url to restrict to
 			memorize_param( $this->param_prefix.'include_emptyurl', 'string', $this->default_filters['include_emptyurl'], $this->filters['include_emptyurl'] );  // List of authors url to restrict to
 			memorize_param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], $this->filters['author_IP'] );  // List of authors ip to restrict to
 
+			/*
+			 * Restrict by dates
+			 */
+			memorize_param( $this->param_prefix.'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(DayHourMinuteSecond) to start at
+			memorize_param( $this->param_prefix.'dstop', 'integer', $this->default_filters['ymdhms_max'], $this->filters['ymdhms_max'] ); // YearMonth(DayHourMinuteSecond) to stop at
+
+			
 			/*
 			 * Restrict to selected rating:
 			 */
@@ -297,11 +308,18 @@ class CommentList2 extends DataObjectList2
 		 */
 		$this->filters['author_IDs'] = param( $this->param_prefix.'author_IDs', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['author_IDs'], true );      // List of authors ID to restrict to
 		$this->filters['author'] = param( $this->param_prefix.'author', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['author'], true );      // List of authors to restrict to
+		$this->filters['authors_login'] = param( $this->param_prefix.'author_login', '/^-?[A-Za-z0-9_\.]+(,[A-Za-z0-9_\.]+)*$/', $this->default_filters['authors_login'], true ); // List of authors users logins to restrict to
 		$this->filters['author_email'] = param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], true );
 		$this->filters['author_url'] = param( $this->param_prefix.'author_url', 'string', $this->default_filters['author_url'], true );
 		$this->filters['url_match'] = param( $this->param_prefix.'url_match', 'string', $this->default_filters['url_match'], true );
 		$this->filters['include_emptyurl'] = param( $this->param_prefix.'include_emptyurl', 'string', $this->default_filters['include_emptyurl'], true );
 		$this->filters['author_IP'] = param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], true );
+
+		/*
+		 * Restrict to selected min and max dates:
+		 */
+		$this->filters['ymdhms_min'] = param_compact_date( $this->param_prefix.'dstart', $this->default_filters['ymdhms_min'], true, T_( 'Invalid date' ) ); // YearMonth(DayHourMinuteSecond) to start at
+		$this->filters['ymdhms_max'] = param_compact_date( $this->param_prefix.'dstop', $this->default_filters['ymdhms_max'], true, T_( 'Invalid date' ) ); // YearMonth(DayHourMinuteSecond) to stop at
 
 		/*
 		 * Restrict to selected statuses:
@@ -406,6 +424,7 @@ class CommentList2 extends DataObjectList2
 		 * filtering stuff:
 		 */
 		$this->CommentQuery->where_author( $this->filters['author_IDs'] );
+		$this->CommentQuery->where_author_logins( $this->filters['authors_login'] );
 		$this->CommentQuery->where_author_email( $this->filters['author_email'] );
 		$this->CommentQuery->where_author_url( $this->filters['author_url'], $this->filters['url_match'], $this->filters['include_emptyurl'] );
 		$this->CommentQuery->where_author_IP( $this->filters['author_IP'] );
@@ -416,6 +435,7 @@ class CommentList2 extends DataObjectList2
 		$this->CommentQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		$this->CommentQuery->where_statuses( $this->filters['statuses'] );
 		$this->CommentQuery->where_types( $this->filters['types'] );
+		$this->CommentQuery->where_dates( $this->filters['ymdhms_min'], $this->filters['ymdhms_max'] );
 		$this->ItemQuery->where_datestart( '', '', '', '', $this->filters['timestamp_min'], $this->filters['timestamp_max'] );
 
 		if( !is_null( $this->Blog ) && isset( $this->filters['user_perm'] ) )

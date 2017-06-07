@@ -257,9 +257,11 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
  * @param string original search term
  * @param array all separated words from the search term
  * @param array all quoted parts from the search term
- * @param number max possible score
+ * @param string Author login
+ * @param string Content age
+ * @return array Results
  */
-function search_and_score_items( $search_term, $keywords, $quoted_parts )
+function search_and_score_items( $search_term, $keywords, $quoted_parts, $author = '', $content_age = '' )
 {
 	global $DB, $Collection, $Blog;
 
@@ -268,6 +270,8 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	$search_ItemList->set_filters( array(
 			'keywords'      => $search_term,
 			'keyword_scope' => 'title,content,tags,excerpt,titletag', // TODO: add more fields
+			'authors_login' => empty( $author ) ? NULL : $author,
+			'ymdhms_min'    => get_search_date_by_content_age( $content_age ),
 			'phrase'        => 'OR',
 			'itemtype_usage'=> '-sidebar', // Exclude from search: 'sidebar' item types
 			'orderby'       => 'datemodified',
@@ -335,25 +339,29 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
  * @param string original search term
  * @param array all separated words from the search term
  * @param array all quoted parts from the search term
- * @param number max possible score
+ * @param string Author login
+ * @param string Content age
+ * @return array Results
  */
-function search_and_score_comments( $search_term, $keywords, $quoted_parts )
+function search_and_score_comments( $search_term, $keywords, $quoted_parts, $author = '', $content_age = '' )
 {
 	global $DB, $Collection, $Blog;
 
 	// Search between comments
 	$search_CommentList = new CommentList2( $Blog, '', 'CommentCache', 'search_comment' );
 	$search_CommentList->set_filters( array(
-			'keywords' => $search_term,
-			'phrase' => 'OR',
-			'order_by' => 'date',
-			'order' => 'DESC',
-			'comments' => 1000
+			'keywords'      => $search_term,
+			'authors_login' => empty( $author ) ? NULL : $author,
+			'ymdhms_min'    => get_search_date_by_content_age( $content_age ),
+			'phrase'        => 'OR',
+			'order_by'      => 'date',
+			'order'         => 'DESC',
+			'comments'      => 1000
 		) );
 	$search_CommentList->query_init();
 
 	$search_query = 'SELECT comment_ID, post_title, comment_content, comment_date,
-	 	IFNULL(comment_author, user_login) as author'
+		IFNULL(comment_author, user_login) as author'
 		.$search_CommentList->CommentQuery->get_from()
 		.' LEFT JOIN T_items__item ON comment_item_ID = post_ID'
 		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
@@ -524,9 +532,11 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
  * @param string the search keywords
  * @param string What types search: 'all', 'item', 'comment', 'category', 'tag'
  *               Use ','(comma) as separator to use several kinds, e.g: 'item,comment' or 'tag,comment,category'
+ * @param string Search by author name
+ * @param string Search by content age
  * @return array scored search result, each element is an array( type, ID, score )
  */
-function perform_scored_search( $search_keywords, $search_types = 'all' )
+function perform_scored_search( $search_keywords, $search_types = 'all', $search_author = '', $search_age = '' )
 {
 	$keywords = trim( $search_keywords );
 	if( empty( $keywords ) )
@@ -591,11 +601,17 @@ function perform_scored_search( $search_keywords, $search_types = 'all' )
 		$search_type_tag = in_array( 'tag', $search_types );
 	}
 
+	if( ! empty( $search_author ) || ! empty( $search_age ) )
+	{	// If search by author or age is enabled then don't search results in categories and tags because they don't have such data:
+		$search_type_category = false;
+		$search_type_tag = false;
+	}
+
 	$search_result = array();
 
 	if( $search_type_item )
 	{	// Perform search on Items:
-		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
+		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts, $search_author, $search_age );
 		$search_result = $item_search_result;
 		if( $debug )
 		{
@@ -606,7 +622,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all' )
 
 	if( $search_type_comment )
 	{	// Perform search on Comments:
-		$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
+		$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts, $search_author, $search_age );
 		$search_result = array_merge( $search_result, $comment_search_result );
 		if( $debug )
 		{
@@ -751,7 +767,7 @@ function search_result_block( $params = array() )
 		$search_types = count( $search_types ) == 4 ? 'all' : implode( ',', $search_types );
 
 		// Perform new search:
-		$search_result = perform_scored_search( $search_keywords, $search_types );
+		$search_result = perform_scored_search( $search_keywords, $search_types, $search_author, $search_age );
 
 		// Save results into session:
 		$Session->set( 'search_params', $search_params );
@@ -1566,4 +1582,56 @@ function display_search_debug_info( $search_result )
 
 		$Debuglog->add( sprintf('Result for [%s]: [Percentage:%d%%][Percentage score:%d][Total score:%d]', $score_map_key, $search_result[$index]['percentage'], $search_result[$index]['percentage_score'], $search_result[$index]['score']), 'info' );
 	}
+}
+
+
+/**
+ * Get date by content age value
+ *
+ * @param string Content age: 
+ * @return string Date in format YYYYmmddHHiiss
+ */
+function get_search_date_by_content_age( $content_age )
+{
+	global $localtimenow;
+
+	switch( $content_age )
+	{
+		case 'hour':
+			// Last hour:
+			$date = date( 'YmdHis', $localtimenow - 3600 ); // 60 * 60
+			break;
+
+		case 'day':
+			// Last day:
+			$date = date( 'YmdHis', $localtimenow - 86400 ); // 3600 * 24
+			break;
+
+		case 'week':
+			// Last week:
+			$date = date( 'YmdHis', $localtimenow - 604800 ); // 86400 * 7
+			break;
+
+		case '30d':
+			// Last 30 days:
+			$date = date( 'YmdHis', $localtimenow - 2592000 ); // 86400 * 30
+			break;
+
+		case '90d':
+			// Last 90 days:
+			$date = date( 'YmdHis', $localtimenow - 7776000 ); // 86400 * 90
+			break;
+
+		case 'year':
+			// Last year:
+			$date = date( 'YmdHis', $localtimenow - 31190400 ); // 86400 * 361
+			break;
+
+		default:
+			// Unknown age value:
+			$date = NULL;
+			break;
+	}
+
+	return $date;
 }
