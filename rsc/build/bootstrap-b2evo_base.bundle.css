@@ -2472,6 +2472,9 @@ div.container_menu_top div.widget_core_coll_search_form {
 div.container_menu_top input.search_field {
   width: 160px;
 }
+.extended_search_form .form-inline {
+  margin-top: 6px;
+}
 .widget_core_user_login #login_form,
 .widget_core_user_register #register_form {
   margin-top: 5px;

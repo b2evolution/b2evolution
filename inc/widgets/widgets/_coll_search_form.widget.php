@@ -107,7 +107,7 @@ class coll_search_form_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 				),
-				'search_content_age' => array(
+				'search_age' => array(
 					'label' => T_('Content age'),
 					'note' => T_('Check this to search by content age'),
 					'type' => 'checkbox',
@@ -134,16 +134,14 @@ class coll_search_form_Widget extends ComponentWidget
 	function init_display( $params )
 	{
 		$params = array_merge( array(
-				'search_input_before'       => '',
-				'search_input_after'        => '',
-				'search_submit_before'      => '',
-				'search_submit_after'       => '',
-				'search_group_before'       => '',
-				'search_group_after'        => '',
-				'search_group_label_before' => '',
-				'search_group_label_after'  => '',
-				'search_group_field_before' => '',
-				'search_group_field_after'  => '',
+				'search_input_before'        => '',
+				'search_input_after'         => '',
+				'search_submit_before'       => '',
+				'search_submit_after'        => '',
+				'search_input_author_before' => '',
+				'search_input_author_after'  => '',
+				'search_input_age_before'    => '',
+				'search_input_age_after'     => '',
 			), $params );
 
 		parent::init_display( $params );
@@ -191,7 +189,7 @@ class coll_search_form_Widget extends ComponentWidget
 
 		echo '<div class="'.$search_form_class.'">';
 
-		// Search input field:
+		// Search keyword input field:
 		echo $this->disp_params['search_input_before'];
 		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars( get_param( 's' ) ).'" class="search_field SearchField form-control" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
 		echo $this->disp_params['search_input_after'];
@@ -201,49 +199,35 @@ class coll_search_form_Widget extends ComponentWidget
 		echo '<input type="submit" name="submit" class="search_submit submit btn btn-primary" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />';
 		echo $this->disp_params['search_submit_after'];
 
-		if( $this->disp_params['search_author'] || $this->disp_params['search_content_age'] )
-		{
-			echo $this->disp_params['search_group_before'];
+		if( $this->disp_params['search_author'] )
+		{	// Display a field to search by author name:
+			echo str_replace( array( '$for$', '$label$' ), array( 'search_author', T_('Author') ), $this->disp_params['search_input_author_before'] );
+			echo '<input type="text" id="search_author" name="search_author" value="'.htmlspecialchars( get_param( 'search_author' ) ).'" class="search_field_author form-control autocomplete_login" title="'.format_to_output( T_('Enter text to search by author name'), 'htmlattr' ).'" />';
+			echo $this->disp_params['search_input_author_after'];
+		}
 
-			if( $this->disp_params['search_author'] )
-			{	// Display a field to search by author name:
-				echo str_replace( '$for$', 'search_author', $this->disp_params['search_group_label_before'] );
-				echo T_('Author');
-				echo $this->disp_params['search_group_label_after'];
-				echo $this->disp_params['search_group_field_before'];
-				echo '<input type="text" id="search_author" name="search_author" value="'.htmlspecialchars( get_param( 'search_author' ) ).'" class="search_field_author SearchField form-control autocomplete_login" title="'.format_to_output( T_('Enter text to search by author name'), 'htmlattr' ).'" />';
-				echo $this->disp_params['search_group_field_after'];
+		if( $this->disp_params['search_age'] )
+		{	// Display a field to search by content age:
+			echo str_replace( array( '$for$', '$label$' ), array( 'search_age', T_('Content age') ), $this->disp_params['search_input_age_before'] );
+			$content_age_options = array(
+					''     => 'All',
+					'hour' => 'Last hour',
+					'day'  => 'Last day',
+					'week' => 'Last week',
+					'30d'  => 'Last 30 days',
+					'90d'  => 'Last 90 days',
+					'year' => 'Last year',
+				);
+			echo '<select id="search_age" name="search_age" class="form-control">';
+			foreach( $content_age_options as $content_age_option_value => $content_age_option_title )
+			{
+				echo '<option value="'.format_to_output( $content_age_option_value, 'htmlattr' ).'"'
+						.( $content_age_option_value == get_param( 'search_age' ) ? ' selected="selected"' : '' ).'>'
+						.format_to_output( $content_age_option_title, 'htmlbody' )
+					.'</option>';
 			}
-
-			if( $this->disp_params['search_content_age'] )
-			{	// Display a field to search by content age:
-				//echo $this->disp_params['search_label_before'];
-				echo str_replace( '$for$', 'search_content_age', $this->disp_params['search_group_label_before'] );
-				echo T_('Content age');
-				echo $this->disp_params['search_group_label_after'];
-				echo $this->disp_params['search_group_field_before'];
-				$content_age_options = array(
-						''     => 'All',
-						'hour' => 'Last hour',
-						'day'  => 'Last day',
-						'week' => 'Last week',
-						'30d'  => 'Last 30 days',
-						'90d'  => 'Last 90 days',
-						'year' => 'Last year',
-					);
-				echo '<select id="search_content_age" name="search_content_age" class="form-control">';
-				foreach( $content_age_options as $content_age_option_value => $content_age_option_title )
-				{
-					echo '<option value="'.format_to_output( $content_age_option_value, 'htmlattr' ).'"'
-							.( $content_age_option_value == get_param( 'search_content_age' ) ? ' selected="selected"' : '' ).'>'
-							.format_to_output( $content_age_option_title, 'htmlbody' )
-						.'</option>';
-				}
-				echo '</select>';
-				echo $this->disp_params['search_group_field_after'];
-			}
-
-			echo $this->disp_params['search_group_after'];
+			echo '</select>';
+			echo $this->disp_params['search_input_age_after'];
 		}
 
 		echo '</div>';
