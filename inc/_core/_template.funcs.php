@@ -1406,6 +1406,48 @@ function add_js_for_toolbar( $relative_to = 'rsc_url' )
 }
 
 
+function add_web_font( $provider, $font_family )
+{
+	global $web_fonts;
+
+	if( ! isset( $web_fonts ) )
+	{
+		$web_fonts = array();
+	}
+
+	if( ! isset( $web_fonts[$provider] ) )
+	{
+		$web_fonts[$provider] = array();
+	}
+
+	if( ! in_array( $font_family, $web_fonts[$provider] ) )
+	{
+		$web_fonts[$provider][] = $font_family;
+	}
+}
+
+
+function init_web_fonts()
+{
+	global $web_fonts;
+
+	if( empty( $web_fonts ) )
+	{
+		return;
+	}
+
+	foreach( $web_fonts as $provider => $fonts )
+	{
+		switch( $provider )
+		{
+			case 'google_font':
+				add_headline( '<link href="https://fonts.googleapis.com/css?family='.implode( '|', $fonts ).'" rel="stylesheet">');
+				break;
+		}
+	}
+}
+
+
 /**
  * Registers headlines required by AJAX forms, but only if javascript forms are enabled in blog settings.
  *
@@ -1806,6 +1848,9 @@ function init_jqplot_js( $relative_to = 'rsc_url' )
 function include_headlines()
 {
 	global $headlines;
+
+	// Initialize web fonts if any
+	init_web_fonts();
 
 	if( $headlines )
 	{

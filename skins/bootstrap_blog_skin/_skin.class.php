@@ -143,10 +143,17 @@ class bootstrap_blog_Skin extends Skin
 							'_family' => array(
 								'defaultvalue' => 'system_helveticaneue',
 								'options'      => $this->get_font_definitions(),
-								'type'         => 'select'
+								'type'         => 'select',
+								'class'        => 'font_input_group'
+							),
+							'_custom_family' => array(
+								'label' => T_('font-family'),
+								'type' => 'text',
+								'class' => 'web_font_setting',
+								'size' => 30
 							),
 							'_size' => array(
-								'label' => T_('Size'),
+								'label' => T_('size'),
 								'defaultvalue' => 'default',
 								'options'      => array(
 									'default'        => T_('Default (14px)'),
@@ -158,7 +165,7 @@ class bootstrap_blog_Skin extends Skin
 								'type' => 'select'
 							),
 							'_weight' => array(
-								'label' => T_('Weight'),
+								'label' => T_('weight'),
 								'defaultvalue' => '400',
 								'options' => array(
 										'100' => '100',
@@ -533,7 +540,7 @@ class bootstrap_blog_Skin extends Skin
 		}
 
 		// Font family customization
-		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight' );
+		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', 'font_custom_family', NULL, 'font_weight' );
 
 		if( ! empty( $custom_css ) )
 		{	// Function for custom_css:

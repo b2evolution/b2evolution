@@ -35,6 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
 {
 	global $debug;
+	global $font_input_script_initialized;
 	static $has_array_type;
 
 	if( ! is_array( $parmeta ) )
@@ -513,7 +514,19 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
 				{
 					$l_parmeta['group'] = $parname; // inject group
+
+					$web_fonts = array( 'google_font' );
+					if( $set_type == 'Skin' && isset( $l_parmeta['class'] ) && preg_match( '/\bweb_font_setting\b/i', $l_parmeta['class'] )
+							&& ! in_array( $Obj->get_setting( '_family', $l_parmeta['group'] ), $web_fonts ) )
+					{
+						echo '<span class="hidden">';
+					}
+					else
+					{
+						echo '<span>';
+					}
 					autoform_display_field( $l_parname, $l_parmeta, $Form, $set_type, $Obj, $set_target, $use_value );
+					echo '</span>';
 				}
 				$Form->end_line();
 			}
@@ -522,6 +535,35 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
+	}
+
+	if( isset( $params['class'] ) && preg_match( '/\bfont_input_group\b/i', $params['class'] ) && ! $font_input_script_initialized )
+	{
+		?>
+		<script type="text/javascript">
+		jQuery( document ).ready( function() {
+			jQuery( '.font_input_group' ).on( 'change',
+				function( e )
+				{
+					var input_group = jQuery( this ).closest( '.form-group' );
+					var selected = jQuery( ':selected', this );
+					var option_group = selected.closest('optgroup').attr('label');
+
+					switch( option_group )
+					{
+						case 'System fonts':
+							jQuery( '.web_font_setting', input_group ).closest( 'span' ).hide();
+							break;
+
+						case 'Web fonts':
+							jQuery( '.web_font_setting', input_group ).closest( 'span' ).removeClass( 'hidden' ).show();
+							break;
+					}
+				} );
+		});
+		</script>
+		<?php
+		$font_input_script_initialized = true;
 	}
 
 	if( $outer_most && $has_array_type )
