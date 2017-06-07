@@ -320,11 +320,38 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'radio':
-			if( ! isset($parmeta['field_lines']) )
+			if( isset( $parmeta['field_lines'] ) )
 			{
-				$parmeta['field_lines'] = false;
+				$params['lines'] = $parmeta['field_lines'];
 			}
-			$Form->radio( $input_name, $set_value, $parmeta['options'], $set_label, $parmeta['field_lines'], $parmeta['note'] );
+			$options = array();
+			foreach( $parmeta['options'] as $l_key => $l_options )
+			{
+				$options[$l_key] = array(
+					'value' => $l_options[0],
+					'label' => $l_options[1]
+				);
+
+				if( isset( $l_options[2] ) )
+				{
+					$options[$l_key]['note'] = $l_options[2];
+				}
+				if( isset( $l_options[4] ) )
+				{	// Convert "inline attribs" to "params" array:
+					preg_match_all( '#(\w+)=[\'"](.*)[\'"]#', $l_options[4], $matches, PREG_SET_ORDER );
+
+					foreach( $matches as $l_set_nr => $l_match )
+					{
+						$options[$l_key][$l_match[1]] = $l_match[2];
+					}
+				}
+
+				if( isset( $l_options[3] ) )
+				{
+					$options[$l_key]['suffix'] = $l_options[3];
+				}
+			}
+			$Form->radio_input( $input_name, $set_value, $options, $set_label, $params );
 			break;
 
 		case 'array':
