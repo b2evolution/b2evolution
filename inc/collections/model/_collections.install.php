@@ -136,7 +136,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_datecreated            TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_datemodified           TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_last_touched_mts       DOUBLE(13,3) UNSIGNED NOT NULL DEFAULT 0,
-			post_contents_last_updated_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			post_contents_last_updated_mts DOUBLE(13,3) UNSIGNED NOT NULL DEFAULT 0,
 			post_status                 ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NOT NULL DEFAULT 'draft',
 			post_pst_ID                 int(11) unsigned NULL,
 			post_ityp_ID                int(10) unsigned NOT NULL DEFAULT 1,

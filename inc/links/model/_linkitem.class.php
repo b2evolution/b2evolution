@@ -336,7 +336,7 @@ class LinkItem extends LinkOwner
 
 
 	/**
-	 * Update field contents_last_updated_ts of Item
+	 * Update field contents_last_updated_mts of Item
 	 */
 	function update_contents_last_updated_ts()
 	{

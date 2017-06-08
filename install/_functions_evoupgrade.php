@@ -8508,6 +8508,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12340, 'Upgrade table posts...' ) )
+	{	// part of 6.9.2-beta
+		db_add_col( 'T_items__item', 'post_contents_last_updated_mts', 'DOUBLE(13,3) UNSIGNED NOT NULL DEFAULT 0 AFTER post_contents_last_updated_ts' );
+		$DB->query( 'UPDATE T_items__item
+			SET post_contents_last_updated_mts = UNIX_TIMESTAMP( post_contents_last_updated_ts )' );
+		db_drop_col( 'T_items__item', 'post_contents_last_updated_ts' );
+		$DB->query( 'UPDATE T_coll_settings
+			  SET cset_value = "contents_last_updated_mts"
+			WHERE cset_name = "orderby"
+			  AND cset_value = "contents_last_updated_ts"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

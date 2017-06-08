@@ -484,8 +484,8 @@ class LinkOwner
 
 
 	/**
-	 * Update owner contents_last_updated_ts if exists
-	 * This must be override in the subclasses if the owner object has contents_last_updated_ts field
+	 * Update owner contents_last_updated_mts if exists
+	 * This must be override in the subclasses if the owner object has contents_last_updated_mts field
 	 */
 	function update_contents_last_updated_ts()
 	{

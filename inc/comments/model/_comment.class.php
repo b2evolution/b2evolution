@@ -4612,9 +4612,9 @@ class Comment extends DataObject
 	 * Update field last_touched_mts
 	 *
 	 * @param boolean update comment's post last touched mts as well or not
-	 * @param boolean Use TRUE to update field contents_last_updated_ts of the comment's item
+	 * @param boolean Use TRUE to update field contents_last_updated_mts of the comment's item
 	 */
-	function update_last_touched_date( $update_item_last_touched_mts = true, $update_item_contents_last_updated_ts = false )
+	function update_last_touched_date( $update_item_last_touched_mts = true, $update_item_contents_last_updated_mts = false )
 	{
 		global $localmicrotimenow, $current_User;
 
@@ -4636,9 +4636,9 @@ class Comment extends DataObject
 			$this->dbupdate();
 		}
 
-		if( $update_item_last_touched_mts || $update_item_contents_last_updated_ts )
+		if( $update_item_last_touched_mts || $update_item_contents_last_updated_mts )
 		{	// Update last touched timestamp or content last update timestamp of the Item:
-			$comment_Item->update_last_touched_date( true, $update_item_last_touched_mts, $update_item_contents_last_updated_ts );
+			$comment_Item->update_last_touched_date( true, $update_item_last_touched_mts, $update_item_contents_last_updated_mts );
 		}
 	}
 

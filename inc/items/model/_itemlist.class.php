@@ -129,11 +129,11 @@ class ItemList2 extends ItemListLight
 					break;
 
 				case 'post_datemodified':
-				case 'post_contents_last_updated_ts':
 					$post_field_value = date2mysql( $localtimenow );
 					break;
 
 				case 'post_last_touched_mts':
+				case 'post_contents_last_updated_mts':
 					global $localmicrotimenow;
 					$post_field_value = $localmicrotimenow;
 					break;
@@ -733,7 +733,7 @@ class ItemList2 extends ItemListLight
 			case 'datecreated':
 			case 'datemodified':
 			case 'last_touched_mts':
-			case 'contents_last_updated_ts':
+			case 'contents_last_updated_mts':
 			case 'urltitle':
 			case 'priority':
 				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]

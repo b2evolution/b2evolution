@@ -72,7 +72,7 @@ class Item extends ItemLight
 	 * @see Item::update_last_touched_date()
 	 * @var integer
 	 */
-	var $contents_last_updated_ts;
+	var $contents_last_updated_mts;
 
 
 	/**
@@ -6108,10 +6108,10 @@ class Item extends ItemLight
 	 */
 	function dbinsert_test()
 	{
-		global $DB, $localtimenow, $localmicrotimenow;
+		global $DB, $localmicrotimenow;
 
 		$this->set_param( 'last_touched_mts', 'number', $localmicrotimenow );
-		$this->set_param( 'contents_last_updated_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
+		$this->set_param( 'contents_last_updated_mts', 'number', $localmicrotimenow );
 
 		$DB->begin( 'SERIALIZABLE' );
 
@@ -6265,7 +6265,7 @@ class Item extends ItemLight
 			{	// Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure:
 				$this->set_last_touched_ts();
 			}
-			if( ! isset( $dbchanges['contents_last_updated_ts'] ) &&
+			if( ! isset( $dbchanges['contents_last_updated_mts'] ) &&
 			  ( isset( $dbchanges['post_title'] ) ||
 			    isset( $dbchanges['post_content'] ) ||
 			    isset( $dbchanges['post_url'] ) ) )
@@ -8357,7 +8357,7 @@ class Item extends ItemLight
 	 */
 	function set_last_touched_ts()
 	{
-		global $localmicrotimenow, $current_User;
+		global $localmicrotimenow;
 
 		if( is_logged_in() )
 		{
@@ -8368,13 +8368,13 @@ class Item extends ItemLight
 
 
 	/**
-	 * Set field contents_last_updated_ts
+	 * Set field contents_last_updated_mts
 	 */
 	function set_contents_last_updated_ts()
 	{
-		global $localtimenow;
+		global $localmicrotimenow;
 
-		$this->set_param( 'contents_last_updated_ts', 'date', date2mysql( $localtimenow ) );
+		$this->set_param( 'contents_last_updated_mts', 'number', $localmicrotimenow );
 	}
 
 
@@ -8383,9 +8383,9 @@ class Item extends ItemLight
 	 *
 	 * @param boolean Use transaction
 	 * @param boolean Use TRUE to update item field last_touched_mts
-	 * @param boolean Use TRUE to update item field contents_last_updated_ts
+	 * @param boolean Use TRUE to update item field contents_last_updated_mts
 	 */
-	function update_last_touched_date( $use_transaction = true, $update_last_touched_mts = true, $update_contents_last_updated_ts = false )
+	function update_last_touched_date( $use_transaction = true, $update_last_touched_mts = true, $update_contents_last_updated_mts = false )
 	{
 		if( $use_transaction )
 		{
@@ -8393,14 +8393,14 @@ class Item extends ItemLight
 			$DB->begin();
 		}
 
-		if( $update_last_touched_mts || $update_contents_last_updated_ts )
+		if( $update_last_touched_mts || $update_contents_last_updated_mts )
 		{	// If at least one date field should be updated
 			if( $update_last_touched_mts )
 			{	// Update field last_touched_mts:
 				$this->set_last_touched_ts();
 			}
-			if( $update_contents_last_updated_ts )
-			{	// Update field contents_last_updated_ts:
+			if( $update_contents_last_updated_mts )
+			{	// Update field contents_last_updated_mts:
 				$this->set_contents_last_updated_ts();
 			}
 			$this->dbupdate( false, false, false );
@@ -8573,9 +8573,9 @@ class Item extends ItemLight
 		}
 
 		// In theory, it would be more safe to use this comparison:
-		// if( $read_date > $this->contents_last_updated_ts )
+		// if( $read_date > $this->contents_last_updated_mts )
 		// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
-		if( $read_date >= $this->contents_last_updated_ts )
+		if( $read_date >= $this->contents_last_updated_mts )
 		{	// This post was read by current user
 			return 'read';
 		}

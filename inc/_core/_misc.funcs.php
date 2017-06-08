@@ -5948,7 +5948,7 @@ function get_available_sort_options()
 		'datecreated'              => T_('Date created'),
 		'datemodified'             => T_('Date last modified'),
 		'last_touched_mts'         => T_('Date last touched'),
-		'contents_last_updated_ts' => T_('Contents last updated'),
+		'contents_last_updated_mts'=> T_('Contents last updated'),
 		'urltitle'                 => T_('URL "filename"'),
 		'priority'                 => T_('Priority'),
 		'numviews'                 => T_('Number of members who have viewed the post (If tracking enabled)'),
