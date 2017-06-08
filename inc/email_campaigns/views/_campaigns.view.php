@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -18,7 +18,7 @@ global $admin_url, $UserSettings;
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, ecmp_name, ecmp_email_title, ecmp_email_html, ecmp_email_text, ecmp_sent_ts' );
+$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, ecmp_name, ecmp_email_title, ecmp_sent_ts' );
 $SQL->FROM( 'T_email__campaign' );
 $SQL->GROUP_BY( 'ecmp_ID' );
 
@@ -49,7 +49,7 @@ $Results->cols[] = array(
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'timestamp compact_data',
-		'td' => '%mysql2localedatetime_spans( #ecmp_date_ts#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #ecmp_date_ts# )%',
 	);
 
 $Results->cols[] = array(
@@ -72,7 +72,7 @@ $Results->cols[] = array(
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'timestamp compact_data',
-		'td' => '%mysql2localedatetime_spans( #ecmp_sent_ts#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #ecmp_sent_ts# )%',
 	);
 
 $Results->cols[] = array(

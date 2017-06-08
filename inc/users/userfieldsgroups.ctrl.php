@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -55,7 +55,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_UserfieldGroup = duplicate( $edited_UserfieldGroup ); // PHP4/5 abstraction
+			$edited_UserfieldGroup = clone $edited_UserfieldGroup;
 			$edited_UserfieldGroup->ID = 0;
 		}
 		break;
@@ -85,44 +85,26 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$DB->begin();
-			// because of manual assigning ID,
-			// member function Userfield::dbexists() is overloaded for proper functionality
-			$q = $edited_UserfieldGroup->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_UserfieldGroup->dbinsert();
+			$Messages->add( T_('New User field group created.'), 'success' );
 
-				param_error( 'ufgp_ID',
-					sprintf( T_('This user field group already exists. Do you want to <a %s>edit the existing user field group</a>?'),
-						'href="?ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID='.$q.'"' ) );
-			}
-			else
-			{
-				$edited_UserfieldGroup->dbinsert();
-				$Messages->add( T_('New User field group created.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{	// What next?
 			switch( $action )
-				{
-					case 'create_copy':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=userfieldsgroups&action=new&ufgp_ID='.$edited_UserfieldGroup->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create_new':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=userfieldsgroups&action=new', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=userfields', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
+			{
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=userfieldsgroups&action=new&ufgp_ID='.$edited_UserfieldGroup->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=userfieldsgroups&action=new', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=userfields', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;

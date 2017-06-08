@@ -9,12 +9,15 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+global $CommentList;
 
 $CommentList = new CommentList2( $Blog );
 
@@ -40,7 +43,7 @@ if( $CommentList->result_num_rows > 0 )
 {
 ?>
 <div class="panel panel-default forums_list single_topic">
-	<div id="styled_content_block" class="table evo_content_block">
+	<div class="table evo_content_block">
 <?php
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:

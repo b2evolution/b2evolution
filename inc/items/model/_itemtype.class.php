@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -25,12 +25,18 @@ class ItemType extends DataObject
 {
 	var $name;
 	var $description;
-	var $backoffice_tab;
+	var $usage;
 	var $template_name;
+	var $front_instruction = 0;
+	var $back_instruction = 0;
+	var $instruction = '';
 	var $use_title = 'required';
 	var $use_url = 'optional';
+	var $podcast = 0;
+	var $use_parent = 'never';
 	var $use_text = 'optional';
 	var $allow_html = 1;
+	var $allow_breaks = 1;
 	var $allow_attachments = 1;
 	var $use_excerpt = 'optional';
 	var $use_title_tag = 'optional';
@@ -45,6 +51,8 @@ class ItemType extends DataObject
 	var $use_coordinates = 'never';
 	var $use_custom_fields = 1;
 	var $use_comments = 1;
+	var $comment_form_msg = '';
+	var $allow_comment_form_msg = 0;
 	var $allow_closing_comments = 1;
 	var $allow_disabling_comments = 0;
 	var $use_comment_expiration = 'optional';
@@ -73,10 +81,10 @@ class ItemType extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function ItemType( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_items__type', 'ityp_', 'ityp_ID' );
+		parent::__construct( 'T_items__type', 'ityp_', 'ityp_ID' );
 
 		// Allow inseting specific IDs
 		$this->allow_ID_insert = true;
@@ -86,12 +94,18 @@ class ItemType extends DataObject
 			$this->ID   = $db_row->ityp_ID;
 			$this->name = $db_row->ityp_name;
 			$this->description = $db_row->ityp_description;
-			$this->backoffice_tab = $db_row->ityp_backoffice_tab;
+			$this->usage = $db_row->ityp_usage;
 			$this->template_name = $db_row->ityp_template_name;
+			$this->front_instruction = $db_row->ityp_front_instruction;
+			$this->back_instruction = $db_row->ityp_back_instruction;
+			$this->instruction = $db_row->ityp_instruction;
 			$this->use_title = $db_row->ityp_use_title;
 			$this->use_url = $db_row->ityp_use_url;
+			$this->podcast = $db_row->ityp_podcast;
+			$this->use_parent = $db_row->ityp_use_parent;
 			$this->use_text = $db_row->ityp_use_text;
 			$this->allow_html = $db_row->ityp_allow_html;
+			$this->allow_breaks = $db_row->ityp_allow_breaks;
 			$this->allow_attachments = $db_row->ityp_allow_attachments;
 			$this->use_excerpt = $db_row->ityp_use_excerpt;
 			$this->use_title_tag = $db_row->ityp_use_title_tag;
@@ -106,6 +120,8 @@ class ItemType extends DataObject
 			$this->use_coordinates = $db_row->ityp_use_coordinates;
 			$this->use_custom_fields = $db_row->ityp_use_custom_fields;
 			$this->use_comments = $db_row->ityp_use_comments;
+			$this->comment_form_msg = $db_row->ityp_comment_form_msg;
+			$this->allow_comment_form_msg = $db_row->ityp_allow_comment_form_msg;
 			$this->allow_closing_comments = $db_row->ityp_allow_closing_comments;
 			$this->allow_disabling_comments = $db_row->ityp_allow_disabling_comments;
 			$this->use_comment_expiration = $db_row->ityp_use_comment_expiration;
@@ -137,6 +153,7 @@ class ItemType extends DataObject
 		return array(
 				array( 'table' => 'T_items__type_coll', 'fk' => 'itc_ityp_ID', 'msg' => T_('%d Post type associations with collections') ),
 				array( 'table' => 'T_items__type_custom_field', 'fk' => 'itcf_ityp_ID', 'msg' => T_('%d Custom field definitions') ),
+				array( 'table' => 'T_items__status_type', 'fk' => 'its_ityp_ID', 'msg' => T_('%d Item status associations') )
 			);
 	}
 
@@ -148,19 +165,11 @@ class ItemType extends DataObject
 	 */
 	function load_from_Request()
 	{
-		// get new ID
-		if( param( 'new_ityp_ID', 'string', NULL ) !== NULL )
-		{
-			param_check_number( 'new_ityp_ID', T_('ID must be a number.'), true );
-			$this->set_from_Request( 'ID', 'new_ityp_ID' );
-		}
+		global $admin_url, $current_User;
 
 		// Name
-		if( ! $this->is_special() )
-		{ // Update the name only of not special post types
-			param_string_not_empty( 'ityp_name', T_('Please enter a name.') );
-			$this->set_from_Request( 'name' );
-		}
+		param_string_not_empty( 'ityp_name', T_('Please enter a name.') );
+		$this->set_from_Request( 'name' );
 
 		// Description
 		param( 'ityp_description', 'text' );
@@ -170,13 +179,28 @@ class ItemType extends DataObject
 		param( 'ityp_perm_level', 'string' );
 		$this->set_from_Request( 'perm_level' );
 
-		// Back-office tab
-		param( 'ityp_backoffice_tab', 'string' );
-		$this->set_from_Request( 'backoffice_tab', NULL, true );
+		// Usage
+		param( 'ityp_usage', 'string' );
+		$this->set_from_Request( 'usage', NULL, true );
 
 		// Template name
 		param( 'ityp_template_name', 'string' );
 		$this->set_from_Request( 'template_name', NULL, true );
+
+		// Show instruction in front-office
+		param( 'ityp_front_instruction', 'integer' );
+		$this->set_from_Request( 'front_instruction' );
+
+		// Show instruction in back-office
+		param( 'ityp_back_instruction', 'integer' );
+		$this->set_from_Request( 'back_instruction' );
+
+		// Post instruction
+		if( param( 'ityp_instruction', 'html', NULL ) !== NULL )
+		{
+			param_check_html( 'ityp_instruction', sprintf( T_('Invalid instruction format. You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'posting' );
+			$this->set_from_Request( 'instruction', NULL, true );
+		}
 
 		// Use title
 		param( 'ityp_use_title', 'string' );
@@ -186,6 +210,14 @@ class ItemType extends DataObject
 		param( 'ityp_use_url', 'string' );
 		$this->set_from_Request( 'use_url' );
 
+		// Treat as Podcast Media
+		param( 'ityp_podcast', 'integer', 0 );
+		$this->set_from_Request( 'podcast' );
+
+		// Use Parent ID
+		param( 'ityp_use_parent', 'string' );
+		$this->set_from_Request( 'use_parent' );
+
 		// Use text
 		param( 'ityp_use_text', 'string' );
 		$this->set_from_Request( 'use_text' );
@@ -193,6 +225,10 @@ class ItemType extends DataObject
 		// Allow HTML
 		param( 'ityp_allow_html', 'integer', 0 );
 		$this->set_from_Request( 'allow_html' );
+
+		// Allow Teaser and Page breaks
+		param( 'ityp_allow_breaks', 'integer', 0 );
+		$this->set_from_Request( 'allow_breaks' );
 
 		// Allow attachments
 		param( 'ityp_allow_attachments', 'integer', 0 );
@@ -256,6 +292,14 @@ class ItemType extends DataObject
 		param( 'ityp_use_comments', 'integer', 0 );
 		$this->set_from_Request( 'use_comments' );
 
+		// Message before comment form:
+		param( 'ityp_comment_form_msg', 'text' );
+		$this->set_from_Request( 'comment_form_msg', NULL, true );
+
+		// Allow custom message for each post
+		param( 'ityp_allow_comment_form_msg', 'integer', 0 );
+		$this->set_from_Request( 'allow_comment_form_msg' );
+
 		// Allow closing comments
 		param( 'ityp_allow_closing_comments', 'integer', 0 );
 		$this->set_from_Request( 'allow_closing_comments' );
@@ -285,7 +329,12 @@ class ItemType extends DataObject
 		// Initialize the arrays
 		$this->update_custom_fields = array();
 		$this->insert_custom_fields = array();
-		$this->delete_custom_fields = trim( param( 'deleted_custom_double', 'string', '' ).','.param( 'deleted_custom_varchar', 'string', '' ), ',' );
+		$this->delete_custom_fields = trim(
+			param( 'deleted_custom_double', 'string', '' ).','.
+			param( 'deleted_custom_varchar', 'string', '' ).','.
+			param( 'deleted_custom_text', 'string', '' ).','.
+			param( 'deleted_custom_html', 'string', '' ).','.
+			param( 'deleted_custom_url', 'string', '' ), ',' );
 		$this->delete_custom_fields = empty( $this->delete_custom_fields ) ? array() : explode( ',', $this->delete_custom_fields );
 
 		// Field names array is used to check the diplicates
@@ -294,7 +343,8 @@ class ItemType extends DataObject
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
-		foreach( array( 'double', 'varchar' ) as $type )
+		$types = array( 'double', 'varchar', 'text', 'html', 'url' );
+		foreach( $types as $type )
 		{
 			$empty_title_error = false; // use this to display empty title fields error message only ones
 			$custom_field_count = param( 'count_custom_'.$type, 'integer', 0 ); // all custom fields count ( contains even deleted fields )
@@ -310,6 +360,7 @@ class ItemType extends DataObject
 				$custom_field_label = param( 'custom_'.$type.'_'.$i, 'string', NULL );
 				$custom_field_name = param( 'custom_'.$type.'_fname'.$i, '/^[a-z0-9\-_]+$/', NULL );
 				$custom_field_order = param( 'custom_'.$type.'_order'.$i, 'integer', NULL );
+				$custom_field_note = param( 'custom_'.$type.'_note'.$i, 'string', NULL );
 				$custom_field_is_new = param( 'custom_'.$type.'_new'.$i, 'integer', 0 );
 
 				// Add each new/existing custom field in this array
@@ -322,6 +373,7 @@ class ItemType extends DataObject
 						'name'    => $custom_field_name,
 						'type'    => $type,
 						'order'   => $custom_field_order,
+						'note'    => $custom_field_note,
 					);
 
 				if( empty( $custom_field_label ) )
@@ -350,7 +402,9 @@ class ItemType extends DataObject
 						'type'  => $type,
 						'name'  => $custom_field_name,
 						'label' => $custom_field_label,
-						'order' => $custom_field_order );
+						'order' => $custom_field_order,
+						'note'  => $custom_field_note,
+					);
 				}
 				else
 				{ // Update custom field
@@ -358,11 +412,14 @@ class ItemType extends DataObject
 						'type'  => $type,
 						'name'  => $custom_field_name,
 						'label' => $custom_field_label,
-						'order' => $custom_field_order );
+						'order' => $custom_field_order,
+						'note'  => $custom_field_note,
+					);
 				}
 			}
 		}
 	}
+
 
 	/**
 	 * Get the name of the ItemType
@@ -371,22 +428,6 @@ class ItemType extends DataObject
 	function get_name()
 	{
 		return $this->name;
-	}
-
-	/**
-	 * Check existence of specified post type ID in ityp_ID unique field.
-	 *
-	 * @return int ID if post type exists otherwise NULL/false
-	 */
-	function dbexists()
-	{
-		global $DB;
-
-		$sql = "SELECT $this->dbIDname
-						  FROM $this->dbtablename
-					   WHERE $this->dbIDname = $this->ID";
-
-		return $DB->get_var( $sql );
 	}
 
 
@@ -401,7 +442,7 @@ class ItemType extends DataObject
 
 		if( parent::dbinsert() )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 
 			// Update/Insert/Delete custom fields:
 			$this->dbsave_custom_fields();
@@ -470,12 +511,13 @@ class ItemType extends DataObject
 			$sql_data = array();
 			foreach( $this->insert_custom_fields as $itcf_ID => $custom_field )
 			{
-				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order )
+				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note )
 					VALUES ( '.$DB->quote( $this->ID ).', '
 						.$DB->quote( $custom_field['label'] ).', '
 						.$DB->quote( $custom_field['name'] ).', '
 						.$DB->quote( $custom_field['type'] ).', '
-						.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).' )' );
+						.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).', '
+						.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).' )' );
 			}
 		}
 
@@ -487,7 +529,8 @@ class ItemType extends DataObject
 					SET
 						itcf_label = '.$DB->quote( $custom_field['label'] ).',
 						itcf_name = '.$DB->quote( $custom_field['name'] ).',
-						itcf_order = '.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).'
+						itcf_order = '.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).',
+						itcf_note = '.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).'
 					WHERE itcf_ityp_ID = '.$DB->quote( $this->ID ).'
 						AND itcf_ID = '.$DB->quote( $itcf_ID ).'
 						AND itcf_type = '.$DB->quote( $custom_field['type'] ) );
@@ -508,51 +551,13 @@ class ItemType extends DataObject
 
 
 	/**
-	 *  Returns array, which determinate the lower and upper limit of protected ID's
+	 * Check if this post type is used for intro posts
 	 *
-	 *  @return array
-	 */
-	function get_special_range()
-	{
-		return array( 1000, 5000 );
-	}
-
-
-	/**
-	 * Check if this post type is special( reserved in system )
-	 *
-	 * @param integer Use this param ID of post type when object is not created
 	 * @return boolean
 	 */
-	function is_special( $ID = NULL )
+	function is_intro()
 	{
-		$special_range = ItemType::get_special_range();
-
-		if( $ID === NULL )
-		{ // Get ID of this object
-			$ID = $this->ID;
-		}
-
-		return $ID >= $special_range[0] && $ID <= $special_range[1];
-	}
-
-
-	/**
-	 * Check if this post type is reserved
-	 *
-	 * @param integer Use this param ID of post type when object is not created
-	 * @return boolean
-	 */
-	static function is_reserved( $ID = NULL )
-	{
-		global $posttypes_reserved_IDs;
-
-		if( $ID === NULL )
-		{ // Get ID of this object
-			$ID = $this->ID;
-		}
-
-		return in_array( $ID, $posttypes_reserved_IDs );
+		return in_array( $this->usage, array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' ) );
 	}
 
 
@@ -584,7 +589,7 @@ class ItemType extends DataObject
 	/**
 	 * Get the custom feilds
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double'
+	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url'. Use comma separator to get several types
 	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order'
 	 * @return array Custom fields
 	 */
@@ -600,7 +605,7 @@ class ItemType extends DataObject
 			{ // Get the custom fields from DB
 				global $DB;
 				$SQL = new SQL();
-				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`' );
+				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );
 				$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
@@ -611,7 +616,7 @@ class ItemType extends DataObject
 		$custom_fields = array();
 		foreach( $this->custom_fields as $custom_field )
 		{
-			if( $type == 'all' || $type == $custom_field['type'] )
+			if( $type == 'all' || strpos( $type, $custom_field['type'] ) !== false )
 			{
 				switch( $array_key )
 				{
@@ -637,6 +642,91 @@ class ItemType extends DataObject
 		}
 
 		return $custom_fields;
+	}
+
+
+	/**
+	 * Get associated post status
+	 *
+	 * @return array IDs of associated post status
+	 */
+	function get_applicable_post_status()
+	{
+		global $DB;
+
+		$sql = 'SELECT its_pst_ID FROM T_items__status_type WHERE its_ityp_ID = '.$this->ID;
+		$item_status_array = $DB->get_col( $sql );
+		$item_status_array = array_map( 'intval', $item_status_array );
+
+		return $item_status_array;
+	}
+
+
+	/**
+	 * Get post status not associated with current item type
+	 *
+	 * @return array IDs of post status not valid for current item type
+	 */
+	function get_ignored_post_status( )
+	{
+		global $DB;
+
+		$sql = 'SELECT pst_ID FROM T_items__status WHERE pst_ID NOT IN ( SELECT its_pst_ID FROM T_items__status_type WHERE its_ityp_ID = '.$this->ID.' )';
+		/*
+		$sql = 'SELECT pst_ID
+							FROM T_items__status
+							JOIN T_items__type
+							LEFT JOIN T_items__status_type ON its_ityp_ID = ityp_ID AND its_pst_ID = pst_ID
+							WHERE ityp_ID = '.$this->ID.'	AND its_pst_ID IS NULL';
+		*/
+		$item_status_array = $DB->get_col( $sql );
+		$item_status_array = array_map( 'intval', $item_status_array );
+
+		return $item_status_array;
+	}
+
+
+	/**
+	 * Update item statuses associated with this item type
+	 */
+	function update_item_statuses_from_Request()
+	{
+		global $DB;
+
+		$allowed_values = array();
+		$remove_values = array();
+
+		// Item Types
+		$item_status_IDs = param( 'item_status_IDs', 'string', true );
+		$item_status_IDs = explode( ',', $item_status_IDs );
+
+		foreach( $item_status_IDs as $loop_status_ID )
+		{
+			$loop_status_ID = intval( $loop_status_ID );
+			$item_status = param( 'status_'.$loop_status_ID, 'integer', 0 );
+
+			if( $item_status )
+			{
+				$allowed_values[] = "( $this->ID, $loop_status_ID )";
+			}
+			else
+			{
+				$remove_values[] = $loop_status_ID;
+			}
+		}
+
+		if( $allowed_values )
+		{
+			$DB->query( 'REPLACE INTO T_items__status_type( its_ityp_ID, its_pst_ID )
+					VALUES '.implode( ', ', $allowed_values ) );
+		}
+
+		if( $remove_values )
+		{
+			$DB->query( 'DELETE FROM T_items__status_type
+					WHERE its_ityp_ID = '.$this->ID.'
+					AND its_pst_ID IN ('.implode( ',', $remove_values ).')' );
+		}
 	}
 }
 

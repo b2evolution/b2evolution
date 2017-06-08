@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @see http://b2evolution.net/man/blogger-api
  * @see http://www.blogger.com/developers/api/1_docs/
@@ -58,7 +58,7 @@ function blogger_newpost( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 1 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 1 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -401,7 +401,7 @@ function blogger_getrecentposts( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 1 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 1 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}

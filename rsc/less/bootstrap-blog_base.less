@@ -6,7 +6,37 @@
  * Override this with style.css in your skin folder.
  */
 
+
+// ----- WIDGETS -----
+
+// About Author widget:
+@import "_about_author_widget.module.less";
+
+// Universal item list widget & Recent posts widget:
+@import "_universal_item_list_widget.module.less";
+
+// Media Index widget:
+@import "_coll_media_index_widget.module.less";
+
+// User Avatars (User List) widget:
+@import "_user_avatars_widget.module.less";
+
+// Organization Members widget:
+@import "_org_members_widget.module.less";
+
+
+// ----- PLUGINS -----
+
+// CSS overrides for "HTML 5 VideoJS Player" plugin:
+@import "inc/video-js-overrides.inc.less";
+
+
+// -----
+
+
+// Rating Summary for all comments of the selected post on disp=single:
 @import "inc/star_rating.inc.less";
+
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -14,6 +44,10 @@
 	-ms-border-radius: @radius;
 	-o-border-radius: @radius;
 	border-radius: @radius;
+}
+
+.evo_container__footer {
+	margin-bottom: 10px;
 }
 
 // MILOS > Intro posts style padding alignment
@@ -140,11 +174,24 @@ div.error_additional_content {
 	color: #0a0;
 }
 
+// List elements in comment panels
+.evo_comment ul {
+	list-style-position: inside;
+	// Here we need only bottom margin to match general concept of separating elements (e-g: p tags have 10px bottom margin as well)
+	margin: 0 0 10px 0px;
+}
 .evo_comment_rating {
 	margin: 3px;
 }
+.evo_comment__list_title {
+	float: left;
+}
+.evo_comment__meta_info {
+	float: right;
+	padding: 20px 0 10px 0;
+}
 // Display round avatars:
-#styled_content_block .evo_comment_avatar img {
+.evo_content_block .evo_comment_avatar img {
 	margin: 4px 10px 10px 0;
 	float:left;
 	border-radius: 50%;
@@ -164,16 +211,6 @@ div.moderation_msg
 	padding: 0 1ex;
 	border: 1px dotted #fa9;
 	color: #e70;
-}
-
-.comment_form .panel-body .alert {
-	&.alert-primary, &.alert-success, &.alert-info, &.alert-warning, &.alert-danger {
-		margin: 0px;
-		padding: 10px 15px;
-	}
-}
-.comment_form .bg-warning {
-	margin: 0px !important;
 }
 
 div.feedback_feed_msg {
@@ -311,6 +348,10 @@ ul li.widget_core_coll_item_list.nobullets ul li:before {
 .action_icon {
 	margin: 0 2px;
 	font-weight: bold;
+	// Fix alignment for flag buttons:
+	&.evo_post_flag_btn {
+		margin-left: 0;
+	}
 }
 .title_action_icons {
 	float: right;
@@ -495,43 +536,8 @@ div.item_location {
 	width: 100%;
 }
 
-// Messages list & form
-.evo_private_messages_list {
-	.messages_navigation {
-		padding: 5px;
-	}
-	> h2 {
-		margin-top: 0;
-	}
-	.messages_list_actions {
-		text-align: center;
-		padding: 10px 0;
-		p {
-			margin: 0;
-			padding: 0;
-			text-align: center;
-		}
-		a {
-			display: inline-block;
-			&:last-child {
-				margin-bottom: 0;
-			}
-		}
-	}
-	span.error {
-		border: 1px solid #BBB;
-		border-bottom: none;
-		padding: 10px;
-		text-align: center;
-		display: block;
-	}
-	.panel {
-		margin-bottom: 0;
-	}
-}
-
 // Not published comments display
-#styled_content_block span[class*=status_] {
+.evo_content_block span[class*=status_] {
 	background: transparent;
 	width: 75px;
 	height: 75px;
@@ -588,10 +594,10 @@ div.item_location {
 .note.status_meta span,			// This is deprecated
 .evo_status__meta {				// This is clean
 	color: #fff !important;
-	background-color: #5133ab !important;
+	background-color: #5bc0de !important;
 }
 
-#styled_content_block span[class*=status_] span {
+.evo_content_block span[class*=status_] span {
 	display: block;
 	width: 120px;
 	text-align: center;
@@ -629,7 +635,7 @@ div.results .status_meta span {
 
 @fix-IE8-media-screen: ~"\0screen";
 @media @fix-IE8-media-screen {/* IE8 */
-	#styled_content_block span[class*=status_] span {
+	.evo_content_block span[class*=status_] span {
 		top: -15px;
 		left: -2px;
 	}
@@ -644,9 +650,6 @@ div.results .status_meta span {
 }
 .search_result {
 	padding: 15px 15px 5px;
-}
-.search_info {
-	font-size: 8pt;
 }
 .search_result_score {
 	float: left;
@@ -735,10 +738,17 @@ form#comment_edit {
 	clear: both;
 }
 
-// Remove padding around attachment frame:
+// Post/comment attachment blocks:
 #post_attachments, #comment_attachments {
 	.panel-body {
 		padding: 0;
+	}
+}
+.attachment_list.results {
+	margin: 0;
+	.table-bordered {
+		border: none;
+		margin: 0;
 	}
 }
 
@@ -748,12 +758,6 @@ input.btn-lg {
 
 #download_timer_js, #download_info_nojs {
 	font-size: 84%;
-	background: #CCC;
-	padding: 3px 5px;
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	-khtml-border-radius: 3px;
 }
 
 // Profile page:
@@ -844,5 +848,238 @@ input.btn-lg {
 		border: 1px solid #ddd;
 		padding: 8px;
 		vertical-align: top;
+	}
+}
+
+.evo_content_block table.evo_poll__table {
+	margin: 1em 0;
+	th {
+		border: 0;
+		padding: 2px 10px 2px 0;
+		background-color: #eee;
+	}
+	td {
+		border: 0;
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+}
+
+// Fix the form elements:
+.evo_form__comment {
+	.panel {
+		margin: 0;
+		border: none;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+		.panel-body {
+			padding: 0;
+		}
+	}
+	.panel-body .alert {
+		&.alert-primary, &.alert-success, &.alert-info, &.alert-warning, &.alert-danger {
+			margin: 0px;
+			padding: 10px 15px;
+		}
+	}
+	.bg-warning {
+		margin: 0px !important;
+	}
+}
+.form-horizontal {
+	.form-group, .custom_content {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	fieldset {
+		margin-top: 0;
+	}
+	input[type=file] {
+		display: inline;
+	}
+}
+#comment_date_field {
+	input {
+		width: 80px;
+	}
+	label {
+		font-weight: normal;
+	}
+}
+.form-group[id^="ffield_uploadfile"] .controls {
+	padding-top: 5px;
+	input {
+		line-height: 10px;
+	}
+}
+
+// Comment template:
+.comment_rating {
+	margin-top: 2px;
+}
+#comment_edit .comment_rating {
+	margin-top: 9px;
+}
+#comment_preview {
+	background-color: #FFF;
+}
+#comment_date_field .panel {
+	border: none;
+	box-shadow: none;
+	margin-bottom: 0;
+	.panel-body {
+		padding: 0;
+		.control-label {
+			font-weight: bold;
+		}
+		.controls .form-group {
+			display: inline-block;
+			padding-left: 15px;
+			margin-bottom: 0;
+		}
+	}
+}
+
+// Images gallery:
+.evo_post_gallery__image {
+	display: inline-block;
+	margin: 0 1em 1em 0;
+}
+
+// Post workflow properties form:
+.evo_item_workflow_form .evo_item_workflow_form__fields {
+	display: flex;
+	display: -webkit-flex;
+	justify-content: space-around;
+	-webkit-justify-content: space-around;
+	flex-wrap: wrap;
+	-webkit-flex-wrap: wrap;
+	.form-group {
+		display: inline-block;
+		.control-label {
+			width: auto;
+		}
+		.controls {
+			display: inline-block;
+			width: auto;
+		}
+	}
+	.btn {
+		margin-bottom: 15px;
+	}
+}
+
+// Poll table:
+.evo_poll__table {
+	margin-bottom: 14px;
+	width: 100%;
+	td {
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+	tr td:last-child {
+		padding-right: 0;
+	}
+	input[type=radio], label {
+		margin: 0;
+	}
+	.evo_poll__percent_bar {
+		width: 100%;
+		min-width: 40px;
+		padding-right: 6px;
+		> div {
+			width: 100%;
+			vertical-align: middle;
+			display: inline-block;
+			> div {
+				background: #ffcc66;
+				height: 12px;
+				min-width: 1px;
+			}
+		}
+	}
+	.evo_poll__selector {
+		width: 5px;
+	}
+	.evo_poll__title {
+		white-space: nowrap;
+	}
+	.evo_poll_percentage {
+		max-width: 50px;
+	}
+}
+.evo_container__sidebar .evo_poll__title {
+	white-space: normal;
+}
+
+// Attachments table:
+#itemform_links .panel-body {
+	padding: 0;
+}
+div.qq-upload-button,
+div.qq-upload-drop-area,
+div.qq-upload-drop-area-active {
+	border: 2px dashed #fff;
+	background: #5bc0de;
+	.border-radius(9px);
+}
+div.qq-upload-button-hover,
+div.qq-upload-drop-area,
+div.qq-upload-drop-area-active {
+	background: #5cb85c;
+}
+ul.qq-upload-list {
+	margin: 0;
+}
+div#fileuploader_form {
+	padding: 5px;
+	height: 65px;
+	background: #f5f5f5;
+}
+#attachments_fieldset_wrapper {
+	width: 100%;
+	height: 160px;
+	position: relative;
+	padding-bottom: 6px;
+	box-sizing: content-box;
+	#attachments_fieldset_block {
+		overflow: auto;
+		height: 100%;
+	}
+	.ui-resizable-s {
+		background: #c0c0c0;
+		height: 6px;
+		bottom: 0;
+		&:after {
+			content: "...";
+			font-size: 10px;
+			top: -7px;
+			position: relative;
+			text-align: center;
+			display: block;
+		}
+	}
+	.table_scroll {
+		// Use this position to fix red triangle when attachment is dragged by mouse:
+		position: relative;
+	}
+	div.results, div.table_scroll {
+		overflow: initial;
+	}
+	table tbody {
+		.dragged {
+			opacity: 0.8;
+			position: absolute;
+			z-index: 1000;
+		}
+		td {
+			cursor: move;
+		}
+	}
+}
+#filelist_tbody {
+	tr:first-child .action_icon_link_move_up,
+	tr:last-child .action_icon_link_move_down {
+		visibility: hidden;
 	}
 }

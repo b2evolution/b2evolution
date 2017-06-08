@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -53,7 +53,7 @@ class CommentList2 extends DataObjectList2
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param string Name to be used when saving the filterset (leave empty to use default for collection)
 	 */
-	function CommentList2(
+	function __construct(
 		$Blog,
 		$limit = 1000,
 		$cache_name = 'CommentCache',	// name of cache to be used
@@ -64,7 +64,7 @@ class CommentList2 extends DataObjectList2
 		global $Settings;
 
 		// Call parent constructor:
-		parent::DataObjectList2( get_Cache($cache_name), $limit, $param_prefix, NULL );
+		parent::__construct( get_Cache($cache_name), $limit, $param_prefix, NULL );
 
 		// Set Blog. Note: It can be NULL on ?disp=usercomments
 		$this->Blog = $Blog;
@@ -460,14 +460,8 @@ class CommentList2 extends DataObjectList2
 			$sql_item_IDs .= ' INNER JOIN T_categories ON post_main_cat_ID = cat_ID ';
 		}
 		$sql_item_IDs .= $this->ItemQuery->get_where();
-		$item_IDs = $DB->get_col( $sql_item_IDs, 0, 'Get CommentQuery Item IDs' );
-		if( empty( $item_IDs ) )
-		{ // There is no item which belongs to the given blog and user may view it, so there are no comments either
-			parent::count_total_rows( 0 );
-			$this->CommentQuery->WHERE_and( 'FALSE' );
-			return;
-		}
-		$this->CommentQuery->where_post_ID( implode( ',', $item_IDs ) );
+		// We use a sub-query for the list of post IDs because we do not want to pass 10000 item IDs back and forth between MySQL and PHP:
+		$this->CommentQuery->WHERE_and( $this->CommentQuery->dbprefix.'item_ID IN ( '.$sql_item_IDs.' )' );
 
 		/*
 		 * Restrict to active comments by default, show expired comments only if it was requested
@@ -506,8 +500,23 @@ class CommentList2 extends DataObjectList2
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 * 
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it
+	 * 
+	 * @deprecated Use new function run_query()
 	 */
-	function query()
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
+	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 */
+	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+											$query_title = 'Results::run_query()' )
 	{
 		global $DB;
 
@@ -557,8 +566,7 @@ class CommentList2 extends DataObjectList2
 			$this->sql .= ' WHERE 0';
 		}
 
-		// ATTENTION: we skip the parent on purpose here!! fp> refactor
-		DataObjectList2::query( false, false, false, 'CommentList2::Query() Step 2' );
+		parent::run_query( false, false, false, 'CommentList2::Query() Step 2' );
 	}
 
 
@@ -655,6 +663,9 @@ class CommentList2 extends DataObjectList2
 				'list_next_text' => '...',
 				'list_span' => 11,
 				'scroll_list_range' => 5,
+				'page_item_before' => '',
+				'page_item_after'  => '',
+				'page_current_template' => '<strong class="current_page">$page_num$</strong>',
 			);
 
 		// Use defaults + overrides:
@@ -755,7 +766,7 @@ class CommentList2 extends DataObjectList2
 	{
 		if( ! $only_trash )
 		{ // Check if statuses filter contains the 'trash' value
-			return in_array( 'trash', $this->filters['statuses'] );
+			return is_array( $this->filters['statuses'] ) && in_array( 'trash', $this->filters['statuses'] );
 		}
 		if( count( $this->filters['statuses'] ) == 1 )
 		{ // Check if statuses filter contains only the 'trash' value
@@ -820,6 +831,203 @@ class CommentList2 extends DataObjectList2
 		}
 
 		return $Comment;
+	}
+
+
+	/**
+	 * Load data of Comments from the current page at once to cache variables.
+	 * For each loading we use only single query to optimize performance.
+	 * By default it loads all Comments of current list page into global $CommentCache,
+	 * Other data are loaded depending on $params, see below:
+	 *
+	 * @param array Params:
+	 *        - 'load_votes'      - use TRUE to load the votes(spam and helpful) of the current
+	 *                              logged in User for all Comments of current list page.
+	 *        - 'load_items_data' - use TRUE to load all Items of the current list page Comments
+	 *                              into global $ItemCache and category associations for these Items.
+	 *        - 'load_links'      - use TRUE to load all Links of the current list page Comments
+	 *                              into global $LinkCache, also it loads Files of these Links into global $FileCache.
+	 */
+	function load_list_data( $params = array() )
+	{
+		$params = array_merge( array(
+				'load_votes'      => true,
+				'load_items_data' => true,
+				'load_links'      => true,
+			), $params );
+
+		$page_comment_ids = $this->get_page_ID_array();
+		if( empty( $page_comment_ids ) )
+		{	// There are no items on this list:
+			return;
+		}
+
+		// Load all comments of the current page in single query:
+		$CommentCache = & get_CommentCache();
+		$CommentCache->load_list( $page_comment_ids );
+
+		if( $params['load_votes'] )
+		{	// Load the vote statuses:
+			$this->load_vote_statuses();
+		}
+
+		if( $params['load_links'] )
+		{	// Load the links:
+			$LinkCache = & get_LinkCache();
+			$LinkCache->load_by_comment_list( $page_comment_ids );
+		}
+		
+
+		if( $params['load_items_data'] )
+		{	// Load items data:
+			$comment_items_IDs = array();
+			foreach( $CommentCache->cache as $Comment )
+			{
+				if( $Comment )
+				{
+					$comment_items_IDs[] = $Comment->get( 'item_ID' );
+				}
+			}
+
+			if( count( $comment_items_IDs ) )
+			{	// Load all items of the current page in single query:
+				$ItemCache = & get_ItemCache();
+				$ItemCache->load_list( $comment_items_IDs );
+
+				// Load category associations for the items of current page:
+				postcats_get_by_IDs( $comment_items_IDs );
+			}
+		}
+	}
+
+
+	/**
+	 * Load the vote statuses for current user and comments of the current page list
+	 */
+	function load_vote_statuses()
+	{
+		global $current_User, $DB, $cache_comments_vote_statuses;
+
+		if( ! is_logged_in() )
+		{	// Current user must be logged in:
+			return;
+		}
+
+		$page_comment_ids = $this->get_page_ID_array();
+		if( empty( $page_comment_ids ) )
+		{	// There are no items on this list:
+			return;
+		}
+
+		if( ! is_array( $cache_comments_vote_statuses ) )
+		{	// Initialize array first time:
+			$cache_comments_vote_statuses = array();
+		}
+
+		$not_cached_comment_ids = array_diff( $page_comment_ids, array_keys( $cache_comments_vote_statuses ) );
+
+		if( empty( $not_cached_comment_ids ) )
+		{	// The vote statuses are loaded for all comments:
+			return;
+		}
+
+		// Load the vote statuses from DB and cache into global cache array:
+		$SQL = new SQL( 'Load the vote statuses for current user and comments of the current page list' );
+		$SQL->SELECT( 'cmvt_cmt_ID AS ID, cmvt_spam AS spam, cmvt_helpful AS helpful' );
+		$SQL->FROM( 'T_comments__votes' );
+		$SQL->WHERE( 'cmvt_cmt_ID IN ( '.$DB->quote( $not_cached_comment_ids ).' )' );
+		$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
+		$comments_vote_statuses = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+
+		// Load all existing votes into cache variable:
+		foreach( $comments_vote_statuses as $comments_vote_status )
+		{
+			$vote_status_comment_ID = $comments_vote_status['ID'];
+			unset( $comments_vote_status['ID'] );
+			$cache_comments_vote_statuses[ $vote_status_comment_ID ] = $comments_vote_status;
+		}
+
+		// Set all unexiting votes for requested comments in order to don't repeat SQL queries later:
+		foreach( $not_cached_comment_ids as $not_cached_comment_ID )
+		{
+			if( ! isset( $cache_comments_vote_statuses[ $not_cached_comment_ID ] ) )
+			{
+				$cache_comments_vote_statuses[ $not_cached_comment_ID ] = false;
+			}
+		}
+	}
+
+
+	/**
+	 * Initialize things in order to be ready for displaying.
+	 *
+	 * This is useful when manually displaying, i-e: not by using Results::display()
+ 	 *
+	 * @param array ***please document***
+	 * @param array Fadeout settings array( 'key column' => array of values ) or 'session'
+ 	 */
+	function display_init( $display_params = NULL, $fadeout = NULL )
+	{
+		parent::display_init( $display_params, $fadeout );
+
+		if( ! isset( $display_params['init_order_numbers_mode'] ) )
+		{	// Set default mode to initialize order numbers:
+			$display_params['init_order_numbers_mode'] = 'list';
+		}
+
+		// Initialize comment order numbers for this filtered list:
+		$this->init_order_numbers( $display_params['init_order_numbers_mode'] );
+	}
+
+
+	/**
+	 * Initialize comment order numbers for this filtered list
+	 * (Used for meta comments)
+	 *
+	 * @param string Order mode:
+	 *               'date' - first created comment has first order,
+	 *               'list' - orders are assigned depedning on list sorting
+	 */
+	function init_order_numbers( $mode = 'list' )
+	{
+		$this->inlist_orders = array();
+
+		switch( $mode )
+		{
+			case 'date':
+				while( $Comment = & $this->get_next() )
+				{
+					$this->inlist_orders[ $Comment->ID ] = $Comment->date;
+				}
+
+				if( count( $this->inlist_orders ) )
+				{
+					// Reverse sort comments by date of this list:
+					arsort( $this->inlist_orders );
+
+					// Get max number from the list:
+					$max_number = $this->total_rows - ( $this->limit * ( $this->page - 1 ) );
+
+					foreach( $this->inlist_orders as $i => $date )
+					{
+						$this->inlist_orders[ $i ] = $max_number--;
+					}
+				}
+				break;
+
+			case 'list':
+			default:
+				// Set first number of comment depending on current page:
+				$first_number = ( ( $this->page - 1 ) * $this->limit ) + 1;
+				while( $Comment = & $this->get_next() )
+				{
+					$this->inlist_orders[ $Comment->ID ] = $first_number++;
+				}
+				break;
+		}
+
+		// Restart this list:
+		$this->restart();
 	}
 }
 

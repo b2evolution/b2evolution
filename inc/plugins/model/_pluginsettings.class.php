@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -29,9 +29,9 @@ class PluginSettings extends AbstractSettings
 	 *
 	 * @param integer plugin ID where these settings are for
 	 */
-	function PluginSettings( $plugin_ID )
+	function __construct( $plugin_ID )
 	{ // constructor
-		parent::AbstractSettings( 'T_pluginsettings', array( 'pset_plug_ID', 'pset_name' ), 'pset_value', 1 );
+		parent::__construct( 'T_pluginsettings', array( 'pset_plug_ID', 'pset_name' ), 'pset_value', 1 );
 
 		$this->plugin_ID = $plugin_ID;
 	}
@@ -45,7 +45,7 @@ class PluginSettings extends AbstractSettings
 	 */
 	function get( $setting )
 	{
-		return parent::get( $this->plugin_ID, $setting );
+		return parent::getx( $this->plugin_ID, $setting );
 	}
 
 
@@ -58,7 +58,7 @@ class PluginSettings extends AbstractSettings
 	 */
 	function set( $setting, $value )
 	{
-		return parent::set( $this->plugin_ID, $setting, $value );
+		return parent::setx( $this->plugin_ID, $setting, $value );
 	}
 
 

@@ -9,14 +9,14 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $edited_Comment, $comment_Item, $comment_content;
-global $display_params, $admin_url, $samedomain_htsrv_url, $dummy_fields;
+global $Collection, $Blog, $edited_Comment, $comment_Item, $comment_content;
+global $display_params, $admin_url, $dummy_fields;
 
 if( empty( $comment_Item ) )
 {
@@ -62,11 +62,7 @@ $Form->begin_form( 'bComment' );
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayToolbar', array(
-			'target_type' => 'Comment',
-			'edit_layout' => NULL,
-			'Comment' => $edited_Comment,
-		) );
+	$Plugins->trigger_event( 'DisplayCommentToolbar', array( 'Comment' => & $edited_Comment, 'Item' => & $comment_Item ) );
 	echo '</div>';
 	$comment_toolbar = ob_get_clean();
 
@@ -102,8 +98,12 @@ $Form->begin_form( 'bComment' );
 			) );
 	}
 
+	$comment_Item = & $edited_Comment->get_Item();
+	// Comment status cannot be more than post status, restrict it:
+	$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : '' );
+
 	// Get those statuses which are not allowed for the current User to create comments in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit' ), array( 'redirected', 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $edited_Comment->status, $restrict_max_allowed_status ), array( 'redirected', 'trash' ) );
 	// Get allowed visibility statuses
 	$sharing_options = get_visibility_statuses( 'radio-options', $exclude_statuses );
 	if( count( $sharing_options ) == 1 )

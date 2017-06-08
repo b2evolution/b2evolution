@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
+global $dispatcher, $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -50,8 +50,8 @@ $params = array_merge( array(
 	'skin_form_params'          => array(),
 	'display_navigation'        => false,
 	'display_title'             => false,
-	'messages_list_start'       => '',
-	'messages_list_end'         => '',
+	'messages_list_start'       => is_admin_page() ? '<div class="evo_private_messages_list">' : '',
+	'messages_list_end'         => is_admin_page() ? '</div>' : '',
 	'messages_list_title'       => $edited_Thread->title,
 	'messages_list_title_start' => '<div class="panel-heading"><h2 class="panel-title">',
 	'messages_list_title_end'   => '</h2></div>',
@@ -152,12 +152,6 @@ if( $action == 'preview' )
 { // Init PREVIEW message
 	global $localtimenow;
 
-	foreach( $recipient_status_list as $row )
-	{ // To make the unread status for each recipient
-		$read_status_list[ $row->user_ID ] = -1;
-		$leave_status_list[ $row->user_ID ] = 0;
-	}
-
 	$count_SQL->SELECT( 'COUNT(*) + 1' );
 
 	$select_sql = '(
@@ -166,7 +160,7 @@ if( $action == 'preview' )
 		'.$current_User->ID.' AS msg_user_ID, '.$DB->quote( $current_User->login ).' AS msg_author,
 		'.$DB->quote( $current_User->firstname ).' AS msg_firstname, '.$DB->quote( $current_User->lastname ).' AS msg_lastname,
 		'.$DB->quote( $current_User->avatar_file_ID ).' AS msg_user_avatar_ID,
-		'.$DB->quote( '<b>'.T_('PREVIEW').':</b><br /> '.$edited_Message->get_prerendered_content() ).' AS msg_text, '.$DB->quote( $edited_Message->renderers ).' AS msg_renderers,
+		'.$DB->quote( $edited_Message->text ).' AS msg_text, '.$DB->quote( $edited_Message->renderers ).' AS msg_renderers,
 		'.$DB->quote( $edited_Thread->title ).' AS thread_title
 	)
 	UNION
@@ -179,11 +173,11 @@ $Results = new Results( $select_sql, 'msg_', '', 0, $count_SQL->get() );
 
 $Results->Cache = & get_MessageCache();
 
-$Results->title = $params['messages_list_title'];
+$Results->title = $params['messages_list_title'].( is_admin_page() ? get_manual_link( 'messages-thread-list' ) : '' );
 
 if( is_admin_page() )
 {
-	$Results->global_icon( T_('Cancel!'), 'close', '?ctrl=threads' );
+	$Results->global_icon( T_('Cancel').'!', 'close', '?ctrl=threads' );
 }
 
 /**
@@ -219,7 +213,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Message'),
 		'td_class' => 'left top message_text',
-		'td' => '%col_msg_format_text( #msg_ID#, #msg_text# )%',
+		'td' => '@get_content()@@get_images()@@get_files()@',
 	);
 /**
  * Read?:
@@ -275,6 +269,10 @@ if( $is_recipient )
 		echo $params['messages_list_form_start'];
 
 		$form_title = sprintf( T_('Reply to: %s'), get_avatar_imgtags( $available_recipients, true, true, 'crop-top-15x15', 'avatar_before_login mb1' ) );
+		if( is_admin_page() )
+		{
+			$form_title .= get_manual_link( 'messages-reply-to-thread' );
+		}
 
 		if( ! is_admin_page() )
 		{
@@ -333,6 +331,17 @@ if( $is_recipient )
 			if( !empty( $message_renderer_checkboxes ) )
 			{
 				$Form->info( T_('Text Renderers'), $message_renderer_checkboxes );
+			}
+
+			// ####################### ATTACHMENTS/LINKS #########################
+			if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
+			{	// If current user has a permission to view the files AND it is back-office:
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				// Initialize this object as global because this is used in many link functions:
+				global $LinkOwner;
+				$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				// Display attachments fieldset:
+				display_attachments_fieldset( $Form, $LinkOwner );
 			}
 
 		$Form->end_form( array(
@@ -397,6 +406,9 @@ if( $action == 'preview' )
 // Disable rollover effect on table rows
 $Results->display_init( $display_params );
 $display_params['list_start'] = str_replace( 'class="grouped', 'class="grouped nohover', $Results->params['list_start'] );
+
+// Disable highlight on hover
+$display_params['list_start'] = str_replace( 'table-hover', '', $Results->params['list_start'] );
 
 // Dispaly message list
 $Results->display( $display_params );

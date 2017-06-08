@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -27,7 +27,7 @@ echo '<p'.emailskin_style( '.p' ).'>'.T_('You just created the following posts:'
 foreach( $Items as $Item )
 {
 	echo format_to_output( $Item->title );
-	echo '<p'.emailskin_style( '.p' ).'>'.get_link_tag( $Item->get_permanent_url(), '', '.a' ).'</p>';
+	echo '<p'.emailskin_style( '.p' ).'>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), '', '.a' ).'</p>';
 }
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

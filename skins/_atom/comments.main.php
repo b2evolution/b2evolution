@@ -84,7 +84,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 	{	/* Loop through comments: */ ?>
 	<entry>
 		<title type="text"><?php
-			echo format_to_output( T_('In response to:'), 'xml' ).' ';
+			echo format_to_output( T_('In response to').':', 'xml' ).' ';
 				$Comment->get_Item();
 				$Comment->Item->title( array(
 				'format' => 'xml',

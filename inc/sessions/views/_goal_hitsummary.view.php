@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -38,13 +38,13 @@ $SQL = new SQL();
 $SQL->SELECT( 'goal_ID, goal_name, gcat_color' );
 $SQL->FROM( 'T_track__goal' );
 $SQL->FROM_add( 'LEFT JOIN T_track__goalcat ON gcat_ID = goal_gcat_ID' );
-if( !empty($final) )
+if( ! empty( $final ) )
 {	// We want to filter on final goals only:
 	$SQL->WHERE_and( 'goal_redir_url IS NULL' );
 }
-if( !empty($goal_name) ) // TODO: allow combine
+if( ! empty( $goal_name ) ) // TODO: allow combine
 { // We want to filter on the goal name:
-	$SQL->WHERE_and( 'goal_name LIKE '.$DB->quote($goal_name.'%') );
+	$SQL->WHERE_and( 'goal_name LIKE '.$DB->quote( $goal_name.'%' ) );
 }
 if( ! empty( $goal_cat ) )
 { // We want to filter on the goal category:
@@ -103,11 +103,11 @@ if( count( $goal_rows ) && count( $hitgroup_array ) )
 	}
 
 	// Chart params
-	$chart['canvas_bg'] = array( 'width' => 780, 'height' => 355 );
+	$chart['canvas_bg'] = array( 'width' => '100%', 'height' => 355 );
 
 	// Print out chart
 	echo '<div class="center">';
-	load_funcs('_ext/_canvascharts.php');
+	load_funcs( '_ext/_canvascharts.php' );
 	CanvasBarsChart( $chart );
 	echo '</div>';
 }

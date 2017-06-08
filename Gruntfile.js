@@ -1,22 +1,6 @@
-// In order to use Grunt:
-// - first install NodeJS on your system (http://nodejs.org), which includes the npm tool.
-// - then install the Grunt CLI on your system: (sudo) npm install -g grunt-cli
-// - then switch to the b2evolution folder (where this file resides) and install (locally in this dir) 
-//   everything that is needed: just type "npm install" - this will use the package.json file to know what to install.
-//   each of the required packages with "npm install xxx" for each of the Dependencies listed in package.json
-// - then, in order to be able to invoke 'grunt' on your system, type "sudo npm install -g grunt-cli". This will make
-//   grunt available from the Command Line Interface.
-// - ONCE IN A WHILE: run "npm update" to update all youe packages
-// In order to use Sass:
-// - Make sur Ruby is installed on your system (should be preinstalled on MacOSX. On windows: http://rubyinstaller.org)
-// - Type: "sudo gem install sass"
-// Once this is done, you can:
-// - type 'grunt' (in this dir) and run the default tasks
-// - type 'grunt xxx' where xxx is a specific task name
-// - type 'grunt watch' and grunt will start listening for file edits and run automatically 
-// Note for devs: when adding new plugins, use for example "npm install grunt-contrib-less --save-dev" 
-// to update the package.json file with the new plugin reference.
-
+// ---------------------------------------------------------------
+// To get started with Grunt: see http://b2evolution.net/man/grunt
+// ---------------------------------------------------------------
 module.exports = function(grunt) {
 
 	// Project configuration:
@@ -38,15 +22,16 @@ module.exports = function(grunt) {
 				files: {
 					// target.css file: source.less file
 					'rsc/build/testless.css': 'rsc/less/test.less',
-					
+
 					// Basic styles:
 					'rsc/css/basic_styles.css': 'rsc/less/basic_styles.less',
 					'rsc/css/basic.css':        'rsc/less/basic.less',
 					'rsc/css/blog_base.css':    'rsc/less/blog_base.less',
 					'rsc/css/item_base.css':    'rsc/less/item_base.less',
 
-					// Fp> the following probaly needs to be merged with the font and back office bundles below					
+					// Fp> the following probaly needs to be merged with the font and back office bundles below
 					'rsc/css/bootstrap-blog_base.css': 'rsc/less/bootstrap-blog_base.less', // Used on several back-office pages
+
 
 					// Bootstrap front-office styles:
 					'rsc/build/bootstrap-b2evo_base.bundle.css': [
@@ -63,7 +48,7 @@ module.exports = function(grunt) {
 							// Basic styles for all bootstrap skins
 							'rsc/less/bootstrap-basic_styles.less',
 							'rsc/less/bootstrap-basic.less',
-							'rsc/less/bootstrap-item_base.less',		// fp> I added this because blockquote was not properly styles in the backoffice
+							'rsc/less/bootstrap-item_base.less',		// fp> I added this because blockquote was not properly styled in the backoffice
 							'rsc/less/bootstrap-evoskins.less'			// Common styles for all bootstrap skins
 						],
 
@@ -71,12 +56,17 @@ module.exports = function(grunt) {
 					'skins/bootstrap_blog_skin/style.css':    'skins/bootstrap_blog_skin/style.less',
 					'skins/bootstrap_main_skin/style.css':    'skins/bootstrap_main_skin/style.less',
 					'skins/bootstrap_forums_skin/style.css':  'skins/bootstrap_forums_skin/style.less',
+					'skins/bootstrap_gallery_legacy/style.css': 'skins/bootstrap_gallery_legacy/style.less',
 					'skins/bootstrap_gallery_skin/style.css': 'skins/bootstrap_gallery_skin/style.less',
 					'skins/bootstrap_manual_skin/style.css':  'skins/bootstrap_manual_skin/style.less',
 					'skins_adm/bootstrap/rsc/css/style.css':  'skins_adm/bootstrap/rsc/css/style.less',
 
 					// Helper pages
 					'rsc/build/b2evo_helper_screens.css':    'rsc/less/b2evo_helper_screens.less',
+
+					// Colorbox
+					'rsc/css/colorbox/colorbox-regular.css':   'rsc/css/colorbox/colorbox-regular.less',
+					'rsc/css/colorbox/colorbox-bootstrap.css': 'rsc/css/colorbox/colorbox-bootstrap.less',
 				}
 			},
 
@@ -84,20 +74,16 @@ module.exports = function(grunt) {
 		},
 
 		// Configuration for the scss->css compiling tasks:
-		sass: {
-			development: {
-				options: {
-					style: 'expanded',
-				},
-				files: {
+		// sass: {
+			// development: {
+				// options: {
+					// style: 'expanded',
+				// },
+				// files: {
 					// target.css file: source.scss file
-					//'rsc/build/testscss.css': 'rsc/scss/test.scss',
-					'skins/pureforums/pureforums_header.css': 'skins/pureforums/pureforums_header.scss',
-					'skins/pureforums/pureforums_main.css': 'skins/pureforums/pureforums_main.scss',
-					'skins/pureforums/pureforums_footer.css': 'skins/pureforums/pureforums_footer.scss',
-				}
-			}
-		},
+				// }
+			// }
+		// },
 
 		// Configuration for Autoprefixing tasks:
 		autoprefixer: {
@@ -113,7 +99,7 @@ module.exports = function(grunt) {
 
 		// Configuration for the concatenate tasks:
 		concat: {
-			options: { 
+			options: {
 				// The following will appear on top of the created files:
 				// banner: '/*! <%= pkg.name %> v<%= pkg.version %> */\n',
 			},
@@ -133,17 +119,12 @@ module.exports = function(grunt) {
 				src: ['skins/evopress/style.css', 'skins/evopress/item.css'],
 				dest: 'skins/evopress/evopress.bundle.css',
 			},
-			skin_pureforums: {
-				nonull: true, // Display missing files
-				src: ['skins/pureforums/pureforums_header.css', 'skins/pureforums/pureforums_main.css', 'skins/pureforums/pureforums_footer.css'],
-				dest: 'skins/pureforums/pureforums.bundle.css',
-			},
 			/*
 			 * JS:
 			 */
 			// Login screen:
 			sha1_md5: {
-				src: ['rsc/js/src/sha1.js', 'rsc/js/src/md5.js'],
+				src: ['rsc/js/src/sha1.js', 'rsc/js/src/md5.js', 'rsc/js/src/twin-bcrypt.js'],
 				dest: 'rsc/js/build/sha1_md5.bundle.js',
 			},
 		},
@@ -173,18 +154,21 @@ module.exports = function(grunt) {
 					'skins/bootstrap_blog_skin/style.min.css':    'skins/bootstrap_blog_skin/style.css',
 					'skins/bootstrap_main_skin/style.min.css':    'skins/bootstrap_main_skin/style.css',
 					'skins/bootstrap_forums_skin/style.min.css':  'skins/bootstrap_forums_skin/style.css',
+					'skins/bootstrap_gallery_legacy/style.min.css': 'skins/bootstrap_gallery_legacy/style.css',
 					'skins/bootstrap_gallery_skin/style.min.css': 'skins/bootstrap_gallery_skin/style.css',
 					'skins/bootstrap_manual_skin/style.min.css':  'skins/bootstrap_manual_skin/style.css',
 					'skins_adm/bootstrap/rsc/css/style.min.css':  'skins_adm/bootstrap/rsc/css/style.css',
-				}	
+				}
 			},
 			skin_evopress: {
 				src: 'skins/evopress/evopress.bundle.css',
 				dest: 'skins/evopress/evopress.bmin.css',
 			},
-			skin_pureforums: {
-				src: 'skins/pureforums/pureforums.bundle.css',
-				dest: 'skins/pureforums/pureforums.bmin.css',
+			colorbox: {
+				files: {
+					'rsc/build/colorbox-regular.min.css':   'rsc/css/colorbox/colorbox-regular.css',
+					'rsc/build/colorbox-bootstrap.min.css': 'rsc/css/colorbox/colorbox-bootstrap.css',
+				}
 			},
 		},
 
@@ -203,15 +187,6 @@ module.exports = function(grunt) {
 				src: 'rsc/js/functions.js',
 				dest: 'rsc/js/build/functions.min.js'
 			},
-			ajaxcomjs: {
-				options: {
-					// Extend default banner:
-					banner: '<%= uglify.options.banner %>// This includes 2 files \n'
-				},
-				nonull: true, // Display missing files
-				src: ['rsc/js/ajax.js', 'rsc/js/communication.js'],
-				dest: 'rsc/js/build/ajaxcom.min.js',
-			},
 			*/
 			// Colorbox + Voting + Touchswipe
 			colorbox: {
@@ -229,7 +204,7 @@ module.exports = function(grunt) {
 				},
 				nonull: true, // Display missing files
 				// fp>yura: why isn't jquery.bubbletip.js bundled into this?
-				// if plugins.js is used only for editing we should probably move it to a textedit.bundle		
+				// if plugins.js is used only for editing we should probably move it to a textedit.bundle
 				src: ['rsc/js/bubbletip.js', 'rsc/js/plugins.js', 'rsc/js/userfields.js', 'rsc/js/colorpicker.js'],
 				dest: 'rsc/js/build/bubbletip.bmin.js'
 			},
@@ -254,41 +229,87 @@ module.exports = function(grunt) {
 			// JS files that are used on front-office standard skins:
 			evo_frontoffice: {
 				options: {
-					banner: '/* This includes 4 files: src/evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js */\n'
+					banner: '/* This includes 9 files: src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, ajax.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/src/evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_contact_groups.js'],
+				src: ['rsc/js/src/evo_modal_window.js',
+							'rsc/js/src/evo_images.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_contact_groups.js',
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_item_flag.js',
+							'rsc/js/src/evo_links.js',
+							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
 			},
 			// JS files that are used on front-office bootstrap skins:
 			evo_frontoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 4 files: src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js */\n'
+					banner: '/* This includes 9 files: src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, ajax.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/src/bootstrap-evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_contact_groups.js'],
+				src: ['rsc/js/src/bootstrap-evo_modal_window.js',
+							'rsc/js/src/evo_images.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_contact_groups.js',
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_item_flag.js',
+							'rsc/js/src/evo_links.js',
+							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
 			},
 			// JS files that are used on back-office standard skins:
 			evo_backoffice: {
 				options: {
-					banner: '/* This includes 10 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js */\n'
+					banner: '/* This includes 15 files: functions.js, ajax.js, communication.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
+						'src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
+						'src/evo_user_org.js, src/evo_rest_api.js, src/evo_links.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/functions.js', 'rsc/js/ajax.js',
-							'rsc/js/form_extensions.js', 'rsc/js/extracats.js', 'rsc/js/dynamic_select.js', 'rsc/js/backoffice.js',
-							'rsc/js/src/evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_deldata.js'],
+				src: ['rsc/js/functions.js',
+							'rsc/js/ajax.js',
+							'rsc/js/communication.js',
+							'rsc/js/form_extensions.js',
+							'rsc/js/extracats.js',
+							'rsc/js/dynamic_select.js',
+							'rsc/js/backoffice.js',
+							'rsc/js/blog_widgets.js',
+							'rsc/js/src/evo_modal_window.js',
+							'rsc/js/src/evo_images.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_deldata.js',
+							'rsc/js/src/evo_user_org.js',
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/evo_backoffice.bmin.js'
 			},
 			// JS files that are used on back-office bootstrap skins:
 			evo_backoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 10 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js */\n'
+					banner: '/* This includes 15 files: functions.js, ajax.js, communication.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
+						'src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
+						'src/evo_user_org.js, src/evo_rest_api.js, src/evo_links.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/functions.js', 'rsc/js/ajax.js',
-							'rsc/js/form_extensions.js', 'rsc/js/extracats.js', 'rsc/js/dynamic_select.js', 'rsc/js/backoffice.js',
-							'rsc/js/src/bootstrap-evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_deldata.js'],
+				src: ['rsc/js/functions.js',
+							'rsc/js/ajax.js',
+							'rsc/js/communication.js',
+							'rsc/js/form_extensions.js',
+							'rsc/js/extracats.js',
+							'rsc/js/dynamic_select.js',
+							'rsc/js/backoffice.js',
+							'rsc/js/blog_widgets.js',
+							'rsc/js/src/bootstrap-evo_modal_window.js',
+							'rsc/js/src/evo_images.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_deldata.js',
+							'rsc/js/src/evo_user_org.js',
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/bootstrap-evo_backoffice.bmin.js'
 			},
 		},
@@ -374,6 +395,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-markdown');
 
 	// Default task(s):
-	grunt.registerTask('default', ['less','sass','autoprefixer','concat','cssmin','uglify','markdown']);
+	grunt.registerTask('default', ['less','autoprefixer','concat','cssmin','uglify','markdown']);
 
 };

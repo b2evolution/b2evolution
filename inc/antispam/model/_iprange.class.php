@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -40,10 +40,10 @@ class IPRange extends DataObject
 	 *
 	 * @param object table Database row
 	 */
-	function IPRange( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_antispam__iprange', 'aipr_', 'aipr_ID' );
+		parent::__construct( 'T_antispam__iprange', 'aipr_', 'aipr_ID' );
 
 		if( $db_row != NULL )
 		{
@@ -112,12 +112,38 @@ class IPRange extends DataObject
 
 		if( ! param_errors_detected() )
 		{	// Check IPs for inside in other ranges
-			if( $ip_range = get_ip_range( $aipr_IPv4start, $aipr_IPv4end, $this->ID ) )
-			{
-				$admin_url;
-				$Messages->add( sprintf( T_('IP range already exists with params: %s - <a %s>Edit this range</a>'),
-					int2ip( $ip_range->aipr_IPv4start ).' - '.int2ip( $ip_range->aipr_IPv4end ),
-					'href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$ip_range->aipr_ID.'"' ), 'error' );
+			if( $ip_ranges = get_ip_ranges( $aipr_IPv4start, $aipr_IPv4end, $this->ID ) )
+			{	// If at least one IP range is found:
+				if( param( 'delete_conflicts', 'integer', 0 ) )
+				{	// Delete all conflicts:
+					global $DB;
+					$delete_ip_ranges_IDs = array();
+					$ip_ranges_html = '<ul>';
+					foreach( $ip_ranges as $ip_range )
+					{
+						$ip_ranges_html .= '<li>- '.int2ip( $ip_range->aipr_IPv4start ).' - '.int2ip( $ip_range->aipr_IPv4end ).'</li>';
+						$delete_ip_ranges_IDs[] = $ip_range->aipr_ID;
+					}
+					$ip_ranges_html .= '</ul>';
+					$delete_result = $DB->query( 'DELETE FROM T_antispam__iprange
+						WHERE aipr_ID IN ( '.$DB->quote( $delete_ip_ranges_IDs ).' )' );
+					if( $delete_result )
+					{	// If IP ranges have been deleted successfully:
+						$Messages->add( sprintf( T_('Conflicting IP Ranges have been deleted: %s'), $ip_ranges_html ), 'success' );
+					}
+				}
+				else
+				{	// Inform user about conflicts:
+					global $admin_url;
+					$ip_ranges_html = '<ul>';
+					foreach( $ip_ranges as $ip_range )
+					{
+						$ip_ranges_html .= '<li>- '.int2ip( $ip_range->aipr_IPv4start ).' - '.int2ip( $ip_range->aipr_IPv4end ).' - <a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$ip_range->aipr_ID.'">'.T_('Edit this range').'</a></li>';
+					}
+					$ip_ranges_html .= '</ul>';
+					$Messages->add( sprintf( T_('Conflicting IP Ranges already exist: %s'), $ip_ranges_html )
+						.'<button class="btn btn-danger" type="button" id="delete_iprange_conflicts">'.T_('Delete all conflicts and save new Range').'</button>', 'error' );
+				}
 			}
 		}
 

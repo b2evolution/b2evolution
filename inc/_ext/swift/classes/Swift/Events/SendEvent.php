@@ -11,14 +11,15 @@
 /**
  * Generated when a message is being sent.
  *
- * @package    Swift
- * @subpackage Events
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Events_SendEvent extends Swift_Events_EventObject
 {
     /** Sending has yet to occur */
     const RESULT_PENDING = 0x0001;
+
+    /** Email is spooled, ready to be sent */
+    const RESULT_SPOOLED = 0x0011;
 
     /** Sending was successful */
     const RESULT_SUCCESS = 0x0010;
@@ -46,7 +47,7 @@ class Swift_Events_SendEvent extends Swift_Events_EventObject
     /**
      * The overall result as a bitmask from the class constants.
      *
-     * @var integer
+     * @var int
      */
     private $_result;
 
@@ -106,7 +107,7 @@ class Swift_Events_SendEvent extends Swift_Events_EventObject
     /**
      * Set the result of sending.
      *
-     * @param integer $result
+     * @param int $result
      */
     public function setResult($result)
     {
@@ -119,7 +120,7 @@ class Swift_Events_SendEvent extends Swift_Events_EventObject
      * The return value is a bitmask from
      * {@see RESULT_PENDING, RESULT_SUCCESS, RESULT_TENTATIVE, RESULT_FAILED}
      *
-     * @return integer
+     * @return int
      */
     public function getResult()
     {

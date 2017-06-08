@@ -9,6 +9,7 @@
  *
  * @param string HTML content
  * @param string Width value in css format
+ * @param string Height value in css format
  * @param boolean TRUE - to use transparent template
  * @param string Title of modal window (Used in bootstrap)
  * @param string|boolean Button to submit a form (Used in bootstrap), FALSE - to hide bottom panel with buttons

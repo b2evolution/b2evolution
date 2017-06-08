@@ -68,7 +68,7 @@ class EvoUnitTestCase extends UnitTestCase
 		$Plugins = new Plugins_admin_no_DB();
 
 		$db_params = $db_config;
-		$db_params['new_link'] = true; // needed to not interfere with the DB connection to the test DB (setup in EvoDbUnitTestCase).
+		$db_params['use_persistent'] = false; // needed to not interfere with the DB connection to the test DB (setup in EvoDbUnitTestCase).
 		$DB = new DB( $db_params );
 
 		/*
@@ -76,7 +76,7 @@ class EvoUnitTestCase extends UnitTestCase
 		{	// DB tables created, but no data loaded
 			// Let's delete it and reinstall
 
-			echo '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>';
+			echo '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>';
 			evo_flush();
 
 			if( $allow_evodb_reset != 1 )
@@ -158,8 +158,8 @@ class EvoUnitTestCase extends UnitTestCase
 		}
 
 		// Reload conf and vars.
-		require EVODIR.'blogs/conf/_config.php';
-		require EVODIR.'blogs/inc/_main.inc.php';
+		require EVODIR.'conf/_config.php';
+		require EVODIR.'inc/_main.inc.php';
 
 		$this->_saved_globals = array();
 		$this->_saved_server = array();

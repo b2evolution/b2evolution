@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -50,7 +50,7 @@ if( !isset( $params ) )
 $params = array_merge( array(
 	'form_class_thread' => 'bComment',
 	'form_title' => '',
-	'form_action' => $samedomain_htsrv_url.'action.php?mname=messaging',
+	'form_action' => get_htsrv_url().'action.php?mname=messaging',
 	'form_name' => '',
 	'form_layout' => NULL,
 	'cols' => 40,

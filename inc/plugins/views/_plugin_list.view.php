@@ -11,7 +11,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -201,6 +201,20 @@ $Results->cols[] = array(
 	);
 
 /*
+ * VERSION TD:
+ */
+function plugin_results_td_version( $Plugin )
+{
+	return '<a href="'.regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$Plugin->classname )
+		.'">'.$Plugin->version.'</a>';
+
+}
+$Results->cols[] = array(
+		'th' => T_('Version'),
+		'td' => '% plugin_results_td_version( {Obj} ) %'
+	);
+
+/*
  * HELP TD:
  */
 function plugin_results_td_help( $Plugin )
@@ -251,7 +265,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$Results->global_icon( T_('Reload events and codes for installed plugins.'), 'reload', regenerate_url( 'action', 'action=reload_plugins' ).'&amp;'.url_crumb('plugin'), T_('Reload plugins'), 3, 4 );
 }
 
-$Results->global_icon( T_('Install new plugin...'), 'new', regenerate_url( 'action', 'action=list_available' ), T_('Install new'), 3, 4 );
+$Results->global_icon( T_('Install new plugin...'), 'new', regenerate_url( 'action', 'action=list_available' ), T_('Install new'), 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 
 

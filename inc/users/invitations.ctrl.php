@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -54,7 +54,7 @@ switch( $action )
 		}
 		else
 		{ // Duplicate object in order no to mess with the cache:
-			$edited_Invitation = duplicate( $edited_Invitation ); // PHP4/5 abstraction
+			$edited_Invitation = clone $edited_Invitation;
 			$edited_Invitation->ID = 0;
 		}
 		break;
@@ -90,11 +90,10 @@ switch( $action )
 
 			// Insert in DB:
 			$DB->begin();
-			// because of manual assigning ID,
-			// member function Invitation::dbexists() is overloaded for proper functionality
+			// Check if the entered invitation code is not assigned to other one:
 			$duplicated_invitation_ID = $edited_Invitation->dbexists( 'ivc_code', $edited_Invitation->get( 'code' ) );
 			if( $duplicated_invitation_ID )
-			{ // We have a duplicate entry:
+			{	// Display error if we have a duplicate entry:
 				param_error( 'ivc_ID',
 					sprintf( T_('This invitation code already exists. Do you want to <a %s>edit the existing invitation code</a>?'),
 						'href="?ctrl=invitations&amp;action=edit&amp;ivc_ID='.$duplicated_invitation_ID.'"' ) );

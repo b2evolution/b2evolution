@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -25,7 +25,7 @@ class UserQuery extends SQL
 {
 	/**
 	 * Fields of users table to search by keywords
-	 * 
+	 *
 	 */
 	var $keywords_fields = 'user_login, user_firstname, user_lastname, user_nickname, user_email';
 
@@ -37,7 +37,7 @@ class UserQuery extends SQL
 	 * @param string Name of the ID field (including prefix)
 	 * @param array Query params
 	 */
-	function UserQuery( $dbtablename = 'T_users', $dbprefix = 'user_', $dbIDname = 'user_ID', $params = array() )
+	function __construct( $dbtablename = 'T_users', $dbprefix = 'user_', $dbIDname = 'user_ID', $params = array() )
 	{
 		global $collections_Module;
 
@@ -47,21 +47,32 @@ class UserQuery extends SQL
 
 		// Params to build query
 		$params = array_merge( array(
-				'join_group'   => true,
-				'join_session' => false,
-				'join_country' => true,
-				'join_city'    => true,
-				'grouped'      => false,
+				'join_group'     => true,
+				'join_sec_groups'=> false,
+				'join_session'   => false,
+				'join_country'   => true,
+				'join_region'    => false,
+				'join_subregion' => false,
+				'join_city'      => true,
+				'join_colls'     => true,
+				'grouped'        => false,
 			), $params );
 
-		$this->SELECT( 'user_ID, user_login, user_nickname, user_lastname, user_firstname, user_gender, user_source, user_created_datetime, user_profileupdate_date, user_lastseen_ts, user_level, user_status, user_avatar_file_ID, user_email, user_url, user_age_min, user_age_max, user_pass, user_salt, user_locale, user_unsubscribe_key, user_reg_ctry_ID, user_ctry_ID, user_rgn_ID, user_subrg_ID, user_city_ID, user_grp_ID' );
+		$this->SELECT( 'user_ID, user_login, user_nickname, user_lastname, user_firstname, user_gender, user_source, user_created_datetime, user_profileupdate_date, user_lastseen_ts, user_level, user_status, user_avatar_file_ID, user_email, user_url, user_age_min, user_age_max, user_pass, user_salt, user_pass_driver, user_locale, user_unsubscribe_key, user_reg_ctry_ID, user_ctry_ID, user_rgn_ID, user_subrg_ID, user_city_ID, user_grp_ID' );
 		$this->SELECT_add( ', IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture' );
 		$this->FROM( $this->dbtablename );
 
 		if( $params['join_group'] )
 		{ // Join Group
 			$this->SELECT_add( ', grp_ID, grp_name, grp_level' );
-			$this->FROM_add( 'LEFT JOIN T_groups ON user_grp_ID = grp_ID ' );
+			//$this->SELECT_add( ', ( SELECT COUNT( sug_count.sug_grp_ID ) FROM T_users__secondary_user_groups AS sug_count WHERE sug_count.sug_user_ID = user_ID ) AS secondary_groups_count' );
+			$this->FROM_add( 'LEFT JOIN T_groups ON user_grp_ID = grp_ID' );
+		}
+
+		if( $params['join_sec_groups'] )
+		{	// Join Secondary groups:
+			$this->SELECT_add( ', COUNT( DISTINCT sug_count.sug_grp_ID ) AS secondary_groups_count' );
+			$this->FROM_add( 'LEFT JOIN T_users__secondary_user_groups AS sug_count ON sug_count.sug_user_ID = user_ID' );
 		}
 
 		if( $params['join_session'] )
@@ -77,20 +88,35 @@ class UserQuery extends SQL
 			$this->FROM_add( 'LEFT JOIN T_regional__country AS rc ON user_reg_ctry_ID = rc.ctry_ID ' );
 		}
 
+		if( $params['join_region'] )
+		{	// Join Region:
+			$this->SELECT_add( ', rgn_name' );
+			$this->FROM_add( 'LEFT JOIN T_regional__region ON user_rgn_ID = rgn_ID ' );
+		}
+
+		if( $params['join_subregion'] )
+		{	// Join Sub-region:
+			$this->SELECT_add( ', subrg_name' );
+			$this->FROM_add( 'LEFT JOIN T_regional__subregion ON user_subrg_ID = subrg_ID ' );
+		}
+
 		if( $params['join_city'] )
 		{ // Join City
 			$this->SELECT_add( ', city_name, city_postcode' );
 			$this->FROM_add( 'LEFT JOIN T_regional__city ON user_city_ID = city_ID ' );
 		}
 
-		if( isset( $collections_Module ) )
-		{ // We are handling blogs:
-			$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
-			$this->FROM_add( 'LEFT JOIN T_blogs on user_ID = blog_owner_user_ID ' );
-		}
-		else
-		{
-			$this->SELECT_add( ', 0 AS nb_blogs' );
+		if( $params['join_colls'] )
+		{	// Join a count of collections:
+			if( isset( $collections_Module ) )
+			{	// We are handling blogs:
+				$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
+				$this->FROM_add( 'LEFT JOIN T_blogs on user_ID = blog_owner_user_ID ' );
+			}
+			else
+			{
+				$this->SELECT_add( ', 0 AS nb_blogs' );
+			}
 		}
 
 		$this->WHERE( 'user_ID IS NOT NULL' );
@@ -108,13 +134,31 @@ class UserQuery extends SQL
 
 
 	/**
+	 * Restrict by user IDs
+	 *
+	 * @param array User IDs
+	 */
+	function where_user_IDs( $user_IDs )
+	{
+		global $DB;
+
+		if( empty( $user_IDs ) )
+		{	// Don't restrict:
+			return;
+		}
+
+		$this->WHERE_and( 'user_ID IN ( '.$DB->quote( $user_IDs ).' ) ');
+	}
+
+
+	/**
 	 * Restrict by members
 	 *
 	 * @param boolean TRUE to select only member of the current Blog
 	 */
 	function where_members( $members )
 	{
-		global $DB, $Blog;
+		global $DB, $Collection, $Blog;
 
 		if( empty( $members ) || is_admin_page() || empty( $Blog ) || $Blog->get_setting( 'allow_access' ) != 'members' )
 		{ // Don't restrict
@@ -140,7 +184,9 @@ class UserQuery extends SQL
 		$usergroups_SQL->SELECT( 'user_ID' );
 		$usergroups_SQL->FROM( 'T_users' );
 		$usergroups_SQL->FROM_add( 'INNER JOIN T_groups ON grp_ID = user_grp_ID' );
-		$usergroups_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( bloggroup_group_ID = grp_ID AND bloggroup_ismember = 1 )' );
+		$usergroups_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( bloggroup_ismember = 1
+			AND ( bloggroup_group_ID = grp_ID
+			      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID ) ) )' );
 		$usergroups_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $Blog->ID ) );
 
 		$members_count_sql = 'SELECT DISTINCT user_ID FROM ( '
@@ -159,7 +205,7 @@ class UserQuery extends SQL
 	 *
 	 * @param string Keyword search string
 	 */
-	function where_keywords( $keywords )
+	function where_keywords( $keywords, $search_kw_combine = 'AND' )
 	{
 		global $DB;
 
@@ -179,7 +225,7 @@ class UserQuery extends SQL
 
 		if( count( $search ) > 0 )
 		{
-			$this->WHERE_and( implode( ' AND ', $search ) );
+			$this->WHERE_and( implode( ' '.$search_kw_combine.' ', $search ) );
 		}
 	}
 
@@ -187,7 +233,7 @@ class UserQuery extends SQL
 	/**
 	 * Restrict with gender
 	 *
-	 * @param string Gender ( M, F, MF )
+	 * @param string Gender ( M, F, O, MF, MO, FO, MFO )
 	 */
 	function where_gender( $gender )
 	{
@@ -198,13 +244,13 @@ class UserQuery extends SQL
 			return;
 		}
 
-		if( $gender == 'MF' )
-		{	// Get men AND women
-			$this->WHERE_and( 'user_gender IN ( "M", "F" )' );
-		}
-		else
-		{	// Get men OR women
-			$this->WHERE_and( 'user_gender = '.$DB->quote( $gender ) );
+		switch( $gender )
+		{
+			case 'MF': $this->WHERE_and( 'user_gender IN ( "M", "F" )' ); break;
+			case 'MO': $this->WHERE_and( 'user_gender IN ( "M", "O" )' ); break;
+			case 'FO': $this->WHERE_and( 'user_gender IN ( "F", "O" )' ); break;
+			case 'MFO': $this->WHERE_and( 'user_gender IN ( "M", "F", "O" )' ); break;
+			default: $this->WHERE_and( 'user_gender = '.$DB->quote( $gender ) ); break;
 		}
 	}
 
@@ -290,9 +336,9 @@ class UserQuery extends SQL
 
 
 	/**
-	 * Restrict with user group
+	 * Restrict with primary user group
 	 *
-	 * @param integer User group ID
+	 * @param integer Primary user group ID
 	 */
 	function where_group( $group_ID )
 	{
@@ -306,6 +352,27 @@ class UserQuery extends SQL
 		}
 
 		$this->WHERE_and( 'user_grp_ID = '.$DB->quote( $group_ID ) );
+	}
+
+
+	/**
+	 * Restrict with secondary user group
+	 *
+	 * @param integer Secondary user group ID
+	 */
+	function where_secondary_group( $secondary_group_ID )
+	{
+		global $DB;
+
+		$secondary_group_ID = intval( $secondary_group_ID );
+
+		if( $secondary_group_ID < 1 )
+		{	// Group ID may be '0' - to show all groups
+			return;
+		}
+
+		$this->FROM_add( 'INNER JOIN T_users__secondary_user_groups sug_filter ON sug_filter.sug_user_ID = user_ID' );
+		$this->WHERE_and( 'sug_filter.sug_grp_ID = '.$DB->quote( $secondary_group_ID ) );
 	}
 
 
@@ -438,11 +505,16 @@ class UserQuery extends SQL
 			return;
 		}
 
-		$this->WHERE_and( 'uorg_org_ID = '.$DB->quote( $org_ID ) );
-
 		// Join Organization table
-		$this->SELECT_add( ', uorg_org_ID, uorg_accepted' );
-		$this->FROM_add( 'LEFT JOIN T_users__user_org ON uorg_user_ID = user_ID ' );
+		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role' );
+		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
+	}
+
+	function where_viewed_user( $user_ID )
+	{
+		global $DB;
+		$this->SELECT_add( ', upv_visited_user_ID, upv_visitor_user_ID, upv_last_visit_ts' );
+		$this->FROM_add( 'RIGHT JOIN T_users__profile_visits ON upv_visitor_user_ID = user_ID AND upv_visited_user_ID = '.$DB->quote( $user_ID ) );
 	}
 
 	/**

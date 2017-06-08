@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -19,19 +19,26 @@ load_funcs('plugins/_plugin.funcs.php');
  * @var ComponentWidget
  */
 global $edited_ComponentWidget;
-global $Blog, $admin_url;
+global $Collection, $Blog, $admin_url, $AdminUI, $Plugins, $display_mode;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-$Form = new Form( NULL, 'form' );
+$Form = new Form( NULL, 'widget_checkchanges' );
 
-// Manual link
-$Form->global_icon( T_('View manual'), 'manual', $edited_ComponentWidget->get_help_url(), '', 3, 2, array( 'target' => '_blank' ) );
-// Close link
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
+if( ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
+{	// Display a link to close form (Don't display this link on bootstrap skin, because it already has an icon to close a modal window)
+	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
+}
 
-$Form->begin_form( 'fform', sprintf( $creating ?  T_('New widget %s in %s') : T_('Edit widget %s in %s'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get( 'sco_name' ) ) );
+$Form->begin_form( 'fform', sprintf( $creating ?  T_('New widget "%s" in container "%s"') : T_('Edit widget "%s" in container "%s"'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get( 'sco_name' ) )
+		.' '.action_icon( T_('Open relevant page in online manual'), 'manual', $edited_ComponentWidget->get_help_url(), NULL, 5, NULL, array( 'target' => '_blank' ) ) );
+
+// Plugin widget form event:
+$Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
+		'Form'            => & $Form,
+		'ComponentWidget' => & $edited_ComponentWidget,
+	) );
 
 	$Form->add_crumb( 'widget' );
 	$Form->hidden( 'action', $creating ? 'create' : 'update' );
@@ -51,7 +58,8 @@ $Form->begin_fieldset( T_('Params') );
 	//$params = $edited_ComponentWidget->get_params();
 
 	// Loop through all widget params:
-	foreach( $edited_ComponentWidget->get_param_definitions( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
+	$tmp_params = array( 'for_editing' => true );
+	foreach( $edited_ComponentWidget->get_param_definitions( $tmp_params ) as $l_name => $l_meta )
 	{
 		$l_value = NULL;
 		if( $l_name == 'allow_blockcache' )
@@ -83,9 +91,30 @@ $Form->end_fieldset();
 //       catch any params/settings maybe? Although this could be done in the
 //       same hook in most cases probably. (dh)
 
-$Form->end_form( array(
+$Form->buttons( array(
 		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ),
 		array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton' )
 	) );
 
+// Plugin widget form event:
+$Plugins->trigger_event( 'WidgetEndSettingsForm', array(
+		'Form'            => & $Form,
+		'ComponentWidget' => & $edited_ComponentWidget,
+	) );
+
+$Form->end_form();
+
+if( $display_mode == 'js' )
+{	// Reset previous and Initialize new bozo validator for each new opened widget edit form in popup window,
+	// because it is not applied for new created forms dynamically:
+?>
+<script type="text/javascript">
+if( typeof( bozo ) != 'undefined' )
+{
+	bozo.reset_changes();
+	bozo.init();
+}
+</script>
+<?php
+}
 ?>

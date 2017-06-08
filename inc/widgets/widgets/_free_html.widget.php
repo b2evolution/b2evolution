@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,10 +27,10 @@ class free_html_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function free_html_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'free_html' );
+		parent::__construct( $db_row, 'core', 'free_html' );
 	}
 
 
@@ -77,7 +77,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Custom text/HTML of your choice.');
+		return T_('Display any HTML snippet of your choice.');
 	}
 
 
@@ -114,7 +114,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 

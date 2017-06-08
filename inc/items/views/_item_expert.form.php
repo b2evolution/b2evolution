@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -24,7 +24,7 @@ global $edited_Item;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var Plugins
  */
@@ -42,11 +42,11 @@ global $pagenow;
 
 global $Session;
 
-global $mode, $admin_url, $rsc_url;
+global $mode, $admin_url, $rsc_url, $locales;
 global $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
-global $redirect_to;
+global $redirect_to, $orig_action;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -82,25 +82,63 @@ $Form->begin_form( '', '', $params );
 		// Item ID
 		$Form->hidden( 'post_ID', $edited_Item->ID );
 	}
+
+	// Try to get the original item ID (For example, on copy action):
+	$original_item_ID = get_param( 'p' );
+	if( ! empty( $original_item_ID ) )
+	{
+		$Form->hidden( 'p', $original_item_ID );
+	}
+
 	$Form->hidden( 'redirect_to', $redirect_to );
 
 	// In case we send this to the blog for a preview :
 	$Form->hidden( 'preview', 1 );
 	$Form->hidden( 'more', 1 );
-	$Form->hidden( 'preview_userid', $current_User->ID );
 
 	// Post type
 	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );
 ?>
 <div class="row">
 
-<div class="left_col col-md-9">
+<div class="left_col col-lg-9 col-md-8">
 
 	<?php
+	// ############################ INSTRUCTIONS ##############################
+	$ItemType = & $edited_Item->get_ItemType();
+	if( $ItemType && $ItemType->get( 'back_instruction' ) == 1 && $ItemType->get( 'instruction' ) )
+	{
+		?>
+		<div class="alert alert-dismissable alert-info fade in">
+			<button type="button" class="close" data-dismiss="alert">
+				<span aria-hidden="true">x</span>
+			</button>
+			<?php echo $ItemType->get( 'instruction' );?>
+		</div>
+		<?php
+	}
+
 	// ############################ POST CONTENTS #############################
 
 	$item_type_link = $edited_Item->get_type_edit_link( 'link', $edited_Item->get( 't_type' ), T_('Change type') );
-	$Form->begin_fieldset( sprintf( T_('%s contents'), $item_type_link ).get_manual_link('post_contents_fieldset'), array( 'id' => 'itemform_content' ) );
+	if( $edited_Item->ID > 0 )
+	{	// Set form title for editing the item:
+		$form_title_item_ID = T_('Item').' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'" class="post_type_link">#'.$edited_Item->ID.'</a>';
+	}
+	elseif( $creating )
+	{
+		if( ! empty( $original_item_ID ) )
+		{	// Set form title for duplicating the item:
+			$form_title_item_ID = sprintf( T_('Duplicating Item %s'), '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$original_item_ID.'" class="post_type_link">#'.$original_item_ID.'</a>' );
+		}
+		else
+		{	// Set form title for creating new item:
+			$form_title_item_ID = T_('New Item');
+		}
+	}
+	$Form->begin_fieldset( $form_title_item_ID.get_manual_link( 'post-contents-panel' )
+				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).'</span>',
+			array( 'id' => 'itemform_content' ) );
 
 	$Form->switch_layout( 'none' );
 
@@ -120,14 +158,22 @@ $Form->begin_form( '', '', $params );
 	}
 
 	// -- Language chooser BEGIN --
-	$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
+	if( $Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
+	    $edited_Item->get( 'locale' ) == $Blog->get( 'locale' ) &&
+	    isset( $locales[ $edited_Item->get( 'locale' ) ] ) )
+	{	// Force to use  collection locale because it is restricted by collection setting and the edited item has the same locale as collection:
+		$locale_options = array( $edited_Item->get( 'locale' ), $locales[ $edited_Item->get( 'locale' ) ]['name'] );
+	}
+	else
+	{	// Allow to select a locale:
+		$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
+	}
 
 	if( is_array( $locale_options ) )
 	{ // We've only one enabled locale.
 		// Tblue> The locale name is not really needed here, but maybe we
 		//        want to display the name of the only locale?
 		$Form->hidden( 'post_locale', $locale_options[0] );
-		//pre_dump( $locale_options );
 	}
 	else
 	{ // More than one locale => select field.
@@ -152,7 +198,6 @@ $Form->begin_form( '', '', $params );
 		echo '<div class="edit_toolbars">';
 		// CALL PLUGINS NOW:
 		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
-				'target_type' => 'Item',
 				'edit_layout' => 'expert',
 				'Item' => $edited_Item,
 			) );
@@ -184,14 +229,37 @@ $Form->begin_form( '', '', $params );
 
 	echo '<div class="pull-left">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
+	ob_start();
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+			'target_type'   => 'Item',
+			'target_object' => $edited_Item,
+			'content_id'    => 'itemform_post_content',
+			'edit_layout'   => 'expert',
+		) );
+	$plugin_button = ob_get_flush();
+	if( empty( $plugin_button ) )
+	{	// If button is not displayed by any plugin
+		// Display a current status of HTML allowing for the edited item:
+		echo '<span class="html_status">';
+		if( $edited_Item->get_type_setting( 'allow_html' ) )
+		{
+			echo T_('HTML is allowed');
+		}
+		else
+		{
+			echo T_('HTML is not allowed');
+		}
+		// Display manual link for more info:
+		echo get_manual_link( 'post-allow-html' );
+		echo '</span>';
+	}
 	echo '</div>';
 
 	echo '<div class="pull-right">';
 	echo_publish_buttons( $Form, $creating, $edited_Item );
 	echo '</div>';
 
-	echo '<div class="clear"></div>';
+	echo '<div class="clearfix"></div>';
 
 	echo '</div>';
 
@@ -199,35 +267,71 @@ $Form->begin_form( '', '', $params );
 
 
 	// ####################### ATTACHMENTS/LINKS #########################
-	if( isset( $GLOBALS['files_Module'] )
-		&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
-		&& $current_User->check_perm( 'files', 'view', false ) )
-	{ // Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
+	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
+	    $current_User->check_perm( 'files', 'view', false ) )
+	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
-		$LinkOwner = new LinkItem( $edited_Item );
-		attachment_iframe( $Form, $LinkOwner, $iframe_name, $creating, true );
+		// Initialize this object as global because this is used in many link functions:
+		global $LinkOwner;
+		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+		// Display attachments fieldset:
+		$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
+		display_attachments_fieldset( $Form, $LinkOwner, false, $fold_images_attachments_block );
 	}
-	// ############################ ADVANCED #############################
 
-	$Form->begin_fieldset( T_('Advanced properties').get_manual_link('post_advanced_properties_fieldset'), array( 'id' => 'itemform_adv_props', 'fold' => true ) );
 
-	echo '<table cellspacing="0" class="compose_layout">';
+	// ############################ CUSTOM FIELDS #############################
 
 	if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-	{ // All CUSTOM FIELDS are hidden by post type
+	{	// All CUSTOM FIELDS are hidden by post type:
 		display_hidden_custom_fields( $Form, $edited_Item );
 	}
 	else
-	{ // CUSTOM FIELDS varchar
-		$custom_fields = $edited_Item->get_type_custom_fields( 'varchar' );
-		foreach( $custom_fields as $custom_field )
-		{ // Loop through custom varchar fields
-			echo '<tr><td class="label"><label for="item_varchar_'.$custom_field['ID'].'"><strong>'.$custom_field['label'].':</strong></label></td>';
-			echo '<td class="input" width="97%">';
-			$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-			echo '</td></tr>';
+	{	// CUSTOM FIELDS:
+		$custom_fields = $edited_Item->get_type_custom_fields();
+
+		if( count( $custom_fields ) )
+		{	// Display fieldset with custom fields only if at least one exists:
+			$Form->begin_fieldset( T_('Custom fields').get_manual_link( 'post-custom-fields-panel' ), array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
+
+			echo '<table cellspacing="0" class="compose_layout">';
+
+			foreach( $custom_fields as $custom_field )
+			{	// Loop through custom fields:
+				echo '<tr><td class="label"><label for="item_'.$custom_field['type'].'_'.$custom_field['ID'].'"><strong>'.$custom_field['label'].':</strong></label></td>';
+				echo '<td class="input" width="97%">';
+				switch( $custom_field['type'] )
+				{
+					case 'double':
+						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, '', $custom_field['note'].' <code>'.$custom_field['name'].'</code>' );
+						break;
+					case 'varchar':
+						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, '', '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						break;
+					case 'text':
+						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, '', array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
+						break;
+					case 'html':
+						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, '', array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
+						break;
+					case 'url':
+						$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_url_'.$custom_field['ID'] ), 20, '', '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						break;
+				}
+				echo '</td></tr>';
+			}
+
+			echo '</table>';
+
+			$Form->end_fieldset();
 		}
 	}
+
+	// ############################ ADVANCED PROPERTIES #############################
+
+	$Form->begin_fieldset( T_('Advanced properties').get_manual_link( 'post-advanced-properties-panel' ), array( 'id' => 'itemform_adv_props', 'fold' => true ) );
+
+	echo '<table cellspacing="0" class="compose_layout">';
 
 	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
 	$Form->hidden( 'slug_changed', 0 );
@@ -273,7 +377,18 @@ $Form->begin_form( '', '', $params );
 				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
 				.T_('Auto-suggest tags as you type (based on existing tags)').$link_to_tags_manager
 			.'</label>';
-		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array(
+				'maxlength' => 255,
+				'style'     => 'width: 100%;',
+				'input_prefix' => '<div class="input-group">',
+				'input_suffix' => '<span class="input-group-btn">'
+						.'<input class="btn btn-primary" type="button" name="actionArray[extract_tags]"'
+							.' onclick="return b2edit_confirm( \''.TS_('This will save your changes, then analyze your post to find existing tags. Are you sure?').'\','
+							.' \''.$admin_url.'?ctrl=items&amp;blog='.$edited_Item->get_blog_ID().'\','
+							.' \'extract_tags\' );"'
+							.' value="'.format_to_output( T_('Extract'), 'htmlattr' ).'" />'
+					.'</span></div>',
+			) );
 		echo '</td></tr>';
 	}
 	else
@@ -281,29 +396,34 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'item_tags', $item_tags );
 	}
 
-	$edited_Item_excerpt = $edited_Item->get('excerpt');
+	$edited_item_excerpt = $edited_Item->get( 'excerpt' );
 	if( $edited_Item->get_type_setting( 'use_excerpt' ) != 'never' )
 	{ // Display excerpt
 		$field_required = ( $edited_Item->get_type_setting( 'use_excerpt' ) == 'required' ) ? $required_star : '';
 		$field_class = param_has_error( 'post_excerpt' ) ? ' field_error' : '';
 		echo '<tr><td class="label"><label for="post_excerpt">'.$field_required.'<strong>'.T_('Excerpt').':</strong></label></td>';
 		echo '<td class="input" width="97%">';
-		$Form->textarea_input( 'post_excerpt', $edited_Item_excerpt, 3, '', array(
+		$excerpt_checkbox = '<label>'
+				.'<input name="post_excerpt_autogenerated" value="1" type="checkbox"'.( $edited_Item->get( 'excerpt_autogenerated' ) ? ' checked="checked"' : '' ).' /> '
+				.T_('Auto-generate excerpt from content')
+			.'</label>';
+		$Form->textarea_input( 'post_excerpt', $edited_item_excerpt, 3, '', array(
 				'class'    => $field_class,
 				'required' => $field_required,
-				'style'    => 'width:100%'
+				'style'    => 'width:100%',
+				'note'     => $excerpt_checkbox,
 			) );
 		echo '</td></tr>';
 	}
 	else
 	{ // Hide excerpt
-		$Form->hidden( 'post_excerpt', htmlspecialchars( $edited_Item_excerpt ) );
+		$Form->hidden( 'post_excerpt', htmlspecialchars( $edited_item_excerpt ) );
 	}
 
 	if( $edited_Item->get_type_setting( 'use_url' ) != 'never' )
 	{ // Display url
 		$field_required = ( $edited_Item->get_type_setting( 'use_url' ) == 'required' ) ? $required_star : '';
-		echo '<tr><td class="label"><label for="post_excerpt">'.$field_required.'<strong>'.T_('Link to url').':</strong></label></td>';
+		echo '<tr><td class="label"><label for="post_url">'.$field_required.'<strong>'.T_('Link to url').':</strong></label></td>';
 		echo '<td class="input" width="97%">';
 		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
 		echo '</td></tr>';
@@ -311,6 +431,36 @@ $Form->begin_form( '', '', $params );
 	else
 	{ // Hide url
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
+	}
+
+	if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
+	{ // Display parent ID:
+		if( $parent_Item = & $edited_Item->get_parent_Item() )
+		{	// Get parent item info if it is defined:
+			$parent_info = '';
+			$status_icons = get_visibility_statuses( 'icons' );
+			if( isset( $status_icons[ $parent_Item->get( 'status' ) ] ) )
+			{	// Status colored icon:
+				$parent_info .= $status_icons[ $parent_Item->get( 'status' ) ];
+			}
+			// Title with link to permament url:
+			$parent_info .= ' '.$parent_Item->get_title( array( 'link_type' => 'permalink' ) );
+			// Icon to edit:
+			$parent_info .= ' '.$parent_Item->get_edit_link( array( 'text' => '#icon#' ) );
+		}
+		else
+		{	// No parent item defined
+			$parent_info = '';
+		}
+		$field_required = ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ) ? $required_star : '';
+		echo '<tr><td class="label"><label for="post_parent_ID">'.$field_required.'<strong>'.T_('Parent ID').':</strong></label></td>';
+		echo '<td class="input" width="97%">';
+		$Form->text_input( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), 11, '', $parent_info );
+		echo '</td></tr>';
+	}
+	else
+	{ // Hide parent ID:
+		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 	}
 
 	if( $edited_Item->get_type_setting( 'use_title_tag' ) != 'never' )
@@ -354,10 +504,6 @@ $Form->begin_form( '', '', $params );
 
 	echo '</table>';
 
-	if( $edited_Item->get('excerpt_autogenerated') )
-	{ // store hash of current post_excerpt to detect if it was changed.
-		$Form->hidden('post_excerpt_previous_md5', md5($edited_Item_excerpt));
-	}
 	$Form->end_fieldset();
 
 
@@ -365,14 +511,14 @@ $Form->begin_form( '', '', $params );
 
 	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
 	{
-		$Form->begin_fieldset( T_('Additional actions'), array( 'id' => 'itemform_additional_actions', 'fold' => true ) );
+		$Form->begin_fieldset( T_('Additional actions').get_manual_link( 'post-edit-additional-actions-panel' ), array( 'id' => 'itemform_additional_actions', 'fold' => true ) );
 
 		// --------------------------- TRACKBACK --------------------------------------
 		?>
 		<div id="itemform_trackbacks">
 			<label for="trackback_url"><strong><?php echo T_('Trackback URLs') ?>:</strong>
 			<span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br />
-			<input type="text" name="trackback_url" class="large form_text_input" id="trackback_url" value="<?php echo format_to_output( $trackback_url, 'formvalue' ); ?>" />
+			<input type="text" name="trackback_url" class="large form_text_input form-control" id="trackback_url" value="<?php echo format_to_output( $trackback_url, 'formvalue' ); ?>" />
 		</div>
 		<?php
 
@@ -384,7 +530,7 @@ $Form->begin_form( '', '', $params );
 
 	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
 
-	if( $current_User->check_perm( 'meta_comment', 'view', false, $edited_Item ) )
+	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 	{
 		// ####################### META COMMENTS #########################
 		$currentpage = param( 'currentpage', 'integer', 1 );
@@ -392,45 +538,52 @@ $Form->begin_form( '', '', $params );
 		param( 'comments_number', 'integer', $total_comments_number );
 		param( 'comment_type', 'string', 'meta' );
 
-		$Form->begin_fieldset( T_('Meta comments')
+		$Form->begin_fieldset( T_('Meta comments').get_manual_link( 'meta-comments-panel' )
 						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
 					array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
 
-		global $CommentList, $UserSettings;
-		$CommentList = new CommentList2( $Blog );
-
-		// Filter list:
-		$CommentList->set_filters( array(
-			'types' => array( 'meta' ),
-			'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
-			'order' => 'DESC',
-			'post_ID' => $edited_Item->ID,
-			'comments' => $UserSettings->get( 'results_per_page' ),
-			'page' => $currentpage,
-			'expiry_statuses' => array( 'active' ),
-		) );
-		$CommentList->query();
-
-		// comments_container value shows, current Item ID
-		echo '<div id="styled_content_block">';
-		echo '<div id="comments_container" value="'.$edited_Item->ID.'">';
-		// display comments
-		$CommentList->display_if_empty( array(
-				'before'    => '<div class="bComment"><p>',
-				'after'     => '</p></div>',
-				'msg_empty' => T_('No feedback for this post yet...'),
-			) );
-		require $inc_path.'comments/views/_comment_list.inc.php';
-		echo '</div>'; // comments_container div
-		echo '</div>';
-
-		if( $current_User->check_perm( 'meta_comment', 'add', false, $edited_Item ) )
-		{ // Display a link to add new meta comment if current user has a permission
-			echo action_icon( T_('Add a meta comment'), 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add a meta comment').' &raquo;', 3, 4 );
+		if( $creating )
+		{	// Display button to save new creating item:
+			$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save post to start adding Meta comments'), 'btn-primary' ) );
 		}
+		else
+		{	// Display meta comments of the edited item:
+			global $CommentList, $UserSettings;
+			$CommentList = new CommentList2( $Blog );
 
-		// Load JS functions to work with meta comments:
-		load_funcs( 'comments/model/_comment_js.funcs.php' );
+			// Filter list:
+			$CommentList->set_filters( array(
+				'types' => array( 'meta' ),
+				'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
+				'order' => 'DESC',
+				'post_ID' => $edited_Item->ID,
+				'comments' => $UserSettings->get( 'results_per_page' ),
+				'page' => $currentpage,
+				'expiry_statuses' => array( 'active' ),
+			) );
+			$CommentList->query();
+
+			// comments_container value shows, current Item ID
+			echo '<div class="evo_content_block">';
+			echo '<div id="comments_container" value="'.$edited_Item->ID.'" class="evo_comments_container">';
+			// display comments
+			$CommentList->display_if_empty( array(
+					'before'    => '<div class="evo_comment"><p>',
+					'after'     => '</p></div>',
+					'msg_empty' => T_('No meta comment for this post yet...'),
+				) );
+			require $inc_path.'comments/views/_comment_list.inc.php';
+			echo '</div>'; // comments_container div
+			echo '</div>';
+
+			if( $edited_Item->can_meta_comment() )
+			{ // Display a link to add new meta comment if current user has a permission
+				echo action_icon( T_('Add meta comment').'...', 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add meta comment').' &raquo;', 3, 4 );
+			}
+
+			// Load JS functions to work with meta comments:
+			load_funcs( 'comments/model/_comment_js.funcs.php' );
+		}
 
 		$Form->end_fieldset();
 	}
@@ -438,7 +591,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="right_col col-md-3">
+<div class="right_col col-lg-3 col-md-4">
 
 	<?php
 	// ################### MODULES SPECIFIC ITEM SETTINGS ###################
@@ -447,9 +600,9 @@ $Form->begin_form( '', '', $params );
 
 	// ############################ WORKFLOW #############################
 
-	if( $Blog->get_setting( 'use_workflow' ) )
+	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 	{	// We want to use workflow properties for this blog:
-		$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
+		$Form->begin_fieldset( T_('Workflow properties').get_manual_link( 'post-edit-workflow-panel' ), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
 
 			echo '<div id="itemform_edit_workflow" class="edit_fieldgroup">';
 			$Form->switch_layout( 'linespan' );
@@ -466,7 +619,7 @@ $Form->begin_form( '', '', $params );
 			if( count( $UserCache->cache ) > 20 )
 			{
 				$assigned_User = & $UserCache->get_by_ID( $edited_Item->get( 'assigned_user_ID' ), false, false );
-				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
+				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
 			}
 			else
 			{
@@ -477,11 +630,23 @@ $Form->begin_form( '', '', $params );
 			echo ' '; // allow wrapping!
 
 			$ItemStatusCache = & get_ItemStatusCache();
-			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
+			$ItemStatusCache->load_all();
+
+			$ItemTypeCache = & get_ItemTypeCache();
+			$current_ItemType = $ItemTypeCache->get_by_ID( $edited_Item->ityp_ID );
+			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
 
 			echo ' '; // allow wrapping!
 
-			$Form->date( 'item_deadline', $edited_Item->get('datedeadline'), T_('Deadline') );
+			$Form->begin_line( T_('Deadline'), 'item_deadline' );
+
+				$datedeadline = $edited_Item->get( 'datedeadline' );
+				$Form->date( 'item_deadline', $datedeadline, '' );
+
+				$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+				$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+
+			$Form->end_line();
 
 			$Form->switch_layout( NULL );
 			echo '</div>';
@@ -497,7 +662,7 @@ $Form->begin_form( '', '', $params );
 
 	// ################### PROPERTIES ###################
 
-	$Form->begin_fieldset( T_('Properties'), array( 'id' => 'itemform_extra', 'fold' => true ) );
+	$Form->begin_fieldset( T_('Properties').get_manual_link( 'post-properties-panel' ), array( 'id' => 'itemform_extra', 'fold' => true ) );
 
 	$Form->switch_layout( 'linespan' );
 
@@ -544,17 +709,6 @@ $Form->begin_form( '', '', $params );
 		echo '</td></tr>';
 	}
 
-	if( $edited_Item->get_type_setting( 'use_custom_fields' ) )
-	{ // Display CUSTOM FIELDS double only when its are allowed by post type setting
-		$custom_fields = $edited_Item->get_type_custom_fields( 'double' );
-		foreach( $custom_fields as $custom_field )
-		{ // Loop through custom double fields
-			echo '<tr><td><strong>'.$custom_field['label'].':</strong></td><td>';
-			$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, '', T_('can be decimal') );
-			echo '</td></tr>';
-		}
-	}
-
 	echo '</table>';
 
 	$Form->switch_layout( NULL );
@@ -564,8 +718,8 @@ $Form->begin_form( '', '', $params );
 
 	// ################### TEXT RENDERERS ###################
 
-	$Form->begin_fieldset( T_('Text Renderers')
-					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
+	$Form->begin_fieldset( T_('Text Renderers').get_manual_link( 'post-renderers-panel' )
+					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=plugins&plugin_group=rendering&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
 				array( 'id' => 'itemform_renderers', 'fold' => true ) );
 
 	// fp> TODO: there should be no param call here (shld be in controller)
@@ -578,7 +732,7 @@ $Form->begin_form( '', '', $params );
 
 	if( $edited_Item->allow_comment_statuses() )
 	{
-		$Form->begin_fieldset( T_('Comments'), array( 'id' => 'itemform_comments', 'fold' => true ) );
+		$Form->begin_fieldset( T_('Comments').get_manual_link( 'post-comments-panel' ), array( 'id' => 'itemform_comments', 'fold' => true ) );
 
 		?>
 			<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="open" class="checkbox" <?php if( $post_comment_status == 'open' ) echo 'checked="checked"'; ?> />
@@ -598,6 +752,14 @@ $Form->begin_form( '', '', $params );
 			<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="disabled" class="checkbox" <?php if( $post_comment_status == 'disabled' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Disabled') ?></label><br />
 		<?php
+		}
+
+		if( $edited_Item->get_type_setting( 'allow_comment_form_msg' ) )
+		{	// If custom message is allowed before comment form:
+			$Form->switch_layout( 'none' );
+			$Form->textarea_input( 'comment_form_msg', $edited_Item->get_setting( 'comment_form_msg' ), 3, T_('Message before comment form') );
+			echo '<br />';
+			$Form->switch_layout( NULL );
 		}
 
 		if( $edited_Item->get_type_setting( 'use_comment_expiration' ) != 'never' )
@@ -620,7 +782,7 @@ $Form->begin_form( '', '', $params );
 
 	// ################### GOAL TRACKING ###################
 
-	$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'track-item-as-goal' )
+	$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'post-goal-tracking-panel' )
 					.action_icon( T_('Goals'), 'edit', $admin_url.'?ctrl=goals&amp;blog='.$Blog->ID, T_('Goals'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
 				array( 'id' => 'itemform_goals', 'fold' => true ) );
 
@@ -670,6 +832,59 @@ $Form->begin_form( '', '', $params );
 	$Form->end_fieldset();
 
 
+	// ################### NOTIFICATIONS ###################
+
+	$Form->begin_fieldset( T_('Notifications').get_manual_link( 'post-notifications-panel' ), array( 'id' => 'itemform_notifications', 'fold' => true ) );
+
+		$Form->info( T_('Moderators'), $edited_Item->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
+
+		$notify_types = array(
+				'members_notified'   => T_('Members'),
+				'community_notified' => T_('Community'),
+				'pings_sent'         => T_('Public pings'),
+		);
+
+		foreach( $notify_types as $notify_type => $notify_title )
+		{
+			if( ! $edited_Item->notifications_allowed() )
+			{	// Notifications are not allowed for the Item:
+				$Form->info( $notify_title, T_('Not Possible for this post type') );
+			}
+			else
+			{	// Notifications are allowed for the Item:
+				if( $edited_Item->check_notifications_flags( $notify_type ) )
+				{	// Nofications/Pings were sent:
+					$notify_status = ( $notify_type == 'pings_sent' ) ? T_('Sent') : T_('Notified');
+					$notify_select_options = array(
+							''      => T_('Done'),
+							'force' => ( $notify_type == 'pings_sent' ) ? T_('Send again') : T_('Notify again')
+						);
+				}
+				elseif( $edited_Item->get_type_setting( 'usage' ) != 'post' )
+				{	// Item type is not applicable and Nofications/Pings are not sent yet:
+					$notify_status = T_('Not Recommended');
+					$notify_select_options = array(
+							''      => T_('Do nothing'),
+							'force' => ( $notify_type == 'pings_sent' ) ? T_('Send anyways') : T_('Notify anyways'),
+							'mark'  => ( $notify_type == 'pings_sent' ) ? T_('Mark as Sent') : T_('Mark as Notified')
+						);
+				}
+				else
+				{	// Nofications/Pings are not sent yet:
+					$notify_status = ( $notify_type == 'pings_sent' ) ? T_('To be sent') : T_('To be notified');
+					$notify_select_options = array(
+							''     => ( $notify_type == 'pings_sent' ) ? T_('Send on next save') : T_('Notify on next save'),
+							'skip' => T_('Skip on next save'),
+							'mark' => ( $notify_type == 'pings_sent' ) ? T_('Mark as Sent') : T_('Mark as Notified')
+						);
+				}
+				$Form->select_input_array( 'item_'.$notify_type, get_param( 'item_'.$notify_type ), $notify_select_options, $notify_title, NULL, array( 'input_prefix' => $notify_status.' &nbsp; &nbsp; ' ) );
+			}
+		}
+
+	$Form->end_fieldset();
+
+
 	// ################### QUICK SETTINGS ###################
 
 	$item_ID = get_param( 'p' ) > 0 ? get_param( 'p' ) : $edited_Item->ID;
@@ -696,6 +911,18 @@ $Form->begin_form( '', '', $params );
 			echo action_icon( '', 'deactivate', $quick_setting_url.'show_quick_button', T_('Never show the quick "Publish!" button.'), 3, 4 );
 		}
 		echo '</p>';
+
+		// CALL PLUGINS NOW:
+		ob_start();
+		$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+				'target_type'   => 'Item',
+				'target_object' => $edited_Item,
+				'content_id'    => 'itemform_post_content',
+				'edit_layout'   => 'expert_quicksettings',
+				'quicksetting_item_start' => '<p id="quicksetting_wysiwyg_switch">',
+				'quicksetting_item_end' => '</p>'
+			) );
+		$quick_setting_switch = ob_get_flush();
 	}
 
 	// Display a link to reset default settings for current user on this screen:
@@ -707,7 +934,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="clear"></div>
+<div class="clearfix"></div>
 
 </div>
 
@@ -732,12 +959,23 @@ else
 echo_onchange_newcat();
 // Location
 echo_regional_js( 'item', $edited_Item->region_visible() );
-// Post type
-echo_onchange_item_type_js();
 // Goal
 echo_onchange_goal_cat();
 // Fieldset folding
 echo_fieldset_folding_js();
+// Save and restore item content field height and scroll position:
+echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
+
+// JS to post excerpt mode switching:
+?>
+<script type="text/javascript">
+jQuery( '#post_excerpt' ).on( 'keyup', function()
+{
+	// Disable excerpt auto-generation on any changing and enable if excerpt field is empty:
+	jQuery( 'input[name=post_excerpt_autogenerated]' ).prop( 'checked', ( jQuery( this ).val() == '' ) );
+} );
+</script>
+<?php
 
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 

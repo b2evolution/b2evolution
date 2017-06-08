@@ -78,8 +78,8 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Thread = duplicate( $edited_Message->Thread ); // PHP4/5 abstraction
-			$edited_Message = duplicate( $edited_Message ); // PHP4/5 abstraction
+			$edited_Thread = clone $edited_Message->Thread;
+			$edited_Message = clone $edited_Message; // PHP4/5 abstraction
 			$edited_Message->ID = 0;
 		}
 		$edited_Message->Thread = & $edited_Thread;
@@ -188,6 +188,16 @@ switch( $action )
 	case 'create':
 	case 'preview':
 		$AdminUI->set_page_manual_link( 'messages-new-thread' );
+
+		// Require colorbox js:
+		require_js_helper( 'colorbox' );
+		// Require File Uploader js and css:
+		init_fileuploader_js_lang_strings();
+		require_js( 'multiupload/fileuploader.js' );
+		require_css( 'fileuploader.css' );
+		// Load JS files to make the links table sortable:
+		require_js( '#jquery#' );
+		require_js( 'jquery/jquery.sortable.min.js' );
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'conversations-list' );

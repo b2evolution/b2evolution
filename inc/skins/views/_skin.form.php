@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -24,7 +24,7 @@ global $edited_Skin;
 $Form = new Form( NULL, 'skin_checkchanges' );
 
 $Form->global_icon( T_('Uninstall this skin!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('skin') ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', T_('Skin properties') );
 
@@ -33,7 +33,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'skin_ID', $edited_Skin->ID );
 
-	$Form->begin_fieldset( T_('Skin properties') );
+	$Form->begin_fieldset( T_('Skin properties').get_manual_link( 'skin-system-settings' ) );
 
 		echo '<div class="skin_settings well">';
 			$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );
@@ -45,13 +45,12 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				echo '<span>'.$edited_Skin->name.'</span>';
 			echo '</div>';
 
-			if( isset( $edited_Skin->version ) )
-			{ // Skin version
-				echo '<div class="skin_setting_row">';
-					echo '<label>'.T_('Skin version').':</label>';
-					echo '<span>'.$edited_Skin->version.'</span>';
-				echo '</div>';
-			}
+
+			// Skin version
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin version').':</label>';
+				echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
+			echo '</div>';
 
 			// Skin type
 			echo '<div class="skin_setting_row">';
@@ -75,7 +74,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 
 		echo '</div>';
 		echo '<div class="skin_settings_form">';
-			$Form->begin_fieldset( T_('Edit properties') );
+			$Form->begin_fieldset( T_('System Settings for this skin').get_manual_link( 'skin-system-settings' ) );
 
 			$Form->text_input( 'skin_name', $edited_Skin->name, 32, T_('Skin name'), T_('As seen by blog owners'), array( 'required'=>true ) );
 
@@ -85,6 +84,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 														array( 'normal', T_( 'Normal' ), T_( 'Normal skin for general browsing' ) ),
 														array( 'mobile', T_( 'Mobile' ), T_( 'Mobile skin for mobile phones browsers' ) ),
 														array( 'tablet', T_( 'Tablet' ), T_( 'Tablet skin for tablet browsers' ) ),
+														array( 'rwd', T_( 'RWD' ), T_( 'Skin can be used for general, mobile phones and tablet browsers' ) ),
 														array( 'feed', T_( 'XML Feed' ), T_( 'Special system skin for XML feeds like RSS and Atom' ) ),
 														array( 'sitemap', T_( 'XML Sitemap' ), T_( 'Special system skin for XML sitemaps' ) ),
 													),
@@ -92,7 +92,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 											true // separate lines
 									 );
 			$Form->end_fieldset();
-		
+
 		echo '</div>';
 
 	$Form->end_fieldset();

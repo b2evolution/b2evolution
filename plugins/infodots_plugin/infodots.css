@@ -12,6 +12,9 @@
 	margin: 0 !important;
 }
 .infodots_image .infodots_dot:after {
+	-webkit-box-sizing: initial;
+	-moz-box-sizing: initial;
+	box-sizing: initial; /* Always show red dots in the middle even with Bootstrap */
 	content: "";
 	position: absolute;
 	top: -11px;
@@ -27,6 +30,7 @@
 	border: 1px solid transparent; /* Fix for IE to correct working of border-radius */
 }
 .infodots_image .infodots_dot:before {
+	box-sizing: content-box;
 	content: "";
 	z-index: 1;
 	position: absolute;

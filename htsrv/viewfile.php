@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -51,12 +51,7 @@ $current_User->check_perm( 'files', 'view', true, $perm_blog );
 
 // Load the other params:
 param( 'viewtype', 'string', true, true );
-param( 'path', 'string', true, true );
-
-if ( false !== strpos( urldecode( $path ), '..' ) )
-{
-	debug_die( 'Relative pathnames not allowed!' );
-}
+param( 'path', 'filepath', true, true );
 
 // Load fileroot infos
 $FileRootCache = & get_FileRootCache();
@@ -105,6 +100,9 @@ switch( $action )
 require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
 require_css( 'basic.css', 'rsc_url' ); // Basic styles
 require_css( 'viewfile.css', 'rsc_url' );
+
+// Send the predefined cookies:
+evo_sendcookies();
 
 headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
 ?>
@@ -196,7 +194,7 @@ switch( $viewtype )
 
 			if( !$buffer_lines )
 			{
-				echo '<p>** '.T_('Empty file!').' ** </p></div>';
+				echo '<p>** '.T_('Empty file').'! ** </p></div>';
 			}
 			else
 			{

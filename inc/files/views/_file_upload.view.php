@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Settings;
 
-global $upload_quickmode, $failedFiles, $ads_list_path, $renamedMessages, $renamedFiles;
+global $failedFiles, $ads_list_path, $renamedMessages, $renamedFiles;
 
 global $fm_FileRoot;
 
@@ -92,7 +92,7 @@ global $fm_FileRoot;
 		var uploadfiles = document.getElementById("uploadfileinputs");
 		var newLI = document.createElement("li");
 		var closeLink = document.createElement("a");
-		closeLink.innerHTML = '<?php echo get_icon( 'close' ); ?>';
+		closeLink.innerHTML = '<?php echo format_to_js( get_icon( 'close' ) ); ?>';
 		closeLink.className = 'btn btn-default pull-right';
 		var closeImage = jQuery( closeLink ).children( 'span' );
 
@@ -136,7 +136,6 @@ global $fm_FileRoot;
 	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
-	$Form->hidden( 'upload_quickmode', $upload_quickmode );
 	$Form->hiddens_by_key( get_memorized() );
 
 	$Widget = new Widget( 'file_browser' );
@@ -145,7 +144,7 @@ global $fm_FileRoot;
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
-<table id="fm_browser" cellspacing="0" cellpadding="0" class="table table-striped table-bordered table-hover table-condensed">
+<table id="fm_browser" cellspacing="0" cellpadding="0" class="table table-bordered table-condensed">
 	<tbody>
 		<tr>
 			<?php

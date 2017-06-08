@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -46,6 +46,8 @@ global $Plugins;
  */
 global $AdminUI;
 
+/*
+ * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 
 // Admin skin dropdown list handler
 // Display settings corresponding only for the current (loaded) admin skin
@@ -73,6 +75,7 @@ global $AdminUI;
 </script>
 <?php
 
+*/
 
 // Begin payload block:
 $this->disp_payload_begin();
@@ -85,15 +88,15 @@ user_prevnext_links( array(
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
-$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 
 if( !$user_profile_only )
 {
 	echo_user_actions( $Form, $edited_User, $action );
 }
 
-$form_text_title = T_( 'Edit notifications' ); // used for js confirmation message on leave the changed form
-$form_title = get_usertab_header( $edited_User, 'advanced', T_( 'Edit advanced preferences' ) );
+$form_text_title = T_( 'Edit advanced preferences' ); // used for js confirmation message on leave the changed form
+$form_title = get_usertab_header( $edited_User, 'advanced', '<span class="nowrap">'.T_( 'Edit advanced preferences' ).'</span>'.get_manual_link( 'user-advanced-tab' ) );
 
 $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
@@ -109,6 +112,8 @@ $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_t
 
 $Form->begin_fieldset( T_('Preferences').get_manual_link('user_preferences') );
 
+/*
+ * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 $value_admin_skin = get_param('edited_user_admin_skin');
 if( !$value_admin_skin )
 { // no value supplied through POST/GET
@@ -120,11 +125,15 @@ if( !$value_admin_skin )
 }
 
 $Form->hidden( 'current_admin_skin', $value_admin_skin );
+ */
 
 if( $action != 'view' )
 { // We can edit the values:
 
+	/*
+	 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 	$Form->select_input_array( 'edited_user_admin_skin', $value_admin_skin, get_admin_skins(), T_('Admin skin'), T_('The skin defines how the backoffice appears to you.'), array( 'onchange' => 'admin_skin_changed()' ) );
+	 */
 
   // fp> TODO: We gotta have something like $edited_User->UserSettings->get('legend');
 	// Icon/text thresholds:
@@ -155,7 +164,11 @@ if( $action != 'view' )
 }
 else
 { // display only
+
+	/*
+	 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 	$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );
+	 */
 
 	// fp> TODO: a lot of things will not be displayed in view only mode. Do we want that?
 
@@ -192,7 +205,8 @@ if( $action != 'view' )
 
 		ob_start();
 		// UserSettings:
-		$plugin_user_settings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true, 'user_ID' => $edited_User->ID) );
+		$tmp_params = array( 'for_editing' => true, 'user_ID' => $edited_User->ID );
+		$plugin_user_settings = $loop_Plugin->GetDefaultUserSettings( $tmp_params );
 		if( is_array($plugin_user_settings) )
 		{
 			foreach( $plugin_user_settings as $l_name => $l_meta )
@@ -203,8 +217,8 @@ if( $action != 'view' )
 		}
 
 		// fp> what's a use case for this event? (I soooo want to nuke it...)
-		$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter',
-			$tmp_params = array( 'Form' => & $Form, 'User' => $edited_User ) );
+		$tmp_params = array( 'Form' => & $Form, 'User' => $edited_User );
+		$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter', $tmp_params );
 
 		$has_contents = strlen( ob_get_contents() );
 		$Form->end_fieldset();

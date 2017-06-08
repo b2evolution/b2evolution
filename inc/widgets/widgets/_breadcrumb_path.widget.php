@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,10 +27,10 @@ class breadcrumb_path_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function breadcrumb_path_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'breadcrumb_path' );
+		parent::__construct( $db_row, 'core', 'breadcrumb_path' );
 	}
 
 
@@ -107,16 +107,24 @@ class breadcrumb_path_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $cat, $disp;
+		global $Collection, $Blog, $cat, $disp;
 
 		$params = array_merge( array(
 				'item_mask'        => '<a href="$url$">$title$</a>',
 				'item_active_mask' => '$title$',
+				'suffix_text'      => '', // Used to add custom item at the end of list
 			), $params );
 
 		$this->init_display( $params );
 
 		$breadcrumbs = array();
+
+		if( ! empty( $this->disp_params['suffix_text'] ) )
+		{	// Append custom breadcrumb item at the end:
+			$breadcrumbs[] = array(
+					'title' => $this->disp_params['suffix_text'],
+				);
+		}
 
 		if( ! empty( $disp ) && $disp == 'single' )
 		{ // Include current post

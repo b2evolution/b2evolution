@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2007 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * @package plugins
@@ -66,7 +66,7 @@ class code_highlight_plugin extends Plugin
 	var $name = 'Code highlight';
 	var $code = 'evo_code';
 	var $priority = 27;
-	var $version = '5.0.0';
+	var $version = '6.9.2';
 	var $author = 'Astonish Me';
 	var $group = 'rendering';
 	var $help_topic = 'code-highlight-plugin';
@@ -114,15 +114,14 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
 	function GetDefaultSettings( & $params )
 	{
@@ -145,22 +144,22 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Allowing the user to override the display of the toolbar.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
 	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 *
-	 * @return array
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		return array(
 				'display_toolbar' => array(
 					'label' => T_( 'Display code toolbar' ),
 					'defaultvalue' => $this->Settings->get('toolbar_default'),
 					'type' => 'checkbox',
-					'note' => $this->T_( 'Display the code toolbar' ),
+					'note' => $this->T_( 'Display code toolbar' ),
 				),
 			);
 	}
@@ -180,7 +179,7 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -193,13 +192,13 @@ class code_highlight_plugin extends Plugin
 			if( !empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{ // Comment is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;
@@ -211,7 +210,7 @@ class code_highlight_plugin extends Plugin
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'display_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'toolbar_default' ) ) ) )
 		{
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 		return false;
 	}
@@ -230,14 +229,35 @@ class code_highlight_plugin extends Plugin
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'display_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'toolbar_default' ) ) ) )
 		{
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 		return false;
 	}
 
 
 	/**
-	 * Display a toolbar in admin
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( !empty( $apply_rendering ) && $apply_rendering != 'never'
+		&& ( ( is_logged_in() && $this->UserSettings->get( 'display_toolbar' ) )
+			|| ( !is_logged_in() && $this->Settings->get( 'toolbar_default' ) ) ) )
+		{
+			return $this->DisplayCodeToolbar( $params );
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -247,52 +267,60 @@ class code_highlight_plugin extends Plugin
 		if( !empty( $params['Item'] ) )
 		{	// Item is set, get Blog from post
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
 			}
 		}
 
-		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
-		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( empty( $apply_rendering ) || $apply_rendering == 'never' || ! $this->UserSettings->get( 'display_toolbar' ) )
-		{ // This plugin is disabled for this blog or user doesn't want the toolbar, don't display it:
+		{	// This plugin is disabled for this blog or user doesn't want the toolbar, don't display it:
 			return false;
 		}
-		$this->DisplayCodeToolbar();
+		$this->DisplayCodeToolbar( $params );
 	}
 
 
-	function DisplayCodeToolbar()
+	/**
+	 * Display toolbar
+	 *
+	 * @param array Params
+	 */
+	function DisplayCodeToolbar( $params = array() )
 	{
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 
 		// TODO: dh> make this optional.. just like with line numbers, this "Code" line is not feasible with oneliners.
 		echo $this->get_template( 'toolbar_title_before' ).T_('Code').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
-		echo '<input type="button" id="code_samp" title="'.T_('Insert &lt;samp&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|samp" value="samp" />';
-		echo '<input type="button" id="code_kbd" title="'.T_('Insert &lt;kbd&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|kbd" value="kbd" />';
-		echo '<input type="button" id="code_var" title="'.T_('Insert &lt;var&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|var" value="var" />';
-		echo '<input type="button" id="code_code" title="'.T_('Insert &lt;code&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|code" value="code" />';
+		echo '<input type="button" id="code_samp" title="'.T_('Insert &lt;samp&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'code_tag|samp" value="samp" />';
+		echo '<input type="button" id="code_kbd" title="'.T_('Insert &lt;kbd&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'code_tag|kbd" value="kbd" />';
+		echo '<input type="button" id="code_var" title="'.T_('Insert &lt;var&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'code_tag|var" value="var" />';
+		echo '<input type="button" id="code_code" title="'.T_('Insert &lt;code&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'code_tag|code" value="code" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_group_before' );
-		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codespan_tag| " value="codespan" />';
+		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codespan_tag| " value="codespan" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_group_before' );
-		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag| " value="codeblock" />';
-		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|xml" value="XML" />';
-		echo '<input type="button" id="codeblock_html" title="'.T_('Insert HTML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|html" value="HTML" />';
-		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|php" value="PHP" />';
-		echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|css" value="CSS" />';
-		echo '<input type="button" id="codeblock_shell" title="'.T_('Insert Shell codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|shell" value="Shell" />';
+		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag| " value="codeblock" />';
+		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag|xml" value="XML" />';
+		echo '<input type="button" id="codeblock_html" title="'.T_('Insert HTML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag|html" value="HTML" />';
+		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag|php" value="PHP" />';
+		echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag|css" value="CSS" />';
+		echo '<input type="button" id="codeblock_shell" title="'.T_('Insert Shell codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag|shell" value="Shell" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_after' );
@@ -302,23 +330,23 @@ class code_highlight_plugin extends Plugin
 
 		?><script type="text/javascript">
 			//<![CDATA[
-			function code_tag( tag_name )
+			function <?php echo $params['js_prefix']; ?>code_tag( tag_name )
 			{
 				tag = '<' + tag_name + '>';
 
-				textarea_wrap_selection( b2evoCanvas, tag, '</' + tag_name + '>', 0 );
+				textarea_wrap_selection( <?php echo $params['js_prefix']; ?>b2evoCanvas, tag, '</' + tag_name + '>', 0 );
 			}
-			function codespan_tag( lang )
+			function <?php echo $params['js_prefix']; ?>codespan_tag( lang )
 			{
 				tag = '[codespan]';
 
-				textarea_wrap_selection( b2evoCanvas, tag, '[/codespan]', 0 );
+				textarea_wrap_selection( <?php echo $params['js_prefix']; ?>b2evoCanvas, tag, '[/codespan]', 0 );
 			}
-			function codeblock_tag( lang )
+			function <?php echo $params['js_prefix']; ?>codeblock_tag( lang )
 			{
 				tag = '[codeblock lang="'+lang+'" line="1"]';
 
-				textarea_wrap_selection( b2evoCanvas, tag, '[/codeblock]', 0 );
+				textarea_wrap_selection( <?php echo $params['js_prefix']; ?>b2evoCanvas, tag, '[/codeblock]', 0 );
 			}
 			//]]>
 		</script><?php
@@ -430,7 +458,24 @@ class code_highlight_plugin extends Plugin
 	}
 
 
-	function BeforeCommentFormInsert( $params )
+	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 */
+	function EmailFormSent( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{	// render code blocks in email:
+			$this->FilterItemContents( $params );
+			if( empty( $params['dont_remove_pre'] ) || !$params['dont_remove_pre'] )
+			{	// remove <pre>:
+				$params['content'] = preg_replace( '#(<\!--\s*codeblock[^-]*?\s*-->)<pre[^>]*><code>(.+?)</code></pre>(<\!--\s+/codeblock\s*-->)#is', '$1<code>$2</code>$3', $params['content'] );
+			}
+		}
+	}
+
+
+	function BeforeCommentFormInsert( & $params )
 	{
 		$Comment = & $params['Comment'];
 		$comment_Item = & $Comment->get_Item();
@@ -574,33 +619,36 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Spits out the styles used
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
 	 *
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
 		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
 		{ // Don't load css/js files when plugin is not enabled
 			return;
 		}
 
-		require_css( $this->get_plugin_url().'amcode.css', true );
+		$this->require_css( 'amcode.css' );
 	}
 
 
 	/**
-	 * Spits out the styles used
+	 * Event handler: Called when ending the admin html head section.
 	 *
-	 * @see Plugin::AdminEndHtmlHead()
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead()
+	function AdminEndHtmlHead( & $params )
 	{
-		$this->SkinBeginHtmlHead();
+		$this->SkinBeginHtmlHead( $params );
 	}
 
 

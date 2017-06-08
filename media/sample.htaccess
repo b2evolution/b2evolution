@@ -2,3 +2,12 @@
 <IfModule mod_php5.c>
 	php_flag engine off
 </IfModule>
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+
+	# Redirect any _evocache file that does not exist to generate new by htsrv/getfile.php:
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{QUERY_STRING} mtime=(\d+)
+	RewriteRule ^(.+/[_\.]evocache/.+/([a-z0-9\-]+)\.[a-z]{3,4})$ /htsrv/getfile.php?abspath=$1&size=$2&mtime=%1 [L]
+</IfModule>

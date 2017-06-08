@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -48,6 +48,12 @@ else
 }
 
 $Results->cols[] = array(
+						'th' => T_('Version'),
+						'td_class' => 'center',
+						'td' => '%get_skin_version( #skin_ID# )%'
+					);
+
+$Results->cols[] = array(
 						'th' => T_('Skin type'),
 						'order' => 'skin_type',
 						'td_class' => 'center',
@@ -55,8 +61,9 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => T_('Blogs'),
+						'th' => T_('Collections'),
 						'order' => 'nb_blogs',
+						'default_dir' => 'D',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'center',
 						'td' => '~conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )~',
@@ -76,7 +83,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'td_class' => 'shrinkwrap',
 							'td' => action_icon( TS_('Edit skin properties...'), 'properties',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
-	                    .action_icon( TS_('Reload containers!'), 'reload',
+	                    .action_icon( TS_('Reload containers').'!', 'reload',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload&amp;'.url_crumb('skin').'\')%' )
 											.'~conditional( #nb_blogs# < 1, \''
 											.action_icon( TS_('Uninstall this skin!'), 'delete',

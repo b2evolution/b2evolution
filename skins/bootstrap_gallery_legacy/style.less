@@ -166,85 +166,6 @@ textarea.message_text {
 	width: 95%;
 }
 
-// Fix the form elements
-.comment_form {
-	h3 {
-		margin: 0;
-	}
-	.panel {
-		margin: 0;
-		border: none;
-		-webkit-box-shadow: none;
-		box-shadow: none;
-		.panel-body {
-			padding: 0;
-		}
-	}
-}
-.form-horizontal {
-	.form-group, .custom_content {
-		margin-left: 0;
-		margin-right: 0;
-	}
-	fieldset {
-		margin-top: 0;
-	}
-	input[type=file] {
-		display: inline;
-	}
-}
-#comment_date_field {
-	input {
-		width: 80px;
-	}
-	label {
-		font-weight: normal;
-	}
-}
-.form-group[id^="ffield_uploadfile"] .controls {
-	padding-top: 5px;
-	input {
-		line-height: 10px;
-	}
-}
-// Comment template
-.comment_rating {
-	margin-top: 2px;
-}
-#comment_edit .comment_rating {
-	margin-top: 9px;
-}
-.ratings_table {
-	margin-bottom: 10px;
-	.rating_summary {
-		border-spacing: 1px;
-		border-collapse: separate;
-	}
-	.progress {
-		border-radius: 0;
-		height: 13px;
-	}
-}
-#comment_preview {
-	background-color: #FFF;
-}
-#comment_date_field .panel {
-	border: none;
-	box-shadow: none;
-	margin-bottom: 0;
-	.panel-body {
-		padding: 0;
-		.control-label {
-			font-weight: bold;
-		}
-		.controls .form-group {
-			display: inline-block;
-			padding-left: 15px;
-			margin-bottom: 0;
-		}
-	}
-}
-
 // Disp=single form
 .evo_form__comment {
 	.form-group {
@@ -268,6 +189,11 @@ textarea.message_text {
 			}
 		}
 	}
+}
+
+// Disp=single comment notification button
+.evo_post_comment_notification a {
+	white-space: normal;
 }
 
 .evo_post {
@@ -409,7 +335,7 @@ div.action_messages, div.log_container {
 // Bootstrap Gallery styles
 html, body {
 	width: auto !important;
-	overflow-x: hidden !important;
+	// overflow-x: hidden !important;
 	margin:0;
 	padding:0;
 	height:100%;
@@ -458,7 +384,7 @@ text-align: center;
 .evo_post {
 }
 .evo_post_content {
-	padding-top: 15px;	
+	padding-top: 15px;
 }
 .single-image {
 	display: inline-block;
@@ -467,6 +393,7 @@ text-align: center;
 	.img-responsive {
 		width: 100%;
 		text-align: center;
+		display: inline-block;
 	}
 }
 .float-right {
@@ -521,7 +448,7 @@ div.evo_image_index div {
 			font-family: FontAwesome;
 			margin-right: 5px;
 		}
-	}	
+	}
 	.nav_album_title {
 		display: inline-block;
 		margin-top: 8px;
@@ -632,7 +559,7 @@ div.evo_image_index div {
 		padding-bottom: 10px;
 	}
 }
-@media screen and (max-width: 991px) { 
+@media screen and (max-width: 991px) {
 	.single-image {
 		margin-left: 0px;
 		margin-right: 0px;
@@ -650,7 +577,7 @@ div.evo_image_index div {
 	.evo_details, .col-lg-12 {
 		padding-left: 0px;
 		padding-right: 0px;
-	}	
+	}
 	.single-image {
 		margin-left: 42px;
 		margin-right: 42px;
@@ -705,6 +632,10 @@ div.evo_image_index div {
 }
 .label {
 	font-size: 14px !important;
+}
+// Remove predefined bootstrap background-color style
+.panel, .avatar_main_frame, .pagination li a {
+	background-color: transparent;
 }
 // Bottom b2evo image background issue fix
 .powered_by {

@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_manual
@@ -30,12 +30,32 @@ if( ! empty( $params['Item'] ) )
 
 ?>
 <li><?php
-		$item_edit_link = $Item->get_edit_link( array(
+		$item_action_links = $Item->get_edit_link( array(
+				'before' => '',
+				'after'  => '',
 				'class' => button_class( 'text' ),
 			) );
+		$item_action_links .= $Item->get_copy_link( array(
+				'before' => '',
+				'after'  => '',
+				'class' => button_class(),
+				'text'  => '#icon#',
+			) );
+		if( ! empty( $item_action_links ) )
+		{	// Group all action icons:
+			$item_action_links = '<div class="'.button_class( 'group' ).'">'.$item_action_links.'</div>';
+		}
+
+		// Flag:
+		$item_flag = $Item->get_flag( array(
+				'before'       => ' ',
+				'only_flagged' => true,
+			) );
+
+		// Title:
 		$Item->title( array(
 				'before'          => $params['before_title'],
-				'after'           => $params['after_title'].$item_edit_link.'<div class="clear"></div>',
+				'after'           => $item_flag.$params['after_title'].$item_action_links.'<div class="clear"></div>',
 				'before_title'    => get_icon( 'file_message' ),
 				//'after'      => ' <span class="red">'.( $Item->get('order') > 0 ? $Item->get('order') : 'NULL').'</span>'.$params['after_title'].$item_edit_link.'<div class="clear"></div>',
 				'post_navigation' => $params['post_navigation'],

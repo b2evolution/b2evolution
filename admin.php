@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the main dispatcher for the admin interface.
+ * This is the main dispatcher for the admin interface, a.k.a. The Back-Office.
  *
  * ---------------------------------------------------------------------------------------------------------------
  * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
@@ -12,7 +12,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -59,7 +59,7 @@ if( !$current_User->check_status( 'can_access_admin' ) )
 {
 	if( $current_User->check_status( 'can_be_validated' ) )
 	{ // redirect back to the login page
-		$action = 'req_validatemail';
+		$action = 'req_activate_email';
 		require $htsrv_path.'login.php';
 	}
 	else
@@ -81,14 +81,14 @@ if( isset($collections_Module) )
 	$user_selected_blog = (int)$UserSettings->get('selected_blog');
 	$BlogCache = & get_BlogCache();
 	if( param( 'blog', 'integer', NULL, true ) === NULL      // We got no explicit blog choice (not even '0' for 'no blog'):
-		|| ($blog > 0 && ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false )) )) // or we requested a nonexistent blog
+		|| ( $blog > 0 && ! ( $Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) ) ) // or we requested a nonexistent blog
 	{ // Try the memorized blog from the previous action:
 		$blog = $user_selected_blog;
-		if( ! ( $Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) )
+		if( ! ( $Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) )
 		{ // That one doesn't exist either...
 			$blog = 0;
 			// Unset $Blog because otherwise isset( $Blog ) returns true and it may cause issues later
-			unset( $Blog );
+			unset( $Blog, $Collection );
 		}
 	}
 	elseif( $blog != $user_selected_blog )
@@ -132,29 +132,21 @@ if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 			$Debuglog->add( 'The default admin skin ['.$admin_skin.'] does not exist!', array('skin','error') );
 		}
 
-		if( file_exists(sprintf( $admin_skin_path, 'chicago' )) )
-		{ // 'legacy' does exist
-			$admin_skin = 'chicago';
+		// Get the first one available one:
+		$admin_skin_dirs = get_admin_skins();
 
-			$Debuglog->add( 'Falling back to legacy admin skin.', 'skins' );
+		if( $admin_skin_dirs === false )
+		{
+			$Debuglog->add( 'No admin skin found! Check that the path '.$adminskins_path.' exists.', array('skin','error') );
+		}
+		elseif( empty($admin_skin_dirs) )
+		{ // No admin skin directories found
+			$Debuglog->add( 'No admin skin found! Check that there are skins in '.$adminskins_path.'.', array('skin','error') );
 		}
 		else
-		{ // get the first one available one
-			$admin_skin_dirs = get_admin_skins();
-
-			if( $admin_skin_dirs === false )
-			{
-				$Debuglog->add( 'No admin skin found! Check that the path '.$adminskins_path.' exists.', array('skin','error') );
-			}
-			elseif( empty($admin_skin_dirs) )
-			{ // No admin skin directories found
-				$Debuglog->add( 'No admin skin found! Check that there are skins in '.$adminskins_path.'.', array('skin','error') );
-			}
-			else
-			{
-				$admin_skin = array_shift($admin_skin_dirs);
-				$Debuglog->add( 'Falling back to first available skin.', 'skins' );
-			}
+		{
+			$admin_skin = array_shift($admin_skin_dirs);
+			$Debuglog->add( 'Falling back to first available skin.', 'skins' );
 		}
 	}
 }

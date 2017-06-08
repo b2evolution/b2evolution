@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -114,7 +114,7 @@ function replace_special_chars( $str, $post_locale = NULL )
 	{	// Use locale 'transliteration_map' if present
 		if( ! array_key_exists( '', $locales[$our_locale]['transliteration_map'] ) )
 		{	// Make sure there's no empty string key, otherwise strtr() returns false
-			if( $tmp_str = strtr( $str, $locales[$our_locale]['transliteration_map'] ) );
+			if( $tmp_str = strtr( $str, $locales[$our_locale]['transliteration_map'] ) )
 			{	// Use newly transliterated string
 				$str = $tmp_str;
 			}

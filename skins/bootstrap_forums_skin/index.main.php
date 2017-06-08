@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '6.4' ) < 0 )
+if( evo_version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -48,9 +48,6 @@ if( $disp == 'posts' )
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
-	'edit_text_create'  => T_('New topic'),
-	'edit_text_update'  => T_('Edit topic'),
-	'edit_text_copy'    => T_('Duplicate topic'),
 	'catdir_text'       => T_('Forum'),
 	'category_text'     => T_('Forum').': ',
 	'comments_text'     => T_('Latest Replies'),
@@ -58,6 +55,7 @@ skin_include( '_html_header.inc.php', array(
 	'posts_text'        => $posts_text,
 	'useritems_text'    => T_('User\'s topics'),
 	'usercomments_text' => T_('User\'s replies'),
+	'flagged_text'      => T_('Flagged topics'),
 ) );
 // -------------------------------- END OF HEADER --------------------------------
 
@@ -146,7 +144,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="row">
 
-	<div class="col-md-12">
+	<div class="<?php echo $Skin->get_column_class(); ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -170,7 +168,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				// TODO: fp>yura : this MUST NOT be in the skin. It must be in the b2evolution core (somewhere where we determine $disp)
 				$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
 			}
-			
+
 			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
 			request_title( array(
 					'title_before'      => '<h2 class="page_title">',
@@ -179,15 +177,13 @@ siteskin_include( '_site_body_header.inc.php' );
 					'title_page_disp'   => false,
 					'format'            => 'htmlbody',
 					'display_edit_links'=> false,
-					'edit_text_create'  => T_('New topic'),
-					'edit_text_update'  => T_('Edit topic'),
-					'edit_text_copy'    => T_('Duplicate topic'),
 					'category_text'     => '',
 					'categories_text'   => '',
 					'catdir_text'       => '',
 					'comments_text'     => T_('Latest Replies'),
 					'front_text'        => '',
 					'posts_text'        => '',
+					'flagged_text'      => '',
 					'useritems_text'    => T_('User\'s topics'),
 					'usercomments_text' => T_('User\'s replies'),
 					'register_text'     => '',
@@ -202,7 +198,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 
 		<?php
-		if( in_array( $disp, array( 'front', 'single', 'page' ) ) || ( $disp == 'posts' && ! empty( $cat ) ) )
+		if( in_array( $disp, array( 'front', 'single', 'page', 'posts' ) ) )
 		{ // Widget 'Search form':
 			skin_widget( array(
 					// CODE for the widget:
@@ -224,7 +220,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
-					'author_link_text' => 'preferredname',
+					'author_link_text' => 'auto',
 					// Profile tabs to switch between user edit forms
 					'profile_tabs' => array(
 						'block_start'         => '<nav><ul class="nav nav-tabs profile_tabs">',
@@ -238,9 +234,11 @@ siteskin_include( '_site_body_header.inc.php' );
 					'pagination' => array(
 						'block_start'           => '<div class="center"><ul class="pagination">',
 						'block_end'             => '</ul></div>',
-						'page_current_template' => '<span><b>$page_num$</b></span>',
+						'page_current_template' => '<span>$page_num$</span>',
 						'page_item_before'      => '<li>',
 						'page_item_after'       => '</li>',
+						'page_item_current_before' => '<li class="active">',
+						'page_item_current_after'  => '</li>',
 						'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
 						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
@@ -285,11 +283,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'featured_intro_before' => '<div class="jumbotron">',
 					'featured_intro_after'  => '</div>',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
-					// Edit post form
-					'edit_text_create'  => T_('New topic'),
-					'edit_text_update'  => T_('Edit topic'),
-					'edit_text_copy'    => T_('Duplicate topic'),
+					'msgform_form_title' => T_('Contact'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
@@ -300,12 +294,120 @@ siteskin_include( '_site_body_header.inc.php' );
 
 	</div><!-- .col -->
 
+
+	<?php
+	if( $Skin->is_visible_sidebar() )
+	{ // Display sidebar:
+	?>
+	<aside class="col-md-3<?php echo ( $Skin->get_setting_layout() == 'left_sidebar' ? ' pull-left' : '' ); ?>">
+		<!-- =================================== START OF SIDEBAR =================================== -->
+		<div class="evo_container evo_container__sidebar">
+		<?php
+			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
+			// Display container contents:
+			skin_container( NT_('Sidebar'), array(
+					// The following (optional) params will be used as defaults for widgets included in this container:
+					// This will enclose each widget in a block:
+					'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
+					'block_end' => '</div>',
+					// This will enclose the title of each widget:
+					'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+					'block_title_end' => '</h4></div>',
+					// This will enclose the body of each widget:
+					'block_body_start' => '<div class="panel-body">',
+					'block_body_end' => '</div>',
+					// If a widget displays a list, this will enclose that list:
+					'list_start' => '<ul>',
+					'list_end' => '</ul>',
+					// This will enclose each item in a list:
+					'item_start' => '<li>',
+					'item_end' => '</li>',
+					// This will enclose sub-lists in a list:
+					'group_start' => '<ul>',
+					'group_end' => '</ul>',
+					// This will enclose (foot)notes:
+					'notes_start' => '<div class="notes">',
+					'notes_end' => '</div>',
+					// Widget 'Search form':
+					'search_class'         => 'compact_search_form',
+					'search_input_before'  => '<div class="input-group">',
+					'search_input_after'   => '',
+					'search_submit_before' => '<span class="input-group-btn">',
+					'search_submit_after'  => '</span></div>',
+				) );
+			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
+		?>
+		</div>
+
+		<div class="evo_container evo_container__sidebar2">
+		<?php
+			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
+			// Display container contents:
+			skin_container( NT_('Sidebar 2'), array(
+					// The following (optional) params will be used as defaults for widgets included in this container:
+					// This will enclose each widget in a block:
+					'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
+					'block_end' => '</div>',
+					// This will enclose the title of each widget:
+					'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+					'block_title_end' => '</h4></div>',
+					// This will enclose the body of each widget:
+					'block_body_start' => '<div class="panel-body">',
+					'block_body_end' => '</div>',
+					// If a widget displays a list, this will enclose that list:
+					'list_start' => '<ul>',
+					'list_end' => '</ul>',
+					// This will enclose each item in a list:
+					'item_start' => '<li>',
+					'item_end' => '</li>',
+					// This will enclose sub-lists in a list:
+					'group_start' => '<ul>',
+					'group_end' => '</ul>',
+					// This will enclose (foot)notes:
+					'notes_start' => '<div class="notes">',
+					'notes_end' => '</div>',
+					// Widget 'Search form':
+					'search_class'         => 'compact_search_form',
+					'search_input_before'  => '<div class="input-group">',
+					'search_input_after'   => '',
+					'search_submit_before' => '<span class="input-group-btn">',
+					'search_submit_after'  => '</span></div>',
+				) );
+			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
+		?>
+		</div>
+	</aside><!-- .col -->
+	<?php } ?>
+
 	<footer class="col-md-12">
 	<?php skin_include( '_legend.inc.php' ); ?>
 	</footer>
 
 </div><!-- .row -->
 
+<?php
+// ------------------------- "Forum Front Secondary Area" CONTAINER EMBEDDED HERE --------------------------
+if( $disp == 'front' )
+{
+?>
+<section class="secondary_area">
+	<div class="evo_container evo_container__forum_front_secondary">
+	<?php
+		// Display container and contents:
+		skin_container( NT_('Forum Front Secondary Area'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start'       => '<div class="evo_widget $wi_class$">',
+				'block_end'         => '</div>',
+				'block_title_start' => '<h2 class="page-header">',
+				'block_title_end'   => '</h2>',
+			) );
+		// ----------------------------- END OF "Forum Front Secondary Area" CONTAINER -----------------------------
+	?>
+	</div>
+</section>
+<?php
+}
+?>
 
 <footer class="row">
 
@@ -315,7 +417,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<div class="evo_container evo_container__footer">
 		<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
@@ -377,7 +479,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

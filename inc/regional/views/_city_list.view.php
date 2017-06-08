@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -256,7 +256,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 		);
 
 	$Results->global_icon( T_('Create a new city ...'), 'new',
-				regenerate_url( 'action', 'action=new'), T_('New city').' &raquo;', 3, 4  );
+				regenerate_url( 'action', 'action=new'), T_('New city').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 	$Results->global_icon( T_('Import cities from CSV file ...'), 'new',
 				regenerate_url( 'action', 'action=csv'), T_('Import CSV').' &raquo;', 3, 4  );
@@ -270,7 +270,7 @@ jQuery( '#c' ).change( function ()
 {	// Load option list with regions for seleted country
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_regions_option_list&mode=load_subregions&ctry_id=' + jQuery( this ).val(),
 	success: function( result )
 		{
@@ -292,7 +292,7 @@ function load_subregions( region_ID )
 {	// Load option list with sub-regions for seleted region
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_subregions_option_list&rgn_id=' + region_ID,
 	success: function( result )
 		{

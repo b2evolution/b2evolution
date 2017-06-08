@@ -1,6 +1,6 @@
 # Apache configuration for b2evolution's base folder
 # Lines starting with # are comments.
-# Updated 2013-07-16
+# Updated 2016-01-25
 
 # PHP / SECURITY:
 <IfModule mod_php5.c>
@@ -8,16 +8,32 @@
 	# AddHandler application/x-httpd-php5 .php
 
 	# The following will try to configure PHP in the way b2evolution would like it to be:
+	# However, these falgs will only work if the server configuration allows them...
+
+	# Increase memory limit
+	php_value memory_limit 384M
+
+	# Security settings
 	php_flag register_globals Off
+	php_flag allow_url_include Off
+	php_flag magic_quotes_gpc Off
+
+	# For uploading
+	php_value upload_max_filesize 32M
+	php_value post_max_size 40M
+
+	# You may increase the following if PHP is not able to increase it by itself when needed
+	# Otherwiwse it's better to keep the number low enough for general use
+	php_value max_execution_time 30
+	
 	# You may want to turn the following to Off on production servers
 	# Please do this only if you know what you're doing and will be able to retrieve potential errors from your error log
 	php_flag display_errors On
 	# The following is the same as 'E_ALL & ~ E_STRICT' (except those constants may not be available here)
 	php_value error_reporting 30719
 
-	# You may also need some of the following:
-	# Increase memory limit
-	# php_value memory_limit 256M
+	# To avoid warning about the automatically populating $HTTP_RAW_POST_DATA is deprecated and will be removed in a future version
+	php_value always_populate_raw_post_data -1
 </IfModule>
 
 # DISABLE LISTING FILES ON SERVER:
@@ -36,7 +52,7 @@ Options -Indexes
 
 # CLEAN URLS:
 # The following will ensure you can pass extra params after the filename on the URL
-AcceptPathInfo	On
+AcceptPathInfo On
 
 # CATCH EVERYTHING INTO B2EVO: (even if no php file appears in the URL)
 # The following will allow you to have a blog running right off the site root,
@@ -48,6 +64,9 @@ AcceptPathInfo	On
 	# This line may be needed or not.
 	# enabling this would prevent running in a subdir like /blog/index.php
 	# RewriteBase /
+
+	# Redirect to REST API controller:
+	RewriteRule ^api/v(\d+)/(.+)$ htsrv/rest.php?api_version=$1&api_request=$2 [QSA,L]
 
 	# Redirect any .htm .html or no-extension-file that's not an existing file or directory to index.php:
 	RewriteCond %{REQUEST_FILENAME} !-d

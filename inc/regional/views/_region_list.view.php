@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -45,7 +45,7 @@ if( count( $sql_where ) > 0 )
 // Create result set:
 $Results = new Results( $SQL->get(), 'rgn_', '----A' );
 
-$Results->title = T_('Regions/States').get_manual_link('countries_list');
+$Results->title = T_('Regions/States').get_manual_link('regions-list');
 
 /*
  * STATUS TD:
@@ -221,7 +221,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 		);
 
 	$Results->global_icon( T_('Create a new region...'), 'new',
-				regenerate_url( 'action', 'action=new'), T_('New region').' &raquo;', 3, 4  );
+				regenerate_url( 'action', 'action=new'), T_('New region').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->display();

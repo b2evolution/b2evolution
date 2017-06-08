@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -55,7 +55,7 @@ $Form->begin_form( 'fform', '',
 
 
 // --------------------------- INFO ---------------------------
-$Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
+$Form->begin_fieldset( T_('Plugin info').get_manual_link( 'plugins-editing' ), array( 'class' => 'clear' ) );
 	// Name:
 	$Form->text_input( 'edited_plugin_name', $edited_plugin_name, 25, T_('Name'), '', array('maxlength' => 255) );
 	// Desc:
@@ -76,14 +76,16 @@ if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plu
 	// We use output buffers here to only display the fieldset if there's content in there
 	// (either from PluginSettings or PluginSettingsEditDisplayAfter).
 	ob_start();
-	foreach( $edit_Plugin->GetDefaultSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
+	$tmp_params = array( 'for_editing' => true );
+	foreach( $edit_Plugin->GetDefaultSettings( $tmp_params ) as $l_name => $l_meta )
 	{
 		// Display form field for this setting:
 		autoform_display_field( $l_name, $l_meta, $Form, 'Settings', $edit_Plugin );
 	}
 
 	// This can be used add custom input fields or display custom output (e.g. a test link):
-	$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditDisplayAfter', $tmp_params = array( 'Form' => & $Form ) );
+	$tmp_params = array( 'Form' => & $Form );
+	$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditDisplayAfter', $tmp_params );
 
 	$setting_contents = ob_get_contents();
 	ob_end_clean();
@@ -138,7 +140,7 @@ $Form->end_fieldset();
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	$Form->buttons_input( array(
-		array( 'type' => 'submit', 'name' => 'actionArray[update_edit_settings]', 'value' => T_('Save & Edit...') ),
+		array( 'type' => 'submit', 'name' => 'actionArray[update_edit_settings]', 'value' => T_('Save & edit').'...' ),
 		array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save Changes!'), 'class' => 'SaveButton' ),
 		) );
 }

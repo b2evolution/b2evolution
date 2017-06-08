@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
@@ -29,7 +29,7 @@ class smilies_plugin extends Plugin
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 25;
-	var $version = '5.0.0';
+	var $version = '6.9.2';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
 
@@ -66,11 +66,16 @@ Optionally, it will also display a toolbar for quick insertion of smilies into a
 
 
 	/**
-	* Defaults for user specific settings: "Display toolbar"
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
-	function GetDefaultSettings()
+	function GetDefaultSettings( & $params )
 	{
 		global $rsc_subdir;
 		return array(
@@ -138,15 +143,19 @@ XX(      graydead.gif
  :wave:  icon_wave.gif',
 				),
 			);
-}
+	}
 
 
 	/**
-	 * Allowing the user to override the display of the toolbar.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
-	 * @return array
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		return array(
 				'use_toolbar' => array(
@@ -172,23 +181,29 @@ XX(      graydead.gif
 
 
 	/**
-	 * Display a toolbar in admin
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		if( $this->UserSettings->get('use_toolbar') )
+		global $Collection, $Blog;
+
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
+		    && is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 		{
-			return $this->display_smiley_bar();
+			return $this->display_smiley_bar( $params );
 		}
 		return false;
 	}
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -201,24 +216,25 @@ XX(      graydead.gif
 			if( !empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{ // Comment is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;
 			}
 		}
 
-		if( $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog )
-		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
-			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
+		    && ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
+		    || ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
-			return $this->display_smiley_bar();
+			return $this->display_smiley_bar( $params );
 		}
 		return false;
 	}
@@ -232,11 +248,31 @@ XX(      graydead.gif
 	 */
 	function DisplayMessageToolbar( & $params )
 	{
-		if( $this->get_msg_setting( 'msg_apply_rendering' )
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
-			return $this->display_smiley_bar();
+			return $this->display_smiley_bar( $params );
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
+		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
+			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
+		{
+			return $this->display_smiley_bar( $params );
 		}
 		return false;
 	}
@@ -245,10 +281,15 @@ XX(      graydead.gif
 	/**
 	 * Display the smiley toolbar
 	 *
+	 * @param array Params
 	 * @return boolean did we display a toolbar?
 	 */
-	function display_smiley_bar()
+	function display_smiley_bar( $params )
 	{
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
 		$this->InitSmilies();	// check smilies cached
 
 		$grins = '';
@@ -260,7 +301,7 @@ XX(      graydead.gif
 				$smiled[] = $smiley['image'];
 
 				$grins .= '<span class="'.$this->get_template( 'toolbar_button_class' ).'"'
-					.' data-func="textarea_wrap_selection|b2evoCanvas|'.str_replace( array( "'", '|' ), array( "\'", '\|' ), $smiley['code'] ).'| |1">'
+					.' data-func="textarea_wrap_selection|'.$params['js_prefix'].'b2evoCanvas|'.str_replace( array( "'", '|' ), array( "\'", '\|' ), $smiley['code'] ).'| |1">'
 						.$this->get_smiley_img_tag( $smiley )
 					.'</span> ';
 			}
@@ -269,7 +310,7 @@ XX(      graydead.gif
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo $grins;
 		echo $this->get_template( 'toolbar_group_after' );
@@ -390,7 +431,7 @@ XX(      graydead.gif
 	 */
 	function ReplaceInlinePlaceholderSafe( $text )
 	{
-		return callback_on_non_matching_blocks( $text, '~\[(image|file|inline):\d+:?[^\]]*\]~', array( & $this, 'preg_insert_smilies_callback' ) );
+		return callback_on_non_matching_blocks( $text, '~\[(image|file|inline|video|audio|thumbnail):\d+:?[^\]]*\]~', array( & $this, 'preg_insert_smilies_callback' ) );
 	}
 
 

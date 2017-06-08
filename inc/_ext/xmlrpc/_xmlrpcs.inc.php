@@ -516,7 +516,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		* @param array $dispmap the dispatch map withd efinition of exposed services
 		* @param boolean $servicenow set to false to prevent the server from runnung upon construction
 		*/
-		function xmlrpc_server($dispMap=null, $serviceNow=true)
+		function __construct($dispMap=null, $serviceNow=true)
 		{
 			// if ZLIB is enabled, let the server by default accept compressed requests,
 			// and compress responses sent to clients that support them
@@ -1143,10 +1143,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					{
 						$r = call_user_func($func, $m);
 					}
-					if (!is_a($r, 'xmlrpcresp'))
+					if (!($r instanceof xmlrpcresp))
 					{
 						error_log("XML-RPC: ".__METHOD__.": function $func registered as method handler does not return an xmlrpcresp object");
-						if (is_a($r, 'xmlrpcval'))
+						if ($r instanceof xmlrpcval)
 						{
 							$r = new xmlrpcresp($r);
 						}
@@ -1193,7 +1193,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 						}
 					}
 					// the return type can be either an xmlrpcresp object or a plain php value...
-					if (!is_a($r, 'xmlrpcresp'))
+					if (!($r instanceof xmlrpcresp))
 					{
 						// what should we assume here about automatic encoding of datetimes
 						// and php classes instances???

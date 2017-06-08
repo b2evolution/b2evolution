@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -25,9 +25,10 @@ $creating = $action == 'iprange_new';
 
 $Form = new Form( NULL, 'iprange_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,iprange_ID' ) );
+$Form->global_icon( T_('Delete this IP range!'), 'delete', regenerate_url( 'iprange_ID,action', 'iprange_ID='.$edited_IPRange->ID.'&amp;action=iprange_delete&amp;'.url_crumb( 'iprange' ) ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,iprange_ID' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New IP Range') : T_('IP Range') );
+$Form->begin_form( 'fform', ( $creating ?  T_('New IP Range') : T_('IP Range') ).get_manual_link( 'ip-range-editing' ) );
 
 	$Form->add_crumb( 'iprange' );
 	$Form->hidden( 'action',  $creating ? 'iprange_create' : 'iprange_update' );
@@ -46,6 +47,17 @@ $Form->begin_form( 'fform', $creating ?  T_('New IP Range') : T_('IP Range') );
 
 	$Form->info( T_('Block count'), (int)$edited_IPRange->get( 'block_count' ) );
 
-$Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'save', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 
 ?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( '#delete_iprange_conflicts' ).click( function()
+	{	// Submit form with deleting of all IP range conflicts:
+		jQuery( 'form#iprange_checkchanges' )
+			.append( '<input type="hidden" name="delete_conflicts" value="1" />' )
+			.submit();
+	} );
+} );
+</script>

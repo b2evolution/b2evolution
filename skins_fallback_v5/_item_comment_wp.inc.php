@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  *
@@ -53,12 +53,12 @@ $Comment = & $params['Comment'];
 				{	// Normal comment
 					$Comment->permanent_link( array(
 							'before'    => '',
-							'after'     => ' '.T_('by').' ',
-							'text' 			=> T_('Comment'),
+							'after'     => ' ',
+							'text' 		=> T_('Comment'),
 							'nofollow'	=> true,
 						) );
 				}
-				$Comment->author();
+				$Comment->author( /* TRANS: author name */ T_('by').' ' );
 				if( ! $Comment->get_author_User() )
 				{ // Display action icon to message only if this comment is from a visitor
 					$Comment->msgform_link( $Blog->get( 'msgformurl' ) );
@@ -69,21 +69,21 @@ $Comment = & $params['Comment'];
 			case 'trackback': // Display a trackback:
 				$Comment->permanent_link( array(
 						'before'    => '',
-						'after'     => ' '.T_('by').' ',
+						'after'     => ' ',
 						'text' 			=> T_('Trackback'),
 						'nofollow'	=> true,
 					) );
-				$Comment->author( '', '#', '', '#', 'htmlbody', true );
+				$Comment->author( /* TRANS: author name */ T_('by').' ', '#', '', '#', 'htmlbody', true );
 				break;
 
 			case 'pingback': // Display a pingback:
 				$Comment->permanent_link( array(
 						'before'    => '',
-						'after'     => ' '.T_('by').' ',
+						'after'     => ' ',
 						'text' 			=> T_('Pingback'),
 						'nofollow'	=> true,
 					) );
-				$Comment->author( '', '#', '', '#', 'htmlbody', true );
+				$Comment->author( /* TRANS: author name */ T_('by').' ', '#', '', '#', 'htmlbody', true );
 				break;
 		}
 	?>

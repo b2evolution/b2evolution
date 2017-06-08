@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -25,7 +25,7 @@ $SQL->WHERE( 'slug_type = "item" AND slug_itm_ID NOT IN (SELECT post_ID FROM T_i
 $Results = new Results( $SQL->get(), 'broken_slugs_' );
 
 $Results->title = T_( 'Broken item slugs with no matching item' );
-$Results->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
+$Results->global_icon( T_('Cancel').'!', 'close', regenerate_url( 'action' ) );
 
 $Results->cols[] = array(
 	'th' => T_('Slug ID'),

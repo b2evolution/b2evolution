@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -80,7 +80,7 @@ function hits_results( & $Results, $params = array() )
 			'order' => 'hit_ID',
 			'default_dir' => 'D',
 			'td_class' => 'timestamp compact_data',
-			'td' => '%mysql2localedatetime_spans( #hit_datetime#, "M-d" )%',
+			'td' => '%mysql2localedatetime_spans( #hit_datetime# )%',
 		);
 
 	$Results->cols[] = array(
@@ -147,7 +147,7 @@ function hits_results( & $Results, $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Blog'),
+			'th' => T_('Collection'),
 			'order' => 'hit_coll_ID',
 			'td' => '$blog_shortname$',
 			'td_class' => 'compact_data'
@@ -172,6 +172,16 @@ function hits_results( & $Results, $params = array() )
 			'order' => 'hit_response_code',
 			'td' => '$hit_response_code$',
 			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap compact_data'
+		);
+	$Results->cols[] = array(
+			'th' => T_('HTTP meth'),
+			'order' => 'hit_method',
+			'td' => '$hit_method$',
+			'td_class' => 'shrinkwrap compact_data',
+			'extra' => array(
+					'style' => '%hit_method_style( "#hit_method#" )%',
+					'format_to_output'=> false
+				)
 		);
 
 	$Results->cols[] = array(
@@ -211,7 +221,7 @@ function filter_hits( & $Form )
 
 	$Form->date_input( 'datestartinput', $datestart, T_( 'From date' ) );
 	$Form->date_input( 'datestopinput', $datestop, T_( 'To date' ) );
-	
+
 	if( !isset( $preset_agent_type ) )
 	{
 		$Form->select_input_array( 'agent_type', get_param( 'agent_type' ), $agent_type_array, T_( 'Agent type' ), '', array( 'force_keys_as_values' => true, 'background_color' => $agent_type_color ) );
@@ -274,14 +284,14 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 		$full_url = $hit_uri;
 	}
 
-	$int_search_uri = urldecode($hit_uri);
+	$int_search_uri = urldecode( $hit_uri );
 	if( ( utf8_strpos( $int_search_uri , '?s=' ) !== false )
 	 || ( utf8_strpos( $int_search_uri , '&s=' ) !== false ) )
 	{ // This is an internal search:
 		preg_match( '~[?&]s=([^&#]*)~', $int_search_uri, $res );
 		$hit_uri = sprintf( T_( 'Internal search: %s' ), $res[1] );
 	}
-	elseif( utf8_strlen($hit_uri) > $max_len )
+	elseif( utf8_strlen( $hit_uri ) > $max_len )
 	{
 		$hit_uri = '...'.utf8_substr( $hit_uri, -$max_len );
 	}
@@ -316,7 +326,7 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
  */
 function stat_session_login( $login )
 {
-	if( empty($login) )
+	if( empty( $login ) )
 	{
 		return '<span class="note">'.T_('Anon.').'</span>';
 	}
@@ -331,10 +341,17 @@ function stat_session_login( $login )
  * @param string session ID
  * @param string link text
  */
-function stat_session_hits( $sess_ID,  $link_text )
+function stat_session_hits( $sess_ID, $link_text )
 {
-	global $blog;
-	return '<strong><a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID='.$sess_ID.'&remote_IP=&blog='.$blog.'">'.$link_text.'</a></strong>';
+	global $blog, $admin_url;
+
+	$tab = get_param( 'tab' );
+	if( empty( $tab ) )
+	{
+		$tab = 'hits';
+	}
+
+	return '<strong><a href="'.$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;sess_ID='.$sess_ID.'&amp;blog='.$blog.'">'.$link_text.'</a></strong>';
 }
 
 
@@ -372,7 +389,7 @@ function disp_clickable_log_IP( $hit_remote_addr )
 function disp_color_referer( $hit_referer_type )
 {
 	global $referer_type_color;
-	if(!empty ($referer_type_color[$hit_referer_type]))
+	if( ! empty( $referer_type_color[$hit_referer_type] ) )
 	{
 		return '<span style="background-color: #'.$referer_type_color[$hit_referer_type].'">'.$hit_referer_type.'</span>';
 	}
@@ -382,6 +399,7 @@ function disp_color_referer( $hit_referer_type )
 	}
 }
 
+
 /**
  * Display color agent type
  *
@@ -390,7 +408,7 @@ function disp_color_referer( $hit_referer_type )
 function disp_color_agent( $hit_agent_type )
 {
 	global $agent_type_color;
-	if(!empty ($agent_type_color[$hit_agent_type]))
+	if( ! empty( $agent_type_color[$hit_agent_type] ) )
 	{
 		return '<span style="background-color: #'.$agent_type_color[$hit_agent_type].'">'.$hit_agent_type.'</span>';
 	}
@@ -400,39 +418,38 @@ function disp_color_agent( $hit_agent_type )
 	}
 }
 
+
 /**
  * Generate html response code class
  *
  * @param integer response code
  * @return string class
  */
-function hit_response_code_class($hit_response_code)
+function hit_response_code_class( $hit_response_code )
 {
 	$class = '';
 
-	if($hit_response_code >= 200 && $hit_response_code < 300)
+	if( $hit_response_code >= 200 && $hit_response_code < 300 )
 	{
 		$class =  "code_2xx";
 	}
-	if($hit_response_code >= 300 && $hit_response_code < 400)
+	if( $hit_response_code >= 300 && $hit_response_code < 400 )
 	{
 		$class =  "code_3xx";
 	}
 
-	if($hit_response_code == 304)
+	if( $hit_response_code == 304 )
 	{
 		$class =  "code_304";
 	}
 
-	if ($hit_response_code >= 400)
+	if( $hit_response_code >= 400 )
 	{
 		$class =  "code_4xx";
 	}
 
-
 	return $class;
 }
-
 
 
 /**
@@ -446,7 +463,7 @@ function hit_type_color( $hit_type )
 	global $hit_type_color;
 	$color = '#FFFFFF';
 
-	if( ! empty ( $hit_type_color[$hit_type] ) )
+	if( ! empty( $hit_type_color[$hit_type] ) )
 	{
 		$color ='#'.$hit_type_color[$hit_type];
 	}
@@ -466,7 +483,7 @@ function hit_agent_type_color( $hit_agent_type )
 	global $agent_type_color;
 	$color = '#FFFFFF';
 
-	if( ! empty ( $agent_type_color[$hit_agent_type] ) )
+	if( ! empty( $agent_type_color[$hit_agent_type] ) )
 	{
 		$color ='#'.$agent_type_color[$hit_agent_type];
 	}
@@ -608,5 +625,29 @@ function hit_iprange_status_color( $IP_address )
 	}
 
 	return aipr_status_color( $ip_range_status );
+}
+
+
+/**
+ * Get style for hit method cell
+ *
+ * @param string Hit request method
+ * @return string Method style
+ */
+function hit_method_style( $hit_method )
+{
+	global $hit_method_color;
+
+	// Purple color for non traditional methods:
+	$color = '551A8B';
+
+	if( isset( $hit_method_color[ $hit_method ] ) )
+	{	// Get background color from config array:
+		$color = $hit_method_color[ $hit_method ];
+	}
+
+	$style = 'color: #'.$color;
+
+	return $style;
 }
 ?>

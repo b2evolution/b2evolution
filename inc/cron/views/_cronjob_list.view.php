@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -171,7 +171,7 @@ $Results->title = T_('Scheduled jobs').get_manual_link('scheduled-jobs-list');
 $Results->global_icon( T_('Refresh'), 'refresh', regenerate_url(), T_('Refresh'), 3, 4 );
 if( $current_User->check_perm( 'options', 'edit', false, NULL ) )
 {	// Permission to edit settings:
-	$Results->global_icon( T_('Create a new scheduled job...'), 'new', regenerate_url( 'action,cjob_ID', 'action=new' ), T_('New job').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new scheduled job...'), 'new', regenerate_url( 'action,cjob_ID', 'action=new' ), T_('New job').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 /**
@@ -206,11 +206,11 @@ function filter_crontab( & $Form )
 	$Form->text( 's', get_param( 's' ), 20, T_('Search'), '', 255 );
 
 	// Date/time filters:
-	$Form->date_input( 'datestartinput', $datestart, T_('Start Date') );
+	$Form->date_input( 'datestartinput', $datestart, T_('Start Date'), array( 'add_date_format_note' => true )  );
 	echo T_('at').' &nbsp;';
 	$Form->time_input( 'timestart', '           '.$timestart, '' );
 
-	$Form->date_input( 'datestopinput', $datestop, T_('End Date') );
+	$Form->date_input( 'datestopinput', $datestop, T_('End Date'), array( 'add_date_format_note' => true )  );
 	echo T_('at').' &nbsp;';
 	$Form->time_input( 'timestop', '           '.$timestop, '' );
 }
@@ -238,7 +238,7 @@ $Results->cols[] = array(
 						'th' => T_('Planned at'),
 						'order' => 'ctsk_start_datetime',
 						'td_class' => 'shrinkwrap',
-						'td' => '$ctsk_start_datetime$',
+						'td' => '%mysql2localedatetime_spans( #ctsk_start_datetime# )%',
 					);
 
 $Results->cols[] = array(

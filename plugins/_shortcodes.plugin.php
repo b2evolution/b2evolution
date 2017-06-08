@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -22,7 +22,7 @@ class shortcodes_plugin extends Plugin
 	var $code = 'evo_shortcodes';
 	var $name = 'Short Codes';
 	var $priority = 40;
-	var $version = '5.0.0';
+	var $version = '6.9.2';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -37,7 +37,23 @@ class shortcodes_plugin extends Plugin
 
 
 	/**
-	 * Display a toolbar
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_params = array_merge( $params, array( 'default_comment_using' => 'disabled' ) );
+
+		return parent::get_coll_setting_definitions( $default_params );
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @todo dh> This seems to be a lot of Javascript. Please try exporting it in a
 	 *       (dynamically created) .js src file. Then we could use cache headers
@@ -47,15 +63,24 @@ class shortcodes_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		global $Hit, $edited_Comment;
-
-		if( ! empty( $edited_Comment ) )
-		{ // Don't display the toolbars on edit comment form
-			return false;
-		}
+		global $Hit;
 
 		if( $Hit->is_lynx() )
 		{ // let's deactivate quicktags on Lynx, because they don't work there.
+			return false;
+		}
+
+		$Item = & $params['Item'];
+
+		if( empty( $Item ) || $Item->is_intro() || ! $Item->get_type_setting( 'allow_breaks' ) )
+		{	// Teaser and page breaks are not allowed for current item type and for all intro items:
+			return false;
+		}
+
+		$item_Blog = & $Item->get_Blog();
+
+		if( ! $this->get_coll_setting( 'coll_use_for_posts', $item_Blog ) )
+		{	// This plugin is disabled to use for posts:
 			return false;
 		}
 
@@ -86,15 +111,17 @@ class shortcodes_plugin extends Plugin
 
 		function shortcodes_toolbar( title )
 		{
-			document.write( '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>' );
-			document.write( '<?php echo $this->get_template( 'toolbar_group_before' ); ?>' );
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
 			for( var i = 0; i < shortcodes_buttons.length; i++ )
 			{
 				var button = shortcodes_buttons[i];
-				document.write( '<input type="button" id="' + button.id + '" title="' + button.title + '"'
-					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="shortcodes_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />' );
+				r += '<input type="button" id="' + button.id + '" title="' + button.title + '"'
+					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="shortcodes_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />';
 			}
-			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ); ?>' );
+			r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
+
+			jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
 		function shortcodes_insert_tag( canvas_field, i )
@@ -109,9 +136,9 @@ class shortcodes_plugin extends Plugin
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'shortcodes_toolbar' ) );
-		?><script type="text/javascript">shortcodes_toolbar( '<?php echo TS_('Shortcodes:'); ?>' );</script><?php
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
+		?><script type="text/javascript">shortcodes_toolbar( '<?php echo TS_('Shortcodes:'); ?>' );</script><?php
 
 		return true;
 	}

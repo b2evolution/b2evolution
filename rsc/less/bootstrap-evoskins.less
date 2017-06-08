@@ -16,6 +16,32 @@
 	div.checkbox:last-of-type {
 		padding-bottom: 7px;
 	}
+	.text-left-sm {
+		text-align: left;
+	}
+	.text-right-sm {
+		text-align: right;
+	}
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+	.text-left-md {
+		text-align: left;
+	}
+	.text-right-md {
+		text-align: right;
+	}
+}
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+	.text-left-lg {
+		text-align: left;
+	}
+	.text-right-lg {
+		text-align: right;
+	}
 }
 
 // Don't rewrite a font family of glyph icons
@@ -35,12 +61,29 @@ ul, ol {
 
 // Custom styles for buttons
 .btn {
+	margin-top: 3px;
+	margin-bottom: 3px;
 	&.btn-success, &.btn-danger {
 		.fa {
 			// Use only white icons in color buttons
 			color: #FFF !important;
 		}
 	}
+}
+.evo_widget{
+	.btn { // we need this to give space to buttons on successive widget lines
+		margin-top: 4px;
+		margin-bottom: 4px;
+	}
+	.input-group .btn { // In this case we need to cancel the previous -- eg: search form widget
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+}
+
+.input-group .btn {
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 // Keep almost same style for active disabled buttons (used by TinyMCE plugin)
@@ -84,6 +127,13 @@ a.btn.action_icon {
 		}
 		.controls-info {
 			margin: 0 5px;
+		}
+	}
+	// Info field with full height in value
+	.info_full_height {
+		.form-control-static {
+			padding-top: 0;
+			padding-bottom: 0;
 		}
 	}
 	// Part after label where input elements
@@ -162,6 +212,9 @@ a.btn.action_icon {
 			padding: 0 2px 2px 0;
 			vertical-align: middle;
 		}
+		tr:last-child td {
+			padding-bottom: 0;
+		}
 		th.label, td.label {
 			display: table-cell;
 			color: #333;
@@ -172,6 +225,11 @@ a.btn.action_icon {
 		}
 		td.input div.tile label.control-label {
 			display: none;
+		}
+	}
+	#itemform_custom_fields {
+		.panel-body .form-group:last-child {
+			margin-bottom: 0;
 		}
 	}
 	// Select category table on edit post form
@@ -206,7 +264,7 @@ a.btn.action_icon {
 		.form-group {
 			display: inline-block;
 			margin: 0 0 2px;
-			input[type=text] {
+			input[type=text]:not( #item_issue_date ) {
 				max-width: 85px;
 			}
 		}
@@ -366,6 +424,43 @@ div.results {
 		margin-top: 5px;
 		margin-bottom: 5px;
 	}
+	tr.placeholder {
+		position: relative;
+		&:before {
+			content: "";
+			position: absolute;
+			width: 0;
+			height: 0;
+			border: 6px solid transparent;
+			border-left-color: #f00;
+			border-right: none;
+			margin-top: -5px;
+			left: 0;
+		}
+		&:after {
+			content: "";
+			position: absolute;
+			width: 100%;
+			height: 2px;
+			background: #F00;
+			left: 0;
+			margin-top: 1px;
+		}
+		td {
+			border: none;
+			height: 0;
+			padding: 0;
+		}
+	}
+	tr.placeholder, tr.dragged {
+		+ tr:not(:nth-child(2)):not(.dragged) > td {
+			border-top: none;
+		}
+	}
+	// Fix this, because max-width:100% of main img style breaks width of table cell with user avatar and login:
+	img {
+		max-width: none;
+	}
 }
 // Filters in results table
 div.filters {
@@ -388,6 +483,13 @@ div.filters {
 	&.panel-body {
 		padding: 15px;
 	}
+	// Fix style for fields with autocomplete usernames:
+	.twitter-typeahead {
+		vertical-align: middle;
+		.tt-dropdown-menu div {
+			margin-left: 0;
+		}
+	}
 }
 .table_scroll .table {
 	margin-bottom: 0;
@@ -398,6 +500,7 @@ div.messages{
 
 // Popover
 .popover {
+	max-width: 100%;
 	color: #333;
 	&.right {
 		text-align: left;
@@ -509,11 +612,23 @@ select:focus:invalid:focus {
 		position: relative;
 		top: -4px;
 	}
-	.btn {
-		margin: -6px 0 0 6px;
-	}
 	.btn-group {
 		margin-left: 6px;
+	}
+	.panel_heading_action_icons {
+		margin-top: -6px;
+		.btn {
+			margin: 0 3px 3px 0;
+		}
+		.btn:last-child {
+			margin: 0 0 3px 0;
+		}
+		.btn-group {
+			margin: 0 6px 0 0;
+			.btn {
+				margin: 0 0 3px 0;
+			}
+		}
 	}
 }
 legend.panel-heading {
@@ -540,6 +655,10 @@ legend.panel-heading {
 			color: #23527c;
 		}
 	}
+}
+.panel-warning > .panel-footer {
+	background-color: #fcf8e3;
+	border-color: #faebcc;
 }
 
 // Title of confirmation block to delete DB object
@@ -615,9 +734,11 @@ div.edit_toolbars, div.message_toolbars {
 		margin-left: 0;
 	}
 	.btn {
+		margin-top: 0;
 		margin-bottom: 2px;
 	}
 	.btn-toolbar-title {
+		padding-top: 1px;
 		padding-left: 5px;
 		float: left;
 		font-weight: bold;
@@ -643,6 +764,17 @@ div.edit_toolbars, div.message_toolbars {
 .badge-info {
 	background-color: #5bc0de !important;
 	color: #FFF !important;
+}
+.badge-warning {
+	background-color: #f0ad4e !important;
+	color: #fff !important;
+}
+.badge-meta {
+	background-color: #5bc0de !important;
+	color: #fff !important;
+}
+.dropdown-menu > li > a .tooltip {
+	white-space: normal;
 }
 .panel-heading .badge {
 	position: relative;
@@ -680,6 +812,11 @@ div.edit_toolbars, div.message_toolbars {
 	// Set this for all screen sizes(especially for small screens) in order to fix a moving modal over evo_toolbar
 	margin: 30px auto;
 }
+.modal-footer {
+	.btn+.btn {
+		margin-bottom: 3px;
+	}
+}
 
 // Typeahead plugin
 .tt-dropdown-menu {
@@ -714,41 +851,132 @@ div.edit_toolbars, div.message_toolbars {
 }
 
 // Make rounded corners for all images in content
-#styled_content_block {
+.evo_content_block {
 	img {
 		.border-radius;
 	}
-	/*
-	a.user img { // bubbletip
-		.border-radius(0);
-	}
-	*/
 }
 
 // User links widget
-.ufld_icon_links a {
-	display: inline-block;
-	text-decoration: none;
-	color: #FFF;
-	background: #ddd;
-	border-radius: 50%;
-	width: 40px;
-	height: 40px;
-	margin: 2px;
-	position: relative;
-	-webkit-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	-moz-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	-o-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	&:hover {
-		.border-radius;
+.ufld_icon_links {
+	a {
+		display: inline-block;
+		text-decoration: none;
 		color: #FFF;
-		background: #23527c;
-		// TODO: use @variable name
+		background: #ddd;
+		border-radius: 50%;
+		width: 40px;
+		height: 40px;
+		margin: 2px;
+		position: relative;
+		-webkit-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		-moz-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		-o-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		&:hover {
+			.border-radius;
+			color: #FFF;
+			background: #23527c;
+			// TODO: use @variable name
+		}
+		.fa {
+			font-size: 20px;
+			line-height: 40px;
+			display: block;
+		}
 	}
-	.fa {
-		font-size: 20px;
-		line-height: 40px;
+	&.small {
+		a {
+			width: 20px;
+			height: 20px;
+			.fa {
+				font-size: 10px;
+				line-height: 20px;
+			}
+		}
+	}
+}
+
+// Messages list & form
+.evo_private_messages_list {
+	.messages_navigation {
+		padding: 5px;
+	}
+	> h2 {
+		margin-top: 0;
+	}
+	.messages_list_actions {
+		text-align: center;
+		padding: 10px 0;
+		p {
+			margin: 0;
+			padding: 0;
+			text-align: center;
+		}
+		a {
+			display: inline-block;
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+	span.error {
+		border: 1px solid #BBB;
+		border-bottom: none;
+		padding: 10px;
+		text-align: center;
 		display: block;
+	}
+	.panel {
+		margin-bottom: 0;
+		&.results {
+			margin-bottom: 20px;
+		}
+	}
+	.image_block img {
+		max-width: 100%;
+		height: auto;
+	}
+}
+
+@media (min-width: 768px) {
+	div.coll-dashboard-block-3 {
+		float: left;
+	}
+}
+
+@media (min-width: 992px) {
+	div.coll-dashboard-block-3 {
+		float: left;
+	}
+}
+
+@media (min-width: 1200px) {
+	div.coll-dashboard-block-3 {
+		float: right;
+	}
+}
+
+.btn-spinner {
+	background-image: url(../img/ajax-loader/000.gif);
+	background-size: 14px 14px;
+	background-repeat: no-repeat;
+	background-position: left 5px center;
+}
+
+// Widgets container "Page Top":
+.evo_container__page_top {
+	// Align right all text on top-right widget container (useful for buttons of menu linkwidgets):
+	text-align: right;
+}
+
+// Widgets containers "Sidebar" and "Sidebar 2":
+.evo_container__sidebar, .evo_container__sidebar2 {
+	// .widget_core_menu_link
+	// .widget_core_msg_menu_link
+	// .widget_core_profile_menu_link
+	// .widget_core_flag_menu_link
+	.evo_widget[class$=_menu_link] a.btn {
+		width: 100%;
 	}
 }

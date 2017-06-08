@@ -8,21 +8,52 @@
 		text-align: right;
 	}
 }
-div.widget_core_coll_tagline {
-	margin-bottom: 30px;
+// div.widget_core_coll_tagline {
+	// margin-bottom: 30px;
+// }
+.evo_container__front_page_primary {
+	padding-bottom: 30px;
+	.evo_widget {
+		margin-top: 30px;
+		div, h1, h2, p {
+			margin-top: 0;
+		}
+		div > p:last-child, // When it's the last <p> of the each div, no martgin-bottom, because of regular widget margin-bottom
+		//&:last-child > h2,
+		&:last-child > ul, // When it's the last <ul> of the each div, no martgin-bottom, because of regular widget margin-bottom
+		& > ul li:last-child {
+			margin-bottom: 0 !important; // When it's the last <li> of last <ul> of the each div, no martgin-bottom, because of regular widget margin-bottom
+		}
+		// .widget_core_menu_link
+		// .widget_core_msg_menu_link
+		// .widget_core_profile_menu_link
+		// .widget_core_flag_menu_link
+		&[class$=_menu_link] {
+			// Align center buttons:
+			text-align: center;
+		}
+	}
+}
+.evo_container__front_page_secondary {
+	padding-top: 30px;
 }
 
-// Footer
+// Secondary Area:
 .secondary_area {
-	background-color: #FFF;
+	// Important for hiding "Slide down" arrow behind this div
+	position: relative;
+	z-index: 1;
+	
 	width: 100%;
 	p {
 		margin-top: 10px;
 	}
 }
-body.pictured .secondary_area {
+
+// Footer
+body.pictured .secondary_area footer {
 	color: #666;
-	a:not([class^=ufld_]) {
+	a {
 		color: #666;
 	}
 }
@@ -33,6 +64,7 @@ html {
 	height: 100%;
 }
 body {
+	overflow-x: visible !important;
 	-webkit-font-smoothing: subpixel-antialiased;
 }
 
@@ -53,34 +85,6 @@ div.front_main_area {
 	div.widget {
 		margin: 30px 0;
 	}
-
-	// Universal item list:
-	div.widget_core_coll_item_list {
-		// We want to display the first image cleanly before the title
-		// This may need further tweaking...
-		ul {
-			padding: 0;
-			margin-left: 0;
-		}
-		li {
-			clear: both;
-			list-style: none;
-			height: 80px;
-			margin: 5px 0;
-			padding: 0;
-		}
-		div.item_first_image {
-			float: left; 
-			margin-right: 6px;
-		}
-		div.item_title {
-			vertical-align: middle;
-			line-height: 80px;
-		}
-		img {
-			border-radius: 3px;
-		}
-	}
 }
 
 body.pictured {
@@ -88,12 +92,18 @@ body.pictured {
 	#skin_wrapper {
 		width: 100%;
 		height: 100%;
+		overflow-x: hidden; // Keep this to allow animate page down on webkit browsers
+		&.skin_wrapper_loggedin {
+			// Use padding instead of margin to avoid a double scrolling on Windows FireFox
+			margin-top: 0;
+			padding-top: 27px;
+		}
 	}
 	.container.main_page_wrapper {
 		display: table;
 		height: 100%;
 		min-height: 100%;
-	 .panel {
+		.panel {
 			color: #333;
 			a:not([class]) {
 				color: #337ab7;
@@ -109,23 +119,30 @@ body.pictured {
 		}
 	}
 	// Fix debug info position after skin wrapper:
+	// @FP > I think we don't need this
 	div#debug_info.debug {
 		position: absolute;
 		top: 100%;
 	}
 }
-#bg_picture {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	width: 100%;
+.evo_pictured_layout {
+	//position: fixed;
+	// top: 0;
+	// left: 0;
+	// right: 0;
+	// bottom: 0;
+	// width: 100%;
+	// height: 100%;
+	display: table;
 	height: 100%;
+	min-height: 100%;
+	min-width: 100%;
+	position: relative;
+	width: 100%;
+	background-attachment: fixed;
 	background-size: cover;
 	background-position: center center;
-	z-index: -999999;
-	img {
+	> .evo_pictured__image {
 		display: none;
 		width: 100%;
 	}
@@ -135,10 +152,11 @@ body.pictured {
 		.sitewide_header {
 			margin-bottom: 0;
 		}
-		#bg_picture {
+		.evo_pictured_layout {
 			position: relative;
 			height: auto;
-			img {
+			min-height: auto;
+			> .evo_pictured__image {
 				display: block;
 			}
 		}
@@ -303,82 +321,6 @@ textarea.message_text {
 	width: 95%;
 }
 
-// Fix the form elements
-.comment_form {
-	h3 {
-		margin: 0;
-	}
-	.panel {
-		margin: 0;
-		border: none;
-		-webkit-box-shadow: none;
-		box-shadow: none;
-		.panel-body {
-			padding: 0;
-		}
-	}
-}
-.form-horizontal {
-	.form-group, .custom_content {
-		margin-left: 0;
-		margin-right: 0;
-	}
-	input[type=file] {
-		display: inline;
-	}
-}
-#comment_date_field {
-	input {
-		width: 80px;
-	}
-	label {
-		font-weight: normal;
-	}
-}
-.form-group[id^="ffield_uploadfile"] .controls {
-	padding-top: 5px;
-	input {
-		line-height: 10px;
-	}
-}
-// Comment template
-.comment_rating {
-	margin-top: 2px;
-}
-#comment_edit .comment_rating {
-	margin-top: 9px;
-}
-.ratings_table {
-	margin-bottom: 10px;
-	.rating_summary {
-		border-spacing: 1px;
-		border-collapse: separate;
-	}
-	.progress {
-		border-radius: 0;
-		height: 13px;
-	}
-}
-#comment_preview {
-	background-color: #FFF;
-}
-#comment_date_field .panel {
-	border: none;
-	box-shadow: none;
-	margin-bottom: 0;
-	.panel-body {
-		padding: 0;
-		.control-label {
-			font-weight: bold;
-		}
-		.controls .form-group {
-			display: inline-block;
-			padding-left: 15px;
-			margin-bottom: 0;
-		}
-	}
-}
-
 .evo_post {
 	margin-bottom: 2em;
 	.small.text-muted {
@@ -387,6 +329,12 @@ textarea.message_text {
 			color: inherit;
 		}
 	}
+}
+
+.evo_hasbgimg {
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
 }
 
 div.bSideItem {
@@ -574,6 +522,30 @@ body.pictured .secondary_area .widget_core_org_members {
 		.fa {
 			font-size: 20px;
 			line-height: 45px;
+		}
+	}
+	.slide_button_wrap {
+		display: none !important;
+	}
+}
+
+.slide_button_wrap {
+	position: fixed;
+	bottom: 20px;
+	left: 50%;
+	line-height: 1em;
+	#slide_button {
+		display: inline-block;
+		font-size: 55px;
+		color: #ffffff;
+		text-align: center;
+		opacity: 0.5;
+		transition: 0.1s all;
+		position:relative; 
+		left:-50%;
+		&:hover {
+			cursor: pointer;
+			opacity: 0.9;
 		}
 	}
 }

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,10 +27,10 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function mobile_skin_switcher_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'mobile_skin_switcher' );
+		parent::__construct( $db_row, 'core', 'mobile_skin_switcher' );
 	}
 
 
@@ -76,7 +76,7 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Mobile Skin Switcher.');
+		return T_('Mobile Skin Switcher').'.';
 	}
 
 
@@ -123,7 +123,7 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 						</div></div>',
 			), $params );
 
-		global $ReqURI, $Session, $Blog;
+		global $ReqURI, $Session, $Collection, $Blog;
 
 		if( empty( $Blog ) )
 		{ // Blog must be defined

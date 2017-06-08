@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -206,7 +206,7 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'file-type-editing' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'file-types' );
+		$AdminUI->set_page_manual_link( 'file-types-list' );
 		break;
 }
 

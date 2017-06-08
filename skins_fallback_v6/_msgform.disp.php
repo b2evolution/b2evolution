@@ -10,7 +10,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  *
@@ -54,20 +54,28 @@ if( ! strlen( $email_author ) )
 
 $recipient_User = NULL;
 // Get the name and email address of the recipient
-if( empty($recipient_id) )
-{
-	$recipient_name = param( 'recipient_name', 'string', '' );
-	$recipient_address = param( 'recipient_address', 'string', '' );
-}
-else
-{ // If the email is to a registered user get the email address from the users table
+if( ! empty( $recipient_id ) )
+{	// If the email is to a registered user get the email address from the users table
 	$UserCache = & get_UserCache();
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
 	if( $recipient_User )
 	{ // recipient User found
-		$recipient_name = $recipient_User->get('preferredname');
-		$recipient_address = $recipient_User->get('email');
+		$recipient_name = $recipient_User->get_username();
+		$recipient_address = $recipient_User->get( 'email' );
+	}
+}
+elseif( ! empty( $comment_id ) )
+{	// If the email is to anonymous user of comment
+	$CommentCache = & get_CommentCache();
+	if( $Comment = & $CommentCache->get_by_ID( $comment_id, false ) )
+	{
+		$recipient_User = & $Comment->get_author_User();
+		if( empty( $recipient_User ) && ( $Comment->allow_msgform ) && ( is_email( $Comment->get_author_email() ) ) )
+		{	// Get recipient name and email from comment's author:
+			$recipient_name = $Comment->get_author_name();
+			$recipient_address = $Comment->get_author_email();
+		}
 	}
 }
 
@@ -105,7 +113,7 @@ else
 {
 	if( ! empty( $recipient_User ) )
 	{ // Get identity link for existed users
-		$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'nickname' ) );
+		$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'auto' ) );
 	}
 	else
 	{ // Get login name for anonymous user

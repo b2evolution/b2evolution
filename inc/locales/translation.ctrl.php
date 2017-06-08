@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -37,7 +37,7 @@ global $locales, $io_charset, $evo_charset;
 if( $locales[$edit_locale]['charset'] == 'utf-8' && $io_charset != 'utf-8' )
 {
 	// Set encoding for MySQL connection
-	$DB->set_connection_charset( $locales[$edit_locale]['charset'] );
+	$DB->connection_charset = $locales[$edit_locale]['charset'];
 	// Set charset for html format
 	$io_charset = $locales[$edit_locale]['charset'];
 	$evo_charset = $locales[$edit_locale]['charset'];

@@ -6,13 +6,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $DB, $UserSettings, $Settings;
 
-global $servertimenow, $htsrv_url, $unread_message_reminder_delay, $unread_messsage_reminder_threshold;
+global $servertimenow, $unread_message_reminder_delay, $unread_messsage_reminder_threshold;
 
 // New unread messages reminder may be sent to a user if it has at least one unread message which is older then the given threshold date
 $threshold_date = date2mysql( $servertimenow - $unread_messsage_reminder_threshold );
 // New unread messages reminder should be sent to a user if the last one was sent at least x days ago, where x depends from the configuration
 // Get the minimum delay value from the configuration array
-$minimum_delay = array_shift( array_values( $unread_message_reminder_delay ) );
+$minimum_delay = array_values( $unread_message_reminder_delay );
+$minimum_delay = array_shift( $minimum_delay );
 // Get the datetime which corresponds to the minimum delay value.
 // If the last unread message reminder for a specific user is after this datetime, then notification must not be send to that user now.
 $reminder_threshold = date2mysql( $servertimenow - ( $minimum_delay * 86400 ) );
@@ -47,6 +48,7 @@ $query = 'SELECT DISTINCT user_ID, last_sent.uset_value
 		WHERE ( msg_datetime < '.$DB->quote( $threshold_date ).' )
 			AND ( last_sent.uset_value IS NULL OR last_sent.uset_value < '.$DB->quote( $reminder_threshold ).' )
 			AND ( '.$notify_condition.' )
+			AND ( user_status IN ( "activated", "autoactivated" ) )
 			AND ( LENGTH(TRIM(user_email)) > 0 )
 			AND ( user_email NOT IN ( SELECT emadr_address FROM T_email__address WHERE '.get_mail_blocked_condition().' ) )';
 $users_to_remind = $DB->get_assoc( $query, 0, 'Find users who need to be reminded' );
@@ -121,7 +123,7 @@ foreach( $users_to_remind_ids as $user_ID )
 	$notify_User = $UserCache->get_by_ID( $user_ID );
 	// Change locale here to localize the email subject and content
 	locale_temp_switch( $notify_User->get( 'locale' ) );
-	if( send_mail_to_User( $user_ID, T_( 'You have unread messages!' ), 'private_messages_unread_reminder', $email_template_params ) )
+	if( send_mail_to_User( $user_ID, T_('You have unread messages').'!', 'private_messages_unread_reminder', $email_template_params ) )
 	{ // Update users last unread message reminder timestamp
 		$UserSettings->set( 'last_unread_messages_reminder', date2mysql( $servertimenow ), $user_ID );
 		// save UserSettings after each email, because the cron task mail fail and users won't be updated!
@@ -131,6 +133,6 @@ foreach( $users_to_remind_ids as $user_ID )
 	locale_restore_previous();
 }
 
-$result_message = sprintf( T_( '%d reminder emails were sent!' ), $reminder_sent );
+$result_message = sprintf( T_('%d reminder emails were sent!'), $reminder_sent );
 return 1; /* ok */
 ?>

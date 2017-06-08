@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package main
@@ -49,7 +49,7 @@ $BlogCache = & get_BlogCache();
 /**
  * @var Blog
  */
-$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 if( empty( $Blog ) )
 {
 	require $siteskins_path.'_404_blog_not_found.main.php'; // error & exit
@@ -57,26 +57,30 @@ if( empty( $Blog ) )
 }
 
 
-// Show/Hide the containers:
-$display_containers = param( 'display_containers', 'string' );
-if( $display_containers == 'show' )
-{
-	$Session->set( 'display_containers_'.$blog, 1 );
-}
-elseif( $display_containers == 'hide' )
-{
-	$Session->delete( 'display_containers_'.$blog );
-}
+if( $debug == 2 || is_logged_in() )
+{	// Allow debug info only for logged-in users OR when debug == 2:
 
-// Show/Hide the includes:
-$display_includes = param( 'display_includes', 'string' );
-if( $display_includes == 'show' )
-{
-	$Session->set( 'display_includes_'.$blog, 1 );
-}
-elseif( $display_includes == 'hide' )
-{
-	$Session->delete( 'display_includes_'.$blog );
+	// Show/Hide the containers:
+	$display_containers = param( 'display_containers', 'string' );
+	if( $display_containers == 'show' )
+	{
+		$Session->set( 'display_containers_'.$blog, 1 );
+	}
+	elseif( $display_containers == 'hide' )
+	{
+		$Session->delete( 'display_containers_'.$blog );
+	}
+
+	// Show/Hide the includes:
+	$display_includes = param( 'display_includes', 'string' );
+	if( $display_includes == 'show' )
+	{
+		$Session->set( 'display_includes_'.$blog, 1 );
+	}
+	elseif( $display_includes == 'hide' )
+	{
+		$Session->delete( 'display_includes_'.$blog );
+	}
 }
 
 
@@ -109,7 +113,7 @@ if( init_charsets( $current_charset ) )
 	// Reload Blog(s) (for encoding of name, tagline etc):
 	$BlogCache->clear();
 
-	$Blog = & $BlogCache->get_by_ID( $blog );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	if( is_logged_in() )
 	{ // We also need to reload the current User with the new final charset
 		$UserCache = & get_UserCache();
@@ -521,15 +525,34 @@ elseif( !empty($preview) )
 	// Consider this as an admin hit!
 	$Hit->hit_type = 'admin';
 }
+elseif( ( $disp == 'visits' ) && ( ( $Settings->get( 'enable_visit_tracking' ) != 1 ) || ! is_logged_in() ) )
+{ // Check if visit tracking is enabled and the user is logged in before allowing profile visit display
+	$disp = '403';
+	$disp_detail = '403-visit-tracking-disabled';
+}
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post
-	// if( in_array( $Item->ityp_ID, $posttypes_specialtypes ) )
-	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
+	if( in_array( $Item->get_type_setting( 'usage' ), array( 'special', 'content-block' ) ) )
+	{	// Display 404 page for all "Content Blocks" and "Special" items intead of normal single page:
+		$disp = '404';
+	}
+	elseif( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
 	{
 		$disp = 'download';
+
+		// erhsatingin> Is this the right place to increment the download count?
+		$link_ID = param( 'download', 'integer', false);
+		$LinkCache = & get_LinkCache();
+		if( ( $download_Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) && // Link exists in DB
+				( $download_File = & $download_Link->get_File() ) && // Link has a correct File object
+				( $download_File->exists() ) // File exists on the disk
+			)
+		{
+			$download_File->increment_download_count();
+		}
 	}
-	elseif( $Item->ityp_ID == 1000 )
+	elseif( $Item->get_type_setting( 'usage' ) == 'page' )
 	{
 		$disp = 'page';
 	}
@@ -551,7 +574,7 @@ elseif( $disp == '-' )
 			|| $Blog->get_setting( 'relcanonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
-		if( ! is_same_url($ReqURL, $canonical_url) )
+		if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 		{	// We are not on the canonicial blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
@@ -561,6 +584,21 @@ elseif( $disp == '-' )
 			{	// Use link rel="canoncial":
 				add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 			}
+		}
+	}
+
+	if( $disp == 'single' )
+	{	// We must find first item from disp=posts and display it on front page:
+		if( $Item = & $Blog->get_first_mainlist_Item() )
+		{	// The item is found, Use it:
+			set_param( 'p', $Item->ID );
+			$c = 1; // Display comments
+		}
+
+		if( empty( $Item ) )
+		{	// If item is not found, display 404 page with below error message:
+			$Messages->add( sprintf( T_('Front page is set to display first post but there is nothing to display.'), $p ), 'error' );
+			$disp = '404';
 		}
 	}
 
@@ -586,6 +624,59 @@ elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
 	$disp = '404';
 	$disp_detail = '404-post_not_found';
 }
+
+param( 'user_ID', 'integer', NULL );
+if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID != $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
+{ // add or increment to user profile visit
+	add_user_profile_visit( $user_ID, $current_User->ID );
+}
+
+
+if( $disp == 'terms' )
+{	// Display a page of terms & conditions:
+	$terms_item_ID = intval( $Settings->get( 'site_terms' ) );
+	if( $Settings->get( 'site_terms_enabled' ) && $terms_item_ID  > 0 )
+	{	// Only if item ID is defined for terms page:
+		set_param( 'p', $terms_item_ID );
+		$c = 0; // Don't display comments
+
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $p, false );
+
+		if( is_logged_in() && $UserSettings->get( 'terms_accepted', $current_User->ID ) )
+		{	// Display the message if current user already accepted the terms:
+			$Messages->add( T_('You already accepted these terms.'), 'success' );
+		}
+
+		// Don't redirect to permanent url of the page:
+		$redir = 'no';
+	}
+}
+
+// Check if terms & conditions should be accepted by current user:
+if( is_logged_in() && // Only for logged in users
+    ! in_array( $disp, array( 'terms', 'help', 'msgform', 'activateinfo' ) ) && // Allow these pages
+    $Settings->get( 'site_terms_enabled' ) && // Terms must be enabled
+    ! $UserSettings->get( 'terms_accepted', $current_User->ID ) ) // If it was not accepted yet
+{	// Current user didn't accept the terms yet:
+
+	// Get ID of page with terms & conditions from global settings:
+	$terms_page_ID = intval( $Settings->get( 'site_terms' ) );
+
+	$ItemCache = & get_ItemCache();
+	if( $terms_page_ID &&
+	    $terms_Item = & $ItemCache->get_by_ID( $terms_page_ID, false, false ) &&
+	    $terms_item_Blog = & $terms_Item->get_Blog() )
+	{	// Redirect to view page with terms & conditions if it is defined correctly in settings:
+		$Messages->add( T_('You need to accept the following before you can enter this site.'), 'note' );
+		header_redirect( $terms_item_Blog->get( 'termsurl', array(
+				'url_suffix' => 'redirect_to='.rawurlencode( $ReqURI ),
+				'glue'       => '&',
+			) ), 303 );
+		// EXIT HERE
+	}
+}
+
 
 
 /*
@@ -721,7 +812,8 @@ if( !empty( $skin ) )
 
 		if( $skin_provided_by_plugin = skin_provided_by_plugin( $skin ) )
 		{
-			$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params = array( 'skin' => $skin ) );
+			$tmp_params = array( 'skin' => $skin );
+			$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params );
 		}
 		else
 		{
@@ -758,6 +850,9 @@ if( !empty( $skin ) )
 					'usercomments'   => 'usercomments.main.php',
 					'download'       => 'download.main.php',
 					'access_requires_login' => 'access_requires_login.main.php',
+					'tags'           => 'tags.main.php',
+					'terms'          => 'terms.main.php',
+					'help'           => 'help.main.php',
 					// All others will default to index.main.php
 				);
 

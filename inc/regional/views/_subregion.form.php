@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -27,9 +27,9 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'subregion_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this sub-region!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('subregion') ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New sub-region') : T_('Sub-region') );
+$Form->begin_form( 'fform', ( $creating ?  T_('New sub-region') : T_('Sub-region') ).get_manual_link( 'subregions-editing' ) );
 
 	$Form->add_crumb( 'subregion' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',subrg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
@@ -60,7 +60,7 @@ jQuery( '#subrg_ctry_ID' ).change( function ()
 {	// Load option list with regions for seleted country
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_regions_option_list&page=edit&ctry_id=' + jQuery( this ).val(),
 	success: function( result )
 		{

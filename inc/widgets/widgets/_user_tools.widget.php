@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,10 +27,10 @@ class user_tools_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function user_tools_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'user_tools' );
+		parent::__construct( $db_row, 'core', 'user_tools' );
 	}
 
 
@@ -170,7 +170,7 @@ class user_tools_Widget extends ComponentWidget
 				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
-				'defaultvalue' => T_( 'Notifications &amp; Subscriptions' ),
+				'defaultvalue' => T_( 'Notifications & Subscriptions' ),
 			),
 			// Admin
 			'user_admin_link_show' => array(
@@ -356,7 +356,7 @@ class user_tools_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?

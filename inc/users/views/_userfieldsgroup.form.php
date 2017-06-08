@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -27,7 +27,7 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'userfieldgroup_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this user field group!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('userfieldgroup') ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', '?ctrl=userfields' );
+$Form->global_icon( T_('Cancel editing').'!', 'close', '?ctrl=userfields' );
 
 $Form->begin_form( 'fform', $creating ?  T_('New user field group') : T_('User field group') );
 
@@ -39,7 +39,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field group') : T_('User f
 
 	$Form->text_input( 'ufgp_name', $edited_UserfieldGroup->name, 50, T_('Name'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
-	$Form->text_input( 'ufgp_order', $edited_UserfieldGroup->order, 50, T_('Order number'), '', array( 'maxlength'=> 11, 'required'=>true ) );
+	$Form->text_input( 'ufgp_order', $edited_UserfieldGroup->order, 5, T_('Order number'), '', array( 'maxlength'=> 11, 'required'=>true ) );
 
 if( $creating )
 {

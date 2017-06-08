@@ -7,19 +7,14 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_Widget' );
 
-global $msg_menu_link_widget_link_types;
-$msg_menu_link_widget_link_types = array(
-		'messages' => T_( 'Messages' ),
-		'contacts' => T_( 'Contacts' ),
-	);
 
 /**
  * ComponentWidget Class
@@ -28,15 +23,22 @@ $msg_menu_link_widget_link_types = array(
  *
  * @package evocore
  */
-class msg_menu_link_Widget extends ComponentWidget
+class msg_menu_link_Widget extends generic_menu_link_Widget
 {
+	var $link_types;
+
 	/**
 	 * Constructor
 	 */
-	function msg_menu_link_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'msg_menu_link' );
+		parent::__construct( $db_row, 'core', 'msg_menu_link' );
+
+		$this->link_types = array(
+			'messages' => T_('Messages'),
+			'contacts' => T_('Contacts'),
+		);
 	}
 
 
@@ -56,7 +58,7 @@ class msg_menu_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Messaging Menu link');
+		return T_('Messaging Menu link or button');
 	}
 
 
@@ -65,13 +67,11 @@ class msg_menu_link_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		global $msg_menu_link_widget_link_types;
-
 		$this->load_param_array();
 
 		if( !empty($this->param_array['link_type']) )
 		{	// Messaging or Contacts
-			return sprintf( T_( '%s link' ), $msg_menu_link_widget_link_types[$this->param_array['link_type']] );
+			return sprintf( T_( '%s link' ), $this->link_types[ $this->param_array['link_type'] ] );
 		}
 
 		return $this->get_name();
@@ -95,14 +95,17 @@ class msg_menu_link_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $msg_menu_link_widget_link_types;
+		global $admin_url;
+
+		// Try to get collection that is used for messages on this site:
+		$msg_Blog = & get_setting_Blog( 'msg_blog_ID' );
 
 		$r = array_merge( array(
 				'link_type' => array(
 					'label' => T_( 'Link Type' ),
 					'note' => T_('What do you want to link to?'),
 					'type' => 'select',
-					'options' => $msg_menu_link_widget_link_types,
+					'options' => $this->link_types,
 					'defaultvalue' => 'messages',
 					'onchange' => '
 						var curr_link_type = this.value;
@@ -127,11 +130,25 @@ class msg_menu_link_Widget extends ComponentWidget
 				),
 				'blog_ID' => array(
 					'label' => T_('Collection ID'),
-					'note' => T_('Leave empty for current collection.'),
+					'note' => T_('Leave empty for current collection.')
+						.( $msg_Blog ? ' <span class="red">'.sprintf( T_('The site is <a %s>configured</a> to always use collection %s for profiles/messaging functions.'),
+								'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"',
+								'<b>'.$msg_Blog->get( 'name' ).'</b>' ).'</span>' : '' ),
 					'type' => 'integer',
 					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
+					'disabled' => $msg_Blog ? 'disabled' : false,
+				),
+				'visibility' => array(
+					'label' => T_( 'Visibility' ),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'always', T_( 'Always show (cacheable)') ),
+							array( 'access', T_( 'Only show if access is allowed (not cacheable)' ) ) ),
+					'defaultvalue' => 'always',
+					'field_lines' => true,
 				),
 				'show_to' => array(
 					'label' => T_( 'Show to' ),
@@ -195,8 +212,7 @@ class msg_menu_link_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $current_User, $unread_messages_count;
-		global $disp;
+		global $Blog, $current_User, $disp;
 
 		$this->init_display( $params );
 
@@ -209,13 +225,18 @@ class msg_menu_link_Widget extends ComponentWidget
 
 		if( empty( $current_Blog ) )
 		{ // Blog is not defined in setting or it doesn't exist in DB
-			global $Blog;
+			global $Collection, $Blog;
 			// Use current blog
 			$current_Blog = & $Blog;
 		}
 
 		if( empty( $current_Blog ) )
 		{ // Don't use this widget without current collection:
+			return false;
+		}
+
+		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
+		{	// Don't use this widget because current user has no access to the collection:
 			return false;
 		}
 
@@ -239,8 +260,8 @@ class msg_menu_link_Widget extends ComponentWidget
 				debug_die( 'Invalid params!' );
 		}
 
-		// Default link class
-		$link_class = $this->disp_params['link_default_class'];
+		// Allow to higlight current menu item only when it is linked to current collection:
+		$highlight_current = ( $current_Blog->ID == $Blog->ID );
 
 		switch( $this->disp_params[ 'link_type' ] )
 		{
@@ -249,12 +270,8 @@ class msg_menu_link_Widget extends ComponentWidget
 				$text = T_( 'Messages' );
 				// set allow blockcache to 0, this way make sure block cache is never allowed for messages
 				$this->disp_params[ 'allow_blockcache' ] = 0;
-				// Is this the current display?
-				if( ( $disp == 'threads' && ( ! isset( $_GET['disp'] ) || $_GET['disp'] != 'msgform' ) ) || $disp == 'messages' )
-				{ // The current page is currently displaying the messages:
-					// Let's display it as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && ( ( $disp == 'threads' && ( ! isset( $_GET['disp'] ) || $_GET['disp'] != 'msgform' ) ) || $disp == 'messages' ) );
 				break;
 
 			case 'contacts':
@@ -262,12 +279,8 @@ class msg_menu_link_Widget extends ComponentWidget
 				$text = T_( 'Contacts' );
 				// set show badge to 0, this way make sure badge won't be displayed
 				$this->disp_params[ 'show_badge' ] = 0;
-				// Is this the current display?
-				if( $disp == 'contacts' )
-				{ // The current page is currently displaying the contacts:
-					// Let's display it as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'contacts' );
 				break;
 		}
 
@@ -276,44 +289,22 @@ class msg_menu_link_Widget extends ComponentWidget
 			$text = $this->disp_params[ 'link_text' ];
 		}
 
-		if( ( $this->disp_params[ 'show_badge' ] ) && ( $unread_messages_count > 0 ) )
-		{
-			$badge = ' <span class="badge badge-important">'.$unread_messages_count.'</span>';
-			if( isset( $this->BlockCache ) )
-			{ // Do not cache if bage is displayed because the number of unread messages are always changing
-				$this->BlockCache->abort_collect();
+		$badge = '';
+		if( ( $this->disp_params[ 'show_badge' ] ) )
+		{	// Show badge with count of uread messages:
+			$unread_messages_count = get_unread_messages_count();
+			if( $unread_messages_count > 0 )
+			{	// If at least one unread message:
+				$badge = ' <span class="badge badge-important">'.$unread_messages_count.'</span>';
+				if( isset( $this->BlockCache ) )
+				{	// Do not cache if bage is displayed because the number of unread messages are always changing:
+					$this->BlockCache->abort_collect();
+				}
 			}
 		}
-		else
-		{
-			$badge = '';
-		}
 
-		echo $this->disp_params['block_start'];
-		echo $this->disp_params['block_body_start'];
-		echo $this->disp_params['list_start'];
-
-		if( $link_class == $this->disp_params['link_selected_class'] )
-		{
-			echo $this->disp_params['item_selected_start'];
-		}
-		else
-		{
-			echo $this->disp_params['item_start'];
-		}
-		echo '<a href="'.$url.'" class="'.$link_class.'">'.$text.$badge.'</a>';
-		if( $link_class == $this->disp_params['link_selected_class'] )
-		{
-			echo $this->disp_params['item_selected_end'];
-		}
-		else
-		{
-			echo $this->disp_params['item_end'];
-		}
-
-		echo $this->disp_params['list_end'];
-		echo $this->disp_params['block_body_end'];
-		echo $this->disp_params['block_end'];
+		// Display a layout with menu link:
+		echo $this->get_layout_menu_link( $url, $text.$badge, $highlight_current );
 
 		return true;
 	}

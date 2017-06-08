@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package sessions
  *
@@ -27,6 +27,11 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  * HEAVY :(
  */
 require_once $inc_path.'_main.inc.php';
+
+
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
 
 param( 'key', 'string', '' );
 

@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -60,20 +60,26 @@ $params = array_merge( array(
 		'image_size'               => 'fit-1280x720',
 		'image_limit'              =>  1000,
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
-		'excerpt_image_class'      => 'img-responsive',
-		'excerpt_image_size'       => 'fit-1280x720',
-		'excerpt_image_limit'      => 1,
+		'excerpt_image_class'      => '',
+		'excerpt_image_size'       => 'fit-80x80',
+		'excerpt_image_limit'      => 0,
 		'excerpt_image_link_to'    => 'single',
 		'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
 
 		'before_gallery'           => '<div class="evo_post_gallery">',
 		'after_gallery'            => '</div>',
+		'gallery_table_start'      => '',
+		'gallery_table_end'        => '',
+		'gallery_row_start'        => '',
+		'gallery_row_end'          => '',
+		'gallery_cell_start'       => '<div class="evo_post_gallery__image">',
+		'gallery_cell_end'         => '</div>',
 		'gallery_image_size'       => 'crop-80x80',
 		'gallery_image_limit'      => 1000,
 		'gallery_colls'            => 5,
 		'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 
-		'before_url_link'          => '<p class="evo_post_link">'.T_('Link:').' ',
+		'before_url_link'          => '<p class="evo_post_link">'.T_('Link').': ',
 		'after_url_link'           => '</p>',
 		'url_link_text_template'   => '$url$', // If evaluates to empty, nothing will be displayed (except player if podcast)
 		'url_link_url_template'    => '$url$', // $url$ will be replaced with saved URL address
@@ -85,15 +91,7 @@ $params = array_merge( array(
 		'more_link_to'             => 'single#anchor', // Can be 'single' or 'single#anchor' which is permalink + "#more55" where 55 is item ID
 		'anchor_text'              => '<p class="evo_post_more_anchor">...</p>', // Text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 
-		'limit_attach'             => 1000,
-		'attach_list_start'        => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
-		'attach_list_end'          => '</ul></div>',
-		'attach_start'             => '<li class="evo_file">',
-		'attach_end'               => '</li>',
-		'before_attach_size'       => ' <span class="evo_file_size">(',
-		'after_attach_size'        => ')</span>',
-
-		'page_links_start'         => '<p class="evo_post_pagination">'.T_('Pages:').' ',
+		'page_links_start'         => '<p class="evo_post_pagination">'.T_('Pages').': ',
 		'page_links_end'           => '</p>',
 		'page_links_separator'     => '&middot; ',
 		'page_links_single'        => '',
@@ -121,6 +119,7 @@ if( $content_mode == 'auto' )
 	switch( $disp_detail )
 	{
 		case 'posts-cat':
+		case 'posts-topcat':
 		case 'posts-subcat':
 			$content_mode = $Blog->get_setting('chapter_content');
 			break;
@@ -165,7 +164,7 @@ switch( $content_mode )
 		// Compact display:
 		echo $params['content_start_excerpt'];
 
-		if( !empty($params['excerpt_image_size']) )
+		if( !empty($params['excerpt_image_size']) && !empty($params['excerpt_image_limit']) )
 		{
 			// Display images that are linked to this post:
 			$Item->images( array(
@@ -181,6 +180,12 @@ switch( $content_mode )
 					'image_link_to'       => $params['excerpt_image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
 					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
 					'gallery_image_size'  => $params['gallery_image_size'],
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
@@ -210,9 +215,15 @@ switch( $content_mode )
 	default:
 		// Normal dislpay:  (and Full display if force_more is true)
 		echo $params['content_start_full'];
-			
+
 			// Title and number of photos in album
 			echo $params['content_title_start'];
+				// Flag:
+				$Item->flag( array(
+						'before' => '<span class="pull-left">',
+						'after'  => '</span>',
+					) );
+				// Title:
 				$Item->title( array(
 						'link_type' => 'permalink',
 						'before'    => '<h4 class="panel-title">',
@@ -239,6 +250,12 @@ switch( $content_mode )
 					'image_link_to'       => $params['image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
 					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
 					'gallery_image_size'  => $params['gallery_image_size'],
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
@@ -252,16 +269,6 @@ switch( $content_mode )
 		{	// We want to display text, not just images:
 
 			echo $params['content_start_full_text'];
-						
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => $params['before_url_link'],
-					'after'         => $params['after_url_link'],
-					'text_template' => $params['url_link_text_template'],
-					'url_template'  => $params['url_link_url_template'],
-					'target'        => $params['url_link_target'],
-					'podcast'       => '#', // Auto display mp3 player if post type is podcast (=> false, to disable)
-				) );
 
 			// Display CONTENT (at least the TEASER part):
 			$Item->content_teaser( array(
@@ -287,9 +294,8 @@ switch( $content_mode )
 					'link_to'     => $params['more_link_to'],
 				) );
 
-			// Display images that are linked "after more" to this post:
-			if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) /* only if not displayed all images already */ )
-			{	
+			if( ! empty( $params['image_size'] ) && ( $more || $params['force_more'] ) && $Item->has_content_parts( $params ) /* only if not displayed all images already */ )
+			{	// Display images that are linked "after more" to this post:
 				$Item->images( array(
 						'before'              => $params['before_images'],
 						'before_image'        => $params['before_image'],
@@ -303,6 +309,12 @@ switch( $content_mode )
 						'image_link_to'       => $params['image_link_to'],
 						'before_gallery'      => $params['before_gallery'],
 						'after_gallery'       => $params['after_gallery'],
+						'gallery_table_start' => $params['gallery_table_start'],
+						'gallery_table_end'   => $params['gallery_table_end'],
+						'gallery_row_start'   => $params['gallery_row_start'],
+						'gallery_row_end'     => $params['gallery_row_end'],
+						'gallery_cell_start'  => $params['gallery_cell_start'],
+						'gallery_cell_end'    => $params['gallery_cell_end'],
 						'gallery_image_size'  => $params['gallery_image_size'],
 						'gallery_image_limit' => $params['gallery_image_limit'],
 						'gallery_colls'       => $params['gallery_colls'],
@@ -344,41 +356,10 @@ switch( $content_mode )
 					'block_start' => $params['footer_text_start'],
 					'block_end'   => $params['footer_text_end'],
 				) );
-							
-				// URL link, if the post has one:
-				$Item->url_link( array(
-						'before'        => '<div class="small evo_print text-muted">'.T_('Link').': ',
-						'after'         => '</div>',
-						'text_template' => '$url$',
-						'url_template'  => '$url$',
-						'target'        => '',
-						'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-					) );			
-				
+
 			echo $params['content_end_full_text'];
 		}
 
-		if( ! empty($params['limit_attach'])
-			&& ( $more || ! $Item->has_content_parts($params) ) )
-		{	// Display attachments/files that are linked to this post:
-			$Item->files( array(
-					'before' =>              $params['attach_list_start'],
-					'before_attach' =>       $params['attach_start'],
-					'before_attach_size' =>  $params['before_attach_size'],
-					'after_attach_size' =>   $params['after_attach_size'],
-					'after_attach' =>        $params['attach_end'],
-					'after' =>               $params['attach_list_end'],
-					'limit_attach' =>        $params['limit_attach'],
-				) );
-		}
-
-		// Display location info
-		$Item->location( '<div class="evo_post_location"><strong>'.T_('Location').': </strong>', '</div>' );
-
-		if( $disp == 'single' )
-		{	// Display custom fields
-			$Item->custom_fields();
-		}
 
 		echo $params['content_end_full'];
 

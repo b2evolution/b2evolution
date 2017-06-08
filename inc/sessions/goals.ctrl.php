@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'sessions/model/_goal.class.php', 'Goal' );
 load_class( 'sessions/model/_goalcat.class.php', 'GoalCategory' );
-load_funcs('sessions/model/_hitlog.funcs.php');
+load_funcs( 'sessions/model/_hitlog.funcs.php' );
 
 /**
  * @var User
@@ -60,7 +60,7 @@ if( $blog == 0 )
 		elseif( set_working_blog( $selected ) ) // set $blog & memorize in user prefs
 		{ // Selected a new blog:
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 	}
 }
@@ -71,7 +71,7 @@ $current_User->check_perm( 'stats', 'list', true, $blog );
 if( param( 'goal_ID', 'integer', '', true) )
 { // Load goal:
 	$GoalCache = & get_GoalCache();
-	if( ($edited_Goal = & $GoalCache->get_by_ID( $goal_ID, false )) === false )
+	if( ( $edited_Goal = & $GoalCache->get_by_ID( $goal_ID, false ) ) === false )
 	{ // We could not find the goal to edit:
 		unset( $edited_Goal );
 		forget_param( 'goal_ID' );
@@ -83,7 +83,7 @@ if( param( 'goal_ID', 'integer', '', true) )
 if( param( 'gcat_ID', 'integer', '', true) )
 { // Load goal category:
 	$GoalCategoryCache = & get_GoalCategoryCache();
-	if( ($edited_GoalCategory = & $GoalCategoryCache->get_by_ID( $gcat_ID, false )) === false )
+	if( ( $edited_GoalCategory = & $GoalCategoryCache->get_by_ID( $gcat_ID, false ) ) === false )
 	{ // We could not find the goal category to edit:
 		unset( $edited_GoalCategory );
 		forget_param( 'gcat_ID' );
@@ -100,13 +100,13 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'stats', 'edit', true );
 
-		if( ! isset($edited_Goal) )
+		if( ! isset( $edited_Goal ) )
 		{	// We don't have a model to use, start with blank object:
 			$edited_Goal = new Goal();
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Goal = duplicate( $edited_Goal ); // PHP4/5 abstraction
+			$edited_Goal = clone $edited_Goal;
 			$edited_Goal->ID = 0;
 		}
 		break;
@@ -138,42 +138,27 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$DB->begin();
-			$q = $edited_Goal->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Goal->dbinsert();
+			$Messages->add( T_('New goal created.'), 'success' );
 
-				param_error( 'goal_key',
-					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
-						'href="?ctrl=goals&amp;action=edit&amp;blog='.$Blog->ID.'&amp;goal_ID='.$q.'"' ) );
-			}
-			else
+			// What next?
+			switch( $action )
 			{
-				$edited_Goal->dbinsert();
-				$Messages->add( T_('New goal created.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{	// What next?
-				switch( $action )
-				{
-					case 'create_copy':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&action=new&blog='.$Blog->ID.'&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create_new':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&action=new&blog='.$Blog->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&blog='.$Blog->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&action=new'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ).'&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&action=new'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;
@@ -195,29 +180,13 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Update in DB:
-			$DB->begin();
-			$q = $edited_Goal->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Goal->dbupdate();
+			$Messages->add( T_('Goal updated.'), 'success' );
 
-				param_error( 'goal_key',
-					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
-						'href="?ctrl=goals&amp;action=edit&amp;blog='.$Blog->ID.'&amp;goal_ID='.$q.'"' ) );
-			}
-			else
-			{
-				$edited_Goal->dbupdate();
-				$Messages->add( T_('Goal updated.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{
-				$action = 'list';
-				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=goals&blog='.$Blog->ID, 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
+			$action = 'list';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=goals'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 
 
@@ -237,7 +206,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Goal &laquo;%s&raquo; deleted.'), $edited_Goal->dget('name') );
+			$msg = sprintf( T_('Goal &laquo;%s&raquo; deleted.'), $edited_Goal->dget( 'name' ) );
 			$edited_Goal->dbdelete();
 			unset( $edited_Goal );
 			forget_param( 'goal_ID' );
@@ -248,7 +217,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Goal->check_delete( sprintf( T_('Cannot delete goal &laquo;%s&raquo;'), $edited_Goal->dget('name') ) ) )
+			if( ! $edited_Goal->check_delete( sprintf( T_('Cannot delete goal &laquo;%s&raquo;'), $edited_Goal->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -269,7 +238,7 @@ switch( $action )
 		}
 		else
 		{ // Duplicate object in order no to mess with the cache:
-			$edited_GoalCategory = duplicate( $edited_GoalCategory ); // PHP4/5 abstraction
+			$edited_GoalCategory = clone $edited_GoalCategory;
 			$edited_GoalCategory->ID = 0;
 		}
 		break;
@@ -372,14 +341,14 @@ switch( $action )
 
 		if( $gcat_ID == 1 )
 		{ // Deny to delete "Default" category
-			$Messages->add( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget('name') ), 'error' );
+			$Messages->add( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget( 'name' ) ), 'error' );
 			$action = 'view';
 			break;
 		}
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Goal category &laquo;%s&raquo; deleted.'), $edited_GoalCategory->dget('name') );
+			$msg = sprintf( T_('Goal category &laquo;%s&raquo; deleted.'), $edited_GoalCategory->dget( 'name' ) );
 			$edited_GoalCategory->dbdelete();
 			unset( $edited_GoalCategory );
 			forget_param( 'gcat_ID' );
@@ -390,7 +359,7 @@ switch( $action )
 		}
 		else
 		{ // not confirmed, Check for restrictions:
-			if( ! $edited_GoalCategory->check_delete( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget('name') ) ) )
+			if( ! $edited_GoalCategory->check_delete( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget( 'name' ) ) ) )
 			{ // There are restrictions:
 				$action = 'view';
 			}
@@ -450,7 +419,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Goal->confirm_delete(
-				sprintf( T_('Delete goal &laquo;%s&raquo;?'), $edited_Goal->dget('name') ),
+				sprintf( T_('Delete goal &laquo;%s&raquo;?'), $edited_Goal->dget( 'name' ) ),
 				'goal', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
@@ -466,7 +435,7 @@ switch( $action )
 	case 'cat_delete':
 		// We need to ask for confirmation:
 		$edited_GoalCategory->confirm_delete(
-				sprintf( T_('Delete goal category &laquo;%s&raquo;?'), $edited_GoalCategory->dget('name') ),
+				sprintf( T_('Delete goal category &laquo;%s&raquo;?'), $edited_GoalCategory->dget( 'name' ) ),
 				'goalcat', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'cat_new':

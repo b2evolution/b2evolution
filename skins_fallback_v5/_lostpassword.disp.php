@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  */
@@ -63,7 +63,7 @@ display_lostpassword_form( $login, $params_hidden, $form_params );
 
 if( $params['lostpass_form_footer'] )
 { // Display lost password form footer
-	echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'login.php?action=lostpassword&amp;source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard password recovery form instead').' &raquo;</a></div>';
+	echo '<div class="notes standard_login_link"><a href="'.get_htsrv_url( true ).'login.php?action=lostpassword&amp;source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard password recovery form instead').' &raquo;</a></div>';
 
 	echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }

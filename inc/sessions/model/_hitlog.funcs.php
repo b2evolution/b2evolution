@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal Origin:
@@ -125,7 +125,7 @@ function hits_results_block( $params = array() )
 
 	$SQL = new SQL();
 	$SQL->SELECT( 'SQL_NO_CACHE hit_ID, sess_ID, sess_device, hit_datetime, hit_type, hit_referer_type, hit_uri, hit_disp, hit_ctrl, hit_action, hit_coll_ID, hit_referer, hit_remote_addr,'
-		.'user_login, hit_agent_type, blog_shortname, dom_name, goal_name, hit_keyphrase, hit_serprank, hit_response_code, hit_agent_ID' );
+		.'user_login, hit_agent_type, blog_shortname, dom_name, goal_name, hit_keyphrase, hit_serprank, hit_response_code, hit_method, hit_agent_ID' );
 	$SQL->FROM( 'T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID'
 		.' LEFT JOIN T_sessions ON hit_sess_ID = sess_ID'
 		.' LEFT JOIN T_blogs ON hit_coll_ID = blog_ID'
@@ -253,222 +253,6 @@ function hits_results_block( $params = array() )
 
 
 /**
- * @todo Transform to make this a stub for {@link $Hitlist}
- *
- * Extract stats
- */
-function refererList(
-	$howMany = 5,
-	$visitURL = '',
-	$disp_blog = 0,
-	$disp_uri = 0,
-	$type = "'referer'",		// was: 'referer' normal refer, 'invalid', 'badchar', 'blacklist', 'rss', 'robot', 'search'
-													// new: 'search', 'blacklist', 'referer', 'direct', ('spam' but spam is not logged)
-	$groupby = '', 	// dom_name
-	$blog_ID = '',
-	$get_total_hits = false, // Get total number of hits (needed for percentages)
-	$get_user_agent = false ) // Get the user agent
-{
-	global $DB, $res_stats, $stats_total_hits, $ReqURI;
-
-	if( strpos( $type, "'" ) !== 0 )
-	{ // no quote at position 0
-		$type = "'".$type."'";
-	}
-
-	//if no visitURL, will show links to current page.
-	//if url given, will show links to that page.
-	//if url="global" will show links to all pages
-	if (!$visitURL)
-	{
-		$visitURL = $ReqURI;
-	}
-
-	if( $groupby == '' )
-	{ // No grouping:
-		$sql = 'SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime) AS hit_datetime, hit_referer, dom_name';
-	}
-	else
-	{ // group by
-		if( $groupby == 'baseDomain' )
-		{ // compatibility HACK!
-			$groupby = 'dom_name';
-		}
-		$sql = 'SELECT COUNT(*) AS totalHits, hit_referer, dom_name';
-	}
-	if( $disp_blog )
-	{
-		$sql .= ', hit_coll_ID';
-	}
-	if( $disp_uri )
-	{
-		$sql .= ', hit_uri';
-	}
-	if( $get_user_agent )
-	{
-		$sql .= ', agnt_signature';
-	}
-
-	$sql_from_where = "
-			  FROM T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
-			 WHERE hit_referer_type IN (".$type.")
-			   AND hit_agent_type = 'browser'";
-	if( !empty($blog_ID) )
-	{
-		$sql_from_where .= " AND hit_coll_ID = '".$blog_ID."'";
-	}
-	if ( $visitURL != 'global' )
-	{
-		$sql_from_where .= " AND hit_uri = '".$DB->escape($visitURL, 0, 250)."'";
-	}
-
-	$sql .= $sql_from_where;
-
-	if( $groupby == '' )
-	{ // No grouping:
-		$sql .= ' ORDER BY hit_ID DESC';
-	}
-	else
-	{ // group by
-		$sql .= " GROUP BY ".$groupby." ORDER BY totalHits DESC";
-	}
-	$sql .= ' LIMIT '.$howMany;
-
-	$res_stats = $DB->get_results( $sql, ARRAY_A );
-
-	if( $get_total_hits )
-	{ // we need to get total hits
-		$sql = 'SELECT COUNT(*) '.$sql_from_where;
-		$stats_total_hits = $DB->get_var( $sql );
-	}
-	else
-	{ // we're not getting total hits
-		$stats_total_hits = 1;		// just in case some tries a percentage anyway (avoid div by 0)
-	}
-
-}
-
-
-/*
- * stats_hit_ID(-)
- */
-function stats_hit_ID()
-{
-	global $row_stats;
-	echo $row_stats['visitID'];
-}
-
-/*
- * stats_hit_remote_addr(-)
- */
-function stats_hit_remote_addr()
-{
-	global $row_stats;
-	echo $row_stats['hit_remote_addr'];
-}
-
-/*
- * stats_time(-)
- */
-function stats_time( $format = '' )
-{
-	global $row_stats;
-	if( $format == '' )
-		$format = locale_datefmt().' '.locale_timefmt();
-	echo date_i18n( $format, $row_stats['hit_datetime'] );
-}
-
-
-/*
- * stats_total_hit_count(-)
- */
-function stats_total_hit_count()
-{
-	global $stats_total_hits;
-	echo $stats_total_hits;
-}
-
-
-/*
- * stats_hit_count(-)
- */
-function stats_hit_count( $disp = true )
-{
-	global $row_stats;
-	if( $disp )
-		echo $row_stats['totalHits'];
-	else
-		return $row_stats['totalHits'];
-}
-
-
-/*
- * stats_hit_percent(-)
- */
-function stats_hit_percent(
-	$decimals = 1,
-	$dec_point = '.' )
-{
-	global $row_stats, $stats_total_hits;
-	$percent = $row_stats['totalHits'] * 100 / $stats_total_hits;
-	echo number_format( $percent, $decimals, $dec_point, '' ).'&nbsp;%';
-}
-
-
-/*
- * stats_blog_ID(-)
- */
-function stats_blog_ID()
-{
-	global $row_stats;
-	echo $row_stats['hit_coll_ID'];
-}
-
-
-/*
- * stats_blog_name(-)
- */
-function stats_blog_name()
-{
-	global $row_stats;
-
-	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID($row_stats['hit_coll_ID']);
-
-	$Blog->disp('name');
-}
-
-
-/*
- * stats_referer(-)
- */
-function stats_referer( $before='', $after='', $disp_ref = true )
-{
-	global $row_stats;
-	$ref = trim($row_stats['hit_referer']);
-	if( strlen($ref) > 0 )
-	{
-		echo $before;
-		if( $disp_ref ) echo htmlentities( $ref );
-		echo $after;
-	}
-}
-
-
-/*
- * stats_basedomain(-)
- */
-function stats_basedomain( $disp = true )
-{
-	global $row_stats;
-	if( $disp )
-		echo htmlentities( $row_stats['dom_name'] );
-	else
-		return $row_stats['dom_name'];
-}
-
-
-/**
  * Displays keywords used for search leading to this page
  */
 function stats_search_keywords( $keyphrase, $length = 45 )
@@ -483,7 +267,7 @@ function stats_search_keywords( $keyphrase, $length = 45 )
 	// Save original string
 	$keyphrase_orig = $keyphrase;
 
-	$keyphrase = strmaxlen($keyphrase, $length, '...', 'raw');
+	$keyphrase = strmaxlen( $keyphrase, $length, '...', 'raw' );
 
 	// Convert keyword encoding, some charsets are supported only in PHP 4.3.2 and later.
 	// This fixes encoding problem for Cyrillic keywords
@@ -501,7 +285,7 @@ function stats_search_keywords( $keyphrase, $length = 45 )
  */
 function generate_random_ip()
 {
-	return mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255).'.'.mt_rand(0, 255);
+	return mt_rand( 0, 255 ).'.'.mt_rand( 0, 255 ).'.'.mt_rand( 0, 255 ).'.'.mt_rand( 0, 255 );
 }
 
 
@@ -516,10 +300,10 @@ function generate_random_ip()
  */
 function generate_hit_stat( $days, $min_interval, $max_interval, $display_process = false )
 {
-	global $baseurlroot, $admin_url, $user_agents, $DB, $htsrv_url;
+	global $baseurlroot, $admin_url, $user_agents, $DB, $htsrv_url, $is_api_request;
 
-	load_class('items/model/_itemlistlight.class.php', 'ItemListLight');
-	load_class('sessions/model/_hit.class.php', 'Hit');
+	load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
+	load_class( 'sessions/model/_hit.class.php', 'Hit' );
 
 	$links = array();
 
@@ -527,15 +311,15 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 
 	$blogs_id = $BlogCache->load_public();
 
-	foreach ($blogs_id as $blog_id)
-	{ // handle all public blogs
-			$listBlog = & $BlogCache->get_by_ID($blog_id);
-		if (empty($listBlog))
+	foreach( $blogs_id as $blog_id )
+	{	// Handle all public blogs:
+		$listBlog = & $BlogCache->get_by_ID( $blog_id );
+		if( empty( $listBlog ) )
 		{
 			continue;
 		}
 
-		$ItemList = new ItemListLight($listBlog);
+		$ItemList = new ItemListLight( $listBlog );
 		$filters = array();
 
 		# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
@@ -549,58 +333,93 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 		$linkblog_cat_array = array();
 		$linkblog_cat_modifier = '';
 
-		compile_cat_array($linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */ $linkblog_cat_modifier, $listBlog->ID);
+		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */ $linkblog_cat_modifier, $listBlog->ID );
 
 		$filters['cat_array'] = $linkblog_cat_array;
 		$filters['cat_modifier'] = $linkblog_cat_modifier;
 
 
-		$ItemList->set_default_filters($filters);
+		$ItemList->set_default_filters( $filters );
 
 		// Get the items list of current blog
 		$ItemList->query();
 
-		if (!$ItemList->result_num_rows)
-		{ // Nothing to display:
+		if( ! $ItemList->result_num_rows )
+		{	// Nothing to display:
 			continue;
 		}
 
-		while ($Item = & $ItemList->get_category_group())
+		while( $Item = & $ItemList->get_category_group() )
 		{
 			// Open new cat:
 			$Chapter = & $Item->get_main_Chapter();
-			while ($Item = & $ItemList->get_item())
+			while( $Item = & $ItemList->get_item() )
 			{
-				$links[] = array('link' => '/' . $listBlog->siteurl . '/' . $Chapter->get_url_path() . $Item->urltitle, // trim($Chapter->get_permanent_url(NULL ,' ')).
-					'blog_id' => $blog_id);
+				$links[] = array(
+					'link' => '/'.$listBlog->siteurl.'/'.$Chapter->get_url_path().$Item->urltitle, // trim( $Chapter->get_permanent_url( NULL ,' ' ) ).
+					'blog_id' => $blog_id
+				);
 			}
 		}
 
 		// add search links for all blogs
-		$links[] = array('link' => url_add_param( '/' . $listBlog->siteurl, 's=$keywords$&disp=search&submit=Search', '&' ),
-			'blog_id' => $blog_id);
-
-		$links[] = array('link' => url_add_param( '/' . $listBlog->siteurl, 'disp=users', '&' ),
-			'blog_id' => $blog_id,
-			'disp' => 'users');
-
-		$links[] = array('link' => url_add_param( '/'.$listBlog->siteurl, 'disp=user&user_ID=1', '&' ),
-			'blog_id' => $blog_id,
-			'disp' => 'users');
-
-		$links[] = array('link' => url_add_param( '/' . $listBlog->siteurl, 'disp=threads', '&' ),
-			'blog_id' => $blog_id,
-			'disp' => 'threads');
-
-		$links[] = array('link' => url_add_param( '/' . $listBlog->siteurl, 'disp=profile', '&' ),
-			'blog_id' => $blog_id,
-			'disp' => 'profile');
+		$links[] = array(
+			'link' => url_add_param( '/'.$listBlog->siteurl, 's=$keywords$&disp=search&submit=Search', '&' ),
+			'blog_id' => $blog_id
+		);
 
 		$links[] = array(
-				'link' => $htsrv_url.'anon_async.php',
-				'blog_id' => $blog_id
-			);
+			'link' => url_add_param( '/'.$listBlog->siteurl, 'disp=users', '&' ),
+			'blog_id' => $blog_id,
+			'disp' => 'users'
+		);
+
+		$links[] = array(
+			'link' => url_add_param( '/'.$listBlog->siteurl, 'disp=user&user_ID=1', '&' ),
+			'blog_id' => $blog_id,
+			'disp' => 'users'
+		);
+
+		$links[] = array(
+			'link' => url_add_param( '/'.$listBlog->siteurl, 'disp=threads', '&' ),
+			'blog_id' => $blog_id,
+			'disp' => 'threads'
+		);
+
+		$links[] = array(
+			'link' => url_add_param( '/'.$listBlog->siteurl, 'disp=profile', '&' ),
+			'blog_id' => $blog_id,
+			'disp' => 'profile'
+		);
+
+		$links[] = array(
+			'link' => $htsrv_url.'anon_async.php',
+			'blog_id' => $blog_id
+		);
+
+		$links[] = array(
+			'link' => '/api/v1/collections/'.$listBlog->urlname.'/posts',
+			'blog_id' => $blog_id
+		);
+
+		$links[] = array(
+			'link' => '/api/v1/collections/'.$listBlog->urlname.'/search/post',
+			'blog_id' => $blog_id
+		);
+
+		$links[] = array(
+			'link' => '/xmlsrv/xmlrpc.php?blog='.$listBlog->ID,
+			'blog_id' => $blog_id
+		);
 	}
+
+	$links[] = array(
+			'link' => '/api/v1/collections',
+		);
+
+	$links[] = array(
+			'link' => '/xmlsrv/xmlrpc.php'
+		);
 
 	$referes = array('http://www.fake-referer1.com',
 		'http://www.fake-referer2.com',
@@ -635,10 +454,13 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			'gendvice'
 		);
 
+	$request_methods = array( 'GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'unknown' );
+	$request_methods_count = count( $request_methods ) - 1;
+
 	$robots = array();
 	foreach( $user_agents as $lUserAgent )
 	{
-		if ($lUserAgent[0] == 'robot')
+		if( $lUserAgent[0] == 'robot' )
 		{
 			$robots[] = $lUserAgent[1];
 		}
@@ -669,7 +491,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 					  FROM T_users
 					  WHERE user_status = "activated" OR user_status= "autoactivated"
 					  LIMIT 10'
-					, 'ARRAY_A');
+					, ARRAY_A );
 
 	$users_count = count( $users_array );
 	$devices_count = count( $devices );
@@ -677,24 +499,24 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 	if( empty( $users_count ) )
 	{
 		$Messages->add( 'Cannot generate statistics without valid users.' );
-		break;
+		return;
 	}
 
 	// Calculate the period of testing
 	$cur_time = time();
-	$past_time = mktime(date("H"), date("i"), date("s"), date("m"), date("d") - $days, date("Y"));
+	$past_time = mktime( date( 'H' ), date( 'i' ), date( 's' ), date( 'm' ), date( 'd' ) - $days, date( 'Y' ) );
 
 	$insert_data = '';
 	$insert_data_count = 0;
 
 	// create session array for testing
 	$sessions = array();
-	mt_srand(crc32(microtime()));
-	for ($i = 0; $i <= $users_count - 1; $i++)
+	mt_srand( crc32( microtime() ) );
+	for( $i = 0; $i <= $users_count - 1; $i++ )
 	{
 		$sessions[] = array(
 				'sess_ID'          => -1,
-				'sess_key'         => generate_random_key(32),
+				'sess_key'         => generate_random_key( 32 ),
 				'sess_start_ts'    => 0,
 				'sess_lastseen_ts' => 0,
 				'sess_ipaddress'   => generate_random_ip(),
@@ -707,112 +529,113 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 
 	// main cycle of generation
 	//mt_srand(crc32(microtime()));
-	for ($time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand($min_interval, $max_interval))
+	for( $time_shift = $past_time; $cur_time > $time_shift; $time_shift += mt_rand( $min_interval, $max_interval ) )
 	{
 		//mt_srand(crc32(microtime()));
 		$insert_data_count = $insert_data_count + 1;
 
-		$rand_i = mt_rand(0, $users_count - 1);
-		$rand_link = mt_rand(0, $links_count - 1);
-		$cur_seesion = $sessions[$rand_i];
+		$rand_i = mt_rand( 0, $users_count - 1 );
+		$rand_link = mt_rand( 0, $links_count - 1 );
+		$cur_session = $sessions[$rand_i];
+		$rand_request_method = $request_methods[ mt_rand( 0, $request_methods_count - 1 ) ];
 
 
-		if (strstr($links[$rand_link]['link'], '$keywords$'))
+		if( strstr( $links[$rand_link]['link'], '$keywords$' ) )
 		{ // check if the current search link is selected randomly.
 			// If yes, generate search link and add it to DB
 			//mt_srand(crc32(microtime()+ $time_shift));
-			$keywords = 'fake search ' . mt_rand(0, 9);
-			$links[$rand_link]['link'] = str_replace('$keywords$', urlencode($keywords), $links[$rand_link]['link']);
-			if (strstr($links[$rand_link]['link'], 's='))
+			$keywords = 'fake search '.mt_rand( 0, 9 );
+			$links[$rand_link]['link'] = str_replace( '$keywords$', urlencode( $keywords ), $links[$rand_link]['link'] );
+			if( strstr( $links[$rand_link]['link'], 's=' ) )
 			{
 				$links[$rand_link]['s'] = $keywords;
 			}
 		}
 
-
-		if ($cur_seesion['sess_ID'] == -1)
+		if( $cur_session['sess_ID'] == -1 )
 		{ // This session needs initialization:
-			$cur_seesion['sess_start_ts'] = $time_shift - 1;
-			$cur_seesion['sess_lastseen_ts'] = $time_shift;
+			$cur_session['sess_start_ts'] = $time_shift - 1;
+			$cur_session['sess_lastseen_ts'] = $time_shift;
 
-			$DB->query("
-					INSERT INTO T_sessions ( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_user_ID, sess_device )
+			$DB->query( 'INSERT INTO T_sessions ( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_user_ID, sess_device )
 					VALUES (
-						'" . $cur_seesion['sess_key'] . "',
-						'" . date('Y-m-d H:i:s', $cur_seesion['sess_start_ts']) . "',
-						'" . date('Y-m-d H:i:s', $cur_seesion['sess_lastseen_ts']) . "',
-						" . $DB->quote( $cur_seesion['sess_ipaddress'] ) . ",
-						" . $cur_seesion['sess_user_ID'] . ",
-						" . $DB->quote( $cur_seesion['sess_device'] ) . "
-					)");
+						'.$DB->quote( $cur_session['sess_key'] ).',
+						'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_start_ts'] ) ).',
+						'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_lastseen_ts'] ) ).',
+						'.$DB->quote( $cur_session['sess_ipaddress'] ).',
+						'.$DB->quote( $cur_session['sess_user_ID'] ).',
+						'.$DB->quote( $cur_session['sess_device'] ).'
+					)' );
 
-			$cur_seesion['sess_ID'] = $DB->insert_id;
-			$sessions[$rand_i] = $cur_seesion;
+			$cur_session['sess_ID'] = $DB->insert_id;
+			$sessions[$rand_i] = $cur_session;
 
-			$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+			// Check if current url is api request:
+			$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
+
+			$Test_hit = new Hit( '', $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $links[$rand_link] );
+			$Test_hit->method = $rand_request_method;
 			$Test_hit->log();
 		}
 		else
 		{
-			if (($time_shift - $cur_seesion['sess_lastseen_ts']) > 3000 || !empty($cur_seesion['robot']))
+			if( ( $time_shift - $cur_session['sess_lastseen_ts'] ) > 3000 || ! empty( $cur_session['robot'] ) )
 			{ // This session last updated more than 3000 sec ago. Instead of this session create a new session.
-				$cur_seesion = array(
+				$cur_session = array(
 					'sess_ID'          => -1,
-					'sess_key'         => generate_random_key(32),
+					'sess_key'         => generate_random_key( 32 ),
 					'sess_start_ts'    => 0,
 					'sess_lastseen_ts' => 0,
 					'sess_ipaddress'   => generate_random_ip(),
-					'sess_user_ID'     => $users_array[mt_rand(0, $users_count - 1)]['user_ID'],
+					'sess_user_ID'     => $users_array[ mt_rand( 0, $users_count - 1 ) ]['user_ID'],
 					'sess_device'      => $devices[ mt_rand( 0, $devices_count - 1 ) ],
 					'pervios_link'     => '',
 					'robot'            => ''
 				);
 
-				$cur_seesion['sess_start_ts'] = $time_shift - 1;
-				$cur_seesion['sess_lastseen_ts'] = $time_shift;
-				$r_num = mt_rand(0, 100);
-				if ($r_num > 40)
+				$cur_session['sess_start_ts'] = $time_shift - 1;
+				$cur_session['sess_lastseen_ts'] = $time_shift;
+				$r_num = mt_rand( 0, 100 );
+				if( $r_num > 40 )
 				{ // Create anonymous user and make double insert into hits.
-					$cur_seesion['sess_user_ID'] = -1;
-					$DB->query("
-							INSERT INTO T_sessions ( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_device )
+					$cur_session['sess_user_ID'] = -1;
+					$DB->query( 'INSERT INTO T_sessions ( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_device )
 							VALUES (
-								'" . $cur_seesion['sess_key'] . "',
-								'" . date('Y-m-d H:i:s', $cur_seesion['sess_start_ts']) . "',
-								'" . date('Y-m-d H:i:s', $cur_seesion['sess_lastseen_ts']) . "',
-								" . $DB->quote( $cur_seesion['sess_ipaddress'] ) . ",
-								" . $DB->quote( $cur_seesion['sess_device'] ) . "
-							)");
+								'.$DB->quote( $cur_session['sess_key'] ).',
+								'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_start_ts'] ) ).',
+								'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_lastseen_ts'] ) ).',
+								'.$DB->quote( $cur_session['sess_ipaddress'] ).',
+								'.$DB->quote( $cur_session['sess_device'] ).'
+							)' );
 
-					if ($r_num >= 80)
+					if( $r_num >= 80 )
 					{ // Create robot hit
-						$cur_seesion['robot'] = $robots[mt_rand(0, $robots_count)];
+						$cur_session['robot'] = $robots[ mt_rand( 0, $robots_count ) ];
 					}
 				}
 				else
 				{
-					$DB->query("
-							INSERT INTO T_sessions( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_user_ID, sess_device )
+					$DB->query(	'INSERT INTO T_sessions( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_user_ID, sess_device )
 							VALUES (
-								'" . $cur_seesion['sess_key'] . "',
-								'" . date('Y-m-d H:i:s', $cur_seesion['sess_start_ts']) . "',
-								'" . date('Y-m-d H:i:s', $cur_seesion['sess_lastseen_ts']) . "',
-								" . $DB->quote($cur_seesion['sess_ipaddress']) . ",
-								" . $cur_seesion['sess_user_ID'] . ",
-								" . $DB->quote( $cur_seesion['sess_device'] ) . "
-							)");
+								'.$DB->quote( $cur_session['sess_key'] ).',
+								'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_start_ts'] ) ).',
+								'.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_lastseen_ts'] ) ).',
+								'.$DB->quote( $cur_session['sess_ipaddress'] ).',
+								'.$DB->quote( $cur_session['sess_user_ID'] ).',
+								'.$DB->quote( $cur_session['sess_device'] ).'
+							)' );
 				}
 
-				$cur_seesion['sess_ID'] = $DB->insert_id;
+				$cur_session['sess_ID'] = $DB->insert_id;
 
-				if (mt_rand(0, 100) > 20)
+				if( mt_rand( 0, 100 ) > 20 )
 				{
 					//$ref_count
-					$ref_link = $referes[mt_rand(0, $ref_count)];
-					if (strstr($ref_link, '$keywords$'))
+					$ref_link = $referes[ mt_rand( 0, $ref_count ) ];
+					if( strstr( $ref_link, '$keywords$' ) )
 					{ // check if the current search link is selected randomly.
-						$keywords = 'fake search ' . mt_rand(0, 9);
-						$ref_link = str_replace('$keywords$', urlencode($keywords), $ref_link);
+						$keywords = 'fake search '.mt_rand( 0, 9 );
+						$ref_link = str_replace( '$keywords$', urlencode( $keywords ), $ref_link );
 					}
 				}
 				else
@@ -820,78 +643,103 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 					$ref_link = '';
 				}
 
-				if ($cur_seesion['sess_user_ID'] == -1)
+				if( $cur_session['sess_user_ID'] == -1 )
 				{
-					if (empty($cur_seesion['robot']))
+					if( empty( $cur_session['robot'] ) )
 					{
-						$link = array('link' => '/htsrv/login.php',
-							'blog_id' => 1);
+						$link = array(
+							'link'    => '/htsrv/login.php',
+							'blog_id' => 1
+						);
 
-						$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $link);
+						// This is NOT api request:
+						$is_api_request = false;
+
+						$Test_hit = new Hit( $ref_link, $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $link );
+
+						$Test_hit->method = $rand_request_method;
 
 						$Test_hit->log();
 
-						$link = array('link' => '/htsrv/login.php?redirect_to=fake_stat',
-							'blog_id' => 1);
+						$link = array(
+							'link'    => '/htsrv/login.php?redirect_to=fake_stat',
+							'blog_id' => 1
+						);
 
-						$Test_hit = new Hit($baseurlroot, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'] + 3, 1, $link);
+						$Test_hit = new Hit( $baseurlroot, $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'] + 3, 1, $link );
+
+						$Test_hit->method = $rand_request_method;
 
 						$Test_hit->log();
 
-						$cur_seesion['pervios_link'] = $baseurlroot . $link['link'];
+						$cur_session['pervios_link'] = $baseurlroot.$link['link'];
 					}
 					else
 					{
-						if (mt_rand(0, 100) < 50)
+						// Check if current url is api request:
+						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
+
+						if( mt_rand( 0, 100 ) < 50 )
 						{ // robot hit
-							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link], $cur_seesion['robot']);
+							$Test_hit = new Hit( '', $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $links[$rand_link], $cur_session['robot'] );
 						}
 						else
 						{ // rss/atom hit
-							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link], NULL, NULL, 1);
+							$Test_hit = new Hit( '', $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $links[$rand_link], NULL, NULL, 1 );
 						}
+						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
 					}
 				}
 				else
 				{
-					if (mt_rand(0, 100) < 10)
-					{ // Test hit to admin page
-						$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $admin_link, NULL, 1);
+					if( mt_rand( 0, 100 ) < 10 )
+					{	// Test hit to admin page:
+
+						// This is NOT api request:
+						$is_api_request = false;
+
+						$Test_hit = new Hit( '', $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $admin_link, NULL, 1 );
+						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
-						$cur_seesion['pervios_link'] = $admin_url;
+						$cur_session['pervios_link'] = $admin_url;
 					}
 					else
 					{
-						$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+						// Check if current url is api request:
+						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
+
+						$Test_hit = new Hit( $ref_link, $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $links[$rand_link] );
+						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
-						$cur_seesion['pervios_link'] = $baseurlroot . $links[$rand_link]['link'];
+						$cur_session['pervios_link'] = $baseurlroot.$links[$rand_link]['link'];
 					}
 				}
 			}
 			else
 			{
 				// Update session
-				$cur_seesion['sess_lastseen_ts'] = $time_shift;
+				$cur_session['sess_lastseen_ts'] = $time_shift;
 
-				$Test_hit = new Hit($cur_seesion['pervios_link'], $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+				// Check if current url is api request:
+				$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
+
+				$Test_hit = new Hit( $cur_session['pervios_link'], $cur_session['sess_ipaddress'], $cur_session['sess_ID'], $cur_session['sess_lastseen_ts'], 1, $links[$rand_link] );
+				$Test_hit->method = $rand_request_method;
 				$Test_hit->log();
 
+				$DB->query( 'UPDATE T_sessions
+					  SET sess_lastseen_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $cur_session['sess_lastseen_ts'] ) ).'
+					WHERE sess_ID = '.$DB->quote( $cur_session['sess_ID'] ),
+					'Update session' );
 
+				$cur_session['pervios_link'] = $baseurlroot.$links[$rand_link]['link'];
 
-				$sql = "UPDATE T_sessions SET
-								sess_lastseen_ts = '" . date('Y-m-d H:i:s', $cur_seesion['sess_lastseen_ts']) . "'
-								WHERE sess_ID = {$cur_seesion['sess_ID']}";
-
-				$DB->query($sql, 'Update session');
-
-				$cur_seesion['pervios_link'] = $baseurlroot . $links[$rand_link]['link'];
-
-				$sessions[$rand_i] = $cur_seesion;
+				$sessions[$rand_i] = $cur_session;
 			}
 		}
 
-		$sessions[$rand_i] = $cur_seesion;
+		$sessions[$rand_i] = $cur_session;
 
 		if( $display_process )
 		{
@@ -902,6 +750,9 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			}
 		}
 	}
+
+	// Reset this back to from test values:
+	$is_api_request = false;
 
 	return $insert_data_count;
 }
@@ -1029,6 +880,34 @@ function stats_dom_status_icon( $dom_status )
 
 
 /**
+ * Get top existing Domain object by subdomain name
+ *
+ * @param string Subdomain name
+ * @return onject Domain object
+ */
+function & get_Domain_by_subdomain( $subdomain_name )
+{
+	$DomainCache = & get_DomainCache();
+
+	$subdomain_name = explode( '.', $subdomain_name );
+
+	for( $i = 0; $i < count( $subdomain_name ); $i++ )
+	{
+		$domain_name = implode( '.', array_slice( $subdomain_name, $i ) );
+
+		if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) ||
+		    $Domain = & $DomainCache->get_by_name( '.'.$domain_name, false, false ) )
+		{	// Domain exists with name, Get it:
+			return $Domain;
+		}
+	}
+
+	$Domain = NULL;
+	return $Domain;
+}
+
+
+/**
  * Get Domain object by url
  *
  * @param string URL
@@ -1036,24 +915,11 @@ function stats_dom_status_icon( $dom_status )
  */
 function & get_Domain_by_url( $url )
 {
-	// Exctract domain name from url
+	// Exctract domain name from url:
 	$domain_name = url_part( $url, 'host' );
 
-	$DomainCache = & get_DomainCache();
-	while( empty( $Domain ) )
-	{
-		if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) )
-		{ // Domain exists with name, Get it
-			return $Domain;
-		}
-		if( ! preg_match( '/[^\.]+\.(.+\..+)$/i', $domain_name, $matches ) )
-		{ // Find if DB contains the parent domain of current subdomain
-			break;
-		}
-		$domain_name = $matches[1];
-	}
+	$Domain = & get_Domain_by_subdomain( $domain_name );
 
-	$Domain = NULL;
 	return $Domain;
 }
 
@@ -1108,10 +974,10 @@ function extract_keyphrase_from_hitlogs()
 				FROM T_hitlog as h
 				WHERE h.hit_keyphrase IS NOT NULL
 					AND h.hit_keyphrase_keyp_ID IS NULL';
-	$ids = $DB->get_row( $sql, "ARRAY_A", NULL, ' Get max/min hits ids of unextracted keyphrases' );
+	$ids = $DB->get_row( $sql, ARRAY_A, NULL, ' Get max/min hits ids of unextracted keyphrases' );
 
-	if ( ! empty ( $ids['min'] ) && ! empty ( $ids['max'] ) )
-	{ // Extract keyphrases if needed:
+	if( ! empty ( $ids['min'] ) && ! empty ( $ids['max'] ) )
+	{	// Extract keyphrases if needed:
 
 		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_refered_searches)
 					SELECT h.hit_keyphrase, 1
@@ -1179,5 +1045,271 @@ function stats_goal_hit_extra_params( $ghit_params )
 	}
 
 	return htmlspecialchars( $ghit_params );
+}
+
+
+/**
+ * Display panel with buttons to control a view of hits summary pages:
+ *     - Two buttons to toggle between type of hits summary data(Live or Aggregate)
+ *     - Button to aggregate hits and sessions right now
+ */
+function display_hits_summary_panel()
+{
+	global $ReqURL, $current_User;
+
+	$hits_summary_mode = get_hits_summary_mode();
+
+	$current_url = preg_replace( '/(\?|&)hits_summary_mode=([^&]+|$)/', '', $ReqURL );
+
+	echo '<div class="btn-group pull-left">';
+
+	// Button to switch to view the live hits:
+	echo '<a href="'.url_add_param( $current_url, 'hits_summary_mode=live' ).'"'
+		.' class="btn btn-default'.( $hits_summary_mode == 'live' ? ' active' : '' ).'">'
+		.T_('Live data')
+		.'</a>';
+
+	// Button to switch to view the aggregated hits data:
+	echo '<a href="'.url_add_param( $current_url, 'hits_summary_mode=aggregate' ).'"'
+		.' class="btn btn-default'.( $hits_summary_mode == 'aggregate' ? ' active' : '' ).'">'
+		.T_('Aggregate data')
+		.'</a>';
+
+	echo '</div>';
+
+	if( $hits_summary_mode == 'aggregate' )
+	{	// Filter the aggregated data by date period:
+		global $UserSettings;
+
+		echo '<div class="evo_aggregate_filter pull-left">';
+		$Form = new Form();
+		$Form->hidden_ctrl();
+		$Form->hidden( 'tab', get_param( 'tab' ) );
+		$Form->hidden( 'tab3', get_param( 'tab3' ) );
+		$Form->hidden( 'blog', get_param( 'blog' ) );
+		$Form->hidden( 'action', 'filter_aggregated' );
+		$Form->add_crumb( 'aggfilter' );
+
+		$Form->switch_layout( 'none' );
+
+		$Form->begin_form();
+
+		$Form->select_input_array( 'agg_period', $UserSettings->get( 'agg_period' ), array(
+				'last_30_days'   => sprintf( T_('Last %d days'), 30 ),
+				'last_60_days'   => sprintf( T_('Last %d days'), 60 ),
+				'current_month'  => T_( 'Current Month to date' ),
+				'specific_month' => T_( 'Specific Month:' ),
+			), T_('Show') );
+
+		$months_years_params = array( 'force_keys_as_values' => true );
+		if( $UserSettings->get( 'agg_period' ) != 'specific_month' )
+		{
+			$months_years_params['style'] = 'display:none';
+		}
+		$months = array();
+		for( $m = 1; $m <= 12; $m++ )
+		{
+			$months[ $m ] = T_( date( 'F', mktime( 0, 0, 0, $m ) ) );
+		}
+		$agg_month = $UserSettings->get( 'agg_month' );
+		$Form->select_input_array( 'agg_month', ( empty( $agg_month ) ? date( 'n' ) : $agg_month ), $months, '', NULL, $months_years_params );
+
+		$years = array();
+		for( $y = date( 'Y' ) - 20; $y <= date( 'Y' ); $y++ )
+		{
+			$years[ $y ] = $y;
+		}
+		$agg_year = $UserSettings->get( 'agg_year' );
+		$Form->select_input_array( 'agg_year', ( empty( $agg_year ) ? date( 'Y' ) : $agg_year ), $years, '', NULL, $months_years_params );
+
+		$Form->end_form( array( array( 'submit', 'submit', T_('Filter'), 'btn-info' ) ) );
+
+		echo '<script type="text/javascript">
+			jQuery( "#agg_period" ).change( function()
+			{
+				if( jQuery( this ).val() == "specific_month" )
+				{
+					jQuery( "#agg_month, #agg_year" ).show();
+				}
+				else
+				{
+					jQuery( "#agg_month, #agg_year" ).hide();
+				}
+			} );
+			</script>';
+
+		echo '</div>';
+	}
+
+	if( $current_User->check_perm( 'stats', 'edit' ) )
+	{	// Display button to aggregate hits right now only if current user has a permission to edit hits:
+		echo '<a href="'.url_add_param( $current_url, 'action=aggregate&'.url_crumb( 'aggregate' ) ).'"'
+			.' class="btn btn-default pull-right">'
+			.T_('Aggregate Now')
+			.'</a>';
+	}
+
+	echo '<div class="clear"></div>';
+}
+
+
+/**
+ * Get dates for filter the aggregated hits
+ *
+ * @return array Array with two items: 0 - start date, 1 - end date
+ */
+function get_filter_aggregated_hits_dates()
+{
+	global $DB, $UserSettings;
+
+	switch( $UserSettings->get( 'agg_period' ) )
+	{
+		case 'last_60_days':
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 59 ) ); // Date of 60 days ago
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
+			break;
+
+		case 'current_month':
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), 1 ) ); // First day of current month
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
+			break;
+
+		case 'specific_month':
+			$agg_month = $UserSettings->get( 'agg_month' );
+			$agg_year = $UserSettings->get( 'agg_year' );
+			if( empty( $agg_month ) )
+			{
+				$agg_month = date( 'm' );
+			}
+			if( empty( $agg_year ) )
+			{
+				$agg_year = date( 'Y' );
+			}
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month, 1, $agg_year ) ); // First day of the selected month
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month + 1, 0, $agg_year ) ); // Last day of the selected month
+			break;
+
+		case 'last_30_days':
+		default:
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 29 ) ); // Date of 30 days ago
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
+			break;
+	}
+
+	return array( $start_date, $end_date );
+}
+
+
+/**
+ * Get mode of hits summary data
+ *
+ * @return string Mode: 'live' or 'aggregate'
+ */
+function get_hits_summary_mode()
+{
+	global $Session;
+
+	$hits_summary_mode = $Session->get( 'hits_summary_mode' );
+	if( empty( $hits_summary_mode ) )
+	{	// Set mode to display the aggregated data by default:
+		$hits_summary_mode = 'aggregate';
+	}
+
+	return $hits_summary_mode;
+}
+
+
+/**
+ * Find the dates without hits and fill them with 0 to display on graph and table
+ *
+ * @param array Source hits data
+ * @param string Start date of hits log in format 'YYYY-mm-dd'
+ * @param string End date of hits log in format 'YYYY-mm-dd'
+ * @return array Fixed hits data
+ */
+function fill_empty_hit_days( $hits_data, $start_date, $end_date )
+{
+	$fixed_hits_data = array();
+
+	if( empty( $hits_data ) )
+	{
+		return $fixed_hits_data;
+	}
+
+	// Get additional fields which must be exist in each array item of new filled empty day below:
+	$additional_fields = array_diff_key( $hits_data[0], array( 'hits' => 0, 'year' => 0, 'month' => 0, 'day' => 0 ) );
+
+	// Check if hits data array contains start and end dates:
+	$start_date_is_contained = empty( $start_date );
+	$end_date_is_contained = empty( $end_date );
+	if( ! $start_date_is_contained || ! $end_date_is_contained )
+	{
+		foreach( $hits_data as $hit )
+		{
+			$this_date = $hit['year'].'-'.$hit['month'].'-'.$hit['day'];
+			if( $this_date == $start_date )
+			{	// The start date is detected:
+				$start_date_is_contained = true;
+			}
+			if( $this_date == $end_date )
+			{	// The start date is detected:
+				$end_date_is_contained = true;
+			}
+			if( $start_date_is_contained && $end_date_is_contained )
+			{	// Stop array searching here because we have found the dates:
+				break;
+			}
+		}
+	}
+
+	if( ! $start_date_is_contained )
+	{	// Add item to array with 0 for start date if stats has no data for the date:
+		array_push( $hits_data, array(
+				'hits'     => 0,
+				'year'     => date( 'Y', strtotime( $start_date ) ),
+				'month'    => date( 'n', strtotime( $start_date ) ),
+				'day'      => date( 'j', strtotime( $start_date ) ),
+			) + $additional_fields );
+	}
+	if( ! $end_date_is_contained )
+	{	// Add item to array with 0 for end date if stats has no data for the date:
+		array_unshift( $hits_data, array(
+				'hits'     => 0,
+				'year'     => date( 'Y', strtotime( $end_date ) ),
+				'month'    => date( 'n', strtotime( $end_date ) ),
+				'day'      => date( 'j', strtotime( $end_date ) ),
+			) + $additional_fields );
+	}
+
+	foreach( $hits_data as $hit )
+	{
+		$this_date = $hit['year'].'-'.$hit['month'].'-'.$hit['day'];
+
+		if( isset( $prev_date ) && $prev_date != $this_date )
+		{	// If hits are from another day:
+			$prev_time = strtotime( $prev_date ) - 86400;
+			$this_time = strtotime( $this_date );
+
+			if( $prev_time != $this_time )
+			{	// If previous date is not previous day(it means some day has no hits):
+				$empty_days = ( $prev_time - $this_time ) / 86400;
+				for( $d = 0; $d <= $empty_days; $d++ )
+				{	// Add each empty day to array with 0 hits count:
+					$empty_day = $prev_time - $d * 86400;
+					$fixed_hits_data[] = array(
+							'hits'     => 0,
+							'year'     => date( 'Y', $empty_day ),
+							'month'    => date( 'n', $empty_day ),
+							'day'      => date( 'j', $empty_day ),
+						) + $additional_fields;
+				}
+			}
+		}
+
+		$prev_date = $hit['year'].'-'.$hit['month'].'-'.$hit['day'];
+		$fixed_hits_data[] = $hit;
+	}
+
+	return $fixed_hits_data;
 }
 ?>

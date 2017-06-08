@@ -7,14 +7,14 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $preview, $dummy_fields, $cat;
+global $Item, $preview, $dummy_fields, $cat, $current_User, $app_version;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -69,11 +69,11 @@ skin_widget( array(
 			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 			item_prevnext_links( array(
 					'block_start'     => '<ul class="pager col-lg-12 post_nav">',
-					'prev_start'      => '<li class="prev-left">',
+					'prev_start'      => '<li class="previous">',
 					'prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
 					'prev_end'        => '</li>',
 					'separator'       => ' ',
-					'next_start'      => '<li class="next-right">',
+					'next_start'      => '<li class="next">',
 					'next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
 					'next_end'        => '</li>',
 					'block_end'       => '</ul>',
@@ -85,9 +85,12 @@ skin_widget( array(
 		}
 	?>
 
-<div id="styled_content_block" class="forums_list single_topic">
-	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
-	
+<div class="forums_list single_topic evo_content_block">
+	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */
+	if( $disp != 'page' )
+	{
+	?>
+
 	<div class="single_page_title">
 		<?php
 		// Page title
@@ -96,22 +99,30 @@ skin_widget( array(
 				'after'     => '</h2>',
 				'link_type' => 'permalink'
 			) );
-				// Author info:
-				echo '<div class="ft_author_info">'.T_('Thread started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
-				echo ', '.$Item->get_datecreated( 'D M j, Y H:i' );
-				echo '<span class="text-muted"> &ndash; '
-						.T_('Last touched:').' '.$Item->get_last_touch_date( 'D M j, Y H:i' )
-					.'</span>';
-				echo '</div>';
-				// Author info - shrinked:
-				echo '<div class="ft_author_info shrinked">'.T_('Started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
-				echo ', '.$Item->get_datecreated( 'm/j/y' );
-				echo '</div>';
+
+		// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="evo_widget $wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
+
+			'author_link_text' => $params['author_link_text'],
+		) );
+		// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
+
+		}
 		?>
 	</div>
-	
+
+	<div class="row">
+		<div class="<?php echo $Skin->get_column_class( 'single' ); ?>">
+
 	<section class="table evo_content_block">
 	<div class="panel panel-default">
 		<div class="panel-heading posts_panel_title_wrapper">
@@ -119,34 +130,32 @@ skin_widget( array(
 				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
 					<?php
 						$Item->author( array(
-							'link_text' => 'login',
+							'link_text' => 'auto',
 						) );
 					?>
 					<?php
-						if( $Skin->get_setting( 'display_post_date' ) )
-						{ // We want to display the post date:
-							$Item->issue_time( array(
-									'before'      => '',
-									'after'       => ' &nbsp; &nbsp; ',
-									'time_format' => 'M j, Y H:i',
-								) );
-						}
+						// Display the post date:
+						$Item->issue_time( array(
+								'before'      => '<span class="text-muted">',
+								'after'       => '</span> &nbsp; &nbsp; ',
+								'time_format' => locale_extdatefmt().' '.locale_shorttimefmt(),
+							) );
 					?>
 				</h4>
-			</div>	
+			</div>
 					<?php
 						if( $Skin->enabled_status_banner( $Item->status ) )
 						{ // Status banner
 							echo '<div class="cell2">';
 							$Item->format_status( array(
-									'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+									'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 								) );
 							$legend_statuses[] = $Item->status;
 							echo '</div>';
 						}
-					?>	
+					?>
 		</div>
-		
+
 		<div class="panel-body">
 			<div class="ft_avatar col-md-1 col-sm-2"><?php
 				$Item->author( array(
@@ -156,60 +165,154 @@ skin_widget( array(
 			?></div>
 			<div class="post_main col-md-11 col-sm-10">
 				<?php
+				if( $disp == 'single' )
+				{
+					?>
+					<div class="evo_container evo_container__item_single">
+					<?php
+					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+					// Display container contents:
+					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+						'widget_context' => 'item',	// Signal that we are displaying within an Item
+						// The following (optional) params will be used as defaults for widgets included in this container:
+						// This will enclose each widget in a block:
+						'block_start' => '<div class="evo_widget $wi_class$">',
+						'block_end' => '</div>',
+						// This will enclose the title of each widget:
+						'block_title_start' => '<h3>',
+						'block_title_end' => '</h3>',
+						// Template params for "Item Link" widget
+						'widget_item_link_before'    => '<p class="evo_post_link">',
+						'widget_item_link_after'     => '</p>',
+						// Template params for "Item Tags" widget
+						'widget_item_tags_before'    => '<nav class="small post_tags">',
+						'widget_item_tags_after'     => '</nav>',
+						'widget_item_tags_separator' => ' ',
+						// Params for skin file "_item_content.inc.php"
+						'widget_item_content_params' => $params,
+						// Template params for "Item Attachments" widget:
+						'widget_item_attachments_params' => array(
+								'limit_attach'       => 1000,
+								'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+								'after'              => '</ul></div>',
+								'before_attach'      => '<li class="evo_file">',
+								'after_attach'       => '</li>',
+								'before_attach_size' => ' <span class="evo_file_size">(',
+								'after_attach_size'  => ')</span>',
+							),
+						// Template params for "Item Tags" widget
+						'widget_item_tags_before'    => '<nav class="small post_tags">',
+						'widget_item_tags_after'     => '</nav>',
+					) );
+					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+					?>
+					</div>
+					<?php
+				}
+				elseif( $disp == 'page' )
+				{
+					?>
+					<div class="evo_container evo_container__item_page">
+					<?php
+					// ------------------------- "Item Page" CONTAINER EMBEDDED HERE --------------------------
+					// Display container contents:
+					skin_container( /* TRANS: Widget container name */ NT_('Item Page'), array(
+						'widget_context' => 'item',	// Signal that we are displaying within an Item
+						// The following (optional) params will be used as defaults for widgets included in this container:
+						// This will enclose each widget in a block:
+						'block_start' => '<div class="evo_widget $wi_class$">',
+						'block_end' => '</div>',
+						// This will enclose the title of each widget:
+						'block_title_start' => '<h3>',
+						'block_title_end' => '</h3>',
+						// Params for skin file "_item_content.inc.php"
+						'widget_item_content_params' => $params,
+						// Template params for "Item Attachments" widget:
+						'widget_item_attachments_params' => array(
+								'limit_attach'       => 1000,
+								'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+								'after'              => '</ul></div>',
+								'before_attach'      => '<li class="evo_file">',
+								'after_attach'       => '</li>',
+								'before_attach_size' => ' <span class="evo_file_size">(',
+								'after_attach_size'  => ')</span>',
+							),
+					) );
+					// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
+					?>
+					</div>
+					<?php
+				}
+				else
+				{
 					// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 					skin_include( '_item_content.inc.php', $params );
 					// Note: You can customize the default item content by copying the generic
 					// /skins/_item_content.inc.php file into the current skin folder.
 					// -------------------------- END OF POST CONTENT -------------------------
 
-				if( ! $Item->is_intro() )
-				{ // List all tags attached to this topic:
-					$Item->tags( array(
-							'before'    => '<nav class="small post_tags">',
-							'after'     => '</nav>',
-							'separator' => ' ',
-						) );
+					if( ! $Item->is_intro() )
+					{ // List all tags attached to this topic:
+						$Item->tags( array(
+								'before'    => '<nav class="small post_tags">',
+								'after'     => '</nav>',
+								'separator' => ' ',
+							) );
+					}
 				}
 				?>
 			</div>
 		</div><!-- ../panel-body -->
-		
-		<div class="panel-footer clearfix">
-		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
-		<?php
-			// Check if BBcode plugin is enabled for current blog
-			$bbcode_plugin_is_enabled = false;
-			if( class_exists( 'bbcode_plugin' ) )
-			{ // Plugin exists
-				global $Plugins;
-				$bbcode_Plugin = & $Plugins->get_by_classname( 'bbcode_plugin' );
-				if( $bbcode_Plugin->status == 'enabled' && $bbcode_Plugin->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) != 'never' )
-				{ // Plugin is enabled and activated for comments
-					$bbcode_plugin_is_enabled = true;
+
+		<div class="panel-footer clearfix small">
+			<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
+			<?php
+				// Check if BBcode plugin is enabled for current blog
+				$bbcode_plugin_is_enabled = false;
+				if( class_exists( 'bbcode_plugin' ) )
+				{ // Plugin exists
+					global $Plugins;
+					$bbcode_Plugin = & $Plugins->get_by_classname( 'bbcode_plugin' );
+					if( $bbcode_Plugin->status == 'enabled' && $bbcode_Plugin->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) != 'never' )
+					{ // Plugin is enabled and activated for comments
+						$bbcode_plugin_is_enabled = true;
+					}
 				}
-			}
-			if( $bbcode_plugin_is_enabled && $Item->can_comment( NULL ) )
-			{	// Display button to quote this post
-				echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
-			}
-			echo '<div class="floatright">';
-			$Item->edit_link( array(
-					'before' => ' ',
-					'after'  => '',
-					'title'  => T_('Edit this topic'),
-					'text'   => '#',
-					'class'  => button_class( 'text' ),
-				) );
-			echo ' <span class="'.button_class( 'group' ).'">';
-			// Set redirect after publish to the same category view of the items permanent url
-			$redirect_after_publish = $Item->add_navigation_param( $Item->get_permanent_url(), 'same_category', $current_cat );
-			$Item->next_status_link( array( 'before' => ' ', 'class' => button_class( 'text' ), 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), true );
-			$Item->next_status_link( array( 'class' => button_class( 'text' ), 'before_text' => '', 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), false );
-			$Item->delete_link( '', '', '#', T_('Delete this topic'), button_class( 'text' ), false, '#', TS_('You are about to delete this post!\\nThis cannot be undone!'), get_caturl( $current_cat ) );
-			echo '</span>';
-			echo '</div>';
+				if( $bbcode_plugin_is_enabled && $Item->can_comment( NULL ) )
+				{	// Display button to quote this post
+					echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
+				}
+
+				// Display a panel with voting buttons for item:
+				$Skin->display_item_voting_panel( $Item );
+
+				echo '<span class="pull-left">';
+					$Item->edit_link( array(
+							'before' => ' ',
+							'after'  => '',
+							'title'  => T_('Edit this topic'),
+							'text'   => '#',
+							'class'  => button_class( 'text' ).' comment_edit_btn',
+						) );
+				echo '</span>';
+				echo '<div class="action_btn_group">';
+					$Item->edit_link( array(
+							'before' => ' ',
+							'after'  => '',
+							'title'  => T_('Edit this topic'),
+							'text'   => '#',
+							'class'  => button_class( 'text' ).' comment_edit_btn',
+						) );
+					echo '<span class="'.button_class( 'group' ).'">';
+					// Set redirect after publish to the same category view of the items permanent url
+					$redirect_after_publish = $Item->add_navigation_param( $Item->get_permanent_url(), 'same_category', $current_cat );
+					$Item->next_status_link( array( 'before' => ' ', 'class' => button_class( 'text' ), 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), true );
+					$Item->next_status_link( array( 'class' => button_class( 'text' ), 'before_text' => '', 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), false );
+					$Item->delete_link( '', '', '#', T_('Delete this topic'), button_class( 'text' ), false, '#', TS_('You are about to delete this post!\\nThis cannot be undone!'), get_caturl( $current_cat ) );
+					echo '</span>';
+				echo '</div>';
 		?>
-		
+
 		</div><!-- ../panel-footer -->
 	</div><!-- ../panel panel-default -->
 	</section><!-- ../table evo_content_block -->
@@ -219,27 +322,107 @@ skin_widget( array(
 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-		skin_include( '_item_feedback.inc.php', array ( 
+		skin_include( '_item_feedback.inc.php', array_merge( $params, array(
 			'disp_section_title'    => false,
-			'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
+			'disp_meta_comment_info' => false,
+
+			'comment_post_before'   => '<br /><h4 class="evo_comment_post_title ellipsis">',
 			'comment_post_after'    => '</h4>',
 
 			'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
 			'comment_status_before' => '</h4></div>',
 			'comment_title_after'   => '</div>',
 
-			'comment_avatar_before' => '<div class="panel-body"><span class="evo_comment_avatar col-md-1 col-sm-2">',
+			'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
 			'comment_avatar_after'  => '</span>',
 			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 			'comment_text_after'    => '</div>',
-		) );
+		) ) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 
-echo_comment_moderate_js();
+		echo_comment_moderate_js();
 
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 	?>
+
+	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
+		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
+		skin_include( '_item_workflow.inc.php' );
+		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	}
+	?>
+
+	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
+		// ------------------ META COMMENTS INCLUDED HERE ------------------
+		skin_include( '_item_meta_comments.inc.php', array(
+				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
+				'comment_end'           => '</article>',
+				'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
+				'comment_post_after'    => '</h4>',
+				'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
+				'comment_status_before' => '</h4></div>',
+				'comment_title_after'   => '</div>',
+				'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
+				'comment_avatar_after'  => '</span>',
+				'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
+				'comment_text_after'    => '</div>',
+			) );
+		// ---------------------- END OF META COMMENTS ---------------------
+	}
+	?>
+
+		</div><!-- .col -->
+
+		<?php
+		if( $Skin->is_visible_sidebar( 'single' ) )
+		{	// Display sidebar:
+		?>
+		<aside class="col-md-3<?php echo ( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
+			<div class="evo_container evo_container__sidebar_single">
+			<?php
+				// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
+				// Display container contents:
+				skin_container( NT_('Sidebar Single'), array(
+						// The following (optional) params will be used as defaults for widgets included in this container:
+						// This will enclose each widget in a block:
+						'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
+						'block_end' => '</div>',
+						// This will enclose the title of each widget:
+						'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+						'block_title_end' => '</h4></div>',
+						// This will enclose the body of each widget:
+						'block_body_start' => '<div class="panel-body">',
+						'block_body_end' => '</div>',
+						// If a widget displays a list, this will enclose that list:
+						'list_start' => '<ul>',
+						'list_end' => '</ul>',
+						// This will enclose each item in a list:
+						'item_start' => '<li>',
+						'item_end' => '</li>',
+						// This will enclose sub-lists in a list:
+						'group_start' => '<ul>',
+						'group_end' => '</ul>',
+						// This will enclose (foot)notes:
+						'notes_start' => '<div class="notes">',
+						'notes_end' => '</div>',
+						// Widget 'Search form':
+						'search_class'         => 'compact_search_form',
+						'search_input_before'  => '<div class="input-group">',
+						'search_input_after'   => '',
+						'search_submit_before' => '<span class="input-group-btn">',
+						'search_submit_after'  => '</span></div>',
+					) );
+				// ----------------------------- END OF "Sidebar Single" CONTAINER -----------------------------
+			?>
+			</div>
+		</aside><!-- .col -->
+		<?php } ?>
+	</div><!-- .row -->
 
 </div><!-- ../forums_list single_topic -->
 

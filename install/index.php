@@ -3,19 +3,41 @@
  * This is the main install menu
  *
  * ---------------------------------------------------------------------------------------------------------------
- * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER.
  * TO GET STARTED, GO TO THIS PAGE: http://b2evolution.net/man/getting-started
  * ---------------------------------------------------------------------------------------------------------------
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
 
 // Turn off the output buffering to do the correct work of the function flush()
 @ini_set( 'output_buffering', 'off' );
+
+/**
+ * @global boolean Are we running on Command Line Interface instead of a web request?
+ */
+$is_cli = empty($_SERVER['SERVER_SOFTWARE']) ? true : false;
+
+if( $is_cli )
+{	// Initialize params from CLI mode request:
+	if( isset( $_SERVER['argc'], $_SERVER['argv'] ) )
+	{
+		$argc = $_SERVER['argc'];
+		$argv = $_SERVER['argv'];
+	}
+	if( isset( $argv ) )
+	{	// may not be set for CGI
+		foreach( $argv as $v => $argv_param )
+		{
+			$argv_param = explode( '=', $argv_param );
+			$_GET[ $argv_param[0] ] = isset( $argv_param[1] ) ? $argv_param[1] : NULL;
+		}
+	}
+}
 
 /**
  * include config and default functions:
@@ -48,7 +70,7 @@ if( ! $config_is_done )
 	$rsc_url = '../rsc/';
 }
 
-require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
+require_once $inc_path.'_core/_class_loader.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 
 /**
@@ -153,11 +175,22 @@ else
 }
 
 // Display mode:
-// - 'normal' - Normal mode; Used for normal installation.
+// - 'normal'  - Normal mode; Used for normal installation.
 // - 'compact' - Compact mode; Hide header, footer and progress bar; Used for automated installation.
+// - 'cli'     - CLI mode; Used for command line interface.
 param( 'display', 'string', 'normal' );
 
-// check if we should try to connect to db if config is not done
+// How to handle htaccess:
+// - 'test'  - Default: test if htacess is supported, and try to install the file if it doesn't exist
+// - 'force' - Force updating htaccess to latest version
+// - 'skip'  - Skip this process entirely
+// pre_dump( $htaccess );
+// WARNING: be sure you do not force this in a config file (frequent on developer machines)
+param( 'htaccess', 'string', 'test' );
+// pre_dump( $htaccess );
+
+
+// check if we should try to connect to db if config is not done:
 switch( $action )
 {
 	case 'evoupgrade':
@@ -186,7 +219,10 @@ switch( $action )
 		break;
 }
 
+// pre_dump($action);
+
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
+
 
 // Load all available locale defintions:
 locales_load_available_defs();
@@ -202,10 +238,12 @@ if( ! empty( $default_locale ) && ! empty( $locales ) && isset( $locales[ $defau
 	$evo_charset = $locales[ $default_locale ]['charset'];
 }
 
+
 if( $action == 'newdb' )
 { // Check request for quick installation AND Update basic config file from url params:
 	$basic_config_file_result = check_quick_install_request();
 }
+
 
 if( $config_is_done || $try_db_connect )
 { // Connect to DB:
@@ -229,7 +267,7 @@ if( $config_is_done || $try_db_connect )
 		$DB->show_errors = true;    // From now on, show errors (they're helpful in case of errors!).
 
 		// Check MySQL version
-		$mysql_version = $DB->get_version();
+		$mysql_version = $DB->version;
 		foreach( $required_mysql_version as $key => $value )
 		{ // check required MySQL version for the whole application and for each module
 			if( version_compare( $mysql_version, $value, '<' ) )
@@ -247,6 +285,7 @@ if( $config_is_done || $try_db_connect )
 		}
 	}
 }
+
 
 if( ! $use_locale_from_request )
 { // detect language
@@ -272,10 +311,12 @@ if( ! locale_activate( $default_locale ) )
 
 init_charsets( $current_charset );
 
+
 if( $action == 'menu-install' && ! ( $old_db_version = get_db_version() ) )
 { // Force to step 3 (Select install options) if DB is not installed yet
 	$action = 'menu-options';
 }
+
 
 switch( $action )
 {
@@ -332,10 +373,21 @@ $booststrap_install_form_params = array(
 		'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-4 col-sm-8">',
 		'buttonsend'     => "</div></div>\n\n",
 		'note_format'    => ' <span class="help-inline text-muted small">%s</span>',
+		// - checkbox
+		'fieldstart_checkbox'    => '<div class="form-group" $ID$>'."\n",
+		'fieldend_checkbox'      => "</div>\n\n",
+		'inputclass_checkbox'    => '',
+		'inputstart_checkbox'    => '<div class="col-sm-8 col-sm-offset-4"><div class="checkbox"><label>',
+		'inputend_checkbox'      => "</label></div></div>\n",
+		'checkbox_newline_start' => '<div class="checkbox">',
+		'checkbox_newline_end'   => "</div>\n",
 	);
 
 header('Content-Type: text/html; charset='.$evo_charset);
 header('Cache-Control: no-cache'); // no request to this page should get cached!
+
+if( $display != 'cli' )
+{	// Don't display HTML on CLI mode:
 ?>
 <!DOCTYPE html>
 <html lang="<?php locale_lang() ?>">
@@ -366,13 +418,17 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 						<li role="presentation"><a href="../index.php"><?php echo T_('Your site'); ?></a></li>
 					</ul>
 				</nav>
-				<h3 class="text-muted"><a href="http://b2evolution.net/"><img class="b2evolution_plane_logo" src="../rsc/img/b2evolution_254x52.svg" alt="b2evolution CCMS"></a></h3>
+				<h3 class="text-muted"><a href="http://b2evolution.net/">
+					<img src="../rsc/img/b2evolution_254x52.png" width="254" height="52" alt="b2evolution" class="b2evolution_plane_logo"
+					  srcset="../rsc/img/b2evolution_508x104.png 2x,
+						 		 ../rsc/img/b2evolution_762x156.png 3x" /></a>
+				</h3>
 			</div>
 		<?php } ?>
 
 		<!-- InstanceBeginEditable name="Main" -->
-
 <?php
+} // END OF: $display != 'cli'
 
 if( ! $install_memory_limit_allow )
 { // Display error that current memory limit size is not enough for correct using:
@@ -380,11 +436,29 @@ if( ! $install_memory_limit_allow )
 		ini_get( 'memory_limit' ), 'href="http://b2evolution.net/web-hosting/"' ) );
 }
 
-// echo $action;
 $date_timezone = ini_get( "date.timezone" );
 if( empty( $date_timezone ) && empty( $date_default_timezone ) )
 { // The default timezone is not set, display a warning
 	display_install_messages( sprintf( T_("No default time zone is set. Please open PHP.ini and set the value of 'date.timezone' (Example: date.timezone = Europe/Paris) or open /conf/_advanced.php and set the value of %s (Example: %s)"), '$date_default_timezone', '$date_default_timezone = \'Europe/Paris\';' ) );
+}
+
+// pre_dump($action);
+
+if( isset( $basic_config_file_result ) && !$basic_config_file_result )
+{
+	if( ! empty( $basic_config_file_result_messages ) )
+	{ // Display messages that were generated on creating basic config file on quick installation:
+		echo $basic_config_file_result_messages;
+	}
+
+	if( $display == 'normal' )
+	{ // Set action to display a start form of installation:
+		$action = 'start';
+	}
+	else // 'compact'
+	{ // Use fake action to don't provide a form to set db access data on compact mode:
+		$action = 'none';
+	}
 }
 
 if( ( $config_is_done || $try_db_connect ) && ( $DB->error ) )
@@ -411,6 +485,9 @@ if( $req_errors = install_validate_requirements() )
 	die;
 }
 
+// pre_dump($action);
+
+
 switch( $action )
 {
 	case 'conf':
@@ -421,6 +498,7 @@ switch( $action )
 		 */
 		display_locale_selector();
 
+		param( 'conf_create_db', 'integer', 0 );
 		param( 'conf_db_user', 'string', true );
 		param( 'conf_db_password', 'raw', true );
 		param( 'conf_db_name', 'string', true );
@@ -432,6 +510,7 @@ switch( $action )
 
 		// Try to create/update basic config file:
 		$basic_config_params = array(
+				'create_db'      => $conf_create_db,
 				'db_user'        => $conf_db_user,
 				'db_password'    => $conf_db_password,
 				'db_name'        => $conf_db_name,
@@ -459,6 +538,9 @@ switch( $action )
 			// Display only a locale selector:
 			display_locale_selector();
 
+			// And display message again to make it extra clear:
+			display_install_messages( T_('b2evolution cannot be installed on the current configuration.') );
+
 			break;
 		}
 
@@ -470,7 +552,7 @@ switch( $action )
 
 			echo '<h1>'.T_('Base configuration').'</h1>';
 
-			if( $config_is_done && $allow_evodb_reset != 1 )
+			if( $config_is_done && $allow_evodb_reset < 1 )
 			{
 				echo '<p><strong>'.T_('Resetting the base configuration is currently disabled for security reasons.').'</strong></p>';
 				echo '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>';
@@ -481,65 +563,66 @@ switch( $action )
 			else
 			{
 
-			// Set default params if not provided otherwise:
-			param( 'conf_db_user', 'string', $db_config['user'] );
-			param( 'conf_db_password', 'raw', $db_config['password'] );
-			param( 'conf_db_name', 'string', $db_config['name'] );
-			param( 'conf_db_host', 'string', $db_config['host'] );
-			param( 'conf_db_tableprefix', 'string', $tableprefix );
-			// Guess baseurl:
-			// TODO: dh> IMHO HTTP_HOST would be a better default, because it's what the user accesses for install.
-			//       fp, please change it, if it's ok. SERVER_NAME might get used if HTTP_HOST is not given, but that shouldn't be the case normally.
-			// fp> ok for change and test after first 3.x-stable release
-			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
-			if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
-				$baseurl .= ':'.$_SERVER['SERVER_PORT'];
+				// Set default params if not provided otherwise:
+				param( 'conf_db_user', 'string', $db_config['user'] );
+				param( 'conf_db_password', 'raw', $db_config['password'] );
+				param( 'conf_db_name', 'string', $db_config['name'] );
+				param( 'conf_db_host', 'string', $db_config['host'] );
+				param( 'conf_db_tableprefix', 'string', $tableprefix );
+				// Guess baseurl:
+				// TODO: dh> IMHO HTTP_HOST would be a better default, because it's what the user accesses for install.
+				//       fp, please change it, if it's ok. SERVER_NAME might get used if HTTP_HOST is not given, but that shouldn't be the case normally.
+				// fp> ok for change and test after first 3.x-stable release
+				$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
+				if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
+					$baseurl .= ':'.$_SERVER['SERVER_PORT'];
 
-			// ############ Get ReqPath & ReqURI ##############
-			list($ReqPath,$ReqURI) = get_ReqURI();
+				// ############ Get ReqPath & ReqURI ##############
+				list($ReqPath,$ReqURI) = get_ReqURI();
 
-			$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath ).'/';
+				$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath ).'/';
 
-			param( 'conf_baseurl', 'string', $baseurl );
-			param( 'conf_admin_email', 'string', $admin_email );
+				param( 'conf_baseurl', 'string', $baseurl );
+				param( 'conf_admin_email', 'string', $admin_email );
 
-			?>
+				?>
 
-			<p><?php echo T_('The basic configuration file (<code>/conf/_basic_config.php</code>) has not been created yet. You can do automatically generate it by filling out the form below.') ?></p>
+			<p><?php echo T_('The basic configuration file (<code>/conf/_basic_config.php</code>) has not been created yet. You can automatically generate it by filling out the form below.') ?></p>
 
-			<p><?php echo T_('This is the minimum info we need to set up b2evolution on this server:') ?></p>
+				<p><?php echo T_('This is the minimum info we need to set up b2evolution on this server:') ?></p>
 
-			<?php
-			$Form = new Form( 'index.php' );
-
-			$Form->switch_template_parts( $booststrap_install_form_params );
-
-			$Form->begin_form( 'form-horizontal' );
-
-			$Form->hidden( 'action', 'conf' );
-			$Form->hidden( 'locale', $default_locale );
-
-			block_open( T_('Database you want to install into') );
-			?>
-				<p class="text-muted small"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
 				<?php
-				$Form->text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
-				$Form->text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
-				$Form->text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
-				$Form->text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
-				// Too confusing for (most) newbies.	form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
-			block_close();
+				$Form = new Form( 'index.php' );
 
-			block_open( T_('Additional settings') );
-				$Form->text( 'conf_baseurl', $conf_baseurl, 50, T_('Base URL'), sprintf( T_('This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' ) ), 120 );
-				$Form->text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('This is used to create your admin account. You will receive notifications for comments on your blog, etc.' ) ), 80 );
-			block_close();
+				$Form->switch_template_parts( $booststrap_install_form_params );
 
-			$Form->end_form( array( array( 'name' => 'submit', 'value' => T_('Update config file'), 'class' => 'btn-primary btn-lg' ),
-					array( 'type' => 'reset', 'value' => T_('Reset'), 'class' => 'btn-default btn-lg' )
-				) );
+				$Form->begin_form( 'form-horizontal' );
 
-			break;
+				$Form->hidden( 'action', 'conf' );
+				$Form->hidden( 'locale', $default_locale );
+
+				block_open( T_('Database you want to install into') );
+				?>
+					<p class="text-muted small"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
+					<?php
+					$Form->checkbox( 'conf_create_db', param( 'conf_create_db', 'integer' ), '', T_('Try to create this DB if it doesn\'t exist yet (useful for developers)') );
+					$Form->text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
+					$Form->text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
+					$Form->text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
+					$Form->text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
+					// Too confusing for (most) newbies.	form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
+				block_close();
+
+				block_open( T_('Additional settings') );
+					$Form->text( 'conf_baseurl', $conf_baseurl, 50, T_('Base URL'), sprintf( T_('This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' ) ), 120 );
+					$Form->text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('This is used to create your admin account. You will receive notifications for comments on your blog, etc.' ) ), 80 );
+				block_close();
+
+				$Form->end_form( array( array( 'name' => 'submit', 'value' => T_('Update config file'), 'class' => 'btn-primary btn-lg' ),
+						array( 'type' => 'reset', 'value' => T_('Reset'), 'class' => 'btn-default btn-lg' )
+					) );
+
+				break;
 			}
 		}
 		// if config was already done, move on to main menu:
@@ -624,7 +707,7 @@ switch( $action )
 			</div>
 
 			<?php
-			if( $allow_evodb_reset == 1 )
+			if( $allow_evodb_reset >= 1 )
 			{
 			?>
 			<div class="radio">
@@ -652,7 +735,7 @@ switch( $action )
 			<?php
 
 
-			if( $allow_evodb_reset != 1 )
+			if( $allow_evodb_reset < 1 )
 			{
 				echo '<div class="pull-right"><a href="index.php?action=deletedb&amp;locale='.$default_locale.'">'.T_('Need to start anew?').' &raquo;</a></div>';
 			}
@@ -684,7 +767,7 @@ switch( $action )
 			<h2><?php echo T_('b2evolution is already installed') ?></h2>
 
 		<?php
-		if( $test_install_all_features && $allow_evodb_reset )
+		if( $allow_evodb_reset >= 2 || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
 		{ // We can allow to continue installation with deleting DB
 		?>
 			<input type="hidden" name="action" value="menu-options" />
@@ -749,6 +832,7 @@ switch( $action )
 							'photos' => T_('Photos'),
 							'forums' => T_('Forums'),
 							'manual' => T_('Manual'),
+							'group'  => T_('Tracker'),
 						);
 
 					// Allow all modules to set what collections should be installed
@@ -776,17 +860,33 @@ switch( $action )
 					<?php } ?>
 				</div>
 			</div>
-			<?php
-				if( $test_install_all_features )
-				{ // Checkbox to install all features
-			?>
-			<div class="checkbox" style="margin-top:15px">
+
+			<div class="checkbox" style="margin-top: 15px">
 				<label>
-					<input accept=""type="checkbox" name="install_all_features" id="install_all_features" value="1" />
-					<?php echo T_('Also install all test features.')?>
-				</label>
+					<input type="checkbox" name="create_sample_organization" id="create_sample_organization" value="1" checked="checked" />
+					<?php echo T_('Create a sample organization');?>
+					</label>
 			</div>
+
+			<div class="checkbox" style="margin-top: 15px">
+				<label>
+					<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" />
+					<?php echo T_('Create demo users (in addition to the admin account)');?>
+					</label>
+			</div>
+
+			<?php
+			if( $allow_install_test_features )
+			{ // Checkbox to install all features
+			?>
+				<div class="checkbox" style="margin-top:15px">
+					<label>
+						<input accept="" type="checkbox" name="install_test_features" id="install_test_features" value="1" />
+						<?php echo T_('Also install all test features.')?>
+					</label>
+				</div>
 			<?php } ?>
+
 			<div class="checkbox" style="margin:15px 0 15px">
 				<label>
 					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo check_local_installation() ? ' checked="checked"' : ''; ?> />
@@ -795,19 +895,25 @@ switch( $action )
 			</div>
 
 			<p class="evo_form__install_buttons">
-			<?php
-			if( $test_install_all_features && $allow_evodb_reset && $old_db_version = get_db_version() )
-			{ // We can allow to delete DB before installation
-			?>
-				<input type="hidden" name="delete_contents" value="1" />
-				<button id="cancel_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & RE-INSTALL!')?></button><?php
-			}
-			else
-			{ // Allow only install new DB without deleting previous DB
-			?>
-			<button id="cancel_button" type="submit" class="btn btn-success btn-lg"><?php echo T_('INSTALL!')?></button><?php
-			}
-			?><a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
+
+				<?php
+				if( ( ( $allow_evodb_reset >= 2 )
+				      || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
+				    && $old_db_version = get_db_version() )
+				{ // We can allow to delete DB before installation
+				?>
+					<input type="hidden" name="delete_contents" value="1" />
+					<button id="cancel_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & RE-INSTALL!')?></button><?php
+				}
+				else
+				{ // Allow only install new DB without deleting previous DB
+				?>
+					<button id="cancel_button" type="submit" class="btn btn-success btn-lg"><?php echo T_('INSTALL!')?></button><?php
+				}
+				?>
+
+				<a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
+
 			</p>
 		</form>
 
@@ -864,16 +970,23 @@ switch( $action )
 		 */
 		track_step( 'install-start' );
 
-		$create_sample_contents = param( 'create_sample_contents', 'string', '' );
+		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
+		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
+		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
 
-		$config_test_install_all_features = $test_install_all_features;
-		if( $test_install_all_features )
-		{ // Allow to use $test_install_all_features from request only when it is enabled in config
-			$test_install_all_features = param( 'install_all_features', 'boolean', false );
+		if( $create_sample_contents == 'all' )
+		{ // Override create sample organization and demo user setting
+			$create_sample_organization = true;
+			$create_demo_users = true;
+		}
+
+		if( $allow_install_test_features )
+		{	// Allow to use $allow_install_test_features from request only when it is enabled in config:
+			$install_test_features = param( 'install_test_features', 'boolean', false );
 		}
 		else
 		{
-			$test_install_all_features = false;
+			$install_test_features = false;
 		}
 
 		// fp> TODO: this test should probably be made more generic and applied to upgrade too.
@@ -889,7 +1002,7 @@ switch( $action )
 		// Progress bar
 		start_install_progress_bar( T_('Installation in progress'), get_install_steps_count() );
 
-		echo '<h2>'.T_('Installing b2evolution...').'</h2>';
+		echo get_install_format_text( '<h2>'.T_('Installing b2evolution...').'</h2>', 'h2' );
 
 		// Try to display the messages here because they can be created during checking params of quick installation:
 		$Messages->display();
@@ -898,7 +1011,7 @@ switch( $action )
 			echo $basic_config_file_result_messages;
 		}
 
-		if( $config_test_install_all_features && $allow_evodb_reset )
+		if( $allow_evodb_reset >= 2 || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
 		{ // Allow to quick delete before new installation only when these two settings are enabled in config files
 			$delete_contents = param( 'delete_contents', 'integer', 0 );
 
@@ -906,7 +1019,7 @@ switch( $action )
 			{ // A quick deletion is requested before new installation
 				require_once( dirname(__FILE__). '/_functions_delete.php' );
 
-				echo '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>';
+				echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>', 'h2' );
 				evo_flush();
 
 				// Uninstall b2evolution: Delete DB & Cache files
@@ -919,11 +1032,11 @@ switch( $action )
 
 		if( $old_db_version = get_db_version() )
 		{
-			echo '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>';
+			echo get_install_format_text( '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>', 'p' );
 
 			if( $old_db_version < $new_db_version )
 			{
-				echo '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>';
+				echo get_install_format_text( '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>', 'p' );
 			}
 
 			// Stop the animation of the progress bar
@@ -932,12 +1045,15 @@ switch( $action )
 			break;
 		}
 
-		echo '<h2>'.T_('Checking files...').'</h2>';
-		evo_flush();
-		// Check for .htaccess:
-		if( ! install_htaccess( false ) )
-		{ // Exit installation here because the .htaccess file has the some errors
-			break;
+		if( $htaccess != 'skip' )
+		{
+			echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
+			evo_flush();
+			// Check for .htaccess:
+			if( ! install_htaccess( false, ($htaccess == 'force') ) )
+			{ // Exit installation here because the .htaccess file produced some errors
+				break;
+			}
 		}
 
 		// Update the progress bar status
@@ -964,16 +1080,19 @@ switch( $action )
 		require_once( dirname(__FILE__). '/_functions_evoupgrade.php' );
 
 		// Progress bar
-		start_install_progress_bar( T_('Uprade in progress'), get_upgrade_steps_count() );
+		start_install_progress_bar( T_('Upgrade in progress'), get_upgrade_steps_count() );
 
-		echo '<h2>'.T_('Upgrading b2evolution...').'</h2>';
+		echo get_install_format_text( '<h2>'.T_('Upgrading b2evolution...').'</h2>', 'h2' );
 
-		echo '<h2>'.T_('Checking files...').'</h2>';
-		evo_flush();
-		// Check for .htaccess:
-		if( ! install_htaccess( true ) )
-		{ // Exit installation here because the .htaccess file has the some errors
-			break;
+		if( $htaccess != 'skip' )
+		{
+			echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
+			evo_flush();
+			// Check for .htaccess:
+			if( ! install_htaccess( true, ($htaccess == 'force') ) )
+			{ // Exit installation here because the .htaccess file produced some errors
+				break;
+			}
 		}
 
 		// Update the progress bar status
@@ -987,12 +1106,26 @@ switch( $action )
 			echo '<div class="text-warning"><evo:warning>'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</evo:warning></div>';
 		}
 
-		echo '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>';
+		echo get_install_format_text( '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>', 'h2' );
 		evo_flush();
 
 		$is_automated_upgrade = ( $action !== 'evoupgrade' );
 
 		$upgrade_result = upgrade_b2evo_tables( $action );
+
+		if( $is_automated_upgrade && $upgrade_result !== 'need-fix' )
+		{
+			if( $upgrade_result === true )
+			{	// After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
+				remove_after_upgrade();
+			}
+			// Disable maintenance mode at the end of the upgrade script:
+			// TODO: check all exist conditions, and do this only when upgrade was aborted, not when upgrade failed in the middle...
+			if( ! switch_maintenance_mode( false, 'upgrade' ) )
+			{	// If error on switching out of maintenance mode:
+				$upgrade_result = false;
+			}
+		}
 
 		if( $upgrade_result === 'need-fix' )
 		{	// We are waiting for the user to click on "try to repair/upgrade now"...
@@ -1002,39 +1135,21 @@ switch( $action )
 		}
 		elseif( $upgrade_result === true )
 		{
-			if( $is_automated_upgrade )  // What EXACTLY does "$not_upgrade mean???"
-			{ // After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
-				remove_after_upgrade();
-				// disable maintenance mode at the end of the upgrade script
-				switch_maintenance_mode( false, 'upgrade' );
-			}
-
 			// Update the progress bar status
 			update_install_progress_bar();
 
 			$upgrade_result_title = T_('Upgrade completed successfully!');
 			$upgrade_result_body = sprintf( T_('Now you can <a %s>log in</a> with your usual b2evolution username and password.'), 'href="'.$admin_url.'"' );
 
-			?>
-			<p class="alert alert-success"><evo:success><?php echo $upgrade_result_title; ?></evo:success></p>
-			<p><?php echo $upgrade_result_body; ?></p>
-			<?php
+			echo get_install_format_text( '<p class="alert alert-success"><evo:success>'.$upgrade_result_title.'</evo:success></p>', 'p' );
+			echo get_install_format_text( '<p>'.$upgrade_result_body.'</p>', 'p' );
 
 			// Display modal window with upgrade data and instructions
 			display_install_result_window( $upgrade_result_title, $upgrade_result_body );
 		}
 		else
 		{	// There has been an error during upgrade... (or upgrade was not performed)
-
-			if( $is_automated_upgrade )
-			{	// disable maintenance mode at the end of the upgrade script
-				// TODO: check all exist conditions, and do this only when upgrade was aborted, not when upgrade failed in the middle...
-				switch_maintenance_mode( false, 'upgrade' );
-			}
-
-			?>
-			<p class="alert alert-danger" style="margin-top: 40px;"><evo:error><?php echo T_('Upgrade failed!')?></evo:error></p>
-			<?php
+			echo get_install_format_text( '<p class="alert alert-danger" style="margin-top: 40px;"><evo:error>'.T_('Upgrade failed!').'</evo:error></p>', 'p' );
 
 			// A link back to install menu
 			display_install_back_link();
@@ -1061,14 +1176,14 @@ switch( $action )
 			start_install_progress_bar( T_('Deletion in progress') );
 		}
 
-		echo '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>';
+		echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>', 'h2' );
 		evo_flush();
 
-		if( $allow_evodb_reset != 1 )
+		if( $allow_evodb_reset < 1 )
 		{
 			echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
-			echo '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>';
-			echo '<p>'.T_('Then reload this page and a reset option will appear.').'</p>';
+			echo get_install_format_text( '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>', 'p' );
+			echo get_install_format_text( '<p>'.T_('Then reload this page and a reset option will appear.').'</p>', 'p' );
 			// A link to back to install menu
 			display_install_back_link();
 
@@ -1186,9 +1301,19 @@ switch( $action )
 		// A link to back to install menu
 		display_install_back_link();
 		break;
+
+
+	default:
+		// This should not happen!
+		pre_dump($action);
 }
 
+// pre_dump($action);
+
 block_close();
+
+if( $display != 'cli' )
+{	// Don't display HTML on CLI mode:
 ?>
 
 <!-- InstanceEndEditable -->
@@ -1219,3 +1344,6 @@ block_close();
 <!-- b2evo-install-end -->
 	</body>
 </html>
+<?php
+} // END OF: $display != 'cli'
+?>

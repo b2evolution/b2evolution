@@ -46,7 +46,7 @@ div.codeblock pre {
 p.codeblock_title,
 .evo_comment p.codeblock_title {
 	font-family: Verdana, sans-serif;
-	letter-spacing: 110%;
+	letter-spacing: 0.1em;
 	line-height: 95%;
 	font-weight:bold;
 	font-size: 72%;
@@ -76,6 +76,10 @@ div.podplayer {
 }
 */
 
-span.NonExistentWikiWord {
-	border-bottom: 1px dotted #ccc;
+// Broken links of the plugin "Short Links":
+.evo_shortlink_broken {
+	border-bottom: 1px dotted #F00;
+	&.btn {
+		border: 1px dotted #F00;
+	}
 }

@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -94,7 +94,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Currency = duplicate( $edited_Currency ); // PHP4/5 abstraction
+			$edited_Currency = clone $edited_Currency;
 			$edited_Currency->ID = 0;
 		}
 		break;
@@ -124,43 +124,27 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$DB->begin();
-			$q = $edited_Currency->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Currency->dbinsert();
+			$Messages->add( T_('New currency created.'), 'success' );
 
-				param_error( 'curr_code',
-					sprintf( T_('This currency already exists. Do you want to <a %s>edit the existing currency</a>?'),
-						'href="?ctrl=currencies&amp;action=edit&amp;curr_ID='.$q.'"' ) );
-			}
-			else
+			// What next?
+			switch( $action )
 			{
-				$edited_Currency->dbinsert();
-				$Messages->add( T_('New currency created.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{	// What next?
-
-				switch( $action )
-				{
-					case 'create_copy':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=currencies&action=new&curr_ID='.$edited_Currency->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create_new':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=currencies&action=new', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=currencies&action=new&curr_ID='.$edited_Currency->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=currencies&action=new', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;
@@ -182,26 +166,12 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Update in DB:
-			$DB->begin();
-			$q = $edited_Currency->dbexists();
-			if($q)
-			{ 	// We have a duplicate entry:
-				param_error( 'curr_code',
-					sprintf( T_('This currency already exists. Do you want to <a %s>edit the existing currency</a>?'),
-						'href="?ctrl=currencies&amp;action=edit&amp;curr_ID='.$q.'"' ) );
-			}
-			else
-			{
-				$edited_Currency->dbupdate();
-				$Messages->add( T_('Currency updated.'), 'success' );
-			}
-			$DB->commit();
+			$edited_Currency->dbupdate();
+			$Messages->add( T_('Currency updated.'), 'success' );
 
-			if( empty($q) )
-			{	// If no error, Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
+			// If no error, Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 

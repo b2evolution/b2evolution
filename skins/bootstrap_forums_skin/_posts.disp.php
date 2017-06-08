@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -23,44 +23,36 @@ if( ! is_array( $legend_icons ) )
 	$legend_icons = array();
 }
 
-if( $cat > 0 )
+// Get ID of single selected category:
+$single_cat_ID = intval( $cat );
+
+// Get IDs of several selected categories:
+$multi_cat_IDs = get_param( 'cat_array' );
+
+if( $single_cat_ID )
 {
 	$ChapterCache = & get_ChapterCache();
-	$current_Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
-
-	// Init MainList
-	$page = param( 'paged', 'integer', 1 );
-	$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $Blog->get_setting('posts_per_page') );
-	$MainList->load_from_Request();
-	$MainList->set_filters( array(
-			'cat_array' => array( $cat ), // Limit only by selected cat (exclude posts from child categories)
-			'cat_modifier' => NULL,
-			'page' => $page
-		) );
-	$MainList->query();
-	$MainList->nav_target = $cat; // set navigation target, we are always navigating through category in this skin
-
-	// Load read statuses if required
-	$MainList->load_content_read_statuses();
-
-	// Breadcrumbs
-	skin_widget( array(
-			// CODE for the widget:
-			'widget' => 'breadcrumb_path',
-			// Optional display params
-			'block_start'      => '<ol class="breadcrumb">',
-			'block_end'        => '</ol><div class="clear"></div>',
-			'separator'        => '',
-			'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-			'item_active_mask' => '<li class="active">$title$</li>',
-		) );
+	$current_Chapter = & $ChapterCache->get_by_ID( $single_cat_ID, false, false );
 }
 
-if( !empty( $cat ) && ( $cat > 0 ) )
-{ // Display sub-chapters
+// Breadcrumbs
+skin_widget( array(
+		// CODE for the widget:
+		'widget' => 'breadcrumb_path',
+		// Optional display params
+		'block_start'      => '<ol class="breadcrumb">',
+		'block_end'        => '</ol><div class="clear"></div>',
+		'separator'        => '',
+		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
+		'item_active_mask' => '<li class="active">$title$</li>',
+		'suffix_text'      => empty( $single_cat_ID ) ? T_('Latest topics') : '',
+	) );
+
+if( $single_cat_ID )
+{	// Display sub-chapters:
 
 $ChapterCache = & get_ChapterCache();
-$chapters = $ChapterCache->get_chapters( $Blog->ID, $cat, true );
+$chapters = $ChapterCache->get_chapters( $Blog->ID, $single_cat_ID, true );
 
 if( count( $chapters ) > 0 )
 {
@@ -151,9 +143,9 @@ if( count( $chapters ) > 0 )
 			</div>
 			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s topics'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
 			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
-			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></div>
+			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().' '.locale_shorttimefmt() ); ?></div>
 			<!-- Apply this on XS size -->
-			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( 'm/j/y' ); ?></div>
+			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( locale_datefmt() ); ?></div>
 		</article>
 <?php
 		}
@@ -172,21 +164,21 @@ if( count( $chapters ) > 0 )
 }
 
 // ---------------------------------- START OF POSTS ------------------------------------
-if( isset( $MainList ) && ( empty( $cat ) ||
+if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs ) ||
    ( isset( $current_Chapter ) && ! $current_Chapter->meta ) /* Note: the meta categories cannot contain the posts */ ) )
 {
 	echo !empty( $chapters ) ? '<br />' : '';
 ?>
 <div class="panel panel-default forums_list">
 	<?php
-	if( ! empty( $cat ) )
-	{ // Category title
+	if( $single_cat_ID )
+	{	// Display category title:
 		$ChapterCache = & get_ChapterCache();
-		if( $category = & $ChapterCache->get_by_ID( $cat ) )
+		if( $category = & $ChapterCache->get_by_ID( $single_cat_ID ) )
 		{ // Display category title
 			echo '<div class="panel-heading">'
 					// Buttons to post/reply:
-					.$Skin->get_post_button( $cat, NULL, array(
+					.$Skin->get_post_button( $single_cat_ID, NULL, array(
 							'group_class'  => 'pull-right',
 							'button_class' => 'btn-sm',
 						) )
@@ -200,12 +192,14 @@ if( isset( $MainList ) && ( empty( $cat ) ||
 	<section class="table table-hover">
 <?php
 
-if( ! empty( $cat ) )
+if( $single_cat_ID )
 { // Go to grab the featured posts only on pages with defined category:
-	while( $Item = get_featured_Item() )
+	while( $Item = & get_featured_Item() )
 	{ // We have a intro post to display:
 		// ---------------------- ITEM LIST INCLUDED HERE ------------------------
-		skin_include( '_item_list.inc.php' );
+		skin_include( '_item_list.inc.php', array(
+				'Item' => $Item
+			) );
 		// ----------------------------END ITEM LIST  ----------------------------
 	}
 }
@@ -237,15 +231,25 @@ elseif( isset( $current_Chapter ) )
 	<div class="panel-body comments_link__pagination">
 	<?php
 		// Buttons to post/reply
-		$Skin->display_post_button( $cat );
+		$Skin->display_post_button( $single_cat_ID );
+		if( check_user_status( 'can_be_validated' ) )
+		{	// Display a warning if current user cannot post a topic because he must activate account:
+			global $Messages;
+			$Messages->clear();
+			$Messages->add( T_( 'You must activate your account before you can post a new topic.' )
+				.' <a href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>', 'warning' );
+			$Messages->display();
+		}
 
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
 				'block_start'           => '<ul class="pagination">',
-				'block_end'             => '</ul></div>',
-				'page_current_template' => '<span><b>$page_num$</b></span>',
+				'block_end'             => '</ul>',
+				'page_current_template' => '<span>$page_num$</span>',
 				'page_item_before'      => '<li>',
 				'page_item_after'       => '</li>',
+				'page_item_current_before' => '<li class="active">',
+				'page_item_current_after'  => '</li>',
 				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
 				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 			) );

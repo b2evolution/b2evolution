@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -305,4 +305,70 @@ function form_textarea( $field_name, $field_value, $field_rows, $field_label, $f
 	echo $r;
 }
 
+
+/**
+ * Builds a fileselect item
+ *
+ * @param integer ID of file to generate thumbnail
+ * @param array params
+ */
+function file_select_item( $file_ID, $params = array() )
+{
+	$FileCache = & get_FileCache();
+	$File = & $FileCache->get_by_ID( $file_ID, false );
+
+	$params = array_merge( array(
+			'field_item_start' => '<div class="file_select_item" data-item-value="%value%">',
+			'field_item_end' => '</div>',
+			'size_name' => 'crop-64x64',
+			'class' => '',
+			'remove_file_text' => T_('Remove file'),
+			'edit_file_text' => T_('Select another'),
+			'max_file_num' => 1
+		), $params );
+
+	$r = str_replace( '%value%', $file_ID, $params['field_item_start'] );
+	$r .= $params['max_file_num'] > 1 ? '<div>' : '';
+	if( $File )
+	{
+		if( $File->exists() )
+		{
+			$r .= $File->get_thumb_imgtag( $params['size_name'], $params['class'] );
+		}
+		else
+		{
+			$r .= '<div class="bg-danger">'.T_('File not found').'</div>';
+		}
+	}
+	else
+	{
+		$r .= '<div class="bg-danger">'.T_('You have no permission to see this file.').'</div>';
+	}
+	$blog_param = empty( $blog ) ? '' : '&amp;blog='.$blog;
+	if( $params['max_file_num'] > 1 )
+	{
+		$r .= '<div>';
+	}
+	else
+	{
+		$r .= '<div class="item_actions">';
+	}
+	// Display a button to select another file:
+	$r .= action_icon( $params['edit_file_text'], 'edit',
+			'', ' '.T_('Select another'), NULL, $params['max_file_num'] > 1 ? NULL : 4,
+			array( 'onclick' => 'return window.parent.file_select_attachment_window( this, true );',
+			       'class' => 'btn btn-sm btn-info' ),
+			array( 'class' => 'edit_file_icon' ) );
+	// Display a button to remove current selected file:
+	$r .= action_icon( $params['remove_file_text'], 'remove',
+			'', ' '.T_('Remove'), NULL, $params['max_file_num'] > 1 ? NULL : 4,
+			array( 'onclick' => 'return file_select_delete( this );',
+			       'class' => 'btn btn-sm btn-default' ),
+			array( 'class' => 'remove_file_icon' ) );
+	$r .= '</div>';
+	$r .= $params['max_file_num'] > 1 ? '</div>' : '';
+	$r .= $params['field_item_end'];
+
+	return $r;
+}
 ?>

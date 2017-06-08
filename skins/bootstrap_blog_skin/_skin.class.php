@@ -18,6 +18,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class bootstrap_blog_Skin extends Skin
 {
 	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = '6.9.2';
+
+	/**
 	 * Do we want to use style.min.css instead of style.css ?
 	 */
 	var $use_min_css = 'check';  // true|false|'check' Set this to true for better optimization
@@ -39,7 +45,7 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -56,10 +62,50 @@ class bootstrap_blog_Skin extends Skin
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'partial',
+				'std' => 'yes',		// Blog
+				'photo' => 'no',
+				'forum' => 'no',
+				'manual' => 'no',
+				'group' => 'maybe',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	/*
+	 * What CSS framework does has this skin been designed with?
+	 *
+	 * This may impact default markup returned by Skin::get_template() for example
+	 */
+	function get_css_framework()
+	{
+		return 'bootstrap';
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
+	 * @return array
 	 */
 	function get_param_definitions( $params )
 	{
@@ -70,7 +116,7 @@ class bootstrap_blog_Skin extends Skin
 				),
 					'layout' => array(
 						'label' => T_('Layout'),
-						'note' => '',
+						'note' => T_('Select skin layout.'),
 						'defaultvalue' => 'right_sidebar',
 						'options' => array(
 								'single_column'              => T_('Single Column Large'),
@@ -82,9 +128,144 @@ class bootstrap_blog_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'max_image_height' => array(
+						'label' => T_('Max image height'),
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
+
+					'font' => array(
+						'label' => T_('Default font'),
+						'type'  => 'input_group',
+						'inputs' => array(
+							'_family' => array(
+								'defaultvalue' => 'system_helveticaneue',
+								'options'      => $this->get_font_definitions(),
+								'type'         => 'select'
+							),
+							'_size' => array(
+								'label' => T_('Size'),
+								'defaultvalue' => 'default',
+								'options'      => array(
+									'default'        => T_('Default (14px)'),
+									'standard'       => T_('Standard (16px)'),
+									'medium'         => T_('Medium (18px)'),
+									'large'          => T_('Large (20px)'),
+									'very_large'     => T_('Very large (22px)'),
+								),
+								'type' => 'select'
+							),
+							'_weight' => array(
+								'label' => T_('Weight'),
+								'defaultvalue' => '400',
+								'options' => array(
+										'100' => '100',
+										'200' => '200',
+										'300' => '300',
+										'400' => '400 ('.T_('Normal').')',
+										'500' => '500',
+										'600' => '600',
+										'700' => '700 ('.T_('Bold').')',
+										'800' => '800',
+										'900' => '900',
+									),
+								'type' => 'select',
+							)
+						)
+					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
+
+
+				'section_color_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Custom Settings')
+				),
+					'page_bg_color' => array(
+						'label' => T_('Background color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'page_text_color' => array(
+						'label' => T_('Text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#333',
+						'type' => 'color',
+					),
+					'page_link_color' => array(
+						'label' => T_('Link color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+					'page_hover_link_color' => array(
+						'label' => T_('Hover link color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#23527c',
+						'type' => 'color',
+					),
+					'bgimg_text_color' => array(
+						'label' => T_('Text color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'bgimg_link_color' => array(
+						'label' => T_('Link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+					'bgimg_hover_link_color' => array(
+						'label' => T_('Hover link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+					'current_tab_text_color' => array(
+						'label' => T_('Current tab text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#333',
+						'type' => 'color',
+					),
+					'current_tab_bg_color' => array(
+						'label' => T_('Current tab background color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'hover_tab_bg_color' => array(
+						'label' => T_('Hovered tab background color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+					),
+					'panel_bg_color' => array(
+						'label' => T_('Panel background color'),
+						'note' => T_('Choose background color for function panels and widgets.'),
+						'defaultvalue' => '#ffffff',
+						'type' => 'color',
+					),
+					'panel_border_color' => array(
+						'label' => T_('Panel border color'),
+						'note' => T_('Choose border color for function panels and widgets.'),
+						'defaultvalue' => '#ddd',
+						'type' => 'color',
+					),
+					'panel_heading_bg_color' => array(
+						'label' => T_('Panel heading background color'),
+						'note' => T_('Choose background color for function panels and widgets.'),
+						'defaultvalue' => '#f5f5f5',
+						'type' => 'color',
+					),
+				'section_color_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
 
 				'section_colorbox_start' => array(
 					'layout' => 'begin_fieldset',
@@ -197,7 +378,7 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function display_init()
 	{
-		global $Messages, $debug;
+		global $Messages, $disp, $debug;
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
@@ -213,361 +394,176 @@ class bootstrap_blog_Skin extends Skin
 			) );
 
 		// Skin specific initializations:
-	}
+		global $media_url, $media_path;
 
+		// Add custom CSS:
+		$custom_css = '';
 
-	/**
-	 * Those templates are used for example by the messaging screens.
-	 */
-	function get_template( $name )
-	{
-		switch( $name )
+		if( $color = $this->get_setting( 'page_bg_color' ) )
+		{ // Custom page background color:
+			$custom_css .= '#skin_wrapper { background-color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'page_text_color' ) )
+		{ // Custom page text color:
+			$custom_css .= '#skin_wrapper { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'page_link_color' ) )
+		{ // Custom page link color:
+			$custom_css .= 'a { color: '.$color." }\n";
+			$custom_css .= 'h4.evo_comment_title a, h4.panel-title a.evo_comment_type, .pagination li:not(.active) a, .pagination li:not(.active) span { color: '.$color." !important }\n";
+			$custom_css .= '.pagination li.active a, .pagination li.active span { color: #fff; background-color: '.$color.' !important; border-color: '.$color." }\n";
+			if( $this->get_setting( 'gender_colored' ) !== 1 )
+			{ // If gender option is not enabled, choose custom link color. Otherwise, chose gender link colors:
+				$custom_css .= 'h4.panel-title a { color: '.$color." }\n";
+			}
+		}
+		if( $color = $this->get_setting( 'page_hover_link_color' ) )
+		{ // Custom page link color on hover:
+			$custom_css .= 'a:hover { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_text_color' ) )
+		{	// Custom text color on background image:
+			$custom_css .= '.evo_hasbgimg { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_link_color' ) )
+		{	// Custom link color on background image:
+			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
+		{	// Custom link hover color on background image:
+			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'current_tab_text_color' ) )
+		{ // Custom current tab text color:
+			$custom_css .= 'ul.nav.nav-tabs li a.selected { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'current_tab_bg_color' ) )
+		{ // Custom current tab background color:
+			$custom_css .= 'ul.nav.nav-tabs li a.selected { background-color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'hover_tab_bg_color' ) )
+		{ // Custom hovered tab background text color:
+			$custom_css .= 'ul.nav.nav-tabs li a.default:hover { background-color: '.$color."; border-top-color: $color; border-left-color: $color; border-right-color: $color }\n";
+		}
+		if( $color = $this->get_setting( 'panel_bg_color' ) )
+		{ // Panel background text color:
+			$custom_css .= '.panel, .pagination>li>a { background-color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'panel_border_color' ) )
+		{ // Panel border color:
+			$custom_css .= '
+			.pagination li a, .pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover,
+			.nav-tabs,
+			.panel-default, .panel .panel-footer,
+			.panel .table, .panel .table th, .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th
+			{ border-color: '.$color." }\n";
+			$custom_css .= '.panel .panel-heading { border-color: '.$color."; background-color: $color }\n";
+			$custom_css .= '.nav-tabs>li>a:hover { border-bottom: 1px solid '.$color." }\n";
+			$custom_css .= '.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover { border-top-color: '.$color."; border-left-color: $color; border-right-color: $color }\n";
+		}
+		if( $color = $this->get_setting( 'panel_heading_bg_color' ) )
+		{ // Panel border color:
+			$custom_css .= '.panel .panel-heading, .panel .panel-footer { background-color: '.$color." }\n";
+		}
+
+		// Limit images by max height:
+		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
+		if( $max_image_height > 0 )
 		{
-			case 'Results':
-				// Results list:
-				return array(
-					'page_url' => '', // All generated links will refer to the current page
-					'before' => '<div class="results panel panel-default">',
-					'content_start' => '<div id="$prefix$ajax_content">',
-					'header_start' => '',
-						'header_text' => '<div class="center"><ul class="pagination">'
-								.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
-							.'</ul></div>',
-						'header_text_single' => '',
-					'header_end' => '',
-					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
-					'global_icons_class' => 'btn btn-default btn-sm',
-					'filters_start'        => '<div class="filters panel-body">',
-					'filters_end'          => '</div>',
-					'filter_button_class'  => 'btn-sm btn-info',
-					'filter_button_before' => '<div class="form-group pull-right">',
-					'filter_button_after'  => '</div>',
-					'messages_start' => '<div class="messages form-inline">',
-					'messages_end' => '</div>',
-					'messages_separator' => '<br />',
-					'list_start' => '<div class="table_scroll">'."\n"
-					               .'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0">'."\n",
-						'head_start' => "<thead>\n",
-							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre a jour admin_UI_general; utiliser colspan="$headspan$"
-							'colhead_start' => '<th $class_attrib$>',
-							'colhead_start_first' => '<th class="firstcol $class$">',
-							'colhead_start_last' => '<th class="lastcol $class$">',
-							'colhead_end' => "</th>\n",
-							'sort_asc_off' => get_icon( 'sort_asc_off' ),
-							'sort_asc_on' => get_icon( 'sort_asc_on' ),
-							'sort_desc_off' => get_icon( 'sort_desc_off' ),
-							'sort_desc_on' => get_icon( 'sort_desc_on' ),
-							'basic_sort_off' => '',
-							'basic_sort_asc' => get_icon( 'ascending' ),
-							'basic_sort_desc' => get_icon( 'descending' ),
-						'head_end' => "</thead>\n\n",
-						'tfoot_start' => "<tfoot>\n",
-						'tfoot_end' => "</tfoot>\n\n",
-						'body_start' => "<tbody>\n",
-							'line_start' => '<tr class="even">'."\n",
-							'line_start_odd' => '<tr class="odd">'."\n",
-							'line_start_last' => '<tr class="even lastline">'."\n",
-							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
-								'col_end' => "</td>\n",
-							'line_end' => "</tr>\n\n",
-							'grp_line_start' => '<tr class="group">'."\n",
-							'grp_line_start_odd' => '<tr class="odd">'."\n",
-							'grp_line_start_last' => '<tr class="lastline">'."\n",
-							'grp_line_start_odd_last' => '<tr class="odd lastline">'."\n",
-										'grp_col_start' => '<td $class_attrib$ $colspan_attrib$>',
-										'grp_col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
-										'grp_col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
-								'grp_col_end' => "</td>\n",
-							'grp_line_end' => "</tr>\n\n",
-						'body_end' => "</tbody>\n\n",
-						'total_line_start' => '<tr class="total">'."\n",
-							'total_col_start' => '<td $class_attrib$>',
-							'total_col_start_first' => '<td class="firstcol $class$">',
-							'total_col_start_last' => '<td class="lastcol $class$">',
-							'total_col_end' => "</td>\n",
-						'total_line_end' => "</tr>\n\n",
-					'list_end' => "</table></div>\n\n",
-					'footer_start' => '',
-					'footer_text' => '<div class="center"><ul class="pagination">'
-							.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
-						.'</ul></div><div class="center">$page_size$</div>'
-					                  /* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
-					                  /* '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$' */
-					                  /* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
-					'footer_text_single' => '<div class="center">$page_size$</div>',
-					'footer_text_no_limit' => '', // Text if theres no LIMIT and therefor only one page anyway
-						'page_current_template' => '<span><b>$page_num$</b></span>',
-						'page_item_before' => '<li>',
-						'page_item_after' => '</li>',
-						'prev_text' => T_('Previous'),
-						'next_text' => T_('Next'),
-						'no_prev_text' => '',
-						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
-						'list_span' => 11,
-						'scroll_list_range' => 5,
-					'footer_end' => "\n\n",
-					'no_results_start' => '<div class="panel-footer">'."\n",
-					'no_results_end'   => '$no_results$</div>'."\n\n",
-					'content_end' => '</div>',
-					'after' => '</div>',
-					'sort_type' => 'basic'
-				);
-				break;
+			$custom_css .= '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }'." }\n";
+		}
 
-			case 'blockspan_form':
-				// Form settings for filter area:
-				return array(
-					'layout'         => 'blockspan',
-					'formclass'      => 'form-inline',
-					'formstart'      => '',
-					'formend'        => '',
-					'title_fmt'      => '$title$'."\n",
-					'no_title_fmt'   => '',
-					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
-																.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
-					'fieldset_end'   => '</fieldset>'."\n",
-					'fieldstart'     => '<div class="form-group form-group-sm" $ID$>'."\n",
-					'fieldend'       => "</div>\n\n",
-					'labelclass'     => 'control-label',
-					'labelstart'     => '',
-					'labelend'       => "\n",
-					'labelempty'     => '<label></label>',
-					'inputstart'     => '',
-					'inputend'       => "\n",
-					'infostart'      => '<div class="form-control-static">',
-					'infoend'        => "</div>\n",
-					'buttonsstart'   => '<div class="form-group form-group-sm">',
-					'buttonsend'     => "</div>\n\n",
-					'customstart'    => '<div class="custom_content">',
-					'customend'      => "</div>\n",
-					'note_format'    => ' <span class="help-inline">%s</span>',
-					// Additional params depending on field type:
-					// - checkbox
-					'fieldstart_checkbox'    => '<div class="form-group form-group-sm checkbox" $ID$>'."\n",
-					'fieldend_checkbox'      => "</div>\n\n",
-					'inputclass_checkbox'    => '',
-					'inputstart_checkbox'    => '',
-					'inputend_checkbox'      => "\n",
-					'checkbox_newline_start' => '',
-					'checkbox_newline_end'   => "\n",
-					// - radio
-					'inputclass_radio'       => '',
-					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '',
-					'radio_newline_end'      => "\n",
-					'radio_oneline_start'    => '',
-					'radio_oneline_end'      => "\n",
-				);
+		// Font size customization
+		if( $font_size = $this->get_setting( 'font_size' ) )
+		{
+			switch( $font_size )
+			{
+				case 'default': // When default font size, no CSS entry
+					//$custom_css .= '';
+					break;
 
-			case 'compact_form':
-			case 'Form':
-				// Default Form settings:
-				return array(
-					'layout'         => 'fieldset',
-					'formclass'      => 'form-horizontal',
-					'formstart'      => '',
-					'formend'        => '',
-					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
-					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
-															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
-					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
-					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
-					'fieldend'       => "</div>\n\n",
-					'labelclass'     => 'control-label col-sm-3',
-					'labelstart'     => '',
-					'labelend'       => "\n",
-					'labelempty'     => '<label class="control-label col-sm-3"></label>',
-					'inputstart'     => '<div class="controls col-sm-9">',
-					'inputend'       => "</div>\n",
-					'infostart'      => '<div class="controls col-sm-9"><div class="form-control-static">',
-					'infoend'        => "</div></div>\n",
-					'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-3 col-sm-9">',
-					'buttonsend'     => "</div></div>\n\n",
-					'customstart'    => '<div class="custom_content">',
-					'customend'      => "</div>\n",
-					'note_format'    => ' <span class="help-inline">%s</span>',
-					// Additional params depending on field type:
-					// - checkbox
-					'inputclass_checkbox'    => '',
-					'inputstart_checkbox'    => '<div class="controls col-sm-9"><div class="checkbox"><label>',
-					'inputend_checkbox'      => "</label></div></div>\n",
-					'checkbox_newline_start' => '<div class="checkbox">',
-					'checkbox_newline_end'   => "</div>\n",
-					// - radio
-					'fieldstart_radio'       => '<div class="form-group radio-group" $ID$>'."\n",
-					'fieldend_radio'         => "</div>\n\n",
-					'inputclass_radio'       => '',
-					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
-					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
-					'radio_oneline_end'      => "</label>\n",
-				);
+				case 'standard':// When standard layout
+					$custom_css .= '.container { font-size: 16px !important'." }\n";
+					$custom_css .= '.container input.search_field { height: 100%'." }\n";
+					$custom_css .= '.container h1 { font-size: 38px'." }\n";
+					$custom_css .= '.container h2 { font-size: 32px'." }\n";
+					$custom_css .= '.container h3 { font-size: 26px'." }\n";
+					$custom_css .= '.container h4 { font-size: 18px'." }\n";
+					$custom_css .= '.container h5 { font-size: 16px'." }\n";
+					$custom_css .= '.container h6 { font-size: 14px'." }\n";
+					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+					break;
 
-			case 'linespan_form':
-				// Linespan form:
-				return array(
-					'layout'         => 'linespan',
-					'formclass'      => 'form-horizontal',
-					'formstart'      => '',
-					'formend'        => '',
-					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
-					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
-															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
-					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
-					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
-					'fieldend'       => "</div>\n\n",
-					'labelclass'     => '',
-					'labelstart'     => '',
-					'labelend'       => "\n",
-					'labelempty'     => '',
-					'inputstart'     => '<div class="controls">',
-					'inputend'       => "</div>\n",
-					'infostart'      => '<div class="controls"><div class="form-control-static">',
-					'infoend'        => "</div></div>\n",
-					'buttonsstart'   => '<div class="form-group"><div class="control-buttons">',
-					'buttonsend'     => "</div></div>\n\n",
-					'customstart'    => '<div class="custom_content">',
-					'customend'      => "</div>\n",
-					'note_format'    => ' <span class="help-inline">%s</span>',
-					// Additional params depending on field type:
-					// - checkbox
-					'inputclass_checkbox'    => '',
-					'inputstart_checkbox'    => '<div class="controls"><div class="checkbox"><label>',
-					'inputend_checkbox'      => "</label></div></div>\n",
-					'checkbox_newline_start' => '<div class="checkbox">',
-					'checkbox_newline_end'   => "</div>\n",
-					'checkbox_basic_start'   => '<div class="checkbox"><label>',
-					'checkbox_basic_end'     => "</label></div>\n",
-					// - radio
-					'fieldstart_radio'       => '',
-					'fieldend_radio'         => '',
-					'inputstart_radio'       => '<div class="controls">',
-					'inputend_radio'         => "</div>\n",
-					'inputclass_radio'       => '',
-					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
-					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
-					'radio_oneline_end'      => "</label>\n",
-				);
+				case 'medium': // When default font size, no CSS entry
+					$custom_css .= '.container { font-size: 18px !important'." }\n";
+					$custom_css .= '.container input.search_field { height: 100%'." }\n";
+					$custom_css .= '.container h1 { font-size: 40px'." }\n";
+					$custom_css .= '.container h2 { font-size: 34px'." }\n";
+					$custom_css .= '.container h3 { font-size: 28px'." }\n";
+					$custom_css .= '.container h4 { font-size: 20px'." }\n";
+					$custom_css .= '.container h5 { font-size: 18px'." }\n";
+					$custom_css .= '.container h6 { font-size: 16px'." }\n";
+					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+					break;
 
-			case 'fixed_form':
-				// Form with fixed label width:
-				return array(
-					'layout'         => 'fieldset',
-					'formclass'      => 'form-horizontal',
-					'formstart'      => '',
-					'formend'        => '',
-					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
-					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
-															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
-					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
-					'fieldstart'     => '<div class="form-group fixedform-group" $ID$>'."\n",
-					'fieldend'       => "</div>\n\n",
-					'labelclass'     => 'control-label fixedform-label',
-					'labelstart'     => '',
-					'labelend'       => "\n",
-					'labelempty'     => '<label class="control-label fixedform-label"></label>',
-					'inputstart'     => '<div class="controls fixedform-controls">',
-					'inputend'       => "</div>\n",
-					'infostart'      => '<div class="controls fixedform-controls"><div class="form-control-static">',
-					'infoend'        => "</div></div>\n",
-					'buttonsstart'   => '<div class="form-group"><div class="control-buttons fixedform-controls">',
-					'buttonsend'     => "</div></div>\n\n",
-					'customstart'    => '<div class="custom_content">',
-					'customend'      => "</div>\n",
-					'note_format'    => ' <span class="help-inline">%s</span>',
-					// Additional params depending on field type:
-					// - checkbox
-					'inputclass_checkbox'    => '',
-					'inputstart_checkbox'    => '<div class="controls fixedform-controls"><div class="checkbox"><label>',
-					'inputend_checkbox'      => "</label></div></div>\n",
-					'checkbox_newline_start' => '<div class="checkbox">',
-					'checkbox_newline_end'   => "</div>\n",
-					// - radio
-					'fieldstart_radio'       => '<div class="form-group radio-group" $ID$>'."\n",
-					'fieldend_radio'         => "</div>\n\n",
-					'inputclass_radio'       => '',
-					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
-					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
-					'radio_oneline_end'      => "</label>\n",
-				);
+				case 'large': // When default font size, no CSS entry
+					$custom_css .= '.container { font-size: 20px !important'." }\n";
+					$custom_css .= '.container input.search_field { height: 100%'." }\n";
+					$custom_css .= '.container h1 { font-size: 42px'." }\n";
+					$custom_css .= '.container h2 { font-size: 36px'." }\n";
+					$custom_css .= '.container h3 { font-size: 30px'." }\n";
+					$custom_css .= '.container h4 { font-size: 22px'." }\n";
+					$custom_css .= '.container h5 { font-size: 20px'." }\n";
+					$custom_css .= '.container h6 { font-size: 18px'." }\n";
+					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+					break;
 
-			case 'user_navigation':
-				// The Prev/Next links of users
-				return array(
-					'block_start'  => '<ul class="pager">',
-					'prev_start'   => '<li class="previous">',
-					'prev_end'     => '</li>',
-					'prev_no_user' => '',
-					'back_start'   => '<li>',
-					'back_end'     => '</li>',
-					'next_start'   => '<li class="next">',
-					'next_end'     => '</li>',
-					'next_no_user' => '',
-					'block_end'    => '</ul>',
-				);
+				case 'very_large': // When default font size, no CSS entry
+					$custom_css .= '.container { font-size: 22px !important'." }\n";
+					$custom_css .= '.container input.search_field { height: 100%'." }\n";
+					$custom_css .= '.container h1 { font-size: 44px'." }\n";
+					$custom_css .= '.container h2 { font-size: 38px'." }\n";
+					$custom_css .= '.container h3 { font-size: 32px'." }\n";
+					$custom_css .= '.container h4 { font-size: 24px'." }\n";
+					$custom_css .= '.container h5 { font-size: 22px'." }\n";
+					$custom_css .= '.container h6 { font-size: 20px'." }\n";
+					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+					break;
+			}
+		}
 
-			case 'button_classes':
-				// Button classes
-				return array(
-					'button'       => 'btn btn-default btn-xs',
-					'button_red'   => 'btn-danger',
-					'button_green' => 'btn-success',
-					'text'         => 'btn btn-default btn-xs',
-					'group'        => 'btn-group',
-				);
+		// Font family customization
+		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight' );
 
-			case 'tooltip_plugin':
-				// Plugin name for tooltips: 'bubbletip' or 'popover'
-				return 'popover';
-				break;
-
-			case 'plugin_template':
-				// Template for plugins
-				return array(
-						'toolbar_before'       => '<div class="btn-toolbar $toolbar_class$" role="toolbar">',
-						'toolbar_after'        => '</div>',
-						'toolbar_title_before' => '<div class="btn-toolbar-title">',
-						'toolbar_title_after'  => '</div>',
-						'toolbar_group_before' => '<div class="btn-group btn-group-xs" role="group">',
-						'toolbar_group_after'  => '</div>',
-						'toolbar_button_class' => 'btn btn-default',
-					);
-
-			case 'modal_window_js_func':
-				// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
-				return 'echo_modalwindow_js_bootstrap';
-				break;
-
-			default:
-				// Delegate to parent class:
-				return parent::get_template( $name );
+		if( ! empty( $custom_css ) )
+		{	// Function for custom_css:
+			$custom_css = '<style type="text/css">
+<!--
+'.$custom_css.'
+-->
+		</style>';
+			add_headline( $custom_css );
 		}
 	}
 
 
 	/**
-	 * Check if we can display a widget container
+	 * Check if we can display a widget container when access is denied to collection by current user
 	 *
 	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @param string Skin setting name
 	 * @return boolean TRUE to display
 	 */
-	function is_visible_container( $container_key, $setting_name = 'access_login_containers' )
+	function show_container_when_access_denied( $container_key )
 	{
-		$access = $this->get_setting( $setting_name );
+		global $Collection, $Blog;
+
+		if( $Blog->has_access() )
+		{	// If current user has an access to this collection then don't restrict containers:
+			return true;
+		}
+
+		// Get what containers are available for this skin when access is denied or requires login:
+		$access = $this->get_setting( 'access_login_containers' );
 
 		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
@@ -590,7 +586,7 @@ class bootstrap_blog_Skin extends Skin
 
 		if( $check_containers )
 		{ // Check if at least one sidebar container is visible
-			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
+			return ( $this->show_container_when_access_denied( 'sidebar' ) ||  $this->show_container_when_access_denied( 'sidebar2' ) );
 		}
 		else
 		{ // We should not check the visibility of the sidebar containers for this case

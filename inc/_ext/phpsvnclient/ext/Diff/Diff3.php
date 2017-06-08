@@ -39,7 +39,7 @@ class Text_Diff3 extends Text_Diff {
      * @param array $final1  The first version to compare to.
      * @param array $final2  The second version to compare to.
      */
-    function Text_Diff3($orig, $final1, $final2)
+    function __construct($orig, $final1, $final2)
     {
         if (extension_loaded('xdiff')) {
             $engine = new Text_Diff_Engine_xdiff();
@@ -85,7 +85,7 @@ class Text_Diff3 extends Text_Diff {
         $e1 = current($edits1);
         $e2 = current($edits2);
         while ($e1 || $e2) {
-            if ($e1 && $e2 && is_a($e1, 'Text_Diff_Op_copy') && is_a($e2, 'Text_Diff_Op_copy')) {
+            if ($e1 && $e2 && ($e1 instanceof Text_Diff_Op_copy) && ($e2 instanceof Text_Diff_Op_copy)) {
                 /* We have copy blocks from both diffs. This is the (only)
                  * time we want to emit a diff3 copy block.  Flush current
                  * diff3 diff block, if any. */
@@ -119,11 +119,11 @@ class Text_Diff3 extends Text_Diff {
                         $bb->input($orig);
                     }
 
-                    if (is_a($e1, 'Text_Diff_Op_copy')) {
+                    if ($e1 instanceof Text_Diff_Op_copy) {
                         $bb->out1(array_splice($e1->final, 0, $norig));
                     }
 
-                    if (is_a($e2, 'Text_Diff_Op_copy')) {
+                    if ($e2 instanceof Text_Diff_Op_copy) {
                         $bb->out2(array_splice($e2->final, 0, $norig));
                     }
                 }
@@ -156,7 +156,7 @@ class Text_Diff3 extends Text_Diff {
  */
 class Text_Diff3_Op {
 
-    function Text_Diff3_Op($orig = false, $final1 = false, $final2 = false)
+    function __construct($orig = false, $final1 = false, $final2 = false)
     {
         $this->orig = $orig ? $orig : array();
         $this->final1 = $final1 ? $final1 : array();
@@ -222,7 +222,7 @@ class Text_Diff3_Op_copy extends Text_Diff3_Op {
  */
 class Text_Diff3_BlockBuilder {
 
-    function Text_Diff3_BlockBuilder()
+    function __construct()
     {
         $this->_init();
     }

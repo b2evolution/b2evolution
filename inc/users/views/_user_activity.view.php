@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -46,10 +46,12 @@ if( !$user_profile_only )
 { // echo user edit action icons
 	$Widget = new Widget();
 	echo_user_actions( $Widget, $edited_User, 'edit' );
-	echo '<span class="floatright">'.$Widget->gen_global_icons().'</span>';
+	echo '<div class="row">';
+	echo '<span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">'.$Widget->gen_global_icons().'</span>';
 }
 
-echo '<div>'.get_usertab_header( $edited_User, $user_tab, $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity') ).'</div>';
+echo '<div class="col-xs-12 col-lg-6 col-lg-pull-6">'.get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity') ).'</span>'.get_manual_link( 'user-activity-tab' ) ).'</div>';
+echo '</div>';
 
 // Display IP address from where this user was created
 echo '<div style="margin-top:25px;font-weight:bold;"><span>'.T_( 'User created from IP' ).': '.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'</span></div>';

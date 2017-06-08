@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '4.0.0-dev' ) < 0 )
+if( evo_version_compare( $app_version, '4.0.0-dev' ) < 0 )
 { // Older 2.x skins work on newer 2.x b2evo versions, but newer 2.x skins may not work on older 2.x b2evo versions.
 	die( 'This skin is designed for b2evolution 4.0.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -92,10 +92,11 @@ if( $Item = & get_featured_Item() )
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 	skin_include( '_item_block.inc.php', array(
 			'feature_block' => true,
-			'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-			'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
-			'item_class'   => 'featured_post',
-			'image_size'	 =>	'fit-400x320',
+			'content_mode'  => 'auto',		// 'auto' will auto select depending on $disp-detail
+			'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+			'item_class'    => 'featured_post',
+			'image_size'    => 'fit-400x320',
+			'Item'          => $Item,
 		) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 }
@@ -105,10 +106,7 @@ if( $Item = & get_featured_Item() )
 // Display message if no post:
 display_if_empty();
 
-// Load posts read statuses if required
-$MainList->load_content_read_statuses();
-
-echo '<div id="styled_content_block">'; // Beginning of posts display
+echo '<div class="evo_content_block">'; // Beginning of posts display
 while( $Item = & mainlist_get_item() )
 {	// For each blog post:
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------

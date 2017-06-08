@@ -8,18 +8,18 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package tests
  */
-require_once  dirname(__FILE__).'/../blogs/conf/_config.php';
+require_once  dirname(__FILE__).'/../conf/_config.php';
 
 define( 'EVO_MAIN_INIT', true );
 
 /**
  * class loader
  */
-require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
+require_once $inc_path.'_core/_class_loader.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 
 load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
@@ -36,8 +36,11 @@ switch( $target )
 	case 'local':
 		$test_user = 'admin';
 		$test_pass = $install_password;
-		pre_dump( $test_user, $test_pass );
-		$client = new xmlrpc_client( $basesubpath.$xmlsrv_subdir.'xmlrpc.php', $basehost, $baseport );
+		if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+		{	// Could not use xmlrpc client because server has no the requested extensions:
+			die( 'Could not use xmlrpc client because of server error: '.( defined( 'CANUSEXMLRPC' ) ? CANUSEXMLRPC : 'Unknown' ) );
+		}
+		$client = new xmlrpc_client( $basesubpath.$xmlsrv_subdir.'xmlrpc.php', $basehost, substr( $baseport, 1 ) );
 		break;
 
 	default:

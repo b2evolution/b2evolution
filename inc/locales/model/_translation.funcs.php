@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -415,7 +415,7 @@ function translation_find_T_strings( $file, & $translation_strings )
 			continue;
 		}
 
-		for( $l = 0; $l <= strlen( $line_string ); $l++ )
+		for( $l = 0; $l < strlen( $line_string ); $l++ )
 		{
 			$char = $line_string[ $l ];
 

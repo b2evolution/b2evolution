@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -23,9 +23,9 @@ $Form->hiddens_by_key( get_memorized( 'action' ), array( 'svn_url', 'svn_folder'
 
 $Form->begin_form( 'fform', T_('Upgrade from SVN').get_manual_link( 'upgrade-from-svn' ) );
 
-$Form->text_input( 'svn_url', $UserSettings->get( 'svn_upgrade_url' ), 80, T_('URL of repository'), T_('e.g. https://server.com/svn/repository/'), array( 'maxlength' => 300, 'required' => true ) );
-$Form->text_input( 'svn_folder', $UserSettings->get( 'svn_upgrade_folder' ), 80, T_('SVN folder'), T_('e.g. trunk/blogs/'), array( 'maxlength' => 300 ) );
-$Form->text_input( 'svn_user', $UserSettings->get( 'svn_upgrade_user' ), 32, T_('Login'), '', array( 'maxlength' => 300 ) );
+$Form->text_input( 'svn_url', $UserSettings->get( 'svn_upgrade_url' ), 80, T_('URL of repository'), sprintf( T_('E.g. %s'), '<code>https://server.com/svn/repository/</code>' ), array( 'maxlength' => 300, 'required' => true ) );
+$Form->text_input( 'svn_folder', $UserSettings->get( 'svn_upgrade_folder' ), 80, T_('SVN folder'), sprintf( T_('E.g. %s'), '<code>trunk/blogs/</code>' ), array( 'maxlength' => 300 ) );
+$Form->text_input( 'svn_user', $UserSettings->get( 'svn_upgrade_user' ), 32, /* TRANS: noun */ T_('Login'), '', array( 'maxlength' => 300 ) );
 $Form->password_input( 'svn_password', get_param( 'svn_password' ), 32, T_('Password'), '', array( 'maxlength' => 300 ) );
 $Form->text_input( 'svn_revision', $UserSettings->get( 'svn_upgrade_revision' ), 7, T_('Revision'), T_('Leave blank to get the latest revision') );
 

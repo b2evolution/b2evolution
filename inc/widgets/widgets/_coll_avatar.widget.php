@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -28,10 +28,10 @@ class coll_avatar_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_avatar_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_avatar' );
+		parent::__construct( $db_row, 'core', 'coll_avatar' );
 	}
 
 
@@ -97,7 +97,7 @@ class coll_avatar_Widget extends ComponentWidget
 	function display( $params )
 	{
 		global $cat_modifier;
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 
@@ -132,7 +132,7 @@ class coll_avatar_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$owner_User = & $Blog->get_owner_User();
 

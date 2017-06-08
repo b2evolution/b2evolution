@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  *
  * @package admin
@@ -105,7 +105,7 @@ switch( $action )
 												WHERE hit_referer LIKE '.$DB->quote( '%'.$keyword.'%' ),
 												'Delete all banned hit-log entries' );
 
-			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success' );
+			$Messages->add_to_group( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 		}
 
 		if( $delcomments )
@@ -115,7 +115,7 @@ switch( $action )
 							OR comment_author_email LIKE '.$DB->quote( '%'.utf8_strtolower( $keyword ).'%' ).'
 							OR comment_author_url LIKE '.$DB->quote( '%'.$keyword.'%' ).'
 							OR comment_content LIKE '.$DB->quote( '%'.$keyword.'%' ).')';
-			// asimo> we don't need transaction here 
+			// asimo> we don't need transaction here
 			$query = 'SELECT comment_ID FROM T_comments
 							WHERE '.$keyword_cond.$del_condition;
 			$deleted_ids = $DB->get_col( $query, 0, 'Get comment ids awaiting for delete' );
@@ -125,14 +125,14 @@ switch( $action )
 			// Delete all comments data from DB
 			Comment::db_delete_where( 'Comment', $keyword_cond.$del_condition );
 
-			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success' );
+			$Messages->add_to_group( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 		}
 
 		if( $blacklist_locally )
 		{ // Local blacklist:
 			if( antispam_create( $keyword ) )
 			{ // Success
-				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars( $keyword ) ), 'success' );
+				$Messages->add_to_group( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 			}
 			else
 			{ // Failed
@@ -157,23 +157,18 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 
-		if( $Messages->has_errors() )
-		{ // Reset js display mode in order to display a correct view after confirmation
-			$display_mode = '';
-			$mode = '';
-		}
-
-		param( 'request', 'string', '' );
-		if( $display_mode == 'js' && $request != 'checkban' )
-		{
+		if( $display_mode == 'js' && ! $Messages->has_errors() )
+		{	// Initialize JS functions to execute after action from modal window:
+			$javascript_messages = array();
 			if( $delcomments && $r ) // $r not null => means the commentlist was deleted successfully
 			{
-				send_javascript_message( array( 'refreshAfterBan' => array( $deleted_ids ), 'closeModalWindow' => array() ), true );
+				$javascript_messages['refreshAfterBan'] = array( $deleted_ids );
 			}
-			else
-			{
-				send_javascript_message( array( 'closeModalWindow' => array() ), true );
-			}
+			$javascript_messages['updateModalAfterBan'] = array( array(
+					'title' => T_('Open Antispam Blacklist'),
+					'url'   => $admin_url.'?ctrl=antispam',
+					'class' => 'btn btn-info'
+				) );
 		}
 
 		// We'll ask the user later what to do, if no "sub-action" given.
@@ -239,6 +234,9 @@ switch( $action )
 		param_integer_range( 'antispam_threshold_delete', -100, 100, T_('The threshold must be between -100 and 100.') );
 		$Settings->set( 'antispam_threshold_delete', $antispam_threshold_delete );
 
+		param( 'antispam_block_contact_form', 'integer', 0 );
+		$Settings->set( 'antispam_block_contact_form', $antispam_block_contact_form );
+
 		param( 'antispam_block_spam_referers', 'integer', 0 );
 		$Settings->set( 'antispam_block_spam_referers', $antispam_block_spam_referers );
 
@@ -296,7 +294,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
+		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
 		$rows_affected = 0;
 
@@ -331,7 +329,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
+		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
 		$rows_affected = 0;
 
@@ -527,7 +525,14 @@ if( $display_mode != 'js' )
 			$AdminUI->breadcrumbpath_add( T_('IP Ranges'), '?ctrl=antispam&amp;tab3='.$tab3 );
 
 			// Set an url for manual page:
-			$AdminUI->set_page_manual_link( 'ip-ranges' );
+			if( $action == 'iprange_new' || $action == 'iprange_edit' )
+			{
+				$AdminUI->set_page_manual_link( 'ip-range-editing' );
+			}
+			else
+			{
+				$AdminUI->set_page_manual_link( 'ip-ranges' );
+			}
 			break;
 
 		case 'countries':
@@ -562,16 +567,16 @@ if( $display_mode != 'js' )
 	{
 		$AdminUI->append_path_level( $tab3 );
 	}
-
-	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-	$AdminUI->disp_html_head();
-	
-	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-	$AdminUI->disp_body_top();
-
-	// Begin payload block:
-	$AdminUI->disp_payload_begin();
 }
+
+// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+$AdminUI->disp_html_head();
+
+// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+$AdminUI->disp_body_top();
+
+// Begin payload block:
+$AdminUI->disp_payload_begin();
 
 switch( $tab3 )
 {
@@ -635,6 +640,11 @@ switch( $tab3 )
 
 	case 'blacklist':
 	default:
+		if( ! empty( $javascript_messages ) )
+		{	// Don't display form and list when we should update a content from modal window by JS:
+			break;
+		}
+
 		if( $action == 'ban' && ( ! $Messages->has_errors() || ! empty( $confirm ) ) && !( $delhits || $delcomments ) )
 		{	// Nothing to do, ask user:
 			$AdminUI->disp_view( 'antispam/views/_antispam_ban.form.php' );
@@ -647,12 +657,14 @@ switch( $tab3 )
 }
 
 // End payload block:
-if( $display_mode != 'js')
-{
-	$AdminUI->disp_payload_end();
+$AdminUI->disp_payload_end();
 
-	// Display body bottom, debug info and close </html>:
-	$AdminUI->disp_global_footer();
+// Display body bottom, debug info and close </html>:
+$AdminUI->disp_global_footer();
+
+
+if( ! empty( $javascript_messages ) )
+{	// Execute JS functions after action from modal window:
+	send_javascript_message( $javascript_messages, true, 'window.parent' );
 }
-
 ?>

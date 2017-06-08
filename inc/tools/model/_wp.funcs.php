@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -15,11 +15,136 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Import WordPress data from XML file into b2evolution database
+ * Get data to start import from wordpress XML/ZIP file
+ *
+ * @param string Path of XML/ZIP file
+ * @return array Data array:
+ *                 'error' - FALSE on success OR error message ,
+ *                 'XML_file_path' - Path to XML file,
+ *                 'attached_files_path' - Path to attachments folder,
+ *                 'temp_zip_folder_path' - Path to temp extracted ZIP files
  */
-function wpxml_import()
+function wpxml_get_import_data( $XML_file_path )
 {
-	global $DB, $tableprefix;
+	// Start to collect all printed errors from buffer:
+	ob_start();
+
+	$XML_file_name = basename( $XML_file_path );
+	$ZIP_folder_path = NULL;
+
+	// Do NOT use first found folder for attachments:
+	$use_first_folder_for_attachments = false;
+
+	if( preg_match( '/\.(xml|txt)$/i', $XML_file_name ) )
+	{	// XML format
+		// Check WordPress XML file:
+		wpxml_check_xml_file( $XML_file_path );
+	}
+	else if( preg_match( '/\.zip$/i', $XML_file_name ) )
+	{	// ZIP format
+		// Extract ZIP and check WordPress XML file
+		global $media_path;
+
+		// $ZIP_folder_path must be deleted after import!
+		$ZIP_folder_path = $media_path.'import/temp-'.md5( rand() );
+
+		if( unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
+		{	// If ZIP archive is unpacked successfully:
+
+			// 
+			$XML_file_path = false;
+
+			// Find valid XML file in ZIP package:
+			$ZIP_files_list = scandir( $ZIP_folder_path );
+			$xml_exists_in_zip = false;
+			for( $i = 1; $i <= 2; $i++ )
+			{	// Run searcher 1st time to find XML file in a root of ZIP archive
+				// and 2nd time to find XML file in 1 level subfolders of the root:
+				foreach( $ZIP_files_list as $ZIP_file )
+				{
+					if( $ZIP_file == '.' || $ZIP_file == '..' )
+					{	// Skip reserved dir names of the current path:
+						continue;
+					}
+					if( $i == 2 )
+					{	// This is 2nd time to find XML file in 1 level subfolders of the root:
+						if( is_dir( $ZIP_folder_path.'/'.$ZIP_file ) )
+						{	// This is a subfolder, Scan it to find XML files inside:
+							$ZIP_folder_current_path = $ZIP_folder_path.'/'.$ZIP_file;
+							$ZIP_folder_files = scandir( $ZIP_folder_current_path );
+						}
+						else
+						{	// Skip files:
+							continue;
+						}
+					}
+					else
+					{	// This is a single file or folder:
+						$ZIP_folder_files = array( $ZIP_file );
+						$ZIP_folder_current_path = $ZIP_folder_path;
+					}
+					foreach( $ZIP_folder_files as $ZIP_file )
+					{
+						if( preg_match( '/\.(xml|txt)$/i', $ZIP_file ) )
+						{	// XML file is found in ZIP package:
+							$XML_file_path = $ZIP_folder_current_path.'/'.$ZIP_file;
+							if( wpxml_check_xml_file( $XML_file_path ) )
+							{	// XML file is valid:
+								$xml_exists_in_zip = true;
+								break 3;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// Use first found folder for attachments when no reserved folders not found in ZIP before:
+		$use_first_folder_for_attachments = true;
+	}
+	else
+	{	// Unrecognized extension:
+		echo '<p class="text-danger">'.sprintf( T_( '%s has an unrecognized extension.' ), '<code>'.$xml_file['name'].'</code>' ).'</p>';
+	}
+
+	if( $XML_file_path )
+	{	// Get a path with attached files for the XML file:
+		$attached_files_path = wpxml_get_attachments_folder( $XML_file_path, $use_first_folder_for_attachments );
+	}
+	else
+	{	// Wrong source file:
+		$attached_files_path = false;
+	}
+
+	if( isset( $xml_exists_in_zip ) && $xml_exists_in_zip === false && file_exists( $ZIP_folder_path ) )
+	{	// No XML is detected in ZIP package:
+		echo '<p class="text-danger">'.T_( 'Correct XML file is not detected in your ZIP package.' ).'</p>';
+		// Delete temporary folder that contains the files from extracted ZIP package:
+		rmdir_r( $ZIP_folder_path );
+	}
+
+	// Get all printed errors:
+	$errors = ob_get_clean();
+
+	return array(
+			'errors'               => empty( $errors ) ? false : $errors,
+			'XML_file_path'        => $XML_file_path,
+			'attached_files_path'  => $attached_files_path,
+			'temp_zip_folder_path' => $ZIP_folder_path,
+		);
+}
+
+
+/**
+ * Import WordPress data from XML file into b2evolution database
+ *
+ * @param string Path of XML file
+ * @param string|boolean Path of folder with attachments, may be FALSE if folder is not found
+ * @param string|NULL Temporary folder of unpacked ZIP archive
+ */
+function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder_path = NULL )
+{
+	global $DB, $tableprefix, $media_path;
 
 	// Load classes:
 	load_class( 'regional/model/_country.class.php', 'Country' );
@@ -36,65 +161,9 @@ function wpxml_import()
 	$import_type = param( 'import_type', 'string', 'replace' );
 	// Should we delete files on 'replace' mode?
 	$delete_files = param( 'delete_files', 'integer', 0 );
-
-	$XML_file_path = get_param( 'wp_file' );
-	$XML_file_name = basename( $XML_file_path );
-
-	if( preg_match( '/\.(xml|txt)$/i', $XML_file_name ) )
-	{ // XML format
-		// Check WordPress XML file
-		if( ! wpxml_check_xml_file( $XML_file_path ) )
-		{ // Errors are in XML file
-			return;
-		}
-
-		// Use this folder to upload files if they exist in subfolder "/b2evolution_export_files"
-		$attached_files_path = dirname( $XML_file_path );
-	}
-	else if( preg_match( '/\.zip$/i', $XML_file_name ) )
-	{ // ZIP format
-		// Extract ZIP and check WordPress XML file
-		global $media_path;
-
-		$ZIP_folder_path = $media_path.'import/temp-'.md5( rand() );
-
-		if( ! unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
-		{ // Errors on unpack ZIP file
-			return;
-		}
-
-		// Find valid XML file in ZIP package
-		$ZIP_files_list = scandir( $ZIP_folder_path );
-		$xml_exists_in_zip = false;
-		foreach( $ZIP_files_list as $ZIP_file )
-		{
-			if( preg_match( '/\.(xml|txt)$/i', $ZIP_file ) )
-			{ // XML file is found in ZIP package
-				if( wpxml_check_xml_file( $ZIP_folder_path.'/'.$ZIP_file ) )
-				{ // XML file is valid
-					$XML_file_path = $ZIP_folder_path.'/'.$ZIP_file;
-					$xml_exists_in_zip = true;
-					break;
-				}
-			}
-		}
-
-		if( ! $xml_exists_in_zip )
-		{ // No XML is detected in ZIP package
-			echo '<p style="color:red">'.T_( 'XML file is not detected in your ZIP package.' ).'</p>';
-			// Delete temporary folder that contains the files from extracted ZIP package
-			rmdir_r( $ZIP_folder_path );
-			return;
-		}
-
-		// Use this folder to upload files, $ZIP_folder_path must be deleted after import
-		$attached_files_path = $ZIP_folder_path;
-	}
-	else
-	{ // Unrecognized extension
-		echo '<p style="color:red">'.sprintf( T_( '%s has an unrecognized extension.' ), '<b>'.$xml_file['name'].'</b>' ).'</p>';
-		return;
-	}
+	// Should we try to match <img> tags with imported attachments based on filename in post content after import?
+	$import_img = param( 'import_img', 'integer', 0 );
+	$all_wp_attachments = array();
 
 	// Parse WordPress XML file into array
 	$xml_data = wpxml_parser( $XML_file_path );
@@ -162,7 +231,7 @@ function wpxml_import()
 				$DB->query( 'DELETE l, lv FROM T_links AS l
 											 LEFT JOIN T_links__vote AS lv ON lv.lvot_link_ID = l.link_ID
 											WHERE l.link_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
-				$DB->query( 'DELETE FROM T_users__item_read_status WHERE uirs_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
+				$DB->query( 'DELETE FROM T_items__user_data WHERE itud_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
 			}
 		}
 		echo T_('OK').'<br />';
@@ -228,11 +297,11 @@ function wpxml_import()
 				{
 					if( ! ( $deleted_File = & $FileCache->get_by_ID( $deleted_file_ID, false, false ) ) )
 					{ // Incorrect file ID
-						echo '<p class="red">'.sprintf( T_('No file #%s found in DB. It cannot be deleted.'), $deleted_file_ID ).'</p>';
+						echo '<p class="text-danger">'.sprintf( T_('No file #%s found in DB. It cannot be deleted.'), $deleted_file_ID ).'</p>';
 					}
 					if( ! $deleted_File->unlink() )
 					{ // No permission to delete file
-						echo '<p class="red">'.sprintf( T_('Could not delete the file &laquo;%s&raquo;.'), $deleted_File->get_full_path() ).'</p>';
+						echo '<p class="text-danger">'.sprintf( T_('Could not delete the file %s.'), '<code>'.$deleted_File->get_full_path().'</code>' ).'</p>';
 					}
 					// Clear cache to save memory
 					$FileCache->clear();
@@ -268,7 +337,11 @@ function wpxml_import()
 		$authors_count = 0;
 		foreach( $xml_data['authors'] as $author )
 		{
-			if( empty( $existing_users[ (string) $author['author_login'] ] ) )
+			// Replace unauthorized chars of username:
+			$author_login = preg_replace( '/([^a-z0-9_])/i', '_', $author['author_login'] );
+			$author_login = utf8_substr( utf8_strtolower( $author_login ), 0, 20 );
+
+			if( empty( $existing_users[ $author_login ] ) )
 			{	// Insert new user into DB if User doesn't exist with current login name
 
 				$GroupCache = & get_GroupCache();
@@ -303,11 +376,13 @@ function wpxml_import()
 				$author_regions = wp_get_regional_data( $author['author_country'], $author['author_region'], $author['author_subregion'], $author['author_city'] );
 
 				$User = new User();
-				$User->set( 'login', $author['author_login'] );
-				$User->set( 'email', $author['author_email'] );
+				$User->set( 'login', $author_login );
+				$User->set( 'email', trim( $author['author_email'] ) );
 				$User->set( 'firstname', $author['author_first_name'] );
 				$User->set( 'lastname', $author['author_last_name'] );
 				$User->set( 'pass', $author['author_pass'] );
+				$User->set( 'salt', '' );
+				$User->set( 'pass_driver', 'evo$md5' );
 				$User->set_Group( $UserGroup );
 				$User->set( 'status', !empty( $author['author_status'] ) ? $author['author_status'] : 'autoactivated' );
 				$User->set( 'nickname', $author['author_nickname'] );
@@ -344,9 +419,9 @@ function wpxml_import()
 					}
 				}
 				$User->set( 'source', $author['author_source'] );
-				$User->set_datecreated( empty( $author['author_created_ts'] ) ? mktime() : intval( $author['author_created_ts'] ) );
+				$User->set_datecreated( empty( $author['author_created_ts'] ) ? time() : intval( $author['author_created_ts'] ) );
 				$User->set( 'lastseen_ts', ( empty( $author['author_lastseen_ts'] ) ? NULL : $author['author_lastseen_ts'] ), true );
-				$User->set( 'profileupdate_date', empty( $author['author_profileupdate_date'] ) ? date( 'Y-m-d', mktime() ): $author['author_profileupdate_date'] );
+				$User->set( 'profileupdate_date', empty( $author['author_profileupdate_date'] ) ? date( 'Y-m-d H:i:s' ): $author['author_profileupdate_date'] );
 				$User->dbinsert();
 				$user_ID = $User->ID;
 				if( !empty( $user_ID ) && !empty( $author['author_created_fromIPv4'] ) )
@@ -357,10 +432,10 @@ function wpxml_import()
 			}
 			else
 			{	// Get ID of existing user
-				$user_ID = $existing_users[ (string) $author['author_login'] ];
+				$user_ID = $existing_users[ $author_login ];
 			}
 			// Save user ID of current author
-			$authors[ $author['author_login'] ] = (string) $user_ID;
+			$authors[ $author_login ] = (string) $user_ID;
 			$authors_IDs[ $author['author_id'] ] = (string) $user_ID;
 		}
 
@@ -370,21 +445,19 @@ function wpxml_import()
 	}
 
 	/* Import files, Copy them all to media folder */
+	$files = array();
 	if( isset( $xml_data['files'] ) && count( $xml_data['files'] ) > 0 )
 	{
 		echo T_('Importing the files... ');
 		evo_flush();
 
-		if( ! file_exists( $attached_files_path.'/b2evolution_export_files' ) )
-		{ // Display an error if files are attached but folder doesn't exist
-			echo '<p class="red">'.sprintf( T_('No folder %s found. It must exists to import the attached files properly.'), '<b>'.$attached_files_path.'/b2evolution_export_files'.'</b>' ).'</p>';
+		if( ! $attached_files_path || ! file_exists( $attached_files_path ) )
+		{	// Display an error if files are attached but folder doesn't exist:
+			echo '<p class="text-danger">'.sprintf( T_('No attachments folder %s found. It must exists to import the attached files properly.'), ( $attached_files_path ? '<code>'.$attached_files_path.'</code>' : '' ) ).'</p>';
 		}
 		else
-		{ // The attached files are located in this subfolder
-			$subfolder_path = '/b2evolution_export_files';
-
+		{	// Try to import files from the selected subfolder:
 			$files_count = 0;
-			$files = array();
 
 			foreach( $xml_data['files'] as $file )
 			{
@@ -392,14 +465,14 @@ function wpxml_import()
 				{
 					case 'shared':
 						// Shared files
-						$file_root_ID = 0;
+						$file['file_root_ID'] = 0;
 						break;
 
 					case 'user':
 						// User's files
 						if( isset( $authors_IDs[ $file['file_root_ID'] ] ) )
 						{ // If owner of this file exists in our DB
-							$file_root_ID = $authors_IDs[ $file['file_root_ID'] ];
+							$file['file_root_ID'] = $authors_IDs[ $file['file_root_ID'] ];
 							break;
 						}
 						// Otherwise we should upload this file into blog's folder:
@@ -407,58 +480,36 @@ function wpxml_import()
 					default: // 'collection', 'absolute', 'skins'
 						// The files from other blogs and from other places must be moved in the folder of the current blog
 						$file['file_root_type'] = 'collection';
-						$file_root_ID = $wp_blog_ID;
+						$file['file_root_ID'] = $wp_blog_ID;
 						break;
 				}
 
-				// Get FileRoot by type and ID
-				$FileRootCache = & get_FileRootCache();
-				$FileRoot = & $FileRootCache->get_by_type_and_ID( $file['file_root_type'], $file_root_ID );
-				if( is_dir( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'] ) )
-				{ // Folder
-					$file_destination_path = $FileRoot->ads_path;
-				}
-				else
-				{ // File
-					$file_destination_path = $FileRoot->ads_path.$file['file_path'];
-				}
+				// Source of the importing file:
+				$file_source_path = $attached_files_path.$file['zip_path'].$file['file_path'];
 
-				if( ! file_exists( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'] ) )
-				{ // File doesn't exist
-					echo '<p class="orange">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<b>'.$file['zip_path'].$file['file_path'].'</b>' ).'</p>';
-					// Skip it
-					continue;
-				}
-				else if( ! copy_r( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'], $file_destination_path ) )
-				{ // No permission to copy to this folder
-					if( is_dir( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'] ) )
-					{ // Folder
-						echo '<p class="orange">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<b>'.$file['zip_path'].$file['file_path'].'</b>', '<b>'.$file_destination_path.'</b>' ).'</p>';
+				// Try to import file from source path:
+				if( $File = & wpxml_create_File( $file_source_path, $file ) )
+				{	// Store the created File in array because it will be linked to the Items below:
+					$files[ $file['file_ID'] ] = $File;
+
+					if( $import_img )
+					{	// Collect file name in array to link with post below:
+						$file_name = basename( $file['file_path'] );
+						if( isset( $all_wp_attachments[ $file_name ] ) )
+						{	// Don't use this file if more than one use same name, e.g. from different folders:
+							$all_wp_attachments[ $file_name ] = false;
+						}
+						else
+						{	// This is a first detected file with current name:
+							$all_wp_attachments[ $file_name ] = $File->ID;
+						}
 					}
-					else
-					{ // File
-						echo '<p class="orange">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<b>'.$file['zip_path'].$file['file_path'].'</b>', '<b>'.$file_destination_path.'</b>' ).'</p>';
-					}
-					// Skip it
-					continue;
+
+					$files_count++;
 				}
-
-				// Create new File object, It will be linked to the items below
-				$File = new File( $file['file_root_type'], $file_root_ID, $file['file_path'] );
-				$File->set( 'title', $file['file_title'] );
-				$File->set( 'alt', $file['file_alt'] );
-				$File->set( 'desc', $file['file_desc'] );
-				$files[ $file['file_ID'] ] = $File;
-
-				$files_count++;
 			}
 
 			echo sprintf( T_('%d records'), $files_count ).'<br />';
-
-			if( isset( $ZIP_folder_path ) && file_exists( $ZIP_folder_path ) )
-			{ // This folder was created only to extract files from ZIP package, Remove it now
-				rmdir_r( $ZIP_folder_path );
-			}
 		}
 	}
 
@@ -544,9 +595,9 @@ function wpxml_import()
 		{
 			if( empty( $tags[ (string) $tag['tag_name'] ] ) )
 			{	// Insert new tag into DB if tag doesn't exist with current name
-				mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'items__tag ( tag_name )
+				$DB->query( 'INSERT INTO '.$tableprefix.'items__tag ( tag_name )
 					VALUES ( '.$DB->quote( $tag['tag_name'] ).' )' );
-				$tag_ID = mysqli_insert_id( $DB->dbhandle );
+				$tag_ID = $DB->insert_id;
 				// Save new tag
 				$tags[ $tag['tag_name'] ] = (string) $tag_ID;
 				$tags_count++;
@@ -569,6 +620,7 @@ function wpxml_import()
 			'publish'    => 'published',
 			'pending'    => 'review',
 			'draft'      => 'draft',
+			'inherit'    => 'draft',
 			'trash'      => 'deprecated',
 			// These statuses don't exist in WP, but we handle them if they will appear once
 			'community'  => 'community',
@@ -582,15 +634,134 @@ function wpxml_import()
 
 		// Get post types
 		$SQL = new SQL();
-		$SQL->SELECT( 'LOWER( ityp_name ), ityp_ID' );
+		$SQL->SELECT( 'LOWER( ityp_usage ), ityp_ID' );
 		$SQL->FROM( 'T_items__type' );
+		$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID' );
+		$SQL->WHERE( 'itc_coll_ID = '.$DB->quote( $wp_blog_ID ) );
+		$SQL->GROUP_BY( 'ityp_usage' );
+		$SQL->ORDER_BY( 'ityp_ID' );
 		$post_types = $DB->get_assoc( $SQL->get() );
+
+		echo T_('Importing the files from attachment posts... ');
+		evo_flush();
+
+		$attachment_IDs = array();
+		$attachments_count = 0;
+		foreach( $xml_data['posts'] as $post )
+		{	// Import ONLY attachment posts here, all other posts are imported below:
+			if( $post['post_type'] != 'attachment' )
+			{	// Skip not attachment post:
+				continue;
+			}
+
+			echo '<p>'.sprintf( T_('Importing attachment: %s'), '#'.$post['post_id'].' - "'.$post['post_title'].'"' );
+
+			if( isset( $post['postmeta'] ) )
+			{	// Link the files to the Item from meta data:
+				$attch_imported_files = array();
+				foreach( $post['postmeta'] as $postmeta )
+				{
+					if( ! isset( $postmeta['key'] ) || ! isset( $postmeta['value'] ) )
+					{	// Skip wrong meta data:
+						continue;
+					}
+					$attch_file_name = '';
+					$file_params = array(
+							'file_root_type' => 'collection',
+							'file_root_ID'   => $wp_blog_ID,
+							'file_title'     => $post['post_title'],
+							'file_desc'      => empty( $post['post_content'] ) ? $post['post_excerpt'] : $post['post_content'],
+						);
+
+					if( $postmeta['key'] == '_wp_attached_file' )
+					{	// Get file name from the string meta data:
+						$attch_file_name = $postmeta['value'];
+					}
+					elseif( $postmeta['key'] == '_wp_attachment_metadata' )
+					{	// Try to get file name from the serialized meta data:
+						$postmeta_value = @unserialize( $postmeta['value'] );
+						if( isset( $postmeta_value['file'] ) )
+						{	// Set file name:
+							$attch_file_name = $postmeta_value['file'];
+						}
+					}
+					if( empty( $attch_file_name ) || in_array( $attch_file_name, $attch_imported_files ) )
+					{	// Skip empty file name or if it has been already imported:
+						continue;
+					}
+
+					// Set file path where we should store the importing file relating to the collection folder:
+					$file_params['file_path'] = preg_replace( '#^.+[/\\\\]#', '', $attch_file_name );
+
+					// Source of the importing file:
+					$file_source_path = $attached_files_path.$attch_file_name;
+
+					// Try to import file from source path:
+					if( $File = & wpxml_create_File( $file_source_path, $file_params ) )
+					{	// Store the created File in array because it will be linked to the Items below:
+						$attachment_IDs[ $post['post_id'] ] = $File->ID;
+						$files[ $File->ID ] = $File;
+
+						if( $import_img )
+						{	// Collect file name in array to link with post below:
+							$file_name = basename( $file_source_path );
+							if( isset( $all_wp_attachments[ $file_name ] ) )
+							{	// Don't use this file if more than one use same name, e.g. from different folders:
+								$all_wp_attachments[ $file_name ] = false;
+							}
+							else
+							{	// This is a first detected file with current name:
+								$all_wp_attachments[ $file_name ] = $File->ID;
+							}
+						}
+
+						$attachments_count++;
+						// Break here because such post can contains only one file:
+						break;
+					}
+
+					$attch_imported_files[] = $attch_file_name;
+				}
+			}
+
+			echo '</p>';
+			$attachments_count++;
+		}
+
+		echo sprintf( T_('%d records'), $attachments_count ).'<br />';
 
 		echo T_('Importing the posts... ');
 		evo_flush();
 
+		$posts_count = 0;
 		foreach( $xml_data['posts'] as $post )
 		{
+			if( $post['post_type'] == 'revision' )
+			{	// Ignore post with type "revision":
+				echo '<p class="text-warning">'.sprintf( T_('Ignore post "%s" because of post type is %s'),
+						'#'.$post['post_id'].' - '.$post['post_title'],
+						'<code>'.$post['post_type'].'</code>' )
+					.'</p>';
+				continue;
+			}
+			elseif( $post['post_type'] == 'attachment' )
+			{	// Skip attachment post because it shoul be imported above:
+				continue;
+			}
+			elseif( $post['post_type'] == 'page' && ! isset( $categories['standalone-pages'] ) )
+			{	// Try to create special category "Standalone Pages" for pages only it doesn't exist:
+				$page_Chapter = new Chapter( NULL, $wp_blog_ID );
+				$page_Chapter->set( 'name', T_('Standalone Pages') );
+				$page_Chapter->set( 'urlname', 'standalone-pages' );
+				$page_Chapter->dbinsert();
+				$categories['standalone-pages'] = $page_Chapter->ID;
+				// Add new created chapter to cache to avoid error when this cache loaded all elements before:
+				$ChapterCache = & get_ChapterCache();
+				$ChapterCache->add( $page_Chapter );
+			}
+
+			echo '<p>'.sprintf( T_('Importing post: %s'), '#'.$post['post_id'].' - "'.$post['post_title'].'"' );
+
 			$author_ID = isset( $authors[ (string) $post['post_author'] ] ) ? $authors[ (string) $post['post_author'] ] : 1;
 			$last_edit_user_ID = isset( $authors[ (string) $post['post_lastedit_user'] ] ) ? $authors[ (string) $post['post_lastedit_user'] ] : $author_ID;
 
@@ -616,13 +787,19 @@ function wpxml_import()
 							break;
 
 						case 'post_tag':
-							if( isset( $tags[ (string) $term['slug'] ] ) )
+							if( isset( $tags[ (string) $term['name'] ] ) )
 							{ // Set tag
-								$post_tags[] = $term['slug'];
+								$post_tags[] = $term['name'];
 							}
 							break;
 					}
 				}
+			}
+
+			if( $post['post_type'] == 'page' )
+			{	// Set static category "Standalone Pages" for pages because they have no categories in wordpress DB:
+				$post_main_cat_ID = $categories['standalone-pages'];
+				$post_extra_cat_IDs[] = $categories['standalone-pages'];
 			}
 
 			// Set post type ID
@@ -631,13 +808,14 @@ function wpxml_import()
 			// Get regional IDs by their names
 			$item_regions = wp_get_regional_data( $post['post_country'], $post['post_region'], $post['post_subregion'], $post['post_city'] );
 
+			$post_content = $post['post_content'];
+
 			$Item = new Item();
 			$Item->set( 'main_cat_ID', $post_main_cat_ID );
 			$Item->set( 'creator_user_ID', $author_ID );
 			$Item->set( 'lastedit_user_ID', $last_edit_user_ID );
 			$Item->set( 'title', $post['post_title'] );
-			$Item->set( 'content', $post['post_content'] );
-			$Item->set( 'excerpt', $post['post_excerpt'] );
+			$Item->set( 'content', $post_content );
 			$Item->set( 'datestart', $post['post_date'] );
 			$Item->set( 'datecreated', !empty( $post['post_datecreated'] ) ? $post['post_datecreated'] : $post['post_date'] );
 			$Item->set( 'datemodified', !empty( $post['post_datemodified'] ) ? $post['post_datemodified'] : $post['post_date'] );
@@ -647,10 +825,17 @@ function wpxml_import()
 			// If 'comment_status' has the unappropriate value set it to 'open'
 			$Item->set( 'comment_status', ( in_array( $post['comment_status'], array( 'open', 'closed', 'disabled' ) ) ? $post['comment_status'] : 'open' ) );
 			$Item->set( 'ityp_ID', $post_type_ID );
-			if( empty( $post['post_excerpt'] ) && !empty( $post['post_content'] ) )
-			{	// Generate excerpt
-				$Item->set( 'excerpt', excerpt( $post['post_content'] ) );
-				$Item->set( 'excerpt_autogenerated', '1' );
+			if( empty( $post['post_excerpt'] ) )
+			{	// If excerpt is not provided:
+				if( ! empty( $post_content ) )
+				{	// Generate excerpt from content:
+					$Item->set_param( 'excerpt', 'string', excerpt( $post_content ), true );
+					$Item->set( 'excerpt_autogenerated', 1 );
+				}
+			}
+			else
+			{	// Set excerpt from given value:
+				$Item->set_param( 'excerpt', 'string', $post['post_excerpt'], true );
 			}
 			$Item->set( 'extra_cat_IDs', $post_extra_cat_IDs );
 			$Item->set( 'dateset', $post['post_date_mode'] == 'set' ? 1 : 0 );
@@ -692,36 +877,113 @@ function wpxml_import()
 			$Item->dbinsert();
 			$posts[ $post['post_id'] ] = $Item->ID;
 
+			$LinkOwner = new LinkItem( $Item );
+			$updated_post_content = $post_content;
+			$link_order = 1;
+
 			if( ! empty( $files ) && ! empty( $post['links'] ) )
-			{ // Link the files to the Item if it has them
+			{	// Link the files to the Item if it has them:
 				foreach( $post['links'] as $link )
 				{
+					$file_is_linked = false;
 					if( isset( $files[ $link['link_file_ID'] ] ) )
-					{ // Link a file to Item
+					{	// Link a File to Item:
 						$File = $files[ $link['link_file_ID'] ];
-						$LinkOwner = new LinkItem( $Item );
-						$File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] );
+						if( $File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] ) )
+						{	// If file has been linked to the post
+							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							$file_is_linked = true;
+							// Update link order to the latest for two other ways([caption] and <img />) below:
+							$link_order = $link['link_order'];
+						}
+					}
+					if( ! $file_is_linked )
+					{	// If file could not be linked to the post:
+						echo '<p class="text-warning">'.sprintf( T_('Link %s could not be attached to this post because file %s is not found.'), '#'.$link['link_ID'], '#'.$link['link_file_ID'] ).'</p>';
 					}
 				}
+			}
+
+			// Try to extract files from content tag [caption ...]:
+			if( preg_match_all( '#\[caption[^\]]+id="attachment_(\d+)"[^\]]+\].+?\[/caption\]#i', $updated_post_content, $caption_matches ) )
+			{	// If [caption ...] tag is detected
+				foreach( $caption_matches[1] as $caption_post_ID )
+				{
+					$file_is_linked = false;
+					if( isset( $attachment_IDs[ $caption_post_ID ] ) && isset( $files[ $attachment_IDs[ $caption_post_ID ] ] ) )
+					{
+						$File = $files[ $attachment_IDs[ $caption_post_ID ] ];
+						if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
+						{	// If file has been linked to the post
+							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							// Replace this caption tag from content with b2evolution format:
+							$updated_post_content = preg_replace( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
+							$file_is_linked = true;
+							$link_order++;
+						}
+					}
+					if( ! $file_is_linked )
+					{	// If file could not be linked to the post:
+						echo '<p class="text-warning">'.sprintf( T_('Caption file %s could not be attached to this post because it is not found in the source attachments folder.'), '#'.$caption_post_ID ).'</p>';
+					}
+				}
+			}
+
+			// Try to extract files from html tag <img />:
+			if( $import_img && count( $all_wp_attachments ) )
+			{	// Only if it is requested and at least one attachment has been detected above:
+				if( preg_match_all( '#<img[^>]+src="([^"]+)"[^>]+>#i', $updated_post_content, $img_matches ) )
+				{	// If <img /> tag is detected
+					foreach( $img_matches[1] as $img_url )
+					{
+						$file_is_linked = false;
+						$img_file_name = basename( $img_url );
+						if( isset( $all_wp_attachments[ $img_file_name ], $files[ $all_wp_attachments[ $img_file_name ] ] ) )
+						{
+							$File = $files[ $all_wp_attachments[ $img_file_name ] ];
+							if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
+							{	// If file has been linked to the post
+								echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+								// Replace this img tag from content with b2evolution format:
+								$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
+								$file_is_linked = true;
+								$link_order++;
+							}
+						}
+						if( ! $file_is_linked )
+						{	// If file could not be linked to the post:
+							echo '<p class="text-warning">'.sprintf( T_('File of image url %s could not be attached to this post because it is not found in the source attachments folder.'), '<code>'.$img_url.'</code>' ).'</p>';
+						}
+					}
+				}
+			}
+
+			if( $updated_post_content != $post_content )
+			{	// Update new content:
+				$Item->set( 'content', $updated_post_content );
+				$Item->dbupdate();
 			}
 
 			if( !empty( $post['comments'] ) )
 			{ // Set comments
 				$comments[ $Item->ID ] = $post['comments'];
 			}
+
+			echo '</p>';
+			$posts_count++;
 		}
 
 		foreach( $xml_data['posts'] as $post )
 		{	// Set post parents
-			if( !empty( $post['post_parent'] ) && isset( $posts[ (string) $post['post_parent'] ] ) )
+			if( !empty( $post['post_parent'] ) && isset( $posts[ (string) $post['post_parent'] ], $posts[ (string) $post['post_id'] ] ) )
 			{
-				mysqli_query($DB->dbhandle, 'UPDATE '.$tableprefix.'items__item
+				$DB->query( 'UPDATE '.$tableprefix.'items__item
 						  SET post_parent_ID = '.$DB->quote( $posts[ (string) $post['post_parent'] ] ).'
 						WHERE post_ID = '.$DB->quote( $posts[ (string) $post['post_id'] ] ) );
 			}
 		}
 
-		echo sprintf( T_('%d records'), count( $xml_data['posts'] ) ).'<br />';
+		echo sprintf( T_('%d records'), $posts_count ).'<br />';
 	}
 
 
@@ -812,7 +1074,12 @@ function wpxml_import()
 		echo sprintf( T_('%d records'), $comments_count ).'<br />';
 	}
 
-	echo '<p>'.T_('Import complete.').'</p>';
+	if( ! empty( $ZIP_folder_path ) && file_exists( $ZIP_folder_path ) )
+	{	// This folder was created only to extract files from ZIP package, Remove it now:
+		rmdir_r( $ZIP_folder_path );
+	}
+
+	echo '<br /><p class="text-success">'.T_('Import complete.').'</p>';
 
 	$DB->commit();
 }
@@ -840,7 +1107,11 @@ function wpxml_parser( $file )
 	$terms = array();
 	$files = array();
 
-	$xml = simplexml_load_file( $file );
+	// Register filter to avoid wrong chars in XML content:
+	stream_filter_register( 'xmlutf8', 'ValidUTF8XMLFilter' );
+
+	// Load XML content from file with xmlutf8 filter:
+	$xml = simplexml_load_file( 'php://filter/read=xmlutf8/resource='.$file );
 
 	// Get WXR version
 	$wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' );
@@ -1136,45 +1407,59 @@ function wpxml_parser( $file )
  */
 function wpxml_check_xml_file( $file, $halt = false )
 {
+	// Enable XML error handling:
 	$internal_errors = libxml_use_internal_errors( true );
-	$xml = simplexml_load_file( $file );
-	if( !$xml )
-	{ // halt/display if loading produces an error
+
+	// Clear error of previous XML file (e.g. when ZIP archive has several XML files):
+	libxml_clear_errors();
+
+	// Register filter to avoid wrong chars in XML content:
+	stream_filter_register( 'xmlutf8', 'ValidUTF8XMLFilter' );
+
+	// Load XML content from file with xmlutf8 filter:
+	$xml = simplexml_load_file( 'php://filter/read=xmlutf8/resource='.$file );
+
+	if( ! $xml )
+	{	// Halt/Display if loading produces an error:
+		$errors = array();
 		if( $halt )
-		{
-			debug_die( 'There was an error when reading this WXR file.' );
+		{	// Halt on error:
+			foreach( libxml_get_errors() as $error )
+			{
+				$errors[] = 'Line '.$error->line.' - "'.format_to_output( $error->message, 'htmlspecialchars' ).'"';
+			}
+			debug_die( 'There was an error when reading XML file "'.$file.'".'
+				.' Error: '.implode( ', ', $errors ) );
 		}
 		else
-		{
-			echo '<p style="color:red">'.T_('There was an error when reading this WXR file.').'</p>';
+		{	// Display error:
+			foreach( libxml_get_errors() as $error )
+			{
+				$errors[] = sprintf( T_('Line %s'), '<code>'.$error->line.'</code>' ).' - '.'"'.format_to_output( $error->message, 'htmlspecialchars' ).'"';
+			}
+			echo '<p class="text-danger">'.sprintf( T_('There was an error when reading XML file %s.'), '<code>'.$file.'</code>' ).'<br />'
+				.sprintf( T_('Error: %s'), implode( ',<br />', $errors ) ).'</p>';
 			return false;
 		}
 	}
 
-	$wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' );
-	if( !$wxr_version )
+	// Check WXR version for correct format:
+	$r = false;
+	if( $wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' ) )
 	{
-		if( $halt )
-		{
-			debug_die( 'This does not appear to be a WXR file, missing/invalid WXR version number.' );
-		}
-		else
-		{
-			echo '<p style="color:red">'.T_('This does not appear to be a WXR file, missing/invalid WXR version number.').'</p>';
-			return false;
-		}
+		$wxr_version = (string) trim( $wxr_version[0] );
+		$r = preg_match( '/^\d+\.\d+$/', $wxr_version );
 	}
 
-	$wxr_version = (string) trim( $wxr_version[0] );
-	if( !preg_match( '/^\d+\.\d+$/', $wxr_version ) )
-	{ // confirm that we are dealing with the correct file format
+	if( ! $r )
+	{	// If file format is wrong:
 		if( $halt )
-		{
-			debug_die( 'This does not appear to be a WXR file, missing/invalid WXR version number.' );
+		{	// Halt on error:
+			debug_die( 'This does not appear to be a XML file, missing/invalid WXR version number.' );
 		}
 		else
-		{
-			echo '<p style="color:red">'.T_('This does not appear to be a WXR file, missing/invalid WXR version number.').'</p>';
+		{	// Display error:
+			echo '<p class="text-danger">'.T_('This does not appear to be a XML file, missing/invalid WXR version number.').'</p>';
 			return false;
 		}
 	}
@@ -1313,31 +1598,41 @@ function wpxml_get_import_files()
 		$file_paths = array();
 		$file_type = '';
 		if( is_array( $file ) )
-		{ // It is a folder, Find xml file inside
+		{	// It is a folder, Find xml files inside:
 			foreach( $file as $key => $sub_file )
 			{
-				if( $key == 'b2evolution_export_files' && is_array( $sub_file ) )
-				{ // Probably it is folder with the attached files
-					$file_type = T_('Complete export (text+attachments)');
-				}
-				elseif( is_string( $sub_file ) && preg_match( '/\.(xml|txt)$/i', $sub_file ) )
-				{ // Probably it is a file with import data
+				if( is_string( $sub_file ) && preg_match( '/\.(xml|txt)$/i', $sub_file ) )
+				{
 					$file_paths[] = $sub_file;
 				}
 			}
 		}
 		elseif( is_string( $file ) )
-		{ // File in the root, Single XML file
+		{	// File in the root:
 			$file_paths[] = $file;
 		}
 
 		foreach( $file_paths as $file_path )
 		{
 			if( ! empty( $file_path ) && preg_match( '/\.(xml|txt|zip)$/i', $file_path, $file_matches ) )
-			{ // This file can be a file with import data
+			{	// This file can be a file with import data
 				if( empty( $file_type ) )
-				{ // Set type from file extension
-					$file_type = $file_matches[1] == 'zip' ? T_('Compressed Archive') : T_('Basic export (text only)');
+				{	// Set type from file extension
+					if( $file_matches[1] == 'zip' )
+					{
+						$file_type = T_('Compressed Archive');
+					}
+					else
+					{
+						if( $file_attachments_folder = wpxml_get_attachments_folder( $file_path ) )
+						{	// Probably it is a file with attachments folder:
+							$file_type = sprintf( T_('Complete export (attachments folder: %s)'), '<code>'.basename( $file_attachments_folder ).'</code>' );
+						}
+						else
+						{	// Single XML file without attachments folder:
+							$file_type = T_('Basic export (no attachments folder found)');
+						}
+					}
 				}
 				$import_files[] = array(
 						'path' => $file_path,
@@ -1376,6 +1671,167 @@ function wpxml_convert_value( $value )
 	}
 
 	return $value;
+}
+
+
+/**
+ * Create object File from source path
+ *
+ * @param string Source file path
+ * @param array Params
+ * @return object|boolean File or FALSE
+ */
+function & wpxml_create_File( $file_source_path, $params )
+{
+	$params = array_merge( array(
+			'file_root_type' => 'collection',
+			'file_root_ID'   => '',
+			'file_path'      => '',
+			'file_title'     => '',
+			'file_alt'       => '',
+			'file_desc'      => '',
+		), $params );
+
+	// Set false to return failed result by reference
+	$File = false;
+
+	if( ! file_exists( $file_source_path ) )
+	{	// File doesn't exist
+		echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</p>';
+		// Skip it:
+		return $File;
+	}
+
+	// Get FileRoot by type and ID
+	$FileRootCache = & get_FileRootCache();
+	$FileRoot = & $FileRootCache->get_by_type_and_ID( $params['file_root_type'], $params['file_root_ID'] );
+
+	// Get file name with a fixed name if file with such name already exists in the destination path:
+	$dest_file = basename( $params['file_path'] );
+	$dest_folder = dirname( $params['file_path'] );
+	if( $dest_folder == '.' )
+	{
+		$dest_folder = '/';
+	}
+	list( $File, $old_file_thumb ) = check_file_exists( $FileRoot, $dest_folder, $dest_file );
+
+	if( ! $File || ! copy_r( $file_source_path, $File->get_full_path() ) )
+	{	// No permission to copy to the destination folder
+		if( is_dir( $file_source_path ) )
+		{	// Folder
+			echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
+		}
+		else
+		{	// File
+			echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
+		}
+		// Skip it:
+		return $File;
+	}
+
+	// Set additional params for new creating File object:
+	$File->set( 'title', $params['file_title'] );
+	$File->set( 'alt', $params['file_alt'] );
+	$File->set( 'desc', $params['file_desc'] );
+	$File->dbsave();
+
+	echo '<p class="text-success">'.sprintf( T_('File %s has been imported to %s successfully.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+
+	evo_flush();
+
+	return $File;
+}
+
+
+/**
+ * Find attachments folder path for given XML file path
+ *
+ * @param string File path
+ * @param boolean TRUE to use first found folder if no reserved folders not found before
+ * @return string Folder path
+ */
+function wpxml_get_attachments_folder( $file_path, $first_folder = false )
+{
+	$file_name = basename( $file_path );
+	$file_folder_path = dirname( $file_path ).'/';
+	$folder_full_name = preg_replace( '#\.[^\.]+$#', '', $file_name );
+	$folder_part_name = preg_replace( '#_[^_]+$#', '', $folder_full_name );
+
+	// Find and get first existing folder with attachments:
+	if( is_dir( $file_folder_path.$folder_full_name ) )
+	{	// 1st priority folder:
+		return $file_folder_path.$folder_full_name.'/';
+	}
+	if( is_dir( $file_folder_path.$folder_part_name.'_files' ) )
+	{	// 2nd priority folder:
+		return $file_folder_path.$folder_part_name.'_files/';
+	}
+	if( is_dir( $file_folder_path.$folder_part_name.'_attachments' ) )
+	{	// 3rd priority folder:
+		return $file_folder_path.$folder_part_name.'_attachments/';
+	}
+	if( is_dir( $file_folder_path.'b2evolution_export_files' ) )
+	{	// 4th priority folder:
+		return $file_folder_path.'b2evolution_export_files/';
+	}
+	if( is_dir( $file_folder_path.'export_files' ) )
+	{	// 5th priority folder:
+		return $file_folder_path.'export_files/';
+	}
+	if( is_dir( $file_folder_path.'import_files' ) )
+	{	// 6th priority folder:
+		return $file_folder_path.'import_files/';
+	}
+	if( is_dir( $file_folder_path.'files' ) )
+	{	// 7th priority folder:
+		return $file_folder_path.'files/';
+	}
+	if( is_dir( $file_folder_path.'attachments' ) )
+	{	// 8th priority folder:
+		return $file_folder_path.'attachments/';
+	}
+
+	if( $first_folder )
+	{	// Try to use first found folder:
+		$files = scandir( $file_folder_path );
+		foreach( $files as $file )
+		{
+			if( $file == '.' || $file == '..' )
+			{	// Skip reserved dir names of the current path:
+				continue;
+			}
+			if( is_dir( $file_folder_path.$file ) )
+			{	// 9th priority folder:
+				return $file_folder_path.$file.'/';
+			}
+		}
+	}
+
+	// File has no attachments folder
+	return false;
+}
+
+
+/**
+ * This class is used to avoid wrong chars in XML files on import
+ *
+ * @see wpxml_parser()
+ * @see wpxml_check_xml_file()
+ */
+class ValidUTF8XMLFilter extends php_user_filter
+{
+	protected static $pattern = '/[^\x{0009}\x{000a}\x{000d}\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}]+/u';
+
+	function filter( $in, $out, & $consumed, $closing )
+	{
+		while( $bucket = stream_bucket_make_writeable( $in ) )
+		{
+			$bucket->data = preg_replace( self::$pattern, '', $bucket->data );
+			$consumed += $bucket->datalen;
+			stream_bucket_append( $out, $bucket );
+		}
+		return PSFS_PASS_ON;
+	}
 }
 
 ?>

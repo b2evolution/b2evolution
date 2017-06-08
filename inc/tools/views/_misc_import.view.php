@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $block_item_Widget = new Widget( 'block_item' );
 
 // fp> TODO: pluginize MT! :P
-$block_item_Widget->title = T_('Movable Type Import');
+$block_item_Widget->title = T_('Movable Type Import').get_manual_link( 'import-tab' );
 $block_item_Widget->disp_template_replaced( 'block_start' );
 ?>
 	<ol>
@@ -39,7 +39,7 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 
 $block_item_Widget->title = T_('phpBB Import');
 $block_item_Widget->disp_template_replaced( 'block_start' );
-printf( '<p>'.T_('You can import contents from your phpBB 2.x database into your b2evolution database by using <a %s>phpBB Importer</a>.').'</p>', ' href="?ctrl=phpbbimport"' );
+printf( '<p>'.T_('You can import contents from your phpBB 2.x or 3.x database into your b2evolution database by using <a %s>phpBB Importer</a> or <a %s>phpBB 3 Importer</a> .').'</p>', ' href="?ctrl=phpbbimport"', ' href="?ctrl=phpbbimport&ver=3"' );
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 ?>

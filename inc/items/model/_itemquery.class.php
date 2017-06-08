@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -35,14 +35,17 @@ class ItemQuery extends SQL
 	var $assignees_login;
 	var $statuses;
 	var $types;
+	var $itemtype_usage;
 	var $dstart;
 	var $dstop;
 	var $timestamp_min;
 	var $timestamp_max;
 	var $keywords;
+	var $keyword_scope;
 	var $phrase;
 	var $exact;
 	var $featured;
+	var $flagged;
 
 
 	/**
@@ -52,7 +55,7 @@ class ItemQuery extends SQL
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function ItemQuery( $dbtablename, $dbprefix = '', $dbIDname )
+	function __construct( $dbtablename, $dbprefix = '', $dbIDname )
 	{
 		$this->dbtablename = $dbtablename;
 		$this->dbprefix = $dbprefix;
@@ -208,9 +211,9 @@ class ItemQuery extends SQL
 	/**
 	 * Restrict to specific collection/chapters (blog/categories)
 	 *
-	 * @param Blog
-	 * @param array
-	 * @param string
+	 * @param object Blog
+	 * @param array Categories IDs
+	 * @param string Use '-' to exclude the categories
 	 * @param string 'wide' to search in extra cats too
 	 *               'main' for main cat only
 	 *               'extra' for extra cats only
@@ -225,15 +228,21 @@ class ItemQuery extends SQL
 		$this->cat_modifier = $cat_modifier;
 
 		if( ! empty( $cat_array ) && ( $cat_focus == 'wide' || $cat_focus == 'extra' ) )
-		{
+		{	// Select extra categories if we want filter by several categories:
 			$sql_join_categories = ( $cat_focus == 'extra' ) ? ' AND post_main_cat_ID != cat_ID' : '';
-			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
-												INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
+			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
+			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
 			// fp> we try to restrict as close as possible to the posts but I don't know if it matters
 			$cat_ID_field = 'postcat_cat_ID';
 		}
+		elseif( get_allow_cross_posting() >= 1 )
+		{	// Select extra categories if cross posting is enabled:
+			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
+			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+			$cat_ID_field = 'postcat_cat_ID';
+		}
 		else
-		{
+		{	// Select only main categories:
 			$this->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$cat_ID_field = 'post_main_cat_ID';
 		}
@@ -300,7 +309,7 @@ class ItemQuery extends SQL
 		{ // Blog IDs are not defined, Use them depending on current collection setting
 			// NOTE! collection can be 0, for example, on disp=usercomments|useritems where we display data from all collections
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $this->blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $this->blog );
 			$aggregate_coll_IDs = $Blog->get_setting( 'aggregate_coll_IDs' );
 		}
 
@@ -314,18 +323,32 @@ class ItemQuery extends SQL
 		// Check status permission for multiple blogs
 		if( $aggregate_coll_IDs == '*' )
 		{ // Get the status restrictions for all blogs
-			global $DB;
-			$blog_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs ORDER BY blog_ID' );
+			// Load all collections in single query, because otherwise we may have too many queries (1 query for each collection) later:
+			// fp> TODO: PERF: we probably want to remove this later when we restrict the use of '*'
+			$BlogCache = & get_BlogCache();
+			$BlogCache->load_all();
+			$blog_IDs = $BlogCache->get_ID_array();
 		}
 		else
 		{ // Get the status restrictions for several blogs
 			$blog_IDs = explode( ',', $aggregate_coll_IDs );
 		}
 
-		$status_restrictions = array();
+		$status_coll_clauses = array();
 		foreach( $blog_IDs as $blog_ID )
-		{ // Check status permission for each blog separately
-			$status_restrictions[] = 'cat_blog_ID='.$blog_ID.' AND '.statuses_where_clause( $show_statuses, $this->dbprefix, $blog_ID, 'blog_post!', true, $this->author );
+		{	// Check status permission for each blog separately:
+			$statuses_where_clause = statuses_where_clause( $show_statuses, $this->dbprefix, $blog_ID, 'blog_post!', true, $this->author );
+			if( ! isset( $status_coll_clauses[ $statuses_where_clause ] ) )
+			{	// Initialize array item for each different status condition:
+				$status_coll_clauses[ $statuses_where_clause ] = array();
+			}
+			// Group collections by same status condition:
+			$status_coll_clauses[ $statuses_where_clause ][] = $blog_ID;
+		}
+		$status_restrictions = array();
+		foreach( $status_coll_clauses as $status_coll_clause => $status_coll_IDs )
+		{	// Initialize status permission restriction for each grouped condition that is formed above:
+			$status_restrictions[] = 'cat_blog_ID IN ( '.implode( ',', $status_coll_IDs ).' ) AND '.$status_coll_clause;
 		}
 
 		$this->WHERE_and( '( '.implode( ' ) OR ( ', $status_restrictions ).' )' );
@@ -375,7 +398,7 @@ class ItemQuery extends SQL
 		$tags = explode( ',', $tags );
 
 		$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID
-											INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
+								INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
 	}
 
 
@@ -599,6 +622,43 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restrict to specific post types usage
+	 *
+	 * @param string List of types usage to restrict to (must have been previously validated):
+	 *               Allowed values: post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
+	 */
+	function where_itemtype_usage( $itemtype_usage )
+	{
+		global $DB;
+
+		$this->itemtype_usage = $itemtype_usage;
+
+		if( empty( $itemtype_usage ) )
+		{
+			return;
+		}
+
+		$this->FROM_add( 'LEFT JOIN T_items__type ON ityp_ID = '.$this->dbprefix.'ityp_ID' );
+
+		if( $itemtype_usage == '-' )
+		{	// List is ONLY a MINUS sign (we want only those not assigned)
+			$this->WHERE_and( $this->dbprefix.'ityp_ID IS NULL' );
+		}
+		elseif( substr( $itemtype_usage, 0, 1 ) == '-' )
+		{	// List starts with MINUS sign:
+			$itemtype_usage = explode( ',', substr( $itemtype_usage, 1 ) );
+			$this->WHERE_and( '( '.$this->dbprefix.'ityp_ID IS NULL
+			                  OR ityp_usage NOT IN ( '.$DB->quote( $itemtype_usage ).' ) )' );
+		}
+		else
+		{
+			$itemtype_usage = explode( ',', $itemtype_usage );
+			$this->WHERE_and( 'ityp_usage IN ( '.$DB->quote( $itemtype_usage ).' )' );
+		}
+	}
+
+
+	/**
 	 * Restricts the datestart param to a specific date range.
 	 *
 	 * Start date gets restricted to minutes only (to make the query more
@@ -789,62 +849,154 @@ class ItemQuery extends SQL
 	 * Restrict with keywords
 	 *
 	 * @param string Keyword search string
-	 * @param mixed Search for entire phrase or for individual words
-	 * @param mixed Require exact match of title or contents
+	 * @param string Search for entire phrase or for individual words: 'OR', 'AND', 'sentence'(or '1')
+	 * @param string Require exact match of title or contents — does NOT apply to tags which are always an EXACT match
+	 * @param string Scope of keyword search string: 'title', 'content', 'tags', 'excerpt', 'titletag', 'metadesc', 'metakeywords'
 	 */
-	function where_keywords( $keywords, $phrase, $exact )
+	function where_keywords( $keywords, $phrase, $exact, $keyword_scope = 'title,content' )
 	{
 		global $DB;
 
-		$this->keywords = $keywords;
+		$this->keywords = utf8_trim( $keywords );
+		$this->keyword_scope = $keyword_scope;
 		$this->phrase = $phrase;
 		$this->exact = $exact;
 
-		if( empty($keywords) )
-		{
+		if( empty( $keywords ) )
+		{ // Nothing to search, Exit here:
 			return;
 		}
 
-		$search = '';
+		$search_sql = array();
 
-		if( $exact )
-		{	// We want exact match of title or contents
-			$n = '';
-		}
-		else
-		{ // The words/sentence are/is to be included in in the title or the contents
-			$n = '%';
-		}
-
-		if( ($phrase == '1') or ($phrase == 'sentence') )
-		{ // Sentence search
-			$keywords = $DB->escape(trim($keywords));
-			$search .= '('.$this->dbprefix.'title LIKE \''. $n. $keywords. $n. '\') OR ('.$this->dbprefix.'content LIKE \''. $n. $keywords. $n.'\')';
-		}
-		else
-		{ // Word search
-			if( strtoupper( $phrase ) == 'OR' )
-				$swords = 'OR';
-			else
-				$swords = 'AND';
-
-			// puts spaces instead of commas
-			$keywords = preg_replace('/, +/', ',', $keywords);
-			$keywords = str_replace(',', ' ', $keywords);
-			$keywords = str_replace('"', ' ', $keywords);
-			$keywords = trim($keywords);
-			$keyword_array = preg_split( '/\s+/', $keywords );
-			$join = '';
-			for ( $i = 0; $i < count($keyword_array); $i++)
+		// Determine what fields should be used in search:
+		$search_fields = array();
+		$keyword_scopes = explode( ',', $keyword_scope );
+		foreach( $keyword_scopes as $keyword_scope )
+		{
+			switch( $keyword_scope )
 			{
-				$search .= ' '. $join. ' ( ('.$this->dbprefix.'title LIKE \''. $n. $DB->escape($keyword_array[$i]). $n. '\')
-																OR ('.$this->dbprefix.'content LIKE \''. $n. $DB->escape($keyword_array[$i]). $n.'\') ) ';
-				$join = $swords;
+				case 'title':
+					$search_fields[] = $this->dbprefix.'title';
+					break;
+
+				case 'content':
+					$search_fields[] = $this->dbprefix.'content';
+					break;
+
+				case 'tags':
+					$this->FROM_add( 'LEFT JOIN T_items__itemtag ON post_ID = itag_itm_ID' );
+					$this->FROM_add( 'LEFT JOIN T_items__tag ON itag_tag_ID = tag_ID' );
+					$this->GROUP_BY( 'post_ID' );
+					// Tags are always an EXACT match:
+					$search_sql[] = 'tag_name = '.$DB->quote( $keywords );
+					break;
+
+				case 'excerpt':
+					$search_fields[] = $this->dbprefix.'excerpt';
+					break;
+
+				case 'titletag':
+					$search_fields[] = $this->dbprefix.'titletag';
+					break;
+
+				case 'metadesc':
+					$this->FROM_add( 'LEFT JOIN T_items__item_settings AS is_md ON post_ID = is_md.iset_item_ID AND is_md.iset_name = "metadesc"' );
+					$search_fields[] = 'is_md.iset_value';
+					break;
+
+				case 'metakeywords':
+					$this->FROM_add( 'LEFT JOIN T_items__item_settings AS is_mk ON post_ID = is_mk.iset_item_ID AND is_mk.iset_name = "metakeywords"' );
+					$search_fields[] = 'is_mk.iset_value';
+					break;
+
+				// TODO: add more.
 			}
 		}
 
-		//echo $search;
-		$this->WHERE_and( $search );
+		if( empty( $search_fields ) && empty( $search_sql ) )
+		{	// No correct fields to search, Exit here:
+			return;
+		}
+
+		// Set sql operator depending on parameter:
+		if( in_array( strtolower( $phrase ), array( 'or', '1', 'sentence' ) ) )
+		{
+			$operator_sql = 'OR';
+		}
+		else
+		{
+			$operator_sql =  'AND';
+		}
+
+		if( ! empty( $search_fields ) )
+		{	// Do search if at least one field is requested:
+
+			if( $exact )
+			{	// We want exact match of each search field:
+				$mask = '';
+			}
+			else
+			{	// The words/sentence are/is to be included in the each search field:
+				$mask = '%';
+			}
+
+			if( $phrase == '1' || $phrase == 'sentence' )
+			{	// Sentence search:
+				foreach( $search_fields as $search_field )
+				{
+					$search_sql[] = $search_field.' LIKE '.$DB->quote( $mask.$keywords.$mask );
+				}
+			}
+			else
+			{	// Word search:
+
+				// Put spaces instead of commas:
+				$keywords = preg_replace( '/, +/', ',', $keywords );
+				$keywords = utf8_trim( str_replace( array( ',', '"' ), ' ', $keywords ) );
+
+				// Split by each word:
+				$keywords = preg_split( '/\s+/', $keywords );
+
+				foreach( $keywords as $keyword )
+				{
+					$search_field_sql = array();
+					foreach( $search_fields as $search_field )
+					{
+						$search_field_sql[] = $search_field.' LIKE '.$DB->quote( $mask.$keyword.$mask );
+					}
+					$search_sql[] = '( '.implode( ' OR ', $search_field_sql ).' )';
+				}
+			}
+		}
+
+		// Concat the searches:
+		$search_sql = '( '.implode( ' '.$operator_sql.' ', $search_sql ).' )';
+
+		$this->WHERE_and( $search_sql );
+	}
+
+
+	/**
+	 * Restrict to the flagged items
+	 *
+	 * @param boolean TRUE - Restrict to flagged items, FALSE - Don't restrict/Get all items
+	 */
+	function where_flagged( $flagged = false )
+	{
+		global $current_User;
+
+		$this->flagged = $flagged;
+
+		if( ! $this->flagged )
+		{	// Don't restrict if it is not requested or if user is not logged in:
+			return;
+		}
+
+		// Get items which are flagged by current user:
+		$this->FROM_add( 'INNER JOIN T_items__user_data ON '.$this->dbIDname.' = itud_item_ID
+			AND itud_flagged_item = 1
+			AND itud_user_ID = '.( is_logged_in() ? $current_User->ID : '-1' ) );
 	}
 
 

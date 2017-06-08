@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -161,7 +161,7 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 locale_activate( $default_locale );
 
 // Set encoding for MySQL connection:
-$DB->set_connection_charset( $current_charset );
+$DB->connection_charset = $current_charset;
 
 
 /**

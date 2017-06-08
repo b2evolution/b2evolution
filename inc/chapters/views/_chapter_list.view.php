@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -17,11 +17,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 global $Settings;
 
-global $GenericCategoryCache;
+global $ChapterCache;
 
 global $line_class;
 
@@ -43,14 +43,14 @@ $line_class = 'odd';
 /**
  * Generate category line when it has children
  *
- * @param Chapter generic category we want to display
- * @param int level of the category in the recursive tree
+ * @param object Chapter we want to display
+ * @param integer Level of the category in the recursive tree
  * @return string HTML
  */
 function cat_line( $Chapter, $level )
 {
 	global $line_class, $permission_to_edit, $current_User, $Settings;
-	global $GenericCategoryCache, $current_default_cat_ID;
+	global $ChapterCache, $current_default_cat_ID;
 	global $number_of_posts_in_cat;
 
 	global $Session;
@@ -80,6 +80,9 @@ function cat_line( $Chapter, $level )
 	}
 	$r .= '<td class="center">'.$makedef_icon.'</td>';
 
+	// Image:
+	$r .= '<td>'.$Chapter->get_image_tag().'</td>';
+
 	// Name
 	if( $permission_to_edit )
 	{	// We have permission permission to edit:
@@ -102,7 +105,7 @@ function cat_line( $Chapter, $level )
 	// Order
 	if( $Chapter->get_parent_subcat_ordering() == 'manual' )
 	{ // Manual ordering
-		$r .= '<td class="center cat_order_edit" rel="'.$Chapter->ID.'">'
+		$r .= '<td class="center jeditable_cell cat_order_edit" rel="'.$Chapter->ID.'">'
 						.'<a href="#">'.( $Chapter->get( 'order' ) === NULL ? '-' : $Chapter->dget( 'order' ) ).'</a>'
 					.'</td>';
 	}
@@ -166,8 +169,8 @@ function cat_line( $Chapter, $level )
 		{ // If moving cats between blogs is allowed:
 			$r .= action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=move' ), T_('Move') );
 		}
-		$r .= action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
-					.action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete&amp;'.url_crumb('element') ) );
+		$r .= action_icon( T_('New').'...', 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
+					.action_icon( T_('Delete').'...', 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete&amp;'.url_crumb('element') ) );
 	}
 	$r .= '</td>';
 	$r .=	'</tr>';
@@ -179,8 +182,8 @@ function cat_line( $Chapter, $level )
 /**
  * Generate category line when it has no children
  *
- * @param Chapter generic category we want to display
- * @param int level of the category in the recursive tree
+ * @param object Chapter generic category we want to display
+ * @param integer Level of the category in the recursive tree
  * @return string HTML
  */
 function cat_no_children( $Chapter, $level )
@@ -225,14 +228,18 @@ $Table = new Table();
 
 $Table->title = sprintf( T_('Categories for blog: %s'), $Blog->get_maxlen_name( 50 ).get_manual_link( 'categories-tab' ) );
 
-$Table->global_icon( T_('Refresh'), 'refresh', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
-$Table->global_icon( T_('Create a new category...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('New category').' &raquo;', 3, 4  );
+$Table->global_icon( T_('Refresh'), 'refresh', regenerate_url( 'action,'.$ChapterCache->dbIDname ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
+$Table->global_icon( T_('Create a new category...'), 'new', regenerate_url( 'action,'.$ChapterCache->dbIDname, 'action=new' ), T_('New category').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 $Table->cols[] = array(
 						'th' => T_('ID'),
 					);
 $Table->cols[] = array(
 						'th' => T_('Default'),
+						'th_class' => 'shrinkwrap',
+					);
+$Table->cols[] = array(
+						'th' => T_('Image'),
 						'th_class' => 'shrinkwrap',
 					);
 $Table->cols[] = array(
@@ -297,7 +304,7 @@ $Table->display_list_start();
 
 	$Table->display_body_start();
 
-	echo $GenericCategoryCache->recurse( $callbacks, $subset_ID, NULL, 0, 0, array( 'sorted' => true ) );
+	echo $ChapterCache->recurse( $callbacks, $subset_ID, NULL, 0, 0, array( 'sorted' => true ) );
 
 	$Table->display_body_end();
 
@@ -343,7 +350,7 @@ $Session->delete( 'fadeout_array');
 // Print JS to edit order of the chapters inline
 echo_editable_column_js( array(
 	'column_selector' => '.cat_order_edit',
-	'ajax_url'        => get_secure_htsrv_url().'async.php?action=cat_order_edit&blogid='.$Blog->ID.'&'.url_crumb( 'catorder' ),
+	'ajax_url'        => get_htsrv_url().'async.php?action=cat_order_edit&blogid='.$Blog->ID.'&'.url_crumb( 'catorder' ),
 	'new_field_name'  => 'new_cat_order',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
 	'ID_name'         => 'cat_ID',

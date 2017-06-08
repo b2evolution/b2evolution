@@ -57,7 +57,7 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 	$curr_Chapter = & $ChapterCache->get_by_ID( $cat, false );
 
 	// Go Grab the featured post:
-	$intro_Item = get_featured_Item(); // $intro_Item is used below for comments form
+	$intro_Item = & get_featured_Item(); // $intro_Item is used below for comments form
 
 	if( empty( $intro_Item ) || $intro_Item->get( 'title' ) == '' )
 	{ // Display chapter title only if intro post has no title
@@ -72,7 +72,7 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 			) );
 
 		// Button to create a new page
-		$write_new_intro_url = $Blog->get_write_item_url( $cat, '', '', 1520 );
+		$write_new_intro_url = $Blog->get_write_item_url( $cat, '', '', 'intro-cat' );
 		if( !empty( $write_new_intro_url ) )
 		{ // Display button to write a new intro
 			echo '<a href="'.$write_new_intro_url.'" class="'.button_class( 'text' ).'">'
@@ -88,7 +88,7 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 	if( ! empty( $intro_Item ) )
 	{ // We have a featured/intro post to display:
 		$Item = $intro_Item;
-		echo '<div id="styled_content_block">'; // Beginning of posts display TODO: get rid of this ID, use class .evo_content_block instead
+		echo '<div class="evo_content_block">'; // Beginning of posts display
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 		skin_include( '_item_block.inc.php', array_merge( array(
 				'feature_block'     => true,
@@ -99,6 +99,7 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 				'disp_comment_form' => false,
 				'disp_notification' => false,
 				'item_link_type'    => 'none',
+				'Item'              => $Item,
 			), $Skin->get_template( 'disp_params' ) ) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 		echo '</div>'; // End of posts display
@@ -139,10 +140,10 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 		global $c, $ReqURI;
 		$c = 1; // Display comments
 
-		echo '<div id="styled_content_block">'; // Beginning of posts display TODO: get rid of this ID, use class .evo_content_block instead
+		echo '<div class="evo_content_block">'; // Beginning of posts display
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( array(
-				'before_section_title' => '<h3 class="comments_list_title">',
+				'before_section_title' => '<h3 class="evo_comment__list_title">',
 				'after_section_title'  => '</h3>',
 				'Item'                 => $intro_Item,
 				'form_title_text'      => T_('Comment form'),

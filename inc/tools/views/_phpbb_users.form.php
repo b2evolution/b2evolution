@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -15,18 +15,19 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $flush_action;
+global $dispatcher, $flush_action, $phpbb_tool_title, $phpbb_version;
 
 phpbb_display_steps( 3 );
 
 $Form = new Form();
 
-$Form->begin_form( 'fform', T_('phpBB Importer').' - '.T_('Step 3: Import users') );
+$Form->begin_form( 'fform', $phpbb_tool_title.' - '.T_('Step 3: Import users') );
 evo_flush();
 
 $Form->add_crumb( 'phpbb' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'forums' );
+$Form->hidden( 'ver', get_param( 'ver' ) );
 
 if( $flush_action == 'users' )
 {
@@ -44,6 +45,8 @@ $Form->begin_fieldset( T_('Report of users import') );
 	$Form->info( T_('Count of the imported users'), '<b>'.(int)phpbb_get_var( 'users_count_imported' ).'</b>' );
 
 	$Form->info( T_('Count of the updated users'), '<b>'.(int)phpbb_get_var( 'users_count_updated' ).'</b>' );
+
+	$Form->info( T_('Count of the imported / missing avatars'), intval( phpbb_get_var( 'avatars_count_imported' ) ).' / <b class="red">'.intval( phpbb_get_var( 'avatars_count_missing' ) ).'</b>' );
 
 	$GroupCache = & get_GroupCache();
 
@@ -66,7 +69,7 @@ $Form->begin_fieldset( T_('Report of users import') );
 
 $Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' )/*,
+$Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' )/*,
 											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$dispatcher.'?ctrl=phpbbimport&step=groups\'' )*/ ) );
 
 $Form->end_form();

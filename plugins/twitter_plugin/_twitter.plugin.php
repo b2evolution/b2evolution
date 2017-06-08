@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * @copyright (c)2007 by Lee Turner - {@link http://leeturner.org/}.
  *
  * @package plugins
@@ -47,7 +47,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.9.2';
 	var $author = 'b2evolution Group';
 
 	/*
@@ -143,9 +143,14 @@ class twitter_plugin extends Plugin
 		return $this->send_a_tweet( $content, $params['Item'], $params['xmlrpcresp'] );
 	}
 
+
 	/**
-	 * Allowing the user to specify their twitter account name and password.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function GetDefaultUserSettings( & $params )
@@ -170,6 +175,47 @@ class twitter_plugin extends Plugin
 					'note' => T_('$title$, $excerpt$ and $url$ will be replaced appropriately.'),
 				),
 			);
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlHead( & $params )
+	{
+		global $Collection, $Blog, $Item;
+
+		if( $Blog && $Blog->get_setting( 'tags_twitter_card' ) )
+		{
+			if( $Item )
+			{
+				$Item->get_creator_User();
+			}
+
+			$params = array_merge( array(
+					'blog_ID' => $Blog->ID,
+					'user_ID' => isset( $Item->creator_user_ID ) ? $Item->creator_user_ID : NULL
+				), $params );
+
+			$oauth_info = $this->get_oauth_info( $params );
+
+			if( ! empty( $oauth_info['token'] ) && isset( $oauth_info['contact'] ) )
+			{
+				echo '<meta property="twitter:site" content="@'.$oauth_info['contact'].'" />'."\n";
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 
@@ -214,7 +260,7 @@ class twitter_plugin extends Plugin
 	 */
 	function get_twitter_link( $target_type, $target_id )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		require_once 'twitteroauth/twitteroauth.php';
 
@@ -347,7 +393,7 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // redirect to blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugin_settings&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugins&blog='.$target_id );
 		}
 		else if ($target_type == 'user' )
 		{ // redirect to user advanced preferences form
@@ -405,7 +451,7 @@ class twitter_plugin extends Plugin
 			$this->set_coll_setting( 'twitter_contact', $contact, $target_id );
 			// save Collection settings
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $target_id, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $target_id, false, false );
 			$Blog->dbupdate();
 		}
 		else if( $target_type == 'user' )
@@ -446,10 +492,10 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // Blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugin_settings&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugins&blog='.$target_id );
 
 			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $target_id );
+			$Collection = $Blog = $BlogCache->get_by_ID( $target_id );
 
 			$this->delete_coll_setting( 'twitter_token', $target_id );
 			$this->delete_coll_setting( 'twitter_secret', $target_id );
@@ -515,7 +561,7 @@ class twitter_plugin extends Plugin
 		if( ! empty($blog_ID) )
 		{	// CollSettings
 			$BlogCache = & get_Cache('BlogCache');
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 			if( !empty( $Blog ) )
 			{
 				$r['token'] = $this->get_coll_setting( 'twitter_token', $Blog );

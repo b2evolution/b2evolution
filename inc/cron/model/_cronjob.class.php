@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -40,10 +40,10 @@ class Cronjob extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function Cronjob( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_cron__task', 'ctsk_', 'ctsk_ID', '', '', '', '' );
+		parent::__construct( 'T_cron__task', 'ctsk_', 'ctsk_ID', '', '', '', '' );
 
 		if( $db_row != NULL )
 		{	// Loading an object from DB:
@@ -129,7 +129,7 @@ class Cronjob extends DataObject
 		}
 
 		// start datetime:
-		param_date( 'cjob_date', T_('Please enter a valid date.'), true );
+		param_date( 'cjob_date', sprintf( T_('Please enter a valid date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), true );
 		param_time( 'cjob_time' );
 		$this->set( 'start_datetime', form_date( get_param( 'cjob_date' ), get_param( 'cjob_time' ) ) );
 

@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -33,10 +33,10 @@ class Country extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function Country( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_regional__country', 'ctry_', 'ctry_ID' );
+		parent::__construct( 'T_regional__country', 'ctry_', 'ctry_ID' );
 
 		if( $db_row )
 		{
@@ -87,6 +87,17 @@ class Country extends DataObject
 		param_check_number( 'ctry_curr_ID', T_('Please select a currency') );
 		$this->set_from_Request( 'curr_ID', 'ctry_curr_ID', true );
 
+		if( ! param_errors_detected() )
+		{	// Check country code for duplicating:
+			$existing_ctry_ID = $this->dbexists( 'ctry_code', $this->get( 'code' ) );
+			if( $existing_ctry_ID )
+			{	// We have a duplicate country:
+				param_error( 'ctry_code',
+					sprintf( T_('This country already exists. Do you want to <a %s>edit the existing country</a>?'),
+						'href="?ctrl=countries&amp;action=edit&amp;ctry_ID='.$existing_ctry_ID.'"' ) );
+			}
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -124,17 +135,6 @@ class Country extends DataObject
 	function get_name()
 	{
 		return $this->name;
-	}
-
-
-	/**
-	 * Check existence of specified country code in ctry_code unique field.
-	 *
-	 * @return int ID if country code exists otherwise NULL/false
-	 */
-	function dbexists()
-	{
-		return parent::dbexists('ctry_code', $this->code);
 	}
 }
 

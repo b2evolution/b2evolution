@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -19,11 +19,11 @@ global $user_ID, $viewed_User, $display_params, $user_CommentList;
 $params = array_merge( array(
 		'user_commentlist_title'      => T_('Comments posted by %s'),
 		'user_commentlist_no_results' => T_('User has not posted any comment yet'),
-		'user_commentlist_col_post'   => T_('Comment on:'),
+		'user_commentlist_col_post'   => T_('Comment on').':',
 	), $params );
 
 
-$user_CommentList->title = sprintf( $params['user_commentlist_title'], $viewed_User->get_identity_link( array( 'link_text' => 'name' ) ) );
+$user_CommentList->title = sprintf( $params['user_commentlist_title'], $viewed_User->get_identity_link( array( 'link_text' => 'auto' ) ) );
 $user_CommentList->no_results_text = $params['user_commentlist_no_results'];
 
 // Initialize Results object

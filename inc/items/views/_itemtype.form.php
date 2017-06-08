@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -30,37 +30,27 @@ $Form = new Form( NULL, 'itemtype_checkchanges' );
 if( $edited_Itemtype->ID > 0 )
 {
 	$default_ids = ItemType::get_default_ids();
-	if( ! $edited_Itemtype->is_special() && ! in_array( $edited_Itemtype->ID, $default_ids ) )
-	{ // Allow delete post type only if it is not default of blogs
+	if( ! in_array( $edited_Itemtype->ID, $default_ids ) )
+	{	// Allow delete post type only if it is not default of blogs:
 		$Form->global_icon( T_('Delete this Post Type!'), 'delete', regenerate_url( 'action', 'action=delete&amp;crumb_itemtype='.get_crumb( 'itemtype' ) ) );
 	}
 }
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,ityp_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,ityp_ID' ) );
 
 $Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit post type') : T_('New post type') ) );
 
 $Form->add_crumb( 'itemtype' );
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ityp_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-$Form->begin_fieldset( $creating ?  T_('New Post Type') : T_('Post type').get_manual_link('item-type-form') );
+$Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 
-	if( $creating )
-	{
-		$Form->text_input( 'new_ityp_ID', get_param( 'new_ityp_ID' ), 8, T_('ID'), '', array( 'maxlength'=> 10, 'required'=>true ) );
-	}
-	else
-	{
-		$Form->hidden( 'ityp_ID', $edited_Itemtype->ID );
-	}
+	$Form->hidden( 'ityp_ID', $edited_Itemtype->ID );
 
-	if( $edited_Itemtype->is_special() )
-	{ // Don't edit a name of special post types
-		$Form->info( T_('Name'), $edited_Itemtype->name );
-	}
-	else
-	{ // Display a field to edit a name
-		$Form->text_input( 'ityp_name', $edited_Itemtype->name, 50, T_('Name'), '', array( 'maxlength' => 30, 'required' => true ) );
-	}
+	$ItemTypeCache = & get_ItemTypeCache();
+	$Form->select_input_array( 'ityp_usage', $edited_Itemtype->usage, $ItemTypeCache->get_usage_option_array(), T_('Usage'), '', array( 'required' => true ) );
+
+	// Display a field to edit a name:
+	$Form->text_input( 'ityp_name', $edited_Itemtype->name, 50, T_('Name'), '', array( 'maxlength' => 30, 'required' => true ) );
 
 	$Form->textarea_input( 'ityp_description', $edited_Itemtype->description, 2, T_('Description'), array( 'cols' => 47 ) );
 	$Form->radio( 'ityp_perm_level', $edited_Itemtype->perm_level, array(
@@ -68,49 +58,105 @@ $Form->begin_fieldset( $creating ?  T_('New Post Type') : T_('Post type').get_ma
 			array( 'restricted', T_('Restricted') ),
 			array( 'admin',      T_('Admin') )
 		), T_('Permission level') );
-	$Form->text_input( 'ityp_backoffice_tab', $edited_Itemtype->backoffice_tab, 25, T_('Back-office tab'), T_('Items of this type will be listed in this back-office tab. If empty, items will be found only in the "All" tab.'), array( 'maxlength' => 30 ) );
 	$Form->text_input( 'ityp_template_name', $edited_Itemtype->template_name, 25, T_('Template name'), T_('b2evolution will automatically append .main.php or .disp.php'), array( 'maxlength' => 40 ) );
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Use of Instructions').get_manual_link( 'item-type-instructions' ), array( 'id' => 'itemtype_instructions' ) );
+	$Form->checklist( array(
+		array( 'ityp_front_instruction', 1, T_('In front-office edit screen'),$edited_Itemtype->front_instruction ),
+		array( 'ityp_back_instruction', 1, T_('In back-office edit screen'), $edited_Itemtype->back_instruction )
+	), 'ityp_instruction_enable', T_('Display instructions') );
+	$Form->textarea_input( 'ityp_instruction', $edited_Itemtype->instruction, 5, T_('Instructions'), array( 'cols' => 47 ) );
+$Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Features').get_manual_link('item-type-features'), array( 'id' => 'itemtype_features' ) );
+$options = array(
+		array( 'required', T_('Required') ),
+		array( 'optional', T_('Optional') ),
+		array( 'never', T_('Never') )
+	);
 
-	$options = array(
-			array( 'required', T_('Required') ),
-			array( 'optional', T_('Optional') ),
-			array( 'never', T_('Never') )
-		);
+// Check if current type is intro and set specific params for the fields "ityp_allow_breaks" and "ityp_allow_featured":
+$intro_type_disabled = $edited_Itemtype->is_intro();
+$intro_type_note = $intro_type_disabled ? T_('This feature is not compatible with Intro posts.') : '';
 
+$Form->begin_fieldset( T_('Features').get_manual_link( 'item-type-features' ), array( 'id' => 'itemtype_features' ) );
 	$Form->radio( 'ityp_use_title', $edited_Itemtype->use_title, $options, T_('Use title') );
-	$Form->radio( 'ityp_use_url', $edited_Itemtype->use_url, $options, T_('Use URL') );
 	$Form->radio( 'ityp_use_text', $edited_Itemtype->use_text, $options, T_('Use text') );
 	$Form->checkbox( 'ityp_allow_html', $edited_Itemtype->allow_html, T_('Allow HTML'), T_( 'Check to allow HTML in posts.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
+	$Form->checkbox( 'ityp_allow_breaks', $edited_Itemtype->allow_breaks, T_('Allow Teaser and Page breaks'), $intro_type_note, '', 1, $intro_type_disabled );
 	$Form->checkbox( 'ityp_allow_attachments', $edited_Itemtype->allow_attachments, T_('Allow attachments') );
+	$Form->checkbox( 'ityp_allow_featured', $edited_Itemtype->allow_featured, T_('Allow featured'), $intro_type_note, '', 1, $intro_type_disabled );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Use of Advanced Properties').get_manual_link( 'item-type-advanced-properties' ), array( 'id' => 'itemtype_advprops' ) );
+	$Form->radio( 'ityp_use_tags', $edited_Itemtype->use_tags, $options, T_('Use tags') );
 	$Form->radio( 'ityp_use_excerpt', $edited_Itemtype->use_excerpt, $options, T_('Use excerpt') );
+	$Form->radio( 'ityp_use_url', $edited_Itemtype->use_url, $options, T_('Use URL') );
+	$Form->checkbox( 'ityp_podcast', $edited_Itemtype->podcast, '', T_('Treat as Podcast Media') );
+	$Form->radio( 'ityp_use_parent', $edited_Itemtype->use_parent, $options, T_('Use Parent ID') );
 	$Form->radio( 'ityp_use_title_tag', $edited_Itemtype->use_title_tag, $options, htmlspecialchars( T_('Use <title> tag') ) );
 	$Form->radio( 'ityp_use_meta_desc', $edited_Itemtype->use_meta_desc, $options, htmlspecialchars( T_('Use <meta> description') ) );
 	$Form->radio( 'ityp_use_meta_keywds', $edited_Itemtype->use_meta_keywds, $options, htmlspecialchars( T_('Use <meta> keywords') ) );
-	$Form->radio( 'ityp_use_tags', $edited_Itemtype->use_tags, $options, T_('Use tags') );
-	$Form->checkbox( 'ityp_allow_featured', $edited_Itemtype->allow_featured, T_('Allow featured') );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Use of Location').get_manual_link( 'item-type-location' ), array( 'id' => 'itemtype_location' ) );
 	$Form->radio( 'ityp_use_country', $edited_Itemtype->use_country, $options, T_('Use country') );
 	$Form->radio( 'ityp_use_region', $edited_Itemtype->use_region, $options, T_('Use region') );
 	$Form->radio( 'ityp_use_sub_region', $edited_Itemtype->use_sub_region, $options, T_('Use sub-region') );
 	$Form->radio( 'ityp_use_city', $edited_Itemtype->use_city, $options, T_('Use city') );
 	$Form->radio( 'ityp_use_coordinates', $edited_Itemtype->use_coordinates, $options, T_('Use coordinates'), false, T_('Turn this on to be able to set the location coordinates and view on map.') );
-	$Form->checkbox( 'ityp_use_custom_fields', $edited_Itemtype->use_custom_fields, T_('Use custom fields') );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Use of Comments').get_manual_link( 'item-type-comments' ), array( 'id' => 'itemtype_comments' ) );
 	$Form->checkbox( 'ityp_use_comments', $edited_Itemtype->use_comments, T_('Use comments'), T_('Also see collection\'s feedback options') );
+	$Form->textarea_input( 'ityp_comment_form_msg', $edited_Itemtype->comment_form_msg, 3, T_('Message before comment form') );
+	$Form->checkbox( 'ityp_allow_comment_form_msg', $edited_Itemtype->allow_comment_form_msg, T_('Allow custom message for each post'), T_('Check to allow a different custom message before comment form for each post.') );
 	$Form->checkbox( 'ityp_allow_closing_comments', $edited_Itemtype->allow_closing_comments, T_('Allow closing comments'), T_('Check to allow closing comments on individual items/posts.') );
 	$Form->checkbox( 'ityp_allow_disabling_comments', $edited_Itemtype->allow_disabling_comments, T_('Allow disabling comments'), T_('Check to allow disabling comments on individual items/posts.') );
 	$Form->radio( 'ityp_use_comment_expiration', $edited_Itemtype->use_comment_expiration, $options, T_('Use comment expiration') );
-
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Custom fields').get_manual_link('item-custom-fields') );
+$Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-custom-fields' ) );
+	$Form->checkbox( 'ityp_use_custom_fields', $edited_Itemtype->use_custom_fields, T_('Use custom fields') );
+
 	$custom_field_types = array(
-			'double' => array( 'label' => T_('Numeric'), 'title' => T_('Add new numeric custom field'), 'note' => T_('Ex: Price, Weight, Length... &ndash; will be stored as a double floating point number.'), 'size' => 20, 'maxlength' => 40 ),
-			'varchar' => array( 'label' => T_('String'), 'title' => T_('Add new text custom field'), 'note' => T_('Ex: Color, Fabric... &ndash; will be stored as a varchar(2000) field.'), 'size' => 30, 'maxlength' => 60 )
+			'double' => array(
+					'label'     => T_('Numeric'),
+					'title'     => T_('Add new numeric custom field'),
+					'note'      => T_('Ex: Price, Weight, Length... &ndash; will be stored as a double floating point number.'),
+					'size'      => 20,
+					'maxlength' => 40
+				),
+			'varchar' => array(
+					'label'     => T_('String'),
+					'title'     => T_('Add new string custom field'),
+					'note'      => T_('Ex: Color, Fabric... &ndash; will be stored as a varchar(10000) field.'),
+					'size'      => 30,
+					'maxlength' => 60
+				),
+			'text' => array(
+					'label'     => T_('Text'),
+					'title'     => T_('Add new text custom field'),
+					'note'      => T_('Ex: Content, Description... &ndash; will be stored as a varchar(10000) field.'),
+					'size'      => 30,
+					'maxlength' => 60
+				),
+			'html' => array(
+					'label'     => 'HTML',
+					'title'     => T_('Add new HTML custom field'),
+					'note'      => T_('Ex: Content, Description... &ndash; will be stored as a varchar(10000) field.'),
+					'size'      => 30,
+					'maxlength' => 60
+				),
+			'url' => array(
+					'label'     => T_('URL'),
+					'title'     => T_('Add new URL custom field'),
+					'note'      => T_('Ex: Website, Twitter... &ndash; will be stored as a varchar(10000) field.'),
+					'size'      => 30,
+					'maxlength' => 60
+				),
 	);
 
 	$custom_fields_names = array();
@@ -164,6 +210,7 @@ $Form->begin_fieldset( T_('Custom fields').get_manual_link('item-custom-fields')
 			}
 			$custom_field_name = ' '.T_('Name').' <input type="text" name="custom_'.$type.'_fname'.$i.'" value="'.$custom_field_name.'" class="form_text_input form-control custom_field_name '.$custom_field_name_class.'" maxlength="36" />';
 			$custom_field_name .= ' '.T_('Order').' <input type="text" name="custom_'.$type.'_order'.$i.'" value="'.$custom_field['order'].'" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />';
+			$custom_field_name .= ' '.T_('Note').' <input type="text" name="custom_'.$type.'_note'.$i.'" value="'.$custom_field['note'].'" class="form_text_input form-control custom_field_note" size="30" maxlength="255" />';
 			$Form->text_input( $field_id_suffix, $custom_field_label, $data[ 'size' ], $data[ 'label' ], $action_delete, array(
 					'maxlength'    => $data[ 'maxlength' ],
 					'input_prefix' => T_('Title').' ',
@@ -179,6 +226,92 @@ $Form->begin_fieldset( T_('Custom fields').get_manual_link('item-custom-fields')
 		$Form->info( '', '<a onclick="return false;" href="#" id="add_new_'.$type.'_custom_field">'.$data[ 'title' ].'</a>', '( '.$data[ 'note' ].' )' );
 	}
 $Form->end_fieldset();
+
+$SQL = new SQL();
+if( $edited_Itemtype->ID )
+{
+	$SQL->SELECT( 'pst_ID, pst_name, its_ityp_ID' );
+	$SQL->FROM( 'T_items__status' );
+	$SQL->FROM_add( 'JOIN T_items__type' );
+	$SQL->FROM_add( 'LEFT JOIN T_items__status_type ON its_ityp_ID = ityp_ID AND its_pst_ID = pst_ID' );
+	$SQL->WHERE( 'ityp_ID = '.$edited_Itemtype->ID );
+}
+else
+{
+	$SQL->SELECT( 'pst_ID, pst_name, NULL AS its_ityp_ID' );
+	$SQL->FROM( 'T_items__status' );
+}
+
+$Results = new Results( $SQL->get(), 'pst_' );
+$Results->title = T_('Item Statuses allowed for this Item Type').get_manual_link( 'item-statuses-allowed-per-item-type' );
+$Results->cols[] = array(
+		'th' => T_('ID'),
+		'th_class' => 'shrinkwrap',
+		'td' => '$pst_ID$',
+		'td_class' => 'center'
+	);
+
+function item_status_type_checkbox( $row )
+{
+	$title = $row->pst_name;
+	$r = '<input type="checkbox"';
+	$r .= ' name="status_'.$row->pst_ID.'"';
+
+	if( isset( $row->its_ityp_ID ) && ! empty( $row->its_ityp_ID ) )
+	{
+		$r .= ' checked="checked"';
+	}
+
+	$r .= ' class="checkbox" value="1" title="'.$title.'" />';
+
+	return $r;
+}
+
+$Results->cols[] = array(
+		'th' => T_('Allowed Item Status'),
+		'th_class' => 'shrinkwrap',
+		'td' => '%item_status_type_checkbox( {row} )%',
+		'td_class' => 'center'
+	);
+
+function get_name_for_itemstatus( $id, $name )
+{
+	global $current_User;
+
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{ // Not reserved id AND current User has permission to edit the global settings
+		$ret_name = '<a href="'.regenerate_url( 'ctrl,action,ID,pst_ID', 'ctrl=itemstatuses&amp;pst_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a>';
+	}
+	else
+	{
+		$ret_name = $name;
+	}
+
+	return '<strong>'.$ret_name.'</strong>';
+}
+
+$Results->cols[] = array(
+		'th' => T_('Name'),
+		'td' => '%get_name_for_itemstatus( #pst_ID#, #pst_name# )%'
+	);
+
+$display_params = array(
+		'page_url' => 'admin.php?ctrl=itemtypes&ityp_ID='.$edited_Itemtype->ID.'&action=edit'
+	);
+
+$Results->display( $display_params );
+
+
+$item_status_IDs = array();
+if( $Results->result_num_rows > 0 )
+{	// If at least one post status exists in DB:
+	foreach( $Results->rows as $row )
+	{
+		$item_status_IDs[] = $row->pst_ID;
+	}
+}
+$Form->hidden( 'item_status_IDs', implode( ',', $item_status_IDs ) );
+
 
 if( $creating )
 {
@@ -205,38 +338,47 @@ function guidGenerator()
 	return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4());
 }
 
+function add_new_custom_field( type, title, title_size )
+{
+	var count_custom = jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value' );
+	count_custom++;
+	var custom_ID = guidGenerator();
+	jQuery( '#custom_' + type + '_field_list' ).append( '<?php echo str_replace( array( '$ID$' ), array( 'ffield_custom_\' + type + \'_\' + count_custom + \'' ), format_to_js( $Form->fieldstart ) ); ?>' +
+			'<input type="hidden" name="custom_' + type + '_ID' + count_custom + '" value="' + custom_ID + '" />' +
+			'<input type="hidden" name="custom_' + type + '_new' + count_custom + '" value="1" />' +
+			'<?php echo format_to_js( $Form->labelstart ); ?><label for="custom_' + type + '_' + count_custom + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>>' + title + ':</label><?php echo format_to_js( $Form->labelend ); ?>' +
+			'<?php echo format_to_js( $Form->inputstart ); ?>' +
+				'<?php echo TS_('Title'); ?> <input type="text" id="custom_' + type + '_' + count_custom + '" name="custom_' + type + '_' + count_custom + '" class="form_text_input form-control new_custom_field_title" maxlength="255" size="' + title_size + '" />' +
+				' <?php echo TS_('Name'); ?> <input type="text" name="custom_' + type + '_fname' + count_custom + '" value="" class="form_text_input form-control custom_field_name" maxlength="255" />' +
+				' <?php echo TS_('Order'); ?> <input type="text" name="custom_' + type + '_order' + count_custom + '" value="" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />' +
+				' <?php echo TS_('Note'); ?> <input type="text" name="custom_' + type + '_note' + count_custom + '" value="" class="form_text_input form-control custom_field_note" maxlength="255" size="30" />' +
+			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>' );
+	jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value', count_custom );
+}
+
 jQuery( '#add_new_double_custom_field' ).click( function()
 {
-	var count_custom_double = jQuery( 'input[name=count_custom_double]' ).attr( 'value' );
-	count_custom_double++;
-	var custom_ID = guidGenerator();
-	jQuery( '#custom_double_field_list' ).append( '<?php echo str_replace( array( '$ID$', "\n" ), array( 'ffield_custom_double_\' + count_custom_double + \'', '' ), $Form->fieldstart ); ?>' +
-			'<input type="hidden" name="custom_double_ID' + count_custom_double + '" value="' + custom_ID + '" />' +
-			'<input type="hidden" name="custom_double_new' + count_custom_double + '" value="1" />' +
-			'<?php echo $Form->labelstart; ?><label for="custom_double_' + count_custom_double + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>><?php echo TS_('Numeric'); ?>:</label><?php echo str_replace( "\n", '', $Form->labelend ); ?>' +
-			'<?php echo $Form->inputstart; ?>' +
-				'<?php echo TS_('Title'); ?> <input type="text" id="custom_double_' + count_custom_double + '" name="custom_double_' + count_custom_double + '" class="form_text_input form-control new_custom_field_title" size="20" maxlength="60" />' +
-				' <?php echo TS_('Name'); ?> <input type="text" name="custom_double_fname' + count_custom_double + '" value="" class="form_text_input form-control custom_field_name" maxlength="36" />' +
-				' <?php echo TS_('Order'); ?> <input type="text" name="custom_double_order' + count_custom_double + '" value="" class="form_text_input form-control custom_field_order" maxlength="36" size="3" />' +
-			'<?php echo str_replace( "\n", '', $Form->inputend.$Form->fieldend ); ?>' );
-	jQuery( 'input[name=count_custom_double]' ).attr( 'value', count_custom_double );
+	add_new_custom_field( 'double', '<?php echo TS_('Numeric'); ?>', 20 );
 } );
 
 jQuery( '#add_new_varchar_custom_field' ).click( function()
 {
-	var count_custom_varchar = jQuery( 'input[name=count_custom_varchar]' ).attr( 'value' );
-	count_custom_varchar++;
-	var custom_ID = guidGenerator();
-	jQuery( '#custom_varchar_field_list' ).append( '<?php echo str_replace( array( '$ID$', "\n" ), array( 'ffield_custom_string_\' + count_custom_varchar + \'', '' ), $Form->fieldstart ); ?>' +
-			'<input type="hidden" name="custom_varchar_ID' + count_custom_varchar + '" value="' + custom_ID + '" />' +
-			'<input type="hidden" name="custom_varchar_new' + count_custom_varchar + '" value="1" />' +
-			'<?php echo $Form->labelstart; ?><label for="custom_varchar_' + count_custom_varchar + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>><?php echo TS_('String'); ?>:</label><?php echo str_replace( "\n", '', $Form->labelend ); ?>' +
-			'<?php echo $Form->inputstart; ?>' +
-				'<?php echo TS_('Title'); ?> <input type="text" id="custom_varchar_' + count_custom_varchar + '" name="custom_varchar_' + count_custom_varchar + '" class="form_text_input form-control new_custom_field_title" size="30" maxlength="40" />' +
-				' <?php echo TS_('Name'); ?> <input type="text" name="custom_varchar_fname' + count_custom_varchar + '" value="" class="form_text_input form-control custom_field_name" maxlength="36" />' +
-				' <?php echo TS_('Order'); ?> <input type="text" name="custom_varchar_order' + count_custom_varchar + '" value="" class="form_text_input form-control custom_field_order" maxlength="36" size="3" />' +
-			'<?php echo str_replace( "\n", '', $Form->inputend.$Form->fieldend ); ?>' );
-	jQuery( 'input[name=count_custom_varchar]' ).attr( 'value', count_custom_varchar );
+	add_new_custom_field( 'varchar', '<?php echo TS_('String'); ?>', 30 );
+} );
+
+jQuery( '#add_new_text_custom_field' ).click( function()
+{
+	add_new_custom_field( 'text', '<?php echo TS_('Text'); ?>', 30 );
+} );
+
+jQuery( '#add_new_html_custom_field' ).click( function()
+{
+	add_new_custom_field( 'html', 'HTML', 30 );
+} );
+
+jQuery( '#add_new_url_custom_field' ).click( function()
+{
+	add_new_custom_field( 'url', '<?php echo TS_('URL'); ?>', 30 );
 } );
 
 jQuery( '[id^="delete_custom_"]' ).click( function()

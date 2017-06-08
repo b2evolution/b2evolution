@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -75,27 +75,30 @@ $Comment = NULL;
 
 if( empty($subject) )
 {
-	$Messages->add( T_('Please fill in the subject of your message.'), 'error' );
+	$Messages->add_to_group( T_('Please fill in the subject of your message.'), 'error', T_('Validation errors:') );
 }
 
 if( empty( $message ) )
 { // message should not be empty!
-	$Messages->add( T_('Please do not send empty messages.'), 'error' );
+	$Messages->add_to_group( T_('Please do not send empty messages.'), 'error', T_('Validation errors:') );
 }
-elseif( $antispam_on_message_form && antispam_check( $message ) )
-{ // a blacklisted keyword ha sbeen found in the message:
-	$Messages->add( T_('The supplied message is invalid / appears to be spam.'), 'error' );
+elseif( $Settings->get( 'antispam_block_contact_form' ) && ( $block = antispam_check( $message ) ) )
+{ // a blacklisted keyword has been found in the message:
+	// Log incident in system log
+	syslog_insert( sprintf( 'Antispam: Supplied message is invalid / appears to be spam. Message contains blacklisted word "%s".', $block ), 'error' );
+
+	$Messages->add_to_group( T_('The supplied message is invalid / appears to be spam.'), 'error', T_('Validation errors:') );
 }
 
 // Getting current blog info:
 $BlogCache = & get_BlogCache();
 if( !empty( $comment_id ) || !empty( $post_id ) )
 {
-	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );	// Required
 }
 else
 {
-	$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
 }
 
 $allow_msgform = '';
@@ -143,15 +146,18 @@ elseif( ! empty( $comment_id ) )
 
 if( empty($sender_name) )
 {
-	$Messages->add( T_('Please fill in your name.'), 'error' );
+	$Messages->add_to_group( T_('Please fill in your name.'), 'error', T_('Validation errors:') );
 }
 if( empty($sender_address) )
 {
-	$Messages->add( T_('Please fill in your email.'), 'error' );
+	$Messages->add_to_group( T_('Please fill in your email.'), 'error', T_('Validation errors:') );
 }
-elseif( !is_email($sender_address) || antispam_check( $sender_address ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
+elseif( !is_email($sender_address) || ( $block = antispam_check( $sender_address ) ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
 {
-	$Messages->add( T_('Supplied email address is invalid.'), 'error' );
+	// Log incident in system log
+	syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $sender_address, $block ), 'error' );
+
+	$Messages->add_to_group( T_('Supplied email address is invalid.'), 'error', T_('Validation errors:') );
 }
 
 if( empty( $recipient_User ) && empty( $recipient_address ) )
@@ -249,8 +255,8 @@ if( empty( $redirect_to ) && empty( $Blog ) )
 }
 if( $success_message )
 {
-	// Never say to whom we sent the email -- prevent user enumeration.
-	$Messages->add( T_('Your message has been sent by email.'), 'success' );
+	$Messages->add( sprintf( T_('You have successfully sent an email to %s.'),
+		( empty( $recipient_User ) ? $recipient_name : $recipient_User->get_username() ) ), 'success' );
 	if( empty( $redirect_to ) )
 	{
 		$redirect_to = $Blog->gen_blogurl();

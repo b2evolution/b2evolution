@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -19,7 +19,7 @@ $Form = new Form( NULL, 'city_checkchanges', 'post', 'compact', 'multipart/form-
 
 $Form->global_icon( T_('Cancel importing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', T_('Import cities') );
+$Form->begin_form( 'fform', T_('Import cities').get_manual_link( 'cities-import' ) );
 
 	echo T_('Select a country and upload a CSV file with the following columns:');
 	echo '<div style="padding:10px 0 10px 40px">';

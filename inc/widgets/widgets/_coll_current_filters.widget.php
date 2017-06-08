@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -28,10 +28,10 @@ class coll_current_filters_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_current_filters_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_current_filters' );
+		parent::__construct( $db_row, 'core', 'coll_current_filters' );
 	}
 
 
@@ -95,14 +95,15 @@ class coll_current_filters_Widget extends ComponentWidget
 						array( 'category', T_('Category'), 1 ),
 						array( 'archive', T_('Archive'), 1 ),
 						array( 'keyword', T_('Keyword'), 1 ),
-						array( 'tag', T_('Tag'), 1 ),
+						array( 'tag', /* TRANS: noun */ T_('Tag'), 1 ),
 						array( 'author', T_('Author'), 1 ),
 						array( 'assignee', T_('Assignee'), 1 ),
 						array( 'locale', T_('Locale'), 1 ),
 						array( 'status', T_('Status'), 1 ),
 						array( 'visibility', T_('Visibility'), 1 ),
 						array( 'time', T_('Past/Future'), 0 ),
-						array( 'limit', T_('Limit by days'), 1 ) ),
+						array( 'limit', T_('Limit by days'), 1 ),
+						array( 'flagged', T_('Flagged'), 1 ) ),
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -175,6 +176,7 @@ class coll_current_filters_Widget extends ComponentWidget
 				'display_visibility' => ! empty( $this->disp_params['show_filters']['visibility'] ),
 				'display_time'       => ! empty( $this->disp_params['show_filters']['time'] ),
 				'display_limit'      => ! empty( $this->disp_params['show_filters']['limit'] ),
+				'display_flagged'    => ! empty( $this->disp_params['show_filters']['flagged'] ),
 			) ) );
 
 		if( empty( $filters ) && ! $this->disp_params['display_empty_filter'] )
@@ -211,7 +213,7 @@ class coll_current_filters_Widget extends ComponentWidget
 
 			if( $params['display_button_reset'] )
 			{ // Button to reset all filters
-				echo '<p>'.action_icon( T_('Reset all filters'), 'reset_filters',
+				echo '<p>'.action_icon( T_('Reset all filters!'), 'reset_filters',
 					regenerate_url( 'catsel,cat,'
 						.$params['ItemList']->param_prefix.'tag,'
 						.$params['ItemList']->param_prefix.'author,'
@@ -234,8 +236,9 @@ class coll_current_filters_Widget extends ComponentWidget
 						.$params['ItemList']->param_prefix.'dstart,'
 						.$params['ItemList']->param_prefix.'dstop,'
 						.$params['ItemList']->param_prefix.'show_past,'
-						.$params['ItemList']->param_prefix.'show_future' ),
-					' '.T_('Reset all filters'), 3, 4 ).'<p>';
+						.$params['ItemList']->param_prefix.'show_future,'
+						.$params['ItemList']->param_prefix.'flagged' ),
+					' '.T_('Reset all filters!'), 3, 4 ).'<p>';
 			}
 		}
 

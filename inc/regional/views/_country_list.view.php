@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -13,11 +13,16 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+global $admin_url;
+
 load_class( 'regional/model/_currency.class.php', 'Currency' );
 load_funcs( 'regional/model/_regional.funcs.php' );
 
-// Get params from request
+// Get params from request:
 $s = param( 's', 'string', '', true );
+$status = param( 'status', 'string', '', true );
+$pref = param( 'pref', 'integer', 0, true );
 
 // Create query
 $SQL = new SQL();
@@ -29,13 +34,30 @@ $SQL->ORDER_BY( '*, ctry_code ASC' );
 if( !empty($s) )
 {	// We want to filter on search keyword:
 	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
-	$SQL->WHERE( 'CONCAT_WS( " ", ctry_code, ctry_name, curr_code ) LIKE "%'.$DB->escape($s).'%"' );
+	$SQL->WHERE( 'CONCAT_WS( " ", ctry_code, ctry_name, curr_code ) LIKE '.$DB->quote( '%'.$s.'%' ) );
+}
+
+if( ! empty( $status ) )
+{	// Filter by status:
+	if( $status == 'unknown' )
+	{
+		$SQL->WHERE_and( 'ctry_status IS NULL' );
+	}
+	else
+	{
+		$SQL->WHERE_and( 'ctry_status = '.$DB->quote( $status ) );
+	}
+}
+
+if( $pref )
+{	// Filter by preferred countries:
+	$SQL->WHERE_and( 'ctry_preferred = 1' );
 }
 
 // Create result set:
 $Results = new Results( $SQL->get(), 'ctry_', '-D' );
 
-$Results->title = T_('Countries').get_manual_link('countries_list');
+$Results->title = T_('Countries').get_manual_link('regional-countries-tab');
 
 /*
  * STATUS TD:
@@ -105,7 +127,7 @@ $Results->cols[] = array(
 			/* Current user can edit Country */'<a href="#" rel="$ctry_status$">%ctry_status_title( #ctry_status# )%</a>' :
 			/* No edit, only view the status */'%ctry_status_title( #ctry_status# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'country_status_edit',
+		'td_class' => 'jeditable_cell country_status_edit',
 		'order' => 'ctry_status',
 		'extra' => array ( 'id' => '#ctry_ID#', 'style' => 'background-color: %ctry_status_color( "#ctry_status#" )%;', 'format_to_output' => false )
 	);
@@ -127,13 +149,23 @@ if( $ctrl == 'antispam' )
  */
 function filter_countries( & $Form )
 {
-	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
+	$Form->text( 's', get_param( 's' ), 30, T_('Search'), '', 255 );
+
+	$status_titles = array( '-1' => T_('All') ) + ctry_status_titles( true, 'unknown' );
+	$Form->select_input_array( 'status', get_param( 'status' ), $status_titles, T_('Status'), '', array( 'force_keys_as_values' => true ) );
+
+	$Form->checkbox( 'pref', get_param( 'pref' ), T_('Preferred only') );
 }
 
 $Results->filter_area = array(
 	'callback' => 'filter_countries',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=countries' ),
+		'all'       => array( T_('All'), $admin_url.'?ctrl=countries' ),
+		'unknown'   => array( T_('Unknown'), $admin_url.'?ctrl=countries&amp;status=unknown' ),
+		'trusted'   => array( T_('Trusted'), $admin_url.'?ctrl=countries&amp;status=trusted' ),
+		'suspect'   => array( T_('Suspect'), $admin_url.'?ctrl=countries&amp;status=suspect' ),
+		'blocked'   => array( T_('Blocked'), $admin_url.'?ctrl=countries&amp;status=blocked' ),
+		'preferred' => array( T_('Preferred'), $admin_url.'?ctrl=countries&amp;pref=1' ),
 		)
 	);
 
@@ -233,7 +265,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 		);
 
 	$Results->global_icon( T_('Create a new country ...'), 'new',
-				regenerate_url( 'ctrl,action', 'ctrl=countries&amp;action=new'), T_('New country').' &raquo;', 3, 4  );
+				regenerate_url( 'ctrl,action', 'ctrl=countries&amp;action=new'), T_('New country').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->display();
@@ -243,7 +275,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	// Print JS to edit a country status
 	echo_editable_column_js( array(
 		'column_selector' => '.country_status_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=country_status_edit&'.url_crumb( 'country' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=country_status_edit&'.url_crumb( 'country' ),
 		'options'         => ctry_status_titles(),
 		'new_field_name'  => 'new_status',
 		'ID_value'        => 'jQuery( this ).attr( "id" )',

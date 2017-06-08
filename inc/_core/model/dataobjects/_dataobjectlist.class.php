@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -60,7 +60,7 @@ class DataObjectList extends Results
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param string default ordering of columns (special syntax)
 	 */
-	function DataObjectList( $tablename, $prefix = '', $dbIDname = 'ID', $objType = 'Item', $sql = NULL,
+	function __construct( $tablename, $prefix = '', $dbIDname = 'ID', $objType = 'Item', $sql = NULL,
 														$limit = 20, $param_prefix = '', $default_order = NULL )
 	{
 		$this->dbtablename = $tablename;
@@ -70,12 +70,12 @@ class DataObjectList extends Results
 
 		if( !is_null( $sql ) )
 		{	// We have an SQL query to execute:
-			parent::Results( $sql, $param_prefix, $default_order, $limit );
+			parent::__construct( $sql, $param_prefix, $default_order, $limit );
 		}
 		else
 		{	// TODO: do we want to autogenerate a query here???
 			// Temporary...
-			parent::Results( $sql, $param_prefix, $default_order, $limit );
+			parent::__construct( $sql, $param_prefix, $default_order, $limit );
 		}
 	}
 

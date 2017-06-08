@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -21,9 +21,9 @@ global $edited_Message;
 global $edited_Thread;
 global $creating_success;
 
-global $DB, $action, $Plugins;
+global $DB, $action, $Plugins, $Settings;
 
-global $Blog;
+global $Collection, $Blog;
 
 $creating = is_create_action( $action );
 
@@ -38,7 +38,7 @@ if( !isset( $params ) )
 }
 $params = array_merge( array(
 	'form_class_thread' => 'fform',
-	'form_title' => T_('New thread'),
+	'form_title' => T_('New thread').( is_admin_page() ? get_manual_link( 'messages-new-thread' ) : '' ),
 	'form_action' => NULL,
 	'form_name' => 'thread_checkchanges',
 	'form_layout' => 'compact',
@@ -47,8 +47,8 @@ $params = array_merge( array(
 	'thrdtype' => param( 'thrdtype', 'string', 'discussion' ),  // alternative: individual
 	'skin_form_params' => array(),
 	'allow_select_recipients' => true,
-	'messages_list_start' => '',
-	'messages_list_end' => '',
+	'messages_list_start' => is_admin_page() ? '<div class="evo_private_messages_list">' : '',
+	'messages_list_end' => is_admin_page() ? '</div>' : '',
 	'messages_list_title' => $edited_Thread->title,
 	), $params );
 
@@ -58,7 +58,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 
 if( is_admin_page() )
 {
-	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 }
 
 $Form->begin_form( $params['form_class_thread'], $params['form_title'], array( 'onsubmit' => 'return check_form_thread()') );
@@ -90,7 +90,7 @@ else
 	foreach( $recipients_selected as $recipient )
 	{
 		$Form->hidden( 'thrd_recipients_array[id][]', $recipient['id'] );
-		$Form->hidden( 'thrd_recipients_array[title][]', $recipient['title'] );
+		$Form->hidden( 'thrd_recipients_array[login][]', $recipient['login'] );
 	}
 }
 
@@ -123,6 +123,17 @@ if( !empty( $message_renderer_checkboxes ) )
 	$Form->info( T_('Text Renderers'), $message_renderer_checkboxes );
 }
 
+// ####################### ATTACHMENTS/LINKS #########################
+if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
+{	// If current user has a permission to view the files AND it is back-office:
+	load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+	// Initialize this object as global because this is used in many link functions:
+	global $LinkOwner;
+	$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+	// Display attachments fieldset:
+	display_attachments_fieldset( $Form, $LinkOwner );
+}
+
 global $thrd_recipients_array, $recipients_selected;
 if( !empty( $thrd_recipients_array ) )
 {	// Initialize the preselected users (from post request or when user send a message to own contacts)
@@ -130,7 +141,7 @@ if( !empty( $thrd_recipients_array ) )
 	{
 		$recipients_selected[] = array(
 			'id'    => $recipient_ID,
-			'title' => $thrd_recipients_array['title'][$rnum]
+			'login' => $thrd_recipients_array['login'][$rnum]
 		);
 	}
 }
@@ -151,33 +162,34 @@ jQuery( document ).ready( function()
 } );
 
 jQuery( '#thrd_recipients' ).tokenInput(
-	'<?php echo get_samedomain_htsrv_url(); ?>anon_async.php?action=get_recipients',
+	'<?php echo get_restapi_url(); ?>users/recipients',
 	{
 		theme: 'facebook',
-		queryParam: 'term',
-		propertyToSearch: 'title',
+		queryParam: 'q',
+		propertyToSearch: 'login',
 		preventDuplicates: true,
 		prePopulate: <?php echo evo_json_encode( $recipients_selected ) ?>,
 		hintText: '<?php echo TS_('Type in a username') ?>',
 		noResultsText: '<?php echo TS_('No results') ?>',
 		searchingText: '<?php echo TS_('Searching...') ?>',
-		tokenFormatter: function( item )
+		jsonContainer: 'users',
+		tokenFormatter: function( user )
 		{
 			return '<li>' +
-					item.title +
-					'<input type="hidden" name="thrd_recipients_array[id][]" value="' + item.id + '" />' +
-					'<input type="hidden" name="thrd_recipients_array[title][]" value="' + item.title + '" />' +
+					<?php echo $Settings->get( 'username_display' ) == 'name' ? 'user.fullname' : 'user.login';?> +
+					'<input type="hidden" name="thrd_recipients_array[id][]" value="' + user.id + '" />' +
+					'<input type="hidden" name="thrd_recipients_array[login][]" value="' + user.login + '" />' +
 				'</li>';
 		},
-		resultsFormatter: function( item )
+		resultsFormatter: function( user )
 		{
-			var title = item.title;
-			if( item.fullname != null && item.fullname !== undefined )
+			var title = user.login;
+			if( user.fullname != null && user.fullname !== undefined )
 			{
-				title += '<br />' + item.fullname;
+				title += '<br />' + user.fullname;
 			}
 			return '<li>' +
-					item.picture +
+					user.avatar +
 					'<div>' +
 						title +
 					'</div><span></span>' +
@@ -208,7 +220,7 @@ jQuery( '#thrd_recipients' ).tokenInput(
  */
 function check_multiple_recipients()
 {
-	if( jQuery( 'input[name="thrd_recipients_array[title][]"]' ).length > 1 )
+	if( jQuery( 'input[name="thrd_recipients_array[login][]"]' ).length > 1 )
 	{
 		jQuery( '#multiple_recipients' ).show();
 	}
@@ -263,12 +275,14 @@ if( $action == 'preview' )
 	}
 
 	$preview_SQL = new SQL();
-	$preview_SQL->SELECT( '0 AS msg_ID, "'.date( 'Y-m-d H:i:s', $localtimenow ).'" AS msg_datetime,
+	$preview_SQL->SELECT( $current_User->ID.' AS msg_author_user_ID, 0 AS msg_thread_ID, 0 AS msg_ID, "'.date( 'Y-m-d H:i:s', $localtimenow ).'" AS msg_datetime,
 		'.$current_User->ID.' AS msg_user_ID,
-		'.$DB->quote( '<b>'.T_('PREVIEW').':</b><br /> '.$edited_Message->get_prerendered_content() ).' AS msg_text, "" AS msg_renderers,
+		'.$DB->quote( $edited_Message->text ).' AS msg_text, "" AS msg_renderers,
 		'.$DB->quote( $edited_Thread->title ).' AS thread_title' );
 
 	$Results = new Results( $preview_SQL->get(), 'pvwmsg_', '', NULL, 1 );
+
+	$Results->Cache = & get_MessageCache();
 
 	if( $creating_success )
 	{ // Display error messages again before preview of message
@@ -292,7 +306,7 @@ if( $action == 'preview' )
 	$Results->cols[] = array(
 			'th' => T_('Message'),
 			'td_class' => 'left top message_text',
-			'td' => '%col_msg_format_text( #msg_ID#, #msg_text# )%',
+			'td' => '@get_content()@@get_images()@@get_files()@',
 		);
 	/**
 	 * Read?:

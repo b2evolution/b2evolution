@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage photoalbums
@@ -55,24 +55,39 @@ $params = array_merge( array(
 	<div class="bDetails">
 
 		<?php
+		if( $disp == 'single' )
+		{
+			// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+			// Display container contents:
+			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+				'widget_context' => 'item',	// Signal that we are displaying within an Item
+				// The following (optional) params will be used as defaults for widgets included in this container:
+				// This will enclose each widget in a block:
+				'block_start' => '<div class="$wi_class$">',
+				'block_end' => '</div>',
+				// This will enclose the title of each widget:
+				'block_title_start' => '<h3>',
+				'block_title_end' => '</h3>',
+				// Template params for "Item Link" widget
+				'widget_item_link_before'    => '<p class="evo_post_link">',
+				'widget_item_link_after'     => '</p>',
+				// Template params for "Item Tags" widget
+				'widget_item_tags_before'    => '<nav class="small post_tags">',
+				'widget_item_tags_after'     => '</nav>',
+				// Params for skin file "_item_content.inc.php"
+				'widget_item_content_params' => $params,
+			) );
+			// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+		}
+		else
+		{
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 			// Note: at the top of this file, we set: 'image_size' =>	'', // Do not display images in content block - Image is handled separately
 			skin_include( '_item_content.inc.php', $params );
 			// Note: You can customize the default item content by copying the generic
 			// /skins/_item_content.inc.php file into the current skin folder.
 			// -------------------------- END OF POST CONTENT -------------------------
-		?>
-
-		<?php
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => '<div class="bSmallPrint">'.T_('Link').': ',
-					'after'         => '</div>',
-					'text_template' => '$url$',
-					'url_template'  => '$url$',
-					'target'        => '',
-					'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-				) );
+		}
 		?>
 
 		<div class="item_comments">
@@ -81,7 +96,7 @@ $params = array_merge( array(
 				skin_include( '_item_feedback.inc.php', array(
 						'before_section_title' => '<h4>',
 						'after_section_title'  => '</h4>',
-						'author_link_text'     => 'preferredname',
+						'author_link_text'     => 'auto',
 						'comment_image_size'   => 'fit-256x256',
 					) );
 				// Note: You can customize the default item feedback by copying the generic

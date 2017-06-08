@@ -12,7 +12,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author Devin Doucette - darksnoopy@shaw.ca
  *
@@ -28,7 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class archive
 {
-	function archive($name)
+	function __construct($name)
 	{
 		$this->options = array (
 			'basedir' => ".",
@@ -347,9 +347,9 @@ class archive
  */
 class tar_file extends archive
 {
-	function tar_file($name)
+	function __construct($name)
 	{
-		$this->archive($name);
+		parent::__construct($name);
 		$this->options['type'] = "tar";
 	}
 
@@ -510,7 +510,7 @@ class tar_file extends archive
  */
 class gzip_file extends tar_file
 {
-	function gzip_file($name)
+	function __construct($name)
 	{
 		$this->tar_file($name);
 		$this->options['type'] = "gzip";
@@ -557,7 +557,7 @@ class gzip_file extends tar_file
  */
 class bzip_file extends tar_file
 {
-	function bzip_file($name)
+	function __construct($name)
 	{
 		$this->tar_file($name);
 		$this->options['type'] = "bzip";
@@ -604,9 +604,9 @@ class bzip_file extends tar_file
  */
 class zip_file extends archive
 {
-	function zip_file($name)
+	function __construct($name)
 	{
-		$this->archive($name);
+		parent::__construct($name);
 		$this->options['type'] = "zip";
 	}
 

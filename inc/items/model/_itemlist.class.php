@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -54,7 +54,7 @@ class ItemList2 extends ItemListLight
 	 * @param string Name to be used when saving the filterset (leave empty to use default for collection)
 	 * @param array restrictions for itemlist (position, contact, firm, ...) key: restriction name, value: ID of the restriction
 	 */
-	function ItemList2(
+	function __construct(
 			& $Blog,
 			$timestamp_min = NULL,       // Do not show posts before this timestamp
 			$timestamp_max = NULL,   		 // Do not show posts after this timestamp
@@ -67,7 +67,7 @@ class ItemList2 extends ItemListLight
 		global $Settings;
 
 		// Call parent constructor:
-		parent::ItemListLight( $Blog, $timestamp_min, $timestamp_max, $limit, $cache_name, $param_prefix, $filterset_name );
+		parent::__construct( $Blog, $timestamp_min, $timestamp_max, $limit, $cache_name, $param_prefix, $filterset_name );
 	}
 
 
@@ -76,161 +76,87 @@ class ItemList2 extends ItemListLight
 	 */
 	function preview_from_request()
 	{
-		global $current_User;
-
-		if( empty($current_User) )
+		if( ! is_logged_in() )
 		{ // dh> only logged in user's can preview. Alternatively we need those checks where $current_User gets used below.
 			return;
 		}
 
-		global $DB, $localtimenow, $Messages, $BlogCache;
-		global $Plugins;
+		global $current_User, $DB, $localtimenow, $Blog, $Plugins;
 
-		$item_typ_ID = param( 'item_typ_ID', 'integer', NULL );
+		$post_ID = param( 'post_ID', 'integer', 0 );
 
-		$ItemTypeCache = & get_ItemTypeCache();
-		$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID, false, false );
-
-		if( $ItemType && $ItemType->get( 'allow_html' ) )
-		{ // HTML is allowed for this post
-			$text_format = 'html';
-		}
-		else
-		{ // HTML is disallowed for this post
-			$text_format = 'htmlspecialchars';
+		// Get Item by ID or create new Item object:
+		$ItemCache = & get_ItemCache();
+		if( ! ( $Item = & $ItemCache->get_by_ID( $post_ID, false, false ) ) )
+		{	// Initialize new creating Item:
+			$Item = new Item();
 		}
 
-		$preview_userid = param( 'preview_userid', 'integer', true );
-		$post_status = param( 'post_status', 'string', true );
-		$post_locale = param( 'post_locale', 'string', $current_User->locale );
-		$content = param( 'content', $text_format, true );
-		$post_title = param( 'post_title', $text_format, true );
-		$post_titletag = param( 'titletag', 'string', true );
-		$post_excerpt = param( 'post_excerpt', 'string', true );
-		$post_url = param( 'post_url', 'string', '' );
-		check_categories_nosave( $post_category, $post_extracats );
-		$renderers = param( 'renderers', 'array:string', array('default') );
-		if( ! is_array($renderers) )
-		{ // dh> workaround for param() bug. See rev 1.93 of /inc/_misc/_misc.funcs.php
-			$renderers = array('default');
-		}
-		if( $post_category == 0 )
-		{
-			$post_category = $this->Blog->get_default_cat_ID();
-		}
-		$comment_Blog = & $BlogCache->get_by_ID( get_catblog( $post_category ) );
-		if( ( $comment_Blog->get_setting( 'allow_comments' ) != 'never' ) &&
-		    ( $ItemType && $ItemType->get( 'use_comments' ) &&
-		      ( $ItemType->get( 'allow_disabling_comments' ) || $ItemType->get( 'allow_closing_comments' ) )
-		  ) )
-		{ // param is required
-			$post_comment_status = param( 'post_comment_status', 'string', true );
-		}
-		else
-		{
-			$post_comment_status = $comment_Blog->get_setting( 'allow_comments' );
-		}
+		param( 'item_typ_ID', 'integer', true );
 
+		$Item->status = param( 'post_status', 'string', NULL ); // 'published' or 'draft' or ...
+		// We know we can use at least one status,
+		// but we need to make sure the requested/default one is ok:
+		$Item->status = $Blog->get_allowed_item_status( $Item->status );
 
-		// Get issue date, using the user's locale (because it's entered like this in the form):
+		// Check if new category was started to create. If yes then set up parameters for next page:
+		check_categories_nosave( $post_category, $post_extracats, $Item );
+
+		// Switch to current user's locale to display errors:
 		locale_temp_switch( $current_User->locale );
 
-		param_date( 'item_issue_date', T_('Please enter a valid issue date.'), false );
-		// TODO: dh> get_param() is always true here, also on invalid dates:
-		if( strlen(get_param('item_issue_date')) )
-		{ // only set it, if a date was given:
-			param_time( 'item_issue_time' );
-			$item_issue_date = form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ); // TODO: cleanup...
+		// Set Item params from request:
+		$Item->load_from_Request();
+
+		if( isset( $Item->previous_status ) )
+		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
+			// (ONLY if current request is updating item status)
+			$Item->restrict_status( true );
 		}
-		else
-		{
-			$item_issue_date = date( 'Y-m-d H:i:s', $localtimenow );
-		}
+
 		locale_restore_previous();
 
-		$item_st_ID = param( 'item_st_ID', 'integer', NULL );
-		$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
-		$item_deadline = param( 'item_deadline', 'string', NULL );
-		$item_priority = param( 'item_priority', 'integer', NULL ); // QUESTION: can this be also empty/NULL?
+		// Initialize SQL query to preview Item:
+		$post_fields = $DB->get_col( 'SHOW COLUMNS FROM T_items__item', 0, 'Get all item columns to init SQL query for preview the creating/editing Item' );
+		$sql_post_fields = array();
+		$post_dbprefix_length = strlen( $Item->dbprefix );
+		foreach( $post_fields as $post_field )
+		{
+			switch( $post_field )
+			{
+				case 'post_lastedit_user_ID':
+					$post_field_value = $current_User->ID;
+					break;
 
-		// Do some optional filtering on the content
-		// Typically stuff that will help the content to validate
-		// Useful for code display.
-		// Will probably be used for validation also.
-		$Plugins_admin = & get_Plugins_admin();
-		$params = array( 'object_type' => 'Item', 'object_Blog' => & $comment_Blog );
-		$Plugins_admin->filter_contents( $post_title /* by ref */, $content /* by ref */, $renderers, $params );
+				case 'post_datemodified':
+				case 'post_contents_last_updated_ts':
+					$post_field_value = date2mysql( $localtimenow );
+					break;
 
-		$post_title = format_to_post( $post_title );
-		$content = format_to_post( $content );
+				case 'post_last_touched_mts':
+					global $localmicrotimenow;
+					$post_field_value = $localmicrotimenow;
+					break;
 
-		$post_ID = param('post_ID', 'integer', 0);
+				default:
+					$post_field_name = substr( $post_field, $post_dbprefix_length );
+					$post_field_value = isset( $Item->$post_field_name ) ? $Item->$post_field_name : NULL;
+					break;
+			}
+			$sql_post_fields[] = "\n".$DB->quote( $post_field_value ).' AS '.$post_field;
+		}
+		// Create a fake SQL query(to initialize the previewing Item) like "SELECT 123 AS post_ID, 'Post Title text' AS post_title, ...":
+		$this->sql = 'SELECT '.implode( ', ', $sql_post_fields );
 
-		$this->sql = "SELECT
-			$post_ID AS post_ID,
-			$preview_userid AS post_creator_user_ID,
-			$preview_userid AS post_lastedit_user_ID,
-			'$item_issue_date' AS post_datestart,
-			'$item_issue_date' AS post_datecreated,
-			'$item_issue_date' AS post_datemodified,
-			'$item_issue_date' AS post_last_touched_mts,
-			0 AS post_dateset,
-			'".$DB->escape($post_status)."' AS post_status,
-			'".$DB->escape($post_locale)."' AS post_locale,
-			'".$DB->escape($content)."' AS post_content,
-			'".$DB->escape($post_title)."' AS post_title,
-			'".$DB->escape($post_titletag)."' AS post_titletag,
-			'".$DB->escape($post_excerpt)."' AS post_excerpt,
-			NULL AS post_excerpt_autogenerated,
-			NULL AS post_urltitle,
-			NULL AS post_canonical_slug_ID,
-			NULL AS post_tiny_slug_ID,
-			'".$DB->escape($post_url)."' AS post_url,
-			$post_category AS post_main_cat_ID,
-			'' AS post_flags,
-			'noreq' AS post_notifications_status,
-			NULL AS post_notifications_ctsk_ID,
-			".bpost_count_words( $content )." AS post_wordcount,
-			".$DB->quote($post_comment_status)." AS post_comment_status,
-			'".$DB->escape( implode( '.', $renderers ) )."' AS post_renderers,
-			".$DB->quote($item_assigned_user_ID)." AS post_assigned_user_ID,
-			".$DB->quote($item_typ_ID)." AS post_ityp_ID,
-			".$DB->quote($item_st_ID)." AS post_pst_ID,
-			".$DB->quote($item_deadline)." AS post_datedeadline,
-			".$DB->quote($item_priority)." AS post_priority,";
-
-		$this->sql .= $DB->quote(param( 'item_order', 'double', NULL )).' AS post_order'.",\n"
-								.$DB->quote(param( 'item_featured', 'integer', NULL )).' AS post_featured'."\n";
 		$this->total_rows = 1;
 		$this->total_pages = 1;
 		$this->page = 1;
 
-		// ATTENTION: we skip the parent on purpose here!! fp> refactor
-		DataObjectList2::query( false, false, false, 'PREVIEW QUERY' );
-
-		$Item = & $this->Cache->instantiate( $this->rows[0] );
-
-		// set Item settings
-		$Item->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
-		$Item->set_setting( 'metadesc', param( 'metadesc', 'string', true ) );
-		$Item->set_setting( 'metakeywords', param( 'metakeywords', 'string', true ) );
-
-		// set custom Item settings
-		$custom_fields = $Item->get_type_custom_fields();
-		foreach( $custom_fields as $custom_field )
-		{ // For each custom double field:
-			$param_type = ( $custom_field['type'] == 'varchar' ) ? 'string' : $custom_field['type'];
-			$Item->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], param( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $param_type, NULL ) );
-		}
+		// Skip the function of this class and call it of the parent because we have already initialized SQL query above in this function:
+		DataObjectList2::run_query( false, false, false, 'ItemList2::preview_from_request() PREVIEW QUERY' );
 
 		// Trigger plugin event, allowing to manipulate or validate the item before it gets previewed
 		$Plugins->trigger_event( 'AppendItemPreviewTransact', array( 'Item' => & $Item ) );
-
-		if( $Messages->has_errors() )
-		{
-			$errcontent = $Messages->display( T_('Invalid post, please correct these errors:'), '', false );
-			$Item->content = $errcontent."\n<hr />\n".$content;
-		}
 
 		// little funky fix for IEwin, rawk on that code
 		global $Hit;
@@ -243,8 +169,23 @@ class ItemList2 extends ItemListLight
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 *
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it
+	 *
+	 * @deprecated Use new function run_query()
 	 */
-	function query()
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
+	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 */
+	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+											$query_title = 'Results::run_query()' )
 	{
 		global $DB;
 
@@ -294,11 +235,18 @@ class ItemList2 extends ItemListLight
 		// echo DB::format_query( $step1_sql );
 
 		// Get list of the IDs we need:
-		$ID_list = implode( ',', $DB->get_col( $step1_sql, 0, 'ItemList2::Query() Step 1: Get ID list' ) );
+		$ID_list = implode( ',', $DB->get_col( $step1_sql, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).'ItemList2::Query() Step 1: Get ID list' ) );
 
 		// *** STEP 2 ***
 		$this->sql = 'SELECT *'.$select_temp_order.'
 			              FROM '.$this->Cache->dbtablename;
+
+		if( isset( $this->filters['orderby'] ) && $this->filters['orderby'] == 'numviews' )
+		{ // special case for order by number of views
+			$this->sql .= ' LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+					ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID';
+		}
+
 		if( !empty($ID_list) )
 		{
 			$this->sql .= ' WHERE '.$this->Cache->dbIDname.' IN ('.$ID_list.') '
@@ -311,8 +259,8 @@ class ItemList2 extends ItemListLight
 
 		//echo DB::format_query( $this->sql );
 
-		// ATTENTION: we skip the parent on purpose here!! fp> refactor
-		DataObjectList2::query( false, false, false, 'ItemList2::Query() Step 2' );
+		// Skip the function of first parent and call it of main parent because we have already initialized SQL query above in this function:
+		DataObjectList2::run_query( false, false, false, 'ItemList2::Query() Step 2' );
 	}
 
 
@@ -441,8 +389,6 @@ class ItemList2 extends ItemListLight
 	 */
 	function prevnext_item_links( $params )
 	{
-		global $posttypes_specialtypes;
-
 		$params = array_merge( array(
 									'template' => '$prev$$separator$$next$',
 									'prev_start' => '',
@@ -458,7 +404,7 @@ class ItemList2 extends ItemListLight
 									'next_class' => '',
 									'target_blog' => '',
 									'post_navigation' => $this->Blog->get_setting( 'post_navigation' ),
-									'types' => '-'.implode(',',$posttypes_specialtypes), // Exclude pages, intros & sidebar stuff
+									'itemtype_usage' => 'post', // Include only post with type usage "post"
 									'featured' => NULL,
 								), $params );
 
@@ -505,8 +451,8 @@ class ItemList2 extends ItemListLight
 			}
 		}
 
-		$prev = $this->prev_item_link( $params['prev_start'], $params['prev_end'], $params[ 'prev_text' ], $params[ 'prev_no_item' ], false, $params[ 'target_blog'], $params['prev_class'], $params['types'], $params['featured'], $params['post_navigation'] );
-		$next = $this->next_item_link( $params['next_start'], $params['next_end'], $params[ 'next_text' ], $params[ 'next_no_item' ], false, $params[ 'target_blog'], $params['next_class'], $params['types'], $params['featured'], $params['post_navigation'] );
+		$prev = $this->prev_item_link( $params['prev_start'], $params['prev_end'], $params[ 'prev_text' ], $params[ 'prev_no_item' ], false, $params[ 'target_blog'], $params['prev_class'], $params['itemtype_usage'], $params['featured'], $params['post_navigation'] );
+		$next = $this->next_item_link( $params['next_start'], $params['next_end'], $params[ 'next_text' ], $params[ 'next_no_item' ], false, $params[ 'target_blog'], $params['next_class'], $params['itemtype_usage'], $params['featured'], $params['post_navigation'] );
 
 		if( empty( $prev ) || empty( $next ) )
 		{	// Use separator text only when prev & next are not empty
@@ -529,12 +475,12 @@ class ItemList2 extends ItemListLight
 	/**
 	 * Skip to previous
 	 */
-	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$', $no_item = '', $display = true, $target_blog = '', $class = '', $types = '', $featured = NULL, $post_navigation = NULL )
+	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$', $no_item = '', $display = true, $target_blog = '', $class = '', $itemtype_usage = '', $featured = NULL, $post_navigation = NULL )
 	{
 		/**
 		 * @var Item
 		 */
-		$prev_Item = & $this->get_prevnext_Item( 'prev', $types, $featured, $post_navigation );
+		$prev_Item = & $this->get_prevnext_Item( 'prev', $itemtype_usage, $featured, $post_navigation );
 
 		if( !is_null($prev_Item) )
 		{
@@ -554,12 +500,12 @@ class ItemList2 extends ItemListLight
 	/**
 	 * Skip to next
 	 */
-	function next_item_link( $before = '', $after = '', $text = '$title$ &raquo;', $no_item = '', $display = true, $target_blog = '', $class = '', $types = '', $featured = true, $post_navigation = NULL )
+	function next_item_link( $before = '', $after = '', $text = '$title$ &raquo;', $no_item = '', $display = true, $target_blog = '', $class = '', $itemtype_usage = '', $featured = true, $post_navigation = NULL )
 	{
 		/**
 		 * @var Item
 		 */
-		$next_Item = & $this->get_prevnext_Item( 'next', $types, $featured, $post_navigation );
+		$next_Item = & $this->get_prevnext_Item( 'next', $itemtype_usage, $featured, $post_navigation );
 
 		if( !is_null($next_Item) )
 		{
@@ -635,9 +581,9 @@ class ItemList2 extends ItemListLight
 	 *
 	 * @param string prev | next  (relative to the current sort order)
 	 */
-	function & get_prevnext_Item( $direction = 'next', $types = '', $featured = NULL, $post_navigation = 'same_blog' )
+	function & get_prevnext_Item( $direction = 'next', $itemtype_usage = '', $featured = NULL, $post_navigation = 'same_blog' )
 	{
-		global $DB, $ItemCache, $posttypes_specialtypes;
+		global $DB, $ItemCache;
 
 		if( ! $this->single_post )
 		{	// We are not on a single post:
@@ -656,7 +602,7 @@ class ItemList2 extends ItemListLight
 			return $r;
 		}
 
-		if( in_array( $current_Item->ityp_ID, $posttypes_specialtypes ) ) // page, intros, ads
+		if( $current_Item->get_type_setting( 'usage' ) != 'post' )
 		{	// We are not on a REGULAR post -- we cannot navigate:
 			$r = NULL;
 			return $r;
@@ -683,8 +629,8 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_author_assignee( $this->filters['author_assignee'] );
 		$next_Query->where_locale( $this->filters['lc'] );
 		$next_Query->where_statuses( $this->filters['statuses'] );
-		// types param is kept only for the case when some custom types should be displayed
-		$next_Query->where_types( !empty( $types ) ? $types : $this->filters['types'] );
+		// itemtype_usage param is kept only for the case when some custom types should be displayed
+		$next_Query->where_itemtype_usage( ! empty( $itemtype_usage ) ? $itemtype_usage : $this->filters['itemtype_usage'] );
 		$next_Query->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		// $next_Query->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$next_Query->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
@@ -693,6 +639,7 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_visibility( $this->filters['visibility_array'] );
 		$next_Query->where_featured( $featured );
 		$next_Query->where_tags( $this->filters['tags'] );
+		$next_Query->where_flagged( $this->filters['flagged'] );
 
 		/*
 		 * ORDER BY stuff:
@@ -725,6 +672,12 @@ class ItemList2 extends ItemListLight
 
 		$next_Query->order_by( $order_by );
 
+		// Special case for numviews
+		if( $orderby_array[0] == 'numviews' )
+		{
+			$next_Query->FROM_add( 'LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+				ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID' );
+		}
 
 		// LIMIT to 1 single result
 		$next_Query->LIMIT( '1' );
@@ -757,11 +710,30 @@ class ItemList2 extends ItemListLight
 														 );
 				break;
 
+			case 'numviews':
+				// we need to get the number of members who has viewed the post
+				$numviews = get_item_numviews( $current_Item );
+				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
+																.$operator
+																.$DB->quote($numviews)
+																.' OR ( '
+                                  .$this->Cache->dbprefix.$orderby_array[0]
+																	.' = '
+																	.$DB->quote($numviews)
+																	.' AND '
+																	.$this->Cache->dbIDname
+																	.$operator
+																	.$current_Item->ID
+																.')'
+															);
+				break;
+
 			case 'title':
 			case 'ityp_ID':
 			case 'datecreated':
 			case 'datemodified':
 			case 'last_touched_mts':
+			case 'contents_last_updated_ts':
 			case 'urltitle':
 			case 'priority':
 				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
@@ -848,7 +820,7 @@ class ItemList2 extends ItemListLight
 		//echo DB::format_query( $step1_sql );
 
 		// Get list of the IDs we need:
-		$next_ID = $DB->get_var( $step1_sql, 0, 0, 'Get ID of next item' );
+		$next_ID = $DB->get_var( $step1_sql, 0, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).'Get ID of next item' );
 
 		//pre_dump( $next_ID );
 
@@ -861,9 +833,61 @@ class ItemList2 extends ItemListLight
 
 
 	/**
-	 * Load posts and comments read statuses for current User in case of each post from this Item List current page
+	 * Load data of Items from the current page at once to cache variables.
+	 * For each loading we use only single query to optimize performance.
+	 * By default it loads all Items of current list page into global $ItemCache,
+	 * Other data are loaded depending on $params, see below:
+	 *
+	 * @param array Params:
+	 *        - 'load_user_data' - use TRUE to load all data from table T_users__postreadstatus(dates of last read
+	 *                             post and comments) of the current logged in User for all Items of current list page.
+	 *                             (ONLY when a tracking unread content is enabled for the collection)
+	 *        - 'load_postcats'  - use TRUE to load all category associations for all Items of current list page.
+	 */
+	function load_list_data( $params = array() )
+	{
+		$params = array_merge( array(
+				'load_user_data' => true,
+				'load_postcats'  => true,
+			), $params );
+
+		$page_post_ids = $this->get_page_ID_array();
+		if( empty( $page_post_ids ) )
+		{	// There are no items on this list:
+			return;
+		}
+
+		// Load all items of the current page in single query:
+		$ItemCache = & get_ItemCache();
+		$ItemCache->load_list( $page_post_ids );
+
+		if( $params['load_user_data'] )
+		{	// Load the user data for items:
+			$this->load_user_data_for_items();
+		}
+
+		if( $params['load_postcats'] )
+		{	// Load category associations for the items of current page:
+			postcats_get_by_IDs( $page_post_ids );
+		}
+	}
+
+
+	/**
+	 * Load user data (posts/comments read statuses) for current User for each post of the current ItemList page
+	 *
+	 * @deprecated Use new function load_user_data_for_items() instead
 	 */
 	function load_content_read_statuses()
+	{
+		$this->load_user_data_for_items();
+	}
+
+
+	/**
+	 * Load user data (posts/comments read statuses) for current User for each post of the current ItemList page
+	 */
+	function load_user_data_for_items()
 	{
 		if( !$this->Blog->get_setting( 'track_unread_content' ) )
 		{ // tracking unread content in this blog is turned off
@@ -876,7 +900,8 @@ class ItemList2 extends ItemListLight
 			return;
 		}
 
-		load_user_read_statuses( $page_post_ids );
+		// Delegate query:
+		load_user_data_for_items( $page_post_ids );
 	}
 }
 

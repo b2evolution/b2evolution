@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author fplanque: Francois PLANQUE.
@@ -37,7 +37,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'wpxml' );
 
 		$wp_blog_ID = param( 'wp_blog_ID', 'integer', 0 );
-		param_check_not_empty( 'wp_blog_ID', T_('Please select a blog!') );
+		param_check_not_empty( 'wp_blog_ID', T_('Please select a collection!') );
 
 		// XML File
 		$xml_file = param( 'wp_file', 'string', '' );
@@ -70,7 +70,7 @@ $AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=imp
 $AdminUI->breadcrumbpath_add( T_('WordPress XML Importer'), $admin_url.'?ctrl=wpimportxml' );
 
 // Set an url for manual page:
-$AdminUI->set_page_manual_link( 'wordpress-import' );
+$AdminUI->set_page_manual_link( 'xml-importer' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -24,9 +24,9 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'currency_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this currency!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('currency') ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New currency') : T_('Currency') );
+$Form->begin_form( 'fform', ( $creating ?  T_('New currency') : T_('Currency') ).get_manual_link( 'currencies-editing' ) );
 
 	$Form->add_crumb( 'currency' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',curr_ID' : '' ) ) ); // (this allows to come back to the right list order & page)

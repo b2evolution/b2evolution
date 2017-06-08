@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $htsrv_url, $samedomain_htsrv_url, $evo_charset;
+global $evo_charset;
 
 // Default params:
 $params = array_merge( array(
@@ -29,7 +29,7 @@ $params = array_merge( array(
 		'Comment'          => NULL,
 	), $params );
 
-$Blog = & $params['Blog'];
+$Collection = $Blog = & $params['Blog'];
 $recipient_User = & $params['recipient_User'];
 
 // show additional message info
@@ -42,7 +42,7 @@ if( !empty( $Blog ) )
 		$Comment = & $CommentCache->get_by_ID( $params['comment_id'] );
 		$Item = & $Comment->get_Item();
 		echo sprintf( T_('Message sent from your <a %s>comment</a> on %s.'),
-			'href="'.$Comment->get_permanent_url( '&' ).'"'.emailskin_style( '.a' ).'',
+			'href="'.$Comment->get_permanent_url( '&', '#comments' ).'"'.emailskin_style( '.a' ).'',
 			'<a href="'.$Item->get_permanent_url( '', '', '&' ).'"'.emailskin_style( '.a' ).'>'.$Item->get( 'title' ).'</a>' );
 	}
 	elseif( !empty( $params['post_id'] ) )
@@ -97,13 +97,13 @@ if( ! empty( $recipient_User ) )
 
 	// Add quick unsubcribe link so users can deny receiving emails through b2evo message form in any circumstances
 	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more emails through a message form, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 }
 elseif( !empty( $params['Comment'] ) )
 { // Visitor:
 	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive e-mails on your comments for this e-mail address anymore, click here:' )
-			.' <a href="'.$samedomain_htsrv_url.'anon_unsubscribe.php?type=comment&c='.$params['Comment']->ID.'&anon_email='.rawurlencode( $params['Comment']->author_email ).'"'.emailskin_style( '.a' ).'>'
+			.' <a href="'.get_htsrv_url().'anon_unsubscribe.php?type=comment&c='.$params['Comment']->ID.'&anon_email='.rawurlencode( $params['Comment']->author_email ).'"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 }
 

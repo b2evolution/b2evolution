@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -30,7 +30,7 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'ftyp_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this filetype!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') );
 
@@ -40,11 +40,11 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 
 	if( ! $creating ) $Form->hidden( 'ftyp_ID', $edited_Filetype->ID );
 
-	$Form->text_input( 'ftyp_extensions', $edited_Filetype->extensions, 40, T_('Extensions'), '', array( 'maxlength'=>30, 'required'=>true, 'note'=>sprintf('E.g. &laquo;%s&raquo;'.', '.T_('separated by whitespace'), 'html') ) );
+	$Form->text_input( 'ftyp_extensions', $edited_Filetype->extensions, 40, T_('Extensions'), '', array( 'maxlength'=>30, 'required'=>true, 'note'=>sprintf( T_('E.g. %s'), '<code>html</code>' ).', '.T_('separated by whitespace') ) );
 
-	$Form->text_input( 'ftyp_name', $edited_Filetype->name, 40, T_('File type name'), sprintf('E.g. &laquo;%s&raquo;', 'HTML file'), array( 'maxlength'=> 30, 'required'=>true ) );
+	$Form->text_input( 'ftyp_name', $edited_Filetype->name, 40, T_('File type name'), sprintf( T_('E.g. %s'), '<code>'.T_('HTML file').'</code>' ), array( 'maxlength'=> 30, 'required'=>true ) );
 
-	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), sprintf('E.g. &laquo;%s&raquo;', 'text/html'), array( 'maxlength'=> 50, 'required'=>true ) );
+	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), sprintf( T_('E.g. %s'), '<code>text/html</code>'), array( 'maxlength'=> 50, 'required'=>true ) );
 
 	$Form->select_input_array( 'ftyp_icon', $edited_Filetype->icon, get_available_filetype_icons(), T_('Icon') );
 
@@ -75,11 +75,11 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 
 	$Form->radio( 'ftyp_allowed',  $edited_Filetype->allowed,
 					array(
-							array( 'any', T_( 'Allow anyone (including anonymous users) to upload/rename files of this type' ) ),
-							array( 'registered', T_( 'Allow only registered users to upload/rename files of this type' ) ),
-							array( 'admin', T_( 'Allow only admins to upload/rename files of this type' ) )
+							array( 'any', T_( 'Allow anyone (including anonymous users) to upload/rename/edit files of this type' ) ),
+							array( 'registered', T_( 'Allow only registered users to upload/rename/edit files of this type' ) ),
+							array( 'admin', T_( 'Allow only admins to upload/rename/edit files of this type' ) )
 						),
-					T_( 'Allow upload' ), true );
+					T_( 'Allow upload' ), true, T_('The exact users who will be impacted depends on each User Group\'s configuration.') );
 
 if( $creating )
 {

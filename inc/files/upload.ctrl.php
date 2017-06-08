@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * (dh please re-add)
  *
  * {@internal Open Source relicensing agreement:
@@ -56,7 +56,7 @@ param( 'iframe_name', 'string', '', true );
 $action = param_action();
 
 // INIT params:
-if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
+if( param( 'root_and_path', 'filepath', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
 { // root and path together: decode and override (used by "radio-click-dirtree")
 	list( $root, $path ) = explode( '::', $root_and_path, 2 );
 	// Memorize new root:
@@ -66,7 +66,7 @@ if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ 
 else
 {
 	param( 'root', 'string', NULL, true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
-	param( 'path', 'string', '', true );  // the path relative to the root dir
+	param( 'path', 'filepath', '', true );  // the path relative to the root dir
 	if( param( 'new_root', 'string', '' )
 		&& $new_root != $root )
 	{ // We have changed root in the select list
@@ -84,7 +84,7 @@ $fm_FileRoot = NULL;
 
 load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
 
-$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ) );
+$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ), 'favorite' );
 
 if( ! empty( $root ) )
 { // We have requested a root folder by string:
@@ -214,9 +214,6 @@ if( $Messages->count( 'error' ) > $initial_error_count )
 }
 
 
-// Quick mode means "just upload and leave mode when successful"
-param( 'upload_quickmode', 'integer', 0 );
-
 /**
  * Remember failed files (and the error messages)
  * @var array
@@ -227,7 +224,7 @@ $failedFiles = array();
  * Remember renamed files (and the messages)
  * @var array
  */
-param( 'renamedFiles', 'array:array:string', array(), true );
+param( 'renamedFiles', 'array:array:filepath', array(), true );
 $renamedMessages = array();
 
 // Process files we want to get from an URL:
@@ -311,11 +308,6 @@ if( ! empty($renamedFiles) )
 	}
 	forget_param( 'renamedFiles' );
 	unset( $renamedFiles );
-
-	if( $upload_quickmode )
-	{
-		header_redirect( regenerate_url( 'ctrl', 'ctrl=files', '', '&' ) );
-	}
 }
 
 // Process uploaded files:
@@ -327,7 +319,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 	// Check that this action request is not a CSRF hacked request:
 	$Session->assert_received_crumb( 'file' );
 
-	$upload_result = process_upload( $fm_FileRoot->ID, $path, false, false, $upload_quickmode );
+	$upload_result = process_upload( $fm_FileRoot->ID, $path, false, false, false );
 	if( isset( $upload_result ) )
 	{
 		$failedFiles = $upload_result['failedFiles'];
@@ -369,14 +361,8 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 					.'</ul>';
 			}
 
-			$Messages->add( $success_msg, 'success' );
+			$Messages->add_to_group( $success_msg, 'success', T_('Uploading files:') );
 		}
-	}
-
-	if( $upload_quickmode && !empty($failedFiles) )
-	{	// Transmit file error to next page!
-		$Messages->add( $failedFiles[0], 'error' );
-		unset($failedFiles);
 	}
 
 	if( empty($failedFiles) && empty($renamedFiles) )
