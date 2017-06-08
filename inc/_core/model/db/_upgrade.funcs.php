@@ -575,7 +575,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				$field_to_parse = $match[5];
 
 				// The length param is optional:
-				if( substr($fieldtype, 0, 7) == 'DECIMAL' )
+				if( substr($fieldtype, 0, 7) == 'DECIMAL' || substr($fieldtype, 0, 6) == 'DOUBLE' )
 					$matches_pattern = '~^'.preg_quote($tablefield->Type, '~').'$~i';
 				else
 					$matches_pattern = '~^'.preg_replace( '~\((\d+)\)~', '(\(\d+\))?', $tablefield->Type ).'$~i';
