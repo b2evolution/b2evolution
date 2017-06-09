@@ -126,6 +126,7 @@ function score_tags( $tag_name, $search_term, $score_weight = 4 )
 	{	// We use only EXACT match for post tags:
 		$score = $score_weight;
 		$scores_map['tags'] = $score;
+		$scores_map['word_case_insensitive_match'][$tag_name] = $score;
 	}
 
 	return array( 'score' => $score, 'score_weight' => $score_weight, 'map' => $scores_map );
