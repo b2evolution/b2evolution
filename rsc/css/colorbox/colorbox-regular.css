@@ -264,6 +264,7 @@
 }
 #cboxVoting .voting_wrapper {
   text-align: left;
+  width: 100%;
 }
 #cboxVoting .voting_wrapper .separator {
   display: inline-block;

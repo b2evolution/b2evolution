@@ -95,6 +95,7 @@ class ItemTypeCache extends DataObjectCache
 				T_('Out of content flow') => array(
 						'page'    => T_('Page'),
 						'special' => T_('Special'),
+						'content-block' => T_('Content Block'),
 					),
 				T_('Intros') => array(
 						'intro-front' => T_('Intro-Front'),

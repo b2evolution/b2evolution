@@ -180,6 +180,7 @@ class shortlinks_plugin extends Plugin
 			( \[\[ | \(\( )                    # Lookbehind for (( or [[
 			( (https?|mailto)://[^<>{}\s\]]+ ) # URL
 			( \s \.[a-z0-9_\-\.]+ )?           # Style classes started and separated with dot (Optional)
+			( \s _[a-z0-9_\-]+ )?              # Link target started with _ (Optional)
 			( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
 			( \]\] | \)\) )                    # Lookahead for )) or ]]
 			*ix'; // x = extended (spaces + comments allowed)
@@ -319,6 +320,7 @@ class shortlinks_plugin extends Plugin
 					( \[\[ | \(\( )          # Lookbehind for (( or [[
 					'.$WikiWord.'            # Specific WikiWord to replace
 					( \s \.[a-z0-9_\-\.]+ )? # Style classes started and separated with dot (Optional)
+					( \s _[a-z0-9_\-]+ )?    # Link target started with _ (Optional)
 					( \s .+? )?              # Custom link text instead of post/chapter title (Optional)
 					( \]\] | \)\) )          # Lookahead for )) or ]]
 					*sx'; // s = dot matches newlines, x = extended (spaces + comments allowed)
@@ -339,21 +341,25 @@ class shortlinks_plugin extends Plugin
 	 */
 	function callback_replace_bracketed_urls( $m )
 	{
-		if( ! ( $m[1] == '[[' && $m[6] == ']]' ) &&
-		    ! ( $m[1] == '((' && $m[6] == '))' ) )
+		if( ! ( $m[1] == '[[' && $m[7] == ']]' ) &&
+		    ! ( $m[1] == '((' && $m[7] == '))' ) )
 		{	// Wrong pattern, Return original text:
 			return $m[0];
 		}
 
 		// Clear custom link text:
-		$custom_link_text = utf8_trim( $m[5] );
+		$custom_link_text = utf8_trim( $m[6] );
 
 		// Clear custom link style classes:
 		$custom_link_class = utf8_trim( str_replace( '.', ' ', $m[4] ) );
 
+		// Clear custom link target:
+		$custom_link_target = utf8_trim( $m[5] );
+
 		// Build a link from bracketed URL:
 		$r = '<a href="'.$m[2].'"';
 		$r .= empty( $custom_link_class ) ? '' : ' class="'.$custom_link_class.'"';
+		$r .= empty( $custom_link_target ) ? '' : ' target="'.$custom_link_target.'"';
 		$r .= '>';
 		$r .= empty( $custom_link_text ) ? $m[2] : $custom_link_text;
 		$r .= '</a>';
@@ -372,8 +378,8 @@ class shortlinks_plugin extends Plugin
 	{
 		global $blog, $evo_charset, $admin_url;
 
-		if( ! ( $m[1] == '[[' && $m[4] == ']]' ) &&
-		    ! ( $m[1] == '((' && $m[4] == '))' ) )
+		if( ! ( $m[1] == '[[' && $m[5] == ']]' ) &&
+		    ! ( $m[1] == '((' && $m[5] == '))' ) )
 		{	// Wrong pattern, Return original text:
 			return $m[0];
 		}
@@ -431,26 +437,30 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// Clear custom link text:
-		$custom_link_text = utf8_trim( $m[3] );
+		$custom_link_text = utf8_trim( $m[4] );
 
 		// Clear custom link style classes:
 		$custom_link_class = utf8_trim( str_replace( '.', ' ', $m[2] ) );
 
+		// Clear custom link target:
+		$custom_link_target = utf8_trim( $m[3] );
+
 		if( ! empty( $permalink ) )
 		{	// Chapter or Item are found in DB
 			$custom_link_class = empty( $custom_link_class ) ? '' : ' class="'.$custom_link_class.'"';
+			$custom_link_target = empty( $custom_link_target ) ? '' : ' target="'.$custom_link_target.'"';
 
 			if( ! empty( $custom_link_text ) )
 			{	// [[WikiWord custom link text]] or ((WikiWord custom link text)) or [[WikiWord .style.classes custom link text]] or ((WikiWord .style.classes custom link text))
-				return '<a href="'.$permalink.$url_params.'"'.$custom_link_class.'>'.$custom_link_text.'</a>';
+				return '<a href="'.$permalink.$url_params.'"'.$custom_link_class.$custom_link_target.'>'.$custom_link_text.'</a>';
 			}
 			elseif( $m[1] == '[[' )
 			{	// [[Wikiword]] or [[Wikiword .style.classes]]
-				return '<a href="'.$permalink.$url_params.'"'.$custom_link_class.'>'.$existing_link_text.'</a>';
+				return '<a href="'.$permalink.$url_params.'"'.$custom_link_class.$custom_link_target.'>'.$existing_link_text.'</a>';
 			}
 			else
 			{	// ((Wikiword)) or ((Wikiword .style.classes))
-				return '<a href="'.$permalink.$url_params.'"'.$custom_link_class.'>'.$link_text.'</a>';
+				return '<a href="'.$permalink.$url_params.'"'.$custom_link_class.$custom_link_target.'>'.$link_text.'</a>';
 			}
 		}
 		else

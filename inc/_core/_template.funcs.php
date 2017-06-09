@@ -1268,7 +1268,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				$colorbox_voting_params = '{'.$colorbox_strings_params.'
 					displayVoting: true,
 					votingUrl: "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.$blog_param.'",
-					minWidth: 305}';
+					minWidth: 320}';
 				// Colorbox params without voting panel:
 				$colorbox_no_voting_params = '{'.$colorbox_strings_params.'
 					minWidth: 255}';
@@ -2535,16 +2535,13 @@ function display_login_form( $params )
 
 	if( $inskin )
 	{
-		$Form->begin_field();
-		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, /* TRANS: noun */ T_('Login'), $separator.T_('Enter your username (or email address).'),
-					array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true ) );
-		$Form->end_field();
+		$Form->login_input( $dummy_fields['login'], $params['login'], 18, /* TRANS: noun */ T_('Login'), $separator.T_('Enter your username (or email address).'),
+					array( 'maxlength' => 255, 'required' => true ) );
 	}
 	else
 	{
-		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, '', '',
-					array( 'maxlength' => 255, 'class' => 'input_text', 'input_required' => 'required', 'placeholder' => T_('Username (or email address)'),
-								 'autocapitalize' => 'off', 'autocorrect' => 'off' ) );
+		$Form->login_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, '', '',
+					array( 'maxlength' => 255, 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
 	}
 
 	$lost_password_url = get_lostpassword_url( $redirect_to, '&amp;', $return_to );

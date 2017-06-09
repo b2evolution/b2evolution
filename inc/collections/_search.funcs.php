@@ -126,6 +126,7 @@ function score_tags( $tag_name, $search_term, $score_weight = 4 )
 	{	// We use only EXACT match for post tags:
 		$score = $score_weight;
 		$scores_map['tags'] = $score;
+		$scores_map['word_case_insensitive_match'][$tag_name] = $score;
 	}
 
 	return array( 'score' => $score, 'score_weight' => $score_weight, 'map' => $scores_map );
@@ -279,7 +280,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	$search_ItemList->query_init();
 
 	// Make a custom search query:
-	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content,'
+	$search_query = 'SELECT DISTINCT post_ID, post_datestart, post_datemodified, post_title, post_content,'
 		.' user_login as creator_login, tag_name, post_excerpt, post_titletag'
 		.$search_ItemList->ItemQuery->get_from()
 		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
@@ -319,6 +320,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 		$search_result[] = array(
 			'type' => 'item',
 			'score' => $final_score,
+			'date' => $row->post_datestart,
 			'ID' => $row->post_ID,
 			'scores_map' => $scores_map,
 		);
@@ -384,6 +386,7 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 		$search_result[] = array(
 			'type' => 'comment',
 			'score' => $final_score,
+			'date' => $row->comment_date,
 			'ID' => $row->comment_ID,
 			'scores_map' => $scores_map
 		);
@@ -635,19 +638,40 @@ function perform_scored_search( $search_keywords, $search_types = 'all' )
 		}
 	}
 
-	// Sort results by score:
-	$score_result = array();
-	foreach( $search_result as $result_item )
-	{
-		$score_result[] = $result_item['score'];
-	}
-	array_multisort( $score_result, SORT_DESC, $search_result );
-
 	if( count( $search_result ) > 0 )
 	{
-		$first_result = $search_result[0];
-		$max_percentage = get_percentage_from_result_map( $first_result['type'], $first_result['scores_map'], $quoted_parts, $keywords );
-		$search_result[0]['percentage'] = $max_percentage;
+		// Sort results by score or date:
+		$score_result = array();
+		$max_score_result = $search_result[0];
+		foreach( $search_result as $result_item )
+		{
+			if( $Blog->get_setting( 'search_sort_by' ) == 'date' )
+			{	// Sort by date:
+				if( isset( $result_item['date'] ) )
+				{	// If search item has a date, e-g posts and comments:
+					$score_result[] = preg_replace( '#[^\d]+#', '', $result_item['date'] ).'-'.$result_item['score'];
+				}
+				else
+				{	// If search item has no date, e-g categories and tags:
+					// Put them at the end of list with sorting by score:
+					// (00000000000000 is fake null date YYYYmmddHHiiss)
+					$score_result[] = '00000000000000-'.$result_item['score'];
+				}
+			}
+			else
+			{	// Sort by score:
+				$score_result[] = $result_item['score'];
+			}
+			if( $max_score_result['score'] < $result_item['score'] )
+			{	// Find item with max score:
+				$max_score_result = $result_item;
+			}
+		}
+		array_multisort( $score_result, SORT_DESC, $search_result );
+
+		$max_percentage = get_percentage_from_result_map( $max_score_result['type'], $max_score_result['scores_map'], $quoted_parts, $keywords );
+		$search_result[0]['max_percentage'] = $max_percentage;
+		$search_result[0]['max_score'] = $max_score_result['score'];
 		if( $search_type_item )
 		{
 			$search_result[0]['nr_of_items'] = count( $item_search_result );
@@ -681,12 +705,14 @@ function search_result_block( $params = array() )
 	global $Collection, $Blog, $Session, $debug;
 
 	$search_keywords = param( 's', 'string', '', true );
+	$allow_cache = param( 'allow_cache', 'boolean', false );
 
 	// Try to load existing search results from Session:
 	$search_params = $Session->get( 'search_params' );
 	$search_result = $Session->get( 'search_result' );
 	$search_result_loaded = false;
-	if( empty( $search_params )
+	if( ! $allow_cache	// Force to load new search results, e-g when form is submitted, but don't force on page switching
+		|| empty( $search_params )	// We have no saved search params
 		|| ( $search_params['search_keywords'] != $search_keywords )	// We had saved search results but for a different search string
 		|| ( $search_params['search_blog'] != $Blog->ID ) 		// We had saved search results but for a different collection
 		|| ( $search_result === NULL ) )
@@ -704,8 +730,27 @@ function search_result_block( $params = array() )
 			'search_blog' => $Blog->ID
 		);
 
+		$search_types = array();
+		if( $Blog->get_setting( 'search_include_posts' ) )
+		{	// Search items:
+			$search_types[] = 'item';
+		}
+		if( $Blog->get_setting( 'search_include_cmnts' ) )
+		{	// Search comments:
+			$search_types[] = 'comment';
+		}
+		if( $Blog->get_setting( 'search_include_cats' ) )
+		{	// Search categories:
+			$search_types[] = 'category';
+		}
+		if( $Blog->get_setting( 'search_include_tags' ) )
+		{	// Search tags:
+			$search_types[] = 'tag';
+		}
+		$search_types = count( $search_types ) == 4 ? 'all' : implode( ',', $search_types );
+
 		// Perform new search:
-		$search_result = perform_scored_search( $search_keywords );
+		$search_result = perform_scored_search( $search_keywords, $search_types );
 
 		// Save results into session:
 		$Session->set( 'search_params', $search_params );
@@ -718,10 +763,24 @@ function search_result_block( $params = array() )
 		{	// Display counts
 			echo '<div class="text-muted">';
 			echo '<p>We found the desired saved search results in the Session:</p>';
-			echo '<ul><li>'.sprintf( '%d posts', empty( $search_result[0]['nr_of_items'] ) ? 0 : $search_result[0]['nr_of_items'] ).'</li>';
-			echo '<li>'.sprintf( '%d comments', empty( $search_result[0]['nr_of_comments'] ) ? 0 : $search_result[0]['nr_of_comments'] ).'</li>';
-			echo '<li>'.sprintf( '%d chapters', empty( $search_result[0]['nr_of_cats'] ) ? 0 : $search_result[0]['nr_of_cats'] ).'</li>';
-			echo '<li>'.sprintf( '%d tags', empty( $search_result[0]['nr_of_tags'] ) ? 0 : $search_result[0]['nr_of_tags'] ).'</li></ul>';
+			echo '<ul>';
+			if( isset( $search_result[0]['nr_of_items'] ) )
+			{
+				echo '<li>'.sprintf( '%d posts', $search_result[0]['nr_of_items'] ).'</li>';
+			}
+			if( isset( $search_result[0]['nr_of_comments'] ) )
+			{
+				echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
+			}
+			if( isset( $search_result[0]['nr_of_cats'] ) )
+			{
+				echo '<li>'.sprintf( '%d chapters', $search_result[0]['nr_of_cats'] ).'</li>';
+			}
+			if( isset( $search_result[0]['nr_of_tags'] ) )
+			{
+				echo '<li>'.sprintf( '%d tags', $search_result[0]['nr_of_tags'] ).'</li>';
+			}
+			echo '</ul>';
 			echo '</div>';
 		}
 
@@ -836,8 +895,8 @@ function search_result_block( $params = array() )
 	echo $params['block_start'];
 
 	// Memorize best scores:
-	$max_percentage = $search_result[0]['percentage'];
-	$max_score = $search_result[0]['score'];
+	$max_percentage = isset( $search_result[0]['max_percentage'] ) ? $search_result[0]['max_percentage'] : 100;
+	$max_score = isset( $search_result[0]['max_score'] ) ? $search_result[0]['max_score'] : $search_result[0]['score'];
 
 	// Display results for current page:
 	for( $index = $from; $index < $to; $index++ )
@@ -878,7 +937,7 @@ function search_result_block( $params = array() )
 					$creator_User = & $Item->get_creator_User();
 					$display_params = array_merge( array(
 							'author'        => $creator_User->get_identity_link( array( 'link_text' => $params['author_format'] ) ),
-							'creation_date' => mysql2date( $params['date_format'], $Item->datecreated ),
+							'creation_date' => mysql2date( $params['date_format'], $Item->datestart ),
 							'lastedit_date' => mysql2date( $params['date_format'], $Item->datemodified ),
 						), $display_params );
 				}
@@ -940,8 +999,9 @@ function search_result_block( $params = array() )
 		}
 
 		// Common display params for all types:
+		$display_params['score_date'] = isset( $row['date'] ) ? $row['date'] : 0;
 		$display_params['score'] = $row['score'];
-		$display_params['percentage'] = isset( $row['percentage'] ) ? $row['percentage'] : round( $row['score'] * $max_percentage / $max_score );
+		$display_params['percentage'] = round( $row['score'] * $max_percentage / $max_score );
 		$display_params['scores_map'] = $row['scores_map'];
 		$display_params['type'] = $row['type'];
 		$display_params['best_result'] = $index == 0;
@@ -991,7 +1051,7 @@ function search_page_links( $params = array() )
 	$page_list_span = $params['list_span'];
 	$total_pages = $params['total_pages'];
 	$current_page = isset( $params['current_page'] ) ? $params['current_page'] : 1;
-	$page_url = regenerate_url( 'page', '' );
+	$page_url = regenerate_url( 'page', 'allow_cache=1' );
 
 	// Initialize a start of pages list:
 	if( $current_page <= intval( $page_list_span / 2 ) )
@@ -1256,7 +1316,7 @@ function display_search_result( $params = array() )
 		if( ! empty( $params['author'] ) )
 		{ // Display author if it is defined
 			$lastedit_date = ( isset( $params['lastedit_date'] ) ) ? ', '.T_('last edited on').' '.$params['lastedit_date'] : '';
-			printf( T_('Created by %s on %s'), $params['author'], $params['creation_date'] ).$lastedit_date;
+			printf( T_('Published by %s on %s'), $params['author'], $params['creation_date'] ).$lastedit_date;
 		}
 		elseif( ! empty( $params['editor'] ) )
 		{ // Display editor if it is defined
@@ -1288,6 +1348,9 @@ function display_search_result( $params = array() )
 function display_score_map( $params )
 {
 	echo '<ul class="search_score_map dimmed">';
+
+	echo '<li>Date: '.( empty( $params['score_date'] ) ? 'None' : mysql2localedatetime( $params['score_date'] ) ).'</li>';
+
 	foreach( $params['scores_map'] as $result_part => $score_map )
 	{
 

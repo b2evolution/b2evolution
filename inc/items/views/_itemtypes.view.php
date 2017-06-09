@@ -186,6 +186,8 @@ function ityp_row_usage( $item_type_usage )
 			return T_('Intro-All');
 		case 'special':
 			return T_('Special');
+		case 'content-block':
+			return T_('Content Block');
 		default:
 			return $item_type_usage;
 	}

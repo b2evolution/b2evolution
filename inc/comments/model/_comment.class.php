@@ -1710,7 +1710,7 @@ class Comment extends DataObject
 				'title_ok'            => T_('Cast an OK vote!'),
 				'title_ok_voted'      => T_('You sent an OK vote.'),
 				'title_yes'           => T_('Cast a helpful vote!'),
-				'title_yes_voted'     => T_('You sent helpful vote.'),
+				'title_yes_voted'     => T_('You sent a "helpful" vote.'),
 				'title_no'            => T_('Cast a "not helpful" vote!'),
 				'title_no_voted'      => T_('You sent a "not helpful" vote.'),
 			), $params );
@@ -1913,7 +1913,7 @@ class Comment extends DataObject
 				'skin_ID'               => 0,
 				'helpful_text'          => T_('Is this comment helpful?'),
 				'title_yes'             => T_('Cast a helpful vote!'),
-				'title_yes_voted'       => T_('You sent helpful vote.'),
+				'title_yes_voted'       => T_('You sent a "helpful" vote.'),
 				'title_noopinion'       => T_('Cast a "no opinion" vote!'),
 				'title_noopinion_voted' => T_('You sent a "no opinion" vote.'),
 				'title_no'              => T_('Cast a "not helpful" vote!'),
@@ -3712,8 +3712,9 @@ class Comment extends DataObject
 		{	// Get the notify users for NORMAL comments:
 
 			// Send only for active users:
-			$except_condition = ' AND user_status IN ( "activated", "autoactivated" )';
+			$active_users_condition = 'AND user_status IN ( "activated", "autoactivated" )';
 
+			$except_condition = '';
 			if( ! empty( $already_notified_user_IDs ) )
 			{	// Set except moderators condition. Exclude moderators who already got a notification email:
 				$except_condition .= ' AND user_ID NOT IN ( "'.implode( '", "', $already_notified_user_IDs ).'" )';
@@ -3734,6 +3735,7 @@ class Comment extends DataObject
 						FROM (
 							SELECT DISTINCT isub_user_ID AS user_ID
 							FROM T_items__subscriptions
+							INNER JOIN T_users ON ( user_ID = isub_user_ID '.$active_users_condition.' )
 							WHERE isub_item_ID = '.$comment_Item->ID.'
 							AND isub_comments <> 0
 
@@ -3743,7 +3745,7 @@ class Comment extends DataObject
 							FROM T_coll_settings AS opt
 							INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
 							LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
-							LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+							INNER JOIN T_users ON ( user_grp_ID = bloggroup_group_ID '.$active_users_condition.' )
 							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = user_ID )
 							WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 								AND opt.cset_name = "opt_out_item_subscription"
@@ -3759,6 +3761,7 @@ class Comment extends DataObject
 							LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 							LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
 							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = sug_user_ID )
+							INNER JOIN T_users ON ( user_ID = isub_user_ID '.$active_users_condition.' )
 							WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 								AND opt.cset_name = "opt_out_item_subscription"
 								AND opt.cset_value = 1
@@ -3772,6 +3775,7 @@ class Comment extends DataObject
 							INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
 							LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
 							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = bloguser_user_ID )
+							INNER JOIN T_users ON ( user_ID = isub_user_ID '.$active_users_condition.' )
 							WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 								AND opt.cset_name = "opt_out_item_subscription"
 								AND opt.cset_value = 1
@@ -3799,6 +3803,7 @@ class Comment extends DataObject
 								FROM (
 									SELECT DISTINCT sub_user_ID AS user_ID
 									FROM T_subscriptions
+									INNER JOIN T_users ON ( user_ID = sub_user_ID '.$active_users_condition.' )
 									WHERE sub_coll_ID = '.$comment_item_Blog->ID.'
 									AND sub_comments <> 0
 
@@ -3809,7 +3814,7 @@ class Comment extends DataObject
 									INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
 									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
 									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
-									LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+									INNER JOIN T_users ON ( user_grp_ID = bloggroup_group_ID '.$active_users_condition.' )
 									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = user_ID )
 									WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 										AND opt.cset_name = "opt_out_comment_subscription"
@@ -3826,6 +3831,7 @@ class Comment extends DataObject
 									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 									LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
 									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
+									INNER JOIN T_users ON ( user_ID = sub_user_ID '.$active_users_condition.' )
 									WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 										AND opt.cset_name = "opt_out_comment_subscription"
 										AND opt.cset_value = 1
@@ -3840,6 +3846,7 @@ class Comment extends DataObject
 									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
 									LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
 									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+									INNER JOIN T_users ON ( user_ID = sub_user_ID '.$active_users_condition.' )
 									WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 										AND opt.cset_name = "opt_out_comment_subscription"
 										AND opt.cset_value = 1

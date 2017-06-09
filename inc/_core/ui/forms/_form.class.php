@@ -1233,14 +1233,14 @@ class Form extends Widget
 
 
 	/**
-	 * Build username/login field.
+	 * Build username field
 	 *
 	 * @param string the name of the input field
 	 * @param User initial value
-	 * @param integer size of the input field
 	 * @param string label displayed in front of the field
 	 * @param string note displayed with field
 	 * @param string class of the input field. Class name "only_assignees" provides to load only assignee users of the blog
+	 * @param array Field params
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '', $field_params = array() )
@@ -1248,6 +1248,8 @@ class Form extends Widget
 		$field_params = array_merge( array(
 				'note' => $field_note,
 				'size' => 20,
+				'autocapitalize' => 'off',
+				'autocorrect' => 'off'
 			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
@@ -1261,6 +1263,30 @@ class Form extends Widget
 		$r .= $this->end_field();
 
 		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Build login field.
+	 *
+	 * @param string the name of the input field
+	 * @param string User login
+	 * @param integer size of the input field
+	 * @param string label displayed in front of the field
+	 * @param string note displayed with field
+	 * @param array Field params
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function login_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		$field_params = array_merge( array(
+				'size' => $field_size,
+				'class' => 'input_text',
+				'autocapitalize' => 'off',
+				'autocorrect' => 'off'
+			), $field_params );
+
+		return $this->text_input( $field_name, $field_value, $field_params['size'], $field_label, $field_note, $field_params );
 	}
 
 

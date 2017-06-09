@@ -734,9 +734,11 @@ div.edit_toolbars, div.message_toolbars {
 		margin-left: 0;
 	}
 	.btn {
+		margin-top: 0;
 		margin-bottom: 2px;
 	}
 	.btn-toolbar-title {
+		padding-top: 1px;
 		padding-left: 5px;
 		float: left;
 		font-weight: bold;
@@ -809,6 +811,11 @@ div.edit_toolbars, div.message_toolbars {
 .modal-dialog {
 	// Set this for all screen sizes(especially for small screens) in order to fix a moving modal over evo_toolbar
 	margin: 30px auto;
+}
+.modal-footer {
+	.btn+.btn {
+		margin-bottom: 3px;
+	}
 }
 
 // Typeahead plugin

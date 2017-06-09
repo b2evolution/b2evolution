@@ -593,13 +593,14 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		$tags_count = 0;
 		foreach( $xml_data['tags'] as $tag )
 		{
-			if( empty( $tags[ (string) $tag['tag_name'] ] ) )
+			$tag_name = substr( html_entity_decode( $tag['tag_name'] ), 0, 50 );
+			if( empty( $tags[ $tag_name ] ) )
 			{	// Insert new tag into DB if tag doesn't exist with current name
 				$DB->query( 'INSERT INTO '.$tableprefix.'items__tag ( tag_name )
-					VALUES ( '.$DB->quote( $tag['tag_name'] ).' )' );
+					VALUES ( '.$DB->quote( $tag_name ).' )' );
 				$tag_ID = $DB->insert_id;
 				// Save new tag
-				$tags[ $tag['tag_name'] ] = (string) $tag_ID;
+				$tags[ $tag_name ] = (string) $tag_ID;
 				$tags_count++;
 			}
 		}
@@ -787,9 +788,10 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 							break;
 
 						case 'post_tag':
-							if( isset( $tags[ (string) $term['name'] ] ) )
+							$tag_name = substr( html_entity_decode( $tag['tag_name'] ), 0, 50 );
+							if( isset( $tags[ $tag_name ] ) )
 							{ // Set tag
-								$post_tags[] = $term['name'];
+								$post_tags[] = $tag_name;
 							}
 							break;
 					}

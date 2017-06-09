@@ -844,6 +844,9 @@ div#evo_toolbar .actions_right {
   margin-left: 6px;
   float: right;
 }
+.evobar-menu .evobar-entry-new-post span.icon {
+  margin-top: -3px;
+}
 @media (max-width: 800px) {
   .evobar-menu li.rwdhide,
   .evobar-menu li u {
@@ -2408,9 +2411,11 @@ div.message_toolbars {
   margin-left: 0;
 }
 .btn-toolbar[class*="_toolbar"] .btn {
+  margin-top: 0;
   margin-bottom: 2px;
 }
 .btn-toolbar[class*="_toolbar"] .btn-toolbar-title {
+  padding-top: 1px;
   padding-left: 5px;
   float: left;
   font-weight: bold;
@@ -2474,6 +2479,9 @@ div.message_toolbars {
 }
 .modal-dialog {
   margin: 30px auto;
+}
+.modal-footer .btn + .btn {
+  margin-bottom: 3px;
 }
 .tt-dropdown-menu {
   background-color: #FFFFFF;

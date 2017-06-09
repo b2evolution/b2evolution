@@ -2120,6 +2120,9 @@ class Item extends ItemLight
 		// Render all inline tags to HTML code:
 		$output = $this->render_inline_tags( $output, $params );
 
+		// Render Content block tags like [include:123], [include:item-slug] into item/post content:
+		$output = $this->render_content_blocks( $output, $params );
+
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
 				'Item' => $this,
@@ -2243,6 +2246,9 @@ class Item extends ItemLight
 
 		// Render all inline tags to HTML code:
 		$output = $this->render_inline_tags( $output, $params );
+
+		// Render Content block tags like [include:123], [include:item-slug] into item/post content:
+		$output = $this->render_content_blocks( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2760,6 +2766,117 @@ class Item extends ItemLight
 				}
 				$content = substr_replace( $content, $link_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
 			}
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Convert inline content block tags like [include:123], [include:item-slug] into item/post content
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_content_blocks( $content, $params = array() )
+	{
+		global $content_block_items;
+
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_content_blocks() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_content_blocks' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of content block posts:
+		preg_match_all( '/\[include:?([^\]]*)?\]/i', $content, $tags );
+
+		$ItemCache = & get_ItemCache();
+
+		foreach( $tags[0] as $t => $source_tag )
+		{
+			$item_ID_slug = trim( $tags[1][ $t ] );
+
+			if( ! ( $content_Item = & $ItemCache->get_by_ID( $item_ID_slug, false, false ) ) )
+			{	// Try to get item by slug if it is not found by ID:
+				$content_Item = & $ItemCache->get_by_urltitle( $item_ID_slug, false, false );
+			}
+
+			if( ! $content_Item || $content_Item->get_type_setting( 'usage' ) != 'content-block' )
+			{	// Item is not found by ID and slug or it is not a content block:
+				if( $content_Item )
+				{	// It is not a content block:
+					$wrong_item_info = '#'.$content_Item->ID.' '.$content_Item->get( 'title' );
+				}
+				else
+				{	// Item is not found:
+					$wrong_item_info = '<code>'.$item_ID_slug.'</code>';
+				}
+				// Replace inline content block tag with error message about wrong referenced item:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
+				continue;
+			}
+
+			if( ! isset( $content_block_items ) )
+			{	// Initialize global array to avoid recursion:
+				$content_block_items = array();
+			}
+
+			if( in_array( $content_Item->ID, $content_block_items ) )
+			{	// Replace inline content block tag with error message about recursion:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ).'</p>', $content );
+				continue;
+			}
+
+			// Store current item in global array to avoid recursion:
+			array_unshift( $content_block_items, $content_Item->ID );
+
+			// Start to collect item content in buffer:
+			ob_start();
+
+			if( ! empty( $params['image_size'] ) )
+			{	// Display images that are linked to this post:
+				$teaser_image_positions = 'teaser,teaserperm,teaserlink';
+				if( ! empty( $params['include_cover_images'] ) )
+				{	// Include the cover images on teaser place:
+					$teaser_image_positions = 'cover,'.$teaser_image_positions;
+				}
+				$content_Item->images( array_merge( $params, array(
+						'restrict_to_image_position' => $teaser_image_positions,
+					) ) );
+			}
+
+			// Display CONTENT (at least the TEASER part):
+			$content_Item->content_teaser( $params );
+
+			if( ! empty( $params['image_size'] ) && $content_Item->has_content_parts( $params ) /* only if not displayed all images already */ )
+			{	// Display images that are linked "after more" to this post:
+				$content_Item->images( array_merge( $params, array(
+						'restrict_to_image_position' => 'aftermore',
+					) ) );
+			}
+
+			// Display the "after more" part of the text: (part after "[teaserbreak]")
+			$content_Item->content_extension( $params );
+
+			// Links to post pages (for multipage posts):
+			$content_Item->page_links( $params );
+
+			// Display Item footer text (text can be edited in Blog Settings):
+			$content_Item->footer( $params );
+
+			// Get item content from buffer:
+			$current_tag_item_content = ob_get_clean();
+
+			// Replace inline content block tag with item content:
+			$content = str_replace( $source_tag, $current_tag_item_content, $content );
+
+			// Remove 
+			array_shift( $content_block_items );
 		}
 
 		return $content;

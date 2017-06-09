@@ -1043,7 +1043,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	{
 		// =======================================================================================================
 		case 'main':
-			$post_count = 12;
+			$post_count = 13;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1170,6 +1170,16 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
  				$Settings->dbupdate();
  			}
 			$item_IDs[] = array( $edited_Item->ID, $now );
+
+			// Insert a post:
+			$post_count--;
+			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+			$edited_Item = new Item();
+			$edited_Item->set_tags_from_string( 'demo' );
+			$edited_Item->insert( $owner_ID, T_('This is a Content Block'), T_('<p>This is a Post/Item of type "Content Block".</p>
+
+<p>A content block can be included in several places.</p>'),
+					$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Content Block' );
 			break;
 
 		// =======================================================================================================
@@ -1313,7 +1323,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 '<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
 
-'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[field:first_string_field]' ).'</p>'.
+'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>'.
 
 '<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );

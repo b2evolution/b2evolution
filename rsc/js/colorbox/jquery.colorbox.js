@@ -173,7 +173,7 @@
 		click = "click." + prefix,
 		start,
 		stop;
-		
+
 		if (settings.slideshow && $related[1]) {
 			start = function () {
 				$slideshow
@@ -606,8 +606,9 @@
 				}
 			}
 
-			$title.attr( 'title', settings.title );
-			$title.html(settings.title).add($loaded).show();
+			//$title.attr( 'title', settings.title );
+			//$title.html(settings.title).add($loaded).show();
+			$title.add($loaded).show();
 
 			if (total > 1) { // handle grouping
 				if (typeof settings.current === "string" && $loaded.width() > 380) {

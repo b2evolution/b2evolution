@@ -129,7 +129,7 @@ class IPRange extends DataObject
 						WHERE aipr_ID IN ( '.$DB->quote( $delete_ip_ranges_IDs ).' )' );
 					if( $delete_result )
 					{	// If IP ranges have been deleted successfully:
-						$Messages->add( sprintf( T_('Conflict IP ranges have been deleted: %s'), $ip_ranges_html ), 'success' );
+						$Messages->add( sprintf( T_('Conflicting IP Ranges have been deleted: %s'), $ip_ranges_html ), 'success' );
 					}
 				}
 				else
@@ -141,7 +141,7 @@ class IPRange extends DataObject
 						$ip_ranges_html .= '<li>- '.int2ip( $ip_range->aipr_IPv4start ).' - '.int2ip( $ip_range->aipr_IPv4end ).' - <a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$ip_range->aipr_ID.'">'.T_('Edit this range').'</a></li>';
 					}
 					$ip_ranges_html .= '</ul>';
-					$Messages->add( sprintf( T_('IP ranges already exist with params: %s'), $ip_ranges_html )
+					$Messages->add( sprintf( T_('Conflicting IP Ranges already exist: %s'), $ip_ranges_html )
 						.'<button class="btn btn-danger" type="button" id="delete_iprange_conflicts">'.T_('Delete all conflicts and save new Range').'</button>', 'error' );
 				}
 			}

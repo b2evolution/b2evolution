@@ -159,31 +159,31 @@ class bootstrap_photoblog_Skin extends Skin
 					'label'  => T_('Page Color Settings')
 				),
 					'background_color' => array(
-						'label' => T_('Page background color'),
+						'label' => T_('Background color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
 					'page_text_color' => array(
-						'label' => T_('Page text color'),
+						'label' => T_('Text color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
-						'label' => T_('Page link color'),
+						'label' => T_('Link color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'page_link_h_color' => array(
-						'label' => T_('Page link hover color'),
+						'label' => T_('Link hover color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
 					'well_color' => array(
-						'label' => T_('Post background color'),
+						'label' => T_('Background color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#f5f5f5',
 						'type' => 'color',

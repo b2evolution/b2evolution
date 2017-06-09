@@ -35,8 +35,8 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Newsletter recipients') );
 	if( !empty( $users_numbers ) )
 	{ // We know this data only one time after selecting users
-		$Form->info( T_('Number of accounts in filterset'), $users_numbers['all'] );
-		$Form->info( T_('Number of active accounts in filterset'), $users_numbers['active'] );
+		$Form->info( T_('Accounts in filterset'), $users_numbers['all'] );
+		$Form->info( T_('Active accounts in filterset'), $users_numbers['active'] );
 	}
 	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_users_count(), '('.T_('Accounts which accept newsletter emails').') - <a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'">'.T_('Change selection').' &gt;&gt;</a>' );
 	$Form->info( T_('Already received'), $edited_EmailCampaign->get_users_count( 'accept' ), '('.T_('Accounts which have already been sent this newsletter').')' );

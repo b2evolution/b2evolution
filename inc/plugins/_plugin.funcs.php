@@ -232,12 +232,12 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		if( $error_value )
 		{ // add error
-			param_error( 'edit_plugin_'.$Obj->ID.'_set_'.$parname, NULL, $error_value ); // only add the error to the field
+			param_error( $Obj->get_param_prefix().$parname, NULL, $error_value ); // only add the error to the field
 		}
 	}
 
 	// Display input element:
-	$input_name = 'edit_plugin_'.$Obj->ID.'_set_'.$parname;
+	$input_name = $Obj->get_param_prefix().$parname;
 	if( substr($parmeta['type'], 0, 6) == 'select' && ! empty($parmeta['multiple']) )
 	{ // a "multiple" select:
 		$input_name .= '[]';
@@ -320,11 +320,38 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'radio':
-			if( ! isset($parmeta['field_lines']) )
+			if( isset( $parmeta['field_lines'] ) )
 			{
-				$parmeta['field_lines'] = false;
+				$params['lines'] = $parmeta['field_lines'];
 			}
-			$Form->radio( $input_name, $set_value, $parmeta['options'], $set_label, $parmeta['field_lines'], $parmeta['note'] );
+			$options = array();
+			foreach( $parmeta['options'] as $l_key => $l_options )
+			{
+				$options[$l_key] = array(
+					'value' => $l_options[0],
+					'label' => $l_options[1]
+				);
+
+				if( isset( $l_options[2] ) )
+				{
+					$options[$l_key]['note'] = $l_options[2];
+				}
+				if( isset( $l_options[4] ) )
+				{	// Convert "inline attribs" to "params" array:
+					preg_match_all( '#(\w+)=[\'"](.*)[\'"]#', $l_options[4], $matches, PREG_SET_ORDER );
+
+					foreach( $matches as $l_set_nr => $l_match )
+					{
+						$options[$l_key][$l_match[1]] = $l_match[2];
+					}
+				}
+
+				if( isset( $l_options[3] ) )
+				{
+					$options[$l_key]['suffix'] = $l_options[3];
+				}
+			}
+			$Form->radio_input( $input_name, $set_value, $options, $set_label, $params );
 			break;
 
 		case 'array':
@@ -796,7 +823,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 	if( $set_value === NULL )
 	{ // Get the value from request:
-		$l_value = param( 'edit_plugin_'.$Obj->ID.'_set_'.$parname, $l_param_type, $l_param_default );
+		$l_value = param( $Obj->get_param_prefix().$parname, $l_param_type, $l_param_default );
 	}
 	else
 	{ // Force value
@@ -808,7 +835,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		handle_array_keys_in_plugin_settings($l_value);
 	}
 
-	if( ! autoform_validate_param_value('edit_plugin_'.$Obj->ID.'_set_'.$parname, $l_value, $parmeta) )
+	if( ! autoform_validate_param_value( $Obj->get_param_prefix().$parname, $l_value, $parmeta ) )
 	{
 		return;
 	}
@@ -852,7 +879,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				'action' => 'set' );
 			$error_value = $Obj->PluginUserSettingsValidateSet( $dummy );
 			// Update the param value, because a plugin might have changed it (through reference):
-			$GLOBALS['edit_plugin_'.$Obj->ID.'_set_'.$parname] = $l_value;
+			$GLOBALS[ $Obj->get_param_prefix().$parname ] = $l_value;
 
 			if( empty( $error_value ) )
 			{
@@ -873,7 +900,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				'action' => 'set' );
 			$error_value = $Obj->PluginSettingsValidateSet( $dummy );
 			// Update the param value, because a plugin might have changed it (through reference):
-			$GLOBALS['edit_plugin_'.$Obj->ID.'_set_'.$parname] = $l_value;
+			$GLOBALS[ $Obj->get_param_prefix().$parname ] = $l_value;
 
 			if( empty( $error_value ) )
 			{	// Set new value:
@@ -899,7 +926,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 	if( $error_value )
 	{ // A validation error has occured, record error message:
-		param_error( 'edit_plugin_'.$Obj->ID.'_set_'.$parname, $error_value );
+		param_error( $Obj->get_param_prefix().$parname, $error_value );
 	}
 }
 
