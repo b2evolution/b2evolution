@@ -108,7 +108,7 @@ function load_db_schema( $inlcude_plugins = false )
 		while( $loop_Plugin = & $admin_Plugins->get_next() )
 		{ // loop through all installed plugins
 			$create_table_queries = $loop_Plugin->GetDbLayout();
-			foreach( $create_table_queries as $create_table_query )
+			foreach( (array) $create_table_queries as $create_table_query )
 			{
 				if( ! preg_match( '|^\s*CREATE TABLE\s+(IF NOT EXISTS\s+)?([^\s(]+).*$|is', $create_table_query, $match) )
 				{ // Could not parse the CREATE TABLE command

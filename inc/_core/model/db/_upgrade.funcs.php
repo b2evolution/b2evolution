@@ -1721,7 +1721,7 @@ function convert_table_to_utf8_ascii( $table )
 	$col_definitions = array();
 	foreach( $text_columns as $text_column )
 	{ // Update each text column character set explicitly to utf8. Those columns which should not be updated were already removed from this array.
-		$col_definition = $text_column->Field.
+		$col_definition = '`'.$text_column->Field.'`'.
 			' '.$text_column->Type.' COLLATE utf8_general_ci'.
 			( ( $text_column->Null == 'NO' ) ? ' NOT' : '' ).' NULL'.
 			( isset( $text_column->Default ) ? ' DEFAULT "'.$text_column->Default.'"' : '' ).
