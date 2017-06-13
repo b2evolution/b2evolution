@@ -141,6 +141,7 @@ function create_default_data()
 						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', 'aolaim',       NULL ),
 						( 2, 'number', 'ICQ ID',        NULL, 'optional',    'allowed',   '4',  '0', 'icqid',        NULL ),
 						( 2, 'phone',  'Skype',         NULL, 'optional',    'allowed',   '5',  '0', 'skype',        'fa fa-skype' ),
+						( 2, 'phone',  'WhatsApp',      NULL, 'optional',    'allowed',   '6',  '0', 'whatsapp',     'fa fa-whatsapp' ),
 						( 3, 'phone',  'Main phone',    NULL, 'optional',    'forbidden', '1',  '0', 'mainphone',    'fa fa-phone' ),
 						( 3, 'phone',  'Cell phone',    NULL, 'optional',    'allowed',   '2',  '0', 'cellphone',    'fa fa-mobile-phone' ),
 						( 3, 'phone',  'Office phone',  NULL, 'optional',    'allowed',   '3',  '0', 'officephone',  'fa fa-phone' ),
@@ -160,6 +161,13 @@ function create_default_data()
 						( 4, 'url',    'Digg',          NULL, 'optional',    'forbidden', '11', '0', 'digg',         'fa fa-digg' ),
 						( 4, 'url',    'StumbleUpon',   NULL, 'optional',    'forbidden', '12', '0', 'stumbleupon',  'fa fa-stumbleupon' ),
 						( 4, 'url',    'Pinterest',     NULL, 'optional',    'forbidden', '13', '0', 'pinterest',    'fa fa-pinterest-p' ),
+						( 4, 'url',    'SoundCloud',    NULL, 'optional',    'forbidden', '14', '0', 'soundcloud',   'fa fa-soundcloud' ),
+						( 4, 'url',    'Yelp',          NULL, 'optional',    'forbidden', '15', '0', 'yelp',         'fa fa-yelp' ),
+						( 4, 'url',    'PayPal',        NULL, 'optional',    'forbidden', '16', '0', 'paypal',       'fa fa-paypal' ),
+						( 4, 'url',    '500px',         NULL, 'optional',    'forbidden', '17', '0', '500px',        'fa fa-500px' ),
+						( 4, 'url',    'Amazon',        NULL, 'optional',    'forbidden', '18', '0', 'amazon',       'fa fa-amazon' ),
+						( 4, 'url',    'Instagram',     NULL, 'optional',    'forbidden', '19', '0', 'instagram',    'fa fa-instagram' ),
+						( 4, 'url',    'Vimeo',         NULL, 'optional',    'forbidden', '20', '0', 'vimeo',        'fa fa-vimeo' ),
 						( 5, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
 						( 5, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' )" );
 	task_end();
