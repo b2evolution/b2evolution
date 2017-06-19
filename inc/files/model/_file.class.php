@@ -1912,7 +1912,15 @@ class File extends DataObject
 		$this->set_param( 'path_hash', 'string', md5( $this->_FileRoot->type.$this->_FileRoot->in_type_ID.$this->_rdfp_rel_path, true ) );
 		if( ! $this->is_dir() )
 		{ // create hash value only for files but not for folders
-			$this->set_param( 'hash', 'string', md5_file( $this->get_full_path(), true ) );
+			$file_full_path = $this->get_full_path();
+			if( file_exists( $file_full_path ) )
+			{
+				$this->set_param( 'hash', 'string', md5_file( $file_full_path, true ) );
+			}
+			else
+			{
+				debug_die( sprintf( 'File not found: %s', $file_full_path ) );
+			}
 		}
 
 		// Let parent do the insert:
