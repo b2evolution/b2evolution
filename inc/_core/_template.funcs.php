@@ -3344,7 +3344,7 @@ function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rs
 /**
  * Initialize JavaScript variables for fileuploader.js
  */
-function init_fileuploader_js_lang_strings()
+function init_fineuploader_js_lang_strings()
 {
 	// Initialize variables for the file "fileuploader.js":
 	add_js_headline( 'var evo_js_lang_file_sizes = [\''

@@ -1812,10 +1812,10 @@ if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action,
 	init_autocomplete_usernames_js();
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
-	// Require File Uploader js and css:
-	init_fileuploader_js_lang_strings();
-	require_js( 'multiupload/fileuploader.js' );
-	require_css( 'fileuploader.css' );
+	// Require Fine Uploader js and css:
+	init_fineuploader_js_lang_strings();
+	require_js( 'multiupload/fine-uploader.js' );
+	require_css( 'fine-uploader.css' );
 	// Load JS files to make the links table sortable:
 	require_js( '#jquery#' );
 	require_js( 'jquery/jquery.sortable.min.js' );
