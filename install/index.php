@@ -864,14 +864,22 @@ switch( $action )
 				<label>
 					<input type="checkbox" name="create_sample_organization" id="create_sample_organization" value="1" checked="checked" />
 					<?php echo T_('Create a sample organization');?>
-					</label>
+				</label>
 			</div>
 
 			<div class="checkbox" style="margin-top: 15px">
 				<label>
 					<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" />
 					<?php echo T_('Create demo users (in addition to the admin account)');?>
-					</label>
+				</label>
+				<div id="create_demo_users_options" style="margin:10px 0 0 20px">
+					<div class="checkbox" style="margin-left: 1em">
+						<label>
+							<input type="checkbox" name="create_sample_private_messages" id="create_sameple_private_messages" value="1" checked="checked" />
+							<?php echo T_('Create sample private messages between users');?>
+						</label>
+					</div>
+				</div>
 			</div>
 
 			<?php
@@ -920,6 +928,11 @@ switch( $action )
 			jQuery( '#create_sample_contents' ).click( function()
 			{
 				jQuery( '#create_sample_contents_options' ).toggle();
+			} );
+
+			jQuery( '#create_demo_users' ).click( function()
+			{
+				jQuery( '#create_demo_users_options' ).toggle();
 			} );
 		</script>
 		<?php
@@ -972,11 +985,13 @@ switch( $action )
 		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
 		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
 		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
+		$create_demo_messages = param( 'create_sample_private_messages', 'boolean', false, true );
 
 		if( $create_sample_contents == 'all' )
 		{ // Override create sample organization and demo user setting
 			$create_sample_organization = true;
 			$create_demo_users = true;
+			$create_demo_messages = true;
 		}
 
 		if( $allow_install_test_features )

@@ -155,7 +155,7 @@ function display_base_config_recap()
 function install_newdb()
 {
 	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password;
-	global $create_sample_contents, $create_sample_organization, $create_demo_users;
+	global $create_sample_contents, $create_sample_organization, $create_demo_users, $create_demo_messages;
 
 	/*
 	 * -----------------------------------------------------------------------------------
@@ -230,6 +230,11 @@ function install_newdb()
 			$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
 			create_demo_users();
+
+			if( $create_demo_messages )
+			{
+				create_demo_messages();
+			}
 		}
 	}
 
