@@ -323,7 +323,7 @@ class shortlinks_plugin extends Plugin
 					( \s _[a-z0-9_\-]+ )?    # Link target started with _ (Optional)
 					( \s .+? )?              # Custom link text instead of post/chapter title (Optional)
 					( \]\] | \)\) )          # Lookahead for )) or ]]
-					*sx'; // s = dot matches newlines, x = extended (spaces + comments allowed)
+					*isx'; // s = dot matches newlines, x = extended (spaces + comments allowed)
 
 				$content = replace_content_outcode( $search_wikiword, array( $this, 'callback_replace_bracketed_words' ), $content, 'replace_content', 'preg_callback' );
 			}
@@ -917,8 +917,8 @@ class shortlinks_plugin extends Plugin
 					+ '</div>'
 					+ '<div id="shortlinks_posts_block"></div>'
 					+ '<div id="shortlinks_post_block"></div>'
+					+ '<input type="hidden" id="shortlinks_hidden_prefix" value="' + ( prefix ? prefix : '' ) + '" />'
 					+ '<div id="shortlinks_post_form" style="display:none">'
-						+ '<input type="hidden" id="shortlinks_hidden_prefix" value="' + ( prefix ? prefix : '' ) + '" />'
 						+ '<input type="hidden" id="shortlinks_hidden_ID" />'
 						+ '<input type="hidden" id="shortlinks_hidden_cover_link" />'
 						+ '<input type="hidden" id="shortlinks_hidden_teaser_link" />'
@@ -931,6 +931,23 @@ class shortlinks_plugin extends Plugin
 						+ '<p><label><input type="checkbox" id="shortlinks_form_excerpt" checked="checked" /> <?php echo TS_('Insert excerpt'); ?></label><p>'
 						+ '<p><label><input type="checkbox" id="shortlinks_form_teaser" /> <?php echo TS_('Insert teaser'); ?></label><p>'
 						+ '<p><label><input type="checkbox" id="shortlinks_form_more" checked="checked" /> <?php echo TS_('Insert "Read more" link'); ?></label><p>'
+					+ '</div>'
+					+ '<div id="shortlinks_post_options" class="form-horizontal" style="display:none">'
+						+ '<div class="form-group"><label class="control-label col-sm-2"><?php echo TS_('Slug'); ?>:</label><div class="controls col-sm-10"><input type="text" id="shortlinks_opt_slug" class="form-control" style="width:100%" /></div></div>'
+						+ '<div class="form-group"><label class="control-label col-sm-2"><?php echo TS_('Mode'); ?>:</label><div class="controls col-sm-10">'
+							+ '<div class="radio"><label><input type="radio" name="shortlinks_opt_mode" id="shortlinks_opt_mode_title" checked="checked"><code>[[...]]</code> <?php echo TS_('Use title of destination post as link text'); ?></label></div>'
+							+ '<div class="radio"><label><input type="radio" name="shortlinks_opt_mode" id="shortlinks_opt_mode_slug"><code>((...))</code> <?php echo TS_('Use slug words as link text'); ?></label></div>'
+						+ '</div></div>'
+						+ '<div class="form-group"><label class="control-label col-sm-2"><?php echo TS_('Classes'); ?>:</label><div class="controls col-sm-10"><input type="text" id="shortlinks_opt_classes" class="form-control" style="width:100%" /></div></div>'
+						+ '<div class="form-group"><label class="control-label col-sm-2"><?php echo TS_('Target'); ?>:</label><div class="controls col-sm-10">'
+							+ '<select id="shortlinks_opt_target" class="form-control">'
+								+ '<option value=""><?php echo TS_('None'); ?></option>'
+								+ '<option value="_blank"><?php echo TS_('Blank'); ?></option>'
+								+ '<option value="_parent"><?php echo TS_('Parent'); ?></option>'
+								+ '<option value="_top"><?php echo TS_('Top'); ?></option>'
+							+ '</select>'
+						+ '</div></div>'
+						+ '<div class="form-group"><label class="control-label col-sm-2"><?php echo TS_('Text'); ?>:</label><div class="controls col-sm-10"><input type="text" id="shortlinks_opt_text" class="form-control" style="width:100%" /></div></div>'
 					+ '</div>';
 
 				shortlinks_end_loading( '#shortlinks_wrapper', r );
@@ -1139,10 +1156,12 @@ class shortlinks_plugin extends Plugin
 					var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
 						jQuery( '.shortlinks_post_buttons' ) :
 						jQuery( '#shortlinks_post_content' );
-					jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).remove();
+					jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).remove();
 					buttons_side_obj.after( '<button id="shortlinks_btn_back_to_list" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
 						+ '<button id="shortlinks_btn_insert" class="btn btn-primary"><?php echo sprintf( /* TRANS: %s is a shortlink preview like [[url-slug]] */ TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>'
-						+ '<button id="shortlinks_btn_form" class="btn btn-info"><?php echo TS_('Insert Complex Link'); ?></button>' );
+						+ '<button id="shortlinks_btn_options" class="btn btn-default"><?php echo TS_('Insert with options').'...'; ?></button>'
+						+ '<button id="shortlinks_btn_form" class="btn btn-info"><?php echo TS_('Insert Snippet + Link').'...'; ?></button>' );
+					jQuery( '#shortlinks_opt_slug' ).val( post.urltitle );
 				} );
 			}
 
@@ -1153,20 +1172,61 @@ class shortlinks_plugin extends Plugin
 		// Insert a post link to textarea:
 		jQuery( document ).on( 'click', '#shortlinks_btn_insert', function()
 		{
-			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
-			{	// tinyMCE plugin is active now, we should focus cursor to the edit area:
-				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
+			shortlinks_insert_link_text( '[[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ']]' );
+		} );
+
+		// Insert a post link with options to textarea:
+		jQuery( document ).on( 'click', '#shortlinks_btn_insert_with_options', function()
+		{
+			// Select what brakets to use:
+			if( jQuery( '#shortlinks_opt_mode_title' ).is( ':checked' ) )
+			{
+				var brakets_start = '[[';
+				var brakets_end = ']]';
 			}
-			// Insert tag text in area:
-			textarea_wrap_selection( window[ jQuery( '#shortlinks_hidden_prefix' ).val() + 'b2evoCanvas' ], '[[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ']]', '', 0 );
-			// Close main modal window:
-			closeModalWindow();
+			else
+			{
+				var brakets_start = '((';
+				var brakets_end = '))';
+			}
+
+			var link_text = brakets_start;
+
+			// Slug:
+			link_text += jQuery( '#shortlinks_opt_slug' ).val();
+
+			// Classes:
+			var classes = jQuery( '#shortlinks_opt_classes' ).val().trim();
+			classes = classes.replace( /^\./g, '' ).replace( /\s+/g, '.' ).replace( /\.+/g, '.' );
+			if( classes != '' )
+			{
+				link_text += ' .' + classes;
+			}
+
+			// Link target:
+			var target = jQuery( '#shortlinks_opt_target option:selected' ).val().trim();
+			if( target != '' )
+			{
+				link_text += ' ' + target;
+			}
+
+			// Custom text:
+			var custom_text = jQuery( '#shortlinks_opt_text' ).val().trim();
+			if( custom_text != '' )
+			{
+				link_text += ' ' + custom_text;
+			}
+
+			link_text += brakets_end;
+
+			shortlinks_insert_link_text( link_text );
 		} );
 
 		// Display a form to insert complex link:
 		jQuery( document ).on( 'click', '#shortlinks_btn_form', function()
 		{
-			var coll_urlname = jQuery( this ).data( 'urlname' );
+			// Set proper title for modal window:
+			jQuery( '#modal_window .modal-title' ).html( '<?php echo TS_('Insert Snippet + Link'); ?>' );
 
 			// Hide the post preview block:
 			jQuery( '#shortlinks_post_block, #shortlinks_btn_insert' ).hide();
@@ -1178,9 +1238,9 @@ class shortlinks_plugin extends Plugin
 			var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
 				jQuery( '.shortlinks_post_buttons' ) :
 				jQuery( '#shortlinks_post_content' );
-			jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).hide();
+			jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).hide();
 			buttons_side_obj.after( '<button id="shortlinks_btn_back_to_post" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
-				+ '<button id="shortlinks_btn_insert_complex" class="btn btn-primary"><?php echo TS_('Insert Complex Link'); ?></button>' );
+				+ '<button id="shortlinks_btn_insert_complex" class="btn btn-primary"><?php echo TS_('Insert Snippet + Link'); ?></button>' );
 
 			// To prevent link default event:
 			return false;
@@ -1296,6 +1356,48 @@ class shortlinks_plugin extends Plugin
 			return false;
 		} );
 
+		// Display a form to insert a link with options:
+		jQuery( document ).on( 'click', '#shortlinks_btn_options', function()
+		{
+			// Set proper title for modal window:
+			jQuery( '#modal_window .modal-title' ).html( '<?php echo TS_('Insert with options'); ?>...' );
+
+			// Hide the post preview block:
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_insert' ).hide();
+
+			// Show the form to select options before insert a link:
+			jQuery( '#shortlinks_post_options' ).show();
+
+			// Display the buttons to back and insert a complex link to textarea:
+			var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
+				jQuery( '.shortlinks_post_buttons' ) :
+				jQuery( '#shortlinks_post_content' );
+			jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).hide();
+			buttons_side_obj.after( '<button id="shortlinks_btn_back_to_post" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
+				+ '<button id="shortlinks_btn_insert_with_options" class="btn btn-primary"><?php echo TS_('Insert Link'); ?></button>' );
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		/*
+		 * Insert simple link data to content
+		 *
+		 * @param string Text
+		 */
+		function shortlinks_insert_link_text( text )
+		{
+			
+			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
+			{	// tinyMCE plugin is active now, we should focus cursor to the edit area:
+				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
+			}
+			// Insert tag text in area:
+			textarea_wrap_selection( window[ jQuery( '#shortlinks_hidden_prefix' ).val() + 'b2evoCanvas' ], text, '', 0 );
+			// Close main modal window:
+			closeModalWindow();
+		}
+
 		/*
 		 * Insert complex link data to content
 		 *
@@ -1353,7 +1455,7 @@ class shortlinks_plugin extends Plugin
 			jQuery( '#shortlinks_colls_list, #shortlinks_posts_block' ).show();
 
 			// Hide the post preview block and action buttons:
-			jQuery( '#shortlinks_post_block, #shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).hide();
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).hide();
 
 			// To prevent link default event:
 			return false;
@@ -1362,11 +1464,14 @@ class shortlinks_plugin extends Plugin
 		// Back to previous post preview:
 		jQuery( document ).on( 'click', '#shortlinks_btn_back_to_post', function()
 		{
+			// Set proper title for modal window:
+			jQuery( '#modal_window .modal-title' ).html( '<?php echo TS_('Link to a Post'); ?>' );
+
 			// Show the post preview block and action buttons:
-			jQuery( '#shortlinks_post_block, #shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).show();
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).show();
 
 			// Hide the post complex form and action buttons:
-			jQuery( '#shortlinks_btn_back_to_post, #shortlinks_btn_insert_complex, #shortlinks_post_form' ).hide();
+			jQuery( '#shortlinks_btn_back_to_post, #shortlinks_btn_insert_complex, #shortlinks_btn_insert_with_options, #shortlinks_post_form, #shortlinks_post_options' ).hide();
 
 			// To prevent link default event:
 			return false;
