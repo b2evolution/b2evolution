@@ -141,6 +141,7 @@ function create_default_data()
 						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', 'aolaim',       NULL ),
 						( 2, 'number', 'ICQ ID',        NULL, 'optional',    'allowed',   '4',  '0', 'icqid',        NULL ),
 						( 2, 'phone',  'Skype',         NULL, 'optional',    'allowed',   '5',  '0', 'skype',        'fa fa-skype' ),
+						( 2, 'phone',  'WhatsApp',      NULL, 'optional',    'allowed',   '6',  '0', 'whatsapp',     'fa fa-whatsapp' ),
 						( 3, 'phone',  'Main phone',    NULL, 'optional',    'forbidden', '1',  '0', 'mainphone',    'fa fa-phone' ),
 						( 3, 'phone',  'Cell phone',    NULL, 'optional',    'allowed',   '2',  '0', 'cellphone',    'fa fa-mobile-phone' ),
 						( 3, 'phone',  'Office phone',  NULL, 'optional',    'allowed',   '3',  '0', 'officephone',  'fa fa-phone' ),
@@ -160,6 +161,13 @@ function create_default_data()
 						( 4, 'url',    'Digg',          NULL, 'optional',    'forbidden', '11', '0', 'digg',         'fa fa-digg' ),
 						( 4, 'url',    'StumbleUpon',   NULL, 'optional',    'forbidden', '12', '0', 'stumbleupon',  'fa fa-stumbleupon' ),
 						( 4, 'url',    'Pinterest',     NULL, 'optional',    'forbidden', '13', '0', 'pinterest',    'fa fa-pinterest-p' ),
+						( 4, 'url',    'SoundCloud',    NULL, 'optional',    'forbidden', '14', '0', 'soundcloud',   'fa fa-soundcloud' ),
+						( 4, 'url',    'Yelp',          NULL, 'optional',    'forbidden', '15', '0', 'yelp',         'fa fa-yelp' ),
+						( 4, 'url',    'PayPal',        NULL, 'optional',    'forbidden', '16', '0', 'paypal',       'fa fa-paypal' ),
+						( 4, 'url',    '500px',         NULL, 'optional',    'forbidden', '17', '0', '500px',        'fa fa-500px' ),
+						( 4, 'url',    'Amazon',        NULL, 'optional',    'forbidden', '18', '0', 'amazon',       'fa fa-amazon' ),
+						( 4, 'url',    'Instagram',     NULL, 'optional',    'forbidden', '19', '0', 'instagram',    'fa fa-instagram' ),
+						( 4, 'url',    'Vimeo',         NULL, 'optional',    'forbidden', '20', '0', 'vimeo',        'fa fa-vimeo' ),
 						( 5, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
 						( 5, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' )" );
 	task_end();
@@ -501,6 +509,7 @@ function create_default_data()
 	return true;
 }
 
+
 /**
  * Create default currencies
  *
@@ -679,6 +688,7 @@ function create_default_currencies( $table_name = 'T_regional__currency' )
 			" );
 	task_end();
 }
+
 
 /**
  * Create default countries with relations to currencies
@@ -952,6 +962,7 @@ function create_default_countries( $table_name = 'T_regional__country', $set_pre
 	task_end();
 }
 
+
 /**
  * Create default regions
  *
@@ -1048,6 +1059,7 @@ function create_default_regions()
 
 	task_end();
 }
+
 
 /**
  * Create default sub-regions
@@ -1171,6 +1183,7 @@ function create_default_subregions()
 
 	task_end();
 }
+
 
 /**
  * Create default scheduled jobs that don't exist yet:
@@ -1346,6 +1359,127 @@ function create_demo_users()
 	task_end();
 }
 
+
+/**
+ * Creates sample private messages between admin and existing users
+ *
+ */
+function create_demo_messages()
+{
+	task_begin('Creating sample private messages... ');
+	global $UserSettings, $DB, $now, $localtimenow;
+
+	load_class( 'messaging/model/_thread.class.php', 'Thread' );
+	load_class( 'messaging/model/_message.class.php', 'Message' );
+	load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+	$UserSettings = new UserSettings();
+
+	$users_SQL = new SQL();
+	$users_SQL->SELECT( 'user_ID, user_login' );
+	$users_SQL->FROM( 'T_users' );
+	$users_SQL->WHERE( 'NOT user_ID  = 1' );
+	$users_SQL->ORDER_BY( 'user_ID' );
+	$users = $DB->get_results( $users_SQL->get() );
+
+	for( $i = 0; $i < count( $users ); $i++ )
+	{
+		if( $i % 2 == 0 )
+		{
+			$author_ID = 1;
+			$recipient_ID = $users[$i]->user_ID;
+		}
+		else
+		{
+			$author_ID = $users[$i]->user_ID;
+			$recipient_ID = 1;
+		}
+
+		$loop_Thread = new Thread();
+		$loop_Message = new Message();
+
+		// Initial message
+		$loop_Message->Thread = $loop_Thread;
+		$loop_Message->Thread->set_param( 'datemodified', 'string', date( 'Y-m-d H:i:s', $localtimenow - 60 ) );
+		$loop_Message->Thread->set( 'title', sprintf( T_('Demo private conversation #%s'), $i + 1 ) );
+		$loop_Message->Thread->recipients_list = array( $recipient_ID );
+		$loop_Message->set( 'author_user_ID', $author_ID );
+		$loop_Message->creator_user_ID = $author_ID;
+		$loop_Message->set( 'text', T_('This is a private message.') );
+
+		$DB->begin();
+		$conversation_saved = false;
+		if( $loop_Message->Thread->dbinsert() )
+		{
+			$loop_Message->set_param( 'thread_ID', 'integer', $loop_Message->Thread->ID );
+			if( $loop_Message->dbinsert() )
+			{
+				if( $loop_Message->dbinsert_threadstatus( $loop_Message->Thread->recipients_list ) )
+				{
+					if( $loop_Message->dbinsert_contacts( $loop_Message->Thread->recipients_list ) )
+					{
+						if( $loop_Message->dbupdate_last_contact_datetime() )
+						{
+							$conversation_saved = true;
+						}
+					}
+				}
+			}
+		}
+
+		if( $conversation_saved )
+		{
+			$conversation_saved = false;
+
+			// Reply message
+			$loop_reply_Message = new Message();
+			$loop_reply_Message->Thread = $loop_Thread;
+			$loop_reply_Message->set( 'author_user_ID', $recipient_ID );
+			$loop_reply_Message->creator_user_ID = $author_ID;
+			$loop_reply_Message->set( 'text', T_('This is a private reply.') );
+			$loop_reply_Message->set_param( 'thread_ID', 'integer', $loop_reply_Message->Thread->ID );
+
+			if( $loop_reply_Message->dbinsert() )
+			{
+				// Mark reply message as unread by initiator
+				$sql = 'UPDATE T_messaging__threadstatus
+						SET tsta_first_unread_msg_ID = '.$loop_reply_Message->ID.'
+						WHERE tsta_thread_ID = '.$loop_reply_Message->Thread->ID.'
+							AND tsta_user_ID = '.$author_ID.'
+							AND tsta_first_unread_msg_ID IS NULL';
+				$DB->query( $sql, 'Insert thread statuses' );
+
+				// Mark all messages as read by recipient
+				$sql = 'UPDATE T_messaging__threadstatus
+						SET tsta_first_unread_msg_ID = NULL
+						WHERE tsta_thread_ID = '.$loop_reply_Message->Thread->ID.'
+							AND tsta_user_ID = '.$recipient_ID;
+				$DB->query( $sql, 'Insert thread statuses' );
+
+				// check if contact pairs between sender and recipients exists
+				$recipient_list = $loop_reply_Message->Thread->load_recipients();
+				// remove author user from recipient list
+				$recipient_list = array_diff( $recipient_list, array( $loop_reply_Message->author_user_ID ) );
+				// insert missing contact pairs if required
+				if( $loop_reply_Message->dbinsert_contacts( $recipient_list ) )
+				{
+					if( $loop_reply_Message->dbupdate_last_contact_datetime() )
+					{
+						$DB->commit();
+						$conversation_saved = true;
+					}
+				}
+			}
+		}
+
+		if( ! $conversation_saved )
+		{
+			$DB->rollback();
+		}
+	}
+	task_end();
+}
+
+
 /**
  * This is called only for fresh installs and fills the tables with
  * demo/tutorial things.
@@ -1394,6 +1528,7 @@ function create_demo_contents()
 	{
 		$kate_user_ID = $admin_user->ID;
 	}
+
 
 	/**
 	 * @var FileRootCache

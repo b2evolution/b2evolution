@@ -649,7 +649,7 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 		if( $maxwords < 1 )
 		{	// We have reached the cutting point:
 			break;
-		} 
+		}
 	}
 
 	if( $maxwords < 1 )
@@ -7470,13 +7470,8 @@ jQuery( document ).ready( function()
 		name       : '<?php echo $params['new_field_name']; ?>',
 		tooltip    : '<?php echo $params['tooltip']; ?>',
 		event      : 'click',
+		width      : '<?php echo $params['field_type'] == 'select' ? 'input' : 'auto'; ?>',
 		onblur     : '<?php echo $onblur_action; ?>',
-		onedit     : function ( settings, original )
-		{
-			// Set width to fix value to don't change it on selector displaying:
-			var wrapper_width = jQuery( original ).width();
-			jQuery( original ).css( { 'width': wrapper_width, 'max-width': wrapper_width } );
-		},
 		callback   : function ( settings, original )
 		{
 			<?php
@@ -8223,7 +8218,7 @@ function render_inline_files( $content, $Object, $params = array() )
 			{
 				$content = str_replace( $current_link_tag, $rendered_link_tag, $content );
 			}
-		}	
+		}
 	}
 
 	return $content;

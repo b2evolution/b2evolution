@@ -307,7 +307,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 
 	if( empty( $redirect_to ) )
 	{ // Redirect back to current URL
-		$redirect_to = rawurlencode( url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( true ) ) );
+		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( true ) );
 	}
 
 	if( use_in_skin_login() )
