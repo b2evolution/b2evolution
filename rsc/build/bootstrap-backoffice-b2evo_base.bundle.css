@@ -2575,9 +2575,6 @@ div.message_toolbars {
 .evo_private_messages_list .messages_list_actions a {
   display: inline-block;
 }
-.evo_private_messages_list .messages_list_actions a:last-child {
-  margin-bottom: 0;
-}
 .evo_private_messages_list span.error {
   border: 1px solid #BBB;
   border-bottom: none;
