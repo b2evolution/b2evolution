@@ -548,6 +548,13 @@ class messaging_Module extends Module
 						}
 						break;
 
+					case 'hide':
+						// Current user wants to hide the thread:
+						hide_thread( $edited_Thread->ID, $current_User->ID );
+
+						$Messages->add( sprintf( T_( 'You have successfuly hide the &laquo;%s&raquo; conversation!' ), $edited_Thread->get( 'title' ) ), 'success' );
+						break;
+
 					case 'leave': // user wants to leave the thread
 						leave_thread( $edited_Thread->ID, $current_User->ID, false );
 

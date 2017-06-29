@@ -66,6 +66,7 @@ $schema_queries['T_messaging__threadstatus'] = array(
 			tsta_user_ID int(10) unsigned NOT NULL,
 			tsta_first_unread_msg_ID int(10) unsigned NULL,
 			tsta_thread_leave_msg_ID int(10) unsigned NULL DEFAULT NULL,
+			tsta_thread_hidden TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
 			INDEX(tsta_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 

@@ -466,13 +466,21 @@ class Message extends DataObject
 
 			if( parent::dbinsert() )
 			{
+				// Update read statuses for thread:
 				$sql = 'UPDATE T_messaging__threadstatus
 						SET tsta_first_unread_msg_ID = '.$this->ID.'
 						WHERE tsta_thread_ID = '.$this->Thread->ID.'
 							AND tsta_user_ID <> '.$this->author_user_ID.'
 							AND tsta_first_unread_msg_ID IS NULL';
+				$DB->query( $sql, 'Update read statuses for thread #'.$this->Thread->ID.' on adding new message #'.$this->ID );
 
-				$DB->query( $sql, 'Insert thread statuses' );
+				// Unhide thread for all not left users:
+				$sql = 'UPDATE T_messaging__threadstatus
+					  SET tsta_thread_hidden = 0
+					WHERE tsta_thread_ID = '.$this->Thread->ID.'
+					  AND tsta_thread_hidden = 1
+					  AND tsta_thread_leave_msg_ID IS NULL';
+				$DB->query( $sql, 'Unhide thread #'.$this->Thread->ID.' for all not left users because of new message #'.$this->ID );
 
 				// check if contact pairs between sender and recipients exists
 				$recipient_list = $this->Thread->load_recipients();

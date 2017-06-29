@@ -251,6 +251,34 @@ function create_new_message( $thrd_ID )
 
 
 /**
+ * Hide a thread for user
+ *
+ * @param integer Thread ID
+ * @param integer User ID
+ * @return mixed number 1 on success, false otherwise
+ */
+function hide_thread( $thread_ID, $user_ID )
+{
+	global $DB;
+
+	$ThreadCache = & get_ThreadCache();
+	$edited_Thread = & $ThreadCache->get_by_ID( $thread_ID );
+
+	if( ! $edited_Thread->check_thread_recipient( $user_ID ) )
+	{	// Stop if user is not between the thread recipients:
+		debug_die( 'Invalid request, current User is not recipient of the selected thread!' );
+	}
+
+	$sql_query = 'UPDATE T_messaging__threadstatus
+		  SET tsta_thread_hidden = 1
+		WHERE tsta_thread_ID = '.$DB->quote( $thread_ID ).'
+		  AND tsta_user_ID = '.$DB->quote( $user_ID );
+
+	return $DB->query( $sql_query, 'Hide thread #'.$thread_ID.' for user #'.$user_ID );
+}
+
+
+/**
  * User leave a thread
  *
  * @param integer thread ID
@@ -643,6 +671,7 @@ function get_threads_results( $params = array() )
 			'search_word' => '',               // Filter by this keyword
 			'search_user' => '',               // Filter by this user name
 			'show_closed_threads' => NULL,     // Show closed conversations
+			'show_hidden_threads' => false,    // Show hidden conversations
 			'only_sql' => false,               // TRUE - to return only SQL object, FALSE - Results object
 		), $params );
 
@@ -699,7 +728,7 @@ function get_threads_results( $params = array() )
 
 	// Create SELECT SQL query
 	$select_SQL = new SQL();
-	$select_SQL->SELECT( 'thrd_ID, thrd_title, thrd_datemodified, '.$thrd_msg_ID.' AS thrd_msg_ID, tsta_thread_leave_msg_ID, msg_datetime AS thrd_unread_since' );
+	$select_SQL->SELECT( 'thrd_ID, thrd_title, thrd_datemodified, '.$thrd_msg_ID.' AS thrd_msg_ID, tsta_thread_leave_msg_ID, tsta_thread_hidden, msg_datetime AS thrd_unread_since' );
 	$select_SQL->FROM( 'T_messaging__threadstatus' );
 	$select_SQL->FROM_add( 'INNER JOIN T_messaging__thread ON tsta_thread_ID = thrd_ID' );
 	$select_SQL->FROM_add( 'LEFT OUTER JOIN T_messaging__message ON tsta_first_unread_msg_ID = msg_ID' );
@@ -721,6 +750,10 @@ function get_threads_results( $params = array() )
 		if( ! $params['show_closed_threads'] )
 		{ // Don't show the closed conversations
 			$select_SQL->WHERE_and( '( tsta_thread_leave_msg_ID IS NULL )' );
+		}
+		if( ! $params['show_hidden_threads'] )
+		{	// Don't show the hidden conversations:
+			$select_SQL->WHERE_and( 'tsta_thread_hidden = 0' );
 		}
 	}
 	if( !empty( $filter_sql ) )
@@ -2052,7 +2085,7 @@ function threads_results( & $threads_Results, $params = array() )
 				'th' => T_('Subject'),
 				'th_class' => 'thread_subject',
 				'td_class' => 'thread_subject',
-				'td' => '%col_thread_subject_link( #thrd_ID#, #thrd_title#, #thrd_msg_ID#, #tsta_thread_leave_msg_ID#, '.(int)$params['abuse_management'].' )%',
+				'td' => '%col_thread_subject_link( #thrd_ID#, #thrd_title#, #thrd_msg_ID#, #tsta_thread_leave_msg_ID#, #tsta_thread_hidden#, '.(int)$params['abuse_management'].' )%',
 			);
 	}
 
@@ -2137,14 +2170,15 @@ function col_thread_recipients( $thread_ID, $abuse_management )
 /**
  * Get subject as link with icon (read or unread)
  *
- * @param thread ID
- * @param thread title
- * @param message ID (If ID > 0 - message is still unread)
- * @param message ID
+ * @param integer Thread ID
+ * @param string Thread title
+ * @param integer Message ID (If ID > 0 - message is still unread)
+ * @param integer Message ID when user left the thread
+ * @param boolean Is thread hidden for current user
  * @param boolean TRUE for abuse management mode
  * @return string link with subject
  */
-function col_thread_subject_link( $thrd_ID, $thrd_title, $thrd_msg_ID, $thrd_leave_msg_ID, $abuse_management )
+function col_thread_subject_link( $thrd_ID, $thrd_title, $thrd_msg_ID, $thrd_leave_msg_ID, $thrd_hidden, $abuse_management )
 {
 	$messages_url = get_dispctrl_url( 'messages' );
 	if( $thrd_title == '' )
@@ -2157,19 +2191,23 @@ function col_thread_subject_link( $thrd_ID, $thrd_title, $thrd_msg_ID, $thrd_lea
 	{	// Don't show the read status for abuse management
 		if( !empty( $thrd_leave_msg_ID ) )
 		{ // Conversation is left
-			$read_icon = get_icon( 'bullet_black', 'imgtag', array( 'style' => 'margin:0 2px', 'alt' => T_( "Conversation left" ) ) );
+			$read_icon = get_icon( 'bullet_black', 'imgtag', array( 'style' => 'margin:0 2px', 'alt' => T_('Conversation left') ) );
 			if( $thrd_msg_ID > 0 && $thrd_msg_ID <= $thrd_leave_msg_ID )
 			{ // also show unread messages icon, because user has not seen all messages yet
-				$read_icon .= get_icon( 'bullet_red', 'imgtag', array( 'style' => 'margin:0 2px', 'alt' => T_( "You have unread messages" ) ) );
+				$read_icon .= get_icon( 'bullet_red', 'imgtag', array( 'style' => 'margin:0 2px', 'alt' => T_('You have unread messages') ) );
 			}
+		}
+		elseif( $thrd_hidden )
+		{	// Conversation is hidden
+			$read_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'style' => 'margin:0 2px', 'alt' => T_('Conversation hidden') ) );
 		}
 		elseif( $thrd_msg_ID > 0 )
 		{ // Message is unread OR Show all messages in Abuse Management as unread
-			$read_icon = get_icon( 'bullet_red', 'imgtag', array( 'style' => 'margin:0 2px', 'alt' => T_( "You have unread messages" ) ) );
+			$read_icon = get_icon( 'bullet_red', 'imgtag', array( 'style' => 'margin:0 2px', 'alt' => T_('You have unread messages') ) );
 		}
 		else
 		{ // Message is read
-			$read_icon = get_icon( 'allowback', 'imgtag', array( 'alt' => "You have read all messages" ) );
+			$read_icon = get_icon( 'allowback', 'imgtag', array( 'alt' => T_('You have read all messages') ) );
 		}
 	}
 
@@ -2179,7 +2217,7 @@ function col_thread_subject_link( $thrd_ID, $thrd_title, $thrd_msg_ID, $thrd_lea
 		$tab = '&amp;tab=abuse';
 	}
 
-	$link = $read_icon.'<a href="'.$messages_url.'&amp;thrd_ID='.$thrd_ID.$tab.'" title="'.T_('Show messages...').'">';
+	$link = $read_icon.'<a href="'.$messages_url.'&amp;thrd_ID='.$thrd_ID.$tab.'" title="'.format_to_output( T_('Show messages...'), 'htmlattr' ).'">';
 	$link .= '<strong>'.$thrd_title.'</strong>';
 	$link .= '</a>';
 

@@ -152,6 +152,13 @@ switch( $action )
 		}
 		break;
 
+	case 'hide':
+		// Hide thread for current user:
+		hide_thread( $edited_Thread->ID, $current_User->ID );
+
+		$Messages->add( sprintf( T_( 'You have successfuly hide the &laquo;%s&raquo; conversation!' ), $edited_Thread->get( 'title' ) ), 'success' );
+		break;
+
 	case 'leave': // Leave thread:
 		leave_thread( $edited_Thread->ID, $current_User->ID, false );
 

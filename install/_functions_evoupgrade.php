@@ -8472,6 +8472,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12310, 'Upgrading message thread statuses table...' ) )
+	{	// part of 6.9.2-beta
+		db_add_col( 'T_messaging__threadstatus', 'tsta_thread_hidden', 'TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER tsta_thread_leave_msg_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

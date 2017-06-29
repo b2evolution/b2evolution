@@ -371,21 +371,24 @@ if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) 
 		$recipient_login = $available_recipients[$recipient_ID];
 		$leave_text = get_icon( 'stop', 'imgtag', array( 'style' => 'margin-right:5px' ) ).T_( 'I want to end this conversation now!' );
 		$block_text = get_icon( 'ban', 'imgtag', array( 'style' => 'margin:0 7px 2px 1px;vertical-align:middle;' ) ).sprintf( T_( 'I want to block %s from sending me any more messages!' ), $recipient_login );
-		$confirm_leave_text = T_( 'Are you sure you want to close this conversation?' );
+		$confirm_leave_text = TS_( 'Are you sure you want to close this conversation?' );
 		$confirm_block_text = sprintf( TS_( 'This action will close this conversion\\nand will block %s from starting any new\\nconversation with you.\\n(You can see blocked users in your contacts list)\\nAre you sure you want to close and block?' ), $recipient_login );
 		$leave_action = 'close';
 	}
 	if( is_admin_page() )
 	{ // backoffice
+		$hide_url = '?ctrl=threads&thrd_ID='.$edited_Thread->ID.'&action=hide&'.url_crumb( 'messaging_threads' );
 		$leave_url = '?ctrl=threads&thrd_ID='.$edited_Thread->ID.'&action='.$leave_action.'&'.url_crumb( 'messaging_threads' );
 		$close_and_block_url = '?ctrl=threads&thrd_ID='.$edited_Thread->ID.'&action=close_and_block&block_ID='.$recipient_ID.'&'.url_crumb( 'messaging_threads' );
 	}
 	else
 	{ // frontoffice
+		$hide_url = url_add_param( $params[ 'form_action' ], 'disp=threads&thrd_ID='.$edited_Thread->ID.'&action=hide&redirect_to='.rawurlencode( url_add_param( $Blog->gen_blogurl(), 'disp=threads', '&' ) ).'&'.url_crumb( 'messaging_threads' ) );
 		$leave_url = url_add_param( $params[ 'form_action' ], 'disp=threads&thrd_ID='.$edited_Thread->ID.'&action='.$leave_action.'&redirect_to='.rawurlencode( url_add_param( $Blog->gen_blogurl(), 'disp=threads', '&' ) ).'&'.url_crumb( 'messaging_threads' ) );
 		$close_and_block_url = url_add_param( $params[ 'form_action' ], 'disp=threads&thrd_ID='.$edited_Thread->ID.'&action=close_and_block&block_ID='.$recipient_ID.'&redirect_to='.rawurlencode( url_add_param( $Blog->gen_blogurl(), 'disp=threads', '&' ) ).'&'.url_crumb( 'messaging_threads' ) );
 	}
 	echo '<p>';
+	echo '<a href="'.$hide_url.'" onclick="return confirm( \''.TS_( 'Are you sure you want to hide this conversation?' ).'\' );" class="btn btn-default btn-sm">'.T_('Hide this conversation').'</a> ';
 	echo '<a href="'.$leave_url.'" onclick="return confirm( \''.$confirm_leave_text.'\' );" class="btn btn-default btn-sm">'.$leave_text.'</a>';
 	if( $leave_action == 'close' )
 	{ // user want's to close this conversation ( there is only one recipient )

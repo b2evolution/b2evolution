@@ -33,6 +33,7 @@ $Results = get_threads_results( array(
 		'search_word' => param( 's', 'string', '', true ),
 		'search_user' => param( 'u', 'string', '', true ),
 		'show_closed_threads' => param( 'show_closed', 'boolean', NULL, true ),
+		'show_hidden_threads' => param( 'show_hidden', 'boolean', false, true ),
 	) );
 
 $Results->Cache = & get_ThreadCache();
@@ -56,6 +57,7 @@ function filter_recipients( & $Form )
 	if( !$perm_abuse_management )
 	{
 		$Form->checkbox( 'show_closed', get_param('show_closed'), T_( 'Show closed conversations' ) );
+		$Form->checkbox( 'show_hidden', get_param('show_hidden'), T_( 'Show hidden conversations' ) );
 	}
 }
 
@@ -67,7 +69,7 @@ else
 { // In case of simple thread list view
 	$preset_filters = array(
 		'avtive' => array( T_('Active conversations'), get_dispctrl_url( 'threads', 'show_closed=0' ) ),
-		'all' => array( T_('All conversations'), get_dispctrl_url( 'threads', 'show_closed=1' ) )
+		'all' => array( T_('All conversations'), get_dispctrl_url( 'threads', 'show_closed=1&amp;show_hidden=1' ) )
 	);
 }
 
