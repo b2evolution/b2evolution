@@ -3341,8 +3341,16 @@ class User extends DataObject
 			case 'can_edit_post':
 			case 'can_edit_comment':
 			case 'can_edit_contacts':
-			case 'can_report_user':
 				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+			case 'can_report_user':
+				if( ! empty( $target ) )
+				{
+					$UserCache = & get_UserCache();
+					$target_User = & $UserCache->get_by_ID( $target );
+					return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) )
+							&& ( ! empty( $target_User ) && ( $target_User->get( 'level' ) <= $this->get( 'level' ) ) );
+				}
+				return false;
 			case 'can_be_validated':
 				return ( ( $this->status == 'new' ) || ( $this->status == 'emailchanged' ) || ( $this->status == 'deactivated' ) || ( $this->status == 'failedactivation' ) );
 			case 'can_view_msgform':
