@@ -38,6 +38,18 @@ if( empty( $item_id ) )
 $currentpage = param( 'currentpage', 'integer', 1 );
 $comments_number = param( 'comments_number', 'integer', 0 );
 
+if( $item_id > 0 )
+{	// Allow to select comments for action on item view page:
+	global $blog, $admin_url;
+
+	$Form = new Form( $admin_url );
+
+	$Form->begin_form();
+	$Form->hidden( 'ctrl', 'items' );
+	$Form->hidden( 'blog', $blog );
+	$Form->hidden( 'p', $item_id );
+}
+
 if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 { // Display a pagination:
 	$comment_params = array_merge( $AdminUI->get_template( 'pagination' ), array( 'page_size' => $CommentList->limit ) );
@@ -105,6 +117,14 @@ if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 { // Display a pagination:
 	$comment_params = array_merge( $AdminUI->get_template( 'pagination' ), array( 'page_size' => $CommentList->limit ) );
 	echo_comment_pages( $item_id, $currentpage, $comments_number, $comment_params );
+}
+
+if( $item_id > 0 )
+{	// Allow to select comments for action on item view page:
+	echo T_('With checked comments').': ';
+	$Form->button( array( 'submit', 'actionArray[create_comments_post]', T_('Create new Post'), 'btn-warning' ) );
+
+	$Form->end_form();
 }
 
 ?>

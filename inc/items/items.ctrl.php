@@ -417,6 +417,101 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=items&action='.$prev_action.( $item_ID > 0 ? '&p='.$item_ID : '' ).'&blog='.$blog );
 		break;
 
+	case 'create_comments_post':
+		// Create new post from selected comments:
+
+		$item_ID = param( 'p', 'integer', 0 );
+		$selected_comments = param( 'selected_comments', 'array:integer' );
+
+		if( empty( $selected_comments ) )
+		{	// If no comments selected:
+			$Messages->add( T_('Please select at least one comment.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.$item_ID.'&comment_type=feedback#comments' );
+		}
+
+		$new_post_creation_result = false;
+		$CommentCache = & get_CommentCache();
+		$moved_comments_IDs = array();
+		foreach( $selected_comments as $s => $selected_comment_ID )
+		{
+			$selected_Comment = & $CommentCache->get_by_ID( $selected_comment_ID, false, false );
+			if( ! $selected_Comment || $selected_Comment->item_ID != $item_ID )
+			{	// Skip wrong comment:
+				continue;
+			}
+
+			$moved_comments_IDs[] = $selected_Comment->ID;
+
+			if( $s == 0 )
+			{	// Create post from first comment:
+				$comment_Item = & $selected_Comment->get_Item();
+
+				// Use same chapters of the parent Item:
+				$comment_item_chapters = $comment_Item->get_Chapters();
+				$comment_item_chapters_IDs = array();
+				foreach( $comment_item_chapters as $comment_item_Chapter )
+				{
+					$comment_item_chapters_IDs[] = $comment_item_Chapter->ID;
+				}
+
+				$new_Item = new Item();
+				$new_Item->set( $new_Item->creator_field, empty( $selected_Comment->author_user_ID ) ? $current_User->ID : $selected_Comment->author_user_ID );
+				$new_Item->set( 'status', $comment_Item->status );
+				$new_Item->set( 'main_cat_ID', $comment_Item->main_cat_ID );
+				$new_Item->set( 'extra_cat_IDs', $comment_item_chapters_IDs );
+				$new_Item->set( 'title', substr( $comment_Item->title.' - comment #'.$selected_Comment->ID, 0, 255 ) );
+				$new_Item->set( 'content', $selected_Comment->content );
+				$new_Item->set( 'ityp_ID', $comment_Item->ityp_ID );
+				$new_Item->set( 'renderers', $selected_Comment->get_renderers() );
+				if( $new_Item->dbinsert() )
+				{	// New post creation is success:
+					$Messages->add( sprintf( T_('New post has been created from comment #%d'), $selected_Comment->ID ), 'success' );
+					$new_post_creation_result = true;
+					// Move all links/attachments from old comment to new created post:
+					$DB->query( 'UPDATE T_links
+						  SET link_itm_ID = '.$new_Item->ID.', link_cmt_ID = NULL
+						WHERE link_cmt_ID = '.$selected_Comment->ID );
+					// Delete source comment after creating of new post:
+					$selected_Comment->dbdelete( true );
+				}
+				else
+				{	// New post creation is failed:
+					$Messages->add( sprintf( T_('Could not create new post from comment #%d'), $selected_Comment->ID ), 'error' );
+					break;
+				}
+			}
+			else
+			{	// Append all next comments for new created post which has been created from first comment:
+				$selected_Comment->set( 'item_ID', $new_Item->ID );
+				// Set proper parent Comment if comment has been not moved to new Item:
+				$selected_Comment->set_correct_parent_comment();
+				// Update comment with new data:
+				$selected_Comment->dbupdate();
+			}
+		}
+
+		// Set proper parent Comment for all child comments if the parent comment has been moved to other new Item:
+		foreach( $moved_comments_IDs as $moved_comments_ID )
+		{
+			$moved_Comment = & $CommentCache->get_by_ID( $moved_comments_ID );
+			$child_comment_IDs = $moved_Comment->get_child_comment_IDs();
+			foreach( $child_comment_IDs as $child_comment_ID )
+			{
+				$child_Comment = & $CommentCache->get_by_ID( $child_comment_ID );
+				$old_in_reply_to_cmt_ID = $child_Comment->get( 'in_reply_to_cmt_ID' );
+				$child_Comment->set_correct_parent_comment();
+				if( $old_in_reply_to_cmt_ID != $child_Comment->get( 'in_reply_to_cmt_ID' ) )
+				{	// Update only if parent comment has been really corrected:
+					$child_Comment->dbupdate();
+				}
+			}
+		}
+
+		// REDIRECT / EXIT
+		header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.( $new_post_creation_result ? $new_Item->ID : $item_ID.'&comment_type=feedback#comments' ) );
+		break;
+
 	default:
 		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
 }

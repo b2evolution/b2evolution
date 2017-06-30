@@ -164,6 +164,13 @@ class Comment extends DataObject
 	var $in_reply_to_cmt_ID;
 
 	/**
+	 * Parent Comment
+	 *
+	 * @var object
+	 */
+	var $parent_Comment;
+
+	/**
 	 * Voting result of all votes in system helpfulness
 	 *
 	 * @var integer
@@ -382,6 +389,51 @@ class Comment extends DataObject
 		}
 
 		return $this->Item;
+	}
+
+
+	/**
+	 * Get the Item this comment relates to
+	 *
+	 * @return Item
+	 */
+	function & get_parent_Comment()
+	{
+		if( ! isset( $this->parent_Comment ) )
+		{
+			$CommentCache = & get_CommentCache();
+			$this->parent_Comment = & $CommentCache->get_by_ID( $this->in_reply_to_cmt_ID, false, false );
+		}
+
+		return $this->parent_Comment;
+	}
+
+
+	/**
+	 * Fix parent Comment to top possible Comment from the same Item/Post
+	 */
+	function set_correct_parent_comment()
+	{
+		if( empty( $this->in_reply_to_cmt_ID ) )
+		{	// Nothing to fix because this comment has no parent Comment:
+			return;
+		}
+
+		// Use NULL to set comment in root if no found a proper top parent comment:
+		$correct_in_reply_to_cmt_ID = NULL;
+
+		$parent_Comment = & $this->get_parent_Comment();
+		while( $parent_Comment )
+		{
+			if( $parent_Comment->get( 'item_ID' ) == $this->get( 'item_ID' ) )
+			{	// This comment is located in same new created Item then we should use this as parent:
+				$correct_in_reply_to_cmt_ID = $parent_Comment->ID;
+				break;
+			}
+			$parent_Comment = & $parent_Comment->get_parent_Comment();
+		}
+
+		$this->set( 'in_reply_to_cmt_ID', $correct_in_reply_to_cmt_ID, true );
 	}
 
 
