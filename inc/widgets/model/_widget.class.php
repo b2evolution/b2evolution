@@ -809,7 +809,9 @@ class ComponentWidget extends DataObject
 	/**
 	 * List of collections/blogs
 	 *
-	 * @param array MUST contain at least the basic display params
+	 * @param string Filter: 'owner', 'public', 'access', 'public_access', 'all'
+	 * @param string Order by
+	 * @param string Order direction: 'ASC', 'DESC'
 	 */
 	function disp_coll_list( $filter = 'public', $order_by = 'ID', $order_dir = 'ASC' )
 	{
@@ -827,13 +829,27 @@ class ComponentWidget extends DataObject
 		 */
 		$BlogCache = & get_BlogCache();
 
-		if( $filter == 'owner' )
-		{	// Load blogs of same owner
-			$blog_array = $BlogCache->load_owner_blogs( $Blog->owner_user_ID, $order_by, $order_dir );
-		}
-		else
-		{	// Load all public blogs
-			$blog_array = $BlogCache->load_public( $order_by, $order_dir );
+		switch( $filter )
+		{
+			case 'owner':
+				// Load collections of same owner:
+				$blog_array = $BlogCache->load_owner_blogs( $Blog->owner_user_ID, $order_by, $order_dir );
+				break;
+
+			case 'all':
+				// Load all collections:
+				$blog_array = $BlogCache->load_all( $order_by, $order_dir );
+				break;
+
+			case 'access':
+			case 'public_access':
+				// Load restricted collections:
+				$blog_array = $BlogCache->load_restricted_colls( $filter, $order_by, $order_dir );
+				break;
+
+			default: // 'public'
+				// Load all public collections:
+				$blog_array = $BlogCache->load_public( $order_by, $order_dir );
 		}
 
 		// 3.3? if( $this->disp_params['list_type'] == 'list' )

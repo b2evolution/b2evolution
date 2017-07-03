@@ -50,7 +50,7 @@ class colls_list_public_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Public collections list');
+		return T_('Collection list');
 	}
 
 
@@ -68,7 +68,7 @@ class colls_list_public_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display list of all blogs marked as public.');
+		return T_('Display list of collections.');
 	}
 
 
@@ -103,6 +103,16 @@ class colls_list_public_Widget extends ComponentWidget
 										array( 'DESC', T_('Descending') ) ),
 					'defaultvalue' => 'ASC',
 				),
+				'restrict_public' => array(
+					'label' => T_('Restrict to public collections'),
+					'type' => 'checkbox',
+					'defaultvalue' => '1',
+				),
+				'restrict_access' => array(
+					'label' => T_('Restrict to collections accessible by current user'),
+					'type' => 'checkbox',
+					'defaultvalue' => '0',
+				),
 				/* 3.3? this is borked
 				'list_type' => array(
 					'label' => T_( 'Display type' ),
@@ -127,7 +137,24 @@ class colls_list_public_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
-		$this->disp_coll_list( 'public', $this->disp_params['order_by'], $this->disp_params['order_dir'] );
+		if( $this->disp_params['restrict_public'] && $this->disp_params['restrict_access'] )
+		{	// Restrict to public collections and collections accessible by current user:
+			$filter = 'public_access';
+		}
+		elseif( $this->disp_params['restrict_public'] )
+		{	// Restrict only to public collections:
+			$filter = 'public';
+		}
+		elseif( $this->disp_params['restrict_access'] )
+		{	// Restrict only to collections accessible by current user:
+			$filter = 'access';
+		}
+		else
+		{	// Display ALL collections:
+			$filter = 'all';
+		}
+
+		$this->disp_coll_list( $filter, $this->disp_params['order_by'], $this->disp_params['order_dir'] );
 
 		return true;
 	}
@@ -140,11 +167,14 @@ class colls_list_public_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Collection, $Blog;
+		global $current_User;
 
 		return array(
-				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
-				'set_coll_ID' =>'any', 					// Have the settings of ANY blog changed ? (ex: new skin here, new name on another)
+				'wi_ID'       => $this->ID, // Have the widget settings changed ?
+				'set_coll_ID' =>'any', // Have the settings of ANY blog changed ? (ex: new skin here, new name on another)
+				'loggedin'    => ( is_logged_in() ? 1 : 0 ), // Is a user logged in at the time this widget is cached/displayed?
+				'user_ID'     => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
+				'grp_ID'      => ( is_logged_in() ? $current_User->grp_ID : 0 ), // Has a group of the current User changed?
 			);
 	}
 }

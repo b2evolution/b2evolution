@@ -528,6 +528,10 @@ class Group extends DataObject
 		$GroupSettings = & $this->get_GroupSettings();
 		$GroupSettings->update( $this->ID );
 
+		// BLOCK CACHE INVALIDATION:
+		// This Group has been modified, cached content depending on it should be invalidated:
+		BlockCache::invalidate_key( 'grp_ID', $this->ID );
+
 		$DB->commit();
 	}
 

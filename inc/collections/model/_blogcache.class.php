@@ -199,6 +199,83 @@ class BlogCache extends DataObjectCache
 
 
 	/**
+	 * Load a list of restricted collections into the cache
+	 *
+	 * @param string Filter: 'all', 'public', 'access', 'public_access', 
+	 * @param string Order By
+	 * @param string Order Direction
+	 * @return array of IDs
+	 */
+	function load_restricted_colls( $filter, $order_by = '', $order_dir = '' )
+	{
+		global $DB, $Debuglog, $Settings;
+
+		$Debuglog->add( 'Loading <strong>'.$this->objtype.'(restricted "'.$filter.'")</strong> into cache', 'dataobjects' );
+
+		if( $order_by == '' )
+		{	// Use default value from settings:
+			$order_by = $Settings->get( 'blogs_order_by' );
+		}
+
+		if( $order_dir == '' )
+		{	// Use default value from settings:
+			$order_dir = $Settings->get( 'blogs_order_dir' );
+		}
+
+		$SQL = new SQL( 'Load restricted collection list with filter "'.$filter.'"' );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( $this->dbtablename );
+		if( $filter == 'public' || $filter == 'public_access' )
+		{	// Restrict with public collections:
+			$public_SQL = $this->get_public_colls_SQL( $order_by, $order_dir );
+			$SQL->WHERE( '( '.$public_SQL->get_where( '' ).' )' );
+		}
+		if( $filter == 'access' || $filter == 'public_access' )
+		{	// Restrict with public collections:
+			$CollectionSettings = new CollectionSettings();
+			$default_allow_access = isset( $CollectionSettings->_defaults['allow_access'] ) ? $CollectionSettings->_defaults['allow_access'] : 'public';
+
+			$SQL->FROM_add( 'LEFT JOIN T_coll_settings ON blog_ID = cset_coll_ID AND cset_name = "allow_access"' );
+			$access_sql_where = '( cset_value = "public"'.( $default_allow_access == 'public' ? ' OR cset_value IS NULL' : '' ).' )';
+			if( is_logged_in() )
+			{	// Allow the collections that available for logged in users:
+				$access_sql_where .= ' OR ( cset_value = "users"'.( $default_allow_access == 'users' ? ' OR cset_value IS NULL' : '' ).' )';
+				// Allow the collections that available for members:
+				global $current_User;
+				$access_sql_where .= ' OR ( ( cset_value = "members"'.( $default_allow_access == 'members' ? ' OR cset_value IS NULL' : '' ).' ) AND (
+						( SELECT grp_ID
+								FROM T_groups
+							 WHERE grp_ID = '.$current_User->grp_ID.'
+								 AND grp_perm_blogs IN ( "viewall", "editall" ) ) OR
+						( SELECT bloguser_user_ID
+								FROM T_coll_user_perms
+							 WHERE bloguser_blog_ID = blog_ID
+								 AND bloguser_ismember = 1
+								 AND bloguser_user_ID = '.$current_User->ID.' ) OR
+						( SELECT bloggroup_group_ID
+								FROM T_coll_group_perms
+							 WHERE bloggroup_blog_ID = blog_ID
+								 AND bloggroup_ismember = 1
+								 AND ( bloggroup_group_ID = '.$current_User->grp_ID.'
+											 OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) )
+							LIMIT 1
+						)
+					) )';
+			}
+			$SQL->WHERE_and( '( '.$access_sql_where.' )' );
+		}
+		$SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, 'blog_', 'blog_ID' ) );
+
+		foreach( $DB->get_results( $SQL->get(), OBJECT, $SQL->title ) as $row )
+		{	// Instantiate a custom object
+			$this->instantiate( $row );
+		}
+
+		return $DB->get_col( NULL, 0 );
+	}
+
+
+	/**
 	 * Load a list of public blogs into the cache
 	 *
 	 * @param string Order By
