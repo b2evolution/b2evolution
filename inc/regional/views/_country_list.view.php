@@ -129,7 +129,7 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'jeditable_cell country_status_edit',
 		'order' => 'ctry_status',
-		'extra' => array ( 'id' => '#ctry_ID#', 'style' => 'background-color: %ctry_status_color( "#ctry_status#" )%;', 'format_to_output' => false )
+		'extra' => array ( 'id' => '#ctry_ID#', 'style' => 'background-color: %ctry_status_color( "#ctry_status#" )%; min-width: 10.5em;', 'format_to_output' => false )
 	);
 
 if( $ctrl == 'antispam' )

@@ -238,7 +238,7 @@ echo '<div class="profile_column_left">';
 
 	// - Report:
 	if( $is_logged_in && ( $current_User->ID != $User->ID ) &&
-			$current_User->check_status( 'can_report_user' ) )
+			$current_User->check_status( 'can_report_user', $User->ID ) )
 	{ // Current user must be logged in, cannot report own account, and must has a permission to report
 		if( ! isset( $buttons['group'] ) )
 		{

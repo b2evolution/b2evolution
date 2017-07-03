@@ -150,11 +150,12 @@ switch( $action )
 
 	case 'report_user':
 		// Report an user
+		$user_ID = param( 'user_ID', 'integer', 0 );
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! $current_User->check_status( 'can_report_user' ) )
+		if( ! $current_User->check_status( 'can_report_user', $user_ID ) )
 		{ // current User status doesn't allow user reporting
 			// Redirect to the account activation page
 			$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
@@ -164,7 +165,6 @@ switch( $action )
 
 		$report_status = param( 'report_user_status', 'string', '' );
 		$report_info = param( 'report_info_content', 'text', '' );
-		$user_ID = param( 'user_ID', 'integer', 0 );
 
 		$user_tab = param( 'user_tab', 'string' );
 		if( get_report_status_text( $report_status ) == '' )
@@ -209,11 +209,12 @@ switch( $action )
 
 	case 'remove_report':
 		// Remove current User report from the given user
+		$user_ID = param( 'user_ID', 'integer', 0 );
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! $current_User->check_status( 'can_report_user' ) )
+		if( ! $current_User->check_status( 'can_report_user', $user_ID ) )
 		{ // current User status doesn't allow user reporting
 			// Redirect to the account activation page
 			$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
@@ -221,7 +222,6 @@ switch( $action )
 			// will have exited
 		}
 
-		$user_ID = param( 'user_ID', 'integer', 0 );
 		$user_tab = param( 'user_tab', 'string' );
 
 		remove_report_from( $user_ID );

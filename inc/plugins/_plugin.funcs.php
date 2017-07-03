@@ -442,6 +442,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			// TODO: fix this for AJAX callbacks, when removing and re-adding items (dh):
 			if( ! isset( $parmeta['max_number'] ) || $parmeta['max_number'] > ($k_nb) )
 			{ // no max_number defined or not reached: display link to add a new set
+				global $Blog;
 				$set_path = $parname.'['.$k_nb.']';
 
 				echo '<div id="'.$parname.'_add_new">';
@@ -459,6 +460,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								plugin_ID: '{$Obj->ID}',
 								set_type: '$set_type',
 								set_path: '$set_path'
+								".( isset( $Blog ) ? ',blog: '.$Blog->ID : '' )."
+								".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
 							},
 							function(r, status) {
 								jQuery('#".$parname."_add_new').replaceWith(r);
@@ -565,7 +568,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  *
  * Walks the given settings path and either inits the target entry or unsets it ($init_value=NULL).
  *
- * @param Plugin
+ * @param object Plugin or Skin
  * @param string Settings type ("Settings" or "UserSettings")
  * @param string The settings path, e.g. 'setting[0]foo[1]'. (Is used as array internally for recursion.)
  * @param mixed The initial value of the setting, typically array() - NULL to unset it (action "delete_settings_set" uses it)
@@ -628,8 +631,37 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 		}
 	}
 
-	// Set it into $Plugin->Settings or $Plugin->UserSettings:
-	$Plugin->$set_type->set( $set_name, $setting );
+	switch( $set_type )
+	{
+		case 'Settings':
+		case 'CollSettings':
+		case 'Widget':
+			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'UserSettings':
+			$Plugin->UserSettings->set( $set_name, $setting );
+			break;
+
+		case 'MsgSettings':
+			$set_name = ( $set_name == 'msg_apply_rendering' ? '' : 'msg_' ).$set_name;
+			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'EmailSettings':
+			$set_name = ( $set_name == 'email_apply_rendering' ? '' : 'email_' ).$set_name;
+			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'Skin':
+			$Skin = & $Plugin;
+			$Skin->set_setting( $set_name, $setting );
+			break;
+
+		default:
+			debug_die( 'Invalid plugin type param!' );
+	}
+
 
 	return $setting;
 }
@@ -638,7 +670,7 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 /**
  * Get a node from settings by path (e.g. "locales[0][questions]")
  *
- * @param Plugin
+ * @param object Plugin or Skin
  * @param string Settings type ("Settings" or "UserSettings")
  * @param string The settings path, e.g. 'setting[0]foo[1]' or even 'setting[]'. (Is used as array internally for recursion.)
  * @return array Array(
@@ -664,18 +696,60 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 
 	$set_name = $path[0];
 
-	$setting = $Plugin->$set_type->get($set_name);  // $Plugin->Settings or $Plugin->UserSettings
-	if( ! is_array($setting) )
+	// meta info for this setting:
+	$tmp_params = array( 'for_editing' => true );
+
+	switch( $set_type )
+	{
+		case 'Settings':
+			$setting = $Plugin->Settings->get( $set_name );
+			$defaults = $Plugin->GetDefaultSettings( $tmp_params );
+			break;
+
+		case 'UserSettings':
+			$setting = $Plugin->UserSettings->get( $set_name );
+			$defaults = $Plugin->GetDefaultUserSettings( $tmp_params );
+			break;
+
+		case 'CollSettings':
+			$setting = $Plugin->Settings->get( $set_name );
+			$defaults = $Plugin->get_coll_setting_definitions( $tmp_params );
+			break;
+
+		case 'MsgSettings':
+			$param_name = ( $set_name == 'msg_apply_rendering' ? '' : 'msg_' ).$set_name;
+			$setting = $Plugin->Settings->get( $param_name );
+			$defaults = $Plugin->get_msg_setting_definitions( $tmp_params );
+			break;
+
+		case 'EmailSettings':
+			$param_name = ( $set_name == 'email_apply_rendering' ? '' : 'email_' ).$set_name;
+			$setting = $Plugin->Settings->get( $param_name );
+			$defaults = $Plugin->get_email_setting_definitions( $tmp_params );
+			break;
+
+		case 'Widget':
+			$setting = $Plugin->Settings->get( $set_name );
+			$defaults = $Plugin->get_widget_param_definitions( $tmp_params );
+			break;
+
+		case 'Skin':
+			$Skin = & $Plugin;
+			$setting = $Skin->get_setting( $set_name );
+			$defaults = $Skin->get_param_definitions( $tmp_params );
+			break;
+
+		default:
+			debug_die( 'Invalid plugin type param!' );
+	}
+
+	if( ! is_array( $setting ) )
 	{ // this may happen, if there was a non-array setting stored previously:
 		// discard those!
 		$setting = array();
 	}
 
-	// meta info for this setting:
-	$method = 'GetDefault'.$set_type; // GetDefaultSettings or GetDefaultUserSettings
-	$tmp_params = array( 'for_editing' => true );
-	$defaults = $Plugin->$method( $tmp_params );
-	if( ! isset($defaults[ $set_name ]) )
+	if( ! isset( $defaults[ $set_name ] ) )
 	{
 		//debug_die( 'Invalid setting ('.$set_name.') - no meta data!' );
 		return false;

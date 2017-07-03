@@ -1307,13 +1307,13 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
+		$user_ID = param( 'user_ID', 'integer', true );
 
-		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) || ! $current_User->check_status( 'can_report_user' ) )
+		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) || ! $current_User->check_status( 'can_report_user', $user_ID ) )
 		{ // Only if current user can reports
 			break;
 		}
 
-		$user_ID = param( 'user_ID', 'integer', true );
 		$UserCache = & get_UserCache();
 		$edited_User = & $UserCache->get_by_ID( $user_ID );
 

@@ -195,17 +195,52 @@ switch( $action )
 		$AdminUI = new AdminUI();
 
 		param( 'plugin_ID', 'integer', true );
+		param( 'set_type', 'string', '' ); // 'Settings', 'UserSettings', 'CollSettings', 'MsgSettings', 'EmailSettings', 'Skin', 'Widget'
 
-		$admin_Plugins = & get_Plugins_admin(); // use Plugins_admin, because a plugin might be disabled
-		$Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
+		if( ! in_array( $set_type, array( 'Settings', 'UserSettings', 'CollSettings', 'MsgSettings', 'EmailSettings', 'Skin', 'Widget' ) ) )
+		{
+			bad_request_die( 'Invalid set_type param!' );
+		}
+
+		param( 'blog', 'integer', 0 );
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+
+		$target_Object = NULL;
+
+		switch( $set_type )
+		{
+			case 'Widget':
+				$WidgetCache = & get_WidgetCache();
+				$Widget = & $WidgetCache->get_by_ID( $plugin_ID );
+				$Plugin = & $Widget->get_Plugin();
+				$plugin_Object = $Widget;
+				break;
+
+			case 'Skin':
+				$SkinCache = & get_SkinCache();
+				$Skin = & $SkinCache->get_by_ID( $plugin_ID );
+				$Plugin = $Skin;
+				$plugin_Object = $Skin;
+				break;
+
+			default:
+				// 'Settings', 'UserSettings', 'CollSettings', 'MsgSettings', 'EmailSettings'
+				$admin_Plugins = & get_Plugins_admin(); // use Plugins_admin, because a plugin might be disabled
+				$Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
+				$plugin_Object = $Plugin;
+				if( $set_type == 'UserSettings' )
+				{	// Initialize User object for this plugin type:
+					param( 'user_ID', 'integer', true );
+					$UserCache = & get_UserCache();
+					$target_Object = & $UserCache->get_by_ID( $user_ID );
+				}
+				break;
+		}
+
 		if( ! $Plugin )
 		{
 			bad_request_die('Invalid Plugin.');
-		}
-		param( 'set_type', 'string', '' ); // "Settings" or "UserSettings"
-		if( $set_type != 'Settings' /* && $set_type != 'UserSettings' */ )
-		{
-			bad_request_die('Invalid set_type param!');
 		}
 		param( 'set_path', '/^\w+(?:\[\w+\])+$/', '' );
 
@@ -218,7 +253,7 @@ switch( $action )
 		$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $set_path, /* create: */ false );
 
 		$Form = new Form(); // fake Form to display plugin setting
-		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $Plugin, NULL, $r['set_node'] );
+		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $plugin_Object, $target_Object, $r['set_node'] );
 		break;
 
 	case 'edit_comment':
