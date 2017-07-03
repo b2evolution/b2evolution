@@ -445,6 +445,12 @@ switch( $action )
 
 			if( $s == 0 )
 			{	// Create post from first comment:
+				if( empty( $selected_Comment->author_user_ID ) )
+				{	// Don't create a post from comment with anonymous user:
+					$Messages->add( T_('Could not create new post from comment without author.'), 'error' );
+					break;
+				}
+
 				$comment_Item = & $selected_Comment->get_Item();
 
 				// Use same chapters of the parent Item:
@@ -456,11 +462,11 @@ switch( $action )
 				}
 
 				$new_Item = new Item();
-				$new_Item->set( $new_Item->creator_field, empty( $selected_Comment->author_user_ID ) ? $current_User->ID : $selected_Comment->author_user_ID );
+				$new_Item->set( $new_Item->creator_field, $selected_Comment->author_user_ID );
 				$new_Item->set( 'status', $comment_Item->status );
 				$new_Item->set( 'main_cat_ID', $comment_Item->main_cat_ID );
 				$new_Item->set( 'extra_cat_IDs', $comment_item_chapters_IDs );
-				$new_Item->set( 'title', substr( $comment_Item->title.' - comment #'.$selected_Comment->ID, 0, 255 ) );
+				$new_Item->set( 'title', substr( sprintf( T_('Branched from: %s'), $comment_Item->title ), 0, 255 ) );
 				$new_Item->set( 'content', $selected_Comment->content );
 				$new_Item->set( 'ityp_ID', $comment_Item->ityp_ID );
 				$new_Item->set( 'renderers', $selected_Comment->get_renderers() );
