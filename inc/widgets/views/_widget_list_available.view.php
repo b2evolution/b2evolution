@@ -133,6 +133,7 @@ $core_componentwidget_defs = array(
 			'colls_list_owner',
 			'mobile_skin_switcher',
 			'page_404_not_found',
+			'map_view'
 		),
 );
 

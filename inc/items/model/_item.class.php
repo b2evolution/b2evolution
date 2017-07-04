@@ -2875,7 +2875,7 @@ class Item extends ItemLight
 			// Replace inline content block tag with item content:
 			$content = str_replace( $source_tag, $current_tag_item_content, $content );
 
-			// Remove 
+			// Remove
 			array_shift( $content_block_items );
 		}
 
@@ -8044,7 +8044,7 @@ class Item extends ItemLight
 	 * @param string Text after location
 	 * @param string Separator
 	 */
-	function location( $before, $after, $separator = ', ' )
+	function location( $before = '', $after = '', $separator = ', ', $output = true )
 	{
 		$location = array();
 		$location[] = $this->get_city();
@@ -8057,11 +8057,18 @@ class Item extends ItemLight
 
 		if( !empty( $location ) )
 		{	// Display location
-			echo $before;
+			if( $output )
+			{
+				echo $before;
 
-			echo implode( $separator, $location );
+				echo implode( $separator, $location );
 
-			echo $after;
+				echo $after;
+			}
+			else
+			{
+				return $before.implode( $separator, $location ).$after;
+			}
 		}
 	}
 

@@ -1269,6 +1269,11 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$edited_Item = new Item();
 			$edited_Item->set( 'featured', 1 );
 			$edited_Item->set_tags_from_string( 'photo,demo' );
+
+			// Location information
+			$edited_Item->set_setting( 'latitude', 34.0201797 );
+			$edited_Item->set_setting( 'longitude', -118.6925988 );
+
 			$edited_Item->insert( $owner_ID, T_('Extended post'), '<p>'.T_('This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.').'</p>'.get_filler_text( 'lorem_1paragraph' )
 .'[teaserbreak]
 
@@ -1342,6 +1347,11 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$edited_Item = new Item();
 			$edited_Item->set( 'featured', 1 );
 			$edited_Item->set_tags_from_string( 'photo,demo' );
+
+			// Location information
+			$edited_Item->set_setting( 'latitude', 36.9810823 );
+			$edited_Item->set_setting( 'longitude', -110.2290802 );
+
 			$edited_Item->insert( $owner_ID, T_('Image post'), T_('<p>This post has several images attached to it. Each one uses a different Attachment Position. Each may be displayed differently depending on the skin they are viewed in.</p>
 
 <p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_bg );
@@ -1361,6 +1371,11 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'photo' );
+
+			// Location information
+			$edited_Item->set_setting( 'latitude', 48.8370875 );
+			$edited_Item->set_setting( 'longitude', 2.2372931 );
+
 			$additional_comments_item_IDs[] = $edited_Item->insert( $owner_ID, T_('Welcome to your b2evolution-powered website!'),
 T_("<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>
 
