@@ -57,6 +57,13 @@ class Message extends DataObject
 	 */
 	var $Thread;
 
+	/**
+	 * Author User of this Message
+	 *
+	 * @var instance of User class
+	 */
+	var $author_User;
+
 
 	/**
 	 * Constructor
@@ -1409,6 +1416,23 @@ class Message extends DataObject
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Get author User of this Message
+	 *
+	 * @return object User
+	 */
+	function & get_author_User()
+	{
+		if( ! isset( $this->author_User ) )
+		{	// Try to get author User only first time:
+			$UserCache = & get_UserCache();
+			$this->author_User = & $UserCache->get_by_ID( $this->author_user_ID, false, false );
+		}
+
+		return $this->author_User;
 	}
 }
 

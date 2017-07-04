@@ -581,6 +581,72 @@ class Thread extends DataObject
 		param_error( '', T_( 'The recipient(s) do not want you to contact them at this time.' ) );
 		return false;
 	}
+
+
+	/**
+	 * Get first Message of this Thread
+	 *
+	 * @return object Message
+	 */
+	function & get_first_Message()
+	{
+		if( ! isset( $this->first_Message ) )
+		{	// Initialize first Message:
+			if( empty( $this->ID ) )
+			{	// Thread must be store in DB:
+				$this->first_Message = false;
+				return $this->first_Message;
+			}
+
+			global $DB;
+
+			$MessageCache = get_MessageCache();
+			$MessageCache->clear();
+
+			// Load only first Message:
+			$SQL = $MessageCache->get_SQL_object( 'Get first Message of Thread #'.$this->ID );
+			$SQL->WHERE( 'msg_thread_ID = '.$this->ID );
+			$SQL->ORDER_BY( 'msg_datetime ASC' );
+			$SQL->LIMIT( 1 );
+			$messages = $MessageCache->load_by_sql( $SQL );
+			$this->first_Message = isset( $messages[0] ) ? $messages[0] : false;
+		}
+
+		return $this->first_Message;
+	}
+
+
+	/**
+	 * Check if this Thread can be moved to collection by current User
+	 *
+	 * @param integer Collection ID
+	 * @return boolean
+	 */
+	function can_be_moved_to_collection( $blog_ID )
+	{
+		global $current_User;
+
+		if( ! is_logged_in() )
+		{	// Current User must be logged in:
+			return false;
+		}
+
+		if( ! $this->check_thread_recipient( $current_User->ID ) &&
+		    ! $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+		{	// Don't allow if current user is NOT a recipient of this Thread AND he has no permission to edit all threads:
+			return false;
+		}
+
+		$first_Message = & $this->get_first_Message();
+		$message_author_User = & $first_Message->get_author_User();
+
+		if( ! $message_author_User->check_perm( 'blog_post_statuses', 'edit', false, $blog_ID ) )
+		{	// Don't allow if first message's author has no permission to add a post with any status to the given collection:
+			return false;
+		}
+
+		return true;
+	}
 }
 
 ?>

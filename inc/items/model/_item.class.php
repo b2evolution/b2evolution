@@ -642,6 +642,22 @@ class Item extends ItemLight
 		global $default_locale, $current_User, $localtimenow;
 		global $item_typ_ID;
 
+		// Try to prefill Item/Post fields from source thread/message ONLY for new creating post:
+		if( empty( $this->ID ) && param( 'thrd_ID', 'integer', NULL ) !== NULL )
+		{	// If new post is moving from a private message:
+			$ThreadCache = & get_ThreadCache();
+			$source_Thread = & $ThreadCache->get_by_ID( get_param( 'thrd_ID' ), false, false );
+			if( $source_Thread && $source_Thread->can_be_moved_to_collection( $this->get_blog_ID() ) )
+			{	// If given Thread can be moved to current collection:
+				$source_Message = & $source_Thread->get_first_Message();
+				$source_message_author_User = & $source_Message->get_author_User();
+				$this->set( 'title', $source_Thread->get( 'title' ) );
+				$this->set( 'content', $source_Message->get( 'text' ) );
+				$this->set_creator_User( $source_message_author_User );
+				$this->set_renderers( $source_Message->get_renderers() );
+			}
+		}
+
 		// LOCALE:
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
 		{
@@ -6090,6 +6106,9 @@ class Item extends ItemLight
 
 			// Update last touched date of this Item and also all categories of this Item
 			$this->update_last_touched_date( false, false );
+
+			// Send notification after creating new post from thread:
+			$this->send_moved_thread_notification();
 		}
 
 		if( ! $result )
@@ -7464,6 +7483,39 @@ class Item extends ItemLight
 		$this->set( 'notifications_flags', 'pings_sent' );
 
 		return $r;
+	}
+
+
+	/**
+	 * Send notification when new post is created from thread
+	 */
+	function send_moved_thread_notification()
+	{
+		$thrd_ID = param( 'thrd_ID', 'integer', NULL );
+
+		if( empty( $thrd_ID ) )
+		{	// Thread ID must be passed from a submitted form
+			return false;
+		}
+
+		$ThreadCache = & get_ThreadCache();
+		$source_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false, false );
+		if( ! $source_Thread ||
+		    ! $source_Thread->can_be_moved_to_collection( $this->get_blog_ID() ) )
+		{	// Wrong Thread, because it can not be moved to collection of this Item:
+			return false;
+		}
+
+		$item_Blog = & $this->get_Blog();
+
+		// Insert new private message to inform author thread:
+		$notif_Message = new Message();
+		$notif_Message->set( 'thread_ID', $thrd_ID );
+		$notif_Message->set( 'text', sprintf( T_('Automatic notification: your question has been published to "%s": %s'),
+			$item_Blog->get( 'shortname' ),
+			$this->get_permanent_url() ) );
+
+		return $notif_Message->dbinsert_message();
 	}
 
 

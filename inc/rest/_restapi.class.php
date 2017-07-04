@@ -560,6 +560,7 @@ class RestApi
 					'name'      => $Blog->get( 'name' ),
 					'tagline'   => $Blog->get( 'tagline' ),
 					'desc'      => $Blog->get( 'longdesc' ),
+					'url'       => $Blog->get( 'url' ),
 				), 'array' );
 		}
 	}

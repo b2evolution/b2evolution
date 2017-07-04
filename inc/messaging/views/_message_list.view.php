@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
+global $dispatcher, $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message, $admin_url;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -391,6 +391,7 @@ if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) 
 	{ // user want's to close this conversation ( there is only one recipient )
 		echo ' <a href="'.$close_and_block_url.'" onclick="return confirm( \''.$confirm_block_text.'\' );" class="btn btn-default btn-sm">'.$block_text.'</a>';
 	}
+	echo ' <a href="" onclick="return evo_msg_move_to_coll();" class="btn btn-default btn-sm">'.get_icon( 'copy', 'imgtag', array( 'title' => T_('Move to a collection...') ) ).' '.T_('Move to a collection...').'</a>';
 	echo '</p>';
 	echo '</div>';
 }
@@ -415,4 +416,43 @@ $Results->display( $display_params );
 
 echo $params['messages_list_end'];
 
+// Initialize JavaScript to build and open window:
+echo_modalwindow_js();
+
+if( is_admin_page() )
+{	// New item URL for back-office:
+	$new_item_url = $admin_url.'?ctrl=items&action=new&thrd_ID='.$edited_Thread->ID.'&blog=\' + coll.id + \'';
+}
+else
+{	// New item URL for front-office:
+	$new_item_url = '\' + coll.url + ( coll.url.indexOf( \'?\' ) > 0 ? \'&\' : \'?\' ) + \'disp=edit&thrd_ID='.$edited_Thread->ID;
+}
 ?>
+<script type="text/javascript">
+function evo_msg_move_to_coll()
+{
+	openModalWindow( '<div id="evo_msg_move_coll_wrapper"><span class="loader_img absolute_center" title="<?php echo T_('Loading...'); ?>"></span></div>', '300px', '', true,
+		'<?php echo TS_('Move to a collection...'); ?>', // Window title
+		[ '-', 'evo_msg_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back" and "Create Post"
+		true );
+
+	evo_rest_api_request( 'collections',
+	{
+		'per_page': 1000,
+		'fields'  : 'id,shortname',
+	},
+	function( data )
+	{
+		var r = '<ul>';
+		for( var c in data.colls )
+		{
+			var coll = data.colls [c];
+			r += '<li><a href="<?php echo $new_item_url; ?>">' + coll.name + '</a></li>';
+		}
+		r += '</ul>';
+		jQuery( '#evo_msg_move_coll_wrapper' ).html( r );
+	} );
+
+	return false;
+}
+</script>

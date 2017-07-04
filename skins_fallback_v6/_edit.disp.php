@@ -92,6 +92,14 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'post_ID', $edited_Item->ID );
 		}
 	}
+
+	// Try to get the thread ID (For example, on moving a thread to collection):
+	$thrd_ID = get_param( 'thrd_ID' );
+	if( ! empty( $thrd_ID ) )
+	{
+		$Form->hidden( 'thrd_ID', $thrd_ID );
+	}
+
 	$Form->hidden( 'redirect_to', $redirect_to );
 
 	// In case we send this to the blog for a preview :
