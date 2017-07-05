@@ -655,6 +655,18 @@ class Item extends ItemLight
 				$this->set( 'content', $source_Message->get( 'text' ) );
 				$this->set_creator_User( $source_message_author_User );
 				$this->set_renderers( $source_Message->get_renderers() );
+
+				// Inform user that other replies will not be copied to new creating post:
+				global $action;
+				if( ! empty( $action ) && strpos( $action, 'create' ) === false )
+				{
+					$thread_messages_count = $source_Thread->get_messages_count();
+					if( $thread_messages_count > 1 )
+					{
+						global $Messages;
+						$Messages->add( sprintf( T_('%d replies of this thread have not been copied.'), $thread_messages_count - 1 ), 'error' );
+					}
+				}
 			}
 		}
 

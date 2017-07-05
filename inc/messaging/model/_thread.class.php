@@ -647,6 +647,33 @@ class Thread extends DataObject
 
 		return true;
 	}
+
+
+	/**
+	 * Get a messages count of this Thread
+	 *
+	 * @return integer
+	 */
+	function get_messages_count()
+	{
+		if( empty( $this->ID ) )
+		{	// Current User must be logged in:
+			return 0;
+		}
+
+		if( ! isset( $this->messages_count ) )
+		{	// Initialize a messages count:
+			global $DB;
+
+			$SQL = new SQL( 'Get a messages count of Thread #'.$this->ID );
+			$SQL->SELECT( 'COUNT( msg_ID )' );
+			$SQL->FROM( 'T_messaging__message' );
+			$SQL->WHERE( 'msg_thread_ID = '.$this->ID );
+			$this->messages_count = intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
+		}
+
+		return $this->messages_count;
+	}
 }
 
 ?>
