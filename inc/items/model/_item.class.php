@@ -656,6 +656,22 @@ class Item extends ItemLight
 				$this->set_creator_User( $source_message_author_User );
 				$this->set_renderers( $source_Message->get_renderers() );
 
+				$tmp_object_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+				if( empty( $tmp_object_ID ) )
+				{	// If a create item edit form is not submitted yet:
+					$LinkMessage = new LinkMessage( $source_Message );
+					if( $message_LinkList = $LinkMessage->get_attachment_LinkList() )
+					{	// If message has at least one attachment:
+						$LinkItem = new LinkItem( $this );
+						set_param( 'temp_link_owner_ID', $LinkItem->link_Object->tmp_ID );
+						while( $message_Link = & $message_LinkList->get_next() )
+						{	// Copy each attachment from sourse Message to new create Item:
+							$message_File = & $message_Link->get_File();
+							$LinkItem->add_link( $message_File->ID, $message_Link->get( 'position' ), $message_Link->get( 'order' ) );
+						}
+					}
+				}
+
 				// Inform user that other replies will not be copied to new creating post:
 				global $action;
 				if( ! empty( $action ) && strpos( $action, 'create' ) === false )
@@ -1149,20 +1165,21 @@ class Item extends ItemLight
 			return;
 		}
 
-		// Change link owner from temporary to message object:
+		// Change link owner from temporary to Item object:
 		$DB->query( 'UPDATE T_links
 			  SET link_itm_ID = '.$this->ID.',
 			      link_tmp_ID = NULL
 			WHERE link_tmp_ID = '.$TemporaryID->ID );
 
-		// Move all temporary files to folder of new created message:
+		// Move all temporary files to folder of new created Item:
 		foreach( $LinkOwner->Links as $item_Link )
 		{
 			if( $item_File = & $item_Link->get_File() &&
-			    $item_FileRoot = & $item_File->get_FileRoot() )
+			    $item_FileRoot = & $item_File->get_FileRoot() &&
+			    file_exists( $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/'.$item_File->get_name() ) )
 			{
 				if( ! file_exists( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
-				{	// Create if folder doesn't exist for files of new created message:
+				{	// Create if folder doesn't exist for files of new created Item:
 					if( mkdir_r( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
 					{
 						$tmp_folder_path = $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/';

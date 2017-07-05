@@ -802,10 +802,14 @@ class LinkCache extends DataObjectCache
 				$this->loaded_cache_comment = array();
 				$this->cache_user = array();
 				$this->loaded_cache_user = array();
+				$this->cache_emailcampaign = array();
 				$this->loaded_cache_emailcampaign = array();
+				$this->cache_message = array();
 				$this->loaded_cache_message = array();
 				$this->cache_file = array();
 				$this->loaded_cache_file = array();
+				$this->cache_temporary = array();
+				$this->loaded_cache_temporary = array();
 				break;
 
 			case 'item':

@@ -169,6 +169,27 @@ class LinkItem extends LinkOwner
 		}
 	}
 
+
+	/**
+	 * Reload all links of owner Item
+	 */
+	function reload_Links()
+	{
+		// Clear cache array of Links:
+		$this->Links = NULL;
+
+		// Unset flag to load Links again:
+		$LinkCache = & get_LinkCache();
+		$flag_name = $this->is_temp() ? 'loaded_cache_temporary' : 'loaded_cache_item';
+		if( isset( $LinkCache->{$flag_name}[ $this->get_ID() ] ) )
+		{
+			unset( $LinkCache->{$flag_name}[ $this->get_ID() ] );
+		}
+
+		// Load Links:
+		$this->load_Links();
+	}
+
 	/**
 	 * Add new link to owner Item
 	 *
@@ -209,9 +230,8 @@ class LinkItem extends LinkOwner
 				$this->update_contents_last_updated_ts();
 			}
 
-			// Reset the Links
-			$this->Links = NULL;
-			$this->load_Links();
+			// Reload the Links:
+			$this->reload_Links();
 
 			return $edited_Link->ID;
 		}
