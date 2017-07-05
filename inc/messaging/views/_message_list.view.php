@@ -427,29 +427,47 @@ else
 {	// New item URL for front-office:
 	$new_item_url = '\' + coll.url + ( coll.url.indexOf( \'?\' ) > 0 ? \'&\' : \'?\' ) + \'disp=edit&thrd_ID='.$edited_Thread->ID;
 }
+
+// Use current User and User of first Message to restrict collections list where new post can be created from Thread:
+$restrict_users = $current_User->ID;
+if( $first_Message = & $edited_Thread->get_first_Message() &&
+    $first_message_User = & $first_Message->get_author_User() &&
+    $first_message_User->ID != $current_User->ID )
+{
+	$restrict_users .= ','.$first_message_User->ID;
+}
 ?>
 <script type="text/javascript">
 function evo_msg_move_to_coll()
 {
 	openModalWindow( '<div id="evo_msg_move_coll_wrapper"><span class="loader_img absolute_center" title="<?php echo T_('Loading...'); ?>"></span></div>', '300px', '', true,
 		'<?php echo TS_('Move to a collection...'); ?>', // Window title
-		[ '-', 'evo_msg_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back" and "Create Post"
+		[ '-', 'evo_msg_post_buttons' ], // Fake button that is hidden by default, Used to display button "Close"
 		true );
 
 	evo_rest_api_request( 'collections',
 	{
-		'per_page': 1000,
-		'fields'  : 'id,shortname',
+		'per_page'      : 1000,
+		'filter'        : 'all',
+		'restrict'      : 'create_post',
+		'restrict_users': '<?php echo $restrict_users; ?>',
 	},
 	function( data )
 	{
-		var r = '<ul>';
-		for( var c in data.colls )
+		if( data.found == 0 )
 		{
-			var coll = data.colls [c];
-			r += '<li><a href="<?php echo $new_item_url; ?>">' + coll.name + '</a></li>';
+			r = '<p><?php echo TS_('No found collection where you and author of first message can create a post.'); ?></p>';
 		}
-		r += '</ul>';
+		else
+		{
+			var r = '<ul>';
+			for( var c in data.colls )
+			{
+				var coll = data.colls [c];
+				r += '<li><a href="<?php echo $new_item_url; ?>">' + coll.name + '</a></li>';
+			}
+			r += '</ul>';
+		}
 		jQuery( '#evo_msg_move_coll_wrapper' ).html( r );
 	} );
 

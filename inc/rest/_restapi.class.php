@@ -420,8 +420,16 @@ class RestApi
 		$api_per_page = param( 'per_page', 'integer', 10 );
 		$api_q = param( 'q', 'string', '' );
 		$api_fields = param( 'fields', 'string', 'shortname' ); // 'id', 'shortname'
-		$api_restrict = param( 'restrict', 'string', '' ); // 'available_fileroots' - Load only collections with available file roots for current user
-		$api_filter = param( 'filter', 'string', 'public' ); // 'public' - Load only collections which can be viewed for current user
+		// Restrict collection with user(s) permissions:
+		// - ''                    - Don't restrict,
+		// - 'available_fileroots' - Load only collections with available file roots for current user,
+		// - 'create_post'         - Load only collections where 'restrict_users' can create a post with at least one status,
+		$api_restrict = param( 'restrict', 'string', '' );
+		$api_restrict_users = param( 'restrict_users', 'string', '' ); // User IDs which should be restricted (separated with comma)
+		// Filter:
+		// - 'all'    - Load all collections,
+		// - 'public' - (Default) Load only collections which can be viewed for current user on front-office.
+		$api_filter = param( 'filter', 'string', 'public' );
 
 		if( $api_filter == 'public' )
 		{	// SQL to get ONLY public collections:
@@ -465,56 +473,133 @@ class RestApi
 			$SQL->WHERE_and( $search_sql_where );
 			$count_SQL->WHERE_and( $search_sql_where );
 		}
-
-		$collections = array();
-		if( $api_restrict == 'available_fileroots' &&
-		    (
-		      ! is_logged_in() ||
-		      ! $current_User->check_perm( 'admin', 'restricted' ) ||
-		      ! $current_User->check_perm( 'files', 'view' )
-		    ) )
-		{	// Anonymous user has no access to file roots AND also if current use has no access to back-office or to file manager:
-			$result_count = 0;
-		}
-		else
-		{
-			if( $api_restrict == 'available_fileroots' )
-			{	// Restrict collections by available file roots for current user:
-
-				// SQL analog for $current_User->check_perm( 'blogs', 'view' ) || $current_User->check_perm( 'files', 'edit' ):
-				$current_User->get_Group();
-				$check_perm_blogs_view_files_edit_SQL = new SQL();
-				$check_perm_blogs_view_files_edit_SQL->SELECT( 'grp_ID' );
-				$check_perm_blogs_view_files_edit_SQL->FROM( 'T_groups' );
-				$check_perm_blogs_view_files_edit_SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON grp_ID = gset_grp_ID AND gset_name = "perm_files"' );
-				$check_perm_blogs_view_files_edit_SQL->WHERE( 'grp_ID = '.$current_User->Group->ID );
-				$check_perm_blogs_view_files_edit_SQL->WHERE_and( 'grp_perm_blogs IN ( "viewall", "editall" ) OR gset_value IS NULL OR gset_value IN ( "all", "edit" )' );
-				$restrict_available_fileroots_sql = '( '.$check_perm_blogs_view_files_edit_SQL->get().' )';
-
-				// SQL analog for $current_User->check_perm( 'blog_media_browse', 'view', false, $Blog ):
-				$check_perm_blog_media_browse_user_SQL = new SQL();
-				$check_perm_blog_media_browse_user_SQL->SELECT( 'bloguser_blog_ID' );
-				$check_perm_blog_media_browse_user_SQL->FROM( 'T_coll_user_perms' );
-				$check_perm_blog_media_browse_user_SQL->WHERE( 'bloguser_user_ID = '.$current_User->ID );
-				$check_perm_blog_media_browse_user_SQL->WHERE_and( 'bloguser_perm_media_browse <> 0' );
-				$check_perm_blog_media_browse_group_SQL = new SQL();
-				$check_perm_blog_media_browse_group_SQL->SELECT( 'bloggroup_blog_ID' );
-				$check_perm_blog_media_browse_group_SQL->FROM( 'T_coll_group_perms' );
-				$check_perm_blog_media_browse_group_SQL->WHERE( '( bloggroup_group_ID = '.$current_User->Group->ID.'
-					OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) )' );
-				$check_perm_blog_media_browse_group_SQL->WHERE_and( 'bloggroup_perm_media_browse <> 0' );
-				$restrict_available_fileroots_sql .= ' OR blog_owner_user_ID = '.$current_User->ID
-					.' OR ( blog_advanced_perms <> 0 AND ( '
-					.'        blog_ID IN ( '.$check_perm_blog_media_browse_user_SQL->get().' ) OR '
-					.'        blog_ID IN ( '.$check_perm_blog_media_browse_group_SQL->get().' )'
-					.'      )'
-					.'    )';
-
-				$SQL->WHERE_and( $restrict_available_fileroots_sql );
-				$count_SQL->WHERE_and( $restrict_available_fileroots_sql );
+		
+		if( ! empty( $api_restrict ) )
+		{	// Restrict collections:
+			$UserCache = & get_UserCache();
+			$restrict_users = explode( ',', $api_restrict_users );
+			foreach( $restrict_users as $r => $restrict_user_ID )
+			{
+				if( $restrict_User = & $UserCache->get_by_ID( intval( $restrict_user_ID ), false, false ) )
+				{	// Use only correct User:
+					$restrict_users[ $r ] = $restrict_User;
+				}
+				else
+				{	// Remove wrong User from list:
+					unset( $restrict_users[ $r ] );
+				}
 			}
 
-			$result_count = intval( $DB->get_var( $count_SQL->get(), 0, NULL, 'Get a count of collections for search request' ) );
+			if( empty( $restrict_users ) && is_logged_in() )
+			{	// Use current User by default:
+				$restrict_users[] = $current_User;
+			}
+
+			if( empty( $restrict_users ) )
+			{	// No users to check permissions:
+				$result_count = 0;
+			}
+			else
+			{	// Restrict collections with users:
+				switch( $api_restrict )
+				{
+					case 'available_fileroots':
+						// Restrict collections by available file roots for users:
+						if( ! $current_User->check_perm( 'admin', 'restricted' ) ||
+						    ! $current_User->check_perm( 'files', 'view' ) )
+						{	// Anonymous user has no access to file roots AND also if current use has no access to back-office or to file manager:
+							$result_count = 0;
+							break;
+						}
+
+						// SQL analog for $current_User->check_perm( 'blogs', 'view' ) || $current_User->check_perm( 'files', 'edit' ):
+						$current_User->get_Group();
+						$check_perm_blogs_view_files_edit_SQL = new SQL();
+						$check_perm_blogs_view_files_edit_SQL->SELECT( 'grp_ID' );
+						$check_perm_blogs_view_files_edit_SQL->FROM( 'T_groups' );
+						$check_perm_blogs_view_files_edit_SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON grp_ID = gset_grp_ID AND gset_name = "perm_files"' );
+						$check_perm_blogs_view_files_edit_SQL->WHERE( 'grp_ID = '.$current_User->Group->ID );
+						$check_perm_blogs_view_files_edit_SQL->WHERE_and( 'grp_perm_blogs IN ( "viewall", "editall" ) OR gset_value IS NULL OR gset_value IN ( "all", "edit" )' );
+						$restrict_sql = '( '.$check_perm_blogs_view_files_edit_SQL->get().' )';
+
+						// SQL analog for $current_User->check_perm( 'blog_media_browse', 'view', false, $Blog ):
+						$check_perm_blog_media_browse_user_SQL = new SQL();
+						$check_perm_blog_media_browse_user_SQL->SELECT( 'bloguser_blog_ID' );
+						$check_perm_blog_media_browse_user_SQL->FROM( 'T_coll_user_perms' );
+						$check_perm_blog_media_browse_user_SQL->WHERE( 'bloguser_user_ID = '.$current_User->ID );
+						$check_perm_blog_media_browse_user_SQL->WHERE_and( 'bloguser_perm_media_browse <> 0' );
+						$check_perm_blog_media_browse_group_SQL = new SQL();
+						$check_perm_blog_media_browse_group_SQL->SELECT( 'bloggroup_blog_ID' );
+						$check_perm_blog_media_browse_group_SQL->FROM( 'T_coll_group_perms' );
+						$check_perm_blog_media_browse_group_SQL->WHERE( '( bloggroup_group_ID = '.$current_User->Group->ID.'
+							OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) )' );
+						$check_perm_blog_media_browse_group_SQL->WHERE_and( 'bloggroup_perm_media_browse <> 0' );
+						$restrict_sql .= ' OR blog_owner_user_ID = '.$current_User->ID
+							.' OR ( blog_advanced_perms <> 0 AND ( '
+							.'        blog_ID IN ( '.$check_perm_blog_media_browse_user_SQL->get().' ) OR '
+							.'        blog_ID IN ( '.$check_perm_blog_media_browse_group_SQL->get().' )'
+							.'      )'
+							.'    )';
+						break;
+
+					case 'create_post':
+						// Restrict collections by permission of creating new post with at least one status:
+						$restrict_sql = array();
+						foreach( $restrict_users as $restrict_User )
+						{
+							// All collection owners can creat new post:
+							$restrict_user_sql = 'blog_owner_user_ID = '.$restrict_User->ID;
+
+							// SQL analog for $current_User->check_perm( 'blogs', 'edit' ):
+							$restrict_User->get_Group();
+							$check_perm_blogs_edit_SQL = new SQL();
+							$check_perm_blogs_edit_SQL->SELECT( 'grp_ID' );
+							$check_perm_blogs_edit_SQL->FROM( 'T_groups' );
+							$check_perm_blogs_edit_SQL->WHERE( 'grp_ID = '.$restrict_User->Group->ID );
+							$check_perm_blogs_edit_SQL->WHERE_and( 'grp_perm_blogs = "editall"' );
+							$restrict_user_sql .= ' OR ( '.$check_perm_blogs_edit_SQL->get().' )';
+
+							// SQL analog for $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog_ID ):
+							$check_perm_create_post_user_SQL = new SQL();
+							$check_perm_create_post_user_SQL->SELECT( 'bloguser_blog_ID' );
+							$check_perm_create_post_user_SQL->FROM( 'T_coll_user_perms' );
+							$check_perm_create_post_user_SQL->WHERE( 'bloguser_user_ID = '.$restrict_User->ID );
+							$check_perm_create_post_user_SQL->WHERE_and( 'bloguser_perm_poststatuses <> ""' );
+							$check_perm_create_post_user_SQL->WHERE_and( 'bloguser_perm_poststatuses <> "deprecated"' );
+							$check_perm_create_post_user_SQL->WHERE_and( 'bloguser_perm_poststatuses <> "redirected"' );
+							$check_perm_create_post_user_SQL->WHERE_and( 'bloguser_perm_poststatuses <> "deprecated,redirected"' );
+							$check_perm_create_post_group_SQL = new SQL();
+							$check_perm_create_post_group_SQL->SELECT( 'bloggroup_blog_ID' );
+							$check_perm_create_post_group_SQL->FROM( 'T_coll_group_perms' );
+							$check_perm_create_post_group_SQL->WHERE( '( bloggroup_group_ID = '.$restrict_User->Group->ID.'
+								OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$restrict_User->ID.' ) )' );
+							$check_perm_create_post_group_SQL->WHERE_and( 'bloggroup_perm_poststatuses <> ""' );
+							$check_perm_create_post_group_SQL->WHERE_and( 'bloggroup_perm_poststatuses <> "deprecated"' );
+							$check_perm_create_post_group_SQL->WHERE_and( 'bloggroup_perm_poststatuses <> "redirected"' );
+							$check_perm_create_post_group_SQL->WHERE_and( 'bloggroup_perm_poststatuses <> "deprecated,redirected"' );
+							$restrict_user_sql .= ' OR ( blog_advanced_perms <> 0 AND ( '
+								.'    blog_ID IN ( '.$check_perm_create_post_user_SQL->get().' ) OR '
+								.'    blog_ID IN ( '.$check_perm_create_post_group_SQL->get().' )'
+								.'  )'
+								.')';
+
+							$restrict_sql[] = $restrict_user_sql;
+						}
+						$restrict_sql = '( '.implode( ' ) AND ( ', $restrict_sql ).' )';
+						break;
+				}
+
+				if( empty( $restrict_sql ) )
+				{
+					$result_count = 0;
+				}
+				else
+				{
+					$SQL->WHERE_and( $restrict_sql );
+					$count_SQL->WHERE_and( $restrict_sql );
+					$result_count = intval( $DB->get_var( $count_SQL->get(), 0, NULL, 'Get a count of collections for search request' ) );
+				}
+			}
 		}
 
 		// Prepare pagination:
