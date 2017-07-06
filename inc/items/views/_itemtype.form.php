@@ -115,6 +115,7 @@ $Form->begin_fieldset( T_('Use of Comments').get_manual_link( 'item-type-comment
 	$Form->checkbox( 'ityp_allow_closing_comments', $edited_Itemtype->allow_closing_comments, T_('Allow closing comments'), T_('Check to allow closing comments on individual items/posts.') );
 	$Form->checkbox( 'ityp_allow_disabling_comments', $edited_Itemtype->allow_disabling_comments, T_('Allow disabling comments'), T_('Check to allow disabling comments on individual items/posts.') );
 	$Form->radio( 'ityp_use_comment_expiration', $edited_Itemtype->use_comment_expiration, $options, T_('Use comment expiration') );
+	$Form->checkbox( 'ityp_allow_resolving_comments', $edited_Itemtype->allow_resolving_comments, T_('Allow selecting the best comment'), T_('Check to allow selecting comment as the best answer to resolve a question post.') );
 $Form->end_fieldset();
 
 

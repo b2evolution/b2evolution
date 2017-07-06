@@ -166,6 +166,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_city_ID                INT(10) UNSIGNED NULL,
 			post_addvotes               INT NOT NULL DEFAULT 0,
 			post_countvotes             INT UNSIGNED NOT NULL DEFAULT 0,
+			post_resolved_cmt_ID        INT UNSIGNED NULL,
 			PRIMARY KEY post_ID( post_ID ),
 			UNIQUE post_urltitle( post_urltitle ),
 			INDEX post_datestart( post_datestart ),
@@ -319,6 +320,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_allow_closing_comments   TINYINT DEFAULT 1,
 			ityp_allow_disabling_comments TINYINT DEFAULT 0,
 			ityp_use_comment_expiration   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ityp_allow_resolving_comments TINYINT DEFAULT 0,
 			ityp_perm_level               ENUM( 'standard', 'restricted', 'admin' ) COLLATE ascii_general_ci NOT NULL default 'standard',
 			PRIMARY KEY ( ityp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

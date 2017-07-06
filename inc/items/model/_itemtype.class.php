@@ -56,6 +56,7 @@ class ItemType extends DataObject
 	var $allow_closing_comments = 1;
 	var $allow_disabling_comments = 0;
 	var $use_comment_expiration = 'optional';
+	var $allow_resolving_comments = 0;
 	var $perm_level = 'standard';
 
 	/**
@@ -125,6 +126,7 @@ class ItemType extends DataObject
 			$this->allow_closing_comments = $db_row->ityp_allow_closing_comments;
 			$this->allow_disabling_comments = $db_row->ityp_allow_disabling_comments;
 			$this->use_comment_expiration = $db_row->ityp_use_comment_expiration;
+			$this->allow_resolving_comments = $db_row->ityp_allow_resolving_comments;
 			$this->perm_level = $db_row->ityp_perm_level;
 		}
 	}
@@ -311,6 +313,10 @@ class ItemType extends DataObject
 		// Use comment expiration
 		param( 'ityp_use_comment_expiration', 'string' );
 		$this->set_from_Request( 'use_comment_expiration' );
+
+		// Allow selecting the best comment
+		param( 'ityp_allow_resolving_comments', 'integer', 0 );
+		$this->set_from_Request( 'allow_resolving_comments' );
 
 		// Load custom fields from request
 		$this->load_custom_fields_from_Request();
