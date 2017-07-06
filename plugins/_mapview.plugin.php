@@ -206,16 +206,6 @@ class mapview_plugin extends Plugin
 		global $admin_url, $DB, $BlogCache, $ItemCache, $Collection, $Blog;
 		global $Item, $disp;
 
-		if( empty( $Item ) )
-		{
-			var_dump( 'Not in Item Single View' );
-		}
-		else
-		{
-			var_dump( 'In Item Single View!' );
-			var_dump( $disp );
-		}
-
 		/**
 		 * Default params:
 		 */
