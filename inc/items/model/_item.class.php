@@ -302,6 +302,13 @@ class Item extends ItemLight
 	var $countvotes;
 
 	/**
+	 * ID of Comment which is selected as the best answer by Item author
+	 *
+	 * @var integer
+	 */
+	var $resolve_cmt_ID = NULL;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -421,6 +428,9 @@ class Item extends ItemLight
 			// Voting fields:
 			$this->addvotes = $db_row->post_addvotes;
 			$this->countvotes = $db_row->post_countvotes;
+
+			// Comment ID which is selected as the best answer for this Item:
+			$this->resolved_cmt_ID = $db_row->post_resolved_cmt_ID;
 		}
 
 		modules_call_method( 'constructor_item', array( 'Item' => & $this ) );
@@ -9135,7 +9145,6 @@ class Item extends ItemLight
 	/**
 	 * Flag or unflag item for current user
 	 *
-	 * @param string Vote value (positive, neutral, negative)
 	 * @access protected
 	 */
 	function update_flag()
@@ -9173,6 +9182,75 @@ class Item extends ItemLight
 		$this->set_user_data( 'item_flag', $new_flag_value );
 
 		$DB->commit();
+	}
+
+
+	/*
+	 * Check if current User can resolve this Item
+	 *
+	 * @return boolean
+	 */
+	function can_resolve()
+	{
+		if( empty( $this->ID ) )
+		{	// Item is not created yet:
+			return false;
+		}
+
+		if( ! is_logged_in() )
+		{	// If user is NOT logged in:
+			return false;
+		}
+
+		if( ! $this->get_type_setting( 'allow_resolving_comments' ) )
+		{	// This Item doesn't allow to ba a resolved:
+			return false;
+		}
+
+		global $current_User;
+		$item_creator_User = & $this->get_creator_User();
+		if( ! $item_creator_User || $current_User->ID != $item_creator_User->ID )
+		{	// Current User must be an author of the comment's Item:
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Resolve or unresolve Item
+	 *
+	 * @param integer Comment ID
+	 * @access protected
+	 */
+	function update_resolve( $comment_ID = NULL )
+	{
+		if( ! $this->can_resolve() )
+		{	// Don't allow to resolve this Item:
+			return;
+		}
+
+		if( ! empty( $comment_ID ) )
+		{	// Check if comment is really posted on this Item:
+			$CommentCache = & get_CommentCache();
+			$Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
+			if( ! $Comment ||
+			    ! ( $comment_Item = & $Comment->get_Item() ) ||
+			    $comment_Item->ID != $this->ID )
+			{	// Comment is wrong or Comment is from another Item:
+				return;
+			}
+		}
+
+		if( $this->get( 'resolved_cmt_ID' ) == $comment_ID )
+		{	// If user press on the same Comment then unresolve the Item:
+			$comment_ID = NULL;
+		}
+
+		// Update
+		$this->set( 'resolved_cmt_ID', $comment_ID, true );
+		$this->dbupdate();
 	}
 
 

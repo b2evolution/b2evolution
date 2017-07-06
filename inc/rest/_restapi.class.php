@@ -328,7 +328,7 @@ class RestApi
 
 			case 'POST':
 				// List of valid resources
-				$valid_resources = array( 'favorite', 'items_flag' );
+				$valid_resources = array( 'favorite', 'items_flag', 'items_resolve' );
 				break;
 
 			default:
@@ -389,6 +389,14 @@ class RestApi
 		{	// Set controller name for single object and action:
 			$coll_controller = $coll_controller.'_'.$object_action;
 			$coll_controller_params[] = $object_ID;
+		}
+
+		if( count( $this->args ) > 5 )
+		{	// Append additional params:
+			for( $a = 5; $a < count( $this->args ); $a++ )
+			{
+				$coll_controller_params[] = $this->args[ $a ];
+			}
 		}
 
 		if( ! method_exists( $this, 'controller_coll_'.$coll_controller ) )
@@ -1113,6 +1121,57 @@ class RestApi
 
 		// Return current state of flag:
 		$this->add_response( 'flag', $Item->get_user_data( 'item_flag' ), 'integer' );
+	}
+
+
+	/**
+	 * Call item controller to resolve by current user
+	 * (Mark item as resolved and optionally select the best comment/answer)
+	 *
+	 * @param integer Item ID
+	 * @param integer Comment ID
+	 */
+	private function controller_coll_items_resolve( $item_ID, $comment_ID = NULL )
+	{
+		global $Collection, $Blog;
+
+		$ItemCache = & get_ItemCache();
+		if( ( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) === false )
+		{	// Item is not detected in DB by requested ID:
+			$this->halt( 'No item found in DB by requested ID #'.$item_ID, 'unknown_item', 404 );
+			// Exit here.
+		}
+
+		if( $Item->get_blog_ID() != $Blog->ID )
+		{	// Item should be called for current collection:
+			$this->halt( 'You request item #'.$Item->ID.' from another collection "'.$Blog->get( 'urlname' ).'"', 'wrong_item_coll', 403 );
+			// Exit here.
+		}
+
+		if( ! empty( $comment_ID ) )
+		{	// Check if comment is really posted on the Item:
+			$CommentCache = & get_CommentCache();
+			$Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
+			if( ! $Comment ||
+			    ! ( $comment_Item = & $Comment->get_Item() ) ||
+			    $comment_Item->ID != $Item->ID )
+			{	// Comment is wrong or Comment is from another Item:
+				$this->halt( 'You request comment #'.$comment_ID.' from another item #'.$Item->ID, 'wrong_comment_item_coll', 403 );
+				// Exit here.
+			}
+		}
+
+		if( ( ! empty( $Comment ) && ! $Comment->can_resolve() ) ||
+		    ( empty( $Comment ) && ! $Item->can_resolve() ) )
+		{	// Don't allow resolve:
+			$this->halt( 'You cannot resolve the item #'.$Item->ID, 'cannot_resolve_item', 403 );
+		}
+
+		// Resolve or unresolve item for current user:
+		$Item->update_resolve( $comment_ID );
+
+		// Return current resolving comment ID:
+		$this->add_response( 'resolved_cmt_ID', $Item->get( 'resolved_cmt_ID' ), 'integer' );
 	}
 
 

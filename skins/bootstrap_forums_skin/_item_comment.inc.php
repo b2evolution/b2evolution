@@ -283,6 +283,9 @@ echo $params['comment_body_after'];
 	// Display Spam Voting system
 	$Comment->vote_spam( '', '', '&amp;', true, true );
 
+	// 
+	$Comment->resolve_button();
+
 	echo '<span class="pull-left">';
 		$comment_redirect_url = $Comment->get_permanent_url();
 		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */

@@ -4909,6 +4909,95 @@ class Comment extends DataObject
 
 		return $inlist_order < 0 ? 0 : $inlist_order;
 	}
+
+
+	/*
+	 * Check if user can select this Comment as the best answer of the Item
+	 *
+	 * @return boolean
+	 */
+	function can_resolve()
+	{
+		if( empty( $this->ID ) )
+		{	// Comment is not created yet:
+			return false;
+		}
+
+		if( $comment_Item = & $this->get_Item() )
+		{	// Check if Item of this Comment can be resolved:
+			return $comment_Item->can_resolve();
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Display button to resolve Item of this Comment
+	 * (Select the best answer)
+	 *
+	 * @param array Params
+	 */
+	function resolve_button( $params = array() )
+	{
+		echo $this->get_resolve_button( $params );
+	}
+
+
+	/**
+	 * Get button to resolve Item of this Comment
+	 * (Select the best answer)
+	 *
+	 * @param array Params
+	 * @return string HTML of the button
+	 */
+	function get_resolve_button( $params = array() )
+	{
+		global $current_User;
+
+		$params = array_merge( array(
+				'before'              => '',
+				'after'               => '',
+				'btn_class_resolve'   => 'btn btn-default btn-xs',
+				'btn_class_unresolve' => 'btn btn-success btn-xs',
+				'text_resolve'        => '#icon# '.T_('Mark this as Best Answer'),
+				'text_unresolve'      => '#icon# '.T_('Remove this from Best Answer'),
+				'title_resolve'       => T_('Mark this as Best Answer').'.',
+				'title_unresolve'     => T_('You have selected this as the best answer. Click to unselect.'),
+			), $params );
+
+		if( ! $this->can_resolve() )
+		{	// Don't display the resolve button if it is not allowed by some reason:
+			return '';
+		}
+
+		$comment_Item = & $this->get_Item();
+		$item_Blog = & $comment_Item->get_Blog();
+
+		// Get current state of resolving:
+		$is_resolving = ( $this->ID == $comment_Item->get( 'resolved_cmt_ID' ) );
+
+		$r = $params['before'];
+
+		$r .= '<span class="evo_post_resolve_btn" data-cmt-id="'.$this->ID.'" data-id="'.$comment_Item->ID.'" data-coll="'.$item_Blog->get( 'urlname' ).'">'
+				// Icon + Text to Resolve:
+				.'<a href="#" class="'.$params['btn_class_resolve'].'"'
+						.( $is_resolving ? ' style="display:none"' : '' )
+						.( empty( $params['title_resolve'] ) ? '' : ' title="'.format_to_output( $params['title_resolve'], 'htmlattr' ).'"' ).'>'
+					.str_replace( '#icon#', get_icon( 'resolve_off' ), $params['text_resolve'] )
+				.'</a>'
+				// Icon + Text to Unresolve:
+				.'<a href="#" class="'.$params['btn_class_unresolve'].'"'
+						.( $is_resolving ? '' : ' style="display:none"' )
+						.( empty( $params['title_unresolve'] ) ? '' : ' title="'.format_to_output( $params['title_unresolve'], 'htmlattr' ).'"' ).'>'
+					.str_replace( '#icon#', get_icon( 'resolve_on' ), $params['text_unresolve'] )
+				.'</a>'
+			.'</span>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
 }
 
 ?>
