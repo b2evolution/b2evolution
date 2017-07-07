@@ -837,13 +837,9 @@ class ComponentWidget extends DataObject
 				break;
 
 			case 'all':
-				// Load all collections:
-				$blog_array = $BlogCache->load_all( $order_by, $order_dir );
-				break;
-
 			case 'access':
 			case 'public_access':
-				// Load restricted collections:
+				// Load all or restricted collections:
 				$blog_array = $BlogCache->load_restricted_colls( $filter, $order_by, $order_dir );
 				break;
 
