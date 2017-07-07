@@ -160,6 +160,16 @@ $display_workflow = ( $disp == 'posts' ) &&
 			printf( T_('%s replies'), '<div>0</div>' );
 		}
 
+		// Display button to resolve current Item:
+		$Item->resolve_button( array(
+				'before'              => ' ',
+				'after'               => '',
+				'btn_class_resolve'   => '',
+				'btn_class_unresolve' => '',
+				'text_resolve'        => '#icon#',
+				'text_unresolve'      => '#icon#',
+			) );
+
 		echo '</div>';
 	} // --------------------------------------------------------------------------------------------------------------------------
 
@@ -207,6 +217,16 @@ $display_workflow = ( $disp == 'posts' ) &&
 
 			// Workflow status
 			echo '<span><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></span>';
+
+			// Display button to resolve current Item:
+			$Item->resolve_button( array(
+					'before'              => ' ',
+					'btn_class_resolve'   => '',
+					'btn_class_unresolve' => '',
+					'text_resolve'        => '',
+					'text_unresolve'      => '#icon#',
+				) );
+
 			echo '</div>';
 
 			echo '</div>'; // /col
@@ -218,6 +238,16 @@ $display_workflow = ( $disp == 'posts' ) &&
 
 			// Workflow status
 			echo '<b><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></b>';
+
+			// Display button to resolve current Item:
+			$Item->resolve_button( array(
+					'before'              => ' ',
+					'btn_class_resolve'   => '',
+					'btn_class_unresolve' => '',
+					'text_resolve'        => '',
+					'text_unresolve'      => '#icon#',
+				) );
+
 			echo '</div>';
 
 			// b2evonet:
@@ -266,8 +296,16 @@ $display_workflow = ( $disp == 'posts' ) &&
 		{	// No replies yet:
 			printf( T_('%s replies'), '0' );
 		}
-		
-		
+
+		// Display button to resolve current Item:
+		$Item->resolve_button( array(
+				'before'              => ' ',
+				'btn_class_resolve'   => '',
+				'btn_class_unresolve' => '',
+				'text_resolve'        => '#icon#',
+				'text_unresolve'      => '#icon#',
+			) );
+
 		echo '</div>';
 	} // ==========================================================================================================================
 	else
