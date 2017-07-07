@@ -1318,10 +1318,10 @@ class Skin extends DataObject
 						require_js( 'bozo_validator.js', 'blog' );
 					}
 
-					// Require File Uploader js and css:
-					init_fileuploader_js_lang_strings();
-					require_js( 'multiupload/fileuploader.js', 'blog' );
-					require_css( 'fileuploader.css', 'blog' );
+					// Require Fine Uploader js and css:
+					init_fineuploader_js_lang_strings();
+					require_js( 'multiupload/fine-uploader.js', 'blog' );
+					require_css( 'fine-uploader.css', 'blog' );
 					// Load JS files to make the links table sortable:
 					require_js( '#jquery#' );
 					require_js( 'jquery/jquery.sortable.min.js' );

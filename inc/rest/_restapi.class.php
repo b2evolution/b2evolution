@@ -326,7 +326,7 @@ class RestApi
 				$valid_resources = array( '', 'view', 'items', 'posts', 'search', 'assignees' );
 				break;
 
-			case 'POST':
+			case 'PUT':
 				// List of valid resources
 				$valid_resources = array( 'favorite', 'items_flag' );
 				break;
@@ -1065,7 +1065,9 @@ class RestApi
 			// Exit here.
 		}
 
-		$setting = ( $Blog->favorite( $current_User->ID ) == 1 ? 0 : 1 );
+		parse_str( file_get_contents( 'php://input' ), $data );
+		$setting = param_format( $data['setting'], 'integer' );
+
 		$r = $Blog->favorite( $current_User->ID, $setting );
 
 		if( is_null( $r ) )
