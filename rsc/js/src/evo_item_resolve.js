@@ -6,7 +6,7 @@ jQuery( document ).on( 'click', 'span.evo_post_resolve_btn a', function()
 {
 	var resolve_wrapper = jQuery( this ).parent();
 	var item_ID = parseInt( resolve_wrapper.data( 'id' ) );
-	var comment_ID = parseInt( resolve_wrapper.data( 'cmt-id' ) );
+	var comment_ID = resolve_wrapper.data( 'cmt-id' ) === undefined ? 0 : parseInt( resolve_wrapper.data( 'cmt-id' ) );
 
 	if( item_ID > 0 )
 	{	// If item ID is defined...
@@ -21,15 +21,22 @@ jQuery( document ).on( 'click', 'span.evo_post_resolve_btn a', function()
 		{	// Toggle icon to new resolve status:
 			if( data.resolved_cmt_ID == comment_ID )
 			{	// If item is resolved
-				jQuery( 'span.evo_post_resolve_btn[data-id=' + item_ID + '][data-cmt-id]' ).each( function()
-				{	// Clear resolved status from previous selected comment:
-					jQuery( this ).find( ' a:first' ).show().next().hide();
+				jQuery( 'span.evo_post_resolve_btn[data-id=' + item_ID + ']' ).each( function()
+				{
+					if( jQuery( this ).data( 'cmt-id' ) === undefined )
+					{	// Set resolved status for main Item button:
+						jQuery( this ).find( ' a:first' ).hide().next().show();
+					}
+					else
+					{	// Clear resolved status from previous selected comment:
+						jQuery( this ).find( ' a:first' ).show().next().hide();
+					}
 				} );
 				resolve_wrapper.find( 'a:first' ).hide().next().show();
 			}
 			else
 			{	// If item is unresolved
-				resolve_wrapper.find( 'a:first' ).show().next().hide();
+				jQuery( 'span.evo_post_resolve_btn[data-id=' + item_ID + ']' ).find( 'a:first' ).show().next().hide();
 			}
 
 			// Remove hover style in order to keep current updated status:

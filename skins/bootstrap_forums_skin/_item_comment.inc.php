@@ -283,7 +283,7 @@ echo $params['comment_body_after'];
 	// Display Spam Voting system
 	$Comment->vote_spam( '', '', '&amp;', true, true );
 
-	// 
+	// Display button to select current Comment as the best answer:
 	$Comment->resolve_button();
 
 	echo '<span class="pull-left">';

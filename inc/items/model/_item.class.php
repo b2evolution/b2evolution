@@ -9219,6 +9219,76 @@ class Item extends ItemLight
 
 
 	/**
+	 * Display button to resolve this Item
+	 * (Select the best answer/comment OR Resolve this Item without selected Comment)
+	 *
+	 * @param array Params
+	 */
+	function resolve_button( $params = array() )
+	{
+		echo $this->get_resolve_button( $params );
+	}
+
+
+	/**
+	 * Get button to resolve this Item
+	 * (Select the best answer/comment OR Resolve this Item without selected Comment)
+	 *
+	 * @param array Params
+	 * @return string HTML of the button
+	 */
+	function get_resolve_button( $params = array() )
+	{
+		if( ! $this->can_resolve() )
+		{	// Don't display the resolve button if it is not allowed by some reason:
+			return '';
+		}
+
+		$params = array_merge( array(
+				'comment_ID'          => 0, // 0 - when Item is resolved without selected Comment, > 0 - ID of the Comment which should be used to resolve/unresolve
+				'before'              => '',
+				'after'               => '',
+				'btn_class_resolve'   => 'btn btn-default',
+				'btn_class_unresolve' => 'btn btn-success',
+				'text_resolve'        => '#icon# '.T_('Mark this thread as resolved'),
+				'text_unresolve'      => '#icon# '.T_('Mark this thread as unresolved'),
+				'title_resolve'       => T_('Mark this thread as resolved').'.',
+				'title_unresolve'     => T_('You have resolved this thread. Click to unresolve.'),
+			), $params );
+
+		$item_Blog = & $this->get_Blog();
+
+		// Get current state of resolving:
+		$is_resolving = ( $params['comment_ID'] === $this->get( 'resolved_cmt_ID' ) ||
+		                ( $params['comment_ID'] === 0 && $this->get( 'resolved_cmt_ID' ) !== NULL ) );
+
+		$r = $params['before'];
+
+		$r .= '<span class="evo_post_resolve_btn"'
+					.' data-coll="'.$item_Blog->get( 'urlname' ).'"'
+					.' data-id="'.$this->ID.'"'
+					.( empty( $params['comment_ID'] ) ? '' : ' data-cmt-id="'.$params['comment_ID'].'"' ).'>'
+				// Icon + Text to Resolve:
+				.'<a href="#" class="'.$params['btn_class_resolve'].'"'
+						.( $is_resolving ? ' style="display:none"' : '' )
+						.( empty( $params['title_resolve'] ) ? '' : ' title="'.format_to_output( $params['title_resolve'], 'htmlattr' ).'"' ).'>'
+					.str_replace( '#icon#', get_icon( 'resolve_off' ), $params['text_resolve'] )
+				.'</a>'
+				// Icon + Text to Unresolve:
+				.'<a href="#" class="'.$params['btn_class_unresolve'].'"'
+						.( $is_resolving ? '' : ' style="display:none"' )
+						.( empty( $params['title_unresolve'] ) ? '' : ' title="'.format_to_output( $params['title_unresolve'], 'htmlattr' ).'"' ).'>'
+					.str_replace( '#icon#', get_icon( 'resolve_on' ), $params['text_unresolve'] )
+				.'</a>'
+			.'</span>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
 	 * Resolve or unresolve Item
 	 *
 	 * @param integer Comment ID
@@ -9243,8 +9313,10 @@ class Item extends ItemLight
 			}
 		}
 
-		if( $this->get( 'resolved_cmt_ID' ) == $comment_ID )
-		{	// If user press on the same Comment then unresolve the Item:
+		if( $this->get( 'resolved_cmt_ID' ) == $comment_ID ||
+		    $this->get( 'resolved_cmt_ID' ) !== NULL && empty( $comment_ID ) )
+		{	// If user press on the same Comment then unresolve the Item
+			// OR :
 			$comment_ID = NULL;
 		}
 

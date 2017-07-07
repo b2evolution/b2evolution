@@ -4953,7 +4953,17 @@ class Comment extends DataObject
 	 */
 	function get_resolve_button( $params = array() )
 	{
-		global $current_User;
+		global $disp;
+
+		if( isset( $disp ) && $disp != 'single' &&  $disp != 'page' )
+		{	// Allow display the resolve button only Item view page:
+			return '';
+		}
+
+		if( ! $this->can_resolve() )
+		{	// Don't display the resolve button if it is not allowed by some reason:
+			return '';
+		}
 
 		$params = array_merge( array(
 				'before'              => '',
@@ -4966,37 +4976,12 @@ class Comment extends DataObject
 				'title_unresolve'     => T_('You have selected this as the best answer. Click to unselect.'),
 			), $params );
 
-		if( ! $this->can_resolve() )
-		{	// Don't display the resolve button if it is not allowed by some reason:
-			return '';
-		}
-
 		$comment_Item = & $this->get_Item();
-		$item_Blog = & $comment_Item->get_Blog();
 
-		// Get current state of resolving:
-		$is_resolving = ( $this->ID == $comment_Item->get( 'resolved_cmt_ID' ) );
+		// Set comment ID to mark this comment is the best answer:
+		$params['comment_ID'] = $this->ID;
 
-		$r = $params['before'];
-
-		$r .= '<span class="evo_post_resolve_btn" data-cmt-id="'.$this->ID.'" data-id="'.$comment_Item->ID.'" data-coll="'.$item_Blog->get( 'urlname' ).'">'
-				// Icon + Text to Resolve:
-				.'<a href="#" class="'.$params['btn_class_resolve'].'"'
-						.( $is_resolving ? ' style="display:none"' : '' )
-						.( empty( $params['title_resolve'] ) ? '' : ' title="'.format_to_output( $params['title_resolve'], 'htmlattr' ).'"' ).'>'
-					.str_replace( '#icon#', get_icon( 'resolve_off' ), $params['text_resolve'] )
-				.'</a>'
-				// Icon + Text to Unresolve:
-				.'<a href="#" class="'.$params['btn_class_unresolve'].'"'
-						.( $is_resolving ? '' : ' style="display:none"' )
-						.( empty( $params['title_unresolve'] ) ? '' : ' title="'.format_to_output( $params['title_unresolve'], 'htmlattr' ).'"' ).'>'
-					.str_replace( '#icon#', get_icon( 'resolve_on' ), $params['text_unresolve'] )
-				.'</a>'
-			.'</span>';
-
-		$r .= $params['after'];
-
-		return $r;
+		return $comment_Item->get_resolve_button( $params );
 	}
 }
 

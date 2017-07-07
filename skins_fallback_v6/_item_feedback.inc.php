@@ -425,6 +425,12 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 		}
 	}
 
+	// Display button to resolve current Item:
+	$Item->resolve_button( array(
+			'before' => '<p class="text-center">',
+			'after'  => '</p>',
+		) );
+
 	echo '</section>';
 }
 
