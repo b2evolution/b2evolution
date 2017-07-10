@@ -9188,16 +9188,17 @@ class Item extends ItemLight
 	/*
 	 * Check if current User can resolve this Item
 	 *
+	 * @param string Mode: 'edit', 'view'
 	 * @return boolean
 	 */
-	function can_resolve()
+	function can_resolve( $mode = 'edit' )
 	{
 		if( empty( $this->ID ) )
 		{	// Item is not created yet:
 			return false;
 		}
 
-		if( ! is_logged_in() )
+		if( $mode == 'edit' && ! is_logged_in() )
 		{	// If user is NOT logged in:
 			return false;
 		}
@@ -9207,14 +9208,69 @@ class Item extends ItemLight
 			return false;
 		}
 
-		global $current_User;
-		$item_creator_User = & $this->get_creator_User();
-		if( ! $item_creator_User || $current_User->ID != $item_creator_User->ID )
-		{	// Current User must be an author of the comment's Item:
-			return false;
+		if( $mode == 'edit' )
+		{	// For edit mode we should check if current User is author of this Item:
+			global $current_User;
+			$item_creator_User = & $this->get_creator_User();
+			if( ! $item_creator_User || $current_User->ID != $item_creator_User->ID )
+			{	// Current User must be an author of the comment's Item:
+				return false;
+			}
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Display status if this Item is resolved
+	 *
+	 * @param array Params
+	 */
+	function resolved_status( $params = array() )
+	{
+		echo $this->get_resolved_status( $params );
+	}
+
+
+	/**
+	 * Get status text if this Item is resolved
+	 *
+	 * @param array Params
+	 * @return string HTML of the status text
+	 */
+	function get_resolved_status( $params = array() )
+	{
+		if( ! $this->can_resolve( 'view' ) )
+		{	// Don't display the resolved status if it is not allowed by some reason:
+			return '';
+		}
+
+		$params = array_merge( array(
+				'comment_ID' => 0, // 0 - to check if this Item is resolved with any Comment, > 0 - ID of the Comment to check if this Item is resolved with the Comment
+				'before'     => '',
+				'after'      => '',
+				'text'       => '#icon# '.T_('This thread is resolved.'),
+				'title'      => T_('This thread is resolved.'),
+			), $params );
+
+		$item_Blog = & $this->get_Blog();
+
+		if( $params['comment_ID'] !== $this->get( 'resolved_cmt_ID' ) &&
+		    ( $params['comment_ID'] !== 0 || $this->get( 'resolved_cmt_ID' ) === NULL ) )
+		{	// If Item is not resolved:
+			return '';
+		}
+
+		$r = $params['before'];
+
+		$r .= '<span class="evo_post_resolve_status"'.( empty( $params['title'] ) ? '' : ' title="'.format_to_output( $params['title'], 'htmlattr' ) ).'">'
+				.str_replace( '#icon#', get_icon( 'resolve_on' ), $params['text'] )
+			.'</span>';
+
+		$r .= $params['after'];
+
+		return $r;
 	}
 
 

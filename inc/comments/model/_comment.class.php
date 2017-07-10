@@ -4914,9 +4914,10 @@ class Comment extends DataObject
 	/*
 	 * Check if user can select this Comment as the best answer of the Item
 	 *
+	 * @param string Mode: 'edit', 'view'
 	 * @return boolean
 	 */
-	function can_resolve()
+	function can_resolve(  $mode = 'edit'  )
 	{
 		if( empty( $this->ID ) )
 		{	// Comment is not created yet:
@@ -4925,10 +4926,57 @@ class Comment extends DataObject
 
 		if( $comment_Item = & $this->get_Item() )
 		{	// Check if Item of this Comment can be resolved:
-			return $comment_Item->can_resolve();
+			return $comment_Item->can_resolve( $mode );
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Display status if this Comment is selected as the best answer
+	 *
+	 * @param array Params
+	 */
+	function resolved_status( $params = array() )
+	{
+		echo $this->get_resolved_status( $params );
+	}
+
+
+	/**
+	 * Get status text if this Comment is selected as the best answer
+	 *
+	 * @param array Params
+	 * @return string HTML of the status text
+	 */
+	function get_resolved_status( $params = array() )
+	{
+		global $disp;
+
+		if( isset( $disp ) && $disp != 'single' &&  $disp != 'page' )
+		{	// Allow display the resolved status only on Item view page:
+			return '';
+		}
+
+		if( ! $this->can_resolve( 'view' ) )
+		{	// Don't display the resolved status if it is not allowed by some reason:
+			return '';
+		}
+
+		$params = array_merge( array(
+				'before' => '',
+				'after'  => '',
+				'text'   => '#icon# '.T_('This is the Best Answer.'),
+				'title'  => T_('This is the Best Answer.'),
+			), $params );
+
+		$comment_Item = & $this->get_Item();
+
+		// Set comment ID to mark this comment is the best answer:
+		$params['comment_ID'] = $this->ID;
+
+		return $comment_Item->get_resolved_status( $params );
 	}
 
 
@@ -4956,7 +5004,7 @@ class Comment extends DataObject
 		global $disp;
 
 		if( isset( $disp ) && $disp != 'single' &&  $disp != 'page' )
-		{	// Allow display the resolve button only Item view page:
+		{	// Allow display the resolve button only on Item view page:
 			return '';
 		}
 

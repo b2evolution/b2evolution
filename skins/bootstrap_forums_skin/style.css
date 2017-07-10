@@ -598,6 +598,16 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar a > img {
 .evo_comment .panel-footer .action_btn_group .comment_edit_btn {
   display: inline-block;
 }
+.evo_content_block .panel-footer span.evo_post_resolve_btn,
+.evo_comment .panel-footer span.evo_post_resolve_btn {
+  margin: 0 10px 0 0;
+  float: left;
+}
+.evo_content_block .panel-footer span.evo_post_resolve_status,
+.evo_comment .panel-footer span.evo_post_resolve_status {
+  margin: 3px 10px 3px 0;
+  float: left;
+}
 .vote_spam {
   float: left;
   height: 22px;

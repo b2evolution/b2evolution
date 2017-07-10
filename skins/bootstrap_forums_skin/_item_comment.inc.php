@@ -286,6 +286,9 @@ echo $params['comment_body_after'];
 	// Display button to select current Comment as the best answer:
 	$Comment->mark_resolved_button();
 
+	// Display status if current Comment is selected as the best answer:
+	$Comment->resolved_status();
+
 	echo '<span class="pull-left">';
 		$comment_redirect_url = $Comment->get_permanent_url();
 		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */

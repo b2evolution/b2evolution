@@ -431,6 +431,12 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 			'after'  => '</p>',
 		) );
 
+	// Display status if current Item is resolved:
+	$Item->resolved_status( array(
+			'before' => '<p class="text-center">',
+			'after'  => '</p>',
+		) );
+
 	echo '</section>';
 }
 
