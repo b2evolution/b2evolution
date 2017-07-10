@@ -149,7 +149,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 		echo '<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-5">';
 
 		// Get button to resolve current Item:
-		$item_resolve_button = $Item->get_resolve_button( array(
+		$item_resolve_button = $Item->get_mark_resolved_button( array(
 				'before'              => '',
 				'after'               => ' ',
 				'btn_class_resolve'   => '',
@@ -224,7 +224,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 			echo '<span><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></span>';
 
 			// Display button to resolve current Item:
-			$Item->resolve_button( array(
+			$Item->mark_resolved_button( array(
 					'before'              => ' ',
 					'btn_class_resolve'   => '',
 					'btn_class_unresolve' => '',
@@ -245,7 +245,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 			echo '<b><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></b>';
 
 			// Display button to resolve current Item:
-			$Item->resolve_button( array(
+			$Item->mark_resolved_button( array(
 					'before'              => ' ',
 					'btn_class_resolve'   => '',
 					'btn_class_unresolve' => '',
@@ -303,7 +303,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 		}
 
 		// Display button to resolve current Item:
-		$Item->resolve_button( array(
+		$Item->mark_resolved_button( array(
 				'before'              => ' ',
 				'btn_class_resolve'   => '',
 				'btn_class_unresolve' => '',

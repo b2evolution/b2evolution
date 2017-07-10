@@ -9224,9 +9224,9 @@ class Item extends ItemLight
 	 *
 	 * @param array Params
 	 */
-	function resolve_button( $params = array() )
+	function mark_resolved_button( $params = array() )
 	{
-		echo $this->get_resolve_button( $params );
+		echo $this->get_mark_resolved_button( $params );
 	}
 
 
@@ -9237,7 +9237,7 @@ class Item extends ItemLight
 	 * @param array Params
 	 * @return string HTML of the button
 	 */
-	function get_resolve_button( $params = array() )
+	function get_mark_resolved_button( $params = array() )
 	{
 		if( ! $this->can_resolve() )
 		{	// Don't display the resolve button if it is not allowed by some reason:

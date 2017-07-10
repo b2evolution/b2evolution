@@ -4938,9 +4938,9 @@ class Comment extends DataObject
 	 *
 	 * @param array Params
 	 */
-	function resolve_button( $params = array() )
+	function mark_resolved_button( $params = array() )
 	{
-		echo $this->get_resolve_button( $params );
+		echo $this->get_mark_resolved_button( $params );
 	}
 
 
@@ -4951,7 +4951,7 @@ class Comment extends DataObject
 	 * @param array Params
 	 * @return string HTML of the button
 	 */
-	function get_resolve_button( $params = array() )
+	function get_mark_resolved_button( $params = array() )
 	{
 		global $disp;
 
@@ -4981,7 +4981,7 @@ class Comment extends DataObject
 		// Set comment ID to mark this comment is the best answer:
 		$params['comment_ID'] = $this->ID;
 
-		return $comment_Item->get_resolve_button( $params );
+		return $comment_Item->get_mark_resolved_button( $params );
 	}
 }
 

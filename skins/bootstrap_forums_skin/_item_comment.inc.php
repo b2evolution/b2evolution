@@ -284,7 +284,7 @@ echo $params['comment_body_after'];
 	$Comment->vote_spam( '', '', '&amp;', true, true );
 
 	// Display button to select current Comment as the best answer:
-	$Comment->resolve_button();
+	$Comment->mark_resolved_button();
 
 	echo '<span class="pull-left">';
 		$comment_redirect_url = $Comment->get_permanent_url();
