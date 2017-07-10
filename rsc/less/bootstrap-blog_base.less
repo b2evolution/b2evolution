@@ -537,13 +537,38 @@ div.item_location {
 }
 
 // Not published comments display
-.evo_content_block span[class*=status_] {
-	background: transparent;
-	width: 75px;
-	height: 75px;
-	display: block;
-	position: relative;
-	overflow: hidden;
+.evo_content_block span {
+	&.status_published,
+	&.status_community,
+	&.status_protected,
+	&.status_review,
+	&.status_private,
+	&.status_draft,
+	&.status_deprecated,
+	&.status_redirected,
+	&.status_trash {
+		background: transparent;
+		width: 75px;
+		height: 75px;
+		display: block;
+		position: relative;
+		overflow: hidden;
+		span {
+			display: block;
+			width: 120px;
+			text-align: center;
+			padding: 3px 0;
+			position: relative;
+			font-size: 9pt;
+			top: 15px;
+			left: -12px;
+			-webkit-transform: rotate(45deg);
+			-moz-transform: rotate(45deg);
+			-o-transform: rotate(45deg);
+			-ms-transform: rotate(45deg);
+			-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476)"; /* IE8 */
+		}
+	}
 }
 
 .note.status_draft span,		// This is deprecated
@@ -597,47 +622,47 @@ div.item_location {
 	background-color: #5bc0de !important;
 }
 
-.evo_content_block span[class*=status_] span {
-	display: block;
-	width: 120px;
-	text-align: center;
-	padding: 3px 0;
-	position: relative;
-	font-size: 9pt;
-	top: 15px;
-	left: -12px;
-	-webkit-transform: rotate(45deg);
-	-moz-transform: rotate(45deg);
-	-o-transform: rotate(45deg);
-	-ms-transform: rotate(45deg);
-	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476)"; /* IE8 */
-}
-
-div.results .status_draft span,
-div.results .status_review span,
-div.results .status_community span,
-div.results .status_protected span,
-div.results .status_private span,
-div.results .status_published span,
-div.results .status_deprecated span,
-div.results .status_redirected span,
-div.results .status_trash span,
-div.results .status_meta span {
-	text-align: center;
-	padding: 3px 0;
-	font-size: 11px;
-	font-weight: bold;
-	border: 1px solid #FFFFFF;
-	border-radius: 12px 12px 12px 12px;
-	float: left;
-	width: 80px;
+div.results {
+	.status_draft,
+	.status_review,
+	.status_community,
+	.status_protected,
+	.status_private,
+	.status_published,
+	.status_deprecated,
+	.status_redirected,
+	.status_trash,
+	.status_meta {
+		span {
+			text-align: center;
+			padding: 3px 0;
+			font-size: 11px;
+			font-weight: bold;
+			border: 1px solid #FFFFFF;
+			border-radius: 12px 12px 12px 12px;
+			float: left;
+			width: 80px;
+		}
+	}
 }
 
 @fix-IE8-media-screen: ~"\0screen";
 @media @fix-IE8-media-screen {/* IE8 */
-	.evo_content_block span[class*=status_] span {
-		top: -15px;
-		left: -2px;
+	.evo_content_block span {
+		&.status_published,
+		&.status_community,
+		&.status_protected,
+		&.status_review,
+		&.status_private,
+		&.status_draft,
+		&.status_deprecated,
+		&.status_redirected,
+		&.status_trash {
+			span {
+				top: -15px;
+				left: -2px;
+			}
+		}
 	}
 }
 

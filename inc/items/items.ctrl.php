@@ -430,6 +430,9 @@ switch( $action )
 			header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.$item_ID.'&comment_type=feedback#comments' );
 		}
 
+		// Check perm:
+		$current_User->check_perm( 'blog_post_statuses', 'edit', true, $blog );
+
 		$new_post_creation_result = false;
 		$CommentCache = & get_CommentCache();
 		$moved_comments_IDs = array();
@@ -516,6 +519,56 @@ switch( $action )
 
 		// REDIRECT / EXIT
 		header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.( $new_post_creation_result ? $new_Item->ID : $item_ID.'&comment_type=feedback#comments' ) );
+		break;
+
+	case 'set_visibility':
+		// Set visibility of selected comments:
+
+		$item_ID = param( 'p', 'integer', 0 );
+		$selected_comments = param( 'selected_comments', 'array:integer' );
+
+		if( empty( $selected_comments ) )
+		{	// If no comments selected:
+			$Messages->add( T_('Please select at least one comment.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.$item_ID.'&comment_type=feedback#comments' );
+		}
+
+		$comment_status = param( 'comment_status', 'string' );
+		$status_options = get_visibility_statuses();
+		$comment_status_title = isset( $status_options[ $comment_status ] ) ? $status_options[ $comment_status ] : $comment_status;
+
+		$CommentCache = & get_CommentCache();
+		$comments_success = 0;
+		$comments_failed = 0;
+		foreach( $selected_comments as $selected_comment_ID )
+		{
+			if( ( $selected_Comment = & $CommentCache->get_by_ID( $selected_comment_ID, false, false ) ) &&
+			    $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $selected_Comment ) &&
+			    $current_User->check_perm( 'comment!'.$comment_status, 'moderate', false, $selected_Comment ) )
+			{	// If current User has a permission to edit the selected Comment:
+				$selected_Comment->set( 'status', $comment_status );
+				if( $selected_Comment->dbupdate() )
+				{
+					$comments_success++;
+					continue;
+				}
+			}
+			// Wrong comment or current User has no perm to edit the selected comment:
+			$comments_failed++;
+		}
+
+		if( $comments_success )
+		{	// Inform about success updates:
+			$Messages->add( sprintf( T_('Visibility of %d comments have been updated to %s.'), $comments_success, $comment_status_title ), 'success' );
+		}
+		if( $comments_failed )
+		{	// Inform about failed updates:
+			$Messages->add( sprintf( T_('Visibility of %d comments could not be updated to %s.'), $comments_failed, $comment_status_title ), 'error' );
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.$item_ID.'&comment_type=feedback#comments' );
 		break;
 
 	default:

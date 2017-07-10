@@ -3056,6 +3056,11 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 		echo '</span>';
 		echo '</div>';
 
+		if( ! empty( $item_id ) && $Comment->ID > 0 && ! $Comment->is_meta() )
+		{	// Display checkbox to select normal existing comments for action only on view item page:
+			echo '<input type="checkbox" name="selected_comments[]" value="'.$Comment->ID.'" /> ';
+		}
+
 		echo '<span class="bDate">';
 		$Comment->date();
 		echo '</span>@<span class = "bTime">';

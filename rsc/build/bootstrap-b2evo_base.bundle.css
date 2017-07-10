@@ -2698,13 +2698,45 @@ div.item_location {
 #ffield_item_tags ul.token-input-list-facebook {
   width: 100%;
 }
-.evo_content_block span[class*=status_] {
+.evo_content_block span.status_published,
+.evo_content_block span.status_community,
+.evo_content_block span.status_protected,
+.evo_content_block span.status_review,
+.evo_content_block span.status_private,
+.evo_content_block span.status_draft,
+.evo_content_block span.status_deprecated,
+.evo_content_block span.status_redirected,
+.evo_content_block span.status_trash {
   background: transparent;
   width: 75px;
   height: 75px;
   display: block;
   position: relative;
   overflow: hidden;
+}
+.evo_content_block span.status_published span,
+.evo_content_block span.status_community span,
+.evo_content_block span.status_protected span,
+.evo_content_block span.status_review span,
+.evo_content_block span.status_private span,
+.evo_content_block span.status_draft span,
+.evo_content_block span.status_deprecated span,
+.evo_content_block span.status_redirected span,
+.evo_content_block span.status_trash span {
+  display: block;
+  width: 120px;
+  text-align: center;
+  padding: 3px 0;
+  position: relative;
+  font-size: 9pt;
+  top: 15px;
+  left: -12px;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476)";
+  /* IE8 */
 }
 .note.status_draft span,
 .evo_status__draft {
@@ -2756,22 +2788,6 @@ div.item_location {
   color: #fff !important;
   background-color: #5bc0de !important;
 }
-.evo_content_block span[class*=status_] span {
-  display: block;
-  width: 120px;
-  text-align: center;
-  padding: 3px 0;
-  position: relative;
-  font-size: 9pt;
-  top: 15px;
-  left: -12px;
-  -webkit-transform: rotate(45deg);
-  -moz-transform: rotate(45deg);
-  -o-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476)";
-  /* IE8 */
-}
 div.results .status_draft span,
 div.results .status_review span,
 div.results .status_community span,
@@ -2793,7 +2809,15 @@ div.results .status_meta span {
 }
 @media \0screen {
   /* IE8 */
-  .evo_content_block span[class*=status_] span {
+  .evo_content_block span.status_published span,
+  .evo_content_block span.status_community span,
+  .evo_content_block span.status_protected span,
+  .evo_content_block span.status_review span,
+  .evo_content_block span.status_private span,
+  .evo_content_block span.status_draft span,
+  .evo_content_block span.status_deprecated span,
+  .evo_content_block span.status_redirected span,
+  .evo_content_block span.status_trash span {
     top: -15px;
     left: -2px;
   }
