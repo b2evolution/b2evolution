@@ -160,7 +160,8 @@ ol.breadcrumb {
   font-size: 90%;
 }
 .forums_list .ft_count a,
-.forums_list .ft_count div {
+.forums_list .ft_count div,
+.forums_list .ft_count div span.fa {
   font-size: 16px;
 }
 .forums_list .ft_assigned {

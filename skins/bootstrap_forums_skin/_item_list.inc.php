@@ -147,28 +147,33 @@ $display_workflow = ( $disp == 'posts' ) &&
 	if( ! $display_workflow )
 	{ // --------------------------------------------------------------------------------------------------------------------------
 		echo '<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-5">';
-		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
-		{ // The comments are disabled:
-			echo T_('n.a.');
-		}
-		else if( $latest_Comment = & $Item->get_latest_Comment() )
-		{	// At least one reply exists:
-			printf( T_('%s replies'), '<div><a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest comment').'">'.$comments_number.'</a></div>' );
-		}
-		else
-		{	// No replies yet:
-			printf( T_('%s replies'), '<div>0</div>' );
-		}
 
-		// Display button to resolve current Item:
-		$Item->resolve_button( array(
-				'before'              => ' ',
-				'after'               => '',
+		// Get button to resolve current Item:
+		$item_resolve_button = $Item->get_resolve_button( array(
+				'before'              => '',
+				'after'               => ' ',
 				'btn_class_resolve'   => '',
 				'btn_class_unresolve' => '',
 				'text_resolve'        => '#icon#',
 				'text_unresolve'      => '#icon#',
 			) );
+
+		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
+		{ // The comments are disabled:
+			if( ! empty( $item_resolve_button ) )
+			{
+				echo '<div>'.$item_resolve_button.'</div>';
+			}
+			echo T_('n.a.');
+		}
+		else if( $latest_Comment = & $Item->get_latest_Comment() )
+		{	// At least one reply exists:
+			printf( T_('%s replies'), '<div>'.$item_resolve_button.'<a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest comment').'">'.$comments_number.'</a></div>' );
+		}
+		else
+		{	// No replies yet:
+			printf( T_('%s replies'), '<div>'.$item_resolve_button.'0</div>' );
+		}
 
 		echo '</div>';
 	} // --------------------------------------------------------------------------------------------------------------------------
