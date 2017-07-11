@@ -287,7 +287,9 @@ echo $params['comment_body_after'];
 	$Comment->mark_resolved_button();
 
 	// Display status if current Comment is selected as the best answer:
-	$Comment->resolved_status();
+	$Comment->resolved_status( array(
+			'before' => ' '
+		) );
 
 	echo '<span class="pull-left">';
 		$comment_redirect_url = $Comment->get_permanent_url();

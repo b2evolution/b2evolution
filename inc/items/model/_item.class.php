@@ -9247,12 +9247,23 @@ class Item extends ItemLight
 		}
 
 		$params = array_merge( array(
-				'comment_ID' => 0, // 0 - to check if this Item is resolved with any Comment, > 0 - ID of the Comment to check if this Item is resolved with the Comment
-				'before'     => '',
-				'after'      => '',
-				'text'       => '#icon# '.T_('This thread is resolved.'),
-				'title'      => T_('This thread is resolved.'),
+				'comment_ID'         => 0, // 0 - to check if this Item is resolved with any Comment, > 0 - ID of the Comment to check if this Item is resolved with the Comment
+				'before'             => '',
+				'after'              => '',
+				'text'               => '#icon# '.T_('This thread is resolved.'),
+				'title'              => T_('This thread is resolved.'),
+				'display_for_author' => false,
 			), $params );
+
+		if( ! $params['display_for_author'] && is_logged_in() )
+		{	// This should not be displayed for author:
+			global $current_User;
+			$item_creator_User = & $this->get_creator_User();
+			if( $item_creator_User && $current_User->ID == $item_creator_User->ID )
+			{	// Current User is an author of this Item, Don't display:
+				return '';
+			}
+		}
 
 		$item_Blog = & $this->get_Blog();
 
