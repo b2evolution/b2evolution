@@ -9326,70 +9326,37 @@ class Item extends ItemLight
 		$item_Blog = & $this->get_Blog();
 
 		// Get current state of resolving:
-		$is_resolving = ( $params['comment_ID'] === $this->get( 'resolved_cmt_ID' ) ||
-		                ( $params['comment_ID'] === 0 && $this->get( 'resolved_cmt_ID' ) !== NULL ) );
+		$is_resolved = ( $params['comment_ID'] === $this->get( 'resolved_cmt_ID' ) ||
+		               ( $params['comment_ID'] === 0 && $this->get( 'resolved_cmt_ID' ) !== NULL ) );
 
 		$r = $params['before'];
 
-		$r .= '<span class="evo_post_resolve_btn"'
-					.' data-coll="'.$item_Blog->get( 'urlname' ).'"'
-					.' data-id="'.$this->ID.'"'
-					.( empty( $params['comment_ID'] ) ? '' : ' data-cmt-id="'.$params['comment_ID'].'"' ).'>'
-				// Icon + Text to Resolve:
-				.'<a href="#" class="'.$params['btn_class_resolve'].'"'
-						.( $is_resolving ? ' style="display:none"' : '' )
-						.( empty( $params['title_resolve'] ) ? '' : ' title="'.format_to_output( $params['title_resolve'], 'htmlattr' ).'"' ).'>'
-					.str_replace( '#icon#', get_icon( 'resolve_off' ), $params['text_resolve'] )
-				.'</a>'
-				// Icon + Text to Unresolve:
-				.'<a href="#" class="'.$params['btn_class_unresolve'].'"'
-						.( $is_resolving ? '' : ' style="display:none"' )
+		$r .= '<span class="evo_post_resolve_btn">';
+
+		$action_url = get_htsrv_url().'action.php?mname=collections&amp;p='.$this->ID.'&amp;blog='.$item_Blog->ID.'&amp;action=';
+
+		if( $is_resolved )
+		{	// Icon + Text to Unresolve:
+			$r .= '<a href="'.$action_url.'item_unresolve&amp;'.url_crumb( 'collections_item_unresolve' ).'"'
+						.' class="'.$params['btn_class_unresolve'].'"'
 						.( empty( $params['title_unresolve'] ) ? '' : ' title="'.format_to_output( $params['title_unresolve'], 'htmlattr' ).'"' ).'>'
 					.str_replace( '#icon#', get_icon( 'resolve_on' ), $params['text_unresolve'] )
-				.'</a>'
-			.'</span>';
+				.'</a>';
+		}
+		else
+		{	// Icon + Text to Resolve:
+			$r .= '<a href="'.$action_url.'item_resolve&amp;c='.$params['comment_ID'].'&amp;'.url_crumb( 'collections_item_resolve' ).'"'
+						.' class="'.$params['btn_class_resolve'].'"'
+						.( empty( $params['title_resolve'] ) ? '' : ' title="'.format_to_output( $params['title_resolve'], 'htmlattr' ).'"' ).'>'
+					.str_replace( '#icon#', get_icon( 'resolve_off' ), $params['text_resolve'] )
+				.'</a>';
+		}
+
+		$r .= '</span>';
 
 		$r .= $params['after'];
 
 		return $r;
-	}
-
-
-	/**
-	 * Resolve or unresolve Item
-	 *
-	 * @param integer Comment ID
-	 * @access protected
-	 */
-	function update_resolve( $comment_ID = NULL )
-	{
-		if( ! $this->can_resolve() )
-		{	// Don't allow to resolve this Item:
-			return;
-		}
-
-		if( ! empty( $comment_ID ) )
-		{	// Check if comment is really posted on this Item:
-			$CommentCache = & get_CommentCache();
-			$Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
-			if( ! $Comment ||
-			    ! ( $comment_Item = & $Comment->get_Item() ) ||
-			    $comment_Item->ID != $this->ID )
-			{	// Comment is wrong or Comment is from another Item:
-				return;
-			}
-		}
-
-		if( $this->get( 'resolved_cmt_ID' ) == $comment_ID ||
-		    $this->get( 'resolved_cmt_ID' ) !== NULL && empty( $comment_ID ) )
-		{	// If user press on the same Comment then unresolve the Item
-			// OR :
-			$comment_ID = NULL;
-		}
-
-		// Update
-		$this->set( 'resolved_cmt_ID', $comment_ID, true );
-		$this->dbupdate();
 	}
 
 

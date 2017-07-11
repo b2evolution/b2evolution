@@ -285,9 +285,6 @@ a:hover .fa-flag-o.fa-x--hover {
 a:hover .fa-flag-o.fa-x--hover:before {
   content: "\f024";
 }
-a:hover .fa-check.fa-x--hover {
-  color: #F00 !important;
-}
 .fa-x-external-link--nudge:before {
   position: relative;
   top: 0.05em;

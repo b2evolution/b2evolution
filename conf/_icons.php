@@ -1250,7 +1250,7 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 32, 112 ),
 			'glyph' => 'check',
-			'fa' => 'check fa-x--hover',
+			'fa' => 'check',
 			'color' => '#5cb85c'
 		);
 		case 'resolve_off': return array(
@@ -1258,7 +1258,7 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 32, 112 ),
 			'glyph' => 'check',
-			'fa' => 'check fa-x--hover',
+			'fa' => 'check',
 			'color' => '#7f7f7f'
 		);
 	}
