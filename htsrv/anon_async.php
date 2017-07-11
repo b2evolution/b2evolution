@@ -504,16 +504,8 @@ switch( $action )
 					break 2;
 				}
 
-				if( $current_User->ID == $Comment->author_user_ID )
-				{ // Do not allow users to vote on their own comments
-					break 2;
-				}
-
-				$comment_Item = & $Comment->get_Item();
-				$comment_Item->load_Blog();
-
-				if( ! $comment_Item->Blog->get_setting('allow_rating_comment_helpfulness') )
-				{ // If Users cannot vote
+				if( ! $Comment->can_vote_helpful() )
+				{	// If voting is not allowed by some reason:
 					break 2;
 				}
 

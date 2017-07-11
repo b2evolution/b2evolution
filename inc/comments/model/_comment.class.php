@@ -1897,6 +1897,41 @@ class Comment extends DataObject
 
 
 	/**
+	 * Check if user can vote helpful on this
+	 *
+	 * @param boolean Check author, because comment's author cannot vote on own comments
+	 * @return boolean
+	 */
+	function can_vote_helpful( $check_author = true )
+	{
+		if( $this->is_meta() )
+		{	// Don't allow voting on meta comments:
+			return false;
+		}
+
+		if( ! is_logged_in( false ) )
+		{	// If User is not logged:
+			return false;
+		}
+
+		if( ! ( $comment_Item = & $this->get_Item() ) ||
+		    ! ( $item_Blog = & $comment_Item->get_Blog() ) ||
+		    ! $item_Blog->get_setting( 'allow_rating_comment_helpfulness' ) )
+		{	// If the voting is disabled by collection setting:
+			return false;
+		}
+
+		global $current_User;
+		if( $check_author && $current_User->ID == $this->author_user_ID )
+		{	// Do not allow users to vote on their own comments:
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Display links to vote a comment as HELPFUL if user is logged
 	 *
 	 * @param string to display before link
@@ -1923,20 +1958,12 @@ class Comment extends DataObject
 				'display_wrapper'       => true, // Use FALSE when you update this from AJAX request
 			), $params );
 
-		if( $this->is_meta() )
-		{	// Don't allow voting on meta comments:
+		if( ! $this->can_vote_helpful( false ) )
+		{	// If voting is not allowed by some reason:
 			return;
 		}
 
 		global $current_User;
-
-		$comment_Item = & $this->get_Item();
-		$comment_Item->load_Blog();
-
-		if( ! is_logged_in( false ) || ! $comment_Item->Blog->get_setting('allow_rating_comment_helpfulness') )
-		{ // If User is not logged OR Users cannot vote
-			return false;
-		}
 
 		echo $before;
 

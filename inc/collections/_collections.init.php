@@ -1252,6 +1252,15 @@ class collections_Module extends Module
 					{
 						$Messages->add( T_('You marked this thread as Unresolved' ).'.', 'success' );
 					}
+
+					// If Comment has been selected as the best answer:
+					if( $action == 'item_resolve' &&
+					    ! empty( $Comment ) &&
+					    $Comment->can_vote_helpful() )
+					{	// Auto voting for comment helpful if current user can vote:
+						$Comment->set_vote( 'helpful', 'yes' );
+						$Comment->dbupdate();
+					}
 				}
 
 				header_redirect();

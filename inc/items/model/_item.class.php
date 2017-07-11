@@ -9198,8 +9198,8 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( $mode == 'edit' && ! is_logged_in() )
-		{	// If user is NOT logged in:
+		if( $mode == 'edit' && ! is_logged_in( false ) )
+		{	// If user is NOT logged in OR NOT activated yet:
 			return false;
 		}
 
