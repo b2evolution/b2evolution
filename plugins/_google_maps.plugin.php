@@ -107,7 +107,12 @@ class google_maps_plugin extends Plugin
 				'defaultvalue' => '',
 				'note' => sprintf( T_('Visit the <a %s>Google Maps API</a> documentation site for instructions on how to obtain an API key'),
 						'href="https://developers.google.com/maps/documentation/javascript/get-api-key#get-an-api-key" target="_blank"' ),
-				)
+				),
+			'map_title_coll' => array(
+				'label' => T_('Widget title'),
+				'defaultvalue' => T_('Google Maps plugin'),
+				'note' => T_('Widget title on edit post page')
+				),
 			), parent::get_coll_setting_definitions( $params ) );
 
 		return $r;
@@ -125,30 +130,117 @@ class google_maps_plugin extends Plugin
 		global $preview;
 
 		$r = array_merge( array(
-			'map_title' => array(
-				'label' => T_('Widget title'),
-				'defaultvalue' => T_('Google maps Widget'),
-				'note' => T_('Widget title'),
-				'set_for_plugin' => true,
-				),
-			'width' => array(
-				'label' => T_('Map width on page'),
-				'defaultvalue' => '',
-				'note' => T_('100% width if left empty'),
-				),
-			'height_front' => array(
-				'label' => T_('Map height on page'),
-				'defaultvalue' => '300px',
-				'note' => '',
-				),
-			'map_type' => array(
-				'label' => T_( 'Map default view ' ),
-				'type' => 'radio',
-				'options' => array( array('map', T_( 'Map' ) ), array( 'satellite', T_( 'Satellite' ) ) ),
-				'defaultvalue' => 'map',
-				'note' => ''
-				),
-			), parent::get_widget_param_definitions( $params ) );
+			'section_post_edit_start' => array(
+				'layout' => 'begin_fieldset',
+				'label' => T_('Item detail widget settings')
+			),
+				'map_title' => array(
+					'label' => T_('Widget title'),
+					'defaultvalue' => T_('Google maps Widget'),
+					'note' => T_('Widget title'),
+					'set_for_plugin' => true,
+					),
+				'width' => array(
+					'label' => T_('Map width on page'),
+					'defaultvalue' => '',
+					'note' => T_('100% width if left empty'),
+					),
+				'height_front' => array(
+					'label' => T_('Map height on page'),
+					'defaultvalue' => '300px',
+					'note' => '',
+					),
+				'map_type' => array(
+					'label' => T_( 'Map default view ' ),
+					'type' => 'radio',
+					'options' => array( array('map', T_( 'Map' ) ), array( 'satellite', T_( 'Satellite' ) ) ),
+					'defaultvalue' => 'map',
+					'note' => ''
+					),
+				'map_zoom' => array(
+					'label' => T_('Map default zoom' ),
+					'type' => 'integer',
+					'defaultvalue' => 10,
+					'size' => 4
+					),
+			'section_post_edit_end' => array(
+				'layout' => 'end_fieldset'
+			),
+
+			'section_list_start' => array(
+				'layout' => 'begin_fieldset',
+				'label' => T_('Listing content widget settings')
+			),
+				'list_map_title' => array(
+					'label' => T_('Widget title'),
+					'defaultvalue' => T_('Location Map'),
+					'note' => T_('Widget title'),
+					'set_for_plugin' => true,
+					),
+				'list_map_width' => array(
+					'label' => T_('Map width'),
+					'defaultvalue' => '',
+					'note' => T_('100% width if left empty'),
+					),
+				'list_map_height' => array(
+					'label' => T_('Map height'),
+					'defaultvalue' => '300px',
+					'note' => '',
+					),
+				'list_map_type' => array(
+					'label' => T_( 'Map default view ' ),
+					'type' => 'radio',
+					'options' => array( array('roadmap', T_( 'Map' ) ), array( 'satellite', T_( 'Satellite' ) ) ),
+					'defaultvalue' => 'roadmap',
+					'note' => ''
+					),
+				'list_blog_ID' => array(
+					'label' => T_('Collections'),
+					'note' => T_('List collection IDs separated by \',\', \'*\' for all collections, \'-\' for current collection without aggregation or leave empty for current collection including aggregation.'),
+					'size' => 4,
+					'type' => 'text',
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																		'error'   => T_('Invalid list of Collection IDs.') ),
+					'defaultvalue' => '',
+					),
+				'list_order_by' => array(
+					'label' => T_('Order by'),
+					'note' => T_('How to sort the items'),
+					'type' => 'select',
+					'options' => array(
+							'datestart'                => T_('Date issued (Default)'),
+							'order'                    => T_('Order (as explicitly specified)'),
+							//'datedeadline'           => T_('Deadline'),
+							'title'                    => T_('Title'),
+							'datecreated'              => T_('Date created'),
+							'datemodified'             => T_('Date last modified'),
+							'last_touched_ts'          => T_('Date last touched'),
+							'contents_last_updated_ts' => T_('Contents last updated'),
+							'urltitle'                 => T_('URL "filename"'),
+							'priority'                 => T_('Priority'),
+							'numviews'                 => T_('Number of members who have viewed the post (If tracking enabled)'),
+						),
+					'defaultvalue' => 'datestart',
+					),
+				'list_order_dir' => array(
+					'label' => T_('Direction'),
+					'note' => T_('How to sort the items'),
+					'type' => 'radio',
+					'options' => array( array( 'ASC', T_('Ascending') ),
+										array( 'DESC', T_('Descending') ) ),
+					'defaultvalue' => 'DESC',
+					),
+				'list_limit' => array(
+					'label' => T_( 'Max items' ),
+					'note' => T_( 'Maximum number of items to display.' ),
+					'size' => 4,
+					'defaultvalue' => 10,
+					),
+			'section_list_end' => array(
+				'layout' => 'end_fieldset'
+			),
+
+		), parent::get_widget_param_definitions( $params ) );
 
 		if( $preview && isset( $r['allow_blockcache'] ) )
 		{	// Disable block caching for this widget when item is previewed currently:
@@ -225,7 +317,7 @@ class google_maps_plugin extends Plugin
 		global $Collection, $Blog, $DB, $admin_url;
 
 		// fp>vitaliy : make thhis title configurable per blog . default shoul dbe as below.
-		$plugin_title = $this->Settings->get( 'map_title_coll'.$Blog->ID );
+		$plugin_title = $this->get_coll_setting( 'map_title_coll', $Blog );
 		$plugin_title = empty( $plugin_title ) ? T_( 'Google Maps plugin' ) : $plugin_title;
 		$params['Form']->begin_fieldset( $plugin_title, array( 'id' => 'itemform_googlemap', 'fold' => ( isset( $params['edit_layout'] ) && $params['edit_layout'] == 'expert' ) ) );
 		$api_key = $this->get_coll_setting( 'api_key', $Blog );
@@ -926,80 +1018,401 @@ function locate()
 	function SkinTag( & $params )
 	{
 		global $Collection, $Blog, $Item;
+		global $google_maps_initialized;
+		/**
+		 * Default params:
+		 */
+		$params = array_merge( array(
+				// This is what will enclose the block in the skin:
+				'block_start'            => '<div>',
+				'block_end'              => '</div>\n',
+				'list_block_start'       => '<div>',
+				'list_block_end'         => "</div>\n",
+				// This is what will enclose the title:
+				'block_title_start' => '<h3>',
+				'block_title_end'   => '</h3>',
+				'list_block_title_start' => '<h3>',
+				'list_block_title_end'   => '</h3>',
+				// This is what will enclose the body:
+				'block_body_start'  => '',
+				'block_body_end'    => '',
+				'list_block_body_start'  => '',
+				'list_block_body_end'    => '',
+			), $params );
 
-		if( empty( $Item ) )
-		{	// Don't display this widget when no Item object:
-			return;
-		}
+		$api_key = $this->get_coll_setting( 'api_key', $Blog );
 
-		$this->number_of_widgets += 1;
-
-		if( $Item->get_type_setting( 'use_coordinates' ) == 'never' )
-		{	// Coordinates are not allowed for the item type:
-			return;
-		}
-
-		$lat = $Item->get_setting( 'latitude' );
-		$lng = $Item->get_setting( 'longitude' );
-		if( empty( $lat ) && empty( $lng ) )
-		{	// Coordinates must be defined for the viewed Item:
-			return;
-		}
-
-		$width = $this->display_param($this->get_widget_setting('width', $params));
-		$width = 'width:'.$width;
-
-		$height = $this->display_param($this->get_widget_setting('height_front', $params));
-		$height = 'height:'.$height;
-
-		?>
-		<div class="map_title"><?php echo $this->get_widget_setting('map_title_coll'.$Blog->ID, $params); ?></div>
-		<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
-		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
-		<script type="text/javascript">
-		<?php
-		$map_type = (string)$this->get_widget_setting('map_type', $params);
-		switch ($map_type)
+		if( empty( $api_key ) )
 		{
-			case 'satellite':
-				?>
-				var mapTypeId = google.maps.MapTypeId.SATELLITE;
-				<?php
-				break;
-			default:
-				?>
-				var mapTypeId = google.maps.MapTypeId.ROADMAP;
-				<?php
-				break;
-		}
-		?>
-			var latlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng;?>);
-			var mapTypes = new Array();
-			mapTypes.push(google.maps.MapTypeId.HYBRID);
-			mapTypes.push(google.maps.MapTypeId.ROADMAP);
-			mapTypes.push(google.maps.MapTypeId.SATELLITE);
-			mapTypes.push(google.maps.MapTypeId.TERRAIN);
+			$url = $admin_url.'?ctrl=coll_settings&tab=plugins&blog='.$Blog->ID.'&plugin_group=widget';
 
-			var myOptions = {
-				  zoom: 17,
-				  center: latlng,
-				  mapTypeId: mapTypeId,
-				  scrollwheel: false,
-				  mapTypeControlOptions:
-					  {
-					   style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-					   mapTypeIds: mapTypes
-					  }
-				};
-			var map<?php echo $this->number_of_widgets; ?> = new google.maps.Map(document.getElementById("map_canvas<?php echo $this->number_of_widgets; ?>"),
-					myOptions);
-			var marker<?php echo $this->number_of_widgets; ?> = new google.maps.Marker({
-				position: latlng,
-				map: map<?php echo $this->number_of_widgets; ?>,
-				title:"Position"
-				});
+			echo sprintf( T_('You must specify a valid Google Maps API key in the Plugins settings <a %s>Collection Settings</a> tab to use the plugin.'), 'href="'.$url.'"' );
+			return;
+		}
+
+		if( ! $google_maps_initialized )
+		{
+			echo '<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key='.$api_key.'"></script>';
+			$google_maps_initialized = true;
+		}
+
+		if( isset( $params['widget_context'] ) && $params['widget_context'] == 'item' )
+		{ // Single item container
+
+			if( empty( $Item ) )
+			{	// Don't display this widget when no Item object:
+				return;
+			}
+
+			$this->number_of_widgets += 1;
+
+			if( $Item->get_type_setting( 'use_coordinates' ) == 'never' )
+			{	// Coordinates are not allowed for the item type:
+				return;
+			}
+
+			$lat = $Item->get_setting( 'latitude' );
+			$lng = $Item->get_setting( 'longitude' );
+			if( empty( $lat ) && empty( $lng ) )
+			{	// Coordinates must be defined for the viewed Item:
+				return;
+			}
+
+			$width = $this->display_param( $this->get_widget_setting( 'width', $params ) );
+			$width = 'width:'.$width;
+
+			$height = $this->display_param( $this->get_widget_setting( 'height_front', $params ) );
+			$height = 'height:'.$height;
+
+			$zoom = $this->get_widget_setting( 'map_zoom', $params );
+
+			echo $this->get_widget_setting( 'block_start', $params );
+			$map_title = $this->get_widget_setting( 'map_title', $params );
+			if( ! empty( $map_title ) )
+			{
+				echo $this->get_widget_setting( 'block_title_start', $params );
+				echo '<div class="map_title">'.$map_title.'</div>';
+				echo $this->get_widget_setting( 'block_title_end', $params );
+			}
+			echo $this->get_widget_setting( 'block_body_start', $params );
+			?>
+			<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>;"></div>
+			<script type="text/javascript">
+			<?php
+			$map_type = (string) $this->get_widget_setting( 'map_type', $params );
+			switch ($map_type)
+			{
+				case 'satellite':
+					?>
+					var mapTypeId = google.maps.MapTypeId.SATELLITE;
+					<?php
+					break;
+				default:
+					?>
+					var mapTypeId = google.maps.MapTypeId.ROADMAP;
+					<?php
+					break;
+			}
+			?>
+				var latlng = new google.maps.LatLng( <?php echo $lat; ?>, <?php echo $lng;?> );
+				var mapTypes = new Array();
+				mapTypes.push( google.maps.MapTypeId.HYBRID );
+				mapTypes.push( google.maps.MapTypeId.ROADMAP );
+				mapTypes.push( google.maps.MapTypeId.SATELLITE );
+				mapTypes.push( google.maps.MapTypeId.TERRAIN );
+
+				var myOptions = {
+						zoom: <?php echo $zoom; ?>,
+						center: latlng,
+						mapTypeId: mapTypeId,
+						scrollwheel: false,
+						mapTypeControlOptions:
+							{
+							style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+							mapTypeIds: mapTypes
+							}
+					};
+				var map<?php echo $this->number_of_widgets; ?> = new google.maps.Map( document.getElementById( "map_canvas<?php echo $this->number_of_widgets; ?>" ),
+						myOptions);
+				var marker<?php echo $this->number_of_widgets; ?> = new google.maps.Marker( {
+					position: latlng,
+					map: map<?php echo $this->number_of_widgets; ?>,
+					title:"Position"
+					} );
+				</script>
+			<?php
+			echo $this->get_widget_setting( 'block_body_end', $params );
+			echo $this->get_widget_setting( 'block_end', $params );
+		}
+		else
+		{ // Collection list widget
+			global $map_functions_initialized;
+			global $admin_url, $DB, $BlogCache, $ItemCache;
+			global $disp;
+
+			$this->number_of_widgets += 1;
+			$blog_ID = $this->get_widget_setting( 'list_blog_ID', $params );
+			if( empty( $blog_ID ) ) $blog_ID = NULL;
+
+			// Create ItemList
+			$limit = intval( $this->get_widget_setting( 'list_limit', $params ) );
+			$order_by = 'post_'.$this->get_widget_setting( 'list_order_by', $params ).' '.$this->get_widget_setting( 'list_order_dir', $params );
+
+			$SQL = new SQL();
+			$SQL->SELECT( 'post_ID, cat_blog_ID,
+					MAX(IF(iset_name = "latitude", iset_value, NULL)) AS latitude,
+					MAX(IF(iset_name = "longitude", iset_value, NULL)) AS longitude' );
+			$SQL->FROM( 'T_items__item' );
+			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON iset_item_ID = post_ID AND iset_name IN ( "latitude", "longitude" )' );
+			$SQL->FROM_add( 'LEFT JOIN T_postcats ON postcat_post_ID = post_ID' );
+			$SQL->FROM_add( 'LEFT JOIN T_categories ON cat_ID = postcat_cat_ID' );
+			$SQL->WHERE( 'iset_value IS NOT NULL' );
+			$SQL->WHERE_or( 'post_ctry_ID IS NOT NULL' );
+			$SQL->WHERE_or( 'post_rgn_ID IS NOT NULL' );
+			$SQL->WHERE_or( 'post_subrg_ID IS NOT NULL' );
+			$SQL->WHERE_or( 'post_city_ID IS NOT NULL' );
+			$SQL->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID', $blog_ID ) );
+			$SQL->GROUP_BY( 'post_ID' );
+			$SQL->ORDER_BY( $order_by );
+			$SQL->LIMIT( $limit );
+
+			$items = $DB->get_results( $SQL->get(), ARRAY_A, 'Fetching posts with location information' );
+
+			if( empty( $items ) )
+			{ // Do not display if there are no locations to show
+				return;
+			}
+
+			echo $this->get_widget_setting( 'list_block_start', $params );
+			$map_title = $this->get_widget_setting( 'list_map_title', $params );
+			if( ! empty( $map_title ) )
+			{
+				echo $this->get_widget_setting( 'list_block_title_start', $params );
+				echo '<div class="map_title">'.$map_title.'</div>';
+				echo $this->get_widget_setting( 'list_block_title_end', $params );
+			}
+			echo $this->get_widget_setting( 'list_block_body_start', $params );
+
+			$map_attrs = array(
+				'id' => 'map_view'.$this->number_of_widgets
+			);
+
+			// Initialize image attributes:
+			$map_attrs['style'] = 'width:'.( empty( $this->get_widget_setting( 'list_map_width', $params ) ) ? 'auto' : format_to_output( $this->get_widget_setting( 'list_map_width', $params ), 'htmlattr' ) ).';';
+			// Image height:
+			$map_attrs['style'] .= 'height:'.( empty( $this->get_widget_setting( 'list_map_height', $params ) ) ? 'auto' : format_to_output( $this->get_widget_setting( 'list_map_height', $params ), 'htmlattr' ) ).';';
+			// If no unit is specified in a size, consider the unit to be px:
+			$map_attrs['style'] = preg_replace( '/(\d+);/', '$1px;', $map_attrs['style'] );
+
+			// Print out div container tag:
+			echo '<div'.get_field_attribs_as_string( $map_attrs ).'></div>';
+
+			$map_options = array(
+					'zoom' => 4,
+					'mapTypeId' => $this->get_widget_setting( 'list_map_type', $params )
+				);
+
+			$marker_data = array();
+			foreach( $items as $item )
+			{
+				$loop_Item = & $ItemCache->get_by_ID( $item['post_ID'] );
+
+				$item_latitude = $loop_Item->get_setting( 'latitude' );
+				$item_longitude = $loop_Item->get_setting( 'longitude' );
+
+				$item_location = $loop_Item->location( '', '', ', ', false );
+
+				if( ! empty( $item_latitude ) && ! empty( $item_longitude ) )
+				{
+					$marker_data[] = array(
+						'title' => $loop_Item->title,
+						'coordinates' => array( $item_longitude, $item_latitude ),
+						'excerpt' => $loop_Item->get_excerpt(),
+						'id' => $loop_Item->ID
+					);
+				}
+				elseif( ! empty( $item_location ) )
+				{
+					$marker_data[] = array(
+						'title' => $loop_Item->title,
+						'location' => $item_location,
+						'excerpt' => $loop_Item->get_excerpt(),
+						'id' => $loop_Item->ID
+					);
+				}
+			}
+
+			if( ! $map_functions_initialized )
+			{
+			?>
+			<script type="text/javascript">
+				var maps = {};
+				var markers = {};
+				var unknownLocations = [];
+				var nextLocation = 0;
+				var delay = 100;
+				var geocoder = new google.maps.Geocoder();
+				var infoWindow = new google.maps.InfoWindow({
+						content: 'Initial content'
+					});
+				var exceededQueryLimit = false;
+
+				function addMarker( map, latLng, title, data )
+				{
+					var pinFillColor = '#F75850';
+
+					var pinIcon = {
+							path: 'M79.185,29.644 c0-16.11-13.04-29.172-29.137-29.224 V0.416 c-0.015,0-0.032,0.002-0.049,0.002   c-0.015,0-0.032-0.002-0.047-0.002V0.42C33.854,0.472,20.815,13.534,20.815,29.644c0,0-0.307,7.275,3.33,14.812   c2.71,5.622,6.149,9.38,9.68,14.492c5.444,7.88,8.03,12.018,10.744,19.646c1.928,5.413,3.778,11.801,5.429,20.99   c1.653-9.189,3.504-15.577,5.432-20.99c2.717-7.629,5.303-11.767,10.744-19.646c3.531-5.111,6.968-8.87,9.681-14.492   C79.491,36.919,79.185,29.644,79.185,29.644z M49.979,40.219c-5.971,0-10.809-4.839-10.809-10.811   c0-5.969,4.837-10.806,10.809-10.806c5.973,0,10.81,4.837,10.81,10.806C60.789,35.379,55.952,40.219,49.979,40.219z',
+							anchor: new google.maps.Point(50, 98),
+							scale: 0.4,
+							fillColor: pinFillColor,
+							fillOpacity: 1.0,
+							strokeWeight: 1,
+							strokeColor: '#424242',
+						};
+
+					var marker = new google.maps.Marker({
+							map: map,
+							position: latLng,
+							title: title,
+							extra: data,
+							icon: pinIcon
+						} );
+
+					marker.addListener( 'click', function() {
+							infoWindow.setContent( '<h4>' + this.title + '</h4>' + '<p>' + this.extra.excerpt + '</p>' );
+							infoWindow.open( map, this );
+						} );
+
+					return marker;
+				}
+
+				function geocodeLocation( map, address, title, data )
+				{
+					if( ! exceededQueryLimit )
+					{
+						geocoder.geocode( { 'address': address }, function( results, status ) {
+							if( status == google.maps.GeocoderStatus.OK ) {
+								// erwin > We should cache the latitude and longitude of the location (preferably to the DB) to avoid excessive geocoding
+								// But how do we update these values when any of the location fields, i.e., country, region, city, etc., are updated?
+								var marker = addMarker( map, results[0].geometry.location, title, data );
+								var bounds = map.getBounds();
+
+								bounds.extend( marker.getPosition() );
+								map.fitBounds( bounds );
+
+								locateNext();
+							}
+							else if ( status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT )
+							{
+								exceededQueryLimit = true;
+								console.error( 'Geocode has exceeded the query limit');
+							}
+							else
+							{
+								console.error( 'Geocode was not successful for the following reason: ' + status );
+							}
+						} );
+					}
+				}
+
+				function locateNext()
+				{
+					if( ! exceededQueryLimit && ( nextLocation < unknownLocations.length ) )
+					{
+						var loc = unknownLocations[nextLocation];
+						var extraData = { postId: loc.id, excerpt: loc.excerpt };
+						// We need to add a delay to our geocoding
+						setTimeout( geocodeLocation( maps[loc.mapId], loc.location, loc.title, extraData ), delay );
+						nextLocation++;
+					}
+				}
+
+				function initMap( mapId, mapOptions, markerData )
+				{
+					var bounds = new google.maps.LatLngBounds();
+					var mapCenter = { lat: 48.8370875, lng: 2.2372931 };
+					var map = new google.maps.Map( document.getElementById( 'map_view' + mapId ), mapOptions );
+
+					maps[mapId] = map;
+
+					if( markerData )
+					{
+						var markerCount = markerData.length;
+						for( var i = 0; i < markerCount; i++ )
+						{
+							var extraData = { postId: markerData[i].id, excerpt: markerData[i].excerpt };
+							if( markerData[i].coordinates )
+							{
+								var coords = markerData[i].coordinates;
+								var latLng = new google.maps.LatLng( coords[1], coords[0] );
+								var marker = addMarker( map, latLng, markerData[i].title, extraData );
+								mapCenter = latLng;
+
+								bounds.extend( marker.getPosition() );
+							}
+							else if( markerData[i].location )
+							{
+								markerData[i].mapId = mapId;
+								unknownLocations.push( markerData[i] );
+							}
+						}
+
+						if( markerCount > 1 )
+						{
+							map.fitBounds( bounds );
+						}
+						else
+						{
+							map.setCenter( mapCenter );
+						}
+					}
+				}
 			</script>
 			<?php
+				$map_functions_initialized = true;
+			}
+
+			?>
+			<script type="text/javascript">
+				var mapOptions<?php echo $this->number_of_widgets; ?> = <?php echo json_encode( $map_options ); ?>;
+				var markerData<?php echo $this->number_of_widgets; ?> = <?php echo json_encode( $marker_data ); ?>;
+				initMap( <?php echo $this->number_of_widgets; ?>, mapOptions<?php echo $this->number_of_widgets; ?>, markerData<?php echo $this->number_of_widgets; ?> );
+			</script>
+			<?php
+			echo $this->get_widget_setting( 'block_body_end', $params );
+			echo $this->get_widget_setting( 'block_end', $params );
+
+			return true;
+		}
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the skin's HTML BODY section.
+	 *
+	 * Use this to add any HTML snippet at the end of the generated page.
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinEndHtmlBody( & $params )
+	{
+		global $map_functions_initialized;
+
+		if( $map_functions_initialized )
+		{ // Page has listing content widget displayed
+		?>
+		<script type="text/javascript">
+		if( typeof locateNext == 'function' )
+		{
+			if( unknownLocations.length )
+			{ // There are locations with no coordinates, trigger geocoding for these:
+				locateNext();
+			}
+		}
+		</script>
+		<?php
+		}
 	}
 
 	/**
