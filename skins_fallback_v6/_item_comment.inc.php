@@ -166,6 +166,16 @@ $Comment->date(); echo ' @ '; $Comment->time( '#short_time' );
 $Comment->reply_link(); /* Link for replying to the Comment */
 $Comment->vote_helpful( '', '', '&amp;', true, true );
 
+// Display button to select current Comment as the best answer:
+$Comment->mark_resolved_button( array(
+		'before' => ' '
+	) );
+
+// Display status if current Comment is selected as the best answer:
+$Comment->resolved_status( array(
+		'before' => ' '
+	) );
+
 echo $params['comment_info_after'];
 
 echo $params['comment_end'];

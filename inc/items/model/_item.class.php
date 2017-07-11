@@ -9307,7 +9307,7 @@ class Item extends ItemLight
 				'btn_class_resolve'   => 'btn btn-default',
 				'btn_class_unresolve' => 'btn btn-success',
 				'text_resolve'        => '#icon# '.T_('Mark this thread as resolved'),
-				'text_unresolve'      => '#icon# '.T_('Mark this thread as unresolved'),
+				'text_unresolve'      => '#icon# '.T_('You marked this thread as Resolved'),
 				'title_resolve'       => T_('Mark this thread as resolved').'.',
 				'title_unresolve'     => T_('You have resolved this thread. Click to unresolve.'),
 			), $params );
