@@ -323,6 +323,13 @@ while( $Item = & $ItemList->get_item() )
 					'text'   => '#icon#',
 					'class'  => button_class()
 				) );
+
+			// Display merge button if current user has the rights:
+			$Item->merge_link( array( // Link to backoffice for merging
+					'before' => '',
+					'after'  => '',
+					'class'  => button_class()
+				) );
 			echo '</span>';
 
 			echo '<span class="'.button_class( 'group' ).'"> ';

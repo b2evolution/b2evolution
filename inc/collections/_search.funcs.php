@@ -258,11 +258,31 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
  * @param string original search term
  * @param array all separated words from the search term
  * @param array all quoted parts from the search term
+ * @param string Post IDs to exclude from result, Separated with ','(comma)
  * @param number max possible score
  */
-function search_and_score_items( $search_term, $keywords, $quoted_parts )
+function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclude_posts = '' )
 {
 	global $DB, $Collection, $Blog;
+
+	$exclude_posts = trim( $exclude_posts, ' ,' );
+	if( empty( $exclude_posts ) )
+	{	// No posts to exclude:
+		$exclude_posts = '';
+	}
+	else
+	{	// Check if values are correct:
+		$exclude_posts = explode( ',', $exclude_posts );
+		foreach( $exclude_posts as $e => $exclude_post )
+		{
+			$exclude_post = intval( trim( $exclude_post ) );
+			if( empty( $exclude_post ) )
+			{
+				unset( $exclude_posts[ $e ] );
+			}
+		}
+		$exclude_posts = empty( $exclude_posts ) ? '' : '-'.implode( ',', $exclude_posts );
+	}
 
 	// Prepare filters:
 	$search_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), '', 'ItemCache', 'search_item' );
@@ -273,7 +293,8 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 			'itemtype_usage'=> '-sidebar', // Exclude from search: 'sidebar' item types
 			'orderby'       => 'datemodified',
 			'order'         => 'DESC',
-			'posts'         => 1000
+			'posts'         => 1000,
+			'post_ID_list'  => $exclude_posts,
 		) );
 
 	// Generate query from filters above and count results:
@@ -525,9 +546,10 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
  * @param string the search keywords
  * @param string What types search: 'all', 'item', 'comment', 'category', 'tag'
  *               Use ','(comma) as separator to use several kinds, e.g: 'item,comment' or 'tag,comment,category'
+ * @param string Post IDs to exclude from result, Separated with ','(comma)
  * @return array scored search result, each element is an array( type, ID, score )
  */
-function perform_scored_search( $search_keywords, $search_types = 'all' )
+function perform_scored_search( $search_keywords, $search_types = 'all', $exclude_posts = '' )
 {
 	$keywords = trim( $search_keywords );
 	if( empty( $keywords ) )
@@ -596,7 +618,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all' )
 
 	if( $search_type_item )
 	{	// Perform search on Items:
-		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
+		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts, $exclude_posts );
 		$search_result = $item_search_result;
 		if( $debug )
 		{

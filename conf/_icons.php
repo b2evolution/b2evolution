@@ -1244,6 +1244,14 @@ function get_icon_info( $name )
 			'fa' => 'comments',
 			'color' => '#F90'
 		);
+
+		case 'merge': return array(
+			'alt' => T_('Merge '),
+			'size' => array( 14, 14 ),
+			'xy' => array( 96, 96 ),
+			'glyph' => 'link',
+			'fa' => 'link'
+		);
 	}
 }
 ?>
