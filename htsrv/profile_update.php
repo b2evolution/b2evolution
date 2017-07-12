@@ -332,7 +332,14 @@ else
 	$Skin = & $SkinCache->get_by_ID( $Blog->get_skin_ID() );
 	$skin = $Skin->folder;
 	$ads_current_skin_path = $skins_path.$skin.'/';
-	require $ads_current_skin_path.'index.main.php';
+	if( ! empty( $disp ) && file_exists( $ads_current_skin_path.$disp.'.main.php' ) )
+	{	// Call custom file for profile disp if it exists:
+		require $ads_current_skin_path.$disp.'.main.php';
+	}
+	else
+	{	// Call index main skin file to display a profile disp:
+		require $ads_current_skin_path.'index.main.php';
+	}
 }
 
 ?>
