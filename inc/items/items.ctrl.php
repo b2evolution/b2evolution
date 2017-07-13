@@ -1495,8 +1495,8 @@ switch( $action )
 			$SQL->WHERE( 'comment_item_ID = '.$edited_Item->ID );
 			$latest_comment_time = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
 			if( $latest_comment_time !== NULL )
-			{	// If target Item has ata lest one comment use new date/time for new appended comments
-				$append_comment_timestamp = strtotime( $latest_comment_time ) + 1;
+			{	// If target Item has at lest one comment use new date/time for new appended comments:
+				$append_comment_timestamp = strtotime( $latest_comment_time ) + 60;
 			}
 		}
 
@@ -1507,7 +1507,15 @@ switch( $action )
 		$Comment->set_renderers( $source_Item->get_renderers() );
 		$Comment->set( 'status', $source_Item->get( 'status' ) == 'redirected' ? 'draft' : $source_Item->get( 'status' ) );
 		$Comment->set( 'author_user_ID', $source_Item->get( 'creator_user_ID' ) );
-		$Comment->set( 'date', isset( $append_comment_timestamp ) ? date2mysql( $append_comment_timestamp++ ) : $source_Item->get( 'datestart' ) );
+		if( isset( $append_comment_timestamp ) )
+		{	// Append action with 1 minute incrementing:
+			$Comment->set( 'date', date2mysql( $append_comment_timestamp ) );
+			$append_comment_timestamp += 60;
+		}
+		else
+		{	// Merge action with saving date/time:
+			$Comment->set( 'date', $source_Item->get( 'datestart' ) );
+		}
 		$Comment->set( 'notif_status', $source_Item->get( 'notifications_status' ) );
 		$Comment->set( 'notif_flags', $source_Item->get( 'notifications_flags' ) );
 		if( $Comment->dbinsert() )
@@ -1534,8 +1542,10 @@ switch( $action )
 			{
 				$DB->query( 'UPDATE T_comments
 						SET comment_item_ID = '.$edited_Item->ID.',
-						    comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp++ ) ).'
+						    comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp ) ).'
 					WHERE comment_ID = '.$source_comment_ID );
+				// Increment 1 minute for each next appending comment:
+				$append_comment_timestamp += 60;
 			}
 		}
 		else
