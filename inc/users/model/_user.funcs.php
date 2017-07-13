@@ -1467,6 +1467,17 @@ function profile_check_params( $params, $User = NULL )
 		else
 		{
 			param_check_valid_login( $dummy_fields[ $params['login'][1] ] );
+			
+			if( param_check_valid_login( $dummy_fields[ $params['login'][1] ] ) )
+			{	// If login is valid
+				global $reserved_logins, $current_User;
+				if( ! empty( $reserved_logins ) &&
+				    in_array( $params['login'][0], $reserved_logins ) &&
+				    ( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit', false ) ) )
+				{	// If new entered login is reserved and current logged in User cannot use this:
+					param_error( $dummy_fields[ $params['login'][1] ], T_('You cannot use this login because it is reserved.') );
+				}
+			}
 		}
 	}
 

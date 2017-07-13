@@ -4832,6 +4832,80 @@ class Item extends ItemLight
 	function edit_link( $params = array() )
 	{
 		echo $this->get_edit_link( $params );
+
+		echo_item_merge_js();
+	}
+
+
+	/**
+	 * Provide link to merge a post if user has edit rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 */
+	function get_merge_link( $params = array() )
+	{
+		global $admin_url, $current_User;
+
+		if( ! is_logged_in( false ) )
+		{	// Current User must be logged in and activated:
+			return false;
+		}
+
+		if( ! $this->ID )
+		{	// Item must be stored in DB:
+			return false;
+		}
+
+		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// User has no right to edit this Item:
+			return false;
+		}
+
+		$params = array_merge( array(
+				'before' => ' ',
+				'after'  => ' ',
+				'text'   => '#',
+				'title'  => '#',
+				'class'  => '',
+			), $params );
+
+		if( $params['text'] == '#' )
+		{
+			$params['text'] = get_icon( 'merge' ).' '.T_('Merge with');
+		}
+		elseif( $params['text'] == '#icon#' )
+		{
+			$params['text'] = get_icon( 'merge' );
+		}
+		if( $params['title'] == '#' )
+		{
+			$params['title'] = T_('Merge with...');
+		}
+
+		$r = $params['before'];
+		$r .= '<a href="#" onclick="return evo_merge_load_window( '.$this->ID.' )"'
+					.' title="'.$params['title'].'"'
+					.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' ).'>'
+				.$params['text']
+			.'</a>';
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Template tag
+	 * @see Item::get_merge_link()
+	 */
+	function merge_link( $params = array() )
+	{
+		echo $this->get_merge_link( $params );
 	}
 
 

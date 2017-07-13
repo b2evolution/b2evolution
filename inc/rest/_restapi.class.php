@@ -735,6 +735,7 @@ class RestApi
 		// Get additional params:
 		$api_page = param( 'page', 'integer', 1 );
 		$api_per_page = param( 'per_page', 'integer', 10 );
+		$api_exclude_posts = param( 'exclude_posts', 'string', '' );
 		// What types search: 'all', 'item', 'comment', 'category', 'tag'
 		// Use separator comma to use several kinds:
 		$api_kind = param( 'kind', 'string', 'all' );
@@ -752,15 +753,17 @@ class RestApi
 		if( empty( $search_params )
 			|| ( $search_params['search_keywords'] != $search_keywords ) // We had saved search results but for a different search string
 			|| ( $search_params['search_blog'] != $Blog->ID ) // We had saved search results but for a different collection
+			|| ( isset( $search_params['exclude_posts'] ) && $search_params['exclude_posts'] != $api_exclude_posts ) // We had saved search results but for a different posts excluding
 			|| ( $search_result === NULL ) )
 		{	// We need to perform a new search:
 			$search_params = array(
 				'search_keywords' => $search_keywords,
 				'search_blog'     => $Blog->ID,
+				'exclude_posts'   => $api_exclude_posts,
 			);
 
 			// Perform new search:
-			$search_result = perform_scored_search( $search_keywords, $api_kind );
+			$search_result = perform_scored_search( $search_keywords, $api_kind, $api_exclude_posts );
 
 			// Save results into session:
 			$Session->set( 'search_params', $search_params );
