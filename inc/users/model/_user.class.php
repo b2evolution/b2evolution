@@ -431,7 +431,17 @@ class User extends DataObject
 			{	// Empty login
 				param_error( 'edited_user_login', T_('Please enter your login.') );
 			}
-			param_check_valid_login( 'edited_user_login' );
+			if( param_check_valid_login( 'edited_user_login' ) )
+			{	// If login is valid
+				global $reserved_logins;
+				if( $edited_user_login != $this->get( 'login' ) &&
+				    ! empty( $reserved_logins ) &&
+				    in_array( $edited_user_login, $reserved_logins ) &&
+				    ( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit', false ) ) )
+				{	// If login has been changed and new entered login is reserved and current User cannot use this:
+					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
+				}
+			}
 		}
 		else
 		{

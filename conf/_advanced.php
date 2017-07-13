@@ -828,6 +828,14 @@ $failed_logins_lockout = 600; // 10 minutes
 
 
 /**
+ * Deny to register new accounts with these logins;
+ * Also deny to change user login to one of these;
+ * Only admins with permission to create new users can use these:
+ */
+$reserved_logins = array( 'admin', 'administrator', 'moderator', 'webmaster' );
+
+
+/**
  * Most of the time, the best security practice is to NOT allow redirects from your current site to another domain.
  * That is, unless you specifically configured a redirected post.
  * If this doesn't work for you, you can change this security policy here.
