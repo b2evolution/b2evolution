@@ -741,7 +741,7 @@ class User extends DataObject
 
 			if( user_region_visible() )
 			{ // Save region
-				$region_is_required = ( $Settings->get( 'location_region' ) == 'required' && regions_exist( $country_ID ) );
+				$region_is_required = ( $Settings->get( 'location_region' ) == 'required' && regions_exist( $edited_user_ctry_ID ) );
 				$edited_user_rgn_ID = param( 'edited_user_rgn_ID', 'integer', ! $is_api_request || $region_is_required ? true : NULL );
 				if( isset( $edited_user_rgn_ID ) )
 				{
@@ -759,7 +759,7 @@ class User extends DataObject
 
 			if( user_subregion_visible() )
 			{ // Save subregion
-				$subregion_is_required = ( $Settings->get( 'location_subregion' ) == 'required' && subregions_exist( $region_ID ) );
+				$subregion_is_required = ( $Settings->get( 'location_subregion' ) == 'required' && subregions_exist( $edited_user_rgn_ID ) );
 				$edited_user_subrg_ID = param( 'edited_user_subrg_ID', 'integer', ! $is_api_request || $subregion_is_required ? true : NULL );
 				if( isset( $edited_user_subrg_ID ) )
 				{
@@ -777,7 +777,7 @@ class User extends DataObject
 
 			if( user_city_visible() )
 			{ // Save city
-				$city_is_required = ( $Settings->get( 'location_city' ) == 'required' && cities_exist( $country_ID, $region_ID, $subregion_ID ) );
+				$city_is_required = ( $Settings->get( 'location_city' ) == 'required' && cities_exist( $edited_user_ctry_ID, $edited_user_rgn_ID, $edited_user_subrg_ID ) );
 				$edited_user_city_ID = param( 'edited_user_city_ID', 'integer', ! $is_api_request || $city_is_required ? true : NULL );
 				if( isset( $edited_user_city_ID ) )
 				{
