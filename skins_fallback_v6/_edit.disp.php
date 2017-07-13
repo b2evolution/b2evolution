@@ -93,11 +93,11 @@ $Form->begin_form( 'inskin', '', $form_params );
 		}
 	}
 
-	// Try to get the thread ID (For example, on moving a thread to collection):
-	$thrd_ID = get_param( 'thrd_ID' );
-	if( ! empty( $thrd_ID ) )
+	// Try to get the message ID (For example, on moving a private message to collection):
+	$msg_ID = get_param( 'msg_ID' );
+	if( ! empty( $msg_ID ) )
 	{
-		$Form->hidden( 'thrd_ID', $thrd_ID );
+		$Form->hidden( 'msg_ID', $msg_ID );
 	}
 
 	$Form->hidden( 'redirect_to', $redirect_to );

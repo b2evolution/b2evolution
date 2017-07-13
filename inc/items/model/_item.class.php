@@ -642,14 +642,15 @@ class Item extends ItemLight
 		global $default_locale, $current_User, $localtimenow;
 		global $item_typ_ID;
 
-		// Try to prefill Item/Post fields from source thread/message ONLY for new creating post:
-		if( empty( $this->ID ) && param( 'thrd_ID', 'integer', NULL ) !== NULL )
+		// Try to prefill Item/Post fields from source private message ONLY for new creating post:
+		if( empty( $this->ID ) && param( 'msg_ID', 'integer', NULL ) !== NULL )
 		{	// If new post is moving from a private message:
-			$ThreadCache = & get_ThreadCache();
-			$source_Thread = & $ThreadCache->get_by_ID( get_param( 'thrd_ID' ), false, false );
-			if( $source_Thread && $source_Thread->can_be_moved_to_collection( $this->get_blog_ID() ) )
+			$MessageCache = & get_MessageCache();
+			$source_Message = & $MessageCache->get_by_ID( get_param( 'msg_ID' ), false, false );
+			if( $source_Message &&
+			    $source_Thread = & $source_Message->get_Thread() &&
+			    $source_Thread->can_be_moved_to_collection( $this->get_blog_ID(), $source_Message->ID ) )
 			{	// If given Thread can be moved to current collection:
-				$source_Message = & $source_Thread->get_first_Message();
 				$source_message_author_User = & $source_Message->get_author_User();
 				$this->set( 'title', $source_Thread->get( 'title' ) );
 				$this->set( 'content', $source_Message->get( 'text' ) );
@@ -7520,17 +7521,18 @@ class Item extends ItemLight
 	 */
 	function send_moved_thread_notification()
 	{
-		$thrd_ID = param( 'thrd_ID', 'integer', NULL );
+		$msg_ID = param( 'msg_ID', 'integer', NULL );
 
-		if( empty( $thrd_ID ) )
-		{	// Thread ID must be passed from a submitted form
+		if( empty( $msg_ID ) )
+		{	// Message ID must be passed from a submitted form
 			return false;
 		}
 
-		$ThreadCache = & get_ThreadCache();
-		$source_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false, false );
-		if( ! $source_Thread ||
-		    ! $source_Thread->can_be_moved_to_collection( $this->get_blog_ID() ) )
+		$MessageCache = & get_MessageCache();
+		$source_Message = & $MessageCache->get_by_ID( $msg_ID, false, false );
+		if( ! $source_Message ||
+		    ! ( $source_Thread = & $source_Message->get_Thread() ) ||
+		    ! $source_Thread->can_be_moved_to_collection( $this->get_blog_ID(), $msg_ID ) )
 		{	// Wrong Thread, because it can not be moved to collection of this Item:
 			return false;
 		}
@@ -7539,7 +7541,7 @@ class Item extends ItemLight
 
 		// Insert new private message to inform author thread:
 		$notif_Message = new Message();
-		$notif_Message->set( 'thread_ID', $thrd_ID );
+		$notif_Message->set( 'thread_ID', $source_Thread->ID );
 		$notif_Message->set( 'text', sprintf( T_('Automatic notification: your question has been published to "%s": %s'),
 			$item_Blog->get( 'shortname' ),
 			$this->get_permanent_url() ) );

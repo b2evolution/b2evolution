@@ -620,9 +620,10 @@ class Thread extends DataObject
 	 * Check if this Thread can be moved to collection by current User
 	 *
 	 * @param integer Collection ID
+	 * @param integer Message ID, NULL - to use first message
 	 * @return boolean
 	 */
-	function can_be_moved_to_collection( $blog_ID )
+	function can_be_moved_to_collection( $blog_ID, $msg_ID = NULL )
 	{
 		global $current_User;
 
@@ -637,8 +638,20 @@ class Thread extends DataObject
 			return false;
 		}
 
-		$first_Message = & $this->get_first_Message();
-		$message_author_User = & $first_Message->get_author_User();
+		if( $msg_ID === NULL )
+		{	// Get first Message of this Thread:
+			$Message = & $this->get_first_Message();
+		}
+		else
+		{	// Get Message by requested ID:
+			$MessageCache = & get_MessageCache();
+			if( ! ( $Message = & $MessageCache->get_by_ID( $msg_ID, false, false ) ) ||
+			    $Message->thread_ID != $this->ID )
+			{	// Wrong requested message:
+				return false;
+			}
+		}
+		$message_author_User = & $Message->get_author_User();
 
 		if( ! $message_author_User->check_perm( 'blog_post_statuses', 'edit', false, $blog_ID ) )
 		{	// Don't allow if first message's author has no permission to add a post with any status to the given collection:

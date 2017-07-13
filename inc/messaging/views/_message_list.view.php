@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message, $admin_url;
+global $dispatcher, $action, $view, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message, $admin_url;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -197,6 +197,16 @@ $Results->filter_area = array(
 			'all' => array( T_('All'), get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID ) ),
 			)
 	);
+
+if( $view == 'move' )
+{	// Radio box to select a private message:
+	$Results->cols[] = array(
+			'th' => '',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+			'td' => '<input type="radio" name="msg_ID" value="$msg_ID$" data-author-id="$msg_user_ID$" />'
+		);
+}
 
 /**
  * Author:
@@ -391,7 +401,12 @@ if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) 
 	{ // user want's to close this conversation ( there is only one recipient )
 		echo ' <a href="'.$close_and_block_url.'" onclick="return confirm( \''.$confirm_block_text.'\' );" class="btn btn-default btn-sm">'.$block_text.'</a>';
 	}
-	echo ' <a href="" onclick="return evo_msg_move_to_coll();" class="btn btn-default btn-sm">'.get_icon( 'copy', 'imgtag', array( 'title' => T_('Move to a collection...') ) ).' '.T_('Move to a collection...').'</a>';
+	echo ' <a href="'.get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID.'&amp;view=move' ).'"'
+				.( $view == 'move' ? ' onclick="return evo_msg_move_to_coll();"' : '' )
+				.' class="btn '.( $view == 'move' ? 'btn-primary' : 'btn-default' ).' btn-sm">'
+					.get_icon( 'copy', 'imgtag', array( 'title' => T_('Move to a collection...') ) ).' '
+					.T_('Move to a collection...')
+				.'</a>';
 	echo '</p>';
 	echo '</div>';
 }
@@ -421,25 +436,34 @@ echo_modalwindow_js();
 
 if( is_admin_page() )
 {	// New item URL for back-office:
-	$new_item_url = $admin_url.'?ctrl=items&action=new&thrd_ID='.$edited_Thread->ID.'&blog=\' + coll.id + \'';
+	$new_item_url = $admin_url.'?ctrl=items&action=new&msg_ID=\' + msg_id + \'&blog=\' + coll.id + \'';
 }
 else
 {	// New item URL for front-office:
-	$new_item_url = '\' + coll.url + ( coll.url.indexOf( \'?\' ) > 0 ? \'&\' : \'?\' ) + \'disp=edit&thrd_ID='.$edited_Thread->ID;
+	$new_item_url = '\' + coll.url + ( coll.url.indexOf( \'?\' ) > 0 ? \'&\' : \'?\' ) + \'disp=edit&msg_ID=\' + msg_id + \'';
 }
 
-// Use current User and User of first Message to restrict collections list where new post can be created from Thread:
-$restrict_users = $current_User->ID;
-if( $first_Message = & $edited_Thread->get_first_Message() &&
-    $first_message_User = & $first_Message->get_author_User() &&
-    $first_message_User->ID != $current_User->ID )
-{
-	$restrict_users .= ','.$first_message_User->ID;
-}
 ?>
 <script type="text/javascript">
 function evo_msg_move_to_coll()
 {
+	var selected_message = jQuery( 'input[type=radio][name=msg_ID]:checked' );
+	if( selected_message.length == 0 )
+	{	// If message is not selected
+		alert( '<?php echo TS_('Please select a private message which should be moved to a collection.'); ?>' );
+		return false;
+	}
+
+	var msg_id = selected_message.val();
+
+	// Use current User and User of first Message to restrict collections list where new post can be created from Thread:
+	var msg_author_id = selected_message.data( 'author-id' );
+	var restrict_users = '<?php echo $current_User->ID; ?>';
+	if( restrict_users != msg_author_id )
+	{
+		restrict_users += ',' + msg_author_id;
+	}
+
 	openModalWindow( '<div id="evo_msg_move_coll_wrapper"><span class="loader_img absolute_center" title="<?php echo T_('Loading...'); ?>"></span></div>', '300px', '', true,
 		'<?php echo TS_('Move to a collection...'); ?>', // Window title
 		[ '-', 'evo_msg_post_buttons' ], // Fake button that is hidden by default, Used to display button "Close"
@@ -450,7 +474,7 @@ function evo_msg_move_to_coll()
 		'per_page'      : 1000,
 		'filter'        : 'all',
 		'restrict'      : 'create_post',
-		'restrict_users': '<?php echo $restrict_users; ?>',
+		'restrict_users': restrict_users,
 	},
 	function( data )
 	{
