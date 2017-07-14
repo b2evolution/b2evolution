@@ -260,22 +260,7 @@ class Skin extends DataObject
 						'error'   => T_('Invalid color code.')
 					);
 			}
-
-			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'input_group' )
-			{
-				if( ! empty( $parmeta['inputs'] ) )
-				{
-					foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
-					{
-						$l_parmeta['group'] = $parname; // inject group into meta
-						autoform_set_param_from_request( $l_parname, $l_parmeta, $this, 'Skin' );
-					}
-				}
-			}
-			else
-			{
-				autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
-			}
+			autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
 		}
 	}
 
@@ -761,7 +746,7 @@ class Skin extends DataObject
 
 		if( ! empty( $group ) )
 		{ // $parname is prefixed with $group, we'll remove the group prefix
-			$parname = str_replace( $group, '', $parname );
+			$parname = substr( $parname, strlen( $group ) );
 		}
 
 		// Name of the setting in the blog settings:

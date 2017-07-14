@@ -178,17 +178,17 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		switch( $set_type )
 		{
 			case 'CollSettings':
-				$set_value = $Obj->get_coll_setting( $parname, $set_target );
+				$set_value = $Obj->get_coll_setting( $parname, $set_target, false, $group );
 				$error_value = NULL;
 				break;
 
 			case 'MsgSettings':
-				$set_value = $Obj->get_msg_setting( $parname );
+				$set_value = $Obj->get_msg_setting( $parname, $group );
 				$error_value = NULL;
 				break;
 
 			case 'EmailSettings':
-				$set_value = $Obj->get_email_setting( $parname );
+				$set_value = $Obj->get_email_setting( $parname, $group );
 				$error_value = NULL;
 				break;
 
@@ -198,7 +198,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				break;
 
 			case 'Widget':
-				$set_value = $Obj->get_param( $parname );
+				$set_value = $Obj->get_param( $parname, false, $group );
 				$error_value = NULL;
 				break;
 
@@ -857,6 +857,16 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		return;
 	}
 
+	if( ! empty( $parmeta['inputs'] ) )
+	{
+		foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
+		{
+			$l_parmeta['group'] = $parname; // inject group into meta
+			autoform_set_param_from_request( $l_parname, $l_parmeta, $Obj, $set_type, $set_target, $set_value );
+		}
+		return;
+	}
+
 	// set input group
 	if( isset( $parmeta['group'] ) )
 	{
@@ -976,7 +986,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 					) );
 				$l_value = array_fill_keys( $l_value, 1 );
 			}
-			$Obj->set( $parname, $l_value );
+			$Obj->set( $parname, $l_value, false, ( isset( $parmeta['group'] ) ? $parmeta['group'] : NULL ) );
 			break;
 
 		case 'UserSettings':
