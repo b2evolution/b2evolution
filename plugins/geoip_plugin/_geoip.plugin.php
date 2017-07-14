@@ -693,9 +693,12 @@ jQuery( document ).ready( function()
 		$params = array_merge( array(
 				'display_info'        => true,
 				'display_button_find' => true,
-				'display_version'     => true,
 				'before_button_find'  => '<p>',
 				'after_button_find'   => '</p>',
+				'display_button_fix'  => false,
+				'before_button_fix'   => '<p>',
+				'after_button_fix'    => '</p>',
+				'display_version'     => true,
 			), $params );
 
 		$Form = new Form();
@@ -720,6 +723,16 @@ jQuery( document ).ready( function()
 					'value' => T_('Find Registration Country for all Users NOW!')
 				) );
 			echo $params['after_button_find'];
+		}
+
+		if( $params['display_button_fix'] )
+		{	// Display a button to fix country for users:
+			echo $params['before_button_fix'];
+			$Form->button( array(
+					'name'  => 'actionArray[geoip_fix_country]',
+					'value' => T_('Fix for Profile Country for all Users Now')
+				) );
+			echo $params['after_button_fix'];
 		}
 
 		if( $params['display_version'] )
@@ -767,14 +780,14 @@ jQuery( document ).ready( function()
 				case 'geoip_find_country':
 				// Find and Assign Registration Country for all Users
 
-					$SQL = new SQL( 'Find all users without registration country' );
+					$SQL = new SQL( 'GeoIP plugin #'.$this->ID.': Find all users without registration country' );
 					$SQL->SELECT( 'user_ID, uset_value' );
 					$SQL->FROM( 'T_users' );
 					$SQL->FROM_add( 'LEFT JOIN T_users__usersettings
 						 ON user_ID = uset_user_ID
 						AND uset_name = "created_fromIPv4"' );
 					$SQL->WHERE( 'user_reg_ctry_ID IS NULL' );
-					$users = $DB->get_assoc( $SQL->get() );
+					$users = $DB->get_assoc( $SQL->get(), $SQL->title );
 
 					$total_users = count( $users );
 					if( $total_users == 0 )
@@ -817,6 +830,106 @@ jQuery( document ).ready( function()
 					}
 
 					$this->text_from_AdminTabAction = '<div>'.sprintf( T_('Count of users without registration country: <b>%s</b>' ), $total_users ).'</div>';
+					if( $count_nofound_country > 0 )
+					{	// If some users have IP address with unknown country
+						$this->text_from_AdminTabAction .= '<div>'.sprintf( T_('Count of users whose country could not be identified: <b>%s</b>' ), $count_nofound_country ).'</div>';
+					}
+					$this->text_from_AdminTabAction .= '<div style="margin-top:20px">'.$users_report.'</div>';
+
+					break;
+
+				case 'geoip_fix_country':
+					// Find and Assign Profile Country for all Users:
+
+					$SQL = new SQL( 'GeoIP plugin #'.$this->ID.': Find all users without profile country' );
+					$SQL->SELECT( 'user_ID AS ID, user_reg_ctry_ID AS reg_ctry_ID, uset_value AS reg_IP, sess_ipaddress AS session_IP' );
+					$SQL->FROM( 'T_users' );
+					$SQL->FROM_add( 'LEFT JOIN T_users__usersettings
+						 ON user_ID = uset_user_ID
+						AND uset_name = "created_fromIPv4"' );
+					$SQL->FROM_add( 'LEFT JOIN T_sessions
+						 ON user_ID = sess_user_ID' );
+					$SQL->WHERE( 'user_ctry_ID IS NULL' );
+					$SQL->ORDER_BY( 'sess_ID DESC' );
+					$SQL->GROUP_BY( 'user_ID' );
+					$users = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+
+					$total_users = count( $users );
+					if( $total_users == 0 )
+					{	// No users
+						$this->text_from_AdminTabAction = T_('No found users without profile country.');
+						break;
+					}
+					$count_nofound_country = 0;
+
+					$users_report = '';
+					foreach( $users as $user )
+					{
+						$Country = false;
+
+						$users_report .= sprintf( T_('User #%s' ), $user->ID ).': ';
+
+						// STEP 1: Get profile Country from IP address of last session:
+						if( empty( $user->session_IP ) )
+						{	// No defined session IP:
+							$users_report .= '<b class="orange">'.T_('Session IP address is not defined!').'</b>';
+						}
+						else
+						{	// Get Country by session IP address:
+							$users_report .= sprintf( T_('Session IP: %s'), $user->session_IP );
+							$Country = $this->get_country_by_IP( $user->session_IP );
+						}
+
+						// STEP 2: Get profile Country from registration Country:
+						if( ! $Country )
+						{
+							$users_report .= ' - ';
+							if( empty( $user->reg_ctry_ID ) )
+							{	// No defined registration country:
+								$users_report .= '<b class="orange">'.T_('Registration country is not defined!').'</b>';
+							}
+							else
+							{	// Get Country by registration IP address:
+								$users_report .= sprintf( T_('Registration country ID: %s'), $user->reg_ctry_ID );
+								$CountryCache = & get_CountryCache();
+								$Country = & $CountryCache->get_by_ID( $user->reg_ctry_ID, false, false );
+							}
+						}
+
+						// STEP 3: Get profile Country from registration IP address:
+						if( ! $Country )
+						{
+							$users_report .= ' - ';
+							if( empty( $user->reg_IP ) )
+							{	// No defined registration IP:
+								$users_report .= '<b class="orange">'.T_('Registration IP address is not defined!').'</b>';
+							}
+							else
+							{	// Get Country by registration IP address:
+								$users_report .= sprintf( T_('Registration IP: %s'), int2ip( $user->reg_IP ) );
+								$Country = $this->get_country_by_IP( int2ip( $user->reg_IP ) );
+							}
+						}
+
+						if( ! $Country )
+						{	// No found country in 3 steps above:
+							$count_nofound_country++;
+							$users_report .= ' - <b class="red">'.T_('Country is not detected!').'</b><br />';
+							continue;
+						}
+
+						// Update user's registration country
+						$DB->query( 'UPDATE T_users
+								  SET user_ctry_ID = '.$DB->quote( $Country->ID ).'
+								WHERE user_ID = '.$DB->quote( $user->ID ) );
+
+						// Move user to suspect group by Country ID
+						antispam_suspect_user_by_country( $Country->ID, $user->ID );
+
+						$users_report .= ' - '.sprintf( T_('Country: <b>%s</b>'), $Country->get( 'name' ) ).'<br />';
+					}
+
+					$this->text_from_AdminTabAction = '<div>'.sprintf( T_('Count of users without profile country: %s' ), '<b>'.$total_users.'</b>' ).'</div>';
 					if( $count_nofound_country > 0 )
 					{	// If some users have IP address with unknown country
 						$this->text_from_AdminTabAction .= '<div>'.sprintf( T_('Count of users whose country could not be identified: <b>%s</b>' ), $count_nofound_country ).'</div>';
@@ -916,9 +1029,12 @@ jQuery( document ).ready( function()
 		// Display a form to find countries for users:
 		$this->display_tool_form( array(
 				'display_info'       => false,
-				'display_version'    => false,
 				'before_button_find' => '<p class="center">',
-				'after_button_find'  => '</p>',
+				'after_button_find'  => ' ',
+				'display_button_fix' => true,
+				'before_button_fix'  => '',
+				'after_button_fix'   => '</p>',
+				'display_version'    => false,
 			) );
 	}
 }
