@@ -666,54 +666,84 @@ jQuery( document ).ready( function()
 				break;
 
 			default:
-				// Display a form to find countries for users
-
-				if( $this->status != 'enabled' )
-				{ // Don't allow use this tool when GeoIP plugin is not enabled
-					echo '<p class="error">'.T_('You must enable the GeoIP plugin before to use this tool.').'</p>';
-					break;
-				}
-
-				$Form = new Form();
-
-				$Form->begin_form( 'fform' );
-
-				$Form->add_crumb( 'tools' );
-				$Form->hidden_ctrl(); // needed to pass the "ctrl=tools" param
-				$Form->hiddens_by_key( get_memorized() ); // needed to pass all other memorized params, especially "tab"
-				$Form->hidden( 'action', 'geoip_find_country' );
-
-				echo '<p>'.T_('This tool finds all users that do not have a registration country yet and then assigns them a registration country based on their registration IP.').
-						   get_manual_link('geoip-plugin').'</p>';
-
-				echo '<p>';
-				$Form->button( array(
-						'value' => T_('Find Registration Country for all Users NOW!')
-					) );
-				echo '</p>';
-
-				global $admin_url;
-				if( file_exists( $this->geoip_file_path ) )
-				{
-					$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datetimefmt(), filemtime( $this->geoip_file_path ) ) );
-				}
-				else
-				{
-					$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
-				}
-				$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-warning">'.T_('Download update now!').'</a>';
-				echo '<p><b>GeoIP.dat:</b> '.$datfile_info.'</p>';
-
-
-				if( !empty( $this->text_from_AdminTabAction ) )
-				{	// Display a report of executed action
-					echo '<p><b>'.T_('Report').':</b></p>';
-					echo $this->text_from_AdminTabAction;
-				}
-
-				$Form->end_form();
+				// Display a form to find countries for users:
+				$this->display_tool_form();
 				break;
 		}
+	}
+
+
+	/**
+	 * Display a form with tool buttons like "Find Registration Country for all Users NOW!" or "Fix for Profile Country for all Users Now"
+	 */
+	function display_tool_form( $params = array() )
+	{
+		if( $this->status != 'enabled' )
+		{ // Don't allow use this tool when GeoIP plugin is not enabled
+			echo '<p class="error">'.T_('You must enable the GeoIP plugin before to use this tool.').'</p>';
+			return;
+		}
+
+		global $current_User;
+		if( ! is_logged_in() || ! $current_User->check_perm( 'options', 'edit' ) )
+		{	// Current User must has a permission to run tools:
+			return;
+		}
+
+		$params = array_merge( array(
+				'display_info'        => true,
+				'display_button_find' => true,
+				'display_version'     => true,
+				'before_button_find'  => '<p>',
+				'after_button_find'   => '</p>',
+			), $params );
+
+		$Form = new Form();
+
+		$Form->begin_form( 'fform' );
+
+		$Form->add_crumb( 'tools' );
+		$Form->hidden( 'ctrl', 'tools' );
+		$Form->hiddens_by_key( get_memorized() ); // needed to pass all other memorized params, especially "tab"
+
+		if( $params['display_info'] )
+		{	// Display info about this form:
+			echo '<p>'.T_('This tool finds all users that do not have a registration country yet and then assigns them a registration country based on their registration IP.').
+					 get_manual_link('geoip-plugin').'</p>';
+		}
+
+		if( $params['display_button_find'] )
+		{	// Display a button to find country for users:
+			echo $params['before_button_find'];
+			$Form->button( array(
+					'name'  => 'actionArray[geoip_find_country]',
+					'value' => T_('Find Registration Country for all Users NOW!')
+				) );
+			echo $params['after_button_find'];
+		}
+
+		if( $params['display_version'] )
+		{	// Display plugin version and links to update:
+			global $admin_url;
+			if( file_exists( $this->geoip_file_path ) )
+			{
+				$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datetimefmt(), filemtime( $this->geoip_file_path ) ) );
+			}
+			else
+			{
+				$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
+			}
+			$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-warning">'.T_('Download update now!').'</a>';
+			echo '<p><b>GeoIP.dat:</b> '.$datfile_info.'</p>';
+		}
+
+		if( !empty( $this->text_from_AdminTabAction ) )
+		{	// Display a report of executed action
+			echo '<p><b>'.T_('Report').':</b></p>';
+			echo $this->text_from_AdminTabAction;
+		}
+
+		$Form->end_form();
 	}
 
 
@@ -872,6 +902,24 @@ jQuery( document ).ready( function()
 
 		echo $before.$message.$after;
 		evo_flush();
+	}
+
+
+	/**
+	 * Event handler: Called right after displaying the admin users list.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminAfterUsersList( & $params )
+	{
+		// Display a form to find countries for users:
+		$this->display_tool_form( array(
+				'display_info'       => false,
+				'display_version'    => false,
+				'before_button_find' => '<p class="center">',
+				'after_button_find'  => '</p>',
+			) );
 	}
 }
 

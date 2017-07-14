@@ -2967,6 +2967,18 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: Called right after displaying the admin users list.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminAfterUsersList( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
 	// }}}
 
 
