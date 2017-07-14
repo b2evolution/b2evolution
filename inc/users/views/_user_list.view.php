@@ -24,5 +24,11 @@ users_results_block( array(
 		'display_params'     => $display_params,
 	) );
 
+if( is_admin_page() )
+{	// Call plugins event:
+	global $Plugins;
+	$Plugins->trigger_event( 'AdminAfterUsersList' );
+}
+
 load_funcs( 'users/model/_user_js.funcs.php' );
 ?>

@@ -745,6 +745,16 @@ class Plugins
 			{
 				$set_Obj->_defaults[$l_name] = array();
 			}
+			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'input_group' && is_array( $l_meta['inputs'] ) )
+			{	// Get default values from input group fields:
+				foreach( $l_meta['inputs'] as $l_meta_input_key => $l_meta_input_data )
+				{
+					if( isset( $l_meta_input_data['defaultvalue'] ) )
+					{
+						$set_Obj->_defaults[ $l_name.$l_meta_input_key ] = $l_meta_input_data['defaultvalue'];
+					}
+				}
+			}
 			else
 			{
 				$set_Obj->_defaults[$l_name] = '';

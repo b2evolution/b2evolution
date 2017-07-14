@@ -49,6 +49,7 @@ function init_system_check( $name, $value, $info = '' )
 	$syscheck_name = $name;
 	$syscheck_value = $value;
 	$syscheck_info = $info;
+	evo_flush();
 }
 
 function disp_system_check( $condition, $message = '' )

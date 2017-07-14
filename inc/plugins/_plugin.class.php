@@ -2967,6 +2967,18 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: Called right after displaying the admin users list.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminAfterUsersList( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
 	// }}}
 
 
@@ -3866,9 +3878,10 @@ class Plugin
 	 * @param string Setting name
 	 * @param object Blog collection
 	 * @param boolean TRUE - to allow empty Blog, it is used to get default value when Blog is not defined, e.g. in case with Messages
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_coll_setting( $parname, & $Blog, $allow_null_blog = false )
+	function get_coll_setting( $parname, & $Blog, $allow_null_blog = false, $group = NULL )
 	{
 		if( empty( $Blog ) )
 		{ // Blog is not defined
@@ -3897,7 +3910,7 @@ class Plugin
 		}
 
 		// Try default values:
-		return $this->get_coll_default_setting( $parname, $blog_type );
+		return $this->get_coll_default_setting( $parname, $blog_type, $group );
 	}
 
 
@@ -3906,15 +3919,27 @@ class Plugin
 	 *
 	 * @param string Setting name
 	 * @param string Blog type
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_coll_default_setting( $parname, $blog_type = 'std' )
+	function get_coll_default_setting( $parname, $blog_type = 'std', $group = NULL )
 	{
 		$tmp_params = array( 'for_editing' => true, 'blog_type' => $blog_type );
 		$params = $this->get_coll_setting_definitions( $tmp_params );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{ // We have a default value:
-			return $params[$parname]['defaultvalue'] ;
+		if( $group === NULL )
+		{	// Get default value from sinple field:
+			if( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'] ;
+			}
+		}
+		else
+		{	// Get default value from input group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
 		}
 
 		return NULL;
@@ -3980,9 +4005,10 @@ class Plugin
 	 * Get a message specific param value
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_msg_setting( $parname )
+	function get_msg_setting( $parname, $group = NULL )
 	{
 		if( empty( $this->Settings ) )
 		{
@@ -4001,9 +4027,20 @@ class Plugin
 		// Try default values:
 		$tmp_params = array( 'for_editing' => true );
 		$params = $this->get_msg_setting_definitions( $tmp_params );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{ // We have a default value:
-			return $params[$parname]['defaultvalue'] ;
+		if( $group === NULL )
+		{	// Get default value from sinple field:
+			if( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'] ;
+			}
+		}
+		else
+		{	// Get default value from input group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
 		}
 
 		return NULL;
@@ -4013,9 +4050,10 @@ class Plugin
 	 * Get a email specific param value
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_email_setting( $parname )
+	function get_email_setting( $parname, $group = NULL )
 	{
 		if( empty( $this->Settings ) )
 		{
@@ -4034,9 +4072,20 @@ class Plugin
 		// Try default values:
 		$tmp_params = array( 'for_editing' => true );
 		$params = $this->get_email_setting_definitions( $tmp_params );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{ // We have a default value:
-			return $params[$parname]['defaultvalue'] ;
+		if( $group === NULL )
+		{	// Get default value from sinple field:
+			if( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'] ;
+			}
+		}
+		else
+		{	// Get default value from input group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
 		}
 
 		return NULL;

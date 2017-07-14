@@ -369,7 +369,7 @@ class ComponentWidget extends DataObject
  	 * @param boolean default false, set to true only if it is called from a widget::get_param_definition() function to avoid infinite loop
  	 * @return mixed
 	 */
-	function get_param( $parname, $check_infinite_loop = false )
+	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
 	{
 		$this->load_param_array();
 		if( isset( $this->param_array[$parname] ) )
@@ -380,9 +380,21 @@ class ComponentWidget extends DataObject
 		// Try default values:
 		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
 		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{	// We ahve a default value:
-			return $params[$parname]['defaultvalue'] ;
+
+		if( $group === NULL )
+		{	// Get param from simple field:
+			if( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'] ;
+			}
+		}
+		else
+		{	// Get param from group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
 		}
 
 		return NULL;
@@ -397,11 +409,12 @@ class ComponentWidget extends DataObject
 	 * @param boolean true to set to NULL if empty value
 	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue, $make_null = false )
+	function set( $parname, $parvalue, $make_null = false, $group = NULL )
 	{
 		$params = $this->get_param_definitions( NULL );
 
-		if( isset( $params[$parname] ) )
+		if( isset( $params[$parname] ) || 
+		    ( $group !== NULL && isset( $params[ $group ]['inputs'][ substr( $parname, strlen( $group ) ) ] ) ) )
 		{ // This is a widget specific param:
 			// Make sure param_array is loaded before set the param value
 			$this->load_param_array();
