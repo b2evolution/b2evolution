@@ -89,7 +89,7 @@ class UploadHandler {
 			if( ( $memory_limit - $curr_mem_usage ) < 8192 )
 			{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 				fclose( $temp );
-				return array( 'error' => T_('') );
+				return array( 'error' => T_('Out of memory.') );
 			}
 			$contents .= fread( $target, 8192 );
 		}
@@ -229,7 +229,7 @@ class UploadHandler {
 				if( ( $memory_limit - $curr_mem_usage ) < 8192 )
 				{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 					fclose( $temp );
-					return array( 'error' => T_('') );
+					return array( 'error' => T_('Out of memory.') );
 				}
 				$contents .= fread( $temp, 8192 );
 			}
