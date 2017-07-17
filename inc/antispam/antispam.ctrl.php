@@ -33,7 +33,14 @@ param( 'confirm', 'string' );
 param( 'keyword', 'string', '', true );
 param( 'domain', 'string' );
 param( 'filteron', 'string', '', true );
-param( 'filter', 'array:string', array() );
+if( $action == 'iprange_edit' )
+{	// Memorize action for users and sessions list below edit form:
+	memorize_param( 'action', 'string', '', $action );
+}
+else
+{	// Don't initialize this param as array because it must be string for UserList:
+	param( 'filter', 'array:string', array() );
+}
 
 $tab = param( 'tab', 'string', '', true );
 $tab3 = param( 'tab3', 'string', '', true );

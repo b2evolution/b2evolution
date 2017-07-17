@@ -5155,6 +5155,8 @@ function users_results_block( $params = array() )
 	$params = array_merge( array(
 			'org_ID'               => NULL,
 			'viewed_user'          => NULL,
+			'reg_ip_min'           => NULL,
+			'reg_ip_max'           => NULL,
 			'filterset_name'       => 'admin',
 			'results_param_prefix' => 'users_',
 			'results_title'        => T_('Users').get_manual_link('users_and_groups'),
@@ -5243,7 +5245,12 @@ function users_results_block( $params = array() )
 			'where_org_ID'        => $params['org_ID'],
 			'where_viewed_user'   => $params['viewed_user'],
 		) );
-	$default_filters = array( 'order' => $params['results_order'], 'org' => $params['org_ID'] );
+	$default_filters = array(
+			'order'      => $params['results_order'],
+			'org'        => $params['org_ID'],
+			'reg_ip_min' => $params['reg_ip_min'],
+			'reg_ip_max' => $params['reg_ip_max'],
+		);
 	$UserList->title = $params['results_title'];
 	$UserList->no_results_text = $params['results_no_text'];
 

@@ -49,6 +49,34 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New IP Range') : T_('IP Range') )
 
 $Form->end_form( array( array( 'submit', 'save', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 
+if( $edited_IPRange->ID > 0 )
+{	// Display members of this organization:
+	users_results_block( array(
+			'reg_ip_min'           => int2ip( $edited_IPRange->get( 'IPv4start' ) ),
+			'reg_ip_max'           => int2ip( $edited_IPRange->get( 'IPv4end' ) ),
+			'filterset_name'       => 'iprange_'.$edited_IPRange->ID,
+			'results_param_prefix' => 'ipruser_',
+			'results_title'        => T_('Users registered through this IP Range').get_manual_link( 'ip-range-users' ),
+			'results_order'        => '/user_created_datetime/D',
+			'page_url'             => get_dispctrl_url( 'antispam', 'tab3=ipranges&action=iprange_edit&amp;iprange_ID='.$edited_IPRange->ID ),
+			'display_ID'           => false,
+			'display_btn_adduser'  => false,
+			'display_btn_addgroup' => false,
+			'display_blogs'        => false,
+			'display_source'       => false,
+			'display_regcountry'   => false,
+			'display_update'       => false,
+			'display_lastvisit'    => false,
+			'display_contact'      => false,
+			'display_reported'     => false,
+			'display_group'        => false,
+			'display_level'        => false,
+			'display_status'       => false,
+			'display_actions'      => false,
+			'display_newsletter'   => false,
+		) );
+}
+
 ?>
 <script type="text/javascript">
 jQuery( document ).ready( function()
