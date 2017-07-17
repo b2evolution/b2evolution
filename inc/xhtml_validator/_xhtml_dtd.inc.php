@@ -304,7 +304,7 @@ if( $use_strict )
 		'li' => $A_attrs,
 		'dl' => $A_attrs,
 		'hr' => $A_attrs,
-		'pre' => $A_attrs.' xml:space',
+		'pre' => $A_attrs.' xml:space data-*',
 		'a' => $A_attrs.' charset type href hreflang rel rev shape coords name',
 		'br' => $A_coreattrs,
 		'img' => $A_attrs.' src alt longdesc height width usemap ismap',
@@ -335,7 +335,7 @@ else
 		'li' => $A_attrs.' type value',
 		'dl' => $A_attrs.' compact',
 		'hr' => $A_attrs.' align noshade size width',
-		'pre' => $A_attrs.' width xml:space',
+		'pre' => $A_attrs.' width xml:space data-*',
 		'center' => $A_attrs,					// Transitional only
 		// sam2kb> TODO: 'name' is deprecated by 'id', we should allow 'id' in <a> tags without 'href' attribute
 		'a' => $A_attrs.' charset type href hreflang rel rev shape coords target name',
