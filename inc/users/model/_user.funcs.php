@@ -3138,7 +3138,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 				{
 					$url = 'http://'.$url;
 				}
-				$field_note .= '<a href="'.$url.'" target="_blank" class="action_icon" style="vertical-align: 0;">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
+				$field_note .= '<a href="'.$url.'" target="_blank" class="action_icon" style="vertical-align: 0;">'.get_icon( 'permalink', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
 			}
 		}
 
@@ -3186,6 +3186,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 
 				default:
 					$field_params['maxlength'] = 255;
+					$field_params['style'] = 'max-width:90%';
 					$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, $field_size, $userfield_icon.$userfield->ufdf_name, $field_note, $field_params );
 			}
 		}
