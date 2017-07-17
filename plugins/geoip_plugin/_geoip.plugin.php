@@ -857,7 +857,7 @@ jQuery( document ).ready( function()
 					$total_users = count( $users );
 					if( $total_users == 0 )
 					{	// No users
-						$this->text_from_AdminTabAction = T_('No found users without profile country.');
+						$this->text_from_AdminTabAction = T_('All users already have a profile country.');
 						break;
 					}
 					$count_nofound_country = 0;
@@ -867,16 +867,16 @@ jQuery( document ).ready( function()
 					{
 						$Country = false;
 
-						$users_report .= sprintf( T_('User #%s' ), $user->ID ).': ';
+						$users_report .= sprintf( T_('User: %s'), '#'.$user->ID ).': ';
 
 						// STEP 1: Get profile Country from IP address of last session:
 						if( empty( $user->session_IP ) )
 						{	// No defined session IP:
-							$users_report .= '<b class="orange">'.T_('Session IP address is not defined!').'</b>';
+							$users_report .= '<b class="orange">'.T_('Session IP address is not set!').'</b>';
 						}
 						else
 						{	// Get Country by session IP address:
-							$users_report .= sprintf( T_('Session IP: %s'), $user->session_IP );
+							$users_report .= T_('Session IP address:').' '.$user->session_IP;
 							$Country = $this->get_country_by_IP( $user->session_IP );
 						}
 
@@ -886,13 +886,13 @@ jQuery( document ).ready( function()
 							$users_report .= ' - ';
 							if( empty( $user->reg_ctry_ID ) )
 							{	// No defined registration country:
-								$users_report .= '<b class="orange">'.T_('Registration country is not defined!').'</b>';
+								$users_report .= '<b class="orange">'.T_('Registration country is not set!').'</b>';
 							}
 							else
 							{	// Get Country by registration IP address:
-								$users_report .= sprintf( T_('Registration country ID: %s'), $user->reg_ctry_ID );
 								$CountryCache = & get_CountryCache();
 								$Country = & $CountryCache->get_by_ID( $user->reg_ctry_ID, false, false );
+								$users_report .= T_('Registration country:').' '.( $Country ? $Country->get_name() : '#'.$user->reg_ctry_ID );
 							}
 						}
 
@@ -902,11 +902,11 @@ jQuery( document ).ready( function()
 							$users_report .= ' - ';
 							if( empty( $user->reg_IP ) )
 							{	// No defined registration IP:
-								$users_report .= '<b class="orange">'.T_('Registration IP address is not defined!').'</b>';
+								$users_report .= '<b class="orange">'.T_('Registration IP address is not set!').'</b>';
 							}
 							else
 							{	// Get Country by registration IP address:
-								$users_report .= sprintf( T_('Registration IP: %s'), int2ip( $user->reg_IP ) );
+								$users_report .= T_('Registration IP address:').' '.int2ip( $user->reg_IP );
 								$Country = $this->get_country_by_IP( int2ip( $user->reg_IP ) );
 							}
 						}
