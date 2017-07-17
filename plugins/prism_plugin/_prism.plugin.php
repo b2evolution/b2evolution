@@ -161,7 +161,7 @@ class prism_plugin extends Plugin
 	 */
 	function filter_code_callback( $block )
 	{
-		$content = trim( $block[3] );
+		$content = isset( $block[3] ) ? trim( $block[3] ) : '';
 
 		if( empty( $content ) )
 		{ // Don't render if no code content
