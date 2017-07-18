@@ -135,7 +135,7 @@ else
 
 // Allowed Attribute classes
 // TODO: individual checkboxes for class / style / id
-$A_coreattrs = 'class title'.( $allow_css_tweaks ? ' style' : '' )					// 'id' is really nasty
+$A_coreattrs = 'class title data-*'.( $allow_css_tweaks ? ' style' : '' )					// 'id' is really nasty
 					.( $allow_javascript ? ' onmouseover onmouseout onclick' : '' );
 $A_i18n = 'lang xml:lang dir';
 $A_attrs = $A_coreattrs.' '.$A_i18n;
@@ -304,7 +304,7 @@ if( $use_strict )
 		'li' => $A_attrs,
 		'dl' => $A_attrs,
 		'hr' => $A_attrs,
-		'pre' => $A_attrs.' xml:space data-*',
+		'pre' => $A_attrs.' xml:space',
 		'a' => $A_attrs.' charset type href hreflang rel rev shape coords name',
 		'br' => $A_coreattrs,
 		'img' => $A_attrs.' src alt longdesc height width usemap ismap',
@@ -335,7 +335,7 @@ else
 		'li' => $A_attrs.' type value',
 		'dl' => $A_attrs.' compact',
 		'hr' => $A_attrs.' align noshade size width',
-		'pre' => $A_attrs.' width xml:space data-*',
+		'pre' => $A_attrs.' width xml:space',
 		'center' => $A_attrs,					// Transitional only
 		// sam2kb> TODO: 'name' is deprecated by 'id', we should allow 'id' in <a> tags without 'href' attribute
 		'a' => $A_attrs.' charset type href hreflang rel rev shape coords target name',
@@ -456,7 +456,7 @@ $C_E_a_content = '#PCDATA '.$C_E_special.' '.$C_E_fontstyle.' '.$C_E_phrase.' '.
 $C_E_pre_content = '#PCDATA a '.$C_E_fontstyle.' '.$C_E_phrase.' '.$C_E_special_pre.' '.$C_E_misc_inline;
 
 // Allowed Attribute classes
-$C_A_coreattrs = 'class title'.( $comments_allow_css_tweaks ? ' style' : '' );  // 'id' is really nasty
+$C_A_coreattrs = 'class title data-*'.( $comments_allow_css_tweaks ? ' style' : '' );  // 'id' is really nasty
 $C_A_i18n = 'lang xml:lang dir';
 $C_A_attrs = $C_A_coreattrs.' '.$C_A_i18n;
 $C_A_cellhalign = 'align char charoff';
