@@ -3160,7 +3160,7 @@ msgstr "Открыть соответствующую страницу в онл
 #: ../../../inc/_core/_misc.funcs.php:5894
 #, php-format
 msgid "This action can only be performed with HTTP_REFERER = %s"
-msgstr ""
+msgstr "Это действие может быть выполнено только с HTTP_REFERER = %s"
 
 #: ../../../inc/_core/_misc.funcs.php:5944
 msgid "Date issued (Default)"
@@ -5544,20 +5544,20 @@ msgstr "Начало IP диапазона должно быть меньше ч
 #: ../../../inc/antispam/model/_iprange.class.php:132
 #, php-format
 msgid "Conflicting IP Ranges have been deleted: %s"
-msgstr ""
+msgstr "Конфликтующие IP Диапазоны были удален: %s"
 
 #: ../../../inc/antispam/model/_iprange.class.php:141
 msgid "Edit this range"
-msgstr ""
+msgstr "Редактировать этот диапазон"
 
 #: ../../../inc/antispam/model/_iprange.class.php:144
 #, php-format
 msgid "Conflicting IP Ranges already exist: %s"
-msgstr ""
+msgstr "Конфликтующие IP Диапазоны уже существуют: %s"
 
 #: ../../../inc/antispam/model/_iprange.class.php:145
 msgid "Delete all conflicts and save new Range"
-msgstr ""
+msgstr "Удалить все конфликты и сохранить новый Диапазон"
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:27
 #: ../../../inc/antispam/views/_antispam_list.view.php:40
@@ -7283,10 +7283,13 @@ msgid ""
 "\n"
 "<p>A content block can be included in several places.</p>"
 msgstr ""
+"<p>Это Пост/Запись типа \"Блок Содержимого\".</p>\n"
+"\n"
+"<p>Блок содержимого может быть включен в несколько мест.</p>"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1162
 msgid "This is a Content Block"
-msgstr ""
+msgstr "Это Блок Содержимого"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1175
 #: ../../../inc/collections/_demo_content.funcs.php:1636
@@ -7351,6 +7354,9 @@ msgid ""
 "\n"
 "<p>It appears in a single category.</p>"
 msgstr ""
+"<p>Это первая запись в коллекции \"[coll:shortname]\".</p>\n"
+"\n"
+"<p>Она находится в одной рубрике.</p>"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1205
 msgid "First Post"
@@ -7362,6 +7368,9 @@ msgid ""
 "\n"
 "<p>It appears in multiple categories.</p>"
 msgstr ""
+"<p>Это вторая запись в коллекции \"[coll:shortname]\".</p>\n"
+"\n"
+"<p>Она находится в нескольких рубриках.</p>"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1214
 msgid "Second post"
@@ -7476,11 +7485,14 @@ msgid ""
 "Finally, we can also display just the value of a specific field, like this: "
 "%s."
 msgstr ""
+"В заключение, мы также можем отображать только значение определенного поля, "
+"подобно этому: %s."
 
 #: ../../../inc/collections/_demo_content.funcs.php:1311
 #, php-format
 msgid "It is also possible to create links using a custom field URL: %s"
 msgstr ""
+"Также возможно создать ссылки, используя пользовательское поле URL: %s"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1322
 msgid "Child Post Example"
@@ -7516,6 +7528,8 @@ msgid ""
 "It is also possible to create links using a custom field URL from the parent"
 " post: %s"
 msgstr ""
+"Также возможно создать ссылки, используя пользовательское поле URL из "
+"родительской записи: %s"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1345
 msgid ""
@@ -7840,6 +7854,9 @@ msgid ""
 "\n"
 "<p>It appears in a single category.</p>"
 msgstr ""
+"<p>Это первый топик в коллекции \"[coll:shortname]\".</p>\n"
+"\n"
+"<p>Он находится в одной рубрике.</p>"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1669
 msgid "First Topic"
@@ -7851,6 +7868,9 @@ msgid ""
 "\n"
 "<p>It appears in multiple categories.</p>"
 msgstr ""
+"<p>Это второй топик в коллекции \"[coll:shortname]\".</p>\n"
+"\n"
+"<p>Он находится в нескольких рубриках.</p>"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1678
 msgid "Second topic"
@@ -8010,6 +8030,9 @@ msgid ""
 "\n"
 "<p>It appears in a single category.</p>"
 msgstr ""
+"<p>Это первая страница в коллекции \"[coll:shortname]\".</p>\n"
+"\n"
+"<p>Она находится в одной рубрике.</p>"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1845
 msgid "First Page"
@@ -8021,6 +8044,9 @@ msgid ""
 "\n"
 "<p>It appears in multiple categories.</p>"
 msgstr ""
+"<p>Это вторая страница в коллекции \"[coll:shortname]\".</p>\n"
+"\n"
+"<p>Она находится в нескольких рубриках.</p>"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1855
 msgid "Second Page"
@@ -8129,7 +8155,7 @@ msgstr "последний раз редактировалось"
 #: ../../../inc/collections/_search.funcs.php:1318
 #, php-format
 msgid "Published by %s on %s"
-msgstr ""
+msgstr "Опубликовано %s в %s"
 
 #: ../../../inc/collections/_search.funcs.php:1322
 #: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:209
@@ -8323,7 +8349,7 @@ msgstr "Новая \"%s\" коллекция"
 
 #: ../../../inc/collections/collections.ctrl.php:131
 msgid "Please select an option for \"New contents\""
-msgstr ""
+msgstr "Пожалуйста, выберите опцию \"Нового содержимого\""
 
 #: ../../../inc/collections/collections.ctrl.php:202
 msgid "The collection has been duplicated."
@@ -8550,6 +8576,8 @@ msgstr "Пожалуйста, введите ID специальной запи�
 #: ../../../inc/collections/model/_blog.class.php:822
 msgid "Stale content alert must be configured with a number of months."
 msgstr ""
+"Оповещение об устаревшем контенте должно быть сконфигурировано как "
+"количество месяцев."
 
 #: ../../../inc/collections/model/_blog.class.php:842
 #, php-format
@@ -8744,7 +8772,7 @@ msgstr ""
 
 #: ../../../inc/collections/model/_blog.class.php:2388
 msgid "Media directory file permission error"
-msgstr ""
+msgstr "Ошибка файловых прав медиа папки"
 
 #: ../../../inc/collections/model/_blog.class.php:2396
 #, php-format
@@ -8753,7 +8781,7 @@ msgstr "Медиа директория &laquo;%s&raquo; не может быт�
 
 #: ../../../inc/collections/model/_blog.class.php:2397
 msgid "Media directory creation error"
-msgstr ""
+msgstr "Ошибка создания медиа папки"
 
 #: ../../../inc/collections/model/_blog.class.php:2405
 msgid "Collection media directories created:"
@@ -9717,7 +9745,7 @@ msgstr "Редактирование из блога"
 #: ../../../inc/collections/views/_coll_advanced.form.php:132
 #, php-format
 msgid "See more options in Features &gt; <a %s>Posts</a>"
-msgstr ""
+msgstr "См. больше опций в Возможности &gt; <a %s>Записи</a>"
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:135
 #: ../../../inc/files/views/_file_browse_set.form.php:72
@@ -11135,23 +11163,25 @@ msgstr "Результатов на страницу"
 
 #: ../../../inc/collections/views/_coll_other.form.php:38
 msgid "Score"
-msgstr ""
+msgstr "Кол-во очков"
 
 #: ../../../inc/collections/views/_coll_other.form.php:39
 msgid "If sorted by date, everything without a date will be sorted last."
 msgstr ""
+"Если отсортировано по дате, то все результаты без даты будут отсортированы в"
+" конце."
 
 #: ../../../inc/collections/views/_coll_other.form.php:40
 msgid "Sort by"
-msgstr ""
+msgstr "Сортировать по"
 
 #: ../../../inc/collections/views/_coll_other.form.php:46
 msgid "Include"
-msgstr ""
+msgstr "Включать"
 
 #: ../../../inc/collections/views/_coll_other.form.php:51
 msgid "Comments shown"
-msgstr ""
+msgstr "Показывать комментариев"
 
 #: ../../../inc/collections/views/_coll_other.form.php:55
 msgid "Archive pages"
@@ -11886,7 +11916,7 @@ msgstr "Open Graph"
 
 #: ../../../inc/collections/views/_coll_seo.form.php:126
 msgid "Open Graph tags"
-msgstr ""
+msgstr "Теги Open Graph"
 
 #: ../../../inc/collections/views/_coll_seo.form.php:129
 msgid "Include Twitter Summary card"
@@ -13047,7 +13077,7 @@ msgstr "Голосовать как полезный!"
 #: ../../../inc/comments/model/_comment.class.php:1713
 #: ../../../inc/comments/model/_comment.class.php:1916
 msgid "You sent a \"helpful\" vote."
-msgstr ""
+msgstr "Вы отправили \"полезный\" голос."
 
 #: ../../../inc/comments/model/_comment.class.php:1714
 #: ../../../inc/comments/model/_comment.class.php:1919
@@ -14663,11 +14693,11 @@ msgstr "Получатели рассылки"
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:38
 msgid "Accounts in filterset"
-msgstr ""
+msgstr "Аккаунты в заданном фильтре"
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:39
 msgid "Active accounts in filterset"
-msgstr ""
+msgstr "Активные аккаунты в заданном фильтре"
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:41
 #: ../../../inc/email_campaigns/views/_campaigns_send.form.php:59
@@ -15833,7 +15863,7 @@ msgstr "%s был промасштабирован до %dx%d пикселей."
 
 #: ../../../inc/files/model/_image.funcs.php:769
 msgid "The following images were resized:"
-msgstr ""
+msgstr "Следующие изображения были изменены в размерах:"
 
 #: ../../../inc/files/model/_image.funcs.php:773
 #, php-format
@@ -15842,7 +15872,7 @@ msgstr "%s не может быть промасштабирован до раз
 
 #: ../../../inc/files/model/_image.funcs.php:774
 msgid "Unable to resize the following images:"
-msgstr ""
+msgstr "Не удалось изменить размеры следующих изображений:"
 
 #: ../../../inc/files/upload.ctrl.php:96
 msgid "You don't have upload permission to the requested root directory."
@@ -16422,7 +16452,7 @@ msgstr "Переименовать файлы..."
 
 #: ../../../inc/files/views/_file_list.inc.php:707
 msgid "Resize images..."
-msgstr ""
+msgstr "Изменить размеры изображений..."
 
 #: ../../../inc/files/views/_file_list.inc.php:708
 msgid "Delete files..."
@@ -16522,13 +16552,13 @@ msgstr "Имя файла на сервере."
 #: ../../../inc/files/views/_file_properties.form.php:54
 #, php-format
 msgid "Check to resize and fit into %s px"
-msgstr ""
+msgstr "Отметьте, чтобы изменить размеры и подогнать в %s пикселей"
 
 #: ../../../inc/files/views/_file_properties.form.php:54
 #: ../../../inc/files/views/_file_resize.form.php:27
 #: ../../../inc/files/views/_file_resize.form.php:51
 msgid "Resize"
-msgstr ""
+msgstr "Изменить размер"
 
 #: ../../../inc/files/views/_file_properties.form.php:62
 #: ../../../inc/files/views/_file_properties.form.php:68
@@ -16589,16 +16619,16 @@ msgstr "Переименовать"
 
 #: ../../../inc/files/views/_file_resize.form.php:25
 msgid "Cancel resize!"
-msgstr ""
+msgstr "Отменить изменение размера!"
 
 #: ../../../inc/files/views/_file_resize.form.php:35
 msgid "Confirm resize"
-msgstr ""
+msgstr "Подтвердить изменение размера"
 
 #: ../../../inc/files/views/_file_resize.form.php:37
 #, php-format
 msgid "%s images will be resized to fit %s. Are you sure?"
-msgstr ""
+msgstr "%s изображениям будут изменены размеры в %s. Вы уверены?"
 
 #: ../../../inc/files/views/_file_settings.form.php:147
 msgid "File manager settings"
@@ -17340,7 +17370,7 @@ msgstr "Пожалуйста, введите корректную дату со�
 #: ../../../inc/items/model/_item.class.php:745
 #: ../../../inc/slugs/model/_slug.class.php:112
 msgid "All slugs must contain at least one letter."
-msgstr ""
+msgstr "Все короткие ссылки должны содержать, по крайней мере, одну букву."
 
 #: ../../../inc/items/model/_item.class.php:757
 msgid "Please provide a title tag."
@@ -17378,7 +17408,7 @@ msgstr "Пожалуйста, введите долготу."
 #: ../../../inc/items/model/_item.class.php:892
 #, php-format
 msgid "Custom \"%s\" field must be a number"
-msgstr ""
+msgstr "Пользовательское поле \"%s\" должно быть числом"
 
 #: ../../../inc/items/model/_item.class.php:949
 msgid "Please provide a comment expiration delay."
@@ -17547,18 +17577,18 @@ msgstr "Родительская запись не имеет пользоват
 #: ../../../inc/items/model/_item.class.php:2759
 #, php-format
 msgid "The URL field \"%s\" does not exist"
-msgstr ""
+msgstr "URL поле \"%s\" не существует"
 
 #: ../../../inc/items/model/_item.class.php:2820
 #: ../../../inc/widgets/widgets/_content_block.widget.php:152
 #, php-format
 msgid "The referenced Item (%s) is not a Content Block."
-msgstr ""
+msgstr "Запись (%s) не является Блоком Содержимого."
 
 #: ../../../inc/items/model/_item.class.php:2831
 #, php-format
 msgid "Content inclusion loop detected. Not including \"%s\"."
-msgstr ""
+msgstr "Обнаружено бесконечное включение контента. Не включиться запись \"%s\"."
 
 #. TRANS: this is the default text for the extended post "more" link
 #: ../../../inc/items/model/_item.class.php:2939
@@ -17975,7 +18005,7 @@ msgstr "Введения"
 
 #: ../../../inc/items/model/_item.funcs.php:1642
 msgid "Content Blocks"
-msgstr ""
+msgstr "Блоки Содержимое"
 
 #: ../../../inc/items/model/_item.funcs.php:1736
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:156
@@ -18496,7 +18526,7 @@ msgstr "Вне потока контента"
 #: ../../../inc/items/views/_itemtypes.view.php:190
 #: ../../../inc/widgets/widgets/_content_block.widget.php:53
 msgid "Content Block"
-msgstr ""
+msgstr "Блок Содержимое"
 
 #: ../../../inc/items/model/_itemtypecache.class.php:101
 #: ../../../inc/items/views/_itemtypes.view.php:176
@@ -19601,12 +19631,14 @@ msgstr "Добавить новое HTML пользовательское пол
 
 #: ../../../inc/items/views/_itemtype.form.php:155
 msgid "Add new URL custom field"
-msgstr ""
+msgstr "Добавить новое URL пользовательское поле"
 
 #: ../../../inc/items/views/_itemtype.form.php:156
 msgid ""
 "Ex: Website, Twitter... &ndash; will be stored as a varchar(10000) field."
 msgstr ""
+"Например: Вебсайт, Twitter... &ndash; будет храниться как текстовое поле "
+"(макс. 10000 символов для значений)."
 
 #: ../../../inc/items/views/_itemtype.form.php:182
 msgid "Remove custom field"
@@ -31284,7 +31316,7 @@ msgstr "Участие"
 #: ../../../inc/users/views/_organization_user_remove.form.php:31
 #, php-format
 msgid "This will remove %s from the organization. Would you like to continue?"
-msgstr ""
+msgstr "Это удалит %s из организации. Хотите ли вы продолжить?"
 
 #: ../../../inc/users/views/_registration.form.php:42
 msgid "Default user permissions"
@@ -32515,7 +32547,7 @@ msgstr "% активных польз-ей"
 #: ../../../inc/users/views/_user_stats.view.php:164
 #: ../../../inc/users/views/_user_stats.view.php:165
 msgid "Active"
-msgstr ""
+msgstr "Активный"
 
 #: ../../../inc/users/views/_user_stats.view.php:152
 #: ../../../inc/users/views/_user_stats.view.php:154
@@ -32527,7 +32559,7 @@ msgstr ""
 #: ../../../inc/users/views/_user_stats.view.php:166
 #: ../../../inc/users/views/_user_stats.view.php:168
 msgid "With Photo"
-msgstr ""
+msgstr "С Фото"
 
 #: ../../../inc/users/views/_user_stats.view.php:153
 #: ../../../inc/users/views/_user_stats.view.php:155
@@ -32539,7 +32571,7 @@ msgstr ""
 #: ../../../inc/users/views/_user_stats.view.php:167
 #: ../../../inc/users/views/_user_stats.view.php:169
 msgid "No Photo"
-msgstr ""
+msgstr "Без Фото"
 
 #: ../../../inc/users/views/_user_stats.view.php:154
 #: ../../../inc/users/views/_user_stats.view.php:155
@@ -32548,7 +32580,7 @@ msgstr ""
 #: ../../../inc/users/views/_user_stats.view.php:166
 #: ../../../inc/users/views/_user_stats.view.php:167
 msgid "Inactive"
-msgstr ""
+msgstr "Неактивный"
 
 #: ../../../inc/users/views/_user_stats.view.php:287
 msgid "Gender statistics"
@@ -34743,15 +34775,16 @@ msgstr "Все блоги"
 
 #: ../../../inc/widgets/widgets/_content_block.widget.php:74
 msgid "Display post of type \"Content Block\"."
-msgstr ""
+msgstr "Отображать запись типа \"Блок Содержимого\"."
 
 #: ../../../inc/widgets/widgets/_content_block.widget.php:98
 msgid "Item Slug"
-msgstr ""
+msgstr "Короткая ссылка Записи"
 
 #: ../../../inc/widgets/widgets/_content_block.widget.php:117
 msgid "Please enter either an Item ID or an Item Slug, but not both."
 msgstr ""
+"Пожалуйста, введите либо ID Записи, либо Короткую ссылку Записи, но не оба."
 
 #: ../../../inc/widgets/widgets/_content_hierarchy.widget.php:49
 msgid "Blog Title"
@@ -35831,55 +35864,55 @@ msgstr "Защищено"
 #: ../../../install/_functions_create.php:409
 #: ../install/_functions_create.php:410
 msgid "Enter a number"
-msgstr ""
+msgstr "Введите число"
 
 #: ../../../install/_functions_create.php:409
 msgid "First numeric field"
-msgstr ""
+msgstr "Первое числовое поле"
 
 #: ../../../install/_functions_create.php:410
 msgid "Second numeric field"
-msgstr ""
+msgstr "Второе числовое поле"
 
 #: ../../../install/_functions_create.php:411
 msgid "Enter a string"
-msgstr ""
+msgstr "Введите строку"
 
 #: ../../../install/_functions_create.php:411
 msgid "First string field"
-msgstr ""
+msgstr "Первое строковое поле"
 
 #: ../../../install/_functions_create.php:412
 msgid "Define your own labels"
-msgstr ""
+msgstr "Определите ваши метки"
 
 #: ../../../install/_functions_create.php:412
 msgid "Define your own notes"
-msgstr ""
+msgstr "Определите ваши заметки"
 
 #: ../../../install/_functions_create.php:413
 msgid "Enter multiple lines"
-msgstr ""
+msgstr "Введите несколько линий"
 
 #: ../../../install/_functions_create.php:413
 msgid "Multiline plain text field"
-msgstr ""
+msgstr "Поле многострочного простого текста"
 
 #: ../../../install/_functions_create.php:414
 msgid "Enter HTML code"
-msgstr ""
+msgstr "Введите HTML код"
 
 #: ../../../install/_functions_create.php:414
 msgid "Multiline HTML field"
-msgstr ""
+msgstr "Поле многострочного HTML текста"
 
 #: ../../../install/_functions_create.php:415
 msgid "Enter an URL (absolute or relative)"
-msgstr ""
+msgstr "Введите URL (абсолютный или относительный)"
 
 #: ../../../install/_functions_create.php:415
 msgid "URL field"
-msgstr ""
+msgstr "URL поле"
 
 #: ../../../install/_functions_create.php:1246
 msgid "Creating default scheduled jobs... "
@@ -40960,7 +40993,7 @@ msgstr "Настройки Цветов Страницы"
 
 #: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:180
 msgid "Link hover color"
-msgstr ""
+msgstr "Цвет ссылок при наведении"
 
 #: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:199
 msgid "Navigation Settings"

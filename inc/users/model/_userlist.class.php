@@ -528,9 +528,11 @@ class UserList extends DataObjectList2
 			$this->UserQuery->where_organization( $org_ID );
 		}
 		if( isset( $this->query_params['where_viewed_user'] ) )
-		{ // Filter by user profile viewed
+		{	// Filter by user profile viewed:
 			$this->UserQuery->where_viewed_user( $this->query_params['where_viewed_user'] );
 		}
+		// Filter by IP address:
+		$this->UserQuery->where_reg_ip( $this->filters['reg_ip_min'], $this->filters['reg_ip_max'] );
 		if( ! is_logged_in() )
 		{ // Restrict users by group level for anonymous users
 			global $Settings;

@@ -17389,6 +17389,8 @@ msgid ""
 "The current item status is no longer valid for the new item type and has "
 "been reset."
 msgstr ""
+"Le statut d'Item actuel n'est plus valide pour le nouveau type d'Item et a "
+"été réinitialisé."
 
 #: ../../../inc/items/items.ctrl.php:1147
 msgid "Post type has been updated."
@@ -17528,12 +17530,12 @@ msgstr "Merci d'indiquer un ID parent."
 #: ../../../inc/items/model/_item.class.php:725
 #, php-format
 msgid "Please enter a valid issue date using the following format: %s"
-msgstr ""
+msgstr "Merci de saisir une date de sortie valide utilisant le format: %s"
 
 #: ../../../inc/items/model/_item.class.php:745
 #: ../../../inc/slugs/model/_slug.class.php:112
 msgid "All slugs must contain at least one letter."
-msgstr ""
+msgstr "Toutes les slugs doivent contenir au moins une lettre."
 
 #: ../../../inc/items/model/_item.class.php:757
 msgid "Please provide a title tag."
@@ -17554,7 +17556,7 @@ msgstr "Merci d'indiquer au moins un tag."
 #: ../../../inc/items/model/_item.class.php:812
 #, php-format
 msgid "Invalid task status for post type %s"
-msgstr ""
+msgstr "Statut de tâche invalide pour le type de post %s"
 
 #: ../../../inc/items/model/_item.class.php:853
 msgid "Please enter valid owner login."
@@ -17571,7 +17573,7 @@ msgstr "Merci d'indiquer une longitude."
 #: ../../../inc/items/model/_item.class.php:892
 #, php-format
 msgid "Custom \"%s\" field must be a number"
-msgstr ""
+msgstr "Le champ personnalisé \"%s\" doit être un nombre"
 
 #: ../../../inc/items/model/_item.class.php:949
 msgid "Please provide a comment expiration delay."
@@ -17723,36 +17725,36 @@ msgstr "Le champ personnalisé %s n'existe pas!"
 #: ../../../inc/items/model/_item.class.php:2642
 #, php-format
 msgid "The field \"%s\" does not exist"
-msgstr ""
+msgstr "Le champ \"%s\" n'existe pas"
 
 #: ../../../inc/items/model/_item.class.php:2556
 msgid "The item has no custom fields"
-msgstr ""
+msgstr "L'item n'a pas de champs personnalisés"
 
 #: ../../../inc/items/model/_item.class.php:2614
 #: ../../../inc/items/model/_item.class.php:2747
 msgid "This item has no parent."
-msgstr ""
+msgstr "Cet item n'a pas de parent."
 
 #: ../../../inc/items/model/_item.class.php:2628
 msgid "The parent item has no custom fields"
-msgstr ""
+msgstr "L'item parent n'a pas de champs personnalisés"
 
 #: ../../../inc/items/model/_item.class.php:2759
 #, php-format
 msgid "The URL field \"%s\" does not exist"
-msgstr ""
+msgstr "Le champ URL \"%s\" n'existe pas"
 
 #: ../../../inc/items/model/_item.class.php:2820
 #: ../../../inc/widgets/widgets/_content_block.widget.php:152
 #, php-format
 msgid "The referenced Item (%s) is not a Content Block."
-msgstr ""
+msgstr "L'Item référencé (%s) n'est pas un Bloc de Contenu."
 
 #: ../../../inc/items/model/_item.class.php:2831
 #, php-format
 msgid "Content inclusion loop detected. Not including \"%s\"."
-msgstr ""
+msgstr "Boucle infinie d'inclusion de contenu. \"%s\" ne sera pas inclus."
 
 #. TRANS: this is the default text for the extended post "more" link
 #: ../../../inc/items/model/_item.class.php:2939
@@ -18032,6 +18034,8 @@ msgid ""
 "Since this collection is \"Private\", the visibility of this post will be "
 "restricted to \"%s\"."
 msgstr ""
+"Etant donné que cette collection est \"Privée\", la visibilité de ce post "
+"sera restreinte à \"%s\"."
 
 #: ../../../inc/items/model/_item.class.php:8977
 #, php-format
@@ -18039,6 +18043,8 @@ msgid ""
 "Since this collection is \"Members only\", the visibility of this post will "
 "be restricted to \"%s\"."
 msgstr ""
+"Etant donné que cette collection est \"Réservée aux Membres\", la visibilité"
+" de ce post sera restreinte à \"%s\"."
 
 #: ../../../inc/items/model/_item.class.php:8982
 #, php-format
@@ -18046,14 +18052,16 @@ msgid ""
 "Since this collection is \"Community only\", the visibility of this post "
 "will be restricted to \"%s\"."
 msgstr ""
+"Etant donné que cette collection est \"Réservée à la Communauté\", la "
+"visibilité de ce post sera restreinte à \"%s\"."
 
 #: ../../../inc/items/model/_item.class.php:9083
 msgid "Click to flag this."
-msgstr ""
+msgstr "Cliquer pour marquer ceci."
 
 #: ../../../inc/items/model/_item.class.php:9084
 msgid "You have flagged this. Click to remove flag."
-msgstr ""
+msgstr "Vous avez marqué ceci. Cliquez pour démarquer."
 
 #: ../../../inc/items/model/_item.class.php:9222
 #: ../../../inc/users/model/_user.funcs.php:3952
@@ -18067,7 +18075,7 @@ msgstr "Voter positivement!"
 
 #: ../../../inc/items/model/_item.class.php:9224
 msgid "You sent a positive vote."
-msgstr ""
+msgstr "Vous avez envoyé un vote positif."
 
 #: ../../../inc/items/model/_item.class.php:9225
 msgid "Cast a neutral vote!"
@@ -18075,7 +18083,7 @@ msgstr "Voter de manière neutre!"
 
 #: ../../../inc/items/model/_item.class.php:9226
 msgid "You sent a neutral vote."
-msgstr ""
+msgstr "Vous avez envoyé un vote neutre."
 
 #: ../../../inc/items/model/_item.class.php:9227
 msgid "Cast a negative vote!"
@@ -18083,7 +18091,7 @@ msgstr "Voter négativement!"
 
 #: ../../../inc/items/model/_item.class.php:9228
 msgid "You sent a negative vote."
-msgstr ""
+msgstr "Vous avez envoyé un vote négatif."
 
 #: ../../../inc/items/model/_item.class.php:9251
 msgid "Voting:"
@@ -18164,7 +18172,7 @@ msgstr "Intros"
 
 #: ../../../inc/items/model/_item.funcs.php:1642
 msgid "Content Blocks"
-msgstr ""
+msgstr "Blocs de Contenu"
 
 #: ../../../inc/items/model/_item.funcs.php:1736
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:156
@@ -18478,7 +18486,7 @@ msgstr "%d abonnements à un post"
 #: ../../../inc/users/model/_user.class.php:327
 #, php-format
 msgid "%d recordings of user data for a specific post"
-msgstr ""
+msgstr "%denregistrements de données utilisateur pour un post spécifique"
 
 #. TRANS: When the categories for a specific post are displayed, the user can
 #. click
@@ -18648,7 +18656,7 @@ msgstr "%d définitions de champ personnalisés"
 #: ../../../inc/items/model/_itemtype.class.php:156
 #, php-format
 msgid "%d Item status associations"
-msgstr ""
+msgstr "%dassociations de statut d'Item"
 
 #: ../../../inc/items/model/_itemtype.class.php:201
 #, php-format
@@ -18683,7 +18691,7 @@ msgstr "Hors flux de contenus"
 #: ../../../inc/items/views/_itemtypes.view.php:190
 #: ../../../inc/widgets/widgets/_content_block.widget.php:53
 msgid "Content Block"
-msgstr ""
+msgstr "Bloc de Contenu"
 
 #: ../../../inc/items/model/_itemtypecache.class.php:101
 #: ../../../inc/items/views/_itemtypes.view.php:176
@@ -19205,7 +19213,7 @@ msgstr "Montrer"
 
 #: ../../../inc/items/views/_item_list_full.view.php:474
 msgid "Requiring moderation"
-msgstr ""
+msgstr "Modération requise"
 
 #: ../../../inc/items/views/_item_list_full.view.php:478
 msgid "Valid"
@@ -19436,11 +19444,11 @@ msgstr "Nouveau statut de post"
 
 #: ../../../inc/items/views/_itemstatus.form.php:56
 msgid "Item Types allowed for this Item Status"
-msgstr ""
+msgstr "Types d'Item autorisés pour ce Statut d'Item"
 
 #: ../../../inc/items/views/_itemstatus.form.php:81
 msgid "Allowed Item Type"
-msgstr ""
+msgstr "Type d'Item autorisé"
 
 #: ../../../inc/items/views/_itemstatuses.view.php:51
 msgid "Edit this post status..."
@@ -19692,12 +19700,14 @@ msgstr "Utiliser commentaires"
 
 #: ../../../inc/items/views/_itemtype.form.php:114
 msgid "Allow custom message for each post"
-msgstr ""
+msgstr "Autoriser un message personnalisé pour chaque post"
 
 #: ../../../inc/items/views/_itemtype.form.php:114
 msgid ""
 "Check to allow a different custom message before comment form for each post."
 msgstr ""
+"Cochez pour autoriser un message personnalisé différent avant chaque "
+"formulaire de commentaire pour chaque post."
 
 #: ../../../inc/items/views/_itemtype.form.php:115
 msgid "Allow closing comments"
@@ -19755,7 +19765,7 @@ msgstr "Chaine de caractères"
 
 #: ../../../inc/items/views/_itemtype.form.php:134
 msgid "Add new string custom field"
-msgstr ""
+msgstr "Ajouter nouveau champ chaine de caractères"
 
 #: ../../../inc/items/views/_itemtype.form.php:135
 msgid "Ex: Color, Fabric... &ndash; will be stored as a varchar(10000) field."
@@ -19782,11 +19792,11 @@ msgstr ""
 
 #: ../../../inc/items/views/_itemtype.form.php:148
 msgid "Add new HTML custom field"
-msgstr ""
+msgstr "Ajouter nouveau champ HTML"
 
 #: ../../../inc/items/views/_itemtype.form.php:155
 msgid "Add new URL custom field"
-msgstr ""
+msgstr "Ajouter champ personnalisé URL"
 
 #: ../../../inc/items/views/_itemtype.form.php:156
 msgid ""
@@ -19917,7 +19927,7 @@ msgstr "Attacher des fichiers au commentaire #%s"
 #: ../../../inc/links/model/_link.funcs.php:136
 #, php-format
 msgid "Attach files to email campaign \"%s\""
-msgstr ""
+msgstr "Attacher des fichiers à la campagne email \"%s\""
 
 #: ../../../inc/links/model/_link.funcs.php:151
 msgid "Images &amp; Attachments"

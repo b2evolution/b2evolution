@@ -4568,7 +4568,6 @@ function items_results( & $items_Results, $params = array() )
 			'tab'                        => '',
 			'field_prefix'               => '',
 			'display_date'               => true,
-			'display_permalink'          => true,
 			'display_blog'               => true,
 			'display_author'             => true,
 			'display_type'               => true,
@@ -4585,18 +4584,13 @@ function items_results( & $items_Results, $params = array() )
 
 	if( $params['display_date'] )
 	{	// Display Date column
-		$td = '<span class="date">@get_issue_date()@</span>';
-		if( $params['display_permalink'] )
-		{
-			$td = '@get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@ '.$td;
-		}
 		$items_Results->cols[] = array(
 				'th' => T_('Date'),
 				'order' => $params['field_prefix'].'datestart',
 				'default_dir' => 'D',
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => $td,
+				'td' => '<span class="date">@get_issue_date()@</span>',
 			);
 	}
 
@@ -4641,7 +4635,8 @@ function items_results( & $items_Results, $params = array() )
 				'th' => T_('Title'),
 				'order' => $params['field_prefix'].'title',
 				'td_class' => 'tskst_$post_pst_ID$',
-				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].' )%</strong>',
+				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].' )%</strong>'.
+				        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@' : '' ),
 			);
 	}
 

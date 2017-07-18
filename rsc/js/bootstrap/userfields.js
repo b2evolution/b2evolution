@@ -24,7 +24,7 @@ jQuery( document ).ready(function()
 		{ // Init popover for the first time event "focus"
 			var popover_params = {
 				trigger: 'focus',
-				placement: 'right',
+				placement: 'auto right',
 				html: true,
 				template: '<div class="popover popover-userfield"><div class="arrow"></div><div class="popover-content"></div></div>'
 			};

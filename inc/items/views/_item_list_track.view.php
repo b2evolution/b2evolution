@@ -77,7 +77,8 @@ $ItemList->cols[] = array(
 						'th' => T_('Item/Task'),
 						'order' => 'title',
 						'td_class' => 'tskst_$post_pst_ID$',
-						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1, 1 )%</strong>',
+						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1, 1 )%</strong>'.
+						        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@' : '' ),
 					);
 
 $ItemList->cols[] = array(

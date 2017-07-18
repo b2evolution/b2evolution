@@ -2352,7 +2352,7 @@ function skin_twitter_tags()
 		{
 			if( $twitter_links = $creator_User->userfield_values_by_code( 'twitter' ) )
 			{
-				preg_match( '/https?:\/\/(www\.)?twitter\.com\/(#!\/)?@?([^\/\?]*)/', $twitter_links[0], $matches );
+				preg_match( '/https?:\/\/(www\.)?twitter\.com((?:\/\#!)?\/(\w+))/', $twitter_links[0], $matches );
 				if( isset( $matches[3] ) )
 				{
 					echo '<meta property="twitter:creator" content="@'.$matches[3].'" />'."\n";
