@@ -40,7 +40,7 @@ $view = param( 'view', 'string' );
 
 if( $view == 'move' )
 {	// Inform user before moving to collection:
-	$Messages->add( T_('Please select a private message which should be moved to a collection.'), 'note' );
+	$Messages->add( T_('Select which message you want to move...'), 'note' );
 }
 
 /**

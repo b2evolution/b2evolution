@@ -450,7 +450,7 @@ function evo_msg_move_to_coll()
 	var selected_message = jQuery( 'input[type=radio][name=msg_ID]:checked' );
 	if( selected_message.length == 0 )
 	{	// If message is not selected
-		alert( '<?php echo TS_('Please select a private message which should be moved to a collection.'); ?>' );
+		alert( '<?php echo TS_('Select which message you want to move...'); ?>' );
 		return false;
 	}
 
@@ -480,7 +480,7 @@ function evo_msg_move_to_coll()
 	{
 		if( data.found == 0 )
 		{
-			r = '<p><?php echo TS_('No found collection where you and author of first message can create a post.'); ?></p>';
+			r = '<p><?php echo TS_('No found collection where you and author of the selected message can create a post.'); ?></p>';
 		}
 		else
 		{

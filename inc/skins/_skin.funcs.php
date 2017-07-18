@@ -730,7 +730,7 @@ function skin_init( $disp )
 
 					if( $view == 'move' )
 					{	// Inform user before moving to collection:
-						$Messages->add( T_('Please select a private message which should be moved to a collection.'), 'note' );
+						$Messages->add( T_('Select which message you want to move...'), 'note' );
 					}
 
 					// fp> The correct place to get thrd_ID is here, because we want it in redirect_to in case we need to ask for login.
