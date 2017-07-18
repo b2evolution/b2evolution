@@ -226,6 +226,22 @@ if( $resolve_extra_path )
 					}
 					$disp = 'posts';
 				}
+				elseif( strlen( $path_elements[0] ) > 5 && substr( $path_elements[0], 0, 5 ) == 'user:' )
+				{	// Alias for disp=user:
+					$user_ID = -1; // Set -1 for case when user is not detected by login and ID
+					$user_request = substr( $path_elements[0], 5 );
+
+					$UserCache = & get_UserCache();
+					if( $User = & $UserCache->get_by_login( $user_request ) ||
+					    $User = & $UserCache->get_by_ID( $user_request, false, false ) )
+					{	// If user is detected in DB by login or ID:
+						$user_ID = $User->ID;
+					}
+
+					// Set disp to user with ID of user which was detected from request URL:
+					$disp = 'user';
+					set_param( 'user_ID', $user_ID );
+				}
 				elseif( ( $tags_dash_fix && $last_char == '-' && $last_len == 40 ) || $last_char != '/' )
 				{	// NO ENDING SLASH or ends with a dash, is 40 chars long and $tags_dash_fix is true
 					// -> We'll consider this to be a ref to a post.
