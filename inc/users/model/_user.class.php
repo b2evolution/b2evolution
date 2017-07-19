@@ -2311,7 +2311,7 @@ class User extends DataObject
 			}
 			else
 			{ // Use an user page if url is not defined
-				return url_add_param( $current_Blog->get( 'userurl' ), 'user_ID='.$this->ID );
+				return $current_Blog->get( 'userurl', array( 'user_login' => $this->login ) );
 			}
 		}
 		else
@@ -2326,7 +2326,7 @@ class User extends DataObject
 				}
 				elseif( $Settings->get( 'allow_anonymous_user_profiles' ) )
 				{ // Use an user page if url is not defined and this is enabled by setting for anonymous users
-					return url_add_param( $current_Blog->get( 'userurl' ), 'user_ID='.$this->ID );
+					return $current_Blog->get( 'userurl', array( 'user_login' => $this->login ) );
 				}
 			}
 		}
@@ -4476,7 +4476,7 @@ class User extends DataObject
 				$redirect_to = '';
 				if( isset( $Blog ) )
 				{ // Redirect user after login
-					$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&', 'url_suffix' => 'user_ID='.$this->ID ) );
+					$redirect_to = $Blog->get( 'userurl', array( 'user_login' => $this->login ) );
 				}
 				$r = '<a href="'.get_login_url( 'cannot see avatar', $redirect_to ) .'">'.$File->get_thumb_imgtag( $size, $class, $align, '', $tag_size ).'</a>';
 			}

@@ -707,7 +707,22 @@ function get_file_links( $file_ID, $params = array() )
 				{
 					if( $current_User->ID != $User->ID && !$current_User->check_perm( 'users', 'view' ) )
 					{ // No permission to view other users in admin form
-						$r .= $params['user_prefix'].'<a href="'.url_add_param( $baseurl, 'disp=user&amp;user_ID='.$User->ID ).'">'.$User->login.'</a>';
+						$BlogCache = & get_BlogCache();
+						$BlogCache->load_user_blogs();
+						$user_url = '';
+						if( ! empty( $BlogCache->cache ) )
+						{	// Try to use alias user url:
+							foreach( $BlogCache->cache as $user_Blog )
+							{	// Use first found collection:
+								$user_url = $user_Blog->get( 'userurl', array( 'user_login' => $User->login ) );
+								break;
+							}
+						}
+						if( empty( $user_url ) )
+						{	// Use standard user url:
+							$user_url = url_add_param( $baseurl, 'disp=user&amp;user_ID='.$User->ID );
+						}
+						$r .= $params['user_prefix'].'<a href="'.$user_url.'">'.$User->login.'</a>';
 					}
 					else
 					{ // Build a link to display a user in admin form

@@ -2783,13 +2783,34 @@ class Blog extends DataObject
 			}
 
 			if( $this_Blog->get_setting( 'front_disp' ) == $disp_param )
-			{ // Get home page of this blog because front page displays current disp
+			{	// Get home page of this blog because front page displays current disp:
 				$url = $this_Blog->gen_blogurl( 'default' );
 			}
+			elseif( $disp_param == 'user' && ( isset( $params['user_login'] ) || isset( $params['user_ID'] ) ))
+			{	// Use alias if user login or ID is provided:
+				if( isset( $params['user_login'] ) )
+				{	// Use login if it is provided:
+					$user_param = $params['user_login'];
+				}
+				else
+				{	// Try tp get user login by provided user ID:
+					$UserCache = & get_UserCache();
+					if( $User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
+					{	// Use login If user is detected in DB:
+						$user_param = $User->login;
+					}
+					else
+					{	// Use ID:
+						$user_param = $params['user_ID'];
+					}
+				}
+				$url = url_add_tail( $this_Blog->gen_blogurl(), '/user:'.$user_param );
+			}
 			else
-			{ // Add disp param to blog's url when current disp is not a front page
+			{	// Add disp param to blog's url when current disp is not a front page:
 				$url = url_add_param( $this_Blog->gen_blogurl(), 'disp='.$disp_param, $params['glue'] );
 			}
+
 			if( ! empty( $params['url_suffix'] ) )
 			{ // Append url suffix
 				$url = url_add_param( $url, $params['url_suffix'], $params['glue'] );

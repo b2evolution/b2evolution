@@ -233,7 +233,7 @@ if( $resolve_extra_path )
 
 					$UserCache = & get_UserCache();
 					if( $User = & $UserCache->get_by_login( $user_request ) ||
-					    $User = & $UserCache->get_by_ID( $user_request, false, false ) )
+					    ( is_number( $user_request ) && $User = & $UserCache->get_by_ID( $user_request, false, false ) ) )
 					{	// If user is detected in DB by login or ID:
 						$user_ID = $User->ID;
 					}

@@ -845,7 +845,7 @@ function skin_init( $disp )
 										$Messages->add( 'User has been added to your contacts.', 'success' );
 									}
 								}
-								header_redirect( $Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$user_ID, 'glue' => '&' ) ) );
+								header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ) );
 							}
 							break;
 
@@ -878,7 +878,7 @@ function skin_init( $disp )
 									}
 									else
 									{ // Redirect to the user profile page
-										header_redirect( $Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$user_ID, 'glue' => '&' ) ) );
+										header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ) );
 									}
 								}
 							}

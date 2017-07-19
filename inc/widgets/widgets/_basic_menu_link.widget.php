@@ -354,7 +354,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 			case 'owneruserinfo':
 				global $User;
-				$url = url_add_param( $current_Blog->get( 'userurl' ), 'user_ID='.$current_Blog->owner_user_ID );
+				$url = $current_Blog->get( 'userurl', array( 'user_ID' => $current_Blog->owner_user_ID ) );
 				$text = T_('Owner details');
 				// Check if current menu item must be highlighted:
 				$highlight_current = ( $highlight_current && $disp == 'user' && ! empty( $User ) && $User->ID == $current_Blog->owner_user_ID );
@@ -488,12 +488,12 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				break;
 
 			case 'myprofile':
-				global $user_ID;
+				global $user_ID, $current_User;
 				if( ! is_logged_in() )
 				{	// Don't show this link for not logged in users
 					return false;
 				}
-				$url = $current_Blog->get( 'userurl' );
+				$url = $current_Blog->get( 'userurl', array( 'user_login' => $current_User->login ) );
 				$text = T_('My profile');
 				// Check if current menu item must be highlighted:
 				// If $user_ID is not set, it means we will fall back to the current user, so it's ok

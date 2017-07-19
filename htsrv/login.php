@@ -289,7 +289,7 @@ switch( $action )
 			$Collection = $Blog = $BlogCache->get_by_ID( $blog );
 			if( $Blog )
 			{
-				$changepwd_url = $Blog->get( 'userurl', array( 'url_suffix' => 'disp=pwdchange&reqID='.$reqID, 'glue' => '&' ) );
+				$changepwd_url = $Blog->get( 'pwdchangeurl', array( 'url_suffix' => 'reqID='.$reqID, 'glue' => '&' ) );
 			}
 		}
 

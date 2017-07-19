@@ -248,7 +248,7 @@ class coll_common_links_Widget extends ComponentWidget
 		if( $this->disp_params['show_owneruserinfo'] )
 		{
 			echo $this->disp_params['item_start'];
-			echo '<strong><a href="'.url_add_param( $Blog->get('userurl'), 'user_ID='.$Blog->owner_user_ID ).'">'.T_('Owner details').'</a></strong>';
+			echo '<strong><a href="'.$Blog->get( 'userurl', array( 'user_ID' => $Blog->owner_user_ID ) ).'">'.T_('Owner details').'</a></strong>';
 			echo $this->disp_params['item_end'];
 		}
 
