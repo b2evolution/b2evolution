@@ -76,8 +76,7 @@ input#nav-trigger {
 }
 
 .nav-trigger + .sitewide_header_menu_wrapper {
-	-webkit-transition: max-height 0.5s ease-in-out;
-	        transition: max-height 0.5s ease-in-out;
+	transition: max-height 0.5s ease-in-out;
 }
 
 .sitewide_header,
