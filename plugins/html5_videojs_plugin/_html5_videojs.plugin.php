@@ -54,11 +54,7 @@ class html5_videojs_plugin extends Plugin
 		require_js( '#videojs#', 'blog' );
 		$this->require_skin();
 
-		// Set a video size in css style, because option setting is ignored by some reason
-		$width = intval( $this->get_coll_setting( 'width', $Blog ) );
-		$width = empty( $width ) ? '100%' : $width.'px';
-		$height = intval( $this->get_coll_setting( 'height', $Blog ) );
-		add_css_headline( '.video-js{ width: '.$width.' !important; max-width: 100% !important; height: '.$height.'px !important; margin: auto; }
+		add_css_headline( '.video-js{ max-width: 100% !important; margin: auto; }
 .videojs_block {
 	margin: 0 auto 1em;
 }
@@ -116,10 +112,8 @@ class html5_videojs_plugin extends Plugin
 					),
 				'height' => array(
 					'label' => T_('Video height (px)'),
-					'type' => 'integer',
 					'defaultvalue' => 300,
-					'note' => '',
-					'valid_range' => array( 'min' => 1 ),
+					'note' => T_('100% height if left empty or 0'),
 					),
 				'allow_download' => array(
 					'label' => T_('Display Download Link'),
@@ -200,6 +194,27 @@ class html5_videojs_plugin extends Plugin
 			$video_options = array();
 			$video_options['controls'] = true;
 			$video_options['preload'] = 'auto';
+
+			// Set a video size:
+			$width = trim( $this->get_coll_setting( 'width', $item_Blog ) );
+			$height = trim( $this->get_coll_setting( 'height', $item_Blog ) );
+			if( empty( $width ) && empty( $height ) )
+			{	// Use auto width and height:
+				$video_options['fluid'] = true;
+			}
+			else
+			{	// Use fixed sizes:
+				$width = intval( $width );
+				if( ! empty( $width ) )
+				{	// Use fixed width:
+					$video_options['width'] = $width;
+				}
+				$height = intval( $height );
+				if( ! empty( $height ) )
+				{	// Use fixed height:
+					$video_options['height'] = $height;
+				}
+			}
 
 			if( $placeholder_File = & $Item->get_placeholder_File( $File ) )
 			{ // Display placeholder/poster when image file is linked to the Item with same name as current video File
