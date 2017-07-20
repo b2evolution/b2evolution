@@ -114,10 +114,8 @@ class flowplayer_plugin extends Plugin
 					),
 				'height' => array(
 					'label' => T_('Video height (px)'),
-					'type' => 'integer',
 					'defaultvalue' => 300,
-					'note' => '',
-					'valid_range' => array( 'min' => 1 ),
+					'note' => T_('100% height if left empty or 0'),
 					),
 				'allow_download' => array(
 					'label' => T_('Display Download Link'),
@@ -184,8 +182,8 @@ class flowplayer_plugin extends Plugin
 		}
 
 		// Set height from blog plugin setting
-		$height = intval( $this->get_coll_setting( 'height', $item_Blog ) );
-		$height = 'height:'.$height.'px;';
+		$height = trim( $this->get_coll_setting( 'height', $item_Blog ) );
+		$height = empty( $height ) ? '' : 'height:'.$height.'px';
 
 		if( $File->exists() )
 		{
