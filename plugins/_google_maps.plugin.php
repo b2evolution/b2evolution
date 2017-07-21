@@ -15,7 +15,7 @@
  *
  * @package plugins
  */
-if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+if( !defined( 'EVO_MAIN_INIT' ) ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -60,36 +60,6 @@ class google_maps_plugin extends Plugin
 
 
 	/**
-	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
-	 *
-	 * @param array Associative array of parameters (since v1.9).
-	 *    'for_editing': true, if the settings get queried for editing;
-	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
-	 * @return array see {@link Plugin::GetDefaultSettings()}.
-	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
-	 * and assign an array with the following keys to them (only 'label' is required):
-	 */
-	function GetDefaultSettings( & $params )
-	{
-		$r = array(
-			'height_back' => array(
-				'label' => T_( 'Map height on edit post page' ),
-				'defaultvalue' => '300',
-				'note' => '',
-				),
-			'map_type' => array(
-				'label' => T_( 'Map default view ' ),
-				'type' => 'radio',
-				'options' => array( array( 'map', T_( 'Map' ) ), array( 'satellite', T_( 'Satellite' ) ) ),
-				'defaultvalue' => 'map',
-				'note' => ''
-			)
-			);
-		return $r;
-	}
-
-
-	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -113,6 +83,18 @@ class google_maps_plugin extends Plugin
 				'defaultvalue' => T_('Google Maps plugin'),
 				'note' => T_('Widget title on edit post page')
 				),
+			'map_height_coll' => array(
+				'label' => T_( 'Map height on edit post page' ),
+				'defaultvalue' => '300',
+				'note' => '',
+				),
+			'map_type_coll' => array(
+				'label' => T_( 'Map default view ' ),
+				'type' => 'radio',
+				'options' => array( array( 'map', T_( 'Map' ) ), array( 'satellite', T_( 'Satellite' ) ) ),
+				'defaultvalue' => 'map',
+				'note' => ''
+				)
 			), parent::get_coll_setting_definitions( $params ) );
 
 		return $r;
@@ -149,19 +131,6 @@ class google_maps_plugin extends Plugin
 					'label' => T_('Map height on page'),
 					'defaultvalue' => '300px',
 					'note' => '',
-					),
-				'map_type' => array(
-					'label' => T_( 'Map default view ' ),
-					'type' => 'radio',
-					'options' => array( array('map', T_( 'Map' ) ), array( 'satellite', T_( 'Satellite' ) ) ),
-					'defaultvalue' => 'map',
-					'note' => ''
-					),
-				'map_zoom' => array(
-					'label' => T_('Map default zoom' ),
-					'type' => 'integer',
-					'defaultvalue' => 10,
-					'size' => 4
 					),
 			'section_post_edit_end' => array(
 				'layout' => 'end_fieldset'
@@ -293,11 +262,11 @@ class google_maps_plugin extends Plugin
 	 * @param mixed display param
 	 * @return string
 	 */
-	function display_param($param)
+	function display_param( $param )
 	{
-		if ( ! empty ($param) )
+		if ( ! empty ( $param ) )
 		{
-			if( ! preg_match("/\D{1,}$/", $param) )
+			if( ! preg_match( "/\D{1,}$/", $param ) )
 			{
 				$param = $param.'px';
 			}
@@ -346,41 +315,41 @@ class google_maps_plugin extends Plugin
 
 		require_js( '#jqueryUI#', 'blog' );
 
-		$lat = $Item->get_setting('latitude');
-		$lng = $Item->get_setting('longitude');
-		$zoom = $Item->get_setting('map_zoom');
-		$map_type = $Item->get_setting('map_type');
+		$lat = $Item->get_setting( 'latitude' );
+		$lng = $Item->get_setting( 'longitude' );
+		$zoom = $Item->get_setting( 'map_zoom' );
+		$map_type = $Item->get_setting( 'map_type' );
 
-		$city_ID = $Item->get('city_ID');
-		$subrg_ID = $Item->get('subrg_ID');
-		$rgn_ID = $Item->get('rgn_ID');
-		$ctry_ID = $Item->get('ctry_ID');
+		$city_ID = $Item->get( 'city_ID' );
+		$subrg_ID = $Item->get( 'subrg_ID' );
+		$rgn_ID = $Item->get( 'rgn_ID' );
+		$ctry_ID = $Item->get( 'ctry_ID' );
 
 		$search_location = '';
 
-		if (empty( $lat ) && empty( $lng ) )
+		if( empty( $lat ) && empty( $lng ) )
 		{	// post location not set
 
-			if ( ! empty ( $city_ID ) )
+			if( ! empty ( $city_ID ) )
 			{
 				$query = '
 					SELECT city_name
 					FROM T_regional__city
 					WHERE city_ID  = '.$DB->quote( $city_ID );
 
-				$text = $DB->get_var($query);
+				$text = $DB->get_var( $query );
 				$search_location .= "$text";
 			}
 
-			if ( ! empty ( $subrg_ID ) )
+			if( ! empty ( $subrg_ID ) )
 			{
 				$query = '
 					SELECT subrg_name
 					FROM T_regional__subregion
 					WHERE subrg_ID  = '.$DB->quote( $subrg_ID );
 
-				$text = $DB->get_var($query);
-				if ( empty ( $search_location ) )
+				$text = $DB->get_var( $query );
+				if( empty( $search_location ) )
 				{
 					$search_location .= "$text";
 				}
@@ -390,15 +359,15 @@ class google_maps_plugin extends Plugin
 				}
 			}
 
-			if ( ! empty ( $rgn_ID ) )
+			if( ! empty( $rgn_ID ) )
 			{
 				$query = '
 					SELECT rgn_name
 					FROM T_regional__region
 					WHERE rgn_ID = '.$DB->quote( $rgn_ID );
 
-				$text = $DB->get_var($query);
-				if ( empty ( $search_location ) )
+				$text = $DB->get_var( $query );
+				if( empty( $search_location ) )
 				{
 					$search_location .= "$text";
 				}
@@ -408,15 +377,15 @@ class google_maps_plugin extends Plugin
 				}
 			}
 
-			if ( ! empty ( $ctry_ID ) )
+			if( ! empty ( $ctry_ID ) )
 			{
 				$query = '
 					SELECT ctry_name
 					FROM T_regional__country
 					WHERE ctry_ID = '.$DB->quote( $ctry_ID );
 
-				$text = $DB->get_var($query);
-				if ( empty ( $search_location ) )
+				$text = $DB->get_var( $query );
+				if( empty( $search_location ) )
 				{
 					$search_location .= "$text";
 				}
@@ -435,15 +404,15 @@ class google_maps_plugin extends Plugin
 
 		if( empty( $map_type ) )
 		{
-			$map_type = (string)$this->Settings->get('map_type');
+			$map_type = ( string ) $this->get_coll_setting( 'map_type_coll', $Blog );
 		}
 
-		$params['Form']->hidden( 'google_map_zoom', $zoom, array('id' => 'google_map_zoom'));
-		$params['Form']->hidden( 'google_map_type', $map_type, array('id' => 'google_map_type'));
-		$params['Form']->text_input( 'address', $search_location, 40, '<strong>1. </strong>'.T_('<b>Search for an address</b> (may be approximate)'), '', array('maxlength'=>500, 'id' =>'searchbox'));
-		$params['Form']->button(array ('id' => 'locate_on_map', 'type' =>'button', 'value' => T_('Locate on map') ) );
+		$params['Form']->hidden( 'google_map_zoom', $zoom, array('id' => 'google_map_zoom' ) );
+		$params['Form']->hidden( 'google_map_type', $map_type, array('id' => 'google_map_type' ) );
+		$params['Form']->text_input( 'address', $search_location, 40, '<strong>1. </strong>'.T_('<b>Search for an address</b> (may be approximate)' ), '', array( 'maxlength'=>500, 'id' =>'searchbox' ) );
+		$params['Form']->button( array('id' => 'locate_on_map', 'type' =>'button', 'value' => T_('Locate on map') ) );
 
-		$height = $this->display_param($this->Settings->get('height_back'));
+		$height = $this->display_param( $this->get_coll_setting( 'map_height_coll', $Blog ) );
 		$height = 'height:'.$height;
 
 		echo '<div style="margin-top:1ex"><strong>2. '.T_('Drag the pin to the exact location you want:').'</strong></div>';
@@ -454,7 +423,7 @@ class google_maps_plugin extends Plugin
 	<script type="text/javascript">
 	var post_position = 0;
 	<?php
-	switch ($map_type)
+	switch( $map_type )
 	{
 		case 'satellite':
 			?>
@@ -473,10 +442,10 @@ class google_maps_plugin extends Plugin
 			break;
 	}
 
-	if (!empty( $lat ) || !empty( $lng ) )
+	if( ! empty( $lat ) || ! empty( $lng ) )
 	{
 		?>
-		var latlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng;?>);
+		var latlng = new google.maps.LatLng( <?php echo $lat; ?>, <?php echo $lng;?> );
 		var zoom = <?php echo $zoom; ?>;
 		var post_position = 1; // position is set
 		<?php
@@ -487,54 +456,50 @@ class google_maps_plugin extends Plugin
 		var latlng = new google.maps.LatLng(48.856614, 2.3522219000000177);
 		var zoom = 11;
 		<?php
-		if ( !empty ( $search_location ) )
+		if( ! empty( $search_location ) )
 		{
 			?>
 
 			var geocoder = new google.maps.Geocoder();
-			geocoder.geocode( {'address': '<?php echo format_to_js( $search_location ); ?>'}, function(results, status)
-			{
-				if (status == google.maps.GeocoderStatus.OK)
+			geocoder.geocode( {'address': '<?php echo format_to_js( $search_location ); ?>'}, function( results, status )
 				{
-					var searchLoc = results[0].geometry.location;
-					var bounds = results[0].geometry.bounds;
-					if (bounds != null)
+					if( status == google.maps.GeocoderStatus.OK )
 					{
-						map.fitBounds(bounds);
-					}
-					else
-					{
-						map.setCenter(searchLoc);
-					}
+						var searchLoc = results[0].geometry.location;
+						var bounds = results[0].geometry.bounds;
+						if( bounds != null )
+						{
+							map.fitBounds( bounds );
+						}
+						else
+						{
+							map.setCenter( searchLoc );
+						}
 
-					if (marker != null)
-					{
-						marker.setMap(null);
+						if( marker != null )
+						{
+							marker.setMap( null );
+						}
+
+						marker = new google.maps.Marker( {
+								position: searchLoc,
+								map: map,
+								title:"Position",
+								draggable: true
+							} );
+						marker_dragend( marker, map );
 					}
-
-					marker = new google.maps.Marker({
-						position: searchLoc,
-						map: map,
-						title:"Position",
-						draggable: true
-						});
-					marker_dragend(marker, map);
-				}
-			});
-
+				} );
 			<?php
-
 		}
 	}
 	?>
 
-
 	var mapTypes = new Array();
-	mapTypes.push(google.maps.MapTypeId.HYBRID);
-	mapTypes.push(google.maps.MapTypeId.ROADMAP);
-	mapTypes.push(google.maps.MapTypeId.SATELLITE);
-	mapTypes.push(google.maps.MapTypeId.TERRAIN);
-
+	mapTypes.push( google.maps.MapTypeId.HYBRID );
+	mapTypes.push( google.maps.MapTypeId.ROADMAP );
+	mapTypes.push( google.maps.MapTypeId.SATELLITE );
+	mapTypes.push( google.maps.MapTypeId.TERRAIN );
 
 	var myOptions = {
 		  zoom: zoom,
@@ -548,15 +513,13 @@ class google_maps_plugin extends Plugin
 			  }
 		};
 
-	var map = new google.maps.Map(document.getElementById("map_canvas"),
-			myOptions);
-
-	var marker = new google.maps.Marker({
-		position: latlng,
-		map: map,
-		title:"Position",
-		draggable: true
-		});
+	var map = new google.maps.Map( document.getElementById( "map_canvas" ),	myOptions );
+	var marker = new google.maps.Marker( {
+			position: latlng,
+			map: map,
+			title:"Position",
+			draggable: true
+		} );
 
 	var geocoder = new google.maps.Geocoder();
 	var geo_region = null;
@@ -565,7 +528,7 @@ class google_maps_plugin extends Plugin
 	// otherwise the map display will be empty for quite a while.
 	var mapEl = jQuery( '#map_canvas' );
 
-	if( mapEl.not(':visible') )
+	if( mapEl.not( ':visible' ) )
 	{ // map is hidden in folded fieldset
 		var target = document.getElementById( 'itemform_googlemap' ).parentElement; // this is the element that we need to observe
 		var config = { attributes: true };
@@ -576,6 +539,7 @@ class google_maps_plugin extends Plugin
 						if( mapEl.is( ':visible' ) )
 						{ // map is now visible
 							google.maps.event.trigger( map, 'resize' );
+							map.setCenter( latlng ); // recenter map otherwise the marker will be at the top-left corner of the map
 							observer.disconnect(); // we only need to do this once so we can stop observing
 						}
 					} );
@@ -584,409 +548,415 @@ class google_maps_plugin extends Plugin
 		observer.observe( target, config );
 	}
 
-	function set_region(region_code)
+	function set_region( region_code )
 	{
 		geo_region = region_code;
 	}
 
-	geocoder.geocode({'latLng': latlng}, function(region_res, region_status)
+	geocoder.geocode( {'latLng': latlng}, function( region_res, region_status )
 		{
-			if (region_status == google.maps.GeocoderStatus.OK)
+			if( region_status == google.maps.GeocoderStatus.OK )
 			{
-				if (region_res)
+				if( region_res )
 				{
 					var country = region_res.pop();
-					set_region(country.address_components[0].short_name);
+					set_region( country.address_components[0].short_name );
 				}
 			}
 			else
 			{
-				set_region('');
+				set_region( '' );
 			}
-		});
+		} );
 
 
 	var searchLoc = null;
 	var bounds = null;
 
-	function marker_dragend(marker, map)
+	function marker_dragend( marker, map )
 	{
-	google.maps.event.addListener(marker, 'dragend', function()
-	{
-		map.setCenter(marker.getPosition());
-		jQuery('input[name=item_latitude]').val(marker.getPosition().lat());
-
-
-
-		jQuery('input[name=item_longitude]').val(marker.getPosition().lng());
-
-		geocoder.geocode({'latLng': marker.getPosition()}, function(region_res, region_status)
-		{
-			if (region_status == google.maps.GeocoderStatus.OK)
+		google.maps.event.addListener( marker, 'dragend', function()
 			{
-				if (region_res)
-				{
-					var country = region_res.pop();
-					set_region(country.address_components[0].short_name);
-				}
-			}
-			else
-			{
-				set_region('');
-			}
-		});
-
-	});
-	}
-
-	marker_dragend(marker, map);
-
-	google.maps.event.addListener(map, 'zoom_changed', function()
-	{
-		jQuery('#google_map_zoom').val(map.getZoom());
-	});
-	google.maps.event.addListener(map, 'maptypeid_changed', function()
-	{
-		jQuery('#google_map_type').val(map.getMapTypeId());
-	});
-	google.maps.event.addListener(map, 'click', function(event)
-	{
-		if (marker != null)
-		{
-			marker.setMap(null);
-		}
-		marker = new google.maps.Marker({
-		position: event.latLng,
-		map: map,
-		title:"Position",
-		draggable: true
-		});
-
-		geocoder.geocode({'latLng': event.latLng}, function(region_res, region_status)
-		{
-			if (region_status == google.maps.GeocoderStatus.OK)
-			{
-				if (region_res)
-				{
-					var country = region_res.pop();
-					set_region(country.address_components[0].short_name);
-				}
-			}
-			else
-			{
-				set_region('');
-			}
-		});
-
-		map.setCenter(marker.getPosition());
-		jQuery('input[name=item_latitude]').val(event.latLng.lat());
-		jQuery('input[name=item_longitude]').val(event.latLng.lng());
-
-		marker_dragend(marker, map);
-	});
+				map.setCenter( marker.getPosition() );
+				jQuery( 'input[name=item_latitude]' ).val( marker.getPosition().lat() );
 
 
-	jQuery("#searchbox").autocomplete(
-		{
-		source: function(request, response)
-		  {
-			if (geocoder == null)
-			{
-				geocoder = new google.maps.Geocoder();
-			}
-			geocoder.geocode( {'address': request.term, 'region' : geo_region, 'bounds':  map.getBounds() }, function(results, status)
-			{
-				if (status == google.maps.GeocoderStatus.OK)
-				{
-					searchLoc = results[0].geometry.location;
-					bounds = results[0].geometry.bounds;
 
-					geocoder.geocode({'latLng': searchLoc}, function(results1, status1)
+				jQuery( 'input[name=item_longitude]' ).val( marker.getPosition().lng() );
+
+				geocoder.geocode( {'latLng': marker.getPosition()}, function( region_res, region_status )
 					{
-						if (status1 == google.maps.GeocoderStatus.OK)
+						if( region_status == google.maps.GeocoderStatus.OK )
 						{
-							if (results1[1])
+							if( region_res )
 							{
-								response(jQuery.map(results1, function(loc)
-								{
-									return {
-										label  : loc.formatted_address,
-										value  : loc.formatted_address,
-										bounds : loc.geometry.bounds,
-										location : loc.geometry.location
-									  }
-								})
-								);
+								var country = region_res.pop();
+								set_region( country.address_components[0].short_name );
 							}
 						}
-					});
+						else
+						{
+							set_region( '' );
+						}
+					} );
+
+			} );
+	}
+
+	marker_dragend( marker, map );
+
+	google.maps.event.addListener( map, 'zoom_changed', function()
+		{
+			jQuery( '#google_map_zoom' ).val( map.getZoom());
+		} );
+	google.maps.event.addListener( map, 'maptypeid_changed', function()
+		{
+			jQuery( '#google_map_type' ).val( map.getMapTypeId() );
+		} );
+	google.maps.event.addListener( map, 'click', function( event )
+		{
+			if( marker != null )
+			{
+				marker.setMap( null );
+			}
+			marker = new google.maps.Marker( {
+				position: event.latLng,
+				map: map,
+				title:"Position",
+				draggable: true
+			} );
+
+			geocoder.geocode( {'latLng': event.latLng}, function( region_res, region_status )
+			{
+				if( region_status == google.maps.GeocoderStatus.OK )
+				{
+					if( region_res )
+					{
+						var country = region_res.pop();
+						set_region( country.address_components[0].short_name );
+					}
 				}
 				else
 				{
-					searchLoc = null;
-					bounds = null;
+					set_region( '' );
 				}
-				  });
-			   },
-		select: function(event,ui)
-		{
-			var pos = ui.item.position;
-			var lct = ui.item.locType;
-			bounds = ui.item.bounds;
-			searchLoc = ui.item.location;
-		}
-		});
+			});
 
-function locate()
-{
-	if (searchLoc != null)
-	{
+			map.setCenter( marker.getPosition() );
+			jQuery( 'input[name=item_latitude]' ).val( event.latLng.lat() );
+			jQuery( 'input[name=item_longitude]' ).val( event.latLng.lng() );
 
-	geocoder.geocode({'latLng': searchLoc}, function(region_res, region_status)
-		{
-			if (region_status == google.maps.GeocoderStatus.OK)
+			marker_dragend( marker, map );
+		} );
+
+
+	jQuery( "#searchbox" ).autocomplete( {
+		source: function( request, response )
 			{
-				if (region_res)
+				if( geocoder == null )
 				{
-					var country = region_res.pop();
-					set_region(country.address_components[0].short_name);
+					geocoder = new google.maps.Geocoder();
 				}
+				geocoder.geocode( {'address': request.term, 'region' : geo_region, 'bounds':  map.getBounds() }, function( results, status )
+					{
+						if( status == google.maps.GeocoderStatus.OK )
+						{
+							searchLoc = results[0].geometry.location;
+							bounds = results[0].geometry.bounds;
+
+							geocoder.geocode( {'latLng': searchLoc}, function( results1, status1 )
+							{
+								if( status1 == google.maps.GeocoderStatus.OK )
+								{
+									if( results1[1] )
+									{
+										response( jQuery.map( results1, function( loc )
+											{
+												return {
+													label  : loc.formatted_address,
+													value  : loc.formatted_address,
+													bounds : loc.geometry.bounds,
+													location : loc.geometry.location
+													}
+											} )
+										);
+									}
+								}
+							} );
+						}
+						else
+						{
+							searchLoc = null;
+							bounds = null;
+						}
+					} );
+			},
+		select: function( event,ui )
+			{
+				var pos = ui.item.position;
+				var lct = ui.item.locType;
+				bounds = ui.item.bounds;
+				searchLoc = ui.item.location;
+			}
+		} );
+
+	function locate()
+	{
+		if( searchLoc != null )
+		{
+
+			geocoder.geocode( {'latLng': searchLoc}, function( region_res, region_status )
+				{
+					if( region_status == google.maps.GeocoderStatus.OK )
+					{
+						if (region_res)
+						{
+							var country = region_res.pop();
+							set_region( country.address_components[0].short_name );
+						}
+					}
+					else
+					{
+						set_region('');
+					}
+				} );
+
+			if( marker != null )
+			{
+				marker.setMap( null );
+			}
+
+			marker = new google.maps.Marker( {
+					position: searchLoc,
+					map: map,
+					title: "Position",
+					draggable: true
+				} );
+
+			if( bounds !== undefined )
+			{
+				map.fitBounds( bounds );
 			}
 			else
 			{
-				set_region('');
+				map.setCenter( searchLoc );
 			}
-		});
-
-		if (marker != null)
-		{
-			marker.setMap(null);
+			marker_dragend( marker, map );
+			jQuery( 'input[name=item_latitude]' ).val( searchLoc.lat() );
+			jQuery( 'input[name=item_longitude]' ).val( searchLoc.lng() );
+			jQuery( '#google_map_zoom' ).val( map.getZoom() );
+			jQuery( '#google_map_type' ).val( map.getMapTypeId() );
 		}
-
-		marker = new google.maps.Marker({
-			position: searchLoc,
-			map: map,
-			title:"Position",
-			draggable: true
-			});
-		if (bounds !== undefined)
-		{
-			map.fitBounds(bounds);
-		}
-		else
-		{
-			map.setCenter(searchLoc);
-		}
-		marker_dragend(marker, map);
-		jQuery('input[name=item_latitude]').val(searchLoc.lat());
-		jQuery('input[name=item_longitude]').val(searchLoc.lng());
-		jQuery('#google_map_zoom').val(map.getZoom());
-		jQuery('#google_map_type').val(map.getMapTypeId());
 	}
 
-}
-
-	jQuery("#searchbox").keypress(function(event){
-		if (event.keyCode == 13)
+	jQuery( "#searchbox" ).keypress( function( event )
 		{
-			locate();
-			return false
-		}
-
-	});
+			if( event.keyCode == 13 )
+			{
+				locate();
+				return false
+			}
+		} );
 
 	jQuery('#locate_on_map').click( locate );
 
 	function post_location_change( adress )
 	{
-		if ( adress == '')
+		if ( adress == '' )
 		{
 			adress = 'Paris, France';
 		}
-			jQuery('#searchbox').val(adress);
-			geocoder.geocode( {'address': adress}, function(results, status)
+		jQuery( '#searchbox' ).val( adress );
+		geocoder.geocode( {'address': adress}, function( results, status )
 			{
-				if (status == google.maps.GeocoderStatus.OK)
+				if( status == google.maps.GeocoderStatus.OK )
 				{
 					var searchLoc = results[0].geometry.location;
 					var bounds = results[0].geometry.bounds;
-					if (bounds != null)
+					if( bounds != null )
 					{
-						map.fitBounds(bounds);
+						map.fitBounds( bounds );
 					}
 					else
 					{
-						map.setCenter(searchLoc);
+						map.setCenter( searchLoc );
 					}
-					if (marker != null)
+					if( marker != null )
 					{
-						marker.setMap(null);
+						marker.setMap( null );
 					}
-					marker = new google.maps.Marker({
-						position: searchLoc,
-						map: map,
-						title:"Position",
-						draggable: true
-						});
-					marker_dragend(marker, map);
+					marker = new google.maps.Marker( {
+							position: searchLoc,
+							map: map,
+							title:"Position",
+							draggable: true
+						} );
+					marker_dragend( marker, map );
 				}
-			});
-
+			} );
 	}
 
-	jQuery(document).ready( function(){
-		if ( post_position == 0 )
+	jQuery( document ).ready( function()
 		{
-			jQuery('#item_ctry_ID').change(function(){
-				var adress = '';
-				var text =  jQuery('#item_city_ID option:selected').text();
+			if( post_position == 0 )
+			{
+				jQuery( '#item_ctry_ID' ).change( function()
+					{
+						var adress = '';
+						var text = jQuery( '#item_city_ID option:selected' ).text();
 
-				if (text != 'Unknown')
-				{
-					if (adress == '')
-					{
-						adress = adress + text;
-					}
-					else
-					{
-						adress = adress + ', ' + text;
-					}
-				}
+						if( text != 'Unknown' )
+						{
+							if( adress == '' )
+							{
+								adress = adress + text;
+							}
+							else
+							{
+								adress = adress + ', ' + text;
+							}
+						}
 
-				text =  jQuery('#item_subrg_ID option:selected').text();
-				if (text != 'Unknown')
-				{
-					if (adress == '')
-					{
-						adress = adress + text;
-					}
-					else
-					{
-						adress = adress + ', ' + text;
-					}
-				}
+						text = jQuery( '#item_subrg_ID option:selected' ).text();
+						if( text != 'Unknown' )
+						{
+							if( adress == '' )
+							{
+								adress = adress + text;
+							}
+							else
+							{
+								adress = adress + ', ' + text;
+							}
+						}
 
-				text =  jQuery('#item_rgn_ID option:selected').text();
-				if (text != 'Unknown')
-				{
-					if (adress == '')
-					{
-						adress = adress + text;
-					}
-					else
-					{
-						adress = adress + ', ' + text;
-					}
-				}
+						text = jQuery( '#item_rgn_ID option:selected' ).text();
+						if( text != 'Unknown' )
+						{
+							if( adress == '' )
+							{
+								adress = adress + text;
+							}
+							else
+							{
+								adress = adress + ', ' + text;
+							}
+						}
 
-				text =  jQuery('#item_ctry_ID option:selected').text();
-				if (text != 'Unknown')
-				{
-					if (adress == '')
-					{
-						adress = adress + text;
-					}
-					else
-					{
-						adress = adress + ', ' + text;
-					}
-				}
+						text = jQuery( '#item_ctry_ID option:selected' ).text();
+						if( text != 'Unknown' )
+						{
+							if( adress == '' )
+							{
+								adress = adress + text;
+							}
+							else
+							{
+								adress = adress + ', ' + text;
+							}
+						}
 
-			post_location_change( adress );
-			});
+						post_location_change( adress );
+					} );
 
-			jQuery('#item_subrg_ID').change(function(){
-				var adress = '';
-				text =  jQuery('#item_subrg_ID option:selected').text();
-				if (text != 'Unknown')
-				{
-					if (adress == '')
+				jQuery( '#item_subrg_ID' ).change( function()
 					{
-						adress = adress + text;
-					}
-					else
-					{
-						adress = adress + ', ' + text;
-					}
-				}
+						var adress = '';
+						text = jQuery( '#item_subrg_ID option:selected' ).text();
+						if( text != 'Unknown' )
+						{
+							if( adress == '' )
+							{
+								adress = adress + text;
+							}
+							else
+							{
+								adress = adress + ', ' + text;
+							}
+						}
 
-				text =  jQuery('#item_rgn_ID option:selected').text();
-				if (text != 'Unknown')
-				{
-					if (adress == '')
-					{
-						adress = adress + text;
-					}
-					else
-					{
-						adress = adress + ', ' + text;
-					}
-				}
+						text = jQuery( '#item_rgn_ID option:selected' ).text();
+						if( text != 'Unknown' )
+						{
+							if( adress == '' )
+							{
+								adress = adress + text;
+							}
+							else
+							{
+								adress = adress + ', ' + text;
+							}
+						}
 
-				text =  jQuery('#item_ctry_ID option:selected').text();
-				if (text != 'Unknown')
-				{
-					if (adress == '')
-					{
-						adress = adress + text;
-					}
-					else
-					{
-						adress = adress + ', ' + text;
-					}
-				}
-				post_location_change( adress );
-				});
+						text = jQuery( '#item_ctry_ID option:selected' ).text();
+						if( text != 'Unknown' )
+						{
+							if( adress == '' )
+							{
+								adress = adress + text;
+							}
+							else
+							{
+								adress = adress + ', ' + text;
+							}
+						}
 
-			jQuery('#item_rgn_ID').change(function(){
-				var adress = '';
-				text =  jQuery('#item_rgn_ID option:selected').text();
-				if (text != 'Unknown')
-				{
-					if (adress == '')
-					{
-						adress = adress + text;
-					}
-					else
-					{
-						adress = adress + ', ' + text;
-					}
-				}
+						post_location_change( adress );
+					} );
 
-				text =  jQuery('#item_ctry_ID option:selected').text();
-				if (text != 'Unknown')
-				{
-					if (adress == '')
+				jQuery( '#item_rgn_ID' ).change( function()
 					{
-						adress = adress + text;
-					}
-					else
-					{
-						adress = adress + ', ' + text;
-					}
-				}
-				post_location_change( adress );
-				});
+						var adress = '';
+						text = jQuery( '#item_rgn_ID option:selected' ).text();
+						if( text != 'Unknown' )
+						{
+							if( adress == '' )
+							{
+								adress = adress + text;
+							}
+							else
+							{
+								adress = adress + ', ' + text;
+							}
+						}
 
-			jQuery('#item_ctry_ID').change(function(){
-				var adress = '';
-				text =  jQuery('#item_ctry_ID option:selected').text();
-				if (text != 'Unknown')
-				{
-					if (adress == '')
+						text = jQuery( '#item_ctry_ID option:selected' ).text();
+						if( text != 'Unknown' )
+						{
+							if( adress == '' )
+							{
+								adress = adress + text;
+							}
+							else
+							{
+								adress = adress + ', ' + text;
+							}
+						}
+
+						post_location_change( adress );
+					} );
+
+				jQuery( '#item_ctry_ID' ).change( function()
 					{
-						adress = adress + text;
-					}
-					else
-					{
-						adress = adress + ', ' + text;
-					}
-				}
-				post_location_change( adress );
-				});
+						var adress = '';
+						text = jQuery( '#item_ctry_ID option:selected' ).text();
+						if( text != 'Unknown' )
+						{
+							if( adress == '' )
+							{
+								adress = adress + text;
+							}
+							else
+							{
+								adress = adress + ', ' + text;
+							}
+						}
+
+						post_location_change( adress );
+					} );
 			}
 
-		});
+		} );
 	</script>
 
 	<?php
@@ -1073,6 +1043,17 @@ function locate()
 
 			$lat = $Item->get_setting( 'latitude' );
 			$lng = $Item->get_setting( 'longitude' );
+			$map_type = $Item->get_setting( 'map_type' );
+			$zoom = $Item->get_setting( 'map_zoom' );
+
+			if( empty( $map_type ) )
+			{
+				$map_type = ( string ) $this->get_coll_setting( 'map_type_coll', $Blog );
+			}
+			if( empty( $zoom ) )
+			{
+				$zoom = 17;
+			}
 			if( empty( $lat ) && empty( $lng ) )
 			{	// Coordinates must be defined for the viewed Item:
 				return;
@@ -1083,8 +1064,6 @@ function locate()
 
 			$height = $this->display_param( $this->get_widget_setting( 'height_front', $params ) );
 			$height = 'height:'.$height;
-
-			$zoom = $this->get_widget_setting( 'map_zoom', $params );
 
 			echo $this->get_widget_setting( 'block_start', $params );
 			$map_title = $this->get_widget_setting( 'map_title', $params );
@@ -1099,8 +1078,7 @@ function locate()
 			<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>;"></div>
 			<script type="text/javascript">
 			<?php
-			$map_type = (string) $this->get_widget_setting( 'map_type', $params );
-			switch ($map_type)
+			switch( $map_type )
 			{
 				case 'satellite':
 					?>
@@ -1125,7 +1103,6 @@ function locate()
 						zoom: <?php echo $zoom; ?>,
 						center: latlng,
 						mapTypeId: mapTypeId,
-						scrollwheel: false,
 						mapTypeControlOptions:
 							{
 							style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
@@ -1139,6 +1116,43 @@ function locate()
 					map: map<?php echo $this->number_of_widgets; ?>,
 					title:"Position"
 					} );
+
+				var controlsOut = {
+						mapTypeControl: false,
+						zoomControl: false,
+						panControl: false,
+						streetViewControl: false
+					};
+
+				var controlsIn = {
+						mapTypeControl: true,
+						zoomControl: true,
+						panControl: true,
+						streetViewControl: true
+					};
+
+				// Initially hide the controls
+				map<?php echo $this->number_of_widgets; ?>.setOptions( controlsOut );
+
+				google.maps.event.addDomListener( map<?php echo $this->number_of_widgets; ?>.getDiv(), 'mouseover', function( e )
+					{
+						e.cancelBubble = true;
+						if( ! map<?php echo $this->number_of_widgets; ?>.hover )
+						{
+							map<?php echo $this->number_of_widgets; ?>.hover = true;
+							map<?php echo $this->number_of_widgets; ?>.setOptions( controlsIn );
+						}
+					} );
+
+				google.maps.event.addDomListener(document.getElementsByTagName('body')[0], 'mouseover', function( e )
+					{
+						if( map<?php echo $this->number_of_widgets; ?>.hover )
+						{
+								map<?php echo $this->number_of_widgets; ?>.setOptions( controlsOut );
+								map<?php echo $this->number_of_widgets; ?>.hover = false;
+						}
+					} );
+
 				</script>
 			<?php
 			echo $this->get_widget_setting( 'block_body_end', $params );
@@ -1257,6 +1271,20 @@ function locate()
 					});
 				var exceededQueryLimit = false;
 
+				var controlsOut = {
+						mapTypeControl: false,
+						zoomControl: false,
+						panControl: false,
+						streetViewControl: false
+					};
+
+				var controlsIn = {
+						mapTypeControl: true,
+						zoomControl: true,
+						panControl: true,
+						streetViewControl: true
+					};
+
 				function addMarker( map, latLng, title, data )
 				{
 					var pinFillColor = '#F75850';
@@ -1367,6 +1395,28 @@ function locate()
 							map.setCenter( mapCenter );
 						}
 					}
+
+					// Initially hide the controls
+					map.setOptions( controlsOut );
+
+					google.maps.event.addDomListener( map.getDiv(), 'mouseover', function( e )
+						{
+							e.cancelBubble = true;
+							if( ! map.hover )
+							{
+								map.hover = true;
+								map.setOptions( controlsIn );
+							}
+						} );
+
+					google.maps.event.addDomListener( document.getElementsByTagName('body')[0], 'mouseover', function( e )
+						{
+							if( map.hover )
+							{
+									map.setOptions( controlsOut );
+									map.hover = false;
+							}
+						} );
 				}
 			</script>
 			<?php
