@@ -566,6 +566,92 @@ class BlogCache extends DataObjectCache
 
 
 	/**
+	 * Load into the cache a list of collections where users can create a post
+	 *
+	 * @param array User IDs, which must have a permission to create a post
+	 * @param string Order By
+	 * @param string Order Direction
+	 */
+	function load_create_post_colls( $users, $order_by = '', $order_dir = '' )
+	{
+		global $DB, $Debuglog, $Settings;
+
+		$Debuglog->add( "Loading <strong>$this->objtype(create_post)</strong> into cache", 'dataobjects' );
+
+		if( empty( $users ) )
+		{	// Don't try to load any collection because no users provided:
+			return;
+		}
+
+		if( $order_by == '' )
+		{	// Use default value from settings:
+			$order_by = $Settings->get( 'blogs_order_by' );
+		}
+
+		if( $order_dir == '' )
+		{	// Use default value from settings:
+			$order_dir = $Settings->get( 'blogs_order_dir' );
+		}
+
+		$UserCache = get_UserCache();
+
+		$restrict_sql = array();
+		foreach( $users as $user_ID )
+		{
+			$restrict_User = & $UserCache->get_by_ID( $user_ID );
+
+			// All collection owners can creat new post:
+			$restrict_user_sql = 'blog_owner_user_ID = '.$restrict_User->ID;
+
+			// SQL analog for $current_User->check_perm( 'blogs', 'edit' ):
+			$check_perm_blogs_edit_SQL = new SQL();
+			$check_perm_blogs_edit_SQL->SELECT( 'grp_ID' );
+			$check_perm_blogs_edit_SQL->FROM( 'T_groups' );
+			$check_perm_blogs_edit_SQL->WHERE( 'grp_ID = '.$restrict_User->grp_ID );
+			$check_perm_blogs_edit_SQL->WHERE_and( 'grp_perm_blogs = "editall"' );
+			$restrict_user_sql .= ' OR ( '.$check_perm_blogs_edit_SQL->get().' )';
+
+			// SQL analog for $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog_ID ):
+			$check_perm_create_post_user_SQL = new SQL();
+			$check_perm_create_post_user_SQL->SELECT( 'bloguser_blog_ID' );
+			$check_perm_create_post_user_SQL->FROM( 'T_coll_user_perms' );
+			$check_perm_create_post_user_SQL->WHERE( 'bloguser_user_ID = '.$restrict_User->ID );
+			$check_perm_create_post_user_SQL->WHERE_and( 'bloguser_perm_poststatuses <> ""' );
+			$check_perm_create_post_user_SQL->WHERE_and( 'bloguser_perm_poststatuses <> "deprecated"' );
+			$check_perm_create_post_user_SQL->WHERE_and( 'bloguser_perm_poststatuses <> "redirected"' );
+			$check_perm_create_post_user_SQL->WHERE_and( 'bloguser_perm_poststatuses <> "deprecated,redirected"' );
+			$check_perm_create_post_group_SQL = new SQL();
+			$check_perm_create_post_group_SQL->SELECT( 'bloggroup_blog_ID' );
+			$check_perm_create_post_group_SQL->FROM( 'T_coll_group_perms' );
+			$check_perm_create_post_group_SQL->WHERE( '( bloggroup_group_ID = '.$restrict_User->grp_ID.'
+				OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$restrict_User->ID.' ) )' );
+			$check_perm_create_post_group_SQL->WHERE_and( 'bloggroup_perm_poststatuses <> ""' );
+			$check_perm_create_post_group_SQL->WHERE_and( 'bloggroup_perm_poststatuses <> "deprecated"' );
+			$check_perm_create_post_group_SQL->WHERE_and( 'bloggroup_perm_poststatuses <> "redirected"' );
+			$check_perm_create_post_group_SQL->WHERE_and( 'bloggroup_perm_poststatuses <> "deprecated,redirected"' );
+			$restrict_user_sql .= ' OR ( blog_advanced_perms <> 0 AND ( '
+				.'    blog_ID IN ( '.$check_perm_create_post_user_SQL->get().' ) OR '
+				.'    blog_ID IN ( '.$check_perm_create_post_group_SQL->get().' )'
+				.'  )'
+				.')';
+
+			$restrict_sql[] = $restrict_user_sql;
+		}
+
+		$SQL = new SQL();
+		$SQL->SELECT( '*' );
+		$SQL->FROM( $this->dbtablename );
+		$SQL->WHERE( '( '.implode( ' ) AND ( ', $restrict_sql ).' )' );
+		$SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, 'blog_', 'blog_ID' ) );
+
+		foreach( $DB->get_results( $SQL->get(), OBJECT, 'Load collections list where users ('.implode( ', ', $users ).') can create a post' ) as $row )
+		{	// Instantiate a custom object
+			$this->instantiate( $row );
+		}
+	}
+
+
+	/**
 	 * Returns form option list with cache contents
 	 *
 	 * Loads the whole cache!

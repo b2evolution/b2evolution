@@ -198,13 +198,15 @@ $Results->filter_area = array(
 			)
 	);
 
-if( $view == 'move' )
+if( $view == 'move' || $view == 'move2' )
 {	// Radio box to select a private message:
 	$Results->cols[] = array(
 			'th' => '',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
-			'td' => '<input type="radio" name="msg_ID" value="$msg_ID$" data-author-id="$msg_user_ID$" />'
+			'td' => '<input type="radio" name="msg_ID" value="$msg_ID$" data-author-id="$msg_user_ID$"'
+				.( $view == 'move2' ? '~conditional( #msg_ID# == "'.get_param( 'move_msg_ID' ).'", \' checked="checked"\', \'\' )~' : '' )
+				.( $view == 'move2' ? ' disabled="disabled"' : '' ).' />'
 		);
 }
 
@@ -402,8 +404,7 @@ if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) 
 		echo ' <a href="'.$close_and_block_url.'" onclick="return confirm( \''.$confirm_block_text.'\' );" class="btn btn-default btn-sm">'.$block_text.'</a>';
 	}
 	echo ' <a href="'.get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID.'&amp;view=move' ).'"'
-				.( $view == 'move' ? ' onclick="return evo_msg_move_to_coll();"' : '' )
-				.' class="btn '.( $view == 'move' ? 'btn-primary' : 'btn-default' ).' btn-sm">'
+				.' class="btn btn-default btn-sm">'
 					.get_icon( 'copy', 'imgtag', array( 'title' => T_('Move to a collection...') ) ).' '
 					.T_('Move to a collection...')
 				.'</a>';
@@ -431,16 +432,58 @@ $Results->display( $display_params );
 
 echo $params['messages_list_end'];
 
-// Initialize JavaScript to build and open window:
-echo_modalwindow_js();
+switch( $view )
+{
+	case 'move':
+		// Display a button to move a selected message to a collection:
+		echo '<p><a href="'.get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID.'&amp;view=move' ).'"'
+			.' onclick="return evo_msg_move_to_coll();"'
+			.' class="btn btn-primary">'
+				.get_icon( 'copy', 'imgtag', array( 'title' => T_('Move selected message to a collection...') ) ).' '
+				.T_('Move selected message to a collection...')
+			.'</a></p>';
+		break;
+
+	case 'move2':
+		// Display a button to move a selected message to a collection:
+		echo '<p>';
+		$MessageCache = & get_MessageCache();
+		$moving_Message = & $MessageCache->get_by_ID( get_param( 'move_msg_ID' ) );
+
+		$BlogCache = get_BlogCache();
+		$BlogCache->clear();
+		$BlogCache->load_create_post_colls( array( $current_User->ID, $moving_Message->author_user_ID ) );
+		if( empty( $BlogCache->cache ) )
+		{	// No available collections:
+			echo T_('No found collection where you and author of the selected message can create a post.');
+		}
+		else
+		{	// Display a form 
+			echo T_('Move selected message to');
+			echo ' <select id="msg_move_coll" class="form-control" style="display:inline-block;width:auto">';
+			foreach( $BlogCache->cache as $msg_Blog )
+			{
+				echo '<option value="'.$msg_Blog->ID.'" data-url="'.format_to_output( $msg_Blog->gen_blogurl(), 'htmlattr' ).'">'.$msg_Blog->get( 'name' ).'</option>';
+			}
+			echo '</select>';
+			echo ' <a href="'.get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID.'&amp;view=move2&amp;move_msg_ID='.get_param( 'move_msg_ID' ) ).'"'
+				.' onclick="return evo_msg_move2_to_coll();"'
+				.' class="btn btn-primary">'
+					.get_icon( 'copy', 'imgtag', array( 'title' => T_('Continue').'...' ) ).' '
+					.T_('Continue').'...'
+				.'</a>';
+		}
+		echo '<p>';
+		break;
+}
 
 if( is_admin_page() )
 {	// New item URL for back-office:
-	$new_item_url = $admin_url.'?ctrl=items&action=new&msg_ID=\' + msg_id + \'&blog=\' + coll.id + \'';
+	$new_item_url = $admin_url.'?ctrl=items&action=new&msg_ID='.get_param( 'move_msg_ID' ).'&blog=\' + coll_id + \'';
 }
 else
 {	// New item URL for front-office:
-	$new_item_url = '\' + coll.url + ( coll.url.indexOf( \'?\' ) > 0 ? \'&\' : \'?\' ) + \'disp=edit&msg_ID=\' + msg_id + \'';
+	$new_item_url = '\' + coll_url + ( coll_url.indexOf( \'?\' ) > 0 ? \'&\' : \'?\' ) + \'disp=edit&msg_ID='.get_param( 'move_msg_ID' );
 }
 
 ?>
@@ -454,46 +497,18 @@ function evo_msg_move_to_coll()
 		return false;
 	}
 
-	var msg_id = selected_message.val();
+	location.href = '<?php echo get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID.'&view=move2&move_msg_ID=', '&' ); ?>' + selected_message.val();
 
-	// Use current User and User of first Message to restrict collections list where new post can be created from Thread:
-	var msg_author_id = selected_message.data( 'author-id' );
-	var restrict_users = '<?php echo $current_User->ID; ?>';
-	if( restrict_users != msg_author_id )
-	{
-		restrict_users += ',' + msg_author_id;
-	}
+	return false;
+}
 
-	openModalWindow( '<div id="evo_msg_move_coll_wrapper"><span class="loader_img absolute_center" title="<?php echo T_('Loading...'); ?>"></span></div>', '300px', '', true,
-		'<?php echo TS_('Move to a collection...'); ?>', // Window title
-		[ '-', 'evo_msg_post_buttons' ], // Fake button that is hidden by default, Used to display button "Close"
-		true );
+function evo_msg_move2_to_coll()
+{
+	var selected_coll = jQuery( 'select#msg_move_coll option:selected' );
+	var coll_id = selected_coll.val();
+	var coll_url = selected_coll.data( 'url' );
 
-	evo_rest_api_request( 'collections',
-	{
-		'per_page'      : 1000,
-		'filter'        : 'all',
-		'restrict'      : 'create_post',
-		'restrict_users': restrict_users,
-	},
-	function( data )
-	{
-		if( data.found == 0 )
-		{
-			r = '<p><?php echo TS_('No found collection where you and author of the selected message can create a post.'); ?></p>';
-		}
-		else
-		{
-			var r = '<ul>';
-			for( var c in data.colls )
-			{
-				var coll = data.colls [c];
-				r += '<li><a href="<?php echo $new_item_url; ?>">' + coll.name + '</a></li>';
-			}
-			r += '</ul>';
-		}
-		jQuery( '#evo_msg_move_coll_wrapper' ).html( r );
-	} );
+	location.href = '<?php echo $new_item_url; ?>';
 
 	return false;
 }

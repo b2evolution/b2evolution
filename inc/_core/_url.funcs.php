@@ -891,14 +891,15 @@ function idna_decode( $url )
  *
  * @param string specific sub entry url
  * @param string additional params
+ * @param string delimiter to use for more params
  */
-function get_dispctrl_url( $dispctrl, $params = '' )
+function get_dispctrl_url( $dispctrl, $params = '', $glue = '&amp;' )
 {
 	global $Collection, $Blog;
 
 	if( $params != '' )
 	{
-		$params = '&amp;'.$params;
+		$params = $glue.$params;
 	}
 
 	if( is_admin_page() || empty( $Blog ) )
@@ -907,7 +908,7 @@ function get_dispctrl_url( $dispctrl, $params = '' )
 		if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_status( 'can_access_admin' ) )
 		{ // User must has an access to backoffice
 			global $admin_url;
-			return url_add_param( $admin_url, 'ctrl='.$dispctrl.$params );
+			return url_add_param( $admin_url, 'ctrl='.$dispctrl.$params, $glue );
 		}
 		else
 		{ // Return empty because user has no access
@@ -917,11 +918,14 @@ function get_dispctrl_url( $dispctrl, $params = '' )
 
 	if( in_array( $dispctrl, array( 'threads', 'messages', 'contacts', 'msgform' ) ) )
 	{ // Get this url through Blog function, because it can be linked to other blog
-		return $Blog->get( $dispctrl.'url' ).$params;
+		return $Blog->get( $dispctrl.'url', array(
+				'glue'       => $glue,
+				'url_suffix' => $params,
+			) );
 	}
 	else
 	{ // Use current blog url
-		return url_add_param( $Blog->gen_blogurl(), 'disp='.$dispctrl.$params );
+		return url_add_param( $Blog->gen_blogurl(), 'disp='.$dispctrl.$params, $glue );
 	}
 }
 

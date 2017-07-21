@@ -38,9 +38,17 @@ param_action();
 // Mode, e-g 'move' to display radio boxes to select moving private message
 $view = param( 'view', 'string' );
 
-if( $view == 'move' )
-{	// Inform user before moving to collection:
-	$Messages->add( T_('Select which message you want to move...'), 'note' );
+switch( $view )
+{
+	case 'move':
+		// STEP 1: Inform user before moving to collection:
+		$Messages->add( T_('Select which message you want to move...'), 'note' );
+		break;
+
+	case 'move2':
+		// STEP 2: Allow to select collection:
+		param( 'move_msg_ID', 'integer', true );
+		break;
 }
 
 /**
