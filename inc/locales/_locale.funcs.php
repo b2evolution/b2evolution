@@ -1718,7 +1718,7 @@ function locale_get( $field, $locale = NULL, $default = NULL )
 		$default_values = array(
 			'datefmt' => 'Y-m-d',
 			'longdatefmt' => 'Y-m-d',
-			'extdatefmt' => 'M d Y',
+			'extdatefmt' => 'M d, Y',
 			'input_datefmt' => 'Y-m-d',
 			'timefmt' => 'H:i:s',
 			'shorttimefmt' => 'H:i',
