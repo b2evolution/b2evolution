@@ -230,11 +230,11 @@ class item_info_line_Widget extends ComponentWidget
 			switch( $this->disp_params['before_author'] )
 			{
 				case 'posted_by':
-					$before_author = T_('posted by').' ';
+					$before_author = T_('Posted by').' ';
 					break;
 
 				case 'started_by':
-					$before_author = T_('started by').' ';
+					$before_author = T_('Started by').' ';
 					break;
 
 				default:
