@@ -828,11 +828,11 @@ $failed_logins_lockout = 600; // 10 minutes
 
 
 /**
- * Deny to register new accounts with these logins;
- * Also deny to change user login to one of these;
+ * Deny registering new accounts with these reserved logins;
+ * Also deny changing user logins to one of these;
  * Only admins with permission to create new users can use these:
  */
-$reserved_logins = array( 'admin', 'administrator', 'moderator', 'webmaster' );
+$reserved_logins = array( 'admin', 'admins', 'administrator', 'administrators', 'moderator', 'moderators', 'webmaster', 'postmaster', 'mailer', 'mail', 'support', 'owner', 'sysop', 'root', 'system', 'web', 'site', 'website', 'server' );
 
 
 /**
