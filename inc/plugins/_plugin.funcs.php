@@ -309,11 +309,38 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'radio':
-			if( ! isset($parmeta['field_lines']) )
+			if( isset( $parmeta['field_lines'] ) )
 			{
-				$parmeta['field_lines'] = false;
+				$params['lines'] = $parmeta['field_lines'];
 			}
-			$Form->radio( $input_name, $set_value, $parmeta['options'], $set_label, $parmeta['field_lines'], $parmeta['note'] );
+			$options = array();
+			foreach( $parmeta['options'] as $l_key => $l_options )
+			{
+				$options[$l_key] = array(
+					'value' => $l_options[0],
+					'label' => $l_options[1]
+				);
+
+				if( isset( $l_options[2] ) )
+				{
+					$options[$l_key]['note'] = $l_options[2];
+				}
+				if( isset( $l_options[4] ) )
+				{	// Convert "inline attribs" to "params" array:
+					preg_match_all( '#(\w+)=[\'"](.*)[\'"]#', $l_options[4], $matches, PREG_SET_ORDER );
+
+					foreach( $matches as $l_set_nr => $l_match )
+					{
+						$options[$l_key][$l_match[1]] = $l_match[2];
+					}
+				}
+
+				if( isset( $l_options[3] ) )
+				{
+					$options[$l_key]['suffix'] = $l_options[3];
+				}
+			}
+			$Form->radio_input( $input_name, $set_value, $options, $set_label, $params );
 			break;
 
 		case 'array':
@@ -392,7 +419,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 					foreach( $parmeta['entries'] as $l_set_name => $l_set_entry )
 					{
-						$l_value = isset($set_value[$k][$l_set_name]) ? $set_value[$k][$l_set_name] : NULL;
+						if( isset( $set_value[$k][$l_set_name] ) )
+						{	// Use a saved value:
+							$l_value = $set_value[$k][$l_set_name];
+						}
+						else
+						{	// Use default value if it is defined:
+							$l_value = isset( $l_set_entry['defaultvalue'] ) ? $l_set_entry['defaultvalue'] : NULL;
+						}
 						// RECURSE:
 						autoform_display_field( $parname.'['.$k_nb.']['.$l_set_name.']', $l_set_entry, $Form, $set_type, $Obj, $set_target, $l_value );
 					}
@@ -762,6 +796,35 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 	if( $set_value === NULL )
 	{ // Get the value from request:
 		$l_value = param( 'edit_plugin_'.$Obj->ID.'_set_'.$parname, $l_param_type, $l_param_default );
+		// Store values of unchecked checkboxes manually because their empty values are not passed to a submitted form:
+		switch( $l_param_type )
+		{
+			case 'array':
+			case 'array:integer':
+			case 'array:array:integer':
+			case 'array:string':
+			case 'array:array:string':
+			case 'array:regexp':
+				if( ! empty( $parmeta['entries'] ) )
+				{
+					foreach( $l_value as $l_index => $l_index_values )
+					{
+						if( count( $parmeta['entries'] ) != count( $l_index_values ) )
+						{	// If some entry(like checkbox) is missed:
+							foreach( $parmeta['entries'] as $parmeta_entry_key => $parmeta_entry_data )
+							{
+								if( isset( $parmeta_entry_data['type'] ) &&
+								    $parmeta_entry_data['type'] == 'checkbox' &&
+								    ! isset( $l_index_values[ $parmeta_entry_key ] ) )
+								{	// If field is checkbox but value is not passed to a submitted form becauase it was unchecked:
+									$l_value[ $l_index ][ $parmeta_entry_key ] = 0;
+								}
+							}
+						}
+					}
+				}
+				break;
+		}
 	}
 	else
 	{ // Force value

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-05-30 22:21+0200\n"
+"POT-Creation-Date: 2017-07-16 01:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Alexander Osokin <alex.osokin@gmail.com>, 2017\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/fplanque/teams/23/ru_RU/)\n"
@@ -138,7 +138,7 @@ msgstr "Скачать"
 #: ../../../inc/_core/ui/results/_resultsel.class.php:520
 #: ../../../inc/cron/views/_cronjob_list.view.php:190
 #: ../../../inc/tools/model/_email.funcs.php:27
-#: ../inc/tools/system.ctrl.php:214 ../../../inc/tools/system.ctrl.php:218
+#: ../inc/tools/system.ctrl.php:215 ../../../inc/tools/system.ctrl.php:219
 msgid "Warning"
 msgstr "Внимание"
 
@@ -159,8 +159,6 @@ msgstr "Информация"
 #: ../../../inc/users/views/_user_identity.form.php:148
 #: ../../../inc/users/views/_user_subscriptions.form.php:136
 #: ../../../skins/basic/_item_comment_form.inc.php:79
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:85
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:300
 #: ../../../skins/touch/_item_comment_form.inc.php:240
 #: ../../../skins_email/account_activated.html.php:41
 #: ../../../skins_email/account_activated.txt.php:38
@@ -191,7 +189,6 @@ msgstr "WWW"
 
 #: ../../../conf/_icons.php:363 ../inc/users/model/_user.funcs.php:5625
 #: ../../../inc/users/model/_user.funcs.php:5626
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:305
 #: ../../../skins/touch/_item_comment_form.inc.php:245
 #: ../../../skins_email/comment_new.txt.php:67
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:308
@@ -233,7 +230,6 @@ msgstr "Контакты"
 #: ../../../inc/sessions/views/_stats_view.funcs.php:72
 #: ../../../inc/users/user.ctrl.php:63 ../inc/users/users.ctrl.php:60
 #: ../../../skins/basic/_item_comment_form.inc.php:62
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:287
 #: ../../../skins/touch/_item_comment_form.inc.php:226
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:290
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:310
@@ -344,8 +340,7 @@ msgstr "Убрать связь"
 #: ../../../inc/plugins/views/_plugin_list_available.view.php:38
 #: ../../../inc/plugins/views/_plugin_settings.form.php:66
 #: ../../../inc/slugs/views/_slug.form.php:40
-#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:327
-#: ../../../skins/asevo/_body_footer.inc.php:40
+#: ../skins/asevo/_body_footer.inc.php:40
 #: ../../../skins/bootstrap_blog_skin/access_denied.main.php:309
 #: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:308
 #: ../../../skins/bootstrap_blog_skin/help.main.php:314
@@ -403,11 +398,6 @@ msgstr "Убрать связь"
 #: ../../../skins/horizon_main_skin/index.main.php:383
 #: ../../../skins/photoalbums/_body_footer.inc.php:40
 #: ../../../skins/photoblog/_body_footer.inc.php:33
-#: ../../../skins/pureforums_skin/access_denied.main.php:173
-#: ../../../skins/pureforums_skin/access_requires_login.main.php:175
-#: ../../../skins/pureforums_skin/help.main.php:179
-#: ../../../skins/pureforums_skin/index.main.php:270
-#: ../../../skins/pureforums_skin/msgform.main.php:180
 #: ../../../skins/touch/_body_footer.inc.php:39
 msgid "Help"
 msgstr "Помощь"
@@ -600,7 +590,7 @@ msgstr "Считать как хит поисковика"
 #: ../../../inc/_core/ui/forms/_form.class.php:3917
 #: ../../../inc/locales/views/_translation.form.php:43
 #: ../../../inc/messaging/views/_contact_list.view.php:460
-#: ../../../inc/plugins/_plugin.funcs.php:414
+#: ../../../inc/plugins/_plugin.funcs.php:448
 #: ../../../inc/users/model/_user.funcs.php:4532
 #: ../../../inc/users/views/_organization_user.form.php:47
 msgid "Add"
@@ -608,8 +598,8 @@ msgstr "Добавить"
 
 #: ../../../conf/_icons.php:1081 ../inc/_core/ui/forms/_form.funcs.php:357
 #: ../../../inc/links/model/_link.funcs.php:314
-#: ../inc/plugins/_plugin.funcs.php:364
-#: ../../../inc/plugins/_plugin.funcs.php:367
+#: ../inc/plugins/_plugin.funcs.php:391
+#: ../../../inc/plugins/_plugin.funcs.php:394
 msgid "Remove"
 msgstr "Удалить"
 
@@ -1035,7 +1025,6 @@ msgstr "действие: %s"
 #: ../../../inc/users/views/_userfield.form.php:74
 #: ../../../inc/users/views/_userfieldsgroup.form.php:52
 #: ../../../inc/widgets/views/_widget.form.php:95 ../install/debug.php:360
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:184
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:142
 msgid "Save Changes!"
 msgstr "Сохранить Изменения!"
@@ -1794,7 +1783,6 @@ msgstr "Пожалуйста, не отправляйте пустых комм�
 #: ../../../inc/messaging/views/_message_list.view.php:348
 #: ../../../inc/messaging/views/_thread.form.php:151
 #: ../../../inc/skins/model/_skin.class.php:690
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:414
 #: ../../../skins/touch/_item_comment_form.inc.php:361
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:422
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:455
@@ -2777,7 +2765,7 @@ msgstr "Локали"
 
 #: ../../../inc/_core/__core.init.php:1908
 #: ../../../inc/comments/views/_comment.form.php:229
-#: ../../../inc/regional/time.ctrl.php:92 ../inc/tools/system.ctrl.php:304
+#: ../../../inc/regional/time.ctrl.php:92 ../inc/tools/system.ctrl.php:305
 msgid "Time"
 msgstr "Время"
 
@@ -2913,8 +2901,8 @@ msgstr "1 минута"
 
 #: ../../../inc/_core/_misc.funcs.php:1683 ../inc/_core/_misc.funcs.php:1705
 #: ../../../inc/cron/views/_cronjob_list.view.php:272
-#: ../../../inc/tools/system.ctrl.php:521 ../inc/tools/system.ctrl.php:526
-#: ../../../inc/tools/system.ctrl.php:531
+#: ../../../inc/tools/system.ctrl.php:522 ../inc/tools/system.ctrl.php:527
+#: ../../../inc/tools/system.ctrl.php:532
 #, php-format
 msgid "%s seconds"
 msgstr "%s секунд"
@@ -3175,7 +3163,6 @@ msgstr "ID блога"
 #: ../../../inc/users/views/_userfields.view.php:198
 #: ../../../inc/users/views/_userfieldsgroup.form.php:40
 #: ../../../skins/basic/_item_comment_form.inc.php:74
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:298
 #: ../../../skins/touch/_item_comment_form.inc.php:238
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:301
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:322
@@ -3444,7 +3431,6 @@ msgstr "Список записей"
 #: ../../../skins/bootstrap_forums_skin/_search.disp.php:32
 #: ../../../skins/bootstrap_forums_skin/index.main.php:213
 #: ../../../skins/clean1_skin/posts.main.php:69
-#: ../../../skins/pureforums_skin/_search.disp.php:32
 msgid "Search"
 msgstr "Поиск"
 
@@ -3456,7 +3442,6 @@ msgstr "Карта сайта"
 
 #: ../../../inc/_core/_template.funcs.php:430
 #: ../../../inc/collections/views/_coll_home.form.php:45
-#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:269
 #: ../../../skins/bootstrap_blog_skin/index.main.php:267
 #: ../../../skins/bootstrap_forums_skin/index.main.php:286
 #: ../../../skins/bootstrap_main_skin/front.main.php:191
@@ -3478,7 +3463,6 @@ msgstr "Авторизоваться "
 #: ../inc/_core/_template.funcs.php:2488
 #: ../../../inc/users/model/_user.funcs.php:624
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:419
-#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:248
 #: ../../../skins/bootstrap_blog_skin/index.main.php:248
 #: ../../../skins/bootstrap_forums_skin/index.main.php:267
 #: ../../../skins/bootstrap_main_skin/front.main.php:170
@@ -3494,7 +3478,6 @@ msgstr "Регистрация"
 #: ../../../inc/_core/_template.funcs.php:435
 #: ../inc/_core/_template.funcs.php:436
 #: ../../../inc/users/views/_registration.form.php:109
-#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:255
 #: ../../../skins/bootstrap_blog_skin/index.main.php:255
 #: ../../../skins/bootstrap_forums_skin/index.main.php:274
 #: ../../../skins/bootstrap_main_skin/front.main.php:177
@@ -3592,8 +3575,6 @@ msgstr "Комметарии пользователя"
 #: ../../../skins/dating_mood/_item_block.inc.php:113
 #: ../../../skins/evopress/_item_block.inc.php:79
 #: ../../../skins/photoblog/_item_block.inc.php:184
-#: ../../../skins/pureforums_skin/_edit.disp.php:381
-#: ../../../skins/pureforums_skin/_item_block.inc.php:182
 #: ../../../skins/touch/_item_block.inc.php:96
 #: ../skins/touch/single.main.php:160
 #: ../../../skins_fallback_v5/_item_block.inc.php:89
@@ -3685,11 +3666,6 @@ msgstr "изображение {current} из {total}"
 #: ../../../skins/horizon_main_skin/_skin.class.php:533
 #: ../../../skins/photoblog/index.main.php:103
 #: ../skins/photoblog/index.main.php:121
-#: ../../../skins/pureforums_skin/_item_block.inc.php:271
-#: ../../../skins/pureforums_skin/_posts.disp.php:155
-#: ../../../skins/pureforums_skin/_posts.disp.php:213
-#: ../../../skins/pureforums_skin/_search.disp.php:52
-#: ../../../skins/pureforums_skin/_skin.class.php:433
 #: ../../../skins_adm/_adminUI_general.class.php:1026
 #: ../../../skins_adm/_adminUI_general.class.php:1106
 #: ../../../skins_adm/bootstrap/_adminUI.class.php:404
@@ -3710,11 +3686,6 @@ msgstr "Предыдущие"
 #: ../../../skins/horizon_main_skin/_skin.class.php:534
 #: ../../../skins/photoblog/index.main.php:104
 #: ../skins/photoblog/index.main.php:117
-#: ../../../skins/pureforums_skin/_item_block.inc.php:272
-#: ../../../skins/pureforums_skin/_posts.disp.php:156
-#: ../../../skins/pureforums_skin/_posts.disp.php:214
-#: ../../../skins/pureforums_skin/_search.disp.php:53
-#: ../../../skins/pureforums_skin/_skin.class.php:434
 #: ../../../skins_adm/_adminUI_general.class.php:1027
 #: ../../../skins_adm/_adminUI_general.class.php:1107
 #: ../../../skins_adm/bootstrap/_adminUI.class.php:405
@@ -3723,7 +3694,7 @@ msgid "Next"
 msgstr "Следующие"
 
 #: ../../../inc/_core/_template.funcs.php:1228
-#: ../../../inc/files/model/_file.class.php:2090
+#: ../../../inc/files/model/_file.class.php:2098
 #: ../../../inc/files/views/_file_list.inc.php:282
 msgid "Open in a new window"
 msgstr "Открыть в новом окне"
@@ -4465,7 +4436,6 @@ msgstr "Выбрать другой"
 #: ../../../inc/_core/ui/forms/_form.class.php:3704
 #: ../../../inc/items/views/_item_list_full.view.php:644
 #: ../../../inc/links/views/_link_list.inc.php:162
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:374
 #: ../../../skins/touch/_item_comment_form.inc.php:316
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:375
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:404
@@ -4549,8 +4519,6 @@ msgstr "Строк на странице:"
 #: ../../../inc/skins/model/_skin.class.php:1705
 #: ../../../inc/skins/model/_skin.class.php:1761
 #: ../../../inc/widgets/widgets/_coll_page_list.widget.php:60
-#: ../../../skins/pureforums_skin/_skin.class.php:365
-#: ../../../skins/pureforums_skin/_skin.class.php:422
 #: ../../../skins_adm/_adminUI_general.class.php:965
 #: ../../../skins_adm/_adminUI_general.class.php:1020
 #: ../../../skins_adm/_adminUI_general.class.php:1100
@@ -5178,8 +5146,6 @@ msgstr "IP автора"
 #: ../../../inc/messaging/views/_message_list.view.php:205
 #: ../../../inc/messaging/views/_thread.form.php:298
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:99
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:80
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:84
 #: ../../../skins_email/comment_new.txt.php:74
 #: ../skins_email/comment_new.txt.php:78
 #: ../../../skins_email/comment_spam.html.php:90
@@ -7223,6 +7189,8 @@ msgid ""
 "Finally, we can also display just the value of a specific field, like this: "
 "%s."
 msgstr ""
+"В заключение, мы также можем отображать только значение определенного поля, "
+"подобно этому: %s."
 
 #: ../../../inc/collections/_demo_content.funcs.php:1207
 msgid "Child Post Example"
@@ -8274,8 +8242,10 @@ msgid "Please enter a specific post ID"
 msgstr "Пожалуйста, введите ID специальной записи"
 
 #: ../../../inc/collections/model/_blog.class.php:822
-msgid "Old content alert must be numeric (1-12)."
-msgstr "Оповещение о старом контенте должно быть числом (1-12)."
+msgid "Stale content alert must be configured with a number of months."
+msgstr ""
+"Оповещение об устаревшем контенте должно быть сконфигурировано как "
+"количество месяцев."
 
 #: ../../../inc/collections/model/_blog.class.php:842
 #, php-format
@@ -8470,7 +8440,7 @@ msgstr ""
 
 #: ../../../inc/collections/model/_blog.class.php:2376
 msgid "Media directory file permission error"
-msgstr ""
+msgstr "Ошибка файловых прав медиа папки"
 
 #: ../../../inc/collections/model/_blog.class.php:2384
 #, php-format
@@ -8479,7 +8449,7 @@ msgstr "Медиа директория &laquo;%s&raquo; не может быт�
 
 #: ../../../inc/collections/model/_blog.class.php:2385
 msgid "Media directory creation error"
-msgstr ""
+msgstr "Ошибка создания медиа папки"
 
 #: ../../../inc/collections/model/_blog.class.php:2393
 msgid "Collection media directories created:"
@@ -8732,12 +8702,6 @@ msgstr ""
 #: ../../../skins/bootstrap_forums_skin/index.main.php:51
 #: ../../../skins/bootstrap_forums_skin/index.main.php:52
 #: ../../../skins/bootstrap_forums_skin/index.main.php:54
-#: ../../../skins/pureforums_skin/_edit.disp.php:71
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:45
-#: ../../../skins/pureforums_skin/index.main.php:49
-#: ../../../skins/pureforums_skin/index.main.php:70
-#: ../../../skins/pureforums_skin/index.main.php:71
-#: ../../../skins/pureforums_skin/index.main.php:73
 msgid "Forum"
 msgstr "Форум"
 
@@ -9188,7 +9152,7 @@ msgstr "Публичный список"
 #: ../../../inc/collections/model/_blog.funcs.php:1905
 #: ../../../inc/collections/views/_coll_advanced.form.php:110
 #: ../../../inc/collections/views/_coll_settings_blog.form.php:48
-#: ../../../inc/tools/system.ctrl.php:261
+#: ../../../inc/tools/system.ctrl.php:262
 msgid "Caching"
 msgstr "Кэширование"
 
@@ -9447,7 +9411,7 @@ msgstr "Редактирование из блога"
 #: ../../../inc/collections/views/_coll_advanced.form.php:132
 #, php-format
 msgid "See more options in Features &gt; <a %s>Posts</a>"
-msgstr ""
+msgstr "См. больше опций в Возможности &gt; <a %s>Записи</a>"
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:135
 #: ../../../inc/files/views/_file_browse_set.form.php:72
@@ -9469,7 +9433,7 @@ msgid "directory"
 msgstr "папка"
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:160
-#: ../../../inc/tools/system.ctrl.php:201
+#: ../../../inc/tools/system.ctrl.php:202
 msgid "Media directory"
 msgstr "Папка медиа"
 
@@ -9841,8 +9805,7 @@ msgstr "Автозаполнение имен пользователей в па
 #: ../../../skins/horizon_main_skin/_skin.class.php:272
 #: ../../../skins/photoalbums/_skin.class.php:189
 #: ../../../skins/photoblog/_skin.class.php:189
-#: ../../../skins/pureforums_skin/_skin.class.php:149
-#: ../../../skins/touch/_skin.class.php:116
+#: ../skins/touch/_skin.class.php:116
 msgid ""
 "Check to enable auto-completion of usernames entered after a \"@\" sign in "
 "the comment forms"
@@ -10229,9 +10192,9 @@ msgstr "Отметьте это, чтобы видеть список запис
 #: ../../../inc/collections/views/_coll_features.form.php:99
 #: ../../../inc/collections/views/_coll_features.form.php:105
 #: ../../../inc/files/views/_file_browse_set.form.php:39
-#: ../../../inc/tools/system.ctrl.php:337 ../inc/tools/system.ctrl.php:627
-#: ../../../inc/tools/system.ctrl.php:638 ../inc/tools/system.ctrl.php:659
-#: ../../../inc/tools/system.ctrl.php:662 ../inc/tools/system.ctrl.php:676
+#: ../../../inc/tools/system.ctrl.php:338 ../inc/tools/system.ctrl.php:628
+#: ../../../inc/tools/system.ctrl.php:639 ../inc/tools/system.ctrl.php:660
+#: ../../../inc/tools/system.ctrl.php:663 ../inc/tools/system.ctrl.php:677
 #: ../../../inc/users/views/_organization.form.php:61
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:137
 #: ../../../inc/widgets/widgets/_item_vote.widget.php:104
@@ -11794,8 +11757,8 @@ msgid "No notification about your new content will be sent out."
 msgstr "Никаких уведомлений о новом содержимом не будет отправлено."
 
 #: ../../../inc/collections/views/_coll_settings_blog.form.php:65
-#: ../../../inc/tools/system.ctrl.php:390 ../inc/tools/system.ctrl.php:404
-#: ../../../inc/tools/system.ctrl.php:423 ../inc/tools/system.ctrl.php:447
+#: ../../../inc/tools/system.ctrl.php:391 ../inc/tools/system.ctrl.php:405
+#: ../../../inc/tools/system.ctrl.php:424 ../inc/tools/system.ctrl.php:448
 msgid "Off"
 msgstr "Откл"
 
@@ -12599,8 +12562,8 @@ msgstr "Успешно"
 #: ../../../inc/tools/model/_email.funcs.php:1074
 #: ../../../inc/tools/model/_email.funcs.php:1118
 #: ../../../inc/tools/model/_email.funcs.php:1119
-#: ../inc/tools/system.ctrl.php:91 ../../../inc/tools/system.ctrl.php:723
-#: ../inc/tools/system.ctrl.php:765
+#: ../inc/tools/system.ctrl.php:92 ../../../inc/tools/system.ctrl.php:724
+#: ../inc/tools/system.ctrl.php:766
 msgid "Failed"
 msgstr "Неудачно"
 
@@ -12740,8 +12703,8 @@ msgstr "Голосовать как полезный!"
 
 #: ../../../inc/comments/model/_comment.class.php:1713
 #: ../../../inc/comments/model/_comment.class.php:1916
-msgid "You sent helpful vote."
-msgstr "Вы отправили голос как полезный."
+msgid "You sent a \"helpful\" vote."
+msgstr "Вы отправили \"полезный\" голос."
 
 #: ../../../inc/comments/model/_comment.class.php:1714
 #: ../../../inc/comments/model/_comment.class.php:1919
@@ -13079,7 +13042,6 @@ msgstr ""
 #: ../../../inc/items/views/_item_list_full.view.php:530
 #: ../../../skins/basic/_item_comment_form.inc.php:23
 #: ../../../skins/basic/_item_feedback.inc.php:184
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:28
 #: ../../../skins/touch/_item_comment_form.inc.php:27
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:27
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:28
@@ -13113,7 +13075,6 @@ msgstr "%d комментариев"
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:169
 #: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:144
 #: ../../../inc/widgets/widgets/_profile_menu_link.widget.php:111
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:152
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:115
 msgid "Visibility"
 msgstr "Видимость"
@@ -13148,7 +13109,6 @@ msgstr ""
 #: ../../../inc/comments/model/_comment.funcs.php:598
 #: ../../../inc/items/views/_item_list_full.view.php:607
 #: ../../../skins/basic/_item_comment_form.inc.php:102
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:29
 #: ../../../skins/touch/_item_comment_form.inc.php:28
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:28
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:29
@@ -13182,7 +13142,6 @@ msgstr ""
 #: ../../../inc/comments/model/_comment.funcs.php:906
 #: ../../../inc/items/views/_item_list_full.view.php:574
 #: ../../../skins/basic/_item_comment_form.inc.php:54
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:273
 #: ../../../skins/touch/_item_comment_form.inc.php:212
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:276
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:294
@@ -13295,7 +13254,6 @@ msgid "Comment contents"
 msgstr "Содержимое комментария"
 
 #: ../../../inc/comments/views/_comment.form.php:85
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:71
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:44
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:66
 msgid "In response to"
@@ -13306,14 +13264,12 @@ msgid "Move to post ID"
 msgstr "Переместить в запись (ID)"
 
 #: ../../../inc/comments/views/_comment.form.php:107
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:75
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:48
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:70
 msgid "(leave blank for normal comments)"
 msgstr "(оставьте пустым для обычных комментариев)"
 
 #: ../../../inc/comments/views/_comment.form.php:107
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:75
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:48
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:70
 msgid "In reply to comment ID"
@@ -13332,7 +13288,6 @@ msgstr ""
 " отправит ему email."
 
 #: ../../../inc/comments/views/_comment.form.php:130
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:86
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:59
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:81
 msgid "Website URL"
@@ -13340,7 +13295,6 @@ msgstr "URL сайта"
 
 #: ../../../inc/comments/views/_comment.form.php:207
 #: ../../../inc/comments/views/_comments_sidebar.view.php:126
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:133
 #: ../../../skins_email/comment_new.html.php:75
 #: ../../../skins_email/comment_new.txt.php:86
 #: ../../../skins_email/comment_spam.html.php:57
@@ -13376,9 +13330,6 @@ msgstr "Информация об отзыве"
 #: ../../../inc/messaging/views/_message_list.view.php:333
 #: ../../../inc/messaging/views/_thread.form.php:123
 #: ../../../inc/settings/views/_eblog.form.php:138
-#: ../../../skins/pureforums_skin/_edit.disp.php:367
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:159
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:341
 #: ../../../skins/touch/_item_comment_form.inc.php:349
 #: ../../../skins_fallback_v5/_edit.disp.php:301
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:122
@@ -13840,7 +13791,6 @@ msgstr "Почтовый сервер имеет следующие папки:"
 #: ../../../inc/messaging/views/_thread.form.php:97
 #: ../../../inc/tools/views/_email_sent.view.php:149
 #: ../../../inc/tools/views/_email_sent_details.view.php:44
-#: ../../../skins/pureforums_skin/_edit.disp.php:217
 #: ../../../skins_fallback_v5/_contact_msg.form.php:75
 #: ../../../skins_fallback_v6/_contact_msg.form.php:75
 msgid "Subject"
@@ -14006,7 +13956,7 @@ msgstr "Время вышло"
 #: ../../../inc/cron/views/_cronjob_list.view.php:192
 #: ../../../inc/tools/model/_email.funcs.php:219
 #: ../../../inc/tools/model/_email.funcs.php:223
-#: ../inc/tools/system.ctrl.php:210
+#: ../inc/tools/system.ctrl.php:211
 #: ../../../inc/tools/views/_email_return.view.php:130
 #: ../../../inc/tools/views/_email_return_details.view.php:30
 msgid "Error"
@@ -14258,11 +14208,9 @@ msgstr "Запланированная задача была создана дл
 
 #: ../../../inc/email_campaigns/model/_emailcampaign.class.php:642
 msgid ""
-"No scheduled job has not been created for this campaign because no there are"
-" no waiting recipients for this campaing."
+"No scheduled job has been created for this campaign because it has no "
+"waiting recipients."
 msgstr ""
-"Запланированная задача не была создана для этой кампании, потому что нет "
-"пользователей, ожидающих рассылку."
 
 #: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:123
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:28
@@ -15010,23 +14958,23 @@ msgstr "Папка"
 msgid "&lt;dir&gt;"
 msgstr "&lt;папка&gt;"
 
-#: ../../../inc/files/model/_file.class.php:2781
+#: ../../../inc/files/model/_file.class.php:2789
 msgid "Comment "
 msgstr "Комментарий"
 
-#: ../../../inc/files/model/_file.class.php:2838
+#: ../../../inc/files/model/_file.class.php:2846
 #: ../../../inc/links/model/_link.funcs.php:416
 #: ../../../inc/links/views/_link_list.inc.php:137
 msgid "Locate this directory!"
 msgstr "Найти эту папку!"
 
-#: ../../../inc/files/model/_file.class.php:2842
+#: ../../../inc/files/model/_file.class.php:2850
 #: ../../../inc/links/model/_link.funcs.php:416
 #: ../../../inc/links/views/_link_list.inc.php:139
 msgid "Locate this file!"
 msgstr "Найти этот файл!"
 
-#: ../../../inc/files/model/_file.class.php:3062
+#: ../../../inc/files/model/_file.class.php:3070
 #: ../../../inc/items/views/_item_history_compare.view.php:43
 #: ../../../inc/tools/views/_email_sent.view.php:130
 #: ../../../inc/tools/views/_email_sent_details.view.php:38
@@ -15035,7 +14983,7 @@ msgstr "Найти этот файл!"
 msgid "Deleted user"
 msgstr "Удаленный пользователь"
 
-#: ../../../inc/files/model/_file.class.php:3090
+#: ../../../inc/files/model/_file.class.php:3098
 #, php-format
 msgid "%d times by %s"
 msgstr "%d раз пользователями %s"
@@ -15836,7 +15784,6 @@ msgstr "Кол-во загрузок файла через disp=download"
 #: ../../../inc/files/views/_file_browse_set.form.php:50
 #: ../../../inc/users/views/_userfield.form.php:52
 #: ../../../skins/basic/_item_comment_form.inc.php:110
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:404
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:405
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:434
 msgid "Options"
@@ -16973,7 +16920,6 @@ msgstr "Удалить эту запись"
 #: ../../../inc/items/items.ctrl.php:1651
 #: ../inc/items/model/_item.class.php:4257
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:269
-#: ../../../skins/pureforums_skin/_item_block.inc.php:200
 msgid "You are about to delete this post!\\nThis cannot be undone!"
 msgstr "Вы собираетесь удалить эту запись! \\nЭто необратимо!"
 
@@ -17284,8 +17230,6 @@ msgstr "Страницы:"
 #: ../../../skins/bootstrap_gallery_skin/single.main.php:260
 #: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:133
 #: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:199
-#: ../../../skins/pureforums_skin/_edit.disp.php:396
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:169
 #: ../../../skins_email/comment_new.html.php:93
 #: ../../../skins_email/comment_new.txt.php:102
 #: ../../../skins_email/comment_spam.html.php:72
@@ -17523,13 +17467,11 @@ msgstr ""
 #: ../../../inc/items/model/_item.class.php:8175
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:64
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:442
-#: ../../../skins/pureforums_skin/_legend.inc.php:64
 msgid "New topic"
 msgstr "Новый топик"
 
 #: ../../../inc/items/model/_item.class.php:8176
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:68
-#: ../../../skins/pureforums_skin/_legend.inc.php:68
 msgid "Updated topic"
 msgstr "Обновленный топик"
 
@@ -17687,17 +17629,14 @@ msgstr "Введения"
 
 #: ../../../inc/items/model/_item.funcs.php:1730
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:156
-#: ../../../skins/pureforums_skin/_edit.disp.php:293
 msgid "Issue date"
 msgstr "Дата создания"
 
 #: ../../../inc/items/model/_item.funcs.php:1737
-#: ../../../skins/pureforums_skin/_edit.disp.php:290
 msgid "Update to NOW"
 msgstr "Установить текущую дату"
 
 #: ../../../inc/items/model/_item.funcs.php:1746
-#: ../../../skins/pureforums_skin/_edit.disp.php:291
 msgid "Set to"
 msgstr "Выбрать дату"
 
@@ -18493,32 +18432,27 @@ msgstr "Долгота"
 
 #: ../../../inc/items/views/_item_expert.form.php:728
 #: ../../../inc/items/views/_item_mass.form.php:189
-#: ../../../skins/pureforums_skin/_edit.disp.php:335
 msgid "Visitors can leave comments on this post."
 msgstr "Посетители могут оставлять комментарии к этой записи."
 
 #: ../../../inc/items/views/_item_expert.form.php:729
 #: ../../../inc/items/views/_item_mass.form.php:190
-#: ../../../skins/pureforums_skin/_edit.disp.php:335
 msgid "Open"
 msgstr "Открыто"
 
 #: ../../../inc/items/views/_item_expert.form.php:734
 #: ../../../inc/items/views/_item_mass.form.php:195
-#: ../../../skins/pureforums_skin/_edit.disp.php:338
 msgid "Visitors can NOT leave comments on this post."
 msgstr "Посетители НЕ могут оставлять комментарии к этой записи."
 
 #: ../../../inc/items/views/_item_expert.form.php:735
 #: ../../../inc/items/views/_item_mass.form.php:196
 #: ../../../inc/users/model/_user.funcs.php:3573
-#: ../../../skins/pureforums_skin/_edit.disp.php:338
 msgid "Closed"
 msgstr "Закрыто"
 
 #: ../../../inc/items/views/_item_expert.form.php:742
 #: ../../../inc/items/views/_item_mass.form.php:203
-#: ../../../skins/pureforums_skin/_edit.disp.php:342
 msgid "Visitors cannot see nor leave comments on this post."
 msgstr ""
 "Посетители не могут ни оставлять, ни просматривать комментарии к этой "
@@ -18526,8 +18460,7 @@ msgstr ""
 
 #: ../../../inc/items/views/_item_expert.form.php:743
 #: ../../../inc/items/views/_item_mass.form.php:204
-#: ../inc/tools/system.ctrl.php:760
-#: ../../../skins/pureforums_skin/_edit.disp.php:342
+#: ../inc/tools/system.ctrl.php:761
 msgid "Disabled"
 msgstr "Запрещено"
 
@@ -18774,13 +18707,11 @@ msgstr ""
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:40
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:427
 #: ../../../skins/basic/_item_comment_form.inc.php:65
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:288
 #: ../../../skins/touch/_item_comment_form.inc.php:228
 msgid "Edit profile"
 msgstr "Редактирование профиля"
 
 #: ../../../inc/items/views/_item_list_full.view.php:594
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:311
 #: ../../../skins/touch/_item_comment_form.inc.php:251
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:317
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:338
@@ -18788,7 +18719,6 @@ msgid "Your vote"
 msgstr "Ваша оценка"
 
 #: ../../../inc/items/views/_item_list_full.view.php:636
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:367
 #: ../../../skins/touch/_item_comment_form.inc.php:309
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:368
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:397
@@ -18796,7 +18726,6 @@ msgid "Attached files"
 msgstr "Прикрепленные файлы"
 
 #: ../../../inc/items/views/_item_list_full.view.php:663
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:414
 #: ../../../skins/touch/_item_comment_form.inc.php:361
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:422
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:455
@@ -18805,7 +18734,6 @@ msgstr "Просмотр/Добавить файл"
 
 #: ../../../inc/items/views/_item_list_full.view.php:666
 #: ../../../skins/basic/_item_comment_form.inc.php:124
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:30
 #: ../../../skins/touch/_item_comment_form.inc.php:29
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:29
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:30
@@ -18953,7 +18881,6 @@ msgid "Create posts"
 msgstr "Создать записи"
 
 #: ../../../inc/items/views/_item_mass.form.php:164
-#: ../../../skins/pureforums_skin/_edit.disp.php:357
 #: ../../../skins_fallback_v5/_edit.disp.php:277
 msgid "Visibility / Sharing"
 msgstr "Видимость / Доступность"
@@ -20648,8 +20575,8 @@ msgstr "Копируем &laquo;<strong>%s</strong>&raquo; ..."
 #: ../../../inc/maintenance/model/_backup.class.php:414
 #: ../../../inc/maintenance/model/_backup.class.php:625
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:310
-#: ../../../inc/tools/system.ctrl.php:93 ../inc/tools/system.ctrl.php:716
-#: ../../../inc/tools/system.ctrl.php:721 ../inc/tools/system.ctrl.php:769
+#: ../../../inc/tools/system.ctrl.php:94 ../inc/tools/system.ctrl.php:717
+#: ../../../inc/tools/system.ctrl.php:722 ../inc/tools/system.ctrl.php:770
 #, php-format
 msgid "Error: %s"
 msgstr "Ошибка: %s"
@@ -22135,52 +22062,52 @@ msgstr "Нажмите %s для доступа к полной документ
 msgid "Edit plugin settings!"
 msgstr "Редактировать настройки плагина!"
 
-#: ../../../inc/plugins/_plugin.funcs.php:411
+#: ../../../inc/plugins/_plugin.funcs.php:445
 #, php-format
 msgid "Add a new set of &laquo;%s&raquo;"
 msgstr "Добавить новый набор &laquo;%s&raquo;"
 
-#: ../../../inc/plugins/_plugin.funcs.php:501
+#: ../../../inc/plugins/_plugin.funcs.php:535
 msgid "Note: before adding a new set you have to save any changes."
 msgstr ""
 "Примечание: прежде чем добавить новый набор, вы должны сохранить любые "
 "изменения."
 
-#: ../../../inc/plugins/_plugin.funcs.php:898
+#: ../../../inc/plugins/_plugin.funcs.php:961
 #, php-format
 msgid "Too many entries in the \"%s\" set. It must have %d at most."
 msgstr "Слишком много записей в наборе \"%s\". Должно быть не более %d."
 
-#: ../../../inc/plugins/_plugin.funcs.php:904
+#: ../../../inc/plugins/_plugin.funcs.php:967
 #, php-format
 msgid "Too few entries in the \"%s\" set. It must have %d at least."
 msgstr "Слишком мало записей в наборе \"%s\". Должно быть не менее %d."
 
-#: ../../../inc/plugins/_plugin.funcs.php:936
-#: ../inc/plugins/_plugin.funcs.php:944
+#: ../../../inc/plugins/_plugin.funcs.php:999
+#: ../inc/plugins/_plugin.funcs.php:1007
 #, php-format
 msgid "The value for &laquo;%s&raquo; must be numeric."
 msgstr "Значение для &laquo;%s&raquo; должно быть цифровым."
 
-#: ../../../inc/plugins/_plugin.funcs.php:936
-#: ../inc/plugins/_plugin.funcs.php:944
+#: ../../../inc/plugins/_plugin.funcs.php:999
+#: ../inc/plugins/_plugin.funcs.php:1007
 msgid "The value must be numeric."
 msgstr "Значение должно быть цифровым."
 
-#: ../../../inc/plugins/_plugin.funcs.php:955
-#: ../inc/plugins/_plugin.funcs.php:966
-#: ../../../inc/plugins/_plugin.funcs.php:1000
-#: ../inc/plugins/_plugin.funcs.php:1014
-#: ../../../inc/plugins/_plugin.funcs.php:1049
+#: ../../../inc/plugins/_plugin.funcs.php:1018
+#: ../inc/plugins/_plugin.funcs.php:1029
+#: ../../../inc/plugins/_plugin.funcs.php:1063
+#: ../inc/plugins/_plugin.funcs.php:1077
+#: ../../../inc/plugins/_plugin.funcs.php:1112
 #, php-format
 msgid "Invalid option &laquo;%s&raquo;."
 msgstr "Недопустимая опция &laquo;%s&raquo;."
 
-#: ../../../inc/plugins/_plugin.funcs.php:1063
+#: ../../../inc/plugins/_plugin.funcs.php:1126
 msgid "The value is too long."
 msgstr "Значение слишком большое."
 
-#: ../../../inc/plugins/_plugin.funcs.php:1073
+#: ../../../inc/plugins/_plugin.funcs.php:1136
 #, php-format
 msgid ""
 "The value is invalid. It must match the regular expression &laquo;%s&raquo;."
@@ -22188,26 +22115,26 @@ msgstr ""
 "Значение недопустимо. Оно должно быть регулярным выражением "
 "&laquo;%s&raquo;."
 
-#: ../../../inc/plugins/_plugin.funcs.php:1105
+#: ../../../inc/plugins/_plugin.funcs.php:1168
 #, php-format
 msgid "The value is invalid. It must be in the range from %s to %s."
 msgstr "Зачение недопустимо. Оно должно быть в диапазоне от %s до %s."
 
-#: ../../../inc/plugins/_plugin.funcs.php:1109
+#: ../../../inc/plugins/_plugin.funcs.php:1172
 #, php-format
 msgid "The value is invalid. It must be smaller than or equal to %s."
 msgstr "Значение недопустимо. Оно должно быть меньше либо равным %s."
 
-#: ../../../inc/plugins/_plugin.funcs.php:1113
+#: ../../../inc/plugins/_plugin.funcs.php:1176
 #, php-format
 msgid "The value is invalid. It must be greater than or equal to %s."
 msgstr "Значение недопустимо. Оно должно быть больше либо равным %s."
 
-#: ../../../inc/plugins/_plugin.funcs.php:1231
+#: ../../../inc/plugins/_plugin.funcs.php:1294
 msgid "The database has been updated."
 msgstr "База данных обновлена."
 
-#: ../../../inc/plugins/_plugin.funcs.php:1235
+#: ../../../inc/plugins/_plugin.funcs.php:1298
 #: ../../../install/_functions_evoupgrade.php:8356
 msgid "The DB schema has been changed since confirmation."
 msgstr "Структура базы данных была изменена после подтверждения."
@@ -23854,10 +23781,9 @@ msgid "Refered browser hits"
 msgstr "Хиты браузеров"
 
 #: ../../../inc/sessions/model/_hitlog.funcs.php:480
-#: ../../../inc/tools/system.ctrl.php:487
+#: ../../../inc/tools/system.ctrl.php:488
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:152
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:259
-#: ../../../skins/pureforums_skin/_item_list.inc.php:126
 msgid "n.a."
 msgstr "н/д"
 
@@ -25215,8 +25141,6 @@ msgstr "Предварительный просмотр блога с этой �
 #: ../../../skins/horizon_blog_skin/_skin.class.php:392
 #: ../../../skins/horizon_main_skin/_skin.class.php:537
 #: ../../../skins/horizon_main_skin/_skin.class.php:538
-#: ../../../skins/pureforums_skin/_skin.class.php:437
-#: ../../../skins/pureforums_skin/_skin.class.php:438
 #: ../../../skins_adm/_adminUI_general.class.php:1030
 #: ../../../skins_adm/_adminUI_general.class.php:1031
 #: ../../../skins_adm/_adminUI_general.class.php:1110
@@ -26591,17 +26515,17 @@ msgstr ""
 "данных, запустив инструмент <a %s>Проверить/Конвертировать/Нормализовать "
 "кодировки/представления, используемые Базой Данных (UTF-8 / ASCII)</a>."
 
-#: ../../../inc/tools/system.ctrl.php:92 ../inc/tools/system.ctrl.php:724
-#: ../../../inc/tools/system.ctrl.php:739
+#: ../../../inc/tools/system.ctrl.php:93 ../inc/tools/system.ctrl.php:725
+#: ../../../inc/tools/system.ctrl.php:740
 msgid "This API doesn't work properly on this server."
 msgstr "Этот API не работает правильно на этом сервере."
 
-#: ../../../inc/tools/system.ctrl.php:93 ../inc/tools/system.ctrl.php:716
+#: ../../../inc/tools/system.ctrl.php:94 ../inc/tools/system.ctrl.php:717
 #, php-format
 msgid "Status code: %s"
 msgstr "Код статуса: %s"
 
-#: ../../../inc/tools/system.ctrl.php:97
+#: ../../../inc/tools/system.ctrl.php:98
 msgid ""
 "When enabled, this feature is known to facilitate hacking exploits in any "
 "PHP application."
@@ -26609,7 +26533,7 @@ msgstr ""
 "Когда включено, эта возможность, как известно, облегчает взлом эксплоитами в"
 " любом PHP приложении."
 
-#: ../../../inc/tools/system.ctrl.php:98
+#: ../../../inc/tools/system.ctrl.php:99
 msgid ""
 "b2evolution includes additional measures in order not to be affected by "
 "this. However, for maximum security, we still recommend disabling this PHP "
@@ -26619,7 +26543,7 @@ msgstr ""
 "от этого. Однако, для обеспечения максимальной безопасности, мы по-прежнему "
 "рекомендуем отключить эту функцию PHP."
 
-#: ../../../inc/tools/system.ctrl.php:99
+#: ../../../inc/tools/system.ctrl.php:100
 #, php-format
 msgid ""
 "If possible, change this setting to <code>%s</code> in your php.ini or ask "
@@ -26628,25 +26552,25 @@ msgstr ""
 "Если возможно, измените эту настройку на <code>%s</code> в вашем php.ini или"
 " попросите провайдера вашего хостинга сделать это."
 
-#: ../../../inc/tools/system.ctrl.php:102
+#: ../../../inc/tools/system.ctrl.php:103
 msgid "System status"
 msgstr "О системе"
 
-#: ../../../inc/tools/system.ctrl.php:151
+#: ../../../inc/tools/system.ctrl.php:152
 msgid "Instance name"
 msgstr "Системное имя"
 
 #. TRANS: First %s: App version, second %s: release date
-#: ../../../inc/tools/system.ctrl.php:156
+#: ../../../inc/tools/system.ctrl.php:157
 #, php-format
 msgid "%s released on %s"
 msgstr "%s, дата релиза %s"
 
-#: ../../../inc/tools/system.ctrl.php:156
+#: ../../../inc/tools/system.ctrl.php:157
 msgid "b2evolution version"
 msgstr "b2evolution версии"
 
-#: ../../../inc/tools/system.ctrl.php:181
+#: ../../../inc/tools/system.ctrl.php:182
 #, php-format
 msgid ""
 "Furthermore, this version is old. You should check for newer releases on %s."
@@ -26654,7 +26578,7 @@ msgstr ""
 "К тому же, эта версия сильно устарела. Вам следует проверить новые релизы на"
 " <a %s>b2evolution.net</a>."
 
-#: ../../../inc/tools/system.ctrl.php:186
+#: ../../../inc/tools/system.ctrl.php:187
 #, php-format
 msgid ""
 "Furthermore, this version is aging. You may want to check for newer releases"
@@ -26662,7 +26586,7 @@ msgid ""
 msgstr ""
 "К тому же, эта версия устарела. Вы можете проверить новые релизы на %s."
 
-#: ../../../inc/tools/system.ctrl.php:198
+#: ../../../inc/tools/system.ctrl.php:199
 msgid ""
 "You will not be able to upload files/images and b2evolution will not be able"
 " to generate thumbnails."
@@ -26670,7 +26594,7 @@ msgstr ""
 "Вы не сможете загружать файлы и изображения, b2evolution не сможет "
 "генерировать миниатюры изображений."
 
-#: ../../../inc/tools/system.ctrl.php:199
+#: ../../../inc/tools/system.ctrl.php:200
 msgid ""
 "Your host requires that you set special file permissions on your media "
 "directory."
@@ -26678,34 +26602,34 @@ msgstr ""
 "Ваш сервер требует от вас назначения специальных разрешений для папки "
 "/media."
 
-#: ../../../inc/tools/system.ctrl.php:210 ../inc/tools/system.ctrl.php:214
+#: ../../../inc/tools/system.ctrl.php:211 ../inc/tools/system.ctrl.php:215
 #, php-format
 msgid "%s has not been found."
 msgstr "%s не был найден."
 
-#: ../../../inc/tools/system.ctrl.php:218
+#: ../../../inc/tools/system.ctrl.php:219
 #, php-format
 msgid "%s differs from %s"
 msgstr "%s отличается от %s"
 
-#: ../../../inc/tools/system.ctrl.php:222
+#: ../../../inc/tools/system.ctrl.php:223
 #, php-format
 msgid "%s is identical to %s"
 msgstr "%s - одинаковый с %s"
 
-#: ../../../inc/tools/system.ctrl.php:226
+#: ../../../inc/tools/system.ctrl.php:227
 msgid "Deleted"
 msgstr "Удалено"
 
-#: ../../../inc/tools/system.ctrl.php:226
+#: ../../../inc/tools/system.ctrl.php:227
 msgid "Install folder"
 msgstr "Установочная папка"
 
-#: ../../../inc/tools/system.ctrl.php:226
+#: ../../../inc/tools/system.ctrl.php:227
 msgid "Not deleted"
 msgstr "Не удалено"
 
-#: ../../../inc/tools/system.ctrl.php:229
+#: ../../../inc/tools/system.ctrl.php:230
 msgid ""
 "For maximum security, it is recommended that you delete your /blogs/install/"
 " folder once you are done with install or upgrade."
@@ -26713,20 +26637,20 @@ msgstr ""
 "Для максимальной безопасности, рекомендуется удалить вашу папку "
 "/blogs/install/ после того как вы закончили установку или обновление."
 
-#: ../../../inc/tools/system.ctrl.php:232
+#: ../../../inc/tools/system.ctrl.php:233
 msgid "Allowed!"
 msgstr "Разрешено!"
 
-#: ../../../inc/tools/system.ctrl.php:232
+#: ../../../inc/tools/system.ctrl.php:233
 msgid "Database reset"
 msgstr "Сброс базы данных"
 
-#: ../../../inc/tools/system.ctrl.php:232
+#: ../../../inc/tools/system.ctrl.php:233
 #: ../../../inc/users/model/_userfield.class.php:130
 msgid "Forbidden"
 msgstr "Запрещено"
 
-#: ../../../inc/tools/system.ctrl.php:235
+#: ../../../inc/tools/system.ctrl.php:236
 msgid ""
 "Currently, anyone who accesses your install folder could entirely reset your"
 " b2evolution database."
@@ -26734,11 +26658,11 @@ msgstr ""
 "В настоящее время любой, кто попадет в папку install, сможет полностью "
 "сбросить вашу базу данных b2evolution."
 
-#: ../../../inc/tools/system.ctrl.php:236
+#: ../../../inc/tools/system.ctrl.php:237
 msgid "ALL YOUR DATA WOULD BE LOST!"
 msgstr "ВСЕ ВАШИ ДАННЫЕ БУДУТ УТЕРЯНЫ!"
 
-#: ../../../inc/tools/system.ctrl.php:237
+#: ../../../inc/tools/system.ctrl.php:238
 msgid ""
 "As soon as possible, change the setting <code>$allow_evodb_reset = 0;</code>"
 " in your /conf/_basic.config.php."
@@ -26746,11 +26670,11 @@ msgstr ""
 "Как можно быстрее измените значение функции <code>$allow_evodb_reset = "
 "0;</code> в вашем /conf/_basic.config.php."
 
-#: ../../../inc/tools/system.ctrl.php:269
+#: ../../../inc/tools/system.ctrl.php:270
 msgid "You will not be able to use page cache."
 msgstr "Вы не сможете использовать кэширование страниц."
 
-#: ../../../inc/tools/system.ctrl.php:270
+#: ../../../inc/tools/system.ctrl.php:271
 msgid ""
 "Your host requires that you set special file permissions on your cache "
 "directory."
@@ -26758,57 +26682,57 @@ msgstr ""
 "Ваш сервер требует от вас назначения специальных разрешений для директории с"
 " кэшем."
 
-#: ../../../inc/tools/system.ctrl.php:272
+#: ../../../inc/tools/system.ctrl.php:273
 msgid "Cache directory"
 msgstr "Директория для кэша"
 
-#: ../../../inc/tools/system.ctrl.php:283
+#: ../../../inc/tools/system.ctrl.php:284
 msgid "General caching"
 msgstr "Глобальный кэш"
 
-#: ../../../inc/tools/system.ctrl.php:289
+#: ../../../inc/tools/system.ctrl.php:290
 msgid "Blog's cache setting"
 msgstr "Настройки кэша блогов"
 
-#: ../../../inc/tools/system.ctrl.php:293
+#: ../../../inc/tools/system.ctrl.php:294
 msgid "Blog's cache errors"
 msgstr "Ошибки в кэше блогов"
 
-#: ../../../inc/tools/system.ctrl.php:307
+#: ../../../inc/tools/system.ctrl.php:308
 msgid "Server time"
 msgstr "Время на сервере"
 
-#: ../../../inc/tools/system.ctrl.php:310
+#: ../../../inc/tools/system.ctrl.php:311
 msgid "GMT / UTC time"
 msgstr "Время GMT / UTC"
 
-#: ../../../inc/tools/system.ctrl.php:313
+#: ../../../inc/tools/system.ctrl.php:314
 msgid "b2evolution time"
 msgstr "Время в b2evolution"
 
-#: ../../../inc/tools/system.ctrl.php:326
+#: ../../../inc/tools/system.ctrl.php:327
 msgid "MySQL version"
 msgstr "Версия MySQL"
 
-#: ../../../inc/tools/system.ctrl.php:329
+#: ../../../inc/tools/system.ctrl.php:330
 #, php-format
 msgid "This version is too old. The minimum recommended MySQL version is %s."
 msgstr ""
 "Эта версия очень устаревшая. Минимально рекомендуемая MySQL версия - %s."
 
-#: ../../../inc/tools/system.ctrl.php:337 ../inc/tools/system.ctrl.php:676
+#: ../../../inc/tools/system.ctrl.php:338 ../inc/tools/system.ctrl.php:677
 msgid "Yes"
 msgstr "Да"
 
-#: ../../../inc/tools/system.ctrl.php:340
+#: ../../../inc/tools/system.ctrl.php:341
 msgid "UTF-8 is not supported by your MySQL server."
 msgstr "UTF-8 не поддерживается вашим MySQL сервером."
 
-#: ../../../inc/tools/system.ctrl.php:371
+#: ../../../inc/tools/system.ctrl.php:372
 msgid "View PHP info"
 msgstr "Информация о PHP"
 
-#: ../../../inc/tools/system.ctrl.php:376
+#: ../../../inc/tools/system.ctrl.php:377
 msgid ""
 "This version is too old. b2evolution will not run correctly. You must ask "
 "your host to upgrade PHP before you can run b2evolution."
@@ -26817,7 +26741,7 @@ msgstr ""
 "должны попросить администратора вашего хостинга обновить PHP перед тем как "
 "вы сможете запустить b2evolution."
 
-#: ../../../inc/tools/system.ctrl.php:380
+#: ../../../inc/tools/system.ctrl.php:381
 msgid ""
 "This version is old. b2evolution may run but some features may fail. You "
 "should ask your host to upgrade PHP before running b2evolution."
@@ -26826,7 +26750,7 @@ msgstr ""
 " будут. Вы должны попросить администратора вашего хостинга обновить PHP "
 "перед запуском b2evolution."
 
-#: ../../../inc/tools/system.ctrl.php:382
+#: ../../../inc/tools/system.ctrl.php:383
 msgid ""
 "PHP 5.2 or greater is recommended for maximum security, especially for "
 "\"httpOnly\" cookies support."
@@ -26834,13 +26758,13 @@ msgstr ""
 "PHP 5.2 или выше рекомендуется для максимальной безопасности, в особенности "
 "для поддержки \"httpOnly\" куков."
 
-#: ../../../inc/tools/system.ctrl.php:390 ../inc/tools/system.ctrl.php:404
-#: ../../../inc/tools/system.ctrl.php:423 ../inc/tools/system.ctrl.php:437
-#: ../../../inc/tools/system.ctrl.php:442
+#: ../../../inc/tools/system.ctrl.php:391 ../inc/tools/system.ctrl.php:405
+#: ../../../inc/tools/system.ctrl.php:424 ../inc/tools/system.ctrl.php:438
+#: ../../../inc/tools/system.ctrl.php:443
 msgid "On"
 msgstr "Вкл"
 
-#: ../../../inc/tools/system.ctrl.php:453
+#: ../../../inc/tools/system.ctrl.php:454
 msgid ""
 "PHP is adding extra quotes to all inputs. This leads to unnecessary extra "
 "processing."
@@ -26848,11 +26772,11 @@ msgstr ""
 "PHP добавляет дополнительные кавычки во все транзакции. Это приводит к "
 "необоснованным затратам ресурсов."
 
-#: ../../../inc/tools/system.ctrl.php:476 ../inc/tools/system.ctrl.php:480
+#: ../../../inc/tools/system.ctrl.php:477 ../inc/tools/system.ctrl.php:481
 msgid "post_max_size should be larger than upload_max_filesize"
 msgstr "post_max_size должен быть больше чем upload_max_filesize"
 
-#: ../../../inc/tools/system.ctrl.php:495
+#: ../../../inc/tools/system.ctrl.php:496
 msgid ""
 "The memory_limit is too low. Some features like image manipulation will fail"
 " to work."
@@ -26860,7 +26784,7 @@ msgstr ""
 "Лимит памяти memory_limit слишком мал. Некоторые функции, такие как "
 "манипуляция изображениями, не будут работать."
 
-#: ../../../inc/tools/system.ctrl.php:499
+#: ../../../inc/tools/system.ctrl.php:500
 msgid ""
 "The memory_limit is low. Some features like image manipulation of large "
 "files may fail to work."
@@ -26868,11 +26792,11 @@ msgstr ""
 "Лимит памяти memory_limit слишком мал. Некоторые функции, такие как "
 "манипуляция большими файлами, не будут работать."
 
-#: ../../../inc/tools/system.ctrl.php:511
+#: ../../../inc/tools/system.ctrl.php:512
 msgid "Unlimited"
 msgstr "Неограниченно."
 
-#: ../../../inc/tools/system.ctrl.php:522
+#: ../../../inc/tools/system.ctrl.php:523
 #, php-format
 msgid ""
 "b2evolution was able to request more time (than the default %s seconds) to "
@@ -26881,29 +26805,29 @@ msgstr ""
 "b2evolution имеет возможность запросить больше времени (чем %s секунд по "
 "умолчанию), чтобы выполнить сложные задачи."
 
-#: ../../../inc/tools/system.ctrl.php:527
+#: ../../../inc/tools/system.ctrl.php:528
 msgid "b2evolution may frequently run out of time to execute properly."
 msgstr ""
 "b2evolution возможно будет часто работать в режиме превышения времени, чтобы"
 " должным образом выполнить код."
 
-#: ../../../inc/tools/system.ctrl.php:532
+#: ../../../inc/tools/system.ctrl.php:533
 msgid "b2evolution may sometimes run out of time to execute properly."
 msgstr ""
 "b2evolution возможно будет иногда работать в режиме превышения времени, "
 "чтобы должным образом выполнить код."
 
-#: ../../../inc/tools/system.ctrl.php:537 ../inc/tools/system.ctrl.php:549
-#: ../../../inc/tools/system.ctrl.php:564
+#: ../../../inc/tools/system.ctrl.php:538 ../inc/tools/system.ctrl.php:550
+#: ../../../inc/tools/system.ctrl.php:565
 msgid "Loaded"
 msgstr "Загружено"
 
-#: ../../../inc/tools/system.ctrl.php:537 ../inc/tools/system.ctrl.php:549
-#: ../../../inc/tools/system.ctrl.php:564
+#: ../../../inc/tools/system.ctrl.php:538 ../inc/tools/system.ctrl.php:550
+#: ../../../inc/tools/system.ctrl.php:565
 msgid "Not loaded"
 msgstr "Не загружено"
 
-#: ../../../inc/tools/system.ctrl.php:540
+#: ../../../inc/tools/system.ctrl.php:541
 msgid ""
 "b2evolution will not be able to convert character sets and special "
 "characters/languages may not be displayed correctly. Enable the mbstring "
@@ -26913,11 +26837,11 @@ msgstr ""
 "Активируйте расширение mbstring в вашем php.ini файле или попросите "
 "провайдера вашего хостинга сделать это."
 
-#: ../../../inc/tools/system.ctrl.php:552
+#: ../../../inc/tools/system.ctrl.php:553
 msgid "The XML extension is not loaded."
 msgstr "Расширение XML не загружено."
 
-#: ../../../inc/tools/system.ctrl.php:567
+#: ../../../inc/tools/system.ctrl.php:568
 msgid ""
 "You will not be able to use the Post by Email feature and the Return Path "
 "email processing of b2evolution. Enable the IMAP extension in your php.ini "
@@ -26927,7 +26851,7 @@ msgstr ""
 "Писем в b2evolution. Включите IMAP расширение в вашем файле php.ini или "
 "попросите об этом провайдера вашего хостинга."
 
-#: ../../../inc/tools/system.ctrl.php:579
+#: ../../../inc/tools/system.ctrl.php:580
 msgid ""
 "Using an opcode cache allows all your PHP scripts to run faster by caching a"
 " \"compiled\" (opcode) version of the scripts instead of recompiling "
@@ -26940,7 +26864,7 @@ msgstr ""
 " opcode кэширования. Мы рекомендуем APC (которая включена в PHP, начиная с "
 "PHP 7)."
 
-#: ../../../inc/tools/system.ctrl.php:591
+#: ../../../inc/tools/system.ctrl.php:592
 msgid ""
 "Using an user cache allows b2evolution to store some cached data (Block "
 "Cache) in memory instead of regenerated the blocks at each page load. "
@@ -26953,19 +26877,19 @@ msgstr ""
 "пользовательского кэширования. Мы рекомендуем APCu (которая требует "
 "включения отдельно от APC, начиная с PHP 7)."
 
-#: ../../../inc/tools/system.ctrl.php:610
+#: ../../../inc/tools/system.ctrl.php:611
 msgid "GD Library (image handling)"
 msgstr "GD библиотека (обработка изображений)"
 
-#: ../../../inc/tools/system.ctrl.php:614
+#: ../../../inc/tools/system.ctrl.php:615
 msgid "GD Library version"
 msgstr "Версия GD Library"
 
-#: ../../../inc/tools/system.ctrl.php:614
+#: ../../../inc/tools/system.ctrl.php:615
 msgid "Not installed"
 msgstr "Не установлена"
 
-#: ../../../inc/tools/system.ctrl.php:617
+#: ../../../inc/tools/system.ctrl.php:618
 msgid ""
 "You will not be able to automatically generate thumbnails for images. Enable"
 " the gd2 extension in your php.ini file or ask your hosting provider about "
@@ -26975,48 +26899,48 @@ msgstr ""
 "Активируйте расширение gd2 в вашем php.ini файле или попросите провайдера "
 "вашего хостинга сделать это."
 
-#: ../../../inc/tools/system.ctrl.php:627 ../inc/tools/system.ctrl.php:638
-#: ../../../inc/tools/system.ctrl.php:651
+#: ../../../inc/tools/system.ctrl.php:628 ../inc/tools/system.ctrl.php:639
+#: ../../../inc/tools/system.ctrl.php:652
 msgid "Read/Write"
 msgstr "Чтение / Запись"
 
-#: ../../../inc/tools/system.ctrl.php:630
+#: ../../../inc/tools/system.ctrl.php:631
 msgid ""
 "You will not be able to automatically generate thumbnails for JPG images."
 msgstr ""
 "Вы не сможете автоматически генерировать миниатюры для изображений JPG."
 
-#: ../../../inc/tools/system.ctrl.php:641
+#: ../../../inc/tools/system.ctrl.php:642
 msgid ""
 "You will not be able to automatically generate thumbnails for PNG images."
 msgstr ""
 "Вы не сможете автоматически генерировать миниатюры для изображений PNG."
 
-#: ../../../inc/tools/system.ctrl.php:655 ../inc/tools/system.ctrl.php:666
+#: ../../../inc/tools/system.ctrl.php:656 ../inc/tools/system.ctrl.php:667
 msgid "Read"
 msgstr "Читать"
 
-#: ../../../inc/tools/system.ctrl.php:664
+#: ../../../inc/tools/system.ctrl.php:665
 msgid ""
 "You will not be able to automatically generate thumbnails for GIF images."
 msgstr ""
 "Вы не сможете автоматически генерировать миниатюры для изображений GIF."
 
-#: ../../../inc/tools/system.ctrl.php:668
+#: ../../../inc/tools/system.ctrl.php:669
 msgid "Thumbnails for GIF images will be generated as PNG or JPG."
 msgstr "Миниатюры для GIF изображений будут генерированы как PNG или JPG."
 
-#: ../../../inc/tools/system.ctrl.php:679
+#: ../../../inc/tools/system.ctrl.php:680
 msgid "You will not be able to write text to images using TrueType fonts."
 msgstr ""
 "Вы не сможете добавлять текстовые подписи на картинки используя TrueType "
 "шрифты."
 
-#: ../../../inc/tools/system.ctrl.php:694
+#: ../../../inc/tools/system.ctrl.php:695
 msgid "APIs"
 msgstr "API сервисы"
 
-#: ../../../inc/tools/system.ctrl.php:725
+#: ../../../inc/tools/system.ctrl.php:726
 msgid ""
 "You should probably update your <code>.htaccess</code> file to the latest "
 "version and check the file permissions of this file."
@@ -27024,7 +26948,7 @@ msgstr ""
 "Возможно вы должны обновить ваш файл <code>.htaccess</code> до последней "
 "версии и проверить его права доступа."
 
-#: ../../../inc/tools/system.ctrl.php:745
+#: ../../../inc/tools/system.ctrl.php:746
 msgid "This server cannot use XML-RPC client."
 msgstr "Этот сервер не может использовать XML-RPC клиент."
 
@@ -29801,7 +29725,6 @@ msgstr "Последний визит"
 #: ../../../inc/users/model/_user.funcs.php:5620
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:258
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:371
-#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:320
 #: ../../../skins/asevo/_body_footer.inc.php:33
 #: ../../../skins/basic/access_denied.main.php:135
 #: ../../../skins/basic/access_requires_login.main.php:136
@@ -29864,11 +29787,6 @@ msgstr "Последний визит"
 #: ../../../skins/horizon_main_skin/index.main.php:376
 #: ../../../skins/photoalbums/_body_footer.inc.php:33
 #: ../../../skins/photoblog/_body_footer.inc.php:26
-#: ../../../skins/pureforums_skin/access_denied.main.php:166
-#: ../../../skins/pureforums_skin/access_requires_login.main.php:168
-#: ../../../skins/pureforums_skin/help.main.php:172
-#: ../../../skins/pureforums_skin/index.main.php:263
-#: ../../../skins/pureforums_skin/msgform.main.php:173
 #: ../../../skins/touch/_body_footer.inc.php:32
 #: ../../../skins_fallback_v5/_body_footer.inc.php:23
 msgid "Contact"
@@ -30513,8 +30431,7 @@ msgstr "Показывать пол в панели управления"
 #: ../../../skins/horizon_main_skin/_skin.class.php:260
 #: ../../../skins/photoalbums/_skin.class.php:177
 #: ../../../skins/photoblog/_skin.class.php:177
-#: ../../../skins/pureforums_skin/_skin.class.php:137
-#: ../../../skins/touch/_skin.class.php:104
+#: ../skins/touch/_skin.class.php:104
 msgid "Use colored usernames to differentiate men & women."
 msgstr ""
 "Использовать цветные имена пользователей для различия мужчин и женщин."
@@ -30540,8 +30457,7 @@ msgstr "Отображение имени пользователя в панел
 #: ../../../skins/horizon_main_skin/_skin.class.php:266
 #: ../../../skins/photoalbums/_skin.class.php:183
 #: ../../../skins/photoblog/_skin.class.php:183
-#: ../../../skins/pureforums_skin/_skin.class.php:143
-#: ../../../skins/touch/_skin.class.php:110
+#: ../skins/touch/_skin.class.php:110
 msgid "Check to enable bubble tips on usernames"
 msgstr ""
 "Отметьте, чтобы включить всплывающие подсказки над имена пользователей"
@@ -30562,8 +30478,7 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:265
 #: ../../../skins/photoalbums/_skin.class.php:182
 #: ../../../skins/photoblog/_skin.class.php:182
-#: ../../../skins/pureforums_skin/_skin.class.php:142
-#: ../../../skins/touch/_skin.class.php:109
+#: ../skins/touch/_skin.class.php:109
 msgid "Username bubble tips"
 msgstr "Всплывающие подсказки над именами пользователей"
 
@@ -30933,7 +30848,7 @@ msgstr "Участие"
 #: ../../../inc/users/views/_organization_user_remove.form.php:31
 #, php-format
 msgid "This will remove %s from the organization. Would you like to continue?"
-msgstr ""
+msgstr "Это удалит %s из организации. Хотите ли вы продолжить?"
 
 #: ../../../inc/users/views/_registration.form.php:42
 msgid "Default user permissions"
@@ -32567,7 +32482,6 @@ msgstr "Порядковый номер"
 #: ../../../install/_functions_evoupgrade.php:2145
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:48
 #: ../../../skins/bootstrap_forums_skin/index.main.php:45
-#: ../../../skins/pureforums_skin/index.main.php:62
 msgid "Latest topics"
 msgstr "Последние топики"
 
@@ -34406,8 +34320,6 @@ msgid "Posted by"
 msgstr "Создано пользователем"
 
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:120
-#: ../../../skins/pureforums_skin/_item_block.inc.php:64
-#: ../../../skins/pureforums_skin/_item_list.inc.php:118
 msgid "Started by"
 msgstr "Начато пользователем"
 
@@ -34727,7 +34639,6 @@ msgid "Do not try to highlight (cacheable)"
 msgstr "Не пытаться подсвечивать (кэшируемое)"
 
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:279
-#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:110
 #: ../../../skins/asevo/index.main.php:45
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:332
 #: ../../../skins/bootstrap_blog_skin/access_denied.main.php:105
@@ -34788,7 +34699,6 @@ msgstr "Не пытаться подсвечивать (кэшируемое)"
 #: ../../../skins/horizon_main_skin/_skin.class.php:292
 #: ../../../skins/photoalbums/index.main.php:79
 #: ../skins/photoblog/index.main.php:63
-#: ../../../skins/pureforums_skin/index.main.php:137
 #: ../../../skins/touch/_body_header.inc.php:124
 msgid "Menu"
 msgstr "Меню"
@@ -36438,326 +36348,6 @@ msgstr "Французский (FR) utf-8"
 #: ../../../locales/ru_RU/ru-RU.locale.php:17
 msgid "Russian (RU) utf-8"
 msgstr "Русский (RU) utf-8"
-
-#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:67
-#: ../../../skins/basic/access_denied.main.php:62
-#: ../../../skins/basic/access_requires_login.main.php:63
-#: ../../../skins/basic/help.main.php:68 ../skins/basic/index.main.php:61
-#: ../../../skins/basic/msgform.main.php:69
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:331
-#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:52
-#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:52
-#: ../../../skins/bootstrap_blog_skin/help.main.php:57
-#: ../../../skins/bootstrap_blog_skin/index.main.php:51
-#: ../../../skins/bootstrap_blog_skin/msgform.main.php:58
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:303
-#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:55
-#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:55
-#: ../../../skins/bootstrap_forums_skin/help.main.php:61
-#: ../../../skins/bootstrap_forums_skin/index.main.php:80
-#: ../../../skins/bootstrap_forums_skin/msgform.main.php:62
-#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:285
-#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:52
-#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:52
-#: ../../../skins/bootstrap_gallery_legacy/help.main.php:58
-#: ../../../skins/bootstrap_gallery_legacy/index.main.php:50
-#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:59
-#: ../../../skins/bootstrap_gallery_legacy/single.main.php:50
-#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:285
-#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:52
-#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:52
-#: ../../../skins/bootstrap_gallery_skin/help.main.php:58
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:50
-#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:59
-#: ../../../skins/bootstrap_gallery_skin/single.main.php:50
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:351
-#: ../../../skins/bootstrap_main_skin/access_denied.main.php:63
-#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:63
-#: ../../../skins/bootstrap_main_skin/help.main.php:57
-#: ../../../skins/bootstrap_main_skin/index.main.php:66
-#: ../../../skins/bootstrap_main_skin/msgform.main.php:58
-#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:57
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:220
-#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:51
-#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:51
-#: ../../../skins/bootstrap_manual_skin/help.main.php:57
-#: ../../../skins/bootstrap_manual_skin/index.main.php:56
-#: ../../../skins/bootstrap_manual_skin/msgform.main.php:58
-#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:319
-#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:52
-#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:52
-#: ../../../skins/bootstrap_photoblog_skin/help.main.php:58
-#: ../../../skins/bootstrap_photoblog_skin/index.main.php:51
-#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:59
-#: ../../../skins/clean1_skin/_body_header.inc.php:29
-#: ../../../skins/dating_mood/access_denied.main.php:42
-#: ../../../skins/dating_mood/access_requires_login.main.php:43
-#: ../../../skins/dating_mood/help.main.php:48
-#: ../../../skins/dating_mood/index.main.php:44
-#: ../../../skins/dating_mood/msgform.main.php:49
-#: ../../../skins/evopress/_body_header.inc.php:29
-#: ../../../skins/horizon_blog_skin/access_denied.main.php:52
-#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:52
-#: ../../../skins/horizon_blog_skin/index.main.php:48
-#: ../../../skins/horizon_blog_skin/single.main.php:48
-#: ../../../skins/horizon_main_skin/_skin.class.php:291
-#: ../../../skins/horizon_main_skin/access_denied.main.php:68
-#: ../../../skins/horizon_main_skin/access_requires_login.main.php:69
-#: ../../../skins/horizon_main_skin/index.main.php:78
-#: ../../../skins/photoalbums/access_denied.main.php:43
-#: ../../../skins/photoalbums/access_requires_login.main.php:42
-#: ../../../skins/photoalbums/help.main.php:49
-#: ../../../skins/photoalbums/index.main.php:48
-#: ../../../skins/photoalbums/msgform.main.php:50
-#: ../../../skins/photoblog/access_denied.main.php:39
-#: ../../../skins/photoblog/access_requires_login.main.php:40
-#: ../../../skins/photoblog/help.main.php:45
-#: ../skins/photoblog/index.main.php:44
-#: ../../../skins/photoblog/msgform.main.php:46
-#: ../../../skins/pureforums_skin/access_denied.main.php:60
-#: ../../../skins/pureforums_skin/access_requires_login.main.php:61
-#: ../../../skins/pureforums_skin/help.main.php:66
-#: ../../../skins/pureforums_skin/index.main.php:94
-#: ../../../skins/pureforums_skin/msgform.main.php:67
-msgid "Page Top"
-msgstr "Верх страницы"
-
-#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:87
-#: ../../../skins/asevo/access_denied.main.php:44
-#: ../../../skins/asevo/access_requires_login.main.php:45
-#: ../../../skins/asevo/help.main.php:50 ../skins/asevo/index.main.php:72
-#: ../../../skins/asevo/msgform.main.php:51
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:330
-#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:77
-#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:77
-#: ../../../skins/bootstrap_blog_skin/help.main.php:82
-#: ../../../skins/bootstrap_blog_skin/index.main.php:71
-#: ../../../skins/bootstrap_blog_skin/msgform.main.php:83
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:302
-#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:80
-#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:80
-#: ../../../skins/bootstrap_forums_skin/help.main.php:86
-#: ../../../skins/bootstrap_forums_skin/index.main.php:100
-#: ../../../skins/bootstrap_forums_skin/msgform.main.php:87
-#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:284
-#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:77
-#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:77
-#: ../../../skins/bootstrap_gallery_legacy/help.main.php:83
-#: ../../../skins/bootstrap_gallery_legacy/index.main.php:80
-#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:84
-#: ../../../skins/bootstrap_gallery_legacy/single.main.php:80
-#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:284
-#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:77
-#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:77
-#: ../../../skins/bootstrap_gallery_skin/help.main.php:83
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:80
-#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:84
-#: ../../../skins/bootstrap_gallery_skin/single.main.php:80
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:350
-#: ../../../skins/bootstrap_main_skin/access_denied.main.php:88
-#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:88
-#: ../../../skins/bootstrap_main_skin/help.main.php:82
-#: ../../../skins/bootstrap_main_skin/index.main.php:86
-#: ../../../skins/bootstrap_main_skin/msgform.main.php:83
-#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:77
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:219
-#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:76
-#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:76
-#: ../../../skins/bootstrap_manual_skin/help.main.php:82
-#: ../../../skins/bootstrap_manual_skin/index.main.php:76
-#: ../../../skins/bootstrap_manual_skin/msgform.main.php:83
-#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:318
-#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:77
-#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:77
-#: ../../../skins/bootstrap_photoblog_skin/help.main.php:83
-#: ../../../skins/bootstrap_photoblog_skin/index.main.php:71
-#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:84
-#: ../../../skins/clean1_skin/_body_header.inc.php:74
-#: ../../../skins/dating_mood/access_denied.main.php:60
-#: ../../../skins/dating_mood/access_requires_login.main.php:61
-#: ../../../skins/dating_mood/help.main.php:66
-#: ../../../skins/dating_mood/index.main.php:62
-#: ../../../skins/dating_mood/msgform.main.php:67
-#: ../../../skins/evopress/_body_header.inc.php:44
-#: ../../../skins/horizon_blog_skin/access_denied.main.php:77
-#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:77
-#: ../../../skins/horizon_blog_skin/index.main.php:65
-#: ../../../skins/horizon_blog_skin/single.main.php:65
-#: ../../../skins/horizon_main_skin/_skin.class.php:290
-#: ../../../skins/horizon_main_skin/access_denied.main.php:86
-#: ../../../skins/horizon_main_skin/access_requires_login.main.php:87
-#: ../../../skins/horizon_main_skin/index.main.php:97
-#: ../../../skins/pureforums_skin/access_denied.main.php:87
-#: ../../../skins/pureforums_skin/access_requires_login.main.php:88
-#: ../../../skins/pureforums_skin/help.main.php:93
-#: ../../../skins/pureforums_skin/index.main.php:121
-#: ../../../skins/pureforums_skin/msgform.main.php:94
-msgid "Header"
-msgstr "Заголовок"
-
-#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:235
-#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:146
-#: ../../../skins/bootstrap_blog_skin/index.main.php:235
-#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:149
-#: ../../../skins/bootstrap_forums_skin/index.main.php:254
-#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:146
-#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:146
-#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:157
-#: ../../../skins/bootstrap_main_skin/front.main.php:157
-#: ../../../skins/bootstrap_main_skin/index.main.php:247
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:341
-#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:146
-#: ../../../skins/bootstrap_photoblog_skin/index.main.php:223
-#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:146
-#: ../../../skins/horizon_blog_skin/index.main.php:263
-#: ../../../skins/horizon_blog_skin/single.main.php:272
-#: ../../../skins/horizon_main_skin/access_requires_login.main.php:117
-#: ../../../skins/horizon_main_skin/index.main.php:264
-#: ../../../skins_adm/login/_login_form.main.php:38
-msgid "Log in to your account"
-msgstr "Форма авторизации"
-
-#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:297
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:335
-#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:276
-#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:275
-#: ../../../skins/bootstrap_blog_skin/help.main.php:281
-#: ../../../skins/bootstrap_blog_skin/index.main.php:373
-#: ../../../skins/bootstrap_blog_skin/msgform.main.php:282
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:305
-#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:184
-#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:183
-#: ../../../skins/bootstrap_forums_skin/help.main.php:190
-#: ../../../skins/bootstrap_forums_skin/index.main.php:397
-#: ../../../skins/bootstrap_forums_skin/msgform.main.php:191
-#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:287
-#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:181
-#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:180
-#: ../../../skins/bootstrap_gallery_legacy/help.main.php:187
-#: ../../../skins/bootstrap_gallery_legacy/index.main.php:213
-#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:188
-#: ../../../skins/bootstrap_gallery_legacy/single.main.php:334
-#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:287
-#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:181
-#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:180
-#: ../../../skins/bootstrap_gallery_skin/help.main.php:187
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:213
-#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:188
-#: ../../../skins/bootstrap_gallery_skin/single.main.php:341
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:353
-#: ../../../skins/bootstrap_main_skin/access_denied.main.php:200
-#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:200
-#: ../../../skins/bootstrap_main_skin/front.main.php:246
-#: ../../../skins/bootstrap_main_skin/help.main.php:192
-#: ../../../skins/bootstrap_main_skin/index.main.php:311
-#: ../../../skins/bootstrap_main_skin/msgform.main.php:193
-#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:374
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:224
-#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:322
-#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:313
-#: ../../../skins/bootstrap_manual_skin/help.main.php:328
-#: ../../../skins/bootstrap_manual_skin/index.main.php:303
-#: ../../../skins/bootstrap_manual_skin/msgform.main.php:329
-#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:321
-#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:181
-#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:180
-#: ../../../skins/bootstrap_photoblog_skin/help.main.php:187
-#: ../../../skins/bootstrap_photoblog_skin/index.main.php:276
-#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:188
-#: ../../../skins/dating_mood/access_denied.main.php:142
-#: ../../../skins/dating_mood/access_requires_login.main.php:142
-#: ../../../skins/dating_mood/help.main.php:148
-#: ../../../skins/dating_mood/index.main.php:254
-#: ../../../skins/dating_mood/msgform.main.php:149
-#: ../../../skins/horizon_blog_skin/access_denied.main.php:276
-#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:275
-#: ../../../skins/horizon_blog_skin/index.main.php:399
-#: ../../../skins/horizon_blog_skin/single.main.php:432
-#: ../../../skins/horizon_main_skin/_skin.class.php:293
-#: ../../../skins/horizon_main_skin/access_denied.main.php:146
-#: ../../../skins/horizon_main_skin/access_requires_login.main.php:147
-#: ../../../skins/horizon_main_skin/index.main.php:355
-#: ../../../skins/photoalbums/_body_footer.inc.php:23
-#: ../../../skins/pureforums_skin/access_denied.main.php:145
-#: ../../../skins/pureforums_skin/access_requires_login.main.php:147
-#: ../../../skins/pureforums_skin/help.main.php:151
-#: ../../../skins/pureforums_skin/index.main.php:242
-#: ../../../skins/pureforums_skin/msgform.main.php:152
-msgid "Footer"
-msgstr "Футер"
-
-#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:321
-#: ../../../skins/asevo/_body_footer.inc.php:34
-#: ../../../skins/basic/access_denied.main.php:136
-#: ../../../skins/basic/access_requires_login.main.php:137
-#: ../../../skins/basic/help.main.php:142 ../skins/basic/index.main.php:302
-#: ../../../skins/basic/msgform.main.php:143
-#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:303
-#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:302
-#: ../../../skins/bootstrap_blog_skin/help.main.php:308
-#: ../../../skins/bootstrap_blog_skin/index.main.php:397
-#: ../../../skins/bootstrap_blog_skin/msgform.main.php:309
-#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:211
-#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:210
-#: ../../../skins/bootstrap_forums_skin/help.main.php:217
-#: ../../../skins/bootstrap_forums_skin/index.main.php:423
-#: ../../../skins/bootstrap_forums_skin/msgform.main.php:218
-#: ../../../skins/bootstrap_gallery_legacy/_body_footer.inc.php:31
-#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:208
-#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:207
-#: ../../../skins/bootstrap_gallery_legacy/help.main.php:214
-#: ../../../skins/bootstrap_gallery_legacy/index.main.php:237
-#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:215
-#: ../../../skins/bootstrap_gallery_legacy/single.main.php:358
-#: ../../../skins/bootstrap_gallery_skin/_body_footer.inc.php:31
-#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:208
-#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:207
-#: ../../../skins/bootstrap_gallery_skin/help.main.php:214
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:237
-#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:215
-#: ../../../skins/bootstrap_gallery_skin/single.main.php:365
-#: ../../../skins/bootstrap_main_skin/access_denied.main.php:225
-#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:225
-#: ../../../skins/bootstrap_main_skin/front.main.php:270
-#: ../../../skins/bootstrap_main_skin/help.main.php:217
-#: ../../../skins/bootstrap_main_skin/index.main.php:335
-#: ../../../skins/bootstrap_main_skin/msgform.main.php:218
-#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:398
-#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:347
-#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:338
-#: ../../../skins/bootstrap_manual_skin/help.main.php:353
-#: ../../../skins/bootstrap_manual_skin/index.main.php:327
-#: ../../../skins/bootstrap_manual_skin/msgform.main.php:354
-#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:208
-#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:207
-#: ../../../skins/bootstrap_photoblog_skin/help.main.php:214
-#: ../../../skins/bootstrap_photoblog_skin/index.main.php:300
-#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:215
-#: ../../../skins/clean1_skin/_body_footer.inc.php:33
-#: ../../../skins/dating_mood/access_denied.main.php:162
-#: ../../../skins/dating_mood/access_requires_login.main.php:162
-#: ../../../skins/dating_mood/help.main.php:168
-#: ../../../skins/dating_mood/index.main.php:274
-#: ../../../skins/dating_mood/msgform.main.php:169
-#: ../../../skins/evopress/_body_footer.inc.php:35
-#: ../../../skins/horizon_blog_skin/access_denied.main.php:303
-#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:302
-#: ../../../skins/horizon_blog_skin/index.main.php:422
-#: ../../../skins/horizon_blog_skin/single.main.php:455
-#: ../../../skins/horizon_main_skin/access_denied.main.php:168
-#: ../../../skins/horizon_main_skin/access_requires_login.main.php:169
-#: ../../../skins/horizon_main_skin/index.main.php:377
-#: ../../../skins/photoalbums/_body_footer.inc.php:34
-#: ../../../skins/photoblog/_body_footer.inc.php:27
-#: ../../../skins/pureforums_skin/access_denied.main.php:167
-#: ../../../skins/pureforums_skin/access_requires_login.main.php:169
-#: ../../../skins/pureforums_skin/help.main.php:173
-#: ../../../skins/pureforums_skin/index.main.php:264
-#: ../../../skins/pureforums_skin/msgform.main.php:174
-#: ../../../skins/touch/_body_footer.inc.php:33
-#: ../../../skins_fallback_v5/_body_footer.inc.php:24
-msgid "Send a message to the owner of this blog..."
-msgstr "Отправить письмо владельцу этого блога..."
 
 #: ../../../plugins/_adjust_headings.plugin.php:41
 msgid "Adjust heading levels so they are consistent for all posts."
@@ -39088,7 +38678,6 @@ msgstr ""
 #: ../skins/_rdf/comments.main.php:97 ../../../skins/_rss/comments.main.php:81
 #: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:69
 #: ../../../skins/horizon_blog_skin/_item_comment.inc.php:67
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:70
 #: ../../../skins_fallback_v5/_item_comment.inc.php:68
 #: ../../../skins_fallback_v6/_item_comment.inc.php:67
 msgid "In response to:"
@@ -39099,6 +38688,73 @@ msgstr "В ответ на:"
 #, php-format
 msgid "%s in response to: %s"
 msgstr "%s в ответ на %s"
+
+#: ../../../skins/asevo/_body_footer.inc.php:34
+#: ../../../skins/basic/access_denied.main.php:136
+#: ../../../skins/basic/access_requires_login.main.php:137
+#: ../../../skins/basic/help.main.php:142 ../skins/basic/index.main.php:302
+#: ../../../skins/basic/msgform.main.php:143
+#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:303
+#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:302
+#: ../../../skins/bootstrap_blog_skin/help.main.php:308
+#: ../../../skins/bootstrap_blog_skin/index.main.php:397
+#: ../../../skins/bootstrap_blog_skin/msgform.main.php:309
+#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:211
+#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:210
+#: ../../../skins/bootstrap_forums_skin/help.main.php:217
+#: ../../../skins/bootstrap_forums_skin/index.main.php:423
+#: ../../../skins/bootstrap_forums_skin/msgform.main.php:218
+#: ../../../skins/bootstrap_gallery_legacy/_body_footer.inc.php:31
+#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:208
+#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:207
+#: ../../../skins/bootstrap_gallery_legacy/help.main.php:214
+#: ../../../skins/bootstrap_gallery_legacy/index.main.php:237
+#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:215
+#: ../../../skins/bootstrap_gallery_legacy/single.main.php:358
+#: ../../../skins/bootstrap_gallery_skin/_body_footer.inc.php:31
+#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:208
+#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:207
+#: ../../../skins/bootstrap_gallery_skin/help.main.php:214
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:237
+#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:215
+#: ../../../skins/bootstrap_gallery_skin/single.main.php:365
+#: ../../../skins/bootstrap_main_skin/access_denied.main.php:225
+#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:225
+#: ../../../skins/bootstrap_main_skin/front.main.php:270
+#: ../../../skins/bootstrap_main_skin/help.main.php:217
+#: ../../../skins/bootstrap_main_skin/index.main.php:335
+#: ../../../skins/bootstrap_main_skin/msgform.main.php:218
+#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:398
+#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:347
+#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:338
+#: ../../../skins/bootstrap_manual_skin/help.main.php:353
+#: ../../../skins/bootstrap_manual_skin/index.main.php:327
+#: ../../../skins/bootstrap_manual_skin/msgform.main.php:354
+#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:208
+#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:207
+#: ../../../skins/bootstrap_photoblog_skin/help.main.php:214
+#: ../../../skins/bootstrap_photoblog_skin/index.main.php:300
+#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:215
+#: ../../../skins/clean1_skin/_body_footer.inc.php:33
+#: ../../../skins/dating_mood/access_denied.main.php:162
+#: ../../../skins/dating_mood/access_requires_login.main.php:162
+#: ../../../skins/dating_mood/help.main.php:168
+#: ../../../skins/dating_mood/index.main.php:274
+#: ../../../skins/dating_mood/msgform.main.php:169
+#: ../../../skins/evopress/_body_footer.inc.php:35
+#: ../../../skins/horizon_blog_skin/access_denied.main.php:303
+#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:302
+#: ../../../skins/horizon_blog_skin/index.main.php:422
+#: ../../../skins/horizon_blog_skin/single.main.php:455
+#: ../../../skins/horizon_main_skin/access_denied.main.php:168
+#: ../../../skins/horizon_main_skin/access_requires_login.main.php:169
+#: ../../../skins/horizon_main_skin/index.main.php:377
+#: ../../../skins/photoalbums/_body_footer.inc.php:34
+#: ../../../skins/photoblog/_body_footer.inc.php:27
+#: ../../../skins/touch/_body_footer.inc.php:33
+#: ../../../skins_fallback_v5/_body_footer.inc.php:24
+msgid "Send a message to the owner of this blog..."
+msgstr "Отправить письмо владельцу этого блога..."
 
 #. TRANS: Widget container name
 #: ../../../skins/asevo/_item_block.inc.php:97
@@ -39113,7 +38769,6 @@ msgstr "%s в ответ на %s"
 #: ../../../skins/evopress/single.main.php:135
 #: ../../../skins/photoalbums/_item_block.inc.php:62
 #: ../../../skins/photoblog/_item_block.inc.php:136
-#: ../../../skins/pureforums_skin/_item_block.inc.php:132
 #: ../../../skins/touch/single.main.php:123
 #: ../../../skins_fallback_v6/_item_block.inc.php:133
 msgid "Item Single"
@@ -39143,8 +38798,7 @@ msgstr "В каждой записи"
 #: ../../../skins/horizon_main_skin/_skin.class.php:210
 #: ../../../skins/photoalbums/_skin.class.php:134
 #: ../../../skins/photoblog/_skin.class.php:134
-#: ../../../skins/pureforums_skin/_skin.class.php:94
-#: ../../../skins/touch/_skin.class.php:61
+#: ../skins/touch/_skin.class.php:61
 msgid "Colorbox Image Zoom"
 msgstr "Включить \"Colorbox\""
 
@@ -39163,8 +38817,7 @@ msgstr "Включить \"Colorbox\""
 #: ../../../skins/horizon_main_skin/_skin.class.php:211
 #: ../../../skins/photoalbums/_skin.class.php:135
 #: ../../../skins/photoblog/_skin.class.php:135
-#: ../../../skins/pureforums_skin/_skin.class.php:95
-#: ../../../skins/touch/_skin.class.php:62
+#: ../skins/touch/_skin.class.php:62
 msgid ""
 "Check to enable javascript zooming on images (using the colorbox script)"
 msgstr ""
@@ -39185,8 +38838,7 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:216
 #: ../../../skins/photoalbums/_skin.class.php:140
 #: ../../../skins/photoblog/_skin.class.php:140
-#: ../../../skins/pureforums_skin/_skin.class.php:100
-#: ../../../skins/touch/_skin.class.php:67
+#: ../skins/touch/_skin.class.php:67
 msgid "Voting on Post Images"
 msgstr "Голосование на Изображениях Записей"
 
@@ -39234,11 +38886,8 @@ msgstr "Голосование на Изображениях Записей"
 #: ../../../skins/photoblog/_skin.class.php:141
 #: ../../../skins/photoblog/_skin.class.php:153
 #: ../../../skins/photoblog/_skin.class.php:165
-#: ../../../skins/pureforums_skin/_skin.class.php:101
-#: ../../../skins/pureforums_skin/_skin.class.php:113
-#: ../../../skins/pureforums_skin/_skin.class.php:125
-#: ../../../skins/touch/_skin.class.php:68 ../skins/touch/_skin.class.php:80
-#: ../../../skins/touch/_skin.class.php:92
+#: ../skins/touch/_skin.class.php:68 ../../../skins/touch/_skin.class.php:80
+#: ../skins/touch/_skin.class.php:92
 msgid "Check this to enable AJAX voting buttons in the colorbox zoom view"
 msgstr ""
 "Отметьте это, чтобы включить кнопки AJAX голосования в увеличенном просмотре"
@@ -39288,9 +38937,8 @@ msgstr ""
 #: ../../../skins/photoblog/_skin.class.php:146
 #: ../../../skins/photoblog/_skin.class.php:158
 #: ../../../skins/photoblog/_skin.class.php:170
-#: ../../../skins/pureforums_skin/_skin.class.php:130
-#: ../../../skins/touch/_skin.class.php:73 ../skins/touch/_skin.class.php:85
-#: ../../../skins/touch/_skin.class.php:97
+#: ../skins/touch/_skin.class.php:73 ../../../skins/touch/_skin.class.php:85
+#: ../skins/touch/_skin.class.php:97
 msgid "Display Votes"
 msgstr "Отображать Голоса"
 
@@ -39338,9 +38986,8 @@ msgstr "Отображать Голоса"
 #: ../../../skins/photoblog/_skin.class.php:147
 #: ../../../skins/photoblog/_skin.class.php:159
 #: ../../../skins/photoblog/_skin.class.php:171
-#: ../../../skins/pureforums_skin/_skin.class.php:131
-#: ../../../skins/touch/_skin.class.php:74 ../skins/touch/_skin.class.php:86
-#: ../../../skins/touch/_skin.class.php:98
+#: ../skins/touch/_skin.class.php:74 ../../../skins/touch/_skin.class.php:86
+#: ../skins/touch/_skin.class.php:98
 msgid "Check to display number of likes and dislikes"
 msgstr "Отметьте для отображения количества лайков и дислайков"
 
@@ -39359,8 +39006,7 @@ msgstr "Отметьте для отображения количества ла
 #: ../../../skins/horizon_main_skin/_skin.class.php:228
 #: ../../../skins/photoalbums/_skin.class.php:152
 #: ../../../skins/photoblog/_skin.class.php:152
-#: ../../../skins/pureforums_skin/_skin.class.php:112
-#: ../../../skins/touch/_skin.class.php:79
+#: ../skins/touch/_skin.class.php:79
 msgid "Voting on Comment Images"
 msgstr "Голосование на Изображениях Комментариев"
 
@@ -39379,8 +39025,7 @@ msgstr "Голосование на Изображениях Комментар�
 #: ../../../skins/horizon_main_skin/_skin.class.php:240
 #: ../../../skins/photoalbums/_skin.class.php:164
 #: ../../../skins/photoblog/_skin.class.php:164
-#: ../../../skins/pureforums_skin/_skin.class.php:124
-#: ../../../skins/touch/_skin.class.php:91
+#: ../skins/touch/_skin.class.php:91
 msgid "Voting on User Images"
 msgstr "Голосование на Изображениях Пользователей"
 
@@ -39399,8 +39044,7 @@ msgstr "Голосование на Изображениях Пользоват�
 #: ../../../skins/horizon_main_skin/_skin.class.php:259
 #: ../../../skins/photoalbums/_skin.class.php:176
 #: ../../../skins/photoblog/_skin.class.php:176
-#: ../../../skins/pureforums_skin/_skin.class.php:136
-#: ../../../skins/touch/_skin.class.php:103
+#: ../skins/touch/_skin.class.php:103
 msgid "Display gender"
 msgstr "Показывать пол"
 
@@ -39419,10 +39063,76 @@ msgstr "Показывать пол"
 #: ../../../skins/horizon_main_skin/_skin.class.php:271
 #: ../../../skins/photoalbums/_skin.class.php:188
 #: ../../../skins/photoblog/_skin.class.php:188
-#: ../../../skins/pureforums_skin/_skin.class.php:148
-#: ../../../skins/touch/_skin.class.php:115
+#: ../skins/touch/_skin.class.php:115
 msgid "Autocomplete usernames"
 msgstr "Автозаполнение имен пользователей"
+
+#: ../../../skins/asevo/access_denied.main.php:44
+#: ../../../skins/asevo/access_requires_login.main.php:45
+#: ../../../skins/asevo/help.main.php:50 ../skins/asevo/index.main.php:72
+#: ../../../skins/asevo/msgform.main.php:51
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:330
+#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:77
+#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:77
+#: ../../../skins/bootstrap_blog_skin/help.main.php:82
+#: ../../../skins/bootstrap_blog_skin/index.main.php:71
+#: ../../../skins/bootstrap_blog_skin/msgform.main.php:83
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:302
+#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:80
+#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:80
+#: ../../../skins/bootstrap_forums_skin/help.main.php:86
+#: ../../../skins/bootstrap_forums_skin/index.main.php:100
+#: ../../../skins/bootstrap_forums_skin/msgform.main.php:87
+#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:284
+#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:77
+#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:77
+#: ../../../skins/bootstrap_gallery_legacy/help.main.php:83
+#: ../../../skins/bootstrap_gallery_legacy/index.main.php:80
+#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:84
+#: ../../../skins/bootstrap_gallery_legacy/single.main.php:80
+#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:284
+#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:77
+#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:77
+#: ../../../skins/bootstrap_gallery_skin/help.main.php:83
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:80
+#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:84
+#: ../../../skins/bootstrap_gallery_skin/single.main.php:80
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:350
+#: ../../../skins/bootstrap_main_skin/access_denied.main.php:88
+#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:88
+#: ../../../skins/bootstrap_main_skin/help.main.php:82
+#: ../../../skins/bootstrap_main_skin/index.main.php:86
+#: ../../../skins/bootstrap_main_skin/msgform.main.php:83
+#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:77
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:219
+#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:76
+#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:76
+#: ../../../skins/bootstrap_manual_skin/help.main.php:82
+#: ../../../skins/bootstrap_manual_skin/index.main.php:76
+#: ../../../skins/bootstrap_manual_skin/msgform.main.php:83
+#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:318
+#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:77
+#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:77
+#: ../../../skins/bootstrap_photoblog_skin/help.main.php:83
+#: ../../../skins/bootstrap_photoblog_skin/index.main.php:71
+#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:84
+#: ../../../skins/clean1_skin/_body_header.inc.php:74
+#: ../../../skins/dating_mood/access_denied.main.php:60
+#: ../../../skins/dating_mood/access_requires_login.main.php:61
+#: ../../../skins/dating_mood/help.main.php:66
+#: ../../../skins/dating_mood/index.main.php:62
+#: ../../../skins/dating_mood/msgform.main.php:67
+#: ../../../skins/evopress/_body_header.inc.php:44
+#: ../../../skins/horizon_blog_skin/access_denied.main.php:77
+#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:77
+#: ../../../skins/horizon_blog_skin/index.main.php:65
+#: ../../../skins/horizon_blog_skin/single.main.php:65
+#: ../../../skins/horizon_main_skin/_skin.class.php:290
+#: ../../../skins/horizon_main_skin/access_denied.main.php:86
+#: ../../../skins/horizon_main_skin/access_requires_login.main.php:87
+#: ../../../skins/horizon_main_skin/index.main.php:97
+msgid "Header"
+msgstr "Заголовок"
 
 #: ../../../skins/asevo/index.main.php:187
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:333
@@ -39471,7 +39181,6 @@ msgid "Site/Url"
 msgstr "Сайт / URL"
 
 #: ../../../skins/basic/_item_comment_form.inc.php:93
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:305
 #: ../../../skins/touch/_item_comment_form.inc.php:245
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:308
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:329
@@ -39487,7 +39196,6 @@ msgid "(Set cookies for name, email &amp; url)"
 msgstr "(Установит cookie для имени, email и url)"
 
 #: ../../../skins/basic/_item_comment_form.inc.php:115
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:382
 #: ../../../skins/touch/_item_comment_form.inc.php:324
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:383
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:412
@@ -39507,6 +39215,83 @@ msgstr "Трекбек адрес этой записи:"
 #, php-format
 msgid "No %s for this post yet..."
 msgstr "Еще нет %s для этой записи..."
+
+#: ../../../skins/basic/access_denied.main.php:62
+#: ../../../skins/basic/access_requires_login.main.php:63
+#: ../../../skins/basic/help.main.php:68 ../skins/basic/index.main.php:61
+#: ../../../skins/basic/msgform.main.php:69
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:331
+#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:52
+#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:52
+#: ../../../skins/bootstrap_blog_skin/help.main.php:57
+#: ../../../skins/bootstrap_blog_skin/index.main.php:51
+#: ../../../skins/bootstrap_blog_skin/msgform.main.php:58
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:303
+#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:55
+#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:55
+#: ../../../skins/bootstrap_forums_skin/help.main.php:61
+#: ../../../skins/bootstrap_forums_skin/index.main.php:80
+#: ../../../skins/bootstrap_forums_skin/msgform.main.php:62
+#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:285
+#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:52
+#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:52
+#: ../../../skins/bootstrap_gallery_legacy/help.main.php:58
+#: ../../../skins/bootstrap_gallery_legacy/index.main.php:50
+#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:59
+#: ../../../skins/bootstrap_gallery_legacy/single.main.php:50
+#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:285
+#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:52
+#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:52
+#: ../../../skins/bootstrap_gallery_skin/help.main.php:58
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:50
+#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:59
+#: ../../../skins/bootstrap_gallery_skin/single.main.php:50
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:351
+#: ../../../skins/bootstrap_main_skin/access_denied.main.php:63
+#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:63
+#: ../../../skins/bootstrap_main_skin/help.main.php:57
+#: ../../../skins/bootstrap_main_skin/index.main.php:66
+#: ../../../skins/bootstrap_main_skin/msgform.main.php:58
+#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:57
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:220
+#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:51
+#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:51
+#: ../../../skins/bootstrap_manual_skin/help.main.php:57
+#: ../../../skins/bootstrap_manual_skin/index.main.php:56
+#: ../../../skins/bootstrap_manual_skin/msgform.main.php:58
+#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:319
+#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:52
+#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:52
+#: ../../../skins/bootstrap_photoblog_skin/help.main.php:58
+#: ../../../skins/bootstrap_photoblog_skin/index.main.php:51
+#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:59
+#: ../../../skins/clean1_skin/_body_header.inc.php:29
+#: ../../../skins/dating_mood/access_denied.main.php:42
+#: ../../../skins/dating_mood/access_requires_login.main.php:43
+#: ../../../skins/dating_mood/help.main.php:48
+#: ../../../skins/dating_mood/index.main.php:44
+#: ../../../skins/dating_mood/msgform.main.php:49
+#: ../../../skins/evopress/_body_header.inc.php:29
+#: ../../../skins/horizon_blog_skin/access_denied.main.php:52
+#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:52
+#: ../../../skins/horizon_blog_skin/index.main.php:48
+#: ../../../skins/horizon_blog_skin/single.main.php:48
+#: ../../../skins/horizon_main_skin/_skin.class.php:291
+#: ../../../skins/horizon_main_skin/access_denied.main.php:68
+#: ../../../skins/horizon_main_skin/access_requires_login.main.php:69
+#: ../../../skins/horizon_main_skin/index.main.php:78
+#: ../../../skins/photoalbums/access_denied.main.php:43
+#: ../../../skins/photoalbums/access_requires_login.main.php:42
+#: ../../../skins/photoalbums/help.main.php:49
+#: ../../../skins/photoalbums/index.main.php:48
+#: ../../../skins/photoalbums/msgform.main.php:50
+#: ../../../skins/photoblog/access_denied.main.php:39
+#: ../../../skins/photoblog/access_requires_login.main.php:40
+#: ../../../skins/photoblog/help.main.php:45
+#: ../skins/photoblog/index.main.php:44
+#: ../../../skins/photoblog/msgform.main.php:46
+msgid "Page Top"
+msgstr "Верх страницы"
 
 #: ../../../skins/basic/access_denied.main.php:67
 #: ../../../skins/basic/access_requires_login.main.php:68
@@ -39826,8 +39611,91 @@ msgstr "\"%s\" контейнер"
 msgid "Sidebar 2"
 msgstr "Боковая панель 2"
 
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:335
+#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:276
+#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:275
+#: ../../../skins/bootstrap_blog_skin/help.main.php:281
+#: ../../../skins/bootstrap_blog_skin/index.main.php:373
+#: ../../../skins/bootstrap_blog_skin/msgform.main.php:282
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:305
+#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:184
+#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:183
+#: ../../../skins/bootstrap_forums_skin/help.main.php:190
+#: ../../../skins/bootstrap_forums_skin/index.main.php:397
+#: ../../../skins/bootstrap_forums_skin/msgform.main.php:191
+#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:287
+#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:181
+#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:180
+#: ../../../skins/bootstrap_gallery_legacy/help.main.php:187
+#: ../../../skins/bootstrap_gallery_legacy/index.main.php:213
+#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:188
+#: ../../../skins/bootstrap_gallery_legacy/single.main.php:334
+#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:287
+#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:181
+#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:180
+#: ../../../skins/bootstrap_gallery_skin/help.main.php:187
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:213
+#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:188
+#: ../../../skins/bootstrap_gallery_skin/single.main.php:341
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:353
+#: ../../../skins/bootstrap_main_skin/access_denied.main.php:200
+#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:200
+#: ../../../skins/bootstrap_main_skin/front.main.php:246
+#: ../../../skins/bootstrap_main_skin/help.main.php:192
+#: ../../../skins/bootstrap_main_skin/index.main.php:311
+#: ../../../skins/bootstrap_main_skin/msgform.main.php:193
+#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:374
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:224
+#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:322
+#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:313
+#: ../../../skins/bootstrap_manual_skin/help.main.php:328
+#: ../../../skins/bootstrap_manual_skin/index.main.php:303
+#: ../../../skins/bootstrap_manual_skin/msgform.main.php:329
+#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:321
+#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:181
+#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:180
+#: ../../../skins/bootstrap_photoblog_skin/help.main.php:187
+#: ../../../skins/bootstrap_photoblog_skin/index.main.php:276
+#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:188
+#: ../../../skins/dating_mood/access_denied.main.php:142
+#: ../../../skins/dating_mood/access_requires_login.main.php:142
+#: ../../../skins/dating_mood/help.main.php:148
+#: ../../../skins/dating_mood/index.main.php:254
+#: ../../../skins/dating_mood/msgform.main.php:149
+#: ../../../skins/horizon_blog_skin/access_denied.main.php:276
+#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:275
+#: ../../../skins/horizon_blog_skin/index.main.php:399
+#: ../../../skins/horizon_blog_skin/single.main.php:432
+#: ../../../skins/horizon_main_skin/_skin.class.php:293
+#: ../../../skins/horizon_main_skin/access_denied.main.php:146
+#: ../../../skins/horizon_main_skin/access_requires_login.main.php:147
+#: ../../../skins/horizon_main_skin/index.main.php:355
+#: ../../../skins/photoalbums/_body_footer.inc.php:23
+msgid "Footer"
+msgstr "Футер"
+
+#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:146
+#: ../../../skins/bootstrap_blog_skin/index.main.php:235
+#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:149
+#: ../../../skins/bootstrap_forums_skin/index.main.php:254
+#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:146
+#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:146
+#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:157
+#: ../../../skins/bootstrap_main_skin/front.main.php:157
+#: ../../../skins/bootstrap_main_skin/index.main.php:247
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:341
+#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:146
+#: ../../../skins/bootstrap_photoblog_skin/index.main.php:223
+#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:146
+#: ../../../skins/horizon_blog_skin/index.main.php:263
+#: ../../../skins/horizon_blog_skin/single.main.php:272
+#: ../../../skins/horizon_main_skin/access_requires_login.main.php:117
+#: ../../../skins/horizon_main_skin/index.main.php:264
+#: ../../../skins_adm/login/_login_form.main.php:38
+msgid "Log in to your account"
+msgstr "Форма авторизации"
+
 #: ../../../skins/bootstrap_forums_skin/_comments.disp.php:36
-#: ../../../skins/pureforums_skin/_comments.disp.php:36
 msgid "No replies yet..."
 msgstr "Пока еще нет ответов...."
 
@@ -39847,9 +39715,6 @@ msgstr "Редактировать введение"
 #: ../../../skins/bootstrap_forums_skin/_front.disp.php:112
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:96
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:451
-#: ../../../skins/pureforums_skin/_front.disp.php:58
-#: ../../../skins/pureforums_skin/_posts.disp.php:67
-#: ../../../skins/pureforums_skin/_skin.class.php:299
 msgid "This forum is locked: you cannot post, reply to, or edit topics."
 msgstr ""
 "Этот форум заблокирован: вы не можете постить, комментировать или "
@@ -39858,22 +39723,16 @@ msgstr ""
 #: ../../../skins/bootstrap_forums_skin/_front.disp.php:118
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:25
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:110
-#: ../../../skins/pureforums_skin/_legend.inc.php:25
-#: ../../../skins/pureforums_skin/_posts.disp.php:81
 msgid "Forum (contains several topics)"
 msgstr "Форум (содержит несколько топиков)"
 
 #: ../../../skins/bootstrap_forums_skin/_front.disp.php:137
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:131
-#: ../../../skins/pureforums_skin/_front.disp.php:82
-#: ../../../skins/pureforums_skin/_posts.disp.php:100
 msgid "Subforums"
 msgstr "Подфорумы"
 
 #: ../../../skins/bootstrap_forums_skin/_front.disp.php:151
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:144
-#: ../../../skins/pureforums_skin/_front.disp.php:94
-#: ../../../skins/pureforums_skin/_posts.disp.php:112
 #, php-format
 msgid "%s topics"
 msgstr "%s топиков"
@@ -39884,9 +39743,6 @@ msgstr "%s топиков"
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:263
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:267
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:145
-#: ../../../skins/pureforums_skin/_front.disp.php:95
-#: ../../../skins/pureforums_skin/_item_list.inc.php:130
-#: ../../../skins/pureforums_skin/_posts.disp.php:113
 #, php-format
 msgid "%s replies"
 msgstr "%s ответов"
@@ -39899,33 +39755,25 @@ msgstr "Заголовок Одиночной Записи"
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:226
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:265
-#: ../../../skins/pureforums_skin/_item_block.inc.php:158
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:136
 msgid "Back to top"
 msgstr "Наверх"
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:241
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:280
-#: ../../../skins/pureforums_skin/_item_block.inc.php:176
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:158
 msgid "Quote"
 msgstr "Цитировать"
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:241
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:280
-#: ../../../skins/pureforums_skin/_item_block.inc.php:176
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:158
 msgid "Reply with quote"
 msgstr "Ответить с цитатой"
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:251
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:260
-#: ../../../skins/pureforums_skin/_item_block.inc.php:191
 msgid "Edit this topic"
 msgstr "Редактировать этот топик"
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:269
-#: ../../../skins/pureforums_skin/_item_block.inc.php:200
 msgid "Delete this topic"
 msgstr "Удалить этот топик"
 
@@ -39984,12 +39832,10 @@ msgstr "Пинг"
 
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:295
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:298
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:186
 msgid "Edit this reply"
 msgstr "Редактировать этот ответ"
 
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:307
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:195
 msgid "Delete this reply"
 msgstr "Удалить это ответ"
 
@@ -40004,26 +39850,20 @@ msgstr "Ссылка:"
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:43
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:43
-#: ../../../skins/pureforums_skin/_legend.inc.php:43
 msgid "Discussion topic"
 msgstr "Топик обсуждения"
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:48
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:55
-#: ../../../skins/pureforums_skin/_legend.inc.php:55
 msgid "Sticky topic / Announcement"
 msgstr "Прикрепленный топик / Объявление"
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:49
-#: ../../../skins/pureforums_skin/_edit.disp.php:326
-#: ../../../skins/pureforums_skin/_item_list.inc.php:47
 msgid "Sticky"
 msgstr "Прилеплены"
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:55
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:462
-#: ../../../skins/pureforums_skin/_item_list.inc.php:53
-#: ../../../skins/pureforums_skin/_skin.class.php:310
 msgid "This topic is locked: you cannot edit posts or make replies."
 msgstr ""
 "Этот топик заблокирован: вы не можете редактировать записи или создавать "
@@ -40031,7 +39871,6 @@ msgstr ""
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:61
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:47
-#: ../../../skins/pureforums_skin/_legend.inc.php:47
 msgid "Popular topic"
 msgstr "Популярный топик"
 
@@ -40044,30 +39883,23 @@ msgstr "Просмотреть последний комментарий"
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:334
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:357
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:370
-#: ../../../skins/pureforums_skin/_item_list.inc.php:153
-#: ../../../skins/pureforums_skin/_item_list.inc.php:170
 msgid "View latest post"
 msgstr "Просмотреть последний ответ"
 
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:29
-#: ../../../skins/pureforums_skin/_legend.inc.php:29
 msgid "Forum is locked"
 msgstr "Форум заблокирован"
 
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:33
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:105
-#: ../../../skins/pureforums_skin/_legend.inc.php:33
-#: ../../../skins/pureforums_skin/_posts.disp.php:76
 msgid "Sub-forum (contains several topics)"
 msgstr "Подфорум (содержит несколько топиков)"
 
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:51
-#: ../../../skins/pureforums_skin/_legend.inc.php:51
 msgid "Locked topic"
 msgstr "Заблокированный топик"
 
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:224
-#: ../../../skins/pureforums_skin/_posts.disp.php:199
 msgid "There is no topic in this forum yet."
 msgstr "В этом форуме пока еще нет топиков."
 
@@ -40078,22 +39910,18 @@ msgstr ""
 "топики."
 
 #: ../../../skins/bootstrap_forums_skin/_search.disp.php:38
-#: ../../../skins/pureforums_skin/_search.disp.php:38
 msgid "Topic: "
 msgstr "Топик:"
 
 #: ../../../skins/bootstrap_forums_skin/_search.disp.php:39
-#: ../../../skins/pureforums_skin/_search.disp.php:39
 msgid "Reply: "
 msgstr "Ответ:"
 
 #: ../../../skins/bootstrap_forums_skin/_search.disp.php:40
-#: ../../../skins/pureforums_skin/_search.disp.php:40
 msgid "Forum: "
 msgstr "Форум:"
 
 #: ../../../skins/bootstrap_forums_skin/_search.disp.php:41
-#: ../../../skins/pureforums_skin/_search.disp.php:41
 msgid "Tag: "
 msgstr "Тег:"
 
@@ -40130,7 +39958,6 @@ msgstr "Отображать баннер \"Публичные\""
 
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:154
 #: ../../../skins/photoalbums/_skin.class.php:195
-#: ../../../skins/pureforums_skin/_skin.class.php:155
 msgid "Display banner for \"Public\" posts (posts & comments)"
 msgstr ""
 "Отображать баннер видимости для \"Публичных\" записей (записей и "
@@ -40149,7 +39976,6 @@ msgid "Display Assignee (with Priority color coding) & Status"
 msgstr "Отображать Назначенного (с цветом приоритета) и Статус"
 
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:442
-#: ../../../skins/pureforums_skin/_skin.class.php:290
 msgid "Post new topic"
 msgstr "Создать новый топик"
 
@@ -40158,7 +39984,6 @@ msgid "Reply"
 msgstr "Ответить"
 
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:467
-#: ../../../skins/pureforums_skin/_skin.class.php:315
 msgid "Reply to topic"
 msgstr "Ответить на топик"
 
@@ -40172,28 +39997,21 @@ msgid "New Topics"
 msgstr "Новые Топики"
 
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:713
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:164
 msgid "Is this reply helpful?"
 msgstr "Этот ответ полезный?"
 
 #: ../../../skins/bootstrap_forums_skin/index.main.php:53
 #: ../../../skins/bootstrap_forums_skin/index.main.php:183
-#: ../../../skins/pureforums_skin/index.main.php:72
-#: ../../../skins/pureforums_skin/index.main.php:201
 msgid "Latest Replies"
 msgstr "Последние Ответы"
 
 #: ../../../skins/bootstrap_forums_skin/index.main.php:56
 #: ../../../skins/bootstrap_forums_skin/index.main.php:187
-#: ../../../skins/pureforums_skin/index.main.php:75
-#: ../../../skins/pureforums_skin/index.main.php:204
 msgid "User's topics"
 msgstr "Топики пользователя"
 
 #: ../../../skins/bootstrap_forums_skin/index.main.php:57
 #: ../../../skins/bootstrap_forums_skin/index.main.php:188
-#: ../../../skins/pureforums_skin/index.main.php:76
-#: ../../../skins/pureforums_skin/index.main.php:205
 msgid "User's replies"
 msgstr "Ответы пользователя"
 
@@ -40536,7 +40354,7 @@ msgstr "Настройки Цветов Страницы"
 
 #: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:180
 msgid "Link hover color"
-msgstr ""
+msgstr "Цвет ссылок при наведении"
 
 #: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:199
 msgid "Navigation Settings"
@@ -40732,7 +40550,6 @@ msgid "Post info text color"
 msgstr "Цвет текста информации записи"
 
 #: ../../../skins/photoalbums/_skin.class.php:194
-#: ../../../skins/pureforums_skin/_skin.class.php:154
 msgid "\"Public\" banner"
 msgstr "Баннер \"Публичные\""
 
@@ -40753,291 +40570,6 @@ msgstr "Размер миниатюр на странице одиночной �
 #, php-format
 msgid "%s photos"
 msgstr "%s фотографий"
-
-#: ../../../skins/pureforums_skin/_edit.disp.php:54
-#: ../../../skins/pureforums_skin/index.main.php:69
-#: ../../../skins/pureforums_skin/index.main.php:197
-#: ../../../skins_email/post_new.html.php:97
-msgid "Edit post"
-msgstr "Редактировать запись"
-
-#: ../../../skins/pureforums_skin/_edit.disp.php:54
-#: ../../../skins/pureforums_skin/index.main.php:196
-msgid "Post a new topic"
-msgstr "Создать новый топик"
-
-#: ../../../skins/pureforums_skin/_edit.disp.php:70
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:44
-msgid "Appears in"
-msgstr "Появляется в"
-
-#: ../../../skins/pureforums_skin/_edit.disp.php:72
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:46
-msgid "Main forum"
-msgstr "Основной форум"
-
-#: ../../../skins/pureforums_skin/_edit.disp.php:73
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:47
-msgid "Additional forum"
-msgstr "Дополнительный форум"
-
-#: ../../../skins/pureforums_skin/_edit.disp.php:248
-#: ../../../skins/pureforums_skin/_item_block.inc.php:238
-msgid "Message body"
-msgstr "Сообщение"
-
-#: ../../../skins/pureforums_skin/_edit.disp.php:326
-msgid "Make this topic sticky (featured at the top of the list)"
-msgstr "Сделать этот топик прикрепленным (расположенным в верху списка)"
-
-#: ../../../skins/pureforums_skin/_edit.disp.php:345
-msgid "Allow replies"
-msgstr "Разрешить ответы"
-
-#: ../../../skins/pureforums_skin/_edit.disp.php:377
-msgid ""
-"Check this to let b2evolution auto-suggest tags as you type, based on the "
-"tags existing on other posts."
-msgstr ""
-"Отметьте это, чтобы дать b2evolution автоматически предлагать теги, "
-"основанные на существующих тегах в других записях, во время их написания."
-
-#: ../../../skins/pureforums_skin/_edit.disp.php:379
-msgid "suggest"
-msgstr "предлагать"
-
-#: ../../../skins/pureforums_skin/_edit.disp.php:403
-#: ../../../skins_fallback_v5/_edit.disp.php:375
-msgid "You do not have permission to edit file attachments for this post"
-msgstr ""
-"У вас нет разрешений на редактирование прикрепленных файлов этой записи"
-
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:28
-msgid "Editing reply"
-msgstr "Редактирование ответа"
-
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:49
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:30
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:30
-msgid "Comment content"
-msgstr "Содержимое комментария"
-
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:127
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:85
-msgid "Comment date"
-msgstr "Дата комментария"
-
-#: ../../../skins/pureforums_skin/_edit_comment.disp.php:176
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:137
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:137
-msgid "You do not have permission to edit file attachments for this comment"
-msgstr ""
-"У вас нет разрешений на редактирование прикрепленных файлов этого "
-"комментария"
-
-#: ../../../skins/pureforums_skin/_front.disp.php:64
-#: ../../../skins/pureforums_skin/_item_list.inc.php:43
-msgid "No new posts"
-msgstr "Нет новых записей"
-
-#: ../../../skins/pureforums_skin/_item_block.inc.php:225
-msgid ""
-"This is your topic. You are receiving notifications when anyone posts a "
-"reply on your topics."
-msgstr ""
-"Это ваш топик. Вы получаете уведомления, когда кто-нибудь постит ответ на "
-"ваши топики."
-
-#: ../../../skins/pureforums_skin/_item_block.inc.php:226
-msgid "You will be notified by email when someone posts a reply here."
-msgstr "Вы будете уведомлены по email, когда кто-нибудь ответит здесь."
-
-#: ../../../skins/pureforums_skin/_item_block.inc.php:227
-msgid "Notify me by email when someone posts a reply here."
-msgstr "Уведомите меня по email, когда кто-нибудь ответит здесь."
-
-#: ../../../skins/pureforums_skin/_item_block.inc.php:239
-msgid "Submit"
-msgstr "Отправить"
-
-#: ../../../skins/pureforums_skin/_item_block.inc.php:241
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:50
-msgid "Post a reply"
-msgstr "Ответить"
-
-#: ../../../skins/pureforums_skin/_item_block.inc.php:254
-msgid "You must be a member of this blog to post a reply."
-msgstr "Вы должны быть участником этого блога, чтобы постить ответы."
-
-#: ../../../skins/pureforums_skin/_item_block.inc.php:255
-msgid "You must be logged in to post a reply."
-msgstr "Вы должны авторизоваться, чтобы постить ответы."
-
-#: ../../../skins/pureforums_skin/_item_block.inc.php:256
-msgid "You must activate your account before you can post a reply."
-msgstr ""
-"Вы должны активировать ваш аккаунт, прежде чем вы сможете постить ответы."
-
-#: ../../../skins/pureforums_skin/_item_block.inc.php:257
-msgid "RSS feed for replies to this topic"
-msgstr "RSS лента для ответов по этому топику"
-
-#: ../../../skins/pureforums_skin/_item_block.inc.php:259
-msgid "This topic is closed."
-msgstr "Этот топик закрыт."
-
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:165
-msgid "Mark this reply as helpful!"
-msgstr "Отметить этот ответ как полезный!"
-
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:166
-msgid "You think this reply is helpful"
-msgstr "Вы считаете этот ответ полезным"
-
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:167
-msgid "Mark this reply as not helpful!"
-msgstr "Отметить этот ответ как бесполезный!"
-
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:168
-msgid "You think this reply is not helpful"
-msgstr "Вы считаете этот ответ бесполезным"
-
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:175
-msgid "Mark this reply as spam!"
-msgstr "Отметить этот ответ как спам!"
-
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:176
-msgid "You think this reply is spam"
-msgstr "Вы считаете этот ответ спамом"
-
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:177
-msgid "Mark this reply as not sure!"
-msgstr "Отметить этот ответ как нейтральный!"
-
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:178
-msgid "You are not sure in this reply"
-msgstr "Вы считаете этот ответ нейтральным"
-
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:179
-msgid "Mark this reply as OK!"
-msgstr "Отметить этот ответ как хороший!"
-
-#: ../../../skins/pureforums_skin/_item_comment.inc.php:180
-msgid "You think this reply is OK"
-msgstr "Вы считаете этот ответ хорошим"
-
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:300
-#: ../../../skins/touch/_item_comment_form.inc.php:240
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:303
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:324
-msgid "Your email address will <strong>not</strong> be revealed on this site."
-msgstr "Ваш email адрес <strong>не будет</strong> показан на сайте."
-
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:383
-#: ../../../skins/touch/_item_comment_form.inc.php:325
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:384
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:413
-msgid "For my next comment on this site"
-msgstr ""
-"Использовать введенные здесь данные для следующих комментариев на этом сайте"
-
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:396
-#: ../../../skins/touch/_item_comment_form.inc.php:338
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:397
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:426
-msgid "Allow message form"
-msgstr "Разрешить форму сообщений"
-
-#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:397
-#: ../../../skins/touch/_item_comment_form.inc.php:339
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:398
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:427
-msgid ""
-"Allow users to contact me through a message form -- Your email will "
-"<strong>not</strong> be revealed!"
-msgstr ""
-"Разрешить пользователям посылать мне сообщения -- Ваш email адрес <strong>не"
-" будет</strong> показан!"
-
-#: ../../../skins/pureforums_skin/_skin.class.php:84
-msgid "Style of profile pictures"
-msgstr "Стиль фото пользователей"
-
-#: ../../../skins/pureforums_skin/_skin.class.php:89
-msgid "Round the corners of profile pictures"
-msgstr "Округлять углы фотографий пользователей"
-
-#: ../../../skins/pureforums_skin/_skin.class.php:90
-msgid "Original pictures with square corners"
-msgstr "Оригинальные фотографии с квадратными углами"
-
-#: ../../../skins/pureforums_skin/_skin.class.php:106
-msgid "Display Post Votes"
-msgstr "Отображать Голоса Записи"
-
-#: ../../../skins/pureforums_skin/_skin.class.php:107
-msgid "Check to display number of post likes and dislikes"
-msgstr "Отметьте для отображения количества лайков и дислайков записи"
-
-#: ../../../skins/pureforums_skin/_skin.class.php:118
-msgid "Display Comment Votes"
-msgstr "Отображать Голоса Комментария"
-
-#: ../../../skins/pureforums_skin/_skin.class.php:119
-msgid "Check to display number of comment likes and dislikes"
-msgstr "Отметьте для отображения количества лайков и дислайков комментария"
-
-#: ../../../skins/pureforums_skin/_skin.class.php:160
-msgid "Width switcher"
-msgstr "Переключатель ширины"
-
-#: ../../../skins/pureforums_skin/_skin.class.php:161
-msgid "Check to enable the width switcher between fixed value and 100%."
-msgstr ""
-"Отметьте, чтобы включить переключатель ширины между фиксированным значением "
-"и 100%."
-
-#: ../../../skins/pureforums_skin/index.main.php:68
-msgid "Start a new topic"
-msgstr "Начать новый топик"
-
-#: ../../../skins/pureforums_skin/index.main.php:218
-msgid ""
-"Notify me by email whenever a reply is published on one of "
-"<strong>my</strong> topics."
-msgstr ""
-"Уведомите меня по email, когда какой-нибудь ответ опубликован на одном из "
-"<strong>моих</strong> топиков."
-
-#: ../../../skins/pureforums_skin/index.main.php:219
-msgid ""
-"Notify me by email whenever a reply is posted in a forum where I am a "
-"moderator."
-msgstr ""
-"Уведомите меня по email, когда какой-нибудь ответ создан в форуме, где я "
-"являюсь модератором."
-
-#: ../../../skins/pureforums_skin/index.main.php:220
-#, php-format
-msgid "Topics created by %s"
-msgstr "Топики, созданные пользователем %s"
-
-#: ../../../skins/pureforums_skin/index.main.php:221
-msgid "User has not created any topics"
-msgstr "Пользователь не создал ни один топик"
-
-#: ../../../skins/pureforums_skin/index.main.php:222
-#, php-format
-msgid "Replies posted by %s"
-msgstr "Ответы, созданные пользователем %s"
-
-#: ../../../skins/pureforums_skin/index.main.php:223
-msgid "User has not posted any replies"
-msgstr "Пользователь не создал ни один ответ"
-
-#: ../../../skins/pureforums_skin/index.main.php:224
-msgid "Reply on:"
-msgstr "Ответ на:"
 
 #: ../../../skins/touch/_body_header.inc.php:23
 msgid "Notice"
@@ -41075,6 +40607,35 @@ msgstr "Мобильный: Меню Инструментов"
 #: ../../../skins/touch/_body_header.inc.php:141
 msgid "Search..."
 msgstr "Поиск..."
+
+#: ../../../skins/touch/_item_comment_form.inc.php:240
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:303
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:324
+msgid "Your email address will <strong>not</strong> be revealed on this site."
+msgstr "Ваш email адрес <strong>не будет</strong> показан на сайте."
+
+#: ../../../skins/touch/_item_comment_form.inc.php:325
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:384
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:413
+msgid "For my next comment on this site"
+msgstr ""
+"Использовать введенные здесь данные для следующих комментариев на этом сайте"
+
+#: ../../../skins/touch/_item_comment_form.inc.php:338
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:397
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:426
+msgid "Allow message form"
+msgstr "Разрешить форму сообщений"
+
+#: ../../../skins/touch/_item_comment_form.inc.php:339
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:398
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:427
+msgid ""
+"Allow users to contact me through a message form -- Your email will "
+"<strong>not</strong> be revealed!"
+msgstr ""
+"Разрешить пользователям посылать мне сообщения -- Ваш email адрес <strong>не"
+" будет</strong> показан!"
 
 #: ../../../skins/touch/_item_feedback.inc.php:43
 msgid "Preview comment"
@@ -41961,6 +41522,10 @@ msgstr "%s создал новую запись на %s с заголовком 
 msgid "View post"
 msgstr "Просмотреть запись"
 
+#: ../../../skins_email/post_new.html.php:97
+msgid "Edit post"
+msgstr "Редактировать запись"
+
 #: ../../../skins_email/post_new.html.php:107
 #: ../skins_email/post_new.txt.php:102
 msgid ""
@@ -42247,6 +41812,27 @@ msgstr "Ваша загрузка начнется скоро..."
 #, php-format
 msgid "If nothing happens, please <a %s>click here</a>."
 msgstr "Если ничего не происходит, пожалуйста, <a %s>нажмите здесь</a>."
+
+#: ../../../skins_fallback_v5/_edit.disp.php:375
+msgid "You do not have permission to edit file attachments for this post"
+msgstr ""
+"У вас нет разрешений на редактирование прикрепленных файлов этой записи"
+
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:30
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:30
+msgid "Comment content"
+msgstr "Содержимое комментария"
+
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:85
+msgid "Comment date"
+msgstr "Дата комментария"
+
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:137
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:137
+msgid "You do not have permission to edit file attachments for this comment"
+msgstr ""
+"У вас нет разрешений на редактирование прикрепленных файлов этого "
+"комментария"
 
 #: ../../../skins_fallback_v5/_help.disp.php:26
 msgid "This is a private website or section"

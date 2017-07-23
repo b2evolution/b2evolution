@@ -7971,7 +7971,7 @@ class Item extends ItemLight
 			return;
 		}
 
-		global $DB, $current_User, $localtimenow, $cache_items_user_data;
+		global $DB, $current_User, $localtimenow;
 
 		$timestamp = date2mysql( $localtimenow );
 
@@ -8126,13 +8126,13 @@ class Item extends ItemLight
 			$cache_items_user_data[ $this->ID ] = NULL;
 		}
 
-		if( is_null( $field ) || ! isset( $cache_items_user_data[ $this->ID ][ $field ] ) )
+		if( $field === NULL )
 		{	// Return all fields as array:
 			return $cache_items_user_data[ $this->ID ];
 		}
 		else
 		{	// Return a value of single field:
-			return $cache_items_user_data[ $this->ID ][ $field ];
+			return isset( $cache_items_user_data[ $this->ID ][ $field ] ) ? $cache_items_user_data[ $this->ID ][ $field ] : NULL;
 		}
 	}
 
@@ -8149,10 +8149,10 @@ class Item extends ItemLight
 
 		if( ! isset( $cache_items_user_data[ $this->ID ] ) || ! is_array( $cache_items_user_data[ $this->ID ] ) )
 		{	// Initialize array:
-			$cache_items_user_data[ $this->ID ][ $field ] = array();
+			$cache_items_user_data[ $this->ID ] = array();
 		}
 
-		$cache_items_user_data[ $this->ID ] = $value;
+		$cache_items_user_data[ $this->ID ][ $field ] = $value;
 	}
 
 
