@@ -675,7 +675,7 @@ function get_icon_info( $name )
 			'size' => array( 11, 13 ),
 			'xy' => array( 0, 128 ),
 			'glyph' => 'file',
-			'fa' => 'external-link'
+			'fa' => 'external-link-square'
 		);
 		case 'history': return array(
 			'alt'  => T_('History'),
