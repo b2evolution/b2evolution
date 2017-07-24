@@ -136,7 +136,7 @@ while( $Item = & $ItemList->get_item() )
 				echo '<div class="pull-right">';
 				$Item->permanent_link( array(
 						'before' => '',
-						'text'   => '#text#'
+						'text'   => get_icon( 'permalink' ).' '.T_('Permalink'),
 					) );
 				// Item slug control:
 				$Item->tinyurl_link( array(
@@ -170,8 +170,6 @@ while( $Item = & $ItemList->get_item() )
 
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'name' ) );
-
-				echo $Item->get_history_link( array( 'before' => ' ' ) );
 
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
@@ -283,8 +281,13 @@ while( $Item = & $ItemList->get_item() )
 			echo '<span class="'.button_class( 'group' ).'">';
 			if( $action != 'view' )
 			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('View').'</a>';
+				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('Details').'</a>';
 			}
+
+			echo $Item->get_history_link( array(
+					'class'     => button_class( 'text' ),
+					'link_text' => '$icon$ '.T_('History'),
+				) );
 
 			if( isset( $GLOBALS['files_Module'] )
 			    && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )

@@ -4876,7 +4876,7 @@ class Item extends ItemLight
 
 		if( $params['text'] == '#' )
 		{
-			$params['text'] = get_icon( 'merge' ).' '.T_('Merge with');
+			$params['text'] = get_icon( 'merge' ).' '.T_('Merge with...');
 		}
 		elseif( $params['text'] == '#icon#' )
 		{
