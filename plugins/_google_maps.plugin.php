@@ -987,7 +987,7 @@ class google_maps_plugin extends Plugin
 
 	function SkinTag( & $params )
 	{
-		global $Collection, $Blog, $Item;
+		global $Collection, $Blog, $Item, $admin_url;
 		global $google_maps_initialized;
 		/**
 		 * Default params:
