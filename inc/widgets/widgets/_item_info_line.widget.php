@@ -109,7 +109,7 @@ class item_info_line_Widget extends ComponentWidget
 					'label' => T_( 'Permalink icon' ),
 					'note' => T_( 'Display permalink icon' ),
 					'type' => 'checkbox',
-					'defaultvalue' => true
+					'defaultvalue' => false
 				),
 				'before_author' => array(
 					'label' => T_( 'Before author' ),
@@ -175,7 +175,7 @@ class item_info_line_Widget extends ComponentWidget
 					'label' => T_( 'Edit link' ),
 					'note' => T_( 'Display link to edit the item/post' ),
 					'type' => 'checkbox',
-					'defaultvalue' => true
+					'defaultvalue' => false
 				)
 			), parent::get_param_definitions( $params ) );
 
