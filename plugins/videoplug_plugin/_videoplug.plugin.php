@@ -68,7 +68,7 @@ class videoplug_plugin extends Plugin
 				'<div class="videoblock"><iframe id="ytplayer" type="text/html" width="425" height="350" src="//www.youtube.com/embed/\\1" allowfullscreen="allowfullscreen" frameborder="0"></iframe></div>',
 				'<div class="videoblock"><iframe src="//www.dailymotion.com/embed/video/\\1" width="425" height="335" frameborder="0" allowfullscreen></iframe></div>',
 				'<div class="videoblock"><iframe src="//player.vimeo.com/video/$1" width="400" height="225" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>',
-				'<div class="videoblock"><iframe src="$1" width="560" height="315" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe></div>',
+				'<div class="videoblock"><iframe src="https://www.facebook.com/plugins/video.php?href=$1" width="560" height="315" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe></div>',
 				// Unavailable services. Keep them for backwards compatibility
 				'<div class="videoblock">The Google video service is not available anymore.</div>',
 				'<div class="videoblock">The Live Video service is not available anymore.</div>',
