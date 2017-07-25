@@ -264,8 +264,8 @@ class videoplug_plugin extends Plugin
 							break;
 
 						case 'facebook':
-							regexp_ID = /^https:\/\/www\.facebook\.com\/.+/i;
-							regexp_URL = /^((https:\/\/www\.facebook\.com\/.+))$/i;
+							regexp_ID = /^https:\/\/.+\.facebook\.com\/.+/i;
+							regexp_URL = /^((https:\/\/.+\.facebook\.com\/.+))$/i;
 							break;
 
 						default:
