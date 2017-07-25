@@ -294,7 +294,7 @@ while( $Item = & $ItemList->get_item() )
 			    && $current_User->check_perm( 'files', 'view' ) )
 			{	// Display a button to view the files of the post only if current user has a permissions:
 				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID )
-							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).' '.T_('Files').'</a>';
+							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).' '.T_('Attachments').'</a>';
 			}
 
 			if( $Blog->get_setting( 'allow_comments' ) != 'never' )

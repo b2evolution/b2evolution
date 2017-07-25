@@ -1257,31 +1257,34 @@ class shortlinks_plugin extends Plugin
 
 			var dest_type = false;
 			var dest_object_ID = false;
-			if( jQuery( 'input[type=hidden][name=p]' ).length )
+			if( jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).length )
+			{	// New object form:
+				dest_type = 'temporary';
+				dest_object_ID = jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).val();
+			}
+			else if( jQuery( 'input[type=hidden][name=post_ID]' ).length && jQuery( 'input[type=hidden][name=item_typ_ID]' ).length )
 			{	// Item form:
 				dest_type = 'item';
-				dest_object_ID = jQuery( 'input[type=hidden][name=p]' ).val();
+				dest_object_ID = jQuery( 'input[type=hidden][name=post_ID]' ).val();
 			}
-			else if( jQuery( 'input[type=hidden][name=comment_ID]' ).length )
+			else if( jQuery( 'input[type=hidden][name=comment_ID]' ).length || jQuery( 'input[type=hidden][name=comment_item_ID]' ).length )
 			{	// Comment form:
 				dest_type = 'comment';
-				dest_object_ID = jQuery( 'input[type=hidden][name=comment_ID]' ).val();
+				if( jQuery( 'input[type=hidden][name=comment_ID]' ).length )
+				{
+					dest_object_ID = jQuery( 'input[type=hidden][name=comment_ID]' ).val();
+				}
 			}
 			else if( jQuery( 'input[type=hidden][name=ecmp_ID]' ).length )
 			{	// Email Campaign form:
 				dest_type = 'emailcampaign';
 				dest_object_ID = jQuery( 'input[type=hidden][name=ecmp_ID]' ).val();
 			}
-			else if( jQuery( 'input[type=hidden][name=thrd_ID]' ).length )
+			else if( jQuery( 'input[name=msg_text]' ).length )
 			{	// Message form:
 				dest_type = 'message';
 				dest_object_ID = 0;
-			}/*
-			else if( jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).length )
-			{	// New object form:
-				dest_type = 'temporary';
-				dest_object_ID = jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).val();
-			}*/
+			}
 
 			// Check if at least one image is requested to insert:
 			var insert_images = ( jQuery( '#shortlinks_form_full_cover, #shortlinks_form_thumb_cover, #shortlinks_form_teaser' ).is( ':checked' ) &&
@@ -1346,7 +1349,7 @@ class shortlinks_plugin extends Plugin
 			else
 			{	// Insert only simple text without images:
 				if( insert_images )
-				{	// Display this alert if user wants to insert image for new creating object:
+				{	// Display this alert if user wants to insert image for new creating object but it doesn't support:
 					alert( 'Please save your ' + dest_type + ' before trying to attach files. This limitation will be removed in a future version of b2evolution.' );
 				}
 				shortlinks_insert_complex_link();
@@ -1423,7 +1426,8 @@ class shortlinks_plugin extends Plugin
 			}
 			if( jQuery( '#shortlinks_form_excerpt' ).is( ':checked' ) )
 			{	// Excerpt:
-				post_content += "\r\n" + jQuery( '#shortlinks_hidden_excerpt' ).val();
+				post_content += ( typeof( thumb_cover ) != 'undefined' && thumb_cover != '' ? ' ' : "\r\n" )
+					+ jQuery( '#shortlinks_hidden_excerpt' ).val();
 			}
 			if( typeof( teasers ) != 'undefined' && teasers != '' )
 			{	// Teaser images:

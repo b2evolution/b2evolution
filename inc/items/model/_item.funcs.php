@@ -2203,7 +2203,7 @@ function echo_item_merge_js()
 function evo_merge_load_window( item_ID )
 {
 	openModalWindow( '<div id="evo_merge_wrapper"></div>', 'auto', '', true,
-		'<?php echo TS_('Merge with a Post'); ?>', // Window title
+		'<?php echo TS_('Select destination Post...'); ?>', // Window title
 		[ '-', 'evo_merge_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back", "Merge with original dates",  "Append to this post with new dates"
 		true );
 
@@ -2236,7 +2236,7 @@ function evo_merge_load_window( item_ID )
 			+ '<div id="evo_merge_posts_block"></div>'
 			+ '<div id="evo_merge_post_block"></div>'
 			+ '<input type="hidden" id="evo_merge_post_ID" value="' + item_ID + '" />'
-			+ '<input type="hidden" id="evo_merge_source_post_ID" />';
+			+ '<input type="hidden" id="evo_merge_dest_post_ID" />';
 
 		evo_rest_api_end_loading( '#evo_merge_wrapper', r );
 
@@ -2530,7 +2530,7 @@ jQuery( document ).on( 'click', '#evo_merge_posts_list a[data-id]', function()
 	if( jQuery( '#evo_merge_post_block' ).data( 'post' ) == post_id )
 	{	// If user loads the same post, just display the cached content to save ajax calls:
 		// Show the action buttons:
-		jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btn_insert' ).show();
+		jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btns_group' ).show();
 	}
 	else
 	{	// Load new post:
@@ -2541,7 +2541,7 @@ jQuery( document ).on( 'click', '#evo_merge_posts_list a[data-id]', function()
 			jQuery( '#evo_merge_post_block' ).data( 'post', post.id );
 
 			// Store item field values in hidden inputs to use on insert complex link:
-			jQuery( '#evo_merge_source_post_ID' ).val( post.id );
+			jQuery( '#evo_merge_dest_post_ID' ).val( post.id );
 
 			// Item title:
 			var item_content = '<h2>' + post.title + '</h2>';
@@ -2568,14 +2568,21 @@ jQuery( document ).on( 'click', '#evo_merge_posts_list a[data-id]', function()
 
 			evo_rest_api_end_loading( '#evo_merge_post_block', item_content );
 
+			jQuery( '.modal-title' ).html( '<?php echo T_('Destination Post:'); ?>' );
+
 			// Display the buttons to back and merge/append a post:
 			var buttons_side_obj = jQuery( '.evo_merge_post_buttons' ).length ?
 				jQuery( '.evo_merge_post_buttons' ) :
 				jQuery( '#evo_merge_post_content' );
-			jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btn_merge, #evo_merge_btn_form, #evo_merge_btn_append' ).remove();
+			jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btns_group, #evo_merge_btn_form' ).remove();
 			buttons_side_obj.after( '<button id="evo_merge_btn_back_to_list" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
-				+ '<button id="evo_merge_btn_merge" class="btn btn-primary"><?php echo TS_('Merge with original dates'); ?></button>'
-				+ '<button id="evo_merge_btn_append" class="btn btn-default"><?php echo TS_('Append to this post with new dates'); ?></button>' );
+				+ '<span id="evo_merge_btns_group" style="margin:0 5px">'
+				+ '<?php echo TS_('Move source post & comments'); ?>: '
+				+ '<div class="btn-group">'
+				+ '<button id="evo_merge_btn_merge" class="btn btn-primary"><?php echo TS_('by keeping original dates (merge)'); ?></button>'
+				+ '<button id="evo_merge_btn_append" class="btn btn-default"><?php echo TS_('by assigning new dates (append)'); ?></button>'
+				+ '</div>'
+				+ '</span>' );
 		} );
 	}
 
@@ -2590,8 +2597,23 @@ jQuery( document ).on( 'click', '#evo_merge_btn_merge, #evo_merge_btn_append', f
 
 	location.href = '<?php echo $admin_url; ?>?ctrl=items&action=' + action
 		+ '&post_ID=' + jQuery( '#evo_merge_post_ID' ).val()
-		+ '&source_post_ID=' + jQuery( '#evo_merge_source_post_ID' ).val()
+		+ '&dest_post_ID=' + jQuery( '#evo_merge_dest_post_ID' ).val()
 		+ '&<?php echo url_crumb( 'item' ); ?>';
+} );
+
+// Back to previous list:
+jQuery( document ).on( 'click', '#evo_merge_btn_back_to_list', function()
+{
+	jQuery( '.modal-title' ).html( '<?php echo T_('Select destination Post...'); ?>' );
+
+	// Show the lists of collections and posts:
+	jQuery( '#evo_merge_colls_list, #evo_merge_posts_block' ).show();
+
+	// Hide the post preview block and action buttons:
+	jQuery( '#evo_merge_post_block, #evo_merge_btn_back_to_list, #evo_merge_btns_group' ).hide();
+
+	// To prevent link default event:
+	return false;
 } );
 </script>
 <?php
