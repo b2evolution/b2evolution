@@ -964,6 +964,9 @@ div.filters .filter_item div {
 .panel-meta .panel-body {
   background-color: #d9edf7;
 }
+.panel-meta .btn-toolbar {
+  background-color: #afd9ee !important;
+}
 .evo_voting_panel > span.fa {
   margin-right: 4px;
   margin-left: 2px;

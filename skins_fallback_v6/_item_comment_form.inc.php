@@ -304,15 +304,7 @@ function validateCommentForm(form)
 			$params['form_comment_redirect_to']
 		);
 
-	if( check_user_status( 'is_validated' ) )
-	{ // User is logged in and activated:
-		$temp_infostart = $Form->infostart;
-		$Form->switch_template_parts( array( 'infostart' => add_tag_class( $Form->infostart, 'inline-block' ) ) );
-		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array(
-				'link_text' => $params['author_link_text'] ) ).'</strong>', array( 'class' => 'row' ) );
-		$Form->infostart = $temp_infostart;
-	}
-	else
+	if( ! check_user_status( 'is_validated' ) )
 	{ // User is not logged in or not activated:
 		if( is_logged_in() && empty( $comment_author ) && empty( $comment_author_email ) )
 		{

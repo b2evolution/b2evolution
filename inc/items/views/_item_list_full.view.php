@@ -596,8 +596,6 @@ while( $Item = & $ItemList->get_item() )
 			$Form->hidden( 'comment_type', $comment_type );
 			$Form->hidden( 'redirect_to', $admin_url.'?ctrl=items&blog='.$Item->Blog->ID.'&p='.$Item->ID.'&comment_type='.$comment_type );
 
-			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'name' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
-
 			if( $comment_type != 'meta' && $Item->can_rate() )
 			{	// Comment rating:
 				ob_start();
