@@ -57,6 +57,7 @@ class videoplug_plugin extends Plugin
 				'#\[video:youtube:(.+?)]#',     // Youtube
 				'#\[video:dailymotion:(.+?)]#', // Dailymotion
 				'#\[video:vimeo:(.+?)]#',       // vimeo // blueyed> TODO: might want to use oEmbed (to get title etc separately and display it below video): http://vimeo.com/api/docs/oembed
+				'#\[video:facebook:(.+?)]#',    // Facebook
 				// Unavailable services. Keep them for backwards compatibility
 				'#\[video:google:(.+?)]#',      // Google video
 				'#\[video:livevideo:(.+?)]#',   // LiveVideo
@@ -67,6 +68,7 @@ class videoplug_plugin extends Plugin
 				'<div class="videoblock"><iframe id="ytplayer" type="text/html" width="425" height="350" src="//www.youtube.com/embed/\\1" allowfullscreen="allowfullscreen" frameborder="0"></iframe></div>',
 				'<div class="videoblock"><iframe src="//www.dailymotion.com/embed/video/\\1" width="425" height="335" frameborder="0" allowfullscreen></iframe></div>',
 				'<div class="videoblock"><iframe src="//player.vimeo.com/video/$1" width="400" height="225" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>',
+				'<div class="videoblock"><iframe src="$1" width="560" height="315" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe></div>',
 				// Unavailable services. Keep them for backwards compatibility
 				'<div class="videoblock">The Google video service is not available anymore.</div>',
 				'<div class="videoblock">The Live Video service is not available anymore.</div>',
@@ -74,7 +76,7 @@ class videoplug_plugin extends Plugin
 			);
 
 		// Move short tag outside of paragraph
-		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo):?[^\[\]]*\]/i' );
+		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo|facebook):?[^\[\]]*\]/i' );
 
 		$content = replace_content_outcode( $search_list, $replace_list, $content );
 
@@ -219,6 +221,7 @@ class videoplug_plugin extends Plugin
 		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|youtube|'.$params['js_prefix'].'" value="YouTube" />';
 		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo|'.$params['js_prefix'].'" value="Vimeo" />';
 		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion|'.$params['js_prefix'].'" value="DailyMotion" />';
+		echo '<input type="button" id="video_facebook" title="'.T_('Insert Facebook video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|facebook|'.$params['js_prefix'].'" value="Facebook" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_after' );
@@ -258,6 +261,11 @@ class videoplug_plugin extends Plugin
 						case 'vimeo':
 							regexp_ID = /^\d+$/;
 							regexp_URL = /^(.+\/)?(\d+)$/;
+							break;
+
+						case 'facebook':
+							regexp_ID = /^https:\/\/www\.facebook\.com\/.+/i;
+							regexp_URL = /^((https:\/\/www\.facebook\.com\/.+))$/i;
 							break;
 
 						default:
