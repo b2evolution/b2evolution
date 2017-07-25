@@ -2266,6 +2266,20 @@ class RestApi
 			$position_counts = array();
 		}
 
+		// Find all attached files of the destination LinkOwner in order to don't link twice same files:
+		$dest_files_links = array();
+		$dest_links = $dest_LinkOwner->get_Links();
+		if( ! empty( $dest_links ) && is_array( $dest_links ) )
+		{
+			foreach( $dest_links as $dest_Link )
+			{
+				if( $dest_File = & $dest_Link->get_File() )
+				{
+					$dest_files_links[ $dest_File->ID ] = $dest_Link->ID;
+				}
+			}
+		}
+
 		while( $source_Link = & $source_LinkList->get_next() )
 		{	// Copy a Link to new object:
 			if( $limit_position )
@@ -2281,9 +2295,16 @@ class RestApi
 				$position_counts[ $source_Link->position ]++;
 			}
 
-			if( $source_File = & $source_Link->get_File() &&
-			    $new_link_ID = $dest_LinkOwner->add_link( $source_Link->file_ID, ( empty( $dest_position ) ? $source_Link->position : $dest_position ), $dest_last_order++ ) )
+			if( $source_File = & $source_Link->get_File() )
 			{
+				if( isset( $dest_files_links[ $source_File->ID ] ) )
+				{	// Don't attach the File twice if it is already linked to the destination LinkOwner:
+					$new_link_ID = $dest_files_links[ $source_File->ID ];
+				}
+				else
+				{	// Attach new file because it is not linked to the destination LinkOwner yet:
+					$new_link_ID = $dest_LinkOwner->add_link( $source_Link->file_ID, ( empty( $dest_position ) ? $source_Link->position : $dest_position ), $dest_last_order++ );
+				}
 				$this->add_response( 'links', array(
 						'ID'            => $new_link_ID,
 						'file_type'     => $source_File->get_file_type(),
