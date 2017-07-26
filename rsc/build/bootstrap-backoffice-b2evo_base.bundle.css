@@ -971,6 +971,10 @@ div.filters .filter_item div {
   margin-right: 4px;
   margin-left: 2px;
 }
+.btn-toolbar .btn-toolbar-title {
+  margin-top: 1px;
+  margin-bottom: 2px;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
