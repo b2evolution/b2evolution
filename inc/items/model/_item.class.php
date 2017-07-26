@@ -681,6 +681,7 @@ class Item extends ItemLight
 					if( $thread_messages_count > 1 )
 					{
 						global $Messages;
+						$Messages->add( T_('You can edit the moved message below if needed. When finished, use the Publish button.'), 'note' );
 						$Messages->add( sprintf( T_('%d replies of this thread have not been copied.'), $thread_messages_count - 1 ), 'error' );
 					}
 				}

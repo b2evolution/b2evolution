@@ -105,6 +105,11 @@ foreach( $recipient_status_list as $row )
 $is_recipient = $edited_Thread->check_thread_recipient( $current_User->ID );
 $leave_msg_ID = ( $is_recipient ? $leave_status_list[ $current_User->ID ] : NULL );
 
+// Current user is involved in this thread, only involved users can send a message
+// we had to check this because admin user can see all messages in 'Abuse management', but should not be able to reply
+// Also don't display the form to send new message if user is moving a message to a collection:
+$display_new_message_form = $is_recipient && $view != 'move' && $view != 'move2';
+
 // Create SELECT query:
 $select_SQL = new SQL();
 
@@ -250,9 +255,8 @@ if( $current_User->check_perm( 'perm_messaging', 'delete' ) && ( $Results->get_t
 						);
 }
 
-if( $is_recipient )
-{ // Current user is involved in this thread, only involved users can send a message
-	// we had to check this because admin user can see all messages in 'Abuse management', but should not be able to reply
+if( $display_new_message_form )
+{	// Display form to send new message only when it is allowed:
 	// get all available recipient in this thread
 	$available_recipients = array();
 	foreach( $recipient_list as $recipient_ID )
@@ -368,7 +372,7 @@ if( $is_recipient )
 }
 
 // Display Leave or Close conversation action if they are available
-if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) > 0 ) )
+if( $display_new_message_form && empty( $leave_msg_ID ) && ( count( $available_recipients ) > 0 ) )
 { // user is recipient and didn't leave this conversation yet and this conversation is not closed
 	echo '<div class="fieldset messages_list_actions">';
 	if( count( $available_recipients ) > 1 )
