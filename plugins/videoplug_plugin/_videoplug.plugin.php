@@ -40,6 +40,32 @@ class videoplug_plugin extends Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+				'width' => array(
+					'label' => T_('Video width (px or %)'),
+					'note' => T_('100% width if left empty or 0'),
+					'valid_pattern' => '/^(\d+(\.\d+)?%?)?$/',
+				),
+				'height' => array(
+					'label' => T_('Video height (px or %)'),
+					'defaultvalue' => '',
+					'allow_empty' => true,
+					'valid_pattern' => '/^(\d+(\.\d+)?%?)?$/',
+					'note' => T_('Leave empty for a 16/9 aspect ratio').' (16/9=56.25%)',
+				),
+			);
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @todo add more video sites, anyone...
@@ -49,6 +75,72 @@ class videoplug_plugin extends Plugin
 	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
+
+		if( $setting_Blog = & $this->get_Blog_from_params( $params ) )
+		{	// We are rendering Item, Comment or Widget now, Get the settings depending on Collection:
+			$width = $this->get_coll_setting( 'width', $setting_Blog );
+			$height = $this->get_coll_setting( 'height', $setting_Blog );
+		}
+		elseif( ! empty( $params['Message'] ) )
+		{	// We are rendering Message now:
+			$width = $this->get_msg_setting( 'width' );
+			$height = $this->get_msg_setting( 'height' );
+		}
+		elseif( ! empty( $params['EmailCampaign'] ) )
+		{	// We are rendering EmailCampaign now:
+			$width = $this->get_email_setting( 'width' );
+			$height = $this->get_email_setting( 'height' );
+		}
+		else
+		{	// Unknown call, Don't render this case:
+			return;
+		}
+
+		$style = '';
+
+		if( empty( $width ) && ! empty( $height ) )
+		{	// Use default/auto width depending on not default height:
+			$width_ratio = 1.7778; // for 16/9 aspect ratio (16/9=177.78%)
+			if( strpos( $height, '%' ) === false )
+			{	// If height in digits:
+				$style .= 'width:'.floor( $height * $width_ratio ).'px;';
+			}
+			else
+			{	// If height in percents:
+				$style .= 'width:'.( str_replace( '%', '', $height ) * $width_ratio ).'%;';
+			}
+		}
+		elseif( ! empty( $width ) )
+		{	// Set style width from plugin setting:
+			$style .= 'width:'.( strpos( $width, '%' ) === false ? $width.'px' : $width ).';';
+		}
+
+		if( empty( $height ) && ! empty( $width ) )
+		{	// Use default/auto height depending on not default width:
+			$height_ratio = 0.5625; // for 16/9 aspect ratio (9/16=56.25%)
+			if( strpos( $width, '%' ) === false )
+			{	// If width in digits:
+				$style .= 'padding-bottom:'.floor( $width * $height_ratio ).'px;';
+			}
+			else
+			{	// If width in percents:
+				$style .= 'padding-bottom:'.( str_replace( '%', '', $width ) * $height_ratio ).'%;';
+			}
+		}
+		elseif( ! empty( $height ) )
+		{	// Set height depending on what units are used:
+			if( strpos( $height, '%' ) === false )
+			{	// Use digits for pixel size:
+				$style .= 'padding-bottom:0;height:'.$height.'px';
+			}
+			else
+			{	// Use percents to set aspect ratio:
+				$style .= 'padding-bottom:'.$height;
+			}
+		}
+
+		$video_block_before = '<div class="videoblock"'.( $style == '' ? '' : ' style="'.$style.'"' ).'>';
+		$video_block_after = '</div>';
 
 		// fp> removed some embeds to make it xhtml compliant, using only object. (Hari style ;)
 		// anyone, feel free to clean up the ones that have no object tag at all.
@@ -62,17 +154,16 @@ class videoplug_plugin extends Plugin
 				'#\[video:google:(.+?)]#',      // Google video
 				'#\[video:livevideo:(.+?)]#',   // LiveVideo
 				'#\[video:ifilm:(.+?)]#',       // iFilm
-
 			);
 		$replace_list = array(
-				'<div class="videoblock"><iframe id="ytplayer" type="text/html" width="425" height="350" src="//www.youtube.com/embed/\\1" allowfullscreen="allowfullscreen" frameborder="0"></iframe></div>',
-				'<div class="videoblock"><iframe src="//www.dailymotion.com/embed/video/\\1" width="425" height="335" frameborder="0" allowfullscreen></iframe></div>',
-				'<div class="videoblock"><iframe src="//player.vimeo.com/video/$1" width="400" height="225" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>',
-				'<div class="videoblock"><iframe src="https://www.facebook.com/plugins/video.php?href=$1" width="560" height="315" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe></div>',
+				$video_block_before.'<iframe id="ytplayer" type="text/html" src="//www.youtube.com/embed/\\1" allowfullscreen="allowfullscreen" frameborder="0"></iframe>'.$video_block_after,
+				$video_block_before.'<iframe src="//www.dailymotion.com/embed/video/\\1" frameborder="0" allowfullscreen></iframe>'.$video_block_after,
+				$video_block_before.'<iframe src="//player.vimeo.com/video/$1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>'.$video_block_after,
+				$video_block_before.'<iframe src="https://www.facebook.com/plugins/video.php?href=$1" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>'.$video_block_after,
 				// Unavailable services. Keep them for backwards compatibility
-				'<div class="videoblock">The Google video service is not available anymore.</div>',
-				'<div class="videoblock">The Live Video service is not available anymore.</div>',
-				'<div class="videoblock">The iFilm video service is not available anymore.</div>',
+				$video_block_before.'The Google video service is not available anymore.'.$video_block_after,
+				$video_block_before.'The Live Video service is not available anymore.'.$video_block_after,
+				$video_block_before.'The iFilm video service is not available anymore.'.$video_block_after,
 			);
 
 		// Move short tag outside of paragraph
