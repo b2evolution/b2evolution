@@ -1461,7 +1461,7 @@ switch( $action )
 
 	case 'merge':
 	case 'append':
-		// Merge/Append the edited Item with another selected Item:
+		// Merge/Append the edited Item to another selected Item:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'item' );
@@ -1469,9 +1469,9 @@ switch( $action )
 		// Check edit permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		$source_post_ID = param( 'source_post_ID', 'integer', true );
+		$dest_post_ID = param( 'dest_post_ID', 'integer', true );
 
-		if( $edited_Item->ID == $source_post_ID )
+		if( $edited_Item->ID == $dest_post_ID )
 		{	// If same Item is used as source for merging:
 			// DO NOT translate, because it is a wrong request:
 			$Messages->add( 'Don\'t use the same item for merging!', 'error' );
@@ -1480,7 +1480,7 @@ switch( $action )
 		}
 
 		$ItemCache = & get_ItemCache();
-		if( ! ( $source_Item = & $ItemCache->get_by_ID( $source_post_ID, false, false ) ) )
+		if( ! ( $dest_Item = & $ItemCache->get_by_ID( $dest_post_ID, false, false ) ) )
 		{	// If Item doesn't exist in DB:
 			$Messages->add( T_('Wrong selected item for merging, please try again.'), 'error' );
 			// REDIRECT / EXIT
@@ -1489,10 +1489,10 @@ switch( $action )
 
 		if( $action == 'append' )
 		{	// If we should append
-			$SQL = new SQL( 'Get the latest comment of Item #'.$edited_Item->ID.' to append Item #'.$source_Item->ID );
+			$SQL = new SQL( 'Get the latest comment of Item #'.$dest_Item->ID.' to append Item #'.$edited_Item->ID );
 			$SQL->SELECT( 'MAX( comment_date )' );
 			$SQL->FROM( 'T_comments' );
-			$SQL->WHERE( 'comment_item_ID = '.$edited_Item->ID );
+			$SQL->WHERE( 'comment_item_ID = '.$dest_Item->ID );
 			$latest_comment_time = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
 			if( $latest_comment_time !== NULL )
 			{	// If target Item has at lest one comment use new date/time for new appended comments:
@@ -1502,11 +1502,11 @@ switch( $action )
 
 		// Convert the source Item to comment of the target Item:
 		$Comment = new Comment();
-		$Comment->set( 'item_ID', $edited_Item->ID );
-		$Comment->set( 'content', $source_Item->get( 'content' ) );
-		$Comment->set_renderers( $source_Item->get_renderers() );
-		$Comment->set( 'status', $source_Item->get( 'status' ) == 'redirected' ? 'draft' : $source_Item->get( 'status' ) );
-		$Comment->set( 'author_user_ID', $source_Item->get( 'creator_user_ID' ) );
+		$Comment->set( 'item_ID', $dest_Item->ID );
+		$Comment->set( 'content', $edited_Item->get( 'content' ) );
+		$Comment->set_renderers( $edited_Item->get_renderers() );
+		$Comment->set( 'status', $edited_Item->get( 'status' ) == 'redirected' ? 'draft' : $edited_Item->get( 'status' ) );
+		$Comment->set( 'author_user_ID', $edited_Item->get( 'creator_user_ID' ) );
 		if( isset( $append_comment_timestamp ) )
 		{	// Append action with 1 minute incrementing:
 			$Comment->set( 'date', date2mysql( $append_comment_timestamp ) );
@@ -1514,15 +1514,15 @@ switch( $action )
 		}
 		else
 		{	// Merge action with saving date/time:
-			$Comment->set( 'date', $source_Item->get( 'datestart' ) );
+			$Comment->set( 'date', $edited_Item->get( 'datestart' ) );
 		}
-		$Comment->set( 'notif_status', $source_Item->get( 'notifications_status' ) );
-		$Comment->set( 'notif_flags', $source_Item->get( 'notifications_flags' ) );
+		$Comment->set( 'notif_status', $edited_Item->get( 'notifications_status' ) );
+		$Comment->set( 'notif_flags', $edited_Item->get( 'notifications_flags' ) );
 		if( $Comment->dbinsert() )
 		{	// If comment has been created try to copy all attachments from source Item:
 			$DB->query( 'UPDATE T_links
 				  SET link_itm_ID = NULL, link_cmt_ID = '.$Comment->ID.'
-				WHERE link_itm_ID = '.$source_Item->ID );
+				WHERE link_itm_ID = '.$edited_Item->ID );
 			$DB->query( 'UPDATE T_links
 				  SET link_position = "aftermore"
 				WHERE link_cmt_ID = '.$Comment->ID.'
@@ -1532,16 +1532,16 @@ switch( $action )
 		// Move all comments of the source Item to the target Item:
 		if( isset( $append_comment_timestamp ) )
 		{	// Append comments with new dates after the latest comment of the target Item:
-			$SQL = new SQL( 'Get all comments of source Item #'.$source_Item->ID.' in order to append to target Item #'.$edited_Item->ID );
+			$SQL = new SQL( 'Get all comments of source Item #'.$edited_Item->ID.' in order to append to target Item #'.$dest_Item->ID );
 			$SQL->SELECT( 'comment_ID' );
 			$SQL->FROM( 'T_comments' );
-			$SQL->WHERE( 'comment_item_ID = '.$source_Item->ID );
+			$SQL->WHERE( 'comment_item_ID = '.$edited_Item->ID );
 			$SQL->ORDER_BY( 'comment_date' );
 			$source_comment_IDs = $DB->get_col( $SQL->get(), 0, $SQL->title );
 			foreach( $source_comment_IDs as $source_comment_ID )
 			{
 				$DB->query( 'UPDATE T_comments
-						SET comment_item_ID = '.$edited_Item->ID.',
+						SET comment_item_ID = '.$dest_Item->ID.',
 						    comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp ) ).'
 					WHERE comment_ID = '.$source_comment_ID );
 				// Increment 1 minute for each next appending comment:
@@ -1551,19 +1551,19 @@ switch( $action )
 		else
 		{	// Merge comments with saving their dates:
 			$DB->query( 'UPDATE T_comments
-						SET comment_item_ID = '.$edited_Item->ID.'
-					WHERE comment_item_ID = '.$source_Item->ID );
+						SET comment_item_ID = '.$dest_Item->ID.'
+					WHERE comment_item_ID = '.$edited_Item->ID );
 		}
 		// Delete the source Item completely:
-		$source_item_ID = $source_Item->ID;
-		$source_Item->dbdelete();
+		$edited_Item_ID = $edited_Item->ID;
+		$edited_Item->dbdelete();
 
 		$Messages->add( sprintf( ( $action == 'append' )
 			? T_('Item #%d has been appended to current Item.')
-			: T_('Item #%d has been merged to current Item.'), $source_item_ID ), 'success' );
+			: T_('Item #%d has been merged to current Item.'), $edited_Item_ID ), 'success' );
 
 		// REDIRECT / EXIT
-		header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.$edited_Item->ID );
+		header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.$dest_Item->ID );
 		break;
 
 	default:

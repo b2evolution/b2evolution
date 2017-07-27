@@ -964,9 +964,16 @@ div.filters .filter_item div {
 .panel-meta .panel-body {
   background-color: #d9edf7;
 }
+.panel-meta .btn-toolbar {
+  background-color: #afd9ee !important;
+}
 .evo_voting_panel > span.fa {
   margin-right: 4px;
   margin-left: 2px;
+}
+.btn-toolbar .btn-toolbar-title {
+  margin-top: 1px;
+  margin-bottom: 2px;
 }
 
 /*
@@ -3571,6 +3578,17 @@ div.videoblock {
   text-align: center;
   margin: auto;
   overflow: auto;
+  position: relative;
+  max-width: 100%;
+  height: 0;
+  padding-bottom: 56.25%;
+}
+div.videoblock iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 div.podplayer {
   margin: 1em 0;

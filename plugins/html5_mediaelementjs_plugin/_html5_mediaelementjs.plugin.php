@@ -22,7 +22,7 @@ class html5_mediaelementjs_plugin extends Plugin
 	var $code = 'b2evH5MP';
 	var $name = 'HTML 5 MediaElement.js Video and Audio Player';
 	var $priority = 80;
-	var $version = '6.9.2';
+	var $version = '6.9.3';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'm4v', 'f4v', 'mp4', 'ogv', 'webm', 'mp3', 'm4a' );
@@ -190,7 +190,10 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 				'height' => array(
 					'label' => T_('Video height (px)'),
 					'defaultvalue' => 320,
-					'note' => T_('100% height if left empty or 0'),
+					'type' => 'integer',
+					'allow_empty' => true,
+					'valid_range' => array( 'min' => 1 ),
+					'note' => T_('auto height if left empty'),
 					),
 				'allow_download' => array(
 					'label' => T_('Display Download Link'),

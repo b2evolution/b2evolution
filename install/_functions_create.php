@@ -343,6 +343,7 @@ function create_default_data()
 			'usage'          => 'special',
 			'template_name'  => NULL,
 			'perm_level'     => 'admin',
+			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'           => 'Advertisement',
@@ -1373,6 +1374,7 @@ function create_demo_messages()
 	load_class( 'messaging/model/_message.class.php', 'Message' );
 	load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
 	$UserSettings = new UserSettings();
+	$UserCache = & get_UserCache();
 
 	$users_SQL = new SQL();
 	$users_SQL->SELECT( 'user_ID, user_login' );
@@ -1394,6 +1396,9 @@ function create_demo_messages()
 			$recipient_ID = 1;
 		}
 
+		$author_User = & $UserCache->get_by_ID( $author_ID );
+		$recipient_User = & $UserCache->get_by_ID( $recipient_ID );
+
 		$loop_Thread = new Thread();
 		$loop_Message = new Message();
 
@@ -1404,7 +1409,7 @@ function create_demo_messages()
 		$loop_Message->Thread->recipients_list = array( $recipient_ID );
 		$loop_Message->set( 'author_user_ID', $author_ID );
 		$loop_Message->creator_user_ID = $author_ID;
-		$loop_Message->set( 'text', T_('This is a private message.') );
+		$loop_Message->set( 'text', sprintf( T_('This is a demo private message to %s.'), $recipient_User->login ) );
 
 		$DB->begin();
 		$conversation_saved = false;
@@ -1435,7 +1440,7 @@ function create_demo_messages()
 			$loop_reply_Message->Thread = $loop_Thread;
 			$loop_reply_Message->set( 'author_user_ID', $recipient_ID );
 			$loop_reply_Message->creator_user_ID = $author_ID;
-			$loop_reply_Message->set( 'text', T_('This is a private reply.') );
+			$loop_reply_Message->set( 'text', sprintf( T_('This is a demo private reply to %s.'), $author_User->login ) );
 			$loop_reply_Message->set_param( 'thread_ID', 'integer', $loop_reply_Message->Thread->ID );
 
 			if( $loop_reply_Message->dbinsert() )

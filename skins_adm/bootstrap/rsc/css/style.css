@@ -272,6 +272,9 @@ div.delete_messages ul li {
   border: 2px solid #5bc0de;
   background-color: #d9edf7;
 }
+.evo_post__comments .evo_form__comment.form-horizontal.evo_form__comment_meta .btn-toolbar {
+  background-color: #afd9ee;
+}
 .evo_post__comments .evo_form__comment.form-horizontal .form_info {
   display: block;
   text-align: center;

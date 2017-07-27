@@ -598,9 +598,9 @@ $Form->begin_fieldset( T_('Add new fields').( is_admin_page() ? get_manual_link(
 		}
 	}
 
-	$button_add_field = '<button type="submit" id="button_add_field" name="actionArray[add_field]" class="action_icon">'.get_icon( 'add' ).'</button>';
+	$button_add_field = '<button type="submit" id="button_add_field" name="actionArray[add_field]" class="btn btn-default">'.T_('Add').'</button>';
 
-	$Form->select( 'new_field_type', param( 'new_field_type', 'integer', 0 ), 'callback_options_user_new_fields', T_('Add a field of type'), $button_add_field );
+	$Form->select_input( 'new_field_type', param( 'new_field_type', 'integer', 0 ), 'callback_options_user_new_fields', T_('Add a field of type'), array( 'field_suffix' => $button_add_field ) );
 
 $Form->end_fieldset();
 }
@@ -647,7 +647,7 @@ $Form->end_form();
 
 	jQuery( '#button_add_field' ).click( function ()
 	{	// Action for the button when we want to add a new field in the Additional info
-		var field_id = jQuery( this ).parent().prev().find( 'option:selected' ).val();
+		var field_id = jQuery( this ).prev().find( 'option:selected' ).val();
 
 		if( field_id == '' )
 		{	// Mark select element of field types as error

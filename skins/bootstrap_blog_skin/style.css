@@ -268,10 +268,13 @@ div.log_container {
 .evo_post_title {
   display: table;
 }
+.evo_post_title h1 {
+  margin-bottom: 0;
+}
 .evo_post_title h2 {
   display: table-cell;
   margin: 0;
-  padding: 20px 0 10px;
+  padding: 20px 0 0;
 }
 .evo_post_title .btn-group {
   display: table-cell;

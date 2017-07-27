@@ -22,7 +22,7 @@ class shortlinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Short Links';
 	var $priority = 35;
-	var $version = '6.9.2';
+	var $version = '6.9.3';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -925,9 +925,10 @@ class shortlinks_plugin extends Plugin
 						+ '<input type="hidden" id="shortlinks_hidden_urltitle" />'
 						+ '<input type="hidden" id="shortlinks_hidden_title" />'
 						+ '<input type="hidden" id="shortlinks_hidden_excerpt" />'
+						+ '<input type="hidden" id="shortlinks_hidden_teaser" />'
 						+ '<p><label><input type="checkbox" id="shortlinks_form_full_cover" /> <?php echo TS_('Insert full cover image'); ?></label><p>'
 						+ '<p><label><input type="checkbox" id="shortlinks_form_title" checked="checked" /> <?php echo TS_('Insert title'); ?></label><p>'
-						+ '<p><label><input type="checkbox" id="shortlinks_form_thumb_cover" checked="checked" /> <?php echo TS_('Insert thumbnail of cover image'); ?></label><p>'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_thumb_cover" checked="checked" /> <?php echo TS_('Insert thumbnail of cover or first image'); ?></label><p>'
 						+ '<p><label><input type="checkbox" id="shortlinks_form_excerpt" checked="checked" /> <?php echo TS_('Insert excerpt'); ?></label><p>'
 						+ '<p><label><input type="checkbox" id="shortlinks_form_teaser" /> <?php echo TS_('Insert teaser'); ?></label><p>'
 						+ '<p><label><input type="checkbox" id="shortlinks_form_more" checked="checked" /> <?php echo TS_('Insert "Read more" link'); ?></label><p>'
@@ -1116,33 +1117,35 @@ class shortlinks_plugin extends Plugin
 					jQuery( '#shortlinks_hidden_urltitle' ).val( post.urltitle );
 					jQuery( '#shortlinks_hidden_title' ).val( post.title );
 					jQuery( '#shortlinks_hidden_excerpt' ).val( post.excerpt );
+					jQuery( '#shortlinks_hidden_teaser' ).val( post.teaser );
 					jQuery( '#shortlinks_hidden_cover_link' ).val( '' );
 					jQuery( '#shortlinks_hidden_teaser_link' ).val( '' );
 
 					// Item title:
 					var item_content = '<h2>' + post.title + '</h2>';
-					// Item attachments, Only images and on teaser positions:
+					// Item attachments, Only images:
 					if( typeof( post.attachments ) == 'object' && post.attachments.length > 0 )
 					{
 						item_content += '<div id="shortlinks_post_attachments">';
 						for( var a in post.attachments )
 						{
 							var attachment = post.attachments[a];
-							if( attachment.type == 'image' &&
-									( attachment.position == 'teaser' ||
-										attachment.position == 'teaserperm' ||
-										attachment.position == 'teaserlink' )
-								)
-							{
-								item_content += '<img src="' + attachment.url + '" />';
-								if( attachment.position == 'teaser' && jQuery( '#shortlinks_hidden_teaser_link' ).val() == '' )
-								{	// Store link ID of first teaser image in hidden field to use on insert complex link:
+							if( attachment.type == 'image' )
+							{	// Use only images:
+								if( attachment.position == 'teaser' ||
+								    attachment.position == 'teaserperm' ||
+								    attachment.position == 'teaserlink' )
+								{	// Add teaser image to post content:
+									item_content += '<img src="' + attachment.url + '" />';
+								}
+								if( attachment.position == 'cover' )
+								{	// Store link ID of cover image in hidden field to use on insert complex link:
+									jQuery( '#shortlinks_hidden_cover_link' ).val( attachment.link_ID );
+								}
+								if( jQuery( '#shortlinks_hidden_teaser_link' ).val() == '' )
+								{	// Store link ID of any first image in hidden field to use on insert complex link:
 									jQuery( '#shortlinks_hidden_teaser_link' ).val( attachment.link_ID );
 								}
-							}
-							if( attachment.type == 'image' && attachment.position == 'cover' )
-							{	// Store link ID of cover image in hidden field to use on insert complex link:
-								jQuery( '#shortlinks_hidden_cover_link' ).val( attachment.link_ID );
 							}
 						}
 						item_content += '</div>';
@@ -1257,43 +1260,50 @@ class shortlinks_plugin extends Plugin
 
 			var dest_type = false;
 			var dest_object_ID = false;
-			if( jQuery( 'input[type=hidden][name=p]' ).length )
+			if( jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).length )
+			{	// New object form:
+				dest_type = 'temporary';
+				dest_object_ID = jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).val();
+			}
+			else if( jQuery( 'input[type=hidden][name=post_ID]' ).length && jQuery( 'input[type=hidden][name=item_typ_ID]' ).length )
 			{	// Item form:
 				dest_type = 'item';
-				dest_object_ID = jQuery( 'input[type=hidden][name=p]' ).val();
+				dest_object_ID = jQuery( 'input[type=hidden][name=post_ID]' ).val();
 			}
-			else if( jQuery( 'input[type=hidden][name=comment_ID]' ).length )
+			else if( jQuery( 'input[type=hidden][name=comment_ID]' ).length || jQuery( 'input[type=hidden][name=comment_item_ID]' ).length )
 			{	// Comment form:
 				dest_type = 'comment';
-				dest_object_ID = jQuery( 'input[type=hidden][name=comment_ID]' ).val();
+				if( jQuery( 'input[type=hidden][name=comment_ID]' ).length )
+				{
+					dest_object_ID = jQuery( 'input[type=hidden][name=comment_ID]' ).val();
+				}
 			}
 			else if( jQuery( 'input[type=hidden][name=ecmp_ID]' ).length )
 			{	// Email Campaign form:
 				dest_type = 'emailcampaign';
 				dest_object_ID = jQuery( 'input[type=hidden][name=ecmp_ID]' ).val();
 			}
-			else if( jQuery( 'input[type=hidden][name=thrd_ID]' ).length )
+			else if( jQuery( 'input[name=msg_text]' ).length )
 			{	// Message form:
 				dest_type = 'message';
 				dest_object_ID = 0;
-			}/*
-			else if( jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).length )
-			{	// New object form:
-				dest_type = 'temporary';
-				dest_object_ID = jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).val();
-			}*/
+			}
 
 			// Check if at least one image is requested to insert:
-			var insert_images = ( jQuery( '#shortlinks_form_full_cover, #shortlinks_form_thumb_cover, #shortlinks_form_teaser' ).is( ':checked' ) &&
-			    jQuery( '#shortlinks_hidden_cover_link' ).val() != '' &&
-					jQuery( '#shortlinks_hidden_teaser_link' ).val() != '' );
+			var insert_images = ( jQuery( '#shortlinks_form_full_cover' ).is( ':checked' ) && jQuery( '#shortlinks_hidden_cover_link' ).val() != '' )
+				|| ( jQuery( '#shortlinks_form_thumb_cover' ).is( ':checked' ) && jQuery( '#shortlinks_hidden_teaser_link' ).val() != '' );
 
 			if( insert_images && dest_type != false && dest_object_ID > 0 )
 			{	// We need to insert at least one image/file inline tag:
 				shortlinks_start_loading( '#shortlinks_post_block' );
 
-				var source_position = ( jQuery( '#shortlinks_form_full_cover, #shortlinks_form_thumb_cover' ).is( ':checked' ) ? 'cover' : '' )
-					+ ',' + ( jQuery( '#shortlinks_form_teaser' ).is( ':checked' ) ? 'teaser' : '' );
+				// Get first image with any position:
+				var source_position = '';
+				if( jQuery( '#shortlinks_form_full_cover' ).is( ':checked' ) &&
+				  ! jQuery( '#shortlinks_form_thumb_cover' ).is( ':checked' ) )
+				{	// Get only cover image:
+					source_position = 'cover';
+				}
 
 				// Call REST API request to copy the links from the selected Item to the edited object:
 				evo_rest_api_request( 'links',
@@ -1302,6 +1312,7 @@ class shortlinks_plugin extends Plugin
 					'source_type':      'item',
 					'source_object_ID': jQuery( '#shortlinks_hidden_ID' ).val(),
 					'source_position':  source_position,
+					'source_file_type': 'image',
 					'dest_type':        dest_type,
 					'dest_object_ID':   dest_object_ID,
 					'dest_position':    'inline',
@@ -1310,28 +1321,20 @@ class shortlinks_plugin extends Plugin
 				{
 					var full_cover = '';
 					var thumb_cover = '';
-					var teasers = '';
 
 					for( var l in data.links )
 					{
 						var link = data.links[l];
-						if( link.orig_position == 'cover' )
-						{	// Build inline tags for cover image:
-							if( jQuery( '#shortlinks_form_full_cover' ).is( ':checked' ) )
-							{	// Full cover image:
-								full_cover = '[image:' + link.ID + ']';
-							}
-							if( jQuery( '#shortlinks_form_thumb_cover' ).is( ':checked' ) )
-							{	// Thumbnail cover image:
-								thumb_cover = '[thumbnail:' + link.ID + ']';
-							}
+						if( link.orig_position == 'cover' && jQuery( '#shortlinks_form_full_cover' ).is( ':checked' ) )
+						{	// Build inline tag for full cover image:
+							full_cover = '[image:' + link.ID + ']';
 						}
-						else if( link.orig_position == 'teaser' && jQuery( '#shortlinks_form_teaser' ).is( ':checked' ) )
-						{	// Build inline tags for teaser files:
-							teasers += "\r\n" + '[' + ( link.file_type == 'other' ? 'file' : link.file_type ) + ':' + link.ID + ']';
+						if( jQuery( '#shortlinks_form_thumb_cover' ).is( ':checked' ) )
+						{	// Build inline tag for thumbnail cover image:
+							thumb_cover = '[thumbnail:' + link.ID + ']';
 						}
 					}
-					shortlinks_insert_complex_link( full_cover, thumb_cover, teasers );
+					shortlinks_insert_complex_link( full_cover, thumb_cover );
 
 					shortlinks_end_loading( '#shortlinks_post_block', jQuery( '#shortlinks_post_block' ).html() );
 
@@ -1346,7 +1349,7 @@ class shortlinks_plugin extends Plugin
 			else
 			{	// Insert only simple text without images:
 				if( insert_images )
-				{	// Display this alert if user wants to insert image for new creating object:
+				{	// Display this alert if user wants to insert image for new creating object but it doesn't support:
 					alert( 'Please save your ' + dest_type + ' before trying to attach files. This limitation will be removed in a future version of b2evolution.' );
 				}
 				shortlinks_insert_complex_link();
@@ -1403,9 +1406,8 @@ class shortlinks_plugin extends Plugin
 		 *
 		 * @param string Full cover image inline tag
 		 * @param string Thumbnail cover image inline tag
-		 * @param string Teaser image inline tags
 		 */
-		function shortlinks_insert_complex_link( full_cover, thumb_cover, teasers )
+		function shortlinks_insert_complex_link( full_cover, thumb_cover )
 		{
 			var post_content = '';
 
@@ -1423,11 +1425,12 @@ class shortlinks_plugin extends Plugin
 			}
 			if( jQuery( '#shortlinks_form_excerpt' ).is( ':checked' ) )
 			{	// Excerpt:
-				post_content += "\r\n" + jQuery( '#shortlinks_hidden_excerpt' ).val();
+				post_content += ( typeof( thumb_cover ) != 'undefined' && thumb_cover != '' ? ' ' : "\r\n" )
+					+ jQuery( '#shortlinks_hidden_excerpt' ).val();
 			}
-			if( typeof( teasers ) != 'undefined' && teasers != '' )
-			{	// Teaser images:
-				post_content += teasers;
+			if( jQuery( '#shortlinks_form_teaser' ).is( ':checked' ) )
+			{	// Teaser (text before [teaserbreak]):
+				post_content += "\r\n" + jQuery( '#shortlinks_hidden_teaser' ).val();
 			}
 			if( jQuery( '#shortlinks_form_more' ).is( ':checked' ) )
 			{	// "Read more" link:

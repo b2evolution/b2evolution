@@ -955,6 +955,16 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		handle_array_keys_in_plugin_settings($l_value);
 	}
 
+	if( isset( $parmeta['type'] ) && $parmeta['type'] == 'integer' )
+	{	// Convert to correct integer value:
+		$l_value = intval( $l_value );
+		if( $l_value == 0 && ! empty( $parmeta['allow_empty'] ) &&
+				isset( $parmeta['valid_range'], $parmeta['valid_range']['min'] ) && $parmeta['valid_range']['min'] > 0 )
+		{	// Convert 0 to empty value for integer field if it allows empty values:
+			$l_value = NULL;
+		}
+	}
+
 	if( ! autoform_validate_param_value( $Obj->get_param_prefix().$parname, $l_value, $parmeta ) )
 	{
 		return;

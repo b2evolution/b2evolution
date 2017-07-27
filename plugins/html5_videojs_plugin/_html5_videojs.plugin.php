@@ -22,7 +22,7 @@ class html5_videojs_plugin extends Plugin
 	var $code = 'b2evH5VJSP';
 	var $name = 'HTML 5 VideoJS Player';
 	var $priority = 80;
-	var $version = '6.9.2';
+	var $version = '6.9.3';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'm4v', 'f4v', 'mp4', 'ogv', 'webm' );
@@ -113,7 +113,10 @@ class html5_videojs_plugin extends Plugin
 				'height' => array(
 					'label' => T_('Video height (px)'),
 					'defaultvalue' => 300,
-					'note' => T_('100% height if left empty or 0'),
+					'type' => 'integer',
+					'allow_empty' => true,
+					'valid_range' => array( 'min' => 1 ),
+					'note' => T_('auto height if left empty'),
 					),
 				'allow_download' => array(
 					'label' => T_('Display Download Link'),

@@ -109,7 +109,7 @@ class item_info_line_Widget extends ComponentWidget
 					'label' => T_( 'Permalink icon' ),
 					'note' => T_( 'Display permalink icon' ),
 					'type' => 'checkbox',
-					'defaultvalue' => true
+					'defaultvalue' => false
 				),
 				'before_author' => array(
 					'label' => T_( 'Before author' ),
@@ -175,7 +175,7 @@ class item_info_line_Widget extends ComponentWidget
 					'label' => T_( 'Edit link' ),
 					'note' => T_( 'Display link to edit the item/post' ),
 					'type' => 'checkbox',
-					'defaultvalue' => true
+					'defaultvalue' => false
 				)
 			), parent::get_param_definitions( $params ) );
 
@@ -230,11 +230,11 @@ class item_info_line_Widget extends ComponentWidget
 			switch( $this->disp_params['before_author'] )
 			{
 				case 'posted_by':
-					$before_author = T_('posted by').' ';
+					$before_author = T_('Posted by').' ';
 					break;
 
 				case 'started_by':
-					$before_author = T_('started by').' ';
+					$before_author = T_('Started by').' ';
 					break;
 
 				default:
@@ -321,6 +321,7 @@ class item_info_line_Widget extends ComponentWidget
 			echo '<span class="text-muted"> &ndash; '
 				.T_('Last touched').': '
 				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) )
+				.$Item->get_refresh_last_touched_link()
 				.'</span>';
 		}
 
