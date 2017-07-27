@@ -125,7 +125,7 @@ class ItemList2 extends ItemListLight
 		      ( $ItemType->get( 'allow_disabling_comments' ) || $ItemType->get( 'allow_closing_comments' ) )
 		  ) )
 		{ // param is required
-			$post_comment_status = param( 'post_comment_status', 'string', true );
+			$post_comment_status = param( 'post_comment_status', 'string', 'open' );
 		}
 		else
 		{
