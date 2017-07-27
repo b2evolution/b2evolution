@@ -9640,5 +9640,128 @@ class Item extends ItemLight
 		echo nl2br( $comment_form_msg );
 		echo $params['after'];
 	}
+
+
+	/**
+	 * Check if current User has a permission to refresh a last touched date of this Item
+	 *
+	 * @return boolean
+	 */
+	function can_refresh_last_touched()
+	{
+		if( ! $this->ID )
+		{	// If this Item is not saved in DB yet:
+			return false;
+		}
+
+		if( ! is_logged_in( false ) )
+		{	// If current user is not logged in or not activated:
+			return false;
+		}
+
+		global $current_User;
+
+		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// If user has no perm to edit this Item:
+			return false;
+		}
+
+		// No restriction, Current User has a permission to refresh a last touched date of this Item:
+		return true;
+	}
+
+
+	/**
+	 * Get URL to refresh a last touched date of this Item if user has refresh rights
+	 *
+	 * @param array Params
+	 * @return string|boolean URL or FALSE if current user has no perm
+	 */
+	function get_refresh_last_touched_url( $params = array() )
+	{
+		if( ! $this->can_refresh_last_touched() )
+		{	// If current User has no perm to refresh:
+			return false;
+		}
+
+		$params = array_merge( array(
+				'glue' => '&amp;'
+			), $params );
+
+		$url = get_htsrv_url().'action.php?mname=collections'.$params['glue']
+			.'action=refresh_last_touched'.$params['glue']
+			.'item_ID='.$this->ID.$params['glue']
+			.url_crumb( 'collections_refresh_last_touched' );
+
+		return $url;
+	}
+
+
+	/**
+	 * Get a link to refresh a last touched date of this Item if user has refresh rights
+	 *
+	 * @param array Params
+	 */
+	function get_refresh_last_touched_link( $params = array() )
+	{
+		$params = array_merge( array(
+				'before' => ' ',
+				'after'  => '',
+				'text'   => '#icon#',
+				'title'  => '#',
+				'class'  => '',
+				'glue'   => '&amp;',
+			), $params );
+
+		$refresh_url = $this->get_refresh_last_touched_url( $params );
+		if( ! $refresh_url )
+		{	// If current user has no perm to refesh last touched date of this Item:
+			return;
+		}
+
+		if( $params['title'] == '#' )
+		{	// Use default title
+			$params['title'] = T_('Refresh last touched date');
+		}
+
+		$params['text'] = utf8_trim( $params['text'] );
+		$params['title'] = utf8_trim( $params['title'] );
+		$params['class'] = utf8_trim( $params['class'] );
+
+		$r = $params['before'];
+
+		$r .= '<a href="'.$refresh_url.'"'
+				.( empty( $params['title'] ) ? '' : ' title="'.format_to_output( $params['title'], 'htmlattr' ).'"' )
+				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
+			.'>'
+				.str_replace( '#icon#', get_icon( 'refresh', 'imgtag', array( 'title' => $params['title'] ) ), $params['text'] )
+			.'</a>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Refresh last touched ts with date of the latest Comment
+	 *
+	 * @return boolean TRUE of success
+	 */
+	function refresh_last_touched_ts()
+	{
+		if( ! ( $latest_Comment = & $this->get_latest_Comment() ) )
+		{	// Only if this Item has the latest Comment:
+			return false;
+		}
+
+		global $DB;
+
+		$DB->query( 'UPDATE T_items__item
+					SET post_last_touched_ts = '.$DB->quote( $latest_Comment->get( 'last_touched_ts' ) ).'
+				WHERE post_ID = '.$this->ID );
+
+		return true;
+	}
 }
 ?>

@@ -4447,6 +4447,14 @@ class Comment extends DataObject
 			}
 		}
 
+		// Get the latest Comment of parent Item in order to know to refresh 
+		$comment_Item = & $this->get_Item();
+		if( $item_latest_Comment = & $comment_Item->get_latest_Comment() &&
+		    $item_latest_Comment->ID == $this->ID )
+		{	// We should refresh last touched date after deleting of this Comment because it was the latest comment of parent Item:
+			$refresh_parent_item = true;
+		}
+
 		if( $force_permanent_delete || ( $this->status == 'trash' ) || $this->is_meta() )
 		{	// Permamently delete comment from DB:
 			// remember ID, because parent method resets it to 0
@@ -4477,6 +4485,12 @@ class Comment extends DataObject
 			if( $use_transaction )
 			{
 				$DB->commit();
+			}
+
+			if( ! empty( $refresh_parent_item ) )
+			{	// Refresh last touched ts of parent Item if this Comment was the latest Comment of parent Item:
+				$comment_Item->latest_Comment = NULL;
+				$comment_Item->refresh_last_touched_ts();
 			}
 		}
 		else

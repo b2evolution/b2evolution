@@ -171,6 +171,11 @@ while( $Item = & $ItemList->get_item() )
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'name' ) );
 
+				// Last touched date:
+				echo ' &dash; '.T_('Last touched').': '
+					.mysql2date( locale_datefmt().' @ '.locale_shorttimefmt(), $Item->get( 'last_touched_ts' ) )
+					.$Item->get_refresh_last_touched_link();
+
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
 

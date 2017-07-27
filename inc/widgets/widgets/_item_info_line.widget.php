@@ -321,6 +321,7 @@ class item_info_line_Widget extends ComponentWidget
 			echo '<span class="text-muted"> &ndash; '
 				.T_('Last touched').': '
 				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) )
+				.$Item->get_refresh_last_touched_link()
 				.'</span>';
 		}
 
