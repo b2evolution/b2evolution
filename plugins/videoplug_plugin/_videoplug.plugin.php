@@ -53,6 +53,7 @@ class videoplug_plugin extends Plugin
 					'label' => T_('Video width (px or %)'),
 					'note' => T_('100% width if left empty or 0'),
 					'valid_pattern' => '/^(\d+(\.\d+)?%?)?$/',
+					'defaultvalue' => '100%',
 				),
 				'height' => array(
 					'label' => T_('Video height (px or %)'),
@@ -60,6 +61,7 @@ class videoplug_plugin extends Plugin
 					'allow_empty' => true,
 					'valid_pattern' => '/^(\d+(\.\d+)?%?)?$/',
 					'note' => T_('Leave empty for a 16/9 aspect ratio').' (16/9=56.25%)',
+					'defaultvalue' => '56.25%',
 				),
 			);
 	}
@@ -98,45 +100,14 @@ class videoplug_plugin extends Plugin
 
 		$style = '';
 
-		if( empty( $width ) && ! empty( $height ) )
-		{	// Use default/auto width depending on not default height:
-			$width_ratio = 1.7778; // for 16/9 aspect ratio (16/9=177.78%)
-			if( strpos( $height, '%' ) === false )
-			{	// If height in digits:
-				$style .= 'width:'.floor( $height * $width_ratio ).'px;';
-			}
-			else
-			{	// If height in percents:
-				$style .= 'width:'.( str_replace( '%', '', $height ) * $width_ratio ).'%;';
-			}
-		}
-		elseif( ! empty( $width ) )
-		{	// Set style width from plugin setting:
+		if( ! empty( $width ) )
+		{	// Set width depending on what units are used:
 			$style .= 'width:'.( strpos( $width, '%' ) === false ? $width.'px' : $width ).';';
 		}
 
-		if( empty( $height ) && ! empty( $width ) )
-		{	// Use default/auto height depending on not default width:
-			$height_ratio = 0.5625; // for 16/9 aspect ratio (9/16=56.25%)
-			if( strpos( $width, '%' ) === false )
-			{	// If width in digits:
-				$style .= 'padding-bottom:'.floor( $width * $height_ratio ).'px;';
-			}
-			else
-			{	// If width in percents:
-				$style .= 'padding-bottom:'.( str_replace( '%', '', $width ) * $height_ratio ).'%;';
-			}
-		}
-		elseif( ! empty( $height ) )
+		if( ! empty( $height ) )
 		{	// Set height depending on what units are used:
-			if( strpos( $height, '%' ) === false )
-			{	// Use digits for pixel size:
-				$style .= 'padding-bottom:0;height:'.$height.'px';
-			}
-			else
-			{	// Use percents to set aspect ratio:
-				$style .= 'padding-bottom:'.$height;
-			}
+			$style .= 'padding-bottom:'.( strpos( $height, '%' ) === false ? '0;height:'.$height.'px' : $height );
 		}
 
 		$video_block_before = '<div class="videoblock"'.( $style == '' ? '' : ' style="'.$style.'"' ).'>';
