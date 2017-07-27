@@ -343,6 +343,7 @@ function create_default_data()
 			'usage'          => 'special',
 			'template_name'  => NULL,
 			'perm_level'     => 'admin',
+			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'           => 'Advertisement',
