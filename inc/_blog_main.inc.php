@@ -212,6 +212,8 @@ if( $resolve_extra_path )
 				$last_char = substr( $path_string, -1 );
 				$last_part = $path_elements[count( $path_elements )-1];
 				$last_len  = strlen( $last_part );
+				$user_page_prefix = $Blog->get_setting( 'user_prefix' ).':';
+				$user_page_prefix_length = strlen( $user_page_prefix );
 				if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) ) || $last_char == ':'|| $last_char == ';' )
 				{	// - : or ; -> We'll consider this to be a tag page
 					$tag = substr( $last_part, 0, -1 );
@@ -226,10 +228,12 @@ if( $resolve_extra_path )
 					}
 					$disp = 'posts';
 				}
-				elseif( strlen( $path_elements[0] ) > 5 && substr( $path_elements[0], 0, 5 ) == 'user:' )
+				elseif( $user_page_prefix_length > 1 &&
+				        strlen( $path_elements[0] ) > $user_page_prefix_length &&
+				        substr( $path_elements[0], 0, $user_page_prefix_length ) == $user_page_prefix )
 				{	// Alias for disp=user:
 					$user_ID = -1; // Set -1 for case when user is not detected by login and ID
-					$user_request = substr( $path_elements[0], 5 );
+					$user_request = substr( $path_elements[0], $user_page_prefix_length );
 
 					$UserCache = & get_UserCache();
 					if( $User = & $UserCache->get_by_login( $user_request ) ||

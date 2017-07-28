@@ -50,6 +50,9 @@ class CollectionSettings extends AbstractSettings
 			'paged_noindex' => '1',							// META NOINDEX on following blog pages
 			'paged_nofollowto' => '0',						// NOFOLLOW on links to following blog pages
 
+		// User profile page settings:
+			'user_prefix' => 'user',
+
 		// Single post settings:
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?

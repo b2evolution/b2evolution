@@ -523,6 +523,15 @@ jQuery("#tag_prefix").keyup( function() {
 
 
 <?php
+$Form->begin_fieldset( T_('User profile page URLs') . get_manual_link('user-profile-page-url-settings') );
+
+	$Form->text_input( 'user_prefix', $edited_Blog->get_setting( 'user_prefix' ), 30, T_('Prefix'),
+		T_('A prefix to be added to the URLs of the user profile pages'),
+		array( 'maxlength' => 120, 'required' => true ) );
+
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('Single post URLs') . get_manual_link('single-post-url-settings') );
 
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),

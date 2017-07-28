@@ -674,6 +674,13 @@ class Blog extends DataObject
 		// Tag posts per page:
 		$this->set_setting( 'tag_posts_per_page', param( 'tag_posts_per_page', 'integer', NULL ), true );
 
+		if( param( 'user_prefix', 'string', NULL ) !== NULL )
+		{	// User profile page prefix:
+			param_check_not_empty( 'user_prefix', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('User profile page prefix') ) );
+			param_check_regexp( 'user_prefix', '#^[a-z0-9\-_]+$#i', T_('User profile page prefix must be letters, digits or signs "-", "_".') );
+			$this->set_setting( 'user_prefix', get_param( 'user_prefix' ) );
+		}
+
 		if( param( 'single_links', 'string', NULL ) !== NULL )
 		{ // Single post link type:
 			$this->set_setting( 'single_links', get_param( 'single_links' ) );
@@ -2804,7 +2811,7 @@ class Blog extends DataObject
 						$user_param = $params['user_ID'];
 					}
 				}
-				$url = url_add_tail( $this_Blog->gen_blogurl(), '/user:'.$user_param );
+				$url = url_add_tail( $this_Blog->gen_blogurl(), '/'.$this_Blog->get_setting( 'user_prefix' ).':'.$user_param );
 			}
 			else
 			{	// Add disp param to blog's url when current disp is not a front page:
