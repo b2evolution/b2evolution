@@ -1574,6 +1574,91 @@ function get_coll_fav_icon( $blog_ID, $params = array() )
 			.'</a>';
 }
 
+
+/**
+ * Get blog order field
+ *
+ * @param object Blog
+ * @param string What return: 'field', 'dir'
+ * @param string Separator
+ * @return string
+ */
+function get_blog_order( $Blog = NULL, $return = 'field', $separator = ',' )
+{
+	$result = '';
+
+	switch( $return )
+	{
+		case 'field':
+			// Get field for ORDERBY sql clause
+			if( empty( $Blog ) )
+			{ // Get default value if blog is not defined
+				$result = 'datestart';
+			}
+			else
+			{
+				$result = $Blog->get_setting( 'orderby' );
+				if( $Blog->get_setting( 'orderby_1' ) != '' )
+				{ // Append second order field
+					$result .= $separator.$Blog->get_setting( 'orderby_1' );
+					if( $Blog->get_setting( 'orderby_2' ) != '' )
+					{ // Append third order field
+						$result .= $separator.$Blog->get_setting( 'orderby_2' );
+					}
+				}
+			}
+			break;
+
+		case 'dir':
+			// Get direction(ASC|DESC) for ORDERBY sql clause
+			if( empty( $Blog ) )
+			{ // Get default value if blog is not defined
+				$result = 'DESC';
+			}
+			else
+			{
+				$result = $Blog->get_setting( 'orderdir' );
+				if( $Blog->get_setting( 'orderby_1' ) != '' && $Blog->get_setting( 'orderdir_1' ) != '' )
+				{ // Append second order direction
+					$result .= $separator.$Blog->get_setting( 'orderdir_1' );
+					if( $Blog->get_setting( 'orderby_2' ) != '' && $Blog->get_setting( 'orderdir_2' ) != '' )
+					{ // Append third order direction
+						$result .= $separator.$Blog->get_setting( 'orderdir_2' );
+					}
+				}
+			}
+			break;
+	}
+
+	return $result;
+}
+
+
+/**
+ * Get posts order by options for the order by select list
+ *
+ * @param string the value which should be selected by default
+ * @param boolean set tru to allow 'none' option, false otherwise
+ */
+function get_post_orderby_options( $selected_value, $allow_none = false )
+{
+	// Get available sort options
+	$available_sort_options = get_available_sort_options( $allow_none, true );
+	$general_orderby_list = array_shift( $available_sort_options );
+
+	// Build $option_list
+	$option_list = Form::get_select_options_string( $general_orderby_list, $selected_value, false, false );
+	if( ! empty( $available_sort_options['custom'] ) )
+	{ // There are custom fields order by options
+		$option_list .= '<optgroup label="'.T_('Custom fields').'">';
+		$option_list .= Form::get_select_options_string( $available_sort_options['custom'], $selected_value, false, false );
+		$option_list .= '</optgroup>';
+	}
+
+	return $option_list;
+}
+
+
 /**
  * Display blogs results table
  *

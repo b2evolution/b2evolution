@@ -845,6 +845,23 @@ class Blog extends DataObject
 			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
 			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
 
+			// Set additional order fields
+			$orderby_1 = param( 'orderby_1', 'string', '' );
+			if( empty( $orderby_1 ) )
+			{ // Delete if first additional field is not defined
+				$this->delete_setting( 'orderby_1' );
+				$this->delete_setting( 'orderdir_1' );
+				$this->delete_setting( 'orderby_2' );
+				$this->delete_setting( 'orderdir_2' );
+			}
+			else
+			{
+				$this->set_setting( 'orderby_1', $orderby_1 );
+				$this->set_setting( 'orderdir_1', param( 'orderdir_1', 'string', '' ) );
+				$this->set_setting( 'orderby_2', param( 'orderby_2', 'string', '' ) );
+				$this->set_setting( 'orderdir_2', param( 'orderdir_2', 'string', '' ) );
+			}
+
 			$disp_featured_above_list = param( 'disp_featured_above_list', 'integer', 0 );
 			$this->set_setting( 'disp_featured_above_list', $disp_featured_above_list );
 

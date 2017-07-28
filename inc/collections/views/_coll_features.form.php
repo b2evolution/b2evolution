@@ -32,10 +32,33 @@ $Form->hidden( 'tab', 'features' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
-	$Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), get_available_sort_options(), T_('Order by'), T_('Default ordering of posts.') );
-	$Form->select_input_array( 'orderdir', $edited_Blog->get_setting('orderdir'), array(
-												'ASC'  => T_('Ascending'),
-												'DESC' => T_('Descending'), ), T_('Direction') );
+
+	// Display the 3 orderby fields with order direction
+	for( $order_index = 0; $order_index <= 2 /* The number of orderby fields - 1 */; $order_index++ )
+	{ // The order fields:
+		$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
+
+		// Direction
+		$Form->output = false;
+		$Form->switch_layout( 'none' );
+		$field_params = array();
+		if( ( $order_index == 2 ) && ! $edited_Blog->get_setting( 'orderdir_1' ) )
+		{ // The third orderby field should be disable if the second was not set yet
+			$field_params['disabled'] = 'disabled';
+		}
+		$orderdir_select = $Form->select_input_array( 'orderdir'.$field_suffix, $edited_Blog->get_setting( 'orderdir'.$field_suffix ), array(
+													'ASC' => T_('Ascending'),
+													'DESC' => T_('Descending'), ), '', '', $field_params );
+		$Form->switch_layout( NULL );
+		$Form->output = true;
+
+		// Set order direction as field suffix
+		$field_params['field_suffix'] = $orderdir_select;
+		// Get orderby options and create the select list
+		$orderby_options = get_post_orderby_options( $edited_Blog->get_setting( 'orderby'.$field_suffix ), $order_index > 0 );
+		$Form->select_input_options( 'orderby'.$field_suffix, $orderby_options, ( $order_index == 0 ? T_('Order by') : '' ), '', $field_params );
+	}
+
 	$Form->begin_line( T_('Display') );
 		$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, '', '', 4 );
 		$Form->radio( 'what_to_show', $edited_Blog->get_setting('what_to_show'),
@@ -289,4 +312,47 @@ jQuery( '#voting_positive' ).click( function()
 		jQuery( '#voting_neutral, #voting_negative' ).attr( 'disabled', 'disabled' ).removeAttr( 'checked' );
 	}
 } );
+
+// JS for order fields:
+jQuery( document ).ready( function()
+{
+	disable_selected_orderby_options();
+} );
+
+jQuery( 'select[id^=orderby]' ).change( function()
+{
+	if( jQuery( this ).attr( 'id' ) == 'orderby_1' )
+	{ // First additional order field was changed
+		if( jQuery( this ).val() == '' )
+		{ // If 'None' is selected - Disable second additional order field
+			jQuery( '#orderby_2, #orderdir_2' ).attr( 'disabled', 'disabled' ).val( '' );
+		}
+		else
+		{ // Enable second if first is selected
+			jQuery( '#orderby_2, #orderdir_2' ).removeAttr( 'disabled' );
+		}
+	}
+
+	// Redisable options after some order field was changed
+	jQuery( 'select[id^=orderby] option' ).removeAttr( 'disabled' );
+	disable_selected_orderby_options();
+} );
+
+/**
+ * Disable the selected option in two other 'orderby' <select>s
+ */
+function disable_selected_orderby_options()
+{
+	jQuery( 'select[id^=orderby]' ).each( function()
+	{
+		var selected = jQuery( this ).val();
+		if( selected != '' )
+		{
+			jQuery( 'select[id^=orderby][id!="' + jQuery( this ).attr( 'id' ) + '"]' ).each( function()
+			{
+				jQuery( this ).find( 'option[value="' + selected + '"]' ).attr( 'disabled', 'disabled' );
+			} );
+		}
+	} );
+}
 </script>

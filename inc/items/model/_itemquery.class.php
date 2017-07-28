@@ -47,6 +47,13 @@ class ItemQuery extends SQL
 	var $featured;
 	var $flagged;
 
+	/**
+	 * A query FROM string to join other tables.
+	 * It is set in case of the select queries when we need to order by custom fields.
+	 *
+	 * @var string
+	 */
+	var $orderby_from = '';
 
 	/**
 	 * Constructor.
@@ -1000,6 +1007,112 @@ class ItemQuery extends SQL
 	}
 
 
+	/**
+	 * Generate order by clause
+	 *
+	 * @param $order_by
+	 * @param $order_dir
+	 */
+	function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname )
+	{
+		global $DB;
+
+		$order_by = str_replace( ' ', ',', $order_by );
+		$orderby_array = explode( ',', $order_by );
+
+		if( in_array( 'numviews', $orderby_array ) )
+		{	// Special case for numviews:
+			$this->orderby_from .= ' LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS post_numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+				ON post_ID = numviews.itud_item_ID ';
+		}
+
+		// asimo> $nullable_fields may be used if we would like to order the null values into the end of the result
+		// asimo> It would move the null values into the end no matter what kind of direction are we sorting
+		// Set of sort options which are nullable
+		// $nullable_fields = array( 'order', 'priority' );
+
+		$available_fields = get_available_sort_options( false, true );
+		// Custom sort options
+		$custom_sort_fields = $available_fields['custom'];
+
+		foreach( $custom_sort_fields as $key => $field_name )
+		{
+			$table_alias = $key.'_table';
+			$field_value = $table_alias.'.iset_value';
+			if( strpos( $key, 'custom_double' ) === 0 )
+			{ // Double values should be compared as numbers and not like strings
+				$field_value .= '+0';
+			}
+			if( in_array( $key, $orderby_array ) )
+			{
+				if( empty( $this->orderby_from ) )
+				{
+					$this->orderby_from .= ' ';
+				}
+				// $nullable_fields[$key] = $field_value;
+				$this->orderby_from .= 'LEFT JOIN T_items__item_settings as '.$table_alias.' ON post_ID = '.$table_alias.'.iset_item_ID AND '
+						.$table_alias.'.iset_name = (
+							SELECT CONCAT( "custom_", itcf_type, "_", itcf_ID )
+							FROM T_items__type_custom_field WHERE itcf_name = '.$DB->quote( $field_name ).' AND itcf_ityp_ID = post_ityp_ID )';
+				$order_by = str_replace( $key, $field_value, $order_by );
+			}
+			$custom_sort_fields[$key] = $field_value;
+		}
+
+		$available_fields = array_merge( array_keys( $available_fields['general'] ), array_values( $custom_sort_fields ) );
+		// Extend general list to allow order posts by these fields as well for some special cases
+		$available_fields[] = 'creator_user_ID';
+		$available_fields[] = 'assigned_user_ID';
+		$available_fields[] = 'pst_ID';
+		$available_fields[] = 'datedeadline';
+		$available_fields[] = 'ityp_ID';
+		$available_fields[] = 'status';
+		$available_fields[] = 'T_categories.cat_name';
+		$available_fields[] = 'T_categories.cat_order';
+
+		$order_clause = gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname, $available_fields );
+
+		// asimo> The following commented code parts handles the nullable fields order, to move them NULL values into the end of the result
+		// asimo> !!!Do NOT remove!!!
+//		$orderby_fields = explode( ',', $order_clause );
+//		foreach( $orderby_array as $index => $orderby_field )
+//		{
+//			$field_name = NULL;
+//			$additional_clause = 0;
+//			if( in_array( $orderby_field, $nullable_fields ) )
+//			{ // This is an item nullable field
+//				$field_name = $dbprefix.$orderby_field;
+//			}
+//			elseif( strpos( $orderby_field, 'custom_' ) === 0 )
+//			{ // This is an item custom field which are always nullable
+//				$field_name = $nullable_fields[$orderby_field];
+//			}
+//
+//			if( empty( $field_name ) || ( strpos( $order_clause, $field_name ) === false ) )
+//			{ // The field is not nullable or it is not present in the final order clause
+//				continue;
+//			}
+//
+//			// Insert 'order null values into the end' order clause
+//			array_splice( $orderby_fields, $index + $additional_clause, 0, array( ' (CASE WHEN '.$field_name.' IS NULL then 1 ELSE 0 END)' ) );
+//			$additional_clause++;
+//		}
+//		$order_clause = implode( ',', $orderby_fields );
+
+		return $order_clause;
+	}
+
+
+	/**
+	 * Get additional FROM clause if it is required because of custom order_by fields
+	 *
+	 * @param return before the FROM clause
+	 * @return string the FROM clause to JOIN the custom fields tables
+	 */
+	function get_orderby_from( $prefix = '' )
+	{
+		return $prefix.$this->orderby_from;
+	}
 }
 
 ?>

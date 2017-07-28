@@ -51,8 +51,8 @@ skin_widget( array(
 		'grid_colend' => '',
 		'grid_cellstart' => '<div><span'.$photocell_styles.'>',
 		'grid_cellend' => '</span></div>',
-		'order_by' => $Blog->get_setting('orderby'),
-		'order_dir' => $Blog->get_setting('orderdir'),
+		'order_by' => get_blog_order( $Blog, 'field' ),
+		'order_dir' => get_blog_order( $Blog, 'dir' ),
 		'limit' => 1000,
 	) );
 // ---------------------------------- END OF MEDIA INDEX ---------------------------------

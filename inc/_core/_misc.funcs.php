@@ -5934,13 +5934,22 @@ function format_to_js( $unformatted )
 
 
 /**
- * Get available sort options for items
+ * Get available cort oprions for items
  *
- * @return array key=>name
+ * @param boolean true to enable none option
+ * @param boolean true to also return custom field options, false otherwise
+ * @return array key=>name or array( 'general' => array( key=>name ), 'custom' => array( key=>name ) )
  */
-function get_available_sort_options()
+function get_available_sort_options( $allow_none = false, $include_custom_fields = false )
 {
-	return array(
+	$options = array();
+
+	if( $allow_none )
+	{ // Enable none option
+		$options[''] = T_('None');
+	}
+
+	$options = array_merge( $options, array(
 		'datestart'                => T_('Date issued (Default)'),
 		'order'                    => T_('Order (as explicitly specified)'),
 		//'datedeadline'           => T_('Deadline'),
@@ -5953,7 +5962,22 @@ function get_available_sort_options()
 		'priority'                 => T_('Priority'),
 		'numviews'                 => T_('Number of members who have viewed the post (If tracking enabled)'),
 		'RAND'                     => T_('Random order!'),
-	);
+	) );
+
+	if( $include_custom_fields )
+	{ // We need to include custom fields as well
+		global $DB;
+
+		$custom_fields = $DB->get_assoc( 'SELECT DISTINCT( CONCAT( "custom_", itcf_type, "_", itcf_name ) ), itcf_name
+				 FROM T_items__type_custom_field
+				INNER JOIN T_items__type ON ityp_ID = itcf_ityp_ID
+				WHERE ityp_usage = "post"' );
+
+		// Add custom fields as available sort options
+		return array( 'general' => $options, 'custom' => $custom_fields );
+	}
+
+	return $options;
 }
 
 
