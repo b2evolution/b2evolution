@@ -384,6 +384,11 @@ class Plugin
 		{ // Merge default params with current skin params
 			$this->template = array_merge( $params, $skin_template );
 		}
+
+		if( ! empty( $this->template['toolbar_title_after'] ) )
+		{ // Add toolbar info icon after the title
+			$this->template['toolbar_title_after'] = $this->get_help_link( '', 'info', true, 'name' ).$this->template['toolbar_title_after'];
+		}
 	}
 
 
@@ -3605,7 +3610,7 @@ class Plugin
 	 * @param boolean TRUE - to add info to display it in tooltip on mouseover
 	 * @return string The html A tag, linking to the help (or empty in case of $readme, if there is none).
 	 */
-	function get_help_link( $target = '', $icon = 'help', $use_tooltip = true )
+	function get_help_link( $target = '', $icon = 'help', $use_tooltip = true, $tooltip_field = 'long_desc' )
 	{
 		static $target_counter = 0;
 		$title = '';
@@ -3627,7 +3632,7 @@ class Plugin
 			if( $use_tooltip )
 			{ // Add these data only for tooltip
 				$link_attribs['class'] = 'action_icon help_plugin_icon';
-				$link_attribs['rel'] = format_to_output( $this->long_desc, 'htmlspecialchars' );
+				$link_attribs['rel'] = format_to_output( $this->$tooltip_field, 'htmlspecialchars' );
 			}
 
 			// Display additional info for help plugin icon only one time. It is used on plugins.js
