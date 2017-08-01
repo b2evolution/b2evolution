@@ -1218,7 +1218,7 @@ class collections_Module extends Module
 				}
 				else
 				{	// Failed, probably the refreshed Item has no comments:
-					$Messages->add( T_('Last touched date of this item could be refreshed.' ), 'error');
+					$Messages->add( T_('Last touched date of this item could not be refreshed.' ), 'error' );
 				}
 
 				header_redirect();
