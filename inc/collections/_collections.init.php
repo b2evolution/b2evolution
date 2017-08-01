@@ -1212,14 +1212,9 @@ class collections_Module extends Module
 					// EXIT HERE.
 				}
 
-				if( $refreshed_Item->refresh_last_touched_ts() )
-				{	// The last touched date has been updated successfully:
-					$Messages->add( T_('Last touched date of this item has been refreshed successfully.'), 'success' );
-				}
-				else
-				{	// Failed, probably the refreshed Item has no comments:
-					$Messages->add( T_('Last touched date of this item could not be refreshed.' ), 'error' );
-				}
+				// Run refreshing and display a message:
+				$refreshed_Item->refresh_last_touched_ts();
+				$Messages->add( T_('Last touched date of this item has been refreshed successfully.'), 'success' );
 
 				header_redirect();
 				break; // already exited here

@@ -9776,15 +9776,19 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! ( $latest_Comment = & $this->get_latest_Comment( array( 'published', 'community', 'protected', 'private', 'review' ) ) ) )
-		{	// Only if this Item has the latest Comment:
-			return false;
+		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ) ) )
+		{	// Use date from the latest public Comment:
+			$new_last_touched_ts = $latest_Comment->get( 'last_touched_ts' );
+		}
+		else
+		{	// Use date from issue date of this Item:
+			$new_last_touched_ts = $this->get( 'datestart' );
 		}
 
 		global $DB;
 
 		$DB->query( 'UPDATE T_items__item
-					SET post_last_touched_ts = '.$DB->quote( $latest_Comment->get( 'last_touched_ts' ) ).'
+					SET post_last_touched_ts = '.$DB->quote( $new_last_touched_ts ).'
 				WHERE post_ID = '.$this->ID );
 
 		return true;
