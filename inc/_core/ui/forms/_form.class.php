@@ -3837,6 +3837,7 @@ class Form extends Widget
 						function file_select_add( fieldName, root, path )
 						{
 							// check if value is already present
+							fieldName = fieldName.replace(/(\[|\])/g, "\\\\$1");
 							var inputField = jQuery( "input#" + fieldName );
 							var values = inputField.val().split( "'.$field_params['value_separator'].'" );
 
@@ -3943,6 +3944,7 @@ class Form extends Widget
 							var wrapper = jQuery( event_object ).closest( ".file_select_wrapper" );
 							var item = jQuery( event_object ).closest( ".file_select_item" );
 							var fieldName = wrapper.attr( "name" );
+							fieldName = fieldName.replace(/(\[|\])/g, "\\\\$1");
 							var fieldValue = item.data( "itemValue" ).toString(); // converted to string because it will later be compared to array of strings
 							var maxLength = wrapper.data( "maxLength" );
 							var addButton = jQuery( "button", wrapper );
