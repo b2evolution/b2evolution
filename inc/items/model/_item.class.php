@@ -294,12 +294,20 @@ class Item extends ItemLight
 	 * @var integer
 	 */
 	var $addvotes;
+
 	/**
 	 * A count of all votes
 	 *
 	 * @var integer
 	 */
 	var $countvotes;
+
+	/**
+	 * Current revision
+	 *
+	 * @var integer
+	 */
+	var $revision;
 
 	/**
 	 * Constructor
@@ -1751,7 +1759,8 @@ class Item extends ItemLight
 		$post_renderers = $this->get_renderers_validated();
 		$cache_key = $format.'/'.implode('.', $post_renderers); // logic gets used below, for setting cache, too.
 
-		$use_cache = $this->ID && in_array( $format, array('htmlbody', 'entityencoded', 'xml', 'text') );
+		$use_cache = $this->ID && in_array( $format, array('htmlbody', 'entityencoded', 'xml', 'text') )
+				&& ! ( isset( $this->revision ) && $this->revision > 0 ); // do not use cache when viewing historical revision
 
 		// $use_cache = false;
 
@@ -1839,7 +1848,7 @@ class Item extends ItemLight
 			}
 
 			// Call RENDERER plugins:
-			$r = $this->content;
+			$r = $this->get( 'content' );
 			$Plugins->render( $r /* by ref */, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
 
 			// Check and clear inline files, to avoid to have placeholders without corresponding attachment
@@ -2099,7 +2108,7 @@ class Item extends ItemLight
 			) );
 
 		$view_type = 'full';
-		if( $this->has_content_parts($params) )
+		if( $this->has_content_parts( $params ) )
 		{ // This is an extended post (has a more section):
 			if( $stripteaser === '#' )
 			{
@@ -2875,7 +2884,7 @@ class Item extends ItemLight
 			// Replace inline content block tag with item content:
 			$content = str_replace( $source_tag, $current_tag_item_content, $content );
 
-			// Remove 
+			// Remove
 			array_shift( $content_block_items );
 		}
 
@@ -3053,7 +3062,7 @@ class Item extends ItemLight
 	{
 		if( empty($this->titletag) )
 		{
-			return $this->title;
+			return $this->get( 'title' );
 		}
 
 		return $this->titletag;
@@ -5869,6 +5878,9 @@ class Item extends ItemLight
 				$this->previous_status = $this->get( 'status' );
 				return parent::set( 'status', $parvalue, $make_null );
 
+			case 'revision':
+				return $this->set_param( $parname, 'integer', $parvalue, true );
+
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
 		}
@@ -7596,7 +7608,15 @@ class Item extends ItemLight
 			case 't_status':
 				// Text status:
 				$post_statuses = get_visibility_statuses();
-				return $post_statuses[$this->status];
+				$t_status = $this->status;
+				if( isset( $this->revision ) && $this->revision > 0 )
+				{
+					if( $Revision = $this->get_revision( $this->revision ) )
+					{
+						$t_status = $Revision->iver_status;
+					}
+				}
+				return $post_statuses[$t_status];
 
 			case 't_extra_status':
 				$ItemStatusCache = & get_ItemStatusCache();
@@ -7630,6 +7650,36 @@ class Item extends ItemLight
 
 			case 'notifications_flags':
 				return empty( $this->notifications_flags ) ? array() : explode( ',', $this->notifications_flags );
+
+			case 'title':
+				if( isset( $this->revision ) && $this->revision > 0 )
+				{
+					if( $Revision = $this->get_revision( $this->revision ) )
+					{
+						return $Revision->iver_title;
+					}
+				}
+				break;
+
+			case 'content':
+				if( isset( $this->revision ) && $this->revision > 0 )
+				{
+					if( $Revision = $this->get_revision( $this->revision ) )
+					{
+						return $Revision->iver_content;
+					}
+				}
+				break;
+
+			case 'status':
+				if( isset( $this->revision ) && $this->revision > 0 )
+				{
+					if( $Revision = $this->get_revision( $this->revision ) )
+					{
+						return $Revision->iver_status;
+					}
+				}
+				break;
 		}
 
 		return parent::get( $parname );

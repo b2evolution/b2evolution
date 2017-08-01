@@ -1753,15 +1753,6 @@ switch( $action )
 			case 'update_publish': // on error
 			case 'history':
 			case 'extract_tags':
-				if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
-				{	// User has permissions to delete this post
-					$AdminUI->global_icon( T_('Delete this post'), 'delete', $admin_url.'?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
-						' '.T_('Delete'), 4, 3, array(
-								'onclick' => 'return confirm(\''.TS_('You are about to delete this post!\\nThis cannot be undone!').'\')',
-								'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
-						) );
-				}
-
 				$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $edited_Item->get_permanent_url(),
 						' '.T_('Permalink'), 4, 3, array(
 								'style' => 'margin-right: 3ex',
@@ -1773,6 +1764,15 @@ switch( $action )
 					$AdminUI->global_icon( T_('Duplicate this post...'), 'copy', $edited_item_url,
 						' '.T_('Duplicate...'), 4, 3, array(
 								'style' => 'margin-right: 3ex;',
+						) );
+				}
+
+				if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
+				{	// User has permissions to delete this post
+					$AdminUI->global_icon( T_('Delete this post'), 'delete', $admin_url.'?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
+						' '.T_('Delete'), 4, 3, array(
+								'onclick' => 'return confirm(\''.TS_('You are about to delete this post!\\nThis cannot be undone!').'\')',
+								'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
 						) );
 				}
 				break;
@@ -1794,6 +1794,14 @@ switch( $action )
 			{
 				$tab_switch_params = '';
 			}
+
+			// Rearrange global icons to show: Permalink - History - Duplicate - Delete - Close
+			if( count( $AdminUI->global_icons ) > 1 )
+			{
+				$history_icon = array_pop( $AdminUI->global_icons );
+				// Insert the history icon right after the permalink icon
+				array_splice( $AdminUI->global_icons, 1, 0, array( $history_icon ) );
+			};
 
 			if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
 			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog

@@ -23,7 +23,7 @@ global $Collection, $Blog;
  */
 global $edited_Item;
 
-global $admin_url;
+global $admin_url, $current_User;
 
 if( $lastedit_User = & $edited_Item->get_lastedit_User() )
 {	// Get login of last edit user
@@ -34,7 +34,7 @@ else
 	$lastedit_user_login = T_('(deleted user)');
 }
 
-$sql_current_version = 'SELECT "C" AS iver_ID,
+$sql_current_version = 'SELECT "'.T_('Current').'" AS iver_ID,
 		"'.$edited_Item->datemodified.'" AS iver_edit_datetime,
 		"'.$edited_Item->lastedit_user_ID.'" AS iver_edit_user_ID,
 		"'.T_('Current version').'" AS action,
@@ -63,7 +63,7 @@ $default_order = $revisions_count > 1 ? '---D' : '-D';
 // Create result set:
 $Results = new Results( $sql_current_version . ' UNION ' . $SQL->get(), 'iver_', $default_order, NULL, $count_SQL->get() );
 
-$Results->title = T_('Item history (experimental) for:').' '.$edited_Item->get_title();
+$Results->title = T_('Item history for:').' '.$edited_Item->get_title();
 
 /**
  * Get radio input to select a revision to compare
@@ -120,7 +120,7 @@ if( $revisions_count > 1 )
 }
 
 $Results->cols[] = array(
-						'th' => T_('ID'),
+						'th' => T_('Revision'),
 						'order' => 'iver_ID',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
@@ -192,20 +192,28 @@ $Results->cols[] = array(
 
 function history_td_actions( $iver_ID )
 {
-	if( (int)$iver_ID == 0 )
-	{	// Dont' display a restore link for current version
-		return;
+	global $edited_Item, $current_User;
+	$r = '';
+
+	$permanent_url = $edited_Item->get_permanent_url();
+	if( ( int ) $iver_ID !== 0 )
+	{
+		$permanent_url = url_add_param( $permanent_url, array( 'revision' => $iver_ID ) );
+	}
+	$r .= '<a href="'.$permanent_url.'" class="action_icon btn btn-info btn-xs">'.T_('View').'</a>';
+	if( ( int ) $iver_ID !== 0 )
+	{
+		$r .= '<a href="'.regenerate_url( 'action', 'action=history_restore&amp;r='.$iver_ID.'&amp;'.url_crumb( 'item' ) ).'" class="action_icon btn btn-primary btn-xs">'.T_('Restore').'</a>';
 	}
 
-	$restore_link = '<a href="'.regenerate_url( 'action', 'action=history_restore&amp;r='.$iver_ID.'&amp;'.url_crumb( 'item' ) ).'">'.T_('Restore').'</a>';
 
-	return $restore_link;
+	return $r;
 }
 
 $Results->cols[] = array(
 						'th' => T_('Actions'),
 						'td' => '%history_td_actions( #iver_ID# )%',
-						'td_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap left',
 					);
 
 $Form = new Form( NULL, '', 'get' );
@@ -225,7 +233,6 @@ $buttons = array();
 if( $revisions_count > 1 )
 {	// Button to compare the revisions
 	$buttons = array( array( 'submit', '', T_('Compare selected revisions'), 'SaveButton' ) );
-	echo get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin-left:18px;position:relative;top:-5px;') );
 }
 $Form->end_form( $buttons );
 
