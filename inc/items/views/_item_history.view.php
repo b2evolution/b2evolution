@@ -167,8 +167,15 @@ $Results->cols[] = array(
  */
 function iver_status_label( $iver_status )
 {
+	$r = '';
 	$statuses = get_visibility_statuses();
-	return isset( $statuses[ $iver_status ] ) ? $statuses[ $iver_status ] : $iver_status;
+	$status = isset( $statuses[ $iver_status ] ) ? $statuses[ $iver_status ] : $iver_status;
+
+	$r .= '<span class="note status_'.$iver_status.'">';
+	$r .= '<span>'.$status.'</span>';
+	$r .= '</span>';
+
+	return $r;
 }
 $Results->cols[] = array(
 						'th' => T_('Status'),
