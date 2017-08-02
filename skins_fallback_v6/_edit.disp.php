@@ -112,6 +112,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		// Fields used in "advanced" form, but not here:
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
+		$Form->hidden( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ) );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 		$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );

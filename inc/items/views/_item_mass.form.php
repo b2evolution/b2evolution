@@ -77,6 +77,7 @@ $Form->begin_form( '', '', $params );
 
 	// Fields used in "advanced" form, but not here:
 	$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
+	$Form->hidden( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ) );
 	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );
 	$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 	$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );

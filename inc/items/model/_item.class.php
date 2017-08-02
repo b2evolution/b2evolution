@@ -147,6 +147,16 @@ class Item extends ItemLight
 	 */
 	var $locale;
 
+	/**
+	 * Display the Item in list depending on navigation locale
+	 *
+	 * 0 - Always show
+	 * 1 - Show only if matching navigation locale
+	 *
+	 * @var integer|boolean
+	 */
+	var $locale_visibility;
+
 	var $content;
 	/**
 	 * Flag to know if content was updated during current request
@@ -381,6 +391,7 @@ class Item extends ItemLight
 			$this->datedeadline = $db_row->post_datedeadline;
 			$this->priority = $db_row->post_priority;
 			$this->locale = $db_row->post_locale;
+			$this->locale_visibility = $db_row->post_locale_visibility;
 			$this->wordcount = $db_row->post_wordcount;
 			$this->notifications_status = $db_row->post_notifications_status;
 			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
@@ -646,6 +657,12 @@ class Item extends ItemLight
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
 		{
 			$this->set_from_Request( 'locale' );
+		}
+
+		// LOCALE VISIBILITY:
+		if( param( 'post_locale_visibility', 'integer', NULL ) !== NULL )
+		{
+			$this->set_from_Request( 'locale_visibility' );
 		}
 
 		// POST TYPE:

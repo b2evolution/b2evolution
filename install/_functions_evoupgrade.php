@@ -8478,6 +8478,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12320, 'Upgrading posts table...' ) )
+	{	// part of 6.9.3-beta
+		db_add_col( 'T_items__item', 'post_locale_visibility', 'TINYINT(1) NOT NULL DEFAULT 0 AFTER post_locale' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

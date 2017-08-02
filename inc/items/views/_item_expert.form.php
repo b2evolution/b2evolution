@@ -677,6 +677,14 @@ $Form->begin_form( '', '', $params );
 
 	$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.T_('Hide teaser when displaying -- more --').'</strong>' );
 
+	if( ! is_array( $locale_options ) )
+	{	// Display this setting if we have more than 1 enabled locale:
+		$Form->radio( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ), array(
+				array( 0, T_('Always show') ),
+				array( 1, T_('Show only if matching navigation locale') )
+			), '', true );
+	}
+
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
 		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
