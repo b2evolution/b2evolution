@@ -254,6 +254,7 @@ class coll_media_index_Widget extends ComponentWidget
 		{ // Get image of all available posts for current user
 			$ItemQuery->where_visibility( NULL );
 		}
+		$ItemQuery->where_locale_visibility();
 		$ItemQuery->WHERE_and( '( file_type = "image" ) OR ( file_type IS NULL )' );
 		$ItemQuery->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
 		$ItemQuery->WHERE_and( 'link_position != "cover"' );

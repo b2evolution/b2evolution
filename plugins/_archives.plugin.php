@@ -464,6 +464,8 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_itemtype_usage( 'post' );
 		}
 
+		// Restrict with locale visibility by current navigation locale:
+		$ItemQuery->where_locale_visibility();
 
 		$this->from = $this->ItemQuery->get_from();
 		$this->where = $this->ItemQuery->get_where();

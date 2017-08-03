@@ -452,6 +452,7 @@ class CommentList2 extends DataObjectList2
 		}
 		// Restrict post filters to available statuses. When blog = 0 we will check visibility statuses for each blog separately ( on the same query ).
 		$this->ItemQuery->where_visibility( $post_show_statuses );
+		$this->ItemQuery->where_locale_visibility();
 		$sql_item_IDs = 'SELECT DISTINCT post_ID'
 						.$this->ItemQuery->get_from();
 		if( strpos( $this->ItemQuery->get_from(), 'T_categories' ) === false &&

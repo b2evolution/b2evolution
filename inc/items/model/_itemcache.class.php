@@ -152,6 +152,7 @@ class ItemCache extends DataObjectCache
 		$ItemQuery->where_visibility( $visibility_statuses );
 		$ItemQuery->where_datestart( NULL, NULL, NULL, NULL, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
 		$ItemQuery->where_itemtype_usage( 'post' );
+		$ItemQuery->where_locale_visibility();
 
 		// Clear previous items from the cache and load by the defined SQL
 		$this->clear( true );

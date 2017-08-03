@@ -628,6 +628,10 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_visibility( $this->filters['visibility_array'], $this->filters['coll_IDs'] );
 		$this->ItemQuery->where_featured( $this->filters['featured'] );
 		$this->ItemQuery->where_flagged( $this->filters['flagged'] );
+		if( ! $this->single_post )
+		{	// Restrict with locale visibility by current navigation locale ONLY for not single page:
+			$this->ItemQuery->where_locale_visibility();
+		}
 
 
 		/*
@@ -883,6 +887,7 @@ class ItemListLight extends DataObjectList2
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
 		$lastpost_ItemQuery->where_visibility( $this->filters['visibility_array'] );
+		$lastpost_ItemQuery->where_locale_visibility();
 
 		/*
 		 * order by stuff:
