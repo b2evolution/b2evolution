@@ -660,7 +660,7 @@ class Item extends ItemLight
 		}
 
 		// LOCALE VISIBILITY:
-		if( param( 'post_locale_visibility', 'integer', NULL ) !== NULL )
+		if( param( 'post_locale_visibility', 'string', NULL ) !== NULL )
 		{
 			$this->set_from_Request( 'locale_visibility' );
 		}

@@ -217,7 +217,7 @@ $Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-set
 		$Form->radio( 'blog_post_locale_source', $edited_Blog->get_setting( 'post_locale_source' ),
 				array(
 					array( 'post', T_('Always force to post locale') ),
-					array( 'blog', T_('Follow navigation locale') ),
+					array( 'blog', T_('Follow navigation locale'), '('.T_('Navigation/Widget Display').')' ),
 			), T_('Content Display'), true );
 
 		$Form->radio( 'blog_new_item_locale_source', $edited_Blog->get_setting( 'new_item_locale_source' ),

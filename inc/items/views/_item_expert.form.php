@@ -680,8 +680,8 @@ $Form->begin_form( '', '', $params );
 	if( ! is_array( $locale_options ) )
 	{	// Display this setting if we have more than 1 enabled locale:
 		$Form->radio( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ), array(
-				array( 0, T_('Always show') ),
-				array( 1, T_('Show only if matching navigation locale') )
+				array( 'always', T_('Always show') ),
+				array( 'follow-nav-locale', T_('Show only if matching navigation locale') )
 			), '', true );
 	}
 
