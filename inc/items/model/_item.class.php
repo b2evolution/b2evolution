@@ -5980,6 +5980,19 @@ class Item extends ItemLight
 			}
 		}
 
+		if( $post_comment_status == 'closed' || $post_comment_status == 'disabled' )
+		{	// Check if item type allows these options:
+			$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
+			if( $post_comment_status == 'closed' && ! $ItemType->get( 'allow_closing_comments' ) )
+			{
+				debug_die( 'Item type "'.$ItemType->get_name().'" doesn\'t support closing comments, please set another comment status for item "'.$post_title.'"' );
+			}
+			elseif( $post_comment_status == 'disabled' && ! $ItemType->get( 'allow_disabling_comments' ) )
+			{
+				debug_die( 'Item type "'.$ItemType->get_name().'" doesn\'t support disabling comments, please set another comment status for item "'.$post_title.'"' );
+			}
+		}
+
 		if( empty( $item_typ_ID ) )
 		{	// Use first item type by default for wrong request:
 			$item_typ_ID = 1;
@@ -7945,9 +7958,10 @@ class Item extends ItemLight
 	/**
 	 * Get the latest Comment on this Item
 	 *
+	 * @param array|NULL Restrict comments selection with statuses, NULL - to select only allowed statuses for current User
 	 * @return Comment
 	 */
-	function & get_latest_Comment()
+	function & get_latest_Comment( $statuses = NULL )
 	{
 		global $DB;
 
@@ -7964,7 +7978,14 @@ class Item extends ItemLight
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$DB->quote( $this->ID ) );
 			$SQL->WHERE_and( 'comment_type != "meta"' );
-			$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), 'comment_', $this->get_blog_ID(), 'blog_comment!', true ) );
+			if( $statuses === NULL )
+			{	// Restrict with comment statuses which are allowed for current User:
+				$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), 'comment_', $this->get_blog_ID(), 'blog_comment!', true ) );
+			}
+			elseif( is_array( $statuses ) && count( $statuses ) )
+			{	// Restrict with given comment statuses:
+				$SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $statuses ).' )' );
+			}
 			$SQL->ORDER_BY( 'comment_date DESC' );
 			$SQL->LIMIT( '1' );
 
@@ -9750,15 +9771,24 @@ class Item extends ItemLight
 	 */
 	function refresh_last_touched_ts()
 	{
-		if( ! ( $latest_Comment = & $this->get_latest_Comment() ) )
-		{	// Only if this Item has the latest Comment:
+		if( ! $this->can_refresh_last_touched() )
+		{	// If current User has no permission to refresh a last touched date of the requested Item:
 			return false;
+		}
+
+		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ) ) )
+		{	// Use date from the latest public Comment:
+			$new_last_touched_ts = $latest_Comment->get( 'last_touched_ts' );
+		}
+		else
+		{	// Use date from issue date of this Item:
+			$new_last_touched_ts = $this->get( 'datestart' );
 		}
 
 		global $DB;
 
 		$DB->query( 'UPDATE T_items__item
-					SET post_last_touched_ts = '.$DB->quote( $latest_Comment->get( 'last_touched_ts' ) ).'
+					SET post_last_touched_ts = '.$DB->quote( $new_last_touched_ts ).'
 				WHERE post_ID = '.$this->ID );
 
 		return true;
