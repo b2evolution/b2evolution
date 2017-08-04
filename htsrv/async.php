@@ -157,17 +157,23 @@ switch( $action )
 						}
 					}
 
-					if( $IPRange )
-					{
-						if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) )
-						{
-							$result['rawdata'][$i] = str_replace( $matches[2][0],  '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'.$matches[2][0].'</a> <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[$iprange_status], $result['rawdata'][$i] );
+					$ip_range_text = $matches[2][0];
+					if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'edit' ) )
+					{	// If current user has a permission to edit IP ranges:
+						if( $IPRange )
+						{	// If IP range is found in DB:
+							$ip_range_text = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'.int2ip( $IPRange->get( 'IPv4start' ) ).' - '.int2ip( $IPRange->get( 'IPv4end' ) ).'</a>';
+						}
+						else
+						{	// No IP range in DB yet:
+							$new_ips = explode( '-', $ip_range_text );
+							$new_ip_start_param = isset( $new_ips[0] ) ? '&amp;ip_start='.trim( $new_ips[0] ) : '';
+							$new_ip_end_param = isset( $new_ips[1] ) ? '&amp;ip_end='.trim( $new_ips[1] ) : '';
+							$ip_range_text = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_new'.$new_ip_start_param.$new_ip_end_param.'">'.$ip_range_text.'</a>';
 						}
 					}
-					else
-					{
-						$result['rawdata'][$i] = str_replace( $matches[2][0],  '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_new&amp;ip='.$query.'">'.$matches[2][0].'</a> <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[$iprange_status], $result['rawdata'][$i] );
-					}
+					$ip_range_text .= ' <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[ $iprange_status ];
+					$result['rawdata'][$i] = str_replace( $matches[2][0], $ip_range_text, $result['rawdata'][$i] );
 				}
 			}
 			$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
