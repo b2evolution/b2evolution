@@ -58,7 +58,7 @@ function blogger_newpost( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 1 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 1 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -401,7 +401,7 @@ function blogger_getrecentposts( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 1 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 1 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}

@@ -106,12 +106,37 @@ class item_content_Widget extends ComponentWidget
 
 
 	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		global $preview;
+
+		parent::init_display( $params );
+
+		if( $preview )
+		{	// Disable block caching for this widget when item is previewed currently:
+			$this->disp_params['allow_blockcache'] = 0;
+		}
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
 	function display( $params )
 	{
+		global $Item;
+
+		if( empty( $Item ) )
+		{	// Don't display this widget when no Item object:
+			return false;
+		}
+
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( array(
@@ -158,12 +183,14 @@ class item_content_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog, $Item;
 
 		return array(
-				'wi_ID'        => $this->ID, // Have the widget settings changed ?
+				'wi_ID'        => $this->ID, // Cache each widget separately + Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+				'item_ID'      => $Item->ID, // Cache each item separately + Has the Item changed?
+				'item_page'    => isset( $GLOBALS['page'] ) ? $GLOBALS['page'] : 1, // Cache each Item page separately
 			);
 	}
 }

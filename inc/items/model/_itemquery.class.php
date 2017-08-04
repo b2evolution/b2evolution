@@ -45,6 +45,7 @@ class ItemQuery extends SQL
 	var $phrase;
 	var $exact;
 	var $featured;
+	var $flagged;
 
 
 	/**
@@ -210,9 +211,9 @@ class ItemQuery extends SQL
 	/**
 	 * Restrict to specific collection/chapters (blog/categories)
 	 *
-	 * @param Blog
-	 * @param array
-	 * @param string
+	 * @param object Blog
+	 * @param array Categories IDs
+	 * @param string Use '-' to exclude the categories
 	 * @param string 'wide' to search in extra cats too
 	 *               'main' for main cat only
 	 *               'extra' for extra cats only
@@ -227,15 +228,21 @@ class ItemQuery extends SQL
 		$this->cat_modifier = $cat_modifier;
 
 		if( ! empty( $cat_array ) && ( $cat_focus == 'wide' || $cat_focus == 'extra' ) )
-		{
+		{	// Select extra categories if we want filter by several categories:
 			$sql_join_categories = ( $cat_focus == 'extra' ) ? ' AND post_main_cat_ID != cat_ID' : '';
-			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
-												INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
+			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
+			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
 			// fp> we try to restrict as close as possible to the posts but I don't know if it matters
 			$cat_ID_field = 'postcat_cat_ID';
 		}
+		elseif( get_allow_cross_posting() >= 1 )
+		{	// Select extra categories if cross posting is enabled:
+			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
+			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+			$cat_ID_field = 'postcat_cat_ID';
+		}
 		else
-		{
+		{	// Select only main categories:
 			$this->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$cat_ID_field = 'post_main_cat_ID';
 		}
@@ -302,7 +309,7 @@ class ItemQuery extends SQL
 		{ // Blog IDs are not defined, Use them depending on current collection setting
 			// NOTE! collection can be 0, for example, on disp=usercomments|useritems where we display data from all collections
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $this->blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $this->blog );
 			$aggregate_coll_IDs = $Blog->get_setting( 'aggregate_coll_IDs' );
 		}
 
@@ -316,12 +323,11 @@ class ItemQuery extends SQL
 		// Check status permission for multiple blogs
 		if( $aggregate_coll_IDs == '*' )
 		{ // Get the status restrictions for all blogs
-			global $DB;
-			$blog_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs ORDER BY blog_ID' );
 			// Load all collections in single query, because otherwise we may have too many queries (1 query for each collection) later:
 			// fp> TODO: PERF: we probably want to remove this later when we restrict the use of '*'
 			$BlogCache = & get_BlogCache();
 			$BlogCache->load_all();
+			$blog_IDs = $BlogCache->get_ID_array();
 		}
 		else
 		{ // Get the status restrictions for several blogs
@@ -845,7 +851,7 @@ class ItemQuery extends SQL
 	 * @param string Keyword search string
 	 * @param string Search for entire phrase or for individual words: 'OR', 'AND', 'sentence'(or '1')
 	 * @param string Require exact match of title or contents — does NOT apply to tags which are always an EXACT match
-	 * @param string Scope of keyword search string: 'title', 'content'
+	 * @param string Scope of keyword search string: 'title', 'content', 'tags', 'excerpt', 'titletag', 'metadesc', 'metakeywords'
 	 */
 	function where_keywords( $keywords, $phrase, $exact, $keyword_scope = 'title,content' )
 	{
@@ -884,6 +890,24 @@ class ItemQuery extends SQL
 					$this->GROUP_BY( 'post_ID' );
 					// Tags are always an EXACT match:
 					$search_sql[] = 'tag_name = '.$DB->quote( $keywords );
+					break;
+
+				case 'excerpt':
+					$search_fields[] = $this->dbprefix.'excerpt';
+					break;
+
+				case 'titletag':
+					$search_fields[] = $this->dbprefix.'titletag';
+					break;
+
+				case 'metadesc':
+					$this->FROM_add( 'LEFT JOIN T_items__item_settings AS is_md ON post_ID = is_md.iset_item_ID AND is_md.iset_name = "metadesc"' );
+					$search_fields[] = 'is_md.iset_value';
+					break;
+
+				case 'metakeywords':
+					$this->FROM_add( 'LEFT JOIN T_items__item_settings AS is_mk ON post_ID = is_mk.iset_item_ID AND is_mk.iset_name = "metakeywords"' );
+					$search_fields[] = 'is_mk.iset_value';
 					break;
 
 				// TODO: add more.
@@ -950,6 +974,29 @@ class ItemQuery extends SQL
 		$search_sql = '( '.implode( ' '.$operator_sql.' ', $search_sql ).' )';
 
 		$this->WHERE_and( $search_sql );
+	}
+
+
+	/**
+	 * Restrict to the flagged items
+	 *
+	 * @param boolean TRUE - Restrict to flagged items, FALSE - Don't restrict/Get all items
+	 */
+	function where_flagged( $flagged = false )
+	{
+		global $current_User;
+
+		$this->flagged = $flagged;
+
+		if( ! $this->flagged )
+		{	// Don't restrict if it is not requested or if user is not logged in:
+			return;
+		}
+
+		// Get items which are flagged by current user:
+		$this->FROM_add( 'INNER JOIN T_items__user_data ON '.$this->dbIDname.' = itud_item_ID
+			AND itud_flagged_item = 1
+			AND itud_user_ID = '.( is_logged_in() ? $current_User->ID : '-1' ) );
 	}
 
 

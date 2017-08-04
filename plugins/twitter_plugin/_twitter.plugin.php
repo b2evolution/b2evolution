@@ -47,7 +47,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.9.3';
 	var $author = 'b2evolution Group';
 
 	/*
@@ -179,6 +179,47 @@ class twitter_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlHead( & $params )
+	{
+		global $Collection, $Blog, $Item;
+
+		if( $Blog && $Blog->get_setting( 'tags_twitter_card' ) )
+		{
+			if( $Item )
+			{
+				$Item->get_creator_User();
+			}
+
+			$params = array_merge( array(
+					'blog_ID' => $Blog->ID,
+					'user_ID' => isset( $Item->creator_user_ID ) ? $Item->creator_user_ID : NULL
+				), $params );
+
+			$oauth_info = $this->get_oauth_info( $params );
+
+			if( ! empty( $oauth_info['token'] ) && isset( $oauth_info['contact'] ) )
+			{
+				echo '<meta property="twitter:site" content="@'.$oauth_info['contact'].'" />'."\n";
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @todo: ideally we'd want a warning if the twitter ping is not enabled
@@ -219,7 +260,7 @@ class twitter_plugin extends Plugin
 	 */
 	function get_twitter_link( $target_type, $target_id )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		require_once 'twitteroauth/twitteroauth.php';
 
@@ -352,7 +393,7 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // redirect to blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=renderers&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugins&blog='.$target_id );
 		}
 		else if ($target_type == 'user' )
 		{ // redirect to user advanced preferences form
@@ -410,7 +451,7 @@ class twitter_plugin extends Plugin
 			$this->set_coll_setting( 'twitter_contact', $contact, $target_id );
 			// save Collection settings
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $target_id, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $target_id, false, false );
 			$Blog->dbupdate();
 		}
 		else if( $target_type == 'user' )
@@ -451,10 +492,10 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // Blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=renderers&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugins&blog='.$target_id );
 
 			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $target_id );
+			$Collection = $Blog = $BlogCache->get_by_ID( $target_id );
 
 			$this->delete_coll_setting( 'twitter_token', $target_id );
 			$this->delete_coll_setting( 'twitter_secret', $target_id );
@@ -520,7 +561,7 @@ class twitter_plugin extends Plugin
 		if( ! empty($blog_ID) )
 		{	// CollSettings
 			$BlogCache = & get_Cache('BlogCache');
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 			if( !empty( $Blog ) )
 			{
 				$r['token'] = $this->get_coll_setting( 'twitter_token', $Blog );

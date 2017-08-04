@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url;
+global $blog, $sec_ID, $admin_url;
 
 $final = param( 'final', 'integer', 0, true );
 $goal_name = param( 'goal_name', 'string', NULL, true );
@@ -38,13 +38,13 @@ $SQL = new SQL();
 $SQL->SELECT( 'goal_ID, goal_name, gcat_color' );
 $SQL->FROM( 'T_track__goal' );
 $SQL->FROM_add( 'LEFT JOIN T_track__goalcat ON gcat_ID = goal_gcat_ID' );
-if( !empty($final) )
+if( ! empty( $final ) )
 {	// We want to filter on final goals only:
 	$SQL->WHERE_and( 'goal_redir_url IS NULL' );
 }
-if( !empty($goal_name) ) // TODO: allow combine
+if( ! empty( $goal_name ) ) // TODO: allow combine
 { // We want to filter on the goal name:
-	$SQL->WHERE_and( 'goal_name LIKE '.$DB->quote($goal_name.'%') );
+	$SQL->WHERE_and( 'goal_name LIKE '.$DB->quote( $goal_name.'%' ) );
 }
 if( ! empty( $goal_cat ) )
 { // We want to filter on the goal category:
@@ -53,6 +53,9 @@ if( ! empty( $goal_cat ) )
 $SQL->ORDER_BY( 'goal_name' );
 $goal_rows = $DB->get_results( $SQL->get(), OBJECT, 'Get list of all goals' );
 
+// Initialize params to filter by selected collection and/or group:
+$section_params = empty( $blog ) ? '' : '&blog='.$blog;
+$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
 
 /*
  * Chart
@@ -66,7 +69,7 @@ if( count( $goal_rows ) && count( $hitgroup_array ) )
 
 	// Initialize the data to open an url by click on bar item
 	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=goals&tab3=hits&blog='.$blog.'&datestartinput=$date$&datestopinput=$date$&goal_name=$param1$';
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=goals&tab3=hits'.$section_params.'&datestartinput=$date$&datestopinput=$date$&goal_name=$param1$';
 	$chart['link_data']['params'] = array();
 
 	// Column mapping and colors
@@ -103,11 +106,11 @@ if( count( $goal_rows ) && count( $hitgroup_array ) )
 	}
 
 	// Chart params
-	$chart['canvas_bg'] = array( 'width' => 780, 'height' => 355 );
+	$chart['canvas_bg'] = array( 'width' => '100%', 'height' => 355 );
 
 	// Print out chart
 	echo '<div class="center">';
-	load_funcs('_ext/_canvascharts.php');
+	load_funcs( '_ext/_canvascharts.php' );
 	CanvasBarsChart( $chart );
 	echo '</div>';
 }
@@ -157,8 +160,8 @@ $Table->filter_area = array(
 	'callback' => 'filter_goal_hitsummary',
 	'url_ignore' => 'final,goal_name',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=goals&amp;tab3=stats&amp;blog='.$blog ),
-		'final' => array( T_('Final'), '?ctrl=goals&amp;tab3=stats&amp;final=1&amp;blog='.$blog ),
+		'all' => array( T_('All'), '?ctrl=goals&amp;tab3=stats'.$section_params ),
+		'final' => array( T_('Final'), '?ctrl=goals&amp;tab3=stats&amp;final=1'.$section_params ),
 		)
 	);
 
@@ -211,7 +214,7 @@ if( $Table->total_pages > 0 )
 			$Table->display_col_start();
 			if( isset( $hitday_array[ $goal_row->goal_ID ] ) )
 			{
-				echo '<a href="'.$admin_url.'?blog='.$blog.'&amp;ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;datestartinput='.$date_param.'&amp;datestopinput='.$date_param.'&amp;goal_name='.rawurlencode( $goal_row->goal_name ).'">'.$hitday_array[ $goal_row->goal_ID ].'</a>';
+				echo '<a href="'.$admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;datestartinput='.$date_param.'&amp;datestopinput='.$date_param.$section_params.'&amp;goal_name='.rawurlencode( $goal_row->goal_name ).'">'.$hitday_array[ $goal_row->goal_ID ].'</a>';
 				$line_total += $hitday_array[ $goal_row->goal_ID ];
 				$goal_total[ $goal_row->goal_ID ] += $hitday_array[ $goal_row->goal_ID ];
 			}

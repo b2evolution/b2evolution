@@ -16,6 +16,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+global $CommentList;
+
 $CommentList = new CommentList2( $Blog );
 
 // Filter list:
@@ -28,9 +31,6 @@ $CommentList->set_filters( array(
 		// 'timestamp_min' => $Blog->get_timestamp_min(),
 		// 'timestamp_max' => $Blog->get_timestamp_max(),
 	) );
-
-// Run SQL query to get results depending on current filters:
-$CommentList->query();
 
 // Get ready for display (runs the query):
 $CommentList->display_init();

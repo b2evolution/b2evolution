@@ -106,6 +106,23 @@ class org_members_Widget extends ComponentWidget
 					'size' => 3,
 					'defaultvalue' => 1,
 				),
+				'layout' => array(
+					'label' => T_('Layout'),
+					'note' => T_('How to lay out the members'),
+					'type' => 'select',
+					'options' => array(
+							'rwd'  => T_( 'RWD Blocks' ),
+							'flow' => T_( 'Flowing Blocks' ),
+							'list' => T_( 'List' ),
+						),
+					'defaultvalue' => 'rwd',
+				),
+				'rwd_block_class' => array(
+					'label' => T_('RWD block class'),
+					'note' => T_('Specify the responsive column classes you want to use.'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12',
+				),
 				'thumb_size' => array(
 					'label' => T_('Image size'),
 					'note' => T_('Cropping and sizing of thumbnails'),
@@ -115,7 +132,7 @@ class org_members_Widget extends ComponentWidget
 				),
 				'order_by' => array(
 					'label' => T_('Order by'),
-					'note' => T_('Field used to sort the order in which the members are displayed'),
+					'note' => T_('Field used to determine the order in which the members are displayed'),
 					'type' => 'select',
 					'options' => array(
 							'user_id' => 'User ID', 
@@ -180,7 +197,7 @@ class org_members_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $DB, $Item, $Blog, $thumbnail_sizes;
+		global $DB, $Item, $Collection, $Blog, $thumbnail_sizes;
 
 		$this->init_display( $params );
 
@@ -226,11 +243,12 @@ class org_members_Widget extends ComponentWidget
 
 			if( count( $users ) )
 			{
-				echo '<div class="row">';
+				echo $this->get_layout_start();
+
 				$member_counter = 0;
 				foreach( $users as $org_User )
 				{
-					echo '<div class="evo_org_member col-lg-4 col-md-6 col-sm-6 text-center">';
+					echo $this->get_layout_item_start( $member_counter );
 
 					$user_url = $this->disp_params['link_profile'] ? $org_User->get_userpage_url( $Blog->ID, true ) : '';
 
@@ -264,8 +282,8 @@ class org_members_Widget extends ComponentWidget
 					// Organizational role
 					if( $this->disp_params['display_role'] == 1 )
 					{
-						$org_data = $org_User->get_organizations_data();
-						echo '<div class="evo_org_role text-muted">'.$org_data[$org_ID]['role'].'</div>';
+						$organizations_data = $org_User->get_organizations_data();
+						echo '<div class="evo_org_role text-muted">'.$organizations_data[$org_ID]['role'].'</div>';
 					}
 
 					if( $this->disp_params['display_icons'] )
@@ -305,23 +323,12 @@ class org_members_Widget extends ComponentWidget
 						echo '</p>';
 					}
 
-					echo '</div>';
-					
 					$member_counter++;
-					switch( $member_counter )
-					{
-						case 3:
-							echo '<div class="clearfix visible-lg-block"></div>';
-							break;
-						case 2:
-							echo '<div class="clearfix visible-sm-block visible-md-block"></div>';
-							break;
-						default:
-							// do nothing
-					}
+
+					echo $this->get_layout_item_end( $member_counter );
 				}
-				echo '<div class="clear"></div>';
-				echo '</div>';
+
+				echo $this->get_layout_end( $member_counter );
 			}
 		}
 
@@ -340,7 +347,7 @@ class org_members_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		return array(
 				'wi_ID'       => $this->ID, // Have the widget settings changed ?

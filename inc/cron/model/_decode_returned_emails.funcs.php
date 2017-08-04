@@ -58,7 +58,7 @@ function dre_connect( $cron = false, $print_out_folders = false )
 {
 	if( ! extension_loaded( 'imap' ) )
 	{	// Exit here if imap extension is not loaded:
-		dre_msg( '<b class="red">'.T_( 'IMAP extension is NOT loaded! ').'</b>', $cron );
+		dre_msg( '<b class="red">'.( 'IMAP extension is NOT loaded! ').'</b>', $cron );
 		return false;
 	}
 
@@ -67,7 +67,7 @@ function dre_connect( $cron = false, $print_out_folders = false )
 	$host = $Settings->get('repath_server_host').':'.$Settings->get('repath_server_port');
 	$mailserver = '{'.$host;
 
-	dre_msg( sprintf( T_('Connecting and authenticating to mail server %s'), '<b>'.$host.'</b>' ), $cron );
+	dre_msg( sprintf( ('Connecting and authenticating to mail server %s'), '<b>'.$host.'</b>' ), $cron );
 
 	switch( $Settings->get('repath_encrypt') )
 	{
@@ -122,10 +122,10 @@ function dre_connect( $cron = false, $print_out_folders = false )
 			$error = implode( "<br />\n", $error );
 		}
 
-		dre_msg( sprintf( /* TRANS: %s is the error message */ T_('Connection failed: %s'), $error ), $cron );
+		dre_msg( sprintf( ('Connection failed: %s'), $error ), $cron );
 		return false;
 	}
-	dre_msg( '<b class="green">'.T_('Successfully connected!').'</b>', $cron );
+	dre_msg( '<b class="green">'.('Successfully connected!').'</b>', $cron );
 
 	@imap_errors();
 
@@ -172,13 +172,13 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 	for( $index = 1; $index <= $limit; $index++ )
 	{	// Repeat for as many messages as allowed...
 
-		dre_msg( '<hr /><h3>'.sprintf( T_('Processing message %s:'), '#'.$index ).'</h3>', $cron );
+		dre_msg( '<hr /><h3>'.sprintf( ('Processing message %s:'), '#'.$index ).'</h3>', $cron );
 
 		if( $Settings->get( 'repath_ignore_read' ) )
 		{	// Check if we can read this message or we should skip this:
 			if( isset( $msg_statuses[ $index - 1 ] ) && $msg_statuses[ $index - 1 ]->seen == 1 )
 			{	// Skip this message because it has already been read:
-				dre_msg( T_('Ignoring this message because it has aleady been read.'), $cron );
+				dre_msg( ('Ignoring this message because it has aleady been read.'), $cron );
 				continue;
 			}
 			else
@@ -195,7 +195,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		// Save email to a temporary file on hard drive, otherwise BIG attachments may take a lot of RAM:
 		if( ! ($tmpMIME = tempnam( sys_get_temp_dir(), 'b2evoMail' )) )
 		{
-			dre_msg( T_('Could not create temporary file.'), $cron );
+			dre_msg( ('Could not create temporary file.'), $cron );
 			continue;
 		}
 		// Save the whole body of a specific message from the mailbox:
@@ -224,19 +224,19 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		// STEP 1: Parse and decode message data and retrieve its structure:
 		if( !$mimeParser->Decode( $MIMEparameters, /* BY REF */ $decodedMIME ) )
 		{	// error:
-			dre_msg( sprintf( T_('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position ), $cron );
+			dre_msg( sprintf( ('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position ), $cron );
 			rmdir_r( $tmpDirMIME );
 			unlink( $tmpMIME );
 			continue;
 		}
 		else
 		{	// the specified message data was parsed successfully:
-			dre_msg( T_('MIME message decoding successful'), $cron );
+			dre_msg( ('MIME message decoding successful'), $cron );
 
 			// STEP 2: Analyze (the first) parsed message to describe its contents:
 			if( ! $mimeParser->Analyze( $decodedMIME[0], /* BY REF */ $parsedMIME ) )
 			{	// error:
-				dre_msg( sprintf( T_('MIME message analyze error: %s'), $mimeParser->error ), $cron );
+				dre_msg( sprintf( ('MIME message analyze error: %s'), $mimeParser->error ), $cron );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
 				continue;
@@ -258,13 +258,13 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			// yura> I replaced imap_qprint() with quoted_printable_decode() to avoid notices about invalid quoted-printable sequence
 			// yura> imap_qprint() and quoted_printable_decode() do empty the message text, thus they were deleted.
 
-			dre_msg( T_('Email Type').': '.$parsedMIME['Type'], $cron );
+			dre_msg( ('Email Type').': '.$parsedMIME['Type'], $cron );
 
 			if( $parsedMIME['Type'] == 'html' )
 			{	// Mail is HTML:
 				if( $debug )
 				{	// Display this info only in debug mode:
-					dre_msg( sprintf( T_('HTML message part saved as %s'), $parsedMIME['DataFile'] ), $cron );
+					dre_msg( sprintf( ('HTML message part saved as %s'), $parsedMIME['DataFile'] ), $cron );
 				}
 				$html_body = file_get_contents( $parsedMIME['DataFile'] );
 
@@ -276,7 +276,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 						{	// HTML text
 							if( $debug )
 							{	// Display this info only in debug mode:
-								dre_msg( sprintf( T_('HTML alternative message part saved as %s'), $alternative['DataFile'] ), $cron );
+								dre_msg( sprintf( ('HTML alternative message part saved as %s'), $alternative['DataFile'] ), $cron );
 							}
 							$strbody = file_get_contents( $alternative['DataFile'] );
 							break; // stop after first alternative
@@ -285,7 +285,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 						{	// Plain text
 							if( $debug )
 							{	// Display this info only in debug mode:
-								dre_msg( sprintf( T_('Text alternative message part saved as %s'), $alternative['DataFile'] ), $cron );
+								dre_msg( sprintf( ('Text alternative message part saved as %s'), $alternative['DataFile'] ), $cron );
 							}
 							$strbody = file_get_contents( $alternative['DataFile'] );
 							break; // stop after first alternative
@@ -297,7 +297,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			{	// Mail is plain text:
 				if( $debug )
 				{	// Display this info only in debug mode:
-					dre_msg( sprintf( T_('Plain-text message part saved as %s'), $parsedMIME['DataFile'] ), $cron );
+					dre_msg( sprintf( ('Plain-text message part saved as %s'), $parsedMIME['DataFile'] ), $cron );
 				}
 				$strbody = file_get_contents( $parsedMIME['DataFile'] );
 			}
@@ -309,10 +309,10 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 
 			if( count($mimeParser->warnings) > 0 )
 			{ // Record potential warnings:
-				dre_msg( '<h4>'.sprintf( T_('%d warnings during decode:'), count( $mimeParser->warnings ) ).'</h4>', $cron );
+				dre_msg( '<h4>'.sprintf( ('%d warnings during decode:'), count( $mimeParser->warnings ) ).'</h4>', $cron );
 				foreach( $mimeParser->warnings as $k => $v )
 				{
-					dre_msg( sprintf( T_('Warning: %s at position %s'), $v, $k ), $cron );
+					dre_msg( sprintf( ('Warning: %s at position %s'), $v, $k ), $cron );
 				}
 			}
 		}
@@ -321,26 +321,26 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 
 		if( empty( $html_body ) )
 		{	// Plain-text message
-			dre_msg( sprintf( T_('Message type: %s'), 'TEXT' ), $cron );
+			dre_msg( sprintf( ('Message type: %s'), 'TEXT' ), $cron );
 
 			// Process body. First fix different line-endings (dos, mac, unix), remove double newlines
 			$content = str_replace( array( "\r", "\n\n" ), "\n", trim( $strbody ) );
 
-			dre_msg( sprintf( T_('Message body: %s'), '<pre style="font-size:10px">'.htmlspecialchars( $strbody ).'</pre>' ), $cron );
+			dre_msg( sprintf( ('Message body: %s'), '<pre style="font-size:10px">'.htmlspecialchars( $strbody ).'</pre>' ), $cron );
 		}
 		else
 		{	// HTML message
-			dre_msg( sprintf( T_('Message type: %s'), 'HTML' ), $cron );
-			dre_msg( sprintf( T_('Message body (original): %s'), '<pre style="font-size:10px">'.htmlspecialchars( $html_body ).'</pre>', $cron ) );
+			dre_msg( sprintf( ('Message type: %s'), 'HTML' ), $cron );
+			dre_msg( sprintf( ('Message body (original): %s'), '<pre style="font-size:10px">'.htmlspecialchars( $html_body ).'</pre>', $cron ) );
 
 			// Prepare html message body text:
 			$content = dre_prepare_html_message( $html_body );
 
-			dre_msg( sprintf( T_('Message body (processed): %s'), '<pre style="font-size:10px">'.htmlspecialchars( $content ).'</pre>', $cron ) );
+			dre_msg( sprintf( ('Message body (processed): %s'), '<pre style="font-size:10px">'.htmlspecialchars( $content ).'</pre>', $cron ) );
 		}
 
 
-		dre_msg( '<b class="green">'.T_('MIME Decoding Successful').'</b>', $cron );
+		dre_msg( '<b class="green">'.('MIME Decoding Successful').'</b>', $cron );
 
 		$message_text = $content;
 
@@ -351,8 +351,8 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		if( $Messages->has_errors() )
 		{
 			// Make it easier for user to find and correct the errors
-			dre_msg( "\n".sprintf( T_('Processing message: %s'), $post_title ), $cron );
-			dre_msg( $Messages->get_string( T_('Cannot post, please correct these errors:'), 'error' ), $cron );
+			dre_msg( "\n".sprintf( ('Processing message: %s'), $post_title ), $cron );
+			dre_msg( $Messages->get_string( ('Cannot post, please correct these errors:'), 'error' ), $cron );
 
 			$Messages->clear();
 			rmdir_r( $tmpDirMIME );
@@ -361,7 +361,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 
 		global $dre_emails, $DB, $localtimenow;
 
-		dre_msg( '<h4>'.T_('Saving the returned email in the database').'</h4>', $cron );
+		dre_msg( '<h4>'.('Saving the returned email in the database').'</h4>', $cron );
 
 		// Get Headers from Decoded MIME Data:
 		$email_headers = dre_get_headers( $decodedMIME );
@@ -369,9 +369,9 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		// Get data of the returned email:
 		$email_data = dre_get_email_data( $content, $message_text, $email_headers );
 
-		dre_msg( T_('Email Address').': '.$email_data['address'], $cron );
-		dre_msg( T_('Error Type').': '.dre_decode_error_type( $email_data['errtype'] ), $cron );
-		dre_msg( T_('Error Message').': '.$email_data['errormsg'], $cron );
+		dre_msg( ('Email Address').': '.$email_data['address'], $cron );
+		dre_msg( ('Error Type').': '.dre_decode_error_type( $email_data['errtype'] ), $cron );
+		dre_msg( ('Error Message').': '.$email_data['errormsg'], $cron );
 
 		// Insert a returned email's data into DB
 		if( dre_insert_returned_email( $email_data ) )
@@ -385,7 +385,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		// Mark message to be deleted:
 		if( $Settings->get('repath_delete_emails') )
 		{
-			dre_msg( sprintf( T_('Marking message for deletion from inbox: %s'), $index ), $cron );
+			dre_msg( sprintf( ('Marking message for deletion from inbox: %s'), $index ), $cron );
 			imap_delete( $mbox, $index );
 			++$del_cntr;
 		}
@@ -411,23 +411,23 @@ function dre_simulate_message( $message_text )
 
 	$content = $message_text;
 
-	dre_msg( '<hr /><h3>'.sprintf( T_('Working with message %s:'), '#1' ).'</h3>' );
+	dre_msg( '<hr /><h3>'.sprintf( ('Working with message %s:'), '#1' ).'</h3>' );
 
-	dre_msg( sprintf( T_('Message body: %s'), '<pre style="font-size:10px">'.htmlspecialchars( $content ).'</pre>' ) );
+	dre_msg( sprintf( ('Message body: %s'), '<pre style="font-size:10px">'.htmlspecialchars( $content ).'</pre>' ) );
 
-	dre_msg( '<b class="green">'.T_('(No MIME decoding is done in simulation mode)').'</b>' );
+	dre_msg( '<b class="green">'.('(No MIME decoding is done in simulation mode)').'</b>' );
 
 	// Remove content after terminators
 	$content = dre_limit_by_terminators( $content );
 
-	dre_msg( '<h4>'.T_('Saving the returned email in the database').'</h4>' );
+	dre_msg( '<h4>'.('Saving the returned email in the database').'</h4>' );
 
 	// Get data of the returned email:
 	$email_data = dre_get_email_data( $content, $message_text, 'Empty headers' );
 
-	dre_msg( T_('Email Address').': '.$email_data['address'] );
-	dre_msg( T_('Error Type').': '.dre_decode_error_type( $email_data['errtype'] ) );
-	dre_msg( T_('Error Message').': '.$email_data['errormsg'] );
+	dre_msg( ('Email Address').': '.$email_data['address'] );
+	dre_msg( ('Error Type').': '.dre_decode_error_type( $email_data['errtype'] ) );
+	dre_msg( ('Error Message').': '.$email_data['errormsg'] );
 
 	// Insert a returned email's data into DB:
 	return dre_insert_returned_email( $email_data );
@@ -486,7 +486,7 @@ function dre_process_header( $header, & $subject, & $post_date, $cron = false )
 
 	if( !$subject_is_correct )
 	{ // Subject is not match to identify return email
-		dre_msg( sprintf( T_('Subject prefix is not "%s", skip this email'), implode( '", "', $repath_subjects ) ), $cron );
+		dre_msg( sprintf( ('Subject prefix is not "%s", skip this email'), implode( '", "', $repath_subjects ) ), $cron );
 		return false;
 	}
 
@@ -496,7 +496,7 @@ function dre_process_header( $header, & $subject, & $post_date, $cron = false )
 		$ddate_U = @strtotime($ddate);
 		if( empty($ddate_U) || strlen($ddate_U) < 2 )
 		{
-			dre_msg( sprintf( T_('Could not parse date header "%s"'), $ddate ), $cron );
+			dre_msg( sprintf( ('Could not parse date header "%s"'), $ddate ), $cron );
 			return false;
 		}
 	}
@@ -524,7 +524,7 @@ function dre_process_header( $header, & $subject, & $post_date, $cron = false )
 
 		if( ! isset( $dmonths[$match[3]] ) )
 		{
-			dre_msg( T_('Invalid month name in message date string.'), $cron );
+			dre_msg( ('Invalid month name in message date string.'), $cron );
 			return false;
 		}
 		$ddate_m = $dmonths[$match[3]];
@@ -817,7 +817,7 @@ function dre_decode_error_type( $error_type )
 	$titles = array(
 		''  => T_('Unknown error'),
 		'S' => T_('Spam suspicion'),
-		'P' => T_('Permament error'),
+		'P' => T_('Permanent error'),
 		'T' => T_('Temporary error'),
 		'C' => T_('Configuration error')
 	);
@@ -867,7 +867,7 @@ function dre_limit_by_terminators( $content )
 
 /**
  * Get data of returned email
- * 
+ *
  * @param string Prepared message text (without text after body terminator)
  * @param string Full message text
  * @param string Headers

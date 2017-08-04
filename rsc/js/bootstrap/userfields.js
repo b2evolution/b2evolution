@@ -23,8 +23,26 @@ jQuery( document ).ready(function()
 		if( div_cache_ID != '' )
 		{ // Init popover for the first time event "focus"
 			var popover_params = {
+				container: 'body',
 				trigger: 'focus',
-				placement: 'right',
+				placement: function( context, source )
+				{
+					var input_obj = jQuery( source );
+					var input_pos = input_obj.offset();
+					var right_space = jQuery( window ).width() - input_pos.left - input_obj.width();
+
+					if( right_space < 290 && input_pos.left < 240 )
+					{
+						return 'bottom';
+					}
+
+					if( right_space < 290 )
+					{
+						return 'left';
+					}
+
+					return 'right';
+				},
 				html: true,
 				template: '<div class="popover popover-userfield"><div class="arrow"></div><div class="popover-content"></div></div>'
 			};
@@ -37,7 +55,7 @@ jQuery( document ).ready(function()
 				{ // Get field info
 					type: 'POST',
 					url: htsrv_url + 'anon_async.php',
-					data: 'action=get_field_bubbletip' + '&field_ID=' + field_ID + '&b2evo_icons_type=glyphicons',
+					data: 'action=get_field_bubbletip' + '&field_ID=' + field_ID + '&b2evo_icons_type=fontawesome',
 					success: function( result )
 					{ // If success request - fill div with field data, save same data to the cache, init popover
 						if( ajax_response_is_correct( result ) )

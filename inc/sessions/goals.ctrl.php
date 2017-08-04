@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'sessions/model/_goal.class.php', 'Goal' );
 load_class( 'sessions/model/_goalcat.class.php', 'GoalCategory' );
-load_funcs('sessions/model/_hitlog.funcs.php');
+load_funcs( 'sessions/model/_hitlog.funcs.php' );
 
 /**
  * @var User
@@ -30,6 +30,14 @@ $activate_collection_toolbar = true;
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
+// Section ID:
+param( 'sec_ID', 'integer', 0, true );
+if( ! $perm_view_all && ! $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
+{
+	forget_param( 'sec_ID' );
+	unset( $sec_ID );
+}
+
 $tab3 = param( 'tab3', 'string', 'goals', true );
 $AdminUI->set_path( 'stats', 'goals', $tab3 );
 
@@ -37,12 +45,13 @@ if( isset( $collections_Module ) )
 { // Display list of blogs:
 	if( $perm_view_all )
 	{
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => 'global' ), T_('All'),
-						$admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0' );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'goals' ), T_('All'),
+						$admin_url.'?ctrl=goals&amp;blog=0', NULL, false, true );
 	}
 	else
 	{ // No permission to view aggregated stats:
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => $tab3 ) );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'goals' ), NULL,
+						'', NULL, false, true );
 	}
 }
 
@@ -60,7 +69,7 @@ if( $blog == 0 )
 		elseif( set_working_blog( $selected ) ) // set $blog & memorize in user prefs
 		{ // Selected a new blog:
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 	}
 }
@@ -71,7 +80,7 @@ $current_User->check_perm( 'stats', 'list', true, $blog );
 if( param( 'goal_ID', 'integer', '', true) )
 { // Load goal:
 	$GoalCache = & get_GoalCache();
-	if( ($edited_Goal = & $GoalCache->get_by_ID( $goal_ID, false )) === false )
+	if( ( $edited_Goal = & $GoalCache->get_by_ID( $goal_ID, false ) ) === false )
 	{ // We could not find the goal to edit:
 		unset( $edited_Goal );
 		forget_param( 'goal_ID' );
@@ -83,7 +92,7 @@ if( param( 'goal_ID', 'integer', '', true) )
 if( param( 'gcat_ID', 'integer', '', true) )
 { // Load goal category:
 	$GoalCategoryCache = & get_GoalCategoryCache();
-	if( ($edited_GoalCategory = & $GoalCategoryCache->get_by_ID( $gcat_ID, false )) === false )
+	if( ( $edited_GoalCategory = & $GoalCategoryCache->get_by_ID( $gcat_ID, false ) ) === false )
 	{ // We could not find the goal category to edit:
 		unset( $edited_GoalCategory );
 		forget_param( 'gcat_ID' );
@@ -100,7 +109,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'stats', 'edit', true );
 
-		if( ! isset($edited_Goal) )
+		if( ! isset( $edited_Goal ) )
 		{	// We don't have a model to use, start with blank object:
 			$edited_Goal = new Goal();
 		}
@@ -138,42 +147,27 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$DB->begin();
-			$q = $edited_Goal->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Goal->dbinsert();
+			$Messages->add( T_('New goal created.'), 'success' );
 
-				param_error( 'goal_key',
-					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
-						'href="?ctrl=goals&amp;action=edit&amp;blog='.$Blog->ID.'&amp;goal_ID='.$q.'"' ) );
-			}
-			else
+			// What next?
+			switch( $action )
 			{
-				$edited_Goal->dbinsert();
-				$Messages->add( T_('New goal created.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{	// What next?
-				switch( $action )
-				{
-					case 'create_copy':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&action=new&blog='.$Blog->ID.'&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create_new':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&action=new&blog='.$Blog->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&blog='.$Blog->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&action=new'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ).'&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&action=new'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;
@@ -195,29 +189,13 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Update in DB:
-			$DB->begin();
-			$q = $edited_Goal->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Goal->dbupdate();
+			$Messages->add( T_('Goal updated.'), 'success' );
 
-				param_error( 'goal_key',
-					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
-						'href="?ctrl=goals&amp;action=edit&amp;blog='.$Blog->ID.'&amp;goal_ID='.$q.'"' ) );
-			}
-			else
-			{
-				$edited_Goal->dbupdate();
-				$Messages->add( T_('Goal updated.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{
-				$action = 'list';
-				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=goals&blog='.$Blog->ID, 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
+			$action = 'list';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=goals'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 
 
@@ -237,7 +215,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Goal &laquo;%s&raquo; deleted.'), $edited_Goal->dget('name') );
+			$msg = sprintf( T_('Goal &laquo;%s&raquo; deleted.'), $edited_Goal->dget( 'name' ) );
 			$edited_Goal->dbdelete();
 			unset( $edited_Goal );
 			forget_param( 'goal_ID' );
@@ -248,7 +226,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Goal->check_delete( sprintf( T_('Cannot delete goal &laquo;%s&raquo;'), $edited_Goal->dget('name') ) ) )
+			if( ! $edited_Goal->check_delete( sprintf( T_('Cannot delete goal &laquo;%s&raquo;'), $edited_Goal->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -372,14 +350,14 @@ switch( $action )
 
 		if( $gcat_ID == 1 )
 		{ // Deny to delete "Default" category
-			$Messages->add( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget('name') ), 'error' );
+			$Messages->add( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget( 'name' ) ), 'error' );
 			$action = 'view';
 			break;
 		}
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Goal category &laquo;%s&raquo; deleted.'), $edited_GoalCategory->dget('name') );
+			$msg = sprintf( T_('Goal category &laquo;%s&raquo; deleted.'), $edited_GoalCategory->dget( 'name' ) );
 			$edited_GoalCategory->dbdelete();
 			unset( $edited_GoalCategory );
 			forget_param( 'gcat_ID' );
@@ -390,7 +368,7 @@ switch( $action )
 		}
 		else
 		{ // not confirmed, Check for restrictions:
-			if( ! $edited_GoalCategory->check_delete( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget('name') ) ) )
+			if( ! $edited_GoalCategory->check_delete( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget( 'name' ) ) ) )
 			{ // There are restrictions:
 				$action = 'view';
 			}
@@ -450,7 +428,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Goal->confirm_delete(
-				sprintf( T_('Delete goal &laquo;%s&raquo;?'), $edited_Goal->dget('name') ),
+				sprintf( T_('Delete goal &laquo;%s&raquo;?'), $edited_Goal->dget( 'name' ) ),
 				'goal', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
@@ -466,7 +444,7 @@ switch( $action )
 	case 'cat_delete':
 		// We need to ask for confirmation:
 		$edited_GoalCategory->confirm_delete(
-				sprintf( T_('Delete goal category &laquo;%s&raquo;?'), $edited_GoalCategory->dget('name') ),
+				sprintf( T_('Delete goal category &laquo;%s&raquo;?'), $edited_GoalCategory->dget( 'name' ) ),
 				'goalcat', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'cat_new':

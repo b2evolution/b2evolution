@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $AdminUI;
 
 param( 'user_tab', 'string', '', true );
-if( empty($user_tab) )
+if( empty( $user_tab ) )
 {
 	$user_tab = 'profile';
 }
@@ -49,14 +49,14 @@ if( $user_profile_only )
 
 $UserCache = & get_UserCache();
 
-if( ! is_null($user_ID) )
+if( ! is_null( $user_ID ) )
 { // User selected
 	if( $action == 'update' && $user_ID == 0 )
 	{ // we create a new user
 		$edited_User = new User();
 		$edited_User->set_datecreated( $localtimenow );
 	}
-	elseif( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
+	elseif( ( $edited_User = & $UserCache->get_by_ID( $user_ID, false ) ) === false )
 	{	// We could not find the User to edit:
 		unset( $edited_User );
 		forget_param( 'user_ID' );
@@ -86,6 +86,11 @@ if( ! is_null($user_ID) )
 			{
 				$action = 'view';
 			}
+		}
+		elseif( $user_tab == 'visits' && $Settings->get( 'enable_visit_tracking' ) != 1 )
+		{
+			$Messages->add( T_('Visit tracking is not enabled.') );
+			header_redirect( '?ctrl=users&user_tab=profile&user_ID='.$current_User->ID, 403 );
 		}
 	}
 }
@@ -801,11 +806,20 @@ if( $display_mode != 'js')
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-notifications-tab' );
 			break;
+		case 'visits':
+			$AdminUI->breadcrumbpath_add( T_('Visits'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'profile-visits-tab' );
+			break;
 		case 'advanced':
 			$AdminUI->breadcrumbpath_add( T_('Advanced'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-advanced-tab' );
+
+			// Initialize JS for color picker field on the edit plugin settings form:
+			init_colorpicker_js();
 			break;
 		case 'admin':
 			$AdminUI->breadcrumbpath_add( T_('Admin'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
@@ -898,6 +912,12 @@ switch( $action )
 				// Display user subscriptions form:
 				$AdminUI->disp_payload_begin();
 				$AdminUI->disp_view( 'users/views/_user_subscriptions.form.php' );
+				$AdminUI->disp_payload_end();
+				break;
+			case 'visits':
+				// Display profile visits view
+				$AdminUI->disp_payload_begin();
+				$AdminUI->disp_view( 'users/views/_user_profile_visits.view.php' );
 				$AdminUI->disp_payload_end();
 				break;
 			case 'advanced':
@@ -1024,6 +1044,9 @@ switch( $action )
 				}
 				$image_width = param( 'image_width', 'integer' );
 				$image_height = param( 'image_height', 'integer' );
+				$aspect_ratio = param( 'aspect_ratio', 'double' );
+				$content_width = param( 'content_width', 'integer' );
+				$content_height = param( 'content_height', 'integer' );
 				$AdminUI->disp_view( 'users/views/_user_crop.form.php' );
 				if( $display_mode != 'js')
 				{

@@ -14,12 +14,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $htsrv_url;
+global $admin_url;
 
 // Default params:
 $params = array_merge( array(
 		'country'     => '',
-		'firstname'   => '',
+		'reg_country' => '',
+		'reg_domain'  => '',
+		'fullname'    => '',
 		'gender'      => '',
 		'locale'      => '',
 		'source'      => '',
@@ -34,19 +36,38 @@ $params = array_merge( array(
 echo T_('A new user has registered on the site').":";
 echo "\n\n";
 
-echo T_('Login').": ".$params['login']."\n";
+echo /* TRANS: noun */ T_('Login').": ".$params['login']."\n";
 echo T_('Email').": ".$params['email']."\n";
+
+if( $params['fullname'] != '' )
+{ // Full name is entered
+	echo T_('Full name').": ".$params['fullname']."\n";
+}
+
+if( $params['reg_country'] > 0 )
+{ // Country field is entered
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	$CountryCache = & get_CountryCache();
+	$reg_Country = $CountryCache->get_by_ID( $params['reg_country'] );
+	echo T_('Registration Country').": ".$reg_Country->get_name()."\n";
+}
+
+if( ! empty( $params['reg_domain'] ) )
+{	// Domain field is entered:
+	echo T_('Registration Domain').": ".$params['reg_domain']."\n";
+}
+
 if( $params['country'] > 0 )
 { // Country field is entered
 	load_class( 'regional/model/_country.class.php', 'Country' );
 	$CountryCache = & get_CountryCache();
 	$user_Country = $CountryCache->get_by_ID( $params['country'] );
-	echo T_('Country').": ".$user_Country->get_name()."\n";
+	echo T_('Profile Country').": ".$user_Country->get_name()."\n";
 }
 
-if( $params['firstname'] != '' )
-{ // First name is entered
-	echo T_('First name').": ".$params['firstname']."\n";
+if( !empty( $params['source'] ) )
+{ // Source is defined
+	echo T_('Registration Source').": ".$params['source']."\n";
 }
 
 if( $params['gender'] == 'M' )
@@ -62,11 +83,6 @@ if( !empty( $params['locale'] ) )
 { // Locale field is entered
 	global $locales;
 	echo T_('Locale').": ".$locales[ $params['locale'] ]['name']."\n";
-}
-
-if( !empty( $params['source'] ) )
-{ // Source is defined
-	echo T_('Registration Source').": ".$params['source']."\n";
 }
 
 if( !empty( $params['trigger_url'] ) )
@@ -98,7 +114,7 @@ echo T_('Recent registrations').': '.$admin_url.'?ctrl=users&action=show_recent'
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new user registrations, click here:' ).' '.
-		$htsrv_url.'quick_unsubscribe.php?type=user_registration&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=user_registration&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

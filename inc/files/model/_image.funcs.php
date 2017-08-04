@@ -274,7 +274,10 @@ function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 			global $Settings;
 			$chmod = $Settings->get('fm_default_chmod_file');
 		}
-		chmod( $path, octdec( $chmod ) );
+		if( ! @chmod( $path, octdec( $chmod ) ) )
+		{
+			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '[['.$path.']]', $chmod ), 'error', 'file' );
+		}
 	}
 
 	return $err;
@@ -505,8 +508,13 @@ function rotate_image( $File, $degrees )
 		return false;
 	}
 
-	// Save image
-	save_image( $imh, $File->get_full_path(), $Filetype->mimetype );
+	// Save image:
+	$save_image_err = save_image( $imh, $File->get_full_path(), $Filetype->mimetype );
+	if( $save_image_err !== NULL )
+	{	// Some error has been detected on save image:
+		syslog_insert( substr( $save_image_err, 1 ), 'error', 'file', $File->ID );
+		return false;
+	}
 
 	// Remove the old thumbnails
 	$File->rm_cache();
@@ -579,8 +587,13 @@ function crop_image( $File, $x, $y, $width, $height, $min_size = 0, $max_size = 
 		return false;
 	}
 
-	// Save image
-	save_image( $dst_imh, $File->get_full_path(), $Filetype->mimetype );
+	// Save image:
+	$save_image_err = save_image( $dst_imh, $File->get_full_path(), $Filetype->mimetype );
+	if( $save_image_err !== NULL )
+	{	// Some error has been detected on save image:
+		syslog_insert( substr( $save_image_err, 1 ), 'error', 'file', $File->ID );
+		return false;
+	}
 
 	// Remove the old thumbnails
 	$File->rm_cache();
@@ -713,6 +726,69 @@ if( !function_exists( 'imagerotate' ) )
 			}
 		}
 		return $destimg;
+	}
+}
+
+
+/**
+ * Scale image to dimensions specified.
+ * The scaling only happens if the source is larger than the constraint.
+ *
+ * @param object File
+ * @param integer constrained width
+ * @param integer constrained height
+ * @param string mimetype of File
+ * @param integer image quality
+ */
+function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_quality = NULL)
+{
+	global $Settings, $Messages;
+
+	if( empty( $mimetype ) )
+	{
+		$Filetype = $File->get_Filetype();
+		$mimetype = $Filetype->mimetype;
+	}
+
+	if( empty( $image_quality ) )
+	{
+		$image_quality = $Settings->get( 'fm_resize_quality' );
+	}
+
+	$resized_imh = null;
+
+	list( $err, $src_imh ) = load_image( $File->get_full_path(), $mimetype );
+	if( empty( $err ) )
+	{
+		list( $err, $resized_imh ) = generate_thumb( $src_imh, 'fit', $new_width, $new_height );
+	}
+
+	if( empty( $err ) )
+	{ // Image was resized successfully
+		$Messages->add_to_group( sprintf( T_( '%s was resized to %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', imagesx( $resized_imh ), imagesy( $resized_imh ) ),
+				'success', T_('The following images were resized:') );
+	}
+	else
+	{ // Image was not resized
+		$Messages->add_to_group( sprintf( T_( '%s could not be resized to target resolution of %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', $new_width, $new_height ),
+				'error', T_('Unable to resize the following images:') );
+		// Error exists, exit here
+		return;
+	}
+
+	if( $mimetype == 'image/jpeg' )
+	{	// JPEG, do autorotate if EXIF Orientation tag is defined
+		exif_orientation( $File->get_full_path(), $resized_imh );
+	}
+
+	if( !$resized_imh )
+	{	// Image resource is incorrect
+		return;
+	}
+
+	if( empty( $err ) )
+	{	// Save resized image ( and also rotated image if this operation was done )
+		save_image( $resized_imh, $File->get_full_path(), $mimetype, $image_quality );
 	}
 }
 

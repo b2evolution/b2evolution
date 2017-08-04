@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $Skin;
+global $Item, $Skin, $app_version;
 
 // Default params:
 $params = array_merge( array(
@@ -25,7 +25,7 @@ $params = array_merge( array(
 		// Controlling the title:
 		'disp_title'                 => true,
 		'item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
-			'item_title_before'          => '<h2>',	
+			'item_title_before'          => '<h2>',
 			'item_title_after'           => '</h2>',
 			'item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
 			'item_title_single_after'    => '</h1>',
@@ -34,7 +34,7 @@ $params = array_merge( array(
 		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
 		'image_class'                => 'img-responsive',
 		'image_size'                 => 'fit-1280x720',
-		'author_link_text'           => 'preferredname',
+		'author_link_text'           => 'auto',
 	), $params );
 
 
@@ -76,16 +76,9 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'restrict_to_image_position' => 'teaser',
 			) );
 	?>
-	
-	<?php 
-		if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
-			echo '<section class="evo_post__full well">';
-			echo '<div class="evo_post__full_text">';
-		} else {
-			echo '<section class="evo_post__full">';
-			echo '<div class="evo_post__full_text">';
-		}
-	?>
+
+	<div class="evo_post_wrapper <?php if(!$Item->is_intro()){echo 'well';} ?>">
+
 	<header>
 	<?php
 		// ------- Title -------
@@ -124,16 +117,16 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 			echo $params['item_title_line_after'];
 		}
-		
+
 		if( ! $Item->is_intro() )
 		{ // Don't display the following for intro posts
 
 			echo '<div class="small text-muted">';
-		
+
 			if( $Item->status != 'published' )
 			{
 				$Item->format_status( array(
-						'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 					) );
 			}
 			// Permalink:
@@ -145,19 +138,19 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			$Item->issue_time( array(
 					'before'      => ' '.T_('posted on '),
 					'after'       => ' ',
-					'time_format' => 'M j, Y',
+					'time_format' => locale_extdatefmt(),
 				) );
 
 			// Author
 			$Item->author( array(
-				'before'    => ' '.T_('by').' ',
+				'before'    => /* TRANS: author name */ ' '.T_('by').' ',
 				'after'     => ' ',
 				'link_text' => $params['author_link_text'],
 			) );
 
 			// Categories
 			$Item->categories( array(
-				'before'          => T_('in').' ',
+				'before'          => /* TRANS: category name(s) */ T_('in').' ',
 				'after'           => ' ',
 				'include_main'    => true,
 				'include_other'   => true,
@@ -170,12 +163,13 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'before'    => ' &bull; ',
 				'after'     => '',
 			) );
-			
+
 			echo '</div>';
 		}
 	?>
-	
+
 	</header>
+
 	<?php
 	if( $disp == 'single' )
 	{
@@ -183,24 +177,71 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		<div class="evo_container evo_container__item_single">
 		<?php
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-		// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 		// Display container contents:
 		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
 			// This will enclose each widget in a block:
-			'block_start' => '<div class="$wi_class$">',
+			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
 			// This will enclose the title of each widget:
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
+			// Template params for "Item Link" widget
+			'widget_item_link_before'    => '<p class="evo_post_link">',
+			'widget_item_link_after'     => '</p>',
 			// Template params for "Item Tags" widget
-			'widget_item_tags_before'    => '<div class="small">'.T_('Tags').': ',
-			'widget_item_tags_after'     => '</div>',
+			'widget_item_tags_before'    => '<nav class="small post_tags">',
+			'widget_item_tags_after'     => '</nav>',
+			'widget_item_tags_separator' => ' ',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
+			// Template params for "Item Attachments" widget:
+			'widget_item_attachments_params' => array(
+					'limit_attach'       => 1000,
+					'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+					'after'              => '</ul></div>',
+					'before_attach'      => '<li class="evo_file">',
+					'after_attach'       => '</li>',
+					'before_attach_size' => ' <span class="evo_file_size">(',
+					'after_attach_size'  => ')</span>',
+				),
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+		?>
+		</div>
+		<?php
+	}
+	elseif( $disp == 'page' )
+	{
+		?>
+		<div class="evo_container evo_container__item_page">
+		<?php
+		// ------------------------- "Item Page" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		skin_container( /* TRANS: Widget container name */ NT_('Item Page'), array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="evo_widget $wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
+			// Params for skin file "_item_content.inc.php"
+			'widget_item_content_params' => $params,
+			// Template params for "Item Attachments" widget:
+			'widget_item_attachments_params' => array(
+					'limit_attach'       => 1000,
+					'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+					'after'              => '</ul></div>',
+					'before_attach'      => '<li class="evo_file">',
+					'after_attach'       => '</li>',
+					'before_attach_size' => ' <span class="evo_file_size">(',
+					'after_attach_size'  => ')</span>',
+				),
+		) );
+		// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
 		?>
 		</div>
 		<?php
@@ -217,15 +258,12 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	}
 	?>
 
-	<footer>
+	</div> <!-- ../content_end_full_text -->
+
 		<?php
-			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
+			if( ! $Item->is_intro() && $disp == 'posts' ) // Do NOT apply tags, comments and feedback on intro posts
 			{ // List all tags attached to this post:
-				$Item->tags( array(
-						'before'    => '<nav class="small post_tags">',
-						'after'     => '</nav>',
-						'separator' => ' ',
-					) );
+				echo '<footer>';
 		?>
 
 		<nav>
@@ -255,10 +293,11 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 						) );
 		?>
 		</nav>
-		<?php } ?>
-	</footer>
-	
-	</div> <!-- ../content_end_full_text -->
+			<?php
+				echo '</footer>';
+			} ?>
+
+	</div><!-- ../evo_post_wrapper -->
 	</section>  <!-- ../content_end_full -->
 
 	<?php
@@ -273,18 +312,24 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
 		skin_include( '_item_workflow.inc.php' );
 		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	}
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ META COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
 			) );
 		// ---------------------- END OF META COMMENTS ---------------------
+	}
 	?>
 
 	<?php

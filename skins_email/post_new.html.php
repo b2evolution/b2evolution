@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $baseurl, $htsrv_url;
+global $admin_url, $baseurl;
 
 // Default params:
 $params = array_merge( array(
@@ -22,12 +22,13 @@ $params = array_merge( array(
 		'Item'           => NULL,
 		'recipient_User' => NULL,
 		'notify_type'    => '',
+		'is_new_item'    => true,
 	), $params );
 
 
 $recipient_User = $params['recipient_User'];
 $Item = $params['Item'];
-$Blog = & $Item->get_Blog();
+$Collection = $Blog = & $Item->get_Blog();
 
 if( $params['notify_full'] )
 {	/* Full notification */
@@ -73,7 +74,7 @@ if( $params['notify_full'] )
 }
 else
 { /* Short notification */
-	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:', 'login_text' => 'name' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
 
 	if( $params['notify_type'] == 'moderator' )
 	{
@@ -101,15 +102,25 @@ echo "</div>\n";
 // Footer vars:
 if( $params['notify_type'] == 'moderator' )
 { // moderation email
-	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' ).'<br />';
-	$params['unsubscribe_text'] .= T_( 'If you don\'t want to receive any more notifications about post moderation, click here' ).': '
-			.'<a href="'.$htsrv_url.'quick_unsubscribe.php?type=post_moderator&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+	if( $params['is_new_item'] )
+	{	// about new item:
+		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new posts, click here' );
+		$unsubscribe_type = 'post_moderator';
+	}
+	else
+	{	// about updated item:
+		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated posts, click here' );
+		$unsubscribe_type = 'post_moderator_edit';
+	}
+	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' ).'<br />'
+			.$unsubscribe_text.': '
+			.'<a href="'.get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 }
 else
 { // subscription email
 	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new posts on this blog, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=coll_post&user_ID=$user_ID$&coll_ID='.$Blog->ID.'&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=coll_post&user_ID=$user_ID$&coll_ID='.$Blog->ID.'&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 }
 

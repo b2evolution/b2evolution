@@ -119,7 +119,7 @@ while( $Item = & mainlist_get_item() )
 		if( $Item->status != 'published' )
 		{
 			$Item->format_status( array(
-					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 				) );
 		}
 		?>
@@ -131,7 +131,6 @@ while( $Item = & mainlist_get_item() )
 
 		<?php
 			// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-			// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 				'widget_context' => 'item',	// Signal that we are displaying within an Item
@@ -158,7 +157,7 @@ while( $Item = & mainlist_get_item() )
 		skin_include( '_item_feedback.inc.php', array(
 				'before_section_title' => '<h3>',
 				'after_section_title'  => '</h3>',
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.

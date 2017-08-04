@@ -48,10 +48,7 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
 		// Set random of "Permission management" from the selected options:
 		$new_Blog->set( 'advanced_perms', $perm_management[ rand( 0, $perm_management_max_index ) ] == 'advanced' ? 1 : 0 );
 		// Set random of "Allow access to" from the selected options:
-		$new_Blog->set_setting( 'allow_access', $allow_access[ rand( 0, $allow_access_max_index ) ] );
-		// Don't show a sample collection on top menu in back-office:
-		// TODO: In another branch Erwin has implemented a rule similar to "only enable first 10 collections". This will be merged here at some point.
-		$new_Blog->set( 'favorite', 0 );
+		$new_Blog->set_setting( 'allow_access', $allow_access[ rand( 0, $allow_access_max_index ) ] );;
 
 		// Define collection settings by its kind:
 		$Plugins->trigger_event( 'InitCollectionKinds', array(
@@ -61,6 +58,10 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
 
 		// Do a creating new collection:
 		$new_Blog->create();
+
+		// Don't show a sample collection on top menu in back-office:
+		// TODO: In another branch Erwin has implemented a rule similar to "only enable first 10 collections". This will be merged here at some point.
+		$new_Blog->favorite( NULL, 0 );
 
 		// Clear the messages because we have at least 4 messages after each $new_Blog->create() which are the same:
 		$Messages->clear();
@@ -284,7 +285,8 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 	$DB->log_queries = false;
 
 	// Check if we should assign at least one advanced permission:
-	$assign_adv_user_perms = ! empty( array_intersect( $advanced_user_perms, array( 'member', 'moderator', 'admin' ) ) );
+	$array_intersect = array_intersect( $advanced_user_perms, array( 'member', 'moderator', 'admin' ) );
+	$assign_adv_user_perms = ! empty( $array_intersect );
 
 	if( $assign_adv_user_perms )
 	{ // Get all collections with advanced perms:
@@ -356,6 +358,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'perm_media_upload'    => 0,
 									'perm_media_browse'    => 0,
 									'perm_media_change'    => 0,
+									'perm_analytics'       => 0,
 								) );
 							break;
 
@@ -382,6 +385,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'perm_media_upload'    => 1,
 									'perm_media_browse'    => 1,
 									'perm_media_change'    => 1,
+									'perm_analytics'       => 0,
 								) );
 							break;
 
@@ -408,6 +412,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'perm_media_upload'    => 1,
 									'perm_media_browse'    => 1,
 									'perm_media_change'    => 1,
+									'perm_analytics'       => 1,
 								) );
 							break;
 					}
@@ -418,7 +423,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 							bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_perm_delpost, bloguser_perm_edit_ts,
 							bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses,
 							bloguser_perm_edit_cmt, bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,
-							bloguser_perm_media_browse, bloguser_perm_media_change )
+							bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_analytics )
 						VALUES ( '.implode( '), (', $adv_perm_coll_insert_values ).' )' );
 				}
 			}
@@ -485,7 +490,7 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 {
 	global $Messages, $DB;
 
-	echo T_('Creating of the sample messages...');
+	echo T_('Creating sample messages...');
 	evo_flush();
 
 	/**
@@ -502,8 +507,7 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 	if( count( $users ) < 2 )
 	{	// No users
 		$Messages->add( T_('At least two users must exist in DB to create the messages'), 'error' );
-		$action = 'show_create_messages';
-		break;
+		return;
 	}
 
 	$count_threads = 0;

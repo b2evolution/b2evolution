@@ -75,6 +75,18 @@ class coll_comment_list_Widget extends ComponentWidget
 				'defaultvalue' => T_( 'Read the full comment' ),
 				'type' => 'text',
 			),
+			'comment_excerpt' => array(
+				'label' => T_('Comment excerpt'),
+				'note' => T_('Show comment excerpt version'),
+				'defaultvalue' => false,
+				'type' => 'checkbox'
+			),
+			'max_words' => array(
+				'label' => T_('Max words'),
+				'note' => T_('Maximum number of words shown in the excerpt'),
+				'size' => 4,
+				'defaultvalue' => 20
+			),
 			'blog_ID' => array(
 				'label' => T_( 'Collection' ),
 				'note' => T_( 'ID of the collection to use, leave empty for the current collection.' ),
@@ -127,13 +139,27 @@ class coll_comment_list_Widget extends ComponentWidget
 
 
 	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		parent::init_display( $params );
+
+		$this->disp_params['comment_excerpt_before'] = '<p class="comment_excerpt">';
+		$this->disp_params['comment_excerpt_after'] = '</p>';
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 
@@ -151,7 +177,7 @@ class coll_comment_list_Widget extends ComponentWidget
 
 		$filters = array(
 				'types' => array( 'comment','trackback','pingback' ),
-				'statuses' => array( 'published' ),
+				'statuses' => explode( ',', $listBlog->get_setting( 'comment_inskin_statuses' ) ),
 				'order' => $order,
 				'comments' => $limit,
 			);
@@ -164,59 +190,72 @@ class coll_comment_list_Widget extends ComponentWidget
 		// Filter list:
 		$CommentList->set_filters( $filters );
 
-		// Run SQL query to get results depending on current filters:
-		$CommentList->query();
-
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
 
-		echo $this->disp_params[ 'block_start'];
+		// Get count of comments to be displayed
+		$count = $CommentList->get_total_rows();
 
-		// Display title if requested
-		$this->disp_title();
-
-		echo $this->disp_params['block_body_start'];
-
-		echo $this->disp_params[ 'list_start' ];
-
-		if( empty( $this->disp_params[ 'author_link_text' ] ) )
+		if( $count )
 		{
-			$this->disp_params[ 'author_link_text' ] = 'login';
-		}
+			echo $this->disp_params[ 'block_start'];
 
-		/**
-		 * @var Comment
-		 */
-		while( $Comment = & $CommentList->get_next() )
-		{ // Loop through comments:
-			// Load comment's Item object:
-			$Comment->get_Item();
-			echo $this->disp_params[ 'item_start' ];
-			$Comment->author( '', ' ', '', ' ', 'htmlbody', $this->disp_params[ 'author_links' ], $this->disp_params[ 'author_link_text' ] );
-			echo T_( 'on ' );
-			$Comment->permanent_link( array(
-				'text'        => $Comment->Item->title,
-				'title'       => $this->disp_params[ 'hover_text' ],
-				) );
-			echo $this->disp_params[ 'item_end' ];
-		}	// End of comment loop.}
+			// Display title if requested
+			$this->disp_title();
 
-		if( isset( $this->disp_params['page'] ) )
-		{
-			if( empty( $this->disp_params['pagination'] ) )
+			echo $this->disp_params['block_body_start'];
+
+			echo $this->disp_params[ 'list_start' ];
+
+			if( empty( $this->disp_params[ 'author_link_text' ] ) )
 			{
-				$this->disp_params['pagination'] = array();
+				$this->disp_params[ 'author_link_text' ] = 'auto';
 			}
-			$CommentList->page_links( $this->disp_params['pagination'] );
+
+			/**
+			 * @var Comment
+			 */
+			while( $Comment = & $CommentList->get_next() )
+			{ // Loop through comments:
+				// Load comment's Item object:
+				$Comment->get_Item();
+				echo $this->disp_params[ 'item_start' ];
+				$Comment->author( '', ' ', '', ' ', 'htmlbody', $this->disp_params[ 'author_links' ], $this->disp_params[ 'author_link_text' ] );
+				echo T_( 'on ' );
+				$Comment->permanent_link( array(
+					'text'        => $Comment->Item->title,
+					'title'       => $this->disp_params[ 'hover_text' ],
+					) );
+				if( $this->disp_params['comment_excerpt'] )
+				{
+					echo $this->disp_params['comment_excerpt_before'];
+					echo excerpt_words( $Comment->get_content(), $this->disp_params['max_words'] );
+					echo $this->disp_params['comment_excerpt_after'];
+				}
+				echo $this->disp_params[ 'item_end' ];
+			}	// End of comment loop.}
+
+			if( isset( $this->disp_params['page'] ) )
+			{
+				if( empty( $this->disp_params['pagination'] ) )
+				{
+					$this->disp_params['pagination'] = array();
+				}
+				$CommentList->page_links( $this->disp_params['pagination'] );
+			}
+
+			echo $this->disp_params[ 'list_end' ];
+
+			echo $this->disp_params['block_body_end'];
+
+			echo $this->disp_params[ 'block_end' ];
+
+			return true;
 		}
-
-		echo $this->disp_params[ 'list_end' ];
-
-		echo $this->disp_params['block_body_end'];
-
-		echo $this->disp_params[ 'block_end' ];
-
-		return true;
+		else
+		{ // there are no comments to display
+			return false;
+		}
 	}
 }
 

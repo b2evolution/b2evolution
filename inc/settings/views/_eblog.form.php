@@ -53,7 +53,7 @@ $Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'post-by-email
 		// Display scrollable div
 		echo '<div style="padding: 6px; margin:5px; border: 1px solid #CCC; overflow:scroll; height: 350px">'.$eblog_test_output.'</div>';
 	}
-	
+
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('General settings').get_manual_link('post-by-email-general-settings') );
@@ -106,7 +106,7 @@ $Form->begin_fieldset( T_('General settings').get_manual_link('post-by-email-gen
 				T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating on your mail server.') ) );
 
 	$Form->checkbox( 'eblog_delete_emails', $Settings->get('eblog_delete_emails'), T_('Delete processed emails'),
-				T_('Check this if you want processed messages to be deleted form server after successful processing.') );
+				T_('Check this if you want processed messages to be deleted from server after successful processing.') );
 
 $Form->end_fieldset();
 

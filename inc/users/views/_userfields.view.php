@@ -158,7 +158,7 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 
 			if( !in_array( $row->ufgp_ID, $usedgroups ) )
 			{ // delete
-				$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=delete&amp;ufgp_ID='.$row->ufgp_ID.'&amp;'.url_crumb('userfieldgroup') ) );
+				$r .= action_icon( T_('Delete this group').'!', 'delete', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=delete&amp;ufgp_ID='.$row->ufgp_ID.'&amp;'.url_crumb('userfieldgroup') ) );
 			}
 			else
 			{

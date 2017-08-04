@@ -21,7 +21,7 @@ class escapecode_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '5.0.0';
+	var $version = '6.9.3';
 	var $number_of_installs = 1;
 
 

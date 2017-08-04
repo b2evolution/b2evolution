@@ -1,11 +1,3 @@
-// ------------- Organization Members widget -------------
-@import "../../rsc/less/_org_members_widget.module.less";
-	// Override constants used in the module:
-	@widget_core_org_members-color: #333;
-	@widget_core_org_members-user-link-color: #000;
-	@widget_core_org_members-user-link-hover-color: #23527c;
-// -------------------------------------------------------
-
 // Header
 .evo_container__header {
 	margin-bottom: 20px;
@@ -19,17 +11,6 @@
 .nav.nav-tabs {
 	margin-top: 0;
 }
-
-// Intro post - Featured post background images sample
-//.well {
-//	background: url(images/7T0W8MYRN0.jpg) no-repeat center center; 
-//	-webkit-background-size: cover;
-//	-moz-background-size: cover;
-//	-o-background-size: cover;
-//	background-size: cover;
-//	width: 100%;
-//	height: auto;
-//}
 
 // Login widget form
 .widget_core_user_login {
@@ -203,6 +184,11 @@ textarea.message_text {
 //		margin-right: 5px;
 //	}
 }
+.evo_hasbgimg {
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+}
 
 div.bSideItem {
 	background: #F7F5FA;
@@ -327,10 +313,13 @@ div.action_messages, div.log_container {
 // Positions on the action buttons near page titles
 .evo_post_title {
 	display: table;
+	h1 {
+		margin-bottom: 0;
+	}
 	h2 {
 		display: table-cell;
 		margin: 0;
-		padding: 20px 0 10px;
+		padding: 20px 0 0;
 	}
 	.btn-group {
 		display: table-cell;
@@ -342,4 +331,9 @@ div.action_messages, div.log_container {
 // This skin needs this for disp=posts to separate from lower pagination
 footer.row {
 	margin-top: 20px;
+}
+
+// Overrule predefined background-color style
+.avatar_main_frame {
+	background-color: transparent;
 }

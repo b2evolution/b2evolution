@@ -191,7 +191,7 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_items__item_settings', 'fk'=>'iset_item_ID', 'msg'=>T_('%d items settings') ),
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
 				array( 'table'=>'T_items__prerendering', 'fk'=>'itpr_itm_ID', 'msg'=>T_('%d prerendered content') ),
-				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_post_ID', 'msg'=>T_('%d recordings of a post having been read') ),
+				array( 'table'=>'T_items__user_data', 'fk'=>'itud_item_ID', 'msg'=>T_('%d recordings of user data for a specific post') ),
 			);
 	}
 
@@ -437,17 +437,23 @@ class ItemLight extends DataObject
 		}
 
 		$this->get_Blog();
+
+		// Special Items types/usages will have special permalink types
 		if( ( $this->Blog->get_setting( 'front_disp' ) == 'page' &&
 		      $this->Blog->get_setting( 'front_post_ID' ) == $this->ID ) ||
 		    ( $this->Blog->get_setting( 'front_disp' ) == 'single' &&
 		      ( $first_mainlist_Item = & $this->Blog->get_first_mainlist_Item() ) &&
 		      $first_mainlist_Item->ID == $this->ID ) )
 		{ // This item is used as front specific page or as first post on the blog's home
-			$permalink_type = 'none';
+			$permalink_type = 'front';
 		}
 		elseif( $item_type_usage != 'post' ) // page, intros, sidebar and other not "post"
 		{	// This is not an "in stream" post:
-			if( in_array( $item_type_usage, array( 'intro-front', 'intro-main', 'special' ) ) )
+			if( in_array( $item_type_usage, array( 'intro-front', 'intro-main' ) ) )
+			{	// This type of post is not allowed to have a permalink:
+				$permalink_type = 'front';
+			}
+			elseif( in_array( $item_type_usage, array( 'special', 'content-block' ) ) )
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'none';
 			}
@@ -475,9 +481,12 @@ class ItemLight extends DataObject
 			case 'subchap':
 				return $this->get_chapter_url( $blogurl, $glue );
 
+			case 'front':
+				// Link to collection front page:
+				return $this->Blog->gen_blogurl();
+
 			case 'none':
 				// This is a silent fallback when we try to permalink to an Item that cannot be addressed directly:
-				// Link to blog home:
 				return $this->Blog->gen_blogurl();
 
 			case 'cat':
@@ -721,7 +730,7 @@ class ItemLight extends DataObject
 
 			foreach( $categoryIDs as $cat_ID )
 			{
-				if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) )
+				if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false, false ) )
 				{
 					$chapters[] = $Chapter;
 				}
@@ -761,13 +770,13 @@ class ItemLight extends DataObject
 			}
 			if( empty( $this->main_Chapter ) )
 			{	// If we still don't have a valid Chapter, display clean error and die().
-				global $admin_url, $Blog, $blog;
+				global $admin_url, $Collection, $Blog, $blog;
 				if( empty( $Blog ) )
 				{
 					if( !empty( $blog ) )
 					{
 						$BlogCache = & get_BlogCache();
-						$Blog = & $BlogCache->get_by_ID( $blog, false );
+						$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false );
 					}
 				}
 
@@ -970,7 +979,7 @@ class ItemLight extends DataObject
 	 */
 	function locale_temp_switch()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! empty( $Blog ) && $Blog->get_setting( 'post_locale_source' ) == 'blog' )
 		{ // Use locale what current blog is using now
@@ -1123,7 +1132,7 @@ class ItemLight extends DataObject
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL )
 	{
-		global $current_User, $Blog;
+		global $current_User, $Collection, $Blog;
 
 		switch( $text )
 		{
@@ -1218,7 +1227,7 @@ class ItemLight extends DataObject
 	 */
 	function get_title( $params = array() )
 	{
-		global $ReqURL, $Blog, $MainList;
+		global $ReqURL, $Collection, $Blog, $MainList;
 
 		// Set default post navigation
 		$def_post_navigation = empty( $Blog ) ? 'same_blog' : $Blog->get_setting( 'post_navigation' );
@@ -1248,7 +1257,7 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		$title = format_to_output( $this->$params['title_field'], $params['format'] );
+		$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
 
 		if( $params['max_length'] != '' )
 		{	// Crop long title
@@ -1359,7 +1368,7 @@ class ItemLight extends DataObject
 
 
 	/**
-	 * Template tag: get excerpt 
+	 * Template tag: get excerpt
 	 * This light version does display only. It never tries to auto-generate the excerpt.
 	 *
 	 *  May be used in ItemLight lists such as sitemaps, feeds, recent posts, post widgets where the exceprt might be used as a title, etc.
@@ -1552,7 +1561,8 @@ class ItemLight extends DataObject
 		$params = array_merge( array(
 				'before'    => '',
 				'after'     => '',
-				'link_text' => '$icon$' // Use a mask $icon$ or some other text
+				'link_text' => '$icon$', // Use a mask $icon$ or some other text
+				'class'     => '',
 			), $params );
 
 		if( ( $history_url = $this->get_history_url() ) === false )
@@ -1564,7 +1574,7 @@ class ItemLight extends DataObject
 		$link_text = str_replace( '$icon$', $this->history_info_icon(), $params['link_text'] );
 
 		return $params['before']
-			.'<a href="'.$history_url.'">'.$link_text.'</a>'
+			.'<a href="'.$history_url.'"'.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' ).'>'.$link_text.'</a>'
 			.$params['after'];
 	}
 

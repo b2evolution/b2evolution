@@ -86,7 +86,7 @@ while( $Item = & mainlist_get_item() )
 					) );
 				$Item->author( array(
 						'before'    => ' > ',
-						'link_text' => 'preferredname',
+						'link_text' => 'auto',
 					) );
 			?>
 		<br>
@@ -112,16 +112,16 @@ while( $Item = & mainlist_get_item() )
 			if( $Item->status != 'published' )
 			{
 				$Item->format_status( array(
-						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 					) );
 			}
 		?>
 
 		<?php
 			// ------------------------- "Item - Single" CONTAINER EMBEDDED HERE --------------------------
-			// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+					'widget_context' => 'item',	// Signal that we are displaying within an Item
 					// The following (optional) params will be used as defaults for widgets included in this container:
 					// This will enclose each widget in a block:
 					'block_start' => '<div class="widget $wi_class$">',
@@ -131,6 +131,9 @@ while( $Item = & mainlist_get_item() )
 					'block_title_end' => '</h3>',
 					// Params for skin file "_item_content.inc.php"
 					'widget_item_content_params' => array( 'image_size' => 'fit-256x256' ),
+					// Template params for "Item Link" widget
+					'widget_item_link_before'    => '<p class="evo_post_link">',
+					'widget_item_link_after'     => '</p>',
 				) );
 			// ----------------------------- END OF "Item - Single" CONTAINER -----------------------------
 		?>
@@ -187,7 +190,7 @@ while( $Item = & mainlist_get_item() )
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array(
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.

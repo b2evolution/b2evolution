@@ -36,22 +36,22 @@ $Comment = & $params['Comment'];
 	{
 		case 'comment': // Display a comment:
 			echo T_('Comment from:') ?>
-			<?php $Comment->author( '', '#', '', '#', 'htmlbody', false, 'preferredname' ) ?>
+			<?php $Comment->author( '', '#', '', '#', 'htmlbody', false, 'auto' ) ?>
 			<?php $Comment->author_url( '', ' &middot; ', '' ) ?>
 			<?php break;
 
 		case 'trackback': // Display a trackback:
 			echo T_('Trackback from:') ?>
-			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true, 'preferredname' ) ?>
+			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true, 'auto' ) ?>
 			<?php break;
 
 		case 'pingback': // Display a pingback:
 			echo T_('Pingback from:') ?>
-			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true, 'preferredname' ) ?>
+			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true, 'auto' ) ?>
 			<?php break;
 	}
 
-	$Comment->edit_link( ' &middot; ', ' ', '#', '#', '', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); // Link to backoffice for editing
+	$Comment->edit_link( ' &middot; ', ' ', '#', '#', '', '&amp;', true, $Comment->get_permanent_url() ); // Link to backoffice for editing
 
 	if( $Comment->status != 'published' )
 	{

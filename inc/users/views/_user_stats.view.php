@@ -27,15 +27,13 @@ $SQL->SELECT( 'dom_name,
 	COUNT( IF( user_status = \'failedactivation\', 1, NULL ) ) AS cnt_failedactivation,
 	COUNT( IF( user_status = \'closed\', 1, NULL ) ) AS cnt_closed,
 	( COUNT( IF( user_status IN( \'activated\', \'autoactivated\' ), 1, NULL ) ) / COUNT( * ) ) AS percent' );
-$SQL->FROM( 'T_basedomains' );
-$SQL->FROM_add( 'LEFT JOIN T_users ON user_email_dom_ID = dom_ID' );
-$SQL->WHERE( 'dom_type = \'email\'' );
+$SQL->FROM( 'T_users' );
+$SQL->FROM_add( 'LEFT JOIN T_basedomains ON dom_ID = user_email_dom_ID' );
 $SQL->GROUP_BY( 'dom_ID' );
 
 $count_SQL = new SQL();
-$count_SQL->SELECT( 'COUNT( dom_ID )' );
-$count_SQL->FROM( 'T_basedomains' );
-$count_SQL->WHERE( 'dom_type = \'email\'' );
+$count_SQL->SELECT( 'COUNT( DISTINCT user_email_dom_ID )' );
+$count_SQL->FROM( 'T_users' );
 
 // Create result set:
 $Results = new Results( $SQL->get(), 'dom_', '--D', NULL, $count_SQL->get() );
@@ -151,24 +149,24 @@ foreach( $user_gender_color as $color )
 // Legend titles:
 $donut_chart['legend_numrows'] = 9;
 $donut_chart['legends'] = array(
-	T_('Women / Active / With Photo'),
-	T_('Women / Active / No Photo'),
-	T_('Women / Inactive / With Photo'),
-	T_('Women / Inactive / No Photo'),
-	T_('Women / Closed / With Photo'),
-	T_('Women / Closed / No Photo'),
-	T_('Men / Active / With Photo'),
-	T_('Men / Active / No Photo'),
-	T_('Men / Inactive / With Photo'),
-	T_('Men / Inactive / No Photo'),
-	T_('Men / Closed / With Photo'),
-	T_('Men / Closed / No Photo'),
-	T_('Unknown / Active / With Photo'),
-	T_('Unknown / Active / No Photo'),
-	T_('Unknown / Inactive / With Photo'),
-	T_('Unknown / Inactive / No Photo'),
-	T_('Unknown / Closed / With Photo'),
-	T_('Unknown / Closed / No Photo') );
+	T_('Women').' / '.T_('Active').' / '.T_('With Photo'),
+	T_('Women').' / '.T_('Active').' / '.T_('No Photo'),
+	T_('Women').' / '.T_('Inactive').' / '.T_('With Photo'),
+	T_('Women').' / '.T_('Inactive').' / '.T_('No Photo'),
+	T_('Women').' / '.T_('Closed').' / '.T_('With Photo'),
+	T_('Women').' / '.T_('Closed').' / '.T_('No Photo'),
+	T_('Men').' / '.T_('Active').' / '.T_('With Photo'),
+	T_('Men').' / '.T_('Active').' / '.T_('No Photo'),
+	T_('Men').' / '.T_('Inactive').' / '.T_('With Photo'),
+	T_('Men').' / '.T_('Inactive').' / '.T_('No Photo'),
+	T_('Men').' / '.T_('Closed').' / '.T_('With Photo'),
+	T_('Men').' / '.T_('Closed').' / '.T_('No Photo'),
+	T_('Unknown').' / '.T_('Active').' / '.T_('With Photo'),
+	T_('Unknown').' / '.T_('Active').' / '.T_('No Photo'),
+	T_('Unknown').' / '.T_('Inactive').' / '.T_('With Photo'),
+	T_('Unknown').' / '.T_('Inactive').' / '.T_('No Photo'),
+	T_('Unknown').' / '.T_('Closed').' / '.T_('With Photo'),
+	T_('Unknown').' / '.T_('Closed').' / '.T_('No Photo') );
 
 // Data:
 $donut_chart['data'] = array();
@@ -176,12 +174,12 @@ $donut_chart['data'][0] = array();
 $donut_chart['data'][1] = array();
 $donut_chart['data'][2] = array();
 
-/* 
+/*
  * Test data array:
  *   F - Female, M - Male, G - No gender
  *   a - Active, i - Inactive, c - closed
  *   p - with photo, n - without photo
- * 
+ *
  *
 $donut_chart['data'][0] = array( 'Fap' => 1, 'Fan' => 4, 'Fip' => 1, 'Fin' => 2, 'Fcp' => 2, 'Fcn' => 1,
 	                               'Map' => 3, 'Man' => 1, 'Mip' => 2, 'Min' => 1, 'Mcp' => 0, 'Mcn' => 1,

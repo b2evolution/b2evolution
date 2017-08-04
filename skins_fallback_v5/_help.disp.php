@@ -16,7 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Blog;
+global $Collection, $Blog;
 // TODO: add more help stuff here
 // TODO: maked editable through admin (special post type?) and use the contents below as default only
 

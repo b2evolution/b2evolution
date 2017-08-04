@@ -99,6 +99,13 @@ class item_seen_by_Widget extends ComponentWidget
 				),
 			), parent::get_param_definitions( $params ) );
 
+		if( isset( $r['allow_blockcache'] ) )
+		{	// Disable "allow blockcache" because this widget displays dynamic data:
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
+
 		return $r;
 	}
 
@@ -110,7 +117,7 @@ class item_seen_by_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $Item, $current_User, $DB;
+		global $Collection, $Blog, $Item, $current_User, $DB;
 
 		if( empty( $Blog ) || ! $Blog->get_setting( 'track_unread_content' ) )
 		{	// Don't display this widget if current collection doesn't track the unread content:
@@ -147,11 +154,11 @@ class item_seen_by_Widget extends ComponentWidget
 
 		// Get post read statuses for all collection members of the current Item:
 		$SQL = new SQL();
-		$SQL->SELECT( 'uprs_user_ID, IF( uprs_read_post_ts >= '.$DB->quote( $Item->last_touched_ts ).', "read", "updated" ) AS read_post_status' );
-		$SQL->FROM( 'T_users__postreadstatus' );
-		$SQL->FROM_add( 'INNER JOIN T_users ON uprs_user_ID = user_ID' );
-		$SQL->WHERE( 'uprs_user_ID IN ( '.$DB->quote( $member_user_IDs ).' )' );
-		$SQL->WHERE_and( 'uprs_post_ID = '.$DB->quote( $Item->ID ) );
+		$SQL->SELECT( 'itud_user_ID, IF( itud_read_item_ts >= '.$DB->quote( $Item->last_touched_ts ).', "read", "updated" ) AS read_post_status' );
+		$SQL->FROM( 'T_items__user_data' );
+		$SQL->FROM_add( 'INNER JOIN T_users ON itud_user_ID = user_ID' );
+		$SQL->WHERE( 'itud_user_ID IN ( '.$DB->quote( $member_user_IDs ).' )' );
+		$SQL->WHERE_and( 'itud_item_ID = '.$DB->quote( $Item->ID ) );
 		$SQL->ORDER_BY( 'read_post_status, user_login' );
 		$read_statuses = $DB->get_assoc( $SQL->get(), 'Get post read statuses for all collection members of the Item#'.$Item->ID );
 
@@ -185,34 +192,17 @@ class item_seen_by_Widget extends ComponentWidget
 			}
 
 			// Display each user as login with colored status icon:
-			$login_users[] = $status_icon.' '.$seen_post_User->get_identity_link( array( 'link_text' => 'login' ) );
+			$login_users[] = $status_icon.' '.$seen_post_User->get_identity_link( array( 'link_text' => 'auto' ) );
 		}
 
 		// Print out all member logins with post read statuses:
+		echo '<span class="evo_seen_by">';
 		echo sprintf( T_('Seen by: %s'), implode( ', ', $login_users ) );
-
+		echo '</span>';
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 
 		return true;
-	}
-
-
-	/**
-	 * Maybe be overriden by some widgets, depending on what THEY depend on..
-	 *
-	 * @return array of keys this widget depends on
-	 */
-	function get_cache_keys()
-	{
-		global $Blog, $current_User;
-
-		return array(
-				'wi_ID'        => $this->ID, // Have the widget settings changed ?
-				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
-				'user_ID'      => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
-				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-			);
 	}
 }
 

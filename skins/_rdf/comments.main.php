@@ -45,9 +45,6 @@ $CommentList->set_filters( array(
 		'comments' => $Blog->get_setting('comments_per_feed'),
 	) );
 
-// Run SQL query to get results depending on current filters:
-$CommentList->query();
-
 // Get ready for display (runs the query):
 $CommentList->display_init();
 
@@ -97,7 +94,7 @@ while( $Comment = & $CommentList->get_next() )
 	$Comment->get_Item();
 	?>
 <item rdf:about="<?php $Comment->permanent_url() ?>">
-	<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( array(
+	<title><?php echo format_to_output( T_('In response to').':', 'xml' ) ?> <?php $Comment->Item->title( array(
 				'format' => 'xml',
 				'link_type' => 'none',
 			) ); ?></title>

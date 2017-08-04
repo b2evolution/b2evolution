@@ -86,10 +86,10 @@ switch( $action )
 				$Settings->set( 'notification_long_name',  param( 'notification_long_name', 'string', '' ) );
 
 				// Site logo url
-				$Settings->set( 'notification_logo',  param( 'notification_logo', 'string', '' ) );
+				$Settings->set( 'notification_logo_file_ID',  param( 'notification_logo_file_ID', 'integer', NULL ) );
 				break;
 
-			case 'renderers':
+			case 'plugins':
 				// Update email renderers settings:
 				load_funcs('plugins/_plugin.funcs.php');
 
@@ -190,25 +190,32 @@ switch( $action )
 				// Force email sending
 				$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
 
+				// Sendmail additional params:
+				$Settings->set( 'sendmail_params', param( 'sendmail_params', 'string', 'return' ) );
+				$Settings->set( 'sendmail_params_custom', param( 'sendmail_params_custom', 'string' ) );
+
 				$old_smtp_enabled = $Settings->get( 'smtp_enabled' );
 
 				// Enabled
 				$Settings->set( 'smtp_enabled', param( 'smtp_enabled', 'boolean', 0 ) );
 
 				// SMTP Host
-				$Settings->set( 'smtp_server_host',  param( 'smtp_server_host', 'string', '' ) );
+				$Settings->set( 'smtp_server_host', param( 'smtp_server_host', 'string', '' ) );
 
 				// Port Number
-				$Settings->set( 'smtp_server_port',  param( 'smtp_server_port', 'integer' ) );
+				$Settings->set( 'smtp_server_port', param( 'smtp_server_port', 'integer' ) );
 
 				// Encryption Method
-				$Settings->set( 'smtp_server_security',  param( 'smtp_server_security', 'string', '' ) );
+				$Settings->set( 'smtp_server_security', param( 'smtp_server_security', 'string', '' ) );
+
+				// Accept certificate
+				$Settings->set( 'smtp_server_novalidatecert', param( 'smtp_server_novalidatecert', 'boolean', 0 ) );
 
 				// SMTP Username
-				$Settings->set( 'smtp_server_username',  param( 'smtp_server_username', 'string', '' ) );
+				$Settings->set( 'smtp_server_username', param( 'smtp_server_username', 'string', '' ) );
 
 				// SMTP Password
-				$Settings->set( 'smtp_server_password',  param( 'smtp_server_password', 'string', '' ) );
+				$Settings->set( 'smtp_server_password', param( 'smtp_server_password', 'string', '' ) );
 
 				// Check if we really can use SMTP mailer
 				if( $Settings->get( 'smtp_enabled' ) && ( $smtp_error = check_smtp_mailer() ) !== true )
@@ -230,10 +237,16 @@ switch( $action )
 				break;
 
 			case 'other':
-				/* Campaign sending: */
+				/* Campaign/Newsletter throttling: */
+
+				// Sending:
+				$Settings->set( 'email_campaign_send_mode', param( 'email_campaign_send_mode', 'string', 'immediate' ) );
 
 				// Chunk Size:
 				$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
+
+				// Delay between chunks:
+				$Settings->set( 'email_campaign_cron_repeat', param_duration( 'email_campaign_cron_repeat' ) );
 				break;
 
 			default:
@@ -242,7 +255,7 @@ switch( $action )
 		}
 
 		if( ! $Messages->has_errors() )
-		{  
+		{
 			if( $Settings->dbupdate() )
 			{
 				if( ! empty( $syslog_message ) )
@@ -255,9 +268,9 @@ switch( $action )
 				{ // Check if connection is available
 					global $smtp_connection_result;
 					// Test SMTP connection
-					$smtp_messages = smtp_connection_test();
+					$test_mail_messages = smtp_connection_test();
 					// Init this var to display a result on the page
-					$smtp_test_output = is_array( $smtp_messages ) ? implode( "<br />\n", $smtp_messages ) : '';
+					$test_mail_output = is_array( $test_mail_messages ) ? implode( "<br />\n", $test_mail_messages ) : '';
 					if( $smtp_connection_result )
 					{ // Success
 						$Messages->add( T_('The connection with this SMTP server has been tested successfully.'), 'success' );
@@ -266,7 +279,7 @@ switch( $action )
 					{ // Error
 						$Messages->add( T_('The connection with this SMTP server has failed.'), 'error' );
 					}
-					// Don't redirect here in order to display a result($smtp_test_output) of SMTP connection above settings form
+					// Don't redirect here in order to display a result($test_mail_output) of SMTP connection above settings form
 				}
 				else
 				{ // Redirect so that a reload doesn't write to the DB twice:
@@ -356,10 +369,34 @@ switch( $action )
 		$current_User->check_perm( 'emails', 'edit', true );
 
 		// Test SMTP connection
-		$smtp_messages = smtp_connection_test();
+		$test_mail_messages = smtp_connection_test();
 
 		// Init this var to display a result on the page
-		$smtp_test_output = is_array( $smtp_messages ) ? implode( "<br />\n", $smtp_messages ) : '';
+		$test_mail_output = is_array( $test_mail_messages ) ? implode( "<br />\n", $test_mail_messages ) : '';
+		break;
+
+	case 'test_email_smtp':
+	case 'test_email_php':
+		// Test email sending by SMTP/PHP gateway:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'emailsettings' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		// Test email sending:
+		if( $action == 'test_email_smtp' )
+		{	// SMTP gateway:
+			$test_mail_messages = smtp_email_sending_test();
+		}
+		else
+		{	// PHP mail():
+			$test_mail_messages = php_email_sending_test();
+		}
+
+		// Initialize this var to display a result on the page:
+		$test_mail_output = is_array( $test_mail_messages ) ? implode( "<br />\n", $test_mail_messages ) : '';
 		break;
 
 	case 'blocked_new':
@@ -388,7 +425,7 @@ switch( $action )
 			$Messages->add( T_('The email address was updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=email&tab=blocked', 303 ); // Will EXIT
+			header_redirect( '?ctrl=email', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -407,7 +444,7 @@ switch( $action )
 			$Messages->add( T_('The email address was deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=email&tab=blocked', 303 ); // Will EXIT
+			header_redirect( '?ctrl=email', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -514,7 +551,7 @@ switch( $tab )
 
 		if( empty( $tab3 ) )
 		{	// Default tab3 for this case:
-			$tab3 = 'renderers';
+			$tab3 = 'plugins';
 		}
 
 		switch( $tab3 )
@@ -545,12 +582,15 @@ switch( $tab )
 				$AdminUI->set_page_manual_link( 'email-other-settings' );
 				break;
 
-			case 'renderers':
+			case 'plugins':
 			default:
-				$AdminUI->breadcrumbpath_add( T_('Renderers'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'email-renderers-settings' );
+				$AdminUI->set_page_manual_link( 'email-plugins-settings' );
+
+				// Initialize JS for color picker field on the edit plugin settings form:
+				init_colorpicker_js();
 				break;
 		}
 
@@ -655,7 +695,7 @@ switch( $tab )
 				$AdminUI->disp_view( 'tools/views/_email_other.form.php' );
 				break;
 
-			case 'renderers':
+			case 'plugins':
 			default:
 				$AdminUI->disp_view( 'tools/views/_email_renderers.form.php' );
 		}

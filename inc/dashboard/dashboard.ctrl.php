@@ -24,13 +24,13 @@ load_funcs( 'dashboard/model/_dashboard.funcs.php' );
  */
 global $current_User;
 
-global $dispatcher, $allow_evo_stats, $blog;
+global $dispatcher, $blog;
 
 
 if( empty( $_GET['blog'] ) )
 { // Use dashboard for selected blog only from GET request
 	$blog = 0;
-	unset( $Blog );
+	unset( $Blog, $Collection );
 }
 
 // Site dashboard
@@ -46,7 +46,6 @@ $AdminUI->set_page_manual_link( 'site-dashboard' );
 // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
 require_js( '#jqueryUI#' );
 
-require_js( 'communication.js' ); // auto requires jQuery
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
@@ -56,10 +55,14 @@ require_js_helper( 'colorbox' );
 require_js( '#easypiechart#' );
 require_css( 'jquery/jquery.easy-pie-chart.css' );
 
-// Init JS to quick edit an order of the blogs in the table cell by AJAX
+// Init JS to quick edit an order of the collections and their groups in the table cell by AJAX:
 init_field_editor_js( array(
 		'field_prefix' => 'order-blog-',
 		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update&order_data=',
+	) );
+init_field_editor_js( array(
+		'field_prefix' => 'order-section-',
+		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update_section&order_data=',
 	) );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -72,6 +75,7 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 // Display blog list VIEW:
 $AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
+load_funcs( 'collections/model/_blog_js.funcs.php' );
 $AdminUI->disp_payload_end();
 
 
@@ -113,14 +117,14 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 			'type'  => 'number',
 		);
 	$post_all_counter = get_table_count( 'T_items__item' );
-	
+
 	// Posts
 	$chart_data[] = array(
 			'title' => T_('Posts'),
 			'value' => $post_all_counter,
 			'type'  => 'number',
 		);
-	
+
 	// Slugs
 	$chart_data[] = array(
 			'title' => T_('Slugs'),
@@ -166,7 +170,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	//---- END OF - System stats ----//
 
-	 
+
 	$block_item_Widget = new Widget( 'block_item' );
 
 	$block_item_Widget->title = T_('Updates from b2evolution.net');

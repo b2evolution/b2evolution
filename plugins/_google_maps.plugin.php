@@ -34,7 +34,7 @@ class google_maps_plugin extends Plugin
 	var $name = 'Google Maps';
 	var $code = 'evo_Gmaps';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.9.3';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -43,6 +43,7 @@ class google_maps_plugin extends Plugin
 	 */
 	var $number_of_installs = 1;
 	var $group = 'widget';
+	var $subgroup = 'infoitem';
 	var $number_of_widgets ;
 
 
@@ -88,6 +89,31 @@ class google_maps_plugin extends Plugin
 	}
 
 
+	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$UserSettings}.
+	 * @return
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$r = array_merge( array(
+			'api_key' => array(
+				'label' => T_('API key'),
+				'size' => 40,
+				'defaultvalue' => '',
+				'note' => sprintf( T_('Visit the <a %s>Google Maps API</a> documentation site for instructions on how to obtain an API key'),
+						'href="https://developers.google.com/maps/documentation/javascript/get-api-key#get-an-api-key" target="_blank"' ),
+				)
+			), parent::get_coll_setting_definitions( $params ) );
+
+		return $r;
+	}
+
+
 		/**
 	 * Get definitions for widget editable params
 	 *
@@ -96,7 +122,9 @@ class google_maps_plugin extends Plugin
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		$r = array(
+		global $preview;
+
+		$r = array_merge( array(
 			'map_title' => array(
 				'label' => T_('Widget title'),
 				'defaultvalue' => T_('Google maps Widget'),
@@ -112,16 +140,43 @@ class google_maps_plugin extends Plugin
 				'label' => T_('Map height on page'),
 				'defaultvalue' => '300px',
 				'note' => '',
-			),
+				),
 			'map_type' => array(
 				'label' => T_( 'Map default view ' ),
 				'type' => 'radio',
 				'options' => array( array('map', T_( 'Map' ) ), array( 'satellite', T_( 'Satellite' ) ) ),
 				'defaultvalue' => 'map',
-				'note' => ''),
+				'note' => ''
+				),
+			), parent::get_widget_param_definitions( $params ) );
 
-			);
+		if( $preview && isset( $r['allow_blockcache'] ) )
+		{	// Disable block caching for this widget when item is previewed currently:
+			$r['allow_blockcache']['defaultvalue'] = false;
+		}
+
 		return $r;
+	}
+
+
+	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		global $Collection, $Blog, $Item;
+
+		return array(
+				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+				'item_ID'      => $Item->ID, // Has the Item page changed?
+			);
 	}
 
 
@@ -139,7 +194,7 @@ class google_maps_plugin extends Plugin
 		return array();
 	}
 
-	
+
 	/**
 	 *  Add 'px' to display param if need.
 	 *
@@ -167,12 +222,13 @@ class google_maps_plugin extends Plugin
 	 */
 	function AdminDisplayItemFormFieldset( & $params )
 	{
-		global $Blog, $DB, $admin_url;
+		global $Collection, $Blog, $DB, $admin_url;
 
 		// fp>vitaliy : make thhis title configurable per blog . default shoul dbe as below.
 		$plugin_title = $this->Settings->get( 'map_title_coll'.$Blog->ID );
 		$plugin_title = empty( $plugin_title ) ? T_( 'Google Maps plugin' ) : $plugin_title;
 		$params['Form']->begin_fieldset( $plugin_title, array( 'id' => 'itemform_googlemap', 'fold' => ( isset( $params['edit_layout'] ) && $params['edit_layout'] == 'expert' ) ) );
+		$api_key = $this->get_coll_setting( 'api_key', $Blog );
 
 		$Item = $params['Item'];
 
@@ -180,14 +236,23 @@ class google_maps_plugin extends Plugin
 		{
 			$url = $admin_url.'?ctrl=itemtypes&amp;action=edit&amp;blog='.$Blog->ID.'&amp;ityp_ID='.$Item->get_ItemType()->ID.'#itemtype_features';
 
-			echo sprintf( T_('You must turn on the <b>"Use coordinates"</b> setting in Post Type settings <a %s>Features</a> tab so the Google Maps plugin can save its coordinates.'), 'href="'.$url.'"' );
+			echo sprintf( T_('You must turn on the <b>"Use coordinates"</b> setting in Post Type settings <a %s>Settings</a> tab so the Google Maps plugin can save its coordinates.'), 'href="'.$url.'"' );
+			$params['Form']->end_fieldset();
+			return;
+		}
+
+		if( empty( $api_key ) )
+		{
+			$url = $admin_url.'?ctrl=coll_settings&tab=plugins&blog='.$Blog->ID.'&plugin_group=widget';
+
+			echo sprintf( T_('You must specify a valid Google Maps API key in the Plugins settings <a %s>Collection Settings</a> tab to use the plugin.'), 'href="'.$url.'"' );
 			$params['Form']->end_fieldset();
 			return;
 		}
 
 		$params['Form']->switch_layout( 'linespan' );
 
-		require_js( '#jqueryUI#' );
+		require_js( '#jqueryUI#', 'blog' );
 
 		$lat = $Item->get_setting('latitude');
 		$lng = $Item->get_setting('longitude');
@@ -293,7 +358,7 @@ class google_maps_plugin extends Plugin
 
 	?>
 	<div id="map_canvas" style="width:100%; <?php echo $height; ?>; margin: 5px 0px;"></div>
-	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
 	<script type="text/javascript">
 	var post_position = 0;
 	<?php
@@ -315,7 +380,7 @@ class google_maps_plugin extends Plugin
 			<?php
 			break;
 	}
-	
+
 	if (!empty( $lat ) || !empty( $lng ) )
 	{
 		?>
@@ -335,7 +400,7 @@ class google_maps_plugin extends Plugin
 			?>
 
 			var geocoder = new google.maps.Geocoder();
-			geocoder.geocode( {'address': '<?php echo $search_location; ?>'}, function(results, status)
+			geocoder.geocode( {'address': '<?php echo format_to_js( $search_location ); ?>'}, function(results, status)
 			{
 				if (status == google.maps.GeocoderStatus.OK)
 				{
@@ -403,6 +468,29 @@ class google_maps_plugin extends Plugin
 
 	var geocoder = new google.maps.Geocoder();
 	var geo_region = null;
+
+	// If the map is initially hidden, we will need to trigger the resize event of the map when it is initially shown,
+	// otherwise the map display will be empty for quite a while.
+	var mapEl = jQuery( '#map_canvas' );
+
+	if( mapEl.not(':visible') )
+	{ // map is hidden in folded fieldset
+		var target = document.getElementById( 'itemform_googlemap' ).parentElement; // this is the element that we need to observe
+		var config = { attributes: true };
+		var observer = new MutationObserver( function( mutations )
+			{
+				mutations.forEach( function( mutation )
+					{
+						if( mapEl.is( ':visible' ) )
+						{ // map is now visible
+							google.maps.event.trigger( map, 'resize' );
+							observer.disconnect(); // we only need to do this once so we can stop observing
+						}
+					} );
+			} );
+
+		observer.observe( target, config );
+	}
 
 	function set_region(region_code)
 	{
@@ -667,7 +755,7 @@ function locate()
 					{
 						adress = adress + text;
 					}
-					else 
+					else
 					{
 						adress = adress + ', ' + text;
 					}
@@ -706,7 +794,7 @@ function locate()
 					{
 						adress = adress + text;
 					}
-					else 
+					else
 					{
 						adress = adress + ', ' + text;
 					}
@@ -837,30 +925,27 @@ function locate()
 
 	function SkinTag( & $params )
 	{
-		global $Item;
-		global $Blog;
+		global $Collection, $Blog, $Item;
 
-		$this->number_of_widgets += 1;
-
-		if( ! empty( $Item ) && $Item->get_type_setting( 'use_coordinates' ) == 'never' )
-		{
+		if( empty( $Item ) )
+		{	// Don't display this widget when no Item object:
 			return;
 		}
 
-		if( !empty( $Item ) )
-		{
-			$lat = $Item->get_setting('latitude');
-			$lng = $Item->get_setting('longitude');
-			if (empty($lat) && empty($lng))
-			{
-				return;
-			}
+		$this->number_of_widgets += 1;
+
+		if( $Item->get_type_setting( 'use_coordinates' ) == 'never' )
+		{	// Coordinates are not allowed for the item type:
+			return;
 		}
-		else
-		{
-			$lat = 0;
-			$lng = 0;
+
+		$lat = $Item->get_setting( 'latitude' );
+		$lng = $Item->get_setting( 'longitude' );
+		if( empty( $lat ) && empty( $lng ) )
+		{	// Coordinates must be defined for the viewed Item:
+			return;
 		}
+
 		$width = $this->display_param($this->get_widget_setting('width', $params));
 		$width = 'width:'.$width;
 
@@ -870,7 +955,7 @@ function locate()
 		?>
 		<div class="map_title"><?php echo $this->get_widget_setting('map_title_coll'.$Blog->ID, $params); ?></div>
 		<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
-		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
 		<script type="text/javascript">
 		<?php
 		$map_type = (string)$this->get_widget_setting('map_type', $params);

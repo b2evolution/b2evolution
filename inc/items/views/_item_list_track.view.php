@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var ItemList2
  */
@@ -29,7 +29,7 @@ global $Session;
 if( $highlight = param( 'highlight', 'integer', NULL ) )
 {	// There are lines we want to highlight:
 	$result_fadeout = array( 'post_ID' => array($highlight) );
-} 
+}
 elseif ( $highlight = $Session->get( 'highlight_id' ) )
 {
 	$result_fadeout = array( 'post_ID' => array($highlight) );
@@ -68,7 +68,7 @@ $ItemList->cols[] = array(
 						'th' => /* TRANS: abbrev for Priority */ T_('Priority'),
 						'order' => 'priority',
 						'th_class' => 'shrinkwrap',
-						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "task_priority_edit" )%',
+						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "jeditable_cell task_priority_edit" )%',
 						'td' => '%item_td_task_cell( "priority", {Obj} )%',
 						'extra' => array( 'rel' => '#post_ID#', 'style' => 'background-color: %item_priority_color( "#post_priority#" )%;', 'format_to_output' => false )
 					);
@@ -77,14 +77,15 @@ $ItemList->cols[] = array(
 						'th' => T_('Item/Task'),
 						'order' => 'title',
 						'td_class' => 'tskst_$post_pst_ID$',
-						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1, 1 )%</strong>',
+						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1, 1 )%</strong>'.
+						        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@' : '' ),
 					);
 
 $ItemList->cols[] = array(
 						'th' => T_('Assigned'),
 						'order' => 'assigned_user_ID',
 						'th_class' => 'shrinkwrap',
-						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "task_assigned_edit" )%',
+						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "jeditable_cell task_assigned_edit" )%',
 						'td' => '%item_td_task_cell( "assigned", {Obj} )%',
 						'extra' => array( 'rel' => '#post_ID#', 'format_to_output' => false )
 					);
@@ -93,9 +94,9 @@ $ItemList->cols[] = array(
 						'th' => T_('Status'),
 						'order' => 'pst_ID',
 						'th_class' => 'shrinkwrap',
-						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "task_status_edit" )%',
+						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "jeditable_cell task_status_edit" )%',
 						'td' => '%item_td_task_cell( "status", {Obj} )%',
-						'extra' => array( 'rel' => '#post_ID#', 'format_to_output' => false )
+						'extra' => array( 'rel' => '#post_ID#', 'data-post-type' => '#post_ityp_ID#', 'format_to_output' => false )
 					);
 
 
@@ -161,7 +162,7 @@ $ItemList->display( NULL, $result_fadeout );
 // Print JS to edit a task priority
 echo_editable_column_js( array(
 	'column_selector' => '.task_priority_edit',
-	'ajax_url'        => get_secure_htsrv_url().'async.php?action=item_task_edit&field=priority&'.url_crumb( 'itemtask' ),
+	'ajax_url'        => get_htsrv_url().'async.php?action=item_task_edit&field=priority&'.url_crumb( 'itemtask' ),
 	'options'         => item_priority_titles(),
 	'new_field_name'  => 'new_priority',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
@@ -186,7 +187,7 @@ if( $field_type == 'select' )
 }
 echo_editable_column_js( array(
 	'column_selector' => '.task_assigned_edit',
-	'ajax_url'        => get_secure_htsrv_url().'async.php?action=item_task_edit&field=assigned&'.url_crumb( 'itemtask' ),
+	'ajax_url'        => get_htsrv_url().'async.php?action=item_task_edit&field=assigned&'.url_crumb( 'itemtask' ),
 	'options'         => $task_assignees,
 	'new_field_name'  => $field_type == 'select' ? 'new_assigned_ID' : 'new_assigned_login',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
@@ -196,18 +197,38 @@ echo_editable_column_js( array(
 	'null_text'       => TS_('No user') ) );
 
 // Print JS to edit a task status
-$ItemStatusCache = & get_ItemStatusCache();
-$ItemStatusCache->load_all();
-$task_statuses = array( 0 => T_('No status') );
-foreach( $ItemStatusCache->cache as $ItemStatus )
+global $DB;
+$post_status_types = $DB->get_results( 'SELECT its_ityp_ID, its_pst_ID, pst_name FROM T_items__status_type LEFT JOIN T_items__status ON pst_ID = its_pst_ID' );
+$post_statuses = array();
+foreach( $post_status_types as $post_status_type )
 {
+	if( ! isset( $post_statuses[$post_status_type->its_ityp_ID] ) )
+	{
+		$post_statuses[$post_status_type->its_ityp_ID] = array();
+	}
+
 	// Add '_' to don't break a sorting by name on jeditable:
-	$task_statuses[ '_'.$ItemStatus->ID ] = $ItemStatus->name;
+	$post_statuses[$post_status_type->its_ityp_ID]['_'.$post_status_type->its_pst_ID] = $post_status_type->pst_name;
 }
+
+?>
+<script type="text/javascript">
+	var itemStatuses = <?php echo json_encode( $post_statuses );?>;
+
+	function getApplicableStatus( el, selected ) {
+		var postType = el.attr( "data-post-type" );
+		var statuses = itemStatuses[postType];
+		statuses[0] = 'No status';
+		statuses['selected'] = selected;
+
+		return statuses;
+	}
+</script>
+<?php
 echo_editable_column_js( array(
 	'column_selector' => '.task_status_edit',
-	'ajax_url'        => get_secure_htsrv_url().'async.php?action=item_task_edit&field=status&'.url_crumb( 'itemtask' ),
-	'options'         => $task_statuses,
+	'ajax_url'        => get_htsrv_url().'async.php?action=item_task_edit&field=status&'.url_crumb( 'itemtask' ),
+	'options'         => 'getApplicableStatus( jQuery( this ), result[1] );',
 	'new_field_name'  => 'new_status',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
 	'ID_name'         => 'post_ID' ) );

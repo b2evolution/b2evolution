@@ -95,7 +95,7 @@ function mt_setPostCategories($m)
 	}
 
 	// Check if category exists and can be used:
-	$Blog = & $edited_Item->get_Blog();
+	$Collection = $Blog = & $edited_Item->get_Blog();
 	if( ! xmlrpcs_check_cats( $category, $Blog, $categories ) )
 	{	// Error:
 		return xmlrpcs_resperror();
@@ -230,7 +230,7 @@ $mt_publishPost_doc = 'Published a post';
  */
 function mt_publishPost($m)
 {
-	global $localtimenow, $DB;
+	global $localtimenow, $DB, $current_User;
 
 	// CHECK LOGIN:
 	/**
@@ -270,7 +270,7 @@ function mt_publishPost($m)
 
 	// Execute or schedule notifications & pings:
 	logIO( 'mt_publishPost: Handling notifications...' );
-	$edited_Item->handle_post_processing( false, false );
+	$edited_Item->handle_notifications();
 
 	logIO( 'mt_publishPost: OK.' );
 

@@ -121,7 +121,7 @@ if( $disp == 'single' )
 		if( $Skin->enabled_status_banner( $single_Item->status ) )
 		{ // Status banner
 			$single_Item->format_status( array(
-					'template' => '<div class="post_status"><div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div></div>',
+					'template' => '<div class="post_status"><div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div></div>',
 				) );
 		}
 	?>
@@ -194,9 +194,10 @@ if( $disp == 'single' )
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 		skin_include( '_item_block.inc.php', array(
 				'feature_block' => true,
-				'content_mode' => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
-				'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
-				'item_class'   => 'featured_post',
+				'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+				'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+				'item_class'    => 'featured_post',
+				'Item'          => $Item,
 			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
@@ -236,7 +237,7 @@ if( $disp == 'single' )
 				'disp_single' => '', // We already handled this case above
 				'disp_page'   => '', // We already handled this case above
 				'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
-				'author_link_text'     => 'preferredname',
+				'author_link_text'     => 'auto',
 				'login_page_before'    => '<div class="login_block"><div class="bDetails">',
 				'login_page_after'     => '</div></div>',
 				'register_page_before' => '<div class="login_block"><div class="bDetails">',

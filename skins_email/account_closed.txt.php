@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $htsrv_url;
+global $admin_url;
 
 // Default params:
 $params = array_merge( array(
@@ -37,7 +37,7 @@ else
 }
 echo "\n\n";
 
-echo T_('Login').": ".$params['login']."\n";
+echo /* TRANS: noun */ T_('Login').": ".$params['login']."\n";
 echo T_('Email').": ".$params['email']."\n";
 echo T_('Account close reason').": ".$params['reason'];
 echo "\n\n";
@@ -55,7 +55,7 @@ echo T_('Edit user').': '.$admin_url.'?ctrl=user&user_tab=profile&user_ID='.$par
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notification when an account was closed, click here:' ).' '.
-		$htsrv_url.'quick_unsubscribe.php?type=account_closed&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=account_closed&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 // If site footers are enabled, they will be included here:

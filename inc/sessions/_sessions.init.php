@@ -17,7 +17,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for sessions module to function properly
  */
-$required_php_version[ 'sessions' ] = '5.0';
+$required_php_version[ 'sessions' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for sessions module to function properly
@@ -33,6 +33,8 @@ $required_mysql_version[ 'sessions' ] = '5.0.3';
  */
 $db_config['aliases']['T_basedomains'] = $tableprefix.'basedomains';
 $db_config['aliases']['T_hitlog'] = $tableprefix.'hitlog';
+$db_config['aliases']['T_hits__aggregate'] = $tableprefix.'hits__aggregate';
+$db_config['aliases']['T_hits__aggregate_sessions'] = $tableprefix.'hits__aggregate_sessions';
 $db_config['aliases']['T_sessions'] = $tableprefix.'sessions';
 $db_config['aliases']['T_track__goal'] = $tableprefix.'track__goal';
 $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
@@ -130,14 +132,14 @@ class sessions_Module extends Module
 		global $topleft_Menu;
 		global $current_User;
 		global $admin_url;
-		global $Blog, $activate_collection_toolbar;
+		global $Collection, $Blog, $activate_collection_toolbar;
 
 		if( !$current_User->check_perm( 'admin', 'normal' ) )
 		{
 			return;
 		}
 
-		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) && $current_User->check_perm( 'stats', 'list' ) )
+		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) && $current_User->check_perm( 'stats', 'list', false, $Blog->ID ) )
 		{ // Permission to view stats for user's blogs:
 			$entries = array(
 				'stats_separator' => array( 'separator' => true ),
@@ -171,10 +173,6 @@ class sessions_Module extends Module
 
 		if( $current_User->check_perm( 'stats', 'view' ) )
 		{	// We have permission to view all stats
-
-			// TODO: this is hackish and would require a proper function call
-			$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
-
 			$entries = array(
 				'stats_separator' => array( 'separator' => true ),
 				'stats' => array(
@@ -212,16 +210,21 @@ class sessions_Module extends Module
 						)
 				) );
 
-			if( !is_admin_page() )
-			{
-				$blog_ID = empty( $Blog ) ? 0 : $Blog->ID;
-				$entries['stats_page'] = array(
-						'text' => T_('Page stats').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&tab=hits&blog='.$blog_ID.'&reqURI='.rawurlencode( $_SERVER['REQUEST_URI'] ),
-					);
-			}
+			$topleft_Menu->add_menu_entries( 'site', $entries );
 
-			$topleft_Menu->add_menu_entries( 'tools', $entries );
+			if( !is_admin_page() )
+			{	// Only for front-office:
+				$page_menus = array();
+				if( $topleft_Menu->get_node_by_path( array( 'page', 'edit' ) ) )
+				{
+					$page_menus['stats_sep'] = array( 'separator' => true );
+				}
+				$page_menus['stats_page'] = array(
+					'text' => T_('Page Analytics').'&hellip;',
+					'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.( empty( $Blog ) ? 0 : $Blog->ID ).'&amp;reqURI='.rawurlencode( $_SERVER['REQUEST_URI'] ),
+				);
+				$topleft_Menu->add_menu_entries( 'page', $page_menus );
+			}
 		}
 	}
 
@@ -231,12 +234,12 @@ class sessions_Module extends Module
 	 */
 	function build_menu_1()
 	{
-		global $blog, $admin_url;
+		global $blog, $sec_ID, $admin_url;
 		/**
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -249,6 +252,11 @@ class sessions_Module extends Module
 
 		if( $current_User->check_perm( 'stats', 'list' ) )
 		{	// Permission to view stats for user's blogs:
+
+			// Initialize params to filter by selected collection and/or group:
+			$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+			$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
+
 			$AdminUI->add_menu_entries(
 					NULL, // root
 					array(
@@ -258,24 +266,24 @@ class sessions_Module extends Module
 							'entries' => array(
 								'summary' => array(
 									'text' => T_('Hit summary'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog,
+									'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global'.$section_params,
 									'order' => 'group_last',
 									'entries' => array(
 										'global' => array(
 											'text' => T_('Global hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global'.$section_params ),
 										'browser' => array(
 											'text' => T_('Browser hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=browser'.$section_params ),
 										'api' => array(
 											'text' => T_('API hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=api&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=api'.$section_params ),
 										'robot' => array(
 											'text' => T_('Robot hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=robot'.$section_params ),
 										'feed' => array(
 											'text' => T_('RSS/Atom hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=feed&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=feed'.$section_params ),
 										),
 									),
 								),
@@ -285,57 +293,57 @@ class sessions_Module extends Module
 
 			$ips_entries = array( 'top' => array(
 					'text' => T_('Top IPs'),
-					'href' => $admin_url.'?ctrl=stats&amp;tab=ips&amp;blog='.$blog
+					'href' => $admin_url.'?ctrl=stats&amp;tab=ips'.$section_params
 				) );
 			if( $current_User->check_perm( 'spamblacklist', 'view' ) )
 			{ // Display IP ranges only if current user has access to view Antispam tools
 				$ips_entries['ranges'] = array(
 					'text' => T_('IP Ranges'),
-					'href' => $admin_url.'?ctrl=antispam&amp;tab=stats&amp;tab3=ipranges&amp;blog='.$blog
+					'href' => $admin_url.'?ctrl=antispam&amp;tab=stats&amp;tab3=ipranges'.$section_params
 				);
 			}
 
 			$AdminUI->add_menu_entries( 'stats', array(
 								'refsearches' => array(
 									'text' => T_('Search B-hits'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog,
+									'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits'.$section_params,
 									'entries' => array(
 										'hits' => array(
 											'text' => T_('Search hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits'.$section_params ),
 										'keywords' => array(
 											'text' => T_('Keywords'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords'.$section_params ),
 										'topengines' => array(
 											'text' => T_('Top engines'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=topengines&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=topengines'.$section_params ),
 										),
 									),
 								'referers' => array(
 									'text' => T_('Referered B-hits'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=referers'.$section_params ),
 								'other' => array(
 									'text' => T_('Direct B-hits'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=other'.$section_params ),
 								'hits' => array(
 									'text' => T_('All Hits'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.$blog ),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=hits'.$section_params ),
 								'domains' => array(
 									'text' => T_('Referring domains'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;blog='.$blog,
+									'href' => $admin_url.'?ctrl=stats&amp;tab=domains'.$section_params,
 									'order' => 'group_last',
 									'entries' => array(
 										'all' => array(
 											'text' => T_('All referrers'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=domains'.$section_params ),
 										'top' => array(
 											'text' => T_('Top referrers'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3=top&amp;blog='.$blog ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3=top'.$section_params ),
 										),
 									),
 								'ips' => array(
 									'text' => T_('IPs'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=ips&amp;blog='.$blog,
+									'href' => $admin_url.'?ctrl=stats&amp;tab=ips'.$section_params,
 									'entries' => $ips_entries ),
 							)
 						);
@@ -348,29 +356,29 @@ class sessions_Module extends Module
 					array(
 						'goals' => array(
 							'text' => T_('Goals'),
-							'href' => $admin_url.'?ctrl=goals&amp;blog='.$blog,
+							'href' => $admin_url.'?ctrl=goals'.$section_params,
 							'entries' => array(
 								'goals' => array(
 									'text' => T_('Goals'),
-									'href' => $admin_url.'?ctrl=goals&amp;blog='.$blog
+									'href' => $admin_url.'?ctrl=goals'.$section_params
 									),
 								'cats' => array(
 									'text' => T_('Categories'),
-									'href' => $admin_url.'?ctrl=goals&amp;tab3=cats&amp;blog='.$blog
+									'href' => $admin_url.'?ctrl=goals&amp;tab3=cats'.$section_params
 									),
 								'hits' => array(
 									'text' => T_('Goal hits'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog='.$blog
+									'href' => $admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params
 									),
 								'stats' => array(
 									'text' => T_('Stats'),
-									'href' => $admin_url.'?ctrl=goals&amp;tab3=stats&amp;blog='.$blog
+									'href' => $admin_url.'?ctrl=goals&amp;tab3=stats'.$section_params
 									),
 								),
 							),
 						'settings' => array(
 							'text' => T_('Settings'),
-							'href' => $admin_url.'?ctrl=stats&amp;tab=settings&amp;blog='.$blog ),
+							'href' => $admin_url.'?ctrl=stats&amp;tab=settings'.$section_params ),
 						)
 				);
 			}

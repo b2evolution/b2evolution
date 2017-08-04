@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $action, $disp, $rsc_url, $Settings, $rsc_path, $transmit_hashed_password, $dummy_fields;
+global $blog, $action, $disp, $rsc_url, $Settings, $rsc_path, $dummy_fields;
 
 if( is_logged_in() )
 { // already logged in
@@ -27,7 +27,7 @@ $return_to = param( 'return_to', 'url', '' );
 $source = param( 'source', 'string', 'inskin login form' );
 $login_required = ( $action == 'req_login' );
 
-global $admin_url, $ReqHost, $secure_htsrv_url;
+global $admin_url, $ReqHost;
 
 if( !isset( $redirect_to ) )
 {
@@ -58,7 +58,7 @@ $params = array_merge( array(
 		'login_action_value'       => '',
 		'login_form_reqID'         => '',
 		'login_form_sessID'        => '',
-		'transmit_hashed_password' => $transmit_hashed_password,
+		'transmit_hashed_password' => can_use_hashed_password(),
 		'display_abort_link'       => true,
 		'abort_link_position'      => 'above_form',
 		'abort_link_text'          => T_('Abort login!'),
@@ -107,7 +107,7 @@ display_login_form( $login_form_params );
 
 if( $params['login_form_footer'] )
 { // Display login form footer
-	echo '<div class="evo_login_dialog_standard_link"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
+	echo '<div class="evo_login_dialog_standard_link"><a href="'.get_htsrv_url( true ).'login.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
 
 	echo '<div class="evo_login_dialog_footer text-muted">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }

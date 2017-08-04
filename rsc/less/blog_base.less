@@ -6,7 +6,43 @@
  * Override this with style.css in your skin folder.
  */
 
+// ----- WIDGETS -----
+
+// About Author widget:
+@import "_about_author_widget.module.less";
+
+// Universal item list widget & Recent posts widget:
+@import "_universal_item_list_widget.module.less";
+
+// Media Index widget:
+@import "_coll_media_index_widget.module.less";
+
+// User Avatars (User List) widget:
+@import "_user_avatars_widget.module.less";
+
+// Organization Members widget:
+@import "_org_members_widget.module.less";
+
+
+// ----- PLUGINS -----
+
+// CSS overrides for "HTML 5 VideoJS Player" plugin:
+@import "inc/video-js-overrides.inc.less";
+
+// Styles for jQuery plugin "Autocomplete for Textarea":
+@import "inc/jquery.textcomplete.inc.less";
+
+// -----
+
+
+// Rating Summary for all comments of the selected post on disp=single:
 @import "inc/star_rating.inc.less";
+
+
+
+*[class^="listnav_distance_"], *[class*=" listnav_distance_"] {
+	display: none;
+}
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -402,6 +438,10 @@ div.tabs div.selected a {
 .action_icon {
 	margin: 0 2px;
 	font-weight: bold;
+	// Fix alignment for flag buttons:
+	&.evo_post_flag_btn {
+		margin-left: 0;
+	}
 }
 .title_action_icons {
 	float: right;
@@ -681,7 +721,7 @@ div.item_location {
 }
 .note.status_meta span {
 	color: #fff;
-	background-color: #5133ab;
+	background-color: #5bc0de;
 }
 
 #styled_content_block span[class*=status_] span,
@@ -906,6 +946,20 @@ input.btn-lg {
 	}
 }
 
+.evo_content_block table.evo_poll__table {
+	border-spacing: 0;
+	border-collapse: collapse;
+	margin: 1em 0;
+	th {
+		padding: 2px 10px 2px 0;
+		background-color: #eee;
+	}
+	td {
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+}
+
 // Images gallery:
 .evo_post_gallery__image {
 	display: inline-block;
@@ -946,6 +1000,9 @@ input.btn-lg {
 	}
 	.evo_poll__title {
 		white-space: nowrap;
+	}
+	.evo_poll_percentage {
+		max-width: 50px;
 	}
 }
 .evo_container__sidebar .evo_poll__title {

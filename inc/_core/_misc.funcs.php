@@ -329,8 +329,15 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'htmlspecialchars':
 		case 'formvalue':
-			// Replace special chars to &amp;, &quot;, &apos;, &lt; and &gt; :
-			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );  // Handles &, ", ', < and >
+			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
+			if( version_compare( phpversion(), '5.4', '>=' ) )
+			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
+			}
+			else
+			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
+			}
 			break;
 
 		case 'xml':
@@ -354,6 +361,19 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = strtr( $content, $trans_tbl );
 			$content = preg_replace( '/[ \t]+/', ' ', $content);
 			$content = trim($content);
+			break;
+
+		case 'syslog':
+			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
+			if( version_compare( phpversion(), '5.4', '>=' ) )
+			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
+			}
+			else
+			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
+			}
+			$content = preg_replace( "/\[\[(.+?)]]/is", "<code>$1</code>", $content ); // Replaces [[...]] into <code>...</code>
 			break;
 
 		default:
@@ -431,18 +451,53 @@ function zeroise( $number, $threshold )
 function excerpt( $str, $maxlen = 254, $tail = '&hellip;' )
 {
 	// Add spaces
-	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
+	$str = str_replace( array( '<p>', '<br', '</tr><tr', '</th><th', '</td><td' ), array( ' <p>', ' <br', '</tr> <tr', '</th> <th', '</td> <td' ), $str );
 
 	// Remove <code>
-	$str = preg_replace( '#<code>(.+)</code>#i', '', $str );
+	$str = preg_replace( '#<code>(.+)</code>#is', '', $str );
 
-	// fp> Note: I'm not sure about using 'text' here, but there should definitely be no rendering here.
-	$str = format_to_output( $str, 'text' );
+	// Strip tags:
+	$str = strip_tags( $str );
+
+	// Remove spaces:
+	$str = preg_replace( '/[ \t]+/', ' ', $str);
+	$str = trim( $str );
 
 	// Ger rid of all new lines and Display the html tags as source text:
 	$str = trim( preg_replace( '#[\r\n\t\s]+#', ' ', $str ) );
 
 	$str = strmaxlen( $str, $maxlen, $tail, 'raw', true );
+
+	return $str;
+}
+
+
+/**
+ * Get a limited text-only excerpt based on number of words
+ *
+ * @param string
+ * @param int Maximum length
+ * @return string
+ */
+function excerpt_words( $str, $maxwords = 50 )
+{
+	// Add spaces
+	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
+
+	// Remove <code>
+	$str = preg_replace( '#<code>(.+)</code>#is', '', $str );
+
+	// Strip tags:
+	$str = strip_tags( $str );
+
+	// Remove spaces:
+	$str = preg_replace( '/[ \t]+/', ' ', $str);
+	$str = trim( $str );
+
+	// Ger rid of all new lines and Display the html tags as source text:
+	$str = trim( preg_replace( '#[\r\n\t\s]+#', ' ', $str ) );
+
+	$str = strmaxwords( $str, $maxwords );
 
 	return $str;
 }
@@ -547,62 +602,74 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw', $cut_at_w
 function strmaxwords( $str, $maxwords = 50, $params = array() )
 {
 	$params = array_merge( array(
-			'continued_link' => '',
-			'continued_text' => '&hellip;',
+			'cutting_mark'    => '&hellip;',
+			'continued_link'  => '',
+			'continued_text'  => '&hellip;',
+			'continued_class' => '',
 			'always_continue' => false,
 		), $params );
-	$open = false;
+
+	// STATE MACHINE:
+	$in_tag = false;
 	$have_seen_non_whitespace = false;
-	$end = utf8_strlen( $str );
+	$end = strlen( $str );  // If we use utf8_strlen here(), we also need to access UTF chars below
 	for( $i = 0; $i < $end; $i++ )
 	{
-		switch( $char = $str[$i] )
+		switch( $char = $str[$i] )		// This is NOT UTF-8
 		{
 			case '<' :	// start of a tag
-				$open = true;
-				break;
-			case '>' : // end of a tag
-				$open = false;
+				$in_tag = true;
 				break;
 
-			case ctype_space($char):
-				if( ! $open )
-				{ // it's a word gap
-					// Eat any other whitespace.
+			case '>' : // end of a tag
+				$in_tag = false;
+				break;
+
+			case ctype_space($char): // This is a whitespace char...
+				if( ! $in_tag )
+				{	// it's a word gap:
+					// Eat any additional whitespace:
 					while( isset($str[$i+1]) && ctype_space($str[$i+1]) )
 					{
 						$i++;
 					}
 					if( isset($str[$i+1]) && $have_seen_non_whitespace )
-					{ // only decrement words, if there's a non-space char left.
+					{ // only decrement words, if there's been at least one non-space char before.
 						--$maxwords;
 					}
 				}
+				// ignore white space in a tag...
 				break;
 
 			default:
 				$have_seen_non_whitespace = true;
 				break;
 		}
-		if( $maxwords < 1 ) break;
+
+		if( $maxwords < 1 )
+		{	// We have reached the cutting point:
+			break;
+		}
 	}
 
-	// restrict content to required number of words and balance the tags out
-	$str = balance_tags( utf8_substr( $str, 0, $i ) );
+	if( $maxwords < 1 )
+	{	// Cutting is necessary:
+		// restrict content to required number of words:
+		$str = utf8_substr( $str, 0, $i );
 
-	if( $params['always_continue'] || $maxwords == false )
+		// Add a cutting mark:
+		$str .= $params['cutting_mark'];
+
+		// balance the tags out:
+		$str = balance_tags( $str );
+		// remove empty tags:
+		$str = preg_replace( '~<([\s]+?)[^>]*?></\1>~is', '', $str );
+	}
+
+	if( $params['always_continue'] || $maxwords < 1 )
 	{ // we want a continued text
-		if( $params['continued_link'] )
-		{ // we have a url
-			$str .= ' <a href="'.$params['continued_link'].'">'.$params['continued_text'].'</a>';
-		}
-		else
-		{ // we don't have a url
-			$str .= ' '.$params['continued_text'];
-		}
+		$str .= ' <a href="'.$params['continued_link'].'" class="'.$params['continued_class'].'">'.$params['continued_text'].'</a>';
 	}
-	// remove empty tags
-	$str = preg_replace( '~<([\s]+?)[^>]*?></\1>~is', '', $str );
 
 	return $str;
 }
@@ -866,13 +933,50 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 
 
 /**
+ * Perform a global regular expression match outside blocks <code></code>, <pre></pre> and markdown codeblocks
+ *
+ * @param string Pattern to search for
+ * @param string Content
+ * @param array Array of all matches in multi-dimensional array
+ * @return integer|boolean Number of full pattern matches (which might be zero), or FALSE if an error occurred.
+ */
+function preg_match_outcode( $search, $content, & $matches )
+{
+	if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
+	{	// Call preg_match_all() on everything outside code/pre and markdown codeblocks:
+		return callback_on_non_matching_blocks( $content,
+			'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
+			'preg_match_outcode_callback', array( $search, & $matches ) );
+	}
+	else
+	{	// No code/pre blocks, search in the whole thing:
+		return preg_match_all( $search, $content, $matches );
+	}
+}
+
+
+/**
+ * Used for function callback_on_non_matching_blocks(), because there is different order of params
+ *
+ * @param string Pattern to search for
+ * @param string Content
+ * @param array Array of all matches in multi-dimensional array
+ * @return integer|boolean Number of full pattern matches (which might be zero), or FALSE if an error occurred.
+ */
+function preg_match_outcode_callback( $content, $search, & $matches )
+{
+	return preg_match_all( $search, $content, $matches );
+}
+
+
+/**
  * Replace content outside blocks <code></code>, <pre></pre> and markdown codeblocks
  *
  * @param array|string Search list
- * @param array|string Replace list
+ * @param array|string Replace list or Callback function
  * @param string Source content
  * @param string Callback function name
- * @param string Type of callback function: 'preg' -> preg_replace(), 'str' -> str_replace() (@see replace_content())
+ * @param string Type of callback function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace() (@see replace_content())
  * @return string Replaced content
  */
 function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
@@ -901,7 +1005,7 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
  * @param string Source content
  * @param array|string Search list
  * @param array|string Replace list
- * @param string Type of function: 'preg' -> preg_replace(), 'str' -> str_replace()
+ * @param string Type of function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace()
  * @param string The maximum possible replacements for each pattern in each subject string. Defaults to -1 (no limit).
  * @return string Replaced content
  */
@@ -937,6 +1041,9 @@ function replace_content( $content, $search, $replace, $type = 'preg', $limit = 
 				}
 				return $content;
 			}
+
+		case 'preg_callback':
+			return preg_replace_callback( $search, $replace, $content, $limit );
 
 		default: // 'preg'
 			return preg_replace( $search, $replace, $content, $limit );
@@ -1036,6 +1143,59 @@ function split_outcode( $separators, $content, $capture_separator = false )
 	{ // No separators in content, Return whole content as one element of array
 		return array( $content );
 	}
+}
+
+
+/**
+ * Remove [image:] and [video:] short tags that are inside <p> blocks and move them before the paragraph
+ *
+ * @param string Source content
+ * @param string Search pattern
+ * @param function Optional callback function that accepts search pattern and current paragraph as arguments and returns the new_paragraph
+ * @return string Content
+ */
+function move_short_tags( $content, $pattern = NULL, $callback = NULL )
+{	// Move [image:], [video:] and [audio:] tags out of <p> blocks
+
+	// Get individual paragraphs
+	preg_match_all( '/<p[\s*|>].*?<\/p>/i', $content, $paragraphs );
+
+	if( is_null( $pattern ) )
+	{
+		$pattern = '/\[(image|video|audio):\d+:?[^\[\]]*\]/i';
+	}
+
+	foreach( $paragraphs[0] as $i => $current_paragraph )
+	{
+		if( $callback )
+		{
+			$new_paragraph = call_user_func( $callback, $pattern, $current_paragraph );
+		}
+		else
+		{
+			// get short tags in each paragraph
+			preg_match_all( $pattern, $current_paragraph, $matches );
+			$new_paragraph = $current_paragraph;
+
+			if( $matches[0] )
+			{
+				$new_paragraph = str_replace( $matches[0], '', $current_paragraph );
+
+				// convert &nbsp; to space
+				$x = str_replace( "\xC2\xA0", ' ', $new_paragraph );
+
+				if( preg_match( '/<p[\s*|>]\s*<\/p>/i', $x ) === 1 )
+				{ // remove paragraph the if moving out the short tag will result to an empty paragraph
+					$new_paragraph = '';
+				}
+
+				$new_paragraph = implode( '', $matches[0] ).$new_paragraph;
+			}
+		}
+		$content = str_replace( $current_paragraph, $new_paragraph, $content );
+	}
+
+	return $content;
 }
 
 
@@ -1191,14 +1351,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 			}
 
 			// Make the text before the opening < clickable:
-			if( is_array($callback) )
-			{
-				$r .= $callback[0]->$callback[1]( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
-			else
-			{
-				$r .= $callback( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
+			$r .= call_user_func_array( $callback, array( substr( $text, $from_pos, $i-$from_pos ), $moredelim, $additional_attrs ) );
 			$from_pos = $i;
 
 			// $i += 2;
@@ -1214,14 +1367,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 	}
 	else
 	{	// Make remplacements in the remaining part:
-		if( is_array($callback) )
-		{
-			$r .= $callback[0]->$callback[1]( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
-		else
-		{
-			$r .= $callback( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
+		$r .= call_user_func_array( $callback, array( substr( $text, $from_pos ), $moredelim, $additional_attrs ) );
 	}
 
 	return $r;
@@ -1258,11 +1404,11 @@ function make_clickable_callback( $text, $moredelim = '&amp;', $additional_attrs
 		/* Tblue> I removed the double quotes from the first RegExp because
 				  it made URLs in tag attributes clickable.
 				  See http://forums.b2evolution.net/viewtopic.php?p=92073 */
-		array( '#(^|[\s>\(]|\[url=)(https?|mailto)://([^<>{}\s]+[^.,:;!\?<>{}\s\]\)])#i',
-			'#(^|[\s>\(]|\[url=)aim:([^,<\s\]\)]+)#i',
+		array( '#(^|[\s>\(]|\[url=)(https?|mailto)://([^"<>{}\s]+[^".,:;!\?<>{}\s\]\)])#i',
+			'#(^|[\s>\(]|\[url=)aim:([^",<\s\]\)]+)#i',
 			'#(^|[\s>\(]|\[url=)icq:(\d+)#i',
-			'#(^|[\s>\(]|\[url=)www\.'.$pattern_domain.'([^<>{}\s]*[^.,:;!\?\s\]\)])#i',
-			'#(^|[\s>\(]|\[url=)([a-z0-9\-_.]+?)@'.$pattern_domain.'([^.,:;!\?<\s\]\)]+)#i', ),
+			'#(^|[\s>\(]|\[url=)www\.'.$pattern_domain.'([^"<>{}\s]*[^".,:;!\?\s\]\)])#i',
+			'#(^|[\s>\(]|\[url=)([a-z0-9\-_.]+?)@'.$pattern_domain.'([^".,:;!\?<\s\]\)]+)#i', ),
 		array( '$1<a href="$2://$3"'.$additional_attrs.'>$2://$3</a>',
 			'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.rawurlencode(T_('Hello')).'"'.$additional_attrs.'>$2$3</a>',
 			'$1<a href="http://wwp.icq.com/scripts/search.dll?to=$2"'.$additional_attrs.'>$2</a>',
@@ -1297,7 +1443,13 @@ function date2mysql( $ts )
 function mysql2timestamp( $m, $useGM = false )
 {
 	$func = $useGM ? 'gmmktime' : 'mktime';
-	return $func( substr( $m, 11, 2 ), substr( $m, 14, 2 ), substr( $m, 17, 2 ), substr( $m, 5, 2 ), substr( $m, 8, 2 ), substr( $m, 0, 4 ) );
+	return $func(
+		intval( substr( $m, 11, 2 ) ),  // hour
+		intval( substr( $m, 14, 2 ) ),  // minute
+		intval( substr( $m, 17, 2 ) ),  // second
+		intval( substr( $m, 5, 2 ) ),   // month
+		intval( substr( $m, 8, 2 ) ),   // day
+		intval( substr( $m, 0, 4 ) ) ); // year
 }
 
 /**
@@ -1750,6 +1902,44 @@ function get_duration_title( $duration, $titles = array() )
 	}
 }
 
+function get_lastseen_date( $date, $view = 'exact_date', $cheat = 0 )
+{
+	$result = mysql2localedate( $date );
+
+	if( $view == 'blurred_date' )
+	{
+		$result = (int)( ( ( time() - strtotime( $date ) ) / 86400 ) - $cheat);
+
+		if( $result < 0 )
+		{
+			$result = 0;
+		}
+
+		if( $result < 3 )
+		{
+			$result = T_('less than 3 days ago');
+		}
+		elseif( $result < 7 )
+		{
+			$result = T_('less than a week ago');
+		}
+		elseif( $result < 30 )
+		{
+			$result = T_('less than a month ago');
+		}
+		elseif( $result < 90 )
+		{
+			$result = T_('less than 3 months ago');
+		}
+		else
+		{
+			$result = T_('more than 3 months ago');
+		}
+	}
+
+	return $result;
+}
+
 
 /**
  * Validate variable
@@ -2068,21 +2258,29 @@ function get_atags( $content )
  */
 function add_tag_class( $content, $class, $limit = 1 )
 {
-	// Check if there's an opening tag
-	if( preg_match( '/<.*>/i', $content ) )
-	{
-		// Check if class attribute is already defined
-		if( preg_match( '/\sclass\s*=/i', $content) )
-		{ // Insert class
-			$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
-		}
-		else
-		{
-			$content = preg_replace( '/>/i', ' class="'.$class.'"$1>', $content, $limit );
-		}
-	}
+	global $add_class;
+	$add_class = $class;
+
+	$content = preg_replace_callback( '/<[^\/].*?>/i', 'callback_add_tag_class',
+		$content, $limit );
+
+	unset( $add_class );
 
 	return $content;
+}
+function callback_add_tag_class( $matches )
+{
+	global $add_class;
+	// Check if class attribute is already defined
+	if( preg_match( '/\sclass\s*=/i', $matches[0] ) )
+	{ // Insert class
+		//$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
+		return preg_replace( '/(<[a-zA-z_:]\s*?.*?\s*?class=")(.*?)(".*?>)/i', '$1$2 '.$add_class.'$3', $matches[0] );
+	}
+	else
+	{
+		return preg_replace( '/>/i', ' class="'.$add_class.'"$1>', $matches[0] );
+	}
 }
 
 
@@ -2355,9 +2553,9 @@ function pre_dump( $var__var__var__var__ )
 	{ // xdebug already does fancy displaying:
 
 		// no limits:
-		$old_var_display_max_children = ini_set('xdebug.var_display_max_children', -1); // default: 128
-		$old_var_display_max_data = ini_set('xdebug.var_display_max_data', -1); // max string length; default: 512
-		$old_var_display_max_depth = ini_set('xdebug.var_display_max_depth', -1); // default: 3
+		$old_var_display_max_children = @ini_set('xdebug.var_display_max_children', -1); // default: 128
+		$old_var_display_max_data = @ini_set('xdebug.var_display_max_data', -1); // max string length; default: 512
+		$old_var_display_max_depth = @ini_set('xdebug.var_display_max_depth', -1); // default: 3
 
 		echo "\n<div style=\"padding:1ex;border:1px solid #00f;\">\n";
 		foreach( func_get_args() as $lvar )
@@ -2373,13 +2571,13 @@ function pre_dump( $var__var__var__var__ )
 		echo '</div>';
 
 		// restore xdebug settings:
-		ini_set('xdebug.var_display_max_children', $old_var_display_max_children);
-		ini_set('xdebug.var_display_max_data', $old_var_display_max_data);
-		ini_set('xdebug.var_display_max_depth', $old_var_display_max_depth);
+		@ini_set('xdebug.var_display_max_children', $old_var_display_max_children);
+		@ini_set('xdebug.var_display_max_data', $old_var_display_max_data);
+		@ini_set('xdebug.var_display_max_depth', $old_var_display_max_depth);
 	}
 	else
 	{
-		$orig_html_errors = ini_set('html_errors', 0); // e.g. xdebug would use fancy html, if this is on; we catch (and use) xdebug explicitly above, but just in case
+		$orig_html_errors = @ini_set('html_errors', 0); // e.g. xdebug would use fancy html, if this is on; we catch (and use) xdebug explicitly above, but just in case
 
 		echo "\n<pre style=\"padding:1ex;border:1px solid #00f;overflow:auto\">\n";
 		foreach( func_get_args() as $lvar )
@@ -2397,7 +2595,7 @@ function pre_dump( $var__var__var__var__ )
 			}
 		}
 		echo "</pre>\n";
-		ini_set('html_errors', $orig_html_errors);
+		@ini_set('html_errors', $orig_html_errors);
 	}
 	evo_flush();
 	return true;
@@ -2633,6 +2831,9 @@ function debug_die( $additional_info = '', $params = array() )
 		$additional_info = $params['debug_info'];
 	}
 
+	// Send the predefined cookies:
+	evo_sendcookies();
+
 	if( $is_api_request )
 	{	// REST API or XMLRPC request:
 
@@ -2785,6 +2986,9 @@ function bad_request_die( $additional_info = '' )
 {
 	global $debug, $baseurl, $is_api_request;
 
+	// Send the predefined cookies:
+	evo_sendcookies();
+
 	if( $is_api_request )
 	{	// REST API or XMLRPC request:
 
@@ -2896,10 +3100,12 @@ function debug_info( $force = false, $force_clean = false )
 	{	// Display debug jslog once
 		global $rsc_url, $app_version_long;
 
-		require_js( '#jqueryUI#', 'rsc_url', false, true );
-		require_css( '#jqueryUI_css#', 'rsc_url', NULL, NULL, '#', true );
-		require_js( 'debug_jslog.js', 'rsc_url', false, true );
-		require_js( 'jquery/jquery.cookie.min.js', 'rsc_url', false, true );
+		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+
+		require_js( '#jqueryUI#', $relative_to, false, true );
+		require_css( '#jqueryUI_css#', $relative_to, NULL, NULL, '#', true );
+		require_js( 'debug_jslog.js', $relative_to, false, true );
+		require_js( 'jquery/jquery.cookie.min.js', $relative_to, false, true );
 
 		$jslog_style_cookies = param_cookie( 'jslog_style', 'string' );
 		$jslog_styles = array();
@@ -3134,7 +3340,8 @@ function debug_info( $force = false, $force_clean = false )
 			echo "\n</tbody></table>";
 
 			// add jquery.tablesorter to the "Debug info" table.
-			require_js( 'jquery/jquery.tablesorter.min.js', 'rsc_url', true, true );
+			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+			require_js( 'jquery/jquery.tablesorter.min.js', $relative_to, true, true );
 			echo '
 			<script type="text/javascript">
 			(function($){
@@ -3156,7 +3363,12 @@ function debug_info( $force = false, $force_clean = false )
 		echo '<div class="log_container"><div>';
 		echo 'Opcode cache: '.get_active_opcode_cache();
 		echo $clean ? "\n" : '<p>';
+
+		// ================================ User caching ================================
+		echo 'User cache: '.get_active_user_cache();
+		echo $clean ? "\n" : '<p>';
 		echo '</div></div>';
+
 
 		// ================================ Memory Usage ================================
 		echo '<div class="log_container"><div>';
@@ -3360,7 +3572,7 @@ function exit_blocked_request( $block_type, $log_message, $syslog_origin_type = 
 	syslog_insert( $log_message, 'warning', NULL, NULL, $syslog_origin_type, $syslog_origin_ID );
 
 	// Print out this text to inform an user:
-	echo 'Blocked.';
+	echo 'This request has been blocked.';
 
 	if( $debug )
 	{ // Display additional info on debug mode:
@@ -3541,7 +3753,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	// Stop a request from the blocked IP addresses or Domains
 	antispam_block_request();
 
-	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $sendmail_additional_params;
+	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode;
 
 	$message_data = $message;
 	if( is_array( $message_data ) && isset( $message_data['full'] ) )
@@ -3645,12 +3857,24 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$headerstring = get_mail_headers( $headers, $NL );
 
 	// Set an additional parameter for the return path:
-	if( ! empty( $sendmail_additional_params ) )
+	switch( $Settings->get( 'sendmail_params' ) )
+	{
+		case 'return':
+			$sendmail_params = '-r $return-address$';
+			break;
+		case 'from':
+			$sendmail_params = '-f $return-address$';
+			break;
+		case 'custom':
+			$sendmail_params = $Settings->get( 'sendmail_params_custom' );
+			break;
+	}
+	if( ! empty( $sendmail_params ) )
 	{
 		$additional_parameters = str_replace(
 			array( '$from-address$', '$return-address$' ),
-			array( $from, ( empty( $return_path ) ? $from : $return_path ) ),
-			$sendmail_additional_params );
+			array( $message_data['from_email'], ( empty( $return_path ) ? $message_data['from_email'] : $return_path ) ),
+			$sendmail_params );
 	}
 	else
 	{
@@ -3743,6 +3967,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'private_messages_unread_reminder':
 			case 'post_new':
 			case 'comment_new':
+			case 'comment_spam':
 			case 'account_activated':
 			case 'account_closed':
 			case 'account_reported':
@@ -3919,6 +4144,13 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		  //   and with simple login text in PLAIN TEXT format
 			if( $format == 'html' )
 			{
+				$username = $User->get_colored_login( array(
+						'mask'      => '$avatar$ $login$',
+						'login_text'=> 'name',
+						'use_style' => true,
+						'protocol'  => 'http:',
+					) );
+
 				$user_login = $User->get_colored_login( array(
 						'mask'      => '$avatar$ $login$',
 						'use_style' => true,
@@ -3927,9 +4159,10 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			}
 			else
 			{
+				$username = $User->get_username();
 				$user_login = $User->login;
 			}
-			$formated_message = str_replace( '$login$', $user_login, $formated_message );
+			$formated_message = str_replace( array( '$login$', '$username$' ), array( $user_login, $username ) , $formated_message );
 		}
 
 		$template_message .= $formated_message;
@@ -4481,7 +4714,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 					if( isset( $icon['size-'.$icon_param_name][1] ) )
 					{ // Height
-						$styles['width'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
+						$styles['height'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
 					}
 				}
 
@@ -4848,37 +5081,45 @@ function get_base_domain( $url )
 {
 	global $evo_charset;
 
-	//echo '<p>'.$url;
-	// Chop away the http part and the path:
+	// Chop away the protocol part(http,htpps,ftp) and the path:
 	$domain = preg_replace( '~^([a-z]+://)?([^:/#]+)(.*)$~i', '\\2', $url );
 
-	if( empty($domain) || preg_match( '~^(\d+\.)+\d+$~', $domain ) )
-	{	// Empty or All numeric = IP address, don't try to cut it any further
+	if( empty( $domain ) || preg_match( '~^(\d+\.)+\d+$~', $domain ) )
+	{	// Empty or All numeric = IP address, don't try to cut it any further:
 		return $domain;
 	}
 
-	//echo '<br>'.$domain;
-
-	// Get the base domain up to 3 levels (x.y.tld):
+	// Get the base domain up to 2 or 3 levels (x.y.tld):
 	// NOTE: "_" is not really valid, but for Windows it is..
 	// NOTE: \w includes "_"
 
-	// convert URL to IDN:
-	$domain = idna_encode($domain);
+	// Convert URL to IDN:
+	$domain = idna_encode( $domain );
 
-	$domain_pattern = '~ ( \w (\w|-|_)* \. ){0,2}   \w (\w|-|_)* $~ix';
-	if( ! preg_match( $domain_pattern, $domain, $match ) )
-	{
+	if( preg_match( '~\.(com|net|org|int|edu|gov|mil)$~i', $domain ) )
+	{	// Use max 2 level domain for very well known TLDs:
+		// (for example: "sub3.sub2.sub1.domain.com" will be "domain.com")
+		$max_level = 2;
+	}
+	else
+	{	// Use max 3 level domain for all others:
+		// (for example: "sub3.sub2.sub1.domain.fr" will be "sub1.domain.fr")
+		$max_level = 3;
+	}
+
+	// Limit domain by 2 or 3 level depending on TLD:
+	if( ! preg_match( '~ ( \w (\w|-|_)* \. ){0,'.( $max_level - 1 ).'}   \w (\w|-|_)* $~ix', $domain, $match ) )
+	{	// Return an empty if domain doesn't match to proper format:
 		return '';
 	}
-	$base_domain = convert_charset(idna_decode($match[0]), $evo_charset, 'UTF-8');
 
-	// Remove any www. prefix:
-	$base_domain = preg_replace( '~^www\.~i', '', $base_domain );
+	// Convert all symbols of domain name to UTF-8:
+	$domain = convert_charset( idna_decode( $match[0] ), $evo_charset, 'UTF-8' );
 
-	//echo '<br>'.$base_domain.'</p>';
+	// Remove any prefix like "www.", "www2.", "www9999." and etc.:
+	$domain = preg_replace( '~^www[0-9]*\.~i', '', $domain );
 
-	return $base_domain;
+	return $domain;
 }
 
 
@@ -5140,6 +5381,68 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 
 
 /**
+ * Update values of HTML tag attributes
+ *
+ * @param string HTML tag
+ * @param array Attributes
+ * @param array Actions for each attribute:
+ *              'append'  - Append to existing attribute value (Default for all)
+ *              'skip'    - Skip if attribute already exists
+ *              'replace' - Replace attribute to new value completely
+ * @return string Updated HTML tag
+ */
+function update_html_tag_attribs( $html_tag, $new_attribs, $attrib_actions = array() )
+{
+	if( ! preg_match( '#^<([\S]+)[^>]*>$#i', $html_tag, $tag_match ) )
+	{	// Wrong HTML tag format, Return original string:
+		return $html_tag;
+	}
+
+	$html_tag_name = $tag_match[1];
+
+	$old_attribs = array();
+	$updated_attribs = array();
+	if( preg_match_all( '@(\S+)=("|\'|)(.*)("|\'|>)@isU', $html_tag, $attr_matches ) )
+	{	// Get all existing attributes:
+		foreach( $attr_matches[1] as $o => $old_attr_name )
+		{
+			$old_attribs[ $old_attr_name ] = $attr_matches[3][ $o ];
+			if( ! isset( $new_attribs[ $old_attr_name ] ) )
+			{	// This attribute is not updated, keep current value:
+				$updated_attribs[] = $old_attr_name.'="'.format_to_output( $attr_matches[3][ $o ], 'formvalue' ).'"';
+			}
+		}
+	}
+
+	foreach( $new_attribs as $new_attrib_name => $new_attrib_value )
+	{
+		if( isset( $old_attribs[ $new_attrib_name ] ) )
+		{	// If attribute exists in original HTML tag then Update it depending on selected action:
+			$attrib_action = isset( $attrib_actions[ $new_attrib_name ] ) ? $attrib_actions[ $new_attrib_name ] : 'append';
+			switch( $attrib_action )
+			{
+				case 'skip':
+					// Don't update old value:
+					$new_attrib_value = $old_attribs[ $new_attrib_name ];
+					break;
+
+				case 'append':
+				default:
+					// Append new value to old:
+					$new_attrib_value = $old_attribs[ $new_attrib_name ].' '.$new_attrib_value;
+					break;
+			}
+		}
+		// ELSE If attribute doesn't exist in original HTML tag then create new one.
+
+		$updated_attribs[] = $new_attrib_name.'="'.format_to_output( $new_attrib_value, 'formvalue' ).'"';
+	}
+
+	return '<'.$html_tag_name.' '.implode( ' ', $updated_attribs ).'>';
+}
+
+
+/**
  * Is the current page an install page?
  *
  * @return boolean
@@ -5375,7 +5678,7 @@ function hash_link_params( $link_array, $force_hash = NULL )
 	{
 		$key = $ReqHost.$ReqPath;
 
-		global $Blog;
+		global $Collection, $Blog;
 		if( !empty($Blog) && strpos( $Blog->get_setting('single_links'), 'param_' ) === 0 )
 		{	// We are on a blog that doesn't even have clean URLs for posts
 			$key .= $ReqURI;
@@ -5523,34 +5826,77 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 		foreach( $methods as $method => $param_list )
 		{	// loop through each requested method
 			$params = array();
+			$internal_scripts = array();
 			if( !is_array( $param_list ) )
 			{	// lets make it an array
 				$param_list = array( $param_list );
 			}
 			foreach( $param_list as $param )
 			{	// add each parameter to the output
-				if( !is_numeric( $param ) )
-				{	// this is a string, quote it
+				if( is_array( $param ) )
+				{	// This is an array:
+					$param = json_encode( $param );
+				}
+				elseif( !is_numeric( $param ) )
+				{	// This is a string
+					if( preg_match_all( '#<script(.*?)?>(.*?)</script>#is', $param, $match_scripts ) )
+					{	// Extract internal scripts from content:
+						$param = str_replace( $match_scripts[0], '', $param );
+						foreach( $match_scripts[2] as $i => $internal_script_code )
+						{
+							if( $internal_script_code === '' && strpos( $match_scripts[1][ $i ], 'src=' ) !== false )
+							{	// Append external JS file to <head> to execute code:
+								$internal_script_code = 'jQuery( \'head\' ).append( \''.format_to_js( $match_scripts[0][ $i ] ).'\' );';
+							}
+							$internal_scripts[] = $internal_script_code;
+						}
+					}
+					// Quote the string to javascript format:
 					$param = '\''.format_to_js( $param ).'\'';
 				}
 				$params[] = $param;// add param to the list
 			}
-			// add method and parameters
+			// Add method and parameters:
 			$output .= $target.$method.'('.implode( ',', $params ).');'."\n";
+			// Append all internal scripts from content on order to execute this properly:
+			foreach( $internal_scripts as $internal_script )
+			{
+				$output .= "\n// Internal script from {$target}{$method}():\n".$internal_script;
+			}
 		}
 	}
 
+	// Send the predefined cookies:
+	evo_sendcookies();
+
 	if( $send_as_html )
 	{	// we want to send as a html document
-		headers_content_mightcache( 'text/html', 0 );		// Do NOT cache interactive communications.
+		if( ! headers_sent() )
+		{	// Send headers only when they are not send yet to avoid an error:
+			headers_content_mightcache( 'text/html', 0 );		// Do NOT cache interactive communications.
+		}
 		echo '<html><head></head><body><script type="text/javascript">'."\n";
 		echo $output;
 		echo '</script></body></html>';
 	}
 	else
 	{	// we want to send as js
-		headers_content_mightcache( 'text/javascript', 0 );		// Do NOT cache interactive communications.
-		echo $output;
+		if( ! headers_sent() )
+		{	// Send headers only when they are not send yet to avoid an error:
+			headers_content_mightcache( 'text/javascript', 0 );		// Do NOT cache interactive communications.
+		}
+		global $baseurl;
+		if( empty( $_SERVER['HTTP_REFERER'] ) ||
+		    ! ( $referer_url = parse_url( $_SERVER['HTTP_REFERER'] ) ) || empty( $referer_url['host'] ) ||
+		    ! ( $baseurl_info = parse_url( $baseurl ) ) || empty( $baseurl_info['host'] ) ||
+		    ( $baseurl_info['host'] != $referer_url['host'] ) )
+		{	// Deny request from other server:
+			echo 'alert( \''.sprintf( TS_('This action can only be performed with HTTP_REFERER = %s'), $baseurl ).' \');';
+		}
+		else
+		{	// Send JS content only for allowed referer:
+			echo $output;
+		}
 	}
 
 	exit(0);
@@ -5588,29 +5934,31 @@ function format_to_js( $unformatted )
 
 
 /**
- * Get available cort oprions for items
+ * Get available sort options for items
  *
  * @return array key=>name
  */
 function get_available_sort_options()
 {
 	return array(
-		'datestart'       => T_('Date issued (Default)'),
-		'order'           => T_('Order (as explicitly specified)'),
-		//'datedeadline' => T_('Deadline'),
-		'title'           => T_('Title'),
-		'datecreated'     => T_('Date created'),
-		'datemodified'    => T_('Date last modified'),
-		'last_touched_ts' => T_('Date last touched'),
-		'urltitle'        => T_('URL "filename"'),
-		'priority'        => T_('Priority'),
-		'RAND'            => T_('Random order!'),
+		'datestart'                => T_('Date issued (Default)'),
+		'order'                    => T_('Order (as explicitly specified)'),
+		//'datedeadline'           => T_('Deadline'),
+		'title'                    => T_('Title'),
+		'datecreated'              => T_('Date created'),
+		'datemodified'             => T_('Date last modified'),
+		'last_touched_ts'          => T_('Date last touched'),
+		'contents_last_updated_ts' => T_('Contents last updated'),
+		'urltitle'                 => T_('URL "filename"'),
+		'priority'                 => T_('Priority'),
+		'numviews'                 => T_('Number of members who have viewed the post (If tracking enabled)'),
+		'RAND'                     => T_('Random order!'),
 	);
 }
 
 
 /**
- * Get available cort oprions for blogs
+ * Get available sort options for blogs
  *
  * @return array key=>name
  */
@@ -5673,18 +6021,24 @@ function array_to_option_list( $array, $default = '', $allow_none = array() )
  * @param boolean success (by reference)
  * @return mixed True in case of success, false in case of failure. NULL, if no backend is available.
  */
-function get_from_mem_cache($key, & $success )
+function get_from_mem_cache( $key, & $success )
 {
 	global $Timer;
 
-	$Timer->resume('get_from_mem_cache', false);
+	$Timer->resume( 'get_from_mem_cache', false );
 
-	if( function_exists('apc_fetch') )
+	if( function_exists( 'apcu_fetch' ) )
+	{	// APCu
+		$r = apcu_fetch( $key, $success );
+	}
+	elseif( function_exists( 'apc_fetch' ) )
+	{	// APC
 		$r = apc_fetch( $key, $success );
-	elseif( function_exists('xcache_get') && ini_get('xcache.var_size') > 0 )
-		$r = xcache_get($key);
-	elseif( function_exists('eaccelerator_get') )
-		$r = eaccelerator_get($key);
+	}
+	elseif( function_exists( 'xcache_get' ) && ini_get( 'xcache.var_size' ) > 0 )
+	{	// XCache
+		$r = xcache_get( $key );
+	}
 
 	if( ! isset($success) )
 	{ // set $success for implementation that do not set it itself (only APC does so)
@@ -5695,10 +6049,11 @@ function get_from_mem_cache($key, & $success )
 		$r = NULL;
 
 		global $Debuglog;
-		$Debuglog->add('No caching backend available for reading "'.$key.'".', 'cache');
+		$Debuglog->add( 'No caching backend available for reading "'.$key.'".', 'cache' );
 	}
 
-	$Timer->pause('get_from_mem_cache', false);
+	$Timer->pause( 'get_from_mem_cache', false );
+
 	return $r;
 }
 
@@ -5714,25 +6069,32 @@ function get_from_mem_cache($key, & $success )
  * @param int Time to live (seconds). Default is 0 and means "forever".
  * @return mixed
  */
-function set_to_mem_cache($key, $payload, $ttl = 0)
+function set_to_mem_cache( $key, $payload, $ttl = 0 )
 {
 	global $Timer;
 
-	$Timer->resume('set_to_mem_cache', false);
+	$Timer->resume( 'set_to_mem_cache', false );
 
-	if( function_exists('apc_store') )
+	if( function_exists( 'apcu_store' ) )
+	{	// APCu
+		$r = apcu_store( $key, $payload, $ttl );
+	}
+	elseif( function_exists( 'apc_store' ) )
+	{	// APC
 		$r = apc_store( $key, $payload, $ttl );
-	elseif( function_exists('xcache_set') && ini_get('xcache.var_size') > 0 )
+	}
+	elseif( function_exists( 'xcache_set' ) && ini_get( 'xcache.var_size' ) > 0 )
+	{	// XCache
 		$r = xcache_set( $key, $payload, $ttl );
-	elseif( function_exists('eaccelerator_put') )
-		$r = eaccelerator_put( $key, $payload, $ttl );
-	else {
+	}
+	else
+	{	// No available cache module:
 		global $Debuglog;
-		$Debuglog->add('No caching backend available for writing "'.$key.'".', 'cache');
+		$Debuglog->add( 'No caching backend available for writing "'.$key.'".', 'cache' );
 		$r = NULL;
 	}
 
-	$Timer->pause('set_to_mem_cache', false);
+	$Timer->pause( 'set_to_mem_cache', false );
 
 	return $r;
 }
@@ -5744,16 +6106,22 @@ function set_to_mem_cache($key, $payload, $ttl = 0)
  * @param string key
  * @return boolean True on success, false on failure. NULL if no backend available.
  */
-function unset_from_mem_cache($key)
+function unset_from_mem_cache( $key )
 {
-	if( function_exists('apc_delete') )
+	if( function_exists( 'apc_delete' ) )
+	{	// APC
 		return apc_delete( $key );
+	}
 
-	if( function_exists('xcache_unset') )
-		return xcache_unset(gen_key_for_cache($key));
+	if( function_exists( 'xcache_unset' ) )
+	{	// XCache
+		return xcache_unset( gen_key_for_cache( $key ) );
+	}
 
-	if( function_exists('eaccelerator_rm') )
-		return eaccelerator_rm(gen_key_for_cache($key));
+	if( function_exists( 'apcu_delete' ) )
+	{	// APCu
+		return apcu_delete( $key );
+	}
 }
 
 
@@ -5840,14 +6208,14 @@ function & get_IconLegend()
  */
 function get_active_opcode_cache()
 {
-	if( function_exists('apc_cache_info') && ini_get('apc.enabled') ) # disabled for CLI (see apc.enable_cli), however: just use this setting and do not call the function.
+	if( function_exists('opcache_invalidate') )
 	{
-		// fp>blueyed? why did you remove the following 2 lines? your comment above is not clear.
-		$apc_info = apc_cache_info( '', true );
-		if( isset( $apc_info['num_slots'] ) && ( $apc_info['num_slots'] ) )
-		{
-			return 'APC';
-		}
+		return 'OPCache';
+	}
+
+	if( function_exists('apc_delete_file') )
+	{
+		return 'APC';
 	}
 
 	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
@@ -5863,6 +6231,33 @@ function get_active_opcode_cache()
 		{
 			return 'eAccelerator';
 		}
+	}
+
+	return 'none';
+}
+
+
+/**
+ * Get name of active user cache, or "none".
+ * {@internal Anyone using something else, please extend.}}
+ * @return string
+ */
+function get_active_user_cache()
+{
+	if( function_exists( 'apcu_cache_info' ) /* && ini_get( 'apc.enabled' ) */ )
+	{
+		return 'APCu';
+	}
+
+	if( function_exists( 'apc_cache_info' ) /* && ini_get( 'apc.enabled' ) */ )
+	{
+		return 'APC';
+	}
+
+	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
+	if( ini_get('xcache.size') > 0 )
+	{
+		return 'xcache';
 	}
 
 	return 'none';
@@ -6008,13 +6403,54 @@ function get_ReqURI()
 
 
 /**
+ * Get URL to REST API script depending on current collection base url from front-office or site base url from back-office
+ *
+ * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+ *
+ * @return string URL to htsrv folder
+ */
+function get_restapi_url()
+{
+	global $restapi_script;
+
+	return get_htsrv_url().$restapi_script;
+}
+
+
+/**
+ * Get URL to htsrv folder depending on current collection base url from front-office or site base url from back-office
+ *
+ * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+ *
+ * @param boolean TRUE to use https URL
+ * @return string URL to htsrv folder
+ */
+function get_htsrv_url( $force_https = false )
+{
+	global $Collection, $Blog;
+
+	if( is_admin_page() || empty( $Blog ) )
+	{	// For back-office or when no collection page:
+		return get_samedomain_htsrv_url( $force_https );
+	}
+	else
+	{	// For current collection:
+		return $Blog->get_local_htsrv_url( NULL, $force_https );
+	}
+}
+
+
+/**
  * Get htsrv url on the same domain as the http request came from
  *
  * Note: _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+ *
+ * @param boolean TRUE to use https URL
+ * @return string URL to htsrv folder
  */
 function get_samedomain_htsrv_url( $secure = false )
 {
-	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $Blog;
+	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Collection, $Blog;
 
 	if( $secure )
 	{
@@ -6025,9 +6461,12 @@ function get_samedomain_htsrv_url( $secure = false )
 		$req_htsrv_url = $htsrv_url;
 	}
 
+	// Cut htsrv folder from end of the URL:
+	$req_htsrv_url = substr( $req_htsrv_url, 0, strlen( $req_htsrv_url ) - strlen( $htsrv_subdir ) );
+
 	if( strpos( $ReqHost.$ReqPath, $req_htsrv_url ) !== false )
-	{
-		return $req_htsrv_url;
+	{	// If current request path contains the required htsrv URL:
+		return $req_htsrv_url.$htsrv_subdir;
 	}
 
 	$req_url_parts = @parse_url( $ReqHost );
@@ -6036,18 +6475,23 @@ function get_samedomain_htsrv_url( $secure = false )
 	{
 		debug_die( 'Invalid hosts!' );
 	}
+
 	$req_domain = $req_url_parts['host'];
 	$htsrv_domain = $hsrv_url_parts['host'];
 
+	// Replace domain + path of htsrv URL with current request:
 	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
+
+	// Revert htsrv folder to end of the URL which has been cut above:
+	$samedomain_htsrv_url .= $htsrv_subdir;
 
 	// fp> The following check would apply well if we always had 301 redirects.
 	// But it's possible to turn them off in SEO settings for some page and not others (we don't know which here)
   // And some kinds of pages do not have 301 redirections implemented yet, e-g: disp=users
   /*
-	if( ( !is_admin_page() ) && ( !empty( $Blog ) ) && ( $samedomain_htsrv_url != $Blog->get_local_htsrv_url() ) )
+	if( ( !is_admin_page() ) && ( !empty( $Blog ) ) && ( $samedomain_htsrv_url != $Blog->get_htsrv_url( $secure ) ) )
 	{
-		debug_die( 'The blog is configured to have /htsrv/ at:<br> '.$Blog->get_local_htsrv_url().'<br>but in order to stay on the current domain, we would need to use:<br>'.$samedomain_htsrv_url.'<br>Maybe we have a missing redirection to the proper blog url?' );
+		debug_die( 'The blog is configured to have /htsrv/ at:<br> '.$Blog->get_htsrv_url( $secure ).'<br>but in order to stay on the current domain, we would need to use:<br>'.$samedomain_htsrv_url.'<br>Maybe we have a missing redirection to the proper blog url?' );
 	}
 	*/
 
@@ -6423,43 +6867,10 @@ function int2ip( $int )
  */
 function is_valid_ip_format( $ip )
 {
-	if( function_exists( 'filter_var' ) )
-	{ // filter_var() function exists we have PHP version >= 5.2.0
-		return filter_var( $ip, FILTER_VALIDATE_IP ) !== false;
-	}
-
-	// PHP version is < 5.2.0
-	if( $ip == '::1' )
-	{	// Reserved IP for localhost
-		$ip = '127.0.0.1';
-	}
-
-	if( strpos( $ip, '.' ) !== false )
-	{ // we have IPv4
-		if( strpos( $ip, ':' !== false ) )
-		{ // It is combined with IPv6, remove the IPv6 prefix
-			$ip = substr( $ip, strrpos( $ip, ':' ) );
-		}
-		if( substr_count( $ip, '.' ) != 3 )
-		{ // Don't vaildate formats like 'zz.yyyyy' which would be allowed by ip2long() function
-			return false;
-		}
-		$result = ip2long( $ip );
-		return ( ( $result !== false ) && ( $result !== -1 ) );
-	}
-
-	// Check if it is a valid IPv6 string
-	if( preg_match( "/^[0-9a-f]{1,4}:([0-9a-f]{0,4}:){1,6}[0-9a-f]{1,4}$/", $ip ) )
-	{ // $ip has the correct format
-		if( ( substr_count( $ip, '::' ) > 1 ) || ( strpos( $ip, ':::' ) !== false ) )
-		{ // Not valid IPv6 format because contains a ':::' char sequence or more than one '::'
-			return false;
-		}
-		return true;
-	}
-
-	return false;
+	return filter_var( $ip, FILTER_VALIDATE_IP ) !== false;
 }
+
+
 
 
 /**
@@ -6491,6 +6902,26 @@ function ip2int( $ip )
 	}
 
 	return $result;
+}
+
+
+/**
+ * Check if URL has a domain in IP format
+ *
+ * @param string URL
+ * @return boolean
+ */
+function is_ip_url_domain( $url )
+{
+	$url_data = parse_url( $url );
+
+	if( $url_data === false || ! isset( $url_data['host'] ) )
+	{	// Wrong url:
+		return false;
+	}
+
+	// Check if host is IP address:
+	return is_valid_ip_format( $url_data['host'] );
 }
 
 
@@ -6629,6 +7060,22 @@ if( !function_exists( 'array_walk_recursive' ) )
 
 
 /**
+ * Provide hex2bin for older versions of PHP (< 5.4)
+ *
+ * Decodes a hexadecimally encoded binary string
+ * @param string Hexadecimal representation of data
+ * @return string The binary representation of the given data or FALSE on failure
+ */
+if( !function_exists( 'hex2bin' ) )
+{
+	function hex2bin( $hex )
+	{
+		return pack( 'H*', $hex );
+	}
+}
+
+
+/**
  * Save text data to file, create target file if it doesn't exist
  *
  * @param string data to be written
@@ -6697,13 +7144,14 @@ function is_ajax_content( $template_name = '' )
  * @param integer Object ID
  * @param string Origin type: 'core', 'plugin'
  * @param integer Origin ID
+ * @param integer User ID
  */
-function syslog_insert( $message, $log_type, $object_type = NULL, $object_ID = NULL, $origin_type = 'core', $origin_ID = NULL )
+function syslog_insert( $message, $log_type, $object_type = NULL, $object_ID = NULL, $origin_type = 'core', $origin_ID = NULL, $user_ID = NULL )
 {
 	global $servertimenow;
 
 	$Syslog = new Syslog();
-	$Syslog->set_user();
+	$Syslog->set_user( $user_ID );
 	$Syslog->set( 'type', $log_type );
 	$Syslog->set_origin( $origin_type, $origin_ID );
 	$Syslog->set_object( $object_type, $object_ID );
@@ -6753,7 +7201,19 @@ function get_file_permissions_message()
  */
 function evo_flush()
 {
-	global $Timer;
+	global $Timer, $disable_evo_flush;
+
+	if( isset( $disable_evo_flush ) && $disable_evo_flush )
+	{	// This function is disabled (for example, used for ajax/rest api requests)
+		return;
+	}
+
+	// To fill the output buffer in order to flush data:
+	// NOTE: Uncomment the below line if flush doesn't work as expected
+	// echo str_repeat( ' ', 4096 );
+
+	// New line char is required as flag of that output portion is printed out:
+	echo "\n";
 
 	$zlib_output_compression = ini_get( 'zlib.output_compression' );
 	if( empty( $zlib_output_compression ) || $zlib_output_compression == 'Off' )
@@ -6820,27 +7280,118 @@ function apm_log_custom_param( $name, $value )
 	}
 }
 
+
 /**
- * Send a cookie (@see setcookie() for more details)
+ * Get cookie domain depending on current page:
+ *     - For back-office the config var $cookie_domain is used
+ *     - For front-office it is dynamically generated from collection url
+ *
+ * @return string Cookie domain
+ */
+function get_cookie_domain()
+{
+	global $Collection, $Blog;
+
+	if( is_admin_page() || empty( $Blog ) )
+	{	// Use cookie domain of base url from config:
+		global $cookie_domain;
+		return $cookie_domain;
+	}
+	else
+	{	// Use cookie domain of current collection url:
+		return $Blog->get_cookie_domain();
+	}
+}
+
+
+/**
+ * Get cookie path depending on current page:
+ *     - For back-office the config var $cookie_path is used
+ *     - For front-office it is dynamically generated from collection url
+ *
+ * @return string Cookie path
+ */
+function get_cookie_path()
+{
+	global $Collection, $Blog;
+
+	if( is_admin_page() || empty( $Blog ) )
+	{	// Use cookie path of base url from config:
+		global $cookie_path;
+		return $cookie_path;
+	}
+	else
+	{	// Use base path of current collection url:
+		return $Blog->get_cookie_path();
+	}
+}
+
+
+/**
+ * Set a cookie to send it by evo_sendcookies()
  *
  * @param string The name of the cookie
  * @param string The value of the cookie
  * @param integer The time the cookie expires
- * @param string The path on the server in which the cookie will be available on
- * @param string The domain that the cookie is available
+ * @param string DEPRECATED: The path on the server in which the cookie will be available on
+ * @param string DEPRECATED: The domain that the cookie is available
  * @param boolean Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
  * @param boolean (Added in PHP 5.2.0) When TRUE the cookie will be made accessible only through the HTTP protocol
- * @return boolean TRUE if setcookie() successfully runs
  */
-function evo_setcookie( $name, $value = '', $expire = 0, $path = '', $domain = '', $secure = false, $httponly = false )
+function evo_setcookie( $name, $value = '', $expire = 0, $dummy = '', $dummy2 = '', $secure = false, $httponly = false )
 {
-	if( version_compare( phpversion(), '5.2', '>=' ) )
-	{ // Use HTTP-only setting since PHP 5.2.0
-		return setcookie( $name, $value, $expire, $path, $domain, $secure, $httponly );
+	global $evo_cookies;
+
+	if( ! is_array( $evo_cookies ) )
+	{	// Initialize array for cookies only first time:
+		$evo_cookies = array();
 	}
-	else
-	{ // PHP < 5.2 doesn't support HTTP-only
-		return setcookie( $name, $value, $expire, $path, $domain, $secure );
+
+	// Store cookie in global var:
+	$evo_cookies[ $name ] = array(
+			'value'    => $value,
+			'expire'   => $expire,
+			'secure'   => $secure,
+			'httponly' => $httponly,
+		);
+}
+
+
+/**
+ * Send the predefined cookies (@see setcookie() for more details)
+ */
+function evo_sendcookies()
+{
+	global $evo_cookies;
+
+	if( headers_sent() )
+	{	// Exit to avoid errors because headers already were sent:
+		return;
+	}
+
+	if( empty( $evo_cookies ) )
+	{	// No cookies:
+		return;
+	}
+
+	$php_version_52 = version_compare( phpversion(), '5.2', '>=' );
+
+	$current_cookie_domain = get_cookie_domain();
+	$current_cookie_path = get_cookie_path();
+
+	foreach( $evo_cookies as $evo_cookie_name => $evo_cookie )
+	{
+		if( $php_version_52 )
+		{	// Use HTTP-only setting since PHP 5.2.0:
+			setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'], $evo_cookie['httponly'] );
+		}
+		else
+		{	// PHP < 5.2 doesn't support HTTP-only:
+			setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'] );
+		}
+
+		// Unset to don't send cookie twice:
+		unset( $evo_cookies[ $evo_cookie_name ] );
 	}
 }
 
@@ -6865,6 +7416,7 @@ function echo_editable_column_js( $params = array() )
 			'field_type'      => 'select', // Type of the editable field: 'select', 'text'
 			'field_class'     => '', // Class of the editable field
 			'null_text'       => '', // Null text of an input field, Use TS_() to translate it
+			'callback_code'   => '', // Additional JS code after main callback code
 		), $params );
 
 	// Set onblur action to 'submit' when type is 'text' in order to don't miss the selected user login from autocomplete list
@@ -6873,9 +7425,12 @@ function echo_editable_column_js( $params = array() )
 	if( $params['field_type'] == 'select' )
 	{
 		$options = '';
-		foreach( $params['options'] as $option_value => $option_title )
+		if( is_array( $params['options'] ) )
 		{
-			$options .= '\''.$option_value.'\':\''.$option_title.'\','."\n";
+			foreach( $params['options'] as $option_value => $option_title )
+			{
+				$options .= '\''.$option_value.'\':\''.$option_title.'\','."\n";
+			}
 		}
 	}
 
@@ -6895,7 +7450,16 @@ jQuery( document ).ready( function()
 			value = ajax_debug_clear( value );
 			<?php if( $params['field_type'] == 'select' ) { ?>
 			var result = value.match( /rel="([^"]*)"/ );
-			return { <?php echo $options; ?>'selected' : result[1] }
+			<?php
+			if( is_array( $params['options'] ) )
+			{
+				echo "return { ".$options."'selected' : result[1] }";
+			}
+			else
+			{
+				echo "return ".$params['options'];
+			}
+			?>
 			<?php } else { ?>
 			var result = value.match( />\s*([^<]+)\s*</ );
 			return result[1] == '<?php echo $params['null_text'] ?>' ? '' : result[1];
@@ -6907,6 +7471,12 @@ jQuery( document ).ready( function()
 		tooltip    : '<?php echo $params['tooltip']; ?>',
 		event      : 'click',
 		onblur     : '<?php echo $onblur_action; ?>',
+		onedit     : function ( settings, original )
+		{
+			// Set width to fix value to don't change it on selector displaying:
+			var wrapper_width = jQuery( original ).width();
+			jQuery( original ).css( { 'width': wrapper_width, 'max-width': wrapper_width } );
+		},
 		callback   : function ( settings, original )
 		{
 			<?php
@@ -6926,9 +7496,12 @@ jQuery( document ).ready( function()
 			{
 				evoFadeSuccess( this );
 			}
-			<?php } ?>
+			<?php
+			}
+			// Execute additional code:
+			echo $params['callback_code'];
+			?>
 		},
-		onsubmit: function( settings, original ) {},
 		submitdata : function( value, settings )
 		{
 			return { <?php echo $params['ID_name']; ?>: <?php echo $params['ID_value']; ?> }
@@ -7020,7 +7593,7 @@ function button_class( $type = 'button', $jQuery_selector = false )
  */
 function echo_modalwindow_js()
 {
-	global $AdminUI, $Blog, $modal_window_js_initialized;
+	global $AdminUI, $Collection, $Blog, $modal_window_js_initialized;
 
 	if( ! empty( $modal_window_js_initialized ) )
 	{ // Don't print out these functions twice
@@ -7060,7 +7633,8 @@ function echo_modalwindow_js_bootstrap()
 {
 	// Initialize variables for the file "bootstrap-evo_modal_window.js":
 	echo '<script type="text/javascript">
-		var evo_js_lang_close = \''.TS_('Close').'\';
+		var evo_js_lang_close = \''.TS_('Close').'\'
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 	</script>';
 }
 
@@ -7113,7 +7687,7 @@ function get_fieldset_folding_icon( $id, $params = array() )
 	}
 	else
 	{ // Get the fold value from user settings
-		global $UserSettings, $Blog;
+		global $UserSettings, $Collection, $Blog;
 		if( empty( $Blog ) )
 		{ // Get user setting value
 			$value = intval( $UserSettings->get( 'fold_'.$id ) );
@@ -7301,7 +7875,7 @@ function get_status_dropdown_button( $params = array() )
 	}
 	$status_icon_options = get_visibility_statuses( 'icons', $params['exclude_statuses'] );
 
-	$r = '<div class="btn-group dropdown autoselected">';
+	$r = '<div class="btn-group dropdown autoselected" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $params['value'] ).'">';
 	$r .= '<button type="button" class="btn btn-status-'.$params['value'].' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
 					.'<span>'.$status_options[ $params['value'] ].'</span>'
 				.' <span class="caret"></span></button>';
@@ -7321,23 +7895,36 @@ function get_status_dropdown_button( $params = array() )
  */
 function echo_form_dropdown_js()
 {
+	// Build a string to initialize javascript array with button titles
+	$tooltip_titles = get_visibility_statuses( 'tooltip-titles' );
+	$tooltip_titles_js_array = array();
+	foreach( $tooltip_titles as $status => $tooltip_title )
+	{
+		$tooltip_titles_js_array[] = $status.': \''.TS_( $tooltip_title ).'\'';
+	}
+	$tooltip_titles_js_array = implode( ', ', $tooltip_titles_js_array );
 ?>
 <script type="text/javascript">
 jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
 {
+	var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};
 	var item = jQuery( this ).parent();
 	var status = item.attr( 'rel' );
-	var button = jQuery( this ).parent().parent().prev();
+	var btn_group = item.parent().parent();
+	var button = jQuery( item.parent().parent().find( 'button:first' ) );
 	var field_name = jQuery( this ).parent().parent().attr( 'aria-labelledby' );
 
 	// Change status class name to new changed for all buttons:
 	button.attr( 'class', button.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
 	// Update selector button to status title:
-	button.find( 'span:first' ).html( item.find( 'span:last' ).html() );
+	button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
 	// Update hidden field to new status value:
 	jQuery( 'input[type=hidden][name=' + field_name + ']' ).val( status );
 	// Hide dropdown menu:
 	item.parent().parent().removeClass( 'open' );
+
+	// Update tooltip
+	btn_group.tooltip( 'hide' ).attr( 'data-original-title', item_status_tooltips[status] ).tooltip( 'show' );
 
 	return false;
 } );
@@ -7397,8 +7984,6 @@ function get_script_baseurl()
  */
 function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title = '#', $value = NULL )
 {
-	$badge_class = 'badge badge-warning';
-
 	switch( $type )
 	{
 		case 'coll':
@@ -7431,21 +8016,6 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 			}
 			break;
 
-		case 'group':
-			if( $value == 'primary' )
-			{	// Use text for primary group:
-				$text = T_('Primary');
-				$badge_class = 'label label-primary';
-			}
-			else
-			{	// Use text for secondary group:
-				$text = T_('Secondary');
-				$badge_class = 'label label-info';
-			}
-			$title = '';
-			$manual_url = '';
-			break;
-
 		default:
 			// Unknown badge type:
 			return '';
@@ -7459,7 +8029,7 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 	{	// Use link:
 		$r = ' <a href="'.get_manual_url( $manual_url ).'" target="_blank"';
 	}
-	$r .= ' class="'.$badge_class.'"';
+	$r .= ' class="badge badge-warning"';
 	if( ! empty( $title ) && $title != '#' )
 	{	// Use title for tooltip:
 		$r .= ' data-toggle="tooltip" data-placement="top" title="'.format_to_output( $title, 'htmlattr' ).'"';
@@ -7482,7 +8052,7 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 /**
  * Compares two "PHP-standardized" version number strings
  *
- * @param string First version number
+ * @param string First version number, Use 'current' for global $app_version
  * @param string Second version number
  * @param string If the third optional operator argument is specified, test for a particular relationship.
  *               The possible operators are: <, lt, <=, le, >, gt, >=, ge, ==, =, eq, !=, <>, ne respectively.
@@ -7492,15 +8062,22 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
  */
 function evo_version_compare( $version1, $version2, $operator = NULL )
 {
-	// Remove part after "-" from versions like "6.6.6-stable":
-	$version1 = preg_replace( '/(-.+)?/', '', $version1 );
+	if( $version1 === 'current' )
+	{	// Use current version of application:
+		global $app_version;
+		$version1 = $app_version;
+	}
+
+	// Remove "stable" suffix to compare such versions as upper than "alpha", "beta" and etc.:
+	$version1 = str_replace( '-stable', '', $version1 );
+	$version2 = str_replace( '-stable', '', $version2 );
 
 	if( is_null( $operator ) )
-	{	// To return integer
+	{	// To return integer:
 		return version_compare( $version1, $version2 );
 	}
 	else
-	{ // To return boolean
+	{	// To return boolean:
 		return version_compare( $version1, $version2, $operator );
 	}
 }
@@ -7581,5 +8158,567 @@ function get_install_format_text( $text, $format = 'string' )
 	$text = html_entity_decode( $text );
 
 	return $text;
+}
+
+
+/**
+ * Check if password should be transmitted in hashed format during Login
+ *
+ * @return boolean TRUE - hashed password will be transmitted, FALSE - raw password will be transmitted
+ */
+function can_use_hashed_password()
+{
+	global $transmit_hashed_password;
+
+	if( isset( $transmit_hashed_password ) )
+	{	// Get value from already defined var:
+		return $transmit_hashed_password;
+	}
+
+	global $Settings, $Plugins;
+
+	// Allow to transmit hashed password only when:
+	// - it is enabled by general setting "Password hashing during Login"
+	// - no plugins that automatically disable this option during Login
+	$transmit_hashed_password = (bool)$Settings->get( 'js_passwd_hashing' ) && !(bool)$Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
+
+	return $transmit_hashed_password;
+}
+
+
+/**
+ * Convert inline file tags like [image|file:123:link title:.css_class_name] or [inline:123:.css_class_name] into HTML tags
+ *
+ * @param string Source content
+ * @param object Source object
+ * @param array Params
+ * @return string Content
+ */
+function render_inline_files( $content, $Object, $params = array() )
+{
+	if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+	{	// Call render_inline_files() on everything outside code/pre:
+		$params['check_code_block'] = false;
+		$content = callback_on_non_matching_blocks( $content,
+			'~<(code|pre)[^>]*>.*?</\1>~is',
+			'render_inline_files', array( $Object, $params ) );
+		return $content;
+	}
+
+	// No code/pre blocks, replace on the whole thing
+
+	// Remove block level short tags inside <p> blocks and move them before the paragraph
+	$content = move_short_tags( $content );
+
+	// Find all matches with inline tags
+	preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
+
+	if( !empty( $inlines[0] ) )
+	{	// There are inline tags in the content...
+
+		$rendered_tags = render_inline_tags( $Object, $inlines[0], $params );
+		if( $rendered_tags )
+		{	// Do replacing if the object really contains inline attached tags:
+			foreach( $rendered_tags as $current_link_tag => $rendered_link_tag )
+			{
+				$content = str_replace( $current_link_tag, $rendered_link_tag, $content );
+			}
+		}
+	}
+
+	return $content;
+}
+
+
+/**
+ * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:] into HTML tags
+ *
+ * @param object Source object: Item, EmailCampaign
+ * @param array Inline tags
+ * @param array Params
+ * @return array Associative array of rendered HTML tags with inline tags as key
+ */
+function render_inline_tags( $Object, $tags, $params = array() )
+{
+	global $Plugins;
+	$inlines = array();
+
+	$params = array_merge( array(
+				'before'                   => '<div>',
+				'before_image'             => '<div class="image_block">',
+				'before_image_legend'      => '<div class="image_legend">',
+				'after_image_legend'       => '</div>',
+				'after_image'              => '</div>',
+				'after'                    => '</div>',
+				'image_size'               => 'fit-400x320',
+				'image_link_to'            => 'original', // Can be 'orginal' (image) or 'single' (this post)
+				'limit'                    => 1000, // Max # of images displayed
+				'get_rendered_attachments' => true,
+			), $params );
+
+	$object_class = get_class( $Object );
+
+	if( !isset( $LinkList ) )
+	{	// Get list of attached Links only first time:
+		if( $Object->ID == 0 )
+		{	// Get temporary object ID on preview new creating object:
+			$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', NULL );
+		}
+		else
+		{	// Don't use temporary object for existing object:
+			$temp_link_owner_ID = NULL;
+		}
+		switch( $object_class )
+		{
+			case 'Item':
+				$LinkOwner = new LinkItem( $Object, $temp_link_owner_ID );
+				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
+				$render_plugin_event_name = 'RenderItemAttachment';
+				break;
+
+			case 'EmailCampaign':
+				$LinkOwner = new LinkEmailCampaign( $Object );
+				$prepare_plugin_event_name = 'PrepareForRenderEmailAttachment';
+				$render_plugin_event_name = 'RenderEmailAttachment';
+				break;
+
+			case 'Message':
+				$LinkOwner = new LinkMessage( $Object, $temp_link_owner_ID );
+				$prepare_plugin_event_name = 'PrepareForRenderMessageAttachment';
+				$render_plugin_event_name = 'RenderMessageAttachment';
+				break;
+
+			default:
+				// Wrong source object type:
+				return false;
+		}
+		$LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], 'inline' );
+	}
+
+	if( empty( $LinkList ) )
+	{ // This Item has no attached files for 'inline' position, Exit here
+		return false;
+	}
+
+	foreach( $tags as $current_inline )
+	{
+		preg_match("/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i", $current_inline, $inline);
+
+		if( empty( $inline ) )
+		{
+			$inlines[$current_inline] = $current_inline;
+			continue;
+		}
+
+		$inline_type = $inline[1]; // image|file|inline|video|audio|thumbnail
+		$current_link_ID = (int) $inline[2];
+
+		if( empty( $current_link_ID ) )
+		{ // Invalid link ID, Go to next match
+			$inlines[$current_inline] = $current_inline;
+			continue;
+		}
+
+		if( ! ( $Link = & $LinkList->get_by_field( 'link_ID', $current_link_ID ) ) )
+		{ // Link ID is not part of the linked files for position "inline"
+			$inlines[$current_inline] = $current_inline;
+			continue;
+		}
+
+		if( ! ( $File = & $Link->get_File() ) )
+		{ // No File object:
+			global $Debuglog;
+			$Debuglog->add( sprintf( 'Link ID#%d of '.$object_class.' #%d does not have a file object!', $Link->ID, $Object->ID ), array( 'error', 'files' ) );
+			$inlines[$current_inline] = $current_inline;
+			continue;
+		}
+
+		if( ! $File->exists() )
+		{ // File doesn't exist:
+			global $Debuglog;
+			$Debuglog->add( sprintf( 'File linked to '.$object_class.' #%d does not exist (%s)!', $Object->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+			$inlines[$current_inline] = $current_inline;
+			continue;
+		}
+
+		$params['File'] = $File;
+		$params['Link'] = $Link;
+		$params[ $object_class ] = $Object;
+
+		$current_file_params = array();
+
+		switch( $inline_type )
+		{
+			case 'image':
+			case 'inline': // valid file type: image
+				if( $File->is_image() )
+				{
+					$current_image_params = $params;
+
+					if( ! empty( $inline[3] ) ) // check if second colon is present
+					{
+						// Get the inline params: caption and class
+						$inline_params = explode( ':.', $inline[4] );
+
+						if( ! empty( $inline_params[0] ) )
+						{ // Caption is set, so overwrite the image link title
+							if( $inline_params[0] == '-' )
+							{ // Caption display is disabled
+								$current_image_params['image_link_title'] = '';
+								$current_image_params['hide_image_link_title'] = true;
+							}
+							else
+							{ // New image caption was set
+								$current_image_params['image_link_title'] = strip_tags( $inline_params[0] );
+							}
+
+							$current_image_params['image_desc'] = $current_image_params['image_link_title'];
+							$current_file_params['title'] = $inline_params[0];
+						}
+
+						$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
+						if( ! empty( $inline_params[ $class_index ] ) )
+						{ // A class name is set for the inline tags
+							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
+							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
+							{	// Overwrite 'before_image' setting to add an extra class name:
+								$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
+
+								// Append extra class to file inline img tags:
+								$current_file_params['class'] = $image_extraclass;
+							}
+						}
+					}
+
+					if( ! $current_image_params['get_rendered_attachments'] )
+					{ // Save $r to temp var in order to don't get the rendered data from plugins
+						$temp_r = $r;
+					}
+
+					$temp_params = $current_image_params;
+					foreach( $current_image_params as $param_key => $param_value )
+					{ 	// Pass all params by reference, in order to give possibility to modify them by plugin
+						// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+						$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
+					}
+
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_image_params );
+
+					// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_image_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_image_params['data']):
+						if( ! $current_image_params['get_rendered_attachments'] )
+						{	// Restore $r value and mark this item has the rendered attachments:
+							$r = $temp_r;
+							$plugin_render_attachments = true;
+						}
+					}
+
+					if( $inline_type == 'image' )
+					{	// Generate the IMG tag with all the alt, title and desc if available:
+						switch( $object_class )
+						{
+							case 'Item':
+								// Get the IMG tag with link to original image or to Item page:
+								$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+								break;
+
+							case 'EmailCampaign':
+								// Get the IMG tag without link for email content:
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
+										'image_link_to' => false
+									) ) );
+								break;
+
+							default:
+								// Get the IMG tag with link to original big image:
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) );
+								break;
+						}
+					}
+					elseif( $inline_type == 'inline' )
+					{	// Generate simple IMG tag with resized image size:
+						$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
+							( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '' );
+					}
+				}
+				else
+				{ // not an image file, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			case 'thumbnail':
+				if( $File->is_image() )
+				{
+					global $thumbnail_sizes;
+
+					$thumbnail_size = 'medium';
+					$thumbnail_position = 'left';
+
+					$thumbnail_classes = array();
+
+					if( ! empty( $inline[3] ) ) // check if second colon is present
+					{
+						// Get the inline params: caption and class
+						$inline_params = explode( ':', $inline[4] );
+
+						$valid_thumbnail_sizes = array( 'small', 'medium', 'large' );
+						if( ! empty( $inline_params[0] ) && in_array( $inline_params[0], $valid_thumbnail_sizes ) )
+						{
+							$thumbnail_size = $inline_params[0];
+						}
+
+						$valid_thumbnail_positions = array( 'left', 'right' );
+						if( ! empty( $inline_params[1] ) && in_array( $inline_params[1], $valid_thumbnail_positions ) )
+						{
+							$thumbnail_position = $inline_params[1];
+						}
+
+						if( ! empty( $inline_params[2] ) )
+						{
+							$extra_classes = explode( '.', ltrim( $inline_params[2], '.' ) );
+						}
+					}
+
+					switch( $thumbnail_size )
+					{
+						case 'small':
+							$thumbnail_size = 'fit-128x128';
+							break;
+
+						case 'large':
+							$thumbnail_size = 'fit-320x320';
+							break;
+
+						case 'medium':
+						default:
+							$thumbnail_size = 'fit-192x192';
+							break;
+					}
+
+					$thumbnail_classes[] = 'evo_thumbnail';
+					$thumbnail_classes[] = 'evo_thumbnail__'.$thumbnail_position;
+					if( isset( $extra_classes ) )
+					{
+						$thumbnail_classes = array_merge( $thumbnail_classes, $extra_classes );
+					}
+
+					$current_image_params = array(
+						'before_image'        => '',
+						'before_image_legend' => '', // can be NULL
+						'after_image_legend'  => '',
+						'after_image'         => '',
+						'image_size'          => $thumbnail_size,
+						'image_link_to'       => 'original',
+						'image_link_title'    => '',	// can be text or #title# or #desc#
+						'image_class'         => implode( ' ', $thumbnail_classes ),
+					);
+
+					switch( $object_class )
+					{
+						case 'Item':
+							// Get the IMG tag with link to original image or to Item page:
+							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+							break;
+
+						case 'EmailCampaign':
+							// Get the IMG tag without link for email content:
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
+									'image_link_to' => false
+								) ) );
+							break;
+
+						default:
+							// Get the IMG tag with link to original big image:
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) );
+							break;
+					}
+				}
+				else
+				{
+					continue;
+				}
+				break;
+
+			case 'file': // valid file types: image, video, audio, other
+				$valid_file_types = array( 'image', 'video', 'audio', 'other' );
+				if( in_array( $File->get_file_type(), $valid_file_types ) )
+				{
+					if( ! empty( $inline[3] ) ) // check if second colon is present
+					{
+						// Get the file caption
+						$caption = $inline[4];
+
+						if( ! empty( $caption ) )
+						{ // Caption is set
+							$current_file_params['title'] = strip_tags( $caption );
+						}
+					}
+
+					if( empty( $current_file_params['title'] ) )
+					{ // Use real file name as title when it is not defined for inline tag
+						$file_title = $File->get( 'title' );
+						$current_file_params['title'] = ' '.( empty( $file_title ) ? $File->get_name() : $file_title );
+					}
+					elseif( $current_file_params['title'] == '-' )
+					{ // Don't display a title in this case, Only file icon will be displayed
+						$current_file_params['title'] = '';
+					}
+					else
+					{ // Add a space between file icon and title
+						$current_file_params['title'] = ' '.$current_file_params['title'];
+					}
+
+					$inlines[$current_inline] = '<a href="'.$File->get_url().'"'
+						.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
+						.'>'.$File->get_icon( $current_file_params ).$current_file_params['title'].'</a>';
+				}
+				else
+				{ // not a valid file type, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			case 'video':	// valid file type: video
+				if( $File->is_video() )
+				{
+					$current_video_params = $params;
+					// Create an empty dummy element where the plugin is expected to append the rendered video
+					$current_video_params['data'] = '';
+
+					foreach( $current_video_params as $param_key => $param_value )
+					{ // Pass all params by reference, in order to give possibility to modify them by plugin
+						// So plugins can add some data before/after tags (E.g. used by infodots plugin)
+						$current_video_params[ $param_key ] = & $current_video_params[ $param_key ];
+					}
+
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_video_params );
+
+					// Render attachments by plugin:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_video_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_video_params['data']):
+						$inlines[$current_inline] = $current_video_params['data'];
+					}
+					else
+					{ // no plugin available or was able to render the tag
+						$inlines[$current_inline] = $current_inline;
+					}
+				}
+				else
+				{ // not a video file, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			case 'audio': // valid file type: audio
+				if( $File->is_audio() )
+				{
+					$current_audio_params = $params;
+					// Create an empty dummy element where the plugin is expected to append the rendered video
+					$current_audio_params['data'] = '';
+
+					foreach( $current_audio_params as $param_key => $param_value )
+					{ // Pass all params by reference, in order to give possibility to modify them by plugin
+						// So plugins can add some data before/after tags (E.g. used by infodots plugin)
+						$current_audio_params[ $param_key ] = & $current_audio_params[ $param_key ];
+					}
+
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_audio_params );
+
+					// Render attachments by plugin:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_audio_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_audio_params['data']):
+						$inlines[$current_inline] =  $current_audio_params['data'];
+					}
+					else
+					{ // no plugin available or was able to render the tag
+						$inlines[$current_inline] = $current_inline;
+					}
+				}
+				else
+				{ // not a video file, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			default:
+				$inlines[$current_inline] = $current_inline;
+		}
+	}
+
+	return $inlines;
+}
+
+function php_to_jquery_date_format( $php_format )
+{
+	$tokens = array(
+			// Day
+			'd' => 'dd',
+			'D' => 'D',
+			'j' => 'd',
+			'l' => 'DD',
+			'N' => '',
+			'S' => '',
+			'w' => '',
+			'z' => 'o',
+			// Week
+			'W' => '',
+			// Month
+			'F' => 'MM',
+			'm' => 'mm',
+			'M' => 'M',
+			'n' => 'm',
+			't' => '',
+			// Year
+			'L' => '',
+			'o' => '',
+			'Y' => 'yy',
+			'y' => 'y',
+			// Time
+			'a' => '',
+			'A' => '',
+			'B' => '',
+			'g' => '',
+			'G' => '',
+			'h' => '',
+			'H' => '',
+			'i' => '',
+			's' => '',
+			'u' => '' );
+
+	$js_format = "";
+	$escaping = false;
+	for( $i = 0; $i < strlen( $php_format ); $i++ )
+	{
+		$char = $php_format[$i];
+		if($char === '\\') // PHP date format escaping character
+		{
+			$i++;
+			if( $escaping ) $js_format .= $php_format[$i];
+			else $js_format .= '\'' . $php_format[$i];
+			$escaping = true;
+		}
+		else
+		{
+			if( $escaping )
+			{
+				$jqueryui_format .= "'"; $escaping = false;
+			}
+			if( isset( $tokens[$char] ) )
+			{
+				$js_format .= $tokens[$char];
+			}
+			else
+			{
+				$js_format .= $char;
+			}
+		}
+	}
+
+	return $js_format;
 }
 ?>

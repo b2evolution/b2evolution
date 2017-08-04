@@ -59,13 +59,17 @@ class Thread extends DataObject
 		{	// New Thread
 			global $Session;
 
-			// check if there is unsaved Thread object stored in Session
-			$unsaved_Thread = $Session->get( 'core.unsaved_Thread' );
-			if( !empty( $unsaved_Thread ) )
-			{	// unsaved thread exists, delete it from Session
-				$Session->delete( 'core.unsaved_Thread' );
-				$this->title = $unsaved_Thread['title'];
-				$this->text = $unsaved_Thread['text'];
+			// erwin > Added check for $Session to enable creation of threads in cases where there is
+			// no Session available such as generation of sample private conversation during install
+			if( $Session )
+			{	// check if there is unsaved Thread object stored in Session
+				$unsaved_Thread = $Session->get( 'core.unsaved_Thread' );
+				if( !empty( $unsaved_Thread ) )
+				{	// unsaved thread exists, delete it from Session
+					$Session->delete( 'core.unsaved_Thread' );
+					$this->title = $unsaved_Thread['title'];
+					$this->text = $unsaved_Thread['text'];
+				}
 			}
 
 			$logins = array();
@@ -136,7 +140,7 @@ class Thread extends DataObject
 				{
 					$recipients_selected[] = array(
 						'id'    => $user_ID,
-						'title' => $user_login
+						'login' => $user_login
 					);
 				}
 			}
@@ -191,7 +195,7 @@ class Thread extends DataObject
 	{
 		global $thrd_recipients, $thrd_recipients_array;
 
-		// Resipients
+		// Recipients
 		$this->set_string_from_param( 'recipients', empty( $thrd_recipients_array ) ? true : false );
 
 		// Title
@@ -246,7 +250,7 @@ class Thread extends DataObject
 
 		if( !empty( $recipients_array ) )
 		{	// These data is created by jQuery plugin fbautocomplete
-			$recipients_list = $recipients_array['title'];
+			$recipients_list = $recipients_array['login'];
 		}
 		else
 		{	// For browsers without JavaScript

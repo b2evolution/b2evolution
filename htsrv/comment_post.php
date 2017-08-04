@@ -42,8 +42,8 @@ $commented_Item = & $ItemCache->get_by_ID( $comment_item_ID );
 // Make sure Blog is loaded
 $commented_Item->load_Blog();
 $blog = $commented_Item->Blog->ID;
-// Initialize global $Blog to avoid restriction of redirect to external URL, for example, when collection URL is subdomain:
-$Blog = $commented_Item->Blog;
+// Initialize global $Collection, $Blog to avoid restriction of redirect to external URL, for example, when collection URL is subdomain:
+$Collection = $Blog = $commented_Item->Blog;
 
 // Re-Init charset handling, in case current_charset has changed:
 locale_activate( $commented_Item->Blog->get('locale') );
@@ -65,7 +65,7 @@ if( $Settings->get('system_lock') )
 // Check user permissions to post this comment:
 if( $comment_type == 'meta' )
 { // Meta comment
-	if( ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item ) )
+	if( ! $commented_Item->can_meta_comment() )
 	{ // Current user has no permission to post a meta comment
 		$Messages->add( T_('You cannot leave meta comments on this post!'), 'error' );
 		header_redirect(); // Will save $Messages into Session
@@ -172,37 +172,40 @@ else
 	// NO permission to edit!
 	$perm_comment_edit = false;
 
-	// we need some id info from the anonymous user:
-	if ($require_name_email)
-	{ // We want Name and EMail with comments
-		if( empty($author) )
-		{
-			$Messages->add( T_('Please fill in your name.'), 'error' );
-		}
-		if( empty($email) )
-		{
-			$Messages->add( T_('Please fill in your email.'), 'error' );
-		}
+	// We need some id info from the anonymous user:
+	if( $commented_Item->Blog->get_setting( 'require_anon_name' ) && empty( $author ) )
+	{	// Author name is required for anonymous users:
+		$Messages->add_to_group( T_('Please fill in your name.'), 'error', T_('Validation errors:') );
+	}
+	if( $commented_Item->Blog->get_setting( 'require_anon_email' ) && empty( $email ) )
+	{	// Author email address is required for anonymous users:
+		$Messages->add_to_group( T_('Please fill in your email.'), 'error', T_('Validation errors:') );
 	}
 
-	if( !empty($author) && antispam_check( $author ) )
+	if( !empty( $author ) && ( $block = antispam_check( $author ) ) )
 	{
-		$Messages->add( T_('Supplied name is invalid.'), 'error' );
+		// Log incident in system log
+		syslog_insert( sprintf( 'Antispam: Supplied name "%s" contains blacklisted word "%s".', $author, $block ), 'error', 'comment', $comment_item_ID );
+
+		$Messages->add_to_group( T_('Supplied name is invalid.'), 'error', T_('Validation errors:') );
 	}
 
-	if( !empty($email)
-		&& ( !is_email($email)|| antispam_check( $email ) ) )
+	if( !empty( $email )
+		&& ( !is_email( $email )|| ( $block = antispam_check( $email ) ) ) )
 	{
-		$Messages->add( T_('Supplied email address is invalid.'), 'error' );
+		// Log incident in system log
+		syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $email, $block ), 'error', 'comment', $comment_item_ID );
+
+		$Messages->add_to_group( T_('Supplied email address is invalid.'), 'error', T_('Validation errors:') );
 	}
 
 
-	if( !stristr($url, '://') && !stristr($url, '@') )
+	if( !stristr( $url, '://' ) && !stristr( $url, '@' ) )
 	{ // add 'http://' if no protocol defined for URL; but not if the user seems to be entering an email address alone
 		$url = 'http://'.$url;
 	}
 
-	if( strlen($url) <= 8 )
+	if( strlen( $url ) <= 8 )
 	{	// ex: https:// is 8 chars
 		$url = '';
 	}
@@ -211,7 +214,7 @@ else
 	// a title for their comment or whatever...
 	if( $error = validate_url( $url, 'commenting' ) )
 	{
-		$Messages->add( T_('Supplied website address is invalid: ').$error, 'error' );
+		$Messages->add_to_group( T_('Supplied website address is invalid: ').$error, 'error', T_('Validation errors:') );
 	}
 
 	if( $commented_Item->Blog->get_setting( 'comments_detect_email' ) )
@@ -257,7 +260,7 @@ else
 	$Comment->set( 'allow_msgform', $comment_allow_msgform );
 }
 
-if( $commented_Item->can_rate() )
+if( ! $Comment->is_meta() && $commented_Item->can_rate() )
 {	// Comment rating:
 	$Comment->set( 'rating', $comment_rating );
 }
@@ -276,39 +279,6 @@ if( param( 'renderers_displayed', 'integer', 0 ) )
 // Def status will be the highest publish status what the current User ( or anonymous user if there is no current user ) can post
 $def_status = $Comment->is_meta() ? 'published' : get_highest_publish_status( 'comment', $commented_Item->Blog->ID, false );
 $Comment->set( 'status', $def_status );
-
-// Restrict comment status by parent item:
-$Comment->restrict_status_by_item( true );
-
-if( $action != 'preview' )
-{
-	/*
-	 * Flood-protection
-	 * NOTE: devs can override the flood protection delay in /conf/_overrides_TEST.php
-	 * TODO: Put time check into query?
-	 * TODO: move that as far !!UP!! as possible! We want to waste minimum resources on Floods
-	 * TODO: have several thresholds. For example:
-	 * 1 comment max every 30 sec + 5 comments max every 10 minutes + 15 comments max every 24 hours
-	 * TODO: factorize with trackback
-	 */
-	$query = 'SELECT MAX(comment_date)
-							FROM T_comments
-						 WHERE comment_author_IP = '.$DB->quote($Hit->IP).'
-								OR comment_author_email = '.$DB->quote( $Comment->get_author_email() );
-	$ok = 1;
-	if( $then = $DB->get_var( $query ) )
-	{
-		$time_lastcomment = mysql2date("U",$then);
-		$time_newcomment = mysql2date("U",$now);
-		if( ($time_newcomment - $time_lastcomment) < $minimum_comment_interval )
-			$ok = 0;
-	}
-	if( !$ok )
-	{
-		$Messages->add( sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ), 'error' );
-	}
-	/* end flood-protection */
-}
 
 // get already attached file ids
 param( 'preview_attachments', 'string', '' );
@@ -333,8 +303,7 @@ if( !empty( $preview_attachments ) )
 	}
 }
 
-if( $commented_Item->can_attach() && ( ( $action == 'preview' ) || $ok ) &&
-    !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
+if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
 { // attaching files is permitted
 	$FileRootCache = & get_FileRootCache();
 	if( is_logged_in() )
@@ -355,7 +324,7 @@ if( $commented_Item->can_attach() && ( ( $action == 'preview' ) || $ok ) &&
 		$uploadedFiles = $result['uploadedFiles'];
 		if( !empty( $result['failedFiles'] ) )
 		{ // upload failed
-			$Messages->add( T_( 'Couldn\'t attach selected file:' ).$result['failedFiles'][0], 'warning' );
+			$Messages->add_to_group( T_( 'Couldn\'t attach selected file:' ).$result['failedFiles'][0], 'error' );
 		}
 		if( !empty( $uploadedFiles ) )
 		{ // upload succeeded
@@ -388,7 +357,7 @@ if( $commented_Item->can_attach() && ( ( $action == 'preview' ) || $ok ) &&
 
 if( empty( $comment ) && $checked_attachments_count == 0 )
 { // comment should not be empty!
-	$Messages->add( T_('Please do not send empty comments.'), 'error' );
+	$Messages->add_to_group( T_('Please do not send empty comments.'), 'error', T_('Validation errors:') );
 }
 
 
@@ -407,7 +376,7 @@ if( $Messages->has_errors() && $action != 'preview' )
 {
 	$Comment->set( 'preview_attachments', $preview_attachments );
 	$Comment->set( 'checked_attachments', $checked_attachments );
-	save_comment_to_session( $Comment );
+	save_comment_to_session( $Comment, 'unsaved', $comment_type );
 
 	if( !empty( $reply_ID ) )
 	{
@@ -449,13 +418,13 @@ if( $action == 'preview' )
 	$Comment->set( 'email_is_detected', $comments_email_is_detected ); // used to change a style of the comment
 	// Set Comment Item object to NULL, so this way the Item object won't be serialized, but the item_ID is still set
 	$Comment->Item = NULL;
-	$Session->set( 'core.preview_Comment', $Comment );
+	save_comment_to_session( $Comment, 'preview', $comment_type );
 	$Session->set( 'core.no_CachePageContent', 1 );
 	$Session->dbsave();
 
 	// This message serves the purpose that the next page will not even try to retrieve preview from cache... (and won't collect data to be cached)
 	// This is session based, so it's not 100% safe to prevent caching. We are also using explicit caching prevention whenever personal data is displayed
-	$Messages->add( T_('This is a preview only! Do not forget to send your comment!'), 'error' );
+	$Messages->add_to_group( T_('This is a preview only! Do not forget to send your comment!'), 'error', T_('Preview:') );
 
 	if( $comments_email_is_detected )
 	{ // Comment contains an email address, We should show an error about this
@@ -467,7 +436,7 @@ if( $action == 'preview' )
 			}
 			$link_log_in = 'href="'.get_login_url( 'blocked comment email', $commented_Item->get_url( 'public_view' ) ).'"';
 			$link_register = 'href="'.get_user_register_url( $commented_Item->get_url( 'public_view' ), 'blocked comment email' ).'"';
-			$Messages->add( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error' );
+			$Messages->add_to_group( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error', T_('Preview:') );
 
 			// Save the user data if he will go to register form after this action
 			$register_user = array(
@@ -478,14 +447,15 @@ if( $action == 'preview' )
 		}
 		else
 		{	// No registration
-			$Messages->add( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error' );
+			$Messages->add_to_group( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error', T_('Preview:') );
 		}
 	}
 
 	// Passthrough comment_cookies & comment_allow_msgform params:
 	// fp> moved this down here in order to keep return URLs clean whenever this is not needed.
 	$redirect_to = url_add_param( $redirect_to, 'redir=no&comment_cookies='.$comment_cookies
-		.'&comment_allow_msgform='.$comment_allow_msgform, '&' );
+		.'&comment_allow_msgform='.$comment_allow_msgform
+		.'&comment_type='.$comment_type, '&' );
 
 	if( !empty( $reply_ID ) )
 	{
@@ -499,7 +469,7 @@ if( $action == 'preview' )
 }
 else
 { // delete any preview comment from session data:
-	$Session->delete( 'core.preview_Comment' );
+	$Session->delete( 'core.preview_Comment'.( $comment_type == 'meta' ? $comment_type : '' ) );
 }
 
 
@@ -567,23 +537,23 @@ if( !is_logged_in() )
 			$url = ' '; // this to make sure a cookie is set for 'no url'
 
 		// fplanque: made cookies available for whole site
-		evo_setcookie( $cookie_name, $author, $cookie_expires, $cookie_path, $cookie_domain, false, true );
-		evo_setcookie( $cookie_email, $email, $cookie_expires, $cookie_path, $cookie_domain, false, true );
-		evo_setcookie( $cookie_url, $url, $cookie_expires, $cookie_path, $cookie_domain, false, true );
+		evo_setcookie( $cookie_name, $author, $cookie_expires, '', '', false, true );
+		evo_setcookie( $cookie_email, $email, $cookie_expires, '', '', false, true );
+		evo_setcookie( $cookie_url, $url, $cookie_expires, '', '', false, true );
 	}
 	else
 	{	// Erase cookies:
 		if( !empty($_COOKIE[$cookie_name]) )
 		{
-			evo_setcookie( $cookie_name, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+			evo_setcookie( $cookie_name, '', $cookie_expired, '', '', false, true );
 		}
 		if( !empty($_COOKIE[$cookie_email]) )
 		{
-			evo_setcookie( $cookie_email, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+			evo_setcookie( $cookie_email, '', $cookie_expired, '', '', false, true );
 		}
 		if( !empty($_COOKIE[$cookie_url]) )
 		{
-			evo_setcookie( $cookie_url, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+			evo_setcookie( $cookie_url, '', $cookie_expired, '', '', false, true );
 		}
 	}
 }
@@ -605,8 +575,7 @@ if( $Comment->ID )
 	// asimo> this handle moderators and general users as well and use "outbound_notifications_mode" in case of general users
 	// Moderators will get emails about every new comment
 	// Subscribed user will only get emails about new published comments
-	$executed_by_userid = is_logged_in() ? $current_User->ID : NULL;
-	$Comment->handle_notifications( true, $executed_by_userid );
+	$Comment->handle_notifications( NULL, true );
 
 
 	// Add a message, according to the comment's status:

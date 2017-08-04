@@ -23,7 +23,7 @@ class cookie_consent_plugin extends Plugin
 	var $priority = 1;
 	var $short_desc;
 	var $long_desc;
-	var $version = '5.0.0';
+	var $version = '6.9.3';
 	var $number_of_installs = 1;
 
 
@@ -52,12 +52,12 @@ class cookie_consent_plugin extends Plugin
 		return array(
 				'title' => array(
 					'label' => T_('Title'),
-					'note' => T_('Leave empty for default.'),
+					'note' => T_('Leave empty for default').'.',
 					'type' => 'text',
 				),
 				'intro' => array(
 					'label' => T_('Intro Text'),
-					'note' => T_('Leave empty for default.'),
+					'note' => T_('Leave empty for default').'.',
 					'type' => 'text',
 				),
 				'post_ID' => array(
@@ -66,17 +66,17 @@ class cookie_consent_plugin extends Plugin
 				),
 				'info' => array(
 					'label' => T_('More info Text'),
-					'note' => T_('Leave empty for default.'),
+					'note' => T_('Leave empty for default').'.',
 					'type' => 'html_textarea',
 				),
 				'consent' => array(
 					'label' => T_('Consent Text'),
-					'note' => T_('Leave empty for default.'),
+					'note' => T_('Leave empty for default').'.',
 					'type' => 'html_textarea',
 				),
 				'accept_button' => array(
 					'label' => T_('Accept button Text'),
-					'note' => T_('Leave empty for default.'),
+					'note' => T_('Leave empty for default').'.',
 					'type' => 'text',
 				),
 			);
@@ -135,8 +135,8 @@ class cookie_consent_plugin extends Plugin
 		}
 
 		// Initialize html block:
-		require_css( $this->get_plugin_url().'style.css', true, NULL, NULL, '#', true );
-		require_js( 'jquery/jquery.cookie.min.js', 'rsc_url', false, true );
+		$this->require_css( 'style.css', true );
+		require_js( 'jquery/jquery.cookie.min.js', 'blog', false, true );
 
 		$html_block = '<div id="eu_cookie_consent"'.( is_logged_in() ? ' class="eu_cookie_consent__loggedin"' : '' ).'>'
 				.'<div>'

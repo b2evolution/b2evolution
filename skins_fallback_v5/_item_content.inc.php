@@ -66,7 +66,7 @@ $params = array_merge( array(
 		'gallery_colls'            => 5,
 		'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 
-		'before_url_link'          => '<p class="post_link">'.T_('Link:').' ',
+		'before_url_link'          => '<p class="post_link">'.T_('Link').': ',
 		'after_url_link'           => '</p>',
 		'url_link_text_template'   => '$url$', // If evaluates to empty, nothing will be displayed (except player if podcast)
 		'url_link_url_template'    => '$url$', // $url$ will be replaced with saved URL address
@@ -78,15 +78,7 @@ $params = array_merge( array(
 		'more_link_to'             => 'single#anchor', // Can be 'single' or 'single#anchor' which is permalink + "#more55" where 55 is item ID
 		'anchor_text'              => '<p class="bMore">...</p>', // Text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 
-		'limit_attach'             => 1000,
-		'attach_list_start'        => '<div class="attachments"><h3>'.T_('Attachments').':</h3><ul class="bFiles">',
-		'attach_list_end'          => '</ul></div>',
-		'attach_start'             => '<li>',
-		'attach_end'               => '</li>',
-		'before_attach_size'       => ' <span class="file_size">(',
-		'after_attach_size'        => ')</span>',
-
-		'page_links_start'         => '<p class="right">'.T_('Pages:').' ',
+		'page_links_start'         => '<p class="right">'.T_('Pages').': ',
 		'page_links_end'           => '</p>',
 		'page_links_separator'     => '&middot; ',
 		'page_links_single'        => '',
@@ -114,6 +106,7 @@ if( $content_mode == 'auto' )
 	switch( $disp_detail )
 	{
 		case 'posts-cat':
+		case 'posts-topcat':
 		case 'posts-subcat':
 			$content_mode = $Blog->get_setting('chapter_content');
 			break;
@@ -158,7 +151,7 @@ switch( $content_mode )
 		// Compact display:
 		echo $params['content_start_excerpt'];
 
-		if( !empty($params['excerpt_image_size']) )
+		if( !empty($params['excerpt_image_size']) && !empty($params['excerpt_image_limit']) )
 		{
 			// Display images that are linked to this post:
 			$Item->images( array(
@@ -231,18 +224,8 @@ switch( $content_mode )
 
 		if( $params['content_display_full'] )
 		{	// We want to display text, not just images:
-		
-			echo '<div class="bText">';
 
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => $params['before_url_link'],
-					'after'         => $params['after_url_link'],
-					'text_template' => $params['url_link_text_template'],
-					'url_template'  => $params['url_link_url_template'],
-					'target'        => $params['url_link_target'],
-					'podcast'       => '#', // Auto display mp3 player if post type is podcast (=> false, to disable)
-				) );
+			echo '<div class="bText">';
 
 			// Display CONTENT:
 			$Item->content_teaser( array(
@@ -267,9 +250,8 @@ switch( $content_mode )
 					'link_to'     => $params['more_link_to'],
 				) );
 
-			if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) /* only if not displayed all images already */ )
-			{
-				// Display images that are linked "after more" to this post:
+			if( ! empty( $params['image_size'] ) && ( $more || $params['force_more'] ) && $Item->has_content_parts( $params ) /* only if not displayed all images already */ )
+			{	// Display images that are linked "after more" to this post:
 				$Item->images( array(
 						'before'              => $params['before_images'],
 						'before_image'        => $params['before_image'],
@@ -319,28 +301,6 @@ switch( $content_mode )
 				) );
 
 			echo '</div>';
-		}
-
-		if( ! empty($params['limit_attach'])
-			&& ( $more || ! $Item->has_content_parts($params) ) )
-		{	// Display attachments/files that are linked to this post:
-			$Item->files( array(
-					'before' =>              $params['attach_list_start'],
-					'before_attach' =>       $params['attach_start'],
-					'before_attach_size' =>  $params['before_attach_size'],
-					'after_attach_size' =>   $params['after_attach_size'],
-					'after_attach' =>        $params['attach_end'],
-					'after' =>               $params['attach_list_end'],
-					'limit_attach' =>        $params['limit_attach'],
-				) );
-		}
-
-		// Display location info
-		$Item->location( '<div class="item_location"><strong>'.T_('Location').': </strong>', '</div>' );
-
-		if( $disp == 'single' )
-		{	// Display custom fields
-			$Item->custom_fields();
 		}
 
 		echo $params['content_end_full'];

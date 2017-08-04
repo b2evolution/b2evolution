@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 global $Settings;
 
@@ -80,6 +80,9 @@ function cat_line( $Chapter, $level )
 	}
 	$r .= '<td class="center">'.$makedef_icon.'</td>';
 
+	// Image:
+	$r .= '<td>'.$Chapter->get_image_tag().'</td>';
+
 	// Name
 	if( $permission_to_edit )
 	{	// We have permission permission to edit:
@@ -102,7 +105,7 @@ function cat_line( $Chapter, $level )
 	// Order
 	if( $Chapter->get_parent_subcat_ordering() == 'manual' )
 	{ // Manual ordering
-		$r .= '<td class="center cat_order_edit" rel="'.$Chapter->ID.'">'
+		$r .= '<td class="center jeditable_cell cat_order_edit" rel="'.$Chapter->ID.'">'
 						.'<a href="#">'.( $Chapter->get( 'order' ) === NULL ? '-' : $Chapter->dget( 'order' ) ).'</a>'
 					.'</td>';
 	}
@@ -166,8 +169,8 @@ function cat_line( $Chapter, $level )
 		{ // If moving cats between blogs is allowed:
 			$r .= action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=move' ), T_('Move') );
 		}
-		$r .= action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
-					.action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete&amp;'.url_crumb('element') ) );
+		$r .= action_icon( T_('New').'...', 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
+					.action_icon( T_('Delete').'...', 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete&amp;'.url_crumb('element') ) );
 	}
 	$r .= '</td>';
 	$r .=	'</tr>';
@@ -233,6 +236,10 @@ $Table->cols[] = array(
 					);
 $Table->cols[] = array(
 						'th' => T_('Default'),
+						'th_class' => 'shrinkwrap',
+					);
+$Table->cols[] = array(
+						'th' => T_('Image'),
 						'th_class' => 'shrinkwrap',
 					);
 $Table->cols[] = array(
@@ -343,7 +350,7 @@ $Session->delete( 'fadeout_array');
 // Print JS to edit order of the chapters inline
 echo_editable_column_js( array(
 	'column_selector' => '.cat_order_edit',
-	'ajax_url'        => get_secure_htsrv_url().'async.php?action=cat_order_edit&blogid='.$Blog->ID.'&'.url_crumb( 'catorder' ),
+	'ajax_url'        => get_htsrv_url().'async.php?action=cat_order_edit&blogid='.$Blog->ID.'&'.url_crumb( 'catorder' ),
 	'new_field_name'  => 'new_cat_order',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
 	'ID_name'         => 'cat_ID',

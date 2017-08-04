@@ -30,7 +30,7 @@ class LinkComment extends LinkOwner
 	 */
 	function __construct( $edited_Comment )
 	{
-		parent::__construct( $edited_Comment, 'comment' );
+		parent::__construct( $edited_Comment, 'comment', 'cmt_ID' );
 		$this->Comment = & $this->link_Object;
 
 		$this->_trans = array(
@@ -39,7 +39,7 @@ class LinkComment extends LinkOwner
 			'The file will be linked for download at the end of the xxx' => NT_( 'The file will be linked for download at the end of the comment.' ),
 			'Insert the following code snippet into your xxx' => NT_( 'Insert the following code snippet into your comment.' ),
 			'View this xxx...' => NT_( 'View this comment...' ),
-			'Edit this xxx...' => NT_( 'Edit this comment...' ),
+			'Edit this xxx...' => NT_( 'Edit this comment' ).'...',
 			'Link files to current xxx' => NT_( 'Link files to current comment' ),
 			'Selected files have been linked to xxx.' => NT_( 'Selected files have been linked to comment.' ),
 			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from the &laquo;Comment&raquo;.' ),
@@ -66,9 +66,10 @@ class LinkComment extends LinkOwner
 	/**
 	 * Get all positions ( key, display name ) pairs where link can be displayed
 	 *
+	 * @param integer File ID
 	 * @return array
 	 */
-	function get_positions()
+	function get_positions( $file_ID = NULL )
 	{
 		// Should be ordered like the ENUM.
 		return array(
@@ -115,7 +116,8 @@ class LinkComment extends LinkOwner
 			$FileCache = & get_FileCache();
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
-			syslog_insert( sprintf( 'File %s was linked to %s with ID=%s', '<b>'.$file_name.'</b>', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
+			$file_dir = $File->dir_or_file( 'Directory', 'File' );
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', $file_dir, '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
 			if( $update_owner )
 			{ // Update last touched date of the Comment & Item
@@ -140,12 +142,6 @@ class LinkComment extends LinkOwner
 		}
 	}
 
-	/**
-	 * Get where condition for select query to get Comment links
-	 */
-	function get_where_condition() {
-		return 'link_cmt_ID = '.$this->Comment->ID;
-	}
 
 	/**
 	 * Get Comment parameter

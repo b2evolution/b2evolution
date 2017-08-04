@@ -138,16 +138,20 @@ siteskin_include( '_site_body_header.inc.php' );
 
 			<span class="nav_album_title">
 				<?php
+					// Flag:
+					$single_Item->flag();
+
+					// Title:
 					$single_Item->title( array(
 							'link_type' => 'permalink',
 							'before'    => '',
 							'after'     => '',
 						) );
 				?>
-				<?php 	
+				<?php
 					if( $Skin->enabled_status_banner( $single_Item->status ) )
 					{ // Status banner
-						$single_Item->format_status( array( 'template' => '<div class="evo_status evo_status__$status$ badge">$status_title$</div>' ) );						
+						$single_Item->format_status( array( 'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>' ) );
 					}
 					$single_Item->edit_link( array( // Link to backoffice for editing
 							'before'    => '',
@@ -157,7 +161,7 @@ siteskin_include( '_site_body_header.inc.php' );
 						) );
 				?>
 			</span><!-- .nav_album_title -->
-		
+
 			<?php
 				// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 				item_prevnext_links( array(
@@ -177,14 +181,14 @@ siteskin_include( '_site_body_header.inc.php' );
 					) );
 				// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 			?>
-		
+
 			<div class="clear"></div>
-			
+
 			</nav><!-- .nav_album -->
 			</div><!-- .col -->
 		</div><!-- .row -->
 		<?php
-		} // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) ------------------- 
+		} // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) -------------------
 	?>
 
 	<?php
@@ -195,8 +199,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
-		
-	<article class="row">	
+
+	<article class="row">
 
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
@@ -233,13 +237,12 @@ siteskin_include( '_site_body_header.inc.php' );
 			<div class="evo_container evo_container__item_single">
 				<?php
 				// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-				// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 				// Display container contents:
 				skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 					'widget_context' => 'item',	// Signal that we are displaying within an Item
 					// The following (optional) params will be used as defaults for widgets included in this container:
 					// This will enclose each widget in a block:
-					'block_start' => '<div class="$wi_class$">',
+					'block_start' => '<div class="evo_widget $wi_class$">',
 					'block_end' => '</div>',
 					// This will enclose the title of each widget:
 					'block_title_start' => '<h3>',
@@ -254,6 +257,9 @@ siteskin_include( '_site_body_header.inc.php' );
 							'image_size'             => '', // Do not display images in content block - Image is handled separately
 							'url_link_text_template' => '', // link will be displayed (except player if podcast)
 						),
+						// Template params for "Item Link" widget
+						'widget_item_link_before'    => '<p class="evo_post_link">',
+						'widget_item_link_after'     => '</p>',
 				) );
 				// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 				?>
@@ -265,7 +271,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					skin_include( '_item_feedback.inc.php', array(
 							'before_section_title' => '<h4>',
 							'after_section_title'  => '</h4>',
-							'author_link_text'     => 'preferredname',
+							'author_link_text'     => 'auto',
 							'comment_image_size'   => 'fit-256x256',
 							// Pagination:
 							'pagination' => array(
@@ -286,18 +292,24 @@ siteskin_include( '_site_body_header.inc.php' );
 				?>
 
 				<?php
+				if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+				{	// We are running at least b2evo 6.7, so we can include this file:
 					// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
 					skin_include( '_item_workflow.inc.php' );
 					// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+				}
 				?>
 
 				<?php
+				if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+				{	// We are running at least b2evo 6.7, so we can include this file:
 					// ------------------ META COMMENTS INCLUDED HERE ------------------
 					skin_include( '_item_meta_comments.inc.php', array(
 							'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 							'comment_end'           => '</article>',
 						) );
 					// ---------------------- END OF META COMMENTS ---------------------
+				}
 				?>
 			</div>
 
@@ -322,7 +334,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<div class="evo_container evo_container__footer">
 		<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
@@ -382,7 +394,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

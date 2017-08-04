@@ -163,7 +163,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
 					'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
-					'author_link_text'     => 'preferredname',
+					'author_link_text'     => 'auto',
 					'item_class'           => 'evo_post evo_content_block',
 					'item_type_class'      => 'evo_post__ptyp_',
 					'item_status_class'    => 'evo_post__',
@@ -210,7 +210,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<div class="evo_container evo_container__footer">
 		<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',

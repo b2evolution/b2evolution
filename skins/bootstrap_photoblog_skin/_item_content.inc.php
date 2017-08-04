@@ -41,9 +41,8 @@ $params = array_merge( array(
 		'excerpt_more_text'        => T_('more').' &raquo;',
 
 		// In case we display a full version of the post:
-		'content_start_full_text'  => '<div class="evo_post__full_text panel-body">',
-		'content_start_full_text_intro'  => '<div class="evo_post__full_text">',
-		'content_end_full_text'    => '</div>',
+		'content_start_full_text'  => '<section class="evo_post__full"><div class="evo_post__full_text clearfix">',
+		'content_end_full_text'    => '</div></div>',
 
 		'before_content_teaser'    => '',
 		'after_content_teaser'     => '',
@@ -60,8 +59,8 @@ $params = array_merge( array(
 		'image_size'               => 'fit-1280x720',
 		'image_limit'              =>  1000,
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
-		'excerpt_image_class'      => 'img-responsive',
-		'excerpt_image_size'       => 'fit-1280x720',
+		'excerpt_image_class'      => '',
+		'excerpt_image_size'       => 'fit-80x80',
 		'excerpt_image_limit'      => 1,
 		'excerpt_image_link_to'    => 'single',
 		'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
@@ -79,17 +78,11 @@ $params = array_merge( array(
 		'gallery_colls'            => 5,
 		'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 
-		'url_link_position'        => 'top',  // or 'none'
-		'before_url_link'          => '<p class="evo_post_link">'.T_('Link:').' ',
+		'before_url_link'          => '<p class="evo_post_link">'.T_('Link').': ',
 		'after_url_link'           => '</p>',
 		'url_link_text_template'   => '$url$', // If evaluates to empty, nothing will be displayed (except player if podcast)
 		'url_link_url_template'    => '$url$', // $url$ will be replaced with saved URL address
 		'url_link_target'          => '', // Link target attribute e.g. '_blank'
-
-		'parent_link_position'     => 'top',  // or 'none'
-		'parent_link_before'       => '<p class="evo_post_parent">'.T_('Parent').': ',
-		'parent_link_after'        => '</p>',
-		'parent_link_not_found'    => '<i>'.T_('Item not found.').'</i>',
 
 		'before_more_link'         => '<p class="evo_post_more_link">',
 		'after_more_link'          => '</p>',
@@ -97,15 +90,7 @@ $params = array_merge( array(
 		'more_link_to'             => 'single#anchor', // Can be 'single' or 'single#anchor' which is permalink + "#more55" where 55 is item ID
 		'anchor_text'              => '<p class="evo_post_more_anchor">...</p>', // Text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 
-		'limit_attach'             => 1000,
-		'attach_list_start'        => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
-		'attach_list_end'          => '</ul></div>',
-		'attach_start'             => '<li class="evo_file">',
-		'attach_end'               => '</li>',
-		'before_attach_size'       => ' <span class="evo_file_size">(',
-		'after_attach_size'        => ')</span>',
-
-		'page_links_start'         => '<p class="evo_post_pagination">'.T_('Pages:').' ',
+		'page_links_start'         => '<p class="evo_post_pagination">'.T_('Pages').': ',
 		'page_links_end'           => '</p>',
 		'page_links_separator'     => '&middot; ',
 		'page_links_single'        => '',
@@ -133,6 +118,7 @@ if( $content_mode == 'auto' )
 	switch( $disp_detail )
 	{
 		case 'posts-cat':
+		case 'posts-topcat':
 		case 'posts-subcat':
 			$content_mode = $Blog->get_setting('chapter_content');
 			break;
@@ -196,7 +182,7 @@ switch( $content_mode )
 	case 'normal':
 	default:
 		// Normal dislpay:  (and Full display if force_more is true)
-		
+
 		/* This is written in _item.block.inc.php
 		if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
 			echo $params['content_start_full'];
@@ -207,36 +193,10 @@ switch( $content_mode )
 
 		if( $params['content_display_full'] )
 		{	// We want to display text, not just images:
-	
-			/* This is written in _item.block.inc.php
+
+			/* This is written in _item.block.inc.php */
 			if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
 				echo $params['content_start_full_text'];
-			} else {
-				echo $params['content_start_full_text_intro'];
-			}
-			*/
-
-			// URL link, if the post has one:
-			if( $params['url_link_position'] == 'top' )
-			{
-				$Item->url_link( array(
-						'before'        => $params['before_url_link'],
-						'after'         => $params['after_url_link'],
-						'text_template' => $params['url_link_text_template'],
-						'url_template'  => $params['url_link_url_template'],
-						'target'        => $params['url_link_target'],
-						'podcast'       => '#', // Auto display mp3 player if post type is podcast (=> false, to disable)
-					) );
-			}
-
-			// Parent link, if the post has one:
-			if( $params['parent_link_position'] == 'top' )
-			{
-				$Item->parent_link( array(
-						'before'         => $params['parent_link_before'],
-						'after'          => $params['parent_link_after'],
-						'not_found_text' => $params['parent_link_not_found'],
-					) );
 			}
 
 			// Display CONTENT (at least the TEASER part):
@@ -299,27 +259,6 @@ switch( $content_mode )
 			// echo $params['content_end_full_text'];  <-- We want to show this after the content footer in _item.block.inc.php
 		}
 
-		if( ! empty($params['limit_attach'])
-			&& ( $more || ! $Item->has_content_parts($params) ) )
-		{	// Display attachments/files that are linked to this post:
-			$Item->files( array(
-					'before' =>              $params['attach_list_start'],
-					'before_attach' =>       $params['attach_start'],
-					'before_attach_size' =>  $params['before_attach_size'],
-					'after_attach_size' =>   $params['after_attach_size'],
-					'after_attach' =>        $params['attach_end'],
-					'after' =>               $params['attach_list_end'],
-					'limit_attach' =>        $params['limit_attach'],
-				) );
-		}
-
-		// Display location info
-		$Item->location( '<div class="evo_post_location"><strong>'.T_('Location').': </strong>', '</div>' );
-
-		if( $disp == 'single' )
-		{	// Display custom fields
-			$Item->custom_fields();
-		}
 
 		// echo $params['content_end_full']; <-- We want to show this after the content footer in _item.block.inc.php
 }

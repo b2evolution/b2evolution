@@ -3,12 +3,6 @@
  * These are the default styles that are used INSIDE of a blog post.
  * Override this with an item.css file in your skin folder.
  */
-blockquote {
-  border: 2px dotted #ccc;
-  background-color: #eee;
-  margin: 1em 2em;
-  padding: 0 1ex;
-}
 pre {
   overflow: hidden;
 }
@@ -46,7 +40,7 @@ div.codeblock pre {
 p.codeblock_title,
 .bText p.codeblock_title {
   font-family: Verdana, sans-serif;
-  letter-spacing: 110%;
+  letter-spacing: 0.1em;
   line-height: 95%;
   font-weight: bold;
   font-size: 72%;
@@ -60,6 +54,17 @@ div.videoblock {
   text-align: center;
   margin: auto;
   overflow: auto;
+  position: relative;
+  max-width: 100%;
+  height: 0;
+  padding-bottom: 56.25%;
+}
+div.videoblock iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 div.podplayer {
   margin: 1em 0;
@@ -70,6 +75,6 @@ div.podplayer {
 .bMore a {
   font-weight: bold;
 }
-span.NonExistentWikiWord {
-  border-bottom: 1px dotted #ccc;
+.evo_shortlink_broken {
+  border-bottom: 1px dotted #F00;
 }

@@ -50,11 +50,11 @@ if( $demo_mode && ( $current_User->ID <= 3 ) )
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'user' );
 
-$Blog = NULL;
+$Collection = $Blog = NULL;
 if( $blog > 0 )
 { // Get Blog
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 }
 
 switch( $action )
@@ -144,17 +144,18 @@ switch( $action )
 		$result = $current_User->crop_avatar( $file_ID, $image_crop_data[0], $image_crop_data[1], $image_crop_data[2], $image_crop_data[3] );
 		if( $result !== true )
 		{ // If error on crop action then redirect to avatar profile page
-			header_redirect( $redirect_to );
+			header_redirect( get_user_avatar_url() );
 		}
 		break;
 
 	case 'report_user':
 		// Report an user
+		$user_ID = param( 'user_ID', 'integer', 0 );
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! $current_User->check_status( 'can_report_user' ) )
+		if( ! $current_User->check_status( 'can_report_user', $user_ID ) )
 		{ // current User status doesn't allow user reporting
 			// Redirect to the account activation page
 			$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
@@ -164,7 +165,6 @@ switch( $action )
 
 		$report_status = param( 'report_user_status', 'string', '' );
 		$report_info = param( 'report_info_content', 'text', '' );
-		$user_ID = param( 'user_ID', 'integer', 0 );
 
 		$user_tab = param( 'user_tab', 'string' );
 		if( get_report_status_text( $report_status ) == '' )
@@ -209,11 +209,12 @@ switch( $action )
 
 	case 'remove_report':
 		// Remove current User report from the given user
+		$user_ID = param( 'user_ID', 'integer', 0 );
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! $current_User->check_status( 'can_report_user' ) )
+		if( ! $current_User->check_status( 'can_report_user', $user_ID ) )
 		{ // current User status doesn't allow user reporting
 			// Redirect to the account activation page
 			$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
@@ -221,7 +222,6 @@ switch( $action )
 			// will have exited
 		}
 
-		$user_ID = param( 'user_ID', 'integer', 0 );
 		$user_tab = param( 'user_tab', 'string' );
 
 		remove_report_from( $user_ID );
@@ -304,7 +304,7 @@ elseif( ! param_errors_detected() )
 			break;
 		case 'upload_avatar':
 			// Redirect to display user profile form
-			$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=profile', '&' );
+			$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=avatar', '&' );
 			break;
 	}
 	if( !empty( $redirect_to ) )
@@ -332,7 +332,14 @@ else
 	$Skin = & $SkinCache->get_by_ID( $Blog->get_skin_ID() );
 	$skin = $Skin->folder;
 	$ads_current_skin_path = $skins_path.$skin.'/';
-	require $ads_current_skin_path.'index.main.php';
+	if( ! empty( $disp ) && file_exists( $ads_current_skin_path.$disp.'.main.php' ) )
+	{	// Call custom file for profile disp if it exists:
+		require $ads_current_skin_path.$disp.'.main.php';
+	}
+	else
+	{	// Call index main skin file to display a profile disp:
+		require $ads_current_skin_path.'index.main.php';
+	}
 }
 
 ?>

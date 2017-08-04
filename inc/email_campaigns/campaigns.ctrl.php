@@ -212,7 +212,8 @@ switch( $action )
 		break;
 
 	case 'send':
-		// Send newsletter email for all users of this campaign
+	case 'create_cron':
+		// Send newsletter email for all users of this campaign OR create cron job to do this later:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'campaign' );
@@ -232,13 +233,45 @@ switch( $action )
 			break;
 		}
 
-		// Execute a sending in template to display report in real time
-		$template_action = 'send_campaign';
+		if( $Settings->get( 'email_campaign_send_mode' ) == 'cron' )
+		{	// Asynchronous sending mode:
 
-		// Try to obtain some serious time to do some serious processing (15 minutes)
-		set_max_execution_time( 900 );
-		// Turn off the output buffering to do the correct work of the function flush()
-		@ini_set( 'output_buffering', 'off' );
+			// Create a scheduled job to send newsletters of this email campaign:
+			$edited_EmailCampaign->create_cron_job();
+		}
+		else
+		{	// Immediate sending mode:
+
+			// Execute a sending in template to display report in real time
+			$template_action = 'send_campaign';
+
+			// Try to obtain some serious time to do some serious processing (15 minutes)
+			set_max_execution_time( 900 );
+			// Turn off the output buffering to do the correct work of the function flush()
+			@ini_set( 'output_buffering', 'off' );
+		}
+		break;
+
+	case 'view_cron':
+		// Redirect to view cron job of the email campaign:
+
+		if( ! ( $email_campaign_Cronjob = & $edited_EmailCampaign->get_Cronjob() ) )
+		{	// No cron job found:
+			$action = 'edit';
+			$tab = param( 'current_tab', 'string' );
+			break;
+		}
+
+		if( $current_User->check_perm( 'options', 'view' ) )
+		{	// No access to view cron jobs:
+			$Messages->add( T_('Sorry, you don\'t have permission to view scheduled jobs.' ), 'warning' );
+			$action = 'edit';
+			$tab = param( 'current_tab', 'string' );
+			break;
+		}
+
+		header_redirect( $admin_url.'?ctrl=crontab&action=view&cjob_ID='.$email_campaign_Cronjob->ID, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 }
 
@@ -301,6 +334,18 @@ if( $action == 'edit' )
 	{
 		$AdminUI->breadcrumbpath_add( $campaign_edit_modes[ $tab ]['text'], $campaign_edit_modes[ $tab ]['href'] );
 	}
+
+	if( $tab == 'compose' )
+	{	// Require colorbox js:
+		require_js_helper( 'colorbox' );
+		// Require Fine Uploader js and css:
+		init_fineuploader_js_lang_strings();
+		require_js( 'multiupload/fine-uploader.js' );
+		require_css( 'fine-uploader.css' );
+		// Load JS files to make the links table sortable:
+		require_js( '#jquery#' );
+		require_js( 'jquery/jquery.sortable.min.js' );
+	}
 }
 else
 { // List of campaigns
@@ -342,6 +387,7 @@ switch( $action )
 				break;
 
 			case 'send':
+			case 'create_cron':
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_send.form.php' );
 				break;
 		}

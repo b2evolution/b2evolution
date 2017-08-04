@@ -98,7 +98,7 @@ function _wp_mw_newmediaobject($m)
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -175,7 +175,7 @@ function _wp_mw_newmediaobject($m)
 		if( $error = validate_dirname($filepath_part) )
 		{	// invalid relative path:
 			logIO( $error );
-			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$filepath_part.'</b>' ), 'warning', 'file' );
+			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$filepath_part.']]' ), 'warning', 'file' );
 			return xmlrpcs_resperror( 6, $error );
 		}
 
@@ -364,7 +364,7 @@ function _wp_mw_get_item_struct( & $Item )
 	if( isset($Item->parent_ID) )
 	{
 		$ItemCache = & get_ItemCache();
-		if( $parent_Item = & $ItemCache->get_by_ID( $Item->parent_ID, false, false ) );
+		if( $parent_Item = & $ItemCache->get_by_ID( $Item->parent_ID, false, false ) )
 		{
 			$parent_title = $parent_Item->title;
 		}
@@ -607,7 +607,7 @@ function _b2_or_mt_get_categories( $type, $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -661,7 +661,7 @@ function _wp_mw_getcategories( $m, $params = array() )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Not found the selected blog, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -802,7 +802,7 @@ function & xmlrpcs_get_Blog( $m, $id_param )
 	/**
 	 * @var Blog
 	 */
-	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 
 	if( empty( $Blog ) )
 	{	// Blog not found
@@ -1005,7 +1005,7 @@ function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
  */
 function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 {
-	global $DB, $Plugins, $Messages, $Hit, $localtimenow, $require_name_email, $minimum_comment_interval;
+	global $DB, $Plugins, $Messages, $Hit, $localtimenow;
 
 	$params = array_merge( array(
 			'password'			=> '',
@@ -1044,27 +1044,28 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 			$url = NULL;
 		}
 
-		// we need some id info from the anonymous user:
-		if( $require_name_email )
-		{ // We want Name and EMail with comments
-			if( empty($author) )
-			{
-				return xmlrpcs_resperror( 5, T_('Please fill in your name.') );
-			}
-			if( empty($email) )
-			{
-				return xmlrpcs_resperror( 5, T_('Please fill in your email.') );
-			}
+		// We need some id info from the anonymous user:
+		if( $commented_Item->Blog->get_setting( 'require_anon_name' ) && empty( $author ) )
+		{	// Author name is required for anonymous users:
+			return xmlrpcs_resperror( 5, T_('Please fill in your name.') );
+		}
+		if( $commented_Item->Blog->get_setting( 'require_anon_email' ) && empty( $email ) )
+		{	// Author email address is required for anonymous users:
+			return xmlrpcs_resperror( 5, T_('Please fill in your email.') );
 		}
 
-		if( !empty($author) && antispam_check( $author ) )
+		if( !empty($author) && ( $block = antispam_check( $author ) ) )
 		{
+			// Log incident in system log
+			syslog_insert( sprintf( 'Antispam: Supplied name "%s" contains blacklisted word "%s".', $author, $block ), 'error', 'comment', $commented_Item->ID );
 			return xmlrpcs_resperror( 5, T_('Supplied name is invalid.') );
 		}
 
 		if( !empty($email)
-			&& ( !is_email($email)|| antispam_check( $email ) ) )
+			&& ( !is_email($email)|| ( $block = antispam_check( $email ) ) ) )
 		{
+			// Log incident in system log
+			syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $email, $block ), 'error', 'comment', $commented_Item->ID );
 			return xmlrpcs_resperror( 5, T_('Supplied email address is invalid.') );
 		}
 
@@ -1109,34 +1110,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 		return xmlrpcs_resperror( 5, T_('Please do not send empty comments.') );
 	}
 
-	$now = date2mysql($localtimenow);
-
-	/*
-	 * Flood-protection
-	 * NOTE: devs can override the flood protection delay in /conf/_overrides_TEST.php
-	 * TODO: Put time check into query?
-	 * TODO: move that as far !!UP!! as possible! We want to waste minimum resources on Floods
-	 * TODO: have several thresholds. For example:
-	 * 1 comment max every 30 sec + 5 comments max every 10 minutes + 15 comments max every 24 hours
-	 * TODO: factorize with trackback
-	 */
-	$query = 'SELECT MAX(comment_date)
-				FROM T_comments
-				WHERE comment_author_IP = '.$DB->quote( $Hit->IP ).'
-				OR comment_author_email = '.$DB->quote( $email );
-	$ok = 1;
-	if( $then = $DB->get_var( $query ) )
-	{
-		$time_lastcomment = mysql2date("U",$then);
-		$time_newcomment = mysql2date("U",$now);
-		if( ($time_newcomment - $time_lastcomment) < $minimum_comment_interval )
-			$ok = 0;
-	}
-	if( !$ok )
-	{
-		return xmlrpcs_resperror( 5, sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ) );
-	}
-	/* end flood-protection */
+	$now = date2mysql( $localtimenow );
 
 	/**
 	 * Create comment object. Gets validated, before recording it into DB:
@@ -1204,7 +1178,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 		// Moderators will get emails about every new comment
 		// Subscribed user will only get emails about new published comments
 		$executed_by_userid = empty( $User ) ? NULL : $User->ID;
-		$Comment->handle_notifications( true, $executed_by_userid );
+		$Comment->handle_notifications( $executed_by_userid, true );
 	}
 	else
 	{
@@ -1281,7 +1255,7 @@ function xmlrpcs_edit_comment( $params = array(), & $edited_Comment )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Comment->handle_notifications( false, $current_User->ID );
+	$edited_Comment->handle_notifications();
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( true, 'boolean' ) );
@@ -1330,7 +1304,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 		}
 
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $main_Chapter->blog_ID, false, false );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $main_Chapter->blog_ID, false, false );
 
 		logIO( 'Requested Blog: '.$Blog->ID.' - '.$Blog->name );
 	}
@@ -1456,7 +1430,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_post_processing( true );
+	$edited_Item->handle_notifications( NULL, true );
 
  	logIO( 'OK.' );
 	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));
@@ -1496,7 +1470,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 			'locale'			=> '',
 		), $params );
 
-	$Blog = & $edited_Item->get_Blog();
+	$Collection = $Blog = & $edited_Item->get_Blog();
 	logIO( 'Requested Blog: '.$Blog->ID.' - '.$Blog->name );
 
 	if( empty($Blog) )
@@ -1653,7 +1627,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_post_processing( false );
+	$edited_Item->handle_notifications();
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
@@ -1917,9 +1891,6 @@ function xmlrpc_get_comments( $params, & $Blog )
 
 	// Filter list:
 	$CommentList->set_filters( $filters, false );
-
-	// Run SQL query to get results depending on current filters:
-	$CommentList->query();
 
 	// Get ready for display (runs the query):
 	$CommentList->display_init();

@@ -40,9 +40,10 @@ class FileRootCache
 	 * and initialize the whole cache at construction time
 	 *
 	 * @param string Special file root ID (Used e.g. to view file root of the special user)
+	 * @param string Collection filter: 'favorite' - to get only favorite collections for current user
 	 * @return array of FileRoots (key being the FileRoot's ID)
 	 */
-	static function get_available_FileRoots( $special_root_ID = NULL )
+	static function get_available_FileRoots( $special_root_ID = NULL, $coll_filter = NULL )
 	{
 		global $current_User;
 		global $collections_Module;
@@ -53,7 +54,7 @@ class FileRootCache
 
 		if( ! empty( $special_root_ID ) &&
 		    ( $special_FileRoot = & $FileRootCache->get_by_ID( $special_root_ID, true ) ) &&
-		    $current_User->check_perm( 'files', 'edit_allowed', false, $special_FileRoot ) )
+		    $current_User->check_perm( 'files', 'view', false, $special_FileRoot ) )
 		{ // Try to add special file root if current user has an access
 			$r[ $special_FileRoot->ID ] = & $special_FileRoot;
 		}
@@ -68,7 +69,7 @@ class FileRootCache
 		if( isset($collections_Module) )
 		{	// Blog/collection media dirs:
 			$BlogCache = & get_BlogCache();
-			$bloglist = $BlogCache->load_user_blogs( 'blog_media_browse', $current_User->ID );
+			$bloglist = $BlogCache->load_user_blogs( 'blog_media_browse', 'view', NULL, '', '', NULL, $coll_filter );
 			foreach( $bloglist as $blog_ID )
 			{
 				if( $Root = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_ID, true ) )
@@ -85,8 +86,8 @@ class FileRootCache
 			$r[ $shared_FileRoot->ID ] = & $shared_FileRoot;
 		}
 
-		if( isset($collections_Module) )
-		{ // Skins root:
+		if( isset( $collections_Module ) && ! get_param( 'link_type' ) && ! get_param( 'link_object_ID' ) && ! get_param( 'user_ID' ) )
+		{ // Skins root, Don't allow files of this root to link to objects:
 			$skins_FileRoot = & $FileRootCache->get_by_type_and_ID( 'skins', 0, false );
 			if( $skins_FileRoot )
 			{ // We got a skins dir:

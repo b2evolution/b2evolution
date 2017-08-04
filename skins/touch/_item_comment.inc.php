@@ -19,7 +19,7 @@ $params = array_merge( array(
 		'comment_start'        => '<div class="bComment">',
 		'comment_end'          => '</div>',
 		'link_to'              => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-		'author_link_text'     => 'preferredname',
+		'author_link_text'     => 'auto',
 		'before_image'         => '<div class="image_block">',
 		'before_image_legend'  => '<div class="image_legend">',
 		'after_image_legend'   => '</div>',
@@ -66,7 +66,7 @@ $Comment = & $params['Comment'];
 			if( $Comment->status != 'published' )
 			{
 				$Comment->format_status( array(
-						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 					) );
 			}
 			$Comment->rating();
@@ -78,8 +78,8 @@ $Comment = & $params['Comment'];
 			<?php
 				$comment_Item = & $Comment->get_Item();
 				$Comment->vote_helpful( '', '', '&amp;', true, true );
-				$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); /* Link to backoffice for editing */
-				$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', rawurlencode( $comment_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
+				$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, $Comment->get_permanent_url() ); /* Link to backoffice for editing */
+				$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', $comment_Item->get_permanent_url() ); /* Link to backoffice for deleting */
 				$Comment->reply_link(); /* Link for replying to the Comment */
 			?>
 		</div>

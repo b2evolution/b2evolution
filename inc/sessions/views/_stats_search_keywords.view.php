@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 load_class( '/sessions/model/_goal.class.php', 'Goal' );
 load_funcs('/cron/_cron.funcs.php');
 
-global $blog, $admin_url, $rsc_url, $goal_ID, $localtimenow;
+global $blog, $sec_ID, $admin_url, $rsc_url, $goal_ID, $localtimenow;
 global $datestartinput, $datestart, $datestopinput, $datestop;
 
 if( param_date( 'datestartinput', T_('Invalid date'), false,  NULL ) !== NULL )
@@ -72,17 +72,17 @@ else
 	}
 
 	$SQL = new SQL();
-	if( empty( $goal_ID ) && empty($goal_name)  )
+	if( empty( $goal_ID ) && empty( $goal_name )  )
 	{	// We're not restricting to one or more Goals, get ALL possible keyphrases:
 		$SQL->FROM( 'T_track__keyphrase INNER JOIN T_hitlog ON keyp_ID = hit_keyphrase_keyp_ID' );
 		// Date param applies to serach hit
-		if( !empty($datestart) )
+		if( ! empty( $datestart ) )
 		{
-			$SQL->WHERE_and( 'T_hitlog.hit_datetime >= '.$DB->quote($datestart.' 00:00:00') );
+			$SQL->WHERE_and( 'T_hitlog.hit_datetime >= '.$DB->quote( $datestart.' 00:00:00' ) );
 		}
-		if( !empty($datestop) )
+		if( ! empty( $datestop ) )
 		{
-			$SQL->WHERE_and( 'T_hitlog.hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
+			$SQL->WHERE_and( 'T_hitlog.hit_datetime <= '.$DB->quote( $datestop.' 23:59:59' ) );
 		}
 	}
 	else
@@ -101,17 +101,17 @@ else
 		else
 		{
 			$SQL->FROM_add( 'INNER JOIN T_track__goal ON goal_ID = ghit_goal_ID' );
-			$SQL->WHERE_and( 'goal_name LIKE '.$DB->quote($goal_name.'%') );
+			$SQL->WHERE_and( 'goal_name LIKE '.$DB->quote( $goal_name.'%' ) );
 		}
 
 		// Date param applies to goal hit
-		if( !empty($datestart) )
+		if( ! empty( $datestart ) )
 		{
-			$SQL->WHERE_and( 'goalhit_hit.hit_datetime >= '.$DB->quote($datestart.' 00:00:00') );
+			$SQL->WHERE_and( 'goalhit_hit.hit_datetime >= '.$DB->quote( $datestart.' 00:00:00' ) );
 		}
-		if( !empty($datestop) )
+		if( ! empty( $datestop ) )
 		{
-			$SQL->WHERE_and( 'goalhit_hit.hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
+			$SQL->WHERE_and( 'goalhit_hit.hit_datetime <= '.$DB->quote( $datestop.' 23:59:59' ) );
 		}
 	}
 	$SQL->WHERE_and( 'hit_agent_type = "browser"' );
@@ -124,14 +124,19 @@ else
 		$SQL->GROUP_BY( 'keyp_ID' );
 	}
 
-	if( ! empty($blog) )
-	{
+	if( ! empty( $sec_ID ) )
+	{	// Filter by section:
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON T_hitlog.hit_coll_ID = blog_ID' );
+		$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
+	}
+	if( ! empty( $blog ) )
+	{	// Filter by collection:
 		$SQL->WHERE_and( 'T_hitlog.hit_coll_ID = '.$blog );
 	}
 
 	// COUNT:
 	$SQL->SELECT( 'keyp_ID' );
-	if( empty( $goal_ID ) && empty($goal_name) )
+	if( empty( $goal_ID ) && empty( $goal_name ) )
 	{	// We're not restricting to a Goal
 		$SQL->SELECT_add( ', COUNT(DISTINCT hit_remote_addr) as count' );
 	}
@@ -188,15 +193,20 @@ function filter_keyphrases( & $Form )
 
 	$Form->text_input( 'goal_name', get_param('goal_name'), 20, T_('Goal names starting with'), '', array( 'maxlength'=>50 ) );
 
- 	$Form->checkbox_basic_input( 'split_engines', get_param('split_engines'), /* TRANS: split search engines in results table */ T_('Split search engines') );
+	$Form->checkbox_basic_input( 'split_engines', get_param('split_engines'), /* TRANS: split search engines in results table */ T_('Split search engines') );
 }
+
+// Initialize params to filter by selected collection and/or group:
+$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
+
 $today = date( 'Y-m-d', $localtimenow );
 $Results->filter_area = array(
 	'callback' => 'filter_keyphrases',
 	'url_ignore' => 'goal_ID,datestartinput,datestart,datestopinput,datestop,goal_name,split_engines',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords&amp;blog='.$blog ),
-		'today' => array( T_('Today'), '?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords&amp;blog='.$blog
+		'all' => array( T_('All'), '?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords'.$section_params ),
+		'today' => array( T_('Today'), '?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords'.$section_params
 																	.'&amp;datestart='.$today.'&amp;datestop='.$today ),
 		)
 	);

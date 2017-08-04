@@ -257,7 +257,7 @@ class DataObjectCache
 	{
 		global $DB, $Debuglog;
 
-		if( is_a($Debuglog, 'Log') )
+		if( $Debuglog instanceof Log )
 		{
 			$sql_where = trim($SQL->get_where(''));
 			if( empty($sql_where) )
@@ -343,8 +343,11 @@ class DataObjectCache
 
 	/**
 	 * Add a dataobject to the cache
+	 *
+	 * @param object Object to add in cache
+	 * @return boolean TRUE on adding, FALSE on wrong object or if it is already in cache
 	 */
-	function add( & $Obj )
+	function add( $Obj )
 	{
 		global $Debuglog;
 
@@ -364,9 +367,9 @@ class DataObjectCache
 
 		// If the object is valid and not already cached:
 		// Add object to cache:
-		$this->cache[$Obj->ID] = & $Obj;
+		$this->cache[$Obj->ID] = $Obj;
 		// Add a reference in the object list:
-		$this->DataObject_array[] = & $Obj;
+		$this->DataObject_array[] = $Obj;
 		// Add the ID to the list of IDs
 		$this->ID_array[] = $Obj->ID;
 
@@ -524,7 +527,7 @@ class DataObjectCache
 	 * @param integer ID of object to load
 	 * @param boolean true if function should die on error
 	 * @param boolean true if function should die on empty/null
-	 * @return DataObject reference on cached object or NULL if not found
+	 * @return object|NULL|boolean Reference on cached object, NULL - if request with empty ID, FALSE - if requested object does not exist
 	 */
 	function & get_by_ID( $req_ID, $halt_on_error = true, $halt_on_empty = true )
 	{
@@ -533,7 +536,7 @@ class DataObjectCache
 		$req_ID = intval( $req_ID );
 
 		if( empty( $req_ID ) )
-		{
+		{	// Don't allow request with empty ID:
 			if( $halt_on_empty )
 			{
 				debug_die( "Requested $this->objtype from $this->dbtablename without ID!" );
@@ -596,7 +599,7 @@ class DataObjectCache
 	 * @param integer ID of object to load
 	 * @param boolean true if function should die on error
 	 * @param boolean true if function should die on empty/null
-	 * @return reference on cached object
+	 * @return object|NULL|boolean Reference on cached object, NULL - if request with empty name, FALSE - if requested object does not exist
 	 */
 	function & get_by_name( $req_name, $halt_on_error = true, $halt_on_empty = true )
 	{
@@ -607,9 +610,12 @@ class DataObjectCache
 			debug_die( 'DataObjectCache::get_by_name() : No name field to query on' );
 		}
 
-		if( empty($req_name) )
-		{
-			if($halt_on_empty) { debug_die( "Requested $this->objtype from $this->dbtablename without name!" ); }
+		if( empty( $req_name ) )
+		{	// Don't allow request with empty name:
+			if( $halt_on_empty )
+			{
+				debug_die( "Requested $this->objtype from $this->dbtablename without name!" );
+			}
 			$r = NULL;
 			return $r;
 		}
@@ -627,7 +633,6 @@ class DataObjectCache
 			{	// Object is not already in cache:
 				$Debuglog->add( 'Adding to cache...', 'dataobjects' );
 				//$Obj = new $this->objtype( $row ); // COPY !!
-				//if( ! $this->add( $this->new_obj( $db_row ) ) )
 				if( ! $this->add( $this->new_obj( $db_row ) ) )
 				{	// could not add
 					$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
@@ -642,50 +647,9 @@ class DataObjectCache
 			{
 				debug_die( "Requested $this->objtype does not exist!" );
 			}
-			$r = NULL;
+			$r = false;
 			return $r;
 		}
-
-/* fp> code below  by blueyed, undocumented, except for cache insertion in instantiate which is self labeled as dirty
-		if( isset($this->cache_name[$req_name]) )
-		{
-			return $this->cache_name[$req_name];
-		}
-
-		if( ! $this->all_loaded )
-		{
-			// Load just the requested object:
-			$Debuglog->add( "Loading <strong>$this->objtype($req_name)</strong>", 'dataobjects' );
-			$SQL = $this->get_SQL_object();
-			$SQL->WHERE_and($this->name_field.' = '.$DB->quote($req_name));
-
-			if( $db_row = $DB->get_row( $SQL->get(), OBJECT, 0, 'DataObjectCache::get_by_name()' ) )
-			{
-				$resolved_ID = $db_row->{$this->dbIDname};
-				$Debuglog->add( 'success; ID = '.$resolved_ID, 'dataobjects' );
-				if( ! isset( $this->cache[$resolved_ID] ) )
-				{	// Object is not already in cache:
-					$Debuglog->add( 'Adding to cache...', 'dataobjects' );
-					//$Obj = new $this->objtype( $row ); // COPY !!
-					//if( ! $this->add( $this->new_obj( $db_row ) ) )
-					if( ! $this->add( $this->new_obj( $db_row ) ) )
-					{	// could not add
-						$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
-					}
-				}
-				$this->cache_name[$req_name] = $this->cache[$resolved_ID];
-				return $this->cache[$resolved_ID];
-			}
-		}
-
-		$Debuglog->add( 'Could not get DataObject by name.', 'dataobjects' );
-		if( $halt_on_error )
-		{
-			debug_die( "Requested $this->objtype does not exist!" );
-		}
-		$r = NULL;
-		return $r;
-*/
 	}
 
 
@@ -896,6 +860,28 @@ class DataObjectCache
 		return $r;
 	}
 
+
+	/**
+	 * Returns option array for Form->cheklist()
+	 *
+	 * Load the cache if necessary
+	 *
+	 * @param string Field name
+	 * @param array IDs to ignore.
+	 * @return array Options
+	 */
+	function get_checklist_options( $field_name, $ignore_IDs = array() )
+	{
+		$options = array();
+
+		$names = $this->get_option_array( $ignore_IDs );
+		foreach( $names as $ID => $name )
+		{
+			$options[] = array( $field_name.'[]', $ID, $name, 0 );
+		}
+
+		return $options;
+	}
 
 
 	/**

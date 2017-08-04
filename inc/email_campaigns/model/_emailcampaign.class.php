@@ -41,6 +41,8 @@ class EmailCampaign extends DataObject
 
 	var $use_wysiwyg = 0;
 
+	var $send_ctsk_ID;
+
 	/**
 	 * @var array|NULL User IDs which assigned for this email campaign
 	 *   'all'    - All users which assigned to this campaign
@@ -80,6 +82,7 @@ class EmailCampaign extends DataObject
 			$this->sent_ts = $db_row->ecmp_sent_ts;
 			$this->renderers = $db_row->ecmp_renderers;
 			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
+			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 		}
 	}
 
@@ -93,6 +96,8 @@ class EmailCampaign extends DataObject
 	{
 		return array(
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_camp_ID', 'msg'=>T_('%d links with users') ),
+				array( 'table'=>'T_links', 'fk'=>'link_ecmp_ID', 'msg'=>T_('%d links to destination email campaigns'),
+						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 			);
 	}
 
@@ -240,6 +245,12 @@ class EmailCampaign extends DataObject
 
 		$email_text = $this->get( 'email_text' );
 
+		// Render inline file tags like [image:123:caption] or [file:123:caption] :
+		$email_text = render_inline_files( $email_text, $this, array(
+				'check_code_block' => true,
+				'image_size'       => 'original',
+			) );
+
 		// This must get triggered before any internal validation and must pass all relevant params.
 		$Plugins->trigger_event( 'EmailFormSent', array(
 				'content'         => & $email_text,
@@ -256,6 +267,7 @@ class EmailCampaign extends DataObject
 
 		// Save plain-text message:
 		$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
+		$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 		$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
 		$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
 		$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
@@ -328,7 +340,7 @@ class EmailCampaign extends DataObject
 		{ // Email title is empty
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter an email title.'), 'error' );
+				$Messages->add_to_group( T_('Please enter an email title for this campaign.'), 'error', T_('Validation errors:') );
 			}
 			$result = false;
 		}
@@ -337,7 +349,7 @@ class EmailCampaign extends DataObject
 		{	// Email message is empty:
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter a text message.'), 'error' );
+				$Messages->add_to_group( T_('Please enter the email text for this campaign.'), 'error', T_('Validation errors:') );
 			}
 			$result = false;
 		}
@@ -346,7 +358,7 @@ class EmailCampaign extends DataObject
 		{ // No users found which wait this newsletter
 			if( $display_messages )
 			{
-				$Messages->add( T_('No recipients found for this campaign.'), 'error' );
+				$Messages->add_to_group( T_('No recipients found for this campaign.'), 'error', T_('Validation errors:') );
 			}
 			$result = false;
 		}
@@ -498,12 +510,12 @@ class EmailCampaign extends DataObject
 		$wait_count = count( $this->users['wait'] );
 		if( $wait_count > 0 )
 		{	// Some recipients still wait this newsletter:
-			$Messages->add( sprintf( T_('Campaign has been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
+			$Messages->add( sprintf( T_('Emails have been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
 					$email_campaign_chunk_size, $email_skip_count, $wait_count ), 'warning' );
 		}
 		else
 		{	// All recipients received this bewsletter:
-			$Messages->add( T_('Campaign has been sent to all recipients.'), 'success' );
+			$Messages->add( T_('Emails have been sent to all recipients of this campaign.'), 'success' );
 		}
 		echo '<br />';
 		$Messages->display();
@@ -544,6 +556,96 @@ class EmailCampaign extends DataObject
 	function set_renderers( $renderers )
 	{
 		return $this->set_param( 'renderers', 'string', implode( '.', $renderers ) );
+	}
+
+
+	/**
+	 * Get current Cronjob of this email campaign
+	 *
+	 * @return object Cronjob
+	 */
+	function & get_Cronjob()
+	{
+		$CronjobCache = & get_CronjobCache();
+
+		$Cronjob = & $CronjobCache->get_by_ID( $this->get( 'send_ctsk_ID' ), false, false );
+
+		return $Cronjob;
+	}
+
+
+	/**
+	 * Create a scheduled job to send newsletters of this email campaign
+	 *
+	 * @param boolean TRUE if cron job should be created to send next chunk of waiting users, FALSE - to create first cron job
+	 */
+	function create_cron_job( $next_chunk = false )
+	{
+		global $Messages, $servertimenow, $current_User;
+
+		if( ! $next_chunk && ( $email_campaign_Cronjob = & $this->get_Cronjob() ) )
+		{	// If we create first cron job but this email campaign already has one:
+			if( $current_User->check_perm( 'options', 'view' ) )
+			{	// If user has an access to view cron jobs:
+				global $admin_url;
+				$Messages->add( sprintf( T_('A scheduled job was already created for this campaign, <a %s>click here</a> to view it.'),
+					'href="'.$admin_url.'?ctrl=crontab&amp;action=view&amp;cjob_ID='.$email_campaign_Cronjob->ID.'" target="_blank"' ), 'error' );
+			}
+			else
+			{	// If user has no access to view cron jobs:
+				$Messages->add( T_('A scheduled job was already created for this campaign.'), 'error' );
+			}
+
+			return false;
+		}
+
+		if( $this->get_users_count( 'wait' ) > 0 )
+		{	// Create cron job only when at least one user is waiting a newsletter of this email campaing:
+			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
+			$email_campaign_Cronjob = new Cronjob();
+
+			$start_datetime = $servertimenow;
+			if( $next_chunk )
+			{	// Send next chunk only after delay:
+				global $Settings;
+				$start_datetime += $Settings->get( 'email_campaign_cron_repeat' );
+			}
+			$email_campaign_Cronjob->set( 'start_datetime', date2mysql( $start_datetime ) );
+
+			// no repeat.
+
+			// key:
+			$email_campaign_Cronjob->set( 'key', 'send-email-campaign' );
+
+			// params: specify which post this job is supposed to send notifications for:
+			$email_campaign_Cronjob->set( 'params', array(
+					'ecmp_ID' => $this->ID,
+				) );
+
+			// Save cronjob to DB:
+			$r = $email_campaign_Cronjob->dbinsert();
+
+			if( ! $r )
+			{	// Error on cron job inserting:
+				return false;
+			}
+
+			// Memorize the cron job ID which is going to handle this email campaign:
+			$this->set( 'send_ctsk_ID', $email_campaign_Cronjob->ID );
+
+			$Messages->add( T_('A scheduled job has been created for this campaign.'), 'success' );
+		}
+		else
+		{	// If no waiting users then don't create a cron job and reset ID of previous cron job:
+			$this->set( 'send_ctsk_ID', NULL, true );
+
+			$Messages->add( T_('No scheduled job has been created for this campaign because it has no waiting recipients.'), 'warning' );
+		}
+
+		// Update the changed email campaing settings:
+		$this->dbupdate();
+
+		return true;
 	}
 }
 

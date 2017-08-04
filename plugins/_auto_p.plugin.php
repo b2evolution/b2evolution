@@ -22,7 +22,7 @@ class auto_p_plugin extends Plugin
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
 	var $priority = 80;
-	var $version = '5.0.0';
+	var $version = '6.9.3';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -497,7 +497,7 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 		$NL_end = '';
 		if( $ignore_NL )
 		{
-			while( $block{0} == "\n" )
+			while( isset( $block{0} ) && $block{0} == "\n" )
 			{
 				$NL_start .= $block{0};
 				$block = substr($block, 1);

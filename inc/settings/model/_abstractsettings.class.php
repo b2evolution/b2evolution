@@ -194,7 +194,7 @@ class AbstractSettings
 			FROM '.$this->db_table_name.(
 				isset( $whereList[0] )
 				? ' WHERE '.implode( ' AND ', $whereList )
-				: '' ) );
+				: '' ), OBJECT, 'Load settings from '.$this->db_table_name );
 
 		switch( $this->count_col_key_names )
 		{
@@ -375,6 +375,34 @@ class AbstractSettings
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Get a ready-to-display member param by its name
+	 *
+	 * Same as disp but don't echo
+	 *
+	 * @param string Name of parameter
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function dget( $parname, $format = 'htmlbody' )
+	{
+		// Note: we call get again because of derived objects specific handlers !
+		return format_to_output( $this->get($parname), $format );
+	}
+
+
+	/**
+	 * Display a member param by its name
+	 *
+	 * @param string Name of parameter
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function disp( $parname, $format = 'htmlbody' )
+	{
+		// Note: we call get again because of derived objects specific handlers !
+		echo format_to_output( $this->get($parname), $format );
 	}
 
 

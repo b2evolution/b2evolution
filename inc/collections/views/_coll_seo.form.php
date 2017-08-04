@@ -74,9 +74,9 @@ $Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(di
 
 	$Form->radio( 'main_content', $edited_Blog->get_setting('main_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
  	$Form->radio( 'permalinks', $edited_Blog->get_setting('permalinks'), array(
@@ -123,7 +123,10 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 			T_('Meta Keywords'), T_('When no meta keywords are provided for an item, use tags instead.') );
 
 	$Form->checkbox( 'tags_open_graph', $edited_Blog->get_setting( 'tags_open_graph' ),
-			T_('Open Graph'), T_('Include open graph tags like og:image and og:type.') );
+			T_('Open Graph'), T_('Open Graph tags').' (og:title, og:url, og:description, og:type and og:image)' );
+
+	$Form->checkbox( 'tags_twitter_card', $edited_Blog->get_setting( 'tags_twitter_card' ),
+			T_('Twitter Card'), T_('Include Twitter Summary card') );
 
 $Form->end_fieldset();
 
@@ -147,9 +150,9 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_s
 
 	$Form->radio( 'archive_content', $edited_Blog->get_setting('archive_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, T_('Posts per page'),
@@ -196,9 +199,9 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 
 	$Form->radio( 'chapter_content', $edited_Blog->get_setting('chapter_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, T_('Posts per page'),
@@ -244,9 +247,9 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('
 
 	$Form->radio( 'tag_content', $edited_Blog->get_setting('tag_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts per page'),
@@ -296,9 +299,9 @@ $Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other_filtere
 
 	$Form->radio( 'filtered_content', $edited_Blog->get_setting('filtered_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 $Form->end_fieldset();
 
@@ -312,9 +315,9 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
 	$Form->radio( '404_response', $edited_Blog->get_setting('404_response'),
 		array(
 				array( '200', T_('200 "OK" response') ),
-				array( '301', T_('301 redirect to main page') ),
-				array( '302', T_('302 redirect to main page') ),
-				array( '303', T_('303 redirect to main page') ),
+				array( '301', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '301' ) ),
+				array( '302', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '302' ) ),
+				array( '303', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '303' ) ),
 				array( '404', T_('404 "Not found" response') ),
 				array( '410', T_('410 "Gone" response') ),
 			), T_('404 "Not Found" response'), true );

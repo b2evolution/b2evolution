@@ -13,8 +13,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $comment_template_counter;
-
 // Default params:
 $params = array_merge( array(
 		'comment_start'         => '<article class="evo_comment panel panel-default">',
@@ -33,7 +31,7 @@ $params = array_merge( array(
 		'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
 		'comment_info_after'    => '</small></footer></div>',
 		'link_to'               => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-		'author_link_text'      => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'      => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'before_image'          => '<figure class="evo_image_block">',
 		'before_image_legend'   => '<figcaption class="evo_image_legend">',
 		'after_image_legend'    => '</figcaption>',
@@ -42,11 +40,6 @@ $params = array_merge( array(
 		'image_class'           => 'img-responsive',
 		'Comment'               => NULL, // This object MUST be passed as a param!
 	), $params );
-
-if( ! isset( $comment_template_counter ) )
-{	// Initialize global comment counter:
-	$comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
-}
 
 /**
  * @var Comment
@@ -64,7 +57,7 @@ echo $params['comment_start'];
 if( $params['comment_post_display'] )
 {
 	echo $params['comment_post_before'];
-	echo T_('In response to:').' ';
+	echo T_('In response to').': ';
 	$Comment->Item->title( array(
 			'link_type' => 'permalink',
 		) );
@@ -79,7 +72,7 @@ switch( $Comment->get( 'type' ) )
 	case 'meta': // Display a meta comment:
 		if( $Comment->is_meta() )
 		{	// Meta comment:
-			echo '<span class="badge badge-info">'.$comment_template_counter.'</span> ';
+			echo '<span class="badge badge-info">'.$Comment->get_inlist_order().'</span> ';
 		}
 
 		if( empty($Comment->ID) )
@@ -140,7 +133,7 @@ switch( $Comment->get( 'type' ) )
 if( $Comment->status != 'published' )
 { // display status of comment (typically an angled banner in the top right corner):
 	$Comment->format_status( array(
-			'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+			'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 		) );
 }
 
@@ -166,8 +159,8 @@ echo $params['comment_text_after'];
 echo $params['comment_info_before'];
 
 $commented_Item = & $Comment->get_Item();
-$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); /* Link to backoffice for editing */
-$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
+$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, $Comment->get_permanent_url() ); /* Link to backoffice for editing */
+$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', $commented_Item->get_permanent_url() ); /* Link to backoffice for deleting */
 
 $Comment->date(); echo ' @ '; $Comment->time( '#short_time' );
 $Comment->reply_link(); /* Link for replying to the Comment */
@@ -176,7 +169,4 @@ $Comment->vote_helpful( '', '', '&amp;', true, true );
 echo $params['comment_info_after'];
 
 echo $params['comment_end'];
-
-// Decrease a counter for meta comments:
-$comment_template_counter--;
 ?>

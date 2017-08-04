@@ -21,7 +21,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'cronjob' );
 
-$Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit scheduled job') );
 
@@ -37,6 +37,7 @@ $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit sched
 			// Exclude these cron jobs from manual creating
 			unset( $cron_jobs_names['send-post-notifications'] );
 			unset( $cron_jobs_names['send-comment-notifications'] );
+			unset( $cron_jobs_names['send-email-campaign'] );
 			$Form->select_input_array( 'cjob_type', get_param( 'cjob_type' ), $cron_jobs_names, T_('Job type') );
 		}
 		else

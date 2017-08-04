@@ -74,7 +74,7 @@ function wp_getauthors($m)
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -134,7 +134,7 @@ function wp_gettags( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -199,7 +199,7 @@ function wp_getpagelist( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -279,7 +279,7 @@ function wp_getpages( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -338,7 +338,7 @@ function wp_getpage( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -388,7 +388,7 @@ function wp_getpagestatuslist( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -462,7 +462,7 @@ function wp_getpostformats( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -736,7 +736,7 @@ function wp_newcategory( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -804,7 +804,7 @@ function wp_deletecategory( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -864,7 +864,7 @@ function wp_getcommentstatuslist( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -926,7 +926,7 @@ function wp_getcomments( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -999,7 +999,7 @@ function wp_getcomment( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -1049,7 +1049,7 @@ function wp_getcommentcount( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -1107,7 +1107,7 @@ function wp_newcomment( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Blog not found
 		return xmlrpcs_resperror();
 	}
@@ -1194,7 +1194,7 @@ function wp_editcomment( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Blog not found
 		return xmlrpcs_resperror();
 	}
@@ -1260,7 +1260,7 @@ function wp_deletecomment( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -1322,7 +1322,7 @@ function wp_getoptions( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}

@@ -58,9 +58,9 @@ $params = array_merge( array(
 		if( $disp == 'single' )
 		{
 			// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-			// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+				'widget_context' => 'item',	// Signal that we are displaying within an Item
 				// The following (optional) params will be used as defaults for widgets included in this container:
 				// This will enclose each widget in a block:
 				'block_start' => '<div class="$wi_class$">',
@@ -68,9 +68,12 @@ $params = array_merge( array(
 				// This will enclose the title of each widget:
 				'block_title_start' => '<h3>',
 				'block_title_end' => '</h3>',
+				// Template params for "Item Link" widget
+				'widget_item_link_before'    => '<p class="evo_post_link">',
+				'widget_item_link_after'     => '</p>',
 				// Template params for "Item Tags" widget
-				'widget_item_tags_before'    => '<div class="bText"><p>'.T_('Tags').': ',
-				'widget_item_tags_after'     => '</p></div>',
+				'widget_item_tags_before'    => '<nav class="small post_tags">',
+				'widget_item_tags_after'     => '</nav>',
 				// Params for skin file "_item_content.inc.php"
 				'widget_item_content_params' => $params,
 			) );
@@ -87,25 +90,13 @@ $params = array_merge( array(
 		}
 		?>
 
-		<?php
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => '<div class="bSmallPrint">'.T_('Link').': ',
-					'after'         => '</div>',
-					'text_template' => '$url$',
-					'url_template'  => '$url$',
-					'target'        => '',
-					'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-				) );
-		?>
-
 		<div class="item_comments">
 			<?php
 				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 				skin_include( '_item_feedback.inc.php', array(
 						'before_section_title' => '<h4>',
 						'after_section_title'  => '</h4>',
-						'author_link_text'     => 'preferredname',
+						'author_link_text'     => 'auto',
 						'comment_image_size'   => 'fit-256x256',
 					) );
 				// Note: You can customize the default item feedback by copying the generic

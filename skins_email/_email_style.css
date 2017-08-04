@@ -1,5 +1,7 @@
 .email_wrap img{
 	border: none;
+	max-width: 100%;
+	height: auto;
 }
 .email_wrap img.avatar_before_login{
 	margin-right: 2px;

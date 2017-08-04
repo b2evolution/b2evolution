@@ -27,7 +27,6 @@ global $AdminUI, $UserSettings;
 
 // If rediret_to was not set, create new redirect
 $redirect_to = param( 'redirect_to', 'url', regenerate_url( '', 'filter=restore', '', '&' ) );
-$redirect_to = rawurlencode( $redirect_to );
 $save_context = param( 'save_context', 'boolean', 'true' );
 $show_comments = param( 'show_comments', 'string', 'all' );
 
@@ -46,16 +45,29 @@ if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 }
 
 if( $item_id > 0 )
-{ // Calculate index of first comment only on post view/edit pages:
-	$comment_index = $CommentList->total_rows - ( $CommentList->limit * ( $CommentList->page - 1 ) );
-	// Don't display additional info when we are already viewing a selected post page:
+{	// Don't display additional info when we are already viewing a selected post page:
 	$display_meta_title = false;
 }
 else
-{	// Don't calculate the comments when we view them from many posts:
-	$comment_index = false;
-	// Display additional info of meta comment when no post page, e.g. on "Meta discussion" tab:
+{	// Display additional info of meta comment when no post page, e.g. on "Meta discussion" tab:
 	$display_meta_title = true;
+}
+
+// Check if mode "Threaded comments" is active to current filterset:
+$threaded_comments_mode = ! empty( $CommentList->filters['threaded_comments'] );
+
+if( $threaded_comments_mode )
+{	// This is "Threaded comments" mode, Initialize global array to store replies:
+	global $CommentReplies;
+	$CommentReplies = array();
+
+	if( ( get_param( 'reply_ID' ) > 0 ) &&
+	    isset( $item_ID ) &&
+	    ( $Comment = get_comment_from_session( 'preview', $comment_type ) ) &&
+	    ( $Comment->item_ID == $item_ID ) )
+	{	// Put a preview comment in array to display it in proper place:
+		$CommentReplies[ $Comment->in_reply_to_cmt_ID ] = array( $Comment );
+	}
 }
 
 while( $Comment = & $CommentList->get_next() )
@@ -64,10 +76,28 @@ while( $Comment = & $CommentList->get_next() )
 	{ // if show only draft comments, and current comment status isn't draft, then continue with the next comment
 		continue;
 	}
-	echo_comment( $Comment->ID, $redirect_to, $save_context, $comment_index, $display_meta_title );
-	if( $comment_index !== false )
-	{	// Decrease a comment index only when it is requested:
-		$comment_index--;
+
+	if( $threaded_comments_mode && $Comment->in_reply_to_cmt_ID > 0 )
+	{	// Store the comment replies in a special array:
+		if( !isset( $CommentReplies[ $Comment->in_reply_to_cmt_ID ] ) )
+		{
+			$CommentReplies[ $Comment->in_reply_to_cmt_ID ] = array();
+		}
+		$CommentReplies[ $Comment->in_reply_to_cmt_ID ][] = $Comment;
+		// Skip dispay a comment reply here in order to dispay it after parent comment by function display_comment_replies():
+		continue;
+	}
+
+	// Display a comment:
+	echo_comment( $Comment, $redirect_to, $save_context, $Comment->get_inlist_order(), $display_meta_title );
+
+	if( $threaded_comments_mode )
+	{	// Display the comment replies:
+		echo_comment_replies( $Comment->ID, array(
+				'redirect_to'        => $redirect_to,
+				'save_context'       => $save_context,
+				'display_meta_title' => $display_meta_title,
+			) );
 	}
 } //end of the loop, don't delete
 

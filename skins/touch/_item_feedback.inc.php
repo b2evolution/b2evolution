@@ -45,7 +45,7 @@ $params = array_merge( array(
 		'comment_error_start'  => '<div class="bComment" id="comment_error">',
 		'comment_error_end'    => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
-		'author_link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'     => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'              => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3 id="respond">',
 		'form_title_end'       => '</h3>',
@@ -96,7 +96,10 @@ if( $Item->can_see_comments( true ) )
 		if( $Item->can_see_comments() )
 		{	// User can see a comments
 			$type_list[] = 'comment';
-			if( $title = $Item->get_feedback_title( 'comments' ) )
+			$Item->load_Blog();
+			$comment_inskin_statuses = explode( ',', $Item->Blog->get_setting( 'comment_inskin_statuses' ) );
+
+			if( $title = $Item->get_feedback_title( 'comments', '#', '#', '#', $comment_inskin_statuses ) )
 			{
 				$disp_title[] = $title;
 			}
@@ -154,7 +157,7 @@ if( $Item->can_see_comments( true ) )
 	{
 		if( empty($disp_title) )
 		{	// No title yet
-			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), array( 'review', 'draft' ), false ) )
+			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), '#moderation#', false ) )
 			{ // We have some feedback awaiting moderation: we'll want to show that in the title
 				$disp_title[] = $title;
 			}
@@ -164,6 +167,8 @@ if( $Item->can_see_comments( true ) )
 		{	// Still no title
 			$disp_title[] = T_('No feedback yet');
 		}
+
+		global $CommentList;
 
 		$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
 		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', 'c_' );
@@ -178,9 +183,6 @@ if( $Item->can_see_comments( true ) )
 			) );
 
 		$CommentList->load_from_Request();
-
-		// Run SQL query to get results depending on current filters:
-		$CommentList->query();
 
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
@@ -201,7 +203,7 @@ if( $Item->can_see_comments( true ) )
 			global $CommentReplies;
 			$CommentReplies = array();
 
-			if( $Comment = $Session->get('core.preview_Comment') )
+			if( $Comment = get_comment_from_session( 'preview' ) )
 			{	// Init PREVIEW comment
 				if( $Comment->item_ID == $Item->ID )
 				{
@@ -282,28 +284,32 @@ if( $Item->can_see_comments( true ) )
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $Blog->get_ajax_form_enabled() && ( $Blog->get_setting( 'allow_comments' ) != 'never' ) )
-{
-	$json_params = array(
-		'action' => 'get_comment_form',
-		'p' => $Item->ID,
-		'blog' => $Blog->ID,
-		'disp' => $disp,
-		'params' => $params );
-	display_ajax_form( $json_params );
+if( $Blog->get_setting( 'allow_comments' ) != 'never' && // if enabled by collection setting
+    $Item->get_type_setting( 'use_comments' ) ) // if enabled by item type setting
+{	// Display a comment form only if it is enabled:
+	if( $Blog->get_ajax_form_enabled() )
+	{
+		$json_params = array(
+			'action' => 'get_comment_form',
+			'p' => $Item->ID,
+			'blog' => $Blog->ID,
+			'disp' => $disp,
+			'params' => $params );
+		display_ajax_form( $json_params );
+	}
+	else
+	{
+		skin_include( '_item_comment_form.inc.php', $params );
+	}
+	// Note: You can customize the default item comment form by copying the generic
+	// /skins/_item_comment_form.inc.php file into the current skin folder.
 }
-else
-{
-	skin_include( '_item_comment_form.inc.php', $params );
-}
-// Note: You can customize the default item comment form by copying the generic
-// /skins/_item_comment_form.inc.php file into the current skin folder.
 // ---------------------- END OF COMMENT FORM ---------------------
 
 // ----------- Register for item's comment notification -----------
 if( is_logged_in() && $Item->can_comment( NULL ) )
 {
-	global $DB, $htsrv_url;
+	global $DB;
 	global $UserSettings;
 
 	echo '<div class="comment_notification">';
@@ -311,7 +317,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 	$not_subscribed = true;
 	$creator_User = $Item->get_creator_User();
 
-	if( $Blog->get_setting( 'allow_subscriptions' ) )
+	if( $Blog->get_setting( 'allow_comment_subscriptions' ) )
 	{
 		$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
 					WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
@@ -334,11 +340,11 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 		if( get_user_isubscription( $current_User->ID, $Item->ID ) )
 		{
 			echo '<p>'.T_( 'You will be notified by email when someone comments here.' );
-			echo ' <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></p>';
+			echo ' <a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></p>';
 		}
 		else
 		{
-			echo '<p><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
+			echo '<p><a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
 		}
 	}
 

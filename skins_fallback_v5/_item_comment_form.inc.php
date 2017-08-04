@@ -17,7 +17,7 @@ global $comment_allowed_tags;
 global $comment_cookies, $comment_allow_msgform;
 global $checked_attachments; // Set this var as global to use it in the method $Item->can_attach()
 global $PageCache;
-global $Blog, $dummy_fields;
+global $Collection, $Blog, $dummy_fields;
 
 // Default params:
 $params = array_merge( array(
@@ -29,7 +29,7 @@ $params = array_merge( array(
 		'form_submit_text'     => T_('Send comment'),
 		'form_params'          => array(), // Use to change a structre of form, i.e. fieldstart, fieldend and etc.
 		'policy_text'          => '',
-		'author_link_text'     => 'name',
+		'author_link_text'     => 'auto',
 		'textarea_lines'       => 10,
 		'default_text'         => '',
 		'preview_block_start'  => '',
@@ -68,7 +68,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['before_comment_form'];
 
 	// INIT/PREVIEW:
-	if( $Comment = $Session->get('core.preview_Comment') )
+	if( $Comment = get_comment_from_session( 'preview' ) )
 	{	// We have a comment to preview
 		if( $Comment->item_ID == $Item->ID )
 		{ // display PREVIEW:
@@ -126,9 +126,6 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			global $Messages;
 			$Messages->display();
 		}
-
-		// delete any preview comment from session data:
-		$Session->delete( 'core.preview_Comment' );
 	}
 	else
 	{ // New comment:
@@ -253,11 +250,17 @@ function validateCommentForm(form)
 /* ]]> *
 </script>';*/
 
-	$Form = new Form( $samedomain_htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
+	$Form = new Form( get_htsrv_url().'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
 
 	$Form->switch_template_parts( $params['form_params'] );
 
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self'/*, 'onsubmit' => 'return validateCommentForm(this);'*/ ) );
+
+	// Display a message before comment form:
+	$Item->display_comment_form_msg( array(
+			'before' => '<br /><div class="warning"><div class="action_messages">',
+			'after'  => '</div></div>',
+		) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin
@@ -276,7 +279,7 @@ function validateCommentForm(form)
 			// Make sure we get back to the right page (on the right domain)
 			// fp> TODO: check if we can use the permalink instead but we must check that application wide,
 			// that is to say: check with the comments in a pop-up etc...
-			// url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl'), '&' ), $htsrv_url)
+			// url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl'), '&' ), get_htsrv_url())
 			// fp> what we need is a regenerate_url that will work in permalinks
 			// fp> below is a simpler approach:
 			$params['form_comment_redirect_to']

@@ -32,7 +32,7 @@ function skin_init( $disp )
 	/**
 	 * @var Blog
 	 */
-	global $Blog;
+	global $Collection, $Blog;
 
 	/**
 	 * @var Item
@@ -78,6 +78,9 @@ function skin_init( $disp )
 
 	$Debuglog->add('skin_init: $disp='.$disp, 'skins' );
 
+	// Initialize site skin if it is enabled:
+	siteskin_init();
+
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
 	switch( $disp )
@@ -89,7 +92,16 @@ function skin_init( $disp )
 		case 'terms':
 		case 'download':
 		case 'feedback-popup':
+		case 'flagged':
 			// We need to load posts for this display:
+
+			if( $disp == 'flagged' && ! is_logged_in() )
+			{	// Forbid access to flagged content for not logged in users:
+				global $disp;
+				$disp = '403';
+				$Messages->add( T_('You must log in before you can see your flagged content.'), 'error' );
+				break;
+			}
 
 			if( $disp == 'terms' )
 			{	// Initialize the redirect param to know what page redirect after accepting of terms:
@@ -168,6 +180,25 @@ function skin_init( $disp )
 				header_redirect( $Item->url, true, true );
 			}
 
+			// Check if the post has 'deprecated' status:
+			if( isset( $Item->status ) && $Item->status == 'deprecated' )
+			{ // If the post is deprecated
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-deprecated-post' ;
+				break;
+			}
+
+			// Check if the post has allowed front office statuses
+			$allowed_statuses = get_inskin_statuses( $Blog->ID, 'post' );
+			if( ! $preview && ! in_array( $Item->status, $allowed_statuses ) )
+			{
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-disallowed-post-status';
+				break;
+			}
+
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview
@@ -185,7 +216,7 @@ function skin_init( $disp )
 					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
 				}
 
-				if( ! is_same_url( $ReqURL, $canonical_url ) )
+				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 				{	// The requested URL does not look like the canonical URL for this post...
 					// url difference was resolved
 					$url_resolved = false;
@@ -203,7 +234,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $cat_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
 					}
 					if( preg_match( '|[&?]tag=([^&A-Z]+)|', $ReqURI, $tag_param ) )
 					{ // A tag post navigation param is set
@@ -218,7 +249,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $tag_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
 					}
 
 					if( !$url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
@@ -269,27 +300,6 @@ function skin_init( $disp )
 			// Save global $Item to $download_Item, because $Item can be rewritten by function get_featured_Item() in some skins
 			$GLOBALS['download_Item'] = & $Item;
 
-			init_ajax_forms( 'blog' ); // auto requires jQuery
-
-			// Initialize JavaScript to download file after X seconds
-			add_js_headline( '
-jQuery( document ).ready( function ()
-{
-	jQuery( "#download_timer_js" ).show();
-} );
-
-var b2evo_download_timer = '.intval( $Blog->get_setting( 'download_delay' ) ).';
-var downloadInterval = setInterval( function()
-{
-	jQuery( "#download_timer" ).html( b2evo_download_timer );
-	if( b2evo_download_timer == 0 )
-	{ // Stop timer and download a file
-		clearInterval( downloadInterval );
-		jQuery( "#download_help_url" ).show();
-	}
-	b2evo_download_timer--;
-}, 1000 );' );
-
 			// Use meta tag to download file when JavaScript is NOT enabled
 			add_headline( '<meta http-equiv="refresh" content="'.intval( $Blog->get_setting( 'download_delay' ) )
 				.'; url='.$download_Link->get_download_url( array( 'type' => 'action' ) ).'" />' );
@@ -303,7 +313,6 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'posts':
-			init_ajax_forms( 'blog' ); // auto requires jQuery
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 
@@ -322,7 +331,7 @@ var downloadInterval = setInterval( function()
 						$robots_index = false;
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
+				elseif( array_diff( $active_filters, array( 'cat_single', 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
 				{ // This is a category page
 					$disp_detail = 'posts-cat';
 					$seo_page_type = 'Category page';
@@ -339,7 +348,7 @@ var downloadInterval = setInterval( function()
 						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
 
 						// echo 'SINGLE CAT PAGE';
-						// fp> add this?: $disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
+						$disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
 
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
@@ -361,7 +370,7 @@ var downloadInterval = setInterval( function()
 								}
 
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-								if( ! is_same_url($ReqURL, $canonical_url) )
+								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
 									if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
@@ -402,7 +411,7 @@ var downloadInterval = setInterval( function()
 							|| $Blog->get_setting( 'relcanonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
-						if( ! is_same_url($ReqURL, $canonical_url) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 						{
 							if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -431,7 +440,7 @@ var downloadInterval = setInterval( function()
 							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
-						if( ! is_same_url($ReqURL, $canonical_url) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -540,7 +549,7 @@ var downloadInterval = setInterval( function()
 			}
 			else
 			{ // Recipient was not defined, try set the blog owner as recipient
-				global $Blog;
+				global $Collection, $Blog;
 				if( empty( $Blog ) )
 				{ // Blog is not set, this is an invalid request
 					debug_die( 'Invalid send message request!');
@@ -615,7 +624,8 @@ var downloadInterval = setInterval( function()
 					// Set global variable to auto define the FB autocomplete plugin field
 					$recipients_selected = array( array(
 							'id'    => $recipient_User->ID,
-							'title' => $recipient_User->login,
+							'login' => $recipient_User->login,
+							'fullname' => $recipient_User->get_username()
 						) );
 
 					init_tokeninput_js( 'blog' );
@@ -1074,8 +1084,23 @@ var downloadInterval = setInterval( function()
 			display_user_email_status_message();
 			break;
 
+		case 'access_requires_login':
+			global $login_mode;
+
+			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
+			{	// Require HTTP authentication:
+				header( 'WWW-Authenticate: Basic realm="b2evolution"' );
+				header( 'HTTP/1.0 401 Unauthorized' );
+			}
+
+			if( ! empty( $login_mode ) && $login_mode == 'http_basic_auth' )
+			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
+				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
+			}
+			break;
+
 		case 'login':
-			global $Plugins, $transmit_hashed_password;
+			global $Plugins, $login_mode;
 
 			if( is_logged_in() )
 			{ // User is already logged in
@@ -1087,7 +1112,7 @@ var downloadInterval = setInterval( function()
 				}
 
 				// User is already logged in, redirect to "redirect_to" page
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				$redirect_to = param( 'redirect_to', 'url', NULL );
 				if( empty( $redirect_to ) )
 				{ // If empty redirect to referer page
@@ -1097,9 +1122,20 @@ var downloadInterval = setInterval( function()
 				// will have exited
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
+			}
+
+			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
+			{	// Require HTTP authentication:
+				header( 'WWW-Authenticate: Basic realm="b2evolution"' );
+				header( 'HTTP/1.0 401 Unauthorized' );
+			}
+
+			if( ! empty( $login_mode ) && $login_mode == 'http_basic_auth' )
+			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
+				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
 			}
 
 			$seo_page_type = 'Login form';
@@ -1109,11 +1145,11 @@ var downloadInterval = setInterval( function()
 		case 'register':
 			if( is_logged_in() )
 			{ // If user is logged in the register form should not be displayed. In this case redirect to the blog home page.
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'registerurl', array( 'glue' => '&' ) ) );
 			}
@@ -1129,11 +1165,11 @@ var downloadInterval = setInterval( function()
 		case 'lostpassword':
 			if( is_logged_in() )
 			{ // If user is logged in the lost password form should not be displayed. In this case redirect to the blog home page.
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'lostpasswordurl', array( 'glue' => '&' ) ) );
 			}
@@ -1155,15 +1191,15 @@ var downloadInterval = setInterval( function()
 				$after_email_validation = $Settings->get( 'after_email_validation' );
 				if( $after_email_validation == 'return_to_original' )
 				{ // we want to return to original page after account activation
-					// check if Session 'validatemail.redirect_to' param is still set
-					$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
+					// check if Session 'activateacc.redirect_to' param is still set
+					$redirect_to = $Session->get( 'core.activateacc.redirect_to' );
 					if( empty( $redirect_to ) )
 					{ // Session param is empty try to get general redirect_to param
 						$redirect_to = param( 'redirect_to', 'url', '' );
 					}
 					else
 					{ // cleanup validateemail.redirect_to param from session
-						$Session->delete('core.validatemail.redirect_to');
+						$Session->delete('core.activateacc.redirect_to');
 					}
 				}
 				else
@@ -1184,7 +1220,7 @@ var downloadInterval = setInterval( function()
 				// will have exited
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'activateinfourl', array( 'glue' => '&' ) ) );
 			}
@@ -1216,6 +1252,7 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'users':
+		case 'visits':
 			// Check if current user has an access to public list of the users:
 			check_access_users_list();
 
@@ -1351,7 +1388,7 @@ var downloadInterval = setInterval( function()
 			$display_params = array();
 
 			// Restrict comment status by parent item:
-			$edited_Comment->restrict_status_by_item();
+			$edited_Comment->restrict_status();
 			break;
 
 		case 'useritems':
@@ -1456,6 +1493,12 @@ var downloadInterval = setInterval( function()
 				global $disp;
 				$disp = '404';
 			}
+			elseif( $Session->get( 'account_close_reason' ) )
+			{
+				global $account_close_reason;
+				$account_close_reason = $Session->get( 'account_close_reason' );
+				$Session->delete( 'account_close_reason' );
+			}
 			elseif( $Session->get( 'account_closing_success' ) )
 			{ // User has closed the account
 				global $account_closing_success;
@@ -1480,9 +1523,15 @@ var downloadInterval = setInterval( function()
 
 	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );
 
-	// Make this switch block special only for 404 page
+	// Make this switch block special only for 403 and 404 pages:
 	switch( $disp )
 	{
+		case '403':
+			// We have a 403 forbidden content error:
+			header_http_response( '403 Forbidden' );
+			$robots_index = false;
+			break;
+
 		case '404':
 			// We have a 404 unresolved content error
 			// How do we want do deal with it?
@@ -1521,6 +1570,9 @@ var downloadInterval = setInterval( function()
 	$Skin->display_init();
 	$Timer->pause( 'Skin:display_init' );
 
+	// Send the predefined cookies:
+	evo_sendcookies();
+
 	// Send default headers:
 	// See comments inside of this function:
 	headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
@@ -1531,15 +1583,60 @@ var downloadInterval = setInterval( function()
 	}
 }
 
+
+/**
+ * Get site Skin global object
+ *
+ * @return object Site Skin
+ */
+function & get_site_Skin()
+{
+	global $site_Skin;
+
+	if( ! isset( $site_Skin ) )
+	{	// Initialize site Skin only first time:
+
+		global $Settings;
+		if( ! $Settings->get( 'site_skins_enabled' ) )
+		{	// Site skins are not enabled:
+			$site_Skin = NULL;
+			return $site_Skin;
+		}
+
+		global $Session;
+		if( ! empty( $Session ) )
+		{	// Get site skin Id depending on current session:
+			if( $Session->is_mobile_session() )
+			{	// Mobile session:
+				$skin_ID = $Settings->get( 'mobile_skin_ID' );
+			}
+			elseif( $Session->is_tablet_session() )
+			{	// Tablet session:
+				$skin_ID = $Settings->get( 'tablet_skin_ID' );
+			}
+		}
+		if( empty( $skin_ID ) )
+		{	// Use normal skin ID by default when mobile and tablet skins are not defined for site:
+			$skin_ID = $Settings->get( 'normal_skin_ID' );
+		}
+
+		// Try to get site Skin from DB by ID:
+		$SkinCache = & get_SkinCache();
+		$site_Skin = $SkinCache->get_by_ID( $skin_ID, false, false );
+	}
+
+	return $site_Skin;
+}
+
+
+/**
+ * Initalize site Skin
+ */
 function siteskin_init()
 {
-	// The following is temporary and should be moved to some SiteSkin class
-	global $Settings;
-
-	if( $Settings->get( 'site_skins_enabled' ) )
-	{ // Site skins are enabled
-		// Include the additional required files
-		siteskin_include( '_skin_init.inc.php' );
+	if( $site_Skin = & get_site_Skin() )
+	{	// Initialize site skin:
+		$site_Skin->siteskin_init();
 	}
 }
 
@@ -1628,11 +1725,10 @@ function skin_include( $template_name, $params = array() )
 	global $skins_path, $ads_current_skin_path, $disp;
 
 	// Globals that may be needed by the template:
-	global $Blog, $MainList, $Item;
+	global $Collection, $Blog, $MainList, $Item;
 	global $Plugins, $Skin;
-	global $current_User, $Hit, $Session, $Settings;
-	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
-	global $samedomain_htsrv_url, $secure_htsrv_url;
+	global $current_User, $Hit, $Session, $Settings, $debug;
+	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
 	* @var Log
@@ -1643,20 +1739,9 @@ function skin_include( $template_name, $params = array() )
 	$timer_name = 'skin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
-	if( ! empty( $disp ) && ( $disp == 'single' || $disp == 'page' ) &&
-	    $template_name == '$disp$' &&
-	    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) )
-	{ // Get template name for the current Item if it is defined by Item Type
-		$item_type_template_name = $ItemType->get( 'template_name' );
-		if( ! empty( $item_type_template_name ) )
-		{ // The item type has a specific template for this display:
-			$item_type_template_name = '_'.$item_type_template_name.'.disp.php';
-			if( file_exists( $ads_current_skin_path.$item_type_template_name ) ||
-			    skin_fallback_path( $item_type_template_name ) )
-			{ // Use template file name of the Item Type only if it exists
-				$template_name = $item_type_template_name;
-			}
-		}
+	if( ! empty( $params['Item'] ) )
+	{	// Get Item from params:
+		$Item = $params['Item'];
 	}
 
 	if( $template_name == '$disp$' )
@@ -1665,47 +1750,49 @@ function skin_include( $template_name, $params = array() )
 
 		// Default display handlers:
 		$disp_handlers = array(
-				'disp_404'            => '_404_not_found.disp.php',
-				'disp_403'            => '_403_forbidden.disp.php',
-				'disp_arcdir'         => '_arcdir.disp.php',
-				'disp_catdir'         => '_catdir.disp.php',
-				'disp_comments'       => '_comments.disp.php',
-				'disp_feedback-popup' => '_feedback_popup.disp.php',
-				'disp_help'           => '_help.disp.php',
-				'disp_login'          => '_login.disp.php',
-				'disp_register'       => '_register.disp.php',
-				'disp_activateinfo'   => '_activateinfo.disp.php',
-				'disp_lostpassword'   => '_lostpassword.disp.php',
-				'disp_mediaidx'       => '_mediaidx.disp.php',
-				'disp_msgform'        => '_msgform.disp.php',
-				'disp_threads'        => '_threads.disp.php',
-				'disp_contacts'       => '_threads.disp.php',
-				'disp_messages'       => '_messages.disp.php',
-				'disp_page'           => '_page.disp.php',
-				'disp_postidx'        => '_postidx.disp.php',
-				'disp_posts'          => '_posts.disp.php',
-				'disp_profile'        => '_profile.disp.php',
-				'disp_avatar'         => '_profile.disp.php',
-				'disp_pwdchange'      => '_profile.disp.php',
-				'disp_userprefs'      => '_profile.disp.php',
-				'disp_subs'           => '_profile.disp.php',
-				'disp_search'         => '_search.disp.php',
-				'disp_single'         => '_single.disp.php',
-				'disp_sitemap'        => '_sitemap.disp.php',
-				'disp_user'           => '_user.disp.php',
-				'disp_users'          => '_users.disp.php',
-				'disp_edit'           => '_edit.disp.php',
-				'disp_edit_comment'   => '_edit_comment.disp.php',
-				'disp_closeaccount'   => '_closeaccount.disp.php',
-				'disp_module_form'    => '_module_form.disp.php',
-				'disp_front'          => '_front.disp.php',
-				'disp_useritems'      => '_useritems.disp.php',
-				'disp_usercomments'   => '_usercomments.disp.php',
-				'disp_download'       => '_download.disp.php',
-				'disp_access_denied'  => '_access_denied.disp.php',
+				'disp_403'                   => '_403_forbidden.disp.php',
+				'disp_404'                   => '_404_not_found.disp.php',
+				'disp_access_denied'         => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
-				'disp_tags'           => '_tags.disp.php',
-				'disp_terms'          => '_terms.disp.php',
+				'disp_activateinfo'          => '_activateinfo.disp.php',
+				'disp_arcdir'                => '_arcdir.disp.php',
+				'disp_catdir'                => '_catdir.disp.php',
+				'disp_closeaccount'          => '_closeaccount.disp.php',
+				'disp_comments'              => '_comments.disp.php',
+				'disp_download'              => '_download.disp.php',
+				'disp_edit'                  => '_edit.disp.php',
+				'disp_edit_comment'          => '_edit_comment.disp.php',
+				'disp_feedback-popup'        => '_feedback_popup.disp.php',
+				'disp_flagged'               => '_flagged.disp.php',
+				'disp_front'                 => '_front.disp.php',
+				'disp_help'                  => '_help.disp.php',
+				'disp_login'                 => '_login.disp.php',
+				'disp_lostpassword'          => '_lostpassword.disp.php',
+				'disp_mediaidx'              => '_mediaidx.disp.php',
+				'disp_messages'              => '_messages.disp.php',
+				'disp_module_form'           => '_module_form.disp.php',
+				'disp_msgform'               => '_msgform.disp.php',
+				'disp_page'                  => '_page.disp.php',
+				'disp_postidx'               => '_postidx.disp.php',
+				'disp_posts'                 => '_posts.disp.php',
+				'disp_profile'               => '_profile.disp.php',
+				'disp_avatar'                => '_profile.disp.php',
+				'disp_pwdchange'             => '_profile.disp.php',
+				'disp_userprefs'             => '_profile.disp.php',
+				'disp_subs'                  => '_profile.disp.php',
+				'disp_visits'                => '_profile.disp.php',
+				'disp_register'              => '_register.disp.php',
+				'disp_search'                => '_search.disp.php',
+				'disp_single'                => '_single.disp.php',
+				'disp_sitemap'               => '_sitemap.disp.php',
+				'disp_tags'                  => '_tags.disp.php',
+				'disp_terms'                 => '_terms.disp.php',
+				'disp_threads'               => '_threads.disp.php',
+				'disp_contacts'              => '_threads.disp.php',
+				'disp_user'                  => '_user.disp.php',
+				'disp_useritems'             => '_useritems.disp.php',
+				'disp_usercomments'          => '_usercomments.disp.php',
+				'disp_users'                 => '_users.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -1743,6 +1830,22 @@ function skin_include( $template_name, $params = array() )
 			return;
 		}
 
+		if( $template_name[0] != '#' && // if template is not handled by plugins
+		    ( $disp == 'single' || $disp == 'page' ) &&
+		    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) )
+		{	// Get template name for the current Item if it is defined by Item Type:
+			$item_type_template_name = $ItemType->get( 'template_name' );
+			if( ! empty( $item_type_template_name ) )
+			{	// The item type has a specific template for this display:
+				$item_type_template_name = '_'.$item_type_template_name.'.disp.php';
+				if( ( $Skin->get_api_version() == 7 && file_exists( $ads_current_skin_path.$Blog->get( 'type' ).'/'.$item_type_template_name ) ) ||
+						file_exists( $ads_current_skin_path.$item_type_template_name ) ||
+						skin_fallback_path( $item_type_template_name ) )
+				{	// Use template file name of the Item Type only if it exists:
+					$template_name = $item_type_template_name;
+				}
+			}
+		}
 	}
 
 
@@ -1751,6 +1854,12 @@ function skin_include( $template_name, $params = array() )
 	{ // This disp mode is handled by a plugin:
 		$debug_info = 'Call plugin';
 		$disp_handled = 'plugin';
+	}
+	elseif( $Skin->get_api_version() == 7 && file_exists( $ads_current_skin_path.$Blog->get( 'type' ).'/'.$template_name ) )
+	{ // The skin has a customized handler, use that one instead:
+		$file = $ads_current_skin_path.$Blog->get( 'type' ).'/'.$template_name;
+		$debug_info = '<b>Theme template for collection kind</b>: '.rel_path_to_base( $file );
+		$disp_handled = 'custom';
 	}
 	elseif( file_exists( $ads_current_skin_path.$template_name ) )
 	{ // The skin has a customized handler, use that one instead:
@@ -1776,7 +1885,7 @@ function skin_include( $template_name, $params = array() )
 	}
 	else
 	{	// We may wrap with a <div>:
-		$display_includes = $Session->get( 'display_includes_'.$Blog->ID ) == 1;
+		$display_includes = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_includes_'.$Blog->ID ) );
 	}
 	if( $display_includes )
 	{ // Wrap the include with a visible div:
@@ -1840,12 +1949,21 @@ function skin_fallback_path( $template_name, $skin_api_version = NULL )
 	global $Skin, $basepath;
 
 	if( $skin_api_version === NULL && ! empty( $Skin ) )
-	{ // Get API version of the current skin
+	{	// Get API version of the current skin:
 		$skin_api_version = $Skin->get_api_version();
 	}
 
-	if( $skin_api_version == 6 )
-	{ // Check fallback file for v6 API skin
+	if( $skin_api_version == 7 )
+	{	// Check fallback file for v7 API skin:
+		$fallback_path = $basepath.'skins_fallback_v7/'.$template_name;
+		if( file_exists( $fallback_path ) )
+		{
+			return $fallback_path;
+		}
+	}
+
+	if( $skin_api_version >= 6 )
+	{	// Check fallback file for v6 API skin:
 		$fallback_path = $basepath.'skins_fallback_v6/'.$template_name;
 		if( file_exists( $fallback_path ) )
 		{
@@ -1853,7 +1971,7 @@ function skin_fallback_path( $template_name, $skin_api_version = NULL )
 		}
 	}
 
-	// Check fallback file for v5 API skin
+	// Check fallback file for v5 API skin:
 	$fallback_path = $basepath.'skins_fallback_v5/'.$template_name;
 	if( file_exists( $fallback_path ) )
 	{
@@ -1893,14 +2011,13 @@ function skin_template_path( $template_name )
  *
  * @param string Template name
  * @param array Params
- * @param boolean force include even if sitewide header/footer not enabled
  */
-function siteskin_include( $template_name, $params = array(), $force = false )
+function siteskin_include( $template_name, $params = array() )
 {
-	global $Settings, $siteskins_path, $Blog;
+	global $Settings, $skins_path, $Collection, $Blog;
 
-	if( !$Settings->get( 'site_skins_enabled' ) && !$force )
-	{ // Site skins are not enabled and we don't want to force either
+	if( ! $Settings->get( 'site_skins_enabled' ) )
+	{	// Site skins are not enabled:
 		return;
 	}
 
@@ -1910,9 +2027,8 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	}
 
 	// Globals that may be needed by the template:
-	global $current_User, $Hit, $Session, $Settings;
-	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
-	global $samedomain_htsrv_url, $secure_htsrv_url;
+	global $current_User, $Hit, $Session, $Settings, $debug;
+	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
 	* @var Log
@@ -1923,20 +2039,23 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	$timer_name = 'siteskin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
-	if( file_exists( $siteskins_path.'custom/'.$template_name ) )
-	{ // Use the custom template:
-		$file = $siteskins_path.'custom/'.$template_name;
-		$debug_info = '<b>Custom template</b>: '.rel_path_to_base($file);
-		$disp_handled = 'custom';
+	// Get site Skin:
+	$site_Skin = & get_site_Skin();
+
+	if( $site_Skin && file_exists( $site_Skin->get_path().$template_name ) )
+	{	// Use site skin template:
+		$file = $site_Skin->get_path().$template_name;
+		$debug_info = '<b>Site Skin template</b>: '.rel_path_to_base( $file );
+		$disp_handled = 'skin';
 	}
-	elseif( file_exists( $siteskins_path.$template_name ) ) // Try to include standard template only if custom template doesn't exist
-	{ // Use the default/fallback template:
-		$file = $siteskins_path.$template_name;
-		$debug_info = '<b>Fallback to</b>: '.rel_path_to_base($file);
+	elseif( $fallback_template_path = skin_fallback_path( $template_name ) )
+	{	// Use the default/fallback template:
+		$file = $fallback_template_path;
+		$debug_info = '<b>Site Skin Fallback to</b>: '.rel_path_to_base( $file );
 		$disp_handled = 'fallback';
 	}
 	else
-	{
+	{	// Site skin is wrong or the requested template file is not found in current site skin:
 		$disp_handled = false;
 	}
 
@@ -1948,37 +2067,32 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	}
 	elseif( isset( $Session ) )
 	{	// We may wrap with a <div>:
-		$display_includes = $Session->get( 'display_includes_'.( empty( $Blog ) ? 0 : $Blog->ID ) ) == 1;
+		$display_includes = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_includes_'.( empty( $Blog ) ? 0 : $Blog->ID ) ) );
 	}
 	else
 	{	// Request without defined $Session, Don't display the includes:
 		$display_includes = false;
 	}
 	if( $display_includes )
-	{ // Wrap the include with a visible div:
+	{	// Wrap the include with a visible div:
 		echo '<div class="dev-blocks dev-blocks--siteinclude">';
 		echo '<div class="dev-blocks-name">siteskin_include( <b>'.$template_name.'</b> ) -> '.$debug_info.'</div>';
 	}
 
 
-	if($disp_handled)
-	{
-		$Debuglog->add('siteskin_include: '.rel_path_to_base($file), 'skins');
+	if( $disp_handled )
+	{	// Include site skin template file:
+		$Debuglog->add('siteskin_include: '.rel_path_to_base( $file ), 'skins');
 		require $file;
 	}
 	else
-	{	// nothing handled the display
-		printf( '<div class="skin_error">Site template [%s] not found.</div>', $template_name );
-		if( !empty($current_User) && $current_User->level == 10 )
-		{
-			printf( '<div class="skin_error">User level 10 help info: [%s]</div>', $siteskins_path.$template_name );
-		}
+	{	// Nothing handled the display:
+		printf( '<div class="skin_error">Site skin template [%s] not found.</div>', $template_name );
 	}
 
 
 	if( $display_includes )
-	{ // End of visible container:
-		// echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
+	{	// End of visible container:
 		echo '</div>';
 	}
 
@@ -1994,7 +2108,7 @@ function siteskin_include( $template_name, $params = array(), $force = false )
  */
 function skin_base_tag()
 {
-	global $skins_url, $skin, $Blog, $disp;
+	global $skins_url, $skin, $Collection, $Blog, $disp;
 
 	if( ! empty( $Blog ) )
 	{	// We are displaying a blog:
@@ -2030,7 +2144,7 @@ function skin_base_tag()
  */
 function skin_description_tag()
 {
-	global $Blog, $disp, $disp_detail, $MainList, $Chapter, $is_front;
+	global $Collection, $Blog, $disp, $disp_detail, $MainList, $Chapter, $is_front;
 
 	$r = '';
 
@@ -2041,7 +2155,7 @@ function skin_description_tag()
 			$r = $Blog->get( 'shortdesc' );
 		}
 	}
-	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-subcat' )
+	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
 	{
 		if( $Blog->get_setting( 'categories_meta_description' ) && ( ! empty( $Chapter ) ) )
 		{
@@ -2079,7 +2193,7 @@ function skin_description_tag()
  */
 function skin_keywords_tag()
 {
-	global $Blog, $is_front, $disp, $MainList;
+	global $Collection, $Blog, $is_front, $disp, $MainList;
 
 	$r = '';
 
@@ -2122,7 +2236,7 @@ function skin_keywords_tag()
  */
 function skin_opengraph_tags()
 {
-	global $Blog, $disp, $MainList;
+	global $Collection, $Blog, $disp, $MainList;
 
 	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_open_graph' ) )
 	{ // Open Graph tags are not allowed
@@ -2140,32 +2254,37 @@ function skin_opengraph_tags()
 		}
 
 		$LinkOwner = new LinkItem( $Item );
-		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
+				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has no linked files
-			return;
-		}
+			while( $Link = & $LinkList->get_next() )
+			{
+				if( ! ( $File = & $Link->get_File() ) )
+				{ // No File object
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+					continue;
+				}
 
-		while( $Link = & $LinkList->get_next() )
-		{
-			if( ! ( $File = & $Link->get_File() ) )
-			{ // No File object
-				global $Debuglog;
-				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
-				continue;
-			}
+				if( ! $File->exists() )
+				{ // File doesn't exist
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					continue;
+				}
 
-			if( ! $File->exists() )
-			{ // File doesn't exist
-				global $Debuglog;
-				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-				continue;
-			}
-
-			if( $File->is_image() )
-			{ // Use only image files for og:image tag
-				$og_images[] = $File->get_url();
+				if( $File->is_image() )
+				{ // Use only image files for og:image tag
+					$og_images[] = $File->get_url();
+				}
 			}
 		}
+
+		echo '<meta property="og:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
+		echo '<meta property="og:url" content="'.format_to_output( $Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
+		echo '<meta property="og:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+		echo '<meta property="og:site_name" content="'.format_to_output( $Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
 	}
 
 	if( ! empty( $og_images ) )
@@ -2180,12 +2299,85 @@ function skin_opengraph_tags()
 }
 
 
+function skin_twitter_tags()
+{
+	global $Collection, $Blog, $disp, $MainList;
+
+	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_twitter_card' ) )
+	{ // Twitter summary card tags are not allowed
+		return;
+	}
+
+	// Get info for og:image tag
+	$twitter_image = '';
+	if( in_array( $disp, array( 'single', 'page' ) ) )
+	{ // Use only on 'single' and 'page' disp
+		$Item = & $MainList->get_by_idx( 0 );
+		if( is_null( $Item ) )
+		{ // This is not an object (happens on an invalid request):
+			return;
+		}
+
+		$LinkOwner = new LinkItem( $Item );
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
+				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
+		{ // Item has no linked files
+			while( $Link = & $LinkList->get_next() )
+			{
+				if( ! ( $File = & $Link->get_File() ) )
+				{ // No File object
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( ! $File->exists() )
+				{ // File doesn't exist
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( $File->is_image() )
+				{ // Use only image files for og:image tag
+					$twitter_image = $File->get_url();
+					break;
+				}
+			}
+		}
+
+		// Get author's Twitter username
+		if( $creator_User = & $Item->get_creator_User() )
+		{
+			if( $twitter_links = $creator_User->userfield_values_by_code( 'twitter' ) )
+			{
+				preg_match( '/https?:\/\/(www\.)?twitter\.com((?:\/\#!)?\/(\w+))/', $twitter_links[0], $matches );
+				if( isset( $matches[3] ) )
+				{
+					echo '<meta property="twitter:creator" content="@'.$matches[3].'" />'."\n";
+				}
+			}
+		}
+
+		echo '<meta property="twitter:card" content="summary" />'."\n";
+		echo '<meta property="twitter:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
+		echo '<meta property="twitter:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+	}
+
+	if( ! empty( $twitter_image ) )
+	{ // Display meta tags for image:
+		echo '<meta property="twitter:image" content="'.format_to_output( $twitter_image, 'htmlattr' )."\" />\n";
+	}
+}
+
+
 /**
  * Sends the desired HTTP response header in case of a "404".
  */
 function skin_404_header()
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	// We have a 404 unresolved content error
 	// How do we want do deal with it?
@@ -2425,7 +2617,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
-		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin.').'</div>';
+		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin').'.</div>';
 	}
 	else
 	{
@@ -2442,17 +2634,27 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 			echo '<span>'.$edited_Skin->name.'</span>';
 		echo '</div>';
 
-		if( isset( $edited_Skin->version ) )
-		{ // Skin version
-			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Skin version').':</label>';
-				echo '<span>'.$edited_Skin->version.'</span>';
-			echo '</div>';
-		}
-
-		// Skin type
+		// Skin version
 		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Skin type').':</label>';
+			echo '<label>'.T_('Skin version').':</label>';
+			echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
+		echo '</div>';
+
+		// Site Skin:
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Site Skin').':</label>';
+			echo '<span>'.( $edited_Skin->provides_site_skin() ? T_('Yes') : T_('No') ).'</span>';
+		echo '</div>';
+
+		// Collection Skin:
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Collection Skin').':</label>';
+			echo '<span>'.( $edited_Skin->provides_collection_skin() ? T_('Yes') : T_('No') ).'</span>';
+		echo '</div>';
+
+		// Skin format:
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Skin format').':</label>';
 			echo '<span>'.$edited_Skin->type.'</span>';
 		echo '</div>';
 
@@ -2532,10 +2734,10 @@ function skin_body_attrs( $params = array() )
 			'class' => NULL
 		), $params );
 
-	global $PageCache, $Blog, $disp, $disp_detail, $Item, $current_User;
+	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User;
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
-	global $Session;
+	global $Session, $debug;
 
 	$classes = array();
 
@@ -2589,13 +2791,13 @@ function skin_body_attrs( $params = array() )
 	$classes[] = 'usergroup_'.( ! is_logged_in() && empty( $current_User->grp_ID ) ? 'none' : $current_User->grp_ID );
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
-	if ( ! empty($Blog) )
+	if( ( $debug == 2 || is_logged_in() ) && ! empty( $Blog ) )
 	{
-		if( $Session->get( 'display_includes_'.$Blog->ID ) ) 
+		if( $Session->get( 'display_includes_'.$Blog->ID ) )
 		{
 			$classes[] = 'dev_show_includes';
 		}
-		if( $Session->get( 'display_containers_'.$Blog->ID ) ) 
+		if( $Session->get( 'display_containers_'.$Blog->ID ) )
 		{
 			$classes[] = 'dev_show_containers';
 		}
@@ -2607,4 +2809,40 @@ function skin_body_attrs( $params = array() )
 	}
 }
 
+
+function get_skin_version( $skin_ID )
+{
+	$SkinCache = & get_SkinCache();
+	$Skin = $SkinCache->get_by_ID( $skin_ID );
+
+	if( isset( $Skin->version ) )
+	{
+		return $Skin->version;
+	}
+
+	return 'unknown';
+}
+
+
+/**
+ * Check compatibility skin with requested type
+ *
+ * @param integer Skin ID
+ * @param string Type: 'site' or 'coll'
+ * @return boolean
+ */
+function skin_check_compatibility( $skin_ID, $type )
+{
+	$SkinCache = & get_SkinCache();
+	$Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
+
+	if( ! $Skin ||
+	    ( $type == 'coll' && ! $Skin->provides_collection_skin() ) ||
+	    ( $type == 'site' && ! $Skin->provides_site_skin() ) )
+	{	// Skin cannot be used for requested type:
+		return false;
+	}
+
+	return true;
+}
 ?>

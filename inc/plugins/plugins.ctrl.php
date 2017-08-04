@@ -297,7 +297,7 @@ switch( $action )
 		{ // second step:
 			$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
 
-			if( ! is_a($edit_Plugin, 'Plugin') )
+			if( ! ( $edit_Plugin instanceof Plugin ) )
 			{
 				$Messages->add( sprintf( T_( 'The plugin with ID %d could not be instantiated.' ), $plugin_ID ), 'error' );
 				$action = 'list';
@@ -325,7 +325,8 @@ switch( $action )
 		$Messages->add( $msg, 'success' );
 
 		// Install completed:
-		$r = $admin_Plugins->call_method( $edit_Plugin->ID, 'AfterInstall', $params = array() );
+		$params = array();
+		$r = $admin_Plugins->call_method( $edit_Plugin->ID, 'AfterInstall', $params );
 
 		// invalidate all PageCaches
 		invalidate_pagecaches();
@@ -395,7 +396,8 @@ switch( $action )
 		}
 
 		// Ask plugin:
-		$uninstall_ok = $admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstall', $params = array( 'unattended' => false ) );
+		$params = array( 'unattended' => false );
+		$uninstall_ok = $admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstall', $params );
 
 		if( $uninstall_ok === false )
 		{ // Plugin said "NO":
@@ -556,7 +558,7 @@ switch( $action )
 
 
 		// Plugin priority
-		if( param_check_range( 'edited_plugin_priority', 0, 100, T_('Plugin priority must be numeric (0-100).'), true ) )
+		if( param_check_range( 'edited_plugin_priority', 0, 255, sprintf( T_('Plugin priority must be numeric (%s).'), '0-255' ), true ) )
 		{
 			$updated = $admin_Plugins->set_priority( $edit_Plugin->ID, $edited_plugin_priority );
 			if( $updated === 1 )
@@ -592,7 +594,7 @@ switch( $action )
 			}
 			elseif( $edit_Plugin->Settings->dbupdate() )
 			{
-				$Messages->add( T_('Plugin settings have been updated.'), 'success' );
+				$Messages->add( T_('Plugin settings have been updated').'.', 'success' );
 			}
 		}
 
@@ -719,7 +721,7 @@ switch( $action )
 		// Priority:
 		if( ! preg_match( '~^1?\d?\d$~', $edited_plugin_priority ) )
 		{
-			param_error( 'edited_plugin_priority', T_('Plugin priority must be numeric (0-100).') );
+			param_error( 'edited_plugin_priority', sprintf( T_('Plugin priority must be numeric (%s).'), '0-255' ) );
 		}
 		else
 		{
@@ -810,6 +812,8 @@ switch( $action )
 	case 'edit_settings':
 		$AdminUI->append_to_titlearea( '<a href="'.regenerate_url('', 'action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID).'">'
 			.sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ).'</a>' );
+		// Initialize JS for color picker field on the edit plugin settings form:
+		init_colorpicker_js();
 		break;
 
 	case 'disp_help_plain': // just the help, without any payload
@@ -927,7 +931,7 @@ switch( $action )
 			}
 
 			echo '<div class="center">';
-			$Form->submit( array( '', T_('Install!'), 'ActionButton btn-primary' ) );
+			$Form->submit( array( '', T_('Install').'!', 'ActionButton btn-primary' ) );
 			echo '</div>';
 			$Form->end_form();
 			?>
@@ -969,7 +973,8 @@ switch( $action )
 
 			if( $uninstall_ok === NULL )
 			{ // Plugin requested this:
-				$admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstallPayload', $params = array( 'Form' => & $Form ) );
+				$params = array( 'Form' => & $Form );
+				$admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstallPayload', $params );
 			}
 
 			echo '<p>'.T_('THIS CANNOT BE UNDONE!').'</p>';

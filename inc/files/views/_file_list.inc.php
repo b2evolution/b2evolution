@@ -50,7 +50,7 @@ global $LinkOwner;
 
 global $edited_User;
 
-global $Blog, $blog;
+global $Collection, $Blog, $blog;
 
 global $fm_mode, $fm_hide_dirtree, $create_name, $ads_list_path, $mode;
 
@@ -58,7 +58,7 @@ global $fm_mode, $fm_hide_dirtree, $create_name, $ads_list_path, $mode;
 global $linkctrl, $linkdata;
 
 // Name of the iframe we want some actions to come back to:
-global $iframe_name;
+global $iframe_name, $field_name, $file_type;
 
 $Form = new Form( NULL, 'FilesForm', 'post', 'none' );
 $Form->begin_form();
@@ -68,6 +68,11 @@ $Form->begin_form();
 	$Form->hidden( 'md5_filelist', $fm_Filelist->md5_checksum() );
 	$Form->hidden( 'md5_cwd', md5($fm_Filelist->get_ads_list_path()) );
 	$Form->hiddens_by_key( get_memorized('fm_selected') ); // 'fm_selected' gets provided by the form itself
+
+	if( get_param( 'fm_sources_root' ) == '' )
+	{ // Set the root only when it is not defined, otherwise it is gone from memorized param
+		$Form->hidden( 'fm_sources_root', $fm_Filelist->_FileRoot->ID );
+	}
 ?>
 <table class="filelist table table-striped table-bordered table-hover table-condensed">
 	<thead>
@@ -84,7 +89,7 @@ $Form->begin_form();
 		}
 		else
 		{
-			echo action_icon( T_('Go to parent folder'), 'folder_parent', regenerate_url( 'path', 'path='.$fm_Filelist->_rds_list_path.'..' ) );
+			echo action_icon( T_('Go to parent folder'), 'folder_parent', regenerate_url( 'path', 'path='.rawurlencode( $fm_Filelist->_rds_list_path.'..' ) ) );
 		}
 		echo '</th>';
 
@@ -110,6 +115,11 @@ $Form->begin_form();
 		if( $UserSettings->get('fm_showtypes') )
 		{ // Show file types column
 			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
+		}
+
+		if( $UserSettings->get('fm_showcreator') )
+		{ // Show file creator
+			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'creator_user_ID', /* TRANS: added by */ T_('Added by') ).'</th>';
 		}
 
 		if( $UserSettings->get('fm_showdownload') )
@@ -173,7 +183,7 @@ $Form->begin_form();
 		echo '<td class="checkbox firstcol">';
 		echo '<span name="surround_check" class="checkbox_surround_init">';
 		echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
-					name="fm_selected[]" value="'.rawurlencode($lFile->get_rdfp_rel_path()).'" id="cb_filename_'.$countFiles.'"';
+					name="fm_selected[]" value="'.format_to_output( $lFile->get_rdfp_rel_path(), 'formvalue' ).'" id="cb_filename_'.$countFiles.'"';
 		if( $checkall || $selected_Filelist->contains( $lFile ) )
 		{
 			echo ' checked="checked"';
@@ -251,13 +261,13 @@ $Form->begin_form();
 				if( $error_filename = validate_filename( $lFile->get_name() ) )
 				{ // TODO: Warning icon with hint
 					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_filename ) );
-					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '<b>'.$lFile->get_name().'</b>' ), 'warning', 'file', $lFile->ID );
+					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 				}
 			}
 			elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
 			{ // TODO: Warning icon with hint
 				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_dirname ) );
-				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$lFile->get_name().'</b>' ), 'warning', 'file', $lFile->ID );
+				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 			}
 
 			/****  Open in a new window  (only directories)  ****/
@@ -283,12 +293,14 @@ $Form->begin_form();
 				// fp> here might not be the best place to put the perm check
 				if( isset( $LinkOwner ) && $LinkOwner->check_perm( 'edit' ) )
 				{	// Offer option to link the file to an Item (or anything else):
-					$link_attribs = array();
+					$link_attribs = array( 'class' => 'action_icon link_file btn btn-primary btn-xs' );
 					$link_action = 'link';
 					if( $mode == 'upload' )
 					{	// We want the action to happen in the post attachments iframe:
 						$link_attribs['target'] = $iframe_name;
-						$link_attribs['class'] = 'action_icon link_file btn btn-primary btn-xs';
+						$link_attribs['onclick'] = 'return evo_link_attach( \''.$LinkOwner->type.'\', '.$LinkOwner->get_ID()
+								.', \''.FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() )
+								.'\', \''.$lFile->get_rdfp_rel_path().'\' )';
 						$link_action = 'link_inpost';
 					}
 					echo action_icon( T_('Link this file!'), 'link',
@@ -304,6 +316,9 @@ $Form->begin_form();
 						echo action_icon( T_('Use this as my profile picture!'), 'link',
 									regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 									NULL, NULL, NULL, array() );
+						echo action_icon( T_('Duplicate and use as profile picture'), 'user',
+									regenerate_url( 'fm_selected', 'action=duplicate_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
+									NULL, NULL, NULL, array() );
 						echo ' ';
 					}
 				}
@@ -313,6 +328,21 @@ $Form->begin_form();
 								regenerate_url( 'fm_selected', 'action=link_data&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 								NULL, NULL, NULL, array() );
 
+					echo ' ';
+				}
+
+				if( $fm_mode == 'file_select' && !empty( $field_name )  && !$lFile->is_dir() && $lFile->get( 'type' ) == $file_type )
+				{
+					$sfile_root = FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() );
+					$sfile_path = $lFile->get_rdfp_rel_path();
+					$link_attribs = array();
+					$link_action = 'set_field';
+					$link_attribs['target'] = '_parent';
+					$link_attribs['class'] = 'action_icon select_file btn btn-primary btn-xs';
+					$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \''.$sfile_path.'\' );';
+					echo action_icon( T_('Select file'), 'link',
+							regenerate_url( 'fm_selected', 'action=file_select&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
+							' './* TRANS: verb */ T_('Select'), NULL, 5, $link_attribs );
 					echo ' ';
 				}
 			}
@@ -360,11 +390,25 @@ $Form->begin_form();
 			echo '<td class="type">'.$lFile->get_type().'</td>';
 		}
 
+		/*******************  Added by  *******************/
+
+		if( $UserSettings->get('fm_showcreator') )
+		{
+			if( $creator = $lFile->get_creator() )
+			{
+				echo '<td class="center">'.$creator->get( 'login' ).'</td>';
+			}
+			else
+			{
+				echo '<td class="center">unknown</td>';
+			}
+		}
+
 		/****************  Download Count  ****************/
-		
+
 		if( $UserSettings->get('fm_showdownload') )
 		{ // Show download count
-			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead 
+			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead
 			echo '<td class="center">'.$lFile->get_download_count().'</td>';
 		}
 
@@ -444,9 +488,9 @@ $Form->begin_form();
 			}
 
 			echo action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ), NULL, NULL, NULL,
-							array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.rawurlencode( $lFile->get_rdfp_rel_path() ).'\' )' ) );
-			echo action_icon( T_('Move'), 'file_move', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_move&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
-			echo action_icon( T_('Copy'), 'file_copy', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_copy&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
+							array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.$lFile->get_rdfp_rel_path().'\' )' ) );
+			echo action_icon( T_('Move'), 'file_move', regenerate_url( 'action,fm_selected,fm_sources_root', 'action=file_move&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
+			echo action_icon( T_('Copy'), 'file_copy', regenerate_url( 'action,fm_selected,fm_sources_root', 'action=file_copy&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
 			echo action_icon( T_('Delete'), 'file_delete', regenerate_url( 'fm_selected', 'action=delete&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ) );
 		}
 		echo '</td>';
@@ -463,34 +507,39 @@ $Form->begin_form();
 	 */
 	$filetable_cols = 5
 		+ (int)$fm_flatmode
+		+ (int)$UserSettings->get('fm_showcreator')
 		+ (int)$UserSettings->get('fm_showtypes')
 		+ (int)($UserSettings->get('fm_showdate') != 'no')
 		+ (int)$UserSettings->get('fm_showfsperms')
 		+ (int)$UserSettings->get('fm_showfsowner')
 		+ (int)$UserSettings->get('fm_showfsgroup')
+		+ (int)$UserSettings->get('fm_showdownloads')
 		+ (int)$UserSettings->get('fm_imglistpreview');
 
 
+	ob_start();
+	?>
+
+	<tr class="noresults">
+		<td class="firstcol">&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
+		<td class="lastcol" colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
+			<?php
+				if( ! $Messages->has_errors() )
+				{ // no Filelist errors, the directory must be empty
+					$Messages->clear();
+					$Messages->add( T_('No files found.')
+						.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'error' );
+					$Messages->display( '', '' );
+				}
+			?>
+		</td>
+	</tr>
+
+	<?php
+	$noresults = ob_get_clean();
 	if( $countFiles == 0 )
 	{ // Filelist errors or "directory is empty"
-		?>
-
-		<tr class="noresults">
-			<td class="firstcol">&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
-			<td class="lastcol" colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
-				<?php
-					if( ! $Messages->has_errors() )
-					{ // no Filelist errors, the directory must be empty
-						$Messages->clear();
-						$Messages->add( T_('No files found.')
-							.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'error' );
-						$Messages->display( '', '' );
-					}
-				?>
-			</td>
-		</tr>
-
-		<?php
+		echo $noresults;
 	}
 
 	echo '</tbody>';
@@ -513,6 +562,9 @@ $Form->begin_form();
 				if( $mode == 'upload' )
 				{ // We want the action to happen in the post attachments iframe:
 					$link_attribs['target'] = $iframe_name;
+					$link_attribs['onclick'] = 'return evo_link_attach( \''.$LinkOwner->type.'\', '.$LinkOwner->get_ID()
+							.', \''.FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() )
+							.'\', \''.'$file_path$'.'\' )';
 					$link_attribs['class'] = 'action_icon link_file btn btn-primary btn-xs';
 					$link_action = 'link_inpost';
 				}
@@ -525,52 +577,102 @@ $Form->begin_form();
 				$icon_to_link_files = '';
 			}
 
-			$template_filerow = '<table><tr>'
-				.'<td class="checkbox firstcol qq-upload-checkbox">&nbsp;</td>'
-				.'<td class="icon_type qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>';
+			$template = '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
+				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
+				.'<span class="qq-upload-drop-area-text-selector"></span>'
+				.'</div>'
+				.'<div class="qq-upload-button-selector qq-upload-button">'
+				.'<div>#button_text#</div>'
+				.'</div>'
+				.'<span class="qq-drop-processing-selector qq-drop-processing">'
+				.'<span>'.TS_('Processing dropped files...').'</span>'
+				.'<span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>'
+				.'</span>'
+				.'<table>'
+				.'<tbody class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">'
+				.'<tr>';
+
+			$template .= '<td class="checkbox firstcol qq-upload-checkbox">&nbsp;</td>';
+			$template .= '<td class="icon_type qq-upload-image shrinkwrap"><span class="qq-upload-spinner-selector qq-upload-spinner">&nbsp;</span></td>';
+
+			if( $fm_mode == 'file_select' && !empty( $field_name ) )
+			{
+				$sfile_root = FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() );
+				$link_attribs = array();
+				$link_action = 'set_field';
+				$link_attribs['target'] = '_parent';
+				$link_attribs['class'] = 'action_icon select_file btn btn-primary btn-xs';
+				$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \''.'$file_path$'.'\' );';
+				$icon_to_select_files = action_icon( T_('Select file'), 'link',
+						regenerate_url( 'fm_selected', 'action=file_select&amp;fm_selected[]='.'$file_path$'.'&amp;'.url_crumb('file') ),
+						' './* TRANS: verb */ T_('Select'), NULL, 5, $link_attribs ).' ';
+			}
+			else
+			{
+				$icon_to_select_files = '';
+			}
+
 			if( $fm_flatmode )
 			{
-				$template_filerow .= '<td class="filepath">'.( empty( $path ) ? './' : $path ).'</td>';
+				$template .= '<td class="filepath">'.( empty( $path ) ? './' : $path ).'</td>';
 			}
-			$template_filerow .= '<td class="fm_filename qq-upload-file">&nbsp;</td>';
+			$template .= '<td class="fm_filename">';
+			$template .= '<div class="qq-upload-file-selector"></div>';
+			$template .= '<div class="qq-progress-bar-container-selector progress" style="margin-bottom: 0;">';
+			$template .= '<div class="qq-progressbar-selector progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;"></div>';
+			$template .= '</div>';
+			$template .= '</td>';
 			if( $UserSettings->get('fm_showtypes') )
 			{
-				$template_filerow .= '<td class="type">&nbsp;</td>';
+				$template .= '<td class="type qq-upload-file-type">&nbsp;</td>';
 			}
-			$template_filerow .= '<td class="size"><span class="qq-upload-size">&nbsp;</span><span class="qq-upload-spinner">&nbsp;</span></td>';
+			if( $UserSettings->get( 'fm_showcreator' ) )
+			{
+				$template .= '<td class="center qq-upload-file-creator">&nbsp;</td>';
+			}
+			if( $UserSettings->get( 'fm_showdownload' ) )
+			{
+				$template .= '<td class="center qq-upload-downloads">&nbsp;</td>';
+			}
+			$template .= '<td class="size"><span class="qq-upload-size-selector">&nbsp;</span>';
+			$template .= '</td>';
 			if( $UserSettings->get('fm_showdate') != 'no' )
 			{
-				$template_filerow .= '<td class="qq-upload-status timestamp">'.TS_('Uploading...').'</td>';
+				$template .= '<td class="qq-upload-status-text-selector qq-upload-status-text timestamp"></td>';
 			}
 			if( $UserSettings->get('fm_showfsperms') )
 			{
-				$template_filerow .= '<td class="perms">&nbsp;</td>';
+				$template .= '<td class="perms">&nbsp;</td>';
 			}
 			if( $UserSettings->get('fm_showfsowner') )
 			{
-				$template_filerow .= '<td class="fsowner">&nbsp;</td>';
+				$template .= '<td class="fsowner">&nbsp;</td>';
 			}
 			if( $UserSettings->get('fm_showfsgroup') )
 			{
-				$template_filerow .= '<td class="fsgroup">&nbsp;</td>';
+				$template .= '<td class="fsgroup">&nbsp;</td>';
 			}
-			$template_filerow .= '<td class="actions lastcol">';
+			$template .= '<td class="actions lastcol shrinkwrap">';
 			if( $UserSettings->get('fm_showdate') == 'no' )
 			{ // Display status in the last column if column with datetime is hidden
-				$template_filerow .= '<span class="qq-upload-status">'.TS_('Uploading...').'</span> ';
+				$template .= '<span class="qq-upload-status-text-selector qq-upload-status-text"></span> ';
 			}
-			$template_filerow .= '<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
-				.'</td>'
-			.'</tr></table>';
+			$template .= '<a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'.'</td>';
+
+			$template .= '</tr></tbody></table>	</div>';
+
 			// Display a button to quick upload the files by drag&drop method
 			display_dragdrop_upload_button( array(
 					'fileroot_ID'         => $fm_FileRoot->ID,
 					'path'                => $path,
+					'listElement'         => 'jQuery( "#filelist_tbody" ).get(0)',
 					'list_style'          => 'table',
-					'template_filerow'    => $template_filerow,
+					'template'            => $template,
 					'display_support_msg' => false,
-					'additional_dropzone' => '#filelist_tbody',
+					'additional_dropzone' => '[ document.getElementById( "filelist_tbody" ) ]',
 					'filename_before'     => $icon_to_link_files,
+					'noresults'           => $noresults,
+					'filename_select'     => $icon_to_select_files,
 				) );
 			?>
 			</td>
@@ -614,6 +716,11 @@ $Form->begin_form();
 				$field_options['make_posts_pre'] = T_('Make multiple posts (1 per image)');
 			}
 
+			if( $edit_allowed_perm )
+			{ // User can edit:
+				$field_options['move_copy'] = T_('Copy/Move to another directory...');
+			}
+
 			if( $mode == 'upload' && isset( $LinkOwner ) && $LinkOwner->type == 'item' )
 			{	// We are uploading in a popup opened by an edit screen
 				$field_options['img_tag'] = T_('Insert IMG/link into post');
@@ -622,8 +729,9 @@ $Form->begin_form();
 			if( $edit_allowed_perm )
 			{ // User can edit:
 				$field_options['rename'] = T_('Rename files...');
+				$field_options['resize'] = T_('Resize images...');
 				$field_options['delete'] = T_('Delete files...');
-				$field_options['create_zip'] = T_('Create ZIP archive...');
+				$field_options['create_zip'] = T_('Create ZIP archive').'...';
 				// NOTE: No delete confirmation by javascript, we need to check DB integrity!
 			}
 
@@ -661,6 +769,41 @@ $Form->begin_form();
 				<?php
 			}
 			*/
+
+
+			/*
+			 * CREATE FILE/FOLDER CREATE PANEL:
+			 */
+			if( ( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ) )
+						&& $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+			{	// dir or file creation is enabled and we're allowed to add files:
+				global $create_type;
+
+				echo '<div class="evo_file_folder_creator">';
+					if( ! $Settings->get( 'fm_enable_create_dir' ) )
+					{	// We can create files only:
+						echo '<label for="fm_createname" class="tooltitle">'.T_('New file:').'</label>';
+						$Form->hidden( 'create_type', 'file' );
+					}
+					elseif( ! $Settings->get( 'fm_enable_create_file' ) )
+					{	// We can create directories only:
+						echo '<label for="fm_createname" class="tooltitle">'.T_('New folder:').'</label>';
+						$Form->hidden( 'create_type', 'dir' );
+					}
+					else
+					{	// We can create both files and directories:
+						echo T_('New').': ';
+						echo '<select name="create_type" class="form-control">';
+						echo '<option value="dir"'.( isset($create_type) &&  $create_type == 'dir' ? ' selected="selected"' : '' ).'>'.T_('folder').'</option>';
+						echo '<option value="file"'.( isset($create_type) && $create_type == 'file' ? ' selected="selected"' : '' ).'>'.T_('file').'</option>';
+						echo '</select>:';
+					}
+				?>
+				<input type="text" name="create_name" id="fm_createname" value="<?php echo isset( $create_name ) ? $create_name : ''; ?>" size="15" class="form-control" />
+				<input class="ActionButton btn btn-default" type="submit" name="actionArray[createnew]" value="<?php echo format_to_output( T_('Create').'!', 'formvalue' ) ?>" />
+				<?php
+				echo '</div>';
+			}
 			?>
 			</td>
 		</tr>
@@ -772,6 +915,16 @@ $Form->begin_form();
 				jQuery( document ).on( 'click', 'a.link_file', function()
 				{
 					jQuery( this ).parent().append( '<div class="green"><?php echo TS_('The file has been linked.'); ?></div>' );
+				} );
+			} );
+
+			// Display a message to inform user after the file was selected
+			jQuery( document ).ready( function()
+			{
+				jQuery( document ).on( 'click', 'a.select_file', function()
+				{
+					jQuery( '.selected_msg' ).remove();
+					jQuery( this ).parent().append( '<div class="green selected_msg"><?php echo TS_('The file has been selected.'); ?></div>' );
 				} );
 			} );
 			// -->

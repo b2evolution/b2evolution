@@ -63,22 +63,29 @@ class user_avatars_Widget extends ComponentWidget
 				'label' => T_('Layout'),
 				'note' => T_('How to lay out the thumbnails'),
 				'type' => 'select',
-				'options' => array( 
+				'options' => array(
+						'rwd'  => T_( 'RWD Blocks' ),
 						'flow' => T_( 'Flowing Blocks' ),
-						'list' => T_( 'List' ), 
-						'grid' => T_( 'Grid' ),
+						'list' => T_( 'List' ),
+						'grid' => T_( 'Table' ),
 					 ),
 				'defaultvalue' => 'flow',
 			),
-			'grid_nb_cols' => array(
-				'label' => T_( 'Columns' ),
-				'note' => T_( 'Number of columns in grid mode.' ),
-				'size' => 4,
-				'defaultvalue' => 1,
+			'rwd_block_class' => array(
+				'label' => T_('RWD block class'),
+				'note' => T_('Specify the responsive column classes you want to use.'),
+				'size' => 60,
+				'defaultvalue' => 'col-lg-2 col-md-3 col-sm-4 col-xs-6',
 			),
 			'limit' => array(
 				'label' => T_( 'Max pictures' ),
 				'note' => T_( 'Maximum number of pictures to display.' ),
+				'size' => 4,
+				'defaultvalue' => 1,
+			),
+			'grid_nb_cols' => array(
+				'label' => T_( 'Columns' ),
+				'note' => T_( 'Number of columns in Table mode.' ),
 				'size' => 4,
 				'defaultvalue' => 1,
 			),
@@ -96,7 +103,7 @@ class user_avatars_Widget extends ComponentWidget
 						'random'  => T_('Random users'),
 						'regdate' => T_('Most recent registrations'),
 						'moddate' => T_('Most recent profile updates'),
-						'numposts' => T_('Number of posts'),
+						'numposts' => T_('Number of (Public+Community+Member) posts'),
 					),
 				'defaultvalue' => 'random',
 			),
@@ -329,7 +336,6 @@ class user_avatars_Widget extends ComponentWidget
 
 		$layout = $this->disp_params[ 'thumb_layout' ];
 
-		$nb_cols = intval( $this->disp_params[ 'grid_nb_cols' ] );
 		$count = 0;
 		$r = '';
 		/**
@@ -337,22 +343,7 @@ class user_avatars_Widget extends ComponentWidget
 		 */
 		while( $User = & $UserList->get_next() )
 		{
-			if( $layout == 'grid' )
-			{ // Grid layout
-				if( $count % $nb_cols == 0 )
-				{
-					$r .= $this->disp_params[ 'grid_colstart' ];
-				}
-				$r .= $this->disp_params[ 'grid_cellstart' ];
-			}
-			elseif( $layout == 'flow' )
-			{ // Flow block layout
-				$r .= $this->disp_params[ 'flow_block_start' ];
-			}
-			else
-			{ // List layout
-				$r .= $this->disp_params[ 'item_start' ];
-			}
+			$r .= $this->get_layout_item_start( $count );
 
 			$identity_url = get_user_identity_url( $User->ID );
 			$avatar_tag = $User->get_avatar_imgtag( $this->disp_params['thumb_size'] );
@@ -373,7 +364,7 @@ class user_avatars_Widget extends ComponentWidget
 
 				if( $this->disp_params[ 'style' ] == 'badges' )
 				{ // Add user login after picture
-					$r .= '<br >'.$User->get_colored_login();
+					$r .= '<br >'.$User->get_colored_login( array( 'login_text' => 'name' ) );
 				}
 				elseif( $this->disp_params[ 'style' ] == 'username' )
 				{ // username without <br>
@@ -388,22 +379,7 @@ class user_avatars_Widget extends ComponentWidget
 
 			++$count;
 
-			if( $layout == 'grid' )
-			{ // Grid layout
-				$r .= $this->disp_params[ 'grid_cellend' ];
-				if( $count % $nb_cols == 0 )
-				{
-					$r .= $this->disp_params[ 'grid_colend' ];
-				}
-			}
-			elseif( $layout == 'flow' )
-			{ // Flow block layout
-				$r .= $this->disp_params[ 'flow_block_end' ];				
-			}
-			else
-			{ // List layout
-				$r .= $this->disp_params[ 'item_end' ];
-			}
+			$r .= $this->get_layout_item_end( $count );
 		}
 
 		// Exit if no files found
@@ -416,38 +392,11 @@ class user_avatars_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		if( $layout == 'grid' )
-		{
-			echo $this->disp_params[ 'grid_start' ];
-		}
-		elseif( $layout == 'flow' )
-		{ // Flow block layout
-			echo $this->disp_params[ 'flow_start' ];
-		}
-		else
-		{
-			echo $this->disp_params[ 'list_start' ];
-		}
-		
+		echo $this->get_layout_start();
+
 		echo $r;
 
-		if( $layout == 'grid' )
-		{
-			if( $count && ( $count % $nb_cols != 0 ) )
-			{
-				echo $this->disp_params[ 'grid_colend' ];
-			}
-
-			echo $this->disp_params[ 'grid_end' ];
-		}
-		elseif ( $layout == 'flow' )
-		{ // Flow block layout
-			echo $this->disp_params[ 'flow_end' ];
-		}
-		else
-		{
-			echo $this->disp_params[ 'list_end' ];
-		}
+		echo $this->get_layout_end( $count );
 
 		echo $this->disp_params['block_body_end'];
 

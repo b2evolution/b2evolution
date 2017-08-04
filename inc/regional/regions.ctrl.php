@@ -162,43 +162,27 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$DB->begin();
-			$q = $edited_Region->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Region->dbinsert();
+			$Messages->add( T_('New region created.'), 'success' );
 
-				param_error( 'rgn_code',
-					sprintf( T_('This region already exists. Do you want to <a %s>edit the existing region</a>?'),
-						'href="?ctrl=regions&amp;action=edit&amp;rgn_ID='.$q.'"' ) );
-			}
-			else
+			// What next?
+			switch( $action )
 			{
-				$edited_Region->dbinsert();
-				$Messages->add( T_('New region created.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{	// What next?
-
-				switch( $action )
-				{
-					case 'create_copy':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=regions&action=new&rgn_ID='.$edited_Region->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create_new':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=regions&action=new', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=regions', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=regions&action=new&rgn_ID='.$edited_Region->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=regions&action=new', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=regions', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;
@@ -220,26 +204,12 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Update in DB:
-			$DB->begin();
-			$q = $edited_Region->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
-				param_error( 'rgn_code',
-					sprintf( T_('This region already exists. Do you want to <a %s>edit the existing region</a>?'),
-						'href="?ctrl=regions&amp;action=edit&amp;rgn_ID='.$q.'"' ) );
-			}
-			else
-			{
-				$edited_Region->dbupdate();
-				$Messages->add( T_('Region updated.'), 'success' );
-			}
-			$DB->commit();
+			$edited_Region->dbupdate();
+			$Messages->add( T_('Region updated.'), 'success' );
 
-			if( empty($q) )
-			{	// If no error, Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=regions', 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
+			// If no error, Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=regions', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 

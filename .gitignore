@@ -15,3 +15,11 @@ npm-debug.log
 /nbproject/
 .idea/*
 media/blogs/a
+skins/business_skin
+conf/_local.php
+plugins/geoip_plugin/GeoIP.dat
+media/blogs/b
+npm-debug.log
+/media/users/admin/private_message
+/media/import
+/media/blogs/forums

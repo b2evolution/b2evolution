@@ -1,11 +1,3 @@
-// ------------- Organization Members widget -------------
-@import "../../rsc/less/_org_members_widget.module.less";
-	// Override constants used in the module:
-	@widget_core_org_members-color: #333;
-	@widget_core_org_members-user-link-color: #000;
-	@widget_core_org_members-user-link-hover-color: #23527c;
-// -------------------------------------------------------
-
 // Header
 .evo_container__header {
 	margin-bottom: 30px;
@@ -16,13 +8,42 @@
 		text-align: right;
 	}
 }
-div.widget_core_coll_tagline {
-	margin-bottom: 30px;
+// div.widget_core_coll_tagline {
+	// margin-bottom: 30px;
+// }
+.evo_container__front_page_primary {
+	padding-bottom: 30px;
+	.evo_widget {
+		margin-top: 30px;
+		div, h1, h2, p {
+			margin-top: 0;
+		}
+		div > p:last-child, // When it's the last <p> of the each div, no martgin-bottom, because of regular widget margin-bottom
+		//&:last-child > h2,
+		&:last-child > ul, // When it's the last <ul> of the each div, no martgin-bottom, because of regular widget margin-bottom
+		& > ul li:last-child {
+			margin-bottom: 0 !important; // When it's the last <li> of last <ul> of the each div, no martgin-bottom, because of regular widget margin-bottom
+		}
+		// .widget_core_menu_link
+		// .widget_core_msg_menu_link
+		// .widget_core_profile_menu_link
+		// .widget_core_flag_menu_link
+		&[class$=_menu_link] {
+			// Align center buttons:
+			text-align: center;
+		}
+	}
+}
+.evo_container__front_page_secondary {
+	padding-top: 30px;
 }
 
 // Secondary Area:
 .secondary_area {
-	background-color: #FFF;
+	// Important for hiding "Slide down" arrow behind this div
+	position: relative;
+	z-index: 1;
+	
 	width: 100%;
 	p {
 		margin-top: 10px;
@@ -43,6 +64,7 @@ html {
 	height: 100%;
 }
 body {
+	overflow-x: visible !important;
 	-webkit-font-smoothing: subpixel-antialiased;
 }
 
@@ -63,120 +85,6 @@ div.front_main_area {
 	div.widget {
 		margin: 30px 0;
 	}
-
-	// Universal item widget and Recent Posts widget specific styles:
-	div.widget_core_coll_item_list, div.widget_core_coll_post_list {
-		// If "Display first picture" and "Special treatment"
-		&.evo_1pic__special {
-			ul {
-				padding: 0;
-				margin-left: 0;
-				li {
-					list-style: none;
-					height: auto;
-					display: table;
-					clear: both;
-					margin: 5px 0;
-					padding: 0;
-					vertical-align: middle;
-					// Placeholder for item list when "Display first picture" but no picture to show
-					.item_first_image_placeholder {
-						display: table;
-						text-align: center;
-						vertical-align: middle;
-						float: left;
-						height: 80px;
-						width: 80px;
-						background: #f5f5f5;
-						margin-right: 6px;
-						-webkit-border-radius: 3px;
-						-moz-border-radius: 3px;
-						-ms-border-radius: 3px;
-						-o-border-radius: 3px;
-						border-radius: 3px;
-						&:before {
-							font-family: FontAwesome;
-							display: table-cell;
-							vertical-align: middle;
-							content: '\f0f6';
-							color: #ddd;
-							font-size: 40px;
-						}
-					}
-					div.item_title {
-						vertical-align: middle;
-						display: table-cell;
-						height: 100%;
-					}
-				}
-			}	
-		}
-		// If "Display all pictures" and "No special treatment"
-		&.evo_pics {
-			.item_images {			
-				clear: both;
-				img {
-					margin-right: 6px;
-					margin-top: 6px;
-				}
-			}
-		}
-		// If "Display all pictures" and "Special treatment" 
-		// THIS NEEDS EDITING!!!!
-		&.evo_pics.evo_1pic__special {
-			.item_images {
-			}
-		}
-		// With excerpt
-		&.evo_withexcerpt, &.evo_withteaser {
-			// Special treatment - remove bullets
-			&.evo_1pic__special ul li {
-				list-style: none;	
-				display: table;				
-			}
-			ul li {
-				height: auto;
-				width: 100%;
-				display: list-item;
-				clear: both;
-				margin: 15px 0;
-				padding: 0;
-				vertical-align: middle;
-				div.item_title {
-					vertical-align: middle;
-					display: block !important;
-					height: auto !important;
-					width: 100%;
-					margin-bottom: 6px;
-				}
-			}
-		}
-		div.item_first_image {
-			float: left; 
-			margin-right: 6px;
-		}
-		img {
-			border-radius: 3px;
-		}
-		// If grouped, bigger group title
-		&.evo_withgroup > ul > li {
-			font-size: 17px;
-		}
-	}
-	
-	
-	div.widget_core_coll_item_list {
-		// We want to display the first image cleanly before the title
-		// This may need further tweaking...
-		ul {
-			//padding: 0;
-			//margin-left: 0;
-		}
-		li {
-			// list-style: none;
-			// height: 80px;
-		}
-	}
 }
 
 body.pictured {
@@ -184,12 +92,18 @@ body.pictured {
 	#skin_wrapper {
 		width: 100%;
 		height: 100%;
+		overflow-x: hidden; // Keep this to allow animate page down on webkit browsers
+		&.skin_wrapper_loggedin {
+			// Use padding instead of margin to avoid a double scrolling on Windows FireFox
+			margin-top: 0;
+			padding-top: 27px;
+		}
 	}
 	.container.main_page_wrapper {
 		display: table;
 		height: 100%;
 		min-height: 100%;
-	 .panel {
+		.panel {
 			color: #333;
 			a:not([class]) {
 				color: #337ab7;
@@ -205,36 +119,63 @@ body.pictured {
 		}
 	}
 	// Fix debug info position after skin wrapper:
+	// @FP > I think we don't need this
 	div#debug_info.debug {
 		position: absolute;
 		top: 100%;
 	}
 }
-#bg_picture {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	width: 100%;
+.evo_pictured_layout {
+	//position: fixed;
+	// top: 0;
+	// left: 0;
+	// right: 0;
+	// bottom: 0;
+	// width: 100%;
+	// height: 100%;
+	display: table;
 	height: 100%;
+	min-height: 100%;
+	min-width: 100%;
+	position: relative;
+	width: 100%;
+	background-attachment: fixed;
 	background-size: cover;
 	background-position: center center;
-	z-index: -999999;
-	img {
+	> .evo_pictured__image {
 		display: none;
 		width: 100%;
 	}
 }
+
+	// Separate slide-top button from the scrollbar on Mozilla and Chrome
+	// body.disp_front .slide-top {
+		// right: 29px;
+	// }
+	
+@media (min-width: 640px) and (min-device-width: 640px) {
+	// Separate slide-top button from the scrollbar on Mozilla and Chrome
+	body.disp_front .slide-top {
+		right: 29px;
+	}
+}
+	
 @media only screen and (max-width: 640px) {
+	// Important for preventing white gap in .main_page_wrapper on this viewport size
+	// Since we break #bg_picture on this size, height: 100% is not needed anymore
+	html {
+		height: auto;
+	}
+	
 	body.disp_front {
 		.sitewide_header {
 			margin-bottom: 0;
 		}
-		#bg_picture {
+		.evo_pictured_layout {
 			position: relative;
 			height: auto;
-			img {
+			min-height: auto;
+			> .evo_pictured__image {
 				display: block;
 			}
 		}
@@ -243,6 +184,25 @@ body.pictured {
 			margin-top: 0;
 			margin-bottom: 0;
 		}
+		
+		.slide-top {
+			right: 8px;
+		}
+	}
+}
+
+@media only screen and (min-device-width: 1024px) {
+body.pictured {
+	#skin_wrapper.skin_wrapper_loggedin {
+		// Use padding instead of margin to avoid a double scrolling on Windows FireFox
+		margin-top: 0;
+		padding-top: 27px;
+		}
+	}
+}
+@media (min-width: 640px) and (max-device-width: 1024px) {
+	.btn.slide-top.logged_in_margin_top {
+		top: 35px;
 	}
 }
 
@@ -409,6 +369,12 @@ textarea.message_text {
 	}
 }
 
+.evo_hasbgimg {
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+}
+
 div.bSideItem {
 	background: #F7F5FA;
 	border-radius: 5px;
@@ -537,10 +503,13 @@ div.action_messages, div.log_container {
 // Positions on the action buttons near page titles
 .evo_post_title {
 	display: table;
+	h1 {
+		margin-bottom: 0;
+	}
 	h2 {
 		display: table-cell;
 		margin: 0;
-		padding: 20px 0 10px;
+		padding: 20px 0 0;
 	}
 	.btn-group {
 		display: table-cell;
@@ -557,5 +526,67 @@ body.pictured .front_main_content .ufld_icon_links a {
 	.fa {
 		font-size: 30px;
 		line-height: 60px;
+	}
+}
+
+// Organization Members widget
+.widget_core_org_members {
+	margin: 5em 0 30px;
+	color: #333;
+	img {
+		width: 200px;
+		height: 200px;
+		display: inline-block;
+	}
+	h2.page-header {
+		margin-top: 0;
+	}
+	p.user_field {
+		margin-bottom: 40px;
+	}
+}
+body.pictured .secondary_area .widget_core_org_members {
+	a.user_link {
+		color: #000;
+		&:hover {
+			color: #23527c;
+		}
+	}
+}
+
+// Responsive layout
+@media (max-width: 640px) {
+	body.pictured .front_main_content .ufld_icon_links a {
+		width: 45px;
+		height: 45px;
+		margin: 5px;
+		.fa {
+			font-size: 20px;
+			line-height: 45px;
+		}
+	}
+	.slide_button_wrap {
+		display: none !important;
+	}
+}
+
+.slide_button_wrap {
+	position: fixed;
+	bottom: 20px;
+	left: 50%;
+	line-height: 1em;
+	#slide_button {
+		display: inline-block;
+		font-size: 55px;
+		color: #ffffff;
+		text-align: center;
+		opacity: 0.5;
+		transition: 0.1s all;
+		position:relative; 
+		left:-50%;
+		&:hover {
+			cursor: pointer;
+			opacity: 0.9;
+		}
 	}
 }

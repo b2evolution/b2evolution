@@ -22,7 +22,7 @@ class shortlinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Short Links';
 	var $priority = 35;
-	var $version = '5.0.0';
+	var $version = '6.9.3';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -117,22 +117,10 @@ class shortlinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		if( !empty( $params['Item'] ) )
-		{ // Get Item from params
-			$Item = & $params['Item'];
-		}
-		elseif( !empty( $params['Comment'] ) )
-		{ // Get Item from Comment
-			$Comment = & $params['Comment'];
-			$Item = & $Comment->get_Item();
-		}
-		else
-		{ // Item and Comment are not defined, Exit here
-			return;
-		}
-		$item_Blog = & $Item->get_Blog();
+		// Get collection from given params:
+		$setting_Blog = $this->get_Blog_from_params( $params );
 
-		$this->setting_link_without_brackets = $this->get_coll_setting( 'link_without_brackets', $item_Blog );
+		$this->setting_link_without_brackets = $this->get_coll_setting( 'link_without_brackets', $setting_Blog );
 
 		return $this->render_content( $content );
 	}
@@ -182,34 +170,21 @@ class shortlinks_plugin extends Plugin
 	 */
 	function render_content( & $content )
 	{
+		global $admin_url, $blog, $evo_charset, $post_ID;
 
-		global $ItemCache, $admin_url, $blog, $evo_charset, $post_ID;
+		// Add regexp modifier 'u' to work with UTF-8 strings correctly:
+		$regexp_modifier = ( $evo_charset == 'utf-8' ) ? 'u' : '';
 
-		$regexp_modifier = '';
-		if( $evo_charset == 'utf-8' )
-		{ // Add this modifier to work with UTF-8 strings correctly
-			$regexp_modifier = 'u';
-		}
-
-		// Regular links:
-		$search = array(
-			// [[http://url]] :
-			'#\[\[((https?|mailto)://((?:[^<>{}\s\]]|,(?!\s))+?))\]\]#i',
-			// [[http://url text]] :
-			'#\[\[((https?|mailto)://([^<>{}\s\]]+)) ([^\n\r]+?)\]\]#i',
-			// ((http://url)) :
-			'#\(\(((https?|mailto)://((?:[^<>{}\s\]]|,(?!\s))+?))\)\)#i',
-			// ((http://url text)) :
-			'#\(\(((https?|mailto)://([^<>{}\s\]]+)) ([^\n\r]+?)\)\)#i',
-		);
-		$replace = array(
-			'<a href="$1">$1</a>',
-			'<a href="$1">$4</a>',
-			'<a href="$1">$1</a>',
-			'<a href="$1">$4</a>'
-		);
-
-		$content = replace_content_outcode( $search, $replace, $content );
+		// -------- REGULAR BRACKETED URLS -------- :
+		$search_urls = '*
+			( \[\[ | \(\( )                    # Lookbehind for (( or [[
+			( (https?|mailto)://[^<>{}\s\]]+ ) # URL
+			( \s \.[a-z0-9_\-\.]+ )?           # Style classes started and separated with dot (Optional)
+			( \s _[a-z0-9_\-]+ )?              # Link target started with _ (Optional)
+			( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
+			( \]\] | \)\) )                    # Lookahead for )) or ]]
+			*ix'; // x = extended (spaces + comments allowed)
+		$content = replace_content_outcode( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
 
 /* QUESTION: fplanque, implementation of this planned? then use make_clickable() - or remove this comment
 	$ret = preg_replace("#([\n ])aim:([^,< \n\r]+)#i", "\\1<a href=\"aim:goim?screenname=\\2\\3&message=Hello\">\\2\\3</a>", $ret);
@@ -223,13 +198,12 @@ class shortlinks_plugin extends Plugin
 		// To use function replace_special_chars()
 		load_funcs('locales/_charset.funcs.php');
 
-		// WIKIWORDS:
-
-		$search_wikiwords = array();
-		$replace_links = array();
-
+		// -------- STANDALONE WIKIWORDS -------- :
 		if( $this->setting_link_without_brackets )
 		{	// Create the links from standalone WikiWords
+
+			$search_wikiwords = array();
+			$replace_links = array();
 
 			// STANDALONE WIKIWORDS:
 			$search = '/
@@ -238,7 +212,7 @@ class shortlinks_plugin extends Plugin
 					(?= [\.,:;!\?] \s | \s | $ )											# Lookahead for whitespace or punctuation
 				/x'.$regexp_modifier;	// x = extended (spaces + comments allowed)
 
-			if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER) )
+			if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER ) )
 			{
 				// Construct array of wikiwords to look up in post urltitles
 				$wikiwords = array();
@@ -263,42 +237,40 @@ class shortlinks_plugin extends Plugin
 					// WikiWord
 					$search_wikiwords[] = '/
 						(?<= \s | ^ ) 						# Lookbehind for whitespace or start
-						(?<! <span\ class="NonExistentWikiWord"> )
+						(?<! evo_shortlink_broken">)
 						'.$WikiWord.'							# Specific WikiWord to replace
 						(?= [\.,:;!\?] \s | \s | $ )							# Lookahead for whitespace or end of string
 						/sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
 
 
 					// Find matching Item:
-					if( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
-					{ // Item Found
-						$permalink = $Item->get_permanent_url();
-
+					if( $Item = & $ItemCache->get_by_urltitle( $wiki_word, false, false ) )
+					{	// Item Found
 						// WikiWord
-						$replace_links[] = '<a href="'.$permalink.'">'.$Item->get( 'title' ).'</a>';
-
+						$replace_links[] = '<a href="'.$Item->get_permanent_url().'">'.$Item->get( 'title' ).'</a>';
 					}
 					else
-					{ // Item not found
-
-						$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
-
+					{	// Item not found
 						// WikiWord
-						$replace_links[] = '<span class="NonExistentWikiWord">'.$WikiWord.$create_link.'</span>';
-
+						$replace_links[] = $this->get_broken_link( $WikiWord, $wiki_word, $WikiWord );
 					}
 				}
 			}
+
+			// Replace all found standalone words with links:
+			$content = replace_content_outcode( $search_wikiwords, $replace_links, $content );
 		}
 
-		// BRACKETED WIKIWORDS:
+		// -------- BRACKETED WIKIWORDS -------- :
 		$search = '/
-				(?<= \(\( | \[\[ )										# Lookbehind for (( or [[
-				([\p{L}0-9#]+[\p{L}0-9#_\-]*)									# Anything from Wikiword to WikiWordLong
-				(?= ( \s .*? )? ( \)\) | \]\] ) )			# Lookahead for )) or ]]
-			/x'.$regexp_modifier;	// x = extended (spaces + comments allowed)
-
-		if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER) )
+				(?<= \(\( | \[\[ )            # Lookbehind for (( or [[
+				([\p{L}0-9#]+[\p{L}0-9#_\-]*) # Anything from Wikiword to WikiWordLong
+				(?=
+					( \s .*? )?                 # Custom link text instead of post or chapter title with optional style classes
+					( \)\) | \]\] )             # Lookahead for )) or ]]
+				)
+			/x'.$regexp_modifier; // x = extended (spaces + comments allowed)
+		if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER ) )
 		{
 			// Construct array of wikiwords to look up in post urltitles
 			$wikiwords = array();
@@ -328,127 +300,218 @@ class shortlinks_plugin extends Plugin
 			$ItemCache = & get_ItemCache();
 			$ItemCache->load_urltitle_array( $wikiwords );
 
-			// Construct arrays for replacing wikiwords by links:
+			// Replace wikiwords by links:
 			foreach( $wikiwords as $WikiWord => $wiki_word )
 			{
-				// Parse wiki word to find additional param for atrr "id"
-				$url_params = '';
-				preg_match( '/^([^#]+)(#(.+))?$/i', $WikiWord, $WikiWord_match );
-				if( empty( $WikiWord_match ) )
-				{
-					preg_match( '/#(?<=#).*/', $WikiWord, $WikiWord_match );
-					$WikiWord_match[1] = isset( $WikiWord_match[0] ) ? $WikiWord_match[0] : null;
-					$anchor = $WikiWord_match[1];
-				}
+				// Initialize current wiki word which is used in callback function callback_replace_bracketed_words():
+				$this->current_WikiWord = $WikiWord;
+				$this->current_wiki_word = $wiki_word;
 
-				if( isset( $WikiWord_match[3] ) )
-				{ // wiki word has attr "id"
-					$url_params .= '#'.$WikiWord_match[3];
-				}
+				// Fix for regexp:
+				$WikiWord = str_replace( '#', '\#', preg_quote( $WikiWord ) );
 
-				// Fix for regexp
-				$WikiWord = str_replace( '#', '\#', $WikiWord );
-
+				// [[WikiWord]]
 				// [[WikiWord text]]
-				$search_wikiwords[] = '*
-					\[\[
-					'.$WikiWord.'							# Specific WikiWord to replace
-					\s (.+?)
-					\]\]
-					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
-
+				// [[WikiWord .style.classes text]]
+				// ((WikiWord))
 				// ((WikiWord text))
-				$search_wikiwords[] = '*
-					\(\(
-					'.$WikiWord.'							# Specific WikiWord to replace
-					\s (.+?)
-					\)\)
-					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
+				// ((WikiWord .style.classes text))
+				$search_wikiword = '*
+					( \[\[ | \(\( )          # Lookbehind for (( or [[
+					'.$WikiWord.'            # Specific WikiWord to replace
+					( \s \.[a-z0-9_\-\.]+ )? # Style classes started and separated with dot (Optional)
+					( \s _[a-z0-9_\-]+ )?    # Link target started with _ (Optional)
+					( \s .+? )?              # Custom link text instead of post/chapter title (Optional)
+					( \]\] | \)\) )          # Lookahead for )) or ]]
+					*isx'; // s = dot matches newlines, x = extended (spaces + comments allowed)
 
-				// [[Wikiword]]
-				$search_wikiwords[] = '*
-					\[\[
-					'.$WikiWord.'							# Specific WikiWord to replace
-					\]\]
-					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
-
-				// ((Wikiword))
-				$search_wikiwords[] = '*
-					\(\(
-					'.$WikiWord.'							# Specific WikiWord to replace
-					\)\)
-					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
-
-				// Use title of wiki word without attribute part
-				$WikiWord = $WikiWord_match[1];
-
-				// Find matching Chapter or Item:
-				$permalink = '';
-				$link_text = preg_replace( array( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1 $2', $WikiWord );
-				$link_text = ucwords( str_replace( '-', ' ', $link_text ) );
-				if( is_numeric( $wiki_word ) && ( $Item = & $ItemCache->get_by_ID( $wiki_word, false )) !== false )
-				{ // Item is found
-					$permalink = $Item->get_permanent_url();
-					$existing_link_text = $Item->get( 'title' );
-				}
-				elseif( ($Chapter = & $ChapterCache->get_by_urlname( $wiki_word, false )) !== false )
-				{ // Chapter is found
-					$permalink = $Chapter->get_permanent_url();
-					$existing_link_text = $Chapter->get( 'name' );
-				}
-				elseif( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
-				{ // Item is found
-					$permalink = $Item->get_permanent_url();
-					$existing_link_text = $Item->get( 'title' );
-				}
-				elseif( isset( $anchor ) && ( $Item = & $ItemCache->get_by_ID( $ItemCache->ID_array[0], false )) !== false )
-				{ // Item is found
-					$permalink = $Item->get_permanent_url();
-					$permalink = $url_params == '' ? $permalink.$anchor : $url_params;
-					$existing_link_text = $Item->get( 'title' );
-					unset($anchor);
-				}
-
-				if( !empty( $permalink ) )
-				{ // Chapter or Item are found
-					// [[WikiWord text]]
-					$replace_links[] = '<a href="'.$permalink.$url_params.'">$1</a>';
-
-					// ((WikiWord text))
-					$replace_links[] = '<a href="'.$permalink.$url_params.'">$1</a>';
-
-					// [[Wikiword]]
-					$replace_links[] = '<a href="'.$permalink.$url_params.'">'.$existing_link_text.'</a>';
-
-					// ((Wikiword))
-					$replace_links[] = '<a href="'.$permalink.$url_params.'">'.$link_text.'</a>';
-				}
-				else
-				{ // Chapter and Item are not found
-					$create_link = isset( $blog ) && !is_numeric( $wiki_word ) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
-
-					// [[WikiWord text]]
-					$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
-
-					// ((WikiWord text))
-					$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
-
-					// [[Wikiword]]
-					$replace_links[] = '<span class="NonExistentWikiWord">'.$link_text.$create_link.'</span>';
-
-					// ((Wikiword))
-					$replace_links[] = '<span class="NonExistentWikiWord">'.$link_text.$create_link.'</span>';
-				}
+				$content = replace_content_outcode( $search_wikiword, array( $this, 'callback_replace_bracketed_words' ), $content, 'replace_content', 'preg_callback' );
 			}
 		}
 
-		// echo '<br />---';
-
-		// pre_dump( $search_wikiwords );
-
-		$content = replace_content_outcode( $search_wikiwords, $replace_links, $content );
-
 		return true;
+	}
+
+
+	/**
+	 * Callback function for replace_content_outcode to render links like [[http://site.com/page.html .style.classes text]] or ((http://site.com/page.html .style.classes text))
+	 *
+	 * @param array Matches of regexp
+	 * @return string A processed link to the requested URL
+	 */
+	function callback_replace_bracketed_urls( $m )
+	{
+		if( ! ( $m[1] == '[[' && $m[7] == ']]' ) &&
+		    ! ( $m[1] == '((' && $m[7] == '))' ) )
+		{	// Wrong pattern, Return original text:
+			return $m[0];
+		}
+
+		// Clear custom link text:
+		$custom_link_text = utf8_trim( $m[6] );
+
+		// Clear custom link style classes:
+		$custom_link_class = utf8_trim( str_replace( '.', ' ', $m[4] ) );
+
+		// Clear custom link target:
+		$custom_link_target = utf8_trim( $m[5] );
+
+		// Build a link from bracketed URL:
+		$r = '<a href="'.$m[2].'"';
+		$r .= empty( $custom_link_class ) ? '' : ' class="'.$custom_link_class.'"';
+		$r .= empty( $custom_link_target ) ? '' : ' target="'.$custom_link_target.'"';
+		$r .= '>';
+		$r .= empty( $custom_link_text ) ? $m[2] : $custom_link_text;
+		$r .= '</a>';
+
+		return $r;
+	}
+
+
+	/**
+	 * Callback function for replace_content_outcode to render links like [[wiki-word .style.classes text]] or ((wiki-word .style.classes text))
+	 *
+	 * @param array Matches of regexp
+	 * @return string A processed link to post/chapter URL OR a suggestion text to create new post from unfound post urltitle
+	 */
+	function callback_replace_bracketed_words( $m )
+	{
+		global $blog, $evo_charset, $admin_url;
+
+		if( ! ( $m[1] == '[[' && $m[5] == ']]' ) &&
+		    ! ( $m[1] == '((' && $m[5] == '))' ) )
+		{	// Wrong pattern, Return original text:
+			return $m[0];
+		}
+
+		$ItemCache = & get_ItemCache();
+		$ChapterCache = & get_ChapterCache();
+
+		// Add regexp modifier 'u' to work with UTF-8 strings correctly:
+		$regexp_modifier = ( $evo_charset == 'utf-8' ) ? 'u' : '';
+
+		// Parse wiki word to find additional param for atrr "id":
+		$url_params = '';
+		preg_match( '/^([^#]+)(#(.+))?$/i', $this->current_WikiWord, $WikiWord_match );
+		if( empty( $WikiWord_match ) )
+		{
+			preg_match( '/#(?<=#).*/', $this->current_WikiWord, $WikiWord_match );
+			$WikiWord_match[1] = isset( $WikiWord_match[0] ) ? $WikiWord_match[0] : null;
+			$anchor = $WikiWord_match[1];
+		}
+
+		if( isset( $WikiWord_match[3] ) )
+		{	// wiki word has attr "id"
+			$url_params .= '#'.$WikiWord_match[3];
+		}
+
+		// Use title of wiki word without attribute part:
+		$WikiWord = $WikiWord_match[1];
+
+		// Find matching Chapter or Item:
+		$permalink = '';
+		$link_text = preg_replace( array( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1 $2', $WikiWord );
+		$link_text = ucwords( str_replace( '-', ' ', $link_text ) );
+
+		if( is_numeric( $this->current_wiki_word ) && ( $Item = & $ItemCache->get_by_ID( $this->current_wiki_word, false, false ) ) )
+		{	// Item is found
+			$permalink = $Item->get_permanent_url();
+			$existing_link_text = $Item->get( 'title' );
+		}
+		elseif( $Chapter = & $ChapterCache->get_by_urlname( $this->current_wiki_word, false, false ) )
+		{	// Chapter is found
+			$permalink = $Chapter->get_permanent_url();
+			$existing_link_text = $Chapter->get( 'name' );
+		}
+		elseif( $Item = & $ItemCache->get_by_urltitle( $this->current_wiki_word, false, false ) )
+		{	// Item is found
+			$permalink = $Item->get_permanent_url();
+			$existing_link_text = $Item->get( 'title' );
+		}
+		elseif( isset( $anchor ) && ( $Item = & $ItemCache->get_by_ID( $ItemCache->ID_array[0], false, false ) ) )
+		{	// Item is found
+			$permalink = $Item->get_permanent_url();
+			$permalink = $url_params == '' ? $permalink.$anchor : $url_params;
+			$existing_link_text = $Item->get( 'title' );
+			unset($anchor);
+		}
+
+		// Clear custom link text:
+		$custom_link_text = utf8_trim( $m[4] );
+
+		// Clear custom link style classes:
+		$custom_link_class = utf8_trim( str_replace( '.', ' ', $m[2] ) );
+
+		// Clear custom link target:
+		$custom_link_target = utf8_trim( $m[3] );
+
+		if( ! empty( $permalink ) )
+		{	// Chapter or Item are found in DB
+			$custom_link_class = empty( $custom_link_class ) ? '' : ' class="'.$custom_link_class.'"';
+			$custom_link_target = empty( $custom_link_target ) ? '' : ' target="'.$custom_link_target.'"';
+
+			if( ! empty( $custom_link_text ) )
+			{	// [[WikiWord custom link text]] or ((WikiWord custom link text)) or [[WikiWord .style.classes custom link text]] or ((WikiWord .style.classes custom link text))
+				return '<a href="'.$permalink.$url_params.'"'.$custom_link_class.$custom_link_target.'>'.$custom_link_text.'</a>';
+			}
+			elseif( $m[1] == '[[' )
+			{	// [[Wikiword]] or [[Wikiword .style.classes]]
+				return '<a href="'.$permalink.$url_params.'"'.$custom_link_class.$custom_link_target.'>'.$existing_link_text.'</a>';
+			}
+			else
+			{	// ((Wikiword)) or ((Wikiword .style.classes))
+				return '<a href="'.$permalink.$url_params.'"'.$custom_link_class.$custom_link_target.'>'.$link_text.'</a>';
+			}
+		}
+		else
+		{	// Chapter and Item are not found in DB
+			return $this->get_broken_link( $WikiWord, $this->current_wiki_word, ( empty( $custom_link_text ) ? $link_text : $custom_link_text ), $custom_link_class );
+		}
+	}
+
+
+	/**
+	 * Get HTML code for broken link
+	 *
+	 * @param string Post title
+	 * @param string Post slug
+	 * @param string Link/Span text
+	 * @param string Link/Span class
+	 * @return string
+	 */
+	function get_broken_link( $post_title, $post_slug, $text, $class = '' )
+	{
+		global $blog, $admin_url, $evo_charset;
+
+		// Add regexp modifier 'u' to work with UTF-8 strings correctly:
+		$regexp_modifier = ( $evo_charset == 'utf-8' ) ? 'u' : '';
+
+		$class = empty( $class ) ? '' : $class.' ';
+
+		if( is_numeric( $post_slug ) && ! is_numeric( $text ) )
+		{	// Try to use custom text if it is provided instead of post ID to suggest a link to create new post:
+			$post_slug = preg_replace( array( '*([^\p{Lu}#_])([\p{Lu}#])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1-$2', utf8_strtolower( $text ) );
+			$post_title = $text;
+		}
+
+		if( isset( $blog ) && ! is_numeric( $post_slug ) )
+		{	// Suggest to create new post from given word:
+			$post_title = preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1 $2', $post_title );
+			$post_title = ucfirst( str_replace( '-', ' ', $post_title ) );
+
+			$before_wikiword = '<a'
+				.' href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.urlencode( $post_title ).'&amp;post_urltitle='.urlencode( $post_slug ).'"'
+				.' title="'.format_to_output( T_('Create').'...', 'htmlattr' ).'"'
+				.' class="'.$class.'evo_shortlink_broken">';
+			$after_wikiword = '</a>';
+		}
+		else
+		{	// Don't allow to create new post from numeric wiki word:
+			$before_wikiword = '<span class="'.$class.'evo_shortlink_broken">';
+			$after_wikiword = '</span>';
+		}
+
+		return $before_wikiword.$text.$after_wikiword;
 	}
 
 
@@ -468,12 +531,12 @@ class shortlinks_plugin extends Plugin
 		if( ! empty( $params['Item'] ) )
 		{	// Item is set, get Blog from post:
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog:
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
 				return false;
@@ -487,7 +550,7 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// Print toolbar on screen:
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( $Blog, $params );
 	}
 
 
@@ -505,13 +568,13 @@ class shortlinks_plugin extends Plugin
 			if( ! empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{	// Comment is not set, try global Blog:
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available:
 				return false;
@@ -525,7 +588,7 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( $Blog, $params );
 	}
 
 
@@ -577,35 +640,39 @@ class shortlinks_plugin extends Plugin
 			return false;
 		}
 
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
 		// Load js to work with textarea:
 		require_js( 'functions.js', 'blog', true, true );
 
 		// Load css for modal window:
-		require_css( $this->get_plugin_url().'/shortlinks.css', 'relative', NULL, NULL, '#', true );
+		$this->require_css( 'shortlinks.css', true );
 
 		// Initialize JavaScript to build and open window:
 		echo_modalwindow_js();
 
 		?><script type="text/javascript">
 		//<![CDATA[
-		function shortlinks_toolbar( title )
+		function shortlinks_toolbar( title, prefix )
 		{
-			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
-				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>'
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>'
 
 				+ '<input type="button" title="<?php echo TS_('Link to a Post') ?>"'
 				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="shortlinks_load_window" value="<?php echo TS_('Link to a Post') ?>" />'
+				+ ' data-func="shortlinks_load_window|' + prefix + '" value="<?php echo TS_('Link to a Post') ?>" />'
 
-				+ '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
-				jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
+				jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
 		/**
 		 * Load main modal window to select collection and posts
 		 */
-		function shortlinks_load_window()
+		function shortlinks_load_window( prefix )
 		{
 			openModalWindow( '<div id="shortlinks_wrapper"></div>', 'auto', '', true,
 				'<?php echo TS_('Link to a Post'); ?>', // Window title
@@ -613,7 +680,7 @@ class shortlinks_plugin extends Plugin
 				true );
 
 			// Load collections:
-			shortlinks_load_colls( '<?php echo empty( $Blog ) ? '' : $Blog->get( 'urlname' ); ?>' );
+			shortlinks_load_colls( '<?php echo empty( $Blog ) ? '' : format_to_js( $Blog->get( 'urlname' ) ); ?>', prefix );
 
 			// Set max-height to keep the action buttons on screen:
 			var modal_window = jQuery( '#shortlinks_wrapper' ).parent();
@@ -668,17 +735,24 @@ class shortlinks_plugin extends Plugin
 		/**
 		 * Execute REST API request
 		 *
-		 * @param string URL
+		 * @param string REST API path
 		 * @param string Object selector
 		 * @param function Function on success request
+		 * @param array Additional params
 		 */
-		function shortlinks_api_request( url, obj_selector, func )
+		function shortlinks_api_request( api_path, obj_selector, func, params )
 		{
 			shortlinks_start_loading( obj_selector );
 
+			if( typeof( params ) == 'undefined' )
+			{
+				params = {};
+			}
+
 			jQuery.ajax(
 			{
-				url: '<?php echo $baseurl; ?>api/v1/' + url
+				url: restapi_url + api_path,
+				data: params
 			} )
 			.then( func, function( jqXHR )
 			{	// Error request, Display the error data:
@@ -814,8 +888,9 @@ class shortlinks_plugin extends Plugin
 		 * Load all available collections for current user:
 		 *
 		 * @param string Current collection urlname
+		 * @param string Prefix to use several toolbars on one page
 		 */
-		function shortlinks_load_colls( current_coll_urlname )
+		function shortlinks_load_colls( current_coll_urlname, prefix )
 		{
 			shortlinks_api_request( 'collections', '#shortlinks_wrapper', function( data )
 			{	// Display the colllections on success request:
@@ -826,9 +901,9 @@ class shortlinks_plugin extends Plugin
 				var r = '<div id="shortlinks_colls_list">'
 					+ '<h2><?php echo TS_('Collections'); ?></h2>'
 					+ '<select class="form-control">';
-				for( var c in data )
+				for( var c in data.colls )
 				{
-					var coll = data[c];
+					var coll = data.colls[c];
 					r += '<option value="' + coll.urlname + '"'
 						+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
 						+ coll.name + '</option>';
@@ -841,7 +916,40 @@ class shortlinks_plugin extends Plugin
 				r += '</select>'
 					+ '</div>'
 					+ '<div id="shortlinks_posts_block"></div>'
-					+ '<div id="shortlinks_post_block"></div>';
+					+ '<div id="shortlinks_post_block"></div>'
+					+ '<input type="hidden" id="shortlinks_hidden_prefix" value="' + ( prefix ? prefix : '' ) + '" />'
+					+ '<div id="shortlinks_post_form" style="display:none">'
+						+ '<input type="hidden" id="shortlinks_hidden_ID" />'
+						+ '<input type="hidden" id="shortlinks_hidden_cover_link" />'
+						+ '<input type="hidden" id="shortlinks_hidden_teaser_link" />'
+						+ '<input type="hidden" id="shortlinks_hidden_urltitle" />'
+						+ '<input type="hidden" id="shortlinks_hidden_title" />'
+						+ '<input type="hidden" id="shortlinks_hidden_excerpt" />'
+						+ '<input type="hidden" id="shortlinks_hidden_teaser" />'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_full_cover" /> <?php echo TS_('Insert full cover image'); ?></label><p>'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_title" checked="checked" /> <?php echo TS_('Insert title'); ?></label><p>'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_thumb_cover" checked="checked" /> <?php echo TS_('Insert thumbnail of cover or first image'); ?></label><p>'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_excerpt" checked="checked" /> <?php echo TS_('Insert excerpt'); ?></label><p>'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_teaser" /> <?php echo TS_('Insert teaser'); ?></label><p>'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_more" checked="checked" /> <?php echo TS_('Insert "Read more" link'); ?></label><p>'
+					+ '</div>'
+					+ '<div id="shortlinks_post_options" class="form-horizontal" style="display:none">'
+						+ '<div class="form-group"><label class="control-label col-sm-2"><?php echo TS_('Slug'); ?>:</label><div class="controls col-sm-10"><input type="text" id="shortlinks_opt_slug" class="form-control" style="width:100%" /></div></div>'
+						+ '<div class="form-group"><label class="control-label col-sm-2"><?php echo TS_('Mode'); ?>:</label><div class="controls col-sm-10">'
+							+ '<div class="radio"><label><input type="radio" name="shortlinks_opt_mode" id="shortlinks_opt_mode_title" checked="checked"><code>[[...]]</code> <?php echo TS_('Use title of destination post as link text'); ?></label></div>'
+							+ '<div class="radio"><label><input type="radio" name="shortlinks_opt_mode" id="shortlinks_opt_mode_slug"><code>((...))</code> <?php echo TS_('Use slug words as link text'); ?></label></div>'
+						+ '</div></div>'
+						+ '<div class="form-group"><label class="control-label col-sm-2"><?php echo TS_('Classes'); ?>:</label><div class="controls col-sm-10"><input type="text" id="shortlinks_opt_classes" class="form-control" style="width:100%" /></div></div>'
+						+ '<div class="form-group"><label class="control-label col-sm-2"><?php echo TS_('Target'); ?>:</label><div class="controls col-sm-10">'
+							+ '<select id="shortlinks_opt_target" class="form-control">'
+								+ '<option value=""><?php echo TS_('None'); ?></option>'
+								+ '<option value="_blank"><?php echo TS_('Blank'); ?></option>'
+								+ '<option value="_parent"><?php echo TS_('Parent'); ?></option>'
+								+ '<option value="_top"><?php echo TS_('Top'); ?></option>'
+							+ '</select>'
+						+ '</div></div>'
+						+ '<div class="form-group"><label class="control-label col-sm-2"><?php echo TS_('Text'); ?>:</label><div class="controls col-sm-10"><input type="text" id="shortlinks_opt_text" class="form-control" style="width:100%" /></div></div>'
+					+ '</div>';
 
 				shortlinks_end_loading( '#shortlinks_wrapper', r );
 
@@ -890,7 +998,7 @@ class shortlinks_plugin extends Plugin
 
 			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&paged=' + page;
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/items?orderby=datemodified&order=DESC' + page_param, '#shortlinks_posts_list', function( data )
+			shortlinks_api_request( 'collections/' + coll_urlname + '/items&orderby=datemodified&order=DESC' + page_param, '#shortlinks_posts_list', function( data )
 			{	// Display the posts on success request:
 				var r = '<ul>';
 				for( var p in data.items )
@@ -915,7 +1023,7 @@ class shortlinks_plugin extends Plugin
 		{
 			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + '?kind=item' + page_param, '#shortlinks_posts_list', function( data )
+			shortlinks_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + '&kind=item' + page_param, '#shortlinks_posts_list', function( data )
 			{	// Display the post data in third column on success request:
 				if( typeof( data.code ) != 'undefined' )
 				{	// Error code was responsed:
@@ -941,6 +1049,11 @@ class shortlinks_plugin extends Plugin
 				shortlinks_end_loading( '#shortlinks_posts_list', r );
 			} );
 		}
+
+	if( typeof( b2evo_shortlinks_plugin_initialized ) == 'undefined' )
+	{	// Initialize the code below only once:
+
+		b2evo_shortlinks_plugin_initialized = true;
 
 		// Load the posts of the selected collection:
 		jQuery( document ).on( 'change', '#shortlinks_colls_list select', function()
@@ -990,7 +1103,7 @@ class shortlinks_plugin extends Plugin
 			if( jQuery( '#shortlinks_post_block' ).data( 'post' ) == post_id )
 			{	// If user loads the same post, just display the cached content to save ajax calls:
 				// Show the action buttons:
-				jQuery( '#shortlinks_btn_back, #shortlinks_btn_insert' ).show();
+				jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert' ).show();
 			}
 			else
 			{	// Load new post:
@@ -999,22 +1112,40 @@ class shortlinks_plugin extends Plugin
 				{	// Display the post data on success request:
 					jQuery( '#shortlinks_post_block' ).data( 'post', post.id );
 
+					// Store item field values in hidden inputs to use on insert complex link:
+					jQuery( '#shortlinks_hidden_ID' ).val( post.id );
+					jQuery( '#shortlinks_hidden_urltitle' ).val( post.urltitle );
+					jQuery( '#shortlinks_hidden_title' ).val( post.title );
+					jQuery( '#shortlinks_hidden_excerpt' ).val( post.excerpt );
+					jQuery( '#shortlinks_hidden_teaser' ).val( post.teaser );
+					jQuery( '#shortlinks_hidden_cover_link' ).val( '' );
+					jQuery( '#shortlinks_hidden_teaser_link' ).val( '' );
+
 					// Item title:
 					var item_content = '<h2>' + post.title + '</h2>';
-					// Item attachments, Only images and on teaser positions:
+					// Item attachments, Only images:
 					if( typeof( post.attachments ) == 'object' && post.attachments.length > 0 )
 					{
 						item_content += '<div id="shortlinks_post_attachments">';
 						for( var a in post.attachments )
 						{
 							var attachment = post.attachments[a];
-							if( attachment.type == 'image' &&
-									( attachment.position == 'teaser' ||
-										attachment.position == 'teaserperm' ||
-										attachment.position == 'teaserlink' )
-								)
-							{
-								item_content += '<img src="' + attachment.url + '" />';
+							if( attachment.type == 'image' )
+							{	// Use only images:
+								if( attachment.position == 'teaser' ||
+								    attachment.position == 'teaserperm' ||
+								    attachment.position == 'teaserlink' )
+								{	// Add teaser image to post content:
+									item_content += '<img src="' + attachment.url + '" />';
+								}
+								if( attachment.position == 'cover' )
+								{	// Store link ID of cover image in hidden field to use on insert complex link:
+									jQuery( '#shortlinks_hidden_cover_link' ).val( attachment.link_ID );
+								}
+								if( jQuery( '#shortlinks_hidden_teaser_link' ).val() == '' )
+								{	// Store link ID of any first image in hidden field to use on insert complex link:
+									jQuery( '#shortlinks_hidden_teaser_link' ).val( attachment.link_ID );
+								}
 							}
 						}
 						item_content += '</div>';
@@ -1024,13 +1155,16 @@ class shortlinks_plugin extends Plugin
 
 					shortlinks_end_loading( '#shortlinks_post_block', item_content );
 
-					// Display the buttons to back and insert a post link to textarea
+					// Display the buttons to back and insert a post link to textarea:
 					var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
 						jQuery( '.shortlinks_post_buttons' ) :
 						jQuery( '#shortlinks_post_content' );
-					jQuery( '#shortlinks_btn_back, #shortlinks_btn_insert' ).remove();
-					buttons_side_obj.after( '<button id="shortlinks_btn_back" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
-						+ '<button id="shortlinks_btn_insert" data-urltitle="' + post.urltitle + '" class="btn btn-primary"><?php echo sprintf( TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>' );
+					jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).remove();
+					buttons_side_obj.after( '<button id="shortlinks_btn_back_to_list" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
+						+ '<button id="shortlinks_btn_insert" class="btn btn-primary"><?php echo sprintf( /* TRANS: %s is a shortlink preview like [[url-slug]] */ TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>'
+						+ '<button id="shortlinks_btn_options" class="btn btn-default"><?php echo TS_('Insert with options').'...'; ?></button>'
+						+ '<button id="shortlinks_btn_form" class="btn btn-info"><?php echo TS_('Insert Snippet + Link').'...'; ?></button>' );
+					jQuery( '#shortlinks_opt_slug' ).val( post.urltitle );
 				} );
 			}
 
@@ -1041,24 +1175,306 @@ class shortlinks_plugin extends Plugin
 		// Insert a post link to textarea:
 		jQuery( document ).on( 'click', '#shortlinks_btn_insert', function()
 		{
+			shortlinks_insert_link_text( '[[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ']]' );
+		} );
+
+		// Insert a post link with options to textarea:
+		jQuery( document ).on( 'click', '#shortlinks_btn_insert_with_options', function()
+		{
+			// Select what brakets to use:
+			if( jQuery( '#shortlinks_opt_mode_title' ).is( ':checked' ) )
+			{
+				var brakets_start = '[[';
+				var brakets_end = ']]';
+			}
+			else
+			{
+				var brakets_start = '((';
+				var brakets_end = '))';
+			}
+
+			var link_text = brakets_start;
+
+			// Slug:
+			link_text += jQuery( '#shortlinks_opt_slug' ).val();
+
+			// Classes:
+			var classes = jQuery( '#shortlinks_opt_classes' ).val().trim();
+			classes = classes.replace( /^\./g, '' ).replace( /\s+/g, '.' ).replace( /\.+/g, '.' );
+			if( classes != '' )
+			{
+				link_text += ' .' + classes;
+			}
+
+			// Link target:
+			var target = jQuery( '#shortlinks_opt_target option:selected' ).val().trim();
+			if( target != '' )
+			{
+				link_text += ' ' + target;
+			}
+
+			// Custom text:
+			var custom_text = jQuery( '#shortlinks_opt_text' ).val().trim();
+			if( custom_text != '' )
+			{
+				link_text += ' ' + custom_text;
+			}
+
+			link_text += brakets_end;
+
+			shortlinks_insert_link_text( link_text );
+		} );
+
+		// Display a form to insert complex link:
+		jQuery( document ).on( 'click', '#shortlinks_btn_form', function()
+		{
+			// Set proper title for modal window:
+			jQuery( '#modal_window .modal-title' ).html( '<?php echo TS_('Insert Snippet + Link'); ?>' );
+
+			// Hide the post preview block:
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_insert' ).hide();
+
+			// Show the form to select options before insert complex link:
+			jQuery( '#shortlinks_post_form' ).show();
+
+			// Display the buttons to back and insert a complex link to textarea:
+			var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
+				jQuery( '.shortlinks_post_buttons' ) :
+				jQuery( '#shortlinks_post_content' );
+			jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).hide();
+			buttons_side_obj.after( '<button id="shortlinks_btn_back_to_post" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
+				+ '<button id="shortlinks_btn_insert_complex" class="btn btn-primary"><?php echo TS_('Insert Snippet + Link'); ?></button>' );
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Insert complex link:
+		jQuery( document ).on( 'click', '#shortlinks_btn_insert_complex', function()
+		{
+			if( ! jQuery( 'input[id^=shortlinks_form_]' ).is( ':checked' ) )
+			{	// Display message if no item option checkbox is checked:
+				alert( '<?php echo TS_('Please select at least one item option to insert.'); ?>' );
+				return false;
+			}
+
+			var dest_type = false;
+			var dest_object_ID = false;
+			if( jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).length )
+			{	// New object form:
+				dest_type = 'temporary';
+				dest_object_ID = jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).val();
+			}
+			else if( jQuery( 'input[type=hidden][name=post_ID]' ).length && jQuery( 'input[type=hidden][name=item_typ_ID]' ).length )
+			{	// Item form:
+				dest_type = 'item';
+				dest_object_ID = jQuery( 'input[type=hidden][name=post_ID]' ).val();
+			}
+			else if( jQuery( 'input[type=hidden][name=comment_ID]' ).length || jQuery( 'input[type=hidden][name=comment_item_ID]' ).length )
+			{	// Comment form:
+				dest_type = 'comment';
+				if( jQuery( 'input[type=hidden][name=comment_ID]' ).length )
+				{
+					dest_object_ID = jQuery( 'input[type=hidden][name=comment_ID]' ).val();
+				}
+			}
+			else if( jQuery( 'input[type=hidden][name=ecmp_ID]' ).length )
+			{	// Email Campaign form:
+				dest_type = 'emailcampaign';
+				dest_object_ID = jQuery( 'input[type=hidden][name=ecmp_ID]' ).val();
+			}
+			else if( jQuery( 'input[name=msg_text]' ).length )
+			{	// Message form:
+				dest_type = 'message';
+				dest_object_ID = 0;
+			}
+
+			// Check if at least one image is requested to insert:
+			var insert_images = ( jQuery( '#shortlinks_form_full_cover' ).is( ':checked' ) && jQuery( '#shortlinks_hidden_cover_link' ).val() != '' )
+				|| ( jQuery( '#shortlinks_form_thumb_cover' ).is( ':checked' ) && jQuery( '#shortlinks_hidden_teaser_link' ).val() != '' );
+
+			if( insert_images && dest_type != false && dest_object_ID > 0 )
+			{	// We need to insert at least one image/file inline tag:
+				shortlinks_start_loading( '#shortlinks_post_block' );
+
+				// Get first image with any position:
+				var source_position = '';
+				if( jQuery( '#shortlinks_form_full_cover' ).is( ':checked' ) &&
+				  ! jQuery( '#shortlinks_form_thumb_cover' ).is( ':checked' ) )
+				{	// Get only cover image:
+					source_position = 'cover';
+				}
+
+				// Call REST API request to copy the links from the selected Item to the edited object:
+				evo_rest_api_request( 'links',
+				{
+					'action':           'copy',
+					'source_type':      'item',
+					'source_object_ID': jQuery( '#shortlinks_hidden_ID' ).val(),
+					'source_position':  source_position,
+					'source_file_type': 'image',
+					'dest_type':        dest_type,
+					'dest_object_ID':   dest_object_ID,
+					'dest_position':    'inline',
+					'limit_position':   1,
+				}, function( data )
+				{
+					var full_cover = '';
+					var thumb_cover = '';
+
+					for( var l in data.links )
+					{
+						var link = data.links[l];
+						if( link.orig_position == 'cover' && jQuery( '#shortlinks_form_full_cover' ).is( ':checked' ) )
+						{	// Build inline tag for full cover image:
+							full_cover = '[image:' + link.ID + ']';
+						}
+						if( jQuery( '#shortlinks_form_thumb_cover' ).is( ':checked' ) )
+						{	// Build inline tag for thumbnail cover image:
+							thumb_cover = '[thumbnail:' + link.ID + ']';
+						}
+					}
+					shortlinks_insert_complex_link( full_cover, thumb_cover );
+
+					shortlinks_end_loading( '#shortlinks_post_block', jQuery( '#shortlinks_post_block' ).html() );
+
+					// Refresh the attachments block after adding new links:
+					var refresh_attachments_button = jQuery( 'a[onclick*=evo_link_refresh_list]' );
+					if( refresh_attachments_button.length )
+					{
+						refresh_attachments_button.click();
+					}
+				} );
+			}
+			else
+			{	// Insert only simple text without images:
+				if( insert_images )
+				{	// Display this alert if user wants to insert image for new creating object but it doesn't support:
+					alert( 'Please save your ' + dest_type + ' before trying to attach files. This limitation will be removed in a future version of b2evolution.' );
+				}
+				shortlinks_insert_complex_link();
+			}
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Display a form to insert a link with options:
+		jQuery( document ).on( 'click', '#shortlinks_btn_options', function()
+		{
+			// Set proper title for modal window:
+			jQuery( '#modal_window .modal-title' ).html( '<?php echo TS_('Insert with options'); ?>...' );
+
+			// Hide the post preview block:
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_insert' ).hide();
+
+			// Show the form to select options before insert a link:
+			jQuery( '#shortlinks_post_options' ).show();
+
+			// Display the buttons to back and insert a complex link to textarea:
+			var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
+				jQuery( '.shortlinks_post_buttons' ) :
+				jQuery( '#shortlinks_post_content' );
+			jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).hide();
+			buttons_side_obj.after( '<button id="shortlinks_btn_back_to_post" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
+				+ '<button id="shortlinks_btn_insert_with_options" class="btn btn-primary"><?php echo TS_('Insert Link'); ?></button>' );
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		/*
+		 * Insert simple link data to content
+		 *
+		 * @param string Text
+		 */
+		function shortlinks_insert_link_text( text )
+		{
+			
 			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
 			{	// tinyMCE plugin is active now, we should focus cursor to the edit area:
 				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
 			}
 			// Insert tag text in area:
-			textarea_wrap_selection( b2evoCanvas, '[[' + jQuery( this ).data( 'urltitle' ) + ']]', '', 0 );
+			textarea_wrap_selection( window[ jQuery( '#shortlinks_hidden_prefix' ).val() + 'b2evoCanvas' ], text, '', 0 );
 			// Close main modal window:
 			closeModalWindow();
-		} );
+		}
+
+		/*
+		 * Insert complex link data to content
+		 *
+		 * @param string Full cover image inline tag
+		 * @param string Thumbnail cover image inline tag
+		 */
+		function shortlinks_insert_complex_link( full_cover, thumb_cover )
+		{
+			var post_content = '';
+
+			if( typeof( full_cover ) != 'undefined' && full_cover != '' )
+			{	// Full cover image:
+				post_content += "\r\n" + full_cover;
+			}
+			if( jQuery( '#shortlinks_form_title' ).is( ':checked' ) )
+			{	// Title:
+				post_content += "\r\n" + '## [[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ' ' + jQuery( '#shortlinks_hidden_title' ).val() + ']]';
+			}
+			if( typeof( thumb_cover ) != 'undefined' && thumb_cover != '' )
+			{	// Thumbnail cover image:
+				post_content += "\r\n" + thumb_cover;
+			}
+			if( jQuery( '#shortlinks_form_excerpt' ).is( ':checked' ) )
+			{	// Excerpt:
+				post_content += ( typeof( thumb_cover ) != 'undefined' && thumb_cover != '' ? ' ' : "\r\n" )
+					+ jQuery( '#shortlinks_hidden_excerpt' ).val();
+			}
+			if( jQuery( '#shortlinks_form_teaser' ).is( ':checked' ) )
+			{	// Teaser (text before [teaserbreak]):
+				post_content += "\r\n" + jQuery( '#shortlinks_hidden_teaser' ).val();
+			}
+			if( jQuery( '#shortlinks_form_more' ).is( ':checked' ) )
+			{	// "Read more" link:
+				post_content += "\r\n" + '[[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ' <?php echo TS_('Read more'); ?>...]]';
+			}
+			if( post_content != '' )
+			{
+				post_content = post_content + "\r\n\r\n";
+			}
+
+			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
+			{	// tinyMCE plugin is active now, we should focus cursor to the edit area:
+				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
+			}
+			// Insert tag text in area:
+			textarea_wrap_selection( window[ jQuery( '#shortlinks_hidden_prefix' ).val() + 'b2evoCanvas' ], post_content, '', 0 );
+			// Close main modal window:
+			closeModalWindow();
+		}
 
 		// Back to previous list:
-		jQuery( document ).on( 'click', '#shortlinks_btn_back', function()
+		jQuery( document ).on( 'click', '#shortlinks_btn_back_to_list', function()
 		{
-			// Show the lists of collectionss and posts:
+			// Show the lists of collections and posts:
 			jQuery( '#shortlinks_colls_list, #shortlinks_posts_block' ).show();
 
 			// Hide the post preview block and action buttons:
-			jQuery( '#shortlinks_post_block, #shortlinks_btn_back, #shortlinks_btn_insert' ).hide();
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).hide();
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Back to previous post preview:
+		jQuery( document ).on( 'click', '#shortlinks_btn_back_to_post', function()
+		{
+			// Set proper title for modal window:
+			jQuery( '#modal_window .modal-title' ).html( '<?php echo TS_('Link to a Post'); ?>' );
+
+			// Show the post preview block and action buttons:
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).show();
+
+			// Hide the post complex form and action buttons:
+			jQuery( '#shortlinks_btn_back_to_post, #shortlinks_btn_insert_complex, #shortlinks_btn_insert_with_options, #shortlinks_post_form, #shortlinks_post_options' ).hide();
 
 			// To prevent link default event:
 			return false;
@@ -1082,12 +1498,14 @@ class shortlinks_plugin extends Plugin
 			// To prevent link default event:
 			return false;
 		} );
+
+	}
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>' );</script><?php
+		?><script type="text/javascript">shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
 	}

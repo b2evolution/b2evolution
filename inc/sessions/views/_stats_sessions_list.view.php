@@ -59,12 +59,13 @@ $Results = new Results( $SQL->get(), 'sess_', 'D', $UserSettings->get( 'results_
 
 // echo user edit action icons
 echo_user_actions( $Results, $edited_User, 'edit' );
-echo '<span class="floatright">'.$Results->gen_global_icons().'</span>';
+echo '<div class="row">';
+echo '<span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">'.$Results->gen_global_icons().'</span>';
 $Results->global_icons = array();
 
 // echo user tabs
-echo '<div>'.get_usertab_header( $edited_User, $user_tab, T_( 'Sessions' ).get_manual_link( 'user-sessions-tab' ) ).'</div>';
-
+echo '<div class="col-xs-12 col-lg-6 col-lg-pull-6">'.get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.T_( 'Sessions' ).'</span>'.get_manual_link( 'user-sessions-tab' ) ).'</div>';
+echo '</div>';
 $Results->title = T_('Recent sessions').get_manual_link( 'user-sessions-tab' );
 
 /**

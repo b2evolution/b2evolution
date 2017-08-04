@@ -36,17 +36,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class captcha_qstn_plugin extends Plugin
 {
-	var $version = '5.0.0';
+	var $version = '6.9.3';
 	var $group = 'antispam';
 	var $code = 'captcha_qstn';
 
 
 	/**
-	 * Delete unnecessary captcha data from DB table.
-	 *
-	 * @todo This should be added to the "scheduler", once available
+	 * Init
 	 */
-	function captcha_qstn_plugin()
+	function PluginInit( & $params )
 	{
 		$this->name = $this->T_('Captcha questions');
 		$this->short_desc = $this->T_('Use questions to tell humans and robots apart.');

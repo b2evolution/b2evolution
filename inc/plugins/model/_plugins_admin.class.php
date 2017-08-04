@@ -107,6 +107,9 @@ class Plugins_admin extends Plugins
 
 				'AdminBeginPayload' => 'This gets called before the main payload in the backoffice is displayed.',
 
+				'WidgetBeginSettingsForm' => 'This gets called at the beginning of the "Edit wdiget" form on back-office.',
+				'WidgetEndSettingsForm' => 'This gets called at the end of the "Edit wdiget" form on back-office.',
+
 				'CacheObjects' => 'Cache data objects.',
 				'CachePageContent' => 'Cache page content.',
 				'CacheIsCollectingContent' => 'Gets asked for if we are generating cached content.',
@@ -140,10 +143,17 @@ class Plugins_admin extends Plugins
 				'RenderItemAsHtml' => 'Renders content when generated as HTML.',
 				'RenderItemAsXml' => 'Renders content when generated as XML.',
 				'RenderItemAsText' => 'Renders content when generated as plain text.',
+				'PrepareForRenderItemAttachment' => 'Prepare to render item attachment.',
 				'RenderItemAttachment' => 'Renders item attachment.',
+				'PrepareForRenderCommentAttachment' => 'Prepare to render comment attachment.',
 				'RenderCommentAttachment' => 'Renders comment attachment.',
 				'RenderMessageAsHtml' => 'Renders message content when generated as HTML.',
+				'PrepareForRenderMessageAttachment' => 'Prepare to render message attachment.',
+				'RenderMessageAttachment' => 'Renders message attachment.',
 				'RenderEmailAsHtml' => 'Renders email content when generated as HTML.',
+				'PrepareForRenderEmailAttachment' => 'Prepare to render email campaign attachment.',
+				'RenderEmailAttachment' => 'Renders email campaign attachment.',
+				'RenderURL' => 'Renders file by URL.',
 
 
 				// fp> rename to "DispRender"
@@ -166,6 +176,7 @@ class Plugins_admin extends Plugins
 				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
 				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
 				'AfterUserUpdate' => 'This gets called after an user has been updated in the database.',
+				'AdminAfterUsersList' => 'This gets called right after displaying the admin users list.',
 
 				// fp> This is actually RENDERing, right?
 				// TODO: Rename to "DispRender"
@@ -236,6 +247,8 @@ class Plugins_admin extends Plugins
 				'BeforeBlogDisplay' => 'Gets called before a (part of the blog) gets displayed.',
 				'InitMainList' => 'Initializes the MainList object. Use this method to create your own MainList, see init_MainList()',
 				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
+				'SkinEndHtmlHead' => 'Gets called at the end of the HTML HEAD section in a skin.',
+				'SkinBeginHtmlBody' => 'Gets called at the top of the skin\'s HTML BODY section.',
 				'SkinEndHtmlBody' => 'Gets called at the end of the skin\'s HTML BODY section.',
 				'DisplayTrackbackAddr' => 'Called to display the trackback URL for an item.',
 				'BeforeSkinWrapper' => 'Gets called before skin wrapper.',
@@ -417,7 +430,7 @@ class Plugins_admin extends Plugins
 					'always' => 'always',
 					'opt-out' => 'opt-out',
 					'opt-in' => 'opt-in',
-					'lazy' => 'automatic', // The plugin will automatically deside to use rendering or not
+					'lazy' => 'automatic', // The plugin will automatically decide to use rendering or not
 					'never' => 'never',
 				);
 		}
@@ -1073,9 +1086,9 @@ class Plugins_admin extends Plugins
 	{
 		global $DB;
 
-		if( ! preg_match( '~^1?\d?\d$~', $priority ) ) // using preg_match() to catch floating numbers
+		if( ! preg_match( '~^[12]?\d?\d$~', $priority ) ) // using preg_match() to catch floating numbers
 		{
-			debug_die( 'Plugin priority must be numeric (0-100).' );
+			debug_die( 'Plugin priority must be numeric (0-255).' );
 		}
 
 		$Plugin = & $this->get_by_ID($plugin_ID);
@@ -1490,7 +1503,7 @@ class Plugins_admin extends Plugins
 		if( !isset( $params['object_Blog'] ) &&
 		    ( !isset( $params['object_type'] ) || ( isset( $params['object_type'] ) && $params['object_type'] != 'Message' ) ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{
 				return false;

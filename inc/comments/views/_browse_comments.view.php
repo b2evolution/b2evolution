@@ -21,11 +21,11 @@ global $Comment;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var CommentList
  */
-global $CommentList, $show_statuses;
+global $CommentList;
 
 global $current_User, $admin_url, $tab3;
 
@@ -52,12 +52,12 @@ if( check_comment_mass_delete( $CommentList ) )
 
 $emptytrash_link = '';
 // Display recycle bin placeholder, because users may have rights to recycle particular comments
-$opentrash_link = '<span id="recycle_bin" class="floatright"></span>';
+$opentrash_link = '<span id="recycle_bin" class="pull-right"></span>';
 if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
 	{
-		$block_item_Widget->global_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;blog='.$CommentList->Blog->ID.'&amp;action=emptytrash', T_('Empty recycle bin...'), 5, 3 );
+		$block_item_Widget->global_icon( /* TRANS: verb */ T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;blog='.$CommentList->Blog->ID.'&amp;action=emptytrash', /* TRANS: verb */ T_('Empty recycle bin').'...', 5, 3 );
 	}
 	else
 	{
@@ -101,7 +101,7 @@ load_funcs( 'comments/model/_comment_js.funcs.php' );
 // Display list of comments:
 echo '<a id="comments"></a>'; // Used to animate a moving the deleting comment to trash by ajax
 // comments_container value is -1, because in this case we have to show all comments in current blog (Not just one item comments)
-echo '<div id="comments_container" value="-1" class="full_comment_list">';
+echo '<div id="comments_container" value="-1" class="evo_comments_container evo_comments_container__full_list">';
 require dirname(__FILE__).'/_comment_list.inc.php';
 echo '</div>';
 

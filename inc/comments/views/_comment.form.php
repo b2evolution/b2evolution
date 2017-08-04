@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var Comment
  */
@@ -29,8 +29,15 @@ global $Plugins;
 global $mode, $month, $tab, $redirect_to, $comment_content;
 
 $Form = new Form( NULL, 'comment_checkchanges', 'post' );
+$Form->switch_template_parts(
+	array(
+		'labelclass' => 'control-label col-lg-3 col-md-3 col-sm-3',
+		'inputstart' => '<div class="controls col-lg-8 col-md-9 col-sm-9">',
+		'infostart' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div class="form-control-static">',
+		'inputstart_checkbox' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div class="checkbox"><label>' )
+);
 
-$link_attribs = array( 'style' => 'margin-left:3ex', 'class' => 'btn btn-sm btn-default action_icon' ); // Avoid misclicks by all means!
+$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default action_icon' ); // Avoid misclicks by all means!
 if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
 {
 	$Form->global_icon( T_( 'Post as a quote' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;type=quote&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
@@ -53,7 +60,7 @@ else
 }
 $Form->global_icon( $delete_title, 'recycle', $delete_url, $delete_text, 4, 3, $link_attribs );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1, $link_attribs );
+$Form->global_icon( T_('Cancel editing').'!', 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1, $link_attribs );
 
 $Form->begin_form( 'eform' );
 
@@ -72,7 +79,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->begin_fieldset( T_('Comment contents').get_manual_link( 'editing-comments' ) );
 
 	echo '<div class="row">';
-		echo '<div class="col-md-7 col-sm-12">';
+		echo '<div class="col-sm-12">';
 
 		$comment_Item = & $edited_Comment->get_Item();
 		$Form->info( T_('In response to'), $comment_Item->get_title( array(
@@ -81,19 +88,19 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 			) ) );
 
 		echo '</div>';
-		echo '<div class="col-md-5 col-sm-12">';
+		echo '<div class="col-sm-12">';
 
 		$Blog_owner_User = & $Blog->get_owner_User();
 		if( ( $Blog_owner_User->ID == $current_User->ID ) || $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
 		{	// User has permission to change comment's post, because user is the owner of the current blog, or user has admin full access permission for current blog
-			$Form->text_input( 'moveto_post', $comment_Item->ID, 20, T_('Move to post ID'), '', array( 'maxlength' => 100, 'style' => 'width:25%' ) );
+			$Form->text_input( 'moveto_post', $comment_Item->ID, 20, T_('Move to post ID'), '', array( 'maxlength' => 100, 'size' => 10 ) );
 		}
 
 		echo '</div>';
 	echo '</div>';
 
 	echo '<div class="row">';
-		echo '<div class="col-md-7 col-sm-12">';
+		echo '<div class="col-sm-12">';
 
 		if( $Blog->get_setting( 'threaded_comments' ) )
 		{	// Display a reply comment ID only when this feature is enabled in blog settings:
@@ -173,11 +180,14 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->end_fieldset();
 
 	// -------------------------- ATTACHMENTS/LINKS --------------------------
-	if( isset($GLOBALS['files_Module']) )
-	{
+	if( $current_User->check_perm( 'files', 'view' ) )
+	{	// If current user has a permission to view the files:
 		load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+		// Initialize this object as global because this is used in many link functions:
+		global $LinkOwner;
 		$LinkOwner = new LinkComment( $edited_Comment );
-		attachment_iframe( $Form, $LinkOwner, NULL, false, true );
+		// Display attachments fieldset:
+		display_attachments_fieldset( $Form, $LinkOwner, false, true );
 	}
 
 	// ####################### PLUGIN FIELDSETS #########################
@@ -191,8 +201,8 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 <?php
 	// ####################### RATING #########################
-	if( $comment_Item->can_rate()
-		|| !empty( $edited_Comment->rating ) )
+	if( ! $edited_Comment->is_meta() &&
+	    ( $comment_Item->can_rate() || !empty( $edited_Comment->rating ) ) )
 	{	// Rating is editable
 		$Form->begin_fieldset( T_('Rating'), array( 'id' => 'cmntform_rating', 'fold' => true ) );
 
@@ -253,10 +263,46 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'cmntform_renderers', 'fold' => true  ) );
 	$edited_Comment->renderer_checkboxes();
 	$Form->end_fieldset();
+
+
+	// ################### NOTIFICATIONS ###################
+
+	$Form->begin_fieldset( T_('Notifications'), array( 'id' => 'cmntform_notifications', 'fold' => true ) );
+
+		$Form->info( T_('Moderators'), $edited_Comment->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
+
+		$notify_types = array(
+				'members_notified'   => T_('Members'),
+				'community_notified' => T_('Community'),
+		);
+
+		foreach( $notify_types as $notify_type => $notify_title )
+		{
+			if( $edited_Comment->check_notifications_flags( $notify_type ) )
+			{	// Nofications were sent:
+				$notify_status = T_('Notified');
+				$notify_select_options = array(
+						''      => T_('Done'),
+						'force' => T_('Notify again')
+					);
+			}
+			else
+			{	// Nofications are not sent yet:
+				$notify_status = T_('To be notified');
+				$notify_select_options = array(
+						''     => T_('Notify on next save'),
+						'skip' => T_('Skip on next save'),
+						'mark' => T_('Mark as Notified')
+					);
+			}
+			$Form->select_input_array( 'comment_'.$notify_type, get_param( 'comment_'.$notify_type ), $notify_select_options, $notify_title, NULL, array( 'input_prefix' => $notify_status.' &nbsp; &nbsp; ' ) );
+		}
+
+	$Form->end_fieldset();
 	?>
 </div>
 
-<div class="clear"></div>
+<div class="clearfix"></div>
 
 </div>
 

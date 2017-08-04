@@ -22,13 +22,12 @@ $params = array_merge( array(
 	), $params );
 
 
-$user_ItemList->title = sprintf( $params['user_itemlist_title'], $viewed_User->get_identity_link( array( 'link_text' => 'name' ) ) );
+$user_ItemList->title = sprintf( $params['user_itemlist_title'], $viewed_User->get_identity_link( array( 'link_text' => 'auto' ) ) );
 $user_ItemList->no_results_text = $params['user_itemlist_no_results'];
 
 // Initialize Results object
 items_results( $user_ItemList, array(
 		'field_prefix'       => $user_ItemList->param_prefix,
-		'display_permalink'  => false,
 		'display_title_flag' => false,
 		'display_ord'        => false,
 		'display_history'    => false,

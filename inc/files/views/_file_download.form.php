@@ -26,7 +26,7 @@ $Form->begin_form( 'fform', T_('Download files in archive') );
 	$Form->hidden( 'action_invoked', 1 );
 	$Form->hiddens_by_key( get_memorized() );
 
-	$Form->text_input( 'zipname', $zipname, 30, T_('Archive filename'), T_('End in .ZIP'),  array( 'maxlength' => '' ) );
+	$Form->text_input( 'zipname', $zipname, 30, T_('Archive filename'), T_('End with .zip'),  array( 'maxlength' => '' ) );
 
 	if( $selected_Filelist->count_dirs() )
 	{ // Allow to exclude dirs:

@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $htsrv_url, $admin_url;
+global $admin_url;
 
 // Default params:
 $params = array_merge( array(
@@ -25,11 +25,12 @@ $params = array_merge( array(
 		'author_ID'   => NULL,
 		'author_name' => '',
 		'notify_type' => '',
+		'is_new_comment' => true,
 	), $params );
 
 
 $Comment = $params['Comment'];
-$Blog = $params['Blog'];
+$Collection = $Blog = $params['Blog'];
 $Item = $params['Item'];
 
 if( $params['notify_type'] == 'meta_comment' )
@@ -50,7 +51,7 @@ if( $params['notify_full'] )
 		// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 		.T_('Collection').': '.$Blog->get('shortname')."\n"
 		// Mail bloat: .' ( '.str_replace('&amp;', '&', $Blog->gen_blogurl())." )\n"
-		.T_('Post').': '.$Item->get('title')."\n";
+		./* TRANS: noun */ T_('Post').': '.$Item->get('title')."\n";
 		// Mail bloat: .' ( '.str_replace('&amp;', '&', $Item->get_permanent_url( '', '', '&' ))." )\n";
 		// TODO: fp> We MAY want to force short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
@@ -125,27 +126,43 @@ else
 
 $notify_message .= "\n\n";
 
+if( $params['notify_type'] == 'moderator' )
+{	// moderation email
+	if( ( $Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $Comment->secret ) ) )
+	{	// quick moderation is permitted, and comment secret was set
+		$notify_message .= T_('Quick moderation').': '.'$secret_content_start$'.get_htsrv_url().'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$'."\n\n";
+	}
+	$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID."\n\n";
+}
+
+echo $notify_message;
+
 // add unsubscribe and edit links
 $params['unsubscribe_text'] = '';
 switch( $params['notify_type'] )
 {
 	case 'moderator':
 		// moderation email
-		if( ( $Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $Comment->secret ) ) )
-		{ // quick moderation is permitted, and comment secret was set
-			$notify_message .= T_('Quick moderation').': '.'$secret_content_start$'.$htsrv_url.'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$'."\n\n";
+		if( $params['is_new_comment'] )
+		{	// about new comment:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new comments, click here' );
+			$unsubscribe_type = 'comment_moderator';
 		}
-		$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID."\n\n";
+		else
+		{	// about updated comment:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated comments, click here' );
+			$unsubscribe_type = 'comment_moderator_edit';
+		}
 		$params['unsubscribe_text'] = T_( 'You are a moderator of this blog and you are receiving notifications when a comment may need moderation.' )."\n"
-			.T_( 'If you don\'t want to receive any more notifications about comment moderation, click here' ).': '
-			.$htsrv_url.'quick_unsubscribe.php?type=comment_moderator&user_ID=$user_ID$&key=$unsubscribe_key$';
+			.$unsubscribe_text.': '
+			.get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 
 	case 'blog_subscription':
 		// blog subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on any post.' )."\n"
 			.T_( 'If you don\'t want to receive any more notifications on this blog, click here' ).': '
-			.$htsrv_url.'quick_unsubscribe.php?type=coll_comment&coll_ID='.$Blog->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$';
+			.get_htsrv_url().'quick_unsubscribe.php?type=coll_comment&coll_ID='.$Blog->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$';
 		// subscribers are not allowed to see comment author email
 		break;
 
@@ -153,7 +170,7 @@ switch( $params['notify_type'] )
 		// item subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' )."\n"
 			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
-			.$htsrv_url.'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$';
+			.get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$';
 		// subscribers are not allowed to see comment author email
 		break;
 
@@ -161,18 +178,16 @@ switch( $params['notify_type'] )
 		// user is the creator of the post
 		$params['unsubscribe_text'] = T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' )."\n"
 			.T_( 'If you don\'t want to receive any more notifications on your posts, click here' ).': '
-			.$htsrv_url.'quick_unsubscribe.php?type=creator&user_ID=$user_ID$&key=$unsubscribe_key$';
+			.get_htsrv_url().'quick_unsubscribe.php?type=creator&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 
 	case 'meta_comment':
 		// meta comment subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when meta comment is added on this post.' )."\n"
 			.T_( 'If you don\'t want to receive any more notifications about meta comments, click here' ).': '
-			.$htsrv_url.'quick_unsubscribe.php?type=meta_comment&user_ID=$user_ID$&key=$unsubscribe_key$';
+			.get_htsrv_url().'quick_unsubscribe.php?type=meta_comment&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 }
-
-echo $notify_message;
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

@@ -136,7 +136,7 @@ class contact_form_Widget extends ComponentWidget
 
 			if( $recipient_User )
 			{ // recipient User found
-				$recipient_name = $recipient_User->get( 'preferredname' );
+				$recipient_name = $recipient_User->get_username();
 				$recipient_address = $recipient_User->get( 'email' );
 			}
 		}
@@ -188,7 +188,7 @@ class contact_form_Widget extends ComponentWidget
 		{
 			if( ! empty( $recipient_User ) )
 			{ // Get identity link for existed users
-				$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'nickname' ) );
+				$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'auto' ) );
 			}
 			else
 			{ // Get login name for anonymous user

@@ -18,7 +18,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog;
+global $app_version, $disp, $Collection, $Blog;
 
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
@@ -146,7 +146,7 @@ siteskin_include( '_site_body_header.inc.php' );
 <div id="pageFooter">
 	<?php
 		// Display container and contents:
-		skin_container( NT_("Footer"), array(
+		skin_container( NT_('Footer'), array(
 				// The following params will be used as defaults for widgets included in this container:
 			) );
 		// Note: Double quotes have been used around "Footer" only for test purposes.

@@ -6,18 +6,37 @@
  * Override this with style.css in your skin folder.
  */
 
+
+// ----- WIDGETS -----
+
+// About Author widget:
+@import "_about_author_widget.module.less";
+
+// Universal item list widget & Recent posts widget:
+@import "_universal_item_list_widget.module.less";
+
+// Media Index widget:
+@import "_coll_media_index_widget.module.less";
+
+// User Avatars (User List) widget:
+@import "_user_avatars_widget.module.less";
+
+// Organization Members widget:
+@import "_org_members_widget.module.less";
+
+
+// ----- PLUGINS -----
+
+// CSS overrides for "HTML 5 VideoJS Player" plugin:
+@import "inc/video-js-overrides.inc.less";
+
+
+// -----
+
+
+// Rating Summary for all comments of the selected post on disp=single:
 @import "inc/star_rating.inc.less";
 
-// Hides pager elements with active_distance >= 3 on small devices
-@media only screen and (max-width: 360px) {
-	li[class^="active_distance_"], li[class*=" active_distance_"] {
-		display: none;
-	}
-
-	li[class~="active_distance_1"], li[class~="active_distance_2"], {
-		display: inline;
-	}
-}
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -25,6 +44,10 @@
 	-ms-border-radius: @radius;
 	-o-border-radius: @radius;
 	border-radius: @radius;
+}
+
+.evo_container__footer {
+	margin-bottom: 10px;
 }
 
 // MILOS > Intro posts style padding alignment
@@ -151,6 +174,12 @@ div.error_additional_content {
 	color: #0a0;
 }
 
+// List elements in comment panels
+.evo_comment ul {
+	list-style-position: inside;
+	// Here we need only bottom margin to match general concept of separating elements (e-g: p tags have 10px bottom margin as well)
+	margin: 0 0 10px 0px;
+}
 .evo_comment_rating {
 	margin: 3px;
 }
@@ -319,6 +348,10 @@ ul li.widget_core_coll_item_list.nobullets ul li:before {
 .action_icon {
 	margin: 0 2px;
 	font-weight: bold;
+	// Fix alignment for flag buttons:
+	&.evo_post_flag_btn {
+		margin-left: 0;
+	}
 }
 .title_action_icons {
 	float: right;
@@ -561,7 +594,7 @@ div.item_location {
 .note.status_meta span,			// This is deprecated
 .evo_status__meta {				// This is clean
 	color: #fff !important;
-	background-color: #5133ab !important;
+	background-color: #5bc0de !important;
 }
 
 .evo_content_block span[class*=status_] span {
@@ -818,6 +851,20 @@ input.btn-lg {
 	}
 }
 
+.evo_content_block table.evo_poll__table {
+	margin: 1em 0;
+	th {
+		border: 0;
+		padding: 2px 10px 2px 0;
+		background-color: #eee;
+	}
+	td {
+		border: 0;
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+}
+
 // Fix the form elements:
 .evo_form__comment {
 	.panel {
@@ -957,7 +1004,82 @@ input.btn-lg {
 	.evo_poll__title {
 		white-space: nowrap;
 	}
+	.evo_poll_percentage {
+		max-width: 50px;
+	}
 }
 .evo_container__sidebar .evo_poll__title {
 	white-space: normal;
+}
+
+// Attachments table:
+#itemform_links .panel-body {
+	padding: 0;
+}
+div.qq-upload-button,
+div.qq-upload-drop-area,
+div.qq-upload-drop-area-active {
+	border: 2px dashed #fff;
+	background: #5bc0de;
+	.border-radius(9px);
+}
+div.qq-upload-button-hover,
+div.qq-upload-drop-area,
+div.qq-upload-drop-area-active {
+	background: #5cb85c;
+}
+ul.qq-upload-list {
+	margin: 0;
+}
+div#fileuploader_form {
+	padding: 5px;
+	height: 65px;
+	background: #f5f5f5;
+}
+#attachments_fieldset_wrapper {
+	width: 100%;
+	height: 160px;
+	position: relative;
+	padding-bottom: 6px;
+	box-sizing: content-box;
+	#attachments_fieldset_block {
+		overflow: auto;
+		height: 100%;
+	}
+	.ui-resizable-s {
+		background: #c0c0c0;
+		height: 6px;
+		bottom: 0;
+		&:after {
+			content: "...";
+			font-size: 10px;
+			top: -7px;
+			position: relative;
+			text-align: center;
+			display: block;
+		}
+	}
+	.table_scroll {
+		// Use this position to fix red triangle when attachment is dragged by mouse:
+		position: relative;
+	}
+	div.results, div.table_scroll {
+		overflow: initial;
+	}
+	table tbody {
+		.dragged {
+			opacity: 0.8;
+			position: absolute;
+			z-index: 1000;
+		}
+		td {
+			cursor: move;
+		}
+	}
+}
+#filelist_tbody {
+	tr:first-child .action_icon_link_move_up,
+	tr:last-child .action_icon_link_move_down {
+		visibility: hidden;
+	}
 }

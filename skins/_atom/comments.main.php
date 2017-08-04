@@ -45,9 +45,6 @@ $CommentList->set_filters( array(
 		'comments' => $Blog->get_setting('comments_per_feed'),
 	) );
 
-// Run SQL query to get results depending on current filters:
-$CommentList->query();
-
 // Get ready for display (runs the query):
 $CommentList->display_init();
 
@@ -87,7 +84,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 	{	/* Loop through comments: */ ?>
 	<entry>
 		<title type="text"><?php
-			echo format_to_output( T_('In response to:'), 'xml' ).' ';
+			echo format_to_output( T_('In response to').':', 'xml' ).' ';
 				$Comment->get_Item();
 				$Comment->Item->title( array(
 				'format' => 'xml',

@@ -28,15 +28,15 @@ $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-campaign' ) );
 	$Form->text_input( 'ecmp_name', $edited_EmailCampaign->get( 'name' ), 60, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ) == '' ? $edited_EmailCampaign->get( 'name' ) : $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
-	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );
-	$Form->info( T_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ), 'M-d' ) : T_('Not sent yet') );
+	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ) ) );
+	$Form->info( T_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ) ) : T_('Not sent yet') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Newsletter recipients') );
 	if( !empty( $users_numbers ) )
 	{ // We know this data only one time after selecting users
-		$Form->info( T_('Number of accounts in filterset'), $users_numbers['all'] );
-		$Form->info( T_('Number of active accounts in filterset'), $users_numbers['active'] );
+		$Form->info( T_('Accounts in filterset'), $users_numbers['all'] );
+		$Form->info( T_('Active accounts in filterset'), $users_numbers['active'] );
 	}
 	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_users_count(), '('.T_('Accounts which accept newsletter emails').') - <a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'">'.T_('Change selection').' &gt;&gt;</a>' );
 	$Form->info( T_('Already received'), $edited_EmailCampaign->get_users_count( 'accept' ), '('.T_('Accounts which have already been sent this newsletter').')' );

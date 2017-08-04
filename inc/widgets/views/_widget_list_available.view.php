@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $container;
 
-echo '<h2><span class="right_icons">'.action_icon( T_('Cancel!'), 'close', regenerate_url( 'container' ) ).'</span>'
+echo '<h2><span class="right_icons">'.action_icon( T_('Cancel').'!', 'close', regenerate_url( 'container' ) ).'</span>'
 	.sprintf(T_('Widgets available for insertion into &laquo;%s&raquo;'), $container ).'</h2>';
 
 
@@ -47,27 +47,33 @@ foreach( $Plugin_array as $k => $Plugin )
 unset( $Plugin_array );
 
 $widget_groups = array (
-	'multipurpose' => T_('Multi-Purpose Widgets'),
-	'menu_item'    => T_('Menu Item Widgets'),
-	'navigation'   => T_('Navigation Widgets'),
-	'content'      => T_('Content Listing Widgets'),
-	'infoitem'     => T_('Info about a specific Item'),
-	'collection'   => T_('Collection Support Widgets'),
-	'site'         => T_('Site Support Widgets'),
-	'user'         => T_('User Support Widgets'),
+	'free_content' => T_('Free Content'),
+	'menu_item'    => T_('Menu Items / Buttons'),
+	'navigation'   => T_('Navigation'),
+	'content'      => T_('Listing Contents'),
+	'infoitem'     => T_('Item Details'),
+	'collection'   => T_('Collection Details'),
+	'about_user'   => T_('User Details'),
+	'user'         => T_('User Related'),
 	'other'        => T_('Other'),
 );
 
 $core_componentwidget_defs = array(
-	'multipurpose' => array(
-			'image',
-			'coll_avatar',
+	'free_content' => array(
+			'free_text',
 			'free_html',
-			'user_links',
+			'spacer',
+			'image',
+			'social_links',
+		),
+	'about_user' => array(
+			'coll_avatar',		// Avatar of User
+			'user_links',		// Social links of coll owner
 		),
 	'menu_item' => array(
-			'menu_link',
+			'basic_menu_link',
 			'msg_menu_link',
+			'flag_menu_link',
 			'profile_menu_link',
 		),
 	'navigation' => array(
@@ -80,20 +86,28 @@ $core_componentwidget_defs = array(
 			'coll_current_filters',
 		),
 	'content' => array(
+			'coll_featured_posts',    // Simplified UIL: Featured Posts
 			'coll_post_list',         // Simple Post list
 			'coll_page_list',         // Simple Page list
 			'coll_related_post_list', // Simple Related Posts list
+			'coll_flagged_list',      // Simplified UIL: Flagged Items
 			'coll_item_list',         // Universal Item list
-			'coll_featured_intro',    // Featured/Intro Post 
+			'coll_featured_intro',    // Featured/Intro Post
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
+			'content_block',          // Content Block
 		),
 	'infoitem' => array(
+			'item_info_line',
 			'item_content',
+			'item_attachments',
+			'item_link',
+			'item_location',
 			'item_small_print',
 			'item_tags',
 			'item_about_author',
 			'item_seen_by',
+			'item_vote',
 		),
 	'collection' => array(
 			'coll_logo',
@@ -102,23 +116,24 @@ $core_componentwidget_defs = array(
 			'coll_longdesc',
 			'coll_member_count',
 			'coll_xml_feeds',
-		),
-	'site' => array(
-			'colls_list_public',
-			'colls_list_owner',
-			'user_avatars',
+			'coll_subscription',
+			'coll_activity_stats',
 		),
 	'user' => array(
+			'user_avatars',
+			'org_members',
 			'user_login',
 			'user_register',
 			'user_tools',
+			'online_users',
 		),
 	'other' => array(
-			'org_members',
-			'online_users',
-			'mobile_skin_switcher',
 			'poll',
+			'colls_list_public',
+			'colls_list_owner',
+			'mobile_skin_switcher',
 			'contact_form',
+			'page_404_not_found',
 		),
 );
 
