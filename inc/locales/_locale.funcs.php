@@ -1331,7 +1331,7 @@ function locales_load_available_defs()
 		$locale_def_files = get_filenames( $ad_locale_folder, $filename_params );
 		if( $locale_def_files === false )
 		{	// Impossible to read the locale folder:
-			$Messages->add( sprintf( T_('The locale %s is not readable. Please check file permissions.'), $locale_folder ), 'warning' );
+			$Messages->add( sprintf( /* No trans for debug messages */ 'The locale %s is not readable. Please check file permissions.', $locale_folder ), 'warning' );
 			continue;
 		}
 		// Go through files in locale folder:
