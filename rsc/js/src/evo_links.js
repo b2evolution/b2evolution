@@ -182,13 +182,28 @@ function evo_link_change_order( event_object, link_ID, action )
 	{
 		// Change an order in the attachments table
 		var row = jQuery( event_object ).closest( 'tr' );
+		var currentEl = row.find( 'span[data-order]' );
 		if( action == 'move_up' )
 		{	// Move up:
+			var currentOrder = currentEl.attr( 'data-order' );
+			var previousRow = jQuery( row.prev() );
+			var previousEl = previousRow.find( 'span[data-order]' );
+			var previousOrder = previousEl.attr( 'data-order' );
+
 			row.prev().before( row );
+			currentEl.attr( 'data-order', previousOrder );
+			previousEl.attr( 'data-order', currentOrder );
 		}
 		else
 		{	// Move down:
+			var currentOrder = currentEl.attr( 'data-order' );
+			var nextRow = jQuery( row.next() );
+			var nextEl = nextRow.find( 'span[data-order]' );
+			var nextOrder = nextEl.attr( 'data-order' );
+
 			row.next().after( row );
+			currentEl.attr( 'data-order', nextOrder );
+			nextEl.attr( 'data-order', currentOrder );
 		}
 		evoFadeSuccess( row );
 	},
