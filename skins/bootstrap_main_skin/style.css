@@ -453,7 +453,8 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   color: #ffffff;
   text-align: center;
   opacity: 0.5;
-  transition: 0.1s all;
+  -webkit-transition: 0.1s all;
+          transition: 0.1s all;
   position: relative;
   left: -50%;
 }

@@ -482,6 +482,7 @@ if( $upload )
 			$message['link_url'] = $newFile->get_view_link();
 			$message['link_preview'] = $new_Link->get_preview_thumb();
 			$message['link_actions'] = link_actions( $new_Link->ID, 'last', $link_owner_type );
+			$message['link_order'] = $new_Link->get( 'order' );
 			$mask_row = (object) array(
 					'link_ID'       => $new_Link->ID,
 					'file_ID'       => $newFile->ID,

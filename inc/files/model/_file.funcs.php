@@ -2468,7 +2468,8 @@ function display_dragdrop_upload_button( $params = array() )
 
 						if( table_view == 'link' )
 						{ // Update the cells for link view, because these data exist in response
-							this_row.find( '.qq-upload-link-id' ).html( responseJSON.success.link_ID );
+							this_row.find( '.qq-upload-link-id' ).html( '<span data-order="' + responseJSON.success.link_order
+									+ '">' + responseJSON.success.link_ID + '</span>' );
 							this_row.find( '.qq-upload-image' ).html( responseJSON.success.link_preview );
 							this_row.find( '.qq-upload-link-actions' ).prepend( responseJSON.success.link_actions );
 							if( typeof( responseJSON.success.link_position ) != 'undefined' )
@@ -2477,6 +2478,7 @@ function display_dragdrop_upload_button( $params = array() )
 							}
 							init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 						}
+						evo_link_sort_list();
 					}
 					<?php
 					}
