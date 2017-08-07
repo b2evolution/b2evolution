@@ -49,13 +49,18 @@ class shortlinks_plugin extends Plugin
 	function get_custom_setting_definitions( & $params )
 	{
 		return array(
-			'link_without_brackets' => array(
-					'label' => $this->T_('Links without brackets'),
-					'type' => 'checkbox',
-					'defaultvalue' => 0,
-					'note' => $this->T_('Enable this to create the links from words like WikiWord without brackets [[]]'),
-				)
-		);
+			'link_types' => array(
+				'label' => T_('Link types to allow'),
+				'type' => 'checklist',
+				'options' => array(
+						array( 'absolute_urls',   sprintf( $this->T_('Absolute URLs (starting with %s or %s) in brackets'), '<code>http://</code>, <code>https://</code>, <code>mailto://</code>', '<code>//</code>' ), 1 ),
+						array( 'relative_urls',   sprintf( $this->T_('Relative URLs (starting with %s followed by a letter or digit) in brackets'), '<code>/</code>' ), 0 ),
+						array( 'slugs',           $this->T_('Slugs in brackets'), 1 ),
+						array( 'item_id',         $this->T_('Item ID in brackets'), 1 ),
+						array( 'without_backets', $this->T_('WikiWords without backets'), 0 ),
+					),
+				),
+			);
 	}
 
 
@@ -120,7 +125,7 @@ class shortlinks_plugin extends Plugin
 		// Get collection from given params:
 		$setting_Blog = $this->get_Blog_from_params( $params );
 
-		$this->setting_link_without_brackets = $this->get_coll_setting( 'link_without_brackets', $setting_Blog );
+		$this->link_types = $this->get_coll_setting( 'link_types', $setting_Blog );
 
 		return $this->render_content( $content );
 	}
@@ -137,7 +142,7 @@ class shortlinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$this->setting_link_without_brackets = $this->get_msg_setting( 'link_without_brackets' );
+		$this->link_types = $this->get_msg_setting( 'link_types' );
 
 		return $this->render_content( $content );
 	}
@@ -154,7 +159,7 @@ class shortlinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$this->setting_link_without_brackets = $this->get_email_setting( 'link_without_brackets' );
+		$this->link_types = $this->get_email_setting( 'link_types' );
 
 		return $this->render_content( $content );
 	}
@@ -175,16 +180,33 @@ class shortlinks_plugin extends Plugin
 		// Add regexp modifier 'u' to work with UTF-8 strings correctly:
 		$regexp_modifier = ( $evo_charset == 'utf-8' ) ? 'u' : '';
 
-		// -------- REGULAR BRACKETED URLS -------- :
-		$search_urls = '*
-			( \[\[ | \(\( )                    # Lookbehind for (( or [[
-			( (https?|mailto)://[^<>{}\s\]]+ ) # URL
-			( \s \.[a-z0-9_\-\.]+ )?           # Style classes started and separated with dot (Optional)
-			( \s _[a-z0-9_\-]+ )?              # Link target started with _ (Optional)
-			( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
-			( \]\] | \)\) )                    # Lookahead for )) or ]]
-			*ix'; // x = extended (spaces + comments allowed)
-		$content = replace_content_outcode( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
+		// -------- ABSOLUTE BRACKETED URLS -------- :
+		if( ! empty( $this->link_types['absolute_urls'] ) )
+		{	// If it is allowed by plugin setting
+			$search_urls = '*
+				( \[\[ | \(\( )                    # Lookbehind for (( or [[
+				( (https?://|mailto://|//)[^<>{}\s\]]+ ) # URL
+				( \s \.[a-z0-9_\-\.]+ )?           # Style classes started and separated with dot (Optional)
+				( \s _[a-z0-9_\-]+ )?              # Link target started with _ (Optional)
+				( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
+				( \]\] | \)\) )                    # Lookahead for )) or ]]
+				*ix'; // x = extended (spaces + comments allowed)
+			$content = replace_content_outcode( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
+		}
+
+		// -------- RELATIVE BRACKETED URLS -------- :
+		if( ! empty( $this->link_types['relative_urls'] ) )
+		{	// If it is allowed by plugin setting
+			$search_urls = '*
+				( \[\[ | \(\( )                    # Lookbehind for (( or [[
+				( (/)[^/][^<>{}\s\]]+ ) # URL
+				( \s \.[a-z0-9_\-\.]+ )?           # Style classes started and separated with dot (Optional)
+				( \s _[a-z0-9_\-]+ )?              # Link target started with _ (Optional)
+				( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
+				( \]\] | \)\) )                    # Lookahead for )) or ]]
+				*ix'; // x = extended (spaces + comments allowed)
+			$content = replace_content_outcode( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
+		}
 
 /* QUESTION: fplanque, implementation of this planned? then use make_clickable() - or remove this comment
 	$ret = preg_replace("#([\n ])aim:([^,< \n\r]+)#i", "\\1<a href=\"aim:goim?screenname=\\2\\3&message=Hello\">\\2\\3</a>", $ret);
@@ -199,7 +221,7 @@ class shortlinks_plugin extends Plugin
 		load_funcs('locales/_charset.funcs.php');
 
 		// -------- STANDALONE WIKIWORDS -------- :
-		if( $this->setting_link_without_brackets )
+		if( ! empty( $this->link_types['without_backets'] ) )
 		{	// Create the links from standalone WikiWords
 
 			$search_wikiwords = array();
@@ -262,70 +284,76 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// -------- BRACKETED WIKIWORDS -------- :
-		$search = '/
-				(?<= \(\( | \[\[ )            # Lookbehind for (( or [[
-				([\p{L}0-9#]+[\p{L}0-9#_\-]*) # Anything from Wikiword to WikiWordLong
-				(?=
-					( \s .*? )?                 # Custom link text instead of post or chapter title with optional style classes
-					( \)\) | \]\] )             # Lookahead for )) or ]]
-				)
-			/x'.$regexp_modifier; // x = extended (spaces + comments allowed)
-		if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER ) )
-		{
-			// Construct array of wikiwords to look up in post urltitles
-			$wikiwords = array();
-			foreach( $matches as $match )
+		if( ! empty( $this->link_types['slugs'] ) || ! empty( $this->link_types['item_id'] ) )
+		{	// If it is allowed by plugin setting
+			$search_slug_itemid = empty( $this->link_types['slugs'] ) ?
+					'([0-9]+) # Only item ID' :
+					'([\p{L}0-9#]+[\p{L}0-9#_\-]*) # Anything from Wikiword to WikiWordLong';
+			$search = '/
+					(?<= \(\( | \[\[ )            # Lookbehind for (( or [[
+					'.$search_slug_itemid.'
+					(?=
+						( \s .*? )?                 # Custom link text instead of post or chapter title with optional style classes
+						( \)\) | \]\] )             # Lookahead for )) or ]]
+					)
+				/x'.$regexp_modifier; // x = extended (spaces + comments allowed)
+			if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER ) )
 			{
-				// Convert the WikiWord to an urltitle
-				$WikiWord = $match[0];
-				if( preg_match( '/^[\p{Ll}0-9#_\-]+$/'.$regexp_modifier, $WikiWord ) )
-				{	// This WikiWord already matches a slug format
-					$Wiki_Word = $WikiWord;
-					$wiki_word = $Wiki_Word;
+				// Construct array of wikiwords to look up in post urltitles
+				$wikiwords = array();
+				foreach( $matches as $match )
+				{
+					// Convert the WikiWord to an urltitle
+					$WikiWord = $match[0];
+					if( preg_match( '/^[\p{Ll}0-9#_\-]+$/'.$regexp_modifier, $WikiWord ) )
+					{	// This WikiWord already matches a slug format
+						$Wiki_Word = $WikiWord;
+						$wiki_word = $Wiki_Word;
+					}
+					else
+					{	// Convert WikiWord to slug format
+						$Wiki_Word = preg_replace( array( '*([^\p{Lu}#_])([\p{Lu}#])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1-$2', $WikiWord );
+						$wiki_word = utf8_strtolower( $Wiki_Word );
+					}
+					// Remove additional params from $wiki_word, it should be cleared. We keep the params in $WikiWord and parse them below.
+					$wiki_word = preg_replace( '/^([^#]+)(#.+)?$/i', '$1', $wiki_word );
+					$wiki_word = replace_special_chars( $wiki_word );
+					$wikiwords[ $WikiWord ] = $wiki_word;
 				}
-				else
-				{	// Convert WikiWord to slug format
-					$Wiki_Word = preg_replace( array( '*([^\p{Lu}#_])([\p{Lu}#])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1-$2', $WikiWord );
-					$wiki_word = utf8_strtolower( $Wiki_Word );
+
+				// Lookup all urltitles at once in DB and preload cache:
+				$ChapterCache = & get_ChapterCache();
+				$ChapterCache->load_urlname_array( $wikiwords );
+				$ItemCache = & get_ItemCache();
+				$ItemCache->load_urltitle_array( $wikiwords );
+
+				// Replace wikiwords by links:
+				foreach( $wikiwords as $WikiWord => $wiki_word )
+				{
+					// Initialize current wiki word which is used in callback function callback_replace_bracketed_words():
+					$this->current_WikiWord = $WikiWord;
+					$this->current_wiki_word = $wiki_word;
+
+					// Fix for regexp:
+					$WikiWord = str_replace( '#', '\#', preg_quote( $WikiWord ) );
+
+					// [[WikiWord]]
+					// [[WikiWord text]]
+					// [[WikiWord .style.classes text]]
+					// ((WikiWord))
+					// ((WikiWord text))
+					// ((WikiWord .style.classes text))
+					$search_wikiword = '*
+						( \[\[ | \(\( )          # Lookbehind for (( or [[
+						'.$WikiWord.'            # Specific WikiWord to replace
+						( \s \.[a-z0-9_\-\.]+ )? # Style classes started and separated with dot (Optional)
+						( \s _[a-z0-9_\-]+ )?    # Link target started with _ (Optional)
+						( \s .+? )?              # Custom link text instead of post/chapter title (Optional)
+						( \]\] | \)\) )          # Lookahead for )) or ]]
+						*isx'; // s = dot matches newlines, x = extended (spaces + comments allowed)
+
+					$content = replace_content_outcode( $search_wikiword, array( $this, 'callback_replace_bracketed_words' ), $content, 'replace_content', 'preg_callback' );
 				}
-				// Remove additional params from $wiki_word, it should be cleared. We keep the params in $WikiWord and parse them below.
-				$wiki_word = preg_replace( '/^([^#]+)(#.+)?$/i', '$1', $wiki_word );
-				$wiki_word = replace_special_chars( $wiki_word );
-				$wikiwords[ $WikiWord ] = $wiki_word;
-			}
-
-			// Lookup all urltitles at once in DB and preload cache:
-			$ChapterCache = & get_ChapterCache();
-			$ChapterCache->load_urlname_array( $wikiwords );
-			$ItemCache = & get_ItemCache();
-			$ItemCache->load_urltitle_array( $wikiwords );
-
-			// Replace wikiwords by links:
-			foreach( $wikiwords as $WikiWord => $wiki_word )
-			{
-				// Initialize current wiki word which is used in callback function callback_replace_bracketed_words():
-				$this->current_WikiWord = $WikiWord;
-				$this->current_wiki_word = $wiki_word;
-
-				// Fix for regexp:
-				$WikiWord = str_replace( '#', '\#', preg_quote( $WikiWord ) );
-
-				// [[WikiWord]]
-				// [[WikiWord text]]
-				// [[WikiWord .style.classes text]]
-				// ((WikiWord))
-				// ((WikiWord text))
-				// ((WikiWord .style.classes text))
-				$search_wikiword = '*
-					( \[\[ | \(\( )          # Lookbehind for (( or [[
-					'.$WikiWord.'            # Specific WikiWord to replace
-					( \s \.[a-z0-9_\-\.]+ )? # Style classes started and separated with dot (Optional)
-					( \s _[a-z0-9_\-]+ )?    # Link target started with _ (Optional)
-					( \s .+? )?              # Custom link text instead of post/chapter title (Optional)
-					( \]\] | \)\) )          # Lookahead for )) or ]]
-					*isx'; // s = dot matches newlines, x = extended (spaces + comments allowed)
-
-				$content = replace_content_outcode( $search_wikiword, array( $this, 'callback_replace_bracketed_words' ), $content, 'replace_content', 'preg_callback' );
 			}
 		}
 
@@ -413,7 +441,7 @@ class shortlinks_plugin extends Plugin
 		$link_text = preg_replace( array( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1 $2', $WikiWord );
 		$link_text = ucwords( str_replace( '-', ' ', $link_text ) );
 
-		if( is_numeric( $this->current_wiki_word ) && ( $Item = & $ItemCache->get_by_ID( $this->current_wiki_word, false, false ) ) )
+		if( ! empty( $this->link_types['item_id'] ) && is_numeric( $this->current_wiki_word ) && ( $Item = & $ItemCache->get_by_ID( $this->current_wiki_word, false, false ) ) )
 		{	// Item is found
 			$permalink = $Item->get_permanent_url();
 			$existing_link_text = $Item->get( 'title' );
@@ -465,7 +493,14 @@ class shortlinks_plugin extends Plugin
 		}
 		else
 		{	// Chapter and Item are not found in DB
-			return $this->get_broken_link( $WikiWord, $this->current_wiki_word, ( empty( $custom_link_text ) ? $link_text : $custom_link_text ), $custom_link_class );
+			if( empty( $this->link_types['item_id'] ) && is_numeric( $this->current_wiki_word ) )
+			{	// Return original text if no found by numeric wikiword and "Item ID in brackets" is disabled:
+				return $m[0];
+			}
+			else
+			{	// Display a link to suggest to create new post from wiki word:
+				return $this->get_broken_link( $WikiWord, $this->current_wiki_word, ( empty( $custom_link_text ) ? $link_text : $custom_link_text ), $custom_link_class );
+			}
 		}
 	}
 

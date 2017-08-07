@@ -3933,7 +3933,16 @@ class Plugin
 		$params = $this->get_coll_setting_definitions( $tmp_params );
 		if( $group === NULL )
 		{	// Get default value from sinple field:
-			if( isset( $params[$parname]['defaultvalue'] ) )
+			if( isset( $params[$parname]['type'] ) && $params[$parname]['type'] == 'checklist' )
+			{	// Get default values for checklist:
+				$param_defaults = array();
+				foreach( $params[$parname]['options'] as $param_option )
+				{
+					$param_defaults[ $param_option[0] ] = $param_option[2];
+				}
+				return $param_defaults;
+			}
+			elseif( isset( $params[$parname]['defaultvalue'] ) )
 			{	// We have a default value:
 				return $params[$parname]['defaultvalue'] ;
 			}
