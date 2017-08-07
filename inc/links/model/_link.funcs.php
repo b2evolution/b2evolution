@@ -21,6 +21,7 @@ load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
 load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
 load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 load_class( 'links/model/_temporaryid.class.php', 'TemporaryID' );
+load_class( 'messaging/model/_message.class.php', 'Message' );
 
 /**
  * Get a link owner object from link_type and object ID
