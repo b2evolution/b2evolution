@@ -296,3 +296,44 @@ function evo_link_refresh_list( type, object_ID, action )
 
 	return false;
 }
+
+/**
+ * Sort list of Item/Comment attachments based on link_order
+ */
+function evo_link_sort_list()
+{
+	var rows = jQuery( 'tr', 'tbody#filelist_tbody' );
+	rows.sort( function( a, b )	{
+		var A = parseInt( jQuery( 'span[data-order]', a ).attr( 'data-order' ) );
+		var B = parseInt( jQuery( 'span[data-order]', b ).attr( 'data-order' ) );
+
+		if( ! A ) A = rows.length;
+		if( ! B ) B = rows.length;
+
+		if( A < B )
+		{
+			return -1;
+		}
+
+		if( B < A )
+		{
+			return 1;
+		}
+
+		return 0;
+	} );
+
+	var previousRow;
+	$.each( rows, function( index, row ) {
+		if( index === 0 )
+		{
+			jQuery( row ).prependTo( 'tbody#filelist_tbody' );
+			previousRow = row;
+		}
+		else
+		{
+			jQuery( row ).insertAfter( previousRow );
+			previousRow = row;
+		}
+	} );
+}
