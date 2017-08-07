@@ -1445,12 +1445,14 @@ switch( $action )
 		$fake_sql_update_strings = '';
 		$real_sql_update_strings = '';
 		$real_link_order = 0;
+		$link_order = array();
 		foreach( $link_IDs as $link_ID )
 		{
 			$max_link_order++;
 			$fake_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$max_link_order;
 			$real_link_order++;
 			$real_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$real_link_order;
+			$link_order[$link_ID] = $real_link_order;
 		}
 
 		// Do firstly fake ordering start with max order, to avoid duplicate entry error:
@@ -1463,6 +1465,7 @@ switch( $action )
 			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
 
 		$DB->commit();
+		echo json_encode( $link_order );
 		break;
 
 	case 'test_api':
