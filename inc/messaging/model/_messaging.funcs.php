@@ -1894,6 +1894,32 @@ function get_thread_prevnext_links( $current_thread_ID, $params = array() )
 
 
 /**
+ * Get preferred contact methods on disp=msgform
+ *
+ * @return array
+ */
+function get_msgform_contact_methods()
+{
+	global $DB;
+
+	$contact_methods = array( 'email' => T_('Email') );
+
+	$SQL = new SQL( 'Get preferred contact methods for disp=msgform' );
+	$SQL->SELECT( 'ufdf_id, ufdf_name' );
+	$SQL->FROM( 'T_users__fielddefs' );
+	$SQL->WHERE( 'ufdf_type = "phone" OR ufdf_type = "email"' );
+	$SQL->ORDER_BY( 'ufdf_name' );
+	$user_fields = $DB->get_assoc( $SQL->get(), $SQL->title );
+	foreach( $user_fields as $user_field_ID => $user_field_name )
+	{
+		$contact_methods[ $user_field_ID ] = $user_field_name;
+	}
+
+	return $contact_methods;
+}
+
+
+/**
  * Display threads results table
  *
  * @param array Params

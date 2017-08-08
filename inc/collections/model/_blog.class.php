@@ -922,6 +922,22 @@ class Blog extends DataObject
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
 		}
 
+		if( in_array( 'contact', $groups ) )
+		{	// we want to load the contact form settings:
+			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
+			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
+			$this->set_setting( 'msgform_recipient_label', param( 'msgform_recipient_label', 'string' ) );
+			$this->set_setting( 'msgform_user_name', param( 'msgform_user_name', 'string' ) );
+			$this->set_setting( 'msgform_require_name', param( 'msgform_require_name', 'integer', 0 ) );
+			$this->set_setting( 'msgform_subject_list', param( 'msgform_subject_list', 'text' ) );
+			$this->set_setting( 'msgform_display_subject', param( 'msgform_display_subject', 'integer', 0 ) );
+			$this->set_setting( 'msgform_require_subject', param( 'msgform_require_subject', 'integer', 0 ) );
+			$this->set_setting( 'msgform_contact_method', param( 'msgform_contact_method', 'integer', 0 ) );
+			$this->set_setting( 'msgform_display_message', param( 'msgform_display_message', 'integer', 0 ) );
+			$this->set_setting( 'msgform_require_message', param( 'msgform_require_message', 'integer', 0 ) );
+			$this->set_setting( 'msgform_message_label', param( 'msgform_message_label', 'string' ) );
+		}
+
 		if( in_array( 'userdir', $groups ) )
 		{ // we want to load the user directory settings:
 			$this->set_setting( 'userdir_picture', param( 'userdir_picture', 'integer', 0 ) );
@@ -967,10 +983,6 @@ class Blog extends DataObject
 
 			// Archive pages:
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
-
-			// Contact form:
-			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
-			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
 		}
 
 		if( in_array( 'more', $groups ) )
@@ -2889,6 +2901,22 @@ class Blog extends DataObject
 					{
 						array_push( $coll_IDs, $this->ID );
 						$result = implode( ',', $coll_IDs );
+					}
+				}
+				break;
+
+			case 'msgform_subject_options':
+				$subject_list = utf8_trim( $this->get_setting( 'msgform_subject_list' ) );
+				$result = array();
+				if( ! empty( $subject_list ) )
+				{
+					$subject_list = explode( "\n", str_replace( "\r", '', $subject_list ) );
+					foreach( $subject_list as $subject_option )
+					{
+						if( utf8_trim( $subject_option ) != '' )
+						{	// Use only not empty line:
+							$result[ $subject_option ] = $subject_option;
+						}
 					}
 				}
 				break;

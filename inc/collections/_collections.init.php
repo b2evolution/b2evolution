@@ -768,6 +768,9 @@ class collections_Module extends Module
 							'comments' => array(
 								'text' => T_('Comments'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog ),
+							'contact' => array(
+								'text' => T_('Contact form'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=contact&amp;blog='.$blog ),
 							'userdir' => array(
 								'text' => T_('User directory'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$blog ),

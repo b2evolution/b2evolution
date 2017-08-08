@@ -4073,7 +4073,7 @@ function mail_autoinsert_user_data( $text, $User = NULL )
  */
 function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
 {
-	global $current_charset;
+	global $current_charset, $current_User;
 
 	if( !empty( $params['locale'] ) )
 	{ // Switch to locale for current email template
@@ -4156,13 +4156,21 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 						'use_style' => true,
 						'protocol'  => 'http:',
 					) );
+
+				$sender_username = is_logged_in() ? $current_User->get_colored_login( array(
+							'mask'      => '$avatar$ $login$',
+							'login_text'=> 'name',
+							'use_style' => true,
+							'protocol'  => 'http:',
+						) ) : '';
 			}
 			else
 			{
 				$username = $User->get_username();
 				$user_login = $User->login;
+				$sender_username = is_logged_in() ? $current_User->get_username() : '';
 			}
-			$formated_message = str_replace( array( '$login$', '$username$' ), array( $user_login, $username ) , $formated_message );
+			$formated_message = str_replace( array( '$login$', '$username$', '$sender_username$' ), array( $user_login, $username, $sender_username ) , $formated_message );
 		}
 
 		$template_message .= $formated_message;

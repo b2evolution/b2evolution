@@ -139,6 +139,7 @@ switch( $action )
 			case 'home':
 			case 'features':
 			case 'comments':
+			case 'contact':
 			case 'userdir':
 			case 'other':
 			case 'more':
@@ -987,6 +988,13 @@ else
 			$AdminUI->set_page_manual_link( 'comment-features' );
 			break;
 
+		case 'contact':
+			$AdminUI->set_path( 'collections', 'features', $tab );
+			$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
+			$AdminUI->breadcrumbpath_add( T_('Contact form'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+			$AdminUI->set_page_manual_link( 'contact-form' );
+			break;
+
 		case 'userdir':
 			$AdminUI->set_path( 'collections', 'features', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
@@ -1097,6 +1105,9 @@ else
 					break;
 				case 'comments':
 					$AdminUI->disp_view( 'collections/views/_coll_comments.form.php' );
+					break;
+				case 'contact':
+					$AdminUI->disp_view( 'collections/views/_coll_contact.form.php' );
 					break;
 				case 'userdir':
 					$AdminUI->disp_view( 'collections/views/_coll_user_dir.form.php' );

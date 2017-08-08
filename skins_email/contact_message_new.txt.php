@@ -32,9 +32,18 @@ $Collection = $Blog = & $params['Blog'];
 $recipient_User = & $params['recipient_User'];
 
 // show sender name
-echo sprintf( T_('%s has sent you this message:'), $params['sender_name'] )."\n\n";
+echo sprintf( T_('%s has sent you this message').( empty( $params['message'] ) ? '.' : ':' ), $params['sender_name'] );
 
-echo $params['message'];
+if( ! empty( $params['message'] ) )
+{	// Display a message only if it has been entered:
+	echo "\n\n".$params['message'];
+}
+
+if( ! empty( $params['contact_method'] ) )
+{	// Display a preferred contact method only if it has been selected:
+	echo "\n\n".T_('Preferred contact method').': '.$params['contact_method'];
+}
+
 echo "\n\n-- \n";
 
 // show sender IP address

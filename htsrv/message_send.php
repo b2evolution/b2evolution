@@ -58,10 +58,12 @@ param( 'comment_id', 'integer', '' );
 activate_blog_locale( $blog );
 
 // Note: we use funky field names in order to defeat the most basic guestbook spam bots:
-$sender_name = param( $dummy_fields[ 'name' ], 'string', '' );
-$sender_address = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
-$subject = param( $dummy_fields[ 'subject' ], 'string', '' );
-$message = param( $dummy_fields[ 'content' ], 'html', '' );	// We accept html but we will NEVER display it
+$sender_name = param( $dummy_fields['name'], 'string', '' );
+$sender_address = utf8_strtolower( param( $dummy_fields['email'], 'string', '' ) );
+$subject = param( $dummy_fields['subject'], 'string', '' );
+$subject_other = param( $dummy_fields['subject'].'_other', 'string', '' );
+$message = param( $dummy_fields['content'], 'html', '' );	// We accept html but we will NEVER display it
+$contact_method = param( 'contact_method', 'string', '' );
 // save the message original content
 $original_content = $message;
 
@@ -71,34 +73,40 @@ $recipient_name = '';
 $recipient_User = NULL;
 $Comment = NULL;
 
-// Core param validation
-
-if( empty($subject) )
-{
-	$Messages->add_to_group( T_('Please fill in the subject of your message.'), 'error', T_('Validation errors:') );
-}
-
-if( empty( $message ) )
-{ // message should not be empty!
-	$Messages->add_to_group( T_('Please do not send empty messages.'), 'error', T_('Validation errors:') );
-}
-elseif( $Settings->get( 'antispam_block_contact_form' ) && ( $block = antispam_check( $message ) ) )
-{ // a blacklisted keyword has been found in the message:
-	// Log incident in system log
-	syslog_insert( sprintf( 'Antispam: Supplied message is invalid / appears to be spam. Message contains blacklisted word "%s".', $block ), 'error' );
-
-	$Messages->add_to_group( T_('The supplied message is invalid / appears to be spam.'), 'error', T_('Validation errors:') );
-}
-
-// Getting current blog info:
+// Getting current collection:
 $BlogCache = & get_BlogCache();
-if( !empty( $comment_id ) || !empty( $post_id ) )
+if( ! empty( $comment_id ) || ! empty( $post_id ) )
 {
 	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );	// Required
 }
 else
 {
 	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
+}
+
+// Core param validation
+
+if( $Blog->get_setting( 'msgform_display_subject' ) &&
+    $Blog->get_setting( 'msgform_require_subject' ) &&
+    empty( $subject ) &&
+    empty( $subject_other ) )
+{	// If subject is required:
+	$Messages->add_to_group( T_('Please fill in the subject of your message.'), 'error', T_('Validation errors:') );
+}
+
+if( $Blog->get_setting( 'msgform_display_message' ) )
+{	// If message field is displayed:
+	if( $Blog->get_setting( 'msgform_require_message' ) && empty( $message ) )
+	{	// If message is required:
+		$Messages->add_to_group( T_('Please do not send empty messages.'), 'error', T_('Validation errors:') );
+	}
+	elseif( $Settings->get( 'antispam_block_contact_form' ) && ( $block = antispam_check( $message ) ) )
+	{	// a blacklisted keyword has been found in the message:
+		// Log incident in system log
+		syslog_insert( sprintf( 'Antispam: Supplied message is invalid / appears to be spam. Message contains blacklisted word "%s".', $block ), 'error' );
+
+		$Messages->add_to_group( T_('The supplied message is invalid / appears to be spam.'), 'error', T_('Validation errors:') );
+	}
 }
 
 $allow_msgform = '';
@@ -144,20 +152,28 @@ elseif( ! empty( $comment_id ) )
 	}
 }
 
-if( empty($sender_name) )
-{
-	$Messages->add_to_group( T_('Please fill in your name.'), 'error', T_('Validation errors:') );
+if( is_logged_in() )
+{	// Set name and email of the current logged in user:
+	$sender_name = '$sender_username$';
+	$sender_address = $current_User->get( 'email' );
 }
-if( empty($sender_address) )
-{
-	$Messages->add_to_group( T_('Please fill in your email.'), 'error', T_('Validation errors:') );
-}
-elseif( !is_email($sender_address) || ( $block = antispam_check( $sender_address ) ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
-{
-	// Log incident in system log
-	syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $sender_address, $block ), 'error' );
+else
+{	// Ask name and email only for anonymous users:
+	if( $Blog->get_setting( 'msgform_require_name' ) && empty( $sender_name ) )
+	{	// If name is required:
+		$Messages->add_to_group( T_('Please fill in your name.'), 'error', T_('Validation errors:') );
+	}
+	if( empty( $sender_address ) )
+	{
+		$Messages->add_to_group( T_('Please fill in your email.'), 'error', T_('Validation errors:') );
+	}
+	elseif( ! is_email( $sender_address ) || ( $block = antispam_check( $sender_address ) ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
+	{
+		// Log incident in system log
+		syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $sender_address, $block ), 'error' );
 
-	$Messages->add_to_group( T_('Supplied email address is invalid.'), 'error', T_('Validation errors:') );
+		$Messages->add_to_group( T_('Supplied email address is invalid.'), 'error', T_('Validation errors:') );
+	}
 }
 
 if( empty( $recipient_User ) && empty( $recipient_address ) )
@@ -169,12 +185,12 @@ if( empty( $recipient_User ) && empty( $recipient_address ) )
 if( $recipient_User )
 { // Member:
 	// Change the locale so the email is in the recipients language
-	locale_temp_switch($recipient_User->locale);
+	locale_temp_switch( $recipient_User->locale );
 }
 else
 { // Visitor:
 	// We don't know the recipient's language - Change the locale so the email is in the blog's language:
-	locale_temp_switch($Blog->locale);
+	locale_temp_switch( $Blog->locale );
 }
 
 // Trigger event: a Plugin could add a $category="error" message here..
@@ -192,12 +208,50 @@ $Plugins->trigger_event( 'MessageFormSent', array(
 
 $success_message = ( !$Messages->has_errors() );
 if( $success_message )
-{ // no errors, try to send the message
+{	// No errors, try to send the message:
+
+	$send_subject = ( empty( $subject_other ) ? $subject : $subject_other );
+
+	$send_contact_method = $contact_method;
+	if( ! empty( $send_contact_method ) )
+	{	// If a preferred contact method is selected of the form:
+		if( $send_contact_method === 'email' )
+		{	// Email default option:
+			$send_contact_method = T_('Email');
+			if( is_logged_in() )
+			{	// Display an email of current user:
+				$send_contact_method .= ' ('.$current_User->get( 'email' ).')';
+			}
+		}
+		elseif( intval( $send_contact_method ) > 0 )
+		{	// User field option:
+			$UserFieldCache = & get_UserFieldCache();
+			if( $UserField = & $UserFieldCache->get_by_ID( $send_contact_method, false, false ) &&
+			    ( $UserField->get( 'type' ) == 'email' || $UserField->get( 'type' ) == 'phone' ) )
+			{	// Get real name of the selected user field:
+				$send_contact_method = $UserField->get( 'name' );
+				if( is_logged_in() )
+				{	// Display a value of the selected contact method of current user:
+					$user_field_values = $current_User->userfield_values_by_code( $UserField->get( 'code' ) );
+					if( ! empty( $user_field_values ) )
+					{	// Only if it is entered by user:
+						$send_contact_method .= ' ('.implode( ', ', $user_field_values ).')';
+					}
+				}
+			}
+			else
+			{	// Wrong user field:
+				$send_contact_method = '';
+			}
+		}
+	}
+
 	$email_template_params = array(
 			'sender_name'    => $sender_name,
 			'sender_address' => $sender_address,
 			'Blog'           => $Blog,
 			'message'        => $message,
+			'contact_method' => $send_contact_method,
 			'comment_id'     => $comment_id,
 			'post_id'        => $post_id,
 			'recipient_User' => $recipient_User,
@@ -205,14 +259,14 @@ if( $success_message )
 		);
 
 	if( empty( $recipient_User ) )
-	{ // Send mail to visitor
+	{	// Send email to visitor/anonymous:
 		// Get a message text from template file
 		$message = mail_template( 'contact_message_new', 'text', $email_template_params );
-		$success_message = send_mail( $recipient_address, $recipient_name, $subject, $message, NULL, NULL, array( 'Reply-To' => $sender_address ) );
+		$success_message = send_mail( $recipient_address, $recipient_name, $send_subject, $message, NULL, NULL, array( 'Reply-To' => $sender_address ) );
 	}
 	else
-	{ // Send mail to registered user
-		$success_message = send_mail_to_User( $recipient_User->ID, $subject, 'contact_message_new', $email_template_params, false, array( 'Reply-To' => $sender_address ) );
+	{	// Send mail to registered user:
+		$success_message = send_mail_to_User( $recipient_User->ID, $send_subject, 'contact_message_new', $email_template_params, false, array( 'Reply-To' => $sender_address ) );
 	}
 
 	// restore the locale to the blog visitor language, before we would display an error message
@@ -274,7 +328,9 @@ $unsaved_message_params = array();
 $unsaved_message_params[ 'sender_name' ] = $sender_name;
 $unsaved_message_params[ 'sender_address' ] = $sender_address;
 $unsaved_message_params[ 'subject' ] = $subject;
+$unsaved_message_params[ 'subject_other' ] = $subject_other;
 $unsaved_message_params[ 'message' ] = $original_content;
+$unsaved_message_params[ 'contact_method' ] = $contact_method;
 save_message_params_to_session( $unsaved_message_params );
 
 if( param_errors_detected() || empty( $redirect_to ) )

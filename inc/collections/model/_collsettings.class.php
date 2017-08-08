@@ -200,6 +200,16 @@ class CollectionSettings extends AbstractSettings
 			'cookie_domain_type' => 'auto', // Cookie domain type: 'auto', 'custom'
 			'cookie_path_type' => 'auto', // Cookie path type: 'auto', 'custom'
 
+		// Contact form settings (disp=msgform):
+			'msgform_display_recipient' => 1, // Display a "Message to:" line
+			'msgform_user_name' => 'none', // Name input for logged in users
+			'msgform_require_name' => 1, // Require name
+			'msgform_display_subject' => 1, // Display subject
+			'msgform_require_subject' => 1, // Require subject
+			'msgform_contact_method' => 1, // Require a preferred contact method
+			'msgform_display_message' => 1, // Display message
+			'msgform_require_message' => 1, // Require message
+
 		// User directory:
 			'userdir_picture' => 1,
 			'image_size_user_list' => 'crop-top-48x48',
@@ -226,7 +236,6 @@ class CollectionSettings extends AbstractSettings
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
-			'msgform_display_recipient' => 1, // Display a "Message to:" line on disp=msgform
 
 		// Time frame settings:
 			'timestamp_min' => 'yes',
