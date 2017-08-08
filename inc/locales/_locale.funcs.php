@@ -935,7 +935,7 @@ function locale_updateDB()
 		{
 			if( $lfield == 'datefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s date format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Date format cannot be empty.').' ('.$plocale.')' );
 			}
 			elseif( $lfield == 'input_datefmt' && empty( $pval ) )
 			{
@@ -943,7 +943,7 @@ function locale_updateDB()
 			}
 			elseif( $lfield == 'timefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s time format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Time format cannot be empty.').' ('.$plocale.')' );
 			}
 			elseif( $lfield == 'input_timefmt' && empty( $pval ) )
 			{
