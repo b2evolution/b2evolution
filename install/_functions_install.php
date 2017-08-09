@@ -1797,6 +1797,18 @@ function check_quick_install_request()
 
 
 /**
+ * Format an install param like DB config and base url
+ *
+ * @return string
+ */
+function format_install_param( $value )
+{
+	$value = str_replace( array( "'",  "\$" ), array( "\'", "\\$" ), $value );
+	return preg_replace( "#([\\\\]*)(\\\\\\\')#", "\\\\\\\\\\\\\\\\\'", $value );
+}
+
+
+/**
  * Update file /conf/_basic_config.php
  *
  * @param string Current action, updated by reference
@@ -1896,13 +1908,13 @@ function update_basic_config_file( $params = array() )
 			),
 			array(
 				"\$db_config = array(\n"
-					."\t'user'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_user'] )."',\$1"
-					."\t'password' => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_password'] )."',\$2"
-					."\t'name'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_name'] )."',\$3"
-					."\t'host'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_host'] )."',\$4",
-				"tableprefix = '".str_replace( "'", "\'", $params['db_tableprefix'] )."';",
-				"baseurl = '".str_replace( "'", "\'", $params['baseurl'] )."';",
-				"admin_email = '".str_replace( "'", "\'", $params['admin_email'] )."';",
+					."\t'user'     => '".format_install_param( $params['db_user'] )."',\$1"
+					."\t'password' => '".format_install_param( $params['db_password'] )."',\$2"
+					."\t'name'     => '".format_install_param( $params['db_name'] )."',\$3"
+					."\t'host'     => '".format_install_param( $params['db_host'] )."',\$4",
+				"tableprefix = '".format_install_param( $params['db_tableprefix'] )."';",
+				"baseurl = '".format_install_param( $params['baseurl'] )."';",
+				"admin_email = '".format_install_param( $params['admin_email'] )."';",
 				'config_is_done = 1;',
 			), $conf );
 
