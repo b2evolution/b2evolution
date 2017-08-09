@@ -246,27 +246,72 @@ if( $success_message )
 		}
 	}
 
-	$email_template_params = array(
-			'sender_name'    => $sender_name,
-			'sender_address' => $sender_address,
-			'Blog'           => $Blog,
-			'message'        => $message,
-			'contact_method' => $send_contact_method,
-			'comment_id'     => $comment_id,
-			'post_id'        => $post_id,
-			'recipient_User' => $recipient_User,
-			'Comment'        => $Comment,
-		);
-
-	if( empty( $recipient_User ) )
-	{	// Send email to visitor/anonymous:
-		// Get a message text from template file
-		$message = mail_template( 'contact_message_new', 'text', $email_template_params );
-		$success_message = send_mail( $recipient_address, $recipient_name, $send_subject, $message, NULL, NULL, array( 'Reply-To' => $sender_address ) );
+	$send_method_type = 'email';
+	// Check if sender and recipient can use private message instead of email:
+	if( $recipient_User && // recipient is a registered user
+	    $recipient_User->get_msgform_possibility() == 'PM' && // recipient allows to send PM
+	    ! check_create_thread_limit() ) // sender can create a thread today
+	{
+		$send_method_type = 'PM';
 	}
-	else
-	{	// Send mail to registered user:
-		$success_message = send_mail_to_User( $recipient_User->ID, $send_subject, 'contact_message_new', $email_template_params, false, array( 'Reply-To' => $sender_address ) );
+
+	if( $send_method_type == 'PM' )
+	{	// Send private message:
+		load_class( 'messaging/model/_thread.class.php', 'Thread' );
+		load_class( 'messaging/model/_message.class.php', 'Message' );
+
+		$send_message = $message;
+		if( ! empty( $send_contact_method ) )
+		{	// Append a preferred contact method to the message text:
+			$send_message .= "\n\n---\n\n".T_('Preferred contact method').': '.$send_contact_method;
+		}
+
+		$edited_Thread = new Thread();
+		$edited_Message = new Message();
+
+		$edited_Thread->set( 'title', $send_subject );
+		$edited_Thread->set( 'recipients', $current_User->ID.','.$recipient_User->ID );
+		$edited_Thread->recipients_list = array( $recipient_User->ID );
+		$edited_Message->Thread = & $edited_Thread;
+		$edited_Message->set( 'text', $send_message );
+
+		if( $edited_Message->dbinsert_discussion() )
+		{	// Successful creating of new thread:
+			$success_message = true;
+			// update author user last new thread setting
+			update_todays_thread_settings( 1 );
+		}
+		else
+		{	// Failed
+			$success_message = false;
+		}
+	}
+	if( $send_method_type == 'email' ||
+	    ( $send_method_type == 'PM' && ! $success_message ) )
+	{	// Send email message:
+		$send_method_type = 'email';
+		$email_template_params = array(
+				'sender_name'    => $sender_name,
+				'sender_address' => $sender_address,
+				'Blog'           => $Blog,
+				'message'        => $message,
+				'contact_method' => $send_contact_method,
+				'comment_id'     => $comment_id,
+				'post_id'        => $post_id,
+				'recipient_User' => $recipient_User,
+				'Comment'        => $Comment,
+			);
+
+		if( empty( $recipient_User ) )
+		{	// Send email to visitor/anonymous:
+			// Get a message text from template file
+			$message = mail_template( 'contact_message_new', 'text', $email_template_params );
+			$success_message = send_mail( $recipient_address, $recipient_name, $send_subject, $message, NULL, NULL, array( 'Reply-To' => $sender_address ) );
+		}
+		else
+		{	// Send mail to registered user:
+			$success_message = send_mail_to_User( $recipient_User->ID, $send_subject, 'contact_message_new', $email_template_params, false, array( 'Reply-To' => $sender_address ) );
+		}
 	}
 
 	// restore the locale to the blog visitor language, before we would display an error message
@@ -309,8 +354,15 @@ if( empty( $redirect_to ) && empty( $Blog ) )
 }
 if( $success_message )
 {
-	$Messages->add( sprintf( T_('You have successfully sent an email to %s.'),
-		( empty( $recipient_User ) ? $recipient_name : $recipient_User->get_username() ) ), 'success' );
+	if( $send_method_type == 'PM' )
+	{	// If PM has been sent:
+		$Messages->add( T_('Your private message has been sent.'), 'success' );
+	}
+	else
+	{	// If EMAIL has been sent:
+		$Messages->add( sprintf( T_('You have successfully sent an email to %s.'),
+			( empty( $recipient_User ) ? $recipient_name : $recipient_User->get_username() ) ), 'success' );
+	}
 	if( empty( $redirect_to ) )
 	{
 		$redirect_to = $Blog->gen_blogurl();
