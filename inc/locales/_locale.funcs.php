@@ -939,7 +939,7 @@ function locale_updateDB()
 			}
 			elseif( $lfield == 'input_datefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s input date format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Input date format cannot be empty.').' ('.$plocale.')' );
 			}
 			elseif( $lfield == 'timefmt' && empty( $pval ) )
 			{
@@ -947,7 +947,7 @@ function locale_updateDB()
 			}
 			elseif( $lfield == 'input_timefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s input time format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Input time format cannot be empty.').' ('.$plocale.')' );
 			}
 
 			if( $lfield == 'startofweek' && ( $pval < 0 || $pval > 6 ) )
