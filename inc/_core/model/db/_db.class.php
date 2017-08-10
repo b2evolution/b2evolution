@@ -365,12 +365,10 @@ class DB
 			if( function_exists('dl') )
 			{
 				$mysql_ext_file = is_windows() ? 'php_mysqli.dll' : 'mysqli.so';
-				$php_errormsg = null;
-				$old_track_errors = @ini_set('track_errors', 1);
+				if (function_exists('error_clear_last')) error_clear_last(); // PHP 7+
 				$old_html_errors = @ini_set('html_errors', 0);
 				@dl( $mysql_ext_file );
-				$error_msg = $php_errormsg;
-				if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
+				$error_msg = error_get_last();
 				if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
 			}
 			else
@@ -399,14 +397,12 @@ class DB
 			// echo "mysqli::real_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $this->dbname, port, $socket, $client_flags )";
 			// mysqli::$connect_error is tied to an established connection
 			// if the connection fails we need a different method to get the error message
-			$php_errormsg = null;
-			$old_track_errors = @ini_set('track_errors', 1);
+			if (function_exists('error_clear_last')) error_clear_last(); // PHP 7+
 			$old_html_errors = @ini_set('html_errors', 0);
 			$this->dbhandle = new mysqli();
 			@$this->dbhandle->real_connect($this->use_persistent ? 'p:'.$this->dbhost : $this->dbhost,
 				$this->dbuser, $this->dbpassword, '', $port, $socket, $client_flags );
-			$mysql_error = $php_errormsg;
-			if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
+			$mysql_error = error_get_last();
 			if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
 		}
 
