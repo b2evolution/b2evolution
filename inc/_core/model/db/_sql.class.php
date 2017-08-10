@@ -392,7 +392,7 @@ class SQL
 			case 'OR':
 				// Create array of key words of the search string
 				$keyword_array = explode( ' ', $search );
-				$keyword_array = array_filter( $keyword_array, create_function( '$val', 'return !empty($val);' ) );
+				$keyword_array = array_filter( $keyword_array, function($val) { return !empty($val); } );
 
 				$twhere = array();
 				// Loop on all keywords

@@ -327,27 +327,27 @@ class basic_antispam_plugin extends Plugin
 			return;
 		}
 
-		$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', create_function( '$m', '
-				if( preg_match( \'~\brel=([\\\'"])(.*?)\1~\', $m[2], $match ) )
+		$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', function( $m ) {
+				if( preg_match( '~\brel=([\\\'"])(.*?)\1~', $m[2], $match ) )
 				{ // there is already a rel attrib:
 					$rel_values = explode( " ", $match[2] );
 
-					if( ! in_array( \'nofollow\', $rel_values ) )
+					if( ! in_array( 'nofollow', $rel_values ) )
 					{
-						$rel_values[] = \'nofollow\';
+						$rel_values[] = 'nofollow';
 					}
 
 					return $m[1]
 						.preg_replace(
-							\'~\brel=([\\\'"]).*?\1~\',
-							\'rel=$1\'.implode( " ", $rel_values ).\'$1\',
+							'~\brel=([\'"]).*?\1~',
+							'rel=$1'.implode( " ", $rel_values ).'$1',
 							$m[2] )
 						.">";
 				}
 				else
 				{
-					return $m[1].$m[2].\' rel="nofollow">\';
-				}' ), $data );
+					return $m[1].$m[2].' rel="nofollow">';
+				} }, $data );
 	}
 
 

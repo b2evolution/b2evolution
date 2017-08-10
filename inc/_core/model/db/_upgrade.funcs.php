@@ -408,11 +408,11 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 			// Sort index definitions with names to the beginning:
 			/*
-			usort( $indices, create_function( '$a, $b', '
-				if( preg_match( "~^\w+\s+[^(]~", $a["create_definition"] )
+			usort( $indices, function( $a, $b) {
+				if( preg_match( "~^\w+\s+[^(]~", $a["create_definition"] ))
 				{
 
-				}' ) );
+				} } );
 			*/
 
 

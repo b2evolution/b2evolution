@@ -1319,8 +1319,8 @@ class Form extends Widget
 
 		// Convert PHP date format to JS library date format:
 		// NOTE: when editing/extending this here, you probably also have to adjust param_check_date()!
-		$js_date_format = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
-			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
+		$js_date_format = preg_replace_callback( '~(\\\)?(\w)~', function( $m ) {
+			if( $m[1] == "\\" ) return "\\".$m[0]; // leave escaped
 			switch( $m[2] )
 			{
 				case "d": return "dd"; // day, 01-31
@@ -1340,11 +1340,11 @@ class Form extends Widget
 				case "Y": return "yyyy"; // year, XXXX
 				default:
 					return $m[0];
-			}' ), $date_format );
+			} }, $date_format );
 
 		// Get max length of each date component
-		$js_date_length = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
-			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
+		$js_date_length = preg_replace_callback( '~(\\\)?(\w)~', function( $m ) {
+			if( $m[1] == "\\" ) return "\\".$m[0]; // leave escaped
 			switch( $m[2] )
 			{
 				case "d": return "nn"; // day, 01-31(2)
@@ -1364,7 +1364,7 @@ class Form extends Widget
 				case "Y": return "nnnn"; // year, 1970 to 2038(4)
 				default:
 					return "_"; // (1)
-			}' ), $date_format );
+			} }, $date_format );
 
 		$field_params['type'] = 'text';
 

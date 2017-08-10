@@ -1142,7 +1142,7 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 
 			if( $format == 'notes-string' )
 			{	// String notes
-				$r = array_map( create_function('$v', 'return implode(" ", $v);'), $r );
+				$r = array_map( function($v) { return implode(" ", $v);}, $r );
 			}
 			break;
 

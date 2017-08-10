@@ -732,7 +732,7 @@ function convert_chars( $content, $flag = 'html' )
 		// fp> why do we actually bother doing this:?
 		$content = preg_replace_callback(
 			'/[\x80-\xff]/',
-			create_function( '$j', 'return "&#".ord($j[0]).";";' ),
+			function( $j ) { return "&#".ord($j[0]).";";},
 			$content);
 	}
 

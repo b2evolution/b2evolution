@@ -1072,8 +1072,8 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 	}
 
 	// Convert PHP date format to regexp pattern:
-	$date_regexp = '~^'.preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
-		if( $m[1] == "\\\" ) return $m[2]; // escaped
+	$date_regexp = '~^'.preg_replace_callback( '~(\\\)?(\w)~', function( $m) {
+		if( $m[1] == "\\" ) return $m[2]; // escaped
 		switch( $m[2] )
 		{
 			case "d": return "([0-3]\\d)"; // day, 01-31
@@ -1093,7 +1093,7 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 			case "Y": return "(\\d{4})"; // year, XXXX
 			default:
 				return $m[0];
-		}' ), $date_format ).'$~i'; // case-insensitive?
+		} }, $date_format ).'$~i'; // case-insensitive?
 	// Allow additional spaces, e.g. "03  May 2007" when format is "d F Y":
 	$date_regexp = preg_replace( '~ +~', '\s+', $date_regexp );
 	// echo $date_format.'...'.$date_regexp;

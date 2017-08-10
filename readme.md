@@ -16,7 +16,7 @@ More info: http://b2evolution.net
 
 Basically, all you need is a standard [web hosting plan](http://b2evolution.net/web-hosting/top-quality-best-webhosting.php).
 
-More specifically, your web server should support PHP 5.2+, MySQL 5+ & Apache 2+ (which is very common). More info about these requirements [here](http://b2evolution.net/man/installation-upgrade/system_requirements).
+More specifically, your web server should support PHP 5.3+, MySQL 5+ & Apache 2+ (which is very common). More info about these requirements [here](http://b2evolution.net/man/installation-upgrade/system_requirements).
 
 ## Downloading
 

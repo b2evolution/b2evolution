@@ -465,7 +465,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				$allOK = 0;
 				eval($code.'$allOK=1;');
 				// alternative
-				//$xmlrpcfuncname = create_function('$m', $innercode);
+				//$xmlrpcfuncname = function($m) { eval("$innercode"); };
 
 				if(!$allOK)
 				{
@@ -680,7 +680,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					$allOK = 0;
 					eval($results['source'].'$allOK=1;');
 					// alternative
-					//$xmlrpcfuncname = create_function('$m', $innercode);
+					//$xmlrpcfuncname = function($m) { eval("$innercode");};
 					if($allOK)
 					{
 						return $xmlrpcfuncname;
@@ -799,7 +799,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					$allOK = 0;
 					eval($source.'$allOK=1;');
 					// alternative
-					//$xmlrpcfuncname = create_function('$m', $innercode);
+					//$xmlrpcfuncname = function($m) { eval($innercode); };
 					if($allOK)
 					{
 						return $xmlrpcclassname;

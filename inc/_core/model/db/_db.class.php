@@ -389,8 +389,7 @@ class DB
 		$socket = isset( $params['socket'] ) ? $params['socket'] : ini_get('mysqli.default_socket');
 		$client_flags = isset( $params['client_flags'] ) ? $params['client_flags'] : 0;
 
-		/* Persistent connections are only available in PHP 5.3+ */
-		$this->use_persistent = isset($params['use_persistent']) ? $params['use_persistent'] : version_compare(PHP_VERSION, '5.3', '>=');
+		$this->use_persistent = isset($params['use_persistent']) ? $params['use_persistent'] : TRUE;
 
 		if( ! $this->dbhandle )
 		{ // Connect to the Database:
@@ -1333,7 +1332,7 @@ class DB
 		if( $html )
 		{ // poor man's indent
 			$sql = htmlspecialchars( $sql );
-			$sql = preg_replace_callback("~^(\s+)~m", create_function('$m', 'return str_replace(" ", "&nbsp;", $m[1]);'), $sql);
+			$sql = preg_replace_callback("~^(\s+)~m", function($m) { return str_replace(" ", "&nbsp;", $m[1]);}, $sql);
 			$sql = nl2br($sql);
 		}
 		return $sql;
@@ -1385,11 +1384,13 @@ class DB
 		{
 			$count_queries++;
 
-			$get_md5_query = create_function( '', '
+			$get_md5_query = function()
+			{
 				static $r; if( isset($r) ) return $r;
 				global $query;
 				$r = md5(serialize($query))."-".rand();
-				return $r;' );
+				return $r;
+			};
 
 			if ( $html )
 			{
