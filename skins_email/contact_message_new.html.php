@@ -80,6 +80,16 @@ if( ! empty( $params['contact_method'] ) )
 		.'</p>';
 }
 
+if( ! empty( $params['additional_fields'] ) )
+{	// Display additional fields which have been entered:
+	echo '<p'.emailskin_style( '.p' ).'>';
+	foreach( $params['additional_fields'] as $additional_field )
+	{
+		echo '<b>'.$additional_field['title'].':</b> '.$additional_field['value'].'<br />';
+	}
+	echo '</p>';
+}
+
 // show sender IP address
 $ip_list = implode( ', ', get_linked_ip_list( NULL, $recipient_User ) );
 echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( 'This message was typed by a user connecting from this IP address: %s.' ), $ip_list ).'</p>';

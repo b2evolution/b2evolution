@@ -41,7 +41,16 @@ if( ! empty( $params['message'] ) )
 
 if( ! empty( $params['contact_method'] ) )
 {	// Display a preferred contact method only if it has been selected:
-	echo "\n\n".T_('Preferred contact method').': '.$params['contact_method'];
+	echo "\n\n-- \n".T_('Preferred contact method').': '.$params['contact_method'];
+}
+
+if( ! empty( $params['additional_fields'] ) )
+{	// Display additional fields which have been entered:
+	echo "\n\n-- \n";
+	foreach( $params['additional_fields'] as $additional_field )
+	{
+		echo $additional_field['title'].': '.$additional_field['value']."\n\n";
+	}
 }
 
 echo "\n\n-- \n";

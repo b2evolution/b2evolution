@@ -46,7 +46,21 @@ $Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'co
 	$Form->textarea( 'msgform_subject_list', $edited_Blog->get_setting( 'msgform_subject_list' ), 10, T_('Subject option list'), T_('Enter one option per line. Max length 255 symbols.') );
 	$Form->checkbox( 'msgform_display_subject', $edited_Blog->get_setting( 'msgform_display_subject' ), T_('Free subject input'), T_('Check to display "Subject:" or "Other:" in case pre-filled options are provided above.') );
 	$Form->checkbox( 'msgform_require_subject', $edited_Blog->get_setting( 'msgform_require_subject' ), T_('Require subject'), T_('Check to require a subject selection or input.') );
-	$Form->info( T_('Additional fields'), '---' );
+	$msgform_additional_fields = $edited_Blog->get_msgform_additional_fields();
+	$saved_additional_fields = '';
+	foreach( $msgform_additional_fields as $UserField )
+	{
+		$saved_additional_fields .= $Form->infostart
+			.'<input type="hidden" name="msgform_additional_fields[]" value="'.$UserField->ID.'" />'
+			.$UserField->get( 'name' )
+			.' '.get_icon( 'minus', 'imgtag', array( 'class' => 'remove_user_field', 'style' => 'cursor:pointer' ) )
+			.$Form->infoend;
+	}
+	$saved_additional_fields .= '<div class="clearfix"></div>';
+	$Form->select_input( 'new_user_field', 0, 'callback_options_user_new_fields', T_('Additional fields'), array(
+			'input_prefix' => $saved_additional_fields,
+			'field_suffix' => '<button type="button" id="button_add_field" class="btn btn-default">'.T_('Add').'</button>'
+		) );
 	$Form->checkbox( 'msgform_contact_method', $edited_Blog->get_setting( 'msgform_contact_method' ), T_('Preferred contact method'), T_('Check to let user specify a preferred contact method.') );
 	$Form->begin_line( T_('Allow message field') );
 		$Form->checkbox( 'msgform_display_message', $edited_Blog->get_setting( 'msgform_display_message' ), '', T_('Check to display textarea.') );
@@ -58,3 +72,40 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
+<script type="text/javascript">
+jQuery( '#button_add_field' ).click( function ()
+{	// Action for the button to add a new field in the additional fields:
+	var field_id = jQuery( this ).prev().find( 'option:selected' ).val();
+
+	if( field_id == 0 )
+	{	// We should stop the action without field_id:
+		return false;
+	}
+	var field_title = jQuery( this ).prev().find( 'option:selected' ).html();
+
+	var separator_obj = jQuery( this ).prev().prev();
+	if( separator_obj.length == 0 )
+	{	// Add separator clearfix between fields and control elements:
+		jQuery( this ).prev().before( '<div class="clearfix"></div>' );
+		separator_obj = jQuery( this ).prev().prev();
+	}
+
+	var added_field = jQuery( 'input[type=hidden][name="msgform_additional_fields[]"][value=' + field_id + ']' );
+	if( added_field.length )
+	{	// Remove already added field to add new at the end:
+		added_field.parent().parent().remove();
+	}
+
+	separator_obj.before( '<?php echo format_to_js( $Form->infostart ); ?>'
+		+ '<input type="hidden" name="msgform_additional_fields[]" value="' + field_id + '" />'
+		+ field_title
+		+ ' <?php echo format_to_js( get_icon( 'minus', 'imgtag', array( 'class' => 'remove_user_field', 'style' => 'cursor:pointer' ) ) ); ?>'
+		+ '<?php echo format_to_js( $Form->infoend ); ?>' );
+
+	return false;
+} );
+jQuery( document ).on( 'click', '.remove_user_field', function ()
+{	// Action for the icon to remove a field from the additional fields:
+	jQuery( this ).parent().parent().remove();
+} );
+</script>

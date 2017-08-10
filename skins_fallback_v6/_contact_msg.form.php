@@ -130,6 +130,9 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 			T_('Plain text only.'), 35, 'wide_textarea', $Blog->get_setting( 'msgform_require_message' ) );
 	}
 
+	// Display additional user feilds:
+	$Blog->display_msgform_additional_fields( $Form );
+
 	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
 		'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
 

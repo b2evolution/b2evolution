@@ -64,6 +64,7 @@ $subject = param( $dummy_fields['subject'], 'string', '' );
 $subject_other = param( $dummy_fields['subject'].'_other', 'string', '' );
 $message = param( $dummy_fields['content'], 'html', '' );	// We accept html but we will NEVER display it
 $contact_method = param( 'contact_method', 'string', '' );
+$user_fields = param( 'user_fields', 'array', array() );
 // save the message original content
 $original_content = $message;
 
@@ -181,6 +182,37 @@ if( empty( $recipient_User ) && empty( $recipient_address ) )
 	debug_die( 'No recipient specified!' );
 }
 
+// Additional fields:
+$send_additional_fields = array();
+if( is_array( $user_fields ) && ! empty( $user_fields ) )
+{
+	$UserFieldCache = & get_UserFieldCache();
+	$coll_additional_fields = $Blog->get_msgform_additional_fields();
+	foreach( $user_fields as $user_field_ID => $user_field )
+	{
+		if( ! isset( $coll_additional_fields[ $user_field_ID ] ) )
+		{	// Skip wrong field which is not selected for current collection as additional field:
+			continue;
+		}
+
+		if( ! ( $UserField = & $UserFieldCache->get_by_ID( $user_field_ID, false, false ) ) )
+		{	// Skip wrong field:
+			continue;
+		}
+
+		$user_field_value = utf8_trim( is_array( $user_field ) ? implode( ', ', $user_field ) : $user_field );
+		if( empty( $user_field_value ) )
+		{	// Skip empty values:
+			continue;
+		}
+
+		$send_additional_fields[] = array(
+				'title' => $UserField->get( 'name' ),
+				'value' => $user_field_value,
+			);
+	}
+}
+
 // opt-out links:
 if( $recipient_User )
 { // Member:
@@ -266,6 +298,15 @@ if( $success_message )
 			$send_message .= "\n\n---\n\n".T_('Preferred contact method').': '.$send_contact_method;
 		}
 
+		if( ! empty( $send_additional_fields ) )
+		{	// Append all filled additonal fields:
+			$send_message .= "\n\n---";
+			foreach( $send_additional_fields as $send_additional_field )
+			{
+				$send_message .= "\n\n".$send_additional_field['title'].': '.$send_additional_field['value'];
+			}
+		}
+
 		$edited_Thread = new Thread();
 		$edited_Message = new Message();
 
@@ -291,15 +332,16 @@ if( $success_message )
 	{	// Send email message:
 		$send_method_type = 'email';
 		$email_template_params = array(
-				'sender_name'    => $sender_name,
-				'sender_address' => $sender_address,
-				'Blog'           => $Blog,
-				'message'        => $message,
-				'contact_method' => $send_contact_method,
-				'comment_id'     => $comment_id,
-				'post_id'        => $post_id,
-				'recipient_User' => $recipient_User,
-				'Comment'        => $Comment,
+				'sender_name'       => $sender_name,
+				'sender_address'    => $sender_address,
+				'Blog'              => $Blog,
+				'message'           => $message,
+				'contact_method'    => $send_contact_method,
+				'additional_fields' => $send_additional_fields,
+				'comment_id'        => $comment_id,
+				'post_id'           => $post_id,
+				'recipient_User'    => $recipient_User,
+				'Comment'           => $Comment,
 			);
 
 		if( empty( $recipient_User ) )
