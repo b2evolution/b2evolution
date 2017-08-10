@@ -112,8 +112,7 @@ class utils extends Whois {
 
 			if (is_array($nserver))
 				{
-				reset($nserver); 
-				while (list($host, $ip) = each($nserver))
+				foreach ($nserver as $host => $ip)
 					{
 					$url = '<a href="'. str_replace('$0',$ip,$link)."\">$host</a>";
 					$out = str_replace($host, $url, $out);

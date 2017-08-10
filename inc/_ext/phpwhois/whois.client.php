@@ -331,7 +331,7 @@ class WhoisClient {
 		$output = '';
 		$pre = '';
 
-		while (list($key, $val)=each($lines)) {
+		foreach ($lines as $key => $val) {
 			$val = trim($val);
 
 			$pos=strpos(strtoupper($val),'<PRE>');
@@ -367,7 +367,7 @@ class WhoisClient {
 		$rawdata = array();
 		$null = 0;
 
-		while (list($key, $val)=each($output)) {
+		foreach ($output as $key => $val) {
 			$val=trim($val);
 			if ($val=='') {
 				if (++$null>2) continue;
@@ -524,9 +524,7 @@ class WhoisClient {
 
 	function merge_results($a1, $a2) {
 
-		reset($a2);
-
-		while (list($key, $val) = each($a2))
+		foreach ($a2 as $key => $val)
 			{
 			if (isset($a1[$key]))
 				{
