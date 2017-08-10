@@ -25,7 +25,7 @@ $map_class_path = array();
 
 /**
  * Autoload the required .class.php file when a class is accessed but not defined yet.
- * This gets hooked into spl_autoload_register (preferred) or called through __autoload.
+ * This gets hooked into spl_autoload_register.
  * Requires PHP5.
  */
 function evocms_autoload_class( $classname )
@@ -41,22 +41,10 @@ function evocms_autoload_class( $classname )
 
 
 /*
- * Use spl_autoload_register mechanism, if available (PHP>=5.1.2).
+ * Use spl_autoload_register mechanism.
  * This way a stacked set of autoload functions can be used.
  */
-if( function_exists('spl_autoload_register') )
-{
-	// spl_autoload_register( 'var_dump' );
-	spl_autoload_register( 'evocms_autoload_class' );
-}
-else
-{
-	// PHP<5.1.2: Use the fallback method.
-	function __autoload( $classname )
-	{
-		return evocms_autoload_class($classname);
-	}
-}
+spl_autoload_register( 'evocms_autoload_class' );
 
 
 /**

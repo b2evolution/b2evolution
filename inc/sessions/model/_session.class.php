@@ -767,7 +767,7 @@ class Session
  * IMPORTANT: when modifying this, modify the following also:
  * @see session_unserialize_load_all_classes()
  *
- * @todo Once we require PHP5, we should think about using this as __autoload function.
+ * @todo Once we require PHP5, we should think about using this as an spl_autoload_register callback.
  *
  * @return boolean True, if the required class could be loaded; false, if not
  */
