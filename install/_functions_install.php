@@ -1803,8 +1803,19 @@ function check_quick_install_request()
  */
 function format_install_param( $value )
 {
-	$value = str_replace( array( "'",  "\$" ), array( "\'", "\\$" ), $value );
-	return preg_replace( "#([\\\\]*)(\\\\\\\')#", "\\\\\\\\\\\\\\\\\'", $value );
+	// We need backslashes only for single quote(') and backslash(\):
+	$value = addcslashes( $value, "'\\" );
+	/*
+		The below code excludes even number of slashes, because we need always odd
+		number of slashes before single quote(') to avoid a broken string value.
+		Examples for source and result:
+		  \'     => \'         (1 slash is not converted because it is used only for single quote backslashing)
+		  \\'    => \\\'       (2 slashes are converted to 3, because only first one slash must be backslashed)
+		  \\\'   => \\\\\'     (3 slashes are converted to 5, first two slashes must be backslashed)
+		  \\\\'  => \\\\\\\'   (4 slashes are converted to 7, first three slashes must be backslashed)
+		  \\\\\' => \\\\\\\\\' (5 slashes are converted to 9, first four slashes must be backslashed)
+	*/
+	return preg_replace( '#(\\\\*)(\\\')#', '$1$1$2', $value );
 }
 
 
