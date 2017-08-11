@@ -2614,7 +2614,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 			xml_set_default_handler($parser, 'xmlrpc_dh');
 
 			// first error check: xml not well formed
-			if(!xml_parse($parser, $data, count($data)))
+			if(!xml_parse($parser, $data, strlen($data) > 0))
 			{
 				// thanks to Peter Kocks <peter.kocks@baygate.com>
 				if((xml_get_current_line_number($parser)) == 1)
@@ -3090,6 +3090,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		}
 
 		/**
+		* DEPRECATED!
 		* Reset internal pointer for xmlrpcvals of type struct.
 		* @access public
 		*/
@@ -3099,6 +3100,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		}
 
 		/**
+		* DEPRECATED!
 		* Return next member element for xmlrpcvals of type struct.
 		* @return xmlrpcval
 		* @access public
@@ -3348,7 +3350,6 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 				}
 				return $arr;
 			case 'struct':
-				$xmlrpc_val->structreset();
 				// If user said so, try to rebuild php objects for specific struct vals.
 				/// @todo should we raise a warning for class not found?
 				// shall we check for proper subclass of xmlrpcval instead of
@@ -3357,7 +3358,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 					&& class_exists($xmlrpc_val->_php_class))
 				{
 					$obj = @new $xmlrpc_val->_php_class;
-					while(list($key,$value)=$xmlrpc_val->structeach())
+					foreach ($xmlrpc_val->me['struct'] as $key => $value)
 					{
 						$obj->$key = php_xmlrpc_decode($value, $options);
 					}
@@ -3366,7 +3367,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 				else
 				{
 					$arr = array();
-					while(list($key,$value)=$xmlrpc_val->structeach())
+					foreach ($xmlrpc_val->me['struct'] as $key => $value)
 					{
 						$arr[$key] = php_xmlrpc_decode($value, $options);
 					}

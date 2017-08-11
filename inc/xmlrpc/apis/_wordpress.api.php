@@ -749,6 +749,7 @@ function wp_newcategory( $m )
 	$xcontent = $m->getParam(3);
 	$contentstruct = xmlrpc_decode_recurse($xcontent);
 
+	$parent_id = !empty($contentstruct['parent_id']) ? intval($contentstruct['parent_id']) : 0;
 	$slug = strtolower($contentstruct['name']);
 	if( !empty($contentstruct['slug']) )
 	{
@@ -760,7 +761,7 @@ function wp_newcategory( $m )
 	$new_Chapter = new Chapter(NULL, $Blog->ID);
 	$new_Chapter->set('name', $contentstruct['name']);
 	$new_Chapter->set('urlname', $slug);
-	$new_Chapter->set('parent_ID', intval($contentstruct['parent_id']));
+	$new_Chapter->set('parent_ID', $parent_id);
 
 	if( !empty($contentstruct['description']) )
 	{	// Set decription
