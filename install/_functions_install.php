@@ -1805,17 +1805,9 @@ function format_install_param( $value )
 {
 	// We need backslashes only for single quote(') and backslash(\):
 	$value = addcslashes( $value, "'\\" );
-	/*
-		The below code excludes even number of slashes, because we need always odd
-		number of slashes before single quote(') to avoid a broken string value.
-		Examples for source and result:
-		  \'     => \'         (1 slash is not converted because it is used only for single quote backslashing)
-		  \\'    => \\\'       (2 slashes are converted to 3, because only first one slash must be backslashed)
-		  \\\'   => \\\\\'     (3 slashes are converted to 5, first two slashes must be backslashed)
-		  \\\\'  => \\\\\\\'   (4 slashes are converted to 7, first three slashes must be backslashed)
-		  \\\\\' => \\\\\\\\\' (5 slashes are converted to 9, first four slashes must be backslashed)
-	*/
-	return preg_replace( '#(\\\\*)(\\\')#', '$1$1$2', $value );
+	// Also append additional backslash for each backslash to avoid a broken string value,
+	// when it is used to build a config var like code: echo "\$config_var = '".$value."';"
+	return str_replace( '\\', '\\\\', $value );
 }
 
 
@@ -1853,6 +1845,35 @@ function update_basic_config_file( $params = array() )
 		global $basic_config_file_result_messages;
 	}
 
+	// Check the install params for allowed characters:
+	$check_install_params = array(
+			'db_host'        => T_('MySQL Host/Server'),
+			'db_name'        => T_('MySQL Database'),
+			'db_user'        => T_('MySQL Username'),
+			'db_password'    => T_('MySQL Password'),
+			'db_tableprefix' => T_('MySQL tables prefix'),
+			'baseurl'        => T_('Base URL'),
+			'admin_email'    => T_('Your email'),
+		);
+	$check_install_params_result = true;
+	foreach( $check_install_params as $check_install_param_value => $check_install_field_title )
+	{
+		if( preg_match( '#[\'\\\\]#', $params[ $check_install_param_value ] ) )
+		{	// Param value cannot contains characters ' and \
+			display_install_messages( sprintf( T_('The characters %s and %s are not allowed in field: "%s".'), '<code>\'</code>', '<code>\\</code>', $check_install_field_title ) );
+			$check_install_params_result = false;
+		}
+	}
+	if( ! $check_install_params_result )
+	{	// Switch action to display a config form to fix errors:
+		$action = 'start';
+		if( ! $params['print_messages'] )
+		{	// Return all messages instead of printing on screen:
+			$basic_config_file_result_messages = ob_get_clean();
+		}
+		return false;
+	}
+
 	// Connect to DB host (without selecting DB because we should maybe create this by request):
 	$DB = new DB( array(
 			'user'     => $params['db_user'],
@@ -1871,7 +1892,11 @@ function update_basic_config_file( $params = array() )
 		{
 			display_install_messages( sprintf( T_('You don\'t seem to have permission to create this new database on "%s" (%s).'), $params['db_host'], $DB->last_error ) );
 			$action = 'start';
-			return true;
+			if( ! $params['print_messages'] )
+			{	// Return all messages instead of printing on screen:
+				$basic_config_file_result_messages = ob_get_clean();
+			}
+			return false;
 		}
 	}
 
@@ -1882,6 +1907,11 @@ function update_basic_config_file( $params = array() )
 	{ // restart conf
 		display_install_messages( T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...') );
 		$action = 'start';
+		if( ! $params['print_messages'] )
+		{	// Return all messages instead of printing on screen:
+			$basic_config_file_result_messages = ob_get_clean();
+		}
+		return false;
 	}
 	else
 	{
