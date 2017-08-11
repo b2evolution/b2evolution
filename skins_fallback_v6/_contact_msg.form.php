@@ -73,12 +73,31 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 	}
 
 	if( is_logged_in() )
-	{	// Name field of current logged in user:
-		if( $Blog->get_setting( 'msgform_user_name' ) != 'none' )
+	{	// Name fields for current logged in user:
+		$edited_user_perms = array( 'edited-user', 'edited-user-required' );
+		switch( $Blog->get_setting( 'msgform_user_name' ) )
 		{
-			$Form->info_field( T_('From'),
-				$current_User->get_identity_link( array( 'link_text' => ( $Blog->get_setting( 'msgform_user_name' ) == 'fullname' ? 'fullname' : 'login' ) ) ),
-				array( 'required'  => $Blog->get_setting( 'msgform_require_name' ) ) );
+			case 'fullname':
+				$firstname_editing = $Settings->get( 'firstname_editing' );
+				if( in_array( $firstname_editing, $edited_user_perms ) )
+				{	// First name:
+					$Form->text_input( 'user_firstname', $current_User->get( 'firstname' ), 20, T_('First name'), '', array( 'maxlength' => 50, 'required' => ( $firstname_editing == 'edited-user-required' ) ) );
+				}
+
+				$lastname_editing = $Settings->get( 'lastname_editing' );
+				if( in_array( $lastname_editing, $edited_user_perms ) )
+				{	// Last name:
+					$Form->text_input( 'user_lastname', $current_User->get( 'lastname' ), 20, T_('Last name'), '', array( 'maxlength' => 50, 'required' => ( $lastname_editing == 'edited-user-required' ) ) );
+				}
+				break;
+
+			case 'nickname':
+				$nickname_editing = $Settings->get( 'nickname_editing' );
+				if( in_array( $nickname_editing, $edited_user_perms ) )
+				{	// Nickname:
+					$Form->text_input( 'user_nickname', $current_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => ( $nickname_editing == 'edited-user-required' ) ) );
+				}
+				break;
 		}
 	}
 	else

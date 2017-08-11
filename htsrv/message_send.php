@@ -155,8 +155,75 @@ elseif( ! empty( $comment_id ) )
 
 if( is_logged_in() )
 {	// Set name and email of the current logged in user:
-	$sender_name = '$sender_username$';
+	$sender_name = '';
 	$sender_address = $current_User->get( 'email' );
+	$edited_user_perms = array( 'edited-user', 'edited-user-required' );
+	$update_user_fields = false;
+	switch( $Blog->get_setting( 'msgform_user_name' ) )
+	{
+		case 'fullname':
+			$firstname_editing = $Settings->get( 'firstname_editing' );
+			if( in_array( $firstname_editing, $edited_user_perms ) )
+			{	// Get first name:
+				$user_firstname = param( 'user_firstname', 'string', '' );
+				if( $firstname_editing == 'edited-user-required' && empty( $user_firstname ) )
+				{	// First name is required:
+					param_error( 'user_firstname', T_('Please enter your first name.'), NULL, T_('Validation errors:') );
+				}
+				$sender_name .= $user_firstname;
+				if( ! empty( $user_firstname ) && $user_firstname != $current_User->get( 'firstname' ) )
+				{	// Set new first name if it has been entered as new:
+					$current_User->set( 'firstname', $user_firstname );
+					$update_user_fields = true;
+				}
+			}
+
+			$lastname_editing = $Settings->get( 'lastname_editing' );
+			if( in_array( $lastname_editing, $edited_user_perms ) )
+			{	// Get last name:
+				$user_lastname = param( 'user_lastname', 'string', '' );
+				if( $lastname_editing == 'edited-user-required' && empty( $user_lastname ) )
+				{	// Lsst name is required:
+					param_error( 'user_lastname', T_('Please enter your last name.'), NULL, T_('Validation errors:') );
+				}
+				$sender_name .= ' '.$user_lastname;
+				if( ! empty( $user_lastname ) && $user_lastname != $current_User->get( 'lastname' ) )
+				{	// Set new last name if it has been entered as new:
+					$current_User->set( 'lastname', $user_lastname );
+					$update_user_fields = true;
+				}
+			}
+			$sender_name = utf8_trim( $sender_name );
+			break;
+
+		case 'nickname':
+			$nickname_editing = $Settings->get( 'nickname_editing' );
+			if( in_array( $nickname_editing, $edited_user_perms ) )
+			{	// Get nickname:
+				$user_nickname = param( 'user_nickname', 'string', '' );
+				if( $nickname_editing == 'edited-user-required' && empty( $user_nickname ) )
+				{	// Nickname is required:
+					param_error( 'user_nickname', T_('Please enter your nickname.'), NULL, T_('Validation errors:') );
+				}
+				$sender_name .= $user_nickname;
+				if( ! empty( $user_nickname ) && $user_nickname != $current_User->get( 'nickname' ) )
+				{	// Set new nickname if it has been entered as new:
+					$current_User->set( 'nickname', $user_nickname );
+					$update_user_fields = true;
+				}
+			}
+			break;
+	}
+
+	if( empty( $sender_name ) )
+	{	// If sender name has not been detected from first/last/nickname fields then use preferred name of current User:
+		$sender_name = $current_User->get_username();
+	}
+
+	if( $update_user_fields )
+	{	// If at least one field of current user must be updated:
+		$current_User->dbupdate();
+	}
 }
 else
 {	// Ask name and email only for anonymous users:
