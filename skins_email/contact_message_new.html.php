@@ -60,16 +60,19 @@ if( !empty( $Blog ) )
 }
 
 // show sender name
-echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('%s (%s) has sent you this message').( empty( $params['message'] ) ? '.' : ':' ),
+echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('%s (%s) has sent you this message:'),
 			'<b>'.$params['sender_name'].'</b>',
 			'<a href="mailto:'.$params['sender_address'].'"'.emailskin_style( '.a' ).'>'.$params['sender_address'].'</a>' )
 	.'</p>';
 
-if( ! empty( $params['message'] ) )
-{	// Display a message only if it has been entered:
-	echo '<div class="email_ugc"'.emailskin_style( 'div.email_ugc' ).'>'."\n";
-	echo '<p'.emailskin_style( '.p' ).'>'.nl2br( htmlentities( $params['message'], ENT_COMPAT, $evo_charset ) ).'</p>';
-	echo "</div>\n";
+if( ! empty( $params['additional_fields'] ) )
+{	// Display additional fields which have been entered:
+	echo '<p'.emailskin_style( '.p' ).'>';
+	foreach( $params['additional_fields'] as $additional_field )
+	{
+		echo '<b>'.$additional_field['title'].':</b> '.$additional_field['html_value'].'<br />';
+	}
+	echo '</p>';
 }
 
 if( ! empty( $params['contact_method'] ) )
@@ -80,14 +83,11 @@ if( ! empty( $params['contact_method'] ) )
 		.'</p>';
 }
 
-if( ! empty( $params['additional_fields'] ) )
-{	// Display additional fields which have been entered:
-	echo '<p'.emailskin_style( '.p' ).'>';
-	foreach( $params['additional_fields'] as $additional_field )
-	{
-		echo '<b>'.$additional_field['title'].':</b> '.$additional_field['value'].'<br />';
-	}
-	echo '</p>';
+if( ! empty( $params['message'] ) )
+{	// Display a message only if it has been entered:
+	echo '<div class="email_ugc"'.emailskin_style( 'div.email_ugc' ).'>'."\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.nl2br( htmlentities( $params['message'], ENT_COMPAT, $evo_charset ) ).'</p>';
+	echo "</div>\n";
 }
 
 // show sender IP address

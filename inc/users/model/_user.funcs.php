@@ -3202,21 +3202,29 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 
 
 /**
- * Prepare some data for Userfield
+ * Prepare some data of Userfield to html output
  *
- * @param Userfield
+ * @param object User field
  */
 function userfield_prepare( & $userfield )
 {
-	$userfield->uf_varchar = format_to_output( $userfield->uf_varchar, 'formvalue' );
-	if( $userfield->ufdf_type == 'url' )
-	{	// Prepare value for url field
-		$url = $userfield->uf_varchar;
-		if( !preg_match('#://#', $url) )
-		{
-			$url = 'http://'.$url;
-		}
-		$userfield->uf_varchar = '<a href="'.$url.'" target="_blank" rel="nofollow">'.$userfield->uf_varchar.'</a>';
+	$userfield->uf_varchar = format_to_output( $userfield->uf_varchar, 'htmlspecialchars' );
+
+	switch( $userfield->ufdf_type )
+	{
+		case 'url':
+			// Prepare value for url field
+			$url = $userfield->uf_varchar;
+			if( ! preg_match( '#://#', $url ) )
+			{
+				$url = 'http://'.$url;
+			}
+			$userfield->uf_varchar = '<a href="'.$url.'" target="_blank" rel="nofollow">'.$userfield->uf_varchar.'</a>';
+			break;
+
+		case 'text':
+			$userfield->uf_varchar = nl2br( $userfield->uf_varchar );
+			break;
 	}
 }
 

@@ -32,11 +32,15 @@ $Collection = $Blog = & $params['Blog'];
 $recipient_User = & $params['recipient_User'];
 
 // show sender name
-echo sprintf( T_('%s has sent you this message').( empty( $params['message'] ) ? '.' : ':' ), $params['sender_name'] );
+echo sprintf( T_('%s has sent you this message:'), $params['sender_name'] );
 
-if( ! empty( $params['message'] ) )
-{	// Display a message only if it has been entered:
-	echo "\n\n".$params['message'];
+if( ! empty( $params['additional_fields'] ) )
+{	// Display additional fields which have been entered:
+	echo "\n\n-- \n";
+	foreach( $params['additional_fields'] as $additional_field )
+	{
+		echo $additional_field['title'].': '.$additional_field['text_value']."\n\n";
+	}
 }
 
 if( ! empty( $params['contact_method'] ) )
@@ -44,13 +48,9 @@ if( ! empty( $params['contact_method'] ) )
 	echo "\n\n-- \n".T_('Preferred contact method').': '.$params['contact_method'];
 }
 
-if( ! empty( $params['additional_fields'] ) )
-{	// Display additional fields which have been entered:
-	echo "\n\n-- \n";
-	foreach( $params['additional_fields'] as $additional_field )
-	{
-		echo $additional_field['title'].': '.$additional_field['value']."\n\n";
-	}
+if( ! empty( $params['message'] ) )
+{	// Display a message only if it has been entered:
+	echo "\n\n-- \n".$params['message'];
 }
 
 echo "\n\n-- \n";

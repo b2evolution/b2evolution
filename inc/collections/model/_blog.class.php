@@ -5047,7 +5047,7 @@ class Blog extends DataObject
 			if( is_logged_in() )
 			{	// Get saved field value from the current logged in User:
 				global $current_User;
-				$field_value = trim( $current_User->userfield_value_by_ID( $UserField->ID ) );
+				$field_value = trim( $current_User->userfieldget_first_for_type( $UserField->ID, false ) );
 				if( $UserField->get( 'duplicated' ) == 'list' )
 				{	// Use only first value of the list field:
 					$field_value = explode( ', ', $field_value );

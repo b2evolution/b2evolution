@@ -200,15 +200,24 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 			continue;
 		}
 
-		$user_field_value = utf8_trim( is_array( $user_field ) ? implode( ', ', $user_field ) : $user_field );
-		if( empty( $user_field_value ) )
+		$text_value = utf8_trim( is_array( $user_field ) ? implode( ', ', $user_field ) : $user_field );
+		if( empty( $text_value ) )
 		{	// Skip empty values:
 			continue;
 		}
 
+		// Prepare user field for correct html displaying:
+		$userfield = (object)array(
+				'ufdf_type'  => $UserField->get( 'type' ),
+				'uf_varchar' => $text_value,
+			);
+		userfield_prepare( $userfield );
+		$html_value = $userfield->uf_varchar;
+
 		$send_additional_fields[] = array(
-				'title' => $UserField->get( 'name' ),
-				'value' => $user_field_value,
+				'title'       => $UserField->get( 'name' ),
+				'text_value'  => $text_value,
+				'html_value'  => $html_value,
 			);
 	}
 }
@@ -292,20 +301,29 @@ if( $success_message )
 		load_class( 'messaging/model/_thread.class.php', 'Thread' );
 		load_class( 'messaging/model/_message.class.php', 'Message' );
 
-		$send_message = $message;
-		if( ! empty( $send_contact_method ) )
-		{	// Append a preferred contact method to the message text:
-			$send_message .= "\n\n---\n\n".T_('Preferred contact method').': '.$send_contact_method;
-		}
+		$send_message = array();
 
 		if( ! empty( $send_additional_fields ) )
 		{	// Append all filled additonal fields:
-			$send_message .= "\n\n---";
+			$send_message[0] = array();
 			foreach( $send_additional_fields as $send_additional_field )
 			{
-				$send_message .= "\n\n".$send_additional_field['title'].': '.$send_additional_field['value'];
+				$send_message[0][] = $send_additional_field['title'].': '.$send_additional_field['text_value'];
 			}
+			$send_message[0] = implode( "\n\n", $send_message[0] );
 		}
+
+		if( ! empty( $send_contact_method ) )
+		{	// Append a preferred contact method to the message text:
+			$send_message[1] = T_('Preferred contact method').': '.$send_contact_method;
+		}
+
+		if( ! empty( $message ) )
+		{	// Append message text:
+			$send_message[2] = $message;
+		}
+
+		$send_message = implode( "\n\n---\n\n", $send_message );
 
 		$edited_Thread = new Thread();
 		$edited_Message = new Message();

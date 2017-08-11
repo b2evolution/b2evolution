@@ -117,6 +117,9 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 		}
 	}
 
+	// Display additional user feilds:
+	$Blog->display_msgform_additional_fields( $Form );
+
 	if( $Blog->get_setting( 'msgform_contact_method' ) )
 	{	// Display a field to select a preferred contact method:
 		$Form->select_input_array( 'contact_method', $contact_method, get_msgform_contact_methods(), T_('Preferred contact method'), '', array( 'force_keys_as_values' => true ) );
@@ -129,9 +132,6 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 			( ( empty( $message_label ) ? T_('Message') : $message_label ) ),
 			T_('Plain text only.'), 35, 'wide_textarea', $Blog->get_setting( 'msgform_require_message' ) );
 	}
-
-	// Display additional user feilds:
-	$Blog->display_msgform_additional_fields( $Form );
 
 	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
 		'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );

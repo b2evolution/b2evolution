@@ -117,6 +117,9 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 		}
 	}
 
+	// Display additional user feilds:
+	$Blog->display_msgform_additional_fields( $Form );
+
 	if( $Blog->get_setting( 'msgform_contact_method' ) )
 	{	// Display a field to select a preferred contact method:
 		$Form->select_input_array( 'contact_method', $contact_method, get_msgform_contact_methods(), T_('Preferred contact method'), '', array( 'force_keys_as_values' => true ) );

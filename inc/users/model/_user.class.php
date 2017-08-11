@@ -4683,9 +4683,10 @@ class User extends DataObject
 	 * Get user field value by ID
 	 *
 	 * @param integer Field ID
+	 * @param boolean TRUE to prepare user field for correct html displaying
 	 * @return string Field value
 	 */
-	function userfield_value_by_ID( $field_ID )
+	function userfield_value_by_ID( $field_ID, $prepare_userfield = true )
 	{
 		global $DB;
 
@@ -4693,8 +4694,15 @@ class User extends DataObject
 		$this->userfields_load();
 
 		if( isset( $this->userfields_by_type[ $field_ID ], $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ] ) )
-		{ // Get value from cache
-			return $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ]->uf_varchar;
+		{	// Get value from cache:
+			$userfield = $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ];
+
+			if( $prepare_userfield )
+			{	// Prepare user field for correct html displaying:
+				userfield_prepare( $userfield );
+			}
+
+			return $userfield->uf_varchar;
 		}
 
 		// No field value
@@ -4706,9 +4714,10 @@ class User extends DataObject
 	 * Get user field values by code
 	 *
 	 * @param integer Field code
+	 * @param boolean TRUE to prepare user field for correct html displaying
 	 * @return array Field values
 	 */
-	function userfield_values_by_code( $field_code )
+	function userfield_values_by_code( $field_code, $prepare_userfield = true )
 	{
 		global $DB;
 
@@ -4720,7 +4729,12 @@ class User extends DataObject
 		{ // Get value from cache
 			foreach( $this->userfields_by_code[ $field_code ] as $userfield_ID )
 			{
-				$field_values[] = $this->userfields[ $userfield_ID ]->uf_varchar;
+				$userfield = $this->userfields[ $userfield_ID ];
+				if( $prepare_userfield )
+				{	// Prepare user field for correct html displaying:
+					userfield_prepare( $userfield );
+				}
+				$field_values[] = $userfield->uf_varchar;
 			}
 		}
 
@@ -4758,7 +4772,6 @@ class User extends DataObject
 				{	// Init array
 					$userfield_lists[$userfield->ufdf_ID] = array();
 				}
-				userfield_prepare( $userfield );
 				$userfield_lists[$userfield->ufdf_ID][] = $userfield->uf_varchar;
 			}
 		}
@@ -4778,7 +4791,6 @@ class User extends DataObject
 			}
 			else
 			{ // Save all data for this field:
-				userfield_prepare( $userfield );
 				$this->userfields[$userfield->uf_ID] = $userfield;
 				$this->userfields_by_code[$userfield->ufdf_code][] = $userfield->uf_ID;
 			}
@@ -4819,20 +4831,31 @@ class User extends DataObject
 
 
 	/**
-	* Get first field for a specific type
-	*
-	* @return string or NULL
-	*/
-	function userfieldget_first_for_type( $type_ID )
+	 * Get first field for a specific type
+	 *
+	 * @param integer Field type ID
+	 * @param boolean TRUE to prepare user field for correct html displaying
+	 * @return string or NULL
+	 */
+	function userfieldget_first_for_type( $type_ID, $prepare_userfield = true )
 	{
-		if( !isset($this->userfields_by_type[$type_ID]) )
+		$this->userfields_load();
+
+		if( ! isset( $this->userfields_by_type[ $type_ID ] ) )
 		{
 			return NULL;
 		}
 
-		$idx = $this->userfields_by_type[$type_ID][0];
+		$idx = $this->userfields_by_type[ $type_ID ][0];
 
-		return $this->userfields[$idx]->uf_varchar;
+		$userfield = $this->userfields[ $idx ];
+
+		if( $prepare_userfield )
+		{	// Prepare user field for correct html displaying:
+			userfield_prepare( $userfield );
+		}
+
+		return $userfield->uf_varchar;
 	}
 
 
