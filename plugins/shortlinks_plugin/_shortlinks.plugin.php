@@ -53,11 +53,13 @@ class shortlinks_plugin extends Plugin
 				'label' => T_('Link types to allow'),
 				'type' => 'checklist',
 				'options' => array(
-						array( 'absolute_urls',   sprintf( $this->T_('Absolute URLs (starting with %s or %s) in brackets'), '<code>http://</code>, <code>https://</code>, <code>mailto://</code>', '<code>//</code>' ), 1 ),
-						array( 'relative_urls',   sprintf( $this->T_('Relative URLs (starting with %s followed by a letter or digit) in brackets'), '<code>/</code>' ), 0 ),
-						array( 'slugs',           $this->T_('Slugs in brackets'), 1 ),
-						array( 'item_id',         $this->T_('Item ID in brackets'), 1 ),
-						array( 'without_backets', $this->T_('WikiWords without backets'), 0 ),
+						array( 'absolute_urls',    sprintf( $this->T_('Absolute URLs (starting with %s or %s) in brackets'), '<code>http://</code>, <code>https://</code>, <code>mailto://</code>', '<code>//</code>' ), 1 ),
+						array( 'relative_urls',    sprintf( $this->T_('Relative URLs (starting with %s followed by a letter or digit) in brackets'), '<code>/</code>' ), 0 ),
+						array( 'anchor',           sprintf( $this->T_('Current page anchor URLs (starting with %s) in brackets'), '<code>#</code>' ), 1 ),
+						array( 'cat_slugs',        $this->T_('Category slugs in brackets'), 1 ),
+						array( 'item_slugs',       $this->T_('Item slugs in brackets'), 1 ),
+						array( 'item_id',          $this->T_('Item ID in brackets'), 1 ),
+						array( 'without_brackets', $this->T_('WikiWords without brackets'), 0 ),
 					),
 				),
 			);
@@ -221,7 +223,7 @@ class shortlinks_plugin extends Plugin
 		load_funcs('locales/_charset.funcs.php');
 
 		// -------- STANDALONE WIKIWORDS -------- :
-		if( ! empty( $this->link_types['without_backets'] ) )
+		if( ! empty( $this->link_types['without_brackets'] ) )
 		{	// Create the links from standalone WikiWords
 
 			$search_wikiwords = array();
@@ -284,14 +286,17 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// -------- BRACKETED WIKIWORDS -------- :
-		if( ! empty( $this->link_types['slugs'] ) || ! empty( $this->link_types['item_id'] ) )
-		{	// If it is allowed by plugin setting
-			$search_slug_itemid = empty( $this->link_types['slugs'] ) ?
+		if( ! empty( $this->link_types['anchor'] ) ||
+		    ! empty( $this->link_types['cat_slugs'] ) ||
+		    ! empty( $this->link_types['item_slugs'] ) ||
+		    ! empty( $this->link_types['item_id'] ) )
+		{	// If it is allowed by plugin settings:
+			$search_anchor_slug_itemid = ( empty( $this->link_types['anchor'] ) && empty( $this->link_types['cat_slugs'] ) && empty( $this->link_types['item_slugs'] ) ) ?
 					'([0-9]+) # Only item ID' :
 					'([\p{L}0-9#]+[\p{L}0-9#_\-]*) # Anything from Wikiword to WikiWordLong';
 			$search = '/
 					(?<= \(\( | \[\[ )            # Lookbehind for (( or [[
-					'.$search_slug_itemid.'
+					'.$search_anchor_slug_itemid.'
 					(?=
 						( \s .*? )?                 # Custom link text instead of post or chapter title with optional style classes
 						( \)\) | \]\] )             # Lookahead for )) or ]]
@@ -322,10 +327,16 @@ class shortlinks_plugin extends Plugin
 				}
 
 				// Lookup all urltitles at once in DB and preload cache:
-				$ChapterCache = & get_ChapterCache();
-				$ChapterCache->load_urlname_array( $wikiwords );
-				$ItemCache = & get_ItemCache();
-				$ItemCache->load_urltitle_array( $wikiwords );
+				if( ! empty( $this->link_types['cat_slugs'] ) )
+				{
+					$ChapterCache = & get_ChapterCache();
+					$ChapterCache->load_urlname_array( $wikiwords );
+				}
+				if( ! empty( $this->link_types['item_slugs'] ) )
+				{
+					$ItemCache = & get_ItemCache();
+					$ItemCache->load_urltitle_array( $wikiwords );
+				}
 
 				// Replace wikiwords by links:
 				foreach( $wikiwords as $WikiWord => $wiki_word )
@@ -446,17 +457,17 @@ class shortlinks_plugin extends Plugin
 			$permalink = $Item->get_permanent_url();
 			$existing_link_text = $Item->get( 'title' );
 		}
-		elseif( $Chapter = & $ChapterCache->get_by_urlname( $this->current_wiki_word, false, false ) )
+		elseif( ! empty( $this->link_types['cat_slugs'] ) && $Chapter = & $ChapterCache->get_by_urlname( $this->current_wiki_word, false, false ) )
 		{	// Chapter is found
 			$permalink = $Chapter->get_permanent_url();
 			$existing_link_text = $Chapter->get( 'name' );
 		}
-		elseif( $Item = & $ItemCache->get_by_urltitle( $this->current_wiki_word, false, false ) )
+		elseif( ! empty( $this->link_types['item_slugs'] ) && $Item = & $ItemCache->get_by_urltitle( $this->current_wiki_word, false, false ) )
 		{	// Item is found
 			$permalink = $Item->get_permanent_url();
 			$existing_link_text = $Item->get( 'title' );
 		}
-		elseif( isset( $anchor ) && ( $Item = & $ItemCache->get_by_ID( $ItemCache->ID_array[0], false, false ) ) )
+		elseif( ! empty( $this->link_types['anchor'] ) && isset( $anchor ) && ( $Item = & $ItemCache->get_by_ID( $ItemCache->ID_array[0], false, false ) ) )
 		{	// Item is found
 			$permalink = $Item->get_permanent_url();
 			$permalink = $url_params == '' ? $permalink.$anchor : $url_params;
@@ -493,7 +504,8 @@ class shortlinks_plugin extends Plugin
 		}
 		else
 		{	// Chapter and Item are not found in DB
-			if( empty( $this->link_types['item_id'] ) && is_numeric( $this->current_wiki_word ) )
+			if( ( empty( $this->link_types['item_id'] ) && is_numeric( $this->current_wiki_word ) ) ||
+			    ( empty( $this->link_types['anchor'] ) && isset( $anchor ) ) )
 			{	// Return original text if no found by numeric wikiword and "Item ID in brackets" is disabled:
 				return $m[0];
 			}
