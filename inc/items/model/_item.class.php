@@ -387,8 +387,8 @@ class Item extends ItemLight
 			// Updated only when:
 			//   - at least ONE of the fields: title, content, url is updated --> Especially: don't update on status change, workflow change, because it doesn't affect whether users have seen latest content changes or not
 			//   - link, unlink an attachment, update an attached file (note: link order changes not recorder because it doesn't affect whether usees have seen lastest content changes)
-			//   - TODO: any child COMMENT of the post is added/updated (but don't update on deleted comments -- When deleting a comment we WILL actually (in another branch for now) recompute an older timestamp based on last remaining comment)
-			//   - TODO: link, unlink an attachment, update an attached file on any comment (note: link order changes not recorder because it doesn't affect whether usees have seen lastest content changes)
+			//   - TODO?: any child COMMENT of the post is added/updated (but don't update on deleted comments -- When deleting a comment we actually recompute an OLDER timestamp based on last remaining comment)
+			//   - TODO?: link, unlink an attachment, update an attached file on any comment (note: link order changes not recorder because it doesn't affect whether usees have seen lastest content changes)
 			$this->contents_last_updated_ts = $db_row->post_contents_last_updated_ts;
 
 			$this->creator_user_ID = $db_row->post_creator_user_ID;   // Needed for history display
