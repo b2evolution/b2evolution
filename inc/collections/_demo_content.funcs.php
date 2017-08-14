@@ -263,29 +263,30 @@ function create_blog(
  * Create a new User
  *
  * @param array Params
- * @return integer User ID
+ * @return mixed object User if user was succesfully created otherwise false
  */
 function create_user( $params = array() )
 {
 	global $timestamp;
 	global $random_password, $admin_email;
 	global $default_locale, $default_country;
+	global $Messages;
 
 	$params = array_merge( array(
 			'login'     => '',
 			'firstname' => NULL,
 			'lastname'  => NULL,
-			'pass'    => $random_password, // random
-			'email'   => $admin_email,
-			'status'  => 'autoactivated', // assume it's active
-			'level'   => 0,
-			'locale'  => $default_locale,
-			'ctry_ID' => $default_country,
-			'gender'  => 'M',
-			'Group'   => NULL,
-			'org_IDs' => NULL, // array of organization IDs
+			'pass'      => $random_password, // random
+			'email'     => $admin_email,
+			'status'    => 'autoactivated', // assume it's active
+			'level'     => 0,
+			'locale'    => $default_locale,
+			'ctry_ID'   => $default_country,
+			'gender'    => 'M',
+			'group_ID'  => NULL,
+			'org_IDs'   => NULL, // array of organization IDs
 			'org_roles' => NULL, // array of organization roles
-			'fields'  => NULL, // array of additional user fields
+			'fields'    => NULL, // array of additional user fields
 		), $params );
 
 	$User = new User();
@@ -303,7 +304,18 @@ function create_user( $params = array() )
 	}
 	$User->set( 'gender', $params['gender'] );
 	$User->set_datecreated( $timestamp++ );
-	$User->set_Group( $params['Group'] );
+
+	$GroupCache = & get_GroupCache();
+	if( $Group = $GroupCache->get_by_ID( $params['group_ID'], false, false ) )
+	{
+		$User->set_Group( $Group );
+	}
+	else
+	{
+		$Messages->add( sprintf( T_('Cannot create demo user "%s" because User Group #%d was not found.'), $params['login'], $params['group_ID'] ), 'error' );
+		return false;
+	}
+
 	if( ! $User->dbinsert( false ) )
 	{ // Don't continue if user creating has been failed
 		return false;
@@ -487,30 +499,29 @@ function get_demo_users( $create = false, $group = NULL, $user_org_IDs = NULL )
  * @param boolean Create demo user if it does not exist
  * @param integer Group ID of user when created
  * @param array IDs of organization
- * @return object Demo user
+ * @return mixed object Demo user if successful, false otherwise
  */
-function get_demo_user( $login, $create = false, $group = NULL, $user_org_IDs = NULL )
+function get_demo_user( $login, $create = false, $group_ID = NULL, $user_org_IDs = NULL )
 {
 	global $DB, $user_org_IDs;
-	global $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
+	global $current_User, $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
 
 	$UserCache  = & get_UserCache();
 	$demo_user = & $UserCache->get_by_login( $login );
 
 	if( ! $demo_user && $create )
 	{
-		$GroupCache = & get_GroupCache();
 		switch( $login )
 		{
 			case 'mary':
 				$default_group_id = 2;
-				$mary_moderator_ID = create_user( array(
+				$mary_moderator = create_user( array(
 						'login'     => 'mary',
 						'firstname' => 'Mary',
 						'lastname'  => 'Wilson',
 						'level'     => 4,		// NOTE: these levels define the order of display in the Organization memebers widget
 						'gender'    => 'F',
-						'Group'     => $group ? $group : $GroupCache->get_by_ID( 2, false, false ),
+						'group_ID'  => $group_ID ? $group_ID : 2,
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'Queen of Hearts' ),
 						'fields'    => array(
@@ -522,19 +533,26 @@ function get_demo_user( $login, $create = false, $group = NULL, $user_org_IDs = 
 								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
 								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 							)
-					) )->ID;
-				assign_profile_picture( $UserCache->get_by_ID( $mary_moderator_ID ) );
-				$demo_user = & $UserCache->get_by_ID( $mary_moderator_ID );
+					) );
+
+				if( $mary_moderator === false )
+				{
+					return false;
+				}
+
+				$mary_moderator_ID = $mary_moderator->ID;
+				assign_profile_picture( $mary_moderator );
+				$demo_user = & $mary_moderator;
 				break;
 
 			case 'jay':
-				$jay_moderator_ID = create_user( array(
+				$jay_moderator = create_user( array(
 						'login'     => 'jay',
 						'firstname' => 'Jay',
 						'lastname'  => 'Parker',
 						'level'     => 3,
 						'gender'    => 'M',
-						'Group'     => $group ? $group : $GroupCache->get_by_ID( 2, false, false ),
+						'group_ID'  => $group_ID ? $group_ID : 2,
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'The Artist' ),
 						'fields'    => array(
@@ -546,19 +564,26 @@ function get_demo_user( $login, $create = false, $group = NULL, $user_org_IDs = 
 								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
 								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 							)
-					) )->ID;
-				assign_profile_picture( $UserCache->get_by_ID( $jay_moderator_ID ) );
-				$demo_user = & $UserCache->get_by_ID( $jay_moderator_ID );
+					) );
+
+				if( $jay_moderator === false )
+				{
+					return false;
+				}
+
+				$jay_moderator_ID = $jay_moderator->ID;
+				assign_profile_picture( $jay_moderator );
+				$demo_user = & $jay_moderator;
 				break;
 
 			case 'dave':
-				$dave_blogger_ID = create_user( array(
+				$dave_blogger = create_user( array(
 						'login'     => 'dave',
 						'firstname' => 'David',
 						'lastname'  => 'Miller',
 						'level'     => 2,
 						'gender'    => 'M',
-						'Group'     => $group ? $group : $GroupCache->get_by_ID( 3, false, false ),
+						'group_ID'  => $group_ID ? $group_ID : 3,
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'The Writer' ),
 						'fields'    => array(
@@ -570,19 +595,26 @@ function get_demo_user( $login, $create = false, $group = NULL, $user_org_IDs = 
 								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
 								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 							)
-					) )->ID;
-				assign_profile_picture( $UserCache->get_by_ID( $dave_blogger_ID ) );
-				$demo_user = & $UserCache->get_by_ID( $dave_blogger_ID );
+					) );
+
+				if( $dave_blogger === false )
+				{
+					return false;
+				}
+
+				$dave_blogger_ID = $dave_blogger->ID;
+				assign_profile_picture( $dave_blogger );
+				$demo_user = & $dave_blogger;
 				break;
 
 			case 'paul':
-				$paul_blogger_ID = create_user( array(
+				$paul_blogger = create_user( array(
 						'login'     => 'paul',
 						'firstname' => 'Paul',
 						'lastname'  => 'Jones',
 						'level'     => 1,
 						'gender'    => 'M',
-						'Group'     => $group ? $group : $GroupCache->get_by_ID( 3, false, false ),
+						'group_ID'  => $group_ID ? $group_ID : 3,
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'The Thinker' ),
 						'fields'    => array(
@@ -594,51 +626,71 @@ function get_demo_user( $login, $create = false, $group = NULL, $user_org_IDs = 
 								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
 								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 							)
-					) )->ID;
-				assign_profile_picture( $UserCache->get_by_ID( $paul_blogger_ID ) );
-				$demo_user = & $UserCache->get_by_ID( $paul_blogger_ID );
+					) );
+
+				if( $paul_blogger === false )
+				{
+					return false;
+				}
+
+				$paul_blogger_ID = $paul_blogger->ID;
+				assign_profile_picture( $paul_blogger );
+				$demo_user = & $paul_blogger;
 				break;
 
 			case 'larry':
-				$larry_user_ID = create_user( array(
+				$larry_user = create_user( array(
 						'login'     => 'larry',
 						'firstname' => 'Larry',
 						'lastname'  => 'Smith',
 						'level'     => 0,
 						'gender'    => 'M',
-						'Group'     => $group ? $group : $GroupCache->get_by_ID( 4, false, false ),
+						'group_ID'  => $group_ID ? $group_ID : 4,
 						'fields'    => array(
 								'Micro bio' => 'Hi there!',
 							)
-					) )->ID;
-				$larry_User = & $UserCache->get_by_ID( $larry_user_ID );
-				assign_profile_picture( $larry_User );
-				$demo_user = & $UserCache->get_by_ID( $larry_user_ID );
+					) );
+
+				if( $larry_user === false )
+				{
+					return false;
+				}
+
+				$larry_user_ID = $larry_user->ID;
+				assign_profile_picture( $larry_user );
+				$demo_user = & $larry_user;
 				break;
 
 			case 'kate':
-				$kate_user_ID = create_user( array(
+				$kate_user = create_user( array(
 						'login'     => 'kate',
 						'firstname' => 'Kate',
 						'lastname'  => 'Adams',
 						'level'     => 0,
 						'gender'    => 'F',
-						'Group'     => $group ? $group : $GroupCache->get_by_ID( 4, false, false ),
+						'group_ID'  => $group_ID ? $group_ID : 4,
 						'fields'    => array(
 								'Micro bio' => 'Just me!',
 							)
-					) )->ID;
-				assign_profile_picture( $UserCache->get_by_ID( $kate_user_ID ) );
-				$demo_user = & $UserCache->get_by_ID( $kate_user_ID );
+					) );
+
+				if( $kate_user === false )
+				{
+					return false;
+				}
+
+				$kate_user_ID = $kate_user->ID;
+				assign_profile_picture( $kate_user );
+				$demo_user = & $kate_user;
 				break;
 
 			case 'admin':
 				// erhsatingin> Should we recreate 'admin' user here if the initial admin user has a different login?
 			default:
-				// do nothing here
+				return false;
 		}
 
-		if( $demo_user && ! empty( $demo_user->ID ) )
+		if( $demo_user )
 		{	// Insert default user settings:
 			$DB->query( 'INSERT INTO T_users__usersettings ( uset_user_ID, uset_name, uset_value )
 				VALUES ( '.$demo_user->ID.', "created_fromIPv4", '.$DB->quote( ip2int( '127.0.0.1' ) ).' ),
