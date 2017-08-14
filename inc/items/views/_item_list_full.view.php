@@ -176,6 +176,10 @@ while( $Item = & $ItemList->get_item() )
 					.mysql2date( locale_datefmt().' @ '.locale_shorttimefmt(), $Item->get( 'last_touched_ts' ) )
 					.$Item->get_refresh_last_touched_link();
 
+				// Contents updated date:
+				echo ' &dash; '.T_('Contents updated').': '
+					.mysql2date( locale_datefmt().' @ '.locale_shorttimefmt(), $Item->get( 'contents_last_updated_ts' ) );
+
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
 

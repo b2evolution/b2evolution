@@ -165,6 +165,12 @@ class item_info_line_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => false
 				),
+				'contents_updated' => array(
+					'label' => T_( 'Contents last updated' ),
+					'note' => T_( 'Display date and time when item/post contents(title, content, URL or attachments) were updated' ),
+					'type' => 'checkbox',
+					'defaultvalue' => false
+				),
 				'category' => array(
 					'label' => T_( 'Category' ),
 					'note' => T_( 'Display item/post category' ),
@@ -322,6 +328,15 @@ class item_info_line_Widget extends ComponentWidget
 				.T_('Last touched').': '
 				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) )
 				.$Item->get_refresh_last_touched_link()
+				.'</span>';
+		}
+
+		// Contents last updated:
+		if( $this->disp_params['contents_updated'] )
+		{
+			echo '<span class="text-muted"> &ndash; '
+				.T_('Contents updated').': '
+				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) )
 				.'</span>';
 		}
 

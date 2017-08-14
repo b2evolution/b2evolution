@@ -1964,7 +1964,7 @@ class File extends DataObject
 			{
 				$LinkOwner = & $Link->get_LinkOwner();
 				if( $LinkOwner != NULL )
-				{	// Update last touched date content last updated date of the Owner:
+				{	// Update last touched date and content last updated date of the Owner:
 					$LinkOwner->update_last_touched_date();
 					$LinkOwner->update_contents_last_updated_ts();
 				}

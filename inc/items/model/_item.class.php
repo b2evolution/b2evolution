@@ -370,6 +370,7 @@ class Item extends ItemLight
 		{
 			$this->datecreated = $db_row->post_datecreated;           // When Item was created in the system
 			$this->last_touched_ts = $db_row->post_last_touched_ts;   // When Item received last visible change (edit, comment, etc.)
+			$this->contents_last_updated_ts = $db_row->post_contents_last_updated_ts; // When Item received last content change
 			$this->creator_user_ID = $db_row->post_creator_user_ID;   // Needed for history display
 			$this->lastedit_user_ID = $db_row->post_lastedit_user_ID; // Needed for history display
 			$this->assigned_user_ID = $db_row->post_assigned_user_ID;
