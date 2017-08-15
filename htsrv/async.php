@@ -165,20 +165,32 @@ switch( $action )
 						{	// If IP range is found in DB:
 							$db_IP_start = int2ip( $IPRange->get( 'IPv4start' ) );
 							$db_IP_end = int2ip( $IPRange->get( 'IPv4end' ) );
-							// Display IP range with status from DB:
+							// Display IP range with status from DB to edit it:
 							$ip_range_text = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;'
 								.'action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'
 									.$db_IP_start.' - '.$db_IP_end
 								.'</a>';
 							if( $db_IP_start != $whois_IP_start || $db_IP_end != $whois_IP_end )
-							{	// If IP range of "whois" tool is NOT same as IP range from DB then
-								// display "whois" IP range with "Unknown" status before DB IP range to allow create new one:
-								$ip_range_text = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;'
-										.'action=iprange_new&amp;ip_start='.$whois_IP_start.'&amp;ip_end='.$whois_IP_end.'">'
-											.$whois_IP_start.' - '.$whois_IP_end
-										.'</a>'
-									.' <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( '' ).'</div>'.$aipr_status_titles['']
-									.' included in '.$ip_range_text;
+							{	// If IP range of "whois" tool is NOT same as IP range from DB,
+								// Display a link to create new IP range from suggested IPs by "whois" tool:
+								$whois_ip_range_create_link = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;'
+									.'action=iprange_new&amp;ip_start='.$whois_IP_start.'&amp;ip_end='.$whois_IP_end.'">'
+										.$whois_IP_start.' - '.$whois_IP_end
+									.'</a>';
+								if( $IPRange->get( 'IPv4start' ) <= ip2int( $whois_IP_start ) && $IPRange->get( 'IPv4end' ) >= ip2int( $whois_IP_end ) )
+								{	// If IP range of "whois" tool is PART of IP range from DB then
+									// Display "whois" IP range link with "Unknown" status BEFORE DB IP range:
+									$ip_range_text = $whois_ip_range_create_link
+										.' <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( '' ).'</div>'.$aipr_status_titles['']
+										.' included in '.$ip_range_text;
+								}
+								else
+								{	// If IP range of "whois" tool is INERTSECTING with IP range from DB then
+									// Display ONLY "whois" IP range link with "Unknown" status,
+									// (don't display DB IP range because it will be suggested to edit on creating new intersecting IP range):
+									$ip_range_text = $whois_ip_range_create_link;
+									$iprange_status = '';
+								}
 							}
 						}
 						else
