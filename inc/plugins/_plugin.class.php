@@ -3644,7 +3644,7 @@ class Plugin
 			if( $use_tooltip )
 			{ // Add these data only for tooltip
 				$link_attribs['class'] = 'action_icon help_plugin_icon';
-				$link_attribs['rel'] = format_to_output( isset( $this->{$params['tooltip_field']} ) ? $this->{$params['tooltip_field']} : 'long_desc', 'htmlspecialchars' );
+				$link_attribs['rel'] = format_to_output( isset( $this->{$params['tooltip_field']} ) ? $this->{$params['tooltip_field']} : $this->long_desc, 'htmlspecialchars' );
 				if( isset( $params['icon_color'] ) )
 				{
 					$link_attribs['style'] = 'color: '.$params['icon_color'].';';
