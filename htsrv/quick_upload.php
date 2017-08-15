@@ -460,8 +460,10 @@ if( $upload )
 		}
 		else
 		{ // Success uploading
-			$message['text'] = $newFile->get_preview_thumb( 'fulltype' );
-			$message['status'] = 'success';
+			$message = array(
+					'text'   => $newFile->get_preview_thumb( 'fulltype' ),
+					'status' => 'success',
+				);
 			report_user_upload( $newFile );
 		}
 		$message['filetype'] = $newFile->get( 'type' );
