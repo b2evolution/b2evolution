@@ -698,7 +698,7 @@ class AdminUI extends AdminUI_general
 			case 'plugin_template':
 				// Template for plugins
 				return array(
-						'toolbar_before'       => '<div class="btn-toolbar $toolbar_class$" role="toolbar">',
+						'toolbar_before'       => '<div class="btn-toolbar plugin-toolbar $toolbar_class$" data-plugin-toolbar="$toolbar_class$" role="toolbar">',
 						'toolbar_after'        => '</div>',
 						'toolbar_title_before' => '<div class="btn-toolbar-title">',
 						'toolbar_title_after'  => '</div>',
