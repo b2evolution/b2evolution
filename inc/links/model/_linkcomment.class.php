@@ -120,8 +120,10 @@ class LinkComment extends LinkOwner
 			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', $file_dir, '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
 			if( $update_owner )
-			{ // Update last touched date of the Comment & Item
+			{	// Update last touched date of the Comment & Item:
 				$this->update_last_touched_date();
+				// Also update contents last updated date of the comment's Item:
+				$this->update_contents_last_updated_ts();
 			}
 
 			return $edited_Link->ID;
@@ -183,9 +185,31 @@ class LinkComment extends LinkOwner
 	 */
 	function update_last_touched_date()
 	{
-		if( !empty( $this->Comment ) )
-		{ // Update Item & Comment if it exist
+		if( ! empty( $this->Comment ) && ! $this->is_temp() )
+		{	// Update Item & Comment if it exist:
 			$this->Comment->update_last_touched_date();
+		}
+	}
+
+
+	/**
+	 * Update field contents_last_updated_ts of the comment's Item
+	 */
+	function update_contents_last_updated_ts()
+	{
+		if( empty( $this->Comment ) || $this->is_temp() )
+		{	// Comment must be defined:
+			return;
+		}
+
+		if( ! $this->Comment->is_published() )
+		{	// Don't change item contents updated date if comment is not published:
+			return;
+		}
+
+		if( $comment_Item = & $this->Comment->get_Item() )
+		{	// Update item field contents_last_updated_ts:
+			$comment_Item->update_last_touched_date( true, false, true );
 		}
 	}
 }

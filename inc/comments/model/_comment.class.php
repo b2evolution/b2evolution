@@ -449,7 +449,10 @@ class Comment extends DataObject
 				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
 				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
-				$this->previous_status = $this->get( 'status' );
+				if( ! isset( $this->previous_status ) )
+				{	// Set once previous status to know what status was original on several rewriting per same page request:
+					$this->previous_status = $this->get( 'status' );
+				}
 				return parent::set( 'status', $parvalue, $make_null );
 
 			default:
@@ -4241,7 +4244,7 @@ class Comment extends DataObject
 	/**
 	 * Check if this comment is published to some of the public statuses ( 'published', 'community', 'protected' )
 	 *
-	 * @return boolean true ir the item status is public or limited public, false otherwise
+	 * @return boolean true if the item status is public or limited public, false otherwise
 	 */
 	function is_published()
 	{
@@ -4308,16 +4311,17 @@ class Comment extends DataObject
 
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
-			$update_item_last_touched_date = false;
+			$update_item_contents_last_updated_date = false;
 			if( isset( $dbchanges['comment_content'] ) || isset( $dbchanges['comment_renderers'] ) )
 			{ // Content is updated
 				$this->delete_prerendered_content();
-				$update_item_last_touched_date = true;
+				$update_item_contents_last_updated_date = true;
 			}
 
-			if( $this->check_publish_status_changed() )
-			{ // Comment is updated into/out some public status
-				$update_item_last_touched_date = true;
+			if( $this->is_published() && $this->check_publish_status_changed() )
+			{	// If comment is updated into some published(Public, Community or Members),
+				// Update contents last update date of the comment's post:
+				$update_item_contents_last_updated_date = true;
 			}
 
 			if( !empty( $this->previous_item_ID ) )
@@ -4325,11 +4329,13 @@ class Comment extends DataObject
 				$ItemCache = & get_ItemCache();
 				$ItemCache->clear();
 				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
-				{	// Update last touched date of previous item:
-					$previous_Item->update_last_touched_date( false, true, true );
+				{	// Update ONLY last touched date of previous item:
+					$previous_Item->update_last_touched_date( false, true );
 				}
-				// Also update new post
-				$update_item_last_touched_date = true;
+				if( $this->is_published() )
+				{	// Update contents last update date of new post only if comment status is published(Public, Community or Members):
+					$update_item_contents_last_updated_date = true;
+				}
 
 				// Also move all child comments to new post
 				$child_comment_IDs = $this->get_child_comment_IDs();
@@ -4341,7 +4347,7 @@ class Comment extends DataObject
 				}
 			}
 
-			$this->update_last_touched_date( $update_item_last_touched_date, $update_item_last_touched_date );
+			$this->update_last_touched_date( true, $update_item_contents_last_updated_date );
 
 			$DB->commit();
 
@@ -4409,7 +4415,7 @@ class Comment extends DataObject
 		if( $r = parent::dbinsert() )
 		{
 			if( $this->is_published() )
-			{ // Update last touched date of item if comment is created in published status
+			{	// Update last touched date and contents last updated date of item if comment is created in published status(Public, Community or Members):
 				$this->update_last_touched_date( true, true );
 			}
 			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
@@ -4479,8 +4485,8 @@ class Comment extends DataObject
 		if( $r )
 		{
 			if( $was_published )
-			{	// Update last touched date and content last updated date of item if a published comment was deleted:
-				$this->update_last_touched_date( true, true );
+			{	// Update only last touched date of item if a published comment was deleted:
+				$this->update_last_touched_date();
 			}
 			if( $use_transaction )
 			{
