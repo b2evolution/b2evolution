@@ -368,7 +368,7 @@ class DB
 				if (function_exists('error_clear_last')) error_clear_last(); // PHP 7+
 				$old_html_errors = @ini_set('html_errors', 0);
 				@dl( $mysql_ext_file );
-				$error_msg = error_get_last();
+				$error_msg = error_get_last()['message'];
 				if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
 			}
 			else
@@ -401,7 +401,7 @@ class DB
 			$this->dbhandle = new mysqli();
 			@$this->dbhandle->real_connect($this->use_persistent ? 'p:'.$this->dbhost : $this->dbhost,
 				$this->dbuser, $this->dbpassword, '', $port, $socket, $client_flags );
-			$mysql_error = error_get_last();
+			$mysql_error = error_get_last()['message'];
 			if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
 		}
 
