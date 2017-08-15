@@ -387,7 +387,12 @@ class Plugin
 
 		if( ! empty( $this->template['toolbar_title_after'] ) )
 		{ // Add toolbar info icon after the title
-			$this->template['toolbar_title_after'] = $this->get_help_link( '', 'info', true, 'name' ).$this->template['toolbar_title_after'];
+			$toolbar_params = array(
+					'tooltip_field' => 'name',
+					'tooltip_placement' => 'top',
+					'info_suffix_text' => '',
+					'icon_color' => 'gray' );
+			$this->template['toolbar_title_after'] = $this->get_help_link( '', 'info', true, $toolbar_params ).$this->template['toolbar_title_after'];
 		}
 	}
 
@@ -3610,14 +3615,21 @@ class Plugin
 	 * @param boolean TRUE - to add info to display it in tooltip on mouseover
 	 * @return string The html A tag, linking to the help (or empty in case of $readme, if there is none).
 	 */
-	function get_help_link( $target = '', $icon = 'help', $use_tooltip = true, $tooltip_field = 'long_desc' )
+	function get_help_link( $target = '', $icon = 'help', $use_tooltip = true, $params = array() )
 	{
 		static $target_counter = 0;
 		$title = '';
 		$word = '';
 		$link_attribs = array( 'target' => '_blank', 'id' => 'anchor_help_plugin_'.$this->ID.'_'.$target_counter++ );
+		$params = array_merge( array(
+				'tooltip_field'    => 'long_desc',
+				'tooltip_placement'=> 'right',
+				'info_suffix_text' => '<p><strong>'
+						.sprintf( T_('Click %s to access full documentation for this plugin'), get_icon( 'help' ) )
+						.'</strong></p>',
+				'icon_color'       => NULL,
+			), $params );
 
-		$info_suffix_text = '';
 		if( empty( $target ) || in_array( $target, array( '$help_url', '$apply_rendering', '$widget_url' ) ) )
 		{
 			if( $target == '$apply_rendering' )
@@ -3632,13 +3644,20 @@ class Plugin
 			if( $use_tooltip )
 			{ // Add these data only for tooltip
 				$link_attribs['class'] = 'action_icon help_plugin_icon';
-				$link_attribs['rel'] = format_to_output( $this->$tooltip_field, 'htmlspecialchars' );
+				$link_attribs['rel'] = format_to_output( $this->$params['tooltip_field'], 'htmlspecialchars' );
+				if( isset( $params['icon_color'] ) )
+				{
+					$link_attribs['style'] = 'color: '.$params['icon_color'].';';
+				}
+				if( ! empty( $params['info_suffix_text'] ) )
+				{
+					$link_attribs['data-info-suffix-text'] = format_to_output( $params['info_suffix_text'], 'htmlspecialchars' );
+				}
+				$link_attribs['data-tooltip-placement'] = $params['tooltip_placement'];
 			}
 
 			// Display additional info for help plugin icon only one time. It is used on plugins.js
-			$info_suffix_text = '<div id="help_plugin_info_suffix" style="display:none"><p><strong>'
-					.sprintf( T_('Click %s to access full documentation for this plugin'), get_icon( 'help' ) )
-				.'</strong></p></div>';
+			//$info_suffix_text = $params['info_suffix_text'];
 		}
 		elseif( $target == '$readme' )
 		{ // README
@@ -3658,7 +3677,7 @@ class Plugin
 			debug_die( 'Invalid get_help_link() target: '.$target );
 		}
 
-		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs ).$info_suffix_text;
+		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs );
 	}
 
 
