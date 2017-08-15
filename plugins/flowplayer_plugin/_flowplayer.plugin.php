@@ -114,7 +114,6 @@ class flowplayer_plugin extends Plugin
 					),
 				'height' => array(
 					'label' => T_('Video height (px)'),
-					'defaultvalue' => 300,
 					'type' => 'integer',
 					'allow_empty' => true,
 					'valid_range' => array( 'min' => 1 ),
