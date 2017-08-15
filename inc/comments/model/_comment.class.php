@@ -4414,10 +4414,10 @@ class Comment extends DataObject
 
 		if( $r = parent::dbinsert() )
 		{
-			if( $this->is_published() )
-			{	// Update last touched date and contents last updated date of item if comment is created in published status(Public, Community or Members):
-				$this->update_last_touched_date( true, true );
-			}
+			// Update last touched date of item if comment is created with ANY status,
+			// But update contents last updated date of item if comment is created ONLY in published status(Public, Community or Members):
+			$this->update_last_touched_date( true, $this->is_published() );
+			// Plugin event to call after new comment insert:
 			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
 		}
 
