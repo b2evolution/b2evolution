@@ -4484,10 +4484,12 @@ class Comment extends DataObject
 
 		if( $r )
 		{
-			if( $was_published )
-			{	// Update only last touched date of item if a published comment was deleted:
+			if( $this->ID == 0 )
+			{	// Update only last touched date of item if comment was deleted from DB,
+				// Don't call this when comment was recycled because we already called this on dbupdate() above:
 				$this->update_last_touched_date();
 			}
+
 			if( $use_transaction )
 			{
 				$DB->commit();
