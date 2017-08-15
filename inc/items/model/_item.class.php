@@ -9685,11 +9685,11 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if current User has a permission to refresh a last touched date of this Item
+	 * Check if current User has a permission to refresh a contents last updated date of this Item
 	 *
 	 * @return boolean
 	 */
-	function can_refresh_last_touched()
+	function can_refresh_contents_last_updated()
 	{
 		if( ! $this->ID )
 		{	// If this Item is not saved in DB yet:
@@ -9708,20 +9708,20 @@ class Item extends ItemLight
 			return false;
 		}
 
-		// No restriction, Current User has a permission to refresh a last touched date of this Item:
+		// No restriction, Current User has a permission to refresh a contents last updated date of this Item:
 		return true;
 	}
 
 
 	/**
-	 * Get URL to refresh a last touched date of this Item if user has refresh rights
+	 * Get URL to refresh a contents last updated date of this Item if user has refresh rights
 	 *
 	 * @param array Params
 	 * @return string|boolean URL or FALSE if current user has no perm
 	 */
-	function get_refresh_last_touched_url( $params = array() )
+	function get_refresh_contents_last_updated_url( $params = array() )
 	{
-		if( ! $this->can_refresh_last_touched() )
+		if( ! $this->can_refresh_contents_last_updated() )
 		{	// If current User has no perm to refresh:
 			return false;
 		}
@@ -9731,20 +9731,20 @@ class Item extends ItemLight
 			), $params );
 
 		$url = get_htsrv_url().'action.php?mname=collections'.$params['glue']
-			.'action=refresh_last_touched'.$params['glue']
+			.'action=refresh_contents_last_updated'.$params['glue']
 			.'item_ID='.$this->ID.$params['glue']
-			.url_crumb( 'collections_refresh_last_touched' );
+			.url_crumb( 'collections_refresh_contents_last_updated' );
 
 		return $url;
 	}
 
 
 	/**
-	 * Get a link to refresh a last touched date of this Item if user has refresh rights
+	 * Get a link to refresh a contents last updated date of this Item if user has refresh rights
 	 *
 	 * @param array Params
 	 */
-	function get_refresh_last_touched_link( $params = array() )
+	function get_refresh_contents_last_updated_link( $params = array() )
 	{
 		$params = array_merge( array(
 				'before' => ' ',
@@ -9755,15 +9755,15 @@ class Item extends ItemLight
 				'glue'   => '&amp;',
 			), $params );
 
-		$refresh_url = $this->get_refresh_last_touched_url( $params );
+		$refresh_url = $this->get_refresh_contents_last_updated_url( $params );
 		if( ! $refresh_url )
-		{	// If current user has no perm to refesh last touched date of this Item:
+		{	// If current user has no perm to refesh contents last updated date of this Item:
 			return;
 		}
 
 		if( $params['title'] == '#' )
 		{	// Use default title
-			$params['title'] = T_('Refresh last touched date');
+			$params['title'] = T_('Refresh contents last updated date');
 		}
 
 		$params['text'] = utf8_trim( $params['text'] );
@@ -9786,30 +9786,30 @@ class Item extends ItemLight
 
 
 	/**
-	 * Refresh last touched ts with date of the latest Comment
+	 * Refresh contents last updated ts with date of the latest Comment
 	 *
 	 * @return boolean TRUE of success
 	 */
-	function refresh_last_touched_ts()
+	function refresh_contents_last_updated_ts()
 	{
-		if( ! $this->can_refresh_last_touched() )
-		{	// If current User has no permission to refresh a last touched date of the requested Item:
+		if( ! $this->can_refresh_contents_last_updated() )
+		{	// If current User has no permission to refresh a contents last updated date of the requested Item:
 			return false;
 		}
 
 		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ) ) )
 		{	// Use date from the latest public Comment:
-			$new_last_touched_ts = $latest_Comment->get( 'last_touched_ts' );
+			$new_contents_last_updated_ts = $latest_Comment->get( 'last_touched_ts' );
 		}
 		else
 		{	// Use date from issue date of this Item:
-			$new_last_touched_ts = $this->get( 'datestart' );
+			$new_contents_last_updated_ts = $this->get( 'datestart' );
 		}
 
 		global $DB;
 
 		$DB->query( 'UPDATE T_items__item
-					SET post_last_touched_ts = '.$DB->quote( $new_last_touched_ts ).'
+					SET post_contents_last_updated_ts = '.$DB->quote( $new_contents_last_updated_ts ).'
 				WHERE post_ID = '.$this->ID );
 
 		return true;

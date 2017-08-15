@@ -4496,9 +4496,9 @@ class Comment extends DataObject
 			}
 
 			if( ! empty( $refresh_parent_item ) )
-			{	// Refresh last touched ts of parent Item if this Comment was the latest Comment of parent Item:
+			{	// Refresh contents last updated ts of parent Item if this Comment was the latest Comment of parent Item:
 				$comment_Item->latest_Comment = NULL;
-				$comment_Item->refresh_last_touched_ts();
+				$comment_Item->refresh_contents_last_updated_ts();
 			}
 		}
 		else
