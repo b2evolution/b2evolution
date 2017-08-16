@@ -1954,10 +1954,10 @@ function duration_format( $duration, $show_seconds = true )
  * Get the integer value of a status permission
  * The status permissions are stored as a set, and each status has an integer value also
  *
- * @param string status
- * @return integer status perm value
+ * @param string|array Status(es)
+ * @return integer Status perm value
  */
-function get_status_permvalue( $status )
+function get_status_permvalue( $statuses )
 {
 	static $status_permission_map = array(
 			'trash'      => 0, // Note that 'trash' status doesn't have a real permission value, with this value no-one has permission, and that is OK
@@ -1971,21 +1971,22 @@ function get_status_permvalue( $status )
 			'redirected' => 128
 		);
 
-	switch( $status )
-	{
-		case 'published_statuses':
-			return $status_permission_map['protected'] + $status_permission_map['community'] + $status_permission_map['published'];
-
-		default:
-			break;
+	if( ! is_array( $statuses ) )
+	{	// Convert to array if single string status:
+		$statuses = array( $statuses );
 	}
 
-	if( !isset( $status_permission_map[$status] ) )
+	$status_permvalue = 0;
+	foreach( $statuses as $status )
 	{
-		debug_die( 'Invalid status permvalue was requested!' );
+		if( ! isset( $status_permission_map[ $status ] ) )
+		{	// Stop on unknown status request:
+			debug_die( 'Invalid status permvalue was requested!' );
+		}
+		$status_permvalue += $status_permission_map[ $status ];
 	}
 
-	return $status_permission_map[$status];
+	return $status_permvalue;
 }
 
 
@@ -6218,10 +6219,9 @@ function validate_pwd_reset_session( $reqID, $forgetful_User )
  * @param string Field title
  * @param string Field key
  * @param string Domain name
- * @param string IP address
  * @param object Form
  */
-function user_domain_info_display( $field_title, $field_key, $domain_name, $ip_address, & $Form )
+function user_domain_info_display( $field_title, $field_key, $domain_name, & $Form )
 {
 	global $current_User, $admin_url, $UserSettings;
 
@@ -6244,7 +6244,7 @@ function user_domain_info_display( $field_title, $field_key, $domain_name, $ip_a
 		}
 	}
 	$Form->begin_line( $field_title, NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
-		$Form->info_field( '', $domain_name_formatted.( ! empty( $ip_address ) ? ' <button type="button" class="btn btn-default" onclick="return get_whois_info(\''.$ip_address.'\');">'.get_icon( 'magnifier' ).'</button>' : '' ) );
+		$Form->info_field( '', $domain_name_formatted );
 		if( $display_user_domain )
 		{	// Display status of Domain if current user has a permission:
 			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
@@ -6253,11 +6253,11 @@ function user_domain_info_display( $field_title, $field_key, $domain_name, $ip_a
 			{	// User can edit Domain
 				// Link to create a new domain:
 				$domain_status_action = action_icon( sprintf( T_('Add domain %s'), $domain_name ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$domain_name.'&amp;dom_status='.$domain_status );
-				$Form->select_input_array( 'edited_'.$field_key, $domain_status, stats_dom_status_titles(), '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_action ) );
+				$Form->select_input_array( 'edited_'.$field_key, $domain_status, stats_dom_status_titles(), '<b class="evo_label_inline">'.T_('Domain status').': </b>'.$domain_name_formatted.' '.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_action ) );
 			}
 			else
 			{ // Only view status of Domain
-				$Form->info( '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, stats_dom_status_title( $domain_status ) );
+				$Form->info( '<b class="evo_label_inline">'.T_('Domain status').': </b>'.$domain_name_formatted.' '.$domain_status_icon, stats_dom_status_title( $domain_status ) );
 			}
 		}
 	$Form->end_line( NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );

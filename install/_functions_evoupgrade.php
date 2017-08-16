@@ -8478,6 +8478,37 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12320, 'Updating plugin "Short Links"...' ) )
+	{	// part of 6.9.3-beta
+		$SQL = new SQL( 'Get old collection setting "Links without brackets" of the plugin "Short Links"' );
+		$SQL->SELECT( 'cset_coll_ID, plug_ID, cset_name, cset_value' );
+		$SQL->FROM( 'T_plugins' );
+		$SQL->FROM_add( 'INNER JOIN T_coll_settings ON cset_name = CONCAT( "plugin", plug_ID, "_link_without_brackets" )' );
+		$SQL->WHERE( 'plug_code = "b2evWiLi"' );
+		$SQL->WHERE_and( 'cset_value = 1' );
+		$coll_settings = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+
+		// Default values for new setting:
+		$new_short_links_setting = array(
+				'absolute_urls'   => 1,
+				'relative_urls'   => 0,
+				'slugs'           => 1,
+				'item_id'         => 1,
+				'without_backets' => 0,
+			);
+		foreach( $coll_settings as $coll_setting )
+		{	// Update old plugin setting to new format:
+			$new_short_links_setting['without_backets'] = $coll_setting->cset_value;
+			$DB->query( 'UPDATE T_coll_settings
+				  SET cset_name = '.$DB->quote( 'plugin'.$coll_setting->plug_ID.'_link_types' ).',
+				      cset_value = '.$DB->quote( serialize( $new_short_links_setting ) ).'
+				WHERE cset_coll_ID = '.$coll_setting->cset_coll_ID.'
+				  AND cset_name = '.$DB->quote( $coll_setting->cset_name ) );
+		}
+
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_section', '

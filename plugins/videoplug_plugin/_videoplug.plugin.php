@@ -35,7 +35,7 @@ class videoplug_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Video plug for a few popular video sites.');
-		$this->long_desc = T_('This is a basic video plug pluigin. Use it by entering [video:youtube:123xyz] or [video:dailymotion:123xyz] into your post, where 123xyz is the ID of the video.');
+		$this->long_desc = T_('This plugin allows to quickly embed (plug) a video from a video hosting site such as YouTube, Vimeo, DailyMotion and Facebook. Use it through the toolbar or directly by entering a shortcode like [video:youtube:123xyz] or [video:vimeo:123xyz] into your post, where 123xyz is the ID of the video.');
 	}
 
 
@@ -80,69 +80,89 @@ class videoplug_plugin extends Plugin
 
 		if( $setting_Blog = & $this->get_Blog_from_params( $params ) )
 		{	// We are rendering Item, Comment or Widget now, Get the settings depending on Collection:
-			$width = $this->get_coll_setting( 'width', $setting_Blog );
-			$height = $this->get_coll_setting( 'height', $setting_Blog );
+			$this->video_width = $this->get_coll_setting( 'width', $setting_Blog );
+			$this->video_height = $this->get_coll_setting( 'height', $setting_Blog );
 		}
 		elseif( ! empty( $params['Message'] ) )
 		{	// We are rendering Message now:
-			$width = $this->get_msg_setting( 'width' );
-			$height = $this->get_msg_setting( 'height' );
+			$this->video_width = $this->get_msg_setting( 'width' );
+			$this->video_height = $this->get_msg_setting( 'height' );
 		}
 		elseif( ! empty( $params['EmailCampaign'] ) )
 		{	// We are rendering EmailCampaign now:
-			$width = $this->get_email_setting( 'width' );
-			$height = $this->get_email_setting( 'height' );
+			$this->video_width = $this->get_email_setting( 'width' );
+			$this->video_height = $this->get_email_setting( 'height' );
 		}
 		else
 		{	// Unknown call, Don't render this case:
 			return;
 		}
 
+		// Move short tag outside of paragraph:
+		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo|facebook):?[^\[\]]*\]/i' );
+
+		// Replace video tags with html code:
+		$content = replace_content_outcode( '#\[video:(youtube|dailymotion|vimeo|facebook|google|livevideo|ifilm):([^:]+?):?(\d+%?)?:?(\d+%?)?]#',
+			array( $this, 'parse_video_tag_callback' ), $content, 'replace_content', 'preg_callback' );
+
+		return true;
+	}
+
+
+	/**
+	 * Callback function to build HTML video code from video tag
+	 *
+	 * @param array Matches:
+	 *              0 - Full video tag
+	 *              1 - Video type: youtube, dailymotion, vimeo, facebook, google, livevideo, ifilm
+	 *              2 - Video code/key
+	 *              3 - Width
+	 *              4 - Height
+	 * @return string HTML video code
+	 */
+	function parse_video_tag_callback( $m )
+	{
+		switch( $m[1] )
+		{
+			case 'youtube':
+				$video_block = '<iframe id="ytplayer" type="text/html" src="//www.youtube.com/embed/'.$m[2].'" allowfullscreen="allowfullscreen" frameborder="0"></iframe>';
+				break;
+
+			case 'dailymotion':
+				$video_block = '<iframe src="//www.dailymotion.com/embed/video/'.$m[2].'" frameborder="0" allowfullscreen></iframe>';
+				break;
+
+			case 'vimeo':
+				$video_block = '<iframe src="//player.vimeo.com/video/'.$m[2].'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+				break;
+
+			case 'facebook':
+				$video_block = '<iframe src="https://www.facebook.com/plugins/video.php?href='.$m[2].'" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>';
+				break;
+
+			default: // google, livevideo, ifilm:
+				// Unavailable services. Keep them for backwards compatibility:
+				$video_block = 'The '.$m[1].' video service is not available anymore.';
+				break;
+		}
+
 		$style = '';
 
+		// Get width from video tag or from settings:
+		$width = empty( $m[3] ) ? $this->video_width : $m[3];
 		if( ! empty( $width ) )
 		{	// Set width depending on what units are used:
 			$style .= 'width:'.( strpos( $width, '%' ) === false ? $width.'px' : $width ).';';
 		}
 
+		// Get height from video tag or from settings:
+		$height = empty( $m[4] ) ? $this->video_height : $m[4];
 		if( ! empty( $height ) )
 		{	// Set height depending on what units are used:
 			$style .= 'padding-bottom:'.( strpos( $height, '%' ) === false ? '0;height:'.$height.'px' : $height );
 		}
 
-		$video_block_before = '<div class="videoblock"'.( $style == '' ? '' : ' style="'.$style.'"' ).'>';
-		$video_block_after = '</div>';
-
-		// fp> removed some embeds to make it xhtml compliant, using only object. (Hari style ;)
-		// anyone, feel free to clean up the ones that have no object tag at all.
-
-		$search_list = array(
-				'#\[video:youtube:(.+?)]#',     // Youtube
-				'#\[video:dailymotion:(.+?)]#', // Dailymotion
-				'#\[video:vimeo:(.+?)]#',       // vimeo // blueyed> TODO: might want to use oEmbed (to get title etc separately and display it below video): http://vimeo.com/api/docs/oembed
-				'#\[video:facebook:(.+?)]#',    // Facebook
-				// Unavailable services. Keep them for backwards compatibility
-				'#\[video:google:(.+?)]#',      // Google video
-				'#\[video:livevideo:(.+?)]#',   // LiveVideo
-				'#\[video:ifilm:(.+?)]#',       // iFilm
-			);
-		$replace_list = array(
-				$video_block_before.'<iframe id="ytplayer" type="text/html" src="//www.youtube.com/embed/\\1" allowfullscreen="allowfullscreen" frameborder="0"></iframe>'.$video_block_after,
-				$video_block_before.'<iframe src="//www.dailymotion.com/embed/video/\\1" frameborder="0" allowfullscreen></iframe>'.$video_block_after,
-				$video_block_before.'<iframe src="//player.vimeo.com/video/$1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>'.$video_block_after,
-				$video_block_before.'<iframe src="https://www.facebook.com/plugins/video.php?href=$1" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>'.$video_block_after,
-				// Unavailable services. Keep them for backwards compatibility
-				$video_block_before.'The Google video service is not available anymore.'.$video_block_after,
-				$video_block_before.'The Live Video service is not available anymore.'.$video_block_after,
-				$video_block_before.'The iFilm video service is not available anymore.'.$video_block_after,
-			);
-
-		// Move short tag outside of paragraph
-		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo|facebook):?[^\[\]]*\]/i' );
-
-		$content = replace_content_outcode( $search_list, $replace_list, $content );
-
-		return true;
+		return '<div class="videoblock"'.( $style == '' ? '' : ' style="'.$style.'"' ).'>'.$video_block.'</div>';
 	}
 
 

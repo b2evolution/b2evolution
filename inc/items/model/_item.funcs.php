@@ -5211,7 +5211,10 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	// URL "slug"
 	$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Item->ID.'&amp;action=edit' );
-	$r .= '<td>'.$Item->get_title( $params );
+	$r .= '<td>'.$Item->get_title( array_merge( $params, array(
+			'post_navigation' => 'same_category', // set a navigating through category
+			'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
+		) ) );
 	if( $current_User->check_perm( 'slugs', 'view', false ) )
 	{ // Display icon to view all slugs of this item if current user has permission
 		$r .= ' '.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );

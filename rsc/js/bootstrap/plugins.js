@@ -18,15 +18,26 @@ jQuery( document ).on( 'mouseover', 'a.help_plugin_icon', function()
 	jQuery( this ).find( 'span' ).removeAttr( 'title' );
 
 	var tip_text = jQuery( this ).attr( 'rel' );
-	if( jQuery( '#help_plugin_info_suffix' ).length > 0 )
+	var info_suffix_text = jQuery( this ).attr( 'data-info-suffix-text' );
+	var placement = jQuery( this ).attr( 'data-tooltip-placement' );
+
+	if( info_suffix_text )
 	{ // Append additional info
-		tip_text += jQuery( '#help_plugin_info_suffix' ).html();
+		tip_text += info_suffix_text;
 	}
 
-	var placement = 'right';
-	if( jQuery( 'body' ).width() - jQuery( this ).position().left < 220 )
+	if( ! placement )
+	{
+		placement = 'right';
+	}
+
+	if( placement == 'right' && jQuery( 'body' ).width() - jQuery( this ).position().left < 220 )
 	{ // Change position of bubbletip if we have no enough space at the right
 		placement = 'left';
+	}
+	else if( placement == 'top' && jQuery( 'body' ).height() - jQuery( this ).position().top < 220 )
+	{
+		placement = 'bottom';
 	}
 
 	jQuery( this ).popover( {

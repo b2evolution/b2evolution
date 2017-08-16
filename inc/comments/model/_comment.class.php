@@ -449,7 +449,10 @@ class Comment extends DataObject
 				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
 				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
-				$this->previous_status = $this->get( 'status' );
+				if( ! isset( $this->previous_status ) )
+				{	// Set once previous status to know what status was original on several rewriting per same page request:
+					$this->previous_status = $this->get( 'status' );
+				}
 				return parent::set( 'status', $parvalue, $make_null );
 
 			default:
@@ -2312,8 +2315,6 @@ class Comment extends DataObject
 	 */
 	function moderation_links( $params )
 	{
-		global $blog;
-
 		if( ! is_logged_in( false ) )
 		{
 			return false;
@@ -2331,7 +2332,7 @@ class Comment extends DataObject
 		$statuses = get_visibility_statuses( 'ordered-array' );
 		$statuses = array_reverse( $statuses );
 
-		$inskin_statuses = get_inskin_statuses( $blog, 'comment' );
+		$frontoffice_statuses = $this->get_frontoffice_statuses();
 
 		// Get first and last statuses that will be visible buttons
 		$first_status_in_row = $this->get_next_status( true, $this->status );
@@ -2363,7 +2364,7 @@ class Comment extends DataObject
 				{
 					$tmp_params['class'] .= ' btn_next_status';
 				}
-				if( ! in_array( $next_status_in_row[0], $inskin_statuses ) )
+				if( ! in_array( $next_status_in_row[0], $frontoffice_statuses ) )
 				{ // Don't make ajax button for those statuses which are not allowed in the front office
 					$tmp_params = array_merge( $tmp_params, array( 'ajax_button' => false ) );
 				}
@@ -2393,7 +2394,7 @@ class Comment extends DataObject
 				{
 					$tmp_params['class'] .= ' btn_next_status';
 				}
-				if( ! in_array( $next_status_in_row[0], $inskin_statuses ) )
+				if( ! in_array( $next_status_in_row[0], $frontoffice_statuses ) )
 				{ // Don't make ajax button for those statuses which are not allowed in the front office
 					$tmp_params = array_merge( $tmp_params, array( 'ajax_button' => false ) );
 				}
@@ -2511,8 +2512,7 @@ class Comment extends DataObject
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '', $nofollow = false, $restrict_status = true )
 	{
-		$comment_Item = & $this->get_Item();
-		if( $restrict_status && ! in_array( $this->status, get_inskin_statuses( $comment_Item->get_blog_ID(), 'comment' ) ) )
+		if( $restrict_status && ! $this->may_be_seen_in_frontoffice() )
 		{
 			return '';
 		}
@@ -4239,46 +4239,33 @@ class Comment extends DataObject
 
 
 	/**
-	 * Check if this comment is published to some of the public statuses ( 'published', 'community', 'protected' )
-	 *
-	 * @return boolean true ir the item status is public or limited public, false otherwise
-	 */
-	function is_published()
+	* Get a list of those comment statuses which can be displayed in the front office
+	*
+	* @return array Front office statuses in the comment's collection
+	*/
+	function get_frontoffice_statuses()
 	{
-		$permvalue = get_status_permvalue( $this->status );
-		$published_statuses_permvalue = get_status_permvalue( 'published_statuses' );
-		return ( $permvalue & $published_statuses_permvalue ) ? true : false;
+		if( ! ( $comment_Item = & $this->get_Item() ) ||
+		    ! ( $comment_blog_ID = $comment_Item->get_blog_ID() ) )
+		{	// Comment's collection ID must be detected to get front-office comment statuses:
+			return array();
+		}
+
+		return get_inskin_statuses( $comment_blog_ID, 'comment' );
 	}
 
 
 	/**
-	 * Check if comment public or limited public status was changed. Limited public status is like community or protected.
+	 * Check if this comment may be seen in front office
 	 *
-	 * @return boolean false if status was not changed or neither the previous nor current status is public or limited public, true otherwise
+	 * @return boolean true if the comment status is used to display on front office, false otherwise
 	 */
-	function check_publish_status_changed()
+	function may_be_seen_in_frontoffice()
 	{
-		if( !isset( $this->previous_status ) || $this->previous_status == $this->status )
-		{ // Status was not changed
-			return false;
-		}
-
-		$previous_status_permvalue = get_status_permvalue( $this->previous_status );
 		$current_status_permvalue = get_status_permvalue( $this->status );
-		$published_statuses_permvalue = get_status_permvalue( 'published_statuses' );
+		$frontoffice_statuses_permvalue = get_status_permvalue( $this->get_frontoffice_statuses() );
 
-		if( $current_status_permvalue & $published_statuses_permvalue )
-		{ // status has been changed to another public or limited public status
-			return true;
-		}
-
-		if( $previous_status_permvalue & $published_statuses_permvalue )
-		{ // previous status was public or limited public status, but current status is not
-			return true;
-		}
-
-		// This comment was not published before and it is not published now either
-		return false;
+		return ( $current_status_permvalue & $frontoffice_statuses_permvalue ) ? true : false;
 	}
 
 
@@ -4308,16 +4295,22 @@ class Comment extends DataObject
 
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
-			$update_item_last_touched_date = false;
 			if( isset( $dbchanges['comment_content'] ) || isset( $dbchanges['comment_renderers'] ) )
-			{ // Content is updated
+			{	// Delete a prerendered content if content or text renderers have been updated:
 				$this->delete_prerendered_content();
-				$update_item_last_touched_date = true;
 			}
 
-			if( $this->check_publish_status_changed() )
-			{ // Comment is updated into/out some public status
-				$update_item_last_touched_date = true;
+			$update_item_contents_last_updated_date = false;
+			if( $this->may_be_seen_in_frontoffice() )
+			{	// Update contents last update date of the comment's post ONLY when the updated comment may be seen in frontoffice:
+				if( isset( $dbchanges['comment_content'] ) ||
+				    isset( $dbchanges['comment_rating'] ) ||
+				    isset( $dbchanges['comment_item_ID'] ) ||
+				    isset( $dbchanges['comment_status'] ) )
+				{	// AND if content, rating or parent Item have been updated
+					//     or status has been updated into some front-office status:
+					$update_item_contents_last_updated_date = true;
+				}
 			}
 
 			if( !empty( $this->previous_item_ID ) )
@@ -4325,11 +4318,9 @@ class Comment extends DataObject
 				$ItemCache = & get_ItemCache();
 				$ItemCache->clear();
 				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
-				{	// Update last touched date of previous item:
-					$previous_Item->update_last_touched_date( false, true, true );
+				{	// Update ONLY last touched date of previous item:
+					$previous_Item->update_last_touched_date( false, true );
 				}
-				// Also update new post
-				$update_item_last_touched_date = true;
 
 				// Also move all child comments to new post
 				$child_comment_IDs = $this->get_child_comment_IDs();
@@ -4341,7 +4332,7 @@ class Comment extends DataObject
 				}
 			}
 
-			$this->update_last_touched_date( $update_item_last_touched_date, $update_item_last_touched_date );
+			$this->update_last_touched_date( true, $update_item_contents_last_updated_date );
 
 			$DB->commit();
 
@@ -4408,10 +4399,10 @@ class Comment extends DataObject
 
 		if( $r = parent::dbinsert() )
 		{
-			if( $this->is_published() )
-			{ // Update last touched date of item if comment is created in published status
-				$this->update_last_touched_date( true, true );
-			}
+			// Update last touched date of item if comment is created with ANY status,
+			// But update contents last updated date of item if comment is created ONLY in published status(Public, Community or Members):
+			$this->update_last_touched_date( true, $this->may_be_seen_in_frontoffice() );
+			// Plugin event to call after new comment insert:
 			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
 		}
 
@@ -4435,7 +4426,6 @@ class Comment extends DataObject
 			$DB->begin();
 		}
 
-		$was_published = $this->is_published();
 		if( $this->status != 'trash' )
 		{ // The comment was not recycled yet
 			if( $this->has_replies() )
@@ -4478,19 +4468,21 @@ class Comment extends DataObject
 
 		if( $r )
 		{
-			if( $was_published )
-			{	// Update last touched date and content last updated date of item if a published comment was deleted:
-				$this->update_last_touched_date( true, true );
+			if( $this->ID == 0 )
+			{	// Update only last touched date of item if comment was deleted from DB,
+				// Don't call this when comment was recycled because we already called this on dbupdate() above:
+				$this->update_last_touched_date();
 			}
+
 			if( $use_transaction )
 			{
 				$DB->commit();
 			}
 
 			if( ! empty( $refresh_parent_item ) )
-			{	// Refresh last touched ts of parent Item if this Comment was the latest Comment of parent Item:
+			{	// Refresh contents last updated ts of parent Item if this Comment was the latest Comment of parent Item:
 				$comment_Item->latest_Comment = NULL;
-				$comment_Item->refresh_last_touched_ts();
+				$comment_Item->refresh_contents_last_updated_ts();
 			}
 		}
 		else

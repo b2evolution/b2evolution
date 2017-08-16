@@ -218,10 +218,6 @@ switch( $action )
 				{ // Create the demo organization
 					$user_org_IDs = array( create_demo_organization( $edited_Blog->owner_user_ID )->ID );
 				}
-				if( $create_demo_users )
-				{ // Create demo users
-					get_demo_users( true, NULL, $user_org_IDs );
-				}
 
 				// Switch locale to translate content
 				locale_temp_switch( param( 'blog_locale', 'string' ) );

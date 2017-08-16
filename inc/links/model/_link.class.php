@@ -31,7 +31,7 @@ class Link extends DataObject
 	 */
 	var $LinkOwner;
 	/**
-	 * @access protected 
+	 * @access protected
 	 * @see get_File()
 	 */
 	var $File;
@@ -347,6 +347,128 @@ class Link extends DataObject
 		}
 
 		// No any restriction, Current User can delete the file of this link from disk and DB completely:
+		return true;
+	}
+
+
+	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		global $DB, $Plugins, $localtimenow, $current_User;
+
+		if( $this->ID != 0 && !$this->allow_ID_insert )
+		{
+			die( 'Existing object/object with an ID cannot be inserted!' );
+		}
+
+		if( !empty($this->datecreated_field) )
+		{ // We want to track creation date:
+			$this->set_param( $this->datecreated_field, 'date', date('Y-m-d H:i:s',$localtimenow) );
+		}
+		if( !empty($this->datemodified_field) )
+		{ // We want to track modification date:
+			$this->set_param( $this->datemodified_field, 'date', date('Y-m-d H:i:s',$localtimenow) );
+		}
+		if( is_logged_in() )
+		{ // Assign user's ID only when user is logged in
+			if( !empty($this->creator_field) )
+			{ // We want to track creator:
+				if( empty($this->creator_user_ID) )
+				{ // No creator assigned yet, use current user:
+					$this->set_param( $this->creator_field, 'number', $current_User->ID );
+				}
+			}
+			if( !empty($this->lasteditor_field) )
+			{ // We want to track last editor:
+				if( empty($this->lastedit_user_ID) )
+				{ // No editor assigned yet, use current user:
+					$this->set_param( $this->lasteditor_field, 'number', $current_User->ID );
+				}
+			}
+		}
+
+		$sql_fields = array();
+		$sql_values = array();
+		$auto_order = false;
+		$link_owner_ID = NULL;
+		$link_owner_ID_field = NULL;
+		$link_owner_fields = array(	'link_itm_ID', 'link_cmt_ID', 'link_usr_ID', 'link_ecmp_ID', 'link_msg_ID', 'link_tmp_ID' );
+
+		foreach( $this->dbchanges as $loop_dbfieldname => $loop_dbchange )
+		{
+			// Get changed value (we use eval() to allow constructs like $loop_dbchange['value'] = 'Group->get(\'ID\')'):
+			eval( '$loop_value = $this->'. $loop_dbchange['value'].';' );
+			// Prepare matching statement:
+
+			if( $loop_dbfieldname == 'link_order' && $loop_value === 0 )
+			{
+				$auto_order = true;
+				continue;
+			}
+			elseif( in_array( $loop_dbfieldname, $link_owner_fields ) )
+			{
+				$link_owner_ID_field = $loop_dbfieldname;
+				$link_owner_ID = $loop_value;
+			}
+
+			$sql_fields[] = $loop_dbfieldname;
+
+			if( is_null($loop_value) )
+			{
+				$sql_values[] = 'NULL';
+			}
+			else
+			{
+				switch( $loop_dbchange['type'] )
+				{
+					case 'date':
+					case 'string':
+						$sql_values[] = $DB->quote( $loop_value );
+						break;
+
+					default:
+						$sql_values[] = $DB->null( $loop_value );
+				}
+			}
+		}
+
+		// Prepare full statement:
+		if( $auto_order && ! empty( $link_owner_ID_field ) && ! empty( $link_owner_ID ) )
+		{ // Auto generate link_order in DB
+			$sql_fields[] = 'link_order';
+			$sql_values[] = 'COALESCE(z.max_order, 0) + 1';
+			$sql = "INSERT INTO {$this->dbtablename} (". implode( ', ', $sql_fields ). ") SELECT ". implode( ', ', $sql_values )
+				." FROM (SELECT MAX(link_order) AS max_order FROM T_links WHERE ".$link_owner_ID_field." = ".$link_owner_ID.") AS z";
+		}
+		else
+		{
+			$sql = "INSERT INTO {$this->dbtablename} (". implode( ', ', $sql_fields ). ") VALUES (". implode( ', ', $sql_values ). ")";
+		}
+		//echo $sql;
+
+		if( ! $DB->query( $sql, 'DataObject::dbinsert()' ) )
+		{
+			return false;
+		}
+
+
+		if( !( $this->allow_ID_insert && $this->ID ) )
+		{// store ID for newly created db record. Do not if allow_ID_insert is true and $this->ID is not 0
+
+			$this->ID = $DB->insert_id;
+		}
+		// Reset changes in object:
+		$this->dbchanges = array();
+
+		if( !empty( $Plugins ) )
+		{
+			$Plugins->trigger_event( 'AfterObjectInsert', $params = array( 'Object' => & $this, 'type' => get_class($this) ) );
+		}
+
 		return true;
 	}
 }

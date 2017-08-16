@@ -371,8 +371,10 @@ class UploadHandler {
 		* Converts a given size with units to bytes.
 		* @param string $str
 		*/
-	protected function toBytes( $str ){
-		$val = trim( $str );
+	protected function toBytes( $str )
+	{
+		$str = trim( $str );
+		$val = intval( $str );
 		$last = strtolower( $str[strlen( $str ) - 1] );
 		switch( $last )
 		{
