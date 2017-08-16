@@ -53,13 +53,14 @@ class shortlinks_plugin extends Plugin
 				'label' => T_('Link types to allow'),
 				'type' => 'checklist',
 				'options' => array(
-						array( 'absolute_urls',    sprintf( $this->T_('Absolute URLs (starting with %s or %s) in brackets'), '<code>http://</code>, <code>https://</code>, <code>mailto://</code>', '<code>//</code>' ), 1 ),
-						array( 'relative_urls',    sprintf( $this->T_('Relative URLs (starting with %s followed by a letter or digit) in brackets'), '<code>/</code>' ), 0 ),
-						array( 'anchor',           sprintf( $this->T_('Current page anchor URLs (starting with %s) in brackets'), '<code>#</code>' ), 1 ),
-						array( 'cat_slugs',        $this->T_('Category slugs in brackets'), 1 ),
-						array( 'item_slugs',       $this->T_('Item slugs in brackets'), 1 ),
-						array( 'item_id',          $this->T_('Item ID in brackets'), 1 ),
-						array( 'without_brackets', $this->T_('WikiWords without brackets'), 0 ),
+						array( 'absolute_urls',         sprintf( $this->T_('Absolute URLs (starting with %s or %s) in brackets'), '<code>http://</code>, <code>https://</code>, <code>mailto://</code>', '<code>//</code>' ), 1 ),
+						array( 'relative_urls',         sprintf( $this->T_('Relative URLs (starting with %s followed by a letter or digit) in brackets'), '<code>/</code>' ), 0 ),
+						array( 'anchor',                sprintf( $this->T_('Current page anchor URLs (starting with %s) in brackets'), '<code>#</code>' ), 1 ),
+						array( 'cat_slugs',             $this->T_('Category slugs in brackets'), 1 ),
+						array( 'item_slugs',            $this->T_('Item slugs in brackets'), 1 ),
+						array( 'item_id',               $this->T_('Item ID in brackets'), 1 ),
+						array( 'cat_without_brackets',  $this->T_('WikiWords without brackets matching category slugs'), 0 ),
+						array( 'item_without_brackets', $this->T_('WikiWords without brackets matching item slugs'), 0 ),
 					),
 				),
 			);
@@ -223,7 +224,8 @@ class shortlinks_plugin extends Plugin
 		load_funcs('locales/_charset.funcs.php');
 
 		// -------- STANDALONE WIKIWORDS -------- :
-		if( ! empty( $this->link_types['without_brackets'] ) )
+		if( ! empty( $this->link_types['cat_without_brackets'] ) ||
+		    ! empty( $this->link_types['item_without_brackets'] ) )
 		{	// Create the links from standalone WikiWords
 
 			$search_wikiwords = array();
@@ -252,8 +254,16 @@ class shortlinks_plugin extends Plugin
 				}
 
 				// Lookup all urltitles at once in DB and preload cache:
-				$ItemCache = & get_ItemCache();
-				$ItemCache->load_urltitle_array( $wikiwords );
+				if( ! empty( $this->link_types['cat_without_brackets'] ) )
+				{
+					$ChapterCache = & get_ChapterCache();
+					$ChapterCache->load_urlname_array( $wikiwords );
+				}
+				if( ! empty( $this->link_types['item_without_brackets'] ) )
+				{
+					$ItemCache = & get_ItemCache();
+					$ItemCache->load_urltitle_array( $wikiwords );
+				}
 
 				// Construct arrays for replacing wikiwords by links:
 				foreach( $wikiwords as $WikiWord => $wiki_word )
@@ -267,15 +277,19 @@ class shortlinks_plugin extends Plugin
 						/sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
 
 
-					// Find matching Item:
-					if( $Item = & $ItemCache->get_by_urltitle( $wiki_word, false, false ) )
-					{	// Item Found
-						// WikiWord
+					// Find matching Item or Chapter:
+					if( ! empty( $this->link_types['item_without_brackets'] ) &&
+					    ( $Item = & $ItemCache->get_by_urltitle( $wiki_word, false, false ) ) )
+					{	// Replace WikiWord with post permanent link if item is found:
 						$replace_links[] = '<a href="'.$Item->get_permanent_url().'">'.$Item->get( 'title' ).'</a>';
 					}
+					elseif( ! empty( $this->link_types['cat_without_brackets'] ) &&
+					        ( $Chapter = & $ChapterCache->get_by_urlname( $wiki_word, false, false ) ) )
+					{	// Replace WikiWord with category permanent link if Chapter is found:
+						$replace_links[] = '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get( 'name' ).'</a>';
+					}
 					else
-					{	// Item not found
-						// WikiWord
+					{	// Replace WikiWord with broken link if Item and Chapter are not found:
 						$replace_links[] = $this->get_broken_link( $WikiWord, $wiki_word, $WikiWord );
 					}
 				}
