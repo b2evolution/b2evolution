@@ -4270,37 +4270,6 @@ class Comment extends DataObject
 
 
 	/**
-	 * Check if comment front-office status was changed
-	 *
-	 * @return boolean false if status was not changed or neither the previous nor current status is used on front-office, true otherwise
-	 */
-	function check_frontoffice_status_changed()
-	{
-		if( !isset( $this->previous_status ) || $this->previous_status == $this->status )
-		{ // Status was not changed
-			return false;
-		}
-
-		$previous_status_permvalue = get_status_permvalue( $this->previous_status );
-		$current_status_permvalue = get_status_permvalue( $this->status );
-		$frontoffice_statuses_permvalue = get_status_permvalue( $this->get_frontoffice_statuses() );
-
-		if( $current_status_permvalue & $frontoffice_statuses_permvalue )
-		{	// Status has been changed to be displayed on front-office
-			return true;
-		}
-
-		if( $previous_status_permvalue & $frontoffice_statuses_permvalue )
-		{	// Previous status was seen on front-office, but current status is not
-			return true;
-		}
-
-		// This comment was not seen on front-office before and it is not seen on front-office now either
-		return false;
-	}
-
-
-	/**
 	 * Trigger event AfterCommentUpdate after calling parent method.
 	 *
 	 * @return boolean true on success
@@ -4326,17 +4295,22 @@ class Comment extends DataObject
 
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
-			$update_item_contents_last_updated_date = false;
 			if( isset( $dbchanges['comment_content'] ) || isset( $dbchanges['comment_renderers'] ) )
-			{ // Content is updated
+			{	// Delete a prerendered content if content or text renderers have been updated:
 				$this->delete_prerendered_content();
-				$update_item_contents_last_updated_date = true;
 			}
 
-			if( $this->may_be_seen_in_frontoffice() && $this->check_frontoffice_status_changed() )
-			{	// If comment is updated into some front-office status,
-				// Update contents last update date of the comment's post:
-				$update_item_contents_last_updated_date = true;
+			$update_item_contents_last_updated_date = false;
+			if( $this->may_be_seen_in_frontoffice() )
+			{	// Update contents last update date of the comment's post ONLY when the updated comment may be seen in frontoffice:
+				if( isset( $dbchanges['comment_content'] ) ||
+				    isset( $dbchanges['comment_rating'] ) ||
+				    isset( $dbchanges['comment_item_ID'] ) ||
+				    isset( $dbchanges['comment_status'] ) )
+				{	// AND if content, rating or parent Item have been updated
+					//     or status has been updated into some front-office status:
+					$update_item_contents_last_updated_date = true;
+				}
 			}
 
 			if( !empty( $this->previous_item_ID ) )
@@ -4346,10 +4320,6 @@ class Comment extends DataObject
 				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
 				{	// Update ONLY last touched date of previous item:
 					$previous_Item->update_last_touched_date( false, true );
-				}
-				if( $this->may_be_seen_in_frontoffice() )
-				{	// Update contents last update date of new post only if comment status is used on front-office:
-					$update_item_contents_last_updated_date = true;
 				}
 
 				// Also move all child comments to new post
