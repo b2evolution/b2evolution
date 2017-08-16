@@ -202,8 +202,8 @@ class LinkComment extends LinkOwner
 			return;
 		}
 
-		if( ! $this->Comment->is_published() )
-		{	// Don't change item contents updated date if comment is not published:
+		if( ! $this->Comment->may_be_seen_in_frontoffice() )
+		{	// Don't change item contents updated date if comment cannot be displayed on front-office:
 			return;
 		}
 
