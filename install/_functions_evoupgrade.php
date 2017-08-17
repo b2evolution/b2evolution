@@ -8509,6 +8509,73 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12330, 'Upgrading slugs table...' ) )
+	{	// part of 6.9.3-beta
+		db_add_col( 'T_slug', 'slug_cat_ID', 'INT(11) UNSIGNED AFTER slug_type' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12340, 'Upgrading categories table...' ) )
+	{	// part of 6.9.3-beta
+		db_add_col( 'T_categories', 'cat_canonical_slug_ID', 'INT(10) UNSIGNED NULL DEFAULT NULL AFTER cat_urlname' );
+
+		$cats_SQL = new SQL( 'Get urlname of all categories to move into slugs table' );
+		$cats_SQL->SELECT( 'cat_ID, cat_urlname' );
+		$cats_SQL->FROM( 'T_categories' );
+		$cats_SQL->ORDER_BY( 'cat_ID' );
+		$cats = $DB->get_assoc( $cats_SQL->get(), $cats_SQL->title );
+
+		$slug_SQL = new SQL( 'Check if slug is unique on copying from T_categories to T_slug' );
+		$slug_SQL->SELECT( 'slug_ID' );
+		$slug_SQL->FROM( 'T_slug' );
+
+		$urlname_SQL = new SQL( 'Check if cat urlname is unique on copying from T_categories to T_slug' );
+		$urlname_SQL->SELECT( 'cat_ID' );
+		$urlname_SQL->FROM( 'T_categories' );
+
+		foreach( $cats as $cat_ID => $cat_urlname )
+		{
+			$slug_SQL->WHERE( 'slug_title = '.$DB->quote( $cat_urlname ) );
+			$urlname_SQL->WHERE( 'cat_urlname = '.$DB->quote( $cat_urlname ) );
+			$urlname_SQL->WHERE_and( 'cat_ID != '.$cat_ID );
+
+			if( preg_match( '#^(.+)(-\d+)$#', $cat_urlname, $cat_urlname_matches ) )
+			{	// If urlname is a format like 'urlname-1',
+				// Get first part before counter as base:
+				$cat_urlname_base = substr( $cat_urlname, 0, strlen( $cat_urlname_matches[1] ) );
+				// Get the latest number as start of unique counter:
+				$unique_counter = intval( substr( $cat_urlname_matches[2], 1 ) );
+			}
+			else
+			{	// If urlname is normal, use full urlname as base and 1 as start of unique counter:
+				$cat_urlname_base = $cat_urlname;
+				$unique_counter = 0;
+			}
+
+			while( $DB->get_var( $slug_SQL->get(), 0, NULL, $slug_SQL->title ) ||
+			       $DB->get_var( $urlname_SQL->get(), 0, NULL, $urlname_SQL->title ) )
+			{	// Search unique urlname for category before inserting into T_slug:
+				$unique_counter++;
+				$cat_urlname = $cat_urlname_base.'-'.$unique_counter;
+
+				$slug_SQL->WHERE( 'slug_title = '.$DB->quote( $cat_urlname ) );
+				$urlname_SQL->WHERE( 'cat_urlname = '.$DB->quote( $cat_urlname ) );
+				$urlname_SQL->WHERE_and( 'cat_ID != '.$cat_ID );
+			}
+
+			// Insert new slug record for the category:
+			$DB->query( 'INSERT INTO T_slug ( slug_title, slug_type, slug_cat_ID )
+				VALUES ( '.$DB->quote( $cat_urlname ).', "cat", '.$cat_ID.' )' );
+			// Update urlname with new unique value and set new inserted canonical slug ID for the category:
+			$DB->query( 'UPDATE T_categories
+				  SET cat_canonical_slug_ID = '.$DB->insert_id.',
+				      cat_urlname = '.$DB->quote( $cat_urlname ).'
+				WHERE cat_ID = '.$cat_ID );
+		}
+
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

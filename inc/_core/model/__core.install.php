@@ -430,12 +430,13 @@ $schema_queries = array(
 	'T_slug' => array(
 		'Creating table for slugs',
 		"CREATE TABLE T_slug (
-			slug_ID int(10) unsigned NOT NULL auto_increment,
-			slug_title varchar(255) COLLATE ascii_bin NOT NULL,
-			slug_type	char(6) COLLATE ascii_bin NOT NULL DEFAULT 'item',
-			slug_itm_ID	int(11) unsigned,
+			slug_ID     INT(10) UNSIGNED NOT NULL auto_increment,
+			slug_title  VARCHAR(255) COLLATE ascii_bin NOT NULL,
+			slug_type   CHAR(6) COLLATE ascii_bin NOT NULL DEFAULT 'item',
+			slug_cat_ID INT(11) UNSIGNED,
+			slug_itm_ID INT(11) UNSIGNED,
 			PRIMARY KEY slug_ID (slug_ID),
-			UNIQUE	slug_title (slug_title)
+			UNIQUE      slug_title (slug_title)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_email__log' => array(
