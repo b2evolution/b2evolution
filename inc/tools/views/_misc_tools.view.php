@@ -16,6 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $Plugins, $template_action, $admin_url;
+global $deferred_AdminToolActions;
 
 $block_item_Widget = new Widget( 'block_item' );
 
@@ -85,12 +86,20 @@ if( !empty( $template_action ) )
 			// Upgrade DB to UTF-8
 			db_upgrade_to_utf8_ascii();
 			break;
+
+		case 'deferred_admin_tool_action':
+			foreach( $deferred_AdminToolActions as $plugin_ID => $method )
+			{
+				$plugin_params = array();
+				$Plugins->call_method( $plugin_ID, $method, $plugin_params );
+			}
+			break;
 	}
 	$block_item_Widget->disp_template_raw( 'block_end' );
 }
 
 
-if( $current_User->check_perm( 'users', 'edit' ) )
+if( $current_User->check_perm( 'users', 'edit' ) && empty( $action ) )
 { // Setting to lock system
 	global $Settings;
 
@@ -118,51 +127,65 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 }
 
 // TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
-if( $current_User->check_perm('options', 'edit') )
+if( $current_User->check_perm( 'options', 'edit' ) )
 { // default admin actions:
 	global $Settings;
 
-	$block_item_Widget->title = T_('Cache management');
-	// dh> TODO: add link to delete all caches at once?
-	$block_item_Widget->disp_template_replaced( 'block_start' );
-	echo '<ul>';
-	echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache&amp;'.url_crumb('tools')).'">'.T_('Clear pre-rendered item cache (DB)').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=del_commentprecache&amp;'.url_crumb('tools')).'">'.T_('Clear pre-rendered comment cache (DB)').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=del_messageprecache&amp;'.url_crumb('tools')).'">'.T_('Clear pre-rendered message cache (DB)').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=del_filecache&amp;'.url_crumb('tools')).'">'.T_('Clear thumbnail caches (?evocache directories)').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache&amp;'.url_crumb('tools')).'">'.T_('Clear full page caches (/cache/* directories)').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=repair_cache&amp;'.url_crumb('tools')).'">'.T_('Repair /cache/* directory structure').'</a></li>';
-	echo '</ul>';
-	$block_item_Widget->disp_template_raw( 'block_end' );
+	$cache_management_actions = array( 'del_itemprecache', 'del_commentprecache', 'del_messageprecache', 'del_filecache', 'del_pagecache', 'repair_cache' );
+	if( empty( $action ) || in_array( $action, $cache_management_actions ) )
+	{
+		$block_item_Widget->title = T_('Cache management');
+		// dh> TODO: add link to delete all caches at once?
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+		echo '<ul>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=del_itemprecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear pre-rendered item cache (DB)').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=del_commentprecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear pre-rendered comment cache (DB)').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=del_messageprecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear pre-rendered message cache (DB)').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=del_filecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear thumbnail caches (?evocache directories)').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=del_pagecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear full page caches (/cache/* directories)').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=repair_cache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Repair /cache/* directory structure').'</a></li>';
+		echo '</ul>';
+		$block_item_Widget->disp_template_raw( 'block_end' );
+	}
 
-	$block_item_Widget->title = T_('Database management');
-	$block_item_Widget->disp_template_replaced( 'block_start' );
-	echo '<ul>';
-	echo '<li><a href="'.regenerate_url('action', 'action=check_tables&amp;'.url_crumb('tools')).'">'.T_('CHECK database tables').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=optimize_tables&amp;'.url_crumb('tools')).'">'.T_('OPTIMIZE database tables').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=analyze_tables&amp;'.url_crumb('tools')).'">'.T_('ANALYZE database tables').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=utf8check&amp;'.url_crumb('tools')).'">'.T_('Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)').'</a></li>';
-	// echo '<li><a href="'.regenerate_url('action', 'action=backup_db').'">'.T_('Backup database').'</a></li>';
-	echo '</ul>';
-	$block_item_Widget->disp_template_raw( 'block_end' );
+	$database_management_actions = array( 'check_tables', 'optimize_tables', 'analyze_tables', 'utf8check' );
+	if( empty( $action ) || in_array( $action, $database_management_actions ) )
+	{
+		$block_item_Widget->title = T_('Database management');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+		echo '<ul>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=check_tables&amp;'.url_crumb( 'tools' ) ).'">'.T_('CHECK database tables').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=optimize_tables&amp;'.url_crumb( 'tools' ) ).'">'.T_('OPTIMIZE database tables').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=analyze_tables&amp;'.url_crumb( 'tools' ) ).'">'.T_('ANALYZE database tables').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=utf8check&amp;'.url_crumb( 'tools' ) ).'">'.T_('Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)').'</a></li>';
+		// echo '<li><a href="'.regenerate_url('action', 'action=backup_db').'">'.T_('Backup database').'</a></li>';
+		echo '</ul>';
+		$block_item_Widget->disp_template_raw( 'block_end' );
+	}
 
-	$block_item_Widget->title = T_('Cleanup tools');
-	$block_item_Widget->disp_template_replaced( 'block_start' );
-	echo '<ul>';
-	echo '<li><a href="'.$admin_url.'?ctrl=itemtags&amp;action=cleanup&amp;'.url_crumb('tag').'">'.T_('Find and delete all orphan Tag entries (not used anywhere) - DB only.').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_posts&amp;'.url_crumb('tools')).'">'.T_('Find all broken posts (with no matching Category) + Option to delete with related objects - DB only.').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_slugs&amp;'.url_crumb('tools')).'">'.T_('Find all broken slugs (with no matching Item) + Option to delete - DB only.').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=delete_orphan_comments&amp;'.url_crumb('tools')).'">'.T_('Find and delete all orphan Comments (with no matching Item) - Disk &amp; DB.').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=delete_orphan_comment_uploads&amp;'.url_crumb('tools')).'">'.T_('Find and delete all orphan comment Uploads - Disk &amp; DB.').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=delete_orphan_files&amp;'.url_crumb('tools')).'">'.T_('Find and delete all orphan File objects (with no matching file on disk) - DB only.').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=delete_orphan_file_roots&amp;'.url_crumb('tools')).'">'.T_('Find and delete all orphan file roots (with no matching Collection or User) and all of their content recursively - Disk &amp; DB.').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=prune_hits_sessions&amp;'.url_crumb('tools')).'">'.T_('Prune old hits &amp; sessions (includes OPTIMIZE) - DB only.').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=recreate_itemslugs&amp;'.url_crumb('tools')).'">'.T_('Recreate all item Slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but will redirect to the new ones - DB only.').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=recreate_autogenerated_excerpts&amp;'.url_crumb('tools')).'">'.T_('Recreate autogenerated excerpts - DB only.').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=convert_item_content_separators&amp;'.url_crumb('tools')).'">'.T_('Convert item content separators to [teaserbreak] and [pagebreak] - DB only.').'</a></li>';
-	echo '<li><a href="'.regenerate_url('action', 'action=delete_item_versions&amp;'.url_crumb('tools')).'">'.T_('Remove all Item version - DB only.').'</a></li>';
-	echo '</ul>';
-	$block_item_Widget->disp_template_raw( 'block_end' );
+	$cleanup_tools_actions = array( 'cleanup', 'find_broken_posts', 'find_broken_slugs', 'delete_orphan_comments', 'delete_orphan_comment_uploads',
+			'delete_orphan_files', 'delete_orphan_file_roots', 'prune_hits_sessions', 'recreate_itemslugs', 'recreate_autogenerated_excerpts',
+			'convert_item_content_separators', 'delete_item_versions' );
+	if( empty( $action ) || in_array( $action, $cleanup_tools_actions ) )
+	{
+		$block_item_Widget->title = T_('Cleanup tools');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+		echo '<ul>';
+		echo '<li><a href="'.$admin_url.'?ctrl=itemtags&amp;action=cleanup&amp;'.url_crumb( 'tag' ).'">'.T_('Find and delete all orphan Tag entries (not used anywhere) - DB only.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=find_broken_posts&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find all broken posts (with no matching Category) + Option to delete with related objects - DB only.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=find_broken_slugs&amp;'.url_crumb( 'tools')).'">'.T_('Find all broken slugs (with no matching Item) + Option to delete - DB only.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_comments&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan Comments (with no matching Item) - Disk &amp; DB.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_comment_uploads&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan comment Uploads - Disk &amp; DB.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_files&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan File objects (with no matching file on disk) - DB only.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_file_roots&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan file roots (with no matching Collection or User) and all of their content recursively - Disk &amp; DB.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=prune_hits_sessions&amp;'.url_crumb( 'tools' ) ).'">'.T_('Prune old hits &amp; sessions (includes OPTIMIZE) - DB only.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=recreate_itemslugs&amp;'.url_crumb( 'tools' ) ).'">'.T_('Recreate all item Slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but will redirect to the new ones - DB only.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=recreate_autogenerated_excerpts&amp;'.url_crumb( 'tools' ) ).'">'.T_('Recreate autogenerated excerpts - DB only.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=convert_item_content_separators&amp;'.url_crumb( 'tools' ) ).'">'.T_('Convert item content separators to [teaserbreak] and [pagebreak] - DB only.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_item_versions&amp;'.url_crumb( 'tools' ) ).'">'.T_('Remove all Item version - DB only.').'</a></li>';
+		echo '</ul>';
+		$block_item_Widget->disp_template_raw( 'block_end' );
+	}
 }
 
 // We should load GeoIP plugin here even if it is disabled now, because action 'geoip_download' may be requested
@@ -172,11 +195,14 @@ $Plugins->load_plugin_by_classname( 'geoip_plugin' );
 $tool_plugins = $Plugins->get_list_by_event( 'AdminToolPayload' );
 foreach( $tool_plugins as $loop_Plugin )
 {
-	$block_item_Widget->title = format_to_output($loop_Plugin->name);
-	$block_item_Widget->disp_template_replaced( 'block_start' );
-	$params = array();
-	$Plugins->call_method_if_active( $loop_Plugin->ID, 'AdminToolPayload', $params );
-	$block_item_Widget->disp_template_raw( 'block_end' );
+	if( empty( $action ) || ( isset( $deferred_AdminToolActions ) && isset( $deferred_AdminToolActions[intval( $loop_Plugin->ID )] ) ) )
+	{
+		$block_item_Widget->title = format_to_output( $loop_Plugin->name );
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+		$params = array();
+		$Plugins->call_method_if_active( $loop_Plugin->ID, 'AdminToolPayload', $params );
+		$block_item_Widget->disp_template_raw( 'block_end' );
+	}
 }
 
 ?>

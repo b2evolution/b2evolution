@@ -11,6 +11,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $deferred_AdminToolActions;
+
 
 load_funcs('plugins/_plugin.funcs.php');
 load_funcs('tools/model/_maintenance.funcs.php');
@@ -63,7 +65,7 @@ if( ! empty($tab) )
 $AdminUI->set_path( 'options', 'misc', !empty( $tab ) ? $tab : $tab3 );
 
 
-if( empty($tab) )
+if( empty( $tab ) )
 {	// "Main tab" actions:
 	if( param( 'action', 'string', '' ) )
 	{
@@ -74,7 +76,7 @@ if( empty($tab) )
 		$current_User->check_perm('options', 'edit', true);
 	}
 
-	set_max_execution_time(0);
+	set_max_execution_time( 0 );
 
 	$Plugins->trigger_event( 'AdminToolAction' );
 
@@ -428,8 +430,7 @@ $AdminUI->disp_body_top();
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-
-if( empty($tab) )
+if( empty( $tab ) )
 {
 	switch( $action )
 	{
