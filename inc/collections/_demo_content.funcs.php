@@ -289,6 +289,14 @@ function create_user( $params = array() )
 			'fields'    => NULL, // array of additional user fields
 		), $params );
 
+	$GroupCache = & get_GroupCache();
+	$Group = $GroupCache->get_by_ID( $params['group_ID'], false, false );
+	if( ! $Group )
+	{
+		$Messages->add( sprintf( T_('Cannot create demo user "%s" because User Group #%d was not found.'), $params['login'], $params['group_ID'] ), 'error' );
+		return false;
+	}
+
 	$User = new User();
 	$User->set( 'login', $params['login'] );
 	$User->set( 'firstname', $params['firstname'] );
@@ -303,18 +311,8 @@ function create_user( $params = array() )
 		$User->set( 'ctry_ID', $params['ctry_ID'] );
 	}
 	$User->set( 'gender', $params['gender'] );
+	$User->set_Group( $Group );
 	$User->set_datecreated( $timestamp++ );
-
-	$GroupCache = & get_GroupCache();
-	if( $Group = $GroupCache->get_by_ID( $params['group_ID'], false, false ) )
-	{
-		$User->set_Group( $Group );
-	}
-	else
-	{
-		$Messages->add( sprintf( T_('Cannot create demo user "%s" because User Group #%d was not found.'), $params['login'], $params['group_ID'] ), 'error' );
-		return false;
-	}
 
 	if( ! $User->dbinsert( false ) )
 	{ // Don't continue if user creating has been failed
