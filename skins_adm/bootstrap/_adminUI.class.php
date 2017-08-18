@@ -572,6 +572,26 @@ class AdminUI extends AdminUI_general
 					'radio_oneline_end'      => "</label>\n",
 				);
 
+			case 'accordion_form':
+				return array_merge( $this->get_template( 'Form' ), array(
+						'layout'         => 'accordion',
+						'group_begin'    => '<div class="panel-group accordion-caret $group_class$" role="tablist" aria-multiselectable="true" $group_attribs$>',
+						'group_end'      => '</div>',
+						'fieldset_title' => '<a class="accordion-toggler collapsed" data-toggle="collapse" data-parent="#$group_ID$" href="#$group_item_ID$" aria-expanded="false" aria-controls="$group_item_ID$">$fieldset_title$</a>',
+						'fieldset_begin' =>
+							'<div class="panel panel-default $class$" id="fieldset_wrapper_$id$" $fieldset_attribs$>'."\n"
+								.'<div class="panel-heading" $title_attribs$>'
+									.'<h3 class="panel-title">$fieldset_title$</h3>'
+								.'</div>'."\n"
+								.'<div id="$group_item_id$" class="panel-collapse collapse">'
+									.'<div class="panel-body $class$">'."\n",
+						'fieldset_end'   =>
+									 '</div>' // End of <div class="panel-body...>
+								.'</div>' // End of <div id="$group_item_id$...>
+							.'</div>'."\n", // End of <div class="panel panel-default...>
+					
+					) );
+
 			case 'linespan_form':
 				// Linespan form:
 				return array(

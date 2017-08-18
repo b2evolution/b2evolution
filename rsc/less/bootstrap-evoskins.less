@@ -54,6 +54,10 @@ ul, ol {
 	padding: 0;
 }
 
+.text-normal {
+	font-weight: normal;
+}
+
 // Use yellow color on hover table rows intead of grey standard color:
 .table-hover > tbody > tr:hover {
 	background-color: #ffc;
@@ -978,5 +982,22 @@ div.edit_toolbars, div.message_toolbars {
 	// .widget_core_flag_menu_link
 	.evo_widget[class$=_menu_link] a.btn {
 		width: 100%;
+	}
+}
+
+// Grouped form fieldsets with bootstrap js accordion toggle behavior:
+.accordion-caret {
+	.accordion-toggler {
+		&:before {
+			padding-right: 3px;
+			font-size: 14px;
+			font-family: FontAwesome;
+		}
+		&:not(.collapsed):before {
+			content: '\f0d7';
+		}
+		&.collapsed:before {
+			content: '\f0da';
+		}
 	}
 }
