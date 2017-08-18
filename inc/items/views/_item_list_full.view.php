@@ -172,13 +172,13 @@ while( $Item = & $ItemList->get_item() )
 				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'name' ) );
 
 				// Last touched date:
-				echo ' &dash; '.T_('Last touched').': '
-					.mysql2date( locale_datefmt().' @ '.locale_shorttimefmt(), $Item->get( 'last_touched_ts' ) );
+				echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
+					.mysql2date( locale_datefmt().' @ '.locale_shorttimefmt(), $Item->get( 'last_touched_ts' ) ).'</span>';
 
 				// Contents updated date:
-				echo ' &dash; '.T_('Contents updated').': '
+				echo ' <span class="text-nowrap">&middot; '.T_('Contents updated').': '
 					.mysql2date( locale_datefmt().' @ '.locale_shorttimefmt(), $Item->get( 'contents_last_updated_ts' ) )
-					.$Item->get_refresh_contents_last_updated_link();
+					.$Item->get_refresh_contents_last_updated_link().'</span>';
 
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );

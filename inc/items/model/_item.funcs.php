@@ -3384,6 +3384,10 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
 			echo '</span>';
 
+			// Last touched date:
+			echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
+				.mysql2date( locale_datefmt().' @ '.locale_shorttimefmt(), $Comment->get( 'last_touched_ts' ) ).'</span>';
+
 			echo '</div>';
 			echo '<div style="padding-top:3px">';
 			if( $is_expired )
