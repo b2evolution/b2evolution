@@ -1680,7 +1680,7 @@ function create_demo_contents()
 	{ // Install Tracker blog
 		$timeshift += 86400;
 		task_begin( 'Creating Tracker collection...' );
-		create_demo_collection( 'group', $admin_user->ID, $create_demo_users, $timeshift );
+		create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift );
 		update_install_progress_bar();
 		task_end();
 	}
