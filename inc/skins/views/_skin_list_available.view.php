@@ -192,22 +192,31 @@ foreach( $skin_folders as $skin_folder )
 		}
 
 		$redirect_to_after_install = $redirect_to;
-		$skin_compatible = ( empty( $kind ) || $folder_Skin->type == 'normal' || $folder_Skin->type == 'rwd' );
+		$skin_compatible = in_array( $folder_Skin->type, array( 'normal', 'feed', 'sitemap', 'mobile', 'tablet' ) );
 		if( ! empty( $kind ) && $skin_compatible )
 		{ // If we are installing skin for a new collection we're currently creating:
 			$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$kind.'&skin_ID=$skin_ID$';
 		}
 
-		$disp_params = array(
-			'function'        => 'install',
-			'function_url'    => $admin_url.'?ctrl=skins&amp;action=create&amp;tab='.get_param( 'tab' )
-			                     .( empty( $blog ) ? '' : '&amp;blog='.$blog )
-			                     .( empty( $skin_type ) ? '' : '&amp;skin_type='.$skin_type )
-			                     .'&amp;skin_folder='.rawurlencode( $skin_folder )
-			                     .'&amp;redirect_to='.rawurlencode( $redirect_to_after_install )
-			                     .'&amp;'.url_crumb( 'skin' ),
-			'skin_compatible' => $skin_compatible,
-		);
+		if( $skin_compatible )
+		{
+			$disp_params = array(
+				'function'        => 'install',
+				'function_url'    => $admin_url.'?ctrl=skins&amp;action=create&amp;tab='.get_param( 'tab' )
+									 .( empty( $blog ) ? '' : '&amp;blog='.$blog )
+									 .'&amp;skin_folder='.rawurlencode( $skin_folder )
+									 .'&amp;redirect_to='.rawurlencode( $redirect_to_after_install )
+									 .'&amp;'.url_crumb( 'skin' )
+			);
+		}
+		else
+		{
+			$disp_params = array(
+					'function'      => 'broken',
+					'msg'           => T_('Wrong Type!'),
+					'help_info'     => sprintf( T_('The skin type %s is not supported by this version of b2evolution'), '&quot;'.$folder_Skin->type.'&quot;' )
+			);
+		}
 	}
 
 	// Display skinshot:
