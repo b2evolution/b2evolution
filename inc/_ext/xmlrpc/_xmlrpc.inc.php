@@ -2614,7 +2614,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 			xml_set_default_handler($parser, 'xmlrpc_dh');
 
 			// first error check: xml not well formed
-			if(!xml_parse($parser, $data, strlen($data) > 0))
+			if(!xml_parse($parser, $data, isset($data)))
 			{
 				// thanks to Peter Kocks <peter.kocks@baygate.com>
 				if((xml_get_current_line_number($parser)) == 1)
