@@ -9763,7 +9763,7 @@ class Item extends ItemLight
 
 		if( $params['title'] == '#' )
 		{	// Use default title
-			$params['title'] = T_('Refresh contents last updated date');
+			$params['title'] = T_('Refresh "contents last updated" timestamp!');
 		}
 
 		$params['text'] = utf8_trim( $params['text'] );

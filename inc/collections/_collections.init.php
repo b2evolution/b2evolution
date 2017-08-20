@@ -1214,7 +1214,7 @@ class collections_Module extends Module
 
 				// Run refreshing and display a message:
 				$refreshed_Item->refresh_contents_last_updated_ts();
-				$Messages->add( T_('Contents last updated date of this item has been refreshed successfully.'), 'success' );
+				$Messages->add( T_('"Contents last updated" timestamp has been refreshed.'), 'success' );
 
 				header_redirect();
 				break; // already exited here

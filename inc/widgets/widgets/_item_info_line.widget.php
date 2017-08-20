@@ -167,7 +167,7 @@ class item_info_line_Widget extends ComponentWidget
 				),
 				'contents_updated' => array(
 					'label' => T_( 'Contents last updated' ),
-					'note' => T_( 'Display date and time when item/post contents(title, content, URL or attachments) were updated' ),
+					'note' => T_( 'Display date and time when item/post contents (title, content, URL or attachments) were last updated' ),
 					'type' => 'checkbox',
 					'defaultvalue' => false
 				),
