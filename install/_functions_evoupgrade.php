@@ -8443,37 +8443,82 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12270, 'Upgrade datetime fields to timestamp type...' ) )
+	if( upg_task_start( 12270, 'Upgrade datetime fields to timestamp type in users table...' ) )
 	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_users
 			MODIFY user_created_datetime   TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 			MODIFY user_profileupdate_date TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12271, 'Upgrade datetime fields to timestamp type in cron tasks table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_cron__task
 			MODIFY ctsk_start_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12272, 'Upgrade datetime fields to timestamp type in cron logs table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_cron__log
 			MODIFY clog_realstart_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 			MODIFY clog_realstop_datetime  TIMESTAMP NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12273, 'Upgrade datetime fields to timestamp type in posts table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_items__item
 			MODIFY post_datestart    TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 			MODIFY post_datedeadline TIMESTAMP NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12274, 'Upgrade datetime fields to timestamp type in comments table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_comments
 			MODIFY comment_date TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12275, 'Upgrade datetime fields to timestamp type in post versions table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_items__version
 			MODIFY iver_edit_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12276, 'Upgrade datetime fields to timestamp type in links table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_links
 			MODIFY link_datecreated  TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 			MODIFY link_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12277, 'Upgrade datetime fields to timestamp type in message threads table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_messaging__thread
 			MODIFY thrd_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12278, 'Upgrade datetime fields to timestamp type in messages table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_messaging__message
 			MODIFY msg_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12280, 'Upgrade datetime fields to timestamp type...' ) )
+	if( upg_task_start( 12280, 'Upgrade datetime fields to timestamp type in user reports table...' ) )
 	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_users__reports
 			MODIFY urep_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12281, 'Upgrade datetime fields to timestamp type in message contacts table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_messaging__contact
 			MODIFY mct_last_contact_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		upg_task_end();
