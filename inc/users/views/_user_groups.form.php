@@ -52,7 +52,7 @@ foreach( $current_user_groups as $group_ID => $group_title )
 {
 	$group_options[] = array( 'contact_groups[]', $group_ID, $group_title, in_array( $group_ID, $active_groups ) );
 }
-$group_options[] = array( 'contact_groups[]', 'new', T_('new').': <input type="text" name="contact_group_new" class="form-control" />', false, false, '', 'contact_group_new' );
+$group_options[] = array( 'contact_groups[]', 'new', T_('new').':<br /><input type="text" name="contact_group_new" class="form-control" />', false, false, '', 'contact_group_new' );
 
 $Form->checklist( $group_options, 'contact_groups', '', false, false, array( 'wide' => true ) );
 

@@ -192,7 +192,7 @@ foreach( $skin_folders as $skin_folder )
 		}
 
 		$redirect_to_after_install = $redirect_to;
-		$skin_compatible = in_array( $folder_Skin->type, array( 'normal', 'feed', 'sitemap', 'mobile', 'tablet' ) );
+		$skin_compatible = ( empty( $kind ) || in_array( $folder_Skin->type, array( 'normal', 'feed', 'sitemap', 'mobile', 'tablet', 'rwd' ) ) );
 		if( ! empty( $kind ) && $skin_compatible )
 		{ // If we are installing skin for a new collection we're currently creating:
 			$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$kind.'&skin_ID=$skin_ID$';
@@ -203,10 +203,11 @@ foreach( $skin_folders as $skin_folder )
 			$disp_params = array(
 				'function'        => 'install',
 				'function_url'    => $admin_url.'?ctrl=skins&amp;action=create&amp;tab='.get_param( 'tab' )
-									 .( empty( $blog ) ? '' : '&amp;blog='.$blog )
-									 .'&amp;skin_folder='.rawurlencode( $skin_folder )
-									 .'&amp;redirect_to='.rawurlencode( $redirect_to_after_install )
-									 .'&amp;'.url_crumb( 'skin' )
+														.( empty( $blog ) ? '' : '&amp;blog='.$blog )
+														.( empty( $skin_type ) ? '' : '&amp;skin_type='.$skin_type )
+														.'&amp;skin_folder='.rawurlencode( $skin_folder )
+														.'&amp;redirect_to='.rawurlencode( $redirect_to_after_install )
+														.'&amp;'.url_crumb( 'skin' )
 			);
 		}
 		else
