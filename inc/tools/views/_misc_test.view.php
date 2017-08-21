@@ -62,6 +62,12 @@ if( !empty( $template_action ) )
 			tool_create_sample_hits( $days, $min_interval, $max_interval );
 			break;
 
+		case 'create_sample_basedomains':
+			// Create the base domains and display a process of creating:
+			global $num_basedomains;
+			tool_create_sample_basedomains( $num_basedomains );
+			break;
+
 		case 'create_sample_messages':
 			// Create the messages and display a process of creating
 			global $num_loops, $num_messages, $num_words, $max_users;
@@ -87,6 +93,7 @@ if( $current_User->check_perm('options', 'edit') )
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_posts&amp;'.url_crumb('tools')).'">'.T_('Create sample posts').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_users&amp;'.url_crumb('tools')).'">'.T_('Create sample users').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_hits&amp;'.url_crumb('tools')).'">'.T_('Create sample hit data').'</a></li>';
+	echo '<li><a href="'.regenerate_url('action', 'action=show_create_basedomains&amp;'.url_crumb('tools')).'">'.T_('Create sample base domains').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_messages&amp;'.url_crumb('tools')).'">'.T_('Create sample messages').'</a></li>';
 	echo '</ul>';
 	$block_item_Widget->disp_template_raw( 'block_end' );

@@ -649,14 +649,14 @@ class Skin extends DataObject
 
 		//
 		echo '<div class="legend">';
-		if( isset( $disp_params[ 'function' ] ) )
+		if( isset( $disp_params['function'] ) )
 		{
 			echo '<div class="actions">';
-			switch( $disp_params[ 'function' ] )
+			switch( $disp_params['function'] )
 			{
 				case 'broken':
 					echo '<span class="text-danger">';
-					if( !empty($disp_params[ 'msg' ]) )
+					if( ! empty( $disp_params['msg'] ) )
 					{
 						echo $disp_params[ 'msg' ];
 					}
@@ -665,31 +665,24 @@ class Skin extends DataObject
 						echo T_('Broken.');
 					}
 					echo '</span>';
+
+					if( ! empty( $disp_params['help_info'] ) )
+					{
+						echo ' '.get_icon( 'help', 'imgtag', array( 'title' => $disp_params['help_info'] ) );
+					}
 					break;
 
 				case 'install':
 					// Display a link to install the skin
-					if( $disp_params[ 'skin_compatible' ] )
-					{ // If skin is compatible for current selected type
-						if( ! empty( $skin_url ) )
-						{
-							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
-							echo T_('Install NOW!').'</a>';
-						}
-						if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
-						{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
-							$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
-							$skin_name_after = '</label>';
-						}
+					if( ! empty( $skin_url ) )
+					{
+						echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
+						echo T_('Install NOW!').'</a>';
 					}
-					else
-					{ // Inform about skin type is wrong for current case
-						if( ! empty( $skin_url ) )
-						{
-							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'" class="red">';
-							echo T_('Wrong Type!').'</a> ';
-						}
-						echo get_icon( 'help', 'imgtag', array( 'title' => T_('This skin does not fit the blog type you are trying to create.') ) );
+					if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
+					{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
+						$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
+						$skin_name_after = '</label>';
 					}
 					break;
 

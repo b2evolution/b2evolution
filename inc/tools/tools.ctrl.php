@@ -330,6 +330,20 @@ if( empty( $tab ) )
 			$template_action = 'create_sample_hits';
 			break;
 
+		case 'create_sample_basedomains':
+			// Create sample base domains:
+			$num_basedomains = param( 'num_basedomains', 'string', 0 );
+
+			if( ! param_check_number( 'num_basedomains', T_('"How many base domains" field must be a number'), true ) )
+			{	// Stop action because of param error:
+				$action = 'show_create_basedomains';
+				break;
+			}
+
+			// Execute a creating of base domains inside template in order to see a process:
+			$template_action = 'create_sample_basedomains';
+			break;
+
 		case 'create_sample_messages':
 			$num_loops = param( 'num_loops', 'string', 0 );
 			$num_messages = param( 'num_messages', 'string', 0 );
@@ -453,7 +467,6 @@ if( empty( $tab ) )
 		case 'show_create_posts':
 			$AdminUI->disp_view( 'tools/views/_create_posts.form.php' );
 			break;
-			break;
 
 		case 'show_create_users':
 			$AdminUI->disp_view( 'tools/views/_create_users.form.php' );
@@ -461,6 +474,10 @@ if( empty( $tab ) )
 
 		case 'show_create_hits':
 			$AdminUI->disp_view( 'tools/views/_create_test_hit.form.php' );
+			break;
+
+		case 'show_create_basedomains':
+			$AdminUI->disp_view( 'tools/views/_create_basedomains.form.php' );
 			break;
 
 		case 'show_create_messages':
