@@ -421,7 +421,7 @@ class tinymce_plugin extends Plugin
 									+ '</form>',
 									'500px', '', true,
 									'<span class="text-danger"><?php echo TS_('WARNING');?></span>',
-									[ '<?php echo TS_('OK');?>', 'btn-primary' ] );
+									[ '<?php echo TS_('OK');?>', 'btn-primary' ], true );
 							}
 							else
 							{
