@@ -195,7 +195,7 @@ function closeModalWindow( document_obj )
 		document_obj = window.document;
 	}
 
-	jQuery( '#modal_window', document_obj ).remove();
+	jQuery( '#modal_window', document_obj ).modal( 'hide' );
 
 	return false;
 }
