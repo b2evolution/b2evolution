@@ -62,7 +62,7 @@ $ItemList->filter_area = array(
 */
 
 
-$ItemList->title = T_('Task list');
+$ItemList->title = T_('Task list').get_manual_link( 'task-list' );
 
 $ItemList->cols[] = array(
 						'th' => /* TRANS: abbrev for Priority */ T_('Priority'),

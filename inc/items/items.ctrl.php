@@ -1762,10 +1762,14 @@ switch( $action )
 						) );
 				}
 
-				$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $edited_Item->get_permanent_url(),
-						' '.T_('Permalink'), 4, 3, array(
-								'style' => 'margin-right: 3ex',
-						) );
+				$item_permanent_url = $edited_Item->get_permanent_url( '', '', '&amp;', array( 'none' ) );
+				if( $item_permanent_url !== false )
+				{	// Display item permanent URL only if permanent type is not 'none':
+					$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $item_permanent_url,
+							' '.T_('Permalink'), 4, 3, array(
+									'style' => 'margin-right: 3ex',
+							) );
+				}
 
 				$edited_item_url = $edited_Item->get_copy_url();
 				if( ! empty( $edited_item_url ) )
@@ -1967,12 +1971,21 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'mass-edit-screen' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'browse-edit-tab' );
+		switch( get_param( 'tab' ) )
+		{
+			case 'tracker':
+				$AdminUI->set_page_manual_link( 'task-list' );
+				break;
+			case 'manual':
+				$AdminUI->set_page_manual_link( 'manual-pages-editor' );
+				break;
+			case 'type':
+				$AdminUI->set_page_manual_link( $tab_type.'-list' );
+				break;
+			default:
+				$AdminUI->set_page_manual_link( 'browse-edit-tab' );
+		}
 		break;
-}
-if( get_param( 'tab' ) == 'manual' )
-{
-	$AdminUI->set_page_manual_link( 'manual-pages-editor' );
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

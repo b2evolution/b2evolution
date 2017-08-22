@@ -55,8 +55,10 @@ load_funcs( 'skins/_skin.funcs.php' );
 $Widget = new Widget();
 $template = $AdminUI->get_template( 'side_item' );
 
-$Widget->title = format_to_output( $Blog->get_maxlen_name( 22 ), 'htmlbody' );
-echo $Widget->replace_vars( $template['block_start'] );
+if( get_param( 'tab_type' ) == 'post' )
+{
+	$Widget->title = format_to_output( $Blog->get_maxlen_name( 22 ), 'htmlbody' );
+	echo $Widget->replace_vars( $template['block_start'] );
 
 	// CALENDAR:
 	// Call the Calendar plugin:
@@ -68,7 +70,8 @@ echo $Widget->replace_vars( $template['block_start'] );
 			'itemlist_prefix' => $pp        // Prefix of the ItemList object
 		) );
 
-echo $template['block_end'];
+	echo $template['block_end'];
+}
 
 $Widget = new Widget();
 $Widget->title = T_('Filters');
