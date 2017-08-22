@@ -1305,15 +1305,15 @@ class _core_Module extends Module
 					if( $Blog->get( 'type' ) == 'manual' )
 					{ // Manual view
 						global $cat, $Item;
-						if( ! empty( $cat ) && is_number( $cat ) )
-						{	// Set category param from current selected category:
-							$manual_view_cat_param = '&amp;cat_ID='.$cat;
-						}
-						elseif( ! empty( $Item ) &&
+						if( ! empty( $Item ) &&
 						        $Item->ID > 0 &&
 						        ( $item_Chapter = & $Item->get_main_Chapter() ) )
 						{	// Set category param from current selected item/post:
-							$manual_view_cat_param = '&amp;cat_ID='.$item_Chapter->ID;
+							$manual_view_cat_param = '&amp;cat_ID='.$item_Chapter->ID.'&amp;highlight_id='.$Item->ID;
+						}
+						elseif( ! empty( $cat ) && is_number( $cat ) )
+						{	// Set category param from current selected category:
+							$manual_view_cat_param = '&amp;cat_ID='.$cat.'&amp;highlight_cat_id='.$cat;
 						}
 						else
 						{	// No selected category and item/post:

@@ -1078,6 +1078,7 @@ switch( $action )
 		{ // Use original $redirect_to:
 			// Set highlight:
 			$Session->set( 'highlight_id', $edited_Item->ID );
+			$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 			$redirect_to = url_add_param( $redirect_to, 'highlight_id='.$edited_Item->ID, '&' );
 		}
 		else

@@ -58,11 +58,14 @@ function cat_line( $Chapter, $level )
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
+	// Check if current item's row should be highlighted:
+	$is_highlighted = ( param( 'highlight_id', 'integer', NULL ) == $Chapter->ID ) ||
+		( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) );
+
 	// ID
 	$r = '<tr id="tr-'.$Chapter->ID.'"class="'.$line_class.
 					' chapter_parent_'.( $Chapter->parent_ID ? $Chapter->parent_ID : '0' ).
-					// Fadeout?
-					( isset($result_fadeout) && in_array( $Chapter->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">
+					( $is_highlighted ? ' evo_highlight' : '' ).'">
 					<td class="firstcol shrinkwrap">'.
 						$Chapter->ID.'
 				</td>';
