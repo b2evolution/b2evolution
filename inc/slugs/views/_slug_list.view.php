@@ -21,8 +21,10 @@ global $Sug, $current_User, $admin_url;
 
 $SQL = new SQL();
 
-$SQL->SELECT( '*, post_title AS target_title' ); // select target_title for sorting
-$SQL->FROM( 'T_slug LEFT OUTER JOIN T_items__item ON slug_itm_ID = post_ID' );
+$SQL->SELECT( '*, IFNULL( post_title, cat_name ) AS target_title' ); // select target_title for sorting
+$SQL->FROM( 'T_slug' );
+$SQL->FROM_add( 'LEFT OUTER JOIN T_categories ON slug_cat_ID = cat_ID' );
+$SQL->FROM_add( 'LEFT OUTER JOIN T_items__item ON slug_itm_ID = post_ID' );
 
 // filters
 $list_is_filtered = false;
@@ -123,20 +125,19 @@ $Results->cols[] = array(
  */
 function get_target_ID( $Slug )
 {
-	switch( $Slug->type )
+	switch( $Slug->get( 'type' ) )
 	{
+		case 'cat':
+			return $Slug->get( 'cat_ID' );
+			break;
+
 		case 'item':
-			$r = $Slug->itm_ID;
+			return $Slug->get( 'itm_ID' );
 			break;
 
 		default:
-			$r = 'n.a.';
+			return T_('n.a.');
 	}
-
-	if( is_null($r) )
-		$r = 'null';
-
-	return $r;
 }
 $Results->cols[] = array(
 			'th' => T_('Target'),
@@ -160,8 +161,9 @@ function get_target_coll( $Slug )
 	*/
 	global $current_User;
 
-	switch( $Slug->type )
+	switch( $Slug->get( 'type' ) )
 	{
+		case 'cat':
 		case 'item':
 		// case other: (add here)
 			$target = & $Slug->get_object();
@@ -172,8 +174,12 @@ function get_target_coll( $Slug )
 
 			$allow_edit = false;
 			$allow_view = false;
-			switch( $Slug->get( 'type') )
+			switch( $Slug->get( 'type' ) )
 			{
+				case 'cat':
+					$allow_view = $allow_edit = $current_User->check_perm( 'blog_cats', '', false, $target->get( 'blog_ID' ) );
+					break;
+
 				case 'item':
 					$allow_edit = $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $target );
 					$allow_view = $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $target );
@@ -195,12 +201,12 @@ function get_target_coll( $Slug )
 			}
 			else
 			{ // Display just the title (If there is no object title need to change this)
-				$coll .= ' '.$target->get( 'title' );
+				$coll .= ' '.$Slug->get_object_title();
 			}
 			return $coll;//'<a href="'.$target->get_single_url().'">'.$target->dget('title').'</a>';
 
 		default:
-			return 'n.a.';
+			return T_('n.a.');
 	}
 }
 $Results->cols[] = array(

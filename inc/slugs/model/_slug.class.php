@@ -161,9 +161,9 @@ class Slug extends DataObject
 	{
 		if( $object = $this->get_object() )
 		{
-			if( ! isset($link_text ) )
+			if( ! isset( $link_text ) )
 			{ // link_text is not set -> get object title for link text
-				$link_text = $object->get( 'title' );
+				$link_text = $this->get_object_title();
 			}
 			// get respective url
 			$link_url = $this->get_url_to_object( $type );
@@ -211,6 +211,29 @@ class Slug extends DataObject
 
 
 	/**
+	 * Get title of current object
+	 *
+	 * @return string
+	 */
+	function get_object_title()
+	{
+		if( ! ( $object = & $this->get_object() ) )
+		{	// No object:
+			return '';
+		}
+
+		switch( $this->get( 'type' ) )
+		{
+			case 'cat':
+				return $object->get( 'name' );
+
+			case 'item':
+				return $object->get( 'title' );
+		}
+	}
+
+
+	/**
 	 * Get link to restricted object
 	 *
 	 * Used when try to delete a slug, which is another object slug
@@ -247,11 +270,13 @@ class Slug extends DataObject
 
 		switch( $this->type )
 		{ // can be different type of object
+			case 'cat':
+				$ChapterCache = & get_ChapterCache();
+				return $ChapterCache->get_by_ID( $this->get( 'cat_ID' ), false, false );
+
 			case 'item':
-				// TODO: dh> should use ItemCache altogether
-				// was: $object_query = 'SELECT post_ID, post_title FROM T_items__item WHERE '.$fk.' = '.$this->ID;
 				$ItemCache = & get_ItemCache();
-				return $ItemCache->get_by_ID( $this->itm_ID, false, false );
+				return $ItemCache->get_by_ID( $this->get( 'itm_ID' ), false, false );
 
 			case 'help':
 				return false;

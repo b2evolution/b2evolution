@@ -36,11 +36,12 @@ $Form->begin_form( 'fform', $creating ?  T_('New Slug') . get_manual_link('slug-
 	$Form->text_input( 'slug_title', $edited_Slug->get( 'title' ), 50, T_('Slug'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
 	$Form->radio_input( 'slug_type', $creating ? 'item' : $edited_Slug->get( 'type' ), array(
+						array( 'value' => 'cat',  'label' => T_( 'Category' ) ),
 						array( 'value' => 'item', 'label' => T_( 'Item' ) ),
 						array( 'value' => 'help', 'label' => T_( 'Help' ) ) ),
 						T_('Type'), array( 'lines' => 1 ) );
 
-	$Form->text_input( 'slug_object_ID', $edited_Slug->get( 'itm_ID' ), 50, T_('Object ID'), '', array( 'maxlength'=> 11, 'required'=>false ) );
+	$Form->text_input( 'slug_object_ID', ( $edited_Slug->get( 'type' ) == 'cat' ? $edited_Slug->get( 'cat_ID' ) : $edited_Slug->get( 'itm_ID' ) ), 50, T_('Object ID'), '', array( 'maxlength'=> 11, 'required'=>false ) );
 
 $Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 

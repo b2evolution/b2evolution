@@ -967,6 +967,40 @@ class Chapter extends DataObject
 
 		return false;
 	}
+
+
+	/**
+	 * Get an url to this Chapter
+	 *
+	 * @param string values:
+	 * 		- 'admin_view': url to this Chapter admin interface view
+	 * 		- 'public_view': url to this Chapter public interface view (permanent url)
+	 * 		- 'edit': url to this Chapter edit screen
+	 * @return string the url if exists, empty string otherwise
+	 */
+	function get_url( $type )
+	{
+		if( empty( $this->ID ) )
+		{	// If Chapter doesn't exist in DB yet:
+			return '';
+		}
+
+		switch( $type )
+		{
+			case 'admin_view':
+				global $admin_url;
+				return $admin_url.'?ctrl=chapters&amp;action=edit&amp;blog='.$this->get( 'blog_ID' ).'&amp;cat_ID='.$this->ID;
+
+			case 'public_view':
+				return $this->get_permanent_url();
+
+			case 'edit':
+				return $this->get_edit_url();
+
+			default:
+				return '';
+		}
+	}
 }
 
 ?>
