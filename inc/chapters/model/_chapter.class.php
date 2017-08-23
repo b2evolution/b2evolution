@@ -55,6 +55,7 @@ class Chapter extends DataObject
 	var $Blog;
 
 	var $urlname;
+	var $canonical_slug_ID;
 	var $description;
 	var $order;
 	var $meta;
@@ -113,6 +114,7 @@ class Chapter extends DataObject
 			$this->blog_ID = $db_row->cat_blog_ID;
 			$this->image_file_ID = $db_row->cat_image_file_ID;
 			$this->urlname = $db_row->cat_urlname;
+			$this->canonical_slug_ID = $db_row->cat_canonical_slug_ID;
 			$this->description = $db_row->cat_description;
 			$this->order = $db_row->cat_order;
 			$this->subcat_ordering = $db_row->cat_subcat_ordering;
@@ -556,12 +558,16 @@ class Chapter extends DataObject
 		$DB->begin( 'SERIALIZABLE' );
 
 		// validate url title / slug
-		$this->set( 'urlname', urltitle_validate( $this->urlname, $this->name, $this->ID, false, $this->dbprefix.'urlname', $this->dbIDname, $this->dbtablename) );
+		$this->set( 'urlname', urltitle_validate( $this->urlname, $this->name, $this->ID, false, 'slug_title', 'slug_cat_ID', 'T_slug' ) );
 
 		$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
 
 		if( parent::dbinsert() )
-		{ // The chapter was inserted successful
+		{	// The chapter was inserted successful
+
+			// Update chapter slug:
+			$this->update_slug();
+
 			$DB->commit();
 			return true;
 		}
@@ -574,9 +580,10 @@ class Chapter extends DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
+	 * @param boolean TRUE to update slug
 	 * @return boolean true on success
 	 */
-	function dbupdate()
+	function dbupdate( $update_slug = true )
 	{
 		global $DB;
 
@@ -584,9 +591,9 @@ class Chapter extends DataObject
 		$DB->begin( 'SERIALIZABLE' );
 
 		// validate url title / slug
-		if( empty($this->urlname) || isset($this->dbchanges['cat_urlname']) )
-		{ // Url title has changed or is empty
-			$this->set( 'urlname', urltitle_validate( $this->urlname, $this->name, $this->ID, false, $this->dbprefix.'urlname', $this->dbIDname, $this->dbtablename) );
+		if( empty( $this->urlname ) || isset( $this->dbchanges['cat_urlname'] ) )
+		{	// Url title has been changed or empty value has been submitted to set automatical slug:
+			$this->set( 'urlname', urltitle_validate( $this->urlname, $this->name, $this->ID, false, 'slug_title', 'slug_cat_ID', 'T_slug' ) );
 		}
 
 		if( count( $this->dbchanges ) > 0 && !isset( $this->dbchanges['last_touched_ts'] ) )
@@ -599,6 +606,11 @@ class Chapter extends DataObject
 		{ // The update was unsuccessful
 			$DB->rollback();
 			return false;
+		}
+
+		if( $update_slug )
+		{	// Update chapter slug:
+			$this->update_slug();
 		}
 
 		// The chapter was updated successful
@@ -916,6 +928,44 @@ class Chapter extends DataObject
 				'',
 				$params['size_x'],
 				$params['tag_size'] );
+	}
+
+
+	/**
+	 * Update slug or create new if it doesn't exist yet
+	 *
+	 * @return boolean TRUE on success, FALSE on failure
+	 */
+	function update_slug()
+	{
+		if( empty( $this->ID ) )
+		{	// If chapter isn't created:
+			debug_die( 'Chapter must be inserted in DB before slug updating!' );
+		}
+
+		$SlugCache = & get_SlugCache();
+		if( ! ( $cat_Slug = & $SlugCache->get_by_ID( $this->get( 'canonical_slug_ID' ), false, false ) ) ||
+		    $cat_Slug->get( 'cat_ID' ) != $this->ID )
+		{	// If slug is wrong or it is not created yet in DB:
+			$cat_Slug = new Slug();
+		}
+
+		$cat_Slug->set( 'type', 'cat' );
+		$cat_Slug->set( 'cat_ID', $this->ID );
+		// urltitle_validate may modify the urltitle !!!
+		$cat_Slug->set( 'title', urltitle_validate( $this->get( 'urlname' ), $this->get( 'name' ), $this->ID, false, $cat_Slug->dbprefix.'title', $cat_Slug->dbprefix.'cat_ID', $cat_Slug->dbtablename ) );
+
+		if( $cat_Slug->dbsave() )
+		{	// If slug has been updated successfully:
+			if( $this->get( 'canonical_slug_ID' ) != $cat_Slug->ID )
+			{	// Update slug ID in categories table if new slug has been inserted:
+				$this->set( 'canonical_slug_ID', $cat_Slug->ID );
+				return $this->dbupdate( false );
+			}
+			return true;
+		}
+
+		return false;
 	}
 }
 

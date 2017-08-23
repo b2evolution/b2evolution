@@ -31,6 +31,8 @@ class Slug extends DataObject
 
 	var $itm_ID;
 
+	var $cat_ID;
+
 	/**
 	 * Constructor
 	 *
@@ -47,6 +49,7 @@ class Slug extends DataObject
 			$this->title = $db_row->slug_title;
 			$this->type = $db_row->slug_type;
 			$this->itm_ID = $db_row->slug_itm_ID;
+			$this->cat_ID = $db_row->slug_cat_ID;
 		}
 	}
 
@@ -270,11 +273,13 @@ class Slug extends DataObject
 	function dbupdate()
 	{
 		global $DB, $Messages;
-		$ItemCache = & get_ItemCache();
-		$Item = & $ItemCache->get_by_id( $this->itm_ID );
 
 		$DB->begin();
-		if( $Item->get( 'canonical_slug_ID' ) == $this->ID )
+
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_id( $this->get( 'itm_ID' ), false, false );
+
+		if( $Item && $Item->get( 'canonical_slug_ID' ) == $this->ID )
 		{
 			$Item->set( 'urltitle', $this->title );
 			if( ! $Item->dbupdate( true, false, false ) )
@@ -282,11 +287,13 @@ class Slug extends DataObject
 				$DB->rollback();
 				return false;
 			}
-			$Messages->add( sprintf(T_('Warning: this change also changed the canonical slug of the post! (%s)'), $this->get_link_to_object()), 'warning' );
+			$Messages->add( sprintf( T_('Warning: this change also changed the canonical slug of the post! (%s)'), $this->get_link_to_object() ), 'warning' );
 		}
 
 		parent::dbupdate();
+
 		$DB->commit();
+
 		return true;
 	}
 }
