@@ -4306,9 +4306,9 @@ class Comment extends DataObject
 				if( isset( $dbchanges['comment_content'] ) ||
 				    isset( $dbchanges['comment_rating'] ) ||
 				    isset( $dbchanges['comment_item_ID'] ) ||
-				    isset( $dbchanges['comment_status'] ) )
+				    ( isset( $dbchanges['comment_status'] ) && isset( $this->previous_status ) && ! $this->can_be_displayed( $this->previous_status ) ) )
 				{	// AND if content, rating or parent Item have been updated
-					//     or status has been updated into some front-office status:
+					//     or status has been updated from NOT front-office status into some front-office status:
 					$update_item_contents_last_updated_date = true;
 				}
 			}
@@ -4871,9 +4871,10 @@ class Comment extends DataObject
 	/**
 	 * Check if this comment can be displayed for current user on front-office
 	 *
+	 * @param string|NULL Status | NULL to use current status of this comment
 	 * @return boolean
 	 */
-	function can_be_displayed()
+	function can_be_displayed( $status = NULL )
 	{
 		if( empty( $this->ID ) )
 		{	// Comment is not created yet, so it cannot be displayed:
@@ -4883,7 +4884,12 @@ class Comment extends DataObject
 		// Load Item of this comment to get a collection ID:
 		$Item = & $this->get_Item();
 
-		return can_be_displayed_with_status( $this->get( 'status' ), 'comment', $Item->get_blog_ID(), $this->author_user_ID );
+		if( $status === NULL )
+		{	// Use current status of this comment:
+			$status = $this->get( 'status' );
+		}
+
+		return can_be_displayed_with_status( $status, 'comment', $Item->get_blog_ID(), $this->author_user_ID );
 	}
 
 
