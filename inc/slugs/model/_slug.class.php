@@ -122,24 +122,47 @@ class Slug extends DataObject
 		// object ID:
 		$object_id = param( 'slug_object_ID', 'string' );
 		// All DataObject ID must be a number
-		if( ! is_number( $object_id ) && $this->type != 'help' )
+		if( ! is_number( $object_id ) && $this->get( 'type' ) != 'help' )
 		{ // not a number
 			$Messages->add( T_('Object ID must be a number!'), 'error' );
 			return false;
 		}
 
-		switch( $this->type )
+		switch( $this->get( 'type' ) )
 		{
+			case 'cat':
+				// Category slug:
+				$ChapterCache = & get_ChapterCache();
+				if( $ChapterCache->get_by_ID( $object_id, false, false ) )
+				{	// Set new category ID and reset item ID to NULL:
+					$this->set( 'itm_ID', NULL, true );
+					$this->set_from_Request( 'cat_ID', 'slug_object_ID', true );
+				}
+				else
+				{	// Wrong category:
+					$Messages->add( T_('Object ID must be a valid Category ID!'), 'error' );
+				}
+				break;
+
 			case 'item':
+				// Item slug:
 				$ItemCache = & get_ItemCache();
 				if( $ItemCache->get_by_ID( $object_id, false, false ) )
-				{
+				{	// Set new item ID and reset category ID to NULL:
+					$this->set( 'cat_ID', NULL, true );
 					$this->set_from_Request( 'itm_ID', 'slug_object_ID', true );
 				}
 				else
-				{
+				{	// Wrong item:
 					$Messages->add( T_('Object ID must be a valid Post ID!'), 'error' );
 				}
+				break;
+
+			case 'help':
+				// Help slug:
+				// Reset category and item IDs to NULL:
+				$this->set( 'cat_ID', NULL, true );
+				$this->set( 'itm_ID', NULL, true );
 				break;
 		}
 
@@ -289,35 +312,118 @@ class Slug extends DataObject
 
 
 	/**
-	 * Update the DB based on previously recorded changes.
+	 * Insert object into DB based on previously recorded changes.
 	 *
-	 * @todo dh> this is very Item specific, and should get fixed probably.
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		if( ! $this->update_object() )
+		{	// Rollback if target object cannot be updated:
+			$DB->rollback();
+			return false;
+		}
+
+		if( ! parent::dbinsert() )
+		{	// Rollback if slug cannot be inserted:
+			$DB->rollback();
+			return false;
+		}
+
+		$DB->commit();
+
+		return true;
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes.
 	 *
 	 * @return boolean true on success
 	 */
 	function dbupdate()
 	{
-		global $DB, $Messages;
+		global $DB;
 
 		$DB->begin();
 
-		$ItemCache = & get_ItemCache();
-		$Item = & $ItemCache->get_by_id( $this->get( 'itm_ID' ), false, false );
-
-		if( $Item && $Item->get( 'canonical_slug_ID' ) == $this->ID )
-		{
-			$Item->set( 'urltitle', $this->title );
-			if( ! $Item->dbupdate( true, false, false ) )
-			{
-				$DB->rollback();
-				return false;
-			}
-			$Messages->add( sprintf( T_('Warning: this change also changed the canonical slug of the post! (%s)'), $this->get_link_to_object() ), 'warning' );
+		if( ! $this->update_object() )
+		{	// Rollback if target object cannot be updated:
+			$DB->rollback();
+			return false;
 		}
 
-		parent::dbupdate();
+		if( ! parent::dbupdate() )
+		{	// Rollback if slug cannot be updated:
+			$DB->rollback();
+			return false;
+		}
 
 		$DB->commit();
+
+		return true;
+	}
+
+
+	/**
+	 * Update object: Chapter or Item
+	 */
+	function update_object()
+	{
+		global $Messages;
+
+		switch( $this->get( 'type' ) )
+		{
+			case 'cat':
+				$ChapterCache = & get_ChapterCache();
+
+				if( ! ( $Chapter = & $ChapterCache->get_by_ID( $this->get( 'cat_ID' ), false, false ) ) )
+				{	// No category found:
+					$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Category') ), 'error' );
+					return false;
+				}
+
+				$Chapter->set( 'canonical_slug_ID', $this->ID );
+				$Chapter->set( 'urlname', $this->get( 'title' ) );
+				if( ! $Chapter->dbupdate( false ) )
+				{	// Failed on update:
+					$Messages->add( sprintf( T_('Could not change the canonical slug of the object (%s)'), $this->get_link_to_object() ), 'error' );
+					return false;
+				}
+
+				$Messages->add( sprintf( T_('Warning: this change also changed the canonical slug of the category! (%s)'), $this->get_link_to_object() ), 'warning' );
+				break;
+
+			case 'item':
+				$ItemCache = & get_ItemCache();
+
+				if( ! ( $Item = & $ItemCache->get_by_ID( $this->get( 'itm_ID' ), false, false ) ) )
+				{	// No item found:
+					$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Item') ), 'error' );
+					return false;
+				}
+
+				if( $Item->get( 'canonical_slug_ID' ) != $this->ID )
+				{	// Item has a different canonical slug ID,
+					// Don't update Item but don't produce an error for such case,
+					// because Item can has several slugs:
+					return true;
+				}
+
+				$Item->set( 'urltitle', $this->get( 'title' ) );
+				if( ! $Item->dbupdate( true, false, false ) )
+				{	// Failed on update:
+					$Messages->add( sprintf( T_('Could not change the canonical slug of the object (%s)'), $this->get_link_to_object() ), 'error' );
+					return false;
+				}
+
+				$Messages->add( sprintf( T_('Warning: this change also changed the canonical slug of the post! (%s)'), $this->get_link_to_object() ), 'warning' );
+				break;
+		}
 
 		return true;
 	}

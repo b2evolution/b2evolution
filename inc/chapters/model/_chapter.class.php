@@ -957,11 +957,6 @@ class Chapter extends DataObject
 
 		if( $cat_Slug->dbsave() )
 		{	// If slug has been updated successfully:
-			if( $this->get( 'canonical_slug_ID' ) != $cat_Slug->ID )
-			{	// Update slug ID in categories table if new slug has been inserted:
-				$this->set( 'canonical_slug_ID', $cat_Slug->ID );
-				return $this->dbupdate( false );
-			}
 			return true;
 		}
 
