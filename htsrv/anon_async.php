@@ -161,7 +161,7 @@ switch( $action )
 			$Ajaxlog->add( 'User: #'.$user_ID.' '.$User->login );
 
 			if( is_logged_in() &&
-			    $current_User->can_moderate_user( $User->ID ) &&
+			    ( $current_User->ID == $User->ID || $current_User->can_moderate_user( $User->ID ) ) &&
 			    $current_User->check_status( 'can_access_admin' ) &&
 			    $current_User->check_perm( 'admin', 'restricted' ) )
 			{	// Display the moderation buttons only if current user has a permission:
