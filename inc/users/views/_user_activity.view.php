@@ -27,7 +27,7 @@ global $user_tab, $user_ID;
 
 global $current_User, $UserSettings;
 
-if( !$current_User->can_moderate_user( $edited_User->ID ) )
+if( $current_User->ID != $user_ID && ! $current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
 	debug_die( T_( 'You have no permission to see this tab!' ) );
 }

@@ -2508,8 +2508,10 @@ function get_user_sub_entries( $is_admin, $user_ID )
 				$users_sub_entries['admin'] = array(
 								'text' => T_('Admin'),
 								'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=admin'.$user_param ) );
+			}
 
-				// Only users with view/edit all users permission can see the 'Sessions' & 'User Activity' tabs
+			if( $current_User->ID == $user_ID || $current_User->can_moderate_user( $user_ID ) )
+			{	// Only users with view/edit all users permission can see the 'Sessions' & 'User Activity' tabs
 				$users_sub_entries['sessions'] = array(
 									'text' => T_('Sessions'),
 									'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=sessions'.$user_param ) );
