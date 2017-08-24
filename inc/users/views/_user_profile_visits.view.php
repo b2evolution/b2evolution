@@ -37,7 +37,7 @@ user_prevnext_links( array(
 	) );
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
-if( ! $user_profile_only || $is_admin_page )
+if( $is_admin_page )
 {
 	echo '<div class="row">';
 }
@@ -51,11 +51,7 @@ if( !$user_profile_only )
 
 if( $is_admin_page )
 {
-	echo '<div class="col-xs-12 col-lg-6 col-lg-pull-6">'.get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $edited_User->ID ? T_('My Profile Visits') : T_('User Profile Visits') ).'</span>'.get_manual_link( 'profile-visits-tab' ) ).'</div>';
-}
-
-if( ! $user_profile_only || $is_admin_page )
-{
+	echo '<div class="col-xs-12 col-lg-6'.( $user_profile_only ? '' : ' col-lg-pull-6').'">'.get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $edited_User->ID ? T_('My Profile Visits') : T_('User Profile Visits') ).'</span>'.get_manual_link( 'profile-visits-tab' ) ).'</div>';
 	echo '</div>';
 }
 
