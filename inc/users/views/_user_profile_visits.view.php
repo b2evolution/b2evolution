@@ -27,11 +27,6 @@ global $user_tab, $user_ID;
 
 global $current_User, $UserSettings;
 
-if( !$current_User->can_moderate_user( $edited_User->ID ) )
-{ // Check permission:
-	debug_die( T_( 'You have no permission to see this tab!' ) );
-}
-
 
 memorize_param( 'user_tab', 'string', '', $user_tab );
 memorize_param( 'user_ID', 'integer', 0, $user_ID );
