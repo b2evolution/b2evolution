@@ -5022,6 +5022,11 @@ class User extends DataObject
 		global $DB, $UserSettings, $current_User, $servertimenow;
 		global $is_api_request;
 
+		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) )
+		{	// Only moderators can update user status:
+			return false;
+		}
+
 		if( $dbsave )
 		{ // save required
 			$DB->begin();
