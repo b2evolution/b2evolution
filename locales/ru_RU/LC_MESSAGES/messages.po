@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-08-25 17:38+0200\n"
+"POT-Creation-Date: 2017-08-25 22:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Alexander Osokin <alex.osokin@gmail.com>, 2017\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/fplanque/teams/23/ru_RU/)\n"
@@ -8370,7 +8370,7 @@ msgstr "Последние Мета Комментарии"
 
 #: ../../../inc/collections/coll_settings.ctrl.php:760
 #: ../../../inc/items/items.ctrl.php:514
-#: ../inc/items/model/_item.class.php:8719
+#: ../inc/items/model/_item.class.php:8718
 msgid "New post"
 msgstr "Новая запись"
 
@@ -13128,17 +13128,17 @@ msgid "%d prerendered content"
 msgstr "%d предобработанных содержимых"
 
 #: ../../../inc/comments/model/_comment.class.php:759
-#: ../../../inc/items/model/_item.class.php:9603
+#: ../../../inc/items/model/_item.class.php:9602
 msgid "Negative"
 msgstr "Отрицательный"
 
 #: ../../../inc/comments/model/_comment.class.php:763
-#: ../../../inc/items/model/_item.class.php:9607
+#: ../../../inc/items/model/_item.class.php:9606
 msgid "UNDECIDED"
 msgstr "НЕ ОПРЕДЕЛЁН"
 
 #: ../../../inc/comments/model/_comment.class.php:771
-#: ../../../inc/items/model/_item.class.php:9615
+#: ../../../inc/items/model/_item.class.php:9614
 msgid "Positive"
 msgstr "Положительный"
 
@@ -13238,7 +13238,7 @@ msgid "You sent a \"no opinion\" vote."
 msgstr "Вы отправили голос как \"без мнения\"."
 
 #: ../../../inc/comments/model/_comment.class.php:1924
-#: ../../../inc/items/model/_item.class.php:9346
+#: ../../../inc/items/model/_item.class.php:9345
 msgid "No user votes yet."
 msgstr "Пока нет голосов пользователей."
 
@@ -13537,18 +13537,18 @@ msgstr "[%s] Новый комментарий на \"%s\""
 msgid "[%s] Spam comment may need moderation on \"%s\""
 msgstr "[%s] Спам комментарий может нуждаться в модерации в \"%s\""
 
-#: ../../../inc/comments/model/_comment.class.php:4565
-#: ../../../inc/comments/model/_comment.class.php:4569
+#: ../../../inc/comments/model/_comment.class.php:4539
+#: ../../../inc/comments/model/_comment.class.php:4543
 #: ../../../inc/comments/model/_comment.funcs.php:898
 msgid "Reply to this comment"
 msgstr "Ответить на этот комментарий"
 
-#: ../../../inc/comments/model/_comment.class.php:4565
+#: ../../../inc/comments/model/_comment.class.php:4539
 #: ../../../inc/comments/model/_comment.funcs.php:906
 msgid "You are currently replying to this comment"
 msgstr "В настоящий момент вы отвечаете на этот комментарий"
 
-#: ../../../inc/comments/model/_comment.class.php:4873
+#: ../../../inc/comments/model/_comment.class.php:4847
 #, php-format
 msgid ""
 "Since the parent post of this comment have its visibility set to \"%s\", the"
@@ -18007,28 +18007,28 @@ msgstr ""
 "Это короткая ссылка на запись, которую вы можете использовать на Твиттере, в"
 " письмах и везьде, где длина ссылки имеет значение"
 
-#: ../../../inc/items/model/_item.class.php:8714
+#: ../../../inc/items/model/_item.class.php:8713
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:64
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:442
 #: ../../../skins/pureforums_skin/_legend.inc.php:64
 msgid "New topic"
 msgstr "Новый топик"
 
-#: ../../../inc/items/model/_item.class.php:8715
+#: ../../../inc/items/model/_item.class.php:8714
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:68
 #: ../../../skins/pureforums_skin/_legend.inc.php:68
 msgid "Updated topic"
 msgstr "Обновленный топик"
 
-#: ../../../inc/items/model/_item.class.php:8720
+#: ../../../inc/items/model/_item.class.php:8719
 msgid "Updated post"
 msgstr "Обновленная запись"
 
-#: ../../../inc/items/model/_item.class.php:8827
+#: ../../../inc/items/model/_item.class.php:8826
 msgid "Do you want to save your changes before changing the Post Type?"
 msgstr "Хотите ли вы сохранить ваши изменения до смены Типа Записи?"
 
-#: ../../../inc/items/model/_item.class.php:9090
+#: ../../../inc/items/model/_item.class.php:9089
 #, php-format
 msgid ""
 "Since this collection is \"Private\", the visibility of this post will be "
@@ -18037,7 +18037,7 @@ msgstr ""
 "Так как эта коллекция является \"Личной\", то видимость этой записи будет "
 "ограничено в \"%s\"."
 
-#: ../../../inc/items/model/_item.class.php:9094
+#: ../../../inc/items/model/_item.class.php:9093
 #, php-format
 msgid ""
 "Since this collection is \"Members only\", the visibility of this post will "
@@ -18046,7 +18046,7 @@ msgstr ""
 "Так как эта коллекция является \"Только для участников\", то видимость этой "
 "записи будет ограничено в \"%s\"."
 
-#: ../../../inc/items/model/_item.class.php:9099
+#: ../../../inc/items/model/_item.class.php:9098
 #, php-format
 msgid ""
 "Since this collection is \"Community only\", the visibility of this post "
@@ -18055,58 +18055,58 @@ msgstr ""
 "Так как эта коллекция является \"Только для сообщества\", то видимость этой "
 "записи будет ограничено в \"%s\"."
 
-#: ../../../inc/items/model/_item.class.php:9200
+#: ../../../inc/items/model/_item.class.php:9199
 msgid "Click to flag this."
 msgstr "Нажмите чтобы отметить это."
 
-#: ../../../inc/items/model/_item.class.php:9201
+#: ../../../inc/items/model/_item.class.php:9200
 msgid "You have flagged this. Click to remove flag."
 msgstr "Вы пометили это. Нажмите, чтобы удалить пометку."
 
-#: ../../../inc/items/model/_item.class.php:9339
+#: ../../../inc/items/model/_item.class.php:9338
 #: ../../../inc/users/model/_user.funcs.php:3967
 #: ../../../inc/widgets/widgets/_item_vote.widget.php:90
 msgid "My vote:"
 msgstr "Мой голос:"
 
-#: ../../../inc/items/model/_item.class.php:9340
+#: ../../../inc/items/model/_item.class.php:9339
 msgid "Cast a positive vote!"
 msgstr "Голосовать положительно!"
 
-#: ../../../inc/items/model/_item.class.php:9341
+#: ../../../inc/items/model/_item.class.php:9340
 msgid "You sent a positive vote."
 msgstr "Вы отправили положительный голос."
 
-#: ../../../inc/items/model/_item.class.php:9342
+#: ../../../inc/items/model/_item.class.php:9341
 msgid "Cast a neutral vote!"
 msgstr "Голосовать нейтрально!"
 
-#: ../../../inc/items/model/_item.class.php:9343
+#: ../../../inc/items/model/_item.class.php:9342
 msgid "You sent a neutral vote."
 msgstr "Вы отправили нейтральный голос."
 
-#: ../../../inc/items/model/_item.class.php:9344
+#: ../../../inc/items/model/_item.class.php:9343
 msgid "Cast a negative vote!"
 msgstr "Голосовать отрицательно!"
 
-#: ../../../inc/items/model/_item.class.php:9345
+#: ../../../inc/items/model/_item.class.php:9344
 msgid "You sent a negative vote."
 msgstr "Вы отправили отрицательный голос."
 
-#: ../../../inc/items/model/_item.class.php:9368
+#: ../../../inc/items/model/_item.class.php:9367
 msgid "Voting:"
 msgstr "Голосование:"
 
-#: ../../../inc/items/model/_item.class.php:9595
+#: ../../../inc/items/model/_item.class.php:9594
 #, php-format
 msgid "%s Likes"
 msgstr "%s Лайков"
 
-#: ../../../inc/items/model/_item.class.php:9595
+#: ../../../inc/items/model/_item.class.php:9594
 msgid "No likes"
 msgstr "Нет лайков"
 
-#: ../../../inc/items/model/_item.class.php:9767
+#: ../../../inc/items/model/_item.class.php:9766
 msgid "Refresh \"contents last updated\" timestamp!"
 msgstr ""
 
