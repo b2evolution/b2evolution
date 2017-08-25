@@ -3386,7 +3386,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 
 			// Last touched date:
 			echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
-				.mysql2date( locale_datefmt().' @ '.locale_shorttimefmt(), $Comment->get( 'last_touched_ts' ) ).'</span>';
+				.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Comment->get( 'last_touched_ts' ) ).'</span>';
 
 			echo '</div>';
 			echo '<div style="padding-top:3px">';
