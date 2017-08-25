@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog, $admin_url, $rsc_url, $UserSettings, $edited_User, $user_tab, $Plugins, $current_User;
 
-if( !$current_User->can_moderate_user( $edited_User->ID ) )
+if( $edited_User->ID != $current_User->ID && ! $current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
 	debug_die( T_( 'You have no permission to see this tab!' ) );
 }

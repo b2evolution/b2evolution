@@ -451,7 +451,7 @@ function zeroise( $number, $threshold )
 function excerpt( $str, $maxlen = 254, $tail = '&hellip;' )
 {
 	// Add spaces
-	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
+	$str = str_replace( array( '<p>', '<br', '</tr><tr', '</th><th', '</td><td' ), array( ' <p>', ' <br', '</tr> <tr', '</th> <th', '</td> <td' ), $str );
 
 	// Remove <code>
 	$str = preg_replace( '#<code>(.+)</code>#is', '', $str );
@@ -476,10 +476,11 @@ function excerpt( $str, $maxlen = 254, $tail = '&hellip;' )
  * Get a limited text-only excerpt based on number of words
  *
  * @param string
- * @param int Maximum length
+ * @param integer Maximum length
+ * @param array Params
  * @return string
  */
-function excerpt_words( $str, $maxwords = 50 )
+function excerpt_words( $str, $maxwords = 50, $params = array() )
 {
 	// Add spaces
 	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
@@ -497,7 +498,7 @@ function excerpt_words( $str, $maxwords = 50 )
 	// Ger rid of all new lines and Display the html tags as source text:
 	$str = trim( preg_replace( '#[\r\n\t\s]+#', ' ', $str ) );
 
-	$str = strmaxwords( $str, $maxwords );
+	$str = strmaxwords( $str, $maxwords, $params );
 
 	return $str;
 }
@@ -649,7 +650,7 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 		if( $maxwords < 1 )
 		{	// We have reached the cutting point:
 			break;
-		} 
+		}
 	}
 
 	if( $maxwords < 1 )
@@ -976,7 +977,7 @@ function preg_match_outcode_callback( $content, $search, & $matches )
  * @param array|string Replace list or Callback function
  * @param string Source content
  * @param string Callback function name
- * @param string Type of callback function: 'preg' -> preg_replace(), 'str' -> str_replace() (@see replace_content())
+ * @param string Type of callback function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace() (@see replace_content())
  * @return string Replaced content
  */
 function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
@@ -1005,7 +1006,7 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
  * @param string Source content
  * @param array|string Search list
  * @param array|string Replace list
- * @param string Type of function: 'preg' -> preg_replace(), 'str' -> str_replace()
+ * @param string Type of function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace()
  * @param string The maximum possible replacements for each pattern in each subject string. Defaults to -1 (no limit).
  * @return string Replaced content
  */
@@ -1041,6 +1042,9 @@ function replace_content( $content, $search, $replace, $type = 'preg', $limit = 
 				}
 				return $content;
 			}
+
+		case 'preg_callback':
+			return preg_replace_callback( $search, $replace, $content, $limit );
 
 		default: // 'preg'
 			return preg_replace( $search, $replace, $content, $limit );
@@ -5882,7 +5886,18 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 		{	// Send headers only when they are not send yet to avoid an error:
 			headers_content_mightcache( 'text/javascript', 0 );		// Do NOT cache interactive communications.
 		}
-		echo $output;
+		global $baseurl;
+		if( empty( $_SERVER['HTTP_REFERER'] ) ||
+		    ! ( $referer_url = parse_url( $_SERVER['HTTP_REFERER'] ) ) || empty( $referer_url['host'] ) ||
+		    ! ( $baseurl_info = parse_url( $baseurl ) ) || empty( $baseurl_info['host'] ) ||
+		    ( $baseurl_info['host'] != $referer_url['host'] ) )
+		{	// Deny request from other server:
+			echo 'alert( \''.sprintf( TS_('This action can only be performed with HTTP_REFERER = %s'), $baseurl ).' \');';
+		}
+		else
+		{	// Send JS content only for allowed referer:
+			echo $output;
+		}
 	}
 
 	exit(0);
@@ -5927,17 +5942,18 @@ function format_to_js( $unformatted )
 function get_available_sort_options()
 {
 	return array(
-		'datestart'       => T_('Date issued (Default)'),
-		'order'           => T_('Order (as explicitly specified)'),
-		//'datedeadline' => T_('Deadline'),
-		'title'           => T_('Title'),
-		'datecreated'     => T_('Date created'),
-		'datemodified'    => T_('Date last modified'),
-		'last_touched_ts' => T_('Date last touched'),
-		'urltitle'        => T_('URL "filename"'),
-		'priority'        => T_('Priority'),
-		'numviews'        => T_('Number of members who have viewed the post (If tracking enabled)'),
-		'RAND'            => T_('Random order!'),
+		'datestart'                => T_('Date issued (Default)'),
+		'order'                    => T_('Order (as explicitly specified)'),
+		//'datedeadline'           => T_('Deadline'),
+		'title'                    => T_('Title'),
+		'datecreated'              => T_('Date created'),
+		'datemodified'             => T_('Date last modified'),
+		'last_touched_ts'          => T_('Date last touched'),
+		'contents_last_updated_ts' => T_('Contents last updated'),
+		'urltitle'                 => T_('URL "filename"'),
+		'priority'                 => T_('Priority'),
+		'numviews'                 => T_('Number of members who have viewed the post (If tracking enabled)'),
+		'RAND'                     => T_('Random order!'),
 	);
 }
 
@@ -7456,6 +7472,12 @@ jQuery( document ).ready( function()
 		tooltip    : '<?php echo $params['tooltip']; ?>',
 		event      : 'click',
 		onblur     : '<?php echo $onblur_action; ?>',
+		onedit     : function ( settings, original )
+		{
+			// Set width to fix value to don't change it on selector displaying:
+			var wrapper_width = jQuery( original ).width();
+			jQuery( original ).css( { 'width': wrapper_width, 'max-width': wrapper_width } );
+		},
 		callback   : function ( settings, original )
 		{
 			<?php
@@ -7481,7 +7503,6 @@ jQuery( document ).ready( function()
 			echo $params['callback_code'];
 			?>
 		},
-		onsubmit: function( settings, original ) {},
 		submitdata : function( value, settings )
 		{
 			return { <?php echo $params['ID_name']; ?>: <?php echo $params['ID_value']; ?> }
@@ -8203,7 +8224,7 @@ function render_inline_files( $content, $Object, $params = array() )
 			{
 				$content = str_replace( $current_link_tag, $rendered_link_tag, $content );
 			}
-		}	
+		}
 	}
 
 	return $content;

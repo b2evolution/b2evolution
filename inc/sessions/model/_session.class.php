@@ -136,8 +136,8 @@ class Session
 				$row = $DB->get_row( '
 					SELECT sess_ID, sess_key, sess_data, sess_user_ID, sess_start_ts, sess_lastseen_ts, sess_device
 					  FROM T_sessions
-					 WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
-					   AND sess_key = '.$DB->quote($session_key_by_cookie).'
+					 WHERE sess_ID  = '.$DB->quote( $session_id_by_cookie ).'
+					   AND sess_key = '.$DB->quote( $session_key_by_cookie ).'
 					   AND UNIX_TIMESTAMP(sess_lastseen_ts) > '.( $localtimenow - $timeout_sessions ) );
 				if( empty( $row ) )
 				{
@@ -154,7 +154,7 @@ class Session
 					$this->is_validated = true;
 					$this->sess_device = $row->sess_device;
 
-					$Debuglog->add( 'Session: Session user_ID: '.var_export($this->user_ID, true), 'request' );
+					$Debuglog->add( 'Session: Session user_ID: '.var_export( $this->user_ID, true ), 'request' );
 
 					if( empty( $row->sess_data ) )
 					{
@@ -166,7 +166,7 @@ class Session
 
 						// Unserialize session data (using an own callback that should provide class definitions):
 						$old_callback = @ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
-						if( $old_callback === false || is_null($old_callback) /* disabled, reported with PHP 5.2.5 */ )
+						if( $old_callback === false || is_null( $old_callback ) /* disabled, reported with PHP 5.2.5 */ )
 						{	// NULL if ini_set has been disabled for security reasons
 							// Brutally load all classes that we might need:
  							session_unserialize_load_all_classes();
@@ -174,18 +174,18 @@ class Session
 						// TODO: dh> This can fail, if there are special chars in sess_data:
 						//       It will be encoded in $evo_charset _after_ mysqli::set_charset but
 						//       get retrieved here, _before_ any mysqli::set_charset (if $db_config['connection_charset'] is not set (default))!
-						$this->_data = @unserialize($row->sess_data);
+						$this->_data = @unserialize( $row->sess_data );
 
 						if( $old_callback !== false )
 						{	// Restore the old callback if we changed it:
 							@ini_set( 'unserialize_callback_func', $old_callback );
 						}
 
-						if( ! is_array($this->_data) )
+						if( ! is_array( $this->_data ) )
 						{
 							$Debuglog->add( 'Session: Session data corrupted!<br />
-								connection_charset: '.var_export($DB->connection_charset, true).'<br />
-								Serialized data was: --['.var_export($row->sess_data, true).']--', array('session','error') );
+								connection_charset: '.var_export( $DB->connection_charset, true ).'<br />
+								Serialized data was: --['.var_export( $row->sess_data, true ).']--', array('session','error') );
 							$this->_data = array();
 						}
 						else
@@ -193,7 +193,7 @@ class Session
 							$Debuglog->add( 'Session: Session data loaded.', 'request' );
 
 							// Load a Messages object from session data, if available:
-							if( ($sess_Messages = $this->get('Messages')) && $sess_Messages instanceof Messages )
+							if( ( $sess_Messages = $this->get('Messages') ) && $sess_Messages instanceof Messages )
 							{
 								// dh> TODO: "old" messages should rather get prepended to any existing ones from the current request, rather than appended
 								$Messages->add_messages( $sess_Messages );
@@ -216,13 +216,13 @@ class Session
 		}
 		else
 		{ // create a new session! :
-			$this->key = generate_random_key(32);
+			$this->key = generate_random_key( 32 );
 
 			// Detect user device
 			global $user_devices;
 			$this->sess_device = '';
 
-			if( !empty($_SERVER['HTTP_USER_AGENT']) )
+			if( ! empty( $_SERVER['HTTP_USER_AGENT'] ) )
 			{
 				foreach( $user_devices as $device_name => $device_regexp )
 				{
@@ -235,15 +235,14 @@ class Session
 			}
 
 			// We need to INSERT now because we need an ID now! (for the cookie)
-			$DB->query( "
-				INSERT INTO T_sessions( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_device )
+			$DB->query( 'INSERT INTO T_sessions( sess_key, sess_start_ts, sess_lastseen_ts, sess_ipaddress, sess_device )
 				VALUES (
-					'".$this->key."',
-					FROM_UNIXTIME(".$localtimenow."),
-					FROM_UNIXTIME(".$localtimenow."),
-					".$DB->quote( $Hit->IP ).",
-					".$DB->quote( $this->sess_device )."
-				)" );
+					'.$DB->quote( $this->key ).',
+					FROM_UNIXTIME('.$localtimenow.'),
+					FROM_UNIXTIME('.$localtimenow.'),
+					'.$DB->quote( $Hit->IP ).',
+					'.$DB->quote( $this->sess_device ).'
+				)' );
 
 			$this->ID = $DB->insert_id;
 
@@ -352,7 +351,7 @@ class Session
 				$DB->query( '
 					UPDATE T_sessions
 					   SET sess_key = NULL
-					 WHERE sess_user_ID = '.$DB->quote($user_ID).'
+					 WHERE sess_user_ID = '.$DB->quote( $user_ID ).'
 					   AND sess_ID != '.$this->ID );
 			}
 
@@ -413,7 +412,7 @@ class Session
 	 */
 	function & get_User()
 	{
-		if( !empty($this->user_ID) )
+		if( ! empty( $this->user_ID ) )
 		{
 			$UserCache = & get_UserCache();
 			return $UserCache->get_by_ID( $this->user_ID );
@@ -437,7 +436,7 @@ class Session
 
 		if( isset( $this->_data[$param] ) )
 		{
-			if( array_key_exists(1, $this->_data[$param]) // can be NULL!
+			if( array_key_exists( 1, $this->_data[$param] ) // can be NULL!
 			  && ( is_null( $this->_data[$param][0] ) || $this->_data[$param][0] > $localtimenow ) ) // check for expired data
 			{
 				return $this->_data[$param][1];
@@ -467,12 +466,12 @@ class Session
 	{
 		global $Debuglog, $localtimenow;
 
-		if( ! isset($this->_data[$param])
-		 || ! is_array($this->_data[$param]) // deprecated: check to transform 1.6 session data to 1.7
+		if( ! isset( $this->_data[$param] )
+		 || ! is_array( $this->_data[$param] ) // deprecated: check to transform 1.6 session data to 1.7
 		 || $this->_data[$param][1] != $value
 		 || $expire != 0 )
 		{	// There is something to update:
-			$this->_data[$param] = array( ( $expire ? ($localtimenow + $expire) : NULL ), $value );
+			$this->_data[$param] = array( ( $expire ? ( $localtimenow + $expire ) : NULL ), $value );
 
 			if( $param == 'Messages' )
 			{ // also set boolean to not call CachePageContent plugin event on next request:
@@ -495,7 +494,7 @@ class Session
 	{
 		global $Debuglog;
 
-		if( isset($this->_data[$param]) )
+		if( isset( $this->_data[$param] ) )
 		{
 			unset( $this->_data[$param] );
 
@@ -521,7 +520,7 @@ class Session
 			return false;
 		}
 
-		$sess_data = empty($this->_data) ? NULL : serialize($this->_data);
+		$sess_data = empty( $this->_data ) ? NULL : serialize( $this->_data );
 
 	 	// Note: The key actually only needs to be updated on a logout.
 	 	// Note: we increase the hitcoutn every time. That assumes that there will be no 2 calls for a single hit.
@@ -531,7 +530,7 @@ class Session
 				sess_data = ".$DB->quote( $sess_data ).",
 				sess_ipaddress = '".$Hit->IP."',
 				sess_key = ".$DB->quote( $this->key );
-		if( !is_null($this->user_ID) )
+		if( ! is_null( $this->user_ID ) )
 		{	// We do NOT erase existing IDs at logout. We only want to set IDs at login:
 				$sql .= ", sess_user_ID = ".$this->user_ID;
 		}
@@ -556,7 +555,7 @@ class Session
 	{
 		global $Debuglog, $DB;
 
-		if( empty($this->ID) )
+		if( empty( $this->ID ) )
 		{
 			return false;
 		}
@@ -595,17 +594,17 @@ class Session
 		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
 		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
 
-		if( $servertimenow - $crumb_time > ($crumb_expires/2) )
+		if( $servertimenow - $crumb_time > ( $crumb_expires / 2 ) )
 		{	// The crumb we already had is older than 1 hour...
 			// We'll need to generate a new value:
 			$crumb_value = '';
-			if( $servertimenow - $crumb_time < ($crumb_expires - 200) ) // Leave some margin here to make sure we do no overwrite a newer 1-2 hr crumb
+			if( $servertimenow - $crumb_time < ( $crumb_expires - 200 ) ) // Leave some margin here to make sure we do no overwrite a newer 1-2 hr crumb
 			{	// Not too old either, save as previous crumb:
 				$this->set( 'crumb_prev_'.$crumb_name, $crumb_recalled );
 			}
 		}
 
-		if( empty($crumb_value) )
+		if( empty( $crumb_value ) )
 		{	// We need to generate a new crumb:
 			$crumb_value = generate_random_key( 32 );
 
@@ -675,7 +674,7 @@ class Session
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').' ['.$crumb_name.']</h3>';
 		echo '<p>'.T_('Your request was stopped for security reasons.').'</p>';
-		echo '<p>'.sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor($crumb_expires/60) ).'</p>';
+		echo '<p>'.sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor( $crumb_expires / 60 ) ).'</p>';
 		echo '<p>'.T_('Please go back to the previous page and refresh it before submitting the form again.').'</p>';
 		echo '</div>';
 
@@ -693,7 +692,7 @@ class Session
 		$Form = new Form( '', 'evo_session_crumb_resend', $_SERVER['REQUEST_METHOD'] );
 		$Form->begin_form( 'inline' );
 		$Form->add_crumb( $crumb_name );
-		$Form->hiddens_by_key( remove_magic_quotes($_REQUEST) );
+		$Form->hiddens_by_key( remove_magic_quotes( $_REQUEST ) );
 		$Form->button( array( 'submit', '', T_('Resubmit now!'), 'ActionButton' ) );
 		$Form->end_form();
 		echo '</div>';
@@ -774,7 +773,7 @@ class Session
  */
 function session_unserialize_callback( $classname )
 {
-	switch( strtolower($classname) )
+	switch( strtolower( $classname ) )
 	{
 		case 'blog':
 			load_class( 'collections/model/_blog.class.php', 'Blog' );

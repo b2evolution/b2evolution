@@ -83,6 +83,17 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get param prefix with is used on edit forms and submit data
+	 *
+	 * @return string
+	 */
+	function get_param_prefix()
+	{
+		return 'edit_skin_'.( empty( $this->ID ) ? '0' : $this->ID ).'_set_';
+	}
+
+
+	/**
 	 * Get delete restriction settings
 	 *
 	 * @return array
@@ -638,14 +649,14 @@ class Skin extends DataObject
 
 		//
 		echo '<div class="legend">';
-		if( isset( $disp_params[ 'function' ] ) )
+		if( isset( $disp_params['function'] ) )
 		{
 			echo '<div class="actions">';
-			switch( $disp_params[ 'function' ] )
+			switch( $disp_params['function'] )
 			{
 				case 'broken':
 					echo '<span class="text-danger">';
-					if( !empty($disp_params[ 'msg' ]) )
+					if( ! empty( $disp_params['msg'] ) )
 					{
 						echo $disp_params[ 'msg' ];
 					}
@@ -654,31 +665,24 @@ class Skin extends DataObject
 						echo T_('Broken.');
 					}
 					echo '</span>';
+
+					if( ! empty( $disp_params['help_info'] ) )
+					{
+						echo ' '.get_icon( 'help', 'imgtag', array( 'title' => $disp_params['help_info'] ) );
+					}
 					break;
 
 				case 'install':
 					// Display a link to install the skin
-					if( $disp_params[ 'skin_compatible' ] )
-					{ // If skin is compatible for current selected type
-						if( ! empty( $skin_url ) )
-						{
-							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
-							echo T_('Install NOW!').'</a>';
-						}
-						if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
-						{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
-							$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
-							$skin_name_after = '</label>';
-						}
+					if( ! empty( $skin_url ) )
+					{
+						echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
+						echo T_('Install NOW!').'</a>';
 					}
-					else
-					{ // Inform about skin type is wrong for current case
-						if( ! empty( $skin_url ) )
-						{
-							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'" class="red">';
-							echo T_('Wrong Type!').'</a> ';
-						}
-						echo get_icon( 'help', 'imgtag', array( 'title' => T_('This skin does not fit the blog type you are trying to create.') ) );
+					if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
+					{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
+						$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
+						$skin_name_after = '</label>';
 					}
 					break;
 
@@ -723,17 +727,23 @@ class Skin extends DataObject
 	 * Get a skin specific param value from current Blog
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string|array|NULL
 	 */
-	function get_setting( $parname )
+	function get_setting( $parname, $group = NULL )
 	{
 		/**
 		 * @var Blog
 		 */
 		global $Collection, $Blog;
 
+		if( ! empty( $group ) )
+		{ // $parname is prefixed with $group, we'll remove the group prefix
+			$parname = substr( $parname, strlen( $group ) );
+		}
+
 		// Name of the setting in the blog settings:
-		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+		$blog_setting_name = 'skin'.$this->ID.'_'.$group.$parname;
 
 		$value = $Blog->get_setting( $blog_setting_name );
 
@@ -742,6 +752,19 @@ class Skin extends DataObject
 			return $value;
 		}
 
+		return $this->get_setting_default_value( $parname, $group );
+	}
+
+
+	/**
+	 * Get a skin specific param default value
+	 *
+	 * @param string Setting name
+	 * @param string Input group name
+	 * @return string|array|NULL
+	 */
+	function get_setting_default_value( $parname, $group = NULL )
+	{
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
 		if( isset( $params[ $parname ]['defaultvalue'] ) )
@@ -761,6 +784,21 @@ class Skin extends DataObject
 				}
 			}
 			return $options;
+		}
+		elseif( isset( $params[ $parname ]['type'] ) &&
+						$params[ $parname ]['type'] == 'fileselect' &&
+						! empty( $params[ $parname ]['initialize_with'] ) &&
+						$default_File = & get_file_by_abspath( $params[ $parname ]['initialize_with'], true ) )
+		{ // Get default value for fileselect
+			return $default_File->ID;
+		}
+		elseif( ! empty( $group ) &&
+						isset( $params[ $group ]['type'] ) &&
+						$params[ $group ]['type'] == 'input_group' &&
+						! empty( $params[ $group ]['inputs'] ) &&
+						isset( $params[ $group ]['inputs'][ $parname ] ) )
+		{
+			return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
 		}
 
 		return NULL;
@@ -1189,9 +1227,10 @@ class Skin extends DataObject
 						require_js( 'bozo_validator.js', 'blog' );
 					}
 
-					// Require File Uploader js and css:
-					require_js( 'multiupload/fileuploader.js', 'blog' );
-					require_css( 'fileuploader.css', 'blog' );
+					// Require Fine Uploader js and css:
+					init_fineuploader_js_lang_strings();
+					require_js( 'multiupload/fine-uploader.js', 'blog' );
+					require_css( 'fine-uploader.css', 'blog' );
 					// Load JS files to make the links table sortable:
 					require_js( '#jquery#' );
 					require_js( 'jquery/jquery.sortable.min.js' );
@@ -1354,7 +1393,7 @@ var downloadInterval = setInterval( function()
 									.'</ul></div>',
 								'header_text_single' => '',
 							'header_end' => '',
-							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
+							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 							'global_icons_class' => 'btn btn-default btn-sm',
 							'filters_start'        => '<div class="filters panel-body">',
 							'filters_end'          => '</div>',
@@ -1427,8 +1466,8 @@ var downloadInterval = setInterval( function()
 								'next_text' => T_('Next'),
 								'no_prev_text' => '',
 								'no_next_text' => '',
-								'list_prev_text' => T_('...'),
-								'list_next_text' => T_('...'),
+								'list_prev_text' => '...',
+								'list_next_text' => '...',
 								'list_span' => 11,
 								'scroll_list_range' => 5,
 							'footer_end' => "\n\n",
@@ -1675,7 +1714,7 @@ var downloadInterval = setInterval( function()
 						// Template for plugins:
 						return array(
 								// This template is used to build a plugin toolbar with action buttons above edit item/comment area:
-								'toolbar_before'       => '<div class="btn-toolbar $toolbar_class$" role="toolbar">',
+								'toolbar_before'       => '<div class="btn-toolbar plugin-toolbar $toolbar_class$" data-plugin-toolbar="$toolbar_class$" role="toolbar">',
 								'toolbar_after'        => '</div>',
 								'toolbar_title_before' => '<div class="btn-toolbar-title">',
 								'toolbar_title_after'  => '</div>',
@@ -1687,6 +1726,10 @@ var downloadInterval = setInterval( function()
 					case 'modal_window_js_func':
 						// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 						return 'echo_modalwindow_js_bootstrap';
+
+					case 'colorbox_css_file':
+						// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+						return 'colorbox-bootstrap.min.css';
 				}
 				break;
 		}
@@ -1768,8 +1811,8 @@ var downloadInterval = setInterval( function()
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
@@ -1822,6 +1865,10 @@ var downloadInterval = setInterval( function()
 				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
 				return 'children';
 
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-regular.min.css';
+
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'
 				return 'hintbox';
@@ -1857,6 +1904,106 @@ var downloadInterval = setInterval( function()
 		global $app_version_long;
 		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
+
+
+    /**
+     * Web safe fonts for default skin usage
+     *
+     * Used for font customization
+     */
+    private $font_definitions = array(
+        'system_arial' => array( 'Arial', 'Arial, Helvetica, sans-serif' ),
+        'system_arialblack' => array( 'Arial Black', '\'Arial Black\', Gadget, sans-serif' ),
+        'system_arialnarrow' => array( 'Arial Narrow', '\'Arial Narrow\', sans-serif' ),
+        'system_centrygothic' => array( 'Century Gothic', 'Century Gothic, sans-serif' ),
+        'system_copperplategothiclight' => array( 'Copperplate Gothic Light', 'Copperplate Gothic Light, sans-serif' ),
+        'system_couriernew' => array( 'Courier New', '\'Courier New\', Courier, monospace' ),
+        'system_georgia' => array( 'Georgia', 'Georgia, Serif' ),
+        'system_helveticaneue' => array( 'Helvetica Neue', '\'Helvetica Neue\',Helvetica,Arial,sans-serif' ),
+        'system_impact' => array( 'Impact', 'Impact, Charcoal, sans-serif' ),
+        'system_lucidaconsole' => array( 'Lucida Console', '\'Lucida Console\', Monaco, monospace' ),
+        'system_lucidasansunicode' => array( 'Lucida Sans Unicode', '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif' ),
+        'system_palatinolinotype' => array( 'Palatino Linotype', '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif' ),
+        'system_tahoma' => array( 'Tahoma', 'Tahoma, Geneva, sans-serif' ),
+        'system_timesnewroman' => array( 'Times New Roman', '\'Times New Roman\', Times, serif' ),
+        'system_trebuchetms' => array( 'Trebuchet MS', '\'Trebuchet MS\', Helvetica, sans-serif' ),
+        'system_verdana' => array( 'Verdana', 'Verdana, Geneva, sans-serif' ),
+    );
+
+
+    /**
+     * Returns an option list for font customization
+     *
+     * Uses: $this->font_definitions
+     */
+    function get_font_definitions()
+    {
+        // Pull font array keys
+        $font_options = array_keys($this->font_definitions);
+
+        // Pull first value from each array key
+        $font_names = array();
+        foreach ($this->font_definitions as $f) {
+            $font_names[] = current($f);
+        }
+
+        // Create array in format: 'system_arial' => 'arial', etc.
+        $dropdown_option_list = array_combine($font_options, $font_names);
+
+        return $dropdown_option_list;
+    }
+
+
+    /**
+     * Returns a CSS code for font customization
+     *
+     * Uses: $this->font_definitions
+     */
+    function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL, $font_weight_param = NULL )
+    {
+		$font_css = array();
+
+		// Get default font family and font-weight
+		$default_font_family = $this->get_setting_default_value( $font_family_param );
+		$default_font_weight = $this->get_setting_default_value( $font_weight_param );
+
+        // Select the font family CSS string
+		$selected_font_family = $this->get_setting( $font_family_param );
+		if( $selected_font_family != $default_font_family )
+		{
+			$selected_font_css = $this->font_definitions[$selected_font_family][1];
+			$font_css[] = "font-family: $selected_font_css;";
+		}
+
+		// If $text_size_param is passed, add font-size property
+		if( ! is_null( $text_size_param ) )
+		{
+			$selected_text_size = $this->get_setting( $text_size_param );
+			$font_css[] = 'font-size: '.$selected_text_size.';';
+		}
+
+		// If $font_weight_param is passed, add font-weight property
+		if( ! is_null( $font_weight_param ) )
+		{
+			$selected_font_weight = $this->get_setting( $font_weight_param );
+			if( $selected_font_weight != $default_font_weight )
+			{
+				$font_css[] = 'font-weight: '.$selected_font_weight.';';
+			}
+		}
+
+        // Prepare the complete CSS for font customization
+		if( ! empty( $font_css ) )
+		{
+        	$custom_css = "$target_element { ".implode( ' ', $font_css )." }\n";
+		}
+		else
+		{
+			$custom_css = '';
+		}
+
+		return $custom_css;
+    }
 }
 
 ?>

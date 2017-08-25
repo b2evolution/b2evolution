@@ -78,7 +78,8 @@ if( $params['comment_type'] == 'meta' )
 	$params['comment_form_anchor'] = 'meta_form_p';
 }
 $section_title = $params['form_title_start'].$params['form_title_text'].$params['form_title_end'];
-if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_error'], $params['after_comment_error'], '#', $params['comment_closed_text'], $section_title, $params ) )
+if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item->can_meta_comment() ||
+		$Item->can_comment( $params['before_comment_error'], $params['after_comment_error'], '#', $params['comment_closed_text'], $section_title, $params ) ) )
 { // We want to display the comments form and the item can be commented on:
 
 	echo $params['before_comment_form'];
@@ -303,15 +304,7 @@ function validateCommentForm(form)
 			$params['form_comment_redirect_to']
 		);
 
-	if( check_user_status( 'is_validated' ) )
-	{ // User is logged in and activated:
-		$temp_infostart = $Form->infostart;
-		$Form->switch_template_parts( array( 'infostart' => add_tag_class( $Form->infostart, 'inline-block' ) ) );
-		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array(
-				'link_text' => $params['author_link_text'] ) ).'</strong>', array( 'class' => 'row' ) );
-		$Form->infostart = $temp_infostart;
-	}
-	else
+	if( ! check_user_status( 'is_validated' ) )
 	{ // User is not logged in or not activated:
 		if( is_logged_in() && empty( $comment_author ) && empty( $comment_author_email ) )
 		{

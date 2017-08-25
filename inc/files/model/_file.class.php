@@ -1964,8 +1964,9 @@ class File extends DataObject
 			{
 				$LinkOwner = & $Link->get_LinkOwner();
 				if( $LinkOwner != NULL )
-				{
+				{	// Update last touched date and content last updated date of the Owner:
 					$LinkOwner->update_last_touched_date();
+					$LinkOwner->update_contents_last_updated_ts();
 				}
 			}
 
@@ -2714,7 +2715,7 @@ class File extends DataObject
 	 * @param string Position
 	 * @return integer Link ID
 	 */
-	function link_to_Object( & $LinkOwner, $set_order = 1, $position = NULL )
+	function link_to_Object( & $LinkOwner, $set_order = 0, $position = NULL )
 	{
 		global $DB;
 
@@ -2722,20 +2723,6 @@ class File extends DataObject
 
 		$order = $set_order;
 		$existing_Links = & $LinkOwner->get_Links();
-
-		// Find highest order
-		foreach( $existing_Links as $loop_Link )
-		{
-			if( $loop_Link->file_ID == $this->ID )
-			{ // The file is already linked to this owner
-				return;
-			}
-			$existing_order = $loop_Link->get('order');
-			if( $set_order == 1 && $existing_order >= $order )
-			{ // Set order if $set_order is default
-				$order = $existing_order + 1;
-			}
-		}
 
 		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 		$this->load_meta( true );

@@ -21,7 +21,7 @@ class _rss2_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 
   /**
 	 * Get default name for the skin.

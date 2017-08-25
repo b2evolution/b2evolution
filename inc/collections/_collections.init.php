@@ -598,58 +598,6 @@ class collections_Module extends Module
 
 
 	/**
-	 * Build teh evobar menu
-	 */
-	function build_evobar_menu()
-	{
-		/**
-		 * @var Menu
-		 */
-		global $topleft_Menu, $topright_Menu;
-		global $current_User;
-		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
-		global $Collection, $Blog, $blog;
-
-		global $Settings;
-
-		if( ! $current_User->check_perm( 'admin', 'normal' ) )
-		{
-			return;
-		}
-
-		$entries = array();
-		$entries['b2evonet'] = array(
-								'text' => T_('Open b2evolution.net'),
-								'href' => 'http://b2evolution.net/',
-								'target' => '_blank',
-							);
-		$entries['forums'] = array(
-								'text' => T_('Open Support forums'),
-								'href' => 'http://forums.b2evolution.net/',
-								'target' => '_blank',
-							);
-		$entries['manual'] = array(
-								'text' => T_('Open Online manual'),
-								'href' => get_manual_url( NULL ),
-								'target' => '_blank',
-							);
-		$entries[] = array( 'separator' => true );
-		$entries['twitter'] = array(
-								'text' => T_('b2evolution on twitter'),
-								'href' => 'http://twitter.com/b2evolution',
-								'target' => '_blank',
-							);
-		$entries['facebook'] = array(
-								'text' => T_('b2evolution on facebook'),
-								'href' => 'http://www.facebook.com/b2evolution',
-								'target' => '_blank',
-							);
-
-		$topleft_Menu->add_menu_entries( 'b2evo', $entries );
-	}
-
-
-	/**
 	 * Builds the 1st half of the menu. This is the one with the most important features
 	 */
 	function build_menu_1()
@@ -835,9 +783,17 @@ class collections_Module extends Module
 						'text' => T_('Skin'),
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
 						'entries' => array(
-							'current_skin' => array(
-								'text' => T_('Skins for this blog'),
+							'skin_normal' => array(
+								'text' => T_('Default'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog
+							),
+							'skin_mobile' => array(
+								'text' => T_('Phone'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=mobile'
+							),
+							'skin_tablet' => array(
+								'text' => T_('Tablet'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=tablet'
 							)
 						),
 					),
@@ -1021,7 +977,7 @@ class collections_Module extends Module
 				'params' => NULL,
 			),
 			'monthly-alert-old-contents' => array(
-				'name'   => T_('Monthly alert on old contents'),
+				'name'   => T_('Monthly alert on stale contents'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_monthly_alert_old_contents.job.php',
 				'params' => NULL,
@@ -1237,6 +1193,28 @@ class collections_Module extends Module
 				{
 					$Messages->add( T_( 'Could not subscribe to notifications.' ), 'error' );
 				}
+
+				header_redirect();
+				break; // already exited here
+
+			case 'refresh_contents_last_updated':
+				// Refresh last touched date of the Item:
+
+				$item_ID = param( 'item_ID', 'integer', true );
+
+				$ItemCache = & get_ItemCache();
+				$refreshed_Item = & $ItemCache->get_by_ID( $item_ID );
+
+				if( ! $refreshed_Item->can_refresh_contents_last_updated() )
+				{	// If current User has no permission to refresh a last touched date of the requested Item:
+					$Messages->add( T_('You have no permission to refresh this item.'), 'error' );
+					header_redirect();
+					// EXIT HERE.
+				}
+
+				// Run refreshing and display a message:
+				$refreshed_Item->refresh_contents_last_updated_ts();
+				$Messages->add( T_('"Contents last updated" timestamp has been refreshed.'), 'success' );
 
 				header_redirect();
 				break; // already exited here

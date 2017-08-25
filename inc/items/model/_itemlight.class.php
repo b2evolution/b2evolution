@@ -453,7 +453,7 @@ class ItemLight extends DataObject
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'front';
 			}
-			elseif( in_array( $item_type_usage, array( 'special' ) ) )
+			elseif( in_array( $item_type_usage, array( 'special', 'content-block' ) ) )
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'none';
 			}
@@ -1561,7 +1561,8 @@ class ItemLight extends DataObject
 		$params = array_merge( array(
 				'before'    => '',
 				'after'     => '',
-				'link_text' => '$icon$' // Use a mask $icon$ or some other text
+				'link_text' => '$icon$', // Use a mask $icon$ or some other text
+				'class'     => '',
 			), $params );
 
 		if( ( $history_url = $this->get_history_url() ) === false )
@@ -1573,7 +1574,7 @@ class ItemLight extends DataObject
 		$link_text = str_replace( '$icon$', $this->history_info_icon(), $params['link_text'] );
 
 		return $params['before']
-			.'<a href="'.$history_url.'">'.$link_text.'</a>'
+			.'<a href="'.$history_url.'"'.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' ).'>'.$link_text.'</a>'
 			.$params['after'];
 	}
 

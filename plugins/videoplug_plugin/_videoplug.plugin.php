@@ -25,7 +25,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $number_of_installs = 1;
 
 
@@ -35,7 +35,35 @@ class videoplug_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Video plug for a few popular video sites.');
-		$this->long_desc = T_('This is a basic video plug pluigin. Use it by entering [video:youtube:123xyz] or [video:dailymotion:123xyz] into your post, where 123xyz is the ID of the video.');
+		$this->long_desc = T_('This plugin allows to quickly embed (plug) a video from a video hosting site such as YouTube, Vimeo, DailyMotion and Facebook. Use it through the toolbar or directly by entering a shortcode like [video:youtube:123xyz] or [video:vimeo:123xyz] into your post, where 123xyz is the ID of the video.');
+	}
+
+
+	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+				'width' => array(
+					'label' => T_('Video width (px or %)'),
+					'note' => T_('100% width if left empty or 0'),
+					'valid_pattern' => '/^(\d+(\.\d+)?%?)?$/',
+					'defaultvalue' => '100%',
+				),
+				'height' => array(
+					'label' => T_('Video height (px or %)'),
+					'defaultvalue' => '',
+					'allow_empty' => true,
+					'valid_pattern' => '/^(\d+(\.\d+)?%?)?$/',
+					'note' => T_('Leave empty for a 16/9 aspect ratio').' (16/9=56.25%)',
+					'defaultvalue' => '56.25%',
+				),
+			);
 	}
 
 
@@ -50,35 +78,91 @@ class videoplug_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		// fp> removed some embeds to make it xhtml compliant, using only object. (Hari style ;)
-		// anyone, feel free to clean up the ones that have no object tag at all.
+		if( $setting_Blog = & $this->get_Blog_from_params( $params ) )
+		{	// We are rendering Item, Comment or Widget now, Get the settings depending on Collection:
+			$this->video_width = $this->get_coll_setting( 'width', $setting_Blog );
+			$this->video_height = $this->get_coll_setting( 'height', $setting_Blog );
+		}
+		elseif( ! empty( $params['Message'] ) )
+		{	// We are rendering Message now:
+			$this->video_width = $this->get_msg_setting( 'width' );
+			$this->video_height = $this->get_msg_setting( 'height' );
+		}
+		elseif( ! empty( $params['EmailCampaign'] ) )
+		{	// We are rendering EmailCampaign now:
+			$this->video_width = $this->get_email_setting( 'width' );
+			$this->video_height = $this->get_email_setting( 'height' );
+		}
+		else
+		{	// Unknown call, Don't render this case:
+			return;
+		}
 
-		$search_list = array(
-				'#\[video:youtube:(.+?)]#',     // Youtube
-				'#\[video:dailymotion:(.+?)]#', // Dailymotion
-				'#\[video:vimeo:(.+?)]#',       // vimeo // blueyed> TODO: might want to use oEmbed (to get title etc separately and display it below video): http://vimeo.com/api/docs/oembed
-				// Unavailable services. Keep them for backwards compatibility
-				'#\[video:google:(.+?)]#',      // Google video
-				'#\[video:livevideo:(.+?)]#',   // LiveVideo
-				'#\[video:ifilm:(.+?)]#',       // iFilm
+		// Move short tag outside of paragraph:
+		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo|facebook):?[^\[\]]*\]/i' );
 
-			);
-		$replace_list = array(
-				'<div class="videoblock"><iframe id="ytplayer" type="text/html" width="425" height="350" src="//www.youtube.com/embed/\\1" allowfullscreen="allowfullscreen" frameborder="0"></iframe></div>',
-				'<div class="videoblock"><iframe src="//www.dailymotion.com/embed/video/\\1" width="425" height="335" frameborder="0" allowfullscreen></iframe></div>',
-				'<div class="videoblock"><iframe src="//player.vimeo.com/video/$1" width="400" height="225" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>',
-				// Unavailable services. Keep them for backwards compatibility
-				'<div class="videoblock">The Google video service is not available anymore.</div>',
-				'<div class="videoblock">The Live Video service is not available anymore.</div>',
-				'<div class="videoblock">The iFilm video service is not available anymore.</div>',
-			);
-
-		// Move short tag outside of paragraph
-		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo):?[^\[\]]*\]/i' );
-
-		$content = replace_content_outcode( $search_list, $replace_list, $content );
+		// Replace video tags with html code:
+		$content = replace_content_outcode( '#\[video:(youtube|dailymotion|vimeo|facebook|google|livevideo|ifilm):([^:]+?):?(\d+%?)?:?(\d+%?)?]#',
+			array( $this, 'parse_video_tag_callback' ), $content, 'replace_content', 'preg_callback' );
 
 		return true;
+	}
+
+
+	/**
+	 * Callback function to build HTML video code from video tag
+	 *
+	 * @param array Matches:
+	 *              0 - Full video tag
+	 *              1 - Video type: youtube, dailymotion, vimeo, facebook, google, livevideo, ifilm
+	 *              2 - Video code/key
+	 *              3 - Width
+	 *              4 - Height
+	 * @return string HTML video code
+	 */
+	function parse_video_tag_callback( $m )
+	{
+		switch( $m[1] )
+		{
+			case 'youtube':
+				$video_block = '<iframe id="ytplayer" type="text/html" src="//www.youtube.com/embed/'.$m[2].'" allowfullscreen="allowfullscreen" frameborder="0"></iframe>';
+				break;
+
+			case 'dailymotion':
+				$video_block = '<iframe src="//www.dailymotion.com/embed/video/'.$m[2].'" frameborder="0" allowfullscreen></iframe>';
+				break;
+
+			case 'vimeo':
+				$video_block = '<iframe src="//player.vimeo.com/video/'.$m[2].'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+				break;
+
+			case 'facebook':
+				$video_block = '<iframe src="https://www.facebook.com/plugins/video.php?href='.$m[2].'" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>';
+				break;
+
+			default: // google, livevideo, ifilm:
+				// Unavailable services. Keep them for backwards compatibility:
+				$video_block = 'The '.$m[1].' video service is not available anymore.';
+				break;
+		}
+
+		$style = '';
+
+		// Get width from video tag or from settings:
+		$width = empty( $m[3] ) ? $this->video_width : $m[3];
+		if( ! empty( $width ) )
+		{	// Set width depending on what units are used:
+			$style .= 'width:'.( strpos( $width, '%' ) === false ? $width.'px' : $width ).';';
+		}
+
+		// Get height from video tag or from settings:
+		$height = empty( $m[4] ) ? $this->video_height : $m[4];
+		if( ! empty( $height ) )
+		{	// Set height depending on what units are used:
+			$style .= 'padding-bottom:'.( strpos( $height, '%' ) === false ? '0;height:'.$height.'px' : $height );
+		}
+
+		return '<div class="videoblock"'.( $style == '' ? '' : ' style="'.$style.'"' ).'>'.$video_block.'</div>';
 	}
 
 
@@ -219,6 +303,7 @@ class videoplug_plugin extends Plugin
 		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|youtube|'.$params['js_prefix'].'" value="YouTube" />';
 		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo|'.$params['js_prefix'].'" value="Vimeo" />';
 		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion|'.$params['js_prefix'].'" value="DailyMotion" />';
+		echo '<input type="button" id="video_facebook" title="'.T_('Insert Facebook video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|facebook|'.$params['js_prefix'].'" value="Facebook" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_after' );
@@ -258,6 +343,11 @@ class videoplug_plugin extends Plugin
 						case 'vimeo':
 							regexp_ID = /^\d+$/;
 							regexp_URL = /^(.+\/)?(\d+)$/;
+							break;
+
+						case 'facebook':
+							regexp_ID = /^https:\/\/.+\.facebook\.com\/.+/i;
+							regexp_URL = /^((https:\/\/.+\.facebook\.com\/.+))$/i;
 							break;
 
 						default:

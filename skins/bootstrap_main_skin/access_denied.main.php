@@ -36,12 +36,16 @@ siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 
 // Display a picture from skin setting as background image
-global $media_path, $media_url;
-$bg_image = $Skin->get_setting( 'front_bg_image' );
+$FileCache = & get_FileCache();
+$bg_File = NULL;
+if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
+{
+	$bg_File = & $FileCache->get_by_ID( $bg_File_ID, false, false );
+}
 echo '<div class="evo_pictured_layout">';
-if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
+if( $bg_File && $bg_File->exists() )
 { // If it exists in media folder
-	echo '<img class="evo_pictured__image" src="'.$media_url.$bg_image.'" />';
+	echo '<img class="evo_pictured__image" src="'.$bg_File->get_url().'" />';
 }
 
 ?>
@@ -53,7 +57,7 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 
 	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 		<?php
-		if( $Skin->is_visible_container( 'page_top' ) )
+		if( $Skin->show_container_when_access_denied( 'page_top' ) )
 		{ // Display 'Page Top' widget container
 		?>
 		<div class="evo_container evo_container__page_top">
@@ -78,7 +82,7 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 
 	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<?php
-		if( $Skin->is_visible_container( 'header' ) )
+		if( $Skin->show_container_when_access_denied( 'header' ) )
 		{ // Display 'Header' widget container
 		?>
 		<div class="evo_container evo_container__header">
@@ -102,7 +106,7 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 
 
 <?php
-if( $Skin->is_visible_container( 'menu' ) )
+if( $Skin->show_container_when_access_denied( 'menu' ) )
 { // Display 'Menu' widget container
 ?>
 <nav class="row">
@@ -188,9 +192,9 @@ if( $Skin->is_visible_container( 'menu' ) )
 	<div class="row">
 
 		<footer class="col-md-12 center">
-	
+
 			<?php
-			if( $Skin->is_visible_container( 'footer' ) )
+			if( $Skin->show_container_when_access_denied( 'footer' ) )
 			{ // Display 'Footer' widget container
 			?>
 			<div class="evo_container evo_container__footer">
@@ -204,7 +208,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 			?>
 			</div>
 			<?php } ?>
-	
+
 			<p>
 			<?php
 				// Display footer text (text can be edited in Blog Settings):

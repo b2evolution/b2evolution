@@ -563,6 +563,9 @@ div.average_rating .star_rating {
   float: left;
   padding-right: 10px;
 }
+.evo_container__footer {
+  margin-bottom: 10px;
+}
 main .well {
   padding: 15px 15px 25px 15px;
 }
@@ -1379,6 +1382,7 @@ input.btn-lg {
   margin: 0 1em 1em 0;
 }
 .evo_item_workflow_form .evo_item_workflow_form__fields {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;

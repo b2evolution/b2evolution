@@ -23,7 +23,7 @@ class polls_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $number_of_installs = 1;
 
 
@@ -392,7 +392,7 @@ class polls_plugin extends Plugin
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
 		?>
-		<script type="text/javascript">polls_toolbar( '<?php echo TS_('Polls:');?>', '<?php echo $params['js_prefix']; ?>' );</script>
+		<script type="text/javascript">polls_toolbar( '<?php echo TS_('Polls').':';?>', '<?php echo $params['js_prefix']; ?>' );</script>
 		<?php
 
 		return true;

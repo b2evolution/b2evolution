@@ -37,7 +37,7 @@ else
 }
 echo "</p>\n";
 
-echo '<p'.emailskin_style( '.p' ).'>'.T_('Login').": ".get_user_colored_login_link( $params['login'], array( 'use_style' => true, 'protocol' => 'http:' ) )."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'./* TRANS: noun */ T_('Login').": ".get_user_colored_login_link( $params['login'], array( 'use_style' => true, 'protocol' => 'http:' ) )."</p>\n";
 echo '<p'.emailskin_style( '.p' ).'>'.T_('Email').": ".$params['email']."</p>\n";
 echo '<p'.emailskin_style( '.p' ).'>'.T_('Account close reason').": ".nl2br( $params['reason'] )."</p>\n";
 

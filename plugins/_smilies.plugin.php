@@ -29,7 +29,7 @@ class smilies_plugin extends Plugin
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 25;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
 

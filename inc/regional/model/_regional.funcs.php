@@ -720,14 +720,15 @@ function country_flag( $country_code, $country_name, $collection = 'w16px', $cla
  * Get status titles of country
  *
  * @param boolean TRUE - to include false statuses, which don't exist in DB
+ * @param string Value for status "Unknown"
  * @return array Status titles
  */
-function ctry_status_titles( $include_false_statuses = true )
+function ctry_status_titles( $include_false_statuses = true, $unknown_status_value = '' )
 {
 	$status_titles = array();
 	if( $include_false_statuses )
 	{ // Include Unknown status
-		$status_titles[''] = T_('Unknown');
+		$status_titles[ $unknown_status_value ] = T_('Unknown');
 	}
 	$status_titles['trusted'] = T_('Trusted');
 	$status_titles['suspect'] = T_('Suspect');

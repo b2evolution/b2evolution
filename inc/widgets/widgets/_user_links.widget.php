@@ -50,7 +50,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('User links');
+		return T_('User Social Links');
 	}
 
 
@@ -68,7 +68,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display user links.');
+		return T_('Display social links for a specific User.');
 	}
 
 

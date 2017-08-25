@@ -286,7 +286,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 	{ // We can create directory
 		if ( ! mkdir_r( $dest_dir ) )
 		{
-			echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.' ), $dest_dir ).'</p>';
+			echo '<p class="text-danger">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.' ), $dest_dir ).'</p>';
 			evo_flush();
 
 			return false;
@@ -306,7 +306,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 			{ // Set zip file name
 				$src_file_name = $src_file;
 			}
-			echo '<p style="color:red">'
+			echo '<p class="text-danger">'
 					.sprintf( T_( 'Error: %s' ), $PclZip->errorInfo( true ) ).'<br />'
 					.sprintf( T_( 'Unable to decompress &laquo;%s&raquo; ZIP archive.' ), $src_file_name )
 				.'</p>';

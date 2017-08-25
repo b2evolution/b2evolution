@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -421,7 +421,7 @@ class tinymce_plugin extends Plugin
 									+ '</form>',
 									'500px', '', true,
 									'<span class="text-danger"><?php echo TS_('WARNING');?></span>',
-									[ '<?php echo TS_('OK');?>', 'btn-primary' ] );
+									[ '<?php echo TS_('OK');?>', 'btn-primary' ], true );
 							}
 							else
 							{

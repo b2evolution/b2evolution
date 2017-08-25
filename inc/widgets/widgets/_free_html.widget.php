@@ -77,7 +77,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Custom text/HTML of your choice.');
+		return T_('Display any HTML snippet of your choice.');
 	}
 
 

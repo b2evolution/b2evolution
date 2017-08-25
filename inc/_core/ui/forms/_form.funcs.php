@@ -331,11 +331,18 @@ function file_select_item( $file_ID, $params = array() )
 	$r .= $params['max_file_num'] > 1 ? '<div>' : '';
 	if( $File )
 	{
-		$r .= $File->get_thumb_imgtag( $params['size_name'], $params['class'] );
+		if( $File->exists() )
+		{
+			$r .= $File->get_thumb_imgtag( $params['size_name'], $params['class'] );
+		}
+		else
+		{
+			$r .= '<div class="bg-danger">'.T_('File not found').'</div>';
+		}
 	}
 	else
 	{
-		$r .= '<div class="bg-danger">'.T_('Not found').'</div>';
+		$r .= '<div class="bg-danger">'.T_('You have no permission to see this file.').'</div>';
 	}
 	$blog_param = empty( $blog ) ? '' : '&amp;blog='.$blog;
 	if( $params['max_file_num'] > 1 )

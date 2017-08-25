@@ -1109,7 +1109,7 @@ function skin_init( $disp )
 				}
 
 				// User is already logged in, redirect to "redirect_to" page
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				$redirect_to = param( 'redirect_to', 'url', NULL );
 				if( empty( $redirect_to ) )
 				{ // If empty redirect to referer page
@@ -1142,7 +1142,7 @@ function skin_init( $disp )
 		case 'register':
 			if( is_logged_in() )
 			{ // If user is logged in the register form should not be displayed. In this case redirect to the blog home page.
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
@@ -1162,7 +1162,7 @@ function skin_init( $disp )
 		case 'lostpassword':
 			if( is_logged_in() )
 			{ // If user is logged in the lost password form should not be displayed. In this case redirect to the blog home page.
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
@@ -1702,49 +1702,49 @@ function skin_include( $template_name, $params = array() )
 
 		// Default display handlers:
 		$disp_handlers = array(
-				'disp_404'            => '_404_not_found.disp.php',
-				'disp_403'            => '_403_forbidden.disp.php',
-				'disp_arcdir'         => '_arcdir.disp.php',
-				'disp_catdir'         => '_catdir.disp.php',
-				'disp_comments'       => '_comments.disp.php',
-				'disp_feedback-popup' => '_feedback_popup.disp.php',
-				'disp_help'           => '_help.disp.php',
-				'disp_login'          => '_login.disp.php',
-				'disp_register'       => '_register.disp.php',
-				'disp_activateinfo'   => '_activateinfo.disp.php',
-				'disp_lostpassword'   => '_lostpassword.disp.php',
-				'disp_mediaidx'       => '_mediaidx.disp.php',
-				'disp_msgform'        => '_msgform.disp.php',
-				'disp_threads'        => '_threads.disp.php',
-				'disp_contacts'       => '_threads.disp.php',
-				'disp_messages'       => '_messages.disp.php',
-				'disp_page'           => '_page.disp.php',
-				'disp_postidx'        => '_postidx.disp.php',
-				'disp_posts'          => '_posts.disp.php',
-				'disp_profile'        => '_profile.disp.php',
-				'disp_avatar'         => '_profile.disp.php',
-				'disp_pwdchange'      => '_profile.disp.php',
-				'disp_userprefs'      => '_profile.disp.php',
-				'disp_subs'           => '_profile.disp.php',
-				'disp_visits'         => '_profile.disp.php',
-				'disp_search'         => '_search.disp.php',
-				'disp_single'         => '_single.disp.php',
-				'disp_sitemap'        => '_sitemap.disp.php',
-				'disp_user'           => '_user.disp.php',
-				'disp_users'          => '_users.disp.php',
-				'disp_edit'           => '_edit.disp.php',
-				'disp_edit_comment'   => '_edit_comment.disp.php',
-				'disp_closeaccount'   => '_closeaccount.disp.php',
-				'disp_module_form'    => '_module_form.disp.php',
-				'disp_front'          => '_front.disp.php',
-				'disp_useritems'      => '_useritems.disp.php',
-				'disp_usercomments'   => '_usercomments.disp.php',
-				'disp_download'       => '_download.disp.php',
-				'disp_access_denied'  => '_access_denied.disp.php',
+				'disp_403'                   => '_403_forbidden.disp.php',
+				'disp_404'                   => '_404_not_found.disp.php',
+				'disp_access_denied'         => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
-				'disp_tags'           => '_tags.disp.php',
-				'disp_terms'          => '_terms.disp.php',
-				'disp_flagged'        => '_flagged.disp.php',
+				'disp_activateinfo'          => '_activateinfo.disp.php',
+				'disp_arcdir'                => '_arcdir.disp.php',
+				'disp_catdir'                => '_catdir.disp.php',
+				'disp_closeaccount'          => '_closeaccount.disp.php',
+				'disp_comments'              => '_comments.disp.php',
+				'disp_download'              => '_download.disp.php',
+				'disp_edit'                  => '_edit.disp.php',
+				'disp_edit_comment'          => '_edit_comment.disp.php',
+				'disp_feedback-popup'        => '_feedback_popup.disp.php',
+				'disp_flagged'               => '_flagged.disp.php',
+				'disp_front'                 => '_front.disp.php',
+				'disp_help'                  => '_help.disp.php',
+				'disp_login'                 => '_login.disp.php',
+				'disp_lostpassword'          => '_lostpassword.disp.php',
+				'disp_mediaidx'              => '_mediaidx.disp.php',
+				'disp_messages'              => '_messages.disp.php',
+				'disp_module_form'           => '_module_form.disp.php',
+				'disp_msgform'               => '_msgform.disp.php',
+				'disp_page'                  => '_page.disp.php',
+				'disp_postidx'               => '_postidx.disp.php',
+				'disp_posts'                 => '_posts.disp.php',
+				'disp_profile'               => '_profile.disp.php',
+				'disp_avatar'                => '_profile.disp.php',
+				'disp_pwdchange'             => '_profile.disp.php',
+				'disp_userprefs'             => '_profile.disp.php',
+				'disp_subs'                  => '_profile.disp.php',
+				'disp_visits'                => '_profile.disp.php',
+				'disp_register'              => '_register.disp.php',
+				'disp_search'                => '_search.disp.php',
+				'disp_single'                => '_single.disp.php',
+				'disp_sitemap'               => '_sitemap.disp.php',
+				'disp_tags'                  => '_tags.disp.php',
+				'disp_terms'                 => '_terms.disp.php',
+				'disp_threads'               => '_threads.disp.php',
+				'disp_contacts'              => '_threads.disp.php',
+				'disp_user'                  => '_user.disp.php',
+				'disp_useritems'             => '_useritems.disp.php',
+				'disp_usercomments'          => '_usercomments.disp.php',
+				'disp_users'                 => '_users.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -2286,6 +2286,19 @@ function skin_twitter_tags()
 			}
 		}
 
+		// Get author's Twitter username
+		if( $creator_User = & $Item->get_creator_User() )
+		{
+			if( $twitter_links = $creator_User->userfield_values_by_code( 'twitter' ) )
+			{
+				preg_match( '/https?:\/\/(www\.)?twitter\.com((?:\/\#!)?\/(\w+))/', $twitter_links[0], $matches );
+				if( isset( $matches[3] ) )
+				{
+					echo '<meta property="twitter:creator" content="@'.$matches[3].'" />'."\n";
+				}
+			}
+		}
+
 		echo '<meta property="twitter:card" content="summary" />'."\n";
 		echo '<meta property="twitter:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
 		echo '<meta property="twitter:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
@@ -2543,7 +2556,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
-		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin.').'</div>';
+		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin').'.</div>';
 	}
 	else
 	{

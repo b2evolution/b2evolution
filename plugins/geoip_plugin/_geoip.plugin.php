@@ -34,7 +34,7 @@ class geoip_plugin extends Plugin
 	var $name = 'GeoIP';
 	var $code = 'evo_GeoIP';
 	var $priority = 45;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 
@@ -531,189 +531,90 @@ jQuery( document ).ready( function()
 
 		echo '<a name="geoip" style="position:relative;top:-60px"></a>';
 
-		switch( $action )
-		{
-			case 'geoip_download':
-				// Display a process of downloading of GeoIP.dat
-
-				global $admin_url;
-
-				$this->print_tool_log( sprintf( T_('Downloading GeoIP.dat file from the url: %s ...'),
-					'<a href="'.$this->geoip_download_url.'" target="_blank">'.$this->geoip_download_url.'</a>' ) );
-
-				// DOWNLOAD:
-				$gzip_contents = fetch_remote_page( $this->geoip_download_url, $info, 1800 );
-				if( $gzip_contents === false || $info['status'] != 200 )
-				{ // Downloading is Failed
-					if( empty( $info['error'] ) )
-					{ // Some unknown error
-						$this->print_tool_log( T_( 'The URL is not available. It may correspond to an old version of the GeoIP.dat file.' ), 'error' );
-					}
-					else
-					{ // Display an error of request
-						$this->print_tool_log( T_( $info['error'] ), 'error' );
-					}
-					break;
-				}
-				$this->print_tool_log( ' OK.<br />' );
-
-				$plugin_dir = dirname( __FILE__ );
-				$geoip_dat_file = $plugin_dir.'/'.$this->geoip_file_name;
-				// Check if GeoIP.dat file already exists
-				if( file_exists( $geoip_dat_file ) )
-				{
-					if( ! is_writable( $geoip_dat_file ) )
-					{
-						$this->print_tool_log( sprintf( T_('File %s must be writable to update it. Please fix the write permissions and try again.'), '<b>'.$geoip_dat_file.'</b>' ), 'error' );
-						break;
-					}
-				}
-				elseif( ! is_writable( $plugin_dir ) )
-				{ // Check the write rights
-					$this->print_tool_log( sprintf( T_('Plugin folder %s must be writable to receive GeoIP.dat. Please fix the write permissions and try again.'), '<b>'.$plugin_dir.'</b>' ), 'error' );
-					break;
-				}
-
-				$gzip_file_name = explode( '/', $this->geoip_download_url );
-				$gzip_file_name = $gzip_file_name[ count( $gzip_file_name ) - 1 ];
-				$gzip_file_path = sys_get_temp_dir().'/'.$gzip_file_name;
-
-				if( ! save_to_file( $gzip_contents, $gzip_file_path, 'w' ) )
-				{ // Impossible to save file...
-					$this->print_tool_log( sprintf( T_( 'Unable to create file: %s' ), '<b>'.$gzip_file_path.'</b>' ), 'error' );
-
-					if( file_exists( $gzip_file_path ) )
-					{ // Remove file from disk
-						if( ! @unlink( $gzip_file_path ) )
-						{ // File exists without the write rights
-							$this->print_tool_log( sprintf( T_( 'Unable to remove file: %s' ), '<b>'.$gzip_file_path.'</b>' ), 'error' );
-						}
-					}
-					break;
-				}
-
-				// UNPACK:
-				$this->print_tool_log( sprintf( T_('Extracting of the file %s...'), '<b>'.$gzip_file_path.'</b>' ) );
-
-				if( ! function_exists( 'gzopen' ) )
-				{ // No extension
-					$this->print_tool_log( T_( 'There is no \'zip\' or \'zlib\' extension installed!' ), 'error' );
-					break;
-				}
-
-				if( ! ( $gzip_handle = @gzopen( $gzip_file_path, 'rb' ) ) )
-				{ // Try to open gzip file
-					$this->print_tool_log( T_('Could not open the source file!'), 'error' );
-					break;
-				}
-
-				if( ! ( $out_handle = @fopen( $plugin_dir.'/'.str_replace( '.gz', '', $gzip_file_name ), 'w' ) ) )
-				{
-					$this->print_tool_log( sprintf( T_('The file %s cannot be written to disk. Please check the filesystem permissions.'), '<b>'.$plugin_dir.'/'.str_replace( '.gz', '', $gzip_file_name ).'</b>' ), 'error' );
-					break;
-				}
-
-				$i = 0;
-				while( ! gzeof( $gzip_handle ) )
-				{ // Extract file by 4Kb
-					fwrite( $out_handle, gzread( $gzip_handle, 4096 ) );
-					if( $i == 100 )
-					{ // Display the process dots after each 400Kb
-						$this->print_tool_log( ' .' );
-						$i = 0;
-					}
-					$i++;
-				}
-				$this->print_tool_log( ' OK.<br />' );
-
-				fclose( $out_handle );
-				gzclose( $gzip_handle );
-
-				$this->print_tool_log( sprintf( T_('Remove gzip file %s...'), '<b>'.$gzip_file_path.'</b>' ) );
-				if( @unlink( $gzip_file_path ) )
-				{
-					$this->print_tool_log( ' OK.<br />' );
-				}
-				else
-				{ // Failed on removing
-					$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), $gzip_file_path ), 'warning' );
-				}
-
-				// Success message
-				$this->print_tool_log( '<br /><span class="text-success">'.sprintf( T_('%s file was downloaded successfully.'), 'GeoIP.dat' ).'</span>' );
-
-				// Try to enable plugin automatically:
-				global $Plugins;
-				$enable_return = $this->BeforeEnable();
-				if( $enable_return === true )
-				{ // Success enabling
-					$this->print_tool_log( '<br /><span class="text-success">'.T_('The plugin has been enabled.').'</span>' );
-
-					if( $this->status != 'enabled' )
-					{ // Enable this plugin automatically:
-						$Plugins->set_Plugin_status( $this, 'enabled' );
-					}
-				}
-				else
-				{ // Some restriction for enabling
-					$this->print_tool_log( '<br /><span class="text-warning">'.T_('The plugin could not be automatically enabled.').'</span>' );
-
-					if( $this->status != 'needs_config' )
-					{ // Make this plugin incomplete because it cannot be enabled:
-						$Plugins->set_Plugin_status( $this, 'needs_config' );
-					}
-				}
-				break;
-
-			default:
-				// Display a form to find countries for users
-
-				if( $this->status != 'enabled' )
-				{ // Don't allow use this tool when GeoIP plugin is not enabled
-					echo '<p class="error">'.T_('You must enable the GeoIP plugin before to use this tool.').'</p>';
-					break;
-				}
-
-				$Form = new Form();
-
-				$Form->begin_form( 'fform' );
-
-				$Form->add_crumb( 'tools' );
-				$Form->hidden_ctrl(); // needed to pass the "ctrl=tools" param
-				$Form->hiddens_by_key( get_memorized() ); // needed to pass all other memorized params, especially "tab"
-				$Form->hidden( 'action', 'geoip_find_country' );
-
-				echo '<p>'.T_('This tool finds all users that do not have a registration country yet and then assigns them a registration country based on their registration IP.').
-						   get_manual_link('geoip-plugin').'</p>';
-
-				echo '<p>';
-				$Form->button( array(
-						'value' => T_('Find Registration Country for all Users NOW!')
-					) );
-				echo '</p>';
-
-				global $admin_url;
-				if( file_exists( $this->geoip_file_path ) )
-				{
-					$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datetimefmt(), filemtime( $this->geoip_file_path ) ) );
-				}
-				else
-				{
-					$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
-				}
-				$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-warning">'.T_('Download update now!').'</a>';
-				echo '<p><b>GeoIP.dat:</b> '.$datfile_info.'</p>';
+		// Display a form to find countries for users:
+		$this->display_tool_form();
+		return true;
+	}
 
 
-				if( !empty( $this->text_from_AdminTabAction ) )
-				{	// Display a report of executed action
-					echo '<p><b>'.T_('Report').':</b></p>';
-					echo $this->text_from_AdminTabAction;
-				}
-
-				$Form->end_form();
-				break;
+	/**
+	 * Display a form with tool buttons like "Find Registration Country for all Users NOW!" or "Fix for Profile Country for all Users Now"
+	 */
+	function display_tool_form( $params = array() )
+	{
+		if( $this->status != 'enabled' )
+		{ // Don't allow use this tool when GeoIP plugin is not enabled
+			echo '<p class="error">'.T_('You must enable the GeoIP plugin before to use this tool.').'</p>';
+			return;
 		}
+
+		global $current_User;
+		if( ! is_logged_in() || ! $current_User->check_perm( 'options', 'edit' ) )
+		{	// Current User must has a permission to run tools:
+			return;
+		}
+
+		$params = array_merge( array(
+				'display_info'        => true,
+				'display_button_find' => true,
+				'before_button_find'  => '<p>',
+				'after_button_find'   => '</p>',
+				'display_button_fix'  => false,
+				'before_button_fix'   => '<p>',
+				'after_button_fix'    => '</p>',
+				'display_version'     => true,
+			), $params );
+
+		$Form = new Form();
+
+		$Form->begin_form( 'fform' );
+
+		$Form->add_crumb( 'tools' );
+		$Form->hidden( 'ctrl', 'tools' );
+		$Form->hiddens_by_key( get_memorized() ); // needed to pass all other memorized params, especially "tab"
+
+		if( $params['display_info'] )
+		{	// Display info about this form:
+			echo '<p>'.T_('This tool finds all users that do not have a registration country yet and then assigns them a registration country based on their registration IP.').
+					 get_manual_link('geoip-plugin').'</p>';
+		}
+
+		if( $params['display_button_find'] )
+		{	// Display a button to find country for users:
+			echo $params['before_button_find'];
+			$Form->button( array(
+					'name'  => 'actionArray[geoip_find_country]',
+					'value' => T_('Find Registration Country for all Users NOW!')
+				) );
+			echo $params['after_button_find'];
+		}
+
+		if( $params['display_button_fix'] )
+		{	// Display a button to fix country for users:
+			echo $params['before_button_fix'];
+			$Form->button( array(
+					'name'  => 'actionArray[geoip_fix_country]',
+					'value' => T_('Fix for Profile Country for all Users Now')
+				) );
+			echo $params['after_button_fix'];
+		}
+
+		if( $params['display_version'] )
+		{	// Display plugin version and links to update:
+			global $admin_url;
+			if( file_exists( $this->geoip_file_path ) )
+			{
+				$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datetimefmt(), filemtime( $this->geoip_file_path ) ) );
+			}
+			else
+			{
+				$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
+			}
+			$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-warning">'.T_('Download update now!').'</a>';
+			echo '<p><b>GeoIP.dat:</b> '.$datfile_info.'</p>';
+		}
+
+		$Form->end_form();
 	}
 
 
@@ -726,73 +627,28 @@ jQuery( document ).ready( function()
 	 */
 	function AdminToolAction()
 	{
+		global $template_action;
+		global $deferred_AdminToolActions;
+
 		$action = param_action();
 
 		if( !empty( $action ) )
 		{	// If form is submitted
-			global $DB;
-
 			switch( $action )
 			{
+				case 'geoip_download':
+					$deferred_AdminToolActions[$this->ID] = 'download_geoip_data';
+					$template_action = 'deferred_admin_tool_action';
+					break;
+
 				case 'geoip_find_country':
-				// Find and Assign Registration Country for all Users
+					$deferred_AdminToolActions[$this->ID] = 'geoip_find_country';
+					$template_action = 'deferred_admin_tool_action';
+					break;
 
-					$SQL = new SQL( 'Find all users without registration country' );
-					$SQL->SELECT( 'user_ID, uset_value' );
-					$SQL->FROM( 'T_users' );
-					$SQL->FROM_add( 'LEFT JOIN T_users__usersettings
-						 ON user_ID = uset_user_ID
-						AND uset_name = "created_fromIPv4"' );
-					$SQL->WHERE( 'user_reg_ctry_ID IS NULL' );
-					$users = $DB->get_assoc( $SQL->get() );
-
-					$total_users = count( $users );
-					if( $total_users == 0 )
-					{	// No users
-						$this->text_from_AdminTabAction = T_('No found users without registration country.');
-						break;
-					}
-					$count_nofound_country = 0;
-
-					$users_report = '';
-					foreach( $users as $user_ID => $created_fromIPv4 )
-					{
-						$users_report .= sprintf( T_('User #%s, IP:%s' ), $user_ID, int2ip( $created_fromIPv4 ) );
-						if( empty( $created_fromIPv4 ) )
-						{	// No defined IP, Skip this user
-							$count_nofound_country++;
-							$users_report .= ' - <b class="orange">'.T_('IP is not defined!').'</b><br />';
-							continue;
-						}
-
-						// Get Country by IP address
-						$Country = $this->get_country_by_IP( int2ip( $created_fromIPv4 ) );
-
-						if( !$Country )
-						{	// No found country by IP address
-							$count_nofound_country++;
-							$users_report .= ' - <b class="red">'.T_('Country is not detected!').'</b><br />';
-							continue;
-						}
-
-						// Update user's registration country
-						$DB->query( 'UPDATE T_users
-								  SET user_reg_ctry_ID = '.$DB->quote( $Country->ID ).'
-								WHERE user_ID = '.$DB->quote( $user_ID ) );
-
-						// Move user to suspect group by Country ID
-						antispam_suspect_user_by_country( $Country->ID, $user_ID );
-
-						$users_report .= ' - '.sprintf( T_('Country: <b>%s</b>'), $Country->get( 'name' ) ).'<br />';
-					}
-
-					$this->text_from_AdminTabAction = '<div>'.sprintf( T_('Count of users without registration country: <b>%s</b>' ), $total_users ).'</div>';
-					if( $count_nofound_country > 0 )
-					{	// If some users have IP address with unknown country
-						$this->text_from_AdminTabAction .= '<div>'.sprintf( T_('Count of users whose country could not be identified: <b>%s</b>' ), $count_nofound_country ).'</div>';
-					}
-					$this->text_from_AdminTabAction .= '<div style="margin-top:20px">'.$users_report.'</div>';
-
+				case 'geoip_fix_country':
+					$deferred_AdminToolActions[$this->ID] = 'geoip_fix_country';
+					$template_action = 'deferred_admin_tool_action';
 					break;
 			}
 		}
@@ -854,13 +710,18 @@ jQuery( document ).ready( function()
 	{
 		switch( $type )
 		{
+			case 'success':
+				$before = '<br /><span class="text-success">';
+				$after = '</span>';
+				break;
+
 			case 'error':
-				$before = '<br /><span class="red">';
+				$before = '<br /><span class="text-danger">';
 				$after = '</span>';
 				break;
 
 			case 'warning':
-				$before = '<br /><span class="orange">';
+				$before = '<br /><span class="text-warning">';
 				$after = '</span>';
 				break;
 
@@ -872,6 +733,336 @@ jQuery( document ).ready( function()
 
 		echo $before.$message.$after;
 		evo_flush();
+	}
+
+
+	/**
+	 * Event handler: Called right after displaying the admin users list.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminAfterUsersList( & $params )
+	{
+		// Display a form to find countries for users:
+		$this->display_tool_form( array(
+				'display_info'       => false,
+				'before_button_find' => '<p class="center">',
+				'after_button_find'  => ' ',
+				'display_button_fix' => true,
+				'before_button_fix'  => '',
+				'after_button_fix'   => '</p>',
+				'display_version'    => false,
+			) );
+	}
+
+
+	/**
+	 * Download GeoIP.dat
+	 */
+	function download_geoip_data()
+	{
+		// Display a process of downloading of GeoIP.dat
+		global $admin_url;
+
+		$this->print_tool_log( sprintf( T_('Downloading GeoIP.dat file from the url: %s ...'),
+			'<a href="'.$this->geoip_download_url.'" target="_blank">'.$this->geoip_download_url.'</a>' ) );
+
+		// DOWNLOAD:
+		$gzip_contents = fetch_remote_page( $this->geoip_download_url, $info, 1800 );
+		if( $gzip_contents === false || $info['status'] != 200 )
+		{ // Downloading is Failed
+			if( empty( $info['error'] ) )
+			{ // Some unknown error
+				$this->print_tool_log( T_( 'The URL is not available. It may correspond to an old version of the GeoIP.dat file.' ), 'error' );
+			}
+			else
+			{ // Display an error of request
+				$this->print_tool_log( T_( $info['error'] ), 'error' );
+			}
+			return;
+		}
+		$this->print_tool_log( ' OK.<br />' );
+
+		$plugin_dir = dirname( __FILE__ );
+		$geoip_dat_file = $plugin_dir.'/'.$this->geoip_file_name;
+		// Check if GeoIP.dat file already exists
+		if( file_exists( $geoip_dat_file ) )
+		{
+			if( ! is_writable( $geoip_dat_file ) )
+			{
+				$this->print_tool_log( sprintf( T_('File %s must be writable to update it. Please fix the write permissions and try again.'), '<b>'.$geoip_dat_file.'</b>' ), 'error' );
+				return;
+			}
+		}
+		elseif( ! is_writable( $plugin_dir ) )
+		{ // Check the write rights
+			$this->print_tool_log( sprintf( T_('Plugin folder %s must be writable to receive GeoIP.dat. Please fix the write permissions and try again.'), '<b>'.$plugin_dir.'</b>' ), 'error' );
+			return;
+		}
+
+		$gzip_file_name = explode( '/', $this->geoip_download_url );
+		$gzip_file_name = $gzip_file_name[ count( $gzip_file_name ) - 1 ];
+		$gzip_file_path = sys_get_temp_dir().'/'.$gzip_file_name;
+
+		if( ! save_to_file( $gzip_contents, $gzip_file_path, 'w' ) )
+		{ // Impossible to save file...
+			$this->print_tool_log( sprintf( T_( 'Unable to create file: %s' ), '<b>'.$gzip_file_path.'</b>' ), 'error' );
+
+			if( file_exists( $gzip_file_path ) )
+			{ // Remove file from disk
+				if( ! @unlink( $gzip_file_path ) )
+				{ // File exists without the write rights
+					$this->print_tool_log( sprintf( T_( 'Unable to remove file: %s' ), '<b>'.$gzip_file_path.'</b>' ), 'error' );
+				}
+			}
+			return;
+		}
+
+		// UNPACK:
+		$this->print_tool_log( sprintf( T_('Extracting of the file %s...'), '<b>'.$gzip_file_path.'</b>' ) );
+
+		if( ! function_exists( 'gzopen' ) )
+		{ // No extension
+			$this->print_tool_log( T_( 'There is no \'zip\' or \'zlib\' extension installed!' ), 'error' );
+			return;
+		}
+
+		if( ! ( $gzip_handle = @gzopen( $gzip_file_path, 'rb' ) ) )
+		{ // Try to open gzip file
+			$this->print_tool_log( T_('Could not open the source file!'), 'error' );
+			return;
+		}
+
+		if( ! ( $out_handle = @fopen( $plugin_dir.'/'.str_replace( '.gz', '', $gzip_file_name ), 'w' ) ) )
+		{
+			$this->print_tool_log( sprintf( T_('The file %s cannot be written to disk. Please check the filesystem permissions.'), '<b>'.$plugin_dir.'/'.str_replace( '.gz', '', $gzip_file_name ).'</b>' ), 'error' );
+			return;
+		}
+
+		$i = 0;
+		while( ! gzeof( $gzip_handle ) )
+		{ // Extract file by 4Kb
+			fwrite( $out_handle, gzread( $gzip_handle, 4096 ) );
+			if( $i == 100 )
+			{ // Display the process dots after each 400Kb
+				$this->print_tool_log( ' .' );
+				$i = 0;
+			}
+			$i++;
+		}
+		$this->print_tool_log( ' OK.<br />' );
+
+		fclose( $out_handle );
+		gzclose( $gzip_handle );
+
+		$this->print_tool_log( sprintf( T_('Remove gzip file %s...'), '<b>'.$gzip_file_path.'</b>' ) );
+		if( @unlink( $gzip_file_path ) )
+		{
+			$this->print_tool_log( ' OK.<br />' );
+		}
+		else
+		{ // Failed on removing
+			$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), $gzip_file_path ), 'warning' );
+		}
+
+		// Success message
+		$this->print_tool_log( sprintf( T_('%s file was downloaded successfully.'), 'GeoIP.dat' ), 'success' );
+
+		// Try to enable plugin automatically:
+		global $Plugins;
+		$enable_return = $this->BeforeEnable();
+		if( $enable_return === true )
+		{ // Success enabling
+			$this->print_tool_log( T_('The plugin has been enabled.'), 'success' );
+
+			if( $this->status != 'enabled' )
+			{ // Enable this plugin automatically:
+				$Plugins->set_Plugin_status( $this, 'enabled' );
+			}
+		}
+		else
+		{ // Some restriction for enabling
+			$this->print_tool_log( T_('The plugin could not be automatically enabled.'), 'warning' );
+
+			if( $this->status != 'needs_config' )
+			{ // Make this plugin incomplete because it cannot be enabled:
+				$Plugins->set_Plugin_status( $this, 'needs_config' );
+			}
+		}
+
+		return;
+	}
+
+
+	/**
+	 * Find and Assign Registration Country for all Users
+	 */
+	function geoip_find_country()
+	{
+		global $DB, $Messages;
+
+		$SQL = new SQL( 'GeoIP plugin #'.$this->ID.': Find all users without registration country' );
+		$SQL->SELECT( 'user_ID, uset_value' );
+		$SQL->FROM( 'T_users' );
+		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings
+				ON user_ID = uset_user_ID
+			AND uset_name = "created_fromIPv4"' );
+		$SQL->WHERE( 'user_reg_ctry_ID IS NULL' );
+		$users = $DB->get_assoc( $SQL->get(), $SQL->title );
+
+		$total_users = count( $users );
+		if( $total_users == 0 )
+		{	// No users
+			$this->print_tool_log( T_('No found users without registration country.'), 'warning' );
+			return;
+		}
+		$count_nofound_country = 0;
+
+		$users_report = '';
+		foreach( $users as $user_ID => $created_fromIPv4 )
+		{
+			$users_report .= sprintf( T_('User #%s, IP:%s' ), $user_ID, int2ip( $created_fromIPv4 ) );
+			if( empty( $created_fromIPv4 ) )
+			{	// No defined IP, Skip this user
+				$count_nofound_country++;
+				$users_report .= ' - <b class="orange">'.T_('IP is not defined!').'</b><br />';
+				continue;
+			}
+
+			// Get Country by IP address
+			$Country = $this->get_country_by_IP( int2ip( $created_fromIPv4 ) );
+
+			if( !$Country )
+			{	// No found country by IP address
+				$count_nofound_country++;
+				$users_report .= ' - <b class="text-danger">'.T_('Country is not detected!').'</b><br />';
+				continue;
+			}
+
+			// Update user's registration country
+			$DB->query( 'UPDATE T_users
+						SET user_reg_ctry_ID = '.$DB->quote( $Country->ID ).'
+					WHERE user_ID = '.$DB->quote( $user_ID ) );
+
+			// Move user to suspect group by Country ID
+			antispam_suspect_user_by_country( $Country->ID, $user_ID );
+
+			$users_report .= ' - '.sprintf( T_('Country: <b>%s</b>'), $Country->get( 'name' ) ).'<br />';
+		}
+
+		$this->print_tool_log( '<div>'.sprintf( T_('Count of users without registration country: <b>%s</b>' ), $total_users ).'</div>' );
+		if( $count_nofound_country > 0 )
+		{	// If some users have IP address with unknown country
+			$this->print_tool_log( '<div>'.sprintf( T_('Count of users whose country could not be identified: <b>%s</b>' ), $count_nofound_country ).'</div>' );
+		}
+		$this->print_tool_log( '<div style="margin-top:20px;">'.$users_report.'</div>' );
+
+		$this->print_tool_log( '<div>'.T_('Finished searching for registration country of all users').'</div>', 'success' );
+	}
+
+
+	/**
+	 * Find and Assign Profile Country for all Users:
+	 */
+	function geoip_fix_country()
+	{
+		global $DB;
+
+		$SQL = new SQL( 'GeoIP plugin #'.$this->ID.': Find all users without profile country' );
+		$SQL->SELECT( 'user_ID AS ID, user_reg_ctry_ID AS reg_ctry_ID, uset_value AS reg_IP, sess_ipaddress AS session_IP' );
+		$SQL->FROM( 'T_users' );
+		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings
+				ON user_ID = uset_user_ID
+			AND uset_name = "created_fromIPv4"' );
+		$SQL->FROM_add( 'LEFT JOIN T_sessions
+				ON user_ID = sess_user_ID' );
+		$SQL->WHERE( 'user_ctry_ID IS NULL' );
+		$SQL->ORDER_BY( 'sess_ID DESC' );
+		$SQL->GROUP_BY( 'user_ID' );
+		$users = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+
+		$total_users = count( $users );
+		if( $total_users == 0 )
+		{	// No users
+			$this->print_tool_log( T_('All users already have a profile country.'), 'warning' );
+			return;
+		}
+		$count_nofound_country = 0;
+
+		$users_report = '';
+		foreach( $users as $user )
+		{
+			$Country = false;
+
+			$users_report .= sprintf( T_('User: %s'), '#'.$user->ID ).': ';
+
+			// STEP 1: Get profile Country from IP address of last session:
+			if( empty( $user->session_IP ) )
+			{	// No defined session IP:
+				$users_report .= '<b class="orange">'.T_('Session IP address is not set!').'</b>';
+			}
+			else
+			{	// Get Country by session IP address:
+				$users_report .= T_('Session IP address:').' '.$user->session_IP;
+				$Country = $this->get_country_by_IP( $user->session_IP );
+			}
+
+			// STEP 2: Get profile Country from registration Country:
+			if( ! $Country )
+			{
+				$users_report .= ' - ';
+				if( empty( $user->reg_ctry_ID ) )
+				{	// No defined registration country:
+					$users_report .= '<b class="orange">'.T_('Registration country is not set!').'</b>';
+				}
+				else
+				{	// Get Country by registration IP address:
+					$CountryCache = & get_CountryCache();
+					$Country = & $CountryCache->get_by_ID( $user->reg_ctry_ID, false, false );
+					$users_report .= T_('Registration country:').' '.( $Country ? $Country->get_name() : '#'.$user->reg_ctry_ID );
+				}
+			}
+
+			// STEP 3: Get profile Country from registration IP address:
+			if( ! $Country )
+			{
+				$users_report .= ' - ';
+				if( empty( $user->reg_IP ) )
+				{	// No defined registration IP:
+					$users_report .= '<b class="orange">'.T_('Registration IP address is not set!').'</b>';
+				}
+				else
+				{	// Get Country by registration IP address:
+					$users_report .= T_('Registration IP address:').' '.int2ip( $user->reg_IP );
+					$Country = $this->get_country_by_IP( int2ip( $user->reg_IP ) );
+				}
+			}
+
+			if( ! $Country )
+			{	// No found country in 3 steps above:
+				$count_nofound_country++;
+				$users_report .= ' - <b class="text-danger">'.T_('Country is not detected!').'</b><br />';
+				continue;
+			}
+
+			// Update user's registration country
+			$DB->query( 'UPDATE T_users
+						SET user_ctry_ID = '.$DB->quote( $Country->ID ).'
+					WHERE user_ID = '.$DB->quote( $user->ID ) );
+
+			// Move user to suspect group by Country ID
+			antispam_suspect_user_by_country( $Country->ID, $user->ID );
+
+			$users_report .= ' - '.sprintf( T_('Country: <b>%s</b>'), $Country->get( 'name' ) ).'<br />';
+		}
+
+		$this->print_tool_log( '<div>'.sprintf( T_('Count of users without profile country: %s' ), '<b>'.$total_users.'</b>' ).'</div>' );
+		if( $count_nofound_country > 0 )
+		{	// If some users have IP address with unknown country
+			$this->print_tool_log( '<div>'.sprintf( T_('Count of users whose country could not be identified: <b>%s</b>' ), $count_nofound_country ).'</div>' );
+		}
+		$this->print_tool_log( '<div style="margin-top:20px">'.$users_report.'</div>' );
 	}
 }
 

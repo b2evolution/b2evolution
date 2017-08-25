@@ -59,6 +59,17 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		$outer_most = false;
 	}
 
+	// Set input group
+	if( isset( $parmeta['group'] ) )
+	{
+		$group = $parmeta['group'];
+		$parname = $group.$parname;
+	}
+	else
+	{
+		$group = NULL;
+	}
+
 	// Passthrough some attributes to elements:
 	foreach( $parmeta as $k => $v )
 	{
@@ -167,27 +178,27 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		switch( $set_type )
 		{
 			case 'CollSettings':
-				$set_value = $Obj->get_coll_setting( $parname, $set_target );
+				$set_value = $Obj->get_coll_setting( $parname, $set_target, false, $group );
 				$error_value = NULL;
 				break;
 
 			case 'MsgSettings':
-				$set_value = $Obj->get_msg_setting( $parname );
+				$set_value = $Obj->get_msg_setting( $parname, $group );
 				$error_value = NULL;
 				break;
 
 			case 'EmailSettings':
-				$set_value = $Obj->get_email_setting( $parname );
+				$set_value = $Obj->get_email_setting( $parname, $group );
 				$error_value = NULL;
 				break;
 
 			case 'Skin':
-				$set_value = $Obj->get_setting( $parname );
+				$set_value = $Obj->get_setting( $parname, $group );
 				$error_value = NULL;
 				break;
 
 			case 'Widget':
-				$set_value = $Obj->get_param( $parname );
+				$set_value = $Obj->get_param( $parname, false, $group );
 				$error_value = NULL;
 				break;
 
@@ -221,12 +232,12 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		if( $error_value )
 		{ // add error
-			param_error( 'edit_plugin_'.$Obj->ID.'_set_'.$parname, NULL, $error_value ); // only add the error to the field
+			param_error( $Obj->get_param_prefix().$parname, NULL, $error_value ); // only add the error to the field
 		}
 	}
 
 	// Display input element:
-	$input_name = 'edit_plugin_'.$Obj->ID.'_set_'.$parname;
+	$input_name = $Obj->get_param_prefix().$parname;
 	if( substr($parmeta['type'], 0, 6) == 'select' && ! empty($parmeta['multiple']) )
 	{ // a "multiple" select:
 		$input_name .= '[]';
@@ -438,6 +449,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			// TODO: fix this for AJAX callbacks, when removing and re-adding items (dh):
 			if( ! isset( $parmeta['max_number'] ) || $parmeta['max_number'] > ($k_nb) )
 			{ // no max_number defined or not reached: display link to add a new set
+				global $Blog;
 				$set_path = $parname.'['.$k_nb.']';
 
 				echo '<div id="'.$parname.'_add_new">';
@@ -455,6 +467,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								plugin_ID: '{$Obj->ID}',
 								set_type: '$set_type',
 								set_path: '$set_path'
+								".( isset( $Blog ) ? ',blog: '.$Blog->ID : '' )."
+								".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
 							},
 							function(r, status) {
 								jQuery('#".$parname."_add_new').replaceWith(r);
@@ -522,8 +536,26 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$params['root'] = isset( $parmeta['root'] ) ? $parmeta['root'] : '';
 			$params['path'] = isset( $parmeta['path'] ) ? $parmeta['path'] : '';
 			$params['size_name'] = isset( $parmeta['thumbnail_size'] ) ? $parmeta['thumbnail_size'] : 'crop-64x64';
-			$Form->fileselect( $input_name, $set_value, $set_label, '', $params );
+			$params['max_file_num'] = isset( $parmeta['max_file_num'] ) ? $parmeta['max_file_num'] : 1;
+			$params['initialize_with'] = isset( $parmeta['initialize_with'] ) ? $parmeta['initialize_with'] : '';
+			$params['note'] = isset( $parmeta['note'] ) ? $parmeta['note'] : '';
+
+			$Form->fileselect( $input_name, $set_value, $set_label, $params['note'], $params );
 			break;
+
+		case 'input_group':
+			if( ! empty( $parmeta['inputs'] ) && is_array( $parmeta['inputs'] ) )
+			{
+				$Form->begin_line( $parmeta['label'], $input_name );
+				foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
+				{
+					$l_parmeta['group'] = $parname; // inject group
+					autoform_display_field( $l_parname, $l_parmeta, $Form, $set_type, $Obj, $set_target, $use_value );
+				}
+				$Form->end_line();
+			}
+			break;
+
 
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
@@ -543,7 +575,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  *
  * Walks the given settings path and either inits the target entry or unsets it ($init_value=NULL).
  *
- * @param Plugin
+ * @param object Plugin or Skin
  * @param string Settings type ("Settings" or "UserSettings")
  * @param string The settings path, e.g. 'setting[0]foo[1]'. (Is used as array internally for recursion.)
  * @param mixed The initial value of the setting, typically array() - NULL to unset it (action "delete_settings_set" uses it)
@@ -606,8 +638,37 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 		}
 	}
 
-	// Set it into $Plugin->Settings or $Plugin->UserSettings:
-	$Plugin->$set_type->set( $set_name, $setting );
+	switch( $set_type )
+	{
+		case 'Settings':
+		case 'CollSettings':
+		case 'Widget':
+			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'UserSettings':
+			$Plugin->UserSettings->set( $set_name, $setting );
+			break;
+
+		case 'MsgSettings':
+			$set_name = ( $set_name == 'msg_apply_rendering' ? '' : 'msg_' ).$set_name;
+			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'EmailSettings':
+			$set_name = ( $set_name == 'email_apply_rendering' ? '' : 'email_' ).$set_name;
+			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'Skin':
+			$Skin = & $Plugin;
+			$Skin->set_setting( $set_name, $setting );
+			break;
+
+		default:
+			debug_die( 'Invalid plugin type param!' );
+	}
+
 
 	return $setting;
 }
@@ -616,7 +677,7 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 /**
  * Get a node from settings by path (e.g. "locales[0][questions]")
  *
- * @param Plugin
+ * @param object Plugin or Skin
  * @param string Settings type ("Settings" or "UserSettings")
  * @param string The settings path, e.g. 'setting[0]foo[1]' or even 'setting[]'. (Is used as array internally for recursion.)
  * @return array Array(
@@ -642,18 +703,60 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 
 	$set_name = $path[0];
 
-	$setting = $Plugin->$set_type->get($set_name);  // $Plugin->Settings or $Plugin->UserSettings
-	if( ! is_array($setting) )
+	// meta info for this setting:
+	$tmp_params = array( 'for_editing' => true );
+
+	switch( $set_type )
+	{
+		case 'Settings':
+			$setting = $Plugin->Settings->get( $set_name );
+			$defaults = $Plugin->GetDefaultSettings( $tmp_params );
+			break;
+
+		case 'UserSettings':
+			$setting = $Plugin->UserSettings->get( $set_name );
+			$defaults = $Plugin->GetDefaultUserSettings( $tmp_params );
+			break;
+
+		case 'CollSettings':
+			$setting = $Plugin->Settings->get( $set_name );
+			$defaults = $Plugin->get_coll_setting_definitions( $tmp_params );
+			break;
+
+		case 'MsgSettings':
+			$param_name = ( $set_name == 'msg_apply_rendering' ? '' : 'msg_' ).$set_name;
+			$setting = $Plugin->Settings->get( $param_name );
+			$defaults = $Plugin->get_msg_setting_definitions( $tmp_params );
+			break;
+
+		case 'EmailSettings':
+			$param_name = ( $set_name == 'email_apply_rendering' ? '' : 'email_' ).$set_name;
+			$setting = $Plugin->Settings->get( $param_name );
+			$defaults = $Plugin->get_email_setting_definitions( $tmp_params );
+			break;
+
+		case 'Widget':
+			$setting = $Plugin->Settings->get( $set_name );
+			$defaults = $Plugin->get_widget_param_definitions( $tmp_params );
+			break;
+
+		case 'Skin':
+			$Skin = & $Plugin;
+			$setting = $Skin->get_setting( $set_name );
+			$defaults = $Skin->get_param_definitions( $tmp_params );
+			break;
+
+		default:
+			debug_die( 'Invalid plugin type param!' );
+	}
+
+	if( ! is_array( $setting ) )
 	{ // this may happen, if there was a non-array setting stored previously:
 		// discard those!
 		$setting = array();
 	}
 
-	// meta info for this setting:
-	$method = 'GetDefault'.$set_type; // GetDefaultSettings or GetDefaultUserSettings
-	$tmp_params = array( 'for_editing' => true );
-	$defaults = $Plugin->$method( $tmp_params );
-	if( ! isset($defaults[ $set_name ]) )
+	if( ! isset( $defaults[ $set_name ] ) )
 	{
 		//debug_die( 'Invalid setting ('.$set_name.') - no meta data!' );
 		return false;
@@ -754,6 +857,22 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		return;
 	}
 
+	if( ! empty( $parmeta['inputs'] ) )
+	{
+		foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
+		{
+			$l_parmeta['group'] = $parname; // inject group into meta
+			autoform_set_param_from_request( $l_parname, $l_parmeta, $Obj, $set_type, $set_target, $set_value );
+		}
+		return;
+	}
+
+	// set input group
+	if( isset( $parmeta['group'] ) )
+	{
+		$parname = $parmeta['group'].$parname;
+	}
+
 	$l_param_type = 'string';
 	$l_param_default = '';
 	if( isset($parmeta['type']) )
@@ -795,7 +914,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 	if( $set_value === NULL )
 	{ // Get the value from request:
-		$l_value = param( 'edit_plugin_'.$Obj->ID.'_set_'.$parname, $l_param_type, $l_param_default );
+		$l_value = param( $Obj->get_param_prefix().$parname, $l_param_type, $l_param_default );
 		// Store values of unchecked checkboxes manually because their empty values are not passed to a submitted form:
 		switch( $l_param_type )
 		{
@@ -836,7 +955,17 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		handle_array_keys_in_plugin_settings($l_value);
 	}
 
-	if( ! autoform_validate_param_value('edit_plugin_'.$Obj->ID.'_set_'.$parname, $l_value, $parmeta) )
+	if( isset( $parmeta['type'] ) && $parmeta['type'] == 'integer' )
+	{	// Convert to correct integer value:
+		$l_value = intval( $l_value );
+		if( $l_value == 0 && ! empty( $parmeta['allow_empty'] ) &&
+				isset( $parmeta['valid_range'], $parmeta['valid_range']['min'] ) && $parmeta['valid_range']['min'] > 0 )
+		{	// Convert 0 to empty value for integer field if it allows empty values:
+			$l_value = NULL;
+		}
+	}
+
+	if( ! autoform_validate_param_value( $Obj->get_param_prefix().$parname, $l_value, $parmeta ) )
 	{
 		return;
 	}
@@ -856,7 +985,18 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 		case 'Widget':
 			$error_value = NULL;
-			$Obj->set( $parname, $l_value );
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'checklist' && $parname == 'renderers' )
+			{	// Save "stealth" and "always" plugin render options:
+				// (they are hidden or disabled checkboxes of the form and cannot be submitted automatically)
+				global $Plugins;
+				$widget_Blog = & $Obj->get_Blog();
+				$l_value = $Plugins->validate_renderer_list( array_keys( $l_value ), array(
+						'Blog'         => & $widget_Blog,
+						'setting_name' => 'coll_apply_rendering',
+					) );
+				$l_value = array_fill_keys( $l_value, 1 );
+			}
+			$Obj->set( $parname, $l_value, false, ( isset( $parmeta['group'] ) ? $parmeta['group'] : NULL ) );
 			break;
 
 		case 'UserSettings':
@@ -869,7 +1009,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				'action' => 'set' );
 			$error_value = $Obj->PluginUserSettingsValidateSet( $dummy );
 			// Update the param value, because a plugin might have changed it (through reference):
-			$GLOBALS['edit_plugin_'.$Obj->ID.'_set_'.$parname] = $l_value;
+			$GLOBALS[ $Obj->get_param_prefix().$parname ] = $l_value;
 
 			if( empty( $error_value ) )
 			{
@@ -890,7 +1030,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				'action' => 'set' );
 			$error_value = $Obj->PluginSettingsValidateSet( $dummy );
 			// Update the param value, because a plugin might have changed it (through reference):
-			$GLOBALS['edit_plugin_'.$Obj->ID.'_set_'.$parname] = $l_value;
+			$GLOBALS[ $Obj->get_param_prefix().$parname ] = $l_value;
 
 			if( empty( $error_value ) )
 			{	// Set new value:
@@ -916,7 +1056,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 	if( $error_value )
 	{ // A validation error has occured, record error message:
-		param_error( 'edit_plugin_'.$Obj->ID.'_set_'.$parname, $error_value );
+		param_error( $Obj->get_param_prefix().$parname, $error_value );
 	}
 }
 
@@ -938,14 +1078,14 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 		return;
 	}
 
-	if( is_array($value) && isset($meta['entries']) )
+	if( is_array( $value ) && isset( $meta['entries'] ) )
 	{
 		$r = true;
-		if(isset($meta['key']))
+		if( isset( $meta['key'] ) )
 		{ // validate keys:
-			foreach( array_keys($value) as $k )
+			foreach( array_keys( $value ) as $k )
 			{
-				if( ! autoform_validate_param_value($param_name.'['.$k.'][__key__]', $k, $meta['key']) )
+				if( ! autoform_validate_param_value( $param_name.'['.$k.'][__key__]', $k, $meta['key'] ) )
 				{
 					$r = false;
 				}
@@ -954,16 +1094,16 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 
 		// Check max_count/min_count
 		// dh> TODO: find a way to link it to the form's fieldset (and add an "error" class to it)
-		if( isset($meta['max_count']) && count($value) > $meta['max_count'] )
+		if( isset( $meta['max_count'] ) && count( $value ) > $meta['max_count'] )
 		{
 			$r = false;
-			$label = isset($meta['label']) ? $meta['label'] : $param_name;
+			$label = isset( $meta['label'] ) ? $meta['label'] : $param_name;
 			$Messages->add( sprintf( T_('Too many entries in the "%s" set. It must have %d at most.'), $label, $meta['max_count'] ), 'error' );
 		}
-		elseif( isset($meta['min_count']) && count($value) < $meta['min_count'] )
+		elseif( isset( $meta['min_count'] ) && count( $value ) < $meta['min_count'] )
 		{
 			$r = false;
-			$label = isset($meta['label']) ? $meta['label'] : $param_name;
+			$label = isset( $meta['label'] ) ? $meta['label'] : $param_name;
 			$Messages->add( sprintf( T_('Too few entries in the "%s" set. It must have %d at least.'), $label, $meta['min_count'] ), 'error' );
 		}
 
@@ -971,10 +1111,10 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 		{
 			foreach( $value as $vk => $vv )
 			{
-				if( ! isset($vv[$mk]) )
+				if( ! isset( $vv[$mk] ) )
 					continue;
 
-				if( ! autoform_validate_param_value($param_name.'['.$vk.']['.$mk.']', $vv[$mk], $mv) )
+				if( ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.']', $vv[$mk], $mv ) )
 				{
 					$r = false;
 				}
@@ -1128,12 +1268,12 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 	}
 
 	// Check valid pattern:
-	if( isset($meta['valid_pattern']) )
+	if( isset( $meta['valid_pattern'] ) )
 	{
-		$param_pattern = is_array($meta['valid_pattern']) ? $meta['valid_pattern']['pattern'] : $meta['valid_pattern'];
+		$param_pattern = is_array( $meta['valid_pattern'] ) ? $meta['valid_pattern']['pattern'] : $meta['valid_pattern'];
 		if( ! preg_match( $param_pattern, $value ) )
 		{
-			$param_error = is_array($meta['valid_pattern']) ? $meta['valid_pattern']['error'] : sprintf(T_('The value is invalid. It must match the regular expression &laquo;%s&raquo;.'), $param_pattern);
+			$param_error = is_array( $meta['valid_pattern'] ) ? $meta['valid_pattern']['error'] : sprintf( T_('The value is invalid. It must match the regular expression &laquo;%s&raquo;.'), $param_pattern );
 			param_error( $param_name, $param_error );
 			return false;
 		}
@@ -1154,26 +1294,26 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 			$meta['valid_range']['error'] = $meta['valid_range'][2];
 		}
 
-		if( (isset($meta['valid_range']['min']) && $value < $meta['valid_range']['min'])
-				|| (isset($meta['valid_range']['max']) && $value > $meta['valid_range']['max']) )
+		if( ( isset( $meta['valid_range']['min'] ) && $value < $meta['valid_range']['min'] )
+				|| ( isset( $meta['valid_range']['max'] ) && $value > $meta['valid_range']['max'] ) )
 		{
-			if( isset($meta['valid_range']['error']) )
+			if( isset( $meta['valid_range']['error'] ) )
 			{
 				$param_error = $meta['valid_range']['error'];
 			}
 			else
 			{
-				if( isset($meta['valid_range']['min']) && isset($meta['valid_range']['max']) )
+				if( isset( $meta['valid_range']['min'] ) && isset( $meta['valid_range']['max'] ) )
 				{
-					$param_error = sprintf(T_('The value is invalid. It must be in the range from %s to %s.'), $meta['valid_range']['min'], $meta['valid_range']['max']);
+					$param_error = sprintf( T_('The value is invalid. It must be in the range from %s to %s.'), $meta['valid_range']['min'], $meta['valid_range']['max'] );
 				}
-				elseif( isset($meta['valid_range']['max']) )
+				elseif( isset( $meta['valid_range']['max'] ) )
 				{
-					$param_error = sprintf(T_('The value is invalid. It must be smaller than or equal to %s.'), $meta['valid_range']['max']);
+					$param_error = sprintf( T_('The value is invalid. It must be smaller than or equal to %s.'), $meta['valid_range']['max'] );
 				}
 				else
 				{
-					$param_error = sprintf(T_('The value is invalid. It must be greater than or equal to %s.'), $meta['valid_range']['min']);
+					$param_error = sprintf( T_('The value is invalid. It must be greater than or equal to %s.'), $meta['valid_range']['min'] );
 				}
 			}
 
@@ -1194,34 +1334,34 @@ function autoform_validate_param_value( $param_name, $value, $meta )
  */
 function handle_array_keys_in_plugin_settings( & $a )
 {
-	if( ! is_array($a) )
+	if( ! is_array( $a ) )
 	{
 		return;
 	}
 
 	$new_arr = array(); // use a new array to maintain order, also for "numeric" keys
 
-	foreach( array_keys($a) as $k )
+	foreach( array_keys( $a ) as $k )
 	{
 		$v = & $a[$k];
 
-		if( is_array($v) && isset($v['__key__']) )
+		if( is_array( $v ) && isset( $v['__key__'] ) )
 		{
 			if( $k != $v['__key__'] )
 			{
 				$k = $v['__key__'];
-				if( ! strlen($k) || isset($a[ $k ]) )
+				if( ! strlen( $k ) || isset($a[ $k ]) )
 				{ // key already exists (or is empty):
 					$c = 1;
 
-					while( isset($a[ $k.'_'.$c ]) )
+					while( isset( $a[ $k.'_'.$c ] ) )
 					{
 						$c++;
 					}
 					$k = $k.'_'.$c;
 				}
 			}
-			unset($v['__key__']);
+			unset( $v['__key__'] );
 
 			$new_arr[$k] = $v;
 		}
@@ -1231,9 +1371,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 		}
 
 		// Recurse:
-		foreach( array_keys($v) as $rk )
+		foreach( array_keys( $v ) as $rk )
 		{
-			if( is_array($v[$rk]) )
+			if( is_array( $v[$rk] ) )
 			{
 				handle_array_keys_in_plugin_settings($v[$rk]);
 			}
@@ -1262,12 +1402,12 @@ function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = 
 	$install_db_deltas = array(); // This holds changes to make, if any (just all queries)
 	//pre_dump( $db_layout );
 
-	if( ! empty($db_layout) )
+	if( ! empty( $db_layout ) )
 	{ // The plugin has a DB layout attached
 		load_funcs('_core/model/db/_upgrade.funcs.php');
 
 		// Get the queries to make:
-		foreach( db_delta($db_layout) as $table => $queries )
+		foreach( db_delta( $db_layout ) as $table => $queries )
 		{
 			foreach( $queries as $query_info )
 			{
@@ -1278,13 +1418,13 @@ function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = 
 			}
 		}
 
-		if( ! empty($install_db_deltas) )
+		if( ! empty( $install_db_deltas ) )
 		{ // delta queries to make
-			if( empty($install_db_deltas_confirm_md5) && !$force_install_db_deltas )
+			if( empty( $install_db_deltas_confirm_md5 ) && !$force_install_db_deltas )
 			{ // delta queries have to be confirmed in payload
 				return false;
 			}
-			elseif( $install_db_deltas_confirm_md5 == md5( implode('', $install_db_deltas) ) || $force_install_db_deltas )
+			elseif( $install_db_deltas_confirm_md5 == md5( implode( '', $install_db_deltas ) ) || $force_install_db_deltas )
 			{ // Confirmed in first step:
 				foreach( $install_db_deltas as $query )
 				{

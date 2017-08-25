@@ -28,7 +28,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 63;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -445,12 +445,9 @@ class autolinks_plugin extends Plugin
 	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
-		$Item = & $params['Item'];
-		/**
-		 * @var Blog
-		 * Also it is used to build link for tag links
-		 */
-		$this->current_Blog = & $params['Item']->get_Blog();
+
+		// Get collection from given params (also it is used to build link for tag links):
+		$this->current_Blog = $this->get_Blog_from_params( $params );
 
 		// Define the setting names depending on what is rendering now
 		if( !empty( $params['Comment'] ) )

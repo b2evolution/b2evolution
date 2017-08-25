@@ -58,7 +58,7 @@ class UserQuery extends SQL
 				'grouped'        => false,
 			), $params );
 
-		$this->SELECT( 'user_ID, user_login, user_nickname, user_lastname, user_firstname, user_gender, user_source, user_created_datetime, user_profileupdate_date, user_lastseen_ts, user_level, user_status, user_avatar_file_ID, user_email, user_url, user_age_min, user_age_max, user_pass, user_salt, user_locale, user_unsubscribe_key, user_reg_ctry_ID, user_ctry_ID, user_rgn_ID, user_subrg_ID, user_city_ID, user_grp_ID' );
+		$this->SELECT( 'user_ID, user_login, user_nickname, user_lastname, user_firstname, user_gender, user_source, user_created_datetime, user_profileupdate_date, user_lastseen_ts, user_level, user_status, user_avatar_file_ID, user_email, user_url, user_age_min, user_age_max, user_pass, user_salt, user_pass_driver, user_locale, user_unsubscribe_key, user_reg_ctry_ID, user_ctry_ID, user_rgn_ID, user_subrg_ID, user_city_ID, user_grp_ID' );
 		$this->SELECT_add( ', IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture' );
 		$this->FROM( $this->dbtablename );
 
@@ -510,12 +510,54 @@ class UserQuery extends SQL
 		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
 	}
 
+
+	/**
+	 * Select by viewed user
+	 *
+	 * @param integer User ID
+	 */
 	function where_viewed_user( $user_ID )
 	{
 		global $DB;
 		$this->SELECT_add( ', upv_visited_user_ID, upv_visitor_user_ID, upv_last_visit_ts' );
 		$this->FROM_add( 'RIGHT JOIN T_users__profile_visits ON upv_visitor_user_ID = user_ID AND upv_visited_user_ID = '.$DB->quote( $user_ID ) );
 	}
+
+
+	/**
+	 * Select by registration IP range
+	 *
+	 * @param string Min IP address
+	 * @param string Max IP address
+	 */
+	function where_reg_ip( $reg_ip_min, $reg_ip_max )
+	{
+		global $DB;
+
+		$reg_ip_min = ip2int( $reg_ip_min );
+		$reg_ip_max = ip2int( $reg_ip_max );
+
+		if( empty( $reg_ip_min ) && empty( $reg_ip_max ) )
+		{	// No IP filters:
+			return;
+		}
+
+		// Join User settings table:
+		$this->FROM_add( 'INNER JOIN T_users__usersettings
+			 ON uset_user_ID = user_ID
+			AND uset_name = "created_fromIPv4"' );
+
+		if( ! empty( $reg_ip_min ) )
+		{	// Restrict with MIN registration IP address:
+			$this->WHERE_and( 'uset_value >= '.$DB->quote( $reg_ip_min ) );
+		}
+
+		if( ! empty( $reg_ip_max ) )
+		{	// Restrict with MAX registration IP address:
+			$this->WHERE_and( 'uset_value <= '.$DB->quote( $reg_ip_max ) );
+		}
+	}
+
 
 	/**
 	 * Restrict with user group level

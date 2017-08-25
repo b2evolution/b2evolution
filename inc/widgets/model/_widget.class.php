@@ -108,6 +108,17 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get param prefix with is used on edit forms and submit data
+	 *
+	 * @return string
+	 */
+	function get_param_prefix()
+	{
+		return 'edit_widget_'.( empty( $this->ID ) ? '0' : $this->ID ).'_set_';
+	}
+
+
+	/**
 	 * Get ref to the Plugin handling this Widget.
 	 *
 	 * @return Plugin
@@ -191,23 +202,27 @@ class ComponentWidget extends DataObject
 	 * @return string
 	 */
 	function get_desc_for_list()
-	{
-		$name = $this->get_name();
+    {
+        $name = $this->get_name();
 
-		if( $this->type == 'plugin' )
-		{
-			return '<strong>'.$name.'</strong> ('.T_('Plugin').')';
-		}
+        if( $this->type == 'plugin' )
+        {
+            if ( isset($this->disp_params['title']) && ! empty($this->disp_params['title']) ) {
+                return '<strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+            }
 
-		$short_desc = $this->get_short_desc();
+            return '<strong>'.$name.'</strong> ('.T_('Plugin').')';
+        }
 
-		if( $name == $short_desc || empty($short_desc) )
-		{
-			return '<strong>'.$name.'</strong>';
-		}
+        $short_desc = $this->get_short_desc();
 
-		return '<strong>'.$short_desc.'</strong> ('.$name.')';
-	}
+        if( $name == $short_desc || empty($short_desc) )
+        {
+            return '<strong>'.$name.'</strong>';
+        }
+
+        return '<strong>'.$short_desc.'</strong> ('.$name.')';
+    }
 
 
 	/**
@@ -358,7 +373,7 @@ class ComponentWidget extends DataObject
  	 * @param boolean default false, set to true only if it is called from a widget::get_param_definition() function to avoid infinite loop
  	 * @return mixed
 	 */
-	function get_param( $parname, $check_infinite_loop = false )
+	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
 	{
 		$this->load_param_array();
 		if( isset( $this->param_array[$parname] ) )
@@ -369,9 +384,21 @@ class ComponentWidget extends DataObject
 		// Try default values:
 		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
 		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{	// We ahve a default value:
-			return $params[$parname]['defaultvalue'] ;
+
+		if( $group === NULL )
+		{	// Get param from simple field:
+			if( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'] ;
+			}
+		}
+		else
+		{	// Get param from group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
 		}
 
 		return NULL;
@@ -386,11 +413,12 @@ class ComponentWidget extends DataObject
 	 * @param boolean true to set to NULL if empty value
 	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue, $make_null = false )
+	function set( $parname, $parvalue, $make_null = false, $group = NULL )
 	{
 		$params = $this->get_param_definitions( NULL );
 
-		if( isset( $params[$parname] ) )
+		if( isset( $params[$parname] ) || 
+		    ( $group !== NULL && isset( $params[ $group ]['inputs'][ substr( $parname, strlen( $group ) ) ] ) ) )
 		{ // This is a widget specific param:
 			// Make sure param_array is loaded before set the param value
 			$this->load_param_array();
@@ -432,7 +460,7 @@ class ComponentWidget extends DataObject
 			return;
 		}
 
-		// Generate widget defaults array:
+		// Generate widget defaults (editable params) array:
 		$widget_defaults = array();
 		$defs = $this->get_param_definitions( array() );
 		foreach( $defs as $parname => $parmeta )
@@ -454,7 +482,8 @@ class ComponentWidget extends DataObject
 		// Load DB configuration:
 		$this->load_param_array();
 
-		// Merge basic defaults < widget defaults < container params < DB params
+		// DEFAULT CONTAINER PARAMS:
+		// Merge basic defaults < widget defaults (editable params) < container params < DB params
 		// note: when called with skin_widget it falls back to basic defaults < widget defaults < calltime params < array()
 		$params = array_merge( array(
 					'widget_context' => 'general',		// general | item
@@ -473,14 +502,21 @@ class ComponentWidget extends DataObject
 					'list_end' => '</ul>',
 					'item_start' => '<li>',
 					'item_end' => '</li>',
-					'link_default_class' => 'default',
-					'link_selected_class' => 'selected',
-					'item_text_start' => '',
-					'item_text_end' => '',
-					'item_text' => '%s',
+						'link_default_class' => 'default',
+						'link_selected_class' => 'selected',
+						'item_text_start' => '',
+						'item_text_end' => '',
+						'item_text' => '%s',
 					'item_selected_start' => '<li class="selected">',
 					'item_selected_end' => '</li>',
 					'item_selected_text' => '%s',
+
+					// Automatically detect whether we are displaying menu links as list elements or as standalone buttons:
+					'inlist' => 'auto',		// may alose be true or false
+					// Button styles used for Menu Links / Buttons widgets:
+					'button_default_class' => 'btn btn-default',
+					'button_selected_class' => 'btn btn-default active',
+
 					'grid_start' => '<table cellspacing="1" class="widget_grid">',
 						'grid_colstart' => '<tr>',
 							'grid_cellstart' => '<td>',
@@ -1132,6 +1168,71 @@ class ComponentWidget extends DataObject
 					return $this->disp_params[$disp_param_prefix.'item_end'];
 				}
 		}
+	}
+
+
+	/**
+	 * Get the list of validated renderers for this Widget. This includes stealth plugins etc.
+	 *
+	 * @return array List of validated renderer codes
+	 */
+	function get_renderers_validated()
+	{
+		if( ! isset( $this->renderers_validated ) )
+		{
+			global $Plugins;
+
+			$widget_Blog = & $this->get_Blog();
+
+			// Convert active renderers options for plugin functions below:
+			$widget_renderers = array_keys( $this->disp_params['renderers'] );
+
+			$this->renderers_validated = $Plugins->validate_renderer_list( $widget_renderers, array(
+					'Blog'         => & $widget_Blog,
+					'setting_name' => 'coll_apply_rendering'
+				) );
+		}
+
+		return $this->renderers_validated;
+	}
+
+
+	/**
+	 * Get content which is rendered with plugins
+	 *
+	 * @param string Source content
+	 * @return string Rendered content
+	 */
+	function get_rendered_content( $content )
+	{
+		if( ! isset( $this->disp_params['renderers'] ) )
+		{	// This widget has no render settings, Return original content:
+			return $content;
+		}
+
+		global $Plugins;
+
+		$widget_Blog = & $this->get_Blog();
+		$widget_renderers = $this->get_renderers_validated();
+
+		// Do some optional filtering on the content
+		// Typically stuff that will help the content to validate
+		// Useful for code display.
+		// Will probably be used for validation also.
+		$Plugins_admin = & get_Plugins_admin();
+		$params = array(
+				'object_type' => 'Widget',
+				'object'      => & $this,
+				'object_Blog' => & $widget_Blog
+			);
+		$fake_title = '';
+		$Plugins_admin->filter_contents( $fake_title /* by ref */, $content /* by ref */, $widget_renderers, $params /* by ref */ );
+
+		// Render block content with selected plugins:
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Render' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Display' );
+
+		return $content;
 	}
 }
 ?>

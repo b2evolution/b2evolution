@@ -77,8 +77,9 @@ $schema_queries = array(
 		"CREATE TABLE T_users (
 			user_ID int(11) unsigned NOT NULL auto_increment,
 			user_login varchar(20) NOT NULL,
-			user_pass BINARY(16) NOT NULL,
-			user_salt CHAR(8) NOT NULL default '',
+			user_pass VARCHAR(64) NOT NULL,
+			user_salt VARCHAR(32) NOT NULL default '',
+			user_pass_driver VARCHAR(16) NOT NULL default 'evo\$md5',
 			user_grp_ID int(4) NOT NULL default 1,
 			user_email varchar(255) COLLATE ascii_general_ci NOT NULL,
 			user_status enum( 'activated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
@@ -99,10 +100,10 @@ $schema_queries = array(
 			user_subrg_ID int(10) unsigned NULL,
 			user_city_ID int(10) unsigned NULL,
 			user_source varchar(30) NULL,
-			user_created_datetime datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
+			user_created_datetime TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			user_lastseen_ts timestamp NULL,
-			user_email_dom_ID int(10) unsigned NULL,
-			user_profileupdate_date date NOT NULL DEFAULT '2000-01-01',
+			user_email_dom_ID int(10) unsigned NULL COMMENT 'Used for email statistics',
+			user_profileupdate_date TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY user_ID (user_ID),
 			UNIQUE user_login (user_login),
 			KEY user_grp_ID (user_grp_ID),
@@ -155,7 +156,7 @@ $schema_queries = array(
 			urep_reporter_ID    int(11) unsigned NOT NULL,
 			urep_status         enum( 'fake', 'guidelines', 'harass', 'spam', 'other' ) COLLATE ascii_general_ci,
 			urep_info           varchar(240),
-			urep_datetime       datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
+			urep_datetime       TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY ( urep_target_user_ID, urep_reporter_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -230,7 +231,8 @@ $schema_queries = array(
 			itst_standard varchar(10000) NOT NULL default '',
 			itst_custom   varchar(10000) NULL,
 			itst_inpofile tinyint(1) NOT NULL DEFAULT 0,
-			PRIMARY KEY (itst_ID)
+			PRIMARY KEY (itst_ID),
+			INDEX itst_iost_ID_locale ( itst_iost_ID, itst_locale )
 		) ENGINE = innodb DEFAULT CHARSET = utf8" ),
 
 	'T_locales' => array(
@@ -335,7 +337,7 @@ $schema_queries = array(
 		'Creating cron tasks table',
 		"CREATE TABLE T_cron__task(
 			ctsk_ID               int(10) unsigned not null AUTO_INCREMENT,
-			ctsk_start_datetime   datetime not null DEFAULT '2000-01-01 00:00:00',
+			ctsk_start_datetime   TIMESTAMP not null DEFAULT '2000-01-01 00:00:00',
 			ctsk_repeat_after     int(10) unsigned,
 			ctsk_repeat_variation int(10) unsigned DEFAULT 0,
 			ctsk_key              varchar(50) COLLATE ascii_general_ci not null,
@@ -348,8 +350,8 @@ $schema_queries = array(
 		'Creating cron logs table',
 		"CREATE TABLE T_cron__log(
 			clog_ctsk_ID              int(10) unsigned   not null,
-			clog_realstart_datetime   datetime           not null DEFAULT '2000-01-01 00:00:00',
-			clog_realstop_datetime    datetime,
+			clog_realstart_datetime   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			clog_realstop_datetime    TIMESTAMP NULL,
 			clog_status               enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started',
 			clog_messages             text,
 			PRIMARY KEY (clog_ctsk_ID)

@@ -66,7 +66,7 @@ class code_highlight_plugin extends Plugin
 	var $name = 'Code highlight';
 	var $code = 'evo_code';
 	var $priority = 27;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $author = 'Astonish Me';
 	var $group = 'rendering';
 	var $help_topic = 'code-highlight-plugin';
@@ -159,7 +159,7 @@ class code_highlight_plugin extends Plugin
 					'label' => T_( 'Display code toolbar' ),
 					'defaultvalue' => $this->Settings->get('toolbar_default'),
 					'type' => 'checkbox',
-					'note' => $this->T_( 'Display the code toolbar' ),
+					'note' => $this->T_( 'Display code toolbar' ),
 				),
 			);
 	}

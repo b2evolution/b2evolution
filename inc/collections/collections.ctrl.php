@@ -124,7 +124,14 @@ switch( $action )
 		param( 'skin_ID', 'integer', true );
 		$edited_Blog->set_setting( 'normal_skin_ID', $skin_ID );
 
-		if( $edited_Blog->load_from_Request( array() ) )
+		// Check how new content should be created for new collection:
+		param( 'create_demo_contents', 'boolean', NULL );
+		if( $create_demo_contents === NULL )
+		{
+			param_error( 'create_demo_contents', T_('Please select an option for "New contents"') );
+		}
+
+		if( $edited_Blog->load_from_Request() )
 		{
 			// create the new blog
 			$edited_Blog->create( $kind );
@@ -149,9 +156,7 @@ switch( $action )
 			}
 			$Settings->dbupdate();
 
-			// create demo contents for the new blog
-			param( 'create_demo_contents', 'boolean' );
-			param( 'blog_locale', 'string' );
+			// Create demo contents for the new collection:
 			if( $create_demo_contents )
 			{
 				global $user_org_IDs;
@@ -165,13 +170,9 @@ switch( $action )
 				{ // Create the demo organization
 					$user_org_IDs = array( create_demo_organization( $edited_Blog->owner_user_ID )->ID );
 				}
-				if( $create_demo_users )
-				{ // Create demo users
-					get_demo_users( true, NULL, $user_org_IDs );
-				}
 
 				// Switch locale to translate content
-				locale_temp_switch( $blog_locale );
+				locale_temp_switch( param( 'blog_locale', 'string' ) );
 				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID, $create_demo_users );
 				locale_restore_previous();
 			}

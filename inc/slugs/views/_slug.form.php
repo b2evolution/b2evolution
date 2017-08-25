@@ -25,7 +25,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'slug_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New Slug') . get_manual_link('slug-form') : T_('Slug') . get_manual_link('slug-form') );
 
@@ -35,7 +35,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New Slug') . get_manual_link('slug-
 
 	$Form->text_input( 'slug_title', $edited_Slug->get( 'title' ), 50, T_('Slug'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
-	$Form->radio_input( 'slug_type', $creating ? 'item' : $edited_Slug->get( 'type' ), array( 
+	$Form->radio_input( 'slug_type', $creating ? 'item' : $edited_Slug->get( 'type' ), array(
 						array( 'value' => 'item', 'label' => T_( 'Item' ) ),
 						array( 'value' => 'help', 'label' => T_( 'Help' ) ) ),
 						T_('Type'), array( 'lines' => 1 ) );

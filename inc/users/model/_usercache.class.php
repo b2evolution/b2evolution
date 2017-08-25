@@ -121,23 +121,18 @@ class UserCache extends DataObjectCache
 	 *
 	 * @param string Login
 	 * @param string Password
-	 * @param boolean Password is MD5()'ed
+	 * @param boolean Is the password parameter already hashed?
 	 * @return false|User
 	 */
-	function & get_by_loginAndPwd( $login, $pass, $pass_is_md5 = true )
+	function & get_by_loginAndPwd( $login, $pass, $pass_is_hashed = true )
 	{
-		if( !($User =& $this->get_by_login( $login )) )
+		if( !( $User = & $this->get_by_login( $login ) ) )
 		{
 			return false;
 		}
 
-		if( !$pass_is_md5 )
-		{
-			$pass = md5( $User->salt.$pass );
-		}
-
-		if( $User->pass != $pass )
-		{
+		if( ! $User->check_password( $pass, $pass_is_hashed ) )
+		{	// The password doesn't match
 			return false;
 		}
 
@@ -157,7 +152,7 @@ class UserCache extends DataObjectCache
 	 * @param string current session password salt
 	 * @return false|array false if user with this email not exists, array( $User, $exists_more ) pair otherwise
 	 */
-	function get_by_emailAndPwd( $email, $pass, $pwd_hashed = NULL, $pwd_salt = NULL )
+	function get_by_emailAndPwd( $email, $pass, $pwd_hashed = NULL, $pepper = NULL )
 	{
 		global $DB;
 
@@ -181,7 +176,8 @@ class UserCache extends DataObjectCache
 			$index++;
 			if( empty( $pwd_hashed ) )
 			{
-				if( $row->user_pass != md5( $row->user_salt.$pass, true ) )
+				$user_PasswordDriver = get_PasswordDriver( $row->user_pass_driver );
+				if( ! $user_PasswordDriver || ! $user_PasswordDriver->check( $pass, $row->user_salt, $row->user_pass ) )
 				{ // password doesn't match
 					continue;
 				}
@@ -191,7 +187,7 @@ class UserCache extends DataObjectCache
 				$pwd_matched = false;
 				foreach( $pwd_hashed as $encrypted_password )
 				{
-					$pwd_matched = ( sha1( bin2hex( $row->user_pass ).$pwd_salt ) == $encrypted_password );
+					$pwd_matched = ( sha1( $row->user_pass.$pepper ) == $encrypted_password );
 					if( $pwd_matched )
 					{ // The corresponding user was found
 						break;

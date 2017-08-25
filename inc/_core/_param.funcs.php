@@ -2254,16 +2254,8 @@ function param_check_gender( $var, $required = false )
 		global $current_User;
 		if( $required )
 		{
-			if( $current_User->check_perm( 'users', 'edit' ) )
-			{	// Display a note message if user can edit all users
-				param_add_message_to_Log( $var, T_('Please select a gender.'), 'note' );
-				return true;
-			}
-			else
-			{	// Display an error message
-				param_error( $var, T_( 'Please select a gender.' ) );
-				return false;
-			}
+			param_error( $var, T_( 'Please select a gender.' ) );
+			return false;
 		}
 		return true;
 	}
@@ -2472,7 +2464,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		else
 		{
 			$errmsg = ($context == 'commenting')
-				? T_('Illegal content found (spam?).')
+				? T_('Illegal content found (spam?)').'.'
 				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), htmlspecialchars($block) );
 		}
 

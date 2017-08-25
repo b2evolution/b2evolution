@@ -1,0 +1,344 @@
+/*
+	ColorBox Core Style:
+	The following CSS is consistent between example themes and should not be altered.
+*/
+#colorbox,
+#cboxOverlay,
+#cboxWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  overflow: visible;
+}
+#colorbox {
+  z-index: 11001;
+}
+#cboxWrapper {
+  display: block;
+}
+#cboxOverlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+#cboxMiddleLeft,
+#cboxBottomLeft {
+  clear: left;
+}
+#cboxContent {
+  position: relative;
+}
+#cboxLoadedContent {
+  overflow: auto;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+#cboxTitle {
+  margin: 0;
+}
+#cboxLoadingOverlay,
+#cboxLoadingGraphic {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+#cboxPrevious,
+#cboxNext,
+#cboxClose,
+#cboxSlideshow {
+  cursor: pointer;
+}
+.cboxPhoto {
+  float: left;
+  margin: auto;
+  border: 0;
+  display: block;
+  cursor: pointer;
+}
+.cboxPhoto.zoomin {
+  cursor: cell;
+  cursor: -webkit-zoom-in;
+  cursor: -moz-zoom-in;
+}
+.cboxPhoto.zoomout {
+  cursor: cell;
+  cursor: -webkit-zoom-out;
+  cursor: -moz-zoom-out;
+}
+.cboxIframe {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+}
+/*
+	User Style:
+	Change the following styles to modify the appearance of ColorBox.  They are
+	ordered & tabbed in a way that represents the nesting of the generated HTML.
+*/
+#cboxOverlay {
+  background: rgba(25, 25, 25, 0.85);
+}
+#colorbox,
+#colorbox * {
+  font: 11px Verdana, Arial, Sans-Serif;
+  font-weight: normal;
+  color: #000;
+}
+#colorbox .fa {
+  font-family: FontAwesome;
+}
+#cboxContent {
+  border: 7px solid #fff;
+  background: #fff;
+  overflow: hidden;
+  -khtml-border-radius: 2px;
+  border-radius: 2px;
+}
+#cboxError {
+  padding: 50px;
+  border: 1px solid #ccc;
+}
+#cboxLoadedContent {
+  margin-bottom: 30px;
+}
+#cboxTitle {
+  position: absolute;
+  bottom: 50px;
+  left: 0;
+  text-align: center;
+  width: 100%;
+  height: 15px;
+  color: #949494;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#cboxInfoBar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+#cboxCurrent {
+  color: #949494;
+  width: 46px;
+  text-align: center;
+}
+#cboxSlideshow {
+  position: absolute;
+  bottom: 4px;
+  right: 30px;
+  color: #0092ef;
+  line-height: 17px;
+}
+#cboxNavigation {
+  -webkit-flex-basis: auto;
+      -ms-flex-preferred-size: auto;
+          flex-basis: auto;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  min-width: 46px;
+}
+#cboxPrevious,
+#cboxNext {
+  background: url(../icons/icons_sprite.png) no-repeat;
+  width: 23px;
+  height: 23px;
+  text-indent: -9999px;
+  background-position-y: -272px;
+}
+#cboxPrevious.hover,
+#cboxNext.hover {
+  background-position-y: -296px;
+}
+#cboxPrevious {
+  background-position-x: -48px;
+}
+#cboxNext {
+  background-position-x: -72px;
+}
+#cboxClose {
+  background: url(../icons/icons_sprite.png) no-repeat;
+  width: 23px;
+  height: 23px;
+  text-indent: -9999px;
+  -webkit-flex-basis: auto;
+      -ms-flex-preferred-size: auto;
+          flex-basis: auto;
+  background-position-x: -24px;
+  background-position-y: -272px;
+}
+#cboxClose.hover {
+  background-position-y: -296px;
+}
+#cboxLoadingOverlay {
+  background: #FFF;
+}
+#cboxLoadingGraphic {
+  background: url(../img/ajax-loader/fff.gif) no-repeat center center;
+}
+#cboxVoting {
+  white-space: normal;
+  -khtml-border-radius: 6px;
+  border-radius: 6px;
+}
+#cboxVoting a {
+  margin: 0 10px 0 0;
+  vertical-align: middle;
+  display: inline-block;
+}
+#cboxVoting a span {
+  margin: 0;
+  vertical-align: middle;
+}
+#cboxVoting span {
+  margin: 0 10px 0 0;
+  display: inline-block;
+}
+#cboxVoting span.icon {
+  vertical-align: middle;
+}
+#cboxVoting span.separator {
+  border-right: 1px solid #000;
+  margin-right: 14px;
+  vertical-align: middle;
+}
+#cboxVoting span.vote_title {
+  position: relative;
+  top: 1px;
+}
+#cboxVoting span.vote_title_text {
+  margin: 0;
+}
+#cboxVoting label {
+  white-space: nowrap;
+}
+#cboxVoting label input {
+  vertical-align: middle;
+  margin-right: 2px;
+}
+#cboxVoting label span {
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+#cboxVoting .loading {
+  background: url(../img/ajax-loader.gif) no-repeat center;
+  width: 100%;
+  height: 16px;
+}
+#cboxVoting .voting_wrapper {
+  text-align: left;
+  width: 100%;
+}
+#cboxVoting .voting_wrapper .separator {
+  display: inline-block;
+}
+#cboxVoting .voting_wrapper span.btn-group {
+  display: inline-block;
+  min-width: 50px;
+  text-align: center;
+  margin: 0;
+  white-space: nowrap;
+}
+#cboxVoting .voting_wrapper span.vote_title_panel {
+  display: inline-block;
+  width: -webkit-calc(50% - 30px);
+  width: calc(50% - 30px);
+  white-space: nowrap;
+  margin-top: 3px;
+  text-align: right;
+  min-width: 200px;
+}
+#cboxVoting .voting_wrapper span.vote_others {
+  display: inline-block;
+  white-space: nowrap;
+  margin-top: 3px;
+  min-width: 150px;
+}
+#cboxVoting .voting_wrapper.compact {
+  text-align: center;
+}
+#cboxVoting .voting_wrapper.compact .separator {
+  display: none;
+}
+#cboxVoting .voting_wrapper.compact .btn-group {
+  display: block;
+  margin: 3px auto 0;
+}
+#cboxVoting .voting_wrapper.compact span.vote_title_panel {
+  text-align: center;
+  margin-top: 0;
+  margin-right: 0;
+}
+#cboxVoting span.vote_title_panel {
+  display: inline-block;
+  text-align: right;
+  padding-right: 6px;
+}
+#cboxVoting span.btn-group {
+  display: inline-block;
+}
+#cboxVoting span.vote_others {
+  display: inline-block;
+}
+#cboxOpen {
+  display: none;
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 135px;
+  line-height: 17px;
+}
+#cboxOpen a {
+  color: #0092EF;
+}

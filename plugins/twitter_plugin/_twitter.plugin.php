@@ -47,7 +47,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $author = 'b2evolution Group';
 
 	/*
@@ -205,7 +205,7 @@ class twitter_plugin extends Plugin
 
 			if( ! empty( $oauth_info['token'] ) && isset( $oauth_info['contact'] ) )
 			{
-				echo '<meta property="twitter:creator" content="@'.$oauth_info['contact'].'" />'."\n";
+				echo '<meta property="twitter:site" content="@'.$oauth_info['contact'].'" />'."\n";
 			}
 			else
 			{

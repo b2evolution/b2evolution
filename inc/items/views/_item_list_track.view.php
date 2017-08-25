@@ -68,7 +68,7 @@ $ItemList->cols[] = array(
 						'th' => /* TRANS: abbrev for Priority */ T_('Priority'),
 						'order' => 'priority',
 						'th_class' => 'shrinkwrap',
-						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "task_priority_edit" )%',
+						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "jeditable_cell task_priority_edit" )%',
 						'td' => '%item_td_task_cell( "priority", {Obj} )%',
 						'extra' => array( 'rel' => '#post_ID#', 'style' => 'background-color: %item_priority_color( "#post_priority#" )%;', 'format_to_output' => false )
 					);
@@ -77,14 +77,15 @@ $ItemList->cols[] = array(
 						'th' => T_('Item/Task'),
 						'order' => 'title',
 						'td_class' => 'tskst_$post_pst_ID$',
-						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1, 1 )%</strong>',
+						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1, 1 )%</strong>'.
+						        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@' : '' ),
 					);
 
 $ItemList->cols[] = array(
 						'th' => T_('Assigned'),
 						'order' => 'assigned_user_ID',
 						'th_class' => 'shrinkwrap',
-						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "task_assigned_edit" )%',
+						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "jeditable_cell task_assigned_edit" )%',
 						'td' => '%item_td_task_cell( "assigned", {Obj} )%',
 						'extra' => array( 'rel' => '#post_ID#', 'format_to_output' => false )
 					);
@@ -93,7 +94,7 @@ $ItemList->cols[] = array(
 						'th' => T_('Status'),
 						'order' => 'pst_ID',
 						'th_class' => 'shrinkwrap',
-						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "task_status_edit" )%',
+						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "jeditable_cell task_status_edit" )%',
 						'td' => '%item_td_task_cell( "status", {Obj} )%',
 						'extra' => array( 'rel' => '#post_ID#', 'data-post-type' => '#post_ityp_ID#', 'format_to_output' => false )
 					);

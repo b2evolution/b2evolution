@@ -533,7 +533,11 @@ elseif( ( $disp == 'visits' ) && ( ( $Settings->get( 'enable_visit_tracking' ) !
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post
-	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
+	if( in_array( $Item->get_type_setting( 'usage' ), array( 'special', 'content-block' ) ) )
+	{	// Display 404 page for all "Content Blocks" and "Special" items intead of normal single page:
+		$disp = '404';
+	}
+	elseif( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
 	{
 		$disp = 'download';
 
@@ -817,38 +821,50 @@ if( !empty( $skin ) )
 			$ads_current_skin_path = $skins_path.$skin.'/';
 
 			$disp_handlers = array(
-					'404'            => '404_not_found.main.php',
-					'activateinfo'   => 'activateinfo.main.php',
-					'arcdir'         => 'arcdir.main.php',
-					'catdir'         => 'catdir.main.php',
-					'comments'       => 'comments.main.php',
-					'feedback-popup' => 'feedback_popup.main.php',
-					'login'          => 'login.main.php',
-					'mediaidx'       => 'mediaidx.main.php',
-					'msgform'        => 'msgform.main.php',
-					'page'           => 'page.main.php',
-					'postidx'        => 'postidx.main.php',
-					'posts'          => 'posts.main.php',
-					'profile'        => 'profile.main.php',
-					'search'         => 'search.main.php',
-					'single'         => 'single.main.php',
-					'sitemap'        => 'sitemap.main.php',
-					'subs'           => 'subs.main.php',
-					'threads'        => 'threads.main.php',
-					'messages'       => 'messages.main.php',
-					'contacts'       => 'contacts.main.php',
-					'user'           => 'user.main.php',
-					'users'          => 'users.main.php',
-					'edit'           => 'edit.main.php',
-					'edit_comment'   => 'edit_comment.main.php',
-					'front'          => 'front.main.php',
-					'useritems'      => 'useritems.main.php',
-					'usercomments'   => 'usercomments.main.php',
-					'download'       => 'download.main.php',
+					'403'                   => '403_forbidden.main.php',
+					'404'                   => '404_not_found.main.php',
+					'access_denied'         => 'access_denied.main.php',
 					'access_requires_login' => 'access_requires_login.main.php',
-					'tags'           => 'tags.main.php',
-					'terms'          => 'terms.main.php',
-					'help'           => 'help.main.php',
+					'activateinfo'          => 'activateinfo.main.php',
+					'arcdir'                => 'arcdir.main.php',
+					'catdir'                => 'catdir.main.php',
+					'closeaccount'          => 'closeaccount.main.php',
+					'comments'              => 'comments.main.php',
+					'contacts'              => 'contacts.main.php',
+					'download'              => 'download.main.php',
+					'edit'                  => 'edit.main.php',
+					'edit_comment'          => 'edit_comment.main.php',
+					'feedback-popup'        => 'feedback_popup.main.php',
+					'flagged'               => 'flagged.main.php',
+					'front'                 => 'front.main.php',
+					'help'                  => 'help.main.php',
+					'login'                 => 'login.main.php',
+					'lostpassword'          => 'lostpassword.main.php',
+					'mediaidx'              => 'mediaidx.main.php',
+					'messages'              => 'messages.main.php',
+					'module_form'           => 'module_form.main.php',
+					'msgform'               => 'msgform.main.php',
+					'page'                  => 'page.main.php',
+					'postidx'               => 'postidx.main.php',
+					'posts'                 => 'posts.main.php',
+					'profile'               => 'profile.main.php',
+					'avatar'                => 'avatar.main.php',
+					'pwdchange'             => 'pwdchange.main.php',
+					'userprefs'             => 'userprefs.main.php',
+					'subs'                  => 'subs.main.php',
+					'visits'                => 'visits.main.php',
+					'register'              => 'register.main.php',
+					'search'                => 'search.main.php',
+					'single'                => 'single.main.php',
+					'sitemap'               => 'sitemap.main.php',
+					'tags'                  => 'tags.main.php',
+					'terms'                 => 'terms.main.php',
+					'threads'               => 'threads.main.php',
+					'contacts'              => 'contacts.main.php',
+					'user'                  => 'user.main.php',
+					'useritems'             => 'useritems.main.php',
+					'usercomments'          => 'usercomments.main.php',
+					'users'                 => 'users.main.php',
 					// All others will default to index.main.php
 				);
 

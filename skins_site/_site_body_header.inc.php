@@ -84,7 +84,7 @@ else
 	// Call widget directly (without container):
 	skin_widget( array(
 						// CODE for the widget:
-						'widget' => 'menu_link',
+						'widget' => 'basic_menu_link',
 						// Optional display params
 						'block_start' => '',
 						'block_end' => '',
@@ -146,7 +146,7 @@ else
 			// Call widget directly (without container):
 			skin_widget( array_merge( $right_menu_params, array(
 				// CODE for the widget:
-				'widget' => 'menu_link',
+				'widget' => 'basic_menu_link',
 				// Optional display params
 				'link_type' => 'logout',
 			) ) );
@@ -158,7 +158,7 @@ else
 			// Call widget directly (without container):
 			skin_widget( array_merge( $right_menu_params, array(
 				// CODE for the widget:
-				'widget' => 'menu_link',
+				'widget' => 'basic_menu_link',
 				// Optional display params
 				'link_type' => 'login',
 				'link_default_class' => 'swhead_item_login '.$right_menu_params['link_default_class']
@@ -168,7 +168,7 @@ else
 			// Call widget directly (without container):
 			skin_widget( array_merge( $right_menu_params, array(
 				// CODE for the widget:
-				'widget' => 'menu_link',
+				'widget' => 'basic_menu_link',
 				// Optional display params
 				'link_type' => 'register',
 				'link_selected_class' => 'swhead_item_white '.$right_menu_params['link_selected_class'],
@@ -235,7 +235,7 @@ else
 			// Call widget directly (without container):
 			skin_widget( array(
 					// CODE for the widget:
-					'widget' => 'menu_link',
+					'widget' => 'basic_menu_link',
 					// Optional display params
 					'block_start' => '',
 					'block_end' => '',
@@ -274,7 +274,7 @@ else
 				// Call widget directly (without container):
 				skin_widget( array_merge( $right_menu_params, array(
 					// CODE for the widget:
-					'widget' => 'menu_link',
+					'widget' => 'basic_menu_link',
 					// Optional display params
 					'link_type' => 'logout',
 					'item_start' => '<li class="swhead_item_menu_sm">',
@@ -289,7 +289,7 @@ else
 				// Call widget directly (without container):
 				skin_widget( array_merge( $right_menu_params, array(
 				// CODE for the widget:
-				'widget' => 'menu_link',
+				'widget' => 'basic_menu_link',
 				// Optional display params
 				'link_type' => 'register',
 				'item_start' => '<li class="swhead_item_menu_sm">',

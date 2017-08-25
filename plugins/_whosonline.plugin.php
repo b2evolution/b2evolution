@@ -29,7 +29,7 @@ class whosonline_plugin extends Plugin
 	var $name;
 	var $code = 'evo_WhosOnline';
 	var $priority = 96;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'other';

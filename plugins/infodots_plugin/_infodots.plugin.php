@@ -21,7 +21,7 @@ class infodots_plugin extends Plugin
 	var $code = 'b2evoDot';
 	var $name = 'Info dots renderer';
 	var $priority = 95;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -190,6 +190,11 @@ class infodots_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
+		if( empty( $params['Item'] ) )
+		{	// This plugin can works only with items:
+			return false;
+		}
+
 		$params['data'] = $this->render_infodot_captions( 'itm_'.$params['Item']->ID, $params['data'] );
 
 		return true;

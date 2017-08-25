@@ -139,7 +139,7 @@ siteskin_include( '_site_body_header.inc.php' );
 <div id="pageFooter">
 	<?php
 		// Display container and contents:
-		skin_container( NT_("Footer"), array(
+		skin_container( NT_('Footer'), array(
 				// The following params will be used as defaults for widgets included in this container:
 			) );
 		// Note: Double quotes have been used around "Footer" only for test purposes.

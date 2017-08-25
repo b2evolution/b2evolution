@@ -397,7 +397,7 @@ class ItemListLight extends DataObjectList2
 			//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
 			// Record this "single cat":
 			$this->filters['cat_single'] = $cat;
-		}					
+		}
 
 		// Get chapters/categories (and compile those values right away)
 		param_compile_cat_array( ( is_null( $this->Blog ) ? 0 : $this->Blog->ID ), $this->default_filters['cat_modifier'], $this->default_filters['cat_array'] );
@@ -938,8 +938,8 @@ class ItemListLight extends DataObjectList2
 				'categories_display'  => 'toplevel', 	// 'full' | 'toplevel'
 
 				'display_tag'         => true,
-				'tag_text'            => T_('Tag').': ',
-				'tags_text'           => T_('Tags').': ',
+				'tag_text'            => /* TRANS: noun */ T_('Tag').': ',
+				'tags_text'           => /* TRANS: noun */ T_('Tags').': ',
 
 				'display_author'      => true,
 				'author_text'         => T_('Author').': ',

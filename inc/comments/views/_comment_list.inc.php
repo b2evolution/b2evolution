@@ -45,15 +45,11 @@ if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 }
 
 if( $item_id > 0 )
-{ // Calculate index of first comment only on post view/edit pages:
-	$comment_index = $CommentList->total_rows - ( $CommentList->limit * ( $CommentList->page - 1 ) );
-	// Don't display additional info when we are already viewing a selected post page:
+{	// Don't display additional info when we are already viewing a selected post page:
 	$display_meta_title = false;
 }
 else
-{	// Don't calculate the comments when we view them from many posts:
-	$comment_index = false;
-	// Display additional info of meta comment when no post page, e.g. on "Meta discussion" tab:
+{	// Display additional info of meta comment when no post page, e.g. on "Meta discussion" tab:
 	$display_meta_title = true;
 }
 
@@ -93,18 +89,13 @@ while( $Comment = & $CommentList->get_next() )
 	}
 
 	// Display a comment:
-	echo_comment( $Comment, $redirect_to, $save_context, $comment_index, $display_meta_title );
-	if( $comment_index !== false )
-	{	// Decrease a comment index only when it is requested:
-		$comment_index--;
-	}
+	echo_comment( $Comment, $redirect_to, $save_context, $Comment->get_inlist_order(), $display_meta_title );
 
 	if( $threaded_comments_mode )
 	{	// Display the comment replies:
 		echo_comment_replies( $Comment->ID, array(
 				'redirect_to'        => $redirect_to,
 				'save_context'       => $save_context,
-				'comment_index'      => $comment_index,
 				'display_meta_title' => $display_meta_title,
 			) );
 	}

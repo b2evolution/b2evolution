@@ -68,7 +68,7 @@ $res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 /*
  * Chart
  */
-if( count($res_hits) )
+if( count( $res_hits ) )
 {
 	// Find the dates without hits and fill them with 0 to display on graph and table:
 	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
@@ -137,19 +137,19 @@ if( count($res_hits) )
 			array_unshift( $chart['dates'], $last_date );
 		}
 
-		if ($row_stats['hit_agent_type'] == 'unknown')
+		if( $row_stats['hit_agent_type'] == 'unknown' )
 		{	// only those hits are calculated which hit_agent_type = unknown
 			$col = $col_mapping[$row_stats['hit_agent_type']];
 			$chart['chart_data'][$col][0] += $row_stats['hits'];
 		}
 		else
 		{
-			if (! empty ( $col_mapping[$row_stats['hit_type'].'_'.$row_stats['hit_agent_type']] ) )
+			if( ! empty ( $col_mapping[$row_stats['hit_type'].'_'.$row_stats['hit_agent_type']] ) )
 			{	// those hits are calculated here if hit_type = standard and hit_agent_type = browser, robot
 				$col = $col_mapping[$row_stats['hit_type'].'_'.$row_stats['hit_agent_type']];
 				$chart['chart_data'][$col][0] += $row_stats['hits'];
 			}
-			if (! empty ( $col_mapping[$row_stats['hit_type']]) )
+			if( ! empty ( $col_mapping[$row_stats['hit_type']] ) )
 			{	// those hits are calculated here which did not match either of the above rules
 				$col = $col_mapping[$row_stats['hit_type']];
 				$chart['chart_data'][$col][0] += $row_stats['hits'];

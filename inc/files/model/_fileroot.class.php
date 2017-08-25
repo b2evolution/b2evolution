@@ -150,7 +150,7 @@ class FileRoot
 				{ // Skins root is disabled:
 					$Debuglog->add( 'Attempt to access skins dir, but this feature is globally disabled', 'files' );
 				}
-				elseif( empty( $current_User ) || ( ! $current_User->check_perm( 'templates' ) ) )
+				elseif( empty( $current_User ) || ( ! $current_User->check_perm( 'skins_root', 'view' ) ) )
 				{ // No perm to access templates:
 					$Debuglog->add( 'Attempt to access skins dir, but no permission', 'files' );
 				}

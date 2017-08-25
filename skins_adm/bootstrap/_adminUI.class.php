@@ -332,7 +332,7 @@ class AdminUI extends AdminUI_general
 							.'</ul></div>',
 						'header_text_single' => '',
 					'header_end' => '',
-					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
+					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 					'global_icons_class' => 'btn btn-default btn-sm',
 					'filters_start'        => '<div class="filters panel-body">',
 					'filters_end'          => '</div>',
@@ -405,8 +405,8 @@ class AdminUI extends AdminUI_general
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
@@ -483,7 +483,7 @@ class AdminUI extends AdminUI_general
 					'formclass'      => 'form-horizontal',
 					'formstart'      => '<div class="panel panel-default $formstart_class$">'."\n",
 					'formend'        => '</div></div>',
-					'title_fmt'      => '<div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body $class$">'."\n",
+					'title_fmt'      => '<div class="panel-heading"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body $class$">'."\n",
 					'no_title_fmt'   => '<div class="panel-body $class$"><span class="pull-right">$global_icons$</span><div class="clear"></div>'."\n",
 					'no_title_no_icons_fmt' => '<div class="panel-body $class$">'."\n",
 					'global_icons_class' => 'btn btn-default btn-sm',
@@ -623,7 +623,7 @@ class AdminUI extends AdminUI_general
 
 			case 'file_browser':
 				return array(
-					'block_start' => '<div class="panel panel-default file_browser"><div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
+					'block_start' => '<div class="panel panel-default file_browser"><div class="panel-heading"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
 					'block_end'   => '</div></div>',
 					'global_icons_class' => 'btn btn-default btn-sm',
 				);
@@ -631,14 +631,14 @@ class AdminUI extends AdminUI_general
 			case 'block_item':
 			case 'dash_item':
 				return array(
-					'block_start' => '<div class="panel panel-default evo_content_block"><div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
+					'block_start' => '<div class="panel panel-default evo_content_block"><div class="panel-heading"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
 					'block_end'   => '</div></div>',
 					'global_icons_class' => 'btn btn-default btn-sm',
 				);
 
 			case 'side_item':
 				return array(
-					'block_start' => '<div class="panel panel-default"><div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
+					'block_start' => '<div class="panel panel-default"><div class="panel-heading"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
 					'block_end'   => '</div></div>',
 				);
 
@@ -686,22 +686,19 @@ class AdminUI extends AdminUI_general
 			case 'tooltip_plugin':
 				// Plugin name for tooltips: 'bubbletip' or 'popover'
 				return 'popover';
-				break;
 
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete the fields: 'hintbox', 'typeahead'
 				return 'typeahead';
-				break;
 
 			case 'modal_window_js_func':
 				// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 				return 'echo_modalwindow_js_bootstrap';
-				break;
 
 			case 'plugin_template':
 				// Template for plugins
 				return array(
-						'toolbar_before'       => '<div class="btn-toolbar $toolbar_class$" role="toolbar">',
+						'toolbar_before'       => '<div class="btn-toolbar plugin-toolbar $toolbar_class$" data-plugin-toolbar="$toolbar_class$" role="toolbar">',
 						'toolbar_after'        => '</div>',
 						'toolbar_title_before' => '<div class="btn-toolbar-title">',
 						'toolbar_title_after'  => '</div>',
@@ -723,12 +720,14 @@ class AdminUI extends AdminUI_general
 						'page_current_before' => '<li class="active"><span>',
 						'page_current_after'  => '</span></li>',
 					);
-				break;
 
 			case 'blog_base.css':
 				// File name of blog_base.css that are used on several back-office pages
 				return 'bootstrap-blog_base.css';
-				break;
+
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-bootstrap.min.css';
 
 			default:
 				// Delegate to parent class:

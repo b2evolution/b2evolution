@@ -30,7 +30,7 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'ftyp_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this filetype!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') );
 
@@ -75,11 +75,11 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 
 	$Form->radio( 'ftyp_allowed',  $edited_Filetype->allowed,
 					array(
-							array( 'any', T_( 'Allow anyone (including anonymous users) to upload/rename files of this type' ) ),
-							array( 'registered', T_( 'Allow only registered users to upload/rename files of this type' ) ),
-							array( 'admin', T_( 'Allow only admins to upload/rename files of this type' ) )
+							array( 'any', T_( 'Allow anyone (including anonymous users) to upload/rename/edit files of this type' ) ),
+							array( 'registered', T_( 'Allow only registered users to upload/rename/edit files of this type' ) ),
+							array( 'admin', T_( 'Allow only admins to upload/rename/edit files of this type' ) )
 						),
-					T_( 'Allow upload' ), true );
+					T_( 'Allow upload' ), true, T_('The exact users who will be impacted depends on each User Group\'s configuration.') );
 
 if( $creating )
 {

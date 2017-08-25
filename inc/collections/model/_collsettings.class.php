@@ -220,7 +220,13 @@ class CollectionSettings extends AbstractSettings
 		// Other settings:
 			'image_size_messaging' => 'crop-top-32x32', // Used in disp = threads
 			'search_per_page'      => 20, // Number of results per page on disp=search
+			'search_sort_by'       => 'score', // Sort type of results on disp=search ('score', 'date')
+			'search_include_cats'  => 1, // Include categories to results on disp=search
+			'search_include_posts' => 1, // Include posts to results on disp=search
+			'search_include_cmnts' => 1, // Include comments to results on disp=search
+			'search_include_tags'  => 1, // Include tags to results on disp=search
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
+			'msgform_display_recipient' => 1, // Display a "Message to:" line on disp=msgform
 
 		// Time frame settings:
 			'timestamp_min' => 'yes',

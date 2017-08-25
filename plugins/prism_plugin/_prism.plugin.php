@@ -21,7 +21,7 @@ class prism_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $number_of_installs = 1;
 
 
@@ -161,7 +161,7 @@ class prism_plugin extends Plugin
 	 */
 	function filter_code_callback( $block )
 	{
-		$content = trim( $block[3] );
+		$content = isset( $block[3] ) ? trim( $block[3] ) : '';
 
 		if( empty( $content ) )
 		{ // Don't render if no code content
@@ -436,9 +436,8 @@ class prism_plugin extends Plugin
 				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
 			), $params );
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
-
 		// Codespan buttons:
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_title_before' ).T_('Codespan').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo '<input type="button" title="'.T_('Insert Markup codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|markup|span" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
@@ -448,8 +447,10 @@ class prism_plugin extends Plugin
 		echo '<input type="button" title="'.T_('Insert SQL codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|sql|span" value="SQL" />';
 		echo '<input type="button" title="'.T_('Insert Apache codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|apacheconf|span" value="Apache" />';
 		echo $this->get_template( 'toolbar_group_after' );
+		echo $this->get_template( 'toolbar_after' );
 
 		// Codeblock buttons:
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_title_before' ).T_('Codeblock').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo '<input type="button" title="'.T_('Insert Markup codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|markup" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
@@ -459,7 +460,6 @@ class prism_plugin extends Plugin
 		echo '<input type="button" title="'.T_('Insert SQL codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|sql" value="SQL" />';
 		echo '<input type="button" title="'.T_('Insert Apache codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|apacheconf" value="Apache" />';
 		echo $this->get_template( 'toolbar_group_after' );
-
 		echo $this->get_template( 'toolbar_after' );
 
 		// Load js to work with textarea

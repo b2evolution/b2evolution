@@ -1027,8 +1027,8 @@ class AdminUI_general extends Menu
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
@@ -1107,8 +1107,8 @@ class AdminUI_general extends Menu
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
@@ -1219,27 +1219,27 @@ class AdminUI_general extends Menu
 			case 'tooltip_plugin':
 				// Plugin name for tooltips: 'bubbletip' or 'popover'
 				return 'bubbletip';
-				break;
 
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete the fields: 'hintbox', 'typeahead'
 				return 'hintbox';
-				break;
 
 			case 'modal_window_js_func':
 				// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 				return false; // Use standard functions
-				break;
 
 			case 'pagination':
 				// Pagination, @see echo_comment_pages()
 				return array();
-				break;
 
 			case 'blog_base.css':
 				// File name of blog_base.css that are used on several back-office pages
 				return 'blog_base.css';
 				break;
+
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-regular.min.css';
 
 			default:
 				if( $die_on_unknown )

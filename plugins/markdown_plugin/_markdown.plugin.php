@@ -22,7 +22,7 @@ class markdown_plugin extends Plugin
 	var $code = 'b2evMark';
 	var $name = 'Markdown';
 	var $priority = 20;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -141,22 +141,11 @@ class markdown_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		if( !empty( $params['Item'] ) )
-		{ // Get Item from params
-			$Item = & $params['Item'];
-		}
-		elseif( !empty( $params['Comment'] ) )
-		{ // Get Item from Comment
-			$Comment = & $params['Comment'];
-			$Item = & $Comment->get_Item();
-		}
-
-		if( ! empty( $Item ) )
-		{ // We are rendering Item or Comment now, Get the settings depending on Blog
-			$item_Blog = & $Item->get_Blog();
-			$text_styles_enabled = $this->get_coll_setting( 'text_styles', $item_Blog );
-			$links_enabled = $this->get_coll_setting( 'links', $item_Blog );
-			$images_enabled = $this->get_coll_setting( 'images', $item_Blog );
+		if( $setting_Blog = & $this->get_Blog_from_params( $params ) )
+		{	// We are rendering Item, Comment or Widget now, Get the settings depending on Collection:
+			$text_styles_enabled = $this->get_coll_setting( 'text_styles', $setting_Blog );
+			$links_enabled = $this->get_coll_setting( 'links', $setting_Blog );
+			$images_enabled = $this->get_coll_setting( 'images', $setting_Blog );
 		}
 		elseif( ! empty( $params['Message'] ) )
 		{	// We are rendering Message now:

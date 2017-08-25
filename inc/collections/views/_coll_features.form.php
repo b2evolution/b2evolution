@@ -218,7 +218,7 @@ $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' 
 	}
 	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Posts with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );
 
-	$Form->text_input( 'old_content_alert', $edited_Blog->get_setting( 'old_content_alert' ), 2, T_('Old content alert'), T_('Posts that have not been updated within the set delay will be reported to content moderators. Leave empty if you don\'t want such alerts.'), array( 'input_suffix' => ' '.T_('months').'.' ) );
+	$Form->text_input( 'old_content_alert', $edited_Blog->get_setting( 'old_content_alert' ), 2, T_('Stale content alert'), T_('Posts that have not been updated within the set delay will be reported to content moderators. Leave empty if you don\'t want such alerts.'), array( 'input_suffix' => ' '.T_('months').'.' ) );
 
 $Form->end_fieldset();
 

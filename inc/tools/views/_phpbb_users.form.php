@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $flush_action, $phpbb_tool_title;
+global $dispatcher, $flush_action, $phpbb_tool_title, $phpbb_version;
 
 phpbb_display_steps( 3 );
 
@@ -46,6 +46,8 @@ $Form->begin_fieldset( T_('Report of users import') );
 
 	$Form->info( T_('Count of the updated users'), '<b>'.(int)phpbb_get_var( 'users_count_updated' ).'</b>' );
 
+	$Form->info( T_('Count of the imported / missing avatars'), intval( phpbb_get_var( 'avatars_count_imported' ) ).' / <b class="red">'.intval( phpbb_get_var( 'avatars_count_missing' ) ).'</b>' );
+
 	$GroupCache = & get_GroupCache();
 
 	$group_default = phpbb_get_var( 'group_default' );
@@ -67,7 +69,7 @@ $Form->begin_fieldset( T_('Report of users import') );
 
 $Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' )/*,
+$Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' )/*,
 											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$dispatcher.'?ctrl=phpbbimport&step=groups\'' )*/ ) );
 
 $Form->end_form();

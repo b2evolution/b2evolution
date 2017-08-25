@@ -97,7 +97,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 	// In case we send this to the blog for a preview :
 	$Form->hidden( 'preview', 0 );
 	$Form->hidden( 'more', 1 );
-	$Form->hidden( 'preview_userid', $current_User->ID );
 
 	// Add hidden required fields or fields that were set in the init_inskin_editing() function
 	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );
@@ -198,7 +197,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	$Form->output = false;
 	$edit_links = $Form->begin_fieldset( get_request_title( array_merge( array(
 			'edit_links_template' => array(
-				'before'              => '<span class="pull-right">',
+				'before'              => '<span class="pull-right panel_heading_action_icons">',
 				'after'               => '</span>',
 				'advanced_link_class' => 'btn btn-info btn-sm',
 				'close_link_class'    => 'btn btn-default btn-sm',
@@ -351,23 +350,23 @@ else
 
 	if( count( $custom_fields ) > 0 )
 	{
-		$Form->begin_fieldset( T_('Additional fields') );
+		$Form->begin_fieldset( T_('Additional fields'), array( 'id' => 'itemform_custom_fields' ) );
 
 		foreach( $custom_fields as $custom_field )
 		{	// Display each custom field:
 			switch( $custom_field['type'] )
 			{
 				case 'double':
-					$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], T_('can be decimal') );
+					$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>' );
 					break;
 				case 'varchar':
-					$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+					$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 					break;
 				case 'text':
-					$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'] );
+					$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
 					break;
 				case 'html':
-					$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => T_('This field allows HTML code') ) );
+					$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
 					break;
 			}
 		}

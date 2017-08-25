@@ -24,6 +24,14 @@
 		& > ul li:last-child {
 			margin-bottom: 0 !important; // When it's the last <li> of last <ul> of the each div, no martgin-bottom, because of regular widget margin-bottom
 		}
+		// .widget_core_menu_link
+		// .widget_core_msg_menu_link
+		// .widget_core_profile_menu_link
+		// .widget_core_flag_menu_link
+		&[class$=_menu_link] {
+			// Align center buttons:
+			text-align: center;
+		}
 	}
 }
 .evo_container__front_page_secondary {
@@ -95,7 +103,7 @@ body.pictured {
 		display: table;
 		height: 100%;
 		min-height: 100%;
-	 .panel {
+		.panel {
 			color: #333;
 			a:not([class]) {
 				color: #337ab7;
@@ -457,10 +465,13 @@ div.action_messages, div.log_container {
 // Positions on the action buttons near page titles
 .evo_post_title {
 	display: table;
+	h1 {
+		margin-bottom: 0;
+	}
 	h2 {
 		display: table-cell;
 		margin: 0;
-		padding: 20px 0 10px;
+		padding: 20px 0 0;
 	}
 	.btn-group {
 		display: table-cell;

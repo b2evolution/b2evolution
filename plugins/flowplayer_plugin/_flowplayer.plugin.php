@@ -23,7 +23,7 @@ class flowplayer_plugin extends Plugin
 	var $code = 'b2evFlwP';
 	var $name = 'Flowplayer';
 	var $priority = 80;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'swf', 'mp4', 'ogv', 'webm', 'm3u8' );
@@ -115,9 +115,9 @@ class flowplayer_plugin extends Plugin
 				'height' => array(
 					'label' => T_('Video height (px)'),
 					'type' => 'integer',
-					'defaultvalue' => 300,
-					'note' => '',
+					'allow_empty' => true,
 					'valid_range' => array( 'min' => 1 ),
+					'note' => T_('auto height if left empty'),
 					),
 				'allow_download' => array(
 					'label' => T_('Display Download Link'),
@@ -184,8 +184,8 @@ class flowplayer_plugin extends Plugin
 		}
 
 		// Set height from blog plugin setting
-		$height = intval( $this->get_coll_setting( 'height', $item_Blog ) );
-		$height = 'height:'.$height.'px;';
+		$height = trim( $this->get_coll_setting( 'height', $item_Blog ) );
+		$height = empty( $height ) ? '' : 'height:'.$height.'px';
 
 		if( $File->exists() )
 		{

@@ -248,7 +248,7 @@ if( $action != 'view' )
 		$Form->info( T_('Profile picture'), $user_pictures );
 	}
 
-	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', array( 'maxlength' => 60, 'required' => true ) );
+	$Form->text_input( 'edited_user_login', $edited_User->login, 20, /* TRANS: noun */ T_('Login'), '', array( 'maxlength' => 60, 'required' => true ) );
 
 	$firstname_editing = $Settings->get( 'firstname_editing' );
 	if( ( in_array( $firstname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $has_full_access ) )
@@ -459,7 +459,7 @@ else
 		$Form->info( T_('Profile picture'), $edited_User->get_avatar_imgtag( 'crop-top-64x64', 'avatar', '', true ) );
 	}
 
-	$Form->info( T_('Login'), $edited_User->get('login') );
+	$Form->info( /* TRANS: noun */ T_('Login'), $edited_User->get('login') );
 	$Form->info( T_('First name'), $edited_User->get('firstname') );
 	$Form->info( T_('Last name'), $edited_User->get('lastname') );
 	$Form->info( T_('Nickname'), $edited_User->get('nickname') );
@@ -598,9 +598,9 @@ $Form->begin_fieldset( T_('Add new fields').( is_admin_page() ? get_manual_link(
 		}
 	}
 
-	$button_add_field = '<button type="submit" id="button_add_field" name="actionArray[add_field]" class="action_icon">'.get_icon( 'add' ).'</button>';
+	$button_add_field = '<button type="submit" id="button_add_field" name="actionArray[add_field]" class="btn btn-default">'.T_('Add').'</button>';
 
-	$Form->select( 'new_field_type', param( 'new_field_type', 'integer', 0 ), 'callback_options_user_new_fields', T_('Add a field of type'), $button_add_field );
+	$Form->select_input( 'new_field_type', param( 'new_field_type', 'integer', 0 ), 'callback_options_user_new_fields', T_('Add a field of type'), array( 'field_suffix' => $button_add_field ) );
 
 $Form->end_fieldset();
 }
@@ -647,7 +647,7 @@ $Form->end_form();
 
 	jQuery( '#button_add_field' ).click( function ()
 	{	// Action for the button when we want to add a new field in the Additional info
-		var field_id = jQuery( this ).parent().prev().find( 'option:selected' ).val();
+		var field_id = jQuery( this ).prev().find( 'option:selected' ).val();
 
 		if( field_id == '' )
 		{	// Mark select element of field types as error

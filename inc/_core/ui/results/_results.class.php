@@ -1734,7 +1734,7 @@ class Results extends Table
 				if(	$sort == 'ASC' )
 				{	// ASC sort, so move_up action for move up arrow
 					$action = 'move_up';
-					$alt = T_( 'Move up!' );
+					$alt = T_( 'Move up' ).'!';
 					}
 				else
 				{	// Reverse sort, so action and alt are reverse too
@@ -1754,7 +1754,7 @@ class Results extends Table
 				if(	$sort == 'ASC' )
 				{	// ASC sort, so move_down action for move down arrow
 					$action = 'move_down';
-					$alt = T_( 'Move down!' );
+					$alt = T_( 'Move down' ).'!';
 				}
 				else
 				{ // Reverse sort, so action and alt are reverse too

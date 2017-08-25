@@ -55,6 +55,20 @@ class Domain extends DataObject
 
 
 	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_hitlog', 'fk'=>'hit_referer_dom_ID', 'msg'=>T_('%d hits from this domain in the hitlog') ),
+				array( 'table'=>'T_users', 'fk'=>'user_email_dom_ID', 'msg'=>T_('%d users have this as their email domain') ),
+			);
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.

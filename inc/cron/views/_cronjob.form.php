@@ -21,7 +21,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'cronjob' );
 
-$Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit scheduled job') );
 

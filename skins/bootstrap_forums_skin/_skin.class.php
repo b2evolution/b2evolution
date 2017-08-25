@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.8.10';
+	var $version = '6.9.3';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -43,7 +43,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -439,7 +439,7 @@ class bootstrap_forums_Skin extends Skin
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
 		{ // Display button to write a new post
-			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
+			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
 		}
 		else
 		{ // If a creating of new post is unavailable
@@ -464,7 +464,7 @@ class bootstrap_forums_Skin extends Skin
 			}
 			else
 			{ // Display button to post a reply
-				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'" class="btn btn-default '.$params['button_class'].'" title="'.T_('Reply to topic').'"><i class="fa fa-reply"></i> '.T_('Reply').'</a>';
+				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'" class="btn btn-default '.$params['button_class'].'" title="'.T_('Reply to topic').'"><i class="fa fa-reply"></i> './* TRANS: verb */ T_('Reply').'</a>';
 			}
 		}
 
@@ -501,12 +501,12 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
-	 * Check if we can display a widget container
+	 * Check if we can display a widget container when access is denied to collection by current user
 	 *
 	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
 	 * @return boolean TRUE to display
 	 */
-	function is_visible_container( $container_key )
+	function show_container_when_access_denied( $container_key )
 	{
 		global $Collection, $Blog;
 
@@ -540,7 +540,7 @@ class bootstrap_forums_Skin extends Skin
 
 		if( $check_containers )
 		{ // Check if at least one sidebar container is visible
-			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
+			return ( $this->show_container_when_access_denied( 'sidebar' ) ||  $this->show_container_when_access_denied( 'sidebar2' ) );
 		}
 		else
 		{ // We should not check the visibility of the sidebar containers for this case
@@ -610,49 +610,18 @@ class bootstrap_forums_Skin extends Skin
 	{
 		global $Collection, $Blog;
 
-		if( ! is_logged_in() || ! $Blog->get_setting( 'track_unread_content' ) )
-		{	// For not logged in users AND if the tracking of unread content is turned off for the collection
-			$btn_class = 'btn-info';
-			$btn_title = T_('Recent Topics');
+		// Get a number of unread posts by current User:
+		$unread_posts_count = $Blog->get_unread_posts_count();
+
+		if( $unread_posts_count > 0 )
+		{	// If at least one new unread topic exists
+			$btn_class = 'btn-warning';
+			$btn_title = T_('New Topics').' <span class="badge">'.$unread_posts_count.'</span>';
 		}
 		else
-		{	// For logged in users:
-			global $current_User, $DB, $localtimenow;
-
-			// Initialize SQL query to get only the posts which are displayed by global $MainList on disp=posts:
-			$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL, 'ItemCache', 'recent_topics' );
-			$ItemList2->set_default_filters( array(
-					'unit' => 'all', // set this to don't calculate total rows
-				) );
-			$ItemList2->query_init();
-
-			// Get a count of the unread topics for current user:
-			$unread_posts_SQL = new SQL();
-			$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
-			$unread_posts_SQL->FROM( 'T_items__item' );
-			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__user_data ON post_ID = itud_item_ID AND itud_user_ID = '.$DB->quote( $current_User->ID ) );
-			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
-			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
-			$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
-			$unread_posts_SQL->WHERE_and( 'post_last_touched_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
-			// In theory, it would be more safe to use this comparison:
-			// $unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts <= post_last_touched_ts' );
-			// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
-			$unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts < post_last_touched_ts' );
-
-			// Execute a query with to know if current user has new data to view:
-			$unread_posts_count = $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics for current user' );
-
-			if( $unread_posts_count > 0 )
-			{	// If at least one new unread topic exists
-				$btn_class = 'btn-warning';
-				$btn_title = T_('New Topics').' <span class="badge">'.$unread_posts_count.'</span>';
-			}
-			else
-			{	// Current user already have read all topics
-				$btn_class = 'btn-info';
-				$btn_title = T_('Recent Topics');
-			}
+		{	// Current user already have read all topics
+			$btn_class = 'btn-info';
+			$btn_title = T_('Recent Topics');
 		}
 
 		// Print out the button:

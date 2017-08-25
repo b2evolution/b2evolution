@@ -43,12 +43,16 @@ siteskin_include( '_site_body_header.inc.php' );
 
 if( $is_pictured_page )
 { // Display a picture from skin setting as background image
-	global $media_path, $media_url;
-	$bg_image = $Skin->get_setting( 'front_bg_image' );
+	$FileCache = & get_FileCache();
+	$bg_File = NULL;
+	if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
+	{
+		$bg_File = & $FileCache->get_by_ID( $bg_File_ID, false, false );
+	}
 	echo '<div class="evo_pictured_layout">';
-	if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
+	if( $bg_File && $bg_File->exists() )
 	{ // If it exists in media folder
-		echo '<img class="evo_pictured__image" src="'.$media_url.$bg_image.'" />';
+		echo '<img class="evo_pictured__image" src="'.$bg_File->get_url().'" />';
 	}
 }
 ?>
@@ -209,7 +213,7 @@ if( $is_pictured_page )
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
 		?>
-		
+
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
@@ -278,7 +282,7 @@ if( $is_pictured_page )
 					'front_block_title_start'       => '<h2>',
 					'front_block_title_end'         => '</h2>',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.

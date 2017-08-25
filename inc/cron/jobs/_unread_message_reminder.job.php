@@ -123,7 +123,7 @@ foreach( $users_to_remind_ids as $user_ID )
 	$notify_User = $UserCache->get_by_ID( $user_ID );
 	// Change locale here to localize the email subject and content
 	locale_temp_switch( $notify_User->get( 'locale' ) );
-	if( send_mail_to_User( $user_ID, T_( 'You have unread messages!' ), 'private_messages_unread_reminder', $email_template_params ) )
+	if( send_mail_to_User( $user_ID, T_('You have unread messages').'!', 'private_messages_unread_reminder', $email_template_params ) )
 	{ // Update users last unread message reminder timestamp
 		$UserSettings->set( 'last_unread_messages_reminder', date2mysql( $servertimenow ), $user_ID );
 		// save UserSettings after each email, because the cron task mail fail and users won't be updated!
@@ -133,6 +133,6 @@ foreach( $users_to_remind_ids as $user_ID )
 	locale_restore_previous();
 }
 
-$result_message = sprintf( T_( '%d reminder emails were sent!' ), $reminder_sent );
+$result_message = sprintf( T_('%d reminder emails were sent!'), $reminder_sent );
 return 1; /* ok */
 ?>

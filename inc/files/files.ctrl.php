@@ -158,6 +158,7 @@ param( 'linkdata', 'string', '', true );
 // Name of the iframe we want some actions to come back to:
 param( 'iframe_name', 'string', '', true );
 param( 'field_name', 'string', '', true );
+param( 'file_type', 'string', '', true );
 
 // Get root:
 $ads_list_path = false; // false by default, gets set if we have a valid root
@@ -927,6 +928,61 @@ switch( $action )
 		}
 		break;
 
+	case 'resize':
+		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
+		{ // We do not have permission to edit files
+			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$action = 'list';
+			break;
+		}
+
+		if( ! $selected_Filelist->count() && ( ! $source_Filelist || ! $source_Filelist->count() ) )
+		{ // There is nothing to resize
+			$Messages->add( T_('Nothing selected.'), 'error' );
+			$action = 'list';
+			break;
+		}
+
+		param( 'confirmed', 'integer', 0 );
+
+		// Remove non-image files to resize:
+		while( $loop_sel_File = & $selected_Filelist->get_next() )
+		{
+			if( ! $loop_sel_File->is_image() )
+			{
+				if( ! $selected_Filelist->remove( $loop_sel_File ) )
+				{
+					die( 'Failed to remove file from list' );
+				}
+			}
+		}
+
+		if( $confirmed )
+		{ // Resize is confirmed, let's proceed:
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'file' );
+			$selected_Filelist->restart();
+			$FileCache = & get_FileCache();
+
+			$fit_width = $Settings->get( 'fm_resize_width' );
+			$fit_height = $Settings->get( 'fm_resize_height' );
+
+			load_funcs( 'files/model/_image.funcs.php' );
+
+			while( $loop_sel_File = & $selected_Filelist->get_next() )
+			{
+				$current_dimensions = $loop_sel_File->get_image_size('widthheight_assoc');
+				$new_dimensions = fit_into_constraint( $current_dimensions['width'], $current_dimensions['height'], $fit_width, $fit_height );
+				resize_image( $loop_sel_File, (int)$new_dimensions[0], (int)$new_dimensions[1] );
+			}
+
+			$action = 'list';
+			$redirect_to = param( 'redirect_to', 'url', NULL );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( empty( $redirect_to ) ? regenerate_url( '', '', '', '&' ) : $redirect_to, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		break;
 
 	case 'delete':
 		// TODO: We don't need the Filelist, move UP!
@@ -1201,6 +1257,17 @@ switch( $action )
 		$edited_File->set( 'title', param( 'title', 'string', '' ) );
 		$edited_File->set( 'alt', param( 'alt', 'string', '' ) );
 		$edited_File->set( 'desc', param( 'desc', 'text', '' ) );
+
+		$resize_image = param( 'resize_image', 'boolean', false );
+		if( $resize_image )
+		{
+			load_funcs( 'files/model/_image.funcs.php' );
+
+			$current_dimensions = $edited_File->get_image_size('widthheight_assoc');
+			$new_dimensions = fit_into_constraint( $current_dimensions['width'], $current_dimensions['height'],
+					$Settings->get( 'fm_resize_width' ), $Settings->get( 'fm_resize_height' ));
+			resize_image( $edited_File, (int)$new_dimensions[0], (int)$new_dimensions[1] );
+		}
 
 		// Store File object into DB:
 		if( $edited_File->dbsave() )
@@ -1547,9 +1614,10 @@ if( $mode != 'modal' )
 {
 	// require colorbox js
 	require_js_helper( 'colorbox' );
-	// require File Uploader js and css
-	require_js( 'multiupload/fileuploader.js' );
-	require_css( 'fileuploader.css' );
+	// require Fine Uploader js and css:
+	init_fineuploader_js_lang_strings();
+	require_js( 'multiupload/fine-uploader.js' );
+	require_css( 'fine-uploader.css' );
 
 	if( $mode == 'upload' || $mode == 'import' )
 	{ // Add css to remove spaces around window
@@ -1612,6 +1680,11 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 		case 'rename':
 			// Rename files dialog:
 			$AdminUI->disp_view( 'files/views/_file_rename.form.php' );
+			break;
+
+		case 'resize':
+			// Resize file(s). We arrive here either if not confirmed or in case of error(s).
+			$AdminUI->disp_view( 'files/views/_file_resize.form.php' );
 			break;
 
 		case 'delete':

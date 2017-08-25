@@ -113,6 +113,8 @@ switch( $action )
 	case 'restrict':
 	case 'deprecate':
 	case 'delete':
+	case 'merge':
+	case 'append':
 	// Note: we need to *not* use $p in the cases above or it will conflict with the list display
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'edit_type': // this gets set as action by JS, when we switch tabs
@@ -615,7 +617,7 @@ switch( $action )
 		// Page title:
 		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d: %s'), $edited_Item->ID, $Blog->get('name') );
 
-		$AdminUI->breadcrumbpath_add( sprintf( T_('Post #%s'), $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
+		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 		$AdminUI->breadcrumbpath_add( T_('Edit'), '?ctrl=items&amp;action=edit&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 
 		// Params we need for tab switching:
@@ -712,7 +714,7 @@ switch( $action )
 		// Page title:
 		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d: %s'), $edited_Item->ID, $Blog->get('name') );
 
-		$AdminUI->breadcrumbpath_add( sprintf( T_('Post #%s'), $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
+		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 		$AdminUI->breadcrumbpath_add( T_('Edit'), '?ctrl=items&amp;action=edit&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 
 		// Params we need for tab switching:
@@ -1457,6 +1459,113 @@ switch( $action )
 		// Make posts with selected images action:
 		break;
 
+	case 'merge':
+	case 'append':
+		// Merge/Append the edited Item to another selected Item:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		$dest_post_ID = param( 'dest_post_ID', 'integer', true );
+
+		if( $edited_Item->ID == $dest_post_ID )
+		{	// If same Item is used as source for merging:
+			// DO NOT translate, because it is a wrong request:
+			$Messages->add( 'Don\'t use the same item for merging!', 'error' );
+			// REDIRECT / EXIT
+			header_redirect();
+		}
+
+		$ItemCache = & get_ItemCache();
+		if( ! ( $dest_Item = & $ItemCache->get_by_ID( $dest_post_ID, false, false ) ) )
+		{	// If Item doesn't exist in DB:
+			$Messages->add( T_('Wrong selected item for merging, please try again.'), 'error' );
+			// REDIRECT / EXIT
+			header_redirect();
+		}
+
+		if( $action == 'append' )
+		{	// If we should append
+			$SQL = new SQL( 'Get the latest comment of Item #'.$dest_Item->ID.' to append Item #'.$edited_Item->ID );
+			$SQL->SELECT( 'MAX( comment_date )' );
+			$SQL->FROM( 'T_comments' );
+			$SQL->WHERE( 'comment_item_ID = '.$dest_Item->ID );
+			$latest_comment_time = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+			if( $latest_comment_time !== NULL )
+			{	// If target Item has at lest one comment use new date/time for new appended comments:
+				$append_comment_timestamp = strtotime( $latest_comment_time ) + 60;
+			}
+		}
+
+		// Convert the source Item to comment of the target Item:
+		$Comment = new Comment();
+		$Comment->set( 'item_ID', $dest_Item->ID );
+		$Comment->set( 'content', $edited_Item->get( 'content' ) );
+		$Comment->set_renderers( $edited_Item->get_renderers() );
+		$Comment->set( 'status', $edited_Item->get( 'status' ) == 'redirected' ? 'draft' : $edited_Item->get( 'status' ) );
+		$Comment->set( 'author_user_ID', $edited_Item->get( 'creator_user_ID' ) );
+		if( isset( $append_comment_timestamp ) )
+		{	// Append action with 1 minute incrementing:
+			$Comment->set( 'date', date2mysql( $append_comment_timestamp ) );
+			$append_comment_timestamp += 60;
+		}
+		else
+		{	// Merge action with saving date/time:
+			$Comment->set( 'date', $edited_Item->get( 'datestart' ) );
+		}
+		$Comment->set( 'notif_status', $edited_Item->get( 'notifications_status' ) );
+		$Comment->set( 'notif_flags', $edited_Item->get( 'notifications_flags' ) );
+		if( $Comment->dbinsert() )
+		{	// If comment has been created try to copy all attachments from source Item:
+			$DB->query( 'UPDATE T_links
+				  SET link_itm_ID = NULL, link_cmt_ID = '.$Comment->ID.'
+				WHERE link_itm_ID = '.$edited_Item->ID );
+			$DB->query( 'UPDATE T_links
+				  SET link_position = "aftermore"
+				WHERE link_cmt_ID = '.$Comment->ID.'
+					AND link_position != "teaser"
+					AND link_position != "aftermore"' );
+		}
+		// Move all comments of the source Item to the target Item:
+		if( isset( $append_comment_timestamp ) )
+		{	// Append comments with new dates after the latest comment of the target Item:
+			$SQL = new SQL( 'Get all comments of source Item #'.$edited_Item->ID.' in order to append to target Item #'.$dest_Item->ID );
+			$SQL->SELECT( 'comment_ID' );
+			$SQL->FROM( 'T_comments' );
+			$SQL->WHERE( 'comment_item_ID = '.$edited_Item->ID );
+			$SQL->ORDER_BY( 'comment_date' );
+			$source_comment_IDs = $DB->get_col( $SQL->get(), 0, $SQL->title );
+			foreach( $source_comment_IDs as $source_comment_ID )
+			{
+				$DB->query( 'UPDATE T_comments
+						SET comment_item_ID = '.$dest_Item->ID.',
+						    comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp ) ).'
+					WHERE comment_ID = '.$source_comment_ID );
+				// Increment 1 minute for each next appending comment:
+				$append_comment_timestamp += 60;
+			}
+		}
+		else
+		{	// Merge comments with saving their dates:
+			$DB->query( 'UPDATE T_comments
+						SET comment_item_ID = '.$dest_Item->ID.'
+					WHERE comment_item_ID = '.$edited_Item->ID );
+		}
+		// Delete the source Item completely:
+		$edited_Item_ID = $edited_Item->ID;
+		$edited_Item->dbdelete();
+
+		$Messages->add( sprintf( ( $action == 'append' )
+			? T_('Item #%d has been appended to current Item.')
+			: T_('Item #%d has been merged to current Item.'), $edited_Item_ID ), 'success' );
+
+		// REDIRECT / EXIT
+		header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.$dest_Item->ID );
+		break;
+
 	default:
 		debug_die( 'unhandled action 2: '.htmlspecialchars($action) );
 }
@@ -1690,14 +1799,14 @@ switch( $action )
 			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
 				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
 				$mode_inskin_action = get_htsrv_url().'item_edit.php';
-				$AdminUI->global_icon( T_('In skin editing'), 'edit', $mode_inskin_url,
-						' '.T_('In skin editing'), 4, 3, array(
+				$AdminUI->global_icon( T_('In-skin editing'), 'edit', $mode_inskin_url,
+						' '.T_('In-skin editing'), 4, 3, array(
 						'style' => 'margin-right: 3ex',
 						'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$mode_inskin_action.'\' );'
 				) );
 			}
 
-			$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('Cancel'), 4, 2 );
+			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
 
 			init_tokeninput_js();
 		}
@@ -1733,7 +1842,7 @@ switch( $action )
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'tab' => $tab, 'filter' => 'restore' ) );
 
-		$AdminUI->breadcrumbpath_add( sprintf( T_('Post #%s'), $item_ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$item_ID );
+		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $item_ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$item_ID );
 		$AdminUI->breadcrumbpath_add( T_('View post & comments'), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$item_ID );
 		break;
 
@@ -1812,9 +1921,10 @@ if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action,
 	init_autocomplete_usernames_js();
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
-	// Require File Uploader js and css:
-	require_js( 'multiupload/fileuploader.js' );
-	require_css( 'fileuploader.css' );
+	// Require Fine Uploader js and css:
+	init_fineuploader_js_lang_strings();
+	require_js( 'multiupload/fine-uploader.js' );
+	require_css( 'fine-uploader.css' );
 	// Load JS files to make the links table sortable:
 	require_js( '#jquery#' );
 	require_js( 'jquery/jquery.sortable.min.js' );

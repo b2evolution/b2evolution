@@ -22,7 +22,7 @@ class quicktags_plugin extends Plugin
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -93,6 +93,11 @@ class quicktags_plugin extends Plugin
 			return false;
 		}
 
+		global $current_User;
+
+		// Allow html tags like <pre>, <img> and <a> only when current user has a permission for this:
+		$params['allow_restricted_html'] = ( is_logged_in() && $current_User->check_perm( 'blog_comments', 'edit', false, $item_Blog->ID ) );
+
 		return $this->DisplayCodeToolbar( $params );
 	}
 
@@ -114,6 +119,7 @@ class quicktags_plugin extends Plugin
 
 		$params = array_merge( array(
 				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+				'allow_restricted_html' => true, // Set false if html tags like <pre>, <img> and <a> must be hidden for current case
 			), $params );
 
 		$simple = ( isset( $params['edit_layout'] ) && $params['edit_layout'] == 'inskin' );
@@ -219,6 +225,10 @@ class quicktags_plugin extends Plugin
 				,'<?php echo TS_('BLOCKQUOTE [Alt-B]') ?>'
 			);
 
+		<?php
+		if( $params['allow_restricted_html'] )
+		{	// Allow <pre> html tag:
+		?>
 		<?php echo $params['js_prefix']; ?>b2evoButtons[<?php echo $params['js_prefix']; ?>b2evoButtons.length] = new <?php echo $params['js_prefix']; ?>b2evoButton(
 				'<?php echo $params['js_prefix']; ?>b2evo_pre'
 				,'pre', ''
@@ -226,6 +236,9 @@ class quicktags_plugin extends Plugin
 				,'r'
 				,'<?php echo TS_('PREformatted text [Alt-R]') ?>'
 			);
+		<?php
+		}
+		?>
 
 		<?php echo $params['js_prefix']; ?>b2evoButtons[<?php echo $params['js_prefix']; ?>b2evoButtons.length] = new <?php echo $params['js_prefix']; ?>b2evoButton(
 				'<?php echo $params['js_prefix']; ?>b2evo_ul'
@@ -253,8 +266,10 @@ class quicktags_plugin extends Plugin
 
 		<?php
 	}
-	?>
 
+	if( $params['allow_restricted_html'] )
+	{	// Allow <img> and <a> html tags:
+	?>
 		<?php echo $params['js_prefix']; ?>b2evoButtons[<?php echo $params['js_prefix']; ?>b2evoButtons.length] = new <?php echo $params['js_prefix']; ?>b2evoButton(
 				'<?php echo $params['js_prefix']; ?>b2evo_img'
 				,'<?php echo ($simple ? 'image' : 'img') ?>', ''
@@ -271,6 +286,9 @@ class quicktags_plugin extends Plugin
 				,'a'
 				,'<?php echo TS_('A href [Alt-A]') ?>'
 			); // special case
+	<?php
+	}
+	?>
 
 		function <?php echo $params['js_prefix']; ?>b2evoGetButton(button, i)
 		{

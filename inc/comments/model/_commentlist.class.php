@@ -956,6 +956,79 @@ class CommentList2 extends DataObjectList2
 			}
 		}
 	}
+
+
+	/**
+	 * Initialize things in order to be ready for displaying.
+	 *
+	 * This is useful when manually displaying, i-e: not by using Results::display()
+ 	 *
+	 * @param array ***please document***
+	 * @param array Fadeout settings array( 'key column' => array of values ) or 'session'
+ 	 */
+	function display_init( $display_params = NULL, $fadeout = NULL )
+	{
+		parent::display_init( $display_params, $fadeout );
+
+		if( ! isset( $display_params['init_order_numbers_mode'] ) )
+		{	// Set default mode to initialize order numbers:
+			$display_params['init_order_numbers_mode'] = 'list';
+		}
+
+		// Initialize comment order numbers for this filtered list:
+		$this->init_order_numbers( $display_params['init_order_numbers_mode'] );
+	}
+
+
+	/**
+	 * Initialize comment order numbers for this filtered list
+	 * (Used for meta comments)
+	 *
+	 * @param string Order mode:
+	 *               'date' - first created comment has first order,
+	 *               'list' - orders are assigned depedning on list sorting
+	 */
+	function init_order_numbers( $mode = 'list' )
+	{
+		$this->inlist_orders = array();
+
+		switch( $mode )
+		{
+			case 'date':
+				while( $Comment = & $this->get_next() )
+				{
+					$this->inlist_orders[ $Comment->ID ] = $Comment->date;
+				}
+
+				if( count( $this->inlist_orders ) )
+				{
+					// Reverse sort comments by date of this list:
+					arsort( $this->inlist_orders );
+
+					// Get max number from the list:
+					$max_number = $this->total_rows - ( $this->limit * ( $this->page - 1 ) );
+
+					foreach( $this->inlist_orders as $i => $date )
+					{
+						$this->inlist_orders[ $i ] = $max_number--;
+					}
+				}
+				break;
+
+			case 'list':
+			default:
+				// Set first number of comment depending on current page:
+				$first_number = ( ( $this->page - 1 ) * $this->limit ) + 1;
+				while( $Comment = & $this->get_next() )
+				{
+					$this->inlist_orders[ $Comment->ID ] = $first_number++;
+				}
+				break;
+		}
+
+		// Restart this list:
+		$this->restart();
+	}
 }
 
 ?>

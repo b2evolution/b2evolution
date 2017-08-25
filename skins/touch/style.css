@@ -482,7 +482,8 @@ a.post-arrow {
 	-webkit-transform: scale(1.0) rotate(0deg);
 	-ms-transform: scale(1.0) rotate(0deg);
 	     transform: scale(1.0) rotate(0deg);
-	transition-duration: 0.3s;
+	-webkit-transition-duration: 0.3s;
+	        transition-duration: 0.3s;
 	-webkit-touch-callout: none;
 }
 
@@ -490,7 +491,8 @@ a.post-arrow-down {
 	-webkit-transform: scale(1.0) rotate(90deg);
 	-ms-transform: scale(1.0) rotate(90deg);
 	     transform: scale(1.0) rotate(90deg);
-	transition-duration: 0.3s;
+	-webkit-transition-duration: 0.3s;
+	        transition-duration: 0.3s;
 }
 
 a.h2, h2.post-title {
@@ -935,7 +937,8 @@ h3#com-head img#com-arrow {
 	-webkit-transform: scale(1.0) rotate(0deg);
 	-ms-transform: scale(1.0) rotate(0deg);
 	     transform: scale(1.0) rotate(0deg);
-	transition-duration: 0.6s;
+	-webkit-transition-duration: 0.6s;
+	        transition-duration: 0.6s;
 }
 
 .comhead-open {
@@ -949,7 +952,8 @@ h3#com-head img#com-arrow {
 	-webkit-transform: scale(1.0) rotate(90deg) !important;
 	-ms-transform: scale(1.0) rotate(90deg) !important;
 	     transform: scale(1.0) rotate(90deg) !important;
-	transition-duration: 0.6s !important;
+	-webkit-transition-duration: 0.6s !important;
+	        transition-duration: 0.6s !important;
 }
 
 ol.commentlist li:first-child {

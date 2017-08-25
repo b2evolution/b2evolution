@@ -88,7 +88,7 @@ function display_pluggable_permissions( &$Form, $perm_block )
 
 $Form = new Form( NULL, 'group_checkchanges' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'ctrl,grp_ID,action', 'ctrl=groups' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'ctrl,grp_ID,action', 'ctrl=groups' ) );
 
 if( $edited_Group->ID == 0 )
 {
@@ -196,6 +196,10 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 	// Display pluggable permissions:
 	display_pluggable_permissions( $Form, 'additional' );
 
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('File permissions').get_manual_link('group_properties_file_permissions'), array( 'id' => 'file', 'style' => $primary_panels_style ) );
+	display_pluggable_permissions( $Form, 'file' );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_properties_system_permissions'), array( 'id' => 'system', 'style' => $primary_panels_style ) );

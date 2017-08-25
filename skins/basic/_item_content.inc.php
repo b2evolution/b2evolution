@@ -60,7 +60,7 @@ $Item->images( array(
 
 		// Links to post pages (for multipage posts):
 		$Item->page_links( array(
-				'before'      => '<p class="right">'.T_('Pages:').' ',
+				'before'      => '<p class="right">'.T_('Pages').': ',
 				'separator'   => ' &middot; ',
 			) );
 

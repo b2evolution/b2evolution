@@ -156,27 +156,27 @@ class Hitlist
 		// BUT only those with unknown dom_type/dom_status, because otherwise this
 		//     info is useful when we get hit again.
 		$hitlist_Timer->start( 'basedomains' );
-		$basedomains_rows_affected = $DB->query( "
+		$basedomains_rows_affected = $DB->query( '
 			DELETE T_basedomains
 			  FROM T_basedomains LEFT JOIN T_hitlog ON hit_referer_dom_ID = dom_ID
 			 WHERE hit_referer_dom_ID IS NULL
-			 AND dom_type = 'unknown'
-			 AND dom_status = 'unknown'" );
+			 AND dom_type = "unknown"
+			 AND dom_status = "unknown"' );
 		$hitlist_Timer->stop( 'basedomains' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$basedomains_rows_affected.' rows from T_basedomains.', 'request' );
 
 
 		// OPTIMIZE TABLES:
 		$hitlist_Timer->start( 'optimize_hitlog' );
-		$DB->query('OPTIMIZE TABLE T_hitlog');
+		$DB->query( 'OPTIMIZE TABLE T_hitlog' );
 		$hitlist_Timer->stop( 'optimize_hitlog' );
 
 		$hitlist_Timer->start( 'optimize_sessions' );
-		$DB->query('OPTIMIZE TABLE T_sessions');
+		$DB->query( 'OPTIMIZE TABLE T_sessions' );
 		$hitlist_Timer->stop( 'optimize_sessions' );
 
 		$hitlist_Timer->start( 'optimize_basedomains' );
-		$DB->query('OPTIMIZE TABLE T_basedomains');
+		$DB->query( 'OPTIMIZE TABLE T_basedomains' );
 		$hitlist_Timer->stop( 'optimize_basedomains' );
 
 

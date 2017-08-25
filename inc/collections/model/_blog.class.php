@@ -373,7 +373,7 @@ class Blog extends DataObject
 				$this->set_setting( 'in_skin_editing', '1' );
 				$this->set_setting( 'posts_per_page', 30 );
 				$this->set_setting( 'allow_html_comment', 0 );
-				$this->set_setting( 'orderby', 'last_touched_ts' );
+				$this->set_setting( 'orderby', 'contents_last_updated_ts' );
 				$this->set_setting( 'orderdir', 'DESC' );
 				$this->set_setting( 'enable_goto_blog', 'post' );
 				$this->set_setting( 'front_disp', 'front' );
@@ -952,6 +952,11 @@ class Blog extends DataObject
 			// Search results:
 			param_integer_range( 'search_per_page', 1, 9999, T_('Number of search results per page must be between %d and %d.') );
 			$this->set_setting( 'search_per_page', get_param( 'search_per_page' ) );
+			$this->set_setting( 'search_sort_by', param( 'search_sort_by', 'string' ) );
+			$this->set_setting( 'search_include_cats', param( 'search_include_cats', 'integer', 0 ) );
+			$this->set_setting( 'search_include_posts', param( 'search_include_posts', 'integer', 0 ) );
+			$this->set_setting( 'search_include_cmnts', param( 'search_include_cmnts', 'integer', 0 ) );
+			$this->set_setting( 'search_include_tags', param( 'search_include_tags', 'integer', 0 ) );
 
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
@@ -962,6 +967,10 @@ class Blog extends DataObject
 
 			// Archive pages:
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
+
+			// Contact form:
+			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
+			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
 		}
 
 		if( in_array( 'more', $groups ) )
@@ -976,8 +985,11 @@ class Blog extends DataObject
 			{
 				// Subscriptions:
 				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_subscription', param( 'opt_out_subscription', 'integer', 0 ) );
 				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_comment_subscription', param( 'opt_out_comment_subscription', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_item_subscription', param( 'opt_out_item_subscription', 'integer', 0 ) );
 			}
 
 			// Sitemaps:
@@ -1097,19 +1109,19 @@ class Blog extends DataObject
 
 			if( param( 'blog_head_includes', 'html', NULL ) !== NULL )
 			{	// HTML header includes:
-				param_check_html( 'blog_head_includes', sprintf( T_('Invalid Custom meta tag/css section. You can loosen this restriction in the <a %s>group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'head_extension' );
+				param_check_html( 'blog_head_includes', T_('Invalid Custom meta tag/css section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'head_extension' );
 				$this->set_setting( 'head_includes', get_param( 'blog_head_includes' ) );
 			}
 
 			if( param( 'blog_body_includes', 'html', NULL ) !== NULL )
 			{ // HTML body includes:
-				param_check_html( 'blog_body_includes', sprintf( T_('Invalid Custom javascript section. You can loosen this restriction in the <a %s>group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'body_extension' );
+				param_check_html( 'blog_body_includes', T_('Invalid Custom javascript section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'body_extension' );
 				$this->set_setting( 'body_includes', get_param( 'blog_body_includes' ) );
 			}
 
 			if( param( 'blog_footer_includes', 'html', NULL ) !== NULL )
 			{	// HTML footer includes:
-				param_check_html( 'blog_footer_includes', sprintf( T_('Invalid Custom javascript section. You can loosen this restriction in the <a %s>group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'footer_extension' );
+				param_check_html( 'blog_footer_includes', T_('Invalid Custom javascript section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'footer_extension' );
 				$this->set_setting( 'footer_includes', get_param( 'blog_footer_includes' ) );
 			}
 
@@ -4232,6 +4244,10 @@ class Blog extends DataObject
 						$url = url_add_param( $url, 'cat='.$cat_ID );
 					}
 				}
+				else
+				{ // User does not have any means to edit the post!
+					return '';
+				}
 
 				if( !empty( $post_title ) )
 				{ // Append a post title
@@ -4952,6 +4968,46 @@ class Blog extends DataObject
 			WHERE cat_blog_ID = '.$this->ID.'
 				AND comment_status IN ( '.$DB->quote( $reduced_statuses ).' )',
 			'Reduce comments statuses by max allowed status of the collection #'.$this->ID );
+	}
+
+
+	/**
+	 * Get a number of unread posts by current logged in User
+	 *
+	 * @return integer
+	 */
+	function get_unread_posts_count()
+	{
+		global $DB, $current_User, $localtimenow;
+
+		if( ! is_logged_in() || ! $this->get_setting( 'track_unread_content' ) )
+		{	// User must be logged in AND the tracking of unread content is turned ON for the collection:
+			return 0;
+		}
+
+		// Initialize SQL query to get only the posts which are displayed by global $MainList on disp=posts:
+		$ItemList2 = new ItemList2( $this, $this->get_timestamp_min(), $this->get_timestamp_max(), NULL, 'ItemCache', 'recent_topics' );
+		$ItemList2->set_default_filters( array(
+				'unit' => 'all', // set this to don't calculate total rows
+			) );
+		$ItemList2->query_init();
+
+		// Get a count of the unread topics for current user:
+		$unread_posts_SQL = new SQL();
+		$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
+		$unread_posts_SQL->FROM( 'T_items__item' );
+		$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__user_data ON post_ID = itud_item_ID AND itud_user_ID = '.$DB->quote( $current_User->ID ) );
+		$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+		$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+		$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
+		$unread_posts_SQL->WHERE_and( 'post_contents_last_updated_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
+		// In theory, it would be more safe to use this comparison:
+		// $unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts <= post_contents_last_updated_ts' );
+		// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
+		$unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts < post_contents_last_updated_ts' );
+
+		// Execute a query with to know if current user has new data to view:
+		return intval( $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics of collection #'.$this->ID.' for current user' ) );
 	}
 }
 

@@ -30,7 +30,7 @@ $EmailCampaign->create_cron_job( true );
 $result_message = $Messages->get_string( '', '', "\n" );
 if( empty( $result_message ) )
 {
-	$result_message = T_('Done.');
+	$result_message = T_('Done').'.';
 }
 
 return 1; /* ok */

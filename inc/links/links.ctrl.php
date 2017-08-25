@@ -281,9 +281,10 @@ switch( $action )
 
 // require colorbox js
 require_js_helper( 'colorbox' );
-// require File Uploader js and css
-require_js( 'multiupload/fileuploader.js' );
-require_css( 'fileuploader.css' );
+// require Fine Uploader js and css:
+init_fineuploader_js_lang_strings();
+require_js( 'multiupload/fine-uploader.js' );
+require_css( 'fine-uploader.css' );
 if( $action == 'edit_links' )
 { // Load JS files to make the links table sortable:
 	require_js( '#jquery#' );

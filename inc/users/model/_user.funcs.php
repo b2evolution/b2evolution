@@ -84,10 +84,10 @@ function check_user_status( $action, $target = NULL )
  *
  * @param string login
  * @param string password
- * @param boolean Is the password parameter already MD5()'ed?
+ * @param boolean Is the password parameter already hashed?
  * @return boolean
  */
-function user_pass_ok( $login, $pass, $pass_is_md5 = false )
+function user_pass_ok( $login, $pass, $pass_is_hashed = false )
 {
 	$UserCache = & get_UserCache();
 	$User = & $UserCache->get_by_login( $login );
@@ -97,7 +97,7 @@ function user_pass_ok( $login, $pass, $pass_is_md5 = false )
 	}
 	// echo 'got data for: ', $User->login;
 
-	return $User->check_password( $pass, $pass_is_md5 );
+	return $User->check_password( $pass, $pass_is_hashed );
 }
 
 
@@ -1467,6 +1467,17 @@ function profile_check_params( $params, $User = NULL )
 		else
 		{
 			param_check_valid_login( $dummy_fields[ $params['login'][1] ] );
+			
+			if( param_check_valid_login( $dummy_fields[ $params['login'][1] ] ) )
+			{	// If login is valid
+				global $reserved_logins, $current_User;
+				if( ! empty( $reserved_logins ) &&
+				    in_array( $params['login'][0], $reserved_logins ) &&
+				    ( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit', false ) ) )
+				{	// If new entered login is reserved and current logged in User cannot use this:
+					param_error( $dummy_fields[ $params['login'][1] ], T_('You cannot use this login because it is reserved.') );
+				}
+			}
 		}
 	}
 
@@ -1486,7 +1497,7 @@ function profile_check_params( $params, $User = NULL )
 	// Checking country
 	if( isset( $params['country'] ) && empty( $params['country'][0] ) )
 	{
-		param_error( $params['country'][1], T_('Please select country.') );
+		param_error( $params['country'][1], T_('Please select a country').'.' );
 	}
 
 	// Checking first name
@@ -1943,10 +1954,10 @@ function duration_format( $duration, $show_seconds = true )
  * Get the integer value of a status permission
  * The status permissions are stored as a set, and each status has an integer value also
  *
- * @param string status
- * @return integer status perm value
+ * @param string|array Status(es)
+ * @return integer Status perm value
  */
-function get_status_permvalue( $status )
+function get_status_permvalue( $statuses )
 {
 	static $status_permission_map = array(
 			'trash'      => 0, // Note that 'trash' status doesn't have a real permission value, with this value no-one has permission, and that is OK
@@ -1960,21 +1971,22 @@ function get_status_permvalue( $status )
 			'redirected' => 128
 		);
 
-	switch( $status )
-	{
-		case 'published_statuses':
-			return $status_permission_map['protected'] + $status_permission_map['community'] + $status_permission_map['published'];
-
-		default:
-			break;
+	if( ! is_array( $statuses ) )
+	{	// Convert to array if single string status:
+		$statuses = array( $statuses );
 	}
 
-	if( !isset( $status_permission_map[$status] ) )
+	$status_permvalue = 0;
+	foreach( $statuses as $status )
 	{
-		debug_die( 'Invalid status permvalue was requested!' );
+		if( ! isset( $status_permission_map[ $status ] ) )
+		{	// Stop on unknown status request:
+			debug_die( 'Invalid status permvalue was requested!' );
+		}
+		$status_permvalue += $status_permission_map[ $status ];
 	}
 
-	return $status_permission_map[$status];
+	return $status_permvalue;
 }
 
 
@@ -2377,7 +2389,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 	if( $edited_User->ID != 0 )
 	{ // show these actions only if user already exists
 
-		if( $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user' ) )
+		if( $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user', $edited_User->ID ) )
 		{
 			global $user_tab;
 			// get current User report from edited User
@@ -2415,7 +2427,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 	{
 		$redirect_to = regenerate_url( 'user_ID,action,ctrl,user_tab', 'ctrl=users' );
 	}
-	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1, $link_attribs );
+	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing').'!' : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1, $link_attribs );
 }
 
 
@@ -2496,8 +2508,10 @@ function get_user_sub_entries( $is_admin, $user_ID )
 				$users_sub_entries['admin'] = array(
 								'text' => T_('Admin'),
 								'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=admin'.$user_param ) );
+			}
 
-				// Only users with view/edit all users permission can see the 'Sessions' & 'User Activity' tabs
+			if( $current_User->ID == $user_ID || $current_User->can_moderate_user( $user_ID ) )
+			{	// Only users with view/edit all users permission can see the 'Sessions' & 'User Activity' tabs
 				$users_sub_entries['sessions'] = array(
 									'text' => T_('Sessions'),
 									'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=sessions'.$user_param ) );
@@ -2523,9 +2537,57 @@ function get_user_sub_entries( $is_admin, $user_ID )
 function get_user_isubscription( $user_ID, $item_ID )
 {
 	global $DB;
+	$ItemCache = & get_ItemCache();
+	$Item = $ItemCache->get_by_ID( $item_ID );
+	$blog_ID = $Item->get_blog_ID();
+
 	$result = $DB->get_var( 'SELECT count( isub_user_ID )
-								FROM T_items__subscriptions
-								WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$item_ID.' AND isub_comments <> 0' );
+								FROM (
+									SELECT DISTINCT isub_user_ID
+									FROM T_items__subscriptions
+									WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$item_ID.' AND isub_comments <> 0
+
+									UNION
+
+									SELECT user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+									LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$item_ID.' AND isub_user_ID = user_ID )
+									WHERE opt.cset_coll_ID = '.$blog_ID.'
+										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_value = 1
+										AND  user_ID = '.$user_ID.'
+										AND ( isub_comments IS NULL OR isub_comments = 1 )
+
+									UNION
+
+									SELECT sug_user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+									LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$item_ID.' AND isub_user_ID = sug_user_ID )
+									WHERE opt.cset_coll_ID = '.$blog_ID.'
+										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_value = 1
+										AND sug_user_ID = '.$user_ID.'
+										AND ( isub_comments IS NULL OR isub_comments = 1 )
+
+									UNION
+
+									SELECT bloguser_user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
+									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$item_ID.' AND isub_user_ID = bloguser_user_ID )
+									WHERE opt.cset_coll_ID = '.$blog_ID.'
+										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_value = 1
+										AND bloguser_user_ID = '.$user_ID.'
+										AND ( isub_comments IS NULL OR isub_comments = 1 )
+								) AS users' );
 	return $result > 0;
 }
 
@@ -3079,7 +3141,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 				{
 					$url = 'http://'.$url;
 				}
-				$field_note .= '<a href="'.$url.'" target="_blank" class="action_icon" style="vertical-align: 0;">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
+				$field_note .= '<a href="'.$url.'" target="_blank" class="action_icon" style="vertical-align: 0;">'.get_icon( 'permalink', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
 			}
 		}
 
@@ -3127,6 +3189,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 
 				default:
 					$field_params['maxlength'] = 255;
+					$field_params['style'] = 'max-width:90%';
 					$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, $field_size, $userfield_icon.$userfield->ufdf_name, $field_note, $field_params );
 			}
 		}
@@ -3309,7 +3372,7 @@ function callback_filter_userlist( & $Form )
 		$Form->output = true;
 
 		global $user_fields_empty_name;
-		$user_fields_empty_name = T_('Select...');
+		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
 
 		$Form->select( 'criteria_type[]', $type, 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
 	}
@@ -3932,15 +3995,18 @@ function display_voting_form( $params = array() )
 
 	$params_like = array(
 			'id' => 'votingLike',
-			'title' => $params['title_like']
+			'title' => $params['title_like'],
+			'class' => 'voting_btn'
 		);
 	$params_noopinion = array(
 			'id' => 'votingNoopinion',
-			'title' => $params['title_noopinion']
+			'title' => $params['title_noopinion'],
+			'class' => 'voting_btn'
 		);
 	$params_dontlike = array(
 			'id' => 'votingDontlike',
-			'title' => $params['title_dontlike']
+			'title' => $params['title_dontlike'],
+			'class' => 'voting_btn'
 		);
 	$params_inappropriate = array(
 			'id' => 'votingInappropriate',
@@ -4060,7 +4126,7 @@ function display_voting_form( $params = array() )
 				// Don't like
 				$type_voted = 'dontlike';
 				$icon_dontlike = 'thumb_down';
-				$params_dontlike['class'] = 'voted';
+				$params_dontlike['class'] .= ' voted';
 				$params_dontlike['title'] = $params['title_dontlike_voted'];
 				break;
 
@@ -4068,7 +4134,7 @@ function display_voting_form( $params = array() )
 				// No opinion
 				$type_voted = 'noopinion';
 				$icon_noopinion = 'ban';
-				$params_noopinion['class'] = 'voted';
+				$params_noopinion['class'] .= ' voted';
 				$params_noopinion['title'] = $params['title_noopinion_voted'];
 				break;
 
@@ -4076,7 +4142,7 @@ function display_voting_form( $params = array() )
 				// Like
 				$type_voted = 'like';
 				$icon_like = 'thumb_up';
-				$params_like['class'] = 'voted';
+				$params_like['class'] .= ' voted';
 				$params_like['title'] = $params['title_like_voted'];
 				break;
 		}
@@ -4096,8 +4162,10 @@ function display_voting_form( $params = array() )
 		}
 	}
 
-	echo '<span class="vote_title">'.$vote_numbers.'<span class="vote_title_text">'.$params['title_text'].'</span></span>';
+	echo '<span class="voting_wrapper">';
 
+	echo '<span class="vote_title_panel">';
+	echo '<span class="vote_title">'.$vote_numbers.'<span class="vote_title_text">'.$params['title_text'].'</span></span>';
 	$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 	// Set this url for case when JavaScript is not enabled:
 	$url = get_htsrv_url().'anon_async.php?action=voting&vote_type='.$params['vote_type'].'&vote_ID='.$params['vote_ID'].$blog_param.'&'.url_crumb( 'voting' );
@@ -4108,7 +4176,9 @@ function display_voting_form( $params = array() )
 	{	// Append a redirect param:
 		$url .= '&redirect_to='.$redirect_to;
 	}
+	echo '</span>';// END OF <span class="vote_title_panel">
 
+	echo '<span class="btn-group">';
 	if( ! empty( $params['widget_ID'] ) )
 	{	// Append widget ID for action URL:
 		$url .= '&widget_ID='.intval( $params['widget_ID'] );
@@ -4133,7 +4203,9 @@ function display_voting_form( $params = array() )
 	{	// Display 'Dont like' icon:
 		echo action_icon( '', $icon_dontlike, $url.'&vote_action=dontlike', '', 0, 0, array(), $params_dontlike );
 	}
+	echo '</span>';// END OF <span class="btn-group">
 
+	echo '<span class="vote_others">';
 	if( $params['display_inappropriate'] || $params['display_spam'] )
 	{	// Display separator between icons and checkboxes:
 		echo '<span class="separator">&nbsp;</span>';
@@ -4167,6 +4239,9 @@ function display_voting_form( $params = array() )
 	{	// Create a hidden input with skin ID:
 		echo '<input type="hidden" id="skinID" value="'.$params['skin_ID'].'" />';
 	}
+	echo '</span>';// END OF <span class="vote_others">
+
+	echo '</span>';// END OF <span class="voting_wrapper">
 }
 
 
@@ -4399,7 +4474,7 @@ function user_report_form( $params = array() )
 			'cancel_url' => '',
 		), $params );
 
-	if( ! is_logged_in() || $current_User->ID == $params['user_ID'] || ! $current_User->check_status( 'can_report_user' ) )
+	if( ! is_logged_in() || $current_User->ID == $params['user_ID'] || ! $current_User->check_status( 'can_report_user', $params['user_ID'] ) )
 	{ // Current user must be logged in, cannot report own account, and must has a permission to report
 		return;
 	}
@@ -5083,6 +5158,8 @@ function users_results_block( $params = array() )
 	$params = array_merge( array(
 			'org_ID'               => NULL,
 			'viewed_user'          => NULL,
+			'reg_ip_min'           => NULL,
+			'reg_ip_max'           => NULL,
 			'filterset_name'       => 'admin',
 			'results_param_prefix' => 'users_',
 			'results_title'        => T_('Users').get_manual_link('users_and_groups'),
@@ -5171,7 +5248,12 @@ function users_results_block( $params = array() )
 			'where_org_ID'        => $params['org_ID'],
 			'where_viewed_user'   => $params['viewed_user'],
 		) );
-	$default_filters = array( 'order' => $params['results_order'], 'org' => $params['org_ID'] );
+	$default_filters = array(
+			'order'      => $params['results_order'],
+			'org'        => $params['org_ID'],
+			'reg_ip_min' => $params['reg_ip_min'],
+			'reg_ip_max' => $params['reg_ip_max'],
+		);
 	$UserList->title = $params['results_title'];
 	$UserList->no_results_text = $params['results_no_text'];
 
@@ -5397,7 +5479,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_login'] )
 	{ // Display login
 		$UserList->cols[] = array(
-				'th' => T_('Login'),
+				'th' => /* TRANS: noun */ T_('Login'),
 				'th_class' => $params['th_class_login'],
 				'td_class' => $params['td_class_login'],
 				'order' => 'user_login',
@@ -5706,7 +5788,7 @@ function users_results( & $UserList, $params = array() )
 			$UserList->cols[] = array(
 					'th' => T_('Level'),
 					'th_class' => 'shrinkwrap small',
-					'td_class' => 'shrinkwrap user_level_edit small',
+					'td_class' => 'shrinkwrap jeditable_cell user_level_edit small',
 					'order' => 'user_level',
 					'default_dir' => 'D',
 					'td' => '%user_td_level( #user_ID#, #user_level# )%',
@@ -5771,7 +5853,7 @@ function user_td_grp_actions( & $row )
 
 		if( ($row->grp_ID != 1) && ($row->grp_ID != $Settings->get('newusers_grp_ID')) && !in_array( $row->grp_ID, $usedgroups ) )
 		{ // delete
-			$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID.'&amp;'.url_crumb('group') ) );
+			$r .= action_icon( T_('Delete this group').'!', 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID.'&amp;'.url_crumb('group') ) );
 		}
 		else
 		{
@@ -6051,7 +6133,7 @@ function user_td_org_actions( $org_ID, $user_ID )
 		$link_params = array(
 				'onclick' => 'return user_edit( '.$org_ID.', '.$user_ID.' );'
 			);
-		$r .= action_icon( T_('Edit membership...'), 'edit', '#', NULL, NULL, NULL, $link_params );
+		$r .= action_icon( T_('Edit membership').'...', 'edit', '#', NULL, NULL, NULL, $link_params );
 		$link_params = array(
 				'onclick' => 'return user_remove( '.$org_ID.', '.$user_ID.' );'
 			);
@@ -6139,10 +6221,9 @@ function validate_pwd_reset_session( $reqID, $forgetful_User )
  * @param string Field title
  * @param string Field key
  * @param string Domain name
- * @param string IP address
  * @param object Form
  */
-function user_domain_info_display( $field_title, $field_key, $domain_name, $ip_address, & $Form )
+function user_domain_info_display( $field_title, $field_key, $domain_name, & $Form )
 {
 	global $current_User, $admin_url, $UserSettings;
 
@@ -6165,7 +6246,7 @@ function user_domain_info_display( $field_title, $field_key, $domain_name, $ip_a
 		}
 	}
 	$Form->begin_line( $field_title, NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
-		$Form->info_field( '', $domain_name_formatted.( ! empty( $ip_address ) ? ' <button type="button" class="btn btn-default" onclick="return get_whois_info(\''.$ip_address.'\');">'.get_icon( 'magnifier' ).'</button>' : '' ) );
+		$Form->info_field( '', $domain_name_formatted );
 		if( $display_user_domain )
 		{	// Display status of Domain if current user has a permission:
 			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
@@ -6174,14 +6255,118 @@ function user_domain_info_display( $field_title, $field_key, $domain_name, $ip_a
 			{	// User can edit Domain
 				// Link to create a new domain:
 				$domain_status_action = action_icon( sprintf( T_('Add domain %s'), $domain_name ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$domain_name.'&amp;dom_status='.$domain_status );
-				$Form->select_input_array( 'edited_'.$field_key, $domain_status, stats_dom_status_titles(), '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_action ) );
+				$Form->select_input_array( 'edited_'.$field_key, $domain_status, stats_dom_status_titles(), '<b class="evo_label_inline">'.T_('Domain status').': </b>'.$domain_name_formatted.' '.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_action ) );
 			}
 			else
 			{ // Only view status of Domain
-				$Form->info( '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, stats_dom_status_title( $domain_status ) );
+				$Form->info( '<b class="evo_label_inline">'.T_('Domain status').': </b>'.$domain_name_formatted.' '.$domain_status_icon, stats_dom_status_title( $domain_status ) );
 			}
 		}
 	$Form->end_line( NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
+}
+
+
+/**
+ * Get password drivers config
+ *
+ * @return array Password drivers:
+ *         - Key is a driver key and file name of class in the folder /inc/users/model/passwords/,
+ *         - Value is a code of password driver.
+ */
+function get_password_drivers()
+{
+	$password_drivers = array(
+			'evo_salted' => 'evo$salted',
+			'evo_md5'    => 'evo$md5',
+			'bcrypt_2y'  => 'bb$2y',
+			'bcrypt'     => 'bb$2a',
+			'salted_md5' => 'bb$H',
+			'phpass'     => 'bb$P',
+		);
+
+	return $password_drivers;
+}
+
+
+/**
+ * Get password driver by code
+ *
+ * @param string Code of password driver OR use empty string to get first driver from config which is supported by server
+ * @return object|NULL Password driver
+ */
+function get_PasswordDriver( $driver_code = '' )
+{
+	global $enabled_password_drivers, $cached_password_drivers, $inc_path;
+
+	if( isset( $cached_password_drivers[ $driver_code ] ) )
+	{	// Get password driver from cache if it already exists there:
+		return $cached_password_drivers[ $driver_code ];
+	}
+	// Else get password driver by code and store in cache:
+
+	if( ! is_array( $cached_password_drivers ) )
+	{	// Initialize the cache array:
+		$cached_password_drivers = array();
+	}
+
+	$PasswordDriver = NULL;
+
+	// Get password drivers config:
+	$config_password_drivers = get_password_drivers();
+
+	//
+	$allowed_password_drivers = $enabled_password_drivers;
+
+	if( ! empty( $driver_code )
+	    && ( $drv_key = array_search( $driver_code, $config_password_drivers ) ) !== false
+	    && ! in_array( $drv_key, $enabled_password_drivers ) )
+	{	// If the requested password driver is not enabled currently,
+		// This can happens when admin disabled some driver but old users still want log in.
+		// Allow to use the driver:
+		array_unshift( $allowed_password_drivers, $drv_key );
+	}
+
+	foreach( $allowed_password_drivers as $drv_key )
+	{
+		if( ! isset( $config_password_drivers[ $drv_key ] ) )
+		{	// Driver is not detected by key, Skip this wrong:
+			continue;
+		}
+
+		// Get driver code by key:
+		$drv_code = isset( $config_password_drivers[ $drv_key ] ) ? $config_password_drivers[ $drv_key ] : '';
+
+		if( $drv_code == $driver_code || empty( $driver_code ) )
+		{	// The requested password driver is detected in config
+
+			// Check if password driver class exists in the system:
+			$driver_file_path = 'users/model/passwords/'.$drv_key.'.php';
+			if( file_exists( $inc_path.$driver_file_path ) )
+			{	// Class file exists on the disk
+				$driver_class_name = str_replace( ' ', '', lcfirst( ucwords( str_replace( '_', ' ', $drv_key ) ) ) ).'PasswordDriver';
+				// Load the class:
+				load_class( $driver_file_path, $driver_class_name );
+
+				if( class_exists( $driver_class_name ) )
+				{	// Class exists in the system
+					$PasswordDriver = new $driver_class_name();
+					if( $PasswordDriver->is_supported() )
+					{	// If the password driver is supported then stop search others:
+						break;
+					}
+					else
+					{	// The password driver is NOT supported by server (probably it has an old PHP verstion), go to search next supported driver:
+						$PasswordDriver = NULL;
+					}
+				}
+			}
+		}
+	}
+
+	// Store password driver in cache:
+	$cached_password_drivers[ $driver_code ] = $PasswordDriver;
+
+	return $PasswordDriver;
 }
 
 ?>

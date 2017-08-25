@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_Widget' );
 
 /**
  * ComponentWidget Class
@@ -22,7 +22,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class profile_menu_link_Widget extends ComponentWidget
+class profile_menu_link_Widget extends generic_menu_link_Widget
 {
 	/**
 	 * Constructor
@@ -50,7 +50,7 @@ class profile_menu_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('My Profile Menu link');
+		return T_('My Profile Menu link or button');
 	}
 
 
@@ -191,40 +191,15 @@ class profile_menu_link_Widget extends ComponentWidget
 		// Higlight current menu item only when it is linked to current collection and user profile page is displaying currently:
 		$highlight_current = ( $current_Blog->ID == $Blog->ID && $disp == 'user' );
 
-		echo $this->disp_params['block_start'];
-		echo $this->disp_params['block_body_start'];
-		echo $this->disp_params['list_start'];
-
-		if( $highlight_current )
-		{	// Use template and class to highlight current menu item:
-			$link_class = $this->disp_params['link_selected_class'];
-			echo $this->disp_params['item_selected_start'];
-		}
-		else
-		{	// Use normal template:
-			echo $this->disp_params['item_start'];
-		}
-
-		// Profile link:
-		echo $current_User->get_identity_link( array(
+		// Display a layout with menu link:
+		$menu_link_template = $current_User->get_identity_link( array(
 				'display_bubbletip' => false,
+				'thumb_class'       => 'avatar_before_login_middle',
 				'thumb_size'        => $this->disp_params['profile_picture_size'],
-				'link_class'        => $link_class,
+				'link_class'        => '$link_class$',
 				'blog_ID'           => $current_Blog->ID,
 			) );
-	
-		if( $highlight_current )
-		{	// Use template to highlight current menu item:
-			echo $this->disp_params['item_selected_end'];
-		}
-		else
-		{	// Use normal template:
-			echo $this->disp_params['item_end'];
-		}
-
-		echo $this->disp_params['list_end'];
-		echo $this->disp_params['block_body_end'];
-		echo $this->disp_params['block_end'];
+		echo $this->get_layout_menu_link( '', '', $highlight_current, $menu_link_template );
 
 		return true;
 	}

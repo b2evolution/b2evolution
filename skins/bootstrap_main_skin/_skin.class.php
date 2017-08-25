@@ -21,7 +21,7 @@ class bootstrap_main_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.8.10';
+	var $version = '6.9.3';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -43,7 +43,7 @@ class bootstrap_main_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -127,13 +127,11 @@ class bootstrap_main_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Image section')
 				),
-					'front_bg_image' => array(
+					'front_bg_image_file_ID' => array(
 						'label' => T_('Background image'),
-						'note' => T_('Set background image in Main Area section.'),
-						'defaultvalue' => 'shared/global/sunset/sunset.jpg',
-						'type' => 'text',
-						'size' => '50',
-						'allow_empty' => true,
+						'type' => 'fileselect',
+						'initialize_with' => 'shared/global/sunset/sunset.jpg',
+						'thumbnail_size' => 'fit-320x320'
 					),
 					'front_bg_color' => array(
 						'label' => T_('Background color'),
@@ -398,13 +396,18 @@ class bootstrap_main_Skin extends Skin
 
 		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
 		{
-			global $media_url, $media_path;
+			$FileCache = & get_FileCache();
 
-			$bg_image = $this->get_setting( 'front_bg_image' );
-			if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
+			if( $this->get_setting( 'front_bg_image_file_ID' ) )
+			{
+				$bg_image_File = & $FileCache->get_by_ID( $this->get_setting( 'front_bg_image_file_ID' ), false, false );
+			}
+
+			if( !empty( $bg_image_File ) && $bg_image_File->exists() )
 			{ // Custom body background image:
-				$custom_css .= '.evo_pictured_layout { background-image: url('.$media_url.$bg_image.") }\n";
-			} else
+				$custom_css .= '.evo_pictured_layout { background-image: url('.$bg_image_File->get_url().") }\n";
+			}
+			else
 			{
 				$color = $this->get_setting( 'front_bg_color' );
 				$custom_css .= '.evo_pictured_layout { background: '.$color." }\n";
@@ -448,7 +451,7 @@ class bootstrap_main_Skin extends Skin
 			$icon_color = $this->get_setting( 'front_icon_color' );
 			if( $link_color )
 			{ // Custom link color:
-				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a,
+				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a:not(.btn),
 				body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: '.$link_color.' }
 				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,
 				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a { color: '.$link_color." }\n";
@@ -487,7 +490,7 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= 'section.secondary_area, .widget_core_org_members { color: '.$color." !important }\n";
 			}
 		}
-		
+
 
 		if( $color = $this->get_setting( 'bgimg_text_color' ) )
 		{	// Custom text color on background image:
@@ -501,7 +504,7 @@ class bootstrap_main_Skin extends Skin
 		{	// Custom link hover color on background image:
 			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
 		}
-		
+
 		if( ! empty( $custom_css ) )
 		{
 			if( $disp == 'front' )
@@ -522,12 +525,12 @@ class bootstrap_main_Skin extends Skin
 
 
 	/**
-	 * Check if we can display a widget container
+	 * Check if we can display a widget container when access is denied to collection by current user
 	 *
 	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
 	 * @return boolean TRUE to display
 	 */
-	function is_visible_container( $container_key )
+	function show_container_when_access_denied( $container_key )
 	{
 		global $Collection, $Blog;
 

@@ -1233,14 +1233,14 @@ class Form extends Widget
 
 
 	/**
-	 * Build username/login field.
+	 * Build username field
 	 *
 	 * @param string the name of the input field
 	 * @param User initial value
-	 * @param integer size of the input field
 	 * @param string label displayed in front of the field
 	 * @param string note displayed with field
 	 * @param string class of the input field. Class name "only_assignees" provides to load only assignee users of the blog
+	 * @param array Field params
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '', $field_params = array() )
@@ -1248,6 +1248,8 @@ class Form extends Widget
 		$field_params = array_merge( array(
 				'note' => $field_note,
 				'size' => 20,
+				'autocapitalize' => 'off',
+				'autocorrect' => 'off'
 			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
@@ -1261,6 +1263,30 @@ class Form extends Widget
 		$r .= $this->end_field();
 
 		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Build login field.
+	 *
+	 * @param string the name of the input field
+	 * @param string User login
+	 * @param integer size of the input field
+	 * @param string label displayed in front of the field
+	 * @param string note displayed with field
+	 * @param array Field params
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function login_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		$field_params = array_merge( array(
+				'size' => $field_size,
+				'class' => 'input_text',
+				'autocapitalize' => 'off',
+				'autocorrect' => 'off'
+			), $field_params );
+
+		return $this->text_input( $field_name, $field_value, $field_params['size'], $field_label, $field_note, $field_params );
 	}
 
 
@@ -3700,6 +3726,8 @@ class Form extends Widget
 				'remove_file_text' => T_('Remove file'),
 				'edit_file_text' => T_('Select another'),
 				'max_file_num' => 1,
+				'file_type' => 'image',
+				'initialize_with' => '',
 
 				'window_title' => T_('Attach files'),
 				'value_separator' => ';',
@@ -3710,6 +3738,14 @@ class Form extends Widget
 
 			$FileCache = & get_FileCache();
 			$counter = 0;
+
+			if( ! isset( $field_value ) && ! empty( $field_params['initialize_with'] ) )
+			{
+				if( $initial_File = & get_file_by_abspath( $field_params['initialize_with'], true ) )
+				{
+					$field_value = $initial_File->ID;
+				}
+			}
 
 			$field_values = empty( $field_value ) ? $field_value : explode( $field_params['value_separator'], $field_value );
 
@@ -3723,6 +3759,7 @@ class Form extends Widget
 					.'" data-thumb-size="'.$field_params['size_name']
 					.'" data-root="'.$field_params['root']
 					.'" data-path="'.$field_params['path']
+					.'" data-file-type="'.$field_params['file_type']
 					.'" data-overflow-mode="'.$field_params['overflow_mode'].'">';
 
 			if( ! empty( $field_values ) )
@@ -3742,7 +3779,7 @@ class Form extends Widget
 			$thumb_width = $thumbnail_sizes[ $field_params['size_name'] ][1];
 			$thumb_height = $thumbnail_sizes[ $field_params['size_name'] ][2];
 
-			$button_label = ( $counter === 0 ? T_('Select') : get_icon( 'new' ).' '.T_('Add') );
+			$button_label = ( $counter === 0 ? /* TRANS: verb */ T_('Select') : get_icon( 'new' ).' '.T_('Add') );
 
 			$r .= '<button class="btn btn-sm btn-info file_select_item" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
 
@@ -3759,7 +3796,7 @@ class Form extends Widget
 			{
 				$r .= '
 						<script type="text/javascript">
-						var fsel_size, fsel_name, fsel_obj, fsel_replace = false;
+						var fsel_size, fsel_name, fsel_type, fsel_obj, fsel_replace = false;
 
 						function file_select_attachment_window( event_object, replace_item, fm_highlight )
 						{
@@ -3768,6 +3805,7 @@ class Form extends Widget
 							field_object = jQuery( event_object ).closest( ".file_select_wrapper" );
 							fsel_size = field_object.data( "thumbSize" );
 							fsel_name = field_object.attr( "name" );
+							fsel_type = field_object.data( "fileType" );
 							root = field_object.data( "root" );
 							path = field_object.data( "path" );
 
@@ -3784,10 +3822,12 @@ class Form extends Widget
 									"root": typeof( root ) == "undefined" ? "" : root,
 									"path": typeof( path ) == "undefined" ? "" : path,
 									"fm_highlight": typeof( fm_highlight ) == "undefined" ? "" : fm_highlight,
-									"field_name": field_object.attr( "name" )
+									"field_name": field_object.attr( "name" ),
+									"file_type": field_object.data( "fileType" ),
 								},
 								success: function(result)
 								{
+									result = ajax_debug_clear( result );
 									openModalWindow( result, "90%", "80%", true, "'.$field_params['window_title'].'", "" );
 								}
 							} );
@@ -3797,6 +3837,7 @@ class Form extends Widget
 						function file_select_add( fieldName, root, path )
 						{
 							// check if value is already present
+							fieldName = fieldName.replace(/(\[|\])/g, "\\\\$1");
 							var inputField = jQuery( "input#" + fieldName );
 							var values = inputField.val().split( "'.$field_params['value_separator'].'" );
 
@@ -3868,7 +3909,7 @@ class Form extends Widget
 										lastItem = items.last();
 
 										// Toggle add button
-										addButton.html( items.length === 0 ? "'.T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
+										addButton.html( items.length === 0 ? "'./* TRANS: verb */ T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
 										if( maxLength > items.length )
 										{
 											addButton.show();
@@ -3903,6 +3944,7 @@ class Form extends Widget
 							var wrapper = jQuery( event_object ).closest( ".file_select_wrapper" );
 							var item = jQuery( event_object ).closest( ".file_select_item" );
 							var fieldName = wrapper.attr( "name" );
+							fieldName = fieldName.replace(/(\[|\])/g, "\\\\$1");
 							var fieldValue = item.data( "itemValue" ).toString(); // converted to string because it will later be compared to array of strings
 							var maxLength = wrapper.data( "maxLength" );
 							var addButton = jQuery( "button", wrapper );
@@ -3914,7 +3956,7 @@ class Form extends Widget
 							var lastItem = items.last();
 
 							// Toggle add button
-							addButton.html( items.length === 0 ? "'.T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
+							addButton.html( items.length === 0 ? "'./* TRANS: verb */ T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
 							if( maxLength > items.length )
 							{
 								addButton.show();

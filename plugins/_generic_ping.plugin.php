@@ -30,7 +30,7 @@ class generic_ping_plugin extends Plugin
 	 */
 	var $code = 'b2evGPing';
 	var $priority = 50;
-	var $version = '6.7.9';
+	var $version = '6.9.3';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 

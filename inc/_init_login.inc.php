@@ -134,10 +134,10 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 	 * Handle javascript-hashed password:
 	 * If possible, the login form will hash the entered password with a salt that changes everytime.
 	 */
-	param( 'pwd_salt', 'string', '' ); // just for comparison with the one from Session
-	$pwd_salt_sess = $Session->get('core.pwd_salt');
+	param( 'pepper', 'string', '' ); // just for comparison with the one from Session
+	$pepper_sess = $Session->get( 'core.pepper' );
 
-	// $Debuglog->add( 'Login: salt: '.var_export($pwd_salt, true).', session salt: '.var_export($pwd_salt_sess, true), '_init_login' );
+	// $Debuglog->add( 'Login: salt: '.var_export($pepper, true).', session salt: '.var_export($pepper_sess, true), '_init_login' );
 
 	if( can_use_hashed_password() )
 	{
@@ -156,7 +156,7 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 			'login' => & $login,
 			'pass' => & $pass,
 			'pass_md5' => & $pass_md5,
-			'pass_salt' => & $pwd_salt_sess,
+			'pass_salt' => & $pepper_sess,
 			'pass_hashed' => & $pwd_hashed,
 			'pass_ok' => & $pass_ok ) ) )
 	{ // clear the UserCache, if a plugin has been called - it may have changed user(s)
@@ -174,7 +174,7 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 		if( is_email( $login ) )
 		{ // we have an email address instead of login name
 			// get user by email and password
-			list( $User, $exists_more ) = $UserCache->get_by_emailAndPwd( $login, $pass, $pwd_hashed, $pwd_salt_sess );
+			list( $User, $exists_more ) = $UserCache->get_by_emailAndPwd( $login, $pass, $pwd_hashed, $pepper_sess );
 			if( $User )
 			{ // user was found
 				$email_login = $User->get( 'login' );
@@ -210,7 +210,7 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 
 				$Debuglog->add( 'Login: Hashed password available.', '_init_login' );
 
-				if( empty($pwd_salt_sess) )
+				if( empty( $pepper_sess ) )
 				{ // no salt stored in session: either cookie problem or the user had already tried logging in (from another window for example)
 					$Debuglog->add( 'Login: Empty salt_sess!', '_init_login' );
 					if( ($pos = strpos( $pass, '_hashed_' ) ) && substr($pass, $pos+8) == $Session->ID )
@@ -224,29 +224,29 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 						$Debuglog->add( 'Login: Session ID does not match.', '_init_login' );
 					}
 				}
-				elseif( $pwd_salt != $pwd_salt_sess )
+				elseif( $pepper != $pepper_sess )
 				{ // submitted salt differs from the one stored in the session
 					$login_error = T_('The login window has expired. Please try again.');
 					$Debuglog->add( 'Login: Submitted salt and salt from Session do not match.', '_init_login' );
 				}
 				else
 				{ // compare the password, using the salt stored in the Session:
-					#pre_dump( sha1($User->pass.$pwd_salt), $pwd_hashed );
+					#pre_dump( sha1($User->pass.$pepper), $pwd_hashed );
 					foreach( $pwd_hashed as $encrypted_password )
 					{
-						$pass_ok = ( sha1( bin2hex( $User->pass ).$pwd_salt_sess ) == $encrypted_password );
+						$pass_ok = ( sha1( $User->pass.$pepper_sess ) == $encrypted_password );
 						if( $pass_ok )
 						{ // Break after the first matching password
 							break;
 						}
 					}
-					$Session->delete('core.pwd_salt');
+					$Session->delete( 'core.pepper' );
 					$Debuglog->add( 'Login: Compared hashed passwords. Result: '.(int)$pass_ok, '_init_login' );
 				}
 			}
 			else
 			{	// Password NOT hashed by Javascript:
-				$pass_ok = ( $User->pass == md5( $User->salt.$pass, true ) );
+				$pass_ok = $User->check_password( $pass );
 				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, '_init_login' );
 				if( $report_wrong_pass_hashing && $pass_ok && can_use_hashed_password() )
 				{	// Report about this unsecure login action:
@@ -281,7 +281,8 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 		{ // save the user for later hits
 			$Session->set_User( $current_User );
 
-			if( empty( $current_User->salt ) )
+			$user_PasswordDriver = $current_User->get_PasswordDriver();
+			if( $user_PasswordDriver->get_code() == 'evo$md5' )
 			{
 				$Messages->add( sprintf( T_('For best security, we recommend you <a %s>change your password now</a>. This will allow to re-encrypt your password in our database in a more secure way.'), 'href="'.get_user_pwdchange_url().'"' ), 'warning' );
 			}
@@ -516,7 +517,14 @@ if( ! empty( $login_error ) || ( $login_required && ! is_logged_in() ) )
 			// to read a message or sth like that. They must log in first and they may enter the wrong password multiple times.
 			param( 'redirect_to', 'url', $Blog->gen_blogurl() );
 			$ads_current_skin_path = $skins_path.$skin.'/';
-			require $ads_current_skin_path.'index.main.php';
+			if( file_exists( $ads_current_skin_path.'login.main.php' ) )
+			{	// Call custom file for login disp if it exists:
+				require $ads_current_skin_path.'login.main.php';
+			}
+			else
+			{	// Call index main skin file to display a login disp:
+				require $ads_current_skin_path.'index.main.php';
+			}
 			exit(0);
 			// --- EXITED !! ---
 		}

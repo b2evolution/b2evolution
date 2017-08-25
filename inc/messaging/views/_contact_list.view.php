@@ -283,7 +283,7 @@ if( in_array( 'login', $show_columns ) )
 		return '';
 	}
 	$Results->cols[] = array(
-						'th' => T_('Login'),
+						'th' => /* TRANS: noun */ T_('Login'),
 						'order' => 'mct_to_user_login',
 						'td' => '%user_login( #mct_to_user_ID# )%',
 						);

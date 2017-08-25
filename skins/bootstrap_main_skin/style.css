@@ -24,6 +24,9 @@
 .evo_container__front_page_primary .evo_widget > ul li:last-child {
   margin-bottom: 0 !important;
 }
+.evo_container__front_page_primary .evo_widget[class$=_menu_link] {
+  text-align: center;
+}
 .evo_container__front_page_secondary {
   padding-top: 30px;
 }
@@ -387,10 +390,13 @@ div.log_container {
 .evo_post_title {
   display: table;
 }
+.evo_post_title h1 {
+  margin-bottom: 0;
+}
 .evo_post_title h2 {
   display: table-cell;
   margin: 0;
-  padding: 20px 0 10px;
+  padding: 20px 0 0;
 }
 .evo_post_title .btn-group {
   display: table-cell;
@@ -453,7 +459,8 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   color: #ffffff;
   text-align: center;
   opacity: 0.5;
-  transition: 0.1s all;
+  -webkit-transition: 0.1s all;
+          transition: 0.1s all;
   position: relative;
   left: -50%;
 }

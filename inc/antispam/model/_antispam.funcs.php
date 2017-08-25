@@ -280,7 +280,7 @@ function antispam_poll_abuse()
 						if( antispam_create( $banned_string, 'central' ) )
 						{ // Creation successed
 							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('OK.'), 'note', T_('Adding strings to local blacklist:') );
+								.T_('OK').'.', 'note', T_('Adding strings to local blacklist:') );
 						}
 						else
 						{ // Was already handled
@@ -296,12 +296,12 @@ function antispam_poll_abuse()
 					$Settings->set( 'antispam_last_update', $endedat );
 					$Settings->dbupdate();
 				}
-				$Messages->add( T_('Done.'), 'success' );
+				$Messages->add( T_('Done').'.', 'success' );
 			}
 		}
 		else
 		{
-			$Messages->add( T_('Invalid response.'), 'error' );
+			$Messages->add( T_('Invalid response').'.', 'error' );
 			$ret = false;
 		}
 	}
@@ -466,18 +466,18 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 
 
 /**
- * Get IP range from DB
+ * Get IP ranges from DB
  *
  * @param integer IP start of range
  * @param integer IP end of range
  * @param integer ID of existing IP range
- * @return object Row of the table T_antispam__iprange (NULL - if IP range doesn't exist in DB yet)
+ * @return array Rows of the table T_antispam__iprange (Empty array - if IP range doesn't exist in DB yet)
 */
-function get_ip_range( $ip_start, $ip_end, $aipr_ID = 0 )
+function get_ip_ranges( $ip_start, $ip_end, $aipr_ID = 0 )
 {
 	global $DB;
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get all IP ranges between "'.$ip_start.'" and "'.$ip_end.'"'.( $aipr_ID > 0 ? ' (except of #'.$aipr_ID.')' : '' ) );
 	$SQL->SELECT( '*' );
 	$SQL->FROM( 'T_antispam__iprange' );
 	$SQL->WHERE( ' (
@@ -485,12 +485,13 @@ function get_ip_range( $ip_start, $ip_end, $aipr_ID = 0 )
 		( '.$DB->quote( $ip_end ).' >= aipr_IPv4start AND '.$DB->quote( $ip_end ).' <= aipr_IPv4end ) OR
 		( '.$DB->quote( $ip_start ).' <= aipr_IPv4start AND '.$DB->quote( $ip_end ).' >= aipr_IPv4end )
 	)' );
-	if( !empty( $aipr_ID ) )
-	{
+	if( ! empty( $aipr_ID ) )
+	{	// Exclude IP range with given ID:
 		$SQL->WHERE_and( 'aipr_ID != '.$aipr_ID );
 	}
+	$SQL->ORDER_BY( 'aipr_IPv4start' );
 
-	return $DB->get_row( $SQL->get() );
+	return $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 }
 
 
@@ -1118,21 +1119,59 @@ function antispam_increase_counter( $counter_name )
 			continue;
 		}
 
-		$ip = int2ip( ip2int( $ip ) ); // Convert IPv6 to IPv4
+		// Convert IPv6 to IPv4:
+		$ip_int = ip2int( $ip );
+		$ip = int2ip( $ip_int );
 		if( preg_match( '#^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#i', $ip ) )
-		{ // Check IP for correct format
+		{	// If current IP address has a correct format:
 			$ip_24bit_start = ip2int( preg_replace( '#\.\d{1,3}$#i', '.0', $ip ) );
 			$ip_24bit_end = ip2int( preg_replace( '#\.\d{1,3}$#i', '.255', $ip ) );
 
 			global $DB;
-			if( $iprange = get_ip_range( $ip_24bit_start, $ip_24bit_end ) )
-			{ // Update ip range
-				$DB->query( 'UPDATE T_antispam__iprange
+			if( $ipranges = get_ip_ranges( $ip_24bit_start, $ip_24bit_end ) )
+			{	// If at least one IP range is detected:
+				$ip_range_is_detected = false;
+				foreach( $ipranges as $iprange )
+				{
+					if( $iprange->aipr_IPv4start <= $ip_int && $iprange->aipr_IPv4end >= $ip_int )
+					{	// If current IP is from the IP range:
+						$DB->query( 'UPDATE T_antispam__iprange
 								SET '.$field_name.' = '.$field_name.' + 1
 								WHERE aipr_ID = '.$DB->quote( $iprange->aipr_ID ) );
+						$ip_range_is_detected = true;
+					}
+				}
+				if( ! $ip_range_is_detected )
+				{	// If IP range is not detected for current IP address,
+					// Try to find what range is free for current IP address:
+					$iprange_max = NULL;
+					$iprange_min = NULL;
+					foreach( $ipranges as $iprange )
+					{
+						if( ( $iprange_min === NULL || $iprange_min < $iprange->aipr_IPv4end ) && $ip_int > $iprange->aipr_IPv4end )
+						{	// Min free possible IP value:
+							$iprange_min = $iprange->aipr_IPv4end + 1;
+						}
+						if( ( $iprange_max === NULL || $iprange_max > $iprange->aipr_IPv4start ) && $ip_int < $iprange->aipr_IPv4start )
+						{	// Max free possible IP value:
+							$iprange_max = $iprange->aipr_IPv4start - 1;
+						}
+					}
+					if( $iprange_min === NULL )
+					{	// Use begining of range *.*.*.0 if no found:
+						$iprange_min = $ip_24bit_start;
+					}
+					if( $iprange_max === NULL )
+					{	// Use ending of range *.*.*.255 if no found:
+						$iprange_max = $ip_24bit_end;
+					}
+					// Insert new IP range with possible free values:
+					$DB->query( 'INSERT INTO T_antispam__iprange ( aipr_IPv4start, aipr_IPv4end, '.$field_name.' )
+									VALUES ( '.$DB->quote( $iprange_min ).', '.$DB->quote( $iprange_max ).', 1 ) ' );
+				}
 			}
 			else
-			{ // Insert new ip range
+			{	// Insert new IP range with values from *.*.*.0 to *.*.*.255:
 				$DB->query( 'INSERT INTO T_antispam__iprange ( aipr_IPv4start, aipr_IPv4end, '.$field_name.' )
 								VALUES ( '.$DB->quote( $ip_24bit_start ).', '.$DB->quote( $ip_24bit_end ).', 1 ) ' );
 			}

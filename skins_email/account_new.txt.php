@@ -36,7 +36,7 @@ $params = array_merge( array(
 echo T_('A new user has registered on the site').":";
 echo "\n\n";
 
-echo T_('Login').": ".$params['login']."\n";
+echo /* TRANS: noun */ T_('Login').": ".$params['login']."\n";
 echo T_('Email').": ".$params['email']."\n";
 
 if( $params['fullname'] != '' )

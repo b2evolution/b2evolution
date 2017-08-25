@@ -230,7 +230,7 @@ if( ! $system_stats['install_removed'] )
 	disp_system_check( 'warning', T_('For maximum security, it is recommended that you delete your /blogs/install/ folder once you are done with install or upgrade.') );
 
 	// Database reset allowed?
-	init_system_check( T_( 'Database reset' ), $allow_evodb_reset ?  T_('Allowed!') : T_('Forbidden') );
+	init_system_check( T_( 'Database reset' ), $allow_evodb_reset ?  T_('Allowed').'!' : T_('Forbidden') );
 	if( $allow_evodb_reset )
 	{
   	disp_system_check( 'error', '<p>'.T_('Currently, anyone who accesses your install folder could entirely reset your b2evolution database.')."</p>\n"
@@ -521,7 +521,7 @@ else
 		$forced_max_execution_time = system_check_max_execution_time();
 		init_system_check( 'PHP forced max_execution_time', sprintf( T_('%s seconds'), $forced_max_execution_time ) );
 		disp_system_check( 'ok', sprintf( T_('b2evolution was able to request more time (than the default %s seconds) to execute complex tasks.'), $max_execution_time ) );
-	}	
+	}
 	elseif( $max_execution_time <= 5 * 60 )
 	{
 		init_system_check( 'PHP max_execution_time', sprintf( T_('%s seconds'), $max_execution_time ) );

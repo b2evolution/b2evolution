@@ -121,7 +121,7 @@ class RestApi
 			}
 		}
 
-		if( $User->pass != md5( $User->salt.$entered_password, true ) )
+		if( ! $User->check_password( $entered_password ) )
 		{	// The entered password is not right for requested user
 			// Save new login attempt into DB:
 			if( count( $login_attempts ) == 9 )
@@ -143,7 +143,7 @@ class RestApi
 		}
 		elseif( $Settings->get( 'system_lock' ) && ! $User->check_perm( 'users', 'edit' ) )
 		{ // System is locked for maintenance and current user has no permission to log in this mode
-			$this->halt( T_('You cannot log in at this time because the system is under maintenance. Please try again in a few moments.'), 'system_maintenance', '403' );
+			$this->halt( T_('You cannot log in at this time because the system is under maintenance. Please try again in a few moments.'), 'system_maintenance', '503' );
 			// Exit here.
 		}
 
@@ -239,6 +239,7 @@ class RestApi
 		$message_types = explode( ',', $message_types );
 
 		$halt_messages = array();
+		$Messages->close_group(); // Make sure any open message group are closed
 		foreach( $Messages->messages_text as $m => $message_text )
 		{
 			if( in_array( $Messages->messages_type[ $m ], $message_types ) )
@@ -318,17 +319,34 @@ class RestApi
 	{
 		global $Collection, $Blog;
 
-		// Collection controller ('list' by default):
-		$coll_controller = isset( $this->args[2] ) ? $this->args[2] : 'list';
+		switch( $_SERVER['REQUEST_METHOD'] )
+		{
+			case 'GET':
+				// List of valid resources
+				$valid_resources = array( '', 'view', 'items', 'posts', 'search', 'assignees' );
+				break;
 
-		if( $coll_controller != 'list' )
+			case 'PUT':
+				// List of valid resources
+				$valid_resources = array( 'favorite', 'items_flag' );
+				break;
+
+			default:
+				$this->halt( 'Request method not supported for the requested resource', 'wrong_request', 405 );
+				// Exit here
+		}
+
+		if( ! empty( $this->args[1] ) )
+		{
+			$coll_controller = ! empty( $this->args[2] ) ? $this->args[2] : 'view';
+		}
+		else
+		{
+			$coll_controller = '';
+		}
+
+		if( ! empty( $coll_controller ) )
 		{	// Initialize data for request of the selected collection:
-
-			if( ! isset( $this->args[1] ) )
-			{	// Wrong request because collection name is not defined:
-				$this->halt( 'Collection name is not defined' );
-				// Exit here.
-			}
 
 			// Collection urlname:
 			$coll_urlname = $this->args[1];
@@ -379,15 +397,22 @@ class RestApi
 			// Exit here.
 		}
 
+		if( ! in_array( $coll_controller, $valid_resources, true ) )
+		{ // Invalid request method:
+			$this->halt( 'Request method not supported for the requested resource', 'wrong_request', 405 );
+			// Exit here.
+		}
+
 		// Call collection controller to prepare current request:
 		call_user_func_array( array( $this, 'controller_coll_'.$coll_controller ), $coll_controller_params );
 	}
 
 
 	/**
-	 * Call collection controller to list the collections
+	 * Default controller/handler
+	 * erhsatingin > function name is a bit wonky, perhaps there's a better way to go around this.
 	 */
-	private function controller_coll_list()
+	private function controller_coll_()
 	{
 		global $DB, $Settings, $current_User;
 
@@ -541,6 +566,31 @@ class RestApi
 
 
 	/**
+	 * Call collection controller to view collection information
+	 */
+	private function controller_coll_view()
+	{
+		global $current_User;
+
+		$coll_urlname = empty( $this->args[1] ) ? 0 : $this->args[1];
+
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_urlname( $coll_urlname, false );
+
+		$collection_data = array(
+			'id'        => intval( $Blog->ID ),
+			'urlname'   => $Blog->get( 'urlname' ),
+			'kind'      => $Blog->get( 'type' ),
+			'shortname' => $Blog->get( 'shortname' ),
+			'name'      => $Blog->get( 'name' ),
+			'tagline'   => $Blog->get( 'tagline' ),
+			'desc'      => $Blog->get( 'longdesc' ) );
+
+		$this->response = $collection_data;
+	}
+
+
+	/**
 	 * Call collection controller to prepare request for items with ANY types
 	 *
 	 * @param array Force filters of request
@@ -634,6 +684,7 @@ class RestApi
 					'title'       => $Item->get( 'title' ),
 					'content'     => $Item->get_prerendered_content( 'htmlbody' ),
 					'excerpt'     => $Item->get( 'excerpt' ),
+					'teaser'      => $Item->get_content_teaser(),
 					'URL'         => $Item->get_permanent_url( '', '', '&' ),
 					'attachments' => $attachments,
 				);
@@ -685,6 +736,7 @@ class RestApi
 		// Get additional params:
 		$api_page = param( 'page', 'integer', 1 );
 		$api_per_page = param( 'per_page', 'integer', 10 );
+		$api_exclude_posts = param( 'exclude_posts', 'string', '' );
 		// What types search: 'all', 'item', 'comment', 'category', 'tag'
 		// Use separator comma to use several kinds:
 		$api_kind = param( 'kind', 'string', 'all' );
@@ -702,15 +754,17 @@ class RestApi
 		if( empty( $search_params )
 			|| ( $search_params['search_keywords'] != $search_keywords ) // We had saved search results but for a different search string
 			|| ( $search_params['search_blog'] != $Blog->ID ) // We had saved search results but for a different collection
+			|| ( isset( $search_params['exclude_posts'] ) && $search_params['exclude_posts'] != $api_exclude_posts ) // We had saved search results but for a different posts excluding
 			|| ( $search_result === NULL ) )
 		{	// We need to perform a new search:
 			$search_params = array(
 				'search_keywords' => $search_keywords,
 				'search_blog'     => $Blog->ID,
+				'exclude_posts'   => $api_exclude_posts,
 			);
 
 			// Perform new search:
-			$search_result = perform_scored_search( $search_keywords, $api_kind );
+			$search_result = perform_scored_search( $search_keywords, $api_kind, $api_exclude_posts );
 
 			// Save results into session:
 			$Session->set( 'search_params', $search_params );
@@ -721,166 +775,171 @@ class RestApi
 		$search_result = $Session->get( 'search_result' );
 		if( empty( $search_result ) )
 		{	// Nothing found:
-			$this->halt( T_('Sorry, we could not find anything matching your request, please try to broaden your search.'), 'no_search_results', 404 );
-			// Exit here.
-		}
-
-		// Prepare pagination:
-		$result_count = count( $search_result );
-		$result_per_page = $api_per_page;
-		if( $result_count > $result_per_page )
-		{	// We will have multiple search result pages:
-			$current_page = $api_page;
-			if( $current_page < 1 )
-			{
-				$current_page = 1;
-			}
-			$total_pages = ceil( $result_count / $result_per_page );
-			if( $api_page > $total_pages )
-			{
-				$current_page = $total_pages;
-			}
+			$this->add_response( 'found', 0, 'integer' );
+			$this->add_response( 'page', $api_page, 'integer' );
+			$this->add_response( 'page_size', $api_per_page, 'integer' );
+			$this->add_response( 'pages_total', 0, 'integer' );
+			$this->add_response( 'results', array() );
 		}
 		else
-		{	// Only one page of results:
-			$current_page = 1;
-			$total_pages = 1;
-		}
+		{
+			// Prepare pagination:
+			$result_count = count( $search_result );
+			$result_per_page = $api_per_page;
+			if( $result_count > $result_per_page )
+			{	// We will have multiple search result pages:
+				$current_page = $api_page;
+				if( $current_page < 1 )
+				{
+					$current_page = 1;
+				}
+				$total_pages = ceil( $result_count / $result_per_page );
+				if( $api_page > $total_pages )
+				{
+					$current_page = $total_pages;
+				}
+			}
+			else
+			{	// Only one page of results:
+				$current_page = 1;
+				$total_pages = 1;
+			}
 
-		// Set current page indexes:
-		$from = ( ( $current_page -1 ) * $result_per_page );
-		$to = ( $current_page < $total_pages ) ? ( $from + $result_per_page ) : ( $result_count );
+			// Set current page indexes:
+			$from = ( ( $current_page -1 ) * $result_per_page );
+			$to = ( $current_page < $total_pages ) ? ( $from + $result_per_page ) : ( $result_count );
 
-		// Init caches
-		$ItemCache = & get_ItemCache();
-		$CommentCache = & get_CommentCache();
-		$ChapterCache = & get_ChapterCache();
+			// Init caches
+			$ItemCache = & get_ItemCache();
+			$CommentCache = & get_CommentCache();
+			$ChapterCache = & get_ChapterCache();
 
-		if( ! $search_result_loaded )
-		{	// Search result objects are not loaded into memory yet, load them:
-			// Group required object ids by type:
-			$required_ids = array();
+			if( ! $search_result_loaded )
+			{	// Search result objects are not loaded into memory yet, load them:
+				// Group required object ids by type:
+				$required_ids = array();
+				for( $index = $from; $index < $to; $index++ )
+				{
+					$row = $search_result[ $index ];
+					if( isset( $required_ids[ $row['type'] ] ) )
+					{
+						$required_ids[ $row['type'] ][] = $row['ID'];
+					}
+					else
+					{
+						$required_ids[ $row['type'] ] = array( $row['ID'] );
+					}
+				}
+
+				// Load each required object into the corresponding cache:
+				foreach( $required_ids as $type => $object_ids )
+				{
+					switch( $type )
+					{
+						case 'item':
+							$ItemCache->load_list( $object_ids );
+							break;
+
+						case 'comment':
+							$CommentCache->load_list( $object_ids );
+							break;
+
+						case 'category':
+							$ChapterCache->load_list( $object_ids );
+							break;
+
+						// TODO: we'll probably load "tag" objects once we support tag-synonyms.
+
+						default: // Not handled search result type
+							break;
+					}
+				}
+			}
+
+			$this->add_response( 'found', $result_count, 'integer' );
+			$this->add_response( 'page', $current_page, 'integer' );
+			$this->add_response( 'page_size', $result_per_page, 'integer' );
+			$this->add_response( 'pages_total', $total_pages, 'integer' );
+
+			// Get results for current page:
 			for( $index = $from; $index < $to; $index++ )
 			{
 				$row = $search_result[ $index ];
-				if( isset( $required_ids[ $row['type'] ] ) )
-				{
-					$required_ids[ $row['type'] ][] = $row['ID'];
-				}
-				else
-				{
-					$required_ids[ $row['type'] ] = array( $row['ID'] );
-				}
-			}
 
-			// Load each required object into the corresponding cache:
-			foreach( $required_ids as $type => $object_ids )
-			{
-				switch( $type )
+				$result_data = array(
+						'kind' => $row['type'],
+						'id'   => intval( $row['ID'] ),
+					);
+
+				switch( $row['type'] )
 				{
 					case 'item':
-						$ItemCache->load_list( $object_ids );
+						// Prepare to display an Item:
+
+						$Item = $ItemCache->get_by_ID( $row['ID'], false );
+
+						if( empty( $Item ) )
+						{ // This Item was deleted, since the search process was executed
+							continue 2; // skip from switch and skip to the next item in loop
+						}
+
+						$result_data['title'] = $Item->get_title( array( 'link_type' => 'none' ) );
+						$result_data['desc'] = $Item->get_excerpt();
+						$result_data['permalink'] = $Item->get_permanent_url( '', '', '&' );
 						break;
 
 					case 'comment':
-						$CommentCache->load_list( $object_ids );
+						// Prepare to display a Comment:
+
+						$Comment = $CommentCache->get_by_ID( $row['ID'], false );
+
+						if( empty( $Comment ) || ( $Comment->status == 'trash' ) )
+						{ // This Comment was deleted, since the search process was executed
+							continue 2; // skip from switch and skip to the next item in loop
+						}
+
+						$comment_Item = & $Comment->get_Item();
+						$result_data['title'] = $comment_Item->get_title( array( 'link_type' => 'none' ) );
+						$result_data['desc'] = excerpt( $Comment->content );
+						$result_data['permalink'] = $Comment->get_permanent_url( '&' );
 						break;
 
 					case 'category':
-						$ChapterCache->load_list( $object_ids );
+						// Prepare to display a Category:
+
+						$Chapter = $ChapterCache->get_by_ID( $row['ID'], false );
+
+						if( empty( $Chapter ) )
+						{ // This Chapter was deleted, since the search process was executed
+							continue 2; // skip from switch and skip to the next item in loop
+						}
+
+						$result_data['title'] = $Chapter->get_name();
+						$result_data['desc'] = excerpt( $Chapter->get( 'description' ) );
+						$result_data['permalink'] = $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' );
 						break;
 
-					// TODO: we'll probably load "tag" objects once we support tag-synonyms.
+					case 'tag':
+						// Prepare to display a Tag:
 
-					default: // Not handled search result type
+						list( $tag_name, $post_count ) = explode( ',', $row['name'] );
+
+						$result_data['title'] = $tag_name;
+						$result_data['desc'] = sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name );
+						$result_data['permalink'] = url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name, '&' );
 						break;
+
+					default:
+						// Other type of result is not implemented
+
+						// TODO: maybe find collections (especially in case of aggregation)? users? files?
+
+						continue 2;
 				}
+
+				// Add data of the searched thing to response:
+				$this->add_response( 'results', $result_data, 'array' );
 			}
-		}
-
-		$this->add_response( 'found', $result_count, 'integer' );
-		$this->add_response( 'page', $current_page, 'integer' );
-		$this->add_response( 'page_size', $result_per_page, 'integer' );
-		$this->add_response( 'pages_total', $total_pages, 'integer' );
-
-		// Get results for current page:
-		for( $index = $from; $index < $to; $index++ )
-		{
-			$row = $search_result[ $index ];
-
-			$result_data = array(
-					'kind' => $row['type'],
-					'id'   => intval( $row['ID'] ),
-				);
-
-			switch( $row['type'] )
-			{
-				case 'item':
-					// Prepare to display an Item:
-
-					$Item = $ItemCache->get_by_ID( $row['ID'], false );
-
-					if( empty( $Item ) )
-					{ // This Item was deleted, since the search process was executed
-						continue 2; // skip from switch and skip to the next item in loop
-					}
-
-					$result_data['title'] = $Item->get_title( array( 'link_type' => 'none' ) );
-					$result_data['desc'] = $Item->get_excerpt();
-					$result_data['permalink'] = $Item->get_permanent_url( '', '', '&' );
-					break;
-
-				case 'comment':
-					// Prepare to display a Comment:
-
-					$Comment = $CommentCache->get_by_ID( $row['ID'], false );
-
-					if( empty( $Comment ) || ( $Comment->status == 'trash' ) )
-					{ // This Comment was deleted, since the search process was executed
-						continue 2; // skip from switch and skip to the next item in loop
-					}
-
-					$comment_Item = & $Comment->get_Item();
-					$result_data['title'] = $comment_Item->get_title( array( 'link_type' => 'none' ) );
-					$result_data['desc'] = excerpt( $Comment->content );
-					$result_data['permalink'] = $Comment->get_permanent_url( '&' );
-					break;
-
-				case 'category':
-					// Prepare to display a Category:
-
-					$Chapter = $ChapterCache->get_by_ID( $row['ID'], false );
-
-					if( empty( $Chapter ) )
-					{ // This Chapter was deleted, since the search process was executed
-						continue 2; // skip from switch and skip to the next item in loop
-					}
-
-					$result_data['title'] = $Chapter->get_name();
-					$result_data['desc'] = excerpt( $Chapter->get( 'description' ) );
-					$result_data['permalink'] = $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' );
-					break;
-
-				case 'tag':
-					// Prepare to display a Tag:
-
-					list( $tag_name, $post_count ) = explode( ',', $row['name'] );
-
-					$result_data['title'] = $tag_name;
-					$result_data['desc'] = sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name );
-					$result_data['permalink'] = url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name, '&' );
-					break;
-
-				default:
-					// Other type of result is not implemented
-
-					// TODO: maybe find collections (especially in case of aggregation)? users? files?
-
-					continue 2;
-			}
-
-			// Add data of the searched thing to response:
-			$this->add_response( 'results', $result_data, 'array' );
 		}
 	}
 
@@ -997,6 +1056,8 @@ class RestApi
 	/**
 	 * Call collection controller to toggle favorite status
 	 *
+	 * Request scheme: "<baseurl>/api/v1/collections/<collname>/favorite
+	 *
 	 */
 	private function controller_coll_favorite()
 	{
@@ -1008,7 +1069,9 @@ class RestApi
 			// Exit here.
 		}
 
-		$setting = ( $Blog->favorite( $current_User->ID ) == 1 ? 0 : 1 );
+		parse_str( file_get_contents( 'php://input' ), $data );
+		$setting = param_format( $data['setting'], 'integer' );
+
 		$r = $Blog->favorite( $current_User->ID, $setting );
 
 		if( is_null( $r ) )
@@ -1070,49 +1133,81 @@ class RestApi
 	 */
 	private function module_users()
 	{
-		// Set user controller 'list' by default:
-		$user_controller = 'list';
-
-		// Get user ID:
-		$user_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
-
-		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : 'GET';
-		switch( $request_method )
+		switch( $_SERVER['REQUEST_METHOD'] )
 		{
+			case 'GET':
+				// Check for valid controllers
+				$user_controller = '';
+				$user_ID = NULL;
+
+				if( ! empty( $this->args[1] ) )
+				{
+					if( ! empty( $this->args[2] ) )
+					{
+						$user_controller = $this->args[2];
+					}
+					else
+					{
+						if( preg_match( '/^\d+$/', $this->args[1] ) )
+						{ // args[1] should be a positive integer and not just any number:
+							$user_ID = intval( $this->args[1] );
+							$user_controller = 'view';
+						}
+						else
+						{
+							$user_controller = $this->args[1];
+						}
+					}
+				}
+				else
+				{ // default handler
+					$user_controller = '';
+				}
+
+				$valid_resources = array( '', 'view', 'recipients', 'autocomplete', 'logins', 'search' );
+				if( isset( $user_ID ) )
+				{ // Set controller to view the requested user profile:
+					$default_controller = 'view';
+				}
+				else
+				{
+					$default_controller = $user_controller;
+				}
+				break;
+
 			case 'POST':
-				// Set controller to update the requested user OR create one new:
-				$user_controller = 'save';
+				// check for valid controllers
+				$valid_resources = array( 'save' );
+				$default_controller = 'save';
 				break;
 
 			case 'DELETE':
-				// Set controller to delete the requested user:
-				if( $user_ID > 0 )
-				{	// Only if user ID is defined:
-					$user_controller = 'delete';
+				if( empty( $this->args[1] ) )
+				{
+					$this->halt( 'Missing user ID', 'user_missing_id', 400 );
+					// Exit here
 				}
-				else
-				{	// Wrong user request:
-					$this->halt( 'Invalid user ID', 'user_invalid_id' );
-					// Exit here.
-				}
+
+				$valid_resources = array( 'delete' );
+				$default_controller = 'delete';
 				break;
 
-			case 'GET':
 			default:
-				if( $user_ID > 0 )
-				{	// Set controller to view the requested user profile:
-					$user_controller = 'view';
-				}
-				else
-				{	// Set controller to view all users by default or call the requested controller:
-					$user_controller = empty( $this->args[1] ) ? 'list' : $this->args[1];
-				}
-				break;
+				$this->halt( 'Request method not supported for the requested resource', 'wrong_request', 405 );
+				// Exit here
 		}
+
+		$user_controller = $default_controller;
 
 		if( ! method_exists( $this, 'controller_user_'.$user_controller ) )
 		{	// Unknown controller:
 			$this->halt( 'Unknown user controller "'.$user_controller.'"', 'unknown_controller' );
+			// Exit here.
+		}
+
+		if( ! in_array( $user_controller, $valid_resources, true ) )
+		{ // Invalid request method:
+			$this->halt( 'Request method not supported for the requested resource', 'wrong_request', 405 );
 			// Exit here.
 		}
 
@@ -1122,9 +1217,9 @@ class RestApi
 
 
 	/**
-	 * Call user controller to list the users
+	 * Default controller/handler
 	 */
-	private function controller_user_list()
+	private function controller_user_()
 	{
 		global $Settings;
 
@@ -1241,7 +1336,7 @@ class RestApi
 
 		if( ! $User )
 		{	// Wrong user request:
-			$this->halt( 'Invalid user ID', 'user_invalid_id' );
+			$this->halt( 'Invalid user ID', 'user_invalid_id', 404 );
 			// Exit here.
 		}
 
@@ -1372,12 +1467,14 @@ class RestApi
 		$result = $edited_User->update_from_request( $is_new_user );
 		if( $result !== true )
 		{	// There are errors on update the requested user:
+			$Messages->close_group(); // Make sure any open message group are closed
 			$this->halt( $Messages->messages_text[0], 'update_failed', 403 );
 			// Exit here.
 		}
 		else
 		{	// The requested user has been updated successfully
-			$this->halt( $Messages->messages_text[0], 'update_success', 200 );
+			$Messages->close_group(); // Make sure any open message group are closed
+			$this->halt( $Messages->messages_text[0], 'update_success', ( $is_new_user ? 201 : 200 ) );
 			// Exit here.
 		}
 	}
@@ -1397,14 +1494,14 @@ class RestApi
 		}
 
 		// Get an user ID for request "DELETE <baseurl>/api/v1/users/<id>":
-		$user_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+		$user_ID = intval( $this->args[1] );
 
 		$UserCache = & get_UserCache();
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
 
 		if( ! $User )
 		{	// Wrong user request:
-			$this->halt( 'Invalid user ID', 'user_invalid_id' );
+			$this->halt( 'Invalid user ID', 'user_invalid_id', 404 );
 			// Exit here.
 		}
 
@@ -1425,6 +1522,7 @@ class RestApi
 
 		if( ! $User->check_delete( sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $User->get( 'login' ) ) ) )
 		{	// There are restrictions on delete the requested user:
+			$Messages->close_group(); // Make sure any open message group are closed
 			$this->halt( strip_tags( $Messages->messages_text[0] ), 'delete_restriction', 403 );
 			// Exit here.
 		}
@@ -2149,10 +2247,23 @@ class RestApi
 		$source_type = param( 'source_type', 'string' );
 		$source_object_ID = param( 'source_object_ID', 'string' );
 		$source_position = trim( param( 'source_position', 'string' ), ',' );
+		$source_file_type = param( 'source_file_type', 'string', NULL );
 
 		$source_LinkOwner = get_link_owner( $source_type, $source_object_ID );
 
-		if( ! $source_LinkOwner || ! ( $source_LinkList = $source_LinkOwner->get_attachment_LinkList( 1000, $source_position ) ) )
+		$link_list_params = array(
+				// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
+				'sql_select_add' => ', CASE '
+						.'WHEN link_position = "cover"     THEN "1" '
+						.'WHEN link_position = "teaser"    THEN "2" '
+						.'WHEN link_position = "aftermore" THEN "3" '
+						.'WHEN link_position = "inline"    THEN "4" '
+						.'ELSE "99999999"' // Use this line only if you want to put the other position types at the end
+					.'END AS position_order',
+				'sql_order_by' => 'position_order, link_order',
+			);
+
+		if( ! $source_LinkOwner || ! ( $source_LinkList = $source_LinkOwner->get_attachment_LinkList( 1000, $source_position, $source_file_type, $link_list_params ) ) )
 		{	// No requested links, Exit here:
 			$this->response = array();
 			return;
@@ -2167,26 +2278,60 @@ class RestApi
 		if( $limit_position )
 		{
 			$position_counts = array();
+			$all_position_counts = 0;
+		}
+
+		// Find all attached files of the destination LinkOwner in order to don't link twice same files:
+		$dest_files_links = array();
+		$dest_links = $dest_LinkOwner->get_Links();
+		if( ! empty( $dest_links ) && is_array( $dest_links ) )
+		{
+			foreach( $dest_links as $dest_Link )
+			{
+				if( $dest_File = & $dest_Link->get_File() )
+				{
+					$dest_files_links[ $dest_File->ID ] = $dest_Link->ID;
+				}
+			}
 		}
 
 		while( $source_Link = & $source_LinkList->get_next() )
 		{	// Copy a Link to new object:
 			if( $limit_position )
 			{
+				if( $source_position == '' && $all_position_counts >= $limit_position )
+				{	// Stop copy other positions because we are finding any position:
+					break;
+				}
 				if( ! isset( $position_counts[ $source_Link->position ] ) )
 				{
 					$position_counts[ $source_Link->position ] = 0;
 				}
 				if( $position_counts[ $source_Link->position ] >= $limit_position )
 				{	// Skip this because of limit per position:
-					continue;
+					if( $source_position == $source_Link->position )
+					{	// Stop copy other positions because we are finding only current:
+						break;
+					}
+					else
+					{	// Continue to find other positions:
+						continue;
+					}
 				}
 				$position_counts[ $source_Link->position ]++;
+				$all_position_counts++;
 			}
 
-			if( $source_File = & $source_Link->get_File() &&
-			    $new_link_ID = $dest_LinkOwner->add_link( $source_Link->file_ID, ( empty( $dest_position ) ? $source_Link->position : $dest_position ), $dest_last_order++ ) )
+			if( $source_File = & $source_Link->get_File() )
 			{
+				if( isset( $dest_files_links[ $source_File->ID ] ) )
+				{	// Don't attach the File twice if it is already linked to the destination LinkOwner:
+					$new_link_ID = $dest_files_links[ $source_File->ID ];
+				}
+				else
+				{	// Attach new file because it is not linked to the destination LinkOwner yet:
+					$new_link_ID = $dest_LinkOwner->add_link( $source_Link->file_ID, ( empty( $dest_position ) ? $source_Link->position : $dest_position ), $dest_last_order++ );
+				}
 				$this->add_response( 'links', array(
 						'ID'            => $new_link_ID,
 						'file_type'     => $source_File->get_file_type(),

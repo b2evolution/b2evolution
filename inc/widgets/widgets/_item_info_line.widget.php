@@ -109,7 +109,7 @@ class item_info_line_Widget extends ComponentWidget
 					'label' => T_( 'Permalink icon' ),
 					'note' => T_( 'Display permalink icon' ),
 					'type' => 'checkbox',
-					'defaultvalue' => true
+					'defaultvalue' => false
 				),
 				'before_author' => array(
 					'label' => T_( 'Before author' ),
@@ -165,6 +165,12 @@ class item_info_line_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => false
 				),
+				'contents_updated' => array(
+					'label' => T_( 'Contents last updated' ),
+					'note' => T_( 'Display date and time when item/post contents (title, content, URL or attachments) were last updated' ),
+					'type' => 'checkbox',
+					'defaultvalue' => false
+				),
 				'category' => array(
 					'label' => T_( 'Category' ),
 					'note' => T_( 'Display item/post category' ),
@@ -175,7 +181,7 @@ class item_info_line_Widget extends ComponentWidget
 					'label' => T_( 'Edit link' ),
 					'note' => T_( 'Display link to edit the item/post' ),
 					'type' => 'checkbox',
-					'defaultvalue' => true
+					'defaultvalue' => false
 				)
 			), parent::get_param_definitions( $params ) );
 
@@ -230,11 +236,11 @@ class item_info_line_Widget extends ComponentWidget
 			switch( $this->disp_params['before_author'] )
 			{
 				case 'posted_by':
-					$before_author = T_('posted by').' ';
+					$before_author = T_('Posted by').' ';
 					break;
 
 				case 'started_by':
-					$before_author = T_('started by').' ';
+					$before_author = T_('Started by').' ';
 					break;
 
 				default:
@@ -321,6 +327,16 @@ class item_info_line_Widget extends ComponentWidget
 			echo '<span class="text-muted"> &ndash; '
 				.T_('Last touched').': '
 				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) )
+				.'</span>';
+		}
+
+		// Contents last updated:
+		if( $this->disp_params['contents_updated'] )
+		{
+			echo '<span class="text-muted"> &ndash; '
+				.T_('Contents updated').': '
+				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) )
+				.$Item->get_refresh_contents_last_updated_link()
 				.'</span>';
 		}
 

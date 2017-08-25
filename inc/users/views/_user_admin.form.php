@@ -158,7 +158,7 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 		}
 	$Form->end_line();
 
-	user_domain_info_display( T_('Email domain'), 'email_domain_status', $edited_User->get_email_domain(), '', $Form );
+	user_domain_info_display( T_('Email domain'), 'email_domain_status', $edited_User->get_email_domain(), $Form );
 
 	global $UserSettings;
 
@@ -333,7 +333,7 @@ $Form->end_fieldset(); // Usage info
 
 $Form->begin_fieldset( T_('Reputation').get_manual_link('user-admin-reputaion') );
 
-	$Form->info( T_('Number of posts'), $edited_User->get_reputation_posts() );
+	$Form->info( T_('Posts'), $edited_User->get_reputation_posts() );
 
 	$Form->info( T_('Comments'), '<span class="reputation_message">'.$edited_User->get_reputation_comments( array( 'view_type' => 'extended' ) ).'</span>' );
 
@@ -371,16 +371,18 @@ while( $loop_Plugin = & $Plugins->get_next() )
 }
 
 $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-registration') );
+	$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) );
 	$Form->begin_line( T_('Account registered on'), NULL, 'info' );
 		$Form->info_field( '', mysql2localedatetime( $edited_User->dget('datecreated') ), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
-		$Form->info_field( '<b class="evo_label_inline">'.T_('From IP').': </b>', format_to_output( int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ) ) );
+		$Form->info_field( '<b class="evo_label_inline">'.T_('From IP').': </b>',
+			$user_ip_address.( empty( $user_ip_address ) ? '' : ' <a href="" class="btn btn-default" onclick="return get_whois_info(\''.$user_ip_address.'\');">'.get_icon( 'magnifier' ).'</a>' ) );
 	$Form->end_line( NULL, 'info' );
 
 	if( $current_User->check_perm( 'spamblacklist', 'view' ) )
 	{ // User can view IP ranges
 		// Get status and name of IP range
 		$IPRangeCache = & get_IPRangeCache();
-		if( $IPRange = & $IPRangeCache->get_by_ip( int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ) ) )
+		if( $IPRange = & $IPRangeCache->get_by_ip( $user_ip_address ) )
 		{ // IP range exists in DB
 			$iprange_status = $IPRange->get( 'status' );
 			$iprange_name = $IPRange->get_name();
@@ -411,9 +413,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 
 	$Form->info_field( T_('From Country'), $from_country, array( 'field_suffix' => $user_from_country_suffix ) );
 
-	$user_domain = $UserSettings->get( 'user_registered_from_domain', $edited_User->ID );
-	$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) );
-	user_domain_info_display( T_('From Domain'), 'domain_status', $user_domain, $user_ip_address, $Form );
+	user_domain_info_display( T_('From Domain'), 'domain_status', $UserSettings->get( 'user_registered_from_domain', $edited_User->ID ), $Form );
 
 	$Form->info_field( T_('With Browser'), format_to_output( $UserSettings->get( 'user_browser', $edited_User->ID ) ) );
 

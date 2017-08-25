@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $phpbb_db_config, $dispatcher, $phpbb_tool_title;
+global $phpbb_db_config, $dispatcher, $phpbb_tool_title, $phpbb_version;
 
 phpbb_display_steps( 2 );
 
@@ -52,6 +52,18 @@ $Form->begin_fieldset( T_('Access information for database of phpBB forum') );
 	}
 	$Form->info( T_('Source for avatars'), $path_avatars, $path_avatars_note );
 
+	if( $phpbb_version == 3 )
+	{	// Only for phpBB3:
+		$path_attachments = phpbb_get_var( 'path_attachments' );
+		$path_attachments_note = '';
+		if( ! empty( $path_attachments ) && ! file_exists( $path_attachments ) )
+		{	// Path attachments is incorrect
+			$path_attachments = '<b class="red">'.$path_attachments.'</b>';
+			$path_attachments_note = T_('This folder does not exist');
+		}
+		$Form->info( T_('Source for attachments'), $path_attachments, $path_attachments_note );
+	}
+
 	$BlogCache = & get_BlogCache();
 	if( $phpbbBlog = & $BlogCache->get_by_ID( phpbb_get_var( 'blog_ID' ) ) )
 	{
@@ -69,7 +81,7 @@ $Form->begin_fieldset( T_('Users groups') );
 	$phpbb_ranks = phpbb_ranks();
 
 	$b2evo_groups_default = $b2evo_groups;
-	$b2evo_groups_default['0'] = T_('Select');
+	$b2evo_groups_default['0'] = /* TRANS: verb */ T_('Select');
 	$Form->select_input_array( 'phpbb_group_default', phpbb_get_var( 'group_default' ), $b2evo_groups_default, T_('Default group'), T_( 'Use this group as the default for users without a defined rank' ).' ('.phpbb_rank_info( '' ).')', array( 'force_keys_as_values' => true ) );
 
 	$Form->select_input_array( 'phpbb_group_invalid', phpbb_get_var( 'group_invalid' ), $b2evo_groups, '<span class="red">'.T_('Invalid users').'</span>', T_( 'Use this group as the default for users which were deleted from the DB' ), array( 'force_keys_as_values' => true ) );
@@ -95,7 +107,7 @@ $Form->begin_fieldset( T_('Select the forums which will be imported') );
 
 $Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' ),
+$Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' ),
 											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$dispatcher.'?ctrl=phpbbimport\'' ) ) );
 
 $Form->end_form();

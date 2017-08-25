@@ -222,7 +222,7 @@ class Group extends DataObject
 		foreach( $GroupSettings->permission_values as $name => $value )
 		{
 			// We need to handle checkboxes and radioboxes separately , because when a checkbox isn't checked the checkbox variable is not sent
-			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_templates' || $name == 'perm_centralantispam'
+			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_centralantispam'
 				|| $name == 'cross_country_allow_profiles' || $name == 'cross_country_allow_contact' )
 			{ // These permissions are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
 				$value = param( 'edited_grp_'.$name, 'string', 'denied' );
@@ -257,9 +257,6 @@ class Group extends DataObject
 	{
 		switch( $parname )
 		{
-			case 'perm_templates':
-				return $this->set_param( $parname, 'number', $parvalue, $make_null );
-
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
@@ -317,7 +314,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam' );
+		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'skins_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;

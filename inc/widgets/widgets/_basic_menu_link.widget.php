@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the menu_link_Widget class.
+ * This file implements the basic_menu_link_Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -13,39 +13,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_Widget' );
 
-global $menu_link_widget_link_types;
-$menu_link_widget_link_types = array(
-		'home' => T_('Front Page'),
-		'recentposts' => T_('Recent posts'),
-		'search' => T_('Search page'),
-		'arcdir' => T_('Archive directory'),
-		'catdir' => T_('Category directory'),
-		'tags' => T_('Tags'),
-		'postidx' => T_('Post index'),
-		'mediaidx' => T_('Photo index'),
-		'sitemap' => T_('Site Map'),
-		'latestcomments' => T_('Latest comments'),
-
-		'ownercontact' => T_('Blog owner contact form'),
-		'owneruserinfo' => T_('Blog owner profile'),
-
-		'users' => T_('User directory'),
-
-		'login' => T_('Log in form'),
-		'logout' => T_('Logout link'),
-		'register' => T_('Registration form'),
-		'myprofile' => T_('My profile'),
-		'profile' => T_('Edit profile'),
-		'avatar' => T_('Edit profile picture'),
-
-		'item' => T_('Any item (post, page, etc...)'),
-		'postnew' => T_('New Item'),
-
-		'admin' => T_('Admin / Back-Office link'),
-		'url' => T_('Any URL'),
-	);
 
 /**
  * ComponentWidget Class
@@ -58,15 +27,48 @@ $menu_link_widget_link_types = array(
  *
  * @package evocore
  */
-class menu_link_Widget extends ComponentWidget
+class basic_menu_link_Widget extends generic_menu_link_Widget
 {
+	var $link_types = array();
+
 	/**
 	 * Constructor
 	 */
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'menu_link' );
+		parent::__construct( $db_row, 'core', 'basic_menu_link' );
+
+		$this->link_types = array(
+			'home' => T_('Front Page'),
+			'recentposts' => T_('Recent posts'),
+			'search' => T_('Search page'),
+			'arcdir' => T_('Archive directory'),
+			'catdir' => T_('Category directory'),
+			'tags' => T_('Tags'),
+			'postidx' => T_('Post index'),
+			'mediaidx' => T_('Photo index'),
+			'sitemap' => T_('Site Map'),
+			'latestcomments' => T_('Latest comments'),
+
+			'ownercontact' => T_('Blog owner contact form'),
+			'owneruserinfo' => T_('Blog owner profile'),
+
+			'users' => T_('User directory'),
+
+			'login' => T_('Log in form'),
+			'logout' => T_('Logout link'),
+			'register' => T_('Registration form'),
+			'myprofile' => T_('My profile'),
+			'profile' => T_('Edit profile'),
+			'avatar' => T_('Edit profile picture'),
+
+			'item' => T_('Any item (post, page, etc...)'),
+			'postnew' => T_('New Item'),
+
+			'admin' => T_('Admin / Back-Office link'),
+			'url' => T_('Any URL'),
+		);
 	}
 
 
@@ -86,7 +88,7 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Menu link');
+		return T_('Menu link or button');
 	}
 
 
@@ -95,8 +97,6 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		global $menu_link_widget_link_types;
-
 		$this->load_param_array();
 
 
@@ -107,7 +107,7 @@ class menu_link_Widget extends ComponentWidget
 
 		if( !empty($this->param_array['link_type']) )
 		{	// TRANS: %s is the link type, e. g. "Blog home" or "Log in form"
-			return sprintf( T_( '%s link' ), $menu_link_widget_link_types[$this->param_array['link_type']] );
+			return sprintf( T_( '%s link' ), $this->link_types[ $this->param_array['link_type'] ] );
 		}
 
 		return $this->get_name();
@@ -131,7 +131,7 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $menu_link_widget_link_types, $admin_url;
+		global $admin_url;
 
 		// Check if field "Collection ID" is disabled because of link type and site uses only one fixed collection for profile pages:
 		$coll_id_is_disabled = ( empty( $params['infinite_loop'] )
@@ -143,7 +143,7 @@ class menu_link_Widget extends ComponentWidget
 					'label' => T_( 'Link Type' ),
 					'note' => T_('What do you want to link to?'),
 					'type' => 'select',
-					'options' => $menu_link_widget_link_types,
+					'options' => $this->link_types,
 					'defaultvalue' => 'home',
 				),
 				'link_text' => array(
@@ -239,9 +239,6 @@ class menu_link_Widget extends ComponentWidget
 		global $disp;
 
 		$this->init_display( $params );
-
-		// Default link class
-		$link_class = $this->disp_params['link_default_class'];
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 		if( $blog_ID > 0 )
@@ -532,32 +529,8 @@ class menu_link_Widget extends ComponentWidget
 			$text = $this->disp_params['link_text'];
 		}
 
-		echo $this->disp_params['block_start'];
-		echo $this->disp_params['block_body_start'];
-		echo $this->disp_params['list_start'];
-
-		if( $highlight_current )
-		{	// Use template and class to highlight current menu item:
-			$link_class = $this->disp_params['link_selected_class'];
-			echo $this->disp_params['item_selected_start'];
-		}
-		else
-		{	// Use normal template:
-			echo $this->disp_params['item_start'];
-		}
-		echo '<a href="'.$url.'" class="'.$link_class.'">'.$text.'</a>';
-		if( $highlight_current )
-		{	// Use template to highlight current menu item:
-			echo $this->disp_params['item_selected_end'];
-		}
-		else
-		{	// Use normal template:
-			echo $this->disp_params['item_end'];
-		}
-
-		echo $this->disp_params['list_end'];
-		echo $this->disp_params['block_body_end'];
-		echo $this->disp_params['block_end'];
+		// Display a layout with menu link:
+		echo $this->get_layout_menu_link( $url, $text, $highlight_current );
 
 		return true;
 	}

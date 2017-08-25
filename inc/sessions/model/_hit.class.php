@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * A hit to a blog.
+ * Hit Class. Detect client data from browser and store in DB table T_hitlog.
  *
  * @package evocore
  */
@@ -43,7 +43,6 @@ class Hit
 	 */
 	var $referer;
 
-
 	/**
 	 * The type of hit.
 	 *
@@ -63,13 +62,13 @@ class Hit
 	 */
 	var $referer_type;
 
-
 	/**
 	 * The dom_type of the referer's base domain in T_basedomains
 	 * 'unknown'|'normal'|'searcheng'|'aggregator'|'email'
 	 * @var string
 	 */
 	var $dom_type = 'unknown';
+
 	/**
 	 * The ID of the referer's base domain in T_basedomains
 	 *
@@ -229,56 +228,67 @@ class Hit
 	 */
 	var $browser_version;
 
+
 	/**
 	 * Constructor
 	 *
 	 * This may INSERT a basedomain and a useragent but NOT the HIT itself!
+	 *
+	 * @param string Referer
+	 * @param string IP address
+	 * @param string Session ID
+	 * @param string Time
+	 * @param boolean Is test mode?
+	 * @param string Test URI
+	 * @param string User agent
+	 * @param string Test admin
+	 * @param string Test RSS
 	 */
-	function __construct( $referer = NULL, $IP = NULL, $session_id= NULL, $hit_time = NULL, $test_mode = NULL , $test_uri = NULL, $user_agent = NULL, $test_admin = NULL, $test_rss = NULL)
+	function __construct( $referer = NULL, $IP = NULL, $session_id = NULL, $hit_time = NULL, $test_mode = NULL, $test_uri = NULL, $user_agent = NULL, $test_admin = NULL, $test_rss = NULL )
 	{
 		global $debug;
 
-		if( isset($IP) )
-		{
+		if( $IP !== NULL )
+		{	// Use the provided IP address value (for test mode):
 			$this->IP = $IP;
 		}
 		else
-		{	// Get the first IP in the list of REMOTE_ADDR and HTTP_X_FORWARDED_FOR
+		{	// Get the first IP in the list of REMOTE_ADDR and HTTP_X_FORWARDED_FOR:
 			$this->IP = get_ip_list( true );
 		}
 
-		if (!empty($session_id))
-		{
+		if( $session_id !== NULL )
+		{	// Use the provided value (for test mode):
 			$this->session_id = $session_id;
 		}
 
-		if (!empty($hit_time))
-		{
+		if( $hit_time !== NULL )
+		{	// Use the provided value (for test mode):
 			$this->hit_time = $hit_time;
 		}
 
-		if (!empty($test_mode))
-		{
+		if( $test_mode !== NULL )
+		{	// Use the provided value (for test mode):
 			$this->test_mode = $test_mode;
 		}
 
-		if (!empty($test_uri))
-		{
+		if( $test_uri !== NULL )
+		{	// Use the provided value (for test mode):
 			$this->test_uri = $test_uri;
 		}
 
-		if (!empty($user_agent))
-		{
+		if( $user_agent !== NULL )
+		{	// Use the provided value (for test mode):
 			$this->user_agent = $user_agent;
 		}
 
-		if (!empty($test_admin))
-		{
+		if( $test_admin !== NULL )
+		{	// Use the provided value (for test mode):
 			$this->test_admin = $test_admin;
 		}
 
-		if (!empty($test_rss))
-		{
+		if( $test_rss !== NULL )
+		{	// Use the provided value (for test mode):
 			$this->test_rss = $test_rss;
 		}
 
@@ -290,11 +300,11 @@ class Hit
 		$this->detect_referer( $referer ); // May EXIT if we are set up to block referer spam.
 
 		if( $debug )
-		{
+		{	// Initialize data for debug log:
 			global $Debuglog;
 			$Debuglog->add( 'Hit: IP: '.$this->IP, 'request' );
 			$Debuglog->add( 'Hit: UserAgent: '.$this->get_user_agent(), 'request' );
-			$Debuglog->add( 'Hit: Referer: '.var_export($this->referer, true).'; type='.$this->referer_type, 'request' );
+			$Debuglog->add( 'Hit: Referer: '.var_export( $this->referer, true ).'; type='.$this->referer_type, 'request' );
 			$Debuglog->add( 'Hit: Remote Host(NO nslookup): '.$this->get_remote_host( false ), 'request' );
 		}
 	}
@@ -306,7 +316,8 @@ class Hit
 	function detect_admin_page()
 	{
 		global $Debuglog;
-		if (empty($this->test_mode) || (!empty($this->test_mode) && !empty($this->test_admin)))
+
+		if( empty( $this->test_mode ) || ! empty( $this->test_admin ) )
 		{
 			if( is_admin_page() )
 			{	// We are inside of admin, this supersedes 'direct' access
@@ -316,6 +327,7 @@ class Hit
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -325,38 +337,37 @@ class Hit
 	 *
 	 * Due to potential non-thread safety with getenv() (fallback), we'd better do this early.
 	 *
-	 * @return string
+	 * @return string|NULL
 	 */
 	function get_referer()
 	{
 		global $HTTP_REFERER; // might be set by PHP (give highest priority)
 
 		$referer = NULL;
+
 		if( isset( $HTTP_REFERER ) )
-		{ // Referer provided by PHP:
+		{	// Use referer which is provided by PHP global var:
 			$referer = $HTTP_REFERER;
 		}
-		else
-		{
-			if( isset($_SERVER['HTTP_REFERER']) )
-			{
-				$referer = $_SERVER['HTTP_REFERER'];
-			}
-			else
-			{ // Fallback method (not thread safe :[[ ) - this function does not work in ISAPI mode.
-				$referer = getenv('HTTP_REFERER');
-			}
+		elseif( isset( $_SERVER['HTTP_REFERER'] ) )
+		{	// Try to get from global array $_SERVER:
+			$referer = $_SERVER['HTTP_REFERER'];
 		}
+		else
+		{	// Fallback method (not thread safe :[[ ) - this function does not work in ISAPI mode.
+			$referer = getenv( 'HTTP_REFERER' );
+		}
+
 		return $referer;
 	}
 
 
 	/**
-	 * Get & Analyze referer
+	 * Get & Analyze referer URL
 	 *
 	 * Due to potential non-thread safety with getenv() (fallback), we'd better do this early.
 	 *
-	 * referer_type: enum('search', 'blacklist', 'referer', 'direct'); 'spam' gets used internally
+	 * Detect referer_type from referer URL: Possible values: 'search', 'special', 'spam', 'referer', 'direct', 'self'; 'spam' gets used internally
 	 */
 	function detect_referer( $referer = NULL )
 	{
@@ -365,18 +376,18 @@ class Hit
 		global $skins_path, $siteskins_path;
 		global $Settings;
 
-		if( isset($referer) )
-		{
+		if( $referer !== NULL )
+		{	// Use the provided value:
 			$this->referer = $referer;
 		}
 		else
-		{	// Get referer from HTTP request
+		{	// Get referer from HTTP request:
 			$this->referer = $this->get_referer();
 		}
 
 
-		if( empty($this->referer) )
-		{	// NO referer
+		if( empty( $this->referer ) )
+		{	// If NO referer defined yet
 			// This type may be superseeded and set to 'admin'
 			if( ! $this->detect_admin_page() )
 			{	// Not an admin page:
@@ -384,7 +395,7 @@ class Hit
 			}
 			else
 			{
-				if (empty($this->hit_type))
+				if( empty( $this->hit_type ) )
 				{
 					$this->hit_type = 'admin';
 				}
@@ -393,9 +404,7 @@ class Hit
 			return;
 		}
 
-
 		// ANALYZE referer...
-
 
 		// Check self referer list, see {@link $self_referer_list}
 		// fplanque: we log these (again), because if we didn't we woudln't detect
@@ -404,8 +413,8 @@ class Hit
 		{
 			$pos = strpos( $this->referer, $self_referer );
 			// If not starting within in the first 12 chars it's probably an url param as in &url=http://this_blog.com
-			if( $pos !== false && $pos <= 12
-				&& ! ($debug && strpos( $this->referer, '/search.html' ) ) ) // search simulation
+			if( $pos !== false && $pos <= 12 &&
+			    ! ( $debug && strpos( $this->referer, '/search.html' ) ) ) // search simulation
 			{
 				// This type may be superseeded by admin page
 				if( ! $this->detect_admin_page() )
@@ -415,7 +424,7 @@ class Hit
 				}
 				else
 				{
-					if (empty($this->hit_type))
+					if( empty( $this->hit_type ) )
 					{
 						$this->hit_type = 'admin';
 					}
@@ -424,7 +433,6 @@ class Hit
 				return;
 			}
 		}
-
 
 		// Check Special list, see {@link $SpecialList}
 		// NOTE: This is NOT the antispam!!
@@ -447,28 +455,26 @@ class Hit
 			}
 		}
 
-
 		// Check if the referer is valid and does not match the antispam blacklist:
 		// NOTE: requests to admin pages should not arrive here, because they should be matched above through $self_referer_list!
-		load_funcs('_core/_url.funcs.php');
+		load_funcs( '_core/_url.funcs.php' );
 		if( $error = validate_url( $this->referer, 'commenting' ) )
 		{ // This is most probably referer spam!!
 			$Debuglog->add( 'Hit: detect_referer(): '.$error.' (SPAM)', 'hit');
 			$this->referer_type = 'spam';
 
-			if( $Settings->get('antispam_block_spam_referers') )
+			if( $Settings->get( 'antispam_block_spam_referers' ) )
 			{ // In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
 				require $siteskins_path.'_403_referer_spam.main.php';	// error & exit
-				exit(0); // just in case.
+				exit( 0 ); // just in case.
 				// THIS IS THE END!!
 			}
 
 			return; // type "spam"
 		}
 
-
 		// Is the referer a search engine?
-		if( $this->is_search_referer($this->referer) )
+		if( $this->is_search_referer( $this->referer ) )
 		{
 			$Debuglog->add( 'Hit: detect_referer(): search engine', 'request' );
 			$this->referer_type = 'search';
@@ -486,61 +492,61 @@ class Hit
 	 */
 	function get_referer_domain_ID()
 	{
-		if( ! isset($this->referer_domain_ID) )
+		if( ! isset( $this->referer_domain_ID ) )
 		{
 			global $DB;
 			// Check if we know the base domain:
-			$referer_basedomain = get_base_domain($this->referer);
+			$referer_basedomain = get_base_domain( $this->referer );
 			if( $referer_basedomain )
 			{	// This referer has a base domain
 				// Check if we have met it before:
-				$hit_basedomain = $DB->get_row( '
-					SELECT dom_ID
-						FROM T_basedomains
-					 WHERE dom_name = '.$DB->quote($referer_basedomain) );
-				if( !empty( $hit_basedomain->dom_ID ) )
+				$hit_basedomain_ID = $DB->get_var( 'SELECT dom_ID
+					  FROM T_basedomains
+					 WHERE dom_name = '.$DB->quote( $referer_basedomain ), 0, NULL,
+					'GET domain for Hit->get_referer_domain_ID()' );
+				if( ! empty( $hit_basedomain_ID ) )
 				{	// This basedomain has visited before:
-					$this->referer_domain_ID = $hit_basedomain->dom_ID;
+					$this->referer_domain_ID = $hit_basedomain_ID;
 					// fp> The blacklist handling that was here made no sense.
 				}
 				else
 				{	// This is the first time this base domain visits:
 
 					// The INSERT below can fail, probably if we get two simultaneous hits (seen in the demo logfiles)
-					if ($this->agent_type == 'robot' || $this->hit_type == 'rss')
+					if( $this->agent_type == 'robot' || $this->hit_type == 'rss' )
 					{
 						$this->dom_type = 'aggregator';
 					}
-					elseif($this->referer_type == 'search')
+					elseif( $this->referer_type == 'search' )
 					{
 						$this->dom_type = 'searcheng';
 					}
-					elseif($this->referer_type == 'referer' || $this->referer_type == 'self')
+					elseif( $this->referer_type == 'referer' || $this->referer_type == 'self' )
 					{
 						$this->dom_type = 'normal';
 					}
 
-
 					$DB->save_error_state();
 
-					if( $DB->query( '
-						INSERT INTO T_basedomains( dom_name, dom_type)
-							VALUES( '.$DB->quote($referer_basedomain).', '.$DB->quote($this->dom_type).' )' ) )
-					{ // INSERTed ok:
+					if( $DB->query( 'INSERT INTO T_basedomains( dom_name, dom_type )
+							VALUES( '.$DB->quote( $referer_basedomain ).', '.$DB->quote( $this->dom_type ).' )',
+							'Insert new domain for Hit->get_referer_domain_ID()' ) )
+					{	// INSERTed ok:
 						$this->referer_domain_ID = $DB->insert_id;
 					}
 					else
-					{ // INSERT failed: see, try to select again (may become/stay NULL)
-						$this->referer_domain_ID = $DB->get_var( '
-							SELECT dom_ID
+					{	// INSERT failed: see, try to select again (may become/stay NULL)
+						$this->referer_domain_ID = $DB->get_var( 'SELECT dom_ID
 								FROM T_basedomains
-							 WHERE dom_name = '.$DB->quote($referer_basedomain) );
+							 WHERE dom_name = '.$DB->quote( $referer_basedomain ), 0, NULL,
+							'GET second time domain for Hit->get_referer_domain_ID()' );
 					}
 
 					$DB->restore_error_state();
 				}
 			}
 		}
+
 		return $this->referer_domain_ID;
 	}
 
@@ -559,7 +565,6 @@ class Hit
 		global $DB, $Debuglog;
 		global $user_agents;
 		global $Skin; // to detect agent_type (gets set in /xmlsrv/atom.php for example)
-
 
 		// Init is_* members.
 		$this->is_lynx = false;
@@ -598,7 +603,7 @@ class Hit
 			}
 			elseif( $browscap = $this->get_browser_caps() )
 			{
-				$platform = isset( $browscap->platform) ? $browscap->platform : '';
+				$platform = isset( $browscap->platform ) ? $browscap->platform : '';
 
 				$Debuglog->add( 'Hit:detect_useragent(): Trying to detect platform using browscap', 'request' );
 				$Debuglog->add( 'Hit:detect_useragent(): Raw platform string: "'.$platform.'"', 'request' );
@@ -675,7 +680,6 @@ class Hit
 		$Debuglog->add( 'Hit:detect_useragent(): Agent name: '.$this->agent_name, 'request' );
 		$Debuglog->add( 'Hit:detect_useragent(): Agent platform: '.$this->agent_platform, 'request' );
 
-
 		// Lookup robots
 		$match = false;
 		foreach( $user_agents as $agent_ID => $lUserAgent )
@@ -711,7 +715,7 @@ class Hit
 		static $caps = NULL;
 
 		if( $caps === NULL )
-		{
+		{	// Get only first time:
 			$caps = @get_browser( $this->get_user_agent() );
 		}
 
@@ -731,7 +735,6 @@ class Hit
 	 * of auto_prune_stats_mode == "page".
 	 *
 	 * @param boolean Hit saving in the database can be delayed or not because of the hit_ID is required
-	 *
 	 * @return boolean true if the hit gets logged; false if not
 	 */
 	function log( $delayed = false )
@@ -752,7 +755,7 @@ class Hit
 			return false;
 		}
 
-		if( $Plugins->trigger_event_first_true('AppendHitLog', array( 'Hit' => &$this ) ) )
+		if( $Plugins->trigger_event_first_true( 'AppendHitLog', array( 'Hit' => &$this ) ) )
 		{	// Plugin has handled recording
 			return true;
 		}
@@ -779,19 +782,19 @@ class Hit
 	{
 		global $Settings, $Debuglog, $is_admin_page;
 
-		if( $is_admin_page && ! $Settings->get('log_admin_hits') && empty($this->test_mode))
+		if( $is_admin_page && ! $Settings->get( 'log_admin_hits' ) && empty( $this->test_mode ) )
 		{	// We don't want to log admin hits:
 			$Debuglog->add( 'Hit: Hit NOT logged, (Admin page logging is disabled)', 'request' );
 			return false;
 		}
 
-		if( ! $is_admin_page && ! $Settings->get('log_public_hits') )
+		if( ! $is_admin_page && ! $Settings->get( 'log_public_hits' ) )
 		{	// We don't want to log public hits:
 			$Debuglog->add( 'Hit: Hit NOT logged, (Public page logging is disabled)', 'request' );
 			return false;
 		}
 
-		if( ($this->referer_type == 'spam' && ! $Settings->get('log_spam_hits')) && empty($this->test_mode) )
+		if( ( $this->referer_type == 'spam' && ! $Settings->get( 'log_spam_hits' ) ) && empty( $this->test_mode ) )
 		{	// We don't want to log referer spam hits:
 			$Debuglog->add( 'Hit: Hit NOT logged, (Referer spam)', 'request' );
 			return false;
@@ -850,7 +853,7 @@ class Hit
 
 		if( empty( $keyphrase ) )
 		{	// No search hit
-			if ( ! empty( $this->test_mode ) && ! empty( $this->test_uri['s'] ) )
+			if( ! empty( $this->test_mode ) && ! empty( $this->test_uri['s'] ) )
 			{
 				$s = $this->test_uri['s'];
 			}
@@ -859,7 +862,7 @@ class Hit
 				$s = get_param( 's' );
 			}
 			if( ! empty( $s ) && ! empty( $blog_ID ) )
-			{ // Record Internal Search:
+			{	// Record Internal Search:
 				$keyphrase  = $s;
 			}
 		}
@@ -932,11 +935,11 @@ class Hit
 			);
 
 		if( empty( $this->test_mode ) )
-		{ // Normal mode
+		{	// Normal mode
 			$sql_insert_fields['hit_sess_ID']  = $DB->quote( $Session->ID );
 		}
 		else
-		{ // Test mode
+		{	// Test mode
 			$sql_insert_fields['hit_sess_ID']  = $DB->quote( $this->session_id );
 			$sql_insert_fields['hit_datetime'] = 'FROM_UNIXTIME( '.$this->hit_time.' )';
 			$sql_insert_fields['hit_disp']     = $DB->quote( isset( $this->test_uri['disp'] ) ? $this->test_uri['disp'] : NULL );
@@ -945,8 +948,8 @@ class Hit
 		}
 
 		$sql = $delayed ? 'INSERT DELAYED INTO' : 'INSERT INTO';
-		$sql = $sql.' T_hitlog ( '.implode( ', ', array_keys( $sql_insert_fields ) ).' )'.
-		                    ' VALUES ( '.implode( ', ', $sql_insert_fields ).' )';
+		$sql .= ' T_hitlog ( '.implode( ', ', array_keys( $sql_insert_fields ) ).' )';
+		$sql .= ' VALUES ( '.implode( ', ', $sql_insert_fields ).' )';
 
 		$DB->query( $sql, 'Record the hit' );
 		$hit_ID = $DB->insert_id;
@@ -962,71 +965,69 @@ class Hit
 
 	/**
 	 * Get hit type from the uri
-	 * @return mixed Hit type
+	 *
+	 * @return string|NULL Hit type
 	 */
 	function get_hit_type()
 	{
 		global $ReqURI;
+
 		if( $this->hit_type )
-		{
+		{	// Use the hit type from previous detecting time:
 			return $this->hit_type;
 		}
 
-		$ajax_array = array('htsrv/async.php', 'htsrv/anon_async.php');
-
-		foreach ($ajax_array as $ajax)
-		{
-			if (strstr($ReqURI,$ajax))
-			{
-				return 'ajax';
-			}
+		if( strstr( $ReqURI, 'htsrv/async.php' ) || strstr( $ReqURI, 'htsrv/anon_async.php' ) )
+		{	// Mark request from such URLs as AJAX request:
+			return 'ajax';
 		}
 
-		if (strstr($ReqURI,'htsrv/'))
-		{
+		if( strstr( $ReqURI, 'htsrv/' ) )
+		{	// Mark request from such URLs as service request:
 			return 'service';
 		}
-		else
-		{
-			return NULL;
-		}
+
+		return NULL;
 	}
+
 
 	/**
 	 * Get hit action
+	 *
 	 * @return mixed Hit action
 	 */
 	function get_action()
 	{
 		global $ReqURI, $action;
+
 		if( $this->action )
-		{
+		{	// Use the hit action from previous detecting time:
 			return $this->action;
 		}
 
-		if (strstr($ReqURI,'htsrv/getfile.php'))
-		{ // special case
+		if( strstr( $ReqURI, 'htsrv/getfile.php' ) )
+		{	// Special case, this script is used to generate thumbnail images:
 			return 'getfile';
 		}
-		if (!empty ($action))
-		{
+
+		if( ! empty( $action ) )
+		{	// Get action value from global variable which is usually defined from $_GET/$_POST:
 			return $action;
 		}
-		else
-		{
-			return NULL;
-		}
-	}
 
+		return NULL;
+	}
 
 
 	/**
 	 * Get the keyphrase from the referer
+	 *
+	 * @return string
 	 */
 	function get_keyphrase()
 	{
 		if( $this->_search_params_tried )
-		{
+		{	// Use the keyphrase from previous detecting time:
 			return $this->_keyphrase;
 		}
 
@@ -1041,11 +1042,13 @@ class Hit
 
 	/**
 	 * Get the serprank from the referer
+	 *
+	 * @return string
 	 */
 	function get_serprank()
 	{
 		if( $this->_search_params_tried )
-		{
+		{	// Use the keyphrase from previous detecting time:
 			return $this->_serprank;
 		}
 
@@ -1060,11 +1063,13 @@ class Hit
 
 	/**
 	 * Get name of search engine
+	 *
+	 * @return string
 	 */
 	function get_search_engine()
 	{
 		if( $this->_search_params_tried )
-		{
+		{	// Use the keyphrase from previous detecting time:
 			return $this->_search_engine;
 		}
 
@@ -1084,15 +1089,15 @@ class Hit
 	 */
 	function get_user_agent()
 	{
-		if( ! isset($this->user_agent) )
+		if( ! isset( $this->user_agent ) )
 		{
 			global $HTTP_USER_AGENT; // might be set by PHP, give highest priority
 
-			if( isset($HTTP_USER_AGENT) )
+			if( isset( $HTTP_USER_AGENT ) )
 			{
 				$this->user_agent = $HTTP_USER_AGENT;
 			}
-			elseif( isset($_SERVER['HTTP_USER_AGENT']) )
+			elseif( isset( $_SERVER['HTTP_USER_AGENT'] ) )
 			{
 				$this->user_agent = $_SERVER['HTTP_USER_AGENT'];
 			}
@@ -1101,8 +1106,8 @@ class Hit
 				$this->user_agent = false;
 			}
 
-			if( $this->user_agent != strip_tags($this->user_agent) )
-			{ // then they have tried something funky, putting HTML or PHP into the user agent
+			if( $this->user_agent != strip_tags( $this->user_agent ) )
+			{	// then they have tried something funky, putting HTML or PHP into the user agent
 				global $Debuglog;
 				$Debuglog->add( 'Hit: detect_useragent(): '.T_('bad char in User Agent'), 'hit');
 				$this->user_agent = '';
@@ -1124,9 +1129,10 @@ class Hit
 	function get_agent_ID()
 	{
 		if( ! isset( $this->agent_ID ) )
-		{
+		{	// Detect only first time:
 			$this->detect_useragent();
 		}
+
 		return $this->agent_ID;
 	}
 
@@ -1139,9 +1145,10 @@ class Hit
 	function get_agent_name()
 	{
 		if( ! isset( $this->agent_name ) )
-		{
+		{	// Detect only first time:
 			$this->detect_useragent();
 		}
+
 		return $this->agent_name;
 	}
 
@@ -1154,9 +1161,10 @@ class Hit
 	function get_agent_platform()
 	{
 		if( ! isset( $this->agent_platform ) )
-		{
+		{	// Detect only first time:
 			$this->detect_useragent();
 		}
+
 		return $this->agent_platform;
 	}
 
@@ -1169,9 +1177,10 @@ class Hit
 	function get_agent_type()
 	{
 		if( ! isset( $this->agent_type ) )
-		{
+		{	// Detect only first time:
 			$this->detect_useragent();
 		}
+
 		return $this->agent_type;
 	}
 
@@ -1223,18 +1232,26 @@ class Hit
 	}
 
 
+	/**
+	 * Get param value from url string
+	 *
+	 * @param string URL string
+	 * @param string Param name
+	 * @return string Param value
+	 */
 	function get_param_from_string( $string, $param )
 	{
 		// Make sure the string does not start with "?", otherwise parse_str adds the question mark to the first param
 		$string = preg_replace( '~^\?~', '', $string );
 
-		parse_str($string, $array);
+		parse_str( $string, $array );
 
 		$value = NULL;
-		if( isset($array[$param]) && trim($array[$param]) != '' )
+		if( isset( $array[$param] ) && trim( $array[$param] ) != '' )
 		{
 			$value = $array[$param];
 		}
+
 		return $value;
 	}
 
@@ -1264,13 +1281,16 @@ class Hit
 							sk, sl, sm, sn, so, sr, st, sv, sy, sz, tc, td, tf, tg, th, tj, tk, tl, tm, tn, to, tr, tt, tv, tw,
 							tz, ua, ug, um, us, uy, uz, va, vc, ve, vg, vi, vn, vu, wf, ws, ye, yt, za, zm, zw';
 
-			$this->country_codes = array_map( 'trim', explode(',', $countries) );
+			$this->country_codes = array_map( 'trim', explode( ',', $countries ) );
 		}
+
 		return $this->country_codes;
 	}
 
 
 	/**
+	 * Get search engine names
+	 *
 	 * @return array Array of ( searchEngineName => URL )
 	 */
 	function get_search_engine_names()
@@ -1282,12 +1302,13 @@ class Hit
 			$this->search_engine_names = array();
 			foreach( $search_engine_params as $url => $info )
 			{
-				if( !isset($this->search_engine_names[$info[0]]) )
+				if( ! isset( $this->search_engine_names[$info[0]] ) )
 				{	// Do not overwrite existing keys
 					$this->search_engine_names[$info[0]] = $url;
 				}
 			}
 		}
+
 		return $this->search_engine_names;
 	}
 
@@ -1304,14 +1325,14 @@ class Hit
 	 *   example.de -> example.{}
 	 *   example.co.uk -> example.{}
 	 *
-	 * @param string $url
+	 * @param string URL
 	 * @return string
 	 */
 	function get_lossy_url( $url )
 	{
 		static $countries;
 
-		if( !isset($countries) )
+		if( ! isset( $countries ) )
 		{	// Load 2 letter ISO country codes
 			$countries = implode( '|', $this->get_country_codes() );
 		}
@@ -1332,7 +1353,7 @@ class Hit
 				'.{}$4',
 				'{}.',
 			),
-			$url);
+			$url );
 	}
 
 
@@ -1356,33 +1377,28 @@ class Hit
 			return false;
 		}
 
-		if( ! isset($this->_is_new_view) )
+		if( ! isset( $this->_is_new_view ) )
 		{
-			global $current_User;
-			global $DB, $Debuglog, $Settings, $ReqURI, $localtimenow;
-			global $Session;
+			global $DB, $Debuglog, $Settings, $ReqURI, $localtimenow, $Session;
 
+			$SQL = new SQL( 'Hit: Check for reload' );
+			$SQL->SELECT( 'SQL_NO_CACHE hit_ID' );
+			$SQL->FROM( 'T_hitlog' );
+			$SQL->WHERE( 'hit_uri = '.$DB->quote( substr( $ReqURI, 0, 250 ) ) );
+			$SQL->LIMIT( 1 );
 			// Restrict to current user if logged in:
-			if( ! empty($current_User->ID) )
-			{ // select by user ID: one user counts really just once. May be even faster than the anonymous query below..!?
-				$sql = "
-					SELECT SQL_NO_CACHE hit_ID FROM T_hitlog
-					 WHERE hit_sess_ID = ".$Session->ID."
-						 AND hit_uri = '".$DB->escape( substr($ReqURI, 0, 250) )."'
-					 LIMIT 1";
+			if( is_logged_in() )
+			{	// select by user ID: one user counts really just once. May be even faster than the anonymous query below..!?
+				$SQL->WHERE_and( 'hit_sess_ID = '.$Session->ID );
 			}
 			else
-			{ // select by remote_addr/hit_agent_type:
-				$sql = "
-					SELECT SQL_NO_CACHE hit_ID
-					  FROM T_hitlog
-					 WHERE hit_datetime > '".date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') )."'
-					   AND hit_remote_addr = ".$DB->quote( $this->IP )."
-					   AND hit_uri = '".$DB->escape( substr($ReqURI, 0, 250) )."'
-					   AND hit_agent_type = ".$DB->quote($this->get_agent_type())."
-					 LIMIT 1";
+			{	// select by remote_addr/hit_agent_type:
+				$SQL->WHERE_and( 'hit_datetime > '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow - $Settings->get( 'reloadpage_timeout' ) ) ) );
+				$SQL->WHERE_and( 'hit_remote_addr = '.$DB->quote( $this->IP ) );
+				$SQL->WHERE_and( 'hit_agent_type = '.$DB->quote( $this->get_agent_type() ) );
 			}
-			if( $DB->get_var( $sql, 0, 0, 'Hit: Check for reload' ) )
+
+			if( $DB->get_var( $SQL->get(), 0, 0, $SQL->title ) )
 			{
 				$Debuglog->add( 'Hit: No new view!', 'request' );
 				$this->_is_new_view = false;  // We don't want to log this hit again
@@ -1431,43 +1447,43 @@ class Hit
 		// Load search engine definitions
 		require_once dirname(__FILE__).'/_search_engines.php';
 
-		// Parse referer
-		$pu = @parse_url($referer);
+		// Parse referer:
+		$pu = @parse_url( $referer );
 
 		if( ! isset( $pu['host'] ) )
-		{
+		{	// Wrong referer without host name:
 			return false;
 		}
 
 		$ref_host = $pu['host'];
-		$ref_query = isset($pu['query']) ? $pu['query'] : '';
-		$ref_fragment = isset($pu['fragment']) ? $pu['fragment'] : '';
+		$ref_query = isset( $pu['query'] ) ? $pu['query'] : '';
+		$ref_fragment = isset( $pu['fragment'] ) ? $pu['fragment'] : '';
 
 		// Some search engines (eg. Bing Images) use the same domain
 		// as an existing search engine (eg. Bing), we must also use the url path
-		$ref_path = isset($pu['path']) ? $pu['path'] : '';
+		$ref_path = isset( $pu['path'] ) ? $pu['path'] : '';
 
-		$host_pattern = $this->get_lossy_url($ref_host);
+		$host_pattern = $this->get_lossy_url( $ref_host );
 
-		if( array_key_exists($ref_host.$ref_path, $search_engine_params) )
+		if( array_key_exists( $ref_host.$ref_path, $search_engine_params ) )
 		{
 			$ref_host = $ref_host.$ref_path;
 		}
-		elseif( array_key_exists($host_pattern.$ref_path, $search_engine_params) )
+		elseif( array_key_exists( $host_pattern.$ref_path, $search_engine_params ) )
 		{
 			$ref_host = $host_pattern.$ref_path;
 		}
-		elseif( array_key_exists($host_pattern, $search_engine_params) )
+		elseif( array_key_exists( $host_pattern, $search_engine_params ) )
 		{
 			$ref_host = $host_pattern;
 		}
-		elseif( !array_key_exists($ref_host, $search_engine_params) )
+		elseif( !array_key_exists( $ref_host, $search_engine_params ) )
 		{
-			if( !strncmp($ref_query, 'cx=partner-pub-', 15) )
+			if( ! strncmp( $ref_query, 'cx=partner-pub-', 15 ) )
 			{	// Google custom search engine
 				$ref_host = 'www.google.com/cse';
 			}
-			elseif( !strncmp($ref_path, '/pemonitorhosted/ws/results/', 28) )
+			elseif( ! strncmp( $ref_path, '/pemonitorhosted/ws/results/', 28 ) )
 			{	// Private-label search powered by InfoSpace Metasearch
 				$ref_host = 'infospace.com';
 			}
@@ -1512,9 +1528,9 @@ class Hit
 		// Make sure we don't try params extraction twice
 		$this->_search_params_tried = true;
 
-		@list($ref_host, $ref_path, $query, $fragment) = $this->is_search_referer($ref, true);
+		@list( $ref_host, $ref_path, $query, $fragment ) = $this->is_search_referer( $ref, true );
 
-		if( empty($ref_host) )
+		if( empty( $ref_host ) )
 		{	// Not a search referer
 			return false;
 		}
@@ -1522,50 +1538,50 @@ class Hit
 		$search_engine_name = $search_engine_params[$ref_host][0];
 
 		$keyword_param = NULL;
-		if( !empty($search_engine_params[$ref_host][1]) )
+		if( ! empty( $search_engine_params[$ref_host][1] ) )
 		{
 			$keyword_param = $search_engine_params[$ref_host][1];
 		}
-		if( is_null($keyword_param) )
+		if( is_null( $keyword_param ) )
 		{	// Get settings from first item in group
 			$search_engine_names = $this->get_search_engine_names();
 
 			$url = $search_engine_names[$search_engine_name];
 			$keyword_param = $search_engine_params[$url][1];
 		}
-		if( !is_array($keyword_param) )
+		if( ! is_array( $keyword_param ) )
 		{
-			$keyword_param = array($keyword_param);
+			$keyword_param = array( $keyword_param );
 		}
 
-		if( $search_engine_name == 'Google Images' || ($search_engine_name == 'Google' && strpos($ref, '/imgres') !== false) )
+		if( $search_engine_name == 'Google Images' || ( $search_engine_name == 'Google' && strpos( $ref, '/imgres' ) !== false ) )
 		{	// Google image search
 			$search_engine_name = 'Google Images';
 
-			$query = urldecode(trim( $this->get_param_from_string($query, 'prev') ));
-			$query = str_replace( '&', '&amp;', strstr($query, '?') );
+			$query = urldecode( trim( $this->get_param_from_string( $query, 'prev' ) ) );
+			$query = str_replace( '&', '&amp;', strstr( $query, '?' ) );
 		}
-		elseif( $search_engine_name == 'Google' && (strpos($query, '&as_') !== false || strpos($query, 'as_') === 0) )
+		elseif( $search_engine_name == 'Google' && ( strpos( $query, '&as_' ) !== false || strpos( $query, 'as_' ) === 0 ) )
 		{ // Google with "as_" param
 			$keys = array();
 
-			if( $key = $this->get_param_from_string($query, 'as_q') )
+			if( $key = $this->get_param_from_string( $query, 'as_q' ) )
 			{
-				array_push($keys, $key);
+				array_push( $keys, $key );
 			}
-			if( $key = $this->get_param_from_string($query, 'as_oq') )
+			if( $key = $this->get_param_from_string( $query, 'as_oq' ) )
 			{
-				array_push($keys, str_replace('+', ' OR ', $key));
+				array_push( $keys, str_replace( '+', ' OR ', $key ) );
 			}
-			if( $key = $this->get_param_from_string($query, 'as_epq') )
+			if( $key = $this->get_param_from_string( $query, 'as_epq' ) )
 			{
-				array_push($keys, "\"$key\"");
+				array_push( $keys, "\"$key\"" );
 			}
-			if( $key = $this->get_param_from_string($query, 'as_eq') )
+			if( $key = $this->get_param_from_string( $query, 'as_eq' ) )
 			{
-				array_push($keys, "-$key");
+				array_push( $keys, "-$key" );
 			}
-			$key = trim(urldecode(implode(' ', $keys)));
+			$key = trim(urldecode( implode( ' ', $keys ) ) );
 		}
 
 		if( empty( $key ) && ! empty( $keyword_param ) )
@@ -1574,18 +1590,21 @@ class Hit
 			{
 				if( $param[0] == '/' )
 				{	// regular expression match
-					if( @preg_match($param, $ref, $matches) )
+					if( @preg_match( $param, $ref, $matches ) )
 					{
-						$key = trim(urldecode($matches[1]));
+						$key = trim( urldecode( $matches[1] ) );
 						break;
 					}
 				}
 				else
 				{	// search for keywords now &vname=keyword
-					if( $key = $this->get_param_from_string($query, $param) )
+					if( $key = $this->get_param_from_string( $query, $param ) )
 					{
-						$key = trim(urldecode($key));
-						if( !empty($key) ) break;
+						$key = trim( urldecode( $key ) );
+						if( ! empty( $key ) )
+						{
+							break;
+						}
 					}
 				}
 			}
@@ -1618,27 +1637,27 @@ class Hit
 		}
 
 
-		// Convert encoding
-		if( !empty($search_engine_params[$ref_host][3]) )
+		// Convert encoding:
+		if( ! empty( $search_engine_params[$ref_host][3] ) )
 		{
 			$ie = $search_engine_params[$ref_host][3];
 		}
-		elseif( isset($url) && !empty($search_engine_params[$url][3]) )
+		elseif( isset( $url ) && ! empty( $search_engine_params[$url][3] ) )
 		{
 			$ie = $search_engine_params[$url][3];
 		}
 		else
-		{	// Fallback to default encoding
-			$ie = array('utf-8', 'iso-8859-15');
+		{	// Fallback to default encoding:
+			$ie = array( 'utf-8', 'iso-8859-15' );
 		}
 
-		if( is_array($ie) )
+		if( is_array( $ie ) )
 		{
 			if( can_check_encoding() )
 			{
 				foreach( $ie as $test_encoding )
 				{
-					if( check_encoding($key, $test_encoding) )
+					if( check_encoding( $key, $test_encoding ) )
 					{
 						$ie = $test_encoding;
 						break;
@@ -1651,43 +1670,43 @@ class Hit
 			}
 		}
 
-		$key = convert_charset($key, $evo_charset, $ie);
+		$key = convert_charset( $key, $evo_charset, $ie );
 		// convert to lower string but keep in evo_charset
 		$saved_charset = $current_charset;
 		$current_charset = $evo_charset;
-		$key = utf8_strtolower($key);
+		$key = utf8_strtolower( $key );
 		$current_charset = $saved_charset;
 
 		// Extract the "serp rank"
 		// Typically http://google.com?s=keyphraz&start=18 returns 18
-		if( !empty($search_engine_params[$ref_host][4]) )
+		if( ! empty( $search_engine_params[$ref_host][4] ) )
 		{
 			$serp_param = $search_engine_params[$ref_host][4];
 		}
-		elseif( isset($url) && !empty($search_engine_params[$url][4]) )
+		elseif( isset( $url ) && ! empty( $search_engine_params[$url][4] ) )
 		{
 			$serp_param = $search_engine_params[$url][4];
 		}
 		else
 		{	// Fallback to default params
-			$serp_param = array('offset','page','start');
+			$serp_param = array( 'offset', 'page', 'start' );
 		}
 
-		if( !is_array($serp_param) )
+		if( ! is_array( $serp_param ) )
 		{
-			$serp_param = array($serp_param);
+			$serp_param = array( $serp_param );
 		}
 
-		if( strpos($search_engine_name, 'Google') !== false )
+		if( strpos( $search_engine_name, 'Google' ) !== false )
 		{	// Append fragment which Google uses in instant search
 			$query .= '&'.$fragment;
 		}
 
 		foreach( $serp_param as $param )
 		{
-			if( $var = $this->get_param_from_string($query, $param) )
+			if( $var = $this->get_param_from_string( $query, $param ) )
 			{
-				if( ctype_digit($var) )
+				if( ctype_digit( $var ) )
 				{
 					$serprank = $var;
 					break;
@@ -1697,7 +1716,7 @@ class Hit
 
 		$this->_search_engine = $search_engine_name;
 		$this->_keyphrase = $key;
-		$this->_serprank = isset($serprank) ? $serprank : NULL;
+		$this->_serprank = isset( $serprank ) ? $serprank : NULL;
 
 		return array(
 				'engine_name'	=> $this->_search_engine,
@@ -1713,8 +1732,11 @@ class Hit
 	 */
 	function is_lynx()
 	{
-		if( ! isset($this->is_lynx) )
+		if( ! isset( $this->is_lynx ) )
+		{
 			$this->detect_useragent();
+		}
+
 		return $this->is_lynx;
 	}
 
@@ -1724,8 +1746,11 @@ class Hit
 	 */
 	function is_firefox()
 	{
-		if( ! isset($this->is_firefox) )
+		if( ! isset( $this->is_firefox ) )
+		{
 			$this->detect_useragent();
+		}
+
 		return $this->is_firefox;
 	}
 
@@ -1735,8 +1760,11 @@ class Hit
 	 */
 	function is_gecko()
 	{
-		if( ! isset($this->is_gecko) )
+		if( ! isset( $this->is_gecko ) )
+		{
 			$this->detect_useragent();
+		}
+
 		return $this->is_gecko;
 	}
 
@@ -1746,8 +1774,11 @@ class Hit
 	 */
 	function is_winIE()
 	{
-		if( ! isset($this->is_winIE) )
+		if( ! isset( $this->is_winIE ) )
+		{
 			$this->detect_useragent();
+		}
+
 		return $this->is_winIE;
 	}
 
@@ -1757,8 +1788,11 @@ class Hit
 	 */
 	function is_macIE()
 	{
-		if( ! isset($this->is_macIE) )
+		if( ! isset( $this->is_macIE ) )
+		{
 			$this->detect_useragent();
+		}
+
 		return $this->is_macIE;
 	}
 
@@ -1814,8 +1848,11 @@ class Hit
 	 */
 	function is_chrome()
 	{
-		if( ! isset($this->is_chrome) )
+		if( ! isset( $this->is_chrome ) )
+		{
 			$this->detect_useragent();
+		}
+
 		return $this->is_chrome;
 	}
 
@@ -1825,8 +1862,11 @@ class Hit
 	 */
 	function is_safari()
 	{
-		if( ! isset($this->is_safari) )
+		if( ! isset( $this->is_safari ) )
+		{
 			$this->detect_useragent();
+		}
+
 		return $this->is_safari;
 	}
 
@@ -1836,8 +1876,11 @@ class Hit
 	 */
 	function is_opera()
 	{
-		if( ! isset($this->is_opera) )
+		if( ! isset( $this->is_opera ) )
+		{
 			$this->detect_useragent();
+		}
+
 		return $this->is_opera;
 	}
 
@@ -1847,8 +1890,11 @@ class Hit
 	 */
 	function is_NS4()
 	{
-		if( ! isset($this->NS4) )
+		if( ! isset( $this->NS4 ) )
+		{
 			$this->detect_useragent();
+		}
+
 		return $this->is_NS4;
 	}
 
@@ -1859,8 +1905,11 @@ class Hit
 	 */
 	function is_browser()
 	{
-		if( ! isset($this->is_browser) )
-			$this->is_browser = ($this->get_agent_type() == 'browser');
+		if( ! isset( $this->is_browser ) )
+		{
+			$this->is_browser = ( $this->get_agent_type() == 'browser' );
+		}
+
 		return $this->is_browser;
 	}
 
@@ -1871,8 +1920,11 @@ class Hit
 	 */
 	function is_robot()
 	{
-		if( ! isset($this->is_robot) )
-			$this->is_robot = ($this->get_agent_type() == 'robot');
+		if( ! isset( $this->is_robot ) )
+		{
+			$this->is_robot = ( $this->get_agent_type() == 'robot' );
+		}
+
 		return $this->is_robot;
 	}
 

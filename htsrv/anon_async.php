@@ -161,7 +161,7 @@ switch( $action )
 			$Ajaxlog->add( 'User: #'.$user_ID.' '.$User->login );
 
 			if( is_logged_in() &&
-			    $current_User->can_moderate_user( $User->ID ) &&
+			    ( $current_User->ID == $User->ID || $current_User->can_moderate_user( $User->ID ) ) &&
 			    $current_User->check_status( 'can_access_admin' ) &&
 			    $current_User->check_perm( 'admin', 'restricted' ) )
 			{	// Display the moderation buttons only if current user has a permission:
@@ -780,7 +780,7 @@ switch( $action )
 		$Form->output = true;
 
 		global $user_fields_empty_name;
-		$user_fields_empty_name = T_('Select...');
+		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
 
 		$Form->select( 'criteria_type[]', '', 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
 
@@ -1198,6 +1198,12 @@ switch( $action )
 
 		break;
 
+	case 'get_regform_crumb':
+		// Get crumb value for register form:
+		// (Used for widget "Email capture / Quick registration" when page caching is enabled)
+		echo get_crumb( 'regform' );
+		break;
+
 	case 'get_user_salt':
 		// Get the salt of the user from the given login info
 		// Note: If there are more users with the received login then give at most 3 salt values for the 3 most recently active users
@@ -1214,34 +1220,52 @@ switch( $action )
 		$result = array();
 
 		if( $get_widget_login_hidden_fields )
-		{ // Get the loginform crumb, the password encryption salt, and the Session ID for the widget login form
-			$pwd_salt = $Session->get('core.pwd_salt');
-			if( empty($pwd_salt) )
-			{ // Session salt is not generated yet, needs to generate
-				$pwd_salt = generate_random_key(64);
-				$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
+		{	// Get the loginform crumb, the password encryption salt, and the Session ID for the widget login form:
+			$pepper = $Session->get( 'core.pepper' );
+			if( empty( $pepper ) )
+			{	// Session salt is not generated yet, needs to generate:
+				$pepper = generate_random_key(64);
+				$Session->set( 'core.pepper', $pepper, 86400 /* expire in 1 day */ );
 				$Session->dbsave(); // save now, in case there's an error later, and not saving it would prevent the user from logging in.
 			}
 			$result['crumb'] = get_crumb( 'loginform' );
-			$result['pwd_salt'] = $pwd_salt;
+			$result['pepper'] = $pepper;
 			$result['session_id'] = $Session->ID;
 		}
 
 		$login = param( $dummy_fields[ 'login' ], 'string', '' );
 		$check_field = is_email( $login ) ? 'user_email' : 'user_login';
 
-		// Get the most recently used 3 users with matching email address
-		$salts = $DB->get_col('SELECT user_salt FROM T_users
+		// Get the most recently used 3 users with matching email address:
+		$salts = $DB->get_results( 'SELECT user_salt, user_pass_driver FROM T_users
 						WHERE '.$check_field.' = '.$DB->quote( utf8_strtolower( $login ) ).'
 						ORDER BY user_lastseen_ts DESC, user_status ASC
-						LIMIT 3' );
+						LIMIT 3', ARRAY_A );
 
-		// Make sure to return at least one salt, to make it unable to guess if user exists with the given login
+		// Make sure to return at least one hashed password, to make it unable to guess if user exists with the given login
 		if( empty( $salts ) )
 		{ // User with the given login was not found add one random salt value
-			$salts[] = generate_random_key( 8 );
+			$salts[] = array(
+					'user_salt'        => generate_random_key( 8 ),
+					'user_pass_driver' => 'evo$salted',
+				);
 		}
-		$result['salts'] = $salts;
+
+		$result['salts'] = array();
+		$result['hash_algo'] = array();
+		foreach( $salts as $salt )
+		{
+			// Get password driver by code:
+			$user_PasswordDriver = get_PasswordDriver( $salt['user_pass_driver'] );
+
+			if( ! $user_PasswordDriver )
+			{	// Skip this user because he has an unknown password driver:
+				continue;
+			}
+
+			$result['salts'][] = $salt['user_salt'];
+			$result['hash_algo'][] = $user_PasswordDriver->get_javascript_hash_code( 'raw_password', 'salts[index]' );
+		}
 
 		echo evo_json_encode( $result );
 
@@ -1283,13 +1307,13 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
+		$user_ID = param( 'user_ID', 'integer', true );
 
-		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) || ! $current_User->check_status( 'can_report_user' ) )
+		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) || ! $current_User->check_status( 'can_report_user', $user_ID ) )
 		{ // Only if current user can reports
 			break;
 		}
 
-		$user_ID = param( 'user_ID', 'integer', true );
 		$UserCache = & get_UserCache();
 		$edited_User = & $UserCache->get_by_ID( $user_ID );
 
@@ -1445,12 +1469,14 @@ switch( $action )
 		$fake_sql_update_strings = '';
 		$real_sql_update_strings = '';
 		$real_link_order = 0;
+		$link_order = array();
 		foreach( $link_IDs as $link_ID )
 		{
 			$max_link_order++;
 			$fake_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$max_link_order;
 			$real_link_order++;
 			$real_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$real_link_order;
+			$link_order[$link_ID] = $real_link_order;
 		}
 
 		// Do firstly fake ordering start with max order, to avoid duplicate entry error:
@@ -1463,6 +1489,7 @@ switch( $action )
 			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
 
 		$DB->commit();
+		echo json_encode( $link_order );
 		break;
 
 	case 'test_api':

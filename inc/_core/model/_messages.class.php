@@ -341,12 +341,6 @@ class Messages
 
 		if( $this->count )
 		{
-			global $preview;
-			if( $preview )
-			{
-				return;
-			}
-
 			$disp = $this->display( NULL, NULL, false, NULL );
 
 			if( !empty( $disp ) )

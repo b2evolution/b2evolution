@@ -274,6 +274,9 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 		{ // Use from params:
 			$comments_per_page = $params['comments_per_page'];
 		}
+
+		global $CommentList;
+
 		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', $params['disp_meta_comments'] ? 'mc_' : 'c_' );
 
 		// Filter list:
@@ -288,7 +291,9 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 		$CommentList->load_from_Request();
 
 		// Get ready for display (runs the query):
-		$CommentList->display_init();
+		$CommentList->display_init( array(
+				'init_order_numbers_mode' => ( $params['disp_meta_comments'] ? 'date' : 'list' )
+			) );
 
 		// Set redir=no in order to open comment pages
 		memorize_param( 'redir', 'string', '', 'no' );
@@ -334,15 +339,6 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 			echo $params['comment_list_start'];
 		}
 
-		// Set number of comment depending on current page
-		$comment_number = ( ( $CommentList->page - 1 ) * $CommentList->limit ) + 1;
-
-		if( $params['disp_meta_comments'] )
-		{	// Calculate index of first meta comment:
-			global $comment_template_counter;
-			$comment_template_counter = $CommentList->total_rows - ( $CommentList->limit * ( $CommentList->page - 1 ) );
-		}
-
 		/**
 		 * @var Comment
 		 */
@@ -377,7 +373,6 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 					'author_link_text'      => $params['author_link_text'],
 					'link_to'               => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 					'author_link_text'      => $params['author_link_text'],
-					'comment_number'        => $comment_number,
 					'image_size'            => $params['comment_image_size'],
 				) );
 			// Note: You can customize the default item comment by copying the generic
@@ -388,8 +383,6 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 			{	// Display the comment replies
 				display_comment_replies( $Comment->ID, $params );
 			}
-
-			$comment_number++;
 		}	// End of comment list loop.
 
 		if( ! $params['nav_bottom_inside'] )
@@ -436,9 +429,11 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $params['disp_comment_form'] )
-{
-	if( $Blog->get_ajax_form_enabled() && ( $Blog->get_setting( 'allow_comments' ) != 'never' ) )
+if( $params['disp_comment_form'] && // if enabled by skin param
+    $Blog->get_setting( 'allow_comments' ) != 'never' && // if enabled by collection setting
+    $Item->get_type_setting( 'use_comments' ) ) // if enabled by item type setting
+{	// Display a comment form only if it is enabled:
+	if( $Blog->get_ajax_form_enabled() )
 	{
 		// The following params will be piped through the AJAX request...
 		$json_params = array(
@@ -476,8 +471,57 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 
 		if( $Blog->get_setting( 'allow_comment_subscriptions' ) )
 		{
-			$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
-						WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
+			$sql = 'SELECT count( sub_user_ID )
+							FROM (
+								SELECT DISTINCT sub_user_ID
+								FROM T_subscriptions
+								WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0
+
+								UNION
+
+								SELECT user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+								LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_comment_subscription"
+									AND opt.cset_value = 1
+									AND user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+
+								UNION
+
+								SELECT sug_user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+								LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_comment_subscription"
+									AND opt.cset_value = 1
+									AND sug_user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+
+								UNION
+
+								SELECT bloguser_user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_comment_subscription"
+									AND opt.cset_value = 1
+									AND bloguser_user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+							) AS users';
+
 			if( $DB->get_var( $sql ) > 0 )
 			{
 				echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'You are receiving notifications when anyone comments on any post.' );

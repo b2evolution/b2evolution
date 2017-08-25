@@ -138,7 +138,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 
 		<!-- Chapter -->
 		<div class="ft_author_info ellipsis">
-			<?php echo sprintf( T_('In %s'), $Item->get_chapter_links() ); ?>
+			<?php echo sprintf( /* TRANS: %s gets replaced by chapter links */ T_('In %s'), $Item->get_chapter_links() ); ?>
 		</div>
 	</div>
 
