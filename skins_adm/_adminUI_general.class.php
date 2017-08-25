@@ -1162,6 +1162,7 @@ class AdminUI_general extends Menu
 					'formend' => '',
 				);
 
+			case 'accordion_form':
 			case 'compact_form':
 			case 'Form':
 				// Default Form settings:

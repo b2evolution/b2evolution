@@ -252,6 +252,25 @@ function db_add_index( $table, $name, $def, $type = 'INDEX' )
 
 
 /**
+ * Drops an INDEX, if it exists
+ *
+ * @param string Table name
+ * @param string Index name
+ */
+function db_drop_index( $table, $index )
+{
+	global $DB;
+
+	if( ! db_index_exists( $table, $index ) )
+	{	// No index is detected, Stop it:
+		return;
+	}
+
+	$DB->query( 'ALTER TABLE '.$table.' DROP INDEX '.$index );
+}
+
+
+/**
  * Check if a key item value already exists on database
  */
 function db_key_exists( $table, $field_name, $field_value )
@@ -8175,58 +8194,74 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 12180, 'Updating base domains table...' ) )
 	{	// part of 6.9.0-beta
-		$sql = 'SHOW INDEX FROM T_basedomains WHERE KEY_NAME = "dom_type_name"';
-		$indexes = $DB->get_results( $sql, ARRAY_A );
-		if( $DB->num_rows > 0 )
-		{
-			$DB->query( 'ALTER TABLE T_basedomains DROP INDEX dom_type_name' );
+		db_drop_index( 'T_basedomains', 'dom_type_name' );
+
+		$SQL = new SQL( 'Get all domains with duplicated names' );
+		$SQL->SELECT( 'dom_name AS name, GROUP_CONCAT( dom_ID ) AS ids, GROUP_CONCAT( dom_status ) AS statuses' );
+		$SQL->FROM( 'T_basedomains' );
+		$SQL->GROUP_BY( 'dom_name' );
+		$SQL->HAVING( 'COUNT( dom_ID ) > 1' );
+		$SQL->ORDER_BY( 'dom_ID' );
+		$domains = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+
+		if( count( $domains ) )
+		{	// If at least one duplicated domain is detected,
+			// Find what domains should be kept and what deleted depending on their status:
+			$status_orders = array( 'blocked', 'suspect', 'unknown', 'trusted' );
+			$duplicated_domains = array();
+			foreach( $domains as $domain )
+			{
+				$domain_IDs = explode( ',', $domain->ids );
+				$domain_statuses = explode( ',', $domain->statuses );
+				foreach( $status_orders as $status_order )
+				{
+					$s_index = array_search( $status_order, $domain_statuses );
+					if( $s_index !== false )
+					{	// If the highest status is detected:
+						$prefered_domain_ID = $domain_IDs[ $s_index ];
+						unset( $domain_IDs[ $s_index ] );
+						// key is ID of domain which must be used,
+						// values are IDs of domains which must be replaced and deleted completely:
+						$duplicated_domains[ $prefered_domain_ID ] = $domain_IDs;
+						break;
+					}
+				}
+			}
+
+			$update_users_sql = array();
+			$update_hits_sql = array();
+			$delete_duplicated_domains = array();
+			foreach( $duplicated_domains as $keep_domain_ID => $delete_domain_IDs )
+			{
+				$update_users_sql[] = 'WHEN user_email_dom_ID IN ( '.implode( ',', $delete_domain_IDs ).' ) THEN '.$keep_domain_ID;
+				$update_hits_sql[] = 'WHEN hit_referer_dom_ID IN ( '.implode( ',', $delete_domain_IDs ).' ) THEN '.$keep_domain_ID;
+				$delete_duplicated_domains = array_merge( $delete_duplicated_domains, $delete_domain_IDs );
+			}
+
+			// Update user email domains IDs that will deleted to use related domain IDs that will be retained:
+			$DB->query( 'UPDATE T_users
+				SET user_email_dom_ID = CASE
+					'.implode( ' ', $update_users_sql ).'
+					ELSE user_email_dom_ID
+				END' );
+
+			// Update hitlist log referer domains IDs:
+			$DB->query( 'UPDATE T_hitlog
+				SET hit_referer_dom_ID = CASE
+					'.implode( ' ', $update_hits_sql ).'
+					ELSE hit_referer_dom_ID
+				END' );
+
+			// Delete the duplicate domains, order by status: blocked > suspect > unknown > trusted, keep the first one:
+			$DB->query( 'DELETE
+				 FROM T_basedomains
+				WHERE dom_ID IN ( '.implode( ', ', $delete_duplicated_domains ).' )' );
 		}
 
-		// update user email domains IDs that will deleted to use related domain IDs that will be retained
-		$DB->query( 'UPDATE T_users a
-				LEFT JOIN (
-					SELECT a.dom_ID, b.dom_ID AS subst_dom_ID
-					FROM T_basedomains a
-					LEFT JOIN T_basedomains b
-						ON a.dom_name = b.dom_name
-							AND ( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
-					WHERE NOT b.dom_ID IS NULL
-				) c
-					ON c.dom_ID = a.user_email_dom_ID
-				SET a.user_email_dom_ID = c.subst_dom_ID
-				WHERE
-					NOT c.dom_ID IS NULL' );
+		// Add an unique index for domain name:
+		db_add_index( 'T_basedomains', 'dom_name', 'dom_name', 'UNIQUE INDEX' );
 
-		// update hitlist log
-		$DB->query( 'UPDATE T_hitlog a
-				LEFT JOIN (
-					SELECT a.dom_ID, b.dom_ID AS subst_dom_ID
-					FROM T_basedomains a
-					LEFT JOIN T_basedomains b
-						ON a.dom_name = b.dom_name
-							AND ( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
-					WHERE NOT b.dom_ID IS NULL
-				) c
-					ON c.dom_ID = a.hit_referer_dom_ID
-				SET a.hit_referer_dom_ID = c.subst_dom_ID
-				WHERE
-					NOT c.dom_ID IS NULL' );
-
-		// delete duplicate entries, order by status: blocked > suspect > unknown > trusted, keep the first one
-		$DB->query( 'DELETE a
-				FROM T_basedomains a
-				LEFT JOIN T_basedomains b
-					ON a.dom_name = b.dom_name
-						AND (
-							( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
-							OR ( a.dom_status = b.dom_status AND a.dom_ID > b.dom_ID )
-						)
-				WHERE NOT b.dom_ID IS NULL;' );
-
-		// Add index
-		$DB->query( 'ALTER TABLE T_basedomains ADD UNIQUE INDEX `dom_name` (`dom_name`)' );
-
-		// add comment to user_email_dom_ID
+		// Add a comment to user_email_dom_ID:
 		$DB->query( 'ALTER TABLE T_users MODIFY user_email_dom_ID int(10) unsigned NULL COMMENT "Used for email statistics"' );
 		upg_task_end();
 	}
@@ -8408,37 +8443,82 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12270, 'Upgrade datetime fields to timestamp type...' ) )
+	if( upg_task_start( 12262, 'Upgrade datetime fields to timestamp type in users table...' ) )
 	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_users
 			MODIFY user_created_datetime   TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 			MODIFY user_profileupdate_date TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12263, 'Upgrade datetime fields to timestamp type in cron tasks table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_cron__task
 			MODIFY ctsk_start_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12264, 'Upgrade datetime fields to timestamp type in cron logs table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_cron__log
 			MODIFY clog_realstart_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 			MODIFY clog_realstop_datetime  TIMESTAMP NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12265, 'Upgrade datetime fields to timestamp type in posts table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_items__item
 			MODIFY post_datestart    TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 			MODIFY post_datedeadline TIMESTAMP NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12266, 'Upgrade datetime fields to timestamp type in comments table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_comments
 			MODIFY comment_date TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12267, 'Upgrade datetime fields to timestamp type in post versions table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_items__version
 			MODIFY iver_edit_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12268, 'Upgrade datetime fields to timestamp type in links table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_links
 			MODIFY link_datecreated  TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 			MODIFY link_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12269, 'Upgrade datetime fields to timestamp type in message threads table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_messaging__thread
 			MODIFY thrd_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12270, 'Upgrade datetime fields to timestamp type in messages table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_messaging__message
 			MODIFY msg_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12280, 'Upgrade datetime fields to timestamp type...' ) )
+	if( upg_task_start( 12279, 'Upgrade datetime fields to timestamp type in user reports table...' ) )
 	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_users__reports
 			MODIFY urep_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12280, 'Upgrade datetime fields to timestamp type in message contacts table...' ) )
+	{	// part of 6.9.1-beta
 		$DB->query( 'ALTER TABLE T_messaging__contact
 			MODIFY mct_last_contact_datetime TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		upg_task_end();

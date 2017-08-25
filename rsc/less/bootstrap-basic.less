@@ -619,3 +619,16 @@ li[class^="listnav_distance_"], li[class*=" listnav_distance_"] {
 		border-radius: 0;
 	}
 }
+
+// Highlight effect:
+div.evo_highlight, li.evo_highlight, tr.evo_highlight td {
+	animation: evo_highlight 5s ease-out;
+}
+@keyframes evo_highlight {
+	from {
+		background-color: #FF6600;
+	}
+	to {
+		background-color: auto;
+	}
+}

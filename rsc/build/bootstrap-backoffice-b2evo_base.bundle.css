@@ -1970,6 +1970,19 @@ li[class*=" listnav_distance_"] {
     border-radius: 0;
   }
 }
+div.evo_highlight,
+li.evo_highlight,
+tr.evo_highlight td {
+  animation: evo_highlight 5s ease-out;
+}
+@keyframes evo_highlight {
+  from {
+    background-color: #FF6600;
+  }
+  to {
+    background-color: auto;
+  }
+}
 
 /**
  * item_base.css 
@@ -2099,6 +2112,9 @@ ul,
 ol {
   margin: 0 0 10px 25px;
   padding: 0;
+}
+.text-normal {
+  font-weight: normal;
 }
 .table-hover > tbody > tr:hover {
   background-color: #ffc;
@@ -2922,4 +2938,15 @@ div.message_toolbars {
 .evo_container__sidebar .evo_widget[class$=_menu_link] a.btn,
 .evo_container__sidebar2 .evo_widget[class$=_menu_link] a.btn {
   width: 100%;
+}
+.accordion-caret .accordion-toggler:before {
+  padding-right: 3px;
+  font-size: 14px;
+  font-family: FontAwesome;
+}
+.accordion-caret .accordion-toggler:not(.collapsed):before {
+  content: '\f0d7';
+}
+.accordion-caret .accordion-toggler.collapsed:before {
+  content: '\f0da';
 }

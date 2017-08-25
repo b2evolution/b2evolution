@@ -143,7 +143,7 @@ class UploadHandler {
 
 		if( !isset( $type ) )
 		{
-			return array( 'error' => T_('No files were uploaded.') );
+			return array( 'error' => T_('No file was uploaded.') );
 		}
 		elseif ( strpos( strtolower( $type ), 'multipart/' ) !== 0 )
 		{

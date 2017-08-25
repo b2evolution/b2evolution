@@ -479,6 +479,60 @@ function tool_create_sample_hits( $days, $min_interval, $max_interval )
 
 
 /**
+ * Create sample base domains and display a process of creating
+ *
+ * @param integer Number of base domains
+ */
+function tool_create_sample_basedomains( $num_basedomains )
+{
+	global $Messages, $DB;
+
+	echo T_('Creating of the sample base domains...');
+	evo_flush();
+
+	/**
+	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
+	 */
+	$DB->log_queries = false;
+
+	$DB->begin();
+
+	$SQL = new SQL( 'Get all unique base domains before create sample sample base domains' );
+	$SQL->SELECT( 'dom_name' );
+	$SQL->FROM( 'T_basedomains' );
+	$SQL->WHERE( 'dom_type = "unknown"' );
+	$basedomains = $DB->get_col( $SQL->get(), 0, $SQL->title );
+
+	$basedomains_sql_data;
+	for( $i = 0; $i < $num_basedomains; $i++ )
+	{
+		do
+		{	// Generate new unique domain:
+			$domain_name = generate_random_key( 8, 'abcdefghijklmnopqrstuvwxyz0123456789-' ).'.com';
+		} while( in_array( $domain_name, $basedomains ) );
+
+		$basedomains[] = $domain_name;
+		$basedomains_sql_data[] = '( '.$DB->quote( $domain_name ).' )';
+
+		if( $i % 100 == 0 )
+		{	// Display a process of creating by one dot for 100 base domains:
+			echo ' .';
+			evo_flush();
+		}
+	}
+
+	$DB->query( 'INSERT INTO T_basedomains ( dom_name )
+		VALUES '.implode( ', ', $basedomains_sql_data ) );
+
+	$DB->commit();
+
+	echo ' OK.';
+
+	$Messages->add( sprintf( T_('Created %d base domains.'), $num_basedomains ), 'success' );
+}
+
+
+/**
  * Create sample messages and display a process of creating
  *
  * @param integer Number of loops

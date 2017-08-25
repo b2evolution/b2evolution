@@ -5023,6 +5023,16 @@ class User extends DataObject
 		global $DB, $UserSettings, $current_User, $servertimenow;
 		global $is_api_request;
 
+		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) )
+		{	// Only moderators can update user status:
+			return false;
+		}
+
+		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) )
+		{	// Only moderators can update user status:
+			return false;
+		}
+
 		if( $dbsave )
 		{ // save required
 			$DB->begin();
@@ -6391,11 +6401,6 @@ class User extends DataObject
 	 */
 	function can_moderate_user( $user_ID, $assert = false )
 	{
-		if( $this->ID == $user_ID )
-		{	// User can edit own profile
-			return true;
-		}
-
 		if( $this->check_perm( 'users', 'edit' ) )
 		{ // User can edit all users
 			return true;

@@ -369,7 +369,7 @@ if( $upload )
 
 		if( $UserSettings->get('fm_showcreator') )
 		{
-			$message['creator'] = $creator ? $creator->get( 'login' ) : T_('unknown');
+			$message['creator'] = $creator ? $creator->get( 'login' ) : T_('Unknown');
 		}
 
 		if( $UserSettings->get( 'fm_showdownload' ) )

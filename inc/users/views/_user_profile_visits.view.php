@@ -27,11 +27,6 @@ global $user_tab, $user_ID;
 
 global $current_User, $UserSettings;
 
-if( !$current_User->can_moderate_user( $edited_User->ID ) )
-{ // Check permission:
-	debug_die( T_( 'You have no permission to see this tab!' ) );
-}
-
 
 memorize_param( 'user_tab', 'string', '', $user_tab );
 memorize_param( 'user_ID', 'integer', 0, $user_ID );
@@ -42,16 +37,22 @@ user_prevnext_links( array(
 	) );
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
+if( $is_admin_page )
+{
+	echo '<div class="row">';
+}
+
 if( !$user_profile_only )
 { // echo user edit action icons
 	$Widget = new Widget();
 	echo_user_actions( $Widget, $edited_User, 'edit' );
-	echo '<span class="floatright">'.$Widget->gen_global_icons().'</span>';
+	echo '<span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">'.$Widget->gen_global_icons().'</span>';
 }
 
 if( $is_admin_page )
 {
-	echo '<div>'.get_usertab_header( $edited_User, $user_tab, ( $current_User->ID == $edited_User->ID ? T_('My Profile Visits') : T_('User Profile Visits') ).get_manual_link( 'profile-visits-tab' ) ).'</div>';
+	echo '<div class="col-xs-12 col-lg-6'.( $user_profile_only ? '' : ' col-lg-pull-6').'">'.get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $edited_User->ID ? T_('My Profile Visits') : T_('User Profile Visits') ).'</span>'.get_manual_link( 'profile-visits-tab' ) ).'</div>';
+	echo '</div>';
 }
 
 if( ! empty( $Skin ) )

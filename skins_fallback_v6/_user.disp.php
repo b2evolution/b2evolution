@@ -183,9 +183,9 @@ echo '<div class="profile_column_left">';
 			.'</a>';
 	}
 
-	// Check if current user can edit other users from back-office:
-	$user_perms_edit = ( $is_logged_in &&
-			$current_User->can_moderate_user( $User->ID ) &&
+	// Check if current user can edit other users or own user from back-office:
+	$user_perms_backoffice_edit = ( $is_logged_in &&
+			( $current_User->ID == $User->ID || $current_User->can_moderate_user( $User->ID ) ) &&
 			$current_User->check_status( 'can_access_admin' ) &&
 			$current_User->check_perm( 'admin', 'restricted' )
 		);
@@ -197,7 +197,7 @@ echo '<div class="profile_column_left">';
 		if( ! empty( $msgform_url ) )
 		{
 			$msgform_url = url_add_param( $msgform_url, 'msg_type=PM' );
-			$buttons[] = '<a href="'.$msgform_url.'"><button type="button" class="btn '.( $user_perms_edit ? 'btn-default' : 'btn-primary' ).'">'.T_('Send Message').'</button></a>';
+			$buttons[] = '<a href="'.$msgform_url.'"><button type="button" class="btn '.( $user_perms_backoffice_edit ? 'btn-default' : 'btn-primary' ).'">'.T_('Send Message').'</button></a>';
 		}
 	}
 
@@ -256,7 +256,7 @@ echo '<div class="profile_column_left">';
 		}
 	}
 
-	if( $user_perms_edit )
+	if( $user_perms_backoffice_edit )
 	{ // Current user can edit other user's profiles
 		global $admin_url;
 
