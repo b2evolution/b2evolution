@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-08-25 17:38+0200\n"
+"POT-Creation-Date: 2017-08-25 22:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Erika <inactive+erikap@transifex.com>, 2017\n"
 "Language-Team: French (France) (https://www.transifex.com/fplanque/teams/23/fr_FR/)\n"
@@ -8450,7 +8450,7 @@ msgstr "Derniers Commentaires Meta"
 
 #: ../../../inc/collections/coll_settings.ctrl.php:760
 #: ../../../inc/items/items.ctrl.php:514
-#: ../inc/items/model/_item.class.php:8719
+#: ../inc/items/model/_item.class.php:8718
 msgid "New post"
 msgstr "Nouveau post"
 
@@ -13263,17 +13263,17 @@ msgid "%d prerendered content"
 msgstr "%d contenus pré-formattés"
 
 #: ../../../inc/comments/model/_comment.class.php:759
-#: ../../../inc/items/model/_item.class.php:9603
+#: ../../../inc/items/model/_item.class.php:9602
 msgid "Negative"
 msgstr "Négatif"
 
 #: ../../../inc/comments/model/_comment.class.php:763
-#: ../../../inc/items/model/_item.class.php:9607
+#: ../../../inc/items/model/_item.class.php:9606
 msgid "UNDECIDED"
 msgstr "INDECIS"
 
 #: ../../../inc/comments/model/_comment.class.php:771
-#: ../../../inc/items/model/_item.class.php:9615
+#: ../../../inc/items/model/_item.class.php:9614
 msgid "Positive"
 msgstr "Positif"
 
@@ -13373,7 +13373,7 @@ msgid "You sent a \"no opinion\" vote."
 msgstr "Vous avez voté \"sans opinion\"."
 
 #: ../../../inc/comments/model/_comment.class.php:1924
-#: ../../../inc/items/model/_item.class.php:9346
+#: ../../../inc/items/model/_item.class.php:9345
 msgid "No user votes yet."
 msgstr "Pas encore de votes utilisateur."
 
@@ -13674,18 +13674,18 @@ msgstr "[%s] Nouveau commentaire sur \"%s\""
 msgid "[%s] Spam comment may need moderation on \"%s\""
 msgstr "[%s] Commentaire Spam en attente de modération potentielle sur \"%s\""
 
-#: ../../../inc/comments/model/_comment.class.php:4565
-#: ../../../inc/comments/model/_comment.class.php:4569
+#: ../../../inc/comments/model/_comment.class.php:4539
+#: ../../../inc/comments/model/_comment.class.php:4543
 #: ../../../inc/comments/model/_comment.funcs.php:898
 msgid "Reply to this comment"
 msgstr "Répondre à ce commentaire"
 
-#: ../../../inc/comments/model/_comment.class.php:4565
+#: ../../../inc/comments/model/_comment.class.php:4539
 #: ../../../inc/comments/model/_comment.funcs.php:906
 msgid "You are currently replying to this comment"
 msgstr "Vous répondez actuellement à ce commentaire"
 
-#: ../../../inc/comments/model/_comment.class.php:4873
+#: ../../../inc/comments/model/_comment.class.php:4847
 #, php-format
 msgid ""
 "Since the parent post of this comment have its visibility set to \"%s\", the"
@@ -18180,29 +18180,29 @@ msgstr ""
 "emails et d'autres endroits où vous avez besoin d'une adresse courte pour ce"
 " post"
 
-#: ../../../inc/items/model/_item.class.php:8714
+#: ../../../inc/items/model/_item.class.php:8713
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:64
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:442
 #: ../../../skins/pureforums_skin/_legend.inc.php:64
 msgid "New topic"
 msgstr "Nouveau sujet"
 
-#: ../../../inc/items/model/_item.class.php:8715
+#: ../../../inc/items/model/_item.class.php:8714
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:68
 #: ../../../skins/pureforums_skin/_legend.inc.php:68
 msgid "Updated topic"
 msgstr "Sujet mis à jour"
 
-#: ../../../inc/items/model/_item.class.php:8720
+#: ../../../inc/items/model/_item.class.php:8719
 msgid "Updated post"
 msgstr "Post mis à jour"
 
-#: ../../../inc/items/model/_item.class.php:8827
+#: ../../../inc/items/model/_item.class.php:8826
 msgid "Do you want to save your changes before changing the Post Type?"
 msgstr ""
 "Voulez-vous enregistrer vos changements avant de changer de type de post?"
 
-#: ../../../inc/items/model/_item.class.php:9090
+#: ../../../inc/items/model/_item.class.php:9089
 #, php-format
 msgid ""
 "Since this collection is \"Private\", the visibility of this post will be "
@@ -18211,7 +18211,7 @@ msgstr ""
 "Etant donné que cette collection est \"Privée\", la visibilité de ce post "
 "sera restreinte à \"%s\"."
 
-#: ../../../inc/items/model/_item.class.php:9094
+#: ../../../inc/items/model/_item.class.php:9093
 #, php-format
 msgid ""
 "Since this collection is \"Members only\", the visibility of this post will "
@@ -18220,7 +18220,7 @@ msgstr ""
 "Etant donné que cette collection est \"Réservée aux Membres\", la visibilité"
 " de ce post sera restreinte à \"%s\"."
 
-#: ../../../inc/items/model/_item.class.php:9099
+#: ../../../inc/items/model/_item.class.php:9098
 #, php-format
 msgid ""
 "Since this collection is \"Community only\", the visibility of this post "
@@ -18229,58 +18229,58 @@ msgstr ""
 "Etant donné que cette collection est \"Réservée à la Communauté\", la "
 "visibilité de ce post sera restreinte à \"%s\"."
 
-#: ../../../inc/items/model/_item.class.php:9200
+#: ../../../inc/items/model/_item.class.php:9199
 msgid "Click to flag this."
 msgstr "Cliquer pour marquer ceci."
 
-#: ../../../inc/items/model/_item.class.php:9201
+#: ../../../inc/items/model/_item.class.php:9200
 msgid "You have flagged this. Click to remove flag."
 msgstr "Vous avez marqué ceci. Cliquez pour démarquer."
 
-#: ../../../inc/items/model/_item.class.php:9339
+#: ../../../inc/items/model/_item.class.php:9338
 #: ../../../inc/users/model/_user.funcs.php:3967
 #: ../../../inc/widgets/widgets/_item_vote.widget.php:90
 msgid "My vote:"
 msgstr "Mon vote:"
 
-#: ../../../inc/items/model/_item.class.php:9340
+#: ../../../inc/items/model/_item.class.php:9339
 msgid "Cast a positive vote!"
 msgstr "Voter positivement!"
 
-#: ../../../inc/items/model/_item.class.php:9341
+#: ../../../inc/items/model/_item.class.php:9340
 msgid "You sent a positive vote."
 msgstr "Vous avez envoyé un vote positif."
 
-#: ../../../inc/items/model/_item.class.php:9342
+#: ../../../inc/items/model/_item.class.php:9341
 msgid "Cast a neutral vote!"
 msgstr "Voter de manière neutre!"
 
-#: ../../../inc/items/model/_item.class.php:9343
+#: ../../../inc/items/model/_item.class.php:9342
 msgid "You sent a neutral vote."
 msgstr "Vous avez envoyé un vote neutre."
 
-#: ../../../inc/items/model/_item.class.php:9344
+#: ../../../inc/items/model/_item.class.php:9343
 msgid "Cast a negative vote!"
 msgstr "Voter négativement!"
 
-#: ../../../inc/items/model/_item.class.php:9345
+#: ../../../inc/items/model/_item.class.php:9344
 msgid "You sent a negative vote."
 msgstr "Vous avez envoyé un vote négatif."
 
-#: ../../../inc/items/model/_item.class.php:9368
+#: ../../../inc/items/model/_item.class.php:9367
 msgid "Voting:"
 msgstr "Votes:"
 
-#: ../../../inc/items/model/_item.class.php:9595
+#: ../../../inc/items/model/_item.class.php:9594
 #, php-format
 msgid "%s Likes"
 msgstr "%s \"j'aime\""
 
-#: ../../../inc/items/model/_item.class.php:9595
+#: ../../../inc/items/model/_item.class.php:9594
 msgid "No likes"
 msgstr "Pas de \"j'aime\""
 
-#: ../../../inc/items/model/_item.class.php:9767
+#: ../../../inc/items/model/_item.class.php:9766
 msgid "Refresh \"contents last updated\" timestamp!"
 msgstr "Rafraîchir la date de \"dernière mise à jour des contenus\"!"
 
@@ -18483,7 +18483,7 @@ msgstr "<a %s>Meta commentaire</a> sur %s"
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:163
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:328
 msgid "Last touched"
-msgstr ""
+msgstr "Dernier touché"
 
 #: ../../../inc/items/model/_item.funcs.php:3396
 msgid "EXPIRED"
@@ -27875,7 +27875,7 @@ msgstr ""
 
 #: ../../../inc/tools/tools.ctrl.php:284
 msgid "Item versions table already empty."
-msgstr ""
+msgstr "La table des versions d'Item est déjà vide."
 
 #: ../../../inc/tools/tools.ctrl.php:337
 msgid "\"How many base domains\" field must be a number"
@@ -28098,11 +28098,11 @@ msgstr ""
 
 #: ../../../inc/tools/views/_delete_item_versions.form.php:16
 msgid "Clear all item versions?"
-msgstr ""
+msgstr "Supprimer toutes les versions d'items?"
 
 #: ../../../inc/tools/views/_delete_item_versions.form.php:23
 msgid "You are about to empty the item versions table."
-msgstr ""
+msgstr "Vous êtes sur le point de supprimer toutes les versions d'items."
 
 #: ../../../inc/tools/views/_email_address.form.php:27
 msgid "New email address"
@@ -28219,7 +28219,7 @@ msgstr "Modifier cette adresse email..."
 
 #: ../../../inc/tools/views/_email_other.form.php:42
 msgid "Campaign/Newsletter throttling"
-msgstr ""
+msgstr "Vitesse d'envoi des Campagnes/Newsletters"
 
 #: ../../../inc/tools/views/_email_other.form.php:46
 msgid "Press \"Next\" after each chunk"
@@ -28450,11 +28450,11 @@ msgstr "Connexion au serveur SMTP"
 
 #: ../../../inc/tools/views/_email_smtp.form.php:50
 msgid "Send test email via SMTP"
-msgstr ""
+msgstr "Envoyer email de test par SMTP"
 
 #: ../../../inc/tools/views/_email_smtp.form.php:51
 msgid "Send test email via PHP"
-msgstr ""
+msgstr "Envoyer email de test par PHP"
 
 #: ../../../inc/tools/views/_email_smtp.form.php:65
 msgid "Email service settings"
@@ -28462,11 +28462,11 @@ msgstr "Réglages de service d'email"
 
 #: ../../../inc/tools/views/_email_smtp.form.php:68
 msgid "Regular PHP <code>mail()</code> function"
-msgstr ""
+msgstr "Fonction <code>mail</code> standard de PHP"
 
 #: ../../../inc/tools/views/_email_smtp.form.php:69
 msgid "External SMTP Server defined below"
-msgstr ""
+msgstr "Serveur SMTP externe défini ci-dessous"
 
 #: ../../../inc/tools/views/_email_smtp.form.php:70
 msgid "Primary email service"
@@ -28486,16 +28486,16 @@ msgstr ""
 
 #: ../../../inc/tools/views/_email_smtp.form.php:76
 msgid "PHP <code>mail()</code> function settings"
-msgstr ""
+msgstr "Paramètres de la fonction <code>mail()</code> de PHP"
 
 #: ../../../inc/tools/views/_email_smtp.form.php:84
 #, php-format
 msgid "Allowed placeholders: %s"
-msgstr ""
+msgstr "Variables autorisées: %s"
 
 #: ../../../inc/tools/views/_email_smtp.form.php:85
 msgid "Sendmail additional params"
-msgstr ""
+msgstr "Paramètres additionnels de sendmail"
 
 #: ../../../inc/tools/views/_email_smtp.form.php:90
 msgid "SMTP Server connection settings"
@@ -29147,11 +29147,11 @@ msgstr "Impossible de supprimer le groupe &laquo;%s&raquo;"
 
 #: ../../../inc/users/groups.ctrl.php:271
 msgid "General Permissions"
-msgstr ""
+msgstr "Permissions Générales"
 
 #: ../../../inc/users/groups.ctrl.php:274
 msgid "Collection Permissions"
-msgstr ""
+msgstr "Permissions de la collection"
 
 #: ../../../inc/users/groups.ctrl.php:340
 #, php-format
@@ -35403,7 +35403,7 @@ msgstr ""
 
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:181
 msgid "Edit link"
-msgstr ""
+msgstr "Lien modifier"
 
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:182
 msgid "Display link to edit the item/post"
