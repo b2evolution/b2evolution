@@ -5027,6 +5027,11 @@ class User extends DataObject
 			return false;
 		}
 
+		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) )
+		{	// Only moderators can update user status:
+			return false;
+		}
+
 		if( $dbsave )
 		{ // save required
 			$DB->begin();
