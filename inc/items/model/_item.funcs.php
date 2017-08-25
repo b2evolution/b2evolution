@@ -3369,7 +3369,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 
 		echo '<span class="bDate">';
 		$Comment->date();
-		echo '</span>@<span class = "bTime">';
+		echo '</span> @ <span class = "bTime">';
 		$Comment->time( '#short_time' );
 		echo '</span>';
 
