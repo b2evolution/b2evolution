@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-08-24 02:46+0200\n"
+"POT-Creation-Date: 2017-08-25 17:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -120,7 +120,7 @@ msgstr ""
 #: ../../../inc/links/model/_link.funcs.php:201
 #: ../../../inc/links/model/_link.funcs.php:202
 #: ../../../inc/tools/views/_wpxml_file.form.php:41
-#: ../../../inc/users/model/_user.funcs.php:5313
+#: ../../../inc/users/model/_user.funcs.php:5315
 msgid "Refresh"
 msgstr ""
 
@@ -153,7 +153,7 @@ msgstr ""
 #: ../../../inc/tools/views/_email_address.view.php:65
 #: ../../../inc/tools/views/_email_return.view.php:84
 #: ../../../inc/tools/views/_email_sent.view.php:84
-#: ../../../inc/users/model/_user.funcs.php:5946
+#: ../../../inc/users/model/_user.funcs.php:5948
 #: ../../../inc/users/views/_user_admin.form.php:142
 #: ../../../inc/users/views/_user_admin.form.php:144
 #: ../../../inc/users/views/_user_identity.form.php:148
@@ -189,8 +189,8 @@ msgstr ""
 msgid "WWW"
 msgstr ""
 
-#: ../../../conf/_icons.php:363 ../inc/users/model/_user.funcs.php:5705
-#: ../../../inc/users/model/_user.funcs.php:5706
+#: ../../../conf/_icons.php:363 ../inc/users/model/_user.funcs.php:5707
+#: ../../../inc/users/model/_user.funcs.php:5708
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:305
 #: ../../../skins/touch/_item_comment_form.inc.php:245
 #: ../../../skins_email/comment_new.txt.php:67
@@ -206,8 +206,8 @@ msgstr ""
 #: ../../../inc/collections/collections.ctrl.php:71
 #: ../../../inc/files/views/_file_list.inc.php:795
 #: ../../../inc/items/views/_file_create_posts.form.php:154
-#: ../../../inc/users/model/_user.funcs.php:3588
-#: ../../../inc/users/model/_user.funcs.php:3631
+#: ../../../inc/users/model/_user.funcs.php:3590
+#: ../../../inc/users/model/_user.funcs.php:3633
 #: ../../../skins_email/account_changed.html.php:33
 #: ../../../skins_email/account_changed.txt.php:35
 msgid "New"
@@ -255,7 +255,7 @@ msgstr ""
 #: ../../../inc/items/model/_item.funcs.php:3446
 #: ../../../inc/items/views/_item_list_full.view.php:328
 #: ../../../inc/locales/_locale_settings.form.php:296
-#: ../../../inc/users/model/_user.funcs.php:4632
+#: ../../../inc/users/model/_user.funcs.php:4634
 #: ../../../inc/users/views/_organization_user_edit.form.php:59
 msgid "Edit"
 msgstr ""
@@ -325,11 +325,11 @@ msgstr ""
 msgid "Deactivate"
 msgstr ""
 
-#: ../../../conf/_icons.php:619 ../inc/users/model/_user.funcs.php:3629
+#: ../../../conf/_icons.php:619 ../inc/users/model/_user.funcs.php:3631
 msgid "Activated"
 msgstr ""
 
-#: ../../../conf/_icons.php:627 ../inc/users/model/_user.funcs.php:3632
+#: ../../../conf/_icons.php:627 ../inc/users/model/_user.funcs.php:3634
 msgid "Deactivated"
 msgstr ""
 
@@ -599,7 +599,7 @@ msgstr ""
 #: ../../../inc/locales/views/_translation.form.php:43
 #: ../../../inc/messaging/views/_contact_list.view.php:460
 #: ../../../inc/plugins/_plugin.funcs.php:460
-#: ../../../inc/users/model/_user.funcs.php:4605
+#: ../../../inc/users/model/_user.funcs.php:4607
 #: ../../../inc/users/views/_organization_user.form.php:47
 #: ../../../inc/users/views/_user_identity.form.php:601
 msgid "Add"
@@ -616,21 +616,21 @@ msgid "Action for selected elements"
 msgstr ""
 
 #: ../../../conf/_icons.php:1097 ../htsrv/viewfile.php:152
-#: ../../../inc/users/model/_user.class.php:5245
+#: ../../../inc/users/model/_user.class.php:5255
 msgid "Rotate this picture 90&deg; to the right"
 msgstr ""
 
 #: ../../../conf/_icons.php:1103 ../htsrv/viewfile.php:150
-#: ../../../inc/users/model/_user.class.php:5243
+#: ../../../inc/users/model/_user.class.php:5253
 msgid "Rotate this picture 90&deg; to the left"
 msgstr ""
 
 #: ../../../conf/_icons.php:1109 ../htsrv/viewfile.php:151
-#: ../../../inc/users/model/_user.class.php:5244
+#: ../../../inc/users/model/_user.class.php:5254
 msgid "Rotate this picture 180&deg;"
 msgstr ""
 
-#: ../../../conf/_icons.php:1115 ../inc/users/model/_user.class.php:5416
+#: ../../../conf/_icons.php:1115 ../inc/users/model/_user.class.php:5426
 msgid "Crop this picture"
 msgstr ""
 
@@ -789,11 +789,11 @@ msgstr ""
 #: ../../../inc/files/views/_file_list.inc.php:345
 #: ../../../inc/files/views/_file_list.inc.php:608
 #: ../../../inc/tools/views/_phpbb_groups.form.php:84
-#: ../../../inc/users/model/_user.funcs.php:3373
+#: ../../../inc/users/model/_user.funcs.php:3375
 msgid "Select"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:785 ../inc/users/model/_user.funcs.php:3375
+#: ../../../htsrv/anon_async.php:785 ../inc/users/model/_user.funcs.php:3377
 msgid "Specific criteria"
 msgstr ""
 
@@ -847,7 +847,7 @@ msgstr ""
 msgid "Comment cannot be updated!"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:1110 ../inc/users/model/_user.funcs.php:5539
+#: ../../../htsrv/anon_async.php:1110 ../inc/users/model/_user.funcs.php:5541
 #: ../../../inc/users/views/_organization_user.form.php:42
 #: ../../../inc/users/views/_organization_user_edit.form.php:49
 #: ../../../inc/users/views/_organization_user_edit.form.php:53
@@ -857,7 +857,7 @@ msgstr ""
 msgid "Role"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:1125 ../inc/users/model/_user.funcs.php:3341
+#: ../../../htsrv/anon_async.php:1125 ../inc/users/model/_user.funcs.php:3343
 #: ../../../inc/users/organizations.ctrl.php:41
 #: ../../../inc/users/views/_organization.form.php:38
 #: ../../../inc/users/views/_user_identity.form.php:406
@@ -865,14 +865,14 @@ msgstr ""
 msgid "Organization"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:1189 ../inc/users/model/_user.funcs.php:5445
-#: ../../../inc/users/model/_user.funcs.php:6174
+#: ../../../htsrv/anon_async.php:1189 ../inc/users/model/_user.funcs.php:5447
+#: ../../../inc/users/model/_user.funcs.php:6176
 #: ../../../inc/users/views/_organization_user.form.php:38
 #: ../../../inc/users/views/_organization_user_edit.form.php:43
 msgid "Accepted"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:1193 ../inc/users/model/_user.funcs.php:6178
+#: ../../../htsrv/anon_async.php:1193 ../inc/users/model/_user.funcs.php:6180
 msgid "Not accepted"
 msgstr ""
 
@@ -1050,7 +1050,7 @@ msgstr ""
 #: ../../../inc/tools/views/_create_users.form.php:21
 #: ../../../inc/tools/views/_delete_item_versions.form.php:37
 #: ../../../inc/tools/views/_misc_tools.view.php:80
-#: ../../../inc/users/model/_user.funcs.php:4431
+#: ../../../inc/users/model/_user.funcs.php:4433
 #: ../../../inc/widgets/views/_widget_list_available.view.php:18
 #: ../../../install/index.php:780 ../install/index.php:923 ../install/index.php:1291
 #: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:416
@@ -1111,13 +1111,13 @@ msgstr ""
 #: ../../../inc/items/views/_item_expert.form.php:825
 #: ../../../inc/links/model/_link.funcs.php:236
 #: ../../../inc/tools/views/_wpxml_file.form.php:199
-#: ../../../inc/users/model/_user.funcs.php:4379
-#: ../../../inc/users/model/_user.funcs.php:4402
-#: ../../../inc/users/model/_user.funcs.php:4424
-#: ../../../inc/users/model/_user.funcs.php:4450
-#: ../../../inc/users/model/_user.funcs.php:4603
-#: ../../../inc/users/model/_user.funcs.php:4630
-#: ../../../inc/users/model/_user.funcs.php:4658
+#: ../../../inc/users/model/_user.funcs.php:4381
+#: ../../../inc/users/model/_user.funcs.php:4404
+#: ../../../inc/users/model/_user.funcs.php:4426
+#: ../../../inc/users/model/_user.funcs.php:4452
+#: ../../../inc/users/model/_user.funcs.php:4605
+#: ../../../inc/users/model/_user.funcs.php:4632
+#: ../../../inc/users/model/_user.funcs.php:4660
 #: ../../../inc/users/views/_user_identity.form.php:278
 msgid "Loading..."
 msgstr ""
@@ -1370,7 +1370,7 @@ msgstr ""
 msgid "Since you are an Admin with User management privileges, you cannot close your own account!"
 msgstr ""
 
-#: ../../../htsrv/login.php:99 ../inc/users/model/_user.class.php:5072
+#: ../../../htsrv/login.php:99 ../inc/users/model/_user.class.php:5082
 msgid "User account closed"
 msgstr ""
 
@@ -1998,7 +1998,7 @@ msgstr ""
 #: ../../../inc/tools/views/_email_address.view.php:206
 #: ../../../inc/users/account_close.ctrl.php:62 ../inc/users/display.ctrl.php:102
 #: ../../../inc/users/groups.ctrl.php:240 ../inc/users/invitations.ctrl.php:201
-#: ../../../inc/users/model/_user.funcs.php:5163
+#: ../../../inc/users/model/_user.funcs.php:5165
 #: ../../../inc/users/organizations.ctrl.php:295
 #: ../../../inc/users/registration.ctrl.php:176 ../inc/users/settings.ctrl.php:133
 #: ../../../inc/users/user.ctrl.php:752 ../inc/users/userfields.ctrl.php:246
@@ -2155,7 +2155,7 @@ msgstr ""
 #: ../../../inc/sessions/views/_stats_topips.view.php:82
 #: ../../../inc/tools/system.ctrl.php:32
 #: ../../../inc/tools/views/_email_address.view.php:113
-#: ../../../inc/users/model/_user.funcs.php:5770
+#: ../../../inc/users/model/_user.funcs.php:5772
 #: ../../../inc/users/views/_user_admin.form.php:152
 #: ../../../inc/users/views/_user_admin.form.php:157
 #: ../../../inc/users/views/_user_admin.form.php:405
@@ -2628,10 +2628,10 @@ msgstr ""
 #: ../../../inc/sessions/views/_stats_summary.view.php:229
 #: ../../../inc/sessions/views/_stats_view.funcs.php:234
 #: ../../../inc/tools/email.ctrl.php:579 ../inc/users/model/_user.class.php:4220
-#: ../../../inc/users/model/_user.class.php:5046
-#: ../../../inc/users/model/_user.funcs.php:3245
-#: ../../../inc/users/model/_user.funcs.php:3684
-#: ../../../inc/users/model/_user.funcs.php:5284
+#: ../../../inc/users/model/_user.class.php:5056
+#: ../../../inc/users/model/_user.funcs.php:3247
+#: ../../../inc/users/model/_user.funcs.php:3686
+#: ../../../inc/users/model/_user.funcs.php:5286
 #: ../../../inc/users/views/_user_identity.form.php:274
 #: ../../../inc/widgets/views/_widget_list_available.view.php:58
 #: ../../../skins_adm/bootstrap/_adminUI.class.php:850
@@ -3081,7 +3081,7 @@ msgstr ""
 #: ../../../inc/sessions/views/_stats_refdomains.form.php:37
 #: ../../../inc/skins/views/_skin_list.view.php:36
 #: ../../../inc/skins/views/_skin_list.view.php:44
-#: ../../../inc/users/model/_user.funcs.php:3241
+#: ../../../inc/users/model/_user.funcs.php:3243
 #: ../../../inc/users/views/_group.form.php:118
 #: ../../../inc/users/views/_group.view.php:68
 #: ../../../inc/users/views/_organization.form.php:53
@@ -3349,7 +3349,7 @@ msgstr ""
 
 #: ../../../inc/_core/_template.funcs.php:430
 #: ../../../inc/collections/views/_coll_home.form.php:45
-#: ../../../inc/users/model/_user.funcs.php:5700
+#: ../../../inc/users/model/_user.funcs.php:5702
 #: ../../../inc/widgets/widgets/_basic_menu_link.widget.php:368
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:258
 #: ../../../skins/asevo/_body_footer.inc.php:33
@@ -3824,8 +3824,8 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_user_perm.form.php:115
 #: ../../../inc/maintenance/views/_upgrade_svn.form.php:28
 #: ../../../inc/messaging/views/_contact_list.view.php:286
-#: ../../../inc/users/model/_user.class.php:6446
-#: ../../../inc/users/model/_user.funcs.php:5480
+#: ../../../inc/users/model/_user.class.php:6451
+#: ../../../inc/users/model/_user.funcs.php:5482
 #: ../../../inc/users/views/_user_identity.form.php:251
 #: ../../../inc/users/views/_user_identity.form.php:462
 #: ../../../install/_functions_install.php:282
@@ -4017,7 +4017,7 @@ msgstr ""
 
 #. TRANS: Abbr. for "Bytes"
 #: ../../../inc/_core/_template.funcs.php:3351 ../inc/files/model/_file.funcs.php:52
-#: ../../../inc/users/model/_user.class.php:6304
+#: ../../../inc/users/model/_user.class.php:6314
 msgid "B."
 msgstr ""
 
@@ -4330,7 +4330,7 @@ msgstr ""
 
 #: ../../../inc/_core/ui/_uiwidget.class.php:577
 #: ../../../inc/files/views/_file_browse.view.php:135
-#: ../../../inc/users/model/_user.funcs.php:4426
+#: ../../../inc/users/model/_user.funcs.php:4428
 #: ../../../inc/users/views/_user_crop.form.php:145
 msgid "Apply"
 msgstr ""
@@ -4510,8 +4510,8 @@ msgstr ""
 #: ../../../inc/_core/ui/results/_results.class.php:2365
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:128
 #: ../../../inc/sessions/views/_stats_search_keywords.view.php:179
-#: ../../../inc/users/model/_user.funcs.php:3327
-#: ../../../inc/users/model/_user.funcs.php:3332
+#: ../../../inc/users/model/_user.funcs.php:3329
+#: ../../../inc/users/model/_user.funcs.php:3334
 #: ../../../inc/users/views/_display.form.php:151
 #: ../../../inc/users/views/_user_identity.form.php:338
 #: ../../../inc/users/views/_user_identity.form.php:500
@@ -4919,10 +4919,10 @@ msgstr ""
 #: ../../../inc/tools/views/_email_address.view.php:76
 #: ../../../inc/tools/views/_email_return.view.php:89
 #: ../../../inc/tools/views/_email_sent.view.php:89
-#: ../../../inc/users/model/_user.funcs.php:3256
-#: ../../../inc/users/model/_user.funcs.php:3275
-#: ../../../inc/users/model/_user.funcs.php:3296
-#: ../../../inc/users/model/_user.funcs.php:3337
+#: ../../../inc/users/model/_user.funcs.php:3258
+#: ../../../inc/users/model/_user.funcs.php:3277
+#: ../../../inc/users/model/_user.funcs.php:3298
+#: ../../../inc/users/model/_user.funcs.php:3339
 #: ../../../inc/users/views/_userfields.view.php:114
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:99
 #: ../../../inc/widgets/widgets/_coll_featured_posts.widget.php:52
@@ -5254,8 +5254,8 @@ msgstr ""
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:205
 #: ../../../inc/collections/views/_coll_user_dir.form.php:47
-#: ../../../inc/users/model/_user.class.php:6449
-#: ../../../inc/users/model/_user.funcs.php:5491
+#: ../../../inc/users/model/_user.class.php:6454
+#: ../../../inc/users/model/_user.funcs.php:5493
 #: ../../../inc/users/views/_settings.form.php:62
 #: ../../../inc/users/views/_user_identity.form.php:256
 #: ../../../inc/users/views/_user_identity.form.php:463
@@ -5267,8 +5267,8 @@ msgstr ""
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:206
 #: ../../../inc/collections/views/_coll_user_dir.form.php:48
-#: ../../../inc/users/model/_user.class.php:6450
-#: ../../../inc/users/model/_user.funcs.php:5500
+#: ../../../inc/users/model/_user.class.php:6455
+#: ../../../inc/users/model/_user.funcs.php:5502
 #: ../../../inc/users/views/_settings.form.php:64
 #: ../../../inc/users/views/_user_identity.form.php:262
 #: ../../../inc/users/views/_user_identity.form.php:464
@@ -5279,8 +5279,8 @@ msgstr ""
 #: ../../../inc/antispam/views/_antispam_ban.form.php:207
 #: ../../../inc/collections/views/_coll_user_dir.form.php:49
 #: ../../../inc/messaging/views/_contact_list.view.php:304
-#: ../../../inc/users/model/_user.class.php:6448
-#: ../../../inc/users/model/_user.funcs.php:5512
+#: ../../../inc/users/model/_user.class.php:6453
+#: ../../../inc/users/model/_user.funcs.php:5514
 #: ../../../inc/users/views/_settings.form.php:60
 #: ../../../inc/users/views/_user_identity.form.php:268
 #: ../../../inc/users/views/_user_identity.form.php:465
@@ -5421,7 +5421,7 @@ msgstr ""
 #: ../../../inc/tools/views/_email_address.view.php:98
 #: ../../../inc/tools/views/_email_return.view.php:94
 #: ../../../inc/tools/views/_email_sent.view.php:94
-#: ../../../inc/users/model/_user.funcs.php:5457
+#: ../../../inc/users/model/_user.funcs.php:5459
 #: ../../../inc/users/views/_group.form.php:102
 #: ../../../inc/users/views/_group.view.php:57
 #: ../../../inc/users/views/_invitation.view.php:41
@@ -5530,9 +5530,9 @@ msgstr ""
 #: ../../../inc/slugs/views/_slug_list.view.php:217
 #: ../../../inc/tools/views/_email_address.view.php:214
 #: ../../../inc/tools/views/_email_return.view.php:136
-#: ../../../inc/users/model/_user.funcs.php:5139
-#: ../../../inc/users/model/_user.funcs.php:5799
-#: ../../../inc/users/model/_user.funcs.php:5809
+#: ../../../inc/users/model/_user.funcs.php:5141
+#: ../../../inc/users/model/_user.funcs.php:5801
+#: ../../../inc/users/model/_user.funcs.php:5811
 #: ../../../inc/users/views/_group.view.php:173
 #: ../../../inc/users/views/_invitation.view.php:119
 #: ../../../inc/users/views/_organization.view.php:126
@@ -5606,7 +5606,7 @@ msgstr ""
 
 #: ../../../inc/antispam/views/_antispam_list.view.php:100
 #: ../../../inc/antispam/views/_antispam_list.view.php:143
-#: ../../../inc/users/model/_user.funcs.php:5640
+#: ../../../inc/users/model/_user.funcs.php:5642
 #: ../../../inc/users/views/_invitation.view.php:97
 #: ../../../inc/users/views/_user_identity.form.php:446
 msgid "Source"
@@ -6101,7 +6101,7 @@ msgstr ""
 #: ../../../inc/items/item_types.ctrl.php:288 ../inc/items/items.ctrl.php:426
 #: ../../../inc/items/model/_item.funcs.php:2220 ../inc/skins/skins.ctrl.php:285
 #: ../../../inc/skins/views/_skin_list.view.php:64
-#: ../../../inc/users/model/_user.funcs.php:5628
+#: ../../../inc/users/model/_user.funcs.php:5630
 #: ../../../inc/users/views/_group.form.php:152 ../inc/widgets/widgets.ctrl.php:613
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:103
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:142
@@ -6405,7 +6405,7 @@ msgstr ""
 
 #: ../../../inc/collections/_collections.init.php:791
 #: ../../../inc/collections/views/_coll_user_dir.form.php:64
-#: ../../../inc/users/model/_user.funcs.php:5610
+#: ../../../inc/users/model/_user.funcs.php:5612
 msgid "Phone"
 msgstr ""
 
@@ -6594,7 +6594,7 @@ msgid ""
 msgstr ""
 
 #: ../../../inc/collections/_demo_content.funcs.php:129
-#: ../../../install/_functions_create.php:1798
+#: ../../../install/_functions_create.php:1799
 msgid ""
 "Heading\n"
 "=======\n"
@@ -7615,7 +7615,7 @@ msgid "Latest Meta Comments"
 msgstr ""
 
 #: ../../../inc/collections/coll_settings.ctrl.php:760
-#: ../../../inc/items/items.ctrl.php:514 ../inc/items/model/_item.class.php:8718
+#: ../../../inc/items/items.ctrl.php:514 ../inc/items/model/_item.class.php:8719
 msgid "New post"
 msgstr ""
 
@@ -8727,7 +8727,7 @@ msgstr ""
 #: ../../../inc/collections/model/_blog.funcs.php:2251
 #: ../../../inc/items/views/_item_history_compare.view.php:45
 #: ../../../inc/items/views/_item_history_compare.view.php:57
-#: ../../../inc/users/model/_user.funcs.php:3759
+#: ../../../inc/users/model/_user.funcs.php:3761
 msgid "View"
 msgstr ""
 
@@ -10074,14 +10074,14 @@ msgstr ""
 #: ../../../inc/items/views/_itemtags.view.php:60
 #: ../../../inc/sessions/views/_stats_refdomains.view.php:110
 #: ../../../inc/slugs/views/_slug_list.view.php:59
-#: ../../../inc/users/model/_user.funcs.php:5298
+#: ../../../inc/users/model/_user.funcs.php:5300
 #: ../../../inc/users/views/_group_coll_perm.form.php:59
 msgid "Reset filters"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_group_perm.form.php:86
 #: ../../../inc/collections/views/_coll_user_perm.form.php:93
-#: ../../../inc/users/model/_user.funcs.php:5281
+#: ../../../inc/users/model/_user.funcs.php:5283
 #: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:157
 msgid "All users"
 msgstr ""
@@ -10381,7 +10381,7 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_perm_view.funcs.php:714
 #: ../../../inc/files/views/_file_list.inc.php:149
 #: ../../../inc/messaging/views/_contact_list.view.php:121
-#: ../../../inc/users/groups.ctrl.php:66 ../inc/users/model/_user.class.php:6447
+#: ../../../inc/users/groups.ctrl.php:66 ../inc/users/model/_user.class.php:6452
 #: ../../../inc/users/views/_invitation.view.php:81
 #: ../../../inc/users/views/_userfield.form.php:39
 msgid "Group"
@@ -11599,7 +11599,7 @@ msgid "Single post URLs"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:50
-#: ../../../inc/users/model/_user.funcs.php:5524
+#: ../../../inc/users/model/_user.funcs.php:5526
 #: ../../../skins_email/account_activated.html.php:47
 #: ../../../skins_email/account_activated.txt.php:43
 #: ../../../skins_email/account_new.html.php:44
@@ -11625,10 +11625,10 @@ msgstr ""
 #: ../../../inc/regional/views/_subregion_list.view.php:150
 #: ../../../inc/regional/views/_subregion_list.view.php:163
 #: ../../../inc/sessions/views/_stats_topips.view.php:74
-#: ../../../inc/users/model/_user.class.php:6452
-#: ../../../inc/users/model/_user.funcs.php:3290
-#: ../../../inc/users/model/_user.funcs.php:3297
-#: ../../../inc/users/model/_user.funcs.php:5563
+#: ../../../inc/users/model/_user.class.php:6457
+#: ../../../inc/users/model/_user.funcs.php:3292
+#: ../../../inc/users/model/_user.funcs.php:3299
+#: ../../../inc/users/model/_user.funcs.php:5565
 #: ../../../inc/users/views/_settings.form.php:72
 #: ../../../inc/users/views/_user_identity.form.php:286
 #: ../../../inc/users/views/_user_identity.form.php:477
@@ -11659,9 +11659,9 @@ msgstr ""
 #: ../../../inc/regional/views/_subregion_list.view.php:134
 #: ../../../inc/regional/views/_subregion_list.view.php:155
 #: ../../../inc/regional/views/_subregion_list.view.php:168
-#: ../../../inc/users/model/_user.class.php:6453
-#: ../../../inc/users/model/_user.funcs.php:3306
-#: ../../../inc/users/model/_user.funcs.php:5577
+#: ../../../inc/users/model/_user.class.php:6458
+#: ../../../inc/users/model/_user.funcs.php:3308
+#: ../../../inc/users/model/_user.funcs.php:5579
 #: ../../../inc/users/views/_settings.form.php:74
 #: ../../../inc/users/views/_user_identity.form.php:302
 #: ../../../inc/users/views/_user_identity.form.php:483
@@ -11675,9 +11675,9 @@ msgstr ""
 #: ../../../inc/regional/views/_city_list.view.php:169
 #: ../../../inc/regional/views/_city_list.view.php:187
 #: ../../../inc/regional/views/_subregion.form.php:32
-#: ../../../inc/users/model/_user.class.php:6454
-#: ../../../inc/users/model/_user.funcs.php:3314
-#: ../../../inc/users/model/_user.funcs.php:5588
+#: ../../../inc/users/model/_user.class.php:6459
+#: ../../../inc/users/model/_user.funcs.php:3316
+#: ../../../inc/users/model/_user.funcs.php:5590
 #: ../../../inc/users/views/_settings.form.php:76
 #: ../../../inc/users/views/_user_identity.form.php:315
 #: ../../../inc/users/views/_user_identity.form.php:489
@@ -11687,9 +11687,9 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_user_dir.form.php:62
 #: ../../../inc/items/model/_item.funcs.php:3873 ../inc/regional/cities.ctrl.php:44
 #: ../../../inc/regional/views/_city.form.php:32
-#: ../../../inc/users/model/_user.class.php:6455
-#: ../../../inc/users/model/_user.funcs.php:3321
-#: ../../../inc/users/model/_user.funcs.php:5599
+#: ../../../inc/users/model/_user.class.php:6460
+#: ../../../inc/users/model/_user.funcs.php:3323
+#: ../../../inc/users/model/_user.funcs.php:5601
 #: ../../../inc/users/views/_settings.form.php:78
 #: ../../../inc/users/views/_user_identity.form.php:328
 #: ../../../inc/users/views/_user_identity.form.php:495
@@ -11697,7 +11697,7 @@ msgid "City"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:65
-#: ../../../inc/users/model/_user.funcs.php:5619
+#: ../../../inc/users/model/_user.funcs.php:5621
 msgid "Social links"
 msgstr ""
 
@@ -11873,9 +11873,9 @@ msgstr ""
 #: ../../../inc/tools/model/_email.funcs.php:1118
 #: ../../../inc/tools/model/_email.funcs.php:1119 ../inc/tools/system.ctrl.php:92
 #: ../../../inc/tools/system.ctrl.php:724 ../inc/tools/system.ctrl.php:766
-#: ../../../install/_functions_create.php:1347 ../install/_functions_create.php:1360
-#: ../../../install/_functions_create.php:1372 ../install/_functions_create.php:1384
-#: ../../../install/_functions_create.php:1396 ../install/_functions_create.php:1408
+#: ../../../install/_functions_create.php:1348 ../install/_functions_create.php:1361
+#: ../../../install/_functions_create.php:1373 ../install/_functions_create.php:1385
+#: ../../../install/_functions_create.php:1397 ../install/_functions_create.php:1409
 msgid "Failed"
 msgstr ""
 
@@ -11919,17 +11919,17 @@ msgid "%d prerendered content"
 msgstr ""
 
 #: ../../../inc/comments/model/_comment.class.php:759
-#: ../../../inc/items/model/_item.class.php:9602
+#: ../../../inc/items/model/_item.class.php:9603
 msgid "Negative"
 msgstr ""
 
 #: ../../../inc/comments/model/_comment.class.php:763
-#: ../../../inc/items/model/_item.class.php:9606
+#: ../../../inc/items/model/_item.class.php:9607
 msgid "UNDECIDED"
 msgstr ""
 
 #: ../../../inc/comments/model/_comment.class.php:771
-#: ../../../inc/items/model/_item.class.php:9614
+#: ../../../inc/items/model/_item.class.php:9615
 msgid "Positive"
 msgstr ""
 
@@ -12028,7 +12028,7 @@ msgid "You sent a \"no opinion\" vote."
 msgstr ""
 
 #: ../../../inc/comments/model/_comment.class.php:1924
-#: ../../../inc/items/model/_item.class.php:9345
+#: ../../../inc/items/model/_item.class.php:9346
 msgid "No user votes yet."
 msgstr ""
 
@@ -12311,18 +12311,18 @@ msgstr ""
 msgid "[%s] Spam comment may need moderation on \"%s\""
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:4539
-#: ../../../inc/comments/model/_comment.class.php:4543
+#: ../../../inc/comments/model/_comment.class.php:4565
+#: ../../../inc/comments/model/_comment.class.php:4569
 #: ../../../inc/comments/model/_comment.funcs.php:898
 msgid "Reply to this comment"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:4539
+#: ../../../inc/comments/model/_comment.class.php:4565
 #: ../../../inc/comments/model/_comment.funcs.php:906
 msgid "You are currently replying to this comment"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:4847
+#: ../../../inc/comments/model/_comment.class.php:4873
 #, php-format
 msgid "Since the parent post of this comment have its visibility set to \"%s\", the visibility of this comment will be restricted to \"%s\"."
 msgstr ""
@@ -12381,7 +12381,7 @@ msgstr ""
 
 #: ../../../inc/comments/model/_comment.funcs.php:343
 #: ../../../inc/items/model/_item.funcs.php:1925
-#: ../../../inc/users/model/_user.funcs.php:4404
+#: ../../../inc/users/model/_user.funcs.php:4406
 #: ../../../inc/users/views/_user_groups.form.php:65
 msgid "Save"
 msgstr ""
@@ -15054,7 +15054,7 @@ msgstr ""
 #: ../../../inc/files/views/_file_duplicates.view.php:201
 #: ../../../inc/files/views/_file_suspicious.view.php:99
 #: ../../../inc/files/views/_file_suspicious.view.php:137
-#: ../../../inc/users/model/_user.funcs.php:4216
+#: ../../../inc/users/model/_user.funcs.php:4218
 msgid "Inappropriate"
 msgstr ""
 
@@ -15062,7 +15062,7 @@ msgstr ""
 #: ../../../inc/files/views/_file_duplicates.view.php:210
 #: ../../../inc/files/views/_file_suspicious.view.php:100
 #: ../../../inc/files/views/_file_suspicious.view.php:146
-#: ../../../inc/users/model/_user.funcs.php:4224
+#: ../../../inc/users/model/_user.funcs.php:4226
 msgid "Spam"
 msgstr ""
 
@@ -16526,94 +16526,94 @@ msgstr ""
 msgid "This is a tinyurl you can copy/paste into twitter, emails and other places where you need a short link to this post"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:8713
+#: ../../../inc/items/model/_item.class.php:8714
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:64
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:442
 #: ../../../skins/pureforums_skin/_legend.inc.php:64
 msgid "New topic"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:8714
+#: ../../../inc/items/model/_item.class.php:8715
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:68
 #: ../../../skins/pureforums_skin/_legend.inc.php:68
 msgid "Updated topic"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:8719
+#: ../../../inc/items/model/_item.class.php:8720
 msgid "Updated post"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:8826
+#: ../../../inc/items/model/_item.class.php:8827
 msgid "Do you want to save your changes before changing the Post Type?"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9089
+#: ../../../inc/items/model/_item.class.php:9090
 #, php-format
 msgid "Since this collection is \"Private\", the visibility of this post will be restricted to \"%s\"."
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9093
+#: ../../../inc/items/model/_item.class.php:9094
 #, php-format
 msgid "Since this collection is \"Members only\", the visibility of this post will be restricted to \"%s\"."
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9098
+#: ../../../inc/items/model/_item.class.php:9099
 #, php-format
 msgid "Since this collection is \"Community only\", the visibility of this post will be restricted to \"%s\"."
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9199
+#: ../../../inc/items/model/_item.class.php:9200
 msgid "Click to flag this."
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9200
+#: ../../../inc/items/model/_item.class.php:9201
 msgid "You have flagged this. Click to remove flag."
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9338
-#: ../../../inc/users/model/_user.funcs.php:3965
+#: ../../../inc/items/model/_item.class.php:9339
+#: ../../../inc/users/model/_user.funcs.php:3967
 #: ../../../inc/widgets/widgets/_item_vote.widget.php:90
 msgid "My vote:"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9339
+#: ../../../inc/items/model/_item.class.php:9340
 msgid "Cast a positive vote!"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9340
+#: ../../../inc/items/model/_item.class.php:9341
 msgid "You sent a positive vote."
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9341
+#: ../../../inc/items/model/_item.class.php:9342
 msgid "Cast a neutral vote!"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9342
+#: ../../../inc/items/model/_item.class.php:9343
 msgid "You sent a neutral vote."
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9343
+#: ../../../inc/items/model/_item.class.php:9344
 msgid "Cast a negative vote!"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9344
+#: ../../../inc/items/model/_item.class.php:9345
 msgid "You sent a negative vote."
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9367
+#: ../../../inc/items/model/_item.class.php:9368
 msgid "Voting:"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9594
+#: ../../../inc/items/model/_item.class.php:9595
 #, php-format
 msgid "%s Likes"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9594
+#: ../../../inc/items/model/_item.class.php:9595
 msgid "No likes"
 msgstr ""
 
-#: ../../../inc/items/model/_item.class.php:9766
+#: ../../../inc/items/model/_item.class.php:9767
 msgid "Refresh \"contents last updated\" timestamp!"
 msgstr ""
 
@@ -17481,7 +17481,7 @@ msgstr ""
 
 #: ../../../inc/items/views/_item_expert.form.php:745
 #: ../../../inc/items/views/_item_mass.form.php:195
-#: ../../../inc/users/model/_user.funcs.php:3634
+#: ../../../inc/users/model/_user.funcs.php:3636
 #: ../../../inc/users/views/_user_stats.view.php:156
 #: ../../../inc/users/views/_user_stats.view.php:157
 #: ../../../inc/users/views/_user_stats.view.php:162
@@ -18664,7 +18664,7 @@ msgid "View this user..."
 msgstr ""
 
 #: ../../../inc/links/model/_linkuser.class.php:41
-#: ../../../inc/users/model/_user.funcs.php:6095
+#: ../../../inc/users/model/_user.funcs.php:6097
 #: ../../../inc/users/registration.ctrl.php:106
 msgid "Edit this user..."
 msgstr ""
@@ -19988,7 +19988,7 @@ msgstr ""
 #: ../../../inc/tools/views/_phpbb_topics.form.php:65
 #: ../../../inc/tools/views/_phpbb_users.form.php:72
 #: ../../../inc/tools/views/_wpxml_file.form.php:175
-#: ../../../inc/users/model/_user.funcs.php:4660
+#: ../../../inc/users/model/_user.funcs.php:4662
 #: ../../../inc/users/views/_organization_user_remove.form.php:36
 #: ../../../skins_adm/login/_login_form.main.php:29
 msgid "Continue"
@@ -20476,8 +20476,8 @@ msgid "Settings were updated."
 msgstr ""
 
 #: ../../../inc/messaging/threads.ctrl.php:64 ../inc/skins/_skin.funcs.php:810
-#: ../../../inc/skins/_skin.funcs.php:997 ../inc/users/model/_user.funcs.php:4838
-#: ../../../inc/users/model/_user.funcs.php:4972
+#: ../../../inc/skins/_skin.funcs.php:997 ../inc/users/model/_user.funcs.php:4840
+#: ../../../inc/users/model/_user.funcs.php:4974
 msgid "Please specify your country before attempting to contact other users."
 msgstr ""
 
@@ -20502,7 +20502,7 @@ msgid "Select this contact"
 msgstr ""
 
 #: ../../../inc/messaging/views/_contact_list.view.php:257
-#: ../../../inc/users/model/_user.funcs.php:5468
+#: ../../../inc/users/model/_user.funcs.php:5470
 msgid "Picture"
 msgstr ""
 
@@ -20537,7 +20537,7 @@ msgid "Rename this group to"
 msgstr ""
 
 #: ../../../inc/messaging/views/_contact_list.view.php:484
-#: ../../../inc/users/model/_user.funcs.php:5854
+#: ../../../inc/users/model/_user.funcs.php:5856
 #: ../../../inc/users/views/_group.view.php:163
 #: ../../../inc/users/views/_userfields.view.php:161
 msgid "Delete this group"
@@ -22664,7 +22664,7 @@ msgstr ""
 #: ../../../inc/sessions/views/_stats_browserhits.view.php:207
 #: ../../../inc/sessions/views/_stats_browserhits.view.php:251
 #: ../../../inc/sessions/views/_stats_sessions_list.view.php:67
-#: ../../../inc/users/model/_user.funcs.php:2514 ../inc/users/user.ctrl.php:833
+#: ../../../inc/users/model/_user.funcs.php:2516 ../inc/users/user.ctrl.php:833
 msgid "Sessions"
 msgstr ""
 
@@ -22911,7 +22911,6 @@ msgstr ""
 #: ../../../inc/sessions/views/_stats_sessions_list.view.php:20
 #: ../../../inc/users/views/_user_activity.view.php:32
 #: ../../../inc/users/views/_user_admin.form.php:28
-#: ../../../inc/users/views/_user_profile_visits.view.php:32
 msgid "You have no permission to see this tab!"
 msgstr ""
 
@@ -23441,7 +23440,7 @@ msgstr ""
 msgid "You must activate your account before you can edit comments. <b>See below:</b>"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1406 ../inc/users/model/_user.funcs.php:4887
+#: ../../../inc/skins/_skin.funcs.php:1406 ../inc/users/model/_user.funcs.php:4889
 msgid "You must log in to view this user profile."
 msgstr ""
 
@@ -23449,15 +23448,15 @@ msgstr ""
 msgid "You must activate your account before you can view this user profile. <b>See below:</b>"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1421 ../inc/users/model/_user.funcs.php:4919
+#: ../../../inc/skins/_skin.funcs.php:1421 ../inc/users/model/_user.funcs.php:4921
 msgid "Your account status currently does not permit to view this user profile."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1433 ../inc/users/model/_user.funcs.php:4940
+#: ../../../inc/skins/_skin.funcs.php:1433 ../inc/users/model/_user.funcs.php:4942
 msgid "The requested user does not exist!"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1440 ../inc/users/model/_user.funcs.php:4955
+#: ../../../inc/skins/_skin.funcs.php:1440 ../inc/users/model/_user.funcs.php:4957
 msgid "The requested user account is closed!"
 msgstr ""
 
@@ -24867,10 +24866,10 @@ msgstr ""
 msgid "User group"
 msgstr ""
 
-#: ../../../inc/tools/mtimport.ctrl.php:335 ../inc/users/model/_user.funcs.php:3330
-#: ../../../inc/users/model/_user.funcs.php:5756
-#: ../../../inc/users/model/_user.funcs.php:5787
-#: ../../../inc/users/model/_user.funcs.php:5891
+#: ../../../inc/tools/mtimport.ctrl.php:335 ../inc/users/model/_user.funcs.php:3332
+#: ../../../inc/users/model/_user.funcs.php:5758
+#: ../../../inc/users/model/_user.funcs.php:5789
+#: ../../../inc/users/model/_user.funcs.php:5893
 #: ../../../inc/users/views/_group.view.php:76
 #: ../../../inc/users/views/_invitation.view.php:89
 msgid "Level"
@@ -26867,12 +26866,12 @@ msgid "This user does not wish to be contacted directly."
 msgstr ""
 
 #: ../../../inc/users/model/_user.class.php:3978
-#: ../../../inc/users/model/_user.funcs.php:2840
+#: ../../../inc/users/model/_user.funcs.php:2842
 msgid "Activate your account: $login$"
 msgstr ""
 
 #: ../../../inc/users/model/_user.class.php:4038
-#: ../../../inc/users/model/_user.class.php:5111
+#: ../../../inc/users/model/_user.class.php:5121
 #: ../../../skins_email/account_activated.html.php:31
 #: ../../../skins_email/account_activated.txt.php:30
 msgid "New user account activated"
@@ -26887,7 +26886,7 @@ msgid "Send message to user"
 msgstr ""
 
 #: ../../../inc/users/model/_user.class.php:4214
-#: ../../../inc/users/model/_user.class.php:6480
+#: ../../../inc/users/model/_user.class.php:6485
 #: ../../../inc/users/views/_user_identity.form.php:272
 #: ../../../skins_email/account_activated.html.php:82
 #: ../../../skins_email/account_activated.txt.php:78
@@ -26899,7 +26898,7 @@ msgid "A man"
 msgstr ""
 
 #: ../../../inc/users/model/_user.class.php:4217
-#: ../../../inc/users/model/_user.class.php:6480
+#: ../../../inc/users/model/_user.class.php:6485
 #: ../../../inc/users/views/_user_identity.form.php:273
 #: ../../../skins_email/account_activated.html.php:86
 #: ../../../skins_email/account_activated.txt.php:82
@@ -26911,9 +26910,9 @@ msgid "A woman"
 msgstr ""
 
 #: ../../../inc/users/model/_user.class.php:4852
-#: ../../../inc/users/model/_user.class.php:5272
-#: ../../../inc/users/model/_user.class.php:5483
-#: ../../../inc/users/model/_user.class.php:5534
+#: ../../../inc/users/model/_user.class.php:5282
+#: ../../../inc/users/model/_user.class.php:5493
+#: ../../../inc/users/model/_user.class.php:5544
 #: ../../../plugins/twitter_plugin/_twitter.plugin.php:512
 msgid "You are only allowed to update your own profile!"
 msgstr ""
@@ -26959,155 +26958,155 @@ msgstr ""
 msgid "User feature settings have been changed."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5156
-#: ../../../inc/users/model/_user.class.php:5436
+#: ../../../inc/users/model/_user.class.php:5166
+#: ../../../inc/users/model/_user.class.php:5446
 msgid "You are not allowed to update this profile!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5162
-#: ../../../inc/users/model/_user.class.php:5171
-#: ../../../inc/users/model/_user.class.php:5177
-#: ../../../inc/users/model/_user.class.php:5489
+#: ../../../inc/users/model/_user.class.php:5172
+#: ../../../inc/users/model/_user.class.php:5181
+#: ../../../inc/users/model/_user.class.php:5187
+#: ../../../inc/users/model/_user.class.php:5499
 msgid "Profile picture could not be changed!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5195
+#: ../../../inc/users/model/_user.class.php:5205
 msgid "Profile picture has been restored."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5199
-#: ../../../inc/users/model/_user.class.php:5571
+#: ../../../inc/users/model/_user.class.php:5209
+#: ../../../inc/users/model/_user.class.php:5581
 msgid "Profile picture has been changed."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5280
+#: ../../../inc/users/model/_user.class.php:5290
 msgid "You did not specify a file."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5290
+#: ../../../inc/users/model/_user.class.php:5300
 msgid "The requested file does not exist!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5298
+#: ../../../inc/users/model/_user.class.php:5308
 msgid "The requested file doesn't belong to this user."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5333
+#: ../../../inc/users/model/_user.class.php:5343
 msgid "Profile picture could not be rotated!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5337
+#: ../../../inc/users/model/_user.class.php:5347
 msgid "Profile picture has been rotated."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5370
+#: ../../../inc/users/model/_user.class.php:5380
 msgid "Profile picture could not be cropped!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5374
+#: ../../../inc/users/model/_user.class.php:5384
 msgid "Profile picture has been cropped."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5447
+#: ../../../inc/users/model/_user.class.php:5457
 msgid "Profile picture is not found!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5460
+#: ../../../inc/users/model/_user.class.php:5470
 msgid "Profile picture has been forbidden."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5464
+#: ../../../inc/users/model/_user.class.php:5474
 msgid "Profile picture has been removed."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5518
+#: ../../../inc/users/model/_user.class.php:5528
 msgid "Profile picture has been deleted."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5544
+#: ../../../inc/users/model/_user.class.php:5554
 msgid "You don't have permission to selected user file root."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5556
+#: ../../../inc/users/model/_user.class.php:5566
 msgid "It seems you are trying to upload the same profile picture twice."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5575
+#: ../../../inc/users/model/_user.class.php:5585
 msgid "New picture has been uploaded."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5585
+#: ../../../inc/users/model/_user.class.php:5595
 msgid "The file you uploaded does not seem to be an image."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6004
+#: ../../../inc/users/model/_user.class.php:6014
 #, php-format
 msgid "%s (%s%% are public)"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6061
+#: ../../../inc/users/model/_user.class.php:6071
 #, php-format
 msgid "%s has posted %s comments (%s%% of which are public). %s of these comments have been found useful by %s different users."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6062
+#: ../../../inc/users/model/_user.class.php:6072
 #, php-format
 msgid "%s has posted %s comments (%s%% of which are public).<br />%s voted useful by %s different users.<br />%s voted NOT useful by %s different users.<br />%s considered OK by %s different users.<br />%s considered SPAM by %s different users."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6180
+#: ../../../inc/users/model/_user.class.php:6190
 #, php-format
 msgid "%s has uploaded %s photos. %s of these photos have been liked by %s different users."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6181
+#: ../../../inc/users/model/_user.class.php:6191
 #, php-format
 msgid "%s has uploaded %s photos.<br />%s voted up (liked) by %s different users.<br />%s voted down by %s different users.<br />%s considered INAPPROPRIATE by %s different users.<br />%s considered SPAM by %s different users."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6182
+#: ../../../inc/users/model/_user.class.php:6192
 #, php-format
 msgid "%s has uploaded %s audio files."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6183
+#: ../../../inc/users/model/_user.class.php:6193
 #, php-format
 msgid "%s has uploaded %s video files."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6184
+#: ../../../inc/users/model/_user.class.php:6194
 #, php-format
 msgid "%s has uploaded %s other files."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6298
+#: ../../../inc/users/model/_user.class.php:6308
 #, php-format
 msgid "%s has uploaded a total of %s"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6325
+#: ../../../inc/users/model/_user.class.php:6335
 #, php-format
 msgid "%s successfully reported %s spams and/or spammers!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6417
+#: ../../../inc/users/model/_user.class.php:6422
 #, php-format
 msgid "User #%s has no permission to edit user #%s!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6451
-#: ../../../inc/users/model/_user.funcs.php:5550
+#: ../../../inc/users/model/_user.class.php:6456
+#: ../../../inc/users/model/_user.funcs.php:5552
 #: ../../../inc/users/views/_registration.form.php:158
 #: ../../../inc/users/views/_user_identity.form.php:471
 #: ../../../inc/users/views/_user_stats.view.php:325
 msgid "Gender"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6500
+#: ../../../inc/users/model/_user.class.php:6505
 msgid "User profile changed"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6595
+#: ../../../inc/users/model/_user.class.php:6600
 #, php-format
 msgid "You are already a member of \"%s\"."
 msgstr ""
@@ -27213,7 +27212,7 @@ msgid "%d seconds"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:2399
-#: ../../../inc/users/model/_user.funcs.php:4380
+#: ../../../inc/users/model/_user.funcs.php:4382
 #: ../../../inc/users/views/_user_report.form.php:62
 #: ../../../inc/users/views/_user_report.form.php:85
 #: ../../../skins_fallback_v5/_user.disp.php:250
@@ -27226,7 +27225,7 @@ msgid "You have reported this user"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:2412
-#: ../../../inc/users/model/_user.funcs.php:6106
+#: ../../../inc/users/model/_user.funcs.php:6108
 msgid "Delete this user!"
 msgstr ""
 
@@ -27250,94 +27249,94 @@ msgstr ""
 msgid "Visits"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2518 ../inc/users/user.ctrl.php:839
-#: ../../../inc/users/views/_user_activity.view.php:53
+#: ../../../inc/users/model/_user.funcs.php:2520 ../inc/users/user.ctrl.php:839
+#: ../../../inc/users/views/_user_activity.view.php:54
 msgid "My Activity"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2518 ../inc/users/user.ctrl.php:839
-#: ../../../inc/users/views/_user_activity.view.php:53
+#: ../../../inc/users/model/_user.funcs.php:2520 ../inc/users/user.ctrl.php:839
+#: ../../../inc/users/views/_user_activity.view.php:54
 msgid "User Activity"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2888
+#: ../../../inc/users/model/_user.funcs.php:2890
 msgid "Latest account activation email"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2894
+#: ../../../inc/users/model/_user.funcs.php:2896
 msgid "Account is already activated"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2899
+#: ../../../inc/users/model/_user.funcs.php:2901
 msgid "The account is closed, it cannot be activated"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2907
+#: ../../../inc/users/model/_user.funcs.php:2909
 msgid "This user doesn't want to receive account activation reminders"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2914
+#: ../../../inc/users/model/_user.funcs.php:2916
 msgid "Account validation process is secured, so account activation emails are sent only upon request"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2921
+#: ../../../inc/users/model/_user.funcs.php:2923
 #: ../../../inc/users/views/_user_admin.form.php:203
 #: ../../../inc/users/views/_user_admin.form.php:219
 #: ../../../inc/users/views/_user_admin.form.php:237
 msgid "None yet"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2934
+#: ../../../inc/users/model/_user.funcs.php:2936
 msgid "Next account activation reminder"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2937
+#: ../../../inc/users/model/_user.funcs.php:2939
 #, php-format
 msgid "%d reminders were sent out of the maximum allowed of %d."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2939
+#: ../../../inc/users/model/_user.funcs.php:2941
 msgid "Scheduled job responsible for reminders is \"Send reminders about not activated accounts\"."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2943
+#: ../../../inc/users/model/_user.funcs.php:2945
 msgid "Account activation has failed"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2947
+#: ../../../inc/users/model/_user.funcs.php:2949
 #, php-format
 msgid "We already sent %d account activation reminders of the maximum allowed of %d, no more reminders will be sent"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2951
+#: ../../../inc/users/model/_user.funcs.php:2953
 msgid "At least one activation email should have been already sent. Check if the user email address is correct, and PHP is sending emails correctly"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2959
+#: ../../../inc/users/model/_user.funcs.php:2961
 #, php-format
 msgid "%s left before next notification"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:2965
+#: ../../../inc/users/model/_user.funcs.php:2967
 #, php-format
 msgid "next notification pending since %s - check the \"Send reminders about not activated accounts\" scheduled job"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3009
+#: ../../../inc/users/model/_user.funcs.php:3011
 msgid "Add field..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3142
+#: ../../../inc/users/model/_user.funcs.php:3144
 #: ../../../inc/users/views/_user_identity.form.php:164
 msgid "Visit the site"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3238
+#: ../../../inc/users/model/_user.funcs.php:3240
 msgid "Restrict to members of this blog"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3243
-#: ../../../inc/users/model/_user.funcs.php:5282
+#: ../../../inc/users/model/_user.funcs.php:3245
+#: ../../../inc/users/model/_user.funcs.php:5284
 #: ../../../inc/users/views/_user_stats.view.php:158
 #: ../../../inc/users/views/_user_stats.view.php:159
 #: ../../../inc/users/views/_user_stats.view.php:160
@@ -27348,8 +27347,8 @@ msgstr ""
 msgid "Men"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3244
-#: ../../../inc/users/model/_user.funcs.php:5283
+#: ../../../inc/users/model/_user.funcs.php:3246
+#: ../../../inc/users/model/_user.funcs.php:5285
 #: ../../../inc/users/views/_user_stats.view.php:152
 #: ../../../inc/users/views/_user_stats.view.php:153
 #: ../../../inc/users/views/_user_stats.view.php:154
@@ -27360,464 +27359,464 @@ msgstr ""
 msgid "Women"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3251
-#: ../../../inc/users/model/_user.funcs.php:5292
+#: ../../../inc/users/model/_user.funcs.php:3253
+#: ../../../inc/users/model/_user.funcs.php:5294
 msgid "Reported users"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3252
+#: ../../../inc/users/model/_user.funcs.php:3254
 msgid "Users with custom sender address"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3253
+#: ../../../inc/users/model/_user.funcs.php:3255
 msgid "Users with custom sender name"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3256
+#: ../../../inc/users/model/_user.funcs.php:3258
 #: ../../../inc/users/views/_user_admin.form.php:79
 #: ../../../inc/users/views/_user_admin.form.php:88
 #: ../../../inc/users/views/_user_identity.form.php:149
 msgid "Account status"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3263
+#: ../../../inc/users/model/_user.funcs.php:3265
 msgid "All (Ungrouped)"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3264
+#: ../../../inc/users/model/_user.funcs.php:3266
 msgid "All (Grouped)"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3267
+#: ../../../inc/users/model/_user.funcs.php:3269
 #: ../../../inc/users/views/_group.form.php:123
 #, php-format
 msgid "<span %s>Primary</span> Group"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3278
+#: ../../../inc/users/model/_user.funcs.php:3280
 #: ../../../inc/users/views/_group.form.php:128
 #, php-format
 msgid "<span %s>Secondary</span> Group"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3325
+#: ../../../inc/users/model/_user.funcs.php:3327
 msgid "Age group"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3589
+#: ../../../inc/users/model/_user.funcs.php:3591
 msgid "Activated by email"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3590
-#: ../../../inc/users/model/_user.funcs.php:3630
+#: ../../../inc/users/model/_user.funcs.php:3592
+#: ../../../inc/users/model/_user.funcs.php:3632
 #: ../../../inc/users/views/_user_admin.form.php:79
 msgid "Autoactivated"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3591
-#: ../../../inc/users/model/_user.funcs.php:3633
+#: ../../../inc/users/model/_user.funcs.php:3593
+#: ../../../inc/users/model/_user.funcs.php:3635
 msgid "Email changed"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3592
+#: ../../../inc/users/model/_user.funcs.php:3594
 msgid "Deactivated email"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3593
-#: ../../../inc/users/model/_user.funcs.php:3635
+#: ../../../inc/users/model/_user.funcs.php:3595
+#: ../../../inc/users/model/_user.funcs.php:3637
 msgid "Failed activation"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3594
-#: ../../../inc/users/model/_user.funcs.php:3623
+#: ../../../inc/users/model/_user.funcs.php:3596
+#: ../../../inc/users/model/_user.funcs.php:3625
 msgid "Closed account"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3618
+#: ../../../inc/users/model/_user.funcs.php:3620
 msgid "Account has been activated by email"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3619
+#: ../../../inc/users/model/_user.funcs.php:3621
 msgid "Account has been automatically activated"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3620
+#: ../../../inc/users/model/_user.funcs.php:3622
 msgid "New account"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3621
+#: ../../../inc/users/model/_user.funcs.php:3623
 msgid "Deactivated account"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3622
+#: ../../../inc/users/model/_user.funcs.php:3624
 msgid "Email address was changed"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3624
+#: ../../../inc/users/model/_user.funcs.php:3626
 msgid "Account was not activated or the activation failed"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3680
+#: ../../../inc/users/model/_user.funcs.php:3682
 msgid "This user profile is fake"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3681
+#: ../../../inc/users/model/_user.funcs.php:3683
 msgid "This user does not follow the guidelines"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3682
+#: ../../../inc/users/model/_user.funcs.php:3684
 msgid "This user is harassing me"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3683
+#: ../../../inc/users/model/_user.funcs.php:3685
 msgid "This user is spamming me"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3751
+#: ../../../inc/users/model/_user.funcs.php:3753
 msgid "No reports yet."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3796
+#: ../../../inc/users/model/_user.funcs.php:3798
 msgid "User account reported"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3917
+#: ../../../inc/users/model/_user.funcs.php:3919
 msgid "Quick search"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3918
+#: ../../../inc/users/model/_user.funcs.php:3920
 msgid "Find User"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3966
+#: ../../../inc/users/model/_user.funcs.php:3968
 msgid "I like this picture"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3967
+#: ../../../inc/users/model/_user.funcs.php:3969
 msgid "You like this!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3968
+#: ../../../inc/users/model/_user.funcs.php:3970
 msgid "I have no opinion"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3969
+#: ../../../inc/users/model/_user.funcs.php:3971
 msgid "You have no opinion on this."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3970
+#: ../../../inc/users/model/_user.funcs.php:3972
 msgid "I don't like this picture"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3971
+#: ../../../inc/users/model/_user.funcs.php:3973
 msgid "You don't like this."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3972
+#: ../../../inc/users/model/_user.funcs.php:3974
 msgid "I think the content of this picture is inappropriate"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3973
+#: ../../../inc/users/model/_user.funcs.php:3975
 msgid "I think this picture was posted by a spammer"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3976
+#: ../../../inc/users/model/_user.funcs.php:3978
 msgid "No likes yet"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3977
-msgid "1 person likes this"
-msgstr ""
-
-#: ../../../inc/users/model/_user.funcs.php:3978
-#, php-format
-msgid "%d people like this"
-msgstr ""
-
 #: ../../../inc/users/model/_user.funcs.php:3979
-msgid "1 person dislikes this"
+msgid "1 person likes this"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:3980
 #, php-format
-msgid "%d people dislike this"
+msgid "%d people like this"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:3981
-msgid "1 like - 1 dislike"
+msgid "1 person dislikes this"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:3982
 #, php-format
-msgid "%d likes - 1 dislike"
+msgid "%d people dislike this"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:3983
+msgid "1 like - 1 dislike"
+msgstr ""
+
+#: ../../../inc/users/model/_user.funcs.php:3984
+#, php-format
+msgid "%d likes - 1 dislike"
+msgstr ""
+
+#: ../../../inc/users/model/_user.funcs.php:3985
 #, php-format
 msgid "1 like - %d dislikes"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:3984
+#: ../../../inc/users/model/_user.funcs.php:3986
 #, php-format
 msgid "%d likes - %d dislikes"
 msgstr ""
 
 #. TRANS: date of last error
-#: ../../../inc/users/model/_user.funcs.php:4330
+#: ../../../inc/users/model/_user.funcs.php:4332
 #, php-format
 msgid "(last error was detected on %s)"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4338
+#: ../../../inc/users/model/_user.funcs.php:4340
 #, php-format
 msgid "We have detected some delivery problems to your email account %s%s. Please add our email: %s to your address book. If you still don't receive our emails, try using a different email address instead of %s for your account.<br /><a %s>Click here to use a different email address</a>.<br /><a %s>Click here to discard this message once you receive our emails again</a>."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4349
+#: ../../../inc/users/model/_user.funcs.php:4351
 #, php-format
 msgid "Your email address: %s does not seem to work or is refusing our emails%s. Please check your email address carefully. If it's incorrect, <a %s>change your email address</a>. If it's correct, please add our email: %s to your address book, then <a %s>click here to try again</a>!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4359
+#: ../../../inc/users/model/_user.funcs.php:4361
 #, php-format
 msgid "We are currently trying to send email to your address: %s again."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4381
-#: ../../../inc/users/model/_user.funcs.php:4506
+#: ../../../inc/users/model/_user.funcs.php:4383
+#: ../../../inc/users/model/_user.funcs.php:4508
 msgid "Report this user now!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4403
+#: ../../../inc/users/model/_user.funcs.php:4405
 #: ../../../inc/users/views/_user_groups.form.php:43
 msgid "Contact Groups"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4425
+#: ../../../inc/users/model/_user.funcs.php:4427
 #: ../../../inc/users/views/_user_crop.form.php:93
 msgid "Crop profile picture"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4451
+#: ../../../inc/users/model/_user.funcs.php:4453
 #: ../../../inc/users/views/_user_deldata.form.php:62
 #: ../../../inc/users/views/_user_deldata.form.php:78
 msgid "Delete user data"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4452
+#: ../../../inc/users/model/_user.funcs.php:4454
 #: ../../../inc/users/views/_user_deldata.form.php:101
 msgid "Delete selected data"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4495
+#: ../../../inc/users/model/_user.funcs.php:4497
 msgid "If you have an issue with this user, you can report it here:"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4504
+#: ../../../inc/users/model/_user.funcs.php:4506
 msgid "You can provide additional information below"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4531
+#: ../../../inc/users/model/_user.funcs.php:4533
 #: ../../../skins_fallback_v5/_closeaccount.disp.php:48
 msgid "Reason"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4535
+#: ../../../inc/users/model/_user.funcs.php:4537
 msgid "Already Reported User"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4536
+#: ../../../inc/users/model/_user.funcs.php:4538
 #, php-format
 msgid "You have reported this user on %s<br />as \"%s\"<br />with the additional info \"%s\""
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4540
+#: ../../../inc/users/model/_user.funcs.php:4542
 msgid "Cancel Report"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4604
+#: ../../../inc/users/model/_user.funcs.php:4606
 msgid "Add user to organization"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4631
-#: ../../../inc/users/model/_user.funcs.php:6134
+#: ../../../inc/users/model/_user.funcs.php:4633
+#: ../../../inc/users/model/_user.funcs.php:6136
 msgid "Edit membership"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4659
+#: ../../../inc/users/model/_user.funcs.php:4661
 #: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:423
 msgid "WARNING"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4698
-#: ../../../inc/users/model/_user.funcs.php:4713
+#: ../../../inc/users/model/_user.funcs.php:4700
+#: ../../../inc/users/model/_user.funcs.php:4715
 msgid "Invitation code is incorrect!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4790
+#: ../../../inc/users/model/_user.funcs.php:4792
 msgid "You must log in to view the user directory."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4807
+#: ../../../inc/users/model/_user.funcs.php:4809
 msgid "You must activate your account before you can view the user directory."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4815
-#: ../../../inc/users/model/_user.funcs.php:4913
+#: ../../../inc/users/model/_user.funcs.php:4817
+#: ../../../inc/users/model/_user.funcs.php:4915
 msgid "See below:"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4822
+#: ../../../inc/users/model/_user.funcs.php:4824
 msgid "Your account status currently does not permit to view the user directory."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4905
+#: ../../../inc/users/model/_user.funcs.php:4907
 msgid "You must activate your account before you can view this user profile."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:4987
+#: ../../../inc/users/model/_user.funcs.php:4989
 msgid "You don't have permission to view this user profile."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5018
+#: ../../../inc/users/model/_user.funcs.php:5020
 msgid "This user profile has been reported by other users!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5019
+#: ../../../inc/users/model/_user.funcs.php:5021
 msgid "User was not reported yet."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5107
+#: ../../../inc/users/model/_user.funcs.php:5109
 msgid "Date and time"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5116
+#: ../../../inc/users/model/_user.funcs.php:5118
 msgid "Reporting user"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5123
+#: ../../../inc/users/model/_user.funcs.php:5125
 msgid "Selected option in the select list"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5130
+#: ../../../inc/users/model/_user.funcs.php:5132
 msgid "Additional info"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5142
+#: ../../../inc/users/model/_user.funcs.php:5144
 msgid "Remove this report!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5164
+#: ../../../inc/users/model/_user.funcs.php:5166
 msgid "No users"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5289
+#: ../../../inc/users/model/_user.funcs.php:5291
 msgid "Activated users"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5313
+#: ../../../inc/users/model/_user.funcs.php:5315
 msgid "Refresh users list..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5319
-#: ../../../inc/users/model/_user.funcs.php:5333
+#: ../../../inc/users/model/_user.funcs.php:5321
+#: ../../../inc/users/model/_user.funcs.php:5335
 msgid "Add user"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5319
+#: ../../../inc/users/model/_user.funcs.php:5321
 msgid "Create a new user..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5323
+#: ../../../inc/users/model/_user.funcs.php:5325
 #: ../../../inc/users/views/_group.view.php:53
 msgid "Add group"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5323
+#: ../../../inc/users/model/_user.funcs.php:5325
 #: ../../../inc/users/views/_group.view.php:53
 msgid "Create a new group..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5348
+#: ../../../inc/users/model/_user.funcs.php:5350
 msgid "Send newsletter to the current selection"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5433
+#: ../../../inc/users/model/_user.funcs.php:5435
 msgid "default group for new users"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5633
+#: ../../../inc/users/model/_user.funcs.php:5635
 msgid "View personal blogs"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5652
+#: ../../../inc/users/model/_user.funcs.php:5654
 msgid "Registered"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5664
+#: ../../../inc/users/model/_user.funcs.php:5666
 msgid "RC"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5665
+#: ../../../inc/users/model/_user.funcs.php:5667
 msgid "Registration country"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5676
+#: ../../../inc/users/model/_user.funcs.php:5678
 msgid "Profile update"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5688
+#: ../../../inc/users/model/_user.funcs.php:5690
 msgid "Last Visit"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5714
+#: ../../../inc/users/model/_user.funcs.php:5716
 msgid "Rep"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5726
+#: ../../../inc/users/model/_user.funcs.php:5728
 msgid "Primary<br />Group"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5737
+#: ../../../inc/users/model/_user.funcs.php:5739
 msgid "Sec.<br />Groups"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5819
+#: ../../../inc/users/model/_user.funcs.php:5821
 msgid "Last visit on your profile"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5848
+#: ../../../inc/users/model/_user.funcs.php:5850
 #: ../../../inc/users/views/_group.view.php:157
 #: ../../../inc/users/views/_userfields.view.php:156
 msgid "Edit this group..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5850
+#: ../../../inc/users/model/_user.funcs.php:5852
 #: ../../../inc/users/views/_group.view.php:159
 #: ../../../inc/users/views/_userfields.view.php:157
 msgid "Duplicate this group..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5962
+#: ../../../inc/users/model/_user.funcs.php:5964
 msgid "Private Message"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:6103
+#: ../../../inc/users/model/_user.funcs.php:6105
 msgid "Duplicate this user..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:6138
+#: ../../../inc/users/model/_user.funcs.php:6140
 msgid "Remove user from organization"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:6255
+#: ../../../inc/users/model/_user.funcs.php:6257
 #: ../../../inc/users/views/_user_admin.form.php:454
 #, php-format
 msgid "Add domain %s"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:6256
-#: ../../../inc/users/model/_user.funcs.php:6260
+#: ../../../inc/users/model/_user.funcs.php:6258
+#: ../../../inc/users/model/_user.funcs.php:6262
 msgid "Domain status"
 msgstr ""
 
@@ -29179,11 +29178,11 @@ msgstr ""
 msgid "Receiving emails through a message form"
 msgstr ""
 
-#: ../../../inc/users/views/_user_activity.view.php:57
+#: ../../../inc/users/views/_user_activity.view.php:58
 msgid "User created from IP"
 msgstr ""
 
-#: ../../../inc/users/views/_user_activity.view.php:98
+#: ../../../inc/users/views/_user_activity.view.php:99
 msgid "Delete User and All his contributions"
 msgstr ""
 
@@ -29803,11 +29802,11 @@ msgstr ""
 msgid "User Profile Visits"
 msgstr ""
 
-#: ../../../inc/users/views/_user_profile_visits.view.php:75
+#: ../../../inc/users/views/_user_profile_visits.view.php:76
 msgid "No-one visited your profile yet. Please check back later."
 msgstr ""
 
-#: ../../../inc/users/views/_user_profile_visits.view.php:76
+#: ../../../inc/users/views/_user_profile_visits.view.php:77
 msgid "People who have visited your profile"
 msgstr ""
 
@@ -33039,82 +33038,82 @@ msgstr ""
 msgid "Protected"
 msgstr ""
 
-#: ../../../install/_functions_create.php:418 ../install/_functions_create.php:419
+#: ../../../install/_functions_create.php:419 ../install/_functions_create.php:420
 msgid "Enter a number"
 msgstr ""
 
-#: ../../../install/_functions_create.php:418
+#: ../../../install/_functions_create.php:419
 msgid "First numeric field"
 msgstr ""
 
-#: ../../../install/_functions_create.php:419
+#: ../../../install/_functions_create.php:420
 msgid "Second numeric field"
 msgstr ""
 
-#: ../../../install/_functions_create.php:420
+#: ../../../install/_functions_create.php:421
 msgid "Enter a string"
 msgstr ""
 
-#: ../../../install/_functions_create.php:420
+#: ../../../install/_functions_create.php:421
 msgid "First string field"
 msgstr ""
 
-#: ../../../install/_functions_create.php:421
+#: ../../../install/_functions_create.php:422
 msgid "Define your own labels"
 msgstr ""
 
-#: ../../../install/_functions_create.php:421
+#: ../../../install/_functions_create.php:422
 msgid "Define your own notes"
 msgstr ""
 
-#: ../../../install/_functions_create.php:422
+#: ../../../install/_functions_create.php:423
 msgid "Enter multiple lines"
 msgstr ""
 
-#: ../../../install/_functions_create.php:422
+#: ../../../install/_functions_create.php:423
 msgid "Multiline plain text field"
 msgstr ""
 
-#: ../../../install/_functions_create.php:423
+#: ../../../install/_functions_create.php:424
 msgid "Enter HTML code"
 msgstr ""
 
-#: ../../../install/_functions_create.php:423
+#: ../../../install/_functions_create.php:424
 msgid "Multiline HTML field"
 msgstr ""
 
-#: ../../../install/_functions_create.php:424
+#: ../../../install/_functions_create.php:425
 msgid "Enter an URL (absolute or relative)"
 msgstr ""
 
-#: ../../../install/_functions_create.php:424
+#: ../../../install/_functions_create.php:425
 msgid "URL field"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1260
+#: ../../../install/_functions_create.php:1261
 msgid "Creating default scheduled jobs... "
 msgstr ""
 
-#: ../../../install/_functions_create.php:1263
+#: ../../../install/_functions_create.php:1264
 msgid "Create default scheduled jobs"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1457
+#: ../../../install/_functions_create.php:1458
 #, php-format
 msgid "Demo private conversation #%s"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1461
+#: ../../../install/_functions_create.php:1462
 #, php-format
 msgid "This is a demo private message to %s."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1492
+#: ../../../install/_functions_create.php:1493
 #, php-format
 msgid "This is a demo private reply to %s."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1796 ../install/_functions_create.php:1797
+#: ../../../install/_functions_create.php:1797 ../install/_functions_create.php:1798
 msgid "Markdown Example"
 msgstr ""
 
@@ -37370,16 +37369,15 @@ msgstr ""
 msgid "Reply to topic"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:616
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:654
-msgid "Recent Topics"
-msgstr ""
-
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:649
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:619
 msgid "New Topics"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:713
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:624
+msgid "Recent Topics"
+msgstr ""
+
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:682
 #: ../../../skins/pureforums_skin/_item_comment.inc.php:164
 msgid "Is this reply helpful?"
 msgstr ""
