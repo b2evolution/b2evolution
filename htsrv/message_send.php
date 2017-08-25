@@ -153,12 +153,12 @@ elseif( ! empty( $comment_id ) )
 	}
 }
 
+$update_user_fields = false;
 if( is_logged_in() )
 {	// Set name and email of the current logged in user:
 	$sender_name = '';
 	$sender_address = $current_User->get( 'email' );
 	$edited_user_perms = array( 'edited-user', 'edited-user-required' );
-	$update_user_fields = false;
 	switch( $Blog->get_setting( 'msgform_user_name' ) )
 	{
 		case 'fullname':
@@ -219,11 +219,6 @@ if( is_logged_in() )
 	{	// If sender name has not been detected from first/last/nickname fields then use preferred name of current User:
 		$sender_name = $current_User->get_username();
 	}
-
-	if( $update_user_fields )
-	{	// If at least one field of current user must be updated:
-		$current_User->dbupdate();
-	}
 }
 else
 {	// Ask name and email only for anonymous users:
@@ -255,7 +250,7 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 {
 	$UserFieldCache = & get_UserFieldCache();
 	$coll_additional_fields = $Blog->get_msgform_additional_fields();
-	foreach( $user_fields as $user_field_ID => $user_field )
+	foreach( $user_fields as $user_field_ID => $user_field_value )
 	{
 		if( ! isset( $coll_additional_fields[ $user_field_ID ] ) )
 		{	// Skip wrong field which is not selected for current collection as additional field:
@@ -267,10 +262,86 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 			continue;
 		}
 
-		$text_value = utf8_trim( is_array( $user_field ) ? implode( ', ', $user_field ) : $user_field );
+		$text_value = utf8_trim( is_array( $user_field_value ) ? implode( ', ', $user_field_value ) : $user_field_value );
 		if( empty( $text_value ) )
 		{	// Skip empty values:
 			continue;
+		}
+
+		if( is_logged_in() )
+		{	// Update user fields of the logged in User:
+			$userfields = $current_User->userfields_by_ID( $UserField->ID );
+			if( ! is_array( $user_field_value ) )
+			{
+				$user_field_value = array(  $user_field_value );
+			}
+			foreach( $user_field_value as $u => $uf_value )
+			{
+				if( empty( $uf_value ) )
+				{	// Skip empty entered values from contact form:
+					continue;
+				}
+
+				// Format and check the entered value:
+				$field_type = $UserField->get( 'type' );
+				if( $field_type == 'number' )
+				{	// Change number type of integer because we have this type name preparing in function param_format():
+					$field_type = 'integer';
+				}
+				elseif( $field_type != 'text' && $field_type != 'url' )
+				{	// Use all other params as string, Only text and url have a preparing in function param_format():
+					$field_type = 'string';
+				}
+				$uf_value = param_format( $uf_value, $field_type );
+				if( $field_type == 'url' && ( $error_detail = validate_url( $uf_value, 'commenting' ) ) )
+				{	// Skip it if the entered URL is wrong:
+					$Messages->add_to_group( /* TRANS: %s contains error details */ sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ), 'error', T_('Validation errors:') );
+					continue;
+				}
+
+				if( $userfields === false )
+				{	// Add new field value:
+					$current_User->userfield_add( $UserField->ID, $uf_value );
+					$update_user_fields = true;
+				}
+				else
+				{	// Update existing field value:
+					$add_multifield_value = false;
+					foreach( $userfields as $m => $userfield_data )
+					{
+						if( ! empty( $userfield_data->list ) )
+						{	// Update a list field:
+							$s = 0;
+							foreach( $userfield_data->list as $saved_uf_ID => $saved_uf_value )
+							{
+								if( $s == $u && $uf_value != $saved_uf_value )
+								{	// Only if it was changed:
+									$current_User->userfield_update( $saved_uf_ID, $user_field_value[ $s ] );
+									$update_user_fields = true;
+								}
+								$s++;
+							}
+							// If count of entered values is more than count of saved values in DB:
+							$add_multifield_value = ( count( $user_field_value ) > count( $userfield_data->list ) );
+						}
+						elseif( $m == $u && $uf_value != $userfield_data->uf_varchar )
+						{	// Update a single field only if it was changed:
+							$current_User->userfield_update( $userfield_data->uf_ID, $uf_value );
+							$update_user_fields = true;
+						}
+						elseif( $UserField->get( 'duplicated' ) == 'allowed' )
+						{	// Add second value for multiple field:
+							$add_multifield_value = true;
+						}
+
+						if( $add_multifield_value && $u > $m && $u < 2 )
+						{	// It means second value of multiple field should be added:
+							$current_User->userfield_add( $UserField->ID, $uf_value );
+							$update_user_fields = true;
+						}
+					}
+				}
+			}
 		}
 
 		// Prepare user field for correct html displaying:
@@ -287,6 +358,12 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 				'html_value'  => $html_value,
 			);
 	}
+}
+
+
+if( $update_user_fields )
+{	// If at least one field of current user must be updated:
+	$current_User->dbupdate();
 }
 
 // opt-out links:

@@ -4633,22 +4633,26 @@ class User extends DataObject
 
 	/**
 	 * Add a user field
+	 *
+	 * @param integer User field definition ID
+	 * @param string Field value
 	 */
-	function userfield_add( $type, $val )
+	function userfield_add( $uf_ufdf_ID, $val )
 	{
 		global $DB;
-		$this->new_fields[] = $type.', '.$DB->quote( $val );
+		$this->new_fields[] = $uf_ufdf_ID.', '.$DB->quote( $val );
 	}
 
 
 	/**
 	 * Update an user field. Empty fields will be deleted on dbupdate.
+	 *
+	 * @param integer User field ID
+	 * @param string Field value
 	 */
 	function userfield_update( $uf_ID, $val )
 	{
-		global $DB;
-		$this->updated_fields[$uf_ID] = $val;
-		// pre_dump( $uf_ID, $val);
+		$this->updated_fields[ $uf_ID ] = $val;
 	}
 
 
@@ -4680,6 +4684,35 @@ class User extends DataObject
 
 
 	/**
+	 * Get user fields by field definition ID
+	 *
+	 * @param integer Field definition ID
+	 * @return array|false Fields
+	 */
+	function userfields_by_ID( $ufdf_ID )
+	{
+		// Load all user fields once:
+		$this->userfields_load();
+
+		if( ! empty( $this->userfields_by_type[ $ufdf_ID ] ) )
+		{	// Get user fields from cache:
+			$userfields = array();
+			foreach( $this->userfields_by_type[ $ufdf_ID ] as $uf_ID )
+			{
+				if( ! empty( $this->userfields[ $uf_ID ] ) )
+				{
+					$userfields[] = $this->userfields[ $uf_ID ];
+				}
+			}
+			return $userfields;
+		}
+
+		// No fields:
+		return false;
+	}
+
+
+	/**
 	 * Get user field value by ID
 	 *
 	 * @param integer Field ID
@@ -4688,9 +4721,7 @@ class User extends DataObject
 	 */
 	function userfield_value_by_ID( $field_ID, $prepare_userfield = true )
 	{
-		global $DB;
-
-		// Load all user fields once
+		// Load all user fields once:
 		$this->userfields_load();
 
 		if( isset( $this->userfields_by_type[ $field_ID ], $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ] ) )
@@ -4772,7 +4803,7 @@ class User extends DataObject
 				{	// Init array
 					$userfield_lists[$userfield->ufdf_ID] = array();
 				}
-				$userfield_lists[$userfield->ufdf_ID][] = $userfield->uf_varchar;
+				$userfield_lists[$userfield->ufdf_ID][$userfield->uf_ID] = $userfield->uf_varchar;
 			}
 		}
 
@@ -4782,6 +4813,7 @@ class User extends DataObject
 			{ // List style
 				if( isset( $userfield_lists[$userfield->ufdf_ID] ) )
 				{ // Save all data for this field:
+					$userfield->list = $userfield_lists[ $userfield->ufdf_ID ];
 					$userfield->uf_varchar = implode( ', ', $userfield_lists[$userfield->ufdf_ID] );
 					$this->userfields[$userfield->uf_ID] = $userfield;
 					$this->userfields_by_code[$userfield->ufdf_code][] = $userfield->uf_ID;
@@ -4800,6 +4832,9 @@ class User extends DataObject
 
 		// Also make sure the definitions are loaded
 		$this->userfield_defs_load();
+
+		// Set flag to don't call this function twice:
+		$this->userfields_loaded = true;
 	}
 
 

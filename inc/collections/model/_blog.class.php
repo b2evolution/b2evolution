@@ -5044,19 +5044,32 @@ class Blog extends DataObject
 
 		foreach( $msgform_additional_fields as $UserField )
 		{
+			$field_value = '';
+			$field_value2 = '';
 			if( is_logged_in() )
 			{	// Get saved field value from the current logged in User:
 				global $current_User;
-				$field_value = trim( $current_User->userfieldget_first_for_type( $UserField->ID, false ) );
-				if( $UserField->get( 'duplicated' ) == 'list' )
-				{	// Use only first value of the list field:
-					$field_value = explode( ', ', $field_value );
-					$field_value = $field_value[0];
+				$userfields = $current_User->userfields_by_ID( $UserField->ID );
+
+				if( isset( $userfields[0] ) )
+				{	// Get a value for single field or first of multiple field:
+					$userfield_data = $userfields[0];
+					if( in_array( $UserField->get( 'duplicated' ), array( 'list', 'allowed' ) ) && isset( $userfield_data->list ) )
+					{	// Use only first value of the list field:
+						$field_values = array_values( $userfield_data->list );
+						$field_value = isset( $field_values[0] ) ? $field_values[0] : $userfield_data->uf_varchar;
+						$field_value2 = isset( $field_values[1] ) ? $field_values[1] : '';
+					}
+					else
+					{
+						$field_value = $userfield_data->uf_varchar;
+					}
 				}
-			}
-			else
-			{	// Anonymous user cannot has a saved field value:
-				$field_value = '';
+
+				if( isset( $userfields[1] ) )
+				{	// Get a value for second of multiple field:
+					$field_value2 = $userfields[1]->uf_varchar;
+				}
 			}
 
 			// Display single additional field:
@@ -5064,7 +5077,7 @@ class Blog extends DataObject
 
 			if( $field_value != '' && in_array( $UserField->get( 'duplicated' ), array( 'allowed', 'list' ) ) )
 			{	// If field is multiple the display one more additional field:
-				$this->display_msgform_additional_field( $Form, $UserField, '', true );
+				$this->display_msgform_additional_field( $Form, $UserField, $field_value2, true );
 			}
 		}
 	}
