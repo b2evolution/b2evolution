@@ -4293,28 +4293,6 @@ class Comment extends DataObject
 
 		$DB->begin();
 
-		// Check previous comment status was visible on front-office:
-		$was_front_office_visible = ( isset( $this->previous_status ) &&
-			$this->can_be_displayed( $this->previous_status ) );
-
-		// Check we should refresh contents last updated date of the PARENT Item
-		// if this Comment was the latest FRONT-OFFICE VISIBLE Comment of the parent Item:
-		$refresh_parent_item_contents_last_updated_date = ( $was_front_office_visible &&
-			( $comment_Item = & $this->get_Item() ) &&
-			( $item_latest_Comment = & $comment_Item->get_latest_Comment() ) &&
-			( $item_latest_Comment->ID == $this->ID ) );
-
-		$ItemCache = & get_ItemCache();
-		$ItemCache->clear();
-
-		// Check we should refresh contents last updated date of the PREVIOUS Item
-		// if this Comment was the latest FRONT-OFFICE VISIBLE Comment of the previous Item:
-		$refresh_previous_item_contents_last_updated_date = ( ! empty( $this->previous_item_ID ) &&
-			( $was_front_office_visible || $this->may_be_seen_in_frontoffice() ) &&
-			( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) ) &&
-			( $previous_item_latest_Comment = & $previous_Item->get_latest_Comment() ) &&
-			( $previous_item_latest_Comment->ID == $this->ID ) );
-
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
 			if( isset( $dbchanges['comment_content'] ) || isset( $dbchanges['comment_renderers'] ) )
@@ -4335,15 +4313,13 @@ class Comment extends DataObject
 				}
 			}
 
-			if( ! empty( $this->previous_item_ID ) )
-			{	// If comment has been moved from another post:
+			if( !empty( $this->previous_item_ID ) )
+			{ // Comment is moved from another post
+				$ItemCache = & get_ItemCache();
+				$ItemCache->clear();
 				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
 				{	// Update ONLY last touched date of previous item:
 					$previous_Item->update_last_touched_date( false, true );
-					if( $refresh_previous_item_contents_last_updated_date )
-					{	// Refresh contents last updated ts of the previous parent Item if this Comment was the latest FRONT-OFFICE VISIBLE Comment of the previous parent Item:
-						$previous_Item->refresh_contents_last_updated_ts();
-					}
 				}
 
 				// Also move all child comments to new post
@@ -4354,11 +4330,6 @@ class Comment extends DataObject
 						  SET comment_item_ID = '.$DB->quote( $this->item_ID ).'
 						WHERE comment_ID IN ( '.$DB->quote( $child_comment_IDs ).' )' );
 				}
-			}
-
-			if( $refresh_parent_item_contents_last_updated_date )
-			{	// Refresh contents last updated ts of the parent Item:
-				$comment_Item->refresh_contents_last_updated_ts();
 			}
 
 			$this->update_last_touched_date( true, $update_item_contents_last_updated_date );
@@ -4466,11 +4437,13 @@ class Comment extends DataObject
 			}
 		}
 
-		// Check we should refresh contents last updated date of the parent Item after
-		// deleting of this Comment because it was the latest comment of the parent Item:
-		$refresh_parent_item_contents_last_updated_date = ( ( $comment_Item = & $this->get_Item() ) &&
-			( $item_latest_Comment = & $comment_Item->get_latest_Comment() ) &&
-			( $item_latest_Comment->ID == $this->ID ) );
+		// Get the latest Comment of parent Item in order to know to refresh 
+		$comment_Item = & $this->get_Item();
+		if( $item_latest_Comment = & $comment_Item->get_latest_Comment() &&
+		    $item_latest_Comment->ID == $this->ID )
+		{	// We should refresh last touched date after deleting of this Comment because it was the latest comment of parent Item:
+			$refresh_parent_item = true;
+		}
 
 		if( $force_permanent_delete || ( $this->status == 'trash' ) || $this->is_meta() )
 		{	// Permamently delete comment from DB:
@@ -4506,8 +4479,9 @@ class Comment extends DataObject
 				$DB->commit();
 			}
 
-			if( $refresh_parent_item_contents_last_updated_date )
+			if( ! empty( $refresh_parent_item ) )
 			{	// Refresh contents last updated ts of parent Item if this Comment was the latest Comment of parent Item:
+				$comment_Item->latest_Comment = NULL;
 				$comment_Item->refresh_contents_last_updated_ts();
 			}
 		}

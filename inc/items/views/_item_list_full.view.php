@@ -173,11 +173,11 @@ while( $Item = & $ItemList->get_item() )
 
 				// Last touched date:
 				echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
-					.mysql2date( locale_datefmt().' @ '.locale_shorttimefmt(), $Item->get( 'last_touched_ts' ) ).'</span>';
+					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'last_touched_ts' ) ).'</span>';
 
 				// Contents updated date:
 				echo ' <span class="text-nowrap">&middot; '.T_('Contents updated').': '
-					.mysql2date( locale_datefmt().' @ '.locale_shorttimefmt(), $Item->get( 'contents_last_updated_ts' ) )
+					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'contents_last_updated_ts' ) )
 					.$Item->get_refresh_contents_last_updated_link().'</span>';
 
 				echo '<br />';
