@@ -124,8 +124,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 18, array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );
 		}
 		if( $kind == 'forum' )
-		{ // Add menu with User Directory
+		{ // Add menu with User Directory and Profile Visits ONLY for forum
 			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 20, array( 'link_type' => 'users' ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 21, array( 'link_type' => 'visits' ) );
 		}
 		// Pages list:
 		add_basic_widget( $blog_id, 'Menu', 'coll_page_list', 'core', 25 );

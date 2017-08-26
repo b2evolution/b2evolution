@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Load classes
 load_class( 'users/model/_user.class.php', 'User' );
 
-global $Collection, $Blog, $Skin, $Settings, $edited_User, $is_admin_page;
+global $Collection, $Blog, $Skin, $Settings, $current_User, $is_admin_page;
 
 /**
  * @var user permission, if user is only allowed to edit his profile
@@ -25,11 +25,21 @@ global $user_profile_only;
 
 global $user_tab, $user_ID;
 
-global $current_User, $UserSettings;
-
+global $UserSettings;
 
 memorize_param( 'user_tab', 'string', '', $user_tab );
 memorize_param( 'user_ID', 'integer', 0, $user_ID );
+
+if( ! empty( $user_ID ) )
+{
+	$UserCache = & get_UserCache();
+	$viewed_User = $UserCache->get_by_ID( $user_ID );
+}
+
+if( empty( $viewed_User ) )
+{
+	$viewed_User = $current_User;
+}
 
 // ------------------- PREV/NEXT USER LINKS -------------------
 user_prevnext_links( array(
@@ -42,16 +52,16 @@ if( $is_admin_page )
 	echo '<div class="row">';
 }
 
-if( !$user_profile_only )
+if( ! $user_profile_only )
 { // echo user edit action icons
 	$Widget = new Widget();
-	echo_user_actions( $Widget, $edited_User, 'edit' );
+	echo_user_actions( $Widget, $viewed_User, 'edit' );
 	echo '<span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">'.$Widget->gen_global_icons().'</span>';
 }
 
 if( $is_admin_page )
 {
-	echo '<div class="col-xs-12 col-lg-6'.( $user_profile_only ? '' : ' col-lg-pull-6').'">'.get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $edited_User->ID ? T_('My Profile Visits') : T_('User Profile Visits') ).'</span>'.get_manual_link( 'profile-visits-tab' ) ).'</div>';
+	echo '<div class="col-xs-12 col-lg-6'.( $user_profile_only ? '' : ' col-lg-pull-6').'">'.get_usertab_header( $viewed_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $viewed_User->ID ? T_('Who visited my profile?') : T_('User Profile Visits') ).'</span>'.get_manual_link( 'profile-visits-tab' ) ).'</div>';
 	echo '</div>';
 }
 
@@ -70,11 +80,11 @@ if( ! isset( $params ) )
 }
 
 $params = array_merge( array(
-		'page_url'             => is_admin_page() ? get_dispctrl_url( 'user', 'user_tab=visits&amp;user_ID='.$edited_User->ID ) : get_dispctrl_url( 'visits' ),
+		'page_url'             => is_admin_page() ? get_dispctrl_url( 'user', 'user_tab=visits&amp;user_ID='.$viewed_User->ID ) : get_dispctrl_url( 'visits', 'user_ID='.$viewed_User->ID ),
 		'filterset_name'       => '',
 		'results_param_prefix' => 'upv_',
-		'results_no_text'      => T_('No-one visited your profile yet. Please check back later.'),
-		'results_title'        => T_('People who have visited your profile'),
+		'results_no_text'      => $current_User->ID == $viewed_User->ID ? T_('No-one visited your profile yet. Please check back later.') : T_("No-one has visited this user's profile yet. Please check back later."),
+		'results_title'        => $current_User->ID == $viewed_User->ID ? T_('People who have visited your profile') : T_("People who have visited this user's profile"),
 		'results_order'        => '/upv_last_visit_ts/D',
 		'join_group'           => is_logged_in() ? false : true, /* Anonymous users have a limit by user group level */
 		'join_city'            => true,
@@ -133,7 +143,7 @@ $params = array_merge( array(
 		'td_class_city'        => 'nowrap',
 		//'th_class_lastvisit'   => $Blog->get_setting( 'userdir_lastseen_view' ) == 'blurred_date' ? '' : 'shrinkwrap',
 		//'td_class_lastvisit'   => $Blog->get_setting( 'userdir_lastseen_view' ) == 'blurred_date' ? '' :'center',
-		'viewed_user'          => $edited_User->ID,
+		'viewed_user'          => $viewed_User->ID,
 	), $params );
 
 users_results_block( $params ); // user.funcs.php 4974
