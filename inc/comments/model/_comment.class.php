@@ -4299,21 +4299,22 @@ class Comment extends DataObject
 
 		// Check we should refresh contents last updated date of the PARENT Item
 		// if this Comment was the latest FRONT-OFFICE VISIBLE Comment of the parent Item:
-		$refresh_parent_item_contents_last_updated_date = ( $was_front_office_visible &&
-			( $comment_Item = & $this->get_Item() ) &&
-			( $item_latest_Comment = & $comment_Item->get_latest_Comment() ) &&
-			( $item_latest_Comment->ID == $this->ID ) );
+		$refresh_parent_item_contents_last_updated_date = ( $was_front_office_visible && // This Comment was FRONT-OFFICE VISIBLE
+			( ! $this->may_be_seen_in_frontoffice() ) && // This Comment is NOT FRONT-OFFICE VISIBLE currently
+			( $comment_Item = & $this->get_Item() ) && // Get parent Item
+			( $item_latest_Comment = & $comment_Item->get_latest_Comment() ) && // Get the latest Comment of the parent Item
+			( $item_latest_Comment->ID == $this->ID ) ); // This Comment is the latest comment of the parent Item
 
 		$ItemCache = & get_ItemCache();
 		$ItemCache->clear();
 
 		// Check we should refresh contents last updated date of the PREVIOUS Item
 		// if this Comment was the latest FRONT-OFFICE VISIBLE Comment of the previous Item:
-		$refresh_previous_item_contents_last_updated_date = ( ! empty( $this->previous_item_ID ) &&
-			( $was_front_office_visible || $this->may_be_seen_in_frontoffice() ) &&
-			( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) ) &&
-			( $previous_item_latest_Comment = & $previous_Item->get_latest_Comment() ) &&
-			( $previous_item_latest_Comment->ID == $this->ID ) );
+		$refresh_previous_item_contents_last_updated_date = ( ! empty( $this->previous_item_ID ) && // This Comment is moving to another Item
+			( $was_front_office_visible ) && // This Comment was FRONT-OFFICE VISIBLE for previous Item
+			( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) ) && // Get the previous Item
+			( $previous_item_latest_Comment = & $previous_Item->get_latest_Comment() ) && // Get the latest Comment of the previous Item
+			( $previous_item_latest_Comment->ID == $this->ID ) ); // This Comment was the latest comment of the previous Item
 
 		if( ( $r = parent::dbupdate() ) !== false )
 		{

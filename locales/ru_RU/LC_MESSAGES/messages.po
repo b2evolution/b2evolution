@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-08-23 00:34+0200\n"
+"POT-Creation-Date: 2017-08-25 22:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Alexander Osokin <alex.osokin@gmail.com>, 2017\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/fplanque/teams/23/ru_RU/)\n"
@@ -123,7 +123,7 @@ msgstr "Свернуть"
 #: ../../../inc/links/model/_link.funcs.php:201
 #: ../../../inc/links/model/_link.funcs.php:202
 #: ../../../inc/tools/views/_wpxml_file.form.php:41
-#: ../../../inc/users/model/_user.funcs.php:5313
+#: ../../../inc/users/model/_user.funcs.php:5315
 msgid "Refresh"
 msgstr "Обновить"
 
@@ -156,12 +156,14 @@ msgstr "Информация"
 #: ../../../inc/tools/views/_email_address.view.php:65
 #: ../../../inc/tools/views/_email_return.view.php:84
 #: ../../../inc/tools/views/_email_sent.view.php:84
-#: ../../../inc/users/model/_user.funcs.php:5946
+#: ../../../inc/users/model/_user.funcs.php:5948
 #: ../../../inc/users/views/_user_admin.form.php:142
 #: ../../../inc/users/views/_user_admin.form.php:144
 #: ../../../inc/users/views/_user_identity.form.php:148
 #: ../../../inc/users/views/_user_subscriptions.form.php:136
 #: ../../../skins/basic/_item_comment_form.inc.php:79
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:85
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:300
 #: ../../../skins/touch/_item_comment_form.inc.php:240
 #: ../../../skins_email/account_activated.html.php:41
 #: ../../../skins_email/account_activated.txt.php:38
@@ -190,8 +192,9 @@ msgstr "Email"
 msgid "WWW"
 msgstr "WWW"
 
-#: ../../../conf/_icons.php:363 ../inc/users/model/_user.funcs.php:5705
-#: ../../../inc/users/model/_user.funcs.php:5706
+#: ../../../conf/_icons.php:363 ../inc/users/model/_user.funcs.php:5707
+#: ../../../inc/users/model/_user.funcs.php:5708
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:305
 #: ../../../skins/touch/_item_comment_form.inc.php:245
 #: ../../../skins_email/comment_new.txt.php:67
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:308
@@ -206,8 +209,8 @@ msgstr "Сайт"
 #: ../../../inc/collections/collections.ctrl.php:71
 #: ../../../inc/files/views/_file_list.inc.php:795
 #: ../../../inc/items/views/_file_create_posts.form.php:154
-#: ../../../inc/users/model/_user.funcs.php:3588
-#: ../../../inc/users/model/_user.funcs.php:3631
+#: ../../../inc/users/model/_user.funcs.php:3590
+#: ../../../inc/users/model/_user.funcs.php:3633
 #: ../../../skins_email/account_changed.html.php:33
 #: ../../../skins_email/account_changed.txt.php:35
 msgid "New"
@@ -233,6 +236,7 @@ msgstr "Контакты"
 #: ../../../inc/sessions/views/_stats_view.funcs.php:72
 #: ../../../inc/users/user.ctrl.php:63 ../inc/users/users.ctrl.php:60
 #: ../../../skins/basic/_item_comment_form.inc.php:62
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:287
 #: ../../../skins/touch/_item_comment_form.inc.php:226
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:290
 msgid "User"
@@ -255,7 +259,7 @@ msgstr "Выберите"
 #: ../../../inc/items/model/_item.funcs.php:3446
 #: ../../../inc/items/views/_item_list_full.view.php:328
 #: ../../../inc/locales/_locale_settings.form.php:296
-#: ../../../inc/users/model/_user.funcs.php:4632
+#: ../../../inc/users/model/_user.funcs.php:4634
 #: ../../../inc/users/views/_organization_user_edit.form.php:59
 msgid "Edit"
 msgstr "Изменить"
@@ -326,11 +330,11 @@ msgstr "Деактив."
 msgid "Deactivate"
 msgstr "Деактивировать"
 
-#: ../../../conf/_icons.php:619 ../inc/users/model/_user.funcs.php:3629
+#: ../../../conf/_icons.php:619 ../inc/users/model/_user.funcs.php:3631
 msgid "Activated"
 msgstr "Активировано"
 
-#: ../../../conf/_icons.php:627 ../inc/users/model/_user.funcs.php:3632
+#: ../../../conf/_icons.php:627 ../inc/users/model/_user.funcs.php:3634
 msgid "Deactivated"
 msgstr "Деактивировано"
 
@@ -401,13 +405,18 @@ msgstr "Убрать связь"
 #: ../../../skins/evopress/_body_footer.inc.php:41
 #: ../../../skins/horizon_blog_skin/access_denied.main.php:309
 #: ../../../skins/horizon_blog_skin/access_requires_login.main.php:308
-#: ../../../skins/horizon_blog_skin/index.main.php:428
-#: ../../../skins/horizon_blog_skin/single.main.php:461
+#: ../../../skins/horizon_blog_skin/index.main.php:430
+#: ../../../skins/horizon_blog_skin/single.main.php:465
 #: ../../../skins/horizon_main_skin/access_denied.main.php:174
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:175
 #: ../../../skins/horizon_main_skin/index.main.php:385
 #: ../../../skins/photoalbums/_body_footer.inc.php:40
 #: ../../../skins/photoblog/_body_footer.inc.php:33
+#: ../../../skins/pureforums_skin/access_denied.main.php:173
+#: ../../../skins/pureforums_skin/access_requires_login.main.php:175
+#: ../../../skins/pureforums_skin/help.main.php:179
+#: ../../../skins/pureforums_skin/index.main.php:270
+#: ../../../skins/pureforums_skin/msgform.main.php:180
 #: ../../../skins/touch/_body_footer.inc.php:39
 msgid "Help"
 msgstr "Помощь"
@@ -600,7 +609,7 @@ msgstr "Считать как хит поисковика"
 #: ../../../inc/locales/views/_translation.form.php:43
 #: ../../../inc/messaging/views/_contact_list.view.php:460
 #: ../../../inc/plugins/_plugin.funcs.php:460
-#: ../../../inc/users/model/_user.funcs.php:4605
+#: ../../../inc/users/model/_user.funcs.php:4607
 #: ../../../inc/users/views/_organization_user.form.php:47
 #: ../../../inc/users/views/_user_identity.form.php:601
 msgid "Add"
@@ -618,21 +627,21 @@ msgid "Action for selected elements"
 msgstr "Действие для выбранных элементов"
 
 #: ../../../conf/_icons.php:1097 ../htsrv/viewfile.php:152
-#: ../../../inc/users/model/_user.class.php:5245
+#: ../../../inc/users/model/_user.class.php:5255
 msgid "Rotate this picture 90&deg; to the right"
 msgstr "Повернуть это фото на 90&deg; по часовой стрелке"
 
 #: ../../../conf/_icons.php:1103 ../htsrv/viewfile.php:150
-#: ../../../inc/users/model/_user.class.php:5243
+#: ../../../inc/users/model/_user.class.php:5253
 msgid "Rotate this picture 90&deg; to the left"
 msgstr "Повернуть это фото на 90&deg; против часовой стрелки"
 
 #: ../../../conf/_icons.php:1109 ../htsrv/viewfile.php:151
-#: ../../../inc/users/model/_user.class.php:5244
+#: ../../../inc/users/model/_user.class.php:5254
 msgid "Rotate this picture 180&deg;"
 msgstr "Повернуть это фото на 180&deg;"
 
-#: ../../../conf/_icons.php:1115 ../inc/users/model/_user.class.php:5416
+#: ../../../conf/_icons.php:1115 ../inc/users/model/_user.class.php:5426
 msgid "Crop this picture"
 msgstr "Обрезать это изображение"
 
@@ -799,18 +808,19 @@ msgstr "Этот аккаунт удален."
 #: ../../../inc/files/views/_file_list.inc.php:345
 #: ../../../inc/files/views/_file_list.inc.php:608
 #: ../../../inc/tools/views/_phpbb_groups.form.php:84
-#: ../../../inc/users/model/_user.funcs.php:3373
+#: ../../../inc/users/model/_user.funcs.php:3375
 msgid "Select"
 msgstr "Выберите"
 
-#: ../../../htsrv/anon_async.php:785 ../inc/users/model/_user.funcs.php:3375
+#: ../../../htsrv/anon_async.php:785 ../inc/users/model/_user.funcs.php:3377
 msgid "Specific criteria"
 msgstr "Определенные критерии"
 
 #: ../../../htsrv/anon_async.php:799 ../htsrv/anon_async.php:826
-#: ../../../htsrv/anon_async.php:849 ../inc/_core/__core.init.php:146
-#: ../../../inc/_core/__core.init.php:167 ../inc/_core/__core.init.php:186
-#: ../../../inc/_core/__core.init.php:205 ../inc/_core/__core.init.php:492
+#: ../../../htsrv/anon_async.php:849 ../htsrv/quick_upload.php:372
+#: ../../../inc/_core/__core.init.php:146 ../inc/_core/__core.init.php:167
+#: ../../../inc/_core/__core.init.php:186 ../inc/_core/__core.init.php:205
+#: ../../../inc/_core/__core.init.php:492
 #: ../../../inc/antispam/model/_antispam.funcs.php:905
 #: ../../../inc/central_antispam/_central_antispam.init.php:64
 #: ../../../inc/central_antispam/_central_antispam.init.php:83
@@ -856,7 +866,7 @@ msgstr "Для ввода несколькох значений,<br/> пожал
 msgid "Comment cannot be updated!"
 msgstr "Комментарий не может быть обновлен!"
 
-#: ../../../htsrv/anon_async.php:1110 ../inc/users/model/_user.funcs.php:5539
+#: ../../../htsrv/anon_async.php:1110 ../inc/users/model/_user.funcs.php:5541
 #: ../../../inc/users/views/_organization_user.form.php:42
 #: ../../../inc/users/views/_organization_user_edit.form.php:49
 #: ../../../inc/users/views/_organization_user_edit.form.php:53
@@ -866,7 +876,7 @@ msgstr "Комментарий не может быть обновлен!"
 msgid "Role"
 msgstr "Роль"
 
-#: ../../../htsrv/anon_async.php:1125 ../inc/users/model/_user.funcs.php:3341
+#: ../../../htsrv/anon_async.php:1125 ../inc/users/model/_user.funcs.php:3343
 #: ../../../inc/users/organizations.ctrl.php:41
 #: ../../../inc/users/views/_organization.form.php:38
 #: ../../../inc/users/views/_user_identity.form.php:406
@@ -874,14 +884,14 @@ msgstr "Роль"
 msgid "Organization"
 msgstr "Организация"
 
-#: ../../../htsrv/anon_async.php:1189 ../inc/users/model/_user.funcs.php:5445
-#: ../../../inc/users/model/_user.funcs.php:6174
+#: ../../../htsrv/anon_async.php:1189 ../inc/users/model/_user.funcs.php:5447
+#: ../../../inc/users/model/_user.funcs.php:6176
 #: ../../../inc/users/views/_organization_user.form.php:38
 #: ../../../inc/users/views/_organization_user_edit.form.php:43
 msgid "Accepted"
 msgstr "Принято"
 
-#: ../../../htsrv/anon_async.php:1193 ../inc/users/model/_user.funcs.php:6178
+#: ../../../htsrv/anon_async.php:1193 ../inc/users/model/_user.funcs.php:6180
 msgid "Not accepted"
 msgstr "Не принято"
 
@@ -1058,6 +1068,7 @@ msgstr "действие: %s"
 #: ../../../inc/users/views/_userfield.form.php:74
 #: ../../../inc/users/views/_userfieldsgroup.form.php:52
 #: ../../../inc/widgets/views/_widget.form.php:95 ../install/debug.php:360
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:184
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:142
 msgid "Save Changes!"
 msgstr "Сохранить Изменения!"
@@ -1086,7 +1097,7 @@ msgstr "Сохранить Изменения!"
 #: ../../../inc/tools/views/_create_users.form.php:21
 #: ../../../inc/tools/views/_delete_item_versions.form.php:37
 #: ../../../inc/tools/views/_misc_tools.view.php:80
-#: ../../../inc/users/model/_user.funcs.php:4431
+#: ../../../inc/users/model/_user.funcs.php:4433
 #: ../../../inc/widgets/views/_widget_list_available.view.php:18
 #: ../../../install/index.php:780 ../install/index.php:923
 #: ../install/index.php:1291
@@ -1149,13 +1160,13 @@ msgstr "Нет"
 #: ../../../inc/items/views/_item_expert.form.php:825
 #: ../../../inc/links/model/_link.funcs.php:236
 #: ../../../inc/tools/views/_wpxml_file.form.php:199
-#: ../../../inc/users/model/_user.funcs.php:4379
-#: ../../../inc/users/model/_user.funcs.php:4402
-#: ../../../inc/users/model/_user.funcs.php:4424
-#: ../../../inc/users/model/_user.funcs.php:4450
-#: ../../../inc/users/model/_user.funcs.php:4603
-#: ../../../inc/users/model/_user.funcs.php:4630
-#: ../../../inc/users/model/_user.funcs.php:4658
+#: ../../../inc/users/model/_user.funcs.php:4381
+#: ../../../inc/users/model/_user.funcs.php:4404
+#: ../../../inc/users/model/_user.funcs.php:4426
+#: ../../../inc/users/model/_user.funcs.php:4452
+#: ../../../inc/users/model/_user.funcs.php:4605
+#: ../../../inc/users/model/_user.funcs.php:4632
+#: ../../../inc/users/model/_user.funcs.php:4660
 #: ../../../inc/users/views/_user_identity.form.php:278
 msgid "Loading..."
 msgstr "Загрузка..."
@@ -1443,7 +1454,7 @@ msgstr ""
 "Пока вы - Администратор с правами управления Пользователями, вы не можете "
 "закрыть свой собственный аккаунт!"
 
-#: ../../../htsrv/login.php:99 ../inc/users/model/_user.class.php:5072
+#: ../../../htsrv/login.php:99 ../inc/users/model/_user.class.php:5082
 msgid "User account closed"
 msgstr "Учетная запись пользователя закрыта"
 
@@ -1758,10 +1769,6 @@ msgstr "Заменить старую версию %s новым файлом %s
 msgid "Don't touch the old version and keep the new version as %s."
 msgstr "Оставить старую версию файла и сохранить новую как %s."
 
-#: ../../../htsrv/quick_upload.php:372
-msgid "unknown"
-msgstr ""
-
 #: ../../../htsrv/quick_upload.php:393
 #: ../inc/files/views/_file_list.inc.php:185
 msgid "Select this file"
@@ -1837,8 +1844,9 @@ msgid "Server error. Increase post_max_size and upload_max_filesize to %s"
 msgstr ""
 
 #: ../../../htsrv/upload_handler.php:146
-msgid "No files were uploaded."
-msgstr ""
+#: ../inc/files/model/_file.funcs.php:1491
+msgid "No file was uploaded."
+msgstr "Файлы не были загружены."
 
 #: ../../../htsrv/upload_handler.php:150
 msgid ""
@@ -1885,6 +1893,7 @@ msgstr ""
 #: ../../../inc/messaging/views/_message_list.view.php:348
 #: ../../../inc/messaging/views/_thread.form.php:151
 #: ../../../inc/skins/model/_skin.class.php:694
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:414
 #: ../../../skins/touch/_item_comment_form.inc.php:361
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:422
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:448
@@ -2191,7 +2200,7 @@ msgstr "Уведомления о модерации записей"
 #: ../../../inc/users/account_close.ctrl.php:62
 #: ../inc/users/display.ctrl.php:102 ../../../inc/users/groups.ctrl.php:240
 #: ../inc/users/invitations.ctrl.php:201
-#: ../../../inc/users/model/_user.funcs.php:5163
+#: ../../../inc/users/model/_user.funcs.php:5165
 #: ../../../inc/users/organizations.ctrl.php:295
 #: ../../../inc/users/registration.ctrl.php:176
 #: ../inc/users/settings.ctrl.php:133 ../../../inc/users/user.ctrl.php:752
@@ -2357,7 +2366,7 @@ msgstr "Система"
 #: ../../../inc/sessions/views/_stats_topips.view.php:82
 #: ../../../inc/tools/system.ctrl.php:32
 #: ../../../inc/tools/views/_email_address.view.php:113
-#: ../../../inc/users/model/_user.funcs.php:5770
+#: ../../../inc/users/model/_user.funcs.php:5772
 #: ../../../inc/users/views/_user_admin.form.php:152
 #: ../../../inc/users/views/_user_admin.form.php:157
 #: ../../../inc/users/views/_user_admin.form.php:405
@@ -2855,10 +2864,10 @@ msgstr "SMTP шлюз"
 #: ../../../inc/sessions/views/_stats_view.funcs.php:234
 #: ../../../inc/tools/email.ctrl.php:579
 #: ../inc/users/model/_user.class.php:4220
-#: ../../../inc/users/model/_user.class.php:5046
-#: ../../../inc/users/model/_user.funcs.php:3245
-#: ../../../inc/users/model/_user.funcs.php:3684
-#: ../../../inc/users/model/_user.funcs.php:5284
+#: ../../../inc/users/model/_user.class.php:5056
+#: ../../../inc/users/model/_user.funcs.php:3247
+#: ../../../inc/users/model/_user.funcs.php:3686
+#: ../../../inc/users/model/_user.funcs.php:5286
 #: ../../../inc/users/views/_user_identity.form.php:274
 #: ../../../inc/widgets/views/_widget_list_available.view.php:58
 #: ../../../skins_adm/bootstrap/_adminUI.class.php:850
@@ -3327,7 +3336,7 @@ msgstr "ID блога"
 #: ../../../inc/sessions/views/_stats_refdomains.form.php:37
 #: ../../../inc/skins/views/_skin_list.view.php:36
 #: ../../../inc/skins/views/_skin_list.view.php:44
-#: ../../../inc/users/model/_user.funcs.php:3241
+#: ../../../inc/users/model/_user.funcs.php:3243
 #: ../../../inc/users/views/_group.form.php:118
 #: ../../../inc/users/views/_group.view.php:68
 #: ../../../inc/users/views/_organization.form.php:53
@@ -3335,6 +3344,7 @@ msgstr "ID блога"
 #: ../../../inc/users/views/_userfields.view.php:198
 #: ../../../inc/users/views/_userfieldsgroup.form.php:40
 #: ../../../skins/basic/_item_comment_form.inc.php:74
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:298
 #: ../../../skins/touch/_item_comment_form.inc.php:238
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:301
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:315
@@ -3600,6 +3610,7 @@ msgstr "Список записей"
 #: ../../../skins/bootstrap_forums_skin/_search.disp.php:32
 #: ../../../skins/bootstrap_forums_skin/index.main.php:213
 #: ../../../skins/clean1_skin/posts.main.php:69
+#: ../../../skins/pureforums_skin/_search.disp.php:32
 #: ../../../skins/touch/_body_header.inc.php:140
 #: ../../../skins/touch/_body_header.inc.php:141
 msgid "Search"
@@ -3613,7 +3624,7 @@ msgstr "Карта сайта"
 
 #: ../../../inc/_core/_template.funcs.php:430
 #: ../../../inc/collections/views/_coll_home.form.php:45
-#: ../../../inc/users/model/_user.funcs.php:5700
+#: ../../../inc/users/model/_user.funcs.php:5702
 #: ../../../inc/widgets/widgets/_basic_menu_link.widget.php:368
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:258
 #: ../../../skins/asevo/_body_footer.inc.php:33
@@ -3677,13 +3688,18 @@ msgstr "Карта сайта"
 #: ../../../skins/evopress/_body_footer.inc.php:34
 #: ../../../skins/horizon_blog_skin/access_denied.main.php:302
 #: ../../../skins/horizon_blog_skin/access_requires_login.main.php:301
-#: ../../../skins/horizon_blog_skin/index.main.php:421
-#: ../../../skins/horizon_blog_skin/single.main.php:454
+#: ../../../skins/horizon_blog_skin/index.main.php:423
+#: ../../../skins/horizon_blog_skin/single.main.php:458
 #: ../../../skins/horizon_main_skin/access_denied.main.php:167
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:168
 #: ../../../skins/horizon_main_skin/index.main.php:378
 #: ../../../skins/photoalbums/_body_footer.inc.php:33
 #: ../../../skins/photoblog/_body_footer.inc.php:26
+#: ../../../skins/pureforums_skin/access_denied.main.php:166
+#: ../../../skins/pureforums_skin/access_requires_login.main.php:168
+#: ../../../skins/pureforums_skin/help.main.php:172
+#: ../../../skins/pureforums_skin/index.main.php:263
+#: ../../../skins/pureforums_skin/msgform.main.php:173
 #: ../../../skins/touch/_body_footer.inc.php:32
 #: ../../../skins_fallback_v5/_body_footer.inc.php:23
 msgid "Contact"
@@ -3704,8 +3720,8 @@ msgstr "Авторизоваться "
 #: ../../../skins/bootstrap_main_skin/index.main.php:264
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:354
 #: ../../../skins/bootstrap_photoblog_skin/index.main.php:235
-#: ../../../skins/horizon_blog_skin/index.main.php:276
-#: ../../../skins/horizon_blog_skin/single.main.php:286
+#: ../../../skins/horizon_blog_skin/index.main.php:278
+#: ../../../skins/horizon_blog_skin/single.main.php:290
 #: ../../../skins/horizon_main_skin/index.main.php:279
 msgid "Register"
 msgstr "Регистрация"
@@ -3719,8 +3735,8 @@ msgstr "Регистрация"
 #: ../../../skins/bootstrap_main_skin/index.main.php:271
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:361
 #: ../../../skins/bootstrap_photoblog_skin/index.main.php:242
-#: ../../../skins/horizon_blog_skin/index.main.php:283
-#: ../../../skins/horizon_blog_skin/single.main.php:294
+#: ../../../skins/horizon_blog_skin/index.main.php:285
+#: ../../../skins/horizon_blog_skin/single.main.php:298
 #: ../../../skins/horizon_main_skin/index.main.php:286
 #: ../../../skins_adm/login/_validate_form.main.php:25
 msgid "Account activation"
@@ -3814,6 +3830,8 @@ msgstr "Комметарии пользователя"
 #: ../../../skins/dating_mood/_item_block.inc.php:116
 #: ../../../skins/evopress/_item_block.inc.php:79
 #: ../../../skins/photoblog/_item_block.inc.php:187
+#: ../../../skins/pureforums_skin/_edit.disp.php:381
+#: ../../../skins/pureforums_skin/_item_block.inc.php:182
 #: ../../../skins/touch/_item_block.inc.php:96
 #: ../skins/touch/single.main.php:163
 #: ../../../skins_fallback_v5/_item_block.inc.php:89
@@ -3936,6 +3954,11 @@ msgstr "Сохраняем изменения"
 #: ../../../skins/horizon_blog_skin/_skin.class.php:387
 #: ../../../skins/photoblog/index.main.php:103
 #: ../skins/photoblog/index.main.php:121
+#: ../../../skins/pureforums_skin/_item_block.inc.php:271
+#: ../../../skins/pureforums_skin/_posts.disp.php:155
+#: ../../../skins/pureforums_skin/_posts.disp.php:213
+#: ../../../skins/pureforums_skin/_search.disp.php:52
+#: ../../../skins/pureforums_skin/_skin.class.php:433
 #: ../../../skins_adm/_adminUI_general.class.php:1026
 #: ../../../skins_adm/_adminUI_general.class.php:1106
 #: ../../../skins_adm/bootstrap/_adminUI.class.php:404
@@ -3955,6 +3978,11 @@ msgstr "Предыдущие"
 #: ../../../skins/horizon_blog_skin/_skin.class.php:388
 #: ../../../skins/photoblog/index.main.php:104
 #: ../skins/photoblog/index.main.php:117
+#: ../../../skins/pureforums_skin/_item_block.inc.php:272
+#: ../../../skins/pureforums_skin/_posts.disp.php:156
+#: ../../../skins/pureforums_skin/_posts.disp.php:214
+#: ../../../skins/pureforums_skin/_search.disp.php:53
+#: ../../../skins/pureforums_skin/_skin.class.php:434
 #: ../../../skins_adm/_adminUI_general.class.php:1027
 #: ../../../skins_adm/_adminUI_general.class.php:1107
 #: ../../../skins_adm/bootstrap/_adminUI.class.php:405
@@ -4094,8 +4122,8 @@ msgstr "Введите ваше имя пользователя (или email а
 #: ../../../inc/collections/views/_coll_user_perm.form.php:115
 #: ../../../inc/maintenance/views/_upgrade_svn.form.php:28
 #: ../../../inc/messaging/views/_contact_list.view.php:286
-#: ../../../inc/users/model/_user.class.php:6446
-#: ../../../inc/users/model/_user.funcs.php:5480
+#: ../../../inc/users/model/_user.class.php:6451
+#: ../../../inc/users/model/_user.funcs.php:5482
 #: ../../../inc/users/views/_user_identity.form.php:251
 #: ../../../inc/users/views/_user_identity.form.php:462
 #: ../../../install/_functions_install.php:282
@@ -4323,7 +4351,7 @@ msgstr "Вы хотите отменить ваши изменения для э
 #. TRANS: Abbr. for "Bytes"
 #: ../../../inc/_core/_template.funcs.php:3351
 #: ../inc/files/model/_file.funcs.php:52
-#: ../../../inc/users/model/_user.class.php:6304
+#: ../../../inc/users/model/_user.class.php:6314
 msgid "B."
 msgstr "б."
 
@@ -4657,7 +4685,7 @@ msgstr "Нет результатов"
 
 #: ../../../inc/_core/ui/_uiwidget.class.php:577
 #: ../../../inc/files/views/_file_browse.view.php:135
-#: ../../../inc/users/model/_user.funcs.php:4426
+#: ../../../inc/users/model/_user.funcs.php:4428
 #: ../../../inc/users/views/_user_crop.form.php:145
 msgid "Apply"
 msgstr "Применить"
@@ -4744,6 +4772,7 @@ msgstr "Выбрать другой"
 #: ../../../inc/_core/ui/forms/_form.class.php:3732
 #: ../../../inc/items/views/_item_list_full.view.php:663
 #: ../../../inc/links/views/_link_list.inc.php:162
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:374
 #: ../../../skins/touch/_item_comment_form.inc.php:316
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:375
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:397
@@ -4832,6 +4861,8 @@ msgstr "Строк на странице:"
 #: ../../../skins/bootstrap_photoblog_skin/_item_content.inc.php:93
 #: ../../../skins/dating_mood/index.main.php:150
 #: ../../../skins/dating_mood/index.main.php:180
+#: ../../../skins/pureforums_skin/_skin.class.php:365
+#: ../../../skins/pureforums_skin/_skin.class.php:422
 #: ../../../skins_adm/_adminUI_general.class.php:965
 #: ../../../skins_adm/_adminUI_general.class.php:1020
 #: ../../../skins_adm/_adminUI_general.class.php:1100
@@ -4846,8 +4877,8 @@ msgstr "Страницы"
 #: ../../../inc/_core/ui/results/_results.class.php:2365
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:128
 #: ../../../inc/sessions/views/_stats_search_keywords.view.php:179
-#: ../../../inc/users/model/_user.funcs.php:3327
-#: ../../../inc/users/model/_user.funcs.php:3332
+#: ../../../inc/users/model/_user.funcs.php:3329
+#: ../../../inc/users/model/_user.funcs.php:3334
 #: ../../../inc/users/views/_display.form.php:151
 #: ../../../inc/users/views/_user_identity.form.php:338
 #: ../../../inc/users/views/_user_identity.form.php:500
@@ -5304,10 +5335,10 @@ msgstr "Пожалуйста, выберите, по крайней мере, о
 #: ../../../inc/tools/views/_email_address.view.php:76
 #: ../../../inc/tools/views/_email_return.view.php:89
 #: ../../../inc/tools/views/_email_sent.view.php:89
-#: ../../../inc/users/model/_user.funcs.php:3256
-#: ../../../inc/users/model/_user.funcs.php:3275
-#: ../../../inc/users/model/_user.funcs.php:3296
-#: ../../../inc/users/model/_user.funcs.php:3337
+#: ../../../inc/users/model/_user.funcs.php:3258
+#: ../../../inc/users/model/_user.funcs.php:3277
+#: ../../../inc/users/model/_user.funcs.php:3298
+#: ../../../inc/users/model/_user.funcs.php:3339
 #: ../../../inc/users/views/_userfields.view.php:114
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:99
 #: ../../../inc/widgets/widgets/_coll_featured_posts.widget.php:52
@@ -5477,6 +5508,8 @@ msgstr "IP автора"
 #: ../../../inc/messaging/views/_message_list.view.php:205
 #: ../../../inc/messaging/views/_thread.form.php:298
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:99
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:80
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:84
 #: ../../../skins_email/comment_new.txt.php:74
 #: ../skins_email/comment_new.txt.php:78
 #: ../../../skins_email/comment_spam.html.php:90
@@ -5650,8 +5683,8 @@ msgstr "Затронутые пользователи"
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:205
 #: ../../../inc/collections/views/_coll_user_dir.form.php:47
-#: ../../../inc/users/model/_user.class.php:6449
-#: ../../../inc/users/model/_user.funcs.php:5491
+#: ../../../inc/users/model/_user.class.php:6454
+#: ../../../inc/users/model/_user.funcs.php:5493
 #: ../../../inc/users/views/_settings.form.php:62
 #: ../../../inc/users/views/_user_identity.form.php:256
 #: ../../../inc/users/views/_user_identity.form.php:463
@@ -5663,8 +5696,8 @@ msgstr "Имя"
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:206
 #: ../../../inc/collections/views/_coll_user_dir.form.php:48
-#: ../../../inc/users/model/_user.class.php:6450
-#: ../../../inc/users/model/_user.funcs.php:5500
+#: ../../../inc/users/model/_user.class.php:6455
+#: ../../../inc/users/model/_user.funcs.php:5502
 #: ../../../inc/users/views/_settings.form.php:64
 #: ../../../inc/users/views/_user_identity.form.php:262
 #: ../../../inc/users/views/_user_identity.form.php:464
@@ -5675,8 +5708,8 @@ msgstr "Фамилия"
 #: ../../../inc/antispam/views/_antispam_ban.form.php:207
 #: ../../../inc/collections/views/_coll_user_dir.form.php:49
 #: ../../../inc/messaging/views/_contact_list.view.php:304
-#: ../../../inc/users/model/_user.class.php:6448
-#: ../../../inc/users/model/_user.funcs.php:5512
+#: ../../../inc/users/model/_user.class.php:6453
+#: ../../../inc/users/model/_user.funcs.php:5514
 #: ../../../inc/users/views/_settings.form.php:60
 #: ../../../inc/users/views/_user_identity.form.php:268
 #: ../../../inc/users/views/_user_identity.form.php:465
@@ -5823,7 +5856,7 @@ msgstr ""
 #: ../../../inc/tools/views/_email_address.view.php:98
 #: ../../../inc/tools/views/_email_return.view.php:94
 #: ../../../inc/tools/views/_email_sent.view.php:94
-#: ../../../inc/users/model/_user.funcs.php:5457
+#: ../../../inc/users/model/_user.funcs.php:5459
 #: ../../../inc/users/views/_group.form.php:102
 #: ../../../inc/users/views/_group.view.php:57
 #: ../../../inc/users/views/_invitation.view.php:41
@@ -5932,9 +5965,9 @@ msgstr "Редактировать этот IP диапазон..."
 #: ../../../inc/slugs/views/_slug_list.view.php:217
 #: ../../../inc/tools/views/_email_address.view.php:214
 #: ../../../inc/tools/views/_email_return.view.php:136
-#: ../../../inc/users/model/_user.funcs.php:5139
-#: ../../../inc/users/model/_user.funcs.php:5799
-#: ../../../inc/users/model/_user.funcs.php:5809
+#: ../../../inc/users/model/_user.funcs.php:5141
+#: ../../../inc/users/model/_user.funcs.php:5801
+#: ../../../inc/users/model/_user.funcs.php:5811
 #: ../../../inc/users/views/_group.view.php:173
 #: ../../../inc/users/views/_invitation.view.php:119
 #: ../../../inc/users/views/_organization.view.php:126
@@ -6016,7 +6049,7 @@ msgstr "Центральный"
 
 #: ../../../inc/antispam/views/_antispam_list.view.php:100
 #: ../../../inc/antispam/views/_antispam_list.view.php:143
-#: ../../../inc/users/model/_user.funcs.php:5640
+#: ../../../inc/users/model/_user.funcs.php:5642
 #: ../../../inc/users/views/_invitation.view.php:97
 #: ../../../inc/users/views/_user_identity.form.php:446
 msgid "Source"
@@ -6559,7 +6592,7 @@ msgstr "Рубрика &laquo;%s&raquo; не может быть разблок�
 #: ../../../inc/items/model/_item.funcs.php:2220
 #: ../inc/skins/skins.ctrl.php:285
 #: ../../../inc/skins/views/_skin_list.view.php:64
-#: ../../../inc/users/model/_user.funcs.php:5628
+#: ../../../inc/users/model/_user.funcs.php:5630
 #: ../../../inc/users/views/_group.form.php:152
 #: ../inc/widgets/widgets.ctrl.php:613
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:103
@@ -6887,7 +6920,7 @@ msgstr "Список пользователей"
 
 #: ../../../inc/collections/_collections.init.php:791
 #: ../../../inc/collections/views/_coll_user_dir.form.php:64
-#: ../../../inc/users/model/_user.funcs.php:5610
+#: ../../../inc/users/model/_user.funcs.php:5612
 msgid "Phone"
 msgstr "Телефон"
 
@@ -7083,7 +7116,7 @@ msgstr ""
 "<p>Если это необходимо, то тема может располагать информационные страницы не так как обычные записи.</p>"
 
 #: ../../../inc/collections/_demo_content.funcs.php:129
-#: ../../../install/_functions_create.php:1798
+#: ../../../install/_functions_create.php:1799
 msgid ""
 "Heading\n"
 "=======\n"
@@ -9116,6 +9149,12 @@ msgstr ""
 #: ../../../skins/bootstrap_forums_skin/index.main.php:51
 #: ../../../skins/bootstrap_forums_skin/index.main.php:52
 #: ../../../skins/bootstrap_forums_skin/index.main.php:54
+#: ../../../skins/pureforums_skin/_edit.disp.php:71
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:45
+#: ../../../skins/pureforums_skin/index.main.php:49
+#: ../../../skins/pureforums_skin/index.main.php:70
+#: ../../../skins/pureforums_skin/index.main.php:71
+#: ../../../skins/pureforums_skin/index.main.php:73
 msgid "Forum"
 msgstr "Форум"
 
@@ -9637,7 +9676,7 @@ msgstr "Авторизован"
 #: ../../../inc/collections/model/_blog.funcs.php:2251
 #: ../../../inc/items/views/_item_history_compare.view.php:45
 #: ../../../inc/items/views/_item_history_compare.view.php:57
-#: ../../../inc/users/model/_user.funcs.php:3759
+#: ../../../inc/users/model/_user.funcs.php:3761
 msgid "View"
 msgstr "Просмотреть"
 
@@ -10213,7 +10252,8 @@ msgstr "Автозаполнение имен пользователей в па
 #: ../../../skins/horizon_main_skin/_skin.class.php:276
 #: ../../../skins/photoalbums/_skin.class.php:189
 #: ../../../skins/photoblog/_skin.class.php:189
-#: ../skins/touch/_skin.class.php:116
+#: ../../../skins/pureforums_skin/_skin.class.php:149
+#: ../../../skins/touch/_skin.class.php:116
 msgid ""
 "Check to enable auto-completion of usernames entered after a \"@\" sign in "
 "the comment forms"
@@ -11115,14 +11155,14 @@ msgstr "Сохранить и дублировать все настройки �
 #: ../../../inc/items/views/_itemtags.view.php:60
 #: ../../../inc/sessions/views/_stats_refdomains.view.php:110
 #: ../../../inc/slugs/views/_slug_list.view.php:59
-#: ../../../inc/users/model/_user.funcs.php:5298
+#: ../../../inc/users/model/_user.funcs.php:5300
 #: ../../../inc/users/views/_group_coll_perm.form.php:59
 msgid "Reset filters"
 msgstr "Сбросить фильтры"
 
 #: ../../../inc/collections/views/_coll_group_perm.form.php:86
 #: ../../../inc/collections/views/_coll_user_perm.form.php:93
-#: ../../../inc/users/model/_user.funcs.php:5281
+#: ../../../inc/users/model/_user.funcs.php:5283
 #: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:157
 msgid "All users"
 msgstr "Все пользователи"
@@ -11453,7 +11493,7 @@ msgstr "Не участники"
 #: ../../../inc/files/views/_file_list.inc.php:149
 #: ../../../inc/messaging/views/_contact_list.view.php:121
 #: ../../../inc/users/groups.ctrl.php:66
-#: ../inc/users/model/_user.class.php:6447
+#: ../inc/users/model/_user.class.php:6452
 #: ../../../inc/users/views/_invitation.view.php:81
 #: ../../../inc/users/views/_userfield.form.php:39
 msgid "Group"
@@ -12758,7 +12798,7 @@ msgid "Single post URLs"
 msgstr "URL одиночных записей"
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:50
-#: ../../../inc/users/model/_user.funcs.php:5524
+#: ../../../inc/users/model/_user.funcs.php:5526
 #: ../../../skins_email/account_activated.html.php:47
 #: ../../../skins_email/account_activated.txt.php:43
 #: ../../../skins_email/account_new.html.php:44
@@ -12784,10 +12824,10 @@ msgstr "Полное имя"
 #: ../../../inc/regional/views/_subregion_list.view.php:150
 #: ../../../inc/regional/views/_subregion_list.view.php:163
 #: ../../../inc/sessions/views/_stats_topips.view.php:74
-#: ../../../inc/users/model/_user.class.php:6452
-#: ../../../inc/users/model/_user.funcs.php:3290
-#: ../../../inc/users/model/_user.funcs.php:3297
-#: ../../../inc/users/model/_user.funcs.php:5563
+#: ../../../inc/users/model/_user.class.php:6457
+#: ../../../inc/users/model/_user.funcs.php:3292
+#: ../../../inc/users/model/_user.funcs.php:3299
+#: ../../../inc/users/model/_user.funcs.php:5565
 #: ../../../inc/users/views/_settings.form.php:72
 #: ../../../inc/users/views/_user_identity.form.php:286
 #: ../../../inc/users/views/_user_identity.form.php:477
@@ -12819,9 +12859,9 @@ msgstr "Оба"
 #: ../../../inc/regional/views/_subregion_list.view.php:134
 #: ../../../inc/regional/views/_subregion_list.view.php:155
 #: ../../../inc/regional/views/_subregion_list.view.php:168
-#: ../../../inc/users/model/_user.class.php:6453
-#: ../../../inc/users/model/_user.funcs.php:3306
-#: ../../../inc/users/model/_user.funcs.php:5577
+#: ../../../inc/users/model/_user.class.php:6458
+#: ../../../inc/users/model/_user.funcs.php:3308
+#: ../../../inc/users/model/_user.funcs.php:5579
 #: ../../../inc/users/views/_settings.form.php:74
 #: ../../../inc/users/views/_user_identity.form.php:302
 #: ../../../inc/users/views/_user_identity.form.php:483
@@ -12835,9 +12875,9 @@ msgstr "Регион"
 #: ../../../inc/regional/views/_city_list.view.php:169
 #: ../../../inc/regional/views/_city_list.view.php:187
 #: ../../../inc/regional/views/_subregion.form.php:32
-#: ../../../inc/users/model/_user.class.php:6454
-#: ../../../inc/users/model/_user.funcs.php:3314
-#: ../../../inc/users/model/_user.funcs.php:5588
+#: ../../../inc/users/model/_user.class.php:6459
+#: ../../../inc/users/model/_user.funcs.php:3316
+#: ../../../inc/users/model/_user.funcs.php:5590
 #: ../../../inc/users/views/_settings.form.php:76
 #: ../../../inc/users/views/_user_identity.form.php:315
 #: ../../../inc/users/views/_user_identity.form.php:489
@@ -12848,9 +12888,9 @@ msgstr "Субрегион"
 #: ../../../inc/items/model/_item.funcs.php:3873
 #: ../inc/regional/cities.ctrl.php:44
 #: ../../../inc/regional/views/_city.form.php:32
-#: ../../../inc/users/model/_user.class.php:6455
-#: ../../../inc/users/model/_user.funcs.php:3321
-#: ../../../inc/users/model/_user.funcs.php:5599
+#: ../../../inc/users/model/_user.class.php:6460
+#: ../../../inc/users/model/_user.funcs.php:3323
+#: ../../../inc/users/model/_user.funcs.php:5601
 #: ../../../inc/users/views/_settings.form.php:78
 #: ../../../inc/users/views/_user_identity.form.php:328
 #: ../../../inc/users/views/_user_identity.form.php:495
@@ -12858,7 +12898,7 @@ msgid "City"
 msgstr "Город"
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:65
-#: ../../../inc/users/model/_user.funcs.php:5619
+#: ../../../inc/users/model/_user.funcs.php:5621
 msgid "Social links"
 msgstr "Социальные ссылки"
 
@@ -13036,12 +13076,12 @@ msgstr "Успешно"
 #: ../../../inc/tools/model/_email.funcs.php:1119
 #: ../inc/tools/system.ctrl.php:92 ../../../inc/tools/system.ctrl.php:724
 #: ../inc/tools/system.ctrl.php:766
-#: ../../../install/_functions_create.php:1347
-#: ../install/_functions_create.php:1360
-#: ../../../install/_functions_create.php:1372
-#: ../install/_functions_create.php:1384
-#: ../../../install/_functions_create.php:1396
-#: ../install/_functions_create.php:1408
+#: ../../../install/_functions_create.php:1348
+#: ../install/_functions_create.php:1361
+#: ../../../install/_functions_create.php:1373
+#: ../install/_functions_create.php:1385
+#: ../../../install/_functions_create.php:1397
+#: ../install/_functions_create.php:1409
 msgid "Failed"
 msgstr "Неудачно"
 
@@ -13240,6 +13280,8 @@ msgstr "Автор: "
 #: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:170
 #: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:202
 #: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:236
+#: ../../../skins/pureforums_skin/_edit.disp.php:396
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:169
 #: ../../../skins_email/comment_new.html.php:93
 #: ../../../skins_email/comment_new.txt.php:102
 #: ../../../skins_email/comment_spam.html.php:72
@@ -13519,6 +13561,9 @@ msgstr ""
 #: ../../../inc/items/model/_item.class.php:4107
 #: ../../../inc/items/views/_item_list_full.view.php:551
 #: ../../../skins/basic/_item_comment_form.inc.php:23
+#: ../../../skins/horizon_blog_skin/_item_block.inc.php:168
+#: ../../../skins/horizon_main_skin/_item_block.inc.php:140
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:28
 #: ../../../skins/touch/_item_comment_form.inc.php:27
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:27
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:28
@@ -13552,6 +13597,7 @@ msgstr "%d комментариев"
 #: ../../../inc/widgets/widgets/_flag_menu_link.widget.php:101
 #: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:144
 #: ../../../inc/widgets/widgets/_profile_menu_link.widget.php:111
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:152
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:115
 msgid "Visibility"
 msgstr "Видимость"
@@ -13565,7 +13611,7 @@ msgstr "Сохранить и вернуться"
 
 #: ../../../inc/comments/model/_comment.funcs.php:343
 #: ../../../inc/items/model/_item.funcs.php:1925
-#: ../../../inc/users/model/_user.funcs.php:4404
+#: ../../../inc/users/model/_user.funcs.php:4406
 #: ../../../inc/users/views/_user_groups.form.php:65
 msgid "Save"
 msgstr "Сохранить"
@@ -13587,6 +13633,7 @@ msgstr ""
 #: ../../../inc/comments/model/_comment.funcs.php:598
 #: ../../../inc/items/views/_item_list_full.view.php:626
 #: ../../../skins/basic/_item_comment_form.inc.php:102
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:29
 #: ../../../skins/touch/_item_comment_form.inc.php:28
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:28
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:29
@@ -13620,6 +13667,7 @@ msgstr ""
 #: ../../../inc/comments/model/_comment.funcs.php:901
 #: ../../../inc/items/views/_item_list_full.view.php:595
 #: ../../../skins/basic/_item_comment_form.inc.php:54
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:273
 #: ../../../skins/touch/_item_comment_form.inc.php:212
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:276
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:295
@@ -13722,6 +13770,7 @@ msgstr "Содержимое комментария"
 #: ../../../skins/_atom/comments.main.php:87
 #: ../skins/_rdf/comments.main.php:97 ../../../skins/_rss/comments.main.php:81
 #: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:62
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:71
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:44
 #: ../../../skins_fallback_v5/_item_comment.inc.php:68
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:66
@@ -13734,12 +13783,14 @@ msgid "Move to post ID"
 msgstr "Переместить в запись (ID)"
 
 #: ../../../inc/comments/views/_comment.form.php:107
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:75
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:48
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:70
 msgid "(leave blank for normal comments)"
 msgstr "(оставьте пустым для обычных комментариев)"
 
 #: ../../../inc/comments/views/_comment.form.php:107
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:75
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:48
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:70
 msgid "In reply to comment ID"
@@ -13758,6 +13809,7 @@ msgstr ""
 " отправит ему email."
 
 #: ../../../inc/comments/views/_comment.form.php:130
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:86
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:59
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:81
 msgid "Website URL"
@@ -13765,6 +13817,7 @@ msgstr "URL сайта"
 
 #: ../../../inc/comments/views/_comment.form.php:207
 #: ../../../inc/comments/views/_comments_sidebar.view.php:126
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:133
 #: ../../../skins_email/comment_new.html.php:75
 #: ../../../skins_email/comment_new.txt.php:86
 #: ../../../skins_email/comment_spam.html.php:57
@@ -13801,6 +13854,9 @@ msgstr "Информация об отзыве"
 #: ../../../inc/messaging/views/_thread.form.php:123
 #: ../../../inc/settings/views/_eblog.form.php:138
 #: ../../../inc/widgets/widgets/_free_text.widget.php:122
+#: ../../../skins/pureforums_skin/_edit.disp.php:367
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:159
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:341
 #: ../../../skins/touch/_item_comment_form.inc.php:349
 #: ../../../skins_fallback_v5/_edit.disp.php:300
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:122
@@ -14260,6 +14316,7 @@ msgstr "Почтовый сервер имеет следующие папки:"
 #: ../../../inc/messaging/views/_thread.form.php:97
 #: ../../../inc/tools/views/_email_sent.view.php:149
 #: ../../../inc/tools/views/_email_sent_details.view.php:44
+#: ../../../skins/pureforums_skin/_edit.disp.php:217
 #: ../../../skins_fallback_v5/_contact_msg.form.php:78
 #: ../../../skins_fallback_v6/_contact_msg.form.php:78
 msgid "Subject"
@@ -15598,10 +15655,6 @@ msgstr "Файл слишком большой: %s, а разрешено мак
 msgid "The file was only partially uploaded."
 msgstr "Файл был загружен лишь частично."
 
-#: ../../../inc/files/model/_file.funcs.php:1491
-msgid "No file was uploaded."
-msgstr "Файлы не были загружены."
-
 #: ../../../inc/files/model/_file.funcs.php:1503
 msgid "An unknown error has occurred!"
 msgstr "Произошла неожиданная ошибка!"
@@ -16229,6 +16282,7 @@ msgstr "Кол-во загрузок файла через disp=download"
 #: ../../../inc/files/views/_file_browse_set.form.php:50
 #: ../../../inc/users/views/_userfield.form.php:52
 #: ../../../skins/basic/_item_comment_form.inc.php:110
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:404
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:405
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:427
 msgid "Options"
@@ -16375,7 +16429,7 @@ msgstr "Минимум голосов о спаме"
 #: ../../../inc/files/views/_file_duplicates.view.php:201
 #: ../../../inc/files/views/_file_suspicious.view.php:99
 #: ../../../inc/files/views/_file_suspicious.view.php:137
-#: ../../../inc/users/model/_user.funcs.php:4216
+#: ../../../inc/users/model/_user.funcs.php:4218
 msgid "Inappropriate"
 msgstr "Жалоба"
 
@@ -16383,7 +16437,7 @@ msgstr "Жалоба"
 #: ../../../inc/files/views/_file_duplicates.view.php:210
 #: ../../../inc/files/views/_file_suspicious.view.php:100
 #: ../../../inc/files/views/_file_suspicious.view.php:146
-#: ../../../inc/users/model/_user.funcs.php:4224
+#: ../../../inc/users/model/_user.funcs.php:4226
 msgid "Spam"
 msgstr "Спам"
 
@@ -17416,6 +17470,7 @@ msgstr "Удалить эту запись"
 #: ../../../inc/items/items.ctrl.php:1760
 #: ../inc/items/model/_item.class.php:4591
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:311
+#: ../../../skins/pureforums_skin/_item_block.inc.php:200
 msgid "You are about to delete this post!\\nThis cannot be undone!"
 msgstr "Вы собираетесь удалить эту запись! \\nЭто необратимо!"
 
@@ -17955,11 +18010,13 @@ msgstr ""
 #: ../../../inc/items/model/_item.class.php:8713
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:64
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:442
+#: ../../../skins/pureforums_skin/_legend.inc.php:64
 msgid "New topic"
 msgstr "Новый топик"
 
 #: ../../../inc/items/model/_item.class.php:8714
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:68
+#: ../../../skins/pureforums_skin/_legend.inc.php:68
 msgid "Updated topic"
 msgstr "Обновленный топик"
 
@@ -18007,7 +18064,7 @@ msgid "You have flagged this. Click to remove flag."
 msgstr "Вы пометили это. Нажмите, чтобы удалить пометку."
 
 #: ../../../inc/items/model/_item.class.php:9338
-#: ../../../inc/users/model/_user.funcs.php:3965
+#: ../../../inc/users/model/_user.funcs.php:3967
 #: ../../../inc/widgets/widgets/_item_vote.widget.php:90
 msgid "My vote:"
 msgstr "Мой голос:"
@@ -18125,14 +18182,17 @@ msgstr "Блоки Содержимое"
 
 #: ../../../inc/items/model/_item.funcs.php:1736
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:156
+#: ../../../skins/pureforums_skin/_edit.disp.php:293
 msgid "Issue date"
 msgstr "Дата создания"
 
 #: ../../../inc/items/model/_item.funcs.php:1743
+#: ../../../skins/pureforums_skin/_edit.disp.php:290
 msgid "Update to NOW"
 msgstr "Установить текущую дату"
 
 #: ../../../inc/items/model/_item.funcs.php:1752
+#: ../../../skins/pureforums_skin/_edit.disp.php:291
 msgid "Set to"
 msgstr "Выбрать дату"
 
@@ -18933,33 +18993,38 @@ msgstr "Долгота"
 
 #: ../../../inc/items/views/_item_expert.form.php:738
 #: ../../../inc/items/views/_item_mass.form.php:188
+#: ../../../skins/pureforums_skin/_edit.disp.php:335
 msgid "Visitors can leave comments on this post."
 msgstr "Посетители могут оставлять комментарии к этой записи."
 
 #: ../../../inc/items/views/_item_expert.form.php:739
 #: ../../../inc/items/views/_item_mass.form.php:189
+#: ../../../skins/pureforums_skin/_edit.disp.php:335
 msgid "Open"
 msgstr "Открыто"
 
 #: ../../../inc/items/views/_item_expert.form.php:744
 #: ../../../inc/items/views/_item_mass.form.php:194
+#: ../../../skins/pureforums_skin/_edit.disp.php:338
 msgid "Visitors can NOT leave comments on this post."
 msgstr "Посетители НЕ могут оставлять комментарии к этой записи."
 
 #: ../../../inc/items/views/_item_expert.form.php:745
 #: ../../../inc/items/views/_item_mass.form.php:195
-#: ../../../inc/users/model/_user.funcs.php:3634
+#: ../../../inc/users/model/_user.funcs.php:3636
 #: ../../../inc/users/views/_user_stats.view.php:156
 #: ../../../inc/users/views/_user_stats.view.php:157
 #: ../../../inc/users/views/_user_stats.view.php:162
 #: ../../../inc/users/views/_user_stats.view.php:163
 #: ../../../inc/users/views/_user_stats.view.php:168
 #: ../../../inc/users/views/_user_stats.view.php:169
+#: ../../../skins/pureforums_skin/_edit.disp.php:338
 msgid "Closed"
 msgstr "Закрыто"
 
 #: ../../../inc/items/views/_item_expert.form.php:752
 #: ../../../inc/items/views/_item_mass.form.php:202
+#: ../../../skins/pureforums_skin/_edit.disp.php:342
 msgid "Visitors cannot see nor leave comments on this post."
 msgstr ""
 "Посетители не могут ни оставлять, ни просматривать комментарии к этой "
@@ -18968,6 +19033,7 @@ msgstr ""
 #: ../../../inc/items/views/_item_expert.form.php:753
 #: ../../../inc/items/views/_item_mass.form.php:203
 #: ../inc/tools/system.ctrl.php:761
+#: ../../../skins/pureforums_skin/_edit.disp.php:342
 msgid "Disabled"
 msgstr "Запрещено"
 
@@ -19221,6 +19287,7 @@ msgstr ""
 "<u>будет видимым только для других админов</u>"
 
 #: ../../../inc/items/views/_item_list_full.view.php:613
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:311
 #: ../../../skins/touch/_item_comment_form.inc.php:251
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:317
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:331
@@ -19228,6 +19295,7 @@ msgid "Your vote"
 msgstr "Ваша оценка"
 
 #: ../../../inc/items/views/_item_list_full.view.php:655
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:367
 #: ../../../skins/touch/_item_comment_form.inc.php:309
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:368
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:390
@@ -19235,6 +19303,7 @@ msgid "Attached files"
 msgstr "Прикрепленные файлы"
 
 #: ../../../inc/items/views/_item_list_full.view.php:682
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:414
 #: ../../../skins/touch/_item_comment_form.inc.php:361
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:422
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:448
@@ -19243,6 +19312,7 @@ msgstr "Просмотр/Добавить файл"
 
 #: ../../../inc/items/views/_item_list_full.view.php:685
 #: ../../../skins/basic/_item_comment_form.inc.php:124
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:30
 #: ../../../skins/touch/_item_comment_form.inc.php:29
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:29
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:30
@@ -19390,6 +19460,7 @@ msgid "Create posts"
 msgstr "Создать записи"
 
 #: ../../../inc/items/views/_item_mass.form.php:163
+#: ../../../skins/pureforums_skin/_edit.disp.php:357
 #: ../../../skins_fallback_v5/_edit.disp.php:276
 msgid "Visibility / Sharing"
 msgstr "Видимость / Доступность"
@@ -20184,7 +20255,7 @@ msgid "View this user..."
 msgstr "Просмотреть этого пользователя..."
 
 #: ../../../inc/links/model/_linkuser.class.php:41
-#: ../../../inc/users/model/_user.funcs.php:6095
+#: ../../../inc/users/model/_user.funcs.php:6097
 #: ../../../inc/users/registration.ctrl.php:106
 msgid "Edit this user..."
 msgstr "Редактировать этого  пользователя..."
@@ -21672,7 +21743,7 @@ msgstr ""
 #: ../../../inc/tools/views/_phpbb_topics.form.php:65
 #: ../../../inc/tools/views/_phpbb_users.form.php:72
 #: ../../../inc/tools/views/_wpxml_file.form.php:175
-#: ../../../inc/users/model/_user.funcs.php:4660
+#: ../../../inc/users/model/_user.funcs.php:4662
 #: ../../../inc/users/views/_organization_user_remove.form.php:36
 #: ../../../skins_adm/login/_login_form.main.php:29
 msgid "Continue"
@@ -22242,8 +22313,8 @@ msgstr "Настройки были обновлены."
 
 #: ../../../inc/messaging/threads.ctrl.php:64 ../inc/skins/_skin.funcs.php:810
 #: ../../../inc/skins/_skin.funcs.php:997
-#: ../inc/users/model/_user.funcs.php:4838
-#: ../../../inc/users/model/_user.funcs.php:4972
+#: ../inc/users/model/_user.funcs.php:4840
+#: ../../../inc/users/model/_user.funcs.php:4974
 msgid "Please specify your country before attempting to contact other users."
 msgstr ""
 "Пожалуйста, выберите свою страну, прежде чем контактировать с другими "
@@ -22270,7 +22341,7 @@ msgid "Select this contact"
 msgstr "Выбрать этот контакт"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:257
-#: ../../../inc/users/model/_user.funcs.php:5468
+#: ../../../inc/users/model/_user.funcs.php:5470
 msgid "Picture"
 msgstr "Фото"
 
@@ -22305,7 +22376,7 @@ msgid "Rename this group to"
 msgstr "Переименовать эту группу в"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:484
-#: ../../../inc/users/model/_user.funcs.php:5854
+#: ../../../inc/users/model/_user.funcs.php:5856
 #: ../../../inc/users/views/_group.view.php:163
 #: ../../../inc/users/views/_userfields.view.php:161
 msgid "Delete this group"
@@ -24294,6 +24365,7 @@ msgstr "Хиты браузеров"
 #: ../../../inc/tools/system.ctrl.php:488
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:152
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:259
+#: ../../../skins/pureforums_skin/_item_list.inc.php:126
 msgid "n.a."
 msgstr "н/д"
 
@@ -24570,7 +24642,7 @@ msgstr "Спам реферер"
 #: ../../../inc/sessions/views/_stats_browserhits.view.php:207
 #: ../../../inc/sessions/views/_stats_browserhits.view.php:251
 #: ../../../inc/sessions/views/_stats_sessions_list.view.php:67
-#: ../../../inc/users/model/_user.funcs.php:2514
+#: ../../../inc/users/model/_user.funcs.php:2516
 #: ../inc/users/user.ctrl.php:833
 msgid "Sessions"
 msgstr "Сессии"
@@ -24820,7 +24892,6 @@ msgstr "Сбросить счетчики"
 #: ../../../inc/sessions/views/_stats_sessions_list.view.php:20
 #: ../../../inc/users/views/_user_activity.view.php:32
 #: ../../../inc/users/views/_user_admin.form.php:28
-#: ../../../inc/users/views/_user_profile_visits.view.php:32
 msgid "You have no permission to see this tab!"
 msgstr "У вас нет прав на доступ к этой вкладке!"
 
@@ -25460,7 +25531,7 @@ msgstr ""
 "комментарии. <b>См. ниже:</b>"
 
 #: ../../../inc/skins/_skin.funcs.php:1406
-#: ../inc/users/model/_user.funcs.php:4887
+#: ../inc/users/model/_user.funcs.php:4889
 msgid "You must log in to view this user profile."
 msgstr "Вы должны авторизоваться для просмотра профиля этого пользователя."
 
@@ -25473,7 +25544,7 @@ msgstr ""
 "профиль этого пользователя. <b>Смотрите ниже:</b>"
 
 #: ../../../inc/skins/_skin.funcs.php:1421
-#: ../inc/users/model/_user.funcs.php:4919
+#: ../inc/users/model/_user.funcs.php:4921
 msgid ""
 "Your account status currently does not permit to view this user profile."
 msgstr ""
@@ -25481,12 +25552,12 @@ msgstr ""
 "этого пользователя."
 
 #: ../../../inc/skins/_skin.funcs.php:1433
-#: ../inc/users/model/_user.funcs.php:4940
+#: ../inc/users/model/_user.funcs.php:4942
 msgid "The requested user does not exist!"
 msgstr "Запрошенный пользователь не существует!"
 
 #: ../../../inc/skins/_skin.funcs.php:1440
-#: ../inc/users/model/_user.funcs.php:4955
+#: ../inc/users/model/_user.funcs.php:4957
 msgid "The requested user account is closed!"
 msgstr "Запрошенный аккаунт пользователя закрыт!"
 
@@ -27066,10 +27137,10 @@ msgid "User group"
 msgstr "Группа пользователей"
 
 #: ../../../inc/tools/mtimport.ctrl.php:335
-#: ../inc/users/model/_user.funcs.php:3330
-#: ../../../inc/users/model/_user.funcs.php:5756
-#: ../../../inc/users/model/_user.funcs.php:5787
-#: ../../../inc/users/model/_user.funcs.php:5891
+#: ../inc/users/model/_user.funcs.php:3332
+#: ../../../inc/users/model/_user.funcs.php:5758
+#: ../../../inc/users/model/_user.funcs.php:5789
+#: ../../../inc/users/model/_user.funcs.php:5893
 #: ../../../inc/users/views/_group.view.php:76
 #: ../../../inc/users/views/_invitation.view.php:89
 msgid "Level"
@@ -29369,12 +29440,12 @@ msgid "This user does not wish to be contacted directly."
 msgstr "Этот пользователь не желает получать сообщения."
 
 #: ../../../inc/users/model/_user.class.php:3978
-#: ../../../inc/users/model/_user.funcs.php:2840
+#: ../../../inc/users/model/_user.funcs.php:2842
 msgid "Activate your account: $login$"
 msgstr "Активируйте ваш аккаунт: $login$"
 
 #: ../../../inc/users/model/_user.class.php:4038
-#: ../../../inc/users/model/_user.class.php:5111
+#: ../../../inc/users/model/_user.class.php:5121
 #: ../../../skins_email/account_activated.html.php:31
 #: ../../../skins_email/account_activated.txt.php:30
 msgid "New user account activated"
@@ -29389,7 +29460,7 @@ msgid "Send message to user"
 msgstr "Отправить сообщение пользователю"
 
 #: ../../../inc/users/model/_user.class.php:4214
-#: ../../../inc/users/model/_user.class.php:6480
+#: ../../../inc/users/model/_user.class.php:6485
 #: ../../../inc/users/views/_user_identity.form.php:272
 #: ../../../skins_email/account_activated.html.php:82
 #: ../../../skins_email/account_activated.txt.php:78
@@ -29401,7 +29472,7 @@ msgid "A man"
 msgstr "Мужчина"
 
 #: ../../../inc/users/model/_user.class.php:4217
-#: ../../../inc/users/model/_user.class.php:6480
+#: ../../../inc/users/model/_user.class.php:6485
 #: ../../../inc/users/views/_user_identity.form.php:273
 #: ../../../skins_email/account_activated.html.php:86
 #: ../../../skins_email/account_activated.txt.php:82
@@ -29413,9 +29484,9 @@ msgid "A woman"
 msgstr "Женщина"
 
 #: ../../../inc/users/model/_user.class.php:4852
-#: ../../../inc/users/model/_user.class.php:5272
-#: ../../../inc/users/model/_user.class.php:5483
-#: ../../../inc/users/model/_user.class.php:5534
+#: ../../../inc/users/model/_user.class.php:5282
+#: ../../../inc/users/model/_user.class.php:5493
+#: ../../../inc/users/model/_user.class.php:5544
 #: ../../../plugins/twitter_plugin/_twitter.plugin.php:512
 msgid "You are only allowed to update your own profile!"
 msgstr "Вам разрешено изменять только свой собственный профиль!"
@@ -29473,93 +29544,93 @@ msgstr "Email для активации аккаунта был выслан н�
 msgid "User feature settings have been changed."
 msgstr "Пользовательские настройки были изменены."
 
-#: ../../../inc/users/model/_user.class.php:5156
-#: ../../../inc/users/model/_user.class.php:5436
+#: ../../../inc/users/model/_user.class.php:5166
+#: ../../../inc/users/model/_user.class.php:5446
 msgid "You are not allowed to update this profile!"
 msgstr "Вам не разрешено изменять этот профиль!"
 
-#: ../../../inc/users/model/_user.class.php:5162
-#: ../../../inc/users/model/_user.class.php:5171
-#: ../../../inc/users/model/_user.class.php:5177
-#: ../../../inc/users/model/_user.class.php:5489
+#: ../../../inc/users/model/_user.class.php:5172
+#: ../../../inc/users/model/_user.class.php:5181
+#: ../../../inc/users/model/_user.class.php:5187
+#: ../../../inc/users/model/_user.class.php:5499
 msgid "Profile picture could not be changed!"
 msgstr "Фото пользователя не может быть изменено!"
 
-#: ../../../inc/users/model/_user.class.php:5195
+#: ../../../inc/users/model/_user.class.php:5205
 msgid "Profile picture has been restored."
 msgstr "Фото пользователя было восстановлено."
 
-#: ../../../inc/users/model/_user.class.php:5199
-#: ../../../inc/users/model/_user.class.php:5571
+#: ../../../inc/users/model/_user.class.php:5209
+#: ../../../inc/users/model/_user.class.php:5581
 msgid "Profile picture has been changed."
 msgstr "Фото пользователя было изменено."
 
-#: ../../../inc/users/model/_user.class.php:5280
+#: ../../../inc/users/model/_user.class.php:5290
 msgid "You did not specify a file."
 msgstr "Вы не указали файл."
 
-#: ../../../inc/users/model/_user.class.php:5290
+#: ../../../inc/users/model/_user.class.php:5300
 msgid "The requested file does not exist!"
 msgstr "Запрошенный файл не существует!"
 
-#: ../../../inc/users/model/_user.class.php:5298
+#: ../../../inc/users/model/_user.class.php:5308
 msgid "The requested file doesn't belong to this user."
 msgstr "Запрошенный файл не принадлежит этому пользователю."
 
-#: ../../../inc/users/model/_user.class.php:5333
+#: ../../../inc/users/model/_user.class.php:5343
 msgid "Profile picture could not be rotated!"
 msgstr "Фото пользователя не может быть повернуто!"
 
-#: ../../../inc/users/model/_user.class.php:5337
+#: ../../../inc/users/model/_user.class.php:5347
 msgid "Profile picture has been rotated."
 msgstr "Фото пользователя было повернуто."
 
-#: ../../../inc/users/model/_user.class.php:5370
+#: ../../../inc/users/model/_user.class.php:5380
 msgid "Profile picture could not be cropped!"
 msgstr "Фото пользователя не может быть обрезано!"
 
-#: ../../../inc/users/model/_user.class.php:5374
+#: ../../../inc/users/model/_user.class.php:5384
 msgid "Profile picture has been cropped."
 msgstr "Фото пользователя было обрезано."
 
-#: ../../../inc/users/model/_user.class.php:5447
+#: ../../../inc/users/model/_user.class.php:5457
 msgid "Profile picture is not found!"
 msgstr "Фото пользователя не найдено!"
 
-#: ../../../inc/users/model/_user.class.php:5460
+#: ../../../inc/users/model/_user.class.php:5470
 msgid "Profile picture has been forbidden."
 msgstr "Фото пользователя было запрещено."
 
-#: ../../../inc/users/model/_user.class.php:5464
+#: ../../../inc/users/model/_user.class.php:5474
 msgid "Profile picture has been removed."
 msgstr "Фото пользователя было удалено."
 
-#: ../../../inc/users/model/_user.class.php:5518
+#: ../../../inc/users/model/_user.class.php:5528
 msgid "Profile picture has been deleted."
 msgstr "Фото пользователя было удалено."
 
-#: ../../../inc/users/model/_user.class.php:5544
+#: ../../../inc/users/model/_user.class.php:5554
 msgid "You don't have permission to selected user file root."
 msgstr "У вас нет доступа к выбранной директории пользователя."
 
-#: ../../../inc/users/model/_user.class.php:5556
+#: ../../../inc/users/model/_user.class.php:5566
 msgid "It seems you are trying to upload the same profile picture twice."
 msgstr "Кажется, вы пытаетесь загрузить одно и тоже фото дважды. "
 
-#: ../../../inc/users/model/_user.class.php:5575
+#: ../../../inc/users/model/_user.class.php:5585
 msgid "New picture has been uploaded."
 msgstr "Новое фото было загружено."
 
-#: ../../../inc/users/model/_user.class.php:5585
+#: ../../../inc/users/model/_user.class.php:5595
 msgid "The file you uploaded does not seem to be an image."
 msgstr "Загруженный вами файл не является изображением."
 
-#: ../../../inc/users/model/_user.class.php:6004
+#: ../../../inc/users/model/_user.class.php:6014
 #, php-format
 msgid "%s (%s%% are public)"
 msgstr "%s (%s%% опубликовано)"
 
-#: ../../../inc/users/model/_user.class.php:6061
+#: ../../../inc/users/model/_user.class.php:6071
 #, php-format
 msgid ""
 "%s has posted %s comments (%s%% of which are public). %s of these comments "
@@ -29568,7 +29639,7 @@ msgstr ""
 "%s написал %s комментариев (%s%% из которых опубликованы). %s из этих "
 "комментариев были отмечены полезными %s различными пользователями."
 
-#: ../../../inc/users/model/_user.class.php:6062
+#: ../../../inc/users/model/_user.class.php:6072
 #, php-format
 msgid ""
 "%s has posted %s comments (%s%% of which are public).<br />%s voted useful "
@@ -29582,7 +29653,7 @@ msgstr ""
 "разными пользователями.<br />%s посчитаны как СПАМ %s разными "
 "пользователями."
 
-#: ../../../inc/users/model/_user.class.php:6180
+#: ../../../inc/users/model/_user.class.php:6190
 #, php-format
 msgid ""
 "%s has uploaded %s photos. %s of these photos have been liked by %s "
@@ -29590,7 +29661,7 @@ msgid ""
 msgstr ""
 "%s загрузил %s фотографий. %s их них понравились %s различным пользователям."
 
-#: ../../../inc/users/model/_user.class.php:6181
+#: ../../../inc/users/model/_user.class.php:6191
 #, php-format
 msgid ""
 "%s has uploaded %s photos.<br />%s voted up (liked) by %s different "
@@ -29603,49 +29674,49 @@ msgstr ""
 "пользователями.<br />%s посчитано НЕУМЕСТНЫМИ %s разными пользователями.<br "
 "/>%s посчитано СПАМОМ %s разными пользователями."
 
-#: ../../../inc/users/model/_user.class.php:6182
+#: ../../../inc/users/model/_user.class.php:6192
 #, php-format
 msgid "%s has uploaded %s audio files."
 msgstr "%s загрузил %s аудио файлов."
 
-#: ../../../inc/users/model/_user.class.php:6183
+#: ../../../inc/users/model/_user.class.php:6193
 #, php-format
 msgid "%s has uploaded %s video files."
 msgstr "%s загрузил %s видео файлов."
 
-#: ../../../inc/users/model/_user.class.php:6184
+#: ../../../inc/users/model/_user.class.php:6194
 #, php-format
 msgid "%s has uploaded %s other files."
 msgstr "%s загрузил %s других файлов."
 
-#: ../../../inc/users/model/_user.class.php:6298
+#: ../../../inc/users/model/_user.class.php:6308
 #, php-format
 msgid "%s has uploaded a total of %s"
 msgstr "%s загрузил в итоге %s"
 
-#: ../../../inc/users/model/_user.class.php:6325
+#: ../../../inc/users/model/_user.class.php:6335
 #, php-format
 msgid "%s successfully reported %s spams and/or spammers!"
 msgstr "%s сообщил о %s спам случаях и/или спамерах!"
 
-#: ../../../inc/users/model/_user.class.php:6417
+#: ../../../inc/users/model/_user.class.php:6422
 #, php-format
 msgid "User #%s has no permission to edit user #%s!"
 msgstr "Пользователь #%s не имеет прав для редактирования пользователя #%s!"
 
-#: ../../../inc/users/model/_user.class.php:6451
-#: ../../../inc/users/model/_user.funcs.php:5550
+#: ../../../inc/users/model/_user.class.php:6456
+#: ../../../inc/users/model/_user.funcs.php:5552
 #: ../../../inc/users/views/_registration.form.php:158
 #: ../../../inc/users/views/_user_identity.form.php:471
 #: ../../../inc/users/views/_user_stats.view.php:325
 msgid "Gender"
 msgstr "Пол"
 
-#: ../../../inc/users/model/_user.class.php:6500
+#: ../../../inc/users/model/_user.class.php:6505
 msgid "User profile changed"
 msgstr "Профиль пользователя изменен"
 
-#: ../../../inc/users/model/_user.class.php:6595
+#: ../../../inc/users/model/_user.class.php:6600
 #, php-format
 msgid "You are already a member of \"%s\"."
 msgstr "Вы уже участник \"%s\"."
@@ -29756,7 +29827,7 @@ msgid "%d seconds"
 msgstr "%d секунд"
 
 #: ../../../inc/users/model/_user.funcs.php:2399
-#: ../../../inc/users/model/_user.funcs.php:4380
+#: ../../../inc/users/model/_user.funcs.php:4382
 #: ../../../inc/users/views/_user_report.form.php:62
 #: ../../../inc/users/views/_user_report.form.php:85
 #: ../../../skins_fallback_v5/_user.disp.php:250
@@ -29769,7 +29840,7 @@ msgid "You have reported this user"
 msgstr "Вы пожаловались на этого пользователя"
 
 #: ../../../inc/users/model/_user.funcs.php:2412
-#: ../../../inc/users/model/_user.funcs.php:6106
+#: ../../../inc/users/model/_user.funcs.php:6108
 msgid "Delete this user!"
 msgstr "Удалить этого пользователя!"
 
@@ -29794,35 +29865,35 @@ msgstr "Закрыть профиль пользователя!"
 msgid "Visits"
 msgstr "Посещения"
 
-#: ../../../inc/users/model/_user.funcs.php:2518
+#: ../../../inc/users/model/_user.funcs.php:2520
 #: ../inc/users/user.ctrl.php:839
-#: ../../../inc/users/views/_user_activity.view.php:53
+#: ../../../inc/users/views/_user_activity.view.php:54
 msgid "My Activity"
 msgstr "Моя активность"
 
-#: ../../../inc/users/model/_user.funcs.php:2518
+#: ../../../inc/users/model/_user.funcs.php:2520
 #: ../inc/users/user.ctrl.php:839
-#: ../../../inc/users/views/_user_activity.view.php:53
+#: ../../../inc/users/views/_user_activity.view.php:54
 msgid "User Activity"
 msgstr "Активность пользователя"
 
-#: ../../../inc/users/model/_user.funcs.php:2888
+#: ../../../inc/users/model/_user.funcs.php:2890
 msgid "Latest account activation email"
 msgstr "Последняя активация аккаунта по email"
 
-#: ../../../inc/users/model/_user.funcs.php:2894
+#: ../../../inc/users/model/_user.funcs.php:2896
 msgid "Account is already activated"
 msgstr "Аккаунт уже активирован"
 
-#: ../../../inc/users/model/_user.funcs.php:2899
+#: ../../../inc/users/model/_user.funcs.php:2901
 msgid "The account is closed, it cannot be activated"
 msgstr "Этот аккаунт закрыт, он не может быть активирован"
 
-#: ../../../inc/users/model/_user.funcs.php:2907
+#: ../../../inc/users/model/_user.funcs.php:2909
 msgid "This user doesn't want to receive account activation reminders"
 msgstr "Этот пользователь не хочет получать напоминания об активации аккаунта"
 
-#: ../../../inc/users/model/_user.funcs.php:2914
+#: ../../../inc/users/model/_user.funcs.php:2916
 msgid ""
 "Account validation process is secured, so account activation emails are sent"
 " only upon request"
@@ -29830,23 +29901,23 @@ msgstr ""
 "Процесс проверки аккаунта настроен в безопасный режим, поэтому email "
 "сообщения с активацией аккаунта отправляются только по запросу"
 
-#: ../../../inc/users/model/_user.funcs.php:2921
+#: ../../../inc/users/model/_user.funcs.php:2923
 #: ../../../inc/users/views/_user_admin.form.php:203
 #: ../../../inc/users/views/_user_admin.form.php:219
 #: ../../../inc/users/views/_user_admin.form.php:237
 msgid "None yet"
 msgstr "Пока еще нет"
 
-#: ../../../inc/users/model/_user.funcs.php:2934
+#: ../../../inc/users/model/_user.funcs.php:2936
 msgid "Next account activation reminder"
 msgstr "Следующее напоминание об активации аккаунта"
 
-#: ../../../inc/users/model/_user.funcs.php:2937
+#: ../../../inc/users/model/_user.funcs.php:2939
 #, php-format
 msgid "%d reminders were sent out of the maximum allowed of %d."
 msgstr "%d напоминаний были высланы из максимально %d разрешенных."
 
-#: ../../../inc/users/model/_user.funcs.php:2939
+#: ../../../inc/users/model/_user.funcs.php:2941
 msgid ""
 "Scheduled job responsible for reminders is \"Send reminders about not "
 "activated accounts\"."
@@ -29854,11 +29925,11 @@ msgstr ""
 "Запланированная задача, отвечающая за напоминания, это \"Отправка "
 "напоминаний о не активированных аккаунтах\"."
 
-#: ../../../inc/users/model/_user.funcs.php:2943
+#: ../../../inc/users/model/_user.funcs.php:2945
 msgid "Account activation has failed"
 msgstr "Активация аккаунта не удалась"
 
-#: ../../../inc/users/model/_user.funcs.php:2947
+#: ../../../inc/users/model/_user.funcs.php:2949
 #, php-format
 msgid ""
 "We already sent %d account activation reminders of the maximum allowed of "
@@ -29867,7 +29938,7 @@ msgstr ""
 "Мы уже отправили %d напоминаний об активации аккаунтов из максимально %d "
 "разрешенных, больше напоминаний не будет выслано."
 
-#: ../../../inc/users/model/_user.funcs.php:2951
+#: ../../../inc/users/model/_user.funcs.php:2953
 msgid ""
 "At least one activation email should have been already sent. Check if the "
 "user email address is correct, and PHP is sending emails correctly"
@@ -29876,12 +29947,12 @@ msgstr ""
 "выслано. Проверьте верен ли email адрес пользователя, и правильно ли PHP "
 "отправляет email сообщения."
 
-#: ../../../inc/users/model/_user.funcs.php:2959
+#: ../../../inc/users/model/_user.funcs.php:2961
 #, php-format
 msgid "%s left before next notification"
 msgstr "%s осталось до следующего уведомления"
 
-#: ../../../inc/users/model/_user.funcs.php:2965
+#: ../../../inc/users/model/_user.funcs.php:2967
 #, php-format
 msgid ""
 "next notification pending since %s - check the \"Send reminders about not "
@@ -29890,21 +29961,21 @@ msgstr ""
 "следующее уведомление ожидается через %s - проверьте запланированную задачу "
 "\"Отправка напоминаний о не активированных аккаунтах\""
 
-#: ../../../inc/users/model/_user.funcs.php:3009
+#: ../../../inc/users/model/_user.funcs.php:3011
 msgid "Add field..."
 msgstr "Добавить поле..."
 
-#: ../../../inc/users/model/_user.funcs.php:3142
+#: ../../../inc/users/model/_user.funcs.php:3144
 #: ../../../inc/users/views/_user_identity.form.php:164
 msgid "Visit the site"
 msgstr "Посетить сайт"
 
-#: ../../../inc/users/model/_user.funcs.php:3238
+#: ../../../inc/users/model/_user.funcs.php:3240
 msgid "Restrict to members of this blog"
 msgstr "Ограничить для участников этого блога"
 
-#: ../../../inc/users/model/_user.funcs.php:3243
-#: ../../../inc/users/model/_user.funcs.php:5282
+#: ../../../inc/users/model/_user.funcs.php:3245
+#: ../../../inc/users/model/_user.funcs.php:5284
 #: ../../../inc/users/views/_user_stats.view.php:158
 #: ../../../inc/users/views/_user_stats.view.php:159
 #: ../../../inc/users/views/_user_stats.view.php:160
@@ -29915,8 +29986,8 @@ msgstr "Ограничить для участников этого блога"
 msgid "Men"
 msgstr "Мужчина"
 
-#: ../../../inc/users/model/_user.funcs.php:3244
-#: ../../../inc/users/model/_user.funcs.php:5283
+#: ../../../inc/users/model/_user.funcs.php:3246
+#: ../../../inc/users/model/_user.funcs.php:5285
 #: ../../../inc/users/views/_user_stats.view.php:152
 #: ../../../inc/users/views/_user_stats.view.php:153
 #: ../../../inc/users/views/_user_stats.view.php:154
@@ -29927,215 +29998,215 @@ msgstr "Мужчина"
 msgid "Women"
 msgstr "Женщина"
 
-#: ../../../inc/users/model/_user.funcs.php:3251
-#: ../../../inc/users/model/_user.funcs.php:5292
+#: ../../../inc/users/model/_user.funcs.php:3253
+#: ../../../inc/users/model/_user.funcs.php:5294
 msgid "Reported users"
 msgstr "Пользователи с жалобами"
 
-#: ../../../inc/users/model/_user.funcs.php:3252
+#: ../../../inc/users/model/_user.funcs.php:3254
 msgid "Users with custom sender address"
 msgstr "Пользователи с измененным адресом отправителя"
 
-#: ../../../inc/users/model/_user.funcs.php:3253
+#: ../../../inc/users/model/_user.funcs.php:3255
 msgid "Users with custom sender name"
 msgstr "Пользователи с измененным именем отправителя"
 
-#: ../../../inc/users/model/_user.funcs.php:3256
+#: ../../../inc/users/model/_user.funcs.php:3258
 #: ../../../inc/users/views/_user_admin.form.php:79
 #: ../../../inc/users/views/_user_admin.form.php:88
 #: ../../../inc/users/views/_user_identity.form.php:149
 msgid "Account status"
 msgstr "Статус аккаунта"
 
-#: ../../../inc/users/model/_user.funcs.php:3263
+#: ../../../inc/users/model/_user.funcs.php:3265
 msgid "All (Ungrouped)"
 msgstr "Все (Разгруппировано)"
 
-#: ../../../inc/users/model/_user.funcs.php:3264
+#: ../../../inc/users/model/_user.funcs.php:3266
 msgid "All (Grouped)"
 msgstr "Все (Сгруппировано)"
 
-#: ../../../inc/users/model/_user.funcs.php:3267
+#: ../../../inc/users/model/_user.funcs.php:3269
 #: ../../../inc/users/views/_group.form.php:123
 #, php-format
 msgid "<span %s>Primary</span> Group"
 msgstr "<span %s>Основная</span> Группа"
 
-#: ../../../inc/users/model/_user.funcs.php:3278
+#: ../../../inc/users/model/_user.funcs.php:3280
 #: ../../../inc/users/views/_group.form.php:128
 #, php-format
 msgid "<span %s>Secondary</span> Group"
 msgstr "<span %s>Второстепенная</span> Группа"
 
-#: ../../../inc/users/model/_user.funcs.php:3325
+#: ../../../inc/users/model/_user.funcs.php:3327
 msgid "Age group"
 msgstr "Возрастная группа"
 
-#: ../../../inc/users/model/_user.funcs.php:3589
+#: ../../../inc/users/model/_user.funcs.php:3591
 msgid "Activated by email"
 msgstr "Активированный по email"
 
-#: ../../../inc/users/model/_user.funcs.php:3590
-#: ../../../inc/users/model/_user.funcs.php:3630
+#: ../../../inc/users/model/_user.funcs.php:3592
+#: ../../../inc/users/model/_user.funcs.php:3632
 #: ../../../inc/users/views/_user_admin.form.php:79
 msgid "Autoactivated"
 msgstr "Автоактивированный"
 
-#: ../../../inc/users/model/_user.funcs.php:3591
-#: ../../../inc/users/model/_user.funcs.php:3633
+#: ../../../inc/users/model/_user.funcs.php:3593
+#: ../../../inc/users/model/_user.funcs.php:3635
 msgid "Email changed"
 msgstr "Email изменен"
 
-#: ../../../inc/users/model/_user.funcs.php:3592
+#: ../../../inc/users/model/_user.funcs.php:3594
 msgid "Deactivated email"
 msgstr "Деактивированный email"
 
-#: ../../../inc/users/model/_user.funcs.php:3593
-#: ../../../inc/users/model/_user.funcs.php:3635
+#: ../../../inc/users/model/_user.funcs.php:3595
+#: ../../../inc/users/model/_user.funcs.php:3637
 msgid "Failed activation"
 msgstr "Неудачная активация"
 
-#: ../../../inc/users/model/_user.funcs.php:3594
-#: ../../../inc/users/model/_user.funcs.php:3623
+#: ../../../inc/users/model/_user.funcs.php:3596
+#: ../../../inc/users/model/_user.funcs.php:3625
 msgid "Closed account"
 msgstr "Закрытый аккаунт"
 
-#: ../../../inc/users/model/_user.funcs.php:3618
+#: ../../../inc/users/model/_user.funcs.php:3620
 msgid "Account has been activated by email"
 msgstr "Аккаунт был активирован по email"
 
-#: ../../../inc/users/model/_user.funcs.php:3619
+#: ../../../inc/users/model/_user.funcs.php:3621
 msgid "Account has been automatically activated"
 msgstr "Аккаунт был автоматически активирован"
 
-#: ../../../inc/users/model/_user.funcs.php:3620
+#: ../../../inc/users/model/_user.funcs.php:3622
 msgid "New account"
 msgstr "Новый аккаунт"
 
-#: ../../../inc/users/model/_user.funcs.php:3621
+#: ../../../inc/users/model/_user.funcs.php:3623
 msgid "Deactivated account"
 msgstr "Деактивированный аккаунт"
 
-#: ../../../inc/users/model/_user.funcs.php:3622
+#: ../../../inc/users/model/_user.funcs.php:3624
 msgid "Email address was changed"
 msgstr "Email адрес был изменен"
 
-#: ../../../inc/users/model/_user.funcs.php:3624
+#: ../../../inc/users/model/_user.funcs.php:3626
 msgid "Account was not activated or the activation failed"
 msgstr "Аккаунт не был активирован или активация не удалась"
 
-#: ../../../inc/users/model/_user.funcs.php:3680
+#: ../../../inc/users/model/_user.funcs.php:3682
 msgid "This user profile is fake"
 msgstr "Профиль этого пользователя - фальшивка"
 
-#: ../../../inc/users/model/_user.funcs.php:3681
+#: ../../../inc/users/model/_user.funcs.php:3683
 msgid "This user does not follow the guidelines"
 msgstr "Этот пользователь не соблюдает правила"
 
-#: ../../../inc/users/model/_user.funcs.php:3682
+#: ../../../inc/users/model/_user.funcs.php:3684
 msgid "This user is harassing me"
 msgstr "Этот пользователь надоедает мне"
 
-#: ../../../inc/users/model/_user.funcs.php:3683
+#: ../../../inc/users/model/_user.funcs.php:3685
 msgid "This user is spamming me"
 msgstr "Этот пользователь шлет мне спам"
 
-#: ../../../inc/users/model/_user.funcs.php:3751
+#: ../../../inc/users/model/_user.funcs.php:3753
 msgid "No reports yet."
 msgstr "Пока еще нет жалоб."
 
-#: ../../../inc/users/model/_user.funcs.php:3796
+#: ../../../inc/users/model/_user.funcs.php:3798
 msgid "User account reported"
 msgstr "Жалоба на аккаунт пользователя"
 
-#: ../../../inc/users/model/_user.funcs.php:3917
+#: ../../../inc/users/model/_user.funcs.php:3919
 msgid "Quick search"
 msgstr "Быстрый поиск"
 
-#: ../../../inc/users/model/_user.funcs.php:3918
+#: ../../../inc/users/model/_user.funcs.php:3920
 msgid "Find User"
 msgstr "Найти Пользователя"
 
-#: ../../../inc/users/model/_user.funcs.php:3966
+#: ../../../inc/users/model/_user.funcs.php:3968
 msgid "I like this picture"
 msgstr "Мне нравится это изображение"
 
-#: ../../../inc/users/model/_user.funcs.php:3967
+#: ../../../inc/users/model/_user.funcs.php:3969
 msgid "You like this!"
 msgstr "Вам нравится это изображение!"
 
-#: ../../../inc/users/model/_user.funcs.php:3968
+#: ../../../inc/users/model/_user.funcs.php:3970
 msgid "I have no opinion"
 msgstr "У меня нет мнения"
 
-#: ../../../inc/users/model/_user.funcs.php:3969
+#: ../../../inc/users/model/_user.funcs.php:3971
 msgid "You have no opinion on this."
 msgstr "У вас нет мнения об этом."
 
-#: ../../../inc/users/model/_user.funcs.php:3970
+#: ../../../inc/users/model/_user.funcs.php:3972
 msgid "I don't like this picture"
 msgstr "Мне не нравится это изображение"
 
-#: ../../../inc/users/model/_user.funcs.php:3971
+#: ../../../inc/users/model/_user.funcs.php:3973
 msgid "You don't like this."
 msgstr "Вам не нравится это."
 
-#: ../../../inc/users/model/_user.funcs.php:3972
+#: ../../../inc/users/model/_user.funcs.php:3974
 msgid "I think the content of this picture is inappropriate"
 msgstr "Я считаю содержимое этого изображения неприемлемым"
 
-#: ../../../inc/users/model/_user.funcs.php:3973
+#: ../../../inc/users/model/_user.funcs.php:3975
 msgid "I think this picture was posted by a spammer"
 msgstr "Я считаю, это изображение было размещено спамером"
 
-#: ../../../inc/users/model/_user.funcs.php:3976
+#: ../../../inc/users/model/_user.funcs.php:3978
 msgid "No likes yet"
 msgstr "Пока еще нет лайков"
 
-#: ../../../inc/users/model/_user.funcs.php:3977
+#: ../../../inc/users/model/_user.funcs.php:3979
 msgid "1 person likes this"
 msgstr "1 персоне нравится это"
 
-#: ../../../inc/users/model/_user.funcs.php:3978
+#: ../../../inc/users/model/_user.funcs.php:3980
 #, php-format
 msgid "%d people like this"
 msgstr "%d людям нравится это"
 
-#: ../../../inc/users/model/_user.funcs.php:3979
+#: ../../../inc/users/model/_user.funcs.php:3981
 msgid "1 person dislikes this"
 msgstr "1 персоне не нравится это"
 
-#: ../../../inc/users/model/_user.funcs.php:3980
+#: ../../../inc/users/model/_user.funcs.php:3982
 #, php-format
 msgid "%d people dislike this"
 msgstr "%d людям не нравится это"
 
-#: ../../../inc/users/model/_user.funcs.php:3981
+#: ../../../inc/users/model/_user.funcs.php:3983
 msgid "1 like - 1 dislike"
 msgstr "1 нравится - 1 не нравится"
 
-#: ../../../inc/users/model/_user.funcs.php:3982
+#: ../../../inc/users/model/_user.funcs.php:3984
 #, php-format
 msgid "%d likes - 1 dislike"
 msgstr "%d нравится - 1 не нравится"
 
-#: ../../../inc/users/model/_user.funcs.php:3983
+#: ../../../inc/users/model/_user.funcs.php:3985
 #, php-format
 msgid "1 like - %d dislikes"
 msgstr "1 нравится - %d не нравится"
 
-#: ../../../inc/users/model/_user.funcs.php:3984
+#: ../../../inc/users/model/_user.funcs.php:3986
 #, php-format
 msgid "%d likes - %d dislikes"
 msgstr "%d нравится - %d не нравится"
 
 #. TRANS: date of last error
-#: ../../../inc/users/model/_user.funcs.php:4330
+#: ../../../inc/users/model/_user.funcs.php:4332
 #, php-format
 msgid "(last error was detected on %s)"
 msgstr "(последняя ошибка была обнаружена %s)"
 
-#: ../../../inc/users/model/_user.funcs.php:4338
+#: ../../../inc/users/model/_user.funcs.php:4340
 #, php-format
 msgid ""
 "We have detected some delivery problems to your email account %s%s. Please "
@@ -30152,7 +30223,7 @@ msgstr ""
 "другой email адрес</a>.<br /><a %s>Нажмите сюда, чтобы отменить это "
 "сообщение, как только вы получаете наши письма снова</a>."
 
-#: ../../../inc/users/model/_user.funcs.php:4349
+#: ../../../inc/users/model/_user.funcs.php:4351
 #, php-format
 msgid ""
 "Your email address: %s does not seem to work or is refusing our emails%s. "
@@ -30166,57 +30237,57 @@ msgstr ""
 "добавьте наш email адрес: %s в вашу адресную книгу, а затем <a %s>нажмите "
 "сюда, чтобы попробовать снова</a>!"
 
-#: ../../../inc/users/model/_user.funcs.php:4359
+#: ../../../inc/users/model/_user.funcs.php:4361
 #, php-format
 msgid "We are currently trying to send email to your address: %s again."
 msgstr "В данный момент мы пытаемся послать email на ваш адрес: %s еще раз."
 
-#: ../../../inc/users/model/_user.funcs.php:4381
-#: ../../../inc/users/model/_user.funcs.php:4506
+#: ../../../inc/users/model/_user.funcs.php:4383
+#: ../../../inc/users/model/_user.funcs.php:4508
 msgid "Report this user now!"
 msgstr "Пожаловаться на этого пользователя сейчас!"
 
-#: ../../../inc/users/model/_user.funcs.php:4403
+#: ../../../inc/users/model/_user.funcs.php:4405
 #: ../../../inc/users/views/_user_groups.form.php:43
 msgid "Contact Groups"
 msgstr "Группы контактов"
 
-#: ../../../inc/users/model/_user.funcs.php:4425
+#: ../../../inc/users/model/_user.funcs.php:4427
 #: ../../../inc/users/views/_user_crop.form.php:93
 msgid "Crop profile picture"
 msgstr "Обрезать изображение профиля"
 
-#: ../../../inc/users/model/_user.funcs.php:4451
+#: ../../../inc/users/model/_user.funcs.php:4453
 #: ../../../inc/users/views/_user_deldata.form.php:62
 #: ../../../inc/users/views/_user_deldata.form.php:78
 msgid "Delete user data"
 msgstr "Удалить данные пользователя"
 
-#: ../../../inc/users/model/_user.funcs.php:4452
+#: ../../../inc/users/model/_user.funcs.php:4454
 #: ../../../inc/users/views/_user_deldata.form.php:101
 msgid "Delete selected data"
 msgstr "Удалить выбранные данные"
 
-#: ../../../inc/users/model/_user.funcs.php:4495
+#: ../../../inc/users/model/_user.funcs.php:4497
 msgid "If you have an issue with this user, you can report it here:"
 msgstr ""
 "Если вы имеете проблему с этим пользователем, вы можете пожаловаться на это "
 "здесь:"
 
-#: ../../../inc/users/model/_user.funcs.php:4504
+#: ../../../inc/users/model/_user.funcs.php:4506
 msgid "You can provide additional information below"
 msgstr "Вы можете сообщить дополнительную информацию ниже:"
 
-#: ../../../inc/users/model/_user.funcs.php:4531
+#: ../../../inc/users/model/_user.funcs.php:4533
 #: ../../../skins_fallback_v5/_closeaccount.disp.php:48
 msgid "Reason"
 msgstr "Причина"
 
-#: ../../../inc/users/model/_user.funcs.php:4535
+#: ../../../inc/users/model/_user.funcs.php:4537
 msgid "Already Reported User"
 msgstr "На пользователя уже пожаловались"
 
-#: ../../../inc/users/model/_user.funcs.php:4536
+#: ../../../inc/users/model/_user.funcs.php:4538
 #, php-format
 msgid ""
 "You have reported this user on %s<br />as \"%s\"<br />with the additional "
@@ -30225,199 +30296,199 @@ msgstr ""
 "Вы пожаловались на этого пользователя %s<br />как \"%s\"<br />с "
 "дополнительной информацией \"%s\""
 
-#: ../../../inc/users/model/_user.funcs.php:4540
+#: ../../../inc/users/model/_user.funcs.php:4542
 msgid "Cancel Report"
 msgstr "Отменить Жалобу"
 
-#: ../../../inc/users/model/_user.funcs.php:4604
+#: ../../../inc/users/model/_user.funcs.php:4606
 msgid "Add user to organization"
 msgstr "Добавить пользователя в организацию"
 
-#: ../../../inc/users/model/_user.funcs.php:4631
-#: ../../../inc/users/model/_user.funcs.php:6134
+#: ../../../inc/users/model/_user.funcs.php:4633
+#: ../../../inc/users/model/_user.funcs.php:6136
 msgid "Edit membership"
 msgstr "Редактировать участие"
 
-#: ../../../inc/users/model/_user.funcs.php:4659
+#: ../../../inc/users/model/_user.funcs.php:4661
 #: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:423
 msgid "WARNING"
 msgstr "ПРЕДУПРЕЖДЕНИЕ"
 
-#: ../../../inc/users/model/_user.funcs.php:4698
-#: ../../../inc/users/model/_user.funcs.php:4713
+#: ../../../inc/users/model/_user.funcs.php:4700
+#: ../../../inc/users/model/_user.funcs.php:4715
 msgid "Invitation code is incorrect!"
 msgstr "Код приглашения неправильный"
 
-#: ../../../inc/users/model/_user.funcs.php:4790
+#: ../../../inc/users/model/_user.funcs.php:4792
 msgid "You must log in to view the user directory."
 msgstr "Вы должны авторизоваться для просмотра папки пользователя."
 
-#: ../../../inc/users/model/_user.funcs.php:4807
+#: ../../../inc/users/model/_user.funcs.php:4809
 msgid "You must activate your account before you can view the user directory."
 msgstr ""
 "Вы должны активировать ваш аккаунт, прежде чем вы сможете просматривать "
 "список пользователей."
 
-#: ../../../inc/users/model/_user.funcs.php:4815
-#: ../../../inc/users/model/_user.funcs.php:4913
+#: ../../../inc/users/model/_user.funcs.php:4817
+#: ../../../inc/users/model/_user.funcs.php:4915
 msgid "See below:"
 msgstr "См. ниже:"
 
-#: ../../../inc/users/model/_user.funcs.php:4822
+#: ../../../inc/users/model/_user.funcs.php:4824
 msgid ""
 "Your account status currently does not permit to view the user directory."
 msgstr ""
 "Ваш статус аккаунта сейчас не позволяет просматривать список пользователей."
 
-#: ../../../inc/users/model/_user.funcs.php:4905
+#: ../../../inc/users/model/_user.funcs.php:4907
 msgid "You must activate your account before you can view this user profile."
 msgstr ""
 "Вы должны активировать ваш аккаунт, прежде чем вы сможете просмотреть "
 "профиль этого пользователя."
 
-#: ../../../inc/users/model/_user.funcs.php:4987
+#: ../../../inc/users/model/_user.funcs.php:4989
 msgid "You don't have permission to view this user profile."
 msgstr "У вас нет доступа для просмотра профиля этого пользователя."
 
-#: ../../../inc/users/model/_user.funcs.php:5018
+#: ../../../inc/users/model/_user.funcs.php:5020
 msgid "This user profile has been reported by other users!"
 msgstr "Другие пользователи докладывали на этого пользователя!"
 
-#: ../../../inc/users/model/_user.funcs.php:5019
+#: ../../../inc/users/model/_user.funcs.php:5021
 msgid "User was not reported yet."
 msgstr "На пользователя пока еще не было жалоб."
 
-#: ../../../inc/users/model/_user.funcs.php:5107
+#: ../../../inc/users/model/_user.funcs.php:5109
 msgid "Date and time"
 msgstr "Дата и время"
 
-#: ../../../inc/users/model/_user.funcs.php:5116
+#: ../../../inc/users/model/_user.funcs.php:5118
 msgid "Reporting user"
 msgstr "Нажаловавшийся пользователь"
 
-#: ../../../inc/users/model/_user.funcs.php:5123
+#: ../../../inc/users/model/_user.funcs.php:5125
 msgid "Selected option in the select list"
 msgstr "Выбранная опция в списке"
 
-#: ../../../inc/users/model/_user.funcs.php:5130
+#: ../../../inc/users/model/_user.funcs.php:5132
 msgid "Additional info"
 msgstr "Дополнительная информация"
 
-#: ../../../inc/users/model/_user.funcs.php:5142
+#: ../../../inc/users/model/_user.funcs.php:5144
 msgid "Remove this report!"
 msgstr "Удалить эту жалобу!"
 
-#: ../../../inc/users/model/_user.funcs.php:5164
+#: ../../../inc/users/model/_user.funcs.php:5166
 msgid "No users"
 msgstr "Нет пользователей"
 
-#: ../../../inc/users/model/_user.funcs.php:5289
+#: ../../../inc/users/model/_user.funcs.php:5291
 msgid "Activated users"
 msgstr "Активированные пользователи"
 
-#: ../../../inc/users/model/_user.funcs.php:5313
+#: ../../../inc/users/model/_user.funcs.php:5315
 msgid "Refresh users list..."
 msgstr "Обновить список пользователей..."
 
-#: ../../../inc/users/model/_user.funcs.php:5319
-#: ../../../inc/users/model/_user.funcs.php:5333
+#: ../../../inc/users/model/_user.funcs.php:5321
+#: ../../../inc/users/model/_user.funcs.php:5335
 msgid "Add user"
 msgstr "Добавить пользователя"
 
-#: ../../../inc/users/model/_user.funcs.php:5319
+#: ../../../inc/users/model/_user.funcs.php:5321
 msgid "Create a new user..."
 msgstr "Создать нового пользователя..."
 
-#: ../../../inc/users/model/_user.funcs.php:5323
+#: ../../../inc/users/model/_user.funcs.php:5325
 #: ../../../inc/users/views/_group.view.php:53
 msgid "Add group"
 msgstr "Добавить группу"
 
-#: ../../../inc/users/model/_user.funcs.php:5323
+#: ../../../inc/users/model/_user.funcs.php:5325
 #: ../../../inc/users/views/_group.view.php:53
 msgid "Create a new group..."
 msgstr "Создать новую группу..."
 
-#: ../../../inc/users/model/_user.funcs.php:5348
+#: ../../../inc/users/model/_user.funcs.php:5350
 msgid "Send newsletter to the current selection"
 msgstr "Отправить рассылку текущей выборке"
 
-#: ../../../inc/users/model/_user.funcs.php:5433
+#: ../../../inc/users/model/_user.funcs.php:5435
 msgid "default group for new users"
 msgstr "группа по умолчанию для новых пользователей"
 
-#: ../../../inc/users/model/_user.funcs.php:5633
+#: ../../../inc/users/model/_user.funcs.php:5635
 msgid "View personal blogs"
 msgstr "Личные блоги"
 
-#: ../../../inc/users/model/_user.funcs.php:5652
+#: ../../../inc/users/model/_user.funcs.php:5654
 msgid "Registered"
 msgstr "Зарегистрирован"
 
-#: ../../../inc/users/model/_user.funcs.php:5664
+#: ../../../inc/users/model/_user.funcs.php:5666
 msgid "RC"
 msgstr "СР"
 
-#: ../../../inc/users/model/_user.funcs.php:5665
+#: ../../../inc/users/model/_user.funcs.php:5667
 msgid "Registration country"
 msgstr "Страна регистрации"
 
-#: ../../../inc/users/model/_user.funcs.php:5676
+#: ../../../inc/users/model/_user.funcs.php:5678
 msgid "Profile update"
 msgstr "Профиль обновлен"
 
-#: ../../../inc/users/model/_user.funcs.php:5688
+#: ../../../inc/users/model/_user.funcs.php:5690
 msgid "Last Visit"
 msgstr "Последний визит"
 
-#: ../../../inc/users/model/_user.funcs.php:5714
+#: ../../../inc/users/model/_user.funcs.php:5716
 msgid "Rep"
 msgstr "Жалобы"
 
-#: ../../../inc/users/model/_user.funcs.php:5726
+#: ../../../inc/users/model/_user.funcs.php:5728
 msgid "Primary<br />Group"
 msgstr "Основная<br />Группа"
 
-#: ../../../inc/users/model/_user.funcs.php:5737
+#: ../../../inc/users/model/_user.funcs.php:5739
 msgid "Sec.<br />Groups"
 msgstr "Втор.<br />Группы"
 
-#: ../../../inc/users/model/_user.funcs.php:5819
+#: ../../../inc/users/model/_user.funcs.php:5821
 msgid "Last visit on your profile"
 msgstr "Последнее посещение на вашем профиле"
 
-#: ../../../inc/users/model/_user.funcs.php:5848
+#: ../../../inc/users/model/_user.funcs.php:5850
 #: ../../../inc/users/views/_group.view.php:157
 #: ../../../inc/users/views/_userfields.view.php:156
 msgid "Edit this group..."
 msgstr "Редактировать эту группу..."
 
-#: ../../../inc/users/model/_user.funcs.php:5850
+#: ../../../inc/users/model/_user.funcs.php:5852
 #: ../../../inc/users/views/_group.view.php:159
 #: ../../../inc/users/views/_userfields.view.php:157
 msgid "Duplicate this group..."
 msgstr "Дублировать эту группу..."
 
-#: ../../../inc/users/model/_user.funcs.php:5962
+#: ../../../inc/users/model/_user.funcs.php:5964
 msgid "Private Message"
 msgstr "Личное сообщение"
 
-#: ../../../inc/users/model/_user.funcs.php:6103
+#: ../../../inc/users/model/_user.funcs.php:6105
 msgid "Duplicate this user..."
 msgstr "Дублировать этого пользователя..."
 
-#: ../../../inc/users/model/_user.funcs.php:6138
+#: ../../../inc/users/model/_user.funcs.php:6140
 msgid "Remove user from organization"
 msgstr "Удалить пользователя из организации"
 
-#: ../../../inc/users/model/_user.funcs.php:6255
+#: ../../../inc/users/model/_user.funcs.php:6257
 #: ../../../inc/users/views/_user_admin.form.php:454
 #, php-format
 msgid "Add domain %s"
 msgstr "Добавить домен %s"
 
-#: ../../../inc/users/model/_user.funcs.php:6256
-#: ../../../inc/users/model/_user.funcs.php:6260
+#: ../../../inc/users/model/_user.funcs.php:6258
+#: ../../../inc/users/model/_user.funcs.php:6262
 msgid "Domain status"
 msgstr "Статус домена"
 
@@ -31004,7 +31075,8 @@ msgstr "Показывать пол в панели управления"
 #: ../../../skins/horizon_main_skin/_skin.class.php:264
 #: ../../../skins/photoalbums/_skin.class.php:177
 #: ../../../skins/photoblog/_skin.class.php:177
-#: ../skins/touch/_skin.class.php:104
+#: ../../../skins/pureforums_skin/_skin.class.php:137
+#: ../../../skins/touch/_skin.class.php:104
 msgid "Use colored usernames to differentiate men & women."
 msgstr ""
 "Использовать цветные имена пользователей для различия мужчин и женщин."
@@ -31030,7 +31102,8 @@ msgstr "Отображение имени пользователя в панел
 #: ../../../skins/horizon_main_skin/_skin.class.php:270
 #: ../../../skins/photoalbums/_skin.class.php:183
 #: ../../../skins/photoblog/_skin.class.php:183
-#: ../skins/touch/_skin.class.php:110
+#: ../../../skins/pureforums_skin/_skin.class.php:143
+#: ../../../skins/touch/_skin.class.php:110
 msgid "Check to enable bubble tips on usernames"
 msgstr ""
 "Отметьте, чтобы включить всплывающие подсказки над имена пользователей"
@@ -31051,7 +31124,8 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:269
 #: ../../../skins/photoalbums/_skin.class.php:182
 #: ../../../skins/photoblog/_skin.class.php:182
-#: ../skins/touch/_skin.class.php:109
+#: ../../../skins/pureforums_skin/_skin.class.php:142
+#: ../../../skins/touch/_skin.class.php:109
 msgid "Username bubble tips"
 msgstr "Всплывающие подсказки над именами пользователей"
 
@@ -31950,11 +32024,11 @@ msgstr ""
 msgid "Receiving emails through a message form"
 msgstr "Получение email сообщений через форму отправки сообщений"
 
-#: ../../../inc/users/views/_user_activity.view.php:57
+#: ../../../inc/users/views/_user_activity.view.php:58
 msgid "User created from IP"
 msgstr "Пользователь создан из IP"
 
-#: ../../../inc/users/views/_user_activity.view.php:98
+#: ../../../inc/users/views/_user_activity.view.php:99
 msgid "Delete User and All his contributions"
 msgstr "Удалить Пользователя и Все его элементы"
 
@@ -32425,6 +32499,7 @@ msgstr "Изменить профиль пользователя"
 #: ../../../inc/widgets/widgets/_basic_menu_link.widget.php:63
 #: ../../../inc/widgets/widgets/_basic_menu_link.widget.php:424
 #: ../../../skins/basic/_item_comment_form.inc.php:65
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:288
 #: ../../../skins/touch/_item_comment_form.inc.php:228
 msgid "Edit profile"
 msgstr "Редактирование профиля"
@@ -32607,11 +32682,11 @@ msgstr "Посещения Моего Профиля"
 msgid "User Profile Visits"
 msgstr "Посещения Профиля Пользователя"
 
-#: ../../../inc/users/views/_user_profile_visits.view.php:75
+#: ../../../inc/users/views/_user_profile_visits.view.php:76
 msgid "No-one visited your profile yet. Please check back later."
 msgstr "Пока еще никто не посетил ваш профиль. Пожалуйста, проверьте позже."
 
-#: ../../../inc/users/views/_user_profile_visits.view.php:76
+#: ../../../inc/users/views/_user_profile_visits.view.php:77
 msgid "People who have visited your profile"
 msgstr "Люди, которые посетили ваш профиль"
 
@@ -33012,6 +33087,7 @@ msgstr "Порядковый номер"
 #: ../../../install/_functions_evoupgrade.php:2164
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:48
 #: ../../../skins/bootstrap_forums_skin/index.main.php:45
+#: ../../../skins/pureforums_skin/index.main.php:62
 msgid "Latest topics"
 msgstr "Последние топики"
 
@@ -33566,6 +33642,7 @@ msgstr "Не пытаться подсвечивать (кэшируемое)"
 #: ../../../skins/horizon_main_skin/_skin.class.php:296
 #: ../../../skins/photoalbums/index.main.php:79
 #: ../skins/photoblog/index.main.php:63
+#: ../../../skins/pureforums_skin/index.main.php:137
 #: ../../../skins/touch/_body_header.inc.php:124
 msgid "Menu"
 msgstr "Меню"
@@ -35089,6 +35166,8 @@ msgstr "Автор"
 
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:120
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:243
+#: ../../../skins/pureforums_skin/_item_block.inc.php:64
+#: ../../../skins/pureforums_skin/_item_list.inc.php:118
 msgid "Started by"
 msgstr "Начато пользователем"
 
@@ -35965,84 +36044,84 @@ msgstr "Тег &lt;%s&gt; не должен содержать строковы�
 msgid "Protected"
 msgstr "Защищено"
 
-#: ../../../install/_functions_create.php:418
-#: ../install/_functions_create.php:419
+#: ../../../install/_functions_create.php:419
+#: ../install/_functions_create.php:420
 msgid "Enter a number"
 msgstr "Введите число"
 
-#: ../../../install/_functions_create.php:418
+#: ../../../install/_functions_create.php:419
 msgid "First numeric field"
 msgstr "Первое числовое поле"
 
-#: ../../../install/_functions_create.php:419
+#: ../../../install/_functions_create.php:420
 msgid "Second numeric field"
 msgstr "Второе числовое поле"
 
-#: ../../../install/_functions_create.php:420
+#: ../../../install/_functions_create.php:421
 msgid "Enter a string"
 msgstr "Введите строку"
 
-#: ../../../install/_functions_create.php:420
+#: ../../../install/_functions_create.php:421
 msgid "First string field"
 msgstr "Первое строковое поле"
 
-#: ../../../install/_functions_create.php:421
+#: ../../../install/_functions_create.php:422
 msgid "Define your own labels"
 msgstr "Определите ваши метки"
 
-#: ../../../install/_functions_create.php:421
+#: ../../../install/_functions_create.php:422
 msgid "Define your own notes"
 msgstr "Определите ваши заметки"
 
-#: ../../../install/_functions_create.php:422
+#: ../../../install/_functions_create.php:423
 msgid "Enter multiple lines"
 msgstr "Введите несколько линий"
 
-#: ../../../install/_functions_create.php:422
+#: ../../../install/_functions_create.php:423
 msgid "Multiline plain text field"
 msgstr "Поле многострочного простого текста"
 
-#: ../../../install/_functions_create.php:423
+#: ../../../install/_functions_create.php:424
 msgid "Enter HTML code"
 msgstr "Введите HTML код"
 
-#: ../../../install/_functions_create.php:423
+#: ../../../install/_functions_create.php:424
 msgid "Multiline HTML field"
 msgstr "Поле многострочного HTML текста"
 
-#: ../../../install/_functions_create.php:424
+#: ../../../install/_functions_create.php:425
 msgid "Enter an URL (absolute or relative)"
 msgstr "Введите URL (абсолютный или относительный)"
 
-#: ../../../install/_functions_create.php:424
+#: ../../../install/_functions_create.php:425
 msgid "URL field"
 msgstr "URL поле"
 
-#: ../../../install/_functions_create.php:1260
+#: ../../../install/_functions_create.php:1261
 msgid "Creating default scheduled jobs... "
 msgstr "Создание исходных назначенных заданий..."
 
-#: ../../../install/_functions_create.php:1263
+#: ../../../install/_functions_create.php:1264
 msgid "Create default scheduled jobs"
 msgstr "Создание исходных назначенных заданий"
 
-#: ../../../install/_functions_create.php:1457
+#: ../../../install/_functions_create.php:1458
 #, php-format
 msgid "Demo private conversation #%s"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1461
+#: ../../../install/_functions_create.php:1462
 #, php-format
 msgid "This is a demo private message to %s."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1492
+#: ../../../install/_functions_create.php:1493
 #, php-format
 msgid "This is a demo private reply to %s."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1796
-#: ../install/_functions_create.php:1797
+#: ../../../install/_functions_create.php:1797
+#: ../install/_functions_create.php:1798
 msgid "Markdown Example"
 msgstr "Markdown Пример"
 
@@ -39619,13 +39698,18 @@ msgstr "%s в ответ на %s"
 #: ../../../skins/evopress/_body_footer.inc.php:35
 #: ../../../skins/horizon_blog_skin/access_denied.main.php:303
 #: ../../../skins/horizon_blog_skin/access_requires_login.main.php:302
-#: ../../../skins/horizon_blog_skin/index.main.php:422
-#: ../../../skins/horizon_blog_skin/single.main.php:455
+#: ../../../skins/horizon_blog_skin/index.main.php:424
+#: ../../../skins/horizon_blog_skin/single.main.php:459
 #: ../../../skins/horizon_main_skin/access_denied.main.php:168
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:169
 #: ../../../skins/horizon_main_skin/index.main.php:379
 #: ../../../skins/photoalbums/_body_footer.inc.php:34
 #: ../../../skins/photoblog/_body_footer.inc.php:27
+#: ../../../skins/pureforums_skin/access_denied.main.php:167
+#: ../../../skins/pureforums_skin/access_requires_login.main.php:169
+#: ../../../skins/pureforums_skin/help.main.php:173
+#: ../../../skins/pureforums_skin/index.main.php:264
+#: ../../../skins/pureforums_skin/msgform.main.php:174
 #: ../../../skins/touch/_body_footer.inc.php:33
 #: ../../../skins_fallback_v5/_body_footer.inc.php:24
 msgid "Send a message to the owner of this blog..."
@@ -39644,6 +39728,7 @@ msgstr "Отправить письмо владельцу этого блога
 #: ../../../skins/evopress/single.main.php:135
 #: ../../../skins/photoalbums/_item_block.inc.php:62
 #: ../../../skins/photoblog/_item_block.inc.php:136
+#: ../../../skins/pureforums_skin/_item_block.inc.php:132
 #: ../../../skins/touch/single.main.php:123
 #: ../../../skins_fallback_v6/_item_block.inc.php:136
 msgid "Item Single"
@@ -39672,7 +39757,8 @@ msgstr "В каждой записи"
 #: ../../../skins/horizon_main_skin/_skin.class.php:214
 #: ../../../skins/photoalbums/_skin.class.php:134
 #: ../../../skins/photoblog/_skin.class.php:134
-#: ../skins/touch/_skin.class.php:61
+#: ../../../skins/pureforums_skin/_skin.class.php:94
+#: ../../../skins/touch/_skin.class.php:61
 msgid "Colorbox Image Zoom"
 msgstr "Включить \"Colorbox\""
 
@@ -39691,7 +39777,8 @@ msgstr "Включить \"Colorbox\""
 #: ../../../skins/horizon_main_skin/_skin.class.php:215
 #: ../../../skins/photoalbums/_skin.class.php:135
 #: ../../../skins/photoblog/_skin.class.php:135
-#: ../skins/touch/_skin.class.php:62
+#: ../../../skins/pureforums_skin/_skin.class.php:95
+#: ../../../skins/touch/_skin.class.php:62
 msgid ""
 "Check to enable javascript zooming on images (using the colorbox script)"
 msgstr ""
@@ -39712,7 +39799,8 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:220
 #: ../../../skins/photoalbums/_skin.class.php:140
 #: ../../../skins/photoblog/_skin.class.php:140
-#: ../skins/touch/_skin.class.php:67
+#: ../../../skins/pureforums_skin/_skin.class.php:100
+#: ../../../skins/touch/_skin.class.php:67
 msgid "Voting on Post Images"
 msgstr "Голосование на Изображениях Записей"
 
@@ -39760,8 +39848,11 @@ msgstr "Голосование на Изображениях Записей"
 #: ../../../skins/photoblog/_skin.class.php:141
 #: ../../../skins/photoblog/_skin.class.php:153
 #: ../../../skins/photoblog/_skin.class.php:165
-#: ../skins/touch/_skin.class.php:68 ../../../skins/touch/_skin.class.php:80
-#: ../skins/touch/_skin.class.php:92
+#: ../../../skins/pureforums_skin/_skin.class.php:101
+#: ../../../skins/pureforums_skin/_skin.class.php:113
+#: ../../../skins/pureforums_skin/_skin.class.php:125
+#: ../../../skins/touch/_skin.class.php:68 ../skins/touch/_skin.class.php:80
+#: ../../../skins/touch/_skin.class.php:92
 msgid "Check this to enable AJAX voting buttons in the colorbox zoom view"
 msgstr ""
 "Отметьте это, чтобы включить кнопки AJAX голосования в увеличенном просмотре"
@@ -39811,8 +39902,9 @@ msgstr ""
 #: ../../../skins/photoblog/_skin.class.php:146
 #: ../../../skins/photoblog/_skin.class.php:158
 #: ../../../skins/photoblog/_skin.class.php:170
-#: ../skins/touch/_skin.class.php:73 ../../../skins/touch/_skin.class.php:85
-#: ../skins/touch/_skin.class.php:97
+#: ../../../skins/pureforums_skin/_skin.class.php:130
+#: ../../../skins/touch/_skin.class.php:73 ../skins/touch/_skin.class.php:85
+#: ../../../skins/touch/_skin.class.php:97
 msgid "Display Votes"
 msgstr "Отображать Голоса"
 
@@ -39860,8 +39952,9 @@ msgstr "Отображать Голоса"
 #: ../../../skins/photoblog/_skin.class.php:147
 #: ../../../skins/photoblog/_skin.class.php:159
 #: ../../../skins/photoblog/_skin.class.php:171
-#: ../skins/touch/_skin.class.php:74 ../../../skins/touch/_skin.class.php:86
-#: ../skins/touch/_skin.class.php:98
+#: ../../../skins/pureforums_skin/_skin.class.php:131
+#: ../../../skins/touch/_skin.class.php:74 ../skins/touch/_skin.class.php:86
+#: ../../../skins/touch/_skin.class.php:98
 msgid "Check to display number of likes and dislikes"
 msgstr "Отметьте для отображения количества лайков и дислайков"
 
@@ -39880,7 +39973,8 @@ msgstr "Отметьте для отображения количества ла
 #: ../../../skins/horizon_main_skin/_skin.class.php:232
 #: ../../../skins/photoalbums/_skin.class.php:152
 #: ../../../skins/photoblog/_skin.class.php:152
-#: ../skins/touch/_skin.class.php:79
+#: ../../../skins/pureforums_skin/_skin.class.php:112
+#: ../../../skins/touch/_skin.class.php:79
 msgid "Voting on Comment Images"
 msgstr "Голосование на Изображениях Комментариев"
 
@@ -39899,7 +39993,8 @@ msgstr "Голосование на Изображениях Комментар�
 #: ../../../skins/horizon_main_skin/_skin.class.php:244
 #: ../../../skins/photoalbums/_skin.class.php:164
 #: ../../../skins/photoblog/_skin.class.php:164
-#: ../skins/touch/_skin.class.php:91
+#: ../../../skins/pureforums_skin/_skin.class.php:124
+#: ../../../skins/touch/_skin.class.php:91
 msgid "Voting on User Images"
 msgstr "Голосование на Изображениях Пользователей"
 
@@ -39918,7 +40013,8 @@ msgstr "Голосование на Изображениях Пользоват�
 #: ../../../skins/horizon_main_skin/_skin.class.php:263
 #: ../../../skins/photoalbums/_skin.class.php:176
 #: ../../../skins/photoblog/_skin.class.php:176
-#: ../skins/touch/_skin.class.php:103
+#: ../../../skins/pureforums_skin/_skin.class.php:136
+#: ../../../skins/touch/_skin.class.php:103
 msgid "Display gender"
 msgstr "Показывать пол"
 
@@ -39937,7 +40033,8 @@ msgstr "Показывать пол"
 #: ../../../skins/horizon_main_skin/_skin.class.php:275
 #: ../../../skins/photoalbums/_skin.class.php:188
 #: ../../../skins/photoblog/_skin.class.php:188
-#: ../skins/touch/_skin.class.php:115
+#: ../../../skins/pureforums_skin/_skin.class.php:148
+#: ../../../skins/touch/_skin.class.php:115
 msgid "Autocomplete usernames"
 msgstr "Автозаполнение имен пользователей"
 
@@ -40005,6 +40102,11 @@ msgstr "Автозаполнение имен пользователей"
 #: ../../../skins/horizon_main_skin/access_denied.main.php:86
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:87
 #: ../../../skins/horizon_main_skin/index.main.php:97
+#: ../../../skins/pureforums_skin/access_denied.main.php:87
+#: ../../../skins/pureforums_skin/access_requires_login.main.php:88
+#: ../../../skins/pureforums_skin/help.main.php:93
+#: ../../../skins/pureforums_skin/index.main.php:121
+#: ../../../skins/pureforums_skin/msgform.main.php:94
 msgid "Header"
 msgstr "Заголовок"
 
@@ -40028,8 +40130,8 @@ msgstr "Заголовок"
 #: ../../../skins/evopress/_sidebar.inc.php:22
 #: ../../../skins/horizon_blog_skin/access_denied.main.php:180
 #: ../../../skins/horizon_blog_skin/access_requires_login.main.php:179
-#: ../../../skins/horizon_blog_skin/index.main.php:316
-#: ../../../skins/horizon_blog_skin/single.main.php:347
+#: ../../../skins/horizon_blog_skin/index.main.php:318
+#: ../../../skins/horizon_blog_skin/single.main.php:351
 msgid "Sidebar"
 msgstr "Боковая панель"
 
@@ -40055,6 +40157,7 @@ msgid "Site/Url"
 msgstr "Сайт / URL"
 
 #: ../../../skins/basic/_item_comment_form.inc.php:93
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:305
 #: ../../../skins/touch/_item_comment_form.inc.php:245
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:308
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:322
@@ -40070,6 +40173,7 @@ msgid "(Set cookies for name, email &amp; url)"
 msgstr "(Установит cookie для имени, email и url)"
 
 #: ../../../skins/basic/_item_comment_form.inc.php:115
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:382
 #: ../../../skins/touch/_item_comment_form.inc.php:324
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:383
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:405
@@ -40164,6 +40268,11 @@ msgstr "Еще нет %s для этой записи..."
 #: ../../../skins/photoblog/help.main.php:45
 #: ../skins/photoblog/index.main.php:44
 #: ../../../skins/photoblog/msgform.main.php:46
+#: ../../../skins/pureforums_skin/access_denied.main.php:60
+#: ../../../skins/pureforums_skin/access_requires_login.main.php:61
+#: ../../../skins/pureforums_skin/help.main.php:66
+#: ../../../skins/pureforums_skin/index.main.php:94
+#: ../../../skins/pureforums_skin/msgform.main.php:67
 msgid "Page Top"
 msgstr "Верх страницы"
 
@@ -40480,8 +40589,8 @@ msgstr "\"%s\" контейнер"
 #: ../../../skins/bootstrap_manual_skin/msgform.main.php:265
 #: ../../../skins/horizon_blog_skin/access_denied.main.php:223
 #: ../../../skins/horizon_blog_skin/access_requires_login.main.php:222
-#: ../../../skins/horizon_blog_skin/index.main.php:353
-#: ../../../skins/horizon_blog_skin/single.main.php:384
+#: ../../../skins/horizon_blog_skin/index.main.php:355
+#: ../../../skins/horizon_blog_skin/single.main.php:388
 msgid "Sidebar 2"
 msgstr "Боковая панель 2"
 
@@ -40538,13 +40647,18 @@ msgstr "Боковая панель 2"
 #: ../../../skins/dating_mood/msgform.main.php:149
 #: ../../../skins/horizon_blog_skin/access_denied.main.php:276
 #: ../../../skins/horizon_blog_skin/access_requires_login.main.php:275
-#: ../../../skins/horizon_blog_skin/index.main.php:399
-#: ../../../skins/horizon_blog_skin/single.main.php:432
+#: ../../../skins/horizon_blog_skin/index.main.php:401
+#: ../../../skins/horizon_blog_skin/single.main.php:436
 #: ../../../skins/horizon_main_skin/_skin.class.php:297
 #: ../../../skins/horizon_main_skin/access_denied.main.php:146
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:147
 #: ../../../skins/horizon_main_skin/index.main.php:357
 #: ../../../skins/photoalbums/_body_footer.inc.php:23
+#: ../../../skins/pureforums_skin/access_denied.main.php:145
+#: ../../../skins/pureforums_skin/access_requires_login.main.php:147
+#: ../../../skins/pureforums_skin/help.main.php:151
+#: ../../../skins/pureforums_skin/index.main.php:242
+#: ../../../skins/pureforums_skin/msgform.main.php:152
 msgid "Footer"
 msgstr "Футер"
 
@@ -40561,8 +40675,8 @@ msgstr "Футер"
 #: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:146
 #: ../../../skins/bootstrap_photoblog_skin/index.main.php:222
 #: ../../../skins/horizon_blog_skin/access_requires_login.main.php:146
-#: ../../../skins/horizon_blog_skin/index.main.php:263
-#: ../../../skins/horizon_blog_skin/single.main.php:272
+#: ../../../skins/horizon_blog_skin/index.main.php:265
+#: ../../../skins/horizon_blog_skin/single.main.php:276
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:117
 #: ../../../skins/horizon_main_skin/index.main.php:266
 #: ../../../skins_adm/login/_login_form.main.php:38
@@ -40570,6 +40684,7 @@ msgid "Log in to your account"
 msgstr "Форма авторизации"
 
 #: ../../../skins/bootstrap_forums_skin/_comments.disp.php:39
+#: ../../../skins/pureforums_skin/_comments.disp.php:36
 msgid "No replies yet..."
 msgstr "Пока еще нет ответов...."
 
@@ -40589,6 +40704,9 @@ msgstr "Редактировать введение"
 #: ../../../skins/bootstrap_forums_skin/_front.disp.php:112
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:96
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:451
+#: ../../../skins/pureforums_skin/_front.disp.php:58
+#: ../../../skins/pureforums_skin/_posts.disp.php:67
+#: ../../../skins/pureforums_skin/_skin.class.php:299
 msgid "This forum is locked: you cannot post, reply to, or edit topics."
 msgstr ""
 "Этот форум заблокирован: вы не можете постить, комментировать или "
@@ -40597,16 +40715,22 @@ msgstr ""
 #: ../../../skins/bootstrap_forums_skin/_front.disp.php:118
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:25
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:110
+#: ../../../skins/pureforums_skin/_legend.inc.php:25
+#: ../../../skins/pureforums_skin/_posts.disp.php:81
 msgid "Forum (contains several topics)"
 msgstr "Форум (содержит несколько топиков)"
 
 #: ../../../skins/bootstrap_forums_skin/_front.disp.php:137
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:131
+#: ../../../skins/pureforums_skin/_front.disp.php:82
+#: ../../../skins/pureforums_skin/_posts.disp.php:100
 msgid "Subforums"
 msgstr "Подфорумы"
 
 #: ../../../skins/bootstrap_forums_skin/_front.disp.php:151
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:144
+#: ../../../skins/pureforums_skin/_front.disp.php:94
+#: ../../../skins/pureforums_skin/_posts.disp.php:112
 #, php-format
 msgid "%s topics"
 msgstr "%s топиков"
@@ -40617,6 +40741,9 @@ msgstr "%s топиков"
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:263
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:267
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:145
+#: ../../../skins/pureforums_skin/_front.disp.php:95
+#: ../../../skins/pureforums_skin/_item_list.inc.php:130
+#: ../../../skins/pureforums_skin/_posts.disp.php:113
 #, php-format
 msgid "%s replies"
 msgstr "%s ответов"
@@ -40637,25 +40764,33 @@ msgstr "Страница Записи"
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:268
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:258
+#: ../../../skins/pureforums_skin/_item_block.inc.php:158
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:136
 msgid "Back to top"
 msgstr "Наверх"
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:283
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:273
+#: ../../../skins/pureforums_skin/_item_block.inc.php:176
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:158
 msgid "Quote"
 msgstr "Цитировать"
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:283
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:273
+#: ../../../skins/pureforums_skin/_item_block.inc.php:176
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:158
 msgid "Reply with quote"
 msgstr "Ответить с цитатой"
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:293
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:302
+#: ../../../skins/pureforums_skin/_item_block.inc.php:191
 msgid "Edit this topic"
 msgstr "Редактировать этот топик"
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:311
+#: ../../../skins/pureforums_skin/_item_block.inc.php:200
 msgid "Delete this topic"
 msgstr "Удалить этот топик"
 
@@ -40710,29 +40845,37 @@ msgstr "Пинг"
 
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:288
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:291
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:186
 msgid "Edit this reply"
 msgstr "Редактировать этот ответ"
 
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:300
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:195
 msgid "Delete this reply"
 msgstr "Удалить это ответ"
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:43
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:43
+#: ../../../skins/pureforums_skin/_legend.inc.php:43
 msgid "Discussion topic"
 msgstr "Топик обсуждения"
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:48
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:55
+#: ../../../skins/pureforums_skin/_legend.inc.php:55
 msgid "Sticky topic / Announcement"
 msgstr "Прикрепленный топик / Объявление"
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:49
+#: ../../../skins/pureforums_skin/_edit.disp.php:326
+#: ../../../skins/pureforums_skin/_item_list.inc.php:47
 msgid "Sticky"
 msgstr "Прилеплены"
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:55
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:462
+#: ../../../skins/pureforums_skin/_item_list.inc.php:53
+#: ../../../skins/pureforums_skin/_skin.class.php:310
 msgid "This topic is locked: you cannot edit posts or make replies."
 msgstr ""
 "Этот топик заблокирован: вы не можете редактировать записи или создавать "
@@ -40740,6 +40883,7 @@ msgstr ""
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:61
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:47
+#: ../../../skins/pureforums_skin/_legend.inc.php:47
 msgid "Popular topic"
 msgstr "Популярный топик"
 
@@ -40752,23 +40896,30 @@ msgstr "Просмотреть последний комментарий"
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:334
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:357
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:370
+#: ../../../skins/pureforums_skin/_item_list.inc.php:153
+#: ../../../skins/pureforums_skin/_item_list.inc.php:170
 msgid "View latest post"
 msgstr "Просмотреть последний ответ"
 
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:29
+#: ../../../skins/pureforums_skin/_legend.inc.php:29
 msgid "Forum is locked"
 msgstr "Форум заблокирован"
 
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:33
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:105
+#: ../../../skins/pureforums_skin/_legend.inc.php:33
+#: ../../../skins/pureforums_skin/_posts.disp.php:76
 msgid "Sub-forum (contains several topics)"
 msgstr "Подфорум (содержит несколько топиков)"
 
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:51
+#: ../../../skins/pureforums_skin/_legend.inc.php:51
 msgid "Locked topic"
 msgstr "Заблокированный топик"
 
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:224
+#: ../../../skins/pureforums_skin/_posts.disp.php:199
 msgid "There is no topic in this forum yet."
 msgstr "В этом форуме пока еще нет топиков."
 
@@ -40779,6 +40930,7 @@ msgstr ""
 "топики."
 
 #: ../../../skins/bootstrap_forums_skin/_search.disp.php:38
+#: ../../../skins/pureforums_skin/_search.disp.php:38
 msgid "Topic: "
 msgstr "Топик:"
 
@@ -40820,6 +40972,7 @@ msgstr "Отображать баннер \"Публичные\""
 
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:154
 #: ../../../skins/photoalbums/_skin.class.php:195
+#: ../../../skins/pureforums_skin/_skin.class.php:155
 msgid "Display banner for \"Public\" posts (posts & comments)"
 msgstr ""
 "Отображать баннер видимости для \"Публичных\" записей (записей и "
@@ -40838,6 +40991,8 @@ msgid "Display Assignee (with Priority color coding) & Status"
 msgstr "Отображать Назначенного (с цветом приоритета) и Статус"
 
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:442
+#: ../../../skins/pureforums_skin/_edit.disp.php:54
+#: ../../../skins/pureforums_skin/index.main.php:196
 msgid "Post a new topic"
 msgstr "Создать новый топик"
 
@@ -40847,34 +41002,41 @@ msgid "Reply"
 msgstr "Ответить"
 
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:467
+#: ../../../skins/pureforums_skin/_skin.class.php:315
 msgid "Reply to topic"
 msgstr "Ответить на топик"
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:616
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:654
-msgid "Recent Topics"
-msgstr "Последние Топики"
-
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:649
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:619
 msgid "New Topics"
 msgstr "Новые Топики"
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:713
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:624
+msgid "Recent Topics"
+msgstr "Последние Топики"
+
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:682
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:164
 msgid "Is this reply helpful?"
 msgstr "Этот ответ полезный?"
 
 #: ../../../skins/bootstrap_forums_skin/index.main.php:53
 #: ../../../skins/bootstrap_forums_skin/index.main.php:183
+#: ../../../skins/pureforums_skin/index.main.php:72
+#: ../../../skins/pureforums_skin/index.main.php:201
 msgid "Latest Replies"
 msgstr "Последние Ответы"
 
 #: ../../../skins/bootstrap_forums_skin/index.main.php:56
 #: ../../../skins/bootstrap_forums_skin/index.main.php:187
+#: ../../../skins/pureforums_skin/index.main.php:75
+#: ../../../skins/pureforums_skin/index.main.php:204
 msgid "User's topics"
 msgstr "Топики пользователя"
 
 #: ../../../skins/bootstrap_forums_skin/index.main.php:57
 #: ../../../skins/bootstrap_forums_skin/index.main.php:188
+#: ../../../skins/pureforums_skin/index.main.php:76
+#: ../../../skins/pureforums_skin/index.main.php:205
 msgid "User's replies"
 msgstr "Ответы пользователя"
 
@@ -41307,24 +41469,8 @@ msgstr "Расположение боковой панели"
 msgid "posted on"
 msgstr "опубликовано на"
 
-#: ../../../skins/horizon_blog_skin/_item_block.inc.php:169
-#: ../../../skins/horizon_main_skin/_item_block.inc.php:140
-msgid "<span>Leave a comment <i class=\"fa fa-angle-double-right\"></i></span>"
-msgstr ""
-"<span>Оставить комментарий <i class=\"fa fa-angle-double-right\"></i></span>"
-
-#: ../../../skins/horizon_blog_skin/_item_block.inc.php:170
-#: ../../../skins/horizon_main_skin/_item_block.inc.php:141
-msgid "1 <i class=\"fa fa-comments\"></i>"
-msgstr "1 <i class=\"fa fa-comments\"></i>"
-
-#: ../../../skins/horizon_blog_skin/_item_block.inc.php:171
-#: ../../../skins/horizon_main_skin/_item_block.inc.php:142
-#, php-format
-msgid "%d <i class=\"fa fa-comments\"></i>"
-msgstr "%d <i class=\"fa fa-comments\"></i>"
-
 #: ../../../skins/horizon_blog_skin/_item_comment.inc.php:67
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:70
 msgid "In response to:"
 msgstr "В ответ на:"
 
@@ -41359,11 +41505,13 @@ msgstr "Цвет нижней части"
 
 #: ../../../skins/horizon_blog_skin/_skin.class.php:391
 #: ../../../skins/horizon_blog_skin/_skin.class.php:392
+#: ../../../skins/pureforums_skin/_skin.class.php:437
+#: ../../../skins/pureforums_skin/_skin.class.php:438
 msgid "..."
 msgstr "..."
 
-#: ../../../skins/horizon_blog_skin/index.main.php:295
-#: ../../../skins/horizon_blog_skin/single.main.php:329
+#: ../../../skins/horizon_blog_skin/index.main.php:297
+#: ../../../skins/horizon_blog_skin/single.main.php:333
 #: ../../../skins/horizon_main_skin/index.main.php:302
 msgid "Sending a message"
 msgstr "Отправка сообщения"
@@ -41457,6 +41605,7 @@ msgid "Post info text color"
 msgstr "Цвет текста информации записи"
 
 #: ../../../skins/photoalbums/_skin.class.php:194
+#: ../../../skins/pureforums_skin/_skin.class.php:154
 msgid "\"Public\" banner"
 msgstr "Баннер \"Публичные\""
 
@@ -41477,6 +41626,302 @@ msgstr "Размер миниатюр на странице одиночной �
 #, php-format
 msgid "%s photos"
 msgstr "%s фотографий"
+
+#: ../../../skins/pureforums_skin/_edit.disp.php:54
+#: ../../../skins/pureforums_skin/index.main.php:69
+#: ../../../skins/pureforums_skin/index.main.php:197
+#: ../../../skins_email/post_new.html.php:97
+msgid "Edit post"
+msgstr "Редактировать запись"
+
+#: ../../../skins/pureforums_skin/_edit.disp.php:70
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:44
+msgid "Appears in"
+msgstr "Появляется в"
+
+#: ../../../skins/pureforums_skin/_edit.disp.php:72
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:46
+msgid "Main forum"
+msgstr "Основной форум"
+
+#: ../../../skins/pureforums_skin/_edit.disp.php:73
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:47
+msgid "Additional forum"
+msgstr "Дополнительный форум"
+
+#: ../../../skins/pureforums_skin/_edit.disp.php:248
+#: ../../../skins/pureforums_skin/_item_block.inc.php:238
+msgid "Message body"
+msgstr "Сообщение"
+
+#: ../../../skins/pureforums_skin/_edit.disp.php:326
+msgid "Make this topic sticky (featured at the top of the list)"
+msgstr "Сделать этот топик прикрепленным (расположенным в верху списка)"
+
+#: ../../../skins/pureforums_skin/_edit.disp.php:345
+msgid "Allow replies"
+msgstr "Разрешить ответы"
+
+#: ../../../skins/pureforums_skin/_edit.disp.php:377
+msgid ""
+"Check this to let b2evolution auto-suggest tags as you type, based on the "
+"tags existing on other posts."
+msgstr ""
+"Отметьте это, чтобы дать b2evolution автоматически предлагать теги, "
+"основанные на существующих тегах в других записях, во время их написания."
+
+#: ../../../skins/pureforums_skin/_edit.disp.php:379
+msgid "suggest"
+msgstr "предлагать"
+
+#: ../../../skins/pureforums_skin/_edit.disp.php:403
+#: ../../../skins_fallback_v5/_edit.disp.php:374
+msgid "You do not have permission to edit file attachments for this post"
+msgstr ""
+"У вас нет разрешений на редактирование прикрепленных файлов этой записи"
+
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:28
+msgid "Editing reply"
+msgstr "Редактирование ответа"
+
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:49
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:30
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:30
+msgid "Comment content"
+msgstr "Содержимое комментария"
+
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:127
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:85
+msgid "Comment date"
+msgstr "Дата комментария"
+
+#: ../../../skins/pureforums_skin/_edit_comment.disp.php:176
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:137
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:137
+msgid "You do not have permission to edit file attachments for this comment"
+msgstr ""
+"У вас нет разрешений на редактирование прикрепленных файлов этого "
+"комментария"
+
+#: ../../../skins/pureforums_skin/_front.disp.php:64
+#: ../../../skins/pureforums_skin/_item_list.inc.php:43
+msgid "No new posts"
+msgstr "Нет новых записей"
+
+#: ../../../skins/pureforums_skin/_item_block.inc.php:225
+msgid ""
+"This is your topic. You are receiving notifications when anyone posts a "
+"reply on your topics."
+msgstr ""
+"Это ваш топик. Вы получаете уведомления, когда кто-нибудь постит ответ на "
+"ваши топики."
+
+#: ../../../skins/pureforums_skin/_item_block.inc.php:226
+msgid "You will be notified by email when someone posts a reply here."
+msgstr "Вы будете уведомлены по email, когда кто-нибудь ответит здесь."
+
+#: ../../../skins/pureforums_skin/_item_block.inc.php:227
+msgid "Notify me by email when someone posts a reply here."
+msgstr "Уведомите меня по email, когда кто-нибудь ответит здесь."
+
+#: ../../../skins/pureforums_skin/_item_block.inc.php:239
+msgid "Submit"
+msgstr "Отправить"
+
+#: ../../../skins/pureforums_skin/_item_block.inc.php:241
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:50
+msgid "Post a reply"
+msgstr "Ответить"
+
+#: ../../../skins/pureforums_skin/_item_block.inc.php:254
+msgid "You must be a member of this blog to post a reply."
+msgstr "Вы должны быть участником этого блога, чтобы постить ответы."
+
+#: ../../../skins/pureforums_skin/_item_block.inc.php:255
+msgid "You must be logged in to post a reply."
+msgstr "Вы должны авторизоваться, чтобы постить ответы."
+
+#: ../../../skins/pureforums_skin/_item_block.inc.php:256
+msgid "You must activate your account before you can post a reply."
+msgstr ""
+"Вы должны активировать ваш аккаунт, прежде чем вы сможете постить ответы."
+
+#: ../../../skins/pureforums_skin/_item_block.inc.php:257
+msgid "RSS feed for replies to this topic"
+msgstr "RSS лента для ответов по этому топику"
+
+#: ../../../skins/pureforums_skin/_item_block.inc.php:259
+msgid "This topic is closed."
+msgstr "Этот топик закрыт."
+
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:165
+msgid "Mark this reply as helpful!"
+msgstr "Отметить этот ответ как полезный!"
+
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:166
+msgid "You think this reply is helpful"
+msgstr "Вы считаете этот ответ полезным"
+
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:167
+msgid "Mark this reply as not helpful!"
+msgstr "Отметить этот ответ как бесполезный!"
+
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:168
+msgid "You think this reply is not helpful"
+msgstr "Вы считаете этот ответ бесполезным"
+
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:175
+msgid "Mark this reply as spam!"
+msgstr "Отметить этот ответ как спам!"
+
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:176
+msgid "You think this reply is spam"
+msgstr "Вы считаете этот ответ спамом"
+
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:177
+msgid "Mark this reply as not sure!"
+msgstr "Отметить этот ответ как нейтральный!"
+
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:178
+msgid "You are not sure in this reply"
+msgstr "Вы считаете этот ответ нейтральным"
+
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:179
+msgid "Mark this reply as OK!"
+msgstr "Отметить этот ответ как хороший!"
+
+#: ../../../skins/pureforums_skin/_item_comment.inc.php:180
+msgid "You think this reply is OK"
+msgstr "Вы считаете этот ответ хорошим"
+
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:300
+#: ../../../skins/touch/_item_comment_form.inc.php:240
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:303
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:317
+msgid "Your email address will <strong>not</strong> be revealed on this site."
+msgstr "Ваш email адрес <strong>не будет</strong> показан на сайте."
+
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:383
+#: ../../../skins/touch/_item_comment_form.inc.php:325
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:384
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:406
+msgid "For my next comment on this site"
+msgstr ""
+"Использовать введенные здесь данные для следующих комментариев на этом сайте"
+
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:396
+#: ../../../skins/touch/_item_comment_form.inc.php:338
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:397
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:419
+msgid "Allow message form"
+msgstr "Разрешить форму сообщений"
+
+#: ../../../skins/pureforums_skin/_item_comment_form.inc.php:397
+#: ../../../skins/touch/_item_comment_form.inc.php:339
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:398
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:420
+msgid ""
+"Allow users to contact me through a message form -- Your email will "
+"<strong>not</strong> be revealed!"
+msgstr ""
+"Разрешить пользователям посылать мне сообщения -- Ваш email адрес <strong>не"
+" будет</strong> показан!"
+
+#: ../../../skins/pureforums_skin/_search.disp.php:39
+msgid "Reply: "
+msgstr "Ответ:"
+
+#: ../../../skins/pureforums_skin/_search.disp.php:40
+msgid "Forum: "
+msgstr "Форум:"
+
+#: ../../../skins/pureforums_skin/_search.disp.php:41
+msgid "Tag: "
+msgstr "Тег:"
+
+#: ../../../skins/pureforums_skin/_skin.class.php:84
+msgid "Style of profile pictures"
+msgstr "Стиль фото пользователей"
+
+#: ../../../skins/pureforums_skin/_skin.class.php:89
+msgid "Round the corners of profile pictures"
+msgstr "Округлять углы фотографий пользователей"
+
+#: ../../../skins/pureforums_skin/_skin.class.php:90
+msgid "Original pictures with square corners"
+msgstr "Оригинальные фотографии с квадратными углами"
+
+#: ../../../skins/pureforums_skin/_skin.class.php:106
+msgid "Display Post Votes"
+msgstr "Отображать Голоса Записи"
+
+#: ../../../skins/pureforums_skin/_skin.class.php:107
+msgid "Check to display number of post likes and dislikes"
+msgstr "Отметьте для отображения количества лайков и дислайков записи"
+
+#: ../../../skins/pureforums_skin/_skin.class.php:118
+msgid "Display Comment Votes"
+msgstr "Отображать Голоса Комментария"
+
+#: ../../../skins/pureforums_skin/_skin.class.php:119
+msgid "Check to display number of comment likes and dislikes"
+msgstr "Отметьте для отображения количества лайков и дислайков комментария"
+
+#: ../../../skins/pureforums_skin/_skin.class.php:160
+msgid "Width switcher"
+msgstr "Переключатель ширины"
+
+#: ../../../skins/pureforums_skin/_skin.class.php:161
+msgid "Check to enable the width switcher between fixed value and 100%."
+msgstr ""
+"Отметьте, чтобы включить переключатель ширины между фиксированным значением "
+"и 100%."
+
+#: ../../../skins/pureforums_skin/_skin.class.php:290
+msgid "Post new topic"
+msgstr "Создать новый топик"
+
+#: ../../../skins/pureforums_skin/index.main.php:68
+msgid "Start a new topic"
+msgstr "Начать новый топик"
+
+#: ../../../skins/pureforums_skin/index.main.php:218
+msgid ""
+"Notify me by email whenever a reply is published on one of "
+"<strong>my</strong> topics."
+msgstr ""
+"Уведомите меня по email, когда какой-нибудь ответ опубликован на одном из "
+"<strong>моих</strong> топиков."
+
+#: ../../../skins/pureforums_skin/index.main.php:219
+msgid ""
+"Notify me by email whenever a reply is posted in a forum where I am a "
+"moderator."
+msgstr ""
+"Уведомите меня по email, когда какой-нибудь ответ создан в форуме, где я "
+"являюсь модератором."
+
+#: ../../../skins/pureforums_skin/index.main.php:220
+#, php-format
+msgid "Topics created by %s"
+msgstr "Топики, созданные пользователем %s"
+
+#: ../../../skins/pureforums_skin/index.main.php:221
+msgid "User has not created any topics"
+msgstr "Пользователь не создал ни один топик"
+
+#: ../../../skins/pureforums_skin/index.main.php:222
+#, php-format
+msgid "Replies posted by %s"
+msgstr "Ответы, созданные пользователем %s"
+
+#: ../../../skins/pureforums_skin/index.main.php:223
+msgid "User has not posted any replies"
+msgstr "Пользователь не создал ни один ответ"
+
+#: ../../../skins/pureforums_skin/index.main.php:224
+msgid "Reply on:"
+msgstr "Ответ на:"
 
 #: ../../../skins/touch/_body_header.inc.php:23
 msgid "Notice"
@@ -41505,35 +41950,6 @@ msgstr "Мобильный: Меню Навигации"
 #: ../../../skins/touch/_body_header.inc.php:63
 msgid "Mobile: Tools Menu"
 msgstr "Мобильный: Меню Инструментов"
-
-#: ../../../skins/touch/_item_comment_form.inc.php:240
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:303
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:317
-msgid "Your email address will <strong>not</strong> be revealed on this site."
-msgstr "Ваш email адрес <strong>не будет</strong> показан на сайте."
-
-#: ../../../skins/touch/_item_comment_form.inc.php:325
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:384
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:406
-msgid "For my next comment on this site"
-msgstr ""
-"Использовать введенные здесь данные для следующих комментариев на этом сайте"
-
-#: ../../../skins/touch/_item_comment_form.inc.php:338
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:397
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:419
-msgid "Allow message form"
-msgstr "Разрешить форму сообщений"
-
-#: ../../../skins/touch/_item_comment_form.inc.php:339
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:398
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:420
-msgid ""
-"Allow users to contact me through a message form -- Your email will "
-"<strong>not</strong> be revealed!"
-msgstr ""
-"Разрешить пользователям посылать мне сообщения -- Ваш email адрес <strong>не"
-" будет</strong> показан!"
 
 #: ../../../skins/touch/_item_feedback.inc.php:43
 msgid "Preview comment"
@@ -42410,10 +42826,6 @@ msgstr "%s создал новую запись на %s с заголовком 
 msgid "View post"
 msgstr "Просмотреть запись"
 
-#: ../../../skins_email/post_new.html.php:97
-msgid "Edit post"
-msgstr "Редактировать запись"
-
 #: ../../../skins_email/post_new.html.php:107
 #: ../skins_email/post_new.txt.php:102
 msgid ""
@@ -42705,27 +43117,6 @@ msgstr "Ваша загрузка начнется скоро..."
 #, php-format
 msgid "If nothing happens, please <a %s>click here</a>."
 msgstr "Если ничего не происходит, пожалуйста, <a %s>нажмите здесь</a>."
-
-#: ../../../skins_fallback_v5/_edit.disp.php:374
-msgid "You do not have permission to edit file attachments for this post"
-msgstr ""
-"У вас нет разрешений на редактирование прикрепленных файлов этой записи"
-
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:30
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:30
-msgid "Comment content"
-msgstr "Содержимое комментария"
-
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:85
-msgid "Comment date"
-msgstr "Дата комментария"
-
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:137
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:137
-msgid "You do not have permission to edit file attachments for this comment"
-msgstr ""
-"У вас нет разрешений на редактирование прикрепленных файлов этого "
-"комментария"
 
 #: ../../../skins_fallback_v5/_help.disp.php:26
 msgid "This is a private website or section"
