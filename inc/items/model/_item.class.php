@@ -8027,7 +8027,8 @@ class Item extends ItemLight
 			if( $comment_ID = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
 			{	// Load the latest Comment in cache:
 				$CommentCache = & get_CommentCache();
-				$this->latest_Comment = & $CommentCache->get_by_ID( $comment_ID );
+				// WARNING: Do NOT get this object by reference because it may rewrites current updating Comment:
+				$this->latest_Comment = $CommentCache->get_by_ID( $comment_ID );
 			}
 			else
 			{	// Set FALSE to don't call SQL query twice when the item has no comments yet:
@@ -9810,6 +9811,9 @@ class Item extends ItemLight
 		{	// If current User has no permission to refresh a contents last updated date of the requested Item:
 			return false;
 		}
+
+		// Clear latest Comment from previous calling before Comment updating:
+		$this->latest_Comment = NULL;
 
 		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ) ) )
 		{	// Use date from the latest public Comment:
