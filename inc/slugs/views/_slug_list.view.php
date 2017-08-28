@@ -219,15 +219,26 @@ $Results->cols[] = array(
 
 if( $current_User->check_perm( 'slugs', 'edit' ) )
 {
+	function slug_actions( $Slug )
+	{
+		global $admin_url;
+
+		$r = action_icon( T_('Edit this slug...'), 'properties', $admin_url.'?ctrl=slugs&amp;slug_ID='.$Slug->ID.'&amp;action=edit' );
+
+		if( $Slug->may_be_deleted() )
+		{	// Display an icon to delete a slug only if it is allowed:
+			$r .= action_icon( T_('Delete this slug!'), 'delete', regenerate_url( 'slug_ID,action,slug_filter', 'slug_ID='.$Slug->ID.'&amp;action=delete&amp;'.url_crumb( 'slug' ) ) );
+		}
+
+		return $r;
+	}
+
 	$Results->cols[] = array(
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap',
-				'td' => action_icon( TS_('Edit this slug...'), 'properties',
-		        		'admin.php?ctrl=slugs&amp;slug_ID=$slug_ID$&amp;action=edit' )
-		                 .action_icon( T_('Delete this slug!'), 'delete',
-		                  regenerate_url( 'slug_ID,action,slug_filter', 'slug_ID=$slug_ID$&amp;action=delete&amp;'.url_crumb('slug') ) ),
-						);
+				'td' => '%slug_actions( {Obj} )%'
+			);
 
 	$Results->global_icon( T_('Add a new slug...'), 'new', regenerate_url( 'action', 'action=new'), T_('New slug').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }

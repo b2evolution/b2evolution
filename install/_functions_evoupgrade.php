@@ -8576,6 +8576,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12350, 'Upgrading slugs table...' ) )
+	{	// part of 6.9.3-beta
+		db_add_index( 'T_slug', 'slug_cat_ID', 'slug_cat_ID' );
+		db_add_index( 'T_slug', 'slug_itm_ID', 'slug_itm_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

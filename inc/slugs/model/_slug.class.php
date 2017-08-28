@@ -417,6 +417,45 @@ class Slug extends DataObject
 
 		return true;
 	}
+
+
+	/**
+	 * Check if this slug may be deleted
+	 *
+	 * @return boolean
+	 */
+	function may_be_deleted()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Slug must be stored in DB:
+			return false;
+		}
+
+		$SQL = new SQL( 'Get a count of sulgs per object of slug #'.$this->ID );
+		$SQL->SELECT( 'COUNT( slug_ID )' );
+		$SQL->FROM( 'T_slug' );
+
+		switch( $this->get( 'type' ) )
+		{
+			case 'cat':
+				$SQL->WHERE( 'slug_cat_ID = '.$this->get( 'cat_ID' ) );
+				break;
+
+			case 'item':
+				$SQL->WHERE( 'slug_itm_ID = '.$this->get( 'itm_ID' ) );
+				break;
+
+			default:
+				return true;
+		}
+
+		$count = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+
+		// Allow to delete ONLY if parent object has at least two slugs:
+		return ( $count > 1 );
+	}
 }
 
 ?>

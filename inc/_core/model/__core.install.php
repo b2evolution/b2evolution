@@ -436,7 +436,9 @@ $schema_queries = array(
 			slug_cat_ID INT(11) UNSIGNED,
 			slug_itm_ID INT(11) UNSIGNED,
 			PRIMARY KEY slug_ID (slug_ID),
-			UNIQUE      slug_title (slug_title)
+			UNIQUE      slug_title (slug_title),
+			INDEX       slug_cat_ID (slug_cat_ID),
+			INDEX       slug_itm_ID (slug_itm_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_email__log' => array(
