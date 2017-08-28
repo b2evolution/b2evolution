@@ -685,7 +685,7 @@ class Chapter extends DataObject
 		global $localtimenow;
 
 		$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
-		$this->dbupdate();
+		$this->dbupdate( false );
 	}
 
 

@@ -322,21 +322,15 @@ class Slug extends DataObject
 
 		$DB->begin();
 
-		if( ! $this->update_object() )
-		{	// Rollback if target object cannot be updated:
-			$DB->rollback();
-			return false;
+		if( parent::dbinsert() && $this->update_object() )
+		{	// Commit if slug has been inserted and parent object has been updated:
+			$DB->commit();
+			return true;
 		}
 
-		if( ! parent::dbinsert() )
-		{	// Rollback if slug cannot be inserted:
-			$DB->rollback();
-			return false;
-		}
-
-		$DB->commit();
-
-		return true;
+		// Rollback on failed:
+		$DB->rollback();
+		return false;
 	}
 
 
@@ -351,21 +345,15 @@ class Slug extends DataObject
 
 		$DB->begin();
 
-		if( ! $this->update_object() )
-		{	// Rollback if target object cannot be updated:
-			$DB->rollback();
-			return false;
+		if( parent::dbupdate() && $this->update_object() )
+		{	// Commit if slug and parent object have been updated:
+			$DB->commit();
+			return true;
 		}
 
-		if( ! parent::dbupdate() )
-		{	// Rollback if slug cannot be updated:
-			$DB->rollback();
-			return false;
-		}
-
-		$DB->commit();
-
-		return true;
+		// Rollback on failed:
+		$DB->rollback();
+		return false;
 	}
 
 
@@ -380,6 +368,8 @@ class Slug extends DataObject
 		{
 			case 'cat':
 				$ChapterCache = & get_ChapterCache();
+				// Reset the flag "all_loaded":
+				$ChapterCache->all_loaded = false;
 
 				if( ! ( $Chapter = & $ChapterCache->get_by_ID( $this->get( 'cat_ID' ), false, false ) ) )
 				{	// No category found:
