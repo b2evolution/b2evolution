@@ -241,6 +241,12 @@ class Group extends DataObject
 			}
 		}
 
+		if( $GroupSettings->get( 'perm_admin', $this->ID ) != 'normal' && 
+				$GroupSettings->get( 'perm_users', $this->ID ) != 'none' )
+		{	// Display warning when users permissions are not allowed because of not full access to back-office:
+			$Messages->add( T_('Permission to view other users will not work because users of this group have restricted back-office access.'), 'warning' );
+		}
+
 		return !param_errors_detected();
 	}
 

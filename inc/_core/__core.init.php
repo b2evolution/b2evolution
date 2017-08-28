@@ -866,7 +866,15 @@ class _core_Module extends Module
 	 */
 	function check_core_group_perm( $permlevel, $permvalue, $permtarget )
 	{
+		global $current_User;
+
 		$perm = false;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'admin', 'normal' ) )
+		{	// Current user must has Normal Back-office Access to view/moderate/edit other users:
+			return $perm;
+		}
+
 		switch ( $permvalue )
 		{
 			case 'edit':
