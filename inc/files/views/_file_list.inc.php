@@ -89,7 +89,7 @@ $Form->begin_form();
 		}
 		else
 		{
-			echo action_icon( T_('Go to parent folder'), 'folder_parent', regenerate_url( 'path', 'path='.rawurlencode( $fm_Filelist->_rds_list_path.'..' ) ) );
+			echo action_icon( T_('Go to parent folder'), 'folder_parent', regenerate_url( 'path', 'path='.rawurlencode( preg_replace( '#[^\/]+\/?$#', '', $fm_Filelist->_rds_list_path ) ) ) );
 		}
 		echo '</th>';
 
