@@ -55,7 +55,7 @@ if( ! empty( $thrd_ID ) )
 		forget_param( 'thrd_ID' );
 		if( ! $error_messages_exist )
 		{ // Display this error only when no error above
-			$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
+			$Messages->add( T_('The private conversation you are trying to access does not exist any longer.'), 'error' );
 		}
 		$thread_is_missed = true;
 	}

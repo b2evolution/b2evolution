@@ -14,8 +14,12 @@ $locale_defs['de-DE'] = array(
 		'messages' => 'de_DE',
 		'charset' => 'utf-8',
 		'datefmt' => 'j.m.Y',
+		'input_datefmt' => 'j.m.Y',
+		'longdatefmt' => 'j.m.Y',
+		'extdatefmt' => 'j M Y',
 		'timefmt' => 'H:i:s',
 		'shorttimefmt' => 'H:i',
+		'input_timefmt' => 'H:i:s',
 		'startofweek' => 1,
 		'transliteration_map' => array(),
 	);

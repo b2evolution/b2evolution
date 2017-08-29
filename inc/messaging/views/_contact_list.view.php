@@ -226,7 +226,7 @@ if( $Settings->get('allow_avatars') )
 	 */
 	function user_avatar( $user_ID )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$UserCache = & get_UserCache();
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
@@ -283,7 +283,7 @@ if( in_array( 'login', $show_columns ) )
 		return '';
 	}
 	$Results->cols[] = array(
-						'th' => T_('Login'),
+						'th' => /* TRANS: noun */ T_('Login'),
 						'order' => 'mct_to_user_login',
 						'td' => '%user_login( #mct_to_user_ID# )%',
 						);

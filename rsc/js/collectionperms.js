@@ -28,7 +28,7 @@ function toggleall_perm( the_form, id, set )
 	var options = new Array(
 			"blog_ismember_", "blog_can_be_assignee_", "blog_perm_published_", "blog_perm_community_", "blog_perm_protected_", "blog_perm_private_", "blog_perm_review_", "blog_perm_draft_", "blog_perm_deprecated_", "blog_perm_redirected_", "blog_perm_meta_comment_", "blog_perm_page_", "blog_perm_intro_", "blog_perm_podcast_", "blog_perm_sidebar_", "blog_perm_delpost_", "blog_perm_edit_ts_",
 			"blog_perm_delcmts_", "blog_perm_recycle_owncmts_", "blog_perm_vote_spam_cmts_", "blog_perm_published_cmt_", "blog_perm_community_cmt_", "blog_perm_protected_cmt_", "blog_perm_private_cmt_", "blog_perm_review_cmt_", "blog_perm_draft_cmt_", "blog_perm_deprecated_cmt_",
-			"blog_perm_media_upload_", "blog_perm_media_browse_", "blog_perm_media_change_", "blog_perm_meta_cmt_", "blog_perm_cats_", "blog_perm_properties_", "blog_perm_admin_"
+			"blog_perm_media_upload_", "blog_perm_media_browse_", "blog_perm_media_change_", "blog_perm_meta_cmt_", "blog_perm_cats_", "blog_perm_properties_", "blog_perm_admin_", "blog_perm_analytics_"
 		);
 	for( var i = 0; i < options.length; i++ )
 	{

@@ -51,7 +51,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		if( $Item->status != 'published' )
 		{
 			$Item->format_status( array(
-					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 				) );
 		}
 		$Item->permanent_link( array(
@@ -95,6 +95,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
 		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="$wi_class$">',
@@ -104,6 +105,9 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'block_title_end' => '</h3>',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
+			// Template params for "Item Link" widget
+			'widget_item_link_before'    => '<p class="evo_post_link">',
+			'widget_item_link_after'     => '</p>',
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 	}

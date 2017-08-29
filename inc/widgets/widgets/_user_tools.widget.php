@@ -170,7 +170,7 @@ class user_tools_Widget extends ComponentWidget
 				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
-				'defaultvalue' => T_( 'Notifications &amp; Subscriptions' ),
+				'defaultvalue' => T_( 'Notifications & Subscriptions' ),
 			),
 			// Admin
 			'user_admin_link_show' => array(
@@ -356,7 +356,7 @@ class user_tools_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?

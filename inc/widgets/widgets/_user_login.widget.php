@@ -198,7 +198,7 @@ class user_login_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( get_param( 'disp' ) == 'login' )
 		{	// No display a duplicate form for inskin login mode

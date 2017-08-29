@@ -31,6 +31,7 @@ if( !empty( $Item ) )
 			'item_class'        => 'jumbotron evo_content_block evo_post',
 			'disp_comment_form' => false,
 			'item_link_type'    => 'none',
+			'Item'              => $Item,
 		) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 	echo '</div>'; // End of posts display

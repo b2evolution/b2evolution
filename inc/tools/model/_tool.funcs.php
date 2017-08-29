@@ -358,6 +358,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'perm_media_upload'    => 0,
 									'perm_media_browse'    => 0,
 									'perm_media_change'    => 0,
+									'perm_analytics'       => 0,
 								) );
 							break;
 
@@ -384,6 +385,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'perm_media_upload'    => 1,
 									'perm_media_browse'    => 1,
 									'perm_media_change'    => 1,
+									'perm_analytics'       => 0,
 								) );
 							break;
 
@@ -410,6 +412,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'perm_media_upload'    => 1,
 									'perm_media_browse'    => 1,
 									'perm_media_change'    => 1,
+									'perm_analytics'       => 1,
 								) );
 							break;
 					}
@@ -420,7 +423,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 							bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_perm_delpost, bloguser_perm_edit_ts,
 							bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses,
 							bloguser_perm_edit_cmt, bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,
-							bloguser_perm_media_browse, bloguser_perm_media_change )
+							bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_analytics )
 						VALUES ( '.implode( '), (', $adv_perm_coll_insert_values ).' )' );
 				}
 			}
@@ -476,6 +479,60 @@ function tool_create_sample_hits( $days, $min_interval, $max_interval )
 
 
 /**
+ * Create sample base domains and display a process of creating
+ *
+ * @param integer Number of base domains
+ */
+function tool_create_sample_basedomains( $num_basedomains )
+{
+	global $Messages, $DB;
+
+	echo T_('Creating of the sample base domains...');
+	evo_flush();
+
+	/**
+	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
+	 */
+	$DB->log_queries = false;
+
+	$DB->begin();
+
+	$SQL = new SQL( 'Get all unique base domains before create sample sample base domains' );
+	$SQL->SELECT( 'dom_name' );
+	$SQL->FROM( 'T_basedomains' );
+	$SQL->WHERE( 'dom_type = "unknown"' );
+	$basedomains = $DB->get_col( $SQL->get(), 0, $SQL->title );
+
+	$basedomains_sql_data;
+	for( $i = 0; $i < $num_basedomains; $i++ )
+	{
+		do
+		{	// Generate new unique domain:
+			$domain_name = generate_random_key( 8, 'abcdefghijklmnopqrstuvwxyz0123456789-' ).'.com';
+		} while( in_array( $domain_name, $basedomains ) );
+
+		$basedomains[] = $domain_name;
+		$basedomains_sql_data[] = '( '.$DB->quote( $domain_name ).' )';
+
+		if( $i % 100 == 0 )
+		{	// Display a process of creating by one dot for 100 base domains:
+			echo ' .';
+			evo_flush();
+		}
+	}
+
+	$DB->query( 'INSERT INTO T_basedomains ( dom_name )
+		VALUES '.implode( ', ', $basedomains_sql_data ) );
+
+	$DB->commit();
+
+	echo ' OK.';
+
+	$Messages->add( sprintf( T_('Created %d base domains.'), $num_basedomains ), 'success' );
+}
+
+
+/**
  * Create sample messages and display a process of creating
  *
  * @param integer Number of loops
@@ -487,7 +544,7 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 {
 	global $Messages, $DB;
 
-	echo T_('Creating of the sample messages...');
+	echo T_('Creating sample messages...');
 	evo_flush();
 
 	/**

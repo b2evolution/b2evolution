@@ -145,6 +145,24 @@ class item_about_author_Widget extends ComponentWidget
 
 
 	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		global $preview;
+
+		parent::init_display( $params );
+
+		if( $preview )
+		{	// Disable block caching for this widget when item is previewed currently:
+			$this->disp_params['allow_blockcache'] = 0;
+		}
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -224,7 +242,7 @@ class item_about_author_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $Item;
+		global $Collection, $Blog, $Item;
 
 		if( ! empty( $Item ) && ( $creator_User = & $Item->get_creator_User() ) !== false )
 		{ // Get ID of creator User

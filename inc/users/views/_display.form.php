@@ -70,7 +70,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Username display options').get_manual_link('user-username-display-options') );
 
 	$Form->radio( 'username_display', $Settings->get( 'username_display' ),
-		array( array( 'login', T_('Usernames/Logins'), T_('Secure options') ),
+		array( array( 'login', T_('Usernames/Logins'), T_('Most secure option') ),
 					array( 'name', T_('Friendly names (Nickname or Firstname if available)'), T_('WARNING: this may allow users to fake their identity') ),
 		), T_('What to display'), true );
 

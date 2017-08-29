@@ -43,7 +43,7 @@ if( isset( $GLOBALS['files_Module'] ) )
 	$Form->end_line();
 }
 
-$Form->checkbox( 'userdir_login', $edited_Blog->get_setting( 'userdir_login' ), T_('Login') );
+$Form->checkbox( 'userdir_login', $edited_Blog->get_setting( 'userdir_login' ), /* TRANS: noun */ T_('Login') );
 $Form->checkbox( 'userdir_firstname', $edited_Blog->get_setting( 'userdir_firstname' ), T_('First name') );
 $Form->checkbox( 'userdir_lastname', $edited_Blog->get_setting( 'userdir_lastname' ), T_('Last name') );
 $Form->checkbox( 'userdir_nickname', $edited_Blog->get_setting( 'userdir_nickname' ), T_('Nickname') );
@@ -52,9 +52,9 @@ $Form->checkbox( 'userdir_fullname', $edited_Blog->get_setting( 'userdir_fullnam
 $Form->begin_line( T_('Country'), 'userdir_country' );
 	$Form->checkbox( 'userdir_country', $edited_Blog->get_setting( 'userdir_country' ), '' );
 	$Form->select_input_array( 'userdir_country_type', $edited_Blog->get_setting( 'userdir_country_type' ), array(
-			'flag' => T_('flag'),
-			'name' => T_('name'),
-			'both' => T_('both'),
+			'flag' => T_('Flag'),
+			'name' => T_('Name'),
+			'both' => T_('Both'),
 		), '', '', array( 'force_keys_as_values' => true ) );
 $Form->end_line();
 $Form->checkbox( 'userdir_region', $edited_Blog->get_setting( 'userdir_region' ), T_('Region') );

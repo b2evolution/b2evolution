@@ -80,7 +80,7 @@ while( $edited_Comment->get( 'status' ) != $previous_comment_visibility_status )
 $result_message = $Messages->get_string( '', '', "\n" );
 if( empty( $result_message ) )
 {
-	$result_message = T_('Done.');
+	$result_message = T_('Done').'.';
 }
 
 return 1; /* ok */

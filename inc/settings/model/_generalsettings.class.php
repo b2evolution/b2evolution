@@ -37,6 +37,7 @@ class GeneralSettings extends AbstractSettings
 		'antispam_last_update' => '2000-01-01 00:00:00',
 		'antispam_threshold_publish' => '-90',
 		'antispam_threshold_delete' => '100', // do not delete by default!
+		'antispam_block_contact_form' => '1',	// Block spam words on contact form by antispam blacklist
 		'antispam_block_spam_referers' => '0',	// By default, let spam referers go in silently (just don't log them). This is in case the blacklist is too paranoid (social media, etc.)
 		'antispam_report_to_central' => '1',
 
@@ -61,7 +62,7 @@ class GeneralSettings extends AbstractSettings
 		'notification_sender_name' => 'b2evo mailer', // notification emails will be sent with this sender name
 		'notification_short_name' => 'This site', // notification emails will use this as short site name
 		'notification_long_name' => '', // notification emails will use this as long site name
-		'notification_logo' => '', // notification emails will use this as url to site logo
+		'notification_logo_file_ID' => '', // notification emails will use this as url to site logo
 
 		'email_campaign_send_mode' => 'immediate', // Sending mode for campaign
 		'email_campaign_chunk_size' => 50, // Chunk size of emails to send a campaign at a time
@@ -109,6 +110,7 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_published_comments' => '1',
 		'def_notify_comment_moderation' => '1',
 		'def_notify_edit_cmt_moderation' => '1',
+		'def_notify_spam_cmt_moderation' => '1',
 		'def_notify_meta_comments' => '1',
 		'def_notify_post_moderation' => '1',
 		'def_notify_edit_pst_moderation' => '1',

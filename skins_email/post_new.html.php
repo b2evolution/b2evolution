@@ -28,7 +28,7 @@ $params = array_merge( array(
 
 $recipient_User = $params['recipient_User'];
 $Item = $params['Item'];
-$Blog = & $Item->get_Blog();
+$Collection = $Blog = & $Item->get_Blog();
 
 if( $params['notify_full'] )
 {	/* Full notification */
@@ -74,7 +74,7 @@ if( $params['notify_full'] )
 }
 else
 { /* Short notification */
-	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:', 'login_text' => 'name' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
 
 	if( $params['notify_type'] == 'moderator' )
 	{

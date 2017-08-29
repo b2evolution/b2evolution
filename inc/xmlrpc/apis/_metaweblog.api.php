@@ -81,7 +81,7 @@ function mw_newpost($m, $item_type = 'post' )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -405,7 +405,7 @@ function mw_getrecentposts( $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}

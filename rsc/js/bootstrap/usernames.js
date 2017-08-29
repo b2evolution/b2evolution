@@ -82,6 +82,13 @@ jQuery( document ).ready(function()
 						{ // Init Popover only if ajax content is received
 							result = ajax_debug_clear( result );
 							cache.html( result );
+
+							var img = cache.find( 'img' );
+							var height = img.attr( 'height' ) + 'px';
+							var width = img.attr( 'width' ) + 'px';
+							img.css( 'height', height );
+							img.css( 'width', width );
+
 							var show_on_init = true;
 							if( link.hasClass( 'hide_popover' ) )
 							{ // We use this class as flag to understand that when ajax was loading
@@ -99,7 +106,6 @@ jQuery( document ).ready(function()
 							}
 							// Remove this from attr 'rel' to avoid of the repeating of init popover
 							link.attr( 'rel', link.attr( 'rel').replace( /bubbletip_(user_|comment_)[\d\s]+/g, '' ) );
-							console.log( 'ajax' );
 						}
 					}
 				});
@@ -128,5 +134,23 @@ jQuery( document ).ready(function()
 	jQuery( document ).on( 'mouseleave', '[rel^=bubbletip_]', function()
 	{ // This class-flag is used to know that mouse pointer is leaving this element
 		jQuery( this ).addClass( 'hide_popover' );
+	} );
+
+	jQuery( document ).on( 'mouseover', '.popover', function()
+	{	// This class-flag is used to know that mouse pointer is over this popover window
+		jQuery( this ).addClass( 'mouseover' );
+	} );
+	jQuery( document ).on( 'mouseleave', '.popover', function()
+	{	// This class-flag is used to know that mouse pointer is out this popover window
+		jQuery( this ).removeClass( 'mouseover' );
+		jQuery( this ).data( 'bs.popover' ).$element.popover( 'hide' );
+	} );
+
+	jQuery( document ).on( 'hide.bs.popover', function( event )
+	{	// Event is called to hide a popover:
+		if( jQuery( event.target ).data( 'bs.popover' ).$tip.hasClass( 'mouseover' ) )
+		{	// Don't hide a popover when mouse is over it:
+			event.preventDefault();
+		}
 	} );
 } );

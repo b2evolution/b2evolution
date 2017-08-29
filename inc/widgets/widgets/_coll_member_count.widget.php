@@ -70,7 +70,7 @@ class coll_member_count_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( empty( $Blog ) || $Blog->get_setting( 'allow_access' ) != 'members' )
 		{ // Use this widget only when blog is allowed only for members
@@ -101,7 +101,7 @@ class coll_member_count_Widget extends ComponentWidget
 	 */
 	function get_members_count()
 	{
-		global $Blog, $DB;
+		global $Collection, $Blog, $DB;
 
 		// Get blog owner
 		$blogowner_SQL = new SQL();
@@ -122,7 +122,9 @@ class coll_member_count_Widget extends ComponentWidget
 		$usergroups_SQL->SELECT( 'user_ID, user_status' );
 		$usergroups_SQL->FROM( 'T_users' );
 		$usergroups_SQL->FROM_add( 'INNER JOIN T_groups ON grp_ID = user_grp_ID' );
-		$usergroups_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( bloggroup_group_ID = grp_ID AND bloggroup_ismember = 1 )' );
+		$usergroups_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( bloggroup_ismember = 1
+			AND ( bloggroup_group_ID = grp_ID
+			      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID ) ) )' );
 		$usergroups_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $Blog->ID ) );
 
 		$members_count_sql = 'SELECT COUNT( user_ID ) AS coll_member_count FROM ( '

@@ -28,7 +28,7 @@ $params = array_merge( array(
 		'Comment'          => NULL,
 	), $params );
 
-$Blog = & $params['Blog'];
+$Collection = $Blog = & $params['Blog'];
 $recipient_User = & $params['recipient_User'];
 
 // show sender name

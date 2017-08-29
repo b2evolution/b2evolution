@@ -20,6 +20,7 @@ global $admin_url;
 $params = array_merge( array(
 		'country'     => '',
 		'reg_country' => '',
+		'reg_domain'  => '',
 		'fullname'    => '',
 		'gender'      => '',
 		'locale'      => '',
@@ -35,7 +36,7 @@ $params = array_merge( array(
 echo T_('A new user has registered on the site').":";
 echo "\n\n";
 
-echo T_('Login').": ".$params['login']."\n";
+echo /* TRANS: noun */ T_('Login').": ".$params['login']."\n";
 echo T_('Email').": ".$params['email']."\n";
 
 if( $params['fullname'] != '' )
@@ -49,6 +50,11 @@ if( $params['reg_country'] > 0 )
 	$CountryCache = & get_CountryCache();
 	$reg_Country = $CountryCache->get_by_ID( $params['reg_country'] );
 	echo T_('Registration Country').": ".$reg_Country->get_name()."\n";
+}
+
+if( ! empty( $params['reg_domain'] ) )
+{	// Domain field is entered:
+	echo T_('Registration Domain').": ".$params['reg_domain']."\n";
 }
 
 if( $params['country'] > 0 )

@@ -22,7 +22,7 @@ class wikitables_plugin extends Plugin
 	var $code = 'b2evWiTa';
 	var $name = 'Wiki Tables';
 	var $priority = 15;
-	var $version = '6.7.6';
+	var $version = '6.9.4';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -328,7 +328,7 @@ See manual for more.');
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&

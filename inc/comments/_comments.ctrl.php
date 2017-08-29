@@ -22,6 +22,9 @@ global $UserSettings;
 
 $action = param_action( 'list' );
 
+// Set the third level tab
+param( 'tab3', 'string', '', true );
+
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
 
@@ -51,13 +54,13 @@ switch( $action )
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		set_working_blog( $edited_Comment_Item->get_blog_ID() );
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Some users can delete & change a status of comments in their own posts, set corresponding permlevel
 		if( $edited_Comment->is_meta() )
 		{ // Use special permissions for meta comment
 			$check_permname = 'meta_comment';
-			$check_permlevel = 'delete';
+			$check_permlevel = $action == 'delete' ? 'delete' : 'edit';
 		}
 		elseif( $action == 'publish' || $action == 'update_publish' )
 		{ // Load the new comment status from publish request and set perm check values
@@ -107,7 +110,7 @@ switch( $action )
 		$edited_Comment = & Comment_get_by_ID( $comment_ID );
 
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_post!draft', 'edit', true, $blog );
@@ -133,7 +136,14 @@ switch( $action )
 		}
 
 		// Check permission:
-		$selected = autoselect_blog( 'blog_comments', 'edit' );
+		if( $tab3 == 'meta' )
+		{	// For meta comments:
+			$selected = autoselect_blog( 'meta_comment', 'blog' );
+		}
+		else
+		{	// For normal comments:
+			$selected = autoselect_blog( 'blog_comments', 'view' );
+		}
 		if( ! $selected )
 		{ // No blog could be selected
 			$Messages->add( T_('You have no permission to edit comments.' ), 'error' );
@@ -142,7 +152,7 @@ switch( $action )
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 		{ // Selected a new blog:
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		break;
 
@@ -157,7 +167,7 @@ switch( $action )
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		set_working_blog( $edited_Comment_Item->get_blog_ID() );
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission for spam voting
 		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, $Blog->ID );
@@ -183,9 +193,6 @@ switch( $action )
 		debug_die( 'unhandled action 1' );
 }
 
-// Set the third level tab
-param( 'tab3', 'string', '', true );
-
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 $AdminUI->breadcrumbpath_add( T_('Comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
 switch( $tab3 )
@@ -200,7 +207,7 @@ switch( $tab3 )
 
 	case 'meta':
 		// Check permission for meta comments:
-		$current_User->check_perm( 'meta_comment', 'blog', true, $Blog );
+		$current_User->check_perm( 'meta_comment', 'view', true, $Blog->ID );
 
 		$AdminUI->breadcrumbpath_add( T_('Meta discussion'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;
@@ -222,7 +229,7 @@ switch( $action )
 		$AdminUI->title_titlearea = T_('Editing comment').' #'.$edited_Comment->ID;
 
 		// Generate available blogs list:
-		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore' ) );
+		$AdminUI->set_coll_list_params( 'blog_comments', 'view', array( 'ctrl' => 'comments', 'filter' => 'restore' ) );
 
 		/*
 		 * Add sub menu entries:
@@ -670,7 +677,7 @@ switch( $action )
 		$AdminUI->title_titlearea = T_('Latest comments');
 
 		// Generate available blogs list:
-		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore', 'tab3' => $tab3 ) );
+		$AdminUI->set_coll_list_params( 'blog_comments', 'view', array( 'ctrl' => 'comments', 'filter' => 'restore', 'tab3' => $tab3 ) );
 
 		/*
 		 * Add sub menu entries:
@@ -764,10 +771,18 @@ if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit',
 	init_datepicker_js();
 	// Init JS to autocomplete the user logins:
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+	// Require colorbox js:
+	require_js_helper( 'colorbox' );
+	// Require Fine Uploader js and css:
+	init_fineuploader_js_lang_strings();
+	require_js( 'multiupload/fine-uploader.js' );
+	require_css( 'fine-uploader.css' );
+	// Load JS files to make the links table sortable:
+	require_js( '#jquery#' );
+	require_js( 'jquery/jquery.sortable.min.js' );
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
-require_js( 'communication.js' ); // auto requires jQuery
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );
 

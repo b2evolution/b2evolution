@@ -143,9 +143,9 @@ if( count( $chapters ) > 0 )
 			</div>
 			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s topics'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
 			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
-			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></div>
+			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().' '.locale_shorttimefmt() ); ?></div>
 			<!-- Apply this on XS size -->
-			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( 'm/j/y' ); ?></div>
+			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( locale_datefmt() ); ?></div>
 		</article>
 <?php
 		}
@@ -194,10 +194,12 @@ if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs )
 
 if( $single_cat_ID )
 { // Go to grab the featured posts only on pages with defined category:
-	while( $Item = get_featured_Item() )
+	while( $Item = & get_featured_Item() )
 	{ // We have a intro post to display:
 		// ---------------------- ITEM LIST INCLUDED HERE ------------------------
-		skin_include( '_item_list.inc.php' );
+		skin_include( '_item_list.inc.php', array(
+				'Item' => $Item
+			) );
 		// ----------------------------END ITEM LIST  ----------------------------
 	}
 }

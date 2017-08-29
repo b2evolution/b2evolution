@@ -95,13 +95,13 @@ if( $is_admin )
 {
 	if( $new_user_creating )
 	{
-		$form_title = T_('Edit user profile');
+		$form_title = '<span class="nowrap">'.T_('Edit user profile').'</span>';
 	}
 	else
 	{
-		$form_text_title = T_( 'Edit profile' ).get_manual_link( 'user-profile-tab' ); // used for js confirmation message on leave the changed form
+		$form_text_title = '<span class="nowrap">'.T_( 'Edit profile' ).'</span>'.get_manual_link( 'user-profile-tab' ); // used for js confirmation message on leave the changed form
 		$form_title = get_usertab_header( $edited_User, 'profile', $form_text_title );
-		$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+		$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 	}
 	$form_class = 'fform';
 }
@@ -139,7 +139,7 @@ if( $new_user_creating )
 
 	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get( 'newusers_grp_ID' ) : $edited_User->grp_ID;
 	$GroupCache = & get_GroupCache();
-	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_( 'User group' ) );
+	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
 
 	$field_note = '[0 - 10]';
 	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
@@ -248,7 +248,7 @@ if( $action != 'view' )
 		$Form->info( T_('Profile picture'), $user_pictures );
 	}
 
-	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', array( 'maxlength' => 60, 'required' => true ) );
+	$Form->text_input( 'edited_user_login', $edited_User->login, 20, /* TRANS: noun */ T_('Login'), '', array( 'maxlength' => 60, 'required' => true ) );
 
 	$firstname_editing = $Settings->get( 'firstname_editing' );
 	if( ( in_array( $firstname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $has_full_access ) )
@@ -459,7 +459,7 @@ else
 		$Form->info( T_('Profile picture'), $edited_User->get_avatar_imgtag( 'crop-top-64x64', 'avatar', '', true ) );
 	}
 
-	$Form->info( T_('Login'), $edited_User->get('login') );
+	$Form->info( /* TRANS: noun */ T_('Login'), $edited_User->get('login') );
 	$Form->info( T_('First name'), $edited_User->get('firstname') );
 	$Form->info( T_('Last name'), $edited_User->get('lastname') );
 	$Form->info( T_('Nickname'), $edited_User->get('nickname') );
@@ -598,9 +598,9 @@ $Form->begin_fieldset( T_('Add new fields').( is_admin_page() ? get_manual_link(
 		}
 	}
 
-	$button_add_field = '<button type="submit" id="button_add_field" name="actionArray[add_field]" class="action_icon">'.get_icon( 'add' ).'</button>';
+	$button_add_field = '<button type="submit" id="button_add_field" name="actionArray[add_field]" class="btn btn-default">'.T_('Add').'</button>';
 
-	$Form->select( 'new_field_type', param( 'new_field_type', 'integer', 0 ), 'callback_options_user_new_fields', T_('Add a field of type'), $button_add_field );
+	$Form->select_input( 'new_field_type', param( 'new_field_type', 'integer', 0 ), 'callback_options_user_new_fields', T_('Add a field of type'), array( 'field_suffix' => $button_add_field ) );
 
 $Form->end_fieldset();
 }
@@ -618,7 +618,7 @@ $Plugins->trigger_event( 'DisplayProfileFormFieldset', array(
 
 if( $action != 'view' )
 { // Edit buttons
-	$action_buttons = array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
+	$action_buttons = array( array( '', 'actionArray[update]', $new_user_creating ? T_('Create User!') : T_('Save Changes!'), 'SaveButton' ) );
 	if( $is_admin )
 	{
 		// dh> TODO: Non-Javascript-confirm before trashing all settings with a misplaced click.
@@ -647,11 +647,11 @@ $Form->end_form();
 
 	jQuery( '#button_add_field' ).click( function ()
 	{	// Action for the button when we want to add a new field in the Additional info
-		var field_id = jQuery( this ).parent().prev().find( 'option:selected' ).val();
+		var field_id = jQuery( this ).prev().find( 'option:selected' ).val();
 
 		if( field_id == '' )
 		{	// Mark select element of field types as error
-			field_type_error( '<?php echo T_('Please select a field type.'); ?>' );
+			field_type_error( '<?php echo TS_('Please select a field type.'); ?>' );
 			// We should to stop the ajax request without field_id
 			return false;
 		}

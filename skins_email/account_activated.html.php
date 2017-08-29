@@ -37,7 +37,7 @@ else
 echo '</p>'."\n";
 
 echo '<table'.emailskin_style( 'table.email_table' ).'>'."\n";
-echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ).'</td></tr>'."\n";
+echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'./* TRANS: noun */ T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ).'</td></tr>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Email').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->email.'</td></tr>'."\n";
 
 $fullname = $activated_User->get( 'fullname' );
@@ -53,6 +53,17 @@ if( $activated_User->reg_ctry_ID > 0 )
 	$CountryCache = & get_CountryCache();
 	$reg_Country = $CountryCache->get_by_ID( $activated_User->reg_ctry_ID );
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Country').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$reg_Country->get_name().'</td></tr>'."\n";
+}
+
+$user_domain = $UserSettings->get( 'user_registered_from_domain', $activated_User->ID );
+if( ! empty( $user_domain ) )
+{	// Get user domain status if domain field is defined:
+	load_funcs( 'sessions/model/_hitlog.funcs.php' );
+	$DomainCache = & get_DomainCache();
+	$Domain = & get_Domain_by_subdomain( $user_domain );
+	$dom_status_titles = stats_dom_status_titles();
+	$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$user_domain.' ('.$dom_status.')'.'</td></tr>'."\n";
 }
 
 if( $activated_User->ctry_ID > 0 )

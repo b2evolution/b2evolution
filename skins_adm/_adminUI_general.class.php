@@ -186,7 +186,7 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_init( $add_blog = true, $additional_path = array() )
 	{
-		global $Blog, $Settings, $admin_url;
+		global $Collection, $Blog, $Settings, $admin_url;
 
 		// Path to site root
 		$site_style = $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '';
@@ -223,7 +223,7 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_add( $text, $url, $help = NULL, $attrs = '' )
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		$blog_ID = isset($Blog) ? $Blog->ID : 0;
 		$url = str_replace( '$blog$', $blog_ID, $url );
@@ -994,9 +994,9 @@ class AdminUI_general extends Menu
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -1027,8 +1027,8 @@ class AdminUI_general extends Menu
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
@@ -1074,9 +1074,9 @@ class AdminUI_general extends Menu
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -1107,8 +1107,8 @@ class AdminUI_general extends Menu
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
@@ -1148,6 +1148,7 @@ class AdminUI_general extends Menu
 					'formend' => '',
 				);
 
+			case 'accordion_form':
 			case 'compact_form':
 			case 'Form':
 				// Default Form settings:
@@ -1219,27 +1220,27 @@ class AdminUI_general extends Menu
 			case 'tooltip_plugin':
 				// Plugin name for tooltips: 'bubbletip' or 'popover'
 				return 'bubbletip';
-				break;
 
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete the fields: 'hintbox', 'typeahead'
 				return 'hintbox';
-				break;
 
 			case 'modal_window_js_func':
 				// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 				return false; // Use standard functions
-				break;
 
 			case 'pagination':
 				// Pagination, @see echo_comment_pages()
 				return array();
-				break;
 
 			case 'blog_base.css':
 				// File name of blog_base.css that are used on several back-office pages
 				return 'blog_base.css';
 				break;
+
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-regular.min.css';
 
 			default:
 				if( $die_on_unknown )

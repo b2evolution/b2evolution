@@ -68,11 +68,11 @@ function dbm_delete_pagecache( $display_details = true )
 	{ // Display message only when it is required:
 		if( $result )
 		{
-			$Messages->add( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ), 'note' );
+			$Messages->add_to_group( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ), 'note', T_('Clearing page caches:') );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error' );
+			$Messages->add_to_group( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error', T_('Page cache clearing errors:') );
 		}
 	}
 
@@ -91,11 +91,11 @@ function dbm_delete_pagecache( $display_details = true )
 			{ // Display message only when it is required:
 				if( $result )
 				{
-					$Messages->add( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'note' );
+					$Messages->add_to_group( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'note', T_('Clearing page caches:') );
 				}
 				else
 				{
-					$Messages->add( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error' );
+					$Messages->add_to_group( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error', T_('Page cache clearing errors:') );
 				}
 			}
 			// Create .htaccess file with deny rules

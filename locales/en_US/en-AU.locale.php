@@ -13,8 +13,12 @@ $locale_defs['en-AU'] = array(
 		'name' => NT_('English (AU) utf-8'),
 		'charset' => 'utf-8',
 		'datefmt' => 'd/m/y',
+		'longdatefmt' => 'd/m/Y',
+		'extdatefmt' => 'd M Y',
+		'input_datefmt' => 'd/m/y',
 		'timefmt' => 'h:i:s a',
 		'shorttimefmt' => 'h:i a',
+		'input_timefmt' => 'H:i:s',
 		'startofweek' => 1,
 		'messages' => 'en_US',
 	);

@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $account_closing_success, $account_close_reason;
+global $Collection, $Blog, $account_closing_success, $account_close_reason;
 
 if( ! empty( $account_closing_success ) )
 { // Display a bye message after user closed an account

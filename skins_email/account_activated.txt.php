@@ -34,7 +34,7 @@ else
 	printf( T_('New user account activated by %s'), $params['activated_by_admin'] ).':';
 }
 echo "\n\n";
-echo T_('Login').": ".$activated_User->login."\n";
+echo /* TRANS: noun */ T_('Login').": ".$activated_User->login."\n";
 echo T_('Email').": ".$activated_User->email."\n";
 
 $fullname = $activated_User->get( 'fullname' );
@@ -49,6 +49,17 @@ if( $activated_User->reg_ctry_ID > 0 )
 	$CountryCache = & get_CountryCache();
 	$reg_Country = $CountryCache->get_by_ID( $activated_User->reg_ctry_ID );
 	echo T_('Registration Country').": ".$reg_Country->get_name()."\n";
+}
+
+$user_domain = $UserSettings->get( 'user_registered_from_domain', $activated_User->ID );
+if( ! empty( $user_domain ) )
+{	// Get user domain status if domain field is defined:
+	load_funcs( 'sessions/model/_hitlog.funcs.php' );
+	$DomainCache = & get_DomainCache();
+	$Domain = & get_Domain_by_subdomain( $user_domain );
+	$dom_status_titles = stats_dom_status_titles();
+	$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
+	echo T_('Registration Domain').": ".$user_domain.' ('.$dom_status.')'."\n";
 }
 
 if( $activated_User->ctry_ID > 0 )

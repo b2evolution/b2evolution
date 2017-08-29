@@ -129,7 +129,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		{ // Allow to select in-skin login for this blog
 			$Form->checkbox_input( 'in_skin_login', $edited_Blog->get_setting( 'in_skin_login' ), T_( 'In-skin login' ), array( 'note' => T_( 'Use in-skin login form every time it\'s possible' ) ) );
 		}
-		$Form->checkbox_input( 'in_skin_editing', $edited_Blog->get_setting( 'in_skin_editing' ), T_( 'In-skin editing' ) );
+		$Form->checkbox_input( 'in_skin_editing', $edited_Blog->get_setting( 'in_skin_editing' ), T_( 'In-skin editing' ), array( 'note' => sprintf( T_('See more options in Features &gt; <a %s>Posts</a>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$edited_Blog->ID.'#post_options"' ) ) );
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Media directory location').get_admin_badge().get_manual_link('media_directory_location'), array( 'id' => 'media_dir_location' ) );
@@ -256,10 +256,10 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 		switch( jQuery( 'input[name=blog_media_location]:checked' ).val() )
 		{
 			case 'default':
-				url_preview = '<?php echo $edited_Blog->get_local_media_url().'blogs/'.$edited_Blog->urlname.'/'; ?>';
+				url_preview = '<?php echo format_to_js( $edited_Blog->get_local_media_url().'blogs/'.$edited_Blog->urlname.'/' ); ?>';
 				break;
 			case 'subdir':
-				url_preview = '<?php echo $edited_Blog->get_local_media_url(); ?>' + jQuery( 'input[name=blog_media_subdir]' ).val();
+				url_preview = '<?php echo format_to_js( $edited_Blog->get_local_media_url() ); ?>' + jQuery( 'input[name=blog_media_subdir]' ).val();
 				break;
 			case 'custom':
 				url_preview = jQuery( 'input[name=blog_media_url]' ).val();

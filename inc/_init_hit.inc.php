@@ -161,7 +161,7 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 locale_activate( $default_locale );
 
 // Set encoding for MySQL connection:
-$DB->set_connection_charset( $current_charset );
+$DB->connection_charset = $current_charset;
 
 
 /**

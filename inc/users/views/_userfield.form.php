@@ -26,8 +26,8 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'userfield_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Delete this userfield!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('userfield') ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Delete this user field!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('userfield') ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field') );
 

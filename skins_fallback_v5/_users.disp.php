@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Load classes
 load_class( 'users/model/_user.class.php', 'User' );
 
-global $Blog, $Skin, $Settings;
+global $Collection, $Blog, $Skin, $Settings;
 
 if( ! empty( $Skin ) )
 {

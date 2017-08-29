@@ -3,14 +3,6 @@
  * See also {@link https://github.com/b2evolution/b2evolution}.
  */
 
-jQuery( document ).ready( function()
-{
-	jQuery( '[id^=fadeout-]' ).each( function()
-	{ // Highlight each element that requires this
-		evoFadeBg( this, new Array( '#FFFF33' ), { speed: 3000 } );
-	} );
-} );
-
 
 // Event for styled button to browse files
 jQuery( document ).on( 'change', '.btn-file :file', function()
@@ -96,7 +88,7 @@ function toggle_clickopen( id, hide, displayVisible )
  * Used only on BACK-office in the following files:
  *  - _misc_js.funcs.php
  *  - blog_widgets.js
- *  - links.js
+ *  - src/evo_links.js
  *
  * @param jQuery selector
  */
@@ -111,7 +103,7 @@ function evoFadeSuccess( selector )
  *
  * Used only in BACK-office in the following files:
  *  - _misc_js.funcs.php
- *  - links.js
+ *  - src/evo_links.js
  *
  * @param jQuery selector
  */
@@ -143,7 +135,7 @@ function evoFadeHighlight( selector )
  * Used only on BACK-office in the following files:
  *  - _misc_js.funcs.php
  *  - blog_widgets.js
- *  - links.js
+ *  - src/evo_links.js
  *  - _file_list.inc.php
  *
  * @param string|jQuery

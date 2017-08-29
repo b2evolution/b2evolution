@@ -18,7 +18,7 @@ global $perm_management, $allow_access;
 
 $Form = new Form( NULL, 'create_comments', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform',  T_('Create sample collections for testing') );
 

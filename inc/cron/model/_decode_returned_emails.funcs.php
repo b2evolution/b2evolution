@@ -817,7 +817,7 @@ function dre_decode_error_type( $error_type )
 	$titles = array(
 		''  => T_('Unknown error'),
 		'S' => T_('Spam suspicion'),
-		'P' => T_('Permament error'),
+		'P' => T_('Permanent error'),
 		'T' => T_('Temporary error'),
 		'C' => T_('Configuration error')
 	);
@@ -867,7 +867,7 @@ function dre_limit_by_terminators( $content )
 
 /**
  * Get data of returned email
- * 
+ *
  * @param string Prepared message text (without text after body terminator)
  * @param string Full message text
  * @param string Headers
