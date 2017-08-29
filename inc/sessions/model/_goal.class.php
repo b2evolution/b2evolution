@@ -128,10 +128,11 @@ class Goal extends DataObject
 		$this->set_string_from_param( 'key', true );
 
 		// Temporary Redirection URL:
-		$this->set_string_from_param( 'temp_redir_url' );
+		param( 'goal_temp_redir_url', 'url' );
+		$this->set_from_Request( 'temp_redir_url' );
 
 		// Normal Redirection URL:
-		param( 'goal_redir_url', 'string' );
+		param( 'goal_redir_url', 'url' );
 		if( $this->get( 'temp_redir_url' ) != '' )
 		{ // Normal Redirection URL is required when Temporary Redirection URL is not empty
 			param_check_not_empty( 'goal_redir_url', T_('Please enter Normal Redirection URL.') );
@@ -145,7 +146,7 @@ class Goal extends DataObject
 		}
 
 		// Temporary Start
-		$temp_start_date = param_date( 'goal_temp_start_date', T_('Please enter a valid date.'), false );
+		$temp_start_date = param_date( 'goal_temp_start_date', sprintf( T_('Please enter a valid date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), false );
 		if( ! empty( $temp_start_date ) )
 		{
 			$temp_start_time = param( 'goal_temp_start_time', 'string' );
@@ -158,7 +159,7 @@ class Goal extends DataObject
 		}
 
 		// Temporary End
-		$temp_end_date = param_date( 'goal_temp_end_date', T_('Please enter a valid date.'), false );
+		$temp_end_date = param_date( 'goal_temp_end_date', sprintf( T_('Please enter a valid date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), false );
 		if( ! empty( $temp_end_date ) )
 		{
 			$temp_end_time = param( 'goal_temp_end_time', 'string' );
@@ -193,7 +194,7 @@ class Goal extends DataObject
 			$existing_goal_ID = $this->dbexists( 'goal_key', $this->get( 'key' ) );
 			if( $existing_goal_ID )
 			{	// We have a duplicate goal:
-				global $Blog;
+				global $Collection, $Blog;
 				param_error( 'goal_key',
 					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
 						'href="?ctrl=goals&amp;action=edit'.( isset( $Blog ) ? '&amp;blog='.$Blog->ID : '' ).'&amp;goal_ID='.$existing_goal_ID.'"' ) );

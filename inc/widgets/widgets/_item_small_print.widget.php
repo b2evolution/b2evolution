@@ -191,11 +191,13 @@ class item_small_print_Widget extends ComponentWidget
 					'thumb_class' => 'leftmargin',
 				) );
 
+			$Item->flag();
+
 			if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
 			{ // We want to display the post date:
 				$Item->issue_time( array(
 						'before'      => /* TRANS: date */ T_('This entry was posted on').' ',
-						'time_format' => 'F jS, Y',
+						'time_format' => locale_extdatefmt(),
 					) );
 				$Item->issue_time( array(
 						'before'      => /* TRANS: time */ T_('at').' ',
@@ -237,6 +239,8 @@ class item_small_print_Widget extends ComponentWidget
 		}
 		else
 		{ // Revisions
+			$Item->flag();
+
 			$Item->author( array(
 					'before'    => T_('Created by').' ',
 					'after'     => $this->disp_params['widget_item_small_print_separator'],
@@ -245,7 +249,7 @@ class item_small_print_Widget extends ComponentWidget
 
 			$Item->lastedit_user( array(
 					'before'    => T_('Last edit by').' ',
-					'after'     => /* TRANS: "on" is followed by a date here */ ' '.T_('on').' '.$Item->get_mod_date( 'F jS, Y' ),
+					'after'     => /* TRANS: "on" is followed by a date here */ ' '.T_('on').' '.$Item->get_mod_date( locale_extdatefmt() ),
 					'link_text' => 'auto',
 				) );
 
@@ -270,7 +274,7 @@ class item_small_print_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User, $Item;
+		global $Collection, $Blog, $current_User, $Item;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?

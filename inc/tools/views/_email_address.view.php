@@ -25,9 +25,9 @@ if( param( 'all_statuses', 'integer', 0, true ) )
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE emadr_ID, emadr_address, emadr_status, emadr_last_sent_ts, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_error_ts, 
+$SQL->SELECT( 'SQL_NO_CACHE emadr_ID, emadr_address, emadr_status, emadr_last_sent_ts, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_error_ts,
 ( emadr_prmerror_count + emadr_tmperror_count + emadr_spamerror_count + emadr_othererror_count ) AS emadr_all_count,
-emadr_prmerror_count, emadr_tmperror_count, emadr_spamerror_count, emadr_othererror_count, 
+emadr_prmerror_count, emadr_tmperror_count, emadr_spamerror_count, emadr_othererror_count,
 COUNT( user_ID ) AS users_count' );
 $SQL->FROM( 'T_email__address' );
 $SQL->FROM_add( 'LEFT JOIN T_users ON user_email = emadr_address' );
@@ -117,7 +117,7 @@ $Results->cols[] = array(
 			/* Current user can edit emails */'<a href="#" rel="$emadr_status$">%emadr_get_status_title( #emadr_status# )%</a>' :
 			/* No edit, only view the status */'%emadr_get_status_title( #emadr_status# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap emadr_status_edit',
+		'td_class' => 'shrinkwrap jeditable_cell emadr_status_edit',
 		'extra' => array ( 'style' => 'background-color: %emadr_get_status_color( "#emadr_status#" )%;', 'format_to_output' => false )
 	);
 
@@ -127,7 +127,7 @@ $Results->cols[] = array(
 		'order' => 'emadr_last_sent_ts',
 		'default_dir' => 'D',
 		'td_class' => 'timestamp',
-		'td' => '%mysql2localedatetime_spans( #emadr_last_sent_ts#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #emadr_last_sent_ts# )%',
 	);
 
 $Results->cols[] = array(
@@ -154,7 +154,7 @@ $Results->cols[] = array(
 		'order' => 'emadr_last_error_ts',
 		'default_dir' => 'D',
 		'td_class' => 'timestamp',
-		'td' => '%mysql2localedatetime_spans( #emadr_last_error_ts#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #emadr_last_error_ts# )%',
 	);
 
 $Results->cols[] = array(

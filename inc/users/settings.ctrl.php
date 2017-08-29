@@ -20,7 +20,7 @@ switch ( $action )
 		$current_User->check_perm( 'users', 'edit', true );
 
 		// Session settings
-		$Settings->set( 'redirect_to_after_login', param( 'redirect_to_after_login', 'string', '' ) );
+		$Settings->set( 'redirect_to_after_login', param( 'redirect_to_after_login', 'url', '' ) );
 
 		$timeout_sessions = param_duration( 'timeout_sessions' );
 
@@ -50,6 +50,10 @@ switch ( $action )
 			$Messages->add( sprintf( T_( 'You cannot set an online/offline timeout above %d hours.' ), 6 ) );
 		}
 		$Settings->set( 'timeout_online', $timeout_online );
+
+		// Enable visit tracking
+		param( 'enable_visit_tracking', 'integer', 0 );
+		$Settings->set( 'enable_visit_tracking', $enable_visit_tracking );
 
 		// keep old allow_avatars setting value to check if we need to invalidate pagecaches
 		$old_allow_avatars = $Settings->get( 'allow_avatars' );

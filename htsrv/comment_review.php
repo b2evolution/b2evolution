@@ -18,8 +18,8 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'/_main.inc.php';
 
-param('cmt_ID', 'integer', '' );
-param('secret', 'string', '' );
+param( 'cmt_ID', 'integer', '', true );
+param( 'secret', 'string', '', true );
 param_action();
 
 $to_comment_edit = $admin_url.'?ctrl=comments&action=edit&comment_ID='.$cmt_ID;
@@ -94,7 +94,21 @@ $antispam_url = $admin_url.'?ctrl=antispam&action=ban&keyword='.rawurlencode(get
 switch( $action )
 {
 	case 'publish':
-		$posted_Comment->set('status', 'published' );
+		// Open comment to the highest status:
+
+		if( ! is_logged_in() )
+		{	// Don't allow this action for not logged in user:
+			$Messages->add( T_('Log in for more quick moderation actions.'), 'error' );
+
+			header_redirect( get_login_url( 'quick comment moderation', NULL, false, $comment_Blog->ID ) );
+			/* exited */
+		}
+
+		// We try to set a comment status to max allowed as "Public",
+		// but really it can be reduced to lower in Comment->dbupdate()
+		// depending on current User's permissions and parent Item status:
+		$posted_Comment->set( 'status', 'published' );
+
 		// Comment moderation is done, handle moderation "secret"
 		$posted_Comment->handle_qm_secret();
 
@@ -102,14 +116,17 @@ switch( $action )
 
 		$posted_Comment->handle_notifications();
 
-		$Messages->add( T_('Comment has been published.'), 'success' );
+		$Messages->add( T_('Comment status has been updated.'), 'success' );
 
 		header_redirect( regenerate_url('action', 'action=exit', '', '&') );
 		/* exited */
 		break;
 
 	case 'deprecate':
-		$posted_Comment->set('status', 'deprecated' );
+		// Deprecate comment:
+
+		$posted_Comment->set( 'status', 'deprecated' );
+
 		// Comment moderation is done, handle moderation "secret"
 		$posted_Comment->handle_qm_secret();
 
@@ -202,12 +219,30 @@ if ($secret == $posted_Comment->get('secret') && ($secret != NULL) )
 		echo "\n";
 	}
 
-	// publish button
-	if( $posted_Comment->status != 'published' )
+	// Try to display a button to open comment to higher status:
+	if( is_logged_in() && $posted_Comment->status != 'published' )
 	{
-		echo '<input type="submit" name="actionArray[publish]"';
-		echo ' value="'.T_('Publish').'" title="'.T_('Publish this comment').'"/>';
-		echo "\n";
+		// Check what max comment status is allowed for current User:
+		$max_allowed_comment_status = $posted_Comment->get_allowed_status( 'published' );
+
+		if( $max_allowed_comment_status != $posted_Comment->get( 'status' ) )
+		{	// If current comment status is not max allowed status yet:
+			$status_button_titles = get_visibility_statuses( 'ordered-array' );
+			foreach( $status_button_titles as $status_button_title )
+			{	// Find button status title by status key:
+				if( $status_button_title[0] == $max_allowed_comment_status )
+				{
+					$max_allowed_comment_status_title = $status_button_title[1];
+					break;
+				}
+			}
+			if( ! empty( $max_allowed_comment_status_title ) )
+			{	// Display the button only if next/higher status is used as moderation status:
+				echo '<input type="submit" name="actionArray[publish]"';
+				echo ' value="'.$max_allowed_comment_status_title.'" />';
+				echo "\n";
+			}
+		}
 	}
 
 	if( $posted_Comment->author_url != null )
@@ -227,6 +262,11 @@ if ($secret == $posted_Comment->get('secret') && ($secret != NULL) )
 	echo "\n";
 	echo '<input type="hidden" name="cmt_ID" value="'.$cmt_ID.'" />';
 	echo "\n";
+
+	if( ! is_logged_in() )
+	{	// Display this message because the button above to open a comment to higher status is available only for logged in users:
+		echo '<p>'.sprintf( T_('<a %s>Log in</a> for more actions.'), 'href="'.get_login_url( 'quick comment moderation', NULL, false, $comment_Blog->ID ).'"' ).'</p>';
+	}
 }
 else
 {

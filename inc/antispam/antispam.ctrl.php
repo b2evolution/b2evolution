@@ -33,7 +33,14 @@ param( 'confirm', 'string' );
 param( 'keyword', 'string', '', true );
 param( 'domain', 'string' );
 param( 'filteron', 'string', '', true );
-param( 'filter', 'array:string', array() );
+if( $action == 'iprange_edit' )
+{	// Memorize action for users and sessions list below edit form:
+	memorize_param( 'action', 'string', '', $action );
+}
+else
+{	// Don't initialize this param as array because it must be string for UserList:
+	param( 'filter', 'array:string', array() );
+}
 
 $tab = param( 'tab', 'string', '', true );
 $tab3 = param( 'tab3', 'string', '', true );
@@ -105,7 +112,7 @@ switch( $action )
 												WHERE hit_referer LIKE '.$DB->quote( '%'.$keyword.'%' ),
 												'Delete all banned hit-log entries' );
 
-			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success' );
+			$Messages->add_to_group( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 		}
 
 		if( $delcomments )
@@ -115,7 +122,7 @@ switch( $action )
 							OR comment_author_email LIKE '.$DB->quote( '%'.utf8_strtolower( $keyword ).'%' ).'
 							OR comment_author_url LIKE '.$DB->quote( '%'.$keyword.'%' ).'
 							OR comment_content LIKE '.$DB->quote( '%'.$keyword.'%' ).')';
-			// asimo> we don't need transaction here 
+			// asimo> we don't need transaction here
 			$query = 'SELECT comment_ID FROM T_comments
 							WHERE '.$keyword_cond.$del_condition;
 			$deleted_ids = $DB->get_col( $query, 0, 'Get comment ids awaiting for delete' );
@@ -125,14 +132,14 @@ switch( $action )
 			// Delete all comments data from DB
 			Comment::db_delete_where( 'Comment', $keyword_cond.$del_condition );
 
-			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success' );
+			$Messages->add_to_group( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 		}
 
 		if( $blacklist_locally )
 		{ // Local blacklist:
 			if( antispam_create( $keyword ) )
 			{ // Success
-				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars( $keyword ) ), 'success' );
+				$Messages->add_to_group( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 			}
 			else
 			{ // Failed
@@ -234,6 +241,9 @@ switch( $action )
 		param_integer_range( 'antispam_threshold_delete', -100, 100, T_('The threshold must be between -100 and 100.') );
 		$Settings->set( 'antispam_threshold_delete', $antispam_threshold_delete );
 
+		param( 'antispam_block_contact_form', 'integer', 0 );
+		$Settings->set( 'antispam_block_contact_form', $antispam_block_contact_form );
+
 		param( 'antispam_block_spam_referers', 'integer', 0 );
 		$Settings->set( 'antispam_block_spam_referers', $antispam_block_spam_referers );
 
@@ -291,7 +301,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
+		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
 		$rows_affected = 0;
 
@@ -326,7 +336,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
+		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
 		$rows_affected = 0;
 
@@ -608,11 +618,24 @@ switch( $tab3 )
 				}
 				// Set IP Start and End from _GET request
 				$ip = param( 'ip', 'string', '' );
+				$ip_start = param( 'ip_start', 'string', '' );
+				$ip_end = param( 'ip_end', 'string', '' );
 				if( ! empty( $ip ) && is_valid_ip_format( $ip ) &&
 				    ( $ip = explode( '.', $ip ) ) && count( $ip ) == 4 )
-				{
+				{	// Prefill from single IP address:
 					$edited_IPRange->set( 'IPv4start', ip2int( implode( '.', array( $ip[0], $ip[1], $ip[2], 0 ) ) ) );
 					$edited_IPRange->set( 'IPv4end', ip2int( implode( '.', array( $ip[0], $ip[1], $ip[2], 255 ) ) ) );
+				}
+				else
+				{	// Prefill from start and end IP addresses:
+					if( ! empty( $ip_start ) && is_valid_ip_format( $ip_start ) )
+					{
+						$edited_IPRange->set( 'IPv4start', ip2int( $ip_start ) );
+					}
+					if( ! empty( $ip_end ) && is_valid_ip_format( $ip_end ) )
+					{
+						$edited_IPRange->set( 'IPv4end', ip2int( $ip_end ) );
+					}
 				}
 				$AdminUI->disp_view( 'antispam/views/_antispam_ipranges.form.php' );
 				break;

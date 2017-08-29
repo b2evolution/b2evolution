@@ -86,6 +86,7 @@ $params = array_merge( array(
 		'nav_page_current_template' => '<span><b>$page_num$</b></span>',
 		'comments_per_page'     => NULL, // Used instead of blog setting "comments_per_page"
 		'pagination'            => array(),
+		'comment_type'          => 'comment',
 	), $params );
 
 
@@ -103,7 +104,7 @@ modules_call_method( 'before_comments', $params );
 // -------------------- END OF MODULES EVENT ---------------------
 
 // Check if user is allowed to see comments, display corresponding message if not allowed
-if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
     || $Item->can_see_comments( true ) )
 { // user is allowed to see comments
 	if( empty($c) )
@@ -139,14 +140,11 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 		if( $Item->can_see_comments() )
 		{	// User can see a comments
 			$type_list[] = 'comment';
-			$Item->load_Blog();
-			$comment_inskin_statuses = explode( ',', $Item->Blog->get_setting( 'comment_inskin_statuses' ) );
-
 			if( !empty( $params['comments_title_text'] ) )
 			{
 				$disp_title[] = $params['comments_title_text'];
 			}
-			else if( $title = $Item->get_feedback_title( 'comments', '#', '#', '#', $comment_inskin_statuses ) )
+			else if( $title = $Item->get_feedback_title( 'comments' ) )
 			{
 				$disp_title[] = $title;
 			}
@@ -199,9 +197,9 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 		}
 	}
 
-	if( $params['disp_meta_comments'] && is_logged_in() )
+	if( $params['disp_meta_comments'] )
 	{	// We requested to display meta comments
-		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+		if( $Item->can_see_meta_comments() )
 		{	// User can see meta comments
 			$type_list[] = 'meta';
 			if( !empty( $params['comments_title_text'] ) )
@@ -225,7 +223,7 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 	{
 		if( empty($disp_title) )
 		{	// No title yet
-			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), array( 'review', 'draft' ), false ) )
+			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), '#moderation#', false ) )
 			{ // We have some feedback awaiting moderation: we'll want to show that in the title
 				$disp_title[] = $title;
 			}
@@ -246,8 +244,7 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 		// // Display the meta comments info ?
 		if( $params['disp_meta_comment_info'] // If we want it
 			&& ! $params['disp_meta_comments']  // If we're not displaying the full list of meta comments anyways
-			&& is_logged_in()                   // If we're logged in
-			&& $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) ) // If we have permission to view meta comment of the collection
+			&& $Item->can_see_meta_comments() ) // If we have permission to view meta comment of the collection
 		{	// Display the meta comments info:
 			global $admin_url;
 			echo '<div class="evo_comment__meta_info">';
@@ -257,7 +254,7 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 			{	// Display a badge with meta comments count if at least one exists for this Item:
 				echo '<a href="'.$meta_comments_url.'" class="badge badge-meta">'.sprintf( T_('%d meta comments'), $meta_comments_count ).'</a>';
 			}
-			elseif( $current_User->check_perm( 'meta_comment', 'add', false, $Blog->ID ) )
+			elseif( $Item->can_meta_comment() )
 			{	// No meta comments yet, Display a button to add new meta comment:
 				echo '<a href="'.$meta_comments_url.'" class="btn btn-default btn-sm">'.T_('Add meta comment').'</a>';
 			}
@@ -277,6 +274,9 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 		{ // Use from params:
 			$comments_per_page = $params['comments_per_page'];
 		}
+
+		global $CommentList;
+
 		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', $params['disp_meta_comments'] ? 'mc_' : 'c_' );
 
 		// Filter list:
@@ -291,7 +291,9 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 		$CommentList->load_from_Request();
 
 		// Get ready for display (runs the query):
-		$CommentList->display_init();
+		$CommentList->display_init( array(
+				'init_order_numbers_mode' => ( $params['disp_meta_comments'] ? 'date' : 'list' )
+			) );
 
 		// Set redir=no in order to open comment pages
 		memorize_param( 'redir', 'string', '', 'no' );
@@ -323,7 +325,7 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 			global $CommentReplies;
 			$CommentReplies = array();
 
-			if( $Comment = $Session->get('core.preview_Comment') )
+			if( $Comment = get_comment_from_session( 'preview', $params['comment_type'] ) )
 			{	// Init PREVIEW comment
 				if( $Comment->item_ID == $Item->ID )
 				{
@@ -335,15 +337,6 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 		if( ! $params['nav_top_inside'] )
 		{ // To use comments page navigation before list
 			echo $params['comment_list_start'];
-		}
-
-		// Set number of comment depending on current page
-		$comment_number = ( ( $CommentList->page - 1 ) * $CommentList->limit ) + 1;
-
-		if( $params['disp_meta_comments'] )
-		{	// Calculate index of first meta comment:
-			global $comment_template_counter;
-			$comment_template_counter = $CommentList->total_rows - ( $CommentList->limit * ( $CommentList->page - 1 ) );
 		}
 
 		/**
@@ -380,7 +373,6 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 					'author_link_text'      => $params['author_link_text'],
 					'link_to'               => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 					'author_link_text'      => $params['author_link_text'],
-					'comment_number'        => $comment_number,
 					'image_size'            => $params['comment_image_size'],
 				) );
 			// Note: You can customize the default item comment by copying the generic
@@ -391,8 +383,6 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 			{	// Display the comment replies
 				display_comment_replies( $Comment->ID, $params );
 			}
-
-			$comment_number++;
 		}	// End of comment list loop.
 
 		if( ! $params['nav_bottom_inside'] )
@@ -439,9 +429,11 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $params['disp_comment_form'] )
-{
-	if( $Blog->get_ajax_form_enabled() && ( $Blog->get_setting( 'allow_comments' ) != 'never' ) )
+if( $params['disp_comment_form'] && // if enabled by skin param
+    $Blog->get_setting( 'allow_comments' ) != 'never' && // if enabled by collection setting
+    $Item->get_type_setting( 'use_comments' ) ) // if enabled by item type setting
+{	// Display a comment form only if it is enabled:
+	if( $Blog->get_ajax_form_enabled() )
 	{
 		// The following params will be piped through the AJAX request...
 		$json_params = array(
@@ -479,8 +471,57 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 
 		if( $Blog->get_setting( 'allow_comment_subscriptions' ) )
 		{
-			$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
-						WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
+			$sql = 'SELECT count( sub_user_ID )
+							FROM (
+								SELECT DISTINCT sub_user_ID
+								FROM T_subscriptions
+								WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0
+
+								UNION
+
+								SELECT user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+								LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_comment_subscription"
+									AND opt.cset_value = 1
+									AND user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+
+								UNION
+
+								SELECT sug_user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+								LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_comment_subscription"
+									AND opt.cset_value = 1
+									AND sug_user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+
+								UNION
+
+								SELECT bloguser_user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_comment_subscription"
+									AND opt.cset_value = 1
+									AND bloguser_user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+							) AS users';
+
 			if( $DB->get_var( $sql ) > 0 )
 			{
 				echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'You are receiving notifications when anyone comments on any post.' );

@@ -46,7 +46,8 @@
 				delayShow: 0,
 				delayHide: 500,
 				calculateOnShow: false,
-				showOnInit: false
+				showOnInit: false,
+				zIndex: 0,
 			};
 			if (options) {
 				_options = $.extend(_options, options);
@@ -226,6 +227,10 @@
 				}
 				_isHiding = false;
 				_this.css('position', 'relative');
+				if( _options.zIndex > 0 )
+				{
+					_wrapper.css('z-index', _options.zIndex);
+				}
 				_wrapper.show();
 				animation = $.extend(animation, { 'opacity': 1 });
 				_wrapper.animate(animation, _options.animationDuration, _options.animationEasing, function() {

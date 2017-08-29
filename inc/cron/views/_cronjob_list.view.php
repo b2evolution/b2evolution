@@ -238,7 +238,7 @@ $Results->cols[] = array(
 						'th' => T_('Planned at'),
 						'order' => 'ctsk_start_datetime',
 						'td_class' => 'shrinkwrap',
-						'td' => '$ctsk_start_datetime$',
+						'td' => '%mysql2localedatetime_spans( #ctsk_start_datetime# )%',
 					);
 
 $Results->cols[] = array(

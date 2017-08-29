@@ -1,4 +1,6 @@
-// Why no @import "../../rsc/less/_universal_item_list_widget.module.less"; here???
+// --------- Universal item list widget & Recent posts widget ---------
+@import "../../rsc/less/_universal_item_list_widget.module.less";
+// --------------------------------------------------------------------
 
 // ------------------- Media Index widget --------------------
 @import "../../rsc/less/_coll_media_index_widget.module.less";
@@ -14,10 +16,6 @@
 
 // ------------- Organization Members widget -------------
 @import "../../rsc/less/_org_members_widget.module.less";
-	// Override constants used in the module:
-	@widget_core_org_members-color: #333;
-	@widget_core_org_members-user-link-color: #000;
-	@widget_core_org_members-user-link-hover-color: #23527c;
 // -------------------------------------------------------
 
 // Header
@@ -216,6 +214,12 @@ textarea.message_text {
 //		display: inline-block;
 //		margin-right: 5px;
 //	}
+}
+
+.evo_comment_avatar img {
+	float: left;
+	border-radius: 50%;
+	margin: 0 10px 10px 0;
 }
 
 div.bSideItem {

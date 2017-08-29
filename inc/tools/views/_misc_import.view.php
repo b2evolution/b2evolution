@@ -39,7 +39,7 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 
 $block_item_Widget->title = T_('phpBB Import');
 $block_item_Widget->disp_template_replaced( 'block_start' );
-printf( '<p>'.T_('You can import contents from your phpBB 2.x database into your b2evolution database by using <a %s>phpBB Importer</a>.').'</p>', ' href="?ctrl=phpbbimport"' );
+printf( '<p>'.T_('You can import contents from your phpBB 2.x or 3.x database into your b2evolution database by using <a %s>phpBB Importer</a> or <a %s>phpBB 3 Importer</a> .').'</p>', ' href="?ctrl=phpbbimport"', ' href="?ctrl=phpbbimport&ver=3"' );
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 ?>

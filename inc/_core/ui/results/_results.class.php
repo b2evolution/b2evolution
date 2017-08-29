@@ -1254,15 +1254,21 @@ class Results extends Table
 			foreach( $this->cols as $col )
 			{ // For each column:
 
+				if( isset( $this->current_colspan ) && $this->current_colspan > 1 )
+				{	// Skip this column because previous column has a colspan:
+					$this->current_colspan--;
+					continue;
+				}
+
 				// COL START:
 				if ( ! empty($col['extra']) )
 				{
 					// array of extra params $col['extra']
-					$this->display_col_start( $col['extra'] );
+					$this->display_col_start( $col['extra'], $row );
 				}
 				else
 				{
-					$this->display_col_start();
+					$this->display_col_start( array(), $row );
 				}
 
 
@@ -1728,7 +1734,7 @@ class Results extends Table
 				if(	$sort == 'ASC' )
 				{	// ASC sort, so move_up action for move up arrow
 					$action = 'move_up';
-					$alt = T_( 'Move up!' );
+					$alt = T_( 'Move up' ).'!';
 					}
 				else
 				{	// Reverse sort, so action and alt are reverse too
@@ -1748,7 +1754,7 @@ class Results extends Table
 				if(	$sort == 'ASC' )
 				{	// ASC sort, so move_down action for move down arrow
 					$action = 'move_down';
-					$alt = T_( 'Move down!' );
+					$alt = T_( 'Move down' ).'!';
 				}
 				else
 				{ // Reverse sort, so action and alt are reverse too

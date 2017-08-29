@@ -16,7 +16,7 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 
 global $Settings, $Plugins;
 
-global $Blog, $rsc_path, $rsc_url, $dummy_fields;
+global $Collection, $Blog, $rsc_path, $rsc_url, $dummy_fields;
 
 global $display_invitation;
 
@@ -140,7 +140,7 @@ elseif( $display_invitation == 'info' )
 }
 
 // Login
-$Form->text_input( $dummy_fields['login'], $login, 22, T_('Login'), $params['register_use_placeholders'] ? '' : T_('Choose an username').'.',
+$Form->text_input( $dummy_fields['login'], $login, 22, /* TRANS: noun */ T_('Login'), $params['register_use_placeholders'] ? '' : T_('Choose an username').'.',
 	array(
 			'placeholder'  => $params['register_use_placeholders'] ? T_('Choose an username') : '',
 			'maxlength'    => 20,

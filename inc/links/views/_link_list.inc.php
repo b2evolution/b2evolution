@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 global $blog;
 
@@ -119,7 +119,7 @@ $Results->cols[] = array(
 					);
 
 
-if( $current_User->check_perm( 'files', 'view', false, $blog ) )
+if( $current_User->check_perm( 'files', 'view' ) )
 {
 	function file_actions( $link_ID )
 	{
@@ -155,7 +155,7 @@ if( $current_User->check_perm( 'files', 'view', false, $blog ) )
 						);
 }
 
-if( $current_User->check_perm( 'files', 'view', false, $blog )
+if( $current_User->check_perm( 'files', 'view' )
 	&& $LinkOwner->check_perm( 'edit' ) )
 {	// Check that we have permission to edit LinkOwner object:
 	$Results->global_icon( T_('Link a file...'), 'link', url_add_param( $Blog->get_filemanager_link(),

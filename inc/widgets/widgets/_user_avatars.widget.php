@@ -66,7 +66,7 @@ class user_avatars_Widget extends ComponentWidget
 				'options' => array(
 						'rwd'  => T_( 'RWD Blocks' ),
 						'flow' => T_( 'Flowing Blocks' ),
-						'list' => T_( 'List' ), 
+						'list' => T_( 'List' ),
 						'grid' => T_( 'Table' ),
 					 ),
 				'defaultvalue' => 'flow',
@@ -364,7 +364,7 @@ class user_avatars_Widget extends ComponentWidget
 
 				if( $this->disp_params[ 'style' ] == 'badges' )
 				{ // Add user login after picture
-					$r .= '<br >'.$User->get_colored_login();
+					$r .= '<br >'.$User->get_colored_login( array( 'login_text' => 'name' ) );
 				}
 				elseif( $this->disp_params[ 'style' ] == 'username' )
 				{ // username without <br>

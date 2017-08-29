@@ -242,7 +242,7 @@ class item_about_author_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $Item;
+		global $Collection, $Blog, $Item;
 
 		if( ! empty( $Item ) && ( $creator_User = & $Item->get_creator_User() ) !== false )
 		{ // Get ID of creator User

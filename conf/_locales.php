@@ -83,7 +83,7 @@ $force_io_charset_if_accepted = 'utf-8'; // Temporary solution to force here the
  *
  * If not empty, this will issue a mysqli::set_charset() command.
  * This must be a MySQL charset. Example: 'latin1' or 'utf8'
- * fp> Actually, DB::set_connection_charset(x,true) can convert from 'iso-8859-1' to 'latin1' for example.
+ * fp> Actually, DB::$connection_charset=x can convert from 'iso-8859-1' to 'latin1' for example.
  *
  * If left empty, the default charset will be used. The default here is the default set your MySQL Server.
  *
@@ -132,8 +132,12 @@ $locales['en-US'] = array(
 		'name' => NT_('English (US) utf-8'),
 		'charset' => 'utf-8',
 		'datefmt' => 'm/d/y',
+		'longdatefmt' => 'm/d/Y',
+		'extdatefmt' => 'M d, Y',
+		'input_datefmt' => 'm/d/y',
 		'timefmt' => 'h:i:s a',
 		'shorttimefmt' => 'h:i a',
+		'input_timefmt' => 'H:i:s',
 		'startofweek' => 0,
 		'messages' => 'en_US',
 		'enabled' => false,	// We need this line to prevent notices iin locales conf screen and user profile screen.

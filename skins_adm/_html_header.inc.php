@@ -42,9 +42,10 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	global $rsc_path, $rsc_url;
 
 	// var htsrv_url is used for AJAX callbacks
-	add_js_headline( "// Paths used by JS functions:
+	add_js_headline( "// Paths and vars are used by JS functions:
 		var htsrv_url = '".get_htsrv_url()."';
 		var restapi_url = '".get_restapi_url()."';
+		var b2evo_icons_type = '".get_param( 'b2evo_icons_type' )."';
 		var blog_id = '".param( 'blog', 'integer' )."';
 		var is_backoffice = true;" );
 

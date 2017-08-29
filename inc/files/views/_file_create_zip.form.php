@@ -26,7 +26,7 @@ $Form->begin_form( 'fform', T_('Create ZIP archive') );
 	$Form->hidden( 'action_invoked', 1 );
 	$Form->hiddens_by_key( get_memorized() );
 
-	$Form->text_input( 'zipname', $zipname, 30, T_('Archive filename'), T_('End in .ZIP'),  array( 'maxlength' => '' ) );
+	$Form->text_input( 'zipname', $zipname, 30, T_('Archive filename'), T_('End with .zip'),  array( 'maxlength' => '' ) );
 
 	if( $selected_Filelist->count_dirs() )
 	{	// Allow to exclude dirs:
@@ -38,7 +38,7 @@ $Form->begin_form( 'fform', T_('Create ZIP archive') );
 		.'</ul>' );
 
 	// Allow to delete the files after archive:
-	$Form->checkbox( 'delete_files', $delete_files, '', T_('Delete this files upon successful archive creation') );
+	$Form->checkbox( 'delete_files', $delete_files, '', T_('Delete these files upon successful archive creation') );
 
 $Form->end_form( array(
 		array( 'submit', 'submit', T_('Create'), 'btn-primary' ),

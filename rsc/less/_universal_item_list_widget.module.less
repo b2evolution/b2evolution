@@ -110,6 +110,12 @@ div.widget_core_coll_related_post_list {
 				}
 			}
 		}
+		// If special placement, without teaser, without excerpt
+		&.evo_noexcerpt.evo_noteaser {
+			div.item_title a {
+				font-size: 22px;
+			}
+		}
 	}
 
 	// FP: I did not find a better way than to include this in &.evo_layout_list
@@ -149,8 +155,23 @@ div.widget_core_coll_related_post_list {
 			div.item_title a {
 				text-decoration: underline;
 			}
+			div.item_content {
+				blockquote {
+					margin-left: 86px;
+				}
+			}
 			div.item_excerpt {
 				margin-top: -2px;
+			}
+			// We need this code to convert the last line of <p> into "inline", so that the "..." button can be IN LINE with the last <p>
+			div.item_content,
+			div.item_excerpt {
+				p {
+					margin: 0;
+					&:last-of-type {
+						display: inline;
+					}
+				}
 			}
 		}
 		ul li {
@@ -171,69 +192,82 @@ div.widget_core_coll_related_post_list {
 				}
 			}
 		}
-	}
-	// With teaser specific layout (with "..." button)
-	&.evo_noexcerpt.evo_withteaser,&.evo_withexcerpt.evo_withteaser,&.evo_withexcerpt.evo_noteaser {
-			div.item_content,div.item_excerpt {
-				p {
-					margin: 0;
-					&:last-of-type {
-						display: inline;
-						&:after {
-							content: '...';
-						}
-					}
-				}
-				// Special blockquote style for teaser layout
-				blockquote {
-					display: block;
-					margin: 0;
-					padding: 5px 15px;
-				}
-				// Simulation of bootstrap's btn-default class
-				> a {
-					margin-left: -3px;
-					display: inline-block;
-					height: 22px;
-					float: right;
-					padding: 0px 4px 0px 4px;
-					font-size: 20px;
-					line-height: 13px;
-					white-space: nowrap;
-					vertical-align: middle;
-					-ms-touch-action: manipulation;
-					touch-action: manipulation;
-					cursor: pointer;
-					-webkit-user-select: none;
-					-moz-user-select: none;
-					-ms-user-select: none;
-					user-select: none;
-					background-image: none;
-					border: 1px solid transparent;
-					color: @teaser-specific-button-color;
-					border-radius: 4px;
-					border: 1px solid #ccc;
-					&:hover {
-						border: 1px solid #adadad;
-						color: #333;
-						background-color: #e6e6e6;
-						text-decoration: none;
-					}
-				}
-		}
 		// Special blockquote style for teaser layout
-		&.evo_1pic__special ul li div.item_content {
-			blockquote {
-				margin-left: 86px;
+		blockquote {
+			display: block;
+			margin: 0;
+			padding: 5px 15px;
+		}
+		a.btn {
+			// In v6.8.9+ we are using a real bootstrap button but we want the bg to be transparent.
+			background-color: transparent;
+			float: right;
+			height: 22px;
+			line-height: 13px;
+			padding: 0px 4px 0px 4px;
+			&:hover {
+				// We need this because .btn.btn-default from Bootstraps' CSS can't override the overly precise "background-color: transparent" stated above
+				background-color: #e6e6e6;
 			}
 		}
 	}
-	// If special placement, without teaser, without excerpt
-	&.evo_1pic__special.evo_noexcerpt.evo_noteaser {
-		div.item_title a {
-			font-size: 22px;
-		}
-	}
+	
+	// With teaser specific layout (with "..." button)
+	// &.evo_noexcerpt.evo_withteaser,
+	// &.evo_withexcerpt.evo_withteaser,
+	// &.evo_withexcerpt.evo_noteaser {
+
+			// div.item_content,
+			// div.item_excerpt {
+
+				// No longer needed ince we have &hellip; in th output code:
+				// p {
+					// margin: 0;
+					// &:last-of-type {
+						// display: inline;
+						// &:after {
+							// content: '...';
+						// }
+					// }
+				// }
+
+				// > a {
+					// TODO: check if we still need the following. -- Maybe for non-bootstrap skins?
+					// Simulation of bootstrap's btn-default class:
+					// margin-left: -3px;
+					// display: inline-block;
+					// font-size: 20px;
+					// white-space: nowrap;
+					// vertical-align: middle;
+					// -ms-touch-action: manipulation;
+					// touch-action: manipulation;
+					// cursor: pointer;
+					// -webkit-user-select: none;
+					// -moz-user-select: none;
+					// -ms-user-select: none;
+					// user-select: none;
+					// background-image: none;
+					// border: 1px solid transparent;
+					// color: @teaser-specific-button-color;
+					// border-radius: 4px;
+					// border: 1px solid #ccc;
+					// &:hover {
+						// border: 1px solid #adadad;
+						// color: #333;
+						// background-color: #e6e6e6;
+						// text-decoration: none;
+					// }
+				// }
+		// }
+
+		// Special blockquote style for teaser layout
+		// &.evo_1pic__special ul li div.item_content {
+			// blockquote {
+				// margin-left: 86px;
+			// }
+		// }
+	// }
+	
 	img {
 		border-radius: 3px;
 		// Preventing images to exceed the parent's width

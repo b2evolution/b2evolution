@@ -43,7 +43,7 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		load_funcs( 'files/model/_image.funcs.php' );
 
@@ -212,7 +212,7 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $localtimenow, $DB, $Blog;
+		global $localtimenow, $DB, $Collection, $Blog;
 
 		$this->init_display( $params );
 
@@ -358,7 +358,7 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 		if( empty( $blog_ID ) )

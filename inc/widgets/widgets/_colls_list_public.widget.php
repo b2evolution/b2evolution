@@ -140,7 +140,7 @@ class colls_list_public_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?

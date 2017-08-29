@@ -20,12 +20,12 @@ items_manual_results_block();
 echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same collection (smallest category number).').'</p>';
 */
 
-global $Settings, $dispatcher, $ReqURI, $Blog, $blog;
+global $Settings, $dispatcher, $ReqURI, $Collection, $Blog, $blog;
 
 if( empty( $Blog ) )
 { // Set Blog
 	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog );
+	$Collection = $Blog = $BlogCache->get_by_ID( $blog );
 }
 
 // Use a wrapper div to have margin around the form

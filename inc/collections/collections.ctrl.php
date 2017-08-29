@@ -26,7 +26,7 @@ if( strpos( $action, 'new' ) !== false )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
+if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
 {
 	if( valid_blog_requested() )
 	{
@@ -124,15 +124,63 @@ switch( $action )
 		param( 'skin_ID', 'integer', true );
 		$edited_Blog->set_setting( 'normal_skin_ID', $skin_ID );
 
-		if( $edited_Blog->load_from_Request( array() ) )
+		// Check how new content should be created for new collection:
+		param( 'create_demo_contents', 'boolean', NULL );
+		if( $create_demo_contents === NULL )
+		{
+			param_error( 'create_demo_contents', T_('Please select an option for "New contents"') );
+		}
+
+		if( $edited_Blog->load_from_Request() )
 		{
 			// create the new blog
 			$edited_Blog->create( $kind );
 
+			global $Settings;
+
+			param( 'set_as_info_blog', 'boolean' );
+			param( 'set_as_login_blog', 'boolean' );
+			param( 'set_as_msg_blog', 'boolean' );
+
+			if( $set_as_info_blog && ! $Settings->get( 'info_blog_ID' ) )
+			{
+				$Settings->set( 'info_blog_ID', $edited_Blog->ID );
+			}
+			if( $set_as_login_blog && ! $Settings->get( 'login_blog_ID' ) )
+			{
+				$Settings->set( 'login_blog_ID', $edited_Blog->ID );
+			}
+			if( $set_as_msg_blog && ! $Settings->get( 'mgs_blog_ID' ) )
+			{
+				$Settings->set( 'msg_blog_ID', $edited_Blog->ID );
+			}
+			$Settings->dbupdate();
+
+			// Create demo contents for the new collection:
+			if( $create_demo_contents )
+			{
+				global $user_org_IDs;
+
+				load_funcs( 'collections/_demo_content.funcs.php' );
+				param( 'create_demo_org', 'boolean', false );
+				param( 'create_demo_users', 'boolean', false );
+				$user_org_IDs = NULL;
+
+				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', true ) )
+				{ // Create the demo organization
+					$user_org_IDs = array( create_demo_organization( $edited_Blog->owner_user_ID )->ID );
+				}
+
+				// Switch locale to translate content
+				locale_temp_switch( param( 'blog_locale', 'string' ) );
+				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID, $create_demo_users );
+				locale_restore_previous();
+			}
+
 			// We want to highlight the edited object on next list display:
 			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 
-			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
+			header_redirect( $edited_Blog->gen_blogurl() );// will save $Messages into Session
 		}
 		break;
 
@@ -176,7 +224,7 @@ switch( $action )
 
 				$BlogCache->remove_by_ID( $blog );
 				unset( $edited_Blog );
-				unset( $Blog );
+				unset( $Blog, $Collection );
 				forget_param( 'blog' );
 				set_working_blog( 0 );
 				$UserSettings->delete( 'selected_blog' );	// Needed or subsequent pages may try to access the delete blog
@@ -299,10 +347,9 @@ switch( $action )
 		// Site long name
 		$Settings->set( 'notification_long_name', param( 'notification_long_name', 'string', '' ) );
 
-		// Small site logo url
-		param( 'notification_logo', 'string', '' );
-		param_check_url( 'notification_logo', 'http-https' );
-		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
+		// Small site logo
+		param( 'notification_logo_file_ID', 'integer', NULL );
+		$Settings->set( 'notification_logo_file_ID', get_param( 'notification_logo_file_ID' ) );
 
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );

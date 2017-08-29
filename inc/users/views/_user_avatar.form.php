@@ -59,15 +59,15 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_text_title = T_( 'Edit profile picture' ).get_manual_link( 'user-profile-picture-tab' ); // used for js confirmation message on leave the changed form
+	$form_text_title = '<span class="nowrap">'.T_( 'Edit profile picture' ).'</span>'.get_manual_link( 'user-profile-picture-tab' ); // used for js confirmation message on leave the changed form
 	$form_title = get_usertab_header( $edited_User, 'avatar', $form_text_title );
 	$form_class = 'fform';
-	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+	$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 	$ctrl_param = '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID;
 }
 else
 {
-	global $Blog;
+	global $Collection, $Blog;
 	$form_title = '';
 	$form_class = $params['form_class_user_avatar'];
 	$ctrl_param = url_add_param( $Blog->gen_blogurl(), 'disp='.$disp );
@@ -247,7 +247,7 @@ if( ( $current_User->ID == $edited_User->ID ) || $can_moderate_user )
 		// Upload
 		$Form->file_input( 'uploadfile[]', NULL, T_('Upload a new picture'), '', array( 'size' => 10 ) );
 
-		$action_buttons = array( array( 'submit', NULL, '> '.T_('Upload!'), 'btn btn-primary ActionButton' ) );
+		$action_buttons = array( array( 'submit', NULL, '> './* TRANS: verb */ T_('Upload!'), 'btn btn-primary ActionButton' ) );
 		$Form->buttons( $action_buttons );
 	}
 

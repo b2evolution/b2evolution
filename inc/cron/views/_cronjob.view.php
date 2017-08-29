@@ -19,7 +19,7 @@ $Form = new Form( NULL, 'cronlog' );
 
 if( empty( $cjob_row->clog_status ) && $current_User->check_perm( 'options', 'edit', false, NULL ) )
 { // User can edit this job:
-	$Form->global_icon( T_('Edit this job'), 'edit', $admin_url.'?ctrl=crontab&amp;action=edit&amp;ctsk_ID='.$cjob_row->ctsk_ID, T_('Edit this job...'), 3, 3 );
+	$Form->global_icon( T_('Edit this job'), 'edit', $admin_url.'?ctrl=crontab&amp;action=edit&amp;ctsk_ID='.$cjob_row->ctsk_ID, T_('Edit this job').'...', 3, 3 );
 }
 
 $Form->global_icon( T_('Close sheet'), 'close', regenerate_url( 'action,cjob_ID' ) );
@@ -49,7 +49,7 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 		else
 		{
 			$duration_seconds = strtotime( $cjob_row->clog_realstop_datetime ) - strtotime( $cjob_row->clog_realstart_datetime );
-			$duration_icon = ( $duration_seconds > 60 ) ? ' '.get_icon( 'warning_yellow', 'imgtag', array( 'title' => T_('Execution time is more than 60 seconds!') ) ) : '';
+			$duration_icon = ( $duration_seconds > 60 ) ? ' '.get_icon( 'warning_yellow', 'imgtag', array( 'title' => T_('This job took more than 60 seconds to execute!') ) ) : '';
 
 			$Form->info( T_('Status'), '<span style="background-color:'.cron_status_color ( $cjob_row->clog_status ).';padding:0 5px;">'.$cjob_row->clog_status.'</span>'.$duration_icon );
 			$Form->info( T_('Real start time'), mysql2localedatetime( $cjob_row->clog_realstart_datetime ) );

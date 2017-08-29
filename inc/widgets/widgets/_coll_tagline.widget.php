@@ -59,7 +59,7 @@ class coll_tagline_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		return $Blog->dget( 'tagline', 'htmlbody' );
 	}
@@ -70,7 +70,7 @@ class coll_tagline_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 		return sprintf( T_('&laquo;%s&raquo; from the blog\'s <a %s>general settings</a>.'),
 				'<strong>'.$Blog->dget('tagline').'</strong>', 'href="?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'"' );
 	}
@@ -83,7 +83,7 @@ class coll_tagline_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 

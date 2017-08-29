@@ -2,7 +2,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $current_User, $Session, $admin_url, $status_list, $CommentList, $b2evo_icons_type;
+global $Collection, $Blog, $current_User, $Session, $admin_url, $status_list, $CommentList, $b2evo_icons_type;
 
 // Require this file because function evoAlert() is used here
 require_js( 'functions.js', 'blog', false, true );
@@ -369,6 +369,16 @@ function ban_url( authorurl )
 			'90%', '', true,
 			'<?php echo TS_('Confirm ban & delete'); ?>',
 			[ '<?php echo TS_('Perform selected operations'); ?>', 'btn-danger', '#antispam_ban' ], true, false, 'modal_window_frame_ban' );
+
+	var submitButton = jQuery( '.modal-footer button:submit' ).not( '[data-dismiss=modal]' );
+	submitButton.on( 'click', function() { addSpinner( this ) } );
+	jQuery( '#modal_window_frame_ban' ).on( 'load', function() {
+		if( submitButton.hasClass( 'btn-spinner' ) )
+		{
+			submitButton.removeClass( 'btn-spinner' );
+			submitButton.css( 'width', '-=24px' );
+		}
+	});
 }
 
 // Refresh comments on dashboard after ban url -> delete comment
@@ -535,16 +545,16 @@ function get_limit()
 
 function get_show_statuses()
 {
-	if( jQuery('#only_draft') && jQuery('#only_draft').is(':checked') )
+	if( jQuery('#only_moderation') && jQuery('#only_moderation').is(':checked') )
 	{
-		return '(draft)';
+		return '#only_moderation#';
 	}
-	else if( jQuery('#only_published') && jQuery('#only_published').is(':checked') )
+	else if( jQuery('#only_valid') && jQuery('#only_valid').is(':checked') )
 	{
-		return '(published)';
+		return '#only_valid#';
 	}
 
-	return '(published,community,protected,private,review,draft,deprecated)';
+	return '#all#';
 }
 
 function get_expiry_status()

@@ -15,7 +15,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $edited_Comment, $comment_Item, $comment_content;
+global $Collection, $Blog, $edited_Comment, $comment_Item, $comment_content;
 global $display_params, $admin_url, $dummy_fields;
 
 if( empty( $comment_Item ) )

@@ -16,6 +16,32 @@
 	div.checkbox:last-of-type {
 		padding-bottom: 7px;
 	}
+	.text-left-sm {
+		text-align: left;
+	}
+	.text-right-sm {
+		text-align: right;
+	}
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+	.text-left-md {
+		text-align: left;
+	}
+	.text-right-md {
+		text-align: right;
+	}
+}
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+	.text-left-lg {
+		text-align: left;
+	}
+	.text-right-lg {
+		text-align: right;
+	}
 }
 
 // Don't rewrite a font family of glyph icons
@@ -28,6 +54,10 @@ ul, ol {
 	padding: 0;
 }
 
+.text-normal {
+	font-weight: normal;
+}
+
 // Use yellow color on hover table rows intead of grey standard color:
 .table-hover > tbody > tr:hover {
 	background-color: #ffc;
@@ -35,12 +65,29 @@ ul, ol {
 
 // Custom styles for buttons
 .btn {
+	margin-top: 3px;
+	margin-bottom: 3px;
 	&.btn-success, &.btn-danger {
 		.fa {
 			// Use only white icons in color buttons
 			color: #FFF !important;
 		}
 	}
+}
+.evo_widget{
+	.btn { // we need this to give space to buttons on successive widget lines
+		margin-top: 4px;
+		margin-bottom: 4px;
+	}
+	.input-group .btn { // In this case we need to cancel the previous -- eg: search form widget
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+}
+
+.input-group .btn {
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 // Keep almost same style for active disabled buttons (used by TinyMCE plugin)
@@ -169,6 +216,9 @@ a.btn.action_icon {
 			padding: 0 2px 2px 0;
 			vertical-align: middle;
 		}
+		tr:last-child td {
+			padding-bottom: 0;
+		}
 		th.label, td.label {
 			display: table-cell;
 			color: #333;
@@ -179,6 +229,11 @@ a.btn.action_icon {
 		}
 		td.input div.tile label.control-label {
 			display: none;
+		}
+	}
+	#itemform_custom_fields {
+		.panel-body .form-group:last-child {
+			margin-bottom: 0;
 		}
 	}
 	// Select category table on edit post form
@@ -213,7 +268,7 @@ a.btn.action_icon {
 		.form-group {
 			display: inline-block;
 			margin: 0 0 2px;
-			input[type=text] {
+			input[type=text]:not( #item_issue_date ) {
 				max-width: 85px;
 			}
 		}
@@ -374,23 +429,41 @@ div.results {
 		margin-bottom: 5px;
 	}
 	tr.placeholder {
-		display: block;
-		background: red;
 		position: relative;
-		margin: 0;
-		padding: 0;
-		border: none;
 		&:before {
 			content: "";
 			position: absolute;
 			width: 0;
 			height: 0;
-			border: 5px solid transparent;
-			border-left-color: red;
+			border: 6px solid transparent;
+			border-left-color: #f00;
+			border-right: none;
 			margin-top: -5px;
 			left: 0;
-			border-right: none;
 		}
+		&:after {
+			content: "";
+			position: absolute;
+			width: 100%;
+			height: 2px;
+			background: #F00;
+			left: 0;
+			margin-top: 1px;
+		}
+		td {
+			border: none;
+			height: 0;
+			padding: 0;
+		}
+	}
+	tr.placeholder, tr.dragged {
+		+ tr:not(:nth-child(2)):not(.dragged) > td {
+			border-top: none;
+		}
+	}
+	// Fix this, because max-width:100% of main img style breaks width of table cell with user avatar and login:
+	img {
+		max-width: none;
 	}
 }
 // Filters in results table
@@ -543,11 +616,23 @@ select:focus:invalid:focus {
 		position: relative;
 		top: -4px;
 	}
-	.btn {
-		margin: -6px 0 0 6px;
-	}
 	.btn-group {
 		margin-left: 6px;
+	}
+	.panel_heading_action_icons {
+		margin-top: -6px;
+		.btn {
+			margin: 0 3px 3px 0;
+		}
+		.btn:last-child {
+			margin: 0 0 3px 0;
+		}
+		.btn-group {
+			margin: 0 6px 0 0;
+			.btn {
+				margin: 0 0 3px 0;
+			}
+		}
 	}
 }
 legend.panel-heading {
@@ -653,9 +738,11 @@ div.edit_toolbars, div.message_toolbars {
 		margin-left: 0;
 	}
 	.btn {
+		margin-top: 0;
 		margin-bottom: 2px;
 	}
 	.btn-toolbar-title {
+		padding-top: 1px;
 		padding-left: 5px;
 		float: left;
 		font-weight: bold;
@@ -728,6 +815,11 @@ div.edit_toolbars, div.message_toolbars {
 .modal-dialog {
 	// Set this for all screen sizes(especially for small screens) in order to fix a moving modal over evo_toolbar
 	margin: 30px auto;
+}
+.modal-footer {
+	.btn+.btn {
+		margin-bottom: 3px;
+	}
 }
 
 // Typeahead plugin
@@ -845,6 +937,10 @@ div.edit_toolbars, div.message_toolbars {
 			margin-bottom: 20px;
 		}
 	}
+	.image_block img {
+		max-width: 100%;
+		height: auto;
+	}
 }
 
 @media (min-width: 768px) {
@@ -862,5 +958,46 @@ div.edit_toolbars, div.message_toolbars {
 @media (min-width: 1200px) {
 	div.coll-dashboard-block-3 {
 		float: right;
+	}
+}
+
+.btn-spinner {
+	background-image: url(../img/ajax-loader/000.gif);
+	background-size: 14px 14px;
+	background-repeat: no-repeat;
+	background-position: left 5px center;
+}
+
+// Widgets container "Page Top":
+.evo_container__page_top {
+	// Align right all text on top-right widget container (useful for buttons of menu linkwidgets):
+	text-align: right;
+}
+
+// Widgets containers "Sidebar" and "Sidebar 2":
+.evo_container__sidebar, .evo_container__sidebar2 {
+	// .widget_core_menu_link
+	// .widget_core_msg_menu_link
+	// .widget_core_profile_menu_link
+	// .widget_core_flag_menu_link
+	.evo_widget[class$=_menu_link] a.btn {
+		width: 100%;
+	}
+}
+
+// Grouped form fieldsets with bootstrap js accordion toggle behavior:
+.accordion-caret {
+	.accordion-toggler {
+		&:before {
+			padding-right: 3px;
+			font-size: 14px;
+			font-family: FontAwesome;
+		}
+		&:not(.collapsed):before {
+			content: '\f0d7';
+		}
+		&.collapsed:before {
+			content: '\f0da';
+		}
 	}
 }

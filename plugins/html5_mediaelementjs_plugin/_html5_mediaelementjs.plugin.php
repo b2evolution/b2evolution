@@ -22,7 +22,7 @@ class html5_mediaelementjs_plugin extends Plugin
 	var $code = 'b2evH5MP';
 	var $name = 'HTML 5 MediaElement.js Video and Audio Player';
 	var $priority = 80;
-	var $version = '6.7.7';
+	var $version = '6.9.4';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'm4v', 'f4v', 'mp4', 'ogv', 'webm', 'mp3', 'm4a' );
@@ -48,7 +48,7 @@ class html5_mediaelementjs_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		require_css( '#mediaelement_css#', 'blog' );
 		require_js( '#jquery#', 'blog' );
@@ -58,8 +58,9 @@ class html5_mediaelementjs_plugin extends Plugin
 		// Set a video/audio size in css style, because option setting cannot sets correct size
 		$width = intval( $this->get_coll_setting( 'width', $Blog ) );
 		$width = empty( $width ) ? '100%' : $width.'px';
-		$height = intval( $this->get_coll_setting( 'height', $Blog ) );
-		add_css_headline( 'video.html5_mediaelementjs_player{ width: '.$width.' !important; height: '.$height.'px !important; display: block; margin: auto; }
+		$height = trim( $this->get_coll_setting( 'height', $Blog ) );
+		$height = empty( $height ) ? '100%' : intval( $height );
+		add_css_headline( 'video.html5_mediaelementjs_player{ width: '.$width.' !important; height: '.( $height === '100%' ? $height : $height.'px' ).' !important; display: block; margin: auto; }
 audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block; margin: auto; }
 .mediajs_block {
 	width: '.$width.' !important;
@@ -163,6 +164,18 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	{
 		return array_merge( parent::get_coll_setting_definitions( $params ),
 			array(
+				'use_for_posts' => array(
+					'label' => T_('Use for'),
+					'note' => T_('videos attached to posts'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					),
+				'use_for_comments' => array(
+					'label' => '',
+					'note' => T_('videos attached to comments'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					),
 				'skin' => array(
 					'label' => T_('Skin'),
 					'type' => 'select',
@@ -171,18 +184,18 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 					),
 				'width' => array(
 					'label' => T_('Video/Audio width (px)'),
-					'defaultvalue' => 460,
 					'note' => T_('100% width if left empty or 0'),
 					),
 				'height' => array(
 					'label' => T_('Video height (px)'),
 					'type' => 'integer',
-					'defaultvalue' => 320,
-					'note' => '',
+					'allow_empty' => true,
 					'valid_range' => array( 'min' => 1 ),
+					'note' => T_('auto height if left empty'),
 					),
 				'allow_download' => array(
 					'label' => T_('Display Download Link'),
+					'note' => T_('Check to display a "Download this video" link under the video.'),
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 					),
@@ -247,6 +260,12 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 		$Item = & $params['Item'];
 		$item_Blog = $Item->get_Blog();
 
+		if( ( ! $in_comments && ! $this->get_coll_setting( 'use_for_posts', $item_Blog ) ) ||
+		    ( $in_comments && ! $this->get_coll_setting( 'use_for_comments', $item_Blog ) ) )
+		{ // Plugin is disabled for post/comment videos on this Blog
+			return false;
+		}
+
 		if( $File->exists() )
 		{
 			if( ! $File->is_audio() && $placeholder_File = & $Item->get_placeholder_File( $File ) )
@@ -299,7 +318,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	 */
 	function RenderURL( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( empty( $params['url'] ) || ! $this->is_url_supported( $params['url'] ) )
 		{	// This file is not supported by plugin, Exit here:
@@ -313,7 +332,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 		}
 		else
 		{	// Use current collection:
-			global $Blog;
+			global $Collection, $Blog;
 			$player_Blog = $Blog;
 		}
 
@@ -427,7 +446,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	 */
 	function get_skin_class()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$skin = $this->get_coll_setting( 'skin', $Blog );
 
@@ -444,7 +463,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	 */
 	function require_skin()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$skin = $this->get_coll_setting( 'skin', $Blog );
 		if( !empty( $skin ) && $skin != 'default')

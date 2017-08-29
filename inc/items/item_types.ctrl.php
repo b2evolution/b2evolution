@@ -105,6 +105,9 @@ switch( $action )
 			$edited_Itemtype->dbinsert();
 			$Messages->add( T_('New Post Type created.'), 'success' );
 
+			// Update allowed item statuses
+			$edited_Itemtype->update_item_statuses_from_Request();
+
 			// What next?
 			switch( $action )
 			{
@@ -146,6 +149,7 @@ switch( $action )
 			// Update in DB:
 			$DB->begin();
 
+			$edited_Itemtype->update_item_statuses_from_Request();
 			$edited_Itemtype->dbupdate();
 			$Messages->add( T_('Post type updated.'), 'success' );
 
@@ -182,7 +186,7 @@ switch( $action )
 				$blog_names = array();
 				foreach( $default_ids as $blog_ID => $item_type_ID )
 				{
-					if( $edited_Itemtype->ID == $item_type_ID && ( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
+					if( $edited_Itemtype->ID == $item_type_ID && ( $Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
 					{
 						$blog_names[] = '<a href="'.$admin_url.'?ctrl=coll_settings&tab=features&blog='.$Blog->ID.'#fieldset_wrapper_post_options"><b>'.$Blog->get('name').'</b></a>';
 					}

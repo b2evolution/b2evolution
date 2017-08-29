@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $tab3, $admin_url;
+global $Collection, $Blog, $tab3, $admin_url;
 
 $Form = new Form( regenerate_url( 'action', '', '', '&' ), 'comment_massdelete' );
 

@@ -35,7 +35,7 @@ class archives_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '6.7.7';
+	var $version = '6.9.4';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
@@ -66,7 +66,7 @@ class archives_plugin extends Plugin
 	 */
 	function get_widget_cache_keys( $widget_ID = 0 )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		return array(
 				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
@@ -111,7 +111,7 @@ class archives_plugin extends Plugin
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( empty($Blog) )
 		{
@@ -150,7 +150,7 @@ class archives_plugin extends Plugin
 				// Number of archive entries to display:
 				'limit'             => 12,
 				// More link text:
-				'more_link'         => T_('More...'),
+				'more_link'         => T_('More').'...',
 			), $params );
 
 		// Sort order (used only in postbypost mode):
@@ -394,7 +394,7 @@ class ArchiveList extends Results
 	{
 		global $DB;
 		global $blog, $cat, $catsel;
-		global $Blog;
+		global $Collection, $Blog;
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
 		global $s, $sentence, $exact;
@@ -537,7 +537,7 @@ class ArchiveList extends Results
 		// See http://forums.b2evolution.net/viewtopic.php?p=42529#42529
 		if( in_array($this->archive_mode, array('monthly', 'daily', 'weekly')) )
 		{
-			$sql_version = $DB->get_version();
+			$sql_version = $DB->version;
 			if( version_compare($sql_version, '4', '>') )
 			{
 				$sql = 'SELECT SQL_CALC_FOUND_ROWS '.substr( $sql, 7 ); // "SQL_CALC_FOUND_ROWS" available since MySQL 4

@@ -37,7 +37,7 @@ if( isset( $delete_bankruptcy_blogs ) && $delete_bankruptcy_blogs )
 $visibility_statuses = get_visibility_statuses( '', array() );
 $Form->begin_fieldset( T_('Filter comments by status') );
 	$Form->select_input_array( 'comment_status', $comment_status, $visibility_statuses, T_('Look at comments with status'), '' );
-	$Form->buttons( array( array( 'submit', 'actionArray[bankruptcy_filter]', T_('Filter') ) ) );
+	$Form->buttons( array( array( 'submit', 'actionArray[bankruptcy_filter]', /* TRANS: Verb */ T_('Filter') ) ) );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Select blogs') );

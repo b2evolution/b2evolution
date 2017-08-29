@@ -13,6 +13,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * Detail of a line:
  * Url => array( SearchEngineName, KeywordParameter, [path containing the keyword], [charset used by the search engine], [search rank parameter])
  *
+ * NOTE: KeywordParameter may be NULL when search engine supports urls without keyword param like it Google does
+ *
  * The main search engine URL has to be at the top of the list for the given
  * search Engine.  This serves as the master record so additional URLs
  * don't have to duplicate all the information, but can override when needed.
@@ -34,6 +36,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * automatically be replaced by the keyword.
  *
  * A simple example is:
+ *  'www.google.com'		=> array('Google', NULL),
  *  'www.google.com'		=> array('Google', 'q', 'search?q={k}'),
  *
  * A more complicated example, with an array of possible variable names, custom charset and a serp rank param:
@@ -373,7 +376,7 @@ $search_engine_params = array(
 	'ocnsearch.goo.ne.jp'		=> array('goo'),
 
 	// Google
-	'google.com'				=> array('Google', 'q', 'search?q={k}', '', array('start','cd')),
+	'google.com'				=> array('Google', NULL),
 	'google.{}'					=> array('Google'),
 	'www2.google.com'			=> array('Google'),
 	'ipv6.google.com'			=> array('Google'),

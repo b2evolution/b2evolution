@@ -46,9 +46,16 @@ if( ! empty( $params['Item'] ) )
 			$item_action_links = '<div class="'.button_class( 'group' ).'">'.$item_action_links.'</div>';
 		}
 
+		// Flag:
+		$item_flag = $Item->get_flag( array(
+				'before'       => ' ',
+				'only_flagged' => true,
+			) );
+
+		// Title:
 		$Item->title( array(
 				'before'          => $params['before_title'],
-				'after'           => $params['after_title'].$item_action_links.'<div class="clear"></div>',
+				'after'           => $item_flag.$params['after_title'].$item_action_links.'<div class="clear"></div>',
 				'before_title'    => get_icon( 'file_message' ),
 				//'after'      => ' <span class="red">'.( $Item->get('order') > 0 ? $Item->get('order') : 'NULL').'</span>'.$params['after_title'].$item_edit_link.'<div class="clear"></div>',
 				'post_navigation' => $params['post_navigation'],

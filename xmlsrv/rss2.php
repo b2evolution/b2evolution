@@ -22,10 +22,6 @@ $resolve_extra_path = false;	// We don't want extra path resolution on this page
 # Let's force the use of the RSS skin:
 $tempskin = '_rss2';
 
-# This setting retricts posts to those published, thus hiding drafts.
-# You should not have to change this.
-$show_statuses = array();
-
 /**
  * That's it, now let b2evolution do the rest! :)
  */

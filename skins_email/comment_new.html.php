@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $Blog;
+global $admin_url, $Collection, $Blog;
 
 // Default params:
 $params = array_merge( array(
@@ -31,11 +31,11 @@ $params = array_merge( array(
 
 
 $Comment = $params['Comment'];
-$Blog = $params['Blog'];
+$Collection = $Blog = $params['Blog'];
 $Item = $params['Item'];
 $recipient_User = & $params['recipient_User'];
 
-$author_name = empty( $params['author_ID'] ) ? $params['author_name'] : get_user_colored_login_link( $params['author_name'], array( 'use_style' => true, 'protocol' => 'http:' ) );
+$author_name = empty( $params['author_ID'] ) ? $params['author_name'] : get_user_colored_login_link( $params['author_name'], array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) );
 if( $params['notify_type'] == 'meta_comment' )
 { // Meta comment
 	$info_text = T_( '%s posted a new meta comment on %s in %s.' );

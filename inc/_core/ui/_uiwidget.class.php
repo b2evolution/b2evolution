@@ -353,7 +353,7 @@ class Table extends Widget
 
 		$this->param_prefix = $param_prefix;
 
-		$this->no_results_text = T_('No results.');
+		$this->no_results_text = T_('No results').'.';
 	}
 
 
@@ -987,21 +987,26 @@ class Table extends Widget
 		if( $this->displayed_lines_count % 2 )
 		{ // Odd line:
 			if( $is_last )
-				echo $this->params['line_start_odd_last'];
+				$start_tag = $this->params['line_start_odd_last'];
 			else
-				echo $this->params['line_start_odd'];
+				$start_tag = $this->params['line_start_odd'];
 		}
 		else
 		{ // Even line:
 			if( $is_last )
-				echo $this->params['line_start_last'];
+				$start_tag = $this->params['line_start_last'];
 			else
-				echo $this->params['line_start'];
+				$start_tag = $this->params['line_start'];
 		}
 
-		$this->displayed_cols_count = 0;
+		if( $is_fadeout_line )
+		{	// Add css class for this row to highlight:
+			$start_tag = update_html_tag_attribs( $start_tag, array( 'class' => 'evo_highlight' ) );
+		}
 
-		$this->is_fadeout_line = $is_fadeout_line;
+		echo $start_tag;
+
+		$this->displayed_cols_count = 0;
 	}
 
 
@@ -1020,8 +1025,9 @@ class Table extends Widget
 	 * Start a column (data).
 	 *
 	 * @param array Additional attributes for the <td> tag (attr_name => attr_value).
+	 * @param object|NULL Current row data (The var $row is requested inside of $this->parse_col_content() )
 	 */
-	function display_col_start( $extra_attr = array() )
+	function display_col_start( $extra_attr = array(), $row = NULL )
 	{
 		// Get colum definitions for current column:
 		$col = $this->cols[$this->displayed_cols_count];
@@ -1033,16 +1039,6 @@ class Table extends Widget
 		else
 		{	// We have no class for the total column
 			$class = '';
-		}
-
-		/**
-		 * Update class and add a fadeout ID for fadeout list results
-		 */
-		if( $this->is_fadeout_line )
-		{
-			// echo ' fadeout '.$this->fadeout_count;
-			$class .= ' fadeout-ffff00" id="fadeout-'.$this->fadeout_count;
-			$this->fadeout_count++;
 		}
 
 		if( ($this->displayed_cols_count == 0) && isset($this->params['col_start_first']) )
@@ -1062,6 +1058,42 @@ class Table extends Widget
 			$output = $this->params['col_start'];
 			// Replace the "class_attrib" in the total col start param by the td column class
 			$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
+		}
+
+		if( isset( $col['td_colspan'] ) )
+		{	// Initialize colspan attribute:
+			if( method_exists( $this, 'parse_col_content' ) )
+			{
+				$colspan = $this->parse_col_content( $col['td_colspan'] );
+				$colspan = eval( "return '$colspan';" );
+			}
+			else
+			{
+				$colspan = $col['td_colspan'];
+			}
+			if( $colspan < 0 )
+			{	// We want to substract columns from the total count:
+				$colspan = $this->nb_cols + $colspan;
+			}
+			elseif( $colspan == 0 )
+			{	// Use a count of columns:
+				$colspan = $this->nb_cols;
+			}
+			$colspan = intval( $colspan );
+			if( $colspan === 1 )
+			{	// Don't create attribute "colspan" with value "1":
+				$output = str_replace( '$colspan_attrib$', '', $output );
+			}
+			else
+			{
+				$output = str_replace( '$colspan_attrib$', 'colspan="'.$colspan.'"', $output );
+				// Store current colspan value in order to skip next columns:
+				$this->current_colspan = $colspan;
+			}
+		}
+		else
+		{	// Remove non-HTML attrib:
+			$output = str_replace( '$colspan_attrib$', '', $output );
 		}
 
 		// Custom attributes:

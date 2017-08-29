@@ -49,7 +49,7 @@ $BlogCache = & get_BlogCache();
 /**
  * @var Blog
  */
-$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 if( empty( $Blog ) )
 {
 	require $siteskins_path.'_404_blog_not_found.main.php'; // error & exit
@@ -57,26 +57,30 @@ if( empty( $Blog ) )
 }
 
 
-// Show/Hide the containers:
-$display_containers = param( 'display_containers', 'string' );
-if( $display_containers == 'show' )
-{
-	$Session->set( 'display_containers_'.$blog, 1 );
-}
-elseif( $display_containers == 'hide' )
-{
-	$Session->delete( 'display_containers_'.$blog );
-}
+if( $debug == 2 || is_logged_in() )
+{	// Allow debug info only for logged-in users OR when debug == 2:
 
-// Show/Hide the includes:
-$display_includes = param( 'display_includes', 'string' );
-if( $display_includes == 'show' )
-{
-	$Session->set( 'display_includes_'.$blog, 1 );
-}
-elseif( $display_includes == 'hide' )
-{
-	$Session->delete( 'display_includes_'.$blog );
+	// Show/Hide the containers:
+	$display_containers = param( 'display_containers', 'string' );
+	if( $display_containers == 'show' )
+	{
+		$Session->set( 'display_containers_'.$blog, 1 );
+	}
+	elseif( $display_containers == 'hide' )
+	{
+		$Session->delete( 'display_containers_'.$blog );
+	}
+
+	// Show/Hide the includes:
+	$display_includes = param( 'display_includes', 'string' );
+	if( $display_includes == 'show' )
+	{
+		$Session->set( 'display_includes_'.$blog, 1 );
+	}
+	elseif( $display_includes == 'hide' )
+	{
+		$Session->delete( 'display_includes_'.$blog );
+	}
 }
 
 
@@ -109,7 +113,7 @@ if( init_charsets( $current_charset ) )
 	// Reload Blog(s) (for encoding of name, tagline etc):
 	$BlogCache->clear();
 
-	$Blog = & $BlogCache->get_by_ID( $blog );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	if( is_logged_in() )
 	{ // We also need to reload the current User with the new final charset
 		$UserCache = & get_UserCache();
@@ -521,10 +525,19 @@ elseif( !empty($preview) )
 	// Consider this as an admin hit!
 	$Hit->hit_type = 'admin';
 }
+elseif( ( $disp == 'visits' ) && ( ( $Settings->get( 'enable_visit_tracking' ) != 1 ) || ! is_logged_in() ) )
+{ // Check if visit tracking is enabled and the user is logged in before allowing profile visit display
+	$disp = '403';
+	$disp_detail = '403-visit-tracking-disabled';
+}
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post
-	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
+	if( in_array( $Item->get_type_setting( 'usage' ), array( 'special', 'content-block' ) ) )
+	{	// Display 404 page for all "Content Blocks" and "Special" items intead of normal single page:
+		$disp = '404';
+	}
+	elseif( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
 	{
 		$disp = 'download';
 
@@ -561,7 +574,7 @@ elseif( $disp == '-' )
 			|| $Blog->get_setting( 'relcanonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
-		if( ! is_same_url($ReqURL, $canonical_url) )
+		if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 		{	// We are not on the canonicial blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
@@ -612,6 +625,12 @@ elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
 	$disp_detail = '404-post_not_found';
 }
 
+param( 'user_ID', 'integer', NULL );
+if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID != $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
+{ // add or increment to user profile visit
+	add_user_profile_visit( $user_ID, $current_User->ID );
+}
+
 
 if( $disp == 'terms' )
 {	// Display a page of terms & conditions:
@@ -657,6 +676,7 @@ if( is_logged_in() && // Only for logged in users
 		// EXIT HERE
 	}
 }
+
 
 
 /*
@@ -801,38 +821,50 @@ if( !empty( $skin ) )
 			$ads_current_skin_path = $skins_path.$skin.'/';
 
 			$disp_handlers = array(
-					'404'            => '404_not_found.main.php',
-					'activateinfo'   => 'activateinfo.main.php',
-					'arcdir'         => 'arcdir.main.php',
-					'catdir'         => 'catdir.main.php',
-					'comments'       => 'comments.main.php',
-					'feedback-popup' => 'feedback_popup.main.php',
-					'login'          => 'login.main.php',
-					'mediaidx'       => 'mediaidx.main.php',
-					'msgform'        => 'msgform.main.php',
-					'page'           => 'page.main.php',
-					'postidx'        => 'postidx.main.php',
-					'posts'          => 'posts.main.php',
-					'profile'        => 'profile.main.php',
-					'search'         => 'search.main.php',
-					'single'         => 'single.main.php',
-					'sitemap'        => 'sitemap.main.php',
-					'subs'           => 'subs.main.php',
-					'threads'        => 'threads.main.php',
-					'messages'       => 'messages.main.php',
-					'contacts'       => 'contacts.main.php',
-					'user'           => 'user.main.php',
-					'users'          => 'users.main.php',
-					'edit'           => 'edit.main.php',
-					'edit_comment'   => 'edit_comment.main.php',
-					'front'          => 'front.main.php',
-					'useritems'      => 'useritems.main.php',
-					'usercomments'   => 'usercomments.main.php',
-					'download'       => 'download.main.php',
+					'403'                   => '403_forbidden.main.php',
+					'404'                   => '404_not_found.main.php',
+					'access_denied'         => 'access_denied.main.php',
 					'access_requires_login' => 'access_requires_login.main.php',
-					'tags'           => 'tags.main.php',
-					'terms'          => 'terms.main.php',
-					'help'           => 'help.main.php',
+					'activateinfo'          => 'activateinfo.main.php',
+					'arcdir'                => 'arcdir.main.php',
+					'catdir'                => 'catdir.main.php',
+					'closeaccount'          => 'closeaccount.main.php',
+					'comments'              => 'comments.main.php',
+					'contacts'              => 'contacts.main.php',
+					'download'              => 'download.main.php',
+					'edit'                  => 'edit.main.php',
+					'edit_comment'          => 'edit_comment.main.php',
+					'feedback-popup'        => 'feedback_popup.main.php',
+					'flagged'               => 'flagged.main.php',
+					'front'                 => 'front.main.php',
+					'help'                  => 'help.main.php',
+					'login'                 => 'login.main.php',
+					'lostpassword'          => 'lostpassword.main.php',
+					'mediaidx'              => 'mediaidx.main.php',
+					'messages'              => 'messages.main.php',
+					'module_form'           => 'module_form.main.php',
+					'msgform'               => 'msgform.main.php',
+					'page'                  => 'page.main.php',
+					'postidx'               => 'postidx.main.php',
+					'posts'                 => 'posts.main.php',
+					'profile'               => 'profile.main.php',
+					'avatar'                => 'avatar.main.php',
+					'pwdchange'             => 'pwdchange.main.php',
+					'userprefs'             => 'userprefs.main.php',
+					'subs'                  => 'subs.main.php',
+					'visits'                => 'visits.main.php',
+					'register'              => 'register.main.php',
+					'search'                => 'search.main.php',
+					'single'                => 'single.main.php',
+					'sitemap'               => 'sitemap.main.php',
+					'tags'                  => 'tags.main.php',
+					'terms'                 => 'terms.main.php',
+					'threads'               => 'threads.main.php',
+					'contacts'              => 'contacts.main.php',
+					'user'                  => 'user.main.php',
+					'useritems'             => 'useritems.main.php',
+					'usercomments'          => 'usercomments.main.php',
+					'users'                 => 'users.main.php',
 					// All others will default to index.main.php
 				);
 

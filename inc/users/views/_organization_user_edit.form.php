@@ -22,6 +22,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Organization;
 
+$org_ID = get_param( 'org_ID' );
+$UserCache = & get_UserCache();
+$edited_User = & $UserCache->get_by_ID( param( 'user_ID', 'integer' ) );
+$org_data = $edited_User->get_organizations_data();
+
 $Form = new Form( NULL, 'orguser_editmembership' );
 
 $Form->begin_form( 'fform' );
@@ -29,15 +34,8 @@ $Form->begin_form( 'fform' );
 	$Form->add_crumb( 'organization' );
 
 	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
-
-	$user_ID = param( 'user_ID', 'integer' );
-	$org_ID = param( 'org_ID', 'integer' );
-	$UserCache = & get_UserCache();
-	$edited_User = & $UserCache->get_by_ID( $user_ID );
-	$org_data = $edited_User->get_organizations_data();
-	$perm_edit_org_role = ( $edited_Organization->owner_user_ID == $current_User->ID ) || ( $edited_Organization->perm_role == 'owner and member' && $org_data[$org_ID]['accepted'] );
-
 	$Form->hidden( 'edit_mode', true ); // this allows the controller to determine if it an edit to the membership information
+
 	$Form->info_field( T_('Username'), $edited_User->get( 'login' ) );
 	$Form->hidden( 'user_login', $edited_User->get('login') );
 	$Form->radio( 'accepted', $org_data[$org_ID]['accepted'],
@@ -46,12 +44,12 @@ $Form->begin_form( 'fform' );
 					array( '0', T_('Not Accepted') ),
 			), T_('Membership'), true );
 
-	if( $perm_edit_org_role )
-	{
+	if( ( $edited_Organization->owner_user_ID == $current_User->ID ) || ( $edited_Organization->perm_role == 'owner and member' && $org_data[$org_ID]['accepted'] ) )
+	{	// Display edit field if current user has a permission to edit role:
 		$Form->text_input( 'role', $org_data[$org_ID]['role'], 32, T_('Role'), '', array( 'maxlength' => 255 ) );
 	}
 	else
-	{
+	{	// Otherwise display info field with role value:
 		$Form->info_field( T_('Role'), $org_data[$org_ID]['role'] );
 	}
 

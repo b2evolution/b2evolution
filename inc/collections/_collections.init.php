@@ -49,12 +49,15 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__itemtag'           => $tableprefix.'items__itemtag',
 		'T_items__prerendering'      => $tableprefix.'items__prerendering',
 		'T_items__status'            => $tableprefix.'items__status',
+		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
 		'T_items__tag'               => $tableprefix.'items__tag',
 		'T_items__type'              => $tableprefix.'items__type',
 		'T_items__type_custom_field' => $tableprefix.'items__type_custom_field',
 		'T_items__type_coll'         => $tableprefix.'items__type_coll',
-		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
+		'T_items__user_data'         => $tableprefix.'items__user_data',
 		'T_items__version'           => $tableprefix.'items__version',
+		'T_items__votes'             => $tableprefix.'items__votes',
+		'T_items__status_type'       => $tableprefix.'items__status_type',
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
@@ -62,6 +65,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_skins__skin'              => $tableprefix.'skins__skin',
 		'T_subscriptions'            => $tableprefix.'subscriptions',
 		'T_widget'                   => $tableprefix.'widget',
+		'T_temporary_ID'             => $tableprefix.'temporary_ID',
 	) );
 
 /**
@@ -316,6 +320,26 @@ function & get_LinkCache()
 	return $LinkCache;
 }
 
+
+/**
+ * Get the TemporaryIDCache
+ *
+ * @return TemporaryIDCache
+ */
+function & get_TemporaryIDCache()
+{
+	global $TemporaryIDCache;
+
+	if( ! isset( $TemporaryIDCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'links/model/_temporaryid.class.php', 'TemporaryID' );
+		$TemporaryIDCache = new DataObjectCache( 'TemporaryID', false, 'T_temporary_ID', 'tmp_', 'tmp_ID', 'tmp_ID', 'tmp_ID' );
+	}
+
+	return $TemporaryIDCache;
+}
+
+
 /**
  * Get the SkinCache
  *
@@ -501,13 +525,13 @@ class collections_Module extends Module
 				'note' => T_( 'New users automatically get a new blog'),
 				),
 			'perm_max_createblog_num' => array(
-				'label' => T_('Maximum number of collections allowed'),
+				'label' => T_('Maximum collections'),
 				'user_func' => 'check_createblog_user_perm',
 				'group_funct' => 'check_createblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'text_input',
 				'maxlength' => 2,
-				'note' => T_('Leave empty for no limit'),
+				'note' => T_('Users will not be able to create collections if they already own the maximum number of collections (or more).'),
 				),
 			);
 		return $permissions;
@@ -574,58 +598,6 @@ class collections_Module extends Module
 
 
 	/**
-	 * Build teh evobar menu
-	 */
-	function build_evobar_menu()
-	{
-		/**
-		 * @var Menu
-		 */
-		global $topleft_Menu, $topright_Menu;
-		global $current_User;
-		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
-		global $Blog, $blog;
-
-		global $Settings;
-
-		if( ! $current_User->check_perm( 'admin', 'normal' ) )
-		{
-			return;
-		}
-
-		$entries = array();
-		$entries['b2evonet'] = array(
-								'text' => T_('Open b2evolution.net'),
-								'href' => 'http://b2evolution.net/',
-								'target' => '_blank',
-							);
-		$entries['forums'] = array(
-								'text' => T_('Open Support forums'),
-								'href' => 'http://forums.b2evolution.net/',
-								'target' => '_blank',
-							);
-		$entries['manual'] = array(
-								'text' => T_('Open Online manual'),
-								'href' => get_manual_url( NULL ),
-								'target' => '_blank',
-							);
-		$entries[] = array( 'separator' => true );
-		$entries['twitter'] = array(
-								'text' => T_('b2evolution on twitter'),
-								'href' => 'http://twitter.com/b2evolution',
-								'target' => '_blank',
-							);
-		$entries['facebook'] = array(
-								'text' => T_('b2evolution on facebook'),
-								'href' => 'http://www.facebook.com/b2evolution',
-								'target' => '_blank',
-							);
-
-		$topleft_Menu->add_menu_entries( 'b2evo', $entries );
-	}
-
-
-	/**
 	 * Builds the 1st half of the menu. This is the one with the most important features
 	 */
 	function build_menu_1()
@@ -635,7 +607,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		global $Settings;
 		/**
 		 * @var AdminUI_general
@@ -719,7 +691,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -811,9 +783,17 @@ class collections_Module extends Module
 						'text' => T_('Skin'),
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
 						'entries' => array(
-							'current_skin' => array(
-								'text' => T_('Skins for this blog'),
+							'skin_normal' => array(
+								'text' => T_('Default'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog
+							),
+							'skin_mobile' => array(
+								'text' => T_('Phone'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=mobile'
+							),
+							'skin_tablet' => array(
+								'text' => T_('Tablet'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=tablet'
 							)
 						),
 					),
@@ -911,7 +891,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -996,6 +976,12 @@ class collections_Module extends Module
 				'ctrl'   => 'cron/jobs/_post_moderation_reminder.job.php',
 				'params' => NULL,
 			),
+			'monthly-alert-old-contents' => array(
+				'name'   => T_('Monthly alert on stale contents'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_monthly_alert_old_contents.job.php',
+				'params' => NULL,
+			),
 		);
 	}
 
@@ -1040,7 +1026,7 @@ class collections_Module extends Module
 				$linked_File = & $edited_Link->get_File();
 
 				// Load the blog we're in:
-				$Blog = & $LinkOwner->get_Blog();
+				$Collection = $Blog = & $LinkOwner->get_Blog();
 				set_working_blog( $Blog->ID );
 
 				// Check permission:
@@ -1207,6 +1193,28 @@ class collections_Module extends Module
 				{
 					$Messages->add( T_( 'Could not subscribe to notifications.' ), 'error' );
 				}
+
+				header_redirect();
+				break; // already exited here
+
+			case 'refresh_contents_last_updated':
+				// Refresh last touched date of the Item:
+
+				$item_ID = param( 'item_ID', 'integer', true );
+
+				$ItemCache = & get_ItemCache();
+				$refreshed_Item = & $ItemCache->get_by_ID( $item_ID );
+
+				if( ! $refreshed_Item->can_refresh_contents_last_updated() )
+				{	// If current User has no permission to refresh a last touched date of the requested Item:
+					$Messages->add( T_('You have no permission to refresh this item.'), 'error' );
+					header_redirect();
+					// EXIT HERE.
+				}
+
+				// Run refreshing and display a message:
+				$refreshed_Item->refresh_contents_last_updated_ts();
+				$Messages->add( T_('"Contents last updated" timestamp has been refreshed.'), 'success' );
 
 				header_redirect();
 				break; // already exited here

@@ -129,7 +129,7 @@ class Cronjob extends DataObject
 		}
 
 		// start datetime:
-		param_date( 'cjob_date', T_('Please enter a valid date.'), true );
+		param_date( 'cjob_date', sprintf( T_('Please enter a valid date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), true );
 		param_time( 'cjob_time' );
 		$this->set( 'start_datetime', form_date( get_param( 'cjob_date' ), get_param( 'cjob_time' ) ) );
 

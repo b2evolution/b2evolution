@@ -11,6 +11,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $deferred_AdminToolActions;
+
 
 load_funcs('plugins/_plugin.funcs.php');
 load_funcs('tools/model/_maintenance.funcs.php');
@@ -63,7 +65,7 @@ if( ! empty($tab) )
 $AdminUI->set_path( 'options', 'misc', !empty( $tab ) ? $tab : $tab3 );
 
 
-if( empty($tab) )
+if( empty( $tab ) )
 {	// "Main tab" actions:
 	if( param( 'action', 'string', '' ) )
 	{
@@ -74,7 +76,7 @@ if( empty($tab) )
 		$current_User->check_perm('options', 'edit', true);
 	}
 
-	set_max_execution_time(0);
+	set_max_execution_time( 0 );
 
 	$Plugins->trigger_event( 'AdminToolAction' );
 
@@ -266,6 +268,28 @@ if( empty($tab) )
 			$template_action = $action;
 			break;
 
+		case 'delete_item_versions':
+			param( 'confirmed', 'integer', 0 );
+
+			if( $confirmed )
+			{
+				$count = $DB->get_var( 'SELECT COUNT(*) FROM T_items__version' );
+				$DB->query( 'TRUNCATE TABLE T_items__version' );
+				if( $count > 0 )
+				{
+					$Messages->add( sprintf( T_('Cleared %d records from the item versions table.'), $count ) );
+				}
+				else
+				{
+					$Messages->add( sprintf( T_('Item versions table already empty.'), $count ), 'note' );
+				}
+			}
+			else
+			{
+				$action ='show_delete_item_versions';
+			}
+			break;
+
 		case 'del_obsolete_tags':
 			$DB->query('
 				DELETE T_items__tag FROM T_items__tag
@@ -304,6 +328,20 @@ if( empty($tab) )
 
 			// Execute a creating of hits inside template in order to see a process
 			$template_action = 'create_sample_hits';
+			break;
+
+		case 'create_sample_basedomains':
+			// Create sample base domains:
+			$num_basedomains = param( 'num_basedomains', 'string', 0 );
+
+			if( ! param_check_number( 'num_basedomains', T_('"How many base domains" field must be a number'), true ) )
+			{	// Stop action because of param error:
+				$action = 'show_create_basedomains';
+				break;
+			}
+
+			// Execute a creating of base domains inside template in order to see a process:
+			$template_action = 'create_sample_basedomains';
 			break;
 
 		case 'create_sample_messages':
@@ -406,8 +444,7 @@ $AdminUI->disp_body_top();
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-
-if( empty($tab) )
+if( empty( $tab ) )
 {
 	switch( $action )
 	{
@@ -430,7 +467,6 @@ if( empty($tab) )
 		case 'show_create_posts':
 			$AdminUI->disp_view( 'tools/views/_create_posts.form.php' );
 			break;
-			break;
 
 		case 'show_create_users':
 			$AdminUI->disp_view( 'tools/views/_create_users.form.php' );
@@ -438,6 +474,10 @@ if( empty($tab) )
 
 		case 'show_create_hits':
 			$AdminUI->disp_view( 'tools/views/_create_test_hit.form.php' );
+			break;
+
+		case 'show_create_basedomains':
+			$AdminUI->disp_view( 'tools/views/_create_basedomains.form.php' );
 			break;
 
 		case 'show_create_messages':
@@ -449,6 +489,11 @@ if( empty($tab) )
 			$threads_count = $users_count * $users_count - $users_count + 1;
 
 			$AdminUI->disp_view( 'tools/views/_create_messages.form.php' );
+			break;
+
+		case 'show_delete_item_versions':
+			$AdminUI->disp_view( 'tools/views/_delete_item_versions.form.php' );
+			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
 			break;
 
 

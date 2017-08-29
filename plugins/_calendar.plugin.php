@@ -29,7 +29,7 @@ class calendar_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '6.7.7';
+	var $version = '6.9.4';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
@@ -168,7 +168,7 @@ class calendar_plugin extends Plugin
 	 */
 	function get_widget_cache_keys( $widget_ID = 0 )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		return array(
 				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
@@ -222,7 +222,7 @@ class calendar_plugin extends Plugin
 		$itemlist_prefix = isset( $params['itemlist_prefix'] ) ? $params['itemlist_prefix'] : '';
 
 		global $month;
-		global $Blog, $cat_array, $cat_modifier;
+		global $Collection, $Blog, $cat_array, $cat_modifier;
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
 		global ${$itemlist_prefix.'m'}, $w, $dstart;
@@ -803,36 +803,6 @@ class Calendar
 			echo $this->headerrowend;
 		}
 
-		// FOOTER :
-
-		if( $this->navigation == 'tfoot' )
-		{ // We want to display navigation in the table footer:
-			echo "<tfoot>\n";
-			echo "<tr>\n";
-			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->today_is_visible ).'" id="prev">';
-			echo implode( '&nbsp;', $this->getNavLinks( 'prev' ) );
-			echo "</td>\n";
-
-			if( $this->today_is_visible )
-			{
-				if( $this->mode == 'month' )
-				{
-					echo '<td class="pad">&nbsp;</td>'."\n";
-				}
-			}
-			else
-			{
-				echo '<td colspan="'.( $this->mode == 'month' ? '3' : '2' ).'" class="center">'
-							.$this->archive_link( T_('Current'), '', date('Y'), ( $this->mode == 'month' ? date('m') : NULL ) )
-							.'</td>';
-			}
-			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->today_is_visible ).'" id="next">';
-			echo implode( '&nbsp;', $this->getNavLinks( 'next' ) );
-			echo "</td>\n";
-			echo "</tr>\n";
-			echo "</tfoot>\n";
-		}
-
 		// REAL TABLE DATA :
 
 		echo '<tbody>'.$this->rowstart;
@@ -964,6 +934,36 @@ class Calendar
 
 		echo $this->rowend."</tbody>\n";
 
+		// FOOTER :
+
+		if( $this->navigation == 'tfoot' )
+		{ // We want to display navigation in the table footer:
+			echo "<tfoot>\n";
+			echo "<tr>\n";
+			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->today_is_visible ).'" id="prev">';
+			echo implode( '&nbsp;', $this->getNavLinks( 'prev' ) );
+			echo "</td>\n";
+
+			if( $this->today_is_visible )
+			{
+				if( $this->mode == 'month' )
+				{
+					echo '<td class="pad">&nbsp;</td>'."\n";
+				}
+			}
+			else
+			{
+				echo '<td colspan="'.( $this->mode == 'month' ? '3' : '2' ).'" class="center">'
+							.$this->archive_link( T_('Current'), '', date('Y'), ( $this->mode == 'month' ? date('m') : NULL ) )
+							.'</td>';
+			}
+			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->today_is_visible ).'" id="next">';
+			echo implode( '&nbsp;', $this->getNavLinks( 'next' ) );
+			echo "</td>\n";
+			echo "</tr>\n";
+			echo "</tfoot>\n";
+		}
+
 		echo $this->tableend;
 
 	}  // display(-)
@@ -985,7 +985,7 @@ class Calendar
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $this->link_type == 'context' )
 		{	// We want to preserve context:
