@@ -21,7 +21,7 @@ class mobile_bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.7';
+	var $version = '6.9.4';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -45,7 +45,7 @@ class mobile_bootstrap_blog_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -62,6 +62,34 @@ class mobile_bootstrap_blog_Skin extends Skin
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'partial',
+				'std' => 'yes',		// Blog
+				'photo' => 'no',
+				'forum' => 'no',
+				'manual' => 'no',
+				'group' => 'maybe',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -335,28 +363,6 @@ class mobile_bootstrap_blog_Skin extends Skin
 
 
 	/**
-	 * Check if we can display a widget container
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function is_visible_container( $container_key )
-	{
-		global $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
-	}
-
-
-	/**
 	 * Check if we can display a sidebar for the current layout
 	 *
 	 * @param boolean TRUE to check if at least one sidebar container is visible
@@ -373,7 +379,7 @@ class mobile_bootstrap_blog_Skin extends Skin
 
 		if( $check_containers )
 		{ // Check if at least one sidebar container is visible
-			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
+			return ( $this->show_container_when_access_denied( 'sidebar' ) ||  $this->show_container_when_access_denied( 'sidebar2' ) );
 		}
 		else
 		{ // We should not check the visibility of the sidebar containers for this case
