@@ -1198,9 +1198,14 @@ class ItemLight extends DataObject
 				break;
 		}
 
+		if( $title == '#' )
+		{	// Use default title for link:
+			$title = T_('Permanent link to full entry');
+		}
+
 		// Build a permanent link to Item:
 		$r = '<a href="'.$url.'"'
-				.( (  $title == '#' || empty( $title ) ) ? '' : ' title="'.format_to_output( $title, 'htmlattr' ).'"' )
+				.( empty( $title ) ? '' : ' title="'.format_to_output( $title, 'htmlattr' ).'"' )
 				.( empty( $class ) ? '' : ' class="'.format_to_output( $class, 'htmlattr' ).'"' )
 			.'>'
 				.str_replace( '$title$', format_to_output( $this->title ), $text )
