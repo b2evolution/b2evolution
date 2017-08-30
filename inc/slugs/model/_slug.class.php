@@ -77,6 +77,13 @@ class Slug extends DataObject
 	function load_from_Request()
 	{
 		global $Messages;
+
+		// Get old data for checking:
+		$old_object = $this->get_object();
+		$old_type = $this->get( 'type' );
+		$old_cat_ID = $this->get( 'cat_ID' );
+		$old_itm_ID = $this->get( 'itm_ID' );
+
 		// title
 		$slug_title = param( 'slug_title', 'string', true );
 		$slug_title = urltitle_validate( $slug_title, '', 0, true, 'slug_title', 'slug_ID', 'T_slug' );
@@ -139,6 +146,16 @@ class Slug extends DataObject
 				$this->set( 'cat_ID', NULL, true );
 				$this->set( 'itm_ID', NULL, true );
 				break;
+		}
+
+		if( $this->ID > 0 &&
+		    $old_object->get( 'canonical_slug_ID' ) == $this->ID &&
+		    ( $old_type != $this->get( 'type' ) ||
+		      $old_cat_ID != $this->get( 'cat_ID' ) ||
+		      $old_itm_ID != $this->get( 'itm_ID' )
+		    ) )
+		{	// If object has been changed but this slug is used as canonical slug and cannot be deleted and changed to another object:
+			$Messages->add( T_('You cannot change an object of this slug because it is used as canonical slug!'), 'error' );
 		}
 
 		return ! param_errors_detected();
@@ -267,8 +284,6 @@ class Slug extends DataObject
 	 */
 	function & get_object()
 	{
-		global $DB, $admin_url;
-
 		switch( $this->get( 'type' ) )
 		{ // can be different type of object
 			case 'cat':
