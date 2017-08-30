@@ -37,6 +37,7 @@ class geoip_plugin extends Plugin
 	var $version = '6.9.4';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
+	var $plugin_actions = array( 'geoip_download', 'geoip_find_country', 'geoip_fix_country' );
 
 	/*
 	 * These variables MAY be overriden.
@@ -331,8 +332,9 @@ jQuery( document ).ready( function()
 	 */
 	function GetHtsrvMethods()
 	{
-		return array( 'load_country' );
+		return array( 'load_country', 'download_geoip_data' );
 	}
+
 
 	/**
 	 * AJAX callback to load country.
@@ -384,6 +386,15 @@ jQuery( document ).ready( function()
 			// Move user to suspect group by Country ID
 			antispam_suspect_user_by_country( $Country->ID, $User->ID );
 		}
+	}
+
+
+	/**
+	 * AJAX callback to download GeoIP data
+	 */
+	function htsrv_download_geoip_data()
+	{
+		$this->download_geoip_data();
 	}
 
 
@@ -527,12 +538,19 @@ jQuery( document ).ready( function()
 	 */
 	function AdminToolPayload()
 	{
+		global $template_action;
+
 		$action = param_action();
-
-		echo '<a name="geoip" style="position:relative;top:-60px"></a>';
-
-		// Display a form to find countries for users:
-		$this->display_tool_form();
+		if( $action == 'geoip_download' && ! ( isset( $template_action ) && $template_action == 'deferred_admin_tool_action' ) )
+		{
+			$this->download_geoip_data();
+			$this->print_tool_log( '<br /><br />' );
+		}
+		else
+		{
+			// Display a form to find countries for users:
+			$this->display_tool_form();
+		}
 		return true;
 	}
 
@@ -610,7 +628,14 @@ jQuery( document ).ready( function()
 			{
 				$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
 			}
-			$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-warning">'.T_('Download update now!').'</a>';
+			if( $this->status == 'enabled' )
+			{
+				$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-warning">'.T_('Download update now!').'</a>';
+			}
+			else
+			{
+				$datfile_info .= ' - download!!!!!!</a>';
+			}
 			echo '<p><b>GeoIP.dat:</b> '.$datfile_info.'</p>';
 		}
 
@@ -627,16 +652,19 @@ jQuery( document ).ready( function()
 	 */
 	function AdminToolAction()
 	{
-		global $template_action;
+		global $template_log_title, $template_action;
 		global $deferred_AdminToolActions;
 
 		$action = param_action();
+
+		$template_log_title = $this->name;
 
 		if( !empty( $action ) )
 		{	// If form is submitted
 			switch( $action )
 			{
 				case 'geoip_download':
+					// This will not run if the plugin is not enabled!
 					$deferred_AdminToolActions[$this->ID] = 'download_geoip_data';
 					$template_action = 'deferred_admin_tool_action';
 					break;

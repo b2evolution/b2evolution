@@ -14,6 +14,58 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+function print_log( $message, $type = NULL, $params = array()  )
+{
+	$params = array_merge( array(
+			'message_before' => '',
+			'message_after' => '<br />',
+			'text_style' => 'normal'
+		), $params );
+
+	switch( $type )
+	{
+		case 'success':
+			$message_before = '<span class="text-success">';
+			$message_after = '</span>';
+			break;
+
+		case 'error':
+			$message_before = '<span class="text-danger">';
+			$message_after = '</span>';
+			break;
+
+		case 'warning':
+			$message_before = '<span class="text-warning">';
+			$message_after = '</span>';
+			break;
+
+		case 'note':
+			$message_before = '<span class="text-info">';
+			$message_after = '</span>';
+			break;
+
+		default:
+			$message_before = '';
+			$message_after = '';
+			break;
+	}
+
+	switch( $params['text_style'] )
+	{
+		case 'bold':
+			$message = '<b>'.$message.'</b>';
+			break;
+
+		case 'italic':
+			$message = '<i>'.$message.'</i>';
+			break;
+	}
+
+	echo $params['message_before'].$message_before.$message.$message_after.$params['message_after'];
+	evo_flush();
+}
+
+
 /**
  * Clear pre-rendered item cache (DB)
  */
@@ -23,7 +75,7 @@ function dbm_delete_itemprecache()
 
 	$DB->query('DELETE FROM T_items__prerendering WHERE 1=1');
 
-	$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+	print_log( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
 }
 
 
@@ -36,7 +88,8 @@ function dbm_delete_commentprecache()
 
 	$DB->query('DELETE FROM T_comments__prerendering WHERE 1=1');
 
-	$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+	print_log( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+
 }
 
 
@@ -49,7 +102,7 @@ function dbm_delete_messageprecache()
 
 	$DB->query('DELETE FROM T_messaging__prerendering WHERE 1=1');
 
-	$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+	print_log( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
 }
 
 
@@ -62,17 +115,26 @@ function dbm_delete_pagecache( $display_details = true )
 {
 	global $DB, $Messages, $cache_path;
 
+	print_log( T_('Clearing page caches:'), 'normal', array( 'text_style' => 'bold' ) );
+	evo_flush();
+
+	echo '<ul>';
+
 	// Clear general cache directory:
 	$result = cleardir_r( $cache_path.'general' );
 	if( $display_details )
 	{ // Display message only when it is required:
 		if( $result )
 		{
-			$Messages->add_to_group( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ), 'note', T_('Clearing page caches:') );
+			echo '<li>';
+			print_log( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ) );
+			echo '</li>';
 		}
 		else
 		{
-			$Messages->add_to_group( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error', T_('Page cache clearing errors:') );
+			echo '<li>';
+			print_log( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error' );
+			echo '</li>';
 		}
 	}
 
@@ -91,11 +153,15 @@ function dbm_delete_pagecache( $display_details = true )
 			{ // Display message only when it is required:
 				if( $result )
 				{
-					$Messages->add_to_group( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'note', T_('Clearing page caches:') );
+					echo '<li>';
+					print_log( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ) );
+					echo '</li>';
 				}
 				else
 				{
-					$Messages->add_to_group( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error', T_('Page cache clearing errors:') );
+					echo '<li>';
+					print_log( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error' );
+					echo '</li>';
 				}
 			}
 			// Create .htaccess file with deny rules
@@ -103,7 +169,10 @@ function dbm_delete_pagecache( $display_details = true )
 		}
 	}
 
-	$Messages->add( T_('Page caches deleted.'), 'success' );
+	echo '</ul>';
+
+	echo '<br />';
+	print_log( T_('Page caches deleted.'), 'success' );
 }
 
 
@@ -118,7 +187,7 @@ function dbm_delete_filecache()
 	// Delete any ?evocache folders:
 	$deleted_dirs = delete_cachefolders( $Messages );
 
-	$Messages->add( sprintf( T_('Deleted %d directories.'), $deleted_dirs ), 'success' );
+	print_log( sprintf( T_('Deleted %d directories.'), $deleted_dirs ), 'success' );
 }
 
 
@@ -133,12 +202,12 @@ function dbm_repair_cache()
 	$result = system_check_caches();
 	if( empty( $result ) )
 	{
-		$Messages->add( T_( 'All cache folders are working properly.' ), 'success' );
+		print_log( T_( 'All cache folders are working properly.' ), 'success' );
 	}
 	else
 	{
 		$error_message = T_( 'Unable to repair all cache folders becaue of file permissions' ).':<br />';
-		$Messages->add( $error_message.implode( '<br />', $result ) );
+		print_log( $error_message.implode( '<br />', $result ) );
 	}
 }
 
@@ -427,7 +496,7 @@ function dbm_delete_orphan_comments()
 		$CommentCache->clear();
 	}
 
-	$Messages->add( sprintf( T_('%d comments have been deleted'), $num_deleted ), 'success' );
+	print_log( sprintf( T_('%d comments have been deleted'), $num_deleted ), 'success' );
 }
 
 
@@ -440,7 +509,7 @@ function dbm_delete_orphan_comment_uploads()
 
 	$count = remove_orphan_files( NULL, 24 );
 
-	$Messages->add( sprintf( T_('%d files have been deleted'), $count ), 'success' );
+	print_log( sprintf( T_('%d files have been deleted'), $count ), 'success' );
 }
 
 
@@ -666,7 +735,7 @@ function dbm_recreate_itemslugs()
 			}
 		}
 	}
-	$Messages->add( sprintf( 'Created %d new URL slugs.', $count_slugs ), 'success' );
+	print_log( sprintf( 'Created %d new URL slugs.', $count_slugs ), 'success' );
 }
 
 
@@ -886,4 +955,21 @@ function dbm_convert_item_content_separators()
 
 	echo "<br />\n";
 }
+
+function dbm_delete_item_versions()
+{
+	global $DB;
+
+	$count = $DB->get_var( 'SELECT COUNT(*) FROM T_items__version' );
+	$DB->query( 'TRUNCATE TABLE T_items__version' );
+	if( $count > 0 )
+	{
+		print_log( sprintf( T_('Cleared %d records from the item versions table.'), $count ), 'success' );
+	}
+	else
+	{
+		print_log( T_('Item versions table already empty.'), 'note' );
+	}
+}
+
 ?>
