@@ -64,33 +64,8 @@ class Slug extends DataObject
 		return array(
 				array( 'table'=>'T_items__item', 'fk'=>'post_canonical_slug_ID', 'fk_short'=>'canonical_slug_ID', 'msg'=>T_('%d related post') ),
 				array( 'table'=>'T_items__item', 'fk'=>'post_tiny_slug_ID', 'fk_short'=>'tiny_slug_ID', 'msg'=>T_('%d related post') ),
+				array( 'table'=>'T_categories', 'fk'=>'cat_canonical_slug_ID', 'fk_short'=>'canonical_slug_ID', 'msg'=>T_('%d related category') ),
 			);
-	}
-
-
-	/**
-	 * Get a member param by its name
-	 *
-	 * @param mixed Name of parameter
-	 * @return mixed Value of parameter
-	 */
-	function get( $parname )
-	{
-		return parent::get( $parname );
-	}
-
-
-	/**
-	 * Set param value
-	 *
-	 * @param string parameter name
-	 * @param mixed parameter value
-	 * @param boolean true to set to NULL if empty value
-	 * @return boolean true, if a value has been set; false if it has not changed
-	 */
-	function set( $parname, $parvalue, $make_null = false )
-	{
-		return $this->set_param( $parname, 'string', $parvalue, $make_null );
 	}
 
 
@@ -266,19 +241,22 @@ class Slug extends DataObject
 	 */
 	function get_restriction_link( $restriction )
 	{
-		if( $object = $this->get_object() )
-		{ // object exists
-			// check if this is a restriction for this slug or not!
-			if( $object->get( $restriction['fk_short'] ) == $this->ID )
+		if( $object = & $this->get_object() )
+		{	// If object(Chapter or Item) exists:
+			// Check if this is a restriction for this slug or not!
+			if( ( ( $this->get( 'type' ) == 'cat' && $restriction['table'] == 'T_categories' ) ||
+			      ( $this->get( 'type' ) == 'item' && $restriction['table'] == 'T_items__item' ) ) &&
+			    $object->get( $restriction['fk_short'] ) == $this->ID )
 			{
 				$restriction_link = $this->get_link_to_object();
 			}
 		}
 		if( isset( $restriction_link ) )
-		{ // there are restrictions
-			return sprintf( $restriction['msg'].'<br/>'.str_replace('%', '%%', $restriction_link), 1 );
+		{	// There are restrictions:
+			return sprintf( $restriction['msg'].'<br/>'.str_replace( '%', '%%', $restriction_link ), 1 );
 		}
-		// no restriction
+
+		// No restriction:
 		return '';
 	}
 
@@ -291,22 +269,24 @@ class Slug extends DataObject
 	{
 		global $DB, $admin_url;
 
-		switch( $this->type )
+		switch( $this->get( 'type' ) )
 		{ // can be different type of object
 			case 'cat':
 				$ChapterCache = & get_ChapterCache();
-				return $ChapterCache->get_by_ID( $this->get( 'cat_ID' ), false, false );
+				$Chapter = & $ChapterCache->get_by_ID( $this->get( 'cat_ID' ), false, false );
+				return $Chapter;
 
 			case 'item':
 				$ItemCache = & get_ItemCache();
-				return $ItemCache->get_by_ID( $this->get( 'itm_ID' ), false, false );
+				$Item = & $ItemCache->get_by_ID( $this->get( 'itm_ID' ), false, false );
+				return $Item;
 
 			case 'help':
 				return false;
 
 			default:
 				// not defined restriction
-				debug_die('Slug::get_object: Unhandled object type: '.htmlspecialchars($this->type));
+				debug_die( 'Slug::get_object: Unhandled object type: '.$this->dget( 'type', 'htmlspecialchars' ) );
 		}
 	}
 
@@ -426,35 +406,27 @@ class Slug extends DataObject
 	 */
 	function may_be_deleted()
 	{
-		global $DB;
-
 		if( empty( $this->ID ) )
 		{	// Slug must be stored in DB:
 			return false;
 		}
 
-		$SQL = new SQL( 'Get a count of sulgs per object of slug #'.$this->ID );
-		$SQL->SELECT( 'COUNT( slug_ID )' );
-		$SQL->FROM( 'T_slug' );
+		// Get object(Chapter or Item) of this slug:
+		$object = $this->get_object();
 
 		switch( $this->get( 'type' ) )
 		{
 			case 'cat':
-				$SQL->WHERE( 'slug_cat_ID = '.$this->get( 'cat_ID' ) );
-				break;
+				// This slug cannot be deleted when it is used as canonical slug for the Chapter/Catagory:
+				return ( $object->get( 'canonical_slug_ID' ) != $this->ID );
 
 			case 'item':
-				$SQL->WHERE( 'slug_itm_ID = '.$this->get( 'itm_ID' ) );
-				break;
+				// This slug cannot be deleted when it is used as canonical or tiny slug for the Item/Post:
+				return ( $object->get( 'canonical_slug_ID' ) != $this->ID && $object->get( 'tiny_slug_ID' ) != $this->ID );
 
 			default:
 				return true;
 		}
-
-		$count = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
-
-		// Allow to delete ONLY if parent object has at least two slugs:
-		return ( $count > 1 );
 	}
 }
 
