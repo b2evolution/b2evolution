@@ -41,13 +41,17 @@ if( $filter_type = get_param( 'slug_type' ) )
 	$SQL->WHERE_and( 'slug_type = "'.$DB->escape( get_param( 'slug_ftype' ) ).'"' );
 	$list_is_filtered = true;
 }
-if( $filter_item_ID = get_param( 'slug_item_ID' ) )
-{ // add filter for item ID
-	if( is_number( $filter_item_ID ) )
-	{
-		$SQL->WHERE_and( 'slug_itm_ID = '.$DB->quote( $filter_item_ID ) );
-		$list_is_filtered = true;
-	}
+if( ( $filter_cat_ID = get_param( 'slug_cat_ID' ) ) &&
+    is_number( $filter_cat_ID ) )
+{	// Add filter for chapter/category ID:
+	$SQL->WHERE_and( 'slug_cat_ID = '.$DB->quote( $filter_cat_ID ) );
+	$list_is_filtered = true;
+}
+if( ( $filter_item_ID = get_param( 'slug_item_ID' ) ) &&
+    is_number( $filter_item_ID ) )
+{	// Add filter for item/post ID:
+	$SQL->WHERE_and( 'slug_itm_ID = '.$DB->quote( $filter_item_ID ) );
+	$list_is_filtered = true;
 }
 
 // Create result set:
@@ -68,17 +72,12 @@ if( $list_is_filtered )
  */
 function filter_slugs( & $Form )
 {
-	$Form->text_input( 'slug_filter', get_param('slug_filter'), 24, T_('Slug'), '', array( 'maxlength' => 253 ) );
+	param_check_number( 'slug_item_ID', T_('Must be a number') );
+	param_check_number( 'slug_cat_ID', T_('Must be a number') );
 
-	$item_ID_filter_note = '';
-	if( $filter_item_ID = get_param( 'slug_item_ID' ) )
-	{ // check item_Id filter. It must be a number
-		if( ! is_number( $filter_item_ID ) )
-		{ // It is not a number
-			$item_ID_filter_note = T_('Must be a number');
-		}
-	}
-	$Form->text_input( 'slug_item_ID', $filter_item_ID, 9, T_('Item ID'), $item_ID_filter_note, array( 'maxlength' => 9 ) );
+	$Form->text_input( 'slug_filter', get_param('slug_filter'), 24, T_('Slug'), '', array( 'maxlength' => 255 ) );
+	$Form->text_input( 'slug_cat_ID', get_param( 'slug_cat_ID' ), 10, T_('Category ID') );
+	$Form->text_input( 'slug_item_ID', get_param( 'slug_item_ID' ), 10, T_('Item ID') );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_slugs',

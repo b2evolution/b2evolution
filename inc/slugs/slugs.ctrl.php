@@ -29,6 +29,7 @@ param_action( 'list' );
 
 param( 'slug_filter', 'string', '', true );
 param( 'slug_item_ID', 'string', '', true );
+param( 'slug_cat_ID', 'string', '', true );
 // other slug object type IDs come here
 
 if( param( 'slug_ID', 'integer', '', true) )

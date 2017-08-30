@@ -23,7 +23,7 @@ global $edited_Chapter;
  */
 global $ChapterCache;
 
-global $Settings, $action, $subset_ID;
+global $Settings, $action, $subset_ID, $admin_url;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -55,7 +55,14 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 
 	$Form->text_input( 'cat_name', $edited_Chapter->name, 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );
 
-	$Form->text_input( 'cat_urlname', $edited_Chapter->urlname, 40, T_('URL "slug"'), T_('Used for clean URLs. Must be unique.'), array( 'maxlength' => 255 ) );
+	$edit_slug_link = '';
+	if( $edited_Chapter->ID > 0 && $current_User->check_perm( 'slugs', 'view' ) )
+	{	// If current User has permission to view slugs:
+		$edit_slug_link = action_icon( T_('Edit slugs'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_cat_ID='.$edited_Chapter->ID, T_('Edit slugs'), 3, 4 )
+			// TRANS: Full phrase is "<a href="">Edit slugs</a> for this category"
+			.' '.T_('for this category');
+	}
+	$Form->text_input( 'cat_urlname', implode( ', ', $edited_Chapter->get_slugs() ), 40, T_('URL "slug"'), '<br />'.$edit_slug_link, array( 'maxlength' => '', 'style' => 'width:100%' ) );
 
 	$field_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select category image'), 'size_name' => 'fit-320x320' );
 	$Form->fileselect( 'cat_image_file_ID', $edited_Chapter->get( 'image_file_ID' ), T_('Category image'), NULL, $field_params );

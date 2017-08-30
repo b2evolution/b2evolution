@@ -282,7 +282,8 @@ class Slug extends DataObject
 				return $Item;
 
 			case 'help':
-				return false;
+				$r = false;
+				return $r;
 
 			default:
 				// not defined restriction
@@ -357,7 +358,13 @@ class Slug extends DataObject
 					return false;
 				}
 
-				$Chapter->set( 'canonical_slug_ID', $this->ID );
+				if( $Chapter->get( 'canonical_slug_ID' ) != $this->ID )
+				{	// Chapter has a different canonical slug ID,
+					// Don't update Chapter but don't produce an error for such case,
+					// because Chapter can has several slugs:
+					return true;
+				}
+
 				$Chapter->set( 'urlname', $this->get( 'title' ) );
 				if( ! $Chapter->dbupdate( false ) )
 				{	// Failed on update:
