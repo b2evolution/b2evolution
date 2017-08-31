@@ -1638,3 +1638,6 @@ table.diff td.diff-title-addedline {
 .jeditable_cell input {
   max-width: 100%;
 }
+table.evo_locale_selector {
+  width: auto;
+}

@@ -4503,6 +4503,57 @@ class Form extends Widget
 		// End field:
 		echo $this->end_field( $field_type );
 	}
+
+
+	/**
+	 * Locale selector
+	 *
+	 * @param string Field name
+	 * @param string Main locale value
+	 * @param array Extra locale values
+	 * @param string Field label
+	 * @param string Field note
+	 * @param array Params
+	 * @return 
+	 */
+	function locale_selector( $field_name, $main_locale, $extra_locales, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $locales;
+
+		$this->handle_common_params( $field_params, $field_name, $field_label, $field_note );
+
+		$r = $this->begin_field();
+
+		$r .= '<table class="evo_locale_selector table table-striped table-hover table-condensed table-bordered">';
+
+		// Table header:
+		$r .= '<thead><tr>'
+				.'<th>'.T_('Main').'</th>'
+				.'<th>'.T_('Extra').'</th>'
+				.'<th>'.T_('Locale').'</th>'
+			.'</tr></thead>';
+
+		foreach( $locales as $locale_key => $locale_data )
+		{
+			if( ! $locale_data['enabled'] )
+			{	// Skip disabled locale:
+				continue;
+			}
+
+			// Locale row with radio, checkbox and name:
+			$r .= '<tr>'
+					.'<td class="center"><input type="radio" name="'.format_to_output( $field_name, 'htmlattr' ).'" value="'.format_to_output( $locale_key, 'htmlattr' ).'"'.( $main_locale == $locale_key ? ' checked="checked"' : '' ).' /></td>'
+					.'<td class="center"><input type="checkbox" name="'.format_to_output( $field_name, 'htmlattr' ).'_extra[]" /></td>'
+					.'<td>'.T_( $locale_data['name'] ).'</td>'
+				.'</tr>';
+		}
+
+		$r .= '</table>';
+
+		$r .= $this->end_field();
+
+		return $this->display_or_return( $r );
+	}
 }
 
 ?>
