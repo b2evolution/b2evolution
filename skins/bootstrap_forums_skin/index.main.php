@@ -411,11 +411,12 @@ if( $disp == 'front' )
 
 <footer class="row">
 
-	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+   <!-- =================================== START OF FOOTER =================================== -->
+    <div class="col-md-12">
 
-		<div class="evo_container evo_container__footer">
-		<?php
+		<?php // Note: clearfix is because of Bootstraps' .cols ?>
+		<div class="evo_container evo_container__footer clearfix">
+			<?php
 			// Display container and contents:
 			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
@@ -423,10 +424,10 @@ if( $disp == 'front' )
 					'block_end'         => '</div>',
 				) );
 			// Note: Double quotes have been used around "Footer" only for test purposes.
-		?>
-		</div>
+			?>
+		</div><!-- .evo_container__footer -->
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
