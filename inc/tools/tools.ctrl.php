@@ -313,6 +313,20 @@ if( empty( $tab ) )
 			}
 			break;
 
+		case 'resize_all_images':
+			param( 'confirmed', 'integer', 0 );
+
+			if( $confirmed )
+			{
+				$template_log_title = T_('Resize all images in the media directory');
+				$template_action = $action;
+			}
+			else
+			{
+				$action = 'show_resize_all_images';
+			}
+			break;
+
 		case 'del_obsolete_tags':
 			$DB->query('
 				DELETE T_items__tag FROM T_items__tag
@@ -523,6 +537,11 @@ if( empty( $tab ) )
 
 		case 'show_delete_item_versions':
 			$AdminUI->disp_view( 'tools/views/_delete_item_versions.form.php' );
+			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
+			break;
+
+		case 'show_resize_all_images':
+			$AdminUI->disp_view( 'tools/views/_image_resize.form.php' );
 			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
 			break;
 
