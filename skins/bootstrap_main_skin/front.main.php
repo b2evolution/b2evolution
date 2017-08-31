@@ -240,9 +240,9 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 			</div>
 		</div><!-- .col -->
 
-		<footer class="col-md-12 center">
+		<footer class="col-md-12">
 
-			<div class="evo_container evo_container__footer">
+			<div class="evo_container evo_container__footer clearfix">
 			<?php
 				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
@@ -253,7 +253,7 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 			?>
 			</div>
 
-			<p>
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

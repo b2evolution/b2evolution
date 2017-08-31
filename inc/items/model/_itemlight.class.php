@@ -1198,12 +1198,18 @@ class ItemLight extends DataObject
 				break;
 		}
 
-		if( $title == '#' ) $title = T_('Permanent link to full entry');
+		if( $title == '#' )
+		{	// Use default title for link:
+			$title = T_('Permanent link to full entry');
+		}
 
-		// Display as link
-		$r = '<a href="'.$url.'" title="'.$title.'"';
-		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
-		$r .= '>'.str_replace( '$title$', format_to_output( $this->title ), $text ).'</a>';
+		// Build a permanent link to Item:
+		$r = '<a href="'.$url.'"'
+				.( empty( $title ) ? '' : ' title="'.format_to_output( $title, 'htmlattr' ).'"' )
+				.( empty( $class ) ? '' : ' class="'.format_to_output( $class, 'htmlattr' ).'"' )
+			.'>'
+				.str_replace( '$title$', format_to_output( $this->title ), $text )
+			.'</a>';
 
 		return $r;
 	}

@@ -481,7 +481,7 @@ class ItemList2 extends ItemListLight
 		if( !is_null($prev_Item) )
 		{
 			$output = $before;
-			$output .= $prev_Item->get_permanent_link( $text, '#', $class, $target_blog, $post_navigation, $this->nav_target );
+			$output .= $prev_Item->get_permanent_link( $text, '', $class, $target_blog, $post_navigation, $this->nav_target );
 			$output .= $after;
 		}
 		else
@@ -506,7 +506,7 @@ class ItemList2 extends ItemListLight
 		if( !is_null($next_Item) )
 		{
 			$output = $before;
-			$output .= $next_Item->get_permanent_link( $text, '#', $class, $target_blog, $post_navigation, $this->nav_target );
+			$output .= $next_Item->get_permanent_link( $text, '', $class, $target_blog, $post_navigation, $this->nav_target );
 			$output .= $after;
 		}
 		else

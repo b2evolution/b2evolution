@@ -2335,6 +2335,35 @@ class User extends DataObject
 		return NULL;
 	}
 
+	/**
+	 * Get url visits url
+	 *
+	 * @return string
+	 */
+	function get_visits_url( )
+	{
+		global $Settings;
+
+		if( ! empty( $blog_ID ) )
+		{ // Use blog from param by ID
+			$BlogCache = & get_BlogCache();
+			$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		}
+
+		if( empty( $current_Blog ) )
+		{ // Use current blog
+			global $Collection, $Blog;
+			$current_Blog = & $Blog;
+		}
+
+		if( empty( $current_Blog ) || empty( $Settings ) )
+		{ // Wrong request
+			return NULL;
+		}
+
+		return url_add_param( $current_Blog->get( 'visitsurl' ), 'user_ID='.$this->ID );
+	}
+
 
 	/**
 	 * Get url from defined userfields

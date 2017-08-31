@@ -254,6 +254,7 @@ $Form->end_form();
 ?>
 <script type="text/javascript">
 <?php
+global $Settings;
 if( $Settings->get('fm_enable_roots_shared') )
 {	// asimo> this may belong to the pluggable permissions display
 	// javascript to handle shared root permissions, when file permission was changed:

@@ -1467,7 +1467,7 @@ function profile_check_params( $params, $User = NULL )
 		else
 		{
 			param_check_valid_login( $dummy_fields[ $params['login'][1] ] );
-			
+
 			if( param_check_valid_login( $dummy_fields[ $params['login'][1] ] ) )
 			{	// If login is valid
 				global $reserved_logins, $current_User;
@@ -2490,7 +2490,7 @@ function get_user_sub_entries( $is_admin, $user_ID )
 							'text' => T_('Notifications'),
 							'href' => url_add_param( $base_url, $ctrl_param.'subs'.$user_param ) );
 
-		if( $Settings->get( 'enable_visit_tracking' ) == 1 )
+		if( $is_admin && $Settings->get( 'enable_visit_tracking' ) == 1 )
 		{
 			$users_sub_entries['visits'] = array(
 								'text' => T_('Visits'),

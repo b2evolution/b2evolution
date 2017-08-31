@@ -306,9 +306,9 @@ if( $is_pictured_page )
 
 	<div class="row">
 
-		<footer class="col-md-12 center">
+		<footer class="col-md-12">
 
-			<div class="evo_container evo_container__footer">
+			<div class="evo_container evo_container__footer clearfix">
 			<?php
 				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
@@ -319,7 +319,7 @@ if( $is_pictured_page )
 			?>
 			</div>
 
-			<p>
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

@@ -673,4 +673,62 @@ function tool_test_flush()
 		sleep( 1 );
 	}
 }
+
+/**
+ * Resize all images in media folder
+ */
+function tool_resize_all_images()
+{
+	global $Session, $Settings, $media_path;
+	$params = array(
+			'inc_files'      => true,  // include files (not only directories)
+			'inc_dirs'       => false,  // include directories (not the directory itself!)
+			'flat'           => true,  // return a one-dimension-array
+			'recurse'        => true,  // recurse into subdirectories
+			'basename'       => false, // get the basename only
+			'trailing_slash' => false, // add trailing slash
+			'inc_hidden'     => true,  // inlcude hidden files, directories and content
+			'inc_evocache'   => true, // exclude evocache directories and content
+			'inc_temp'       => false,  // include temporary files and directories
+	);
+
+	$Session->assert_received_crumb( 'tools' );
+
+	load_funcs( 'files/model/_image.funcs.php' );
+	$Timer = new Timer('resize_all_images');
+
+	$Timer->start( 'resize_all_images' );
+	$filenames = get_filenames( $media_path, $params );
+	$fit_width = $Settings->get( 'fm_resize_width' );
+	$fit_height = $Settings->get( 'fm_resize_height' );
+	$file_counter = 0;
+
+	print_log( T_('Resize images...'), 'normal', array( 'text_style' => 'bold' ) );
+	echo '<br />';
+
+	foreach( $filenames as $filename )
+	{
+		$filename = str_replace( $media_path, '', $filename );
+		$edited_File = & get_file_by_abspath( $filename );
+		if( ! empty( $edited_File ) && $edited_File->is_image() )
+		{
+			$current_dimensions = $edited_File->get_image_size( 'widthheight_assoc' );
+			$new_dimensions = fit_into_constraint( $current_dimensions['width'], $current_dimensions['height'], $fit_width, $fit_height );
+			$result = resize_image( $edited_File, ( int ) $new_dimensions[0], ( int ) $new_dimensions[1], NULL, NULL, false );
+			if( $result )
+			{
+				print_log( sprintf( T_('%s was resized to %dx%d pixels.'), '<code>'.$filename.'</code>', $new_dimensions[0], $new_dimensions[1] ) );
+			}
+			else
+			{
+				print_log( sprintf( T_('%s could not be resized to target resolution of %dx%d pixels.'), '<code>'.$filename.'</code>', $new_dimensions[0], $new_dimensions[1] ), 'error' );
+			}
+			$file_counter++;
+		}
+	}
+	$Timer->stop( 'resize_all_images' );
+	echo '<br />';
+	print_log( sprintf( T_('%d images were processed.'), $file_counter ), 'success' );
+	print_log( sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( 'resize_all_images' ) ), 'normal', array( 'text_style' => 'bold' ) );
+}
 ?>
