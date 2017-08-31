@@ -519,8 +519,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 	// Get existing categories
 	$SQL = new SQL();
-	$SQL->SELECT( 'cat_urlname, cat_ID' );
+	$SQL->SELECT( 'slug_title, cat_ID' );
 	$SQL->FROM( 'T_categories' );
+	$SQL->FROM_add( 'INNER JOIN T_slug ON cat_ID = slug_cat_ID' );
 	$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $wp_blog_ID ) );
 	$categories = $DB->get_assoc( $SQL->get() );
 
