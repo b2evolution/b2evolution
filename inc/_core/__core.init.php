@@ -1687,6 +1687,36 @@ class _core_Module extends Module
 			);
 		}
 
+		// Collection locales:
+		$coll_locales = $Blog->get_locales();
+		if( count( $coll_locales ) )
+		{
+			global $locales, $current_locale;
+
+			$dev_entries[] = array(
+					'separator' => true,
+				);
+
+			$current_coll_locale = get_param( 'coll_locale' ) != '' ? get_param( 'coll_locale' ) : $current_locale;
+			foreach( $coll_locales as $coll_locale_key )
+			{
+				if( ! isset( $locales[ $coll_locale_key ] ) || ! $locales[ $coll_locale_key ]['enabled'] )
+				{	// Skip wrong or disabled locale:
+					continue;
+				}
+
+				$is_selected = ( $current_coll_locale == $coll_locale_key );
+				$dev_entries[] = array(
+					'text' => ( $is_selected ? '&#10003; ' : '' ).$locales[ $coll_locale_key ]['name'],
+					'href' => $is_selected ?
+						// Url to edit collection locales list:
+						$admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID :
+						// Url to change locale of the current collection:
+						url_add_param( regenerate_url( 'coll_locale' ), 'coll_locale='.urlencode( $coll_locale_key ) ),
+				);
+			}
+		}
+
 		if( ! empty( $dev_entries ) )
 		{ // Add Dev menu if at least one entry is should be displayed
 			$entries['dev'] = array(
