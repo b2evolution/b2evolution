@@ -4542,13 +4542,37 @@ class Form extends Widget
 
 			// Locale row with radio, checkbox and name:
 			$r .= '<tr>'
-					.'<td class="center"><input type="radio" name="'.format_to_output( $field_name, 'htmlattr' ).'" value="'.format_to_output( $locale_key, 'htmlattr' ).'"'.( $main_locale == $locale_key ? ' checked="checked"' : '' ).' /></td>'
-					.'<td class="center"><input type="checkbox" name="'.format_to_output( $field_name, 'htmlattr' ).'_extra[]" /></td>'
+					.'<td class="center"><input type="radio" '
+							.'name="'.format_to_output( $field_name, 'htmlattr' ).'" '
+							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
+							.( $main_locale == $locale_key ? ' checked="checked"' : '' ).' /></td>'
+					.'<td class="center"><input type="checkbox" '
+							.'name="'.format_to_output( $field_name, 'htmlattr' ).'_extra[]" '
+							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
+							.( in_array( $locale_key, $extra_locales ) ? ' checked="checked"' : '' ).' /></td>'
 					.'<td>'.T_( $locale_data['name'] ).'</td>'
 				.'</tr>';
 		}
 
 		$r .= '</table>';
+
+		// JavaScript for autoselecting extra locale:
+		$r .= '<script type="text/javascript">
+			jQuery( "input[type=radio][name='.$field_name.']" ).click( function()
+			{
+				if( jQuery( this ).is( ":checked" ) )
+				{
+					jQuery( "input[type=checkbox][name=\''.$field_name.'_extra[]\'][value=\'" + jQuery( this ).val() + "\']" ).prop( "checked", true );
+				}
+			} );
+			jQuery( "input[type=checkbox][name=\''.$field_name.'_extra[]\']" ).click( function()
+			{
+				if( ! jQuery( this ).is( ":checked" ) && jQuery( "input[type=radio][name='.$field_name.'][value=\'" + jQuery( this ).val() + "\']" ).is( ":checked" ) )
+				{
+					return false;
+				}
+			} );
+		</script>';
 
 		$r .= $this->end_field();
 

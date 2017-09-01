@@ -85,6 +85,14 @@ $schema_queries = array_merge( $schema_queries, array(
 			PRIMARY KEY ( cset_coll_ID, cset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_coll_locales' => array(
+		'Creating table for collection extra locales',
+		"CREATE TABLE T_coll_locales (
+			cl_coll_ID INT(10) UNSIGNED NOT NULL,
+			cl_locale  VARCHAR(20) NOT NULL,
+			PRIMARY KEY cl_coll_loc_pk (cl_coll_ID, cl_locale)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_widget' => array(
 		'Creating components table',
 		"CREATE TABLE T_widget (

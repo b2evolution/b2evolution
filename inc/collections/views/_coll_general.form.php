@@ -206,7 +206,7 @@ $Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-set
 	{ // More than 1 locale
 		$blog_locale_note = ( $current_User->check_perm( 'options', 'view' ) ) ?
 			'<a href="'.$admin_url.'?ctrl=regional">'.T_('Regional settings').' &raquo;</a>' : '';
-		$Form->locale_selector( 'blog_locale', $edited_Blog->get( 'locale' ), array(), T_('Collection Locale'), $blog_locale_note );
+		$Form->locale_selector( 'blog_locale', $edited_Blog->get( 'locale' ), $edited_Blog->get_locales(), T_('Collection Locale'), $blog_locale_note );
 
 		$Form->radio( 'blog_locale_source', $edited_Blog->get_setting( 'locale_source' ),
 				array(

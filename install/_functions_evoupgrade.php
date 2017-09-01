@@ -8484,6 +8484,23 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12330, 'Creating table for collection extra locales...' ) )
+	{	// part of 6.9.3-beta
+		db_create_table( 'T_coll_locales', '
+			cl_coll_ID INT(10) UNSIGNED NOT NULL,
+			cl_locale  VARCHAR(20) NOT NULL,
+			PRIMARY KEY cl_coll_loc_pk (cl_coll_ID, cl_locale)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12340, 'Inserting collection extra locales...' ) )
+	{	// part of 6.9.3-beta
+		$DB->query( 'INSERT INTO T_coll_locales ( cl_coll_ID, cl_locale )
+			SELECT blog_ID, blog_locale
+			  FROM T_blogs' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

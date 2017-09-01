@@ -179,6 +179,12 @@ class Blog extends DataObject
 
 
 	/**
+	 * @var array Locales
+	 */
+	var $locales = NULL;
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -198,6 +204,7 @@ class Blog extends DataObject
 			// echo 'Creating blank blog';
 			$this->owner_user_ID = 1; // DB default
 			$this->set( 'locale', $default_locale );
+			$this->set_locales( array( $default_locale ) );
 			$this->set( 'access_type', 'extrapath' );
 		}
 		else
@@ -248,6 +255,7 @@ class Blog extends DataObject
 		return array(
 				array( 'table'=>'T_coll_user_favs', 'fk'=>'cufv_blog_ID', 'msg'=>T_('%d user favorites') ),
 				array( 'table'=>'T_coll_settings', 'fk'=>'cset_coll_ID', 'msg'=>T_('%d blog settings') ),
+				array( 'table'=>'T_coll_locales', 'fk'=>'cl_coll_ID', 'msg'=>T_('%d collection extra locales') ),
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission definitions') ),
 				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission definitions') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
@@ -476,6 +484,12 @@ class Blog extends DataObject
 				$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
 				$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
 				$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
+
+				$extra_locales = param( 'blog_locale_extra', 'array:string', NULL );
+				if( $extra_locales !== NULL )
+				{	// Set new extra locales:
+					$this->set_locales( $extra_locales );
+				}
 			}
 
 			// Collection permissions:
@@ -3041,6 +3055,9 @@ class Blog extends DataObject
 				$this->CollectionSettings->dbupdate();
 			}
 
+			// Update locales:
+			$this->update_locales();
+
 			$default_post_type_ID = $this->get_setting( 'default_post_type' );
 			if( ! empty( $default_post_type_ID ) )
 			{ // Enable post type that is used by default for this collection:
@@ -3592,6 +3609,9 @@ class Blog extends DataObject
 		{
 			$this->CollectionSettings->dbupdate();
 		}
+
+		// Update locales:
+		$this->update_locales();
 
 		$Plugins->trigger_event( 'AfterCollectionUpdate', $params = array( 'Blog' => & $this ) );
 
@@ -4968,6 +4988,103 @@ class Blog extends DataObject
 			WHERE cat_blog_ID = '.$this->ID.'
 				AND comment_status IN ( '.$DB->quote( $reduced_statuses ).' )',
 			'Reduce comments statuses by max allowed status of the collection #'.$this->ID );
+	}
+
+
+	/**
+	 * Get locales of this collection
+	 *
+	 * @return array
+	 */
+	function get_locales()
+	{
+		if( $this->locales === NULL && ! empty( $this->ID ) )
+		{	// Load locales from DB once and store in cache variable:
+			global $DB;
+			$SQL = new SQL( 'Get extra locales of collection #'.$this->ID );
+			$SQL->SELECT( 'cl_locale' );
+			$SQL->FROM( 'T_coll_locales' );
+			$SQL->WHERE( 'cl_coll_ID = '.$this->ID );
+			$SQL->ORDER_BY( 'cl_locale' );
+			$this->locales = $DB->get_col( $SQL->get(), 0, $SQL->title );
+		}
+
+		if( ! is_array( $this->locales ) )
+		{	// Set default empty array:
+			$this->locales = array();
+		}
+
+		return $this->locales;
+	}
+
+
+	/**
+	 * Set locales for this collection
+	 *
+	 * @param array Locales
+	 */
+	function set_locales( $new_locales = array() )
+	{
+		global $locales;
+
+		$enabled_locales = array();
+		foreach( $locales as $locale_key => $locale_data )
+		{
+			if( $locale_data['enabled'] )
+			{	// If locale is enabled:
+				$enabled_locales[] = $locale_key;
+			}
+		}
+
+		foreach( $new_locales as $l => $new_locale )
+		{
+			if( ! in_array( $new_locale, $enabled_locales ) )
+			{	// Unset a disabled locale:
+				unset( $new_locales[ $l ] );
+			}
+		}
+
+		// Remove duplicates and sort locales:
+		$new_locales = array_unique( $new_locales );
+		sort( $new_locales );
+
+		// Set new locales:
+		$this->locales = $new_locales;
+	}
+
+
+	/**
+	 * Update locales of this collection
+	 *
+	 * @return boolean TRUE on success
+	 */
+	function update_locales()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) || ! is_array( $this->locales ) )
+		{	// Collection must be stored in DB and new locales must be defined:
+			return false;
+		}
+
+		// Delete all previous locales before inserting new:
+		$DB->query( 'DELETE FROM T_coll_locales
+			WHERE cl_coll_ID = '.$this->ID );
+
+		if( ! empty( $this->locales ) )
+		{	// If at least one new locale:
+			$sql_coll_locales = array();
+			foreach( $this->locales as $coll_locale )
+			{
+				$sql_coll_locales[] = '( '.$this->ID.', '.$DB->quote( $coll_locale ).' )';
+			}
+
+			// Insert new locales:
+			$DB->query( 'INSERT INTO T_coll_locales ( cl_coll_ID, cl_locale )
+				VALUES '.implode( ', ', $sql_coll_locales ) );
+		}
+
+		return true;
 	}
 }
 
