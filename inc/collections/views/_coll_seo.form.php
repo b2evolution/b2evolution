@@ -294,6 +294,12 @@ jQuery("#tag_prefix").keyup( function() {
 
 
 <?php
+$Form->begin_fieldset( T_('User profile pages').get_manual_link( 'user_pages_seo' ), array( 'id' => 'user_links_fieldset' ) );
+	$Form->checklist( array(
+		array( 'canonical_user_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_user_urls' ) ),
+		), 'canonical_user_urls_options', T_('Make canonical') );
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other_filtered_pages_seo') );
 	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered posts pages'), T_('META NOINDEX').' - '.T_('Filtered by keyword search, by author, etc.') );
 

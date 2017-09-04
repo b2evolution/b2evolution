@@ -1264,6 +1264,15 @@ function skin_init( $disp )
 			// Check if current user has an access to view a profile of the requested user:
 			check_access_user_profile( $user_ID );
 
+			if( $Blog->get_setting( 'canonical_user_urls' ) && $redir == 'yes' )
+			{	// Check if current user profile URL can be canonical:
+				$canonical_url = $Blog->get( 'userurl', array( 'user_ID' => $user_ID, 'glue' => '&' ) );
+				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+				{	// Redirect to canonical user profile URL:
+					header_redirect( $canonical_url, true );
+				}
+			}
+
 			// Initialize users list from session cache in order to display prev/next links:
 			// It is used to navigate between users
 			load_class( 'users/model/_userlist.class.php', 'UserList' );
