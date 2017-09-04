@@ -52,6 +52,7 @@ class CollectionSettings extends AbstractSettings
 
 		// User profile page settings:
 			'user_prefix' => 'user',
+			'user_links' => 'params',
 
 		// Single post settings:
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?

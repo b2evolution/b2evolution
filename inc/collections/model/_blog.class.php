@@ -676,9 +676,13 @@ class Blog extends DataObject
 
 		if( param( 'user_prefix', 'string', NULL ) !== NULL )
 		{	// User profile page prefix:
-			param_check_not_empty( 'user_prefix', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('User profile page prefix') ) );
-			param_check_regexp( 'user_prefix', '#^[a-z0-9\-_]+$#i', T_('User profile page prefix must be letters, digits or signs "-", "_".') );
+			param_check_regexp( 'user_prefix', '#^[a-z0-9\-_]*$#i', T_('User profile page prefix must be letters, digits or signs "-", "_".') );
 			$this->set_setting( 'user_prefix', get_param( 'user_prefix' ) );
+		}
+
+		if( param( 'user_links', 'string', NULL ) !== NULL )
+		{	// User profile URLs:
+			$this->set_setting( 'user_links', get_param( 'user_links' ) );
 		}
 
 		if( param( 'single_links', 'string', NULL ) !== NULL )
@@ -2793,25 +2797,46 @@ class Blog extends DataObject
 			{	// Get home page of this blog because front page displays current disp:
 				$url = $this_Blog->gen_blogurl( 'default' );
 			}
-			elseif( $disp_param == 'user' && ( isset( $params['user_login'] ) || isset( $params['user_ID'] ) ))
+			elseif( $disp_param == 'user' && ( isset( $params['user_login'] ) || isset( $params['user_ID'] ) ) )
 			{	// Use alias if user login or ID is provided:
-				if( isset( $params['user_login'] ) )
-				{	// Use login if it is provided:
-					$user_param = $params['user_login'];
-				}
-				else
-				{	// Try tp get user login by provided user ID:
-					$UserCache = & get_UserCache();
-					if( $User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
-					{	// Use login If user is detected in DB:
-						$user_param = $User->login;
+				$UserCache = & get_UserCache();
+				if( ! isset( $params['user_ID'] ) &&
+				    ( $this_Blog->get_setting( 'user_links' ) == 'params' || $this_Blog->get_setting( 'user_links' ) == 'prefix_id' ) )
+				{	// We need get user ID by login:
+					if( $param_User = & $UserCache->get_by_login( $params['user_login'] ) )
+					{	// Set user ID if it is detected by login:
+						$params['user_ID'] = $param_User->ID;
 					}
 					else
-					{	// Use ID:
-						$user_param = $params['user_ID'];
+					{	// Wrong request:
+						debug_die( 'Undefined param "user_ID" for Blog->get( "userurl" )' );
 					}
 				}
-				$url = url_add_tail( $this_Blog->gen_blogurl(), '/'.$this_Blog->get_setting( 'user_prefix' ).':'.$user_param );
+				if( ! isset( $params['user_login'] ) &&
+				    $this_Blog->get_setting( 'user_links' ) == 'prefix_login' )
+				{	// We need get user login by ID:
+					if( $param_User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
+					{	// Use login if user is detected in DB:
+						$params['user_login'] = $param_User->get( 'login' );
+					}
+					else
+					{	// Wrong request:
+						debug_die( 'Undefined param "user_login" for Blog->get( "userurl" )' );
+					}
+				}
+
+				if( $this_Blog->get_setting( 'user_links' ) == 'params' || $this_Blog->get_setting( 'user_prefix' ) == '' )
+				{	// Use params E-g: ?disp=user&user_ID=4
+					$url = url_add_param( $this_Blog->gen_blogurl(), 'disp=user'.$params['glue'].'user_ID='.$params['user_ID'], $params['glue'] );
+				}
+				elseif( $this_Blog->get_setting( 'user_links' ) == 'prefix_id' )
+				{	// Use prefix with user ID:
+					$url = url_add_tail( $this_Blog->gen_blogurl(), '/'.$this_Blog->get_setting( 'user_prefix' ).':'.$params['user_ID'] );
+				}
+				else // 'prefix_login'
+				{	// Use prefix with user login:
+					$url = url_add_tail( $this_Blog->gen_blogurl(), '/'.$this_Blog->get_setting( 'user_prefix' ).':'.$params['user_login'] );
+				}
 			}
 			else
 			{	// Add disp param to blog's url when current disp is not a front page:

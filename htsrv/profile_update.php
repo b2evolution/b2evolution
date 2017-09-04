@@ -295,7 +295,7 @@ elseif( ! param_errors_detected() )
 		case 'update':
 			if( $current_User->has_avatar() )
 			{ // Redirect to display user page
-				$redirect_to = $Blog->get( 'userurl', array( 'user_login' => $current_User->login ) );
+				$redirect_to = $Blog->get( 'userurl', array( 'user_ID' => $current_User->ID, 'user_login' => $current_User->login ) );
 			}
 			else
 			{ // Redirect to upload avatar

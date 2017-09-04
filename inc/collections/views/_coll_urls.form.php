@@ -527,7 +527,14 @@ $Form->begin_fieldset( T_('User profile page URLs') . get_manual_link('user-prof
 
 	$Form->text_input( 'user_prefix', $edited_Blog->get_setting( 'user_prefix' ), 30, T_('Prefix'),
 		T_('A prefix to be added to the URLs of the user profile pages'),
-		array( 'maxlength' => 120, 'required' => true ) );
+		array( 'maxlength' => 120 ) );
+
+	$Form->radio( 'user_links', $edited_Blog->get_setting( 'user_links' ),
+		array(
+			array( 'params', T_('Use params'), T_('E-g: ').'<code>?disp=user&user_ID=4</code>' ),
+			array( 'prefix_id', T_('Use prefix with user ID'), T_('E-g: ').'<code>prefix:4</code>' ),
+			array( 'prefix_login', T_('Use prefix with user login'), T_('E-g: ').'<code>prefix:login</code>' ),
+		), T_('User profile URLs'), true );
 
 $Form->end_fieldset();
 

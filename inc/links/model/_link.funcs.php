@@ -714,7 +714,7 @@ function get_file_links( $file_ID, $params = array() )
 						{	// Try to use alias user url:
 							foreach( $BlogCache->cache as $user_Blog )
 							{	// Use first found collection:
-								$user_url = $user_Blog->get( 'userurl', array( 'user_login' => $User->login ) );
+								$user_url = $user_Blog->get( 'userurl', array( 'user_ID' => $User->ID, 'user_login' => $User->login ) );
 								break;
 							}
 						}
