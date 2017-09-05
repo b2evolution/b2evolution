@@ -55,7 +55,7 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 		// Set order direction as field suffix
 		$field_params['field_suffix'] = $orderdir_select;
 		// Get orderby options and create the select list
-		$orderby_options = get_post_orderby_options( $edited_Blog->get_setting( 'orderby'.$field_suffix ), $order_index > 0 );
+		$orderby_options = get_post_orderby_options( $edited_Blog->ID, $edited_Blog->get_setting( 'orderby'.$field_suffix ), $order_index > 0 );
 		$Form->select_input_options( 'orderby'.$field_suffix, $orderby_options, ( $order_index == 0 ? T_('Order by') : '' ), '', $field_params );
 	}
 

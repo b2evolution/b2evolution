@@ -1031,7 +1031,7 @@ class ItemQuery extends SQL
 		// Set of sort options which are nullable
 		// $nullable_fields = array( 'order', 'priority' );
 
-		$available_fields = get_available_sort_options( false, true );
+		$available_fields = get_available_sort_options( $this->blog, false, true );
 		// Custom sort options
 		$custom_sort_fields = $available_fields['custom'];
 

@@ -1637,14 +1637,17 @@ function get_blog_order( $Blog = NULL, $return = 'field', $separator = ',' )
 /**
  * Get posts order by options for the order by select list
  *
+ * @param integer|NULL Collection ID to get only enabled item types for the collection, NULL to get all item types
  * @param string the value which should be selected by default
  * @param boolean set tru to allow 'none' option, false otherwise
+ * @return string HTML code of <option>s for <select>
  */
-function get_post_orderby_options( $selected_value, $allow_none = false )
+function get_post_orderby_options( $coll_ID = NULL, $selected_value, $allow_none = false )
 {
-	// Get available sort options
-	$available_sort_options = get_available_sort_options( $allow_none, true );
-	$general_orderby_list = array_shift( $available_sort_options );
+	// Get available sort options:
+	$available_sort_options = get_available_sort_options( $coll_ID, $allow_none, true );
+	// Get general order list options from sub array:
+	$general_orderby_list = $available_sort_options['general'];
 
 	// Build $option_list
 	$option_list = Form::get_select_options_string( $general_orderby_list, $selected_value, false, false );
