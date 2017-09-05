@@ -242,9 +242,10 @@ function init_inskin_editing()
  *                 "*": all blogs
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
+ * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
  * @return Item
  */
-function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
+function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false )
 {
 	global $Collection, $Blog, $cat;
 	global $disp, $disp_detail, $MainList, $FeaturedList;
@@ -328,31 +329,39 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		// SECOND: If no Intro, try to find an Featured post:
 
 		if( isset($Blog) )
+		{
+			if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
+				&& isset($Blog)
+				&& $Blog->get_setting('disp_featured_above_list') )
+			{ // No Intro page was found, try to find a featured post instead:
 
-		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
-			&& isset($Blog)
-			&& $Blog->get_setting('disp_featured_above_list') )
-		{ // No Intro page was found, try to find a featured post instead:
+				$FeaturedList->reset();
 
-			$FeaturedList->reset();
+				$FeaturedList->set_filters( array(
+						'coll_IDs' => $coll_IDs,
+						'featured' => 1,  // Featured posts only
+						// Types will already be reset to defaults here
+					), false /* Do NOT memorize!! */ );
 
-			$FeaturedList->set_filters( array(
-					'coll_IDs' => $coll_IDs,
-					'featured' => 1,  // Featured posts only
-					// Types will already be reset to defaults here
-				), false /* Do NOT memorize!! */ );
-
-			// Run the query:
-			$FeaturedList->query();
+				// Run the query:
+				$FeaturedList->query();
+			}
 		}
 	}
 
 	// Get first Item in the result set.
-	$Item = $FeaturedList->get_item();
+	if( $preview )
+	{ // We only want want a preview of the first item
+		$Item = $FeaturedList->get_by_idx( 0 );
+	}
+	else
+	{
+		$Item = $FeaturedList->get_item();
 
-	if( $Item )
-	{	// Memorize that ID so that it can later be filtered out of normal display:
-		$featured_displayed_item_IDs[] = $Item->ID;
+		if( $Item )
+		{	// Memorize that ID so that it can later be filtered out of normal display:
+			$featured_displayed_item_IDs[] = $Item->ID;
+		}
 	}
 
 	return $Item;
