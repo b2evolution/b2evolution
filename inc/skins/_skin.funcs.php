@@ -2290,8 +2290,8 @@ function skin_twitter_tags()
 					{
 						if( ! isset( $open_tags_enabled ) )
 						{
-							echo '<meta property="twitter:title" content="'.format_to_output( $featured_Item->get( 'title' ), 'htmlattr' )."\" />\n";
-							echo '<meta property="twitter:description" content="'.format_to_output( $featured_Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+							echo '<meta property="twitter:title" content="'.format_to_output( $intro_Item->get( 'title' ), 'htmlattr' )."\" />\n";
+							echo '<meta property="twitter:description" content="'.format_to_output( $intro_Item->get_excerpt2(), 'htmlattr' )."\" />\n";
 						}
 					}
 				}
