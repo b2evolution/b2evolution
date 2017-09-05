@@ -132,7 +132,7 @@ siteskin_include( '_site_body_header.inc.php' );
 						'block_end'   => '</div>',
 					) );
 				// --------------------------------- END OF MESSAGES ---------------------------------
-			}	
+			}
 
 			if( ! empty( $cat ) )
 			{ // Display breadcrumbs if some category is selected
@@ -349,7 +349,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		</p>
 
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 
