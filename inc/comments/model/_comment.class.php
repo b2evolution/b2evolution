@@ -2615,13 +2615,17 @@ class Comment extends DataObject
 					$SQL->SELECT( 'cmpr_cmt_ID, cmpr_format, cmpr_renderers, cmpr_content_prerendered' );
 					$SQL->FROM( 'T_comments__prerendering' );
 					if( empty( $CommentList ) )
-					{  // load prerendered cache for each comment which belongs to this comments Item
+					{	// Load prerendered cache for each comment which belongs to this comments Item:
 						$SQL->FROM_add( 'INNER JOIN T_comments ON cmpr_cmt_ID = comment_ID' );
 						$SQL->WHERE( 'comment_item_ID = '.$this->Item->ID );
 					}
 					else
-					{ // load prerendered cache for each comment from the CommentList
-						$SQL->WHERE( 'cmpr_cmt_ID IN ( '.implode( ',', $CommentList->get_page_ID_array() ).' )' );
+					{	// Load prerendered cache for each comment from the CommentList:
+						$comments_page_ID_array = $CommentList->get_page_ID_array();
+						if( ! empty( $comments_page_ID_array ) )
+						{	// If at least one comment is loaded in current comments list:
+							$SQL->WHERE( 'cmpr_cmt_ID IN ( '.implode( ',', $comments_page_ID_array ).' )' );
+						}
 					}
 					$SQL->WHERE_and( 'cmpr_format = '.$DB->quote( $format ) );
 					$rows = $DB->get_results( $SQL->get(), OBJECT, 'Preload prerendered comments content ('.$format.')' );
