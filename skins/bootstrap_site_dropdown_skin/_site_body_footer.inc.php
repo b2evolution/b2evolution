@@ -20,7 +20,7 @@ if( ! empty( $site_footer_text ) )
 
 <footer class="bootstrap_site_navbar_footer">
 	<div class="container">
-		<p class="text-muted"><?php
+		<p><?php
 			// Display site footer text:
 			$site_footer_vars = array(
 					'$year$'            => date( 'Y' ),

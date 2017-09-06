@@ -30,11 +30,6 @@
   border-radius: 0;
   padding: 0;
 }
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav li .dropdown-menu > .active > a,
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav li .dropdown-menu > .active > a:focus,
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav li .dropdown-menu > .active > a:hover {
-  background-color: #eee;
-}
 .bootstrap_site_navbar_header .navbar .navbar-collapse .nav li .dropdown-menu li a {
   padding: 10px 20px;
   color: #555;
@@ -53,7 +48,7 @@
     margin-right: 15px;
   }
   .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right .login {
-    padding-top: 9px;
+    padding-top: 8px;
     padding-bottom: 9px;
   }
 }
