@@ -217,7 +217,9 @@ class basic_antispam_plugin extends Plugin
 		$comment_Item = & $params['Comment']->get_Item();
 
 		$min_comment_interval = $this->Settings->get( 'min_comment_interval' );
-		if( $params['action'] != 'preview' && ! empty( $min_comment_interval ) )
+		if( $params['action'] != 'preview' &&
+		    ! empty( $min_comment_interval ) &&
+		    ! $params['Comment']->is_meta() )
 		{	// If a comment posting should be blocked by minumum interval:
 			global $Hit, $DB, $localtimenow;
 
