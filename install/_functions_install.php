@@ -612,6 +612,7 @@ function install_basic_skins( $install_mobile_skins = true )
 
 	skin_install( 'bootstrap_site_navbar_skin' );
 	skin_install( 'bootstrap_site_tabs_skin' );
+	skin_install( 'bootstrap_site_dropdown_skin' );
 
 	task_end();
 }
