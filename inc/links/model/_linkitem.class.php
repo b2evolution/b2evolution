@@ -180,6 +180,8 @@ class LinkItem extends LinkOwner
 	 */
 	function add_link( $file_ID, $position = NULL, $order = 1, $update_owner = true )
 	{
+		global $DB, $localtimenow;
+
 		if( is_null( $position ) )
 		{ // Use default link position
 			$position = $this->get_default_position( $file_ID );
@@ -190,11 +192,38 @@ class LinkItem extends LinkOwner
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
+
+		$previous_Revision = $this->Item->get_revision( 'max' );
+
+		if( $previous_Revision && ( ( $localtimenow - strtotime( $previous_Revision->iver_edit_datetime ) ) < 90 ) )
+		{ // add to previous revision
+			$add_to_previous_revision = true;
+		}
+		else
+		{
+			$this->Item->create_revision();
+		}
+
+		/*
+		if( ( $localtimenow - strtotime( $this->Item->contents_last_updated_ts ) ) > 90 )
+		{ // Last revision is more than 90 seconds ago - create new revision
+			$this->Item->create_revision();
+		}
+		*/
+
 		if( $edited_Link->dbinsert() )
 		{
 			if( ! $this->is_temp() )
 			{	// New link was added to the item, invalidate blog's media BlockCache:
 				BlockCache::invalidate_key( 'media_coll_ID', $this->Item->get_blog_ID() );
+			}
+
+			if( isset( $add_to_previous_revision ) && $add_to_previous_revision )
+			{
+				$sql = 'INSERT INTO T_items__version_link( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order ) VALUES '
+					.'('.$previous_Revision->iver_ID.','.$previous_Revision->iver_itm_ID.','
+					.$edited_Link->ID.','.$edited_Link->file_ID.','.$DB->quote( $edited_Link->position ).','.$edited_Link->order.')';
+				$DB->query( $sql, 'Attach link to revision #'.$previous_Revision->iver_ID ) !== false;
 			}
 
 			$FileCache = & get_FileCache();
@@ -218,6 +247,88 @@ class LinkItem extends LinkOwner
 
 		return false;
 	}
+
+
+	/**
+	 * Remove link from the owner
+	 *
+	 * @param object Link
+	 * @return boolean true on success
+	 */
+	function remove_link( & $Link )
+	{
+		global $DB, $localtimenow;
+
+		$this->load_Links();
+
+		$previous_Revision = $this->Item->get_revision( 'max' );
+
+		if( empty( $previous_Revision ) || ( ( $localtimenow - strtotime( $previous_Revision->iver_edit_datetime ) ) > 90 ) )
+		{ // Last revision is more than 90 seconds ago - create new revision
+			$this->Item->create_revision();
+		}
+		else
+		{	// Check if we can remove the link from the previous revision
+			$last_revision_ID = ( int ) $previous_Revision->iver_ID;
+			$revision_IDs = array( $last_revision_ID );
+			if( $last_revision_ID > 1 )
+			{
+				$previous_revision_ID = $last_revision_ID - 1;
+				$revision_IDs[] = $previous_revision_ID;
+			}
+
+			$sql = new SQL();
+			$sql->SELECT( '*' );
+			$sql->FROM( 'T_items__version_link' );
+			$sql->WHERE( 'ivl_iver_ID IN ('.implode( ',', $revision_IDs ).')' );
+			$sql->WHERE_and( 'ivl_iver_itm_ID = '.$previous_Revision->iver_itm_ID );
+			$sql->WHERE_and( 'ivl_link_ID = '.$Link->ID );
+			$revision_links = $DB->get_results( $sql->get() );
+
+			if( ! empty( $revision_links ) )
+			{
+				foreach( $revision_links as $revision_link )
+				{
+					if( ( int ) $revision_link->ivl_iver_ID === $previous_revision_ID )
+					{
+						$has_previous_link_history = true;
+						break;
+					}
+				}
+
+				if( isset( $has_previous_link_history ) )
+				{ // We can remove this link from the previous revision
+					$sql = 'DELETE FROM T_items__version_link WHERE ivl_iver_ID = '.$previous_Revision->iver_ID
+							.' AND ivl_iver_itm_ID = '.$previous_Revision->iver_itm_ID
+							.' AND ivl_link_ID = '.$Link->ID;
+
+					$DB->query( $sql, 'Remove link from revision #'.$previous_Revision->iver_ID );
+				}
+			}
+		}
+
+		$index = array_search( $Link, $this->Links );
+		if( $index !== false )
+		{
+			unset( $this->Links[ $index ] );
+		}
+		$LinkCache = & get_LinkCache();
+		$LinkCache->remove( $Link );
+
+		if( $Link->dbdelete() )
+		{
+			if( ! $this->is_temp() )
+			{	// Update last touched date and content last updated date of the Item:
+				$this->update_last_touched_date();
+				$this->update_contents_last_updated_ts();
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
 
 	/**
 	 * Set Blog

@@ -31,7 +31,7 @@ class Link extends DataObject
 	 */
 	var $LinkOwner;
 	/**
-	 * @access protected 
+	 * @access protected
 	 * @see get_File()
 	 */
 	var $File;
@@ -183,7 +183,7 @@ class Link extends DataObject
 			return 'file';
 		}
 
-		return 'unkown';
+		return 'unknown';
 	}
 
 

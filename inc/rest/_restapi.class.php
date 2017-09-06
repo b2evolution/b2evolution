@@ -1976,7 +1976,7 @@ class RestApi
 
 		// Unlink File from Item/Comment:
 		$deleted_link_ID = $deleted_Link->ID;
-		$deleted_Link->dbdelete();
+		$LinkOwner->remove_link( $deleted_Link );
 
 		$LinkOwner->after_unlink_action( $deleted_link_ID );
 

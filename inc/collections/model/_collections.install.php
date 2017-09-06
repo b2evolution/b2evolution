@@ -274,6 +274,28 @@ $schema_queries = array_merge( $schema_queries, array(
 			INDEX iver_ID_itm_ID ( iver_ID , iver_itm_ID )
 		) ENGINE = innodb ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_items__version_custom_field' => array(
+		'Creating item version custom fields table',
+		"CREATE TABLE T_items__version_custom_field (
+			ivcf_iver_ID INT UNSIGNED NOT NULL,
+			ivcf_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivcf_itcf_ID INT UNSIGNED NULL,
+			ivcf_value   VARCHAR( 10000 ) NULL,
+			PRIMARY KEY ( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__version_link' => array(
+		'Creating item version links table',
+		"CREATE TABLE T_items__version_link (
+			ivl_iver_ID  INT UNSIGNED NOT NULL,
+			ivl_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivl_link_ID  INT(11) UNSIGNED NULL,
+			ivl_file_ID  INT(11) UNSIGNED NULL,
+			ivl_position VARCHAR(10) COLLATE ascii_general_ci NOT NULL,
+			ivl_order     INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY ( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_items__status' => array(
 		'Creating table for Post Statuses',
 		"CREATE TABLE T_items__status (

@@ -113,7 +113,7 @@ switch( $action )
 
 		// Unlink File from Item/Comment:
 		$deleted_link_ID = $edited_Link->ID;
-		$edited_Link->dbdelete();
+		$LinkOwner->remove_link( $edited_Link );
 		unset( $edited_Link );
 
 		$LinkOwner->after_unlink_action( $deleted_link_ID );
