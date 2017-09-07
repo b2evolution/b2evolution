@@ -377,10 +377,7 @@ class Item extends ItemLight
 		else
 		{
 			$this->datecreated = $db_row->post_datecreated;           // When Item was created in the system
-<<<<<<< HEAD
-			$this->last_touched_ts = $db_row->post_last_touched_ts;   // When Item received last visible change (edit, comment, etc.)
-			$this->contents_last_updated_ts = $db_row->post_contents_last_updated_ts;
-=======
+
 
 			// post_last_touched_ts : When Item received last visible change (edit, comment, etc.)
 			// Used for:
@@ -403,7 +400,7 @@ class Item extends ItemLight
 			//   - link, unlink an attachment, update an attached file on child comments that may be seen in front office (note: link order changes are not recorded because it doesn't affect whether users have seen latest content changes)
 			$this->contents_last_updated_ts = $db_row->post_contents_last_updated_ts;
 
->>>>>>> develop
+
 			$this->creator_user_ID = $db_row->post_creator_user_ID;   // Needed for history display
 			$this->lastedit_user_ID = $db_row->post_lastedit_user_ID; // Needed for history display
 			$this->assigned_user_ID = $db_row->post_assigned_user_ID;
@@ -9796,8 +9793,7 @@ class Item extends ItemLight
 	}
 
 
-	
-
+	/*
 	 * Get URL to refresh a contents last updated date of this Item if user has refresh rights
 	 *
 	 * @param array Params
