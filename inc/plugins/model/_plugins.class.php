@@ -745,6 +745,16 @@ class Plugins
 			{
 				$set_Obj->_defaults[$l_name] = array();
 			}
+			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'input_group' && is_array( $l_meta['inputs'] ) )
+			{	// Get default values from input group fields:
+				foreach( $l_meta['inputs'] as $l_meta_input_key => $l_meta_input_data )
+				{
+					if( isset( $l_meta_input_data['defaultvalue'] ) )
+					{
+						$set_Obj->_defaults[ $l_name.$l_meta_input_key ] = $l_meta_input_data['defaultvalue'];
+					}
+				}
+			}
 			else
 			{
 				$set_Obj->_defaults[$l_name] = '';
@@ -1245,6 +1255,11 @@ class Plugins
 			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.htmlspecialchars(var_export( $debug_params, true )).' )', 'plugins' );
 			*/
 			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( )', 'plugins' );
+		}
+
+		if( $method == 'CacheObjects' )
+		{	// Deny plugins with deprecated event:
+			debug_die( 'The plugin event CacheObjects is deprecated' );
 		}
 
 		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );

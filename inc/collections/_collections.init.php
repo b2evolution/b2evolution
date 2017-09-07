@@ -1196,6 +1196,28 @@ class collections_Module extends Module
 
 				header_redirect();
 				break; // already exited here
+
+			case 'refresh_contents_last_updated':
+				// Refresh last touched date of the Item:
+
+				$item_ID = param( 'item_ID', 'integer', true );
+
+				$ItemCache = & get_ItemCache();
+				$refreshed_Item = & $ItemCache->get_by_ID( $item_ID );
+
+				if( ! $refreshed_Item->can_refresh_contents_last_updated() )
+				{	// If current User has no permission to refresh a last touched date of the requested Item:
+					$Messages->add( T_('You have no permission to refresh this item.'), 'error' );
+					header_redirect();
+					// EXIT HERE.
+				}
+
+				// Run refreshing and display a message:
+				$refreshed_Item->refresh_contents_last_updated_ts();
+				$Messages->add( T_('"Contents last updated" timestamp has been refreshed.'), 'success' );
+
+				header_redirect();
+				break; // already exited here
 		}
 	}
 }

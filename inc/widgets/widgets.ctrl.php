@@ -60,7 +60,12 @@ $action = param_action( 'list' );
 param( 'display_mode', 'string', 'normal' );
 $display_mode = ( in_array( $display_mode, array( 'js', 'normal' ) ) ? $display_mode : 'normal' );
 if( $display_mode == 'js' )
-{	// Javascript in debug mode conflicts/fails.
+{	// JavaScript mode:
+
+	// Check that this action request is not a CSRF hacked request:
+	$Session->assert_received_crumb( 'widget' );
+
+	// Javascript in debug mode conflicts/fails.
 	// fp> TODO: either fix the debug javascript or have an easy way to disable JS in the debug output.
 	$debug = 0;
 	$debug_jslog = false;

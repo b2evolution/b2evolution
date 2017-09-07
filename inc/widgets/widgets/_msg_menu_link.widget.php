@@ -13,13 +13,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_Widget' );
 
-global $msg_menu_link_widget_link_types;
-$msg_menu_link_widget_link_types = array(
-		'messages' => T_( 'Messages' ),
-		'contacts' => T_( 'Contacts' ),
-	);
 
 /**
  * ComponentWidget Class
@@ -28,8 +23,10 @@ $msg_menu_link_widget_link_types = array(
  *
  * @package evocore
  */
-class msg_menu_link_Widget extends ComponentWidget
+class msg_menu_link_Widget extends generic_menu_link_Widget
 {
+	var $link_types;
+
 	/**
 	 * Constructor
 	 */
@@ -37,6 +34,11 @@ class msg_menu_link_Widget extends ComponentWidget
 	{
 		// Call parent constructor:
 		parent::__construct( $db_row, 'core', 'msg_menu_link' );
+
+		$this->link_types = array(
+			'messages' => T_('Messages'),
+			'contacts' => T_('Contacts'),
+		);
 	}
 
 
@@ -65,13 +67,11 @@ class msg_menu_link_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		global $msg_menu_link_widget_link_types;
-
 		$this->load_param_array();
 
 		if( !empty($this->param_array['link_type']) )
 		{	// Messaging or Contacts
-			return sprintf( T_( '%s link' ), $msg_menu_link_widget_link_types[$this->param_array['link_type']] );
+			return sprintf( T_( '%s link' ), $this->link_types[ $this->param_array['link_type'] ] );
 		}
 
 		return $this->get_name();
@@ -95,7 +95,7 @@ class msg_menu_link_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $msg_menu_link_widget_link_types, $admin_url;
+		global $admin_url;
 
 		// Try to get collection that is used for messages on this site:
 		$msg_Blog = & get_setting_Blog( 'msg_blog_ID' );
@@ -105,7 +105,7 @@ class msg_menu_link_Widget extends ComponentWidget
 					'label' => T_( 'Link Type' ),
 					'note' => T_('What do you want to link to?'),
 					'type' => 'select',
-					'options' => $msg_menu_link_widget_link_types,
+					'options' => $this->link_types,
 					'defaultvalue' => 'messages',
 					'onchange' => '
 						var curr_link_type = this.value;

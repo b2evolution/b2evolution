@@ -25,7 +25,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'poll_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,pqst_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,pqst_ID' ) );
 
 $Form->begin_form( 'fform', ( $creating ?  T_('New poll') : T_('Poll') ).get_manual_link( 'poll-form' ) );
 

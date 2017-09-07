@@ -3,14 +3,6 @@
  * See also {@link https://github.com/b2evolution/b2evolution}.
  */
 
-jQuery( document ).ready( function()
-{
-	jQuery( '[id^=fadeout-]' ).each( function()
-	{ // Highlight each element that requires this
-		evoFadeBg( this, new Array( '#FFFF33' ), { speed: 3000 } );
-	} );
-} );
-
 
 // Event for styled button to browse files
 jQuery( document ).on( 'change', '.btn-file :file', function()

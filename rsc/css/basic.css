@@ -242,6 +242,9 @@ div#evo_toolbar .actions_right {
   margin-left: 6px;
   float: right;
 }
+.evobar-menu .evobar-entry-new-post span.icon {
+  margin-top: -3px;
+}
 @media (max-width: 800px) {
   .evobar-menu li.rwdhide,
   .evobar-menu li u {
@@ -1161,4 +1164,26 @@ table.widget_grid div:last-child {
 }
 .ufld_icon_links a {
   text-align: center;
+}
+div.evo_highlight,
+li.evo_highlight,
+tr.evo_highlight td {
+  -webkit-animation: evo_highlight 5s ease-out;
+          animation: evo_highlight 5s ease-out;
+}
+@-webkit-keyframes evo_highlight {
+  from {
+    background-color: #FF6600;
+  }
+  to {
+    background-color: auto;
+  }
+}
+@keyframes evo_highlight {
+  from {
+    background-color: #FF6600;
+  }
+  to {
+    background-color: auto;
+  }
 }

@@ -369,7 +369,28 @@ class Item extends ItemLight
 		else
 		{
 			$this->datecreated = $db_row->post_datecreated;           // When Item was created in the system
-			$this->last_touched_ts = $db_row->post_last_touched_ts;   // When Item received last visible change (edit, comment, etc.)
+
+			// post_last_touched_ts : When Item received last visible change (edit, comment, etc.)
+			// Used for:
+			//   - Sorting posts if configured this way in collection features.
+			// Updated when:
+			//   - ANY item field is updated,
+			//   - link, unlink an attachment, update an attached file, change a link order
+			//   - any child COMMENT of the post is added/updated/deleted,
+			//   - link, unlink an attachment, update an attached file, change a link order on any comment
+			$this->last_touched_ts = $db_row->post_last_touched_ts;
+
+			// post_contents_last_updated_ts : When Item received last content change
+			// Used for:
+			//   - Knowing if current user has seen the updates on the post
+			//   - Sorting forums (by default; can be changed in collection features)
+			// Updated only when:
+			//   - at least ONE of the fields: title, content, url is updated --> Especially: don't update on status change, workflow change, because it doesn't affect whether users have seen latest content changes or not
+			//   - link, unlink an attachment, update an attached file (note: link order changes are not recorded because it doesn't affect whether users have seen lastest content changes)
+			//   - a child COMMENT of the post that can be seen in the front-office is added or updated (only Content or Rating fields, or front-office visibility is changed from NOT front-office visibility) (but don't update on deleted comments or invisible comments -- When deleting a comment we actually recompute an OLDER timestamp based on last remaining comment, Also we recompute this when move a front-office visibility latest comment to other post OR when the latest comment becomes invisible for front-office)
+			//   - link, unlink an attachment, update an attached file on child comments that may be seen in front office (note: link order changes are not recorded because it doesn't affect whether users have seen latest content changes)
+			$this->contents_last_updated_ts = $db_row->post_contents_last_updated_ts;
+
 			$this->creator_user_ID = $db_row->post_creator_user_ID;   // Needed for history display
 			$this->lastedit_user_ID = $db_row->post_lastedit_user_ID; // Needed for history display
 			$this->assigned_user_ID = $db_row->post_assigned_user_ID;
@@ -659,8 +680,16 @@ class Item extends ItemLight
 			$this->set( 'ityp_ID', $item_typ_ID );
 		}
 
+		// Check if this Item type usage is not content block in order to hide several fields below:
+		$is_not_content_block = ( $this->get_type_setting( 'usage' ) != 'content-block' );
+
 		// URL associated with Item:
-		$post_url = param( 'post_url', 'url', NULL );
+		$post_url = param( 'post_url', 'string', NULL );
+		$url_error = validate_url( $post_url, 'http-https' );
+		if( $url_error !== false )
+		{
+			param_error( 'post_url', $url_error );
+		}
 		if( $post_url !== NULL )
 		{
 			param_check_url( 'post_url', 'posting', '' );
@@ -734,37 +763,45 @@ class Item extends ItemLight
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL )
 		{
 			$this->set_from_Request( 'urltitle' );
+			// Added in May 2017; but old slugs are not converted yet.
+			if( preg_match( '#(^|,+)[^a-z\d_]*\d+[^a-z\d_]*($|,+)#i', get_param( 'post_urltitle' ) ) )
+			{	// Display error if item slugs contain only digits:
+				param_error( 'post_urltitle', T_('All slugs must contain at least one letter.') );
+			}
 		}
 
-		// <title> TAG:
-		$titletag = param( 'titletag', 'string', NULL );
-		if( $titletag !== NULL )
-		{
-			$this->set_from_Request( 'titletag', 'titletag' );
-		}
-		if( empty( $titletag ) && $this->get_type_setting( 'use_title_tag' ) == 'required' )
-		{ // Title tag must be entered
-			param_check_not_empty( 'titletag', T_('Please provide a title tag.'), '' );
-		}
+		if( $is_not_content_block )
+		{	// Save title tag, meta description and meta keywords for item with type usage except of content block:
+			// <title> TAG:
+			$titletag = param( 'titletag', 'string', NULL );
+			if( $titletag !== NULL )
+			{
+				$this->set_from_Request( 'titletag', 'titletag' );
+			}
+			if( empty( $titletag ) && $this->get_type_setting( 'use_title_tag' ) == 'required' )
+			{ // Title tag must be entered
+				param_check_not_empty( 'titletag', T_('Please provide a title tag.'), '' );
+			}
 
-		// <meta> DESC:
-		$metadesc = param( 'metadesc', 'string', NULL );
-		if( $metadesc !== NULL ) {
-			$this->set_setting( 'metadesc', get_param( 'metadesc' ) );
-		}
-		if( empty( $metadesc ) && $this->get_type_setting( 'use_meta_desc' ) == 'required' )
-		{ // Meta description must be entered
-			param_check_not_empty( 'metadesc', T_('Please provide a meta description.'), '' );
-		}
+			// <meta> DESC:
+			$metadesc = param( 'metadesc', 'string', NULL );
+			if( $metadesc !== NULL ) {
+				$this->set_setting( 'metadesc', get_param( 'metadesc' ) );
+			}
+			if( empty( $metadesc ) && $this->get_type_setting( 'use_meta_desc' ) == 'required' )
+			{ // Meta description must be entered
+				param_check_not_empty( 'metadesc', T_('Please provide a meta description.'), '' );
+			}
 
-		// <meta> KEYWORDS:
-		$metakeywords = param( 'metakeywords', 'string', NULL );
-		if( $metakeywords !== NULL ) {
-			$this->set_setting( 'metakeywords', get_param( 'metakeywords' ) );
-		}
-		if( empty( $metakeywords ) && $this->get_type_setting( 'use_meta_keywds' ) == 'required' )
-		{ // Meta keywords must be entered
-			param_check_not_empty( 'metakeywords', T_('Please provide the meta keywords.'), '' );
+			// <meta> KEYWORDS:
+			$metakeywords = param( 'metakeywords', 'string', NULL );
+			if( $metakeywords !== NULL ) {
+				$this->set_setting( 'metakeywords', get_param( 'metakeywords' ) );
+			}
+			if( empty( $metakeywords ) && $this->get_type_setting( 'use_meta_keywds' ) == 'required' )
+			{ // Meta keywords must be entered
+				param_check_not_empty( 'metakeywords', T_('Please provide the meta keywords.'), '' );
+			}
 		}
 
 		// TAGS:
@@ -787,7 +824,7 @@ class Item extends ItemLight
 
 		// WORKFLOW stuff:
 		$item_Blog = $this->get_Blog();
-		if( $item_Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
+		if( $is_not_content_block && $item_Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
 		{	// Update workflow properties only when it is enabled by collection setting and allowed for current user:
 			$ItemTypeCache = & get_ItemTypeCache();
 			$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
@@ -813,20 +850,28 @@ class Item extends ItemLight
 			}
 
 			// DEADLINE:
-			if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
-				$this->set_from_Request( 'datedeadline', 'item_deadline', true );
+			if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL )
+			{
+				param_time( 'item_deadline_time', '', false, false, true, true );
+				$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
+				$this->set( 'datedeadline', trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) ), true );
 			}
 		}
 
 		// FEATURED checkbox:
 		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
 
-		// HIDE TEASER checkbox:
-		$this->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
-		$goal_ID = param( 'goal_ID', 'integer', NULL );
-		if( $goal_ID !== NULL )
-		{ // Goal ID
-			$this->set_setting( 'goal_ID', $goal_ID, true );
+		if( $is_not_content_block )
+		{	// Save "hide teaser" and goal for item with type usage except of content block:
+			// HIDE TEASER checkbox:
+			$this->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
+
+			// Goal ID:
+			$goal_ID = param( 'goal_ID', 'integer', NULL );
+			if( $goal_ID !== NULL )
+			{	// Save only if it is provided:
+				$this->set_setting( 'goal_ID', $goal_ID, true );
+			}
 		}
 
 		// ORDER:
@@ -866,23 +911,43 @@ class Item extends ItemLight
 		foreach( $custom_fields as $custom_field )
 		{ // update each custom field
 			$param_name = 'item_'.$custom_field['type'].'_'.$custom_field['ID'];
+			$param_error = false;
 			if( isset_param( $param_name ) )
 			{ // param is set
 				switch( $custom_field['type'] )
 				{
 					case 'double':
 						$param_type = 'double';
+						$field_value = param( $param_name, 'string', NULL );
+						if( ! empty( $field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
+						{
+							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
+							$param_error = true;
+						}
 						break;
 					case 'html':
 					case 'text': // Keep html tags for text fields, they will be escaped at display
 						$param_type = 'html';
+						break;
+					case 'url':
+						$param_type = 'url';
+						$field_value = param( $param_name, 'string', NULL );
+						$url_error = validate_url( $field_value, 'http-https' );
+						if( $url_error !== false )
+						{
+							param_error( $param_name, $url_error );
+							$param_error = true;
+						}
 						break;
 					case 'varchar':
 					default:
 						$param_type = 'string';
 						break;
 				}
-				param( $param_name, $param_type, NULL ); // get par value
+				if( ! $param_error )
+				{
+					param( $param_name, $param_type, NULL ); // get par value
+				}
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], get_param( $param_name ), $custom_field_make_null );
 			}
@@ -994,22 +1059,25 @@ class Item extends ItemLight
 			param_check_not_empty( 'content', T_('Please enter some text.'), '' );
 		}
 
-		// EXCERPT: (must come after content (in order to handle excerpt_autogenerated))
-		$post_excerpt = param( 'post_excerpt', 'text', NULL );
-		if( $post_excerpt !== NULL )
-		{	// The form has sent an excerpt field:
-			$post_excerpt_autogenerated = param( 'post_excerpt_autogenerated', 'integer', 0 );
-			$this->set_from_Request( 'excerpt_autogenerated' );
-			if( ! $this->get( 'excerpt_autogenerated' ) )
-			{	// The post excerpt must be no longer auto-generated:
-				// NOTE: if the new excerpt is empty, set() will switch back to autogeneration:
-				$this->set_from_Request( 'excerpt' );
+		if( $is_not_content_block )
+		{	// Save excerpt for item with type usage except of content block:
+			// EXCERPT: (must come after content (in order to handle excerpt_autogenerated))
+			$post_excerpt = param( 'post_excerpt', 'text', NULL );
+			if( $post_excerpt !== NULL )
+			{	// The form has sent an excerpt field:
+				$post_excerpt_autogenerated = param( 'post_excerpt_autogenerated', 'integer', 0 );
+				$this->set_from_Request( 'excerpt_autogenerated' );
+				if( ! $this->get( 'excerpt_autogenerated' ) )
+				{	// The post excerpt must be no longer auto-generated:
+					// NOTE: if the new excerpt is empty, set() will switch back to autogeneration:
+					$this->set_from_Request( 'excerpt' );
+				}
 			}
-		}
 
-		if( empty( $post_excerpt ) && $this->get_type_setting( 'use_excerpt' ) == 'required' )
-		{ // Content must be entered (this should happen even if no excerpt field was submitted)
-			param_check_not_empty( 'post_excerpt', T_('Please provide an excerpt.'), '' );
+			if( empty( $post_excerpt ) && $this->get_type_setting( 'use_excerpt' ) == 'required' )
+			{ // Content must be entered (this should happen even if no excerpt field was submitted)
+				param_check_not_empty( 'post_excerpt', T_('Please provide an excerpt.'), '' );
+			}
 		}
 
 		// LOCATION (COUNTRY -> CITY):
@@ -2084,17 +2152,11 @@ class Item extends ItemLight
 		$content_parts = $this->get_content_parts( $params );
 		$output = array_shift( $content_parts );
 
-		// Set this flag to check inline tags outside of codeblocks:
-		$params['check_code_block'] = true;
+		// Render all inline tags to HTML code:
+		$output = $this->render_inline_tags( $output, $params );
 
-		// Render inline file tags like [image:123:caption] or [file:123:caption] :
-		$output = render_inline_files( $output, $this, $params );
-
-		// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
-		$output = $this->render_custom_fields( $output, $params );
-
-		// Render Parent Data [parent], [parent:fields] and etc.:
-		$output = $this->render_parent_data( $output, $params );
+		// Render Content block tags like [include:123], [include:item-slug] into item/post content:
+		$output = $this->render_content_blocks( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2213,13 +2275,15 @@ class Item extends ItemLight
 
 		$content_parts = $this->get_content_parts( $params );
 
-		// Output everything after [teaserbreak]
-		array_shift($content_parts);
-		$output = implode('', $content_parts);
+		// Output everything after [teaserbreak]:
+		array_shift( $content_parts );
+		$output = implode( '', $content_parts );
 
-		// Render inline file tags like [image:123:caption] or [file:123:caption] :
-		$params['check_code_block'] = true;
-		$output = render_inline_files( $output, $this, $params );
+		// Render all inline tags to HTML code:
+		$output = $this->render_inline_tags( $output, $params );
+
+		// Render Content block tags like [include:123], [include:item-slug] into item/post content:
+		$output = $this->render_content_blocks( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2277,13 +2341,19 @@ class Item extends ItemLight
 	/**
 	 * Get item custom field value by index
 	 *
-	 * @param String field index which by default is the field name, see {@link load_custom_field_value()}
+	 * @param string Field index which by default is the field name, see {@link load_custom_field_value()}
+	 * @param string Restring field by type, FALSE - to don't restrict
 	 * @return mixed false if the field doesn't exist Double/String otherwise depending from the custom field type
 	 */
-	function get_custom_field_value( $field_index )
+	function get_custom_field_value( $field_index, $restrict_type = false )
 	{
 		if( $this->load_custom_field_value( $field_index ) )
 		{
+			if( $restrict_type !== false && $this->custom_fields[ $field_index ]['type'] != $restrict_type )
+			{	// The requested field is detected but it has another type:
+				return false;
+			}
+
 			$custom_field_value = utf8_trim( $this->custom_fields[ $field_index ]['value'] );
 			if( $this->custom_fields[ $field_index ]['type'] == 'text' )
 			{	// Escape html tags and convert new lines to html <br> for text fields:
@@ -2441,6 +2511,53 @@ class Item extends ItemLight
 
 
 	/**
+	 * Convert all inline tags to HTML code
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_inline_tags( $content, $params = array() )
+	{
+		$params = array_merge( array(
+				'check_code_block'     => true, // TRUE to find inline tags only outside of codeblocks
+				'render_inline_files'  => true,
+				'render_links'         => true,
+				'render_custom_fields' => true,
+				'render_parent'        => true,
+				'render_collection'    => true,
+			), $params );
+
+		if( $params['render_inline_files'] )
+		{	// Render inline file tags like [image:123:caption] or [file:123:caption]:
+			$content = render_inline_files( $content, $this, $params );
+		}
+
+		if( $params['render_links'] )
+		{	// Render Collection Data [link:url_field], [link:url_field]title[/link] and etc.:
+			$content = $this->render_link_data( $content, $params );
+		}
+
+		if( $params['render_custom_fields'] )
+		{	// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
+			$content = $this->render_custom_fields( $content, $params );
+		}
+
+		if( $params['render_parent'] )
+		{	// Render Parent Data [parent], [parent:fields] and etc.:
+			$content = $this->render_parent_data( $content, $params );
+		}
+
+		if( $params['render_collection'] )
+		{	// Render Collection Data [coll:name], [coll:shortname]:
+			$content = $this->render_collection_data( $content, $params );
+		}
+
+		return $content;
+	}
+
+
+	/**
 	 * Convert inline custom field tags like [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field] into HTML tags
 	 *
 	 * @param string Source content
@@ -2514,7 +2631,7 @@ class Item extends ItemLight
 	function render_parent_data( $content, $params = array() )
 	{
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
-		{	// Call $this->render_custom_fields() on everything outside code/pre:
+		{	// Call $this->render_parent_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
@@ -2576,6 +2693,225 @@ class Item extends ItemLight
 						break;
 				}
 			}
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Convert inline collection tags into HTML tags like:
+	 *    [coll:name]
+	 *    [coll:shortname]
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_collection_data( $content, $params = array() )
+	{
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_collection_data() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_collection_data' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of collection data:
+		preg_match_all( '/\[coll:([a-z]+)\]/i', $content, $tags );
+
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one collection tag is found in content:
+			$item_Blog = & $this->get_Blog();
+
+			foreach( $tags[0] as $t => $source_tag )
+			{
+				switch( $tags[1][ $t ] )
+				{
+					case 'name':
+						// Render collection name:
+						$content = str_replace( $source_tag, $item_Blog->get( 'name' ), $content );
+						break;
+
+					case 'shortname':
+						// Render collection short name:
+						$content = str_replace( $source_tag, $item_Blog->get( 'shortname' ), $content );
+						break;
+				}
+			}
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Convert inline link tags into HTML tags like:
+	 *    [link:url_field]
+	 *    [link:url_field]title[/link]
+	 *    [link:url_field:.class1.class2]title[/link]
+	 * url_field is code of custom item field with type "URL"
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_link_data( $content, $params = array() )
+	{
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_link_data() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_link_data' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of link data:
+		preg_match_all( '/\[(parent:)?link:([^\]]+)\]((.*?)\[\/link\])?/i', $content, $tags );
+
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one link tag is found in content:
+			foreach( $tags[0] as $t => $source_tag )
+			{	// Render URL custom field as html:
+				$field_Item = $this;
+				if( $tags[1][ $t ] == 'parent:' && ! ( $field_Item = & $this->get_parent_Item() ) )
+				{	// If parent doesn't exist:
+					$content = substr_replace( $content, '<span class="text-danger">'.T_('This item has no parent.').'</span>', strpos( $content, $source_tag ), strlen( $source_tag ) );
+					continue;
+				}
+
+				$link_data = explode( ':', $tags[2][ $t ] );
+
+				// Get field code:
+				$url_field_code = trim( $link_data[0] );
+
+				$field_value = $field_Item->get_custom_field_value( $url_field_code, 'url' );
+				if( $field_value === false )
+				{	// Wrong field request, display error:
+					$link_html = '<span class="text-danger">'.sprintf( T_('The URL field "%s" does not exist'), $url_field_code ).'</span>';
+				}
+				else
+				{	// Display URL field as html link:
+					$link_class = empty( $link_data[1] ) ? '' : ' class="'.trim( str_replace( '.', ' ', $link_data[1] ) ).'"';
+					$link_text = empty( $tags[4][ $t ] ) ? $field_value : $tags[4][ $t ];
+					$link_html = '<a href="'.$field_value.'"'.$link_class.'>'.$link_text.'</a>';
+				}
+				$content = substr_replace( $content, $link_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
+			}
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Convert inline content block tags like [include:123], [include:item-slug] into item/post content
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_content_blocks( $content, $params = array() )
+	{
+		global $content_block_items;
+
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_content_blocks() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_content_blocks' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of content block posts:
+		preg_match_all( '/\[include:?([^\]]*)?\]/i', $content, $tags );
+
+		$ItemCache = & get_ItemCache();
+
+		foreach( $tags[0] as $t => $source_tag )
+		{
+			$item_ID_slug = trim( $tags[1][ $t ] );
+
+			if( ! ( $content_Item = & $ItemCache->get_by_ID( $item_ID_slug, false, false ) ) )
+			{	// Try to get item by slug if it is not found by ID:
+				$content_Item = & $ItemCache->get_by_urltitle( $item_ID_slug, false, false );
+			}
+
+			if( ! $content_Item || $content_Item->get_type_setting( 'usage' ) != 'content-block' )
+			{	// Item is not found by ID and slug or it is not a content block:
+				if( $content_Item )
+				{	// It is not a content block:
+					$wrong_item_info = '#'.$content_Item->ID.' '.$content_Item->get( 'title' );
+				}
+				else
+				{	// Item is not found:
+					$wrong_item_info = '<code>'.$item_ID_slug.'</code>';
+				}
+				// Replace inline content block tag with error message about wrong referenced item:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
+				continue;
+			}
+
+			if( ! isset( $content_block_items ) )
+			{	// Initialize global array to avoid recursion:
+				$content_block_items = array();
+			}
+
+			if( in_array( $content_Item->ID, $content_block_items ) )
+			{	// Replace inline content block tag with error message about recursion:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ).'</p>', $content );
+				continue;
+			}
+
+			// Store current item in global array to avoid recursion:
+			array_unshift( $content_block_items, $content_Item->ID );
+
+			// Start to collect item content in buffer:
+			ob_start();
+
+			if( ! empty( $params['image_size'] ) )
+			{	// Display images that are linked to this post:
+				$teaser_image_positions = 'teaser,teaserperm,teaserlink';
+				if( ! empty( $params['include_cover_images'] ) )
+				{	// Include the cover images on teaser place:
+					$teaser_image_positions = 'cover,'.$teaser_image_positions;
+				}
+				$content_Item->images( array_merge( $params, array(
+						'restrict_to_image_position' => $teaser_image_positions,
+					) ) );
+			}
+
+			// Display CONTENT (at least the TEASER part):
+			$content_Item->content_teaser( $params );
+
+			if( ! empty( $params['image_size'] ) && $content_Item->has_content_parts( $params ) /* only if not displayed all images already */ )
+			{	// Display images that are linked "after more" to this post:
+				$content_Item->images( array_merge( $params, array(
+						'restrict_to_image_position' => 'aftermore',
+					) ) );
+			}
+
+			// Display the "after more" part of the text: (part after "[teaserbreak]")
+			$content_Item->content_extension( $params );
+
+			// Links to post pages (for multipage posts):
+			$content_Item->page_links( $params );
+
+			// Display Item footer text (text can be edited in Blog Settings):
+			$content_Item->footer( $params );
+
+			// Get item content from buffer:
+			$current_tag_item_content = ob_get_clean();
+
+			// Replace inline content block tag with item content:
+			$content = str_replace( $source_tag, $current_tag_item_content, $content );
+
+			// Remove 
+			array_shift( $content_block_items );
 		}
 
 		return $content;
@@ -2690,13 +3026,26 @@ class Item extends ItemLight
 				'format'   => 'htmlbody',
 			), $params );
 
-		$content_page = $this->get_content_page( $params['disppage'], $params['format'] );
+		if( ! isset( $this->cache_has_content_parts ) )
+		{	// Initialize an array for cache results:
+			$this->cache_has_content_parts = array();
+		}
 
-		// Replace <code> and <pre> blocks from content because we're not interested in [teaserbreak] in there
-		$content_page = preg_replace( '~<(code|pre)[^>]*>.*?</\1>~is', '*', $content_page );
+		if( ! isset( $this->cache_has_content_parts[ $params['disppage'].$params['format'] ] ) )
+		{	// Initialize result only first time and store in cache in order to don't execute a heavy operation twice:
+			$content_page = $this->get_content_page( $params['disppage'], $params['format'] );
 
-		return strpos( $content_page, '[teaserbreak]' ) !== false
-			|| $this->get_images( array( 'restrict_to_image_position' => 'aftermore' ) );
+			// Replace <code> and <pre> blocks from content because we're not interested in [teaserbreak] in there
+			$content_page = preg_replace( '~<(code|pre)[^>]*>.*?</\1>~is', '*', $content_page );
+
+			// Store result in cache for requested page and format:
+			$this->cache_has_content_parts[ $params['disppage'].$params['format'] ] =
+				   strpos( $content_page, '[teaserbreak]' ) !== false
+				|| $this->get_images( array( 'restrict_to_image_position' => 'aftermore' ) );
+		}
+
+		// Get a result from cache or from recently initialized var above:
+		return $this->cache_has_content_parts[ $params['disppage'].$params['format'] ];
 	}
 
 
@@ -2724,7 +3073,7 @@ class Item extends ItemLight
 	function deadline_time( $format = '', $useGM = false )
 	{
 		if( empty($format) )
-			echo mysql2date( locale_timefmt(), $this->datedeadline, $useGM );
+			echo mysql2date( locale_shorttimefmt(), $this->datedeadline, $useGM );
 		else
 			echo mysql2date( $format, $this->datedeadline, $useGM );
 	}
@@ -2919,7 +3268,7 @@ class Item extends ItemLight
 		}
 		else
 		{	// Deprecated since v5, left for compatibility with old skins
-			$params['before']		= isset($args[0]) ? $args[0] : '<p class="evo_post_pagination">'.T_('Pages:').' ';
+			$params['before']		= isset($args[0]) ? $args[0] : '<p class="evo_post_pagination">'.T_('Pages').': ';
 			$params['after']		= isset($args[1]) ? $args[1] : '</p>';
 			$params['separator']	= isset($args[2]) ? $args[2] : ' ';
 			$params['single']		= isset($args[3]) ? $args[3] : '';
@@ -2949,7 +3298,7 @@ class Item extends ItemLight
 	function get_page_links( $params = array(), $format = 'htmlbody' )
 	{
 		$params = array_merge( array(
-					'before'       => '<p class="evo_post_pagination">'.T_('Pages:').' ',
+					'before'       => '<p class="evo_post_pagination">'.T_('Pages').': ',
 					'after'        => '</p>',
 					'separator'    => ' ',
 					'single'       => '',
@@ -4127,7 +4476,7 @@ class Item extends ItemLight
 			if( $edit_comments_link == '#' )
 			{	// Use default link:
 				global $admin_url;
-				$edit_comments_link = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID.'#comments" title="'.T_('Moderate these feedbacks').'">'.get_icon( 'edit' ).' '.T_('Moderate...').'</a>';
+				$edit_comments_link = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID.'#comments" title="'.T_('Moderate these feedbacks').'">'.get_icon( 'edit' ).' '.T_('Moderate').'...</a>';
 			}
 		}
 		else
@@ -4518,6 +4867,80 @@ class Item extends ItemLight
 	function edit_link( $params = array() )
 	{
 		echo $this->get_edit_link( $params );
+
+		echo_item_merge_js();
+	}
+
+
+	/**
+	 * Provide link to merge a post if user has edit rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 */
+	function get_merge_link( $params = array() )
+	{
+		global $admin_url, $current_User;
+
+		if( ! is_logged_in( false ) )
+		{	// Current User must be logged in and activated:
+			return false;
+		}
+
+		if( ! $this->ID )
+		{	// Item must be stored in DB:
+			return false;
+		}
+
+		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// User has no right to edit this Item:
+			return false;
+		}
+
+		$params = array_merge( array(
+				'before' => ' ',
+				'after'  => ' ',
+				'text'   => '#',
+				'title'  => '#',
+				'class'  => '',
+			), $params );
+
+		if( $params['text'] == '#' )
+		{
+			$params['text'] = get_icon( 'merge' ).' '.T_('Merge with...');
+		}
+		elseif( $params['text'] == '#icon#' )
+		{
+			$params['text'] = get_icon( 'merge' );
+		}
+		if( $params['title'] == '#' )
+		{
+			$params['title'] = T_('Merge with...');
+		}
+
+		$r = $params['before'];
+		$r .= '<a href="#" onclick="return evo_merge_load_window( '.$this->ID.' )"'
+					.' title="'.$params['title'].'"'
+					.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' ).'>'
+				.$params['text']
+			.'</a>';
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Template tag
+	 * @see Item::get_merge_link()
+	 */
+	function merge_link( $params = array() )
+	{
+		echo $this->get_merge_link( $params );
 	}
 
 
@@ -4825,7 +5248,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( $text == '#' ) $text = get_icon( 'deprecate', 'imgtag' ).' '.T_('Deprecate!');
+		if( $text == '#' ) $text = get_icon( 'deprecate', 'imgtag' ).' '.T_('Deprecate').'!';
 		if( $title == '#' ) $title = T_('Deprecate this post!');
 
 		if( !empty( $redirect_to ) )
@@ -5263,6 +5686,7 @@ class Item extends ItemLight
 				'podcast'       => '#',						// handle as podcast. # means depending on post type
 				'before_podplayer' => '<div class="podplayer">',
 				'after_podplayer'  => '</div>',
+				'link_class'     => ''
 			), $params );
 
 		if( $params['podcast'] == '#' )
@@ -5292,6 +5716,11 @@ class Item extends ItemLight
 			$r = $params['before'];
 
 			$r .= '<a href="'.str_replace( '$url$', $this->url, $params['url_template'] ).'"';
+
+			if( !empty( $params['link_class'] ) )
+			{
+				$r .= ' class="'.$params['link_class'].'"';
+			}
 
 			if( !empty( $params['target'] ) )
 			{
@@ -5586,6 +6015,19 @@ class Item extends ItemLight
 			}
 		}
 
+		if( $post_comment_status == 'closed' || $post_comment_status == 'disabled' )
+		{	// Check if item type allows these options:
+			$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
+			if( $post_comment_status == 'closed' && ! $ItemType->get( 'allow_closing_comments' ) )
+			{
+				debug_die( 'Item type "'.$ItemType->get_name().'" doesn\'t support closing comments, please set another comment status for item "'.$post_title.'"' );
+			}
+			elseif( $post_comment_status == 'disabled' && ! $ItemType->get( 'allow_disabling_comments' ) )
+			{
+				debug_die( 'Item type "'.$ItemType->get_name().'" doesn\'t support disabling comments, please set another comment status for item "'.$post_title.'"' );
+			}
+		}
+
 		if( empty( $item_typ_ID ) )
 		{	// Use first item type by default for wrong request:
 			$item_typ_ID = 1;
@@ -5875,8 +6317,19 @@ class Item extends ItemLight
 			$this->set( 'dateset', 1 );
 		}
 
+		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
+
 		// Check whether any db change has been executed
 		$db_changed = false;
+
+		if( ! empty( $dbchanges['post_ityp_ID'] ) )
+		{	// If item type has been changed to another,
+			// Clear all custom fields values of previous item type:
+			// NOTE: Call this before item settings updating in order to don't remove values of new selected item type:
+			$DB->query( 'DELETE FROM T_items__item_settings
+				WHERE iset_item_ID = '.$this->ID.'
+					AND iset_name LIKE "custom\_%"' );
+		}
 
 		// save Item settings
 		if( isset( $this->ItemSettings ) )
@@ -5903,8 +6356,6 @@ class Item extends ItemLight
 
 		// TODO: dh> allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemUpdateTransact', $params = array( 'Item' => & $this ) );
-
-		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 
 		$result = true;
 		// fp> note that dbchanges isn't actually 100% accurate. At this time it does include variables that actually haven't changed.
@@ -6214,6 +6665,11 @@ class Item extends ItemLight
 		// Autogenerated excerpts should NEVER show anything after [teaserbreak] or after [pagebreak]
 		$content_parts = $this->get_content_parts( array( 'disppage' => 1 ) );
 		$first_content_part = array_shift( $content_parts );
+
+		// Render inline tags to HTML code, except of inline file tags because they are removed below:
+		$first_content_part = $this->render_inline_tags( $first_content_part, array(
+				'render_inline_files' => false
+			) );
 
 		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
 		$first_content_part = preg_replace( '/\[[a-z]+\]:[^\]]*\]/i', '', $first_content_part );
@@ -6583,6 +7039,7 @@ class Item extends ItemLight
 		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_moderation_setting_name.'"' );
 		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 		$SQL->WHERE( $notify_condition );
+		$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 		$SQL->WHERE_and( '( bloguser_perm_edit IS NOT NULL AND bloguser_perm_edit <> "no" AND bloguser_perm_edit <> "own" )
 				OR ( bloggroup_perm_edit IS NOT NULL AND bloggroup_perm_edit <> "no" AND bloggroup_perm_edit <> "own" )
 				OR ( grp_perm_blogs = "editall" ) OR ( user_ID = blog_owner_user_ID )' );
@@ -6811,8 +7268,10 @@ class Item extends ItemLight
 				FROM (
 					SELECT DISTINCT sub_user_ID AS user_ID
 					FROM T_subscriptions
+					INNER JOIN T_users ON user_ID = sub_user_ID
 					WHERE sub_coll_ID = '.$this->get_blog_ID().'
 					AND sub_items <> 0
+					AND user_status IN ( "activated", "autoactivated" )
 
 					UNION
 
@@ -6828,6 +7287,7 @@ class Item extends ItemLight
 						AND opt.cset_value = 1
 						AND NOT user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+						AND user_status IN ( "activated", "autoactivated" )
 
 					UNION
 
@@ -6838,11 +7298,13 @@ class Item extends ItemLight
 					LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 					LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
 					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
+					LEFT JOIN T_users ON ( user_ID = sub_user_ID )
 					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
 						AND opt.cset_name = "opt_out_subscription"
 						AND opt.cset_value = 1
 						AND NOT sug_user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+						AND user_status IN ( "activated", "autoactivated" )
 
 					UNION
 
@@ -6852,11 +7314,13 @@ class Item extends ItemLight
 					INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
 					LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
 					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+					LEFT JOIN T_users ON ( user_ID = sub_user_ID )
 					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
 						AND opt.cset_name = "opt_out_subscription"
 						AND opt.cset_value = 1
 						AND NOT bloguser_user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+						AND user_status IN ( "activated", "autoactivated" )
 				) AS users
 				WHERE NOT user_ID IS NULL';
 
@@ -7529,9 +7993,10 @@ class Item extends ItemLight
 	/**
 	 * Get the latest Comment on this Item
 	 *
+	 * @param array|NULL Restrict comments selection with statuses, NULL - to select only allowed statuses for current User
 	 * @return Comment
 	 */
-	function & get_latest_Comment()
+	function & get_latest_Comment( $statuses = NULL )
 	{
 		global $DB;
 
@@ -7548,14 +8013,22 @@ class Item extends ItemLight
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$DB->quote( $this->ID ) );
 			$SQL->WHERE_and( 'comment_type != "meta"' );
-			$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), 'comment_', $this->get_blog_ID(), 'blog_comment!', true ) );
+			if( $statuses === NULL )
+			{	// Restrict with comment statuses which are allowed for current User:
+				$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), 'comment_', $this->get_blog_ID(), 'blog_comment!', true ) );
+			}
+			elseif( is_array( $statuses ) && count( $statuses ) )
+			{	// Restrict with given comment statuses:
+				$SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $statuses ).' )' );
+			}
 			$SQL->ORDER_BY( 'comment_date DESC' );
 			$SQL->LIMIT( '1' );
 
 			if( $comment_ID = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
 			{	// Load the latest Comment in cache:
 				$CommentCache = & get_CommentCache();
-				$this->latest_Comment = & $CommentCache->get_by_ID( $comment_ID );
+				// WARNING: Do NOT get this object by reference because it may rewrites current updating Comment:
+				$this->latest_Comment = $CommentCache->get_by_ID( $comment_ID );
 			}
 			else
 			{	// Set FALSE to don't call SQL query twice when the item has no comments yet:
@@ -8051,7 +8524,7 @@ class Item extends ItemLight
 			return;
 		}
 
-		global $DB, $current_User, $localtimenow, $cache_items_user_data;
+		global $DB, $current_User, $localtimenow;
 
 		$timestamp = date2mysql( $localtimenow );
 
@@ -8206,13 +8679,13 @@ class Item extends ItemLight
 			$cache_items_user_data[ $this->ID ] = NULL;
 		}
 
-		if( is_null( $field ) || ! isset( $cache_items_user_data[ $this->ID ][ $field ] ) )
+		if( $field === NULL )
 		{	// Return all fields as array:
 			return $cache_items_user_data[ $this->ID ];
 		}
 		else
 		{	// Return a value of single field:
-			return $cache_items_user_data[ $this->ID ][ $field ];
+			return isset( $cache_items_user_data[ $this->ID ][ $field ] ) ? $cache_items_user_data[ $this->ID ][ $field ] : NULL;
 		}
 	}
 
@@ -8229,10 +8702,10 @@ class Item extends ItemLight
 
 		if( ! isset( $cache_items_user_data[ $this->ID ] ) || ! is_array( $cache_items_user_data[ $this->ID ] ) )
 		{	// Initialize array:
-			$cache_items_user_data[ $this->ID ][ $field ] = array();
+			$cache_items_user_data[ $this->ID ] = array();
 		}
 
-		$cache_items_user_data[ $this->ID ] = $value;
+		$cache_items_user_data[ $this->ID ][ $field ] = $value;
 	}
 
 
@@ -8398,7 +8871,7 @@ class Item extends ItemLight
 	/**
 	 * Get custom fields of post type
 	 *
-	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html'. Use comma separator to get several types
+	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url'. Use comma separator to get several types
 	 * @return array
 	 */
 	function get_type_custom_fields( $type = 'all' )
@@ -8551,7 +9024,7 @@ class Item extends ItemLight
 			.$this->get_setting( 'metadesc' ).' '
 			.$this->get_setting( 'metakeywords' ).' ';
 		// + all text custom fields:
-		$text_custom_fields = $this->get_type_custom_fields( 'varchar' );
+		$text_custom_fields = $this->get_type_custom_fields( 'varchar,text,html' );
 		foreach( $text_custom_fields as $field_index => $text_custom_field )
 		{
 			$search_string .= $this->get_custom_field_value( $field_index ).' ';
@@ -9223,6 +9696,141 @@ class Item extends ItemLight
 		echo $params['before'];
 		echo nl2br( $comment_form_msg );
 		echo $params['after'];
+	}
+
+
+	/**
+	 * Check if current User has a permission to refresh a contents last updated date of this Item
+	 *
+	 * @return boolean
+	 */
+	function can_refresh_contents_last_updated()
+	{
+		if( ! $this->ID )
+		{	// If this Item is not saved in DB yet:
+			return false;
+		}
+
+		if( ! is_logged_in( false ) )
+		{	// If current user is not logged in or not activated:
+			return false;
+		}
+
+		global $current_User;
+
+		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// If user has no perm to edit this Item:
+			return false;
+		}
+
+		// No restriction, Current User has a permission to refresh a contents last updated date of this Item:
+		return true;
+	}
+
+
+	/**
+	 * Get URL to refresh a contents last updated date of this Item if user has refresh rights
+	 *
+	 * @param array Params
+	 * @return string|boolean URL or FALSE if current user has no perm
+	 */
+	function get_refresh_contents_last_updated_url( $params = array() )
+	{
+		if( ! $this->can_refresh_contents_last_updated() )
+		{	// If current User has no perm to refresh:
+			return false;
+		}
+
+		$params = array_merge( array(
+				'glue' => '&amp;'
+			), $params );
+
+		$url = get_htsrv_url().'action.php?mname=collections'.$params['glue']
+			.'action=refresh_contents_last_updated'.$params['glue']
+			.'item_ID='.$this->ID.$params['glue']
+			.url_crumb( 'collections_refresh_contents_last_updated' );
+
+		return $url;
+	}
+
+
+	/**
+	 * Get a link to refresh a contents last updated date of this Item if user has refresh rights
+	 *
+	 * @param array Params
+	 */
+	function get_refresh_contents_last_updated_link( $params = array() )
+	{
+		$params = array_merge( array(
+				'before' => ' ',
+				'after'  => '',
+				'text'   => '#icon#',
+				'title'  => '#',
+				'class'  => '',
+				'glue'   => '&amp;',
+			), $params );
+
+		$refresh_url = $this->get_refresh_contents_last_updated_url( $params );
+		if( ! $refresh_url )
+		{	// If current user has no perm to refesh contents last updated date of this Item:
+			return;
+		}
+
+		if( $params['title'] == '#' )
+		{	// Use default title
+			$params['title'] = T_('Refresh "contents last updated" timestamp!');
+		}
+
+		$params['text'] = utf8_trim( $params['text'] );
+		$params['title'] = utf8_trim( $params['title'] );
+		$params['class'] = utf8_trim( $params['class'] );
+
+		$r = $params['before'];
+
+		$r .= '<a href="'.$refresh_url.'"'
+				.( empty( $params['title'] ) ? '' : ' title="'.format_to_output( $params['title'], 'htmlattr' ).'"' )
+				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
+			.'>'
+				.str_replace( '#icon#', get_icon( 'refresh', 'imgtag', array( 'title' => $params['title'] ) ), $params['text'] )
+			.'</a>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Refresh contents last updated ts with date of the latest Comment
+	 *
+	 * @return boolean TRUE of success
+	 */
+	function refresh_contents_last_updated_ts()
+	{
+		if( ! $this->can_refresh_contents_last_updated() )
+		{	// If current User has no permission to refresh a contents last updated date of the requested Item:
+			return false;
+		}
+
+		// Clear latest Comment from previous calling before Comment updating:
+		$this->latest_Comment = NULL;
+
+		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ) ) )
+		{	// Use date from the latest public Comment:
+			$new_contents_last_updated_ts = $latest_Comment->get( 'last_touched_ts' );
+		}
+		else
+		{	// Use date from issue date of this Item:
+			$new_contents_last_updated_ts = $this->get( 'datestart' );
+		}
+
+		global $DB;
+
+		$DB->query( 'UPDATE T_items__item
+					SET post_contents_last_updated_ts = '.$DB->quote( $new_contents_last_updated_ts ).'
+				WHERE post_ID = '.$this->ID );
+
+		return true;
 	}
 }
 ?>

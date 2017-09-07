@@ -817,6 +817,9 @@ if( $display_mode != 'js')
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-advanced-tab' );
+
+			// Initialize JS for color picker field on the edit plugin settings form:
+			init_colorpicker_js();
 			break;
 		case 'admin':
 			$AdminUI->breadcrumbpath_add( T_('Admin'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );

@@ -24,7 +24,7 @@ global $edited_Skin;
 $Form = new Form( NULL, 'skin_checkchanges' );
 
 $Form->global_icon( T_('Uninstall this skin!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('skin') ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', T_('Skin properties') );
 

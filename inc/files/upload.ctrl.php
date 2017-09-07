@@ -214,9 +214,6 @@ if( $Messages->count( 'error' ) > $initial_error_count )
 }
 
 
-// Quick mode means "just upload and leave mode when successful"
-param( 'upload_quickmode', 'integer', 0 );
-
 /**
  * Remember failed files (and the error messages)
  * @var array
@@ -311,11 +308,6 @@ if( ! empty($renamedFiles) )
 	}
 	forget_param( 'renamedFiles' );
 	unset( $renamedFiles );
-
-	if( $upload_quickmode )
-	{
-		header_redirect( regenerate_url( 'ctrl', 'ctrl=files', '', '&' ) );
-	}
 }
 
 // Process uploaded files:
@@ -327,7 +319,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 	// Check that this action request is not a CSRF hacked request:
 	$Session->assert_received_crumb( 'file' );
 
-	$upload_result = process_upload( $fm_FileRoot->ID, $path, false, false, $upload_quickmode );
+	$upload_result = process_upload( $fm_FileRoot->ID, $path, false, false, false );
 	if( isset( $upload_result ) )
 	{
 		$failedFiles = $upload_result['failedFiles'];
@@ -371,12 +363,6 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 
 			$Messages->add_to_group( $success_msg, 'success', T_('Uploading files:') );
 		}
-	}
-
-	if( $upload_quickmode && !empty($failedFiles) )
-	{	// Transmit file error to next page!
-		$Messages->add( $failedFiles[0], 'error' );
-		unset($failedFiles);
 	}
 
 	if( empty($failedFiles) && empty($renamedFiles) )

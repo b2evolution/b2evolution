@@ -149,24 +149,24 @@ foreach( $user_gender_color as $color )
 // Legend titles:
 $donut_chart['legend_numrows'] = 9;
 $donut_chart['legends'] = array(
-	T_('Women / Active / With Photo'),
-	T_('Women / Active / No Photo'),
-	T_('Women / Inactive / With Photo'),
-	T_('Women / Inactive / No Photo'),
-	T_('Women / Closed / With Photo'),
-	T_('Women / Closed / No Photo'),
-	T_('Men / Active / With Photo'),
-	T_('Men / Active / No Photo'),
-	T_('Men / Inactive / With Photo'),
-	T_('Men / Inactive / No Photo'),
-	T_('Men / Closed / With Photo'),
-	T_('Men / Closed / No Photo'),
-	T_('Unknown / Active / With Photo'),
-	T_('Unknown / Active / No Photo'),
-	T_('Unknown / Inactive / With Photo'),
-	T_('Unknown / Inactive / No Photo'),
-	T_('Unknown / Closed / With Photo'),
-	T_('Unknown / Closed / No Photo') );
+	T_('Women').' / '.T_('Active').' / '.T_('With Photo'),
+	T_('Women').' / '.T_('Active').' / '.T_('No Photo'),
+	T_('Women').' / '.T_('Inactive').' / '.T_('With Photo'),
+	T_('Women').' / '.T_('Inactive').' / '.T_('No Photo'),
+	T_('Women').' / '.T_('Closed').' / '.T_('With Photo'),
+	T_('Women').' / '.T_('Closed').' / '.T_('No Photo'),
+	T_('Men').' / '.T_('Active').' / '.T_('With Photo'),
+	T_('Men').' / '.T_('Active').' / '.T_('No Photo'),
+	T_('Men').' / '.T_('Inactive').' / '.T_('With Photo'),
+	T_('Men').' / '.T_('Inactive').' / '.T_('No Photo'),
+	T_('Men').' / '.T_('Closed').' / '.T_('With Photo'),
+	T_('Men').' / '.T_('Closed').' / '.T_('No Photo'),
+	T_('Unknown').' / '.T_('Active').' / '.T_('With Photo'),
+	T_('Unknown').' / '.T_('Active').' / '.T_('No Photo'),
+	T_('Unknown').' / '.T_('Inactive').' / '.T_('With Photo'),
+	T_('Unknown').' / '.T_('Inactive').' / '.T_('No Photo'),
+	T_('Unknown').' / '.T_('Closed').' / '.T_('With Photo'),
+	T_('Unknown').' / '.T_('Closed').' / '.T_('No Photo') );
 
 // Data:
 $donut_chart['data'] = array();

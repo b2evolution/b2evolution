@@ -272,7 +272,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => T_( 'Display content teaser for each item.' ),
 				),
 				'disp_teaser_maxwords' => array(
-					'label' => T_( 'Max Words' ),
+					'label' => T_( 'Max words' ),
 					'type' => 'integer',
 					'defaultvalue' => 20,
 					'note' => T_( 'Max number of words for the teasers.' ),

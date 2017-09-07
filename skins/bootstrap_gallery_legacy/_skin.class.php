@@ -21,7 +21,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.1';
+	var $version = '6.9.4';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -342,7 +342,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
 		}
 
 		$custom_styles = array();
@@ -353,7 +353,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
 		}
 
 		// Link color
@@ -363,7 +363,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	body .container a { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	#skin_wrapper .container a { '.implode( ';', $custom_styles )." }\n";
 			$custom_css .= '	ul li a { '.implode( ';', $custom_styles )." }\n";
 			$custom_css .= "	ul li a {background-color: transparent;}\n";
 			$custom_css .= "	.ufld_icon_links a {color: #fff !important;}\n";
@@ -386,7 +386,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
 		}
 
 		global $thumbnail_sizes;
@@ -465,29 +465,5 @@ class bootstrap_gallery_legacy_Skin extends Skin
 				return parent::get_template( $name );
 		}
 	}
-
-
-	/**
-	 * Check if we can display a widget container when access is denied to collection by current user
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function show_container_when_access_denied( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
-	}
-
 }
-
 ?>

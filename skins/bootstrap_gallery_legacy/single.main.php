@@ -242,7 +242,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'widget_context' => 'item',	// Signal that we are displaying within an Item
 					// The following (optional) params will be used as defaults for widgets included in this container:
 					// This will enclose each widget in a block:
-					'block_start' => '<div class="$wi_class$">',
+					'block_start' => '<div class="evo_widget $wi_class$">',
 					'block_end' => '</div>',
 					// This will enclose the title of each widget:
 					'block_title_start' => '<h3>',
@@ -257,6 +257,9 @@ siteskin_include( '_site_body_header.inc.php' );
 							'image_size'             => '', // Do not display images in content block - Image is handled separately
 							'url_link_text_template' => '', // link will be displayed (except player if podcast)
 						),
+						// Template params for "Item Link" widget
+						'widget_item_link_before'    => '<p class="evo_post_link">',
+						'widget_item_link_after'     => '</p>',
 				) );
 				// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 				?>
@@ -326,9 +329,9 @@ siteskin_include( '_site_body_header.inc.php' );
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="col-md-12">
 
-		<div class="evo_container evo_container__footer">
+		<div class="evo_container evo_container__footer clearfix">
 		<?php
 			// Display container and contents:
 			skin_container( NT_('Footer'), array(
@@ -340,7 +343,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 		</div>
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

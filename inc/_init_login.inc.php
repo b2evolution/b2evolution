@@ -517,7 +517,14 @@ if( ! empty( $login_error ) || ( $login_required && ! is_logged_in() ) )
 			// to read a message or sth like that. They must log in first and they may enter the wrong password multiple times.
 			param( 'redirect_to', 'url', $Blog->gen_blogurl() );
 			$ads_current_skin_path = $skins_path.$skin.'/';
-			require $ads_current_skin_path.'index.main.php';
+			if( file_exists( $ads_current_skin_path.'login.main.php' ) )
+			{	// Call custom file for login disp if it exists:
+				require $ads_current_skin_path.'login.main.php';
+			}
+			else
+			{	// Call index main skin file to display a login disp:
+				require $ads_current_skin_path.'index.main.php';
+			}
 			exit(0);
 			// --- EXITED !! ---
 		}

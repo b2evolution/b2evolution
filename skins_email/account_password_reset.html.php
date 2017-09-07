@@ -40,7 +40,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	{ // Several accounts with the given email address, display last used date for each
 		$message_content .= '<div style="margin: 1em 0; border: 1px solid #ccc; border-radius: 4px; padding: 1em 1em 1ex;">';
 
-		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login:' ).' '.$iterator_User->get_colored_login( array( 'mask' => '$login$', 'protocol' => 'http:' ) )."</p>\n";
+		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login' ).': '.$iterator_User->get_colored_login( array( 'mask' => '$login$', 'protocol' => 'http:' ) )."</p>\n";
 		$user_lastseen_ts = $iterator_User->get( 'lastseen_ts' );
 		if( empty( $user_lastseen_ts ) )
 		{ // user has never logged in
@@ -53,7 +53,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	}
 	else
 	{
-		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login:' ).' '.$iterator_User->get_colored_login( array( 'mask' => '$login$', 'protocol' => 'http:' ) )."</p>\n";
+		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login' ).': '.$iterator_User->get_colored_login( array( 'mask' => '$login$', 'protocol' => 'http:' ) )."</p>\n";
 	}
 
 	$url_change_password = get_htsrv_url( true ).'login.php?action=changepwd'

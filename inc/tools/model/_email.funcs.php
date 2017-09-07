@@ -324,7 +324,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
  *     'suspicious3' - Suspicious 3
- *     'prmerror'    - Permament error
+ *     'prmerror'    - Permanent error
  *     'spammer'     - Spammer
  */
 function load_blocked_emails( $user_IDs, $blocked_statuses = array() )
@@ -373,7 +373,7 @@ function load_blocked_emails( $user_IDs, $blocked_statuses = array() )
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
  *     'suspicious3' - Suspicious 3
- *     'prmerror'    - Permament error
+ *     'prmerror'    - Permanent error
  *     'spammer'     - Spammer
  * @return boolean TRUE
  */
@@ -418,7 +418,7 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
  *     'suspicious3' - Suspicious 3
- *     'prmerror'    - Permament error
+ *     'prmerror'    - Permanent error
  *     'spammer'     - Spammer
  * @return string the where condition
  */
@@ -437,7 +437,7 @@ function get_mail_blocked_condition( $is_blocked = true, $blocked_statuses = arr
 
 
 /**
- * Memorize the blocked emails in cache array in order to display the message 
+ * Memorize the blocked emails in cache array in order to display the message
  * @see blocked_emails_display()
  *
  * @param string Email address

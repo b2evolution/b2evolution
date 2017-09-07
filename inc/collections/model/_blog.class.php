@@ -819,7 +819,7 @@ class Blog extends DataObject
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
 
 			param( 'old_content_alert', 'integer', NULL );
-			param_check_range( 'old_content_alert', 1, 12, T_('Stale content alert must be a number of months.').'(1 - 12)', false );
+			param_check_range( 'old_content_alert', 1, 12, T_('Stale content alert must be configured with a number of months.').'(1 - 12)', false );
 			$this->set_setting( 'old_content_alert', get_param( 'old_content_alert' ), true );
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
@@ -952,6 +952,11 @@ class Blog extends DataObject
 			// Search results:
 			param_integer_range( 'search_per_page', 1, 9999, T_('Number of search results per page must be between %d and %d.') );
 			$this->set_setting( 'search_per_page', get_param( 'search_per_page' ) );
+			$this->set_setting( 'search_sort_by', param( 'search_sort_by', 'string' ) );
+			$this->set_setting( 'search_include_cats', param( 'search_include_cats', 'integer', 0 ) );
+			$this->set_setting( 'search_include_posts', param( 'search_include_posts', 'integer', 0 ) );
+			$this->set_setting( 'search_include_cmnts', param( 'search_include_cmnts', 'integer', 0 ) );
+			$this->set_setting( 'search_include_tags', param( 'search_include_tags', 'integer', 0 ) );
 
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
@@ -1104,19 +1109,19 @@ class Blog extends DataObject
 
 			if( param( 'blog_head_includes', 'html', NULL ) !== NULL )
 			{	// HTML header includes:
-				param_check_html( 'blog_head_includes', sprintf( T_('Invalid Custom meta tag/css section. You can loosen this restriction in the <a %s>group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'head_extension' );
+				param_check_html( 'blog_head_includes', T_('Invalid Custom meta tag/css section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'head_extension' );
 				$this->set_setting( 'head_includes', get_param( 'blog_head_includes' ) );
 			}
 
 			if( param( 'blog_body_includes', 'html', NULL ) !== NULL )
 			{ // HTML body includes:
-				param_check_html( 'blog_body_includes', sprintf( T_('Invalid Custom javascript section. You can loosen this restriction in the <a %s>group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'body_extension' );
+				param_check_html( 'blog_body_includes', T_('Invalid Custom javascript section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'body_extension' );
 				$this->set_setting( 'body_includes', get_param( 'blog_body_includes' ) );
 			}
 
 			if( param( 'blog_footer_includes', 'html', NULL ) !== NULL )
 			{	// HTML footer includes:
-				param_check_html( 'blog_footer_includes', sprintf( T_('Invalid Custom javascript section. You can loosen this restriction in the <a %s>group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'footer_extension' );
+				param_check_html( 'blog_footer_includes', T_('Invalid Custom javascript section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'footer_extension' );
 				$this->set_setting( 'footer_includes', get_param( 'blog_footer_includes' ) );
 			}
 
@@ -2380,7 +2385,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path ),
-							'error', T_('Collection media file permission errors').get_manual_link('media_file_permission_errors').':' );
+							'error', T_('Media directory file permission error').get_manual_link('media-directory-file-permission-error').':' );
 				}
 				return false;
 			}
@@ -2389,7 +2394,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path ),
-							'error', T_('Collection media directory creation errors').get_manual_link('directory_creation_error').':' );
+							'error', T_('Media directory creation error').get_manual_link('media-directory-creation-error').':' );
 				}
 				return false;
 			}
@@ -2643,6 +2648,10 @@ class Blog extends DataObject
 				$disp_param = 'users';
 				break;
 
+			case 'visitsurl':
+				$disp_param = 'visits';
+				break;
+
 			case 'tagsurl':
 				$disp_param = 'tags';
 				break;
@@ -2769,7 +2778,7 @@ class Blog extends DataObject
 		if( ! empty( $disp_param ) )
 		{ // Get url depending on value of param 'disp'
 			$this_Blog = & $this;
-			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) )
+			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'visits' ) ) )
 			{ // Check if we can use this blog for messaging actions or we should use spec blog
 				if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
 				{ // Use special blog for messaging actions if it is defined in general settings
@@ -4239,6 +4248,10 @@ class Blog extends DataObject
 						$url = url_add_param( $url, 'cat='.$cat_ID );
 					}
 				}
+				else
+				{ // User does not have any means to edit the post!
+					return '';
+				}
 
 				if( !empty( $post_title ) )
 				{ // Append a post title
@@ -4751,6 +4764,7 @@ class Blog extends DataObject
 			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s3 ON s3.uset_user_ID = user_ID AND s3.uset_name = "notify_spam_cmt_moderation"' );
 			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
+			$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )
 				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
 				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );
@@ -4958,6 +4972,46 @@ class Blog extends DataObject
 			WHERE cat_blog_ID = '.$this->ID.'
 				AND comment_status IN ( '.$DB->quote( $reduced_statuses ).' )',
 			'Reduce comments statuses by max allowed status of the collection #'.$this->ID );
+	}
+
+
+	/**
+	 * Get a number of unread posts by current logged in User
+	 *
+	 * @return integer
+	 */
+	function get_unread_posts_count()
+	{
+		global $DB, $current_User, $localtimenow;
+
+		if( ! is_logged_in() || ! $this->get_setting( 'track_unread_content' ) )
+		{	// User must be logged in AND the tracking of unread content is turned ON for the collection:
+			return 0;
+		}
+
+		// Initialize SQL query to get only the posts which are displayed by global $MainList on disp=posts:
+		$ItemList2 = new ItemList2( $this, $this->get_timestamp_min(), $this->get_timestamp_max(), NULL, 'ItemCache', 'recent_topics' );
+		$ItemList2->set_default_filters( array(
+				'unit' => 'all', // set this to don't calculate total rows
+			) );
+		$ItemList2->query_init();
+
+		// Get a count of the unread topics for current user:
+		$unread_posts_SQL = new SQL();
+		$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
+		$unread_posts_SQL->FROM( 'T_items__item' );
+		$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__user_data ON post_ID = itud_item_ID AND itud_user_ID = '.$DB->quote( $current_User->ID ) );
+		$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+		$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+		$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
+		$unread_posts_SQL->WHERE_and( 'post_contents_last_updated_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
+		// In theory, it would be more safe to use this comparison:
+		// $unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts <= post_contents_last_updated_ts' );
+		// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
+		$unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts < post_contents_last_updated_ts' );
+
+		// Execute a query with to know if current user has new data to view:
+		return intval( $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics of collection #'.$this->ID.' for current user' ) );
 	}
 }
 

@@ -210,7 +210,6 @@ siteskin_include( '_site_body_header.inc.php' );
 						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
 					// Item content:
-					'url_link_position'     => 'top',
 					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
 					'skin_form_before'      => '<div class="panel panel-default skin-form">'
 																				.'<div class="panel-heading">'
@@ -268,9 +267,9 @@ siteskin_include( '_site_body_header.inc.php' );
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="col-md-12">
 
-		<div class="evo_container evo_container__footer">
+		<div class="evo_container evo_container__footer clearfix">
 		<?php
 			// Display container and contents:
 			skin_container( NT_('Footer'), array(
@@ -282,7 +281,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 		</div>
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
@@ -333,7 +332,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

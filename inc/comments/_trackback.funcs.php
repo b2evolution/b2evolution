@@ -172,7 +172,7 @@ function trackback(
 	{
 		$result_message = T_('No valid trackback response. Maybe the given url is not a Trackback url.') . ' &quot;' . $result . '&quot;';
 	}
-	$Messages->add( T_('Response:').' '.strip_tags($result_message), 'note' );
+	$Messages->add( T_('Response').': '.strip_tags($result_message), 'note' );
 	return $result;
 }
 

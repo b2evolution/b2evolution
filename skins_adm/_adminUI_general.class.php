@@ -1027,8 +1027,8 @@ class AdminUI_general extends Menu
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
@@ -1107,8 +1107,8 @@ class AdminUI_general extends Menu
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
@@ -1148,6 +1148,7 @@ class AdminUI_general extends Menu
 					'formend' => '',
 				);
 
+			case 'accordion_form':
 			case 'compact_form':
 			case 'Form':
 				// Default Form settings:

@@ -88,7 +88,7 @@ function display_pluggable_permissions( &$Form, $perm_block )
 
 $Form = new Form( NULL, 'group_checkchanges' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'ctrl,grp_ID,action', 'ctrl=groups' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'ctrl,grp_ID,action', 'ctrl=groups' ) );
 
 if( $edited_Group->ID == 0 )
 {
@@ -235,6 +235,7 @@ $Form->end_form();
 ?>
 <script type="text/javascript">
 <?php
+global $Settings;
 if( $Settings->get('fm_enable_roots_shared') )
 {	// asimo> this may belong to the pluggable permissions display
 	// javascript to handle shared root permissions, when file permission was changed:

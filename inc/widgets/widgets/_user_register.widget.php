@@ -211,7 +211,7 @@ class user_register_Widget extends ComponentWidget
 
 		$Form = new Form( get_htsrv_url( true ).'register.php', 'register_form', 'post' );
 
-		$Form->begin_form();
+		$Form->begin_form( NULL, '', array( 'class' => 'widget_register_form') );
 
 		$Form->add_crumb( 'regform' );
 		$Form->hidden( 'action', 'quick_register' );
@@ -267,6 +267,45 @@ class user_register_Widget extends ComponentWidget
 		$Form->end_fieldset();
 
 		$Form->end_form();
+
+		if( ! is_logged_in() )
+		{	// JS code to get crumb from AJAX request when page caching is enabled:
+			echo '<script type="text/javascript">
+var user_reg_widget_request_sent = false;
+jQuery( ".widget_register_form" ).submit( function()
+{
+	if( user_reg_widget_request_sent )
+	{	// A submit request was already sent, do not send another:
+		return;
+	}
+
+	user_reg_widget_request_sent = true;
+	var form = jQuery( this );
+
+	jQuery.ajax(
+	{
+		type: "POST",
+		url: "'.get_htsrv_url().'anon_async.php",
+		data: { "action": "get_regform_crumb" },
+		success: function( result )
+		{
+			result = ajax_debug_clear( result );
+			form.find( "[name=crumb_regform]" ).val( result );
+			form.submit();
+		},
+		error: function( jqXHR, textStatus, errorThrown )
+		{	// Display error text on error request:
+			requestSent = false;
+			var wrong_response_code = typeof( jqXHR.status ) != "undefined" && jqXHR.status != 200 ? "\nHTTP Response code: " + jqXHR.status : "";
+			alert( "Error: could not get crumb from server. Please contact the site admin and check the browser and server error logs. (" + textStatus + ": " + errorThrown + ")"
+				+ wrong_response_code );
+		}
+	} );
+
+	return false;
+} );
+</script>';
+		}
 
 		echo $this->disp_params['block_body_end'];
 

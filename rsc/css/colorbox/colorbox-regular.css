@@ -36,8 +36,8 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-align-items: center;
-  -ms-flex-align: center;
-      align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 #cboxTitle {
   margin: 0;
@@ -129,17 +129,17 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
   -webkit-flex-wrap: nowrap;
       -ms-flex-wrap: nowrap;
           flex-wrap: nowrap;
   -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
-      justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
   -webkit-align-items: center;
-  -ms-flex-align: center;
-      align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 #cboxCurrent {
   color: #949494;
@@ -154,24 +154,24 @@
   line-height: 17px;
 }
 #cboxNavigation {
-  -ms-flex-preferred-size: auto;
-          -webkit-flex-basis: auto;
+  -webkit-flex-basis: auto;
+      -ms-flex-preferred-size: auto;
           flex-basis: auto;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
   -webkit-flex-wrap: nowrap;
       -ms-flex-wrap: nowrap;
           flex-wrap: nowrap;
   -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
-      justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
   -webkit-align-items: center;
-  -ms-flex-align: center;
-      align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   min-width: 46px;
 }
 #cboxPrevious,
@@ -197,8 +197,8 @@
   width: 23px;
   height: 23px;
   text-indent: -9999px;
-  -ms-flex-preferred-size: auto;
-          -webkit-flex-basis: auto;
+  -webkit-flex-basis: auto;
+      -ms-flex-preferred-size: auto;
           flex-basis: auto;
   background-position-x: -24px;
   background-position-y: -272px;
@@ -264,6 +264,7 @@
 }
 #cboxVoting .voting_wrapper {
   text-align: left;
+  width: 100%;
 }
 #cboxVoting .voting_wrapper .separator {
   display: inline-block;

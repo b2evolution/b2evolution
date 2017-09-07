@@ -279,7 +279,7 @@ switch( $action )
 			$result = $DB->query( 'DELETE FROM T_users__user_org WHERE uorg_user_ID = '.$login_User->ID.' AND uorg_org_ID = '.$edited_Organization->ID );
 			if( $result )
 			{	// Display a message after successful linking:
-				$Messages->add( sprintf( T_('%s removed removed from the organization.'), $login_User->get( 'preferredname') ), 'success');
+				$Messages->add( sprintf( T_('%s has been removed from the organization.'), $login_User->get( 'preferredname') ), 'success');
 			}
 		}
 

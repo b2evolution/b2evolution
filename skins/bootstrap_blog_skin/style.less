@@ -9,7 +9,38 @@
 	}
 }
 .nav.nav-tabs {
-	margin-top: 0;
+    margin-top: 0;
+	ul {
+		margin: 0;
+		li {
+			float: left;
+			list-style: none;
+			margin-bottom: -1px;
+			a {
+				border: 1px solid transparent;
+				border-radius: 4px 4px 0 0;
+				display: block;
+				line-height: 1.42857143;
+				margin-right: 2px;
+				padding: 10px 15px;
+				position: relative;
+				&:hover {
+					border-bottom: 1px solid #ddd;
+					border-color: #eee #eee #ddd;
+				}
+				&:focus, &:hover {
+					text-decoration: none;
+					background-color: #eee;
+				}
+				&.default:hover {
+					background-color: #eee;
+					border-top-color: #eee;
+					border-left-color: #eee;
+					border-right-color: #eee;
+				}
+			}
+		}
+	}
 }
 
 // Login widget form
@@ -313,10 +344,13 @@ div.action_messages, div.log_container {
 // Positions on the action buttons near page titles
 .evo_post_title {
 	display: table;
+	h1 {
+		margin-bottom: 0;
+	}
 	h2 {
 		display: table-cell;
 		margin: 0;
-		padding: 20px 0 10px;
+		padding: 20px 0 0;
 	}
 	.btn-group {
 		display: table-cell;

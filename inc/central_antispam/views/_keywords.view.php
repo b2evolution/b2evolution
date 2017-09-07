@@ -105,7 +105,7 @@ $Results->cols[] = array(
 		'th' => T_('Status'),
 		'order' => 'cakw_status',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'cakeyword_status_edit',
+		'td_class' => 'jeditable_cell cakeyword_status_edit',
 		'td' =>  /* Check permission: */$current_User->check_perm( 'centralantispam', 'edit' ) ?
 			/* Current user can edit keyword */'<a href="#" rel="$cakw_status$" style="color:#FFF">%ca_get_keyword_status_title( #cakw_status# )%</a>' :
 			/* No edit, only view the status */'%ca_get_keyword_status_title( #cakw_status# )%',

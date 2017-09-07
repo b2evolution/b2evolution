@@ -72,17 +72,17 @@ else
 	}
 
 	$SQL = new SQL();
-	if( empty( $goal_ID ) && empty($goal_name)  )
+	if( empty( $goal_ID ) && empty( $goal_name )  )
 	{	// We're not restricting to one or more Goals, get ALL possible keyphrases:
 		$SQL->FROM( 'T_track__keyphrase INNER JOIN T_hitlog ON keyp_ID = hit_keyphrase_keyp_ID' );
 		// Date param applies to serach hit
-		if( !empty($datestart) )
+		if( ! empty( $datestart ) )
 		{
-			$SQL->WHERE_and( 'T_hitlog.hit_datetime >= '.$DB->quote($datestart.' 00:00:00') );
+			$SQL->WHERE_and( 'T_hitlog.hit_datetime >= '.$DB->quote( $datestart.' 00:00:00' ) );
 		}
-		if( !empty($datestop) )
+		if( ! empty( $datestop ) )
 		{
-			$SQL->WHERE_and( 'T_hitlog.hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
+			$SQL->WHERE_and( 'T_hitlog.hit_datetime <= '.$DB->quote( $datestop.' 23:59:59' ) );
 		}
 	}
 	else
@@ -101,17 +101,17 @@ else
 		else
 		{
 			$SQL->FROM_add( 'INNER JOIN T_track__goal ON goal_ID = ghit_goal_ID' );
-			$SQL->WHERE_and( 'goal_name LIKE '.$DB->quote($goal_name.'%') );
+			$SQL->WHERE_and( 'goal_name LIKE '.$DB->quote( $goal_name.'%' ) );
 		}
 
 		// Date param applies to goal hit
-		if( !empty($datestart) )
+		if( ! empty( $datestart ) )
 		{
-			$SQL->WHERE_and( 'goalhit_hit.hit_datetime >= '.$DB->quote($datestart.' 00:00:00') );
+			$SQL->WHERE_and( 'goalhit_hit.hit_datetime >= '.$DB->quote( $datestart.' 00:00:00' ) );
 		}
-		if( !empty($datestop) )
+		if( ! empty( $datestop ) )
 		{
-			$SQL->WHERE_and( 'goalhit_hit.hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
+			$SQL->WHERE_and( 'goalhit_hit.hit_datetime <= '.$DB->quote( $datestop.' 23:59:59' ) );
 		}
 	}
 	$SQL->WHERE_and( 'hit_agent_type = "browser"' );
@@ -124,14 +124,14 @@ else
 		$SQL->GROUP_BY( 'keyp_ID' );
 	}
 
-	if( ! empty($blog) )
+	if( ! empty( $blog ) )
 	{
 		$SQL->WHERE_and( 'T_hitlog.hit_coll_ID = '.$blog );
 	}
 
 	// COUNT:
 	$SQL->SELECT( 'keyp_ID' );
-	if( empty( $goal_ID ) && empty($goal_name) )
+	if( empty( $goal_ID ) && empty( $goal_name ) )
 	{	// We're not restricting to a Goal
 		$SQL->SELECT_add( ', COUNT(DISTINCT hit_remote_addr) as count' );
 	}

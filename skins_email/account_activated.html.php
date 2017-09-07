@@ -37,7 +37,7 @@ else
 echo '</p>'."\n";
 
 echo '<table'.emailskin_style( 'table.email_table' ).'>'."\n";
-echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ).'</td></tr>'."\n";
+echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'./* TRANS: noun */ T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ).'</td></tr>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Email').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->email.'</td></tr>'."\n";
 
 $fullname = $activated_User->get( 'fullname' );

@@ -216,7 +216,7 @@ skin_include( '_access_denied.disp.php' );
 					skin_container( NT_('Sidebar'), array(
 							// The following (optional) params will be used as defaults for widgets included in this container:
 							// This will enclose each widget in a block:
-							'block_start' => '<div class="panel panel-default widget $wi_class$">',
+							'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
 							'block_end'   => '</div>',
 							// This will enclose the title of each widget:
 							'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
@@ -258,7 +258,7 @@ skin_include( '_access_denied.disp.php' );
 					skin_container( NT_('Sidebar 2'), array(
 							// The following (optional) params will be used as defaults for widgets included in this container:
 							// This will enclose each widget in a block:
-							'block_start' => '<div class="panel panel-default widget $wi_class$">',
+							'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
 							'block_end'   => '</div>',
 							// This will enclose the title of each widget:
 							'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
@@ -310,13 +310,13 @@ skin_include( '_access_denied.disp.php' );
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="col-md-12">
 
 		<?php
 		if( $Skin->show_container_when_access_denied( 'footer' ) )
 		{ // Display 'Footer' widget container
 		?>
-		<div class="evo_container evo_container__footer">
+		<div class="evo_container evo_container__footer clearfix">
 		<?php
 			// Display container and contents:
 			skin_container( NT_('Footer'), array(
@@ -329,7 +329,7 @@ skin_include( '_access_denied.disp.php' );
 		</div>
 		<?php } ?>
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

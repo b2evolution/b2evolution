@@ -60,7 +60,7 @@ else
 }
 $Form->global_icon( $delete_title, 'recycle', $delete_url, $delete_text, 4, 3, $link_attribs );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1, $link_attribs );
+$Form->global_icon( T_('Cancel editing').'!', 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1, $link_attribs );
 
 $Form->begin_form( 'eform' );
 

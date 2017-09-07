@@ -359,7 +359,9 @@ switch( $action )
 			$edited_Item->set_from_Request( 'priority', 'item_priority', true );
 
 			param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL );
-			$edited_Item->set_from_Request( 'datedeadline', 'item_deadline', true );
+			param_time( 'item_deadline_time', '', false, false, true, true );
+			$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
+			$edited_Item->set( 'datedeadline', trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) ), true );
 
 			// UPDATE POST IN DB:
 			if( $edited_Item->dbupdate() )

@@ -36,8 +36,8 @@ var bozo = {
 			// Hook "change" and "keypress" event for all others:
 			.find("input[type=text], input[type=password], input[type=radio], input[type=checkbox], input[type=file], input[type=hidden], textarea")
 				.not("[class$=_nocheckchanges]")
-					.bind("change", bozo.change)
-					.bind("keypress", bozo.change);
+					.on("change", bozo.change)
+					.on("keypress", bozo.change);
 	},
 
 
@@ -109,7 +109,7 @@ var bozo = {
 
 			if( !other_form_changes )
 			{	// There are no changes on others forms, so cancel onbeforeunload event
-				window.onbeforeunload = '';
+				jQuery( window ).off( 'beforeunload' );
 				return;
 			}
 	},
@@ -136,6 +136,6 @@ var bozo = {
 }
 
 // Init Bozo validator when the window is loaded:
-jQuery( document ).bind( 'ready', bozo.init );
+jQuery( document ).on( 'ready', bozo.init );
 // Note: beforeunload is a "very special" event and cannot be added with addEvent:
-window.onbeforeunload = bozo.validate_close;
+jQuery( window ).on( 'beforeunload', bozo.validate_close );

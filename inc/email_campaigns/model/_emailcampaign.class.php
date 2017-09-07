@@ -639,7 +639,7 @@ class EmailCampaign extends DataObject
 		{	// If no waiting users then don't create a cron job and reset ID of previous cron job:
 			$this->set( 'send_ctsk_ID', NULL, true );
 
-			$Messages->add( T_('No scheduled job has not been created for this campaign because no there are no waiting recipients for this campaing.'), 'warning' );
+			$Messages->add( T_('No scheduled job has been created for this campaign because it has no waiting recipients.'), 'warning' );
 		}
 
 		// Update the changed email campaing settings:

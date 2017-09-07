@@ -274,6 +274,9 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 		{ // Use from params:
 			$comments_per_page = $params['comments_per_page'];
 		}
+
+		global $CommentList;
+
 		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', $params['disp_meta_comments'] ? 'mc_' : 'c_' );
 
 		// Filter list:
@@ -288,7 +291,9 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 		$CommentList->load_from_Request();
 
 		// Get ready for display (runs the query):
-		$CommentList->display_init();
+		$CommentList->display_init( array(
+				'init_order_numbers_mode' => ( $params['disp_meta_comments'] ? 'date' : 'list' )
+			) );
 
 		// Set redir=no in order to open comment pages
 		memorize_param( 'redir', 'string', '', 'no' );
@@ -334,15 +339,6 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 			echo $params['comment_list_start'];
 		}
 
-		// Set number of comment depending on current page
-		$comment_number = ( ( $CommentList->page - 1 ) * $CommentList->limit ) + 1;
-
-		if( $params['disp_meta_comments'] )
-		{	// Calculate index of first meta comment:
-			global $comment_template_counter;
-			$comment_template_counter = $CommentList->total_rows - ( $CommentList->limit * ( $CommentList->page - 1 ) );
-		}
-
 		/**
 		 * @var Comment
 		 */
@@ -377,7 +373,6 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 					'author_link_text'      => $params['author_link_text'],
 					'link_to'               => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 					'author_link_text'      => $params['author_link_text'],
-					'comment_number'        => $comment_number,
 					'image_size'            => $params['comment_image_size'],
 				) );
 			// Note: You can customize the default item comment by copying the generic
@@ -388,8 +383,6 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 			{	// Display the comment replies
 				display_comment_replies( $Comment->ID, $params );
 			}
-
-			$comment_number++;
 		}	// End of comment list loop.
 
 		if( ! $params['nav_bottom_inside'] )

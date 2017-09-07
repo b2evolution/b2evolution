@@ -60,7 +60,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 		$r['title']['defaultvalue'] = T_('Pages');
 		$r['title_link']['no_edit'] = true;
 		$r['item_type_usage']['no_edit'] = true;
-		$r['featured']['no_edit'] = true;
+		$r['flagged']['no_edit'] = true;
 		$r['follow_mainlist']['no_edit'] = true;
 		$r['blog_ID']['no_edit'] = true;
 		$r['blog_ID']['defaultvalue'] = '-'; // Display the pages only of the current blog and exclude the aggregated blogs

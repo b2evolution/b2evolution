@@ -506,7 +506,14 @@ if( $inskin && !empty( $Blog ) )
 	$skin = $Skin->folder;
 	$disp = 'register';
 	$ads_current_skin_path = $skins_path.$skin.'/';
-	require $ads_current_skin_path.'index.main.php';
+	if( file_exists( $ads_current_skin_path.'register.main.php' ) )
+	{	// Call custom file for register disp if it exists:
+		require $ads_current_skin_path.'register.main.php';
+	}
+	else
+	{	// Call index main skin file to display a register disp:
+		require $ads_current_skin_path.'index.main.php';
+	}
 	// already exited here
 	exit(0);
 }

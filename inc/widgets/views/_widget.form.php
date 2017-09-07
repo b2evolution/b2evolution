@@ -28,7 +28,7 @@ $Form = new Form( NULL, 'widget_checkchanges' );
 
 if( ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
 {	// Display a link to close form (Don't display this link on bootstrap skin, because it already has an icon to close a modal window)
-	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
+	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
 }
 
 $Form->begin_form( 'fform', sprintf( $creating ?  T_('New widget "%s" in container "%s"') : T_('Edit widget "%s" in container "%s"'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get( 'sco_name' ) )

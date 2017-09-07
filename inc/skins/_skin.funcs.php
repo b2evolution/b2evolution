@@ -1109,7 +1109,7 @@ function skin_init( $disp )
 				}
 
 				// User is already logged in, redirect to "redirect_to" page
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				$redirect_to = param( 'redirect_to', 'url', NULL );
 				if( empty( $redirect_to ) )
 				{ // If empty redirect to referer page
@@ -1142,7 +1142,7 @@ function skin_init( $disp )
 		case 'register':
 			if( is_logged_in() )
 			{ // If user is logged in the register form should not be displayed. In this case redirect to the blog home page.
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
@@ -1162,7 +1162,7 @@ function skin_init( $disp )
 		case 'lostpassword':
 			if( is_logged_in() )
 			{ // If user is logged in the lost password form should not be displayed. In this case redirect to the blog home page.
-				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
@@ -1679,7 +1679,7 @@ function skin_include( $template_name, $params = array() )
 	// Globals that may be needed by the template:
 	global $Collection, $Blog, $MainList, $Item;
 	global $Plugins, $Skin;
-	global $current_User, $Hit, $Session, $Settings;
+	global $current_User, $Hit, $Session, $Settings, $debug;
 	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
@@ -1702,49 +1702,49 @@ function skin_include( $template_name, $params = array() )
 
 		// Default display handlers:
 		$disp_handlers = array(
-				'disp_404'            => '_404_not_found.disp.php',
-				'disp_403'            => '_403_forbidden.disp.php',
-				'disp_arcdir'         => '_arcdir.disp.php',
-				'disp_catdir'         => '_catdir.disp.php',
-				'disp_comments'       => '_comments.disp.php',
-				'disp_feedback-popup' => '_feedback_popup.disp.php',
-				'disp_help'           => '_help.disp.php',
-				'disp_login'          => '_login.disp.php',
-				'disp_register'       => '_register.disp.php',
-				'disp_activateinfo'   => '_activateinfo.disp.php',
-				'disp_lostpassword'   => '_lostpassword.disp.php',
-				'disp_mediaidx'       => '_mediaidx.disp.php',
-				'disp_msgform'        => '_msgform.disp.php',
-				'disp_threads'        => '_threads.disp.php',
-				'disp_contacts'       => '_threads.disp.php',
-				'disp_messages'       => '_messages.disp.php',
-				'disp_page'           => '_page.disp.php',
-				'disp_postidx'        => '_postidx.disp.php',
-				'disp_posts'          => '_posts.disp.php',
-				'disp_profile'        => '_profile.disp.php',
-				'disp_avatar'         => '_profile.disp.php',
-				'disp_pwdchange'      => '_profile.disp.php',
-				'disp_userprefs'      => '_profile.disp.php',
-				'disp_subs'           => '_profile.disp.php',
-				'disp_visits'         => '_profile.disp.php',
-				'disp_search'         => '_search.disp.php',
-				'disp_single'         => '_single.disp.php',
-				'disp_sitemap'        => '_sitemap.disp.php',
-				'disp_user'           => '_user.disp.php',
-				'disp_users'          => '_users.disp.php',
-				'disp_edit'           => '_edit.disp.php',
-				'disp_edit_comment'   => '_edit_comment.disp.php',
-				'disp_closeaccount'   => '_closeaccount.disp.php',
-				'disp_module_form'    => '_module_form.disp.php',
-				'disp_front'          => '_front.disp.php',
-				'disp_useritems'      => '_useritems.disp.php',
-				'disp_usercomments'   => '_usercomments.disp.php',
-				'disp_download'       => '_download.disp.php',
-				'disp_access_denied'  => '_access_denied.disp.php',
+				'disp_403'                   => '_403_forbidden.disp.php',
+				'disp_404'                   => '_404_not_found.disp.php',
+				'disp_access_denied'         => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
-				'disp_tags'           => '_tags.disp.php',
-				'disp_terms'          => '_terms.disp.php',
-				'disp_flagged'        => '_flagged.disp.php',
+				'disp_activateinfo'          => '_activateinfo.disp.php',
+				'disp_arcdir'                => '_arcdir.disp.php',
+				'disp_catdir'                => '_catdir.disp.php',
+				'disp_closeaccount'          => '_closeaccount.disp.php',
+				'disp_comments'              => '_comments.disp.php',
+				'disp_download'              => '_download.disp.php',
+				'disp_edit'                  => '_edit.disp.php',
+				'disp_edit_comment'          => '_edit_comment.disp.php',
+				'disp_feedback-popup'        => '_feedback_popup.disp.php',
+				'disp_flagged'               => '_flagged.disp.php',
+				'disp_front'                 => '_front.disp.php',
+				'disp_help'                  => '_help.disp.php',
+				'disp_login'                 => '_login.disp.php',
+				'disp_lostpassword'          => '_lostpassword.disp.php',
+				'disp_mediaidx'              => '_mediaidx.disp.php',
+				'disp_messages'              => '_messages.disp.php',
+				'disp_module_form'           => '_module_form.disp.php',
+				'disp_msgform'               => '_msgform.disp.php',
+				'disp_page'                  => '_page.disp.php',
+				'disp_postidx'               => '_postidx.disp.php',
+				'disp_posts'                 => '_posts.disp.php',
+				'disp_profile'               => '_profile.disp.php',
+				'disp_avatar'                => '_profile.disp.php',
+				'disp_pwdchange'             => '_profile.disp.php',
+				'disp_userprefs'             => '_profile.disp.php',
+				'disp_subs'                  => '_profile.disp.php',
+				'disp_visits'                => '_visits.disp.php',
+				'disp_register'              => '_register.disp.php',
+				'disp_search'                => '_search.disp.php',
+				'disp_single'                => '_single.disp.php',
+				'disp_sitemap'               => '_sitemap.disp.php',
+				'disp_tags'                  => '_tags.disp.php',
+				'disp_terms'                 => '_terms.disp.php',
+				'disp_threads'               => '_threads.disp.php',
+				'disp_contacts'              => '_threads.disp.php',
+				'disp_user'                  => '_user.disp.php',
+				'disp_useritems'             => '_useritems.disp.php',
+				'disp_usercomments'          => '_usercomments.disp.php',
+				'disp_users'                 => '_users.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -1830,7 +1830,7 @@ function skin_include( $template_name, $params = array() )
 	}
 	else
 	{	// We may wrap with a <div>:
-		$display_includes = $Session->get( 'display_includes_'.$Blog->ID ) == 1;
+		$display_includes = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_includes_'.$Blog->ID ) );
 	}
 	if( $display_includes )
 	{ // Wrap the include with a visible div:
@@ -1964,7 +1964,7 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	}
 
 	// Globals that may be needed by the template:
-	global $current_User, $Hit, $Session, $Settings;
+	global $current_User, $Hit, $Session, $Settings, $debug;
 	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
@@ -2001,7 +2001,7 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	}
 	elseif( isset( $Session ) )
 	{	// We may wrap with a <div>:
-		$display_includes = $Session->get( 'display_includes_'.( empty( $Blog ) ? 0 : $Blog->ID ) ) == 1;
+		$display_includes = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_includes_'.( empty( $Blog ) ? 0 : $Blog->ID ) ) );
 	}
 	else
 	{	// Request without defined $Session, Don't display the includes:
@@ -2182,57 +2182,56 @@ function skin_opengraph_tags()
 		return;
 	}
 
-	// Get info for og:image tag
-	$og_images = array();
-	if( in_array( $disp, array( 'single', 'page' ) ) )
-	{ // Use only on 'single' and 'page' disp
-		$Item = & $MainList->get_by_idx( 0 );
-		if( is_null( $Item ) )
-		{ // This is not an object (happens on an invalid request):
-			return;
-		}
+	switch( $disp )
+	{
+		case 'single':
+		case 'page':
+			$Item = & $MainList->get_by_idx( 0 );
 
-		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
-				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
-				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
-		{ // Item has no linked files
-			while( $Link = & $LinkList->get_next() )
+			// Get info for og:image tag
+			if( is_null( $Item ) )
+			{ // This is not an object (happens on an invalid request):
+				return;
+			}
+
+			echo '<meta property="og:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
+			echo '<meta property="og:url" content="'.format_to_output( $Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
+			echo '<meta property="og:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+			echo '<meta property="og:site_name" content="'.format_to_output( $Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
+			break;
+
+		case 'posts':
+			$intro_Item = & get_featured_Item( $disp, NULL, true );
+			if( $intro_Item )
 			{
-				if( ! ( $File = & $Link->get_File() ) )
-				{ // No File object
-					global $Debuglog;
-					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
-					continue;
-				}
-
-				if( ! $File->exists() )
-				{ // File doesn't exist
-					global $Debuglog;
-					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-					continue;
-				}
-
-				if( $File->is_image() )
-				{ // Use only image files for og:image tag
-					$og_images[] = $File->get_url();
+				if( $intro_Item->is_intro() )
+				{
+					echo '<meta property="og:title" content="'.format_to_output( $intro_Item->get( 'title' ), 'htmlattr' )."\" />\n";
+					echo '<meta property="og:url" content="'.format_to_output( $intro_Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
+					echo '<meta property="og:description" content="'.format_to_output( $intro_Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+					echo '<meta property="og:site_name" content="'.format_to_output( $intro_Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
 				}
 			}
-		}
+			break;
 
-		echo '<meta property="og:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
-		echo '<meta property="og:url" content="'.format_to_output( $Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
-		echo '<meta property="og:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
-		echo '<meta property="og:site_name" content="'.format_to_output( $Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
+		default:
+			/*
+			echo '<meta property="og:title" content="'.format_to_output( $Blog->name, 'htmlattr' )."\" />\n";
+			echo '<meta property="og:url" content="'.format_to_output( $Blog->get( 'url' ), 'htmlattr' )."\" />\n";
+			echo '<meta property="og:description" content="'.format_to_output( $Blog->longdesc, 'htmlattr' )."\" />\n";
+			echo '<meta property="og:site_name" content="'.format_to_output( $Blog->get( 'name' ), 'htmlattr' )."\" />\n";
+			*/
+			return;
 	}
 
-	if( ! empty( $og_images ) )
-	{ // Display meta tags for image:
-		// Open Graph type tag (This tag is necessary for multiple images on facebook share button)
-		echo '<meta property="og:type" content="article" />'."\n";
-		foreach( $og_images as $og_image )
-		{ // Open Graph image tag
-			echo '<meta property="og:image" content="'.format_to_output( $og_image, 'htmlattr' )."\" />\n";
+	$og_image_File = get_social_tag_image_file( $disp );
+	if( ! empty( $og_image_File ) )
+	{ // Open Graph image tag
+		echo '<meta property="og:image" content="'.format_to_output( $og_image_File->get_url(), 'htmlattr' )."\" />\n";
+		if( $image_dimensions = $og_image_File->get_image_size( 'widthheight') )
+		{
+			echo '<meta property="og:image:height" content="'.format_to_output( $image_dimensions[0], 'htmlattr' )."\" />\n";
+			echo '<meta property="og:image:width" content="'.format_to_output( $image_dimensions[1], 'htmlattr' )."\" />\n";
 		}
 	}
 }
@@ -2247,66 +2246,86 @@ function skin_twitter_tags()
 		return;
 	}
 
-	// Get info for og:image tag
-	$twitter_image = '';
-	if( in_array( $disp, array( 'single', 'page' ) ) )
-	{ // Use only on 'single' and 'page' disp
-		$Item = & $MainList->get_by_idx( 0 );
-		if( is_null( $Item ) )
-		{ // This is not an object (happens on an invalid request):
-			return;
-		}
-
-		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
-				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
-				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
-		{ // Item has no linked files
-			while( $Link = & $LinkList->get_next() )
-			{
-				if( ! ( $File = & $Link->get_File() ) )
-				{ // No File object
-					global $Debuglog;
-					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
-					continue;
-				}
-
-				if( ! $File->exists() )
-				{ // File doesn't exist
-					global $Debuglog;
-					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-					continue;
-				}
-
-				if( $File->is_image() )
-				{ // Use only image files for og:image tag
-					$twitter_image = $File->get_url();
-					break;
-				}
-			}
-		}
-
-		// Get author's Twitter username
-		if( $creator_User = & $Item->get_creator_User() )
-		{
-			if( $twitter_links = $creator_User->userfield_values_by_code( 'twitter' ) )
-			{
-				preg_match( '/https?:\/\/(www\.)?twitter\.com\/(#!\/)?@?([^\/\?]*)/', $twitter_links[0], $matches );
-				if( isset( $matches[3] ) )
-				{
-					echo '<meta property="twitter:creator" content="@'.$matches[3].'" />'."\n";
-				}
-			}
-		}
-
-		echo '<meta property="twitter:card" content="summary" />'."\n";
-		echo '<meta property="twitter:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
-		echo '<meta property="twitter:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+	if( $Blog->get_setting( 'tags_open_graph' ) )
+	{
+		$open_tags_enabled = true;
 	}
 
-	if( ! empty( $twitter_image ) )
-	{ // Display meta tags for image:
-		echo '<meta property="twitter:image" content="'.format_to_output( $twitter_image, 'htmlattr' )."\" />\n";
+	switch( $disp )
+	{
+		case 'single':
+		case 'page':
+			$Item = & $MainList->get_by_idx( 0 );
+			if( is_null( $Item ) )
+			{ // This is not an object (happens on an invalid request):
+				return;
+			}
+
+			// Get author's Twitter username
+			if( $creator_User = & $Item->get_creator_User() )
+			{
+				if( $twitter_links = $creator_User->userfield_values_by_code( 'twitter' ) )
+				{
+					preg_match( '/https?:\/\/(www\.)?twitter\.com((?:\/\#!)?\/(\w+))/', $twitter_links[0], $matches );
+					if( isset( $matches[3] ) )
+					{
+						echo '<meta property="twitter:creator" content="@'.$matches[3].'" />'."\n";
+					}
+				}
+			}
+
+			if( ! isset( $open_tags_enabled ) )
+			{
+				echo '<meta property="twitter:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
+				echo '<meta property="twitter:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+			}
+			break;
+
+		case 'posts':
+			if( ! isset( $open_tags_enabled ) )
+			{
+				$intro_Item = & get_featured_Item( $disp, NULL, true );
+				{
+					if( $intro_Item->is_intro() )
+					{
+						if( ! isset( $open_tags_enabled ) )
+						{
+							echo '<meta property="twitter:title" content="'.format_to_output( $intro_Item->get( 'title' ), 'htmlattr' )."\" />\n";
+							echo '<meta property="twitter:description" content="'.format_to_output( $intro_Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+						}
+					}
+				}
+			}
+			break;
+
+		default:
+			/*
+			if( ! isset( $open_tags_enabled ) )
+			{
+				echo '<meta property="twitter:title" content="'.format_to_output( $Blog->name, 'htmlattr' )."\" />\n";
+				echo '<meta property="twitter:description" content="'.format_to_output( $Blog->longdesc, 'htmlattr' )."\" />\n";
+			}
+			*/
+			return;
+	}
+
+	$twitter_image_File = get_social_tag_image_file( $disp );
+	if( ! empty( $twitter_image_File ) )
+	{ // Has image, use summary with large image card
+		echo '<meta property="twitter:card" content="summary_large_image" />'."\n";
+		if( ! isset( $open_tags_enabled ) )
+		{
+			echo '<meta property="twitter:image" content="'.format_to_output( $twitter_image_File->get_url(), 'htmlattr' )."\" />\n";
+		}
+
+		if( $twitter_image_File->get( 'alt' ) )
+		{ // Alternate text for image
+			echo '<meta property="twitter:image:alt" content="'.format_to_output( $twitter_image_File->get( 'alt' ), 'htmlattr' )."\" />\n";
+		}
+	}
+	else
+	{ // No image, use only summary card
+		echo '<meta property="twitter:card" content="summary" />'."\n";
 	}
 }
 
@@ -2556,7 +2575,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
-		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin.').'</div>';
+		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin').'.</div>';
 	}
 	else
 	{
@@ -2664,7 +2683,7 @@ function skin_body_attrs( $params = array() )
 	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User;
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
-	global $Session;
+	global $Session, $debug;
 
 	$classes = array();
 
@@ -2718,7 +2737,7 @@ function skin_body_attrs( $params = array() )
 	$classes[] = 'usergroup_'.( ! is_logged_in() && empty( $current_User->grp_ID ) ? 'none' : $current_User->grp_ID );
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
-	if ( ! empty($Blog) )
+	if( ( $debug == 2 || is_logged_in() ) && ! empty( $Blog ) )
 	{
 		if( $Session->get( 'display_includes_'.$Blog->ID ) )
 		{

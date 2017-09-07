@@ -290,6 +290,9 @@ class Form extends Widget
 					$this->title_fmt      = $template['title_fmt'];
 					$this->no_title_fmt   = $template['no_title_fmt'];
 					$this->no_title_no_icons_fmt = isset( $template['no_title_no_icons_fmt'] ) ? $template['no_title_no_icons_fmt'] : '';
+					$this->group_begin    = isset( $template['group_begin'] ) ? $template['group_begin'] : '';
+					$this->group_end      = isset( $template['group_end'] ) ? $template['group_end'] : '';
+					$this->fieldset_title = isset( $template['fieldset_title'] ) ? $template['fieldset_title'] : '';
 					$this->fieldset_begin = $template['fieldset_begin'];
 					$this->fieldset_end   = $template['fieldset_end'];
 					$this->fieldstart     = $template['fieldstart'];
@@ -837,6 +840,58 @@ class Form extends Widget
 
 
 	/**
+	 * Builds a fieldset group tag,
+	 * Used as start of wrapper for fieldsets, e-g on accordion layout
+	 *
+	 * @param string Params
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function begin_group( $params = array() )
+	{
+		$params = array_merge( array(
+				'id'    => 'evo_accordion',
+				'class' => '',
+			), $params );
+
+		$field_params = array();
+
+		if( ! empty( $params['id'] ) )
+		{	// If group id is defined:
+			$field_params['id'] = $params['id'];
+			// Set current group ID, used on building feildset:
+			$this->current_group_ID = $params['id'];
+			$this->current_group_item_num = 1;
+		}
+
+		$r = str_replace( array( '$group_class$', '$group_attribs$' ),
+			array( $params['class'], get_field_attribs_as_string( $field_params ) ),
+			$this->group_begin );
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Ends a fieldset group tag,
+	 * Used as end of wrapper for fieldsets, e-g on accordion layout
+	 *
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function end_group()
+	{
+		$r = $this->group_end;
+
+		if( isset( $this->current_group_ID ) )
+		{	// Unset current group ID and counter of group items:
+			unset( $this->current_group_ID );
+			unset( $this->current_group_item_num );
+		}
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
 	 * Builds a fieldset tag. This is a "fieldset" element by default, but a "th" element
 	 * for table layout.
 	 *
@@ -883,6 +938,19 @@ class Form extends Widget
 		unset( $field_params['fold'] );
 		unset( $field_params['deny_fold'] );
 
+		if( ! empty( $this->fieldset_title ) )
+		{	// Replace text part of fieldset title with provided html code:
+			$fieldset_title = str_replace( '$fieldset_title$', '$1', $this->fieldset_title );
+			$title = preg_replace( '/^([^<]+)/', $fieldset_title, $title );
+		}
+
+		if( isset( $this->current_group_ID ) )
+		{	// If fieldset is grouped, Replace the group masks with values:
+			$group_item_ID = $this->current_group_ID.'_item_'.$this->current_group_item_num;
+			$title = str_replace( array( '$group_ID$', '$group_item_ID$' ), array( $this->current_group_ID, $group_item_ID ), $title );
+			$this->current_group_item_num ++;
+		}
+
 		switch( $this->layout )
 		{
 			case 'table':
@@ -920,6 +988,11 @@ class Form extends Widget
 				else
 				{
 					$r = str_replace( '$title_attribs$', get_field_attribs_as_string( $legend_params ), $r );
+				}
+
+				if( isset( $group_item_ID ) )
+				{	// Replace a mask of current group item ID with value:
+					$r = str_replace( '$group_item_id$', $group_item_ID, $r );
 				}
 
 				// Remove any empty legend tags: they cause a small gap in the fieldset border (FF 2.0.0.11)
@@ -1233,14 +1306,14 @@ class Form extends Widget
 
 
 	/**
-	 * Build username/login field.
+	 * Build username field
 	 *
 	 * @param string the name of the input field
 	 * @param User initial value
-	 * @param integer size of the input field
 	 * @param string label displayed in front of the field
 	 * @param string note displayed with field
 	 * @param string class of the input field. Class name "only_assignees" provides to load only assignee users of the blog
+	 * @param array Field params
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '', $field_params = array() )
@@ -1248,6 +1321,8 @@ class Form extends Widget
 		$field_params = array_merge( array(
 				'note' => $field_note,
 				'size' => 20,
+				'autocapitalize' => 'off',
+				'autocorrect' => 'off'
 			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
@@ -1261,6 +1336,30 @@ class Form extends Widget
 		$r .= $this->end_field();
 
 		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Build login field.
+	 *
+	 * @param string the name of the input field
+	 * @param string User login
+	 * @param integer size of the input field
+	 * @param string label displayed in front of the field
+	 * @param string note displayed with field
+	 * @param array Field params
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function login_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		$field_params = array_merge( array(
+				'size' => $field_size,
+				'class' => 'input_text',
+				'autocapitalize' => 'off',
+				'autocorrect' => 'off'
+			), $field_params );
+
+		return $this->text_input( $field_name, $field_value, $field_params['size'], $field_label, $field_note, $field_params );
 	}
 
 
@@ -3753,7 +3852,7 @@ class Form extends Widget
 			$thumb_width = $thumbnail_sizes[ $field_params['size_name'] ][1];
 			$thumb_height = $thumbnail_sizes[ $field_params['size_name'] ][2];
 
-			$button_label = ( $counter === 0 ? T_('Select') : get_icon( 'new' ).' '.T_('Add') );
+			$button_label = ( $counter === 0 ? /* TRANS: verb */ T_('Select') : get_icon( 'new' ).' '.T_('Add') );
 
 			$r .= '<button class="btn btn-sm btn-info file_select_item" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
 
@@ -3792,7 +3891,7 @@ class Form extends Widget
 								data:
 								{
 									"action": "file_attachment",
-									"crumb_file": "'.get_crumb( 'file' ).'",
+									"crumb_file_attachment": "'.get_crumb( 'file_attachment' )/* We use a different crumb name ('file_attachment' vs 'file') for extra security. */.'",
 									"root": typeof( root ) == "undefined" ? "" : root,
 									"path": typeof( path ) == "undefined" ? "" : path,
 									"fm_highlight": typeof( fm_highlight ) == "undefined" ? "" : fm_highlight,
@@ -3811,6 +3910,7 @@ class Form extends Widget
 						function file_select_add( fieldName, root, path )
 						{
 							// check if value is already present
+							fieldName = fieldName.replace(/(\[|\])/g, "\\\\$1");
 							var inputField = jQuery( "input#" + fieldName );
 							var values = inputField.val().split( "'.$field_params['value_separator'].'" );
 
@@ -3882,7 +3982,7 @@ class Form extends Widget
 										lastItem = items.last();
 
 										// Toggle add button
-										addButton.html( items.length === 0 ? "'.T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
+										addButton.html( items.length === 0 ? "'./* TRANS: verb */ T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
 										if( maxLength > items.length )
 										{
 											addButton.show();
@@ -3917,6 +4017,7 @@ class Form extends Widget
 							var wrapper = jQuery( event_object ).closest( ".file_select_wrapper" );
 							var item = jQuery( event_object ).closest( ".file_select_item" );
 							var fieldName = wrapper.attr( "name" );
+							fieldName = fieldName.replace(/(\[|\])/g, "\\\\$1");
 							var fieldValue = item.data( "itemValue" ).toString(); // converted to string because it will later be compared to array of strings
 							var maxLength = wrapper.data( "maxLength" );
 							var addButton = jQuery( "button", wrapper );
@@ -3928,7 +4029,7 @@ class Form extends Widget
 							var lastItem = items.last();
 
 							// Toggle add button
-							addButton.html( items.length === 0 ? "'.T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
+							addButton.html( items.length === 0 ? "'./* TRANS: verb */ T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
 							if( maxLength > items.length )
 							{
 								addButton.show();

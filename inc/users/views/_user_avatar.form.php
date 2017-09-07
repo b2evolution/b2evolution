@@ -247,7 +247,7 @@ if( ( $current_User->ID == $edited_User->ID ) || $can_moderate_user )
 		// Upload
 		$Form->file_input( 'uploadfile[]', NULL, T_('Upload a new picture'), '', array( 'size' => 10 ) );
 
-		$action_buttons = array( array( 'submit', NULL, '> '.T_('Upload!'), 'btn btn-primary ActionButton' ) );
+		$action_buttons = array( array( 'submit', NULL, '> './* TRANS: verb */ T_('Upload!'), 'btn btn-primary ActionButton' ) );
 		$Form->buttons( $action_buttons );
 	}
 

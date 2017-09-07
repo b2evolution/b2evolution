@@ -449,7 +449,10 @@ class Comment extends DataObject
 				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
 				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
-				$this->previous_status = $this->get( 'status' );
+				if( ! isset( $this->previous_status ) )
+				{	// Set once previous status to know what status was original on several rewriting per same page request:
+					$this->previous_status = $this->get( 'status' );
+				}
 				return parent::set( 'status', $parvalue, $make_null );
 
 			default:
@@ -1562,7 +1565,7 @@ class Comment extends DataObject
 
 		if( $text == '#' )
 		{ // Use icon+text as default, if not displayed as button (otherwise just the text)
-			$text = ( $this->status == 'trash' || $this->is_meta() ) ? T_('Delete!') : T_('Recycle!');
+			$text = ( $this->status == 'trash' || $this->is_meta() ) ? T_('Delete').'!' : T_('Recycle').'!';
 			if( ! $button )
 			{ // Append icon before text
 				$text = ( $this->status == 'trash' || $this->is_meta() ? get_icon( 'delete' ) : get_icon( 'recycle' ) ).' '.$text;
@@ -1674,7 +1677,7 @@ class Comment extends DataObject
 		$params = array(
 			'before' => $before,
 			'after'  => $after,
-			'text'   => ( ( $text == '#' ) ?  get_icon( 'move_down_'.$status_icon_color ).' '.T_('Deprecate!') : $text ),
+			'text'   => ( ( $text == '#' ) ?  get_icon( 'move_down_'.$status_icon_color ).' '.T_('Deprecate').'!' : $text ),
 			'title'  => $title,
 			'class'  => $class,
 			'glue'   => $glue,
@@ -1710,7 +1713,7 @@ class Comment extends DataObject
 				'title_ok'            => T_('Cast an OK vote!'),
 				'title_ok_voted'      => T_('You sent an OK vote.'),
 				'title_yes'           => T_('Cast a helpful vote!'),
-				'title_yes_voted'     => T_('You sent helpful vote.'),
+				'title_yes_voted'     => T_('You sent a "helpful" vote.'),
 				'title_no'            => T_('Cast a "not helpful" vote!'),
 				'title_no_voted'      => T_('You sent a "not helpful" vote.'),
 			), $params );
@@ -1913,7 +1916,7 @@ class Comment extends DataObject
 				'skin_ID'               => 0,
 				'helpful_text'          => T_('Is this comment helpful?'),
 				'title_yes'             => T_('Cast a helpful vote!'),
-				'title_yes_voted'       => T_('You sent helpful vote.'),
+				'title_yes_voted'       => T_('You sent a "helpful" vote.'),
 				'title_noopinion'       => T_('Cast a "no opinion" vote!'),
 				'title_noopinion_voted' => T_('You sent a "no opinion" vote.'),
 				'title_no'              => T_('Cast a "not helpful" vote!'),
@@ -2312,8 +2315,6 @@ class Comment extends DataObject
 	 */
 	function moderation_links( $params )
 	{
-		global $blog;
-
 		if( ! is_logged_in( false ) )
 		{
 			return false;
@@ -2331,7 +2332,7 @@ class Comment extends DataObject
 		$statuses = get_visibility_statuses( 'ordered-array' );
 		$statuses = array_reverse( $statuses );
 
-		$inskin_statuses = get_inskin_statuses( $blog, 'comment' );
+		$frontoffice_statuses = $this->get_frontoffice_statuses();
 
 		// Get first and last statuses that will be visible buttons
 		$first_status_in_row = $this->get_next_status( true, $this->status );
@@ -2363,7 +2364,7 @@ class Comment extends DataObject
 				{
 					$tmp_params['class'] .= ' btn_next_status';
 				}
-				if( ! in_array( $next_status_in_row[0], $inskin_statuses ) )
+				if( ! in_array( $next_status_in_row[0], $frontoffice_statuses ) )
 				{ // Don't make ajax button for those statuses which are not allowed in the front office
 					$tmp_params = array_merge( $tmp_params, array( 'ajax_button' => false ) );
 				}
@@ -2393,7 +2394,7 @@ class Comment extends DataObject
 				{
 					$tmp_params['class'] .= ' btn_next_status';
 				}
-				if( ! in_array( $next_status_in_row[0], $inskin_statuses ) )
+				if( ! in_array( $next_status_in_row[0], $frontoffice_statuses ) )
 				{ // Don't make ajax button for those statuses which are not allowed in the front office
 					$tmp_params = array_merge( $tmp_params, array( 'ajax_button' => false ) );
 				}
@@ -2511,8 +2512,7 @@ class Comment extends DataObject
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '', $nofollow = false, $restrict_status = true )
 	{
-		$comment_Item = & $this->get_Item();
-		if( $restrict_status && ! in_array( $this->status, get_inskin_statuses( $comment_Item->get_blog_ID(), 'comment' ) ) )
+		if( $restrict_status && ! $this->may_be_seen_in_frontoffice() )
 		{
 			return '';
 		}
@@ -2615,13 +2615,17 @@ class Comment extends DataObject
 					$SQL->SELECT( 'cmpr_cmt_ID, cmpr_format, cmpr_renderers, cmpr_content_prerendered' );
 					$SQL->FROM( 'T_comments__prerendering' );
 					if( empty( $CommentList ) )
-					{  // load prerendered cache for each comment which belongs to this comments Item
+					{	// Load prerendered cache for each comment which belongs to this comments Item:
 						$SQL->FROM_add( 'INNER JOIN T_comments ON cmpr_cmt_ID = comment_ID' );
 						$SQL->WHERE( 'comment_item_ID = '.$this->Item->ID );
 					}
 					else
-					{ // load prerendered cache for each comment from the CommentList
-						$SQL->WHERE( 'cmpr_cmt_ID IN ( '.implode( ',', $CommentList->get_page_ID_array() ).' )' );
+					{	// Load prerendered cache for each comment from the CommentList:
+						$comments_page_ID_array = $CommentList->get_page_ID_array();
+						if( ! empty( $comments_page_ID_array ) )
+						{	// If at least one comment is loaded in current comments list:
+							$SQL->WHERE( 'cmpr_cmt_ID IN ( '.implode( ',', $comments_page_ID_array ).' )' );
+						}
 					}
 					$SQL->WHERE_and( 'cmpr_format = '.$DB->quote( $format ) );
 					$rows = $DB->get_results( $SQL->get(), OBJECT, 'Preload prerendered comments content ('.$format.')' );
@@ -2892,7 +2896,7 @@ class Comment extends DataObject
 			$after_docs = '';
 			if( count( $attachments ) > 0 )
 			{
-				echo '<br /><b>'.T_( 'Attachments:' ).'</b>';
+				echo '<br /><b>'.T_( 'Attachments' ).':</b>';
 				echo '<ul class="bFiles">';
 				$after_docs = '</ul>';
 			}
@@ -3710,11 +3714,14 @@ class Comment extends DataObject
 
 		if( ! $this->is_meta() )
 		{	// Get the notify users for NORMAL comments:
-			$except_condition = '';
 
+			// Send only for active users:
+			$active_users_condition = 'AND user_status IN ( "activated", "autoactivated" )';
+
+			$except_condition = '';
 			if( ! empty( $already_notified_user_IDs ) )
 			{	// Set except moderators condition. Exclude moderators who already got a notification email:
-				$except_condition = ' AND user_ID NOT IN ( "'.implode( '", "', $already_notified_user_IDs ).'" )';
+				$except_condition .= ' AND user_ID NOT IN ( "'.implode( '", "', $already_notified_user_IDs ).'" )';
 			}
 
 			// Check if we need to include the item creator user:
@@ -3732,6 +3739,7 @@ class Comment extends DataObject
 						FROM (
 							SELECT DISTINCT isub_user_ID AS user_ID
 							FROM T_items__subscriptions
+							INNER JOIN T_users ON ( user_ID = isub_user_ID '.$active_users_condition.' )
 							WHERE isub_item_ID = '.$comment_Item->ID.'
 							AND isub_comments <> 0
 
@@ -3741,7 +3749,7 @@ class Comment extends DataObject
 							FROM T_coll_settings AS opt
 							INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
 							LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
-							LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+							INNER JOIN T_users ON ( user_grp_ID = bloggroup_group_ID '.$active_users_condition.' )
 							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = user_ID )
 							WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 								AND opt.cset_name = "opt_out_item_subscription"
@@ -3757,6 +3765,7 @@ class Comment extends DataObject
 							LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 							LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
 							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = sug_user_ID )
+							INNER JOIN T_users ON ( user_ID = isub_user_ID '.$active_users_condition.' )
 							WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 								AND opt.cset_name = "opt_out_item_subscription"
 								AND opt.cset_value = 1
@@ -3770,6 +3779,7 @@ class Comment extends DataObject
 							INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
 							LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
 							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = bloguser_user_ID )
+							INNER JOIN T_users ON ( user_ID = isub_user_ID '.$active_users_condition.' )
 							WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 								AND opt.cset_name = "opt_out_item_subscription"
 								AND opt.cset_value = 1
@@ -3797,6 +3807,7 @@ class Comment extends DataObject
 								FROM (
 									SELECT DISTINCT sub_user_ID AS user_ID
 									FROM T_subscriptions
+									INNER JOIN T_users ON ( user_ID = sub_user_ID '.$active_users_condition.' )
 									WHERE sub_coll_ID = '.$comment_item_Blog->ID.'
 									AND sub_comments <> 0
 
@@ -3807,7 +3818,7 @@ class Comment extends DataObject
 									INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
 									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
 									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
-									LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+									INNER JOIN T_users ON ( user_grp_ID = bloggroup_group_ID '.$active_users_condition.' )
 									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = user_ID )
 									WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 										AND opt.cset_name = "opt_out_comment_subscription"
@@ -3824,6 +3835,7 @@ class Comment extends DataObject
 									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 									LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
 									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
+									INNER JOIN T_users ON ( user_ID = sub_user_ID '.$active_users_condition.' )
 									WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 										AND opt.cset_name = "opt_out_comment_subscription"
 										AND opt.cset_value = 1
@@ -3838,6 +3850,7 @@ class Comment extends DataObject
 									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
 									LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
 									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+									INNER JOIN T_users ON ( user_ID = sub_user_ID '.$active_users_condition.' )
 									WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 										AND opt.cset_name = "opt_out_comment_subscription"
 										AND opt.cset_value = 1
@@ -3874,6 +3887,8 @@ class Comment extends DataObject
 			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
 			// Check if the users would like to receive notifications about new meta comments:
 			$meta_SQL->WHERE_and( 'uset_value = "1"'.( $Settings->get( 'def_notify_meta_comments' ) ? ' OR uset_value IS NULL' : '' ) );
+			// Check if users are activated:
+			$meta_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 			// Check if the users have permission to edit this Item:
 			$users_with_item_edit_perms = '( user_ID = '.$DB->quote( $comment_item_Blog->owner_user_ID ).' )';
 			$users_with_item_edit_perms .= ' OR ( grp_perm_blogs = "editall" )';
@@ -4228,46 +4243,33 @@ class Comment extends DataObject
 
 
 	/**
-	 * Check if this comment is published to some of the public statuses ( 'published', 'community', 'protected' )
-	 *
-	 * @return boolean true ir the item status is public or limited public, false otherwise
-	 */
-	function is_published()
+	* Get a list of those comment statuses which can be displayed in the front office
+	*
+	* @return array Front office statuses in the comment's collection
+	*/
+	function get_frontoffice_statuses()
 	{
-		$permvalue = get_status_permvalue( $this->status );
-		$published_statuses_permvalue = get_status_permvalue( 'published_statuses' );
-		return ( $permvalue & $published_statuses_permvalue ) ? true : false;
+		if( ! ( $comment_Item = & $this->get_Item() ) ||
+		    ! ( $comment_blog_ID = $comment_Item->get_blog_ID() ) )
+		{	// Comment's collection ID must be detected to get front-office comment statuses:
+			return array();
+		}
+
+		return get_inskin_statuses( $comment_blog_ID, 'comment' );
 	}
 
 
 	/**
-	 * Check if comment public or limited public status was changed. Limited public status is like community or protected.
+	 * Check if this comment may be seen in front office
 	 *
-	 * @return boolean false if status was not changed or neither the previous nor current status is public or limited public, true otherwise
+	 * @return boolean true if the comment status is used to display on front office, false otherwise
 	 */
-	function check_publish_status_changed()
+	function may_be_seen_in_frontoffice()
 	{
-		if( !isset( $this->previous_status ) || $this->previous_status == $this->status )
-		{ // Status was not changed
-			return false;
-		}
-
-		$previous_status_permvalue = get_status_permvalue( $this->previous_status );
 		$current_status_permvalue = get_status_permvalue( $this->status );
-		$published_statuses_permvalue = get_status_permvalue( 'published_statuses' );
+		$frontoffice_statuses_permvalue = get_status_permvalue( $this->get_frontoffice_statuses() );
 
-		if( $current_status_permvalue & $published_statuses_permvalue )
-		{ // status has been changed to another public or limited public status
-			return true;
-		}
-
-		if( $previous_status_permvalue & $published_statuses_permvalue )
-		{ // previous status was public or limited public status, but current status is not
-			return true;
-		}
-
-		// This comment was not published before and it is not published now either
-		return false;
+		return ( $current_status_permvalue & $frontoffice_statuses_permvalue ) ? true : false;
 	}
 
 
@@ -4295,30 +4297,59 @@ class Comment extends DataObject
 
 		$DB->begin();
 
+		// Check previous comment status was visible on front-office:
+		$was_front_office_visible = ( isset( $this->previous_status ) &&
+			$this->can_be_displayed( $this->previous_status ) );
+
+		// Check we should refresh contents last updated date of the PARENT Item
+		// if this Comment was the latest FRONT-OFFICE VISIBLE Comment of the parent Item:
+		$refresh_parent_item_contents_last_updated_date = ( $was_front_office_visible && // This Comment was FRONT-OFFICE VISIBLE
+			( ! $this->may_be_seen_in_frontoffice() ) && // This Comment is NOT FRONT-OFFICE VISIBLE currently
+			( $comment_Item = & $this->get_Item() ) && // Get parent Item
+			( $item_latest_Comment = & $comment_Item->get_latest_Comment() ) && // Get the latest Comment of the parent Item
+			( $item_latest_Comment->ID == $this->ID ) ); // This Comment is the latest comment of the parent Item
+
+		$ItemCache = & get_ItemCache();
+		$ItemCache->clear();
+
+		// Check we should refresh contents last updated date of the PREVIOUS Item
+		// if this Comment was the latest FRONT-OFFICE VISIBLE Comment of the previous Item:
+		$refresh_previous_item_contents_last_updated_date = ( ! empty( $this->previous_item_ID ) && // This Comment is moving to another Item
+			( $was_front_office_visible ) && // This Comment was FRONT-OFFICE VISIBLE for previous Item
+			( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) ) && // Get the previous Item
+			( $previous_item_latest_Comment = & $previous_Item->get_latest_Comment() ) && // Get the latest Comment of the previous Item
+			( $previous_item_latest_Comment->ID == $this->ID ) ); // This Comment was the latest comment of the previous Item
+
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
-			$update_item_last_touched_date = false;
 			if( isset( $dbchanges['comment_content'] ) || isset( $dbchanges['comment_renderers'] ) )
-			{ // Content is updated
+			{	// Delete a prerendered content if content or text renderers have been updated:
 				$this->delete_prerendered_content();
-				$update_item_last_touched_date = true;
 			}
 
-			if( $this->check_publish_status_changed() )
-			{ // Comment is updated into/out some public status
-				$update_item_last_touched_date = true;
-			}
-
-			if( !empty( $this->previous_item_ID ) )
-			{ // Comment is moved from another post
-				$ItemCache = & get_ItemCache();
-				$ItemCache->clear();
-				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
-				{	// Update last touched date of previous item:
-					$previous_Item->update_last_touched_date( false, true, true );
+			$update_item_contents_last_updated_date = false;
+			if( $this->may_be_seen_in_frontoffice() )
+			{	// Update contents last update date of the comment's post ONLY when the updated comment may be seen in frontoffice:
+				if( isset( $dbchanges['comment_content'] ) ||
+				    isset( $dbchanges['comment_rating'] ) ||
+				    isset( $dbchanges['comment_item_ID'] ) ||
+				    ( isset( $dbchanges['comment_status'] ) && isset( $this->previous_status ) && ! $this->can_be_displayed( $this->previous_status ) ) )
+				{	// AND if content, rating or parent Item have been updated
+					//     or status has been updated from NOT front-office status into some front-office status:
+					$update_item_contents_last_updated_date = true;
 				}
-				// Also update new post
-				$update_item_last_touched_date = true;
+			}
+
+			if( ! empty( $this->previous_item_ID ) )
+			{	// If comment has been moved from another post:
+				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
+				{	// Update ONLY last touched date of previous item:
+					$previous_Item->update_last_touched_date( false, true );
+					if( $refresh_previous_item_contents_last_updated_date )
+					{	// Refresh contents last updated ts of the previous parent Item if this Comment was the latest FRONT-OFFICE VISIBLE Comment of the previous parent Item:
+						$previous_Item->refresh_contents_last_updated_ts();
+					}
+				}
 
 				// Also move all child comments to new post
 				$child_comment_IDs = $this->get_child_comment_IDs();
@@ -4330,7 +4361,12 @@ class Comment extends DataObject
 				}
 			}
 
-			$this->update_last_touched_date( $update_item_last_touched_date, $update_item_last_touched_date );
+			if( $refresh_parent_item_contents_last_updated_date )
+			{	// Refresh contents last updated ts of the parent Item:
+				$comment_Item->refresh_contents_last_updated_ts();
+			}
+
+			$this->update_last_touched_date( true, $update_item_contents_last_updated_date );
 
 			$DB->commit();
 
@@ -4397,10 +4433,10 @@ class Comment extends DataObject
 
 		if( $r = parent::dbinsert() )
 		{
-			if( $this->is_published() )
-			{ // Update last touched date of item if comment is created in published status
-				$this->update_last_touched_date( true, true );
-			}
+			// Update last touched date of item if comment is created with ANY status,
+			// But update contents last updated date of item if comment is created ONLY in published status(Public, Community or Members):
+			$this->update_last_touched_date( true, $this->may_be_seen_in_frontoffice() );
+			// Plugin event to call after new comment insert:
 			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
 		}
 
@@ -4424,7 +4460,6 @@ class Comment extends DataObject
 			$DB->begin();
 		}
 
-		$was_published = $this->is_published();
 		if( $this->status != 'trash' )
 		{ // The comment was not recycled yet
 			if( $this->has_replies() )
@@ -4435,6 +4470,12 @@ class Comment extends DataObject
 				  WHERE comment_in_reply_to_cmt_ID = '.$this->ID );
 			}
 		}
+
+		// Check we should refresh contents last updated date of the parent Item after
+		// deleting of this Comment because it was the latest comment of the parent Item:
+		$refresh_parent_item_contents_last_updated_date = ( ( $comment_Item = & $this->get_Item() ) &&
+			( $item_latest_Comment = & $comment_Item->get_latest_Comment() ) &&
+			( $item_latest_Comment->ID == $this->ID ) );
 
 		if( $force_permanent_delete || ( $this->status == 'trash' ) || $this->is_meta() )
 		{	// Permamently delete comment from DB:
@@ -4459,13 +4500,20 @@ class Comment extends DataObject
 
 		if( $r )
 		{
-			if( $was_published )
-			{	// Update last touched date and content last updated date of item if a published comment was deleted:
-				$this->update_last_touched_date( true, true );
+			if( $this->ID == 0 )
+			{	// Update only last touched date of item if comment was deleted from DB,
+				// Don't call this when comment was recycled because we already called this on dbupdate() above:
+				$this->update_last_touched_date();
 			}
+
 			if( $use_transaction )
 			{
 				$DB->commit();
+			}
+
+			if( $refresh_parent_item_contents_last_updated_date )
+			{	// Refresh contents last updated ts of parent Item if this Comment was the latest Comment of parent Item:
+				$comment_Item->refresh_contents_last_updated_ts();
 			}
 		}
 		else
@@ -4854,9 +4902,10 @@ class Comment extends DataObject
 	/**
 	 * Check if this comment can be displayed for current user on front-office
 	 *
+	 * @param string|NULL Status | NULL to use current status of this comment
 	 * @return boolean
 	 */
-	function can_be_displayed()
+	function can_be_displayed( $status = NULL )
 	{
 		if( empty( $this->ID ) )
 		{	// Comment is not created yet, so it cannot be displayed:
@@ -4866,7 +4915,42 @@ class Comment extends DataObject
 		// Load Item of this comment to get a collection ID:
 		$Item = & $this->get_Item();
 
-		return can_be_displayed_with_status( $this->get( 'status' ), 'comment', $Item->get_blog_ID(), $this->author_user_ID );
+		if( $status === NULL )
+		{	// Use current status of this comment:
+			$status = $this->get( 'status' );
+		}
+
+		return can_be_displayed_with_status( $status, 'comment', $Item->get_blog_ID(), $this->author_user_ID );
+	}
+
+
+	/**
+	 * Get comment order numbers for current filtered list (global $CommentList)
+	 *
+	 * @return integer|NULL
+	 */
+	function get_inlist_order()
+	{
+		if( empty( $this->ID ) )
+		{	// This comment must exist in DB
+			return NULL;
+		}
+
+		global $CommentList;
+
+		if( empty( $CommentList ) )
+		{	// Comment list must be initialized globally
+			return NULL;
+		}
+
+		if( ! isset( $CommentList->inlist_orders[ $this->ID ] ) )
+		{	// Order number is not found in list for this comment:
+			return NULL;
+		}
+
+		$inlist_order = intval( $CommentList->inlist_orders[ $this->ID ] );
+
+		return $inlist_order < 0 ? 0 : $inlist_order;
 	}
 }
 

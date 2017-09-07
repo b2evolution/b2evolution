@@ -169,7 +169,7 @@ function ityp_row_usage( $item_type_usage )
 	switch( $item_type_usage )
 	{
 		case 'post':
-			return T_('Post');
+			return /* TRANS: noun */ T_('Post');
 		case 'page':
 			return T_('Page');
 		case 'intro-front':
@@ -186,6 +186,8 @@ function ityp_row_usage( $item_type_usage )
 			return T_('Intro-All');
 		case 'special':
 			return T_('Special');
+		case 'content-block':
+			return T_('Content Block');
 		default:
 			return $item_type_usage;
 	}

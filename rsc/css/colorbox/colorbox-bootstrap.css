@@ -36,8 +36,8 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-align-items: center;
-  -ms-flex-align: center;
-      align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 #cboxTitle {
   margin: 0;
@@ -128,17 +128,17 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
   -webkit-flex-wrap: nowrap;
       -ms-flex-wrap: nowrap;
           flex-wrap: nowrap;
   -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
-      justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
   -webkit-align-items: center;
-  -ms-flex-align: center;
-      align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 #cboxCurrent {
   margin: 0 5px;
@@ -148,30 +148,30 @@
 }
 #cboxSlideshow {
   position: absolute;
-  bottom: 4px;
-  right: 30px;
+  bottom: 13px;
+  right: 50px;
   color: #0092ef;
   line-height: 17px;
 }
 #cboxNavigation {
-  -ms-flex-preferred-size: auto;
-          -webkit-flex-basis: auto;
+  -webkit-flex-basis: auto;
+      -ms-flex-preferred-size: auto;
           flex-basis: auto;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
   -webkit-flex-wrap: nowrap;
       -ms-flex-wrap: nowrap;
           flex-wrap: nowrap;
   -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
-      justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
   -webkit-align-items: center;
-  -ms-flex-align: center;
-      align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   min-width: 80px;
 }
 #cboxPrevious,
@@ -206,8 +206,8 @@
   color: #999;
   font: normal normal normal 40px/1 FontAwesome;
   visibility: hidden;
-  -ms-flex-preferred-size: auto;
-          -webkit-flex-basis: auto;
+  -webkit-flex-basis: auto;
+      -ms-flex-preferred-size: auto;
           flex-basis: auto;
 }
 #cboxClose:before {

@@ -107,8 +107,8 @@
         return this.each(function() {
                         
             /* Save this to self because this changes when scope changes. */
-            var self = this;  
-                   
+            var self = this;
+
             /* Inlined block elements lose their width and height after first edit. */
             /* Save them for later use as workaround. */
             var savedwidth  = $(self).width();
@@ -121,7 +121,8 @@
             if (!$.trim($(this).html())) {
                 $(this).html(settings.placeholder);
             }
-            
+
+
             $(this).bind(settings.event, function(e) {
                 
                 /* Abort if element is disabled. */

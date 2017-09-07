@@ -33,7 +33,14 @@ param( 'confirm', 'string' );
 param( 'keyword', 'string', '', true );
 param( 'domain', 'string' );
 param( 'filteron', 'string', '', true );
-param( 'filter', 'array:string', array() );
+if( $action == 'iprange_edit' )
+{	// Memorize action for users and sessions list below edit form:
+	memorize_param( 'action', 'string', '', $action );
+}
+else
+{	// Don't initialize this param as array because it must be string for UserList:
+	param( 'filter', 'array:string', array() );
+}
 
 $tab = param( 'tab', 'string', '', true );
 $tab3 = param( 'tab3', 'string', '', true );
@@ -611,11 +618,24 @@ switch( $tab3 )
 				}
 				// Set IP Start and End from _GET request
 				$ip = param( 'ip', 'string', '' );
+				$ip_start = param( 'ip_start', 'string', '' );
+				$ip_end = param( 'ip_end', 'string', '' );
 				if( ! empty( $ip ) && is_valid_ip_format( $ip ) &&
 				    ( $ip = explode( '.', $ip ) ) && count( $ip ) == 4 )
-				{
+				{	// Prefill from single IP address:
 					$edited_IPRange->set( 'IPv4start', ip2int( implode( '.', array( $ip[0], $ip[1], $ip[2], 0 ) ) ) );
 					$edited_IPRange->set( 'IPv4end', ip2int( implode( '.', array( $ip[0], $ip[1], $ip[2], 255 ) ) ) );
+				}
+				else
+				{	// Prefill from start and end IP addresses:
+					if( ! empty( $ip_start ) && is_valid_ip_format( $ip_start ) )
+					{
+						$edited_IPRange->set( 'IPv4start', ip2int( $ip_start ) );
+					}
+					if( ! empty( $ip_end ) && is_valid_ip_format( $ip_end ) )
+					{
+						$edited_IPRange->set( 'IPv4end', ip2int( $ip_end ) );
+					}
 				}
 				$AdminUI->disp_view( 'antispam/views/_antispam_ipranges.form.php' );
 				break;

@@ -32,7 +32,7 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = 'b2evBAspm';
 	var $priority = 60;
-	var $version = '6.7.9';
+	var $version = '6.9.4';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $number_of_installs = 1;
@@ -217,7 +217,9 @@ class basic_antispam_plugin extends Plugin
 		$comment_Item = & $params['Comment']->get_Item();
 
 		$min_comment_interval = $this->Settings->get( 'min_comment_interval' );
-		if( $params['action'] != 'preview' && ! empty( $min_comment_interval ) )
+		if( $params['action'] != 'preview' &&
+		    ! empty( $min_comment_interval ) &&
+		    ! $params['Comment']->is_meta() )
 		{	// If a comment posting should be blocked by minumum interval:
 			global $Hit, $DB, $localtimenow;
 

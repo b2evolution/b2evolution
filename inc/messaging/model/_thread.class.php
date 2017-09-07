@@ -59,13 +59,17 @@ class Thread extends DataObject
 		{	// New Thread
 			global $Session;
 
-			// check if there is unsaved Thread object stored in Session
-			$unsaved_Thread = $Session->get( 'core.unsaved_Thread' );
-			if( !empty( $unsaved_Thread ) )
-			{	// unsaved thread exists, delete it from Session
-				$Session->delete( 'core.unsaved_Thread' );
-				$this->title = $unsaved_Thread['title'];
-				$this->text = $unsaved_Thread['text'];
+			// erwin > Added check for $Session to enable creation of threads in cases where there is
+			// no Session available such as generation of sample private conversation during install
+			if( $Session )
+			{	// check if there is unsaved Thread object stored in Session
+				$unsaved_Thread = $Session->get( 'core.unsaved_Thread' );
+				if( !empty( $unsaved_Thread ) )
+				{	// unsaved thread exists, delete it from Session
+					$Session->delete( 'core.unsaved_Thread' );
+					$this->title = $unsaved_Thread['title'];
+					$this->text = $unsaved_Thread['text'];
+				}
 			}
 
 			$logins = array();

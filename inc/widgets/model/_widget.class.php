@@ -108,6 +108,17 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get param prefix with is used on edit forms and submit data
+	 *
+	 * @return string
+	 */
+	function get_param_prefix()
+	{
+		return 'edit_widget_'.( empty( $this->ID ) ? '0' : $this->ID ).'_set_';
+	}
+
+
+	/**
 	 * Get ref to the Plugin handling this Widget.
 	 *
 	 * @return Plugin
@@ -191,23 +202,27 @@ class ComponentWidget extends DataObject
 	 * @return string
 	 */
 	function get_desc_for_list()
-	{
-		$name = $this->get_name();
+    {
+        $name = $this->get_name();
 
-		if( $this->type == 'plugin' )
-		{
-			return '<strong>'.$name.'</strong> ('.T_('Plugin').')';
-		}
+        if( $this->type == 'plugin' )
+        {
+            if ( isset($this->disp_params['title']) && ! empty($this->disp_params['title']) ) {
+                return '<strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+            }
 
-		$short_desc = $this->get_short_desc();
+            return '<strong>'.$name.'</strong> ('.T_('Plugin').')';
+        }
 
-		if( $name == $short_desc || empty($short_desc) )
-		{
-			return '<strong>'.$name.'</strong>';
-		}
+        $short_desc = $this->get_short_desc();
 
-		return '<strong>'.$short_desc.'</strong> ('.$name.')';
-	}
+        if( $name == $short_desc || empty($short_desc) )
+        {
+            return '<strong>'.$name.'</strong>';
+        }
+
+        return '<strong>'.$short_desc.'</strong> ('.$name.')';
+    }
 
 
 	/**
@@ -358,7 +373,7 @@ class ComponentWidget extends DataObject
  	 * @param boolean default false, set to true only if it is called from a widget::get_param_definition() function to avoid infinite loop
  	 * @return mixed
 	 */
-	function get_param( $parname, $check_infinite_loop = false )
+	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
 	{
 		$this->load_param_array();
 		if( isset( $this->param_array[$parname] ) )
@@ -369,9 +384,21 @@ class ComponentWidget extends DataObject
 		// Try default values:
 		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
 		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{	// We ahve a default value:
-			return $params[$parname]['defaultvalue'] ;
+
+		if( $group === NULL )
+		{	// Get param from simple field:
+			if( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'] ;
+			}
+		}
+		else
+		{	// Get param from group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
 		}
 
 		return NULL;
@@ -386,11 +413,12 @@ class ComponentWidget extends DataObject
 	 * @param boolean true to set to NULL if empty value
 	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue, $make_null = false )
+	function set( $parname, $parvalue, $make_null = false, $group = NULL )
 	{
 		$params = $this->get_param_definitions( NULL );
 
-		if( isset( $params[$parname] ) )
+		if( isset( $params[$parname] ) || 
+		    ( $group !== NULL && isset( $params[ $group ]['inputs'][ substr( $parname, strlen( $group ) ) ] ) ) )
 		{ // This is a widget specific param:
 			// Make sure param_array is loaded before set the param value
 			$this->load_param_array();
@@ -614,12 +642,12 @@ class ComponentWidget extends DataObject
 	 */
 	function display_with_cache( $params, $keys = array() )
 	{
-		global $Collection, $Blog, $Timer, $debug, $admin_url, $Session;
+		global $Collection, $Blog, $Timer, $debug, $admin_url, $Session, $current_User;
 
 		$this->init_display( $params );
 
 		// Display the debug conatainers when $debug = 2 OR when it is turned on from evo menu under "Blog" -> "Show/Hide containers"
-		$display_containers = $Session->get( 'display_containers_'.$Blog->ID ) == 1 || $debug == 2;
+		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
 		if( ! $Blog->get_setting('cache_enabled_widgets')
 		    || ! $this->disp_params['allow_blockcache']
@@ -629,9 +657,12 @@ class ComponentWidget extends DataObject
 			if( $display_containers )
 			{ // DEBUG:
 				echo '<div class="dev-blocks dev-blocks--widget"><div class="dev-blocks-name" title="'.
-							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'">'
-							.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
-							.'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
+							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'">';
+				if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+				{	// Display a link to edit this widget only if current user has a permission:
+					echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
+				}
+				echo 'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
 			}
 
 			$this->display( $params );
@@ -658,9 +689,12 @@ class ComponentWidget extends DataObject
 
 				if( $display_containers )
 				{ // DEBUG:
-					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--incache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">'
-								.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
-								.'Widget: <b>'.$this->get_name().'</b> - FROM cache <i class="fa fa-info">?</i></div>'."\n";
+					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--incache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">';
+					if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+					{	// Display a link to edit this widget only if current user has a permission:
+						echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
+					}
+					echo 'Widget: <b>'.$this->get_name().'</b> - FROM cache <i class="fa fa-info">?</i></div>'."\n";
 				}
 
 				echo $content;
@@ -676,9 +710,12 @@ class ComponentWidget extends DataObject
 
 				if( $display_containers )
 				{ // DEBUG:
-					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--notincache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">'
-								.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
-								.'Widget: <b>'.$this->get_name().'</b> - NOT in cache <i class="fa fa-info">?</i></div>'."\n";
+					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--notincache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">';
+					if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+					{	// Display a link to edit this widget only if current user has a permission:
+						echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
+					}
+					echo 'Widget: <b>'.$this->get_name().'</b> - NOT in cache <i class="fa fa-info">?</i></div>'."\n";
 				}
 
 				$this->BlockCache->start_collect();
@@ -1131,96 +1168,6 @@ class ComponentWidget extends DataObject
 					return $this->disp_params[$disp_param_prefix.'item_end'];
 				}
 		}
-	}
-
-
-	/**
-	 * Get a layout for menu link
-	 *
-	 * @param string Link URL
-	 * @param string Link text
-	 * @param boolean Is active menu link?
-	 * @param string Link template, possible masks: $link_url$, $link_class$, $link_text$
-	 * @return string
-	 */
-	function get_layout_menu_link( $link_url, $link_text, $is_active_link, $link_template = '<a href="$link_url$" class="$link_class$">$link_text$</a>' )
-	{
-		$r = $this->disp_params['block_start'];
-		$r .= $this->disp_params['block_body_start'];
-
-		// Are we displaying a link in a list or a standalone button?
-		// "Menu" Containers are 'inlist'. Some sub-containers will also be 'inlist' (displaying a local menu).
-		// fp> Maybe this should be moved up to container level? 
-		$inlist = $this->disp_params['inlist'];
-		if( $inlist == 'auto' )
-		{
-			if( empty( $this->disp_params['list_start'] ) )
-			{	// We're not starting a list. This means (very high probability) that we are already in a list:
-				$inlist = true;
-			}
-			else
-			{	// We have no override for list start. This means (very high probability) that we are displaying a standalone link -> we want a button for this widget
-				$inlist = false;
-			}
-		}
-
-		if( $inlist )
-		{	// Classic menu link display:
-
-			// It's debatable whether of not we want 'list_start' here but it doesn't hurt to keep it (will be empty under typical circumstances):
-			$r .= $this->disp_params['list_start'];
-
-			if( $is_active_link )
-			{	// Use template and class to highlight current menu item:
-				$r .= $this->disp_params['item_selected_start'];
-				$link_class = $this->disp_params['link_selected_class'];
-			}
-			else
-			{	// Use normal template:
-				$r .= $this->disp_params['item_start'];
-				$link_class = $this->disp_params['link_default_class'];
-			}
-
-			// Get a link from template:
-			$r .= str_replace(
-				array( '$link_url$', '$link_class$', '$link_text$' ),
-				array( $link_url, $link_class, $link_text ),
-				$link_template );
-
-			if( $is_active_link )
-			{	// Use template to highlight current menu item:
-				$r .= $this->disp_params['item_selected_end'];
-			}
-			else
-			{	// Use normal template:
-				$r .= $this->disp_params['item_end'];
-			}
-
-			$r .= $this->disp_params['list_end'];
-		}
-		else
-		{	// "out-of list" button display:
-
-			if( $is_active_link )
-			{	// Use template and class to highlight current menu item:
-				$button_class = $this->disp_params['button_selected_class'];
-			}
-			else
-			{	// Use normal template:
-				$button_class = $this->disp_params['button_default_class'];
-			}
-
-			// Get a button from template:
-			$r .= str_replace(
-				array( '$link_url$', '$link_class$', '$link_text$' ),
-				array( $link_url, $button_class, $link_text ),
-				$link_template );
-		}
-
-		$r .= $this->disp_params['block_body_end'];
-		$r .= $this->disp_params['block_end'];
-
-		return $r;
 	}
 
 

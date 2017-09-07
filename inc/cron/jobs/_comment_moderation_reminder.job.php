@@ -148,6 +148,7 @@ $SQL->SELECT( 'T_users.*' );
 $SQL->FROM( 'T_users' );
 $SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "send_cmt_moderation_reminder"' );
 $SQL->WHERE( 'user_ID IN ('.implode( ',', $all_required_users ).')' );
+$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 $SQL->WHERE_and( $send_moderation_reminder_cond );
 $SQL->WHERE_and( 'LENGTH(TRIM(user_email)) > 0' );
 $SQL->WHERE_and( $blocked_emails_condition );

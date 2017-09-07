@@ -108,7 +108,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'widget_context' => 'item',	// Signal that we are displaying within an Item
 				// The following (optional) params will be used as defaults for widgets included in this container:
 				// This will enclose each widget in a block:
-				'block_start' => '<div class="$wi_class$">',
+				'block_start' => '<div class="evo_widget $wi_class$">',
 				'block_end' => '</div>',
 				// This will enclose the title of each widget:
 				'block_title_start' => '<h3>',
@@ -137,11 +137,14 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
 			// This will enclose each widget in a block:
-			'block_start' => '<div class="$wi_class$">',
+			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
 			// This will enclose the title of each widget:
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
+			// Template params for "Item Link" widget
+			'widget_item_link_before'    => '<p class="evo_post_link">',
+			'widget_item_link_after'     => '</p>',
 			// Template params for "Item Tags" widget
 			'widget_item_tags_before'    => '<nav class="small post_tags">',
 			'widget_item_tags_after'     => '</nav>',
@@ -174,11 +177,14 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
 			// This will enclose each widget in a block:
-			'block_start' => '<div class="$wi_class$">',
+			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
 			// This will enclose the title of each widget:
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
+			// Template params for "Item Link" widget
+			'widget_item_link_before'    => '<p class="evo_post_link">',
+			'widget_item_link_after'     => '</p>',
 			// Template params for "Item Tags" widget
 			'widget_item_tags_before'    => '<nav class="small post_tags">'.T_('Tags').': ',
 			'widget_item_tags_after'     => '</nav>',

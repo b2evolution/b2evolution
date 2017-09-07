@@ -675,7 +675,7 @@ function get_icon_info( $name )
 			'size' => array( 11, 13 ),
 			'xy' => array( 0, 128 ),
 			'glyph' => 'file',
-			'fa' => 'external-link'
+			'fa' => 'external-link-square'
 		);
 		case 'history': return array(
 			'alt'  => T_('History'),
@@ -1243,6 +1243,14 @@ function get_icon_info( $name )
 			'xy' => array( 0, 0 ),
 			'fa' => 'comments',
 			'color' => '#F90'
+		);
+
+		case 'merge': return array(
+			'alt' => T_('Merge '),
+			'size' => array( 14, 14 ),
+			'xy' => array( 96, 96 ),
+			'glyph' => 'link',
+			'fa' => 'link'
 		);
 	}
 }

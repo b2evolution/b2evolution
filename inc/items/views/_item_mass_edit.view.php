@@ -31,7 +31,7 @@ $perm_slugs_view = $current_User->check_perm( 'slugs', 'view' );
 $Form = new Form();
 
 $redirect_to = regenerate_url( 'action', '', '', '&' );
-$Form->global_icon( T_('Cancel editing!'), 'close', $redirect_to, 4, 2 );
+$Form->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, 4, 2 );
 
 $Form->begin_form( 'fform', T_('Mass edit the current post list').get_manual_link( 'mass-edit-screen' ) );
 
@@ -65,7 +65,7 @@ while( $Item = & $ItemList->get_item() )
 	$edit_slug_link = '';
 	if( $perm_slugs_view )
 	{	// user has permission to view slugs:
-		$edit_slug_link = '&nbsp;'.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
+		$edit_slug_link = '&nbsp;'.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
 	}
 
 	$Form->text( 'mass_title_'.$Item->ID , htmlspecialchars_decode( $Item->get( 'title' ) ), 70, T_('Title'), '', 255 );

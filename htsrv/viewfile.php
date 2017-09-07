@@ -194,7 +194,7 @@ switch( $viewtype )
 
 			if( !$buffer_lines )
 			{
-				echo '<p>** '.T_('Empty file!').' ** </p></div>';
+				echo '<p>** '.T_('Empty file').'! ** </p></div>';
 			}
 			else
 			{

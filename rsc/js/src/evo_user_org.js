@@ -86,6 +86,7 @@ function user_remove( org_ID, user_ID )
 		{
 			'ctrl': 'organizations',
 			'action': 'remove_user',
+			'org_ID': org_ID,
 			'user_ID': user_ID,
 			'display_mode': 'js',
 			'crumb_user': evo_js_crumb_organization,

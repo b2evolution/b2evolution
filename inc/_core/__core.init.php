@@ -857,7 +857,15 @@ class _core_Module extends Module
 	 */
 	function check_core_group_perm( $permlevel, $permvalue, $permtarget )
 	{
+		global $current_User;
+
 		$perm = false;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'admin', 'normal' ) )
+		{	// Current user must has Normal Back-office Access to view/moderate/edit other users:
+			return $perm;
+		}
+
 		switch ( $permvalue )
 		{
 			case 'edit':
@@ -1192,26 +1200,28 @@ class _core_Module extends Module
 				);
 			}
 
-			// ---- "Page" MENU ----
-			$entries['page'] = array(
-					'text' => T_('Page'),
-					'entries' => array(
-						// PLACE HOLDER FOR ENTRY "Edit contents":
-						'edit'       => NULL,
-						// PLACE HOLDERS FOR SESSIONS MODULE:
-						'stats_sep'  => NULL,
-						'stats_page' => NULL,
-					)
-				);
+			if( ! is_admin_page() )
+			{	// ---- "Page" MENU ----
+				$entries['page'] = array(
+						'text' => T_('Page'),
+						'entries' => array(
+							// PLACE HOLDER FOR ENTRY "Edit contents":
+							'edit'       => NULL,
+							// PLACE HOLDERS FOR SESSIONS MODULE:
+							'stats_sep'  => NULL,
+							'stats_page' => NULL,
+						)
+					);
+			}
 
 			// ---- "Post"/"Edit" MENU ----
 			if( $perm_admin_normal )
 			{	// Only for normal access display a menu item to create new:
 				$entries['post'] = array(
-						'text' => get_icon( 'new' ).' '.T_('Post'),
+						'text' => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
 						'title' => T_('No blog is currently selected'),
 						'disabled' => true,
-						'entry_class' => 'rwdhide',
+						'entry_class' => 'rwdhide evobar-entry-new-post',
 					);
 			}
 		}
@@ -1235,17 +1245,10 @@ class _core_Module extends Module
 							'entry_class' => 'rwdhide',
 						);
 				}
-				elseif(
-				  // Front-office post view page:
-				  ( ( $disp == 'single' || $disp == 'page' ) &&
-				    isset( $Item ) &&
-				    $edit_item_url = $Item->get_edit_url() ) ||
-				  // Back-office post view page:
-				  ( $ctrl == 'items' && $action == 'view' &&
-				    get_param( 'p' ) > 0 &&
-				    $ItemCache = & get_ItemCache() &&
-				    $Item = & $ItemCache->get_by_ID( get_param( 'p' ), false, false ) &&
-				   $edit_item_url = $Item->get_edit_url() ) )
+				elseif( ! is_admin_page() &&
+				  ( $disp == 'single' || $disp == 'page' ) &&
+				  ! empty( $Item ) &&
+				  $edit_item_url = $Item->get_edit_url() )
 				{	// If curent user has a permission to edit a current viewing post:
 					$entries['post'] = array(
 							'text'        => '<span class="fa fa-pencil-square"></span> '.T_('Edit'),
@@ -1264,8 +1267,8 @@ class _core_Module extends Module
 					if( ! $perm_admin_normal )
 					{	// Initialize this menu item when user has no back-office access but can create new post:
 						$entries['post'] = array(
-							'text'        => get_icon( 'new' ).' '.T_('Post'),
-							'entry_class' => 'rwdhide',
+							'text'        => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
+							'entry_class' => 'rwdhide evobar-entry-new-post',
 						);
 					}
 					$entries['post']['href'] = $write_item_url;
@@ -1309,9 +1312,24 @@ class _core_Module extends Module
 
 					if( $Blog->get( 'type' ) == 'manual' )
 					{ // Manual view
+						global $cat, $Item;
+						if( ! empty( $Item ) &&
+						        $Item->ID > 0 &&
+						        ( $item_Chapter = & $Item->get_main_Chapter() ) )
+						{	// Set category param from current selected item/post:
+							$manual_view_cat_param = '&amp;cat_ID='.$item_Chapter->ID.'&amp;highlight_id='.$Item->ID;
+						}
+						elseif( ! empty( $cat ) && is_number( $cat ) )
+						{	// Set category param from current selected category:
+							$manual_view_cat_param = '&amp;cat_ID='.$cat.'&amp;highlight_cat_id='.$cat;
+						}
+						else
+						{	// No selected category and item/post:
+							$manual_view_cat_param = '';
+						}
 						$entries['blog']['entries']['manual'] = array(
 								'text' => T_('Manual view').'&hellip;',
-								'href' => $items_url.'&amp;tab=manual',
+								'href' => $items_url.'&amp;tab=manual'.$manual_view_cat_param,
 							);
 					}
 
@@ -1601,7 +1619,7 @@ class _core_Module extends Module
 					);
 			}
 
-			if( ! empty( $dev_entries ) )
+			if( ! is_admin_page() && ! empty( $dev_entries ) )
 			{	// Use the same dev entries in "Page" menu:
 				if( empty( $entries['page']['entries'] ) )
 				{
@@ -1800,7 +1818,7 @@ class _core_Module extends Module
 		$entries['userprefs']['entries'][] = array( 'separator' => true );
 
 		$entries['userprefs']['entries']['logout'] = array(
-				'text' => T_('Log out!'),
+				'text' => T_('Log out').'!',
 				'href' => get_user_logout_url(),
 			);
 
