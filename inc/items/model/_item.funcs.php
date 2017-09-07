@@ -242,9 +242,10 @@ function init_inskin_editing()
  *                 "*": all blogs
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
+ * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
  * @return Item
  */
-function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
+function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false )
 {
 	global $Collection, $Blog, $cat;
 	global $disp, $disp_detail, $MainList, $FeaturedList;
@@ -328,31 +329,39 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		// SECOND: If no Intro, try to find an Featured post:
 
 		if( isset($Blog) )
+		{
+			if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
+				&& isset($Blog)
+				&& $Blog->get_setting('disp_featured_above_list') )
+			{ // No Intro page was found, try to find a featured post instead:
 
-		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
-			&& isset($Blog)
-			&& $Blog->get_setting('disp_featured_above_list') )
-		{ // No Intro page was found, try to find a featured post instead:
+				$FeaturedList->reset();
 
-			$FeaturedList->reset();
+				$FeaturedList->set_filters( array(
+						'coll_IDs' => $coll_IDs,
+						'featured' => 1,  // Featured posts only
+						// Types will already be reset to defaults here
+					), false /* Do NOT memorize!! */ );
 
-			$FeaturedList->set_filters( array(
-					'coll_IDs' => $coll_IDs,
-					'featured' => 1,  // Featured posts only
-					// Types will already be reset to defaults here
-				), false /* Do NOT memorize!! */ );
-
-			// Run the query:
-			$FeaturedList->query();
+				// Run the query:
+				$FeaturedList->query();
+			}
 		}
 	}
 
 	// Get first Item in the result set.
-	$Item = $FeaturedList->get_item();
+	if( $preview )
+	{ // We only want want a preview of the first item
+		$Item = $FeaturedList->get_by_idx( 0 );
+	}
+	else
+	{
+		$Item = $FeaturedList->get_item();
 
-	if( $Item )
-	{	// Memorize that ID so that it can later be filtered out of normal display:
-		$featured_displayed_item_IDs[] = $Item->ID;
+		if( $Item )
+		{	// Memorize that ID so that it can later be filtered out of normal display:
+			$featured_displayed_item_IDs[] = $Item->ID;
+		}
 	}
 
 	return $Item;
@@ -3369,7 +3378,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 
 		echo '<span class="bDate">';
 		$Comment->date();
-		echo '</span>@<span class = "bTime">';
+		echo '</span> @ <span class = "bTime">';
 		$Comment->time( '#short_time' );
 		echo '</span>';
 
@@ -3383,6 +3392,10 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 			echo ' &middot; <span class="bKarma">';
 			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
 			echo '</span>';
+
+			// Last touched date:
+			echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
+				.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Comment->get( 'last_touched_ts' ) ).'</span>';
 
 			echo '</div>';
 			echo '<div style="padding-top:3px">';
@@ -4175,7 +4188,7 @@ function items_manual_results_block( $params = array() )
 
 	$Table = new Table( 'Results', $params['results_param_prefix'] );
 
-	$Table->title = T_('Manual view');
+	$Table->title = T_('Manual view').get_manual_link( 'manual-pages-editor' );
 
 	// Redirect to manual pages after adding chapter
 	$redirect_page = '&amp;redirect_page=manual';
@@ -4229,7 +4242,7 @@ function items_manual_results_block( $params = array() )
 	$Table->display_list_end();
 
 	// Flush fadeout
-	$Session->delete( 'fadeout_array');
+	$Session->delete( 'fadeout_array' );
 
 	echo $Table->params['content_end'];
 
@@ -4658,7 +4671,7 @@ function items_results( & $items_Results, $params = array() )
 				'order' => $params['field_prefix'].'title',
 				'td_class' => 'tskst_$post_pst_ID$',
 				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].' )%</strong>'.
-				        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@' : '' ),
+				        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\', \'\', NULL, array( \'none\' ) )@' : '' ),
 			);
 	}
 
@@ -5069,7 +5082,11 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	// Redirect to manual pages after adding/editing chapter
 	$redirect_page = '&amp;redirect_page=manual';
 
-	$r = '<tr id="cat-'.$Chapter->ID.'" class="'.$line_class.( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">';
+	// Check if current item's row should be highlighted:
+	$is_highlighted = ( param( 'highlight_cat_id', 'integer', NULL ) == $Chapter->ID ) ||
+		( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) );
+
+	$r = '<tr id="cat-'.$Chapter->ID.'" class="'.$line_class.( $is_highlighted ? ' evo_highlight' : '' ).'">';
 
 	$open_url = $admin_url.'?ctrl=items&amp;tab=manual&amp;blog='.$Chapter->blog_ID;
 	// Name
@@ -5179,7 +5196,11 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
-	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">';
+	// Check if current item's row should be highlighted:
+	$is_highlighted = ( param( 'highlight_id', 'integer', NULL ) == $Item->ID ) ||
+		( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) );
+
+	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( $is_highlighted ? ' evo_highlight' : '' ).'">';
 
 	// Title
 	$edit_url = $Item->ID;
@@ -5211,7 +5232,10 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	// URL "slug"
 	$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Item->ID.'&amp;action=edit' );
-	$r .= '<td>'.$Item->get_title( $params );
+	$r .= '<td>'.$Item->get_title( array_merge( $params, array(
+			'post_navigation' => 'same_category', // set a navigating through category
+			'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
+		) ) );
 	if( $current_User->check_perm( 'slugs', 'view', false ) )
 	{ // Display icon to view all slugs of this item if current user has permission
 		$r .= ' '.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );

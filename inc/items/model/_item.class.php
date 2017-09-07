@@ -377,8 +377,33 @@ class Item extends ItemLight
 		else
 		{
 			$this->datecreated = $db_row->post_datecreated;           // When Item was created in the system
+<<<<<<< HEAD
 			$this->last_touched_ts = $db_row->post_last_touched_ts;   // When Item received last visible change (edit, comment, etc.)
 			$this->contents_last_updated_ts = $db_row->post_contents_last_updated_ts;
+=======
+
+			// post_last_touched_ts : When Item received last visible change (edit, comment, etc.)
+			// Used for:
+			//   - Sorting posts if configured this way in collection features.
+			// Updated when:
+			//   - ANY item field is updated,
+			//   - link, unlink an attachment, update an attached file, change a link order
+			//   - any child COMMENT of the post is added/updated/deleted,
+			//   - link, unlink an attachment, update an attached file, change a link order on any comment
+			$this->last_touched_ts = $db_row->post_last_touched_ts;
+
+			// post_contents_last_updated_ts : When Item received last content change
+			// Used for:
+			//   - Knowing if current user has seen the updates on the post
+			//   - Sorting forums (by default; can be changed in collection features)
+			// Updated only when:
+			//   - at least ONE of the fields: title, content, url is updated --> Especially: don't update on status change, workflow change, because it doesn't affect whether users have seen latest content changes or not
+			//   - link, unlink an attachment, update an attached file (note: link order changes are not recorded because it doesn't affect whether users have seen lastest content changes)
+			//   - a child COMMENT of the post that can be seen in the front-office is added or updated (only Content or Rating fields, or front-office visibility is changed from NOT front-office visibility) (but don't update on deleted comments or invisible comments -- When deleting a comment we actually recompute an OLDER timestamp based on last remaining comment, Also we recompute this when move a front-office visibility latest comment to other post OR when the latest comment becomes invisible for front-office)
+			//   - link, unlink an attachment, update an attached file on child comments that may be seen in front office (note: link order changes are not recorded because it doesn't affect whether users have seen latest content changes)
+			$this->contents_last_updated_ts = $db_row->post_contents_last_updated_ts;
+
+>>>>>>> develop
 			$this->creator_user_ID = $db_row->post_creator_user_ID;   // Needed for history display
 			$this->lastedit_user_ID = $db_row->post_lastedit_user_ID; // Needed for history display
 			$this->assigned_user_ID = $db_row->post_assigned_user_ID;
@@ -668,6 +693,9 @@ class Item extends ItemLight
 			$this->set( 'ityp_ID', $item_typ_ID );
 		}
 
+		// Check if this Item type usage is not content block in order to hide several fields below:
+		$is_not_content_block = ( $this->get_type_setting( 'usage' ) != 'content-block' );
+
 		// URL associated with Item:
 		$post_url = param( 'post_url', 'string', NULL );
 		$url_error = validate_url( $post_url, 'http-https' );
@@ -755,35 +783,38 @@ class Item extends ItemLight
 			}
 		}
 
-		// <title> TAG:
-		$titletag = param( 'titletag', 'string', NULL );
-		if( $titletag !== NULL )
-		{
-			$this->set_from_Request( 'titletag', 'titletag' );
-		}
-		if( empty( $titletag ) && $this->get_type_setting( 'use_title_tag' ) == 'required' )
-		{ // Title tag must be entered
-			param_check_not_empty( 'titletag', T_('Please provide a title tag.'), '' );
-		}
+		if( $is_not_content_block )
+		{	// Save title tag, meta description and meta keywords for item with type usage except of content block:
+			// <title> TAG:
+			$titletag = param( 'titletag', 'string', NULL );
+			if( $titletag !== NULL )
+			{
+				$this->set_from_Request( 'titletag', 'titletag' );
+			}
+			if( empty( $titletag ) && $this->get_type_setting( 'use_title_tag' ) == 'required' )
+			{ // Title tag must be entered
+				param_check_not_empty( 'titletag', T_('Please provide a title tag.'), '' );
+			}
 
-		// <meta> DESC:
-		$metadesc = param( 'metadesc', 'string', NULL );
-		if( $metadesc !== NULL ) {
-			$this->set_setting( 'metadesc', get_param( 'metadesc' ) );
-		}
-		if( empty( $metadesc ) && $this->get_type_setting( 'use_meta_desc' ) == 'required' )
-		{ // Meta description must be entered
-			param_check_not_empty( 'metadesc', T_('Please provide a meta description.'), '' );
-		}
+			// <meta> DESC:
+			$metadesc = param( 'metadesc', 'string', NULL );
+			if( $metadesc !== NULL ) {
+				$this->set_setting( 'metadesc', get_param( 'metadesc' ) );
+			}
+			if( empty( $metadesc ) && $this->get_type_setting( 'use_meta_desc' ) == 'required' )
+			{ // Meta description must be entered
+				param_check_not_empty( 'metadesc', T_('Please provide a meta description.'), '' );
+			}
 
-		// <meta> KEYWORDS:
-		$metakeywords = param( 'metakeywords', 'string', NULL );
-		if( $metakeywords !== NULL ) {
-			$this->set_setting( 'metakeywords', get_param( 'metakeywords' ) );
-		}
-		if( empty( $metakeywords ) && $this->get_type_setting( 'use_meta_keywds' ) == 'required' )
-		{ // Meta keywords must be entered
-			param_check_not_empty( 'metakeywords', T_('Please provide the meta keywords.'), '' );
+			// <meta> KEYWORDS:
+			$metakeywords = param( 'metakeywords', 'string', NULL );
+			if( $metakeywords !== NULL ) {
+				$this->set_setting( 'metakeywords', get_param( 'metakeywords' ) );
+			}
+			if( empty( $metakeywords ) && $this->get_type_setting( 'use_meta_keywds' ) == 'required' )
+			{ // Meta keywords must be entered
+				param_check_not_empty( 'metakeywords', T_('Please provide the meta keywords.'), '' );
+			}
 		}
 
 		// TAGS:
@@ -806,7 +837,7 @@ class Item extends ItemLight
 
 		// WORKFLOW stuff:
 		$item_Blog = $this->get_Blog();
-		if( $item_Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
+		if( $is_not_content_block && $item_Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
 		{	// Update workflow properties only when it is enabled by collection setting and allowed for current user:
 			$ItemTypeCache = & get_ItemTypeCache();
 			$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
@@ -843,12 +874,17 @@ class Item extends ItemLight
 		// FEATURED checkbox:
 		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
 
-		// HIDE TEASER checkbox:
-		$this->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
-		$goal_ID = param( 'goal_ID', 'integer', NULL );
-		if( $goal_ID !== NULL )
-		{ // Goal ID
-			$this->set_setting( 'goal_ID', $goal_ID, true );
+		if( $is_not_content_block )
+		{	// Save "hide teaser" and goal for item with type usage except of content block:
+			// HIDE TEASER checkbox:
+			$this->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
+
+			// Goal ID:
+			$goal_ID = param( 'goal_ID', 'integer', NULL );
+			if( $goal_ID !== NULL )
+			{	// Save only if it is provided:
+				$this->set_setting( 'goal_ID', $goal_ID, true );
+			}
 		}
 
 		// ORDER:
@@ -897,7 +933,7 @@ class Item extends ItemLight
 					case 'double':
 						$param_type = 'double';
 						$field_value = param( $param_name, 'string', NULL );
-						if( ! preg_match( '/^(\+|-)?[0-9]+(.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
+						if( ! empty( $field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
 						{
 							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
 							$param_error = true;
@@ -1042,22 +1078,25 @@ class Item extends ItemLight
 			param_check_not_empty( 'content', T_('Please enter some text.'), '' );
 		}
 
-		// EXCERPT: (must come after content (in order to handle excerpt_autogenerated))
-		$post_excerpt = param( 'post_excerpt', 'text', NULL );
-		if( $post_excerpt !== NULL )
-		{	// The form has sent an excerpt field:
-			$post_excerpt_autogenerated = param( 'post_excerpt_autogenerated', 'integer', 0 );
-			$this->set_from_Request( 'excerpt_autogenerated' );
-			if( ! $this->get( 'excerpt_autogenerated' ) )
-			{	// The post excerpt must be no longer auto-generated:
-				// NOTE: if the new excerpt is empty, set() will switch back to autogeneration:
-				$this->set_from_Request( 'excerpt' );
+		if( $is_not_content_block )
+		{	// Save excerpt for item with type usage except of content block:
+			// EXCERPT: (must come after content (in order to handle excerpt_autogenerated))
+			$post_excerpt = param( 'post_excerpt', 'text', NULL );
+			if( $post_excerpt !== NULL )
+			{	// The form has sent an excerpt field:
+				$post_excerpt_autogenerated = param( 'post_excerpt_autogenerated', 'integer', 0 );
+				$this->set_from_Request( 'excerpt_autogenerated' );
+				if( ! $this->get( 'excerpt_autogenerated' ) )
+				{	// The post excerpt must be no longer auto-generated:
+					// NOTE: if the new excerpt is empty, set() will switch back to autogeneration:
+					$this->set_from_Request( 'excerpt' );
+				}
 			}
-		}
 
-		if( empty( $post_excerpt ) && $this->get_type_setting( 'use_excerpt' ) == 'required' )
-		{ // Content must be entered (this should happen even if no excerpt field was submitted)
-			param_check_not_empty( 'post_excerpt', T_('Please provide an excerpt.'), '' );
+			if( empty( $post_excerpt ) && $this->get_type_setting( 'use_excerpt' ) == 'required' )
+			{ // Content must be entered (this should happen even if no excerpt field was submitted)
+				param_check_not_empty( 'post_excerpt', T_('Please provide an excerpt.'), '' );
+			}
 		}
 
 		// LOCATION (COUNTRY -> CITY):
@@ -5999,6 +6038,19 @@ class Item extends ItemLight
 			}
 		}
 
+		if( $post_comment_status == 'closed' || $post_comment_status == 'disabled' )
+		{	// Check if item type allows these options:
+			$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
+			if( $post_comment_status == 'closed' && ! $ItemType->get( 'allow_closing_comments' ) )
+			{
+				debug_die( 'Item type "'.$ItemType->get_name().'" doesn\'t support closing comments, please set another comment status for item "'.$post_title.'"' );
+			}
+			elseif( $post_comment_status == 'disabled' && ! $ItemType->get( 'allow_disabling_comments' ) )
+			{
+				debug_die( 'Item type "'.$ItemType->get_name().'" doesn\'t support disabling comments, please set another comment status for item "'.$post_title.'"' );
+			}
+		}
+
 		if( empty( $item_typ_ID ) )
 		{	// Use first item type by default for wrong request:
 			$item_typ_ID = 1;
@@ -7997,9 +8049,10 @@ class Item extends ItemLight
 	/**
 	 * Get the latest Comment on this Item
 	 *
+	 * @param array|NULL Restrict comments selection with statuses, NULL - to select only allowed statuses for current User
 	 * @return Comment
 	 */
-	function & get_latest_Comment()
+	function & get_latest_Comment( $statuses = NULL )
 	{
 		global $DB;
 
@@ -8016,14 +8069,22 @@ class Item extends ItemLight
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$DB->quote( $this->ID ) );
 			$SQL->WHERE_and( 'comment_type != "meta"' );
-			$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), 'comment_', $this->get_blog_ID(), 'blog_comment!', true ) );
+			if( $statuses === NULL )
+			{	// Restrict with comment statuses which are allowed for current User:
+				$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), 'comment_', $this->get_blog_ID(), 'blog_comment!', true ) );
+			}
+			elseif( is_array( $statuses ) && count( $statuses ) )
+			{	// Restrict with given comment statuses:
+				$SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $statuses ).' )' );
+			}
 			$SQL->ORDER_BY( 'comment_date DESC' );
 			$SQL->LIMIT( '1' );
 
 			if( $comment_ID = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
 			{	// Load the latest Comment in cache:
 				$CommentCache = & get_CommentCache();
-				$this->latest_Comment = & $CommentCache->get_by_ID( $comment_ID );
+				// WARNING: Do NOT get this object by reference because it may rewrites current updating Comment:
+				$this->latest_Comment = $CommentCache->get_by_ID( $comment_ID );
 			}
 			else
 			{	// Set FALSE to don't call SQL query twice when the item has no comments yet:
@@ -9705,7 +9766,143 @@ class Item extends ItemLight
 		echo $params['after'];
 	}
 
+
+	/**
+	 * Check if current User has a permission to refresh a contents last updated date of this Item
+	 *
+	 * @return boolean
+	 */
+	function can_refresh_contents_last_updated()
+	{
+		if( ! $this->ID )
+		{	// If this Item is not saved in DB yet:
+			return false;
+		}
+
+		if( ! is_logged_in( false ) )
+		{	// If current user is not logged in or not activated:
+			return false;
+		}
+
+		global $current_User;
+
+		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// If user has no perm to edit this Item:
+			return false;
+		}
+
+		// No restriction, Current User has a permission to refresh a contents last updated date of this Item:
+		return true;
+	}
+
+
 	
+
+	 * Get URL to refresh a contents last updated date of this Item if user has refresh rights
+	 *
+	 * @param array Params
+	 * @return string|boolean URL or FALSE if current user has no perm
+	 */
+	function get_refresh_contents_last_updated_url( $params = array() )
+	{
+		if( ! $this->can_refresh_contents_last_updated() )
+		{	// If current User has no perm to refresh:
+			return false;
+		}
+
+		$params = array_merge( array(
+				'glue' => '&amp;'
+			), $params );
+
+		$url = get_htsrv_url().'action.php?mname=collections'.$params['glue']
+			.'action=refresh_contents_last_updated'.$params['glue']
+			.'item_ID='.$this->ID.$params['glue']
+			.url_crumb( 'collections_refresh_contents_last_updated' );
+
+		return $url;
+	}
+
+
+	/**
+	 * Get a link to refresh a contents last updated date of this Item if user has refresh rights
+	 *
+	 * @param array Params
+	 */
+	function get_refresh_contents_last_updated_link( $params = array() )
+	{
+		$params = array_merge( array(
+				'before' => ' ',
+				'after'  => '',
+				'text'   => '#icon#',
+				'title'  => '#',
+				'class'  => '',
+				'glue'   => '&amp;',
+			), $params );
+
+		$refresh_url = $this->get_refresh_contents_last_updated_url( $params );
+		if( ! $refresh_url )
+		{	// If current user has no perm to refesh contents last updated date of this Item:
+			return;
+		}
+
+		if( $params['title'] == '#' )
+		{	// Use default title
+			$params['title'] = T_('Refresh "contents last updated" timestamp!');
+		}
+
+		$params['text'] = utf8_trim( $params['text'] );
+		$params['title'] = utf8_trim( $params['title'] );
+		$params['class'] = utf8_trim( $params['class'] );
+
+		$r = $params['before'];
+
+		$r .= '<a href="'.$refresh_url.'"'
+				.( empty( $params['title'] ) ? '' : ' title="'.format_to_output( $params['title'], 'htmlattr' ).'"' )
+				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
+			.'>'
+				.str_replace( '#icon#', get_icon( 'refresh', 'imgtag', array( 'title' => $params['title'] ) ), $params['text'] )
+			.'</a>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Refresh contents last updated ts with date of the latest Comment
+	 *
+	 * @return boolean TRUE of success
+	 */
+	function refresh_contents_last_updated_ts()
+	{
+		if( ! $this->can_refresh_contents_last_updated() )
+		{	// If current User has no permission to refresh a contents last updated date of the requested Item:
+			return false;
+		}
+
+		// Clear latest Comment from previous calling before Comment updating:
+		$this->latest_Comment = NULL;
+
+		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ) ) )
+		{	// Use date from the latest public Comment:
+			$new_contents_last_updated_ts = $latest_Comment->get( 'last_touched_ts' );
+		}
+		else
+		{	// Use date from issue date of this Item:
+			$new_contents_last_updated_ts = $this->get( 'datestart' );
+		}
+
+		global $DB;
+
+		$DB->query( 'UPDATE T_items__item
+					SET post_contents_last_updated_ts = '.$DB->quote( $new_contents_last_updated_ts ).'
+				WHERE post_ID = '.$this->ID );
+
+		return true;
+	}
+
+
 	/**
 	 * Get the latest revision of the current Item
 	 *

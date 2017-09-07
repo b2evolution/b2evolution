@@ -518,8 +518,9 @@ switch( $action )
 				'baseurl'        => $conf_baseurl,
 				'admin_email'    => $conf_admin_email,
 			);
-		if( ! update_basic_config_file( $basic_config_params ) )
+		if( ! update_basic_config_file( $basic_config_params ) && $action == 'conf' )
 		{ // Break here if some error on creating/updating basic config file
+			// and action has not been switched to display another page from case below:
 			break;
 		}
 		// ATTENTION: we continue here...
@@ -1319,10 +1320,7 @@ switch( $action )
 
 	default:
 		// This should not happen!
-		pre_dump($action);
 }
-
-// pre_dump($action);
 
 block_close();
 

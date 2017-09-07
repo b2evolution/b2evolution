@@ -1739,7 +1739,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_pwdchange'             => '_profile.disp.php',
 				'disp_userprefs'             => '_profile.disp.php',
 				'disp_subs'                  => '_profile.disp.php',
-				'disp_visits'                => '_profile.disp.php',
+				'disp_visits'                => '_visits.disp.php',
 				'disp_register'              => '_register.disp.php',
 				'disp_search'                => '_search.disp.php',
 				'disp_single'                => '_single.disp.php',
@@ -2189,57 +2189,56 @@ function skin_opengraph_tags()
 		return;
 	}
 
-	// Get info for og:image tag
-	$og_images = array();
-	if( in_array( $disp, array( 'single', 'page' ) ) )
-	{ // Use only on 'single' and 'page' disp
-		$Item = & $MainList->get_by_idx( 0 );
-		if( is_null( $Item ) )
-		{ // This is not an object (happens on an invalid request):
-			return;
-		}
+	switch( $disp )
+	{
+		case 'single':
+		case 'page':
+			$Item = & $MainList->get_by_idx( 0 );
 
-		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
-				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
-				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
-		{ // Item has no linked files
-			while( $Link = & $LinkList->get_next() )
+			// Get info for og:image tag
+			if( is_null( $Item ) )
+			{ // This is not an object (happens on an invalid request):
+				return;
+			}
+
+			echo '<meta property="og:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
+			echo '<meta property="og:url" content="'.format_to_output( $Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
+			echo '<meta property="og:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+			echo '<meta property="og:site_name" content="'.format_to_output( $Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
+			break;
+
+		case 'posts':
+			$intro_Item = & get_featured_Item( $disp, NULL, true );
+			if( $intro_Item )
 			{
-				if( ! ( $File = & $Link->get_File() ) )
-				{ // No File object
-					global $Debuglog;
-					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
-					continue;
-				}
-
-				if( ! $File->exists() )
-				{ // File doesn't exist
-					global $Debuglog;
-					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-					continue;
-				}
-
-				if( $File->is_image() )
-				{ // Use only image files for og:image tag
-					$og_images[] = $File->get_url();
+				if( $intro_Item->is_intro() )
+				{
+					echo '<meta property="og:title" content="'.format_to_output( $intro_Item->get( 'title' ), 'htmlattr' )."\" />\n";
+					echo '<meta property="og:url" content="'.format_to_output( $intro_Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
+					echo '<meta property="og:description" content="'.format_to_output( $intro_Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+					echo '<meta property="og:site_name" content="'.format_to_output( $intro_Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
 				}
 			}
-		}
+			break;
 
-		echo '<meta property="og:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
-		echo '<meta property="og:url" content="'.format_to_output( $Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
-		echo '<meta property="og:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
-		echo '<meta property="og:site_name" content="'.format_to_output( $Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
+		default:
+			/*
+			echo '<meta property="og:title" content="'.format_to_output( $Blog->name, 'htmlattr' )."\" />\n";
+			echo '<meta property="og:url" content="'.format_to_output( $Blog->get( 'url' ), 'htmlattr' )."\" />\n";
+			echo '<meta property="og:description" content="'.format_to_output( $Blog->longdesc, 'htmlattr' )."\" />\n";
+			echo '<meta property="og:site_name" content="'.format_to_output( $Blog->get( 'name' ), 'htmlattr' )."\" />\n";
+			*/
+			return;
 	}
 
-	if( ! empty( $og_images ) )
-	{ // Display meta tags for image:
-		// Open Graph type tag (This tag is necessary for multiple images on facebook share button)
-		echo '<meta property="og:type" content="article" />'."\n";
-		foreach( $og_images as $og_image )
-		{ // Open Graph image tag
-			echo '<meta property="og:image" content="'.format_to_output( $og_image, 'htmlattr' )."\" />\n";
+	$og_image_File = get_social_tag_image_file( $disp );
+	if( ! empty( $og_image_File ) )
+	{ // Open Graph image tag
+		echo '<meta property="og:image" content="'.format_to_output( $og_image_File->get_url(), 'htmlattr' )."\" />\n";
+		if( $image_dimensions = $og_image_File->get_image_size( 'widthheight') )
+		{
+			echo '<meta property="og:image:height" content="'.format_to_output( $image_dimensions[0], 'htmlattr' )."\" />\n";
+			echo '<meta property="og:image:width" content="'.format_to_output( $image_dimensions[1], 'htmlattr' )."\" />\n";
 		}
 	}
 }
@@ -2254,66 +2253,86 @@ function skin_twitter_tags()
 		return;
 	}
 
-	// Get info for og:image tag
-	$twitter_image = '';
-	if( in_array( $disp, array( 'single', 'page' ) ) )
-	{ // Use only on 'single' and 'page' disp
-		$Item = & $MainList->get_by_idx( 0 );
-		if( is_null( $Item ) )
-		{ // This is not an object (happens on an invalid request):
-			return;
-		}
-
-		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
-				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
-				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
-		{ // Item has no linked files
-			while( $Link = & $LinkList->get_next() )
-			{
-				if( ! ( $File = & $Link->get_File() ) )
-				{ // No File object
-					global $Debuglog;
-					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
-					continue;
-				}
-
-				if( ! $File->exists() )
-				{ // File doesn't exist
-					global $Debuglog;
-					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-					continue;
-				}
-
-				if( $File->is_image() )
-				{ // Use only image files for og:image tag
-					$twitter_image = $File->get_url();
-					break;
-				}
-			}
-		}
-
-		// Get author's Twitter username
-		if( $creator_User = & $Item->get_creator_User() )
-		{
-			if( $twitter_links = $creator_User->userfield_values_by_code( 'twitter' ) )
-			{
-				preg_match( '/https?:\/\/(www\.)?twitter\.com((?:\/\#!)?\/(\w+))/', $twitter_links[0], $matches );
-				if( isset( $matches[3] ) )
-				{
-					echo '<meta property="twitter:creator" content="@'.$matches[3].'" />'."\n";
-				}
-			}
-		}
-
-		echo '<meta property="twitter:card" content="summary" />'."\n";
-		echo '<meta property="twitter:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
-		echo '<meta property="twitter:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+	if( $Blog->get_setting( 'tags_open_graph' ) )
+	{
+		$open_tags_enabled = true;
 	}
 
-	if( ! empty( $twitter_image ) )
-	{ // Display meta tags for image:
-		echo '<meta property="twitter:image" content="'.format_to_output( $twitter_image, 'htmlattr' )."\" />\n";
+	switch( $disp )
+	{
+		case 'single':
+		case 'page':
+			$Item = & $MainList->get_by_idx( 0 );
+			if( is_null( $Item ) )
+			{ // This is not an object (happens on an invalid request):
+				return;
+			}
+
+			// Get author's Twitter username
+			if( $creator_User = & $Item->get_creator_User() )
+			{
+				if( $twitter_links = $creator_User->userfield_values_by_code( 'twitter' ) )
+				{
+					preg_match( '/https?:\/\/(www\.)?twitter\.com((?:\/\#!)?\/(\w+))/', $twitter_links[0], $matches );
+					if( isset( $matches[3] ) )
+					{
+						echo '<meta property="twitter:creator" content="@'.$matches[3].'" />'."\n";
+					}
+				}
+			}
+
+			if( ! isset( $open_tags_enabled ) )
+			{
+				echo '<meta property="twitter:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
+				echo '<meta property="twitter:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+			}
+			break;
+
+		case 'posts':
+			if( ! isset( $open_tags_enabled ) )
+			{
+				$intro_Item = & get_featured_Item( $disp, NULL, true );
+				{
+					if( $intro_Item->is_intro() )
+					{
+						if( ! isset( $open_tags_enabled ) )
+						{
+							echo '<meta property="twitter:title" content="'.format_to_output( $intro_Item->get( 'title' ), 'htmlattr' )."\" />\n";
+							echo '<meta property="twitter:description" content="'.format_to_output( $intro_Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+						}
+					}
+				}
+			}
+			break;
+
+		default:
+			/*
+			if( ! isset( $open_tags_enabled ) )
+			{
+				echo '<meta property="twitter:title" content="'.format_to_output( $Blog->name, 'htmlattr' )."\" />\n";
+				echo '<meta property="twitter:description" content="'.format_to_output( $Blog->longdesc, 'htmlattr' )."\" />\n";
+			}
+			*/
+			return;
+	}
+
+	$twitter_image_File = get_social_tag_image_file( $disp );
+	if( ! empty( $twitter_image_File ) )
+	{ // Has image, use summary with large image card
+		echo '<meta property="twitter:card" content="summary_large_image" />'."\n";
+		if( ! isset( $open_tags_enabled ) )
+		{
+			echo '<meta property="twitter:image" content="'.format_to_output( $twitter_image_File->get_url(), 'htmlattr' )."\" />\n";
+		}
+
+		if( $twitter_image_File->get( 'alt' ) )
+		{ // Alternate text for image
+			echo '<meta property="twitter:image:alt" content="'.format_to_output( $twitter_image_File->get( 'alt' ), 'htmlattr' )."\" />\n";
+		}
+	}
+	else
+	{ // No image, use only summary card
+		echo '<meta property="twitter:card" content="summary" />'."\n";
 	}
 }
 

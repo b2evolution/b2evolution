@@ -252,7 +252,7 @@ switch( $action )
 				if(	! param_errors_detected() )
 				{	// Update settings:
 					$Blog->dbupdate();
-					$Messages->add( T_('Plugin settings have been updated'), 'success' );
+					$Messages->add( T_('Plugin settings have been updated').'.', 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}

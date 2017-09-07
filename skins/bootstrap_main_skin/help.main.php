@@ -177,27 +177,29 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 <section class="secondary_area"><!-- white background -->
 <div class="container">
 
-	<div class="row">
+<footer class="row">
 
-		<footer class="col-md-12 center">
+   <!-- =================================== START OF FOOTER =================================== -->
+    <div class="col-md-12">
 
+		<?php // Note: clearfix is because of Bootstraps' .cols
+		if( $Skin->show_container_when_access_denied( 'footer' ) )
+		{ // Display 'Footer' widget container
+		?>
+		<div class="evo_container evo_container__footer clearfix">
 			<?php
-			if( $Skin->show_container_when_access_denied( 'footer' ) )
-			{ // Display 'Footer' widget container
+			// Display container and contents:
+			skin_container( NT_('Footer'), array(
+					// The following params will be used as defaults for widgets included in this container:
+					'block_start'       => '<div class="evo_widget $wi_class$">',
+					'block_end'         => '</div>',
+				) );
+			// Note: Double quotes have been used around "Footer" only for test purposes.
 			?>
-			<div class="evo_container evo_container__footer">
-			<?php
-				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
-				// Display container and contents:
-				skin_container( NT_('Footer'), array(
-						// The following params will be used as defaults for widgets included in this container:
-					) );
-				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
-			?>
-			</div>
-			<?php } ?>
+		</div><!-- .evo_container__footer -->
+		<?php } ?>
 
-			<p>
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
@@ -250,9 +252,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 					) );
 			?>
 
-		</footer><!-- .col -->
-
-	</div><!-- .row -->
+</footer><!-- .row -->
 
 </div><!-- .container -->
 

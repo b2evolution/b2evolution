@@ -198,7 +198,7 @@ class ItemType extends DataObject
 		// Post instruction
 		if( param( 'ityp_instruction', 'html', NULL ) !== NULL )
 		{
-			param_check_html( 'ityp_instruction', sprintf( T_('Invalid instruction format. You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'posting' );
+			param_check_html( 'ityp_instruction', T_('Invalid instruction format.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'posting' );
 			$this->set_from_Request( 'instruction', NULL, true );
 		}
 

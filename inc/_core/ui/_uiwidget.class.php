@@ -987,21 +987,26 @@ class Table extends Widget
 		if( $this->displayed_lines_count % 2 )
 		{ // Odd line:
 			if( $is_last )
-				echo $this->params['line_start_odd_last'];
+				$start_tag = $this->params['line_start_odd_last'];
 			else
-				echo $this->params['line_start_odd'];
+				$start_tag = $this->params['line_start_odd'];
 		}
 		else
 		{ // Even line:
 			if( $is_last )
-				echo $this->params['line_start_last'];
+				$start_tag = $this->params['line_start_last'];
 			else
-				echo $this->params['line_start'];
+				$start_tag = $this->params['line_start'];
 		}
 
-		$this->displayed_cols_count = 0;
+		if( $is_fadeout_line )
+		{	// Add css class for this row to highlight:
+			$start_tag = update_html_tag_attribs( $start_tag, array( 'class' => 'evo_highlight' ) );
+		}
 
-		$this->is_fadeout_line = $is_fadeout_line;
+		echo $start_tag;
+
+		$this->displayed_cols_count = 0;
 	}
 
 
@@ -1034,16 +1039,6 @@ class Table extends Widget
 		else
 		{	// We have no class for the total column
 			$class = '';
-		}
-
-		/**
-		 * Update class and add a fadeout ID for fadeout list results
-		 */
-		if( $this->is_fadeout_line )
-		{
-			// echo ' fadeout '.$this->fadeout_count;
-			$class .= ' fadeout-ffff00" id="fadeout-'.$this->fadeout_count;
-			$this->fadeout_count++;
 		}
 
 		if( ($this->displayed_cols_count == 0) && isset($this->params['col_start_first']) )

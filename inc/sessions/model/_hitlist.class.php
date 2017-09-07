@@ -75,7 +75,7 @@ class Hitlist
 	 *   'message' => Message of the error or result data
 	 * )
 	 */
-	static function dbprune()
+	static function dbprune( $output_message = true )
 	{
 		/**
 		 * @var DB
@@ -89,7 +89,10 @@ class Hitlist
 		if( $last_prune >= date( 'Y-m-d', $localtimenow ) && $last_prune <= date( 'Y-m-d', $localtimenow + 86400 ) )
 		{ // Already pruned today (and not more than one day in the future -- which typically never happens)
 			$message = T_('Pruning has already been done today');
-			$Messages->add( $message, 'error' );
+			if( $output_message )
+			{
+				$Messages->add( $message, 'error' );
+			}
 			return array(
 					'result'  => 'error',
 					'message' => $message
@@ -134,7 +137,7 @@ class Hitlist
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$hitlog_rows_affected.' rows from T_hitlog.', 'request' );
 
 
-		// PREPARE PRUNING SESSIONS: 
+		// PREPARE PRUNING SESSIONS:
 		// Prune sessions that have timed out and are older than auto_prune_stats
 		$sess_prune_before = ( $localtimenow - $Settings->get( 'timeout_sessions' ) );
 		// IMPORTANT: we cut off at the oldest date between session timeout and sessions pruning.
@@ -186,7 +189,10 @@ class Hitlist
 		$Settings->set( 'auto_prune_stats_done', date( 'Y-m-d H:i:s', $localtimenow ) ); // save exact datetime
 		$Settings->dbupdate();
 
-		$Messages->add( T_('The old hits & sessions have been pruned.'), 'success' );
+		if( $output_message )
+		{
+			$Messages->add( T_('The old hits & sessions have been pruned.'), 'success' );
+		}
 		return array(
 				'result'  => 'ok',
 				// DO NOT TRANSLATE! (This is sysadmin level info -- we assume they can read English)

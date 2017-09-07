@@ -89,37 +89,39 @@ img.icon {
   vertical-align: text-bottom;
 }
 img.raised,
-.image_block.raised img {
+.image_block.raised img,
+.evo_image_block.raised img {
   box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
 }
 img.noshadow,
-.image_block.noshadow img {
+.image_block.noshadow img,
+.evo_image_block.noshadow img {
   box-shadow: none;
 }
 img.border,
-.image_block.border img {
+.image_block.border img,
+.evo_image_block.border img {
   border: 1px solid #666;
 }
 img.noborder,
-.image_block.noborder img {
+.image_block.noborder img,
+.evo_image_block.noborder img {
   border: none;
 }
 img.squared,
-.image_block.squared img {
+.image_block.squared img,
+.evo_image_block.squared img {
   border-radius: 0;
 }
 img.rounded,
-.image_block.rounded img {
+.image_block.rounded img,
+.evo_image_block.rounded img {
   border-radius: 4px;
 }
 img.round,
-.image_block.round img {
+.image_block.round img,
+.evo_image_block.round img {
   border-radius: 50%;
-}
-img.embossed,
-.image_block.embossed img {
-  border: 5px solid;
-  border-color: rgba(238, 238, 238, 0.6) rgba(34, 34, 34, 0.6) rgba(51, 51, 51, 0.8) rgba(231, 231, 231, 0.6);
 }
 .floatleft {
   float: left;
@@ -1970,6 +1972,19 @@ li[class*=" listnav_distance_"] {
     border-radius: 0;
   }
 }
+div.evo_highlight,
+li.evo_highlight,
+tr.evo_highlight td {
+  animation: evo_highlight 5s ease-out;
+}
+@keyframes evo_highlight {
+  from {
+    background-color: #FF6600;
+  }
+  to {
+    background-color: auto;
+  }
+}
 
 /**
  * item_base.css 
@@ -2031,6 +2046,17 @@ div.videoblock {
   text-align: center;
   margin: auto;
   overflow: auto;
+  position: relative;
+  max-width: 100%;
+  height: 0;
+  padding-bottom: 56.25%;
+}
+div.videoblock iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 div.podplayer {
   margin: 1em 0;
@@ -2088,6 +2114,9 @@ ul,
 ol {
   margin: 0 0 10px 25px;
   padding: 0;
+}
+.text-normal {
+  font-weight: normal;
 }
 .table-hover > tbody > tr:hover {
   background-color: #ffc;
@@ -2911,4 +2940,15 @@ div.message_toolbars {
 .evo_container__sidebar .evo_widget[class$=_menu_link] a.btn,
 .evo_container__sidebar2 .evo_widget[class$=_menu_link] a.btn {
   width: 100%;
+}
+.accordion-caret .accordion-toggler:before {
+  padding-right: 3px;
+  font-size: 14px;
+  font-family: FontAwesome;
+}
+.accordion-caret .accordion-toggler:not(.collapsed):before {
+  content: '\f0d7';
+}
+.accordion-caret .accordion-toggler.collapsed:before {
+  content: '\f0da';
 }

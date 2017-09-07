@@ -1078,6 +1078,7 @@ switch( $action )
 		{ // Use original $redirect_to:
 			// Set highlight:
 			$Session->set( 'highlight_id', $edited_Item->ID );
+			$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 			$redirect_to = url_add_param( $redirect_to, 'highlight_id='.$edited_Item->ID, '&' );
 		}
 		else
@@ -1744,6 +1745,8 @@ switch( $action )
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'filter' => 'restore' ) );
 
+		$display_permalink = false;
+
 		switch( $action )
 		{
 			case 'edit':
@@ -1753,10 +1756,15 @@ switch( $action )
 			case 'update_publish': // on error
 			case 'history':
 			case 'extract_tags':
-				$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $edited_Item->get_permanent_url(),
-						' '.T_('Permalink'), 4, 3, array(
-								'style' => 'margin-right: 3ex',
-						) );
+				$item_permanent_url = $edited_Item->get_permanent_url( '', '', '&amp;', array( 'none' ) );
+				if( $item_permanent_url !== false )
+				{	// Display item permanent URL only if permanent type is not 'none':
+					$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $item_permanent_url,
+							' '.T_('Permalink'), 4, 3, array(
+									'style' => 'margin-right: 3ex',
+							) );
+					$display_permalink = true;
+				}
 
 				$edited_item_url = $edited_Item->get_copy_url();
 				if( ! empty( $edited_item_url ) )
@@ -1796,11 +1804,18 @@ switch( $action )
 			}
 
 			// Rearrange global icons to show: Permalink - History - Duplicate - Delete - Close
-			if( count( $AdminUI->global_icons ) > 1 )
+			if( count( $AdminUI->global_icons ) > 1 && $edited_Item->ID > 0 )
 			{
 				$history_icon = array_pop( $AdminUI->global_icons );
-				// Insert the history icon right after the permalink icon
-				array_splice( $AdminUI->global_icons, 1, 0, array( $history_icon ) );
+
+				if( $display_permalink )
+				{ // Insert the history icon right after the permalink icon
+					array_splice( $AdminUI->global_icons, 1, 0, array( $history_icon ) );
+				}
+				else
+				{ // Move the history icon in front
+					array_unshift( $AdminUI->global_icons, $history_icon );
+				}
 			};
 
 			if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
@@ -1975,12 +1990,21 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'mass-edit-screen' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'browse-edit-tab' );
+		switch( get_param( 'tab' ) )
+		{
+			case 'tracker':
+				$AdminUI->set_page_manual_link( 'task-list' );
+				break;
+			case 'manual':
+				$AdminUI->set_page_manual_link( 'manual-pages-editor' );
+				break;
+			case 'type':
+				$AdminUI->set_page_manual_link( $tab_type.'-list' );
+				break;
+			default:
+				$AdminUI->set_page_manual_link( 'browse-edit-tab' );
+		}
 		break;
-}
-if( get_param( 'tab' ) == 'manual' )
-{
-	$AdminUI->set_page_manual_link( 'manual-pages-editor' );
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

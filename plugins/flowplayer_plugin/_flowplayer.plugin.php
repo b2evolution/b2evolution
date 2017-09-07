@@ -23,7 +23,7 @@ class flowplayer_plugin extends Plugin
 	var $code = 'b2evFlwP';
 	var $name = 'Flowplayer';
 	var $priority = 80;
-	var $version = '6.9.3';
+	var $version = '6.9.4';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'swf', 'mp4', 'ogv', 'webm', 'm3u8' );
@@ -114,7 +114,6 @@ class flowplayer_plugin extends Plugin
 					),
 				'height' => array(
 					'label' => T_('Video height (px)'),
-					'defaultvalue' => 300,
 					'type' => 'integer',
 					'allow_empty' => true,
 					'valid_range' => array( 'min' => 1 ),

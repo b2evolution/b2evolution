@@ -85,9 +85,13 @@ $Results->cols[] = array(
 						'td_class' => 'fm_filename',
 					);
 
+function display_link_info( $link )
+{
+	return '<span data-order="'.$link->link_order.'">'.$link->link_ID.'</span>';
+}
 $Results->cols[] = array(
 						'th' => T_('Link ID'),
-						'td' => '$link_ID$',
+						'td' => '%display_link_info( {row} )%',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap link_id_cell',
 					);

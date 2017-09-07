@@ -21,6 +21,7 @@ load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
 load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
 load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 load_class( 'links/model/_temporaryid.class.php', 'TemporaryID' );
+load_class( 'messaging/model/_message.class.php', 'Message' );
 
 /**
  * Get a link owner object from link_type and object ID
@@ -589,7 +590,7 @@ jQuery( document ).ready( function()
 			var link_IDs = '';
 			jQuery( '#attachments_fieldset_table table tr' ).each( function()
 			{
-				var link_ID_cell = jQuery( this ).find( '.link_id_cell' );
+				var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
 				if( link_ID_cell.length > 0 )
 				{
 					link_IDs += link_ID_cell.html() + ',';
@@ -607,8 +608,18 @@ jQuery( document ).ready( function()
 					'links': link_IDs,
 					'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
 				},
-				success: function()
+				success: function( data )
 				{
+					link_data = JSON.parse( ajax_debug_clear( data ) );
+					// Update data-order attributes
+					jQuery( '#attachments_fieldset_table table tr' ).each( function()
+					{
+						var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
+						if( link_ID_cell.length > 0 )
+						{
+							link_ID_cell.attr( 'data-order', link_data[link_ID_cell.html()] );
+						}
+					} );
 					evoFadeSuccess( $item );
 				}
 			} );

@@ -446,6 +446,10 @@ switch( $action )
 			}
 			else
 			{	// Redirect to previous page(e.g. comments list) after updating:
+
+				// We want to highlight the edited object on next list display:
+				$Session->set( 'fadeout_array', array( 'comment_ID' => array( $edited_Comment->ID ) ) );
+
 				header_redirect( $redirect_to );
 				/* exited */
 			}

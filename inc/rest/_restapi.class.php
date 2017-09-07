@@ -684,6 +684,7 @@ class RestApi
 					'title'       => $Item->get( 'title' ),
 					'content'     => $Item->get_prerendered_content( 'htmlbody' ),
 					'excerpt'     => $Item->get( 'excerpt' ),
+					'teaser'      => $Item->get_content_teaser(),
 					'URL'         => $Item->get_permanent_url( '', '', '&' ),
 					'attachments' => $attachments,
 				);
@@ -2246,10 +2247,23 @@ class RestApi
 		$source_type = param( 'source_type', 'string' );
 		$source_object_ID = param( 'source_object_ID', 'string' );
 		$source_position = trim( param( 'source_position', 'string' ), ',' );
+		$source_file_type = param( 'source_file_type', 'string', NULL );
 
 		$source_LinkOwner = get_link_owner( $source_type, $source_object_ID );
 
-		if( ! $source_LinkOwner || ! ( $source_LinkList = $source_LinkOwner->get_attachment_LinkList( 1000, $source_position ) ) )
+		$link_list_params = array(
+				// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
+				'sql_select_add' => ', CASE '
+						.'WHEN link_position = "cover"     THEN "1" '
+						.'WHEN link_position = "teaser"    THEN "2" '
+						.'WHEN link_position = "aftermore" THEN "3" '
+						.'WHEN link_position = "inline"    THEN "4" '
+						.'ELSE "99999999"' // Use this line only if you want to put the other position types at the end
+					.'END AS position_order',
+				'sql_order_by' => 'position_order, link_order',
+			);
+
+		if( ! $source_LinkOwner || ! ( $source_LinkList = $source_LinkOwner->get_attachment_LinkList( 1000, $source_position, $source_file_type, $link_list_params ) ) )
 		{	// No requested links, Exit here:
 			$this->response = array();
 			return;
@@ -2264,6 +2278,7 @@ class RestApi
 		if( $limit_position )
 		{
 			$position_counts = array();
+			$all_position_counts = 0;
 		}
 
 		// Find all attached files of the destination LinkOwner in order to don't link twice same files:
@@ -2284,15 +2299,27 @@ class RestApi
 		{	// Copy a Link to new object:
 			if( $limit_position )
 			{
+				if( $source_position == '' && $all_position_counts >= $limit_position )
+				{	// Stop copy other positions because we are finding any position:
+					break;
+				}
 				if( ! isset( $position_counts[ $source_Link->position ] ) )
 				{
 					$position_counts[ $source_Link->position ] = 0;
 				}
 				if( $position_counts[ $source_Link->position ] >= $limit_position )
 				{	// Skip this because of limit per position:
-					continue;
+					if( $source_position == $source_Link->position )
+					{	// Stop copy other positions because we are finding only current:
+						break;
+					}
+					else
+					{	// Continue to find other positions:
+						continue;
+					}
 				}
 				$position_counts[ $source_Link->position ]++;
+				$all_position_counts++;
 			}
 
 			if( $source_File = & $source_Link->get_File() )

@@ -131,6 +131,7 @@ function create_default_data()
 
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
+	// erwin > When adding anything to the list below don't forget to update the params for the Social Links widget!
 	$DB->query( "
 		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
 		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
@@ -215,7 +216,7 @@ function create_default_data()
 			'lastname'  => 'Admin',
 			'level'     => 10,
 			'gender'    => 'M',
-			'Group'     => $admins_Group,
+			'group_ID'  => $admins_Group->ID,
 			'org_IDs'   => $user_org_IDs,
 			'org_roles' => array( 'King of Spades' ),
 			'fields'    => array(
@@ -343,6 +344,7 @@ function create_default_data()
 			'usage'          => 'special',
 			'template_name'  => NULL,
 			'perm_level'     => 'admin',
+			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'           => 'Advertisement',
@@ -1335,28 +1337,77 @@ function create_demo_users()
 	task_end();
 
 	task_begin('Creating demo user mary... ');
-	$mary_moderator_ID = get_demo_user( 'mary', true, $moderators_Group, $user_org_IDs )->ID;
-	task_end();
+	$mary_moderator = get_demo_user( 'mary', true, $moderators_Group->ID, $user_org_IDs );
+	if( $mary_moderator )
+	{
+		$mary_moderator_ID = $mary_moderator->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
+
 
 	task_begin('Creating demo user jay... ');
-	$jay_moderator_ID = get_demo_user( 'jay', true, $moderators_Group, $user_org_IDs )->ID;
-	task_end();
+	$jay_moderator = get_demo_user( 'jay', true, $moderators_Group->ID, $user_org_IDs );
+	if( $jay_moderator )
+	{
+		$jay_moderator_ID = $jay_moderator->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
 
 	task_begin('Creating demo user dave... ');
-	$dave_blogger_ID = get_demo_user( 'dave', true, $editors_Group, $user_org_IDs )->ID;
-	task_end();
+	$dave_blogger = get_demo_user( 'dave', true, $editors_Group->ID, $user_org_IDs );
+	if( $dave_blogger )
+	{
+		$dave_blogger_ID = $dave_blogger->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
 
 	task_begin('Creating demo user paul... ');
-	$paul_blogger_ID = get_demo_user( 'paul', true, $editors_Group, $user_org_IDs )->ID;
-	task_end();
+	$paul_blogger = get_demo_user( 'paul', true, $editors_Group->ID, $user_org_IDs );
+	if( $paul_blogger )
+	{
+		$paul_blogger_ID = $paul_blogger->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
 
 	task_begin('Creating demo user larry... ');
-	$larry_user_ID = get_demo_user( 'larry', true, $users_Group, NULL )->ID;
-	task_end();
+	$larry_user = get_demo_user( 'larry', true, $users_Group->ID, NULL );
+	if( $larry_user )
+	{
+		$larry_user_ID = $larry_user->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
 
 	task_begin('Creating demo user kate... ');
-	$kate_user_ID = get_demo_user( 'kate', true, $users_Group, NULL )->ID;
-	task_end();
+	$kate_user = get_demo_user( 'kate', true, $users_Group->ID, NULL );
+	if( $kate_user )
+	{
+		$kate_user_ID = $kate_user->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
 }
 
 
@@ -1630,7 +1681,7 @@ function create_demo_contents()
 	{ // Install Tracker blog
 		$timeshift += 86400;
 		task_begin( 'Creating Tracker collection...' );
-		create_demo_collection( 'group', $admin_user->ID, $create_demo_users, $timeshift );
+		create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift );
 		update_install_progress_bar();
 		task_end();
 	}

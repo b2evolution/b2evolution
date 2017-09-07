@@ -479,6 +479,60 @@ function tool_create_sample_hits( $days, $min_interval, $max_interval )
 
 
 /**
+ * Create sample base domains and display a process of creating
+ *
+ * @param integer Number of base domains
+ */
+function tool_create_sample_basedomains( $num_basedomains )
+{
+	global $Messages, $DB;
+
+	echo T_('Creating of the sample base domains...');
+	evo_flush();
+
+	/**
+	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
+	 */
+	$DB->log_queries = false;
+
+	$DB->begin();
+
+	$SQL = new SQL( 'Get all unique base domains before create sample sample base domains' );
+	$SQL->SELECT( 'dom_name' );
+	$SQL->FROM( 'T_basedomains' );
+	$SQL->WHERE( 'dom_type = "unknown"' );
+	$basedomains = $DB->get_col( $SQL->get(), 0, $SQL->title );
+
+	$basedomains_sql_data;
+	for( $i = 0; $i < $num_basedomains; $i++ )
+	{
+		do
+		{	// Generate new unique domain:
+			$domain_name = generate_random_key( 8, 'abcdefghijklmnopqrstuvwxyz0123456789-' ).'.com';
+		} while( in_array( $domain_name, $basedomains ) );
+
+		$basedomains[] = $domain_name;
+		$basedomains_sql_data[] = '( '.$DB->quote( $domain_name ).' )';
+
+		if( $i % 100 == 0 )
+		{	// Display a process of creating by one dot for 100 base domains:
+			echo ' .';
+			evo_flush();
+		}
+	}
+
+	$DB->query( 'INSERT INTO T_basedomains ( dom_name )
+		VALUES '.implode( ', ', $basedomains_sql_data ) );
+
+	$DB->commit();
+
+	echo ' OK.';
+
+	$Messages->add( sprintf( T_('Created %d base domains.'), $num_basedomains ), 'success' );
+}
+
+
+/**
  * Create sample messages and display a process of creating
  *
  * @param integer Number of loops
@@ -618,5 +672,63 @@ function tool_test_flush()
 		evo_flush();
 		sleep( 1 );
 	}
+}
+
+/**
+ * Resize all images in media folder
+ */
+function tool_resize_all_images()
+{
+	global $Session, $Settings, $media_path;
+	$params = array(
+			'inc_files'      => true,  // include files (not only directories)
+			'inc_dirs'       => false,  // include directories (not the directory itself!)
+			'flat'           => true,  // return a one-dimension-array
+			'recurse'        => true,  // recurse into subdirectories
+			'basename'       => false, // get the basename only
+			'trailing_slash' => false, // add trailing slash
+			'inc_hidden'     => true,  // inlcude hidden files, directories and content
+			'inc_evocache'   => true, // exclude evocache directories and content
+			'inc_temp'       => false,  // include temporary files and directories
+	);
+
+	$Session->assert_received_crumb( 'tools' );
+
+	load_funcs( 'files/model/_image.funcs.php' );
+	$Timer = new Timer('resize_all_images');
+
+	$Timer->start( 'resize_all_images' );
+	$filenames = get_filenames( $media_path, $params );
+	$fit_width = $Settings->get( 'fm_resize_width' );
+	$fit_height = $Settings->get( 'fm_resize_height' );
+	$file_counter = 0;
+
+	print_log( T_('Resize images...'), 'normal', array( 'text_style' => 'bold' ) );
+	echo '<br />';
+
+	foreach( $filenames as $filename )
+	{
+		$filename = str_replace( $media_path, '', $filename );
+		$edited_File = & get_file_by_abspath( $filename );
+		if( ! empty( $edited_File ) && $edited_File->is_image() )
+		{
+			$current_dimensions = $edited_File->get_image_size( 'widthheight_assoc' );
+			$new_dimensions = fit_into_constraint( $current_dimensions['width'], $current_dimensions['height'], $fit_width, $fit_height );
+			$result = resize_image( $edited_File, ( int ) $new_dimensions[0], ( int ) $new_dimensions[1], NULL, NULL, false );
+			if( $result )
+			{
+				print_log( sprintf( T_('%s was resized to %dx%d pixels.'), '<code>'.$filename.'</code>', $new_dimensions[0], $new_dimensions[1] ) );
+			}
+			else
+			{
+				print_log( sprintf( T_('%s could not be resized to target resolution of %dx%d pixels.'), '<code>'.$filename.'</code>', $new_dimensions[0], $new_dimensions[1] ), 'error' );
+			}
+			$file_counter++;
+		}
+	}
+	$Timer->stop( 'resize_all_images' );
+	echo '<br />';
+	print_log( sprintf( T_('%d images were processed.'), $file_counter ), 'success' );
+	print_log( sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( 'resize_all_images' ) ), 'normal', array( 'text_style' => 'bold' ) );
 }
 ?>

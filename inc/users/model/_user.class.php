@@ -2335,6 +2335,35 @@ class User extends DataObject
 		return NULL;
 	}
 
+	/**
+	 * Get url visits url
+	 *
+	 * @return string
+	 */
+	function get_visits_url( )
+	{
+		global $Settings;
+
+		if( ! empty( $blog_ID ) )
+		{ // Use blog from param by ID
+			$BlogCache = & get_BlogCache();
+			$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		}
+
+		if( empty( $current_Blog ) )
+		{ // Use current blog
+			global $Collection, $Blog;
+			$current_Blog = & $Blog;
+		}
+
+		if( empty( $current_Blog ) || empty( $Settings ) )
+		{ // Wrong request
+			return NULL;
+		}
+
+		return url_add_param( $current_Blog->get( 'visitsurl' ), 'user_ID='.$this->ID );
+	}
+
 
 	/**
 	 * Get url from defined userfields
@@ -5022,6 +5051,16 @@ class User extends DataObject
 		global $DB, $UserSettings, $current_User, $servertimenow;
 		global $is_api_request;
 
+		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) )
+		{	// Only moderators can update user status:
+			return false;
+		}
+
+		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) )
+		{	// Only moderators can update user status:
+			return false;
+		}
+
 		if( $dbsave )
 		{ // save required
 			$DB->begin();
@@ -6390,11 +6429,6 @@ class User extends DataObject
 	 */
 	function can_moderate_user( $user_ID, $assert = false )
 	{
-		if( $this->ID == $user_ID )
-		{	// User can edit own profile
-			return true;
-		}
-
 		if( $this->check_perm( 'users', 'edit' ) )
 		{ // User can edit all users
 			return true;

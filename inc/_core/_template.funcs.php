@@ -443,7 +443,7 @@ function get_request_title( $params = array() )
 			'users_text'          => T_('Users'),
 			'closeaccount_text'   => T_('Close account'),
 			'subs_text'           => T_('Notifications & Subscriptions'),
-			'visits_text'         => T_('Profile Visits'),
+			'visits_text'         => T_('Who visited my profile?'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
 			'edit_comment_text'   => T_('Editing comment'),
@@ -556,6 +556,18 @@ function get_request_title( $params = array() )
 
 		case 'visits':
 			// We are requesting the profile visits screen:
+			$user_ID = param( 'user_ID', 'integer', 0 );
+			if( ! empty( $user_ID ) )
+			{
+				$UserCache = & get_UserCache();
+				$viewed_User = & $UserCache->get_by_ID( $user_ID );
+			}
+
+			if( is_logged_in() && ! empty( $viewed_User ) && $current_User->ID != $user_ID )
+			{
+				$params['visits_text'] = T_('User Profile Visits').' - '.$viewed_User->get_identity_link( array( 'link_text' => 'login' ) );
+			}
+
 			$r[] = $params['visits_text'];
 			break;
 

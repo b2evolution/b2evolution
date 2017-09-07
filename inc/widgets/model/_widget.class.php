@@ -202,23 +202,27 @@ class ComponentWidget extends DataObject
 	 * @return string
 	 */
 	function get_desc_for_list()
-	{
-		$name = $this->get_name();
+    {
+        $name = $this->get_name();
 
-		if( $this->type == 'plugin' )
-		{
-			return '<strong>'.$name.'</strong> ('.T_('Plugin').')';
-		}
+        if( $this->type == 'plugin' )
+        {
+            if ( isset($this->disp_params['title']) && ! empty($this->disp_params['title']) ) {
+                return '<strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+            }
 
-		$short_desc = $this->get_short_desc();
+            return '<strong>'.$name.'</strong> ('.T_('Plugin').')';
+        }
 
-		if( $name == $short_desc || empty($short_desc) )
-		{
-			return '<strong>'.$name.'</strong>';
-		}
+        $short_desc = $this->get_short_desc();
 
-		return '<strong>'.$short_desc.'</strong> ('.$name.')';
-	}
+        if( $name == $short_desc || empty($short_desc) )
+        {
+            return '<strong>'.$name.'</strong>';
+        }
+
+        return '<strong>'.$short_desc.'</strong> ('.$name.')';
+    }
 
 
 	/**

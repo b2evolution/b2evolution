@@ -615,7 +615,7 @@ class Skin extends DataObject
 		}
 
 		// Display skinshot:
-		echo '<div class="'.$disp_params['skinshot_class'].'"'.( $disp_params['highlighted'] ? ' id="fadeout-'.$skin_folder : '' ).'">';
+		echo '<div class="'.$disp_params['skinshot_class'].( $disp_params['highlighted'] ? ' evo_highlight' : '' ).'">';
 		echo '<div class="skinshot_placeholder';
 		if( $disp_params[ 'selected' ] )
 		{
@@ -649,14 +649,14 @@ class Skin extends DataObject
 
 		//
 		echo '<div class="legend">';
-		if( isset( $disp_params[ 'function' ] ) )
+		if( isset( $disp_params['function'] ) )
 		{
 			echo '<div class="actions">';
-			switch( $disp_params[ 'function' ] )
+			switch( $disp_params['function'] )
 			{
 				case 'broken':
 					echo '<span class="text-danger">';
-					if( !empty($disp_params[ 'msg' ]) )
+					if( ! empty( $disp_params['msg'] ) )
 					{
 						echo $disp_params[ 'msg' ];
 					}
@@ -665,31 +665,24 @@ class Skin extends DataObject
 						echo T_('Broken.');
 					}
 					echo '</span>';
+
+					if( ! empty( $disp_params['help_info'] ) )
+					{
+						echo ' '.get_icon( 'help', 'imgtag', array( 'title' => $disp_params['help_info'] ) );
+					}
 					break;
 
 				case 'install':
 					// Display a link to install the skin
-					if( $disp_params[ 'skin_compatible' ] )
-					{ // If skin is compatible for current selected type
-						if( ! empty( $skin_url ) )
-						{
-							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
-							echo T_('Install NOW!').'</a>';
-						}
-						if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
-						{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
-							$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
-							$skin_name_after = '</label>';
-						}
+					if( ! empty( $skin_url ) )
+					{
+						echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
+						echo T_('Install NOW!').'</a>';
 					}
-					else
-					{ // Inform about skin type is wrong for current case
-						if( ! empty( $skin_url ) )
-						{
-							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'" class="red">';
-							echo T_('Wrong Type!').'</a> ';
-						}
-						echo get_icon( 'help', 'imgtag', array( 'title' => T_('This skin does not fit the blog type you are trying to create.') ) );
+					if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
+					{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
+						$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
+						$skin_name_after = '</label>';
 					}
 					break;
 
@@ -1721,7 +1714,7 @@ var downloadInterval = setInterval( function()
 						// Template for plugins:
 						return array(
 								// This template is used to build a plugin toolbar with action buttons above edit item/comment area:
-								'toolbar_before'       => '<div class="btn-toolbar $toolbar_class$" role="toolbar">',
+								'toolbar_before'       => '<div class="btn-toolbar plugin-toolbar $toolbar_class$" data-plugin-toolbar="$toolbar_class$" role="toolbar">',
 								'toolbar_after'        => '</div>',
 								'toolbar_title_before' => '<div class="btn-toolbar-title">',
 								'toolbar_title_after'  => '</div>',
@@ -1913,68 +1906,68 @@ var downloadInterval = setInterval( function()
 	}
 
 
-    /**
-     * Web safe fonts for default skin usage
-     *
-     * Used for font customization
-     */
-    private $font_definitions = array(
-        'system_arial' => array( 'Arial', 'Arial, Helvetica, sans-serif' ),
-        'system_arialblack' => array( 'Arial Black', '\'Arial Black\', Gadget, sans-serif' ),
-        'system_arialnarrow' => array( 'Arial Narrow', '\'Arial Narrow\', sans-serif' ),
-        'system_centrygothic' => array( 'Century Gothic', 'Century Gothic, sans-serif' ),
-        'system_copperplategothiclight' => array( 'Copperplate Gothic Light', 'Copperplate Gothic Light, sans-serif' ),
-        'system_couriernew' => array( 'Courier New', '\'Courier New\', Courier, monospace' ),
-        'system_georgia' => array( 'Georgia', 'Georgia, Serif' ),
-        'system_helveticaneue' => array( 'Helvetica Neue', '\'Helvetica Neue\',Helvetica,Arial,sans-serif' ),
-        'system_impact' => array( 'Impact', 'Impact, Charcoal, sans-serif' ),
-        'system_lucidaconsole' => array( 'Lucida Console', '\'Lucida Console\', Monaco, monospace' ),
-        'system_lucidasansunicode' => array( 'Lucida Sans Unicode', '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif' ),
-        'system_palatinolinotype' => array( 'Palatino Linotype', '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif' ),
-        'system_tahoma' => array( 'Tahoma', 'Tahoma, Geneva, sans-serif' ),
-        'system_timesnewroman' => array( 'Times New Roman', '\'Times New Roman\', Times, serif' ),
-        'system_trebuchetms' => array( 'Trebuchet MS', '\'Trebuchet MS\', Helvetica, sans-serif' ),
-        'system_verdana' => array( 'Verdana', 'Verdana, Geneva, sans-serif' ),
-    );
+	/**
+	 * Web safe fonts for default skin usage
+	 *
+	 * Used for font customization
+	 */
+	private $font_definitions = array(
+			'system_arial' => array( 'Arial', 'Arial, Helvetica, sans-serif' ),
+			'system_arialblack' => array( 'Arial Black', '\'Arial Black\', Gadget, sans-serif' ),
+			'system_arialnarrow' => array( 'Arial Narrow', '\'Arial Narrow\', sans-serif' ),
+			'system_centrygothic' => array( 'Century Gothic', 'Century Gothic, sans-serif' ),
+			'system_copperplategothiclight' => array( 'Copperplate Gothic Light', 'Copperplate Gothic Light, sans-serif' ),
+			'system_couriernew' => array( 'Courier New', '\'Courier New\', Courier, monospace' ),
+			'system_georgia' => array( 'Georgia', 'Georgia, Serif' ),
+			'system_helveticaneue' => array( 'Helvetica Neue', '\'Helvetica Neue\',Helvetica,Arial,sans-serif' ),
+			'system_impact' => array( 'Impact', 'Impact, Charcoal, sans-serif' ),
+			'system_lucidaconsole' => array( 'Lucida Console', '\'Lucida Console\', Monaco, monospace' ),
+			'system_lucidasansunicode' => array( 'Lucida Sans Unicode', '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif' ),
+			'system_palatinolinotype' => array( 'Palatino Linotype', '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif' ),
+			'system_tahoma' => array( 'Tahoma', 'Tahoma, Geneva, sans-serif' ),
+			'system_timesnewroman' => array( 'Times New Roman', '\'Times New Roman\', Times, serif' ),
+			'system_trebuchetms' => array( 'Trebuchet MS', '\'Trebuchet MS\', Helvetica, sans-serif' ),
+			'system_verdana' => array( 'Verdana', 'Verdana, Geneva, sans-serif' ),
+		);
 
 
-    /**
-     * Returns an option list for font customization
-     *
-     * Uses: $this->font_definitions
-     */
-    function get_font_definitions()
-    {
-        // Pull font array keys
-        $font_options = array_keys($this->font_definitions);
+	/**
+	 * Returns an option list for font customization
+	 *
+	 * Uses: $this->font_definitions
+	 */
+	function get_font_definitions()
+	{
+		// Pull font array keys
+		$font_options = array_keys($this->font_definitions);
 
-        // Pull first value from each array key
-        $font_names = array();
-        foreach ($this->font_definitions as $f) {
-            $font_names[] = current($f);
-        }
+		// Pull first value from each array key
+		$font_names = array();
+		foreach ($this->font_definitions as $f) {
+				$font_names[] = current($f);
+		}
 
-        // Create array in format: 'system_arial' => 'arial', etc.
-        $dropdown_option_list = array_combine($font_options, $font_names);
+		// Create array in format: 'system_arial' => 'arial', etc.
+		$dropdown_option_list = array_combine($font_options, $font_names);
 
-        return $dropdown_option_list;
-    }
+		return $dropdown_option_list;
+	}
 
 
-    /**
-     * Returns a CSS code for font customization
-     *
-     * Uses: $this->font_definitions
-     */
-    function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL, $font_weight_param = NULL )
-    {
+	/**
+	 * Returns a CSS code for font customization
+	 *
+	 * Uses: $this->font_definitions
+	 */
+	function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL, $font_weight_param = NULL )
+	{
 		$font_css = array();
 
 		// Get default font family and font-weight
 		$default_font_family = $this->get_setting_default_value( $font_family_param );
 		$default_font_weight = $this->get_setting_default_value( $font_weight_param );
 
-        // Select the font family CSS string
+		// Select the font family CSS string
 		$selected_font_family = $this->get_setting( $font_family_param );
 		if( $selected_font_family != $default_font_family )
 		{
@@ -1999,10 +1992,10 @@ var downloadInterval = setInterval( function()
 			}
 		}
 
-        // Prepare the complete CSS for font customization
+		// Prepare the complete CSS for font customization
 		if( ! empty( $font_css ) )
 		{
-        	$custom_css = "$target_element { ".implode( ' ', $font_css )." }\n";
+			$custom_css = $target_element.' { '.implode( ' ', $font_css )." }\n";
 		}
 		else
 		{
@@ -2010,7 +2003,31 @@ var downloadInterval = setInterval( function()
 		}
 
 		return $custom_css;
-    }
+	}
+
+
+	/**
+	 * Check if we can display a widget container when access is denied to collection by current user
+	 *
+	 * NOTE: To use this function your skin must has a checklist setting 'access_login_containers' with options of widget container keys
+	 *
+	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
+	 * @return boolean TRUE to display
+	 */
+	function show_container_when_access_denied( $container_key )
+	{
+		global $Collection, $Blog;
+
+		if( $Blog->has_access() )
+		{	// If current user has an access to this collection then don't restrict containers:
+			return true;
+		}
+
+		// Get what containers are available for this skin when access is denied or requires login:
+		$access = $this->get_setting( 'access_login_containers' );
+
+		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
+	}
 }
 
 ?>

@@ -2622,7 +2622,8 @@ function display_dragdrop_upload_button( $params = array() )
 							}
 							if( table_view == 'link' )
 							{ // Update the cells for link view, because these data exist in response
-								this_row.find( '.qq-upload-link-id' ).html( responseJSON.data.link_ID );
+								this_row.find( '.qq-upload-link-id' ).html( '<span data-order="' + responseJSON.data.link_order
+										+ '">' + responseJSON.data.link_ID + '</span>' );
 								this_row.find( '.qq-upload-image' ).html( responseJSON.data.link_preview );
 								this_row.find( '.qq-upload-link-actions' ).prepend( responseJSON.data.link_actions );
 								if( typeof( responseJSON.data.link_position ) != 'undefined' )
@@ -2631,6 +2632,7 @@ function display_dragdrop_upload_button( $params = array() )
 								}
 								init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 							}
+							evo_link_sort_list();
 						}
 						<?php
 						}
@@ -3167,5 +3169,78 @@ function & get_file_by_abspath( $abspath, $force_create_meta = false )
 
 	$r = NULL;
 	return $r;
+}
+
+
+function get_social_tag_image_file( $disp )
+{
+	global $social_tag_image_File, $Settings;
+
+	if( isset( $social_tag_image_File ) )
+	{
+		return $social_tag_image_File;
+	}
+
+	switch( $disp )
+	{
+		case 'single':
+		case 'page':
+			global $MainList;
+
+			$Item = & $MainList->get_by_idx( 0 );
+			// Get info for og:image tag
+			if( ! is_null( $Item ) )
+			{
+				$LinkOwner = new LinkItem( $Item );
+				if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+						'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+						'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
+				{ // Item has linked files
+					while( $Link = & $LinkList->get_next() )
+					{
+						if( ! ( $File = & $Link->get_File() ) )
+						{ // No File object
+							global $Debuglog;
+							$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+							continue;
+						}
+
+						if( ! $File->exists() )
+						{ // File doesn't exist
+							global $Debuglog;
+							$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+							continue;
+						}
+
+						if( $File->is_image() )
+						{ // Use only image files for og:image tag
+							$social_tag_image_File = $File;
+							break;
+						}
+					}
+				}
+			}
+			break;
+
+		default:
+			// Other disps
+	}
+
+	/*
+	if( empty( $social_tag_image_File ) )
+	{ // Use site logo if available
+		$FileCache = & get_FileCache();
+		$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+		if( $notification_logo_file_ID > 0 &&
+    		( $FileCache = & get_FileCache() ) &&
+    		( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) &&
+    		$File->is_image() )
+		{
+			$social_tag_image_File = $File;
+		}
+	}
+	*/
+
+	return $social_tag_image_File;
 }
 ?>

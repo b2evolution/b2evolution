@@ -166,7 +166,7 @@ jQuery(document).ready( function()
 
 	current_widgets = getWidgetOrder(); // save current widget order
 
-	doFade( ".fadeout-ffff00" );// highlight any changed widgets
+	doFade( '.evo_highlight' );// highlight any changed widgets
 
 	// Actions for buttons to select several widgets to activate/deactivate them by one action
 	jQuery( '#widget_button_check_all' ).click( function()
@@ -289,7 +289,11 @@ function makeDroppable( selector )
  */
 function doFade( selector )
 {
-	evoFadeSuccess( selector );
+	jQuery( selector ).addClass( 'evo_highlight' );
+	setTimeout( function ()
+	{
+		jQuery( selector ).removeClass( 'evo_highlight' );
+	}, 5000 );
 }
 
 
@@ -711,7 +715,7 @@ function doToggle( wi_ID, wi_enabled )
 	}
 	jQuery( '#wi_ID_' + wi_ID + ' .toggle_action' ).html( wi_enabled ? deactivate_icon_tag : activate_icon_tag );
 
-	evoFadeBg( jQuery( '#wi_ID_' + wi_ID ), new Array( '#FFFF33' ), { speed: 3000 } );
+	doFade( '#wi_ID_' + wi_ID );
 }
 
 /**
@@ -736,7 +740,7 @@ function doToggleCache( wi_ID, wi_cache_status )
 {
 	jQuery( '#wi_ID_' + wi_ID + ' .widget_cache_status' ).html( getWidgetCacheIcon( 'wi_ID_'+wi_ID, wi_cache_status ) );
 
-	evoFadeBg( jQuery( '#wi_ID_' + wi_ID ), new Array( '#FFFF33' ), { speed: 3000 } );
+	doFade( '#wi_ID_' + wi_ID );
 }
 
 /**

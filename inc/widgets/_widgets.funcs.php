@@ -124,8 +124,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 18, array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );
 		}
 		if( $kind == 'forum' )
-		{ // Add menu with User Directory
+		{ // Add menu with User Directory and Profile Visits ONLY for forum
 			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 20, array( 'link_type' => 'users' ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 21, array( 'link_type' => 'visits' ) );
 		}
 		// Pages list:
 		add_basic_widget( $blog_id, 'Menu', 'coll_page_list', 'core', 25 );
@@ -205,7 +206,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Page Top */
-	add_basic_widget( $blog_id, 'Page Top', 'social_links', 'core', 10, 'a:19:{s:5:"title";s:0:"";s:5:"link1";s:2:"15";s:10:"link1_href";s:32:"https://twitter.com/b2evolution/";s:5:"link2";s:2:"16";s:10:"link2_href";s:36:"https://www.facebook.com/b2evolution";s:5:"link3";s:2:"17";s:10:"link3_href";s:42:"https://plus.google.com/+b2evolution/posts";s:5:"link4";s:2:"18";s:10:"link4_href";s:48:"https://www.linkedin.com/company/b2evolution-net";s:5:"link5";s:2:"19";s:10:"link5_href";s:42:"https://github.com/b2evolution/b2evolution";s:5:"link6";s:0:"";s:10:"link6_href";s:0:"";s:5:"link7";s:0:"";s:10:"link7_href";s:0:"";s:11:"icon_colors";a:1:{s:7:"hoverbg";s:1:"1";}s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
+	add_basic_widget( $blog_id, 'Page Top', 'social_links', 'core', 10, 'a:19:{s:5:"title";s:0:"";s:5:"link1";s:2:"16";s:10:"link1_href";s:32:"https://twitter.com/b2evolution/";s:5:"link2";s:2:"17";s:10:"link2_href";s:36:"https://www.facebook.com/b2evolution";s:5:"link3";s:2:"18";s:10:"link3_href";s:42:"https://plus.google.com/+b2evolution/posts";s:5:"link4";s:2:"19";s:10:"link4_href";s:48:"https://www.linkedin.com/company/b2evolution-net";s:5:"link5";s:2:"20";s:10:"link5_href";s:42:"https://github.com/b2evolution/b2evolution";s:5:"link6";s:0:"";s:10:"link6_href";s:0:"";s:5:"link7";s:0:"";s:10:"link7_href";s:0:"";s:11:"icon_colors";a:1:{s:7:"hoverbg";s:1:"1";}s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
 
 
 	/* Sidebar */

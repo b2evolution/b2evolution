@@ -28,7 +28,7 @@ global $Plugins;
 global $current_User, $admin_url;
 $plugin_group = param( 'plugin_group', 'string', 'rendering' );
 
-$Form = new Form( NULL, 'plugin_settings_checkchanges' );
+$Form = new Form( NULL, 'plugin_settings_checkchanges', 'post', 'accordion' );
 
 // PluginUserSettings
 load_funcs('plugins/_plugin.funcs.php');
@@ -73,6 +73,8 @@ $Form->switch_layout( NULL );
 $have_plugins = false;
 $Plugins->restart();
 
+$Form->begin_group();
+
 while( $loop_Plugin = & $Plugins->get_next() )
 {
 	if( $loop_Plugin->group != $plugin_group )
@@ -84,7 +86,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	ob_start();
 
 	$priority_link = '<a href="'.$loop_Plugin->get_edit_settings_url().'#ffield_edited_plugin_code">'.$loop_Plugin->priority.'</a>';
-	$Form->begin_fieldset( $loop_Plugin->name.' '.$loop_Plugin->get_help_link('$help_url').' ('.T_('Priority').': '.$priority_link.')' );
+	$Form->begin_fieldset( $loop_Plugin->name.' '.$loop_Plugin->get_help_link('$help_url').' <span class="text-muted text-normal">('.T_('Priority').': '.$priority_link.')</span>' );
 
 	ob_start();
 
@@ -116,6 +118,8 @@ while( $loop_Plugin = & $Plugins->get_next() )
 		ob_end_clean();
 	}
 }
+
+$Form->end_group();
 
 if( $have_plugins )
 {	// End form:

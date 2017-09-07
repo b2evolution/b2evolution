@@ -935,19 +935,19 @@ function locale_updateDB()
 		{
 			if( $lfield == 'datefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s date format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Date format cannot be empty.').' ('.$plocale.')' );
 			}
 			elseif( $lfield == 'input_datefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s input date format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Input date format cannot be empty.').' ('.$plocale.')' );
 			}
 			elseif( $lfield == 'timefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s time format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Time format cannot be empty.').' ('.$plocale.')' );
 			}
 			elseif( $lfield == 'input_timefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s input time format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Input time format cannot be empty.').' ('.$plocale.')' );
 			}
 
 			if( $lfield == 'startofweek' && ( $pval < 0 || $pval > 6 ) )
@@ -1331,7 +1331,7 @@ function locales_load_available_defs()
 		$locale_def_files = get_filenames( $ad_locale_folder, $filename_params );
 		if( $locale_def_files === false )
 		{	// Impossible to read the locale folder:
-			$Messages->add( sprintf( T_('The locale %s is not readable. Please check file permissions.'), $locale_folder ), 'warning' );
+			$Messages->add( sprintf( /* No trans for debug messages */ 'The locale %s is not readable. Please check file permissions.', $locale_folder ), 'warning' );
 			continue;
 		}
 		// Go through files in locale folder:

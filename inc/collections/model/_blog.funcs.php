@@ -1054,8 +1054,9 @@ function get_inskin_statuses( $blog_ID, $type )
 
 	$BlogCache = & get_BlogCache();
 	$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
-	$inskin_statuses = $Blog->get_setting( ( $type == 'comment' ) ? 'comment_inskin_statuses' : 'post_inskin_statuses' );
-	return explode( ',', $inskin_statuses );
+	$inskin_statuses = trim( $Blog->get_setting( ( $type == 'comment' ) ? 'comment_inskin_statuses' : 'post_inskin_statuses' ) );
+
+	return empty( $inskin_statuses ) ? array() : explode( ',', $inskin_statuses );
 }
 
 

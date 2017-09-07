@@ -857,7 +857,15 @@ class _core_Module extends Module
 	 */
 	function check_core_group_perm( $permlevel, $permvalue, $permtarget )
 	{
+		global $current_User;
+
 		$perm = false;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'admin', 'normal' ) )
+		{	// Current user must has Normal Back-office Access to view/moderate/edit other users:
+			return $perm;
+		}
+
 		switch ( $permvalue )
 		{
 			case 'edit':
@@ -1304,9 +1312,24 @@ class _core_Module extends Module
 
 					if( $Blog->get( 'type' ) == 'manual' )
 					{ // Manual view
+						global $cat, $Item;
+						if( ! empty( $Item ) &&
+						        $Item->ID > 0 &&
+						        ( $item_Chapter = & $Item->get_main_Chapter() ) )
+						{	// Set category param from current selected item/post:
+							$manual_view_cat_param = '&amp;cat_ID='.$item_Chapter->ID.'&amp;highlight_id='.$Item->ID;
+						}
+						elseif( ! empty( $cat ) && is_number( $cat ) )
+						{	// Set category param from current selected category:
+							$manual_view_cat_param = '&amp;cat_ID='.$cat.'&amp;highlight_cat_id='.$cat;
+						}
+						else
+						{	// No selected category and item/post:
+							$manual_view_cat_param = '';
+						}
 						$entries['blog']['entries']['manual'] = array(
 								'text' => T_('Manual view').'&hellip;',
-								'href' => $items_url.'&amp;tab=manual',
+								'href' => $items_url.'&amp;tab=manual'.$manual_view_cat_param,
 							);
 					}
 
