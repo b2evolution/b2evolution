@@ -89,7 +89,7 @@ class bootstrap_site_tabs_Skin extends Skin
 		$r = array_merge( array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Layout Settings')
+					'label'  => T_('CSS files')
 				),
 					'css_files' => array(
 						'label' => T_('CSS files'),
@@ -102,131 +102,140 @@ class bootstrap_site_tabs_Skin extends Skin
 								array( 'custom.min.css', 'custom.min.css', 0 ),
 							)
 					),
+				'section_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+				'section_header_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Header')
+				),
 					'grouping' => array(
 						'label' => T_('Grouping'),
 						'note' => T_('Check to group collections into tabs'),
 						'type' => 'checkbox',
 						'defaultvalue' => 1,
 					),
-				'section_layout_end' => array(
-					'layout' => 'end_fieldset',
-				),
 
-				'section_topmenu_start' => array(
-					'layout' => 'begin_fieldset',
-					'label'  => T_('Top menu settings')
-				),
-					'menu_bar_bg_color' => array(
-						'label' => T_('Menu bar background color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#ddd',
-						'type' => 'color',
+					'section_topmenu_start' => array(
+						'layout' => 'begin_fieldset',
+						'label'  => T_('Top menu settings')
 					),
-					'tab_bg_color' => array(
-						'label' => T_('Tab background color'),
-						'note' => T_('E-g: #00ff00 for green'),
-						'defaultvalue' => '#eee',
-						'type' => 'color',
+						'menu_bar_bg_color' => array(
+							'label' => T_('Menu bar background color'),
+							'note' => T_('E-g: #ff0000 for red'),
+							'defaultvalue' => '#ddd',
+							'type' => 'color',
+						),
+						'tab_bg_color' => array(
+							'label' => T_('Tab background color'),
+							'note' => T_('E-g: #00ff00 for green'),
+							'defaultvalue' => '#eee',
+							'type' => 'color',
+						),
+						'tab_border_color' => array(
+							'label' => T_('Tab border color'),
+							'note' => T_('E-g: #0000ff for blue'),
+							'defaultvalue' => '#ddd',
+							'type' => 'color',
+						),
+						'tab_text_color' => array(
+							'label' => T_('Tab text color'),
+							'note' => T_('E-g: #ff0000 for red'),
+							'defaultvalue' => '#337ab7',
+							'type' => 'color',
+						),
+						'hover_tab_bg_color' => array(
+							'label' => T_('Hover tab color'),
+							'note' => T_('E-g: #00ff00 for green'),
+							'defaultvalue' => '#fff',
+							'type' => 'color',
+						),
+						'hover_tab_text_color' => array(
+							'label' => T_('Hover tab text color'),
+							'note' => T_('E-g: #0000ff for blue'),
+							'defaultvalue' => '#23527c',
+							'type' => 'color',
+						),
+						'selected_tab_bg_color' => array(
+							'label' => T_('Selected tab color'),
+							'note' => T_('E-g: #ff0000 for red'),
+							'defaultvalue' => '#fff',
+							'type' => 'color',
+						),
+						'selected_tab_text_color' => array(
+							'label' => T_('Selected tab text color'),
+							'note' => T_('E-g: #00ff00 for green'),
+							'defaultvalue' => '#000',
+							'type' => 'color',
+						),
+					'section_topmenu_end' => array(
+						'layout' => 'end_fieldset',
 					),
-					'tab_border_color' => array(
-						'label' => T_('Tab border color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#ddd',
-						'type' => 'color',
-					),
-					'tab_text_color' => array(
-						'label' => T_('Tab text color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#337ab7',
-						'type' => 'color',
-					),
-					'hover_tab_bg_color' => array(
-						'label' => T_('Hover tab color'),
-						'note' => T_('E-g: #00ff00 for green'),
-						'defaultvalue' => '#fff',
-						'type' => 'color',
-					),
-					'hover_tab_text_color' => array(
-						'label' => T_('Hover tab text color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#23527c',
-						'type' => 'color',
-					),
-					'selected_tab_bg_color' => array(
-						'label' => T_('Selected tab color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#fff',
-						'type' => 'color',
-					),
-					'selected_tab_text_color' => array(
-						'label' => T_('Selected tab text color'),
-						'note' => T_('E-g: #00ff00 for green'),
-						'defaultvalue' => '#000',
-						'type' => 'color',
-					),
-				'section_topmenu_end' => array(
-					'layout' => 'end_fieldset',
-				),
 
-				'section_submenu_start' => array(
-					'layout' => 'begin_fieldset',
-					'label'  => T_('Submenu settings')
-				),
-					'sub_tab_bg_color' => array(
-						'label' => T_('Tab background color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#eee',
-						'type' => 'color',
+					'section_submenu_start' => array(
+						'layout' => 'begin_fieldset',
+						'label'  => T_('Submenu settings')
 					),
-					'sub_tab_border_color' => array(
-						'label' => T_('Tab border color'),
-						'note' => T_('E-g: #00ff00 for green'),
-						'defaultvalue' => '#eee',
-						'type' => 'color',
+						'sub_tab_bg_color' => array(
+							'label' => T_('Tab background color'),
+							'note' => T_('E-g: #ff0000 for red'),
+							'defaultvalue' => '#eee',
+							'type' => 'color',
+						),
+						'sub_tab_border_color' => array(
+							'label' => T_('Tab border color'),
+							'note' => T_('E-g: #00ff00 for green'),
+							'defaultvalue' => '#eee',
+							'type' => 'color',
+						),
+						'sub_tab_text_color' => array(
+							'label' => T_('Tab text color'),
+							'note' => T_('E-g: #0000ff for blue'),
+							'defaultvalue' => '#337ab7',
+							'type' => 'color',
+						),
+						'sub_hover_tab_bg_color' => array(
+							'label' => T_('Hover tab color'),
+							'note' => T_('E-g: #ff0000 for red'),
+							'defaultvalue' => '#eee',
+							'type' => 'color',
+						),
+						'sub_hover_tab_border_color' => array(
+							'label' => T_('Hover tab border color'),
+							'note' => T_('E-g: #00ff00 for green'),
+							'defaultvalue' => '#eee',
+							'type' => 'color',
+						),
+						'sub_hover_tab_text_color' => array(
+							'label' => T_('Hover tab text color'),
+							'note' => T_('E-g: #0000ff for blue'),
+							'defaultvalue' => '#23527c',
+							'type' => 'color',
+						),
+						'sub_selected_tab_bg_color' => array(
+							'label' => T_('Selected tab color'),
+							'note' => T_('E-g: #ff0000 for red'),
+							'defaultvalue' => '#337ab7',
+							'type' => 'color',
+						),
+						'sub_selected_tab_border_color' => array(
+							'label' => T_('Selected tab border color'),
+							'note' => T_('E-g: #00ff00 for green'),
+							'defaultvalue' => '#337ab7',
+							'type' => 'color',
+						),
+						'sub_selected_tab_text_color' => array(
+							'label' => T_('Selected tab text color'),
+							'note' => T_('E-g: #0000ff for blue'),
+							'defaultvalue' => '#fff',
+							'type' => 'color',
+						),
+					'section_submenu_end' => array(
+						'layout' => 'end_fieldset',
 					),
-					'sub_tab_text_color' => array(
-						'label' => T_('Tab text color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#337ab7',
-						'type' => 'color',
-					),
-					'sub_hover_tab_bg_color' => array(
-						'label' => T_('Hover tab color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#eee',
-						'type' => 'color',
-					),
-					'sub_hover_tab_border_color' => array(
-						'label' => T_('Hover tab border color'),
-						'note' => T_('E-g: #00ff00 for green'),
-						'defaultvalue' => '#eee',
-						'type' => 'color',
-					),
-					'sub_hover_tab_text_color' => array(
-						'label' => T_('Hover tab text color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#23527c',
-						'type' => 'color',
-					),
-					'sub_selected_tab_bg_color' => array(
-						'label' => T_('Selected tab color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#337ab7',
-						'type' => 'color',
-					),
-					'sub_selected_tab_border_color' => array(
-						'label' => T_('Selected tab border color'),
-						'note' => T_('E-g: #00ff00 for green'),
-						'defaultvalue' => '#337ab7',
-						'type' => 'color',
-					),
-					'sub_selected_tab_text_color' => array(
-						'label' => T_('Selected tab text color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#fff',
-						'type' => 'color',
-					),
-				'section_submenu_end' => array(
+
+				'section_header_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
