@@ -133,6 +133,13 @@ class bootstrap_site_dropdown_Skin extends Skin
 							'defaultvalue' => '#e7e7e7',
 							'type' => 'color',
 						),
+						'menu_bar_logo_padding' => array(
+							'label' => T_('Menu bar logo padding'),
+							'note' => 'px. ' . T_('Set the padding around the logo.'),
+							'defaultvalue' => '2',
+							'type' => 'integer',
+							'size' => 1,
+						),
 						'tab_bg_color' => array(
 							'label' => T_('Tab background color'),
 							'note' => T_('E-g: #00ff00 for green'),
@@ -283,6 +290,7 @@ class bootstrap_site_dropdown_Skin extends Skin
 		// Top menu:
 		$menu_bar_bg_color = $this->get_setting( 'menu_bar_bg_color' );
 		$menu_bar_border_color = $this->get_setting( 'menu_bar_border_color' );
+		$menu_bar_logo_padding = $this->get_setting( 'menu_bar_logo_padding' );
 		$tab_bg_color = $this->get_setting( 'tab_bg_color' );
 		$tab_text_color = $this->get_setting( 'tab_text_color' );
 		$hover_tab_bg_color = $this->get_setting( 'hover_tab_bg_color' );
@@ -307,6 +315,9 @@ class bootstrap_site_dropdown_Skin extends Skin
 .bootstrap_site_navbar_header .navbar {
 	background-color: '.$menu_bar_bg_color.';
 	border-color: '.$menu_bar_border_color.';
+}
+.bootstrap_site_navbar_header .navbar-brand img {
+	padding: '.$menu_bar_logo_padding.'px;
 }
 .bootstrap_site_navbar_header .navbar .nav > li:not(.active) > a {
 	background-color: '.$tab_bg_color.';
