@@ -2532,6 +2532,7 @@ class Comment extends DataObject
 				break;
 
 			case '#item#':
+				$comment_Item = & $this->get_Item();
 				$text = $comment_Item->get_title( array( 'link_type' => 'none' ) );
 				break;
 		}
