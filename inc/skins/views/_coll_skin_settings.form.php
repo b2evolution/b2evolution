@@ -16,7 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Collection, $Blog, $Settings, $current_User, $skin_type;
+global $Collection, $Blog, $Settings, $current_User, $skin_type, $admin_url;
 
 $Form = new Form( NULL, 'skin_settings_checkchanges' );
 
@@ -45,22 +45,51 @@ $Form->begin_form( 'fform' );
 	{
 		case 'normal':
 			$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'normal_skin_ID' ) : $Settings->get( 'normal_skin_ID' );
-			$fieldset_title = T_('Default skin');
+			$fieldset_title = isset( $Blog ) ? T_('Default Collection skin') : T_('Default Site skin');
 			break;
 
 		case 'mobile':
 			$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'mobile_skin_ID', true ) : $Settings->get( 'mobile_skin_ID', true );
-			$fieldset_title = T_('Default mobile phone skin');
+			$fieldset_title = isset( $Blog ) ? T_('Default Collection mobile phone skin') : T_('Default Site mobile phone skin');
 			break;
 
 		case 'tablet':
 			$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'tablet_skin_ID', true ) : $Settings->get( 'tablet_skin_ID', true );
-			$fieldset_title = T_('Default tablet skin');
+			$fieldset_title = isset( $Blog ) ? T_('Default Collection tablet skin') : T_('Default Site tablet skin');
 			break;
 
 		default:
 			debug_die( 'Wrong skin type: '.$skin_type );
 	}
+
+	// Initialize a link to go to site/collection skin settings:
+	if( isset( $Blog ) )
+	{	// If collection skin page is opened currently:
+		if( $current_User->check_perm( 'options', 'view' ) )
+		{	// If current user has a permission to view site skin:
+			$goto_link_url = $admin_url.'?ctrl=collections&amp;tab=site_skin'.( $skin_type == 'mobile' || $skin_type == 'tablet' ? '&amp;skin_type='.$skin_type : '' );
+			$goto_link_title = T_('Go to Site skin');
+		}
+		// Set manual/doc URL:
+		$fieldset_manual_url = 'blog-skin-settings';
+	}
+	else
+	{	// If site skin page is opened currently:
+		if( ( $working_coll_ID = get_working_blog() ) &&
+		    $current_User->check_perm( 'blog_properties', 'edit', false, $working_coll_ID ) )
+		{	// If working collection is set and current user has a permission to edit the collection skin:
+			$goto_link_url = $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$working_coll_ID.( $skin_type == 'mobile' || $skin_type == 'tablet' ? '&amp;skin_type='.$skin_type : '' );
+			$goto_link_title = T_('Go to Collection skin');
+		}
+		// Set manual/doc URL:
+		$fieldset_manual_url = 'site-skin-settings';
+	}
+	if( isset( $goto_link_url ) )
+	{
+		$fieldset_title .= ' <span class="panel_heading_action_icons"><a href="'.$goto_link_url.'" class="btn btn-sm btn-info">'.$goto_link_title.' &raquo;</a></span>';
+	}
+	// Append manual/doc link:
+	$fieldset_title .= get_manual_link( $fieldset_manual_url );
 
 	$fieldset_title_links = '<span class="floatright panel_heading_action_icons">&nbsp;'.action_icon( T_('Select another skin...'), 'choose', regenerate_url( 'action', 'skinpage=selection&amp;skin_type='.$skin_type ), ' '.T_('Choose a different skin').' &raquo;', 3, 4, array( 'class' => 'action_icon btn btn-info btn-sm' ) );
 	if( $skin_ID && $current_User->check_perm( 'options', 'view' ) )

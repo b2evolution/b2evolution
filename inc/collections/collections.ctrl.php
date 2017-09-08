@@ -650,7 +650,7 @@ switch( $tab )
 			$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
 			$AdminUI->breadcrumbpath_add( T_('Site skin'), $admin_url.'?ctrl=collections&amp;tab=site_skin' );
 
-			$AdminUI->set_page_manual_link( 'site-skin' );
+			$AdminUI->set_page_manual_link( 'site-skin-settings' );
 
 			// Init JS to select colors in skin settings:
 			init_colorpicker_js();
