@@ -435,11 +435,11 @@ class bootstrap_photoblog_Skin extends Skin
 		}
 		// Page link color
 		if ( $page_link_color = $this->get_setting( 'page_link_color' ) ) {
-			$custom_css .= '#skin_wrapper a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+			$custom_css .= 'a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
 		}
 		// Page link hover color
 		if ( $page_link_h_color = $this->get_setting( 'page_link_h_color' ) ) {
-			$custom_css .= '#skin_wrapper a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+			$custom_css .= 'a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
 		}
 		// Posts background color
 		if ( $well_color = $this->get_setting( 'well_color' ) ) {
