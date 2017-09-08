@@ -11,6 +11,44 @@ div.widget_core_coll_post_list,
 div.widget_core_coll_page_list,
 div.widget_core_coll_related_post_list {
 
+	// Flow layout
+	&.evo_layout_flow {
+		.widget_flow_blocks {
+			// Important for centering inner blocks
+			display: inline-block;
+			text-align: center;
+			width: 100%;
+			
+			// Inner blocks div style (should be the same as .widget_rwd_content)
+			> div {
+				padding: 8px;
+				margin: 14px;
+				overflow: hidden;
+				background-color: #fafafa;
+				border-radius: 4px;
+				text-align: left;
+				width: 250px; // Fixed widget for flowing blocks
+
+				display: inline-block;
+				float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
+				vertical-align: top;
+			}
+		}
+		
+		// With teaser or with excerpt
+		&.evo_withteaser,
+		&.evo_withexcerpt {
+			.widget_flow_blocks > div {
+				.item_title {
+					font-size: 16px;
+					font-weight: 700;
+					line-height: 1.5em;
+					margin: 10px 0 5px;
+				}
+			}
+		}
+	}
+	
 	// RWD layout
 	&.evo_layout_rwd {
 
@@ -119,8 +157,7 @@ div.widget_core_coll_related_post_list {
 			}
 		}
 	}
-
-	// FP: I did not find a better way than to include this in &.evo_layout_list
+	
 	// First image when selected "Display first image"
 	&.evo_layout_list div.item_first_image {
 		float: left;
@@ -131,9 +168,9 @@ div.widget_core_coll_related_post_list {
 	&.evo_pics {
 		div.item_images {
 			display: inline-block;
-			margin: 6px 6px 0 0;
+			//margin-top: 6px;
 			img {
-				margin-right: 6px;
+				margin: 6px 6px 0 0;
 			}
 		}
 	}
@@ -145,7 +182,7 @@ div.widget_core_coll_related_post_list {
 		}
 		div.item_images {
 			float: left;
-			margin: 6px 6px 6px 0;
+			//margin: 6px 6px 6px 0;
 		}
 	}
 	// With excerpt or with teaser
@@ -213,62 +250,6 @@ div.widget_core_coll_related_post_list {
 			}
 		}
 	}
-	
-	// With teaser specific layout (with "..." button)
-	// &.evo_noexcerpt.evo_withteaser,
-	// &.evo_withexcerpt.evo_withteaser,
-	// &.evo_withexcerpt.evo_noteaser {
-
-			// div.item_content,
-			// div.item_excerpt {
-
-				// No longer needed ince we have &hellip; in th output code:
-				// p {
-					// margin: 0;
-					// &:last-of-type {
-						// display: inline;
-						// &:after {
-							// content: '...';
-						// }
-					// }
-				// }
-
-				// > a {
-					// TODO: check if we still need the following. -- Maybe for non-bootstrap skins?
-					// Simulation of bootstrap's btn-default class:
-					// margin-left: -3px;
-					// display: inline-block;
-					// font-size: 20px;
-					// white-space: nowrap;
-					// vertical-align: middle;
-					// -ms-touch-action: manipulation;
-					// touch-action: manipulation;
-					// cursor: pointer;
-					// -webkit-user-select: none;
-					// -moz-user-select: none;
-					// -ms-user-select: none;
-					// user-select: none;
-					// background-image: none;
-					// border: 1px solid transparent;
-					// color: @teaser-specific-button-color;
-					// border-radius: 4px;
-					// border: 1px solid #ccc;
-					// &:hover {
-						// border: 1px solid #adadad;
-						// color: #333;
-						// background-color: #e6e6e6;
-						// text-decoration: none;
-					// }
-				// }
-		// }
-
-		// Special blockquote style for teaser layout
-		// &.evo_1pic__special ul li div.item_content {
-			// blockquote {
-				// margin-left: 86px;
-			// }
-		// }
-	// }
 	
 	img {
 		border-radius: 3px;
