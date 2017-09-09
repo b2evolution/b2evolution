@@ -116,7 +116,7 @@ class mobile_bootstrap_blog_Skin extends Skin
 				),
 					'layout' => array(
 						'label' => T_('Layout'),
-						'note' => '',
+						'note' => T_('Select skin layout.'),
 						'defaultvalue' => 'right_sidebar',
 						'options' => array(
 								'single_column'              => T_('Single Column Large'),
@@ -130,27 +130,142 @@ class mobile_bootstrap_blog_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
-					'font_size' => array(
-						'label' => T_('Font size'),
-						'note' => '',
-						'defaultvalue' => 'default',
-						'options' => array(
-								'default'        => T_('Default (14px)'),
-								'standard'       => T_('Standard (16px)'),
-								'medium'      	 => T_('Medium (18px)'),
-								'large' 		 => T_('Large (20px)'),
-								'very_large'     => T_('Very large (22px)'),
+
+					'font' => array(
+						'label' => T_('Default font'),
+						'type'  => 'input_group',
+						'inputs' => array(
+							'_family' => array(
+								'defaultvalue' => 'system_helveticaneue',
+								'options'      => $this->get_font_definitions(),
+								'type'         => 'select'
 							),
-						'type' => 'select',
+							'_size' => array(
+								'label' => T_('Size'),
+								'defaultvalue' => 'default',
+								'options'      => array(
+									'default'        => T_('Default (14px)'),
+									'standard'       => T_('Standard (16px)'),
+									'medium'         => T_('Medium (18px)'),
+									'large'          => T_('Large (20px)'),
+									'very_large'     => T_('Very large (22px)'),
+								),
+								'type' => 'select'
+							),
+							'_weight' => array(
+								'label' => T_('Weight'),
+								'defaultvalue' => '400',
+								'options' => array(
+										'100' => '100',
+										'200' => '200',
+										'300' => '300',
+										'400' => '400 ('.T_('Normal').')',
+										'500' => '500',
+										'600' => '600',
+										'700' => '700 ('.T_('Bold').')',
+										'800' => '800',
+										'900' => '900',
+									),
+								'type' => 'select',
+							)
+						)
 					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
+
+
+				'section_color_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Custom Settings')
+				),
+					'page_bg_color' => array(
+						'label' => T_('Background color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'page_text_color' => array(
+						'label' => T_('Text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#333',
+						'type' => 'color',
+					),
+					'page_link_color' => array(
+						'label' => T_('Link color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+					'page_hover_link_color' => array(
+						'label' => T_('Hover link color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#23527c',
+						'type' => 'color',
+					),
+					'bgimg_text_color' => array(
+						'label' => T_('Text color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'bgimg_link_color' => array(
+						'label' => T_('Link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+					'bgimg_hover_link_color' => array(
+						'label' => T_('Hover link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+					'current_tab_text_color' => array(
+						'label' => T_('Current tab text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#333',
+						'type' => 'color',
+					),
+					'current_tab_bg_color' => array(
+						'label' => T_('Current tab background color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'hover_tab_bg_color' => array(
+						'label' => T_('Hovered tab background color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+					),
+					'panel_bg_color' => array(
+						'label' => T_('Panel background color'),
+						'note' => T_('Choose background color for function panels and widgets.'),
+						'defaultvalue' => '#ffffff',
+						'type' => 'color',
+					),
+					'panel_border_color' => array(
+						'label' => T_('Panel border color'),
+						'note' => T_('Choose border color for function panels and widgets.'),
+						'defaultvalue' => '#ddd',
+						'type' => 'color',
+					),
+					'panel_heading_bg_color' => array(
+						'label' => T_('Panel heading background color'),
+						'note' => T_('Choose background color for function panels and widgets.'),
+						'defaultvalue' => '#f5f5f5',
+						'type' => 'color',
+					),
+				'section_color_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
 
 				'section_colorbox_start' => array(
 					'layout' => 'begin_fieldset',
@@ -263,7 +378,7 @@ class mobile_bootstrap_blog_Skin extends Skin
 	 */
 	function display_init()
 	{
-		global $Messages, $debug;
+		global $Messages, $disp, $debug;
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
@@ -279,17 +394,84 @@ class mobile_bootstrap_blog_Skin extends Skin
 			) );
 
 		// Skin specific initializations:
+		global $media_url, $media_path;
+
+		// Add custom CSS:
+		$custom_css = '';
+
+		if( $color = $this->get_setting( 'page_bg_color' ) )
+		{ // Custom page background color:
+			$custom_css .= '#skin_wrapper { background-color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'page_text_color' ) )
+		{ // Custom page text color:
+			$custom_css .= '#skin_wrapper { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'page_link_color' ) )
+		{ // Custom page link color:
+			$custom_css .= 'a { color: '.$color." }\n";
+			$custom_css .= 'h4.evo_comment_title a, h4.panel-title a.evo_comment_type, .pagination li:not(.active) a, .pagination li:not(.active) span { color: '.$color." !important }\n";
+			$custom_css .= '.pagination li.active a, .pagination li.active span { color: #fff; background-color: '.$color.' !important; border-color: '.$color." }\n";
+			if( $this->get_setting( 'gender_colored' ) !== 1 )
+			{ // If gender option is not enabled, choose custom link color. Otherwise, chose gender link colors:
+				$custom_css .= 'h4.panel-title a { color: '.$color." }\n";
+			}
+		}
+		if( $color = $this->get_setting( 'page_hover_link_color' ) )
+		{ // Custom page link color on hover:
+			$custom_css .= 'a:hover { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_text_color' ) )
+		{	// Custom text color on background image:
+			$custom_css .= '.evo_hasbgimg { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_link_color' ) )
+		{	// Custom link color on background image:
+			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
+		{	// Custom link hover color on background image:
+			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'current_tab_text_color' ) )
+		{ // Custom current tab text color:
+			$custom_css .= 'ul.nav.nav-tabs li a.selected { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'current_tab_bg_color' ) )
+		{ // Custom current tab background color:
+			$custom_css .= 'ul.nav.nav-tabs li a.selected { background-color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'hover_tab_bg_color' ) )
+		{ // Custom hovered tab background text color:
+			$custom_css .= 'ul.nav.nav-tabs li a.default:hover { background-color: '.$color."; border-top-color: $color; border-left-color: $color; border-right-color: $color }\n";
+		}
+		if( $color = $this->get_setting( 'panel_bg_color' ) )
+		{ // Panel background text color:
+			$custom_css .= '.panel, .pagination>li>a { background-color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'panel_border_color' ) )
+		{ // Panel border color:
+			$custom_css .= '
+			.pagination li a, .pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover,
+			.nav-tabs,
+			.panel-default, .panel .panel-footer,
+			.panel .table, .panel .table th, .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th
+			{ border-color: '.$color." }\n";
+			$custom_css .= '.panel .panel-heading { border-color: '.$color."; background-color: $color }\n";
+			$custom_css .= '.nav-tabs>li>a:hover { border-bottom: 1px solid '.$color." }\n";
+			$custom_css .= '.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover { border-top-color: '.$color."; border-left-color: $color; border-right-color: $color }\n";
+		}
+		if( $color = $this->get_setting( 'panel_heading_bg_color' ) )
+		{ // Panel border color:
+			$custom_css .= '.panel .panel-heading, .panel .panel-footer { background-color: '.$color." }\n";
+		}
 
 		// Limit images by max height:
 		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
 		if( $max_image_height > 0 )
 		{
-			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
+			$custom_css .= '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }'." }\n";
 		}
-
-		// Add custom CSS:
-		$custom_css = '';
-
 
 		// Font size customization
 		if( $font_size = $this->get_setting( 'font_size' ) )
@@ -297,67 +479,70 @@ class mobile_bootstrap_blog_Skin extends Skin
 			switch( $font_size )
 			{
 				case 'default': // When default font size, no CSS entry
-				$custom_css = '';
-				break;
+					//$custom_css .= '';
+					break;
 
 				case 'standard':// When standard layout
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 16px !important'." }\n";
-				$custom_css .= '.container input.search_field { height: 100%'." }\n";
-				$custom_css .= '.container h1 { font-size: 38px'." }\n";
-				$custom_css .= '.container h2 { font-size: 32px'." }\n";
-				$custom_css .= '.container h3 { font-size: 26px'." }\n";
-				$custom_css .= '.container h4 { font-size: 18px'." }\n";
-				$custom_css .= '.container h5 { font-size: 16px'." }\n";
-				$custom_css .= '.container h6 { font-size: 14px'." }\n";
-				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-				break;
+					$custom_css .= '.container { font-size: 16px !important'." }\n";
+					$custom_css .= '.container input.search_field { height: 100%'." }\n";
+					$custom_css .= '.container h1 { font-size: 38px'." }\n";
+					$custom_css .= '.container h2 { font-size: 32px'." }\n";
+					$custom_css .= '.container h3 { font-size: 26px'." }\n";
+					$custom_css .= '.container h4 { font-size: 18px'." }\n";
+					$custom_css .= '.container h5 { font-size: 16px'." }\n";
+					$custom_css .= '.container h6 { font-size: 14px'." }\n";
+					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+					break;
 
 				case 'medium': // When default font size, no CSS entry
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 18px !important'." }\n";
-				$custom_css .= '.container input.search_field { height: 100%'." }\n";
-				$custom_css .= '.container h1 { font-size: 40px'." }\n";
-				$custom_css .= '.container h2 { font-size: 34px'." }\n";
-				$custom_css .= '.container h3 { font-size: 28px'." }\n";
-				$custom_css .= '.container h4 { font-size: 20px'." }\n";
-				$custom_css .= '.container h5 { font-size: 18px'." }\n";
-				$custom_css .= '.container h6 { font-size: 16px'." }\n";
-				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-				break;
+					$custom_css .= '.container { font-size: 18px !important'." }\n";
+					$custom_css .= '.container input.search_field { height: 100%'." }\n";
+					$custom_css .= '.container h1 { font-size: 40px'." }\n";
+					$custom_css .= '.container h2 { font-size: 34px'." }\n";
+					$custom_css .= '.container h3 { font-size: 28px'." }\n";
+					$custom_css .= '.container h4 { font-size: 20px'." }\n";
+					$custom_css .= '.container h5 { font-size: 18px'." }\n";
+					$custom_css .= '.container h6 { font-size: 16px'." }\n";
+					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+					break;
 
 				case 'large': // When default font size, no CSS entry
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 20px !important'." }\n";
-				$custom_css .= '.container input.search_field { height: 100%'." }\n";
-				$custom_css .= '.container h1 { font-size: 42px'." }\n";
-				$custom_css .= '.container h2 { font-size: 36px'." }\n";
-				$custom_css .= '.container h3 { font-size: 30px'." }\n";
-				$custom_css .= '.container h4 { font-size: 22px'." }\n";
-				$custom_css .= '.container h5 { font-size: 20px'." }\n";
-				$custom_css .= '.container h6 { font-size: 18px'." }\n";
-				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-				break;
+					$custom_css .= '.container { font-size: 20px !important'." }\n";
+					$custom_css .= '.container input.search_field { height: 100%'." }\n";
+					$custom_css .= '.container h1 { font-size: 42px'." }\n";
+					$custom_css .= '.container h2 { font-size: 36px'." }\n";
+					$custom_css .= '.container h3 { font-size: 30px'." }\n";
+					$custom_css .= '.container h4 { font-size: 22px'." }\n";
+					$custom_css .= '.container h5 { font-size: 20px'." }\n";
+					$custom_css .= '.container h6 { font-size: 18px'." }\n";
+					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+					break;
 
 				case 'very_large': // When default font size, no CSS entry
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 22px !important'." }\n";
-				$custom_css .= '.container input.search_field { height: 100%'." }\n";
-				$custom_css .= '.container h1 { font-size: 44px'." }\n";
-				$custom_css .= '.container h2 { font-size: 38px'." }\n";
-				$custom_css .= '.container h3 { font-size: 32px'." }\n";
-				$custom_css .= '.container h4 { font-size: 24px'." }\n";
-				$custom_css .= '.container h5 { font-size: 22px'." }\n";
-				$custom_css .= '.container h6 { font-size: 20px'." }\n";
-				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-				break;
+					$custom_css .= '.container { font-size: 22px !important'." }\n";
+					$custom_css .= '.container input.search_field { height: 100%'." }\n";
+					$custom_css .= '.container h1 { font-size: 44px'." }\n";
+					$custom_css .= '.container h2 { font-size: 38px'." }\n";
+					$custom_css .= '.container h3 { font-size: 32px'." }\n";
+					$custom_css .= '.container h4 { font-size: 24px'." }\n";
+					$custom_css .= '.container h5 { font-size: 22px'." }\n";
+					$custom_css .= '.container h6 { font-size: 20px'." }\n";
+					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+					break;
 			}
 		}
 
+		// Font family customization
+		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight' );
+
 		if( ! empty( $custom_css ) )
-		{ // Function for custom_css:
-		$custom_css = '<style type="text/css">
+		{	// Function for custom_css:
+			$custom_css = '<style type="text/css">
 <!--
 '.$custom_css.'
 -->
 		</style>';
-		add_headline( $custom_css );
+			add_headline( $custom_css );
 		}
 	}
 
