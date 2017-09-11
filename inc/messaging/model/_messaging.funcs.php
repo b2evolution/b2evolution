@@ -1904,15 +1904,23 @@ function get_msgform_contact_methods()
 
 	$contact_methods = array( 'email' => T_('Email') );
 
-	$SQL = new SQL( 'Get preferred contact methods for disp=msgform' );
-	$SQL->SELECT( 'ufdf_id, ufdf_name' );
-	$SQL->FROM( 'T_users__fielddefs' );
-	$SQL->WHERE( 'ufdf_type = "phone" OR ufdf_type = "email"' );
-	$SQL->ORDER_BY( 'ufdf_name' );
-	$user_fields = $DB->get_assoc( $SQL->get(), $SQL->title );
-	foreach( $user_fields as $user_field_ID => $user_field_name )
-	{
-		$contact_methods[ $user_field_ID ] = $user_field_name;
+	if( is_logged_in() )
+	{	// Get additional user fields if they are filled for current user profile:
+		global $current_User;
+
+		$SQL = new SQL( 'Get preferred contact methods for disp=msgform' );
+		$SQL->SELECT( 'ufdf_id, ufdf_name' );
+		$SQL->FROM( 'T_users__fielddefs' );
+		$SQL->FROM_add( 'INNER JOIN T_users__fields ON uf_ufdf_ID = ufdf_id' );
+		$SQL->FROM_add( 'LEFT JOIN T_users__fieldgroups ON ufgp_ID = ufdf_ufgp_ID' );
+		$SQL->WHERE( 'ufdf_type IN ( "phone", "email" ) OR ufgp_name = "Instant Messaging"' );
+		$SQL->WHERE_and( 'uf_user_ID = '.$current_User->ID );
+		$SQL->ORDER_BY( 'ufdf_name' );
+		$user_fields = $DB->get_assoc( $SQL->get(), $SQL->title );
+		foreach( $user_fields as $user_field_ID => $user_field_name )
+		{
+			$contact_methods[ $user_field_ID ] = $user_field_name;
+		}
 	}
 
 	return $contact_methods;
