@@ -158,9 +158,46 @@ switch ( $action )
 		// Commit changes in cache:
 		$GroupCache->add( $edited_Group );
 
-		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=groups', 303 ); // Will EXIT
-		// We have EXITed already at this point!!
+		// Update plugin group settings:
+		load_funcs( 'plugins/_plugin.funcs.php' );
+
+		$any_plugin_settings_updated = false;
+		$Plugins->restart();
+		while( $loop_Plugin = & $Plugins->get_next() )
+		{
+			$tmp_params = array( 'for_editing' => true );
+			$plugin_group_settings = $loop_Plugin->GetDefaultGroupSettings( $tmp_params );
+			if( empty( $plugin_group_settings ) )
+			{	// Skip plugin without group settings:
+				continue;
+			}
+
+			// Loop through settings for this plugin:
+			foreach( $plugin_group_settings as $set_name => $set_meta )
+			{
+				autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'GroupSettings', $edited_Group );
+			}
+
+			if( $loop_Plugin->GroupSettings->dbupdate() )
+			{
+				$any_plugin_settings_updated = true;
+			}
+		}
+
+		if( $any_plugin_settings_updated )
+		{
+			$Messages->add( T_('Plugin group settings have been updated.'), 'success' );
+		}
+
+		if( param_errors_detected() )
+		{
+			$action = 'edit';
+		}
+		else
+		{	// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=groups', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
 		break;
 
 

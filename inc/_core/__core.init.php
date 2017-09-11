@@ -57,6 +57,7 @@ $db_config['aliases'] = array(
 		'T_pluginevents'           => $tableprefix.'pluginevents',
 		'T_pluginsettings'         => $tableprefix.'pluginsettings',
 		'T_pluginusersettings'     => $tableprefix.'pluginusersettings',
+		'T_plugingroupsettings'    => $tableprefix.'plugingroupsettings',
 		'T_settings'               => $tableprefix.'settings',
 		'T_users'                  => $tableprefix.'users',
 		'T_users__fielddefs'       => $tableprefix.'users__fielddefs',

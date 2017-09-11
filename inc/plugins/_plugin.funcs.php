@@ -27,9 +27,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param string Settings path, e.g. 'locales[0]' or 'setting'
  * @param array Meta data for this setting.
  * @param Form (by reference)
- * @param string Settings type ('Settings' or 'UserSettings' or 'Widget' or 'Skin')
+ * @param string Settings type ('Settings' or 'UserSettings' or 'GroupSettings' or 'Widget' or 'Skin')
  * @param Plugin|Widget
- * @param mixed Target (User object for 'UserSettings')
+ * @param mixed Target (User object for 'UserSettings', Group object for 'GroupSettings')
  * @param mixed Value to really use (used for recursion into array type settings)
  */
 function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
@@ -212,6 +212,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					'User' => $set_target,
 					'action' => 'display' );
 				$error_value = $Obj->PluginUserSettingsValidateSet( $tmp_params );
+				break;
+
+			case 'GroupSettings':
+				// NOTE: this assumes we come here only on recursion or with $use_value set..!
+				$set_value = $Obj->GroupSettings->get( $parname, $set_target->ID );
+				$tmp_params = array(
+					'name'   => $parname,
+					'value'  => & $set_value,
+					'meta'   => $parmeta,
+					'Group'  => $set_target,
+					'action' => 'display' );
+				$error_value = $Obj->PluginGroupSettingsValidateSet( $tmp_params );
 				break;
 
 			case 'Settings':
@@ -650,6 +662,10 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 			$Plugin->UserSettings->set( $set_name, $setting );
 			break;
 
+		case 'GroupSettings':
+			$Plugin->GroupSettings->set( $set_name, $setting );
+			break;
+
 		case 'MsgSettings':
 			$set_name = ( $set_name == 'msg_apply_rendering' ? '' : 'msg_' ).$set_name;
 			$Plugin->Settings->set( $set_name, $setting );
@@ -716,6 +732,11 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 		case 'UserSettings':
 			$setting = $Plugin->UserSettings->get( $set_name );
 			$defaults = $Plugin->GetDefaultUserSettings( $tmp_params );
+			break;
+
+		case 'GroupSettings':
+			$setting = $Plugin->GroupSettings->get( $set_name );
+			$defaults = $Plugin->GetDefaultGroupSettings( $tmp_params );
 			break;
 
 		case 'CollSettings':
@@ -835,8 +856,8 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
  * @param string Settings path, e.g. 'locales[0]' or 'setting'
  * @param array Meta data for this setting.
  * @param Plugin|Widget
- * @param string Type of Settings (either 'Settings' or 'UserSettings').
- * @param mixed Target (User object for 'UserSettings')
+ * @param string Type of Settings (either 'Settings' or 'UserSettings' or 'GroupSettings').
+ * @param mixed Target (User object for 'UserSettings', Group object for 'GroupSettings')
  * @param mixed NULL to use value from request, OR set value what you want to force
  */
 function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type, $set_target = NULL, $set_value = NULL )
@@ -1014,6 +1035,24 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 			if( empty( $error_value ) )
 			{
 				$Obj->UserSettings->set( $parname, $l_value, $set_target->ID );
+			}
+			break;
+
+		case 'GroupSettings':
+			// Plugin Group settings:
+			$dummy = array(
+				'name'   => $parname,
+				'value'  => & $l_value,
+				'meta'   => $parmeta,
+				'Group'  => $set_target,
+				'action' => 'set' );
+			$error_value = $Obj->PluginGroupSettingsValidateSet( $dummy );
+			// Update the param value, because a plugin might have changed it (through reference):
+			$GLOBALS[ $Obj->get_param_prefix().$parname ] = $l_value;
+
+			if( empty( $error_value ) )
+			{
+				$Obj->GroupSettings->set( $parname, $l_value, $set_target->ID );
 			}
 			break;
 

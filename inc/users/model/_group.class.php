@@ -132,6 +132,19 @@ class Group extends DataObject
 
 
 	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table' => 'T_plugingroupsettings', 'fk' => 'pgset_grp_ID', 'msg' => T_('%d group settings on plugins') ),
+			);
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.

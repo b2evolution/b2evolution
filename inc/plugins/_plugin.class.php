@@ -229,6 +229,21 @@ class Plugin
 
 
 	/**
+	 * If the plugin provides group settings, this will become the object to access them.
+	 *
+	 * This gets instantianted on Plugin registration for PHP4 and through
+	 * overloading in PHP5+, which means on first access.
+	 *
+	 * NOTE: its methods use {@link $current_User::$grp_ID} by default, but you may call it
+	 *       if there's no {@link $current_User} instantiated (yet).
+	 *
+	 * @see GetDefaultGroupSettings()
+	 * @var PluginGroupSettings
+	 */
+	var $GroupSettings;
+
+
+	/**
 	 * The status of the plugin.
 	 *
 	 * Use {@link set_status()} to change it, if you need to.
@@ -596,6 +611,32 @@ class Plugin
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function GetDefaultUserSettings( & $params )
+	{
+		return array();
+	}
+
+
+	/**
+	 * Define the PER-GROUP settings of the plugin here. These can then be edited by each group.
+	 *
+	 * You can access them in the plugin through the member object
+	 * {@link $GroupSettings}, e.g.:
+	 * <code>$this->GroupSettings->get( 'my_param' );</code>
+	 *
+	 * This method behaves exactly like {@link Plugin::GetDefaultSettings()},
+	 * except that it defines group specific settings instead of global settings.
+	 *
+	 * @todo 3.0 fp> 1) This is not an event: RENAME to lowercase (in b2evo 3.0)
+	 * @todo 3.0 fp> 2) This defines more than Default values ::  confusing name
+	 * @todo name tentative get_group_param_definitions()
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$GroupSettings}.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function GetDefaultGroupSettings( & $params )
 	{
 		return array();
 	}
@@ -2618,6 +2659,27 @@ class Plugin
 
 	// }}}
 
+
+	// PluginGroupSettings {{{
+	/**
+	 * Event handler: Called before displaying or setting a plugin's group setting in the backoffice.
+	 *
+	 * @see GetDefaultGroupSettings()
+	 * @param array Associative array of parameters
+	 *   - 'name': name of the setting
+	 *   - 'value': value of the setting (by reference)
+	 *   - 'meta': meta data of the setting (as given in {@link GetDefaultGroupSettings()})
+	 *   - 'Group': the {@link Group} for which the setting is
+	 *   - 'action': 'display' or 'set'
+	 * @return string|NULL Return a string with an error to prevent the setting from being set
+	 *                     and/or a message added to the settings field.
+	 */
+	function PluginGroupSettingsValidateSet( & $params )
+	{
+	}
+
+	// }}}
+
 	// PluginCollSettings {{{
 	/**
 	 * Event handler: Called as action just before updating plugin's collection/blog settings.
@@ -3864,6 +3926,18 @@ class Plugin
 				if( isset($this->UserSettings) )
 				{
 					return $this->UserSettings;
+				}
+				break;
+
+			case 'GroupSettings':
+				if( $this->ID < 0 )
+				{
+					debug_die( 'Tried to access "GroupSettings" on a non-installed plugin. ('.$this->classname.'/'.$this->ID.')' );
+				}
+				$Plugins->instantiate_Settings( $this, 'GroupSettings' );
+				if( isset( $this->GroupSettings ) )
+				{
+					return $this->GroupSettings;
 				}
 				break;
 		}

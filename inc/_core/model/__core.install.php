@@ -324,6 +324,16 @@ $schema_queries = array(
 			PRIMARY KEY ( puset_plug_ID, puset_user_ID, puset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_plugingroupsettings' => array(
+		'Creating plugin group settings table',
+		"CREATE TABLE T_plugingroupsettings (
+			pgset_plug_ID INT(11) UNSIGNED NOT NULL,
+			pgset_grp_ID  INT(11) UNSIGNED NOT NULL,
+			pgset_name    VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
+			pgset_value   TEXT NULL,
+			PRIMARY KEY   ( pgset_plug_ID, pgset_grp_ID, pgset_name )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_pluginevents' => array(
 		'Creating plugin events table',
 		"CREATE TABLE T_pluginevents(

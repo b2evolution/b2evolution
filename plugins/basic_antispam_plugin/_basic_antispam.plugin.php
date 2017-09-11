@@ -120,6 +120,30 @@ class basic_antispam_plugin extends Plugin
 
 
 	/**
+	 * Define the PER-GROUP settings of the plugin here. These can then be edited by each user.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function GetDefaultGroupSettings( & $params )
+	{
+		return array(
+				'comment_throttling' => array(
+					'label'        => T_('Comment throttling'),
+					'note'         => T_('Users from this group will only be able to post a comment every x seconds.').' '.T_('0 to disable it.'),
+					'type'         => 'integer',
+					'defaultvalue' => 2,
+					'size'         => 3,
+					'valid_range'  => array( 'min' => 0 ),
+				),
+			);
+	}
+
+
+	/**
 	 * Handle max_number_of_links_feedback setting.
 	 *
 	 * Try to detect as many links as possible
@@ -216,7 +240,16 @@ class basic_antispam_plugin extends Plugin
 	{
 		$comment_Item = & $params['Comment']->get_Item();
 
-		$min_comment_interval = $this->Settings->get( 'min_comment_interval' );
+		if( is_logged_in() )
+		{	// If user is logged in then we can get minimum comment interval per group:
+			global $current_User;
+			$min_comment_interval = $this->GroupSettings->get( 'comment_throttling', $current_User->grp_ID );
+		}
+		else
+		{	// Use plugin setting of minimum comment interval for all anonymous users:
+			$min_comment_interval = $this->Settings->get( 'min_comment_interval' );
+		}
+
 		if( $params['action'] != 'preview' &&
 		    ! empty( $min_comment_interval ) &&
 		    ! $params['Comment']->is_meta() )

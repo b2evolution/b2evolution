@@ -8590,7 +8590,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
-	{	// part of 6.8.0-alpha
+	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
 				sec_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 				sec_name          VARCHAR(255) NOT NULL,
@@ -8601,13 +8601,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 13005, 'Upgrading collections table...' ) )
-	{	// part of 6.8.0-alpha
+	{	// part of 7.0.0-alpha
 		db_add_col( 'T_blogs', 'blog_sec_ID', 'INT(11) UNSIGNED NOT NULL DEFAULT 1' );
 		upg_task_end();
 	}
 
 	if( upg_task_start( 13010, 'Create default section...' ) )
-	{	// part of 6.8.0-alpha
+	{	// part of 7.0.0-alpha
 		$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
 			VALUES ( 1, "No Section", 1, 1 )' );
 		$section_ID = $DB->insert_id;
@@ -8621,14 +8621,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 13015, 'Upgrading general settings table...' ) )
-	{	// part of 6.8.0-alpha
+	{	// part of 7.0.0-alpha
 		$DB->query( 'ALTER TABLE T_settings
 			MODIFY set_name VARCHAR(50) COLLATE ascii_general_ci NOT NULL' );
 		upg_task_end();
 	}
 
 	if( upg_task_start( 13020, 'Install default site skin...' ) )
-	{	// part of 6.8.0-alpha
+	{	// part of 7.0.0-alpha
 		load_funcs( 'skins/_skin.funcs.php' );
 		$SkinCache = & get_SkinCache();
 		if( ! ( $default_site_Skin = & $SkinCache->get_by_folder( 'default_site_skin', false ) ) )
@@ -8640,6 +8640,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'REPLACE INTO T_settings ( set_name, set_value )
 				VALUES ( "normal_skin_ID", '.$default_site_Skin->ID.' )' );
 		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13030, 'Creating plugin group settings table...' ) )
+	{	// part of 7.0.0-alpha
+		db_create_table( 'T_plugingroupsettings', '
+			pgset_plug_ID INT(11) UNSIGNED NOT NULL,
+			pgset_grp_ID  INT(11) UNSIGNED NOT NULL,
+			pgset_name    VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
+			pgset_value   TEXT NULL,
+			PRIMARY KEY   ( pgset_plug_ID, pgset_grp_ID, pgset_name )' );
 		upg_task_end();
 	}
 

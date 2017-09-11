@@ -69,6 +69,7 @@ class Plugins_admin extends Plugins
 	 *  - PluginUserSettingsUpdateAction (Called as action before updating the plugin's user settings)
 	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
 	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
+	 *  - PluginGroupSettingsValidateSet (Called before setting a plugin's group setting in the backoffice)
 	 *  - PluginVersionChanged (Called when we detect a version change)
 	 *  - PluginCollSettingsUpdateAction (Called as action before updating the collection/blog's settings)
 	 *
@@ -676,13 +677,17 @@ class Plugins_admin extends Plugins
 
 		$DB->begin();
 
-		// Delete Plugin settings (constraints)
-		$DB->query( "DELETE FROM T_pluginsettings
-		              WHERE pset_plug_ID = $plugin_ID" );
+		// Delete Plugin settings (constraints):
+		$DB->query( 'DELETE FROM T_pluginsettings
+			WHERE pset_plug_ID = '.$plugin_ID );
 
-		// Delete Plugin user settings (constraints)
-		$DB->query( "DELETE FROM T_pluginusersettings
-		              WHERE puset_plug_ID = $plugin_ID" );
+		// Delete Plugin user settings (constraints):
+		$DB->query( 'DELETE FROM T_pluginusersettings
+			WHERE puset_plug_ID = '.$plugin_ID );
+
+		// Delete Plugin group settings (constraints):
+		$DB->query( 'DELETE FROM T_plugingroupsettings
+			WHERE pgset_plug_ID = '.$plugin_ID );
 
 		// Delete Plugin events (constraints)
 		$plugin_events = $DB->get_col( '

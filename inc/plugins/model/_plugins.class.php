@@ -645,6 +645,7 @@ class Plugins
 			//       see http://forums.b2evolution.net/viewtopic.php?p=49031#49031
 			unset( $Plugin->Settings );
 			unset( $Plugin->UserSettings );
+			unset( $Plugin->GroupSettings );
 
 			// Nothing to do here, will get called through Plugin::__get() when accessed
 			return;
@@ -655,6 +656,7 @@ class Plugins
 		{
 			$this->instantiate_Settings( $Plugin, 'Settings' );
 			$this->instantiate_Settings( $Plugin, 'UserSettings' );
+			$this->instantiate_Settings( $Plugin, 'GroupSettings' );
 		}
 	}
 
@@ -670,7 +672,7 @@ class Plugins
 	 *           Defaults would need to be handled by Plugin(User)Settings::get_default() then.
 	 *
 	 * @param Plugin
-	 * @param string settings type: "Settings" or "UserSettings"
+	 * @param string settings type: "Settings", "UserSettings" or "GroupSettings"
 	 * @return boolean NULL, if no Settings
 	 */
 	function instantiate_Settings( & $Plugin, $set_type )
@@ -718,6 +720,14 @@ class Plugins
 			$Plugin->UserSettings = new PluginUserSettings( $Plugin->ID );
 
 			$set_Obj = & $Plugin->UserSettings;
+		}
+		elseif( $set_type == 'GroupSettings' )
+		{	// Group specific settings:
+			load_class( 'plugins/model/_plugingroupsettings.class.php', 'PluginGroupSettings' );
+
+			$Plugin->GroupSettings = new PluginGroupSettings( $Plugin->ID );
+
+			$set_Obj = & $Plugin->GroupSettings;
 		}
 		else
 		{ // Global settings:

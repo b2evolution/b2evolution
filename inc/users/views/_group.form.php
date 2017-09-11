@@ -244,7 +244,54 @@ $Form->begin_fieldset( T_( 'Notification options').get_manual_link('notification
 $Form->end_fieldset();
 
 if( $action != 'view' )
-{
+{	// If current User can edit this group:
+
+	// Display plugin settings per group:
+	global $Plugins;
+	load_funcs( 'plugins/_plugin.funcs.php' );
+
+	$Plugins->restart();
+	while( $loop_Plugin = & $Plugins->get_next() )
+	{
+		if( ! $loop_Plugin->GroupSettings )
+		{	// Skip plugin without group settings:
+			continue;
+		}
+
+		// We use output buffers here to display the fieldset only, if there's content in there (either from PluginUserSettings or PluginSettingsEditDisplayAfter).
+		ob_start();
+		$Form->begin_fieldset( $loop_Plugin->name.' '.$loop_Plugin->get_help_link( '$help_url' ) );
+
+		ob_start();
+		$tmp_params = array(
+				'for_editing' => true,
+				'group_ID'    => $edited_Group->ID
+			);
+		$plugin_group_settings = $loop_Plugin->GetDefaultGroupSettings( $tmp_params );
+		if( is_array( $plugin_group_settings ) )
+		{
+			foreach( $plugin_group_settings as $l_name => $l_meta )
+			{	// Display form field for this setting:
+				autoform_display_field( $l_name, $l_meta, $Form, 'GroupSettings', $loop_Plugin, $edited_Group );
+			}
+		}
+
+		$has_contents = strlen( ob_get_contents() );
+		$Form->end_fieldset();
+
+		if( $has_contents )
+		{	// Print out plugin group settings:
+			ob_end_flush();
+			ob_end_flush();
+		}
+		else
+		{	// No content, discard output buffers:
+			ob_end_clean();
+			ob_end_clean();
+		}
+	}
+
+	// Display a button to save changes:
 	$Form->buttons( array( array( '', '', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 
