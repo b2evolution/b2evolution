@@ -174,3 +174,32 @@ div.level2 nav .nav li.active a:focus {
 .sitewide_footer .container p {
   margin-bottom: 0px;
 }
+.btn.slide-top {
+  opacity: 0;
+  visibility: hidden;
+  float: right;
+  font-size: 20px;
+  position: fixed;
+  padding: 2px 13px;
+  right: 8px;
+  top: 8px;
+  transition: all 0.3s;
+  z-index: 9999;
+}
+.btn.slide-top.slide-top-visible {
+  opacity: 1;
+  visibility: visible;
+}
+.btn.slide-top.logged_in_margin_top {
+  top: 35px;
+}
+@media only screen and (max-device-width: 1024px) {
+  .btn.slide-top.logged_in_margin_top {
+    top: 8px;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) and (min-device-width: 1024px) {
+  .btn.slide-top.logged_in_margin_top {
+    top: 35px;
+  }
+}
