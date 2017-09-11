@@ -238,6 +238,20 @@ class bootstrap_site_navbar_Skin extends Skin
 				'section_header_end' => array(
 					'layout' => 'end_fieldset',
 				),
+				
+				'section_floating_nav_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Floating navigation settings')
+				),
+						'back_to_top_button' => array(
+							'label' => T_('"Back to Top" button'),
+							'note' => T_('Check to enable "Back to Top" button'),
+							'defaultvalue' => 1,
+							'type' => 'checkbox',
+						),
+				'section_floating_nav_end' => array(
+					'layout' => 'end_fieldset',
+				),
 
 				'section_footer_start' => array(
 					'layout' => 'begin_fieldset',

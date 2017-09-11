@@ -265,6 +265,9 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 
 </div><?php // END OF <div class="bootstrap_site_header"> ?>
 
+<?php if( $site_Skin->get_setting( 'back_to_top_button' ) )
+{ // Check if "Back to Top" button is enabled
+?>
 <a href="#" class="btn btn-primary slide-top<?php echo ( is_logged_in() ? ' logged_in_margin_top' : '' ); ?>"><i class="fa fa-angle-double-up"></i></a>
 
 <script type="text/javascript">
@@ -295,3 +298,4 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 		}, scroll_top_duration );
 	} );
 </script>
+<?php } ?>
