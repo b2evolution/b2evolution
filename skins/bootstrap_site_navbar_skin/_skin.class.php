@@ -322,6 +322,9 @@ class bootstrap_site_navbar_Skin extends Skin
 	background-color: '.$menu_bar_bg_color.';
 	border-color: '.$menu_bar_border_color.';
 }
+.bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right {
+	border-color: '.$menu_bar_border_color.';
+}
 .bootstrap_site_navbar_header .navbar .nav > li:not(.active) > a {
 	background-color: '.$tab_bg_color.';
 	color: '.$tab_text_color.';

@@ -10,6 +10,10 @@
 .bootstrap_site_navbar_header .navbar .navbar-collapse .nav {
   margin: 0;
 }
+.bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right {
+  border-top: 1px solid;
+  padding-top: 9px;
+}
 .bootstrap_site_navbar_header .navbar .navbar-collapse .nav .login {
   padding-top: 4px;
   padding-bottom: 4px;
@@ -28,6 +32,10 @@
   }
   .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-left {
     margin-right: 15px;
+  }
+  .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right {
+    border-top: none;
+    padding: 0;
   }
   .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right .login {
     padding-top: 8px;

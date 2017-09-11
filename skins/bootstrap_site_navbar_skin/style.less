@@ -9,6 +9,12 @@
 			padding: 0;
 			.nav {
 				margin: 0;
+				
+				&.navbar-right {
+					border-top: 1px solid; // For separating action buttons from collection links on responsive menu
+					padding-top: 9px; // Visual adaptation to the border-top
+				}
+				
 				.login {
 					padding-top: 4px;
 					padding-bottom: 4px;
@@ -40,6 +46,9 @@
 						margin-right: 15px;
 					}
 					&.navbar-right {
+						border-top: none; // We don't want to see this separation border on regular menu layout
+						padding: 0;					
+					
 						.login {
 							padding-top: 8px;
 							padding-bottom: 9px;
