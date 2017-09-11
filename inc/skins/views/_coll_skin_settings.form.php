@@ -70,8 +70,8 @@ $Form->begin_form( 'fform' );
 			$goto_link_url = $admin_url.'?ctrl=collections&amp;tab=site_skin'.( $skin_type == 'mobile' || $skin_type == 'tablet' ? '&amp;skin_type='.$skin_type : '' );
 			$goto_link_title = T_('Go to Site skin');
 		}
-		// Set manual/doc URL:
-		$fieldset_manual_url = 'blog-skin-settings';
+		// Append manual/doc link:
+		$fieldset_title .= get_manual_link( 'blog-skin-settings' );
 	}
 	else
 	{	// If site skin page is opened currently:
@@ -81,15 +81,13 @@ $Form->begin_form( 'fform' );
 			$goto_link_url = $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$working_coll_ID.( $skin_type == 'mobile' || $skin_type == 'tablet' ? '&amp;skin_type='.$skin_type : '' );
 			$goto_link_title = T_('Go to Collection skin');
 		}
-		// Set manual/doc URL:
-		$fieldset_manual_url = 'site-skin-settings';
+		// Append manual/doc link:
+		$fieldset_title .= get_manual_link( 'site-skin-settings' );
 	}
 	if( isset( $goto_link_url ) )
 	{
 		$fieldset_title .= ' <span class="panel_heading_action_icons"><a href="'.$goto_link_url.'" class="btn btn-sm btn-info">'.$goto_link_title.' &raquo;</a></span>';
 	}
-	// Append manual/doc link:
-	$fieldset_title .= get_manual_link( $fieldset_manual_url );
 
 	$fieldset_title_links = '<span class="floatright panel_heading_action_icons">&nbsp;'.action_icon( T_('Select another skin...'), 'choose', regenerate_url( 'action', 'skinpage=selection&amp;skin_type='.$skin_type ), ' '.T_('Choose a different skin').' &raquo;', 3, 4, array( 'class' => 'action_icon btn btn-info btn-sm' ) );
 	if( $skin_ID && $current_User->check_perm( 'options', 'view' ) )
