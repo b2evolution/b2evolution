@@ -62,11 +62,9 @@ $Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'co
 			'field_suffix' => '<button type="button" id="button_add_field" class="btn btn-default">'.T_('Add').'</button>'
 		) );
 	$Form->checkbox( 'msgform_contact_method', $edited_Blog->get_setting( 'msgform_contact_method' ), T_('Preferred contact method'), T_('Check to let user specify a preferred contact method.') );
-	$Form->begin_line( T_('Allow message field') );
-		$Form->checkbox( 'msgform_display_message', $edited_Blog->get_setting( 'msgform_display_message' ), '', T_('Check to display textarea.') );
-		$Form->checkbox( 'msgform_require_message', $edited_Blog->get_setting( 'msgform_require_message' ), T_('Required').':', T_('Check to require a custom message.') );
-		$Form->text_input( 'msgform_message_label', $edited_Blog->get_setting( 'msgform_message_label' ), 40, T_('Label').':', T_('Leave empty for default').': "'.T_('Message').'".' );
-	$Form->end_line();
+	$Form->checkbox( 'msgform_display_message', $edited_Blog->get_setting( 'msgform_display_message' ), T_('Allow message field'), T_('Check to display textarea.') );
+	$Form->checkbox( 'msgform_require_message', $edited_Blog->get_setting( 'msgform_require_message' ), T_('Require message field'), T_('Check to require a custom message.') );
+	$Form->text_input( 'msgform_message_label', $edited_Blog->get_setting( 'msgform_message_label' ), 40, T_('Label of message field'), T_('Leave empty for default').': "'.T_('Message').'".' );
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );

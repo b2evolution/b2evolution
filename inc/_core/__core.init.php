@@ -1525,6 +1525,9 @@ class _core_Module extends Module
 					case 'comments':
 						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$Blog->ID;
 						break;
+					case 'msgform':
+						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=contact&amp;blog='.$Blog->ID;
+						break;
 					case 'users':
 						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$Blog->ID;
 						break;
