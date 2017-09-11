@@ -39,7 +39,7 @@ $Form->begin_form( 'fform', sprintf( T_('Difference between revisions for: %s'),
 				$iver_editor_user_link = get_user_identity_link( NULL, $Revision_1->iver_edit_user_ID );
 				printf( T_('Revision #%s as of %s by %s'),
 					$Revision_1->iver_ID == 0 ? '(<b>'.T_('Current version').'</b>)' : $Revision_1->iver_ID,
-					mysql2localedatetime( $Revision_1->iver_edit_datetime, 'Y-m-d', 'H:i:s' ),
+					mysql2localedatetime( $Revision_1->iver_edit_last_touched_ts, 'Y-m-d', 'H:i:s' ),
 					( empty( $iver_editor_user_link ) ? T_( 'Deleted user' ) : $iver_editor_user_link ) );
 			?>
 			(<a href="<?php echo url_add_param( $admin_url, 'ctrl=items&amp;action=history_details&amp;p='.$edited_Item->ID.'&amp;r='.$Revision_1->iver_ID ) ?>" title="<?php echo T_('View this revision') ?>"><?php echo T_('View'); ?></a>)
@@ -51,7 +51,7 @@ $Form->begin_form( 'fform', sprintf( T_('Difference between revisions for: %s'),
 				$iver_editor_user_link = get_user_identity_link( NULL, $Revision_2->iver_edit_user_ID );
 				printf( T_('Revision #%s as of %s by %s'),
 					$Revision_2->iver_ID == 0 ? '(<b>'.T_('Current version').'</b>)' : $Revision_2->iver_ID,
-					mysql2localedatetime( $Revision_2->iver_edit_datetime, 'Y-m-d', 'H:i:s' ),
+					mysql2localedatetime( $Revision_2->iver_edit_last_touched_ts, 'Y-m-d', 'H:i:s' ),
 					( empty( $iver_editor_user_link ) ? T_('(deleted user)') : $iver_editor_user_link ) );
 			?>
 			(<a href="<?php echo url_add_param( $admin_url, 'ctrl=items&amp;action=history_details&amp;p='.$edited_Item->ID.'&amp;r='.$Revision_2->iver_ID ) ?>" title="<?php echo T_('View this revision') ?>"><?php echo T_('View'); ?></a>)

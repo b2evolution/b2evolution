@@ -36,6 +36,9 @@ class Link extends DataObject
 	 */
 	var $File;
 
+	var $previous_position;
+	var $previous_order;
+
 
 	/**
 	 * Constructor
@@ -95,6 +98,23 @@ class Link extends DataObject
 		{	// New object:
 
 		}
+	}
+
+
+	function set( $parname, $parvalue, $make_null = false )
+	{
+		switch( $parname )
+		{
+			case 'position':
+				$this->previous_position = $this->position;
+				break;
+
+			case 'order':
+				$this->previous_order = $this->order;
+				break;
+		}
+
+		return $this->set_param( $parname, 'string', $parvalue, $make_null );
 	}
 
 
@@ -468,6 +488,77 @@ class Link extends DataObject
 		{
 			$Plugins->trigger_event( 'AfterObjectInsert', $params = array( 'Object' => & $this, 'type' => get_class($this) ) );
 		}
+
+		return true;
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 */
+	function dbupdate()
+	{
+		global $DB, $Plugins, $localtimenow;
+		$position_updated = false;
+		$order_updated = false;
+
+		$DB->begin();
+
+		$LinkOwner = & $this->get_LinkOwner();
+
+		if( isset( $this->dbchanges['link_position'] ) || isset( $this->dbchanges['link_order'] ) )
+		{
+			if( $LinkOwner->type == 'item' )
+			{
+				if( ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) > 90 )
+				{ // Create a new revision...
+					$revision_ID = $LinkOwner->Item->create_revision();
+					$new_Revision = $LinkOwner->Item->get_revision( $revision_ID );
+
+					if( ! empty( $new_Revision ) )
+					{ // ...but newly created link history has current position and order values, restore it to previous values
+						$update_values = array();
+
+						if( isset( $this->dbchanges['link_position'] ) )
+						{
+							$position_updated = true;
+							$update_values[] = 'ivl_position = '.$DB->quote( $this->previous_position );
+							$this->previous_position = NULL;
+						}
+
+						if( isset( $this->dbchanges['link_order'] ) )
+						{
+							$order_updated = true;
+							$update_values[] = 'ivl_order = '.$this->previous_order;
+							$this->previous_order = NULL;
+						}
+
+						if( ! empty( $update_values ) )
+						{
+							$sql = 'UPDATE T_items__version_link SET '.implode( ',', $update_values )
+									.' WHERE ivl_iver_ID = '.$new_Revision->iver_ID
+									.' AND ivl_iver_itm_ID = '.$new_Revision->iver_itm_ID
+									.' AND ivl_link_ID = '.$this->ID;
+							$DB->query( $sql, 'Update revision link position' );
+						}
+					}
+				}
+			}
+		}
+
+		if( parent::dbupdate() )
+		{	// Update last touched date and content last updated date of the Item:
+			if( $position_updated || $order_updated )
+			{
+				$LinkOwner->update_last_touched_date();
+			}
+
+			if( $position_updated )
+			{
+				$LinkOwner->update_contents_last_updated_ts();
+			}
+		}
+		$DB->commit();
 
 		return true;
 	}

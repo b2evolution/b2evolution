@@ -23,7 +23,7 @@ $Form->global_icon( T_('Cancel viewing!'), 'close', regenerate_url( 'action', 'a
 
 $Form->begin_form( 'fform', sprintf( T_('Revision #%s for: %s'), $Revision->iver_ID == 0 ? '('.T_('Current version').')' : $Revision->iver_ID, $edited_Item->get_title() ) );
 
-$Form->info( T_('Date'), mysql2localedatetime( $Revision->iver_edit_datetime, 'Y-m-d', 'H:i:s' ) );
+$Form->info( T_('Date'), mysql2localedatetime( $Revision->iver_edit_last_touched_ts, 'Y-m-d', 'H:i:s' ) );
 
 $iver_editor_user_link = get_user_identity_link( NULL, $Revision->iver_edit_user_ID );
 $Form->info( T_('User'), ( empty( $iver_editor_user_link ) ? T_( '(deleted user)' ) : $iver_editor_user_link ) );

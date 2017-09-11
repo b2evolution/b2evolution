@@ -35,21 +35,21 @@ else
 }
 
 $sql_current_version = 'SELECT "'.T_('Current').'" AS iver_ID,
-		"'.$edited_Item->datemodified.'" AS iver_edit_datetime,
+		"'.$edited_Item->last_touched_ts.'" AS iver_edit_last_touched_ts,
 		"'.$edited_Item->lastedit_user_ID.'" AS iver_edit_user_ID,
 		"'.T_('Current version').'" AS action,
 		"'.$edited_Item->status.'" AS iver_status,
 		"'.$edited_Item->title.'" AS iver_title,
 		"'.str_replace( '"', '\"', $lastedit_user_login ).'" AS user_login';
 $SQL = new SQL();
-$SQL->SELECT( 'iver_ID, iver_edit_datetime, iver_edit_user_ID, "'.T_('Archived version').'" AS action, iver_status, iver_title, user_login' );
+$SQL->SELECT( 'iver_ID, iver_edit_last_touched_ts, iver_edit_user_ID, "'.T_('Archived version').'" AS action, iver_status, iver_title, user_login' );
 $SQL->FROM( 'T_items__version' );
 // LEFT JOIN users to display versions edited by already deleted users
 $SQL->FROM_add( 'LEFT JOIN T_users ON iver_edit_user_ID = user_ID' );
 $SQL->WHERE( 'iver_itm_ID = ' . $edited_Item->ID );
 // fp> not actually necessary:
 // UNION
-// SELECT "'.$edited_Item->datecreated.'" AS iver_edit_datetime, "'.$edited_Item->creator_user_ID.'" AS user_login, "First version" AS action';
+// SELECT "'.$edited_Item->datecreated.'" AS iver_edit_last_touched_ts, "'.$edited_Item->creator_user_ID.'" AS user_login, "First version" AS action';
 
 $count_SQL = new SQL();
 $count_SQL->SELECT( 'COUNT(*)+1' );
@@ -129,11 +129,11 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th' => T_('Date'),
-						'order' => 'iver_edit_datetime',
+						'order' => 'iver_edit_last_touched_ts',
 						'default_dir' => 'D',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
-						'td' => '%mysql2localedatetime_spans( #iver_edit_datetime# )%',
+						'td' => '%mysql2localedatetime_spans( #iver_edit_last_touched_ts# )%',
 					);
 
 /**

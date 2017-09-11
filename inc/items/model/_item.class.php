@@ -378,7 +378,6 @@ class Item extends ItemLight
 		{
 			$this->datecreated = $db_row->post_datecreated;           // When Item was created in the system
 
-
 			// post_last_touched_ts : When Item received last visible change (edit, comment, etc.)
 			// Used for:
 			//   - Sorting posts if configured this way in collection features.
@@ -399,7 +398,6 @@ class Item extends ItemLight
 			//   - a child COMMENT of the post that can be seen in the front-office is added or updated (only Content or Rating fields, or front-office visibility is changed from NOT front-office visibility) (but don't update on deleted comments or invisible comments -- When deleting a comment we actually recompute an OLDER timestamp based on last remaining comment, Also we recompute this when move a front-office visibility latest comment to other post OR when the latest comment becomes invisible for front-office)
 			//   - link, unlink an attachment, update an attached file on child comments that may be seen in front office (note: link order changes are not recorded because it doesn't affect whether users have seen latest content changes)
 			$this->contents_last_updated_ts = $db_row->post_contents_last_updated_ts;
-
 
 			$this->creator_user_ID = $db_row->post_creator_user_ID;   // Needed for history display
 			$this->lastedit_user_ID = $db_row->post_lastedit_user_ID; // Needed for history display
@@ -961,7 +959,9 @@ class Item extends ItemLight
 				}
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 				$this->dbchanges_custom_fields[$custom_field['ID']] = get_param( $param_name );
-				if( $this->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] ) != get_param( $param_name ) )
+				$custom_field_value = $this->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] );
+				$this->dbchanges_custom_fields[$custom_field['ID']] = $custom_field_value;
+				if( $custom_field_value != get_param( $param_name ) )
 				{
 					$this->dbchanges_flags['custom_fields'] = true;
 				}
@@ -8432,7 +8432,8 @@ class Item extends ItemLight
 		{	// Get current version
 			$Revision = (object) array(
 				'iver_ID'            => 0,
-				'iver_edit_datetime' => $this->datemodified,
+				'iver_itm_id'        => $this->ID,
+				'iver_edit_last_touched_ts' => $this->contents_last_updated_ts,
 				'iver_edit_user_ID'  => $this->lastedit_user_ID,
 				'iver_status'        => $this->status,
 				'iver_title'         => $this->title,
@@ -9900,28 +9901,6 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get the latest revision of the current Item
-	 *
-	 * @return object The latest revision if there's any
-	 */
-	function get_latest_revision()
-	{
-		global $DB;
-
-		$iver_SQL = new SQL();
-		$iver_SQL->SELECT( 'v1.*' );
-		$iver_SQL->FROM( 'T_items__version v1');
-		$iver_SQL->FROM_add( 'LEFT JOIN T_items__version v2 ON (v1.iver_itm_ID = v2.iver_itm_ID AND v1.iver_edit_datetime < v2.iver_edit_datetime )' );
-		$iver_SQL->WHERE( 'v1.iver_itm_ID = '.$this->ID );
-		$iver_SQL->WHERE_and( 'v2.iver_ID IS NULL' );
-
-		$result = $DB->get_row( $iver_SQL->get() );
-
-		return $result;
-	}
-
-
-	/**
 	 * Create a new item revision
 	 *
 	 * @return boolean True if creation of a revision was successful otherwise False
@@ -9937,8 +9916,8 @@ class Item extends ItemLight
 		$iver_SQL->WHERE( 'iver_itm_ID = '.$this->ID );
 		$iver_ID = ( int ) $DB->get_var( $iver_SQL->get() ) + 1;
 
-		$sql = 'INSERT INTO T_items__version( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_datetime, iver_status, iver_title, iver_content )
-			SELECT "'.$iver_ID.'" AS iver_ID, post_ID, post_lastedit_user_ID, post_datemodified, post_status, post_title, post_content
+		$sql = 'INSERT INTO T_items__version( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
+			SELECT "'.$iver_ID.'" AS iver_ID, post_ID, post_lastedit_user_ID, post_last_touched_ts, post_status, post_title, post_content
 				FROM T_items__item
 				WHERE post_ID = '.$this->ID;
 		$result = ( $DB->query( $sql, 'Save a version of the Item' ) !== false );
@@ -9949,7 +9928,7 @@ class Item extends ItemLight
 			$custom_field_values = array();
 			foreach( $this->dbchanges_custom_fields as $custom_field_ID => $value )
 			{
-				$custom_field_values[] = '('.$iver_ID.','.$custom_field_ID.','.$DB->quote( $value ).')';
+				$custom_field_values[] = '('.$iver_ID.','.$this->ID.','.$custom_field_ID.','.$DB->quote( $value ).')';
 			}
 		}
 		else
@@ -9988,8 +9967,14 @@ class Item extends ItemLight
 			$result = $DB->query( $sql, 'Save a version of attachments' ) !== false;
 		}
 
-
-		return $result;
+		if( $result )
+		{
+			return $iver_ID;
+		}
+		else
+		{
+			return FALSE;
+		}
 	}
 }
 ?>
