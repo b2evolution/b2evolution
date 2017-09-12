@@ -958,11 +958,11 @@ class Item extends ItemLight
 					param( $param_name, $param_type, NULL ); // get par value
 				}
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
-				$this->dbchanges_custom_fields[$custom_field['ID']] = get_param( $param_name );
+
 				$custom_field_value = $this->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] );
-				$this->dbchanges_custom_fields[$custom_field['ID']] = $custom_field_value;
 				if( $custom_field_value != get_param( $param_name ) )
 				{
+					$this->dbchanges_custom_fields[$custom_field['ID']] = $custom_field_value;
 					$this->dbchanges_flags['custom_fields'] = true;
 				}
 				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], get_param( $param_name ), $custom_field_make_null );
@@ -6379,24 +6379,63 @@ class Item extends ItemLight
 
 		$result = true;
 		// fp> note that dbchanges isn't actually 100% accurate. At this time it does include variables that actually haven't changed.
-		if( isset($this->dbchanges['post_status'])
-			|| isset($this->dbchanges['post_title'])
-			|| isset($this->dbchanges['post_content'])
-			|| isset($this->dbchanges_flags['custom_fields']) )
+		if( isset( $this->dbchanges['post_status'] )
+			|| isset( $this->dbchanges['post_title'] )
+			|| isset( $this->dbchanges['post_content'] )
+			|| isset( $this->dbchanges_flags['custom_fields'] ) )
 		{ // One of the fields we track in the revision history has changed:
 			// Save the "current" (soon to be "old") data as a version before overwriting it in parent::dbupdate:
 			// fp> TODO: actually, only the fields that have been changed should be copied to the version, the other should be left as NULL
 
-			$result = $this->create_revision();
+			global $localtimenow;
+			if( $localtimenow - strtotime( $this->last_touched_ts ) > 90 )
+			{ // Create new revision
+				$result = $this->create_revision();
+			}
+			else
+			{ // Update recent revision
+				$last_Revision = $this->get_revision( 'max' );
 
-			// Unset the following otherwise a new revision will be created if another dbupdate is called
-			$this->dbchanges_custom_fields = array();
-			unset( $this->dbchanges_flags['custom_fields'] );
+				if( $last_Revision )
+				{
+					if( isset( $this->dbchanges['post_status'] )
+						|| isset( $this->dbchanges['post_title'] )
+						|| isset( $this->dbchanges['post_content'] ) )
+					{
+						$DB->query( 'UPDATE T_items__version
+								LEFT JOIN T_items__item ON iver_itm_ID = post_ID
+								SET
+										iver_edit_user_ID = post_lastedit_user_ID,
+										iver_edit_last_touched_ts = post_last_touched_ts,
+										iver_status = post_status,
+										iver_title = post_title,
+										iver_content = post_content
+								WHERE iver_ID = '.$last_Revision->iver_ID.' AND iver_itm_ID = '.$this->ID );
+					}
+
+					if( isset( $this->dbchanges_flags['custom_fields'] ) )
+					{
+						$update_strings = '';
+						foreach( $this->dbchanges_custom_fields as $custom_field_ID => $value )
+						{
+							$update_strings .= ' WHEN ivcf_itcf_ID = '.$DB->quote( $custom_field_ID ).' THEN '.$DB->quote( $value );
+						}
+
+						if( ! empty( $update_strings ) )
+						{
+							$DB->query( 'UPDATE T_items__version_custom_field
+									SET ivcf_value = CASE '.$update_strings.' ELSE ivcf_value END
+								WHERE ivcf_iver_ID = '.$last_Revision->iver_ID.'
+								AND ivcf_iver_itm_ID = '.$this->ID );
+						}
+					}
+				}
+			}
 
 			$db_changed = true;
 		}
 
-		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) )
+		if( $auto_track_modification && ( count( $dbchanges ) > 0 || ! empty( $this->dbchanges_custom_fields ) ) )
 		{
 			if( ! isset( $dbchanges['last_touched_ts'] ) )
 			{	// Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure:
@@ -6410,6 +6449,10 @@ class Item extends ItemLight
 				$this->set_contents_last_updated_ts();
 			}
 		}
+
+		// Unset the following otherwise a new revision will be created if another dbupdate is called
+		$this->dbchanges_custom_fields = array();
+		unset( $this->dbchanges_flags['custom_fields'] );
 
 		$parent_update = $this->dbupdate_worker( $auto_track_modification );
 		if( $result && ( $parent_update !== false ) )
@@ -9903,7 +9946,7 @@ class Item extends ItemLight
 	/**
 	 * Create a new item revision
 	 *
-	 * @return boolean True if creation of a revision was successful otherwise False
+	 * @return integer/boolean ID of created item revision if successful, otherwise False
 	 */
 	function create_revision()
 	{
@@ -9922,59 +9965,56 @@ class Item extends ItemLight
 				WHERE post_ID = '.$this->ID;
 		$result = ( $DB->query( $sql, 'Save a version of the Item' ) !== false );
 
-		if( ! empty( $this->dbchanges_custom_fields ) )
+		if( $result )
 		{
-			// Save version of custom fields
 			$custom_field_values = array();
-			foreach( $this->dbchanges_custom_fields as $custom_field_ID => $value )
-			{
-				$custom_field_values[] = '('.$iver_ID.','.$this->ID.','.$custom_field_ID.','.$DB->quote( $value ).')';
-			}
-		}
-		else
-		{
 			$custom_fields = $this->get_type_custom_fields();
 			if( count( $custom_fields ) )
 			{
 				// Save version of custom fields
-				$custom_field_values = array();
 				foreach( $custom_fields as $custom_field )
 				{
 					$value = $this->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] );
-					$custom_field_values[] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$custom_field['ID'].','.$DB->quote( $value ).')';
+					$custom_field_values[$custom_field['ID']] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$custom_field['ID'].','.$DB->quote( $value ).')';
 				}
 			}
-		}
 
-		if( ! empty( $custom_field_values ) )
-		{
-			$sql = 'INSERT INTO T_items__version_custom_field( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_value ) VALUES '.implode( ',', $custom_field_values );
-			$result = ( $DB->query( $sql, 'Save a version of the custom fields' ) !== false );
-		}
-
-		$LinkOwner = new LinkItem( $this );
-		$existing_Links = & $LinkOwner->get_Links();
-
-		if( ! empty( $existing_Links ) )
-		{
-			$link_values = array();
-			foreach( $existing_Links as $loop_Link )
+			if( ! empty( $this->dbchanges_custom_fields ) )
 			{
-				$link_values[] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$loop_Link->ID.','.$loop_Link->file_ID.','
-						.$DB->quote( $loop_Link->position ).','.$loop_Link->order.')';
+				foreach( $this->dbchanges_custom_fields as $custom_field_ID => $value )
+				{
+					$custom_field_values[$custom_field_ID] = '('.$iver_ID.','.$this->ID.','.$custom_field_ID.','.$DB->quote( $value ).')';
+				}
 			}
-			$sql = 'INSERT INTO T_items__version_link( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order ) VALUES '.implode( ',', $link_values );
-			$result = $DB->query( $sql, 'Save a version of attachments' ) !== false;
+
+			if( ! empty( $custom_field_values ) )
+			{
+				$sql = 'INSERT INTO T_items__version_custom_field( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_value ) VALUES '.implode( ',', array_values( $custom_field_values ) );
+				$result = $DB->query( $sql, 'Save a version of the custom fields' ) !== false;
+			}
+
+			if( $result )
+			{
+				$LinkOwner = new LinkItem( $this );
+				$existing_Links = & $LinkOwner->get_Links();
+
+				if( ! empty( $existing_Links ) )
+				{
+					$link_values = array();
+					foreach( $existing_Links as $loop_Link )
+					{
+						$link_values[] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$loop_Link->ID.','.$loop_Link->file_ID.','
+								.$DB->quote( $loop_Link->position ).','.$loop_Link->order.')';
+					}
+					$sql = 'INSERT INTO T_items__version_link( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order ) VALUES '.implode( ',', $link_values );
+					$result = $DB->query( $sql, 'Save a version of attachments' ) !== false;
+				}
+
+				return $iver_ID;
+			}
 		}
 
-		if( $result )
-		{
-			return $iver_ID;
-		}
-		else
-		{
-			return FALSE;
-		}
+		return false;
 	}
 }
 ?>

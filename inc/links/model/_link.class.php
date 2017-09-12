@@ -506,41 +506,51 @@ class Link extends DataObject
 
 		$LinkOwner = & $this->get_LinkOwner();
 
-		if( isset( $this->dbchanges['link_position'] ) || isset( $this->dbchanges['link_order'] ) )
+
+		if( $LinkOwner && $LinkOwner->type == 'item' && isset( $this->dbchanges['link_position'] ) || isset( $this->dbchanges['link_order'] ) )
 		{
-			if( $LinkOwner->type == 'item' )
+			$update_values = array();
+
+			if( isset( $this->dbchanges['link_position'] ) )
 			{
-				if( ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) > 90 )
+				$position_updated = true;
+				$update_values[] = 'ivl_position = '.$DB->quote( $this->previous_position );
+				$this->previous_position = NULL;
+			}
+
+			if( isset( $this->dbchanges['link_order'] ) )
+			{
+				$order_updated = true;
+				$update_values[] = 'ivl_order = '.$this->previous_order;
+				$this->previous_order = NULL;
+			}
+
+			if( ! empty( $update_values ) )
+			{
+				$last_Revision = $LinkOwner->Item->get_revision( 'max' );
+				if( ! empty( $last_Revision ) && ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) < 90 )
+				{ // Update recent revision
+					$sql = 'UPDATE T_items__version_link SET '.implode( ',', $update_values )
+							.' WHERE ivl_iver_ID = '.$last_Revision->iver_ID
+							.' AND ivl_iver_itm_ID = '.$last_Revision->iver_itm_ID
+							.' AND ivl_link_ID = '.$this->ID;
+					$DB->query( $sql, 'Update revision link position/order' );
+				}
+				else
 				{ // Create a new revision...
 					$revision_ID = $LinkOwner->Item->create_revision();
-					$new_Revision = $LinkOwner->Item->get_revision( $revision_ID );
+					if( is_int( $revision_ID ) )
+					{
+						$new_Revision = $LinkOwner->Item->get_revision( $revision_ID );
+					}
 
 					if( ! empty( $new_Revision ) )
 					{ // ...but newly created link history has current position and order values, restore it to previous values
-						$update_values = array();
-
-						if( isset( $this->dbchanges['link_position'] ) )
-						{
-							$position_updated = true;
-							$update_values[] = 'ivl_position = '.$DB->quote( $this->previous_position );
-							$this->previous_position = NULL;
-						}
-
-						if( isset( $this->dbchanges['link_order'] ) )
-						{
-							$order_updated = true;
-							$update_values[] = 'ivl_order = '.$this->previous_order;
-							$this->previous_order = NULL;
-						}
-
-						if( ! empty( $update_values ) )
-						{
-							$sql = 'UPDATE T_items__version_link SET '.implode( ',', $update_values )
-									.' WHERE ivl_iver_ID = '.$new_Revision->iver_ID
-									.' AND ivl_iver_itm_ID = '.$new_Revision->iver_itm_ID
-									.' AND ivl_link_ID = '.$this->ID;
-							$DB->query( $sql, 'Update revision link position' );
-						}
+						$sql = 'UPDATE T_items__version_link SET '.implode( ',', $update_values )
+								.' WHERE ivl_iver_ID = '.$new_Revision->iver_ID
+								.' AND ivl_iver_itm_ID = '.$new_Revision->iver_itm_ID
+								.' AND ivl_link_ID = '.$this->ID;
+						$DB->query( $sql, 'Restore revision link position/order' );
 					}
 				}
 			}
