@@ -132,7 +132,7 @@ class basic_antispam_plugin extends Plugin
 	{
 		return array(
 				'comment_throttling' => array(
-					'label'        => T_('Comment throttling'),
+					'label'        => T_('Minimum comment interval'),
 					'note'         => T_('Users from this group will only be able to post a comment every x seconds.').' '.T_('0 to disable it.'),
 					'type'         => 'integer',
 					'defaultvalue' => 2,
