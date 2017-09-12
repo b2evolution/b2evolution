@@ -611,38 +611,6 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 .nav.nav-tabs {
   margin-top: 0;
 }
-.nav.nav-tabs ul {
-  margin: 0;
-}
-.nav.nav-tabs ul li {
-  float: left;
-  list-style: none;
-  margin-bottom: -1px;
-}
-.nav.nav-tabs ul li a {
-  border: 1px solid transparent;
-  border-radius: 4px 4px 0 0;
-  display: block;
-  line-height: 1.42857143;
-  margin-right: 2px;
-  padding: 10px 15px;
-  position: relative;
-}
-.nav.nav-tabs ul li a:hover {
-  border-bottom: 1px solid #ddd;
-  border-color: #eee #eee #ddd;
-}
-.nav.nav-tabs ul li a:focus,
-.nav.nav-tabs ul li a:hover {
-  text-decoration: none;
-  background-color: #eee;
-}
-.nav.nav-tabs ul li a.default:hover {
-  background-color: #eee;
-  border-top-color: #eee;
-  border-left-color: #eee;
-  border-right-color: #eee;
-}
 .widget_core_user_login #login_form .form-group {
   margin: 0;
 }
