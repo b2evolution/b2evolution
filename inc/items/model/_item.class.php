@@ -9963,7 +9963,7 @@ class Item extends ItemLight
 			SELECT "'.$iver_ID.'" AS iver_ID, post_ID, post_lastedit_user_ID, post_last_touched_ts, post_status, post_title, post_content
 				FROM T_items__item
 				WHERE post_ID = '.$this->ID;
-		$result = ( $DB->query( $sql, 'Save a version of the Item' ) !== false );
+		$result = $DB->query( $sql, 'Save a version of the Item' ) !== false;
 
 		if( $result )
 		{

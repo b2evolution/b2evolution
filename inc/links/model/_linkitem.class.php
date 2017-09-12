@@ -193,13 +193,7 @@ class LinkItem extends LinkOwner
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
 
-		$previous_Revision = $this->Item->get_revision( 'max' );
-
-		if( $previous_Revision && ( $localtimenow - strtotime( $this->Item->last_touched_ts ) ) < 90 )
-		{ // add to previous revision
-			$add_to_previous_revision = true;
-		}
-		else
+		if( ( $localtimenow - strtotime( $this->Item->last_touched_ts ) ) > 90 )
 		{
 			$this->Item->create_revision();
 		}
@@ -209,15 +203,6 @@ class LinkItem extends LinkOwner
 			if( ! $this->is_temp() )
 			{	// New link was added to the item, invalidate blog's media BlockCache:
 				BlockCache::invalidate_key( 'media_coll_ID', $this->Item->get_blog_ID() );
-			}
-
-			if( isset( $add_to_previous_revision ) && $add_to_previous_revision )
-			{
-				$sql = 'INSERT INTO T_items__version_link( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order ) VALUES '
-					.'('.$previous_Revision->iver_ID.','.$previous_Revision->iver_itm_ID.','
-					.$edited_Link->ID.','.$edited_Link->file_ID.','.$DB->quote( $edited_Link->position ).','.$edited_Link->order.')';
-
-				$DB->query( $sql, 'Attach link to revision #'.$previous_Revision->iver_ID ) !== false;
 			}
 
 			$FileCache = & get_FileCache();
@@ -260,30 +245,23 @@ class LinkItem extends LinkOwner
 		if( ! empty( $previous_Revision ) &&  ( $localtimenow - strtotime( $this->Item->last_touched_ts ) ) < 90 )
 		{ // Check if we can remove the link from the previous revision
 			$last_revision_ID = ( int ) $previous_Revision->iver_ID;
-			$revision_IDs = array( $last_revision_ID );
 			if( $last_revision_ID > 1 )
-			{ // Check if the file attachment was recorded prior to last revision
-				$prior_revision_ID = $last_revision_ID - 1;
-
+			{ // Check if the file attachment exists in the previous revision
 				$sql = new SQL();
 				$sql->SELECT( '*' );
 				$sql->FROM( 'T_items__version_link' );
-				$sql->WHERE( 'ivl_iver_ID = '.$prior_revision_ID );
+				$sql->WHERE( 'ivl_iver_ID = '.$previous_Revision->iver_ID );
 				$sql->WHERE_and( 'ivl_iver_itm_ID = '.$previous_Revision->iver_itm_ID );
 				$sql->WHERE_and( 'ivl_link_ID = '.$Link->ID );
 				$revision_links = $DB->get_results( $sql->get() );
 
-				if( ! empty( $revision_links ) )
-				{ // We can remove this link from the previous revision
-					$sql = 'DELETE FROM T_items__version_link WHERE ivl_iver_ID = '.$last_revision_ID
-							.' AND ivl_iver_itm_ID = '.$previous_Revision->iver_itm_ID
-							.' AND ivl_link_ID = '.$Link->ID;
-
-					$DB->query( $sql, 'Remove link from revision #'.$previous_Revision->iver_ID );
+				if( empty( $revision_links ) )
+				{ // Link is not in previous history, we need to create a new revision
+					$this->Item->create_revision();
 				}
 			}
 			else
-			{ // Only 1 revision and it has the initial attachment history, we cannot remove it from the previous revision so we'll have to create a new one
+			{ // Link has no attachment history so we'll have to create a new one
 				$this->Item->create_revision();
 			}
 		}
