@@ -2141,9 +2141,6 @@ class Item extends ItemLight
 		// Render all inline tags to HTML code:
 		$output = $this->render_inline_tags( $output, $params );
 
-		// Render Content block tags like [include:123], [include:item-slug] into item/post content:
-		$output = $this->render_content_blocks( $output, $params );
-
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
 				'Item' => $this,
@@ -2267,9 +2264,6 @@ class Item extends ItemLight
 
 		// Render all inline tags to HTML code:
 		$output = $this->render_inline_tags( $output, $params );
-
-		// Render Content block tags like [include:123], [include:item-slug] into item/post content:
-		$output = $this->render_content_blocks( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2506,12 +2500,13 @@ class Item extends ItemLight
 	function render_inline_tags( $content, $params = array() )
 	{
 		$params = array_merge( array(
-				'check_code_block'     => true, // TRUE to find inline tags only outside of codeblocks
-				'render_inline_files'  => true,
-				'render_links'         => true,
-				'render_custom_fields' => true,
-				'render_parent'        => true,
-				'render_collection'    => true,
+				'check_code_block'      => true, // TRUE to find inline tags only outside of codeblocks
+				'render_inline_files'   => true,
+				'render_links'          => true,
+				'render_custom_fields'  => true,
+				'render_parent'         => true,
+				'render_collection'     => true,
+				'render_content_blocks' => true,
 			), $params );
 
 		if( $params['render_inline_files'] )
@@ -2537,6 +2532,11 @@ class Item extends ItemLight
 		if( $params['render_collection'] )
 		{	// Render Collection Data [coll:name], [coll:shortname]:
 			$content = $this->render_collection_data( $content, $params );
+		}
+
+		if( $params['render_content_blocks'] )
+		{	// Render Content block tags like [include:123], [include:item-slug]:
+			$content = $this->render_content_blocks( $content, $params );
 		}
 
 		return $content;
