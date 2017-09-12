@@ -4,6 +4,13 @@
 .bootstrap_site_navbar_header .navbar {
   margin-bottom: 0;
 }
+.bootstrap_site_navbar_header .navbar .navbar-header.navbar-header-with-logo .navbar-brand {
+  padding: 0;
+}
+.bootstrap_site_navbar_header .navbar .navbar-header.navbar-header-with-logo .navbar-brand img {
+  max-height: 100%;
+  max-width: 270px;
+}
 .bootstrap_site_navbar_header .navbar .navbar-collapse {
   padding: 0;
 }

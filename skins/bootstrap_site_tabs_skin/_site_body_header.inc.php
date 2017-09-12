@@ -117,7 +117,7 @@ else
 
 				<ul class="nav nav-tabs pull-left">
 <?php
-				if( $site_has_logo_file )
+				if( ! $site_has_logo_file )
 				{	// Display site name:
 ?>
 					<li class="swhead_sitename no_logo<?php echo $site_title_class; ?>">

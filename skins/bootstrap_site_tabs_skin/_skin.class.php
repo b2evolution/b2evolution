@@ -127,6 +127,13 @@ class bootstrap_site_tabs_Skin extends Skin
 							'defaultvalue' => '#ddd',
 							'type' => 'color',
 						),
+						'menu_bar_logo_padding' => array(
+							'label' => T_('Menu bar logo padding'),
+							'note' => 'px. ' . T_('Set the padding around the logo.'),
+							'defaultvalue' => '2',
+							'type' => 'integer',
+							'size' => 1,
+						),
 						'tab_bg_color' => array(
 							'label' => T_('Tab background color'),
 							'note' => T_('E-g: #00ff00 for green'),
@@ -308,6 +315,7 @@ class bootstrap_site_tabs_Skin extends Skin
 		// Add custom styles:
 		// Top menu:
 		$menu_bar_bg_color = $this->get_setting( 'menu_bar_bg_color' );
+		$menu_bar_logo_padding = $this->get_setting( 'menu_bar_logo_padding' );
 		$tab_bg_color = $this->get_setting( 'tab_bg_color' );
 		$tab_border_color = $this->get_setting( 'tab_border_color' );
 		$tab_text_color = $this->get_setting( 'tab_text_color' );
@@ -334,6 +342,9 @@ class bootstrap_site_tabs_Skin extends Skin
 .swhead_wrapper .swhead_menus div.level1 {
 	background-color: '.$menu_bar_bg_color.';
 	border-color: '.$tab_border_color.';
+}
+.swhead_wrapper .swhead_sitename.swhead_logo img {
+	padding: '.$menu_bar_logo_padding.'px;
 }
 .swhead_wrapper .swhead_menus div.level1 nav .pull-left li:not(.active):not(.swhead_sitename) a,
 .swhead_wrapper .swhead_menus div.level1 nav div.pull-right a.btn {
