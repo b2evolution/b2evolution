@@ -63,8 +63,13 @@ $Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'co
 		) );
 	$Form->checkbox( 'msgform_contact_method', $edited_Blog->get_setting( 'msgform_contact_method' ), T_('Preferred contact method'), T_('Check to let user specify a preferred contact method.') );
 	$Form->checkbox( 'msgform_display_message', $edited_Blog->get_setting( 'msgform_display_message' ), T_('Allow message field'), T_('Check to display textarea.') );
-	$Form->checkbox( 'msgform_require_message', $edited_Blog->get_setting( 'msgform_require_message' ), T_('Require message field'), T_('Check to require a custom message.') );
-	$Form->text_input( 'msgform_message_label', $edited_Blog->get_setting( 'msgform_message_label' ), 40, T_('Label of message field'), T_('Leave empty for default').': "'.T_('Message').'".' );
+	$Form->checkbox( 'msgform_require_message', $edited_Blog->get_setting( 'msgform_require_message' ), T_('Require message field'), T_('Check to require a custom message.'), '', 1, ! $edited_Blog->get_setting( 'msgform_display_message' ) );
+	$msgform_message_label_params = array();
+	if( ! $edited_Blog->get_setting( 'msgform_display_message' ) )
+	{	// Disable field "Label of message field" if message is not allowed:
+		$msgform_message_label_params['disabled'] = 'disabled';
+	}
+	$Form->text_input( 'msgform_message_label', $edited_Blog->get_setting( 'msgform_message_label' ), 40, T_('Label of message field'), T_('Leave empty for default').': "'.T_('Message').'".', $msgform_message_label_params );
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
@@ -105,5 +110,11 @@ jQuery( '#button_add_field' ).click( function ()
 jQuery( document ).on( 'click', '.remove_user_field', function ()
 {	// Action for the icon to remove a field from the additional fields:
 	jQuery( this ).parent().parent().remove();
+} );
+
+// Disable/Enable settings of message field depending on setting "Allow message field":
+jQuery( '#msgform_display_message' ).click( function()
+{
+	jQuery( '#msgform_require_message, #msgform_message_label' ).prop( 'disabled', ( ! jQuery( this ).is( ':checked' ) ) );
 } );
 </script>

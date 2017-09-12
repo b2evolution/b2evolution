@@ -1913,7 +1913,7 @@ function get_msgform_contact_methods()
 		$SQL->FROM( 'T_users__fielddefs' );
 		$SQL->FROM_add( 'INNER JOIN T_users__fields ON uf_ufdf_ID = ufdf_id' );
 		$SQL->FROM_add( 'LEFT JOIN T_users__fieldgroups ON ufgp_ID = ufdf_ufgp_ID' );
-		$SQL->WHERE( 'ufdf_type IN ( "phone", "email" ) OR ufgp_name = "Instant Messaging"' );
+		$SQL->WHERE( 'ufdf_type IN ( "phone", "email" )' );
 		$SQL->WHERE_and( 'uf_user_ID = '.$current_User->ID );
 		$SQL->ORDER_BY( 'ufdf_name' );
 		$user_fields = $DB->get_assoc( $SQL->get(), $SQL->title );

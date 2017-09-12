@@ -936,8 +936,11 @@ class Blog extends DataObject
 			$this->set_setting( 'msgform_additional_fields', implode( ',', $msgform_additional_fields ) );
 			$this->set_setting( 'msgform_contact_method', param( 'msgform_contact_method', 'integer', 0 ) );
 			$this->set_setting( 'msgform_display_message', param( 'msgform_display_message', 'integer', 0 ) );
-			$this->set_setting( 'msgform_require_message', param( 'msgform_require_message', 'integer', 0 ) );
-			$this->set_setting( 'msgform_message_label', param( 'msgform_message_label', 'string' ) );
+			if( get_param( 'msgform_display_message' ) )
+			{	// Update these two fields only if message is allowed:
+				$this->set_setting( 'msgform_require_message', param( 'msgform_require_message', 'integer', 0 ) );
+				$this->set_setting( 'msgform_message_label', param( 'msgform_message_label', 'string' ) );
+			}
 		}
 
 		if( in_array( 'userdir', $groups ) )
