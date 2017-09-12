@@ -150,8 +150,8 @@ class ItemListLight extends DataObjectList2
 				'types' => NULL, // Filter by item type IDs (separated by comma)
 				'itemtype_usage' => 'post', // Filter by item type usage (separated by comma): post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
 				'visibility_array' => get_inskin_statuses( is_null( $this->Blog ) ? NULL : $this->Blog->ID, 'post' ),
-				'orderby' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderby') : 'datestart',
-				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderdir') : 'DESC',
+				'orderby' => get_blog_order( $this->Blog, 'field' ),
+				'order' => get_blog_order( $this->Blog, 'dir' ),
 				'unit' => !is_null( $this->Blog ) ? $this->Blog->get_setting('what_to_show'): 'posts',
 				'posts' => $this->limit,
 				'page' => 1,
@@ -526,7 +526,7 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * Ordering:
 		 */
-		$this->filters['order'] = param( $this->param_prefix.'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], true );		// ASC or DESC
+		$this->filters['order'] = param( $this->param_prefix.'order', '/^(asc|desc)([ ,](asc|desc))*$/i', $this->default_filters['order'], true );		// ASC or DESC
 		// This order style is OK, because sometimes the commentList is not displayed on a table so we cannot say we want to order by a specific column. It's not a crap.
 		$this->filters['orderby'] = param( $this->param_prefix.'orderby', '/^([A-Za-z0-9_]+([ ,][A-Za-z0-9_]+)*)?$/', $this->default_filters['orderby'], true );   // list of fields to order by (TODO: change that crap)
 
@@ -644,23 +644,13 @@ class ItemListLight extends DataObjectList2
 
 		if( isset( $this->filters['orderby'] ) && $this->filters['orderby'] == 'numviews' )
 		{ // Order by number of views
-			$this->ItemQuery->FROM_add( 'LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
-					ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID' );
+			//$this->ItemQuery->FROM_add( 'LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+			//		ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID' );
 		}
 
 		if( empty($order_by) )
 		{
-			$available_fields = array_keys( get_available_sort_options() );
-			// Extend general list to allow order posts by these fields as well for some special cases
-			$available_fields[] = 'creator_user_ID';
-			$available_fields[] = 'assigned_user_ID';
-			$available_fields[] = 'pst_ID';
-			$available_fields[] = 'datedeadline';
-			$available_fields[] = 'ityp_ID';
-			$available_fields[] = 'status';
-			$available_fields[] = 'T_categories.cat_name';
-			$available_fields[] = 'T_categories.cat_order';
-			$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname, $available_fields );
+			$order_by = $this->ItemQuery->gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname );
 		}
 
 		$this->ItemQuery->order_by( $order_by );

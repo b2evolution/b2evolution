@@ -199,6 +199,7 @@ class ItemList2 extends ItemListLight
 			return;
 		}
 
+		// asimo> This must be removed if the option to 'always move the null values in the end of the result' will be implemented
 		$select_temp_order = '';
 		if( !empty( $this->ItemQuery->order_by ) && strpos( $this->ItemQuery->order_by, 'post_order' ) !== false )
 		{	// Move the items with NULL order to the end of the list
@@ -223,6 +224,7 @@ class ItemList2 extends ItemListLight
 		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname // .', '.implode( ', ', $order_cols_to_select )
 									.$select_temp_order
 									.$this->ItemQuery->get_from()
+									.$this->ItemQuery->get_orderby_from( ' ' )
 									.$this->ItemQuery->get_where()
 									.$this->ItemQuery->get_group_by()
 									.$this->ItemQuery->get_order_by()
@@ -235,12 +237,12 @@ class ItemList2 extends ItemListLight
 
 		// *** STEP 2 ***
 		$this->sql = 'SELECT *'.$select_temp_order.'
-			              FROM '.$this->Cache->dbtablename;
+			              FROM '.$this->Cache->dbtablename.$this->ItemQuery->get_orderby_from( ' ' );
 
 		if( isset( $this->filters['orderby'] ) && $this->filters['orderby'] == 'numviews' )
 		{ // special case for order by number of views
-			$this->sql .= ' LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
-					ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID';
+			//$this->sql .= ' LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+			//		ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID';
 		}
 
 		if( !empty($ID_list) )
@@ -640,40 +642,20 @@ class ItemList2 extends ItemListLight
 		/*
 		 * ORDER BY stuff:
 		 */
-		if( ($direction == 'next' && $this->filters['order'] == 'DESC')
-			|| ($direction == 'prev' && $this->filters['order'] == 'ASC') )
-		{
-			$order = 'DESC';
-			$operator = ' < ';
+		$orderdir = str_replace( ' ', ',',  $this->filters['order'] );
+		$orderdir = explode( ',', $orderdir );
+		foreach( $orderdir as $index => $order )
+		{ // Set the corresponding order by direction depending the original value and the next/prev request
+			$orderdir[$index] = ( ( $direction == 'next' && $orderdir[$index] == 'DESC' )
+				|| ( $direction == 'prev' && $orderdir[$index] == 'ASC' ) ) ? 'DESC' : 'ASC';
 		}
-		else
-		{
-			$order = 'ASC';
-			$operator = ' > ';
-		}
+		$orderdir = implode( ',', $orderdir );
 
-		$orderby = str_replace( ' ', ',', $this->filters['orderby'] );
-		$orderby_array = explode( ',', $orderby );
-
-		// Format each order param with default column names:
-		$orderbyorder_array = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 '.$order, $orderby_array );
-
-		// Add an ID parameter to make sure there is no ambiguity in ordering on similar items:
-		$orderbyorder_array[] = $this->Cache->dbIDname.' '.$order;
-
-		$order_by = implode( ', ', $orderbyorder_array );
-
-		// Special case for RAND:
-		$order_by = str_replace( $this->Cache->dbprefix.'RAND ', 'RAND() ', $order_by );
-
-		$next_Query->order_by( $order_by );
-
-		// Special case for numviews
-		if( $orderby_array[0] == 'numviews' )
-		{
-			$next_Query->FROM_add( 'LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
-				ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID' );
-		}
+		// Init and set the order by condition and the addition required tables ( in case of custom fields )
+		$order_clause = $next_Query->gen_order_clause( $this->filters['orderby'], $orderdir, $this->Cache->dbprefix, $this->Cache->dbIDname );
+		$next_Query->order_by( $order_clause );
+		// Add additionally required tables because of the ordering ( ordering by cutsom fields )
+		$next_Query->FROM_add( $next_Query->get_orderby_from() );
 
 		// LIMIT to 1 single result
 		$next_Query->LIMIT( '1' );
@@ -687,115 +669,164 @@ class ItemList2 extends ItemListLight
 		 * If there are several items on the same issuedatetime for example, we'll then differentiate on post ID
 		 * WARNING: you cannot combine criterias with AND here; you need stuf like a>a0 OR (a=a0 AND b>b0)
 		 */
-		switch( $orderby_array[0] )
+
+		$orderby_fields = explode( ',', $order_clause );
+		$where_condition = '';
+		$condition_separator = '';
+		$equal_condition = '';
+		// Loop through each order by field and set a where condition corresponding to the next/prev and order directions
+		foreach( $orderby_fields as $orderby )
 		{
-			case 'datestart':
-				// special var name:
-				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
-																.$operator
-																.$DB->quote($current_Item->issue_date)
-																.' OR ( '
-                                  .$this->Cache->dbprefix.$orderby_array[0]
-																	.' = '
-																	.$DB->quote($current_Item->issue_date)
-																	.' AND '
-																	.$this->Cache->dbIDname
-																	.$operator
-																	.$current_Item->ID
-																.')'
-														 );
-				break;
+			if( strpos( $orderby, 'CASE WHEN' ) !== false )
+			{ // This handles those cases when the order fields may be null values and we want all null values at the end of the list
+				continue;
+			}
+			if( strpos( $orderby, 'DESC' ) )
+			{ // Descending order
+				$operator = ' < ';
+				// It is the field name in a format how it must be compared in the query
+				$compare_field = substr( $orderby, 0, -5 );
+			}
+			else
+			{ // Ascending order
+				$operator = ' > ';
+				// It is the field name in a format how it must be compared in the query
+				$compare_field = substr( $orderby, 0, -4 );
+			}
+			$compare_field = trim( $compare_field );
+			if( ( $table_separator = strpos( $compare_field, '.' ) ) )
+			{ // This is a custom field from the item settings table
+				// The field name must be get from a string like 'custom_[varchar | double]_fieldname_table.iset_value'
+				$field_name_position = $table_separator - 6 /* the length of '_table' */ - strlen( $compare_field );
+				$compare_field_name = substr( $compare_field, 0, $field_name_position );
+				$compare_field_name = substr( $compare_field_name, strrpos( $compare_field_name, '_' ) + 1 );
+				$post_field_name = 'custom_'.$compare_field_name;
+			}
+			elseif( $compare_field == 'RAND()' )
+			{ // Random order
+				$post_field_name = 'RAND';
+			}
+			else
+			{ // Normal post field ( not custom and not special field RAND )
+				// It is the field name in a format how should be requestd from the item
+				$post_field_name = substr( $compare_field, strlen( $this->Cache->dbprefix ) );
+			}
 
-			case 'numviews':
-				// we need to get the number of members who has viewed the post
-				$numviews = get_item_numviews( $current_Item );
-				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
-																.$operator
-																.$DB->quote($numviews)
-																.' OR ( '
-                                  .$this->Cache->dbprefix.$orderby_array[0]
-																	.' = '
+			if( $condition_separator !== '' )
+			{ // Concatenate the conditions
+				$equal_condition .= ' AND ';
+				$where_condition .= $condition_separator.'( '.$equal_condition;
+			}
+
+			// Set condition corresponding to the order by field name
+			switch( $post_field_name )
+			{
+				case 'numviews':
+					// we need to get the number of members who has viewed the post
+					$numviews = get_item_numviews( $current_Item );
+					$where_condition .= $this->Cache->dbprefix.$post_field_name
+																	.$operator
 																	.$DB->quote($numviews)
-																	.' AND '
-																	.$this->Cache->dbIDname
-																	.$operator
-																	.$current_Item->ID
-																.')'
-															);
-				break;
+																	.' OR ( '
+																		.$this->Cache->dbprefix.$post_field_name
+																		.' = '
+																		.$DB->quote($numviews)
+																		.' AND '
+																		.$this->Cache->dbIDname
+																		.$operator
+																		.$current_Item->ID
+																	.')';
+					break;
 
-			case 'title':
-			case 'ityp_ID':
-			case 'datecreated':
-			case 'datemodified':
-			case 'last_touched_ts':
-			case 'contents_last_updated_ts':
-			case 'urltitle':
-			case 'priority':
-				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
-																.$operator
-																.$DB->quote($current_Item->{$orderby_array[0]})
-																.' OR ( '
-                                  .$this->Cache->dbprefix.$orderby_array[0]
-																	.' = '
-																	.$DB->quote($current_Item->{$orderby_array[0]})
-																	.' AND '
-																	.$this->Cache->dbIDname
-																	.$operator
-																	.$current_Item->ID
-																.')'
-															);
-				break;
+				case 'datestart':
+					// special var name:
+					$post_field_name = 'issue_date';
+				case 'ID':
+				case 'title':
+				case 'ityp_ID':
+				case 'datecreated':
+				case 'datemodified':
+				case 'last_touched_ts':
+				case 'urltitle':
+				case 'priority':
+					$where_condition .= $compare_field.$operator.$DB->quote( $current_Item->{$post_field_name} );
+					$equal_condition .= $compare_field.' = '.$DB->quote( $current_Item->{$post_field_name} );
+					break;
 
-			case 'order':
-				// We have to integrate a rounding error margin
-				$comp_order_value = $current_Item->order;
-				$and_clause = '';
+				case 'order':
+					// We have to integrate a rounding error margin
+					$order_field_value = $current_Item->order;
 
-				if( is_null($comp_order_value) )
-				{	// current Item has NULL order
-					if( $operator == ' < ' )
-					{	// This is needed when browsing through a descending ordered list and we reach the limit where orders are not set/NULL (ex: b2evo screenshots)
-						$and_clause .= $this->Cache->dbprefix.$orderby_array[0].' IS NULL AND ';
+					// asimo> If we would like to order the null values into the end of the result, then we must check the current direction
+					// asimo> In that case NULL values should be allowed only if the direction is 'NEXT' no matter what is the current $operator value
+
+					if( is_null( $order_field_value ) )
+					{ // current Item has NULL order
+						$where_condition .= ( $operator == ' > ' ? $compare_field.' IS NOT NULL' : 'FALSE' );
+						$equal_condition .= $compare_field.' IS NULL';
 					}
 					else
-					{ // This is needed when browsing through a descending ordered list and we want to browse back into the posts that have numbers (pb appears if first NULL posts is the highest ID)
-						$and_clause .= $this->Cache->dbprefix.$orderby_array[0].' IS NOT NULL OR ';
+					{
+						if( $operator == ' > ' )
+						{
+							$where_condition .= '( '.$compare_field.' IS NOT NULL AND '
+												.$compare_field.$operator.( $order_field_value + 0.000000001 ).' )';
+						}
+						else
+						{
+							$where_condition .= '( ( '.$compare_field.' IS NULL ) OR '
+												.$compare_field.$operator.( $order_field_value - 0.000000001 ).' )';
+						}
+						$equal_condition .= '( ( '.$compare_field.' <= '.( $order_field_value + 0.000000001 ).' )
+											 AND ( '.$compare_field.' >= '.( $order_field_value - 0.000000001 ).' ) )';
 					}
-					$and_clause .= $this->Cache->dbIDname
-						.$operator
-						.$current_Item->ID;
-				}
-				else
-				{
-					if( $operator == ' < ' )
-					{	// This is needed when browsing through a descending ordered list and we reach the limit where orders are not set/NULL (ex: b2evo screenshots)
-						$and_clause .= $this->Cache->dbprefix.$orderby_array[0].' IS NULL OR ';
+					break;
+
+				case 'RAND':
+					// Random order. Don't show current item again.
+					$where_condition .= $this->Cache->dbprefix.'ID <> '.$current_Item->ID;
+					// There can't be two equal
+					$equal_condition .= 'FALSE';
+					break;
+
+				default:
+					if( strpos( $post_field_name, 'custom_' ) === 0 )
+					{
+						// asimo> If we would like to order the null values into the end of the result, then we must check the current direction
+						// asimo> In that case NULL values should be allowed only if the direction is 'NEXT' no matter what is the current $operator value
+
+						$custom_field_value = $current_Item->get_custom_field_value( $compare_field_name );
+						if( ( $custom_field_value === false ) || ( $custom_field_value === NULL ) )
+						{ // This custom field is not set for the current Item
+							$where_condition .= ( $operator == ' > ' ? $compare_field.' IS NOT NULL' : 'FALSE' );
+							$equal_condition .= $compare_field.' IS NULL';
+						}
+						else
+						{
+							$where_condition .= ( $operator == ' < ' ) ? '( ' : '';
+							$where_condition .= '( '.$compare_field.' IS NOT NULL AND '
+												.$compare_field.$operator.$DB->quote( $custom_field_value )
+												.' )';
+							// All null values are < than a not null value
+							$where_condition .= ( $operator == ' < ' ) ? ' OR ( '.$compare_field.' IS NULL ) )' : '';
+							$equal_condition .= $compare_field.' = '.$DB->quote( $custom_field_value );
+						}
+						break;
 					}
-					$and_clause .= $this->Cache->dbprefix.$orderby_array[0]
-													.$operator
-													.( $operator == ' < ' ? $comp_order_value-0.000000001 : $comp_order_value+0.000000001 )
-													.' OR ( '
-	                          .$this->Cache->dbprefix.$orderby_array[0]
-														.( $operator == ' < ' ? ' <= '.($comp_order_value+0.000000001) : ' >= '.($comp_order_value-0.000000001) )
-														.' AND '
-														.$this->Cache->dbIDname
-														.$operator
-														.$current_Item->ID
-													.')';
-				}
+					echo 'WARNING: unhandled sorting: '.htmlspecialchars( $post_field_name );
+			}
 
-				$next_Query->WHERE_and( $and_clause );
-				break;
-
-			case 'RAND':
-				// Random order. Don't show current item again.
-				$next_Query->WHERE_and( $this->Cache->dbprefix.'ID <> '.$current_Item->ID );
-				break;
-
-			default:
-				echo 'WARNING: unhandled sorting: '.htmlspecialchars( $orderby_array[0] );
+			if( $condition_separator == '' )
+			{ // The first where condition was set, we need to set an 'OR' separator in case if we will have further conditions
+				$condition_separator = ' OR ';
+			}
+			else
+			{ // More than one WHERE condition was added, the last one always needs a ')'
+				$where_condition .= ' )';
+			}
 		}
+		// Add conditions to get result only from the next/prev items
+		$next_Query->WHERE_and( $where_condition );
 
 		// GET DATA ROWS:
 
