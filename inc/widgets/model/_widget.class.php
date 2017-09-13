@@ -85,6 +85,12 @@ class ComponentWidget extends DataObject
 	var $icon = 'gear';
 
 	/**
+	 * @var Mode: 'designer' or 'normal'
+	 */
+	var $mode = 'normal';
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param object data row from db
@@ -659,10 +665,33 @@ class ComponentWidget extends DataObject
 
 		$this->init_display( $params );
 
-		// Display the debug conatainers when $debug = 2 OR when it is turned on from evo menu under "Blog" -> "Show/Hide containers"
+		// Display the debug conatainers when $debug = 2 OR when it is turned on from evo menu under "Collection" -> "Show/Hide containers"
 		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
-		if( ! $Blog->get_setting('cache_enabled_widgets')
+		$force_nocaching = false;
+
+		// Enable the desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode"
+		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+		{	// Initialize data which is used by JavaScript to build overlay designer mode html elements:
+			$designer_mode_data = array(
+					'data-id'        => $this->ID,
+					'data-type'      => $this->get_name(),
+					'data-container' => $this->get( 'sco_name' ),
+				);
+			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Set data to know current user has a permission to edit this widget:
+				$designer_mode_data['data-can-edit'] = 1;
+			}
+			// Don't load a widget content from cache when designer mode is enabled:
+			$force_nocaching = true;
+			// Set designer mode:
+			$this->mode = 'designer';
+			// Set this param for plugin widgets:
+			$this->disp_params['debug_mode'] = $this->mode;
+		}
+
+		if( $force_nocaching
+		    || ! $Blog->get_setting( 'cache_enabled_widgets' )
 		    || ! $this->disp_params['allow_blockcache']
 		    || $this->get_cache_status() == 'disallowed' )
 		{ // NO CACHING - We do NOT want caching for this collection or for this specific widget:
@@ -676,6 +705,41 @@ class ComponentWidget extends DataObject
 					echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
 				}
 				echo 'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
+			}
+
+			if( ! empty( $designer_mode_data ) )
+			{	// Append designer mode html tag attributes to first not empty widget wrapper/container:
+				$widget_wrappers = array(
+						'block_start',
+						'block_body_start',
+						'list_start',
+						array( 'item_start', 'item_selected_start' ),
+					);
+				foreach( $widget_wrappers as $widget_wrapper_items )
+				{
+					if( ! is_array( $widget_wrapper_items ) )
+					{
+						$widget_wrapper_items = array( $widget_wrapper_items );
+					}
+					$wrapper_is_found = false;
+					foreach( $widget_wrapper_items as $widget_wrapper )
+					{
+						if( ! empty( $params[ $widget_wrapper ] ) )
+						{	// If this wrapper is filled and used with current widget,
+							// Append new data for widget wrapper:
+							$params[ $widget_wrapper ] = update_html_tag_attribs( $params[ $widget_wrapper ], $designer_mode_data );
+							if( isset( $this->disp_params[ $widget_wrapper ] ) )
+							{	// Also update params if they already have been initialized before:
+								$this->disp_params[ $widget_wrapper ] = update_html_tag_attribs( $this->disp_params[ $widget_wrapper ], $designer_mode_data );
+							}
+							$wrapper_is_found = true;
+						}
+					}
+					if( $wrapper_is_found )
+					{	// Stop search other wrapper in order to use only first filled wrapper:
+						break;
+					}
+				}
 			}
 
 			$this->display( $params );
@@ -1246,6 +1310,30 @@ class ComponentWidget extends DataObject
 		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Display' );
 
 		return $content;
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			if( $message === NULL )
+			{	// Set default message:
+				$message = 'Widget "'.$this->get_name().'" is hidden because there is nothing to display.';
+			}
+
+			echo $this->disp_params['block_start'];
+			$this->disp_title();
+			echo $this->disp_params['block_body_start'];
+			echo $message;
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 ?>

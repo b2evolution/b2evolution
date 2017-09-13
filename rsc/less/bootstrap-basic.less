@@ -336,6 +336,12 @@ select.field_error,
 textarea.field_error {
 	background:#fbf2ee;
 	border: 1px solid #d99;
+	+ span:before, + div + span:before {
+		content: '\f06a';
+		font: 16px FontAwesome;
+		color: #F00;
+		margin-right: 5px;
+	}
 }
 span.checkbox_error {
 	background: #fbf2ee;

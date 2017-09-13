@@ -58,7 +58,7 @@ else
 
 $action = param_action( 'list' );
 param( 'display_mode', 'string', 'normal' );
-$display_mode = ( in_array( $display_mode, array( 'js', 'normal' ) ) ? $display_mode : 'normal' );
+$display_mode = ( in_array( $display_mode, array( 'js', 'normal', 'iframe' ) ) ? $display_mode : 'normal' );
 if( $display_mode == 'js' )
 {	// JavaScript mode:
 
@@ -89,6 +89,7 @@ switch( $action )
 		param( 'type', 'string', true );
 		param( 'code', 'string', true );
 	case 'new':
+	case 'add_list':
 		param( 'container', 'string', true, true );	// memorize
 		// Change the symbols back to normal view as they are stored in DB
 		$container = str_replace( array( '_', '-' ), array( ' ', ':' ), $container );
@@ -174,6 +175,7 @@ switch( $action )
 	case 'nil':
 	case 'new':
 	case 'edit':
+	case 'add_list':
 		// Do nothing
 		break;
 
@@ -246,7 +248,7 @@ switch( $action )
 
 			case 'normal' :
 			default : // take usual action
-				header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID );
+				header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID.( $display_mode == 'iframe' ? '&display_mode=iframe' : '' ) );
 				break;
 		}
 		break;
@@ -288,12 +290,22 @@ switch( $action )
 			}
 			if( $action == 'update_edit' )
 			{	// Stay on edit widget form:
-				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&action=edit&wi_ID='.$edited_ComponentWidget->ID, 303 );
+				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&action=edit&wi_ID='.$edited_ComponentWidget->ID.'&display_mode='.$display_mode, 303 );
 			}
 			else
-			{	// Redirect to widgets list:
-				$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
-				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+			{	// If $action == 'update'
+				if( $display_mode == 'iframe' )
+				{	// Close modal window with iframe:
+					send_javascript_message( array(
+							'closeModalWindow' => array(),
+							'location.reload'  => array() ),
+						true, 'window.parent' );
+				}
+				else
+				{	// Redirect to widgets list:
+					$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
+					header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+				}
 			}
 		}
 		elseif( $display_mode == 'js' )
@@ -622,6 +634,15 @@ if( $display_mode == 'normal' )
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 	$AdminUI->disp_body_top();
 }
+elseif( $display_mode == 'iframe' )
+{	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
+	echo '<body>';
+	// Display info & error messages:
+	$Messages->display();
+	// Clear the messages to avoid double displaying:
+	$Messages->clear();
+}
 
 /**
  * Display payload:
@@ -661,6 +682,11 @@ switch( $action )
 					) );
 				break;
 
+			case 'iframe':
+				// Display VIEW:
+				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
+				break;
+
 			case 'normal' :
 			default : // take usual action
 				// Begin payload block:
@@ -671,6 +697,19 @@ switch( $action )
 
 				// End payload block:
 				$AdminUI->disp_payload_end();
+				break;
+		}
+		break;
+
+
+	case 'add_list':
+		// A list of widgets which can be added:
+		switch( $display_mode )
+		{
+			case 'iframe':
+				echo '<div class="available_widgets">'."\n";
+				$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
+				echo '</div>'."\n";
 				break;
 		}
 		break;
@@ -708,7 +747,15 @@ switch( $action )
 		break;
 }
 
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
+if( $display_mode == 'normal' )
+{	// Normal mode:
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+} 
+elseif( $display_mode == 'iframe' )
+{	// Frame mode:
+	echo '<body></html>';
+}
+
 
 ?>

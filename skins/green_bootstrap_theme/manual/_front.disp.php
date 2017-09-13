@@ -37,6 +37,9 @@ if( !empty( $Item ) )
 	echo '</div>'; // End of posts display
 }
 
+?>
+<div class="evo_container evo_container__front_page_main_area">
+<?php
 // ------------------------- "Front Page Main Area" CONTAINER EMBEDDED HERE --------------------------
 	// Display container and contents:
 	skin_container( NT_('Front Page Main Area'), array(
@@ -47,6 +50,9 @@ if( !empty( $Item ) )
 		'block_title_end'   => '</h2>',
 	) );
 // ----------------------------- END OF "Front Page Main Area" CONTAINER -----------------------------
+?>
+</div>
+<?php
 
 // --------------------------------- START OF CONTENT HIERARCHY --------------------------------
 echo '<h2 class="table_contents">'.T_('Table of contents').'</h2>';

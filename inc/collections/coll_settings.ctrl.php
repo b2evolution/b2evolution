@@ -101,7 +101,9 @@ switch( $action )
 
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-		$update_redirect_url = '?ctrl=coll_settings&tab='.$tab.'&blog='.$blog;
+
+		// Set URL to redirect after succesful action:
+		$update_redirect_url = '?ctrl=coll_settings&tab='.$tab.'&blog='.$blog.( empty( $mode ) ? '' : '&mode='.$mode );
 
 		switch( $tab )
 		{

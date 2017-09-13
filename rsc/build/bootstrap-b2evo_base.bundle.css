@@ -1129,7 +1129,7 @@ div#evo_toolbar .actions_right {
   border-radius: 4px;
   padding-top: 5px;
   padding-bottom: 5px;
-  margin: 1px 0;
+  margin: 1px 1px 1px 0;
 }
 .evobar-menu [class^=evobar-icon-] {
   margin-left: 6px;
@@ -1450,6 +1450,166 @@ div.dev-blocks--widget--notincache > .dev-blocks-name {
 div.dev-blocks--belowtoolbar {
   margin: 27px 0 -27px 0;
 }
+.evo_designer {
+  position: absolute;
+  border: 3px solid #666;
+  border-radius: 4px;
+}
+.evo_designer > div {
+  position: relative;
+}
+.evo_designer .evo_designer__title {
+  position: absolute;
+  top: -19px;
+  left: -30px;
+  padding: 2px 7px;
+  border-radius: 4px 4px 3px 0;
+  background: #666;
+  color: #FFF;
+  font-size: 11px;
+  text-align: left;
+  white-space: nowrap;
+}
+.evo_designer .evo_designer__actions {
+  width: 30px;
+  position: absolute;
+  top: -3px;
+  left: -30px;
+  background: #666;
+  border-radius: 0 0 4px 4px;
+  border-top-right-radius: 0;
+  text-align: center;
+}
+.evo_designer .evo_designer__actions .evo_designer__action {
+  color: #FFF !important;
+  padding: 1px 5px;
+  cursor: pointer;
+  font-size: 18px;
+}
+.evo_designer.evo_designer__container {
+  border-color: #DDD;
+}
+.evo_designer.evo_designer__container > div {
+  height: 100%;
+}
+.evo_designer.evo_designer__container .evo_designer__title {
+  top: auto;
+  left: auto;
+  bottom: -19px;
+  right: -30px;
+  border-radius: 4px 0 4px 3px;
+  background: #DDD;
+  color: #333;
+  text-align: right;
+}
+.evo_designer.evo_designer__container .evo_designer__actions {
+  top: auto;
+  left: auto;
+  bottom: 0;
+  right: -30px;
+  background: #DDD;
+  border-radius: 4px 4px 0 0;
+}
+.evo_designer.evo_designer__container .evo_designer__actions .evo_designer__action {
+  color: #333 !important;
+}
+.evo_designer.evo_designer__status_process {
+  border-color: #F60;
+}
+.evo_designer.evo_designer__status_process .evo_designer__title,
+.evo_designer.evo_designer__status_process .evo_designer__actions {
+  background: #F60;
+}
+.evo_designer.evo_designer__status_success {
+  border-color: #3C993D;
+}
+.evo_designer.evo_designer__status_success .evo_designer__title,
+.evo_designer.evo_designer__status_success .evo_designer__actions {
+  background: #3C993D;
+}
+.evo_designer.evo_designer__status_failed {
+  border-color: #E00;
+}
+.evo_designer.evo_designer__status_failed .evo_designer__title,
+.evo_designer.evo_designer__status_failed .evo_designer__actions {
+  background: #E00;
+}
+.evo_container[data-name],
+.evo_widget[data-id] {
+  min-width: 5px;
+  min-height: 5px;
+}
+.evo_container[data-name] {
+  z-index: 10000;
+}
+.evo_designer__container {
+  z-index: 10001;
+}
+.evo_widget[data-id] {
+  z-index: 10002;
+  position: relative;
+}
+.evo_designer__widget {
+  z-index: 10003;
+}
+.evo_designer__modal_backdrop.modal-backdrop {
+  z-index: 10004;
+}
+.evo_designer__modal_window.modal {
+  z-index: 10005;
+}
+.evo_customizer__html,
+.evo_customizer__html body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+.evo_customizer__wrapper {
+  height: 100%;
+  padding-top: 27px;
+  box-sizing: border-box;
+}
+.evo_customizer__wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+.evo_customizer__wrapper.evo_customizer__collapsed .evo_customizer__left {
+  display: none;
+}
+.evo_customizer__wrapper.evo_customizer__collapsed .evo_customizer__right {
+  margin-left: 0;
+}
+.evo_customizer__left {
+  float: left;
+  width: 320px;
+  height: 100%;
+  border-right: 1px solid #DDD;
+  box-sizing: border-box;
+}
+.evo_customizer__right {
+  margin-left: 320px;
+  height: 100%;
+  position: relative;
+}
+.evo_customizer__right .evo_customizer__collapser,
+.evo_customizer__right .evo_customizer__expander {
+  position: absolute;
+  top: 50px;
+  left: 7px;
+  cursor: pointer;
+  font-size: 30px;
+  line-height: 30px;
+  width: 30px;
+  text-align: center;
+  border-radius: 50%;
+  background: #FFF;
+  color: #000;
+}
+.evo_customizer__right .evo_customizer__expander {
+  display: none;
+}
 .results_ajax_loading {
   position: absolute;
   top: 0;
@@ -1744,6 +1904,17 @@ select.field_error,
 textarea.field_error {
   background: #fbf2ee;
   border: 1px solid #d99;
+}
+input.field_error + span:before,
+select.field_error + span:before,
+textarea.field_error + span:before,
+input.field_error + div + span:before,
+select.field_error + div + span:before,
+textarea.field_error + div + span:before {
+  content: '\f06a';
+  font: 16px FontAwesome;
+  color: #F00;
+  margin-right: 5px;
 }
 span.checkbox_error {
   background: #fbf2ee;

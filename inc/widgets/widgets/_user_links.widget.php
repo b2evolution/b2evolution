@@ -163,7 +163,8 @@ class user_links_Widget extends ComponentWidget
 		}
 
 		if( empty( $r ) )
-		{ // Nothing to display
+		{	// Nothing to display
+			$this->display_debug_message();
 			return true;
 		}
 

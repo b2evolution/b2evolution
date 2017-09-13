@@ -1669,3 +1669,52 @@ table.diff {
 		max-width: 100%;
 	}
 }
+
+// Skin Customizer Mode:
+#customizer_wrapper {
+	.page-content {
+		margin: 0;
+		padding: 0;
+	}
+	.panel {
+		border-top: none;
+		border-left: none;
+		border-right: none;
+		border-radius: 0;
+		margin: 0;
+		box-shadow: none;
+		.panel-heading {
+			border-radius: 0;
+		}
+		.panel-body {
+			.form-group:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+	.row {
+		margin: 0;
+		.col-md-12 {
+			padding: 0;
+		}
+	}
+}
+.evo_customizer__buttons {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	padding: 15px;
+	text-align: center;
+	border-top: 1px solid #DDD;
+	background: #FFF;
+	.form-group, .control-buttons {
+		margin: 0;
+		padding: 0;
+	}
+	.evo_customizer__links {
+		margin-top: 10px;
+		a {
+			margin: 0 10px
+		}
+	}
+}

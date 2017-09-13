@@ -1009,4 +1009,27 @@ function url_check_same_domain( $main_url, $check_url )
 	// Check subdomain
 	return $same_domain || ( substr( $check_url_host, - ( strlen( $main_url_host ) + 1 ) ) == '.'.$main_url_host );
 }
+
+
+/**
+ * Get current URL
+ *
+ * @param string Exclude params separated by comma
+ * @return string
+ */
+function get_current_url( $exclude_params = NULL )
+{
+	$current_url = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://' )
+		.$_SERVER['HTTP_HOST']
+		.$_SERVER['REQUEST_URI'];
+
+	if( $exclude_params !== NULL )
+	{	// Exclude params from current url:
+		$exclude_params = str_replace( ',', '|', preg_quote( $exclude_params ) );
+		$current_url = preg_replace( '/(\?|&|&amp;)('.$exclude_params.')=[^&]+/i', '$1', $current_url );
+		$current_url = rtrim( preg_replace( '/\?&+/', '?', $current_url ), '?&' );
+	}
+
+	return $current_url;
+}
 ?>

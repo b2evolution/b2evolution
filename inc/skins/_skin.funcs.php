@@ -2014,7 +2014,7 @@ function skin_template_path( $template_name )
  */
 function siteskin_include( $template_name, $params = array() )
 {
-	global $Settings, $skins_path, $Collection, $Blog;
+	global $Settings, $skins_path, $Collection, $Blog, $baseurl;
 
 	if( ! $Settings->get( 'site_skins_enabled' ) )
 	{	// Site skins are not enabled:
@@ -2632,7 +2632,12 @@ function skin_installed( $name )
  */
 function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 {
-	$Form->begin_fieldset( $display_params['fieldset_title'].' '.$display_params['fieldset_links'] );
+	global $mode;
+
+	if( $mode != 'customizer' )
+	{	// Except of skin customer mode:
+		$Form->begin_fieldset( $display_params[ 'fieldset_title' ].' '.$display_params[ 'fieldset_links' ] );
+	}
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
@@ -2643,56 +2648,59 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		$SkinCache = & get_SkinCache();
 		$edited_Skin = $SkinCache->get_by_ID( $skin_ID );
 
-		echo '<div class="skin_settings well">';
-		$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );
-		Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name, $disp_params );
+		if( $mode != 'customizer' )
+		{	// Except of skin customer mode:
+			echo '<div class="skin_settings well">';
+			$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );
+			Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name, $disp_params );
 
-		// Skin name
-		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Skin name').':</label>';
-			echo '<span>'.$edited_Skin->name.'</span>';
-		echo '</div>';
+			// Skin name
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin name').':</label>';
+				echo '<span>'.$edited_Skin->name.'</span>';
+			echo '</div>';
 
-		// Skin version
-		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Skin version').':</label>';
-			echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
-		echo '</div>';
+			// Skin version
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin version').':</label>';
+				echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
+			echo '</div>';
 
-		// Site Skin:
-		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Site Skin').':</label>';
-			echo '<span>'.( $edited_Skin->provides_site_skin() ? T_('Yes') : T_('No') ).'</span>';
-		echo '</div>';
+			// Site Skin:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Site Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_site_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
 
-		// Collection Skin:
-		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Collection Skin').':</label>';
-			echo '<span>'.( $edited_Skin->provides_collection_skin() ? T_('Yes') : T_('No') ).'</span>';
-		echo '</div>';
+			// Collection Skin:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Collection Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_collection_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
 
-		// Skin format:
-		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Skin format').':</label>';
-			echo '<span>'.$edited_Skin->type.'</span>';
-		echo '</div>';
+			// Skin format:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin format').':</label>';
+				echo '<span>'.$edited_Skin->type.'</span>';
+			echo '</div>';
 
-		// Containers
-		if( $skin_containers = $edited_Skin->get_containers() )
-		{
-			$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
+			// Containers
+			if( $skin_containers = $edited_Skin->get_containers() )
+			{
+				$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
+			}
+			else
+			{
+				$container_ul = '-';
+			}
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Containers').':</label>';
+				echo '<span>'.$container_ul.'</span>';
+			echo '</div>';
+
+			echo '</div>';
+			echo '<div class="skin_settings_form">';
 		}
-		else
-		{
-			$container_ul = '-';
-		}
-		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Containers').':</label>';
-			echo '<span>'.$container_ul.'</span>';
-		echo '</div>';
-
-		echo '</div>';
-		echo '<div class="skin_settings_form">';
 
 		$tmp_params = array( 'for_editing' => true );
 		$skin_params = $edited_Skin->get_param_definitions( $tmp_params );
@@ -2735,10 +2743,16 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 			}
 		}
 
-		echo '</div>';
+		if( $mode != 'customizer' )
+		{	// Except of skin customer mode:
+			echo '</div>';
+		}
 	}
 
-	$Form->end_fieldset();
+	if( $mode != 'customizer' )
+	{	// Except of skin customer mode:
+		$Form->end_fieldset();
+	}
 }
 
 
@@ -2753,7 +2767,7 @@ function skin_body_attrs( $params = array() )
 			'class' => NULL
 		), $params );
 
-	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User;
+	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User, $instance_name;
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
 	global $Session, $debug;
@@ -2791,6 +2805,9 @@ function skin_body_attrs( $params = array() )
 		}
 	}
 
+	// Instance class:
+	$classes[] = 'instance_'.$instance_name;
+
 	// Blog class:
 	$classes[] = 'coll_'.( empty( $Blog ) ? 'none' : $Blog->ID );
 
@@ -2819,6 +2836,10 @@ function skin_body_attrs( $params = array() )
 		if( $Session->get( 'display_containers_'.$Blog->ID ) )
 		{
 			$classes[] = 'dev_show_containers';
+		}
+		if( $Session->get( 'designer_mode_'.$Blog->ID ) )
+		{
+			$classes[] = 'dev_designer_mode';
 		}
 	}
 

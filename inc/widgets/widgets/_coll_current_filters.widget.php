@@ -130,6 +130,7 @@ class coll_current_filters_Widget extends ComponentWidget
 
 		if( empty( $params['ItemList'] ) )
 		{ // Empty ItemList object
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is an empty param "ItemList".' );
 			return false;
 		}
 
@@ -182,7 +183,8 @@ class coll_current_filters_Widget extends ComponentWidget
 			) ) );
 
 		if( empty( $filters ) && ! $this->disp_params['display_empty_filter'] )
-		{ // No filters
+		{	// No filters
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no filters.' );
 			return;
 		}
 

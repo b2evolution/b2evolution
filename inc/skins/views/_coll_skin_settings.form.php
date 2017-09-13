@@ -16,7 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Collection, $Blog, $Settings, $current_User, $skin_type, $admin_url;
+global $Collection, $Blog, $Settings, $current_User, $skin_type, $admin_url, $mode;
 
 $Form = new Form( NULL, 'skin_settings_checkchanges' );
 
@@ -31,6 +31,7 @@ $Form->begin_form( 'fform' );
 		$Form->hidden( 'skin_type', $skin_type );
 		$Form->hidden( 'action', 'update' );
 		$Form->hidden( 'blog', $Blog->ID );
+		$Form->hidden( 'mode', $mode );
 	}
 	else
 	{
@@ -89,15 +90,26 @@ $Form->begin_form( 'fform' );
 		$fieldset_title .= ' <span class="panel_heading_action_icons"><a href="'.$goto_link_url.'" class="btn btn-sm btn-info">'.$goto_link_title.' &raquo;</a></span>';
 	}
 
-	$fieldset_title_links = '<span class="floatright panel_heading_action_icons">&nbsp;'.action_icon( T_('Select another skin...'), 'choose', regenerate_url( 'action', 'skinpage=selection&amp;skin_type='.$skin_type ), ' '.T_('Choose a different skin').' &raquo;', 3, 4, array( 'class' => 'action_icon btn btn-info btn-sm' ) );
+	$link_select_skin = action_icon( T_('Select another skin...'), 'choose',
+			regenerate_url( 'action,mode', 'skinpage=selection&amp;skin_type='.$skin_type ),
+			' '.T_('Choose a different skin').' &raquo;', 3, 4, array(
+				'class' => $mode == 'customizer' ? 'small' : 'action_icon btn btn-info btn-sm',
+				'target' => $mode == 'customizer' ? '_top' : '',
+		) );
+	$link_reset_params = '';
+	$fieldset_title_links = '<span class="floatright panel_heading_action_icons">&nbsp;'.$link_select_skin;
+
 	if( $skin_ID && $current_User->check_perm( 'options', 'view' ) )
 	{	// Display "Reset params" button only when skin ID has a real value ( when $skin_ID = 0 means it must be the same as the normal skin value ):
-		$fieldset_title_links .= action_icon( T_('Reset params'), 'reload',
-				regenerate_url( 'action', 'ctrl=skins&amp;skin_ID='.$skin_ID.'&amp;skin_type='.$skin_type.'&amp;blog='.( isset( $Blog ) ? $Blog->ID : '0' ).'&amp;action=reset&amp;'.url_crumb( 'skin' ) ),
+		$link_reset_url = regenerate_url( 'ctrl,action', 'ctrl=skins&amp;skin_ID='.$skin_ID.'&amp;skin_type='.$skin_type.'&amp;blog='.( isset( $Blog ) ? $Blog->ID : '0' ).'&amp;action=reset&amp;'.url_crumb( 'skin' ) );
+		$link_reset_params = action_icon( T_('Reset params'), 'reload',
+				$link_reset_url,
 				' '.T_('Reset params'), 3, 4, array(
-					'class'   => 'action_icon btn btn-default btn-sm',
-					'onclick' => 'return confirm( \''.TS_( 'This will reset all the params to the defaults recommended by the skin.\nYou will lose your custom settings.\nAre you sure?' ).'\' )',
+					'class'   => $mode == 'customizer' ? 'small' : 'action_icon btn btn-default btn-sm',
+					'onclick' => 'return evo_confirm_skin_reset()',
+					'target' => $mode == 'customizer' ? 'evo_customizer__backoffice' : '',
 			) );
+		$fieldset_title_links .= $link_reset_params;
 	}
 	$fieldset_title_links .= '</span>';
 	display_skin_fieldset( $Form, $skin_ID, array( 'fieldset_title' => $fieldset_title, 'fieldset_links' => $fieldset_title_links ) );
@@ -105,9 +117,49 @@ $Form->begin_form( 'fform' );
 $buttons = array();
 if( $skin_ID )
 {	// Allow to update skin params only when it is really selected (Don't display this button to case "Same as normal skin."):
-	$buttons[] = array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
+}
+
+if( $mode == 'customizer' )
+{	// Display buttons in special div on customizer mode:
+	echo '<div class="evo_customizer__buttons">';
+	$Form->buttons( $buttons );
+	echo '<div class="evo_customizer__links">'.$link_select_skin.$link_reset_params.'</div>';
+	echo '</div>';
+	// Clear buttons to don't display them twice:
+	$buttons = array();
 }
 
 $Form->end_form( $buttons );
 
+if( isset( $link_reset_url ) )
+{	// Initialize JS to confirm skin reset action if current user has a permission:
+	$skin_reset_confirmation_msg = TS_( 'This will reset all the params to the defaults recommended by the skin.\nYou will lose your custom settings.\nAre you sure?' );
+?>
+<script type="text/javascript">
+function evo_confirm_skin_reset()
+{
+<?php
+if( $mode == 'customizer' )
+{	// If skin customizer mode:
+?>
+	window.parent.openModalWindow( '<form action="<?php echo str_replace( '&amp;', '&', $link_reset_url ); ?>" method="post" target="evo_customizer__backoffice" onsubmit="closeModalWindow()">' +
+				'<span class="text-danger"><?php echo $skin_reset_confirmation_msg; ?></span>' +
+				'<input type="submit" value="<?php echo TS_('Reset params'); ?>" />' +
+			'</form>',
+		'500px', '100px', true, '<?php echo TS_('Reset params'); ?>', [ '<?php echo TS_('Reset params'); ?>', 'btn btn-danger' ] );
+	return false;
+<?php
+}
+else
+{	// Normal back-office mode:
+?>
+	return confirm( '<?php echo $skin_reset_confirmation_msg; ?>' );
+<?php
+}
+?>
+}
+</script>
+<?php
+}
 ?>

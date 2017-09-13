@@ -260,6 +260,7 @@ class user_tools_Widget extends ComponentWidget
 	{
 		if( !is_logged_in() )
 		{	// Only logged in users can see this tools panel
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because you are not logged in.' );
 			return false;
 		}
 
@@ -316,6 +317,7 @@ class user_tools_Widget extends ComponentWidget
 
 		if( empty( $tools_links ) )
 		{	// No available links to display
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because no available links to display.' );
 			return false;
 		}
 

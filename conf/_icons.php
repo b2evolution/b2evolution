@@ -1252,6 +1252,36 @@ function get_icon_info( $name )
 			'glyph' => 'link',
 			'fa' => 'link'
 		);
+
+		case 'designer_widget_up': return array(
+			'alt'  => T_('Up'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 96, 80 ),
+			'glyph' => 'circle-arrow-up',
+			'fa' => 'arrow-circle-up',
+		);
+		case 'designer_widget_down': return array(
+			'alt'  => T_('Down'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 64, 80 ),
+			'glyph' => 'circle-arrow-down',
+			'fa' => 'arrow-circle-down',
+		);
+
+		case 'customizer_collapse': return array(
+			'alt'  => T_('Collapse'),
+			'size' => array( 13, 12 ),
+			'xy' => array( 0, 96 ),
+			'glyph' => 'circle-arrow-left',
+			'fa' => 'arrow-circle-left',
+		);
+		case 'customizer_expand': return array(
+			'alt'  => T_('Expand'),
+			'size' => array( 13, 12 ),
+			'xy' => array( 32, 96 ),
+			'glyph' => 'circle-arrow-right',
+			'fa' => 'arrow-circle-right',
+		);
 	}
 }
 ?>

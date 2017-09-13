@@ -113,4 +113,27 @@ class generic_menu_link_Widget extends ComponentWidget
 
 		return $r;
 	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			if( $message === NULL )
+			{	// Set default message:
+				$message = 'Hidden';
+				if( ! empty( $this->disp_params['link_type'] ) )
+				{
+					$message .= '('.$this->disp_params['link_type'].')';
+				}
+			}
+
+			echo $this->get_layout_menu_link( '#', $message, false );
+		}
+	}
 }

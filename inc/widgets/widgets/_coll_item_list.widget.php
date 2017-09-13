@@ -464,12 +464,14 @@ class coll_item_list_Widget extends ComponentWidget
 
 			if( ! isset($MainList) )
 			{	// Nothing to follow, don't display anything
+				$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no MainList object.' );
 				return false;
 			}
 
 			$all_tags = $MainList->get_all_tags();
 			if( empty($all_tags) )
 			{	// Nothing to follow, don't display anything
+				$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is nothing to display.' );
 				return false;
 			}
 
@@ -513,7 +515,8 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( ! $ItemList->result_num_rows )
 		{	// Nothing to display:
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no results to display.' );
+			return false;
 		}
 
 		// Check if the widget displays only single title
@@ -660,6 +663,7 @@ class coll_item_list_Widget extends ComponentWidget
 			ob_end_clean();
 		}
 
+		return true;
 	}
 
 

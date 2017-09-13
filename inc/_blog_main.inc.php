@@ -30,6 +30,16 @@ load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 //$dummy = new Blog();
 $Timer->start( '_BLOG_MAIN.inc' );
 
+// Evo toolbar visibility:
+// true   - (Default) Visible if current user has a permission to view toolbar,
+// false  - Hidden and it is not printed at all,
+// 'hidden' - Toolbar is printed out but it is hidden with css property.
+//            (Used for customizer mode when we should grab toolbar from iframe to main window)
+param( 'show_toolbar', 'string', NULL );
+if( $show_toolbar !== NULL && $show_toolbar !== 'hidden' )
+{	// Convert all not string possible values to boolean type:
+	$show_toolbar = (boolean)$show_toolbar;
+}
 
 /*
  * blog ID. This is a little bit special.
@@ -58,33 +68,16 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
+// Do we allow redirection to canonical URL? (allows to force a 'single post' URL for commenting)
+param( 'redir', 'string', 'yes', false );
 
-if( $debug == 2 || is_logged_in() )
-{	// Allow debug info only for logged-in users OR when debug == 2:
+// Initialize modes to debug collection settings:
+initialize_debug_modes();
 
-	// Show/Hide the containers:
-	$display_containers = param( 'display_containers', 'string' );
-	if( $display_containers == 'show' )
-	{
-		$Session->set( 'display_containers_'.$blog, 1 );
-	}
-	elseif( $display_containers == 'hide' )
-	{
-		$Session->delete( 'display_containers_'.$blog );
-	}
-
-	// Show/Hide the includes:
-	$display_includes = param( 'display_includes', 'string' );
-	if( $display_includes == 'show' )
-	{
-		$Session->set( 'display_includes_'.$blog, 1 );
-	}
-	elseif( $display_includes == 'hide' )
-	{
-		$Session->delete( 'display_includes_'.$blog );
-	}
+if( $Session->get( 'customizer_mode_'.$Blog->ID ) && $redir != 'no' )
+{	// Redirect to customize collection if such mode is enabled:
+	header_redirect( $Blog->get( 'customizer_url', array( 'glue' => '&' ) ) );
 }
-
 
 // Init $disp
 $default_disp = '-'; // '-' means we have no explicit disp request yet... this may change with extraptah info or by detecting front page later
@@ -343,7 +336,6 @@ if( $resolve_extra_path )
  */
 param( 'p', 'integer', '', true );              // Specific post number to display
 param( 'title', 'string', '', true );						// urtitle of post to display
-param( 'redir', 'string', 'yes', false );				// Do we allow redirection to canonical URL? (allows to force a 'single post' URL for commenting)
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 param( 'stats', 'integer', 0 );									// Deprecated but might still be used by spambots
 

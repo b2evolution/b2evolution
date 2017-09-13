@@ -102,6 +102,9 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 		if( $disp != 'page' )
 		{
+			?>
+			<div class="evo_container evo_container__item_single_header">
+			<?php
 			// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
@@ -117,6 +120,9 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'author_link_text' => $params['author_link_text'],
 			) );
 			// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
+			?>
+			</div>
+			<?php
 		}
 	?>
 	</div>
