@@ -25,6 +25,8 @@ load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectLis
  */
 class coll_media_index_Widget extends ComponentWidget
 {
+	var $icon = 'file-photo-o';
+
 	/**
 	 * Constructor
 	 */

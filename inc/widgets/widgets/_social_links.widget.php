@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class social_links_Widget extends ComponentWidget
 {
+	var $icon = 'group';
+
 	/**
 	 * Constructor
 	 */

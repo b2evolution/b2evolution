@@ -33,6 +33,7 @@ class whosonline_plugin extends Plugin
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'other';
+	var $widget_icon = 'wifi';
 
 
 	/**

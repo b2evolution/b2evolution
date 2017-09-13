@@ -25,6 +25,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_category_list_Widget extends ComponentWidget
 {
+	var $icon = 'indent';
+
 	/**
 	 * Constructor
 	 */

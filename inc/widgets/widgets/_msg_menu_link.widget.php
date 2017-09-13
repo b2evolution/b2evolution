@@ -26,6 +26,7 @@ load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_
 class msg_menu_link_Widget extends generic_menu_link_Widget
 {
 	var $link_types;
+	var $icon = 'comments';
 
 	/**
 	 * Constructor

@@ -25,6 +25,8 @@ load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectLis
  */
 class user_login_Widget extends ComponentWidget
 {
+	var $icon = 'key';
+
 	/**
 	 * Constructor
 	 */

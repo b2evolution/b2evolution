@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_link_Widget extends ComponentWidget
 {
+	var $icon = 'external-link';
+
 	/**
 	 * Constructor
 	 */
