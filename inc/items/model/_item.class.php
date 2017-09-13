@@ -6392,45 +6392,6 @@ class Item extends ItemLight
 			{ // Create new revision
 				$result = $this->create_revision();
 			}
-			else
-			{ // Update recent revision
-				$last_Revision = $this->get_revision( 'max' );
-
-				if( $last_Revision )
-				{
-					if( isset( $this->dbchanges['post_status'] )
-						|| isset( $this->dbchanges['post_title'] )
-						|| isset( $this->dbchanges['post_content'] ) )
-					{
-						$DB->query( 'UPDATE T_items__version
-								LEFT JOIN T_items__item ON iver_itm_ID = post_ID
-								SET
-										iver_edit_user_ID = post_lastedit_user_ID,
-										iver_edit_last_touched_ts = post_last_touched_ts,
-										iver_status = post_status,
-										iver_title = post_title,
-										iver_content = post_content
-								WHERE iver_ID = '.$last_Revision->iver_ID.' AND iver_itm_ID = '.$this->ID );
-					}
-
-					if( isset( $this->dbchanges_flags['custom_fields'] ) )
-					{
-						$update_strings = '';
-						foreach( $this->dbchanges_custom_fields as $custom_field_ID => $value )
-						{
-							$update_strings .= ' WHEN ivcf_itcf_ID = '.$DB->quote( $custom_field_ID ).' THEN '.$DB->quote( $value );
-						}
-
-						if( ! empty( $update_strings ) )
-						{
-							$DB->query( 'UPDATE T_items__version_custom_field
-									SET ivcf_value = CASE '.$update_strings.' ELSE ivcf_value END
-								WHERE ivcf_iver_ID = '.$last_Revision->iver_ID.'
-								AND ivcf_iver_itm_ID = '.$this->ID );
-						}
-					}
-				}
-			}
 
 			$db_changed = true;
 		}
@@ -9966,12 +9927,11 @@ class Item extends ItemLight
 		$result = $DB->query( $sql, 'Save a version of the Item' ) !== false;
 
 		if( $result )
-		{
+		{ // Create custom field revisions
 			$custom_field_values = array();
 			$custom_fields = $this->get_type_custom_fields();
 			if( count( $custom_fields ) )
-			{
-				// Save version of custom fields
+			{	// Get current version of custom fields
 				foreach( $custom_fields as $custom_field )
 				{
 					$value = $this->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] );
@@ -9980,7 +9940,7 @@ class Item extends ItemLight
 			}
 
 			if( ! empty( $this->dbchanges_custom_fields ) )
-			{
+			{ // Set previous custom field values if they changed
 				foreach( $this->dbchanges_custom_fields as $custom_field_ID => $value )
 				{
 					$custom_field_values[$custom_field_ID] = '('.$iver_ID.','.$this->ID.','.$custom_field_ID.','.$DB->quote( $value ).')';
@@ -9994,7 +9954,7 @@ class Item extends ItemLight
 			}
 
 			if( $result )
-			{
+			{ // Create link revisions
 				$LinkOwner = new LinkItem( $this );
 				$existing_Links = & $LinkOwner->get_Links();
 
@@ -10003,7 +9963,7 @@ class Item extends ItemLight
 					$link_values = array();
 					foreach( $existing_Links as $loop_Link )
 					{
-						$link_values[] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$loop_Link->ID.','.$loop_Link->file_ID.','
+						$link_values[] = '('.$iver_ID.','.$this->ID.','.$loop_Link->ID.','.$loop_Link->file_ID.','
 								.$DB->quote( $loop_Link->position ).','.$loop_Link->order.')';
 					}
 					$sql = 'INSERT INTO T_items__version_link( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order ) VALUES '.implode( ',', $link_values );

@@ -1997,6 +1997,8 @@ class RestApi
 	 */
 	private function controller_link_change_order()
 	{
+		global $localtimenow;
+
 		// Check permission if current user can update the requested link:
 		$this->link_check_perm();
 
@@ -2037,6 +2039,15 @@ class RestApi
 		}
 		if( $i > -1 && $i < PHP_INT_MAX )
 		{	// Switch the links:
+			if( $LinkOwner->type == 'item' && ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) > 90 )
+			{
+				$LinkOwner->Item->create_revision();
+			}
+
+			// Update last touched date of Owners
+			// Update to last touched date made earlier to prevent subsequent link dbupdate from creating a new revision
+			$LinkOwner->update_last_touched_date();
+
 			$switch_Link->set( 'order', $edited_Link->get( 'order' ) );
 
 			// HACK: go through order=0 to avoid duplicate key conflict:
@@ -2046,9 +2057,6 @@ class RestApi
 
 			$edited_Link->set( 'order', $i );
 			$edited_Link->dbupdate();
-
-			// Update last touched date of Owners
-			$LinkOwner->update_last_touched_date();
 
 			// The requested link order has been changed successfully:
 			$this->halt( ( $link_action == 'move_up' )

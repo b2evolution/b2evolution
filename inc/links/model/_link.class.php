@@ -505,8 +505,6 @@ class Link extends DataObject
 		$DB->begin();
 
 		$LinkOwner = & $this->get_LinkOwner();
-
-
 		if( $LinkOwner && $LinkOwner->type == 'item' && isset( $this->dbchanges['link_position'] ) || isset( $this->dbchanges['link_order'] ) )
 		{
 			$update_values = array();
@@ -527,16 +525,7 @@ class Link extends DataObject
 
 			if( ! empty( $update_values ) )
 			{
-				$last_Revision = $LinkOwner->Item->get_revision( 'max' );
-				if( ! empty( $last_Revision ) && ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) < 90 )
-				{ // Update recent revision
-					$sql = 'UPDATE T_items__version_link SET '.implode( ',', $update_values )
-							.' WHERE ivl_iver_ID = '.$last_Revision->iver_ID
-							.' AND ivl_iver_itm_ID = '.$last_Revision->iver_itm_ID
-							.' AND ivl_link_ID = '.$this->ID;
-					$DB->query( $sql, 'Update revision link position/order' );
-				}
-				else
+				if( ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) > 90 )
 				{ // Create a new revision...
 					$revision_ID = $LinkOwner->Item->create_revision();
 					if( is_int( $revision_ID ) )

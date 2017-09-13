@@ -1481,31 +1481,22 @@ switch( $action )
 			$link_order[$link_ID] = $real_link_order;
 		}
 
+		if( $LinkOwner->type == 'item' && ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) > 90 )
+		{
+			$LinkOwner->Item->create_revision();
+		}
+
 		// Do firstly fake ordering start with max order, to avoid duplicate entry error:
 		$DB->query( 'UPDATE T_links
 			  SET link_order = CASE '.$fake_sql_update_strings.' ELSE link_order END
 			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
-		// Do real ordering start with number 1:
-		if( $LinkOwner->type == 'item' && ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) > 90 )
-		{	// We need to iterate through each link to make sure that item revision history is properly generated
-			foreach( $link_IDs as $link_ID )
-			{
-				$loop_Link = & $LinkCache->get_by_ID( $link_ID );
-				if( $loop_Link )
-				{
-					$loop_Link->set( 'order', $link_order[$link_ID] );
-					$loop_Link->dbupdate();
-				}
-			}
-		}
-		else
-		{
-			$DB->query( 'UPDATE T_links
-					SET link_order = CASE '.$real_sql_update_strings.' ELSE link_order END
-				WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
 
-			$LinkOwner->update_last_touched_date();
-		}
+		// Do real ordering start with number 1:
+		$DB->query( 'UPDATE T_links
+				SET link_order = CASE '.$real_sql_update_strings.' ELSE link_order END
+			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
+
+		$LinkOwner->update_last_touched_date();
 
 		$DB->commit();
 		echo json_encode( $link_order );
