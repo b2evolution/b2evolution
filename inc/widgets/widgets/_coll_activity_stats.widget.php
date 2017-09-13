@@ -25,6 +25,8 @@ init_jqplot_js();
  */
 class coll_activity_stats_Widget extends ComponentWidget
 {
+	var $icon = 'bar-chart';
+
 	/**
 	 * Constructor
 	 */

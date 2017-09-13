@@ -291,6 +291,14 @@ class Plugin
 	 */
 	var $plugin_actions = array();
 
+	/**
+	 * Widget icon name.
+	 * Use icon name from http://fontawesome.io/icons/
+	 *
+	 * @var string
+	 */
+	var $widget_icon = 'puzzle-piece';
+
 	/**#@-*/
 
 

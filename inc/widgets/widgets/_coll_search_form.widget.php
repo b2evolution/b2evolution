@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_search_form_Widget extends ComponentWidget
 {
+	var $icon = 'search';
+
 	/**
 	 * Constructor
 	 */

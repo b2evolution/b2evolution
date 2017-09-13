@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_logo_Widget extends ComponentWidget
 {
+	var $icon = 'photo';
+
 	/**
 	 * Constructor
 	 */

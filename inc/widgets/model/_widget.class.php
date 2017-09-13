@@ -76,6 +76,13 @@ class ComponentWidget extends DataObject
 	*/
 	var $Blog = NULL;
 
+	/**
+	 * Widget icon name.
+	 * Use icon name from http://fontawesome.io/icons/
+	 *
+	 * @var string
+	 */
+	var $icon = 'gear';
 
 	/**
 	 * Constructor
@@ -202,27 +209,33 @@ class ComponentWidget extends DataObject
 	 * @return string
 	 */
 	function get_desc_for_list()
-    {
-        $name = $this->get_name();
+	{
+		$name = $this->get_name();
 
-        if( $this->type == 'plugin' )
-        {
-            if ( isset($this->disp_params['title']) && ! empty($this->disp_params['title']) ) {
-                return '<strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
-            }
+		if( $this->type == 'plugin' )
+		{	// Plugin widget:
+			$widget_Plugin = & $this->get_Plugin();
+			$icon = '<span class="fa fa-'.$widget_Plugin->widget_icon.'"></span>';
 
-            return '<strong>'.$name.'</strong> ('.T_('Plugin').')';
-        }
+			if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+			{
+				return $icon.' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+			}
 
-        $short_desc = $this->get_short_desc();
+			return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+		}
 
-        if( $name == $short_desc || empty($short_desc) )
-        {
-            return '<strong>'.$name.'</strong>';
-        }
+		// Normal widget:
+		$short_desc = $this->get_short_desc();
+		$icon = '<span class="fa fa-'.$this->icon.'"></span>';
 
-        return '<strong>'.$short_desc.'</strong> ('.$name.')';
-    }
+		if( $name == $short_desc || empty( $short_desc ) )
+		{
+			return $icon.' <strong>'.$name.'</strong>';
+		}
+
+		return $icon.' <strong>'.$short_desc.'</strong> ('.$name.')';
+	}
 
 
 	/**

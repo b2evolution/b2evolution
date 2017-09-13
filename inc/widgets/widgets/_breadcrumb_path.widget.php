@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class breadcrumb_path_Widget extends ComponentWidget
 {
+	var $icon = 'angle-right';
+
 	/**
 	 * Constructor
 	 */

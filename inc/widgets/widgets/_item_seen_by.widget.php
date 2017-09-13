@@ -34,6 +34,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_seen_by_Widget extends ComponentWidget
 {
+	var $icon = 'eye';
+
 	/**
 	 * Constructor
 	 */

@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_location_Widget extends ComponentWidget
 {
+	var $icon = 'location-arrow';
+
 	/**
 	 * Constructor
 	 */

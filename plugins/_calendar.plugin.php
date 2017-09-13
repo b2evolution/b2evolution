@@ -33,6 +33,7 @@ class calendar_plugin extends Plugin
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
+	var $widget_icon = 'calendar';
 
 
   /**

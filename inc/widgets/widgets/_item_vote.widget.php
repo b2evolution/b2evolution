@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_vote_Widget extends ComponentWidget
 {
+	var $icon = 'thumbs-o-up';
+
 	/**
 	 * Constructor
 	 */

@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class colls_list_owner_Widget extends ComponentWidget
 {
+	var $icon = 'list-ul';
+
 	/**
 	 * Constructor
 	 */

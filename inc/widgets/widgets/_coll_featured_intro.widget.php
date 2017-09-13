@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_featured_intro_Widget extends ComponentWidget
 {
+	var $icon = 'asterisk';
+
 	/**
 	 * Constructor
 	 */
