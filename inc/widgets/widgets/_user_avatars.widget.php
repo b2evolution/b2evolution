@@ -25,7 +25,7 @@ load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectLis
  */
 class user_avatars_Widget extends ComponentWidget
 {
-	var $icon = 'user-circle';
+	var $icon = 'users';
 
 	/**
 	 * Constructor

@@ -82,7 +82,7 @@ class ComponentWidget extends DataObject
 	 *
 	 * @var string
 	 */
-	var $icon = 'gear';
+	var $icon = 'cube';
 
 	/**
 	 * Constructor
