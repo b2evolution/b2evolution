@@ -6,8 +6,10 @@ img {
 
 	// The following will achieve "fake responsiveness" for images inserted with raw <img src=""> tags.
 	// It will also constrain images added with [inline:]
-	max-width: 100%; 
-	height: auto;
+	max-width: 100%;
+
+	// The following was disabled as it stretches some of the images in the backoffice such as the Site logo under the Site Settings
+	//height: auto;
 }
 
 
@@ -46,32 +48,32 @@ img.noshadow,
 }
 
 // Add a gray border:
-img.border, 
+img.border,
 .image_block.border img,
 .evo_image_block.border img {
 	border: 1px solid #666;
 }
 // Remove border:
-img.noborder, 
+img.noborder,
 .image_block.noborder img,
 .evo_image_block.noborder img {
 	border: none;
 }
 
 // Remove any border-radius:
-img.squared, 
+img.squared,
 .image_block.squared img,
 .evo_image_block.squared img {
 	border-radius: 0;
 }
 // Add bootstrap-default 4px border-radius:
-img.rounded, 
+img.rounded,
 .image_block.rounded img,
 .evo_image_block.rounded img {
 	border-radius: 4px;
 }
 // Make image round/oval:
-img.round, 
+img.round,
 .image_block.round img,
 .evo_image_block.round img {
 	border-radius: 50%;
