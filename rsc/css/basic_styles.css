@@ -66,13 +66,13 @@ abbr {
 pre,
 code {
   -webkit-hyphens: none;
+     -moz-hyphens: none;
       -ms-hyphens: none;
           hyphens: none;
 }
 img {
   border: none;
   max-width: 100%;
-  height: auto;
 }
 .top {
   vertical-align: top;
