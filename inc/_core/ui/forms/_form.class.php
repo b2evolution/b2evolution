@@ -2059,7 +2059,7 @@ class Form extends Widget
 			}
 			else
 			{ // with form title:
-				$r .= sprintf( TS_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $js_form_title );
+				$r .= sprintf( TS_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), format_to_js( $js_form_title ) );
 			}
 
 			$r .= '\';';
