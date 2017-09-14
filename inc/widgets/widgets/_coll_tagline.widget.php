@@ -24,7 +24,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_tagline_Widget extends ComponentWidget
 {
-	var $icon = 'tag';
+	var $icon = 'window-minimize';
 
 	/**
 	 * Constructor
