@@ -18,6 +18,31 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $Collection, $Blog, $Settings, $current_User, $skin_type, $admin_url, $mode;
 
+if( $mode == 'customizer' &&
+    $Settings->get( 'site_skins_enabled' ) &&
+    $current_User->check_perm( 'options', 'edit' ) )
+{	// Display tabs to switch between site and collection skins in special div on customizer mode:
+	if( empty( $Blog ) )
+	{	// Get last working collection:
+		$BlogCache = & get_BlogCache();
+		$tab_Blog = & $BlogCache->get_by_ID( get_working_blog(), false, false );
+	}
+	else
+	{	// Use current collection:
+		$tab_Blog = $Blog;
+		set_working_blog( $tab_Blog->ID );
+	}
+
+	echo '<div class="evo_customizer__tabs">';
+
+	echo '<ul class="nav nav-tabs">'
+			.'<li'.( ! isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=site_skin">'.T_('Site').'</a></li>'
+			.'<li'.( isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID.'">'.$tab_Blog->get( 'shortname' ).'</a></li>'
+		.'</ul>';
+
+	echo '</div>';
+}
+
 $Form = new Form( NULL, 'skin_settings_checkchanges' );
 
 $Form->begin_form( 'fform' );

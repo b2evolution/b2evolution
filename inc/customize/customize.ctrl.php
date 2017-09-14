@@ -26,7 +26,14 @@ param( 'view', 'string', '' );
 
 switch( $view )
 {
-	case 'skin':
+	case 'site_skin':
+		// Open form with site skin settings:
+		$_GET['tab'] = 'site_skin';
+		$ctrl = 'collections';
+		require $inc_path.$ctrl_mappings[ $ctrl ];
+		break;
+
+	case 'coll_skin':
 		// Open form with skin settings of current collection:
 		$_GET['tab'] = 'skin';
 		$ctrl = 'coll_settings';
