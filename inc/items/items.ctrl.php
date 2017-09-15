@@ -1494,7 +1494,7 @@ switch( $action )
 			$SQL->SELECT( 'MAX( comment_date )' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$dest_Item->ID );
-			$latest_comment_time = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+			$latest_comment_time = $DB->get_var( $SQL );
 			if( $latest_comment_time !== NULL )
 			{	// If target Item has at lest one comment use new date/time for new appended comments:
 				$append_comment_timestamp = strtotime( $latest_comment_time ) + 60;
@@ -1538,7 +1538,7 @@ switch( $action )
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$edited_Item->ID );
 			$SQL->ORDER_BY( 'comment_date' );
-			$source_comment_IDs = $DB->get_col( $SQL->get(), 0, $SQL->title );
+			$source_comment_IDs = $DB->get_col( $SQL );
 			foreach( $source_comment_IDs as $source_comment_ID )
 			{
 				$DB->query( 'UPDATE T_comments

@@ -395,12 +395,12 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
 	if( !isset( $cache_mail_is_blocked_status[ $status_filter_name ][ $email ] ) )
 	{ // If we check status of this email first time - get it from DB and store in cache
 		global $DB;
-		$SQL = new SQL();
+		$SQL = new SQL( 'Check if email address is blocked' );
 		$SQL->SELECT( 'emadr_ID' );
 		$SQL->FROM( 'T_email__address' );
 		$SQL->WHERE( 'emadr_address = '.$DB->quote( utf8_strtolower( $email ) ) );
 		$SQL->WHERE_and( get_mail_blocked_condition( true, $blocked_statuses ) );
-		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (boolean) $DB->get_var( $SQL->get() );
+		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (boolean) $DB->get_var( $SQL );
 	}
 
 	// Get email block status from cache variable

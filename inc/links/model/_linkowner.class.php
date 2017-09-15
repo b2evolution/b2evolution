@@ -525,7 +525,7 @@ class LinkOwner
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_'.$this->get_ID_field_name().' = '.$this->get_ID() );
 
-		return intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
+		return intval( $DB->get_var( $SQL ) );
 	}
 }
 

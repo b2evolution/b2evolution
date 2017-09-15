@@ -493,7 +493,7 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 	}
 
 	// Search between tags:
-	$tags_SQL = new SQL();
+	$tags_SQL = new SQL( 'Get tags matching to the search keywords' );
 	$tags_SQL->SELECT( 'tag_ID, tag_name, COUNT( DISTINCT itag_itm_ID ) AS post_count' );
 	$tags_SQL->FROM( 'T_items__tag' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
@@ -502,7 +502,7 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 	$tags_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
 	$tags_SQL->WHERE_and( $tag_where_condition );
 	$tags_SQL->GROUP_BY( 'tag_name' );
-	$tags = $DB->get_results( $tags_SQL->get(), OBJECT, 'Get tags matching to the search keywords' );
+	$tags = $DB->get_results( $tags_SQL );
 
 	foreach( $tags as $tag )
 	{

@@ -602,7 +602,7 @@ class UserList extends DataObjectList2
 			global $Timer;
 			$Timer->start( 'Users_IDs', false );
 
-			$step1_SQL = new SQL();
+			$step1_SQL = new SQL( 'UserList::Query() Step 1: Get ID list' );
 			$step1_SQL->SELECT( 'T_users.user_ID, IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture' );
 			if( ! empty( $this->query_params['join_colls'] ) )
 			{	// Initialize count of collections (used on order by this field):
@@ -623,7 +623,7 @@ class UserList extends DataObjectList2
 			$step1_SQL->LIMIT( 0 );
 
 			// Get list of the IDs we need:
-			$user_IDs = $DB->get_col( $step1_SQL->get(), 0, 'UserList::Query() Step 1: Get ID list' );
+			$user_IDs = $DB->get_col( $step1_SQL );
 			// Update filter with user IDs
 			$this->filters['users'] = $user_IDs;
 			$this->save_filterset();

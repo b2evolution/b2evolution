@@ -73,11 +73,11 @@ if( $edited_Poll->ID > 0 )
 {	// Display the answers table only when poll question is already exist in DB:
 
 	// Get an options count of the edited poll which has at least one answer:
-	$count_SQL = new SQL();
+	$count_SQL = new SQL( 'Get an options count of the edited poll which has at least one answer' );
 	$count_SQL->SELECT( 'COUNT( pans_ID )' );
 	$count_SQL->FROM( 'T_polls__answer' );
 	$count_SQL->WHERE( 'pans_pqst_ID = '.$edited_Poll->ID );
-	$poll_options_count = $DB->get_var( $count_SQL->get(), 0, NULL, 'Get an options count of the edited poll which has at least one answer' );
+	$poll_options_count = $DB->get_var( $count_SQL );
 	if( $poll_options_count == 0 )
 	{	// To don't devide by zero
 		$poll_options_count = 1;

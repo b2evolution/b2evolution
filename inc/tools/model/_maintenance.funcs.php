@@ -408,12 +408,12 @@ function dbm_delete_broken_posts()
 	if( ! empty( $post_IDs ) )
 	{
 		// select broken items
-		$SQL = new SQL();
+		$SQL = new SQL( 'Find broken posts' );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_items__item' );
 		$SQL->WHERE( 'post_main_cat_ID NOT IN ( SELECT cat_ID FROM T_categories )' );
 		$SQL->WHERE_and( 'post_ID IN ( '.$post_IDs.' )' );
-		$broken_items = $DB->get_results( $SQL->get(), OBJECT, 'Find broken posts' );
+		$broken_items = $DB->get_results( $SQL );
 
 		foreach( $broken_items as $r => $row )
 		{ // delete broken items
@@ -639,10 +639,10 @@ function dbm_delete_orphan_file_roots()
 	evo_flush();
 
 	// Get logins of all existing users
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get logins of all existing users' );
 	$SQL->SELECT( 'user_login' );
 	$SQL->FROM( 'T_users' );
-	$user_logins = $DB->get_col( $SQL->get() );
+	$user_logins = $DB->get_col( $SQL );
 
 	$media_path_users = $media_path.'users/';
 

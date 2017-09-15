@@ -229,7 +229,7 @@ class basic_antispam_plugin extends Plugin
 			$SQL->WHERE( 'comment_author_IP = '.$DB->quote( $Hit->IP ) );
 			$SQL->WHERE_or( 'comment_author_email = '.$DB->quote( $params['Comment']->get_author_email() ) );
 
-			if( $last_comment_time = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
+			if( $last_comment_time = $DB->get_var( $SQL ) )
 			{	// If last comment is found from current IP or email address:
 				$last_comment_time = mysql2date( 'U', $last_comment_time );
 				$new_comment_time = mysql2date( 'U', date( 'Y-m-d H:i:s', $localtimenow ) );

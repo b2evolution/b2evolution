@@ -437,7 +437,7 @@ class RestApi
 			$SQL->SELECT( '*' );
 			$SQL->FROM( 'T_blogs' );
 			$SQL->ORDER_BY( $sql_order_by );
-			$count_SQL = new SQL();
+			$count_SQL = new SQL( 'Get a count of collections for search request' );
 			$count_SQL->SELECT( 'COUNT( blog_ID )' );
 			$count_SQL->FROM( 'T_blogs' );
 			$count_SQL->ORDER_BY( $sql_order_by );
@@ -514,7 +514,7 @@ class RestApi
 				$count_SQL->WHERE_and( $restrict_available_fileroots_sql );
 			}
 
-			$result_count = intval( $DB->get_var( $count_SQL->get(), 0, NULL, 'Get a count of collections for search request' ) );
+			$result_count = intval( $DB->get_var( $count_SQL ) );
 		}
 
 		// Prepare pagination:

@@ -543,7 +543,7 @@ class Comment extends DataObject
 		$SQL->FROM( 'T_comments__votes' );
 		$SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $this->ID ) );
 		$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
-		$existing_vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+		$existing_vote = $DB->get_row( $SQL );
 
 		if( $existing_vote === NULL )
 		{	// Add a new vote for first time:
@@ -624,7 +624,7 @@ class Comment extends DataObject
 			$SQL->FROM( 'T_comments__votes' );
 			$SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $this->ID ) );
 			$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
-			$cache_comments_vote_statuses[ $this->ID ] = $DB->get_row( $SQL->get(), ARRAY_A, NULL, $SQL->title );
+			$cache_comments_vote_statuses[ $this->ID ] = $DB->get_row( $SQL, ARRAY_A );
 		}
 
 		if( isset( $cache_comments_vote_statuses[ $this->ID ][ $type ] ) )
@@ -2612,7 +2612,7 @@ class Comment extends DataObject
 				{ // only do the prefetch loading once.
 					$CommentPrerenderingCache[$format] = array();
 
-					$SQL = new SQL();
+					$SQL = new SQL( 'Preload prerendered comments content ('.$format.')' );
 					$SQL->SELECT( 'cmpr_cmt_ID, cmpr_format, cmpr_renderers, cmpr_content_prerendered' );
 					$SQL->FROM( 'T_comments__prerendering' );
 					if( empty( $CommentList ) )
@@ -2629,7 +2629,7 @@ class Comment extends DataObject
 						}
 					}
 					$SQL->WHERE_and( 'cmpr_format = '.$DB->quote( $format ) );
-					$rows = $DB->get_results( $SQL->get(), OBJECT, 'Preload prerendered comments content ('.$format.')' );
+					$rows = $DB->get_results( $SQL );
 					foreach($rows as $row)
 					{
 						$row_cache_key = $row->cmpr_format.'/'.$row->cmpr_renderers;
@@ -3916,7 +3916,7 @@ class Comment extends DataObject
 			$meta_SQL->WHERE_and( $users_with_item_edit_perms );
 
 			// Select users which have permission to the edited_Item meta comments and would like to recieve notifications:
-			$notify_users = $DB->get_assoc( $meta_SQL->get(), $meta_SQL->title );
+			$notify_users = $DB->get_assoc( $meta_SQL );
 		}
 
 		if( $executed_by_userid !== NULL && isset( $notify_users[ $executed_by_userid ] ) )

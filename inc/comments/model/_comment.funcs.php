@@ -561,7 +561,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 		{
 			$SQL->WHERE_and( 'cat_blog_ID = '.$DB->quote( $blog ) );
 		}
-		$show_recycle_bin = ( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) > 0 );
+		$show_recycle_bin = ( $DB->get_var( $SQL ) > 0 );
 	}
 
 	$result = $params['before'];

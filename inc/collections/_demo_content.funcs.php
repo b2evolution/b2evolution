@@ -486,10 +486,10 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 	// Check if our sample organization already exists
 	$demo_org_ID = NULL;
 	$OrganizationCache = & get_OrganizationCache();
-	$SQL = $OrganizationCache->get_SQL_object();
+	$SQL = $OrganizationCache->get_SQL_object( 'Check if our sample organization already exists' );
 	$SQL->WHERE_and( 'org_name = '.$DB->quote( $org_name ) );
 
-	$db_row = $DB->get_row( $SQL->get() );
+	$db_row = $DB->get_row( $SQL );
 	if( $db_row )
 	{
 		$demo_org_ID = $db_row->org_ID;

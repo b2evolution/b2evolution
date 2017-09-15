@@ -183,13 +183,13 @@ class Message extends DataObject
 				global $DB, $current_User;
 
 				// Get last message of current user in this thread
-				$SQL = new SQL();
+				$SQL = new SQL( 'Get last message of current user in thread #'.$this->Thread->ID );
 				$SQL->SELECT( 'msg_text' );
 				$SQL->FROM( 'T_messaging__message' );
 				$SQL->WHERE( 'msg_thread_ID = '.$this->Thread->ID );
 				$SQL->WHERE_and( 'msg_author_user_ID = '.$current_User->ID );
 				$SQL->ORDER_BY( 'msg_ID DESC' );
-				$last_message = $DB->get_var( $SQL->get() );
+				$last_message = $DB->get_var( $SQL );
 
 				if( $last_message == $msg_text )
 				{

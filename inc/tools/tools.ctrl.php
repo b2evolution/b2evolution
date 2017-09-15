@@ -526,10 +526,10 @@ if( empty( $tab ) )
 
 		case 'show_create_messages':
 			// Get count users
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get a count of all users' );
 			$SQL->SELECT( 'COUNT( user_ID )' );
 			$SQL->FROM( 'T_users' );
-			$users_count = $DB->get_var( $SQL->get() );
+			$users_count = $DB->get_var( $SQL );
 			$threads_count = $users_count * $users_count - $users_count + 1;
 
 			$AdminUI->disp_view( 'tools/views/_create_messages.form.php' );
