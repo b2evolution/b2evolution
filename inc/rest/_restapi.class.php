@@ -1254,6 +1254,9 @@ class RestApi
 		// Get param to limit number users per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
 
+		// Get user list params:
+		$api_list_params = param( 'list_params', 'array:string', array() );
+
 		// Alias for filter param 'keywords':
 		$api_q = param( 'q', 'string', NULL );
 		if( $api_q !== NULL )
@@ -1263,8 +1266,7 @@ class RestApi
 
 		// Create result set:
 		load_class( 'users/model/_userlist.class.php', 'UserList' );
-		$UserList = new UserList( 'api_', $api_per_page, '' );
-
+		$UserList = new UserList( 'api_', $api_per_page, '', $api_list_params );
 		$UserList->load_from_Request();
 
 		if( ! empty( $user_filters ) )

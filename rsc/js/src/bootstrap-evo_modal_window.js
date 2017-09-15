@@ -17,8 +17,9 @@ var modal_window_js_initialized = false;
  * @param boolean FALSE by default, TRUE - to don't remove bootstrap panels
  * @param boolean TRUE - to clear all previous windows
  * @param string ID of iframe where all contents
+ * @param function Event handler when dialog is shown
  */
-function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels, iframe_id )
+function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels, iframe_id, on_shown_handler )
 {
 	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
 	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
@@ -104,6 +105,11 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 	else
 	{
 		prepareModalWindow( '#modal_window', button_form, use_buttons, keep_panels );
+	}
+
+	if( on_shown_handler && typeof( on_shown_handler ) == 'function' )
+	{
+		jQuery( '#modal_window' ).on( 'shown.bs.modal', on_shown_handler );
 	}
 
 	// Init modal window and show
