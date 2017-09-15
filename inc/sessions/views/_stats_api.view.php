@@ -97,8 +97,8 @@ $SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type' );
 $sessions_SQL->GROUP_BY( 'hit_date' );
 $sessions_SQL->ORDER_BY( 'hit_date DESC' );
 
-$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
-$sessions = $DB->get_assoc( $sessions_SQL->get(), $SQL->title );
+$res_hits = $DB->get_results( $SQL, ARRAY_A );
+$sessions = $DB->get_assoc( $sessions_SQL );
 
 /*
  * Chart

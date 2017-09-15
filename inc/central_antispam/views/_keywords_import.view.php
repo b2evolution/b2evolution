@@ -31,7 +31,7 @@ $keywords_SQL->FROM( 'T_antispam__keyword' );
 $keywords_SQL->WHERE( 'askw_string NOT IN ( SELECT cakw_keyword FROM T_centralantispam__keyword )' );
 $keywords_SQL->ORDER_BY( 'source_order' );
 $keywords_SQL->GROUP_BY( 'askw_source' );
-$keywords = $DB->get_assoc( $keywords_SQL->get(), $keywords_SQL->title );
+$keywords = $DB->get_assoc( $keywords_SQL );
 
 // Check if at least one keyword exists in Central Antispam:
 $ca_keywords_count = $DB->get_var( 'SELECT cakw_ID FROM T_centralantispam__keyword LIMIT 1', 0, NULL,

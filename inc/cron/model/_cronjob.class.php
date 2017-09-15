@@ -178,7 +178,7 @@ class Cronjob extends DataObject
 			$SQL->SELECT( 'clog_status' );
 			$SQL->FROM( 'T_cron__log' );
 			$SQL->WHERE( 'clog_ctsk_ID = '.$DB->quote( $this->ID ) );
-			$status = $DB->get_var( $SQL->get() );
+			$status = $DB->get_var( $SQL );
 		}
 
 		if( empty( $status ) )

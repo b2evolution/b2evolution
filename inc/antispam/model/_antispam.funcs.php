@@ -491,7 +491,7 @@ function get_ip_ranges( $ip_start, $ip_end, $aipr_ID = 0 )
 	}
 	$SQL->ORDER_BY( 'aipr_IPv4start' );
 
-	return $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+	return $DB->get_results( $SQL );
 }
 
 
@@ -540,13 +540,13 @@ function antispam_block_by_ip()
 	}
 	$condition = '( '.substr( $condition, 4 ).' )';
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get blocked IP ranges' );
 	$SQL->SELECT( 'aipr_ID' );
 	$SQL->FROM( 'T_antispam__iprange' );
 	$SQL->WHERE( $condition );
 	$SQL->WHERE_and( 'aipr_status = \'blocked\'' );
 	$SQL->LIMIT( 1 );
-	$ip_range_ID = $DB->get_var( $SQL->get() );
+	$ip_range_ID = $DB->get_var( $SQL );
 
 	if( !is_null( $ip_range_ID ) )
 	{ // The request from this IP address must be blocked
@@ -772,7 +772,7 @@ function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_
 	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $IP_address_int ) );
 	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $IP_address_int ) );
 	$SQL->WHERE_and( 'aipr_status = \'suspect\'' );
-	$ip_range_ID = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+	$ip_range_ID = $DB->get_row( $SQL );
 
 	if( ! is_null( $ip_range_ID ) )
 	{	// Move the user to suspicious group because current IP address is suspected:
@@ -871,12 +871,12 @@ function antispam_suspect_user_by_country( $country_ID, $user_ID = NULL, $check_
 		$User = $UserCache->get_by_ID( $user_ID, false, false );
 	}
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Check suspected country with ID #'.$country_ID );
 	$SQL->SELECT( 'ctry_ID' );
 	$SQL->FROM( 'T_regional__country' );
 	$SQL->WHERE( 'ctry_ID = '.$DB->quote( $country_ID ) );
 	$SQL->WHERE_and( 'ctry_status = \'suspect\'' );
-	$country_ID = $DB->get_var( $SQL->get() );
+	$country_ID = $DB->get_var( $SQL );
 
 	if( !is_null( $country_ID ) )
 	{ // Move current user to suspicious group because country is suspected
@@ -1013,7 +1013,7 @@ function antispam_bankruptcy_blogs( $comment_status = NULL )
 	$SQL->GROUP_BY( 'blog_ID' );
 	$SQL->ORDER_BY( 'blog_'.$Settings->get('blogs_order_by').' '.$Settings->get('blogs_order_dir') );
 
-	return $DB->get_results( $SQL->get() );
+	return $DB->get_results( $SQL );
 }
 
 
@@ -1043,7 +1043,7 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 	$items_IDs_SQL->FROM( 'T_postcats' );
 	$items_IDs_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
 	$items_IDs_SQL->WHERE( 'cat_blog_ID IN ( '.$DB->quote( $blog_IDs ).' )' );
-	$items_IDs = $DB->get_col( $items_IDs_SQL->get() );
+	$items_IDs = $DB->get_col( $items_IDs_SQL );
 
 	$comments_IDs_SQL = new SQL( 'Get all comments IDs of selected blogs' );
 	$comments_IDs_SQL->SELECT( 'comment_ID' );

@@ -210,17 +210,17 @@ class Poll extends DataObject
 			global $DB;
 
 			// Get an options count of the edited poll which has at least one answer:
-			$count_SQL = new SQL();
+			$count_SQL = new SQL( 'Get an options count of this poll which has at least one answer' );
 			$count_SQL->SELECT( 'COUNT( pans_ID )' );
 			$count_SQL->FROM( 'T_polls__answer' );
 			$count_SQL->WHERE( 'pans_pqst_ID = '.$this->ID );
-			$poll_options_count = $DB->get_var( $count_SQL->get(), 0, NULL, 'Get an options count of this poll which has at least one answer' );
+			$poll_options_count = $DB->get_var( $count_SQL );
 			if( $poll_options_count == 0 )
 			{	// To don't devide by zero
 				$poll_options_count = 1;
 			}
 
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get all options of this poll' );
 			$SQL->SELECT( 'popt_ID AS ID, popt_pqst_ID AS pqst_ID, popt_option_text AS option_text,' );
 			//$SQL->SELECT_add( 'COUNT( pans_ID ) AS answers_count,' );
 			$SQL->SELECT_add( 'ROUND( COUNT( pans_ID ) / '.$poll_options_count.' * 100 ) AS percent' );
@@ -230,7 +230,7 @@ class Poll extends DataObject
 			$SQL->GROUP_BY( 'popt_ID' );
 			$SQL->ORDER_BY( 'popt_order' );
 
-			$this->poll_options = $DB->get_results( $SQL->get(), OBJECT, 'Get all options of this poll' );
+			$this->poll_options = $DB->get_results( $SQL );
 		}
 
 		return $this->poll_options;
@@ -276,12 +276,12 @@ class Poll extends DataObject
 		global $DB, $current_User;
 
 		// Get answer of current user for this poll:
-		$poll_option_SQL = new SQL();
+		$poll_option_SQL = new SQL( 'Get answer of current user on the poll question' );
 		$poll_option_SQL->SELECT( 'pans_popt_ID' );
 		$poll_option_SQL->FROM( 'T_polls__answer' );
 		$poll_option_SQL->WHERE( 'pans_pqst_ID = '.$this->ID );
 		$poll_option_SQL->WHERE_and( 'pans_user_ID = '.$current_User->ID );
-		$poll_option_ID = $DB->get_var( $poll_option_SQL->get(), 0, NULL, 'Get answer of current user on the poll question' );
+		$poll_option_ID = $DB->get_var( $poll_option_SQL );
 
 		return empty( $poll_option_ID ) ? false : $poll_option_ID;
 	}

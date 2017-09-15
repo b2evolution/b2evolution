@@ -53,7 +53,7 @@ else
 
 echo '<h2 class="page-title">'.$page_title.'</h2>';
 
-$SQL = new SQL();
+$SQL = new SQL( 'Get total hit count - referred hits only' );
 $list_is_filtered = false;
 
 $selected_agnt_types = array();
@@ -91,7 +91,7 @@ if( ! empty( $sec_ID ) )
 if( $tab3 == 'top' )
 { // Calculate the counts only for "top" tab
 	$SQL->SELECT( 'SQL_NO_CACHE COUNT( hit_ID ) AS hit_count' );
-	$total_hit_count = $DB->get_var( $SQL->get(), 0, 0, 'Get total hit count - referred hits only' );
+	$total_hit_count = $DB->get_var( $SQL, 0, 0 );
 
 	$sql_select = ', COUNT( hit_ID ) AS hit_count';
 }

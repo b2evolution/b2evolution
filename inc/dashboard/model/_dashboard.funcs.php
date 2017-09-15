@@ -436,7 +436,7 @@ function get_table_count( $table_name, $sql_where = '', $sql_from = '', $sql_tit
 		$SQL->WHERE( $sql_where );
 	}
 
-	return intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
+	return intval( $DB->get_var( $SQL ) );
 }
 
 

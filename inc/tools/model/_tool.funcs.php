@@ -122,7 +122,7 @@ function tool_create_sample_comments( $blog_ID, $num_comments, $num_posts )
 	$curr_orderdir = $selected_Blog->get_setting('orderdir');
 
 	// find the $num_posts latest posts in blog
-	$SQL = new SQL();
+	$SQL = new SQL( 'Find the '.$num_posts.' latest posts in collection #'.$blog_ID );
 	$SQL->SELECT( 'post_ID' );
 	$SQL->FROM( 'T_items__item' );
 	$SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
@@ -133,7 +133,7 @@ function tool_create_sample_comments( $blog_ID, $num_comments, $num_posts )
 	$SQL->WHERE_and( 'post_ityp_ID IS NULL OR ityp_usage = "post"' );
 	$SQL->ORDER_BY( $curr_orderby.' '.$curr_orderdir.', post_ID '.$curr_orderdir );
 	$SQL->LIMIT( $num_posts );
-	$items_result = $DB->get_results( $SQL->get(), ARRAY_A, 'Find the x latest posts in blog' );
+	$items_result = $DB->get_results( $SQL, ARRAY_A );
 
 	$count = 1;
 	$fix_content = 'This is an auto generated comment for testing the moderation features.
@@ -290,11 +290,11 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 
 	if( $assign_adv_user_perms )
 	{ // Get all collections with advanced perms:
-		$coll_SQL = new SQL();
+		$coll_SQL = new SQL( 'Get all collections with advanced perms for tool "Create sample users"' );
 		$coll_SQL->SELECT( 'blog_ID' );
 		$coll_SQL->FROM( 'T_blogs' );
 		$coll_SQL->WHERE( 'blog_advanced_perms = 1' );
-		$adv_perm_coll_IDs = $DB->get_col( $coll_SQL->get(), 0, 'Get all collections with advanced perms for tool "Create sample users"' );
+		$adv_perm_coll_IDs = $DB->get_col( $coll_SQL );
 	}
 
 	// Load all selected groups in cache:
@@ -501,7 +501,7 @@ function tool_create_sample_basedomains( $num_basedomains )
 	$SQL->SELECT( 'dom_name' );
 	$SQL->FROM( 'T_basedomains' );
 	$SQL->WHERE( 'dom_type = "unknown"' );
-	$basedomains = $DB->get_col( $SQL->get(), 0, $SQL->title );
+	$basedomains = $DB->get_col( $SQL );
 
 	$basedomains_sql_data;
 	for( $i = 0; $i < $num_basedomains; $i++ )
@@ -553,10 +553,10 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 	$DB->log_queries = false;
 
 	// Get all users
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get all users' );
 	$SQL->SELECT( 'user_ID' );
 	$SQL->FROM( 'T_users' );
-	$users = $DB->get_col( $SQL->get() );
+	$users = $DB->get_col( $SQL );
 
 	if( count( $users ) < 2 )
 	{	// No users

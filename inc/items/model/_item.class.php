@@ -1639,12 +1639,12 @@ class Item extends ItemLight
 		if( $this->ID > 0 )
 		{ // The post is saved, so it can actually have attachments:
 			global $DB;
-			$links_SQL = new SQL();
+			$links_SQL = new SQL( 'Get item links IDs of the inline images' );
 			$links_SQL->SELECT( 'link_ID' );
 			$links_SQL->FROM( 'T_links' );
 			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
 			$links_SQL->WHERE_and( 'link_position = "inline"' );
-			$inline_links_IDs = $DB->get_col( $links_SQL->get(), 0, 'Get item links IDs of the inline images' );
+			$inline_links_IDs = $DB->get_col( $links_SQL );
 
 			$unused_inline_images = array();
 			foreach( $inline_images[2] as $i => $inline_link_ID )
@@ -1700,13 +1700,13 @@ class Item extends ItemLight
 		}
 
 		// Get a number of attachments from DB
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get a number of attachments for user #'.$User->ID.' and post #'.$this->ID );
 		$SQL->SELECT( 'COUNT( link_ID )' );
 		$SQL->FROM( 'T_links' );
 		$SQL->FROM_add( 'INNER JOIN T_comments ON comment_ID = link_cmt_ID' );
 		$SQL->WHERE( 'link_creator_user_ID = '.$DB->quote( $User->ID ) );
 		$SQL->WHERE_and( 'comment_item_ID = '.$DB->quote( $this->ID ) );
-		$cache_item_attachments_number[$User->ID] = (int)$DB->get_var( $SQL->get() );
+		$cache_item_attachments_number[$User->ID] = (int)$DB->get_var( $SQL );
 
 		return $cache_item_attachments_number[$User->ID];
 	}
@@ -7855,7 +7855,7 @@ class Item extends ItemLight
 			$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
 		}
 		$SQL->ORDER_BY( 'slug_order_num' );
-		$slugs = $DB->get_col( $SQL->get() );
+		$slugs = $DB->get_col( $SQL );
 
 		return implode( $separator, $slugs );
 	}
@@ -8024,7 +8024,7 @@ class Item extends ItemLight
 			$SQL->ORDER_BY( 'comment_date DESC' );
 			$SQL->LIMIT( '1' );
 
-			if( $comment_ID = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
+			if( $comment_ID = $DB->get_var( $SQL ) )
 			{	// Load the latest Comment in cache:
 				$CommentCache = & get_CommentCache();
 				// WARNING: Do NOT get this object by reference because it may rewrites current updating Comment:
@@ -8061,7 +8061,7 @@ class Item extends ItemLight
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->Blog->ID, 'comment' ), 'comment_', $this->Blog->ID, 'blog_comment!' ) );
 		$SQL->GROUP_BY( 'expiry_status, comment_rating' );
 		$SQL->ORDER_BY( 'comment_rating DESC' );
-		$results = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		$results = $DB->get_results( $SQL );
 
 		// init rating arrays
 		$ratings = array();
@@ -8671,7 +8671,7 @@ class Item extends ItemLight
 			$SQL->FROM( 'T_items__user_data' );
 			$SQL->WHERE( 'itud_user_ID = '.$DB->quote( $current_User->ID ) );
 			$SQL->WHERE_and( 'itud_item_ID = '.$DB->quote( $this->ID ) );
-			$cache_items_user_data[ $this->ID ] = $DB->get_row( $SQL->get(), ARRAY_A, NULL, $SQL->title );
+			$cache_items_user_data[ $this->ID ] = $DB->get_row( $SQL, ARRAY_A );
 		}
 
 		if( isset( $cache_items_user_data[ $this->ID ] ) && is_array( $cache_items_user_data[ $this->ID ] ) &&  empty( $cache_items_user_data[ $this->ID ] ) )
@@ -9039,7 +9039,7 @@ class Item extends ItemLight
 		}
 
 		// Get all possible tags that are not related to this item:
-		$other_tags_SQL = new SQL();
+		$other_tags_SQL = new SQL( 'Get all possible tags that are not related to this item' );
 		$other_tags_SQL->SELECT( 'tag_name' );
 		$other_tags_SQL->FROM( 'T_items__tag' );
 		// Get all current tags to exclude from searching:
@@ -9048,7 +9048,7 @@ class Item extends ItemLight
 		{	// If this item has at least one tag, Exclude them:
 			$other_tags_SQL->WHERE( 'tag_name NOT IN ( '.$DB->quote( $item_tags ).' )' );
 		}
-		$other_tags = $DB->get_col( $other_tags_SQL->get(), 0, 'Get all possible tags that are not related to this item' );
+		$other_tags = $DB->get_col( $other_tags_SQL );
 
 		if( count( $other_tags ) == 0 )
 		{	// No tags for searching, Exit here:
@@ -9468,7 +9468,7 @@ class Item extends ItemLight
 		$SQL->FROM( 'T_items__votes' );
 		$SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $this->ID ) );
 		$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
-		$existing_vote = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+		$existing_vote = $DB->get_var( $SQL );
 
 		if( $existing_vote === NULL )
 		{	// Add a new vote for first time:
@@ -9502,7 +9502,7 @@ class Item extends ItemLight
 		$vote_SQL->FROM( 'T_items__votes' );
 		$vote_SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $this->ID ) );
 		$vote_SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
-		$vote = $DB->get_row( $vote_SQL->get(), OBJECT, NULL, $vote_SQL->title );
+		$vote = $DB->get_row( $vote_SQL );
 
 		// These values must be number and not NULL:
 		$vote->votes_sum = intval( $vote->votes_sum );
@@ -9553,7 +9553,7 @@ class Item extends ItemLight
 		$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
 		$SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
 
-		if( $vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title ) )
+		if( $vote = $DB->get_row( $SQL ) )
 		{	// Get a vote for current user and this item:
 			$result['is_voted'] = true;
 			$class_disabled = 'disabled';

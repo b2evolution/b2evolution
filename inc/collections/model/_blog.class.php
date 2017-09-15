@@ -1548,13 +1548,13 @@ class Blog extends DataObject
 		{
 			if( is_null( $setting ) )
 			{ // just return current favorite status
-				$fav_SQL = new SQL();
+				$fav_SQL = new SQL( 'Check if collection #'.$this->ID.' is a favorite for user #'.$user_ID );
 				$fav_SQL->SELECT( 'COUNT(*)' );
 				$fav_SQL->FROM( 'T_coll_user_favs' );
 				$fav_SQL->WHERE( 'cufv_blog_ID = '.$DB->quote( $this->ID ) );
 				$fav_SQL->WHERE_and( 'cufv_user_ID = '.$DB->quote( $user_ID ) );
 
-				return $DB->get_var( $fav_SQL->get() );
+				return $DB->get_var( $fav_SQL );
 			}
 
 			if( $setting == 1 )
@@ -3063,10 +3063,10 @@ class Blog extends DataObject
 
 		if( $this->get( 'order' ) == 0 )
 		{ // Set an order as max value of previous order + 1 if it is not defined yet
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get max collection order' );
 			$SQL->SELECT( 'MAX( blog_order )' );
 			$SQL->FROM( 'T_blogs' );
-			$max_order = intval( $DB->get_var( $SQL->get() ) );
+			$max_order = intval( $DB->get_var( $SQL ) );
 			$this->set( 'order', $max_order + 1 );
 		}
 
@@ -3274,7 +3274,7 @@ class Blog extends DataObject
 		$source_fields_SQL->SELECT( '*' );
 		$source_fields_SQL->FROM( 'T_blogs' );
 		$source_fields_SQL->WHERE( 'blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_fields = $DB->get_row( $source_fields_SQL->get(), ARRAY_A, NULL, $source_fields_SQL->title );
+		$source_fields = $DB->get_row( $source_fields_SQL, ARRAY_A );
 		// Use field values of duplicated collection by default:
 		foreach( $source_fields as $source_field_name => $source_field_value )
 		{
@@ -3296,7 +3296,7 @@ class Blog extends DataObject
 		$source_settings_SQL->SELECT( 'cset_name, cset_value' );
 		$source_settings_SQL->FROM( 'T_coll_settings' );
 		$source_settings_SQL->WHERE( 'cset_coll_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_settings = $DB->get_assoc( $source_settings_SQL->get(), $source_settings_SQL->title );
+		$source_settings = $DB->get_assoc( $source_settings_SQL );
 		// Use setting values of duplicated collection by default:
 		foreach( $source_settings as $source_setting_name => $source_setting_value )
 		{
@@ -3359,7 +3359,7 @@ class Blog extends DataObject
 		$source_cats_SQL->SELECT( '*' );
 		$source_cats_SQL->FROM( 'T_categories' );
 		$source_cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_cats = $DB->get_results( $source_cats_SQL->get(), ARRAY_A, $source_cats_SQL->title );
+		$source_cats = $DB->get_results( $source_cats_SQL, ARRAY_A );
 		$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
 		$ChapterCache = & get_ChapterCache();
 		foreach( $source_cats as $source_cat_fields )
@@ -3598,13 +3598,13 @@ class Blog extends DataObject
 			}
 
 			// Check if the requested group still exists in DB:
-			$group_SQL = new SQL();
+			$group_SQL = new SQL( 'Check if the requested group still exists in DB' );
 			$group_SQL->SELECT( 'grp_ID' );
 			$group_SQL->FROM( 'T_groups' );
 			$group_SQL->WHERE( 'grp_ID = '.$DB->quote( $group['ID'] ) );
 			$group_SQL->WHERE_and( 'grp_name = '.$DB->quote( $group['name'] ) );
 			$group_SQL->WHERE_and( 'grp_name = '.$DB->quote( T_( $group['name'], $default_locale ) ) );
-			if( ! $DB->get_var( $group_SQL->get() ) )
+			if( ! $DB->get_var( $group_SQL ) )
 			{	// Skip this group because we cannot find it in DB:
 				continue;
 			}
@@ -4612,7 +4612,7 @@ class Blog extends DataObject
 			$SQL->FROM_add( 'INNER JOIN T_items__type ON itc_ityp_ID = ityp_ID' );
 			$SQL->WHERE( 'itc_coll_ID = '.$this->ID );
 
-			$this->enabled_item_types = $DB->get_assoc( $SQL->get(), $SQL->title );
+			$this->enabled_item_types = $DB->get_assoc( $SQL );
 		}
 
 		if( $usage === NULL )
@@ -4833,7 +4833,7 @@ class Blog extends DataObject
 				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
 				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );
 
-			$this->comment_moderator_user_data = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+			$this->comment_moderator_user_data = $DB->get_results( $SQL );
 		}
 
 		return $this->comment_moderator_user_data;
@@ -4978,7 +4978,7 @@ class Blog extends DataObject
 		$posts_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
 		$posts_SQL->WHERE_and( 'post_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
 		$posts_SQL->GROUP_BY( 'post_status' );
-		$posts = $DB->get_assoc( $posts_SQL->get(), $posts_SQL->title );
+		$posts = $DB->get_assoc( $posts_SQL );
 
 		$comments_SQL = new SQL( 'Get how much comments will be updated after new max allowed status of the collection #'.$this->ID );
 		$comments_SQL->SELECT( 'comment_status, COUNT( comment_ID )' );
@@ -4988,7 +4988,7 @@ class Blog extends DataObject
 		$comments_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
 		$comments_SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
 		$comments_SQL->GROUP_BY( 'comment_status' );
-		$comments = $DB->get_assoc( $comments_SQL->get(), $comments_SQL->title );
+		$comments = $DB->get_assoc( $comments_SQL );
 
 		if( empty( $posts ) && empty( $comments ) )
 		{	// All posts and comments have a correct status:
@@ -5061,7 +5061,7 @@ class Blog extends DataObject
 		$ItemList2->query_init();
 
 		// Get a count of the unread topics for current user:
-		$unread_posts_SQL = new SQL();
+		$unread_posts_SQL = new SQL( 'Get a count of the unread topics of collection #'.$this->ID.' for current user' );
 		$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
 		$unread_posts_SQL->FROM( 'T_items__item' );
 		$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__user_data ON post_ID = itud_item_ID AND itud_user_ID = '.$DB->quote( $current_User->ID ) );
@@ -5075,7 +5075,7 @@ class Blog extends DataObject
 		$unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts < post_contents_last_updated_ts' );
 
 		// Execute a query with to know if current user has new data to view:
-		return intval( $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics of collection #'.$this->ID.' for current user' ) );
+		return intval( $DB->get_var( $unread_posts_SQL ) );
 	}
 }
 

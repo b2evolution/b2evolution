@@ -2211,12 +2211,12 @@ function user_exists( $login )
 {
 	global $DB;
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get a count of users with login '.$login );
 	$SQL->SELECT( 'COUNT(*)' );
 	$SQL->FROM( 'T_users' );
-	$SQL->WHERE( 'user_login = "'.$DB->escape($login).'"' );
+	$SQL->WHERE( 'user_login = '.$DB->quote( $login ) );
 
-	$var = $DB->get_var( $SQL->get() );
+	$var = $DB->get_var( $SQL );
 	return $var > 0 ? true : false; // PHP4 compatibility
 }
 
@@ -5980,7 +5980,7 @@ function get_available_sort_options( $coll_ID = NULL, $allow_none = false, $incl
 			$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID' );
 			$SQL->WHERE_and( 'itc_coll_ID = '.$DB->quote( $coll_ID ) );
 		}
-		$custom_fields = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$custom_fields = $DB->get_assoc( $SQL );
 
 		// Add custom fields as available sort options:
 		return array( 'general' => $options, 'custom' => $custom_fields );

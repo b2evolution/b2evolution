@@ -20,12 +20,12 @@ $goal_name = param( 'goal_name', 'string', NULL, true );
 $goal_cat = param( 'goal_cat', 'integer', 0, true );
 
 // Get all goal hits:
-$SQL = new SQL();
+$SQL = new SQL( 'Get hits by day and goal' );
 $SQL->SELECT( 'DATE_FORMAT( hit_datetime, "%Y-%m-%d" ) as day, ghit_goal_ID, COUNT(ghit_ID) as count' );
 $SQL->FROM( 'T_track__goalhit' );
 $SQL->FROM_add( 'INNER JOIN T_hitlog ON ghit_hit_ID = hit_ID' );
 $SQL->GROUP_BY( 'day DESC, ghit_goal_ID' );
-$hitgroup_rows = $DB->get_results( $SQL->get(), OBJECT, 'Get hits by day and goal' );
+$hitgroup_rows = $DB->get_results( $SQL );
 
 $hitgroup_array = array();
 foreach( $hitgroup_rows as $hitgroup_row )
@@ -34,7 +34,7 @@ foreach( $hitgroup_rows as $hitgroup_row )
 }
 
 // Get list of all goals
-$SQL = new SQL();
+$SQL = new SQL( 'Get list of all goals' );
 $SQL->SELECT( 'goal_ID, goal_name, gcat_color' );
 $SQL->FROM( 'T_track__goal' );
 $SQL->FROM_add( 'LEFT JOIN T_track__goalcat ON gcat_ID = goal_gcat_ID' );
@@ -51,7 +51,7 @@ if( ! empty( $goal_cat ) )
 	$SQL->WHERE_and( 'goal_gcat_ID = '.$DB->quote( $goal_cat ) );
 }
 $SQL->ORDER_BY( 'goal_name' );
-$goal_rows = $DB->get_results( $SQL->get(), OBJECT, 'Get list of all goals' );
+$goal_rows = $DB->get_results( $SQL );
 
 // Initialize params to filter by selected collection and/or group:
 $section_params = empty( $blog ) ? '' : '&blog='.$blog;

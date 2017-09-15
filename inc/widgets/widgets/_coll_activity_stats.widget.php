@@ -168,7 +168,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 		$SQL->FROM( 'T_users' );
 		$SQL->WHERE( 'user_created_datetime > '.$DB->quote( $start_date ) );
 		$SQL->GROUP_BY( 'DATE(user_created_datetime)' );
-		$users_registered = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$users_registered = $DB->get_assoc( $SQL );
 
 		// Get posts created
 		$visibility_statuses = get_visibility_statuses( 'raw', array( 'deprecated', 'redirected', 'trash' ) );
@@ -190,7 +190,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 		$SQL->WHERE_and( 'post_datestart <= '.$DB->quote( $end_date ) );
 		$SQL->WHERE_and( 'post_status IN ("'.implode( '","', $filter_inskin_statuses ).'")' );
 		$SQL->GROUP_BY( 'DATE(post_datestart)' );
-		$posts_created = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$posts_created = $DB->get_assoc( $SQL );
 
 		// Get new comments
 		$SQL = new SQL( 'Get count of new comments created per day' );
@@ -203,7 +203,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 		$SQL->WHERE_and( 'comment_date <= '.$DB->quote( $end_date ) );
 		$SQL->WHERE_and( 'comment_status IN ("'.implode( '","', $filter_inskin_statuses ).'")' );
 		$SQL->GROUP_BY( 'DATE(comment_date)' );
-		$comments = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$comments = $DB->get_assoc( $SQL );
 
 
 		for( $i = 0; $i < $num_days; $i++ )

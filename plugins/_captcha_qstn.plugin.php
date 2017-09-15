@@ -170,12 +170,12 @@ class captcha_qstn_plugin extends Plugin
 				$answers = trim( $match[2] );
 				if( !empty( $question ) && !empty( $answers ) )
 				{ // Save this question in DB
-					$SQL = new SQL();
+					$SQL = new SQL( 'Get captcha question' );
 					$SQL->SELECT( 'cptq_ID' );
 					$SQL->FROM( $this->get_sql_table( 'questions' ) );
 					$SQL->WHERE( 'cptq_question = '.$DB->quote( $question ) );
 
-					if( $question_ID = $DB->get_var( $SQL->get() ) )
+					if( $question_ID = $DB->get_var( $SQL ) )
 					{ // This question already exists, we should only update the answers
 						$update_data[ $question_ID ] = $answers;
 					}
@@ -315,13 +315,13 @@ class captcha_qstn_plugin extends Plugin
 
 		if( empty( $this->question_ID ) )
 		{	// Get question from DB by current IP address
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get captcha question from DB by current IP address' );
 			$SQL->SELECT( 'cq.*' );
 			$SQL->FROM( $this->get_sql_table( 'ip_question' ) );
 			$SQL->FROM_add( 'INNER JOIN '.$this->get_sql_table( 'questions' ).' AS cq ON cptip_cptq_ID = cptq_ID' );
 			$SQL->WHERE( 'cptip_IP = '.$DB->quote( $IP ) );
 
-			if( $question = $DB->get_row( $SQL->get() ) )
+			if( $question = $DB->get_row( $SQL ) )
 			{
 				$this->question_ID = $question->cptq_ID;
 			}
@@ -334,11 +334,11 @@ class captcha_qstn_plugin extends Plugin
 
 		if( empty( $question ) && !empty( $this->question_ID ) )
 		{	// Get question data
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get captcha question data by ID' );
 			$SQL->SELECT( '*' );
 			$SQL->FROM( $this->get_sql_table( 'questions' ) );
 			$SQL->WHERE( 'cptq_ID = '.$DB->quote( $this->question_ID ) );
-			$question = $DB->get_row( $SQL->get() );
+			$question = $DB->get_row( $SQL );
 
 			if( empty( $question ) )
 			{	// Assign random question if previous question doesn't exist in DB
@@ -362,12 +362,12 @@ class captcha_qstn_plugin extends Plugin
 		$IP = ip2int( $_SERVER['REMOTE_ADDR'] );
 
 		// Get new random question from DB
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get new random captcha question from DB' );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( $this->get_sql_table( 'questions' ) );
 		$SQL->ORDER_BY( 'RAND()' );
 		$SQL->LIMIT( 1 );
-		$question = $DB->get_row( $SQL->get() );
+		$question = $DB->get_row( $SQL );
 
 		// Insert a record for current IP address with assigned question ID
 		$DB->query( 'INSERT INTO '.$this->get_sql_table( 'ip_question' ).'
@@ -613,11 +613,11 @@ class captcha_qstn_plugin extends Plugin
 	{
 		global $DB;
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Check if captcha questions exist in DB' );
 		$SQL->SELECT( 'cptq_ID' );
 		$SQL->FROM( $this->get_sql_table( 'questions' ) );
 
-		if( ! $DB->get_var( $SQL->get() ) )
+		if( ! $DB->get_var( $SQL ) )
 		{
 			return $this->T_( 'Not Enabled: You should create at least one question!' );
 		}

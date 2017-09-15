@@ -636,12 +636,12 @@ class coll_category_list_Widget extends ComponentWidget
 		global $DB;
 
 		// Try to get all children of the given category
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get all children of category #'.$cat_ID );
 		$SQL->SELECT( 'cat_ID' );
 		$SQL->FROM( 'T_categories' );
 		$SQL->WHERE( 'cat_parent_ID = '.$DB->quote( $cat_ID ) );
 
-		$category_children = $DB->get_col( $SQL->get() );
+		$category_children = $DB->get_col( $SQL );
 
 		foreach( $category_children as $category_child_ID )
 		{

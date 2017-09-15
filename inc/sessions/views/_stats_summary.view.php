@@ -72,7 +72,7 @@ else
 }
 $SQL->GROUP_BY( 'year, month, day, hit_agent_type, hit_type' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC, hit_agent_type, hit_type' );
-$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+$res_hits = $DB->get_results( $SQL, ARRAY_A );
 
 
 /*

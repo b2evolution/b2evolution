@@ -264,11 +264,11 @@ class geoip_plugin extends Plugin
 		global $DB;
 
 		// Get country ID by code
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get country ID by code '.$country_code );
 		$SQL->SELECT( 'ctry_ID' );
 		$SQL->FROM( 'T_regional__country' );
 		$SQL->WHERE( 'ctry_code = '.$DB->quote( strtolower( $country_code ) ) );
-		$country_ID = $DB->get_var( $SQL->get() );
+		$country_ID = $DB->get_var( $SQL );
 
 		if( !$country_ID )
 		{ // No found country in the b2evo DB
@@ -937,7 +937,7 @@ jQuery( document ).ready( function()
 				ON user_ID = uset_user_ID
 			AND uset_name = "created_fromIPv4"' );
 		$SQL->WHERE( 'user_reg_ctry_ID IS NULL' );
-		$users = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$users = $DB->get_assoc( $SQL );
 
 		$total_users = count( $users );
 		if( $total_users == 0 )
@@ -1008,7 +1008,7 @@ jQuery( document ).ready( function()
 		$SQL->WHERE( 'user_ctry_ID IS NULL' );
 		$SQL->ORDER_BY( 'sess_ID DESC' );
 		$SQL->GROUP_BY( 'user_ID' );
-		$users = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		$users = $DB->get_results( $SQL );
 
 		$total_users = count( $users );
 		if( $total_users == 0 )

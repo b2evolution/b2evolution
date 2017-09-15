@@ -4540,7 +4540,7 @@ function load_user_data_for_items( $post_ids = NULL )
 	$SQL->WHERE( 'itud_user_ID = '.$DB->quote( $current_User->ID ) );
 	$SQL->WHERE_and( $post_condition );
 	// Set those post read statuses which were opened before:
-	$data_rows = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+	$data_rows = $DB->get_results( $SQL, ARRAY_A );
 
 	if( empty( $post_ids ) )
 	{	// The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user:
@@ -4584,7 +4584,7 @@ function get_item_numviews( $Item )
 	$SQL->FROM( 'T_items__user_data' );
 	$SQL->WHERE( 'itud_item_ID = '.$Item->ID );
 
-	return $DB->get_var( $SQL->get() );
+	return $DB->get_var( $SQL );
 }
 
 

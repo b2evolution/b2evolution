@@ -901,7 +901,7 @@ class User extends DataObject
 					$SQL->FROM( 'T_users__fields' );
 					$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
 					$SQL->WHERE( 'uf_user_ID = '.$user_id );
-					$copied_userfields = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+					$copied_userfields = $DB->get_results( $SQL );
 					foreach( $copied_userfields as $copied_userfield )
 					{
 						$uf_val = param( 'uf_'.$copied_userfield->uf_ID, 'raw' );
@@ -2009,7 +2009,7 @@ class User extends DataObject
 			$SQL->WHERE( 'comment_author_user_ID = '.$this->ID );
 			$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback" )' );
 			$SQL->GROUP_BY( 'comment_status' );
-			$this->_num_comments = $DB->get_assoc( $SQL->get() );
+			$this->_num_comments = $DB->get_assoc( $SQL );
 
 			// Calc number of comments with all statuses
 			$total_num_comments = 0;
@@ -2119,7 +2119,7 @@ class User extends DataObject
 
 		if( $type == 'received' )
 		{	// Get a count of messages received
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get a count of messages received' );
 			$SQL->SELECT( 'COUNT( msg_ID )' );
 			$SQL->FROM( 'T_messaging__threadstatus' );
 			$SQL->FROM_add( 'LEFT JOIN T_messaging__message ON tsta_thread_ID = msg_thread_ID' );
@@ -2128,13 +2128,13 @@ class User extends DataObject
 		}
 		else
 		{	// Get a count of messages sent
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get a count of messages sent' );
 			$SQL->SELECT( 'COUNT( msg_ID )' );
 			$SQL->FROM( 'T_messaging__message' );
 			$SQL->WHERE( 'msg_author_user_ID = '.$DB->quote( $this->ID ) );
 		}
 
-		return $DB->get_var( $SQL->get() );
+		return $DB->get_var( $SQL );
 	}
 
 
@@ -2513,13 +2513,13 @@ class User extends DataObject
 
 			$email_domain = $ematch[1];
 
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get email domain' );
 			$SQL->SELECT( 'dom_ID' );
 			$SQL->FROM( 'T_basedomains' );
 			$SQL->WHERE( 'dom_type = \'email\'' );
 			$SQL->WHERE_and( 'dom_name = '.$DB->quote( $email_domain ) );
 
-			$dom_ID = $DB->get_var( $SQL->get() );
+			$dom_ID = $DB->get_var( $SQL );
 			if( !$dom_ID )
 			{	// The email domains doesn't exist yet, Insert new record
 				$DB->query( 'INSERT INTO T_basedomains ( dom_type, dom_name )
@@ -3506,7 +3506,7 @@ class User extends DataObject
 		}
 
 		// Count blog ids where this user has the required permissions for the given role
-		$SQL = new SQL();
+		$SQL = new SQL( 'Check user role in all collections' );
 		$SQL->SELECT( 'COUNT( DISTINCT blog_ID )' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND blog_ID = bloguser_blog_ID AND bloguser_user_ID = '.$this->ID.' )' );
@@ -3518,7 +3518,7 @@ class User extends DataObject
 		$SQL->WHERE( 'blog_owner_user_ID = '.$this->ID );
 		$SQL->WHERE_or( $where_clause );
 
-		return $DB->get_var( $SQL->get(), 0, NULL, 'Check user role in all blogs' );
+		return $DB->get_var( $SQL );
 	}
 
 
@@ -3563,7 +3563,7 @@ class User extends DataObject
 			$check_owner_SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
 			$check_owner_SQL->LIMIT( '1' );
 
-			$this->is_collection_owner = ($DB->get_var( $check_owner_SQL->get(), 0, NULL, $check_owner_SQL->title ) ? true : false);
+			$this->is_collection_owner = ($DB->get_var( $check_owner_SQL ) ? true : false);
 		}
 
 		return $this->is_collection_owner;
@@ -5880,12 +5880,12 @@ class User extends DataObject
 		global $DB;
 
 		// Get the comments of the user
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get the comments of user #'.$this->ID );
 		$SQL->SELECT( 'comment_ID' );
 		$SQL->FROM( 'T_comments' );
 		$SQL->WHERE( 'comment_author_user_ID = '.$DB->quote( $this->ID ) );
 
-		return $DB->get_col( $SQL->get() );
+		return $DB->get_col( $SQL );
 	}
 
 
@@ -6863,12 +6863,12 @@ class User extends DataObject
 	{
 		global $DB;
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get a count of own collections of user #'.$this->ID );
 		$SQL->SELECT( 'COUNT( blog_ID )' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
 
-		return $DB->get_var( $SQL->get() );
+		return $DB->get_var( $SQL );
 	}
 
 

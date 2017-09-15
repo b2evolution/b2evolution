@@ -1522,10 +1522,10 @@ function locale_insert_default()
 
 	if( ! empty( $activate_locales ) )
 	{ // Insert locales into DB
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get locales' );
 		$SQL->SELECT( 'loc_locale' );
 		$SQL->FROM( 'T_locales' );
-		$existing_locales = $DB->get_col( $SQL->get() );
+		$existing_locales = $DB->get_col( $SQL );
 
 		$insert_data = array();
 		foreach( $activate_locales as $a_locale )
@@ -1645,11 +1645,11 @@ function locale_check_default()
 	}
 
 	// Get a row of current default locale in order to check if it is enabled:
-	$SQL = new SQL();
+	$SQL = new SQL( 'Check if current default locale is enabled' );
 	$SQL->SELECT( 'loc_enabled' );
 	$SQL->FROM( 'T_locales' );
 	$SQL->WHERE( 'loc_locale = '.$DB->quote( $current_default_locale ) );
-	$current_default_locale_enabled = $DB->get_var( $SQL->get() );
+	$current_default_locale_enabled = $DB->get_var( $SQL );
 
 	if( $current_default_locale_enabled !== NULL )
 	{	// Current default locale exists in DB

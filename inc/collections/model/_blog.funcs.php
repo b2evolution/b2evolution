@@ -985,7 +985,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	}
 
 	// Build query to get the tags:
-	$tags_SQL = new SQL();
+	$tags_SQL = new SQL( 'Get tags' );
 
 	if( $blog_ids != '*' || $get_cat_blog_ID )
 	{
@@ -1034,7 +1034,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 		$tags_SQL->LIMIT( $limit );
 	}
 
-	return $DB->get_results( $tags_SQL->get(), OBJECT, 'Get tags' );
+	return $DB->get_results( $tags_SQL );
 }
 
 

@@ -810,13 +810,26 @@ class DB
 	/**
 	 * Basic Query
 	 *
-	 * @param string SQL query
-	 * @param string title for debugging
+	 * @param string|object SQL query string or SQL object
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return mixed # of rows affected or false if error
 	 */
-	function query( $query, $title = '' )
+	function query( $query_SQL, $title = '' )
 	{
 		global $Timer;
+
+		if( $query_SQL instanceof SQL )
+		{	// Get SQL query string from provided object:
+			$query = $query_SQL->get();
+			if( empty( $title ) && $query_SQL->title !== NULL )
+			{	// Use title from SQL object if given function param is not provided:
+				$title = $query_SQL->title;
+			}
+		}
+		else
+		{	// Use SQL query from given function param because it is already a string:
+			$query = $query_SQL;
+		}
 
 		// initialise return
 		$return_val = 0;
@@ -1016,18 +1029,18 @@ class DB
 	 * Note: To be sure that you received NULL from the DB and not "no rows" check
 	 *       for {@link $num_rows}.
 	 *
-	 * @param string Optional query to execute
+	 * @param string|object|NULL Optional SQL query string or SQL object to execute (or NULL for previous query)
 	 * @param integer Column number (starting at and defaulting to 0)
 	 * @param integer Row (defaults to NULL for "next"/"do not seek")
-	 * @param string Optional title of query
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return mixed NULL if not found, the value otherwise (which may also be NULL).
 	 */
-	function get_var( $query = NULL, $x = 0, $y = NULL, $title = '' )
+	function get_var( $query_SQL = NULL, $x = 0, $y = NULL, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
-		if( $query )
+		if( $query_SQL )
 		{
-			$this->query($query, $title);
+			$this->query( $query_SQL, $title );
 		}
 
 		if( $this->num_rows
@@ -1048,22 +1061,22 @@ class DB
 	/**
 	 * Get one row from the DB.
 	 *
-	 * @param string Query (or NULL for previous query)
-	 * @param string Output type ("OBJECT", "ARRAY_A", "ARRAY_N")
+	 * @param string|object|NULL Optional SQL query string or SQL object to execute (or NULL for previous query)
+	 * @param string Output type (OBJECT, ARRAY_A, ARRAY_N)
 	 * @param int Row to fetch (or NULL for next - useful with $query=NULL)
-	 * @param string Optional title for $query (if any)
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return mixed
 	 */
-	function get_row( $query = NULL, $output = OBJECT, $y = NULL, $title = '' )
+	function get_row( $query_SQL = NULL, $output = OBJECT, $y = NULL, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
-		if( $query )
+		if( $query_SQL )
 		{
-			$this->query($query, $title);
+			$this->query( $query_SQL, $title );
 		}
 
 		if( ! $this->num_rows
-			|| ( isset($y) && ! $this->result->data_seek( $y) ) )
+			|| ( isset( $y ) && ! $this->result->data_seek( $y ) ) )
 		{
 			if( $output == OBJECT )
 				return NULL;
@@ -1094,14 +1107,17 @@ class DB
 	 * Function to get 1 column from the cached result set based on X index
 	 * see docs for usage and info
 	 *
+	 * @param string|object|NULL Optional SQL query string or SQL object to execute (or NULL for previous query)
+	 * @param integer Column number
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return array
 	 */
-	function get_col( $query = NULL, $x = 0, $title = '' )
+	function get_col( $query_SQL = NULL, $x = 0, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
-		if( $query )
+		if( $query_SQL )
 		{
-			$this->query( $query, $title );
+			$this->query( $query_SQL, $title );
 		}
 
 		// Extract the column values
@@ -1118,14 +1134,16 @@ class DB
 	/**
 	 * Function to get the second column from the cached result indexed by the first column
 	 *
+	 * @param string|object|NULL Optional SQL query string or SQL object to execute (or NULL for previous query)
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return array [col_0] => col_1
 	 */
-	function get_assoc( $query = NULL, $title = '' )
+	function get_assoc( $query_SQL = NULL, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
-		if( $query )
+		if( $query_SQL )
 		{
-			$this->query( $query, $title );
+			$this->query( $query_SQL, $title );
 		}
 
 		// Extract the column values
@@ -1144,14 +1162,17 @@ class DB
 	/**
 	 * Return the the query as a result set - see docs for more details
 	 *
+	 * @param string|object|NULL Optional SQL query string or SQL object to execute (or NULL for previous query)
+	 * @param string Output type (OBJECT, ARRAY_A, ARRAY_N)
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return mixed
 	 */
-	function get_results( $query = NULL, $output = OBJECT, $title = '' )
+	function get_results( $query_SQL = NULL, $output = OBJECT, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
-		if( $query )
+		if( $query_SQL )
 		{
-			$this->query($query, $title);
+			$this->query( $query_SQL, $title );
 		}
 
 		$r = array();

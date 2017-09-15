@@ -2374,7 +2374,7 @@ function check_coll_first_perm( $perm_name, $target_type, $target_ID )
 	$SQL->WHERE_and( $field_perm_name.' = 1' );
 	$SQL->LIMIT( 1 );
 
-	return (bool)$DB->get_var( $SQL->get(), 0 , NULL, $SQL->title );
+	return (bool)$DB->get_var( $SQL );
 }
 
 
@@ -3712,7 +3712,7 @@ function get_report_from( $user_ID )
 
 
 /**
- * Get an array of user IDs who reported for goven user
+ * Get an array of user IDs who reported for given user
  *
  * @param integer User ID
  * @return array
@@ -3721,12 +3721,12 @@ function get_user_reported_user_IDs( $user_ID )
 {
 	global $DB;
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get an array of user IDs who reported for user #'.$user_ID );
 	$SQL->SELECT( 'DISTINCT( urep_reporter_ID )' );
 	$SQL->FROM( 'T_users__reports' );
 	$SQL->WHERE( 'urep_target_user_ID = '.$DB->quote( $user_ID ) );
 
-	return $DB->get_col( $SQL->get() );
+	return $DB->get_col( $SQL );
 }
 
 
@@ -4033,7 +4033,7 @@ function display_voting_form( $params = array() )
 			$SQL->FROM( 'T_links__vote' );
 			$SQL->WHERE( 'lvot_link_ID = '.$DB->quote( $params['vote_ID'] ) );
 			$SQL->WHERE_and( 'lvot_user_ID = '.$DB->quote( $current_User->ID ) );
-			$vote = $DB->get_row( $SQL->get() );
+			$vote = $DB->get_row( $SQL );
 
 			$params_spam['class'] = 'cboxCheckbox';
 
@@ -4045,7 +4045,7 @@ function display_voting_form( $params = array() )
 				$SQL->FROM( 'T_links__vote' );
 				$SQL->WHERE( 'lvot_link_ID = '.$DB->quote( $params['vote_ID'] ) );
 				$SQL->WHERE_and( 'lvot_like = "1" OR lvot_like = "-1"' );
-				$number_votes = $DB->get_row( $SQL->get() );
+				$number_votes = $DB->get_row( $SQL );
 
 				$num_likes = intval( $number_votes->num_likes );
 				$num_dislikes = intval( $number_votes->num_dislikes );
@@ -4094,7 +4094,7 @@ function display_voting_form( $params = array() )
 
 		case 'comment':
 			// Comment
-			$SQL = new SQL();
+			$SQL = new SQL( 'Check if current User already voted on comment #'.$params['vote_ID'] );
 			$SQL->SELECT( 'cmvt_helpful AS result' );
 			$SQL->FROM( 'T_comments__votes' );
 			$SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $params['vote_ID'] ) );
@@ -4106,13 +4106,13 @@ function display_voting_form( $params = array() )
 
 		case 'item':
 			// Item
-			$SQL = new SQL();
+			$SQL = new SQL( 'Check if current User already voted on Item #'.$params['vote_ID'] );
 			$SQL->SELECT( 'itvt_updown AS result' );
 			$SQL->FROM( 'T_items__votes' );
 			$SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $params['vote_ID'] ) );
 			$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
 			$SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
-			$vote = $DB->get_row( $SQL->get() );
+			$vote = $DB->get_row( $SQL );
 
 			break;
 	}
@@ -4709,12 +4709,12 @@ function check_invitation_code( $invitation_name = 'invitation' )
 		{ // Check invitation code in DB
 			global $DB, $localtimenow;
 
-			$SQL = new SQL();
+			$SQL = new SQL( 'Check invitation code' );
 			$SQL->SELECT( 'ivc_ID' );
 			$SQL->FROM( 'T_users__invitation_code' );
 			$SQL->WHERE( 'ivc_code = '.$DB->quote( $invitation ) );
 			$SQL->WHERE_and( 'ivc_expire_ts > '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ) );
-			$invitation_ID = $DB->get_var( $SQL->get() );
+			$invitation_ID = $DB->get_var( $SQL );
 			if( is_null( $invitation_ID ) )
 			{ // Invitation code doesn't exist in DB or it is expired
 				param_error( $invitation_name, T_('Invitation code is incorrect!') );
