@@ -122,7 +122,7 @@ $Form->begin_form( 'fform' );
 				'target' => $mode == 'customizer' ? '_top' : '',
 		) );
 	$link_reset_params = '';
-	$fieldset_title_links = '<span class="floatright panel_heading_action_icons">&nbsp;'.$link_select_skin;
+	$fieldset_title_links = '<span class="panel_heading_action_icons pull-right">'.$link_select_skin;
 
 	if( $skin_ID && $current_User->check_perm( 'options', 'view' ) )
 	{	// Display "Reset params" button only when skin ID has a real value ( when $skin_ID = 0 means it must be the same as the normal skin value ):
@@ -136,7 +136,7 @@ $Form->begin_form( 'fform' );
 			) );
 		$fieldset_title_links .= $link_reset_params;
 	}
-	$fieldset_title_links .= '</span>';
+	$fieldset_title_links .= '</span><div class="clearfix"></div>';
 	display_skin_fieldset( $Form, $skin_ID, array( 'fieldset_title' => $fieldset_title, 'fieldset_links' => $fieldset_title_links ) );
 
 $buttons = array();

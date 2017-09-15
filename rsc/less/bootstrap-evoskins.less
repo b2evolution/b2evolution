@@ -609,6 +609,12 @@ select:focus:invalid:focus {
 
 // Panels
 .panel-heading {
+	padding-top: 0;
+	padding-bottom: 0;
+	line-height: 36px;
+	.panel-title {
+		line-height: 36px;
+	}
 	h4 {
 		margin: 0;
 	}
@@ -620,21 +626,18 @@ select:focus:invalid:focus {
 		margin-left: 6px;
 	}
 	.panel_heading_action_icons {
-		display: inline-block;
-		margin-top: -6px;
-		margin-bottom: -9px;
 		.btn {
-			margin: 0 3px 3px 0;
+			margin: 0 3px 2px 0;
 		}
-		.btn:last-child {
-			margin: 0 0 3px 0;
+		.btn:last-child, .btn-group .btn {
+			margin-right: 0;
 		}
 		.btn-group {
 			margin: 0 6px 0 0;
-			.btn {
-				margin: 0 0 3px 0;
-			}
 		}
+	}
+	img.avatar_before_login {
+		vertical-align: middle;
 	}
 }
 legend.panel-heading {
