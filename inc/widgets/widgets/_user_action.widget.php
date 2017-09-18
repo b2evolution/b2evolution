@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class user_action_Widget extends ComponentWidget
 {
+	var $icon = 'user-plus';
+
 	/**
 	 * Constructor
 	 */

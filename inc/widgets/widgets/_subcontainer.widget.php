@@ -34,6 +34,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class subcontainer_Widget extends ComponentWidget
 {
+	var $icon = 'cubes';
+
 	/**
 	 * Constructor
 	 */

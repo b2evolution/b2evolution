@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class user_fields_Widget extends ComponentWidget
 {
+	var $icon = 'vcard';
+
 	/**
 	 * Constructor
 	 */

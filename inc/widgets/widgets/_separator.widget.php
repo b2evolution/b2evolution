@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class separator_Widget extends ComponentWidget
 {
+	var $icon = 'arrows-h';
+
 	/**
 	 * Constructor
 	 */

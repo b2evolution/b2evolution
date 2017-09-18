@@ -25,6 +25,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class user_profile_pics_Widget extends ComponentWidget
 {
+	var $icon = 'user-circle';
+
 	/**
 	 * Constructor
 	 */
