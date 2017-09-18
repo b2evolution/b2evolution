@@ -351,6 +351,10 @@ switch( $action )
 		param( 'notification_logo_file_ID', 'integer', NULL );
 		$Settings->set( 'notification_logo_file_ID', get_param( 'notification_logo_file_ID' ) );
 
+		// Social media boilerplate logo
+		param( 'social_media_image_file_ID', 'integer', NULL );
+		$Settings->set( 'social_media_image_file_ID', get_param( 'social_media_image_file_ID' ) );
+
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );
 
