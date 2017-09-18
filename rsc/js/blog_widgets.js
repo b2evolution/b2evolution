@@ -52,27 +52,6 @@ jQuery(document).ready( function()
 	// Make widget rows drag and drop:
 	makeDragnDrop( '.draggable_widget' );
 
-	if( jQuery( '#current_widgets' ).length == 0 )
-	{	// Initialize widgets list only if we really are there:
-		return;
-	}
-
-	// grab some constants -- fp> TODO: this is flawed. Fails when starting with an empty blog having ZERO widgets. Init that in .php
-	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
-	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
-	//get crumb url from delete url and then add it in toggleWidget
-	crumb_url = jQuery( '.delete_icon_hook' ).find( 'a' ).attr('href');
-	if( typeof( crumb_url ) != 'undefined' )
-	{
-		crumb_url = crumb_url.match(/crumb_.*?$/);
-	}
-	// Modify the current widgets screen
-	// remove the "no widgets yet" placeholder:
-	jQuery( ".new_widget" ).parent().parent().remove();
-	// get rid of the odd/even classes and add our own class:
-	jQuery( ".odd" ).addClass( "widget_row" ).removeClass( ".odd" );
-	jQuery( ".even" ).addClass( "widget_row" ).removeClass( ".even" );
-
 	// make container title droppable -- fp> This works but gives no visual feedback. It would actually be cool to drop 'after' the current line in which case dropping on the title would make sense
 	jQuery( '.fieldset_title' ).each( function()
 	{
@@ -377,7 +356,7 @@ function deleteWidget( widget )
 function editWidget( widget )
 {
 	jQuery( '#server_messages' ).html( '' );
-	msg = "wi_ID="+widget.substr( 6, widget.length ) + '&' + crumb_url;
+	msg = "wi_ID="+widget.substr( 6, widget.length ) + '&' + widget_crumb_url_param;
 	SendAdminRequest( "widgets", "edit", msg, true );
 	return false;
 }
