@@ -571,7 +571,7 @@ class CommentQuery extends SQL
 		}
 
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 		if( $current_User->ID == $Blog->get( 'owner_user_ID' ) )
 		{ // User is the blog owner, so has permission on edit/moderate each comment
 			return;
@@ -583,14 +583,16 @@ class CommentQuery extends SQL
 			return;
 		}
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get comment edit permissions for current User' );
 		$SQL->SELECT( 'IF( IFNULL( bloguser_perm_edit_cmt + 0, 0 ) > IFNULL( bloggroup_perm_edit_cmt + 0, 0 ), bloguser_perm_edit_cmt, bloggroup_perm_edit_cmt ) as perm_edit_cmt' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON bloguser_blog_ID = blog_ID AND bloguser_user_ID = '.$current_User->ID );
-		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_blog_ID = blog_ID AND bloggroup_group_ID = '.$current_User->grp_ID );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_blog_ID = blog_ID
+			AND ( bloggroup_group_ID = '.$current_User->grp_ID.'
+			      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) )' );
 		$SQL->WHERE( 'blog_ID = '.$blog_ID );
 
-		$perm_edit_cmt = $DB->get_var( $SQL->get() );
+		$perm_edit_cmt = $DB->get_var( $SQL );
 		$user_level = $current_User->level;
 		$condition = '';
 

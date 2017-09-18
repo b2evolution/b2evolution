@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class user_links_Widget extends ComponentWidget
 {
+	var $icon = 'users';
+
 	/**
 	 * Constructor
 	 */
@@ -50,7 +52,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('User links');
+		return T_('User Social Links');
 	}
 
 
@@ -68,7 +70,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display user links.');
+		return T_('Display social links for a specific User.');
 	}
 
 
@@ -118,7 +120,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $DB, $Item, $Blog;
+		global $DB, $Item, $Collection, $Blog;
 
 		$this->init_display( $params );
 
@@ -161,7 +163,8 @@ class user_links_Widget extends ComponentWidget
 		}
 
 		if( empty( $r ) )
-		{ // Nothing to display
+		{	// Nothing to display
+			$this->display_debug_message();
 			return true;
 		}
 
@@ -212,7 +215,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$cache_keys = array(
 				'wi_ID'       => $this->ID, // Have the widget settings changed ?

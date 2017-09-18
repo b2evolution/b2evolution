@@ -68,9 +68,12 @@ $params = array_merge( array(
 				// This will enclose the title of each widget:
 				'block_title_start' => '<h3>',
 				'block_title_end' => '</h3>',
+				// Template params for "Item Link" widget
+				'widget_item_link_before'    => '<p class="evo_post_link">',
+				'widget_item_link_after'     => '</p>',
 				// Template params for "Item Tags" widget
-				'widget_item_tags_before'    => '<div class="bText"><p>'.T_('Tags').': ',
-				'widget_item_tags_after'     => '</p></div>',
+				'widget_item_tags_before'    => '<nav class="small post_tags">',
+				'widget_item_tags_after'     => '</nav>',
 				// Params for skin file "_item_content.inc.php"
 				'widget_item_content_params' => $params,
 			) );
@@ -85,18 +88,6 @@ $params = array_merge( array(
 			// /skins/_item_content.inc.php file into the current skin folder.
 			// -------------------------- END OF POST CONTENT -------------------------
 		}
-		?>
-
-		<?php
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => '<div class="bSmallPrint">'.T_('Link').': ',
-					'after'         => '</div>',
-					'text_template' => '$url$',
-					'url_template'  => '$url$',
-					'target'        => '',
-					'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-				) );
 		?>
 
 		<div class="item_comments">

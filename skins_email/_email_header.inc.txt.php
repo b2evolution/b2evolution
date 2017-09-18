@@ -18,6 +18,6 @@ $params = array_merge( array(
 
 if( $params['include_greeting'] )
 { // Display the greeting message
-	echo T_( 'Hello $login$!' )."\n\n";
+	echo T_( 'Hello $username$!' )."\n\n";
 }
 ?>

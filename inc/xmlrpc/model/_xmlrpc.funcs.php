@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Usage:
-// $client = new xmlrpc_client( $basesubpath.$xmlsrv_subdir.'xmlrpc.php', $basehost, $baseport );
+// $client = new xmlrpc_client( $basesubpath.$xmlsrv_subdir.'xmlrpc.php', $basehost, substr( $baseport, 1 ) );
 // $client->debug = true;
 
 // Original fix for missing extension file by "Michel Valdrighi" <m@tidakada.com>

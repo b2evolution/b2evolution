@@ -58,10 +58,10 @@ class WidgetContainerCache extends DataObjectCache
 	/**
 	 * Add a WidgetContainer to the cache
 	 *
-	 * @param Skin
+	 * @param object Widget Container
 	 * @return boolean true if it was added false otherwise
 	 */
-	function add( & $WidgetContainer )
+	function add( $WidgetContainer )
 	{
 		$container_code = $WidgetContainer->get( 'code' );
 		if( isset( $WidgetContainer->coll_ID ) && ( !empty( $container_code ) ) )

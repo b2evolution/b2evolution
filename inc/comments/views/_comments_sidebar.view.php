@@ -22,7 +22,7 @@ global $AdminUI;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 global $current_User;
 

@@ -28,7 +28,7 @@ echo sprintf( T_( 'Your login on %s is: $login$' ), $Settings->get( 'notificatio
 echo "\n\n";
 
 echo T_( 'Too many emails?' )."\n";
-echo sprintf( T_('To edit your email notification preferences, click here: %s'), get_notifications_url( '&amp;', $recipient_user_ID ) );
+echo sprintf( T_('To edit your email notification preferences, click here: %s'), get_notifications_url( '&', $recipient_user_ID ) );
 if( !empty( $params['unsubscribe_text'] ) )
 { // Display the unsubscribe message with link
 	echo "\n".$params['unsubscribe_text'];

@@ -115,7 +115,7 @@ $Results->cols[] = array(
 		'th' => 'Date Time',
 		'order' => 'slg_ID',
 		'default_dir' => 'D',
-		'td' => '%mysql2localedatetime_spans( #slg_timestamp#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #slg_timestamp# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap timestamp'
 	);

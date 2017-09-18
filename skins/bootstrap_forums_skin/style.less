@@ -1,23 +1,3 @@
-// --------- Universal item list widget & Recent posts widget --------- 
-@import "../../rsc/less/_universal_item_list_widget.module.less";
-// --------------------------------------------------------------------
-
-// ------------------- Media Index widget -------------------- 
-@import "../../rsc/less/_coll_media_index_widget.module.less";
-// -----------------------------------------------------------
-
-// ----------- User Avatars (User List) widget ------------ 
-@import "../../rsc/less/_user_avatars_widget.module.less";
-// --------------------------------------------------------
-
-// ------------- Organization Members widget -------------
-@import "../../rsc/less/_org_members_widget.module.less";
-	// Override constants used in the module:
-	@widget_core_org_members-color: #333;
-	@widget_core_org_members-user-link-color: #000;
-	@widget_core_org_members-user-link-hover-color: #23527c;
-// -------------------------------------------------------
-
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
 	-moz-border-radius: @radius;
@@ -34,14 +14,6 @@
 	}
 }
 
-// Footer
-.evo_container__footer {
-	text-align: right;
-	color: #A1A9B7;
-	font-size: 13px;
-	font-weight: bold;
-	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
-}
 // Powered By image background
 .powered_by {
 	a {
@@ -168,13 +140,16 @@ ol.breadcrumb {
 			white-space: normal !important;
 		}
 
-		.ft_date {
+		.ft_date, .ft_workflow_info {
 			text-align: left;
 			img {
 				border-radius: 50%;
 			}
 			a.ft_author_avatar:hover {
 				background-color: transparent !important;
+			}
+			.last_mod_date {
+				white-space: normal;
 			}
 		}
 		.ft_count {
@@ -205,7 +180,7 @@ ol.breadcrumb {
 		}
 	}
 	.ft_count {
-		margin-top: 12px;
+		margin-top: 5px;
 		font-size: 90%;
 		a, div {
 			font-size: 16px;
@@ -256,11 +231,11 @@ ol.breadcrumb {
 		margin-top: 13px;
 	}
 
-	.ft_date {
+	.ft_date, .ft_workflow_info {
 		color: #8b96a1;
 		font-size: 90%;
 		line-height: 16px;
-		margin-top: 3px;
+
 		div.ft_date_header {
 				margin-bottom: 5px;
 			}
@@ -271,6 +246,14 @@ ol.breadcrumb {
 			max-width: 100%;
 			display: inline-block;
 		}
+	}
+	// .ft_date margin is set separately because we handle the same CSS for both .ft_date and .ft_workflow_info, only margin is different
+	.ft_date {
+		margin-top: 17px;
+	}
+	// When Enabled "Workflow" option, we use .ft_workflow_info instead of .ft_date
+	.ft_workflow_info {
+		margin-top: 2px;
 	}
 	.ft_title >	a.forumlink {
 		font-size: 21px;
@@ -301,14 +284,20 @@ ol.breadcrumb {
 		line-height: 16px;
 		margin-top: 3px;
 		div.ft_date_header {
-				margin-bottom: 5px;
-			}
+			margin-bottom: 5px;
+		}
 		span.user.anonymous, span.identity_link_username {
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			max-width: 100%;
 			display: inline-block;
+		}
+	}
+	// Remove underline from hover
+	.ft_date, .ft_date_shrinked, .ft_date_shrinked_more {
+		a.icon_latest_reply:active, a.icon_latest_reply:hover {
+			text-decoration: none;
 		}
 	}
 	.ft_author_avatar {
@@ -546,6 +535,10 @@ ul.legend {
 // Single topic view
 .single_page_title {
 	margin-bottom: 20px;
+	// We want shrinked author info to display only on super small sizes (check under <375px media query below)
+	.ft_author_info.shrinked {
+		display: none;
+	}
 }
 .single_topic {
 	.ft_post_info {
@@ -611,10 +604,36 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar {
 		.border-radius(50%);
 	}
 }
+.evo_content_block, .evo_comment {
+	.panel-footer {
+		> a, > span:not(.btn-group), > div {
+			margin-top: 2px;
+			margin-bottom: 2px;
+		}
+		.vote_spam {
+			margin-right: 10px;
+			.btn-group a {
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+		}
+		.comment_edit_btn {
+			display: none;
+			margin-right: 5px;
+		}
+		.action_btn_group {
+			float: right;
+			.comment_edit_btn {
+				display: inline-block;
+			}
+		}
+	}
+}
 
 // Voting panels
 .vote_spam {
 	float: left;
+	height: 22px;
 	line-height: 22px;
 	.action_icon {
 		margin: 0;
@@ -623,11 +642,25 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar {
 a.btn+.vote_spam {
 	margin-left: 5px;
 }
-.vote_helpful {
+.evo_voting_panel {
 	float: left;
-	display: block;
 	margin-right: 10px;
+	height: 22px;
 	line-height: 22px;
+	span.fa {
+		line-height: 20px;
+	}
+}
+// A link to reply on comment:
+.comment_reply {
+	height: 22px;
+	line-height: 22px;
+	margin-right: 10px;
+}
+
+// Button to quote a reply/topic:
+.quote_button {
+	margin-right: 10px;
 }
 
 // Form elements on item edit page
@@ -648,11 +681,17 @@ label.control-label[for=post_title] {
 }
 
 // Search form
-.widget_core_coll_search_form {
+main .widget_core_coll_search_form {
 	float: right;
 	width: 40%;
 	min-width: 250px;
 	margin: 0 0 20px 5px;
+	div.compact_search_form input.search_field {
+		width: 100%;
+	}
+}
+
+aside .widget_core_coll_search_form {
 	div.compact_search_form input.search_field {
 		width: 100%;
 	}
@@ -700,6 +739,19 @@ label.control-label[for=post_title] {
 			margin-top: 12px !important;
 		}
 	}
+	.evo_content_block, .evo_comment {
+		.panel-footer {
+			.comment_edit_btn {
+				display: inline-block;
+			}
+			.action_btn_group {
+				float: left;
+				.comment_edit_btn {
+					display: none;
+				}
+			}
+		}
+	}
 }
 
 @media screen and (max-width: 991px) {
@@ -724,9 +776,20 @@ label.control-label[for=post_title] {
 		margin-left: 10px;
 	}
 }
+//@media screen and (min-width: 600px) and (max-width: 767px) {
+//	.ft_workflow_info {
+//		padding-left: 50px;
+//	}
+//}
 @media screen and (max-width: 767px) {
 	.ft_date {
 		display: none !important;
+	}
+	.ft_workflow_status_and_author {
+		padding-right: 0;
+	}
+	.ft_workflow_last_comment {
+		padding-left: 5px;
 	}
 	.ft_assigned {
 		margin-top: 4px;
@@ -751,6 +814,14 @@ label.control-label[for=post_title] {
 			//padding-left: 5px;
 			div {
 				display: inline-block;
+				line-height: 22px;
+				// Using decimal size here because the other in-line div has 90% font-size of body (which is 14px)
+				// This div cannot have 90% because it already has declared 16px font-size and 90% of it doesn't have the same value
+				font-size: 12.6px;
+				a {
+					// In case there is at least one recent comment, it is a link, so we need to override 16px font-size here as well
+					font-size: 12.6px;
+				}
 			}
 		}
 		.ft_assigned {
@@ -762,6 +833,11 @@ label.control-label[for=post_title] {
 			padding-right: 15px;
 			float: left;
 			margin-top: 4px;
+			line-height: 22px;
+
+			span {
+				vertical-align: top;
+			}
 		}
 	}
 	.legend-item {
@@ -787,8 +863,6 @@ label.control-label[for=post_title] {
 		.evo_comment_post_title {
 			display: block !important;
 		}
-	}
-	.vs_published {
 		.evo_comment_avatar {
 			margin-right: 15px;
 		}
@@ -839,19 +913,19 @@ label.control-label[for=post_title] {
 			}
 		}
 		.ft_not_assigned {
-			padding-left: 0px;
-			margin-top: 4px;
+			//padding-left: 0px;
+			margin-top: 13px;
 		}
 
 		.ft_assigned {
-			padding-left: 0px;
+			//padding-left: 0px;
 			margin-top: 4px;
 		}
 		.ft_date_shrinked {
 			text-align: right;
 			float: right;
-			margin-top: 6px;
-			margin-left: 5px;
+			margin-top: 8px;
+			// margin-left: 5px;
 		}
 	}
 	.front_panel {
@@ -877,9 +951,10 @@ label.control-label[for=post_title] {
 			display: none;
 		}
 		.ft_date_shrinked.item_list {
-			float: none;
-			text-align: left;
 			display: inline;
+			float: none;
+			padding-right: 0;
+			text-align: left;
 			margin-top: 4px;
 		}
 	}
@@ -918,6 +993,9 @@ label.control-label[for=post_title] {
 		.ft_author_info {
 			display: none;
 		}
+		.ft_author_info.shrinked {
+			display: block;
+		}
 	}
 	/* Disp front */
 	.front_panel {
@@ -938,7 +1016,7 @@ label.control-label[for=post_title] {
 	.posts_panel {
 		.ft_status_topic {
 			vertical-align: top;
-			margin-top: 8px;
+			// margin-top: 8px;
 		}
 		.ft_count {
 			margin-top: 0px;
@@ -993,6 +1071,18 @@ label.control-label[for=post_title] {
 	}
 }
 
+@media screen and (max-width: 360px) {
+	/* Disp posts */
+	.posts_panel {
+		.ft_date_shrinked.item_list {
+			// Hide comment date
+			.datestamp_shrinked {
+				display: none;
+			}
+		}
+	}
+}
+
 // POSTS PANEL BADGE FIX
 .posts_panel_title_wrapper {
 	width: 100%;
@@ -1028,7 +1118,7 @@ label.control-label[for=post_title] {
 // Comment-footer link TO TOP size FIX
 a.to_top {
 	font-size: 14px !important;
-	margin-right: 5px;
+	margin-right: 10px;
 	float: left;
 }
 
@@ -1071,22 +1161,4 @@ a.to_top {
 .comments_link__pagination .alert {
 	margin: 0;
 	text-align: left;
-}
-
-// Class for box-shadow on post images
-.raised img {
-	-webkit-box-shadow: 0px 0px 11px 0px rgba(0,0,0,0.3);
-	-moz-box-shadow: 0px 0px 11px 0px rgba(0,0,0,0.3);
-	box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
-}
-
-// Class for thumbnail format on post images
-.thumbnail {
-	max-width: 200px !important;
-	max-height: 200px !important;
-    min-height: auto !important;
-	display: inline-block;
-}
-.thumbnail img {
-	min-height: auto !important;
 }

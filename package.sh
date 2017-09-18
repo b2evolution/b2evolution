@@ -6,6 +6,7 @@ rm -f package.json
 rm -f readme.md
 rm -f readme.template.html
 rm -f .bower.json
+rm -f .gitmodules
 echo Removing test skins
 rm -rf skins/clean1_skin
 rm -rf skins/horizon_blog_skin
@@ -14,5 +15,6 @@ echo Removing myself now
 rm -f cleanup.sh
 echo Stepping out
 cd ..
-echo Compressing
-zip -qr9 b2evolution.zip b2evolution 
+echo Compressing...
+currentbasename=${PWD##*/} 	# Assign current basename to variable
+zip -qr9 ${currentbasename}.zip b2evolution 

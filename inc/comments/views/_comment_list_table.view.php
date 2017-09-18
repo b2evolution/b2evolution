@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var CommentList
  */
@@ -50,6 +50,6 @@ if( check_comment_mass_delete( $CommentList ) )
 // Initialize Results object
 comments_results( $CommentList );
 
-$CommentList->display();
+$CommentList->display( NULL, 'session' );
 
 ?>

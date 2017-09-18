@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class colls_list_public_Widget extends ComponentWidget
 {
+	var $icon = 'list';
+
 	/**
 	 * Constructor
 	 */
@@ -140,7 +142,7 @@ class colls_list_public_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?

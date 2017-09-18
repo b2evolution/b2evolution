@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class content_hierarchy_Widget extends ComponentWidget
 {
+	var $icon = 'sitemap';
+
 	/**
 	 * Constructor
 	 */
@@ -124,14 +126,14 @@ class content_hierarchy_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item;
+		global $Item, $disp;
 
 		$this->init_display( $params );
 
 		echo $this->disp_params['block_start'];
 
-		if( !empty( $Item ) )
-		{ // Set selected Item in the params
+		if( ( $disp == 'single' || $disp == 'page' ) && ! empty( $Item ) )
+		{	// Set selected Item in the params ONLY if we really view item page:
 			$params['selected_item_ID'] = $Item->ID;
 		}
 
@@ -326,8 +328,14 @@ class content_hierarchy_Widget extends ComponentWidget
 			$display_params['after'] = '</i>';
 		}
 
-		// Display a permanent link to post
+		// Display a permanent link to post:
 		$r .= $Item->get_title( $display_params );
+
+		// Flag:
+		$r .= $Item->get_flag( array(
+				'before'       => ' ',
+				'only_flagged' => true,
+			) );
 
 		$r .= $params['item_end'];
 		return $r;

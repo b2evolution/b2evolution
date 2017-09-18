@@ -25,6 +25,8 @@ load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectLis
  */
 class user_login_Widget extends ComponentWidget
 {
+	var $icon = 'key';
+
 	/**
 	 * Constructor
 	 */
@@ -184,8 +186,7 @@ class user_login_Widget extends ComponentWidget
 		global $Settings, $Plugins;
 
 		//get required js files for _widget_login.form
-		$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
-		if( $transmit_hashed_password )
+		if( can_use_hashed_password() )
 		{ // Include JS for client-side password hashing:
 			require_js( 'build/sha1_md5.bmin.js', 'blog' );
 		}
@@ -199,7 +200,7 @@ class user_login_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( get_param( 'disp' ) == 'login' )
 		{	// No display a duplicate form for inskin login mode

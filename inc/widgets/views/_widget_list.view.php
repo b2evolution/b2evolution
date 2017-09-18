@@ -13,16 +13,16 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $Skin, $admin_url;
+global $Collection, $Blog, $Skin, $admin_url;
 
 global $container_Widget_array;
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	echo '<div class="pull-right" style="margin-bottom:10px">';
-		echo action_icon( TS_('Add a new container!'), 'add',
+		echo action_icon( T_('Add a new container!'), 'add',
 					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container', T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default' ) );
-		echo action_icon( TS_('Scan skins for containers'), 'reload',
+		echo action_icon( T_('Scan skins for containers'), 'reload',
 					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Scan skins for containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 	echo '</div>';
 }
@@ -37,7 +37,7 @@ $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID );
  */
 function display_container( $WidgetContainer, $legend_suffix = '' )
 {
-	global $Blog, $admin_url, $embedded_containers;
+	global $Collection, $Blog, $admin_url, $embedded_containers;
 	global $Session;
 
 	$Table = new Table();
@@ -344,7 +344,7 @@ $Form->button( array(
 		'type'  => 'submit'
 	) );
 $Form->button( array(
-		'value' => get_icon( 'bullet_empty_grey' ).' '.T_('De-activate'),
+		'value' => get_icon( 'bullet_empty_grey' ).' '.T_('Deactivate'),
 		'name'  => 'actionArray[deactivate]',
 		'tag'   => 'button',
 		'type'  => 'submit'

@@ -25,6 +25,8 @@ load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectLis
  */
 class user_avatars_Widget extends ComponentWidget
 {
+	var $icon = 'users';
+
 	/**
 	 * Constructor
 	 */
@@ -66,7 +68,7 @@ class user_avatars_Widget extends ComponentWidget
 				'options' => array(
 						'rwd'  => T_( 'RWD Blocks' ),
 						'flow' => T_( 'Flowing Blocks' ),
-						'list' => T_( 'List' ), 
+						'list' => T_( 'List' ),
 						'grid' => T_( 'Table' ),
 					 ),
 				'defaultvalue' => 'flow',
@@ -103,7 +105,7 @@ class user_avatars_Widget extends ComponentWidget
 						'random'  => T_('Random users'),
 						'regdate' => T_('Most recent registrations'),
 						'moddate' => T_('Most recent profile updates'),
-						'numposts' => T_('Number of posts'),
+						'numposts' => T_('Number of (Public+Community+Member) posts'),
 					),
 				'defaultvalue' => 'random',
 			),
@@ -364,7 +366,7 @@ class user_avatars_Widget extends ComponentWidget
 
 				if( $this->disp_params[ 'style' ] == 'badges' )
 				{ // Add user login after picture
-					$r .= '<br >'.$User->get_colored_login();
+					$r .= '<br >'.$User->get_colored_login( array( 'login_text' => 'name' ) );
 				}
 				elseif( $this->disp_params[ 'style' ] == 'username' )
 				{ // username without <br>
@@ -382,8 +384,11 @@ class user_avatars_Widget extends ComponentWidget
 			$r .= $this->get_layout_item_end( $count );
 		}
 
-		// Exit if no files found
-		if( empty($r) ) return;
+		if( empty( $r ) )
+		{	// Exit if no files found:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there no users found with avatars.' );
+			return;
+		}
 
 		echo $this->disp_params[ 'block_start'];
 

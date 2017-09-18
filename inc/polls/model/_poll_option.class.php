@@ -110,11 +110,11 @@ class PollOption extends DataObject
 		{	// If order has not been defined on form:
 
 			// Get max order of the poll options:
-			$order_SQL = new SQL();
+			$order_SQL = new SQL( 'Get max order of the poll options' );
 			$order_SQL->SELECT( 'MAX( popt_order )' );
 			$order_SQL->FROM( 'T_polls__option' );
 			$order_SQL->WHERE( 'popt_pqst_ID = '.$this->get( 'pqst_ID' ) );
-			$max_order = $DB->get_var( $order_SQL->get(), 0, NULL, 'Get max order of the poll options' );
+			$max_order = $DB->get_var( $order_SQL );
 
 			// Set default order as next after max:
 			$this->set( 'order', intval( $max_order ) + 1 );

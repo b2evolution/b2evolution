@@ -28,6 +28,11 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  */
 require_once $inc_path.'_main.inc.php';
 
+
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
+
 param( 'key', 'string', '' );
 
 $GoalCache = & get_GoalCache();
@@ -36,8 +41,10 @@ $Goal = & $GoalCache->get_by_name( $key, false, false );
 if( empty( $Goal ) )
 { // Goal key doesn't exist in DB
 	load_funcs( 'skins/_skin.funcs.php' );
-	require $siteskins_path.'_404_basic_not_found.main.php'; // error & exit
+	siteskin_init();
+	siteskin_include( '_404_basic_not_found.main.php' ); // error
 	exit(0);
+	// EXIT.
 }
 
 if( ! empty( $Goal->redir_url ) || ! empty( $Goal->temp_redir_url ) )

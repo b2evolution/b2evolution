@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.0';
+	var $version = '7.0.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -45,7 +45,7 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -58,6 +58,34 @@ class bootstrap_blog_Skin extends Skin
 	function get_api_version()
 	{
 		return 6;
+	}
+
+
+	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'partial',
+				'std' => 'yes',		// Blog
+				'photo' => 'no',
+				'forum' => 'no',
+				'manual' => 'no',
+				'group' => 'maybe',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
 	}
 
 
@@ -113,7 +141,7 @@ class bootstrap_blog_Skin extends Skin
 				),
 					'layout' => array(
 						'label' => T_('Layout'),
-						'note' => '',
+						'note' => T_('Select skin layout.'),
 						'defaultvalue' => 'right_sidebar',
 						'options' => array(
 								'single_column'              => T_('Single Column Large'),
@@ -127,23 +155,50 @@ class bootstrap_blog_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
-					'font_size' => array(
-						'label' => T_('Font size'),
-						'note' => '',
-						'defaultvalue' => 'default',
-						'options' => array(
-								'default'        => T_('Default (14px)'),
-								'standard'       => T_('Standard (16px)'),
-								'medium'         => T_('Medium (18px)'),
-								'large'          => T_('Large (20px)'),
-								'very_large'     => T_('Very large (22px)'),
+
+					'font' => array(
+						'label' => T_('Default font'),
+						'type'  => 'input_group',
+						'inputs' => array(
+							'_family' => array(
+								'defaultvalue' => 'system_helveticaneue',
+								'options'      => $this->get_font_definitions(),
+								'type'         => 'select'
 							),
-						'type' => 'select',
+							'_size' => array(
+								'label' => T_('Size'),
+								'defaultvalue' => 'default',
+								'options'      => array(
+									'default'        => T_('Default (14px)'),
+									'standard'       => T_('Standard (16px)'),
+									'medium'         => T_('Medium (18px)'),
+									'large'          => T_('Large (20px)'),
+									'very_large'     => T_('Very large (22px)'),
+								),
+								'type' => 'select'
+							),
+							'_weight' => array(
+								'label' => T_('Weight'),
+								'defaultvalue' => '400',
+								'options' => array(
+										'100' => '100',
+										'200' => '200',
+										'300' => '300',
+										'400' => '400 ('.T_('Normal').')',
+										'500' => '500',
+										'600' => '600',
+										'700' => '700 ('.T_('Bold').')',
+										'800' => '800',
+										'900' => '900',
+									),
+								'type' => 'select',
+							)
+						)
 					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
@@ -200,6 +255,36 @@ class bootstrap_blog_Skin extends Skin
 						'label' => T_('Current tab text color'),
 						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#333',
+						'type' => 'color',
+					),
+					'current_tab_bg_color' => array(
+						'label' => T_('Current tab background color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'hover_tab_bg_color' => array(
+						'label' => T_('Hovered tab background color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+					),
+					'panel_bg_color' => array(
+						'label' => T_('Panel background color'),
+						'note' => T_('Choose background color for function panels and widgets.'),
+						'defaultvalue' => '#ffffff',
+						'type' => 'color',
+					),
+					'panel_border_color' => array(
+						'label' => T_('Panel border color'),
+						'note' => T_('Choose border color for function panels and widgets.'),
+						'defaultvalue' => '#ddd',
+						'type' => 'color',
+					),
+					'panel_heading_bg_color' => array(
+						'label' => T_('Panel heading background color'),
+						'note' => T_('Choose background color for function panels and widgets.'),
+						'defaultvalue' => '#f5f5f5',
 						'type' => 'color',
 					),
 				'section_color_end' => array(
@@ -341,11 +426,11 @@ class bootstrap_blog_Skin extends Skin
 
 		if( $color = $this->get_setting( 'page_bg_color' ) )
 		{ // Custom page background color:
-			$custom_css .= 'body { background-color: '.$color." }\n";
+			$custom_css .= '#skin_wrapper { background-color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'page_text_color' ) )
 		{ // Custom page text color:
-			$custom_css .= 'body { color: '.$color." }\n";
+			$custom_css .= '#skin_wrapper { color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'page_link_color' ) )
 		{ // Custom page link color:
@@ -367,15 +452,43 @@ class bootstrap_blog_Skin extends Skin
 		}
 		if( $color = $this->get_setting( 'bgimg_link_color' ) )
 		{	// Custom link color on background image:
-			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
+			$custom_css .= '.evo_hasbgimg a:not(.btn) { color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
 		{	// Custom link hover color on background image:
-			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
+			$custom_css .= '.evo_hasbgimg a:not(.btn):hover { color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'current_tab_text_color' ) )
 		{ // Custom current tab text color:
 			$custom_css .= 'ul.nav.nav-tabs li a.selected { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'current_tab_bg_color' ) )
+		{ // Custom current tab background color:
+			$custom_css .= 'ul.nav.nav-tabs li a.selected { background-color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'hover_tab_bg_color' ) )
+		{ // Custom hovered tab background text color:
+			$custom_css .= 'ul.nav.nav-tabs li a.default:hover { background-color: '.$color."; border-top-color: $color; border-left-color: $color; border-right-color: $color }\n";
+		}
+		if( $color = $this->get_setting( 'panel_bg_color' ) )
+		{ // Panel background text color:
+			$custom_css .= '.panel, .pagination>li>a { background-color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'panel_border_color' ) )
+		{ // Panel border color:
+			$custom_css .= '
+			.pagination li a, .pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover,
+			.nav-tabs,
+			.panel-default, .panel .panel-footer,
+			.panel .table, .panel .table th, .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th
+			{ border-color: '.$color." }\n";
+			$custom_css .= '.panel .panel-heading { border-color: '.$color."; background-color: $color }\n";
+			$custom_css .= '.nav-tabs>li>a:hover { border-bottom: 1px solid '.$color." }\n";
+			$custom_css .= '.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover { border-top-color: '.$color."; border-left-color: $color; border-right-color: $color }\n";
+		}
+		if( $color = $this->get_setting( 'panel_heading_bg_color' ) )
+		{ // Panel border color:
+			$custom_css .= '.panel .panel-heading, .panel .panel-footer { background-color: '.$color." }\n";
 		}
 
 		// Limit images by max height:
@@ -444,6 +557,9 @@ class bootstrap_blog_Skin extends Skin
 			}
 		}
 
+		// Font family customization
+		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight' );
+
 		if( ! empty( $custom_css ) )
 		{	// Function for custom_css:
 			$custom_css = '<style type="text/css">
@@ -453,28 +569,6 @@ class bootstrap_blog_Skin extends Skin
 		</style>';
 			add_headline( $custom_css );
 		}
-	}
-
-
-	/**
-	 * Check if we can display a widget container
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function is_visible_container( $container_key )
-	{
-		global $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
 
@@ -495,7 +589,7 @@ class bootstrap_blog_Skin extends Skin
 
 		if( $check_containers )
 		{ // Check if at least one sidebar container is visible
-			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
+			return ( $this->show_container_when_access_denied( 'sidebar' ) ||  $this->show_container_when_access_denied( 'sidebar2' ) );
 		}
 		else
 		{ // We should not check the visibility of the sidebar containers for this case

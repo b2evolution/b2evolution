@@ -123,7 +123,7 @@ $baseurl = 'http://localhost/b2evolution/blogs/';
 // Use the following if you want to use the current domain:
 /*
 if( isset($_SERVER['HTTP_HOST']) )
-{	// This only works if HOSt provided by webserver (i-e DOES NOT WORK IN PHP CLI MODE)
+{	// This only works if HOST is provided by webserver (i-e DOES NOT WORK IN PHP CLI MODE)
 	$baseurl = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://')
 							.$_SERVER['HTTP_HOST'].'/';
 }

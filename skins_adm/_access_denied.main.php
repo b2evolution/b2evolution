@@ -15,7 +15,6 @@ $page_title = T_('Back-office access denied');
 // Header:
 require dirname( __FILE__ ).'/login/_html_header.inc.php';
 
-$secure_httsrv_url = get_secure_htsrv_url();
 ?>
 <div class="wrap">
 	<div class="panel panel-danger">
@@ -28,7 +27,7 @@ $secure_httsrv_url = get_secure_htsrv_url();
 				<a href="<?php echo $baseurl; ?>" class="btn btn-primary btn-lg">
 					<?php echo '&laquo; '.T_('Back to home page'); ?>
 				</a>
-				<a href="<?php echo $secure_httsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $ReqURL, $secure_httsrv_url ) ); ?>" class="btn btn-default btn-lg pull-right">
+				<a href="<?php echo get_htsrv_url( true ).'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $ReqURL, get_htsrv_url( true ) ) ); ?>" class="btn btn-default btn-lg pull-right">
 					<?php echo T_('Log out').'!'; ?>
 				</a>
 			</p>

@@ -75,7 +75,7 @@ class Hitlist
 	 *   'message' => Message of the error or result data
 	 * )
 	 */
-	static function dbprune()
+	static function dbprune( $output_message = true )
 	{
 		/**
 		 * @var DB
@@ -89,7 +89,10 @@ class Hitlist
 		if( $last_prune >= date( 'Y-m-d', $localtimenow ) && $last_prune <= date( 'Y-m-d', $localtimenow + 86400 ) )
 		{ // Already pruned today (and not more than one day in the future -- which typically never happens)
 			$message = T_('Pruning has already been done today');
-			$Messages->add( $message, 'error' );
+			if( $output_message )
+			{
+				$Messages->add( $message, 'error' );
+			}
 			return array(
 					'result'  => 'error',
 					'message' => $message
@@ -115,19 +118,28 @@ class Hitlist
 
 		$time_prune_before = ( $localtimenow - ( $Settings->get( 'auto_prune_stats' ) * 86400 ) ); // 1 day = 86400 seconds
 
+		// Aggregate the hits before they will be deleted below:
+		$hitlist_Timer->start( 'aggregate' );
+		Hitlist::aggregate_hits();
+		$hitlist_Timer->stop( 'aggregate' );
+
+		// Aggregate the counts of unique sessions:
+		$hitlist_Timer->start( 'aggregate_sessions' );
+		Hitlist::aggregate_sessions();
+		$hitlist_Timer->stop( 'aggregate_sessions' );
 
 		// PRUNE HITLOG:
 		$hitlist_Timer->start( 'hitlog' );
-		$hitlog_rows_affected = $DB->query( "
+		$hitlog_rows_affected = $DB->query( '
 			DELETE FROM T_hitlog
-			WHERE hit_datetime < '".date( 'Y-m-d', $time_prune_before )."'", 'Autopruning hit log' );
+			WHERE hit_datetime < "'.date( 'Y-m-d', $time_prune_before ).'"', 'Autopruning hit log' );
 		$hitlist_Timer->stop( 'hitlog' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$hitlog_rows_affected.' rows from T_hitlog.', 'request' );
 
 
-		// PREPARE PRUNING SESSIONS: 
+		// PREPARE PRUNING SESSIONS:
 		// Prune sessions that have timed out and are older than auto_prune_stats
-		$sess_prune_before = ($localtimenow - $Settings->get( 'timeout_sessions' ));
+		$sess_prune_before = ( $localtimenow - $Settings->get( 'timeout_sessions' ) );
 		// IMPORTANT: we cut off at the oldest date between session timeout and sessions pruning.
 		// So if session timeout is really long (2 years for example), the sessions table won't be pruned as small as expected from the pruning delay.
 		$smaller_time = min( $sess_prune_before, $time_prune_before );
@@ -147,27 +159,27 @@ class Hitlist
 		// BUT only those with unknown dom_type/dom_status, because otherwise this
 		//     info is useful when we get hit again.
 		$hitlist_Timer->start( 'basedomains' );
-		$basedomains_rows_affected = $DB->query( "
+		$basedomains_rows_affected = $DB->query( '
 			DELETE T_basedomains
 			  FROM T_basedomains LEFT JOIN T_hitlog ON hit_referer_dom_ID = dom_ID
 			 WHERE hit_referer_dom_ID IS NULL
-			 AND dom_type = 'unknown'
-			 AND dom_status = 'unknown'" );
+			 AND dom_type = "unknown"
+			 AND dom_status = "unknown"' );
 		$hitlist_Timer->stop( 'basedomains' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$basedomains_rows_affected.' rows from T_basedomains.', 'request' );
 
 
 		// OPTIMIZE TABLES:
 		$hitlist_Timer->start( 'optimize_hitlog' );
-		$DB->query('OPTIMIZE TABLE T_hitlog');
+		$DB->query( 'OPTIMIZE TABLE T_hitlog' );
 		$hitlist_Timer->stop( 'optimize_hitlog' );
 
 		$hitlist_Timer->start( 'optimize_sessions' );
-		$DB->query('OPTIMIZE TABLE T_sessions');
+		$DB->query( 'OPTIMIZE TABLE T_sessions' );
 		$hitlist_Timer->stop( 'optimize_sessions' );
 
 		$hitlist_Timer->start( 'optimize_basedomains' );
-		$DB->query('OPTIMIZE TABLE T_basedomains');
+		$DB->query( 'OPTIMIZE TABLE T_basedomains' );
 		$hitlist_Timer->stop( 'optimize_basedomains' );
 
 
@@ -177,7 +189,10 @@ class Hitlist
 		$Settings->set( 'auto_prune_stats_done', date( 'Y-m-d H:i:s', $localtimenow ) ); // save exact datetime
 		$Settings->dbupdate();
 
-		$Messages->add( T_('The old hits & sessions have been pruned.'), 'success' );
+		if( $output_message )
+		{
+			$Messages->add( T_('The old hits & sessions have been pruned.'), 'success' );
+		}
 		return array(
 				'result'  => 'ok',
 				// DO NOT TRANSLATE! (This is sysadmin level info -- we assume they can read English)
@@ -193,6 +208,10 @@ class Hitlist
 						$tables[ $db_config['aliases']['T_basedomains'] ]['type'],
 						$tables[ $db_config['aliases']['T_basedomains'] ]['rows'] )."\n"
 					."\n"
+					.'AGGREGATING:'."\n"
+					.sprintf( 'Aggregate the rows from T_hitlog to T_hits__aggregate, Execution time: %s seconds', $hitlist_Timer->get_duration( 'aggregate' ) )."\n"
+					.sprintf( 'Aggregate the rows from T_hitlog to T_hits__aggregate_sessions, Execution time: %s seconds', $hitlist_Timer->get_duration( 'aggregate_sessions' ) )."\n"
+					."\n"
 					.'PRUNING:'."\n"
 					.sprintf( '%s rows from T_hitlog, Execution time: %s seconds', $hitlog_rows_affected, $hitlist_Timer->get_duration( 'hitlog' ) )."\n"
 					.sprintf( '%s rows from T_sessions, Execution time: %s seconds', $sessions_rows_affected, $hitlist_Timer->get_duration( 'sessions' ) )."\n"
@@ -205,6 +224,74 @@ class Hitlist
 					."\n"
 					.sprintf( 'Total execution time: %s seconds', $hitlist_Timer->get_duration( 'prune_hits' ) )
 			);
+	}
+
+
+	/**
+	 * Aggregate the hits
+	 */
+	static function aggregate_hits()
+	{
+		global $DB;
+
+		// NOTE: Do NOT aggregate current day because it is not ended yet
+		$max_aggregate_date = date( 'Y-m-d H:i:s', mktime( 0, 0, 0 ) );
+
+		$DB->query( 'REPLACE INTO T_hits__aggregate ( hagg_date, hagg_coll_ID, hagg_type, hagg_referer_type, hagg_agent_type, hagg_count )
+			SELECT DATE( hit_datetime ) AS hit_date, IFNULL( hit_coll_ID, 0 ), hit_type, hit_referer_type, hit_agent_type, COUNT( hit_ID )
+			  FROM T_hitlog
+			 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
+			 GROUP BY hit_date, hit_coll_ID, hit_type, hit_referer_type, hit_agent_type',
+			'Aggregate hits log' );
+	}
+
+
+	/**
+	 * Aggregate the counts of unique sessions
+	 */
+	static function aggregate_sessions()
+	{
+		global $DB;
+
+		// NOTE: Do NOT aggregate current day because it is not ended yet
+		$max_aggregate_date = date( 'Y-m-d H:i:s', mktime( 0, 0, 0 ) );
+
+		// ONLY collection browser sessions:
+		$DB->query( 'REPLACE INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_browser )
+			SELECT DATE( hit_datetime ) AS hit_date, hit_coll_ID, COUNT( DISTINCT hit_sess_ID )
+			  FROM T_hitlog
+			 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
+			   AND hit_agent_type = "browser"
+			   AND hit_coll_ID > 0
+			 GROUP BY hit_date, hit_coll_ID',
+			'Aggregate ONLY collection sessions from hit log (hit_agent_type = "browser")' );
+		// ONLY collection API sessions:
+		$DB->query( 'INSERT INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_api )
+			SELECT DATE( hit_datetime ) AS hit_date, hit_coll_ID, COUNT( DISTINCT hit_sess_ID )
+			  FROM T_hitlog
+			 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
+			   AND hit_type = "api"
+			   AND hit_coll_ID > 0
+			 GROUP BY hit_date, hit_coll_ID
+			ON DUPLICATE KEY UPDATE hags_count_api = VALUES( hags_count_api )',
+			'Aggregate ONLY collection sessions from hit log (hit_type = "api")' );
+		// ALL browser sessions:
+		$DB->query( 'REPLACE INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_browser )
+			SELECT DATE( hit_datetime ) AS hit_date, 0, COUNT( DISTINCT hit_sess_ID )
+			  FROM T_hitlog
+			 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
+			   AND hit_agent_type = "browser"
+			 GROUP BY hit_date',
+			'Aggregate ALL sessions from hit log (hit_agent_type = "browser")' );
+		// ALL API sessions:
+		$DB->query( 'INSERT INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_api )
+			SELECT DATE( hit_datetime ) AS hit_date, 0, COUNT( DISTINCT hit_sess_ID )
+			  FROM T_hitlog
+			 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
+			   AND hit_type = "api"
+			 GROUP BY hit_date
+			ON DUPLICATE KEY UPDATE hags_count_api = VALUES( hags_count_api )',
+			'Aggregate ALL sessions from hit log (hit_type = "api")' );
 	}
 }
 

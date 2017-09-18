@@ -9,3 +9,6 @@
 [submodule "skins/clean1_skin"]
 	path = skins/clean1_skin
 	url = https://fplanque@github.com/b2evolution/clean1_skin.git
+[submodule "skins/pureforums_skin"]
+	path = skins/pureforums_skin
+	url = https://fplanque@github.com/b2evolution/pureforums_skin.git

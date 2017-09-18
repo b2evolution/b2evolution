@@ -1,21 +1,3 @@
-// Why no @import "../../rsc/less/_universal_item_list_widget.module.less"; here???
-
-// ------------------- Media Index widget -------------------- 
-@import "../../rsc/less/_coll_media_index_widget.module.less";
-// -----------------------------------------------------------
-
-// ----------- User Avatars (User List) widget ------------ 
-@import "../../rsc/less/_user_avatars_widget.module.less";
-// --------------------------------------------------------
-
-// ------------- Organization Members widget -------------
-@import "../../rsc/less/_org_members_widget.module.less";
-	// Override constants used in the module:
-	@widget_core_org_members-color: #333;
-	@widget_core_org_members-user-link-color: #000;
-	@widget_core_org_members-user-link-hover-color: #23527c;
-// -------------------------------------------------------
-
 // Header
 .evo_container__header {
 	margin-bottom: 20px;
@@ -209,6 +191,11 @@ textarea.message_text {
 	}
 }
 
+// Disp=single comment notification button
+.evo_post_comment_notification a {
+	white-space: normal;
+}
+
 .evo_post {
 	margin-bottom: 2em;
 	.small.text-muted {
@@ -348,7 +335,7 @@ div.action_messages, div.log_container {
 // Bootstrap Gallery styles
 html, body {
 	width: auto !important;
-	overflow-x: hidden !important;
+	// overflow-x: hidden !important;
 	margin:0;
 	padding:0;
 	height:100%;
@@ -397,7 +384,7 @@ text-align: center;
 .evo_post {
 }
 .evo_post_content {
-	padding-top: 15px;	
+	padding-top: 15px;
 }
 .single-image {
 	display: inline-block;
@@ -406,6 +393,7 @@ text-align: center;
 	.img-responsive {
 		width: 100%;
 		text-align: center;
+		display: inline-block;
 	}
 }
 .float-right {
@@ -460,7 +448,7 @@ div.evo_image_index div {
 			font-family: FontAwesome;
 			margin-right: 5px;
 		}
-	}	
+	}
 	.nav_album_title {
 		display: inline-block;
 		margin-top: 8px;
@@ -571,7 +559,7 @@ div.evo_image_index div {
 		padding-bottom: 10px;
 	}
 }
-@media screen and (max-width: 991px) { 
+@media screen and (max-width: 991px) {
 	.single-image {
 		margin-left: 0px;
 		margin-right: 0px;
@@ -589,7 +577,7 @@ div.evo_image_index div {
 	.evo_details, .col-lg-12 {
 		padding-left: 0px;
 		padding-right: 0px;
-	}	
+	}
 	.single-image {
 		margin-left: 42px;
 		margin-right: 42px;
@@ -644,6 +632,10 @@ div.evo_image_index div {
 }
 .label {
 	font-size: 14px !important;
+}
+// Remove predefined bootstrap background-color style
+.panel, .avatar_main_frame, .pagination li a {
+	background-color: transparent;
 }
 // Bottom b2evo image background issue fix
 .powered_by {

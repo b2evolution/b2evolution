@@ -91,6 +91,20 @@ class ComponentWidget extends DataObject
 	var $target_User = NULL;
 
 	/**
+	 * Widget icon name.
+	 * Use icon name from http://fontawesome.io/icons/
+	 *
+	 * @var string
+	 */
+	var $icon = 'cube';
+
+	/**
+	 * @var Mode: 'designer' or 'normal'
+	 */
+	var $mode = 'normal';
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param object data row from db
@@ -116,6 +130,17 @@ class ComponentWidget extends DataObject
 			$this->order    = $db_row->wi_order;
 			$this->enabled  = $db_row->wi_enabled;
 		}
+	}
+
+
+	/**
+	 * Get param prefix with is used on edit forms and submit data
+	 *
+	 * @return string
+	 */
+	function get_param_prefix()
+	{
+		return 'edit_widget_'.( empty( $this->ID ) ? '0' : $this->ID ).'_set_';
 	}
 
 
@@ -152,7 +177,7 @@ class ComponentWidget extends DataObject
 		if( ! isset( $this->WidgetContainer ) )
 		{
 			$WidgetContainerCache = & get_WidgetContainerCache();
-			$this->WidgetContainer = & $WidgetContainerCache->get_by_ID( $this->wico_ID );
+			$this->WidgetContainer = & $WidgetContainerCache->get_by_ID( $this->wico_ID, false, false );
 		}
 		return $this->WidgetContainer;
 	}
@@ -251,18 +276,28 @@ class ComponentWidget extends DataObject
 		$name = $this->get_name();
 
 		if( $this->type == 'plugin' )
-		{
-			return '<strong>'.$name.'</strong> ('.T_('Plugin').')';
+		{	// Plugin widget:
+			$widget_Plugin = & $this->get_Plugin();
+			$icon = '<span class="fa fa-'.$widget_Plugin->widget_icon.'"></span>';
+
+			if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+			{
+				return $icon.' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+			}
+
+			return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
 		}
 
+		// Normal widget:
 		$short_desc = $this->get_short_desc();
+		$icon = '<span class="fa fa-'.$this->icon.'"></span>';
 
-		if( $name == $short_desc || empty($short_desc) )
+		if( $name == $short_desc || empty( $short_desc ) )
 		{
-			return '<strong>'.$name.'</strong>';
+			return $icon.' <strong>'.$name.'</strong>';
 		}
 
-		return '<strong>'.$short_desc.'</strong> ('.$name.')';
+		return $icon.' <strong>'.$short_desc.'</strong> ('.$name.')';
 	}
 
 
@@ -375,9 +410,12 @@ class ComponentWidget extends DataObject
 
 		if( ! isset( $r['allow_blockcache'] ) )
 		{
+			$widget_Blog = & $this->get_Blog();
 			$r['allow_blockcache'] = array(
 					'label' => T_( 'Allow caching' ),
-					'note' => T_( 'Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.' ),
+					'note' => ( $widget_Blog && $widget_Blog->get_setting( 'cache_enabled_widgets' ) ) ?
+							T_('Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.') :
+							T_('Block caching is disabled for this collection.'),
 					'type' => 'checkbox',
 					'defaultvalue' => true,
 				);
@@ -411,7 +449,7 @@ class ComponentWidget extends DataObject
  	 * @param boolean default false, set to true only if it is called from a widget::get_param_definition() function to avoid infinite loop
  	 * @return mixed
 	 */
-	function get_param( $parname, $check_infinite_loop = false )
+	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
 	{
 		$this->load_param_array();
 		if( isset( $this->param_array[$parname] ) )
@@ -422,9 +460,21 @@ class ComponentWidget extends DataObject
 		// Try default values:
 		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
 		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{	// We ahve a default value:
-			return $params[$parname]['defaultvalue'] ;
+
+		if( $group === NULL )
+		{	// Get param from simple field:
+			if( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'] ;
+			}
+		}
+		else
+		{	// Get param from group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
 		}
 
 		return NULL;
@@ -439,11 +489,12 @@ class ComponentWidget extends DataObject
 	 * @param boolean true to set to NULL if empty value
 	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue, $make_null = false )
+	function set( $parname, $parvalue, $make_null = false, $group = NULL )
 	{
 		$params = $this->get_param_definitions( NULL );
 
-		if( isset( $params[$parname] ) )
+		if( isset( $params[$parname] ) || 
+		    ( $group !== NULL && isset( $params[ $group ]['inputs'][ substr( $parname, strlen( $group ) ) ] ) ) )
 		{ // This is a widget specific param:
 			// Make sure param_array is loaded before set the param value
 			$this->load_param_array();
@@ -485,7 +536,7 @@ class ComponentWidget extends DataObject
 			return;
 		}
 
-		// Generate widget defaults array:
+		// Generate widget defaults (editable params) array:
 		$widget_defaults = array();
 		$defs = $this->get_param_definitions( array() );
 		foreach( $defs as $parname => $parmeta )
@@ -507,7 +558,8 @@ class ComponentWidget extends DataObject
 		// Load DB configuration:
 		$this->load_param_array();
 
-		// Merge basic defaults < widget defaults < container params < DB params
+		// DEFAULT CONTAINER PARAMS:
+		// Merge basic defaults < widget defaults (editable params) < container params < DB params
 		// note: when called with skin_widget it falls back to basic defaults < widget defaults < calltime params < array()
 		$params = array_merge( array(
 					'widget_context' => 'general',		// general | item | user
@@ -526,16 +578,23 @@ class ComponentWidget extends DataObject
 					'list_end' => '</ul>',
 					'item_start' => '<li>',
 					'item_end' => '</li>',
-					'item_title_start' => '<strong>',
-					'item_title_end' => ':</strong> ',
-					'link_default_class' => 'default',
-					'link_selected_class' => 'selected',
-					'item_text_start' => '',
-					'item_text_end' => '',
-					'item_text' => '%s',
+						'item_title_start' => '<strong>',
+						'item_title_end' => ':</strong> ',
+						'link_default_class' => 'default',
+						'link_selected_class' => 'selected',
+						'item_text_start' => '',
+						'item_text_end' => '',
+						'item_text' => '%s',
 					'item_selected_start' => '<li class="selected">',
 					'item_selected_end' => '</li>',
 					'item_selected_text' => '%s',
+
+					// Automatically detect whether we are displaying menu links as list elements or as standalone buttons:
+					'inlist' => 'auto',		// may alose be true or false
+					// Button styles used for Menu Links / Buttons widgets:
+					'button_default_class' => 'btn btn-default',
+					'button_selected_class' => 'btn btn-default active',
+
 					'grid_start' => '<table cellspacing="1" class="widget_grid">',
 						'grid_colstart' => '<tr>',
 							'grid_cellstart' => '<td>',
@@ -630,7 +689,7 @@ class ComponentWidget extends DataObject
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 		global $Plugins;
 		global $rsc_url;
 
@@ -640,6 +699,8 @@ class ComponentWidget extends DataObject
 		switch( $this->type )
 		{
 			case 'plugin':
+				// Set widget ID param to make it available in plugin function SkinTag():
+				$this->disp_params['wi_ID'] = $this->ID;
 				// Call plugin (will return false if Plugin is not enabled):
 				if( $Plugins->call_by_code( $this->code, $this->disp_params ) )
 				{
@@ -663,14 +724,37 @@ class ComponentWidget extends DataObject
 	 */
 	function display_with_cache( $params, $keys = array() )
 	{
-		global $Blog, $Timer, $debug, $admin_url, $Session;
+		global $Collection, $Blog, $Timer, $debug, $admin_url, $Session, $current_User;
 
 		$this->init_display( $params );
 
-		// Display the debug conatainers when $debug = 2 OR when it is turned on from evo menu under "Blog" -> "Show/Hide containers"
-		$display_containers = $Session->get( 'display_containers_'.$Blog->ID ) == 1 || $debug == 2;
+		// Display the debug conatainers when $debug = 2 OR when it is turned on from evo menu under "Collection" -> "Show/Hide containers"
+		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
-		if( ! $Blog->get_setting('cache_enabled_widgets')
+		$force_nocaching = false;
+
+		// Enable the desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode"
+		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+		{	// Initialize data which is used by JavaScript to build overlay designer mode html elements:
+			$designer_mode_data = array(
+					'data-id'        => $this->ID,
+					'data-type'      => $this->get_name(),
+					'data-container' => $this->get( 'sco_name' ),
+				);
+			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Set data to know current user has a permission to edit this widget:
+				$designer_mode_data['data-can-edit'] = 1;
+			}
+			// Don't load a widget content from cache when designer mode is enabled:
+			$force_nocaching = true;
+			// Set designer mode:
+			$this->mode = 'designer';
+			// Set this param for plugin widgets:
+			$this->disp_params['debug_mode'] = $this->mode;
+		}
+
+		if( $force_nocaching
+		    || ! $Blog->get_setting( 'cache_enabled_widgets' )
 		    || ! $this->disp_params['allow_blockcache']
 		    || $this->get_cache_status() == 'disallowed' )
 		{ // NO CACHING - We do NOT want caching for this collection or for this specific widget:
@@ -679,9 +763,47 @@ class ComponentWidget extends DataObject
 			{ // DEBUG:
 				$is_subcontainer = ( $this->get( 'code' ) == 'subcontainer' || $this->get( 'code' ) == 'subcontainer_row' );
 				echo '<div class="dev-blocks '.( $is_subcontainer ? 'dev-blocks--subcontainer' : 'dev-blocks--widget' ).'"><div class="dev-blocks-name" title="'.
-							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'">'
-							.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
-							.'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
+							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'">';
+				if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+				{	// Display a link to edit this widget only if current user has a permission:
+					echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
+				}
+				echo 'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
+			}
+
+			if( ! empty( $designer_mode_data ) )
+			{	// Append designer mode html tag attributes to first not empty widget wrapper/container:
+				$widget_wrappers = array(
+						'block_start',
+						'block_body_start',
+						'list_start',
+						array( 'item_start', 'item_selected_start' ),
+					);
+				foreach( $widget_wrappers as $widget_wrapper_items )
+				{
+					if( ! is_array( $widget_wrapper_items ) )
+					{
+						$widget_wrapper_items = array( $widget_wrapper_items );
+					}
+					$wrapper_is_found = false;
+					foreach( $widget_wrapper_items as $widget_wrapper )
+					{
+						if( ! empty( $params[ $widget_wrapper ] ) )
+						{	// If this wrapper is filled and used with current widget,
+							// Append new data for widget wrapper:
+							$params[ $widget_wrapper ] = update_html_tag_attribs( $params[ $widget_wrapper ], $designer_mode_data );
+							if( isset( $this->disp_params[ $widget_wrapper ] ) )
+							{	// Also update params if they already have been initialized before:
+								$this->disp_params[ $widget_wrapper ] = update_html_tag_attribs( $this->disp_params[ $widget_wrapper ], $designer_mode_data );
+							}
+							$wrapper_is_found = true;
+						}
+					}
+					if( $wrapper_is_found )
+					{	// Stop search other wrapper in order to use only first filled wrapper:
+						break;
+					}
+				}
 			}
 
 			$this->display( $params );
@@ -708,9 +830,12 @@ class ComponentWidget extends DataObject
 
 				if( $display_containers )
 				{ // DEBUG:
-					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--incache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">'
-								.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
-								.'Widget: <b>'.$this->get_name().'</b> - FROM cache <i class="fa fa-info">?</i></div>'."\n";
+					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--incache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">';
+					if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+					{	// Display a link to edit this widget only if current user has a permission:
+						echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
+					}
+					echo 'Widget: <b>'.$this->get_name().'</b> - FROM cache <i class="fa fa-info">?</i></div>'."\n";
 				}
 
 				echo $content;
@@ -726,9 +851,12 @@ class ComponentWidget extends DataObject
 
 				if( $display_containers )
 				{ // DEBUG:
-					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--notincache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">'
-								.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
-								.'Widget: <b>'.$this->get_name().'</b> - NOT in cache <i class="fa fa-info">?</i></div>'."\n";
+					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--notincache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">';
+					if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+					{	// Display a link to edit this widget only if current user has a permission:
+						echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
+					}
+					echo 'Widget: <b>'.$this->get_name().'</b> - NOT in cache <i class="fa fa-info">?</i></div>'."\n";
 				}
 
 				$this->BlockCache->start_collect();
@@ -755,7 +883,7 @@ class ComponentWidget extends DataObject
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $this->type == 'plugin' && $this->get_Plugin() )
 		{	// Get widget cache keys from plugin:
@@ -790,8 +918,8 @@ class ComponentWidget extends DataObject
 			if( $check_blog_restriction )
 			{ // Check blog restriction for widget caching
 				$widget_Blog = & $this->get_Blog();
-				if( ! $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
-				{ // Widget/block cache is not allowed by blog setting
+				if( $widget_Blog && ! $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
+				{	// Widget/block cache is not allowed by collection setting:
 					return 'denied';
 				}
 			}
@@ -846,7 +974,7 @@ class ComponentWidget extends DataObject
 		/**
 		 * @var Blog
 		 */
-		global $Blog, $baseurl;
+		global $Collection, $Blog, $baseurl;
 
 		echo $this->disp_params['block_start'];
 
@@ -997,7 +1125,7 @@ class ComponentWidget extends DataObject
 		if( $this->Blog === NULL )
 		{ // Get blog only first time
 			$BlogCache = & get_BlogCache();
-			$this->Blog = & $BlogCache->get_by_ID( $this->get_coll_ID() );
+			$this->Blog = & $BlogCache->get_by_ID( $this->get_coll_ID(), false, false );
 		}
 
 		return $this->Blog;
@@ -1221,6 +1349,95 @@ class ComponentWidget extends DataObject
 		}
 
 		return $this->target_User;
+	}
+
+
+	/**
+	 * Get the list of validated renderers for this Widget. This includes stealth plugins etc.
+	 *
+	 * @return array List of validated renderer codes
+	 */
+	function get_renderers_validated()
+	{
+		if( ! isset( $this->renderers_validated ) )
+		{
+			global $Plugins;
+
+			$widget_Blog = & $this->get_Blog();
+
+			// Convert active renderers options for plugin functions below:
+			$widget_renderers = array_keys( $this->disp_params['renderers'] );
+
+			$this->renderers_validated = $Plugins->validate_renderer_list( $widget_renderers, array(
+					'Blog'         => & $widget_Blog,
+					'setting_name' => 'coll_apply_rendering'
+				) );
+		}
+
+		return $this->renderers_validated;
+	}
+
+
+	/**
+	 * Get content which is rendered with plugins
+	 *
+	 * @param string Source content
+	 * @return string Rendered content
+	 */
+	function get_rendered_content( $content )
+	{
+		if( ! isset( $this->disp_params['renderers'] ) )
+		{	// This widget has no render settings, Return original content:
+			return $content;
+		}
+
+		global $Plugins;
+
+		$widget_Blog = & $this->get_Blog();
+		$widget_renderers = $this->get_renderers_validated();
+
+		// Do some optional filtering on the content
+		// Typically stuff that will help the content to validate
+		// Useful for code display.
+		// Will probably be used for validation also.
+		$Plugins_admin = & get_Plugins_admin();
+		$params = array(
+				'object_type' => 'Widget',
+				'object'      => & $this,
+				'object_Blog' => & $widget_Blog
+			);
+		$fake_title = '';
+		$Plugins_admin->filter_contents( $fake_title /* by ref */, $content /* by ref */, $widget_renderers, $params /* by ref */ );
+
+		// Render block content with selected plugins:
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Render' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Display' );
+
+		return $content;
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			if( $message === NULL )
+			{	// Set default message:
+				$message = 'Widget "'.$this->get_name().'" is hidden because there is nothing to display.';
+			}
+
+			echo $this->disp_params['block_start'];
+			$this->disp_title();
+			echo $this->disp_params['block_body_start'];
+			echo $message;
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 ?>

@@ -70,6 +70,7 @@ include_once $inc_path.'xmlrpc/apis/_b2.api.php';
 include_once $inc_path.'xmlrpc/apis/_metaweblog.api.php';
 include_once $inc_path.'xmlrpc/apis/_mt.api.php';
 include_once $inc_path.'xmlrpc/apis/_wordpress.api.php';
+include_once $inc_path.'xmlrpc/apis/_antispam.api.php';
 
 
 // fp> xmlrpc.php should actually only load the function/api/plugin to execute once it has been identified

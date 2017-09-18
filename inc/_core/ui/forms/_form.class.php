@@ -290,6 +290,9 @@ class Form extends Widget
 					$this->title_fmt      = $template['title_fmt'];
 					$this->no_title_fmt   = $template['no_title_fmt'];
 					$this->no_title_no_icons_fmt = isset( $template['no_title_no_icons_fmt'] ) ? $template['no_title_no_icons_fmt'] : '';
+					$this->group_begin    = isset( $template['group_begin'] ) ? $template['group_begin'] : '';
+					$this->group_end      = isset( $template['group_end'] ) ? $template['group_end'] : '';
+					$this->fieldset_title = isset( $template['fieldset_title'] ) ? $template['fieldset_title'] : '';
 					$this->fieldset_begin = $template['fieldset_begin'];
 					$this->fieldset_end   = $template['fieldset_end'];
 					$this->fieldstart     = $template['fieldstart'];
@@ -837,6 +840,58 @@ class Form extends Widget
 
 
 	/**
+	 * Builds a fieldset group tag,
+	 * Used as start of wrapper for fieldsets, e-g on accordion layout
+	 *
+	 * @param string Params
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function begin_group( $params = array() )
+	{
+		$params = array_merge( array(
+				'id'    => 'evo_accordion',
+				'class' => '',
+			), $params );
+
+		$field_params = array();
+
+		if( ! empty( $params['id'] ) )
+		{	// If group id is defined:
+			$field_params['id'] = $params['id'];
+			// Set current group ID, used on building feildset:
+			$this->current_group_ID = $params['id'];
+			$this->current_group_item_num = 1;
+		}
+
+		$r = str_replace( array( '$group_class$', '$group_attribs$' ),
+			array( $params['class'], get_field_attribs_as_string( $field_params ) ),
+			$this->group_begin );
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Ends a fieldset group tag,
+	 * Used as end of wrapper for fieldsets, e-g on accordion layout
+	 *
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function end_group()
+	{
+		$r = $this->group_end;
+
+		if( isset( $this->current_group_ID ) )
+		{	// Unset current group ID and counter of group items:
+			unset( $this->current_group_ID );
+			unset( $this->current_group_item_num );
+		}
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
 	 * Builds a fieldset tag. This is a "fieldset" element by default, but a "th" element
 	 * for table layout.
 	 *
@@ -858,7 +913,7 @@ class Form extends Widget
 			$folding_icon = get_fieldset_folding_icon( $field_params['id'], $field_params );
 			if( ! $field_params['deny_fold'] && is_logged_in() )
 			{ // Only loggedin users can fold fieldset
-				global $UserSettings, $Blog;
+				global $UserSettings, $Collection, $Blog;
 				if( empty( $Blog ) )
 				{ // Get user setting value
 					$value = intval( $UserSettings->get( 'fold_'.$field_params['id'] ) );
@@ -882,6 +937,19 @@ class Form extends Widget
 		}
 		unset( $field_params['fold'] );
 		unset( $field_params['deny_fold'] );
+
+		if( ! empty( $this->fieldset_title ) )
+		{	// Replace text part of fieldset title with provided html code:
+			$fieldset_title = str_replace( '$fieldset_title$', '$1', $this->fieldset_title );
+			$title = preg_replace( '/^([^<]+)/', $fieldset_title, $title );
+		}
+
+		if( isset( $this->current_group_ID ) )
+		{	// If fieldset is grouped, Replace the group masks with values:
+			$group_item_ID = $this->current_group_ID.'_item_'.$this->current_group_item_num;
+			$title = str_replace( array( '$group_ID$', '$group_item_ID$' ), array( $this->current_group_ID, $group_item_ID ), $title );
+			$this->current_group_item_num ++;
+		}
 
 		switch( $this->layout )
 		{
@@ -920,6 +988,11 @@ class Form extends Widget
 				else
 				{
 					$r = str_replace( '$title_attribs$', get_field_attribs_as_string( $legend_params ), $r );
+				}
+
+				if( isset( $group_item_ID ) )
+				{	// Replace a mask of current group item ID with value:
+					$r = str_replace( '$group_item_id$', $group_item_ID, $r );
 				}
 
 				// Remove any empty legend tags: they cause a small gap in the fieldset border (FF 2.0.0.11)
@@ -1113,6 +1186,94 @@ class Form extends Widget
 
 
 	/**
+	 * Builds a file input field
+	 *
+	 * @param string the field name
+	 * @param string the field value
+	 * @param string the field label
+	 * @param string the field note
+	 * @param array Extended attributes, see {@link input_field()}
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function file_input( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
+	{
+
+		$field_params = array_merge( array(
+				'type' => 'file',
+				'value' => $field_value,
+				'note' => $field_note,
+				'name' => $field_name,
+				'label' => $field_label,
+				'class' => ''
+			), $field_params );
+
+		$element = $this->get_input_element( $field_params );
+
+		$field_params = array_merge( array(
+				'note_format' => ' <small class="notes">%s</small>',
+			), $field_params );
+
+		if( isset($field_params['format_info']) )
+		{
+			$format_info = $field_params['format_info'];
+			unset($field_params['format_info']); // not an HTML element
+		}
+		else
+		{
+			$format_info = 'htmlbody';
+		}
+
+		$r = $this->fieldstart;
+
+		// Start the new form field and inject an automatic DOM id
+		// This is useful to show/hide the whole field by JS.
+		if( !empty( $this->_common_params['id'] ) )
+		{
+			$ffield_id = ' id="ffield_'.$this->_common_params['id'].'" ';
+		}
+		else
+		{ // No ID in case there's no id/name given for a field.
+			$ffield_id = '';
+		}
+		$r = $this->fieldstart;
+		if( !empty( $field_params['class'] ) )
+		{
+			if( strpos( $r, 'class="' ) === false )
+			{ // Add class attribute
+				$ffield_id .= ' class="'.$field_params['class'].'"';
+			}
+			else
+			{ // Append classes to attribute
+				$r = str_replace( ' class="', ' class="'.$field_params['class'].' ', $r );
+			}
+		}
+		$r = str_replace( '$ID$', $ffield_id, $r );
+
+		$r .= $this->get_label();
+
+		$r .= $this->infostart;
+
+		// PAYLOAD:
+		$r .= format_to_output( $element, $format_info );
+
+		// Taken from end_field() - but we use $infoend:
+		if( !empty($this->_common_params['note']) )
+		{ // We have a note
+			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
+		}
+
+		if( isset($this->_common_params['field_suffix']) )
+		{
+			$r .= $this->_common_params['field_suffix'];
+		}
+
+		$r .= $this->infoend.$this->fieldend;
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
 	 * Builds a password input field.
 	 *
 	 * Calls the text() method with a 'password' parameter.
@@ -1145,14 +1306,14 @@ class Form extends Widget
 
 
 	/**
-	 * Build username/login field.
+	 * Build username field
 	 *
 	 * @param string the name of the input field
 	 * @param User initial value
-	 * @param integer size of the input field
 	 * @param string label displayed in front of the field
 	 * @param string note displayed with field
 	 * @param string class of the input field. Class name "only_assignees" provides to load only assignee users of the blog
+	 * @param array Field params
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '', $field_params = array() )
@@ -1160,6 +1321,8 @@ class Form extends Widget
 		$field_params = array_merge( array(
 				'note' => $field_note,
 				'size' => 20,
+				'autocapitalize' => 'off',
+				'autocorrect' => 'off'
 			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
@@ -1173,6 +1336,30 @@ class Form extends Widget
 		$r .= $this->end_field();
 
 		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Build login field.
+	 *
+	 * @param string the name of the input field
+	 * @param string User login
+	 * @param integer size of the input field
+	 * @param string label displayed in front of the field
+	 * @param string note displayed with field
+	 * @param array Field params
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function login_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		$field_params = array_merge( array(
+				'size' => $field_size,
+				'class' => 'input_text',
+				'autocapitalize' => 'off',
+				'autocorrect' => 'off'
+			), $field_params );
+
+		return $this->text_input( $field_name, $field_value, $field_params['size'], $field_label, $field_note, $field_params );
 	}
 
 
@@ -1194,7 +1381,7 @@ class Form extends Widget
 
 		if( empty($field_params['date_format']) )
 		{	// Use locale date format:
-			$date_format = locale_datefmt();
+			$date_format = locale_input_datefmt();
 		}
 		else
 		{
@@ -1213,6 +1400,8 @@ class Form extends Widget
 				case "j": return "d"; // day, 1-31
 				case "l": return "EE"; // weekday (name)
 				case "D": return "E"; // weekday (abbr)
+				case "S": return "";
+
 				case "e": return ""; // weekday letter, not supported
 
 				case "m": return "MM"; // month, 01-12
@@ -1224,6 +1413,30 @@ class Form extends Widget
 				case "Y": return "yyyy"; // year, XXXX
 				default:
 					return $m[0];
+			}' ), $date_format );
+
+		// Get max length of each date component
+		$js_date_length = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
+			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
+			switch( $m[2] )
+			{
+				case "d": return "nn"; // day, 01-31(2)
+				case "j": return "nn"; // day, 1-31(2)
+				case "l": return "XXXXXXXXX"; // weekday (name) - Wednesday(9)
+				case "D": return "XXX"; // weekday (abbr)(3)
+				case "S": return "";
+
+				case "e": return ""; // weekday letter, not supported
+
+				case "m": return "nn"; // month, 01-12(2)
+				case "n": return "nn"; // month, 1-12(2)
+				case "F": return "XXXXXXXXX"; // full month name; "name or abbr" in date.js - September(9)
+				case "M": return "XXX"; // month name abbr(3)
+
+				case "y": return "nn"; // year, 00-99(2)
+				case "Y": return "nnnn"; // year, 1970 to 2038(4)
+				default:
+					return "_"; // (1)
 			}' ), $date_format );
 
 		$field_params['type'] = 'text';
@@ -1270,7 +1483,7 @@ class Form extends Widget
 
 		if( !isset($field_params['size']) )
 		{ // Get size out of $date_format if not explicitly set
-			$field_params['size'] = strlen( $js_date_format );
+			$field_params['size'] = strlen( $js_date_length );
 		}
 
 		/*
@@ -1854,6 +2067,10 @@ class Form extends Widget
 		}
 		else
 		{ // Standard form
+			if( $form_params['action'] == '' )
+			{ // Remove action attribute instead of an empty one which is not HTML4/5 compliant
+				unset( $form_params['action'] );
+			}
 			$r = "\n\n<form".get_field_attribs_as_string( $form_params ).">\n";
 		}
 
@@ -1915,7 +2132,7 @@ class Form extends Widget
 			}
 			else
 			{ // with form title:
-				$r .= sprintf( TS_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $js_form_title );
+				$r .= sprintf( TS_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), format_to_js( $js_form_title ) );
 			}
 
 			$r .= '\';';
@@ -2039,6 +2256,7 @@ class Form extends Widget
 	 *  - an optional note
 	 *  - an optional class (html attribute)
 	 *  - an optional boolean TRUE - to print out an option as hidden field instead of checkbox
+	 *  - an optional array of additional attributes for the option label
 	 *
 	 * @todo Transform to $field_params schema.
 	 * @param array a two-dimensional array containing the parameters of the input tag
@@ -2081,8 +2299,15 @@ class Form extends Widget
 
 			$loop_field_note = empty( $option[5] ) ? '' : $option[5];
 
+			// extra params for checklist option label
+			$extra_attribs = '';
+			if( ! empty( $option[8] ) )
+			{
+				$extra_attribs = ' '.get_field_attribs_as_string( $option[8] );
+			}
+
 			// asimo>> add id for label: id = label_for_fieldname_fieldvalue
-			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'">';
+			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'"'.$extra_attribs.'>';
 
 			if( $add_highlight_spans )
 			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover
@@ -2237,14 +2462,21 @@ class Form extends Widget
 			$field_object_callback = 'get_option_list';
 		}
 
+		$field_options = '';
+		if( isset( $field_params['prepend_options'] ) )
+		{	// Prepend additional options before cached object (Used to use several none options):
+			$field_options .= $this->get_select_options_string( $field_params['prepend_options'], $field_value, true );
+			unset( $field_params['prepend_options'] );
+		}
+
 		if( isset($field_params['loop_object_method']) )
 		{
-			$field_options = $field_object->$field_object_callback( $field_value, $allow_none, $field_params['loop_object_method'] );
+			$field_options .= $field_object->$field_object_callback( $field_value, $allow_none, $field_params['loop_object_method'] );
 			unset( $field_params['loop_object_method'] );
 		}
 		else
 		{
-			$field_options = $field_object->$field_object_callback( $field_value, $allow_none );
+			$field_options .= $field_object->$field_object_callback( $field_value, $allow_none );
 		}
 
 		if( isset($field_params['note']) )
@@ -3552,6 +3784,282 @@ class Form extends Widget
 	}
 
 
+	function fileselect( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $thumbnail_sizes, $file_select_js_initialized;
+
+		$field_params['note'] = $field_note;
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		$field_params = array_merge( array(
+				'field_item_start' => '<div class="file_select_item" data-item-value="%value%">',
+				'field_item_end' => '</div>',
+				'size_name' => 'crop-64x64',
+				'class' => '',
+				'remove_file_text' => T_('Remove file'),
+				'edit_file_text' => T_('Select another'),
+				'max_file_num' => 1,
+				'file_type' => 'image',
+				'initialize_with' => '',
+
+				'window_title' => T_('Attach files'),
+				'value_separator' => ';',
+				'overflow_mode' => 'queue', // valid values are queue and stack
+				'root' => '',
+				'path' => ''
+			), $field_params );
+
+			$FileCache = & get_FileCache();
+			$counter = 0;
+
+			if( ! isset( $field_value ) && ! empty( $field_params['initialize_with'] ) )
+			{
+				if( $initial_File = & get_file_by_abspath( $field_params['initialize_with'], true ) )
+				{
+					$field_value = $initial_File->ID;
+				}
+			}
+
+			$field_values = empty( $field_value ) ? $field_value : explode( $field_params['value_separator'], $field_value );
+
+			$r = $this->begin_field();
+			$remove_icon = get_icon( 'remove' ); // we'll use this to replace the icon in the AJAX added file_select_items later
+			$edit_icon = get_icon( 'edit' ); // we'll use this to replace the icon in the AJAX added file_select_items later
+
+			$r .= '<input type="hidden" id="'.$field_name.'" name="'.$field_name.'" value="'.$field_value.'">';
+
+			$r .= '<div name="'.$field_name.'" class="file_select_wrapper" data-max-length="'.$field_params['max_file_num']
+					.'" data-thumb-size="'.$field_params['size_name']
+					.'" data-root="'.$field_params['root']
+					.'" data-path="'.$field_params['path']
+					.'" data-file-type="'.$field_params['file_type']
+					.'" data-overflow-mode="'.$field_params['overflow_mode'].'">';
+
+			if( ! empty( $field_values ) )
+			{
+				foreach( $field_values as $file_ID )
+				{
+					$r .= file_select_item( $file_ID, $field_params );
+					$counter++;
+				}
+			}
+
+			if( ! isset( $thumbnail_sizes[ $field_params['size_name'] ] ) )
+			{ // Wrong thumbnail size name
+				debug_die( 'Invalid thumbnail size name' );
+			}
+			$thumb_type = $thumbnail_sizes[ $field_params['size_name'] ][0];
+			$thumb_width = $thumbnail_sizes[ $field_params['size_name'] ][1];
+			$thumb_height = $thumbnail_sizes[ $field_params['size_name'] ][2];
+
+			$button_label = ( $counter === 0 ? /* TRANS: verb */ T_('Select') : get_icon( 'new' ).' '.T_('Add') );
+
+			$r .= '<button class="btn btn-sm btn-info file_select_item" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
+
+			$r .= '</div>';
+			$r .= $this->end_field();
+			echo_modalwindow_js();
+
+			// We have to encode the params that contain HTML tags
+			$script_params = $field_params;
+			$script_params['field_item_start'] = base64_encode( $script_params['field_item_start'] );
+			$script_params['field_item_end'] = base64_encode( $script_params['field_item_end'] );
+
+			if( empty( $file_select_js_initialized ) )
+			{
+				$r .= '
+						<script type="text/javascript">
+						var fsel_size, fsel_name, fsel_type, fsel_obj, fsel_replace = false;
+
+						function file_select_attachment_window( event_object, replace_item, fm_highlight )
+						{
+							fsel_obj = event_object;
+							fsel_replace = replace_item;
+							field_object = jQuery( event_object ).closest( ".file_select_wrapper" );
+							fsel_size = field_object.data( "thumbSize" );
+							fsel_name = field_object.attr( "name" );
+							fsel_type = field_object.data( "fileType" );
+							root = field_object.data( "root" );
+							path = field_object.data( "path" );
+
+							openModalWindow( \'<span class="loader_img loader_user_report absolute_center" title="'.T_('Loading...').'"></span>\',
+								"90%", "80%", true, "'.$field_params['window_title'].'", "", true );
+							jQuery.ajax(
+							{
+								type: "POST",
+								url: "'.get_htsrv_url().'async.php",
+								data:
+								{
+									"action": "file_attachment",
+									"crumb_file_attachment": "'.get_crumb( 'file_attachment' )/* We use a different crumb name ('file_attachment' vs 'file') for extra security. */.'",
+									"root": typeof( root ) == "undefined" ? "" : root,
+									"path": typeof( path ) == "undefined" ? "" : path,
+									"fm_highlight": typeof( fm_highlight ) == "undefined" ? "" : fm_highlight,
+									"field_name": field_object.attr( "name" ),
+									"file_type": field_object.data( "fileType" ),
+								},
+								success: function(result)
+								{
+									result = ajax_debug_clear( result );
+									openModalWindow( result, "90%", "80%", true, "'.$field_params['window_title'].'", "" );
+								}
+							} );
+							return false;
+						}
+
+						function file_select_add( fieldName, root, path )
+						{
+							// check if value is already present
+							fieldName = fieldName.replace(/(\[|\])/g, "\\\\$1");
+							var inputField = jQuery( "input#" + fieldName );
+							var values = inputField.val().split( "'.$field_params['value_separator'].'" );
+
+							// Add new item
+							jQuery.ajax({
+								type: "GET",
+								url: "'.get_htsrv_url().'anon_async.php",
+								data: {
+										"action": "get_file_select_item",
+										"field_name": fieldName,
+										"root": root,
+										"path": path,
+										"params": '.json_encode( $script_params ).'
+									},
+								success: function( result )
+									{
+										result = jQuery.parseJSON( ajax_debug_clear( result) );
+										var fieldName = result.fieldName;
+										var fieldValue = result.fieldValue;
+										var inputField = jQuery( "input#" + fieldName );
+										var wrapper = jQuery( "div[name=" + fieldName + "].file_select_wrapper" );
+										var maxLength = wrapper.data( "maxLength" );
+										var overflowMode = wrapper.data( "overflowMode" );
+										var addButton = jQuery( "button", wrapper );
+										var items = jQuery( ".file_select_item:not(button)", wrapper );
+										var lastItem = items.last();
+
+										var newItem = jQuery( atob( result.item ) );
+
+										if( fsel_replace )
+										{
+											var item = jQuery( fsel_obj ).closest( ".file_select_item" );
+											newItem.insertAfter( item );
+											file_select_delete( item );
+										}
+										else
+										{
+											// Attach new item
+											// check if adding item will result to an overflow
+											if( items.length >= maxLength )
+											{ // remove extra item first depending on overflow mode
+												if( overflowMode == "queue" )
+												{
+													file_select_delete( items.first() );
+												}
+												else if( overflowMode == "stack" )
+												{
+													file_select_delete( items.last() );
+												}
+
+												items = jQuery( ".file_select_item:not(button)", wrapper );
+												lastItem = items.last();
+											}
+
+											if( lastItem.length )
+											{ // attachment already exists, add to the last
+												newItem.insertAfter( lastItem );
+											}
+											else
+											{ // no attachments yet
+												wrapper.prepend( newItem );
+											}
+										}
+
+										newItem.find( "span.remove_file_icon" ).replaceWith(\''.$remove_icon.'\'); // replace unlink icon with skin specific icon saved earlier
+										newItem.find( "span.edit_file_icon" ).replaceWith(\''.$edit_icon.'\'); // replace unlink icon with skin specific icon saved earlier
+
+										items = jQuery( ".file_select_item:not(button)", wrapper );
+										lastItem = items.last();
+
+										// Toggle add button
+										addButton.html( items.length === 0 ? "'./* TRANS: verb */ T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
+										if( maxLength > items.length )
+										{
+											addButton.show();
+										}
+										else
+										{
+											addButton.hide();
+										}
+
+										// append field value
+										var values = inputField.val();
+										values = values ? ( inputField.val().split( "'.$field_params['value_separator'].'" ) ) : [];
+										values.push( fieldValue );
+										inputField.val( values.join( "'.$field_params['value_separator'].'" ) );
+
+										// Trigger change so bozo validator will pickup the change
+										inputField.trigger( "change" );
+
+										// close modal if single item select
+										if( maxLength == 1 )
+										{
+											closeModalWindow();
+										}
+									}
+							});
+
+							return false;
+						}
+
+						function file_select_delete( event_object )
+						{
+							var wrapper = jQuery( event_object ).closest( ".file_select_wrapper" );
+							var item = jQuery( event_object ).closest( ".file_select_item" );
+							var fieldName = wrapper.attr( "name" );
+							fieldName = fieldName.replace(/(\[|\])/g, "\\\\$1");
+							var fieldValue = item.data( "itemValue" ).toString(); // converted to string because it will later be compared to array of strings
+							var maxLength = wrapper.data( "maxLength" );
+							var addButton = jQuery( "button", wrapper );
+
+							// Remove file select item
+							item.remove();
+
+							var items = jQuery( ".file_select_item:not(button)", wrapper );
+							var lastItem = items.last();
+
+							// Toggle add button
+							addButton.html( items.length === 0 ? "'./* TRANS: verb */ T_('Select').'" : \''.get_icon( 'new' ).' '.T_('Add').'\' );
+							if( maxLength > items.length )
+							{
+								addButton.show();
+							}
+							else
+							{
+								addButton.hide();
+							}
+
+							// Change input value
+							var inputField = jQuery( "input#" + fieldName );
+							var values = inputField.val().split( "'.$field_params['value_separator'].'" );
+							var index =  values.indexOf( fieldValue );
+							if( index != -1 )
+							{
+								values.splice( index, 1 );
+							}
+							inputField.val( values.join( "'.$field_params['value_separator'].'" ) );
+							inputField.trigger( "change" );
+
+							return false;
+						}
+						</script>';
+			}
+
+			$file_select_js_initialized = true;
+			return $this->display_or_return( $r );
+	}
+
+
 	/**
 	 * Generate a general input element.
 	 *
@@ -3713,6 +4221,7 @@ class Form extends Widget
 		}
 		else
 		{
+			unset( $field_params['tag'] );
 			$r .= '<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />';
 		}
 

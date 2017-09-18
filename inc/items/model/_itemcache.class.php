@@ -139,7 +139,7 @@ class ItemCache extends DataObjectCache
 
 		// Initialize $Blog from coll_ID
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $coll_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $coll_ID );
 
 		$visibility_statuses = is_admin_page() ? get_visibility_statuses( 'keys', array('trash') ) : get_inskin_statuses( $coll_ID, 'post' );
 

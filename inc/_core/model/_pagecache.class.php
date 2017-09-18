@@ -423,7 +423,13 @@ class PageCache
 			unset($lines[$i]);
 
 			// SEND CONTENT!
-			$body = implode('',$lines);
+			$body = implode( '', $lines );
+
+			if( ! $this->is_valid_cached_content( $body ) )
+			{	// The stored content of the cached page is not valid HTML page,
+				// We cannot use this to display, Exit here to generate new one:
+				return false;
+			}
 
 			$Timer->pause( 'Cache file processing' );
 
@@ -457,13 +463,41 @@ class PageCache
 	}
 
 
-  /**
+	/**
 	 * This is called every x bytes to provide real time output
 	 */
 	function output_handler( $buffer )
 	{
 		$this->cached_page_content .= $buffer;
 		return $buffer;
+	}
+
+
+	/**
+	 * Check if the cached page content is valid HTML page
+	 * (in order to avoid storing/displaying of incomplete page without ending html tag)
+	 *
+	 * @param string|NULL The cached page content, NULL - to use current content
+	 * @return boolean TRUE if the content is valid HTML page and can be used
+	 */
+	function is_valid_cached_content( $content = NULL )
+	{
+		if( $content === NULL )
+		{	// Use current cached page content:
+			$content = $this->cached_page_content;
+		}
+
+		// Check if the cached page content is valid HTML page:
+		if( preg_match( '#<html[^>]*>(.+)<\/html>#is', $content ) )
+		{	// Valid HTML page
+			return true;
+		}
+		else
+		{	// Wrong HTML page
+			global $Debuglog;
+			$Debuglog->add( 'The cached page content is not valid HTML page!', 'pagecache' );
+			return false;
+		}
 	}
 
 
@@ -481,16 +515,16 @@ class PageCache
 			return;
 		}
 
- 		$Debuglog->add( 'Aborting cache data collection...', 'pagecache' );
+		$Debuglog->add( 'Aborting cache data collection...', 'pagecache' );
 
- 		if( $flush )
- 		{ // Flush the output buffer and turn off buffering
+		if( $flush )
+		{ // Flush the output buffer and turn off buffering
 			ob_end_flush();
- 		}
- 		else
- 		{ // Erase the output buffer and turn off buffering
+		}
+		else
+		{ // Erase the output buffer and turn off buffering
 			ob_end_clean();
- 		}
+		}
 
 		// We are no longer collecting...
 		$this->is_collecting = false;
@@ -513,6 +547,11 @@ class PageCache
 
 		// echo ' *** cache end *** ';
 		// echo $this->cached_page_content;
+
+		if( ! $this->is_valid_cached_content() )
+		{	// Current cached page content is not valid HTML page, We cannot use this for storing in cache file:
+			return;
+		}
 
 		// What would be the cache file for the current URL?
 		$af_cache_file = $this->get_af_filecache_path();

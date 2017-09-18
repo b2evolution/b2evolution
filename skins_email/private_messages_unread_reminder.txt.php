@@ -14,8 +14,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $htsrv_url;
-
 // Default params:
 $params = array_merge( array(
 		'unread_threads' => '',
@@ -38,7 +36,7 @@ echo T_( 'Click here to read your private messages:' ).' '.$params['threads_link
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive notifications for unread private messages any more, click here:' ).' '.
-		$htsrv_url.'quick_unsubscribe.php?type=unread_msg&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=unread_msg&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

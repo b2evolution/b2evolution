@@ -16,13 +16,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $disp;
 
 if( ( $disp == 'single' || $disp == 'page' ) &&
-    ! empty( $Item ) &&
+    isset( $Item ) && $Item->ID > 0 &&
     is_logged_in() &&
     $Blog->get_setting( 'use_workflow' ) &&
     $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
     $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 { // Display workflow properties if current user can edit this post:
-	$Form = new Form( get_samedomain_htsrv_url().'item_edit.php' );
+	$Form = new Form( get_htsrv_url().'item_edit.php' );
 
 	$Form->add_crumb( 'item' );
 	$Form->hidden( 'blog', $Blog->ID );
@@ -58,7 +58,15 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 	$ItemStatusCache->load_all();
 	$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true ), T_('Task status') );
 
-	$Form->date( 'item_deadline', $Item->get('datedeadline'), T_('Deadline') );
+	$Form->begin_line( T_('Deadline'), 'item_deadline' );
+
+		$datedeadline = $Item->get( 'datedeadline' );
+		$Form->date( 'item_deadline', $datedeadline, '' );
+
+		$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+		$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+
+	$Form->end_line();
 
 	$Form->button( array( 'submit', 'actionArray[update_workflow]', T_('Update'), 'SaveButton' ) );
 

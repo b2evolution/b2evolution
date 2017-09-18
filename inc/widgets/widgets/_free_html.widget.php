@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class free_html_Widget extends ComponentWidget
 {
+	var $icon = 'code';
+
 	/**
 	 * Constructor
 	 */
@@ -77,7 +79,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Custom text/HTML of your choice.');
+		return T_('Display any HTML snippet of your choice.');
 	}
 
 
@@ -114,7 +116,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 

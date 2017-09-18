@@ -45,7 +45,15 @@ class ItemQuery extends SQL
 	var $phrase;
 	var $exact;
 	var $featured;
+	var $flagged;
 
+	/**
+	 * A query FROM string to join other tables.
+	 * It is set in case of the select queries when we need to order by custom fields.
+	 *
+	 * @var string
+	 */
+	var $orderby_from = '';
 
 	/**
 	 * Constructor.
@@ -210,9 +218,9 @@ class ItemQuery extends SQL
 	/**
 	 * Restrict to specific collection/chapters (blog/categories)
 	 *
-	 * @param Blog
-	 * @param array
-	 * @param string
+	 * @param object Blog
+	 * @param array Categories IDs
+	 * @param string Use '-' to exclude the categories
 	 * @param string 'wide' to search in extra cats too
 	 *               'main' for main cat only
 	 *               'extra' for extra cats only
@@ -227,15 +235,21 @@ class ItemQuery extends SQL
 		$this->cat_modifier = $cat_modifier;
 
 		if( ! empty( $cat_array ) && ( $cat_focus == 'wide' || $cat_focus == 'extra' ) )
-		{
+		{	// Select extra categories if we want filter by several categories:
 			$sql_join_categories = ( $cat_focus == 'extra' ) ? ' AND post_main_cat_ID != cat_ID' : '';
-			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
-												INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
+			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
+			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
 			// fp> we try to restrict as close as possible to the posts but I don't know if it matters
 			$cat_ID_field = 'postcat_cat_ID';
 		}
+		elseif( get_allow_cross_posting() >= 1 )
+		{	// Select extra categories if cross posting is enabled:
+			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
+			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+			$cat_ID_field = 'postcat_cat_ID';
+		}
 		else
-		{
+		{	// Select only main categories:
 			$this->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$cat_ID_field = 'post_main_cat_ID';
 		}
@@ -302,7 +316,7 @@ class ItemQuery extends SQL
 		{ // Blog IDs are not defined, Use them depending on current collection setting
 			// NOTE! collection can be 0, for example, on disp=usercomments|useritems where we display data from all collections
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $this->blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $this->blog );
 			$aggregate_coll_IDs = $Blog->get_setting( 'aggregate_coll_IDs' );
 		}
 
@@ -970,6 +984,135 @@ class ItemQuery extends SQL
 	}
 
 
+	/**
+	 * Restrict to the flagged items
+	 *
+	 * @param boolean TRUE - Restrict to flagged items, FALSE - Don't restrict/Get all items
+	 */
+	function where_flagged( $flagged = false )
+	{
+		global $current_User;
+
+		$this->flagged = $flagged;
+
+		if( ! $this->flagged )
+		{	// Don't restrict if it is not requested or if user is not logged in:
+			return;
+		}
+
+		// Get items which are flagged by current user:
+		$this->FROM_add( 'INNER JOIN T_items__user_data ON '.$this->dbIDname.' = itud_item_ID
+			AND itud_flagged_item = 1
+			AND itud_user_ID = '.( is_logged_in() ? $current_User->ID : '-1' ) );
+	}
+
+
+	/**
+	 * Generate order by clause
+	 *
+	 * @param $order_by
+	 * @param $order_dir
+	 */
+	function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname )
+	{
+		global $DB;
+
+		$order_by = str_replace( ' ', ',', $order_by );
+		$orderby_array = explode( ',', $order_by );
+
+		if( in_array( 'numviews', $orderby_array ) )
+		{	// Special case for numviews:
+			$this->orderby_from .= ' LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS post_numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+				ON post_ID = numviews.itud_item_ID ';
+		}
+
+		// asimo> $nullable_fields may be used if we would like to order the null values into the end of the result
+		// asimo> It would move the null values into the end no matter what kind of direction are we sorting
+		// Set of sort options which are nullable
+		// $nullable_fields = array( 'order', 'priority' );
+
+		$available_fields = get_available_sort_options( $this->blog, false, true );
+		// Custom sort options
+		$custom_sort_fields = $available_fields['custom'];
+
+		foreach( $custom_sort_fields as $key => $field_name )
+		{
+			$table_alias = $key.'_table';
+			$field_value = $table_alias.'.iset_value';
+			if( strpos( $key, 'custom_double' ) === 0 )
+			{ // Double values should be compared as numbers and not like strings
+				$field_value .= '+0';
+			}
+			if( in_array( $key, $orderby_array ) )
+			{
+				if( empty( $this->orderby_from ) )
+				{
+					$this->orderby_from .= ' ';
+				}
+				// $nullable_fields[$key] = $field_value;
+				$this->orderby_from .= 'LEFT JOIN T_items__item_settings as '.$table_alias.' ON post_ID = '.$table_alias.'.iset_item_ID AND '
+						.$table_alias.'.iset_name = (
+							SELECT CONCAT( "custom_", itcf_type, "_", itcf_ID )
+							FROM T_items__type_custom_field WHERE itcf_name = '.$DB->quote( $field_name ).' AND itcf_ityp_ID = post_ityp_ID )';
+				$order_by = str_replace( $key, $field_value, $order_by );
+			}
+			$custom_sort_fields[$key] = $field_value;
+		}
+
+		$available_fields = array_merge( array_keys( $available_fields['general'] ), array_values( $custom_sort_fields ) );
+		// Extend general list to allow order posts by these fields as well for some special cases
+		$available_fields[] = 'creator_user_ID';
+		$available_fields[] = 'assigned_user_ID';
+		$available_fields[] = 'pst_ID';
+		$available_fields[] = 'datedeadline';
+		$available_fields[] = 'ityp_ID';
+		$available_fields[] = 'status';
+		$available_fields[] = 'T_categories.cat_name';
+		$available_fields[] = 'T_categories.cat_order';
+
+		$order_clause = gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname, $available_fields );
+
+		// asimo> The following commented code parts handles the nullable fields order, to move them NULL values into the end of the result
+		// asimo> !!!Do NOT remove!!!
+//		$orderby_fields = explode( ',', $order_clause );
+//		foreach( $orderby_array as $index => $orderby_field )
+//		{
+//			$field_name = NULL;
+//			$additional_clause = 0;
+//			if( in_array( $orderby_field, $nullable_fields ) )
+//			{ // This is an item nullable field
+//				$field_name = $dbprefix.$orderby_field;
+//			}
+//			elseif( strpos( $orderby_field, 'custom_' ) === 0 )
+//			{ // This is an item custom field which are always nullable
+//				$field_name = $nullable_fields[$orderby_field];
+//			}
+//
+//			if( empty( $field_name ) || ( strpos( $order_clause, $field_name ) === false ) )
+//			{ // The field is not nullable or it is not present in the final order clause
+//				continue;
+//			}
+//
+//			// Insert 'order null values into the end' order clause
+//			array_splice( $orderby_fields, $index + $additional_clause, 0, array( ' (CASE WHEN '.$field_name.' IS NULL then 1 ELSE 0 END)' ) );
+//			$additional_clause++;
+//		}
+//		$order_clause = implode( ',', $orderby_fields );
+
+		return $order_clause;
+	}
+
+
+	/**
+	 * Get additional FROM clause if it is required because of custom order_by fields
+	 *
+	 * @param return before the FROM clause
+	 * @return string the FROM clause to JOIN the custom fields tables
+	 */
+	function get_orderby_from( $prefix = '' )
+	{
+		return $prefix.$this->orderby_from;
+	}
 }
 
 ?>

@@ -30,7 +30,7 @@ class Text_Diff_Mapped extends Text_Diff {
      * @param array $mapped_to_lines    This array should have the same number
      *                                  of elements as $to_lines.
      */
-    function Text_Diff_Mapped($from_lines, $to_lines,
+    function __construct($from_lines, $to_lines,
                               $mapped_from_lines, $mapped_to_lines)
     {
         assert(count($from_lines) == count($mapped_from_lines));

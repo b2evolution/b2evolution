@@ -22,6 +22,9 @@ global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins;
 global $month, $month_abbrev, $weekday, $weekday_abbrev; /* for localized calendar */
 global $debug, $Hit, $AdminUI;
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache the admin pages!
 ?>
 <!DOCTYPE html>
@@ -37,13 +40,14 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	$robots_follow = false;
 	robots_tag();
 
-	global $rsc_path, $rsc_url, $htsrv_url, $restapi_url;
+	global $rsc_path, $rsc_url;
 
 	// var htsrv_url is used for AJAX callbacks
-	add_js_headline( "// Paths used by JS functions:
-		var htsrv_url = '$htsrv_url';
-		var restapi_url = '$restapi_url';
+	add_js_headline( "// Paths and vars are used by JS functions:
+		var htsrv_url = '".get_htsrv_url()."';
+		var restapi_url = '".get_restapi_url()."';
 		var blog_id = '".param( 'blog', 'integer' )."';
+		var b2evo_icons_type = '".get_param( 'b2evo_icons_type' )."';
 		var is_backoffice = true;" );
 
 	init_bubbletip_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) ); // Init popover windows for usernames
@@ -68,7 +72,8 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 
 	if( $this->get_path( 0 ) == 'files'
 			|| ( $this->get_path_range( 0, 2 ) == array( 'collections', 'settings', 'perm' ) )
-			|| ( $this->get_path_range( 0, 2 ) == array( 'collections', 'settings', 'permgroup' ) ) )
+			|| ( $this->get_path_range( 0, 2 ) == array( 'collections', 'settings', 'permgroup' ) )
+			|| ( $this->get_path_range( 0, 2 ) == array( 'users', 'groups', 'collection' ) ) )
 	{{{ // -- Inject javascript ----------------
 		// gets initialized in _footer.php
 

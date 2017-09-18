@@ -13,10 +13,13 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $container;
+global $container, $display_mode;
 
-echo '<h2><span class="right_icons">'.action_icon( T_('Cancel!'), 'close', regenerate_url( 'container' ) ).'</span>'
-	.sprintf(T_('Widgets available for insertion into &laquo;%s&raquo;'), $container ).'</h2>';
+if( $display_mode != 'iframe' )
+{	// Don't display this title because it is displayed on modal window header:
+	echo '<h2><span class="right_icons">'.action_icon( T_('Cancel').'!', 'close', regenerate_url( 'container' ) ).'</span>'
+		.sprintf(T_('Widgets available for insertion into &laquo;%s&raquo;'), $container ).'</h2>';
+}
 
 
 /**
@@ -47,27 +50,37 @@ foreach( $Plugin_array as $k => $Plugin )
 unset( $Plugin_array );
 
 $widget_groups = array (
-	'multipurpose' => T_('Multi-Purpose Widgets'),
-	'menu_item'    => T_('Menu Item Widgets'),
-	'navigation'   => T_('Navigation Widgets'),
-	'content'      => T_('Content Listing Widgets'),
-	'infoitem'     => T_('Info about a specific Item'),
-	'collection'   => T_('Collection Support Widgets'),
-	'site'         => T_('Site Support Widgets'),
-	'user'         => T_('User Support Widgets'),
+	'free_content' => T_('Free Content'),
+	'menu_item'    => T_('Menu Items / Buttons'),
+	'navigation'   => T_('Navigation'),
+	'content'      => T_('Listing Contents'),
+	'infoitem'     => T_('Item Details'),
+	'collection'   => T_('Collection Details'),
+	'about_user'   => T_('User Details'),
+	'user'         => T_('User Related'),
 	'other'        => T_('Other'),
 );
 
 $core_componentwidget_defs = array(
-	'multipurpose' => array(
-			'image',
+	'free_content' => array(
+			'free_text',
 			'free_html',
+			'spacer',
 			'separator',
-			'user_links',
+			'image',
+			'social_links',
+		),
+	'about_user' => array(
+			'user_profile_pics',		// Avatar of User
+			'user_links',		// Social links of coll owner
+			'user_info',
+			'user_action',
+			'user_fields',
 		),
 	'menu_item' => array(
-			'menu_link',
+			'basic_menu_link',
 			'msg_menu_link',
+			'flag_menu_link',
 			'profile_menu_link',
 		),
 	'navigation' => array(
@@ -84,17 +97,24 @@ $core_componentwidget_defs = array(
 			'coll_post_list',         // Simple Post list
 			'coll_page_list',         // Simple Page list
 			'coll_related_post_list', // Simple Related Posts list
+			'coll_flagged_list',      // Simplified UIL: Flagged Items
 			'coll_item_list',         // Universal Item list
 			'coll_featured_intro',    // Featured/Intro Post
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
+			'content_block',          // Content Block
 		),
 	'infoitem' => array(
+			'item_info_line',
 			'item_content',
+			'item_attachments',
+			'item_link',
+			'item_location',
 			'item_small_print',
 			'item_tags',
 			'item_about_author',
 			'item_seen_by',
+			'item_vote',
 		),
 	'collection' => array(
 			'coll_logo',
@@ -104,32 +124,30 @@ $core_componentwidget_defs = array(
 			'coll_member_count',
 			'coll_xml_feeds',
 			'coll_subscription',
-		),
-	'site' => array(
-			'colls_list_public',
-			'colls_list_owner',
-			'user_avatars',
+			'coll_activity_stats',
 		),
 	'user' => array(
+			'user_avatars',
+			'org_members',
 			'user_login',
-			'user_profile_pics',
 			'user_register',
 			'user_tools',
-			'user_info',
-			'user_action',
-			'user_fields',
+			'online_users',
 		),
 	'other' => array(
 			'subcontainer',
 			'subcontainer_row',
 			'inc_file',
-			'org_members',
-			'online_users',
+			'poll',
+			'colls_list_public',
+			'colls_list_owner',
 			'mobile_skin_switcher',
-			'poll'
+			'page_404_not_found',
 		),
 );
 
+// Set additional param to add new widget:
+$display_mode_url_param = $display_mode == 'iframe' ? '&amp;display_mode=iframe' : '';
 
 foreach( $widget_groups as $widget_group_code => $widget_group_title )
 {
@@ -154,8 +172,8 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 			$ComponentWidget = new $classname( NULL, 'core', $widget_code );
 
 			echo '<li>';
-			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
-			echo get_icon( 'new' ).' <strong>'.$ComponentWidget->get_name().'</strong>';
+			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.$display_mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
+			echo '<span class="fa fa-'.$ComponentWidget->icon.'"></span> <strong>'.$ComponentWidget->get_name().'</strong>';
 			echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span> '.$ComponentWidget->get_help_link( 'manual', false );
 			echo '</li>';
 		}
@@ -167,8 +185,8 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 		foreach( $Plugin_array_grouped[ $widget_group_code ] as $Plugin )
 		{
 			echo '<li>';
-			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
-			echo get_icon( 'puzzle' ).' <strong>'.$Plugin->name.'</strong>';
+			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.$display_mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
+			echo '<span class="fa fa-'.$Plugin->widget_icon.'"></span> <strong>'.$Plugin->name.'</strong>';
 			echo '</a> <span class="notes">'.$Plugin->short_desc.'</span> '.$Plugin->get_help_link( '$widget_url', 'manual', false );
 			echo '</li>';
 		}

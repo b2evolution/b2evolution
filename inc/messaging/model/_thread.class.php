@@ -59,13 +59,17 @@ class Thread extends DataObject
 		{	// New Thread
 			global $Session;
 
-			// check if there is unsaved Thread object stored in Session
-			$unsaved_Thread = $Session->get( 'core.unsaved_Thread' );
-			if( !empty( $unsaved_Thread ) )
-			{	// unsaved thread exists, delete it from Session
-				$Session->delete( 'core.unsaved_Thread' );
-				$this->title = $unsaved_Thread['title'];
-				$this->text = $unsaved_Thread['text'];
+			// erwin > Added check for $Session to enable creation of threads in cases where there is
+			// no Session available such as generation of sample private conversation during install
+			if( $Session )
+			{	// check if there is unsaved Thread object stored in Session
+				$unsaved_Thread = $Session->get( 'core.unsaved_Thread' );
+				if( !empty( $unsaved_Thread ) )
+				{	// unsaved thread exists, delete it from Session
+					$Session->delete( 'core.unsaved_Thread' );
+					$this->title = $unsaved_Thread['title'];
+					$this->text = $unsaved_Thread['text'];
+				}
 			}
 
 			$logins = array();
@@ -191,7 +195,7 @@ class Thread extends DataObject
 	{
 		global $thrd_recipients, $thrd_recipients_array;
 
-		// Resipients
+		// Recipients
 		$this->set_string_from_param( 'recipients', empty( $thrd_recipients_array ) ? true : false );
 
 		// Title
@@ -555,7 +559,7 @@ class Thread extends DataObject
 			return true;
 		}
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Count all users whou are involved in the given thread but not the current User and didn\'t block the current User' );
 
 		$SQL->SELECT( 'count( ts.tsta_user_ID )' );
 		$SQL->FROM( 'T_messaging__threadstatus ts
@@ -568,7 +572,7 @@ class Thread extends DataObject
 		// sender is not blocked or is not present in all recipient's contact list
 		$SQL->WHERE_and( '( mc.mct_blocked IS NULL OR mc.mct_blocked = 0 )' );
 
-		if( $DB->get_var( $SQL->get(), 0, NULL, 'Count all users whou are involved in the given thread but not the current User and didn\'t block the current User' ) > 0 )
+		if( $DB->get_var( $SQL ) > 0 )
 		{ // there is at least one recipient who accept the reply
 			return true;
 		}

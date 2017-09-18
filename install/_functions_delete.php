@@ -55,15 +55,15 @@ function uninstall_b2evolution()
 	// Skip if T_blogs table is already deleted. Note that db_delete() will not throw any errors on missing tables.
 	if( $DB->query( 'SHOW TABLES LIKE "T_blogs"' ) )
 	{ // Get all blogs
-		$blogs_SQL = new SQL();
+		$blogs_SQL = new SQL( 'Get all collections' );
 		$blogs_SQL->SELECT( 'blog_ID' );
 		$blogs_SQL->FROM( 'T_blogs' );
-		$blogs = $DB->get_col( $blogs_SQL->get() );
+		$blogs = $DB->get_col( $blogs_SQL );
 
 		$BlogCache = & get_BlogCache( 'blog_ID' );
 		foreach( $blogs as $blog_ID )
 		{
-			$Blog = $BlogCache->get_by_ID( $blog_ID );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 			// Remove page cache of current blog
 			$PageCache = new PageCache( $Blog );

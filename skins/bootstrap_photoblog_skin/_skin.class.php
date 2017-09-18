@@ -21,7 +21,7 @@ class bootstrap_photoblog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.0';
+	var $version = '7.0.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -45,7 +45,7 @@ class bootstrap_photoblog_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -62,6 +62,34 @@ class bootstrap_photoblog_Skin extends Skin
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'no',
+				'std' => 'no',		// Blog
+				'photo' => 'yes',
+				'forum' => 'no',
+				'manual' => 'no',
+				'group' => 'no',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -113,7 +141,7 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 					'layout' => array(
 						'label' => T_('Layout'),
-						'note' => '',
+						'note' => T_('Select skin layout.'),
 						'defaultvalue' => 'single_column',
 						'options' => array(
 								'single_column'              => T_('Single Column Large'),
@@ -125,14 +153,14 @@ class bootstrap_photoblog_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
 					'font_size' => array(
 						'label' => T_('Font size'),
-						'note' => '',
+						'note' => T_('Select content font size.'),
 						'defaultvalue' => 'default',
 						'options' => array(
 								'default'        => T_('Default (14px)'),
@@ -154,32 +182,32 @@ class bootstrap_photoblog_Skin extends Skin
 					'label'  => T_('Page Color Settings')
 				),
 					'background_color' => array(
-						'label' => T_('Page background color'),
-						'note' => T_('Default: #fff'),
+						'label' => T_('Background color'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
 					'page_text_color' => array(
-						'label' => T_('Page text color'),
-						'note' => T_('Default: #333'),
+						'label' => T_('Text color'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
-						'label' => T_('Page link color'),
-						'note' => T_('Default: #337ab7'),
+						'label' => T_('Link color'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'page_link_h_color' => array(
-						'label' => T_('Page link hover color'),
-						'note' => T_('Default: #23527c'),
+						'label' => T_('Link hover color'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
 					'well_color' => array(
-						'label' => T_('Post background color'),
-						'note' => T_('Default: #f5f5f5'),
+						'label' => T_('Background color'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#f5f5f5',
 						'type' => 'color',
 					),
@@ -195,25 +223,25 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 					'active_color' => array(
 						'label' => T_('Active navigation link color'),
-						'note' => T_('Default: #555'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#555',
 						'type' => 'color',
 					),
 					'default_color' => array(
 						'label' => T_('Default navigation links color'),
-						'note' => T_('Default: #337ab7'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'default_h_color' => array(
 						'label' => T_('Default navigation links hover color'),
-						'note' => T_('Default: #337ab7'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
 					'default_bgh_color' => array(
 						'label' => T_('Default navigation links hover background-color'),
-						'note' => T_('Default: #eee'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#eee',
 						'type' => 'color',
 					),
@@ -422,19 +450,19 @@ class bootstrap_photoblog_Skin extends Skin
 
 		// Page background color
 		if ( $background_color = $this->get_setting( 'background_color' ) ) {
-			$custom_css .= 'body, .nav li.active a { background-color: '.$background_color."; }\n";
+			$custom_css .= '#skin_wrapper, .nav li.active a { background-color: '.$background_color."; }\n";
 		}
 		// Page text color
 		if ( $page_text_color = $this->get_setting( 'page_text_color' ) ) {
-			$custom_css .= 'body { color: '.$page_text_color."; }\n";
+			$custom_css .= '#skin_wrapper { color: '.$page_text_color."; }\n";
 		}
 		// Page link color
 		if ( $page_link_color = $this->get_setting( 'page_link_color' ) ) {
-			$custom_css .= 'body a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+			$custom_css .= 'a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
 		}
 		// Page link hover color
 		if ( $page_link_h_color = $this->get_setting( 'page_link_h_color' ) ) {
-			$custom_css .= 'body a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+			$custom_css .= 'a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
 		}
 		// Posts background color
 		if ( $well_color = $this->get_setting( 'well_color' ) ) {
@@ -469,28 +497,6 @@ class bootstrap_photoblog_Skin extends Skin
 		</style>';
 		add_headline( $custom_css );
 		}
-	}
-
-
-	/**
-	 * Check if we can display a widget container
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function is_visible_container( $container_key )
-	{
-		global $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
 

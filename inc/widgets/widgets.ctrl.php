@@ -40,7 +40,7 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 		/**
 		 * @var Blog
 		 */
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	}
 
 	/**
@@ -61,9 +61,14 @@ else
 
 $action = param_action( 'list' );
 param( 'display_mode', 'string', 'normal' );
-$display_mode = ( in_array( $display_mode, array( 'js', 'normal' ) ) ? $display_mode : 'normal' );
+$display_mode = ( in_array( $display_mode, array( 'js', 'normal', 'iframe' ) ) ? $display_mode : 'normal' );
 if( $display_mode == 'js' )
-{	// Javascript in debug mode conflicts/fails.
+{	// JavaScript mode:
+
+	// Check that this action request is not a CSRF hacked request:
+	$Session->assert_received_crumb( 'widget' );
+
+	// Javascript in debug mode conflicts/fails.
 	// fp> TODO: either fix the debug javascript or have an easy way to disable JS in the debug output.
 	$debug = 0;
 	$debug_jslog = false;
@@ -93,6 +98,7 @@ switch( $action )
 		param( 'type', 'string', true );
 		param( 'code', 'string', true );
 	case 'new':
+	case 'add_list':
 		param( 'container', 'string', true, true );	// memorize
 		break;
 
@@ -128,7 +134,7 @@ switch( $action )
 		/**
 		* @var Blog
 		*/
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		break;
 
@@ -162,6 +168,8 @@ switch( $display_mode )
 	case 'normal':
 	default : // take usual approach
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		// Initialize JS for color picker field on the edit plugin settings form:
+		init_colorpicker_js();
 }
 
 // Get Skin used by current Blog:
@@ -184,6 +192,7 @@ switch( $action )
 	case 'nil':
 	case 'new':
 	case 'edit':
+	case 'add_list':
 		// Do nothing
 		break;
 
@@ -275,7 +284,7 @@ switch( $action )
 
 			case 'normal' :
 			default : // take usual action
-				header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID );
+				header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID.( $display_mode == 'iframe' ? '&display_mode=iframe' : '' ) );
 				break;
 		}
 		break;
@@ -305,23 +314,39 @@ switch( $action )
 							$edited_ComponentWidget->get_cache_status( true )
 						);
 					if( $action == 'update' )
-					{ // Close window after update, and don't close it when user wants continue editing after updating
-						$methods['closeWidgetSettings'] = array();
+					{	// Close window after update, and don't close it when user wants continue editing after updating:
+						$methods['closeWidgetSettings'] = array( $action );
 					}
 					else
-					{ // Scroll to messages after update
-						$methods['showMessagesWidgetSettings'] = array();
+					{	// Scroll to messages after update:
+						$methods['showMessagesWidgetSettings'] = array( 'success' );
 					}
 					send_javascript_message( $methods, true );
 					break;
 			}
-			$action = 'list';
-			$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
-			header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+			if( $action == 'update_edit' )
+			{	// Stay on edit widget form:
+				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&action=edit&wi_ID='.$edited_ComponentWidget->ID.'&display_mode='.$display_mode, 303 );
+			}
+			else
+			{	// If $action == 'update'
+				if( $display_mode == 'iframe' )
+				{	// Close modal window with iframe:
+					send_javascript_message( array(
+							'closeModalWindow' => array(),
+							'location.reload'  => array() ),
+						true, 'window.parent' );
+				}
+				else
+				{	// Redirect to widgets list:
+					$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
+					header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+				}
+			}
 		}
 		elseif( $display_mode == 'js' )
-		{ // send errors back as js
-			send_javascript_message( array( 'showMessagesWidgetSettings' => array() ), true );
+		{	// Send errors back as js:
+			send_javascript_message( array( 'showMessagesWidgetSettings' => array( 'failed' ) ), true );
 		}
 		break;
 
@@ -674,8 +699,6 @@ if( $display_mode == 'normal' )
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery
-	require_js( 'communication.js' ); // auto requires jQuery
-	require_js( 'blog_widgets.js' );
 	require_css( 'blog_widgets.css' );
 
 
@@ -690,6 +713,15 @@ if( $display_mode == 'normal' )
 
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 	$AdminUI->disp_body_top();
+}
+elseif( $display_mode == 'iframe' )
+{	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
+	echo '<body>';
+	// Display info & error messages:
+	$Messages->display();
+	// Clear the messages to avoid double displaying:
+	$Messages->clear();
 }
 
 /**
@@ -737,7 +769,15 @@ switch( $action )
 				// Display VIEW:
 				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
 				$output = ob_get_clean();
-				send_javascript_message( array( 'widgetSettings' => $output ) );
+				send_javascript_message( array(
+						'widgetSettings' => array( $output, $edited_ComponentWidget->get( 'type' ), $edited_ComponentWidget->get( 'code' ) ),
+						'evo_initialize_colorpicker_inputs' => array(),
+					) );
+				break;
+
+			case 'iframe':
+				// Display VIEW:
+				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
 				break;
 
 			case 'normal' :
@@ -750,6 +790,19 @@ switch( $action )
 
 				// End payload block:
 				$AdminUI->disp_payload_end();
+				break;
+		}
+		break;
+
+
+	case 'add_list':
+		// A list of widgets which can be added:
+		switch( $display_mode )
+		{
+			case 'iframe':
+				echo '<div class="available_widgets">'."\n";
+				$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
+				echo '</div>'."\n";
 				break;
 		}
 		break;
@@ -787,7 +840,15 @@ switch( $action )
 		break;
 }
 
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
+if( $display_mode == 'normal' )
+{	// Normal mode:
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+} 
+elseif( $display_mode == 'iframe' )
+{	// Frame mode:
+	echo '<body></html>';
+}
+
 
 ?>

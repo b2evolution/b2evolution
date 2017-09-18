@@ -32,7 +32,7 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = 'b2evBAspm';
 	var $priority = 60;
-	var $version = '5.0.0';
+	var $version = '7.0.0';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $number_of_installs = 1;
@@ -61,6 +61,14 @@ class basic_antispam_plugin extends Plugin
 	function GetDefaultSettings( & $params )
 	{
 		return array(
+				'min_comment_interval' => array(
+					'type' => 'integer',
+					'label' => T_('Minimum comment interval'),
+					'note' => T_('Minimum interval (in seconds) between consecutive comments from same IP or email address. 0 to disable it.'),
+					'defaultvalue' => '30',
+					'size' => 3,
+					'valid_range' => array( 'min' => 0 ),
+				),
 				'check_dupes' => array(
 					'type' => 'checkbox',
 					'label' => T_('Detect feedback duplicates'),
@@ -107,6 +115,30 @@ class basic_antispam_plugin extends Plugin
 					'defaultvalue' => '0',
 				),
 
+			);
+	}
+
+
+	/**
+	 * Define the PER-GROUP settings of the plugin here. These can then be edited by each user.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function GetDefaultGroupSettings( & $params )
+	{
+		return array(
+				'comment_throttling' => array(
+					'label'        => T_('Minimum comment interval'),
+					'note'         => T_('Users from this group will only be able to post a comment every x seconds.').' '.T_('0 to disable it.'),
+					'type'         => 'integer',
+					'defaultvalue' => 2,
+					'size'         => 3,
+					'valid_range'  => array( 'min' => 0 ),
+				),
 			);
 	}
 
@@ -201,13 +233,54 @@ class basic_antispam_plugin extends Plugin
 
 	/**
 	 * Check for duplicate comments.
+	 *
+	 * @param array Params
 	 */
 	function BeforeCommentFormInsert( & $params )
 	{
 		$comment_Item = & $params['Comment']->get_Item();
 
+		if( is_logged_in() )
+		{	// If user is logged in then we can get minimum comment interval per group:
+			global $current_User;
+			$min_comment_interval = $this->GroupSettings->get( 'comment_throttling', $current_User->grp_ID );
+		}
+		else
+		{	// Use plugin setting of minimum comment interval for all anonymous users:
+			$min_comment_interval = $this->Settings->get( 'min_comment_interval' );
+		}
+
+		if( $params['action'] != 'preview' &&
+		    ! empty( $min_comment_interval ) &&
+		    ! $params['Comment']->is_meta() )
+		{	// If a comment posting should be blocked by minumum interval:
+			global $Hit, $DB, $localtimenow;
+
+			$SQL = new SQL( 'Get time of lat comment from current IP or email address' );
+			$SQL->SELECT( 'MAX( comment_date )' );
+			$SQL->FROM( 'T_comments' );
+			$SQL->WHERE( 'comment_author_IP = '.$DB->quote( $Hit->IP ) );
+			$SQL->WHERE_or( 'comment_author_email = '.$DB->quote( $params['Comment']->get_author_email() ) );
+
+			if( $last_comment_time = $DB->get_var( $SQL ) )
+			{	// If last comment is found from current IP or email address:
+				$last_comment_time = mysql2date( 'U', $last_comment_time );
+				$new_comment_time = mysql2date( 'U', date( 'Y-m-d H:i:s', $localtimenow ) );
+				if( ( $new_comment_time - $last_comment_time ) < $min_comment_interval )
+				{	// Block new comment because of minumum interval:
+					$this->msg( sprintf( T_('You can only post a new comment every %d seconds.'), $min_comment_interval ), 'error' );
+					if( $comment_Item )
+					{
+						syslog_insert( sprintf( 'The comment can be posted only every %d seconds', $min_comment_interval ), 'info', 'item', $comment_Item->ID, 'plugin', $this->ID );
+					}
+					// Exit here to don't spend a time to next checking:
+					return;
+				}
+			}
+		}
+
 		if( $this->is_duplicate_comment( $params['Comment'] ) )
-		{
+		{	// Block a duplicate comment:
 			$this->msg( T_('The comment seems to be a duplicate.'), 'error' );
 			if( $comment_Item )
 			{
@@ -588,7 +661,7 @@ class basic_antispam_plugin extends Plugin
 	{
 		global $DB;
 
-		if( ! $this->Settings->get('check_dupes') )
+		if( ! $this->Settings->get( 'check_dupes' ) )
 		{
 			return false;
 		}
@@ -603,24 +676,24 @@ class basic_antispam_plugin extends Plugin
 				  FROM T_comments
 				 WHERE comment_item_ID = '.$Comment->item_ID;
 
-		if( isset($Comment->author_user_ID) )
+		if( isset( $Comment->author_user_ID ) )
 		{ // registered user:
 			$sql .= ' AND comment_author_user_ID = '.$Comment->author_user_ID;
 		}
 		else
 		{ // visitor (also trackback):
 			$sql_ors = array();
-			if( ! empty($Comment->author) )
+			if( ! empty( $Comment->author ) )
 			{
-				$sql_ors[] = 'comment_author = '.$DB->quote($Comment->author);
+				$sql_ors[] = 'comment_author = '.$DB->quote( $Comment->author );
 			}
-			if( ! empty($Comment->author_email) )
+			if( ! empty( $Comment->author_email ) )
 			{
 				$sql_ors[] = 'comment_author_email = '.$DB->quote( $Comment->author_email );
 			}
-			if( ! empty($Comment->author_url) )
+			if( ! empty( $Comment->author_url ) )
 			{
-				$sql_ors[] = 'comment_author_url = '.$DB->quote($Comment->author_url);
+				$sql_ors[] = 'comment_author_url = '.$DB->quote( $Comment->author_url );
 			}
 
 			if( ! empty($sql_ors) )
@@ -629,7 +702,8 @@ class basic_antispam_plugin extends Plugin
 			}
 		}
 
-		$sql .= ' AND comment_content = '.$DB->quote($Comment->content).' LIMIT 1';
+		$sql .= ' AND comment_type = '.$DB->quote( $Comment->get( 'type' ) );
+		$sql .= ' AND comment_content = '.$DB->quote( $Comment->content ).' LIMIT 1';
 
 		return $DB->get_var( $sql, 0, 0, 'Checking for duplicate feedback content.' );
 	}

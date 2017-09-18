@@ -351,3 +351,14 @@ function findTarget( e )
 
 	return target;
 }
+
+
+/**
+ * Add spinner to button
+ */
+function addSpinner( button )
+{
+	button = jQuery( button );
+	button.addClass( 'btn-spinner' );
+	button.css( 'width', '+=24px' );
+}

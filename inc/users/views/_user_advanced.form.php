@@ -88,7 +88,7 @@ user_prevnext_links( array(
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
-$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 
 if( !$user_profile_only )
 {
@@ -96,7 +96,7 @@ if( !$user_profile_only )
 }
 
 $form_text_title = T_( 'Edit advanced preferences' ); // used for js confirmation message on leave the changed form
-$form_title = get_usertab_header( $edited_User, 'advanced', T_( 'Edit advanced preferences' ).get_manual_link( 'user-advanced-tab' ) );
+$form_title = get_usertab_header( $edited_User, 'advanced', '<span class="nowrap">'.T_( 'Edit advanced preferences' ).'</span>'.get_manual_link( 'user-advanced-tab' ) );
 
 $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
@@ -164,7 +164,7 @@ if( $action != 'view' )
 }
 else
 { // display only
-	
+
 	/*
 	 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 	$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );

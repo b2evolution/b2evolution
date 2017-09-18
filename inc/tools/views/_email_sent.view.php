@@ -104,7 +104,7 @@ $Results->cols[] = array(
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'timestamp compact_data',
-		'td' => '%mysql2localedatetime_spans( #emlog_timestamp#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #emlog_timestamp# )%',
 	);
 
 $Results->cols[] = array(

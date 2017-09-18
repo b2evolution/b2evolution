@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_xml_feeds_Widget extends ComponentWidget
 {
+	var $icon = 'rss';
+
 	/**
 	 * Constructor
 	 */
@@ -124,7 +126,7 @@ class coll_xml_feeds_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 

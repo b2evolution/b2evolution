@@ -25,7 +25,7 @@ $SQL->SELECT( 'clog_ctsk_ID' );
 $SQL->FROM( 'T_cron__log' );
 $SQL->WHERE( 'clog_status = '.$DB->quote( $status ) );
 $SQL->WHERE_and( 'clog_realstart_datetime < '.$DB->quote( date2mysql( $servertimenow - $days_in_seconds ) ) );
-$jobs = $DB->get_col( $SQL->get() );
+$jobs = $DB->get_col( $SQL );
 
 
 if( count( $jobs ) == 0 )

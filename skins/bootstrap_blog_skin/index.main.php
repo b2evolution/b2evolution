@@ -186,10 +186,11 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
-					'content_mode' => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
-					'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
-					'item_class'   => ($Item->is_intro() ? 'well evo_intro_post' : 'well evo_featured_post').( empty( $intro_item_style ) ? '' : ' evo_hasbgimg' ),
-					'item_style'   => $intro_item_style
+					'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+					'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+					'item_class'    => ($Item->is_intro() ? 'well evo_intro_post' : 'well evo_featured_post').( empty( $intro_item_style ) ? '' : ' evo_hasbgimg' ),
+					'item_style'    => $intro_item_style,
+					'Item'          => $Item,
 				) );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
@@ -221,7 +222,6 @@ siteskin_include( '_site_body_header.inc.php' );
 						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
 					// Item content:
-					'url_link_position'     => 'top',
 					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
 					'skin_form_before'      => '<div class="panel panel-default skin-form">'
 																				.'<div class="panel-heading">'
@@ -263,7 +263,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'featured_intro_before' => '<div class="jumbotron">',
 					'featured_intro_after'  => '</div>',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
@@ -363,28 +363,31 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <footer class="row">
 
-	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+   <!-- =================================== START OF FOOTER =================================== -->
+    <div class="col-md-12">
 
-		<div class="evo_container evo_container__footer">
-		<?php
+		<?php // Note: clearfix is because of Bootstraps' .cols ?>
+		<div class="evo_container evo_container__footer clearfix">
+			<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
 				) );
 			// Note: Double quotes have been used around "Footer" only for test purposes.
-		?>
-		</div>
+			?>
+		</div><!-- .evo_container__footer -->
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
 						'before' => '',
 						'after'  => ' &bull; ',
 					) );
+
+			// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
 			?>
 
 			<?php
@@ -429,7 +432,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

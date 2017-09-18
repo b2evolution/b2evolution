@@ -25,6 +25,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_category_list_Widget extends ComponentWidget
 {
+	var $icon = 'indent';
+
 	/**
 	 * Constructor
 	 */
@@ -210,7 +212,7 @@ class coll_category_list_Widget extends ComponentWidget
 	function display( $params )
 	{
 		global $cat_modifier;
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 
@@ -349,6 +351,8 @@ class coll_category_list_Widget extends ComponentWidget
 					echo $this->disp_params['list_end'];
 				}
 			}
+
+			echo $this->disp_params['collist_end'];
 		}
 
 
@@ -483,10 +487,12 @@ class coll_category_list_Widget extends ComponentWidget
 		    ( $this->disp_params['mark_parents'] && $Chapter->ID != $first_selected_cat_ID && in_array( $Chapter->ID, $this->disp_params['current_parents'] ) ) )
 		{ // This category should be selected
 			$start_tag = $this->disp_params['item_selected_start'];
+			$end_tag = $this->disp_params['item_selected_end'];
 		}
 		else
 		{
 			$start_tag = $this->disp_params['item_start'];
+			$end_tag = $this->disp_params['item_end'];
 		}
 
 		if( empty( $Chapter->children ) )
@@ -550,7 +556,7 @@ class coll_category_list_Widget extends ComponentWidget
 		// which then must be called from a the ChapterCache recurse method
 		if( empty( $Chapter->children ) )
 		{
-			$r .= $this->disp_params['item_end'];
+			$r .= $end_tag;
 		}
 
 		return $r;
@@ -633,12 +639,12 @@ class coll_category_list_Widget extends ComponentWidget
 		global $DB;
 
 		// Try to get all children of the given category
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get all children of category #'.$cat_ID );
 		$SQL->SELECT( 'cat_ID' );
 		$SQL->FROM( 'T_categories' );
 		$SQL->WHERE( 'cat_parent_ID = '.$DB->quote( $cat_ID ) );
 
-		$category_children = $DB->get_col( $SQL->get() );
+		$category_children = $DB->get_col( $SQL );
 
 		foreach( $category_children as $category_child_ID )
 		{

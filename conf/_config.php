@@ -92,25 +92,11 @@ if( $debug == 'pwd' )
 			if( $_GET['debug'] == $debug_pwd )
 			{	// Password matches
 				$debug = 1;
-				if( version_compare( phpversion(), '5.2', '>=' ) )
-				{ // Use HTTP-only setting since PHP 5.2.0
-					setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain, false, true );
-				}
-				else
-				{ // PHP < 5.2 doesn't support HTTP-only
-					setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain );
-				}
+				setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain, false, true );
 			}
 			else
 			{	// Password doesn't match: turn off debug mode:
-				if( version_compare( phpversion(), '5.2', '>=' ) )
-				{ // Use HTTP-only setting since PHP 5.2.0
-					setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
-				}
-				else
-				{ // PHP < 5.2 doesn't support HTTP-only
-					setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain );
-				}
+				setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
 			}
 		}
 		elseif( !empty( $_COOKIE['debug'] ) && $_COOKIE['debug'] == $debug_pwd )
@@ -169,7 +155,7 @@ else
 	@ini_set( 'display_errors', 'Off' );
 }
 
-// Check compatibility. Server PHP version can't be lower then the application required PHP version.
+// Check compatibility. Server PHP version can't be lower than the application's required PHP version.
 $php_version = phpversion();
 if( version_compare( $php_version, $required_php_version[ 'application' ], '<' ) )
 {
@@ -181,8 +167,8 @@ if( version_compare( $php_version, $required_php_version[ 'application' ], '<' )
 
 // Check timezone setting:
 $date_timezone = ini_get( "date.timezone" );
-if( version_compare( $php_version, '5.1', '>=' ) && ( !empty( $date_default_timezone ) || empty( $date_timezone ) ) )
-{ // Set default timezone in php versions >= 5.1 but only if $date_default_timezone is set or php.ini 'date.timezone' setting was not set
+if( ( !empty( $date_default_timezone ) || empty( $date_timezone ) ) )
+{ // Set default timezone if $date_default_timezone is set or php.ini 'date.timezone' setting was not set
 	date_default_timezone_set( empty( $date_default_timezone ) ? 'Europe/Paris' : $date_default_timezone );
 }
 

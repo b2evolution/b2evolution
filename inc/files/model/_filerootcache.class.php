@@ -86,8 +86,8 @@ class FileRootCache
 			$r[ $shared_FileRoot->ID ] = & $shared_FileRoot;
 		}
 
-		if( isset($collections_Module) )
-		{ // Skins root:
+		if( isset( $collections_Module ) && ! get_param( 'link_type' ) && ! get_param( 'link_object_ID' ) && ! get_param( 'user_ID' ) )
+		{ // Skins root, Don't allow files of this root to link to objects:
 			$skins_FileRoot = & $FileRootCache->get_by_type_and_ID( 'skins', 0, false );
 			if( $skins_FileRoot )
 			{ // We got a skins dir:

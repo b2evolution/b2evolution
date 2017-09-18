@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $htsrv_url, $admin_url, $baseurl;
+global $admin_url, $baseurl;
 
 // Default params:
 $params = array_merge( array(
@@ -41,7 +41,7 @@ echo "</div>\n";
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'You are a scheduled task admin, and you are receiving notifications when a scheduled tasks ends with error or timeout.' )."<br />\n"
 			.T_( 'If you don\'t want to receive any more notifications about scheduled task errors, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=cronjob_error&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=cronjob_error&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

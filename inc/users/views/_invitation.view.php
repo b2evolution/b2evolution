@@ -56,7 +56,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Code').' | '.T_('Link'),
 		'td_class' => 'shrinkwrap',
-		'td' => '<a href="'.get_secure_htsrv_url().'register.php?invitation=$ivc_code$">'.T_('Link').'</a>',
+		'td' => '<a href="'.get_htsrv_url().'register.php?invitation=$ivc_code$">'.T_('Link').'</a>',
 	);
 
 $Results->cols[] = array(

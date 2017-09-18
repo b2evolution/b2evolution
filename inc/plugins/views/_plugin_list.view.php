@@ -201,6 +201,20 @@ $Results->cols[] = array(
 	);
 
 /*
+ * VERSION TD:
+ */
+function plugin_results_td_version( $Plugin )
+{
+	return '<a href="'.regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$Plugin->classname )
+		.'">'.$Plugin->version.'</a>';
+
+}
+$Results->cols[] = array(
+		'th' => T_('Version'),
+		'td' => '% plugin_results_td_version( {Obj} ) %'
+	);
+
+/*
  * HELP TD:
  */
 function plugin_results_td_help( $Plugin )

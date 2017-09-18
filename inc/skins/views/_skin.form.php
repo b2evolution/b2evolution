@@ -24,7 +24,7 @@ global $edited_Skin;
 $Form = new Form( NULL, 'skin_checkchanges' );
 
 $Form->global_icon( T_('Uninstall this skin!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('skin') ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', T_('Skin properties') );
 
@@ -32,6 +32,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'skin_ID', $edited_Skin->ID );
+	$Form->hidden( 'tab', get_param( 'tab' ) );
 
 	$Form->begin_fieldset( T_('Skin properties').get_manual_link( 'skin-system-settings' ) );
 
@@ -52,9 +53,21 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
 			echo '</div>';
 
-			// Skin type
+			// Site Skin:
 			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Skin type').':</label>';
+				echo '<label>'.T_('Site Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_site_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
+
+			// Collection Skin:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Collection Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_collection_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
+
+			// Skin format:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin format').':</label>';
 				echo '<span>'.$edited_Skin->type.'</span>';
 			echo '</div>';
 
@@ -89,6 +102,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 														array( 'normal', T_( 'Normal' ), T_( 'Normal skin for general browsing' ) ),
 														array( 'mobile', T_( 'Mobile' ), T_( 'Mobile skin for mobile phones browsers' ) ),
 														array( 'tablet', T_( 'Tablet' ), T_( 'Tablet skin for tablet browsers' ) ),
+														array( 'rwd', T_( 'RWD' ), T_( 'Skin can be used for general, mobile phones and tablet browsers' ) ),
 														array( 'feed', T_( 'XML Feed' ), T_( 'Special system skin for XML feeds like RSS and Atom' ) ),
 														array( 'sitemap', T_( 'XML Sitemap' ), T_( 'Special system skin for XML sitemaps' ) ),
 													),

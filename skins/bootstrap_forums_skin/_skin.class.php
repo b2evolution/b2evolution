@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.0';
+	var $version = '7.0.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -43,7 +43,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -60,6 +60,34 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'maybe',
+				'std' => 'no',		// Blog
+				'photo' => 'no',
+				'forum' => 'yes',
+				'manual' => 'no',
+				'group' => 'partial',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -113,7 +141,7 @@ class bootstrap_forums_Skin extends Skin
 				),
 					'layout_general' => array(
 						'label' => T_('General Layout'),
-						'note' => '',
+						'note' => T_('Select global skin layout.'),
 						'defaultvalue' => 'no_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
@@ -124,7 +152,7 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'layout_single' => array(
 						'label' => T_('Single Thread Layout'),
-						'note' => '',
+						'note' => T_('Select skin layout for single threads') . ' (disp=single).',
 						'defaultvalue' => 'no_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
@@ -135,9 +163,10 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
+						'size' => '7',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -154,6 +183,17 @@ class bootstrap_forums_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
+				   'workflow_display_mode' => array(
+					  'label'    => T_('Workflow column'),
+					  'note'     => '',
+					  'type'     => 'radio',
+					  'field_lines' => true,
+					  'options'  => array(
+						 array( 'status_and_author', T_('Display Status & Item Author') ),
+						 array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
+					  ),
+					  'defaultvalue' => 'status_and_author',
+				   ),
 				'section_forum_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -291,7 +331,7 @@ class bootstrap_forums_Skin extends Skin
 							array( 'page_top', sprintf( T_('"%s" container'), NT_('Page Top') ),  1 ),
 							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
 							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
-						),
+					),
 				'section_access_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -347,6 +387,14 @@ class bootstrap_forums_Skin extends Skin
 			require_js( '#jqueryUI#', 'blog' );
 		}
 
+		if( in_array( $disp, array( 'single', 'page' ) ) )
+		{	// Init JS to autcomplete the user logins
+			require_js( '#bootstrap_typeahead#', 'blog' );
+			init_autocomplete_login_js( 'blog', 'typeahead' );
+			// Initialize date picker for _item_expert.form.php
+			init_datepicker_js( 'blog' );
+		}
+
 		// Add custom CSS:
 		$custom_css = '';
 
@@ -357,9 +405,14 @@ class bootstrap_forums_Skin extends Skin
 			$custom_css = "@media screen and (min-width: 1200px) {
 				.forums_list .ft_date {
 					white-space: normal;
-					margin-top: 11px;
+					margin-top: 3px;
 				}
-				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full, .disp_single .evo_comment .panel-body .evo_comment_text p, .disp_single .post_tags {
+				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full,
+				.disp_single .evo_comment .panel-body .evo_comment_text p,
+				.disp_single .post_tags,
+				.disp_single .evo_voting_panel,
+				.disp_single .evo_seen_by
+				{
 					padding-left: 15px;
 				}
 				\n
@@ -400,7 +453,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_post_button( $chapter_ID, $Item = NULL, $params = array() )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$params = array_merge( array(
 				'group_class'  => '',
@@ -414,7 +467,7 @@ class bootstrap_forums_Skin extends Skin
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
 		{ // Display button to write a new post
-			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
+			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
 		}
 		else
 		{ // If a creating of new post is unavailable
@@ -439,7 +492,7 @@ class bootstrap_forums_Skin extends Skin
 			}
 			else
 			{ // Display button to post a reply
-				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'" class="btn btn-default '.$params['button_class'].'" title="'.T_('Reply to topic').'"><i class="fa fa-reply"></i> '.T_('Reply').'</a>';
+				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'" class="btn btn-default '.$params['button_class'].'" title="'.T_('Reply to topic').'"><i class="fa fa-reply"></i> './* TRANS: verb */ T_('Reply').'</a>';
 			}
 		}
 
@@ -476,28 +529,6 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
-	 * Check if we can display a widget container
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function is_visible_container( $container_key )
-	{
-		global $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
-	}
-
-
-	/**
 	 * Check if we can display a sidebar for the current layout
 	 *
 	 * @param string Layout: 'general' or 'single'
@@ -515,7 +546,7 @@ class bootstrap_forums_Skin extends Skin
 
 		if( $check_containers )
 		{ // Check if at least one sidebar container is visible
-			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
+			return ( $this->show_container_when_access_denied( 'sidebar' ) ||  $this->show_container_when_access_denied( 'sidebar2' ) );
 		}
 		else
 		{ // We should not check the visibility of the sidebar containers for this case
@@ -583,51 +614,20 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function display_button_recent_topics()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
-		if( ! is_logged_in() || ! $Blog->get_setting( 'track_unread_content' ) )
-		{	// For not logged in users AND if the tracking of unread content is turned off for the collection
-			$btn_class = 'btn-info';
-			$btn_title = T_('Recent Topics');
+		// Get a number of unread posts by current User:
+		$unread_posts_count = $Blog->get_unread_posts_count();
+
+		if( $unread_posts_count > 0 )
+		{	// If at least one new unread topic exists
+			$btn_class = 'btn-warning';
+			$btn_title = T_('New Topics').' <span class="badge">'.$unread_posts_count.'</span>';
 		}
 		else
-		{	// For logged in users:
-			global $current_User, $DB, $localtimenow;
-
-			// Initialize SQL query to get only the posts which are displayed by global $MainList on disp=posts:
-			$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL, 'ItemCache', 'recent_topics' );
-			$ItemList2->set_default_filters( array(
-					'unit' => 'all', // set this to don't calculate total rows
-				) );
-			$ItemList2->query_init();
-
-			// Get a count of the unread topics for current user:
-			$unread_posts_SQL = new SQL();
-			$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
-			$unread_posts_SQL->FROM( 'T_items__item' );
-			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_users__postreadstatus ON post_ID = uprs_post_ID AND uprs_user_ID = '.$DB->quote( $current_User->ID ) );
-			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
-			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
-			$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
-			$unread_posts_SQL->WHERE_and( 'post_last_touched_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
-			// In theory, it would be more safe to use this comparison:
-			// $unread_posts_SQL->WHERE_and( 'uprs_post_ID IS NULL OR uprs_read_post_ts <= post_last_touched_ts' );
-			// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
-			$unread_posts_SQL->WHERE_and( 'uprs_post_ID IS NULL OR uprs_read_post_ts < post_last_touched_ts' );
-
-			// Execute a query with to know if current user has new data to view:
-			$unread_posts_count = $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics for current user' );
-
-			if( $unread_posts_count > 0 )
-			{	// If at least one new unread topic exists
-				$btn_class = 'btn-warning';
-				$btn_title = T_('New Topics').' <span class="badge">'.$unread_posts_count.'</span>';
-			}
-			else
-			{	// Current user already have read all topics
-				$btn_class = 'btn-info';
-				$btn_title = T_('Recent Topics');
-			}
+		{	// Current user already have read all topics
+			$btn_class = 'btn-info';
+			$btn_title = T_('Recent Topics');
 		}
 
 		// Print out the button:
@@ -652,6 +652,43 @@ class bootstrap_forums_Skin extends Skin
 				// Delegate to parent class:
 				return parent::get_template( $name );
 		}
+	}
+
+
+	/**
+	 * Display a panel with voting buttons for item
+	 *
+	 * @param object Item
+	 * @param array Params
+	 */
+	function display_item_voting_panel( $Item, $params = array() )
+	{
+		skin_widget( array_merge( array(
+				// CODE for the widget:
+				'widget'      => 'item_vote',
+				// Optional display params
+				'Item'        => $Item,
+				'block_start' => '',
+				'block_end'   => '',
+				'skin_ID'     => $this->ID,
+			), $params ) );
+	}
+
+
+	/**
+	 * Display a panel with voting buttons for item
+	 *
+	 * @param object Comment
+	 * @param array Params
+	 */
+	function display_comment_voting_panel( $Comment, $params = array() )
+	{
+		$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+				'before_title'          => '',
+				'helpful_text'          => T_('Is this reply helpful?'),
+				'class'                 => 'vote_helpful',
+				'skin_ID'               => $this->ID,
+			), $params ) );
 	}
 }
 

@@ -66,7 +66,7 @@ $params = array_merge( array(
 				if( $Item->status != 'published' )
 				{
 					$Item->format_status( array(
-							'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+							'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 						) );
 				}
 				// Link to comments, trackbacks, etc.:
@@ -106,7 +106,7 @@ $params = array_merge( array(
 				$Item->issue_date( array(
 						'before'      => '<span class="timestamp">',
 						'after'       => '</span>',
-						'date_format' => locale_datefmt().' H:i',
+						'date_format' => locale_datefmt().' '.locale_shorttimefmt(),
 					) );
 			?>
 
@@ -144,6 +144,9 @@ $params = array_merge( array(
 				'block_title_end' => '</h3>',
 				// Params for skin file "_item_content.inc.php"
 				'widget_item_content_params' => $params,
+				// Template params for "Item Link" widget
+				'widget_item_link_before'    => '<p class="evo_post_link">',
+				'widget_item_link_after'     => '</p>',
 			) );
 			// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		}

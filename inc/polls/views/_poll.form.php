@@ -25,7 +25,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'poll_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,pqst_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,pqst_ID' ) );
 
 $Form->begin_form( 'fform', ( $creating ?  T_('New poll') : T_('Poll') ).get_manual_link( 'poll-form' ) );
 
@@ -73,11 +73,11 @@ if( $edited_Poll->ID > 0 )
 {	// Display the answers table only when poll question is already exist in DB:
 
 	// Get an options count of the edited poll which has at least one answer:
-	$count_SQL = new SQL();
+	$count_SQL = new SQL( 'Get an options count of the edited poll which has at least one answer' );
 	$count_SQL->SELECT( 'COUNT( pans_ID )' );
 	$count_SQL->FROM( 'T_polls__answer' );
 	$count_SQL->WHERE( 'pans_pqst_ID = '.$edited_Poll->ID );
-	$poll_options_count = $DB->get_var( $count_SQL->get(), 0, NULL, 'Get an options count of the edited poll which has at least one answer' );
+	$poll_options_count = $DB->get_var( $count_SQL );
 	if( $poll_options_count == 0 )
 	{	// To don't devide by zero
 		$poll_options_count = 1;
@@ -133,6 +133,7 @@ if( $edited_Poll->ID > 0 )
 		return $r;
 	}
 	$Results->cols[] = array(
+			'td_class' => 'nowrap',
 			'th'    => T_('Option'),
 			'order' => 'popt_option_text',
 			'td'    => '%poll_option_td_option( {Obj} )%',
@@ -149,7 +150,8 @@ if( $edited_Poll->ID > 0 )
 	/**
 	 * Get the Poll percent with bar
 	 *
-	 * @param object Poll
+	 * @param integer Percent of the answer
+	 * @param integer Max percent
 	 * @return string
 	 */
 	function poll_option_td_percent( $poll_option_percent, $max_percent )
@@ -157,18 +159,21 @@ if( $edited_Poll->ID > 0 )
 		// Calculate a percent for style relating on max percent:
 		$style_percent = $max_percent > 0 ? ceil( $poll_option_percent / $max_percent * 100 ) : 0;
 
-		$r = '<div class="evo_poll__percent_bar"><div style="width:'.$style_percent.'%"></div></div>';
-
-		$r .= $poll_option_percent.'%';
-
-		return $r;
+		return '<div><div style="width:'.$style_percent.'%">&nbsp;</div></div>';
 	}
 	$Results->cols[] = array(
 			'th'       => '%',
-			'th_class' => 'shrinkwrap',
-			'td_class' => 'nowrap',
+			'th_class' => '',
+			'td_class' => 'evo_poll__percent_bar',
 			'order'    => 'answers_percent',
 			'td'       => '%poll_option_td_percent( #answers_percent#, '.$edited_Poll->get_max_poll_options_percent().' )%',
+		);
+	$Results->cols[] = array(
+			'th'       => '%',
+			'th_class' => '',
+			'td_class' => 'nowrap',
+			'order'    => 'answers_percent',
+			'td'       => '$answers_percent$%',
 		);
 
 	if( $perm_poll_edit )

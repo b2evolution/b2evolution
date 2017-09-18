@@ -29,10 +29,11 @@ class whosonline_plugin extends Plugin
 	var $name;
 	var $code = 'evo_WhosOnline';
 	var $priority = 96;
-	var $version = '5.0.0';
+	var $version = '7.0.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'other';
+	var $widget_icon = 'wifi';
 
 
 	/**
@@ -264,7 +265,7 @@ class OnlineSessions
 	 */
 	function display_online_users( $params )
 	{
-		global $DB, $Blog, $UserSettings;
+		global $DB, $Collection, $Blog, $UserSettings;
 
 		if( !isset($this->_registered_Users) )
 		{

@@ -77,7 +77,7 @@ if( !empty( $g ) )
 	$count_SQL->WHERE_and( 'cgr_user_ID = '.$current_User->ID );
 
 	// Get info of filtered group
-	$group_filtered_SQL = new SQL();
+	$group_filtered_SQL = new SQL( 'Get info of filtered contact group #'.$g );
 	$group_filtered_SQL->SELECT( 'cgr_ID AS ID, cgr_name AS name, COUNT(cgu_user_ID) AS count_users' );
 	$group_filtered_SQL->FROM( 'T_messaging__contact_groups' );
 	$group_filtered_SQL->FROM_add( 'LEFT JOIN T_messaging__contact_groupusers ON cgu_cgr_ID = cgr_ID' );
@@ -85,7 +85,7 @@ if( !empty( $g ) )
 	$group_filtered_SQL->WHERE_and( 'cgr_user_ID = '.$current_User->ID );
 	$group_filtered_SQL->GROUP_BY( 'cgr_ID' );
 
-	$group_filtered = $DB->get_row( $group_filtered_SQL->get() );
+	$group_filtered = $DB->get_row( $group_filtered_SQL );
 }
 
 // Create result set:
@@ -178,7 +178,7 @@ function contact_block( $block, $user_ID, $user_status )
 	$action_url = regenerate_url();
 	if( !is_admin_page() )
 	{ // in front office the action will be processed by messaging module handle_htsrv_action() through action.php
-		$action_url = get_samedomain_htsrv_url().'action.php?mname=messaging&disp=contacts&redirect_to='.rawurlencode( $action_url );
+		$action_url = get_htsrv_url().'action.php?mname=messaging&disp=contacts&redirect_to='.rawurlencode( $action_url );
 	}
 
 	if( $block == 0 )
@@ -226,7 +226,7 @@ if( $Settings->get('allow_avatars') )
 	 */
 	function user_avatar( $user_ID )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$UserCache = & get_UserCache();
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
@@ -283,7 +283,7 @@ if( in_array( 'login', $show_columns ) )
 		return '';
 	}
 	$Results->cols[] = array(
-						'th' => T_('Login'),
+						'th' => /* TRANS: noun */ T_('Login'),
 						'order' => 'mct_to_user_login',
 						'td' => '%user_login( #mct_to_user_ID# )%',
 						);

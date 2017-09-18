@@ -17,7 +17,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Blog;
+global $Collection, $Blog;
 
 // Default params:
 $params = array_merge( array(
@@ -28,7 +28,7 @@ $params = array_merge( array(
 
 // ------------------------------- START OF INTRO POST -------------------------------
 init_MainList( $Blog->get_setting('posts_per_page') );
-if( $Item = get_featured_Item( 'catdir' ) )
+if( $Item = & get_featured_Item( 'catdir' ) )
 { // We have a intro-front post to display:
 ?>
 <div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( array( 'item_class' => 'jumbotron evo_content_block evo_post' ) ) ?>" lang="<?php $Item->lang() ?>">
@@ -45,7 +45,7 @@ if( $Item = get_featured_Item( 'catdir' ) )
 	if( $Item->status != 'published' )
 	{
 		$Item->format_status( array(
-				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 	}
 	$Item->title( array(
@@ -56,7 +56,7 @@ if( $Item = get_featured_Item( 'catdir' ) )
 		) );
 
 	// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-	skin_include( '_item_content.inc.php', $params );
+	skin_include( '_item_content.inc.php', array_merge( $params, array( 'Item' => $Item ) ) );
 	// Note: You can customize the default item content by copying the generic
 	// /skins/_item_content.inc.php file into the current skin folder.
 	// -------------------------- END OF POST CONTENT -------------------------
@@ -119,7 +119,8 @@ if( ! empty( $chapters ) )
 						'image_size'          => $Skin->get_setting( 'posts_thumb_size' ),
 						'image_link_to'       => 'single',
 						'image_desc'          => '',
-						'limit'                      => 1,
+						'gallery_image_limit'        => 0, // Don't use images from attached folders.
+						'limit'                      => 1, // Get only first attached image depending on position priority, see param below:
 						'restrict_to_image_position' => 'cover,teaser,aftermore,inline',
 						'get_rendered_attachments'   => false,
 						// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
@@ -140,9 +141,13 @@ if( ! empty( $chapters ) )
 				{ // No images, but some attachments(e.g. videos) are rendered by plugins
 					$item_first_image = $Item->get_permanent_link( '<b>'.T_('Click to see contents').'</b>', '#', 'album_nopic' );
 				}
+				// Flag:
+				$item_flag = $Item->get_flag( array(
+						'only_flagged' => true
+					) );
 				// Display a title
 				echo $Item->get_title( array(
-					'before' => $item_first_image.'<br />',
+					'before' => $item_first_image.'<br />'.$item_flag,
 					) );
 				// Restore previous locale (Blog locale)
 				locale_restore_previous();

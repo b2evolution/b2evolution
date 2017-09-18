@@ -33,12 +33,22 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 
 
 $Form->begin_fieldset( T_('Search results').get_manual_link( 'search-results-other' ) );
-	$Form->text( 'search_per_page', $edited_Blog->get_setting( 'search_per_page' ), 4, T_('Number of results per page'), '', 4 );
+	$Form->text( 'search_per_page', $edited_Blog->get_setting( 'search_per_page' ), 4, T_('Results per page'), '', 4 );
+	$Form->radio( 'search_sort_by', $edited_Blog->get_setting( 'search_sort_by' ), array(
+			array( 'score', T_('Score') ),
+			array( 'date', T_('Date'), T_('If sorted by date, everything without a date will be sorted last.') ),
+		), T_('Sort by'), true );
+	$Form->checklist( array(
+			array( 'search_include_posts', 1, T_('Posts'), $edited_Blog->get_setting( 'search_include_posts' ) ),
+			array( 'search_include_cmnts', 1, T_('Comments'), $edited_Blog->get_setting( 'search_include_cmnts' ) ),
+			array( 'search_include_cats',  1, T_('Categories'), $edited_Blog->get_setting( 'search_include_cats' ) ),
+			array( 'search_include_tags',  1, T_('Tags'), $edited_Blog->get_setting( 'search_include_tags' ) ),
+		), 'search_include', T_('Include') );
 $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Latest comments').get_manual_link( 'latest-comments-other' ) );
-	$Form->text( 'latest_comments_num', $edited_Blog->get_setting( 'latest_comments_num' ), 4, T_('Number of comments shown'), '', 4 );
+	$Form->text( 'latest_comments_num', $edited_Blog->get_setting( 'latest_comments_num' ), 4, T_('Comments shown'), '', 4 );
 $Form->end_fieldset();
 
 
@@ -115,15 +125,20 @@ if( isset($GLOBALS['files_Module']) )
 {
 	load_funcs( 'files/model/_image.funcs.php' );
 	$params['force_keys_as_values'] = true;
-	
+
 	$Form->begin_fieldset( T_('User directory').get_manual_link( 'user-directory-other' ) );
 			$Form->select_input_array( 'image_size_user_list', $edited_Blog->get_setting( 'image_size_user_list' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
 	$Form->end_fieldset();
-		
+
 	$Form->begin_fieldset( T_('Messaging pages').get_manual_link( 'messaging-other' ) );
 			$Form->select_input_array( 'image_size_messaging', $edited_Blog->get_setting( 'image_size_messaging' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
 	$Form->end_fieldset();
 }
+
+$Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'contact-form' ) );
+	$Form->text_input( 'msgform_title', $edited_Blog->get_setting( 'msgform_title' ), 80, T_('Page Title'), T_('Leave empty for default') );
+	$Form->checkbox( 'msgform_display_recipient', $edited_Blog->get_setting( 'msgform_display_recipient' ), T_('Display recipient'), T_('Check to show a "Message to:" line.') );
+$Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 

@@ -144,10 +144,10 @@ siteskin_include( '_site_body_header.inc.php' );
 							'after'     => '',
 						) );
 				?>
-				<?php 	
+				<?php
 					if( $Skin->enabled_status_banner( $single_Item->status ) )
 					{ // Status banner
-						$single_Item->format_status( array( 'template' => '<div class="evo_status evo_status__$status$ badge">$status_title$</div>' ) );						
+						$single_Item->format_status( array( 'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>' ) );
 					}
 					$single_Item->edit_link( array( // Link to backoffice for editing
 							'before'    => '',
@@ -157,7 +157,7 @@ siteskin_include( '_site_body_header.inc.php' );
 						) );
 				?>
 			</span><!-- .nav_album_title -->
-		
+
 			<?php
 				// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 				item_prevnext_links( array(
@@ -177,14 +177,14 @@ siteskin_include( '_site_body_header.inc.php' );
 					) );
 				// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 			?>
-		
+
 			<div class="clear"></div>
-			
+
 			</nav><!-- .nav_album -->
 			</div><!-- .col -->
 		</div><!-- .row -->
 		<?php
-		} // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) ------------------- 
+		} // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) -------------------
 	?>
 
 	<?php
@@ -195,8 +195,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
-		
-	<article class="row">	
+
+	<article class="row">
 
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
@@ -239,7 +239,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'widget_context' => 'item',	// Signal that we are displaying within an Item
 					// The following (optional) params will be used as defaults for widgets included in this container:
 					// This will enclose each widget in a block:
-					'block_start' => '<div class="$wi_class$">',
+					'block_start' => '<div class="evo_widget $wi_class$">',
 					'block_end' => '</div>',
 					// This will enclose the title of each widget:
 					'block_title_start' => '<h3>',
@@ -254,6 +254,19 @@ siteskin_include( '_site_body_header.inc.php' );
 							'image_size'             => '', // Do not display images in content block - Image is handled separately
 							'url_link_text_template' => '', // link will be displayed (except player if podcast)
 						),
+					// Template params for "Item Attachments" widget:
+					'widget_item_attachments_params' => array(
+							'limit_attach'       => 1000,
+							'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+							'after'              => '</ul></div>',
+							'before_attach'      => '<li class="evo_file">',
+							'after_attach'       => '</li>',
+							'before_attach_size' => ' <span class="evo_file_size">(',
+							'after_attach_size'  => ')</span>',
+						),
+					// Template params for "Item Link" widget
+					'widget_item_link_before'    => '<p class="evo_post_link">',
+					'widget_item_link_after'     => '</p>',
 				) );
 				// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 				?>
@@ -323,12 +336,12 @@ siteskin_include( '_site_body_header.inc.php' );
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="col-md-12">
 
-		<div class="evo_container evo_container__footer">
+		<div class="evo_container evo_container__footer clearfix">
 		<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
@@ -337,7 +350,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 		</div>
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
@@ -388,7 +401,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

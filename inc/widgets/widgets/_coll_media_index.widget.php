@@ -25,6 +25,8 @@ load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectLis
  */
 class coll_media_index_Widget extends ComponentWidget
 {
+	var $icon = 'file-photo-o';
+
 	/**
 	 * Constructor
 	 */
@@ -43,7 +45,7 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		load_funcs( 'files/model/_image.funcs.php' );
 
@@ -212,7 +214,7 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $localtimenow, $DB, $Blog;
+		global $localtimenow, $DB, $Collection, $Blog;
 
 		$this->init_display( $params );
 
@@ -224,8 +226,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 		$BlogCache = & get_BlogCache();
 		if( ! $BlogCache->get_by_ID( $blog_ID, false, false ) )
-		{ // No blog exists
-			return;
+		{	// No collection exists
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no filters.' );
+			return false;
 		}
 
 		// Display photos:
@@ -327,8 +330,11 @@ class coll_media_index_Widget extends ComponentWidget
 			$r .= $this->get_layout_item_end( $count );
 		}
 
-		// Exit if no files found
-		if( empty($r) ) return;
+		if( empty( $r ) )
+		{	// Exit if no files found:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no image matching the current filters.' );
+			return false;
+		}
 
 		echo $this->disp_params['block_start'];
 
@@ -358,7 +364,7 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 		if( empty( $blog_ID ) )

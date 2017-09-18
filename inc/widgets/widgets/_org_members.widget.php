@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class org_members_Widget extends ComponentWidget
 {
+	var $icon = 'users';
+
 	/**
 	 * Constructor
 	 */
@@ -197,7 +199,7 @@ class org_members_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $DB, $Item, $Blog, $thumbnail_sizes;
+		global $DB, $Item, $Collection, $Blog, $thumbnail_sizes;
 
 		$this->init_display( $params );
 
@@ -347,7 +349,7 @@ class org_members_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		return array(
 				'wi_ID'       => $this->ID, // Have the widget settings changed ?

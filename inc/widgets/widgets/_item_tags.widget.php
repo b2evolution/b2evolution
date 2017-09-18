@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_tags_Widget extends ComponentWidget
 {
+	var $icon = 'tag';
+
 	/**
 	 * Constructor
 	 */
@@ -98,10 +100,34 @@ class item_tags_Widget extends ComponentWidget
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
+				),
+				'before_list' => array(
+					'label' => T_( 'Before List' ),
+					'size' => 40,
+					'note' => T_( 'Label before the list of tags' ),
+					'defaultvalue' => T_('Tags').': '
 				)
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
+	}
+
+
+	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		global $preview;
+
+		parent::init_display( $params );
+
+		if( $preview )
+		{	// Disable block caching for this widget when item is previewed currently:
+			$this->disp_params['allow_blockcache'] = 0;
+		}
 	}
 
 
@@ -114,12 +140,13 @@ class item_tags_Widget extends ComponentWidget
 	{
 		global $Item;
 
+		$this->init_display( $params );
+
 		if( empty( $Item ) )
 		{ // Don't display this widget when no Item object
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item object.' );
+			return false;
 		}
-
-		$this->init_display( $params );
 
 		// We renamed some params; older skin may use the old names; let's convert those params now:
 		$this->convert_legacy_param( 'widget_coll_item_tags_before', 'widget_item_tags_before' );
@@ -127,9 +154,10 @@ class item_tags_Widget extends ComponentWidget
 		$this->convert_legacy_param( 'widget_coll_item_tags_separator', 'widget_item_tags_separator' );
 
 		$this->disp_params = array_merge( array(
-				'widget_item_tags_before'    => T_('Tags').': ',
-				'widget_item_tags_after'     => '',
-				'widget_item_tags_separator' => ', ',
+				'widget_item_tags_before'      => '<nav class="small post_tags">',
+				'widget_item_tags_before_list' => $this->disp_params['before_list'],
+				'widget_item_tags_after'       => '</nav>',
+				'widget_item_tags_separator'   => ', ',
 			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
@@ -138,7 +166,7 @@ class item_tags_Widget extends ComponentWidget
 
 		// List all tags attached to the Item:
 		$Item->tags( array(
-				'before'    => $this->disp_params['widget_item_tags_before'],
+				'before'    => $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' ),
 				'after'     => $this->disp_params['widget_item_tags_after'],
 				'separator' => $this->disp_params['widget_item_tags_separator'],
 			) );
@@ -157,7 +185,7 @@ class item_tags_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User, $Item;
+		global $Collection, $Blog, $current_User, $Item;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?

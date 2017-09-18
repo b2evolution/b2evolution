@@ -28,6 +28,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_common_links_Widget extends ComponentWidget
 {
+	var $icon = 'align-justify';
+
 	/**
 	 * Constructor
 	 */
@@ -174,7 +176,7 @@ class coll_common_links_Widget extends ComponentWidget
 		/**
 		* @var Blog
 		*/
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 

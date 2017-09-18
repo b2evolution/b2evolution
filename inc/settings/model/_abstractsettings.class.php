@@ -379,6 +379,34 @@ class AbstractSettings
 
 
 	/**
+	 * Get a ready-to-display member param by its name
+	 *
+	 * Same as disp but don't echo
+	 *
+	 * @param string Name of parameter
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function dget( $parname, $format = 'htmlbody' )
+	{
+		// Note: we call get again because of derived objects specific handlers !
+		return format_to_output( $this->get($parname), $format );
+	}
+
+
+	/**
+	 * Display a member param by its name
+	 *
+	 * @param string Name of parameter
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function disp( $parname, $format = 'htmlbody' )
+	{
+		// Note: we call get again because of derived objects specific handlers !
+		echo format_to_output( $this->get($parname), $format );
+	}
+
+
+	/**
 	 * Get the default for the last key of {@link $col_key_names}
 	 *
 	 * @param string The last column key

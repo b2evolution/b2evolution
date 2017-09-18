@@ -96,6 +96,9 @@ if( empty( $use_form_links ) )
 	$login_form_params['formstart'] = str_replace( '$form_links$', '', $login_form_params['formstart'] );
 }
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 headers_content_mightcache( 'text/html', 0 );		// NEVER cache the login pages!
 
 $wrap_styles = array();

@@ -97,15 +97,18 @@ class ChapterCache extends DataObjectCache
 
 	/**
 	 * Add a dataobject to the cache
+	 *
+	 * @param object Chapter object to add in cache
+	 * @return boolean TRUE on adding, FALSE on wrong object or if it is already in cache
 	 */
-	function add( & $Obj )
+	function add( $Chapter )
 	{
-		if( parent::add( $Obj ) )
+		if( parent::add( $Chapter ) )
 		{	// Successfully added
 
 			if( !empty( $this->subset_property ) )
 			{	// Also add to subset cache:
-				$this->subset_cache[ $Obj->{$this->subset_property} ][ $Obj->ID ] = & $Obj;
+				$this->subset_cache[ $Chapter->{$this->subset_property} ][ $Chapter->ID ] = $Chapter;
 			}
 			return true;
 		}
@@ -719,7 +722,7 @@ class ChapterCache extends DataObjectCache
 	/**
 	 * Return recursive display of loaded categories
 	 *
-	 * @param array callback funtions (to format the display)
+	 * @param array callback functions (to format the display)
 	 * @param integer|NULL NULL for all subsets
 	 * @param array categories list to display
 	 * @param integer depth of categories list

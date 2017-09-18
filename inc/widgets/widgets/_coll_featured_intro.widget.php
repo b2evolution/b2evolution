@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_featured_intro_Widget extends ComponentWidget
 {
+	var $icon = 'asterisk';
+
 	/**
 	 * Constructor
 	 */
@@ -180,7 +182,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Go Grab the featured post:
-		if( $Item = get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
+		if( $Item = & get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
 		{ // We have a featured/intro post to display:
 			$item_style = '';
 			$LinkOwner = new LinkItem( $Item );
@@ -214,13 +216,19 @@ class coll_featured_intro_Widget extends ComponentWidget
 					'item_title_link_type' => $this->disp_params['item_title_link_type'],
 					'attached_pics'        => $this->disp_params['attached_pics'],
 					'item_pic_link_type'   => $this->disp_params['item_pic_link_type'],
+					'Item'                 => $Item,
 				) );
 			echo $this->disp_params['featured_intro_after'];
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
 			// ----------------------------END ITEM BLOCK  ----------------------------
+			return true;
 		}
-
+		else
+		{	// No featured Item:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no featured/intro post to display' );
+			return false;
+		}
 	}
 
 
@@ -231,7 +239,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		return array(
 				'wi_ID' => $this->ID, // Have the widget settings changed ?
@@ -239,6 +247,26 @@ class coll_featured_intro_Widget extends ComponentWidget
 				'user_ID' => (is_logged_in() ? $current_User->ID : 0), // Has the current User changed?
 				'intro_feat_coll_ID' => empty($this->disp_params['blog_ID']) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the intro/featured post changed ?
 			);
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			echo $this->disp_params['block_body_start'];
+			echo $this->disp_params['featured_intro_before'];
+			echo $message;
+			echo $this->disp_params['featured_intro_after'];
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 ?>

@@ -59,7 +59,7 @@ jQuery( document ).on( 'click', 'span[rel=add_criteria]', function()
 	obj_this = jQuery( this ).parent().parent();
 	jQuery.ajax({
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_userfields_criteria' + params,
 	success: function( result )
 		{	// Display fieldset of new Specific criteria
@@ -104,7 +104,7 @@ jQuery(document).ready( function()
 	// Print JS to edit an user level
 	echo_editable_column_js( array(
 		'column_selector' => '.user_level_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=user_level_edit&'.url_crumb( 'userlevel' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=user_level_edit&'.url_crumb( 'userlevel' ),
 		'options'         => $user_levels,
 		'new_field_name'  => 'new_user_level',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',

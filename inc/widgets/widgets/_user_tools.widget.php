@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class user_tools_Widget extends ComponentWidget
 {
+	var $icon = 'gears';
+
 	/**
 	 * Constructor
 	 */
@@ -170,7 +172,7 @@ class user_tools_Widget extends ComponentWidget
 				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
-				'defaultvalue' => T_( 'Notifications &amp; Subscriptions' ),
+				'defaultvalue' => T_( 'Notifications & Subscriptions' ),
 			),
 			// Admin
 			'user_admin_link_show' => array(
@@ -258,6 +260,7 @@ class user_tools_Widget extends ComponentWidget
 	{
 		if( !is_logged_in() )
 		{	// Only logged in users can see this tools panel
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because you are not logged in.' );
 			return false;
 		}
 
@@ -314,6 +317,7 @@ class user_tools_Widget extends ComponentWidget
 
 		if( empty( $tools_links ) )
 		{	// No available links to display
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because no available links to display.' );
 			return false;
 		}
 
@@ -356,7 +360,7 @@ class user_tools_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?

@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_search_form_Widget extends ComponentWidget
 {
+	var $icon = 'search';
+
 	/**
 	 * Constructor
 	 */
@@ -149,7 +151,7 @@ class coll_search_form_Widget extends ComponentWidget
 		}
 		if( empty( $widget_Blog ) )
 		{ // Use current blog
-			global $Blog;
+			global $Collection, $Blog;
 			$widget_Blog = & $Blog;
 		}
 
