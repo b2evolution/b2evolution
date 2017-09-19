@@ -63,7 +63,16 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	if( isset( $parmeta['group'] ) )
 	{
 		$group = $parmeta['group'];
-		$parname = $group.$parname;
+		if( substr( $group, -1 ) === ']' )
+		{	// If group name is in array format like "edit_plugin_1_set_sample_sets[0][group_name]",
+			// then param name must be like "edit_plugin_1_set_sample_sets[0][group_name_param_name]":
+			$parname = substr( $group, 0, strlen( $group ) - 1 ).$parname.']';
+		}
+		else
+		{	// If group name is simple like "group_name",
+			// then param name must be like "group_name_param_name"
+			$parname = $group.$parname;
+		}
 	}
 	else
 	{
