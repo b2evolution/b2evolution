@@ -87,11 +87,15 @@ class coll_member_count_Widget extends ComponentWidget
 			return false;
 		}
 
+		echo $this->disp_params['block_start'];
+
 		echo $this->disp_params['before'];
 
 		echo '<a href="'.url_add_param( $Blog->get( 'usersurl' ), 'filter=new&amp;membersonly=1' ).'">'.sprintf( T_('%d members'), $this->get_members_count() ).'</a>';
 
 		echo $this->disp_params['after'];
+
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}
@@ -165,9 +169,11 @@ class coll_member_count_Widget extends ComponentWidget
 	{
 		if( $this->mode == 'designer' )
 		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
 			echo $this->disp_params['before'];
 			echo $message;
 			echo $this->disp_params['after'];
+			echo $this->disp_params['block_end'];
 		}
 	}
 }

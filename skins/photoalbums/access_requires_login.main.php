@@ -61,8 +61,10 @@ siteskin_include( '_site_body_header.inc.php' );
 			// CODE for the widget:
 			'widget' => 'coll_member_count',
 			// Optional display params
-			'before' => '(',
-			'after'  => ')',
+			'block_start' => '<span>',
+			'block_end'   => '</span>',
+			'before'      => '(',
+			'after'       => ')',
 		) );
 	?>
 
