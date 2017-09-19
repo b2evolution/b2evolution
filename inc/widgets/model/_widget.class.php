@@ -740,6 +740,10 @@ class ComponentWidget extends DataObject
 						break;
 					}
 				}
+				if( ! $wrapper_is_found )
+				{	// Display error if widget has no wrappers to enable designer mode:
+					echo '<span class="text-danger"><code>'.$this->code.'</code> - no widget wrappers for designer mode</span>';
+				}
 			}
 
 			$this->display( $params );
