@@ -45,6 +45,28 @@ class PluginSettings extends AbstractSettings
 	 */
 	function get( $setting )
 	{
+		if( strpos( $setting, '[' ) !== false )
+		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+			$setting_names = explode( '[', $setting );
+			$setting_value = parent::getx( $this->plugin_ID, $setting_names[0] );
+			unset( $setting_names[0] );
+			foreach( $setting_names as $setting_name )
+			{
+				$setting_name = trim( $setting_name, ']' );
+				if( isset( $setting_value[ $setting_name ] ) )
+				{
+					$setting_value = $setting_value[ $setting_name ];
+				}
+				else
+				{
+					$setting_value = NULL;
+					break;
+				}
+			}
+			return $setting_value;
+		}
+
+		// Get normal(not array) setting value:
 		return parent::getx( $this->plugin_ID, $setting );
 	}
 
