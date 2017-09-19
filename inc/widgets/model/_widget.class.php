@@ -395,9 +395,33 @@ class ComponentWidget extends DataObject
 	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
 	{
 		$this->load_param_array();
-		if( isset( $this->param_array[$parname] ) )
-		{	// We have a value for this param:
-			return $this->param_array[$parname];
+
+		if( strpos( $parname, '[' ) !== false )
+		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+			$setting_names = explode( '[', $parname );
+			if( isset( $this->param_array[ $setting_names[0] ] ) )
+			{
+				$setting_value = $this->param_array[ $setting_names[0] ];
+				unset( $setting_names[0] );
+				foreach( $setting_names as $setting_name )
+				{
+					$setting_name = trim( $setting_name, ']' );
+					if( isset( $setting_value[ $setting_name ] ) )
+					{
+						$setting_value = $setting_value[ $setting_name ];
+					}
+					else
+					{
+						$setting_value = NULL;
+						break;
+					}
+				}
+				return $setting_value;
+			}
+		}
+		elseif( isset( $this->param_array[ $parname ] ) )
+		{	// Get normal(not array) setting value:
+			return $this->param_array[ $parname ];
 		}
 
 		// Try default values:

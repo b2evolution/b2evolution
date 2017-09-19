@@ -3854,7 +3854,7 @@ class Form extends Widget
 
 			$button_label = ( $counter === 0 ? /* TRANS: verb */ T_('Select') : get_icon( 'new' ).' '.T_('Add') );
 
-			$r .= '<button class="btn btn-sm btn-info file_select_item" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
+			$r .= '<button class="btn btn-sm btn-info file_select_item" data-title="'.$field_params['window_title'].'" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
 
 			$r .= '</div>';
 			$r .= $this->end_field();
@@ -3869,13 +3869,14 @@ class Form extends Widget
 			{
 				$r .= '
 						<script type="text/javascript">
-						var fsel_size, fsel_name, fsel_type, fsel_obj, fsel_replace = false;
+						var fsel_size, fsel_name, fsel_type, fsel_obj, fsel_replace = false, fsel_title;
 
 						function file_select_attachment_window( event_object, replace_item, fm_highlight )
 						{
 							fsel_obj = event_object;
 							fsel_replace = replace_item;
 							field_object = jQuery( event_object ).closest( ".file_select_wrapper" );
+							fsel_title = jQuery( event_object ).data(  "title" );
 							fsel_size = field_object.data( "thumbSize" );
 							fsel_name = field_object.attr( "name" );
 							fsel_type = field_object.data( "fileType" );
@@ -3883,7 +3884,7 @@ class Form extends Widget
 							path = field_object.data( "path" );
 
 							openModalWindow( \'<span class="loader_img loader_user_report absolute_center" title="'.T_('Loading...').'"></span>\',
-								"90%", "80%", true, "'.$field_params['window_title'].'", "", true );
+								"90%", "80%", true, fsel_title, "", true );
 							jQuery.ajax(
 							{
 								type: "POST",
