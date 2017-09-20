@@ -29,7 +29,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 // Load widgets for current collection:
 $WidgetCache = & get_WidgetCache();
-$container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID );
+$container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID, false, get_param( 'skin_type' ) );
 
 /**
  * @param string Title of the container. This gets passed to T_()!
@@ -207,9 +207,10 @@ function display_container( $WidgetContainer, $legend_suffix = '' )
 /**
  * Display containers
  *
+ * @param string Skin type: 'normal', 'mobile', 'tablet'
  * @param boolean TRUE to display main containers, FALSE - sub containers
  */
-function display_containers( $main = true )
+function display_containers( $skin_type, $main = true )
 {
 	global $Blog, $blog_container_list, $skins_container_list, $embedded_containers;
 
@@ -227,7 +228,8 @@ function display_containers( $main = true )
 			$WidgetContainer->set( 'name', $container_data[0] );
 			$WidgetContainer->set( 'coll_ID', $Blog->ID );
 		}
-		if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
+		if( $WidgetContainer->get( 'skin_type' ) != $skin_type ||
+		    ( $main && ! $WidgetContainer->get( 'main' ) ) ||
 		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
 		{	// Skip this container because another type is requested:
 			continue;
@@ -294,11 +296,11 @@ echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at rememberin
 echo '<div class="row">';
 
 echo '<div class="col-md-6 col-sm-12">';
-display_containers( true );
+display_containers( get_param( 'skin_type' ), true );
 echo '</div>';
 
 echo '<div class="col-md-6 col-sm-12">';
-display_containers( false );
+display_containers( get_param( 'skin_type' ), false );
 echo '</div>';
 
 echo '</div>';

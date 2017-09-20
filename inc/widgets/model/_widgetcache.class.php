@@ -124,6 +124,16 @@ class WidgetCache extends DataObjectCache
 			}
 		}
 
+		if( ! is_admin_page() && ( $skin_type == 'mobile' || $skin_type == 'tablet' ) )
+		{	// Check if collection use different mobile/tablet skin or same as normal skin:
+			$BlogCache = & get_BlogCache();
+			$widget_Blog = & $BlogCache->get_by_ID( $coll_ID, false, false );
+			if( ! $widget_Blog || $widget_Blog->get_setting( $skin_type.'_skin_ID', true ) === '0' )
+			{	// Force to use widgets for normal skin because collection doesn't use different skin for mobile/tablet session:
+				$skin_type = 'normal';
+			}
+		}
+
 		if( $by_code )
 		{	// Get widgets grouped by container code:
 			$widgets = $this->cache_container_Widget_array_by_code[ $coll_ID ];
