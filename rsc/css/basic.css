@@ -42,6 +42,13 @@ div.dev-blocks--container > .dev-blocks-name {
   color: #f00;
   background-color: #fdd;
 }
+div.dev-blocks--subcontainer {
+  border-color: #f0f;
+}
+div.dev-blocks--subcontainer > .dev-blocks-name {
+  color: #f0f;
+  background-color: #fef;
+}
 div.dev-blocks--widget {
   border-color: #00f;
 }

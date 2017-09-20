@@ -23,7 +23,7 @@ class touch_Skin extends Skin
 	 */
 	var $version = '7.0.0';
 
-  /**
+	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -33,12 +33,34 @@ class touch_Skin extends Skin
 	}
 
 
-  /**
+	/**
 	 * Get default type for the skin.
 	 */
 	function get_default_type()
 	{
 		return 'mobile';
+	}
+
+
+	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		// Note: second param below is the ORDER
+		return array(
+				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
+				'item_single'            => array( NT_('Item Single'), 50 ),
+				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
+				'mobile_footer'          => array( NT_('Mobile: Footer'), 110 ),
+				'mobile_navigation_menu' => array( NT_('Mobile: Navigation Menu'), 120 ),
+				'mobile_tools_menu'      => array( NT_('Mobile: Tools Menu'), 130 ),
+			);
 	}
 
 

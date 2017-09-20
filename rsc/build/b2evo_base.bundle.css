@@ -1216,7 +1216,8 @@ div.message_toolbars div.edit_toolbar {
   width: 100%;
   border-bottom: none;
 }
-.widget_core_coll_category_list .evo_cat_meta {
+.widget_core_coll_category_list .evo_cat_meta > label,
+.widget_core_coll_category_list .evo_cat_meta > a {
   font-weight: bold;
 }
 .widget_core_coll_category_list .evo_cat_meta ul {
@@ -1269,6 +1270,13 @@ div.dev-blocks--include > .dev-blocks-name {
 div.dev-blocks--container > .dev-blocks-name {
   color: #f00;
   background-color: #fdd;
+}
+div.dev-blocks--subcontainer {
+  border-color: #f0f;
+}
+div.dev-blocks--subcontainer > .dev-blocks-name {
+  color: #f0f;
+  background-color: #fef;
 }
 div.dev-blocks--widget {
   border-color: #00f;
@@ -3562,7 +3570,7 @@ textarea.form_textarea_input {
   margin: 1em;
   text-align: center;
 }
-div.widget_core_coll_avatar {
+div.widget_core_user_profile_pics {
   margin-top: 1em;
   margin-bottom: 1em;
   text-align: center;
@@ -3615,6 +3623,10 @@ div.container_menu_top input.search_field {
 .widget_core_user_login .user_group,
 .widget_core_user_login .user_level {
   color: #999;
+}
+.widget_core_user_profile_pics img {
+  max-width: 100%;
+  height: auto;
 }
 div.widget_core_coll_item_list.nobullets ul,
 div.widget_core_coll_item_list.nobullets ul li,
@@ -4122,10 +4134,11 @@ input.btn-lg {
 .main_profile_picture {
   border-radius: 4px;
 }
-.other_profile_pictures {
+div.other_profile_pictures {
+  text-align: left;
   margin-bottom: 10px;
 }
-.other_profile_pictures img {
+div.other_profile_pictures img {
   border-radius: 4px;
 }
 .profile_column_left {

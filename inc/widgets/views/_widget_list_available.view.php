@@ -66,12 +66,16 @@ $core_componentwidget_defs = array(
 			'free_text',
 			'free_html',
 			'spacer',
+			'separator',
 			'image',
 			'social_links',
 		),
 	'about_user' => array(
-			'coll_avatar',		// Avatar of User
+			'user_profile_pics',		// Avatar of User
 			'user_links',		// Social links of coll owner
+			'user_info',
+			'user_action',
+			'user_fields',
 		),
 	'menu_item' => array(
 			'basic_menu_link',
@@ -131,6 +135,9 @@ $core_componentwidget_defs = array(
 			'online_users',
 		),
 	'other' => array(
+			'subcontainer',
+			'subcontainer_row',
+			'inc_file',
 			'poll',
 			'colls_list_public',
 			'colls_list_owner',

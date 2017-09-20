@@ -1215,7 +1215,8 @@ div.message_toolbars div.edit_toolbar {
   width: 100%;
   border-bottom: none;
 }
-.widget_core_coll_category_list .evo_cat_meta {
+.widget_core_coll_category_list .evo_cat_meta > label,
+.widget_core_coll_category_list .evo_cat_meta > a {
   font-weight: bold;
 }
 .widget_core_coll_category_list .evo_cat_meta ul {

@@ -264,7 +264,8 @@ class Blog extends DataObject
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission definitions') ),
 				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission definitions') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
-				array( 'table'=>'T_widget', 'fk'=>'wi_coll_ID', 'msg'=>T_('%d widgets') ),
+				array( 'table'=>'T_widget__container', 'fk'=>'wico_coll_ID', 'msg'=>T_('%d widget container'),
+						'class'=>'WidgetContainer', 'class_path'=>'widgets/model/_widgetcontainer.class.php' ),
 				array( 'table'=>'T_hitlog', 'fk'=>'hit_coll_ID', 'msg'=>T_('%d hits') ),
 				array( 'table'=>'T_categories', 'fk'=>'cat_blog_ID', 'msg'=>T_('%d related categories with all of their content recursively'),
 						'class'=>'Chapter', 'class_path'=>'chapters/model/_chapter.class.php' ),
@@ -2915,7 +2916,7 @@ class Blog extends DataObject
 			case 'tablet_skin_ID':
 				if( $result === NULL )
 				{ // Try to get default from the global settings
-					$result = $Settings->get( 'def_'.$parname );
+					$result = isset( $Settings ) ? $Settings->get( 'def_'.$parname ) : '0';
 				}
 				if( ( $result === '0' ) && ! $real_value )
 				{ // 0 value means that use the same as normal case
@@ -3212,7 +3213,7 @@ class Blog extends DataObject
 
 		// ADD DEFAULT WIDGETS:
 		load_funcs( 'widgets/_widgets.funcs.php' );
-		insert_basic_widgets( $this->ID, false, $kind );
+		insert_basic_widgets( $this->ID, $this->get_skin_ids(), false, $kind );
 
 		$Messages->add_to_group( T_('Default widgets have been set-up for this collection.'), 'success', T_('New collection created:') );
 
@@ -3914,6 +3915,86 @@ class Blog extends DataObject
 
 		// Deny to request invalid skin types
 		debug_die( 'The requested skin type is invalid.' );
+	}
+
+
+	/**
+	 * Get distinct skin ids used by the current blog
+	 *
+	 * @return array Ids of skins which are used as normal, mobile or tablet skin with the current blog
+	 */
+	function get_skin_ids()
+	{
+		return array_unique( array(
+				$this->get_setting( 'normal_skin_ID' ),
+				$this->get_setting( 'mobile_skin_ID' ),
+				$this->get_setting( 'tablet_skin_ID' )
+			) );
+	}
+
+
+	/**
+	 * Get blog main containers
+	 *
+	 * @return array main container codes => array( name, order )
+	 */
+	function get_main_containers()
+	{
+		load_funcs( 'skins/_skin.funcs.php' );
+		// Get all skins of the blog and get the merge of main containers from each skin:
+		$skin_ids = $this->get_skin_ids();
+
+		// Get containers of all collection skins:
+		$blog_containers = get_skin_containers( $skin_ids );
+
+		return $blog_containers;
+	}
+
+
+	/**
+	 * Save blog main containers
+	 */
+	function db_save_main_containers( $verbose = false )
+	{
+		global $DB, $Messages;
+
+		// Get main widget containers defined by the blog's skins
+		$blog_main_containers = $this->get_main_containers();
+		// Get currently saved blog containers from the database
+		$blog_containers = $DB->get_col( 'SELECT wico_code FROM T_widget__container WHERE wico_coll_ID = '.$this->ID );
+
+		// Check all main containers and create insert params for those which are not saved yet
+		$widget_containers_sql_rows = array();
+		foreach( $blog_main_containers as $wico_code => $wico_data )
+		{
+			if( ! in_array( $wico_code, $blog_containers ) )
+			{	// Create only those containers which are not saved yet:
+				$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$this->ID.', '.$wico_data[1].', 1 )';
+			}
+		}
+
+		if( $verbose )
+		{ // Display how many containers are declared by the blog skins
+			$Messages->add( sprintf( T_('%d containers declared by this blog skins.'), count( $blog_main_containers ) ), 'note' );
+		}
+
+		if( ! empty( $widget_containers_sql_rows ) )
+		{ // Insert all containers defined by the blog skins into the database
+			$newly_created = $DB->query( 'REPLACE INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
+					.implode( ', ', $widget_containers_sql_rows ) );
+		}
+
+		if( $verbose )
+		{
+			if( isset( $newly_created ) && ( $newly_created > 0 ) )
+			{
+				$Messages->add( sprintf( T_('%d new container(s) were created.'), $newly_created ), 'success' );
+			}
+			else
+			{
+				$Messages->add( T_('All containers were already created.'), 'success' );
+			}
+		}
 	}
 
 

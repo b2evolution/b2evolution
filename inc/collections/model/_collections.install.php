@@ -35,14 +35,6 @@ $schema_queries = array_merge( $schema_queries, array(
 				KEY skin_name( skin_name )
 			) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_skins__container' => array(
-		'Creating table for skin containers',
-		"CREATE TABLE T_skins__container (
-				sco_skin_ID   int(10) unsigned      NOT NULL,
-				sco_name      varchar(40)           NOT NULL,
-				PRIMARY KEY (sco_skin_ID, sco_name)
-			) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
-
 	'T_blogs' => array(
 		'Creating table for Blogs',
 		"CREATE TABLE T_blogs (
@@ -96,19 +88,31 @@ $schema_queries = array_merge( $schema_queries, array(
 			PRIMARY KEY ( cset_coll_ID, cset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_widget' => array(
+	'T_widget__container' => array(
+		'Creating components container table',
+		"CREATE TABLE T_widget__container (
+			wico_ID       INT(10) UNSIGNED auto_increment,
+			wico_code     VARCHAR(32) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			wico_name     VARCHAR( 40 ) NOT NULL,
+			wico_coll_ID  INT(10) NULL DEFAULT NULL,
+			wico_order    INT(10) NOT NULL,
+			wico_main     TINYINT(1) NOT NULL DEFAULT 0,
+			PRIMARY KEY ( wico_ID ),
+			UNIQUE wico_coll_ID_code ( wico_coll_ID, wico_code )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_widget__widget' => array(
 		'Creating components table',
-		"CREATE TABLE T_widget (
-			wi_ID					INT(10) UNSIGNED auto_increment,
-			wi_coll_ID    INT(11) UNSIGNED NOT NULL,
-			wi_sco_name   VARCHAR( 40 ) NOT NULL,
+		"CREATE TABLE T_widget__widget (
+			wi_ID         INT(10) UNSIGNED auto_increment,
+			wi_wico_ID    INT(10) UNSIGNED NOT NULL,
 			wi_order      INT(10) NOT NULL,
 			wi_enabled    TINYINT(1) NOT NULL DEFAULT 1,
 			wi_type       ENUM( 'core', 'plugin' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'core',
 			wi_code       VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
 			wi_params     TEXT NULL,
 			PRIMARY KEY ( wi_ID ),
-			UNIQUE wi_order( wi_coll_ID, wi_sco_name, wi_order )
+			UNIQUE wi_order( wi_wico_ID, wi_order )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_categories' => array(

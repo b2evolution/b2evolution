@@ -2506,6 +2506,33 @@ function skin_container( $sco_name, $params = array() )
 
 
 /**
+ * Get the set of main containers of multiple skins
+ * Note: Used to get blog main containers when multiple skins are set for different devices
+ *
+ * @param array skin ids
+ * @return array skin container codes => skin container names
+ */
+function get_skin_containers( $skin_ids )
+{
+	if( empty( $skin_ids ) )
+	{ // Return empty list if skins are not set
+		return array();
+	}
+
+	$SkinCache = & get_SkinCache();
+	$SkinCache->load_list( $skin_ids );
+	$blog_containers = array();
+	foreach( $skin_ids as $skin_ID )
+	{ // Collect containers from the given skins and merge them
+		$Skin = $SkinCache->get_by_ID( $skin_ID );
+		$blog_containers = array_merge( $blog_containers, $Skin->get_containers() );
+	}
+
+	return $blog_containers;
+}
+
+
+/**
  * Install a skin
  *
  * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
@@ -2687,7 +2714,12 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 			// Containers
 			if( $skin_containers = $edited_Skin->get_containers() )
 			{
-				$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
+				$skin_containers_names = array();
+				foreach( $skin_containers as $skin_container_data )
+				{
+					$skin_containers_names[] = $skin_container_data[0];
+				}
+				$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers_names ).'</li></ul>';
 			}
 			else
 			{

@@ -265,7 +265,7 @@ textarea.form_textarea_input {
 }
 
 // Avatar widget
-div.widget_core_coll_avatar {
+div.widget_core_user_profile_pics {
 	// margin-top: 1em;
 	// margin-bottom: 1em;
 	text-align:center;
@@ -328,6 +328,12 @@ div.container_menu_top input.search_field {
 .widget_core_user_login .user_group,
 .widget_core_user_login .user_level {
 	color: #999;
+}
+
+// User Profile Picture widget
+.widget_core_user_profile_pics img {
+	max-width: 100%;
+	height: auto;
 }
 
 // Advertisement widget
@@ -765,15 +771,6 @@ input.btn-lg {
 	max-width: 960px;
 	margin: auto;
 }
-.main_profile_picture {
-	.border-radius;
-}
-.other_profile_pictures {
-	margin-bottom: 10px;
-	img {
-		.border-radius;
-	}
-}
 .profile_column_left {
 	float: left;
 	width: 300px;
@@ -783,19 +780,6 @@ input.btn-lg {
 	margin-left: 320px;
 	#fieldset_user_fields {
 		overflow: hidden;
-	}
-}
-.profile_buttons {
-	.btn, .btn-group {
-		width: 100%;
-	}
-	.btn-group .btn {
-		width: 50%;
-	}
-	a.btn button {
-		background: none;
-		border: none;
-		padding: 0;
 	}
 }
 .profile_column_right legend.panel-heading {
@@ -833,6 +817,63 @@ input.btn-lg {
 @media (max-width: 375px) {
 	.evo_form .control-buttons .submit, .evo_form .control-buttons .preview { // Separates form buttons on low resolution when they are not inline
 		margin-bottom: 4px;
+	}
+}
+// Widgets on profile page (disp=user):
+.widget_core_user_info {
+	&.evo_user_info_name,
+	&.evo_user_info_nickname,
+	&.evo_user_info_login {
+		font-size: 30px;
+		font-weight: 500;
+		line-height: 1.1;
+		margin-top: 20px;
+		margin-bottom: 10px;
+	}
+	&.evo_user_info_name {
+		font-size: 36px;
+	}
+	&.evo_user_info_login {
+		color: #777;
+	}
+	&.evo_user_info_gender,
+	&.evo_user_info_location,
+	&.evo_user_info_orgs {
+		margin-bottom: 10px;
+	}
+	&.evo_user_info_location {
+		white-space: nowrap;
+	}
+}
+.widget_core_user_profile_pics {
+	&.evo_user_profile_pics_main,
+	&.evo_user_profile_pics_other {
+		img {
+			.border-radius;
+		}
+	}
+	&.evo_user_profile_pics_other {
+		text-align: left;
+		margin-bottom: 10px;
+		a {
+			display: inline-block;
+			vertical-align: top;
+			margin: 0 0.5em 0.5em 0;
+		}
+	}
+}
+.widget_core_user_action {
+	margin-bottom: 10px;
+	.btn, &.btn-group {
+		width: 100%;
+	}
+	&.btn-group .btn {
+		width: 50%;
+	}
+	a.btn button {
+		background: none;
+		border: none;
+		padding: 0;
 	}
 }
 

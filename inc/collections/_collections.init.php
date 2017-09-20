@@ -62,10 +62,10 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
-		'T_skins__container'         => $tableprefix.'skins__container',
 		'T_skins__skin'              => $tableprefix.'skins__skin',
 		'T_subscriptions'            => $tableprefix.'subscriptions',
-		'T_widget'                   => $tableprefix.'widget',
+		'T_widget__container'        => $tableprefix.'widget__container',
+		'T_widget__widget'           => $tableprefix.'widget__widget',
 		'T_temporary_ID'             => $tableprefix.'temporary_ID',
 	) );
 
@@ -397,6 +397,26 @@ function & get_WidgetCache()
 
 	return $WidgetCache;
 }
+
+
+/**
+ * Get the WidgetContainerCache
+ *
+ * @return WidgetContainerCache
+ */
+function & get_WidgetContainerCache()
+{
+	global $WidgetContainerCache;
+
+	if( ! isset( $WidgetContainerCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'widgets/model/_widgetcontainercache.class.php', 'WidgetContainerCache' );
+		$WidgetContainerCache = new WidgetContainerCache();
+	}
+
+	return $WidgetContainerCache;
+}
+
 
 /**
  * Get the EnabledWidgetCache

@@ -24,11 +24,11 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class ComponentWidget extends DataObject
 {
-	var $coll_ID;
 	/**
-	 * Container name
+	 * Widget container ID
 	 */
-	var $sco_name;
+	var $wico_ID;
+
 	var $order;
 	/**
 	 * @var string Type of the plugin ("core" or "plugin")
@@ -72,9 +72,23 @@ class ComponentWidget extends DataObject
 	var $BlockCache;
 
 	/**
+	 * The widget container where this widget belongs to
+	 *
+	 * Lazy instantiated.
+	 *
+	 * @var WidgetContainer
+	 */
+	var $WidgetContainer;
+
+	/**
 	* @var Blog
 	*/
 	var $Blog = NULL;
+
+	/**
+	* @var target User that should be used depending on context
+	*/
+	var $target_User = NULL;
 
 	/**
 	 * Widget icon name.
@@ -98,7 +112,7 @@ class ComponentWidget extends DataObject
 	function __construct( $db_row = NULL, $type = 'core', $code = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( 'T_widget', 'wi_', 'wi_ID' );
+		parent::__construct( 'T_widget__widget', 'wi_', 'wi_ID' );
 
 		if( is_null($db_row) )
 		{	// We are creating an object here:
@@ -109,8 +123,7 @@ class ComponentWidget extends DataObject
 		else
 		{	// We are loading an object:
 			$this->ID       = $db_row->wi_ID;
-			$this->coll_ID  = $db_row->wi_coll_ID;
-			$this->sco_name = $db_row->wi_sco_name;
+			$this->wico_ID  = $db_row->wi_wico_ID;
 			$this->type     = $db_row->wi_type;
 			$this->code     = $db_row->wi_code;
 			$this->params   = $db_row->wi_params;
@@ -153,6 +166,50 @@ class ComponentWidget extends DataObject
 		}
 
 		return $this->Plugin;
+	}
+
+
+	/**
+	 * Get WidgetContainer
+	 */
+	function & get_WidgetContainer()
+	{
+		if( ! isset( $this->WidgetContainer ) )
+		{
+			$WidgetContainerCache = & get_WidgetContainerCache();
+			$this->WidgetContainer = & $WidgetContainerCache->get_by_ID( $this->wico_ID, false, false );
+		}
+		return $this->WidgetContainer;
+	}
+
+
+	/**
+	 * Get the collection ID where this widget belongs to
+	 *
+	 * @return integer Collection ID
+	 */
+	function get_coll_ID()
+	{
+		return $this->get_container_param( 'coll_ID' );
+	}
+
+
+	/**
+	 * Get param value of container
+	 *
+	 * @param string Param name
+	 * @return string Param value
+	 */
+	function get_container_param( $param )
+	{
+		$WidgetContainer = & $this->get_WidgetContainer();
+
+		if( empty( $WidgetContainer ) )
+		{
+			return NULL;
+		}
+
+		return $WidgetContainer->get( $param );
 	}
 
 
@@ -529,7 +586,7 @@ class ComponentWidget extends DataObject
 		// Merge basic defaults < widget defaults (editable params) < container params < DB params
 		// note: when called with skin_widget it falls back to basic defaults < widget defaults < calltime params < array()
 		$params = array_merge( array(
-					'widget_context' => 'general',		// general | item
+					'widget_context' => 'general',		// general | item | user
 					'block_start' => '<div class="evo_widget widget $wi_class$">',
 					'block_end' => '</div>',
 					'block_display_title' => true,
@@ -545,6 +602,8 @@ class ComponentWidget extends DataObject
 					'list_end' => '</ul>',
 					'item_start' => '<li>',
 					'item_end' => '</li>',
+						'item_title_start' => '<strong>',
+						'item_title_end' => ':</strong> ',
 						'link_default_class' => 'default',
 						'link_selected_class' => 'selected',
 						'item_text_start' => '',
@@ -590,6 +649,10 @@ class ComponentWidget extends DataObject
 					'limit' => 100,
 				), $widget_defaults, $params, $this->param_array );
 
+		if( isset( $params['override_params_for_'.$this->code] ) )
+		{	// Use specific widget params if they are defined for this widget by code:
+			$params = array_merge( $params, $params['override_params_for_'.$this->code] );
+		}
 
 		// Customize params to the current widget:
 
@@ -722,7 +785,8 @@ class ComponentWidget extends DataObject
 
 			if( $display_containers )
 			{ // DEBUG:
-				echo '<div class="dev-blocks dev-blocks--widget"><div class="dev-blocks-name" title="'.
+				$is_subcontainer = ( $this->get( 'code' ) == 'subcontainer' || $this->get( 'code' ) == 'subcontainer_row' );
+				echo '<div class="dev-blocks '.( $is_subcontainer ? 'dev-blocks--subcontainer' : 'dev-blocks--widget' ).'"><div class="dev-blocks-name" title="'.
 							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'">';
 				if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 				{	// Display a link to edit this widget only if current user has a permission:
@@ -1051,9 +1115,8 @@ class ComponentWidget extends DataObject
 
 		$order_max = $DB->get_var(
 			'SELECT MAX(wi_order)
-				 FROM T_widget
-				WHERE wi_coll_ID = '.$this->coll_ID.'
-					AND wi_sco_name = '.$DB->quote($this->sco_name), 0, 0, 'Get current max order' );
+				 FROM T_widget__widget
+				WHERE wi_wico_ID = '.$this->wico_ID, 0, 0, 'Get current max order' );
 
 		$this->set( 'order', $order_max+1 );
 
@@ -1090,7 +1153,7 @@ class ComponentWidget extends DataObject
 		if( $this->Blog === NULL )
 		{ // Get blog only first time
 			$BlogCache = & get_BlogCache();
-			$this->Blog = & $BlogCache->get_by_ID( $this->coll_ID, false, false );
+			$this->Blog = & $BlogCache->get_by_ID( $this->get_coll_ID(), false, false );
 		}
 
 		return $this->Blog;
@@ -1273,6 +1336,47 @@ class ComponentWidget extends DataObject
 					return $this->disp_params[$disp_param_prefix.'item_end'];
 				}
 		}
+	}
+
+
+	/**
+	 * Get User that should be used for this widget currently depending on context
+	 *
+	 * @return object User
+	 */
+	function & get_target_User()
+	{
+		if( $this->target_User === NULL )
+		{	// Initialize target User only first time:
+			global $Item, $Blog;
+
+			if( $this->disp_params['widget_context'] == 'user' )
+			{	// Use an user of current page disp=user (Only if we are in the context of displaying an User, not if $User is set from before):
+				$user_ID = get_param( 'user_ID' );
+				if( empty( $user_ID ) && is_logged_in() )
+				{	// Use current logged in User:
+					global $current_User;
+					$user_ID = $current_User->ID;
+				}
+				if( ! empty( $user_ID ) )
+				{	// Try to get User by ID:
+					$UserCache = & get_UserCache();
+					$this->target_User = & $UserCache->get_by_ID( $user_ID, false, false );
+				}
+			}
+
+			if( empty( $this->target_User ) && $this->disp_params['widget_context'] == 'item' && ! empty( $Item ) )
+			{	// Use an author of the current $Item (Only if we are in the context of displaying an Item, not if $Item is set from before):
+				$this->target_User = & $Item->get_creator_User();
+			}
+
+			if( empty( $this->target_User ) && ! empty( $Blog ) )
+			{	// Use an owner of the current $Blog:
+				$this->target_User = & $Blog->get_owner_User();
+			}
+		}
+
+		return $this->target_User;
 	}
 
 

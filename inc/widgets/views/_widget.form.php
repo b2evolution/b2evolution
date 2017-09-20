@@ -37,7 +37,7 @@ if( $display_mode == 'iframe' )
 }
 else
 {	// Set form title for all other display modes:
-	$form_title = sprintf( $creating ?  T_('New widget "%s" in container "%s"') : T_('Edit widget "%s" in container "%s"'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get( 'sco_name' ) )
+	$form_title = sprintf( $creating ?  T_('New widget "%s" in container "%s"') : T_('Edit widget "%s" in container "%s"'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get_container_param( 'name' ) )
 		.' '.action_icon( T_('Open relevant page in online manual'), 'manual', $edited_ComponentWidget->get_help_url(), NULL, 5, NULL, array( 'target' => '_blank' ) );
 }
 $Form->begin_form( 'fform', $form_title );

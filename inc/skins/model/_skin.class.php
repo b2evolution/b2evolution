@@ -55,7 +55,6 @@ class Skin extends DataObject
 	 */
 	var $_trans = array();
 
-
 	/**
 	 * Constructor
 	 *
@@ -107,19 +106,6 @@ class Skin extends DataObject
 						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" )' ),
 				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('The site is using this skin.'),
 						'and_condition' => '( set_name = "normal_skin_ID" OR set_name = "mobile_skin_ID" OR set_name = "tablet_skin_ID" )' ),
-			);
-	}
-
-
-	/**
-	 * Get delete cascade settings
-	 *
-	 * @return array
-	 */
-	static function get_delete_cascades()
-	{
-		return array(
-				array( 'table'=>'T_skins__container', 'fk'=>'sco_skin_ID', 'msg'=>T_('%d linked containers') ),
 			);
 	}
 
@@ -395,15 +381,36 @@ class Skin extends DataObject
 	 *
 	 * @param string Folder name
 	 * @param array Exclude the files
+	 * @param boolean TRUE to display messages
 	 * @return array Files that were prepared
 	 */
-	function discover_containers_by_folder( $folder, $exclude_files = array() )
+	function discover_containers_by_folder( $folder, $exclude_files = array(), $display_messages = true )
 	{
 		global $skins_path, $Messages;
 
-		if( ! $dir = @opendir( $skins_path.$folder ) )
+		if( empty( $folder ) )
+		{
+			global $basepath;
+			if( $this->get_api_version() == 6 )
+			{
+				$skin_path = $basepath.'skins_fallback_v6';
+			}
+			else
+			{
+				$skin_path = $basepath.'skins_fallback_v5';
+			}
+		}
+		else
+		{
+			$skin_path = $skins_path.$folder;
+		}
+
+		if( ! $dir = @opendir( $skin_path ) )
 		{ // Skin directory not found!
-			$Messages->add( T_('Cannot open skin directory.'), 'error' ); // No trans
+			if( $display_messages )
+			{
+				$Messages->add( T_('Cannot open skin directory.'), 'error' ); // No trans
+			}
 			return false;
 		}
 
@@ -428,14 +435,20 @@ class Skin extends DataObject
 
 			if( ! is_readable( $af_main_path ) )
 			{ // Cannot open PHP file:
-				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+				if( $display_messages )
+				{
+					$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+				}
 				continue;
 			}
 
 			$file_contents = @file_get_contents( $af_main_path );
 			if( ! is_string( $file_contents ) )
 			{ // Cannot get contents:
-				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+				if( $display_messages )
+				{
+					$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+				}
 				continue;
 			}
 
@@ -462,15 +475,17 @@ class Skin extends DataObject
 				// We have one more container:
 				$c++;
 
-				if( in_array( $container, $this->container_list ) )
+				$container_code = preg_replace( '/[^a-z\d]+/', '_', strtolower( $container ) );
+
+				if( in_array( $container_code, $this->container_list ) )
 				{ // we already have that one
 					continue;
 				}
 
-				$this->container_list[] = $container;
+				$this->container_list[ $container_code ] = array( $container, $c );
 			}
 
-			if( $c )
+			if( $c && $display_messages )
 			{
 				$Messages->add_to_group( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $rf_main_subpath ), 'success', sprintf( T_('Containers found in skin "%s":'), $folder ) );
 			}
@@ -482,22 +497,27 @@ class Skin extends DataObject
 
 	/**
 	 * Discover containers included in skin files
+	 *
+	 * @param boolean TRUE to display messages
 	 */
-	function discover_containers()
+	function discover_containers( $display_messages = true )
 	{
 		global $Messages;
 
 		$this->container_list = array();
 
 		// Find the containers in the current skin folder
-		$skin_files = $this->discover_containers_by_folder( $this->folder );
+		$skin_files = $this->discover_containers_by_folder( $this->folder, array(), $display_messages );
 
 		// Find the containers in the root skins folder with excluding the files that are contained in the skin folder
-		$this->discover_containers_by_folder( '', $skin_files );
+		$this->discover_containers_by_folder( '', $skin_files, $display_messages );
 
 		if( empty( $this->container_list ) )
 		{
-			$Messages->add( T_('No containers found in this skin!'), 'error' );
+			if( $display_messages )
+			{
+				$Messages->add( T_('No containers found in this skin!'), 'error' );
+			}
 			return false;
 		}
 
@@ -512,110 +532,40 @@ class Skin extends DataObject
 	 */
 	function get_containers()
 	{
-		/**
-		 * @var DB
-		 */
-		global $DB;
-
 		if( is_null( $this->container_list ) )
 		{
-			$this->container_list = $DB->get_col(
-				'SELECT sco_name
-					 FROM T_skins__container
-					WHERE sco_skin_ID = '.$this->ID, 0, 'get list of containers for skin' );
+			$this->container_list = array();
+
+			$skin_containers = array();
+			if( method_exists( $this, 'get_declared_containers' ) )
+			{	// Get containers what declared by this skin:
+				$skin_containers = $this->get_declared_containers();
+			}
+			else
+			{	// Get containers from skin files:
+				$this->discover_containers( false );
+			}
+
+			if( ! empty( $skin_containers ) )
+			{
+				// Create ordered array with unique items from the skin containers:
+				$ordered_containers = array();
+				foreach( $skin_containers as $container_code => $container_data )
+				{
+					$container_order = isset( $container_data[1] ) ? $container_data[1] : 0;
+					$ordered_containers[ $container_order ] = $container_code;
+				}
+				ksort( $ordered_containers );
+
+				// Fill final container list:
+				foreach( $ordered_containers as $container_code )
+				{
+					$this->container_list[ $container_code ] = $skin_containers[ $container_code ];
+				}
+			}
 		}
 
 		return $this->container_list;
-	}
-
-
-	/**
-	 * Update the DB based on previously recorded changes
-	 *
-	 * @return boolean true
-	 */
-	function dbupdate()
-	{
-		global $DB;
-
-		$DB->begin();
-
-		if( parent::dbupdate() !== false )
-		{	// Skin updated, also save containers:
-			$this->db_save_containers();
-		}
-
-		$DB->commit();
-
-		return true;
-	}
-
-
-	/**
-	 * Insert object into DB based on previously recorded changes.
-	 *
-	 * @return boolean true
-	 */
-	function dbinsert()
-	{
-		global $DB;
-
-		$DB->begin();
-
-		if( parent::dbinsert() )
-		{	// Skin saved, also save containers:
-			$this->db_save_containers();
-		}
-
-		$DB->commit();
-
-		return true;
-	}
-
-
-	/**
-	 * Save containers
-	 *
-	 * to be called by dbinsert / dbupdate
-	 */
-	function db_save_containers()
-	{
-		global $DB;
-
-		// Get a list of all currently empty containers:
-		$sql = 'SELECT sco_name
-						  FROM T_skins__container LEFT JOIN T_widget ON ( sco_name = wi_sco_name )
-						 WHERE sco_skin_ID = '.$this->ID.'
-						 GROUP BY sco_name
-						HAVING COUNT(wi_ID) = 0';
-		$empty_containers_list = $DB->get_col( $sql, 0, 'Get empty containers' );
-		//pre_dump( $empty_containers_list );
-
-		// Look for containers in skin file:
-		$this->discover_containers();
-
-		// Delete empty containers:
-		foreach( $empty_containers_list as $empty_container )
-		{
-			if( !in_array( $empty_container, $this->container_list ) )
-			{	// This container has been removed from the skin + it's empty, so delete it from DB:
-				$DB->query( 'DELETE FROM T_skins__container
-									WHERE sco_name = '.$DB->quote($empty_container) );
-			}
-		}
-
-		// Make sure new containers are added:
-		if( ! empty( $this->container_list ) )
-		{
-			$values = array();
-			foreach( $this->container_list as $container_name )
-			{
-				$values [] = '( '.$this->ID.', '.$DB->quote($container_name).' )';
-			}
-
-			$DB->query( 'REPLACE INTO T_skins__container( sco_skin_ID, sco_name )
-										VALUES '.implode( ',', $values ), 'Insert containers' );
-		}
 	}
 
 

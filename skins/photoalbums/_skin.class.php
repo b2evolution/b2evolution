@@ -43,6 +43,28 @@ class photoalbums_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		// Note: second param below is the ORDER
+		return array(
+				'page_top'               => array( NT_('Page Top'), 2 ),
+				'menu'                   => array( NT_('Menu'), 15 ),
+				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
+				'item_single'            => array( NT_('Item Single'), 50 ),
+				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
+				'footer'                 => array( NT_('Footer'), 100 ),
+			);
+	}
+
+
+	/**
 	 * What evoSkins API does has this skin been designed with?
 	 *
 	 * This determines where we get the fallback templates from (skins_fallback_v*)

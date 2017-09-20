@@ -23,7 +23,7 @@ class evopress_Skin extends Skin
 	 */
 	var $version = '7.0.0';
 
-  /**
+	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -33,7 +33,7 @@ class evopress_Skin extends Skin
 	}
 
 
-  /**
+	/**
 	 * Get default type for the skin.
 	 */
 	function get_default_type()
@@ -67,6 +67,29 @@ class evopress_Skin extends Skin
 			);
 
 		return $supported_kinds;
+	}
+
+
+	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		// Note: second param below is the ORDER
+		return array(
+				'page_top'               => array( NT_('Page Top'), 2 ),
+				'header'                 => array( NT_('Header'), 10 ),
+				'menu'                   => array( NT_('Menu'), 15 ),
+				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
+				'item_single'            => array( NT_('Item Single'), 50 ),
+				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
+				'sidebar'                => array( NT_('Sidebar'), 80 ),
+			);
 	}
 
 

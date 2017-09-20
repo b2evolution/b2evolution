@@ -95,7 +95,7 @@ class item_vote_Widget extends ComponentWidget
 					'label' => T_('Note'),
 					'type' => 'info',
 					'info' => sprintf( T_('To configure what buttons to show (Positive/Neutral/Negative), go to Post Features &gt; <a %s>Voting Options</a>'),
-						'href="'.$admin_url.'?ctrl=coll_settings&tab=features&blog='.$this->coll_ID.'#fieldset_wrapper_voting_options"' ),
+						'href="'.$admin_url.'?ctrl=coll_settings&tab=features&blog='.$this->get_coll_ID().'#fieldset_wrapper_voting_options"' ),
 				),
 				'display_summary' => array(
 					'label' => T_('Show summary'),

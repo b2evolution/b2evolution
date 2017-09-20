@@ -13,17 +13,17 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Collection, $Blog, $admin_url;
+global $Collection, $Blog, $Skin, $admin_url;
 
 global $container_Widget_array;
-
-global $container_list;
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	echo '<div class="pull-right" style="margin-bottom:10px">';
-	echo action_icon( TS_('Reload containers').'!', 'reload',
-	                        '?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Reload containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
+		echo action_icon( T_('Add a new container!'), 'add',
+					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container', T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default' ) );
+		echo action_icon( T_('Scan skins for containers'), 'reload',
+					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Scan skins for containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 	echo '</div>';
 }
 
@@ -35,62 +35,48 @@ $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID );
  * @param string Title of the container. This gets passed to T_()!
  * @param string Suffix of legend
  */
-function display_container( $container, $legend_suffix = '' )
+function display_container( $WidgetContainer, $legend_suffix = '' )
 {
-	global $Collection, $Blog, $admin_url;
+	global $Collection, $Blog, $admin_url, $embedded_containers;
 	global $Session;
 
 	$Table = new Table();
 
-	$Table->title = '<span class="container_name">'.T_($container).'</span>'.$legend_suffix;
-
 	// Table ID - fp> needs to be handled cleanly by Table object
-	$table_id = str_replace( array( ' ', ':' ), array( '_', '-' ), $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better
-
-	$Table->global_icon( T_('Add a widget...'), 'new',
-			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id, 'class' => 'action_icon btn-primary' ) );
-
-	$Table->cols = array(
-			array(
-				'th' => '', // checkbox
-				'th_class' => 'shrinkwrap',
-				'td_class' => 'shrinkwrap' ),
-			array(
-				'th' => /* TRANS: shortcut for enabled */ T_( 'En' ),
-				'th_class' => 'shrinkwrap',
-				'td_class' => 'shrinkwrap' ),
-			array( 'th' => T_('Widget') ),
-			array( 'th' => T_('Type') ),
-			array(
-				'th' => T_('Move'),
-				'th_class' => 'shrinkwrap',
-				'td_class' => 'shrinkwrap' ),
-			array(
-				'th' => T_('Cache'),
-				'th_class' => 'shrinkwrap',
-				'td_class' => 'shrinkwrap widget_cache_status' ),
-			array(
-				'th' => T_('Actions'),
-				'th_class' => 'shrinkwrap',
-				'td_class' => 'shrinkwrap' ),
-		);
-	//enable fadeouts here
-	$Table->display_init( array(
-				'list_attrib' => 'id="'.$table_id.'"',
-				'list_class'  => 'widget_container_list'
-			),
-			array( 'fadeouts' => true )
-		);
-
-	/*
-	if( $legend_suffix )
-	{	// add jQuery no-drop -- fp> what do we need this one for?
-		$Table->params['head_title'] = str_replace( 'class="grouped"', 'class="grouped no-drop"', $Table->params['head_title'] );
+	if( isset( $WidgetContainer->ID ) && ( $WidgetContainer->ID > 0 ) )
+	{
+		$widget_container_id = 'wico_ID_'.$WidgetContainer->ID;
+		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_ID='.$WidgetContainer->ID.'&amp;container='.$widget_container_id );
+		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;'.url_crumb('widget_container') );
 	}
-	*/
+	else
+	{
+		$wico_code = $WidgetContainer->get( 'code' );
+		$widget_container_id = 'wico_code_'.$wico_code;
+		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_code='.$wico_code.'&amp;container='.$widget_container_id );
+		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_code='.$wico_code );
+	}
 
-	// Dirty hack for bootstrap skin
-	$Table->params['list_start'] = str_replace( '<div class="', '<div class="panel panel-default ', $Table->params['list_start'] );
+	$widget_container_name = T_( $WidgetContainer->get( 'name' ) );
+	if( ! empty( $WidgetContainer->ID ) )
+	{
+		$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.'">'.$widget_container_name.'</a>';
+	}
+	$Table->title = '<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span>'
+		.' <span class="dimmed">'.$WidgetContainer->get( 'code' ).' '.$WidgetContainer->get( 'order' ).'</span>'
+		.$legend_suffix;
+
+	if( ! empty( $legend_suffix ) )
+	{ // Legend suffix is not empty when the container is not included into the selected skin
+		// TODO: asimo> Implement cleaner condition for this
+		$Table->global_icon( T_('Destroy container'), 'delete', $destroy_container_url, T_('Destroy container'), 3, 4 );
+	}
+	$Table->global_icon( T_('Add a widget...'), 'new', $add_widget_url, /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$widget_container_id, 'class' => 'action_icon btn-primary' ) );
+
+	$Table->display_init( array(
+			'list_start' => '<div class="panel panel-default">',
+			'list_end'   => '</div>',
+		) );
 
 	$Table->display_list_start();
 
@@ -98,23 +84,15 @@ function display_container( $container, $legend_suffix = '' )
 	$Table->display_head();
 
 	// BODY START:
-	$Table->display_body_start();
+	echo '<ul id="container_'.$widget_container_id.'" class="widget_container">';
 
 	/**
 	 * @var WidgetCache
 	 */
 	$WidgetCache = & get_WidgetCache();
-	$Widget_array = & $WidgetCache->get_by_coll_container( $Blog->ID, $container );
+	$Widget_array = & $WidgetCache->get_by_container_ID( $WidgetContainer->ID );
 
-	if( empty($Widget_array) )
-	{	// TODO: cleanup
-		$Table->display_line_start( true );
-		$Table->display_col_start( array( 'colspan' => 6 ) );
-		echo '<span class="new_widget">'.T_('There is no widget in this container yet.').'</span>';
-		$Table->display_col_end();
-		$Table->display_line_end();
-	}
-	else
+	if( ! empty( $Widget_array ) )
 	{
 		$widget_count = 0;
 		foreach( $Widget_array as $ComponentWidget )
@@ -122,72 +100,62 @@ function display_container( $container, $legend_suffix = '' )
 			$widget_count++;
 			$enabled = $ComponentWidget->get( 'enabled' );
 
-			$fadeout_id = $Session->get( 'fadeout_id' );
-			if( isset($fadeout_id) && $ComponentWidget->ID == $fadeout_id )
+			if( $ComponentWidget->get( 'code' ) == 'subcontainer' )
 			{
-				$fadeout = true;
-				$Session->delete( 'fadeout_id' );
-			}
-			else
-			{
-				$fadeout = false;
+				$container_code = $ComponentWidget->get_param( 'container' );
+				if( ! isset( $embedded_containers[$container_code] ) ) {
+					$embedded_containers[$container_code] = true;
+				}
 			}
 
-			$Table->display_line_start( false, $fadeout );
+			// START Widget row:
+			echo '<li id="wi_ID_'.$ComponentWidget->ID.'" class="draggable_widget">';
 
-			$Table->display_col_start();
-			echo '<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" />';
-			$Table->display_col_end();
+			// Checkbox:
+			echo '<span class="widget_checkbox'.( $enabled ? ' widget_checkbox_enabled' : '' ).'">'
+					.'<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" />'
+				.'</span>';
 
-			$Table->display_col_start();
-			if ( $enabled )
-			{
-				// Indicator for the JS UI:
-				echo '<span class="widget_is_enabled">';
-				echo action_icon( T_( 'The widget is enabled.' ), 'bullet_green', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
-				echo '</span>';
-			}
-			else
-			{
-				echo action_icon( T_( 'The widget is disabled.' ), 'bullet_empty_grey', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
-			}
-			$Table->display_col_end();
+			// State:
+			echo '<span class="widget_state">'
+					.'<a href="#" onclick="return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' );">'
+						.get_icon( ( $enabled ? 'bullet_green' : 'bullet_empty_grey' ), 'imgtag', array( 'title' => ( $enabled ? T_('The widget is enabled.') : T_('The widget is disabled.') ) ) )
+					.'</a>'
+				.'</span>';
 
-			$Table->display_col_start();
+			// Name:
 			$ComponentWidget->init_display( array() );
-			echo '<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ).'" class="widget_name">'
-						.$ComponentWidget->get_desc_for_list().'</a> '
-						.$ComponentWidget->get_help_link();
-			$Table->display_col_end();
+			echo '<span>'
+					.'<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ).'" class="widget_name" onclick="return editWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )">'
+						.$ComponentWidget->get_desc_for_list()
+					.'</a> '
+					.$ComponentWidget->get_help_link()
+				.'</span>';
 
-			// Note: this is totally useless, but we need more cols for the screen to feel "right":
-			$Table->display_col_start();
-			echo $ComponentWidget->type;
-			$Table->display_col_end();
+			// Actions:
+			echo '<span class="widget_actions">'
+					// Enable/Disable:
+					.action_icon( ( $enabled ? T_('Disable this widget!') : T_('Enable this widget!') ),
+							( $enabled ? 'deactivate' : 'activate' ),
+							regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ), NULL, NULL, NULL,
+							array( 'onclick' => 'return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => 'toggle_action' )
+						)
+					// Edit:
+					.action_icon( T_('Edit widget settings!'),
+							'edit',
+							regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ), NULL, NULL, NULL,
+							array( 'onclick' => 'return editWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
+						)
+					// Remove:
+					.action_icon( T_('Remove this widget!'),
+							'delete',
+							regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
+							array( 'onclick' => 'return deleteWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
+						)
+				.'</span>';
 
-			// Move
-			$Table->display_col_start();
-			//echo $ComponentWidget->order.' ';
-			if( $widget_count > 1 )
-			{
-				echo action_icon( T_('Move up').'!', 'move_up', regenerate_url( 'blog', 'action=move_up&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
-			}
-			else
-			{
-				echo get_icon( 'nomove', 'imgtag', array( 'class'=>'action_icon' ) );
-			}
-			if( $widget_count < count($Widget_array))
-			{
-				echo action_icon( T_('Move down').'!', 'move_down', regenerate_url( 'blog', 'action=move_down&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
-			}
-			else
-			{
-				echo get_icon( 'nomove', 'imgtag', array( 'class'=>'action_icon' ) );
-			}
-			$Table->display_col_end();
-
-			// Cache
-			$Table->display_col_start();
+			// Cache:
+			echo'<span class="widget_cache_status">';
 			$widget_cache_status = $ComponentWidget->get_cache_status( true );
 			switch( $widget_cache_status )
 			{
@@ -196,41 +164,122 @@ function display_container( $container, $legend_suffix = '' )
 					break;
 
 				case 'denied':
-					echo action_icon( T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ), 'block_cache_denied', $admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching', NULL, NULL, NULL, array( 'rel' => $widget_cache_status ) );
+					echo action_icon( T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ),
+						'block_cache_denied',
+						$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching', NULL, NULL, NULL,
+						array( 'rel' => $widget_cache_status ) );
 					break;
 
 				case 'enabled':
-					echo action_icon( T_( 'Caching is enabled. Click to disable.' ), 'block_cache_on', regenerate_url( 'blog', 'action=cache_disable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL, array( 'rel' => $widget_cache_status ) );
+					echo action_icon( T_( 'Caching is enabled. Click to disable.' ),
+						'block_cache_on',
+						regenerate_url( 'blog', 'action=cache_disable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
+						array(
+								'rel'     => $widget_cache_status,
+								'onclick' => 'return toggleCacheWidget( \'wi_ID_'.$ComponentWidget->ID.'\', \'disable\' )',
+							) );
 					break;
 
 				case 'disabled':
-					echo action_icon( T_( 'Caching is disabled. Click to enable.' ), 'block_cache_off', regenerate_url( 'blog', 'action=cache_enable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL, array( 'rel' => $widget_cache_status ) );
+					echo action_icon( T_( 'Caching is disabled. Click to enable.' ),
+						'block_cache_off',
+						regenerate_url( 'blog', 'action=cache_enable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
+						array(
+								'rel'     => $widget_cache_status,
+								'onclick' => 'return toggleCacheWidget( \'wi_ID_'.$ComponentWidget->ID.'\', \'enable\' )',
+							) );
 					break;
 			}
-			$Table->display_col_end();
+			echo '</span>';
 
-			// Actions
-			$Table->display_col_start();
-			if ( $enabled )
-			{
-				echo action_icon( T_( 'Disable this widget!' ), 'deactivate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
-			}
-			else
-			{
-				echo action_icon( T_( 'Enable this widget!' ), 'activate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
-			}
-			echo '<span class="edit_icon_hook">'.action_icon( T_('Edit widget settings!'), 'edit', regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ) ).'</span>';
-			echo '<span class="delete_icon_hook">'.action_icon( T_('Remove this widget!'), 'delete', regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) ).'</span>';
-			$Table->display_col_end();
-
-			$Table->display_line_end();
+			// END Widget row:
+			echo '</li>';
 		}
 	}
 
 	// BODY END:
-	$Table->display_body_end();
+	echo '</ul>';
 
 	$Table->display_list_end();
+}
+
+
+/**
+ * Display containers
+ *
+ * @param boolean TRUE to display main containers, FALSE - sub containers
+ */
+function display_containers( $main = true )
+{
+	global $Blog, $blog_container_list, $skins_container_list, $embedded_containers;
+
+	// Display containers for current skin:
+	$displayed_containers = array();
+	$embedded_containers = array();
+	$WidgetContainerCache = & get_WidgetContainerCache();
+	foreach( $skins_container_list as $container_code => $container_data )
+	{
+		$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
+		if( ! $WidgetContainer )
+		{
+			$WidgetContainer = new WidgetContainer();
+			$WidgetContainer->set( 'code', $container_code );
+			$WidgetContainer->set( 'name', $container_data[0] );
+			$WidgetContainer->set( 'coll_ID', $Blog->ID );
+		}
+		if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
+		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
+		{	// Skip this container because another type is requested:
+			continue;
+		}
+
+		display_container( $WidgetContainer );
+		if( $WidgetContainer->ID > 0 )
+		{ // Container exists in the database
+			$displayed_containers[$container_code] = $WidgetContainer->ID;
+		}
+	}
+
+	// Display embedded containers
+	reset( $embedded_containers );
+	while( count( $embedded_containers ) > 0 )
+	{
+		// Get the first item key, and remove the first item from the array
+		$container_code = key( $embedded_containers );
+		array_shift( $embedded_containers );
+		if( isset( $displayed_containers[$container_code] ) )
+		{ // This container was already displayed
+			continue;
+		}
+
+		if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code ) )
+		{ // Confirmed that it is part of the blog's containers in the database
+			if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
+			    ( ! $main && $WidgetContainer->get( 'main' ) ) )
+			{	// Skip this container because another type is requested:
+				continue;
+			}
+			display_container( $WidgetContainer );
+			$displayed_containers[$container_code] = $WidgetContainer->ID;
+		}
+	}
+
+	// Display other blog containers which are not in the current skin
+	foreach( $blog_container_list as $container_ID )
+	{
+		if( in_array( $container_ID, $displayed_containers ) )
+		{
+			continue;
+		}
+
+		$WidgetContainer = & $WidgetContainerCache->get_by_ID( $container_ID );
+		if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
+		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
+		{	// Skip this container because another type is requested:
+			continue;
+		}
+		display_container( $WidgetContainer, ' '.T_('[NOT USED IN CURRENT SKINS!]') );
+	}
 }
 
 $Form = new Form( $admin_url.'?ctrl=widgets&blog='.$Blog->ID );
@@ -242,20 +291,17 @@ $Form->begin_form();
 // fp> what browser do we need a fielset for?
 echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at remembering their width ;)
 
-// Start by displaying all containers we know are in the current skin: (may be different in i8?)
-foreach( $container_list as $container )
-{
-	display_container( $container );
-}
+echo '<div class="row">';
 
-// Now display all other containers that also have widgets in them, just in case we need them:
-foreach( $container_Widget_array as $container=>$dummy )
-{
-	if( !in_array( $container, $container_list ) )
-	{	// No already displayed, display now:
-		display_container( $container );
-	}
-}
+echo '<div class="col-md-6 col-sm-12">';
+display_containers( true );
+echo '</div>';
+
+echo '<div class="col-md-6 col-sm-12">';
+display_containers( false );
+echo '</div>';
+
+echo '</div>';
 
 echo '</fieldset>'."\n";
 

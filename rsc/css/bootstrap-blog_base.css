@@ -877,7 +877,7 @@ textarea.form_textarea_input {
   margin: 1em;
   text-align: center;
 }
-div.widget_core_coll_avatar {
+div.widget_core_user_profile_pics {
   text-align: center;
 }
 .widget_core_profile_menu_link ul li a img {
@@ -932,6 +932,10 @@ div.container_menu_top input.search_field {
 .widget_core_user_login .user_group,
 .widget_core_user_login .user_level {
   color: #999;
+}
+.widget_core_user_profile_pics img {
+  max-width: 100%;
+  height: auto;
 }
 div.widget_core_coll_item_list.nobullets ul,
 div.widget_core_coll_item_list.nobullets ul li,
@@ -1342,15 +1346,6 @@ input.btn-lg {
   max-width: 960px;
   margin: auto;
 }
-.main_profile_picture {
-  border-radius: 4px;
-}
-.other_profile_pictures {
-  margin-bottom: 10px;
-}
-.other_profile_pictures img {
-  border-radius: 4px;
-}
 .profile_column_left {
   float: left;
   width: 300px;
@@ -1361,18 +1356,6 @@ input.btn-lg {
 }
 .profile_column_right #fieldset_user_fields {
   overflow: hidden;
-}
-.profile_buttons .btn,
-.profile_buttons .btn-group {
-  width: 100%;
-}
-.profile_buttons .btn-group .btn {
-  width: 50%;
-}
-.profile_buttons a.btn button {
-  background: none;
-  border: none;
-  padding: 0;
 }
 .profile_column_right legend.panel-heading {
   padding: 10px 15px;
@@ -1409,6 +1392,57 @@ input.btn-lg {
   .evo_form .control-buttons .preview {
     margin-bottom: 4px;
   }
+}
+.widget_core_user_info.evo_user_info_name,
+.widget_core_user_info.evo_user_info_nickname,
+.widget_core_user_info.evo_user_info_login {
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.1;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+.widget_core_user_info.evo_user_info_name {
+  font-size: 36px;
+}
+.widget_core_user_info.evo_user_info_login {
+  color: #777;
+}
+.widget_core_user_info.evo_user_info_gender,
+.widget_core_user_info.evo_user_info_location,
+.widget_core_user_info.evo_user_info_orgs {
+  margin-bottom: 10px;
+}
+.widget_core_user_info.evo_user_info_location {
+  white-space: nowrap;
+}
+.widget_core_user_profile_pics.evo_user_profile_pics_main img,
+.widget_core_user_profile_pics.evo_user_profile_pics_other img {
+  border-radius: 4px;
+}
+.widget_core_user_profile_pics.evo_user_profile_pics_other {
+  text-align: left;
+  margin-bottom: 10px;
+}
+.widget_core_user_profile_pics.evo_user_profile_pics_other a {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 0.5em 0.5em 0;
+}
+.widget_core_user_action {
+  margin-bottom: 10px;
+}
+.widget_core_user_action .btn,
+.widget_core_user_action.btn-group {
+  width: 100%;
+}
+.widget_core_user_action.btn-group .btn {
+  width: 50%;
+}
+.widget_core_user_action a.btn button {
+  background: none;
+  border: none;
+  padding: 0;
 }
 .evo_content_block table {
   margin: 1em 0;

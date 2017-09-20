@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_about_author_Widget extends ComponentWidget
 {
+	var $icon = 'user-o';
+
 	/**
 	 * Constructor
 	 */
