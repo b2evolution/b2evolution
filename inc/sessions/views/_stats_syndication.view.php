@@ -61,13 +61,13 @@ else
 }
 $SQL->GROUP_BY( 'year, month, day' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC' );
-$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+$res_hits = $DB->get_results( $SQL, ARRAY_A );
 
 
 /*
  * Chart
  */
-if( count($res_hits) )
+if( count( $res_hits ) )
 {
 	// Find the dates without hits and fill them with 0 to display on graph and table:
 	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );

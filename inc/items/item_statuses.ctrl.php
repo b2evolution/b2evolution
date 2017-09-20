@@ -135,7 +135,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			$edited_ItemStatus->update_item_types_from_Request();
 			$edited_ItemStatus->dbupdate();
-			$Messages->add( T_('Post Status has been updated.'), 'success' );
+			$Messages->add( T_('Post status has been updated.'), 'success' );
 
 			header_redirect( $admin_url.'?ctrl=itemstatuses&blog='.$blog.'&tab='.$tab.'&tab3='.$tab3, 303 ); // Will EXIT
 			// We have EXITed already at this point!!

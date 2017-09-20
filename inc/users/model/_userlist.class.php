@@ -61,6 +61,7 @@ class UserList extends DataObjectList2
 	 *                    'keywords_fields'     - Fields of users table to search by keywords
 	 *                    'where_status_closed' - FALSE - to don't display closed users
 	 *                    'where_org_ID' - ID of organization
+	 *                    'order_by_login_length' => 'A' for increasing login length, 'D' for decreasing login length
 	 */
 	function __construct(
 		$filterset_name = '', // Name to be used when saving the filterset (leave empty to use default)
@@ -528,8 +529,12 @@ class UserList extends DataObjectList2
 			$this->UserQuery->where_organization( $org_ID );
 		}
 		if( isset( $this->query_params['where_viewed_user'] ) )
-		{ // Filter by user profile viewed
+		{	// Filter by user profile viewed:
 			$this->UserQuery->where_viewed_user( $this->query_params['where_viewed_user'] );
+		}
+		if( isset( $this->filters['reg_ip_min'] ) && isset( $this->filters['reg_ip_max'] ) )
+		{ // Filter by IP address:
+			$this->UserQuery->where_reg_ip( $this->filters['reg_ip_min'], $this->filters['reg_ip_max'] );
 		}
 		if( ! is_logged_in() )
 		{ // Restrict users by group level for anonymous users
@@ -537,13 +542,17 @@ class UserList extends DataObjectList2
 			$this->UserQuery->where_group_level( $Settings->get('allow_anonymous_user_level_min'), $Settings->get('allow_anonymous_user_level_max') );
 		}
 
-		if( $this->get_order_field_list() != '' )
+		if( isset( $this->query_params['order_by_login_length'] ) && in_array( $this->query_params['order_by_login_length'], array( 'A', 'D' ) ) )
 		{
-			$this->UserQuery->order_by( str_replace( '*', $this->get_order_field_list(), $this->UserQuery->order_by ) );
+			$this->UserQuery->ORDER_BY( 'CHAR_LENGTH(user_login) '.( $this->query_params['order_by_login_length'] == 'A' ? 'ASC' : 'DESC' ).', user_login ASC' );
+		}
+		elseif( $this->get_order_field_list() != '' )
+		{
+			$this->UserQuery->ORDER_BY( str_replace( '*', $this->get_order_field_list(), $this->UserQuery->order_by ) );
 		}
 		else
 		{
-			$this->UserQuery->order_by( $this->get_order_field_list() );
+			$this->UserQuery->ORDER_BY( $this->get_order_field_list() );
 		}
 	}
 
@@ -587,13 +596,13 @@ class UserList extends DataObjectList2
 		// *** STEP 1 ***
 		$user_IDs = isset( $this->filters['users'] ) ? $this->filters['users'] : array();
 		if( $this->refresh_query || // Some filters are changed
-			$this->page == 1 || // Always run query on the first page
-		    $localtimenow - $Session->get( $this->filterset_name.'_refresh_time' ) > 7200 ) // Time has passed ( 2 hours )
+				$this->page == 1 || // Always run query on the first page
+				$localtimenow - $Session->get( $this->filterset_name.'_refresh_time' ) > 7200 ) // Time has passed ( 2 hours )
 		{	// We should create new list of user IDs
 			global $Timer;
 			$Timer->start( 'Users_IDs', false );
 
-			$step1_SQL = new SQL();
+			$step1_SQL = new SQL( 'UserList::Query() Step 1: Get ID list' );
 			$step1_SQL->SELECT( 'T_users.user_ID, IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture' );
 			if( ! empty( $this->query_params['join_colls'] ) )
 			{	// Initialize count of collections (used on order by this field):
@@ -614,7 +623,7 @@ class UserList extends DataObjectList2
 			$step1_SQL->LIMIT( 0 );
 
 			// Get list of the IDs we need:
-			$user_IDs = $DB->get_col( $step1_SQL->get(), 0, 'UserList::Query() Step 1: Get ID list' );
+			$user_IDs = $DB->get_col( $step1_SQL );
 			// Update filter with user IDs
 			$this->filters['users'] = $user_IDs;
 			$this->save_filterset();

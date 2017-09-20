@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class mobile_skin_switcher_Widget extends ComponentWidget
 {
+	var $icon = 'toggle-on';
+
 	/**
 	 * Constructor
 	 */
@@ -76,7 +78,7 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Mobile Skin Switcher.');
+		return T_('Mobile Skin Switcher').'.';
 	}
 
 

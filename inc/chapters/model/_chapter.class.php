@@ -653,11 +653,11 @@ class Chapter extends DataObject
 
 		if( !isset( $this->count_posts ) )
 		{
-			$SQL = new SQL();
+			$SQL = new SQL( 'Check if category has posts' );
 			$SQL->SELECT( 'COUNT( postcat_post_ID )' );
 			$SQL->FROM( 'T_postcats' );
 			$SQL->WHERE( 'postcat_cat_ID = '.$DB->quote( $this->ID ) );
-			$count_posts = $DB->get_var( $SQL->get() );
+			$count_posts = $DB->get_var( $SQL );
 			$this->count_posts = $count_posts;
 		}
 

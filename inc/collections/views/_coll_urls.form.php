@@ -212,6 +212,7 @@ function update_urlpreview( baseurl, url_path )
 	jQuery( '#rsc_assets_url_type_relative' ).html( basepath + 'rsc/' );
 	jQuery( '#skins_assets_url_type_relative' ).html( basepath + 'skins/' );
 	jQuery( '#plugins_assets_url_type_relative' ).html( basepath + 'plugins/' );
+	jQuery( '#htsrv_assets_url_type_relative' ).html( baseurl + 'htsrv/' );
 }
 
 // Update blog url name in several places on the page:
@@ -284,9 +285,8 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{ // Permission to edit advanced admin settings
-		global $rsc_url, $media_url, $skins_url, $plugins_url;
+		global $rsc_url, $media_url, $skins_url, $plugins_url, $htsrv_url, $htsrv_url_sensitive;
 
-		$absolute_url_note = T_('Enter path to %s folder ending with / -- This may be located in a CDN zone');
 		$assets_url_data = array();
 		// media url:
 		$assets_url_data['media_assets_url_type'] = array(
@@ -333,6 +333,14 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 				'folder'       => '/plugins/',
 				'local_url'    => $edited_Blog->get_local_plugins_url( 'relative' )
 			);
+		// htsrv url:
+		$assets_url_data['htsrv_assets_url_type'] = array(
+				'label'        => sprintf( T_('Link to %s through'), '<code>/htsrv/</code>' ),
+				'url'          => $htsrv_url.( $htsrv_url !=  $htsrv_url_sensitive ? ', '.$htsrv_url_sensitive : '' ),
+				'absolute_url' => 'htsrv_assets_absolute_url',
+				'folder'       => '/htsrv/',
+				'local_url'    => $edited_Blog->get_htsrv_url()
+			);
 
 		foreach( $assets_url_data as $asset_url_type => $asset_url_data )
 		{
@@ -343,7 +351,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 			else
 			{ // Display options full list
 				$basic_asset_url_note = $asset_url_data['url'];
-				if( $asset_url_type != 'media_assets_url_type' &&
+				if( ! in_array( $asset_url_type, array( 'media_assets_url_type', 'htsrv_assets_url_type' ) ) &&
 				    $edited_Blog->get( 'access_type' ) == 'absolute' &&
 				    $edited_Blog->get_setting( $asset_url_type ) == 'basic' )
 				{
@@ -354,7 +362,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 				}
 
 				$relative_asset_url_note = '<span id="'.$asset_url_type.'_relative">'.$asset_url_data['local_url'].'</span>';
-				if( $asset_url_type != 'skins_assets_url_type' && $asset_url_type != 'media_assets_url_type' &&
+				if( ! in_array( $asset_url_type, array( 'skins_assets_url_type', 'media_assets_url_type', 'htsrv_assets_url_type' ) ) &&
 				    $edited_Blog->get_setting( 'skins_assets_url_type' ) != 'relative' &&
 				    $edited_Blog->get_setting( $asset_url_type ) == 'relative' )
 				{
@@ -363,9 +371,14 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 						.'</span>';
 				}
 
+				$absolute_url_note = T_('Enter path to %s folder ending with /');
+				if( ! in_array( $asset_url_type, array( 'plugins_assets_url_type', 'htsrv_assets_url_type' ) ) )
+				{
+					$absolute_url_note .= ' -- '.T_('This may be located in a CDN zone');
+				}
 				$Form->radio( $asset_url_type, $edited_Blog->get_setting( $asset_url_type ), array(
 					array( 'relative', (
-							( $asset_url_type == 'skins_assets_url_type' || $asset_url_type == 'media_assets_url_type'  ) ?
+							in_array( $asset_url_type, array( 'skins_assets_url_type', 'media_assets_url_type', 'htsrv_assets_url_type' ) ) ?
 							sprintf( T_('%s folder relative to current collection (recommended setting)'), '<code>'.$asset_url_data['folder'].'</code>' ) :
 							sprintf( T_('%s folder relative to %s domain (recommended setting)'), '<code>'.$asset_url_data['folder'].'</code>', '<code>/skins/</code>' )
 						), $relative_asset_url_note ),
@@ -385,6 +398,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 		$Form->info( sprintf( T_('Load %s assets from'), '<code>/skins/</code>' ), $edited_Blog->get_local_skins_url() );
 		$Form->info( sprintf( T_('Load generic %s assets from'), '<code>/rsc/</code>' ), $edited_Blog->get_local_rsc_url() );
 		$Form->info( sprintf( T_('Load %s assets from'), '<code>/plugins/</code>' ), $edited_Blog->get_local_plugins_url() );
+		$Form->info( sprintf( T_('Link to %s through'), '<code>/htsrv/</code>' ), $edited_Blog->get_local_htsrv_url() );
 	}
 
 $Form->end_fieldset();

@@ -200,14 +200,14 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 		{ // Check if current redirect domain is used as absolute URL for at least 1 collection on the system:
 			global $DB;
 
-			$abs_url_coll_SQL = new SQL();
+			$abs_url_coll_SQL = new SQL( 'phpBB: get collection by url' );
 			$abs_url_coll_SQL->SELECT( 'blog_ID' );
 			$abs_url_coll_SQL->FROM( 'T_blogs' );
 			$abs_url_coll_SQL->WHERE( 'blog_access_type = "absolute"' );
 			$abs_url_coll_SQL->WHERE_and( 'blog_siteurl LIKE '.$DB->quote( '%://'.str_replace( '_', '\_', $redirect_to_domain.'/%' ) ) );
 			$abs_url_coll_SQL->LIMIT( '1' );
 
-			$abs_url_coll_ID = $DB->get_var( $abs_url_coll_SQL->get() );
+			$abs_url_coll_ID = $DB->get_var( $abs_url_coll_SQL );
 			if( ! empty( $abs_url_coll_ID ) )
 			{ // We found current redirect goes to a collection domain, Allow this:
 				$allow_collection_redirect = true;
@@ -427,7 +427,7 @@ function get_request_title( $params = array() )
 			'postidx_text'        => T_('Post Index'),
 			'search_text'         => T_('Search'),
 			'sitemap_text'        => T_('Site Map'),
-			'msgform_text'        => T_('Sending a message'),
+			'msgform_text'        => T_('Contact'),
 			'messages_text'       => T_('Messages'),
 			'contacts_text'       => T_('Contacts'),
 			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
@@ -443,7 +443,7 @@ function get_request_title( $params = array() )
 			'users_text'          => T_('Users'),
 			'closeaccount_text'   => T_('Close account'),
 			'subs_text'           => T_('Notifications & Subscriptions'),
-			'visits_text'         => T_('Profile Visits'),
+			'visits_text'         => T_('Who visited my profile?'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
 			'edit_comment_text'   => T_('Editing comment'),
@@ -556,23 +556,33 @@ function get_request_title( $params = array() )
 
 		case 'visits':
 			// We are requesting the profile visits screen:
+			$user_ID = param( 'user_ID', 'integer', 0 );
+			if( ! empty( $user_ID ) )
+			{
+				$UserCache = & get_UserCache();
+				$viewed_User = & $UserCache->get_by_ID( $user_ID );
+			}
+
+			if( is_logged_in() && ! empty( $viewed_User ) && $current_User->ID != $user_ID )
+			{
+				$params['visits_text'] = T_('User Profile Visits').' - '.$viewed_User->get_identity_link( array( 'link_text' => 'login' ) );
+			}
+
 			$r[] = $params['visits_text'];
 			break;
 
 		case 'msgform':
 			// We are requesting the message form:
-			$r[] = $params['msgform_text'];
+			$msgform_title = utf8_trim( $Blog->get_setting( 'msgform_title' ) );
+			$r[] = empty( $msgform_title ) ? $params['msgform_text'] : $msgform_title;
 			break;
 
 		case 'threads':
 		case 'messages':
 			// We are requesting the messages form
+			global $disp_detail;
 			$thrd_ID = param( 'thrd_ID', 'integer', 0 );
-			if( empty( $thrd_ID ) )
-			{
-				$r[] = $params['messages_text'];
-			}
-			else
+			if( ! empty( $thrd_ID ) )
 			{	// We get a thread title by ID
 				load_class( 'messaging/model/_thread.class.php', 'Thread' );
 				$ThreadCache = & get_ThreadCache();
@@ -581,12 +591,19 @@ function get_request_title( $params = array() )
 					if( $params['auto_pilot'] == 'seo_title' )
 					{	// Display thread title only for tag <title>
 						$r[] = $Thread->title;
+						break;
 					}
 				}
-				else
-				{	// Bad request with not existing thread
-					$r[] = strip_tags( $params['messages_text'] );
-				}
+			}
+
+			if( $disp_detail == 'msgform' )
+			{	// disp=msgform for logged in user:
+				$msgform_title = utf8_trim( $Blog->get_setting( 'msgform_title' ) );
+				$r[] = empty( $msgform_title ) ? $params['msgform_text'] : $msgform_title;
+			}
+			else
+			{
+				$r[] = strip_tags( $params['messages_text'] );
 			}
 			break;
 
@@ -1042,8 +1059,10 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 	}
 
 	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
-	{ // Dependency : ensure jQuery is loaded
-		require_js( '#jquery#', $relative_to, $async, $output, $version );
+	{	// Dependency : ensure jQuery is loaded
+		// Don't use TRUE for $async and $output because it may loads jQuery twice on AJAX request, e.g. on comment AJAX form,
+		// and all jQuery UI libraries(like resizable, sortable and etc.) will not work, e.g. on attachments fieldset
+		require_js( '#jquery#', $relative_to, false, false, $version );
 	}
 
 	// Get library url of JS file by alias name
@@ -1219,7 +1238,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				global $b2evo_icons_type, $blog;
 				$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 				// Colorbox params to translate the strings:
-				$colorbox_strings_params = 'current: "'.TS_('image {current} of {total}').'",
+				$colorbox_strings_params = 'current: "{current} / {total}",
 					previous: "'.TS_('Previous').'",
 					next: "'.TS_('Next').'",
 					close: "'.TS_('Close').'",
@@ -1230,7 +1249,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				$colorbox_voting_params = '{'.$colorbox_strings_params.'
 					displayVoting: true,
 					votingUrl: "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.$blog_param.'",
-					minWidth: 305}';
+					minWidth: 320}';
 				// Colorbox params without voting panel:
 				$colorbox_no_voting_params = '{'.$colorbox_strings_params.'
 					minWidth: 255}';
@@ -1290,7 +1309,23 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// TODO: translation strings for colorbox buttons
 
 				require_js( 'build/colorbox.bmin.js', $relative_to, true );
-				require_css( 'colorbox/colorbox.css', $relative_to );
+				if( is_admin_page() )
+				{
+					global $AdminUI;
+					if( ! empty( $AdminUI ) )
+					{
+						$colorbox_css_file = $AdminUI->get_template( 'colorbox_css_file' );
+					}
+				}
+				else
+				{
+					global $Skin;
+					if( ! empty( $Skin ) )
+					{
+						$colorbox_css_file = $Skin->get_template( 'colorbox_css_file' );
+					}
+				}
+				require_css( ( empty( $colorbox_css_file ) ? 'colorbox-regular.min.css' : $colorbox_css_file ), $relative_to );
 				break;
 		}
 		// add to list of loaded helpers
@@ -2248,17 +2283,32 @@ function display_ajax_form( $params )
 	<script type="text/javascript">
 		var ajax_form_offset_<?php echo $ajax_form_number; ?> = jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').offset().top;
 		var request_sent_<?php echo $ajax_form_number; ?> = false;
+		var ajax_form_loading_number_<?php echo $ajax_form_number; ?> = 0;
 
 		function get_form_<?php echo $ajax_form_number; ?>()
 		{
+			var form_id = '#ajax_form_number_<?php echo $ajax_form_number; ?>';
+			ajax_form_loading_number_<?php echo $ajax_form_number; ?>++;
 			jQuery.ajax({
 				url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 				type: 'POST',
 				data: <?php echo $json_params; ?>,
 				success: function(result)
-					{
-						jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').html( ajax_debug_clear( result ) );
+				{
+					jQuery( form_id ).html( ajax_debug_clear( result ) );
+				},
+				error: function( jqXHR, textStatus, errorThrown )
+				{
+					jQuery( '.loader_ajax_form', form_id ).after( '<div class="red center">' + errorThrown + ': ' + jqXHR.responseText + '</div>' );
+					if( ajax_form_loading_number_<?php echo $ajax_form_number; ?> < 3 )
+					{	// Try to load 3 times this ajax form if error occurs:
+						setTimeout( function()
+						{	// After 1 second delaying:
+							jQuery( '.loader_ajax_form', form_id ).next().remove();
+							get_form_<?php echo $ajax_form_number; ?>();
+						}, 1000 );
 					}
+				}
 			});
 		}
 
@@ -2450,15 +2500,13 @@ function display_login_form( $params )
 
 	if( $inskin )
 	{
-		$Form->begin_field();
-		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, T_('Login'), $separator.T_('Enter your username (or email address).'),
-					array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true ) );
-		$Form->end_field();
+		$Form->login_input( $dummy_fields['login'], $params['login'], 18, /* TRANS: noun */ T_('Login'), $separator.T_('Enter your username (or email address).'),
+					array( 'maxlength' => 255, 'required' => true ) );
 	}
 	else
 	{
-		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, '', '',
-					array( 'maxlength' => 255, 'class' => 'input_text', 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
+		$Form->login_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, '', '',
+					array( 'maxlength' => 255, 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
 	}
 
 	$lost_password_url = get_lostpassword_url( $redirect_to, '&amp;', $return_to );
@@ -2601,12 +2649,14 @@ function display_login_js_handler( $params )
 			error: function( jqXHR, textStatus, errorThrown )
 			{	// Display error text on error request:
 				requestSent = false;
-				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')' );
+				var wrong_response_code = typeof( jqXHR.status ) != 'undefined' && jqXHR.status != 200 ? '\nHTTP Response code: ' + jqXHR.status : '';
+				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')'
+					+ wrong_response_code );
 			}
 		});
 
-	    // You must return false to prevent the default form behavior
-	    return false;
+		// You must return false to prevent the default form behavior
+		return false;
 	}
 
 	<?php
@@ -2687,7 +2737,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	if( $params['inskin'] )
 	{
-		$Form->text( $dummy_fields[ 'login' ], $login, 30, T_('Login'), '', 255, 'input_text' );
+		$Form->text( $dummy_fields[ 'login' ], $login, 30, /* TRANS: noun */ T_('Login'), '', 255, 'input_text' );
 	}
 	else
 	{
@@ -3069,7 +3119,7 @@ function display_login_validator( $params = array() )
 	var login_icon_available = \''.get_icon( 'allowback', 'imgtag', array( 'title' => TS_('This username is available.') ) ).'\';
 	var login_icon_exists = \''.get_icon( 'xross', 'imgtag', array( 'title' => TS_('This username is already in use. Please choose another one.') ) ).'\';
 
-	var login_text_empty = \''.TS_('Choose an username.').'\';
+	var login_text_empty = \''.TS_('Choose an username').'.\';
 	var login_text_available = \''.TS_('This username is available.').'\';
 	var login_text_exists = \''.TS_('This username is already in use. Please choose another one.').'\';
 
@@ -3300,6 +3350,21 @@ function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rs
 
 	// Load main CSS file of font-awesome icons
 	require_css( '#fontawesome#', $relative_to );
+}
+
+
+/**
+ * Initialize JavaScript variables for fileuploader.js
+ */
+function init_fineuploader_js_lang_strings()
+{
+	// Initialize variables for the file "fileuploader.js":
+	add_js_headline( 'var evo_js_lang_file_sizes = [\''
+		/* TRANS: Abbr. for "Bytes" */.TS_('B.').'\', \''
+		/* TRANS: Abbr. for "Kilobytes" */.TS_('KB').'\', \''
+		/* TRANS: Abbr. for Megabytes */.TS_('MB').'\', \''
+		/* TRANS: Abbr. for Gigabytes */.TS_('GB').'\', \''
+		/* TRANS: Abbr. for Terabytes */.TS_('TB').'\'];' );
 }
 
 ?>

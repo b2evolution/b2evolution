@@ -155,7 +155,7 @@ function display_base_config_recap()
 function install_newdb()
 {
 	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password;
-	global $create_sample_contents, $create_sample_organization, $create_demo_users;
+	global $create_sample_contents, $create_sample_organization, $create_demo_users, $create_demo_messages;
 
 	/*
 	 * -----------------------------------------------------------------------------------
@@ -230,6 +230,11 @@ function install_newdb()
 			$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
 			create_demo_users();
+
+			if( $create_demo_messages )
+			{
+				create_demo_messages();
+			}
 		}
 	}
 
@@ -1792,6 +1797,21 @@ function check_quick_install_request()
 
 
 /**
+ * Format an install param like DB config and base url
+ *
+ * @return string
+ */
+function format_install_param( $value )
+{
+	// We need backslashes only for single quote(') and backslash(\):
+	$value = addcslashes( $value, "'\\" );
+	// Also append additional backslash for each backslash to avoid a broken string value,
+	// when it is used to build a config var like code: echo "\$config_var = '".$value."';"
+	return str_replace( '\\', '\\\\', $value );
+}
+
+
+/**
  * Update file /conf/_basic_config.php
  *
  * @param string Current action, updated by reference
@@ -1825,6 +1845,35 @@ function update_basic_config_file( $params = array() )
 		global $basic_config_file_result_messages;
 	}
 
+	// Check the install params for allowed characters:
+	$check_install_params = array(
+			'db_host'        => T_('MySQL Host/Server'),
+			'db_name'        => T_('MySQL Database'),
+			'db_user'        => T_('MySQL Username'),
+			'db_password'    => T_('MySQL Password'),
+			'db_tableprefix' => T_('MySQL tables prefix'),
+			'baseurl'        => T_('Base URL'),
+			'admin_email'    => T_('Your email'),
+		);
+	$check_install_params_result = true;
+	foreach( $check_install_params as $check_install_param_value => $check_install_field_title )
+	{
+		if( preg_match( '#[\'\\\\]#', $params[ $check_install_param_value ] ) )
+		{	// Param value cannot contains characters ' and \
+			display_install_messages( sprintf( T_('The characters %s and %s are not allowed in field: "%s".'), '<code>\'</code>', '<code>\\</code>', $check_install_field_title ) );
+			$check_install_params_result = false;
+		}
+	}
+	if( ! $check_install_params_result )
+	{	// Switch action to display a config form to fix errors:
+		$action = 'start';
+		if( ! $params['print_messages'] )
+		{	// Return all messages instead of printing on screen:
+			$basic_config_file_result_messages = ob_get_clean();
+		}
+		return false;
+	}
+
 	// Connect to DB host (without selecting DB because we should maybe create this by request):
 	$DB = new DB( array(
 			'user'     => $params['db_user'],
@@ -1843,7 +1892,11 @@ function update_basic_config_file( $params = array() )
 		{
 			display_install_messages( sprintf( T_('You don\'t seem to have permission to create this new database on "%s" (%s).'), $params['db_host'], $DB->last_error ) );
 			$action = 'start';
-			return true;
+			if( ! $params['print_messages'] )
+			{	// Return all messages instead of printing on screen:
+				$basic_config_file_result_messages = ob_get_clean();
+			}
+			return false;
 		}
 	}
 
@@ -1854,6 +1907,11 @@ function update_basic_config_file( $params = array() )
 	{ // restart conf
 		display_install_messages( T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...') );
 		$action = 'start';
+		if( ! $params['print_messages'] )
+		{	// Return all messages instead of printing on screen:
+			$basic_config_file_result_messages = ob_get_clean();
+		}
+		return false;
 	}
 	else
 	{
@@ -1891,13 +1949,13 @@ function update_basic_config_file( $params = array() )
 			),
 			array(
 				"\$db_config = array(\n"
-					."\t'user'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_user'] )."',\$1"
-					."\t'password' => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_password'] )."',\$2"
-					."\t'name'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_name'] )."',\$3"
-					."\t'host'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_host'] )."',\$4",
-				"tableprefix = '".str_replace( "'", "\'", $params['db_tableprefix'] )."';",
-				"baseurl = '".str_replace( "'", "\'", $params['baseurl'] )."';",
-				"admin_email = '".str_replace( "'", "\'", $params['admin_email'] )."';",
+					."\t'user'     => '".format_install_param( $params['db_user'] )."',\$1"
+					."\t'password' => '".format_install_param( $params['db_password'] )."',\$2"
+					."\t'name'     => '".format_install_param( $params['db_name'] )."',\$3"
+					."\t'host'     => '".format_install_param( $params['db_host'] )."',\$4",
+				"tableprefix = '".format_install_param( $params['db_tableprefix'] )."';",
+				"baseurl = '".format_install_param( $params['baseurl'] )."';",
+				"admin_email = '".format_install_param( $params['admin_email'] )."';",
 				'config_is_done = 1;',
 			), $conf );
 

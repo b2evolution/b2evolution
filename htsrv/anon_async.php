@@ -161,7 +161,7 @@ switch( $action )
 			$Ajaxlog->add( 'User: #'.$user_ID.' '.$User->login );
 
 			if( is_logged_in() &&
-			    $current_User->can_moderate_user( $User->ID ) &&
+			    ( $current_User->ID == $User->ID || $current_User->can_moderate_user( $User->ID ) ) &&
 			    $current_User->check_status( 'can_access_admin' ) &&
 			    $current_User->check_perm( 'admin', 'restricted' ) )
 			{	// Display the moderation buttons only if current user has a permission:
@@ -780,7 +780,7 @@ switch( $action )
 		$Form->output = true;
 
 		global $user_fields_empty_name;
-		$user_fields_empty_name = T_('Select...');
+		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
 
 		$Form->select( 'criteria_type[]', '', 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
 
@@ -922,7 +922,7 @@ switch( $action )
 				$SQL->SELECT( 'user_ID' );
 				$SQL->FROM( 'T_users' );
 				$SQL->WHERE( 'user_login = "'.$DB->escape( $login ).'"' );
-				if( $DB->get_var( $SQL->get() ) )
+				if( $DB->get_var( $SQL ) )
 				{	// Login already exists
 					echo 'exists';
 				}
@@ -1198,6 +1198,12 @@ switch( $action )
 
 		break;
 
+	case 'get_regform_crumb':
+		// Get crumb value for register form:
+		// (Used for widget "Email capture / Quick registration" when page caching is enabled)
+		echo get_crumb( 'regform' );
+		break;
+
 	case 'get_user_salt':
 		// Get the salt of the user from the given login info
 		// Note: If there are more users with the received login then give at most 3 salt values for the 3 most recently active users
@@ -1301,13 +1307,13 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
+		$user_ID = param( 'user_ID', 'integer', true );
 
-		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) || ! $current_User->check_status( 'can_report_user' ) )
+		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) || ! $current_User->check_status( 'can_report_user', $user_ID ) )
 		{ // Only if current user can reports
 			break;
 		}
 
-		$user_ID = param( 'user_ID', 'integer', true );
 		$UserCache = & get_UserCache();
 		$edited_User = & $UserCache->get_by_ID( $user_ID );
 
@@ -1561,12 +1567,14 @@ switch( $action )
 		$fake_sql_update_strings = '';
 		$real_sql_update_strings = '';
 		$real_link_order = 0;
+		$link_order = array();
 		foreach( $link_IDs as $link_ID )
 		{
 			$max_link_order++;
 			$fake_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$max_link_order;
 			$real_link_order++;
 			$real_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$real_link_order;
+			$link_order[$link_ID] = $real_link_order;
 		}
 
 		// Do firstly fake ordering start with max order, to avoid duplicate entry error:
@@ -1579,6 +1587,7 @@ switch( $action )
 			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
 
 		$DB->commit();
+		echo json_encode( $link_order );
 		break;
 
 	case 'test_api':

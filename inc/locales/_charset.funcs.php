@@ -114,7 +114,7 @@ function replace_special_chars( $str, $post_locale = NULL )
 	{	// Use locale 'transliteration_map' if present
 		if( ! array_key_exists( '', $locales[$our_locale]['transliteration_map'] ) )
 		{	// Make sure there's no empty string key, otherwise strtr() returns false
-			if( $tmp_str = strtr( $str, $locales[$our_locale]['transliteration_map'] ) );
+			if( $tmp_str = strtr( $str, $locales[$our_locale]['transliteration_map'] ) )
 			{	// Use newly transliterated string
 				$str = $tmp_str;
 			}

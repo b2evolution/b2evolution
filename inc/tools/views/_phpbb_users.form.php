@@ -69,7 +69,7 @@ $Form->begin_fieldset( T_('Report of users import') );
 
 $Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' )/*,
+$Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' )/*,
 											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$dispatcher.'?ctrl=phpbbimport&step=groups\'' )*/ ) );
 
 $Form->end_form();

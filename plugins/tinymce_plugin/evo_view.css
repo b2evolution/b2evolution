@@ -65,4 +65,5 @@
 
 .evo-view-selected {
 	background-color: #eee;
+	outline: 1px #bbb dashed;
 }

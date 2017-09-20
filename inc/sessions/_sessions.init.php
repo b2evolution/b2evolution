@@ -173,10 +173,6 @@ class sessions_Module extends Module
 
 		if( $current_User->check_perm( 'stats', 'view' ) )
 		{	// We have permission to view all stats
-
-			// TODO: this is hackish and would require a proper function call
-			$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
-
 			$entries = array(
 				'stats_separator' => array( 'separator' => true ),
 				'stats' => array(
@@ -214,16 +210,21 @@ class sessions_Module extends Module
 						)
 				) );
 
-			if( !is_admin_page() )
-			{
-				$blog_ID = empty( $Blog ) ? 0 : $Blog->ID;
-				$entries['stats_page'] = array(
-						'text' => T_('Page stats').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&tab=hits&blog='.$blog_ID.'&reqURI='.rawurlencode( $_SERVER['REQUEST_URI'] ),
-					);
-			}
+			$topleft_Menu->add_menu_entries( 'site', $entries );
 
-			$topleft_Menu->add_menu_entries( 'tools', $entries );
+			if( !is_admin_page() )
+			{	// Only for front-office:
+				$page_menus = array();
+				if( $topleft_Menu->get_node_by_path( array( 'page', 'edit' ) ) )
+				{
+					$page_menus['stats_sep'] = array( 'separator' => true );
+				}
+				$page_menus['stats_page'] = array(
+					'text' => T_('Page Analytics').'&hellip;',
+					'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.( empty( $Blog ) ? 0 : $Blog->ID ).'&amp;reqURI='.rawurlencode( $_SERVER['REQUEST_URI'] ),
+				);
+				$topleft_Menu->add_menu_entries( 'page', $page_menus );
+			}
 		}
 	}
 

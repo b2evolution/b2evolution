@@ -745,6 +745,16 @@ class Plugins
 			{
 				$set_Obj->_defaults[$l_name] = array();
 			}
+			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'input_group' && is_array( $l_meta['inputs'] ) )
+			{	// Get default values from input group fields:
+				foreach( $l_meta['inputs'] as $l_meta_input_key => $l_meta_input_data )
+				{
+					if( isset( $l_meta_input_data['defaultvalue'] ) )
+					{
+						$set_Obj->_defaults[ $l_name.$l_meta_input_key ] = $l_meta_input_data['defaultvalue'];
+					}
+				}
+			}
 			else
 			{
 				$set_Obj->_defaults[$l_name] = '';
@@ -1247,6 +1257,11 @@ class Plugins
 			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( )', 'plugins' );
 		}
 
+		if( $method == 'CacheObjects' )
+		{	// Deny plugins with deprecated event:
+			debug_die( 'The plugin event CacheObjects is deprecated' );
+		}
+
 		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 		$r = $Plugin->$method( $params );
 		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
@@ -1495,11 +1510,11 @@ class Plugins
 
 		$Debuglog->add( sprintf( 'Loading plugin %s by class name.', $classname ), 'plugins' );
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Load Plugin data by class name' );
 		$SQL->SELECT( 'plug_ID, plug_priority, plug_classname, plug_code, plug_name, plug_shortdesc, plug_status, plug_version, plug_spam_weight' );
 		$SQL->FROM( 'T_plugins' );
 		$SQL->WHERE( 'plug_classname = '.$DB->quote( $classname ) );
-		if( $plugin = $DB->get_row( $SQL->get(), ARRAY_A ) )
+		if( $plugin = $DB->get_row( $SQL, ARRAY_A ) )
 		{
 			if( isset( $this->index_ID_rows[$plugin['plug_ID']] ) )
 			{ // Plugin already was loaded before
@@ -2088,30 +2103,26 @@ class Plugins
 
 
 	/**
-	 * Get checkable list of renderers
+	 * Get renderers options which can be used for form selectors, checkboxes and etc.
 	 *
 	 * @param array If given, assume these renderers to be checked.
 	 * @param array params from where to get 'apply_rendering' setting
 	 */
-	function get_renderer_checkboxes( $current_renderers = NULL, $params )
+	function get_renderer_options( $current_renderers = NULL, $params )
 	{
 		global $inc_path, $admin_url;
 
-		load_funcs('plugins/_plugin.funcs.php');
+		load_funcs( 'plugins/_plugin.funcs.php' );
 
-		$name_prefix = isset( $params['name_prefix'] ) ? $params['name_prefix'] : '';
-
-		// Set different prefix if you use several toolbars on one page:
-		$js_prefix = isset( $params['js_prefix'] ) ? $params['js_prefix'] : '';
+		$checkbox_options = array();
 
 		$this->restart(); // make sure iterator is at start position
 
-		if( ! is_array($current_renderers) )
+		if( ! is_array( $current_renderers ) )
 		{
 			$current_renderers = explode( '.', $current_renderers );
 		}
 
-		$atLeastOneRenderer = false;
 		$setting_Blog = NULL;
 		if( isset( $params['setting_name'] ) && $params['setting_name'] == 'msg_apply_rendering' )
 		{ // get Message apply_rendering setting
@@ -2141,7 +2152,7 @@ class Plugins
 		}
 		else
 		{ // Invalid params
-			return '';
+			return $checkbox_options;
 		}
 
 		switch( $setting_name )
@@ -2167,8 +2178,6 @@ class Plugins
 				$RendererPlugins = $this->get_list_by_events( array('RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText') );
 				break;
 		}
-
-		$r = '<input type="hidden" name="renderers_displayed" value="1" />';
 
 		foreach( $RendererPlugins as $loop_RendererPlugin )
 		{ // Go through whole list of renders
@@ -2201,62 +2210,124 @@ class Plugins
 			{ // This is not an option.
 				continue;
 			}
-			$atLeastOneRenderer = true;
 
-			$r .= '<div id="block_renderer_'.$loop_RendererPlugin->code.'">';
-
-			$r .= '<input type="checkbox" class="checkbox" name="'.$name_prefix.'renderers[]" value="'.$loop_RendererPlugin->code.'" id="'.$js_prefix.'renderer_'.$loop_RendererPlugin->code.'"';
+			$checkbox_option = array(
+					'code'       => $loop_RendererPlugin->code,
+					'short_desc' => $loop_RendererPlugin->short_desc,
+					'name'       => $loop_RendererPlugin->name,
+					'checked'    => false,
+					'disabled'   => false,
+					'help_link'  => $loop_RendererPlugin->get_help_link( '$help_url' ),
+				);
 
 			switch( $apply_rendering )
 			{
 				case 'always':
-					$r .= ' checked="checked" disabled="disabled"';
+					//$r .= ' checked="checked" disabled="disabled"';
+					$checkbox_option['checked'] = true;
+					$checkbox_option['disabled'] = true;
 					break;
 
 				case 'opt-out':
 					if( in_array( $loop_RendererPlugin->code, $current_renderers ) // Option is activated
 						|| in_array( 'default', $current_renderers ) ) // OR we're asking for default renderer set
 					{
-						$r .= ' checked="checked"';
+						$checkbox_option['checked'] = true;
 					}
 					break;
 
 				case 'opt-in':
 					if( in_array( $loop_RendererPlugin->code, $current_renderers ) ) // Option is activated
 					{
-						$r .= ' checked="checked"';
+						$checkbox_option['checked'] = true;
 					}
 					break;
 
 				case 'lazy':
 					if( in_array( $loop_RendererPlugin->code, $current_renderers ) ) // Option is activated
 					{
-						$r .= ' checked="checked"';
+						$checkbox_option['checked'] = true;
 					}
-					$r .= ' disabled="disabled"';
+					$checkbox_option['disabled'] = true;
 					break;
 			}
 
-			$r .= ' title="'.format_to_output( $loop_RendererPlugin->short_desc, 'formvalue' ).'"';
+			$checkbox_options[] = $checkbox_option;
+		}
+
+		return $checkbox_options;
+	}
+
+
+	/**
+	 * Get checkable list of renderers
+	 *
+	 * @param array If given, assume these renderers to be checked.
+	 * @param array params from where to get 'apply_rendering' setting
+	 */
+	function get_renderer_checkboxes( $current_renderers = NULL, $params )
+	{
+		if( isset( $params['setting_name'] ) )
+		{	// Use the defined setting name from params:
+			$setting_name = $params['setting_name'];
+		}
+		elseif( ! empty( $params['Comment'] ) )
+		{	// Use setting name for Comment:
+			$setting_name = 'coll_apply_comment_rendering';
+		}
+		elseif( ! empty( $params['Item'] ) )
+		{	// Use setting name for Item:
+			$setting_name = 'coll_apply_rendering';
+		}
+		else
+		{	// Invalid params, Exit here:
+			return '';
+		}
+
+		$name_prefix = isset( $params['name_prefix'] ) ? $params['name_prefix'] : '';
+
+		// Set different prefix if you use several toolbars on one page:
+		$js_prefix = isset( $params['js_prefix'] ) ? $params['js_prefix'] : '';
+
+		$r = '<input type="hidden" name="renderers_displayed" value="1" />';
+
+		$renderer_checkbox_options = $this->get_renderer_options( $current_renderers, $params );
+		foreach( $renderer_checkbox_options as $option )
+		{
+			$r .= '<div id="block_renderer_'.$option['code'].'">';
+
+			// Checkbox:
+			$r .= '<input type="checkbox" class="checkbox" name="'.$name_prefix.'renderers[]" value="'.$option['code'].'" id="'.$js_prefix.'renderer_'.$option['code'].'"';
+			if( $option['checked'] )
+			{	// Is checked:
+				$r .= ' checked="checked"';
+			}
+			if( $option['disabled'] )
+			{	// Is disabled:
+				$r .= ' disabled="disabled"';
+			}
+			$r .= ' title="'.format_to_output( $option['short_desc'], 'formvalue' ).'"';
 			if( ! empty( $js_prefix ) )
 			{	// Set prefix, Used in JS code to disable/enable plugin toolbar:
 				$r .= ' data-prefix="'.format_to_output( $js_prefix, 'formvalue' ).'"';
 			}
 			$r .= ' />';
-			$r .= ' <label for="'.$js_prefix.'renderer_'.$loop_RendererPlugin->code.'"';
-			$r .= ' title="'.format_to_output($loop_RendererPlugin->short_desc, 'formvalue').'">';
-			$r .= format_to_output($loop_RendererPlugin->name).'</label>';
+
+			// Label:
+			$r .= ' <label for="'.$js_prefix.'renderer_'.$option['code'].'"';
+			$r .= ' title="'.format_to_output( $option['short_desc'], 'formvalue' ).'">';
+			$r .= format_to_output( $option['name'] ).'</label>';
 
 			// fp> TODO: the first thing we want here is a TINY javascript popup with the LONG desc. The links to readme and external help should be inside of the tiny popup.
 			// fp> a javascript DHTML onhover help would be even better than the JS popup
 
-			// external help link:
-			$r .= ' '.$loop_RendererPlugin->get_help_link('$help_url');
+			// External help link:
+			$r .= ' '.$option['help_link'];
 
 			$r .= "</div>\n";
 		}
 
-		if( ! $atLeastOneRenderer )
+		if( empty( $renderer_checkbox_options ) )
 		{
 			if( is_admin_page() )
 			{ // Display info about no renderer plugins only in backoffice

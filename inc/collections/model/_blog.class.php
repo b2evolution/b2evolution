@@ -819,7 +819,7 @@ class Blog extends DataObject
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
 
 			param( 'old_content_alert', 'integer', NULL );
-			param_check_range( 'old_content_alert', 1, 12, T_('Old content alert must be numeric (1-12).'), false );
+			param_check_range( 'old_content_alert', 1, 12, T_('Stale content alert must be configured with a number of months.').'(1 - 12)', false );
 			$this->set_setting( 'old_content_alert', get_param( 'old_content_alert' ), true );
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
@@ -844,6 +844,23 @@ class Blog extends DataObject
 
 			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
 			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
+
+			// Set additional order fields
+			$orderby_1 = param( 'orderby_1', 'string', '' );
+			if( empty( $orderby_1 ) )
+			{ // Delete if first additional field is not defined
+				$this->delete_setting( 'orderby_1' );
+				$this->delete_setting( 'orderdir_1' );
+				$this->delete_setting( 'orderby_2' );
+				$this->delete_setting( 'orderdir_2' );
+			}
+			else
+			{
+				$this->set_setting( 'orderby_1', $orderby_1 );
+				$this->set_setting( 'orderdir_1', param( 'orderdir_1', 'string', '' ) );
+				$this->set_setting( 'orderby_2', param( 'orderby_2', 'string', '' ) );
+				$this->set_setting( 'orderdir_2', param( 'orderdir_2', 'string', '' ) );
+			}
 
 			$disp_featured_above_list = param( 'disp_featured_above_list', 'integer', 0 );
 			$this->set_setting( 'disp_featured_above_list', $disp_featured_above_list );
@@ -952,6 +969,11 @@ class Blog extends DataObject
 			// Search results:
 			param_integer_range( 'search_per_page', 1, 9999, T_('Number of search results per page must be between %d and %d.') );
 			$this->set_setting( 'search_per_page', get_param( 'search_per_page' ) );
+			$this->set_setting( 'search_sort_by', param( 'search_sort_by', 'string' ) );
+			$this->set_setting( 'search_include_cats', param( 'search_include_cats', 'integer', 0 ) );
+			$this->set_setting( 'search_include_posts', param( 'search_include_posts', 'integer', 0 ) );
+			$this->set_setting( 'search_include_cmnts', param( 'search_include_cmnts', 'integer', 0 ) );
+			$this->set_setting( 'search_include_tags', param( 'search_include_tags', 'integer', 0 ) );
 
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
@@ -962,6 +984,10 @@ class Blog extends DataObject
 
 			// Archive pages:
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
+
+			// Contact form:
+			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
+			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
 		}
 
 		if( in_array( 'more', $groups ) )
@@ -976,8 +1002,11 @@ class Blog extends DataObject
 			{
 				// Subscriptions:
 				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_subscription', param( 'opt_out_subscription', 'integer', 0 ) );
 				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_comment_subscription', param( 'opt_out_comment_subscription', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_item_subscription', param( 'opt_out_item_subscription', 'integer', 0 ) );
 			}
 
 			// Sitemaps:
@@ -1097,19 +1126,19 @@ class Blog extends DataObject
 
 			if( param( 'blog_head_includes', 'html', NULL ) !== NULL )
 			{	// HTML header includes:
-				param_check_html( 'blog_head_includes', sprintf( T_('Invalid Custom meta tag/css section. You can loosen this restriction in the <a %s>group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'head_extension' );
+				param_check_html( 'blog_head_includes', T_('Invalid Custom meta tag/css section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'head_extension' );
 				$this->set_setting( 'head_includes', get_param( 'blog_head_includes' ) );
 			}
 
 			if( param( 'blog_body_includes', 'html', NULL ) !== NULL )
 			{ // HTML body includes:
-				param_check_html( 'blog_body_includes', sprintf( T_('Invalid Custom javascript section. You can loosen this restriction in the <a %s>group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'body_extension' );
+				param_check_html( 'blog_body_includes', T_('Invalid Custom javascript section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'body_extension' );
 				$this->set_setting( 'body_includes', get_param( 'blog_body_includes' ) );
 			}
 
 			if( param( 'blog_footer_includes', 'html', NULL ) !== NULL )
 			{	// HTML footer includes:
-				param_check_html( 'blog_footer_includes', sprintf( T_('Invalid Custom javascript section. You can loosen this restriction in the <a %s>group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'footer_extension' );
+				param_check_html( 'blog_footer_includes', T_('Invalid Custom javascript section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), "#", 'footer_extension' );
 				$this->set_setting( 'footer_includes', get_param( 'blog_footer_includes' ) );
 			}
 
@@ -1246,6 +1275,7 @@ class Blog extends DataObject
 					'media_assets_url_type'   => array( 'url' => 'media_assets_absolute_url',   'folder' => '/media/' ),
 					'skins_assets_url_type'   => array( 'url' => 'skins_assets_absolute_url',   'folder' => '/skins/' ),
 					'plugins_assets_url_type' => array( 'url' => 'plugins_assets_absolute_url', 'folder' => '/plugins/' ),
+					'htsrv_assets_url_type'   => array( 'url' => 'htsrv_assets_absolute_url',   'folder' => '/htsrv/' ),
 				);
 
 				foreach( $assets_url_data as $asset_url_type => $asset_url_data )
@@ -1475,13 +1505,13 @@ class Blog extends DataObject
 		{
 			if( is_null( $setting ) )
 			{ // just return current favorite status
-				$fav_SQL = new SQL();
+				$fav_SQL = new SQL( 'Check if collection #'.$this->ID.' is a favorite for user #'.$user_ID );
 				$fav_SQL->SELECT( 'COUNT(*)' );
 				$fav_SQL->FROM( 'T_coll_user_favs' );
 				$fav_SQL->WHERE( 'cufv_blog_ID = '.$DB->quote( $this->ID ) );
 				$fav_SQL->WHERE_and( 'cufv_user_ID = '.$DB->quote( $user_ID ) );
 
-				return $DB->get_var( $fav_SQL->get() );
+				return $DB->get_var( $fav_SQL );
 			}
 
 			if( $setting == 1 )
@@ -1834,6 +1864,13 @@ class Blog extends DataObject
 				.( empty( $htsrv_url_parts['port'] ) ? '' : ':'.$htsrv_url_parts['port'] )
 				.( empty( $htsrv_url_parts['path'] ) ? '' : $htsrv_url_parts['path'] );
 
+			if( isset( $coll_url_parts['scheme'], $htsrv_url_parts['scheme'] ) &&
+			    $coll_url_parts['scheme'] != $htsrv_url_parts['scheme'] )
+			{	// If this collection uses an url with scheme like "https://" then
+				// htsrv url must also uses the same url scheme to avoid restriction by secure reason:
+				$required_htsrv_url = $coll_url_parts['scheme'].substr( $required_htsrv_url, strlen( $htsrv_url_parts['scheme'] ) );
+			}
+
 			// Replace domain + path of htsrv URL with current request:
 			$this->htsrv_urls[ $force_https ] = substr_replace( $required_htsrv_url, $coll_domain, strpos( $required_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
 
@@ -1842,6 +1879,33 @@ class Blog extends DataObject
 		}
 
 		return $this->htsrv_urls[ $force_https ];
+	}
+
+
+	/**
+	 * Get the URL of the htsrv folder, on the current collection's domain (which is NOT always the same as the $baseurl domain!).
+	 *
+	 * @param string NULL to use current htsrv_assets_url_type setting. Use 'basic', 'relative' or 'absolute' to force.
+	 * @param boolean TRUE to use https URL
+	 * @return string URL to /htsrv/ folder
+	 */
+	function get_local_htsrv_url( $url_type = NULL, $force_https = false )
+	{
+		$url_type = is_null( $url_type ) ? $this->get_setting( 'htsrv_assets_url_type' ) : $url_type;
+
+		if( $url_type == 'relative' )
+		{	// Relative URL:
+			return $this->get_htsrv_url( $force_https );
+		}
+		elseif( $url_type == 'absolute' )
+		{	// Absolute URL:
+			return $this->get_setting( 'htsrv_assets_absolute_url' );
+		}
+		else// == 'basic'
+		{	// Basic Config URL from config:
+			global $htsrv_url_sensitive, $htsrv_url;
+			return $force_https ? $htsrv_url_sensitive : $htsrv_url;
+		}
 	}
 
 
@@ -2338,7 +2402,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path ),
-							'error', T_('Collection media file permission errors').get_manual_link('media_file_permission_errors').':' );
+							'error', T_('Media directory file permission error').get_manual_link('media-directory-file-permission-error').':' );
 				}
 				return false;
 			}
@@ -2347,7 +2411,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path ),
-							'error', T_('Collection media directory creation errors').get_manual_link('directory_creation_error').':' );
+							'error', T_('Media directory creation error').get_manual_link('media-directory-creation-error').':' );
 				}
 				return false;
 			}
@@ -2601,6 +2665,10 @@ class Blog extends DataObject
 				$disp_param = 'users';
 				break;
 
+			case 'visitsurl':
+				$disp_param = 'visits';
+				break;
+
 			case 'tagsurl':
 				$disp_param = 'tags';
 				break;
@@ -2727,7 +2795,7 @@ class Blog extends DataObject
 		if( ! empty( $disp_param ) )
 		{ // Get url depending on value of param 'disp'
 			$this_Blog = & $this;
-			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) )
+			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'visits' ) ) )
 			{ // Check if we can use this blog for messaging actions or we should use spec blog
 				if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
 				{ // Use special blog for messaging actions if it is defined in general settings
@@ -2948,10 +3016,10 @@ class Blog extends DataObject
 
 		if( $this->get( 'order' ) == 0 )
 		{ // Set an order as max value of previous order + 1 if it is not defined yet
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get max collection order' );
 			$SQL->SELECT( 'MAX( blog_order )' );
 			$SQL->FROM( 'T_blogs' );
-			$max_order = intval( $DB->get_var( $SQL->get() ) );
+			$max_order = intval( $DB->get_var( $SQL ) );
 			$this->set( 'order', $max_order + 1 );
 		}
 
@@ -3159,7 +3227,7 @@ class Blog extends DataObject
 		$source_fields_SQL->SELECT( '*' );
 		$source_fields_SQL->FROM( 'T_blogs' );
 		$source_fields_SQL->WHERE( 'blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_fields = $DB->get_row( $source_fields_SQL->get(), ARRAY_A, NULL, $source_fields_SQL->title );
+		$source_fields = $DB->get_row( $source_fields_SQL, ARRAY_A );
 		// Use field values of duplicated collection by default:
 		foreach( $source_fields as $source_field_name => $source_field_value )
 		{
@@ -3181,7 +3249,7 @@ class Blog extends DataObject
 		$source_settings_SQL->SELECT( 'cset_name, cset_value' );
 		$source_settings_SQL->FROM( 'T_coll_settings' );
 		$source_settings_SQL->WHERE( 'cset_coll_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_settings = $DB->get_assoc( $source_settings_SQL->get(), $source_settings_SQL->title );
+		$source_settings = $DB->get_assoc( $source_settings_SQL );
 		// Use setting values of duplicated collection by default:
 		foreach( $source_settings as $source_setting_name => $source_setting_value )
 		{
@@ -3244,7 +3312,7 @@ class Blog extends DataObject
 		$source_cats_SQL->SELECT( '*' );
 		$source_cats_SQL->FROM( 'T_categories' );
 		$source_cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_cats = $DB->get_results( $source_cats_SQL->get(), ARRAY_A, $source_cats_SQL->title );
+		$source_cats = $DB->get_results( $source_cats_SQL, ARRAY_A );
 		$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
 		$ChapterCache = & get_ChapterCache();
 		foreach( $source_cats as $source_cat_fields )
@@ -3483,13 +3551,13 @@ class Blog extends DataObject
 			}
 
 			// Check if the requested group still exists in DB:
-			$group_SQL = new SQL();
+			$group_SQL = new SQL( 'Check if the requested group still exists in DB' );
 			$group_SQL->SELECT( 'grp_ID' );
 			$group_SQL->FROM( 'T_groups' );
 			$group_SQL->WHERE( 'grp_ID = '.$DB->quote( $group['ID'] ) );
 			$group_SQL->WHERE_and( 'grp_name = '.$DB->quote( $group['name'] ) );
 			$group_SQL->WHERE_and( 'grp_name = '.$DB->quote( T_( $group['name'], $default_locale ) ) );
-			if( ! $DB->get_var( $group_SQL->get() ) )
+			if( ! $DB->get_var( $group_SQL ) )
 			{	// Skip this group because we cannot find it in DB:
 				continue;
 			}
@@ -4197,6 +4265,10 @@ class Blog extends DataObject
 						$url = url_add_param( $url, 'cat='.$cat_ID );
 					}
 				}
+				else
+				{ // User does not have any means to edit the post!
+					return '';
+				}
 
 				if( !empty( $post_title ) )
 				{ // Append a post title
@@ -4493,7 +4565,7 @@ class Blog extends DataObject
 			$SQL->FROM_add( 'INNER JOIN T_items__type ON itc_ityp_ID = ityp_ID' );
 			$SQL->WHERE( 'itc_coll_ID = '.$this->ID );
 
-			$this->enabled_item_types = $DB->get_assoc( $SQL->get(), $SQL->title );
+			$this->enabled_item_types = $DB->get_assoc( $SQL );
 		}
 
 		if( $usage === NULL )
@@ -4709,11 +4781,12 @@ class Blog extends DataObject
 			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s3 ON s3.uset_user_ID = user_ID AND s3.uset_name = "notify_spam_cmt_moderation"' );
 			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
+			$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )
 				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
 				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );
 
-			$this->comment_moderator_user_data = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+			$this->comment_moderator_user_data = $DB->get_results( $SQL );
 		}
 
 		return $this->comment_moderator_user_data;
@@ -4858,7 +4931,7 @@ class Blog extends DataObject
 		$posts_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
 		$posts_SQL->WHERE_and( 'post_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
 		$posts_SQL->GROUP_BY( 'post_status' );
-		$posts = $DB->get_assoc( $posts_SQL->get(), $posts_SQL->title );
+		$posts = $DB->get_assoc( $posts_SQL );
 
 		$comments_SQL = new SQL( 'Get how much comments will be updated after new max allowed status of the collection #'.$this->ID );
 		$comments_SQL->SELECT( 'comment_status, COUNT( comment_ID )' );
@@ -4868,7 +4941,7 @@ class Blog extends DataObject
 		$comments_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
 		$comments_SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
 		$comments_SQL->GROUP_BY( 'comment_status' );
-		$comments = $DB->get_assoc( $comments_SQL->get(), $comments_SQL->title );
+		$comments = $DB->get_assoc( $comments_SQL );
 
 		if( empty( $posts ) && empty( $comments ) )
 		{	// All posts and comments have a correct status:
@@ -4916,6 +4989,46 @@ class Blog extends DataObject
 			WHERE cat_blog_ID = '.$this->ID.'
 				AND comment_status IN ( '.$DB->quote( $reduced_statuses ).' )',
 			'Reduce comments statuses by max allowed status of the collection #'.$this->ID );
+	}
+
+
+	/**
+	 * Get a number of unread posts by current logged in User
+	 *
+	 * @return integer
+	 */
+	function get_unread_posts_count()
+	{
+		global $DB, $current_User, $localtimenow;
+
+		if( ! is_logged_in() || ! $this->get_setting( 'track_unread_content' ) )
+		{	// User must be logged in AND the tracking of unread content is turned ON for the collection:
+			return 0;
+		}
+
+		// Initialize SQL query to get only the posts which are displayed by global $MainList on disp=posts:
+		$ItemList2 = new ItemList2( $this, $this->get_timestamp_min(), $this->get_timestamp_max(), NULL, 'ItemCache', 'recent_topics' );
+		$ItemList2->set_default_filters( array(
+				'unit' => 'all', // set this to don't calculate total rows
+			) );
+		$ItemList2->query_init();
+
+		// Get a count of the unread topics for current user:
+		$unread_posts_SQL = new SQL( 'Get a count of the unread topics of collection #'.$this->ID.' for current user' );
+		$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
+		$unread_posts_SQL->FROM( 'T_items__item' );
+		$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__user_data ON post_ID = itud_item_ID AND itud_user_ID = '.$DB->quote( $current_User->ID ) );
+		$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+		$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+		$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
+		$unread_posts_SQL->WHERE_and( 'post_contents_last_updated_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
+		// In theory, it would be more safe to use this comparison:
+		// $unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts <= post_contents_last_updated_ts' );
+		// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
+		$unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts < post_contents_last_updated_ts' );
+
+		// Execute a query with to know if current user has new data to view:
+		return intval( $DB->get_var( $unread_posts_SQL ) );
 	}
 }
 

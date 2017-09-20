@@ -77,6 +77,8 @@ global $inline_class;
 			echo '</div>';
 
 			$Form->submit( array( 'value' => 'Insert', 'onclick' => 'return evo_image_submit();' ) );
+			//$Form->submit( array( 'value' => 'Insert', 'onclick' => 'alert("hello world!"); return false;' ) );
+			//$Form->button( array( 'type' => 'button', 'name'=>'actionArray[crop]', 'value'=> T_('Insert'), 'class' => 'SaveButton btn-primary', 'onclick' => 'return evo_image_submit( event );' ) );
 
 			$Form->end_fieldset();
 			$Form->end_form();
@@ -106,7 +108,6 @@ global $inline_class;
 				jQuery( 'a[data-toggle="tab"]' ).on( 'shown.bs.tab', function( e ) {
 					var target = jQuery( e.target ).attr( 'href' );
 					apply_image_class( jQuery( 'div' + target + ' input[name$="_class"]' ).val() );
-					console.log( 'Applying style...' );
 				} );
 
 				<?php

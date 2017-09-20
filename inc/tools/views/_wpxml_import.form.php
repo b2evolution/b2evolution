@@ -23,12 +23,42 @@ $Form->begin_form( 'fform', T_('WordPress XML Importer') );
 
 $Form->begin_fieldset( T_('Report of the import') );
 
+	// Get data to import from wordpress XML file:
+	$wp_file = get_param( 'wp_file' );
+	$wpxml_import_data = wpxml_get_import_data( $wp_file );
+
+	echo '<p>';
+
+	if( preg_match( '/\.zip$/i', $wp_file ) )
+	{	// ZIP archive:
+		echo '<b>'.T_('Source ZIP').':</b> <code>'.$wp_file.'</code><br />';
+		// XML file from ZIP archive:
+		echo '<b>'.T_('Source XML').':</b> '
+			.( empty( $wpxml_import_data['XML_file_path'] ) ? T_('Not found') : '<code>'.$wpxml_import_data['XML_file_path'].'</code>' ).'<br />';
+	}
+	else
+	{	// XML file:
+		echo '<b>'.T_('Source XML').':</b> <code>'.$wp_file.'</code><br />';
+	}
+
+	echo '<b>'.T_('Source attachments folder').':</b> '
+		.( empty( $wpxml_import_data['attached_files_path'] ) ? T_('Not found') : '<code>'.$wpxml_import_data['attached_files_path'].'</code>' ).'<br />';
+
 	$BlogCache = & get_BlogCache();
 	$Collection = $Blog = & $BlogCache->get_by_ID( $wp_blog_ID );
-	$Form->info( T_('Collection'), $Blog->get_name() );
+	echo '<b>'.T_('Destination collection').':</b> '.$Blog->dget( 'shortname' ).' &ndash; '.$Blog->dget( 'name' );
 
-	// Import the data and display a report on the screen
-	wpxml_import();
+	echo '</p>';
+
+	if( $wpxml_import_data['errors'] === false )
+	{	// Import the data and display a report on the screen:
+		wpxml_import( $wpxml_import_data['XML_file_path'], $wpxml_import_data['attached_files_path'], $wpxml_import_data['temp_zip_folder_path'] );
+	}
+	else
+	{	// Display errors if import cannot be done:
+		echo $wpxml_import_data['errors'];
+		echo '<br /><p class="text-danger">'.T_('Import failed.').'</p>';
+	}
 
 $Form->end_fieldset();
 

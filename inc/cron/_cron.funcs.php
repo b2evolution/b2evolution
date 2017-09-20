@@ -273,7 +273,7 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 	$SQL->WHERE( 'clog_status = "started"' );
 	$SQL->WHERE_and( 'clog_realstart_datetime < '.$DB->quote( date2mysql( time() + $time_difference - $cron_timeout_delay ) ) );
 	$SQL->GROUP_BY( 'ctsk_ID' );
-	$timeout_tasks = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+	$timeout_tasks = $DB->get_results( $SQL );
 
 	$tasks = array();
 

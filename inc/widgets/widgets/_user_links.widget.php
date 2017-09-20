@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class user_links_Widget extends ComponentWidget
 {
+	var $icon = 'users';
+
 	/**
 	 * Constructor
 	 */
@@ -50,7 +52,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('User links');
+		return T_('User Social Links');
 	}
 
 
@@ -68,7 +70,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display user links.');
+		return T_('Display social links for a specific User.');
 	}
 
 

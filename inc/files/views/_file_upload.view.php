@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Settings;
 
-global $upload_quickmode, $failedFiles, $ads_list_path, $renamedMessages, $renamedFiles;
+global $failedFiles, $ads_list_path, $renamedMessages, $renamedFiles;
 
 global $fm_FileRoot;
 
@@ -136,7 +136,6 @@ global $fm_FileRoot;
 	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
-	$Form->hidden( 'upload_quickmode', $upload_quickmode );
 	$Form->hiddens_by_key( get_memorized() );
 
 	$Widget = new Widget( 'file_browser' );
@@ -145,7 +144,7 @@ global $fm_FileRoot;
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
-<table id="fm_browser" cellspacing="0" cellpadding="0" class="table table-striped table-bordered table-hover table-condensed">
+<table id="fm_browser" cellspacing="0" cellpadding="0" class="table table-bordered table-condensed">
 	<tbody>
 		<tr>
 			<?php

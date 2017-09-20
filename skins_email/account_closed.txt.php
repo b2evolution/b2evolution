@@ -37,7 +37,7 @@ else
 }
 echo "\n\n";
 
-echo T_('Login').": ".$params['login']."\n";
+echo /* TRANS: noun */ T_('Login').": ".$params['login']."\n";
 echo T_('Email').": ".$params['email']."\n";
 echo T_('Account close reason').": ".$params['reason'];
 echo "\n\n";

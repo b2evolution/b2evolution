@@ -140,9 +140,13 @@ class LinkItem extends LinkOwner
 				return 'teaser';
 			}
 		}
-		else
-		{ // If file is not image then always use "aftermore"
+		elseif( $File->is_video() || $File->is_audio() )
+		{	// If file is video or audio then always use "aftermore":
 			return 'aftermore';
+		}
+		else
+		{	// All other file types must use "attachment" position by default:
+			return 'attachment';
 		}
 	}
 
@@ -196,8 +200,8 @@ class LinkItem extends LinkOwner
 			$FileCache = & get_FileCache();
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
-			$file_dir = $File->dir_or_file();
-			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s',  ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
+			$file_dir = $File->dir_or_file( 'Directory', 'File' );
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', $file_dir, '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
 			if( ! $this->is_temp() && $update_owner )
 			{	// Update last touched date and content last updated date of the Item:

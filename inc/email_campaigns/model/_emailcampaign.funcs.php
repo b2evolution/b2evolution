@@ -40,17 +40,17 @@ function get_newsletter_users_numbers()
 		$numbers['all'] = count( $users_IDs );
 
 		// Get number of all active users
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get number of users for newsletter from UserList filterset' );
 		$SQL->SELECT( 'COUNT( * )' );
 		$SQL->FROM( 'T_users' );
 		$SQL->WHERE( 'user_ID IN ( '.implode( ', ', $users_IDs ).' )' );
 		$SQL->WHERE_and( 'user_status IN ( \'activated\', \'autoactivated\' )' );
-		$numbers['active'] = $DB->get_var( $SQL->get() );
+		$numbers['active'] = $DB->get_var( $SQL );
 
 		// Get number of all active users which accept newsletter email
 		$SQL = get_newsletter_users_sql( $users_IDs );
 		$SQL->SELECT( 'COUNT( * )' );
-		$numbers['newsletter'] = $DB->get_var( $SQL->get() );
+		$numbers['newsletter'] = $DB->get_var( $SQL );
 	}
 
 	return $numbers;
@@ -67,7 +67,7 @@ function get_newsletter_users_sql( $users_IDs )
 {
 	global $Settings;
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get active users which accept newsletter email' );
 	$SQL->SELECT( 'u.user_ID' );
 	$SQL->FROM( 'T_users u' );
 	$SQL->FROM_add( 'LEFT OUTER JOIN T_users__usersettings us ON u.user_ID = us.uset_user_ID' );

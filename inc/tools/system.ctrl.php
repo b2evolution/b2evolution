@@ -49,6 +49,7 @@ function init_system_check( $name, $value, $info = '' )
 	$syscheck_name = $name;
 	$syscheck_value = $value;
 	$syscheck_info = $info;
+	evo_flush();
 }
 
 function disp_system_check( $condition, $message = '' )
@@ -229,7 +230,7 @@ if( ! $system_stats['install_removed'] )
 	disp_system_check( 'warning', T_('For maximum security, it is recommended that you delete your /blogs/install/ folder once you are done with install or upgrade.') );
 
 	// Database reset allowed?
-	init_system_check( T_( 'Database reset' ), $allow_evodb_reset ?  T_('Allowed!') : T_('Forbidden') );
+	init_system_check( T_( 'Database reset' ), $allow_evodb_reset ?  T_('Allowed').'!' : T_('Forbidden') );
 	if( $allow_evodb_reset )
 	{
   	disp_system_check( 'error', '<p>'.T_('Currently, anyone who accesses your install folder could entirely reset your b2evolution database.')."</p>\n"
@@ -520,7 +521,7 @@ else
 		$forced_max_execution_time = system_check_max_execution_time();
 		init_system_check( 'PHP forced max_execution_time', sprintf( T_('%s seconds'), $forced_max_execution_time ) );
 		disp_system_check( 'ok', sprintf( T_('b2evolution was able to request more time (than the default %s seconds) to execute complex tasks.'), $max_execution_time ) );
-	}	
+	}
 	elseif( $max_execution_time <= 5 * 60 )
 	{
 		init_system_check( 'PHP max_execution_time', sprintf( T_('%s seconds'), $max_execution_time ) );
@@ -731,10 +732,19 @@ $api_title = 'XML-RPC';
 $api_file = 'xmlrpc.php';
 $api_url = $baseurl.$api_file;
 load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
-$url_data = parse_url( $api_url );
-$client = new xmlrpc_client( $api_file, $url_data['host'], ( isset( $url_data['port'] ) ? $url_data['port'] : '' ) );
-$message = new xmlrpcmsg( 'system.listMethods' );
-$result = $client->send( $message );
+if( defined( 'CANUSEXMLRPC' ) && CANUSEXMLRPC === true )
+{	// Try XML-RPC API only if current server can use it:
+	$client = new xmlrpc_client( $api_url );
+	$message = new xmlrpcmsg( 'system.listMethods' );
+	$result = $client->send( $message );
+	$api_error_type = T_('This API doesn\'t work properly on this server.');
+}
+else
+{	// Get an error message if current server cannot use XML-RPC client:
+	$result = false;
+	$xmlrpc_error_message = CANUSEXMLRPC;
+	$api_error_type = T_('This server cannot use XML-RPC client.');
+}
 if( $result && ! $result->faultCode() )
 {	// XML-RPC request is successful:
 	init_system_check( $api_title, 'OK', $api_url );
@@ -742,7 +752,10 @@ if( $result && ! $result->faultCode() )
 }
 else
 {	// Some error on XML-RPC request:
-	$xmlrpc_error_message = $result->faultString();
+	if( $result )
+	{	// Get an error message of XML-RPC request:
+		$xmlrpc_error_message = $result->faultString();
+	}
 	if( $xmlrpc_error_message == 'XML-RPC services are disabled on this system.' )
 	{	// Exception for this error:
 		$api_status_title = T_('Disabled');
@@ -754,7 +767,7 @@ else
 		$api_status_type = 'warning';
 	}
 	init_system_check( $api_title, $api_status_title, $api_url );
-	disp_system_check( $api_status_type, T_('This API doesn\'t work properly on this server.').' <b>'.sprintf( T_( 'Error: %s' ), $xmlrpc_error_message ).'</b>' );
+	disp_system_check( $api_status_type, $api_error_type.' <b>'.sprintf( T_( 'Error: %s' ), $xmlrpc_error_message ).'</b>' );
 }
 
 // AJAX anon_async.php:

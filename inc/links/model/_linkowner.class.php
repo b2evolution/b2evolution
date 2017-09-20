@@ -71,7 +71,7 @@ class LinkOwner
 	 * Abstract methods that needs to be overriden in every subclass
 	 *
 	 * function check_perm( $perm_name, $assert = false ); // check link owner object ( item, comment, ... ) edit/view permission
-	 * function get_positions(); // get all positions where link can be displayed ( 'teaser', 'aftermore' )
+	 * function get_positions( $file_ID = NULL ); // get all positions where link can be displayed ( 'teaser', 'aftermore' )
 	 * function get_edit_url(); // get link owner edit url
 	 * function get_view_url(); // get link owner view url
 	 * function load_Links(); // load link owner all links
@@ -259,7 +259,7 @@ class LinkOwner
 		}
 
 		// Set links query. Note: Use inner join to make sure that result contains only existing files!
-		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_cmt_ID, link_itm_ID, file_ID, file_creator_user_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
+		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_order, link_cmt_ID, link_itm_ID, file_ID, file_creator_user_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( $this->get_where_condition() );
 		$SQL->ORDER_BY( $order_by );
@@ -523,9 +523,9 @@ class LinkOwner
 		$SQL = new SQL( 'Get last order number of the Link Owner ( '.$this->type.', #'.$this->get_ID().' )' );
 		$SQL->SELECT( 'MAX( link_order )' );
 		$SQL->FROM( 'T_links' );
-		$SQL->WHERE( 'link_'.$this->ID_field_name.' = '.$this->get_ID() );
+		$SQL->WHERE( 'link_'.$this->get_ID_field_name().' = '.$this->get_ID() );
 
-		return intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
+		return intval( $DB->get_var( $SQL ) );
 	}
 }
 

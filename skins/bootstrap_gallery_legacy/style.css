@@ -283,7 +283,6 @@ div.log_container {
 html,
 body {
   width: auto !important;
-  overflow-x: hidden !important;
   margin: 0;
   padding: 0;
   height: 100%;

@@ -324,7 +324,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
  *     'suspicious3' - Suspicious 3
- *     'prmerror'    - Permament error
+ *     'prmerror'    - Permanent error
  *     'spammer'     - Spammer
  */
 function load_blocked_emails( $user_IDs, $blocked_statuses = array() )
@@ -373,7 +373,7 @@ function load_blocked_emails( $user_IDs, $blocked_statuses = array() )
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
  *     'suspicious3' - Suspicious 3
- *     'prmerror'    - Permament error
+ *     'prmerror'    - Permanent error
  *     'spammer'     - Spammer
  * @return boolean TRUE
  */
@@ -395,12 +395,12 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
 	if( !isset( $cache_mail_is_blocked_status[ $status_filter_name ][ $email ] ) )
 	{ // If we check status of this email first time - get it from DB and store in cache
 		global $DB;
-		$SQL = new SQL();
+		$SQL = new SQL( 'Check if email address is blocked' );
 		$SQL->SELECT( 'emadr_ID' );
 		$SQL->FROM( 'T_email__address' );
 		$SQL->WHERE( 'emadr_address = '.$DB->quote( utf8_strtolower( $email ) ) );
 		$SQL->WHERE_and( get_mail_blocked_condition( true, $blocked_statuses ) );
-		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (boolean) $DB->get_var( $SQL->get() );
+		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (boolean) $DB->get_var( $SQL );
 	}
 
 	// Get email block status from cache variable
@@ -418,7 +418,7 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
  *     'suspicious3' - Suspicious 3
- *     'prmerror'    - Permament error
+ *     'prmerror'    - Permanent error
  *     'spammer'     - Spammer
  * @return string the where condition
  */
@@ -437,7 +437,7 @@ function get_mail_blocked_condition( $is_blocked = true, $blocked_statuses = arr
 
 
 /**
- * Memorize the blocked emails in cache array in order to display the message 
+ * Memorize the blocked emails in cache array in order to display the message
  * @see blocked_emails_display()
  *
  * @param string Email address

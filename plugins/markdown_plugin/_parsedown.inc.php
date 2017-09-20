@@ -30,6 +30,7 @@ Modifications by yura:
 	10. Don't convert HTML entities inside <code> html tags because the "Escape code" plugin does this
 	11. Fix the missed empty lines in code blocks which are started and ended with ```
 	12. Ignore wrong URLs for links and images; Allow only which begin with http://, https:// or /
+	13. Format attributes of links and images to allowed values
 */
 
 class Parsedown
@@ -598,7 +599,9 @@ class Parsedown
 						{
 							if( $this->parse_images )
 							{ // Parse images only if it is enabled
-								$element = '<img src="'.$matches[4].$matches[5].'" alt="'.$matches[3].'"'.( ! empty( $matches[7] ) ? ' title="'.$matches[7].'"' : '' ).'>';
+								$element = '<img src="'.format_to_output( $matches[4].$matches[5], 'htmlattr' ).'"'
+									.' alt="'.format_to_output( $matches[3], 'htmlattr' ).'"'
+									.( ! empty( $matches[7] ) ? ' title="'.format_to_output( $matches[7], 'htmlattr' ).'"' : '' ).'>';
 							}
 						}
 						else
@@ -606,7 +609,10 @@ class Parsedown
 							if( $this->parse_links )
 							{ // Parse links only if it is enabled
 								$element_text = $this->parse_inline_elements($matches[3]);
-								$element = '<a href="'.$matches[4].$matches[5].'"'.( ! empty( $matches[7] ) ? ' title="'.$matches[7].'"' : '' ).'>'.$element_text.'</a>';
+								$element = '<a href="'.format_to_output( $matches[4].$matches[5], 'htmlattr' ).'"'
+										.( ! empty( $matches[7] ) ? ' title="'.format_to_output( $matches[7], 'htmlattr' ).'"' : '' ).'>'
+										.format_to_output( $element_text, 'htmlbody' )
+									.'</a>';
 							}
 						}
 
@@ -651,7 +657,7 @@ class Parsedown
 						{
 							if( $this->parse_images )
 							{ // Parse images only if it is enabled
-								$element = '<img alt="'.$matches[2].'" src="'.$url.'">';
+								$element = '<img alt="'.format_to_output( $matches[2], 'htmlattr' ).'" src="'.format_to_output( $url, 'htmlattr' ).'">';
 							}
 						}
 						else # anchor
@@ -659,7 +665,7 @@ class Parsedown
 							if( $this->parse_links )
 							{ // Parse links only if it is enabled
 								$element_text = $this->parse_inline_elements($matches[2]);
-								$element = '<a href="'.$url.'">'.$element_text.'</a>';
+								$element = '<a href="'.format_to_output( $url, 'htmlattr' ).'">'.format_to_output( $element_text, 'htmlbody' ).'</a>';
 							}
 						}
 

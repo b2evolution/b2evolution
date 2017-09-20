@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_comment_list_Widget extends ComponentWidget
 {
+	var $icon = 'comments-o';
+
 	/**
 	 * Constructor
 	 */
@@ -229,7 +231,10 @@ class coll_comment_list_Widget extends ComponentWidget
 				if( $this->disp_params['comment_excerpt'] )
 				{
 					echo $this->disp_params['comment_excerpt_before'];
-					echo excerpt_words( $Comment->get_content(), $this->disp_params['max_words'] );
+					echo excerpt_words( $Comment->get_content(), $this->disp_params['max_words'], array(
+							'cutting_mark'   => '',
+							'continued_link' => $Comment->get_permanent_url(),
+						) );
 					echo $this->disp_params['comment_excerpt_after'];
 				}
 				echo $this->disp_params[ 'item_end' ];

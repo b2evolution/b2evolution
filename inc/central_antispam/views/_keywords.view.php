@@ -65,7 +65,8 @@ $Results = new Results( $SQL->get(), 'cakw_', '---D', $UserSettings->get( 'resul
 
 $Results->title = T_('Keywords');
 
-$Results->global_icon( T_('Import from local antispam list...'), 'new', regenerate_url( 'action', 'action=import' ), T_('Import from local antispam list...'), 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+$Results->global_icon( T_('Add keyword'), 'new', regenerate_url( 'action', 'action=keyword_new' ), T_('Add keyword'), 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+$Results->global_icon( T_('Import from local antispam list...'), 'new', regenerate_url( 'action', 'action=import' ), T_('Import from local antispam list...'), 3, 4, array( 'class' => 'action_icon btn-default' ) );
 
 
 /**
@@ -104,7 +105,7 @@ $Results->cols[] = array(
 		'th' => T_('Status'),
 		'order' => 'cakw_status',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'cakeyword_status_edit',
+		'td_class' => 'jeditable_cell cakeyword_status_edit',
 		'td' =>  /* Check permission: */$current_User->check_perm( 'centralantispam', 'edit' ) ?
 			/* Current user can edit keyword */'<a href="#" rel="$cakw_status$" style="color:#FFF">%ca_get_keyword_status_title( #cakw_status# )%</a>' :
 			/* No edit, only view the status */'%ca_get_keyword_status_title( #cakw_status# )%',

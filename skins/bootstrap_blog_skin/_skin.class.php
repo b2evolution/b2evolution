@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.0';
+	var $version = '6.9.4';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -45,7 +45,7 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -135,18 +135,45 @@ class bootstrap_blog_Skin extends Skin
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
-					'font_size' => array(
-						'label' => T_('Font size'),
-						'note' => T_('Select content font size.'),
-						'defaultvalue' => 'default',
-						'options' => array(
-								'default'        => T_('Default (14px)'),
-								'standard'       => T_('Standard (16px)'),
-								'medium'         => T_('Medium (18px)'),
-								'large'          => T_('Large (20px)'),
-								'very_large'     => T_('Very large (22px)'),
+
+					'font' => array(
+						'label' => T_('Default font'),
+						'type'  => 'input_group',
+						'inputs' => array(
+							'_family' => array(
+								'defaultvalue' => 'system_helveticaneue',
+								'options'      => $this->get_font_definitions(),
+								'type'         => 'select'
 							),
-						'type' => 'select',
+							'_size' => array(
+								'label' => T_('Size'),
+								'defaultvalue' => 'default',
+								'options'      => array(
+									'default'        => T_('Default (14px)'),
+									'standard'       => T_('Standard (16px)'),
+									'medium'         => T_('Medium (18px)'),
+									'large'          => T_('Large (20px)'),
+									'very_large'     => T_('Very large (22px)'),
+								),
+								'type' => 'select'
+							),
+							'_weight' => array(
+								'label' => T_('Weight'),
+								'defaultvalue' => '400',
+								'options' => array(
+										'100' => '100',
+										'200' => '200',
+										'300' => '300',
+										'400' => '400 ('.T_('Normal').')',
+										'500' => '500',
+										'600' => '600',
+										'700' => '700 ('.T_('Bold').')',
+										'800' => '800',
+										'900' => '900',
+									),
+								'type' => 'select',
+							)
+						)
 					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
@@ -374,11 +401,11 @@ class bootstrap_blog_Skin extends Skin
 
 		if( $color = $this->get_setting( 'page_bg_color' ) )
 		{ // Custom page background color:
-			$custom_css .= 'body { background-color: '.$color." }\n";
+			$custom_css .= '#skin_wrapper { background-color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'page_text_color' ) )
 		{ // Custom page text color:
-			$custom_css .= 'body { color: '.$color." }\n";
+			$custom_css .= '#skin_wrapper { color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'page_link_color' ) )
 		{ // Custom page link color:
@@ -400,11 +427,11 @@ class bootstrap_blog_Skin extends Skin
 		}
 		if( $color = $this->get_setting( 'bgimg_link_color' ) )
 		{	// Custom link color on background image:
-			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
+			$custom_css .= '.evo_hasbgimg a:not(.btn) { color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
 		{	// Custom link hover color on background image:
-			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
+			$custom_css .= '.evo_hasbgimg a:not(.btn):hover { color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'current_tab_text_color' ) )
 		{ // Custom current tab text color:
@@ -505,6 +532,9 @@ class bootstrap_blog_Skin extends Skin
 			}
 		}
 
+		// Font family customization
+		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight' );
+
 		if( ! empty( $custom_css ) )
 		{	// Function for custom_css:
 			$custom_css = '<style type="text/css">
@@ -514,28 +544,6 @@ class bootstrap_blog_Skin extends Skin
 		</style>';
 			add_headline( $custom_css );
 		}
-	}
-
-
-	/**
-	 * Check if we can display a widget container when access is denied to collection by current user
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function show_container_when_access_denied( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
 

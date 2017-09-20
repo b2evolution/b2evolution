@@ -13,8 +13,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $comment_template_counter;
-
 // Default params:
 $params = array_merge( array(
 		'comment_start'         => '<article class="evo_comment panel panel-default">',
@@ -43,11 +41,6 @@ $params = array_merge( array(
 		'Comment'               => NULL, // This object MUST be passed as a param!
 	), $params );
 
-if( ! isset( $comment_template_counter ) )
-{	// Initialize global comment counter:
-	$comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
-}
-
 /**
  * @var Comment
  */
@@ -64,7 +57,7 @@ echo $params['comment_start'];
 if( $params['comment_post_display'] )
 {
 	echo $params['comment_post_before'];
-	echo T_('In response to:').' ';
+	echo T_('In response to').': ';
 	$Comment->Item->title( array(
 			'link_type' => 'permalink',
 		) );
@@ -79,7 +72,7 @@ switch( $Comment->get( 'type' ) )
 	case 'meta': // Display a meta comment:
 		if( $Comment->is_meta() )
 		{	// Meta comment:
-			echo '<span class="badge badge-info">'.( $comment_template_counter < 0 ? 0 : $comment_template_counter ).'</span> ';
+			echo '<span class="badge badge-info">'.$Comment->get_inlist_order().'</span> ';
 		}
 
 		if( empty($Comment->ID) )
@@ -176,7 +169,4 @@ $Comment->vote_helpful( '', '', '&amp;', true, true );
 echo $params['comment_info_after'];
 
 echo $params['comment_end'];
-
-// Decrease a counter for meta comments:
-$comment_template_counter--;
 ?>

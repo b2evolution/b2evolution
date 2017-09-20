@@ -72,27 +72,21 @@ function evo_link_change_position( selectInput, url, crumb )
 	jQuery.get( url + 'anon_async.php?action=set_object_link_position&link_ID=' + link_ID + '&link_position=' + new_position + '&crumb_link=' + crumb, {
 	}, function(r, status) {
 		r = ajax_debug_clear( r );
-		var select_inputs = jQuery( 'select[data-link-id=' + link_ID + ']' );
 		if( r == "OK" ) {
-			var select_cols = select_inputs.closest( 'td' );
-			jQuery.each( select_cols, function( i, col ) {
-				evoFadeSuccess( jQuery( 'col' ).parent() );
-				jQuery( col ).removeClass( 'error' );
-				if( new_position == 'cover' )
-				{
-					jQuery( 'select.link_position_select[data-link-id!=' + link_ID + '] option[value=cover]:selected' ).each( function() {
-						var thisOption = jQuery( this );
-						thisOption.parent().val( 'aftermore' );
-						evoFadeSuccess( thisOption.closest( 'tr' ) );
-					} );
-				}
-			});
+			evoFadeSuccess( jQuery(oThis).closest('tr') );
+			jQuery(oThis).closest('td').removeClass('error');
+			if( new_position == 'cover' )
+			{ // Position "Cover" can be used only by one link
+				jQuery( 'select[name=link_position][id!=' + selectInput.id + '] option[value=cover]:selected' ).each( function()
+				{ // Replace previous position with "Inline"
+					jQuery( this ).parent().val( 'aftermore' );
+					evoFadeSuccess( jQuery( this ).closest('tr') );
+				} );
+			}
 		} else {
-			jQuery.each( select_inputs, function( i, select_input ) {
-				jQuery( select_input ).val( r );
-				evoFadeFailure( select_input.closest( 'tr' ) );
-				jQuery( select_input.form ).closest( 'td' ).addClass( 'error' );
-			} );
+			jQuery(oThis).val(r);
+			evoFadeFailure( jQuery(oThis).closest('tr') );
+			jQuery(oThis.form).closest('td').addClass('error');
 		}
 	} );
 	return false;
@@ -104,10 +98,11 @@ function evo_link_change_position( selectInput, url, crumb )
  *
  * @param string Type: 'image', 'file', 'video'
  * @param integer File ID
- * @param string Options text
+ * @param string Caption text
  */
-function evo_link_insert_inline( type, link_ID, options, replace )
+function evo_link_insert_inline( type, link_ID, option, replace )
 {
+	console.log( 'Insert link' );
 	if( replace == undefined )
 	{
 		replace = 0;
@@ -117,15 +112,14 @@ function evo_link_insert_inline( type, link_ID, options, replace )
 	{ // Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
 
-		if( options.length )
+		if( option.length )
 		{
-			insert_tag += ':' + options;
+			insert_tag += ':' + option;
 		}
 
 		insert_tag += ']';
 
-		// Change the position to inline first before inserting so that the image|thumbnail|inline will be rendered
-		var $position_selector = jQuery( 'select.link_position_select[data-link-id=' + link_ID + ']' );
+		var $position_selector = jQuery( '#display_position_' + link_ID );
 		if( $position_selector.length != 0 )
 		{ // Change the position to 'Inline'
 			if( $position_selector.val() != 'inline' )
@@ -170,10 +164,7 @@ function evo_link_delete( event_object, type, link_ID, action )
 		}
 
 		// Remove attachment row from table:
-		var rows = jQuery( 'a[data-link-id=' + link_ID + ']' ).closest( 'tr' );
-		jQuery.each( rows, function( i, row ) {
-			jQuery( row ).remove();
-		} );
+		jQuery( event_object ).closest( 'tr' ).remove();
 
 		// Update the attachment block height after deleting row:
 		evo_link_fix_wrapper_height();
@@ -198,19 +189,31 @@ function evo_link_change_order( event_object, link_ID, action )
 	function( data )
 	{
 		// Change an order in the attachments table
-		var rows = jQuery( 'a[data-link-id=' + link_ID + ']' ).closest( 'tr' );
-		jQuery.each( rows, function( i, row ) {
-			var row = jQuery( row );
-			if( action == 'move_up' )
-			{	// Move up:
-				row.prev().before( row );
-			}
-			else
-			{	// Move down:
-				row.next().after( row );
-			}
-			evoFadeSuccess( row );
-		} );
+		var row = jQuery( event_object ).closest( 'tr' );
+		var currentEl = row.find( 'span[data-order]' );
+		if( action == 'move_up' )
+		{	// Move up:
+			var currentOrder = currentEl.attr( 'data-order' );
+			var previousRow = jQuery( row.prev() );
+			var previousEl = previousRow.find( 'span[data-order]' );
+			var previousOrder = previousEl.attr( 'data-order' );
+
+			row.prev().before( row );
+			currentEl.attr( 'data-order', previousOrder );
+			previousEl.attr( 'data-order', currentOrder );
+		}
+		else
+		{	// Move down:
+			var currentOrder = currentEl.attr( 'data-order' );
+			var nextRow = jQuery( row.next() );
+			var nextEl = nextRow.find( 'span[data-order]' );
+			var nextOrder = nextEl.attr( 'data-order' );
+
+			row.next().after( row );
+			currentEl.attr( 'data-order', nextOrder );
+			nextEl.attr( 'data-order', currentOrder );
+		}
+		evoFadeSuccess( row );
 	},
 	'POST' );
 
@@ -315,4 +318,45 @@ function evo_link_refresh_list( type, object_ID, action )
 	}
 
 	return false;
+}
+
+/**
+ * Sort list of Item/Comment attachments based on link_order
+ */
+function evo_link_sort_list()
+{
+	var rows = jQuery( 'tr', 'tbody#filelist_tbody' );
+	rows.sort( function( a, b )	{
+		var A = parseInt( jQuery( 'span[data-order]', a ).attr( 'data-order' ) );
+		var B = parseInt( jQuery( 'span[data-order]', b ).attr( 'data-order' ) );
+
+		if( ! A ) A = rows.length;
+		if( ! B ) B = rows.length;
+
+		if( A < B )
+		{
+			return -1;
+		}
+
+		if( B < A )
+		{
+			return 1;
+		}
+
+		return 0;
+	} );
+
+	var previousRow;
+	$.each( rows, function( index, row ) {
+		if( index === 0 )
+		{
+			jQuery( row ).prependTo( 'tbody#filelist_tbody' );
+			previousRow = row;
+		}
+		else
+		{
+			jQuery( row ).insertAfter( previousRow );
+			previousRow = row;
+		}
+	} );
 }

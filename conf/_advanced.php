@@ -828,6 +828,14 @@ $failed_logins_lockout = 600; // 10 minutes
 
 
 /**
+ * Deny registering new accounts with these reserved logins;
+ * Also deny changing user logins to one of these;
+ * Only admins with permission to create new users can use these:
+ */
+$reserved_logins = array( 'admin', 'admins', 'administrator', 'administrators', 'moderator', 'moderators', 'webmaster', 'postmaster', 'mailer', 'mail', 'support', 'owner', 'sysop', 'root', 'system', 'web', 'site', 'website', 'server' );
+
+
+/**
  * Most of the time, the best security practice is to NOT allow redirects from your current site to another domain.
  * That is, unless you specifically configured a redirected post.
  * If this doesn't work for you, you can change this security policy here.
@@ -871,9 +879,9 @@ $library_cdn_urls = array(
 		// jqueryUI is commented out because b2evo uses only a subset... ?
 		//'#jqueryUI#' => array( '//code.jquery.com/ui/1.10.4/jquery-ui.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js' ),
 		//'#jqueryUI_css#' => array( '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css' ),
-		'#bootstrap#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.js' ),
-		'#bootstrap_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.css' ),
-		'#bootstrap_theme_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.css' ),
+		'#bootstrap#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.js' ),
+		'#bootstrap_css#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css' ),
+		'#bootstrap_theme_css#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.css' ),
 		// The following are other possible public shared CDNs we are aware of
 		// but it is not clear whether or not they are:
 		// - Future proof (will they continue to serve old versions of the library in the future?)
@@ -882,16 +890,16 @@ $library_cdn_urls = array(
 		//'#easypiechart#' => array( '//cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.1/jquery.easypiechart.min.js', '//cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.1/jquery.easypiechart.js' ),
 		//'#scrollto#' => array( '//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/1.4.2/jquery.scrollTo.min.js' ),
 		//'#touchswipe#' => array( '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.min.js', '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.js' ),
-		/*'#jqplot#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.js' ),
-			'#jqplot_barRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.barRenderer.min.js' ),
-			'#jqplot_canvasAxisTickRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasAxisTickRenderer.min.js' ),
-			'#jqplot_canvasTextRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasTextRenderer.min.js' ),
-			'#jqplot_categoryAxisRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.categoryAxisRenderer.min.js' ),
-			'#jqplot_enhancedLegendRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.enhancedLegendRenderer.min.js' ),
-			'#jqplot_highlighter#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.highlighter.min.js' ),
-			'#jqplot_canvasOverlay#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasOverlay.min.js' ),
-			'#jqplot_donutRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.donutRenderer.min.js' ),
-			'#jqplot_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.css' ),*/
+		/*'#jqplot#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.js' ),
+			'#jqplot_barRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.barRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.barRenderer.js' ),
+			'#jqplot_canvasAxisTickRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasAxisTickRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasAxisTickRenderer.js' ),
+			'#jqplot_canvasTextRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasTextRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasTextRenderer.js' ),
+			'#jqplot_categoryAxisRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.categoryAxisRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.categoryAxisRenderer.js' ),
+			'#jqplot_enhancedLegendRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.enhancedLegendRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.enhancedLegendRenderer.js' ),
+			'#jqplot_highlighter#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.highlighter.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.highlighter.js' ),
+			'#jqplot_canvasOverlay#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasOverlay.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasOverlay.js' ),
+			'#jqplot_donutRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.donutRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.donutRenderer.js' ),
+			'#jqplot_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.css' ),*/
 		//'#tinymce#' => array( '//cdn.tinymce.com/4/tinymce.min.js' ),
 		//'#tinymce_jquery#' => array( '//cdn.tinymce.com/4/jquery.tinymce.min.js' ),
 		//'#flowplayer#' => array( '//releases.flowplayer.org/5.4.4/flowplayer.min.js', '//releases.flowplayer.org/5.4.4/flowplayer.js' ),
@@ -899,7 +907,7 @@ $library_cdn_urls = array(
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
 		//'#videojs#' => array( 'http://vjs.zencdn.net/4.2.0/video.js' ),
 		//'#videojs_css#' => array( 'http://vjs.zencdn.net/4.2.0/video-js.css' ),
-		'#fontawesome#' => array('//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css', '//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css'),
+		'#fontawesome#' => array( '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' ),
 	);
 
 /**
@@ -922,15 +930,15 @@ $library_local_urls = array(
 		'#easypiechart#' => array( 'jquery/jquery.easy-pie-chart.min.js', 'jquery/jquery.easy-pie-chart.js' ),
 		'#scrollto#' => array( 'jquery/jquery.scrollto.min.js', 'jquery/jquery.scrollto.js' ),
 		'#touchswipe#' => array( 'jquery/jquery.touchswipe.min.js', 'jquery/jquery.touchswipe.js' ),
-		'#jqplot#' => array( 'jquery/jqplot/jquery.jqplot.min.js' ),
-		'#jqplot_barRenderer#' => array( 'jquery/jqplot/jqplot.barRenderer.min.js' ),
-		'#jqplot_canvasAxisTickRenderer#' => array( 'jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js' ),
-		'#jqplot_canvasTextRenderer#' => array( 'jquery/jqplot/jqplot.canvasTextRenderer.min.js' ),
-		'#jqplot_categoryAxisRenderer#' => array( 'jquery/jqplot/jqplot.categoryAxisRenderer.min.js' ),
-		'#jqplot_enhancedLegendRenderer#' => array( 'jquery/jqplot/jqplot.enhancedLegendRenderer.min.js' ),
-		'#jqplot_highlighter#' => array( 'jquery/jqplot/jqplot.highlighter.min.js' ),
-		'#jqplot_canvasOverlay#' => array( 'jquery/jqplot/jqplot.canvasOverlay.min.js' ),
-		'#jqplot_donutRenderer#' => array( 'jquery/jqplot/jqplot.donutRenderer.min.js' ),
+		'#jqplot#' => array( 'jquery/jqplot/jquery.jqplot.min.js', 'jquery/jqplot/jquery.jqplot.js' ),
+		'#jqplot_barRenderer#' => array( 'jquery/jqplot/jqplot.barRenderer.min.js', 'jquery/jqplot/jqplot.barRenderer.js' ),
+		'#jqplot_canvasAxisTickRenderer#' => array( 'jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js', 'jquery/jqplot/jqplot.canvasAxisTickRenderer.js' ),
+		'#jqplot_canvasTextRenderer#' => array( 'jquery/jqplot/jqplot.canvasTextRenderer.min.js', 'jquery/jqplot/jqplot.canvasTextRenderer.js' ),
+		'#jqplot_categoryAxisRenderer#' => array( 'jquery/jqplot/jqplot.categoryAxisRenderer.min.js', 'jquery/jqplot/jqplot.categoryAxisRenderer.js' ),
+		'#jqplot_enhancedLegendRenderer#' => array( 'jquery/jqplot/jqplot.enhancedLegendRenderer.min.js', 'jquery/jqplot/jqplot.enhancedLegendRenderer.js' ),
+		'#jqplot_highlighter#' => array( 'jquery/jqplot/jqplot.highlighter.min.js', 'jquery/jqplot/jqplot.highlighter.js' ),
+		'#jqplot_canvasOverlay#' => array( 'jquery/jqplot/jqplot.canvasOverlay.min.js', 'jquery/jqplot/jqplot.canvasOverlay.js' ),
+		'#jqplot_donutRenderer#' => array( 'jquery/jqplot/jqplot.donutRenderer.min.js', 'jquery/jqplot/jqplot.donutRenderer.js' ),
 		'#jqplot_css#' => array( 'jquery/jquery.jqplot.min.css', 'jquery/jquery.jqplot.css' ),
 		'#tinymce#' => array( 'tiny_mce/tinymce.min.js' ),
 		'#tinymce_jquery#' => array( 'tiny_mce/jquery.tinymce.min.js' ),
@@ -941,7 +949,7 @@ $library_local_urls = array(
 		'#videojs_css#' => array( 'videojs/video-js.min.css', 'videojs/video-js.css' ),
 		'#jcrop#' => array( 'jquery/jquery.jcrop.min.js', 'jquery/jquery.jcrop.js' ),
 		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
-		'#fontawesome#' => array('font-awesome.min.css', 'font-awesome.min.css'),
+		'#fontawesome#' => array( 'font-awesome.min.css', 'font-awesome.css' ),
 		'#shortcodes#' => array( 'shortcodes.js' ),
 		'#evo_view#' => array( 'evo_view.js' ),
 	);
@@ -973,10 +981,12 @@ $check_browser_version = false;
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
+$evonetsrv_protocol = 'http';
 $evonetsrv_host = 'rpc.b2evo.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 
+$antispamsrv_protocol = 'http';
 $antispamsrv_host = 'antispam.b2evo.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';

@@ -43,7 +43,7 @@ if( isset( $GLOBALS['files_Module'] ) )
 	$Form->end_line();
 }
 
-$Form->checkbox( 'userdir_login', $edited_Blog->get_setting( 'userdir_login' ), T_('Login') );
+$Form->checkbox( 'userdir_login', $edited_Blog->get_setting( 'userdir_login' ), /* TRANS: noun */ T_('Login') );
 $Form->checkbox( 'userdir_firstname', $edited_Blog->get_setting( 'userdir_firstname' ), T_('First name') );
 $Form->checkbox( 'userdir_lastname', $edited_Blog->get_setting( 'userdir_lastname' ), T_('Last name') );
 $Form->checkbox( 'userdir_nickname', $edited_Blog->get_setting( 'userdir_nickname' ), T_('Nickname') );

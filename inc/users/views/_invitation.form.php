@@ -33,7 +33,7 @@ if( ! $creating )
 {
 	$Form->global_icon( T_('Delete this invitation code!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('invitation') ) );
 }
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', ( $creating ? T_('New invitation code') : T_('Invitation code') ).get_manual_link( 'invitation-code-form' ) );
 

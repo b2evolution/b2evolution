@@ -34,6 +34,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class page_404_not_found_Widget extends ComponentWidget
 {
+	var $icon = 'question-circle-o';
+
 	/**
 	 * Constructor
 	 */

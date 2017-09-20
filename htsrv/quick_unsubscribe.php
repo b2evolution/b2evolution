@@ -51,9 +51,44 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 				}
 				else
 				{
+					$BlogCache = & get_BlogCache();
+					$Blog = $BlogCache->get_by_ID( $coll_ID );
+
 					$subscription_name = ( ( $type == 'coll_comment' ) ? 'sub_comments' : 'sub_items' );
-					$DB->query( 'UPDATE T_subscriptions SET '.$subscription_name.' = 0
+
+					// Get previous setting
+					$sub_values = $DB->get_row( 'SELECT sub_items, sub_comments FROM T_subscriptions WHERE sub_coll_ID = '.$coll_ID.' AND sub_user_ID = '.$user_ID, ARRAY_A );
+
+					$Blog = & $BlogCache->get_by_ID( $coll_ID );
+
+					if( $Blog->get( 'advanced_perms' )
+							&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) || ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
+							&& $edited_User->check_perm( 'blog_ismember', 'view', true, $coll_ID ) )
+					{ // opt-out collection
+						if( $subscription_name == 'sub_items' )
+						{
+							$sub_items_value = 0;
+							$sub_comments_value = empty( $sub_values ) ? 1 : $sub_values['sub_comments'];
+						}
+						elseif( $subscription_name == 'sub_comments' )
+						{
+							$sub_items_value = empty( $sub_values ) ? 1 : $sub_values['sub_items'];
+							$sub_comments_value = 0;
+						}
+						else
+						{
+							$sub_items_value = 0;
+							$sub_comments_value = 0;
+						}
+
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+								VALUES ( '.$coll_ID.', '.$user_ID.', '.$sub_items_value.', '.$sub_comments_value.' )' );
+					}
+					else
+					{
+						$DB->query( 'UPDATE T_subscriptions SET '.$subscription_name.' = 0
 									WHERE sub_user_ID = '.$user_ID.' AND sub_coll_ID = '.$coll_ID );
+					}
 				}
 				break;
 
@@ -65,8 +100,25 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 				}
 				else
 				{
-					$DB->query( 'DELETE FROM T_items__subscriptions
-									WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$post_ID );
+					$ItemCache = & get_ItemCache();
+					$BlogCache = & get_BlogCache();
+					$Item = $ItemCache->get_by_ID( $post_ID );
+					$blog_ID = $Item->get_blog_ID();
+					$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+					if( $Blog->get( 'advanced_perms' )
+							&& $Blog->get_setting( 'allow_item_subscriptions' )
+							&& $Blog->get_setting( 'opt_out_item_subscription' )
+							&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+					{
+						$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+								VALUES ( '.$post_ID.', '.$user_ID.', 0 )' );
+					}
+					else
+					{
+						$DB->query( 'DELETE FROM T_items__subscriptions
+								WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$post_ID );
+					}
 				}
 				break;
 

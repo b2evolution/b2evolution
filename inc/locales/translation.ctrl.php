@@ -37,7 +37,7 @@ global $locales, $io_charset, $evo_charset;
 if( $locales[$edit_locale]['charset'] == 'utf-8' && $io_charset != 'utf-8' )
 {
 	// Set encoding for MySQL connection
-	$DB->set_connection_charset( $locales[$edit_locale]['charset'] );
+	$DB->connection_charset = $locales[$edit_locale]['charset'];
 	// Set charset for html format
 	$io_charset = $locales[$edit_locale]['charset'];
 	$evo_charset = $locales[$edit_locale]['charset'];
@@ -70,22 +70,22 @@ switch( $action )
 	case 'new':
 		param( 'iost_ID', 'integer', 0, true );
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get original string' );
 		$SQL->SELECT( '*, "'.$edit_locale.'" AS itst_locale, "" AS itst_standard' );
 		$SQL->FROM( 'T_i18n_original_string' );
 		$SQL->WHERE( 'iost_ID = '.$DB->quote( $iost_ID ) );
-		$edited_String = $DB->get_row( $SQL->get() );
+		$edited_String = $DB->get_row( $SQL );
 		break;
 
 	case 'edit':
 		param( 'itst_ID', 'integer', 0, true );
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get translated string' );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_i18n_translated_string' );
 		$SQL->FROM_add( 'LEFT JOIN T_i18n_original_string ON iost_ID = itst_iost_ID' );
 		$SQL->WHERE( 'itst_ID = '.$DB->quote( $itst_ID ) );
-		$edited_String = $DB->get_row( $SQL->get() );
+		$edited_String = $DB->get_row( $SQL );
 		break;
 
 	case 'update':

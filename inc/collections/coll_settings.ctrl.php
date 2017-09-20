@@ -73,17 +73,8 @@ else
 
 	memorize_param( 'blog', 'integer', -1 );	// Needed when generating static page for example
 
+	param( 'skin_type', 'string', 'normal' );
 	param( 'skinpage', 'string', '' );
-	if( $tab == 'skin' && $skinpage != 'selection' )	// If not screen selection => screen settings
-	{
-		$SkinCache = & get_SkinCache();
-		/**
-		* @var Skin
-		*/
-		$normal_Skin = & $SkinCache->get_by_ID( $Blog->get_setting( 'normal_skin_ID' ) );
-		$mobile_Skin = & $SkinCache->get_by_ID( $Blog->get_setting( 'mobile_skin_ID' ) );
-		$tablet_Skin = & $SkinCache->get_by_ID( $Blog->get_setting( 'tablet_skin_ID' ) );
-	}
 
 	if( ( $tab == 'perm' || $tab == 'permgroup' )
 		&& ( empty($blog) || ! $Blog->advanced_perms ) )
@@ -172,7 +163,7 @@ switch( $action )
 
 			case 'skin':
 				if( $skinpage == 'selection' )
-				{
+				{	// Set new skin for the collection:
 					if( $edited_Blog->load_from_Request( array() ) )
 					{ // Commit update to the DB:
 						$edited_Blog->dbupdate();
@@ -185,25 +176,39 @@ switch( $action )
 							header_redirect( $edited_Blog->gen_blogurl() );
 						}
 						else
-						{	// Redirect to admin skins page if we change the skin for another device type
-							header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID );
+						{	// Redirect to admin skins page if we change the skin for another device type:
+							$skin_type = ( get_param( 'mobile_skin_ID' ) !== NULL ? 'mobile' : ( get_param( 'tablet_skin_ID' ) !== NULL ? 'tablet' : 'normal' ) );
+							header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&skin_type='.$skin_type );
 						}
 					}
 				}
 				else
-				{ // Update params/Settings
-					$normal_Skin->load_params_from_Request();
-					$mobile_Skin->load_params_from_Request();
-					$tablet_Skin->load_params_from_Request();
+				{	// Update skin params/settings of the collection:
+					if( ! in_array( $skin_type, array( 'normal', 'mobile', 'tablet' ) ) )
+					{
+						debug_die( 'Wrong skin type: '.$skin_type );
+					}
+
+					$SkinCache = & get_SkinCache();
+
+					// Get skin by selected type:
+					$skin_ID = $Blog->get_setting( $skin_type.'_skin_ID', ( $skin_type != 'normal' ) );
+					$edited_Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
+
+					if( ! $edited_Skin )
+					{	// Redirect to don't try update empty skin params:
+						header_redirect( $update_redirect_url.'&skin_type='.$skin_type, 303 ); // Will EXIT
+					}
+
+					// Load skin params from request:
+					$edited_Skin->load_params_from_Request();
 
 					if(	! param_errors_detected() )
 					{	// Update settings:
-						$normal_Skin->dbupdate_settings();
-						$mobile_Skin->dbupdate_settings();
-						$tablet_Skin->dbupdate_settings();
+						$edited_Skin->dbupdate_settings();
 						$Messages->add( T_('Skin settings have been updated'), 'success' );
 						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( $update_redirect_url, 303 ); // Will EXIT
+						header_redirect( $update_redirect_url.'&skin_type='.$skin_type, 303 ); // Will EXIT
 					}
 				}
 				break;
@@ -247,7 +252,7 @@ switch( $action )
 				if(	! param_errors_detected() )
 				{	// Update settings:
 					$Blog->dbupdate();
-					$Messages->add( T_('Plugin settings have been updated'), 'success' );
+					$Messages->add( T_('Plugin settings have been updated').'.', 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
@@ -529,7 +534,12 @@ if( $action == 'dashboard' )
 		echo '<div class="first_payload_block">'."\n";
 
 		$AdminUI->disp_payload_begin();
-		echo '<h2 class="page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).'</h2>';
+		echo '<div class="row">';
+			echo '<div class="col-xs-12 col-sm-2 col-sm-push-10 text-right">';
+			echo action_icon( TS_('View in Front-Office'), '', $Blog->get( 'url' ), T_('View in Front-Office'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
+			echo '</div>';
+			echo '<h2 class="col-xs-12 col-sm-10 col-sm-pull-2 page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).' <span class="text-muted" style="font-size: 0.6em;">('./* TRANS: abbr. for "Collection" */ T_('Collection').' #'.$Blog->ID.')</span>'.'</h2>';
+		echo '</div>';
 		load_funcs( 'collections/model/_blog_js.funcs.php' );
 		echo '<div class="row browse">';
 
@@ -603,7 +613,7 @@ if( $action == 'dashboard' )
 				$opentrash_link = get_opentrash_link( true, false, array(
 						'class' => 'btn btn-default'
 					) );
-				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \'dashboard\' ); return false;', 'class' => 'btn btn-default' ) ).'</span> ';
+				$refresh_link = '<span class="pull-right panel_heading_action_icons">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \'dashboard\' ); return false;', 'class' => 'btn btn-default btn-sm' ) ).'</span> ';
 
 				$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
 				$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
@@ -747,7 +757,7 @@ if( $action == 'dashboard' )
 			echo '<!-- Start of Recently Edited Post Block-->';
 			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 			{	// We have permission to add a post with at least one status:
-				$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+				$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary btn-sm' ) );
 			}
 			echo '<div class="items_container evo_content_block">';
 
@@ -776,7 +786,7 @@ if( $action == 'dashboard' )
 				$Item->edit_link( array( // Link to backoffice for editing
 						'before'    => ' ',
 						'after'     => ' ',
-						'class'     => 'ActionButton btn btn-primary w80px',
+						'class'     => 'ActionButton btn btn-primary btn-sm w80px',
 						'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 					) );
 
@@ -999,7 +1009,7 @@ else
 			break;
 
 		case 'skin':
-			$AdminUI->set_path( 'collections', 'skin', 'current_skin' );
+			$AdminUI->set_path( 'collections', 'skin', 'skin_'.$skin_type );
 			$AdminUI->breadcrumbpath_add( T_('Skin'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			if( $skinpage == 'selection' )
 			{
@@ -1008,7 +1018,7 @@ else
 			else
 			{
 				init_colorpicker_js();
-				$AdminUI->breadcrumbpath_add( T_('Skins for this blog'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+				$AdminUI->breadcrumbpath_add( T_('Default'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			}
 			$AdminUI->set_page_manual_link( 'skins-for-this-blog' );
 			break;

@@ -36,7 +36,7 @@ $params = array_merge( array(
 echo '<p'.emailskin_style( '.p' ).'>'.T_('A new user has registered on the site').':</p>'."\n";
 
 echo '<table'.emailskin_style( 'table.email_table' ).'>'."\n";
-echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_user_colored_login_link( $params['login'], array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) ).'</td></tr>'."\n";
+echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'./* TRANS: noun */ T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_user_colored_login_link( $params['login'], array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) ).'</td></tr>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Email').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['email'].'</td></tr>'."\n";
 
 if( $params['fullname'] != '' )

@@ -529,4 +529,31 @@ jQuery( document ).ready( function()
 	}
 	jQuery( 'input[type=checkbox][name="renderers[]"]' ).each( function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
 	jQuery( 'input[type=checkbox][name="renderers[]"]' ).click( function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
+	jQuery( '.plugin-toolbar' ).on( 'click', function() {
+			var toolbar_obj = jQuery( this );
+			if( toolbar_obj.hasClass( 'disabled' ) )
+			{
+				var plugin_id = jQuery( this ).attr( 'data-plugin-toolbar' );
+				if( plugin_id )
+				{
+					plugin_id = plugin_id.replace( '_toolbar', '' );
+					if( plugin_id.indexOf( 'meta_' ) === 0 )
+					{
+						plugin_id = plugin_id.replace( 'meta_', '' );
+						var checkbox_obj = jQuery( 'input[type=checkbox][id="meta_renderer_' + plugin_id + '"]' );
+					}
+					else
+					{
+						var checkbox_obj = jQuery( 'input[type=checkbox][id="renderer_' + plugin_id + '"]' );
+					}
+
+					if(  checkbox_obj.length > 0 )
+					{
+						checkbox_obj.prop( 'checked', true );
+						change_plugin_toolbar_activity( checkbox_obj );
+					}
+				}
+			}
+
+		} );
 } );

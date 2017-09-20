@@ -151,7 +151,7 @@ function antispam_check( $haystack )
  */
 function antispam_report_abuse( $abuse_string )
 {
-	global $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri, $antispam_test_for_real;
+	global $debug, $antispamsrv_protocol, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri, $antispam_test_for_real;
 	global $baseurl, $Messages, $Settings;
 	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
@@ -169,7 +169,11 @@ function antispam_report_abuse( $abuse_string )
 
 	// Construct XML-RPC client:
 	load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
-	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port );
+	if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+	{	// Could not use xmlrpc client because server has no the requested extensions:
+		return false;
+	}
+	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port, $antispamsrv_protocol );
 	// yura: I commented this because xmlrpc_client prints the debug info on screen and it breaks header_redirect()
 	// $client->debug = $debug;
 
@@ -213,12 +217,12 @@ function antispam_report_abuse( $abuse_string )
  */
 function antispam_poll_abuse()
 {
-	global $Messages, $Settings, $baseurl, $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
+	global $Messages, $Settings, $baseurl, $debug, $antispamsrv_protocol, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
 	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
 	// Construct XML-RPC client:
 	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
-	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port );
+	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port, $antispamsrv_protocol );
 	// yura: I commented this because xmlrpc_client prints the debug info on screen and it breaks header_redirect()
 	// $client->debug = $debug;
 
@@ -276,7 +280,7 @@ function antispam_poll_abuse()
 						if( antispam_create( $banned_string, 'central' ) )
 						{ // Creation successed
 							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('OK.'), 'note', T_('Adding strings to local blacklist:') );
+								.T_('OK').'.', 'note', T_('Adding strings to local blacklist:') );
 						}
 						else
 						{ // Was already handled
@@ -292,12 +296,12 @@ function antispam_poll_abuse()
 					$Settings->set( 'antispam_last_update', $endedat );
 					$Settings->dbupdate();
 				}
-				$Messages->add( T_('Done.'), 'success' );
+				$Messages->add( T_('Done').'.', 'success' );
 			}
 		}
 		else
 		{
-			$Messages->add( T_('Invalid response.'), 'error' );
+			$Messages->add( T_('Invalid response').'.', 'error' );
 			$ret = false;
 		}
 	}
@@ -462,18 +466,18 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 
 
 /**
- * Get IP range from DB
+ * Get IP ranges from DB
  *
  * @param integer IP start of range
  * @param integer IP end of range
  * @param integer ID of existing IP range
- * @return object Row of the table T_antispam__iprange (NULL - if IP range doesn't exist in DB yet)
+ * @return array Rows of the table T_antispam__iprange (Empty array - if IP range doesn't exist in DB yet)
 */
-function get_ip_range( $ip_start, $ip_end, $aipr_ID = 0 )
+function get_ip_ranges( $ip_start, $ip_end, $aipr_ID = 0 )
 {
 	global $DB;
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get all IP ranges between "'.$ip_start.'" and "'.$ip_end.'"'.( $aipr_ID > 0 ? ' (except of #'.$aipr_ID.')' : '' ) );
 	$SQL->SELECT( '*' );
 	$SQL->FROM( 'T_antispam__iprange' );
 	$SQL->WHERE( ' (
@@ -481,12 +485,13 @@ function get_ip_range( $ip_start, $ip_end, $aipr_ID = 0 )
 		( '.$DB->quote( $ip_end ).' >= aipr_IPv4start AND '.$DB->quote( $ip_end ).' <= aipr_IPv4end ) OR
 		( '.$DB->quote( $ip_start ).' <= aipr_IPv4start AND '.$DB->quote( $ip_end ).' >= aipr_IPv4end )
 	)' );
-	if( !empty( $aipr_ID ) )
-	{
+	if( ! empty( $aipr_ID ) )
+	{	// Exclude IP range with given ID:
 		$SQL->WHERE_and( 'aipr_ID != '.$aipr_ID );
 	}
+	$SQL->ORDER_BY( 'aipr_IPv4start' );
 
-	return $DB->get_row( $SQL->get() );
+	return $DB->get_results( $SQL );
 }
 
 
@@ -535,13 +540,13 @@ function antispam_block_by_ip()
 	}
 	$condition = '( '.substr( $condition, 4 ).' )';
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get blocked IP ranges' );
 	$SQL->SELECT( 'aipr_ID' );
 	$SQL->FROM( 'T_antispam__iprange' );
 	$SQL->WHERE( $condition );
 	$SQL->WHERE_and( 'aipr_status = \'blocked\'' );
 	$SQL->LIMIT( 1 );
-	$ip_range_ID = $DB->get_var( $SQL->get() );
+	$ip_range_ID = $DB->get_var( $SQL );
 
 	if( !is_null( $ip_range_ID ) )
 	{ // The request from this IP address must be blocked
@@ -767,7 +772,7 @@ function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_
 	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $IP_address_int ) );
 	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $IP_address_int ) );
 	$SQL->WHERE_and( 'aipr_status = \'suspect\'' );
-	$ip_range_ID = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+	$ip_range_ID = $DB->get_row( $SQL );
 
 	if( ! is_null( $ip_range_ID ) )
 	{	// Move the user to suspicious group because current IP address is suspected:
@@ -866,12 +871,12 @@ function antispam_suspect_user_by_country( $country_ID, $user_ID = NULL, $check_
 		$User = $UserCache->get_by_ID( $user_ID, false, false );
 	}
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Check suspected country with ID #'.$country_ID );
 	$SQL->SELECT( 'ctry_ID' );
 	$SQL->FROM( 'T_regional__country' );
 	$SQL->WHERE( 'ctry_ID = '.$DB->quote( $country_ID ) );
 	$SQL->WHERE_and( 'ctry_status = \'suspect\'' );
-	$country_ID = $DB->get_var( $SQL->get() );
+	$country_ID = $DB->get_var( $SQL );
 
 	if( !is_null( $country_ID ) )
 	{ // Move current user to suspicious group because country is suspected
@@ -1008,7 +1013,7 @@ function antispam_bankruptcy_blogs( $comment_status = NULL )
 	$SQL->GROUP_BY( 'blog_ID' );
 	$SQL->ORDER_BY( 'blog_'.$Settings->get('blogs_order_by').' '.$Settings->get('blogs_order_dir') );
 
-	return $DB->get_results( $SQL->get() );
+	return $DB->get_results( $SQL );
 }
 
 
@@ -1038,7 +1043,7 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 	$items_IDs_SQL->FROM( 'T_postcats' );
 	$items_IDs_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
 	$items_IDs_SQL->WHERE( 'cat_blog_ID IN ( '.$DB->quote( $blog_IDs ).' )' );
-	$items_IDs = $DB->get_col( $items_IDs_SQL->get() );
+	$items_IDs = $DB->get_col( $items_IDs_SQL );
 
 	$comments_IDs_SQL = new SQL( 'Get all comments IDs of selected blogs' );
 	$comments_IDs_SQL->SELECT( 'comment_ID' );
@@ -1114,21 +1119,59 @@ function antispam_increase_counter( $counter_name )
 			continue;
 		}
 
-		$ip = int2ip( ip2int( $ip ) ); // Convert IPv6 to IPv4
+		// Convert IPv6 to IPv4:
+		$ip_int = ip2int( $ip );
+		$ip = int2ip( $ip_int );
 		if( preg_match( '#^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#i', $ip ) )
-		{ // Check IP for correct format
+		{	// If current IP address has a correct format:
 			$ip_24bit_start = ip2int( preg_replace( '#\.\d{1,3}$#i', '.0', $ip ) );
 			$ip_24bit_end = ip2int( preg_replace( '#\.\d{1,3}$#i', '.255', $ip ) );
 
 			global $DB;
-			if( $iprange = get_ip_range( $ip_24bit_start, $ip_24bit_end ) )
-			{ // Update ip range
-				$DB->query( 'UPDATE T_antispam__iprange
+			if( $ipranges = get_ip_ranges( $ip_24bit_start, $ip_24bit_end ) )
+			{	// If at least one IP range is detected:
+				$ip_range_is_detected = false;
+				foreach( $ipranges as $iprange )
+				{
+					if( $iprange->aipr_IPv4start <= $ip_int && $iprange->aipr_IPv4end >= $ip_int )
+					{	// If current IP is from the IP range:
+						$DB->query( 'UPDATE T_antispam__iprange
 								SET '.$field_name.' = '.$field_name.' + 1
 								WHERE aipr_ID = '.$DB->quote( $iprange->aipr_ID ) );
+						$ip_range_is_detected = true;
+					}
+				}
+				if( ! $ip_range_is_detected )
+				{	// If IP range is not detected for current IP address,
+					// Try to find what range is free for current IP address:
+					$iprange_max = NULL;
+					$iprange_min = NULL;
+					foreach( $ipranges as $iprange )
+					{
+						if( ( $iprange_min === NULL || $iprange_min < $iprange->aipr_IPv4end ) && $ip_int > $iprange->aipr_IPv4end )
+						{	// Min free possible IP value:
+							$iprange_min = $iprange->aipr_IPv4end + 1;
+						}
+						if( ( $iprange_max === NULL || $iprange_max > $iprange->aipr_IPv4start ) && $ip_int < $iprange->aipr_IPv4start )
+						{	// Max free possible IP value:
+							$iprange_max = $iprange->aipr_IPv4start - 1;
+						}
+					}
+					if( $iprange_min === NULL )
+					{	// Use begining of range *.*.*.0 if no found:
+						$iprange_min = $ip_24bit_start;
+					}
+					if( $iprange_max === NULL )
+					{	// Use ending of range *.*.*.255 if no found:
+						$iprange_max = $ip_24bit_end;
+					}
+					// Insert new IP range with possible free values:
+					$DB->query( 'INSERT INTO T_antispam__iprange ( aipr_IPv4start, aipr_IPv4end, '.$field_name.' )
+									VALUES ( '.$DB->quote( $iprange_min ).', '.$DB->quote( $iprange_max ).', 1 ) ' );
+				}
 			}
 			else
-			{ // Insert new ip range
+			{	// Insert new IP range with values from *.*.*.0 to *.*.*.255:
 				$DB->query( 'INSERT INTO T_antispam__iprange ( aipr_IPv4start, aipr_IPv4end, '.$field_name.' )
 								VALUES ( '.$DB->quote( $ip_24bit_start ).', '.$DB->quote( $ip_24bit_end ).', 1 ) ' );
 			}

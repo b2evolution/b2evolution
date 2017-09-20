@@ -34,7 +34,7 @@ else
 	printf( T_('New user account activated by %s'), $params['activated_by_admin'] ).':';
 }
 echo "\n\n";
-echo T_('Login').": ".$activated_User->login."\n";
+echo /* TRANS: noun */ T_('Login').": ".$activated_User->login."\n";
 echo T_('Email').": ".$activated_User->email."\n";
 
 $fullname = $activated_User->get( 'fullname' );

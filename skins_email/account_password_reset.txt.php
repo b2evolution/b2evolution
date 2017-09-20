@@ -35,7 +35,7 @@ $message_content = '';
 // Iterate through the User Cache
 while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 {
-	$message_content .= "\n".T_( 'Login:' ).' '.$iterator_User->dget( 'login' )."\n";
+	$message_content .= "\n".T_( 'Login' ).': '.$iterator_User->dget( 'login' )."\n";
 
 	if( $params['user_count'] > 1 )
 	{ // exists more account with the given email address, display last used date for each

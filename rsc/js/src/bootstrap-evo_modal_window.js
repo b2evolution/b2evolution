@@ -17,8 +17,9 @@ var modal_window_js_initialized = false;
  * @param boolean FALSE by default, TRUE - to don't remove bootstrap panels
  * @param boolean TRUE - to clear all previous windows
  * @param string ID of iframe where all contents
+ * @param function Event handler when dialog is shown
  */
-function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels, iframe_id )
+function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels, iframe_id, on_shown_handler )
 {
 	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
 	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
@@ -106,6 +107,11 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 		prepareModalWindow( '#modal_window', button_form, use_buttons, keep_panels );
 	}
 
+	if( typeof( on_shown_handler ) == 'function' )
+	{
+		jQuery( '#modal_window' ).on( 'shown.bs.modal', on_shown_handler );
+	}
+
 	// Init modal window and show
 	var options = {};
 	if( modal_window_js_initialized )
@@ -119,7 +125,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 		jQuery( '#modal_window .modal-dialog .modal-content' ).css( { 'display': 'table-cell' } );
 	}
 
-	jQuery( '#modal_window').on( 'hidden', function ()
+	jQuery( '#modal_window').on( 'hidden.bs.modal', function ()
 	{ // Remove modal window on hide event to draw new window in next time with new title and button
 		jQuery( this ).remove();
 	} );
@@ -162,7 +168,9 @@ function prepareModalWindow( modal_document, button_form, use_buttons, keep_pane
 			}
 		} );
 
-		jQuery( '#modal_window .modal-footer button[type=submit]' ).click( function()
+		// The following clears all existing click events before binding it to a new one
+		jQuery( '#modal_window .modal-footer button[type=submit]' ).off( 'click' );
+		jQuery( '#modal_window .modal-footer button[type=submit]' ).on( 'click', function()
 		{ // Copy a click event from real submit input to button of footer
 			jQuery( button_form + ' input[type=submit]', modal_document ).click();
 		} );
@@ -188,14 +196,18 @@ function prepareModalWindow( modal_document, button_form, use_buttons, keep_pane
  *
  * @param object Document object
  */
-function closeModalWindow( document_obj )
+function closeModalWindow( document_obj, on_hide_handler )
 {
 	if( typeof( document_obj ) == 'undefined' )
 	{
 		document_obj = window.document;
 	}
 
-	jQuery( '#modal_window', document_obj ).remove();
+	if( typeof( on_hide_handler ) == 'function' )
+	{
+		jQuery( '#modal_window' ).on( 'hide.bs.modal', on_hide_handler );
+	}
+	jQuery( '#modal_window', document_obj ).modal( 'hide' );
 
 	return false;
 }

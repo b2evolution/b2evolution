@@ -868,7 +868,8 @@ class Results extends Table
 				// echo $sql_count;
 			}
 
-			$this->total_rows = $DB->get_var( $sql_count, 0, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).get_class( $this ).'::count_total_rows()' ); //count total rows
+			// Calculate the sum of values because the results may be grouped, so we must know a count of rows in all groups and not only in first group:
+			$this->total_rows = array_sum( $DB->get_col( $sql_count, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).get_class( $this ).'::count_total_rows()' ) ); //count total rows
 		}
 
 		// Calculate total pages depending on total rows and page size:
@@ -1734,7 +1735,7 @@ class Results extends Table
 				if(	$sort == 'ASC' )
 				{	// ASC sort, so move_up action for move up arrow
 					$action = 'move_up';
-					$alt = T_( 'Move up!' );
+					$alt = T_( 'Move up' ).'!';
 					}
 				else
 				{	// Reverse sort, so action and alt are reverse too
@@ -1754,7 +1755,7 @@ class Results extends Table
 				if(	$sort == 'ASC' )
 				{	// ASC sort, so move_down action for move down arrow
 					$action = 'move_down';
-					$alt = T_( 'Move down!' );
+					$alt = T_( 'Move down' ).'!';
 				}
 				else
 				{ // Reverse sort, so action and alt are reverse too

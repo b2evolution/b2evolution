@@ -30,7 +30,7 @@ function user_contact_groups( user_ID )
 		success: function( result )
 		{
 			openModalWindow( result, 'auto', '', true,
-				evo_js_lang_contact_groups, evo_js_lang_save, true );
+				evo_js_lang_contact_groups, evo_js_lang_save );
 		}
 	} );
 

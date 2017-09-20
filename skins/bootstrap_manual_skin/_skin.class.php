@@ -21,7 +21,7 @@ class bootstrap_manual_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.0';
+	var $version = '6.9.4';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -43,7 +43,7 @@ class bootstrap_manual_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -375,7 +375,7 @@ class bootstrap_manual_Skin extends Skin
 					'featured_intro_before' => '<div class="jumbotron">',
 					'featured_intro_after'  => '</div>',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				);
 
 			default:
@@ -402,28 +402,5 @@ class bootstrap_manual_Skin extends Skin
 		// Display left navigation column only on these pages:
 		return in_array( $disp, array( 'front', 'posts', 'flagged', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
 	}
-
-
-	/**
-	 * Check if we can display a widget container when access is denied to collection by current user
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function show_container_when_access_denied( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
-	}
 }
-
 ?>

@@ -207,6 +207,11 @@ div.avatartag {
 		vertical-align: middle;
 	}
 }
+#itemform_custom_fields, #itemform_adv_props {
+	.compose_layout {
+		margin-bottom: 0;
+	}
+}
 
 div.log_container {
 	margin: 0;
@@ -294,6 +299,10 @@ div.delete_messages ul {
 		&.evo_form__comment_meta {
 			border: 2px solid #5bc0de;
 			background-color: #d9edf7;
+			.btn-toolbar {
+				// 10% darker of meta color #5bc0de
+				background-color: #afd9ee;
+			}
 		}
 		.form_info {
 			display: block;
@@ -811,32 +820,23 @@ td.fm_filename {
 		border: none;
 	}
 }
-.toolbaritem {
-	input, select {
-		display: inline;
-		width: auto;
-	}
-}
-div.fileman_toolbars_bottom .toolbaritem {
-	border: 2px dashed #fff;
-	background: #e8e8e8;
-	.border-radius;
-	margin: 3px 0 0 10px;
-	padding: 2px 10px;
+.evo_file_folder_creator {
 	float: right;
-	form {
-		margin: 0;
-	}
+	margin-left: 3em;
 	#fm_createname {
 		position: relative;
 		top: 1px;
 	}
+}
+#fm_filter {
+	height: 23px;
 }
 form#FilesForm {
 	margin: 0;
 }
 #fm_dirtree {
 	width: 20%;
+	background-color: #f9f9f9;
 	ul.clicktree {
 		list-style: none;
 		margin-left: 5px;
@@ -852,10 +852,18 @@ form#FilesForm {
 		color: #F00;
 	}
 }
+.file_browser_settings {
+	float: right;
+	margin: 3px 1em 0 3em;
+}
 #fmbar_filter_checkchanges {
 	float: right;
 	label {
 		display: inline;
+	}
+	input {
+		display: inline;
+		width: auto;
 	}
 }
 #fmbar_cwd, #fmbar_filecounts {
@@ -906,8 +914,11 @@ tr#fileuploader_form td {
 	.form-group {
 		margin-bottom: 10px;
 	}
-	p.note {
-		margin-top: 10px;
+	.file_browser_footer {
+		margin: 10px;
+		.note {
+			line-height: 20px;
+		}
 	}
 }
 
@@ -1648,5 +1659,13 @@ table.diff {
 	select {
 		display: inline;
 		width: auto;
+	}
+}
+
+// Cells to edit data in table list:
+.jeditable_cell {
+	white-space: nowrap;
+	select, input {
+		max-width: 100%;
 	}
 }

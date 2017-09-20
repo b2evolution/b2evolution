@@ -242,9 +242,10 @@ function init_inskin_editing()
  *                 "*": all blogs
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
+ * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
  * @return Item
  */
-function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
+function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false )
 {
 	global $Collection, $Blog, $cat;
 	global $disp, $disp_detail, $MainList, $FeaturedList;
@@ -328,31 +329,39 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		// SECOND: If no Intro, try to find an Featured post:
 
 		if( isset($Blog) )
+		{
+			if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
+				&& isset($Blog)
+				&& $Blog->get_setting('disp_featured_above_list') )
+			{ // No Intro page was found, try to find a featured post instead:
 
-		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
-			&& isset($Blog)
-			&& $Blog->get_setting('disp_featured_above_list') )
-		{ // No Intro page was found, try to find a featured post instead:
+				$FeaturedList->reset();
 
-			$FeaturedList->reset();
+				$FeaturedList->set_filters( array(
+						'coll_IDs' => $coll_IDs,
+						'featured' => 1,  // Featured posts only
+						// Types will already be reset to defaults here
+					), false /* Do NOT memorize!! */ );
 
-			$FeaturedList->set_filters( array(
-					'coll_IDs' => $coll_IDs,
-					'featured' => 1,  // Featured posts only
-					// Types will already be reset to defaults here
-				), false /* Do NOT memorize!! */ );
-
-			// Run the query:
-			$FeaturedList->query();
+				// Run the query:
+				$FeaturedList->query();
+			}
 		}
 	}
 
 	// Get first Item in the result set.
-	$Item = $FeaturedList->get_item();
+	if( $preview )
+	{ // We only want want a preview of the first item
+		$Item = $FeaturedList->get_by_idx( 0 );
+	}
+	else
+	{
+		$Item = $FeaturedList->get_item();
 
-	if( $Item )
-	{	// Memorize that ID so that it can later be filtered out of normal display:
-		$featured_displayed_item_IDs[] = $Item->ID;
+		if( $Item )
+		{	// Memorize that ID so that it can later be filtered out of normal display:
+			$featured_displayed_item_IDs[] = $Item->ID;
+		}
 	}
 
 	return $Item;
@@ -415,17 +424,17 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	{ // this should only happen when the slug is auto generated
 		global $Collection, $Blog;
 		if( isset( $Blog ) )
-		{ // Get max length of slug from current blog setting
+		{	// Get max length of slug from current blog setting:
 			$count_of_words = $Blog->get_setting('slug_limit');
 		}
 		if( empty( $count_of_words ) )
-		{ // Use 5 words to limit slug by default
+		{	// Use 5 words to limit slug by default:
 			$count_of_words = 5;
 		}
 
-		$title_words = array();
+		// Limit slug with max count of words:
 		$title_words = explode( '-', $urltitle );
-		if( count($title_words) > $count_of_words )
+		if( count( $title_words ) > $count_of_words )
 		{
 			$urltitle = '';
 			for( $i = 0; $i < $count_of_words; $i++ )
@@ -433,20 +442,18 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 				$urltitle .= $title_words[$i].'-';
 			}
 			//delete last '-'
-			$urltitle = substr( $urltitle, 0, strlen($urltitle) - 1 );
+			$urltitle = substr( $urltitle, 0, strlen( $urltitle ) - 1 );
 		}
-
-		// echo 'leaving 5 words: '.$urltitle.'<br />';
 	}
 
-	// Normalize to 200 chars + a number
+	// Normalize to 200 chars + a number:
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 200 );
 	// strip a possible dash at the end of the URL title:
 	$urlbase = rtrim( $urlbase, '-' );
 	$urltitle = $urlbase;
-	if( ! empty( $matches[4] ) )
-	{
+	if( isset( $matches[4] ) && $matches[4] !== '' )
+	{	// Append only NOT empty string after last dash:
 		$urltitle .= '-'.$matches[4];
 	}
 
@@ -1640,6 +1647,9 @@ function get_tab_by_item_type_usage( $type_usage )
 		case 'intro-all':
 			$type_tab = array( 'intro', NT_('Intros') );
 			break;
+		case 'content-block':
+			$type_tab = array( 'content-block', NT_('Content Blocks') );
+			break;
 
 		default:
 			// Unknown item type usage:
@@ -1667,6 +1677,9 @@ function get_item_type_usage_by_tab( $tab_name )
 			break;
 		case 'intro':
 			$type_usages = array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' );
+			break;
+		case 'content-block':
+			$type_usages = array( 'content-block' );
 			break;
 		case 'post':
 		default:
@@ -1934,7 +1947,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 
 		$Form->submit( array(
 			'actionArray['.$next_action.'_publish]',
-			/* TRANS: This is the value of an input submit button */ T_('Publish!'),
+			/* TRANS: This is the value of an input submit button */ T_('Publish').'!',
 			'SaveButton btn-status-published quick-publish',
 			'',
 			$publish_style
@@ -2173,6 +2186,445 @@ function echo_item_content_position_js( $height, $scroll_position )
 	}
 ?>
 	</script>
+<?php
+}
+
+
+/**
+ * JS Behaviour: Output JavaScript code to merge an item with another item
+ */
+function echo_item_merge_js()
+{
+	global $Blog, $admin_url, $evo_item_merge_js_initialized;
+
+	if( ! empty( $evo_item_merge_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
+
+	// Set flag to know this is initialized:
+	$evo_item_merge_js_initialized = true;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+?>
+<script type="text/javascript">
+function evo_merge_load_window( item_ID )
+{
+	openModalWindow( '<div id="evo_merge_wrapper"></div>', 'auto', '', true,
+		'<?php echo TS_('Select destination Post...'); ?>', // Window title
+		[ '-', 'evo_merge_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back", "Merge with original dates",  "Append to this post with new dates"
+		true );
+
+	// Load collections:
+	var current_coll_urlname = '<?php echo empty( $Blog ) ? '' : format_to_js( $Blog->get( 'urlname' ) ); ?>';
+	evo_rest_api_start_loading( '#evo_merge_wrapper' );
+	evo_rest_api_request( 'collections', function( data )
+	{	// Display the colllections on success request:
+		var coll_urlname = '';
+		var coll_name = '';
+
+		// Initialize html code to view the loaded collections:
+		var r = '<div id="evo_merge_colls_list">'
+			+ '<h2><?php echo TS_('Collections'); ?></h2>'
+			+ '<select class="form-control">';
+		for( var c in data.colls )
+		{
+			var coll = data.colls[c];
+			r += '<option value="' + coll.urlname + '"'
+				+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
+				+ coll.name + '</option>';
+			if( coll_urlname == '' || coll.urlname == current_coll_urlname )
+			{	// Set these vars to load posts of the selected or first collection:
+				coll_urlname = coll.urlname;
+				coll_name = coll.name;
+			}
+		}
+		r += '</select>'
+			+ '</div>'
+			+ '<div id="evo_merge_posts_block"></div>'
+			+ '<div id="evo_merge_post_block"></div>'
+			+ '<input type="hidden" id="evo_merge_post_ID" value="' + item_ID + '" />'
+			+ '<input type="hidden" id="evo_merge_dest_post_ID" />';
+
+		evo_rest_api_end_loading( '#evo_merge_wrapper', r );
+
+		if( coll_urlname != '' )
+		{	// Load posts list of the current or first collection:
+			evo_merge_load_coll_posts( coll_urlname, coll_name );
+		}
+	} );
+
+	// Set max-height to keep the action buttons on screen:
+	var modal_window = jQuery( '#evo_item_merge_wrapper' ).parent();
+	var modal_height = jQuery( window ).height() - 20;
+	if( modal_window.hasClass( 'modal-body' ) )
+	{	// Extract heights of header and footer:
+		modal_height -= 55 + 64 +
+			parseInt( modal_window.css( 'padding-top' ) ) + parseInt( modal_window.css( 'padding-bottom' ) );
+	}
+	modal_window.css( {
+		'display': 'block',
+		'overflow': 'auto',
+		'max-height': modal_height
+	} );
+
+	// To prevent link default event:
+	return false;
+}
+
+
+/**
+ * Load posts list with search form of the collection:
+ *
+ * @param string Collection urlname
+ * @param string Collection name
+ * @param string Predefined Search keyword
+ */
+function evo_merge_display_search_form( coll_urlname, coll_name, search_keyword )
+{
+	var r = '<h2>' + coll_name + '</h2>' +
+		'<form class="form-inline" id="evo_merge_search__form" data-urlname="' + coll_urlname + '">' +
+			'<div class="input-group">' +
+				'<input type="text" id="evo_merge_search__input" class="form-control" value="' + ( typeof( search_keyword ) == 'undefined' ? '' : search_keyword ) + '">' +
+				'<span class="input-group-btn"><button id="evo_merge_search__submit" class="btn btn-primary"><?php echo TS_('Search'); ?></button></span>' +
+			'</div> ' +
+			'<button id="evo_merge_search__clear" class="btn btn-default"><?php echo TS_('Clear'); ?></button>' +
+		'</form>' +
+		'<div id="evo_merge_posts_list"></div>';
+
+	jQuery( '#evo_merge_posts_block' ).html( r );
+}
+
+
+/**
+ * Load posts list with search form of the collection:
+ *
+ * @param string Collection urlname
+ * @param string Collection name
+ * @param integer Page
+ */
+function evo_merge_load_coll_posts( coll_urlname, coll_name, page )
+{
+	if( typeof( coll_name ) != 'undefined' && coll_name !== false )
+	{
+		evo_merge_display_search_form( coll_urlname, coll_name );
+	}
+
+	var current_post_exclude_param = '&pl=-' + jQuery( '#evo_merge_post_ID' ).val();
+
+	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&paged=' + page;
+
+	evo_rest_api_start_loading( '#evo_merge_posts_list' );
+	evo_rest_api_request( 'collections/' + coll_urlname + '/items&orderby=datemodified&order=DESC' + current_post_exclude_param +page_param, function( data )
+	{	// Display the posts on success request:
+		var r = '<ul>';
+		for( var p in data.items )
+		{
+			var post = data.items[p];
+			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
+		}
+		r += '</ul>';
+		r += evo_merge_get_pagination( data );
+		evo_rest_api_end_loading( '#evo_merge_posts_list', r );
+	} );
+}
+
+
+/**
+ * Build a pagination from response data
+ *
+ * @param array Response data
+ * @param string Search keyword
+ * @return string Pagination
+ */
+function evo_merge_get_pagination( data, search_keyword )
+{
+	var r = '';
+
+	if( typeof( data.pages_total ) == 'undefined' || data.pages_total < 2 )
+	{	// No page for this request:
+		return r;
+	}
+
+	var search_keyword_attr = typeof( search_keyword ) == 'undefined' ? '' :
+		' data-search="' + search_keyword.replace( '"', '\"' ) + '"';
+
+	var current_page = data.page;
+	var total_pages = data.pages_total;
+	var page_list_span = 11; // Number of visible pages on navigation line
+	var page_list_start, page_list_end;
+
+	// Initialize a start of pages list:
+	if( current_page <= parseInt( page_list_span / 2 ) )
+	{	// the current page number is small
+		page_list_start = 1;
+	}
+	else if( current_page > total_pages - parseInt( page_list_span / 2 ) )
+	{	// the current page number is big
+		page_list_start = Math.max( 1, total_pages - page_list_span + 1 );
+	}
+	else
+	{	// the current page number can be centered
+		page_list_start = current_page - parseInt( page_list_span / 2 );
+	}
+
+	// Initialize an end of pages list:
+	if( current_page > total_pages - parseInt( page_list_span / 2 ) )
+	{ //the current page number is big
+		page_list_end = total_pages;
+	}
+	else
+	{
+		page_list_end = Math.min( total_pages, page_list_start + page_list_span - 1 );
+	}
+
+	r += '<ul class="evo_merge_pagination pagination"' + search_keyword_attr + '>';
+
+	if( current_page > 1 )
+	{	// A link to previous page:
+		r += '<li><a href="#" data-page="' + ( current_page - 1 ) + '">&lt;&lt;</a></li>';
+	}
+
+	if( page_list_start > 1 )
+	{ // The pages list doesn't contain the first page
+		// Display a link to first page:
+		r += '<li><a href="#" data-page="1">1</a></li>';
+
+		if( page_list_start > 2 )
+		{ // Display a link to previous pages range:
+			r += '<li><a href="#" data-page="' + Math.ceil( page_list_start / 2 ) + '">...</a></li>';
+		}
+	}
+
+	for( p = page_list_start; p <= page_list_end; p++ )
+	{
+		if( current_page == p )
+		{	// Current page:
+			r += '<li class="active"><span>' + p + '</span></li>';
+		}
+		else
+		{
+			r += '<li><a href="#" data-page="' + p + '">' + p + '</a></li>';
+		}
+	}
+
+	if( page_list_end < total_pages )
+	{	// The pages list doesn't contain the last page
+		if( page_list_end < total_pages - 1 )
+		{	// Display a link to next pages range:
+			r += '<li><a href="#" data-page="' + ( page_list_end + Math.floor( ( total_pages - page_list_end ) / 2 ) ) + '">...</a></li>';
+		}
+
+		// Display a link to last page:
+		r += '<li><a href="#" data-page="' + total_pages + '">' + total_pages + '</a></li>';
+	}
+
+	if( current_page < total_pages )
+	{	// A link to next page:
+		r += '<li><a href="#" data-page="' + ( current_page + 1 ) + '">&gt;&gt;</a></li>';
+	}
+
+	r += '</ul>';
+
+	return r;
+}
+
+
+/**
+ * Load the searched posts list:
+ *
+ * @param string Collection urlname
+ * @param string Search keyword
+ * @param integer Page
+ */
+function evo_merge_load_coll_search( coll_urlname, search_keyword, page )
+{
+	var current_post_exclude_param = '&exclude_posts=' + jQuery( '#evo_merge_post_ID' ).val();
+
+	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
+
+	evo_rest_api_start_loading( '#evo_merge_posts_list' );
+	evo_rest_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + '&kind=item' + current_post_exclude_param + page_param, function( data )
+	{	// Display the post data in third column on success request:
+		if( typeof( data.code ) != 'undefined' )
+		{	// Error code was responsed:
+			evo_rest_api_print_error( '#evo_merge_posts_list', data );
+			return;
+		}
+
+		var r = '<ul>';
+		for( var s in data.results )
+		{
+			var search_item = data.results[s];
+			if( search_item.kind != 'item' )
+			{	// Dsiplay only items and skip all other:
+				continue;
+			}
+			r += '<li>';
+			r += '<a href="#" data-id="' + search_item.id + '" data-urlname="' + coll_urlname + '">' + search_item.title + '</a>';
+			r += '</li>';
+		}
+		r += '</ul>';
+		r += evo_merge_get_pagination( data, search_keyword );
+		evo_rest_api_end_loading( '#evo_merge_posts_list', r );
+	} );
+}
+
+// Load the posts of the selected collection:
+jQuery( document ).on( 'change', '#evo_merge_colls_list select', function()
+{
+	evo_merge_load_coll_posts( jQuery( this ).val(), jQuery( 'option:selected', this ).text() );
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Submit a search form:
+jQuery( document ).on( 'submit', '#evo_merge_search__form', function()
+{
+	var coll_urlname = jQuery( this ).data( 'urlname' );
+	var search_keyword = jQuery( '#evo_merge_search__input' ).val();
+
+	evo_merge_load_coll_search( coll_urlname, search_keyword );
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Clear the search results:
+jQuery( document ).on( 'click', '#evo_merge_search__clear', function()
+{
+	evo_merge_load_coll_posts( jQuery( this ).closest( 'form' ).data( 'urlname' ) );
+
+	// Clear search input field:
+	jQuery( '#evo_merge_search__input' ).val( '' );
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Switch page:
+jQuery( document ).on( 'click', '.evo_merge_pagination a', function()
+{
+	var coll_selector = jQuery( '#evo_merge_colls_list select' );
+	var pages_list = jQuery( this ).closest( '.evo_merge_pagination' );
+
+	if( pages_list.data( 'search' ) == undefined )
+	{	// Load posts/items for selected page:
+		evo_merge_load_coll_posts( coll_selector.val(), false, jQuery( this ).data( 'page' ) );
+	}
+	else
+	{	// Load search list for selected page:
+		evo_merge_load_coll_search( coll_selector.val(), pages_list.data( 'search' ), jQuery( this ).data( 'page' ) );
+	}
+
+	// To prevent link default event:
+	return false;
+} );
+
+
+// Load the data of the selected post:
+jQuery( document ).on( 'click', '#evo_merge_posts_list a[data-id]', function()
+{
+	var coll_urlname = jQuery( this ).data( 'urlname' );
+	var post_id = jQuery( this ).data( 'id' );
+
+	// Hide the lists of collectionss and posts:
+	jQuery( '#evo_merge_colls_list, #evo_merge_posts_block' ).hide();
+
+	// Show the post preview block, because it can be hidded after prevous preview:
+	jQuery( '#evo_merge_post_block' ).show();
+
+	if( jQuery( '#evo_merge_post_block' ).data( 'post' ) == post_id )
+	{	// If user loads the same post, just display the cached content to save ajax calls:
+		// Show the action buttons:
+		jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btns_group' ).show();
+	}
+	else
+	{	// Load new post:
+		jQuery( '#evo_merge_post_block' ).html( '' ); // Clear previous cached content
+		evo_rest_api_start_loading( '#evo_merge_post_block' );
+		evo_rest_api_request( 'collections/' + coll_urlname + '/items/' + post_id, function( post )
+		{	// Display the post data on success request:
+			jQuery( '#evo_merge_post_block' ).data( 'post', post.id );
+
+			// Store item field values in hidden inputs to use on insert complex link:
+			jQuery( '#evo_merge_dest_post_ID' ).val( post.id );
+
+			// Item title:
+			var item_content = '<h2>' + post.title + '</h2>';
+			// Item attachments, Only images and on teaser positions:
+			if( typeof( post.attachments ) == 'object' && post.attachments.length > 0 )
+			{
+				item_content += '<div id="evo_merge_post_attachments">';
+				for( var a in post.attachments )
+				{
+					var attachment = post.attachments[a];
+					if( attachment.type == 'image' &&
+							( attachment.position == 'teaser' ||
+								attachment.position == 'teaserperm' ||
+								attachment.position == 'teaserlink' )
+						)
+					{
+						item_content += '<img src="' + attachment.url + '" />';
+					}
+				}
+				item_content += '</div>';
+			}
+			// Item content:
+			item_content += '<div id="evo_merge_post_content">' + post.content + '</div>';
+
+			evo_rest_api_end_loading( '#evo_merge_post_block', item_content );
+
+			jQuery( '.modal-title' ).html( '<?php echo T_('Destination Post:'); ?>' );
+
+			// Display the buttons to back and merge/append a post:
+			var buttons_side_obj = jQuery( '.evo_merge_post_buttons' ).length ?
+				jQuery( '.evo_merge_post_buttons' ) :
+				jQuery( '#evo_merge_post_content' );
+			jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btns_group, #evo_merge_btn_form' ).remove();
+			buttons_side_obj.after( '<button id="evo_merge_btn_back_to_list" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
+				+ '<span id="evo_merge_btns_group" style="margin:0 5px">'
+				+ '<?php echo TS_('Move source post & comments'); ?>: '
+				+ '<div class="btn-group">'
+				+ '<button id="evo_merge_btn_merge" class="btn btn-primary"><?php echo TS_('by keeping original dates (merge)'); ?></button>'
+				+ '<button id="evo_merge_btn_append" class="btn btn-default"><?php echo TS_('by assigning new dates (append)'); ?></button>'
+				+ '</div>'
+				+ '</span>' );
+		} );
+	}
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Submit form to merge/append a post:
+jQuery( document ).on( 'click', '#evo_merge_btn_merge, #evo_merge_btn_append', function()
+{
+	var action = jQuery( this ).attr( 'id' ) == 'evo_merge_btn_merge' ? 'merge' : 'append';
+
+	location.href = '<?php echo $admin_url; ?>?ctrl=items&action=' + action
+		+ '&post_ID=' + jQuery( '#evo_merge_post_ID' ).val()
+		+ '&dest_post_ID=' + jQuery( '#evo_merge_dest_post_ID' ).val()
+		+ '&<?php echo url_crumb( 'item' ); ?>';
+} );
+
+// Back to previous list:
+jQuery( document ).on( 'click', '#evo_merge_btn_back_to_list', function()
+{
+	jQuery( '.modal-title' ).html( '<?php echo T_('Select destination Post...'); ?>' );
+
+	// Show the lists of collections and posts:
+	jQuery( '#evo_merge_colls_list, #evo_merge_posts_block' ).show();
+
+	// Hide the post preview block and action buttons:
+	jQuery( '#evo_merge_post_block, #evo_merge_btn_back_to_list, #evo_merge_btns_group' ).hide();
+
+	// To prevent link default event:
+	return false;
+} );
+</script>
 <?php
 }
 
@@ -2666,7 +3118,7 @@ function echo_slug_filler()
 		{
 			if(!slug_changed)
 			{
-				jQuery( '#post_urltitle' ).val( jQuery( '#post_title' ).val() );
+				jQuery( '#post_urltitle' ).val( jQuery( '#post_title' ).val().replace( /,/g, ' ' ) );
 			}
 		} );
 
@@ -2832,7 +3284,9 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	}
 
 	// Get ready for display (runs the query):
-	$CommentList->display_init();
+	$CommentList->display_init( array(
+			'init_order_numbers_mode' => ( $comment_type == 'meta' ? 'date' : false )
+		) );
 
 	$CommentList->display_if_empty( array(
 		'before'    => '<div class="evo_comment"><p>',
@@ -2851,11 +3305,11 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * @param object Comment object
  * @param string where to redirect after comment edit. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
  * @param boolean true to set the new redirect param, false otherwise
- * @param integer Comment index in the current list, FALSE - to don't display a comment index
+ * @param integer Comment order number in the current list, FALSE - to don't display a comment order
  * @param integer A reply level (Used on mode "Threaded comments" to shift a comment block to right)
  * @param boolean TRUE to display info for meta comment
  */
-function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false, $reply_level = 0 )
+function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $inlist_order = NULL, $display_meta_title = false, $reply_level = 0 )
 {
 	global $current_User, $localtimenow;
 
@@ -2897,9 +3351,9 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 
 		if( $Comment->is_meta() )
 		{ // Meta comment
-			if( $comment_index !== false )
-			{	// Display ID for each meta comment
-				echo '<span class="badge badge-info">'.$comment_index.'</span> ';
+			if( $inlist_order !== false )
+			{	// Display order of meta comment in current list:
+				echo '<span class="badge badge-info">'.$inlist_order.'</span> ';
 			}
 
 			if( $display_meta_title )
@@ -2924,7 +3378,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 
 		echo '<span class="bDate">';
 		$Comment->date();
-		echo '</span>@<span class = "bTime">';
+		echo '</span> @ <span class = "bTime">';
 		$Comment->time( '#short_time' );
 		echo '</span>';
 
@@ -2938,6 +3392,10 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 			echo ' &middot; <span class="bKarma">';
 			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
 			echo '</span>';
+
+			// Last touched date:
+			echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
+				.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Comment->get( 'last_touched_ts' ) ).'</span>';
 
 			echo '</div>';
 			echo '<div style="padding-top:3px">';
@@ -3800,7 +4258,7 @@ function items_manual_results_block( $params = array() )
 
 	$Table = new Table( 'Results', $params['results_param_prefix'] );
 
-	$Table->title = T_('Manual view');
+	$Table->title = T_('Manual view').get_manual_link( 'manual-pages-editor' );
 
 	// Redirect to manual pages after adding chapter
 	$redirect_page = '&amp;redirect_page=manual';
@@ -3854,7 +4312,7 @@ function items_manual_results_block( $params = array() )
 	$Table->display_list_end();
 
 	// Flush fadeout
-	$Session->delete( 'fadeout_array');
+	$Session->delete( 'fadeout_array' );
 
 	echo $Table->params['content_end'];
 
@@ -4152,7 +4610,7 @@ function load_user_data_for_items( $post_ids = NULL )
 	$SQL->WHERE( 'itud_user_ID = '.$DB->quote( $current_User->ID ) );
 	$SQL->WHERE_and( $post_condition );
 	// Set those post read statuses which were opened before:
-	$data_rows = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+	$data_rows = $DB->get_results( $SQL, ARRAY_A );
 
 	if( empty( $post_ids ) )
 	{	// The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user:
@@ -4196,7 +4654,7 @@ function get_item_numviews( $Item )
 	$SQL->FROM( 'T_items__user_data' );
 	$SQL->WHERE( 'itud_item_ID = '.$Item->ID );
 
-	return $DB->get_var( $SQL->get() );
+	return $DB->get_var( $SQL );
 }
 
 
@@ -4215,7 +4673,6 @@ function items_results( & $items_Results, $params = array() )
 			'tab'                        => '',
 			'field_prefix'               => '',
 			'display_date'               => true,
-			'display_permalink'          => true,
 			'display_blog'               => true,
 			'display_author'             => true,
 			'display_type'               => true,
@@ -4232,18 +4689,13 @@ function items_results( & $items_Results, $params = array() )
 
 	if( $params['display_date'] )
 	{	// Display Date column
-		$td = '<span class="date">@get_issue_date()@</span>';
-		if( $params['display_permalink'] )
-		{
-			$td = '@get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@ '.$td;
-		}
 		$items_Results->cols[] = array(
 				'th' => T_('Date'),
 				'order' => $params['field_prefix'].'datestart',
 				'default_dir' => 'D',
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => $td,
+				'td' => '<span class="date">@get_issue_date()@</span>',
 			);
 	}
 
@@ -4288,7 +4740,8 @@ function items_results( & $items_Results, $params = array() )
 				'th' => T_('Title'),
 				'order' => $params['field_prefix'].'title',
 				'td_class' => 'tskst_$post_pst_ID$',
-				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].' )%</strong>',
+				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].' )%</strong>'.
+				        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\', \'\', NULL, array( \'none\' ) )@' : '' ),
 			);
 	}
 
@@ -4309,7 +4762,7 @@ function items_results( & $items_Results, $params = array() )
 				'th' => T_('Ord'),
 				'th_class' => 'shrinkwrap',
 				'order' => $params['field_prefix'].'order',
-				'td_class' => 'right item_order_edit',
+				'td_class' => 'right jeditable_cell item_order_edit',
 				'td' => '%item_row_order( {Obj} )%',
 				'extra' => array( 'rel' => '#post_ID#' ),
 			);
@@ -4376,7 +4829,7 @@ function item_type_global_icons( $object_Widget )
 				$icon_group_create_mass = NULL;
 			}
 
-			$object_Widget->global_icon( T_('Mass edit the current post list...'), 'edit', $admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ), T_('Mass edit'), 3, 4 );
+			$object_Widget->global_icon( T_('Mass edit the current post list').'...', 'edit', $admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ), T_('Mass edit'), 3, 4 );
 
 			foreach( $item_types as $item_type )
 			{
@@ -4699,7 +5152,11 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	// Redirect to manual pages after adding/editing chapter
 	$redirect_page = '&amp;redirect_page=manual';
 
-	$r = '<tr id="cat-'.$Chapter->ID.'" class="'.$line_class.( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">';
+	// Check if current item's row should be highlighted:
+	$is_highlighted = ( param( 'highlight_cat_id', 'integer', NULL ) == $Chapter->ID ) ||
+		( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) );
+
+	$r = '<tr id="cat-'.$Chapter->ID.'" class="'.$line_class.( $is_highlighted ? ' evo_highlight' : '' ).'">';
 
 	$open_url = $admin_url.'?ctrl=items&amp;tab=manual&amp;blog='.$Chapter->blog_ID;
 	// Name
@@ -4809,7 +5266,11 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
-	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">';
+	// Check if current item's row should be highlighted:
+	$is_highlighted = ( param( 'highlight_id', 'integer', NULL ) == $Item->ID ) ||
+		( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) );
+
+	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( $is_highlighted ? ' evo_highlight' : '' ).'">';
 
 	// Title
 	$edit_url = $Item->ID;
@@ -4841,10 +5302,13 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	// URL "slug"
 	$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Item->ID.'&amp;action=edit' );
-	$r .= '<td>'.$Item->get_title( $params );
+	$r .= '<td>'.$Item->get_title( array_merge( $params, array(
+			'post_navigation' => 'same_category', // set a navigating through category
+			'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
+		) ) );
 	if( $current_User->check_perm( 'slugs', 'view', false ) )
 	{ // Display icon to view all slugs of this item if current user has permission
-		$r .= ' '.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
+		$r .= ' '.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
 	}
 	$r .= '</td>';
 

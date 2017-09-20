@@ -19,16 +19,16 @@ load_funcs('plugins/_plugin.funcs.php');
  * @var ComponentWidget
  */
 global $edited_ComponentWidget;
-global $Collection, $Blog, $admin_url, $AdminUI, $Plugins;
+global $Collection, $Blog, $admin_url, $AdminUI, $Plugins, $display_mode;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-$Form = new Form( NULL, 'form' );
+$Form = new Form( NULL, 'widget_checkchanges' );
 
 if( ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
 {	// Display a link to close form (Don't display this link on bootstrap skin, because it already has an icon to close a modal window)
-	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
+	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
 }
 
 $Form->begin_form( 'fform', sprintf( $creating ?  T_('New widget "%s" in container "%s"') : T_('Edit widget "%s" in container "%s"'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get( 'sco_name' ) )
@@ -104,4 +104,17 @@ $Plugins->trigger_event( 'WidgetEndSettingsForm', array(
 
 $Form->end_form();
 
+if( $display_mode == 'js' )
+{	// Reset previous and Initialize new bozo validator for each new opened widget edit form in popup window,
+	// because it is not applied for new created forms dynamically:
+?>
+<script type="text/javascript">
+if( typeof( bozo ) != 'undefined' )
+{
+	bozo.reset_changes();
+	bozo.init();
+}
+</script>
+<?php
+}
 ?>

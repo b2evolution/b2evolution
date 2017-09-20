@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '6.7.9';
+	var $version = '6.9.4';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -142,7 +142,7 @@ class test_plugin extends Plugin
 				'type' => 'select_user',
 				'users_limit' => 5,
 				'allow_none' => true,
-				'default_value' => 0,
+				'defaultvalue' => 0,
 				'note' => 'Allows chosing none or one user'
 			),
 			'sets' => array(
@@ -167,6 +167,12 @@ class test_plugin extends Plugin
 				'type' => 'textarea',
 				'maxlength' => 10,
 				'note' => 'Maximum length is 10 here.',
+			),
+			'plug_color' => array(
+				'label' => 'Plugin color',
+				'type' => 'color',
+				'note' => 'Click on the field to display a color selector.',
+				'defaultvalue' => '#F60',
 			),
 		);
 
@@ -197,6 +203,12 @@ class test_plugin extends Plugin
 					'note' => 'Custom plugin setting for collections, private messages and newsletters.',
 					'defaultvalue' => 'Custom value',
 				),
+			'custom_color' => array(
+					'label' => 'Custom color',
+					'type' => 'color',
+					'note' => 'Click on the field to display a color selector.',
+					'defaultvalue' => '#033',
+				),
 		);
 	}
 
@@ -221,7 +233,13 @@ class test_plugin extends Plugin
 					'coll_custom' => array(
 							'label' => 'Collection setting',
 							'note' => 'Custom plugin setting ONLY for collections.',
-							'defaultvalue' => 'Colleciton value',
+							'defaultvalue' => 'Collection value',
+						),
+					'coll_color' => array(
+							'label' => 'Collection color',
+							'type' => 'color',
+							'note' => 'Click on the field to display a color selector.',
+							'defaultvalue' => '#0C9',
 						),
 				)
 			);
@@ -248,6 +266,12 @@ class test_plugin extends Plugin
 							'note' => 'Custom plugin setting ONLY for messages.',
 							'defaultvalue' => 'Message value',
 						),
+					'msg_color' => array(
+							'label' => 'Message color',
+							'type' => 'color',
+							'note' => 'Click on the field to display a color selector.',
+							'defaultvalue' => '#393',
+						),
 				)
 			);
 
@@ -273,6 +297,12 @@ class test_plugin extends Plugin
 							'note' => 'Custom plugin setting ONLY for emails.',
 							'defaultvalue' => 'Email value',
 						),
+					'email_color' => array(
+							'label' => 'Email color',
+							'type' => 'color',
+							'note' => 'Click on the field to display a color selector.',
+							'defaultvalue' => '#DDF',
+						),
 				)
 			);
 
@@ -295,6 +325,12 @@ class test_plugin extends Plugin
 					'note' => T_('Title to display in your skin.'),
 					'size' => 60,
 					'defaultvalue' => 'Test plugin widget',
+			),
+			'widget_color' => array(
+				'label' => 'Widget color',
+				'type' => 'color',
+				'note' => 'Click on the field to display a color selector.',
+				'defaultvalue' => '#F66',
 			),
 		);
 		return $r;
@@ -650,7 +686,13 @@ class test_plugin extends Plugin
 	 */
 	function AdminEndHtmlHead( & $params )
 	{
-		echo '<!-- This comment was added by the TEST plugin -->';
+		echo '<!-- This comment was added by the TEST plugin event "AdminEndHtmlHead" with function "echo" -->';
+
+		add_headline( '<!-- This comment was added by the TEST plugin event "AdminEndHtmlHead" with function "add_headline"-->' );
+
+		add_js_headline( 'console.log( "This JavaScript log was added by the TEST plugin event \'AdminEndHtmlHead\' with function \'add_js_headline\'" )' );
+
+		add_css_headline( '/* This CSS was added by the TEST plugin event \'AdminEndHtmlHead\' with function "add_css_headline" */' );
 
 		return true;
 	}
@@ -2373,46 +2415,6 @@ class test_plugin extends Plugin
 
 
 	// Caching events: {{{
-
-	/**
-	 * Event handler: called to cache object data.
-	 *
-	 * @see Plugin::CacheObjects()
-	 * @param array Associative array of parameters
-	 *   - 'action': 'delete', 'set', 'get'
-	 *   - 'key': The key to refer to 'data'
-	 *   - 'data': The actual data. This must be set by the plugin.
-	 * @return boolean True if action was successful, false otherwise.
-	 */
-	function CacheObjects( & $params )
-	{
-		switch( $params['action'] )
-		{
-			case 'get':
-				// Get cache object:
-				if( $params['key'] == 'object_GroupCache' )
-				{	// Initialize group cache object with custom params:
-					$allow_none_text = NT_('No group').' - TEST plugin';
-					$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_name DESC', $allow_none_text );
-
-					// Set data param and return true to don't use core initialization for group cache object:
-					$params['data'] = & $GroupCache;
-					return true;
-				}
-				break;
-
-			case 'set':
-				// Set cache object:
-				if( $params['key'] == 'object_ItemTypeCache' )
-				{
-					$ItemTypeCache = & $params['data'];
-
-					// Force to load all item type by this plugin:
-					$ItemTypeCache->load_all();
-				}
-				break;
-		}
-	}
 
 
 	/**

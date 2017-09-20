@@ -53,7 +53,7 @@ else
 
 echo '<h2 class="page-title">'.$page_title.'</h2>';
 
-$SQL = new SQL();
+$SQL = new SQL( 'Get total hit count - referred hits only' );
 $list_is_filtered = false;
 
 $selected_agnt_types = array();
@@ -62,7 +62,7 @@ if( $dtyp_searcheng ) $selected_agnt_types[] = "'searcheng'";
 if( $dtyp_aggregator ) $selected_agnt_types[] = "'aggregator'";
 if( $dtyp_email ) $selected_agnt_types[] = "'email'";
 if( $dtyp_unknown ) $selected_agnt_types[] = "'unknown'";
-$SQL->WHERE( 'dom_type IN ( ' . implode( ', ', $selected_agnt_types ) . ' )' );
+$SQL->WHERE( 'dom_type IN ( '.implode( ', ', $selected_agnt_types ).' )' );
 if( count( $selected_agnt_types ) != 5 ) $list_is_filtered = true;
 
 if( ! empty( $dname ) )
@@ -85,7 +85,7 @@ $SQL->FROM( 'T_basedomains LEFT OUTER JOIN T_hitlog ON dom_ID = hit_referer_dom_
 if( $tab3 == 'top' )
 { // Calculate the counts only for "top" tab
 	$SQL->SELECT( 'SQL_NO_CACHE COUNT( hit_ID ) AS hit_count' );
-	$total_hit_count = $DB->get_var( $SQL->get(), 0, 0, 'Get total hit count - referred hits only' );
+	$total_hit_count = $DB->get_var( $SQL, 0, 0 );
 
 	$sql_select = ', COUNT( hit_ID ) AS hit_count';
 }
@@ -174,7 +174,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Type'),
 		'order' => 'dom_type',
-		'td_class' => 'dom_type_edit',
+		'td_class' => 'jeditable_cell dom_type_edit',
 		'td' => /* Check permission: */$current_User->check_perm( 'stats', 'edit' ) ?
 			/* Current user can edit Domains */'<a href="#" rel="$dom_type$">%stats_dom_type_title( #dom_type# )%</a>' :
 			/* No edit */'%stats_dom_type_title( #dom_type# )%',
@@ -184,7 +184,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Status'),
 		'order' => 'dom_status',
-		'td_class' => 'dom_status_edit',
+		'td_class' => 'jeditable_cell dom_status_edit',
 		'td' => /* Check permission: */$current_User->check_perm( 'stats', 'edit' ) ?
 			/* Current user can edit Domains */'<a href="#" rel="$dom_status$">%stats_dom_status_title( #dom_status# )%</a>' :
 			/* No edit */'%stats_dom_status_title( #dom_status# )%',

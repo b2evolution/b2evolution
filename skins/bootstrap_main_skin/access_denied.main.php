@@ -36,12 +36,16 @@ siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 
 // Display a picture from skin setting as background image
-global $media_path, $media_url;
-$bg_image = $Skin->get_setting( 'front_bg_image' );
+$FileCache = & get_FileCache();
+$bg_File = NULL;
+if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
+{
+	$bg_File = & $FileCache->get_by_ID( $bg_File_ID, false, false );
+}
 echo '<div class="evo_pictured_layout">';
-if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
+if( $bg_File && $bg_File->exists() )
 { // If it exists in media folder
-	echo '<img class="evo_pictured__image" src="'.$media_url.$bg_image.'" />';
+	echo '<img class="evo_pictured__image" src="'.$bg_File->get_url().'" />';
 }
 
 ?>
@@ -187,36 +191,25 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 
 	<div class="row">
 
-		<footer class="col-md-12 center">
-	
+		<footer class="col-md-12">
+
 			<?php
 			if( $Skin->show_container_when_access_denied( 'footer' ) )
 			{ // Display 'Footer' widget container
 			?>
-			<div class="evo_container evo_container__footer">
+			<div class="evo_container evo_container__footer clearfix">
 			<?php
 				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
 				skin_container( NT_('Footer'), array(
 						// The following params will be used as defaults for widgets included in this container:
-						'block_start'         => '<span class="evo_widget $wi_class$">',
-						'block_end'           => '</span> ',
-						'block_display_title' => false,
-						'list_start'          => '',
-						'list_end'            => '',
-						'item_start'          => '',
-						'item_end'            => '',
-						'item_selected_start' => '',
-						'item_selected_end'   => '',
-						'link_default_class'  => 'btn btn-default btn-sm',
-						'link_selected_class' => 'btn btn-default btn-sm active',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
 			</div>
 			<?php } ?>
-	
-			<p>
+
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

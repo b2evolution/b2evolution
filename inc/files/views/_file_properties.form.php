@@ -20,6 +20,8 @@ global $edited_File, $selected_Filelist;
 
 global $blog, $filename_max_length;
 
+global $Settings;
+
 $edit_allowed_perm = $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() );
 
 $Form = new Form( NULL, 'fm_properties_checkchanges' );
@@ -38,14 +40,20 @@ $Form->begin_form( 'fform', ( get_param( 'mode' ) == 'modal' ? '' : T_('File pro
 
 	$Form->begin_fieldset( T_('Properties') );
 		if( $edit_allowed_perm )
-		{ // User can edit: 
+		{ // User can edit:
 			$Form->text( 'name', $edited_File->dget('name'), 32, T_('Filename'), T_('This is the name of the file on the server hard drive.'), $filename_max_length );
 		}
 		else
 		{ // User can view only:
-			$Form->info( T_('Filename'), $edited_File->dget('name'), T_('This is the name of the file on the server hard drive.') );	
+			$Form->info( T_('Filename'), $edited_File->dget('name'), T_('This is the name of the file on the server hard drive.') );
 		}
 		$Form->info( T_('Type'), $edited_File->get_icon().' '.$edited_File->get_type() );
+		if( $edited_File->is_image() )
+		{
+			$Form->info( T_('Dimensions'), $edited_File->get_image_size().' px' );
+			$Form->checkbox( 'resize_image', 0, T_('Resize'), /* TRANS: %s is image dimension */ sprintf( T_('Check to resize and fit into %s px' ),
+					'<a href="'.get_dispctrl_url( 'fileset').'">'.$Settings->get( 'fm_resize_width' ).'x'.$Settings->get( 'fm_resize_height' ).'</a>' ) );
+		}
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Meta data') );

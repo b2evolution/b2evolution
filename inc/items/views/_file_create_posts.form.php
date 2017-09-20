@@ -123,7 +123,7 @@ foreach( $images_list as $item )
 	{
 		$title = basename( $File->get( 'name' ) );
 	}
-	$Form->begin_fieldset( T_('Post #').( $post_counter + 1 ).get_manual_link( 'creating-posts-from-files' ) );
+	$Form->begin_fieldset( /* TRANS: noun */ T_('Post').' #'.( $post_counter + 1 ).get_manual_link( 'creating-posts-from-files' ) );
 	$Form->text_input( 'post_title['.$post_counter.']', $title, 40, T_('Post title') );
 
 	if( $post_counter != 0 )

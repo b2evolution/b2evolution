@@ -94,13 +94,13 @@ $SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type, hit_type' );
 $sessions_SQL->GROUP_BY( 'hit_date' );
 $sessions_SQL->ORDER_BY( 'hit_date DESC' );
 
-$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
-$sessions = $DB->get_assoc( $sessions_SQL->get(), $SQL->title );
+$res_hits = $DB->get_results( $SQL, ARRAY_A );
+$sessions = $DB->get_assoc( $sessions_SQL );
 
 /*
  * Chart
  */
-if( count($res_hits) )
+if( count( $res_hits ) )
 {
 	// Find the dates without hits and fill them with 0 to display on graph and table:
 	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
@@ -317,14 +317,14 @@ if( count($res_hits) )
 
 			// Increment hitcounter:
 
-			if ( $row_stats['hit_type'] == 'ajax' )
+			if( $row_stats['hit_type'] == 'ajax' )
 			{
 				$hits['ajax'] += $row_stats['hits'];
 				$hits_total['ajax'] += $row_stats['hits'];
 			}
 			else
 			{
-				if ( $row_stats['hit_type'] == 'admin' )
+				if( $row_stats['hit_type'] == 'admin' )
 				{
 					$hits['admin'] += $row_stats['hits'];
 					$hits_total['admin'] += $row_stats['hits'];

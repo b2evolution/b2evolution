@@ -56,7 +56,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Page Top'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'         => '<div class="widget $wi_class$">',
+					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
 					'list_start'          => '<ul>',
@@ -76,7 +76,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Header'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="widget $wi_class$">',
+					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
 					'block_title_start' => '<h1>',
 					'block_title_end'   => '</h1>',
@@ -278,7 +278,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					skin_container( NT_('Sidebar'), array(
 							// The following (optional) params will be used as defaults for widgets included in this container:
 							// This will enclose each widget in a block:
-							'block_start' => '<div class="panel panel-default widget $wi_class$">',
+							'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
 							'block_end'   => '</div>',
 							// This will enclose the title of each widget:
 							'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
@@ -315,7 +315,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					skin_container( NT_('Sidebar 2'), array(
 							// The following (optional) params will be used as defaults for widgets included in this container:
 							// This will enclose each widget in a block:
-							'block_start' => '<div class="panel panel-default widget $wi_class$">',
+							'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
 							'block_end'   => '</div>',
 							// This will enclose the title of each widget:
 							'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
@@ -366,30 +366,21 @@ siteskin_include( '_site_body_header.inc.php' );
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="col-md-12">
 
-		<div class="evo_container evo_container__footer">
+		<div class="evo_container evo_container__footer clearfix">
 		<?php
 			// Display container and contents:
 			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'         => '<span class="evo_widget $wi_class$">',
-					'block_end'           => '</span> ',
-					'block_display_title' => false,
-					'list_start'          => '',
-					'list_end'            => '',
-					'item_start'          => '',
-					'item_end'            => '',
-					'item_selected_start' => '',
-					'item_selected_end'   => '',
-					'link_default_class'  => 'btn btn-default btn-sm',
-					'link_selected_class' => 'btn btn-default btn-sm active',
+					'block_start'       => '<div class="evo_widget $wi_class$">',
+					'block_end'         => '</div>',
 				) );
 			// Note: Double quotes have been used around "Footer" only for test purposes.
 		?>
 		</div>
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

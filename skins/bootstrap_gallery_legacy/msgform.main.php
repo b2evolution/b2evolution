@@ -176,35 +176,26 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="col-md-12">
 
 		<?php
 		if( $Skin->show_container_when_access_denied( 'footer' ) )
 		{ // Display 'Footer' widget container
 		?>
-		<div class="evo_container evo_container__footer">
+		<div class="evo_container evo_container__footer clearfix">
 		<?php
 			// Display container and contents:
 			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'         => '<span class="evo_widget $wi_class$">',
-					'block_end'           => '</span> ',
-					'block_display_title' => false,
-					'list_start'          => '',
-					'list_end'            => '',
-					'item_start'          => '',
-					'item_end'            => '',
-					'item_selected_start' => '',
-					'item_selected_end'   => '',
-					'link_default_class'  => 'btn btn-default btn-sm',
-					'link_selected_class' => 'btn btn-default btn-sm active',
+					'block_start'       => '<div class="evo_widget $wi_class$">',
+					'block_end'         => '</div>',
 				) );
 			// Note: Double quotes have been used around "Footer" only for test purposes.
 		?>
 		</div>
 		<?php } ?>
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

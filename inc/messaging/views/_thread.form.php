@@ -58,7 +58,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 
 if( is_admin_page() )
 {
-	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 }
 
 $Form->begin_form( $params['form_class_thread'], $params['form_title'], array( 'onsubmit' => 'return check_form_thread()') );
@@ -141,8 +141,7 @@ if( !empty( $thrd_recipients_array ) )
 	{
 		$recipients_selected[] = array(
 			'id'    => $recipient_ID,
-			'login' => $thrd_recipients_array['login'][$rnum],
-			'fullname' => $thrd_recipients_array['fullname'][$rnum]
+			'login' => $thrd_recipients_array['login'][$rnum]
 		);
 	}
 }

@@ -42,7 +42,7 @@ if( $params['notify_full'] )
 		// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 		.T_('Collection').': '.$Blog->get( 'shortname' )."\n"
 		// Mail bloat: .' ( '.str_replace('&amp;', '&', $Blog->gen_blogurl())." )\n"
-		.T_('Post').': '.$Item->get( 'title' )."\n";
+		./* TRANS: noun */ T_('Post').': '.$Item->get( 'title' )."\n";
 		// Mail bloat: .' ( '.str_replace('&amp;', '&', $Item->get_permanent_url( '', '', '&' ))." )\n";
 		// TODO: fp> We MAY want to force short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 

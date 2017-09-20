@@ -176,6 +176,7 @@ class Plugins_admin extends Plugins
 				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
 				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
 				'AfterUserUpdate' => 'This gets called after an user has been updated in the database.',
+				'AdminAfterUsersList' => 'This gets called right after displaying the admin users list.',
 
 				// fp> This is actually RENDERing, right?
 				// TODO: Rename to "DispRender"

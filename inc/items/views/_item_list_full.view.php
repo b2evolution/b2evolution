@@ -129,14 +129,14 @@ while( $Item = & $ItemList->get_item() )
 		<div class="panel-heading small <?php
 		if( $Item->ID == $highlight )
 		{
-			echo 'fadeout-ffff00" id="fadeout-1';
+			echo ' evo_highlight';
 		}
 		?>">
 			<?php
 				echo '<div class="pull-right">';
 				$Item->permanent_link( array(
 						'before' => '',
-						'text'   => '#text#'
+						'text'   => get_icon( 'permalink' ).' '.T_('Permalink'),
 					) );
 				// Item slug control:
 				$Item->tinyurl_link( array(
@@ -146,7 +146,7 @@ while( $Item = & $ItemList->get_item() )
 				global $admin_url;
 				if( $current_User->check_perm( 'slugs', 'view' ) )
 				{ // user has permission to view slugs:
-					echo '&nbsp;'.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
+					echo '&nbsp;'.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 						NULL, NULL, NULL, array( 'class' => 'small' ) );
 				}
 				If( !empty( $Item->order ) )
@@ -171,7 +171,14 @@ while( $Item = & $ItemList->get_item() )
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'name' ) );
 
-				echo $Item->get_history_link( array( 'before' => ' ' ) );
+				// Last touched date:
+				echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
+					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'last_touched_ts' ) ).'</span>';
+
+				// Contents updated date:
+				echo ' <span class="text-nowrap">&middot; '.T_('Contents updated').': '
+					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'contents_last_updated_ts' ) )
+					.$Item->get_refresh_contents_last_updated_link().'</span>';
 
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
@@ -185,6 +192,8 @@ while( $Item = & $ItemList->get_item() )
 					{ // Display deadline date
 						echo T_('Deadline').': <span class="bDate">';
 						$Item->deadline_date();
+						echo ' ';
+						$Item->deadline_time();
 						echo '</span>';
 					}
 				}
@@ -281,15 +290,20 @@ while( $Item = & $ItemList->get_item() )
 			echo '<span class="'.button_class( 'group' ).'">';
 			if( $action != 'view' )
 			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('View').'</a>';
+				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('Details').'</a>';
 			}
+
+			echo $Item->get_history_link( array(
+					'class'     => button_class( 'text' ),
+					'link_text' => '$icon$ '.T_('History'),
+				) );
 
 			if( isset( $GLOBALS['files_Module'] )
 			    && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
 			    && $current_User->check_perm( 'files', 'view' ) )
 			{	// Display a button to view the files of the post only if current user has a permissions:
 				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID )
-							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).' '.T_('Files').'</a>';
+							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).' '.T_('Attachments').'</a>';
 			}
 
 			if( $Blog->get_setting( 'allow_comments' ) != 'never' )
@@ -319,6 +333,13 @@ while( $Item = & $ItemList->get_item() )
 					'before' => '',
 					'after'  => '',
 					'text'   => '#icon#',
+					'class'  => button_class()
+				) );
+
+			// Display merge button if current user has the rights:
+			$Item->merge_link( array( // Link to backoffice for merging
+					'before' => '',
+					'after'  => '',
 					'class'  => button_class()
 				) );
 			echo '</span>';
@@ -583,8 +604,6 @@ while( $Item = & $ItemList->get_item() )
 			$Form->hidden( 'comment_item_ID', $Item->ID );
 			$Form->hidden( 'comment_type', $comment_type );
 			$Form->hidden( 'redirect_to', $admin_url.'?ctrl=items&blog='.$Item->Blog->ID.'&p='.$Item->ID.'&comment_type='.$comment_type );
-
-			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'name' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
 
 			if( $comment_type != 'meta' && $Item->can_rate() )
 			{	// Comment rating:

@@ -98,7 +98,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 	// In case we send this to the blog for a preview :
 	$Form->hidden( 'preview', 0 );
 	$Form->hidden( 'more', 1 );
-	$Form->hidden( 'preview_userid', $current_User->ID );
 
 	// Add hidden required fields or fields that were set in the init_inskin_editing() function
 	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );

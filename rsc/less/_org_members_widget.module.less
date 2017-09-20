@@ -13,6 +13,28 @@
 		margin-top: 20px;
 		margin-bottom: 30px;
 	}
+	
+	// Flowing blocks Layout
+	&.evo_layout_flow {
+		// Wrapper div
+		.widget_flow_blocks {
+		display: inline-block;
+		text-align: center;
+			// Inner divs
+			> div {
+				display: inline-block;
+				float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
+				margin-left: 14px;
+				margin-right: 14px;
+				vertical-align: top;
+				width: 250px; // Fixed widget for flowing blocks
+				img {
+					border-radius: 50%;
+				}
+			}
+		}
+	}
+	
 	img {
 		display: inline-block;
 	}

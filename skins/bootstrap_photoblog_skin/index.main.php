@@ -210,7 +210,6 @@ siteskin_include( '_site_body_header.inc.php' );
 						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
 					// Item content:
-					'url_link_position'     => 'top',
 					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
 					'skin_form_before'      => '<div class="panel panel-default skin-form">'
 																				.'<div class="panel-heading">'
@@ -252,7 +251,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'featured_intro_before' => '<div class="jumbotron">',
 					'featured_intro_after'  => '</div>',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
@@ -268,30 +267,21 @@ siteskin_include( '_site_body_header.inc.php' );
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="col-md-12">
 
-		<div class="evo_container evo_container__footer">
+		<div class="evo_container evo_container__footer clearfix">
 		<?php
 			// Display container and contents:
 			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'         => '<span class="evo_widget $wi_class$">',
-					'block_end'           => '</span> ',
-					'block_display_title' => false,
-					'list_start'          => '',
-					'list_end'            => '',
-					'item_start'          => '',
-					'item_end'            => '',
-					'item_selected_start' => '',
-					'item_selected_end'   => '',
-					'link_default_class'  => 'btn btn-default btn-sm',
-					'link_selected_class' => 'btn btn-default btn-sm active',
+					'block_start'       => '<div class="evo_widget $wi_class$">',
+					'block_end'         => '</div>',
 				) );
 			// Note: Double quotes have been used around "Footer" only for test purposes.
 		?>
 		</div>
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
@@ -342,7 +332,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

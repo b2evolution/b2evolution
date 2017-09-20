@@ -985,7 +985,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	}
 
 	// Build query to get the tags:
-	$tags_SQL = new SQL();
+	$tags_SQL = new SQL( 'Get tags' );
 
 	if( $blog_ids != '*' || $get_cat_blog_ID )
 	{
@@ -1034,7 +1034,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 		$tags_SQL->LIMIT( $limit );
 	}
 
-	return $DB->get_results( $tags_SQL->get(), OBJECT, 'Get tags' );
+	return $DB->get_results( $tags_SQL );
 }
 
 
@@ -1054,8 +1054,9 @@ function get_inskin_statuses( $blog_ID, $type )
 
 	$BlogCache = & get_BlogCache();
 	$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
-	$inskin_statuses = $Blog->get_setting( ( $type == 'comment' ) ? 'comment_inskin_statuses' : 'post_inskin_statuses' );
-	return explode( ',', $inskin_statuses );
+	$inskin_statuses = trim( $Blog->get_setting( ( $type == 'comment' ) ? 'comment_inskin_statuses' : 'post_inskin_statuses' ) );
+
+	return empty( $inskin_statuses ) ? array() : explode( ',', $inskin_statuses );
 }
 
 
@@ -1202,7 +1203,7 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 
 		case 'ordered-array': // indexed array, ordered from the lowest to the highest public level
 			$r = array(
-				0 => array( 'deprecated', '', T_('Deprecate!'), 'grey' ),
+				0 => array( 'deprecated', '', T_('Deprecate').'!', 'grey' ),
 				1 => array( 'review', T_('Open to moderators!'), T_('Restrict to moderators!'), 'magenta' ),
 				2 => array( 'protected', T_('Open to members!'), T_('Restrict to members!'), 'orange' ),
 				3 => array( 'community', T_('Open to community!'), T_('Restrict to community!'), 'blue' ),
@@ -1548,7 +1549,8 @@ function get_coll_fav_icon( $blog_ID, $params = array() )
 
 	$BlogCache = & get_BlogCache();
 	$edited_Blog = $BlogCache->get_by_ID( $blog_ID );
-	if( $edited_Blog->favorite() > 0 )
+	$is_favorite = $edited_Blog->favorite() > 0;
+	if( $is_favorite )
 	{
 		$icon = 'star_on';
 		$action = 'disable_setting';
@@ -1561,16 +1563,105 @@ function get_coll_fav_icon( $blog_ID, $params = array() )
 		$title = T_('The collection is not a favorite');
 	}
 
-	return '<a href="'.$admin_url.'?ctrl=coll_settings'
+	return '<a class="evo_post_fav_btn" href="'.$admin_url.'?ctrl=coll_settings'
 			.'&amp;tab=general'
 			.'&amp;action='.$action
 			.'&amp;setting=fav'
 			.'&amp;blog='.$blog_ID
 			.'&amp;'.url_crumb('collection').'" '
-			.'onclick="return toggleFavorite( this, \''.$edited_Blog->urlname.'\' );">'
+			.'data-coll="'.$edited_Blog->urlname.'" '
+			.'data-favorite="'.( $edited_Blog->favorite() ? '0' : '1' ).'">'
 			.get_icon( $icon, 'imgtag', $params )
 			.'</a>';
 }
+
+
+/**
+ * Get blog order field
+ *
+ * @param object Blog
+ * @param string What return: 'field', 'dir'
+ * @param string Separator
+ * @return string
+ */
+function get_blog_order( $Blog = NULL, $return = 'field', $separator = ',' )
+{
+	$result = '';
+
+	switch( $return )
+	{
+		case 'field':
+			// Get field for ORDERBY sql clause
+			if( empty( $Blog ) )
+			{ // Get default value if blog is not defined
+				$result = 'datestart';
+			}
+			else
+			{
+				$result = $Blog->get_setting( 'orderby' );
+				if( $Blog->get_setting( 'orderby_1' ) != '' )
+				{ // Append second order field
+					$result .= $separator.$Blog->get_setting( 'orderby_1' );
+					if( $Blog->get_setting( 'orderby_2' ) != '' )
+					{ // Append third order field
+						$result .= $separator.$Blog->get_setting( 'orderby_2' );
+					}
+				}
+			}
+			break;
+
+		case 'dir':
+			// Get direction(ASC|DESC) for ORDERBY sql clause
+			if( empty( $Blog ) )
+			{ // Get default value if blog is not defined
+				$result = 'DESC';
+			}
+			else
+			{
+				$result = $Blog->get_setting( 'orderdir' );
+				if( $Blog->get_setting( 'orderby_1' ) != '' && $Blog->get_setting( 'orderdir_1' ) != '' )
+				{ // Append second order direction
+					$result .= $separator.$Blog->get_setting( 'orderdir_1' );
+					if( $Blog->get_setting( 'orderby_2' ) != '' && $Blog->get_setting( 'orderdir_2' ) != '' )
+					{ // Append third order direction
+						$result .= $separator.$Blog->get_setting( 'orderdir_2' );
+					}
+				}
+			}
+			break;
+	}
+
+	return $result;
+}
+
+
+/**
+ * Get posts order by options for the order by select list
+ *
+ * @param integer|NULL Collection ID to get only enabled item types for the collection, NULL to get all item types
+ * @param string the value which should be selected by default
+ * @param boolean set tru to allow 'none' option, false otherwise
+ * @return string HTML code of <option>s for <select>
+ */
+function get_post_orderby_options( $coll_ID = NULL, $selected_value, $allow_none = false )
+{
+	// Get available sort options:
+	$available_sort_options = get_available_sort_options( $coll_ID, $allow_none, true );
+	// Get general order list options from sub array:
+	$general_orderby_list = $available_sort_options['general'];
+
+	// Build $option_list
+	$option_list = Form::get_select_options_string( $general_orderby_list, $selected_value, false, false );
+	if( ! empty( $available_sort_options['custom'] ) )
+	{ // There are custom fields order by options
+		$option_list .= '<optgroup label="'.T_('Custom fields').'">';
+		$option_list .= Form::get_select_options_string( $available_sort_options['custom'], $selected_value, false, false );
+		$option_list .= '</optgroup>';
+	}
+
+	return $option_list;
+}
+
 
 /**
  * Display blogs results table

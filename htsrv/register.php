@@ -305,12 +305,12 @@ switch( $action )
 
 		if( ! empty( $invitation ) )
 		{ // Invitation code was entered on the form
-			$SQL = new SQL();
+			$SQL = new SQL( 'Check if the entered invitation code is not expired' );
 			$SQL->SELECT( 'ivc_source, ivc_grp_ID, ivc_level' );
 			$SQL->FROM( 'T_users__invitation_code' );
 			$SQL->WHERE( 'ivc_code = '.$DB->quote( $invitation ) );
 			$SQL->WHERE_and( 'ivc_expire_ts > '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ) );
-			if( $invitation_code = $DB->get_row( $SQL->get() ) )
+			if( $invitation_code = $DB->get_row( $SQL ) )
 			{	// Set source and group from invitation code:
 				if( ! empty( $invitation_code->ivc_source ) )
 				{	// Use invitation source only if it is filled:
@@ -506,7 +506,14 @@ if( $inskin && !empty( $Blog ) )
 	$skin = $Skin->folder;
 	$disp = 'register';
 	$ads_current_skin_path = $skins_path.$skin.'/';
-	require $ads_current_skin_path.'index.main.php';
+	if( file_exists( $ads_current_skin_path.'register.main.php' ) )
+	{	// Call custom file for register disp if it exists:
+		require $ads_current_skin_path.'register.main.php';
+	}
+	else
+	{	// Call index main skin file to display a register disp:
+		require $ads_current_skin_path.'index.main.php';
+	}
 	// already exited here
 	exit(0);
 }

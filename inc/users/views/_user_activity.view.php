@@ -27,7 +27,7 @@ global $user_tab, $user_ID;
 
 global $current_User, $UserSettings;
 
-if( !$current_User->can_moderate_user( $edited_User->ID ) )
+if( $current_User->ID != $user_ID && ! $current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
 	debug_die( T_( 'You have no permission to see this tab!' ) );
 }
@@ -42,15 +42,16 @@ user_prevnext_links( array(
 	) );
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
+echo '<div class="row">';
+
 if( !$user_profile_only )
 { // echo user edit action icons
 	$Widget = new Widget();
 	echo_user_actions( $Widget, $edited_User, 'edit' );
-	echo '<div class="row">';
 	echo '<span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">'.$Widget->gen_global_icons().'</span>';
 }
 
-echo '<div class="col-xs-12 col-lg-6 col-lg-pull-6">'.get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity') ).'</span>'.get_manual_link( 'user-activity-tab' ) ).'</div>';
+echo '<div class="col-xs-12 col-lg-6'.( $user_profile_only ? '' : ' col-lg-pull-6').'">'.get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity') ).'</span>'.get_manual_link( 'user-activity-tab' ) ).'</div>';
 echo '</div>';
 
 // Display IP address from where this user was created

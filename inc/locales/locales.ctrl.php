@@ -267,11 +267,11 @@ switch( $action )
 		unset( $locales );
 
 		// Get all enabled locales before restoring:
-		$locale_SQL = new SQL();
+		$locale_SQL = new SQL( 'Get all enabled locales before restoring' );
 		$locale_SQL->SELECT( 'loc_locale' );
 		$locale_SQL->FROM( 'T_locales' );
 		$locale_SQL->WHERE( 'loc_enabled = 1' );
-		$enabled_locales = $DB->get_col( $locale_SQL->get(), 0, 'Get all enabled locales before restoring' );
+		$enabled_locales = $DB->get_col( $locale_SQL );
 
 		// Delete locales that are not enabled and have no file currently:
 		$q = $DB->query( 'DELETE FROM T_locales

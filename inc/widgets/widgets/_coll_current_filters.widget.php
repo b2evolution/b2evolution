@@ -25,6 +25,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_current_filters_Widget extends ComponentWidget
 {
+	var $icon = 'filter';
+
 	/**
 	 * Constructor
 	 */
@@ -95,7 +97,7 @@ class coll_current_filters_Widget extends ComponentWidget
 						array( 'category', T_('Category'), 1 ),
 						array( 'archive', T_('Archive'), 1 ),
 						array( 'keyword', T_('Keyword'), 1 ),
-						array( 'tag', T_('Tag'), 1 ),
+						array( 'tag', /* TRANS: noun */ T_('Tag'), 1 ),
 						array( 'author', T_('Author'), 1 ),
 						array( 'assignee', T_('Assignee'), 1 ),
 						array( 'locale', T_('Locale'), 1 ),

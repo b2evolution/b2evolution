@@ -36,7 +36,7 @@ $Form->begin_fieldset( T_( 'Welcome message after account activation' ).get_manu
 	{	// Use login of the current user if user login is incorrect:
 		$User = $current_User;
 	}
-	$Form->username( 'welcomepm_from', $User, T_('From'), T_('User login.') );
+	$Form->username( 'welcomepm_from', $User, T_('From'), T_('User login').'.' );
 
 	$Form->text_input( 'welcomepm_title', $Settings->get( 'welcomepm_title' ), 58, T_('Title'), '', array( 'maxlength' => 5000 ) );
 
@@ -53,7 +53,7 @@ $Form->begin_fieldset( T_( 'Info message to reporters after account deletion' ).
 	{	// Use login of the current user if user login is incorrect:
 		$User = $current_User;
 	}
-	$Form->username( 'reportpm_from', $User, T_('From'), T_('User login.') );
+	$Form->username( 'reportpm_from', $User, T_('From'), T_('User login').'.' );
 
 	$Form->text_input( 'reportpm_title', $Settings->get( 'reportpm_title' ), 58, T_('Title'), '', array( 'maxlength' => 5000 ) );
 

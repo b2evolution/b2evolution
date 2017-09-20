@@ -42,7 +42,7 @@ $Form->begin_fieldset( T_('Front page').get_manual_link('collection-front-page-s
 			array( 'tags',     T_('Tags') ),
 			array( 'help',     T_('Help') ),
 			array( 'mediaidx', T_('Photo Index') ),
-			array( 'msgform',  T_('Sending a message') ),
+			array( 'msgform',  T_('Contact') ),
 			array( 'threads',  T_('Messages') ),
 			array( 'contacts', T_('Contacts') ),
 			array( 'postidx',  T_('Post Index') ),
