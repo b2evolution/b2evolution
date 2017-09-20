@@ -766,7 +766,7 @@ class ComponentWidget extends DataObject
 				}
 				if( ! $wrapper_is_found )
 				{	// Display error if widget has no wrappers to enable designer mode:
-					echo '<span class="text-danger"><code>'.$this->code.'</code> - no widget wrappers for designer mode</span>';
+					echo '<span class="text-danger">Widget <code>'.$this->code.'</code> cannot be manipulated because it lacks a wrapper tag.</span>';
 				}
 			}
 
