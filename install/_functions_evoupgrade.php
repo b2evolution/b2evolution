@@ -8792,6 +8792,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13110, 'Upgrading widget containers table...' ) )
+	{	// part of 7.0.0-alpha
+		db_add_col( 'T_widget__container', 'wico_skin_type', 'ENUM( "normal", "mobile", "tablet" ) COLLATE ascii_general_ci NOT NULL DEFAULT "normal" AFTER wico_code' );
+		db_drop_index( 'T_widget__container', 'wico_coll_ID_code' );
+		db_add_index( 'T_widget__container', 'wico_coll_ID_code_skin_type', 'wico_coll_ID, wico_code, wico_skin_type', 'UNIQUE' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

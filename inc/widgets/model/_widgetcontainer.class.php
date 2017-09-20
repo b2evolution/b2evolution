@@ -25,6 +25,7 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 class WidgetContainer extends DataObject
 {
 	var $code;
+	var $skin_type;
 	var $name;
 	var $coll_ID;
 	var $order;
@@ -44,6 +45,7 @@ class WidgetContainer extends DataObject
 		{
 			$this->ID = $db_row->wico_ID;
 			$this->code = $db_row->wico_code;
+			$this->skin_type = $db_row->wico_skin_type;
 			$this->name = $db_row->wico_name;
 			$this->coll_ID = $db_row->wico_coll_ID;
 			$this->order = $db_row->wico_order;
@@ -106,25 +108,25 @@ class WidgetContainer extends DataObject
 	 */
 	function load_from_Request()
 	{
-		$wico_code = param( 'wico_code', 'string', true );
-		$this->set( 'code', $wico_code );
+		param( 'wico_name', 'string', true );
+		$this->set_from_Request( 'name' );
 
-		$this->set( 'name', param( 'wico_name', 'string', true ) );
-		if( $this->ID != 0 )
-		{
-			$this->set( 'order', param( 'wico_order', 'integer', true ) );
-		}
-		else
-		{
-			$this->set( 'order', param( 'wico_order', 'integer', 0 ) );
-		}
+		param( 'wico_code', 'string', true );
+		$this->set_from_Request( 'code' );
+
+		param( 'wico_skin_type', 'string', '' );
+		param_check_not_empty( 'wico_skin_type', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Skin type') ) );
+		$this->set_from_Request( 'skin_type' );
+
+		param( 'wico_order', 'integer', $this->ID == 0 ? 0 : true );
+		$this->set_from_Request( 'order' );
 
 		if( ! param_errors_detected() )
 		{	// Widget container code must be unique for collection, Check it only when no errors on the form:
-			if( $wico_ID = $this->dbexists( array( 'wico_code', 'wico_coll_ID' ), array( $this->get( 'code' ), $this->get( 'coll_ID' ) ) ) )
+			if( $wico_ID = $this->dbexists( array( 'wico_code', 'wico_coll_ID', 'wico_skin_type' ), array( $this->get( 'code' ), $this->get( 'coll_ID' ), $this->get( 'skin_type' ) ) ) )
 			{	// We have a duplicate entry:
 				param_error( 'ufdf_code',
-					sprintf( T_('Another widget container already uses this code. Do you want to <a %s>edit the existing widget container</a>?'),
+					sprintf( T_('Another widget container already uses this code for this skin type. Do you want to <a %s>edit the existing widget container</a>?'),
 						'href="?ctrl=widgets&amp;blog='.$this->get( 'coll_ID' ).'&amp;action=edit_container&amp;wico_ID='.$wico_ID.'"' ) );
 			}
 		}

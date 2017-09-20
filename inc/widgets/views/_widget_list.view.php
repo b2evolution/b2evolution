@@ -21,7 +21,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	echo '<div class="pull-right" style="margin-bottom:10px">';
 		echo action_icon( T_('Add a new container!'), 'add',
-					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container', T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default' ) );
+					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default' ) );
 		echo action_icon( T_('Scan skins for containers'), 'reload',
 					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Scan skins for containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 	echo '</div>';

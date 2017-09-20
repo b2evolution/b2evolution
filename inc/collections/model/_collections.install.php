@@ -91,14 +91,15 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_widget__container' => array(
 		'Creating components container table',
 		"CREATE TABLE T_widget__container (
-			wico_ID       INT(10) UNSIGNED auto_increment,
-			wico_code     VARCHAR(32) COLLATE ascii_general_ci NULL DEFAULT NULL,
-			wico_name     VARCHAR( 40 ) NOT NULL,
-			wico_coll_ID  INT(10) NULL DEFAULT NULL,
-			wico_order    INT(10) NOT NULL,
-			wico_main     TINYINT(1) NOT NULL DEFAULT 0,
-			PRIMARY KEY ( wico_ID ),
-			UNIQUE wico_coll_ID_code ( wico_coll_ID, wico_code )
+			wico_ID        INT(10) UNSIGNED auto_increment,
+			wico_code      VARCHAR(32) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			wico_skin_type ENUM( 'normal', 'mobile', 'tablet' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'normal',
+			wico_name      VARCHAR( 40 ) NOT NULL,
+			wico_coll_ID   INT(10) NULL DEFAULT NULL,
+			wico_order     INT(10) NOT NULL,
+			wico_main      TINYINT(1) NOT NULL DEFAULT 0,
+			PRIMARY KEY    ( wico_ID ),
+			UNIQUE wico_coll_ID_code_skin_type ( wico_coll_ID, wico_code, wico_skin_type )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_widget__widget' => array(
