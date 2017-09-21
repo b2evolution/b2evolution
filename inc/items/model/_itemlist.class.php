@@ -747,6 +747,7 @@ class ItemList2 extends ItemListLight
 				case 'datecreated':
 				case 'datemodified':
 				case 'last_touched_ts':
+				case 'contents_last_updated_ts':
 				case 'urltitle':
 				case 'priority':
 					$where_condition .= $compare_field.$operator.$DB->quote( $current_Item->{$post_field_name} );
