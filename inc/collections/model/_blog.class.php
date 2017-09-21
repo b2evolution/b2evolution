@@ -3347,13 +3347,31 @@ class Blog extends DataObject
 			 WHERE bloggroup_blog_ID = '.$DB->quote( $duplicated_coll_ID ),
 			'Duplicate all coll-group permissions from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
 
-		// Copy all widgets from duplicated collection to new created:
-		$DB->query( 'INSERT INTO T_widget
-			        ( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params )
-			SELECT '.$this->ID.', wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params
-			  FROM T_widget
-			 WHERE wi_coll_ID = '.$DB->quote( $duplicated_coll_ID ),
-			'Duplicate all widgets from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
+		// Copy all widgets and containers from duplicated collection to new created:
+		$SQL = new SQL( 'Get all widget containers of the duplicating collection #'.$duplicated_coll_ID );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_widget__container' );
+		$SQL->WHERE( 'wico_coll_ID = '.$DB->quote( $duplicated_coll_ID ) );
+		$widget_containers = $DB->get_results( $SQL, ARRAY_A );
+		foreach( $widget_containers as $widget_container )
+		{
+			$old_wico_ID = $widget_container['wico_ID'];
+			unset( $widget_container['wico_ID'] );
+			$widget_container['wico_coll_ID'] = $this->ID;
+			$r = $DB->query( 'INSERT INTO T_widget__container
+				( '.implode( ', ', array_keys( $widget_container ) ).' )
+				VALUES ( '.$DB->quote( $widget_container ).' )',
+				'Duplicate widget container #'.$old_wico_ID .' from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
+			if( $r && $DB->insert_id > 0 )
+			{	// Duplicate all widgets of the inserted container:
+				$DB->query( 'INSERT INTO T_widget__widget
+				          ( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params )
+				  SELECT '.$DB->insert_id.', wi_order, wi_enabled, wi_type, wi_code, wi_params
+				    FROM T_widget__widget
+				    WHERE wi_wico_ID = '.$DB->quote( $old_wico_ID ),
+					'Duplicate all widgets of container #'.$old_wico_ID.' from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
+			}
+		}
 
 		// Copy all categories from duplicated collection to new created:
 		$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );

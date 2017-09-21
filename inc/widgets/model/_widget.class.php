@@ -763,12 +763,10 @@ class ComponentWidget extends DataObject
 			$designer_mode_data = array(
 					'data-id'        => $this->ID,
 					'data-type'      => $this->get_name(),
-					'data-container' => $this->get( 'sco_name' ),
+					'data-container' => $this->get_container_param( 'name' ),
 				);
-			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-			{	// Set data to know current user has a permission to edit this widget:
-				$designer_mode_data['data-can-edit'] = 1;
-			}
+			// Set data to know current user has a permission to edit this widget:
+			$designer_mode_data['data-can-edit'] = $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) ? 1 : 0;
 			// Don't load a widget content from cache when designer mode is enabled:
 			$force_nocaching = true;
 			// Set designer mode:
@@ -815,10 +813,16 @@ class ComponentWidget extends DataObject
 						if( ! empty( $params[ $widget_wrapper ] ) )
 						{	// If this wrapper is filled and used with current widget,
 							// Append new data for widget wrapper:
-							$params[ $widget_wrapper ] = update_html_tag_attribs( $params[ $widget_wrapper ], $designer_mode_data );
+							$attrib_actions = array(
+									'data-id'        => 'replace',
+									'data-type'      => 'replace',
+									'data-container' => 'replace',
+									'data-can-edit'  => 'replace',
+								);
+							$params[ $widget_wrapper ] = update_html_tag_attribs( $params[ $widget_wrapper ], $designer_mode_data, $attrib_actions );
 							if( isset( $this->disp_params[ $widget_wrapper ] ) )
 							{	// Also update params if they already have been initialized before:
-								$this->disp_params[ $widget_wrapper ] = update_html_tag_attribs( $this->disp_params[ $widget_wrapper ], $designer_mode_data );
+								$this->disp_params[ $widget_wrapper ] = update_html_tag_attribs( $this->disp_params[ $widget_wrapper ], $designer_mode_data, $attrib_actions );
 							}
 							$wrapper_is_found = true;
 						}

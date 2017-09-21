@@ -209,7 +209,10 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__
 	var widgets_ids = [];
 	widget.parent().find( '.evo_widget[data-id]' ).each( function()
 	{
-		widgets_ids.push( jQuery( this ).data( 'id' ) );
+		if( ! jQuery( this ).parents( '.evo_widget[data-id]' ).length )
+		{	// Use only widgets of current container (and exclude from sub containers):
+			widgets_ids.push( jQuery( this ).data( 'id' ) );
+		}
 	} );
 
 	jQuery.ajax(
@@ -402,7 +405,7 @@ function evo_widget_update_order_actions( container )
 	var widget_num = 1;
 	container_widgets.each( function()
 	{
-		var designer_block = jQuery( '.evo_designer__widget[data-id=' + jQuery( this ).data( 'id' ) + ']' );
+		var designer_block = jQuery( evo_widget_designer_block_selector( jQuery( this ) ) );
 		if( designer_block.length )
 		{	// If designer block is initialized:
 			designer_block.find( '.evo_designer__action_order_up, .evo_designer__action_order_down' ).show();

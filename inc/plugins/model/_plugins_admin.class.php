@@ -1013,7 +1013,7 @@ class Plugins_admin extends Plugins
 		if( $result )
 		{ // Update references to code:
 			// Widgets
-			$DB->query( 'UPDATE T_widget
+			$DB->query( 'UPDATE T_widget__widget
 				  SET wi_code = '.$DB->quote( $code ).'
 				WHERE wi_code = '.$DB->quote( $old_code ) );
 			// Update the renderer fields in the tables of Items, Comments and Messages:

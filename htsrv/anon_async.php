@@ -1550,12 +1550,18 @@ switch( $action )
 		param( 'container', 'string' );
 		param( 'widgets', 'array:integer' );
 
+		$SQL = new SQL( 'Get widget container by name and collection ID before reordering (Designer Mode)' );
+		$SQL->SELECT( 'wico_ID' );
+		$SQL->FROM( 'T_widget__container' );
+		$SQL->WHERE( 'wico_coll_ID = '.$DB->quote( $blog ) );
+		$SQL->WHERE_and( 'wico_name = '.$DB->quote( $container ) );
+		$container_ID = $DB->get_var( $SQL );
+
 		$SQL = new SQL( 'Get all widgets of container "'.$container.'" before reordering (Designer Mode)' );
 		$SQL->SELECT( 'wi_ID, wi_order, wi_enabled' );
-		$SQL->FROM( 'T_widget' );
-		$SQL->WHERE( 'wi_coll_ID = '.$DB->quote( $blog ) );
-		$SQL->WHERE_and( 'wi_sco_name = '.$DB->quote( $container ) );
-		$all_widgets = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_wico_ID = '.$DB->quote( $container_ID ) );
+		$all_widgets = $DB->get_results( $SQL );
 
 		$container_widgets = array();
 		$enabled_widgets = array();
@@ -1583,7 +1589,7 @@ switch( $action )
 		// Run reordering two times:
 		// - first is used to set orders starting with max order of the existing widgets,
 		// - second is starting orders with 1.
-		// Such complex is required to avoid error of duplicate entry of unique index (wi_coll_ID, wi_sco_name, wi_order).
+		// Such complex is required to avoid error of duplicate entry of unique index (wi_wico_ID, wi_order).
 		$wi_start_orders = array( max( $container_widgets ) + 1, 1 );
 		foreach( $wi_start_orders as $wi_order )
 		{
@@ -1592,10 +1598,9 @@ switch( $action )
 			{
 				$update_conditions[] = 'WHEN wi_ID = '.$widget_ID.' THEN '.( $wi_order++ );
 			}
-			$DB->query( 'UPDATE T_widget
+			$DB->query( 'UPDATE T_widget__widget
 				  SET wi_order = CASE '.implode( ' ', $update_conditions ).' ELSE 0 END
-				WHERE wi_coll_ID = '.$DB->quote( $blog ).'
-				  AND wi_sco_name = '.$DB->quote( $container ) );
+				WHERE wi_wico_ID = '.$DB->quote( $container_ID ) );
 		}
 		break;
 

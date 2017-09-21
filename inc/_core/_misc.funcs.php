@@ -5427,6 +5427,11 @@ function update_html_tag_attribs( $html_tag, $new_attribs, $attrib_actions = arr
 					$new_attrib_value = $old_attribs[ $new_attrib_name ];
 					break;
 
+				case 'replace':
+					// Replace  old value with new:
+					// $new_attrib_value = $new_attrib_value;
+					break;
+
 				case 'append':
 				default:
 					// Append new value to old:
