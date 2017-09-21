@@ -43,6 +43,32 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 		return false;
 	}
 
+	function editView() {
+		var viewType;
+
+		if( selectedView ) {
+			viewType = selectedView.getAttribute( 'data-evo-view-type' );
+		}
+
+		if( shortTags.indexOf( viewType ) != -1 )  {
+			var shortTag = decodeURIComponent( selected.getAttribute( 'data-evo-view-text' ) );
+			evo_item_image_edit( editor.settings.blog_ID, shortTag );
+		} else {
+			openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '..."></span>',
+					'80%', '', true, evo_js_lang_select_image_insert, '', true );
+			jQuery.ajax(
+			{
+				type: 'POST',
+				url: editor.getParam( 'modal_url' ),
+				success: function(result)
+				{
+					openModalWindow( result, '90%', '80%', true, 'Select image', '' );
+				}
+			} );
+			return false;
+		}
+	}
+
 	function _stop( event ) {
 		event.stopPropagation();
 	}
@@ -85,6 +111,7 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 			// erhsatingin: The following line was commented out as it adds an extra paragraph upon removal of view
 			//handleEnter( view );
 			evo.views.remove( editor, view );
+			deselect();
 		});
 	}
 
@@ -316,6 +343,34 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 		editor.dom.bind( editor.getDoc(), 'touchmove', function() {
 			scrolled = true;
 		});
+
+		editor.on( 'dblclick', function( event ) {
+			var view = getView( event.target );
+
+			// Contain clicks inside the view wrapper
+			if ( view ) {
+				event.stopImmediatePropagation();
+				event.preventDefault();
+
+				if ( event.type === 'touchend' && scrolled ) {
+					scrolled = false;
+				} else {
+					select( view );
+				}
+
+				// Returning false stops the ugly bars from appearing in IE11 and stops the view being selected as a range in FF.
+				// Unfortunately, it also inhibits the dragging of views to a new location.
+
+				if( selectedView ) {
+					viewType = selectedView.getAttribute( 'data-evo-view-type' );
+				}
+
+				var shortTag = decodeURIComponent( selected.getAttribute( 'data-evo-view-text' ) );
+				evo_item_image_edit( editor.settings.blog_ID, shortTag );
+
+				return false;
+			}
+		} );
 
 		editor.on( 'mousedown mouseup click touchend', function( event ) {
 			var view = getView( event.target );
@@ -727,30 +782,7 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 				return false;
 			}
 
-			var viewType;
-
-			if( selectedView ) {
-				viewType = selectedView.getAttribute( 'data-evo-view-type' );
-			}
-
-			if( shortTags.indexOf( viewType ) != -1 )  {
-				var shortTag = decodeURIComponent( selected.getAttribute( 'data-evo-view-text' ) );
-				evo_item_image_edit( editor.settings.blog_ID, shortTag );
-			} else {
-				var root, path, fm_highlight;
-				openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '..."></span>',
-						'80%', '', true, evo_js_lang_select_image_insert, '', true );
-				jQuery.ajax(
-				{
-					type: 'POST',
-					url: editor.getParam( 'modal_url' ),
-					success: function(result)
-					{
-						openModalWindow( result, '90%', '80%', true, 'Select image', '' );
-					}
-				} );
-				return false;
-			}
+			editView();
 		},
 		onPostRender: function()
 		{
@@ -781,8 +813,13 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 	editor.evo.getView = getView;
 	editor.evo.setViewCursor = setViewCursor;
 
+	editor.addCommand( 'evo_view_edit_inline', function() {
+		editView();
+	});
+
 	// Keep for back-compat.
 	return {
-		getView: getView
+		getView: getView,
+		editView: editView
 	};
 });

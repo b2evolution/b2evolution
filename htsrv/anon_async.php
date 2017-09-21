@@ -1432,7 +1432,8 @@ switch( $action )
 		}
 		else
 		{
-			$restrict_tag = true;
+			// Uncomment line below to hide inline type tabs
+			//$restrict_tag = true;
 			$short_tag = param( 'short_tag', 'string', true );
 			$short_tag = rawurldecode( $short_tag );
 			$replace = 1;

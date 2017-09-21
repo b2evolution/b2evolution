@@ -205,7 +205,7 @@ function closeModalWindow( document_obj, on_hide_handler )
 
 	if( typeof( on_hide_handler ) == 'function' )
 	{
-		jQuery( '#modal_window' ).on( 'hide.bs.modal', on_hide_handler );
+		jQuery( '#modal_window' ).on( 'hidden.bs.modal', on_hide_handler );
 	}
 	jQuery( '#modal_window', document_obj ).modal( 'hide' );
 

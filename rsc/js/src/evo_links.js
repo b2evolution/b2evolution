@@ -102,7 +102,6 @@ function evo_link_change_position( selectInput, url, crumb )
  */
 function evo_link_insert_inline( type, link_ID, option, replace )
 {
-	console.log( 'Insert link' );
 	if( replace == undefined )
 	{
 		replace = 0;

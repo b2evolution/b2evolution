@@ -781,7 +781,7 @@ class tinymce_plugin extends Plugin
 				'fontselect fontsizeselect',
 				'removeformat',
 				'nonbreaking charmap',
-				'image media',
+				'evo_image image media',
 				'link unlink',
 				'fullscreen'
 			);
@@ -829,7 +829,6 @@ class tinymce_plugin extends Plugin
 			}
 
 			$tmce_theme_advanced_buttons3_array[] = 'code';
-			$tmce_theme_advanced_buttons3_array[] = 'evo_image';
 
 			/* ----------- button row 4 ------------ */
 
@@ -983,6 +982,9 @@ class tinymce_plugin extends Plugin
 
 		// remove_linebreaks : false,
 		// not documented:	auto_cleanup_word : true,
+
+		// Prevent auto generated <p> that wrap around the views
+		$init_options[] = 'forced_root_block: ""';
 
 		$init = implode( ",\n", $init_options );
 

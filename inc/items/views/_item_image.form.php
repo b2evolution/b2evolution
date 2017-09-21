@@ -23,9 +23,9 @@ global $inline_class;
 <div class="container-fluid">
 	<?php	if( ! $restrict_tag ):	?>
 	<ul class="nav nav-tabs">
-		<li role="presentation" class="evo_widget widget_core_menu_link<?php echo $tag_type == 'image' ? ' active' : '' ;?>"><a href="#image" role="tab" data-toggle="tab">Image</a></li>
-		<li role="presentation" class="evo_widget widget_core_menu_link<?php echo $tag_type == 'thumbnail' ? ' active' : '' ;?>"><a href="#thumbnail" role="tab" data-toggle="tab">Thumbnail</a></li>
-		<li role="presentation" class="evo_widget widget_core_menu_link<?php echo $tag_type == 'inline' ? ' active' : '' ;?>"><a href="#inline" role="tab" data-toggle="tab">Inline</a></li>
+		<li role="presentation" class="evo_widget widget_core_menu_link<?php echo $tag_type == 'image' ? ' active' : '' ;?>"><a href="#image" role="tab" data-toggle="tab"><?php echo T_('Image'); ?></a></li>
+		<li role="presentation" class="evo_widget widget_core_menu_link<?php echo $tag_type == 'thumbnail' ? ' active' : '' ;?>"><a href="#thumbnail" role="tab" data-toggle="tab"><?php echo T_('Thumbnail'); ?></a></li>
+		<li role="presentation" class="evo_widget widget_core_menu_link<?php echo $tag_type == 'inline' ? ' active' : '' ;?>"><a href="#inline" role="tab" data-toggle="tab"><?php echo T_('Basic inline'); ?></a></li>
 	</ul>
 	<?php endif;?>
 	<div style="margin-top: 20px; display: flex; flex-flow: row nowrap; align-items: flex-start;">
