@@ -56,10 +56,12 @@ class touch_Skin extends Skin
 		return array(
 				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
 				'item_single'            => array( NT_('Item Single'), 50 ),
+				'item_page'              => array( NT_('Item Page'), 55 ),
 				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
 				'mobile_footer'          => array( NT_('Mobile: Footer'), 110 ),
 				'mobile_navigation_menu' => array( NT_('Mobile: Navigation Menu'), 120 ),
 				'mobile_tools_menu'      => array( NT_('Mobile: Tools Menu'), 130 ),
+				'404_page'               => array( NT_('404 Page'), 140 ),
 			);
 	}
 

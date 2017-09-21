@@ -86,9 +86,11 @@ class dating_mood_Skin extends Skin
 				'menu'                   => array( NT_('Menu'), 15 ),
 				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
 				'item_single'            => array( NT_('Item Single'), 50 ),
+				'item_page'              => array( NT_('Item Page'), 55 ),
 				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
 				'sidebar'                => array( NT_('Sidebar'), 80 ),
 				'footer'                 => array( NT_('Footer'), 100 ),
+				'404_page'               => array( NT_('404 Page'), 110 ),
 			);
 	}
 

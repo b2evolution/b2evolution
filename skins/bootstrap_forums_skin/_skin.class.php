@@ -112,16 +112,23 @@ class bootstrap_forums_Skin extends Skin
 	{
 		// Note: second param below is the ORDER
 		return array(
-				'page_top'               => array( NT_('Page Top'), 2 ),
-				'header'                 => array( NT_('Header'), 10 ),
-				'menu'                   => array( NT_('Menu'), 15 ),
-				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
-				'item_single'            => array( NT_('Item Single'), 50 ),
-				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
-				'sidebar'                => array( NT_('Sidebar'), 80 ),
-				'sidebar_2'              => array( NT_('Sidebar 2'), 90 ),
-				'sidebar_single'         => array( NT_('Sidebar Single'), 95 ),
-				'footer'                 => array( NT_('Footer'), 100 ),
+				'page_top'                   => array( NT_('Page Top'), 2 ),
+				'header'                     => array( NT_('Header'), 10 ),
+				'menu'                       => array( NT_('Menu'), 15 ),
+				'front_page_main_area'       => array( NT_('Front Page Main Area'), 40 ),
+				'front_page_secondary_area'  => array( NT_('Front Page Secondary Area'), 45 ),
+				'forum_front_secondary_area' => array( NT_('Forum Front Secondary Area'), 47 ),
+				'item_single_header'         => array( NT_('Item Single Header'), 50 ),
+				'item_single'                => array( NT_('Item Single'), 51 ),
+				'item_page'                  => array( NT_('Item Page'), 55 ),
+				'contact_page_main_area'     => array( NT_('Contact Page Main Area'), 60 ),
+				'sidebar'                    => array( NT_('Sidebar'), 80 ),
+				'sidebar_2'                  => array( NT_('Sidebar 2'), 90 ),
+				'sidebar_single'             => array( NT_('Sidebar Single'), 95 ),
+				'footer'                     => array( NT_('Footer'), 100 ),
+				'user_profile_left'          => array( NT_('User Profile - Left'), 110 ),
+				'user_profile_right'         => array( NT_('User Profile - Right'), 120 ),
+				'404_page'                   => array( NT_('404 Page'), 130 ),
 			);
 	}
 

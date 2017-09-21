@@ -116,10 +116,12 @@ class bootstrap_main_Skin extends Skin
 				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
 				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
 				'item_single'               => array( NT_('Item Single'), 50 ),
+				'item_page'                 => array( NT_('Item Page'), 55 ),
 				'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
 				'footer'                    => array( NT_('Footer'), 100 ),
 				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
 				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
+				'404_page'                  => array( NT_('404 Page'), 130 ),
 			);
 	}
 
