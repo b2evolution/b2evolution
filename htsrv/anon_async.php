@@ -1444,25 +1444,16 @@ switch( $action )
 			$tag_type = $parts[0];
 			$link_ID = $parts[1];
 
-			switch( $tag_type )
-			{
-				case 'image':
-					$image_caption = isset( $parts[2] ) ? $parts[2] : NULL;
-					$image_class = isset( $parts[3] ) ? $parts[3] : NULL;
-					$image_disable_caption = ( isset( $image_caption ) && $image_caption == '-' );
-					$image_caption = $image_caption == '-' ? NULL : $image_caption; // disable caption, reset caption to empty string
-					break;
+			$image_caption = $tag_type == 'image' && isset( $parts[2] ) ? $parts[2] : NULL;
+			$image_class = $tag_type == 'image' && isset( $parts[3] ) ? $parts[3] : NULL;
+			$image_disable_caption = $tag_type == 'image' && ( isset( $image_caption ) && $image_caption == '-' );
+			$image_caption = $tag_type == 'image' && $image_caption == '-' ? NULL : $image_caption; // disable caption, reset caption to empty string
 
-				case 'thumbnail':
-					$thumbnail_size = isset( $parts[2] ) ? $parts[2] : 'medium';
-					$thumbnail_alignment = isset( $parts[3] ) ? $parts[3] : 'left';
-					$thumbnail_class = isset( $parts[4] ) ? $parts[4] : NULL;
-					break;
+			$thumbnail_size = $tag_type == 'thumbnail' && isset( $parts[2] ) ? $parts[2] : 'medium';
+			$thumbnail_alignment = $tag_type == 'thumbnail' && isset( $parts[3] ) ? $parts[3] : 'left';
+			$thumbnail_class = $tag_type == 'thumbnail' && isset( $parts[4] ) ? $parts[4] : NULL;
 
-				case 'inline':
-					$inline_class = isset( $parts[2] ) ? $parts[2] : NULL;
-					break;
-			}
+			$inline_class = $tag_type == 'inline' && isset( $parts[2] ) ? $parts[2] : NULL;
 		}
 
 		$LinkCache = & get_LinkCache();
