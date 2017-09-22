@@ -1549,8 +1549,11 @@ class _core_Module extends Module
 			);
 
 
-			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-			{	// If current user has an access to back-office and to edit collection properties:
+			if( $perm_admin_restricted &&
+			    ( ( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) ||
+			      $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			  )
+			{	// If current user has an access to back-office and to edit site or collection properties:
 				global $customizer_url, $Session;
 				if( $Session->get( 'customizer_mode_'.$Blog->ID ) )
 				{	// If skin customizer mode is enabled:
@@ -1560,7 +1563,15 @@ class _core_Module extends Module
 				}
 				else
 				{	// If skin customizer mode is disabled:
-					$menu_entry_skin_href = $Blog->get( 'customizer_url' );
+					if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+					{	// URL to customize collection skin:
+						$menu_entry_skin_href = $Blog->get( 'customizer_url' );
+					}
+					else
+					{	// URL to customize site skin:
+						global $customizer_url;
+						$menu_entry_skin_href = $customizer_url.'?view=site_skin&blog='.$Blog->ID.'&amp;customizing_url='.urlencode( get_current_url() );
+					}
 					$menu_entry_skin_class = '';
 				}
 				$entries['skin'] = array(
@@ -1569,7 +1580,10 @@ class _core_Module extends Module
 					'entry_class' => 'rwdhide',
 					'class'       => $menu_entry_skin_class,
 				);
+			}
 
+			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// If current user has an access to back-office and to edit collection properties:
 				// Display menu item "Features" with depending on $disp:
 				global $disp, $disp_detail;
 				switch( $disp )

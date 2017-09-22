@@ -18,9 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $Collection, $Blog, $Settings, $current_User, $skin_type, $admin_url, $mode;
 
-if( $mode == 'customizer' &&
-    $Settings->get( 'site_skins_enabled' ) &&
-    $current_User->check_perm( 'options', 'edit' ) )
+if( $mode == 'customizer' )
 {	// Display tabs to switch between site and collection skins in special div on customizer mode:
 	if( empty( $Blog ) )
 	{	// Get last working collection:
@@ -35,10 +33,17 @@ if( $mode == 'customizer' &&
 
 	echo '<div class="evo_customizer__tabs">';
 
-	echo '<ul class="nav nav-tabs">'
-			.'<li'.( ! isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=site_skin">'.T_('Site').'</a></li>'
-			.'<li'.( isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID.'">'.$tab_Blog->get( 'shortname' ).'</a></li>'
-		.'</ul>';
+	echo '<ul class="nav nav-tabs">';
+	if( $Settings->get( 'site_skins_enabled' ) &&
+	    $current_User->check_perm( 'options', 'edit' ) )
+	{	// If current User can edit site skin settings:
+		echo '<li'.( ! isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=site_skin">'.T_('Site').'</a></li>';
+	}
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
+	{	// If current User can edit current collection skin settings:
+		echo '<li'.( isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID.'">'.$tab_Blog->get( 'shortname' ).'</a></li>';
+	}
+	echo '</ul>';
 
 	echo '</div>';
 }
@@ -142,7 +147,11 @@ $Form->begin_form( 'fform' );
 $buttons = array();
 if( $skin_ID )
 {	// Allow to update skin params only when it is really selected (Don't display this button to case "Same as normal skin."):
-	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
+	if( isset( $Blog ) ||
+	    ( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) )
+	{	// If current User can edit skin settings of site or collection:
+		$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
+	}
 }
 
 if( $mode == 'customizer' )

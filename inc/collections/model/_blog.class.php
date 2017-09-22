@@ -2643,7 +2643,26 @@ class Blog extends DataObject
 
 			case 'customizer_url':
 				global $customizer_url;
-				return $customizer_url.'?view=coll_skin'.$params['glue'].'blog='.$this->ID.''.$params['glue'].'customizing_url='.urlencode( get_current_url() );
+				if( is_logged_in() )
+				{
+					global $Settings;
+					if( $current_User->check_perm( 'blog_properties', 'edit', false, $this->ID ) )
+					{	// If current User can edit collection skin settings:
+						$customizer_view = 'coll_skin';
+					}
+					elseif( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) )
+					{	// If current User can edit sote skin settings:
+						$customizer_view = 'site_skin';
+					}
+				}
+				if( isset( $customizer_view ) )
+				{	// Return customizer URL only if currnet User can edit skin settings of collection or site:
+					return $customizer_url.'?view='.$customizer_view.$params['glue'].'blog='.$this->ID.$params['glue'].'customizing_url='.urlencode( get_current_url() );
+				}
+				else
+				{	// Return this collection URL instead:
+					return $this->get( 'url' );
+				}
 
 			case 'baseurlroot':
 				return $this->get_baseurl_root();
