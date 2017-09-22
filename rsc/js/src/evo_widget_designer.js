@@ -126,7 +126,7 @@ function evo_widget_open_modal_iframe( iframe_url, iframe_title, container )
 	jQuery( '#modal_window' ).on( 'hidden.bs.modal', function ()
 	{	// Remove temp div of messages on hidding of modal window:
 		jQuery( '.evo_designer__messages' ).remove();
-		if( jQuery( '#evo_designer__iframe').contents().find( '.alert.alert-success' ).length && confirm( evo_js_lang_confirm_reload_new_widget_changes ) )
+		if( jQuery( '#evo_designer__iframe').contents().find( '.alert.alert-success' ).length )
 		{	// If widget has been updated in frame we should reload a page to view new widget changes:
 			location.reload();
 		}

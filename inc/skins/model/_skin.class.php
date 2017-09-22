@@ -1374,7 +1374,6 @@ var downloadInterval = setInterval( function()
 					.'var evo_js_lang_loading = \''.TS_('Loading...').'\';'
 					.'var evo_js_lang_title_available_widgets = \''.sprintf( TS_('Widgets available for insertion into &laquo;%s&raquo;'), '$container_name$' ).'\';'
 					.'var evo_js_lang_title_edit_widget = \''.sprintf( TS_('Edit widget "%s" in container "%s"'), '$widget_name$', '$container_name$' ).'\';'
-					.'var evo_js_lang_confirm_reload_new_widget_changes = \''.TS_('Please confirm to reload current page to view widget changes.').'\';'
 					.'var evo_js_lang_error_communicating = \''.TS_('There was an error communicating with the server. Please reload the page to be in sync with the server.').'\';' );
 			}
 			require_js( 'src/evo_widget_designer.js', 'blog' );
