@@ -511,10 +511,16 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
  */
 function display_link_position( & $row, $show_actions = true )
 {
-	global $LinkOwner, $blog;
+	global $LinkOwner, $blog, $Blog;
 	global $current_File;
 
 	$r = '';
+
+	if( empty( $blog ) )
+	{
+		$Blog = $LinkOwner->get_Blog();
+		$blog = $Blog->ID;
+	}
 
 	// Get available link position for current link owner and file:
 	$available_positions = $LinkOwner->get_positions( $row->file_ID );
