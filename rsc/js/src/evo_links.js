@@ -120,17 +120,33 @@ function evo_link_insert_inline( type, link_ID, option, replace )
 
 		var $position_selector = jQuery( '#display_position_' + link_ID );
 		if( $position_selector.length != 0 )
-		{ // Change the position to 'Inline'
+		{
 			if( $position_selector.val() != 'inline' )
-			{
+			{ // Not yet inline, change the position to 'Inline'
 				deferInlineReminder = true;
-				$position_selector.val( 'inline' ).change();
+				// We have to change the link position in the DB before we insert the image tag
+				// otherwise the inline tag will not render because it is not yet in the 'inline' position
+				evo_rest_api_request( 'links/' + link_ID + '/position/inline',
+					function( data )
+					{
+						$position_selector.val( 'inline' );
+						evoFadeSuccess( $position_selector.closest( 'tr' ) );
+						$position_selector.closest( 'td' ).removeClass( 'error' );
+
+						// Insert an image tag
+						textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+					}, 'POST' );
 				deferInlineReminder = false;
 			}
+			else
+			{ // Already an inline, insert image tag
+				textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+			}
 		}
-
-		// Insert an image tag
-		textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+		else
+		{
+			textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+		}
 	}
 }
 

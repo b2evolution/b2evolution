@@ -765,6 +765,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'custom_tags_plugin', true );
 	}
+
+	if( $old_db_version < 12330 )
+	{
+		install_plugin( 'inlines_plugin' );
+	}
 }
 
 

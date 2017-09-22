@@ -1880,6 +1880,10 @@ class RestApi
 				// Actions to update the links:
 				switch( $link_action )
 				{
+					case 'position':
+						$link_controller = 'change_position';
+						break;
+
 					case 'move_up':
 					case 'move_down':
 						$link_controller = 'change_order';
@@ -1991,6 +1995,57 @@ class RestApi
 		// The requested link has been deleted successfully:
 		$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
 		// Exit here.
+	}
+
+
+	/**
+	 * Call link controller to change the position of the requested link
+	 */
+	private function controller_link_change_position()
+	{
+		global $DB, $Session;
+
+		// Check permission if current user can update the requested link:
+		$this->link_check_perm();
+
+		$link_position = $this->args[3];
+
+		$edited_Link = & $this->get_Link();
+		$LinkOwner = & $edited_Link->get_LinkOwner();
+
+		// Don't display the inline position reminder again until the user logs out or loses the session cookie
+		if( $link_position == 'inline' )
+		{
+			$Session->set( 'display_inline_reminder', 'false' );
+		}
+
+		// Check permission:
+		$LinkOwner->check_perm( 'edit', true );
+
+		if( $edited_Link->set( 'position', $link_position ) && $edited_Link->dbupdate() )
+		{ // update was successful
+
+			// Update last touched date of Owners
+			$LinkOwner->update_last_touched_date();
+
+			if( $link_position == 'cover' && $LinkOwner->type == 'item' )
+			{ // Position "Cover" can be used only by one link
+			  // Replace previous position with "Inline"
+				$DB->query( 'UPDATE T_links
+						SET link_position = "aftermore"
+					WHERE link_ID != '.$DB->quote( $link_ID ).'
+						AND link_itm_ID = '.$DB->quote( $LinkOwner->Item->ID ).'
+						AND link_position = "cover"' );
+			}
+
+			$this->halt( 'Link position has been updated.', 'change_position_success', 200 );
+			// Exit here
+		}
+		else
+		{ // return the current value on failure
+			$this->halt( 'Failed to change link position.', 'change_position_failed', 403 );
+			// Exit here
+		}
 	}
 
 

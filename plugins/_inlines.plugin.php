@@ -17,7 +17,7 @@ class inlines_plugin extends Plugin
 {
 	var $code = 'evo_inlines';
 	var $name = 'Inlines';
-	var $priority = 40;
+	var $priority = 50;
 	var $version = '6.9.4';
 	var $group = 'editor';
 	var $number_of_installs = 1;
@@ -27,7 +27,7 @@ class inlines_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = T_('Inline short tag inserting');
+		$this->short_desc = T_('Inline short tags inserting');
 		$this->long_desc = T_('This plugin will display a toolbar with buttons to quickly insert inline short tags.');
 	}
 

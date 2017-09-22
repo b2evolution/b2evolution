@@ -984,7 +984,7 @@ class tinymce_plugin extends Plugin
 		// not documented:	auto_cleanup_word : true,
 
 		// Prevent auto generated <p> that wrap around the views
-		$init_options[] = 'forced_root_block: ""';
+		//$init_options[] = 'forced_root_block: ""';
 
 		$init = implode( ",\n", $init_options );
 
