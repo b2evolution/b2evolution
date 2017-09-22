@@ -33,9 +33,9 @@ $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID, false, get_
 
 /**
  * @param string Title of the container. This gets passed to T_()!
- * @param string Suffix of legend
+ * @param boolean Is included in collection skin
  */
-function display_container( $WidgetContainer, $legend_suffix = '' )
+function display_container( $WidgetContainer, $is_included = true )
 {
 	global $Collection, $Blog, $admin_url, $embedded_containers;
 	global $Session;
@@ -63,13 +63,11 @@ function display_container( $WidgetContainer, $legend_suffix = '' )
 		$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.'">'.$widget_container_name.'</a>';
 	}
 	$Table->title = '<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span>'
-		.' <span class="dimmed">'.$WidgetContainer->get( 'code' ).' '.$WidgetContainer->get( 'order' ).'</span>'
-		.$legend_suffix;
+		.' <span class="dimmed">'.$WidgetContainer->get( 'code' ).' '.$WidgetContainer->get( 'order' ).'</span>';
 
-	if( ! empty( $legend_suffix ) )
-	{ // Legend suffix is not empty when the container is not included into the selected skin
-		// TODO: asimo> Implement cleaner condition for this
-		$Table->global_icon( T_('Destroy container'), 'delete', $destroy_container_url, T_('Destroy container'), 3, 4 );
+	if( ! $is_included )
+	{	// Allow to destroy sub-container when it is not included into the selected skin:
+		$Table->global_icon( T_('Destroy sub-container'), 'delete', $destroy_container_url, T_('Destroy sub-container'), 3, 4 );
 	}
 	$Table->global_icon( T_('Add a widget...'), 'new', $add_widget_url, /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$widget_container_id, 'class' => 'action_icon btn-primary' ) );
 
@@ -280,7 +278,7 @@ function display_containers( $skin_type, $main = true )
 		{	// Skip this container because another type is requested:
 			continue;
 		}
-		display_container( $WidgetContainer, ' '.T_('[NOT USED IN CURRENT SKINS!]') );
+		display_container( $WidgetContainer, false );
 	}
 }
 
