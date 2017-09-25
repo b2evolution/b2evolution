@@ -1279,10 +1279,6 @@ class _core_Module extends Module
 
 			if( $perm_admin_restricted && $working_blog )
 			{
-				if( empty( $write_item_url ) && empty( $edit_item_url ) && empty( $view_item_url ) )
-				{	// Display a restricted message to create new post on this collection:
-					$entries['post']['title'] = T_('You don\'t have permission to post into this blog');
-				}
 
 				// BLOG MENU:
 				$entries['blog'] = array(
@@ -1504,20 +1500,19 @@ class _core_Module extends Module
 		if( ! is_admin_page() && ! empty( $Blog ) )
 		{	// Only front-office collection pages:
 
-
-			// Display an option to turn on/off containers display:
-			global $Session;
-			$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
-			$entries['containers'] = array(
-				'text'        => '<span class="fa fa-cubes"></span> '.T_('Widgets'),
-				'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
-				'entry_class' => 'rwdhide',
-				'class'       => ( $containers_status ? 'active' : '' ),
-			);
-
-
 			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// If current user has an access to back-office and to edit collection properties:
+
+				// Display an option to turn on/off containers display:
+				global $Session;
+				$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
+				$entries['containers'] = array(
+					'text'        => '<span class="fa fa-cubes"></span> '.T_('Widgets'),
+					'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
+					'entry_class' => 'rwdhide',
+					'class'       => ( $containers_status ? 'active' : '' ),
+				);
+
 				$entries['skin'] = array(
 					'text' => '<span class="fa fa-sliders"></span> '.T_('Skin'),
 					'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID,
