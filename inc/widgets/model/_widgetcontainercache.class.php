@@ -37,13 +37,19 @@ load_class( 'widgets/model/_widgetcontainer.class.php', 'WidgetContainer' );
  */
 class WidgetContainerCache extends DataObjectCache
 {
-
 	/**
 	 * Cache by collection ID and widget container code
 	 *
 	 * @var cache_by_coll_and_code array
 	 */
-	var $cache_by_coll_and_code = array();
+	var $cache_by_coll_and_code;
+
+	/**
+	 * Cache by collection ID, container code and skin type
+	 *
+	 * @var cache_by_coll_skintype_code array
+	 */
+	var $cache_by_coll_skintype_code;
 
 	/**
 	 * Constructor
@@ -71,6 +77,16 @@ class WidgetContainerCache extends DataObjectCache
 				$this->cache_by_coll_and_code[$WidgetContainer->coll_ID] = array();
 			}
 			$this->cache_by_coll_and_code[$WidgetContainer->coll_ID][$container_code] = & $WidgetContainer;
+
+			$skin_type = $WidgetContainer->get( 'skin_type' );
+			if( ! empty( $skin_type ) )
+			{	// Cache by additional field "skin type":
+				if( ! isset( $this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ] ) )
+				{
+					$this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ] = array();
+				}
+				$this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ][ $container_code ] = & $WidgetContainer;
+			}
 		}
 
 		return parent::add( $WidgetContainer );
@@ -80,25 +96,26 @@ class WidgetContainerCache extends DataObjectCache
 	/**
 	 * Load all widget containers from the given collection
 	 *
-	 * @param integer collection ID
+	 * @param integer Collection ID
 	 */
 	function load_by_coll_ID( $coll_ID )
 	{
 		global $DB;
 
-		if( !empty( $this->cache_by_coll_and_code[$coll_ID] ) )
-		{
+		if( isset( $this->cache_by_coll_and_code[ $coll_ID ] ) )
+		{	// Don't load widget containers twice:
 			return;
 		}
 
-		$sql = 'SELECT *
-			FROM T_widget__container
-			WHERE wico_coll_ID = '.$DB->quote( $coll_ID ).' AND wico_code IS NOT NULL
-			ORDER BY wico_order';
-		foreach( $DB->get_results( $sql ) as $row )
-		{ // Instantiate
-			$this->instantiate( $row );
-		}
+		$SQL = new SQL( 'Load all widget containers for collection #'.$coll_ID.' into cache' );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_widget__container' );
+		$SQL->WHERE( 'wico_coll_ID = '.$DB->quote( $coll_ID ) );
+		$SQL->WHERE_and( 'wico_code IS NOT NULL' );
+		$SQL->ORDER_BY( 'wico_order' );
+
+		// Instantiate and cache widget containers:
+		$this->instantiate_list( $DB->get_results( $SQL ) );
 	}
 
 
@@ -112,33 +129,26 @@ class WidgetContainerCache extends DataObjectCache
 	 */
 	function & get_by_coll_and_code( $coll_ID, $wico_code, $halt_on_error = false )
 	{
-		global $DB;
-
-		if( isset( $this->cache_by_coll_and_code[$coll_ID][$wico_code] ) )
-		{
-			return $this->cache_by_coll_and_code[$coll_ID][$wico_code];
-		}
-
 		$this->load_by_coll_ID( $coll_ID );
 
-		if( empty( $this->cache_by_coll_and_code[$coll_ID][$wico_code] ) )
+		if( empty( $this->cache_by_coll_and_code[ $coll_ID ][ $wico_code ] ) )
 		{
 			if( $halt_on_error )
 			{
-				debug_die( "Requested widget container does not exist!" );
+				debug_die( 'Requested widget container does not exist!' );
 			}
 			$r = false;
 			return $r;
 		}
 
-		return $this->cache_by_coll_and_code[$coll_ID][$wico_code];
+		return $this->cache_by_coll_and_code[ $coll_ID ][ $wico_code ];
 	}
 
 
 	/**
 	 * Get widget containers from the given collection
 	 *
-	 * @param $coll_ID
+	 * @param integer Collection ID
 	 * @return array of WidgetContainer
 	 */
 	function & get_by_coll_ID( $coll_ID )
@@ -151,6 +161,33 @@ class WidgetContainerCache extends DataObjectCache
 
 		$r = array();
 		return $r;
+	}
+
+
+	/**
+	 * Get widget container from the given collection with the given container code and for given skin type
+	 *
+	 * @param integer Collection ID
+	 * @param string Skin type
+	 * @param string Container code
+	 * @param boolean Halt on error
+	 * @return object WidgetContainer
+	 */
+	function & get_by_coll_skintype_code( $coll_ID, $skin_type, $code, $halt_on_error = false )
+	{
+		$this->load_by_coll_ID( $coll_ID );
+
+		if( empty( $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ][ $code ] ) )
+		{
+			if( $halt_on_error )
+			{
+				debug_die( 'Requested widget container does not exist!' );
+			}
+			$r = false;
+			return $r;
+		}
+
+		return $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ][ $code ];
 	}
 }
 ?>

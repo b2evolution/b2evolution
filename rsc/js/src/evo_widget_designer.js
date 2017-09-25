@@ -10,7 +10,8 @@ jQuery( document ).on( 'ready', function()
 		if( container.length )
 		{	// If container has a correct class
 			// Copy all data from temp element to real container:
-			container.attr( 'data-name', jQuery( this ).data( 'name' ) );
+			container.attr( 'data-name', jQuery( this ).data( 'name' ) )
+				.attr( 'data-code', jQuery( this ).data( 'code' ) );
 			if( jQuery( this ).data( 'can-edit' ) )
 			{
 				container.data( 'can-edit', '1' );
@@ -21,14 +22,14 @@ jQuery( document ).on( 'ready', function()
 	} );
 } );
 
-jQuery( document ).on( 'mouseover', '.evo_container[data-name]', function()
+jQuery( document ).on( 'mouseover', '.evo_container[data-code]', function()
 {	// Initialize and Show container designer block:
 	var container = jQuery( this );
 
 	// To be sure all previous designer blocks are hidden before show new one:
 	jQuery( '.evo_designer__container' ).hide();
 
-	var container_block = jQuery( '.evo_designer__container[data-name="' + container.data( 'name' ) + '"]' );
+	var container_block = jQuery( '.evo_designer__container[data-code="' + container.data( 'code' ) + '"]' );
 	if( container_block.length )
 	{	// Just display a designer block if it already has been initialized previous time:
 		evo_widget_update_container_position( container );
@@ -43,7 +44,7 @@ jQuery( document ).on( 'mouseover', '.evo_container[data-name]', function()
 				b2evo_widget_icon_add +
 			'</div>';
 	}
-	jQuery( 'body' ).append( '<div class="evo_designer evo_designer__container" data-name="' + container.data( 'name' ) + '">' +
+	jQuery( 'body' ).append( '<div class="evo_designer evo_designer__container" data-code="' + container.data( 'code' ) + '">' +
 			'<div><div class="evo_designer__title">Container: ' + container.data( 'name' ) + '</div>' + container_actions + '</div>' +
 		'</div>' );
 	evo_widget_update_container_position( container );
@@ -138,10 +139,10 @@ jQuery( document ).on( 'click', '.evo_designer__action_add', function( e )
 	if( typeof( b2evo_widget_add_url ) != 'undefined' )
 	{	// If global widget add form url is defined:
 		var container_block = jQuery( this ).closest( '.evo_designer__container' );
-		var container = jQuery( '.evo_container[data-name="' + container_block.data( 'name' ) + '"]' );
+		var container = jQuery( '.evo_container[data-code="' + container_block.data( 'code' ) + '"]' );
 		if( container.length && container.data( 'can-edit' ) == '1' )
 		{	// Open modal window with widget adding list only if it is allowed for current user:
-			evo_widget_open_modal_iframe( b2evo_widget_add_url.replace( '$container$', container.data( 'name' ) ),
+			evo_widget_open_modal_iframe( b2evo_widget_add_url.replace( '$container$', container.data( 'name' ) ).replace( '$container_code$', container.data( 'code' ) ),
 				evo_js_lang_title_available_widgets.replace( '$container_name$', container.data( 'name' ) ),
 				container );
 		}
@@ -160,8 +161,9 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 		var widget = jQuery( evo_widget_selector( jQuery( this ) ) );
 		if( widget.length && widget.data( 'can-edit' ) == '1' )
 		{	// Open modal window with widget edit form only if it is allowed for current user:
+			var container_block = jQuery( evo_widget_container_block_selector( widget.data( 'container' ) ) );
 			evo_widget_open_modal_iframe( b2evo_widget_edit_url.replace( '$wi_ID$', widget_ID ),
-				evo_js_lang_title_edit_widget.replace( '$widget_name$', widget.data( 'type' ) ).replace( '$container_name$', widget.data( 'container' ) ),
+				evo_js_lang_title_edit_widget.replace( '$widget_name$', widget.data( 'type' ) ).replace( '$container_name$', container_block.data( 'name' ) ),
 				widget.closest( '.evo_container' ) );
 		}
 	}
@@ -340,12 +342,12 @@ function evo_widget_designer_block_selector( widget )
 /**
  * Get jQuery selector for container designer block by widget
  *
- * @param string Container name
+ * @param string Container code
  * @returns string
  */
-function evo_widget_container_block_selector( container_name )
+function evo_widget_container_block_selector( container_code )
 {
-	return '.evo_designer__container[data-name="' + container_name + '"]';
+	return '.evo_designer__container[data-code="' + container_code + '"]';
 }
 
 
@@ -455,7 +457,7 @@ function evo_widget_update_designer_position( widget, show )
  */
 function evo_widget_update_container_position( container )
 {
-	jQuery( evo_widget_container_block_selector( container.data( 'name' ) ) )
+	jQuery( evo_widget_container_block_selector( container.data( 'code' ) ) )
 		.css( {
 			'top': container.offset().top - 3,
 			'left': container.offset().left - 3,

@@ -1542,19 +1542,27 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
-		param( 'blog', 'integer', 0 );
+		// Collection ID:
+		param( 'blog', 'integer', true );
+
+		// Get collection by ID:
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
+		// Container code:
 		param( 'container', 'string' );
+		// Widgets IDs:
 		param( 'widgets', 'array:integer' );
 
-		$SQL = new SQL( 'Get widget container by name and collection ID before reordering (Designer Mode)' );
+		$SQL = new SQL( 'Get widget container by code, collection ID and current skin type before reordering (Designer Mode)' );
 		$SQL->SELECT( 'wico_ID' );
 		$SQL->FROM( 'T_widget__container' );
-		$SQL->WHERE( 'wico_coll_ID = '.$DB->quote( $blog ) );
-		$SQL->WHERE_and( 'wico_name = '.$DB->quote( $container ) );
+		$SQL->WHERE( 'wico_coll_ID = '.$Blog->ID );
+		$SQL->WHERE_and( 'wico_code = '.$DB->quote( $container ) );
+		$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $Blog->get_skin_type() ) );
 		$container_ID = $DB->get_var( $SQL );
 
 		$SQL = new SQL( 'Get all widgets of container "'.$container.'" before reordering (Designer Mode)' );

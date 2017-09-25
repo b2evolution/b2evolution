@@ -3911,6 +3911,45 @@ class Blog extends DataObject
 	}
 
 
+	/**
+	 * Get skin type which should be used for current session
+	 *
+	 * @return string Skin type
+	 */
+	function get_skin_type()
+	{
+		global $Session;
+
+		if( ! isset( $Session ) )
+		{	// Session must be defined to autodetect current skin type:
+			return 'normal';
+		}
+
+		if( $Session->is_mobile_session() )
+		{
+			$skin_type = 'mobile';
+		}
+		elseif( $Session->is_tablet_session() )
+		{
+			$skin_type = 'tablet';
+		}
+		else
+		{
+			$skin_type = 'normal';
+		}
+
+		if( $skin_type == 'mobile' || $skin_type == 'tablet' )
+		{	// Check if collection use different mobile/tablet skin or same as normal skin:
+			if( $this->get_setting( $skin_type.'_skin_ID', true ) === '0' )
+			{	// Force to use widgets for normal skin because collection doesn't use different skin for mobile/tablet session:
+				$skin_type = 'normal';
+			}
+		}
+
+		return $skin_type;
+	}
+
+
 	/*
 	 * Get the blog skin ID which correspond to the current session device or which correspond to the selected skin type
 	 *

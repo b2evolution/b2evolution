@@ -763,7 +763,7 @@ class ComponentWidget extends DataObject
 			$designer_mode_data = array(
 					'data-id'        => $this->ID,
 					'data-type'      => $this->get_name(),
-					'data-container' => $this->get_container_param( 'name' ),
+					'data-container' => $this->get_container_param( 'code' ),
 				);
 			// Set data to know current user has a permission to edit this widget:
 			$designer_mode_data['data-can-edit'] = $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) ? 1 : 0;

@@ -313,7 +313,7 @@ function getWidgetOrder()
 		containers_list += container+',';
 	}
 
-	var r = ( typeof( blog ) != 'undefined' ? 'blog='+blog : '' ) +'&'+query_string+'container_list='+containers_list;
+	var r = ( typeof( blog_id ) != 'undefined' ? 'blog='+blog_id : '' ) +'&'+query_string+'container_list='+containers_list;
 
 	// console.log( r );
 
@@ -528,11 +528,10 @@ function addNewWidget( widget_list_item, admin_call )
 	var widget_id = jQuery( widget_list_item ).attr( "id" );
 	jQuery( widget_list_item ).attr( "id", widget_id );
 
-	var widget_name = jQuery( widget_list_item ).html();
 	var destination = jQuery( '.available_widgets' ).attr( 'id' );
 	destination = destination.substr( 18, destination.length );
 
-	SendAdminRequest( 'widgets', 'create', admin_call+"&blog="+blog+"&container="+destination, true );
+	SendAdminRequest( 'widgets', 'create', admin_call+"&blog="+blog_id+"&container="+destination, true );
 }
 
 
@@ -705,6 +704,6 @@ function getWidgetCacheIcon( wi_ID, wi_cache_status )
 			return cache_disallowed_icon_tag;
 
 		case 'denied':
-			return '<a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog=' + blog + '#fieldset_wrapper_caching">' + cache_denied_icon_tag + '</a>';
+			return '<a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog=' + blog_id + '#fieldset_wrapper_caching">' + cache_denied_icon_tag + '</a>';
 	}
 }

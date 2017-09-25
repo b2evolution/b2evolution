@@ -2494,14 +2494,15 @@ function skin_widget( $params )
 /**
  * Display a container
  *
- * @param string
- * @param array
+ * @param string Container name
+ * @param array Additional params
+ * @param string Container code
  */
-function skin_container( $sco_name, $params = array() )
+function skin_container( $sco_name, $params = array(), $container_code = NULL )
 {
 	global $Skin;
 
-	$Skin->container( $sco_name, $params );
+	$Skin->container( $sco_name, $params, $container_code );
 }
 
 

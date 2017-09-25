@@ -102,6 +102,8 @@ switch( $action )
 	case 'new':
 	case 'add_list':
 		param( 'container', 'string', true, true );	// memorize
+		param( 'container_code', 'string' );
+		param( 'skin_type', 'string' );
 		break;
 
 	case 're-order' : // js request
@@ -803,7 +805,12 @@ switch( $action )
 		switch( $display_mode )
 		{
 			case 'iframe':
-				echo '<div class="available_widgets">'."\n";
+
+				// Try to get widget container by collection ID, container code and requested skin type:
+				$WidgetContainerCache = & get_WidgetContainerCache();
+				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $blog, $skin_type, $container_code );
+
+				echo '<div class="available_widgets"'.( $WidgetContainer ? 'id="available_add_new_wico_ID_'.$WidgetContainer->ID.'"' : '' ).'>'."\n";
 				$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
 				echo '</div>'."\n";
 				break;
@@ -827,13 +834,6 @@ switch( $action )
 		echo '<div id="available_widgets_inner">'."\n";
 		$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
 		echo '</div></div>'."\n";
-		echo '
-		<script type="text/javascript">
-			<!--
-			var blog = '.$Blog->ID.';
-			// -->
-		</script>
-		';
 
 		// Display VIEW:
 		$AdminUI->disp_view( 'widgets/views/_widget_list.view.php' );

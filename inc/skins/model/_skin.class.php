@@ -285,10 +285,11 @@ class Skin extends DataObject
 	 * fp> Do we need Skin objects in the frontoffice at all? -- Do we want to include the dispatcher into the Skin object? WARNING: globals
 	 * fp> We might want to customize the container defaults. -- Per blog or per skin?
 	 *
-	 * @param string
-	 * @param array
+	 * @param string Container name
+	 * @param array Additional params
+	 * @param string Container code
 	 */
-	function container( $sco_name, $params = array() )
+	function container( $sco_name, $params = array(), $container_code = NULL )
 	{
 		/**
 		 * Blog currently displayed
@@ -298,24 +299,46 @@ class Skin extends DataObject
 		global $admin_url, $rsc_url;
 		global $Timer, $Session, $debug, $current_User;
 
+		if( $container_code === NULL )
+		{	// Try to detect container in DB by name:
+			global $DB;
+			$SQL = new SQL( 'Get widget container of collection #'.$Blog->ID.' by name for current skin type' );
+			$SQL->SELECT( 'wico_code' );
+			$SQL->FROM( 'T_widget__container' );
+			$SQL->WHERE( 'wico_name = '.$DB->quote( $sco_name ) );
+			$SQL->WHERE_and( 'wico_coll_ID = '.$Blog->ID );
+			$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $Blog->get_skin_type() ) );
+			$SQL->ORDER_BY( 'wico_ID' );
+			$SQL->LIMIT( '1' );
+			$container_code = $DB->get_var( $SQL );
+		}
+
 		$timer_name = 'skin_container('.$sco_name.')';
 		$Timer->start( $timer_name );
 
 		// Enable the desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode"
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
 		{	// Initialize hidden element with data which are used by JavaScript to build overlay designer mode html elements:
-			$designer_mode_data = array(
-					'style'     => 'display:none',
-					'class'     => 'evo_designer__container_data',
-					'data-name' => $sco_name,
-				);
-			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-			{	// Set data to know current user has a permission to edit this widget:
-				$designer_mode_data['data-can-edit'] = 1;
+			if( $container_code === NULL )
+			{	// Display error if container cannot be detected in DB by name:
+				echo ' <span class="text-danger">'.sprintf( T_('Container "%s" cannot be manipulated because it lacks a code name in the skin template.'), $sco_name ).'</span> ';
 			}
-			// We need this hidden span to know container name and if user can add/edit widgets.
-			// Will be removed after page loading when all data will be copied to real container wrapper.
-			echo '<span'.get_field_attribs_as_string( $designer_mode_data ).'></span>';
+			else
+			{	// If container code is defined or detected by name:
+				$designer_mode_data = array(
+						'style'     => 'display:none',
+						'class'     => 'evo_designer__container_data',
+						'data-name' => $sco_name,
+						'data-code' => $container_code,
+					);
+				if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+				{	// Set data to know current user has a permission to edit this widget:
+					$designer_mode_data['data-can-edit'] = 1;
+				}
+				// We need this hidden span to know container name and if user can add/edit widgets.
+				// Will be removed after page loading when all data will be copied to real container wrapper.
+				echo '<span'.get_field_attribs_as_string( $designer_mode_data ).'></span>';
+			}
 		}
 
 		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
@@ -334,7 +357,9 @@ class Skin extends DataObject
 		 * @var EnabledWidgetCache
 		 */
 		$EnabledWidgetCache = & get_EnabledWidgetCache();
-		$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $Blog->ID, $sco_name );
+		$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $Blog->ID,
+			( $container_code === NULL ? $sco_name : $container_code ),// Use container code if it is defined, otherwise use container name
+			( $container_code !== NULL ) );// Get by container code if it is defined
 
 		if( ! empty( $Widget_array ) )
 		{
@@ -1363,7 +1388,7 @@ var downloadInterval = setInterval( function()
 			{	// Initialize this url var only when current user has a permission to edit widgets:
 				global $admin_url;
 				add_js_headline( 'var b2evo_widget_edit_url = "'.$admin_url.'?ctrl=widgets&action=edit&wi_ID=$wi_ID$";'
-					.'var b2evo_widget_add_url = "'.$admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&action=add_list&container=$container$";'
+					.'var b2evo_widget_add_url = "'.$admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container=$container$&container_code=$container_code$";'
 					.'var b2evo_widget_blog = \''.$Blog->ID.'\';'
 					.'var b2evo_widget_crumb = \''.get_crumb( 'widget' ).'\';'
 					.'var b2evo_widget_icon_up = \''.format_to_js( get_icon( 'designer_widget_up', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_up' ) ) ).'\';'
