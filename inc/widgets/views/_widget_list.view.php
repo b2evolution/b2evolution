@@ -62,8 +62,9 @@ function display_container( $WidgetContainer, $is_included = true )
 	{
 		$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.'">'.$widget_container_name.'</a>';
 	}
-	$Table->title = '<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span>'
-		.' <span class="dimmed">'.$WidgetContainer->get( 'code' ).' '.$WidgetContainer->get( 'order' ).'</span>';
+	$Table->title = '<span class="dimmed">'.$WidgetContainer->get( 'order' ).'</span> '
+		.'<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span> '
+		.'<span class="dimmed">'.$WidgetContainer->get( 'code' ).'</span>';
 
 	if( ! $is_included )
 	{	// Allow to destroy sub-container when it is not included into the selected skin:

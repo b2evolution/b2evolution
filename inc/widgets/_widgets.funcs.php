@@ -91,8 +91,8 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 
 	// Additional sub containers:
 	$blog_containers['front_page_column_a'] = array( 'Front Page Column A', 1, 0 );
-	$blog_containers['front_page_column_b'] = array( 'Front Page Column B', 1, 0 );
-	$blog_containers['user_page_reputation'] = array( 'User Page - Reputation', 1, 0 );
+	$blog_containers['front_page_column_b'] = array( 'Front Page Column B', 2, 0 );
+	$blog_containers['user_page_reputation'] = array( 'User Page - Reputation', 100, 0 );
 
 	// Create rows to insert for all collection containers:
 	$widget_containers_sql_rows = array();
