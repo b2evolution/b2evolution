@@ -36,7 +36,7 @@ $SkinCache->load_all();
 
 $block_item_Widget = new Widget( 'block_item' );
 
-switch( $skin_type )
+switch( $sel_skin_type )
 {
 	case 'normal':
 		$skin_type_title = /* TRANS: Skin type name */ T_('Normal');
@@ -141,8 +141,14 @@ echo '<div class="skin_selector_block">';
 
 $skins_exist = false;
 // Go through all skin folders:
+sort( $skin_folders );
 foreach( $skin_folders as $skin_folder )
 {
+	if( is_empty_directory( $skins_path.$skin_folder ) )
+	{ // Empty skin folder:
+		continue;
+	}
+
 	if( !strlen( $skin_folder ) || $skin_folder[0] == '.' || $skin_folder == 'CVS' )
 	{	// Skip system folders:
 		continue;
