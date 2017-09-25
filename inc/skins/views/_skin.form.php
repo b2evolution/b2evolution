@@ -93,6 +93,56 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 									 );
 			$Form->end_fieldset();
 
+			$sql = 'SELECT cset_coll_ID, blog_name, cset_name,
+						CASE cset_name
+							WHEN "normal_skin_ID" THEN "'.T_('Normal').'"
+							WHEN "mobile_skin_ID" THEN "'.T_('Mobile').'"
+							WHEN "tablet_skin_ID" THEN "'.T_('Tablet').'"
+							WHEN "rwd_skin_ID" THEN "'.T_('RWD').'"
+							WHEN "feed_skin_ID" THEN "'.T_('XML Feed').'"
+							WHEN "sitemap_skin_ID" THEN "'.T_('XML Sitemap').'"
+							ELSE "'.T_('Unknown').'" END AS skin_type
+					FROM T_coll_settings
+					LEFT JOIN T_blogs ON blog_ID = cset_coll_ID
+					WHERE cset_name LIKE "%_skin_ID"
+						AND cset_value = '.$edited_Skin->ID;
+			$Results = new Results( $sql, '', '', 1000 );
+			$Results->title = T_('Used by').'...';
+			$Results->cols[] = array(
+				'th' => T_('Collection ID'),
+				'td_class' => 'shrinkwrap',
+				'td' => '$cset_coll_ID$',
+			);
+
+			function display_skin_setting_link( $row )
+			{
+				if( empty( $row->blog_name ) )
+				{
+					return;
+				}
+				$url_params = 'tab=skin&amp;blog='.$row->cset_coll_ID;
+
+				if( in_array( $row->cset_name, array( 'mobile_skin_ID', 'tablet_skin_ID', 'rwd_skin_ID', 'feed_skin_ID', 'sitemap_skin_ID' )  ) )
+				{
+					$url_params .= '&amp;skin_type='.str_replace( '_skin_ID', '', $row->cset_name );
+				}
+
+				return '<a href="'.get_dispctrl_url( 'coll_settings', $url_params ).'">'.$row->blog_name.'</a>';
+			}
+
+			$Results->cols[] = array(
+				'th' => T_('Collection name'),
+				'td' => '%display_skin_setting_link( {row} )%',
+			);
+
+			$Results->cols[] = array(
+				'th' => T_('Skin type'),
+				'td' => '$skin_type$',
+				'td_class' => 'text-center'
+			);
+
+			$Results->display();
+
 		echo '</div>';
 
 	$Form->end_fieldset();
