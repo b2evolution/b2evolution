@@ -16,7 +16,7 @@ jQuery( document ).ready( function()
  */
 function evo_initialize_colorpicker_inputs()
 {
-	jQuery( '.form_color_input' ).each( function ()
+	jQuery( '.form_color_input' ).not('.initialized').each( function ()
 	{
 		var colorpicker_ID = 'farbtastic_colorpicker_' + colorpicker_num;
 		jQuery( 'body' ).append( '<div id="' + colorpicker_ID + '" style="display:none"></div>' );
@@ -50,6 +50,8 @@ function evo_initialize_colorpicker_inputs()
 				popover_obj.hide();
 			}
 		} );
+
+		jQuery( this ).addClass( 'initialized' );
 
 		colorpicker_num++;
 	} );
