@@ -8589,6 +8589,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12330, 'Upgrade categories table...' ) )
+	{	// part of 6.9.4
+		db_add_col( 'T_categories', 'cat_social_media_image_file_ID', 'int(10) unsigned  NULL AFTER cat_image_file_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

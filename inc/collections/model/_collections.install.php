@@ -109,6 +109,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cat_urlname         varchar(255) COLLATE ascii_general_ci NOT NULL,
 			cat_blog_ID         int(10) unsigned NOT NULL default 2,
 			cat_image_file_ID   int(10) unsigned NULL,
+			cat_social_media_image_file_ID int(10) unsigned NULL,
 			cat_description     varchar(255) NULL DEFAULT NULL,
 			cat_order           int(11) NULL DEFAULT NULL,
 			cat_subcat_ordering enum('parent', 'alpha', 'manual') COLLATE ascii_general_ci NULL DEFAULT NULL,
