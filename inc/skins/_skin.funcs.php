@@ -2782,11 +2782,21 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 					) );
 			}
 
+			if( $mode == 'customizer' )
+			{
+				$Form->begin_group();
+			}
+
 			// Loop through all widget params:
 			foreach( $skin_params as $l_name => $l_meta )
 			{
 				// Display field:
 				autoform_display_field( $l_name, $l_meta, $Form, 'Skin', $edited_Skin );
+			}
+
+			if( $mode == 'customizer' )
+			{
+				$Form->end_group();
 			}
 		}
 

@@ -1676,20 +1676,26 @@ table.diff {
 		margin: 0;
 		padding: 0;
 	}
-	form > .fieldset_wrapper > fieldset > .panel {
-		border-top: none;
-		border-left: none;
-		border-right: none;
-		border-radius: 0;
-		margin: 0;
-		box-shadow: none;
-		.panel-heading {
+	form > .panel-group {
+		margin-bottom: 0;
+		> .panel {
+			border-top: none;
+			border-left: none;
+			border-right: none;
 			border-radius: 0;
-		}
-		.panel-body {
-			.form-group:last-child {
-				margin-bottom: 0;
+			margin: 0;
+			box-shadow: none;
+			.panel-heading {
+				border-radius: 0;
 			}
+			.panel-body {
+				.form-group:last-child {
+					margin-bottom: 0;
+				}
+			}
+		}
+		.fieldset > .panel {
+			margin-bottom: 20px;
 		}
 	}
 	.row {
@@ -1699,7 +1705,7 @@ table.diff {
 		}
 	}
 	.evo_customizer__tabs + #skin_settings_checkchanges {
-		margin-top: 52px;
+		margin-top: 93px;
 	}
 }
 .evo_customizer__tabs {
@@ -1710,6 +1716,14 @@ table.diff {
 	background: #FFF;
 	padding: 15px 15px 0 15px;
 	z-index: 1;
+	.evo_customizer__subtabs {
+		padding: 10px 15px;
+		margin: 0 -15px;
+		border-top: 1px solid #DDD;
+		a {
+			margin: 0 10px
+		}
+	}
 }
 .evo_customizer__buttons {
 	position: fixed;
@@ -1722,11 +1736,5 @@ table.diff {
 	.form-group, .control-buttons {
 		margin: 0;
 		padding: 0;
-	}
-	.evo_customizer__links {
-		margin-top: 10px;
-		a {
-			margin: 0 10px
-		}
 	}
 }

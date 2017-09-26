@@ -143,11 +143,19 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		{
 			case 'begin_fieldset':
 				$fieldset_title = $set_label;
+				if( $Form->layout == 'accordion' && ! empty( $Form->_opentags['fieldset'] ) )
+				{	// Use accordion style only for top level:
+					$Form->switch_layout( 'fieldset' );
+				}
 				$Form->begin_fieldset( $fieldset_title.$help_icon );
 				break;
 
 			case 'end_fieldset':
 				$Form->end_fieldset();
+				if( isset( $Form->saved_layouts[0] ) && $Form->saved_layouts[0] == 'accordion' && ! empty( $Form->_opentags['fieldset'] ) )
+				{	// We should switch back to accordion style:
+					$Form->switch_layout( NULL );
+				}
 				break;
 
 			case 'separator':

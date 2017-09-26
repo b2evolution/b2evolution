@@ -534,6 +534,7 @@ class AdminUI extends AdminUI_general
 					'formend'        => '',
 					'title_fmt'      => '<span class="global_icons">$global_icons$</span><h2 class="page-title">$title$</h2>'."\n",
 					'no_title_fmt'   => '<span class="global_icons no_title">$global_icons$</span><div class="clear"></div>'."\n",
+					'fieldset_title' => '',
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
 															.'<legend class="panel-heading" $title_attribs$><h3 class="panel-title">$fieldset_title$</h3></legend><div class="panel-body $class$">'."\n",
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
@@ -589,7 +590,6 @@ class AdminUI extends AdminUI_general
 									 '</div>' // End of <div class="panel-body...>
 								.'</div>' // End of <div id="$group_item_id$...>
 							.'</div>'."\n", // End of <div class="panel panel-default...>
-					
 					) );
 
 			case 'linespan_form':

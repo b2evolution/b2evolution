@@ -140,12 +140,6 @@ class bootstrap_site_dropdown_Skin extends Skin
 							'type' => 'integer',
 							'size' => 1,
 						),
-						'tab_bg_color' => array(
-							'label' => T_('Tab background color'),
-							'note' => T_('E-g: #00ff00 for green'),
-							'defaultvalue' => '#f8f8f8',
-							'type' => 'color',
-						),
 						'tab_text_color' => array(
 							'label' => T_('Tab text color'),
 							'note' => T_('E-g: #ff0000 for red'),
@@ -305,7 +299,6 @@ class bootstrap_site_dropdown_Skin extends Skin
 		$menu_bar_bg_color = $this->get_setting( 'menu_bar_bg_color' );
 		$menu_bar_border_color = $this->get_setting( 'menu_bar_border_color' );
 		$menu_bar_logo_padding = $this->get_setting( 'menu_bar_logo_padding' );
-		$tab_bg_color = $this->get_setting( 'tab_bg_color' );
 		$tab_text_color = $this->get_setting( 'tab_text_color' );
 		$hover_tab_bg_color = $this->get_setting( 'hover_tab_bg_color' );
 		$hover_tab_text_color = $this->get_setting( 'hover_tab_text_color' );
@@ -337,7 +330,6 @@ class bootstrap_site_dropdown_Skin extends Skin
 	padding: '.$menu_bar_logo_padding.'px;
 }
 .bootstrap_site_navbar_header .navbar .nav > li:not(.active) > a {
-	background-color: '.$tab_bg_color.';
 	color: '.$tab_text_color.';
 }
 .bootstrap_site_navbar_header .navbar .nav > li:not(.active) > a:hover {

@@ -32,10 +32,12 @@
 #cboxLoadedContent {
   overflow: auto;
   box-sizing: border-box;
+  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: center;
-      align-items: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 #cboxTitle {
   margin: 0;
@@ -62,10 +64,12 @@
 }
 .cboxPhoto.zoomin {
   cursor: cell;
+  cursor: -webkit-zoom-in;
   cursor: -moz-zoom-in;
 }
 .cboxPhoto.zoomout {
   cursor: cell;
+  cursor: -webkit-zoom-out;
   cursor: -moz-zoom-out;
 }
 .cboxIframe {
@@ -120,16 +124,21 @@
   position: absolute;
   bottom: 0;
   width: 100%;
+  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: row;
-      flex-direction: row;
-  -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
-  -ms-flex-pack: justify;
-      justify-content: space-between;
-  -ms-flex-align: center;
-      align-items: center;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 #cboxCurrent {
   margin: 0 5px;
@@ -145,18 +154,24 @@
   line-height: 17px;
 }
 #cboxNavigation {
-  -ms-flex-preferred-size: auto;
-      flex-basis: auto;
+  -webkit-flex-basis: auto;
+      -ms-flex-preferred-size: auto;
+          flex-basis: auto;
+  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: row;
-      flex-direction: row;
-  -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
-  -ms-flex-pack: justify;
-      justify-content: space-between;
-  -ms-flex-align: center;
-      align-items: center;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   min-width: 80px;
 }
 #cboxPrevious,
@@ -191,8 +206,9 @@
   color: #999;
   font: normal normal normal 40px/1 FontAwesome;
   visibility: hidden;
-  -ms-flex-preferred-size: auto;
-      flex-basis: auto;
+  -webkit-flex-basis: auto;
+      -ms-flex-preferred-size: auto;
+          flex-basis: auto;
 }
 #cboxClose:before {
   visibility: visible;

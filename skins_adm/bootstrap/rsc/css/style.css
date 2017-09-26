@@ -1642,7 +1642,10 @@ table.diff td.diff-title-addedline {
   margin: 0;
   padding: 0;
 }
-#customizer_wrapper form > .fieldset_wrapper > fieldset > .panel {
+#customizer_wrapper form > .panel-group {
+  margin-bottom: 0;
+}
+#customizer_wrapper form > .panel-group > .panel {
   border-top: none;
   border-left: none;
   border-right: none;
@@ -1650,11 +1653,14 @@ table.diff td.diff-title-addedline {
   margin: 0;
   box-shadow: none;
 }
-#customizer_wrapper form > .fieldset_wrapper > fieldset > .panel .panel-heading {
+#customizer_wrapper form > .panel-group > .panel .panel-heading {
   border-radius: 0;
 }
-#customizer_wrapper form > .fieldset_wrapper > fieldset > .panel .panel-body .form-group:last-child {
+#customizer_wrapper form > .panel-group > .panel .panel-body .form-group:last-child {
   margin-bottom: 0;
+}
+#customizer_wrapper form > .panel-group .fieldset > .panel {
+  margin-bottom: 20px;
 }
 #customizer_wrapper .row {
   margin: 0;
@@ -1663,7 +1669,7 @@ table.diff td.diff-title-addedline {
   padding: 0;
 }
 #customizer_wrapper .evo_customizer__tabs + #skin_settings_checkchanges {
-  margin-top: 52px;
+  margin-top: 93px;
 }
 .evo_customizer__tabs {
   position: fixed;
@@ -1673,6 +1679,14 @@ table.diff td.diff-title-addedline {
   background: #FFF;
   padding: 15px 15px 0 15px;
   z-index: 1;
+}
+.evo_customizer__tabs .evo_customizer__subtabs {
+  padding: 10px 15px;
+  margin: 0 -15px;
+  border-top: 1px solid #DDD;
+}
+.evo_customizer__tabs .evo_customizer__subtabs a {
+  margin: 0 10px;
 }
 .evo_customizer__buttons {
   position: fixed;
@@ -1687,10 +1701,4 @@ table.diff td.diff-title-addedline {
 .evo_customizer__buttons .control-buttons {
   margin: 0;
   padding: 0;
-}
-.evo_customizer__buttons .evo_customizer__links {
-  margin-top: 10px;
-}
-.evo_customizer__buttons .evo_customizer__links a {
-  margin: 0 10px;
 }

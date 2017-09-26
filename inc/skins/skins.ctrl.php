@@ -18,13 +18,17 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_funcs( 'skins/_skin.funcs.php' );
 
-// Check permission to display:
-$current_User->check_perm( 'options', 'view', true );
-
 
 param( 'action', 'string', 'list' );
 param( 'tab', 'string', 'manage_skins', true );
 param( 'skin_type', 'string', '' );
+
+
+if( $action != 'reset_coll' )
+{	// Check permission to display site options:
+	// (exception for reset collection skin settings where we should check permission to edit collection properties)
+	$current_User->check_perm( 'options', 'view', true );
+}
 
 param( 'redirect_to', 'url', $admin_url.'?ctrl=skins&tab='.$tab.( isset( $blog ) ? '&blog='.$blog : '' ) );
 
@@ -238,42 +242,48 @@ switch( $action )
 		break;
 
 
-	case 'reset':
-		// Reset settings to default values:
+	case 'reset_site':
+	case 'reset_coll':
+		// Reset site/collection settings to default values:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'skin' );
-
-		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
 
 		// Make sure we got skin and blog IDs:
 		param( 'skin_ID', 'integer', true );
 		param( 'blog', 'integer', true );
 
-		$Messages->add( T_('Skin params have been reset to defaults.'), 'success' );
-
-		if( $blog > 0 )
+		if( $action == 'reset_coll' )
 		{	// Collection skin:
+
+			// Check permission:
+			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+
 			// At some point we may want to remove skin settings from all blogs
 			$DB->query( 'DELETE FROM T_coll_settings
 				WHERE cset_coll_ID = '.$DB->quote( $blog ).'
 				  AND cset_name REGEXP "^skin'.$skin_ID.'_"' );
 
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$blog.'&skin_type='.$skin_type.( empty( $mode ) ? '' : '&mode='.$mode ), 303 ); // Will EXIT
-			// We have EXITed already at this point!!
+			$redirect_to = $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$blog.'&skin_type='.$skin_type.( empty( $mode ) ? '' : '&mode='.$mode );
 		}
 		else
 		{	// Site skin:
+
+			// Check permission:
+			$current_User->check_perm( 'options', 'edit', true );
+
 			// At some point we may want to remove skin settings from all blogs
 			$DB->query( 'DELETE FROM T_settings
 				WHERE set_name REGEXP "^skin'.$skin_ID.'_"' );
 
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skin_type='.$skin_type.( empty( $mode ) ? '' : '&mode='.$mode ), 303 ); // Will EXIT
-			// We have EXITed already at this point!!
+			$redirect_to = $admin_url.'?ctrl=collections&tab=site_skin&skin_type='.$skin_type.( empty( $mode ) ? '' : '&mode='.$mode );
 		}
+
+		$Messages->add( T_('Skin params have been reset to defaults.'), 'success' );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $redirect_to ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 }
 

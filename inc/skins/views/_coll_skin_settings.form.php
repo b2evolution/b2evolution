@@ -18,6 +18,57 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $Collection, $Blog, $Settings, $current_User, $skin_type, $admin_url, $mode;
 
+switch( $skin_type )
+{
+	case 'normal':
+		$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'normal_skin_ID' ) : $Settings->get( 'normal_skin_ID' );
+		$fieldset_title = isset( $Blog ) ? T_('Default Collection skin') : T_('Default Site skin');
+		break;
+
+	case 'mobile':
+		$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'mobile_skin_ID', true ) : $Settings->get( 'mobile_skin_ID', true );
+		$fieldset_title = isset( $Blog ) ? T_('Default Collection mobile phone skin') : T_('Default Site mobile phone skin');
+		break;
+
+	case 'tablet':
+		$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'tablet_skin_ID', true ) : $Settings->get( 'tablet_skin_ID', true );
+		$fieldset_title = isset( $Blog ) ? T_('Default Collection tablet skin') : T_('Default Site tablet skin');
+		break;
+
+	default:
+		debug_die( 'Wrong skin type: '.$skin_type );
+}
+
+$link_select_skin = action_icon( T_('Select another skin...'), 'choose',
+		regenerate_url( 'action,mode', 'skinpage=selection&amp;skin_type='.$skin_type ),
+		' '.T_('Choose a different skin').' &raquo;', 3, 4, array(
+			'class' => $mode == 'customizer' ? 'small' : 'action_icon btn btn-info btn-sm',
+			'target' => $mode == 'customizer' ? '_top' : '',
+	) );
+$link_reset_params = '';
+
+// Check if current user can edit skin settings:
+$can_edit_skin_settings =
+	// When skin ID has a real value ( when $skin_ID = 0 means it must be the same as the normal skin value )
+	$skin_ID &&
+		// If current User can edit colleciton properties:
+	( ( isset( $Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) ) ||
+		// If site skins are enabled and current User can edit site options:
+		( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) )
+	);
+
+if( $can_edit_skin_settings )
+{	// Display "Reset params" button if current User can edit skin settings:
+	$link_reset_url = regenerate_url( 'ctrl,action', 'ctrl=skins&amp;skin_ID='.$skin_ID.'&amp;skin_type='.$skin_type.'&amp;blog='.( isset( $Blog ) ? $Blog->ID : get_working_blog() ).'&amp;action='.( isset( $Blog ) ? 'reset_coll' : 'reset_site' ).'&amp;'.url_crumb( 'skin' ) );
+	$link_reset_params = action_icon( T_('Reset params'), 'reload',
+			$link_reset_url,
+			' '.T_('Reset params'), 3, 4, array(
+				'class'   => $mode == 'customizer' ? 'small' : 'action_icon btn btn-default btn-sm',
+				'onclick' => 'return evo_confirm_skin_reset()',
+				'target' => $mode == 'customizer' ? 'evo_customizer__backoffice' : '',
+		) );
+}
+
 if( $mode == 'customizer' )
 {	// Display tabs to switch between site and collection skins in special div on customizer mode:
 	if( empty( $Blog ) )
@@ -45,10 +96,12 @@ if( $mode == 'customizer' )
 	}
 	echo '</ul>';
 
+	echo '<div class="evo_customizer__subtabs">'.$link_select_skin.$link_reset_params.'</div>';
+
 	echo '</div>';
 }
 
-$Form = new Form( NULL, 'skin_settings_checkchanges' );
+$Form = new Form( NULL, 'skin_settings_checkchanges', 'post', ( $mode == 'customizer' ? 'accordion' : NULL ) );
 
 $Form->begin_form( 'fform' );
 
@@ -70,27 +123,6 @@ $Form->begin_form( 'fform' );
 		$Form->hidden( 'tab', 'site_skin' );
 		$Form->hidden( 'skin_type', $skin_type );
 		$Form->hidden( 'action', 'update_site_skin' );
-	}
-
-	switch( $skin_type )
-	{
-		case 'normal':
-			$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'normal_skin_ID' ) : $Settings->get( 'normal_skin_ID' );
-			$fieldset_title = isset( $Blog ) ? T_('Default Collection skin') : T_('Default Site skin');
-			break;
-
-		case 'mobile':
-			$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'mobile_skin_ID', true ) : $Settings->get( 'mobile_skin_ID', true );
-			$fieldset_title = isset( $Blog ) ? T_('Default Collection mobile phone skin') : T_('Default Site mobile phone skin');
-			break;
-
-		case 'tablet':
-			$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'tablet_skin_ID', true ) : $Settings->get( 'tablet_skin_ID', true );
-			$fieldset_title = isset( $Blog ) ? T_('Default Collection tablet skin') : T_('Default Site tablet skin');
-			break;
-
-		default:
-			debug_die( 'Wrong skin type: '.$skin_type );
 	}
 
 	// Initialize a link to go to site/collection skin settings:
@@ -120,45 +152,21 @@ $Form->begin_form( 'fform' );
 		$fieldset_title .= ' <span class="panel_heading_action_icons"><a href="'.$goto_link_url.'" class="btn btn-sm btn-info">'.$goto_link_title.' &raquo;</a></span>';
 	}
 
-	$link_select_skin = action_icon( T_('Select another skin...'), 'choose',
-			regenerate_url( 'action,mode', 'skinpage=selection&amp;skin_type='.$skin_type ),
-			' '.T_('Choose a different skin').' &raquo;', 3, 4, array(
-				'class' => $mode == 'customizer' ? 'small' : 'action_icon btn btn-info btn-sm',
-				'target' => $mode == 'customizer' ? '_top' : '',
+	display_skin_fieldset( $Form, $skin_ID, array(
+			'fieldset_title' => $fieldset_title,
+			'fieldset_links' => '<span class="panel_heading_action_icons pull-right">'.$link_select_skin.$link_reset_params.'</span><div class="clearfix"></div>'
 		) );
-	$link_reset_params = '';
-	$fieldset_title_links = '<span class="panel_heading_action_icons pull-right">'.$link_select_skin;
-
-	if( $skin_ID && $current_User->check_perm( 'options', 'view' ) )
-	{	// Display "Reset params" button only when skin ID has a real value ( when $skin_ID = 0 means it must be the same as the normal skin value ):
-		$link_reset_url = regenerate_url( 'ctrl,action', 'ctrl=skins&amp;skin_ID='.$skin_ID.'&amp;skin_type='.$skin_type.'&amp;blog='.( isset( $Blog ) ? $Blog->ID : '0' ).'&amp;action=reset&amp;'.url_crumb( 'skin' ) );
-		$link_reset_params = action_icon( T_('Reset params'), 'reload',
-				$link_reset_url,
-				' '.T_('Reset params'), 3, 4, array(
-					'class'   => $mode == 'customizer' ? 'small' : 'action_icon btn btn-default btn-sm',
-					'onclick' => 'return evo_confirm_skin_reset()',
-					'target' => $mode == 'customizer' ? 'evo_customizer__backoffice' : '',
-			) );
-		$fieldset_title_links .= $link_reset_params;
-	}
-	$fieldset_title_links .= '</span><div class="clearfix"></div>';
-	display_skin_fieldset( $Form, $skin_ID, array( 'fieldset_title' => $fieldset_title, 'fieldset_links' => $fieldset_title_links ) );
 
 $buttons = array();
-if( $skin_ID )
-{	// Allow to update skin params only when it is really selected (Don't display this button to case "Same as normal skin."):
-	if( isset( $Blog ) ||
-	    ( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) )
-	{	// If current User can edit skin settings of site or collection:
-		$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
-	}
+if( $can_edit_skin_settings )
+{	// Display a button to update skin params only when if current User can edit this:
+	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
 }
 
 if( $mode == 'customizer' )
 {	// Display buttons in special div on customizer mode:
 	echo '<div class="evo_customizer__buttons">';
 	$Form->buttons( $buttons );
-	echo '<div class="evo_customizer__links">'.$link_select_skin.$link_reset_params.'</div>';
 	echo '</div>';
 	// Clear buttons to don't display them twice:
 	$buttons = array();
