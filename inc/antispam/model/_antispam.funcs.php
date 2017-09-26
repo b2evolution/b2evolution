@@ -577,6 +577,11 @@ function antispam_block_by_domain()
 
 	foreach( $current_ip_addreses as $ip_address )
 	{
+		if( ! is_valid_ip_format( $ip_address ) )
+		{	// Skip not valid IP address:
+			continue;
+		}
+
 		// Get domain name by current IP adress:
 		$ip_domain = gethostbyaddr( $ip_address );
 
@@ -597,6 +602,11 @@ function antispam_block_by_domain()
 function antispam_block_by_initial_referer()
 {
 	global $Session;
+
+	if( ! isset( $Session ) )
+	{	// We cannot use this for request without initialized Session, e-g CLI mode:
+		return;
+	}
 
 	load_funcs( 'sessions/model/_hitlog.funcs.php' );
 
