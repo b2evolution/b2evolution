@@ -112,6 +112,7 @@ class Chapter extends DataObject
 			$this->parent_ID = $db_row->cat_parent_ID;
 			$this->blog_ID = $db_row->cat_blog_ID;
 			$this->image_file_ID = $db_row->cat_image_file_ID;
+			$this->social_media_image_file_ID = $db_row->cat_social_media_image_file_ID;
 			$this->urlname = $db_row->cat_urlname;
 			$this->description = $db_row->cat_description;
 			$this->order = $db_row->cat_order;
@@ -307,6 +308,10 @@ class Chapter extends DataObject
 		// Check image file
 		param( 'cat_image_file_ID', 'integer' );
 		$this->set_from_Request( 'image_file_ID' );
+
+		// Check social media boilerplate image
+		param( 'cat_social_media_image_file_ID', 'integer' );
+		$this->set_from_Request( 'social_media_image_file_ID' );
 
 		// Check url name
 		param( 'cat_urlname', 'string' );

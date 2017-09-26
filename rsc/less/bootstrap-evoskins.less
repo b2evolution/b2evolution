@@ -988,6 +988,15 @@ div.edit_toolbars, div.message_toolbars {
 	.evo_widget[class$=_menu_link] a.btn {
 		width: 100%;
 	}
+	// Fix Flowing and RWD blocks in sidebar containers:
+	div.evo_layout_flow .widget_flow_blocks > div {
+		margin: 8px;
+		width: auto;
+	}
+	div.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img {
+		min-width: auto;
+		min-height: auto;
+	}
 }
 
 // Grouped form fieldsets with bootstrap js accordion toggle behavior:

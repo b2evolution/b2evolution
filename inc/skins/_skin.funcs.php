@@ -2259,9 +2259,22 @@ function skin_opengraph_tags()
 			echo '<meta property="og:url" content="'.format_to_output( $Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
 			echo '<meta property="og:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
 			echo '<meta property="og:site_name" content="'.format_to_output( $Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
+
+			if( $Item->get_type_setting( 'use_coordinates' ) != 'never' )
+			{
+				if( $latitude = $Item->get_setting( 'latitude' ) )
+				{
+					echo '<meta property="og:latitude" content="'.$latitude."\" />\n";
+				}
+				if( $longitude = $Item->get_setting( 'longitude' ) )
+				{
+					echo '<meta property="og:latitude" content="'.$longitude."\" />\n";
+				}
+			}
 			break;
 
 		case 'posts':
+		case 'front':
 			$intro_Item = & get_featured_Item( $disp, NULL, true );
 			if( $intro_Item )
 			{
@@ -2271,18 +2284,18 @@ function skin_opengraph_tags()
 					echo '<meta property="og:url" content="'.format_to_output( $intro_Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
 					echo '<meta property="og:description" content="'.format_to_output( $intro_Item->get_excerpt2(), 'htmlattr' )."\" />\n";
 					echo '<meta property="og:site_name" content="'.format_to_output( $intro_Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
+					break;
 				}
 			}
-			break;
 
 		default:
-			/*
-			echo '<meta property="og:title" content="'.format_to_output( $Blog->name, 'htmlattr' )."\" />\n";
-			echo '<meta property="og:url" content="'.format_to_output( $Blog->get( 'url' ), 'htmlattr' )."\" />\n";
-			echo '<meta property="og:description" content="'.format_to_output( $Blog->longdesc, 'htmlattr' )."\" />\n";
-			echo '<meta property="og:site_name" content="'.format_to_output( $Blog->get( 'name' ), 'htmlattr' )."\" />\n";
-			*/
-			return;
+			if( $Blog )
+			{
+				echo '<meta property="og:title" content="'.format_to_output( $Blog->name, 'htmlattr' )."\" />\n";
+				echo '<meta property="og:url" content="'.format_to_output( $Blog->get( 'url' ), 'htmlattr' )."\" />\n";
+				echo '<meta property="og:description" content="'.format_to_output( $Blog->longdesc, 'htmlattr' )."\" />\n";
+				echo '<meta property="og:site_name" content="'.format_to_output( $Blog->get( 'name' ), 'htmlattr' )."\" />\n";
+			}
 	}
 
 	$og_image_File = get_social_tag_image_file( $disp );
@@ -2343,6 +2356,7 @@ function skin_twitter_tags()
 			break;
 
 		case 'posts':
+		case 'front':
 			if( ! isset( $open_tags_enabled ) )
 			{
 				$intro_Item = & get_featured_Item( $disp, NULL, true );
