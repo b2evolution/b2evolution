@@ -49,6 +49,11 @@ var reorder_delay_remaining = 0;
  */
 jQuery(document).ready( function()
 {
+	if( typeof( b2evo_widgets_init ) != 'undefined' && b2evo_widgets_init === false )
+	{	// Don't initialize widgets if it is special forced to stop it:
+		return;
+	}
+
 	// Make widget rows drag and drop:
 	makeDragnDrop( '.draggable_widget' );
 

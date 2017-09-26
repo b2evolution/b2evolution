@@ -264,7 +264,7 @@ switch( $action )
 		$DB->commit();
 
 		$Messages->add( sprintf( T_('Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;.'),
-					$edited_ComponentWidget->get_name(), T_($container)	), 'success' );
+					$edited_ComponentWidget->get_name(), $edited_ComponentWidget->get_container_param( 'name' ) ), 'success' );
 
 		switch( $display_mode )
 		{
@@ -721,6 +721,11 @@ if( $display_mode == 'normal' )
 }
 elseif( $display_mode == 'iframe' )
 {	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+
+	// Don't initalize widgets JS code for iframe mode,
+	// e-g because we need to work simple URLs to add new widget from front-office side:
+	add_js_headline( 'var b2evo_widgets_init = false;' );
+
 	$AdminUI->disp_html_head();
 	echo '<body>';
 	// Display info & error messages:
@@ -809,6 +814,9 @@ switch( $action )
 				// Try to get widget container by collection ID, container code and requested skin type:
 				$WidgetContainerCache = & get_WidgetContainerCache();
 				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $blog, $skin_type, $container_code );
+
+				// Change this param to proper work of func get_widget_container():
+				set_param( 'container', 'wico_ID_'.$WidgetContainer->ID );
 
 				echo '<div class="available_widgets"'.( $WidgetContainer ? 'id="available_add_new_wico_ID_'.$WidgetContainer->ID.'"' : '' ).'>'."\n";
 				$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
