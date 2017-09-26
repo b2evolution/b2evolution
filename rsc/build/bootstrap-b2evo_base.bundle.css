@@ -2492,16 +2492,6 @@ div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div {
   text-align: left;
   width: 250px;
 }
-.evo_container__sidebar div.evo_layout_flow .widget_flow_blocks > div,
-.evo_container__sidebar2 div.evo_layout_flow .widget_flow_blocks > div {
-  margin: 8px;
-  width: auto;
-}
-.evo_container__sidebar div.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img,
-.evo_container__sidebar2 div.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img {
-  min-width: auto;
-  min-height: auto;
-}
 div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
 div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div {
   padding: 8px;
@@ -4623,6 +4613,16 @@ div.message_toolbars {
 .evo_container__sidebar .evo_widget[class$=_menu_link] a.btn,
 .evo_container__sidebar2 .evo_widget[class$=_menu_link] a.btn {
   width: 100%;
+}
+.evo_container__sidebar div.evo_layout_flow .widget_flow_blocks > div,
+.evo_container__sidebar2 div.evo_layout_flow .widget_flow_blocks > div {
+  margin: 8px;
+  width: auto;
+}
+.evo_container__sidebar div.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img,
+.evo_container__sidebar2 div.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img {
+  min-width: auto;
+  min-height: auto;
 }
 .accordion-caret .accordion-toggler:before {
   padding-right: 3px;
