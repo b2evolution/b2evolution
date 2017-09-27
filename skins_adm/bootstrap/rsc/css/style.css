@@ -1645,7 +1645,8 @@ table.diff td.diff-title-addedline {
 #customizer_wrapper form > .panel-group {
   margin-bottom: 0;
 }
-#customizer_wrapper form > .panel-group > .panel {
+#customizer_wrapper form > .panel-group > .panel,
+#customizer_wrapper form > div.fieldset_wrapper > fieldset > .panel {
   border-top: none;
   border-left: none;
   border-right: none;
@@ -1653,13 +1654,15 @@ table.diff td.diff-title-addedline {
   margin: 0;
   box-shadow: none;
 }
-#customizer_wrapper form > .panel-group > .panel .panel-heading {
+#customizer_wrapper form > .panel-group > .panel > .panel-heading,
+#customizer_wrapper form > div.fieldset_wrapper > fieldset > .panel > .panel-heading {
   border-radius: 0;
 }
-#customizer_wrapper form > .panel-group > .panel .panel-body .form-group:last-child {
+#customizer_wrapper form > .panel-group > .panel > .panel-body .form-group:last-child,
+#customizer_wrapper form > div.fieldset_wrapper > fieldset > .panel > .panel-body .form-group:last-child {
   margin-bottom: 0;
 }
-#customizer_wrapper form > .panel-group .fieldset > .panel {
+#customizer_wrapper form .fieldset > .panel {
   margin-bottom: 20px;
 }
 #customizer_wrapper .row {
@@ -1668,8 +1671,18 @@ table.diff td.diff-title-addedline {
 #customizer_wrapper .row .col-md-12 {
   padding: 0;
 }
-#customizer_wrapper .evo_customizer__tabs + #skin_settings_checkchanges {
-  margin-top: 93px;
+#customizer_wrapper .evo_customizer__tabs + .evo_customizer__content {
+  margin-top: 140px;
+}
+#customizer_wrapper .evo_customizer__available_widgets {
+  padding: 15px;
+}
+#customizer_wrapper .evo_customizer__available_widgets ul {
+  list-style: none;
+  margin: 0 0 0 2px;
+}
+#customizer_wrapper .evo_customizer__available_widgets h3 {
+  margin: 10px 0 5px 0;
 }
 .evo_customizer__tabs {
   position: fixed;
@@ -1680,13 +1693,24 @@ table.diff td.diff-title-addedline {
   padding: 15px 15px 0 15px;
   z-index: 1;
 }
-.evo_customizer__tabs .evo_customizer__subtabs {
+.evo_customizer__tabs .evo_customizer__menus,
+.evo_customizer__tabs .evo_customizer__actions {
   padding: 10px 15px;
   margin: 0 -15px;
   border-top: 1px solid #DDD;
 }
-.evo_customizer__tabs .evo_customizer__subtabs a {
-  margin: 0 10px;
+.evo_customizer__tabs .evo_customizer__menus nav .nav > li {
+  margin-right: 3px;
+}
+.evo_customizer__tabs .evo_customizer__menus nav .nav > li a {
+  padding: 4px 10px;
+  font-size: 92%;
+}
+.evo_customizer__tabs .evo_customizer__actions a {
+  margin-right: 10px;
+}
+.evo_customizer__tabs .evo_customizer__actions a:last-child {
+  margin-right: 0;
 }
 .evo_customizer__buttons {
   position: fixed;

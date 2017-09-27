@@ -25,6 +25,10 @@ jQuery( document ).on( 'ready', function()
 		{	// Remove messages wrapper completely if it had only successful messages:
 			messages_wrapper.closest( '.action_messages' ).remove();
 		}
+
+		// Set proper space before form after top tabs:
+		var tabs_height = jQuery( this ).contents().find( '.evo_customizer__tabs' ).outerHeight();
+		jQuery( this ).contents().find( '.evo_customizer__content' ).css( 'margin-top', tabs_height + 'px' );
 	} );
 
 	jQuery( '#evo_customizer__updater' ).on( 'load', function()

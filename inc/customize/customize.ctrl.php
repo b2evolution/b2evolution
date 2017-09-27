@@ -40,6 +40,14 @@ switch( $view )
 		require $inc_path.$ctrl_mappings[ $ctrl ];
 		break;
 
+	case 'coll_widgets':
+		// Open form with widget settings of current collection:
+		$ctrl = 'widgets';
+		$action = 'customize';
+		$display_mode = 'iframe';
+		require $inc_path.$ctrl_mappings[ $ctrl ];
+		break;
+
 	default:
 		debug_die( 'unhandled view' );
 }

@@ -1538,9 +1538,18 @@ class _core_Module extends Module
 				// Display an option to turn on/off containers display:
 				global $Session;
 				$designer_mode = $Session->get( 'designer_mode_'.$Blog->ID );
+				if( $designer_mode && $Session->get( 'customizer_mode_'.$Blog->ID ) )
+				{	// If widgets customizer mode is enabled:
+					$customizing_url = get_param( 'customizing_url' );
+					$menu_entry_skin_href = url_add_param( ( empty( $customizing_url ) ? get_current_url( 'customizer_mode,designer_mode,show_toolbar,redir' ) : $customizing_url ), 'customizer_mode=disable&amp;designer_mode=disable' );
+				}
+				else
+				{	// If widgets customizer mode is disabled:
+					$menu_entry_skin_href = $Blog->get( 'customizer_url', array( 'view' => 'coll_widgets' ) );
+				}
 				$entries['containers'] = array(
 					'text'        => '<span class="fa fa-cubes"></span> '.( $designer_mode ? T_('Exit Designer') : T_('Designer Mode') ),
-					'href'        => regenerate_url( 'designer_mode', 'designer_mode='.( $designer_mode ? 'disable' : 'enable' ) ),
+					'href'        => $menu_entry_skin_href,
 					'entry_class' => 'rwdhide',
 					'class'       => ( $designer_mode ? 'active' : '' ),
 				);
@@ -1560,19 +1569,11 @@ class _core_Module extends Module
 				}
 				else
 				{	// If skin customizer mode is disabled:
-					if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-					{	// URL to customize collection skin:
-						$menu_entry_skin_href = $Blog->get( 'customizer_url' );
-					}
-					else
-					{	// URL to customize site skin:
-						global $customizer_url;
-						$menu_entry_skin_href = $customizer_url.'?view=site_skin&blog='.$Blog->ID.'&amp;customizing_url='.urlencode( get_current_url() );
-					}
+					$menu_entry_skin_href = $Blog->get( 'customizer_url' );
 					$menu_entry_skin_class = '';
 				}
 				$entries['skin'] = array(
-					'text'        => '<span class="fa fa-sliders"></span> '.T_('Skin'),
+					'text'        => '<span class="fa fa-sliders"></span> '.T_('Customize'),
 					'href'        => $menu_entry_skin_href,
 					'entry_class' => 'rwdhide',
 					'class'       => $menu_entry_skin_class,

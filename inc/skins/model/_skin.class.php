@@ -1387,8 +1387,8 @@ var downloadInterval = setInterval( function()
 			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// Initialize this url var only when current user has a permission to edit widgets:
 				global $admin_url;
-				add_js_headline( 'var b2evo_widget_edit_url = "'.$admin_url.'?ctrl=widgets&action=edit&wi_ID=$wi_ID$";'
-					.'var b2evo_widget_add_url = "'.$admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container=$container$&container_code=$container_code$";'
+				add_js_headline( 'var b2evo_widget_edit_url = "'.$admin_url.'?ctrl=widgets&action=edit&wi_ID=$wi_ID$&mode=customizer";'
+					.'var b2evo_widget_add_url = "'.$admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container=$container$&container_code=$container_code$&mode=customizer";'
 					.'var b2evo_widget_blog = \''.$Blog->ID.'\';'
 					.'var b2evo_widget_crumb = \''.get_crumb( 'widget' ).'\';'
 					.'var b2evo_widget_icon_up = \''.format_to_js( get_icon( 'designer_widget_up', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_up' ) ) ).'\';'

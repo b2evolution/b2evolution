@@ -16,7 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Collection, $Blog, $Settings, $current_User, $skin_type, $admin_url, $mode;
+global $Collection, $Blog, $Settings, $AdminUI, $current_User, $skin_type, $admin_url, $mode;
 
 switch( $skin_type )
 {
@@ -70,35 +70,14 @@ if( $can_edit_skin_settings )
 }
 
 if( $mode == 'customizer' )
-{	// Display tabs to switch between site and collection skins in special div on customizer mode:
-	if( empty( $Blog ) )
-	{	// Get last working collection:
-		$BlogCache = & get_BlogCache();
-		$tab_Blog = & $BlogCache->get_by_ID( get_working_blog(), false, false );
-	}
-	else
-	{	// Use current collection:
-		$tab_Blog = $Blog;
-		set_working_blog( $tab_Blog->ID );
-	}
+{	// Display customizer tabs to switch between site/collection skins and widgets in special div on customizer mode:
+	$AdminUI->display_customizer_tabs( array(
+			'active_submenu' => 'skin',
+			'action_links'   => $link_select_skin.$link_reset_params
+		) );
 
-	echo '<div class="evo_customizer__tabs">';
-
-	echo '<ul class="nav nav-tabs">';
-	if( $Settings->get( 'site_skins_enabled' ) &&
-	    $current_User->check_perm( 'options', 'edit' ) )
-	{	// If current User can edit site skin settings:
-		echo '<li'.( ! isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=site_skin">'.T_('Site').'</a></li>';
-	}
-	if( $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
-	{	// If current User can edit current collection skin settings:
-		echo '<li'.( isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID.'">'.$tab_Blog->get( 'shortname' ).'</a></li>';
-	}
-	echo '</ul>';
-
-	echo '<div class="evo_customizer__subtabs">'.$link_select_skin.$link_reset_params.'</div>';
-
-	echo '</div>';
+	// Start of customizer content:
+	echo '<div class="evo_customizer__content">';
 }
 
 $Form = new Form( NULL, 'skin_settings_checkchanges', 'post', ( $mode == 'customizer' ? 'accordion' : NULL ) );
@@ -173,6 +152,11 @@ if( $mode == 'customizer' )
 }
 
 $Form->end_form( $buttons );
+
+if( $mode == 'customizer' )
+{	// End of customizer content:
+	echo '</div>';
+}
 
 if( isset( $link_reset_url ) )
 {	// Initialize JS to confirm skin reset action if current user has a permission:

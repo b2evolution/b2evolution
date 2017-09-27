@@ -19,10 +19,20 @@ load_funcs('plugins/_plugin.funcs.php');
  * @var ComponentWidget
  */
 global $edited_ComponentWidget;
-global $Collection, $Blog, $admin_url, $AdminUI, $Plugins, $display_mode;
+global $Collection, $Blog, $admin_url, $AdminUI, $Plugins, $display_mode, $mode;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
+
+if( $mode == 'customizer' )
+{	// Display customizer tabs to switch between skin and widgets in special div on customizer mode:
+	$AdminUI->display_customizer_tabs( array(
+			'active_submenu' => 'widgets',
+		) );
+
+	// Start of customizer content:
+	echo '<div class="evo_customizer__content">';
+}
 
 $Form = new Form( NULL, 'widget_checkchanges' );
 
@@ -31,8 +41,8 @@ if( ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name
 	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
 }
 
-if( $display_mode == 'iframe' )
-{	// Don't display this title because it is displayed on modal window header:
+if( $mode == 'customizer' )
+{	// Don't display this title because it is displayed on customizer mode:
 	$form_title = '';
 }
 else
@@ -56,7 +66,7 @@ $Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
 
 // Display properties:
 $Form->begin_fieldset( T_('Properties') );
-	$Form->info( T_('Widget type'), $edited_ComponentWidget->get_name() );
+	$Form->info( T_('Widget type'), $edited_ComponentWidget->get_icon().' '.$edited_ComponentWidget->get_name() );
 	$Form->info( T_('Description'), $edited_ComponentWidget->get_desc() );
 $Form->end_fieldset();
 
@@ -100,18 +110,33 @@ $Form->end_fieldset();
 //       catch any params/settings maybe? Although this could be done in the
 //       same hook in most cases probably. (dh)
 
-$Form->buttons( array(
-		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ),
-		array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton' )
-	) );
-
 // Plugin widget form event:
 $Plugins->trigger_event( 'WidgetEndSettingsForm', array(
 		'Form'            => & $Form,
 		'ComponentWidget' => & $edited_ComponentWidget,
 	) );
 
-$Form->end_form();
+$buttons = array();
+$buttons[] = array( 'submit', 'submit', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
+if( $mode == 'customizer' )
+{	// Display buttons in special div on customizer mode:
+	echo '<div class="evo_customizer__buttons">';
+	$Form->buttons( $buttons );
+	echo '</div>';
+	// Clear buttons to don't display them twice:
+	$buttons = array();
+}
+else
+{	// Additional button for normal mode in back-office:
+	$buttons[] = array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton' );
+}
+
+$Form->end_form( $buttons );
+
+if( $mode == 'customizer' )
+{	// End of customizer content:
+	echo '</div>';
+}
 
 if( $display_mode == 'js' )
 {	// Reset previous and Initialize new bozo validator for each new opened widget edit form in popup window,

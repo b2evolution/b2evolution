@@ -1597,6 +1597,16 @@ class AdminUI_general extends Menu
 	{
 		return true;
 	}
+
+
+	/**
+	 * Display tabs for customizer mode in left iframe
+	 *
+	 * @param array Params
+	 */
+	function display_customizer_tabs( $params = array() )
+	{
+	}
 }
 
 ?>
