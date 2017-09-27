@@ -557,17 +557,6 @@ function get_request_title( $params = array() )
 		case 'visits':
 			// We are requesting the profile visits screen:
 			$user_ID = param( 'user_ID', 'integer', 0 );
-			if( ! empty( $user_ID ) )
-			{
-				$UserCache = & get_UserCache();
-				$viewed_User = & $UserCache->get_by_ID( $user_ID );
-			}
-
-			if( is_logged_in() && ! empty( $viewed_User ) && $current_User->ID != $user_ID )
-			{
-				$params['visits_text'] = T_('User Profile Visits').' - '.$viewed_User->get_identity_link( array( 'link_text' => 'login' ) );
-			}
-
 			$r[] = $params['visits_text'];
 			break;
 
