@@ -268,11 +268,15 @@ if( $action != 'view' )
 		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => ( $nickname_editing == 'edited-user-required' ) ) );
 	}
 
-	$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
-			array( 'M', T_('A man') ),
-			array( 'F', T_('A woman') ),
-			array( 'O', T_('Other') ),
-		), T_('I am'), false, '', $Settings->get( 'registration_require_gender' ) == 'required' );
+	$gender_editing = $Settings->get( 'registration_require_gender' );
+	if( $gender_editing != 'hidden' && ( $edited_User->ID == $current_User->ID || $has_full_access ) )
+	{
+		$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
+				array( 'M', T_('A man') ),
+				array( 'F', T_('A woman') ),
+				array( 'O', T_('Other') ),
+			), T_('I am'), false, '', $Settings->get( 'registration_require_gender' ) == 'required' );
+	}
 
 	$button_refresh_regional = '<button id="%s" type="submit" name="actionArray[refresh_regional]" class="action_icon refresh_button">'.get_icon( 'refresh' ).'</button>';
 	$button_refresh_regional .= '<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.T_('Loading...').'" title="'.T_('Loading...').'" style="display:none;margin:2px 0 0 5px" align="top" />';
