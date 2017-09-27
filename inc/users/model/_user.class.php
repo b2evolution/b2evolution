@@ -724,8 +724,8 @@ class User extends DataObject
 				if( isset( $edited_user_gender ) )
 				{
 					param_check_gender( 'edited_user_gender', $gender_editing == 'required' );
+					$this->set_from_Request('gender', 'edited_user_gender', true);
 				}
-				$this->set_from_Request('gender', 'edited_user_gender', true);
 			}
 
 			// ---- Locations / START ----

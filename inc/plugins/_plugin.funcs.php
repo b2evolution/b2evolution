@@ -390,6 +390,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		case 'array:array:string':
 		case 'array:regexp':
 			$has_array_type = true;
+			$has_color_field = false;
 
 			// Always use 'fieldset' layout to display it the same way from normal and ajax calls
 			$Form->switch_layout( 'fieldset' );
@@ -418,6 +419,15 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$k_nb = 0;
 			}
 
+			// check if a color field is among the entries
+			foreach( $parmeta['entries'] as $entry )
+			{
+				if( $entry['type'] == 'color' )
+				{
+					$has_color_field = true;
+					break;
+				}
+			}
 
 			$user_ID = $set_type == 'UserSettings' ? $set_target->ID : '';
 			if( is_array( $set_value ) && ! empty($set_value) )
@@ -501,6 +511,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 							},
 							function(r, status) {
 								jQuery('#".$parname."_add_new').replaceWith(r);
+								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
 							}
 						);
 						return false;")
