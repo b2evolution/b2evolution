@@ -3957,6 +3957,8 @@ class User extends DataObject
 	 * If the email could get sent, it saves the used "request_id" into the user's Session.
 	 *
 	 * @param string URL, where to redirect the user after he clicked the validation link (gets saved in Session).
+	 * @param integer Collection ID
+	 * @param boolean TRUE if user email is changed
 	 * @return boolean True, if the email could get sent; false if not
 	 */
 	function send_validate_email( $redirect_to_after, $blog = NULL, $email_changed = false )
@@ -3967,18 +3969,8 @@ class User extends DataObject
 		// Display messages depending on user email status
 		display_user_email_status_message( $this->ID );
 
-		if( $Settings->get( 'validation_process' ) == 'easy' )
-		{ // validation process is set to easy, send and easy activation email
-			return send_easy_validate_emails( array( $this->ID ), false, $email_changed );
-		}
-
-		if( mail_is_blocked( $this->email ) )
-		{ // prevent trying to send an email to a blocked email address ( Note this is checked in the send_easy_validate_emails too )
-			return false;
-		}
-
 		if( empty( $redirect_to_after ) )
-		{ // redirect to was not set
+		{	// If redirect to was not set:
 			$redirect_to_after = param( 'redirect_to', 'url', '' );
 			if( empty( $redirect_to_after ) )
 			{
@@ -3991,6 +3983,18 @@ class User extends DataObject
 					$redirect_to_after = $this->get_userpage_url();
 				}
 			}
+		}
+
+		if( $Settings->get( 'validation_process' ) == 'easy' )
+		{	// Validation process is set to easy, send and easy activation email:
+			return send_easy_validate_emails( array( $this->ID ), false, $email_changed, $redirect_to_after );
+		}
+
+		// Secure validation process:
+
+		if( mail_is_blocked( $this->email ) )
+		{ // prevent trying to send an email to a blocked email address ( Note this is checked in the send_easy_validate_emails too )
+			return false;
 		}
 
 		$request_id = generate_random_key(22);

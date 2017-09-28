@@ -2790,11 +2790,13 @@ function update_user_email_counter( $limit_setting, $last_email_setting, $user_I
  *
  * @param array user ids to send validation email
  * @param boolean true if this email is an account activation reminder, false if the account status was changed right now
+ * @param boolean TRUE if user email is changed
+ * @param string URL, where to redirect the user after he clicked the validation link (gets saved in Session).
  * @return integer the number of successfully sent emails
  */
-function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false )
+function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false, $redirect_to_after = NULL )
 {
-	global $UserSettings, $servertimenow;
+	global $UserSettings, $Session, $servertimenow;
 
 	$UserCache = & get_UserCache();
 
@@ -2871,6 +2873,12 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 			}
 			$UserSettings->dbupdate();
 		}
+	}
+	
+	if( $email_sent && isset( $Session ) && $redirect_to_after !== NULL )
+	{	// Set a redirect_to session variable because this way after the account will be activated we will know where to redirect
+		$Session->set( 'core.activateacc.redirect_to', $redirect_to_after  );
+		$Session->dbsave(); // save immediately
 	}
 
 	return $email_sent;
