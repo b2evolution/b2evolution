@@ -1101,10 +1101,13 @@ class User extends DataObject
 				$edited_user_pass2 = preg_replace( '/[<>&]/', '', $edited_user_pass2 );
 			}
 
-			if( $is_new_user || ( !empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) )
-			{ // current password is not required:
+			if( $is_new_user ||
+			    ( ! empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) ||
+			    ( $this->get( 'pass_driver' ) == 'nopass' ) )
+			{	// Current password is not required:
 				//   - new user creating process
 				//   - password change requested by email
+				//   - password has not been set yet(email capture/quick registration)
 
 				if( $request_password_confirmation )
 				{	// Request a password confirmation:
@@ -2461,6 +2464,9 @@ class User extends DataObject
 	{
 		// Use first password driver from config array for new password updating:
 		$PasswordDriver = get_PasswordDriver();
+
+		// Save temporarily current pass driver to know if it has been chaged:
+		$this->previous_pass_driver = $this->get( 'pass_driver' );
 
 		$this->set( 'pass', $PasswordDriver->hash( $raw_password ) );
 		$this->set( 'salt', $PasswordDriver->get_last_generated_salt() );

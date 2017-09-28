@@ -102,6 +102,7 @@ class GeneralSettings extends AbstractSettings
 		'newusers_level' => '1',
 		'registration_require_gender' => 'hidden',
 		'registration_ask_locale' => '0',
+		'pass_after_quick_reg' => '1',
 
 		// Default user settings
 		'def_enable_PM' => '1',

@@ -390,6 +390,19 @@ function redirect_after_account_activation()
 {
 	global $Settings, $Session, $baseurl;
 
+	if( $Settings->get( 'pass_after_quick_reg' ) )
+	{	// Check if we should redirect to password setting page if no password has been set yet (email capture/quick registration):
+		global $current_User;
+		if( ! is_logged_in() )
+		{	// Try to log in if activation URL is opened for not logged in user yet (e-g for easy activation process):
+			$current_User = & $Session->get_User();
+		}
+		if( is_logged_in() && $current_User->get( 'pass_driver' ) == 'nopass' )
+		{	// If user was registered without password:
+			return get_user_pwdchange_url();
+		}
+	}
+
 	// Get general "Users setting" to determine if we want to return to original page after account activation or to a specific url:
 	$redirect_to = $Settings->get( 'after_email_validation' );
 	if( $redirect_to == 'return_to_original' )
@@ -401,6 +414,10 @@ function redirect_after_account_activation()
 		{ // session redirect_to was not set, initialize $redirect_to to the home page
 			$redirect_to = $baseurl;
 		}
+
+		// Cleanup:
+		$Session->delete( 'core.activateacc.request_ids' );
+		$Session->delete( 'core.activateacc.redirect_to' );
 	}
 
 	return $redirect_to;
