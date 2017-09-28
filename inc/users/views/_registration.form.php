@@ -139,6 +139,10 @@ $Form->begin_fieldset( T_('Account activation').get_manual_link('account-activat
 						onfocus="document.getElementsByName(\'after_email_validation\')[1].checked=true;" />' )
 				), T_( 'After email activation' ), true );
 
+	$Form->checklist( array(
+			array( 'pass_after_quick_reg', 1, T_('If no password has been set yet (email capture/quick registration), go to password setting page first.'), $Settings->get( 'pass_after_quick_reg' ) )
+		), '', '' );
+
 $Form->end_fieldset();
 
 // --------------------------------------------

@@ -469,15 +469,8 @@ switch( $action )
 			$Messages->add( T_( 'Your account is now activated.' ), 'success' );
 		}
 
-		// init redirect_to
-		$redirect_to = redirect_after_account_activation();
-
-		// Cleanup:
-		$Session->delete('core.activateacc.request_ids');
-		$Session->delete('core.activateacc.redirect_to');
-
 		// redirect Will save $Messages into Session:
-		header_redirect( $redirect_to );
+		header_redirect( redirect_after_account_activation() );
 		/* exited */
 		break;
 

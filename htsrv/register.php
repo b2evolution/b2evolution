@@ -239,9 +239,7 @@ switch( $action )
 		profile_check_params( $paramsList );
 
 		if( $is_quick && ! $Messages->has_errors() )
-		{ // Generate a login and password for quick registration
-			$pass1 = generate_random_passwd( 10 );
-
+		{	// Generate a login for quick registration:
 			// Get the login from email address:
 			$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
 			$login = preg_replace( '/[\'"><@\s]/', '', $login );
@@ -290,7 +288,16 @@ switch( $action )
 
 		$new_User = new User();
 		$new_User->set( 'login', $login );
-		$new_User->set_password( $pass1 );
+		if( $is_quick )
+		{	// Don't save password for quick registration:
+			$new_User->set( 'pass', '' );
+			$new_User->set( 'salt', '' );
+			$new_User->set( 'pass_driver', 'nopass' );
+		}
+		else
+		{	// Save an entered password from normal registration form:
+			$new_User->set_password( $pass1 );
+		}
 		$new_User->set( 'ctry_ID', $country );
 		$new_User->set( 'firstname', $firstname );
 		$new_User->set( 'lastname', $lastname );
