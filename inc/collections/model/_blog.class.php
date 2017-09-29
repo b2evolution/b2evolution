@@ -605,7 +605,31 @@ class Blog extends DataObject
 
 			// Lists of collections:
 			$this->set( 'order', param( 'blog_order', 'integer' ) );
-			$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', 'public' ) );
+			if( $this->ID > 0 )
+			{
+				$default_in_bloglist = 'public';
+			}
+			else
+			{
+				switch( $new_allow_access )
+				{
+					case 'public':
+						$default_in_bloglist = 'public';
+						break;
+
+					case 'users':
+						$default_in_bloglist = 'logged';
+						break;
+
+					case 'members':
+						$default_in_bloglist = 'member';
+						break;
+
+					default:
+						$default_in_bloglist = 'never';
+				}
+			}
+			$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', $default_in_bloglist ) );
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )

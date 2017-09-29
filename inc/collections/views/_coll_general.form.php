@@ -24,7 +24,8 @@ global $Settings;
 $Form = new Form();
 
 $form_title = '';
-if( $edited_Blog->ID == 0 )
+$is_creating = ( $edited_Blog->ID == 0 );
+if( $is_creating )
 { // "New blog" form: Display a form title and icon to close form
 	global $kind;
 	$kind_title = get_collection_kinds( $kind );
@@ -99,7 +100,7 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 			.' &ndash; '
 			.$collection_kinds[ $edited_Blog->get( 'type' ) ]['desc']
 		.'</p>';
-		if( $edited_Blog->ID > 0 && $action != 'copy' )
+		if( ! $is_creating && $action != 'copy' )
 		{	// Display a link to change collection kind:
 			echo '<p><a href="'.$admin_url.'?ctrl=coll_settings&tab=general&action=type&blog='.$edited_Blog->ID.'">'
 					.T_('Change collection type / Reset')
@@ -181,7 +182,7 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	}
 	else
 	{
-		$Form->info( T_('URL Name'), $edited_Blog->get( 'urlname' ), T_('Used to uniquely identify this blog in URLs.') /* Note: message voluntarily shorter than admin message */ );
+		$Form->info( T_('URL Name'), '<span id="blog_urlname">'.$edited_Blog->get( 'urlname' ).'</span>', T_('Used to uniquely identify this blog in URLs.') /* Note: message voluntarily shorter than admin message */ );
 	}
 
 	// Section:
@@ -191,60 +192,62 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 
 $Form->end_fieldset();
 
+if( ! $is_creating )
+{
+	$Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-settings' ) );
 
-$Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-settings' ) );
-
-	// Calculate how much locales are enabled in system
-	$number_enabled_locales = 0;
-	foreach( $locales as $locale_data )
-	{
-		if( $locale_data['enabled'] )
+		// Calculate how much locales are enabled in system
+		$number_enabled_locales = 0;
+		foreach( $locales as $locale_data )
 		{
-			$number_enabled_locales++;
+			if( $locale_data['enabled'] )
+			{
+				$number_enabled_locales++;
+			}
+			if( $number_enabled_locales > 1 )
+			{ // We need to know we have more than 1 locale is enabled, Stop here
+				break;
+			}
 		}
+
 		if( $number_enabled_locales > 1 )
-		{ // We need to know we have more than 1 locale is enabled, Stop here
-			break;
+		{ // More than 1 locale
+			$blog_locale_note = ( $current_User->check_perm( 'options', 'view' ) ) ?
+				'<a href="'.$admin_url.'?ctrl=regional">'.T_('Regional settings').' &raquo;</a>' : '';
+			$Form->select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options_return', T_('Collection Locale'), $blog_locale_note );
+
+			$Form->radio( 'blog_locale_source', $edited_Blog->get_setting( 'locale_source' ),
+					array(
+						array( 'blog', T_('Always force to collection locale') ),
+						array( 'user', T_('Use browser / user locale when possible') ),
+				), T_('Navigation/Widget Display'), true );
+
+			$Form->radio( 'blog_post_locale_source', $edited_Blog->get_setting( 'post_locale_source' ),
+					array(
+						array( 'post', T_('Always force to post locale') ),
+						array( 'blog', T_('Follow navigation locale') ),
+				), T_('Content Display'), true );
+
+			$Form->radio( 'blog_new_item_locale_source', $edited_Blog->get_setting( 'new_item_locale_source' ),
+					array(
+						array( 'use_coll', T_('Always use collection locale') ),
+						array( 'select_coll', T_('Allow select - use collection locale by default') ),
+						array( 'select_user', T_('Allow select - use user locale by default') ),
+				), T_('New Posts'), true );
 		}
-	}
-
-	if( $number_enabled_locales > 1 )
-	{ // More than 1 locale
-		$blog_locale_note = ( $current_User->check_perm( 'options', 'view' ) ) ?
-			'<a href="'.$admin_url.'?ctrl=regional">'.T_('Regional settings').' &raquo;</a>' : '';
-		$Form->select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options_return', T_('Collection Locale'), $blog_locale_note );
-
-		$Form->radio( 'blog_locale_source', $edited_Blog->get_setting( 'locale_source' ),
-				array(
-					array( 'blog', T_('Always force to collection locale') ),
-					array( 'user', T_('Use browser / user locale when possible') ),
-			), T_('Navigation/Widget Display'), true );
-
-		$Form->radio( 'blog_post_locale_source', $edited_Blog->get_setting( 'post_locale_source' ),
-				array(
-					array( 'post', T_('Always force to post locale') ),
-					array( 'blog', T_('Follow navigation locale') ),
-			), T_('Content Display'), true );
-
-		$Form->radio( 'blog_new_item_locale_source', $edited_Blog->get_setting( 'new_item_locale_source' ),
-				array(
-					array( 'use_coll', T_('Always use collection locale') ),
-					array( 'select_coll', T_('Allow select - use collection locale by default') ),
-					array( 'select_user', T_('Allow select - use user locale by default') ),
-			), T_('New Posts'), true );
-	}
-	else
-	{ // Only one locale
-		echo '<p>';
-		echo sprintf( T_( 'This collection uses %s.' ), '<b>'.$locales[ $edited_Blog->get( 'locale' ) ]['name'].'</b>' );
-		if( $current_User->check_perm( 'options', 'view' ) )
-		{
-			echo ' '.sprintf( T_( 'Go to <a %s>Regional Settings</a> to enable additional locales.' ), 'href="'.$admin_url.'?ctrl=regional"' );
+		else
+		{ // Only one locale
+			echo '<p>';
+			echo sprintf( T_( 'This collection uses %s.' ), '<b>'.$locales[ $edited_Blog->get( 'locale' ) ]['name'].'</b>' );
+			if( $current_User->check_perm( 'options', 'view' ) )
+			{
+				echo ' '.sprintf( T_( 'Go to <a %s>Regional Settings</a> to enable additional locales.' ), 'href="'.$admin_url.'?ctrl=regional"' );
+			}
+			echo '</p>';
 		}
-		echo '</p>';
-	}
 
-$Form->end_fieldset();
+	$Form->end_fieldset();
+}
 
 
 $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection-permission-settings' ) );
@@ -259,16 +262,22 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 	}
 	else
 	{
-		$Form->info( T_('Owner'), $owner_User->login, $owner_User->dget( 'fullname' ) );
+		if( ! $is_creating )
+		{
+			$Form->info( T_('Owner'), $owner_User->login, $owner_User->dget( 'fullname' ) );
+		}
 	}
 
-	$Form->radio( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ),
-			array(
-				array( '0', T_('Simple permissions'), sprintf( T_('(the owner above has most permissions on this collection, except %s)'), get_admin_badge() ) ),
-				array( '1', T_('Advanced permissions'), sprintf( T_('(you can assign granular <a %s>user</a> and <a %s>group</a> permissions for this collection)'),
-										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
-										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ) ),
-		), T_('Permission management'), true );
+	if( ! $is_creating )
+	{
+		$Form->radio( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ),
+				array(
+					array( '0', T_('Simple permissions'), sprintf( T_('(the owner above has most permissions on this collection, except %s)'), get_admin_badge() ) ),
+					array( '1', T_('Advanced permissions'), sprintf( T_('(you can assign granular <a %s>user</a> and <a %s>group</a> permissions for this collection)'),
+											'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
+											'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ) ),
+			), T_('Permission management'), true );
+	}
 
 	$Form->radio( 'blog_allow_access', $edited_Blog->get_setting( 'allow_access' ),
 			array(
@@ -285,28 +294,30 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 
 $Form->end_fieldset();
 
+if( ! $is_creating )
+{
+	$Form->begin_fieldset( T_('Lists of collections').get_manual_link( 'collection-list-settings' ) );
 
-$Form->begin_fieldset( T_('Lists of collections').get_manual_link( 'collection-list-settings' ) );
+		$Form->text( 'blog_order', $edited_Blog->get( 'order' ), 10, T_('Order') );
 
-	$Form->text( 'blog_order', $edited_Blog->get( 'order' ), 10, T_('Order') );
+		$Form->radio( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ),
+								array(  array( 'public', T_('Always (Public)') ),
+												array( 'logged', T_('For logged-in users only') ),
+												array( 'member', T_('For members only') ),
+												array( 'never', T_('Never') )
+											), T_('Show in front-office list'), true, T_('Select when you want this blog to appear in the list of blogs on this system.') );
 
-	$Form->radio( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ),
-							array(  array( 'public', T_('Always (Public)') ),
-											array( 'logged', T_('For logged-in users only') ),
-											array( 'member', T_('For members only') ),
-											array( 'never', T_('Never') )
-										), T_('Show in front-office list'), true, T_('Select when you want this blog to appear in the list of blogs on this system.') );
-
-$Form->end_fieldset();
+	$Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Description').get_manual_link( 'collection-description' ) );
+	$Form->begin_fieldset( T_('Description').get_manual_link( 'collection-description' ) );
 
-	$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is typically displayed by a widget right under the collection name in the front-office.'), 250 );
+		$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is typically displayed by a widget right under the collection name in the front-office.'), 250 );
 
-	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This may be displayed in several places of the front-office. This may also be included in the XML feeds. You may use HTML markup here.'), 50 );
+		$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This may be displayed in several places of the front-office. This may also be included in the XML feeds. You may use HTML markup here.'), 50 );
 
-$Form->end_fieldset();
+	$Form->end_fieldset();
+}
 
 
 $Form->buttons( array( array( 'submit', 'submit', ( $action == 'copy' ? sprintf( T_('Save and duplicate all settings from %s'), $edited_Blog->get( 'shortname' ) ) : T_('Save Changes!') ), 'SaveButton' ) ) );
