@@ -1168,7 +1168,7 @@ class Blog extends DataObject
 		    ( $this->ID == 0 && $current_User->check_perm( 'blogs', 'create', false, $this->sec_ID ) ) )
 		{	// We have permission to edit advanced admin settings,
 			// OR user is creating/coping new collection in section where he has an access:
-			if( ($blog_urlname = param( 'blog_urlname', 'string', NULL )) !== NULL )
+			if( ( $blog_urlname = param( 'blog_urlname', 'string', NULL ) ) !== NULL )
 			{	// check urlname
 				if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL collection name!') ) )
 				{

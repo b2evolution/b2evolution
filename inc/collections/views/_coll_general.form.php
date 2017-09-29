@@ -182,7 +182,40 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	}
 	else
 	{
-		$Form->info( T_('URL Name'), '<span id="blog_urlname">'.$edited_Blog->get( 'urlname' ).'</span>', T_('Used to uniquely identify this blog in URLs.') /* Note: message voluntarily shorter than admin message */ );
+		$Form->info( T_('URL Name'), '<span id="urlname_display">'.$edited_Blog->get( 'urlname' ).'</span>', T_('Used to uniquely identify this blog in URLs.') /* Note: message voluntarily shorter than admin message */ );
+		if( $is_creating )
+		{
+			$Form->hidden( 'blog_urlname', $edited_Blog->get( 'urlname' ) );
+
+			?>
+			<script type="text/javascript">
+			var shortNameInput = jQuery( '#blog_shortname');
+			var timeoutId = 0;
+
+			function getAvailableUrlName( urlname )
+			{
+				evo_rest_api_request( 'tools/available_urlname',
+				{
+					'urlname': urlname
+				},
+				function( data )
+				{
+					jQuery( 'span#urlname_display' ).html( data.urlname );
+					jQuery( 'input[name="blog_urlname"]' ).val( data.urlname );
+				}, 'GET' );
+			}
+
+			shortNameInput.on( 'keyup', function( ) {
+				clearTimeout( timeoutId );
+				timeoutId = setTimeout( function() { getAvailableUrlName( shortNameInput.val() ) }, 500 );
+			} );
+
+			jQuery( document ).ready( function() {
+				getAvailableUrlName( '<?php echo format_to_js( $edited_Blog->get( 'urlname' ) ); ?>' );
+			} );
+			</script>
+			<?php
+		}
 	}
 
 	// Section:
