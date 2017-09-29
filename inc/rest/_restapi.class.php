@@ -2345,4 +2345,44 @@ class RestApi
 
 
 	/**** MODULE LINKS ---- END ****/
+
+	/**** MODULE TOOLS ---- START ****/
+
+	/**
+	 * Call module to prepare request for tools
+	 */
+	private function module_tools()
+	{
+		if( empty( $this->args[1] ) )
+		{
+			$this->halt( 'Missing tool controller', 'wrong_request', 405 );
+		}
+		else
+		{
+			$tool_controller = $this->args[1];
+
+			if( ! method_exists( $this, 'controller_tool_'.$tool_controller ) )
+			{	// Unknown controller:
+				$this->halt( 'Unknown link controller "'.$tool_controller.'"', 'unknown_controller' );
+				// Exit here.
+			}
+
+			// Call collection controller to prepare current request:
+			$this->{'controller_tool_'.$tool_controller}();
+		}
+	}
+
+
+	/**
+	 * Call tool controller to get available urlname
+	 */
+	private function controller_tool_available_urlname()
+	{
+		$urlname = param( 'urlname', 'string' );
+
+		$this->add_response( 'base', $urlname );
+		$this->add_response( 'urlname', urltitle_validate( $urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
+	}
+
+	/**** MODULE TOOLS ---- END ****/
 }

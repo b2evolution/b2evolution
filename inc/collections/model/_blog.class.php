@@ -1182,7 +1182,7 @@ class Blog extends DataObject
 			}
 
 
-			if( ($blog_urlname = param( 'blog_urlname', 'string', NULL )) !== NULL )
+			if( ( $blog_urlname = param( 'blog_urlname', 'string', NULL ) ) !== NULL )
 			{	// check urlname
 				if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL collection name!') ) )
 				{
