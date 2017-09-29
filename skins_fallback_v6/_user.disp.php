@@ -72,11 +72,11 @@ echo '<div class="profile_column_left">';
 
 	// ------------------------- "User Profile - Left" CONTAINER EMBEDDED HERE --------------------------
 	// Display container contents:
-	skin_container( /* TRANS: Widget container name */ NT_('User Profile - Left'), array(
+	widget_container( 'user_profile_left', array(
 		'widget_context' => 'user',	// Signal that we are displaying within an User
 		// The following (optional) params will be used as defaults for widgets included in this container:
 		// This will enclose each widget in a block:
-		'block_start' => '<div class="$wi_class$">',
+		'block_start' => '<div class="evo_widget $wi_class$">',
 		'block_end' => '</div>',
 		// This will enclose the title of each widget:
 		'block_title_start' => '<p><b>',
@@ -92,11 +92,11 @@ echo '<div class="profile_column_right">';
 
 	// ------------------------- "User Profile - Right" CONTAINER EMBEDDED HERE --------------------------
 	// Display container contents:
-	skin_container( /* TRANS: Widget container name */ NT_('User Profile - Right'), array(
+	widget_container( 'user_profile_right', array(
 		'widget_context' => 'user',	// Signal that we are displaying within an User
 		// The following (optional) params will be used as defaults for widgets included in this container:
 		// This will enclose each widget in a block:
-		'block_start' => '<div class="$wi_class$">',
+		'block_start' => '<div class="evo_widget $wi_class$">',
 		'block_end' => '</div>',
 		// This will enclose the title of each widget:
 		'block_title_start' => '<h3>',
@@ -117,7 +117,7 @@ echo '<div class="profile_column_right">';
 		// The following (optional) params will be used as defaults for widgets with code "subcontainer":
 		'override_params_for_subcontainer' => array(
 			// This will enclose each widget in a block:
-			'block_start'       => '<div class="$wi_class$"><fieldset class="fieldset"><div class="panel panel-default">',
+			'block_start'       => '<div class="evo_widget $wi_class$"><fieldset class="fieldset"><div class="panel panel-default">',
 			'block_end'         => '</div><fieldset></div>',
 			// This will enclose the title of each widget:
 			'block_title_start' => '<legend class="panel-heading">',

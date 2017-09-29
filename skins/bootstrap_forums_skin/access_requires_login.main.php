@@ -43,17 +43,15 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header class="row">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 		<?php
 		if( $Skin->show_container_when_access_denied( 'page_top' ) )
-		{ // Display 'Page Top' widget container
-		?>
-		<div class="evo_container evo_container__page_top">
-		<?php
+		{	// Display 'Page Top' widget container:
 			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Page Top'), array(
+			widget_container( 'page_top', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_start'     => '<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
+					'container_end'       => '</div></div>',
 					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
@@ -63,50 +61,37 @@ siteskin_include( '_site_body_header.inc.php' );
 					'item_end'            => '</li>',
 				) );
 			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php } ?>
-	</div><!-- .col -->
+		} ?>
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<?php
 		if( $Skin->show_container_when_access_denied( 'header' ) )
-		{ // Display 'Header' widget container
-		?>
-		<div class="evo_container evo_container__header">
-		<?php
+		{	// Display 'Header' widget container:
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Header'), array(
+			widget_container( 'header', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_start'   => '<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
+					'container_end'     => '</div></div>',
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
 					'block_title_start' => '<h1>',
 					'block_title_end'   => '</h1>',
 				) );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php } ?>
-	</div><!-- .col -->
+		} ?>
 
 </header><!-- .row -->
 
-
 <?php
 if( $Skin->show_container_when_access_denied( 'menu' ) )
-{ // Display 'Menu' widget container
-?>
-<nav class="row">
-
-	<div class="col-xs-12">
-		<ul class="nav nav-tabs evo_container evo_container__menu">
-		<?php
+{	// Display 'Menu' widget container:
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
 			// Note: this container is designed to be a single <ul> list
-			skin_container( NT_('Menu'), array(
+			widget_container( 'menu', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_start'     => '<nav class="row"><div class="col-md-12"><ul class="nav nav-tabs evo_container $wico_class$">',
+					'container_end'       => '</ul></div></nav>',
 					'block_start'         => '',
 					'block_end'           => '',
 					'block_display_title' => false,
@@ -120,13 +105,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 					'item_title_after'    => '',
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
-		?>
-		</ul>
-	</div><!-- .col -->
-
-</nav><!-- .row -->
-<?php } ?>
-
+} ?>
 
 <div class="row">
 	<div class="col-md-12">
@@ -170,25 +149,20 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 
 <footer class="row">
 
-   <!-- =================================== START OF FOOTER =================================== -->
-    <div class="col-md-12">
+	<!-- =================================== START OF FOOTER =================================== -->
+	<div class="col-md-12">
 
-		<?php // Note: clearfix is because of Bootstraps' .cols
+		<?php
 		if( $Skin->show_container_when_access_denied( 'footer' ) )
-		{ // Display 'Footer' widget container
-		?>
-		<div class="evo_container evo_container__footer clearfix">
-			<?php
-			// Display container and contents:
-			skin_container( NT_('Footer'), array(
+		{	// Display 'Footer' widget container:
+			widget_container( 'footer', array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="evo_widget $wi_class$">',
-					'block_end'         => '</div>',
+					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+					'container_end'   => '</div>',
+					'block_start'     => '<div class="evo_widget $wi_class$">',
+					'block_end'       => '</div>',
 				) );
-			// Note: Double quotes have been used around "Footer" only for test purposes.
-			?>
-		</div><!-- .evo_container__footer -->
-		<?php } ?>
+		} ?>
 
 		<p class="center">
 			<?php

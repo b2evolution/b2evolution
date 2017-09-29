@@ -299,6 +299,11 @@ class Skin extends DataObject
 		global $admin_url, $rsc_url;
 		global $Timer, $Session, $debug, $current_User;
 
+		$params = array_merge( array(
+				'container_start' => '',
+				'container_end'   => '',
+			), $params );
+
 		if( $container_code === NULL )
 		{	// Try to detect container in DB by name:
 			global $DB;
@@ -323,11 +328,9 @@ class Skin extends DataObject
 			{	// Display error if container cannot be detected in DB by name:
 				echo ' <span class="text-danger">'.sprintf( T_('Container "%s" cannot be manipulated because it lacks a code name in the skin template.'), $sco_name ).'</span> ';
 			}
-			else
-			{	// If container code is defined or detected by name:
+			elseif( preg_match( '#<[^>]+evo_container[^>]+>#', $params['container_start'], $container_start_wrapper ) )
+			{	// If container start param has a wrapper like '<div class="evo_container">':
 				$designer_mode_data = array(
-						'style'     => 'display:none',
-						'class'     => 'evo_designer__container_data',
 						'data-name' => $sco_name,
 						'data-code' => $container_code,
 					);
@@ -335,15 +338,26 @@ class Skin extends DataObject
 				{	// Set data to know current user has a permission to edit this widget:
 					$designer_mode_data['data-can-edit'] = 1;
 				}
-				// We need this hidden span to know container name and if user can add/edit widgets.
-				// Will be removed after page loading when all data will be copied to real container wrapper.
-				echo '<span'.get_field_attribs_as_string( $designer_mode_data ).'></span>';
+				// Append new data for container wrapper:
+				$attrib_actions = array(
+						'data-name'     => 'replace',
+						'data-code'     => 'replace',
+						'data-can-edit' => 'replace',
+					);
+				$params['container_start'] = str_replace( $container_start_wrapper[0], update_html_tag_attribs( $container_start_wrapper[0], $designer_mode_data, $attrib_actions ), $params['container_start'] );
+			}
+			else
+			{	// If container code is NOT defined or detected by name or container wrapper is not correct:
+				echo ' <span class="text-danger">'.sprintf( T_('Container %s cannot be manipulated because wrapper html tag has no %s.'), '"'.$sco_name.'"(<code>'.$container_code.'</code>)', '<code>class="evo_container"</code>' ).'</span> ';
 			}
 		}
 
-		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
+		// Display start of container wrapper:
+		echo str_replace( '$wico_class$', 'evo_container__'.str_replace( ' ', '_', $container_code ), $params['container_start'] );
 
-		if( $display_containers )
+		$display_debug_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
+
+		if( $display_debug_containers )
 		{ // Wrap container in visible container:
 			echo '<div class="dev-blocks dev-blocks--container"><div class="dev-blocks-name">';
 			if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
@@ -391,11 +405,13 @@ class Skin extends DataObject
 			}
 		}
 
-		if( $display_containers )
-		{ // End of visible container:
-			//echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
+		if( $display_debug_containers )
+		{	// End of visible debug container:
 			echo '</div>';
 		}
+
+		// Display end of container wrapper:
+		echo $params['container_end'];
 
 		$Timer->pause( $timer_name );
 	}

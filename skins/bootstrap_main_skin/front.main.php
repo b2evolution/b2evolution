@@ -223,13 +223,13 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 
 	<div class="row">
 
-		<div class="col-md-12">
-			<div class="evo_container evo_container__front_page_secondary">
 			<?php
 				// ------------------------- "Front Page Secondary Area" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
-				skin_container( NT_('Front Page Secondary Area'), array(
+				widget_container( 'front_page_secondary_area', array(
 						// The following params will be used as defaults for widgets included in this container:
+						'container_start'   => '<div class="col-md-12"><div class="evo_container $wico_class$">',
+						'container_end'     => '</div></div>',
 						'block_start'       => '<div class="evo_widget $wi_class$">',
 						'block_end'         => '</div>',
 						'block_title_start' => '<h2 class="page-header">',
@@ -237,21 +237,19 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 					) );
 				// ----------------------------- END OF "Front Page Secondary Area" CONTAINER -----------------------------
 			?>
-			</div>
-		</div><!-- .col -->
 
 		<footer class="col-md-12">
 
-			<div class="evo_container evo_container__footer clearfix">
 			<?php
 				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
-				skin_container( NT_('Footer'), array(
+				widget_container( 'footer', array(
 						// The following params will be used as defaults for widgets included in this container:
+						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+						'container_end'   => '</div>',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
-			</div>
 
 			<p class="center">
 			<?php

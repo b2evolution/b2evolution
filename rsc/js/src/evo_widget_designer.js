@@ -2,26 +2,6 @@
  * This file is used for widgets designer mode
  */
 
-jQuery( document ).on( 'ready', function()
-{	// Move container data from temp hidden elements to real container wrapper:
-	jQuery( '.evo_designer__container_data' ).each( function()
-	{
-		var container = jQuery( this ).closest( '.evo_container' );
-		if( container.length )
-		{	// If container has a correct class
-			// Copy all data from temp element to real container:
-			container.attr( 'data-name', jQuery( this ).data( 'name' ) )
-				.attr( 'data-code', jQuery( this ).data( 'code' ) );
-			if( jQuery( this ).data( 'can-edit' ) )
-			{
-				container.data( 'can-edit', '1' );
-			}
-			// Remove temp element:
-			jQuery( this ).remove();
-		}
-	} );
-} );
-
 jQuery( document ).on( 'mouseover', '.evo_container[data-code]', function()
 {	// Initialize and Show container designer block:
 	var container = jQuery( this );

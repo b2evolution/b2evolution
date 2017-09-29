@@ -1239,7 +1239,7 @@ jQuery( document ).ready( function()
 	{
 		jQuery( "html, body, #skin_wrapper" ).animate(
 		{
-			scrollTop: jQuery( ".evo_container__front_page_secondary" ).offset().top
+			scrollTop: jQuery( ".evo_container__front_page_secondary_area" ).offset().top
 		}, 1500 );
 	} );
 } );' );
@@ -1722,28 +1722,6 @@ jQuery( document ).ready( function()
 
 		// Delegate to parent class:
 		return parent::get_template( $name );
-	}
-
-
-	/**
-	 * Check if we can display a widget container
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function is_visible_container( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
 

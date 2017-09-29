@@ -48,14 +48,14 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header id="header" class="row<?php echo $Settings->get( 'site_skins_enabled' ) ? ' site_skins' : ''; ?>">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
-		<div class="evo_container evo_container__page_top">
 		<?php
 			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Page Top'), array(
+			widget_container( 'page_top', array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'         => '<div class="widget $wi_class$">',
+					'container_start'     => '<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
+					'container_end'       => '</div></div>',
+					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
 					'list_start'          => '<ul>',
@@ -65,38 +65,32 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 		?>
-		</div>
-	</div><!-- .col -->
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
-		<div class="evo_container evo_container__header">
 		<?php
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Header'), array(
+			widget_container( 'header', array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="widget $wi_class$">',
+					'container_start'   => '<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
+					'container_end'     => '</div></div>',
+					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
 					'block_title_start' => '<h1>',
 					'block_title_end'   => '</h1>',
 				) );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
-		</div>
-	</div><!-- .col -->
 
 </header><!-- .row -->
 
-<nav class="row">
-
-	<div class="col-md-12">
-		<ul class="nav nav-tabs evo_container evo_container__menu">
 		<?php
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
 			// Note: this container is designed to be a single <ul> list
-			skin_container( NT_('Menu'), array(
+			widget_container( 'menu', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_start'     => '<nav class="row"><div class="col-md-12"><ul class="nav nav-tabs evo_container $wico_class$">',
+					'container_end'       => '</ul></div></nav>',
 					'block_start'         => '',
 					'block_end'           => '',
 					'block_display_title' => false,
@@ -111,10 +105,6 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 		?>
-		</ul>
-	</div><!-- .col -->
-
-</nav><!-- .row -->
 
 <div class="row">
 
@@ -198,13 +188,12 @@ siteskin_include( '_site_body_header.inc.php' );
 
 			<div id="evo_container__sidebar">
 
-				<div class="evo_container evo_container__sidebar">
 				<?php
 					// <div data-spy="affix" data-offset-top="165" class="affix_block">
 					// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 					// Display container and contents:
 					// Note: this container is designed to be a single <ul> list
-					skin_container( NT_('Sidebar'), array(
+					widget_container( 'sidebar', array(
 							// The following (optional) params will be used as defaults for widgets included in this container:
 							// This will enclose each widget in a block:
 							'block_start' => '<div class="panel panel-default widget $wi_class$">',
@@ -233,15 +222,13 @@ siteskin_include( '_site_body_header.inc.php' );
 						) );
 					// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 				?>
-				</div>
 
-				<div class="evo_container evo_container__sidebar2">
 				<?php
 					// <div data-spy="affix" data-offset-top="165" class="affix_block">
 					// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 					// Display container and contents:
 					// Note: this container is designed to be a single <ul> list
-					skin_container( NT_('Sidebar 2'), array(
+					widget_container( 'sidebar_2', array(
 							// The following (optional) params will be used as defaults for widgets included in this container:
 							// This will enclose each widget in a block:
 							'block_start' => '<div class="panel panel-default widget $wi_class$">',
@@ -270,7 +257,6 @@ siteskin_include( '_site_body_header.inc.php' );
 						) );
 					// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 				?>
-				</div>
 
 				<?php
 					// Please help us promote b2evolution and leave this logo on your blog:
@@ -297,17 +283,16 @@ siteskin_include( '_site_body_header.inc.php' );
 	<!-- =================================== START OF FOOTER =================================== -->
 	<div class="col-md-12 center">
 
-		<div class="evo_container evo_container__footer">
-		<?php
+			<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			widget_container( 'footer', array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="evo_widget $wi_class$">',
-					'block_end'         => '</div>',
+					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+					'container_end'   => '</div>',
+					'block_start'     => '<div class="evo_widget $wi_class$">',
+					'block_end'       => '</div>',
 				) );
-			// Note: Double quotes have been used around "Footer" only for test purposes.
-		?>
-		</div>
+			?>
 
 		<p>
 			<?php

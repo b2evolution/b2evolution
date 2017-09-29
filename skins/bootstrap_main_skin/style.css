@@ -7,27 +7,27 @@
 .evo_container__page_top .ufld_icon_links {
   text-align: right;
 }
-.evo_container__front_page_primary {
+.evo_container__front_page_main_area {
   padding-bottom: 30px;
 }
-.evo_container__front_page_primary .evo_widget {
+.evo_container__front_page_main_area .evo_widget {
   margin-top: 30px;
 }
-.evo_container__front_page_primary .evo_widget div,
-.evo_container__front_page_primary .evo_widget h1,
-.evo_container__front_page_primary .evo_widget h2,
-.evo_container__front_page_primary .evo_widget p {
+.evo_container__front_page_main_area .evo_widget div,
+.evo_container__front_page_main_area .evo_widget h1,
+.evo_container__front_page_main_area .evo_widget h2,
+.evo_container__front_page_main_area .evo_widget p {
   margin-top: 0;
 }
-.evo_container__front_page_primary .evo_widget div > p:last-child,
-.evo_container__front_page_primary .evo_widget:last-child > ul,
-.evo_container__front_page_primary .evo_widget > ul li:last-child {
+.evo_container__front_page_main_area .evo_widget div > p:last-child,
+.evo_container__front_page_main_area .evo_widget:last-child > ul,
+.evo_container__front_page_main_area .evo_widget > ul li:last-child {
   margin-bottom: 0 !important;
 }
-.evo_container__front_page_primary .evo_widget[class$=_menu_link] {
+.evo_container__front_page_main_area .evo_widget[class$=_menu_link] {
   text-align: center;
 }
-.evo_container__front_page_secondary {
+.evo_container__front_page_secondary_area {
   padding-top: 30px;
 }
 .secondary_area {

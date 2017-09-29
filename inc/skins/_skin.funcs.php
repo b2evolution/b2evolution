@@ -2506,7 +2506,42 @@ function skin_widget( $params )
 
 
 /**
+ * Display a widget container
+ *
+ * @param string Container code
+ * @param array Additional params
+ */
+function widget_container( $container_code, $params = array() )
+{
+	global $Blog, $Skin;
+
+	$params = array_merge( array(
+			'container_start' => '<div class="evo_container $wico_class$">',
+			'container_end'   => '</div>',
+		), $params );
+
+	// Try to find widget container by code for current collection and skin type:
+	$WidgetContainerCache = & get_WidgetContainerCache();
+	$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $Blog->ID, $Blog->get_skin_type(), $container_code );
+
+	if( ! $WidgetContainer )
+	{	// Display error if widget container is not detected in DB by requested code:
+		echo '<div class="text-danger">'
+				.sprintf( T_('Requested widget container %s does not exist for current collection #%d and skin type %s!'),
+					'<code>'.$container_code.'</code>', $Blog->ID, '<code>'.$Blog->get_skin_type().'</code>' )
+			.'</div>';
+		// Exit because we cannot display widgets without container:
+		return;
+	}
+
+	$Skin->container( $WidgetContainer->get( 'name' ), $params, $container_code );
+}
+
+
+/**
  * Display a container
+ *
+ * @deprecated Replaced with function widget_container( $container_code, $params = array() )
  *
  * @param string Container name
  * @param array Additional params

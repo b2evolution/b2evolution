@@ -2596,9 +2596,9 @@ div.widget_core_coll_related_post_list div.item_first_image {
   text-align: center;
 }
 div.evo_container__sidebar div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.evo_container__sidebar2 div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
+div.evo_container__sidebar_2 div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
 div.evo_container__sidebar div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.evo_container__sidebar2 div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+div.evo_container__sidebar_2 div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
   font-size: 16px;
 }
 @media (max-width: 1599px) {
@@ -4823,16 +4823,16 @@ div.message_toolbars {
   text-align: right;
 }
 .evo_container__sidebar .evo_widget[class$=_menu_link] a.btn,
-.evo_container__sidebar2 .evo_widget[class$=_menu_link] a.btn {
+.evo_container__sidebar_2 .evo_widget[class$=_menu_link] a.btn {
   width: 100%;
 }
 .evo_container__sidebar div.evo_layout_flow .widget_flow_blocks > div,
-.evo_container__sidebar2 div.evo_layout_flow .widget_flow_blocks > div {
+.evo_container__sidebar_2 div.evo_layout_flow .widget_flow_blocks > div {
   margin: 8px;
   width: auto;
 }
 .evo_container__sidebar div.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img,
-.evo_container__sidebar2 div.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img {
+.evo_container__sidebar_2 div.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img {
   min-width: auto;
   min-height: auto;
 }
