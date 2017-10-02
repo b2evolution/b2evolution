@@ -1766,12 +1766,12 @@ function blogs_user_results_block( $params = array() )
  */
 function blogs_all_results_block( $params = array() )
 {
-	global $admin_url;
+	global $admin_url, $current_User;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'results_param_prefix' => 'blog_',
-			'results_title'        => T_('List of Collections configured on this system').get_manual_link('site-collection-list'),
+			'results_title'        => $current_User->check_perm( 'blog_admin', 'view', false ) ? T_('List of Collections configured on this system').get_manual_link('site-collection-list') : T_('Your Collections'),
 			'results_no_text'      => T_('Create your first collection now').': '
 					.'<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-primary btn-sm" title="'.T_('New Collection').'..."><span class="fa fa-plus-square"></span> '.T_('New Collection').'...</a>',
 			'results_no_perm_text' => T_('Sorry, you have no permission to edit/view any blog\'s properties.'),

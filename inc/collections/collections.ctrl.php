@@ -162,6 +162,14 @@ switch( $action )
 
 		param( 'kind', 'string', true );
 		param( 'blog_urlname', 'string', true );
+
+		if( $kind == 'main' && ! $current_User->check_perm( 'blog_admin', 'editAll', false ) )
+		{ // Non-collection admins should not be able to create home/main collections
+			$Messages->add( sprintf( T_('You don\'t have permission to create a collection of kind %s.'), '<b>&laquo;'.$kind.'&raquo;</b>' ), 'error' );
+			header_redirect( $admin_url.'?ctrl=dashboard' ); // will EXIT
+			// We have EXITed already at this point!!
+		}
+
 		$edited_Blog->init_by_kind( $kind );
 		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		{ // validate the urlname, which was already set by init_by_kind() function
@@ -211,8 +219,16 @@ switch( $action )
 				global $user_org_IDs;
 
 				load_funcs( 'collections/_demo_content.funcs.php' );
-				param( 'create_demo_org', 'boolean', false );
-				param( 'create_demo_users', 'boolean', false );
+				if( $current_User->check_perm( 'blog_admin', 'editall', false ) )
+				{ // Only collection admins can create demo organization and users
+					param( 'create_demo_org', 'boolean', false );
+					param( 'create_demo_users', 'boolean', false );
+				}
+				else
+				{
+					set_param( 'create_demo_org', false );
+					set_param( 'create_demo_users', false );
+				}
 				$user_org_IDs = NULL;
 
 				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', true ) )

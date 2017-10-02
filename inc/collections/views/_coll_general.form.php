@@ -140,6 +140,13 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 		{
 			$Form->checklist( $set_as_options, 'set_as_options', T_('Automatically set as') );
 		}
+
+		echo '<p>'.T_('The Home collection typically aggregates the contents of all other collections on the site.').'</p>';
+		$Form->radio( 'blog_aggregate', empty( $edited_Blog->get_setting( 'aggregate_coll_IDs' ) ) ? 0 : 1,
+		array(
+			array( 1, T_('Set to aggregate contents of all other collections') ),
+			array( 0, T_('Do not aggregate') ),
+		), T_('Aggregate'), true, '' );
 	}
 $Form->end_fieldset();
 
@@ -151,13 +158,13 @@ if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' 
 						array( 1, T_('Initialize this collection with some demo contents') ),
 						array( 0, T_('Create an empty collection') ),
 					), T_('New contents'), true, '', true );
-		if( $current_User->check_perm( 'orgs', 'create', false ) )
+		if( $current_User->check_perm( 'orgs', 'create', false ) && $current_User->check_perm( 'blog_admin', 'editall', false ) )
 		{ // Permission to create organizations
 			$Form->checkbox( 'create_demo_org', param( 'create_demo_org', 'integer', 1 ),
 					T_( 'Create demo organization' ), T_( 'Create a demo organization if none exists.' ) );
 		}
 
-		if( $current_User->check_perm( 'users', 'edit', false ) )
+		if( $current_User->check_perm( 'users', 'edit', false ) && $current_User->check_perm( 'blog_admin', 'editall', false ) )
 		{ // Permission to edit users
 			$Form->checkbox( 'create_demo_users', param( 'create_demo_users', 'integer', 1 ),
 					T_( 'Create demo users' ), T_( 'Create demo users as comment authors.' ) );
@@ -186,36 +193,39 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 		if( $is_creating )
 		{
 			$Form->hidden( 'blog_urlname', $edited_Blog->get( 'urlname' ) );
-
-			?>
-			<script type="text/javascript">
-			var shortNameInput = jQuery( '#blog_shortname');
-			var timeoutId = 0;
-
-			function getAvailableUrlName( urlname )
-			{
-				evo_rest_api_request( 'tools/available_urlname',
-				{
-					'urlname': urlname
-				},
-				function( data )
-				{
-					jQuery( 'span#urlname_display' ).html( data.urlname );
-					jQuery( 'input[name="blog_urlname"]' ).val( data.urlname );
-				}, 'GET' );
-			}
-
-			shortNameInput.on( 'keyup', function( ) {
-				clearTimeout( timeoutId );
-				timeoutId = setTimeout( function() { getAvailableUrlName( shortNameInput.val() ) }, 500 );
-			} );
-
-			jQuery( document ).ready( function() {
-				getAvailableUrlName( '<?php echo format_to_js( $edited_Blog->get( 'urlname' ) ); ?>' );
-			} );
-			</script>
-			<?php
 		}
+	}
+
+	if( $is_creating )
+	{
+		?>
+		<script type="text/javascript">
+		var shortNameInput = jQuery( '#blog_shortname');
+		var timeoutId = 0;
+
+		function getAvailableUrlName( urlname )
+		{
+			evo_rest_api_request( 'tools/available_urlname',
+			{
+				'urlname': urlname
+			},
+			function( data )
+			{
+				jQuery( 'span#urlname_display' ).html( data.urlname );
+				jQuery( 'input[name="blog_urlname"]' ).val( data.urlname );
+			}, 'GET' );
+		}
+
+		shortNameInput.on( 'keyup', function( ) {
+			clearTimeout( timeoutId );
+			timeoutId = setTimeout( function() { getAvailableUrlName( shortNameInput.val() ) }, 500 );
+		} );
+
+		jQuery( document ).ready( function() {
+			getAvailableUrlName( '<?php echo format_to_js( $edited_Blog->get( 'urlname' ) ); ?>' );
+		} );
+		</script>
+		<?php
 	}
 
 	// Section:

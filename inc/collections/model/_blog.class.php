@@ -497,16 +497,25 @@ class Blog extends DataObject
 
 			// Language / locale:
 			if( param( 'blog_locale', 'string', NULL ) !== NULL )
-			{ // These settings can be hidden when only one locale is enaled in the system
-				$this->set_from_Request( 'locale' );
-				$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
-				$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
-				$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
+			{ // These settings can be hidden when only one locale is enabled in the system
+				if( $this->ID > 0 )
+				{
+					$this->set_from_Request( 'locale' );
+					$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
+					$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
+					$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
+				}
+				else
+				{ // default for new collections
+					$this->set_setting( 'locale_source', 'blog' );
+					$this->set_setting( 'post_locale_source', 'post' );
+					$this->set_setting( 'new_item_locale_source', 'select_coll' );
+				}
 			}
 
 			// Collection permissions:
 			$prev_advanced_perms = $this->get( 'advanced_perms' );
-			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
+			$new_advanced_perms = $this->ID > 0 ? param( 'advanced_perms', 'integer', 0 ) : 0;
 			$prev_allow_access = $this->get_setting( 'allow_access' );
 			$new_allow_access = param( 'blog_allow_access', 'string', '' );
 
@@ -604,10 +613,10 @@ class Blog extends DataObject
 			}
 
 			// Lists of collections:
-			$this->set( 'order', param( 'blog_order', 'integer' ) );
 			if( $this->ID > 0 )
 			{
-				$default_in_bloglist = 'public';
+				$this->set( 'order', param( 'blog_order', 'integer' ) );
+				$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', 'public' ) );
 			}
 			else
 			{
@@ -628,8 +637,8 @@ class Blog extends DataObject
 					default:
 						$default_in_bloglist = 'never';
 				}
+				$this->set( 'in_bloglist', $default_in_bloglist );
 			}
-			$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', $default_in_bloglist ) );
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
@@ -815,14 +824,17 @@ class Blog extends DataObject
 			$this->set_from_Request( 'keywords' );
 		}
 
-		if( param( 'blog_tagline', 'string', NULL ) !== NULL )
-		{	// tagline:
-			$this->set( 'tagline', get_param( 'blog_tagline' ) );
-		}
-		if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
-		{	// HTML long description:
-			param_check_html( 'blog_longdesc', T_('Invalid long description') );
-			$this->set( 'longdesc', get_param( 'blog_longdesc' ) );
+		if( $this->ID > 0 )
+		{
+			if( param( 'blog_tagline', 'string', NULL ) !== NULL )
+			{	// tagline:
+				$this->set( 'tagline', get_param( 'blog_tagline' ) );
+			}
+			if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
+			{	// HTML long description:
+				param_check_html( 'blog_longdesc', T_('Invalid long description') );
+				$this->set( 'longdesc', get_param( 'blog_longdesc' ) );
+			}
 		}
 
 		if( param( 'blog_footer_text', 'html', NULL ) !== NULL )
@@ -1395,22 +1407,33 @@ class Blog extends DataObject
 			}
 
 
-			if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
-			{ // Aggregate list: (can be '*')
-				$aggregate_coll_IDs = get_param( 'aggregate_coll_IDs' );
+			if( param( 'blog_aggregate', 'integer', 1 ) !== 0 || $this->type != 'main' )
+			{
+				if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
+				{ // Aggregate list: (can be '*')
+					$aggregate_coll_IDs = get_param( 'aggregate_coll_IDs' );
 
-				if( $aggregate_coll_IDs != '*' )
-				{	// Sanitize the string
-					$aggregate_coll_IDs = sanitize_id_list($aggregate_coll_IDs);
+					if( $aggregate_coll_IDs != '*' )
+					{	// Sanitize the string
+						$aggregate_coll_IDs = sanitize_id_list($aggregate_coll_IDs);
+					}
+
+					// fp> TODO: check perms on each aggregated blog (if changed)
+					// fp> TODO: better interface
+					if( $aggregate_coll_IDs != '*' && !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', $aggregate_coll_IDs ) )
+					{
+						param_error( 'aggregate_coll_IDs', T_('Invalid aggregate collection ID list!') );
+					}
+					$this->set_setting( 'aggregate_coll_IDs', $aggregate_coll_IDs );
 				}
-
-				// fp> TODO: check perms on each aggregated blog (if changed)
-				// fp> TODO: better interface
-				if( $aggregate_coll_IDs != '*' && !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', $aggregate_coll_IDs ) )
+				elseif( empty( $this->get_setting( 'aggregate_coll_IDs' ) ) )
 				{
-					param_error( 'aggregate_coll_IDs', T_('Invalid aggregate collection ID list!') );
+					$this->set_setting( 'aggregate_coll_IDs', '*' );
 				}
-				$this->set_setting( 'aggregate_coll_IDs', $aggregate_coll_IDs );
+			}
+			else
+			{
+				$this->set_setting( 'aggregate_coll_IDs', NULL );
 			}
 
 

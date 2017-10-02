@@ -860,9 +860,9 @@ if( $action == 'dashboard' )
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			echo '<p><strong>'.T_('Welcome to your new blog\'s dashboard!').'</strong></p>';
-			echo '<p>'.T_('Use the links on the right to write a first post or to customize your blog.').'</p>';
-			echo '<p>'.T_('You can see your blog page at any time by clicking "See" in the b2evolution toolbar at the top of this page.').'</p>';
-			echo '<p>'.T_('You can come back here at any time by clicking "Manage" in that same evobar.').'</p>';
+			echo '<p>'.T_('Use the "Posts" and "Settings" tabs above or under the "Collection" menu in the b2evolution toolbar at the top of this page to write a first post or to customize your blog.').'</p>';
+			echo '<p>'.sprintf( T_('You can see your blog page at any time by clicking "Collection &raquo %s Front Page..." in the b2evolution toolbar at the top of this page.'), $Blog->shortname ).'</p>';
+			echo '<p>'.sprintf( T_('You can come back here at any time by clicking "Collection &raquo %s Dashboard..." in that same evobar.'), $Blog->shortname ).'</p>';
 
 			$block_item_Widget->disp_template_raw( 'block_end' );
 		}
