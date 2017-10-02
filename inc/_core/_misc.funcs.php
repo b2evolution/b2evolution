@@ -8781,6 +8781,8 @@ function initialize_debug_modes()
 		elseif( $customizer_mode == 'disable' )
 		{
 			$Session->delete( 'customizer_mode_'.$blog );
+			// Disable widgets designer mode together with customizer mode:
+			set_param( 'designer_mode', 'disable' );
 		}
 
 		// Enable/Disable designer mode:
