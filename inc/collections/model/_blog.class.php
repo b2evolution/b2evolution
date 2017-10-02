@@ -2649,13 +2649,9 @@ class Blog extends DataObject
 					if( $current_User->check_perm( 'blog_properties', 'edit', false, $this->ID ) )
 					{	// If current User can edit collection skin settings:
 						$customizer_view = isset( $params['view'] ) ? $params['view'] : 'coll_skin';
-						if( $customizer_view == 'coll_widgets' )
-						{	// For widgets customizer mode we should enable designer mode additionally:
-							$customizer_view .= $params['glue'].'designer_mode=enable';
-						}
 					}
 					elseif( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) )
-					{	// If current User can edit sote skin settings:
+					{	// If current User can edit site skin settings:
 						$customizer_view = 'site_skin';
 					}
 				}

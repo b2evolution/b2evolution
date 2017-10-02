@@ -1450,21 +1450,6 @@ class _core_Module extends Module
 								'href' => url_add_param( regenerate_url( 'display_containers' ), 'display_containers=show' ),
 							);
 						}
-
-						if( $Session->get( 'designer_mode_'.$Blog->ID ) == 1 )
-						{ // To hide the debug containers
-							$entries['blog']['entries']['designer'] = array(
-								'text' => T_('Disable designer mode'),
-								'href' => regenerate_url( 'designer_mode', 'designer_mode=disable' ),
-							);
-						}
-						else
-						{ // To show the debug containers
-							$entries['blog']['entries']['designer'] = array(
-								'text' => T_('Enable designer mode'),
-								'href' => regenerate_url( 'designer_mode', 'designer_mode=enable' ),
-							);
-						}
 					}
 
 					$entries['blog']['entries']['general'] = array(
@@ -1532,28 +1517,6 @@ class _core_Module extends Module
 
 		if( ! is_admin_page() && ! empty( $Blog ) )
 		{	// Only front-office collection pages:
-
-			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-			{	// If current user has an access to back-office and to edit collection properties:
-				// Display an option to turn on/off containers display:
-				global $Session;
-				$designer_mode = $Session->get( 'designer_mode_'.$Blog->ID );
-				if( $designer_mode && $Session->get( 'customizer_mode_'.$Blog->ID ) )
-				{	// If widgets customizer mode is enabled:
-					$customizing_url = get_param( 'customizing_url' );
-					$menu_entry_skin_href = url_add_param( ( empty( $customizing_url ) ? get_current_url( 'customizer_mode,designer_mode,show_toolbar,redir' ) : $customizing_url ), 'customizer_mode=disable&amp;designer_mode=disable' );
-				}
-				else
-				{	// If widgets customizer mode is disabled:
-					$menu_entry_skin_href = $Blog->get( 'customizer_url', array( 'view' => 'coll_widgets' ) );
-				}
-				$entries['containers'] = array(
-					'text'        => '<span class="fa fa-cubes"></span> '.( $designer_mode ? T_('Exit Designer') : T_('Designer Mode') ),
-					'href'        => $menu_entry_skin_href,
-					'entry_class' => 'rwdhide',
-					'class'       => ( $designer_mode ? 'active' : '' ),
-				);
-			}
 
 			if( $perm_admin_restricted &&
 			    ( ( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) ||

@@ -55,7 +55,10 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
-// Initialize modes to debug collection settings:
+// Allow to enable widgets designer mode only when user opens sub menu "Widgets" from the left panel of customer mode:
+set_param( 'designer_mode', $view == 'coll_widgets' ? 'enable' : 'disable' );
+
+// Initialize modes to debug and customize collection settings:
 initialize_debug_modes();
 
 load_funcs( 'skins/_skin.funcs.php' );

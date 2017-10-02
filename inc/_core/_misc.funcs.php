@@ -8762,7 +8762,7 @@ function php_to_jquery_date_format( $php_format )
 
 
 /**
- * Initialize modes to debug collection settings
+ * Initialize modes to debug and customize collection settings
  */
 function initialize_debug_modes()
 {
