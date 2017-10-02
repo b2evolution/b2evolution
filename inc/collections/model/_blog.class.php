@@ -2704,7 +2704,12 @@ class Blog extends DataObject
 				}
 				if( isset( $customizer_view ) )
 				{	// Return customizer URL only if currnet User can edit skin settings of collection or site:
-					return $customizer_url.'?view='.$customizer_view.$params['glue'].'blog='.$this->ID.$params['glue'].'customizing_url='.urlencode( get_current_url() );
+					$customizing_url = isset( $params['customizing_url'] ) ? $params['customizing_url'] : get_current_url();
+					if( $customizing_url == '#baseurl#' )
+					{	// Use base URL of this collection:
+						$customizing_url = $this->get( 'baseurl' );
+					}
+					return $customizer_url.'?view='.$customizer_view.$params['glue'].'blog='.$this->ID.$params['glue'].'customizing_url='.urlencode( $customizing_url );
 				}
 				else
 				{	// Return this collection URL instead:

@@ -48,6 +48,16 @@ switch( $view )
 		require $inc_path.$ctrl_mappings[ $ctrl ];
 		break;
 
+	case 'other':
+		// Open a list to select other collections:
+		$AdminUI->disp_html_head();
+		$AdminUI->disp_body_top();
+		$AdminUI->disp_payload_begin();
+		$AdminUI->disp_view( 'customize/views/_other.view.php' );
+		$AdminUI->disp_payload_end();
+		$AdminUI->disp_global_footer();
+		break;
+
 	default:
 		debug_die( 'unhandled view' );
 }

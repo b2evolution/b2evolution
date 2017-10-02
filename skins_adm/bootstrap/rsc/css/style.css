@@ -1684,6 +1684,10 @@ table.diff td.diff-title-addedline {
 #customizer_wrapper .evo_customizer__available_widgets h3 {
   margin: 10px 0 5px 0;
 }
+#customizer_wrapper .evo_customizer__other_lists {
+  margin: 0 0 10px 31px;
+  padding-top: 10px;
+}
 .evo_customizer__tabs {
   position: fixed;
   top: 0;

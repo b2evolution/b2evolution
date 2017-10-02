@@ -934,7 +934,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function display_customizer_tabs( $params = array() )
 	{
-		global $Blog, $Settings, $current_User, $admin_url;
+		global $Blog, $Settings, $current_User, $admin_url, $view;
 
 		$params = array_merge( array(
 				'action_links'   => '',
@@ -958,15 +958,23 @@ class AdminUI extends AdminUI_general
 		if( $Settings->get( 'site_skins_enabled' ) &&
 				$current_User->check_perm( 'options', 'edit' ) )
 		{	// If current User can edit site skin settings:
-			echo '<li'.( ! isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=site_skin">'.T_('Site').'</a></li>';
+			echo '<li'.( $view == 'site_skin' ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=site_skin">'.T_('Site').'</a></li>';
 		}
 		if( $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
-		{	// If current User can edit current collection skin settings:
-			echo '<li'.( isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID.'">'.$tab_Blog->get( 'shortname' ).'</a></li>';
+		{	// If current User can edit current collection settings:
+			echo '<li'.( ( $view == 'coll_skin' || $view == 'coll_widgets' ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID.'">'.$tab_Blog->get( 'shortname' ).'</a></li>';
+		}
+		$BlogCache = & get_BlogCache();
+		$BlogCache->clear();
+		$BlogCache->load_user_blogs( 'blog_properties', 'edit' );
+		if( count( $BlogCache->cache ) > 1 )
+		{	// If current User can edit settings of at least two collections:
+			echo '<li'.( $view == 'other' ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=other&amp;blog='.$tab_Blog->ID.'">'.T_('Other').'</a></li>';
 		}
 		echo '</ul>';
 
-		if( isset( $Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
+		if( ( $view == 'coll_skin' || $view == 'coll_widgets' ) &&
+		    $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
 		{	// Sub menus to switch between skin and widgets if current user can edit properties of current collection:
 			echo '<div class="evo_customizer__menus">';
 
