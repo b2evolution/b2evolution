@@ -185,36 +185,39 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 		if( $is_creating )
 		{
 			$Form->hidden( 'blog_urlname', $edited_Blog->get( 'urlname' ) );
-
-			?>
-			<script type="text/javascript">
-			var shortNameInput = jQuery( '#blog_shortname');
-			var timeoutId = 0;
-
-			function getAvailableUrlName( urlname )
-			{
-				evo_rest_api_request( 'tools/available_urlname',
-				{
-					'urlname': urlname
-				},
-				function( data )
-				{
-					jQuery( 'span#urlname_display' ).html( data.urlname );
-					jQuery( 'input[name="blog_urlname"]' ).val( data.urlname );
-				}, 'GET' );
-			}
-
-			shortNameInput.on( 'keyup', function( ) {
-				clearTimeout( timeoutId );
-				timeoutId = setTimeout( function() { getAvailableUrlName( shortNameInput.val() ) }, 500 );
-			} );
-
-			jQuery( document ).ready( function() {
-				getAvailableUrlName( '<?php echo format_to_js( $edited_Blog->get( 'urlname' ) ); ?>' );
-			} );
-			</script>
-			<?php
 		}
+	}
+
+	if( $is_creating )
+	{
+		?>
+		<script type="text/javascript">
+		var shortNameInput = jQuery( '#blog_shortname');
+		var timeoutId = 0;
+
+		function getAvailableUrlName( urlname )
+		{
+			evo_rest_api_request( 'tools/available_urlname',
+			{
+				'urlname': urlname
+			},
+			function( data )
+			{
+				jQuery( 'span#urlname_display' ).html( data.urlname );
+				jQuery( 'input[name="blog_urlname"]' ).val( data.urlname );
+			}, 'GET' );
+		}
+
+		shortNameInput.on( 'keyup', function( ) {
+			clearTimeout( timeoutId );
+			timeoutId = setTimeout( function() { getAvailableUrlName( shortNameInput.val() ) }, 500 );
+		} );
+
+		jQuery( document ).ready( function() {
+			getAvailableUrlName( '<?php echo format_to_js( $edited_Blog->get( 'urlname' ) ); ?>' );
+		} );
+		</script>
+		<?php
 	}
 
 $Form->end_fieldset();
