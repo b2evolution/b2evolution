@@ -77,8 +77,8 @@ class bootstrap_photoblog_Skin extends Skin
 	{
 		$supported_kinds = array(
 				'main' => 'no',
-				'std' => 'no',		// Blog
-				'photo' => 'yes',
+				'std' => 'yes',		// Blog
+				'photo' => 'maybe',
 				'forum' => 'no',
 				'manual' => 'no',
 				'group' => 'no',  // Tracker
