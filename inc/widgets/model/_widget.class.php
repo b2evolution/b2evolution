@@ -268,6 +268,22 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get widget icon
+	 *
+	 * @return string
+	 */
+	function get_icon()
+	{
+		if( empty( $this->icon ) )
+		{
+			return '';
+		}
+
+		return '<span class="fa fa-'.$this->icon.'"></span>';
+	}
+
+
+	/**
 	 * Get a clean description to display in the widget list.
 	 * @return string
 	 */
@@ -290,7 +306,7 @@ class ComponentWidget extends DataObject
 
 		// Normal widget:
 		$short_desc = $this->get_short_desc();
-		$icon = '<span class="fa fa-'.$this->icon.'"></span>';
+		$icon = $this->get_icon();
 
 		if( $name == $short_desc || empty( $short_desc ) )
 		{

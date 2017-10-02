@@ -927,6 +927,70 @@ class AdminUI extends AdminUI_general
 	}
 
 
+	/**
+	 * Display tabs for customizer mode in left iframe
+	 *
+	 * @param array Params
+	 */
+	function display_customizer_tabs( $params = array() )
+	{
+		global $Blog, $Settings, $current_User, $admin_url;
+
+		$params = array_merge( array(
+				'action_links'   => '',
+				'active_submenu' => '',
+			), $params );
+
+		if( empty( $Blog ) )
+		{	// Get last working collection:
+			$BlogCache = & get_BlogCache();
+			$tab_Blog = & $BlogCache->get_by_ID( get_working_blog(), false, false );
+		}
+		else
+		{	// Use current collection:
+			$tab_Blog = $Blog;
+			set_working_blog( $tab_Blog->ID );
+		}
+
+		echo '<div class="evo_customizer__tabs">';
+
+		echo '<ul class="nav nav-tabs">';
+		if( $Settings->get( 'site_skins_enabled' ) &&
+				$current_User->check_perm( 'options', 'edit' ) )
+		{	// If current User can edit site skin settings:
+			echo '<li'.( ! isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=site_skin">'.T_('Site').'</a></li>';
+		}
+		if( $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
+		{	// If current User can edit current collection skin settings:
+			echo '<li'.( isset( $Blog ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID.'">'.$tab_Blog->get( 'shortname' ).'</a></li>';
+		}
+		echo '</ul>';
+
+		if( isset( $Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
+		{	// Sub menus to switch between skin and widgets if current user can edit properties of current collection:
+			echo '<div class="evo_customizer__menus">';
+
+			echo '<nav><ul class="nav nav-pills">';
+				// Skin:
+				echo '<li'.( $params['active_submenu'] == 'skin' ? ' class="active"' : '' ).'>'
+						.'<a href="'.$admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID.'">'.T_('Skin').'</a>'
+					.'</li>';
+				// Widgets:
+				echo '<li'.( $params['active_submenu'] == 'widgets' ? ' class="active"' : '' ).'>'
+						.'<a href="'.$admin_url.'?ctrl=customize&amp;view=coll_widgets&amp;blog='.$tab_Blog->ID.'">'.T_('Widgets').'</a>'
+					.'</li>';
+			echo '</ul></nav>';
+
+			echo '</div>';
+		}
+
+		if( ! empty( $params['action_links'] ) )
+		{	// Display additional action links:
+			echo '<div class="evo_customizer__actions">'.$params['action_links'].'</div>';
+		}
+
+		echo '</div>';
+	}
 }
 
 ?>

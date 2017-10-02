@@ -25,6 +25,21 @@ jQuery( document ).on( 'ready', function()
 		{	// Remove messages wrapper completely if it had only successful messages:
 			messages_wrapper.closest( '.action_messages' ).remove();
 		}
+
+		// Set proper space before form after top tabs:
+		var tabs_height = jQuery( this ).contents().find( '.evo_customizer__tabs' ).outerHeight();
+		jQuery( this ).contents().find( '.evo_customizer__content' ).css( 'margin-top', tabs_height + 'px' );
+
+		jQuery( this ).contents().find( '.evo_customizer__tabs a' ).click( function()
+		{	// Check to enable/disable designer mode between switching skin and widgets menu entries:
+			var designer_mode = ( jQuery( this ).attr( 'href' ).indexOf( 'view=coll_widgets' ) > -1 ) ? 'enable' : 'disable';
+			if( designer_mode != jQuery( '#evo_customizer__frontoffice' ).data( 'designer-mode' ) )
+			{	// Reload front office iframe only when designer mode was changed:
+				jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.href += '&designer_mode=' + designer_mode;
+				// Save current state of designer mode:
+				jQuery( '#evo_customizer__frontoffice' ).data( 'designer-mode', designer_mode );
+			}
+		} );
 	} );
 
 	jQuery( '#evo_customizer__updater' ).on( 'load', function()

@@ -83,37 +83,6 @@ jQuery( document ).on( 'mouseover', '.evo_designer__widget', function()
 	}
 } );
 
-
-/**
- * Open modal window with iframe
- *
- * @param string Frame url
- * @param string Frame title
- * @param object Container
- */
-function evo_widget_open_modal_iframe( iframe_url, iframe_title, container )
-{
-	openModalWindow( '<span class="loader_img loader_widget_designer absolute_center" title="' + evo_js_lang_loading + '"></span>' +
-		'<iframe id="evo_designer__iframe" src="' + iframe_url + '&display_mode=iframe" width="100%" height="90%" frameborder="0"></iframe>',
-		'90%', '90%', true, iframe_title, false, true );
-	jQuery( '#evo_designer__iframe' ).closest( '#modal_window' ).addClass( 'evo_designer__modal_window' )
-		.next( '.modal-backdrop' ).addClass( 'evo_designer__modal_backdrop' );
-	jQuery( '#evo_designer__iframe' ).on( 'load', function()
-	{	// Remove loader after iframe is loaded:
-		jQuery( '.loader_widget_designer' ).remove();
-		// Append div for display messages after save widget settings:
-		container.prepend( '<div id="server_messages" class="evo_designer__messages"></div>' );
-	} );
-	jQuery( '#modal_window' ).on( 'hidden.bs.modal', function ()
-	{	// Remove temp div of messages on hidding of modal window:
-		jQuery( '.evo_designer__messages' ).remove();
-		if( jQuery( '#evo_designer__iframe').contents().find( '.alert.alert-success' ).length )
-		{	// If widget has been updated in frame we should reload a page to view new widget changes:
-			location.reload();
-		}
-	} );
-}
-
 jQuery( document ).on( 'click', '.evo_designer__action_add', function( e )
 {	// Link to add widget:
 	if( typeof( b2evo_widget_add_url ) != 'undefined' )
@@ -121,10 +90,9 @@ jQuery( document ).on( 'click', '.evo_designer__action_add', function( e )
 		var container_block = jQuery( this ).closest( '.evo_designer__container' );
 		var container = jQuery( '.evo_container[data-code="' + container_block.data( 'code' ) + '"]' );
 		if( container.length && container.data( 'can-edit' ) == '1' )
-		{	// Open modal window with widget adding list only if it is allowed for current user:
-			evo_widget_open_modal_iframe( b2evo_widget_add_url.replace( '$container$', container.data( 'name' ) ).replace( '$container_code$', container.data( 'code' ) ),
-				evo_js_lang_title_available_widgets.replace( '$container_name$', container.data( 'name' ) ),
-				container );
+		{	// Load widget adding list only if it is allowed for current user:
+			jQuery( '#evo_customizer__backoffice', window.parent.document ).get( 0 ).contentWindow.location
+				.href = b2evo_widget_add_url.replace( '$container$', container.data( 'name' ) ).replace( '$container_code$', container.data( 'code' ) );
 		}
 	}
 } );
@@ -140,11 +108,9 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 		var widget_ID = jQuery( this ).data( 'id' );
 		var widget = jQuery( evo_widget_selector( jQuery( this ) ) );
 		if( widget.length && widget.data( 'can-edit' ) == '1' )
-		{	// Open modal window with widget edit form only if it is allowed for current user:
-			var container_block = jQuery( evo_widget_container_block_selector( widget.data( 'container' ) ) );
-			evo_widget_open_modal_iframe( b2evo_widget_edit_url.replace( '$wi_ID$', widget_ID ),
-				evo_js_lang_title_edit_widget.replace( '$widget_name$', widget.data( 'type' ) ).replace( '$container_name$', container_block.data( 'name' ) ),
-				widget.closest( '.evo_container' ) );
+		{	// Load widget edit form only if it is allowed for current user:
+			jQuery( '#evo_customizer__backoffice', window.parent.document ).get( 0 ).contentWindow.location
+				.href = b2evo_widget_edit_url.replace( '$wi_ID$', widget_ID );
 		}
 	}
 } );

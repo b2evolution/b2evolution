@@ -63,7 +63,7 @@ param( 'skin_type', 'string', 'normal' );
 
 $action = param_action( 'list' );
 param( 'display_mode', 'string', 'normal' );
-$display_mode = ( in_array( $display_mode, array( 'js', 'normal', 'iframe' ) ) ? $display_mode : 'normal' );
+$display_mode = ( in_array( $display_mode, array( 'js', 'normal' ) ) ? $display_mode : 'normal' );
 if( $display_mode == 'js' )
 {	// JavaScript mode:
 
@@ -93,6 +93,7 @@ switch( $action )
 	case 'update_container':
 	case 'activate':
 	case 'deactivate':
+	case 'customize':
 		// Do nothing
 		break;
 
@@ -197,6 +198,7 @@ switch( $action )
 	case 'new':
 	case 'edit':
 	case 'add_list':
+	case 'customize':
 		// Do nothing
 		break;
 
@@ -289,7 +291,7 @@ switch( $action )
 
 			case 'normal' :
 			default : // take usual action
-				header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID.( $display_mode == 'iframe' ? '&display_mode=iframe' : '' ) );
+				header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID.( $mode == 'customizer' ? '&mode=customizer' : '' ) );
 				break;
 		}
 		break;
@@ -335,18 +337,9 @@ switch( $action )
 			}
 			else
 			{	// If $action == 'update'
-				if( $display_mode == 'iframe' )
-				{	// Close modal window with iframe:
-					send_javascript_message( array(
-							'closeModalWindow' => array(),
-							'location.reload'  => array() ),
-						true, 'window.parent' );
-				}
-				else
-				{	// Redirect to widgets list:
-					$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
-					header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
-				}
+				// Redirect to widgets list:
+				$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
+				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
 			}
 		}
 		elseif( $display_mode == 'js' )
@@ -719,20 +712,6 @@ if( $display_mode == 'normal' )
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 	$AdminUI->disp_body_top();
 }
-elseif( $display_mode == 'iframe' )
-{	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-
-	// Don't initalize widgets JS code for iframe mode,
-	// e-g because we need to work simple URLs to add new widget from front-office side:
-	add_js_headline( 'var b2evo_widgets_init = false;' );
-
-	$AdminUI->disp_html_head();
-	echo '<body>';
-	// Display info & error messages:
-	$Messages->display();
-	// Clear the messages to avoid double displaying:
-	$Messages->clear();
-}
 
 /**
  * Display payload:
@@ -785,11 +764,6 @@ switch( $action )
 					) );
 				break;
 
-			case 'iframe':
-				// Display VIEW:
-				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
-				break;
-
 			case 'normal' :
 			default : // take usual action
 				// Begin payload block:
@@ -807,10 +781,9 @@ switch( $action )
 
 	case 'add_list':
 		// A list of widgets which can be added:
-		switch( $display_mode )
+		switch( $mode )
 		{
-			case 'iframe':
-
+			case 'customizer':
 				// Try to get widget container by collection ID, container code and requested skin type:
 				$WidgetContainerCache = & get_WidgetContainerCache();
 				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $blog, $skin_type, $container_code );
@@ -818,13 +791,14 @@ switch( $action )
 				// Change this param to proper work of func get_widget_container():
 				set_param( 'container', 'wico_ID_'.$WidgetContainer->ID );
 
-				echo '<div class="available_widgets"'.( $WidgetContainer ? 'id="available_add_new_wico_ID_'.$WidgetContainer->ID.'"' : '' ).'>'."\n";
 				$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
-				echo '</div>'."\n";
 				break;
 		}
 		break;
 
+	case 'customize':
+		$AdminUI->disp_view( 'widgets/views/_widget_customize.form.php' );
+		break;
 
 	case 'list':
 	default:
@@ -855,11 +829,5 @@ if( $display_mode == 'normal' )
 {	// Normal mode:
 	// Display body bottom, debug info and close </html>:
 	$AdminUI->disp_global_footer();
-} 
-elseif( $display_mode == 'iframe' )
-{	// Frame mode:
-	echo '<body></html>';
 }
-
-
 ?>

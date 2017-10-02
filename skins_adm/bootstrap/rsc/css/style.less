@@ -1678,17 +1678,19 @@ table.diff {
 	}
 	form > .panel-group {
 		margin-bottom: 0;
-		> .panel {
+	}
+	form {
+		> .panel-group > .panel, > div.fieldset_wrapper > fieldset > .panel {
 			border-top: none;
 			border-left: none;
 			border-right: none;
 			border-radius: 0;
 			margin: 0;
 			box-shadow: none;
-			.panel-heading {
+			> .panel-heading {
 				border-radius: 0;
 			}
-			.panel-body {
+			> .panel-body {
 				.form-group:last-child {
 					margin-bottom: 0;
 				}
@@ -1704,8 +1706,18 @@ table.diff {
 			padding: 0;
 		}
 	}
-	.evo_customizer__tabs + #skin_settings_checkchanges {
-		margin-top: 93px;
+	.evo_customizer__tabs + .evo_customizer__content {
+		margin-top: 140px;
+	}
+	.evo_customizer__available_widgets {
+		padding: 15px;
+		ul {
+			list-style: none;
+			margin: 0 0 0 2px;
+		}
+		h3 {
+			margin: 10px 0 5px 0;
+		}
 	}
 }
 .evo_customizer__tabs {
@@ -1716,12 +1728,26 @@ table.diff {
 	background: #FFF;
 	padding: 15px 15px 0 15px;
 	z-index: 1;
-	.evo_customizer__subtabs {
+	.evo_customizer__menus, .evo_customizer__actions {
 		padding: 10px 15px;
 		margin: 0 -15px;
 		border-top: 1px solid #DDD;
+	}
+	.evo_customizer__menus {
+		nav .nav > li {
+			margin-right: 3px;
+			a {
+				padding: 4px 10px;
+				font-size: 92%;
+			}
+		}
+	}
+	.evo_customizer__actions {
 		a {
-			margin: 0 10px
+			margin-right: 10px
+		}
+		a:last-child {
+			margin-right: 0
 		}
 	}
 }

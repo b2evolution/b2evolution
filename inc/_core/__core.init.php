@@ -1450,21 +1450,6 @@ class _core_Module extends Module
 								'href' => url_add_param( regenerate_url( 'display_containers' ), 'display_containers=show' ),
 							);
 						}
-
-						if( $Session->get( 'designer_mode_'.$Blog->ID ) == 1 )
-						{ // To hide the debug containers
-							$entries['blog']['entries']['designer'] = array(
-								'text' => T_('Disable designer mode'),
-								'href' => regenerate_url( 'designer_mode', 'designer_mode=disable' ),
-							);
-						}
-						else
-						{ // To show the debug containers
-							$entries['blog']['entries']['designer'] = array(
-								'text' => T_('Enable designer mode'),
-								'href' => regenerate_url( 'designer_mode', 'designer_mode=enable' ),
-							);
-						}
 					}
 
 					$entries['blog']['entries']['general'] = array(
@@ -1533,19 +1518,6 @@ class _core_Module extends Module
 		if( ! is_admin_page() && ! empty( $Blog ) )
 		{	// Only front-office collection pages:
 
-			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-			{	// If current user has an access to back-office and to edit collection properties:
-				// Display an option to turn on/off containers display:
-				global $Session;
-				$designer_mode = $Session->get( 'designer_mode_'.$Blog->ID );
-				$entries['containers'] = array(
-					'text'        => '<span class="fa fa-cubes"></span> '.( $designer_mode ? T_('Exit Designer') : T_('Designer Mode') ),
-					'href'        => regenerate_url( 'designer_mode', 'designer_mode='.( $designer_mode ? 'disable' : 'enable' ) ),
-					'entry_class' => 'rwdhide',
-					'class'       => ( $designer_mode ? 'active' : '' ),
-				);
-			}
-
 			if( $perm_admin_restricted &&
 			    ( ( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) ||
 			      $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
@@ -1560,19 +1532,11 @@ class _core_Module extends Module
 				}
 				else
 				{	// If skin customizer mode is disabled:
-					if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-					{	// URL to customize collection skin:
-						$menu_entry_skin_href = $Blog->get( 'customizer_url' );
-					}
-					else
-					{	// URL to customize site skin:
-						global $customizer_url;
-						$menu_entry_skin_href = $customizer_url.'?view=site_skin&blog='.$Blog->ID.'&amp;customizing_url='.urlencode( get_current_url() );
-					}
+					$menu_entry_skin_href = $Blog->get( 'customizer_url' );
 					$menu_entry_skin_class = '';
 				}
 				$entries['skin'] = array(
-					'text'        => '<span class="fa fa-sliders"></span> '.T_('Skin'),
+					'text'        => '<span class="fa fa-sliders"></span> '.T_('Customize'),
 					'href'        => $menu_entry_skin_href,
 					'entry_class' => 'rwdhide',
 					'class'       => $menu_entry_skin_class,
