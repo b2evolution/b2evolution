@@ -86,6 +86,9 @@ class Blog extends DataObject
 	var $media_fullpath = '';
 	var $media_url = '';
 
+	var $normal_skin_ID = 0;
+	var $mobile_skin_ID = 0;
+	var $tablet_skin_ID = 0;
 
 	/**
 	 * The basepath of that collection.
@@ -232,7 +235,7 @@ class Blog extends DataObject
 			$this->media_url = $db_row->blog_media_url;
 			$this->type = isset( $db_row->blog_type ) ? $db_row->blog_type : 'std';
 			$this->order = isset( $db_row->blog_order ) ? $db_row->blog_order : 0;
-			$this->normal_skin_ID = $db_row->blog_normal_skin_ID;
+			$this->normal_skin_ID = isset( $db_row->blog_normal_skin_ID ) ? $db_row->blog_normal_skin_ID : 0; // check by isset() to avoid warnings of deleting all tables before new install
 			$this->mobile_skin_ID = isset( $db_row->blog_mobile_skin_ID ) ? $db_row->blog_mobile_skin_ID : 0; // 0 means the same as normal_skid_ID value
 			$this->tablet_skin_ID = isset( $db_row->blog_tablet_skin_ID ) ? $db_row->blog_tablet_skin_ID : 0; // 0 means the same as normal_skid_ID value
 		}
