@@ -75,6 +75,7 @@ echo '<div class="profile_column_left">';
 	widget_container( 'user_profile_left', array(
 		'widget_context' => 'user',	// Signal that we are displaying within an User
 		// The following (optional) params will be used as defaults for widgets included in this container:
+		'container_display_if_empty' => false, // If no widget, don't display container at all
 		// This will enclose each widget in a block:
 		'block_start' => '<div class="evo_widget $wi_class$">',
 		'block_end' => '</div>',
@@ -95,6 +96,7 @@ echo '<div class="profile_column_right">';
 	widget_container( 'user_profile_right', array(
 		'widget_context' => 'user',	// Signal that we are displaying within an User
 		// The following (optional) params will be used as defaults for widgets included in this container:
+		'container_display_if_empty' => false, // If no widget, don't display container at all
 		// This will enclose each widget in a block:
 		'block_start' => '<div class="evo_widget $wi_class$">',
 		'block_end' => '</div>',

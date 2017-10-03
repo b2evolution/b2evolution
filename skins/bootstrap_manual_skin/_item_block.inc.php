@@ -108,6 +108,7 @@ $params = array_merge( array(
 		widget_container( 'item_single', array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
@@ -150,6 +151,7 @@ $params = array_merge( array(
 		widget_container( 'item_page', array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',

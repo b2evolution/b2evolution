@@ -221,6 +221,7 @@ echo '</div>';
 				// Display container and contents:
 				widget_container( 'front_page_secondary_area', array(
 						// The following params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
 						'container_start'   => '<div class="col-md-12"><div class="evo_container $wico_class$">',
 						'container_end'     => '</div></div>',
 						'block_start'       => '<div class="widget $wi_class$">',
@@ -237,6 +238,7 @@ echo '</div>';
 			// Display container and contents:
 			widget_container( 'footer', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
 					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
 					'container_end'   => '</div>',
 				) );

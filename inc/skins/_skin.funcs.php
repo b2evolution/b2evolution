@@ -2516,6 +2516,7 @@ function widget_container( $container_code, $params = array() )
 	global $Blog, $Skin;
 
 	$params = array_merge( array(
+			'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
 			'container_start' => '<div class="evo_container $wico_class$">',
 			'container_end'   => '</div>',
 		), $params );

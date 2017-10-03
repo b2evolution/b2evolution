@@ -300,6 +300,7 @@ class Skin extends DataObject
 		global $Timer, $Session, $debug, $current_User;
 
 		$params = array_merge( array(
+				'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
 				'container_start' => '',
 				'container_end'   => '',
 			), $params );
@@ -350,10 +351,13 @@ class Skin extends DataObject
 			{	// If container code is NOT defined or detected by name or container wrapper is not correct:
 				echo ' <span class="text-danger">'.sprintf( T_('Container %s cannot be manipulated because wrapper html tag has no %s.'), '"'.$sco_name.'"(<code>'.$container_code.'</code>)', '<code>class="evo_container"</code>' ).'</span> ';
 			}
+
+			// Force to display container even if no widget:
+			$params['container_display_if_empty'] = true;
 		}
 
-		// Display start of container wrapper:
-		echo str_replace( '$wico_class$', 'evo_container__'.str_replace( ' ', '_', $container_code ), $params['container_start'] );
+		// Start to get content of widgets:
+		ob_start();
 
 		$display_debug_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
@@ -365,6 +369,9 @@ class Skin extends DataObject
 				echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>';
 			}
 			echo 'Container: <b>'.$sco_name.'</b></div>';
+
+			// Force to display container even if no widget:
+			$params['container_display_if_empty'] = true;
 		}
 
 		/**
@@ -410,8 +417,21 @@ class Skin extends DataObject
 			echo '</div>';
 		}
 
-		// Display end of container wrapper:
-		echo $params['container_end'];
+		// Store content of widgets to var in order to display them in container wrapper:
+		$container_widgets_content = ob_get_clean();
+
+		if( $params['container_display_if_empty'] || ! empty( $Widget_array ) )
+		{	// Display container wrapper with widgets content if it is not empty or we should display it anyway:
+
+			// Display start of container wrapper:
+			echo str_replace( '$wico_class$', 'evo_container__'.str_replace( ' ', '_', $container_code ), $params['container_start'] );
+
+			// Display widgets of the container:
+			echo $container_widgets_content;
+
+			// Display end of container wrapper:
+			echo $params['container_end'];
+		}
 
 		$Timer->pause( $timer_name );
 	}
