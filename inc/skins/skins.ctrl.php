@@ -78,7 +78,7 @@ switch( $action )
 			$edited_Blog = & $BlogCache->get_by_ID( $blog );
 
 			// Set new installed skins for the selected collection:
-			$edited_Blog->set_setting( $skin_type.'_skin_ID', $edited_Skin->ID );
+			$edited_Blog->set( $skin_type.'_skin_ID', $edited_Skin->ID );
 			$edited_Blog->dbupdate();
 
 			$Messages->add( T_('The blog skin has been changed.')
@@ -244,9 +244,12 @@ switch( $action )
 		param( 'blog', 'integer', true );
 
 		// At some point we may want to remove skin settings from all blogs
-		$DB->query( 'DELETE FROM T_coll_settings
-			WHERE cset_coll_ID = '.$DB->quote( $blog ).'
-			  AND cset_name REGEXP "^skin'.$skin_ID.'_"' );
+		$DB->query( 'UPDATE T_blogs
+				SET
+						blog_normal_skin_ID = CASE blog_normal_skin_ID WHEN '.$skin_ID.' THEN NULL ELSE blog_normal_skin_ID,
+						blog_mobile_skin_ID = CASE blog_mobile_skin_ID WHEN '.$skin_ID.' THEN NULL ELSE blog_mobile_skin_ID,
+						blog_tablet_skin_ID = CASE blog_tablet_skin_ID WHEN '.$skin_ID.' THEN NULL ELSE blog_tablet_skin_ID
+			 WHERE blog_normal_skin_ID = '.$skin_ID.' OR blog_mobile_skin_ID = '.$skin_ID.' OR blog_table_skin_ID = '.$skin_ID );
 
 		$Messages->add( T_('Skin params have been reset to defaults.'), 'success' );
 

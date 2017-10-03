@@ -8595,6 +8595,38 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12340, 'Upgrade collections table...' ) )
+	{	// part of 6.9.4
+		$DB->begin();
+
+		// Add new fields to collections table
+		db_add_col( 'T_blogs', 'blog_tablet_skin_ID', 'int(10) unsigned NULL AFTER blog_order' );
+		db_add_col( 'T_blogs', 'blog_mobile_skin_ID', 'int(10) unsigned NULL AFTER blog_order' );
+		db_add_col( 'T_blogs', 'blog_normal_skin_ID', 'int(10) unsigned NULL AFTER blog_order' );
+
+		// Populate new fields from existing collection skin settings
+		$DB->query( 'UPDATE evo_blogs a
+				LEFT JOIN (
+					SELECT
+						cset_coll_ID,
+						GROUP_CONCAT( IF( cset_name = "normal_skin_ID", cset_value, NULL ) ) AS normal_skin_ID,
+						GROUP_CONCAT( IF( cset_name = "mobile_skin_ID", cset_value, NULL ) ) AS mobile_skin_ID,
+						GROUP_CONCAT( IF( cset_name = "tablet_skin_ID", cset_value, NULL ) ) AS tablet_skin_ID
+					FROM evo_coll_settings a
+					WHERE cset_name LIKE "%_skin_ID"
+					GROUP BY cset_coll_ID
+				) b ON b.cset_coll_ID = a.blog_ID
+				SET a.blog_normal_skin_ID = SUBSTRING_INDEX( b.normal_skin_ID, " ", -1 ),
+					a.blog_mobile_skin_ID = SUBSTRING_INDEX( b.mobile_skin_ID, " ", -1 ),
+					a.blog_tablet_skin_ID = SUBSTRING_INDEX( b.tablet_skin_ID, " ", -1 )' );
+
+		// Delete old collection skin settings
+		$DB->query( 'DELETE FROM T_coll_settings WHERE cset_name LIKE "%_skin_ID"' );
+
+		$DB->commit();
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -212,7 +212,7 @@ function create_blog(
 	$Blog->set( 'locale', $default_locale );
 	$Blog->set( 'in_bloglist', $in_bloglist );
 	$Blog->set( 'owner_user_ID', $owner_user_ID );
-	$Blog->set_setting( 'normal_skin_ID', $blog_skin_ID );
+	$Blog->set( 'normal_skin_ID', $blog_skin_ID );
 
 	if( $local_installation )
 	{ // Turn off all ping plugins if the installation is local/test/intranet

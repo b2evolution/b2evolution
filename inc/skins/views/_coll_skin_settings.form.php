@@ -32,17 +32,17 @@ $Form->begin_form( 'fform' );
 	switch( $skin_type )
 	{
 		case 'normal':
-			$skin_ID = $Blog->get_setting( 'normal_skin_ID' );
+			$skin_ID = $Blog->get( 'normal_skin_ID' );
 			$fieldset_title = T_('Default skin');
 			break;
 
 		case 'mobile':
-			$skin_ID = $Blog->get_setting( 'mobile_skin_ID', true );
+			$skin_ID = $Blog->get( 'mobile_skin_ID', array( 'real_value' => true ) );
 			$fieldset_title = T_('Default mobile phone skin');
 			break;
 
 		case 'tablet':
-			$skin_ID = $Blog->get_setting( 'tablet_skin_ID', true );
+			$skin_ID = $Blog->get( 'tablet_skin_ID', array( 'real_value' => true ) );
 			$fieldset_title = T_('Default tablet skin');
 			break;
 

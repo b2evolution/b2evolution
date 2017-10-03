@@ -136,8 +136,8 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 		$is_tablet_session = $Session->is_tablet_session();
 
 		if( ( ! $is_mobile_session && ! $is_tablet_session )
-		 || ( $is_mobile_session && $Blog->get_setting( 'mobile_skin_ID', true ) < 1 )
-		 || ( $is_tablet_session && $Blog->get_setting( 'tablet_skin_ID', true ) < 1 ) )
+		 || ( $is_mobile_session && $Blog->get( 'mobile_skin_ID', array( 'real_value' => true ) ) < 1 )
+		 || ( $is_tablet_session && $Blog->get( 'tablet_skin_ID', array( 'real_value' => true ) ) < 1 ) )
 		{ // Display the switcher only for mobile/tablet devices and when the mobile/tablet skins are defined
 			return;
 		}

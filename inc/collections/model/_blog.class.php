@@ -232,6 +232,9 @@ class Blog extends DataObject
 			$this->media_url = $db_row->blog_media_url;
 			$this->type = isset( $db_row->blog_type ) ? $db_row->blog_type : 'std';
 			$this->order = isset( $db_row->blog_order ) ? $db_row->blog_order : 0;
+			$this->normal_skin_ID = $db_row->blog_normal_skin_ID;
+			$this->mobile_skin_ID = isset( $db_row->blog_mobile_skin_ID ) ? $db_row->blog_mobile_skin_ID : 0; // 0 means the same as normal_skid_ID value
+			$this->tablet_skin_ID = isset( $db_row->blog_tablet_skin_ID ) ? $db_row->blog_tablet_skin_ID : 0; // 0 means the same as normal_skid_ID value
 		}
 
 		$Timer->pause( 'Blog constructor' );
@@ -719,18 +722,18 @@ class Blog extends DataObject
 
 		if( param( 'normal_skin_ID', 'integer', NULL ) !== NULL )
 		{ // Normal skin ID:
-			$this->set_setting( 'normal_skin_ID', get_param( 'normal_skin_ID' ) );
+			$this->set( 'normal_skin_ID', get_param( 'normal_skin_ID' ) );
 		}
 
 		if( param( 'mobile_skin_ID', 'integer', NULL ) !== NULL )
 		{ // Mobile skin ID:
 			if( get_param( 'mobile_skin_ID' ) == 0 )
 			{ // Don't store this empty setting in DB
-				$this->delete_setting( 'mobile_skin_ID' );
+				$this->set( 'mobile_skin_ID', NULL );
 			}
 			else
 			{ // Set mobile skin
-				$this->set_setting( 'mobile_skin_ID', get_param( 'mobile_skin_ID' ) );
+				$this->set( 'mobile_skin_ID', get_param( 'mobile_skin_ID' ) );
 			}
 		}
 
@@ -738,11 +741,11 @@ class Blog extends DataObject
 		{ // Tablet skin ID:
 			if( get_param( 'tablet_skin_ID' ) == 0 )
 			{ // Don't store this empty setting in DB
-				$this->delete_setting( 'tablet_skin_ID' );
+				$this->set( 'tablet_skin_ID', NULL );
 			}
 			else
 			{ // Set tablet skin
-				$this->set_setting( 'tablet_skin_ID', get_param( 'tablet_skin_ID' ) );
+				$this->set( 'tablet_skin_ID', get_param( 'tablet_skin_ID' ) );
 			}
 		}
 
@@ -2834,6 +2837,24 @@ class Blog extends DataObject
 					return '';
 				}
 
+			case 'normal_skin_ID':
+			case 'mobile_skin_ID':
+			case 'tablet_skin_ID':
+				$result = parent::get( $parname );
+				if( $result === NULL )
+				{ // Try to get default from the global settings
+					$result = $Settings->get( 'def_'.$parname );
+				}
+
+				if( $parname == 'mobile_skin_ID' || $parname == 'tablet_skin_ID' )
+				{
+					if( ( $result === '0' ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
+					{ // 0 value means that use the same as normal case
+						$result = $this->get( 'normal_skin_ID' );
+					}
+				}
+				return $result;
+
 			default:
 				// All other params:
 				return parent::get( $parname );
@@ -2904,25 +2925,6 @@ class Blog extends DataObject
 
 		switch( $parname )
 		{
-			case 'normal_skin_ID':
-				if( $result === NULL )
-				{ // Try to get default from the global settings
-					$result = $Settings->get( 'def_'.$parname );
-				}
-				break;
-
-			case 'mobile_skin_ID':
-			case 'tablet_skin_ID':
-				if( $result === NULL )
-				{ // Try to get default from the global settings
-					$result = $Settings->get( 'def_'.$parname );
-				}
-				if( ( $result === '0' ) && ! $real_value )
-				{ // 0 value means that use the same as normal case
-					$result = $this->get_setting( 'normal_skin_ID' );
-				}
-				break;
-
 			case 'moderation_statuses':
 			case 'post_moderation_statuses':
 				if( $result === NULL )
@@ -3890,26 +3892,26 @@ class Blog extends DataObject
 				{
 					if( $Session->is_mobile_session() )
 					{
-						return $this->get_setting( 'mobile_skin_ID' );
+						return $this->get( 'mobile_skin_ID' );
 					}
 					if( $Session->is_tablet_session() )
 					{
-						return $this->get_setting( 'tablet_skin_ID' );
+						return $this->get( 'tablet_skin_ID' );
 					}
 				}
-				return $this->get_setting( 'normal_skin_ID' );
+				return $this->get( 'normal_skin_ID' );
 
 			case 'normal':
 				// Normal skin
-				return $this->get_setting( 'normal_skin_ID' );
+				return $this->get( 'normal_skin_ID' );
 
 			case 'mobile':
 				// Mobile skin
-				return $this->get_setting( 'mobile_skin_ID' );
+				return $this->get( 'mobile_skin_ID' );
 
 			case 'tablet':
 				// Tablet skin
-				return $this->get_setting( 'tablet_skin_ID' );
+				return $this->get( 'tablet_skin_ID' );
 		}
 
 		// Deny to request invalid skin types

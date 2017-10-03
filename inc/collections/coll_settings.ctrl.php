@@ -192,7 +192,7 @@ switch( $action )
 					$SkinCache = & get_SkinCache();
 
 					// Get skin by selected type:
-					$skin_ID = $Blog->get_setting( $skin_type.'_skin_ID', ( $skin_type != 'normal' ) );
+					$skin_ID = $Blog->get( $skin_type.'_skin_ID', array( 'real_value' => ( $skin_type != 'normal' ) ) );
 					$edited_Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
 
 					if( ! $edited_Skin )

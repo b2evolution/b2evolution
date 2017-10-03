@@ -93,25 +93,32 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 									 );
 			$Form->end_fieldset();
 
-			$sql = 'SELECT cset_coll_ID, blog_name, cset_name,
-						CASE cset_name
-							WHEN "normal_skin_ID" THEN "'.T_('Normal').'"
-							WHEN "mobile_skin_ID" THEN "'.T_('Mobile').'"
-							WHEN "tablet_skin_ID" THEN "'.T_('Tablet').'"
-							WHEN "rwd_skin_ID" THEN "'.T_('RWD').'"
-							WHEN "feed_skin_ID" THEN "'.T_('XML Feed').'"
-							WHEN "sitemap_skin_ID" THEN "'.T_('XML Sitemap').'"
-							ELSE "'.T_('Unknown').'" END AS skin_type
-					FROM T_coll_settings
-					LEFT JOIN T_blogs ON blog_ID = cset_coll_ID
-					WHERE cset_name LIKE "%_skin_ID"
-						AND cset_value = '.$edited_Skin->ID;
-			$Results = new Results( $sql, '', '', 1000 );
+			$SQL = 'SELECT a.* FROM(
+					SELECT blog_ID, blog_name, "normal" AS skin_type, "1" AS skin_type_order
+					FROM T_blogs
+					WHERE blog_normal_skin_ID = '.$edited_Skin->ID.'
+					UNION ALL
+					SELECT blog_ID, blog_name, "mobile" AS skin_type, "2" AS skin_type_order
+					FROM T_blogs
+					WHERE blog_mobile_skin_ID = '.$edited_Skin->ID.'
+					UNION ALL
+					SELECT blog_ID, blog_name, "tablet" AS skin_type, "3" AS skin_type_order
+					FROM T_blogs
+					WHERE blog_tablet_skin_ID = '.$edited_Skin->ID.' ) AS a
+					ORDER BY blog_ID ASC, skin_type_order ASC';
+
+			$count_SQL = 'SELECT SUM( IF( blog_normal_skin_ID = '.$edited_Skin->ID.', 1, 0 )
+					+ IF( blog_mobile_skin_ID = '.$edited_Skin->ID.', 1, 0 )
+					+ IF( blog_tablet_skin_ID = '.$edited_Skin->ID.', 1, 0 ) )
+					FROM T_blogs
+					WHERE blog_normal_skin_ID = '.$edited_Skin->ID.' OR blog_mobile_skin_ID = '.$edited_Skin->ID.' OR blog_tablet_skin_ID = '.$edited_Skin->ID;
+
+			$Results = new Results( $SQL, '', '', 1000, $count_SQL );
 			$Results->title = T_('Used by').'...';
 			$Results->cols[] = array(
 				'th' => T_('Collection ID'),
 				'td_class' => 'shrinkwrap',
-				'td' => '$cset_coll_ID$',
+				'td' => '$blog_ID$',
 			);
 
 			function display_skin_setting_link( $row )
@@ -120,11 +127,11 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				{
 					return;
 				}
-				$url_params = 'tab=skin&amp;blog='.$row->cset_coll_ID;
+				$url_params = 'tab=skin&amp;blog='.$row->blog_ID;
 
-				if( in_array( $row->cset_name, array( 'mobile_skin_ID', 'tablet_skin_ID', 'rwd_skin_ID', 'feed_skin_ID', 'sitemap_skin_ID' )  ) )
+				if( in_array( $row->skin_type, array( 'mobile', 'tablet' ) ) )
 				{
-					$url_params .= '&amp;skin_type='.str_replace( '_skin_ID', '', $row->cset_name );
+					$url_params .= '&amp;skin_type='.str_replace( '_skin_ID', '', $row->skin_type );
 				}
 
 				return '<a href="'.get_dispctrl_url( 'coll_settings', $url_params ).'">'.$row->blog_name.'</a>';
@@ -135,9 +142,24 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				'td' => '%display_skin_setting_link( {row} )%',
 			);
 
+			function display_skin_type( $skin_type )
+			{
+				switch( $skin_type )
+				{
+					case 'normal':
+						return T_('Normal');
+
+					case 'mobile':
+						return T_('Mobile');
+
+					case 'tablet':
+						return T_('Tablet');
+				}
+			}
+
 			$Results->cols[] = array(
 				'th' => T_('Skin type'),
-				'td' => '$skin_type$',
+				'td' => '%display_skin_type( #skin_type# )%',
 				'td_class' => 'text-center'
 			);
 
