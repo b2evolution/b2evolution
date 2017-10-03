@@ -65,6 +65,9 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_media_url       VARCHAR( 255 ) NULL,
 			blog_type            VARCHAR( 16 ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL,
 			blog_order           int(11) NULL DEFAULT NULL,
+			blog_normal_skin_ID  int(10) unsigned NULL,
+			blog_mobile_skin_ID  int(10) unsigned NULL,
+			blog_tablet_skin_ID  int(10) unsigned NULL,
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

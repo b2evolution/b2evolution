@@ -195,7 +195,7 @@ switch( $action )
 					$SkinCache = & get_SkinCache();
 
 					// Get skin by selected type:
-					$skin_ID = $Blog->get_setting( $skin_type.'_skin_ID', ( $skin_type != 'normal' ) );
+					$skin_ID = $Blog->get( $skin_type.'_skin_ID', array( 'real_value' => ( $skin_type != 'normal' ) ) );
 					$edited_Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
 
 					if( ! $edited_Skin )
@@ -551,58 +551,61 @@ if( $action == 'dashboard' )
 		echo '<div class="row browse">';
 
 		// Block Group 1
-		$Timer->start( 'Panel: Collection Metrics' );
-		echo '<!-- Start of Block Group 1 -->';
-		echo '<div class="col-xs-12 col-sm-12 col-md-3 col-md-push-0 col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '3' ).' col-lg-push-0 floatright">';
-
-		$side_item_Widget = new Widget( 'side_item' );
-
 		$perm_options_edit = $current_User->check_perm( 'options', 'edit' );
-		$perm_blog_properties = $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID );
 
-		// Collection Analytics Block
 		if( $perm_options_edit )
-		{ // We have some serious admin privilege:
+		{
+			$Timer->start( 'Panel: Collection Metrics' );
+			echo '<!-- Start of Block Group 1 -->';
+			echo '<div class="col-xs-12 col-sm-12 col-md-3 col-md-push-0 col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '3' ).' col-lg-push-0 floatright">';
 
-			// -- Collection stats -- //{
-			$chart_data = array();
+			$side_item_Widget = new Widget( 'side_item' );
+			$perm_blog_properties = $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID );
 
-			// Posts
-			$posts_sql_from = 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID';
-			$posts_sql_where = 'cat_blog_ID = '.$DB->quote( $blog );
-			$chart_data[] = array(
-					'title' => T_('Posts'),
-					'value' => get_table_count( 'T_items__item', $posts_sql_where, $posts_sql_from, 'Get a count of Items metric for collection #'.$blog ),
-					'type'  => 'number',
-				);
-			// Slugs
-			$slugs_sql_from = 'INNER JOIN T_items__item ON post_ID = slug_itm_ID '.$posts_sql_from;
-			$slugs_sql_where = 'slug_type = "item" AND '.$posts_sql_where;
-			$chart_data[] = array(
-					'title' => T_('Slugs'),
-					'value' => get_table_count( 'T_slug', $slugs_sql_where, $slugs_sql_from, 'Get a count of Slugs metric for collection #'.$blog ),
-					'type'  => 'number',
-				);
-			// Comments
-			$comments_sql_from = 'INNER JOIN T_items__item ON post_ID = comment_item_ID '.$posts_sql_from;
-			$comments_sql_where = $posts_sql_where;
-			$chart_data[] = array(
-					'title' => T_('Comments'),
-					'value' => get_table_count( 'T_comments', $comments_sql_where, $comments_sql_from, 'Get a count of Comments metric for collection #'.$blog ),
-					'type'  => 'number',
-				);
+			// Collection Analytics Block
+			if( $perm_options_edit )
+			{ // We have some serious admin privilege:
 
-			echo '<div>';
-			$side_item_Widget->title = T_('Collection metrics');
-			$side_item_Widget->disp_template_replaced( 'block_start' );
-			display_charts( $chart_data );
-			$side_item_Widget->disp_template_raw( 'block_end' );
-			echo '</div>';
+				// -- Collection stats -- //{
+				$chart_data = array();
+
+				// Posts
+				$posts_sql_from = 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID';
+				$posts_sql_where = 'cat_blog_ID = '.$DB->quote( $blog );
+				$chart_data[] = array(
+						'title' => T_('Posts'),
+						'value' => get_table_count( 'T_items__item', $posts_sql_where, $posts_sql_from, 'Get a count of Items metric for collection #'.$blog ),
+						'type'  => 'number',
+					);
+				// Slugs
+				$slugs_sql_from = 'INNER JOIN T_items__item ON post_ID = slug_itm_ID '.$posts_sql_from;
+				$slugs_sql_where = 'slug_type = "item" AND '.$posts_sql_where;
+				$chart_data[] = array(
+						'title' => T_('Slugs'),
+						'value' => get_table_count( 'T_slug', $slugs_sql_where, $slugs_sql_from, 'Get a count of Slugs metric for collection #'.$blog ),
+						'type'  => 'number',
+					);
+				// Comments
+				$comments_sql_from = 'INNER JOIN T_items__item ON post_ID = comment_item_ID '.$posts_sql_from;
+				$comments_sql_where = $posts_sql_where;
+				$chart_data[] = array(
+						'title' => T_('Comments'),
+						'value' => get_table_count( 'T_comments', $comments_sql_where, $comments_sql_from, 'Get a count of Comments metric for collection #'.$blog ),
+						'type'  => 'number',
+					);
+
+				echo '<div>';
+				$side_item_Widget->title = T_('Collection metrics');
+				$side_item_Widget->disp_template_replaced( 'block_start' );
+				display_charts( $chart_data );
+				$side_item_Widget->disp_template_raw( 'block_end' );
+				echo '</div>';
+			}
+			echo '</div><!-- End of Block Group 1 -->';
+
+			$Timer->stop( 'Panel: Collection Metrics' );
+			evo_flush();
 		}
-		echo '</div><!-- End of Block Group 1 -->';
-
-		$Timer->stop( 'Panel: Collection Metrics' );
-		evo_flush();
 
 		// Block Group 2
 		if( $have_comments_to_moderate || $have_posts_to_moderate )
@@ -668,13 +671,20 @@ if( $action == 'dashboard' )
 
 		// Block Group 3
 		echo '<!-- Start of Block Group 3 -->';
-		if( $have_comments_to_moderate || $have_posts_to_moderate )
+		if( $perm_options_edit )
 		{
-			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-0 col-lg-6 col-lg-pull-0 coll-dashboard-block-3">';
+			if( $have_comments_to_moderate || $have_posts_to_moderate )
+			{
+				echo '<div class="col-xs-12 col-sm-12 col-md-12 col-md-pull-0 col-lg-6 col-lg-pull-0 coll-dashboard-block-3">';
+			}
+			else
+			{
+				echo '<div class="col-xs-12 col-sm-12 col-md-12 col-md-pull-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '2' : '0' ).' col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '9' ).' col-lg-pull-0 coll-dashboard-block-3">';
+			}
 		}
 		else
 		{
-			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '2' : '0' ).' col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '9' ).' col-lg-pull-0 coll-dashboard-block-3">';
+			echo '<div class="col-xs-12 col-sm-12 col-md-12">';
 		}
 
 		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
@@ -859,9 +869,9 @@ if( $action == 'dashboard' )
 			$block_item_Widget->title = T_('Getting started');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
-			echo '<p><strong>'.T_('Welcome to your new blog\'s dashboard!').'</strong></p>';
-			echo '<p>'.T_('Use the "Posts" and "Settings" tabs above or under the "Collection" menu in the b2evolution toolbar at the top of this page to write a first post or to customize your blog.').'</p>';
-			echo '<p>'.sprintf( T_('You can see your blog page at any time by clicking "Collection &raquo %s Front Page..." in the b2evolution toolbar at the top of this page.'), $Blog->shortname ).'</p>';
+			echo '<p><strong>'.T_('Welcome to your new collection\'s dashboard!').'</strong></p>';
+			echo '<p>'.sprintf( T_('Write your <a %s>first post</a>  or customize this collection via the <a %s>Settings</a> tab.'), 'href="'.get_dispctrl_url( 'items', 'action=new&amp;blog='.$Blog->ID ).'"', 'href="'.get_dispctrl_url( 'coll_settings', 'tab=general&amp;blog='.$Blog->ID ).'"').'</p>';
+			echo '<p>'.sprintf( T_('You can see your collection\'s front page at any time by clicking "Collection &raquo %s Front Page..." in the b2evolution toolbar at the top of this page.'), $Blog->shortname ).'</p>';
 			echo '<p>'.sprintf( T_('You can come back here at any time by clicking "Collection &raquo %s Dashboard..." in that same evobar.'), $Blog->shortname ).'</p>';
 
 			$block_item_Widget->disp_template_raw( 'block_end' );

@@ -75,7 +75,7 @@ switch( $skin_type )
 $block_item_Widget->title .= get_manual_link( $is_collection_skin ? 'skins-for-this-blog' : 'skins-for-this-site' );
 
 // Get what is the current skin ID from this kind of skin type
-$current_skin_ID = $is_collection_skin ? $edited_Blog->get_setting( $skin_type.'_skin_ID', true ) : $Settings->get( $skin_type.'_skin_ID', true );
+$current_skin_ID = $is_collection_skin ? $edited_Blog->get( $skin_type.'_skin_ID', array( 'real_value' => true ) ) : $Settings->get( $skin_type.'_skin_ID', true );
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:

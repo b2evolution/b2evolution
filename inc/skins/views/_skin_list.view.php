@@ -15,9 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'T_skins__skin.*, COUNT( DISTINCT( cset_coll_ID ) ) AS nb_blogs' );
-$SQL->FROM( 'T_skins__skin LEFT JOIN T_coll_settings ON skin_ID = cset_value AND
-			( cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID" )' );
+$SQL->SELECT( 'T_skins__skin.*, SUM( IF( blog_normal_skin_ID = skin_ID, 1, 0 ) + IF( blog_mobile_skin_ID = skin_ID, 1, 0 ) + IF( blog_tablet_skin_ID = skin_ID, 1, 0 ) ) AS nb_blogs' );
+$SQL->FROM( 'T_skins__skin LEFT JOIN T_blogs ON (skin_ID = blog_normal_skin_ID OR skin_ID = blog_mobile_skin_ID OR skin_ID = blog_tablet_skin_ID )' );
 $SQL->GROUP_BY( 'skin_ID' );
 
 $count_SQL = new SQL();

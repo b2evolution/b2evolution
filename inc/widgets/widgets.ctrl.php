@@ -178,9 +178,9 @@ switch( $display_mode )
 }
 
 // Get Skin used by current Blog:
-$blog_normal_skin_ID = $Blog->get_setting( $skin_type.'_skin_ID' );
+$blog_skin_ID = $Blog->get( $skin_type.'_skin_ID' );
 $SkinCache = & get_SkinCache();
-$Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
+$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
 // Make sure containers are loaded for that skin:
 $skins_container_list = $Blog->get_main_containers();
 // Get widget containers from database

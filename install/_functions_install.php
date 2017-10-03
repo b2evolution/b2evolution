@@ -866,16 +866,25 @@ function install_basic_widgets( $old_db_version = 0 )
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
 	$blog_type = ( $old_db_version < 11010 ) ? '"std"' : 'blog_type';
-	$blogs_data_query = 'SELECT blog_ID, '.$blog_type.', GROUP_CONCAT(cset_value) as skin_ids
-			FROM T_blogs LEFT JOIN T_coll_settings ON blog_ID = cset_coll_ID
-			WHERE cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID"
-			GROUP BY blog_ID, blog_type';
-	$blogs_data = $DB->get_results( $blogs_data_query );
+	$SQL = new SQL( 'Get all collections with their skins before install basic widgets' );
+	$SQL->SELECT( 'blog_ID, '.$blog_type.', blog_normal_skin_ID, blog_mobile_skin_ID, blog_tablet_skin_ID' );
+	$SQL->FROM( 'T_blogs' );
+	$SQL->GROUP_BY( 'blog_ID, blog_type' );
+	$blogs_data = $DB->get_results( $SQL );
 
 	foreach( $blogs_data as $blog_data )
 	{
-		task_begin( 'Installing default widgets for blog #'.$blog_data->blog_ID.'... ' );
-		insert_basic_widgets( $blog_data->blog_ID, explode( ',', $blog_data->skin_ids ), true, $blog_data->blog_type );
+		task_begin( 'Installing default widgets for collection #'.$blog_data->blog_ID.'... ' );
+		$skin_IDs = array( $blog_data->blog_normal_skin_ID );
+		if( ! empty( $blog_data->blog_mobile_skin_ID ) )
+		{
+			$skin_IDs[] = $blog_data->blog_mobile_skin_ID;
+		}
+		if( ! empty( $blog_data->blog_tablet_skin_ID ) )
+		{
+			$skin_IDs[] = $blog_data->blog_tablet_skin_ID;
+		}
+		insert_basic_widgets( $blog_data->blog_ID, $skin_IDs, true, $blog_data->blog_type );
 		task_end();
 	}
 }

@@ -21,17 +21,17 @@ global $Collection, $Blog, $Settings, $AdminUI, $current_User, $skin_type, $admi
 switch( $skin_type )
 {
 	case 'normal':
-		$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'normal_skin_ID' ) : $Settings->get( 'normal_skin_ID' );
+		$skin_ID = isset( $Blog ) ? $Blog->get( 'normal_skin_ID' ) : $Settings->get( 'normal_skin_ID' );
 		$fieldset_title = isset( $Blog ) ? T_('Default Collection skin') : T_('Default Site skin');
 		break;
 
 	case 'mobile':
-		$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'mobile_skin_ID', true ) : $Settings->get( 'mobile_skin_ID', true );
+		$skin_ID = isset( $Blog ) ? $Blog->get( 'mobile_skin_ID', array( 'real_value' => true ) ) : $Settings->get( 'mobile_skin_ID', true );
 		$fieldset_title = isset( $Blog ) ? T_('Default Collection mobile phone skin') : T_('Default Site mobile phone skin');
 		break;
 
 	case 'tablet':
-		$skin_ID = isset( $Blog ) ? $Blog->get_setting( 'tablet_skin_ID', true ) : $Settings->get( 'tablet_skin_ID', true );
+		$skin_ID = isset( $Blog ) ? $Blog->get( 'tablet_skin_ID', array( 'real_value' => true ) ) : $Settings->get( 'tablet_skin_ID', true );
 		$fieldset_title = isset( $Blog ) ? T_('Default Collection tablet skin') : T_('Default Site tablet skin');
 		break;
 

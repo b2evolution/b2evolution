@@ -179,7 +179,7 @@ switch( $action )
 		}
 
 		param( 'skin_ID', 'integer', true );
-		$edited_Blog->set_setting( 'normal_skin_ID', $skin_ID );
+		$edited_Blog->set( 'normal_skin_ID', $skin_ID );
 
 		// Check how new content should be created for new collection:
 		param( 'create_demo_contents', 'boolean', NULL );
