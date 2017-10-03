@@ -18,7 +18,7 @@ global $AdminUI;
 
 // Display customizer tabs to switch between site/collection skins and widgets in special div on customizer mode:
 $AdminUI->display_customizer_tabs( array(
-		'active_submenu' => 'widgets',
+		'path' => array( 'coll', 'widgets' ),
 	) );
 
 echo '<div class="evo_customizer__content">';

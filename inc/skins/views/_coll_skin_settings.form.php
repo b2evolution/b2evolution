@@ -72,8 +72,8 @@ if( $can_edit_skin_settings )
 if( $mode == 'customizer' )
 {	// Display customizer tabs to switch between site/collection skins and widgets in special div on customizer mode:
 	$AdminUI->display_customizer_tabs( array(
-			'active_submenu' => 'skin',
-			'action_links'   => $link_select_skin.$link_reset_params
+			'path'         => isset( $Blog ) ? array( 'coll', 'skin' ) : 'site',
+			'action_links' => $link_select_skin.$link_reset_params
 		) );
 
 	// Start of customizer content:

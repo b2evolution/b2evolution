@@ -18,7 +18,7 @@ global $AdminUI, $WidgetContainer, $container, $mode;
 if( $mode == 'customizer' )
 {	// Display customizer tabs to switch between skin and widgets in special div on customizer mode:
 	$AdminUI->display_customizer_tabs( array(
-			'active_submenu' => 'widgets',
+			'path' => array( 'coll', 'widgets' ),
 		) );
 
 	// Start of customizer content:

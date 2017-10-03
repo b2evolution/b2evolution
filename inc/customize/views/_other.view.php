@@ -19,7 +19,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $AdminUI, $Settings, $current_User, $admin_url, $customizer_url;
 
 // Display customizer tabs to switch between site/collection skins and widgets in special div on customizer mode:
-$AdminUI->display_customizer_tabs();
+$AdminUI->display_customizer_tabs( array(
+		'path' => 'other',
+	) );
 
 echo '<div class="evo_customizer__content">';
 

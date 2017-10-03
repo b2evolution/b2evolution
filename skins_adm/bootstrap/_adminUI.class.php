@@ -934,11 +934,12 @@ class AdminUI extends AdminUI_general
 	 */
 	function display_customizer_tabs( $params = array() )
 	{
-		global $Blog, $Settings, $current_User, $admin_url, $view;
+		global $Blog, $Settings, $current_User, $admin_url;
 
 		$params = array_merge( array(
 				'action_links'   => '',
 				'active_submenu' => '',
+				'path'           => NULL, // can be string like 'site', or array like array( 'coll', 'widgets' )
 			), $params );
 
 		if( empty( $Blog ) )
@@ -952,44 +953,82 @@ class AdminUI extends AdminUI_general
 			set_working_blog( $tab_Blog->ID );
 		}
 
-		echo '<div class="evo_customizer__tabs">';
+		$tabs = array();
 
-		echo '<ul class="nav nav-tabs">';
+		// Site:
 		if( $Settings->get( 'site_skins_enabled' ) &&
 				$current_User->check_perm( 'options', 'edit' ) )
 		{	// If current User can edit site skin settings:
-			echo '<li'.( $view == 'site_skin' ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=site_skin">'.T_('Site').'</a></li>';
+			$tabs['site'] = array(
+				'text' => T_('Site'),
+				'href' => $admin_url.'?ctrl=customize&amp;view=site_skin',
+			);
 		}
+		// Colleciton:
 		if( $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
 		{	// If current User can edit current collection settings:
-			echo '<li'.( ( $view == 'coll_skin' || $view == 'coll_widgets' ) ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID.'">'.$tab_Blog->get( 'shortname' ).'</a></li>';
+			$tabs['coll'] = array(
+				'text' => $tab_Blog->get( 'shortname' ),
+				'href' => $admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID,
+				'entries' => array(
+					'skin' => array(
+						'text' => T_('Skin'),
+						'href' => $admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID,
+					),
+					'widgets' => array(
+						'text' => T_('Widgets'),
+						'href' => $admin_url.'?ctrl=customize&amp;view=coll_widgets&amp;blog='.$tab_Blog->ID,
+					),
+				)
+			);
 		}
+		// Other:
 		$BlogCache = & get_BlogCache();
 		$BlogCache->clear();
 		$BlogCache->load_user_blogs( 'blog_properties', 'edit' );
 		if( count( $BlogCache->cache ) > 1 )
 		{	// If current User can edit settings of at least two collections:
-			echo '<li'.( $view == 'other' ? ' class="active"' : '' ).'><a href="'.$admin_url.'?ctrl=customize&amp;view=other&amp;blog='.$tab_Blog->ID.'">'.T_('Other').'</a></li>';
+			$tabs['other'] = array(
+				'text' => T_('Other'),
+				'href' => $admin_url.'?ctrl=customize&amp;view=other&amp;blog='.$tab_Blog->ID,
+			);
 		}
-		echo '</ul>';
 
-		if( ( $view == 'coll_skin' || $view == 'coll_widgets' ) &&
-		    $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
-		{	// Sub menus to switch between skin and widgets if current user can edit properties of current collection:
-			echo '<div class="evo_customizer__menus">';
+		// Display tabs and menu entries:
+		echo '<div class="evo_customizer__tabs">';
 
-			echo '<nav><ul class="nav nav-pills">';
-				// Skin:
-				echo '<li'.( $params['active_submenu'] == 'skin' ? ' class="active"' : '' ).'>'
-						.'<a href="'.$admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID.'">'.T_('Skin').'</a>'
+		if( count( $tabs ) )
+		{	// Display tabs if they are allowed for current user by permissions:
+			$path = ( empty( $params['path'] ) || is_string( $params['path'] ) ) ? array( $params['path'] ) : $params['path'];
+
+			$active_tab_entries = NULL;
+			echo '<ul class="nav nav-tabs">';
+			foreach( $tabs as $tab_key => $tab )
+			{
+				$is_active_tab = ( isset( $path[0] ) && $tab_key == $path[0] );
+				if( $is_active_tab && ! empty( $tab['entries'] ) )
+				{	// Store entries of active tab to print out it below:
+					$active_tab_entries = $tab['entries'];
+				}
+				echo '<li'.( $is_active_tab ? ' class="active"' : '' ).'>'
+						.'<a href="'.$tab['href'].'">'.$tab['text'].'</a>'
 					.'</li>';
-				// Widgets:
-				echo '<li'.( $params['active_submenu'] == 'widgets' ? ' class="active"' : '' ).'>'
-						.'<a href="'.$admin_url.'?ctrl=customize&amp;view=coll_widgets&amp;blog='.$tab_Blog->ID.'">'.T_('Widgets').'</a>'
-					.'</li>';
-			echo '</ul></nav>';
+			}
+			echo '</ul>';
 
-			echo '</div>';
+			if( $active_tab_entries !== NULL )
+			{	// Display sub menu entries for currently active tab:
+				echo '<div class="evo_customizer__menus">';
+				echo '<nav><ul class="nav nav-pills">';
+				foreach( $active_tab_entries as $entry_key => $entry )
+				{
+					echo '<li'.( ( isset( $path[1] ) && $entry_key == $path[1] ) ? ' class="active"' : '' ).'>'
+							.'<a href="'.$entry['href'].'">'.$entry['text'].'</a>'
+						.'</li>';
+				}
+				echo '</ul></nav>';
+				echo '</div>';
+			}
 		}
 
 		if( ! empty( $params['action_links'] ) )
