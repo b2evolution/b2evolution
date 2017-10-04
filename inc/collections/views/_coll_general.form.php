@@ -141,12 +141,15 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 			$Form->checklist( $set_as_options, 'set_as_options', T_('Automatically set as') );
 		}
 
-		echo '<p>'.T_('The Home collection typically aggregates the contents of all other collections on the site.').'</p>';
-		$Form->radio( 'blog_aggregate', empty( $edited_Blog->get_setting( 'aggregate_coll_IDs' ) ) ? 0 : 1,
-		array(
-			array( 1, T_('Set to aggregate contents of all other collections') ),
-			array( 0, T_('Do not aggregate') ),
-		), T_('Aggregate'), true, '' );
+		if( $is_creating )
+		{
+			echo '<p>'.T_('The Home collection typically aggregates the contents of all other collections on the site.').'</p>';
+			$Form->radio( 'blog_aggregate', empty( $edited_Blog->get_setting( 'aggregate_coll_IDs' ) ) ? 0 : 1,
+			array(
+				array( 1, T_('Set to aggregate contents of all other collections') ),
+				array( 0, T_('Do not aggregate') ),
+			), T_('Aggregate'), true, '' );
+		}
 	}
 $Form->end_fieldset();
 

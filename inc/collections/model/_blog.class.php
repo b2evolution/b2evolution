@@ -1413,7 +1413,7 @@ class Blog extends DataObject
 			}
 
 
-			if( param( 'blog_aggregate', 'integer', 1 ) !== 0 || $this->type != 'main' )
+			if( $this->type != 'main' || ( $this->type == 'main' && $this->ID > 0 ) )
 			{
 				if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
 				{ // Aggregate list: (can be '*')
@@ -1432,14 +1432,17 @@ class Blog extends DataObject
 					}
 					$this->set_setting( 'aggregate_coll_IDs', $aggregate_coll_IDs );
 				}
-				elseif( empty( $this->get_setting( 'aggregate_coll_IDs' ) ) )
+			}
+			elseif( $this->type == 'main' && $this->ID === 0 )
+			{ // Only on new Home/Main collection
+				if( param( 'blog_aggregate', 'integer', 1 ) === 0 )
+				{
+					$this->set_setting( 'aggregate_coll_IDs', NULL );
+				}
+				else
 				{
 					$this->set_setting( 'aggregate_coll_IDs', '*' );
 				}
-			}
-			else
-			{
-				$this->set_setting( 'aggregate_coll_IDs', NULL );
 			}
 
 
