@@ -100,6 +100,9 @@ body.pictured div#debug_info.debug {
   position: absolute;
   top: 100%;
 }
+body.pictured.dev_designer_mode {
+  height: auto;
+}
 .evo_pictured_layout {
   display: table;
   height: 100%;
