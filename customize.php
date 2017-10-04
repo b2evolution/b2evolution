@@ -103,8 +103,6 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 			<iframe id="evo_customizer__backoffice" src="<?php echo $admin_url.'?ctrl=customize&amp;view='.$view.'&amp;blog='.$blog; ?>" data-instance="<?php echo $instance_name; ?>" data-coll-id="<?php echo $Blog->ID; ?>"></iframe>
 		</div>
 		<div class="evo_customizer__right">
-			<?php echo get_icon( 'customizer_collapse', 'imgtag', array( 'class' => 'evo_customizer__collapser' ) ); ?>
-			<?php echo get_icon( 'customizer_expand', 'imgtag', array( 'class' => 'evo_customizer__expander' ) ); ?>
 			<iframe id="evo_customizer__frontoffice" src="<?php echo url_add_param( $customizing_url, 'customizer_mode=enable&amp;show_toolbar=hidden&amp;redir=no' ); ?>" data-coll-url="<?php echo format_to_output( $Blog->get( 'url' ), 'htmlattr' ); ?>"></iframe>
 		</div>
 		<iframe id="evo_customizer__updater" name="evo_customizer__updater" style="display:none"></iframe>

@@ -6,19 +6,20 @@ jQuery( document ).on( 'ready', function()
 {
 	jQuery( '#evo_customizer__backoffice' ).on( 'load', function()
 	{	// If iframe with settings has been loaded
-		jQuery( this ).contents().find( 'form' ).attr( 'target', 'evo_customizer__updater' );
-		if( jQuery( this ).contents().find( '.evo_customizer__buttons' ).length )
+		var backoffice_content = jQuery( this ).contents();
+		backoffice_content.find( 'form' ).attr( 'target', 'evo_customizer__updater' );
+		if( backoffice_content.find( '.evo_customizer__buttons' ).length )
 		{	// Set proper bottom margin because buttons block has a fixed position at the bottom:
-			jQuery( this ).contents().find( 'body' ).css( 'margin-bottom', jQuery( this ).contents().find( '.evo_customizer__buttons' ).outerHeight() - 1 );
+			backoffice_content.find( 'body' ).css( 'margin-bottom', backoffice_content.find( '.evo_customizer__buttons' ).outerHeight() - 1 );
 		}
 
-		if( jQuery( this ).contents().find( '.alert.alert-success' ).length )
+		if( backoffice_content.find( '.alert.alert-success' ).length )
 		{	// Reload front-office iframe with collection preview if the back-office iframe has a message about success updating:
 			jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.reload();
 		}
 
 		// Remove the message of successful action:
-		var success_messages = jQuery( this ).contents().find( '.alert.alert-success' );
+		var success_messages = backoffice_content.find( '.alert.alert-success' );
 		var messages_wrapper = success_messages.parent();
 		success_messages.remove();
 		if( ! messages_wrapper.find( '.alert' ).length )
@@ -27,10 +28,10 @@ jQuery( document ).on( 'ready', function()
 		}
 
 		// Set proper space before form after top tabs:
-		var tabs_height = jQuery( this ).contents().find( '.evo_customizer__tabs' ).outerHeight();
-		jQuery( this ).contents().find( '.evo_customizer__content' ).css( 'margin-top', tabs_height + 'px' );
+		var tabs_height = backoffice_content.find( '.evo_customizer__tabs' ).outerHeight();
+		backoffice_content.find( '.evo_customizer__content' ).css( 'margin-top', tabs_height + 'px' );
 
-		jQuery( this ).contents().find( '.evo_customizer__tabs a' ).click( function()
+		backoffice_content.find( '.evo_customizer__tabs a' ).click( function()
 		{	// Check to enable/disable designer mode between switching skin and widgets menu entries:
 			var designer_mode = ( jQuery( this ).attr( 'href' ).indexOf( 'view=coll_widgets' ) > -1 ) ? 'enable' : 'disable';
 			if( designer_mode != jQuery( '#evo_customizer__frontoffice' ).data( 'designer-mode' ) )
@@ -39,6 +40,16 @@ jQuery( document ).on( 'ready', function()
 				// Save current state of designer mode:
 				jQuery( '#evo_customizer__frontoffice' ).data( 'designer-mode', designer_mode );
 			}
+		} );
+
+		backoffice_content.find( '#evo_customizer__collapser' ).click( function()
+		{	// Collapse customizer iframe:
+			jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
+		} );
+
+		backoffice_content.find( '#evo_customizer__closer' ).click( function()
+		{	// Close customizer iframe:
+			window.parent.location.href = jQuery( '.evo_customizer__toggler', window.parent.document ).attr( 'href' );
 		} );
 	} );
 
@@ -106,17 +117,13 @@ jQuery( document ).on( 'ready', function()
 		}
 	} );
 
-	jQuery( '.evo_customizer__collapser' ).click( function()
-	{	// Collapse customizer iframe:
-		jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
-		jQuery( this ).hide();
-		jQuery( '.evo_customizer__expander' ).show();
-	} );
-
-	jQuery( '.evo_customizer__expander' ).click( function()
-	{	// Expand customizer iframe:
-		jQuery( '.evo_customizer__wrapper' ).removeClass( 'evo_customizer__collapsed' );
-		jQuery( this ).hide();
-		jQuery( '.evo_customizer__collapser' ).show();
+	jQuery( document ).on( 'click', '.evo_customizer__toggler.active', function()
+	{	// Expand customizer iframe if it is collapsed:
+		if( jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' ) )
+		{
+			jQuery( '.evo_customizer__wrapper' ).removeClass( 'evo_customizer__collapsed' );
+			// Prevent open link URL, because we need only to expand currently:
+			return false;
+		}
 	} );
 } );

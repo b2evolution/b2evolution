@@ -1527,19 +1527,19 @@ class _core_Module extends Module
 				if( $Session->get( 'customizer_mode_'.$Blog->ID ) )
 				{	// If skin customizer mode is enabled:
 					$customizing_url = get_param( 'customizing_url' );
-					$menu_entry_skin_href = url_add_param( ( empty( $customizing_url ) ? get_current_url( 'customizer_mode,show_toolbar,redir' ) : $customizing_url ), 'customizer_mode=disable' );
-					$menu_entry_skin_class = 'active';
+					$menu_entry_customize_href = url_add_param( ( empty( $customizing_url ) ? get_current_url( 'customizer_mode,show_toolbar,redir' ) : $customizing_url ), 'customizer_mode=disable' );
+					$menu_entry_customize_class = 'active';
 				}
 				else
 				{	// If skin customizer mode is disabled:
-					$menu_entry_skin_href = $Blog->get( 'customizer_url' );
-					$menu_entry_skin_class = '';
+					$menu_entry_customize_href = $Blog->get( 'customizer_url' );
+					$menu_entry_customize_class = '';
 				}
 				$entries['skin'] = array(
 					'text'        => '<span class="fa fa-sliders"></span> '.T_('Customize'),
-					'href'        => $menu_entry_skin_href,
+					'href'        => $menu_entry_customize_href,
 					'entry_class' => 'rwdhide',
-					'class'       => $menu_entry_skin_class,
+					'class'       => 'evo_customizer__toggler '.$menu_entry_customize_class,
 				);
 			}
 

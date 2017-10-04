@@ -91,6 +91,7 @@ jQuery( document ).on( 'click', '.evo_designer__action_add', function( e )
 		var container = jQuery( '.evo_container[data-code="' + container_block.data( 'code' ) + '"]' );
 		if( container.length && container.data( 'can-edit' ) == '1' )
 		{	// Load widget adding list only if it is allowed for current user:
+			jQuery( '.evo_customizer__wrapper', window.parent.document ).removeClass( 'evo_customizer__collapsed' );
 			jQuery( '#evo_customizer__backoffice', window.parent.document ).get( 0 ).contentWindow.location
 				.href = b2evo_widget_add_url.replace( '$container$', container.data( 'name' ) ).replace( '$container_code$', container.data( 'code' ) );
 		}
@@ -109,6 +110,7 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 		var widget = jQuery( evo_widget_selector( jQuery( this ) ) );
 		if( widget.length && widget.data( 'can-edit' ) == '1' )
 		{	// Load widget edit form only if it is allowed for current user:
+			jQuery( '.evo_customizer__wrapper', window.parent.document ).removeClass( 'evo_customizer__collapsed' );
 			jQuery( '#evo_customizer__backoffice', window.parent.document ).get( 0 ).contentWindow.location
 				.href = b2evo_widget_edit_url.replace( '$wi_ID$', widget_ID );
 		}

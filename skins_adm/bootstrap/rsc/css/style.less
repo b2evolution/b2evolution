@@ -1728,14 +1728,17 @@ table.diff {
 	position: fixed;
 	top: 0;
 	width: 100%;
-	border-bottom: 1px solid #DDD;
+	border-bottom: 1px solid #CCC;
 	background: #FFF;
 	padding: 15px 15px 0 15px;
 	z-index: 1;
+	.nav {
+		margin-right: 70px;
+	}
 	.evo_customizer__menus, .evo_customizer__actions {
 		padding: 10px 15px;
 		margin: 0 -15px;
-		border-top: 1px solid #DDD;
+		border-top: 1px solid #CCC;
 	}
 	.evo_customizer__menus {
 		nav .nav > li {
@@ -1754,6 +1757,19 @@ table.diff {
 			margin-right: 0
 		}
 	}
+	.evo_customizer__tab_buttons {
+		position: absolute;
+		top: 13px;
+		right: 12px;
+		.btn {
+			margin-right: 3px;
+		}
+		.fa-backward {
+			top: 1px;
+			right: 1px;
+			position: relative;
+		}
+	}
 }
 .evo_customizer__buttons {
 	position: fixed;
@@ -1761,7 +1777,7 @@ table.diff {
 	width: 100%;
 	padding: 15px;
 	text-align: center;
-	border-top: 1px solid #DDD;
+	border-top: 1px solid #CCC;
 	background: #FFF;
 	.form-group, .control-buttons {
 		margin: 0;

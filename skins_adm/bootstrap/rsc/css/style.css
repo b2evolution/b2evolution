@@ -1692,16 +1692,19 @@ table.diff td.diff-title-addedline {
   position: fixed;
   top: 0;
   width: 100%;
-  border-bottom: 1px solid #DDD;
+  border-bottom: 1px solid #CCC;
   background: #FFF;
   padding: 15px 15px 0 15px;
   z-index: 1;
+}
+.evo_customizer__tabs .nav {
+  margin-right: 70px;
 }
 .evo_customizer__tabs .evo_customizer__menus,
 .evo_customizer__tabs .evo_customizer__actions {
   padding: 10px 15px;
   margin: 0 -15px;
-  border-top: 1px solid #DDD;
+  border-top: 1px solid #CCC;
 }
 .evo_customizer__tabs .evo_customizer__menus nav .nav > li {
   margin-right: 3px;
@@ -1716,13 +1719,26 @@ table.diff td.diff-title-addedline {
 .evo_customizer__tabs .evo_customizer__actions a:last-child {
   margin-right: 0;
 }
+.evo_customizer__tabs .evo_customizer__tab_buttons {
+  position: absolute;
+  top: 13px;
+  right: 12px;
+}
+.evo_customizer__tabs .evo_customizer__tab_buttons .btn {
+  margin-right: 3px;
+}
+.evo_customizer__tabs .evo_customizer__tab_buttons .fa-backward {
+  top: 1px;
+  right: 1px;
+  position: relative;
+}
 .evo_customizer__buttons {
   position: fixed;
   bottom: 0;
   width: 100%;
   padding: 15px;
   text-align: center;
-  border-top: 1px solid #DDD;
+  border-top: 1px solid #CCC;
   background: #FFF;
 }
 .evo_customizer__buttons .form-group,
