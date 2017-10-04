@@ -408,12 +408,6 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			$post_list_params = NULL;
 		}
 		add_basic_widget( $wico_id, 'coll_featured_posts', 'core', 20, $post_list_params );
-		add_basic_widget( $wico_id, 'coll_post_list', 'core', 25, array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
-
-		if( $kind != 'main' )
-		{ // Don't install the "Recent Commnets" widget for Main blogs
-			add_basic_widget( $wico_id, 'coll_comment_list', 'core', 30 );
-		}
 
 		if( $blog_id == $blog_b_ID )
 		{	// Install widget "Poll" only for Blog B on install:
