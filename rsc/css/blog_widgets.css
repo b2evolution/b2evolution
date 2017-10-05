@@ -11,19 +11,29 @@ margin:0 2em 0 0;
 	padding:0;
 	list-style:none;
 	border: 1px solid #9DB0BC;
+	display: table;
+	width: 100%;
 }
 
 .widget_container li{
 	margin:0;
 	padding: 3px 10px;
-	/* border-top:1px solid #ccc; */
+	display: table-row;
+}
+.widget_container li > span {
+	display: table-cell;
+	width: 1%;
+	white-space: nowrap;
+}
+.widget_container li > span.widget_title {
+	width: 100%;
+	white-space: normal;
 }
 
 .widget_state, .widget_checkbox {
 	border-right: 1px solid #9DB0BC;
 	margin-right: 10px;
 	padding-right: 10px;
-	/*float: left;*/
 }
 
 .widget_actions, span.widget_cache_status {
@@ -31,7 +41,6 @@ margin:0 2em 0 0;
 	margin-left:10px;
 	padding-left:10px;
 	cursor:default;
-	float:right;
 }
 td.widget_cache_status, span.widget_cache_status {
 	width: 40px;
