@@ -2213,7 +2213,6 @@ function skin_opengraph_tags()
 			break;
 
 		case 'posts':
-		case 'front':
 			$intro_Item = & get_featured_Item( $disp, NULL, true );
 			if( $intro_Item )
 			{
@@ -2295,7 +2294,6 @@ function skin_twitter_tags()
 			break;
 
 		case 'posts':
-		case 'front':
 			if( ! isset( $open_tags_enabled ) )
 			{
 				$intro_Item = & get_featured_Item( $disp, NULL, true );
@@ -2313,13 +2311,11 @@ function skin_twitter_tags()
 			break;
 
 		default:
-			/*
 			if( ! isset( $open_tags_enabled ) )
 			{
 				echo '<meta property="twitter:title" content="'.format_to_output( $Blog->name, 'htmlattr' )."\" />\n";
 				echo '<meta property="twitter:description" content="'.format_to_output( $Blog->longdesc, 'htmlattr' )."\" />\n";
 			}
-			*/
 			return;
 	}
 
