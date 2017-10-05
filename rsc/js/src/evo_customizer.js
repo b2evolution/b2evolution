@@ -45,6 +45,7 @@ jQuery( document ).on( 'ready', function()
 		backoffice_content.find( '#evo_customizer__collapser' ).click( function()
 		{	// Collapse customizer iframe:
 			jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
+			jQuery( '#evo_customizer__vtoggler' ).css( 'left', '0' );
 		} );
 
 		backoffice_content.find( '#evo_customizer__closer' ).click( function()
@@ -122,8 +123,57 @@ jQuery( document ).on( 'ready', function()
 		if( jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' ) )
 		{
 			jQuery( '.evo_customizer__wrapper' ).removeClass( 'evo_customizer__collapsed' );
+			jQuery( '#evo_customizer__vtoggler' ).css( 'left', '317px' );
 			// Prevent open link URL, because we need only to expand currently:
 			return false;
 		}
+	} );
+
+	// Expand/Collapse left customizer panel with vertical toggler line(separator between left and right customizer panels):
+	jQuery( '#evo_customizer__vtoggler' )
+	.on( 'mousedown', function( e )
+	{
+		jQuery( this )
+			.data( 'resizing', true ) // Set flag to know we are resizing
+			.data( 'startX', e.pageX ) // Store x position to detect "click" event vs "resize" event
+			.css( { left: 0, width: '100%' } ); // Take full window place by vertical toggler to make resizing event properly
+		// Prevent default event in order to don't change mousr cursor to test style while dragging:
+		e.originalEvent.preventDefault();
+	} )
+	.on( 'mousemove', function( e )
+	{
+		if( jQuery( this ).data( 'resizing' ) )
+		{	// Only in dragging mode:
+			var is_collapsed = jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' );
+			if( e.pageX < 200 )
+			{	// Collapse left customizer panel if cursor is moved to the left:
+				if( ! is_collapsed )
+				{	// And if it is not collapsed yet:
+					jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
+				}
+			}
+			else if( is_collapsed )
+			{	// Expand left customizer panel if cursor is moved to the right and if it is really collapsed:
+				jQuery( '.evo_customizer__wrapper' ).removeClass( 'evo_customizer__collapsed' );
+			}
+			if( e.pageX != jQuery( this ).data( 'startX' ) )
+			{	// Set flag if the resizing is detected for at least 1 pixel:
+				jQuery( this ).data( 'resized', true );
+			}
+		}
+	} )
+	.on( 'mouseup', function()
+	{
+		if( ! jQuery( this ).data( 'resized' ) )
+		{	// If it has not been resized then simulate "click" event to expand/collapse:
+			jQuery( '.evo_customizer__wrapper' ).toggleClass( 'evo_customizer__collapsed' );
+		}
+		jQuery( this )
+			.data( 'resizing', false ) // Reset flag of resizing
+			.data( 'resized', false ) // Reset flag of resized
+			.css( {
+				left: jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' ) ? '0' : '317px', // Set correct vertical toggler position depending on collapse state
+				width: '5px' // Back vertical toggler to original size
+			} );
 	} );
 } );
