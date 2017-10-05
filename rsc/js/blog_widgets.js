@@ -644,7 +644,7 @@ function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_cache_sta
  */
 function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled, wi_cache_status )
 {
-	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><span>'+wi_name+'</span></li>' );
+	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><span class="widget_title">'+wi_name+'</span></li>' );
 	newWidget.find( 'a.widget_name' ).click( function()
 	{
 		return editWidget( wi_ID );
@@ -661,21 +661,21 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 			'</a>'+
 		'</span>' ) );
 
+	// Add checkbox:
+	jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox'+( wi_enabled ? ' widget_checkbox_enabled' : '' )+'">'+
+			'<input type="checkbox" name="widgets[]" value="'+wi_ID.replace( 'wi_ID_', '' )+'" />'+
+		'</span>' ) );
+
 	// Add icon to toggle cache status:
 	var cacheIcon = jQuery( '<span class="widget_cache_status">' + getWidgetCacheIcon( wi_ID, wi_cache_status ) + '</span>' );
-	jQuery( newWidget ).prepend( cacheIcon ); // add widget action icons
+	jQuery( newWidget ).append( cacheIcon ); // add widget action icons
 
 	// Add action icons:
 	var actionIcons = jQuery( '<span class="widget_actions"><a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\' );">'
 				+( wi_enabled ? deactivate_icon_tag : activate_icon_tag )+'</a><a href="#" onclick="return editWidget( \''+wi_ID+'\' );">'
 				+edit_icon_tag+'</a><a href="#" onclick="return deleteWidget( \''+wi_ID+'\' );">'
 				+delete_icon_tag+'</a></span>' );
-	jQuery( newWidget ).prepend( actionIcons ); // add widget action icons
-
-	// Add checkbox:
-	jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox'+( wi_enabled ? ' widget_checkbox_enabled' : '' )+'">'+
-			'<input type="checkbox" name="widgets[]" value="'+wi_ID.replace( 'wi_ID_', '' )+'" />'+
-		'</span>' ) );
+	jQuery( newWidget ).append( actionIcons ); // add widget action icons
 
 	jQuery( '#container_'+container ).append( newWidget );	// add widget to container
 
