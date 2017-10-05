@@ -865,6 +865,10 @@ function install_basic_widgets( $old_db_version = 0 )
 
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
+	task_begin( 'Installing default shared widgets... ' );
+	insert_shared_widgets();
+	task_end();
+
 	$blog_type = ( $old_db_version < 11010 ) ? '"std"' : 'blog_type';
 	$SQL = new SQL( 'Get all collections with their skins before install basic widgets' );
 	$SQL->SELECT( 'blog_ID, '.$blog_type.', blog_normal_skin_ID, blog_mobile_skin_ID, blog_tablet_skin_ID' );

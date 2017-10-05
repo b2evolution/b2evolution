@@ -706,4 +706,82 @@ function & get_widget_container( $coll_ID, $container_fieldset_id )
 	return $WidgetContainer;
 }
 
+
+/**
+ * Insert shared widget containers
+ */
+function insert_shared_widgets()
+{
+	global $DB, $basic_widgets_insert_sql_rows;
+
+	// Initialize this array first time and clear after previous call of this function:
+	$basic_widgets_insert_sql_rows = array();
+
+	// Declare default shared widget containers:
+	$shared_containers = array(
+			'site_header'     => array( NT_('Site Header'), 1 ),
+			'site_footer'     => array( NT_('Site Footer'), 1 ),
+			'main_navigation' => array( NT_('Main Navigation'), 0 ),
+		);
+
+	$order = 1;
+	foreach( $shared_containers as $container_code => $container_data )
+	{
+		$widget_containers_sql_rows[] = '( '.$DB->quote( $container_code ).', '
+			.$DB->quote( $container_data[0] ).', '
+			.'NULL, '
+			.$order++.', '
+			.$DB->quote( $container_data[1] ).' )';
+	}
+
+	// Insert widget containers:
+	$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
+		.implode( ', ', $widget_containers_sql_rows ),
+		'Insert default shared widget containers' );
+
+	$SQL = new SQL( 'Get all shared widget containers' );
+	$SQL->SELECT( 'wico_code, wico_ID' );
+	$SQL->FROM( 'T_widget__container' );
+	$SQL->WHERE( 'wico_coll_ID IS NULL' );
+	$shared_containers = $DB->get_assoc( $SQL );
+
+	/* Site Header */
+	if( isset( $shared_containers['site_header'] ) )
+	{
+		$wico_id = $shared_containers['site_header'];
+		add_basic_widget( $wico_id, 'image', 'core', 1 );
+		add_basic_widget( $wico_id, 'subcontainer', 'core', 2, array(
+				'title'     => T_('Main Navigation'),
+				'container' => 'main_navigation',
+			) );
+	}
+
+	/* Site Footer */
+	if( isset( $shared_containers['site_footer'] ) )
+	{
+		$wico_id = $shared_containers['site_footer'];
+		add_basic_widget( $wico_id, 'free_text', 'core', 1, array(
+				'content' => '',
+			) );
+	}
+
+	/* Main Navigation */
+	if( isset( $shared_containers['main_navigation'] ) )
+	{
+		$wico_id = $shared_containers['main_navigation'];
+		add_basic_widget( $wico_id, 'colls_list_public', 'core', 1 );
+		add_basic_widget( $wico_id, 'coll_page_list', 'core', 2 );
+		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 3, array(
+				'link_type' => 'ownercontact',
+			) );
+	}
+
+	// Check if there are widgets to create:
+	if( ! empty( $basic_widgets_insert_sql_rows ) )
+	{	// Insert the widget records by single SQL query:
+		$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+		           .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+	}
+}
+
 ?>

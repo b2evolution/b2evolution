@@ -17,16 +17,6 @@ global $Collection, $Blog, $Skin, $admin_url;
 
 global $container_Widget_array;
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
-{
-	echo '<div class="pull-right" style="margin-bottom:10px">';
-		echo action_icon( T_('Add a new container!'), 'add',
-					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default' ) );
-		echo action_icon( T_('Scan skins for containers'), 'reload',
-					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Scan skins for containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
-	echo '</div>';
-}
-
 // Load widgets for current collection:
 $WidgetCache = & get_WidgetCache();
 $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID, false, get_param( 'skin_type' ) );
@@ -37,7 +27,7 @@ $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID, false, get_
  */
 function display_container( $WidgetContainer, $is_included = true )
 {
-	global $Collection, $Blog, $admin_url, $embedded_containers;
+	global $Collection, $Blog, $admin_url;
 	global $Session;
 
 	$Table = new Table();
@@ -98,14 +88,6 @@ function display_container( $WidgetContainer, $is_included = true )
 		{
 			$widget_count++;
 			$enabled = $ComponentWidget->get( 'enabled' );
-
-			if( $ComponentWidget->get( 'code' ) == 'subcontainer' )
-			{
-				$container_code = $ComponentWidget->get_param( 'container' );
-				if( ! isset( $embedded_containers[$container_code] ) ) {
-					$embedded_containers[$container_code] = true;
-				}
-			}
 
 			// START Widget row:
 			echo '<li id="wi_ID_'.$ComponentWidget->ID.'" class="draggable_widget">';
@@ -208,78 +190,62 @@ function display_container( $WidgetContainer, $is_included = true )
  *
  * @param string Skin type: 'normal', 'mobile', 'tablet'
  * @param boolean TRUE to display main containers, FALSE - sub containers
+ * @param boolean TRUE to display collection containers, FALSE - shared containers
  */
-function display_containers( $skin_type, $main = true )
+function display_containers( $skin_type, $main = true, $shared = false )
 {
-	global $Blog, $blog_container_list, $skins_container_list, $embedded_containers;
+	global $Blog, $DB, $blog_container_list;
 
-	// Display containers for current skin:
-	$displayed_containers = array();
-	$embedded_containers = array();
 	$WidgetContainerCache = & get_WidgetContainerCache();
-	foreach( $skins_container_list as $container_code => $container_data )
-	{
-		$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
-		if( ! $WidgetContainer )
-		{
-			$WidgetContainer = new WidgetContainer();
-			$WidgetContainer->set( 'code', $container_code );
-			$WidgetContainer->set( 'name', $container_data[0] );
-			$WidgetContainer->set( 'coll_ID', $Blog->ID );
-		}
-		if( $WidgetContainer->get( 'skin_type' ) != $skin_type ||
-		    ( $main && ! $WidgetContainer->get( 'main' ) ) ||
-		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
-		{	// Skip this container because another type is requested:
-			continue;
-		}
 
-		display_container( $WidgetContainer );
-		if( $WidgetContainer->ID > 0 )
-		{ // Container exists in the database
-			$displayed_containers[$container_code] = $WidgetContainer->ID;
+	if( $main )
+	{	// Display MAIN containers:
+		if( $shared )
+		{	// Get shared containers:
+			$WidgetContainerCache->clear();
+			$WidgetContainerCache->load_where( 'wico_main = 1
+				AND wico_coll_ID IS NULL
+				AND wico_skin_type = '.$DB->quote( $skin_type ) );
+			$main_containers = $WidgetContainerCache->cache;
 		}
-	}
-
-	// Display embedded containers
-	reset( $embedded_containers );
-	while( count( $embedded_containers ) > 0 )
-	{
-		// Get the first item key, and remove the first item from the array
-		$container_code = key( $embedded_containers );
-		array_shift( $embedded_containers );
-		if( isset( $displayed_containers[$container_code] ) )
-		{ // This container was already displayed
-			continue;
-		}
-
-		if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code ) )
-		{ // Confirmed that it is part of the blog's containers in the database
-			if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
-			    ( ! $main && $WidgetContainer->get( 'main' ) ) )
-			{	// Skip this container because another type is requested:
-				continue;
+		else
+		{	// Get collection/skin containers:
+			$main_containers = array();
+			$coll_containers = $Blog->get_main_containers();
+			foreach( $coll_containers as $container_code => $container_data )
+			{
+				$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
+				if( ! $WidgetContainer )
+				{	// If widget container doesn't exist in DB but it is detected in skin file:
+					$WidgetContainer = new WidgetContainer();
+					$WidgetContainer->set( 'code', $container_code );
+					$WidgetContainer->set( 'name', $container_data[0] );
+					$WidgetContainer->set( 'coll_ID', $Blog->ID );
+					$WidgetContainer->set( 'skin_type', $skin_type );
+				}
+				if( $WidgetContainer->get( 'skin_type' ) != $skin_type )
+				{	// Skip this container because another type is requested:
+					continue;
+				}
+				$main_containers[] = $WidgetContainer;
 			}
+		}
+		foreach( $main_containers as $WidgetContainer )
+		{
 			display_container( $WidgetContainer );
-			$displayed_containers[$container_code] = $WidgetContainer->ID;
 		}
 	}
+	else
+	{	// Display SUB containers:
+		$WidgetContainerCache->clear();
+		$WidgetContainerCache->load_where( 'wico_main = 0
+			AND wico_coll_ID '.( $shared ? 'IS NULL' : ' = '.$Blog->ID ).'
+			AND wico_skin_type = '.$DB->quote( $skin_type ) );
 
-	// Display other blog containers which are not in the current skin
-	foreach( $blog_container_list as $container_ID )
-	{
-		if( in_array( $container_ID, $displayed_containers ) )
+		foreach( $WidgetContainerCache->cache as $WidgetContainer )
 		{
-			continue;
+			display_container( $WidgetContainer, false );
 		}
-
-		$WidgetContainer = & $WidgetContainerCache->get_by_ID( $container_ID );
-		if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
-		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
-		{	// Skip this container because another type is requested:
-			continue;
-		}
-		display_container( $WidgetContainer, false );
 	}
 }
 
@@ -294,12 +260,41 @@ echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at rememberin
 
 echo '<div class="row">';
 
-echo '<div class="col-md-6 col-sm-12">';
-display_containers( get_param( 'skin_type' ), true );
+// Skin Containers:
+echo '<div class="col-md-4 col-sm-12">';
+	echo '<h4 class="pull-left">'.T_('Skin Containers').'</h4>';
+	if( $current_User->check_perm( 'options', 'edit', false ) )
+	{	// Display a button to scan skin for widgets if current User has a permission:
+		echo action_icon( T_('Scan skin'), 'reload',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Scan skin'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info pull-right' ) );
+	}
+	echo '<div class="clearfix"></div>';
+	display_containers( get_param( 'skin_type' ), true, false );
 echo '</div>';
 
-echo '<div class="col-md-6 col-sm-12">';
-display_containers( get_param( 'skin_type' ), false );
+// Sub-Containers:
+echo '<div class="col-md-4 col-sm-12">';
+	echo '<h4 class="pull-left">'.T_('Sub-Containers').'</h4>';
+	if( $current_User->check_perm( 'options', 'edit', false ) )
+	{	// Display a button to add new sub-container if current User has a permission:
+		echo action_icon( T_('Add container'), 'add',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+	}
+	echo '<div class="clearfix"></div>';
+	display_containers( get_param( 'skin_type' ), false, false );
+echo '</div>';
+
+// Shared Containers:
+echo '<div class="col-md-4 col-sm-12">';
+	echo '<h4 class="pull-left">'.T_('Shared Containers').'</h4>';
+	if( $current_User->check_perm( 'options', 'edit', false ) )
+	{	// Display a button to add new sub-container if current User has a permission:
+		echo action_icon( T_('Add container'), 'add',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+	}
+	echo '<div class="clearfix"></div>';
+	display_containers( get_param( 'skin_type' ), true, true );
+	display_containers( get_param( 'skin_type' ), false, true );
 echo '</div>';
 
 echo '</div>';
