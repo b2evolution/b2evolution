@@ -80,9 +80,14 @@ $AdminUI->disp_payload_end();
 
 
 /*
-	* DashboardGlobalMain to be added here (anyone?)
-	*/
-
+ * DashboardGlobalMain to be added here (anyone?)
+ */
+if( $current_User->check_perm( 'blogs', 'create' ) )
+{
+	$AdminUI->disp_payload_begin();
+	$AdminUI->disp_view( 'collections/views/_coll_model_list.view.php' );
+	$AdminUI->disp_payload_end();
+}
 
 /*
  * Administrative tasks

@@ -24,8 +24,8 @@ global $Settings;
 $Form = new Form();
 
 $form_title = '';
-$is_creating = ( $edited_Blog->ID == 0 );
-if( $is_creating )
+$is_creating = ( $edited_Blog->ID == 0 || $action == 'copy' );
+if( $edited_Blog->ID == 0 )
 { // "New blog" form: Display a form title and icon to close form
 	global $kind;
 	$kind_title = get_collection_kinds( $kind );
