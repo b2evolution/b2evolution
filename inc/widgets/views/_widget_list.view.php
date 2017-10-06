@@ -124,33 +124,11 @@ function display_container( $WidgetContainer, $is_included = true )
 
 			// Name:
 			$ComponentWidget->init_display( array() );
-			echo '<span>'
+			echo '<span class="widget_title">'
 					.'<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ).'" class="widget_name" onclick="return editWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )">'
 						.$ComponentWidget->get_desc_for_list()
 					.'</a> '
 					.$ComponentWidget->get_help_link()
-				.'</span>';
-
-			// Actions:
-			echo '<span class="widget_actions">'
-					// Enable/Disable:
-					.action_icon( ( $enabled ? T_('Disable this widget!') : T_('Enable this widget!') ),
-							( $enabled ? 'deactivate' : 'activate' ),
-							regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ), NULL, NULL, NULL,
-							array( 'onclick' => 'return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => 'toggle_action' )
-						)
-					// Edit:
-					.action_icon( T_('Edit widget settings!'),
-							'edit',
-							regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ), NULL, NULL, NULL,
-							array( 'onclick' => 'return editWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
-						)
-					// Remove:
-					.action_icon( T_('Remove this widget!'),
-							'delete',
-							regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
-							array( 'onclick' => 'return deleteWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
-						)
 				.'</span>';
 
 			// Cache:
@@ -190,6 +168,28 @@ function display_container( $WidgetContainer, $is_included = true )
 					break;
 			}
 			echo '</span>';
+
+			// Actions:
+			echo '<span class="widget_actions">'
+					// Enable/Disable:
+					.action_icon( ( $enabled ? T_('Disable this widget!') : T_('Enable this widget!') ),
+							( $enabled ? 'deactivate' : 'activate' ),
+							regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ), NULL, NULL, NULL,
+							array( 'onclick' => 'return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => 'toggle_action' )
+						)
+					// Edit:
+					.action_icon( T_('Edit widget settings!'),
+							'edit',
+							regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ), NULL, NULL, NULL,
+							array( 'onclick' => 'return editWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
+						)
+					// Remove:
+					.action_icon( T_('Remove this widget!'),
+							'delete',
+							regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
+							array( 'onclick' => 'return deleteWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
+						)
+				.'</span>';
 
 			// END Widget row:
 			echo '</li>';
