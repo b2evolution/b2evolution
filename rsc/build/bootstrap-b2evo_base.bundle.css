@@ -1584,7 +1584,7 @@ div.dev-blocks--belowtoolbar {
   display: none;
 }
 .evo_customizer__wrapper.evo_customizer__collapsed .evo_customizer__right {
-  margin-left: 0;
+  margin-left: 6px;
 }
 .evo_customizer__left {
   float: left;
@@ -1594,20 +1594,32 @@ div.dev-blocks--belowtoolbar {
   box-sizing: border-box;
 }
 .evo_customizer__right {
-  margin-left: 320px;
+  margin-left: 326px;
   height: 100%;
   position: relative;
 }
-#evo_customizer__vtoggler {
+.evo_customizer__vtoggler {
   position: absolute;
   top: 0;
-  left: 317px;
+  left: 320px;
   height: 100%;
-  width: 5px;
+  width: 6px;
+  background-color: #666;
   cursor: w-resize;
 }
-.evo_customizer__collapsed #evo_customizer__vtoggler {
+.evo_customizer__collapsed .evo_customizer__vtoggler {
   cursor: e-resize;
+}
+.evo_customizer__vtoggler.evo_customizer__vtoggler_resizing {
+  width: 100%;
+  left: 0 !important;
+  background-color: transparent;
+}
+#evo_customizer__vtoggler_helper.evo_customizer__vtoggler {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.evo_customizer__collapsed #evo_customizer__vtoggler_helper2.evo_customizer__vtoggler {
+  left: 0;
 }
 .results_ajax_loading {
   position: absolute;

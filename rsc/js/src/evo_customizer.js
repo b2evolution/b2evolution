@@ -134,16 +134,18 @@ jQuery( document ).on( 'ready', function()
 	.on( 'mousedown', function( e )
 	{
 		jQuery( this )
-			.data( 'resizing', true ) // Set flag to know we are resizing
+			.addClass( 'evo_customizer__vtoggler_resizing' ) // Set class flag to know we are resizing
 			.data( 'startX', e.pageX ) // Store x position to detect "click" event vs "resize" event
-			.css( { left: 0, width: '100%' } ); // Take full window place by vertical toggler to make resizing event properly
-		// Prevent default event in order to don't change mousr cursor to test style while dragging:
+			// Create temp elements for visualization of resizing:
+			.before( '<div id="evo_customizer__vtoggler_helper" class="evo_customizer__vtoggler" style="left:' + ( e.pageX - 3 )+ 'px"></div>' ) // moving bar
+			.before( '<div id="evo_customizer__vtoggler_helper2" class="evo_customizer__vtoggler"></div>' ); // static bar
+		// Prevent default event in order to don't change mousr cursor to test style while resizing:
 		e.originalEvent.preventDefault();
 	} )
 	.on( 'mousemove', function( e )
 	{
-		if( jQuery( this ).data( 'resizing' ) )
-		{	// Only in dragging mode:
+		if( jQuery( this ).hasClass( 'evo_customizer__vtoggler_resizing' ) )
+		{	// Only in resizing mode:
 			var is_collapsed = jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' );
 			if( e.pageX < 200 )
 			{	// Collapse left customizer panel if cursor is moved to the left:
@@ -160,6 +162,8 @@ jQuery( document ).on( 'ready', function()
 			{	// Set flag if the resizing is detected for at least 1 pixel:
 				jQuery( this ).data( 'resized', true );
 			}
+			// Move vtoggler hepler for mouse cursor:
+			jQuery( '#evo_customizer__vtoggler_helper' ).css( 'left', e.pageX );
 		}
 	} )
 	.on( 'mouseup', function()
@@ -169,11 +173,12 @@ jQuery( document ).on( 'ready', function()
 			jQuery( '.evo_customizer__wrapper' ).toggleClass( 'evo_customizer__collapsed' );
 		}
 		jQuery( this )
-			.data( 'resizing', false ) // Reset flag of resizing
+			.removeClass( 'evo_customizer__vtoggler_resizing' ) // Remove class flag of resizing
 			.data( 'resized', false ) // Reset flag of resized
 			.css( {
-				left: jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' ) ? '0' : '317px', // Set correct vertical toggler position depending on collapse state
-				width: '5px' // Back vertical toggler to original size
+				left: jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' ) ? '0' : '320px', // Set correct vertical toggler position depending on collapse state
 			} );
+		// Remove temp elements after end of resiging:
+		jQuery( '#evo_customizer__vtoggler_helper, #evo_customizer__vtoggler_helper2' ).remove();
 	} );
 } );
