@@ -99,6 +99,10 @@ $Form->begin_fieldset( T_('External Feeds').get_manual_link('external_feeds') );
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Template').get_manual_link('collection_template') );
+	$Form->checkbox_input( 'blog_allow_duplicate', false, T_('Allow duplication'), array( 'note' => T_('Check to allow anyone to duplicate this collection.') ) );
+$Form->end_fieldset();
+
 
 if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings

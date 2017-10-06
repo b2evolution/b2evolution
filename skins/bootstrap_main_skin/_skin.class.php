@@ -395,7 +395,7 @@ class bootstrap_main_Skin extends Skin
 	 */
 	function display_init()
 	{
-		global $Messages, $disp, $debug;
+		global $Messages, $disp, $debug, $Session, $blog;
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
@@ -548,6 +548,18 @@ class bootstrap_main_Skin extends Skin
 -->
 </style>';
 		add_headline( $custom_css );
+		}
+
+		if( $Session->get( 'designer_mode_'.$blog ) )
+		{	// On enabled designer mode we should set full window height for pictured layout in pixel instead of 100% percents to avoid issues on scroll page:
+			add_js_headline( 'jQuery( document ).ready( function()
+			{	// On enabled designer mode we should set full window height for pictured layout in pixel instead of 100% percents to avoid issues on scroll page:
+				jQuery( ".evo_pictured_layout" ).height( jQuery( window ).height() );
+				jQuery( window ).resize( function()
+				{	// Update height on window resizing:
+					jQuery( ".evo_pictured_layout" ).height( jQuery( window ).height() );
+				} );
+			} );' );
 		}
 	}
 }

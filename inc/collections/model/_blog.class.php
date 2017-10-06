@@ -683,6 +683,11 @@ class Blog extends DataObject
 			$this->set_setting( 'rss2_redirect', get_param( 'rss2_redirect' ) );
 		}
 
+		if( param( 'blog_allow_duplicate', 'integer', NULL ) !== NULL )
+		{
+			$this->set_setting( 'allow_duplicate', get_param( 'blog_allow_duplicate' ) );
+		}
+
 		if( param( 'image_size', 'string', NULL ) !== NULL )
 		{
 			$this->set_setting( 'image_size', get_param( 'image_size' ));
@@ -3341,7 +3346,7 @@ class Blog extends DataObject
 	 */
 	function duplicate()
 	{
-		global $DB;
+		global $DB, $current_User;
 
 		$DB->begin();
 
@@ -3380,8 +3385,23 @@ class Blog extends DataObject
 		// Use setting values of duplicated collection by default:
 		foreach( $source_settings as $source_setting_name => $source_setting_value )
 		{
+			if( $source_setting_name == 'allow_duplicate' )
+			{
+				continue;
+			}
 			$this->set_setting( $source_setting_name, $source_setting_value );
 		}
+
+		$blog_urlname = param( 'blog_urlname', 'string', true );
+		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $duplicated_coll_ID ) )
+		{ // validate the urlname, which was already set by init_by_kind() function
+			// It needs to validated, because the user can not set the blog urlname, and every new blog would have the same urlname without validation.
+			// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
+			$this->set( 'urlname', urltitle_validate( empty( $blog_urlname ) ? $this->get( 'urlname' ) : $blog_urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
+		}
+
+		// Set collection owner to current user
+		$this->set( 'owner_user_ID', $current_User->ID );
 
 		// Call this firstly to find all possible errors before inserting:
 		// Also to set new values from submitted form:

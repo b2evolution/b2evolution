@@ -13,7 +13,6 @@ margin:0 2em 0 0;
 	border: 1px solid #9DB0BC;
 	display: table;
 	width: 100%;
-	overflow: hidden;
 }
 
 .widget_container li{
@@ -101,11 +100,14 @@ div.ui-droppable.droppable-hover:before {
 div.ui-droppable.droppable-hover:after {
 	content: "";
 	position: absolute;
-	width: 150%;
+	width: 102%;
 	height: 2px;
 	background: #F00;
 	left: 0;
 	bottom: -2px;
+}
+div.ui-droppable.droppable-hover:after {
+	width: 100%;
 }
 
 .add_widget{

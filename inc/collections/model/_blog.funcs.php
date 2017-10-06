@@ -1910,6 +1910,106 @@ function blogs_all_results_block( $params = array() )
 
 
 /**
+ * Display all blogs results table
+ *
+ * @param array Params
+ */
+function blogs_model_results_block( $params = array() )
+{
+	global $admin_url, $current_User;
+
+	$is_coll_admin = $current_User->check_perm( 'blog_admin', 'editAll', false );
+
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'results_param_prefix' => 'template_',
+			'results_title'        => T_('Models you can use to start your own collections').get_manual_link( 'site-template-list' ),
+			'results_no_text'      => T_('No model available'),
+		), $params );
+
+	if( !is_logged_in() )
+	{ // Only logged in users can access this function
+		return;
+	}
+
+	global $current_User;
+
+	if( is_ajax_content() )
+	{
+		$order_action = param( 'order_action', 'string' );
+
+		if( $order_action == 'update' )
+		{ // Update an order to new value
+			$new_value = ( int ) param( 'new_value', 'string', 0 );
+			$order_data = param( 'order_data', 'string' );
+			$order_obj_ID = ( int ) str_replace( 'order-blog-', '', $order_data );
+			if( $order_obj_ID > 0 )
+			{ // Update blog order
+				$BlogCache = & get_BlogCache();
+				if( $updated_Blog = & $BlogCache->get_by_ID( $order_obj_ID, false ) )
+				{
+					if( $current_User->check_perm( 'blog_properties', 'edit', false, $updated_Blog->ID ) )
+					{ // Check permission to edit this Blog
+						$updated_Blog->set( 'order', $new_value );
+						$updated_Blog->dbupdate();
+						$BlogCache->clear();
+					}
+				}
+			}
+		}
+	}
+
+	$no_results = $params['results_no_text'];
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'DISTINCT blog_ID, T_blogs.*, user_login' );
+	$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
+	$SQL->FROM_add( 'INNER JOIN T_coll_settings ON blog_ID = cset_coll_ID' );
+	$SQL->WHERE( 'cset_name = "allow_duplicate" AND cset_value = 1' );
+
+	// Create result set:
+	$blogs_Results = new Results( $SQL->get(), $params['results_param_prefix'] );
+	$blogs_Results->Cache = & get_BlogCache();
+	$blogs_Results->title = $params['results_title'];
+	$blogs_Results->no_results_text = $no_results;
+
+	if( $current_User->check_perm( 'blogs', 'create' ) )
+	{
+		global $admin_url;
+		//$blogs_Results->global_icon( T_('New Collection').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new' ), T_('New Collection').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+	}
+
+	// Initialize Results object
+	blogs_results( $blogs_Results, array(
+		'display_fav' => false,
+		'display_url' => $is_coll_admin,
+		'display_locale' => $is_coll_admin,
+		'display_plist' => false,
+		'display_order' => $is_coll_admin,
+		'display_caching' => false,
+		'display_actions' => false,
+		'display_model_actions' => true
+	) );
+
+	if( is_ajax_content() )
+	{ // init results param by template name
+		if( !isset( $params[ 'skin_type' ] ) || ! isset( $params[ 'skin_name' ] ) )
+		{
+			debug_die( 'Invalid ajax results request!' );
+		}
+		$blogs_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
+	}
+
+	$blogs_Results->display( NULL, 'session' );
+
+	if( !is_ajax_content() )
+	{ // Create this hidden div to get a function name for AJAX request
+		echo '<div id="'.$params['results_param_prefix'].'ajax_callback" style="display:none">'.__FUNCTION__.'</div>';
+	}
+}
+
+
+/**
  * Initialize Results object for blogs list
  *
  * @param object Results
@@ -1931,6 +2031,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 			'display_order'    => true,
 			'display_caching'  => true,
 			'display_actions'  => true,
+			'display_model_actions' => false,
 			'grouped'          => false,
 		), $params );
 
@@ -2111,6 +2212,16 @@ function blogs_results( & $blogs_Results, $params = array() )
 					'td' => '%blog_row_group_actions( {row} )%',
 				);
 		}
+	}
+
+	if( $params['display_model_actions'] )
+	{
+		$blogs_Results->cols[] = array(
+				'th' => T_('Actions'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap left',
+				'td' => '%model_row_actions( {Obj} )%',
+			);
 	}
 }
 
@@ -2531,6 +2642,34 @@ function blog_row_group_actions( & $row )
 	if( $row->sec_ID != 1 && $row->blog_ID === NULL && $current_User->check_perm( 'section', 'edit', false, $row->sec_ID ) )
 	{	// If user can delete the section(only without collections):
 		$r .= action_icon( T_('Delete this section!'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete_section&amp;sec_ID='.$row->sec_ID.'&amp;'.url_crumb( 'section' ) );
+	}
+
+	return $r;
+}
+
+
+/**
+ * Get available actions for current model
+ *
+ * @param object Blog
+ * @return string Action links
+ */
+function model_row_actions( $Blog )
+{
+	global $current_User, $admin_url;
+	$r = '';
+
+	$r .= '<a href="'.$Blog->get( 'url' ).'" class="action_icon btn btn-info btn-xs" title="'.T_('View this collection').'">'.T_('View').'</a>';
+	$r .= '<a href="'.$admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$Blog->ID.'" class="action_icon btn btn-primary btn-xs" title="'.T_('Use this model').'">'.T_('Use this model').'</a>';
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+	{
+		$r .= action_icon( T_('Edit this collection...'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID );
+		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$Blog->ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
+	}
+
+	if( empty($r) )
+	{ // for IE
+		$r = '&nbsp;';
 	}
 
 	return $r;
