@@ -22,7 +22,7 @@ param( 'tab', 'string', 'site_settings', true );
 
 param_action( 'list' );
 
-if( strpos( $action, 'new' ) !== false )
+if( strpos( $action, 'new' ) !== false || $action == 'copy' )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
