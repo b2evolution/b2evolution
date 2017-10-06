@@ -13,6 +13,7 @@ margin:0 2em 0 0;
 	border: 1px solid #9DB0BC;
 	display: table;
 	width: 100%;
+	overflow: hidden;
 }
 
 .widget_container li{
@@ -80,11 +81,11 @@ color:#444;
 background:#ee8;
 }
 */
-.widget_container li.droppable-hover,
+.widget_container li.droppable-hover > span,
 #current_widgets div.ui-droppable.droppable-hover {
 	position: relative;
 }
-.widget_container li.droppable-hover:before,
+.widget_container li.droppable-hover > span:first-child::before,
 div.ui-droppable.droppable-hover:before {
 	content: "";
 	position: absolute;
@@ -96,11 +97,11 @@ div.ui-droppable.droppable-hover:before {
 	left: 0;
 	bottom: -7px;
 }
-.widget_container li.droppable-hover:after,
+.widget_container li.droppable-hover > span:after,
 div.ui-droppable.droppable-hover:after {
 	content: "";
 	position: absolute;
-	width: 100%;
+	width: 150%;
 	height: 2px;
 	background: #F00;
 	left: 0;
