@@ -16,6 +16,24 @@ global $baseurl, $Settings;
 <nav class="sitewide_header">
 
 <?php
+	widget_container( 'site_header', array(
+			// The following params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => true, // Display container anyway even if no widget
+			'container_start'     => '<div class="evo_container $wico_class$">',
+			'container_end'       => '</div>',
+			'block_start'         => '<span class="evo_widget $wi_class$">',
+			'block_end'           => '</span>',
+			'block_display_title' => false,
+			'list_start'          => '',
+			'list_end'            => '',
+			'item_start'          => '',
+			'item_end'            => '',
+			'item_selected_start' => '',
+			'item_selected_end'   => '',
+			'link_selected_class' => 'swhead_item swhead_item_selected',
+			'link_default_class'  => 'swhead_item',
+		) );
+/*
 $notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
 if( $notification_logo_file_ID > 0 &&
     ( $FileCache = & get_FileCache() ) &&
@@ -35,6 +53,7 @@ else
 <a href="<?php echo $baseurl; ?>" class="swhead_sitename<?php echo $site_title_class; ?>"><?php echo $site_name_text; ?></a>
 
 <?php
+
 	// --------------------------------- START OF COLLECTION LIST --------------------------------
 	// Call widget directly (without container):
 	skin_widget( array(
@@ -177,8 +196,8 @@ else
 			) ) );
 		}
 	?>
+	</div>*/ ?>
 	<label for="nav-trigger"></label>
-	</div>
 	<div class="clear"></div>
 </nav>
 

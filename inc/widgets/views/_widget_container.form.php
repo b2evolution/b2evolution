@@ -27,13 +27,48 @@ $Form = new Form( NULL, 'form' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New container') : T_('Container') );
+if( $edited_WidgetContainer->get( 'coll_ID' ) > 0 )
+{	// Collection/skin container:
+	if( $edited_WidgetContainer->get( 'main' ) )
+	{	// Main container:
+		$form_title = T_('Skin container');
+	}
+	else
+	{	// Sub container:
+		$form_title = $creating ? T_('New sub-container') : T_('Sub-container');
+	}
+}
+else
+{	// Shared container:
+	if( $edited_WidgetContainer->get( 'main' ) )
+	{	// Shared Main container:
+		$form_title = $creating ? T_('New shared container') : T_('Shared container');
+	}
+	else
+	{	// Shared sub-container:
+		$form_title = $creating ? T_('New shared sub-container') : T_('Shared sub-container');
+	}
+}
+$Form->begin_form( 'fform', $form_title );
 
 $Form->add_crumb( 'widget_container' );
 $Form->hidden( 'action', $creating ? 'create_container' : 'update_container' );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
+$Form->hidden( 'wico_coll_ID', intval( $edited_WidgetContainer->get( 'coll_ID' ) ) );
 
 $Form->begin_fieldset( T_('Properties') );
+
+	if( $edited_WidgetContainer->get( 'coll_ID' ) == 0 )
+	{	// Suggect to select container type only for shared containers:
+		$Form->radio( 'wico_container_type',
+				$edited_WidgetContainer->get( 'main' ) ? 'main' : 'sub',
+				array(
+						array( 'main', T_('Shared main container') ),
+						array( 'sub',  T_('Shared sub-container') ),
+					),
+				T_( 'Container type' ), true, '', true
+			);
+	}
 
 	$Form->text_input( 'wico_name', $edited_WidgetContainer->get( 'name' ), 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );
 

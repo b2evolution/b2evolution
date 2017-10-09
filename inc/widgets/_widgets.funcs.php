@@ -712,16 +712,17 @@ function & get_widget_container( $coll_ID, $container_fieldset_id )
  */
 function insert_shared_widgets()
 {
-	global $DB, $basic_widgets_insert_sql_rows;
+	global $Settings, $DB, $basic_widgets_insert_sql_rows;
 
 	// Initialize this array first time and clear after previous call of this function:
 	$basic_widgets_insert_sql_rows = array();
 
 	// Declare default shared widget containers:
 	$shared_containers = array(
-			'site_header'     => array( NT_('Site Header'), 1 ),
-			'site_footer'     => array( NT_('Site Footer'), 1 ),
-			'main_navigation' => array( NT_('Main Navigation'), 0 ),
+			'site_header'      => array( NT_('Site Header'), 1 ),
+			'site_footer'      => array( NT_('Site Footer'), 1 ),
+			'main_navigation'  => array( NT_('Main Navigation'), 0 ),
+			'right_navigation' => array( NT_('Right Navigation'), 0 ),
 		);
 
 	$order = 1;
@@ -749,10 +750,20 @@ function insert_shared_widgets()
 	if( isset( $shared_containers['site_header'] ) )
 	{
 		$wico_id = $shared_containers['site_header'];
-		add_basic_widget( $wico_id, 'image', 'core', 1 );
-		add_basic_widget( $wico_id, 'subcontainer', 'core', 2, array(
+		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 10, array(
+				'link_type' => 'home',
+				'link_text' => T_('This site'),
+				'blog_ID'   => $Settings->get( 'default_blog_ID' ),
+			) );
+		add_basic_widget( $wico_id, 'image', 'core', 20, NULL, 0 );
+		add_basic_widget( $wico_id, 'subcontainer', 'core', 30, array(
 				'title'     => T_('Main Navigation'),
 				'container' => 'main_navigation',
+			) );
+		add_basic_widget( $wico_id, 'subcontainer', 'core', 40, array(
+				'title'            => T_('Right Navigation'),
+				'container'        => 'right_navigation',
+				'widget_css_class' => 'floatright',
 			) );
 	}
 
@@ -760,7 +771,7 @@ function insert_shared_widgets()
 	if( isset( $shared_containers['site_footer'] ) )
 	{
 		$wico_id = $shared_containers['site_footer'];
-		add_basic_widget( $wico_id, 'free_text', 'core', 1, array(
+		add_basic_widget( $wico_id, 'free_text', 'core', 10, array(
 				'content' => '',
 			) );
 	}
@@ -769,10 +780,31 @@ function insert_shared_widgets()
 	if( isset( $shared_containers['main_navigation'] ) )
 	{
 		$wico_id = $shared_containers['main_navigation'];
-		add_basic_widget( $wico_id, 'colls_list_public', 'core', 1 );
-		add_basic_widget( $wico_id, 'coll_page_list', 'core', 2 );
-		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 3, array(
+		add_basic_widget( $wico_id, 'colls_list_public', 'core', 10 );
+		add_basic_widget( $wico_id, 'coll_page_list', 'core', 20 );
+		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 30, array(
 				'link_type' => 'ownercontact',
+			) );
+	}
+
+	/* Right Navigation */
+	if( isset( $shared_containers['right_navigation'] ) )
+	{
+		$wico_id = $shared_containers['right_navigation'];
+		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 10, array(
+				'link_type'        => 'login', 
+				'widget_css_class' => 'swhead_item_login',
+			) );
+		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 20, array(
+				'link_type' => 'register',
+				'widget_css_class' => 'swhead_item_white',
+			) );
+		add_basic_widget( $wico_id, 'profile_menu_link', 'core', 30, array(
+				'profile_picture_size' => 'crop-top-32x32',
+			) );
+		add_basic_widget( $wico_id, 'msg_menu_link', 'core', 40 );
+		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 50, array(
+				'link_type' => 'logout',
 			) );
 	}
 

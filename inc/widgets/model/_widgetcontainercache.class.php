@@ -70,7 +70,7 @@ class WidgetContainerCache extends DataObjectCache
 	function add( $WidgetContainer )
 	{
 		$container_code = $WidgetContainer->get( 'code' );
-		if( isset( $WidgetContainer->coll_ID ) && ( !empty( $container_code ) ) )
+		if( ( !empty( $container_code ) ) )
 		{ // This container is not shared and it is a main container ( has code )
 			if( ! isset( $this->cache_by_coll_and_code[$WidgetContainer->coll_ID] ) )
 			{
@@ -107,10 +107,10 @@ class WidgetContainerCache extends DataObjectCache
 			return;
 		}
 
-		$SQL = new SQL( 'Load all widget containers for collection #'.$coll_ID.' into cache' );
+		$SQL = new SQL( 'Load all widget containers for collection #'.$coll_ID.' and shared into cache' );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_widget__container' );
-		$SQL->WHERE( 'wico_coll_ID = '.$DB->quote( $coll_ID ) );
+		$SQL->WHERE( '( wico_coll_ID = '.$DB->quote( $coll_ID ).' OR wico_coll_ID IS NULL )' );
 		$SQL->WHERE_and( 'wico_code IS NOT NULL' );
 		$SQL->ORDER_BY( 'wico_order' );
 
@@ -131,7 +131,8 @@ class WidgetContainerCache extends DataObjectCache
 	{
 		$this->load_by_coll_ID( $coll_ID );
 
-		if( empty( $this->cache_by_coll_and_code[ $coll_ID ][ $wico_code ] ) )
+		if( empty( $this->cache_by_coll_and_code[ $coll_ID ][ $wico_code ] ) && // collection/skin container
+		    empty( $this->cache_by_coll_and_code[ '' ][ $wico_code ] ) ) // shared container
 		{
 			if( $halt_on_error )
 			{
@@ -141,7 +142,14 @@ class WidgetContainerCache extends DataObjectCache
 			return $r;
 		}
 
-		return $this->cache_by_coll_and_code[ $coll_ID ][ $wico_code ];
+		if( isset( $this->cache_by_coll_and_code[ $coll_ID ][ $wico_code ] ) )
+		{	// Collection/skin container:
+			return $this->cache_by_coll_and_code[ $coll_ID ][ $wico_code ];
+		}
+		else
+		{	// Shared container:
+			return $this->cache_by_coll_and_code[''][ $wico_code ];
+		}
 	}
 
 
@@ -177,7 +185,8 @@ class WidgetContainerCache extends DataObjectCache
 	{
 		$this->load_by_coll_ID( $coll_ID );
 
-		if( empty( $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ][ $code ] ) )
+		if( empty( $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ][ $code ] ) && // collection/skin container
+		    empty( $this->cache_by_coll_skintype_code[''][ $skin_type ][ $code ] ) ) // shared container
 		{
 			if( $halt_on_error )
 			{
@@ -187,7 +196,14 @@ class WidgetContainerCache extends DataObjectCache
 			return $r;
 		}
 
-		return $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ][ $code ];
+		if( isset( $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ][ $code ] ) )
+		{	// Collection/skin container:
+			return $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ][ $code ];
+		}
+		else
+		{	// Shared container:
+			return $this->cache_by_coll_skintype_code[''][ $skin_type ][ $code ];
+		}
 	}
 }
 ?>

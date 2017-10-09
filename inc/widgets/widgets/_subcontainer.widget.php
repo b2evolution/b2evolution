@@ -83,12 +83,18 @@ class subcontainer_Widget extends ComponentWidget
 	{
 		global $DB, $Blog;
 
-		$WidgetContainerCache = & get_WidgetContainerCache();
 		$container_options = array(
-				T_('Sub-containers')  => array(),
-				T_('Main containers') => array(),
+				T_('Sub-containers')        => array(),
+				T_('Main containers')       => array(),
+				T_('Shared containers')     => array(),
+				T_('Shared sub-containers') => array(),
 			);
-		foreach( $WidgetContainerCache->get_by_coll_ID( $Blog->ID ) as $WidgetContainer )
+
+		$WidgetContainerCache = & get_WidgetContainerCache();
+
+		// Collection skin containers:
+		$coll_containers = $WidgetContainerCache->get_by_coll_ID( $Blog->ID );
+		foreach( $coll_containers as $WidgetContainer )
 		{
 			$widget_group = $WidgetContainer->get( 'main' ) ? T_('Main containers') : T_('Sub-containers');
 			$container_options[ $widget_group ][ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
@@ -96,6 +102,22 @@ class subcontainer_Widget extends ComponentWidget
 		if( empty( $container_options[ T_('Sub-containers') ] ) )
 		{
 			unset( $container_options[ T_('Sub-containers') ] );
+		}
+
+		// Shared container:
+		$shared_containers = $WidgetContainerCache->get_by_coll_ID( '' );
+		foreach( $shared_containers as $WidgetContainer )
+		{
+			$widget_group = $WidgetContainer->get( 'main' ) ? T_('Shared containers') : T_('Shared sub-containers');
+			$container_options[ $widget_group ][ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
+		}
+		if( empty( $container_options[ T_('Shared containers') ] ) )
+		{
+			unset( $container_options[ T_('Shared containers') ] );
+		}
+		if( empty( $container_options[ T_('Shared sub-containers') ] ) )
+		{
+			unset( $container_options[ T_('Shared sub-containers') ] );
 		}
 
 		$r = array_merge( array(
@@ -143,7 +165,7 @@ class subcontainer_Widget extends ComponentWidget
 		elseif( in_array( $subcontainer_code, $displayed_subcontainers ) )
 		{	// Do not try do display the same subcontainer which were already displayed to avoid infinite display:
 			$WidgetContainerCache = & get_WidgetContainerCache();
-			if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $subcontainer_code ) )
+			if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $this->get_coll_ID(), $subcontainer_code ) )
 			{
 				$subcontainer_name = $WidgetContainer->get( 'name' );
 			}
@@ -170,7 +192,7 @@ class subcontainer_Widget extends ComponentWidget
 
 		// Get enabled widgets of the container:
 		$EnabledWidgetCache = & get_EnabledWidgetCache();
-		$container_widgets = & $EnabledWidgetCache->get_by_coll_container( $Blog->ID, $subcontainer_code, true );
+		$container_widgets = & $EnabledWidgetCache->get_by_coll_container( $this->get_coll_ID(), $subcontainer_code, true );
 
 		if( ! empty( $container_widgets ) )
 		{

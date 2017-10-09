@@ -84,13 +84,12 @@ class WidgetContainer extends DataObject
 		$DB->begin();
 
 		if( ( !isset( $this->order ) ) || ( $this->order <= 0 ) )
-		{ // Set the order of the container only if it was not defined explicitly
-			$order_max = $DB->get_var(
-				'SELECT MAX(wico_order)
-					 FROM T_widget__container
-					WHERE wico_coll_ID = '.$this->coll_ID, 0, 0, 'Get current max order' );
-
-			$this->set( 'order', $order_max + 1 );
+		{	// Set the order of the container only if it was not defined explicitly
+			$SQL = new SQL( 'Get max order of '.( $this->get( 'coll_ID' ) == 0 ? 'shared containers' : 'containers in collection #'.$this->get( 'coll_ID' ) ) );
+			$SQL->SELECT( 'MAX( wico_order )' );
+			$SQL->FROM( 'T_widget__container' );
+			$SQL->WHERE( 'wico_coll_ID '.( $this->get( 'coll_ID' ) == 0 ? 'IS NULL' : '= '.$this->get( 'coll_ID' ) ) );
+			$this->set( 'order', $DB->get_var( $SQL ) + 1 );
 		}
 
 		$res = parent::dbinsert();
@@ -108,10 +107,20 @@ class WidgetContainer extends DataObject
 	 */
 	function load_from_Request()
 	{
+		$wico_coll_ID = param( 'wico_coll_ID', 'integer', NULL );
+		$this->set( 'coll_ID', ( empty( $wico_coll_ID ) ? NULL : $wico_coll_ID ), true );
+
+		if( $this->get( 'coll_ID' ) == 0 )
+		{	// If shared container:
+			$this->set( 'main', param( 'wico_container_type', 'string' ) == 'sub' ? '0' : '1' );
+		}
+
 		param( 'wico_name', 'string', true );
+		param_check_not_empty( 'wico_name', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Name') ) );
 		$this->set_from_Request( 'name' );
 
 		param( 'wico_code', 'string', true );
+		param_check_not_empty( 'wico_code', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Code') ) );
 		$this->set_from_Request( 'code' );
 
 		param( 'wico_skin_type', 'string', '' );

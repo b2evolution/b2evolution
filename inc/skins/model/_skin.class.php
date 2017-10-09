@@ -306,6 +306,15 @@ class Skin extends DataObject
 				'container_end'   => '',
 			), $params );
 
+		if( ! empty( $params['WidgetContainer'] ) && $params['WidgetContainer']->get( 'coll_ID' ) == 0 )
+		{	// Shared container:
+			$widgets_coll_ID = '';
+		}
+		else
+		{	// Collection/skin container:
+			$widgets_coll_ID = $Blog->ID;
+		}
+
 		if( $container_code === NULL )
 		{	// Try to detect container in DB by name:
 			global $DB;
@@ -379,7 +388,7 @@ class Skin extends DataObject
 		 * @var EnabledWidgetCache
 		 */
 		$EnabledWidgetCache = & get_EnabledWidgetCache();
-		$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $Blog->ID,
+		$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $widgets_coll_ID,
 			( $container_code === NULL ? $sco_name : $container_code ),// Use container code if it is defined, otherwise use container name
 			( $container_code !== NULL ) );// Get by container code if it is defined
 

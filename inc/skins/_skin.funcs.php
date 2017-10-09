@@ -2531,6 +2531,9 @@ function widget_container( $container_code, $params = array() )
 		return;
 	}
 
+	// Pass WidgetContainer object:
+	$params['WidgetContainer'] = $WidgetContainer;
+
 	$Skin->container( $WidgetContainer->get( 'name' ), $params, $container_code );
 }
 

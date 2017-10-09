@@ -192,13 +192,18 @@ switch( $action )
 
 	case 'new_container':
 		// Initialize widget container for creating form:
+		param( 'container_type', 'string' );
 		$edited_WidgetContainer = new WidgetContainer();
-		$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
+		if( $container_type != 'shared' )
+		{	//
+			$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
+		}
 		$edited_WidgetContainer->set( 'skin_type', $skin_type );
 		break;
 
 	case 'edit_container':
 		// Initialize widget container for editing form:
+		$WidgetContainerCache = & get_WidgetContainerCache();
 		$edited_WidgetContainer = $WidgetContainerCache->get_by_ID( $wico_ID );
 		break;
 
@@ -544,7 +549,7 @@ switch( $action )
 		$SQL = new SQL( 'Get IDs of all widget containers of colleciton #'.$Blog->ID );
 		$SQL->SELECT( 'wico_ID' );
 		$SQL->FROM( 'T_widget__container' );
-		$SQL->WHERE( 'wico_coll_ID = '.$Blog->ID );
+		$SQL->WHERE( '( wico_coll_ID = '.$Blog->ID.' OR wico_coll_ID IS NULL )' );
 		$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $skin_type ) );
 		$blog_container_IDs = $DB->get_col( $SQL );
 
@@ -618,12 +623,12 @@ switch( $action )
 
 		if( $wico_ID > 0 )
 		{	// Get the existing widget container:
+			$WidgetContainerCache = & get_WidgetContainerCache();
 			$edited_WidgetContainer = & $WidgetContainerCache->get_by_ID( $wico_ID );
 		}
 		else
 		{	// Get new widget container:
 			$edited_WidgetContainer = new WidgetContainer();
-			$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
 		}
 		if( $edited_WidgetContainer->load_from_Request() )
 		{
