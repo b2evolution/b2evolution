@@ -260,12 +260,9 @@ switch( $action )
 			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
 			// At some point we may want to remove skin settings from all blogs
-			$DB->query( 'UPDATE T_blogs
-					SET
-							blog_normal_skin_ID = CASE blog_normal_skin_ID WHEN '.$skin_ID.' THEN NULL ELSE blog_normal_skin_ID,
-							blog_mobile_skin_ID = CASE blog_mobile_skin_ID WHEN '.$skin_ID.' THEN NULL ELSE blog_mobile_skin_ID,
-							blog_tablet_skin_ID = CASE blog_tablet_skin_ID WHEN '.$skin_ID.' THEN NULL ELSE blog_tablet_skin_ID
-				 WHERE blog_normal_skin_ID = '.$skin_ID.' OR blog_mobile_skin_ID = '.$skin_ID.' OR blog_table_skin_ID = '.$skin_ID );
+			$DB->query( 'DELETE FROM T_coll_settings
+				WHERE cset_coll_ID = '.$DB->quote( $blog ).'
+				  AND cset_name REGEXP "^skin'.$skin_ID.'_"' );
 
 			$redirect_to = $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$blog.'&skin_type='.$skin_type.( empty( $mode ) ? '' : '&mode='.$mode );
 		}
