@@ -738,6 +738,11 @@ class Skin extends DataObject
 		 */
 		global $Collection, $Blog;
 
+		if( ! empty( $group ) )
+		{ // $parname is prefixed with $group, we'll remove the group prefix
+			$parname = substr( $parname, strlen( $group ) );
+		}
+
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'skin'.$this->ID.'_'.$group.$parname;
 
@@ -748,7 +753,7 @@ class Skin extends DataObject
 			return $value;
 		}
 
-		return $this->get_setting_default_value( $parname, $group );
+		return $this->get_setting_default_value( $group.$parname, $group );
 	}
 
 
@@ -761,6 +766,11 @@ class Skin extends DataObject
 	 */
 	function get_setting_default_value( $parname, $group = NULL )
 	{
+		if( ! empty ( $group ) )
+		{
+			$parname = substr( $parname, strlen( $group ) );
+		}
+
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
 		if( isset( $params[ $parname ]['defaultvalue'] ) )
