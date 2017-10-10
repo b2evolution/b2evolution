@@ -104,6 +104,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		</div>
 		<div class="evo_customizer__right">
 			<iframe id="evo_customizer__frontoffice" src="<?php echo url_add_param( $customizing_url, 'customizer_mode=enable&amp;show_toolbar=hidden&amp;redir=no' ); ?>" data-coll-url="<?php echo format_to_output( $Blog->get( 'url' ), 'htmlattr' ); ?>"></iframe>
+			<div id="evo_customizer__frontoffice_loader"></div>
 		</div>
 		<iframe id="evo_customizer__updater" name="evo_customizer__updater" style="display:none"></iframe>
 		<div id="evo_customizer__vtoggler" class="evo_customizer__vtoggler"></div>

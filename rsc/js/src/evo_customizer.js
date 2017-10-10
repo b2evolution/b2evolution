@@ -4,6 +4,19 @@
 
 jQuery( document ).on( 'ready', function()
 {
+	function evo_customizer_reload_frontoffice( additional_url_params )
+	{	// Reload iframe with front-office content:
+		jQuery( '#evo_customizer__frontoffice_loader' ).show();
+		if( typeof( additional_url_params ) == 'undefined' )
+		{	// Reload with current url:
+			jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.reload();
+		}
+		else
+		{	// Reload with additional params:
+			jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.href += additional_url_params;
+		}
+	}
+
 	jQuery( '#evo_customizer__backoffice' ).on( 'load', function()
 	{	// If iframe with settings has been loaded
 		var backoffice_content = jQuery( this ).contents();
@@ -15,7 +28,7 @@ jQuery( document ).on( 'ready', function()
 
 		if( backoffice_content.find( '.alert.alert-success' ).length )
 		{	// Reload front-office iframe with collection preview if the back-office iframe has a message about success updating:
-			jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.reload();
+			evo_customizer_reload_frontoffice();
 		}
 
 		// Remove the message of successful action:
@@ -36,7 +49,7 @@ jQuery( document ).on( 'ready', function()
 			var designer_mode = ( jQuery( this ).attr( 'href' ).indexOf( 'view=coll_widgets' ) > -1 ) ? 'enable' : 'disable';
 			if( designer_mode != jQuery( '#evo_customizer__frontoffice' ).data( 'designer-mode' ) )
 			{	// Reload front office iframe only when designer mode was changed:
-				jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.href += '&designer_mode=' + designer_mode;
+				evo_customizer_reload_frontoffice( '&designer_mode=' + designer_mode );
 				// Save current state of designer mode:
 				jQuery( '#evo_customizer__frontoffice' ).data( 'designer-mode', designer_mode );
 			}
@@ -45,12 +58,18 @@ jQuery( document ).on( 'ready', function()
 		backoffice_content.find( '#evo_customizer__collapser' ).click( function()
 		{	// Collapse customizer iframe:
 			jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
-			jQuery( '#evo_customizer__vtoggler' ).css( 'left', '0' );
 		} );
 
 		backoffice_content.find( '#evo_customizer__closer' ).click( function()
 		{	// Close customizer iframe:
 			window.parent.location.href = jQuery( '.evo_customizer__toggler', window.parent.document ).attr( 'href' );
+		} );
+
+		backoffice_content.find( 'form' ).submit( function()
+		{	// Disable a submit button when form is starting to be submitted:
+			var button = jQuery( this ).find( 'input[type=submit]' );
+			button.prop( 'disabled', true );
+			button.after( '<div id="evo_customizer__form_loader"></div>' );
 		} );
 	} );
 
@@ -58,7 +77,7 @@ jQuery( document ).on( 'ready', function()
 	{	// If iframe with settings has been loaded
 		if( jQuery( this ).contents().find( '.alert.alert-success' ).length )
 		{	// Reload iframe with collection preview if the updater iframe has a message about success updating:
-			jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.reload();
+			evo_customizer_reload_frontoffice();
 		}
 
 		// If the updater iframe has the messages about error or warning updating:
@@ -116,6 +135,11 @@ jQuery( document ).on( 'ready', function()
 		{	// Grab evo toolbar from front-office iframe with actual data for current loaded page:
 			jQuery( '#evo_toolbar' ).html( evo_toolbar.html() );
 		}
+
+		// Revert all animation elements back to show that front-office iframe is refreshed completely:
+		jQuery( '#evo_customizer__frontoffice_loader' ).hide();
+		jQuery( '#evo_customizer__backoffice' ).contents().find( 'input[type=submit]' ).prop( 'disabled', false );
+		jQuery( '#evo_customizer__backoffice' ).contents().find( '#evo_customizer__form_loader' ).remove();
 	} );
 
 	jQuery( document ).on( 'click', '.evo_customizer__toggler.active', function()
@@ -123,7 +147,6 @@ jQuery( document ).on( 'ready', function()
 		if( jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' ) )
 		{
 			jQuery( '.evo_customizer__wrapper' ).removeClass( 'evo_customizer__collapsed' );
-			jQuery( '#evo_customizer__vtoggler' ).css( 'left', '317px' );
 			// Prevent open link URL, because we need only to expand currently:
 			return false;
 		}
@@ -147,7 +170,8 @@ jQuery( document ).on( 'ready', function()
 		if( jQuery( this ).hasClass( 'evo_customizer__vtoggler_resizing' ) )
 		{	// Only in resizing mode:
 			var is_collapsed = jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' );
-			if( e.pageX < 200 )
+			var toggler_x = jQuery( this ).data( 'startX' ) > 120 ? 240 : 80;
+			if( e.pageX < toggler_x )
 			{	// Collapse left customizer panel if cursor is moved to the left:
 				if( ! is_collapsed )
 				{	// And if it is not collapsed yet:
@@ -174,10 +198,7 @@ jQuery( document ).on( 'ready', function()
 		}
 		jQuery( this )
 			.removeClass( 'evo_customizer__vtoggler_resizing' ) // Remove class flag of resizing
-			.data( 'resized', false ) // Reset flag of resized
-			.css( {
-				left: jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' ) ? '0' : '320px', // Set correct vertical toggler position depending on collapse state
-			} );
+			.data( 'resized', false ); // Reset flag of resized
 		// Remove temp elements after end of resiging:
 		jQuery( '#evo_customizer__vtoggler_helper, #evo_customizer__vtoggler_helper2' ).remove();
 	} );
