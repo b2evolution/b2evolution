@@ -3854,7 +3854,7 @@ class Form extends Widget
 
 			$button_label = ( $counter === 0 ? /* TRANS: verb */ T_('Select') : get_icon( 'new' ).' '.T_('Add') );
 
-			$r .= '<button class="btn btn-sm btn-info file_select_item" data-title="'.$field_params['window_title'].'" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
+			$r .= '<button type="button" class="btn btn-sm btn-info file_select_item" data-title="'.$field_params['window_title'].'" onclick="return file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
 
 			$r .= '</div>';
 			$r .= $this->end_field();
@@ -3883,7 +3883,8 @@ class Form extends Widget
 							root = field_object.data( "root" );
 							path = field_object.data( "path" );
 
-							openModalWindow( \'<span class="loader_img loader_user_report absolute_center" title="'.T_('Loading...').'"></span>\',
+							var func_window = ( window.top == window.self ? window : window.parent );
+							func_window.openModalWindow( \'<span class="loader_img loader_user_report absolute_center" title="'.T_('Loading...').'"></span>\',
 								"90%", "80%", true, fsel_title, "", true );
 							jQuery.ajax(
 							{
@@ -3898,11 +3899,12 @@ class Form extends Widget
 									"fm_highlight": typeof( fm_highlight ) == "undefined" ? "" : fm_highlight,
 									"field_name": field_object.attr( "name" ),
 									"file_type": field_object.data( "fileType" ),
+									"iframe_name": ( window.frameElement == null ? "" : window.frameElement.id ),
 								},
 								success: function(result)
 								{
 									result = ajax_debug_clear( result );
-									openModalWindow( result, "90%", "80%", true, "'.$field_params['window_title'].'", "" );
+									func_window.openModalWindow( result, "90%", "80%", true, "'.$field_params['window_title'].'", "" );
 								}
 							} );
 							return false;
@@ -4005,7 +4007,8 @@ class Form extends Widget
 										// close modal if single item select
 										if( maxLength == 1 )
 										{
-											closeModalWindow();
+											var func_window = ( window.top == window.self ? window : window.parent );
+											func_window.closeModalWindow();
 										}
 									}
 							});

@@ -360,7 +360,7 @@ function file_select_item( $file_ID, $params = array() )
 	// Display a button to select another file:
 	$r .= action_icon( $params['edit_file_text'], 'edit',
 			'', ' '.T_('Select another'), NULL, $params['max_file_num'] > 1 ? NULL : 4,
-			array( 'onclick' => 'return window.parent.file_select_attachment_window( this, true );',
+			array( 'onclick' => 'return file_select_attachment_window( this, true );',
 			       'class' => 'btn btn-sm btn-info' ),
 			array( 'class' => 'edit_file_icon' ) );
 	// Display a button to remove current selected file:
