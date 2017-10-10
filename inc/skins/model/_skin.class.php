@@ -738,11 +738,6 @@ class Skin extends DataObject
 		 */
 		global $Collection, $Blog;
 
-		if( ! empty( $group ) )
-		{ // $parname is prefixed with $group, we'll remove the group prefix
-			$parname = substr( $parname, strlen( $group ) );
-		}
-
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'skin'.$this->ID.'_'.$group.$parname;
 
@@ -1960,33 +1955,33 @@ var downloadInterval = setInterval( function()
 	 *
 	 * Uses: $this->font_definitions
 	 */
-	function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL, $font_weight_param = NULL )
+	function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL, $font_weight_param = NULL, $group = NULL )
 	{
 		$font_css = array();
 
 		// Get default font family and font-weight
-		$default_font_family = $this->get_setting_default_value( $font_family_param );
-		$default_font_weight = $this->get_setting_default_value( $font_weight_param );
+		$default_font_family = $this->get_setting_default_value( $font_family_param, $group );
+		$default_font_weight = $this->get_setting_default_value( $font_weight_param, $group );
 
 		// Select the font family CSS string
-		$selected_font_family = $this->get_setting( $font_family_param );
+		$selected_font_family = $this->get_setting( $font_family_param, $group );
 		if( $selected_font_family != $default_font_family )
 		{
-			$selected_font_css = $this->font_definitions[$selected_font_family][1];
+			$selected_font_css = isset( $this->font_definitions[$selected_font_family] ) ? $this->font_definitions[$selected_font_family] : $this->font_definitions[$default_font_family];
 			$font_css[] = "font-family: $selected_font_css;";
 		}
 
 		// If $text_size_param is passed, add font-size property
 		if( ! is_null( $text_size_param ) )
 		{
-			$selected_text_size = $this->get_setting( $text_size_param );
+			$selected_text_size = $this->get_setting( $text_size_param, $group );
 			$font_css[] = 'font-size: '.$selected_text_size.';';
 		}
 
 		// If $font_weight_param is passed, add font-weight property
 		if( ! is_null( $font_weight_param ) )
 		{
-			$selected_font_weight = $this->get_setting( $font_weight_param );
+			$selected_font_weight = $this->get_setting( $font_weight_param, $group );
 			if( $selected_font_weight != $default_font_weight )
 			{
 				$font_css[] = 'font-weight: '.$selected_font_weight.';';
