@@ -103,6 +103,9 @@ body.pictured div#debug_info.debug {
 body.pictured.dev_designer_mode {
   height: auto;
 }
+body.pictured.dev_designer_mode .secondary_area {
+  position: initial;
+}
 .evo_pictured_layout {
   display: table;
   height: 100%;
