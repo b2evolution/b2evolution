@@ -1687,6 +1687,12 @@ table.diff td.diff-title-addedline {
   margin: 0 0 10px 31px;
   padding-top: 10px;
 }
+#customizer_wrapper #fieldset_wrapper_widget_info .control-label {
+  display: none;
+}
+#customizer_wrapper .controls .help-inline {
+  display: block;
+}
 .evo_customizer__tabs {
   position: fixed;
   top: 0;
