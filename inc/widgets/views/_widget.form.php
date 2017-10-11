@@ -46,21 +46,51 @@ $Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
 	$Form->hiddens_by_key( get_memorized( 'action' ) );
 
 // Display properties:
-$Form->begin_fieldset( T_('Properties') );
+$Form->begin_fieldset( T_('Widget info') );
 	$Form->info( T_('Widget type'), $edited_ComponentWidget->get_name() );
 	$Form->info( T_('Description'), $edited_ComponentWidget->get_desc() );
 $Form->end_fieldset();
 
 
 // Display (editable) parameters:
-$Form->begin_fieldset( T_('Params') );
 
-	//$params = $edited_ComponentWidget->get_params();
+	$opened_fieldsets = 0;
+	$default_fieldset_is_opened = false;
 
 	// Loop through all widget params:
 	$tmp_params = array( 'for_editing' => true );
 	foreach( $edited_ComponentWidget->get_param_definitions( $tmp_params ) as $l_name => $l_meta )
 	{
+		if( isset( $l_meta['layout'] ) && $l_meta['layout'] == 'begin_fieldset' )
+		{	// Flag to know fieldset is started by widget params config:
+			$opened_fieldsets++;
+			if( $default_fieldset_is_opened )
+			{	// End default fieldset before new start of config fieldset:
+				$fieldset_name = 'settings_layout_start';
+				$fieldset_meta = array(
+						'layout' => 'end_fieldset',
+					);
+				autoform_display_field( $fieldset_name, $fieldset_meta, $Form, 'Widget', $edited_ComponentWidget );
+				$opened_fieldsets--;
+				$default_fieldset_is_opened = false;
+			}
+		}
+		elseif( isset( $l_meta['layout'] ) && $l_meta['layout'] == 'end_fieldset' )
+		{	// Flag to know fieldset is ended by widget params config:
+			$opened_fieldsets--;
+		}
+		elseif( $opened_fieldsets == 0 )
+		{	// Start default fieldset if it is not defined in widget params config:
+			$fieldset_name = 'settings_layout_start';
+			$fieldset_meta = array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Settings'),
+				);
+			autoform_display_field( $fieldset_name, $fieldset_meta, $Form, 'Widget', $edited_ComponentWidget );
+			$opened_fieldsets++;
+			$default_fieldset_is_opened = true;
+		}
+
 		$l_value = NULL;
 		if( $l_name == 'allow_blockcache' )
 		{
@@ -77,11 +107,19 @@ $Form->begin_fieldset( T_('Params') );
 				$l_meta['disabled'] = 'disabled';
 			}
 		}
+
 		// Display field:
 		autoform_display_field( $l_name, $l_meta, $Form, 'Widget', $edited_ComponentWidget, NULL, $l_value );
 	}
 
-$Form->end_fieldset();
+	for( $o = 0; $o < $opened_fieldsets; $o++ )
+	{	// End all not closed fieldsets:
+		$fieldset_name = 'settings_layout_start';
+		$fieldset_meta = array(
+				'layout' => 'end_fieldset',
+			);
+		autoform_display_field( $fieldset_name, $fieldset_meta, $Form, 'Widget', $edited_ComponentWidget );
+	}
 
 
 // dh> TODO: allow the widget to display information, e.g. the coll_category_list

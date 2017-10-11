@@ -327,8 +327,18 @@ class ComponentWidget extends DataObject
 			}
 		}
 
+		if( ! isset( $r['widget_css_class'] ) ||
+		    ! isset( $r['widget_ID'] ) ||
+		    ! isset( $r['allow_blockcache'] ) )
+		{	// Start fieldset of advanced settings:
+			$r['advanced_layout_start'] = array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Advanced'),
+				);
+		}
+
 		if( ! isset( $r['widget_css_class'] ) )
-		{
+		{	// Widget CSS class:
 			$r['widget_css_class'] = array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
@@ -337,7 +347,7 @@ class ComponentWidget extends DataObject
 		}
 
 		if( ! isset( $r['widget_ID'] ) )
-		{
+		{	// Widget ID:
 			$r['widget_ID'] = array(
 					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
@@ -346,7 +356,7 @@ class ComponentWidget extends DataObject
 		}
 
 		if( ! isset( $r['allow_blockcache'] ) )
-		{
+		{	// Allow widget/block caching:
 			$widget_Blog = & $this->get_Blog();
 			$r['allow_blockcache'] = array(
 					'label' => T_( 'Allow caching' ),
@@ -355,6 +365,15 @@ class ComponentWidget extends DataObject
 							T_('Block caching is disabled for this collection.'),
 					'type' => 'checkbox',
 					'defaultvalue' => true,
+				);
+		}
+
+		if( ! isset( $r['widget_css_class'] ) ||
+		    ! isset( $r['widget_ID'] ) ||
+		    ! isset( $r['allow_blockcache'] ) )
+		{	// End fieldset of advanced settings:
+			$r['advanced_layout_end'] = array(
+					'layout' => 'end_fieldset',
 				);
 		}
 
