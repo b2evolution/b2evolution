@@ -767,7 +767,7 @@ function insert_shared_widgets()
 	{
 		$wico_id = $shared_containers['site_footer'];
 		add_basic_widget( $wico_id, 'free_text', 'core', 10, array(
-				'content' => '',
+				'content' => T_('Cookies are required to enable core site functionality.'),
 			) );
 	}
 

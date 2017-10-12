@@ -422,9 +422,6 @@ switch( $action )
 		param( 'social_media_image_file_ID', 'integer', NULL );
 		$Settings->set( 'social_media_image_file_ID', get_param( 'social_media_image_file_ID' ) );
 
-		// Site footer text
-		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );
-
 		// Enable site skins
 		$old_site_skins_enabled = $Settings->get( 'site_skins_enabled' );
 		$Settings->set( 'site_skins_enabled', param( 'site_skins_enabled', 'integer', 0 ) );

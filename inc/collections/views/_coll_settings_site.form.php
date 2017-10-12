@@ -61,7 +61,6 @@ $Form->begin_fieldset( T_('Global Site Settings').get_manual_link('global-site-s
 	$Form->fileselect( 'notification_logo_file_ID', $Settings->get( 'notification_logo_file_ID' ), T_('Site logo'), NULL, $site_logo_params );
 	$social_media_boilerplate_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select logo for social media boilerplate'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
 	$Form->fileselect( 'social_media_image_file_ID', $Settings->get( 'social_media_image_file_ID' ), T_('Social media boilerplate'), NULL, $social_media_boilerplate_params );
-	$Form->text_input( 'site_footer_text', $Settings->get( 'site_footer_text' ), 50, T_('Site footer text'), '', array( 'maxlength' => 5000 ) );
 	$Form->checkbox_input( 'site_skins_enabled', $Settings->get( 'site_skins_enabled' ), T_('Enable site skins'), array( 'note' => T_('Enables a sitewide header and footer') ) );
 	$Form->begin_line( T_('Terms & Conditions'), 'site_terms_enabled' );
 		$Form->checkbox_input( 'site_terms_enabled', $Settings->get( 'site_terms_enabled' ), '' );
