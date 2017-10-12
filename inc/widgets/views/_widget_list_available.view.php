@@ -147,6 +147,7 @@ $core_componentwidget_defs = array(
 			'online_users',
 		),
 	'other' => array(
+			'site_logo',
 			'subcontainer',
 			'subcontainer_row',
 			'inc_file',

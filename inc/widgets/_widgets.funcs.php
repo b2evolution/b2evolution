@@ -750,17 +750,12 @@ function insert_shared_widgets()
 	if( isset( $shared_containers['site_header'] ) )
 	{
 		$wico_id = $shared_containers['site_header'];
-		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 10, array(
-				'link_type' => 'home',
-				'link_text' => T_('This site'),
-				'blog_ID'   => $Settings->get( 'default_blog_ID' ),
-			) );
-		add_basic_widget( $wico_id, 'image', 'core', 20, NULL, 0 );
-		add_basic_widget( $wico_id, 'subcontainer', 'core', 30, array(
+		add_basic_widget( $wico_id, 'site_logo', 'core', 10 );
+		add_basic_widget( $wico_id, 'subcontainer', 'core', 20, array(
 				'title'     => T_('Main Navigation'),
 				'container' => 'main_navigation',
 			) );
-		add_basic_widget( $wico_id, 'subcontainer', 'core', 40, array(
+		add_basic_widget( $wico_id, 'subcontainer', 'core', 30, array(
 				'title'            => T_('Right Navigation'),
 				'container'        => 'right_navigation',
 				'widget_css_class' => 'floatright',

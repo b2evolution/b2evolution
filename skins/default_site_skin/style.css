@@ -171,28 +171,23 @@ input#nav-trigger {
 .evo_container__site_header .evo_widget {
 	display: inline-block;
 }
-.evo_container__site_header .widget_core_image img {
-	max-height: 42px;
-	max-width: 270px;
-}
 .evo_container__site_header .widget_core_msg_menu_link .badge {
 	margin-top: -3px;
 }
 
-.swhead_item,
-a.swhead_sitename {
+.swhead_item {
 	display: inline-block;
 	padding: 12px;
 	text-decoration: none;
 }
-a.swhead_sitename.swhead_logo {
+a.swhead_item.evo_widget__site_logo_image {
 	padding: 0;
-	float: left;
 }
-a.swhead_sitename.swhead_logo img {
-	max-height: 44px;
+a.swhead_item.evo_widget__site_logo_image img {
+	max-height: 42px;
+	max-width: 270px;
 }
-.sitewide_header a.swhead_sitename {
+.sitewide_header .widget_core_site_logo a.swhead_item {
 	color: #FFF;
 	font-weight: 400;
 }
@@ -257,7 +252,7 @@ a.swhead_sitename.swhead_logo img {
 	margin: auto;
 }
 
-.sitewide_header a.swhead_sitename:hover {
+.sitewide_header .evo_widget.widget_core_site_logo a.swhead_item:hover {
 	text-decoration: none;
 	text-shadow: 0px 0 3px #FFF;
 	color: #FFF;
