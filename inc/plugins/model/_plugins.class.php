@@ -1550,7 +1550,7 @@ class Plugins
 	 *
 	 * @param String setting name ( 'coll_apply_rendering', 'coll_apply_comment_rendering' )
 	 * @param Object the Blog which apply rendering setting should be loaded
-	 * @param string Setting type: 'coll', 'msg', 'email'
+	 * @param string Setting type: 'coll', 'msg', 'email', 'shared'
 	 */
 	function load_index_apply_rendering( $setting_name, & $Blog, $type = 'coll' )
 	{
@@ -1594,6 +1594,11 @@ class Plugins
 				case 'email':
 					// Get plugin email setting value:
 					$rendering_value = $Plugin->get_email_setting( $setting_name );
+					break;
+
+				case 'shared':
+					// Get plugin shared setting value:
+					$rendering_value = 'opt-in';
 					break;
 
 				default:
@@ -2015,14 +2020,26 @@ class Plugins
 			$setting_name = 'email_apply_rendering';
 			$setting_type = 'email';
 		}
-		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
-		{ // Validate the given rendering option in the give Blog
-			$Collection = $Blog = & $params['Blog'];
+		elseif( isset( $params['setting_name'] ) )
+		{	// Validate the given rendering option:
 			$setting_name = $params['setting_name'];
-			$setting_type = 'coll';
-			if( !in_array( $setting_name, array( 'coll_apply_rendering', 'coll_apply_comment_rendering' ) ) )
-			{
-				debug_die( 'Invalid apply rendering param name received!' );
+			if( isset( $params['Blog'] ) )
+			{	// If Collection is given:
+				$Collection = $Blog = & $params['Blog'];
+				$setting_type = 'coll';
+				if( $setting_name == 'shared_apply_rendering' )
+				{	// Force to posts/items rendering settings:
+					$setting_name = 'coll_apply_rendering';
+				}
+				if( !in_array( $setting_name, array( 'coll_apply_rendering', 'coll_apply_comment_rendering', 'shared_apply_rendering' ) ) )
+				{
+					debug_die( 'Invalid apply rendering param name received!' );
+				}
+			}
+			if( $setting_name == 'shared_apply_rendering' )
+			{	// Set shared type instead of collection for this spec setting name:
+				$Collection = $Blog = NULL;
+				$setting_type = 'shared';
 			}
 		}
 		else
@@ -2030,7 +2047,7 @@ class Plugins
 			return array();
 		}
 
-		$blog_ID = !is_null( $Blog ) ? $Blog->ID : 0;
+		$blog_ID = empty( $Blog ) ? 0 : $Blog->ID;
 
 		// Make sure the requested apply_rendering settings are loaded
 		$this->load_index_apply_rendering( $setting_name, $Blog, $setting_type );
@@ -2155,10 +2172,17 @@ class Plugins
 			$Item = & $params['Item'];
 			$setting_Blog = & $Item->get_Blog();
 		}
-		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
-		{ // get given "apply_rendering" collection setting from the given Blog
-			$setting_Blog = & $params['Blog'];
+		elseif( isset( $params['setting_name'] ) )
+		{	// Get given setting:
 			$setting_name = $params['setting_name'];
+			if( ! empty( $params['Blog'] ) )
+			{	// If Collection is given::
+				$setting_Blog = & $params['Blog'];
+				if( $setting_name == 'shared_apply_rendering' )
+				{	// Force to posts/items rendering settings:
+					$setting_name = 'coll_apply_rendering';
+				}
+			}
 		}
 		else
 		{ // Invalid params
@@ -2182,6 +2206,7 @@ class Plugins
 				$RendererPlugins = $this->get_list_by_events( array('FilterCommentContent') );
 				break;
 
+			case 'shared_apply_rendering':
 			case 'coll_apply_rendering':
 			default:
 				// Get Item renderer plugins
@@ -2196,7 +2221,7 @@ class Plugins
 			{ // No unique code!
 				continue;
 			}
-			if( empty( $setting_Blog ) && $setting_name != 'msg_apply_rendering' && $setting_name != 'email_apply_rendering' )
+			if( empty( $setting_Blog ) && $setting_name != 'msg_apply_rendering' && $setting_name != 'email_apply_rendering' && $setting_name != 'shared_apply_rendering' )
 			{ // If $setting_Blog is not set we can't get collection apply_rendering options
 				continue;
 			}
@@ -2208,6 +2233,10 @@ class Plugins
 			elseif( $setting_name == 'email_apply_rendering' )
 			{	// get rendering setting from plugin email settings:
 				$apply_rendering = $loop_RendererPlugin->get_email_setting( $setting_name );
+			}
+			elseif( $setting_name == 'shared_apply_rendering' )
+			{	// get rendering setting from plugin shared settings:
+				$apply_rendering = 'opt-in';
 			}
 			else
 			{ // get rendering setting from plugin coll settings

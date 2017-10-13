@@ -1041,7 +1041,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				$widget_Blog = & $Obj->get_Blog();
 				$l_value = $Plugins->validate_renderer_list( array_keys( $l_value ), array(
 						'Blog'         => & $widget_Blog,
-						'setting_name' => 'coll_apply_rendering',
+						'setting_name' => 'shared_apply_rendering',
 					) );
 				$l_value = array_fill_keys( $l_value, 1 );
 			}

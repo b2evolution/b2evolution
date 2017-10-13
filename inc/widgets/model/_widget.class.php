@@ -1418,7 +1418,7 @@ class ComponentWidget extends DataObject
 
 			$this->renderers_validated = $Plugins->validate_renderer_list( $widget_renderers, array(
 					'Blog'         => & $widget_Blog,
-					'setting_name' => 'coll_apply_rendering'
+					'setting_name' => 'shared_apply_rendering'
 				) );
 		}
 
@@ -1442,6 +1442,11 @@ class ComponentWidget extends DataObject
 		global $Plugins;
 
 		$widget_Blog = & $this->get_Blog();
+		if( empty( $widget_Blog ) )
+		{	// Use current collection if it is not defined, e.g. for shared widget containers:
+			global $Blog;
+			$widget_Blog = $Blog;
+		}
 		$widget_renderers = $this->get_renderers_validated();
 
 		// Do some optional filtering on the content
