@@ -3728,13 +3728,21 @@ class Form extends Widget
 	{
 		$field_params = array_merge( array(
 				'inline' => false,
+				'label_after_input' => false,
 			), $field_params );
 
 		$element = $this->get_input_element( $field_params );
 
+		if( $field_params['label_after_input'] ) {
+			$this->_common_params['element'] = $element;
+			$this->_common_params['label'] = sprintf( $this->_common_params['label'], "" );
+		}
+
 		if( $field_params['inline'] )
 		{ // Display label and input field in one line
-			$this->_common_params['label'] = sprintf( $this->_common_params['label'], $element );
+			if ( ! $field_params['label_after_input'] ) {
+				$this->_common_params['label'] = sprintf( $this->_common_params['label'], $element );
+			}
 
 			// Save the form elements:
 			$label_suffix = $this->label_suffix;
@@ -3765,7 +3773,7 @@ class Form extends Widget
 
 		$input_type = isset( $field_params['type'] ) ? $field_params['type'] : '';
 		$r = $this->begin_field( NULL, NULL, false, $input_type );
-		if( !$field_params['inline'] )
+		if( !$field_params['inline'] && !$field_params['label_after_input'])
 		{ // Append input field
 			$r .= $element;
 		}
@@ -4267,31 +4275,60 @@ class Form extends Widget
 
 		if( strlen($label) )
 		{
-			$r .= $this->labelstart;
+            if( isset($this->_common_params['label_after_input']) && $this->_common_params['label_after_input'] )
+            {
+                $r .= $this->_common_params['element'];
 
-			if( isset( $this->_common_params['clickable_label'] ) && ! $this->_common_params['clickable_label'] )
-			{	// Not set if this method is invoked by ::begin_field()
+                $r .= '<label'
+                    .( ! empty( $this->labelclass )
+                        ? ' class="'.format_to_output( $this->labelclass, 'htmlattr' ).'"'
+                        : '' )
+                    .( ! empty( $this->_common_params['id'] )
+                        ? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
+                        : '' )
+                    .'>';
 
-				if( ! empty( $this->_common_params['required'] ) )
+                if( ! empty( $this->_common_params['required'] ) )
+                {
+                    $r .= '<span class="label_field_required">*</span>';
+                }
+
+                $r .= format_to_output($label, 'htmlbody');
+
+                if( empty( $this->is_lined_fields ) )
+                { // Don't print a label tag and suffix for "lined" mode:
+                    $r .= $this->label_suffix;
+
+                    $r .= '</label>';
+                }
+            }
+            else
+            {
+				$r .= $this->labelstart;
+
+				if( isset( $this->_common_params['clickable_label'] ) && ! $this->_common_params['clickable_label'] )
+				{	// Not set if this method is invoked by ::begin_field()
+
+					if( ! empty( $this->_common_params['required'] ) )
+					{
+						$r .= '<span class="label_field_required">*</span>';
+					}
+
+					$r .= format_to_output($label, 'htmlbody').$this->label_suffix;
+				}
+				else
 				{
-					$r .= '<span class="label_field_required">*</span>';
-				}
-
-				$r .= format_to_output($label, 'htmlbody').$this->label_suffix;
-			}
-			else
-			{
-				if( empty( $this->is_lined_fields ) )
-				{ // Don't print a label tag for "lined" mode:
-					$r .= '<label'
-						.( ! empty( $this->labelclass )
-							? ' class="'.format_to_output( $this->labelclass, 'htmlattr' ).'"'
-							: '' )
-						.( ! empty( $this->_common_params['id'] )
-							? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
-							: '' )
-						.'>';
-				}
+					if( empty( $this->is_lined_fields ) )
+					{ // Don't print a label tag for "lined" mode:
+						$r .= '<label'
+							.( ! empty( $this->labelclass )
+								? ' class="'.format_to_output( $this->labelclass, 'htmlattr' ).'"'
+								: '' )
+							.( ! empty( $this->_common_params['id'] )
+								? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
+								: '' )
+							.'>';
+					}
 
 					if( ! empty( $this->_common_params['required'] ) )
 					{
@@ -4300,15 +4337,16 @@ class Form extends Widget
 
 					$r .= format_to_output($label, 'htmlbody');
 
-				if( empty( $this->is_lined_fields ) )
-				{ // Don't print a label tag and suffix for "lined" mode:
-					$r .= $this->label_suffix;
+					if( empty( $this->is_lined_fields ) )
+					{ // Don't print a label tag and suffix for "lined" mode:
+						$r .= $this->label_suffix;
 
-					$r .= '</label>';
+						$r .= '</label>';
+					}
 				}
-			}
 
-			$r .= $this->labelend;
+				$r .= $this->labelend;
+            }
 		}
 		else
 		{ // Empty label:
@@ -4489,6 +4527,12 @@ class Form extends Widget
 			$this->_common_params['hide_label'] = $field_params['hide_label'];
 			unset( $field_params['hide_label'] );
 		}
+
+        if( isset( $field_params['label_after_input'] ) && $field_params['label_after_input'] )
+        {
+            $this->_common_params['label_after_input'] = $field_params['label_after_input'];
+            unset( $field_params['label_after_input'] );
+        }
 
 		#pre_dump( 'handle_common_params (after)', $field_params );
 	}
