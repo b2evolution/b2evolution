@@ -776,7 +776,9 @@ function insert_shared_widgets()
 	{
 		$wico_id = $shared_containers['main_navigation'];
 		add_basic_widget( $wico_id, 'colls_list_public', 'core', 10 );
-		add_basic_widget( $wico_id, 'coll_page_list', 'core', 20 );
+		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 20, array(
+				'link_type' => 'aboutsite',
+			) );
 		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 30, array(
 				'link_type' => 'ownercontact',
 			) );

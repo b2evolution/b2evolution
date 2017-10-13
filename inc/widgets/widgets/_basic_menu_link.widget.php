@@ -52,6 +52,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			'sitemap' => T_('Site Map'),
 			'latestcomments' => T_('Latest comments'),
 
+			'aboutsite' => T_('About this site'),
+
 			'ownercontact' => T_('Blog owner contact form'),
 			'owneruserinfo' => T_('Blog owner profile'),
 
@@ -356,6 +358,40 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				$text = T_('Latest comments');
 				// Check if current menu item must be highlighted:
 				$highlight_current = ( $highlight_current && $disp == 'comments' );
+				break;
+
+			case 'aboutsite':
+				if( ! ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) )
+				{	// If info collection is not defined:
+					$this->display_debug_message();
+					return false;
+				}
+
+				// Try to get first "page" item/post of the info collection:
+				global $DB, $Item;
+				$ItemCache = & get_ItemCache();
+				$page_SQL = new SQL( 'Get ID of first "page" item from info collection #'.$info_Blog->ID );
+				$page_SQL->SELECT( 'post_ID' );
+				$page_SQL->FROM( 'T_items__item' );
+				$page_SQL->FROM_add( 'INNER JOIN T_postcats ON post_ID = postcat_post_ID' );
+				$page_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+				$page_SQL->FROM_add( 'INNER JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+				$page_SQL->WHERE( 'cat_blog_ID = '.$info_Blog->ID );
+				$page_SQL->WHERE_and( 'ityp_usage = "page"' );
+				$page_SQL->WHERE_and( statuses_where_clause( NULL, 'post_', $info_Blog->ID, 'blog_post!' ) );
+				$page_SQL->ORDER_BY( 'post_ID' );
+				$page_SQL->LIMIT( '1' );
+				$page_ID = $DB->get_var( $page_SQL );
+				if( ! ( $page_Item = & $ItemCache->get_by_ID( $page_ID, false, false ) ) )
+				{	// If info collection has no item/post with type usage "page":
+					$this->display_debug_message();
+					return false;
+				}
+
+				$url = $page_Item->get_permanent_url();
+				$text = T_('About this site');
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'page' && ! empty( $Item->ID ) && $Item->ID == $page_Item->ID );
 				break;
 
 			case 'owneruserinfo':
