@@ -69,6 +69,39 @@ $Form->begin_fieldset( T_('Properties') );
 				T_( 'Container type' ), true, '', true
 			);
 	}
+	else
+	{	// Selector for Page Container:
+		$page_type = param( 'wico_page_type', 'string', NULL );
+		if( $page_type === NULL )
+		{
+			$page_type = ( $edited_WidgetContainer->get( 'ityp_ID' ) > 0 ? 'type' : ( $edited_WidgetContainer->get( 'item_ID' ) > 0 ? 'item' : 'no' ) );
+		}
+		$Form->output = false;
+		$Form->switch_layout( 'none' );
+		$ItemTypeCache = & get_ItemTypeCache();
+		$ItemTypeCache->clear();
+		$ItemTypeCache->load_where( 'ityp_usage = "widget-page"' );
+		$item_types = array( '' => T_('None') );
+		foreach( $ItemTypeCache->cache as $ItemType )
+		{
+			$item_types[ $ItemType->ID ] = $ItemType->get_name();
+		}
+		$wico_ityp_ID_select_input = $Form->select_input_array( 'wico_ityp_ID', $edited_WidgetContainer->get( 'ityp_ID' ), $item_types, '', '', array( 'force_keys_as_values' => true ) );
+		$wico_item_ID_text_input = $Form->text( 'wico_item_ID', $edited_WidgetContainer->get( 'item_ID' ), 5, '' );
+		$Form->switch_layout( NULL );
+		$Form->output = true;
+		$Form->radio_input( 'wico_page_type', $page_type, array(
+				array(
+					'value' => 'no',
+					'label' => T_('No page container') ),
+				array(
+					'value' => 'type',
+					'label' => T_('For a new page of type').': '.$wico_ityp_ID_select_input ),
+				array(
+					'value' => 'item',
+					'label' => T_('For an existing page').': '.$wico_item_ID_text_input ),
+			), T_('Page container type'), array( 'lines' => true ) );
+	}
 
 	$Form->text_input( 'wico_name', $edited_WidgetContainer->get( 'name' ), 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );
 

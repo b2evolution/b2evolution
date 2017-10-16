@@ -278,6 +278,13 @@ function create_default_data()
 			'use_comments'   => 0,
 		);
 	$post_types[] = array(
+			'name'           => 'Widget Page',
+			'usage'          => 'widget-page',
+			'template_name'  => 'widget_page',
+			'perm_level'     => 'admin',
+			'use_comments'   => 0,
+		);
+	$post_types[] = array(
 			'name'           => 'Intro-Front',
 			'usage'          => 'intro-front',
 			'template_name'  => NULL,

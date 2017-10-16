@@ -94,15 +94,28 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	$blog_containers['front_page_column_b'] = array( 'Front Page Column B', 2, 0 );
 	$blog_containers['user_page_reputation'] = array( 'User Page - Reputation', 100, 0 );
 
+	// Additional page containers:
+	$blog_containers['widget_page_section_1'] = array( 'Widget Page Section 1', 10, 0, 9 );
+	$blog_containers['widget_page_section_2'] = array( 'Widget Page Section 2', 20, 0, 9 );
+	$blog_containers['widget_page_section_3'] = array( 'Widget Page Section 3', 30, 0, 9 );
+
 	// Create rows to insert for all collection containers:
 	$widget_containers_sql_rows = array();
 	foreach( $blog_containers as $wico_code => $wico_data )
 	{
-		$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$blog_id.', '.$wico_data[1].', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).' )';
+		$widget_containers_sql_rows[] = '( "'
+			/* Code          */.$wico_code.'", "'
+			/* Name          */.$wico_data[0].'", '
+			/* Collection ID */.$blog_id.', '
+			/* Order         */.$wico_data[1].', '
+			/* Main or Sub   */.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).', '
+			/* Item Type ID  */.( isset( $wico_data[3] ) ? intval( $wico_data[3] ) : 'NULL' ).', '
+			/* Item ID       */.( isset( $wico_data[4] ) ? intval( $wico_data[4] ) : 'NULL' )
+			.' )';
 	}
 
 	// Insert widget containers records by one SQL query
-	$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
+	$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main, wico_ityp_ID, wico_item_ID ) VALUES'
 		.implode( ', ', $widget_containers_sql_rows ) );
 
 	$insert_id = $DB->insert_id;

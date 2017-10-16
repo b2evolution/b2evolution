@@ -93,8 +93,9 @@ class ItemTypeCache extends DataObjectCache
 						'post' => /* TRANS: noun */ T_('Post')
 					),
 				T_('Out of content flow') => array(
-						'page'    => T_('Page'),
-						'special' => T_('Special'),
+						'page'          => T_('Content Page'),
+						'widget-page'   => T_('Widget Page'),
+						'special'       => T_('Special'),
 						'content-block' => T_('Content Block'),
 					),
 				T_('Intros') => array(

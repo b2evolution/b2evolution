@@ -30,6 +30,8 @@ class WidgetContainer extends DataObject
 	var $coll_ID;
 	var $order;
 	var $main;
+	var $item_ID;
+	var $ityp_ID;
 
 	/**
 	 * Constructor
@@ -49,7 +51,8 @@ class WidgetContainer extends DataObject
 			$this->name = $db_row->wico_name;
 			$this->coll_ID = $db_row->wico_coll_ID;
 			$this->order = $db_row->wico_order;
-			$this->main = $db_row->wico_main;
+			$this->item_ID = $db_row->wico_item_ID;
+			$this->ityp_ID = $db_row->wico_ityp_ID;
 		}
 	}
 
@@ -113,6 +116,29 @@ class WidgetContainer extends DataObject
 		if( $this->get( 'coll_ID' ) == 0 )
 		{	// If shared container:
 			$this->set( 'main', param( 'wico_container_type', 'string' ) == 'sub' ? '0' : '1' );
+		}
+
+		// Item ID/Item Type ID:
+		switch( param( 'wico_page_type', 'string', NULL ) )
+		{
+			case 'type':
+				param( 'wico_ityp_ID', 'integer', true );
+				param_check_not_empty( 'wico_ityp_ID', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('For a new page of type') ) );
+				$this->set_from_Request( 'ityp_ID' );
+				$this->set( 'item_ID', NULL, true );
+				break;
+
+			case 'item':
+				param( 'wico_item_ID', 'integer', true );
+				param_check_not_empty( 'wico_item_ID', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('For an existing page') ) );
+				$this->set_from_Request( 'item_ID' );
+				$this->set( 'ityp_ID', NULL, true );
+				break;
+
+			default:
+				$this->set( 'ityp_ID', NULL, true );
+				$this->set( 'item_ID', NULL, true );
+				break;
 		}
 
 		param( 'wico_name', 'string', true );

@@ -8838,6 +8838,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13120, 'Upgrading widget containers table...' ) )
+	{	// part of 7.0.0-alpha
+		db_add_col( 'T_widget__container', 'wico_item_ID', 'INT(11) UNSIGNED NULL DEFAULT NULL' );
+		db_add_col( 'T_widget__container', 'wico_ityp_ID', 'INT(11) UNSIGNED NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

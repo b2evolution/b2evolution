@@ -1773,6 +1773,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_module_form'           => '_module_form.disp.php',
 				'disp_msgform'               => '_msgform.disp.php',
 				'disp_page'                  => '_page.disp.php',
+				'disp_widget_page'           => '_widget_page.disp.php',
 				'disp_postidx'               => '_postidx.disp.php',
 				'disp_posts'                 => '_posts.disp.php',
 				'disp_profile'               => '_profile.disp.php',

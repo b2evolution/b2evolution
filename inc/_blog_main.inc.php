@@ -557,6 +557,10 @@ elseif( $disp == '-' && !empty($Item) )
 	{
 		$disp = 'page';
 	}
+	elseif( $Item->get_type_setting( 'usage' ) == 'widget-page' )
+	{
+		$disp = 'widget_page';
+	}
 	else
 	{
 		$disp = 'single';
@@ -619,8 +623,8 @@ elseif( $disp == '-' )
 	}
 
 }
-elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
-{ // 'page' and 'single' are not valid display params if $Item is not set
+elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) || ( $disp == 'widget_page' ) ) && empty( $Item ) )
+{ // 'page', 'single' and 'widget_page' are not valid display params if $Item is not set
 	// Note: The 'preview' action is the only one exception, but that is handled above in this if statement
 	$disp = '404';
 	$disp_detail = '404-post_not_found';
@@ -631,7 +635,6 @@ if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $use
 { // add or increment to user profile visit
 	add_user_profile_visit( $user_ID, $current_User->ID );
 }
-
 
 if( $disp == 'terms' )
 {	// Display a page of terms & conditions:
@@ -846,6 +849,7 @@ if( !empty( $skin ) )
 					'module_form'           => 'module_form.main.php',
 					'msgform'               => 'msgform.main.php',
 					'page'                  => 'page.main.php',
+					'widget_page'           => 'widget_page.main.php',
 					'postidx'               => 'postidx.main.php',
 					'posts'                 => 'posts.main.php',
 					'profile'               => 'profile.main.php',
@@ -870,7 +874,7 @@ if( !empty( $skin ) )
 				);
 
 			// Handle custom templates defined by the Item Type:
-			if( ! empty( $disp ) && ( $disp == 'single' || $disp == 'page' ) &&
+			if( ! empty( $disp ) && ( $disp == 'single' || $disp == 'page' || $disp == 'widget_page' ) &&
 			    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) && $ItemType->get( 'template_name' ) != '' )
 			{ // Get template name for the current Item if it is defined by its Item Type:
 				$disp_handler_custom = $ItemType->get( 'template_name' ).'.main.php';

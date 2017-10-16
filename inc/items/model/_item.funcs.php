@@ -1634,6 +1634,7 @@ function get_tab_by_item_type_usage( $type_usage )
 			$type_tab = array( 'post', NT_('Posts') );
 			break;
 		case 'page':
+		case 'widget-page':
 			$type_tab = array( 'page', NT_('Pages') );
 			break;
 		case 'special':
@@ -1670,7 +1671,7 @@ function get_item_type_usage_by_tab( $tab_name )
 	switch( $tab_name )
 	{
 		case 'page':
-			$type_usages = array( 'page' );
+			$type_usages = array( 'page', 'widget-page' );
 			break;
 		case 'special':
 			$type_usages = array( 'special' );

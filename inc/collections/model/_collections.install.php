@@ -101,6 +101,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			wico_coll_ID   INT(10) NULL DEFAULT NULL,
 			wico_order     INT(10) NOT NULL,
 			wico_main      TINYINT(1) NOT NULL DEFAULT 0,
+			wico_item_ID   INT(11) UNSIGNED NULL DEFAULT NULL,
+			wico_ityp_ID   INT(11) UNSIGNED NULL DEFAULT NULL,
 			PRIMARY KEY    ( wico_ID ),
 			UNIQUE wico_coll_ID_code_skin_type ( wico_coll_ID, wico_code, wico_skin_type )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

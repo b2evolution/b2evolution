@@ -171,7 +171,9 @@ function ityp_row_usage( $item_type_usage )
 		case 'post':
 			return /* TRANS: noun */ T_('Post');
 		case 'page':
-			return T_('Page');
+			return T_('Content Page');
+		case 'widget-page':
+			return T_('Widget Page');
 		case 'intro-front':
 			return T_('Intro-Front');
 		case 'intro-main':

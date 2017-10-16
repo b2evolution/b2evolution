@@ -191,8 +191,9 @@ function display_container( $WidgetContainer, $is_included = true )
  * @param string Skin type: 'normal', 'mobile', 'tablet'
  * @param boolean TRUE to display main containers, FALSE - sub containers
  * @param boolean TRUE to display collection containers, FALSE - shared containers
+ * @param boolean TRUE to display page containers, FALSE - for all others
  */
-function display_containers( $skin_type, $main = true, $shared = false )
+function display_containers( $skin_type, $main = true, $shared = false, $paged = false )
 {
 	global $Blog, $DB, $blog_container_list;
 
@@ -237,10 +238,19 @@ function display_containers( $skin_type, $main = true, $shared = false )
 	}
 	else
 	{	// Display SUB containers:
+		if( $paged )
+		{	// Set SQL condition to select all page containers:
+			$pages_where_sql = 'wico_item_ID IS NOT NULL OR wico_ityp_ID IS NOT NULL';
+		}
+		else
+		{	// Set SQL condition to select not page containers:
+			$pages_where_sql = 'wico_item_ID IS NULL AND wico_ityp_ID IS NULL';
+		}
 		$WidgetContainerCache->clear();
 		$WidgetContainerCache->load_where( 'wico_main = 0
 			AND wico_coll_ID '.( $shared ? 'IS NULL' : ' = '.$Blog->ID ).'
-			AND wico_skin_type = '.$DB->quote( $skin_type ) );
+			AND wico_skin_type = '.$DB->quote( $skin_type ).'
+			AND ( '.$pages_where_sql.' )' );
 
 		foreach( $WidgetContainerCache->cache as $WidgetContainer )
 		{
@@ -272,8 +282,9 @@ echo '<div class="col-md-4 col-sm-12">';
 	display_containers( get_param( 'skin_type' ), true, false );
 echo '</div>';
 
-// Sub-Containers:
+// Sub-Containers & Page Containers:
 echo '<div class="col-md-4 col-sm-12">';
+	// Sub-Containers:
 	echo '<h4 class="pull-left">'.T_('Sub-Containers').'</h4>';
 	if( $current_User->check_perm( 'options', 'edit', false ) )
 	{	// Display a button to add new sub-container if current User has a permission:
@@ -282,6 +293,16 @@ echo '<div class="col-md-4 col-sm-12">';
 	}
 	echo '<div class="clearfix"></div>';
 	display_containers( get_param( 'skin_type' ), false, false );
+
+	// Page Containers:
+	echo '<h4 class="pull-left">'.T_('Page Containers').'</h4>';
+	if( $current_User->check_perm( 'options', 'edit', false ) )
+	{	// Display a button to add new sub-container if current User has a permission:
+		echo action_icon( T_('Add container'), 'add',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+	}
+	echo '<div class="clearfix"></div>';
+	display_containers( get_param( 'skin_type' ), false, false, true );
 echo '</div>';
 
 // Shared Containers:
