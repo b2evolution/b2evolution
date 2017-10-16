@@ -1763,7 +1763,7 @@ function exif_orientation( $file_name, & $imh/* = null*/, $save_image = false )
 		return;
 	}
 
-	if( ( $exif_data = exif_read_data( $file_name ) ) === false )
+	if( ( $exif_data = @exif_read_data( $file_name ) ) === false )
 	{ // Could not read Exif data
 		return;
 	}
