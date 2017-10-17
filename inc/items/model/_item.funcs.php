@@ -47,6 +47,12 @@ function init_MainList( $items_nb_limit )
 						) );
 					break;
 
+				case 'widget_page':
+					$MainList->set_default_filters( array(
+							'itemtype_usage' => 'widget-page' // Only widget pages
+						) );
+					break;
+
 				case 'terms':
 					$MainList->set_default_filters( array(
 							'itemtype_usage' => 'page,special' // Allow all post types

@@ -46,7 +46,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 	{
 		$ItemTypeCache = & get_ItemTypeCache();
 		$ItemTypeCache->clear();
-		$ItemTypeCache->load_where( 'ityp_usage = "page"' ); // Load only page item types
+		$ItemTypeCache->load_where( 'ityp_usage = "page" OR ityp_usage = "widget-page"' ); // Load only page item types
 		$item_type_cache_load_all = $ItemTypeCache->load_all; // Save original value
 		$ItemTypeCache->load_all = false; // Force to don't load all item types in get_option_array() below
 		$page_item_type_options =
@@ -137,7 +137,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 	function init_display( $params )
 	{
 		// Force some params (because this is a simplified widget):
-		$params['item_type_usage'] = 'page';	// Use post types usage "page" only
+		$params['item_type_usage'] = 'page,widget-page';	// Use post types usage "page" only
 
 		parent::init_display( $params );
 	}

@@ -675,6 +675,31 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			) );
 	}
 
+
+	/* Widget Page Section 1 */
+	if( array_key_exists( 'widget_page_section_1', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['widget_page_section_1']['wico_ID'];
+		add_basic_widget( $wico_id, 'item_info_line', 'core', 10 );
+	}
+
+
+	/* Widget Page Section 2 */
+	if( array_key_exists( 'widget_page_section_2', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['widget_page_section_2']['wico_ID'];
+		add_basic_widget( $wico_id, 'item_content', 'core', 10 );
+	}
+
+
+	/* Widget Page Section 3 */
+	if( array_key_exists( 'widget_page_section_3', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['widget_page_section_3']['wico_ID'];
+		add_basic_widget( $wico_id, 'item_small_print', 'core', 10 );
+	}
+
+
 	// Check if there are widgets to create
 	if( ! empty( $basic_widgets_insert_sql_rows ) )
 	{ // Insert the widget records by single SQL query
@@ -794,6 +819,9 @@ function insert_shared_widgets()
 			) );
 		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 30, array(
 				'link_type' => 'ownercontact',
+			) );
+		add_basic_widget( $wico_id, 'coll_page_list', 'core', 40, array(
+				'item_type' => 9,
 			) );
 	}
 

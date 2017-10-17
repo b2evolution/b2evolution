@@ -89,6 +89,7 @@ function skin_init( $disp )
 		case 'posts':
 		case 'single':
 		case 'page':
+		case 'widget_page':
 		case 'terms':
 		case 'download':
 		case 'feedback-popup':

@@ -1093,7 +1093,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	{
 		// =======================================================================================================
 		case 'main':
-			$post_count = 13;
+			$post_count = 14;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1192,6 +1192,14 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$edit_File = new File( 'shared', 1, 'logos/b2evolution_1016x208_wbg.png' );
 			$LinkOwner = new LinkItem( $edited_Item );
 			$edit_File->link_to_Object( $LinkOwner );
+
+			// Insert a WIDGET PAGE:
+			$post_count--;
+			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+			$edited_Item = new Item();
+			$edited_Item->set_tags_from_string( 'demo' );
+			$edited_Item->insert( $owner_ID, T_('Widget Page'), T_('Widget Page'), $now, $cat_home_b2evo,
+					array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array( 'default' ), 'Widget Page' );
 
 			// Insert a post:
 			$post_count--;
