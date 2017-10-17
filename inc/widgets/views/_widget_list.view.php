@@ -51,6 +51,17 @@ function display_container( $WidgetContainer, $is_included = true )
 	if( ! empty( $WidgetContainer->ID ) )
 	{
 		$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.'">'.$widget_container_name.'</a>';
+		// Display additional info for Page Container:
+		if( $WidgetContainer->get( 'ityp_ID' ) > 0 )
+		{	// If Page Container depends on Item Type:
+			$ItemTypeCache = & get_ItemTypeCache();
+			$wico_ItemType = $ItemTypeCache->get_by_ID( $WidgetContainer->get( 'ityp_ID' ), false, false );
+			$widget_container_name .= ' '.sprintf( T_('on Page Type "%s"'), $wico_ItemType ? $wico_ItemType->get_name() : '<span class="red">'.T_('Not Found').'</span>' );
+		}
+		elseif( $WidgetContainer->get( 'item_ID' ) > 0 )
+		{	// If Page Container depends on Item:
+			$widget_container_name .= ' '.sprintf( T_('on Page #%s'), $WidgetContainer->get( 'item_ID' ) );
+		}
 	}
 	$Table->title = '<span class="dimmed">'.$WidgetContainer->get( 'order' ).'</span> '
 		.'<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span> '

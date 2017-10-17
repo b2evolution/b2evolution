@@ -306,7 +306,9 @@ class Skin extends DataObject
 				'container_end'   => '',
 			), $params );
 
-		if( ! empty( $params['WidgetContainer'] ) && $params['WidgetContainer']->get( 'coll_ID' ) == 0 )
+		$WidgetContainer = isset( $params['WidgetContainer'] ) ? $params['WidgetContainer'] : NULL;
+
+		if( ! empty( $WidgetContainer ) && $WidgetContainer->get( 'coll_ID' ) == 0 )
 		{	// Shared container:
 			$widgets_coll_ID = '';
 		}
@@ -384,13 +386,23 @@ class Skin extends DataObject
 			$params['container_display_if_empty'] = true;
 		}
 
-		/**
-		 * @var EnabledWidgetCache
-		 */
-		$EnabledWidgetCache = & get_EnabledWidgetCache();
-		$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $widgets_coll_ID,
-			( $container_code === NULL ? $sco_name : $container_code ),// Use container code if it is defined, otherwise use container name
-			( $container_code !== NULL ) );// Get by container code if it is defined
+		if( $params['container_item_ID'] !== NULL || $params['container_ityp_ID'] !== NULL )
+		{	// Check restriction for page containers:
+			if( empty( $WidgetContainer ) ||
+			    ( $params['container_item_ID'] !== NULL && $WidgetContainer->get( 'item_ID' ) > 0 && $WidgetContainer->get( 'item_ID' ) != $params['container_item_ID'] ) ||
+			    ( $params['container_ityp_ID'] !== NULL && $WidgetContainer->get( 'ityp_ID' ) > 0 && $WidgetContainer->get( 'ityp_ID' ) != $params['container_ityp_ID'] ) )
+			{	// We should not try to get widgets from this container, because it is a not proper page container:
+				$Widget_array = array();
+			}
+		}
+
+		if( ! isset( $Widget_array ) )
+		{	// Get enabled widget for the container:
+			$EnabledWidgetCache = & get_EnabledWidgetCache();
+			$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $widgets_coll_ID,
+				( $container_code === NULL ? $sco_name : $container_code ),// Use container code if it is defined, otherwise use container name
+				( $container_code !== NULL ) );// Get by container code if it is defined
+		}
 
 		if( ! empty( $Widget_array ) )
 		{
