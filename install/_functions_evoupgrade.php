@@ -8838,6 +8838,26 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13120, 'Creating sites table...' ) )
+	{	// part of 7.0.0-alpha
+		db_create_table( 'T_site', '
+			site_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			site_name          VARCHAR(255) NOT NULL,
+			site_order         INT(11) NOT NULL,
+			site_owner_user_ID INT(11) UNSIGNED NOT NULL default 1,
+			PRIMARY KEY ( site_ID )' );
+		// Create default mandatory site:
+		$DB->query( 'INSERT INTO T_site ( site_ID, site_name, site_order, site_owner_user_ID ) VALUES
+			( 1, "Site", 1, 1 )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13130, 'Upgrading sections table...' ) )
+	{	// part of 7.0.0-alpha
+		db_add_col( 'T_section', 'sec_site_ID', 'INT(11) UNSIGNED NOT NULL DEFAULT 1 AFTER sec_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

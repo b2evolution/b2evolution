@@ -76,10 +76,21 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating sections table',
 		"CREATE TABLE T_section (
 			sec_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			sec_site_ID       INT(11) UNSIGNED NOT NULL DEFAULT 1,
 			sec_name          VARCHAR(255) NOT NULL,
 			sec_order         INT(11) NOT NULL,
 			sec_owner_user_ID INT(11) UNSIGNED NOT NULL default 1,
 			PRIMARY KEY ( sec_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_site' => array(
+		'Creating sites table',
+		"CREATE TABLE T_site (
+			site_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			site_name          VARCHAR(255) NOT NULL,
+			site_order         INT(11) NOT NULL,
+			site_owner_user_ID INT(11) UNSIGNED NOT NULL default 1,
+			PRIMARY KEY ( site_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_coll_settings' => array(

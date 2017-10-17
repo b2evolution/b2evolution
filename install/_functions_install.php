@@ -238,11 +238,18 @@ function install_newdb()
 		}
 	}
 
-	// We need to have at least one section because it is a required field for collection:
 	global $DB;
+
+	// We need to have at least one site because it is a required field for section:
+	task_begin( 'Creating default site... ' );
+	$DB->query( 'INSERT INTO T_site ( site_ID, site_name, site_order, site_owner_user_ID )
+		VALUES ( 1, "Site", 1, 1 )' );
+	task_end();
+
+	// We need to have at least one section because it is a required field for collection:
 	task_begin( 'Creating default section... ' );
-	$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
-		VALUES ( 1, "No Section", 1, 1 )' );
+	$DB->query( 'INSERT INTO T_section ( sec_ID, sec_site_ID, sec_name, sec_order, sec_owner_user_ID )
+		VALUES ( 1, 1, "No Section", 1, 1 )' );
 	task_end();
 
 	if( $create_sample_contents )
