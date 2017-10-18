@@ -254,6 +254,33 @@ if( empty( $tab ) )
 			$template_action = 'create_sample_posts';
 			break;
 
+		case 'create_sample_revisions':
+			$blog_ID = param( 'blog_ID', 'string', 0 );
+			$min_revisions = param( 'min_revisions', 'string', 0 );
+			$max_revisions = param( 'max_revisions', 'string', 0 );
+
+			if( ! ( param_check_number( 'blog_ID', T_('Blog ID must be a number'), true ) &&
+					param_check_number( 'min_revisions', T_('Minimum number of revisions field must be a number'), true ) &&
+					param_check_number( 'max_revisions', T_('Maximum number of revisions filed must be a number'), true ) ) )
+			{ // param errors
+				$action = 'show_create_revisions';
+				break;
+			}
+
+			// check blog_ID
+			$BlogCache = & get_BlogCache();
+			$selected_Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
+			if( $selected_Blog == NULL )
+			{
+				$Messages->add( T_('Blog ID must be a valid Blog ID!'), 'error' );
+				$action = 'show_create_revisions';
+				break;
+			}
+
+			// Execute a creating of revisions inside template in order to see the process
+			$template_action = 'create_sample_revisions';
+			break;
+
 		case 'create_sample_users':
 			$num_users = param( 'num_users', 'string', 0 );
 			param_check_number( 'num_users', T_('"How many users" field must be a number'), true );
@@ -510,6 +537,10 @@ if( empty( $tab ) )
 
 		case 'show_create_posts':
 			$AdminUI->disp_view( 'tools/views/_create_posts.form.php' );
+			break;
+
+		case 'show_create_revisions':
+			$AdminUI->disp_view( 'tools/views/_create_revisions.form.php' );
 			break;
 
 		case 'show_create_users':

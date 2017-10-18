@@ -275,7 +275,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			iver_status        ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NULL,
 			iver_title         VARCHAR(255) NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			iver_content       MEDIUMTEXT NULL,
-			INDEX iver_ID_itm_ID ( iver_ID , iver_itm_ID )
+			INDEX iver_ID_itm_ID ( iver_ID , iver_itm_ID ),
+			INDEX iver_edit_user_ID ( iver_edit_user_ID )
 		) ENGINE = innodb ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__status' => array(
