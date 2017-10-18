@@ -680,7 +680,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'widget_page_section_1', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['widget_page_section_1']['wico_ID'];
-		add_basic_widget( $wico_id, 'item_info_line', 'core', 10 );
+		add_basic_widget( $wico_id, 'coll_featured_posts', 'core', 10 );
 	}
 
 
@@ -688,7 +688,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'widget_page_section_2', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['widget_page_section_2']['wico_ID'];
-		add_basic_widget( $wico_id, 'item_content', 'core', 10 );
+		add_basic_widget( $wico_id, 'org_members', 'core', 10 );
 	}
 
 
@@ -696,7 +696,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'widget_page_section_3', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['widget_page_section_3']['wico_ID'];
-		add_basic_widget( $wico_id, 'item_small_print', 'core', 10 );
+		add_basic_widget( $wico_id, 'evo_Gmaps', 'plugin', 10 );
 	}
 
 

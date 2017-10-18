@@ -1264,7 +1264,7 @@ class _core_Module extends Module
 						);
 				}
 				elseif( ! is_admin_page() &&
-				  ( $disp == 'single' || $disp == 'page' ) &&
+				  ( $disp == 'single' || $disp == 'page' || $disp == 'widget_page' ) &&
 				  ! empty( $Item ) &&
 				  $edit_item_url = $Item->get_edit_url() )
 				{	// If curent user has a permission to edit a current viewing post:
