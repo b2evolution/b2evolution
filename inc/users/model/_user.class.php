@@ -5846,6 +5846,90 @@ class User extends DataObject
 
 
 	/**
+	 * Get the posts of this user which current user can delete
+	 *
+	 * @param string Type of the deleted posts
+	 *               'created'        - the posts created by this user
+	 *               'edited'         - the posts edited by this user
+	 *               'created|edited' - the posts created OR edited by this user
+	 * @return array Items
+	 */
+	function get_deleted_posts2( $type )
+	{
+		global $DB, $current_User;
+
+		$this->get_Group();
+
+		switch( $type )
+		{
+			case 'created':
+				$where_clause = 'post_creator_user_ID = '.$DB->quote( $this->ID );
+				break;
+
+			case 'edited':
+				$where_clause = 'post_lastedit_user_ID = '.$DB->quote( $this->ID );
+				break;
+
+			case 'created|edited':
+				$where_clause = '( post_lastedit_user_ID = '.$DB->quote( $this->ID ).' OR post_creator_user_ID = '.$DB->quote( $this->ID ).' )';
+				break;
+		}
+
+		$sql = 'SELECT T_items__item.*
+				FROM T_items__item
+				LEFT JOIN (
+					SELECT postcat_post_ID,
+						COUNT( * ) AS categories,
+						SUM( IF( cat_lock = 1, 1, 0 ) ) AS locked_categories
+					FROM T_postcats
+					LEFT JOIN evo_categories
+						ON cat_ID = postcat_cat_ID
+					GROUP BY postcat_post_ID
+				) AS a
+					ON a.postcat_post_ID = post_ID
+				LEFT JOIN T_postcats AS b
+					ON b.postcat_post_ID = post_ID
+				LEFT JOIN T_categories
+					ON cat_ID = b.postcat_cat_ID
+				LEFT JOIN T_blogs
+					ON blog_ID = cat_blog_ID
+				LEFT JOIN T_coll_user_perms
+					ON bloguser_blog_ID = blog_ID AND bloguser_user_ID = '.$DB->quote( $this->ID ).'
+				LEFT JOIN T_coll_group_perms
+					ON bloggroup_blog_ID = blog_ID AND bloggroup_group_ID = '.$DB->quote( $this->Group->ID ).'
+				LEFT JOIN (
+					SELECT
+						bloggroup_blog_ID,
+						SUM( IF( bloggroup_perm_delpost = 1, 1, 0 ) ) AS secondary_grp_perm_delpost
+					FROM T_users__secondary_user_groups
+					LEFT JOIN T_groups
+						ON sug_grp_ID = grp_ID
+					LEFT JOIN evo_bloggroups
+						ON bloggroup_group_ID = grp_ID
+					WHERE
+						sug_user_ID = '.$DB->quote( $this->ID ).'
+					GROUP BY
+						bloggroup_blog_ID
+				) AS sg
+					ON sg.bloggroup_blog_ID = blog_ID
+				WHERE
+					'.$where_clause.'
+					AND categories > locked_categories
+					AND ( bloguser_perm_delpost = 1 OR bloggroup_perm_delpost = 1 OR secondary_grp_perm_delpost > 0 )';
+
+		$user_Items = $DB->get_results( $sql );
+
+		$deleted_Items = array();
+		foreach( $user_Items as $r => $row )
+		{
+			$deleted_Items[] = new Item( $row );
+		}
+
+		return $deleted_Items;
+	}
+
+
+	/**
 	 * Delete posts of the user
 	 *
 	 * @param string Type of the deleted posts

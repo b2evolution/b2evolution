@@ -310,6 +310,8 @@ function tool_create_sample_revisions( $blog_ID, $min_revisions = 1, $max_revisi
 
 	$revisions_created = 0;
 	$editors_count = count( $editor_Users );
+
+	$count = 1;
 	while( $Item = & $ItemList->get_item() )
 	{
 		// Get next version ID
@@ -342,9 +344,13 @@ function tool_create_sample_revisions( $blog_ID, $min_revisions = 1, $max_revisi
 			$iver_ID += 1;
 		}
 
-		echo ' .';
-		//pre_dump( memory_get_usage() );
-		evo_flush();
+		if( $count % 100 == 0 )
+		{
+			echo ' .';
+			//pre_dump( memory_get_usage() );
+			evo_flush();
+		}
+		$count++;
 
 		// Clear all debug messages, To avoid an error about full memory
 		$Debuglog->clear( 'all' );
