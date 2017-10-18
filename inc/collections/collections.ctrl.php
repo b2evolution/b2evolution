@@ -27,7 +27,7 @@ if( strpos( $action, 'new' ) !== false || $action == 'copy' )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_section', 'edit_section', 'delete_section', 'update_site_skin' ) ) &&
+if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_section', 'edit_section', 'delete_section', 'update_site_skin', 'new_site', 'edit_site', 'delete_site' ) ) &&
     ! in_array( $tab, array( 'site_settings', 'site_skin' ) ) )
 {
 	if( valid_blog_requested() )
@@ -42,7 +42,25 @@ if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin',
 	}
 }
 
-if( strpos( $action, 'section' ) !== false )
+if( strpos( $action, 'site' ) !== false )
+{	// Initialize Site object:
+	load_class( 'collections/model/_site.class.php', 'Site' );
+
+	param( 'site_ID', 'integer', 0, true );
+
+	$tab = 'site';
+
+	if( $site_ID > 0 )
+	{	// Try to get the existing site by requested ID:
+		$SiteCache = & get_SiteCache();
+		$edited_Site = & $SiteCache->get_by_ID( $site_ID );
+	}
+	else
+	{	// Create new site object:
+		$edited_Site = new Site();
+	}
+}
+elseif( strpos( $action, 'section' ) !== false )
 {	// Initialize Section object:
 	load_class( 'collections/model/_section.class.php', 'Section' );
 
@@ -557,6 +575,81 @@ switch( $action )
 		}
 		break;
 
+	case 'new_site':
+	case 'edit_site':
+		// New/Edit site:
+
+		// Check permissions:
+		$current_User->check_perm( 'site', 'view', true, $edited_Site->ID );
+		break;
+
+	case 'create_site':
+	case 'update_site':
+		// Create/Update site:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'site' );
+
+		// Check permission:
+		$current_User->check_perm( 'site', 'edit', true, $edited_Site->ID );
+
+		if( $edited_Site->load_from_Request() )
+		{
+			if( $edited_Site->dbsave() )
+			{
+				if( is_create_action( $action ) )
+				{
+					$Messages->add( T_('New site has been created.'), 'success' );
+				}
+				else
+				{
+					$Messages->add( T_('The site has been updated.'), 'success' );
+				}
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=dashboard&site='.$edited_Site->ID ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		break;
+
+	case 'delete_site':
+		// Delete site:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'site' );
+
+		// Check permissions:
+		$current_User->check_perm( 'site', 'edit', true, $edited_Site->ID );
+
+		if( $edited_Site->ID == 1 )
+		{	// Forbid to delete default site:
+			$Messages->add( T_('This site cannot be deleted.'), 'error' );
+			$action = 'edit_site';
+			break;
+		}
+
+		if( param( 'confirm', 'integer', 0 ) )
+		{	// confirmed, Delete from DB:
+			$msg = sprintf( T_('Site "%s" has been deleted.'), $edited_Site->dget( 'name' ) );
+			$edited_Site->dbdelete();
+			unset( $edited_Site );
+			forget_param( 'site_ID' );
+			$Messages->add( $msg, 'success' );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=dashboard' ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		else
+		{	// not confirmed, Check for restrictions:
+			memorize_param( 'site_ID', 'integer', $site_ID );
+			if( ! $edited_Site->check_delete( sprintf( T_('Cannot delete site "%s"'), $edited_Site->dget( 'name' ) ) ) )
+			{
+				$action = 'edit_site';
+			}
+		}
+		break;
+
 	case 'update_site_skin':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'siteskin' );
@@ -687,6 +780,9 @@ switch( $tab )
 		// Check minimum permission:
 		$current_User->check_perm( 'options', 'view', true );
 
+		// Activate site bar if current user has a permission:
+		$AdminUI->activate_site_bar();
+
 		$AdminUI->set_path( 'site', 'settings' );
 
 		$AdminUI->breadcrumbpath_init( false );
@@ -753,7 +849,24 @@ switch( $tab )
 		// We should activate toolbar menu items for this controller and tab
 		$activate_collection_toolbar = true;
 		break;
-	
+
+	case 'site':
+		// Pages to create/edit/delete sites:
+		$AdminUI->set_path( 'site', 'dashboard' );
+
+		// Activate site bar if current user has a permission:
+		$AdminUI->activate_site_bar();
+
+		$AdminUI->breadcrumbpath_init( false );
+		$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
+		$AdminUI->breadcrumbpath_add( T_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
+
+		$AdminUI->set_page_manual_link( 'site' );
+
+		// Init JS to autcomplete the user logins:
+		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+		break;
+
 	case 'section':
 		// Pages to create/edit/delete sections:
 		$AdminUI->set_path( 'site', 'dashboard' );
@@ -881,6 +994,24 @@ switch( $action )
 		}
 
 		$AdminUI->disp_view( 'collections/views/_section.form.php' );
+		break;
+
+	case 'new_site':
+	case 'edit_site':
+	case 'create_site':
+	case 'update_site':
+	case 'delete_site':
+		// Form to create/edit site:
+
+		if( $action == 'delete_site' )
+		{	// We need to ask for confirmation:
+			set_param( 'redirect_to', $admin_url.'?ctrl=dashboard' );
+			$edited_Site->confirm_delete(
+				sprintf( T_('Delete site "%s"?'), $edited_Site->dget( 'name' ) ),
+				'site', $action, get_memorized( 'action' ) );
+		}
+
+		$AdminUI->disp_view( 'collections/views/_site.form.php' );
 		break;
 
 	default:

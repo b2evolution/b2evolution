@@ -356,6 +356,11 @@ class Group extends DataObject
 		// Check group permission:
 		switch( $permname )
 		{
+			case 'site':
+				// Check permissions for sites:
+				$perm = $this->check_perm( 'blogs', 'editall' );
+				break;
+
 			case 'section':
 				// Check permissions for this group to the requested section:
 				$perm = $this->check_perm( 'blogs', 'editall' );

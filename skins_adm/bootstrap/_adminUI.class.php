@@ -112,6 +112,9 @@ class AdminUI extends AdminUI_general
 	{
 		$r = $this->get_page_head();
 
+		// Display site bar (to select and add sites):
+		$r .= $this->get_site_bar();
+
 		// Blog selector
 		$r .= $this->get_bloglist_buttons();
 
@@ -302,6 +305,17 @@ class AdminUI extends AdminUI_general
 						'afterEach'  => '</li>',
 						'beforeEachSel' => '<li role="presentation" class="active">',
 						'afterEachSel' => '</li>',
+					);
+
+			case 'site_bar':
+				// Template for a list of Sites:
+				return array(
+						'before_bar'           => '<div class="container-fluid coll-selector"><nav><div class="btn-group">',
+						'after_bar'            => '</div>$button_add_site$</nav></div>',
+						'before_site'          => '',
+						'after_site'           => '',
+						'before_site_selected' => '',
+						'after_site_selected'  => '',
 					);
 
 			case 'CollectionList':
@@ -1043,6 +1057,54 @@ class AdminUI extends AdminUI_general
 			.'</div>';
 
 		echo '</div>';
+	}
+
+
+	/**
+	 * Get site bar
+	 *
+	 * @return string
+	 */
+	function get_site_bar()
+	{
+		if( ! $this->site_bar_activated )
+		{	// Site bar is not activated, Exit here:
+			return '';
+		}
+
+		global $admin_url;
+
+		$site_ID = param( 'site_ID', 'integer', NULL );
+		$site = $site_ID == NULL ? param( 'site', 'integer', 1 ) : $site_ID;
+
+		$template = $this->get_template( 'site_bar' );
+
+		$SiteCache = & get_SiteCache();
+		$SiteCache->load_all();
+
+		$r = $template['before_bar'];
+
+		foreach( $SiteCache->cache as $Site )
+		{
+			$r .= $template[ $Site->ID == $site ? 'before_site_selected' : 'before_site' ];
+
+			$site_url = ( $Site->ID == $site ? $admin_url.'?ctrl=collections&amp;action=edit_site&amp;site_ID='.$Site->ID : regenerate_url( 'site', 'site='.$Site->ID ) );
+			$r .= '<a href="'.$site_url.'" class="btn btn-default'.( $Site->ID == $site ? ' active' : '' ).'">'
+					.$Site->dget( 'name', 'htmlbody' )
+				.'</a>';
+
+			$r .= $template[ $Site->ID == $site ? 'after_site_selected' : 'after_site' ];
+		}
+
+		$r .= $template['after_bar'];
+
+		// Button to add new site:
+		$button_add_site = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new_site" class="btn btn-default" title="'.T_('New Site').'"><span class="fa fa-plus"></span></a>';
+
+		// Replace masked var name with value:
+		$r = str_replace( '$button_add_site$', $button_add_site, $r );
+
+		return $r;
 	}
 }
 

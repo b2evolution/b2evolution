@@ -42,6 +42,11 @@ $Form->begin_form( 'fform', $creating ?  T_('New section') : T_('Section') );
 
 	$Form->hidden( 'sec_ID', $edited_Section->ID );
 
+	// Site:
+	$SiteCache = & get_SiteCache();
+	$SiteCache->load_all();
+	$Form->select_input_object( 'sec_ID', $edited_Section->get( 'site_ID' ), $SiteCache, T_('Site'), array( 'required' => true ) );
+
 	// Name:
 	if( $perm_section_edit && $edited_Section->ID != 1 )
 	{

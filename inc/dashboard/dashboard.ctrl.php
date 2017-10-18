@@ -33,6 +33,9 @@ if( empty( $_GET['blog'] ) )
 	unset( $Blog, $Collection );
 }
 
+// Activate site bar if current user has a permission:
+$AdminUI->activate_site_bar();
+
 // Site dashboard
 $AdminUI->set_path( 'site', 'dashboard' );
 

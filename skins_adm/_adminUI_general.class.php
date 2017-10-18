@@ -147,6 +147,12 @@ class AdminUI_general extends Menu
 	var $page_manual_link = '';
 
 	/**
+	 * TRUE is site bar is activated and should be displayed in body top.
+	 * @var boolean
+	 */
+	var $site_bar_activated = false;
+
+	/**
 	 * Constructor.
 	 */
 	function __construct()
@@ -959,6 +965,18 @@ class AdminUI_general extends Menu
 					);
 
 
+			case 'site_bar':
+				// Template for a list of Sites:
+				return array(
+						'before_bar'           => '<div>',
+						'after_bar'            => '$button_add_site$</div>',
+						'before_site'          => '',
+						'after_site'           => '',
+						'before_site_selected' => '',
+						'after_site_selected'  => '',
+					);
+
+
 			case 'CollectionList':
 				// Template for a list of Collections (Blogs)
 				return array(
@@ -1606,6 +1624,36 @@ class AdminUI_general extends Menu
 	 */
 	function display_customizer_tabs( $params = array() )
 	{
+	}
+
+
+	/**
+	 * Activate site bar uf current user has a permission
+	 */
+	function activate_site_bar()
+	{
+		global $current_User;
+
+		if( is_logged_in() && $current_User->check_perm( 'site', 'edit' ) )
+		{	// Allow to activate site bar only if current user has a permission to edit sites:
+			$this->site_bar_activated = true;
+		}
+	}
+
+
+	/**
+	 * Get site bar
+	 *
+	 * @return string
+	 */
+	function get_site_bar()
+	{
+		if( ! $this->site_bar_activated )
+		{	// Site bar is not activated, Exit here:
+			return '';
+		}
+
+		return '';
 	}
 }
 

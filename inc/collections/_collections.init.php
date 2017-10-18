@@ -145,6 +145,25 @@ function & get_SectionCache()
 
 
 /**
+ * Get the SiteCache
+ *
+ * @return SiteCache
+ */
+function & get_SiteCache()
+{
+	global $SiteCache;
+
+	if( ! isset( $SiteCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'collections/model/_site.class.php', 'Site' );
+		$SiteCache = new DataObjectCache( 'Site', false, 'T_site', 'site_', 'site_ID', 'site_name', 'site_order' );
+	}
+
+	return $SiteCache;
+}
+
+
+/**
  * Get the ChapterCache
  *
  * @return ChapterCache
@@ -699,9 +718,10 @@ class collections_Module extends Module
 		}
 
 		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
+		$perm_site_edit = $current_User->check_perm( 'site', 'edit' );
 
 		$site_menu = array(
-			'text' => T_('Site'),
+			'text' => $perm_site_edit ? T_('Sites') : T_('Site'),
 			'href' => $admin_url.'?ctrl=dashboard',
 			'entries' => array(
 				'dashboard' => array(

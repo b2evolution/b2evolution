@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2017 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -15,22 +15,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
- * Section Class
+ * Site Class
  *
  * @package evocore
  */
-class Section extends DataObject
+class Site extends DataObject
 {
-	var $site_ID = 0;
 	var $name = '';
 	var $order = '';
 	var $owner_user_ID = 0;
 	var $owner_User = NULL;
-
-	/**
-	 * @var array Array of "Blog" objects, @see Section::get_blogs()
-	 */
-	var $blogs;
 
 	/**
 	 * Constructor
@@ -40,15 +34,14 @@ class Section extends DataObject
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( 'T_section', 'sec_', 'sec_ID' );
+		parent::__construct( 'T_site', 'site_', 'site_ID' );
 
 		if( $db_row != NULL )
 		{
-			$this->ID            = $db_row->sec_ID;
-			$this->site_ID       = $db_row->sec_site_ID;
-			$this->name          = $db_row->sec_name;
-			$this->order         = $db_row->sec_order;
-			$this->owner_user_ID = $db_row->sec_owner_user_ID;
+			$this->ID            = $db_row->site_ID;
+			$this->name          = $db_row->site_name;
+			$this->order         = $db_row->site_order;
+			$this->owner_user_ID = $db_row->site_owner_user_ID;
 		}
 		else
 		{
@@ -66,7 +59,7 @@ class Section extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table' => 'T_blogs', 'fk' => 'blog_sec_ID', 'msg' => T_('%d collections in this group') ),
+				array( 'table' => 'T_section', 'fk' => 'sec_site_ID', 'msg' => T_('%d sections in this site') ),
 			);
 	}
 
@@ -80,18 +73,18 @@ class Section extends DataObject
 	{
 		// Name:
 		if( $this->ID != 1 )
-		{	// Only if not first default section:
-			param_string_not_empty( 'sec_name', T_('Please enter a section name.') );
+		{	// Only if not first default site:
+			param_string_not_empty( 'site_name', T_('Please enter a site name.') );
 			$this->set_from_Request( 'name' );
 		}
 
 		// Owner:
-		$sec_owner_login = param( 'sec_owner_login', 'string', '' );
+		$site_owner_login = param( 'site_owner_login', 'string', '' );
 		$UserCache = & get_UserCache();
-		$owner_User = & $UserCache->get_by_login( $sec_owner_login );
+		$owner_User = & $UserCache->get_by_login( $site_owner_login );
 		if( empty( $owner_User ) )
 		{
-			param_error( 'owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $sec_owner_login ) );
+			param_error( 'owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $site_owner_login ) );
 		}
 		else
 		{
@@ -100,20 +93,20 @@ class Section extends DataObject
 		}
 
 		// Order:
-		if( param( 'sec_order', 'integer' ) !== 0 ) // Allow zero value
+		if( param( 'site_order', 'integer' ) !== 0 ) // Allow zero value
 		{
-			param_check_not_empty( 'sec_order', T_('Please enter an order number.') );
+			param_check_not_empty( 'site_order', T_('Please enter an order number.') );
 		}
-		$this->set( 'order', param( 'sec_order', 'integer' ) );
+		$this->set( 'order', param( 'site_order', 'integer' ) );
 
 		return ! param_errors_detected();
 	}
 
 
 	/**
-	 * Get section name.
+	 * Get site name.
 	 *
-	 * @return string section name
+	 * @return string site name
 	 */
 	function get_name()
 	{
@@ -135,30 +128,6 @@ class Section extends DataObject
 		}
 
 		return $this->owner_User;
-	}
-
-
-	/**
-	 * Get collections of this section
-	 *
-	 * @return array Array of "Blog" objects
-	 */
-	function get_blogs()
-	{
-		if( empty( $this->ID ) )
-		{	// New section creating has no collections yet, Return an empty array:
-			return array();
-		}
-
-		if( ! isset( $this->blogs ) )
-		{	// Load collections of this section only on first request and cache the result:
-			$BlogCache = & get_BlogCache();
-			$BlogCache->clear();
-			$BlogCache->load_where( 'blog_sec_ID = '.$this->ID );
-			$this->blogs = $BlogCache->cache;
-		}
-
-		return $this->blogs;
 	}
 }
 ?>
