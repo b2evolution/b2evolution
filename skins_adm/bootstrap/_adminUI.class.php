@@ -1072,10 +1072,9 @@ class AdminUI extends AdminUI_general
 			return '';
 		}
 
-		global $admin_url;
+		global $admin_url, $site;
 
-		$site_ID = param( 'site_ID', 'integer', NULL );
-		$site = $site_ID == NULL ? param( 'site', 'integer', 1 ) : $site_ID;
+		$site_ID = param( 'site_ID', 'integer', $site );
 
 		$template = $this->get_template( 'site_bar' );
 
@@ -1086,20 +1085,27 @@ class AdminUI extends AdminUI_general
 
 		foreach( $SiteCache->cache as $Site )
 		{
-			$r .= $template[ $Site->ID == $site ? 'before_site_selected' : 'before_site' ];
+			$r .= $template[ $Site->ID == $site_ID ? 'before_site_selected' : 'before_site' ];
 
-			$site_url = ( $Site->ID == $site ? $admin_url.'?ctrl=collections&amp;action=edit_site&amp;site_ID='.$Site->ID : regenerate_url( 'site', 'site='.$Site->ID ) );
-			$r .= '<a href="'.$site_url.'" class="btn btn-default'.( $Site->ID == $site ? ' active' : '' ).'">'
+			if( $Site->ID == $site_ID )
+			{	// If current site is selected then open page to edit it on second click:
+				$site_url = $admin_url.'?ctrl=collections&amp;action=edit_site&amp;site_ID='.$Site->ID;
+			}
+			else
+			{	// Url to switch between sites:
+				$site_url = $admin_url.'?ctrl=dashboard&amp;site_ID='.$Site->ID;
+			}
+			$r .= '<a href="'.$site_url.'" class="btn btn-default'.( $Site->ID == $site_ID ? ' active' : '' ).'">'
 					.$Site->dget( 'name', 'htmlbody' )
 				.'</a>';
 
-			$r .= $template[ $Site->ID == $site ? 'after_site_selected' : 'after_site' ];
+			$r .= $template[ $Site->ID == $site_ID ? 'after_site_selected' : 'after_site' ];
 		}
 
 		$r .= $template['after_bar'];
 
 		// Button to add new site:
-		$button_add_site = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new_site" class="btn btn-default" title="'.T_('New Site').'"><span class="fa fa-plus"></span></a>';
+		$button_add_site = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new_site" class="btn btn-default'.( get_param( 'action' ) == 'new_site' ? ' active' : '' ).'" title="'.T_('New Site').'"><span class="fa fa-plus"></span></a>';
 
 		// Replace masked var name with value:
 		$r = str_replace( '$button_add_site$', $button_add_site, $r );

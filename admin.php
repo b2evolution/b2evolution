@@ -174,6 +174,9 @@ $AdminUI = new AdminUI();
  * Pass over to controller...
  */
 
+// Use site #1 by default:
+param( 'site', 'integer', 1 );
+
 // Get requested controller and memorize it:
 param( 'ctrl', '/^[a-z0-9_]+$/', $default_ctrl, true );
 

@@ -257,6 +257,9 @@ switch( $action )
 }
 
 
+// Activate site bar if current user has a permission:
+$AdminUI->activate_site_bar();
+
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
 $AdminUI->breadcrumbpath_add( T_('Tags'), $admin_url.'?ctrl=itemtags' );

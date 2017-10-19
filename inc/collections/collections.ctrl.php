@@ -758,6 +758,9 @@ switch( $tab )
 			// Check minimum permission:
 			$current_User->check_perm( 'options', 'view', true );
 
+			// Activate site bar if current user has a permission:
+			$AdminUI->activate_site_bar();
+
 			$AdminUI->set_path( 'site', 'skin', 'skin_'.$skin_type );
 
 			$AdminUI->breadcrumbpath_init( false );
@@ -852,14 +855,13 @@ switch( $tab )
 
 	case 'site':
 		// Pages to create/edit/delete sites:
-		$AdminUI->set_path( 'site', 'dashboard' );
+		$AdminUI->set_path( 'site' );
 
 		// Activate site bar if current user has a permission:
 		$AdminUI->activate_site_bar();
 
 		$AdminUI->breadcrumbpath_init( false );
 		$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
-		$AdminUI->breadcrumbpath_add( T_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
 
 		$AdminUI->set_page_manual_link( 'site' );
 
