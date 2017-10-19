@@ -5852,9 +5852,10 @@ class User extends DataObject
 	 *               'created'        - the posts created by this user
 	 *               'edited'         - the posts edited by this user
 	 *               'created|edited' - the posts created OR edited by this user
-	 * @return array Items
+	 * @param boolean Count only the number of posts that the current user can delete
+	 * @return mixed array of Items if $count_only is FALSE otherwise integer
 	 */
-	function get_deleted_posts2( $type )
+	function get_deleted_posts2( $type, $count_only = false )
 	{
 		global $DB, $current_User;
 
@@ -5875,8 +5876,16 @@ class User extends DataObject
 				break;
 		}
 
-		$sql = 'SELECT T_items__item.*
-				FROM T_items__item
+		if( $count_only )
+		{
+			$sql = 'SELECT COUNT(*) ';
+		}
+		else
+		{
+			$sql = 'SELECT T_items__item.* ';
+		}
+
+		$sql .= 'FROM T_items__item
 				LEFT JOIN (
 					SELECT postcat_post_ID,
 						COUNT( * ) AS categories,
@@ -5917,15 +5926,22 @@ class User extends DataObject
 					AND categories > locked_categories
 					AND ( bloguser_perm_delpost = 1 OR bloggroup_perm_delpost = 1 OR secondary_grp_perm_delpost > 0 )';
 
-		$user_Items = $DB->get_results( $sql );
-
-		$deleted_Items = array();
-		foreach( $user_Items as $r => $row )
+		if( $count_only )
 		{
-			$deleted_Items[] = new Item( $row );
+			return $DB->get_var( $sql );
 		}
+		else
+		{
+			$user_Items = $DB->get_results( $sql );
 
-		return $deleted_Items;
+			$deleted_Items = array();
+			foreach( $user_Items as $r => $row )
+			{
+				$deleted_Items[] = new Item( $row );
+			}
+
+			return $deleted_Items;
+		}
 	}
 
 

@@ -4313,7 +4313,7 @@ function items_created_results_block( $params = array() )
 	$created_items_Results->no_results_text = $params['results_no_text'];
 
 	// Get a count of the post which current user can delete
-	$deleted_posts_created_count = count( $edited_User->get_deleted_posts2( 'created' ) );
+	$deleted_posts_created_count = $edited_User->get_deleted_posts2( 'created', true );
 	if( ( $created_items_Results->get_total_rows() > 0 ) && ( $deleted_posts_created_count > 0 ) )
 	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one item created by user
 		$created_items_Results->global_icon( sprintf( T_('Delete all post created by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_posts_created&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
@@ -4425,7 +4425,7 @@ function items_edited_results_block( $params = array() )
 	$edited_items_Results->no_results_text = $params['results_no_text'];
 
 	// Get a count of the post which current user can delete
-	$deleted_posts_edited_count = count( $edited_User->get_deleted_posts2( 'edited' ) );
+	$deleted_posts_edited_count = $edited_User->get_deleted_posts2( 'edited', true );
 	if( ( $edited_items_Results->get_total_rows() > 0 ) && ( $deleted_posts_edited_count > 0 ) )
 	{	// Display actino icon to delete all records if at least one record exists & current user can delete at least one item created by user
 		$edited_items_Results->global_icon( sprintf( T_('Delete all post edited by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_posts_edited&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
