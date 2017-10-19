@@ -1736,6 +1736,25 @@ function report_user_upload( $File )
 
 
 /**
+ * Handles warnings and errors when attempting to read EXIF data
+ */
+function exif_read_data_error_handler( $errno, $errstr )
+{
+	global $Messages;
+
+	switch( $errno )
+	{
+		case E_WARNING:
+			$Messages->add( T_('Unable to read EXIF data'), 'warning' );
+			break;
+
+		default:
+			$Messages->add( T_('Unknown error').': <code>'.$errstr.'</code>', 'error' );
+	}
+}
+
+
+/**
  * Rotate the JPEG image if EXIF Orientation tag is defined
  *
  * @param string File name (with full path)
@@ -1763,10 +1782,12 @@ function exif_orientation( $file_name, & $imh/* = null*/, $save_image = false )
 		return;
 	}
 
-	if( ( $exif_data = @exif_read_data( $file_name ) ) === false )
+	set_error_handler( 'exif_read_data_error_handler' );
+	if( ( $exif_data = exif_read_data( $file_name ) ) === false )
 	{ // Could not read Exif data
 		return;
 	}
+	restore_error_handler();
 
 	if( !( isset( $exif_data['Orientation'] ) && in_array( $exif_data['Orientation'], array( 3, 6, 8 ) ) ) )
 	{ // Exif Orientation tag is not defined OR we don't interested in current value

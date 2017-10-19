@@ -8627,6 +8627,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12350, 'Adding item versions index...' ) )
+	{ // part of 6.9.4
+		db_add_index( 'T_items__version', 'iver_edit_user_ID', 'iver_edit_user_ID' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

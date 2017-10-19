@@ -266,6 +266,103 @@ function tool_create_sample_posts( $blog_ID, $num_posts )
 
 
 /**
+ * Create random number of sample revisions of existing posts and display a process of creating
+ *
+ * @param integer Blog ID
+ * @param integer Minimum number of revision per post
+ * @param integer Maximum number of revision per post
+ */
+function tool_create_sample_revisions( $blog_ID, $min_revisions = 1, $max_revisions = 3 )
+{
+	global $Messages, $DB, $Debuglog;
+
+	$BlogCache = & get_BlogCache();
+	$selected_Blog = & $BlogCache->get_by_ID( $blog_ID );
+	if( $selected_Blog == NULL )
+	{ // Incorrect blog ID, Exit here
+		return;
+	}
+
+	echo T_('Creating of the sample revisions...');
+	evo_flush();
+
+	/**
+	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
+	 */
+	$DB->log_queries = false;
+
+	load_class( 'users/model/_userlist.class.php', 'UserList' );
+	$UserList = new UserList( '', 1000 );
+	$UserList->query();
+
+	// Get users who can edit posts in the selected collection
+	$editor_Users = array();
+	while( $loop_User = & $UserList->get_next() )
+	{
+		if( $loop_User->check_perm( 'blog_edit', 'edit', false, $selected_Blog ) )
+		{
+			$editor_Users[] = $loop_User->ID;
+		}
+	}
+
+	$ItemList = new ItemList2( $selected_Blog, NULL, NULL, 0 );
+	$ItemList->query();
+
+	$revisions_created = 0;
+	$editors_count = count( $editor_Users );
+
+	$count = 1;
+	while( $Item = & $ItemList->get_item() )
+	{
+		// Get next version ID
+		$iver_SQL = new SQL();
+		$iver_SQL->SELECT( 'MAX( iver_ID )' );
+		$iver_SQL->FROM( 'T_items__version' );
+		$iver_SQL->WHERE( 'iver_itm_ID = '.$Item->ID );
+		$iver_ID = ( int ) $DB->get_var( $iver_SQL->get() ) + 1;
+
+		$num_revisions = rand( $min_revisions, $max_revisions );
+		for( $i = 0; $i < $num_revisions; $i++ )
+		{
+			if( $i === 0 )
+			{ // Original author
+				$editor_user_id = 'post_lastedit_user_ID';
+			}
+			else
+			{
+				$editor_user_id = $editor_Users[rand( 0, $editors_count - 1 )];
+			}
+
+			$sql = 'INSERT INTO T_items__version( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_datetime, iver_status, iver_title, iver_content )
+				SELECT "'.$iver_ID.'" AS iver_ID, post_ID, '.$editor_user_id.', post_datemodified, post_status, CONCAT( post_title, " - revision '.$iver_ID.'" ), post_content
+					FROM T_items__item
+				WHERE post_ID = '.$Item->ID;
+
+			$revisions_created++;
+			$result = $DB->query( $sql, 'Save a version of the Item' ) !== false;
+
+			$iver_ID += 1;
+		}
+
+		if( $count % 100 == 0 )
+		{
+			echo ' .';
+			//pre_dump( memory_get_usage() );
+			evo_flush();
+		}
+		$count++;
+
+		// Clear all debug messages, To avoid an error about full memory
+		$Debuglog->clear( 'all' );
+	}
+
+	echo ' OK.';
+
+	$Messages->add( sprintf( T_('Created %d revisions.'), $revisions_created ), 'success' );
+}
+
+
+/**
  * Create sample users and display a process of creating
  *
  * @param array Group IDs
