@@ -5868,7 +5868,12 @@ class User extends DataObject
 				break;
 
 			case 'edited':
-				$where_clause = 'post_lastedit_user_ID = '.$DB->quote( $this->ID );
+				$from_add = 'LEFT JOIN ( SELECT iver_itm_ID, COUNT(*) AS counter
+						FROM evo_items__version
+						WHERE iver_edit_user_ID = '.$DB->quote( $this->ID ).'
+						GROUP BY iver_itm_ID ) AS b
+							ON b.iver_itm_ID = post_ID ';
+				$where_clause = 'b.counter > 0';
 				break;
 
 			case 'created|edited':
@@ -5885,8 +5890,12 @@ class User extends DataObject
 			$sql = 'SELECT T_items__item.* ';
 		}
 
-		$sql .= 'FROM T_items__item
-				LEFT JOIN (
+		$sql .= 'FROM T_items__item ';
+		if( ! empty( $from_add ) )
+		{
+			$sql .= $from_add;
+		}
+		$sql .= 'LEFT JOIN (
 					SELECT postcat_post_ID,
 						COUNT( * ) AS categories,
 						SUM( IF( cat_lock = 1, 1, 0 ) ) AS locked_categories
@@ -5909,7 +5918,8 @@ class User extends DataObject
 				LEFT JOIN (
 					SELECT
 						bloggroup_blog_ID,
-						SUM( IF( bloggroup_perm_delpost = 1, 1, 0 ) ) AS secondary_grp_perm_delpost
+						SUM( IF( bloggroup_perm_delpost = 1, 1, 0 ) ) AS secondary_grp_perm_delpost,
+						SUM( IF( bloggroup_perm_cats = 1, 1, 0 ) ) AS secondary_grp_perm_cats
 					FROM T_users__secondary_user_groups
 					LEFT JOIN T_groups
 						ON sug_grp_ID = grp_ID
@@ -5923,7 +5933,7 @@ class User extends DataObject
 					ON sg.bloggroup_blog_ID = blog_ID
 				WHERE
 					'.$where_clause.'
-					AND categories > locked_categories
+					AND ( categories > locked_categories OR ( bloguser_perm_cats = 1 OR bloggroup_perm_cats = 1 OR secondary_grp_perm_cats > 0 ) )
 					AND ( bloguser_perm_delpost = 1 OR bloggroup_perm_delpost = 1 OR secondary_grp_perm_delpost > 0 )';
 
 		if( $count_only )
