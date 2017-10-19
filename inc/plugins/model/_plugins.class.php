@@ -690,11 +690,14 @@ class Plugins
 		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 
 		if( $set_type == 'Settings' )
-		{	// If general settings are requested we should also append messages and emails settings:
-			if( empty( $defaults ) )
-			{
+		{	// If general settings are requested we should also append custom, collection, widgets, messages and emails settings:
+			if( ! is_array( $defaults ) )
+			{	// Initialize array for default settings:
 				$defaults = array();
 			}
+			$defaults = array_merge( $defaults, $Plugin->get_custom_setting_definitions( $params ) );
+			$defaults = array_merge( $defaults, $Plugin->get_coll_setting_definitions( $params ) );
+			$defaults = array_merge( $defaults, $Plugin->get_widget_param_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_msg_setting_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_email_setting_definitions( $params ) );
 		}
