@@ -8605,14 +8605,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_blogs', 'blog_normal_skin_ID', 'int(10) unsigned NULL AFTER blog_order' );
 
 		// Populate new fields from existing collection skin settings
-		$DB->query( 'UPDATE evo_blogs a
+		$DB->query( 'UPDATE T_blogs a
 				LEFT JOIN (
 					SELECT
 						cset_coll_ID,
 						GROUP_CONCAT( IF( cset_name = "normal_skin_ID", cset_value, NULL ) ) AS normal_skin_ID,
 						GROUP_CONCAT( IF( cset_name = "mobile_skin_ID", cset_value, NULL ) ) AS mobile_skin_ID,
 						GROUP_CONCAT( IF( cset_name = "tablet_skin_ID", cset_value, NULL ) ) AS tablet_skin_ID
-					FROM evo_coll_settings a
+					FROM T_coll_settings a
 					WHERE cset_name LIKE "%_skin_ID"
 					GROUP BY cset_coll_ID
 				) b ON b.cset_coll_ID = a.blog_ID
