@@ -695,21 +695,30 @@ class Plugins
 			{	// Initialize array for default settings:
 				$defaults = array();
 			}
+
+			// Initialize object for Settings temporary because it may be used in the functions below to get default values:
+			load_class( 'plugins/model/_pluginsettings.class.php', 'PluginSettings' );
+			$Plugin->Settings = new PluginSettings( $Plugin->ID );
+
 			$defaults = array_merge( $defaults, $Plugin->get_custom_setting_definitions( $params ) );
-			$defaults = array_merge( $defaults, $Plugin->get_coll_setting_definitions( $params ) );
-			$defaults = array_merge( $defaults, $Plugin->get_widget_param_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_msg_setting_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_email_setting_definitions( $params ) );
+
+			// Check what other settings are defined for the Plugin,
+			// We should not merge them with $defaults because they are stored in different DB table,
+			// I.e. they are should be initialized in $Plugin->Settings, but we still need this object for a proper settings work:
+			$other_defaults = $Plugin->get_coll_setting_definitions( $params );
+			$other_defaults = array_merge( $other_defaults, $Plugin->get_widget_param_definitions( $params ) );
 		}
 
-		if( empty( $defaults ) )
-		{ // No settings, no need to instantiate.
+		if( empty( $defaults ) && empty( $other_defaults ) )
+		{	// No settings, no need to instantiate:
 			$Timer->pause( 'plugins_inst_'.$set_type );
 			return NULL;
 		}
 
-		if( ! is_array($defaults) )
-		{ // invalid data
+		if( ! is_array( $defaults ) )
+		{	// Invalid format of default settings:
 			$Debuglog->add( $Plugin->classname.'::GetDefault'.$set_type.'() did not return array!', array('plugins', 'error') );
 			return NULL; // fp> correct me if I'm wrong.
 		}
