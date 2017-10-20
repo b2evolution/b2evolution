@@ -8721,7 +8721,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'Header'                    => 'header',
 			'Footer'                    => 'footer',
 			'Menu'                      => 'menu',
+			'Item Single Header'        => 'item_single_header',
 			'Item Single'               => 'item_single',
+			'Item Page'                 => 'item_page',
 			'Menu Top'                  => 'menu_top',
 			'Page Top'                  => 'page_top',
 			'Sidebar'                   => 'sidebar',
@@ -8729,7 +8731,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'Sidebar Single'            => 'sidebar_single',
 			'Front Page Main Area'      => 'front_page_main_area',
 			'Front Page Secondary Area' => 'front_page_secondary_area',
+			'Forum Front Secondary Area'=> 'forum_front_secondary_area',
 			'Contact Page Main Area'    => 'contact_page_main_area',
+			'404 Page'                  => '404_page',
 			'Mobile: Footer'            => 'mobile_footer',
 			'Mobile: Navigation Menu'   => 'mobile_navigation_menu',
 			'Mobile: Tools Menu'        => 'mobile_tools_menu'
@@ -8823,6 +8827,29 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					  SET wico_main = 1
 					WHERE wico_coll_ID = '.$Blog->ID.'
 					  AND wico_code IN ( '.$DB->quote( array_keys(  $main_containers ) ).' )' );
+
+				// Insert main containers if still doesn't exist in DB but declared only in skin file:
+				$SQL = new SQL( 'Get all existing widget containers of collection #'.$Blog->ID );
+				$SQL->SELECT( 'wico_code' );
+				$SQL->FROM( 'T_widget__container' );
+				$SQL->WHERE( 'wico_coll_ID = '.$Blog->ID );
+				$existing_containers = $DB->get_col( $SQL->get() );
+				$not_existing_containers = array_diff( array_keys(  $main_containers ), $existing_containers );
+				if( ! empty( $not_existing_containers ) )
+				{	// If at least we have one missed container:
+					$new_main_cnontainers_sql = array();
+					foreach( $not_existing_containers as $new_wico_code )
+					{
+						$new_main_cnontainers_sql[] = '( '.$DB->quote( $new_wico_code ).', '
+							.$DB->quote( isset( $main_containers[ $new_wico_code ][0] ) ? $main_containers[ $new_wico_code ][0] : $new_wico_code ).', '
+							.$Blog->ID.', '
+							.$DB->quote( isset( $main_containers[ $new_wico_code ][1] ) ? $main_containers[ $new_wico_code ][1] : $new_wico_code ).', '
+							.'1 )';
+					}
+					$DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_name, wico_coll_ID, wico_order, wico_main )
+						VALUES '.implode( ', ', $new_main_cnontainers_sql ),
+						'Insert new main widget containers which are declared in skin file for colleciton #'.$Blog->ID );
+				}
 			}
 		}
 		upg_task_end();
