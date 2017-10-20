@@ -1088,12 +1088,17 @@ table.coll_kind .btn {
 .navbar {
   margin-bottom: 0;
 }
-div.coll-selector {
+div.evo_site_bar {
   padding-top: 18px;
   background-color: #ddd;
   margin-bottom: -3px;
 }
-div.coll-selector .btn-group {
+div.evo_site_bar .btn-group {
+  margin-right: 4px;
+}
+div.evo_section_collection_selector {
+  display: inline-block;
+  margin-left: 10px;
   margin-right: 4px;
 }
 div.level2 {

@@ -969,7 +969,7 @@ class AdminUI_general extends Menu
 				// Template for a list of Sites:
 				return array(
 						'before_bar'           => '<div>',
-						'after_bar'            => '$button_add_site$</div>',
+						'after_bar'            => '$button_add_site$$collections$</div>',
 						'before_site'          => '',
 						'after_site'           => '',
 						'before_site_selected' => '',

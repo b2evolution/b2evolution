@@ -310,8 +310,8 @@ class AdminUI extends AdminUI_general
 			case 'site_bar':
 				// Template for a list of Sites:
 				return array(
-						'before_bar'           => '<div class="container-fluid coll-selector"><nav><div class="btn-group">',
-						'after_bar'            => '</div>$button_add_site$</nav></div>',
+						'before_bar'           => '<div class="container-fluid evo_site_bar"><nav><div class="btn-group">',
+						'after_bar'            => '</div>$button_add_site$$collections$$button_add_coll$</nav></div>',
 						'before_site'          => '',
 						'after_site'           => '',
 						'before_site_selected' => '',
@@ -794,148 +794,16 @@ class AdminUI extends AdminUI_general
 	{
 		global $blog, $current_User, $admin_url;
 
-		$max_buttons = 7;
-
 		if( empty( $this->coll_list_permname ) )
 		{	// We have not requested a list of blogs to be displayed
 			return;
 		}
 
-		// Prepare url params:
-		$url_params = '?';
-		foreach( $this->coll_list_url_params as $name => $value )
-		{
-			$url_params .= $name.'='.$value.'&amp;';
-		}
+		// Force to activate site bar where we should display sections and collections bars:
+		$this->activate_site_bar();
 
-		$template = $this->get_template( 'CollectionList' );
-
-		$BlogCache = & get_BlogCache();
-
-		$blog_array = $BlogCache->load_user_blogs( $this->coll_list_permname, $this->coll_list_permlevel );
-
-		$buttons = '';
-		$select_options = '';
-		$not_favorite_blogs = false;
-		foreach( $blog_array as $l_blog_ID )
-		{ // Loop through all blogs that match the requested permission:
-
-			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
-
-			if( $l_Blog->favorite() || $l_blog_ID == $blog )
-			{ // If blog is favorute OR current blog, Add blog as a button:
-				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
-
-				$buttons .= '<a href="'.$url_params.'blog='.$l_blog_ID
-							.'" class="btn btn-default'.( $l_blog_ID == $blog ? ' active' : '' ).'"';
-
-				if( !is_null($this->coll_list_onclick) )
-				{	// We want to include an onclick attribute:
-					$buttons .= ' onclick="'.sprintf( $this->coll_list_onclick, $l_blog_ID ).'"';
-				}
-
-				$buttons .= '>'.$l_Blog->dget( 'shortname', 'htmlbody' ).'</a> ';
-
-				if( $l_blog_ID == $blog )
-				{
-					$buttons .= $template['afterEachSel'];
-				}
-				else
-				{
-					$buttons .= $template['afterEach'];
-				}
-			}
-
-			if( !$l_Blog->favorite() )
-			{ // If blog is not favorute, Add it into the select list:
-				$not_favorite_blogs = true;
-				$select_options .= '<li>';
-				if( $l_blog_ID == $blog )
-				{
-					//$select_options .= ' selected="selected"';
-				}
-				$select_options .= '<a href="'.$url_params.'blog='.$l_blog_ID.'">'
-					.$l_Blog->dget( 'shortname', 'formvalue' ).'</a></li>';
-			}
-		}
-
-		$r = $template['before'];
-
-		$r .= $title;
-
-		if( $this->coll_list_disp_sections )
-		{	// Check if filter by section is used currently:
-			$sec_ID = param( 'sec_ID', 'integer', 0 );
-			if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'view', false, $sec_ID ) ) )
-			{
-				$sec_ID = 0;
-				set_param( 'sec_ID', 0 );
-			}
-		}
-
-		if( !empty( $this->coll_list_all_title ) )
-		{ // We want to add an "all" button
-			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
-			$r .= '<a href="'.$this->coll_list_all_url
-						.'" class="btn btn-default'.( empty( $sec_ID ) && $blog == 0 ? ' active' : '' ).'">'
-						.$this->coll_list_all_title.'</a> ';
-			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'afterEachSel' : 'afterEach' ];
-		}
-
-		$r .= $template['buttons_start'];
-		$r .= $buttons;
-		$r .= $template['buttons_end'];
-
-
-		if( $not_favorite_blogs )
-		{ // Display select list with not favorite blogs
-			$r .= $template['select_start']
-				.'<a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.T_('Other')
-				.'<span class="caret"></span></a>'
-				.'<ul class="dropdown-menu">'
-				.$select_options
-				.'</ul>'
-				.$template['select_end'];
-		}
-
-		// Button to add new collection:
-		if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
-		{	// Display a button to add new collection if it is requested and current user has a permission
-			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.T_('New Collection').'"><span class="fa fa-plus"></span></a>';
-		}
-		else
-		{	// No request or permission to add new collection:
-			$button_add_blog = '';
-		}
-
-		// Sections:
-		if( $this->coll_list_disp_sections )
-		{
-			$collection_groups = '';
-
-			$SectionCache = & get_SectionCache();
-			$SectionCache->load_available();
-
-			foreach( $SectionCache->cache as $Section )
-			{	// Loop through all sections that match the requested permission:
-				$collection_groups .= ( $Section->ID == $sec_ID ) ? $template['beforeEachSel'] : $template['beforeEach'];
-
-				$collection_groups .= '<a href="'.$url_params.'blog=0&amp;sec_ID='.$Section->ID
-					.'" class="btn btn-default'.( $Section->ID == $sec_ID ? ' active' : '' ).'">'
-						.$Section->dget( 'name', 'htmlbody' )
-					.'</a> ';
-
-				$collection_groups .= ( $Section->ID == $sec_ID ) ? $template['afterEachSel'] : $template['afterEach'];
-			}
-
-			$collection_groups = empty( $collection_groups ) ? '' : '<div class="btn-group">'.$collection_groups.'</div>';
-		}
-		else
-		{
-			$collection_groups = '';
-		}
-
-		$r .= str_replace( array( '$button_add_blog$', '$collection_groups$' ), array( $button_add_blog, $collection_groups ), $template['after'] );
+		// Get site bar with sections and collections bar if it is allowed by current user permission:
+		$r = $this->get_site_bar();
 
 		return $r;
 	}
@@ -1067,6 +935,8 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_site_bar()
 	{
+		global $blog, $current_User;
+
 		if( ! $this->site_bar_activated )
 		{	// Site bar is not activated, Exit here:
 			return '';
@@ -1102,13 +972,102 @@ class AdminUI extends AdminUI_general
 			$r .= $template[ $Site->ID == $site_ID ? 'after_site_selected' : 'after_site' ];
 		}
 
-		$r .= $template['after_bar'];
-
 		// Button to add new site:
 		$button_add_site = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new_site" class="btn btn-default'.( get_param( 'action' ) == 'new_site' ? ' active' : '' ).'" title="'.T_('New Site').'"><span class="fa fa-plus"></span></a>';
 
-		// Replace masked var name with value:
-		$r = str_replace( '$button_add_site$', $button_add_site, $r );
+		$collections_html = '';
+		$button_add_coll = '';
+
+		// Dropdown selector for sections and collection:
+		if( ! empty( $this->coll_list_permname ) )
+		{	// We have requested a list of blogs to be displayed
+			//$template = $this->get_template( 'CollectionList' );
+
+			// Prepare url params:
+			$url_params = '?';
+			foreach( $this->coll_list_url_params as $name => $value )
+			{
+				$url_params .= $name.'='.$value.'&amp;';
+			}
+
+			$BlogCache = & get_BlogCache();
+			$BlogCache->load_user_blogs( $this->coll_list_permname, $this->coll_list_permlevel );
+
+			$select_options = '';
+			$active_title = '';
+
+			if( ! empty( $this->coll_list_all_title ) )
+			{	// We want to add a button "All" to select all collections:
+				if( empty( $sec_ID ) && $blog == 0 )
+				{	// If no section and collection is active then use it as title for dropdown button:
+					$active_title = $this->coll_list_all_title;
+				}
+				$select_options .= '<li><a href="'.$this->coll_list_all_url.'">'.$this->coll_list_all_title.'</a></li>';
+			}
+
+			foreach( $BlogCache->cache as $perm_Blog )
+			{	// Loop through all collecitons that match the requested permission:
+				if( $perm_Blog->favorite() )
+				{	// If collection is favorute, Add it on the start of the select list:
+					$select_options .= '<li><a href="'.$url_params.'blog='.$perm_Blog->ID.'">'.$perm_Blog->dget( 'shortname' ).'</a></li>';
+				}
+				if( $perm_Blog->ID == $blog )
+				{	// If this collection is active then use it as title for dropdown button:
+					$active_title = T_('Collection').': '.$perm_Blog->dget( 'shortname' );
+				}
+			}
+			foreach( $BlogCache->cache as $perm_Blog )
+			{	// Loop through all collecitons that match the requested permission:
+				if( ! $perm_Blog->favorite() )
+				{	// If collection is NOT favorute, Add it at the start of the select list:
+					$select_options .= '<li><a href="'.$url_params.'blog='.$perm_Blog->ID.'">'.$perm_Blog->dget( 'shortname' ).'</a></li>';
+				}
+			}
+
+			// Sections:
+			if( $this->coll_list_disp_sections )
+			{
+				$sec_ID = param( 'sec_ID', 'integer', 0 );
+				if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'view', false, $sec_ID ) ) )
+				{
+					$sec_ID = 0;
+					set_param( 'sec_ID', 0 );
+				}
+
+				$select_options .= '<li class="dropdown-header">'.T_('Sections').'</li>';
+
+				$SectionCache = & get_SectionCache();
+				$SectionCache->load_available();
+
+				foreach( $SectionCache->cache as $Section )
+				{	// Loop through all sections that match the requested permission:
+					$select_options .= '<li><a href="'.$url_params.'blog=0&amp;sec_ID='.$Section->ID.'">'.$Section->dget( 'name' ).'</a></li>';
+					if( $sec_ID == $Section->ID )
+					{	// This section is selected currently:
+						$active_title = T_('Section').': '.$Section->dget( 'name' );
+					}
+				}
+
+				$collection_groups = empty( $collection_groups ) ? '' : '<div class="btn-group">'.$collection_groups.'</div>';
+			}
+
+			$collections_html = '<div class="evo_section_collection_selector dropdown">'
+				.'<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'
+					.$active_title.' <span class="caret"></span>'
+				.'</button>'
+				.'<ul class="dropdown-menu">'.$select_options.'</ul></div>';
+
+			// Button to add new collection:
+			if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+			{	// Display a button to add new collection if it is requested and current user has a permission
+				$button_add_coll = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.T_('New Collection').'"><span class="fa fa-plus"></span></a>';
+			}
+		}
+
+		$r .= $template['after_bar'];
+
+		// Replace masked var names with values:
+		$r = str_replace( array( '$button_add_site$', '$collections$', '$button_add_coll$' ), array( $button_add_site, $collections_html, $button_add_coll ), $r );
 
 		return $r;
 	}
