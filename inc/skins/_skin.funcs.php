@@ -2571,8 +2571,10 @@ function get_skin_containers( $skin_ids )
 	$blog_containers = array();
 	foreach( $skin_ids as $skin_ID )
 	{ // Collect containers from the given skins and merge them
-		$Skin = $SkinCache->get_by_ID( $skin_ID );
-		$blog_containers = array_merge( $blog_containers, $Skin->get_containers() );
+		if( $Skin = & $SkinCache->get_by_ID( $skin_ID, false, false ) )
+		{
+			$blog_containers = array_merge( $blog_containers, $Skin->get_containers() );
+		}
 	}
 
 	return $blog_containers;
