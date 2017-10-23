@@ -134,7 +134,7 @@ switch( $action )
 			$WidgetCache = & get_WidgetCache();
 			if( ! $user_register_Widget = & $WidgetCache->get_by_ID( $widget, false, false ) ||
 			    $user_register_Widget->code != 'user_register' ||
-			    $user_register_Widget->get( 'coll_ID' ) != $Blog->ID )
+			    $user_register_Widget->get_container_param( 'coll_ID' ) != $Blog->ID )
 			{ // Wrong or hacked request!
 				debug_die( 'Quick registration is currently disabled on this system.' );
 				break;
