@@ -181,12 +181,15 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.')
 		.' ('.sprintf( T_('%s characters'), '<span id="blog_name_chars_count">'.$name_chars_count.'</span>' ).')', 255 );
 
-	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname' ), 15, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
+
+	$blog_shortname = $action == 'copy' ? NULL : $edited_Blog->get( 'shortname' );
+	$Form->text( 'blog_shortname', $blog_shortname, 15, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) ||
 	    $current_User->check_perm( 'blogs', 'create', false, $edited_Blog->sec_ID ) )
 	{ // Permission to edit advanced admin settings
-		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL "filename"'),
+		$blog_urlname = $action == 'copy' ? NULL : $edited_Blog->get( 'urlname' );
+		$Form->text( 'blog_urlname', $blog_urlname, 20, T_('URL "filename"'),
 				sprintf( T_('"slug" used to uniquely identify this blog in URLs. Also used as <a %s>default media folder</a>.'),
 					'href="?ctrl=coll_settings&tab=advanced&blog='.$blog.'"'), 255 );
 	}
@@ -201,6 +204,7 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 
 	if( $is_creating )
 	{
+		$blog_urlname = $action == 'copy' ? NULL : $edited_Blog->get( 'urlname' );
 		?>
 		<script type="text/javascript">
 		var shortNameInput = jQuery( '#blog_shortname');
@@ -208,15 +212,18 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 
 		function getAvailableUrlName( urlname )
 		{
-			evo_rest_api_request( 'tools/available_urlname',
+			if( urlname )
 			{
-				'urlname': urlname
-			},
-			function( data )
-			{
-				jQuery( 'span#urlname_display' ).html( data.urlname );
-				jQuery( 'input[name="blog_urlname"]' ).val( data.urlname );
-			}, 'GET' );
+				evo_rest_api_request( 'tools/available_urlname',
+				{
+					'urlname': urlname
+				},
+				function( data )
+				{
+					jQuery( 'span#urlname_display' ).html( data.urlname );
+					jQuery( 'input[name="blog_urlname"]' ).val( data.urlname );
+				}, 'GET' );
+			}
 		}
 
 		shortNameInput.on( 'keyup', function( ) {
@@ -225,7 +232,7 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 		} );
 
 		jQuery( document ).ready( function() {
-			getAvailableUrlName( '<?php echo format_to_js( $edited_Blog->get( 'urlname' ) ); ?>' );
+			getAvailableUrlName( '<?php echo format_to_js( $blog_urlname ); ?>' );
 		} );
 		</script>
 		<?php
@@ -298,7 +305,14 @@ if( ! $is_creating )
 
 $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection-permission-settings' ) );
 
-	$owner_User = & $edited_Blog->get_owner_User();
+	if( $action == 'copy' )
+	{
+		$owner_User = $current_User;
+	}
+	else
+	{
+		$owner_User = & $edited_Blog->get_owner_User();
+	}
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{ // Permission to edit advanced admin settings
 		// fp> Note: There are 2 reasons why we don't provide a select here:
@@ -325,7 +339,8 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 			), T_('Permission management'), true );
 	}
 
-	$Form->radio( 'blog_allow_access', $edited_Blog->get_setting( 'allow_access' ),
+	$blog_allow_access = $action == 'copy' ? 'public' : $edited_Blog->get_setting( 'allow_access' );
+	$Form->radio( 'blog_allow_access', $blog_allow_access,
 			array(
 				array( 'public', T_('Everyone (Public Blog)') ),
 				array( 'users', T_('Community only (Logged-in users only)') ),
