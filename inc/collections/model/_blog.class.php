@@ -86,9 +86,9 @@ class Blog extends DataObject
 	var $media_fullpath = '';
 	var $media_url = '';
 
-	var $normal_skin_ID = '0';
-	var $mobile_skin_ID = '0';
-	var $tablet_skin_ID = '0';
+	var $normal_skin_ID = NULL;
+	var $mobile_skin_ID = NULL;
+	var $tablet_skin_ID = NULL;
 
 	/**
 	 * The basepath of that collection.
@@ -235,9 +235,9 @@ class Blog extends DataObject
 			$this->media_url = $db_row->blog_media_url;
 			$this->type = isset( $db_row->blog_type ) ? $db_row->blog_type : 'std';
 			$this->order = isset( $db_row->blog_order ) ? $db_row->blog_order : 0;
-			$this->normal_skin_ID = isset( $db_row->blog_normal_skin_ID ) ? $db_row->blog_normal_skin_ID : '0'; // check by isset() to avoid warnings of deleting all tables before new install
-			$this->mobile_skin_ID = isset( $db_row->blog_mobile_skin_ID ) ? $db_row->blog_mobile_skin_ID : '0'; // 0 means the same as normal_skid_ID value
-			$this->tablet_skin_ID = isset( $db_row->blog_tablet_skin_ID ) ? $db_row->blog_tablet_skin_ID : '0'; // 0 means the same as normal_skid_ID value
+			$this->normal_skin_ID = isset( $db_row->blog_normal_skin_ID ) ? $db_row->blog_normal_skin_ID : NULL; // check by isset() to avoid warnings of deleting all tables before new install
+			$this->mobile_skin_ID = isset( $db_row->blog_mobile_skin_ID ) ? $db_row->blog_mobile_skin_ID : NULL; // NULL means the same as normal_skid_ID value
+			$this->tablet_skin_ID = isset( $db_row->blog_tablet_skin_ID ) ? $db_row->blog_tablet_skin_ID : NULL; // NULL means the same as normal_skid_ID value
 		}
 
 		$Timer->pause( 'Blog constructor' );
@@ -2859,8 +2859,8 @@ class Blog extends DataObject
 
 				if( $parname == 'mobile_skin_ID' || $parname == 'tablet_skin_ID' )
 				{
-					if( ( $result === '0' ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
-					{ // 0 value means that use the same as normal case
+					if( ( $result === NULL ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
+					{	// NULL value means that use the same as normal case:
 						$result = $this->get( 'normal_skin_ID' );
 					}
 				}
