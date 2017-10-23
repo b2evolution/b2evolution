@@ -181,7 +181,6 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.')
 		.' ('.sprintf( T_('%s characters'), '<span id="blog_name_chars_count">'.$name_chars_count.'</span>' ).')', 255 );
 
-
 	$blog_shortname = $action == 'copy' ? NULL : $edited_Blog->get( 'shortname' );
 	$Form->text( 'blog_shortname', $blog_shortname, 15, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
 
@@ -239,9 +238,10 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	}
 
 	// Section:
+	$blog_section_id = $action == 'copy' ? 1 : $edited_Blog->get( 'sec_ID' );
 	$SectionCache = & get_SectionCache();
-	$SectionCache->load_available( $edited_Blog->get( 'sec_ID' ) );
-	$Form->select_input_object( 'sec_ID', $edited_Blog->get( 'sec_ID' ), $SectionCache, T_('Section'), array( 'required' => true ) );
+	$SectionCache->load_available( $blog_section_id );
+	$Form->select_input_object( 'sec_ID', $blog_section_id, $SectionCache, T_('Section'), array( 'required' => true ) );
 
 $Form->end_fieldset();
 
