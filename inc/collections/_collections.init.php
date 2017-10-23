@@ -528,12 +528,8 @@ class collections_Module extends Module
 				'perm_createblog' => $permcreateblog,
 				'perm_getblog' => $permgetblog,
 				'perm_default_sec_ID' => 3,
+				'perm_allowed_sections' => $permallowedsections,
 				);
-
-		if( ! empty( $permallowedsections ) )
-		{	// Set this default setting only when at least one is detected, to avoid empty on install when groups are created before sections:
-			$permissions['perm_allowed_sections'] = $permallowedsections;
-		}
 
 		$permissions['perm_max_createblog_num'] = $permmaxcreateblognum;
 
