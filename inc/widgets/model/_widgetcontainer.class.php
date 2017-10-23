@@ -55,6 +55,30 @@ class WidgetContainer extends DataObject
 
 
 	/**
+	 * Get this class db table config params
+	 *
+	 * @return array
+	 */
+	static function get_class_db_config()
+	{
+		static $widget_container_db_config;
+
+		if( !isset( $widget_container_db_config ) )
+		{
+			$widget_container_db_config = array_merge( parent::get_class_db_config(),
+				array(
+					'dbtablename' => 'T_widget__container',
+					'dbprefix'    => 'wico_',
+					'dbIDname'    => 'wico_ID',
+				)
+			);
+		}
+
+		return $widget_container_db_config;
+	}
+
+
+	/**
 	 * Get delete cascade settings
 	 *
 	 * @return array
