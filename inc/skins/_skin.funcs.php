@@ -603,38 +603,6 @@ function skin_init( $disp )
 						$Messages->add( sprintf( T_( 'You cannot send a private message to %s. However you can send them an email if you\'d like.' ), $recipient_User->get( 'login' ) ), 'warning' );
 					}
 				}
-				elseif( ( $msg_type != 'email' ) && ( $allow_msgform == 'PM' ) )
-				{ // private message form should be displayed, change display to create new individual thread with the given recipient user
-					// check if creating new PM is allowed
-					if( check_create_thread_limit( true ) )
-					{ // thread limit reached
-						header_redirect();
-						// exited here
-					}
-
-					global $edited_Thread, $edited_Message, $recipients_selected;
-
-					// Load classes
-					load_class( 'messaging/model/_thread.class.php', 'Thread' );
-					load_class( 'messaging/model/_message.class.php', 'Message' );
-
-					// Set global variable to auto define the FB autocomplete plugin field
-					$recipients_selected = array( array(
-							'id'    => $recipient_User->ID,
-							'login' => $recipient_User->login,
-							'fullname' => $recipient_User->get_username()
-						) );
-
-					init_tokeninput_js( 'blog' );
-
-					$disp = 'threads';
-					$edited_Thread = new Thread();
-					$edited_Message = new Message();
-					$edited_Message->Thread = & $edited_Thread;
-					$edited_Thread->recipients = $recipient_User->login;
-					param( 'action', 'string', 'new', true );
-					param( 'thrdtype', 'string', 'individual', true );
-				}
 
 				if( $allow_msgform == 'email' )
 				{ // set recippient user param

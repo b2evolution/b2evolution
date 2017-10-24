@@ -301,6 +301,7 @@ function & get_UserFieldCache()
 
 	if( ! isset( $UserFieldCache ) )
 	{	// Cache doesn't exist yet:
+		load_class( 'users/model/_userfield.class.php', 'Userfield' );
 		$UserFieldCache = new DataObjectCache( 'Userfield', false, 'T_users__fielddefs', 'ufdf_', 'ufdf_ID', 'ufdf_name', 'ufdf_name' ); // COPY (FUNC)
 	}
 
@@ -1395,6 +1396,14 @@ class _core_Module extends Module
 											'text' => T_('Comments').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments'.$blog_param,
 										),
+									'contact' => array(
+											'text' => T_('Contact form').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=contact'.$blog_param,
+										),
+									'userdir' => array(
+											'text' => T_('User directory').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir'.$blog_param,
+										),
 									'other' => array(
 											'text' => T_('Other displays').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other'.$blog_param,
@@ -1533,6 +1542,9 @@ class _core_Module extends Module
 						break;
 					case 'comments':
 						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$Blog->ID;
+						break;
+					case 'msgform':
+						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=contact&amp;blog='.$Blog->ID;
 						break;
 					case 'users':
 						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$Blog->ID;
