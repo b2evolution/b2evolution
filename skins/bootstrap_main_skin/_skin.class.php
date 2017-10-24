@@ -141,7 +141,8 @@ class bootstrap_main_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px. ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -199,7 +200,8 @@ class bootstrap_main_Skin extends Skin
 					),
 					'front_bg_opacity' => array(
 						'label' => T_('Background opacity'),
-						'note' => '%. ' . T_('Adjust the background transparency level.'),
+						'input_suffix' => ' %. ',
+						'note' => T_('Adjust the background transparency level.'),
 						'size' => '7',
 						'maxlength' => '3',
 						'defaultvalue' => '10',

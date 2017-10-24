@@ -1691,7 +1691,7 @@ table.diff td.diff-title-addedline {
   display: none;
 }
 #customizer_wrapper .controls .help-inline {
-  display: block;
+  display: inline-block;
 }
 #customizer_wrapper .file_select_item {
   margin: 0;
