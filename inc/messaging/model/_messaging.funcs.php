@@ -1896,18 +1896,26 @@ function get_thread_prevnext_links( $current_thread_ID, $params = array() )
 /**
  * Get preferred contact methods on disp=msgform
  *
+ * @param object Recipient User
  * @return array
  */
-function get_msgform_contact_methods()
+function get_msgform_contact_methods( $recipient_User = NULL )
 {
-	global $DB;
+	global $DB, $current_User;
 
-	$contact_methods = array( 'email' => T_('Email') );
+	$contact_methods = array();
+
+	if( is_logged_in() && $recipient_User !== NULL &&
+	    $current_User->get_msgform_possibility( $recipient_User, 'PM' ) )
+	{	// Suggest PM method only if it is allowed between current and recipient users:
+		$contact_methods['pm'] = T_('Private Message on this Site');
+	}
+
+	// Email method is allowed for all users:
+	$contact_methods['email'] = T_('Email');
 
 	if( is_logged_in() )
 	{	// Get additional user fields if they are filled for current user profile:
-		global $current_User;
-
 		$SQL = new SQL( 'Get preferred contact methods for disp=msgform' );
 		$SQL->SELECT( 'ufdf_id, ufdf_name' );
 		$SQL->FROM( 'T_users__fielddefs' );
