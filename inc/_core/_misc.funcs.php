@@ -4074,7 +4074,7 @@ function mail_autoinsert_user_data( $text, $User = NULL )
  */
 function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
 {
-	global $current_charset;
+	global $current_charset, $current_User;
 
 	if( !empty( $params['locale'] ) )
 	{ // Switch to locale for current email template

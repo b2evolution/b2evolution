@@ -35,6 +35,8 @@ $recipient_id = param( 'recipient_id', 'integer', 0 );
 $post_id = param( 'post_id', 'integer', 0 );
 $comment_id = param( 'comment_id', 'integer', 0 );
 $subject = param( 'subject', 'string', '' );
+$subject_other = param( 'subject_other', 'string', '' );
+$contact_method = param( 'contact_method', 'string', '' );
 
 
 // User's preferred name or the stored value in her cookie (from commenting):
@@ -89,14 +91,12 @@ if( empty($recipient_address) )
 // Form to send email
 if( !empty( $Blog ) && ( $Blog->get_ajax_form_enabled() ) )
 {
-	if( empty( $subject ) )
-	{
-		$subject = '';
-	}
 	// init params
 	$json_params = array(
 		'action' => 'get_msg_form',
 		'subject' => $subject,
+		'subject_other' => $subject_other,
+		'contact_method' => $contact_method,
 		'recipient_id' => $recipient_id,
 		'recipient_name' => $recipient_name,
 		'email_author' => $email_author,
@@ -106,7 +106,7 @@ if( !empty( $Blog ) && ( $Blog->get_ajax_form_enabled() ) )
 		'redirect_to' => $redirect_to,
 		'params' => $params );
 
-	// generate form wtih ajax request
+	// Generate form with ajax request:
 	display_ajax_form( $json_params );
 }
 else

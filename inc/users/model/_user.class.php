@@ -2831,8 +2831,9 @@ class User extends DataObject
 					break;
 				}
 
-				if( ( $permlevel != 'view' ) &&  $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
-				{ // Comment item is locked and current user is not allowed to edit/moderate locked items comment
+				if( ( ( $permlevel != 'view' ) &&  $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
+						&& ! ( $permlevel == 'delete' && $this->check_perm( 'users', 'edit' ) ) )
+				{ // Comment item is locked, i.e., all of its categories are locked, and current user is not allowed to edit/moderate locked items comment or is not a user admin
 					break;
 				}
 
@@ -2850,7 +2851,8 @@ class User extends DataObject
 				if( $permlevel == 'delete' )
 				{ // permlevel is delete so we have to check the 'blog_del_cmts' permission
 					$perm = $this->check_perm( 'blog_del_cmts', 'edit', false, $blog_ID )
-							|| $this->check_perm( 'recycle_owncmts', $permlevel, false, $Comment );
+							|| $this->check_perm( 'recycle_owncmts', $permlevel, false, $Comment )
+							|| $this->check_perm( 'users', 'edit', false );
 					break;
 				}
 
@@ -2969,8 +2971,10 @@ class User extends DataObject
 				$blog_ID = $Item->get_blog_ID();
 				$check_status = substr( $permname, 10 );
 
-				if( ( $permlevel != 'view' ) && $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
-				{ // Item is locked and current user is not allowed to edit locked items ( only view permission is allowed by default for locked items )
+				if( ( ( $permlevel != 'view' ) && $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
+						&& ! ( $permlevel == 'delete' && $this->check_perm( 'users', 'edit', false ) ) )
+				{ // Item is locked, i.e., it has all of its categories locked, and current user is not allowed to edit locked items
+					// ( only view permission is allowed by default for locked items ) or is not a user admin
 					break;
 				}
 
@@ -2982,7 +2986,8 @@ class User extends DataObject
 
 				if( $permlevel == 'delete' )
 				{ // permlevel is delete so we have to check the 'blog_del_post' permission
-					$perm = $this->check_perm( 'blog_del_post', 'edit', false, $blog_ID );
+					// User admins are allowed to delete posts
+					$perm = $this->check_perm( 'blog_del_post', 'edit', false, $blog_ID ) || $this->check_perm( 'users', 'edit', false );
 					break;
 				}
 
@@ -3065,7 +3070,7 @@ class User extends DataObject
 				if( ( $permlevel == 'moderate' ) && $this->check_perm( 'users', 'moderate' ) )
 				{ // this user has moderator permission, check if the group level is higher then the target user group level
 					$this->get_Group();
-					$User->get_Group;
+					$User->get_Group();
 					$perm = ( $this->Group->level > $User->Group->level );
 					break;
 				}
@@ -4676,22 +4681,26 @@ class User extends DataObject
 
 	/**
 	 * Add a user field
+	 *
+	 * @param integer User field definition ID
+	 * @param string Field value
 	 */
-	function userfield_add( $type, $val )
+	function userfield_add( $uf_ufdf_ID, $val )
 	{
 		global $DB;
-		$this->new_fields[] = $type.', '.$DB->quote( $val );
+		$this->new_fields[] = $uf_ufdf_ID.', '.$DB->quote( $val );
 	}
 
 
 	/**
 	 * Update an user field. Empty fields will be deleted on dbupdate.
+	 *
+	 * @param integer User field ID
+	 * @param string Field value
 	 */
 	function userfield_update( $uf_ID, $val )
 	{
-		global $DB;
-		$this->updated_fields[$uf_ID] = $val;
-		// pre_dump( $uf_ID, $val);
+		$this->updated_fields[ $uf_ID ] = $val;
 	}
 
 
@@ -4723,21 +4732,56 @@ class User extends DataObject
 
 
 	/**
+	 * Get user fields by field definition ID
+	 *
+	 * @param integer Field definition ID
+	 * @return array|false Fields
+	 */
+	function userfields_by_ID( $ufdf_ID )
+	{
+		// Load all user fields once:
+		$this->userfields_load();
+
+		if( ! empty( $this->userfields_by_type[ $ufdf_ID ] ) )
+		{	// Get user fields from cache:
+			$userfields = array();
+			foreach( $this->userfields_by_type[ $ufdf_ID ] as $uf_ID )
+			{
+				if( ! empty( $this->userfields[ $uf_ID ] ) )
+				{
+					$userfields[] = $this->userfields[ $uf_ID ];
+				}
+			}
+			return $userfields;
+		}
+
+		// No fields:
+		return false;
+	}
+
+
+	/**
 	 * Get user field value by ID
 	 *
 	 * @param integer Field ID
+	 * @param boolean TRUE to prepare user field for correct html displaying
 	 * @return string Field value
 	 */
-	function userfield_value_by_ID( $field_ID )
+	function userfield_value_by_ID( $field_ID, $prepare_userfield = true )
 	{
-		global $DB;
-
-		// Load all user fields once
+		// Load all user fields once:
 		$this->userfields_load();
 
 		if( isset( $this->userfields_by_type[ $field_ID ], $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ] ) )
-		{ // Get value from cache
-			return $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ]->uf_varchar;
+		{	// Get value from cache:
+			$userfield = $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ];
+
+			if( $prepare_userfield )
+			{	// Prepare user field for correct html displaying:
+				userfield_prepare( $userfield );
+			}
+
+			return $userfield->uf_varchar;
 		}
 
 		// No field value
@@ -4749,9 +4793,10 @@ class User extends DataObject
 	 * Get user field values by code
 	 *
 	 * @param integer Field code
+	 * @param boolean TRUE to prepare user field for correct html displaying
 	 * @return array Field values
 	 */
-	function userfield_values_by_code( $field_code )
+	function userfield_values_by_code( $field_code, $prepare_userfield = true )
 	{
 		global $DB;
 
@@ -4763,7 +4808,12 @@ class User extends DataObject
 		{ // Get value from cache
 			foreach( $this->userfields_by_code[ $field_code ] as $userfield_ID )
 			{
-				$field_values[] = $this->userfields[ $userfield_ID ]->uf_varchar;
+				$userfield = $this->userfields[ $userfield_ID ];
+				if( $prepare_userfield )
+				{	// Prepare user field for correct html displaying:
+					userfield_prepare( $userfield );
+				}
+				$field_values[] = $userfield->uf_varchar;
 			}
 		}
 
@@ -4801,8 +4851,7 @@ class User extends DataObject
 				{	// Init array
 					$userfield_lists[$userfield->ufdf_ID] = array();
 				}
-				userfield_prepare( $userfield );
-				$userfield_lists[$userfield->ufdf_ID][] = $userfield->uf_varchar;
+				$userfield_lists[$userfield->ufdf_ID][$userfield->uf_ID] = $userfield->uf_varchar;
 			}
 		}
 
@@ -4812,6 +4861,7 @@ class User extends DataObject
 			{ // List style
 				if( isset( $userfield_lists[$userfield->ufdf_ID] ) )
 				{ // Save all data for this field:
+					$userfield->list = $userfield_lists[ $userfield->ufdf_ID ];
 					$userfield->uf_varchar = implode( ', ', $userfield_lists[$userfield->ufdf_ID] );
 					$this->userfields[$userfield->uf_ID] = $userfield;
 					$this->userfields_by_code[$userfield->ufdf_code][] = $userfield->uf_ID;
@@ -4821,7 +4871,6 @@ class User extends DataObject
 			}
 			else
 			{ // Save all data for this field:
-				userfield_prepare( $userfield );
 				$this->userfields[$userfield->uf_ID] = $userfield;
 				$this->userfields_by_code[$userfield->ufdf_code][] = $userfield->uf_ID;
 			}
@@ -4831,6 +4880,9 @@ class User extends DataObject
 
 		// Also make sure the definitions are loaded
 		$this->userfield_defs_load();
+
+		// Set flag to don't call this function twice:
+		$this->userfields_loaded = true;
 	}
 
 
@@ -4862,20 +4914,31 @@ class User extends DataObject
 
 
 	/**
-	* Get first field for a specific type
-	*
-	* @return string or NULL
-	*/
-	function userfieldget_first_for_type( $type_ID )
+	 * Get first field for a specific type
+	 *
+	 * @param integer Field type ID
+	 * @param boolean TRUE to prepare user field for correct html displaying
+	 * @return string or NULL
+	 */
+	function userfieldget_first_for_type( $type_ID, $prepare_userfield = true )
 	{
-		if( !isset($this->userfields_by_type[$type_ID]) )
+		$this->userfields_load();
+
+		if( ! isset( $this->userfields_by_type[ $type_ID ] ) )
 		{
 			return NULL;
 		}
 
-		$idx = $this->userfields_by_type[$type_ID][0];
+		$idx = $this->userfields_by_type[ $type_ID ][0];
 
-		return $this->userfields[$idx]->uf_varchar;
+		$userfield = $this->userfields[ $idx ];
+
+		if( $prepare_userfield )
+		{	// Prepare user field for correct html displaying:
+			userfield_prepare( $userfield );
+		}
+
+		return $userfield->uf_varchar;
 	}
 
 
@@ -5863,7 +5926,7 @@ class User extends DataObject
 	{
 		global $DB, $current_User;
 
-		$this->get_Group();
+		$current_User_Group = $current_User->get_Group();
 
 		switch( $type )
 		{
@@ -5877,7 +5940,7 @@ class User extends DataObject
 						WHERE iver_edit_user_ID = '.$DB->quote( $this->ID ).'
 						GROUP BY iver_itm_ID ) AS b
 							ON b.iver_itm_ID = post_ID ';
-				$where_clause = 'b.counter > 0';
+				$where_clause = 'post_creator_user_ID != '.$DB->quote( $this->ID ).' AND ( b.counter > 0 OR post_lastedit_user_ID = '.$DB->quote( $this->ID ).' )';
 				break;
 
 			case 'created|edited':
@@ -5887,11 +5950,11 @@ class User extends DataObject
 
 		if( $count_only )
 		{
-			$sql = 'SELECT COUNT(*) ';
+			$sql = 'SELECT COUNT( DISTINCT( post_ID ) ) ';
 		}
 		else
 		{
-			$sql = 'SELECT T_items__item.* ';
+			$sql = 'SELECT DISTINCT T_items__item.* ';
 		}
 
 		$sql .= 'FROM T_items__item ';
@@ -5916,9 +5979,11 @@ class User extends DataObject
 				LEFT JOIN T_blogs
 					ON blog_ID = cat_blog_ID
 				LEFT JOIN T_coll_user_perms
-					ON bloguser_blog_ID = blog_ID AND bloguser_user_ID = '.$DB->quote( $this->ID ).'
+					ON bloguser_blog_ID = blog_ID AND bloguser_user_ID = '.$DB->quote( $current_User->ID ).'
 				LEFT JOIN T_coll_group_perms
-					ON bloggroup_blog_ID = blog_ID AND bloggroup_group_ID = '.$DB->quote( $this->Group->ID ).'
+					ON bloggroup_blog_ID = blog_ID AND bloggroup_group_ID = '.$DB->quote( $current_User_Group->ID ).'
+				LEFT JOIN T_groups__groupsettings
+					ON gset_grp_ID = bloggroup_group_ID AND gset_name = "perm_users"
 				LEFT JOIN (
 					SELECT
 						bloggroup_blog_ID,
@@ -5930,15 +5995,25 @@ class User extends DataObject
 					LEFT JOIN evo_bloggroups
 						ON bloggroup_group_ID = grp_ID
 					WHERE
-						sug_user_ID = '.$DB->quote( $this->ID ).'
+						sug_user_ID = '.$DB->quote( $current_User->ID ).'
 					GROUP BY
 						bloggroup_blog_ID
 				) AS sg
 					ON sg.bloggroup_blog_ID = blog_ID
 				WHERE
 					'.$where_clause.'
-					AND ( categories > locked_categories OR ( bloguser_perm_cats = 1 OR bloggroup_perm_cats = 1 OR secondary_grp_perm_cats > 0 ) )
-					AND ( bloguser_perm_delpost = 1 OR bloggroup_perm_delpost = 1 OR secondary_grp_perm_delpost > 0 )';
+					AND
+					(
+				 	  ( categories > locked_categories OR ( bloguser_perm_cats = 1 OR bloggroup_perm_cats = 1 OR secondary_grp_perm_cats > 0 ) )
+						AND
+						(
+							( blog_advanced_perms = 0 && blog_owner_user_ID = '.$DB->quote( $current_User->ID ).' )
+							OR
+							( blog_advanced_perms = 1 && ( bloguser_perm_delpost = 1 OR bloggroup_perm_delpost = 1 OR secondary_grp_perm_delpost > 0 ) )
+						)
+						OR
+						( gset_value = "edit" )
+					)';
 
 		if( $count_only )
 		{

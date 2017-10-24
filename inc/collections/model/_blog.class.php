@@ -1027,6 +1027,27 @@ class Blog extends DataObject
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
 		}
 
+		if( in_array( 'contact', $groups ) )
+		{	// we want to load the contact form settings:
+			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
+			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
+			$this->set_setting( 'msgform_recipient_label', param( 'msgform_recipient_label', 'string' ) );
+			$this->set_setting( 'msgform_user_name', param( 'msgform_user_name', 'string' ) );
+			$this->set_setting( 'msgform_require_name', param( 'msgform_require_name', 'integer', 0 ) );
+			$this->set_setting( 'msgform_subject_list', param( 'msgform_subject_list', 'text' ) );
+			$this->set_setting( 'msgform_display_subject', param( 'msgform_display_subject', 'integer', 0 ) );
+			$this->set_setting( 'msgform_require_subject', param( 'msgform_require_subject', 'integer', 0 ) );
+			$msgform_additional_fields = param( 'msgform_additional_fields', 'array:integer', array() );
+			$this->set_setting( 'msgform_additional_fields', implode( ',', $msgform_additional_fields ) );
+			$this->set_setting( 'msgform_contact_method', param( 'msgform_contact_method', 'integer', 0 ) );
+			$this->set_setting( 'msgform_display_message', param( 'msgform_display_message', 'integer', 0 ) );
+			if( get_param( 'msgform_display_message' ) )
+			{	// Update these two fields only if message is allowed:
+				$this->set_setting( 'msgform_require_message', param( 'msgform_require_message', 'integer', 0 ) );
+				$this->set_setting( 'msgform_message_label', param( 'msgform_message_label', 'string' ) );
+			}
+		}
+
 		if( in_array( 'userdir', $groups ) )
 		{ // we want to load the user directory settings:
 			$this->set_setting( 'userdir_picture', param( 'userdir_picture', 'integer', 0 ) );
@@ -1072,10 +1093,6 @@ class Blog extends DataObject
 
 			// Archive pages:
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
-
-			// Contact form:
-			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
-			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
 		}
 
 		if( in_array( 'more', $groups ) )
@@ -3042,6 +3059,22 @@ class Blog extends DataObject
 					{
 						array_push( $coll_IDs, $this->ID );
 						$result = implode( ',', $coll_IDs );
+					}
+				}
+				break;
+
+			case 'msgform_subject_options':
+				$subject_list = utf8_trim( $this->get_setting( 'msgform_subject_list' ) );
+				$result = array();
+				if( ! empty( $subject_list ) )
+				{
+					$subject_list = explode( "\n", str_replace( "\r", '', $subject_list ) );
+					foreach( $subject_list as $subject_option )
+					{
+						if( utf8_trim( $subject_option ) != '' )
+						{	// Use only not empty line:
+							$result[ $subject_option ] = $subject_option;
+						}
 					}
 				}
 				break;
@@ -5319,6 +5352,145 @@ class Blog extends DataObject
 
 		// Execute a query with to know if current user has new data to view:
 		return intval( $DB->get_var( $unread_posts_SQL ) );
+	}
+
+
+	/**
+	 * Get additional fields on disp=msgform
+	 *
+	 * @return array
+	 */
+	function get_msgform_additional_fields()
+	{
+		$msgform_additional_fields = trim( $this->get_setting( 'msgform_additional_fields' ) );
+
+		$saved_additional_fields = array();
+
+		if( empty( $msgform_additional_fields ) )
+		{	// No saved additional fields for this collection:
+			return $saved_additional_fields;
+		}
+
+		// Get data of saved additional fields from DB by IDs:
+		$msgform_additional_fields = explode( ',', $msgform_additional_fields );
+		$UserFieldCache = & get_UserFieldCache();
+		foreach( $msgform_additional_fields as $user_field_ID )
+		{
+			if( $UserField = & $UserFieldCache->get_by_ID( $user_field_ID, false, false ) )
+			{
+				$saved_additional_fields[ $UserField->ID ] = $UserField;
+			}
+		}
+
+		return $saved_additional_fields;
+	}
+
+
+	/**
+	 * Display all selected additional fields on disp=msgform
+	 *
+	 * @param object Form
+	 * @return array
+	 */
+	function display_msgform_additional_fields( $Form )
+	{
+		$msgform_additional_fields = $this->get_msgform_additional_fields();
+
+		foreach( $msgform_additional_fields as $UserField )
+		{
+			$field_value = '';
+			$field_value2 = '';
+			if( is_logged_in() )
+			{	// Get saved field value from the current logged in User:
+				global $current_User;
+				$userfields = $current_User->userfields_by_ID( $UserField->ID );
+
+				if( isset( $userfields[0] ) )
+				{	// Get a value for single field or first of multiple field:
+					$userfield_data = $userfields[0];
+					if( in_array( $UserField->get( 'duplicated' ), array( 'list', 'allowed' ) ) && isset( $userfield_data->list ) )
+					{	// Use only first value of the list field:
+						$field_values = array_values( $userfield_data->list );
+						$field_value = isset( $field_values[0] ) ? $field_values[0] : $userfield_data->uf_varchar;
+						$field_value2 = isset( $field_values[1] ) ? $field_values[1] : '';
+					}
+					else
+					{
+						$field_value = $userfield_data->uf_varchar;
+					}
+				}
+
+				if( isset( $userfields[1] ) )
+				{	// Get a value for second of multiple field:
+					$field_value2 = $userfields[1]->uf_varchar;
+				}
+			}
+
+			// Display single additional field:
+			$this->display_msgform_additional_field( $Form, $UserField, $field_value );
+
+			if( $field_value != '' && in_array( $UserField->get( 'duplicated' ), array( 'allowed', 'list' ) ) )
+			{	// If field is multiple the display one more additional field:
+				$this->display_msgform_additional_field( $Form, $UserField, $field_value2, true );
+			}
+		}
+	}
+
+
+	/**
+	 * Display single additional field on disp=msgform
+	 *
+	 * @param object Form
+	 * @param object UserField
+	 * @param string Field value
+	 * @param boolean Is field duplicated
+	 * @return array
+	 */
+	function display_msgform_additional_field( $Form, $UserField, $field_value = '', $force_not_required = false )
+	{
+		$field_params = array();
+
+		if( ! $force_not_required && $UserField->get( 'required' ) == 'require' )
+		{	// Field is required and it is not a second copy of the field:
+			$field_params['required'] = true;
+		}
+
+		if( $UserField->get( 'suggest' ) == '1' && $UserField->get( 'type' ) == 'word' )
+		{	// Mark field with this tag to suggest a values
+			$field_params['autocomplete'] = 'on';
+		}
+
+		// Field name:
+		$field_name = 'user_fields['.$UserField->ID.']';
+		if( in_array( $UserField->get( 'duplicated' ), array( 'allowed', 'list' ) ) )
+		{	// If field can be duplicated:
+			$field_name .= '[]';
+		}
+
+		// Field icon:
+		$userfield_icon = $UserField->get( 'icon_name' ) ? '<span class="'.$UserField->get( 'icon_name' ).' ufld_'.$UserField->get( 'code' ).' ufld__textcolor"></span> ' : '';
+
+		switch( $UserField->get( 'type' ) )
+		{
+			case 'text':
+				$field_params['cols'] = 38;
+				$Form->textarea_input( $field_name, $field_value, 5, $userfield_icon.$UserField->get( 'name' ), $field_params );
+				break;
+
+			case 'list':
+				$uf_options = explode( "\n", str_replace( "\r", '', $UserField->get( 'options' ) ) );
+				if( $UserField->get( 'required' ) != 'require' )
+				{	// Add an empty value for not required field:
+					$uf_options = array_merge( array( '', '---' ), $uf_options );
+				}
+				$Form->select_input_array( $field_name, $field_value, $uf_options, $userfield_icon.$UserField->get( 'name' ), '', $field_params );
+				break;
+
+			default:
+				$field_params['maxlength'] = 255;
+				$field_params['style'] = 'max-width:90%';
+				$Form->text_input( $field_name, $field_value, ( $UserField->get( 'type' ) == 'url' ? 80 : 40 ), $userfield_icon.$UserField->get( 'name' ), '', $field_params );
+		}
 	}
 }
 

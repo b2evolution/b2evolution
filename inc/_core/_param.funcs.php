@@ -908,7 +908,15 @@ function param_check_url( $var, $context, $field_err_msg = NULL )
 	 */
 	global $current_User;
 
-	$Group = $current_User->get_Group();
+	if( is_logged_in() )
+	{	// Use antispam checking depending on current user group setting:
+		$Group = $current_User->get_Group();
+		$antispam_check = ! $Group->perm_bypass_antispam;
+	}
+	else
+	{	// Use antispam checking always for anonymous users:
+		$antispam_check = true;
+	}
 
 	if( strpos( $var, '[' ) !== false )
 	{	// Variable is array, for example 'input_name[group_name][123][]'
@@ -930,7 +938,7 @@ function param_check_url( $var, $context, $field_err_msg = NULL )
 		$url_value = $GLOBALS[$var];
 	}
 
-	if( $error_detail = validate_url( $url_value, $context, ! $Group->perm_bypass_antispam ) )
+	if( $error_detail = validate_url( $url_value, $context, $antispam_check ) )
 	{
 		param_error( $var, /* TRANS: %s contains error details */ sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ), $field_err_msg );
 		return false;
