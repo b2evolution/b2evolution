@@ -2828,8 +2828,9 @@ class User extends DataObject
 					break;
 				}
 
-				if( ( $permlevel != 'view' ) &&  $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
-				{ // Comment item is locked and current user is not allowed to edit/moderate locked items comment
+				if( ( ( $permlevel != 'view' ) &&  $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
+						&& ! ( $permlevel == 'delete' && $this->check_perm( 'users', 'edit' ) ) )
+				{ // Comment item is locked, i.e., all of its categories are locked, and current user is not allowed to edit/moderate locked items comment or is not a user admin
 					break;
 				}
 
@@ -2847,7 +2848,8 @@ class User extends DataObject
 				if( $permlevel == 'delete' )
 				{ // permlevel is delete so we have to check the 'blog_del_cmts' permission
 					$perm = $this->check_perm( 'blog_del_cmts', 'edit', false, $blog_ID )
-							|| $this->check_perm( 'recycle_owncmts', $permlevel, false, $Comment );
+							|| $this->check_perm( 'recycle_owncmts', $permlevel, false, $Comment )
+							|| $this->check_perm( 'users', 'edit', false );
 					break;
 				}
 
@@ -2966,8 +2968,10 @@ class User extends DataObject
 				$blog_ID = $Item->get_blog_ID();
 				$check_status = substr( $permname, 10 );
 
-				if( ( $permlevel != 'view' ) && $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
-				{ // Item is locked and current user is not allowed to edit locked items ( only view permission is allowed by default for locked items )
+				if( ( ( $permlevel != 'view' ) && $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
+						&& ! ( $permlevel == 'delete' && $this->check_perm( 'users', 'edit', false ) ) )
+				{ // Item is locked, i.e., it has all of its categories locked, and current user is not allowed to edit locked items
+					// ( only view permission is allowed by default for locked items ) or is not a user admin
 					break;
 				}
 
@@ -2979,7 +2983,8 @@ class User extends DataObject
 
 				if( $permlevel == 'delete' )
 				{ // permlevel is delete so we have to check the 'blog_del_post' permission
-					$perm = $this->check_perm( 'blog_del_post', 'edit', false, $blog_ID );
+					// User admins are allowed to delete posts
+					$perm = $this->check_perm( 'blog_del_post', 'edit', false, $blog_ID ) || $this->check_perm( 'users', 'edit', false );
 					break;
 				}
 
@@ -3062,7 +3067,7 @@ class User extends DataObject
 				if( ( $permlevel == 'moderate' ) && $this->check_perm( 'users', 'moderate' ) )
 				{ // this user has moderator permission, check if the group level is higher then the target user group level
 					$this->get_Group();
-					$User->get_Group;
+					$User->get_Group();
 					$perm = ( $this->Group->level > $User->Group->level );
 					break;
 				}
@@ -5873,7 +5878,7 @@ class User extends DataObject
 						WHERE iver_edit_user_ID = '.$DB->quote( $this->ID ).'
 						GROUP BY iver_itm_ID ) AS b
 							ON b.iver_itm_ID = post_ID ';
-				$where_clause = 'b.counter > 0';
+				$where_clause = 'post_creator_user_ID != '.$DB->quote( $this->ID ).' AND ( b.counter > 0 OR post_lastedit_user_ID = '.$DB->quote( $this->ID ).' )';
 				break;
 
 			case 'created|edited':
@@ -5915,6 +5920,8 @@ class User extends DataObject
 					ON bloguser_blog_ID = blog_ID AND bloguser_user_ID = '.$DB->quote( $current_User->ID ).'
 				LEFT JOIN T_coll_group_perms
 					ON bloggroup_blog_ID = blog_ID AND bloggroup_group_ID = '.$DB->quote( $current_User_Group->ID ).'
+				LEFT JOIN T_groups__groupsettings
+					ON gset_grp_ID = bloggroup_group_ID AND gset_name = "perm_users"
 				LEFT JOIN (
 					SELECT
 						bloggroup_blog_ID,
@@ -5933,14 +5940,18 @@ class User extends DataObject
 					ON sg.bloggroup_blog_ID = blog_ID
 				WHERE
 					'.$where_clause.'
-					AND (
+					AND
+					(
 				 	  ( categories > locked_categories OR ( bloguser_perm_cats = 1 OR bloggroup_perm_cats = 1 OR secondary_grp_perm_cats > 0 ) )
-						AND (
-								( blog_advanced_perms = 0 && blog_owner_user_ID = '.$DB->quote( $current_User->ID ).' )
-								OR
-								( blog_advanced_perms = 1 && ( bloguser_perm_delpost = 1 OR bloggroup_perm_delpost = 1 OR secondary_grp_perm_delpost > 0 ) )
-					)
-				)';
+						AND
+						(
+							( blog_advanced_perms = 0 && blog_owner_user_ID = '.$DB->quote( $current_User->ID ).' )
+							OR
+							( blog_advanced_perms = 1 && ( bloguser_perm_delpost = 1 OR bloggroup_perm_delpost = 1 OR secondary_grp_perm_delpost > 0 ) )
+						)
+						OR
+						( gset_value = "edit" )
+					)';
 
 		if( $count_only )
 		{
