@@ -1693,6 +1693,21 @@ table.diff td.diff-title-addedline {
 #customizer_wrapper .controls .help-inline {
   display: block;
 }
+#customizer_wrapper .file_select_item {
+  margin: 0;
+}
+#customizer_wrapper .file_select_item .item_actions {
+  margin: 0;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+#customizer_wrapper .file_select_item .item_actions .btn {
+  margin-right: 3px;
+}
+#customizer_wrapper .file_select_item .item_actions .btn:last-child {
+  margin-right: 0;
+}
 .evo_customizer__tabs {
   position: fixed;
   top: 0;
@@ -1728,9 +1743,6 @@ table.diff td.diff-title-addedline {
   position: absolute;
   top: 13px;
   right: 12px;
-}
-.evo_customizer__tabs .evo_customizer__tab_buttons .btn {
-  margin-right: 3px;
 }
 .evo_customizer__tabs .evo_customizer__tab_buttons .fa-backward {
   top: 1px;

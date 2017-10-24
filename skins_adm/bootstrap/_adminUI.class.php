@@ -1037,7 +1037,7 @@ class AdminUI extends AdminUI_general
 		}
 
 		// Buttons to collapse and hide left customizer panel:
-		echo '<div class="evo_customizer__tab_buttons">'
+		echo '<div class="evo_customizer__tab_buttons btn-group">'
 				.'<button id="evo_customizer__collapser" class="btn btn-sm btn-default"><span class="fa fa-backward"></span></button>'
 				.'<button id="evo_customizer__closer" class="btn btn-sm btn-default"><span class="fa fa-close"></span></a>'
 			.'</div>';
