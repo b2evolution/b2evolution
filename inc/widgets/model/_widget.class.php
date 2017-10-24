@@ -279,7 +279,7 @@ class ComponentWidget extends DataObject
 			return '';
 		}
 
-		return '<span class="fa fa-'.$this->icon.'"></span>';
+		return '<span class="label label-info evo_widget_icon"><span class="fa fa-'.$this->icon.'"></span></span>';
 	}
 
 
@@ -294,14 +294,13 @@ class ComponentWidget extends DataObject
 		if( $this->type == 'plugin' )
 		{	// Plugin widget:
 			$widget_Plugin = & $this->get_Plugin();
-			$icon = '<span class="fa fa-'.$widget_Plugin->widget_icon.'"></span>';
 
 			if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
 			{
-				return $icon.' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+				return $widget_Plugin->get_widget_icon().' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
 			}
 
-			return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+			return $widget_Plugin->get_widget_icon().' <strong>'.$name.'</strong> ('.T_('Plugin').')';
 		}
 
 		// Normal widget:

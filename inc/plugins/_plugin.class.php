@@ -3899,6 +3899,22 @@ class Plugin
 
 
 	/**
+	 * Get widget icon
+	 *
+	 * @return string
+	 */
+	function get_widget_icon()
+	{
+		if( empty( $this->widget_icon ) )
+		{
+			return '';
+		}
+
+		return '<span class="label label-info evo_widget_icon"><span class="fa fa-'.$this->widget_icon.'"></span></span>';
+	}
+
+
+	/**
 	 * Display widget debug message e-g on designer mode when we need to show widget when nothing to display currently
 	 *
 	 * @param string Message

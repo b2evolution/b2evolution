@@ -1053,6 +1053,11 @@ div.available_widgets .widget_list {
 div.available_widgets #available_widgets_inner {
   top: 87px;
 }
+.evo_widget_icon {
+  display: inline-block;
+  min-width: 22px;
+  padding: .2em;
+}
 table.coll_kind {
   max-width: 960px;
   margin: 30px auto 10px;

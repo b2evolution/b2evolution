@@ -185,7 +185,7 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 
 			echo '<li>';
 			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.$mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
-			echo '<span class="badge badge-info">'.$ComponentWidget->get_icon().'</span> <strong>'.$ComponentWidget->get_name().'</strong>';
+			echo $ComponentWidget->get_icon().' <strong>'.$ComponentWidget->get_name().'</strong>';
 			echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span> '.$ComponentWidget->get_help_link( 'manual', false );
 			echo '</li>';
 		}
@@ -198,7 +198,7 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 		{
 			echo '<li>';
 			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.$mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
-			echo '<span class="badge badge-info"><span class="fa fa-'.$Plugin->widget_icon.'"></span></span> <strong>'.$Plugin->name.'</strong>';
+			echo $Plugin->get_widget_icon().' <strong>'.$Plugin->name.'</strong>';
 			echo '</a> <span class="notes">'.$Plugin->short_desc.'</span> '.$Plugin->get_help_link( '$widget_url', 'manual', false );
 			echo '</li>';
 		}

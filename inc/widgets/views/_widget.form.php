@@ -66,7 +66,7 @@ $Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
 
 // Display properties:
 $Form->begin_fieldset( T_('Widget info'), array( 'id' => 'widget_info' ) );
-	$Form->info( T_('Widget type'), '<span class="badge badge-info">'.$edited_ComponentWidget->get_icon().'</span> '.$edited_ComponentWidget->get_name() );
+	$Form->info( T_('Widget type'), $edited_ComponentWidget->get_icon().' '.$edited_ComponentWidget->get_name() );
 	$Form->info( T_('Description'), $edited_ComponentWidget->get_desc() );
 $Form->end_fieldset();
 
