@@ -145,7 +145,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max comment image height'),
-						'input_suffix' => ' px. ',
+						'input_suffix' => ' px ',
 						'note' => T_('Set maximum height for comment images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',

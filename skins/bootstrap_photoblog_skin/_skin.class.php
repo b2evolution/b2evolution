@@ -159,7 +159,7 @@ class bootstrap_photoblog_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'input_suffix' => ' px. ',
+						'input_suffix' => ' px ',
 						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
