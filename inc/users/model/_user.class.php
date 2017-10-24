@@ -5859,7 +5859,7 @@ class User extends DataObject
 	{
 		global $DB, $current_User;
 
-		$this->get_Group();
+		$current_User_Group = $current_User->get_Group();
 
 		switch( $type )
 		{
@@ -5883,11 +5883,11 @@ class User extends DataObject
 
 		if( $count_only )
 		{
-			$sql = 'SELECT COUNT(*) ';
+			$sql = 'SELECT COUNT( DISTINCT( post_ID ) ) ';
 		}
 		else
 		{
-			$sql = 'SELECT T_items__item.* ';
+			$sql = 'SELECT DISTINCT T_items__item.* ';
 		}
 
 		$sql .= 'FROM T_items__item ';
@@ -5912,9 +5912,9 @@ class User extends DataObject
 				LEFT JOIN T_blogs
 					ON blog_ID = cat_blog_ID
 				LEFT JOIN T_coll_user_perms
-					ON bloguser_blog_ID = blog_ID AND bloguser_user_ID = '.$DB->quote( $this->ID ).'
+					ON bloguser_blog_ID = blog_ID AND bloguser_user_ID = '.$DB->quote( $current_User->ID ).'
 				LEFT JOIN T_coll_group_perms
-					ON bloggroup_blog_ID = blog_ID AND bloggroup_group_ID = '.$DB->quote( $this->Group->ID ).'
+					ON bloggroup_blog_ID = blog_ID AND bloggroup_group_ID = '.$DB->quote( $current_User_Group->ID ).'
 				LEFT JOIN (
 					SELECT
 						bloggroup_blog_ID,
@@ -5926,15 +5926,21 @@ class User extends DataObject
 					LEFT JOIN evo_bloggroups
 						ON bloggroup_group_ID = grp_ID
 					WHERE
-						sug_user_ID = '.$DB->quote( $this->ID ).'
+						sug_user_ID = '.$DB->quote( $current_User->ID ).'
 					GROUP BY
 						bloggroup_blog_ID
 				) AS sg
 					ON sg.bloggroup_blog_ID = blog_ID
 				WHERE
 					'.$where_clause.'
-					AND ( categories > locked_categories OR ( bloguser_perm_cats = 1 OR bloggroup_perm_cats = 1 OR secondary_grp_perm_cats > 0 ) )
-					AND ( bloguser_perm_delpost = 1 OR bloggroup_perm_delpost = 1 OR secondary_grp_perm_delpost > 0 )';
+					AND (
+				 	  ( categories > locked_categories OR ( bloguser_perm_cats = 1 OR bloggroup_perm_cats = 1 OR secondary_grp_perm_cats > 0 ) )
+						AND (
+								( blog_advanced_perms = 0 && blog_owner_user_ID = '.$DB->quote( $current_User->ID ).' )
+								OR
+								( blog_advanced_perms = 1 && ( bloguser_perm_delpost = 1 OR bloggroup_perm_delpost = 1 OR secondary_grp_perm_delpost > 0 ) )
+					)
+				)';
 
 		if( $count_only )
 		{
