@@ -2734,6 +2734,12 @@ function skin_body_attrs( $params = array() )
 }
 
 
+/**
+ * Get a skin's version
+ *
+ * @param Integer skin's ID
+ * @return String skin's version
+ */
 function get_skin_version( $skin_ID )
 {
 	$SkinCache = & get_SkinCache();
@@ -2745,5 +2751,29 @@ function get_skin_version( $skin_ID )
 	}
 
 	return 'unknown';
+}
+
+
+/**
+ * Get a skins base skin and version
+ *
+ * @param String skin name (directory name)
+ * @return Array of base skin and version
+ */
+function get_skin_folder_base_version( $skin_folder )
+{
+	preg_match( '/-((\d+\.)?(\d+\.)?(\*|\d+))$/', $skin_folder, $matches );
+	if( ! empty( $matches ) )
+	{
+		$base_skin = substr( $skin_folder, 0, strlen( $matches[0] ) * -1 );
+		$skin_version = isset( $matches[2] ) ? $matches[1] : 0;
+	}
+	else
+	{
+		$base_skin = $skin_folder;
+		$skin_version = 0;
+	}
+
+	return array( $base_skin, $skin_version );
 }
 ?>
