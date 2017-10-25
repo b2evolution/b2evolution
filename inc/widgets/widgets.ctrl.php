@@ -102,12 +102,14 @@ switch( $action )
 		param( 'code', 'string', true );
 	case 'new':
 	case 'add_list':
-		param( 'container', 'string', true, true );	// memorize
+	case 'container_list':
+		param( 'container', 'string', $action == 'add_list', true );	// memorize
 		param( 'container_code', 'string' );
 		param( 'skin_type', 'string' );
 		break;
 
 	case 're-order' : // js request
+		param( 'wico_ID', 'integer', 0 );
 		param( 'container_list', 'string', true );
 		$containers_list = explode( ',', trim( $container_list, ',' ) );
 		$containers = array();
@@ -198,6 +200,7 @@ switch( $action )
 	case 'new':
 	case 'edit':
 	case 'add_list':
+	case 'container_list':
 	case 'customize':
 		// Do nothing
 		break;
@@ -491,6 +494,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'widget' );
 
 		$widgets = param( 'widgets', 'array:integer' );
+		$wico_ID = param( 'wico_ID', 'integer', 0 );
 
 		if( count( $widgets ) )
 		{ // Enable/Disable the selected widgets
@@ -513,7 +517,21 @@ switch( $action )
 			}
 		}
 
-		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+		if( $mode == 'customizer' )
+		{	// Set an URL to redirect back to customizer mode:
+			$redirect_to = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type.'&action=container_list&mode=customizer';
+			$WidgetContainerCache = & get_WidgetContainerCache();
+			if( $WidgetContainer = & $WidgetContainerCache->get_by_ID( $wico_ID, false, false ) )
+			{
+				$redirect_to .= '&container='.urlencode( $WidgetContainer->get( 'name' ) ).'&container_code='.urlencode( $WidgetContainer->get( 'code' ) );
+			}
+		}
+		else
+		{	// Set an URL to redirect to normal mode:
+			$redirect_to = $admin_url.'?ctrl=widgets&blog='.$Blog->ID;
+		}
+
+		header_redirect( $redirect_to, 303 );
 		break;
 
 	case 'delete':
@@ -543,17 +561,24 @@ switch( $action )
 		}
 		break;
 
- 	case 'list':
+	case 'list':
 		break;
 
- 	case 're-order' : // js request
- 		// Check that this action request is not a CSRF hacked request:
+	case 're-order' : // js request
+		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
- 		$DB->begin();
+		$DB->begin();
 
- 		$blog_container_ids = implode( ',', $blog_container_list );
- 		// Reset the current orders to avoid duplicate entry errors
+		if( $wico_ID > 0 )
+		{	// Re-order widgets of ONE given container:
+			$blog_container_ids = $wico_ID;
+		}
+		else
+		{	// Re-order widgets of ALL containers:
+			$blog_container_ids = implode( ',', $blog_container_list );
+		}
+		// Reset the current orders to avoid duplicate entry errors:
 		$DB->query( 'UPDATE T_widget__widget
 			SET wi_order = wi_order * -1
 			WHERE wi_wico_ID IN ( '.$blog_container_ids.' )' );
@@ -792,6 +817,20 @@ switch( $action )
 				set_param( 'container', 'wico_ID_'.$WidgetContainer->ID );
 
 				$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
+				break;
+		}
+		break;
+
+	case 'container_list':
+		// A list of widgets of the selected container:
+		switch( $mode )
+		{
+			case 'customizer':
+				// Try to get widget container by collection ID, container code and requested skin type:
+				$WidgetContainerCache = & get_WidgetContainerCache();
+				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $blog, $skin_type, $container_code );
+
+				$AdminUI->disp_view( 'widgets/views/_container_widgets.view.php' );
 				break;
 		}
 		break;

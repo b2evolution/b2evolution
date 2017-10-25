@@ -21,6 +21,7 @@ jQuery( document ).on( 'mouseover', '.evo_container[data-code]', function()
 	if( container.data( 'can-edit' ) == '1' )
 	{	// Display a panel with actions if current user has a permission to edit widgets:
 		container_actions = '<div class="evo_designer__actions">' +
+				b2evo_widget_icon_list +
 				b2evo_widget_icon_add +
 			'</div>';
 	}
@@ -83,17 +84,18 @@ jQuery( document ).on( 'mouseover', '.evo_designer__widget', function()
 	}
 } );
 
-jQuery( document ).on( 'click', '.evo_designer__action_add', function( e )
-{	// Link to add widget:
+jQuery( document ).on( 'click', '.evo_designer__action_add, .evo_designer__action_list', function( e )
+{	// Link to add widget or to manage widgets of the container:
 	if( typeof( b2evo_widget_add_url ) != 'undefined' )
 	{	// If global widget add form url is defined:
 		var container_block = jQuery( this ).closest( '.evo_designer__container' );
 		var container = jQuery( '.evo_container[data-code="' + container_block.data( 'code' ) + '"]' );
 		if( container.length && container.data( 'can-edit' ) == '1' )
 		{	// Load widget adding list only if it is allowed for current user:
+			var widget_action_url = jQuery( this ).hasClass( 'evo_designer__action_add' ) ? b2evo_widget_add_url : b2evo_widget_list_url;
 			jQuery( '.evo_customizer__wrapper', window.parent.document ).removeClass( 'evo_customizer__collapsed' );
 			jQuery( '#evo_customizer__backoffice', window.parent.document ).get( 0 ).contentWindow.location
-				.href = b2evo_widget_add_url.replace( '$container$', container.data( 'name' ) ).replace( '$container_code$', container.data( 'code' ) );
+				.href = widget_action_url.replace( '$container$', container.data( 'name' ) ).replace( '$container_code$', container.data( 'code' ) );
 		}
 	}
 } );

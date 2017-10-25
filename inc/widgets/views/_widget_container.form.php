@@ -18,16 +18,33 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var WidgetContainer
  */
-global $edited_WidgetContainer, $Blog;
+global $edited_WidgetContainer, $Blog, $AdminUI, $mode;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
+$form_title = $creating ?  T_('New container') : T_('Container');
+
+if( $mode == 'customizer' )
+{	// Display customizer tabs to switch between skin and widgets in special div on customizer mode:
+	$AdminUI->display_customizer_tabs( array(
+			'path' => array( 'coll', 'widgets' ),
+		) );
+
+	// Start of customizer content:
+	echo '<div class="evo_customizer__content">';
+
+	$form_title = '';
+}
+
 $Form = new Form( NULL, 'form' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+if( $mode != 'customizer' )
+{
+	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+}
 
-$Form->begin_form( 'fform', $creating ?  T_('New container') : T_('Container') );
+$Form->begin_form( 'fform', $form_title );
 
 $Form->add_crumb( 'widget_container' );
 $Form->hidden( 'action', $creating ? 'create_container' : 'update_container' );
@@ -53,6 +70,21 @@ $Form->begin_fieldset( T_('Properties') );
 
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
+$buttons = array();
+$buttons[] = array( 'submit', 'submit', ( $creating ? T_('Record') : ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ) ), 'SaveButton' );
+if( $mode == 'customizer' )
+{	// Display buttons in special div on customizer mode:
+	echo '<div class="evo_customizer__buttons">';
+	$Form->buttons( $buttons );
+	echo '</div>';
+	// Clear buttons to don't display them twice:
+	$buttons = array();
+}
 
+$Form->end_form( $buttons );
+
+if( $mode == 'customizer' )
+{	// End of customizer content:
+	echo '</div>';
+}
 ?>

@@ -1750,6 +1750,15 @@ table.diff {
 			}
 		}
 	}
+	#current_widgets {
+		.panel {
+			border-top: none;
+			border-left: none;
+			border-right: none;
+			border-radius: 0;
+			margin-bottom: 0;
+		}
+	}
 }
 .evo_customizer__tabs {
 	position: fixed;
@@ -1806,5 +1815,11 @@ table.diff {
 	.form-group, .control-buttons {
 		margin: 0;
 		padding: 0;
+	}
+	&.evo_customizer__buttons_widget_actions {
+		padding: 10px;
+		.btn-group {
+			margin: 0;
+		}
 	}
 }

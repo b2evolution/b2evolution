@@ -1713,6 +1713,13 @@ table.diff td.diff-title-addedline {
 #customizer_wrapper .file_select_item .item_actions .btn:last-child {
   margin-right: 0;
 }
+#customizer_wrapper #current_widgets .panel {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  margin-bottom: 0;
+}
 .evo_customizer__tabs {
   position: fixed;
   top: 0;
@@ -1767,4 +1774,10 @@ table.diff td.diff-title-addedline {
 .evo_customizer__buttons .control-buttons {
   margin: 0;
   padding: 0;
+}
+.evo_customizer__buttons.evo_customizer__buttons_widget_actions {
+  padding: 10px;
+}
+.evo_customizer__buttons.evo_customizer__buttons_widget_actions .btn-group {
+  margin: 0;
 }

@@ -20,7 +20,7 @@ jQuery( document ).on( 'ready', function()
 	jQuery( '#evo_customizer__backoffice' ).on( 'load', function()
 	{	// If iframe with settings has been loaded
 		var backoffice_content = jQuery( this ).contents();
-		backoffice_content.find( 'form' ).attr( 'target', 'evo_customizer__updater' );
+		backoffice_content.find( 'form:not([target])' ).attr( 'target', 'evo_customizer__updater' );
 		if( backoffice_content.find( '.evo_customizer__buttons' ).length )
 		{	// Set proper bottom margin because buttons block has a fixed position at the bottom:
 			backoffice_content.find( 'body' ).css( 'margin-bottom', backoffice_content.find( '.evo_customizer__buttons' ).outerHeight() - 1 );

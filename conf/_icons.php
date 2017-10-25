@@ -1267,6 +1267,13 @@ function get_icon_info( $name )
 			'glyph' => 'circle-arrow-down',
 			'fa' => 'arrow-circle-down',
 		);
+		case 'designer_widget_list': return array(
+			'alt'  => T_('List'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 144, 16 ),
+			'glyph' => 'list',
+			'fa' => 'list',
+		);
 	}
 }
 ?>

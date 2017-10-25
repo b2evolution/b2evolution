@@ -277,6 +277,11 @@ function bufferedServerCall()
 		new_widget_order += '&' + widget_crumb_url_param;
 		jQuery( '.pending_update' ).removeClass( 'pending_update' ).addClass( 'server_updating' ); // change class to "updating"
 
+		if( jQuery( 'input[type=hidden][name=wico_ID]' ).length )
+		{	// Send param to re-order only single container:
+			new_widget_order += '&wico_ID=' + jQuery( 'input[type=hidden][name=wico_ID]' ).val();
+		}
+
 		SendAdminRequest( 'widgets', 're-order', new_widget_order, false ); // send current order to server
 	}
 	else
@@ -499,7 +504,7 @@ function convertAvailableList()
 		the_link = the_link.substr( the_link.indexOf( '&type' ) + 1, the_link.length );
 
 		// replace href with JS addnewwidget action:
-		jQuery( this ).children( 'a:first' ).attr( 'href', '#' ).bind( 'click', function(){
+		jQuery( this ).children( 'a[id^="add_new_wico_ID_"]' ).attr( 'href', '#' ).bind( 'click', function(){
 			addNewWidget( this, the_link );
 			// cancel default href action:
 			return false;
