@@ -1852,18 +1852,24 @@ function blogs_all_results_block( $params = array() )
 			. ' AND ( bloggroup_group_ID = ' . $current_User->grp_ID
 			. '       OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) ) )' );
 		$section_where_sql = '';
+		$colleciton_where_sql = 'blog_owner_user_ID = '.$current_User->ID
+			.' OR bloguser_ismember <> 0'
+			.' OR bloggroup_ismember <> 0';
 		if( $params['grouped'] )
 		{	// Get default section of the current user group:
 			global $DB;
-			$user_Group = & $current_User->get_Group();
-			$section_where_sql .= 'sec_ID IN ( '.$DB->quote( explode( ',', $user_Group->get_setting( 'perm_allowed_sections' ) ) ).' ) OR ';
-			// Get all sections where current user is owner:
+			// Get all collections from sections where current user is owner:
 			$section_where_sql .= 'sec_owner_user_ID = '.$current_User->ID.' OR ';
+			// Get collections(if current user is owner or member of these collections) from sections where current user can create new collection:
+			$user_Group = & $current_User->get_Group();
+			$perm_allowed_sections = trim( $user_Group->get_setting( 'perm_allowed_sections' ) );
+			if( ! empty( $perm_allowed_sections ) )
+			{	// If at least one section is specified to be allowed for new collections:
+				$section_where_sql .= '( sec_ID IN ( '.$DB->quote( explode( ',', $perm_allowed_sections ) ).' ) '
+					.'AND ( '.$colleciton_where_sql.' ) ) OR ';
+			}
 		}
-		$SQL->WHERE( $section_where_sql
-			. 'blog_owner_user_ID = ' . $current_User->ID
-			. ' OR bloguser_ismember <> 0'
-			. ' OR bloggroup_ismember <> 0' );
+		$SQL->WHERE( $section_where_sql.$colleciton_where_sql );
 
 		$no_results = $params['results_no_perm_text'];
 	}
