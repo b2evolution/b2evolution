@@ -24,6 +24,8 @@ global $edited_Group;
 
 global $action;
 
+global $Settings;
+
 /**
  * Display pluggable permissions
  *
