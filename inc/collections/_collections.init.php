@@ -482,7 +482,15 @@ class collections_Module extends Module
 	function get_default_group_permissions( $grp_ID )
 	{
 		$SectionCache = & get_SectionCache();
-		$SectionCache->load_all();
+		if( ( $default_Section = & $SectionCache->get_by_ID( 3, false, false ) ) ||
+		    ( $default_Section = & $SectionCache->get_by_name( 'Blogs', false, false ) ) )
+		{	// Use section with #3 or name "Blogs" by default for user groups if it exists in DB:
+			$default_section_ID = $default_Section->ID;
+		}
+		else
+		{	// Use first section by default because it always exists and cannot be deleted from DB:
+			$default_section_ID = 1;
+		}
 
 		switch( $grp_ID )
 		{
@@ -491,7 +499,6 @@ class collections_Module extends Module
 				$permcreateblog = 'allowed'; // Creating new blogs
 				$permgetblog = 'denied'; // Automatically add a new blog to the new users
 				$permmaxcreateblognum = '';
-				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array() ) );
 				break;
 
 			case 2:		// Moderators (group ID 2) have permission by default:
@@ -499,7 +506,6 @@ class collections_Module extends Module
 				$permcreateblog = 'allowed';
 				$permgetblog = 'denied';
 				$permmaxcreateblognum = '';
-				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array( array( 1 ) ) ) );
 				break;
 
 			case 3:		// Editors (group ID 3) have permission by default:
@@ -508,7 +514,6 @@ class collections_Module extends Module
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
 				$permmaxcreateblognum = '';
-				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array( array( 1 ) ) ) );
 				break;
 
 			default:
@@ -517,7 +522,6 @@ class collections_Module extends Module
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
 				$permmaxcreateblognum = '';
-				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array( array( 1 ) ) ) );
 				break;
 		}
 
@@ -527,8 +531,8 @@ class collections_Module extends Module
 				'perm_api' => $permapi,
 				'perm_createblog' => $permcreateblog,
 				'perm_getblog' => $permgetblog,
-				'perm_default_sec_ID' => 3,
-				'perm_allowed_sections' => $permallowedsections,
+				'perm_default_sec_ID' => $default_section_ID,
+				'perm_allowed_sections' => $default_section_ID,
 				);
 
 		$permissions['perm_max_createblog_num'] = $permmaxcreateblognum;
@@ -590,7 +594,7 @@ class collections_Module extends Module
 				'note' => '',
 				),
 			'perm_allowed_sections' => array(
-				'label'      => T_('Allowed section of collections'),
+				'label'      => T_('Allowed section for new collections'),
 				'user_func'  => 'check_allowed_sections_user_perm',
 				'group_func' => 'check_allowed_sections_group_perm',
 				'perm_block' => 'blogging',

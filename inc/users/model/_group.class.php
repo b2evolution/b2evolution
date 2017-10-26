@@ -263,7 +263,7 @@ class Group extends DataObject
 		$perm_allowed_sections = explode( ',', $GroupSettings->get( 'perm_allowed_sections', $this->ID ) );
 		if( ! in_array( $GroupSettings->get( 'perm_default_sec_ID', $this->ID ), $perm_allowed_sections ) )
 		{
-			param_error( 'edited_grp_perm_default_sec_ID', T_('Default section must be in allowed section of collections.') );
+			param_error( 'edited_grp_perm_default_sec_ID', T_('Default section must be in allowed section for new collections.') );
 		}
 
 		if( $GroupSettings->get( 'perm_admin', $this->ID ) != 'normal' && 
