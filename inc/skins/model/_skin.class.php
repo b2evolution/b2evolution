@@ -454,20 +454,15 @@ class Skin extends DataObject
 		global $skins_path, $Messages;
 
 		if( empty( $folder ) )
-		{
+		{	// Get files from fallback skins folder:
 			global $basepath;
-			if( $this->get_api_version() == 6 )
-			{
-				$skin_path = $basepath.'skins_fallback_v6';
-			}
-			else
-			{
-				$skin_path = $basepath.'skins_fallback_v5';
-			}
+			$skin_folder = $this->get_api_version() == 6 ? 'skins_fallback_v6' : 'skins_fallback_v5';
+			$skin_path = $basepath.$skin_folder;
 		}
 		else
-		{
-			$skin_path = $skins_path.$folder;
+		{	// Get files from given skin folder:
+			$skin_folder = $folder;
+			$skin_path = $skins_path.$skin_folder;
 		}
 
 		if( ! $dir = @opendir( $skin_path ) )
@@ -490,8 +485,7 @@ class Skin extends DataObject
 				continue;
 			}
 
-			$rf_main_subpath = trim( $folder.'/'.$file, '/' );
-			$af_main_path = $skins_path.$rf_main_subpath;
+			$af_main_path = $skin_path.'/'.$file;
 
 			if( !is_file( $af_main_path ) || ! preg_match( '~\.php$~', $file ) )
 			{ // Not a php template file, go to next:
@@ -502,7 +496,7 @@ class Skin extends DataObject
 			{ // Cannot open PHP file:
 				if( $display_messages )
 				{
-					$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+					$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $skin_folder.'/'.$file ), 'error', T_('File read error:') );
 				}
 				continue;
 			}
@@ -512,40 +506,46 @@ class Skin extends DataObject
 			{ // Cannot get contents:
 				if( $display_messages )
 				{
-					$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+					$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $skin_folder.'/'.$file ), 'error', T_('File read error:') );
 				}
 				continue;
 			}
 
-			$files[] = $files;
+			$files[] = $file;
 
 			// DETECT if the file contains containers:
 			// if( ! preg_match_all( '~ \$Skin->container\( .*? (\' (.+?) \' )|(" (.+?) ") ~xmi', $file_contents, $matches ) )
-			if( ! preg_match_all( '~ (\$Skin->|skin_)container\( .*? ((\' (.+?) \')|(" (.+?) ")) ~xmi', $file_contents, $matches ) )
+			if( ! preg_match_all( '~ (\$Skin->|skin_|widget_)container\( .*? ([\'"] (.+?) [\'"]) ~xmi', $file_contents, $matches ) )
 			{ // No containers in this file, go to next:
 				continue;
 			}
 
-			// Merge matches from the two regexp parts (due to regexp "|" )
-			$container_list = array_merge( $matches[4], $matches[6] );
-
 			$c = 0;
-			foreach( $container_list as $container )
+			foreach( $matches[3] as $container )
 			{
 				if( empty( $container ) )
 				{ // regexp empty match -- NOT a container:
 					continue;
 				}
 
-				// We have one more container:
-				$c++;
-
-				$container_code = preg_replace( '/[^a-z\d]+/', '_', strtolower( $container ) );
+				if( $matches[1][ $c ] == 'widget_' )
+				{	// Function widget_container() already uses container code as first param:
+					$container_code = $container;
+					// We should create container name from container code:
+					$container = ucwords( str_replace( '_', ' ', $container_code ) );
+				}
+				else
+				{	// Old functions $Skin->container() and skin_container() use container name, so we should auto convert it to code:
+					$container_code = preg_replace( '/[^a-z\d]+/', '_', strtolower( $container ) );
+				}
 
 				if( in_array( $container_code, $this->container_list ) )
 				{ // we already have that one
 					continue;
 				}
+
+				// We have one more container:
+				$c++;
 
 				$this->container_list[ $container_code ] = array( $container, $c );
 			}
