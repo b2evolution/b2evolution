@@ -8633,6 +8633,20 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12360, 'Upgrading skin table...' ) )
+	{ // part of 6.9.4
+		db_add_col( 'T_skins__skin', 'skin_class', 'varchar(32) NOT NULL AFTER skin_ID' );
+
+		$DB->query( 'UPDATE T_skins__skin
+				SET skin_class = IF(SUBSTRING(skin_folder, -5) = "_skin",
+						CONCAT( LEFT( skin_folder, CHAR_LENGTH( skin_folder ) - 5 ), "_Skin" ),
+						CONCAT( skin_folder, "_Skin" ) )' );
+
+		db_add_index( 'T_skins__skin', 'skin_class', 'skin_class', 'UNIQUE' );
+
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

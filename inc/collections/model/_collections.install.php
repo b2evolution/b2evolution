@@ -27,11 +27,13 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for installed skins',
 		"CREATE TABLE T_skins__skin (
 				skin_ID      int(10) unsigned NOT NULL auto_increment,
+				skin_class   varchar(32) NOT NULL,
 				skin_name    varchar(32) NOT NULL,
 				skin_type    enum('normal','feed','sitemap','mobile','tablet','rwd') COLLATE ascii_general_ci NOT NULL default 'normal',
 				skin_folder  varchar(32) NOT NULL,
 				PRIMARY KEY skin_ID (skin_ID),
 				UNIQUE skin_folder( skin_folder ),
+				UNIQUE skin_class( skin_class ),
 				KEY skin_name( skin_name )
 			) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

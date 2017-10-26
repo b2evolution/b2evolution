@@ -28,6 +28,7 @@ class Skin extends DataObject
 	var $name;
 	var $folder;
 	var $type;
+	var $class;
 
 	/**
 	 * Skin version
@@ -70,6 +71,7 @@ class Skin extends DataObject
 			$this->set( 'folder', $skin_folder );
 			$this->set( 'name', $this->get_default_name() );
 			$this->set( 'type', $this->get_default_type() );
+			$this->set( 'class', get_class( $this ) );
 		}
 		else
 		{	// Wa are loading an object:
@@ -77,6 +79,7 @@ class Skin extends DataObject
 			$this->name = $db_row->skin_name;
 			$this->folder = $db_row->skin_folder;
 			$this->type = $db_row->skin_type;
+			$this->class = $db_row->skin_class;
 		}
 	}
 
@@ -736,6 +739,23 @@ class Skin extends DataObject
 						echo T_('Install NOW!').'</a>';
 					}
 					if( empty( $kind ) && get_param( 'tab' ) != 'coll_skin' && get_param( 'tab' ) != 'site_skin' )
+					{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
+						$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
+						$skin_name_after = '</label>';
+					}
+					break;
+
+				case 'upgrade':
+					$link_text = T_('Upgrade NOW!');
+				case 'downgrade':
+					if( empty( $link_text ) ) $link_text = T_('Downgrade NOW!');
+
+					if( ! empty( $skin_url ) )
+					{
+						echo '<a href="'.$skin_url.'" title="'.$link_text.'">';
+						echo $link_text.'</a>';
+					}
+					if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
 					{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
 						$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
 						$skin_name_after = '</label>';

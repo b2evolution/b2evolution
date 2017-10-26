@@ -143,6 +143,46 @@ switch( $action )
 		header_redirect( $redirect_to );
 		break;
 
+	case 'upgrade':
+	case 'downgrade':
+		param( 'skin_folder', 'string', true );
+		// Check validity of requested skin name:
+		if( preg_match( '~([^-A-Za-z0-9._]|\.\.)~', $skin_folder ) )
+		{
+			debug_die( 'The requested skin name is invalid.' );
+		}
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'skin' );
+
+		// Check permission to edit:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		$SkinCache = & get_SkinCache();
+
+		$new_Skin = & $SkinCache->new_obj( NULL, $skin_folder );
+		$edited_Skin = & $SkinCache->get_by_class( $new_Skin->class );
+		$edited_Skin->set( 'folder', $new_Skin->folder );
+		$edited_Skin->dbupdate();
+
+		if( $action == 'upgrade' )
+		{
+			$Messages->add( T_('Skin has been upgraded to a later version.'), 'success' );
+		}
+		else
+		{
+			$Messages->add( T_('Skin has been downgraded to an earlier version.'), 'success' );
+		}
+
+		$new_installed_skin_IDs = array( $edited_Skin->ID );
+
+		// We want to highlight the edited object on next list display:
+		$Session->set( 'fadeout_array', array( 'skin_ID' => $new_installed_skin_IDs ) );
+
+		// PREVENT RELOAD & Switch to list mode:
+		header_redirect( $redirect_to );
+		break;
+
 
 	case 'install':
 		// Install several skins

@@ -2941,7 +2941,7 @@ class Blog extends DataObject
 			case 'mobile_skin_ID':
 			case 'tablet_skin_ID':
 				$result = parent::get( $parname );
-				if( $result === NULL )
+				if( $result === NULL && ! empty( $Settings ) )
 				{ // Try to get default from the global settings
 					$result = $Settings->get( 'def_'.$parname );
 				}
