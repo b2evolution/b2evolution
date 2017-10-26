@@ -87,7 +87,8 @@
   padding: 2px 13px;
   right: 8px;
   top: 8px;
-  transition: all 0.3s;
+  -webkit-transition: all 0.3s;
+          transition: all 0.3s;
   z-index: 9999;
 }
 .btn.slide-top.slide-top-visible {

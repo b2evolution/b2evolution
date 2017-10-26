@@ -504,7 +504,7 @@ function convertAvailableList()
 		the_link = the_link.substr( the_link.indexOf( '&type' ) + 1, the_link.length );
 
 		// replace href with JS addnewwidget action:
-		jQuery( this ).children( 'a[id^="add_new_wico_ID_"]' ).attr( 'href', '#' ).bind( 'click', function(){
+		jQuery( this ).children( 'a' ).attr( 'href', '#' ).bind( 'click', function(){
 			addNewWidget( this, the_link );
 			// cancel default href action:
 			return false;
