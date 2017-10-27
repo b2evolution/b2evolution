@@ -2600,20 +2600,19 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 function blog_row_actions( $Blog, $sec_ID )
 {
 	global $current_User, $admin_url;
-	$r = '';
 
+	$r = '<a href="'.$Blog->get( 'url' ).'" class="action_icon btn btn-info btn-xs" title="'.T_('View this collection').'">'.T_('View').'</a>';
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{	// If user can edit collection properties:
-		$r .= '<a href="'.$Blog->get( 'url' ).'" class="action_icon btn btn-info btn-xs" title="'.T_('View this collection').'">'.T_('View').'</a>';
 		$r .= '<a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$Blog->ID.'" class="action_icon btn btn-primary btn-xs" title="'.T_('Manage this collection...').'">'.T_('Manage').'</a>';
 	}
-	if( $current_User->check_perm( 'blogs', 'create', false, $sec_ID ) )
-	{	// If user can create new collection in the section:
+	if( $current_User->check_perm( 'blog_properties', 'copy', false, $Blog->ID ) )
+	{	// If user can copy collection properties:
 		$r .= action_icon( T_('Duplicate this collection...'), 'copy', $admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$Blog->ID );
 	}
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-	{	// If user can delete the collection:
-		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$Blog->ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
+	{	// If user can edit collection properties:
+			$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$Blog->ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
 	}
 
 	if( empty($r) )

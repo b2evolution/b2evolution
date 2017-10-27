@@ -2797,6 +2797,24 @@ class User extends DataObject
 					if( $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID ) )
 					{	// Advanced user permissions on the target collection grant the requested permission:
 						$perm = true;
+						// Stop checking other perms:
+						break;
+					}
+
+					if( $permname == 'blog_properties' && $permlevel == 'copy' )
+					{	// Check if user can copy the selected collection:
+						$BlogCache = & get_BlogCache();
+						if( $perm_Blog = & $BlogCache->get_by_ID( $perm_target_ID, false, false ) )
+						{
+							if( $this->check_perm( 'blogs', 'create', $assert, $perm_Blog->get( 'sec_ID' ) ) )
+							{	// If user can create new colleciton in section of the duplicating collection:
+								if( $perm_Blog->get_setting( 'allow_duplicate' ) ||
+								    $this->check_perm( 'blog_properties', 'edit', false, $perm_Blog->ID ) )
+								{	// If the collection is allowed to duplicate by anyone OR user can edit the duplicating collection:
+									$perm = true;
+								}
+							}
+						}
 					}
 				}
 

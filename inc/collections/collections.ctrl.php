@@ -85,10 +85,18 @@ switch( $action )
 			}
 		}
 
-		// Check permissions:
+		// Check permissions to create new collection:
 		if( ! $current_User->check_perm( 'blogs', 'create', false, $sec_ID ) )
 		{
 			$Messages->add( T_('You don\'t have permission to create a collection.'), 'error' );
+			$redirect_to = param( 'redirect_to', 'url', $admin_url );
+			header_redirect( $redirect_to );
+		}
+
+		// Check permissions to copy the selected collection:
+		if( $action == 'copy' && ! $current_User->check_perm( 'blog_properties', 'copy', false, $edited_Blog->ID ) )
+		{
+			$Messages->add( sprintf( T_('You don\'t have a permission to copy the collection "%s".'), $edited_Blog->get( 'shortname' ) ), 'error' );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
 			header_redirect( $redirect_to );
 		}
@@ -258,7 +266,7 @@ switch( $action )
 		param( 'sec_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true, $sec_ID );
+		$current_User->check_perm( 'blog_properties', 'copy', true, $edited_Blog->ID );
 
 		if( $edited_Blog->duplicate() )
 		{	// The collection has been duplicated successfully:
