@@ -289,8 +289,20 @@ class Skin extends DataObject
 		global $admin_url, $rsc_url;
 		global $Timer, $Session, $debug, $current_User;
 
+		$params = array_merge( array(
+				'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
+				'container_start' => '',
+				'container_end'   => '',
+			), $params );
+
 		$timer_name = 'skin_container('.$sco_name.')';
 		$Timer->start( $timer_name );
+
+		// Get container code from container name:
+		$container_code = preg_replace( '/[^a-z\d]+/', '_', strtolower( $sco_name ) );
+
+		// Start to get content of widgets:
+		ob_start();
 
 		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
@@ -344,6 +356,22 @@ class Skin extends DataObject
 		{ // End of visible container:
 			//echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
 			echo '</div>';
+		}
+
+		// Store content of widgets to var in order to display them in container wrapper:
+		$container_widgets_content = ob_get_clean();
+
+		if( $params['container_display_if_empty'] || ! empty( $Widget_array ) )
+		{	// Display container wrapper with widgets content if it is not empty or we should display it anyway:
+
+			// Display start of container wrapper:
+			echo str_replace( '$wico_class$', 'evo_container__'.str_replace( ' ', '_', $container_code ), $params['container_start'] );
+
+			// Display widgets of the container:
+			echo $container_widgets_content;
+
+			// Display end of container wrapper:
+			echo $params['container_end'];
 		}
 
 		$Timer->pause( $timer_name );
