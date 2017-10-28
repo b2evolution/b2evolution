@@ -58,7 +58,7 @@ switch( $action )
 		/* exited */
 		break;
 
-	case 'closeaccount': 
+	case 'closeaccount':
 		// Close current user account and log out:
 
 		global $Session, $Messages, $UserSettings;
@@ -110,7 +110,7 @@ switch( $action )
 		/* exited */
 		break;
 
-	case 'resetpassword': 
+	case 'resetpassword':
 		// Send password reset request by email:
 
 		global $servertimenow;
@@ -256,7 +256,7 @@ switch( $action )
 		break;
 
 
-	case 'changepwd': 
+	case 'changepwd':
 		// User clicked "Reset password NOW" link from an password reset email:
 
 		param( 'reqID', 'string', '' );
@@ -354,9 +354,9 @@ switch( $action )
 		break;
 
 
-	case 'activateacc_ez': 
+	case 'activateacc_ez':
 		// User clicked 'Activate NOW' or 'Reactivate NOW' from an account activation email with EASY activation process (first email or reminder):
-	
+
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
 
@@ -407,11 +407,11 @@ switch( $action )
 		$User->activate_from_Request();
 		$Messages->add( T_('Your account is now activated.'), 'success' );
 
-		header_redirect( redirect_after_account_activation() );
+		header_redirect( htmlspecialchars_decode( redirect_after_account_activation() ) );
 		/* exited */
 		break;
 
-	case 'activateacc_sec': 
+	case 'activateacc_sec':
 		// User clicked 'Activate NOW' or 'Reactivate NOW' from an account activation email with SECURE activation process (first email or reminder):
 		// fp> NOTE: I am not sure secure process works allows reminders.
 
@@ -470,7 +470,7 @@ switch( $action )
 		}
 
 		// redirect Will save $Messages into Session:
-		header_redirect( redirect_after_account_activation() );
+		header_redirect( htmlspecialchars_decode( redirect_after_account_activation() ) );
 		/* exited */
 		break;
 
