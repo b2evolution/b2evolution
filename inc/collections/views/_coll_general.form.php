@@ -213,6 +213,9 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 		{
 			if( urlname )
 			{
+				var urlNameInput = jQuery( 'input#blog_urlname' );
+				urlNameInput.addClass( 'loader_img' );
+
 				evo_rest_api_request( 'tools/available_urlname',
 				{
 					'urlname': urlname
@@ -221,6 +224,7 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 				{
 					jQuery( 'span#urlname_display' ).html( data.urlname );
 					jQuery( 'input[name="blog_urlname"]' ).val( data.urlname );
+					urlNameInput.removeClass( 'loader_img' );
 				}, 'GET' );
 			}
 		}
