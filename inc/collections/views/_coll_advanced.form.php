@@ -100,7 +100,7 @@ $Form->begin_fieldset( T_('External Feeds').get_manual_link('external_feeds') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Template').get_manual_link('collection_template') );
-	$Form->checkbox_input( 'blog_allow_duplicate', false, T_('Allow duplication'), array( 'note' => T_('Check to allow anyone to duplicate this collection.') ) );
+	$Form->checkbox_input( 'blog_allow_duplicate', $edited_Blog->get_setting( 'allow_duplicate' ), T_('Allow duplication'), array( 'note' => T_('Check to allow anyone to duplicate this collection.') ) );
 $Form->end_fieldset();
 
 
