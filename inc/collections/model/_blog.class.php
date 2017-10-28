@@ -683,10 +683,7 @@ class Blog extends DataObject
 			$this->set_setting( 'rss2_redirect', get_param( 'rss2_redirect' ) );
 		}
 
-		if( param( 'blog_allow_duplicate', 'integer', NULL ) !== NULL )
-		{
-			$this->set_setting( 'allow_duplicate', get_param( 'blog_allow_duplicate' ) );
-		}
+		$this->set_setting( 'allow_duplicate', param( 'blog_allow_duplicate', 'integer', 0 ) );
 
 		if( param( 'image_size', 'string', NULL ) !== NULL )
 		{
