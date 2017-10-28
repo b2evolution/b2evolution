@@ -245,7 +245,10 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	$blog_section_id = $action == 'copy' ? 1 : $edited_Blog->get( 'sec_ID' );
 	$SectionCache = & get_SectionCache();
 	$SectionCache->load_available( $blog_section_id );
-	$Form->select_input_object( 'sec_ID', $blog_section_id, $SectionCache, T_('Section'), array( 'required' => true ) );
+	if( count( $SectionCache->cache_available ) > 1 )
+	{ // If we have only one option in the list do not show select input
+		$Form->select_input_object( 'sec_ID', $blog_section_id, $SectionCache, T_('Section'), array( 'required' => true ) );
+	}
 
 $Form->end_fieldset();
 
