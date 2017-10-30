@@ -176,8 +176,8 @@ class GeneralSettings extends AbstractSettings
 
 		//Default blogs skin setting
 		'def_normal_skin_ID' => '1',                // Default normal skin ID
-		'def_mobile_skin_ID' => '0',                // 0 means same as normal skin
-		'def_tablet_skin_ID' => '0',                // 0 means same as normal skin
+		'def_mobile_skin_ID' => NULL,               // NULL means same as normal skin
+		'def_tablet_skin_ID' => NULL,               // NULL means same as normal skin
 
 		// Post by Email
 		'eblog_enabled' => 0,
