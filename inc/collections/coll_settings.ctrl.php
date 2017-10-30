@@ -170,7 +170,9 @@ switch( $action )
 					if( $edited_Blog->load_from_Request( array() ) )
 					{ // Commit update to the DB:
 						$edited_Blog->dbupdate();
+						// Re-scan and create widget containers from new switched skin if they don't exist for the edited collection:
 						$edited_Blog->db_save_main_containers();
+
 						$Messages->add( T_('The blog skin has been changed.')
 											.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
 						if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && param( 'normal_skin_ID', 'integer', NULL ) !== NULL ) ||
