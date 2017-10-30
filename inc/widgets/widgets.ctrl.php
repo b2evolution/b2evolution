@@ -626,9 +626,9 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 
 		// Save to DB, and display correpsonding messages
-		$Blog->db_save_main_containers( true );
+		$Blog->db_save_main_containers( true, $skin_type );
 
-		header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+		header_redirect( '?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type, 303 );
 		break;
 
 	case 'create_container':
