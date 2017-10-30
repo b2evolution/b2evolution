@@ -903,6 +903,7 @@ function display_containers( $skin_type, $main = true )
 
 	// Display containers for current skin:
 	$displayed_containers = array();
+	$ordered_containers = array();
 	$embedded_containers = array();
 	$WidgetContainerCache = & get_WidgetContainerCache();
 	foreach( $skins_container_list as $container_code => $container_data )
@@ -914,6 +915,7 @@ function display_containers( $skin_type, $main = true )
 			$WidgetContainer->set( 'code', $container_code );
 			$WidgetContainer->set( 'name', $container_data[0] );
 			$WidgetContainer->set( 'coll_ID', $Blog->ID );
+			$WidgetContainer->set( 'order', 0 );
 		}
 		if( $WidgetContainer->get( 'skin_type' ) != $skin_type ||
 		    ( $main && ! $WidgetContainer->get( 'main' ) ) ||
@@ -922,7 +924,7 @@ function display_containers( $skin_type, $main = true )
 			continue;
 		}
 
-		display_container( $WidgetContainer );
+		$ordered_containers[] = array( $WidgetContainer, true );
 		if( $WidgetContainer->ID > 0 )
 		{ // Container exists in the database
 			$displayed_containers[$container_code] = $WidgetContainer->ID;
@@ -948,7 +950,7 @@ function display_containers( $skin_type, $main = true )
 			{	// Skip this container because another type is requested:
 				continue;
 			}
-			display_container( $WidgetContainer );
+			$ordered_containers[] = array( $WidgetContainer, true );
 			$displayed_containers[$container_code] = $WidgetContainer->ID;
 		}
 	}
@@ -967,7 +969,39 @@ function display_containers( $skin_type, $main = true )
 		{	// Skip this container because another type is requested:
 			continue;
 		}
-		display_container( $WidgetContainer, false );
+		$ordered_containers[] = array( $WidgetContainer, false );
+	}
+
+	// Sort widget containers by order and name:
+	usort( $ordered_containers, 'callback_sort_widget_containers' );
+
+	// Display the ordered containers:
+	foreach( $ordered_containers as $container_data )
+	{
+		$WidgetContainer = & $container_data[0];
+		// Is included in collection skin?
+		$is_included = $container_data[1];
+		// Display a container with widgets:
+		display_container( $WidgetContainer, $is_included );
+	}
+}
+
+
+/**
+ * Callback function to sort widget containers array by fields order and name
+ *
+ * @param array Widget data
+ * @param array Widget data
+ */
+function callback_sort_widget_containers( $a, $b )
+{
+	if( $a[0]->get( 'order' ) == $b[0]->get( 'order' ) )
+	{	// Sort by name if orders are equal:
+		return strnatcmp( $a[0]->get( 'name' ), $b[0]->get( 'name' ) );
+	}
+	else
+	{	// Sort by order if they are different:
+		return $a[0]->get( 'order' ) > $b[0]->get( 'order' );
 	}
 }
 
