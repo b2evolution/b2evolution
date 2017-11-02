@@ -2896,7 +2896,7 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 			$UserSettings->dbupdate();
 		}
 	}
-	
+
 	if( $email_sent && isset( $Session ) && $redirect_to_after !== NULL )
 	{	// Set a redirect_to session variable because this way after the account will be activated we will know where to redirect
 		$Session->set( 'core.activateacc.redirect_to', $redirect_to_after  );
