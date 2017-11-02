@@ -3412,6 +3412,9 @@ class Blog extends DataObject
 			 WHERE wi_coll_ID = '.$DB->quote( $duplicated_coll_ID ),
 			'Duplicate all widgets from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
 
+		/*
+		// There is currently no use case to duplicate categories if category contents are not duplicated
+
 		// Copy all categories from duplicated collection to new created:
 		$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );
 		$source_cats_SQL->SELECT( '*' );
@@ -3421,7 +3424,7 @@ class Blog extends DataObject
 		$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
 		$ChapterCache = & get_ChapterCache();
 		foreach( $source_cats as $source_cat_fields )
-		{	// Copy each category separately because of uniwue field "cat_urlname":
+		{	// Copy each category separately because of unique field "cat_urlname":
 			$new_Chapter = & $ChapterCache->new_obj( NULL, $this->ID );
 			foreach( $source_cat_fields as $source_cat_field_name => $source_cat_field_value )
 			{
@@ -3450,6 +3453,7 @@ class Blog extends DataObject
 				$new_Chapter->dbupdate();
 			}
 		}
+		*/
 
 		// The duplicating is successful, So commit all above changes:
 		$DB->commit();
