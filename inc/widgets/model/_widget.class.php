@@ -1497,12 +1497,28 @@ class ComponentWidget extends DataObject
 				$message = 'Widget "'.$this->get_name().'" is hidden because there is nothing to display.';
 			}
 
-			echo $this->disp_params['block_start'];
-			$this->disp_title();
-			echo $this->disp_params['block_body_start'];
-			echo $message;
-			echo $this->disp_params['block_body_end'];
-			echo $this->disp_params['block_end'];
+			if( preg_match( '#class="[^"]*evo_widget[^"]*"#i', $this->disp_params['block_start'].$this->disp_params['block_body_start'] ) )
+			{	// If standard widget wrappers have special style class "evo_widget" we can use it:
+				echo $this->disp_params['block_start'];
+				$this->disp_title();
+				echo $this->disp_params['block_body_start'];
+				echo $message;
+				echo $this->disp_params['block_body_end'];
+				echo $this->disp_params['block_end'];
+			}
+			else
+			{	// Otherwise we should use more wrappers to design widgets correctly, e-g for Menu container:
+				echo $this->disp_params['block_start'];
+				$this->disp_title();
+				echo $this->disp_params['block_body_start'];
+				echo $this->get_layout_start();
+				echo $this->get_layout_item_start();
+				echo '<a href="#">(...)</a>';
+				echo $this->get_layout_item_end();
+				echo $this->get_layout_end();
+				echo $this->disp_params['block_body_end'];
+				echo $this->disp_params['block_end'];
+			}
 		}
 	}
 }
