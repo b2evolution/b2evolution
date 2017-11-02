@@ -65,7 +65,6 @@ div.level1 nav ul.nav.nav-tabs li {
   float: none;
 }
 div.level1 nav ul.nav.nav-tabs li a {
-  -webkit-transition: 0.1s ease;
   transition: 0.1s ease;
 }
 div.level1 nav ul.nav.nav-tabs li a:hover {
@@ -105,7 +104,6 @@ div.level1 nav div.pull-right .btn.login img {
   vertical-align: middle;
 }
 div.level1 nav div.pull-right .btn.btn-default {
-  -webkit-transition: 0.1s ease;
   transition: 0.1s ease;
 }
 div.level1 nav div.pull-right .btn.btn-default:hover {
@@ -181,8 +179,7 @@ div.level2 nav .nav li.active a:focus {
   padding: 2px 13px;
   right: 8px;
   top: 8px;
-  -webkit-transition: all 0.3s;
-          transition: all 0.3s;
+  transition: all 0.3s;
   z-index: 9999;
 }
 .btn.slide-top.slide-top-visible {

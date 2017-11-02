@@ -115,6 +115,12 @@ div.dev-blocks--belowtoolbar {
 			font-size: 18px;
 		}
 	}
+	&.evo_designer__widget.evo_widget__outside {
+		.evo_designer__title, .evo_designer__actions {
+			left: -3px;
+		}
+	}
+
 	// Small different styles for container designer block:
 	&.evo_designer__container {
 		border-color: #DDD;
@@ -140,6 +146,11 @@ div.dev-blocks--belowtoolbar {
 			border-radius: 4px 4px 0 0;
 			.evo_designer__action {
 				color: #333 !important;
+			}
+		}
+		&.evo_designer__outside {
+			.evo_designer__title, .evo_designer__actions {
+				right: -3px;
 			}
 		}
 	}

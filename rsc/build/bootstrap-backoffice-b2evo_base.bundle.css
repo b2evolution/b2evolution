@@ -1496,6 +1496,10 @@ div.dev-blocks--belowtoolbar {
   cursor: pointer;
   font-size: 18px;
 }
+.evo_designer.evo_designer__widget.evo_widget__outside .evo_designer__title,
+.evo_designer.evo_designer__widget.evo_widget__outside .evo_designer__actions {
+  left: -3px;
+}
 .evo_designer.evo_designer__container {
   border-color: #DDD;
 }
@@ -1522,6 +1526,10 @@ div.dev-blocks--belowtoolbar {
 }
 .evo_designer.evo_designer__container .evo_designer__actions .evo_designer__action {
   color: #333 !important;
+}
+.evo_designer.evo_designer__container.evo_designer__outside .evo_designer__title,
+.evo_designer.evo_designer__container.evo_designer__outside .evo_designer__actions {
+  right: -3px;
 }
 .evo_designer.evo_designer__status_process {
   border-color: #F60;

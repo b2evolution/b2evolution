@@ -384,13 +384,29 @@ function evo_widget_update_order_actions( container )
  */
 function evo_widget_update_designer_position( widget, show )
 {
+	var widget_class = '';
+	var widget_left = widget.offset().left - 3;
+	var widget_width = widget.outerWidth() + 5;
+	var window_width = jQuery( window ).width();
+	if( widget_left < 0 )
+	{	// Limit container designer block left podition to left window border;
+		widget_left = 0;
+	}
+	if( widget_width > window_width - widget_left - 27 )
+	{	// Limit container designer block width to right window border:
+		widget_width = window_width - widget_left - 27;
+		// Additional class to fix style for outside container designer block:
+		widget_class = 'evo_widget__outside';
+	}
+
 	var designer_block = jQuery( evo_widget_designer_block_selector( widget ) );
 	designer_block.css( {
 			'top': widget.offset().top - 3,
-			'left': widget.offset().left - 3,
-			'width': widget.outerWidth() + 5,
+			'left': widget_left,
+			'width': widget_width,
 			'height': widget.outerHeight() + 5,
 		} )
+		.addClass( widget_class );
 	if( typeof( show ) == 'undefined' || show )
 	{	// Show widget desginer block:
 		designer_block.show();
@@ -408,13 +424,29 @@ function evo_widget_update_designer_position( widget, show )
  */
 function evo_widget_update_container_position( container )
 {
+	var container_class = '';
+	var container_left = container.offset().left - 3;
+	var container_width = container.outerWidth() + 5;
+	var window_width = jQuery( window ).width();
+	if( container_left < 0 )
+	{	// Limit container designer block left podition to left window border;
+		container_left = 0;
+	}
+	if( container_width > window_width - container_left )
+	{	// Limit container designer block width to right window border:
+		container_width = window_width - container_left;
+		// Additional class to fix style for outside container designer block:
+		container_class = 'evo_designer__outside';
+	}
+
 	jQuery( evo_widget_container_block_selector( container.data( 'code' ) ) )
 		.css( {
 			'top': container.offset().top - 3,
-			'left': container.offset().left - 3,
-			'width': container.outerWidth() + 5,
+			'left': container_left,
+			'width': container_width,
 			'height': container.outerHeight() + 5,
 		} )
+		.addClass( container_class )
 		.show();
 }
 
