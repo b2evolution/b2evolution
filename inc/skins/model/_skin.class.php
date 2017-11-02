@@ -433,6 +433,11 @@ class Skin extends DataObject
 			// Display widgets of the container:
 			echo $container_widgets_content;
 
+			if( empty( $Widget_array ) && is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+			{	// Display text for empty container on designer mode:
+				echo '<div class="red">'.T_('Empty Container').'</div>';
+			}
+
 			// Display end of container wrapper:
 			echo $params['container_end'];
 		}

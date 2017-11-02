@@ -140,6 +140,7 @@ jQuery( document ).on( 'mousemove', function( e )
 	if( jQuery( '.evo_designer' ).is( ':visible' ) &&
 	    ! jQuery( e.target ).hasClass( 'evo_designer' ) &&
 	    ! jQuery( e.target ).closest( '.evo_designer' ).length &&
+	    ! jQuery( e.target ).closest( '.evo_container[data-code]' ).length &&
 	    ! jQuery( e.target ).closest( '.evo_widget[data-id]' ).length )
 	{	// Hide all designer blocks if mouse cursor was out them but they were not hidden by some wrong reason:
 		jQuery( '.evo_designer' ).hide();
