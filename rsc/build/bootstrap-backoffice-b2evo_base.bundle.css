@@ -1477,6 +1477,7 @@ div.dev-blocks--belowtoolbar {
   background: #666;
   color: #FFF;
   font-size: 11px;
+  line-height: 1.42857143;
   text-align: left;
   white-space: nowrap;
 }
@@ -1495,6 +1496,7 @@ div.dev-blocks--belowtoolbar {
   padding: 1px 5px;
   cursor: pointer;
   font-size: 18px;
+  line-height: 1.42857143;
 }
 .evo_designer.evo_designer__widget.evo_widget__outside .evo_designer__title,
 .evo_designer.evo_designer__widget.evo_widget__outside .evo_designer__actions {
