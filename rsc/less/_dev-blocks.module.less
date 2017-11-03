@@ -148,11 +148,6 @@ div.dev-blocks--belowtoolbar {
 				color: #333 !important;
 			}
 		}
-		&.evo_designer__outside {
-			.evo_designer__title, .evo_designer__actions {
-				right: -3px;
-			}
-		}
 	}
 	// Color designer block on AJAX processing:
 	&.evo_designer__status_process {
@@ -178,12 +173,12 @@ div.dev-blocks--belowtoolbar {
 	}
 }
 // Set min sizes in order to manage empty containers/widgets:
-.evo_container[data-name], .evo_widget[data-id] {
+.evo_container[data-code], .evo_widget[data-id] {
 	min-width: 5px;
 	min-height: 5px;
 }
 // Set z-index for designer mode elements for proper work:
-.evo_container[data-name] {
+.evo_container[data-code] {
 	z-index: 10000;
 }
 .evo_designer__container {

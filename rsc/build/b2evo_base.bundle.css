@@ -1331,10 +1331,6 @@ div.dev-blocks--belowtoolbar {
 .evo_designer.evo_designer__container .evo_designer__actions .evo_designer__action {
   color: #333 !important;
 }
-.evo_designer.evo_designer__container.evo_designer__outside .evo_designer__title,
-.evo_designer.evo_designer__container.evo_designer__outside .evo_designer__actions {
-  right: -3px;
-}
 .evo_designer.evo_designer__status_process {
   border-color: #F60;
 }
@@ -1356,12 +1352,12 @@ div.dev-blocks--belowtoolbar {
 .evo_designer.evo_designer__status_failed .evo_designer__actions {
   background: #E00;
 }
-.evo_container[data-name],
+.evo_container[data-code],
 .evo_widget[data-id] {
   min-width: 5px;
   min-height: 5px;
 }
-.evo_container[data-name] {
+.evo_container[data-code] {
   z-index: 10000;
 }
 .evo_designer__container {

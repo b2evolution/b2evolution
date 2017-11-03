@@ -424,19 +424,16 @@ function evo_widget_update_designer_position( widget, show )
  */
 function evo_widget_update_container_position( container )
 {
-	var container_class = '';
 	var container_left = container.offset().left - 3;
 	var container_width = container.outerWidth() + 5;
 	var window_width = jQuery( window ).width();
 	if( container_left < 0 )
-	{	// Limit container designer block left podition to left window border;
+	{	// Limit container designer block left podition to left window border:
 		container_left = 0;
 	}
 	if( container_width > window_width - container_left )
 	{	// Limit container designer block width to right window border:
-		container_width = window_width - container_left;
-		// Additional class to fix style for outside container designer block:
-		container_class = 'evo_designer__outside';
+		container_width = window_width - container_left - 27;
 	}
 
 	jQuery( evo_widget_container_block_selector( container.data( 'code' ) ) )
@@ -446,7 +443,6 @@ function evo_widget_update_container_position( container )
 			'width': container_width,
 			'height': container.outerHeight() + 5,
 		} )
-		.addClass( container_class )
 		.show();
 }
 
