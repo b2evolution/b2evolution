@@ -76,12 +76,7 @@ initialize_debug_modes();
 
 if( $Session->get( 'customizer_mode_'.$Blog->ID ) && $redir != 'no' )
 {	// Redirect to customize collection if such mode is enabled:
-	header_redirect( $Blog->get( 'customizer_url', array(
-			'glue' => '&',
-			// Redirect to customize widgets if dessigner mode is enabled currently for the collection,
-			// otherwise redirect to customize skin settings by default:
-			'view' => $Session->get( 'designer_mode_'.$Blog->ID ) ? 'coll_widgets' : 'coll_skin',
-		) ) );
+	header_redirect( $Blog->get( 'customizer_url', array( 'glue' => '&' ) ) );
 }
 
 // Init $disp

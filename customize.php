@@ -38,7 +38,7 @@ set_param( 'customizer_mode', 'enable' );
 
 param( 'customizing_url', 'url', NULL, true );
 param( 'blog', 'integer', true, true );
-param( 'view', 'string', true, true );
+param( 'view', 'string', '', true );
 
 // Getting current blog info:
 $BlogCache = & get_BlogCache();
@@ -53,6 +53,16 @@ if( empty( $Blog ) )
 	siteskin_include( '_404_blog_not_found.main.php' ); // error
 	exit(0);
 	// EXIT.
+}
+
+if( empty( $view ) )
+{	// If view is not defined try to get it from user settings per collection or set default:
+	$view = $UserSettings->get( 'customizer_view_'.$blog );
+	if( empty( $view ) )
+	{	// Display collection skin settings by default:
+		$view = 'coll_skin';
+	}
+	memorize_param( 'view', 'string', '', $view );
 }
 
 // Allow to enable widgets designer mode only when user opens sub menu "Widgets" from the left panel of customer mode:

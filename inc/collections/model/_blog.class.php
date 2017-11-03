@@ -2717,27 +2717,18 @@ class Blog extends DataObject
 				return $this->gen_baseurl();
 
 			case 'customizer_url':
-				global $customizer_url;
-				if( is_logged_in() )
-				{
-					global $Settings;
-					if( $current_User->check_perm( 'blog_properties', 'edit', false, $this->ID ) )
-					{	// If current User can edit collection skin settings:
-						$customizer_view = isset( $params['view'] ) ? $params['view'] : 'coll_skin';
-					}
-					elseif( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) )
-					{	// If current User can edit site skin settings:
-						$customizer_view = 'site_skin';
-					}
-				}
-				if( isset( $customizer_view ) )
+				if( is_logged_in() &&
+				    ( $current_User->check_perm( 'blog_properties', 'edit', false, $this->ID ) ||
+				      $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) )
 				{	// Return customizer URL only if currnet User can edit skin settings of collection or site:
+					global $customizer_url;
 					$customizing_url = isset( $params['customizing_url'] ) ? $params['customizing_url'] : get_current_url();
 					if( $customizing_url == '#baseurl#' )
 					{	// Use base URL of this collection:
 						$customizing_url = $this->get( 'baseurl' );
 					}
-					return $customizer_url.'?view='.$customizer_view.$params['glue'].'blog='.$this->ID.$params['glue'].'customizing_url='.urlencode( $customizing_url );
+					$customizer_view_param = ( isset( $params['view'] ) ? 'view='.$params['view'].$params['glue'] : '' );
+					return $customizer_url.'?'.$customizer_view_param.'blog='.$this->ID.$params['glue'].'customizing_url='.urlencode( $customizing_url );
 				}
 				else
 				{	// Return this collection URL instead:
