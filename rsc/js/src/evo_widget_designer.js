@@ -16,6 +16,9 @@ jQuery( document ).on( 'mouseover', '.evo_container[data-code]', function()
 		return;
 	}
 
+	// Fix z-index issue:
+	evo_widget_fix_parent_zindex( container );
+
 	// Initialize a container designer block only first time:
 	var container_actions = '';
 	if( container.data( 'can-edit' ) == '1' )
@@ -50,6 +53,9 @@ jQuery( document ).on( 'mouseover', '.evo_widget[data-id]', function()
 		evo_widget_update_designer_position( widget );
 		return;
 	}
+
+	// Fix z-index issue:
+	evo_widget_fix_parent_zindex( widget );
 
 	// Initialize a widget designer block only first time:
 	jQuery( 'body' ).append( '<div class="evo_designer evo_designer__widget" data-id="' + widget.data( 'id' ) + '" data-container="' + widget.data( 'container' ) + '">' +
@@ -458,5 +464,30 @@ function evo_widget_hide_designer_block( designer_block )
 	    ! designer_block.hasClass( 'evo_designer__status_failed' ) )
 	{	// Hide only when widget is not in process:
 		designer_block.hide();
+	}
+}
+
+
+/**
+ * Fix issue of parent z-index to make designer mode work properly
+ *
+ * @param object Source
+ */
+function evo_widget_fix_parent_zindex( parent )
+{
+	while( parent )
+	{
+		if( ! parent.hasClass( 'evo_widget' ) &&
+			parent.css( 'z-index' ) != 'auto' &&
+			parent.css( 'z-index' ) != 0 )
+		{	// Change not default z-index to auto, because it breaks designer mode structure:
+			parent.css( 'z-index', 'auto' );
+		}
+		if( parent.prop( 'nodeName' ) == 'BODY' )
+		{	// Stop on body html element and don't up:
+			break;
+		}
+		// Switch to next parent:
+		parent = parent.parent();
 	}
 }
