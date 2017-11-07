@@ -4180,7 +4180,7 @@ class Blog extends DataObject
 
 		foreach( $skin_types as $skin_type )
 		{
-			if( ! ( $coll_Skin = & $SkinCache->get_by_ID( $this->get( $skin_type.'_skin_ID' ) ) ) )
+			if( ! ( $coll_Skin = & $SkinCache->get_by_ID( $this->get( $skin_type.'_skin_ID' ), false, false ) ) )
 			{	// Skip wrong skin to avoid errors:
 				continue;
 			}
