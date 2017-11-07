@@ -248,6 +248,9 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 
 		$Form->radio( 'blog_http_protocol', $edited_Blog->get( 'http_protocol' ), $http_protocol_options, T_('SSL'), true );
 
+	$url_aliases = implode( "\n", $edited_Blog->get_url_aliases() );
+	$Form->textarea( 'blog_url_aliases', $url_aliases, 5, T_('Alias URLs' ), NULL );
+
 $Form->end_fieldset();
 
 

@@ -81,6 +81,15 @@ $schema_queries = array_merge( $schema_queries, array(
 			UNIQUE KEY blog_urlname (blog_urlname)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_coll_url_aliases' => array(
+		'Creating collection URL aliases table',
+		"CREATE TABLE T_coll_url_aliases (
+			cua_coll_ID   INT(11) UNSIGNED NOT NULL,
+			cua_url_alias VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			PRIMARY KEY ( cua_url_alias ),
+			INDEX cua_coll_ID ( cua_coll_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_coll_settings' => array(
 		'Creating collection settings table',
 		"CREATE TABLE T_coll_settings (

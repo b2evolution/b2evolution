@@ -36,6 +36,7 @@ $required_mysql_version[ 'collections' ] = '5.0.3';
  */
 $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_blogs'                    => $tableprefix.'blogs',
+		'T_coll_url_aliases'         => $tableprefix.'coll_url_aliases',
 		'T_categories'               => $tableprefix.'categories',
 		'T_coll_group_perms'         => $tableprefix.'bloggroups',
 		'T_coll_user_perms'          => $tableprefix.'blogusers',

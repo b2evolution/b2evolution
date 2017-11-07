@@ -8647,6 +8647,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12370, 'Creating table for URL aliases...' ) )
+	{ // part of 6.9.4
+		db_create_table( 'T_coll_url_aliases', "
+			cua_coll_ID   INT(11) UNSIGNED NOT NULL,
+			cua_url_alias VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			PRIMARY KEY   ( cua_url_alias ),
+			INDEX         cua_coll_ID ( cua_coll_ID )" );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

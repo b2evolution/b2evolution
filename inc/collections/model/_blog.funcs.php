@@ -594,7 +594,7 @@ function init_requested_blog( $use_blog_param_first = true )
 	// If we want to give priority to ?blog=123..
 	if( $use_blog_param_first == true )
 	{	// Check if a specific blog has been requested in the URL:
-		$Debuglog->add( 'Checking for epxlicit "blog" param', 'detectblog' );
+		$Debuglog->add( 'Checking for explicit "blog" param', 'detectblog' );
 		$blog = param( 'blog', 'integer', '', true );
 
 		if( !empty($blog) )
@@ -642,7 +642,7 @@ function init_requested_blog( $use_blog_param_first = true )
 	{	// Match on the whole URL (we'll try to find the base URL at the beginning)
 		$ReqAbsUrl = $ReqHost.$ReqPath;
 	}
-	$Debuglog->add( 'Looking up absolute url : '.$ReqAbsUrl, 'detectblog' );
+	$Debuglog->add( 'Looking up absolute url: '.$ReqAbsUrl, 'detectblog' );
 	// SQL request 'LIKE':
 	if( ( $Collection = $Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false ) ) !== false )
 	{ // We found a matching blog:
@@ -654,13 +654,28 @@ function init_requested_blog( $use_blog_param_first = true )
 	// If we did NOT give priority to ?blog=123, check for param now:
 	if( $use_blog_param_first == false )
 	{	// Check if a specific blog has been requested in the URL:
-		$Debuglog->add( 'Checking for epxlicit "blog" param', 'detectblog' );
+		$Debuglog->add( 'Checking for explicit "blog" param', 'detectblog' );
 		$blog = param( 'blog', 'integer', '', true );
 
 		if( !empty($blog) )
 		{ // a specific blog has been requested in the URL:
 			return true;
 		}
+	}
+
+	// No blog identified by absolute URL, try searching URL aliases
+	$Debuglog->add( 'Checking for URL alias match', 'detectblog' );
+	$alias = NULL;
+	if( ( $Collection = $Blog = & $BlogCache->get_by_url_alias( $ReqAbsUrl, $alias, false ) ) !== false )
+	{ // We found a matching blog:
+		$Debuglog->add( 'Found matching blog: '.$blog. 'using alias '.$alias, 'detectblog' );
+		$ReqPath = str_replace( $alias, '', $ReqAbsUrl );
+		if( substr( $ReqPath, 0, 1 ) != '/' )
+		{ // Tail must start with '/'
+			$ReqPath = '/'.$ReqPath;
+		}
+		//die( 'Redirect to: '.url_add_tail( $Blog->gen_blogurl(), $ReqPath ).' ('.$alias.')' );
+		header_redirect( url_add_tail( $Blog->gen_blogurl(), $ReqPath ), 301 );
 	}
 
 	// Still no blog requested, use default:
