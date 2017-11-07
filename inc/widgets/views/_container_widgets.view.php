@@ -39,9 +39,9 @@ display_container( $WidgetContainer );
 
 echo '</fieldset>'."\n";
 
-// Display action buttons for widgets list:
+// Display button/link to edit widgets in back-office:
 echo '<div class="evo_customizer__buttons evo_customizer__buttons_widget_actions">';
-display_widgets_action_buttons( $Form );
+echo '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;skin_type='.get_param( 'skin_type' ).'" class="btn btn-default" target="_parent">'.T_('Go to Back-office').'</a>';
 echo '</div>';
 
 $Form->end_form();

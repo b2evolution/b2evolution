@@ -797,9 +797,12 @@ function display_container( $WidgetContainer, $is_included = true )
 			echo '<li id="wi_ID_'.$ComponentWidget->ID.'" class="draggable_widget">';
 
 			// Checkbox:
-			echo '<span class="widget_checkbox'.( $enabled ? ' widget_checkbox_enabled' : '' ).'">'
-					.'<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" />'
-				.'</span>';
+			if( $mode != 'customizer' )
+			{	// Don't display on customizer mode:
+				echo '<span class="widget_checkbox'.( $enabled ? ' widget_checkbox_enabled' : '' ).'">'
+						.'<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" />'
+					.'</span>';
+			}
 
 			// State:
 			echo '<span class="widget_state">'
@@ -820,42 +823,45 @@ function display_container( $WidgetContainer, $is_included = true )
 				.'</span>';
 
 			// Cache:
-			echo'<span class="widget_cache_status">';
-			$widget_cache_status = $ComponentWidget->get_cache_status( true );
-			switch( $widget_cache_status )
-			{
-				case 'disallowed':
-					echo get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ), 'rel' => $widget_cache_status ) );
-					break;
+			if( $mode != 'customizer' )
+			{	// Don't display on customizer mode:
+				echo'<span class="widget_cache_status">';
+				$widget_cache_status = $ComponentWidget->get_cache_status( true );
+				switch( $widget_cache_status )
+				{
+					case 'disallowed':
+						echo get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ), 'rel' => $widget_cache_status ) );
+						break;
 
-				case 'denied':
-					echo action_icon( T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ),
-						'block_cache_denied',
-						$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching', NULL, NULL, NULL,
-						array( 'rel' => $widget_cache_status ) );
-					break;
+					case 'denied':
+						echo action_icon( T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ),
+							'block_cache_denied',
+							$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching', NULL, NULL, NULL,
+							array( 'rel' => $widget_cache_status ) );
+						break;
 
-				case 'enabled':
-					echo action_icon( T_( 'Caching is enabled. Click to disable.' ),
-						'block_cache_on',
-						regenerate_url( 'blog', 'action=cache_disable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
-						array(
-								'rel'     => $widget_cache_status,
-								'onclick' => 'return toggleCacheWidget( \'wi_ID_'.$ComponentWidget->ID.'\', \'disable\' )',
-							) );
-					break;
+					case 'enabled':
+						echo action_icon( T_( 'Caching is enabled. Click to disable.' ),
+							'block_cache_on',
+							regenerate_url( 'blog', 'action=cache_disable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
+							array(
+									'rel'     => $widget_cache_status,
+									'onclick' => 'return toggleCacheWidget( \'wi_ID_'.$ComponentWidget->ID.'\', \'disable\' )',
+								) );
+						break;
 
-				case 'disabled':
-					echo action_icon( T_( 'Caching is disabled. Click to enable.' ),
-						'block_cache_off',
-						regenerate_url( 'blog', 'action=cache_enable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
-						array(
-								'rel'     => $widget_cache_status,
-								'onclick' => 'return toggleCacheWidget( \'wi_ID_'.$ComponentWidget->ID.'\', \'enable\' )',
-							) );
-					break;
+					case 'disabled':
+						echo action_icon( T_( 'Caching is disabled. Click to enable.' ),
+							'block_cache_off',
+							regenerate_url( 'blog', 'action=cache_enable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
+							array(
+									'rel'     => $widget_cache_status,
+									'onclick' => 'return toggleCacheWidget( \'wi_ID_'.$ComponentWidget->ID.'\', \'enable\' )',
+								) );
+						break;
+				}
+				echo '</span>';
 			}
-			echo '</span>';
 
 			// Actions:
 			echo '<span class="widget_actions">'
@@ -864,15 +870,18 @@ function display_container( $WidgetContainer, $is_included = true )
 							( $enabled ? 'deactivate' : 'activate' ),
 							regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ), NULL, NULL, NULL,
 							array( 'onclick' => 'return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => 'toggle_action' )
-						)
+						);
 					// Edit:
-					.action_icon( T_('Edit widget settings!'),
+					if( $mode != 'customizer' )
+					{	// Don't display on customizer mode:
+						echo action_icon( T_('Edit widget settings!'),
 							'edit',
 							regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ), NULL, NULL, NULL,
 							array( 'onclick' => 'return editWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
-						)
+						);
+					}
 					// Remove:
-					.action_icon( T_('Remove this widget!'),
+					echo action_icon( T_('Remove this widget!'),
 							'delete',
 							regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
 							array( 'onclick' => 'return deleteWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )

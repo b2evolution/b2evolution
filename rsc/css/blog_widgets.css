@@ -42,6 +42,10 @@ margin:0 2em 0 0;
 	padding-left:10px;
 	cursor:default;
 }
+#customizer_wrapper .widget_container li > span.widget_actions {
+	white-space: normal;
+	text-align: center;
+}
 td.widget_cache_status, span.widget_cache_status {
 	width: 40px;
 	text-align: center;
