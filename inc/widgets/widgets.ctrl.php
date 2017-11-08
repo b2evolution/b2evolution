@@ -93,7 +93,6 @@ switch( $action )
 	case 'update_container':
 	case 'activate':
 	case 'deactivate':
-	case 'customize':
 		// Do nothing
 		break;
 
@@ -102,7 +101,7 @@ switch( $action )
 		param( 'code', 'string', true );
 	case 'new':
 	case 'add_list':
-	case 'container_list':
+	case 'customize':
 		param( 'container', 'string', $action == 'add_list', true );	// memorize
 		param( 'container_code', 'string' );
 		param( 'skin_type', 'string' );
@@ -200,7 +199,6 @@ switch( $action )
 	case 'new':
 	case 'edit':
 	case 'add_list':
-	case 'container_list':
 	case 'customize':
 		// Do nothing
 		break;
@@ -519,7 +517,7 @@ switch( $action )
 
 		if( $mode == 'customizer' )
 		{	// Set an URL to redirect back to customizer mode:
-			$redirect_to = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type.'&action=container_list&mode=customizer';
+			$redirect_to = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type.'&action=customize&mode=customizer';
 			$WidgetContainerCache = & get_WidgetContainerCache();
 			if( $WidgetContainer = & $WidgetContainerCache->get_by_ID( $wico_ID, false, false ) )
 			{
@@ -821,21 +819,12 @@ switch( $action )
 		}
 		break;
 
-	case 'container_list':
-		// A list of widgets of the selected container:
-		switch( $mode )
-		{
-			case 'customizer':
-				// Try to get widget container by collection ID, container code and requested skin type:
-				$WidgetContainerCache = & get_WidgetContainerCache();
-				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $blog, $skin_type, $container_code );
-
-				$AdminUI->disp_view( 'widgets/views/_container_widgets.view.php' );
-				break;
-		}
-		break;
-
 	case 'customize':
+		if( ! empty( $container_code ) )
+		{	// Try to get widget container by collection ID, container code and requested skin type:
+			$WidgetContainerCache = & get_WidgetContainerCache();
+			$selected_WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $blog, $skin_type, $container_code );
+		}
 		$AdminUI->disp_view( 'widgets/views/_widget_customize.form.php' );
 		break;
 

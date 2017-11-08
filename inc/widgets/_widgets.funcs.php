@@ -710,13 +710,20 @@ function & get_widget_container( $coll_ID, $container_fieldset_id )
 /**
  * @param string Title of the container. This gets passed to T_()!
  * @param boolean Is included in collection skin
+ * @param array Params
  */
-function display_container( $WidgetContainer, $is_included = true )
+function display_container( $WidgetContainer, $is_included = true, $params = array() )
 {
 	global $Collection, $Blog, $admin_url, $embedded_containers, $mode;
 	global $Session;
 
-	$Table = new Table();
+	$params = array_merge( array(
+			'table_layout'  => NULL, // Possible values: 'accordion_table', NULL(for default 'Results')
+			'group_id'      => NULL,
+			'group_item_id' => NULL,
+		), $params );
+
+	$Table = new Table( $params['table_layout'] );
 
 	// Table ID - fp> needs to be handled cleanly by Table object
 	if( isset( $WidgetContainer->ID ) && ( $WidgetContainer->ID > 0 ) )
@@ -758,15 +765,26 @@ function display_container( $WidgetContainer, $is_included = true )
 	}
 	$Table->global_icon( T_('Add a widget...'), 'new', $add_widget_url, /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, $add_widget_link_params );
 
-	$Table->display_init( array(
+	if( $params['table_layout'] == 'accordion_table' )
+	{	// Set ID for current widget container for proper work of accordion style:
+		$params['group_item_id'] = 'container_'.$widget_container_id;
+	}
+
+	$Table->display_init( array_merge( array(
 			'list_start' => '<div class="panel panel-default">',
 			'list_end'   => '</div>',
-		) );
+		), $params ) );
 
 	$Table->display_list_start();
 
 	// TITLE / COLUMN HEADERS:
 	$Table->display_head();
+
+	if( $params['table_layout'] == 'accordion_table' )
+	{	// Start of accordion body of current item:
+		$is_selected_widget_container = empty( $params['selected_wico_ID'] ) || empty( $WidgetContainer ) || $WidgetContainer->ID != $params['selected_wico_ID'];
+		echo '<div id="'.$params['group_item_id'].'" class="panel-collapse '.( $is_selected_widget_container ? 'collapse' : '' ).'">';
+	}
 
 	// BODY START:
 	echo '<ul id="container_'.$widget_container_id.'" class="widget_container">';
@@ -896,6 +914,11 @@ function display_container( $WidgetContainer, $is_included = true )
 	// BODY END:
 	echo '</ul>';
 
+	if( $params['table_layout'] == 'accordion_table' )
+	{	// End of accordion body of current item:
+		echo '</div>';
+	}
+
 	$Table->display_list_end();
 }
 
@@ -905,8 +928,9 @@ function display_container( $WidgetContainer, $is_included = true )
  *
  * @param string Skin type: 'normal', 'mobile', 'tablet'
  * @param boolean TRUE to display main containers, FALSE - sub containers
+ * @param array Params
  */
-function display_containers( $skin_type, $main = true )
+function display_containers( $skin_type, $main = true, $params = array() )
 {
 	global $Blog, $blog_container_list, $skins_container_list, $embedded_containers;
 
@@ -991,7 +1015,7 @@ function display_containers( $skin_type, $main = true )
 		// Is included in collection skin?
 		$is_included = $container_data[1];
 		// Display a container with widgets:
-		display_container( $WidgetContainer, $is_included );
+		display_container( $WidgetContainer, $is_included, $params  );
 	}
 }
 

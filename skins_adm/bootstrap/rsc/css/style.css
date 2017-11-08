@@ -1650,6 +1650,7 @@ table.diff td.diff-title-addedline {
   margin-bottom: 0;
 }
 #customizer_wrapper form > .panel-group > .panel,
+#customizer_wrapper form > fieldset > .panel-group > .panel,
 #customizer_wrapper form > div.fieldset_wrapper > fieldset > .panel {
   border-top: none;
   border-left: none;
@@ -1659,10 +1660,12 @@ table.diff td.diff-title-addedline {
   box-shadow: none;
 }
 #customizer_wrapper form > .panel-group > .panel > .panel-heading,
+#customizer_wrapper form > fieldset > .panel-group > .panel > .panel-heading,
 #customizer_wrapper form > div.fieldset_wrapper > fieldset > .panel > .panel-heading {
   border-radius: 0;
 }
 #customizer_wrapper form > .panel-group > .panel > .panel-body .form-group:last-child,
+#customizer_wrapper form > fieldset > .panel-group > .panel > .panel-body .form-group:last-child,
 #customizer_wrapper form > div.fieldset_wrapper > fieldset > .panel > .panel-body .form-group:last-child {
   margin-bottom: 0;
 }

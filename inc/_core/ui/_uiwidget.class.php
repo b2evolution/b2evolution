@@ -207,6 +207,14 @@ class Widget
 				//prefix
 				return $this->param_prefix;
 
+			case 'group_id':
+				// Group ID (e-g used for accordion style)
+				return isset( $this->params['group_id'] ) ? $this->params['group_id'] : '';
+
+			case 'group_item_id':
+				// ID of group element (e-g used for accordion style)
+				return isset( $this->params['group_item_id'] ) ? $this->params['group_item_id'] : '';
+
 			default:
 				return '[Unknown:'.$matches[1].']';
 		}
