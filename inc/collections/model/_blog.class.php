@@ -5053,6 +5053,7 @@ class Blog extends DataObject
 			$SQL->SELECT( 'cua_url_alias' );
 			$SQL->FROM( 'T_coll_url_aliases' );
 			$SQL->WHERE( 'cua_coll_ID = '.$DB->quote( $this->ID ) );
+			$SQL->ORDER_BY( 'cua_url_alias ASC' );
 			$this->url_aliases = $DB->get_col( $SQL );
 		}
 

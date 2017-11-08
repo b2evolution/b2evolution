@@ -669,13 +669,15 @@ function init_requested_blog( $use_blog_param_first = true )
 	if( ( $Collection = $Blog = & $BlogCache->get_by_url_alias( $ReqAbsUrl, $alias, false ) ) !== false )
 	{ // We found a matching blog:
 		$Debuglog->add( 'Found matching blog: '.$blog. 'using alias '.$alias, 'detectblog' );
+		$alias = url_same_protocol( $alias, $ReqAbsUrl );
 		$ReqPath = str_replace( $alias, '', $ReqAbsUrl );
 		if( substr( $ReqPath, 0, 1 ) != '/' )
 		{ // Tail must start with '/'
 			$ReqPath = '/'.$ReqPath;
 		}
-		//die( 'Redirect to: '.url_add_tail( $Blog->gen_blogurl(), $ReqPath ).' ('.$alias.')' );
-		header_redirect( url_add_tail( $Blog->gen_blogurl(), $ReqPath ), 301 );
+		$redirect_to = url_same_protocol( url_add_tail( $Blog->gen_blogurl(), $ReqPath ), $ReqAbsUrl );
+		//die( 'Redirect to: '.$redirect_to.' ('.$alias.')' );
+		header_redirect( $redirect_to, 301 );
 	}
 
 	// Still no blog requested, use default:

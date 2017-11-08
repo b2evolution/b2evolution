@@ -97,12 +97,13 @@ class BlogCache extends DataObjectCache
 		$req_url_wo_proto = substr( $req_url, strpos( $req_url, '://' ) ); // req_url without protocol, so it matches http and https below
 
 		$sql = 'SELECT *
-			  FROM T_blogs
-			 WHERE ( blog_access_type = "absolute"
-			         AND ( '.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" )
-		                 OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" ) ) )
-			    OR ( blog_access_type = "subdom"
-			         AND '.$DB->quote( $req_url_wo_proto ).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.$baseport.'/%" ) )';
+						FROM T_blogs
+						WHERE ( blog_access_type = "absolute"
+							AND ( '.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" )
+								OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" ) ) )
+							OR ( blog_access_type = "subdom"
+								AND '.$DB->quote( $req_url_wo_proto ).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.$baseport.'/%" ) )
+						ORDER BY blog_ID ASC';
 
 		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
 		/*
