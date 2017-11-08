@@ -5954,7 +5954,7 @@ class User extends DataObject
 
 			case 'edited':
 				$from_add = 'LEFT JOIN ( SELECT iver_itm_ID, COUNT(*) AS counter
-						FROM evo_items__version
+						FROM T_items__version
 						WHERE iver_edit_user_ID = '.$DB->quote( $this->ID ).'
 						GROUP BY iver_itm_ID ) AS b
 							ON b.iver_itm_ID = post_ID ';
@@ -5985,7 +5985,7 @@ class User extends DataObject
 						COUNT( * ) AS categories,
 						SUM( IF( cat_lock = 1, 1, 0 ) ) AS locked_categories
 					FROM T_postcats
-					LEFT JOIN evo_categories
+					LEFT JOIN T_categories
 						ON cat_ID = postcat_cat_ID
 					GROUP BY postcat_post_ID
 				) AS a
@@ -6010,7 +6010,7 @@ class User extends DataObject
 					FROM T_users__secondary_user_groups
 					LEFT JOIN T_groups
 						ON sug_grp_ID = grp_ID
-					LEFT JOIN evo_bloggroups
+					LEFT JOIN T_coll_group_perms
 						ON bloggroup_group_ID = grp_ID
 					WHERE
 						sug_user_ID = '.$DB->quote( $current_User->ID ).'
