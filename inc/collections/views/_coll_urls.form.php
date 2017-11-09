@@ -248,8 +248,18 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 
 		$Form->radio( 'blog_http_protocol', $edited_Blog->get( 'http_protocol' ), $http_protocol_options, T_('SSL'), true );
 
-	$url_aliases = implode( "\n", $edited_Blog->get_url_aliases() );
-	$Form->textarea( 'blog_url_aliases', $url_aliases, 5, T_('Alias URLs' ), NULL );
+	$url_aliases = $edited_Blog->get_url_aliases();
+	$alias_field_note = get_icon( 'add', 'imgtag', array( 'class' => 'url_alias_add', 'style' => 'cursor: pointer; position: relative;' ) );
+	$alias_field_note .= get_icon( 'minus', 'imgtag', array( 'class' => 'url_alias_minus', 'style' => 'margin-left: 2px; cursor: pointer; position: relative;' ) );
+	if( empty( $url_aliases ) )
+	{
+		$Form->text_input( 'blog_url_alias[]', '', 50, T_('Alias URL'), $alias_field_note );
+	}
+
+	foreach( $url_aliases as $alias )
+	{
+		$Form->text_input( 'blog_url_alias[]', $alias, 50, T_('Alias URL'), $alias_field_note );
+	}
 
 $Form->end_fieldset();
 
@@ -556,3 +566,46 @@ $Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButt
 $Form->end_form();
 
 ?>
+<script type="text/javascript">
+	function replace_form_params( result, field_id )
+	{
+		field_id = ( typeof( field_id ) == 'undefined' ? '' : ' id="' + field_id + '"' );
+		return result.replace( '#fieldstart#', '<?php echo str_ireplace( '$id$', "' + field_id + '", format_to_js( $Form->fieldstart ) ); ?>' )
+			.replace( '#fieldend#', '<?php echo format_to_js( $Form->fieldend ); ?>' )
+			.replace( '#labelclass#', '<?php echo format_to_js( $Form->labelclass ); ?>' )
+			.replace( '#labelstart#', '<?php echo format_to_js( $Form->labelstart ); ?>' )
+			.replace( '#labelend#', '<?php echo format_to_js( $Form->labelend ); ?>' )
+			.replace( '#inputstart#', '<?php echo format_to_js( $Form->inputstart ); ?>' )
+			.replace( '#inputend#', '<?php echo format_to_js( $Form->inputend ); ?>' );
+	}
+
+	jQuery( document ).on( 'click', 'span.url_alias_add', function()
+	{
+		var this_obj = jQuery( this );
+		var params = '<?php
+			global $b2evo_icons_type;
+			echo empty( $b2evo_icons_type ) ? '' : '&b2evo_icons_type='.$b2evo_icons_type;
+			?>';
+
+		jQuery.ajax({
+			type: 'GET',
+			url: '<?php echo get_htsrv_url();?>anon_async.php',
+			data: 'action=get_url_alias_new_field' + params,
+			success: function( result )
+			{
+				result = ajax_debug_clear( result );
+				result = replace_form_params( result );
+
+				var cur_fieldset_obj = this_obj.closest( '.form-group' );
+				cur_fieldset_obj.after( result );
+			}
+		});
+	});
+
+	jQuery( document ).on( 'click', 'span.url_alias_minus', function()
+	{
+		var this_obj = jQuery( this );
+		var cur_fieldset_obj = this_obj.closest( '.form-group' );
+		cur_fieldset_obj.remove();
+	});
+</script>

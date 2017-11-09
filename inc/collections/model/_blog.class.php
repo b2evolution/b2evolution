@@ -1305,9 +1305,8 @@ class Blog extends DataObject
 				$this->set( 'http_protocol', $http_protocol );
 			}
 
-			if( ( $url_aliases = param( 'blog_url_aliases', 'text' ) ) !== NULL )
+			if( ( $url_aliases = param( 'blog_url_alias', 'array', NULL ) ) !== NULL )
 			{
-				$url_aliases = explode( "\n", $url_aliases );
 				$has_error = array();
 				foreach( $url_aliases as $key => $alias )
 				{
@@ -1326,7 +1325,7 @@ class Blog extends DataObject
 					$has_error = validate_url( $alias, 'http-https' );
 					if( $has_error )
 					{
-						param_error( 'blog_url_aliases', T_('Invalid URL format.') );
+						param_error( 'blog_url_alias', T_('Invalid URL format.') );
 						break;
 					}
 
@@ -1369,7 +1368,7 @@ class Blog extends DataObject
 
 						if( preg_match( '#^'.$url_regex.'(?=/)#', $subject, $matches ) )
 						{
-							param_error( 'blog_url_aliases', sprintf( T_('URL Alias %s is already in use by another collection or contains the existing alias.'), '&laquo;'.$alias.'&raquo;' ) );
+							param_error( 'blog_url_alias', sprintf( T_('URL alias %s is already in use by another collection or contains an existing alias.'), '&laquo;'.$alias.'&raquo;' ) );
 							break;
 						}
 					}
@@ -1398,7 +1397,7 @@ class Blog extends DataObject
 					}
 				}
 
-				if( ! param_has_error( 'blog_url_aliases' ) )
+				if( ! param_has_error( 'blog_url_alias' ) )
 				{
 					$this->set( 'url_aliases', $url_aliases );
 				}
@@ -5054,8 +5053,7 @@ class Blog extends DataObject
 			$SQL->SELECT( 'cua_url_alias' );
 			$SQL->FROM( 'T_coll_url_aliases' );
 			$SQL->WHERE( 'cua_coll_ID = '.$DB->quote( $this->ID ) );
-			$SQL->ORDER_BY( 'cua_url_alias ASC' );
-			$this->url_aliases = $DB->get_col( $SQL );
+			$this->url_aliases = $DB->get_col( $SQL->get() );
 		}
 
 		return $this->url_aliases;

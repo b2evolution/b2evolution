@@ -1532,6 +1532,23 @@ switch( $action )
 			) );
 		break;
 
+	case 'get_url_alias_new_field':
+			param( 'b2evo_icons_type', 'string', '' );
+
+			$Form = new Form();
+			$Form->fieldstart = '#fieldstart#';
+			$Form->fieldend = '#fieldend#';
+			$Form->labelclass = '#labelclass#';
+			$Form->labelstart = '#labelstart#';
+			$Form->labelend = '#labelend#';
+			$Form->inputstart = '#inputstart#';
+			$Form->inputend = '#inputend#';
+
+			$alias_field_note = get_icon( 'add', 'imgtag', array( 'class' => 'url_alias_add', 'style' => 'cursor: pointer; position: relative;' ) );
+			$alias_field_note .= get_icon( 'minus', 'imgtag', array( 'class' => 'url_alias_minus', 'style' => 'margin-left: 2px; cursor: pointer; position: relative;' ) );
+			$Form->text_input( 'blog_url_alias[]', '', 50, T_('Alias URL'), $alias_field_note );
+			break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;
