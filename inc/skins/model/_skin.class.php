@@ -289,8 +289,20 @@ class Skin extends DataObject
 		global $admin_url, $rsc_url;
 		global $Timer, $Session, $debug, $current_User;
 
+		$params = array_merge( array(
+				'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
+				'container_start' => '',
+				'container_end'   => '',
+			), $params );
+
 		$timer_name = 'skin_container('.$sco_name.')';
 		$Timer->start( $timer_name );
+
+		// Get container code from container name:
+		$container_code = preg_replace( '/[^a-z\d]+/', '_', strtolower( $sco_name ) );
+
+		// Start to get content of widgets:
+		ob_start();
 
 		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
@@ -346,6 +358,22 @@ class Skin extends DataObject
 			echo '</div>';
 		}
 
+		// Store content of widgets to var in order to display them in container wrapper:
+		$container_widgets_content = ob_get_clean();
+
+		if( $params['container_display_if_empty'] || ! empty( $Widget_array ) )
+		{	// Display container wrapper with widgets content if it is not empty or we should display it anyway:
+
+			// Display start of container wrapper:
+			echo str_replace( '$wico_class$', 'evo_container__'.str_replace( ' ', '_', $container_code ), $params['container_start'] );
+
+			// Display widgets of the container:
+			echo $container_widgets_content;
+
+			// Display end of container wrapper:
+			echo $params['container_end'];
+		}
+
 		$Timer->pause( $timer_name );
 	}
 
@@ -361,7 +389,19 @@ class Skin extends DataObject
 	{
 		global $skins_path, $Messages;
 
-		if( ! $dir = @opendir( $skins_path.$folder ) )
+		if( empty( $folder ) )
+		{	// Get files from fallback skins folder:
+			global $basepath;
+			$skin_folder = $this->get_api_version() == 6 ? 'skins_fallback_v6' : 'skins_fallback_v5';
+			$skin_path = $basepath.$skin_folder;
+		}
+		else
+		{	// Get files from given skin folder:
+			$skin_folder = $folder;
+			$skin_path = $skins_path.$skin_folder;
+		}
+
+		if( ! $dir = @opendir( $skin_path ) )
 		{ // Skin directory not found!
 			$Messages->add( T_('Cannot open skin directory.'), 'error' ); // No trans
 			return false;
@@ -378,8 +418,7 @@ class Skin extends DataObject
 				continue;
 			}
 
-			$rf_main_subpath = trim( $folder.'/'.$file, '/' );
-			$af_main_path = $skins_path.$rf_main_subpath;
+			$af_main_path = $skin_path.'/'.$file;
 
 			if( !is_file( $af_main_path ) || ! preg_match( '~\.php$~', $file ) )
 			{ // Not a php template file, go to next:
@@ -388,37 +427,29 @@ class Skin extends DataObject
 
 			if( ! is_readable( $af_main_path ) )
 			{ // Cannot open PHP file:
-				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $skin_folder.'/'.$file ), 'error', T_('File read error:') );
 				continue;
 			}
 
 			$file_contents = @file_get_contents( $af_main_path );
 			if( ! is_string( $file_contents ) )
 			{ // Cannot get contents:
-				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $skin_folder.'/'.$file ), 'error', T_('File read error:') );
 				continue;
 			}
 
-			$files[] = $files;
+			$files[] = $file;
 
 			// DETECT if the file contains containers:
 			// if( ! preg_match_all( '~ \$Skin->container\( .*? (\' (.+?) \' )|(" (.+?) ") ~xmi', $file_contents, $matches ) )
-			if( ! preg_match_all( '~ (\$Skin->|skin_)container\( .*? ((\' (.+?) \')|(" (.+?) ")) ~xmi', $file_contents, $matches ) )
+			if( ! preg_match_all( '~ (\$Skin->|skin_)container\( .*? ([\'"] (.+?) [\'"]) ~xmi', $file_contents, $matches ) )
 			{ // No containers in this file, go to next:
 				continue;
 			}
 
-			// Merge matches from the two regexp parts (due to regexp "|" )
-			$container_list = array_merge( $matches[4], $matches[6] );
-
 			$c = 0;
-			foreach( $container_list as $container )
+			foreach( $matches[3] as $container )
 			{
-				if( empty( $container ) )
-				{ // regexp empty match -- NOT a container:
-					continue;
-				}
-
 				// We have one more container:
 				$c++;
 
@@ -432,7 +463,7 @@ class Skin extends DataObject
 
 			if( $c )
 			{
-				$Messages->add_to_group( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $rf_main_subpath ), 'success', sprintf( T_('Containers found in skin "%s":'), $folder ) );
+				$Messages->add_to_group( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $skin_folder.'/'.$file ), 'success', sprintf( T_('Containers found in skin "%s":'), $skin_folder ) );
 			}
 		}
 
