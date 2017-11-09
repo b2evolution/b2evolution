@@ -594,7 +594,7 @@ class AdminUI extends AdminUI_general
 
 			case 'accordion_table':
 				return array_merge( $this->get_template( 'Results' ), array(
-						'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title"><a class="accordion-toggler collapsed" data-toggle="collapse" data-parent="#$group_id$" href="#$group_item_id$" aria-expanded="false" aria-controls="$group_item_id$"></a>$title$</h3></div>'."\n",
+						'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title"><a class="accordion-toggler collapsed" data-toggle="collapse" data-parent="#$group_id$" href="#$group_item_id$" aria-expanded="false" aria-controls="$group_item_id$">$title$</a></h3></div>'."\n",
 					) );
 
 			case 'linespan_form':

@@ -67,9 +67,12 @@ jQuery( document ).on( 'ready', function()
 
 		backoffice_content.find( 'form' ).submit( function()
 		{	// Disable a submit button when form is starting to be submitted:
-			var button = jQuery( this ).find( 'input[type=submit]' );
-			button.prop( 'disabled', true );
-			button.after( '<div id="evo_customizer__form_loader"></div>' );
+			if( jQuery( this ).data( 'orig-submit' ) != '1' )
+			{
+				var button = jQuery( this ).find( 'input[type=submit]' );
+				button.prop( 'disabled', true );
+				button.after( '<div id="evo_customizer__form_loader"></div>' );
+			}
 		} );
 	} );
 
@@ -85,7 +88,10 @@ jQuery( document ).on( 'ready', function()
 		// OR if the settings iframe has the error message from previous updating:
 			jQuery( '#evo_customizer__backoffice' ).contents().find( '.alert' ).length )
 		{	// Update settings/back-office iframe with new content what we have in updater iframe currently:
-			jQuery( '#evo_customizer__backoffice' ).contents().find( 'form' ).removeAttr( 'target' ).submit();
+			var form = jQuery( '#evo_customizer__backoffice' ).contents().find( 'form' );
+			form.removeAttr( 'target' ).data( 'orig-submit', '1' );
+			form.find( 'input[type=submit]' ).prop( 'disabled', false ).removeAttr( 'disabled' ).next().remove();
+			form.submit();
 		}
 	} );
 

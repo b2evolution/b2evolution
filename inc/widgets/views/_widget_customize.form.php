@@ -36,22 +36,26 @@ $container_params = array(
 // fp> what browser do we need a fielset for?
 echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at remembering their width ;)
 
+echo '<p class="text-center">'.T_('Hover widgets in the right panel and click to edit.').'</p>';
+
 $Form->begin_group( array( 'id' => $container_params['group_id'] ) );
 
 // Display main containers:
 display_containers( get_param( 'skin_type' ), true, $container_params );
 
+echo '<h4>'.T_('Sub-Containers').'</h4>';
+
 // Display sub-containers:
 display_containers( get_param( 'skin_type' ), false, $container_params );
+
+$Form->end_group();
+
+echo '</fieldset>';
 
 // Display button/link to edit widgets in back-office:
 echo '<div class="evo_customizer__buttons evo_customizer__buttons_widget_actions">';
 echo '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;skin_type='.get_param( 'skin_type' ).'" class="btn btn-default" target="_parent">'.T_('Go to Back-office').'</a>';
 echo '</div>';
-
-$Form->end_group();
-
-echo '</fieldset>'."\n";
 
 $Form->end_form();
 

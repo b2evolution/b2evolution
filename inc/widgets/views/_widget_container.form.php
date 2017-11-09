@@ -50,21 +50,24 @@ $Form->add_crumb( 'widget_container' );
 $Form->hidden( 'action', $creating ? 'create_container' : 'update_container' );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
-$Form->begin_fieldset( T_('Properties') );
+$Form->begin_fieldset( T_('Container Properties') );
 
 	$Form->text_input( 'wico_name', $edited_WidgetContainer->get( 'name' ), 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );
 
 	$Form->text_input( 'wico_code', $edited_WidgetContainer->get( 'code' ), 40, T_('Code'), T_('Used for calling from skins. Must be unique.'), array( 'required' => true, 'maxlength' => 255 ) );
 
-	$Form->radio( 'wico_skin_type',
-			$edited_WidgetContainer->get( 'skin_type' ),
-			array(
-					array( 'normal', T_('Normal'), T_('Normal skin for general browsing') ),
-					array( 'mobile', T_('Mobile'), T_('Mobile skin for mobile phones browsers') ),
-					array( 'tablet', T_('Tablet'), T_('Tablet skin for tablet browsers') ),
-				),
-			T_( 'Skin type' ), true, '', true
-		);
+	if( $edited_WidgetContainer->ID == 0 )
+	{	// Allow to set skin type only on creating new widget container:
+		$Form->radio( 'wico_skin_type',
+				$edited_WidgetContainer->get( 'skin_type' ),
+				array(
+						array( 'normal', T_('Normal'), T_('Normal skin for general browsing') ),
+						array( 'mobile', T_('Mobile'), T_('Mobile skin for mobile phones browsers') ),
+						array( 'tablet', T_('Tablet'), T_('Tablet skin for tablet browsers') ),
+					),
+				T_( 'Skin type' ), true, '', true
+			);
+	}
 
 	$Form->text_input( 'wico_order', $edited_WidgetContainer->get( 'order' ), 40, T_('Order'), T_('For manual ordering of the containers,'), array( 'required' => !$creating, 'maxlength' => 255 ) );
 

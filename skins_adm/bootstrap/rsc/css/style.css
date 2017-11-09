@@ -1723,6 +1723,22 @@ table.diff td.diff-title-addedline {
   border-radius: 0;
   margin-bottom: 0;
 }
+#customizer_wrapper #current_widgets h4 + .panel,
+#customizer_wrapper #current_widgets .panel:first-child {
+  border-top: 1px solid #ddd;
+}
+#customizer_wrapper #current_widgets > p {
+  margin: 10px 5px;
+}
+#customizer_wrapper #current_widgets .panel_heading_action_icons a.action_icon span.fa {
+  margin: 0;
+}
+#customizer_wrapper #current_widgets .panel-group {
+  margin: 0;
+}
+#customizer_wrapper #current_widgets .panel-group > h4 {
+  margin: 10px;
+}
 .evo_customizer__tabs {
   position: fixed;
   top: 0;

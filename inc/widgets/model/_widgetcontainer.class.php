@@ -132,15 +132,18 @@ class WidgetContainer extends DataObject
 	 */
 	function load_from_Request()
 	{
-		param( 'wico_name', 'string', true );
+		param_string_not_empty( 'wico_name', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Name') ) );
 		$this->set_from_Request( 'name' );
 
-		param( 'wico_code', 'string', true );
+		param_string_not_empty( 'wico_code', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Code') ) );
 		$this->set_from_Request( 'code' );
 
-		param( 'wico_skin_type', 'string', '' );
-		param_check_not_empty( 'wico_skin_type', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Skin type') ) );
-		$this->set_from_Request( 'skin_type' );
+		if( $this->ID == 0 )
+		{	// Allow to set skin type only on creating new widget container:
+			param( 'wico_skin_type', 'string', '' );
+			param_check_not_empty( 'wico_skin_type', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Skin type') ) );
+			$this->set_from_Request( 'skin_type' );
+		}
 
 		param( 'wico_order', 'integer', $this->ID == 0 ? 0 : true );
 		$this->set_from_Request( 'order' );

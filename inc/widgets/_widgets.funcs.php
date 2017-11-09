@@ -737,33 +737,50 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
 		$wico_code = $WidgetContainer->get( 'code' );
 		$widget_container_id = 'wico_code_'.$wico_code;
 		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_code='.$wico_code.'&amp;container='.$widget_container_id );
-		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_code='.$wico_code );
+		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_code='.$wico_code.'&amp;'.url_crumb('widget_container') );
 	}
 
-	$widget_container_name = T_( $WidgetContainer->get( 'name' ) );
-	if( ! empty( $WidgetContainer->ID ) )
+	if( $mode == 'customizer' )
 	{
-		$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.( $mode == 'customizer' ? '&amp;mode='.$mode : '' ).'">'.$widget_container_name.'</a>';
+		$destroy_container_url .= '&amp;mode='.$mode;
 	}
-	$Table->title = '<span class="dimmed">'.$WidgetContainer->get( 'order' ).'</span> '
-		.'<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span> '
-		.'<span class="dimmed">'.$WidgetContainer->get( 'code' ).'</span>';
 
 	if( ! $is_included )
 	{	// Allow to destroy sub-container when it is not included into the selected skin:
-		$Table->global_icon( T_('Destroy sub-container'), 'delete', $destroy_container_url, T_('Destroy sub-container'), 3, 4 );
+		$Table->global_icon( T_('Destroy sub-container'), 'delete', $destroy_container_url, T_('Destroy sub-container'), $mode == 'customizer' ? 0 : 3, $mode == 'customizer' ? 0 : 4 );
 	}
-	$add_widget_link_params = array( 'class' => 'action_icon btn-primary' );
+
+	$widget_container_name = T_( $WidgetContainer->get( 'name' ) );
 	if( $mode == 'customizer' )
-	{	// Set special url to add new widget on customizer mode:
-		$add_widget_url = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container='.urlencode( $WidgetContainer->get( 'name' ) ).'&container_code='.urlencode( $WidgetContainer->get( 'code' ) ).'&mode=customizer';
+	{	// Customizer mode:
+		$Table->title = '<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span>';
+		if( ! empty( $WidgetContainer->ID ) )
+		{	// Link to edit current widget container:
+			$Table->global_icon( T_('Edit widget container'), 'edit', $admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;mode='.$mode, T_('Edit widget container'), 0, 0 );
+		}
 	}
 	else
-	{	// Add id for link to initialize JS code of opening modal window only for not customizer mode,
-		// because in customizer mode we should open this as simple link in the same left customizer panel:
-		$add_widget_link_params['id'] = 'add_new_'.$widget_container_id;
+	{	// Normal/back-office mode:
+		if( ! empty( $WidgetContainer->ID ) )
+		{
+			$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.( $mode == 'customizer' ? '&amp;mode='.$mode : '' ).'">'.$widget_container_name.'</a>';
+		}
+		$Table->title = '<span class="dimmed">'.$WidgetContainer->get( 'order' ).'</span> '
+			.'<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span> '
+			.'<span class="dimmed">'.$WidgetContainer->get( 'code' ).'</span>';
+
+		$add_widget_link_params = array( 'class' => 'action_icon btn-primary' );
+		if( $mode == 'customizer' )
+		{	// Set special url to add new widget on customizer mode:
+			$add_widget_url = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container='.urlencode( $WidgetContainer->get( 'name' ) ).'&container_code='.urlencode( $WidgetContainer->get( 'code' ) ).'&mode=customizer';
+		}
+		else
+		{	// Add id for link to initialize JS code of opening modal window only for not customizer mode,
+			// because in customizer mode we should open this as simple link in the same left customizer panel:
+			$add_widget_link_params['id'] = 'add_new_'.$widget_container_id;
+		}
+		$Table->global_icon( T_('Add a widget...'), 'new', $add_widget_url, /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, $add_widget_link_params );
 	}
-	$Table->global_icon( T_('Add a widget...'), 'new', $add_widget_url, /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, $add_widget_link_params );
 
 	if( $params['table_layout'] == 'accordion_table' )
 	{	// Set ID for current widget container for proper work of accordion style:

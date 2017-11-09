@@ -649,9 +649,17 @@ switch( $action )
 			$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
 		}
 		if( $edited_WidgetContainer->load_from_Request() )
-		{
+		{	// If widget container has been saved successfully:
 			$edited_WidgetContainer->dbsave();
-			header_redirect( '?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' ), 303 );
+			if( $wico_ID > 0 )
+			{	// The existing widget container has been updated:
+				$Messages->add( T_('Widget container has been updated.'), 'success' );
+			}
+			else
+			{	// New widget container has been created:
+				$Messages->add( T_('New widget has been created.'), 'success' );
+			}
+			header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' ), 303 );
 		}
 		break;
 
@@ -668,7 +676,15 @@ switch( $action )
 		forget_param( 'wico_ID' );
 		$Messages->add( $success_msg, 'success' );
 
-		header_redirect( '?ctrl=widgets&blog='.$blog );
+		if( $mode == 'customizer' )
+		{	// Redirect back to customizer mode:
+			$redirect_to = $admin_url.'?ctrl=widgets&blog='.$blog.'&skin_type='.$skin_type.'&action=customize&mode=customizer';
+		}
+		else
+		{	// Redirect back to back-office widgets list:
+			$redirect_to = $admin_url.'?ctrl=widgets&blog='.$blog;
+		}
+		header_redirect( $redirect_to, 303 );
 		break;
 
 	default:
