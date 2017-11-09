@@ -659,7 +659,15 @@ switch( $action )
 			{	// New widget container has been created:
 				$Messages->add( T_('New widget has been created.'), 'success' );
 			}
-			header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' ), 303 );
+			if( $mode == 'customizer' )
+			{	// Redirect back to customizer mode:
+				$redirect_to = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type.'&action=customize&mode=customizer';
+			}
+			else
+			{	// Redirect back to back-office widgets list:
+				$redirect_to = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' );
+			}
+			header_redirect( $redirect_to, 303 );
 		}
 		break;
 

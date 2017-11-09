@@ -74,7 +74,7 @@ $Form->begin_fieldset( T_('Container Properties') );
 $Form->end_fieldset();
 
 $buttons = array();
-$buttons[] = array( 'submit', 'submit', ( $creating ? T_('Record') : ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ) ), 'SaveButton' );
+$buttons[] = array( 'submit', 'save', ( $creating ? T_('Record') : ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ) ), 'SaveButton' );
 if( $mode == 'customizer' )
 {	// Display buttons in special div on customizer mode:
 	echo '<div class="evo_customizer__buttons">';

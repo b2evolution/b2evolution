@@ -39,10 +39,15 @@ jQuery( document ).on( 'ready', function()
 		{	// Remove messages wrapper completely if it had only successful messages:
 			messages_wrapper.closest( '.action_messages' ).remove();
 		}
+		var error_accordion_toggler = backoffice_content.find( 'input.field_error' ).closest( '.panel-collapse' );
+		if( error_accordion_toggler.length )
+		{	// Expand accordion collapsed block if it has at least one field with error:
+			error_accordion_toggler.collapse( 'show' );
+		}
 
 		// Set proper space before form after top tabs:
 		var tabs_height = backoffice_content.find( '.evo_customizer__tabs' ).outerHeight();
-		backoffice_content.find( '.evo_customizer__content' ).css( 'margin-top', tabs_height + 'px' );
+		backoffice_content.find( '#customizer_wrapper' ).css( 'padding-top', tabs_height + 'px' );
 
 		backoffice_content.find( '.evo_customizer__tabs a' ).click( function()
 		{	// Check to enable/disable designer mode between switching skin and widgets menu entries:

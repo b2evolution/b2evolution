@@ -1642,6 +1642,9 @@ table.diff td.diff-title-addedline {
 .jeditable_cell input {
   max-width: 100%;
 }
+#customizer_wrapper {
+  padding-top: 140px;
+}
 #customizer_wrapper .page-content {
   margin: 0;
   padding: 0;
@@ -1677,9 +1680,6 @@ table.diff td.diff-title-addedline {
 }
 #customizer_wrapper .row .col-md-12 {
   padding: 0;
-}
-#customizer_wrapper .evo_customizer__tabs + .evo_customizer__content {
-  margin-top: 140px;
 }
 #customizer_wrapper .evo_customizer__available_widgets {
   padding: 15px;

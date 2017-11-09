@@ -145,7 +145,15 @@ class WidgetContainer extends DataObject
 			$this->set_from_Request( 'skin_type' );
 		}
 
-		param( 'wico_order', 'integer', $this->ID == 0 ? 0 : true );
+		
+		if( $this->ID > 0 )
+		{	// Field "Order" is required for existing container:
+			param_string_not_empty( 'wico_order', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Order') ) );
+		}
+		else
+		{	// Order is set automatically only if it was not defined explicitly:
+			param( 'wico_order', 'integer', 0 );
+		}
 		$this->set_from_Request( 'order' );
 
 		if( ! param_errors_detected() )
