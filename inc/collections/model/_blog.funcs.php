@@ -2205,7 +2205,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => '%blog_row_actions( {Obj}, #sec_ID# )%',
+				'td' => '%blog_row_actions( {Obj}, #blog_sec_ID# )%',
 			);
 		if( $params['grouped'] )
 		{	// Group actions:
