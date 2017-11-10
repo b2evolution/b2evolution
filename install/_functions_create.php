@@ -1554,6 +1554,18 @@ function create_demo_contents()
 	global $admin_user;
 	global $create_demo_users;
 
+	// Global exception handler function
+	function demo_content_error_handler( $errno, $errstr, $errfile, $errline )
+	{ // handle only E_USER_NOTICE
+		if( $errno == E_USER_NOTICE )
+		{
+			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.$errstr.'</evo:warning></span> ' );
+		}
+	}
+
+	// Set global exception handler
+	set_error_handler( "demo_content_error_handler" );
+
 	if( ! isset( $mary_moderator_ID ) )
 	{
 		$mary_moderator_ID = $admin_user->ID;
@@ -1764,6 +1776,8 @@ function create_demo_contents()
 
 	load_funcs( 'tools/model/_system.funcs.php' );
 	system_init_caches( true, true ); // Outputs messages
+
+	restore_error_handler();
 }
 
 
