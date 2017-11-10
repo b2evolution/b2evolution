@@ -1690,52 +1690,64 @@ class Blog extends DataObject
 	 * Generate blog URL. That is the URL of the main page/home page of the blog.
 	 * This will nto necessarily be a folder. For example, it can end in index.php?blog=4
 	 *
-	 * @param string default|dynamic|static
+	 * @param string default|original
 	 */
 	function gen_blogurl( $type = 'default' )
 	{
 		global $baseprotocol, $basehost, $baseport, $baseurl, $Settings;
 
-		switch( $this->get( 'access_type' ) )
+		if( $type == 'original' && isset( $this->orig_access_type, $this->orig_siteurl ) )
+		{	// Use original access type if it has been forced temporarily to another value
+			// (probably to solve frame origin issue on customize mode):
+			$coll_access_type = $this->orig_access_type;
+			$coll_siteurl = $this->orig_siteurl;
+		}
+		else // 'default'
+		{	// Use current access type of this collection:
+			$coll_access_type = $this->get( 'access_type' );
+			$coll_siteurl = $this->siteurl;
+		}
+
+		switch( $coll_access_type )
 		{
 			case 'baseurl':
 			case 'default':
 				// Access through index.php: match absolute URL or call default blog
 				if( ( $Settings->get('default_blog_ID') == $this->ID )
-					|| preg_match( '#^https?://#', $this->siteurl ) )
+					|| preg_match( '#^https?://#', $coll_siteurl ) )
 				{ // Safety check! We only do that kind of linking if this is really the default blog...
 					// or if we call by absolute URL
 					if( $this->get( 'access_type' ) == 'default' )
 					{
-						return $baseurl.$this->siteurl.'index.php';
+						return $baseurl.$coll_siteurl.'index.php';
 					}
 					else
 					{
-						return $baseurl.$this->siteurl;
+						return $baseurl.$coll_siteurl;
 					}
 				}
 				// ... otherwise, we add the blog ID:
 
 			case 'index.php':
 				// Access through index.php + blog qualifier
-				return $baseurl.$this->siteurl.'index.php?blog='.$this->ID;
+				return $baseurl.$coll_siteurl.'index.php?blog='.$this->ID;
 
 			case 'extrabase':
 				// We want to use extra path on base url, use the blog urlname:
-				return $baseurl.$this->siteurl.$this->urlname.'/';
+				return $baseurl.$coll_siteurl.$this->urlname.'/';
 
 			case 'extrapath':
 				// We want to use extra path on index.php, use the blog urlname:
-				return $baseurl.$this->siteurl.'index.php/'.$this->urlname.'/';
+				return $baseurl.$coll_siteurl.'index.php/'.$this->urlname.'/';
 
 			case 'relative':
-				return $baseurl.$this->siteurl;
+				return $baseurl.$coll_siteurl;
 
 			case 'subdom':
 				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
-				return $this->siteurl;
+				return $coll_siteurl;
 
 			default:
 				debug_die( 'Unhandled Blog access type ['.$this->get( 'access_type' ).']' );
@@ -2699,7 +2711,7 @@ class Blog extends DataObject
 	 */
 	function get( $parname, $params = array() )
 	{
-		global $xmlsrv_url, $basehost, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
+		global $xmlsrv_url, $basehost, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog, $Session;
 
 		if( gettype( $params ) != 'array' )
 		{
@@ -2718,6 +2730,21 @@ class Blog extends DataObject
 				if( $access_type_value == 'subdom' && is_valid_ip_format( $basehost ) )
 				{	// Don't allow subdomain for IP address:
 					$access_type_value = 'index.php';
+				}
+				global $blog;
+				if( ! isset( $this->orig_access_type ) &&
+				    ! is_admin_page() &&
+				    isset( $Session ) &&
+				    ! empty( $this->ID ) &&
+				    $blog == $this->ID &&
+				    $Session->get( 'customizer_mode_'.$this->ID ) &&
+				    in_array( $access_type_value, array( 'subdom', 'absolute' ) ) )
+				{	// Force access type to use same domain as base site URL when
+					// customizer mode is enabled in order to avoid restriction of frame origin:
+					$this->orig_access_type = $access_type_value;
+					$this->orig_siteurl = $this->siteurl;
+					$this->access_type = $access_type_value = 'extrabase';
+					$this->siteurl = '';
 				}
 				return $access_type_value;
 
