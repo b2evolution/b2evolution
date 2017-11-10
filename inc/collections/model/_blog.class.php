@@ -1396,11 +1396,11 @@ class Blog extends DataObject
 						break;
 					}
 				}
+			}
 
-				if( ! param_has_error( 'blog_url_alias' ) )
-				{
-					$this->set( 'url_aliases', $url_aliases );
-				}
+			if( ! param_has_error( 'blog_url_alias' ) )
+			{
+				$this->set( 'url_aliases', $url_aliases );
 			}
 
 			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )

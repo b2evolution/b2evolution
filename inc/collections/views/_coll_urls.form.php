@@ -250,15 +250,15 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 
 	$url_aliases = $edited_Blog->get_url_aliases();
 	$alias_field_note = get_icon( 'add', 'imgtag', array( 'class' => 'url_alias_add', 'style' => 'cursor: pointer; position: relative;' ) );
-	$alias_field_note .= get_icon( 'minus', 'imgtag', array( 'class' => 'url_alias_minus', 'style' => 'margin-left: 2px; cursor: pointer; position: relative;' ) );
+	$alias_field_note .= get_icon( 'minus', 'imgtag', array( 'class' => 'url_alias_minus', 'style' => 'display: none; margin-left: 2px; cursor: pointer; position: relative;' ) );
 	if( empty( $url_aliases ) )
 	{
-		$Form->text_input( 'blog_url_alias[]', '', 50, T_('Alias URL'), $alias_field_note );
+		$Form->text_input( 'blog_url_alias[]', '', 50, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias' ) );
 	}
 
 	foreach( $url_aliases as $alias )
 	{
-		$Form->text_input( 'blog_url_alias[]', $alias, 50, T_('Alias URL'), $alias_field_note );
+		$Form->text_input( 'blog_url_alias[]', $alias, 50, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias' ) );
 	}
 
 $Form->end_fieldset();
@@ -598,6 +598,8 @@ $Form->end_form();
 
 				var cur_fieldset_obj = this_obj.closest( '.form-group' );
 				cur_fieldset_obj.after( result );
+
+				jQuery( 'span.url_alias_minus' ).show();
 			}
 		});
 	});
@@ -607,5 +609,10 @@ $Form->end_form();
 		var this_obj = jQuery( this );
 		var cur_fieldset_obj = this_obj.closest( '.form-group' );
 		cur_fieldset_obj.remove();
+
+		if( jQuery( 'input.evo_url_alias' ).length == 1 )
+		{
+			jQuery( 'span.url_alias_minus' ).hide();
+		}
 	});
 </script>
