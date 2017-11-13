@@ -1502,13 +1502,16 @@ div.dev-blocks--belowtoolbar {
 .evo_designer.evo_designer__widget.evo_widget__outside .evo_designer__actions {
   left: -3px;
 }
-.evo_designer.evo_designer__container {
+.evo_designer.evo_designer__container,
+.evo_designer.evo_designer__subcontainer {
   border-color: #DDD;
 }
-.evo_designer.evo_designer__container > div {
+.evo_designer.evo_designer__container > div,
+.evo_designer.evo_designer__subcontainer > div {
   height: 100%;
 }
-.evo_designer.evo_designer__container .evo_designer__title {
+.evo_designer.evo_designer__container .evo_designer__title,
+.evo_designer.evo_designer__subcontainer .evo_designer__title {
   top: auto;
   left: auto;
   bottom: -19px;
@@ -1518,7 +1521,8 @@ div.dev-blocks--belowtoolbar {
   color: #333;
   text-align: right;
 }
-.evo_designer.evo_designer__container .evo_designer__actions {
+.evo_designer.evo_designer__container .evo_designer__actions,
+.evo_designer.evo_designer__subcontainer .evo_designer__actions {
   top: auto;
   left: auto;
   bottom: 0;
@@ -1526,8 +1530,21 @@ div.dev-blocks--belowtoolbar {
   background: #DDD;
   border-radius: 4px 4px 0 0;
 }
-.evo_designer.evo_designer__container .evo_designer__actions .evo_designer__action {
+.evo_designer.evo_designer__container .evo_designer__actions .evo_designer__action,
+.evo_designer.evo_designer__subcontainer .evo_designer__actions .evo_designer__action {
   color: #333 !important;
+}
+.evo_designer.evo_designer__subcontainer {
+  border-color: #33F;
+}
+.evo_designer.evo_designer__subcontainer .evo_designer__title,
+.evo_designer.evo_designer__subcontainer .evo_designer__actions {
+  background: #33F;
+  color: #FFF;
+}
+.evo_designer.evo_designer__subcontainer .evo_designer__title .evo_designer__action,
+.evo_designer.evo_designer__subcontainer .evo_designer__actions .evo_designer__action {
+  color: #FFF !important;
 }
 .evo_designer.evo_designer__status_process {
   border-color: #F60;

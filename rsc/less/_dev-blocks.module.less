@@ -124,7 +124,7 @@ div.dev-blocks--belowtoolbar {
 	}
 
 	// Small different styles for container designer block:
-	&.evo_designer__container {
+	&.evo_designer__container, &.evo_designer__subcontainer {
 		border-color: #DDD;
 		> div {
 			height: 100%;
@@ -151,6 +151,19 @@ div.dev-blocks--belowtoolbar {
 			}
 		}
 	}
+
+	// Style with blur border for sub-container designer block:
+	&.evo_designer__subcontainer {
+		border-color: #33F;
+		.evo_designer__title, .evo_designer__actions {
+			background: #33F;
+			color: #FFF;
+			.evo_designer__action {
+				color: #FFF !important;
+			}
+		}
+	}
+
 	// Color designer block on AJAX processing:
 	&.evo_designer__status_process {
 		border-color: #F60;
