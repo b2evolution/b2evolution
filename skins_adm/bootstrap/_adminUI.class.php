@@ -813,7 +813,7 @@ class AdminUI extends AdminUI_general
 			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
-				$buttons .= '<a href="'.$url_params.'blog='.$l_blog_ID
+				$buttons .= '<a href="'.format_to_output( $url_params.'blog='.$l_blog_ID, 'htmlattr' )
 							.'" class="btn btn-default'.( $l_blog_ID == $blog ? ' active' : '' ).'"';
 
 				if( !is_null($this->coll_list_onclick) )
@@ -841,8 +841,8 @@ class AdminUI extends AdminUI_general
 				{
 					//$select_options .= ' selected="selected"';
 				}
-				$select_options .= '<a href="'.$url_params.'blog='.$l_blog_ID.'">'
-					.$l_Blog->dget( 'shortname', 'formvalue' ).'</a></li>';
+				$select_options .= '<a href="'.format_to_output( $url_params.'blog='.$l_blog_ID, 'htmlattr' ).'">'
+					.$l_Blog->dget( 'shortname', 'htmlbody' ).'</a></li>';
 			}
 		}
 
@@ -853,9 +853,9 @@ class AdminUI extends AdminUI_general
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
 			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
-			$r .= '<a href="'.$this->coll_list_all_url
+			$r .= '<a href="'.format_to_output( $this->coll_list_all_url, 'htmlattr' )
 						.'" class="btn btn-default'.( $blog == 0 ? ' active' : '' ).'">'
-						.$this->coll_list_all_title.'</a> ';
+						.format_to_output( $this->coll_list_all_title, 'htmlbody' ).'</a> ';
 			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 
