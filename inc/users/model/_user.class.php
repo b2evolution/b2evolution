@@ -5988,7 +5988,7 @@ class User extends DataObject
 					FROM T_users__secondary_user_groups
 					LEFT JOIN T_groups
 						ON sug_grp_ID = grp_ID
-					LEFT JOIN T_bloggroups
+					LEFT JOIN T_coll_group_perms
 						ON bloggroup_group_ID = grp_ID
 					WHERE
 						sug_user_ID = '.$DB->quote( $current_User->ID ).'

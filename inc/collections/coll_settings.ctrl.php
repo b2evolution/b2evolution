@@ -260,7 +260,7 @@ switch( $action )
 				break;
 
 			case 'advanced':
-				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors', 'login', 'styles' ) ) )
+				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors', 'login', 'styles', 'template' ) ) )
 				{ // Commit update to the DB:
 					if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 					{
