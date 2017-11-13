@@ -151,23 +151,23 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	{ // We stay on the same domain or same page:
 		$external_redirect = false;
 	}
-	elseif( strpos($redirect_to, $dispatcher ) === 0 )
+	elseif( strpos( $redirect_to, $dispatcher ) === 0 )
 	{ // $dispatcher is DEPRECATED and pages should use $admin_url URL instead, but at least we're staying on the same site:
 		$external_redirect = false;
 	}
-	elseif( strpos($redirect_to, $baseurl) === 0 )
-	{
-		$Debuglog->add('Redirecting within $baseurl, all is fine.', 'request' );
+	elseif( strpos( preg_replace( '/^https?/', '', $redirect_to ), preg_replace( '/^https?/', '', $baseurl ) ) === 0)
+	{ // redirecting between HTTP and HTTPS on the same domain should not be considered an external redirect
+		$Debuglog->add( 'Redirecting within $baseurl, all is fine.', 'request' );
 		$external_redirect = false;
 	}
-	elseif( strpos($redirect_to, $htsrv_url_sensitive) === 0 )
+	elseif( strpos( $redirect_to, $htsrv_url_sensitive ) === 0 )
 	{
-		$Debuglog->add('Redirecting within $htsrv_url_sensitive, all is fine.', 'request' );
+		$Debuglog->add( 'Redirecting within $htsrv_url_sensitive, all is fine.', 'request' );
 		$external_redirect = false;
 	}
-	elseif( !empty($Blog) && strpos($redirect_to, $Blog->gen_baseurl()) === 0 )
+	elseif( ! empty( $Blog ) && strpos( $redirect_to, $Blog->gen_baseurl() ) === 0 )
 	{
-		$Debuglog->add('Redirecting within current collection URL, all is fine.', 'request' );
+		$Debuglog->add( 'Redirecting within current collection URL, all is fine.', 'request' );
 		$external_redirect = false;
 	}
 
