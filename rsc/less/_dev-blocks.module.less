@@ -124,7 +124,7 @@ div.dev-blocks--belowtoolbar {
 	}
 
 	// Small different styles for container designer block:
-	&.evo_designer__container, &.evo_designer__subcontainer {
+	&.evo_designer__container, &.evo_designer__subcontainer_active, &.evo_designer__subcontainer_inactive {
 		border-color: #DDD;
 		> div {
 			height: 100%;
@@ -153,14 +153,20 @@ div.dev-blocks--belowtoolbar {
 	}
 
 	// Style with blur border for sub-container designer block:
-	&.evo_designer__subcontainer {
-		border-color: #33F;
+	&.evo_designer__subcontainer_active, &.evo_designer__subcontainer_inactive {
+		border-color: #00F;
 		.evo_designer__title, .evo_designer__actions {
-			background: #33F;
+			background: #00F;
 			color: #FFF;
 			.evo_designer__action {
 				color: #FFF !important;
 			}
+		}
+	}
+	&.evo_designer__subcontainer_inactive {
+		border-color: #99F;
+		.evo_designer__title, .evo_designer__actions {
+			background: #99F;
 		}
 	}
 

@@ -45,7 +45,9 @@ jQuery( document ).on( 'mouseover', '.evo_widget[data-id]', function()
 	}
 
 	// To be sure all previous designer blocks are hidden before show new one:
-	jQuery( '.evo_designer' ).removeClass( 'evo_designer__subcontainer' ).hide();
+	jQuery( '.evo_designer' ).removeClass( 'evo_designer__subcontainer_active evo_designer__subcontainer_inactive' ).hide();
+	// Unmark active subcontainer widget:
+	jQuery( '.evo_widget.evo_widget__subcontainer_active' ).removeClass( 'evo_widget__subcontainer_active' );
 
 	// Initialize designer block for widget:
 	evo_widget_initialize_designer_block( widget );
@@ -139,17 +141,29 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 	}
 
 	if( widget.hasClass( 'widget_core_subcontainer' ) || widget.hasClass( 'widget_core_subcontainer_row' ) )
-	{	// Add subcontainer style to widget designer block to mark it with blue border style:
-		jQuery( this ).addClass( 'evo_designer__subcontainer' );
-		evo_subcontainer_widgets = new Array();
-		widget.children( '.evo_widget' ).each( function()
-		{	// Store coordinates of all children:
-			evo_subcontainer_widgets.push( new Array( jQuery( this ),
-				jQuery( this ).offset().top - 3,
-				jQuery( this ).offset().left - 3,
-				jQuery( this ).offset().top + jQuery( this ).height() + 3,
-				jQuery( this ).offset().left + jQuery( this ).width() + 3 ) );
-		} );
+	{	// If widget is a subcontainer:
+		if( ! jQuery( this ).hasClass( 'evo_designer__subcontainer_active' ) )
+		{
+			// Mark currently active parent subcontainer to inactive:
+			jQuery( '.evo_designer__subcontainer_active' ).addClass( 'evo_designer__subcontainer_inactive' );
+			// Add subcontainer style to widget designer block to mark it with blue border style:
+			jQuery( this ).addClass( 'evo_designer__subcontainer_active' );
+			// Mark current subcontainer widget to active status by temp class:
+			widget.addClass( 'evo_widget__subcontainer_active' );
+
+			// Store coordinates of all child widgets to know when cursor over and out,
+			// because z-index doesn't work properly with child element if parent already has z-index:
+			evo_subcontainer_widgets = new Array();
+			widget.children( '.evo_widget' ).each( function()
+			{
+				evo_subcontainer_widgets.push( new Array(
+					jQuery( this ).data( 'id' ),
+					jQuery( this ).offset().top - 3,
+					jQuery( this ).offset().left - 3,
+					jQuery( this ).offset().top + jQuery( this ).height() + 3,
+					jQuery( this ).offset().left + jQuery( this ).width() + 3 ) );
+			} );
+		}
 	}
 } );
 
@@ -177,19 +191,23 @@ jQuery( document ).on( 'mousemove', function( e )
 	    ! jQuery( e.target ).closest( '.evo_container[data-code]' ).length &&
 	    ! jQuery( e.target ).closest( '.evo_widget[data-id]' ).length )
 	{	// Hide all designer blocks if mouse cursor was out them but they were not hidden by some wrong reason:
-		jQuery( '.evo_designer' ).removeClass( 'evo_designer__subcontainer' ).hide();
+		jQuery( '.evo_designer' ).removeClass( 'evo_designer__subcontainer_active evo_designer__subcontainer_inactive' ).hide();
+		// Unmark active subcontainer widget:
+		jQuery( '.evo_widget.evo_widget__subcontainer_active' ).removeClass( 'evo_widget__subcontainer_active' );
 	}
 
-	if( jQuery( '.evo_designer__subcontainer' ).length > 0 &&
+	if( jQuery( '.evo_designer__subcontainer_active' ).length > 0 &&
 	    typeof( evo_subcontainer_widgets ) != 'undefined' &&
-			evo_subcontainer_widgets.length > 0 )
+	    evo_subcontainer_widgets.length > 0 )
 	{	// If sub-container is selected to edit its widgets:
+		var active_subcontainer_widget = jQuery( '.evo_widget.evo_widget__subcontainer_active' );
 		for( var i = 0; i < evo_subcontainer_widgets.length; i++ )
 		{	// Detect what widget designer block should be visible depending on current cursor position:
-			var widget = evo_subcontainer_widgets[i][0];
-			if( widget.data( 'id' ) == jQuery( e.target ).data( 'id' ) ||
+			var widget = active_subcontainer_widget.children( '.evo_widget[data-id="' + evo_subcontainer_widgets[i][0] + '"]' );
+			if( widget.length == 0 ||
+			    widget.data( 'id' ) == jQuery( e.target ).data( 'id' ) ||
 			    jQuery( e.target ).closest( '.evo_designer__widget[data-id=' + widget.data( 'id' ) + ']' ).length > 0 )
-			{	// Skip it because currently cursor is over displayed dsigner block of one of sub-container widgets:
+			{	// Skip it because currently cursor is over displayed designer block of one of sub-container widgets:
 				continue;
 			}
 
@@ -199,7 +217,7 @@ jQuery( document ).on( 'mousemove', function( e )
 			{	// Initialize nad display designer block because cursor is over current widget:
 				evo_widget_initialize_designer_block( widget );
 				// Set z-index to make it over designer block of current sub-container:
-				designer_block.css( 'z-index', '10006' );
+				designer_block.css( 'z-index', jQuery( '.evo_designer__subcontainer_active' ).css( 'z-index' ) + 1  );
 			}
 			else
 			{	// Hide designer block:
