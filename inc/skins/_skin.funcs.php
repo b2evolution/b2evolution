@@ -2504,6 +2504,70 @@ function widget_container( $container_code, $params = array() )
 
 
 /**
+ * Customize params with widget container properties on designer mode;
+ * Replace variables/masks in params with widget container properties;
+ * possible variables/masks in params:
+ *     - $wico_class$ - Widget container class
+ *
+ * @param array Params with variables/masks
+ * @param string Container code
+ * @param string Container name
+ * @return array Params with replaced values instead of source variables
+ */
+function widget_container_customize_params( $params, $wico_code, $wico_name )
+{
+	global $Collection, $Blog, $Session, $current_User;
+
+	$params = array_merge( array(
+			'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
+			'container_start' => '',
+			'container_end'   => '',
+		), $params );
+
+	// Enable the desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode"
+	if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+	{	// Initialize hidden element with data which are used by JavaScript to build overlay designer mode html elements:
+		if( $wico_code === NULL )
+		{	// Display error if container cannot be detected in DB by name:
+			echo ' <span class="text-danger">'.sprintf( T_('Container "%s" cannot be manipulated because it lacks a code name in the skin template.'), $wico_name ).'</span> ';
+		}
+		elseif( preg_match( '#<[^>]+evo_container[^>]+>#', $params['container_start'], $container_start_wrapper ) )
+		{	// If container start param has a wrapper like '<div class="evo_container">':
+			$designer_mode_data = array(
+					'data-name' => $wico_name,
+					'data-code' => $wico_code,
+				);
+			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Set data to know current user has a permission to edit this widget:
+				$designer_mode_data['data-can-edit'] = 1;
+			}
+			// Append new data for container wrapper:
+			$attrib_actions = array(
+					'data-name'     => 'replace',
+					'data-code'     => 'replace',
+					'data-can-edit' => 'replace',
+				);
+			$params['container_start'] = str_replace( $container_start_wrapper[0], update_html_tag_attribs( $container_start_wrapper[0], $designer_mode_data, $attrib_actions ), $params['container_start'] );
+		}
+		else
+		{	// If container code is NOT defined or detected by name or container wrapper is not correct:
+			echo ' <span class="text-danger">'.sprintf( T_('Container %s cannot be manipulated because wrapper html tag has no %s.'), '"'.$wico_name.'"(<code>'.$wico_code.'</code>)', '<code>class="evo_container"</code>' ).'</span> ';
+		}
+
+		// Force to display container even if no widget:
+		$params['container_display_if_empty'] = true;
+	}
+
+	// Replace variables/masks in params with widget container properties;
+	// Possible variables/masks in params:
+	//   - $wico_class$ - Widget container class
+	$params = str_replace( '$wico_class$', 'evo_container__'.str_replace( ' ', '_', $wico_code ), $params );
+
+	return $params;
+}
+
+
+/**
  * Display a container
  *
  * @deprecated Replaced with function widget_container( $container_code, $params = array() )

@@ -190,6 +190,11 @@ class subcontainer_row_Widget extends ComponentWidget
 	{
 		global $Blog, $Timer, $displayed_subcontainers;
 
+		// Get subcontainer name:
+		$WidgetContainerCache = & get_WidgetContainerCache();
+		$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $subcontainer_code );
+		$subcontainer_name = $WidgetContainer ? $WidgetContainer->get( 'name' ) : $subcontainer_code;
+
 		if( ! isset( $displayed_subcontainers ) )
 		{	// Initialize the dispalyed subcontainers array at first usage:
 			// Use this array to avoid embedded containers display in infinite loop
@@ -197,21 +202,17 @@ class subcontainer_row_Widget extends ComponentWidget
 		}
 		elseif( in_array( $subcontainer_code, $displayed_subcontainers ) )
 		{	// Do not try do display the same subcontainer which were already displayed to avoid infinite display:
-			$WidgetContainerCache = & get_WidgetContainerCache();
-			if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $subcontainer_code ) )
-			{
-				$subcontainer_name = $WidgetContainer->get( 'name' );
-			}
-			else
-			{
-				$subcontainer_name = $subcontainer_code;
-			}
 			echo '<div class="alert alert-danger">'.sprintf( T_('Cannot include container "%s" because it would create an infinite loop.'), $subcontainer_name ).'</div>';
 			return;
 		}
 
 		// Add this subcontainer to the displayed_containers array:
 		$displayed_subcontainers[] = $subcontainer_code;
+
+		// Initialize params for current subcontainer:
+		$subcontainer_params = widget_container_customize_params( $params, $subcontainer_code, $subcontainer_name );
+
+		echo $subcontainer_params['container_start'];
 
 		// Get enabled widgets of the container:
 		$EnabledWidgetCache = & get_EnabledWidgetCache();
@@ -230,6 +231,8 @@ class subcontainer_row_Widget extends ComponentWidget
 				$Timer->pause( $widget_timer_name );
 			}
 		}
+
+		echo $subcontainer_params['container_end'];
 
 		// Remove the last item which must be this container from the end of the displayed containers:
 		array_pop( $displayed_subcontainers );

@@ -326,39 +326,8 @@ class Skin extends DataObject
 		$timer_name = 'skin_container('.$sco_name.')';
 		$Timer->start( $timer_name );
 
-		// Enable the desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode"
-		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
-		{	// Initialize hidden element with data which are used by JavaScript to build overlay designer mode html elements:
-			if( $container_code === NULL )
-			{	// Display error if container cannot be detected in DB by name:
-				echo ' <span class="text-danger">'.sprintf( T_('Container "%s" cannot be manipulated because it lacks a code name in the skin template.'), $sco_name ).'</span> ';
-			}
-			elseif( preg_match( '#<[^>]+evo_container[^>]+>#', $params['container_start'], $container_start_wrapper ) )
-			{	// If container start param has a wrapper like '<div class="evo_container">':
-				$designer_mode_data = array(
-						'data-name' => $sco_name,
-						'data-code' => $container_code,
-					);
-				if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-				{	// Set data to know current user has a permission to edit this widget:
-					$designer_mode_data['data-can-edit'] = 1;
-				}
-				// Append new data for container wrapper:
-				$attrib_actions = array(
-						'data-name'     => 'replace',
-						'data-code'     => 'replace',
-						'data-can-edit' => 'replace',
-					);
-				$params['container_start'] = str_replace( $container_start_wrapper[0], update_html_tag_attribs( $container_start_wrapper[0], $designer_mode_data, $attrib_actions ), $params['container_start'] );
-			}
-			else
-			{	// If container code is NOT defined or detected by name or container wrapper is not correct:
-				echo ' <span class="text-danger">'.sprintf( T_('Container %s cannot be manipulated because wrapper html tag has no %s.'), '"'.$sco_name.'"(<code>'.$container_code.'</code>)', '<code>class="evo_container"</code>' ).'</span> ';
-			}
-
-			// Force to display container even if no widget:
-			$params['container_display_if_empty'] = true;
-		}
+		// Customize params with widget container properties:
+		$container_params = widget_container_customize_params( $params, $container_code, $sco_name );
 
 		// Start to get content of widgets:
 		ob_start();
@@ -375,7 +344,7 @@ class Skin extends DataObject
 			echo 'Container: <b>'.$sco_name.'</b></div>';
 
 			// Force to display container even if no widget:
-			$params['container_display_if_empty'] = true;
+			$container_params['container_display_if_empty'] = true;
 		}
 
 		/**
@@ -392,14 +361,14 @@ class Skin extends DataObject
 			{ // Let the Widget display itself (with contextual params):
 				if( $w == 0 )
 				{ // Use special params for first widget in the current container
-					$orig_params = $params;
-					if( isset( $params['block_first_title_start'] ) )
+					$orig_params = $container_params;
+					if( isset( $container_params['block_first_title_start'] ) )
 					{
-						$params['block_title_start'] = $params['block_first_title_start'];
+						$container_params['block_title_start'] = $container_params['block_first_title_start'];
 					}
-					if( isset( $params['block_first_title_end'] ) )
+					if( isset( $container_params['block_first_title_end'] ) )
 					{
-						$params['block_title_end'] = $params['block_first_title_end'];
+						$container_params['block_title_end'] = $container_params['block_first_title_end'];
 					}
 				}
 				$widget_timer_name = 'Widget->display('.$ComponentWidget->code.')';
@@ -409,7 +378,7 @@ class Skin extends DataObject
 					) );
 				if( $w == 0 )
 				{ // Restore the params for next widgets after first
-					$params = $orig_params;
+					$container_params = $orig_params;
 					unset( $orig_params );
 				}
 				$Timer->pause( $widget_timer_name );
@@ -424,11 +393,11 @@ class Skin extends DataObject
 		// Store content of widgets to var in order to display them in container wrapper:
 		$container_widgets_content = ob_get_clean();
 
-		if( $params['container_display_if_empty'] || ! empty( $Widget_array ) )
+		if( $container_params['container_display_if_empty'] || ! empty( $Widget_array ) )
 		{	// Display container wrapper with widgets content if it is not empty or we should display it anyway:
 
 			// Display start of container wrapper:
-			echo str_replace( '$wico_class$', 'evo_container__'.str_replace( ' ', '_', $container_code ), $params['container_start'] );
+			echo $container_params['container_start'];
 
 			// Display widgets of the container:
 			echo $container_widgets_content;
@@ -439,7 +408,7 @@ class Skin extends DataObject
 			}
 
 			// Display end of container wrapper:
-			echo $params['container_end'];
+			echo $container_params['container_end'];
 		}
 
 		$Timer->pause( $timer_name );

@@ -9,8 +9,18 @@ jQuery( document ).on( 'mouseover', '.evo_container[data-code]', function()
 	// To be sure all previous designer blocks are hidden before show new one:
 	jQuery( '.evo_designer__container' ).hide();
 
-	var container_block = jQuery( '.evo_designer__container[data-code="' + container.data( 'code' ) + '"]' );
-	if( container_block.length )
+	// Initialize designer block for widget container:
+	evo_widget_initialize_designer_container_block( container );
+} );
+
+/**
+ * Initialize designer block for widget container
+ *
+ * @param object Widget
+ */
+function evo_widget_initialize_designer_container_block( container )
+{
+	if( jQuery( evo_widget_container_block_selector( container.data( 'code' ) ) ).length )
 	{	// Just display a designer block if it already has been initialized previous time:
 		evo_widget_update_container_position( container );
 		return;
@@ -32,7 +42,7 @@ jQuery( document ).on( 'mouseover', '.evo_container[data-code]', function()
 			'<div><div class="evo_designer__title">Container: ' + container.data( 'name' ) + '</div>' + container_actions + '</div>' +
 		'</div>' );
 	evo_widget_update_container_position( container );
-} );
+}
 
 jQuery( document ).on( 'mouseover', '.evo_widget[data-id]', function()
 {	// Initialize and Show widget designer block:
@@ -91,6 +101,14 @@ function evo_widget_initialize_designer_block( widget )
 		{	// Hide action icon to move widget up if it is the first widget in container:
 			jQuery( designer_block_selector ).find( '.evo_designer__action_order_up' ).hide();
 		}
+	}
+
+	if( widget.hasClass( 'widget_core_subcontainer' ) )
+	{	// If widget is a subcontainer,
+		// Set unique number for subcontainer because same subcontainer widget may be used several times on the same page
+		var subcontainer_unique_num = jQuery( '.evo_widget.widget_core_subcontainer[data-unique-num]' ).length + 1;
+		widget.attr( 'data-unique-num', subcontainer_unique_num );
+		jQuery( designer_block_selector ).attr( 'data-unique-num', subcontainer_unique_num );
 	}
 }
 
@@ -154,7 +172,8 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 			// Store coordinates of all child widgets to know when cursor over and out,
 			// because z-index doesn't work properly with child element if parent already has z-index:
 			evo_subcontainer_widgets = new Array();
-			widget.children( '.evo_widget' ).each( function()
+			var subcontainer_wrapper = widget.hasClass( 'widget_core_subcontainer' ) ? widget : widget.find( '.evo_container' );
+			subcontainer_wrapper.children( '.evo_widget' ).each( function()
 			{
 				evo_subcontainer_widgets.push( new Array(
 					jQuery( this ).data( 'id' ),
@@ -201,6 +220,7 @@ jQuery( document ).on( 'mousemove', function( e )
 	    evo_subcontainer_widgets.length > 0 )
 	{	// If sub-container is selected to edit its widgets:
 		var active_subcontainer_widget = jQuery( '.evo_widget.evo_widget__subcontainer_active' );
+		active_subcontainer_widget = active_subcontainer_widget.hasClass( 'widget_core_subcontainer' ) ? active_subcontainer_widget : active_subcontainer_widget.find( '.evo_container' );
 		for( var i = 0; i < evo_subcontainer_widgets.length; i++ )
 		{	// Detect what widget designer block should be visible depending on current cursor position:
 			var widget = active_subcontainer_widget.children( '.evo_widget[data-id="' + evo_subcontainer_widgets[i][0] + '"]' );
@@ -214,10 +234,24 @@ jQuery( document ).on( 'mousemove', function( e )
 			var designer_block = jQuery( evo_widget_designer_block_selector( widget ) );
 			if( e.pageX >= evo_subcontainer_widgets[i][2] && e.pageY >= evo_subcontainer_widgets[i][1] && // top-left point
 			    e.pageX <= evo_subcontainer_widgets[i][4] && e.pageY <= evo_subcontainer_widgets[i][3] ) // bottom-right point
-			{	// Initialize nad display designer block because cursor is over current widget:
+			{	// Initialize and display designer block because cursor is over current widget:
 				evo_widget_initialize_designer_block( widget );
 				// Set z-index to make it over designer block of current sub-container:
-				designer_block.css( 'z-index', jQuery( '.evo_designer__subcontainer_active' ).css( 'z-index' ) + 1  );
+				var subcontainer_zindex = jQuery( '.evo_designer__subcontainer_active' ).css( 'z-index' );
+				designer_block.css( 'z-index', subcontainer_zindex + 2  );
+				if( widget.parent().hasClass( 'evo_container' ) )
+				{	// Initialize and display also designer block for container:
+					evo_widget_initialize_designer_container_block( widget.parent() );
+					jQuery( evo_widget_container_block_selector( widget.data( 'container' ) ) ).css( 'z-index', subcontainer_zindex + 1 );
+					// Hide designer block of another container from the same current active subcontainer:
+					jQuery( '.evo_widget.evo_widget__subcontainer_active .evo_container' ).each( function()
+					{
+						if( jQuery( this ).data( 'code' ) != widget.data( 'container' ) )
+						{
+							jQuery( evo_widget_container_block_selector( jQuery( this ).data( 'code' ) ) ).hide();
+						}
+					} );
+				}
 			}
 			else
 			{	// Hide designer block:
@@ -352,7 +386,14 @@ jQuery( document ).on( 'ready', function()
  */
 function evo_widget_selector( designer_block )
 {
-	return '.evo_widget[data-id=' + designer_block.data( 'id' ) + ']';
+	var additional_select = '';
+	if( designer_block.data( 'unique-num' ) > 0 )
+	{	// Use additional select, e-g when same subcontainer widget is used in several
+		// places on the same page, and it is not enough to select it only by widget ID:
+		additional_select = '[data-unique-num=' + designer_block.data( 'unique-num' ) + ']';
+	}
+
+	return '.evo_widget[data-id=' + designer_block.data( 'id' ) + ']' + additional_select;
 }
 
 
@@ -364,7 +405,14 @@ function evo_widget_selector( designer_block )
  */
 function evo_widget_designer_block_selector( widget )
 {
-	return '.evo_designer__widget[data-id=' + widget.data( 'id' ) + ']';
+	var additional_select = '';
+	if( widget.data( 'unique-num' ) > 0 )
+	{	// Use additional select, e-g when same subcontainer widget is used in several
+		// places on the same page, and it is not enough to select it only by widget ID:
+		additional_select = '[data-unique-num=' + widget.data( 'unique-num' ) + ']';
+	}
+
+	return '.evo_designer__widget[data-id=' + widget.data( 'id' ) + ']' + additional_select;
 }
 
 
