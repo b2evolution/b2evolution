@@ -6436,7 +6436,12 @@ function get_ReqURI()
 		<?php
 	}
 
-	return array($ReqPath,$ReqURI);
+	$r = array( $ReqPath, $ReqURI );
+
+	// Format several danger chars to urlencoded format to avoid issues:
+	$r = str_replace( array( '"', '\'', '<', '>' ), array( '%22', '%27', '%3C', '%3E' ), $r );
+
+	return $r;
 }
 
 
