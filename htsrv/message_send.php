@@ -398,12 +398,6 @@ if( $success_message )
 	$send_subject = ( empty( $subject_other ) ? $subject : $subject_other );
 
 	$send_contact_method = $contact_method;
-	if( empty( $send_contact_method ) &&
-	    $Blog->get_setting( 'msgform_contact_method' ) )
-	{	// If contact method is not selected but this option is enabled then
-		// it means this option is hidden because only one "email" is allowed to select:
-		$send_contact_method = 'email';
-	}
 	if( ! empty( $send_contact_method ) )
 	{	// If a preferred contact method is selected of the form:
 		if( $send_contact_method === 'pm' && is_logged_in() &&
