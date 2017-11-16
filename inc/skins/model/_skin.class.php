@@ -418,25 +418,43 @@ class Skin extends DataObject
 	/**
 	 * Discover containers included in skin files only in the given folder
 	 *
-	 * @param string Folder name
+	 * @param string Folder path or type:
+	 *                  - '#skin_folder#' - Use skin folder of this skin
+	 *                  - '#fallback_folders#' - Use fallback folders depending on skin version
+	 *                  - real path on disk
 	 * @param array Exclude the files
 	 * @param boolean TRUE to display messages
 	 * @return array Files that were prepared
 	 */
 	function discover_containers_by_folder( $folder, $exclude_files = array(), $display_messages = true )
 	{
-		global $skins_path, $Messages;
+		global $Messages;
 
-		if( empty( $folder ) )
-		{	// Get files from fallback skins folder:
-			global $basepath;
-			$skin_folder = $this->get_api_version() == 6 ? 'skins_fallback_v6' : 'skins_fallback_v5';
-			$skin_path = $basepath.$skin_folder;
-		}
-		else
-		{	// Get files from given skin folder:
-			$skin_folder = $folder;
-			$skin_path = $skins_path.$skin_folder;
+		switch( $folder )
+		{
+			case '#skin_folder#':
+				// Get files from folder of this skin:
+				global $skins_path;
+				$skin_folder = $this->folder;
+				$skin_path = $skins_path.$skin_folder.'/';
+				break;
+
+			case '#fallback_folders#':
+				// Get files from fallback skin folders such as "skins_fallback_v5", "skins_fallback_v6", "skins_fallback_v7" and etc:
+				for( $v = $this->get_api_version(); $v >= 5; $v-- )
+				{	// Start with fallback files of current skin version and go down to find other fallback from older versions:
+					if( $skin_fallback_path = skin_fallback_path( '', $v ) )
+					{	// If fallback folder is detected for the version:
+						$exclude_files = array_merge( $exclude_files, $this->discover_containers_by_folder( $skin_fallback_path, $exclude_files, $display_messages ) );
+					}
+				}
+				return $exclude_files;
+
+			default:
+				// Use real path on disk:
+				$skin_path = $folder;
+				$skin_folder = basename( $skin_path );
+				break;
 		}
 
 		if( ! $dir = @opendir( $skin_path ) )
@@ -459,7 +477,7 @@ class Skin extends DataObject
 				continue;
 			}
 
-			$af_main_path = $skin_path.'/'.$file;
+			$af_main_path = $skin_path.$file;
 
 			if( !is_file( $af_main_path ) || ! preg_match( '~\.php$~', $file ) )
 			{ // Not a php template file, go to next:
@@ -545,11 +563,11 @@ class Skin extends DataObject
 
 		$this->container_list = array();
 
-		// Find the containers in the current skin folder
-		$skin_files = $this->discover_containers_by_folder( $this->folder, array(), $display_messages );
+		// Find the containers in the current skin folder:
+		$skin_files = $this->discover_containers_by_folder( '#skin_folder#', array(), $display_messages );
 
-		// Find the containers in the root skins folder with excluding the files that are contained in the skin folder
-		$this->discover_containers_by_folder( '', $skin_files, $display_messages );
+		// Find the containers in the fallback skin folders with excluding the files that are contained in the skin folder:
+		$this->discover_containers_by_folder( '#fallback_folders#', $skin_files, $display_messages );
 
 		if( empty( $this->container_list ) )
 		{
