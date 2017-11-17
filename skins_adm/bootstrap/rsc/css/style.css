@@ -1096,10 +1096,16 @@ div.evo_site_bar {
 div.evo_site_bar .btn-group {
   margin-right: 4px;
 }
-div.evo_section_collection_selector {
+div.evo_seccoll_selector {
   display: inline-block;
   margin-left: 10px;
   margin-right: 4px;
+}
+div.evo_seccoll_selector .evo_seccoll_selector__section a {
+  font-weight: bold;
+}
+div.evo_seccoll_selector .evo_seccoll_selector__collection a {
+  padding-left: 35px;
 }
 div.level2 {
   padding-top: 17px;

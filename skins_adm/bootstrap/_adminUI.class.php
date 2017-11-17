@@ -993,7 +993,7 @@ class AdminUI extends AdminUI_general
 			$BlogCache = & get_BlogCache();
 			$BlogCache->load_user_blogs( $this->coll_list_permname, $this->coll_list_permlevel );
 
-			$select_options = '';
+			$select_options = array();
 			$active_title = '';
 
 			if( ! empty( $this->coll_list_all_title ) )
@@ -1002,26 +1002,10 @@ class AdminUI extends AdminUI_general
 				{	// If no section and collection is active then use it as title for dropdown button:
 					$active_title = $this->coll_list_all_title;
 				}
-				$select_options .= '<li><a href="'.$this->coll_list_all_url.'">'.$this->coll_list_all_title.'</a></li>';
-			}
-
-			foreach( $BlogCache->cache as $perm_Blog )
-			{	// Loop through all collecitons that match the requested permission:
-				if( $perm_Blog->favorite() )
-				{	// If collection is favorute, Add it on the start of the select list:
-					$select_options .= '<li><a href="'.$url_params.'blog='.$perm_Blog->ID.'">'.$perm_Blog->dget( 'shortname' ).'</a></li>';
-				}
-				if( $perm_Blog->ID == $blog )
-				{	// If this collection is active then use it as title for dropdown button:
-					$active_title = T_('Collection').': '.$perm_Blog->dget( 'shortname' );
-				}
-			}
-			foreach( $BlogCache->cache as $perm_Blog )
-			{	// Loop through all collecitons that match the requested permission:
-				if( ! $perm_Blog->favorite() )
-				{	// If collection is NOT favorute, Add it at the start of the select list:
-					$select_options .= '<li><a href="'.$url_params.'blog='.$perm_Blog->ID.'">'.$perm_Blog->dget( 'shortname' ).'</a></li>';
-				}
+				$select_options[] = array(
+						'url'  => $this->coll_list_all_url,
+						'text' => $this->coll_list_all_title,
+					);
 			}
 
 			// Sections:
@@ -1034,14 +1018,15 @@ class AdminUI extends AdminUI_general
 					set_param( 'sec_ID', 0 );
 				}
 
-				$select_options .= '<li class="dropdown-header">'.T_('Sections').'</li>';
-
 				$SectionCache = & get_SectionCache();
 				$SectionCache->load_available();
 
 				foreach( $SectionCache->cache as $Section )
 				{	// Loop through all sections that match the requested permission:
-					$select_options .= '<li><a href="'.$url_params.'blog=0&amp;sec_ID='.$Section->ID.'">'.$Section->dget( 'name' ).'</a></li>';
+					$select_options[ 'sec_'.$Section->ID ] = array(
+							'url'  => $url_params.'blog=0&amp;sec_ID='.$Section->ID,
+							'text' => $Section->dget( 'name' ),
+						);
 					if( $sec_ID == $Section->ID )
 					{	// This section is selected currently:
 						$active_title = T_('Section').': '.$Section->dget( 'name' );
@@ -1051,11 +1036,65 @@ class AdminUI extends AdminUI_general
 				$collection_groups = empty( $collection_groups ) ? '' : '<div class="btn-group">'.$collection_groups.'</div>';
 			}
 
-			$collections_html = '<div class="evo_section_collection_selector dropdown">'
+			$perm_colls = array();
+			foreach( $BlogCache->cache as $perm_Blog )
+			{	// Loop through all collecitons that match the requested permission:
+				if( $perm_Blog->favorite() )
+				{	// If collection is favorute, Add it on the start of the select list:
+					$perm_colls[] = $perm_Blog;
+				}
+				if( $perm_Blog->ID == $blog )
+				{	// If this collection is active then use it as title for dropdown button:
+					$active_title = T_('Collection').': '.$perm_Blog->dget( 'shortname' );
+				}
+			}
+			foreach( $BlogCache->cache as $perm_Blog )
+			{	// Loop through all collecitons that match the requested permission:
+				if( ! $perm_Blog->favorite() )
+				{	// If collection is NOT favorute, Add it at the end of the select list:
+					$perm_colls[] = $perm_Blog;
+				}
+			}
+
+			foreach( $perm_colls as $perm_Blog )
+			{	// Loop through all collecitons that match the requested permission:
+				$coll_data = array(
+						'url'  => $url_params.'blog='.$perm_Blog->ID,
+						'text' => $perm_Blog->dget( 'shortname' ),
+					);
+				if( isset( $select_options[ 'sec_'.$perm_Blog->get( 'sec_ID' ) ] ) )
+				{	// Link collection with section:
+					if( ! isset( $select_options[ 'sec_'.$perm_Blog->get( 'sec_ID' ) ]['colls'] ) )
+					{	// Initialize array for collections:
+						$select_options[ 'sec_'.$perm_Blog->get( 'sec_ID' ) ]['colls'] = array();
+					}
+					$select_options[ 'sec_'.$perm_Blog->get( 'sec_ID' ) ]['colls'][] = $coll_data;
+				}
+				else
+				{	// Put collection data to options array without linkting to section:
+					$select_options[ 'coll_'.$perm_Blog->ID ] = $coll_data;
+				}
+			}
+
+			$collections_html = '<div class="evo_seccoll_selector dropdown">'
 				.'<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'
 					.$active_title.' <span class="caret"></span>'
 				.'</button>'
-				.'<ul class="dropdown-menu">'.$select_options.'</ul></div>';
+				.'<ul class="dropdown-menu">';
+
+			foreach( $select_options as $obj_ID => $select_option )
+			{
+				$collections_html .= '<li'.( strpos( $obj_ID, 'sec_' ) === false ? '' : ' class="evo_seccoll_selector__section"' ).'><a href="'.$select_option['url'].'">'.$select_option['text'].'</a></li>';
+				if( ! empty( $select_option['colls'] ) )
+				{
+					foreach( $select_option['colls'] as $coll_option )
+					{
+						$collections_html .= '<li class="evo_seccoll_selector__collection"><a href="'.$coll_option['url'].'">'.$coll_option['text'].'</a></li>';
+					}
+				}
+			}
+
+			$collections_html .= '</ul></div>';
 
 			// Button to add new collection:
 			if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
