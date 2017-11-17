@@ -447,10 +447,10 @@ function widgetSettings( the_html, wi_type, wi_code )
 	AttachServerRequest( 'widget_checkchanges' ); // send form via hidden iframe
 
 	// Create modal header for bootstrap skin
-	var page_title = jQuery( '#widget_settings' ).find( 'h2.page-title:first' );
+	var page_title = jQuery( '#widget_settings' ).find( 'form > h2.page-title:first' );
 	if( page_title.length > 0 )
 	{
-		var page_title_icons = jQuery( '#widget_settings' ).find( 'span.pull-right:first' );
+		var page_title_icons = page_title.parent().children( 'span.global_icons' );
 		var page_title_icons_html = '';
 		if( page_title_icons.length > 0 )
 		{

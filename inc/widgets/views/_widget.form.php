@@ -26,7 +26,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'widget_checkchanges' );
 
-if( ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
+if( $display_mode != 'js' || ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
 {	// Display a link to close form (Don't display this link on bootstrap skin, because it already has an icon to close a modal window)
 	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
 }
