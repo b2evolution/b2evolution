@@ -124,10 +124,11 @@ class coll_search_form_Widget extends ComponentWidget
 	function init_display( $params )
 	{
 		$params = array_merge( array(
-				'search_input_before'  => '',
-				'search_input_after'   => '',
-				'search_submit_before' => '',
-				'search_submit_after'  => '',
+				'search_input_before'   => '',
+				'search_input_after'    => '',
+				'search_submit_before'  => '',
+				'search_submit_after'   => '',
+				'show_advanced_options' => false
 			), $params );
 
 		parent::init_display( $params );
@@ -141,6 +142,8 @@ class coll_search_form_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		global $Settings;
+
 		$this->init_display( $params );
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
@@ -162,8 +165,8 @@ class coll_search_form_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		form_formstart( $widget_Blog->gen_blogurl(), 'search', 'SearchForm' );
-
+		$Form = new Form( $widget_Blog->gen_blogurl(), 'SearchForm' );
+		$Form->begin_form( 'search' );
 		if( empty( $this->disp_params['search_class'] ) )
 		{ // Class name is not defined, Use class depend on serach options
 			$search_form_class = 'compact_search_form';
@@ -183,11 +186,114 @@ class coll_search_form_Widget extends ComponentWidget
 		echo '<input type="submit" name="submit" class="search_submit submit btn btn-primary" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />';
 		echo $this->disp_params['search_submit_after'];
 
+		if( $this->disp_params['show_advanced_options'] )
+		{
+			echo '<div style="text-align: left; margin-top: 2em;">';
+			$Form->begin_fieldset( T_('Additional search filters') );
+			$Form->hidden( 'advanced_search', 1 );
+			$Form->text_input( 'search_author', get_param( 'author' ), 25, T_('Author'), '', array( 'title' => T_('Enter author to search for' ) ) );
+
+			$date_posted_options = array(
+				'week_ago' => T_('Less than a week'),
+				'month_ago' => T_('Less than a month'),
+				'year_ago' => T_('Less than a year'),
+				'anytime' => T_('Any time') );
+			$Form->select_input_array( 'search_date', param( 'search_date', 'string', 'anytime' ), $date_posted_options, T_('Date posted') );
+
+			$item_type_options = array();
+
+			if( $Blog->get_setting( 'search_include_posts' ) )
+			{
+				$item_type_options['item'] = T_('Posts');
+			}
+			if( $Blog->get_setting( 'search_include_cmnts' ) )
+			{
+				$item_type_options['comment'] = T_('Comments');
+			}
+			if( $Blog->get_setting( 'search_include_cats' ) )
+			{
+				$item_type_options['category'] = T_('Categories');
+			}
+			if( $Blog->get_setting( 'search_include_tags' ) )
+			{
+				$item_type_options['tag'] = T_('Tags');
+			}
+
+			if( count( $item_type_options ) > 1 )
+			{
+				$item_type_options['all'] = T_('All');
+				$Form->select_input_array( 'search_type', param( 'search_type', 'string', 'all' ), $item_type_options, T_('Type' ) );
+			}
+			$Form->end_fieldset();
+			echo '</div>';
+
+			$selected_author_array = param( 'search_author_array', 'array' );
+			$selected_author = array();
+			foreach( $selected_author_array as $field => $row )
+			{
+				foreach( $row as $key => $value )
+				{
+					$selected_author[$key][$field] = $value;
+				}
+			}
+			?>
+			<script type="text/javascript">
+			jQuery( document ).ready( function()
+			{
+				jQuery( '#search_author' ).tokenInput(
+					'<?php echo get_restapi_url(); ?>users/authors',
+					{
+						theme: 'facebook',
+						queryParam: 'q',
+						propertyToSearch: 'login',
+						preventDuplicates: true,
+						prePopulate: <?php echo evo_json_encode( $selected_author ) ?>,
+						hintText: '<?php echo TS_('Type in a username') ?>',
+						noResultsText: '<?php echo TS_('No results') ?>',
+						searchingText: '<?php echo TS_('Searching...') ?>',
+						jsonContainer: 'users',
+						tokenFormatter: function( user )
+						{
+							return '<li>' +
+									<?php echo $Settings->get( 'username_display' ) == 'name' ? 'user.fullname' : 'user.login';?> +
+									'<input type="hidden" name="search_author_array[id][]" value="' + user.id + '" />' +
+									'<input type="hidden" name="search_author_array[login][]" value="' + user.login + '" />' +
+								'</li>';
+						},
+						resultsFormatter: function( user )
+						{
+							var title = user.login;
+							if( user.fullname != null && user.fullname !== undefined )
+							{
+								title += '<br />' + user.fullname;
+							}
+							return '<li>' +
+									user.avatar +
+									'<div>' +
+										title +
+									'</div><span></span>' +
+								'</li>';
+						},
+						<?php
+						if( param_has_error( 'search_author' ) )
+						{ // Mark this field as error
+						?>
+						onReady: function()
+						{
+							jQuery( '.token-input-list-facebook' ).addClass( 'token-input-list-error' );
+						}
+						<?php } ?>
+					} );
+			} );
+			</script>
+			<?php
+		}
+
 		echo '</div>';
 
 		echo '<input type="hidden" name="disp" value="search" />';
 
-		echo '</form>';
+		$Form->end_form();
 
 		echo $this->disp_params['block_body_end'];
 

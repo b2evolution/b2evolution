@@ -1164,7 +1164,7 @@ class RestApi
 					$user_controller = '';
 				}
 
-				$valid_resources = array( '', 'view', 'recipients', 'autocomplete', 'logins', 'search' );
+				$valid_resources = array( '', 'view', 'recipients', 'authors', 'autocomplete', 'logins', 'search' );
 				if( isset( $user_ID ) )
 				{ // Set controller to view the requested user profile:
 					$default_controller = 'view';
@@ -1559,6 +1559,41 @@ class RestApi
 		{	// User has already reached his limit, don't allow to get a users list:
 			$this->halt_with_Messages();
 		}
+
+		$api_q = param( 'q', 'string', '' );
+
+		// Search users:
+		$users = $this->func_user_search( $api_q, array(
+				'sql_where' => 'user_ID != '.$DB->quote( $current_User->ID ),
+				'sql_mask'  => '%$login$%',
+			) );
+
+		foreach( $users as $User )
+		{
+			if( ! $User->check_status( 'can_receive_pm' ) )
+			{	// This user is probably closed so don't show it:
+				continue;
+			}
+
+			$user_data = array(
+					'id'       => $User->ID,
+					'login'    => $User->get( 'login' ),
+					'fullname' => $User->get( 'fullname' ),
+					'avatar'   => $User->get_avatar_imgtag( 'crop-top-32x32' ),
+				);
+
+			// Add data of each user in separate array of response:
+			$this->add_response( 'users', $user_data, 'array' );
+		}
+	}
+
+
+	/**
+	 * Call user controller to search for authors
+	 */
+	private function controller_user_authors()
+	{
+		global $current_User, $DB;
 
 		$api_q = param( 'q', 'string', '' );
 

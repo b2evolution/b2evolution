@@ -259,9 +259,10 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
  * @param array all separated words from the search term
  * @param array all quoted parts from the search term
  * @param string Post IDs to exclude from result, Separated with ','(comma)
- * @param number max possible score
+ * @param string Author IDs to filter, separated with ',' (comma)
+ * @param string Period to consider
  */
-function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclude_posts = '' )
+function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclude_posts = '', $authors = '', $period = 'anytime' )
 {
 	global $DB, $Collection, $Blog;
 
@@ -285,7 +286,30 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 	}
 
 	// Prepare filters:
-	$search_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), '', 'ItemCache', 'search_item' );
+	switch( $period )
+	{
+		case 'week_ago':
+			$timestamp_min = strtotime( '-1 week' );
+			$timestamp_max = NULL;
+			break;
+
+		case 'month_ago':
+			$timestamp_min = strtotime( '-1 month' );
+			$timestamp_max = NULL;
+			break;
+
+		case 'year_ago':
+			$timestamp_min = strtotime( '-1 year' );
+			$timestamp_max = NULL;
+			break;
+
+		case 'anytime':
+		default:
+			$timestamp_min = $Blog->get_timestamp_min();
+			$timestamp_max = $Blog->get_timestamp_max();
+	}
+
+	$search_ItemList = new ItemList2( $Blog, $timestamp_min, $timestamp_max, '', 'ItemCache', 'search_item' );
 	$search_ItemList->set_filters( array(
 			'keywords'      => $search_term,
 			'keyword_scope' => 'title,content,tags,excerpt,titletag', // TODO: add more fields
@@ -295,6 +319,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 			'order'         => 'DESC',
 			'posts'         => 1000,
 			'post_ID_list'  => $exclude_posts,
+			'authors'       => $authors,
 		) );
 
 	// Generate query from filters above and count results:
@@ -359,18 +384,42 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
  * @param array all quoted parts from the search term
  * @param number max possible score
  */
-function search_and_score_comments( $search_term, $keywords, $quoted_parts )
+function search_and_score_comments( $search_term, $keywords, $quoted_parts, $authors = '', $period = 'anytime' )
 {
 	global $DB, $Collection, $Blog;
 
 	// Search between comments
-	$search_CommentList = new CommentList2( $Blog, '', 'CommentCache', 'search_comment' );
+	switch( $period )
+	{
+		case 'week_ago':
+			$timestamp_min = strtotime( '-1 week' );
+			$timestamp_max = NULL;
+			break;
+
+		case 'month_ago':
+			$timestamp_min = strtotime( '-1 month' );
+			$timestamp_max = NULL;
+			break;
+
+		case 'year_ago':
+			$timestamp_min = strtotime( '-1 year' );
+			$timestamp_max = NULL;
+			break;
+
+		case 'anytime':
+		default:
+			$timestamp_min = NULL;
+			$timestamp_max = NULL;
+	}
+
+	$search_CommentList = new CommentList2( $Blog, '', 'CommentCache', 'search_comment', '', $timestamp_min, $timestamp_max );
 	$search_CommentList->set_filters( array(
 			'keywords' => $search_term,
 			'phrase' => 'OR',
 			'order_by' => 'date',
 			'order' => 'DESC',
-			'comments' => 1000
+			'comments' => 1000,
+			'author_IDs' => $authors
 		) );
 	$search_CommentList->query_init();
 
@@ -538,7 +587,7 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
  * @param string Post IDs to exclude from result, Separated with ','(comma)
  * @return array scored search result, each element is an array( type, ID, score )
  */
-function perform_scored_search( $search_keywords, $search_types = 'all', $exclude_posts = '' )
+function perform_scored_search( $search_keywords, $search_types = 'all', $exclude_posts = '', $authors = '', $period = 'anytime' )
 {
 	$keywords = trim( $search_keywords );
 	if( empty( $keywords ) )
@@ -584,7 +633,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 	if( empty( $keywords ) && empty( $quoted_parts ) )
 	{ // There is nothing to search for
 		return array();
-// TODO: return NULL and display a specific error message like "Please enter some keywords to search."
+		// TODO: return NULL and display a specific error message like "Please enter some keywords to search."
 	}
 
 	if( $search_types == 'all' )
@@ -607,7 +656,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 
 	if( $search_type_item )
 	{	// Perform search on Items:
-		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts, $exclude_posts );
+		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts, $exclude_posts, $authors, $period );
 		$search_result = $item_search_result;
 		if( $debug )
 		{
@@ -618,7 +667,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 
 	if( $search_type_comment )
 	{	// Perform search on Comments:
-		$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
+		$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts, $authors, $period );
 		$search_result = array_merge( $search_result, $comment_search_result );
 		if( $debug )
 		{
@@ -716,6 +765,9 @@ function search_result_block( $params = array() )
 	global $Collection, $Blog, $Session, $debug;
 
 	$search_keywords = param( 's', 'string', '', true );
+	$authors = param( 'search_author', 'string', '' );
+	$search_date = param( 'search_date', 'string', 'anytime' );
+	$item_type = param( 'search_type', 'string', 'all' );
 	$allow_cache = param( 'allow_cache', 'boolean', false );
 
 	// Try to load existing search results from Session:
@@ -760,8 +812,13 @@ function search_result_block( $params = array() )
 		}
 		$search_types = count( $search_types ) == 4 ? 'all' : implode( ',', $search_types );
 
+		if( $item_type != 'all' )
+		{
+			$search_types = $item_type;
+		}
+
 		// Perform new search:
-		$search_result = perform_scored_search( $search_keywords, $search_types );
+		$search_result = perform_scored_search( $search_keywords, $search_types, '', $authors, $search_date );
 
 		// Save results into session:
 		$Session->set( 'search_params', $search_params );
