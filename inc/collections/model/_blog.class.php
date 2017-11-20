@@ -2876,8 +2876,8 @@ class Blog extends DataObject
 
 				if( $parname == 'mobile_skin_ID' || $parname == 'tablet_skin_ID' )
 				{
-					if( ( $result === NULL ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
-					{	// NULL value means that use the same as normal case:
+					if( empty( $result ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
+					{	// Empty values(NULL, 0, '0', '') means that use the same as normal case:
 						$result = $this->get( 'normal_skin_ID' );
 					}
 				}
