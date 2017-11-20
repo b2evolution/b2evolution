@@ -541,11 +541,11 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 		if( isset( $field_type ) )
 		{
-			$Messages->add_to_group( sprintf( /* TRANS: First %s gets replaced by field type, 2nd %s by title, 3rd %s by urltitle */ T_('URL slug for %s &laquo;%s&raquo; has been changed to &laquo;%s&raquo;.'), $field_type, $title, $urltitle ), 'note', T_('Warning: URL slug changed:' ) );
+			$Messages->add_to_group( sprintf( /* TRANS: First %s gets replaced by field type, 2nd %s by title, 3rd %s by urltitle */ T_('URL slug for %s &laquo;%s&raquo; has been changed to &laquo;%s&raquo;.'), $field_type, $title, $urltitle ), 'note', T_('Warning: URL slugs changed:' ) );
 		}
 		else
 		{
-			$Messages->add_to_group( sprintf( T_('URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'note', T_('Warning: URL slug changed:' ) );
+			$Messages->add_to_group( sprintf( T_('URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'note', T_('Warning: URL slugs changed:' ) );
 		}
 	}
 
