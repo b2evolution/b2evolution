@@ -995,6 +995,7 @@ class AdminUI extends AdminUI_general
 
 			$select_options = array();
 			$active_title = '';
+			$dropdown_prefix = '';
 
 			if( ! empty( $this->coll_list_all_title ) )
 			{	// We want to add a button "All" to select all collections:
@@ -1029,7 +1030,8 @@ class AdminUI extends AdminUI_general
 						);
 					if( $sec_ID == $Section->ID )
 					{	// This section is selected currently:
-						$active_title = T_('Section').': '.$Section->dget( 'name' );
+						$dropdown_prefix = T_('Section').': ';
+						$active_title = $Section->dget( 'name' );
 					}
 				}
 
@@ -1045,7 +1047,8 @@ class AdminUI extends AdminUI_general
 				}
 				if( $perm_Blog->ID == $blog )
 				{	// If this collection is active then use it as title for dropdown button:
-					$active_title = T_('Collection').': '.$perm_Blog->dget( 'shortname' );
+					$dropdown_prefix = T_('Collection').': ';
+					$active_title = $perm_Blog->dget( 'shortname' );
 				}
 			}
 			foreach( $BlogCache->cache as $perm_Blog )
@@ -1077,6 +1080,7 @@ class AdminUI extends AdminUI_general
 			}
 
 			$collections_html = '<div class="evo_seccoll_selector dropdown">'
+				.$dropdown_prefix
 				.'<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'
 					.$active_title.' <span class="caret"></span>'
 				.'</button>'
