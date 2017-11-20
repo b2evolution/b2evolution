@@ -383,11 +383,12 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
  * @param string The name of the post ID column
  * @param string The name of the DB table to use
  * @param NULL|string The post locale or NULL if there is no specific locale.
+ * @param NULL|string The name of the DB table to use in the message
  * @return string validated url title
  */
 function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
 									$dbSlugFieldName = 'post_urltitle', $dbIDname = 'post_ID',
-									$dbtable = 'T_items__item', $post_locale = NULL )
+									$dbtable = 'T_items__item', $post_locale = NULL, $msg_dbtable = NULL )
 {
 	global $DB, $Messages;
 
@@ -516,7 +517,8 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	if( !empty($orig_title) && $urltitle != $orig_title )
 	{
-		switch( $dbtable )
+		$msg_table = ! empty( $msg_dbtable ) ? $msg_dbtable : $dbtable;
+		switch( $msg_table )
 		{
 			case 'T_items__item':
 				// post_urltitle

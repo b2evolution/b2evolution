@@ -2910,7 +2910,7 @@ class Item extends ItemLight
 			// Replace inline content block tag with item content:
 			$content = str_replace( $source_tag, $current_tag_item_content, $content );
 
-			// Remove 
+			// Remove
 			array_shift( $content_block_items );
 		}
 
@@ -6104,7 +6104,7 @@ class Item extends ItemLight
 			$urltitles[ $u ] = utf8_trim( $urltitle_value );
 		}
 		$orig_urltitle = implode( ',', array_unique( $urltitles ) );
-		$this->set( 'urltitle', urltitle_validate( $urltitles[0], $this->title, $this->ID, false, 'slug_title', 'slug_itm_ID', 'T_slug', $this->locale ) );
+		$this->set( 'urltitle', urltitle_validate( $urltitles[0], $this->title, $this->ID, false, 'slug_title', 'slug_itm_ID', 'T_slug', $this->locale, 'T_items__item' ) );
 
 		$this->update_renderers_from_Plugins();
 
