@@ -301,7 +301,7 @@ if( $resolve_extra_path )
 						/**
 						 * @var Chapter
 						 */
-						$Chapter = & $ChapterCache->get_by_urlname( $last_part, false );
+						$Chapter = & $ChapterCache->get_by_urlname( $last_part, false, false );
 						if( empty( $Chapter ) )
 						{	// We could not match a chapter...
 							// We are going to consider this to be a post title with a misplaced trailing slash.
@@ -401,7 +401,7 @@ if( !empty($p) || !empty($title) )
 			/**
 			 * @var Chapter
 			 */
-			$Chapter = & $ChapterCache->get_by_urlname( $title, false );
+			$Chapter = & $ChapterCache->get_by_urlname( $title, false, false );
 			if( !empty( $Chapter ) )
 			{	// We could match a chapter from the extra path:
 				$cat = $Chapter->ID;

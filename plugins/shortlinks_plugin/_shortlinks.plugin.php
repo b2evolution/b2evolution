@@ -254,16 +254,19 @@ class shortlinks_plugin extends Plugin
 				}
 
 				// Lookup all urltitles at once in DB and preload cache:
+				$slug_object_types = array();
 				if( ! empty( $this->link_types['cat_without_brackets'] ) )
-				{
+				{	// Load categories objects into cache:
+					$slug_object_types[] = 'cat';
 					$ChapterCache = & get_ChapterCache();
-					$ChapterCache->load_urlname_array( $wikiwords );
 				}
 				if( ! empty( $this->link_types['item_without_brackets'] ) )
-				{
+				{	// Load items objects into cache:
+					$slug_object_types[] = 'item';
 					$ItemCache = & get_ItemCache();
-					$ItemCache->load_urltitle_array( $wikiwords );
 				}
+				$SlugCache = & get_SlugCache();
+				$SlugCache->load_objects_by_slugs( $wikiwords, $slug_object_types );
 
 				// Construct arrays for replacing wikiwords by links:
 				foreach( $wikiwords as $WikiWord => $wiki_word )
@@ -341,16 +344,17 @@ class shortlinks_plugin extends Plugin
 				}
 
 				// Lookup all urltitles at once in DB and preload cache:
+				$slug_object_types = array();
 				if( ! empty( $this->link_types['cat_slugs'] ) )
-				{
-					$ChapterCache = & get_ChapterCache();
-					$ChapterCache->load_urlname_array( $wikiwords );
+				{	// Load categories objects into cache:
+					$slug_object_types[] = 'cat';
 				}
 				if( ! empty( $this->link_types['item_slugs'] ) )
-				{
-					$ItemCache = & get_ItemCache();
-					$ItemCache->load_urltitle_array( $wikiwords );
+				{	// Load items objects into cache:
+					$slug_object_types[] = 'item';
 				}
+				$SlugCache = & get_SlugCache();
+				$SlugCache->load_objects_by_slugs( $wikiwords, $slug_object_types );
 
 				// Replace wikiwords by links:
 				foreach( $wikiwords as $WikiWord => $wiki_word )

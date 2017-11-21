@@ -36,6 +36,11 @@ class ItemCache extends DataObjectCache
 	var $items_by_cat_map = array();
 
 	/**
+	 * @var array
+	 */
+	var $cache_slug = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param string object type of elements in Cache
@@ -175,50 +180,33 @@ class ItemCache extends DataObjectCache
 	 *
 	 * Load into cache if necessary
 	 *
-	 * @param string stub of object to load
-	 * @param boolean false if you want to return false on error
+	 * @param string Item slug title to get by
+	 * @param boolean true if function should die on error
 	 * @param boolean true if function should die on empty/null
+	 * @return object|NULL|boolean Reference on cached object, NULL - if request with empty ID, FALSE - if requested object does not exist
 	 */
 	function & get_by_urltitle( $req_urltitle, $halt_on_error = true, $halt_on_empty = true )
 	{
-		global $DB, $Debuglog;
-
-		if( !isset( $this->urltitle_index[$req_urltitle] ) )
-		{ // not yet in cache:
-	    // Get from SlugCache
+		if( ! isset( $this->urltitle_index[ $req_urltitle ] ) )
+		{	// Get Item by SlugCache if it is not in cache yet:
 			$SlugCache = & get_SlugCache();
-			$req_Slug =  $SlugCache->get_by_name( $req_urltitle, $halt_on_error, $halt_on_empty );
-
-			if( $req_Slug && $req_Slug->get( 'type' ) == 'item' )
-			{	// It is in SlugCache
-				$itm_ID = $req_Slug->get( 'itm_ID' );
-				if( $Item = $this->get_by_ID( $itm_ID, $halt_on_error, $halt_on_empty ) )
-				{
-					$this->urltitle_index[$req_urltitle] = $Item;
-				}
-				else
-				{	// Item does not exist
-					if( $halt_on_error ) debug_die( "Requested $this->objtype does not exist!" );
-					$this->urltitle_index[$req_urltitle] = false;
-				}
-			}
-			else
-			{	// not in the slugCache
-				if( $halt_on_error ) debug_die( "Requested $this->objtype does not exist!" );
-				$this->urltitle_index[$req_urltitle] = false;
-			}
+			$slug_Item = & $SlugCache->get_object_by_slug( $req_urltitle, 'item', $halt_on_error, $halt_on_empty );
+			$this->urltitle_index[ $req_urltitle ] = $slug_Item;
 		}
 		else
-		{
-			$Debuglog->add( "Retrieving <strong>$this->objtype($req_urltitle)</strong> from cache" );
+		{	// Use Item from cache:
+			global $Debuglog;
+			$Debuglog->add( 'Retrieving <strong>'.$this->objtype.'( '.$req_urltitle.' )</strong> from cache' );
 		}
 
-		return $this->urltitle_index[$req_urltitle];
+		return $this->urltitle_index[ $req_urltitle ];
 	}
 
 
 	/**
 	 * Load a list of item referenced by their urltitle into the cache
+	 *
+	 * @deprecated DEPRECATED - To be removed in b2evolution 8.0
 	 *
 	 * @param array of urltitles of Items to load
 	 */

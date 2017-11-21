@@ -227,47 +227,33 @@ class ChapterCache extends DataObjectCache
 	 *
 	 * Load the cache if necessary (all at once if allowed).
 	 *
-	 * @param string ID of object to load
+	 * @param string Item slug title to get by
 	 * @param boolean true if function should die on error
-	 * @return reference on cached object
+	 * @param boolean true if function should die on empty/null
+	 * @return object|NULL|boolean Reference on cached object, NULL - if request with empty ID, FALSE - if requested object does not exist
 	 */
-	function & get_by_urlname( $req_urlname, $halt_on_error = true )
+	function & get_by_urlname( $req_urlname, $halt_on_error = true, $halt_on_empty = true )
 	{
-		global $DB, $Debuglog;
-
-		if( !isset( $this->urlname_index[$req_urlname] ) )
-		{ // not yet in cache:
-			// Load just the requested object:
-			$Debuglog->add( "Loading <strong>$this->objtype($req_urlname)</strong> into cache", 'dataobjects' );
-			$sql = "SELECT *
-			          FROM $this->dbtablename
-			         WHERE cat_urlname = ".$DB->quote($req_urlname);
-			$row = $DB->get_row( $sql );
-			if( empty( $row ) )
-			{	// Requested object does not exist
-				if( $halt_on_error ) debug_die( "Requested $this->objtype does not exist!" );
-				// put into index:
-				$this->urlname_index[$req_urlname] = false;
-
-				return $this->urlname_index[$req_urlname];
-			}
-
-			$this->instantiate( $row );
-
-			// put into index:
-			$this->urlname_index[$req_urlname] = & $this->cache[ $row->cat_ID ];
+		if( ! isset( $this->urlname_index[ $req_urlname ] ) )
+		{	// Get Chapter by SlugCache if it is not in cache yet:
+			$SlugCache = & get_SlugCache();
+			$slug_Chapter = & $SlugCache->get_object_by_slug( $req_urlname, 'cat', $halt_on_error, $halt_on_empty );
+			$this->urlname_index[ $req_urlname ] = $slug_Chapter;
 		}
 		else
-		{
-			$Debuglog->add( "Retrieving <strong>$this->objtype($req_urlname)</strong> from cache" );
+		{	// Use Chapter from cache:
+			global $Debuglog;
+			$Debuglog->add( 'Retrieving <strong>'.$this->objtype.'( '.$req_urlname.' )</strong> from cache' );
 		}
 
-		return $this->urlname_index[$req_urlname];
+		return $this->urlname_index[ $req_urlname ];
 	}
 
 
 	/**
 	 * Load a list of chapter referenced by their urlname into the cache
+	 *
+	 * @deprecated DEPRECATED - To be removed in b2evolution 8.0
 	 *
 	 * @param array of urlnames of Chapters to load
 	 */

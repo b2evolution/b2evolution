@@ -376,7 +376,8 @@ function & get_SlugCache()
 
 	if( ! isset( $SlugCache ) )
 	{	// Cache doesn't exist yet:
-		$SlugCache = new DataObjectCache( 'Slug', false, 'T_slug', 'slug_', 'slug_ID', 'slug_title', 'slug_title' );
+		load_class( 'slugs/model/_slugcache.class.php', 'SlugCache' );
+		$SlugCache = new SlugCache();
 	}
 
 	return $SlugCache;
