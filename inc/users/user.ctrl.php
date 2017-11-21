@@ -443,7 +443,19 @@ if( !$Messages->has_errors() )
 						$user_tab = 'profile';
 					}
 				}
-				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&user_tab='.$user_tab, '', '&' ), 303 );
+
+				if( isset( $current_User->previous_pass_driver ) &&
+						$current_User->previous_pass_driver == 'nopass' &&
+						$current_User->previous_pass_driver != $current_User->get( 'pass_driver' ) )
+				{	// Redirect to page as we use after email validation if current user set password first time, e-g after email capture/quick registration:
+					$redirect_to = redirect_after_account_activation();
+				}
+				else
+				{
+					$redirect_to = regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&user_tab='.$user_tab, '', '&' );
+				}
+
+				header_redirect( $redirect_to, 303 );
 			}
 			break;
 

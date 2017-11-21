@@ -399,8 +399,7 @@ function redirect_after_account_activation()
 		}
 		if( is_logged_in() && $current_User->get( 'pass_driver' ) == 'nopass' )
 		{	// If user was registered without password:
-			//return get_user_pwdchange_url();
-			return get_user_settings_url( 'pwdchange_after_activation' );
+			return get_user_pwdchange_url();
 		}
 	}
 
@@ -1170,13 +1169,6 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile', $blog_ID = NULL
 function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 {
 	global $current_User, $is_admin_page, $admin_url, $ReqURI;
-	$force_front_office = false;
-
-	if( $user_tab == 'pwdchange_after_activation' )
-	{
-		$force_front_office = true;
-		$user_tab = 'pwdchange';
-	}
 
 	if( !is_logged_in() )
 	{
@@ -1226,8 +1218,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 	if( $is_admin_page || $is_admin_tab || empty( $current_Blog ) || $current_User->ID != $user_ID )
 	{
 		if( ( $current_User->ID != $user_ID && ! $current_User->check_perm( 'users', 'view' ) ) ||
-				( ! $current_User->check_perm( 'admin', 'restricted' ) || ! $current_User->check_status( 'can_access_admin' ) ) ||
-				$force_front_office )
+				( ! $current_User->check_perm( 'admin', 'restricted' ) || ! $current_User->check_status( 'can_access_admin' ) ) )
 		{ // Use blog url when user has no access to backoffice
 			if( empty( $current_Blog ) )
 			{ // Check if system has at least one blog
