@@ -5950,7 +5950,6 @@ function get_available_sort_options()
 		'datemodified'             => T_('Date last modified'),
 		'last_touched_ts'          => T_('Date last touched'),
 		'contents_last_updated_ts' => T_('Contents last updated'),
-		'urltitle'                 => T_('URL "filename"'),
 		'priority'                 => T_('Priority'),
 		'numviews'                 => T_('Number of members who have viewed the post (If tracking enabled)'),
 		'RAND'                     => T_('Random order!'),

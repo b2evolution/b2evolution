@@ -8583,6 +8583,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12360, 'Upgrading collection settings table...' ) )
+	{	// part of 6.9.3-beta
+		$DB->query( 'UPDATE T_coll_settings
+			  SET cset_value = "title"
+			WHERE cset_name = "orderby"
+			  AND cset_value = "urltitle"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
