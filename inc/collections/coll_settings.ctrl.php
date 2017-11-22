@@ -678,7 +678,14 @@ if( $action == 'dashboard' )
 		}
 		else
 		{
-			echo '<div class="col-xs-12 col-sm-12 col-md-12">';
+			if( $have_comments_to_moderate || $have_posts_to_moderate )
+			{
+				echo '<div class="col-xs-12 col-sm-12 col-md-12 col-md-pull-0 col-lg-6 col-lg-pull-0">';
+			}
+			else
+			{
+				echo '<div class="col-xs-12 col-sm-12 col-md-12">';
+			}
 		}
 
 		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
