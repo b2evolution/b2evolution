@@ -1079,21 +1079,21 @@ function phpbb_import_forums()
 			'cat_name'        => $DB->quote( $phpbb_forum->forum_name ),
 			'cat_description' => $DB->quote( $phpbb_forum->forum_desc ),
 			'cat_order'       => $DB->quote( $phpbb_forum->forum_order ),
-			'cat_urlname'     => $DB->quote( phpbb_unique_urlname( $phpbb_forum->forum_name, 'T_categories', 'cat_urlname' ) ),
 			'cat_meta'        => $DB->quote( $phpbb_forum->forum_meta ),
 			'cat_lock'        => $DB->quote( $phpbb_forum->forum_lock )
 		);
 
 		$DB->query( 'INSERT INTO T_categories ( '.implode( ', ', array_keys( $forum_data ) ).' )
 			VALUES ( '.implode( ', ', $forum_data ).' )' );
+		$inserted_cat_ID = $DB->insert_id;
 
 		if( $phpbb_forum->forum_meta == '1' )
 		{	// Category
-			$forums_IDs['cat_'.$phpbb_forum->forum_id] = $DB->insert_id;
+			$forums_IDs['cat_'.$phpbb_forum->forum_id] = $inserted_cat_ID;
 		}
 		else
 		{	// Forum
-			$forums_IDs[$phpbb_forum->forum_id] = $DB->insert_id;
+			$forums_IDs[$phpbb_forum->forum_id] = $inserted_cat_ID;
 		}
 
 		if( isset( $phpbb_forum->cat_id ) && $phpbb_forum->cat_id > 0 )
@@ -1104,6 +1104,20 @@ function phpbb_import_forums()
 		{	// Save parent ID to update it in the next step
 			$forums_parents[$phpbb_forum->forum_id] = $phpbb_forum->forum_parent;
 		}
+
+		// Insert slug for category:
+		$slug_data = array(
+			'slug_title'  => phpbb_unique_urlname( $phpbb_forum->forum_name, 'T_slug', 'slug_title' ),
+			'slug_type'   => 'cat',
+			'slug_cat_ID' => $inserted_cat_ID
+		);
+		$DB->query( 'INSERT INTO T_slug ( '.implode( ', ', array_keys( $slug_data ) ).' )
+			VALUES ( '.$DB->quote( $slug_data ).' )' );
+
+		// Set canonical slug ID for new inserted category:
+		$DB->query( 'UPDATE T_categories
+			SET cat_canonical_slug_ID = '.$DB->quote( $DB->insert_id ).'
+			WHERE cat_ID = '.$DB->quote( $inserted_cat_ID ) );
 
 		phpbb_log( sprintf( T_('The forum "%s" is imported.'), $phpbb_forum->forum_name ) );
 		$phpbb_forums_count_imported++;

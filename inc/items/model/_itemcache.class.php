@@ -212,48 +212,8 @@ class ItemCache extends DataObjectCache
 	 */
 	function load_urltitle_array( $req_array )
 	{
-		global $DB, $Debuglog;
-
-		$req_list = "'".implode( "','", $req_array)."'";
-		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache", 'dataobjects' );
-		$sql = "SELECT * FROM $this->dbtablename WHERE post_urltitle IN ( $req_list )";
-		$dbIDname = $this->dbIDname;
-		$objtype = $this->objtype;
-		foreach( $DB->get_results( $sql ) as $row )
-		{
-			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
-			// $obj = $this->cache[ $row->$dbIDname ];
-			// $obj->disp( 'name' );
-
-			// put into index:
-			$this->urltitle_index[$row->post_urltitle] = & $this->cache[ $row->$dbIDname ];
-
-			$Debuglog->add( "Cached <strong>$this->objtype($row->post_urltitle)</strong>" );
-		}
-
-		// Set cache from Slug table:
-		foreach( $req_array as $urltitle )
-		{
-			if( !isset( $this->urltitle_index[$urltitle] ) )
-			{ // not yet in cache:
-				$SlugCache = & get_SlugCache();
-				if( $req_Slug = $SlugCache->get_by_name( $urltitle, false, false ) )
-				{
-					if( $req_Slug->get( 'type' ) == 'item' )
-					{	// Is item slug
-						if( $Item = $this->get_by_ID( $req_Slug->get( 'itm_ID' ), false ) )
-						{	// Set cache
-							$this->urltitle_index[$urltitle] = $Item;
-							$Debuglog->add( "Cached <strong>$this->objtype($urltitle)</strong>" );
-							continue;
-						}
-					}
-				}
-				// Set cache for non found objects:
-				$this->urltitle_index[$urltitle] = false; // Remember it doesn't exist in DB either
-				$Debuglog->add( "Cached <strong>$this->objtype($urltitle)</strong> as NON EXISTENT" );
-			}
-		}
+		$SlugCache = & get_SlugCache();
+		$SlugCache->load_objects_by_slugs( $req_array, 'item' );
 	}
 
 

@@ -96,7 +96,7 @@ class SlugCache extends DataObjectCache
 	 * Load objects of Item or Chapter by slug names depending on slug type
 	 *
 	 * @param array Slug titles
-	 * @param array Restrict to load object only with types; possible values: 'cat', 'item'
+	 * @param array|string Restrict to load object only with types; possible values: 'cat', 'item'
 	 */
 	function load_objects_by_slugs( $slugs, $object_types = array() )
 	{
@@ -112,6 +112,11 @@ class SlugCache extends DataObjectCache
 		// Load slugs by titles in cache:
 		$loaded_slugs = $this->load_where( 'slug_title IN ( '.$DB->quote( $slugs ).' )' );
 
+		if( ! is_array( $object_types ) )
+		{	// Convert to array if it is provided as string:
+			$object_types = array( $object_types );
+		}
+
 		// Load objects(Categories/Items) into cache by requested slug titles:
 		foreach( $object_types as $object_type )
 		{
@@ -120,11 +125,13 @@ class SlugCache extends DataObjectCache
 				case 'cat':
 					$slug_object_cache = & get_ChapterCache();
 					$slug_object_ID_field = 'slug_cat_ID';
+					$cache_index = 'urlname_index';
 					break;
 
 				case 'item':
 					$slug_object_cache = & get_ItemCache();
 					$slug_object_ID_field = 'slug_itm_ID';
+					$cache_index = 'urltitle_index';
 					break;
 
 				default:
@@ -138,7 +145,7 @@ class SlugCache extends DataObjectCache
 			$SQL->FROM_add( 'INNER JOIN T_slug ON '.$slug_object_ID_field.' = '.$slug_object_cache->dbIDname );
 			$SQL->WHERE( 'slug_type = '.$DB->quote( $object_type ) );
 			$SQL->WHERE_and( 'slug_title IN ( '.$DB->quote( $slugs ).' )' );
-			$r = $slug_object_cache->load_by_sql( $SQL );
+			$slug_object_cache->load_by_sql( $SQL );
 
 			$Debuglog->add( 'Load "'.$object_type.'" objects into cache by '.get_class().'->'.__FUNCTION__.'()', 'dataobjects' );
 		}

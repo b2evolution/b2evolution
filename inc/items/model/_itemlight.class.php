@@ -338,7 +338,7 @@ class ItemLight extends DataObject
 
 			case 'subchap':
 				$main_Chapter = & $this->get_main_Chapter();
-				$permalink = url_add_tail( $blogurl, '/'.$main_Chapter->urlname.'/'.$urltail );
+				$permalink = url_add_tail( $blogurl, '/'.$main_Chapter->get_canonical_slug().'/'.$urltail );
 				break;
 
 			case 'chapters':

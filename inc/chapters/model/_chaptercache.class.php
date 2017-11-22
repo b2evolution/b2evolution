@@ -259,22 +259,8 @@ class ChapterCache extends DataObjectCache
 	 */
 	function load_urlname_array( $req_array )
 	{
-		global $DB, $Debuglog;
-
-		$req_list = $DB->quote( $req_array );
-		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache", 'dataobjects' );
-		$sql = "SELECT * FROM $this->dbtablename WHERE cat_urlname IN ( $req_list )";
-		$dbIDname = $this->dbIDname;
-		$objtype = $this->objtype;
-		foreach( $DB->get_results( $sql ) as $row )
-		{
-			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
-
-			// put into index:
-			$this->urlname_index[$row->cat_urlname] = & $this->cache[ $row->$dbIDname ];
-
-			$Debuglog->add( "Cached <strong>$this->objtype($row->cat_urlname)</strong>" );
-		}
+		$SlugCache = & get_SlugCache();
+		$SlugCache->load_objects_by_slugs( $req_array, 'cat' );
 	}
 
 

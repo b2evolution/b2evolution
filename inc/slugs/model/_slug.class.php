@@ -362,34 +362,6 @@ class Slug extends DataObject
 
 		switch( $this->get( 'type' ) )
 		{
-			case 'cat':
-				$ChapterCache = & get_ChapterCache();
-				// Reset the flag "all_loaded":
-				$ChapterCache->all_loaded = false;
-
-				if( ! ( $Chapter = & $ChapterCache->get_by_ID( $this->get( 'cat_ID' ), false, false ) ) )
-				{	// No category found:
-					$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Category') ), 'error' );
-					return false;
-				}
-
-				if( $Chapter->get( 'canonical_slug_ID' ) != $this->ID )
-				{	// Chapter has a different canonical slug ID,
-					// Don't update Chapter but don't produce an error for such case,
-					// because Chapter can has several slugs:
-					return true;
-				}
-
-				$Chapter->set( 'urlname', $this->get( 'title' ) );
-				if( ! $Chapter->dbupdate( false ) )
-				{	// Failed on update:
-					$Messages->add( sprintf( T_('Could not change the canonical slug of the object (%s)'), $this->get_link_to_object() ), 'error' );
-					return false;
-				}
-
-				$Messages->add( sprintf( T_('Warning: this change also changed the canonical slug of the category! (%s)'), $this->get_link_to_object() ), 'warning' );
-				break;
-
 			case 'item':
 				$ItemCache = & get_ItemCache();
 

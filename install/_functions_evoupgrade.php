@@ -8592,6 +8592,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12370, 'Upgrading categories table...' ) )
+	{	// part of 6.9.3-beta
+		db_drop_col( 'T_categories', 'cat_urlname' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -62,7 +62,7 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 			// TRANS: Full phrase is "<a href="">Edit slugs</a> for this category"
 			.' '.T_('for this category');
 	}
-	$Form->text_input( 'cat_urlname', implode( ', ', $edited_Chapter->get_slugs() ), 40, T_('URL "slug"'), '<br />'.$edit_slug_link, array( 'maxlength' => '', 'style' => 'width:100%' ) );
+	$Form->text_input( 'cat_slugs', implode( ', ', $edited_Chapter->get_slugs() ), 40, T_('URL "slug"'), '<br />'.$edit_slug_link, array( 'maxlength' => '', 'style' => 'width:100%' ) );
 
 	$field_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select category image'), 'size_name' => 'fit-320x320' );
 	$Form->fileselect( 'cat_image_file_ID', $edited_Chapter->get( 'image_file_ID' ), T_('Category image'), NULL, $field_params );

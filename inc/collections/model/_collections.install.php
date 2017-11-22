@@ -106,7 +106,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			cat_ID                int(10) unsigned NOT NULL auto_increment,
 			cat_parent_ID         int(10) unsigned NULL,
 			cat_name              varchar(255) NOT NULL,
-			cat_urlname           varchar(255) COLLATE ascii_general_ci NOT NULL,
 			cat_canonical_slug_ID INT(10) UNSIGNED NULL DEFAULT NULL,
 			cat_blog_ID           int(10) unsigned NOT NULL default 2,
 			cat_image_file_ID     int(10) unsigned NULL,
@@ -117,7 +116,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			cat_lock              tinyint(1) NOT NULL DEFAULT 0,
 			cat_last_touched_ts   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY cat_ID (cat_ID),
-			UNIQUE cat_urlname( cat_urlname ),
 			KEY cat_blog_ID (cat_blog_ID),
 			KEY cat_parent_ID (cat_parent_ID),
 			KEY cat_order (cat_order)

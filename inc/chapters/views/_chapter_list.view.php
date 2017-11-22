@@ -100,7 +100,7 @@ function cat_line( $Chapter, $level )
 
 	// URL "slug"
 	$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=edit' );
-	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
+	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.format_to_output( $Chapter->get_canonical_slug() ).'</a></td>';
 
 	// Order
 	if( $Chapter->get_parent_subcat_ordering() == 'manual' )
