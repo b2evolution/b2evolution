@@ -391,7 +391,7 @@ function _wp_mw_get_item_struct( & $Item )
 			'mt_allow_comments'			=> new xmlrpcval( ($Item->can_comment(NULL) ? 1 : 0), 'int' ),
 			'mt_text_more'				=> new xmlrpcval( $content_parts[1] ),
 			'mt_keywords'				=> new xmlrpcval( $tag_names_string ),
-			'wp_slug'					=> new xmlrpcval( $Item->urltitle ),
+			'wp_slug'					=> new xmlrpcval( $Item->get_canonical_slug() ),
 			'wp_author'					=> new xmlrpcval( $Item->get('t_author') ),
 			'wp_page_parent_id'			=> new xmlrpcval( (isset($Item->parent_ID) ? $Item->parent_ID : 0), 'int' ),
 			'wp_page_parent_title'		=> new xmlrpcval( $parent_title ),

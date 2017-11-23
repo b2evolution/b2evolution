@@ -356,7 +356,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			while( $Item = & $ItemList->get_item() )
 			{
 				$links[] = array(
-					'link' => '/'.$listBlog->siteurl.'/'.$Chapter->get_url_path().$Item->urltitle, // trim( $Chapter->get_permanent_url( NULL ,' ' ) ).
+					'link' => '/'.$listBlog->siteurl.'/'.$Chapter->get_url_path().$Item->get_canonical_slug(), // trim( $Chapter->get_permanent_url( NULL ,' ' ) ).
 					'blog_id' => $blog_id
 				);
 			}

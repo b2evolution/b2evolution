@@ -67,13 +67,16 @@ class ItemQuery extends SQL
 
 	/**
 	 * Restrict to a specific post
+	 *
+	 * @param integer Item ID
+	 * @param string Item slug title
 	 */
-	function where_ID( $p = '', $title = '' )
+	function where_ID( $p = '', $slug = '' )
 	{
 		$r = false;
 
 		$this->p = $p;
-		$this->title = $title;
+		$this->slug = $slug;
 
 		// if a post number is specified, load that post
 		if( !empty($p) )
@@ -92,13 +95,13 @@ class ItemQuery extends SQL
 			$r = true;
 		}
 
-		// if a post urltitle is specified, load that post
-		if( !empty( $title ) )
+		// if a post slug is specified, load that post
+		if( ! empty( $slug ) )
 		{
-			if( substr( $this->title, 0, 1 ) == '-' )
+			if( substr( $this->slug, 0, 1 ) == '-' )
 			{	// Starts with MINUS sign:
 				$eq_title = ' <> ';
-				$this->title = substr( $this->title, 1 );
+				$this->slug = substr( $this->slug, 1 );
 			}
 			else
 			{
@@ -106,7 +109,8 @@ class ItemQuery extends SQL
 			}
 
 			global $DB;
-			$this->WHERE_and( $this->dbprefix.'urltitle'.$eq_title.$DB->quote($this->title) );
+			$this->FROM_add( 'INNER JOIN T_slug ON slug_itm_ID = '.$this->dbIDname );
+			$this->WHERE_and( 'slug_title'.$eq_title.$DB->quote( $this->slug ) );
 			$r = true;
 		}
 

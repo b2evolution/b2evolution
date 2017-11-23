@@ -368,17 +368,17 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
  *
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
- * @param integer ID of post
+ * @param integer ID of object
  * @param boolean Query the DB, but don't modify the URL title if the title already exists (Useful if you only want to alert the pro user without making changes for him)
- * @param string The prefix of the database column names (e. g. "post_" for post_urltitle)
- * @param string The name of the post ID column
+ * @param string The prefix of the database column names (e. g. "slug_" for slug_title)
+ * @param string The name of the object ID column
  * @param string The name of the DB table to use
  * @param NULL|string The post locale or NULL if there is no specific locale.
  * @return string validated url title
  */
-function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
-									$dbSlugFieldName = 'post_urltitle', $dbIDname = 'post_ID',
-									$dbtable = 'T_items__item', $post_locale = NULL )
+function urltitle_validate( $urltitle, $title, $obj_ID = 0, $query_only = false,
+									$dbSlugFieldName = 'slug_title', $dbIDname = 'slug_itm_ID',
+									$dbtable = 'T_slug', $post_locale = NULL )
 {
 	global $DB, $Messages;
 
@@ -451,7 +451,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	if( !$query_only )
 	{
 		// TODO: dh> this might get used to utilize the SlugCache instead of the processing below.
-		#if( $post_ID && $dbtable == 'T_slug' )
+		#if( $obj_ID && $dbtable == 'T_slug' )
 		#{
 		#	$existing_Slug = get_SlugCache()->get_by_name($urltitle, false, false);
 		#	if( $existing_Slug )
@@ -475,7 +475,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 		{
 			$existing_urltitle = $row[$dbSlugFieldName];
 			// echo "existing = $existing_urltitle <br />";
-			if( $existing_urltitle == $urltitle && $row[$dbIDname] != $post_ID )
+			if( $existing_urltitle == $urltitle && $row[$dbIDname] != $obj_ID )
 			{ // We have an exact match, we'll have to change the number.
 				$exact_match = true;
 			}
@@ -483,7 +483,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 			{ // This one has a number, we extract it:
 				$existing_number = (int)$matches[1];
 
-				if( ! isset($use_existing_number) && $row[$dbIDname] == $post_ID )
+				if( ! isset($use_existing_number) && $row[$dbIDname] == $obj_ID )
 				{ // if there is a numbered entry for the current ID, use this:
 					$use_existing_number = $existing_number;
 				}
@@ -3109,11 +3109,11 @@ function echo_slug_filler()
 		{
 			if(!slug_changed)
 			{
-				jQuery( '#post_urltitle' ).val( jQuery( '#post_title' ).val().replace( /,/g, ' ' ) );
+				jQuery( '#post_slugs' ).val( jQuery( '#post_title' ).val().replace( /,/g, ' ' ) );
 			}
 		} );
 
-		jQuery( '#post_urltitle' ).change( function()
+		jQuery( '#post_slugs' ).change( function()
 		{
 			slug_changed = true;
 			jQuery( '[name=slug_changed]' ).val( 1 );

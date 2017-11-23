@@ -602,7 +602,7 @@ class Chapter extends DataObject
 	{
 		global $DB;
 
-		// Start transaction because of urltitle validation
+		// Start transaction because of slug validation:
 		$DB->begin( 'SERIALIZABLE' );
 
 		if( count( $this->dbchanges ) > 0 && !isset( $this->dbchanges['last_touched_ts'] ) )
@@ -951,7 +951,7 @@ class Chapter extends DataObject
 
 
 	/**
-	 * Get all slug of this Chapter
+	 * Get canonical slug of this Chapter
 	 *
 	 * @return string Canonical slug title
 	 */
@@ -977,6 +977,11 @@ class Chapter extends DataObject
 	 */
 	function get_slugs()
 	{
+		if( ! empty( $this->new_slugs ) )
+		{	// Use new slugs from the submitted form:
+			return array_map( 'utf8_trim', explode( ',', $this->new_slugs ) );
+		}
+
 		if( empty( $this->ID ) )
 		{	// No slugs for new creating Chapter:
 			return array();
@@ -1018,6 +1023,9 @@ class Chapter extends DataObject
 			return;
 		}
 
+		// Load for function replace_special_chars():
+		load_funcs('locales/_charset.funcs.php');
+
 		$SlugCache = & get_SlugCache();
 		$canonical_Slug = & $SlugCache->get_by_ID( $this->get( 'canonical_slug_ID' ), false, false );
 
@@ -1026,7 +1034,8 @@ class Chapter extends DataObject
 		$s = 0;
 		foreach( $new_slugs as $new_slug_title )
 		{
-			$new_slug_title = utf8_trim( $new_slug_title );
+			// Replace special chars/umlauts:
+			$new_slug_title = replace_special_chars( utf8_trim( $new_slug_title ) );
 
 			if( empty( $new_slug_title ) )
 			{	// Skip empty slug:
@@ -1047,12 +1056,11 @@ class Chapter extends DataObject
 
 			if( $s == 0 && // First slug must be used as canonical for this Chapter
 			    ( ! $canonical_Slug || // If this Chapter has no canonical slug yet OR
-			      $this->get( 'canonical_slug_ID' ) != $cat_Slug->ID || // If other was used as canonical slug
-			      $this->get( 'urlname' ) != $cat_Slug->get( 'title' ) // If canonical slug had another title
+			      $this->get( 'canonical_slug_ID' ) != $cat_Slug->ID // If other was used as canonical slug
 			    ) )
 			{	// Update canonical slug of this Chapter:
 				$this->set( 'canonical_slug_ID', $cat_Slug->ID );
-				$this->dbupdate( false );
+				parent::dbupdate();
 			}
 
 			$s++;

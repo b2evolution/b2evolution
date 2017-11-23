@@ -240,11 +240,11 @@ class shortlinks_plugin extends Plugin
 
 			if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER ) )
 			{
-				// Construct array of wikiwords to look up in post urltitles
+				// Construct array of wikiwords to look up in post slugs:
 				$wikiwords = array();
 				foreach( $matches as $match )
 				{
-					// Convert the WikiWord to an urltitle
+					// Convert the WikiWord to a slug title:
 					$WikiWord = $match[0];
 					$Wiki_Word = preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1-$2', $WikiWord );
 					$wiki_word = utf8_strtolower( $Wiki_Word );
@@ -253,7 +253,7 @@ class shortlinks_plugin extends Plugin
 					$wikiwords[ $WikiWord ] = $wiki_word;
 				}
 
-				// Lookup all urltitles at once in DB and preload cache:
+				// Lookup all slugs at once in DB and preload cache:
 				$slug_object_types = array();
 				if( ! empty( $this->link_types['cat_without_brackets'] ) )
 				{	// Load categories objects into cache:
@@ -321,11 +321,11 @@ class shortlinks_plugin extends Plugin
 				/x'.$regexp_modifier; // x = extended (spaces + comments allowed)
 			if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER ) )
 			{
-				// Construct array of wikiwords to look up in post urltitles
+				// Construct array of wikiwords to look up in post slugs:
 				$wikiwords = array();
 				foreach( $matches as $match )
 				{
-					// Convert the WikiWord to an urltitle
+					// Convert the WikiWord to a slug title:
 					$WikiWord = $match[0];
 					if( preg_match( '/^[\p{Ll}0-9#_\-]+$/'.$regexp_modifier, $WikiWord ) )
 					{	// This WikiWord already matches a slug format
@@ -343,7 +343,7 @@ class shortlinks_plugin extends Plugin
 					$wikiwords[ $WikiWord ] = $wiki_word;
 				}
 
-				// Lookup all urltitles at once in DB and preload cache:
+				// Lookup all slugs at once in DB and preload cache:
 				$slug_object_types = array();
 				if( ! empty( $this->link_types['cat_slugs'] ) )
 				{	// Load categories objects into cache:
@@ -429,7 +429,7 @@ class shortlinks_plugin extends Plugin
 	 * Callback function for replace_content_outcode to render links like [[wiki-word .style.classes text]] or ((wiki-word .style.classes text))
 	 *
 	 * @param array Matches of regexp
-	 * @return string A processed link to post/chapter URL OR a suggestion text to create new post from unfound post urltitle
+	 * @return string A processed link to post/chapter URL OR a suggestion text to create new post from unfound post slug
 	 */
 	function callback_replace_bracketed_words( $m )
 	{
@@ -565,7 +565,7 @@ class shortlinks_plugin extends Plugin
 			$post_title = ucfirst( str_replace( '-', ' ', $post_title ) );
 
 			$before_wikiword = '<a'
-				.' href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.urlencode( $post_title ).'&amp;post_urltitle='.urlencode( $post_slug ).'"'
+				.' href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.urlencode( $post_title ).'&amp;post_slugs='.urlencode( $post_slug ).'"'
 				.' title="'.format_to_output( T_('Create').'...', 'htmlattr' ).'"'
 				.' class="'.$class.'evo_shortlink_broken">';
 			$after_wikiword = '</a>';
@@ -987,7 +987,7 @@ class shortlinks_plugin extends Plugin
 						+ '<input type="hidden" id="shortlinks_hidden_ID" />'
 						+ '<input type="hidden" id="shortlinks_hidden_cover_link" />'
 						+ '<input type="hidden" id="shortlinks_hidden_teaser_link" />'
-						+ '<input type="hidden" id="shortlinks_hidden_urltitle" />'
+						+ '<input type="hidden" id="shortlinks_hidden_slug" />'
 						+ '<input type="hidden" id="shortlinks_hidden_title" />'
 						+ '<input type="hidden" id="shortlinks_hidden_excerpt" />'
 						+ '<input type="hidden" id="shortlinks_hidden_teaser" />'
@@ -1179,7 +1179,7 @@ class shortlinks_plugin extends Plugin
 
 					// Store item field values in hidden inputs to use on insert complex link:
 					jQuery( '#shortlinks_hidden_ID' ).val( post.id );
-					jQuery( '#shortlinks_hidden_urltitle' ).val( post.urltitle );
+					jQuery( '#shortlinks_hidden_slug' ).val( post.urltitle );
 					jQuery( '#shortlinks_hidden_title' ).val( post.title );
 					jQuery( '#shortlinks_hidden_excerpt' ).val( post.excerpt );
 					jQuery( '#shortlinks_hidden_teaser' ).val( post.teaser );
@@ -1240,7 +1240,7 @@ class shortlinks_plugin extends Plugin
 		// Insert a post link to textarea:
 		jQuery( document ).on( 'click', '#shortlinks_btn_insert', function()
 		{
-			shortlinks_insert_link_text( '[[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ']]' );
+			shortlinks_insert_link_text( '[[' + jQuery( '#shortlinks_hidden_slug' ).val() + ']]' );
 		} );
 
 		// Insert a post link with options to textarea:
@@ -1482,7 +1482,7 @@ class shortlinks_plugin extends Plugin
 			}
 			if( jQuery( '#shortlinks_form_title' ).is( ':checked' ) )
 			{	// Title:
-				post_content += "\r\n" + '## [[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ' ' + jQuery( '#shortlinks_hidden_title' ).val() + ']]';
+				post_content += "\r\n" + '## [[' + jQuery( '#shortlinks_hidden_slug' ).val() + ' ' + jQuery( '#shortlinks_hidden_title' ).val() + ']]';
 			}
 			if( typeof( thumb_cover ) != 'undefined' && thumb_cover != '' )
 			{	// Thumbnail cover image:
@@ -1499,7 +1499,7 @@ class shortlinks_plugin extends Plugin
 			}
 			if( jQuery( '#shortlinks_form_more' ).is( ':checked' ) )
 			{	// "Read more" link:
-				post_content += "\r\n" + '[[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ' <?php echo TS_('Read more'); ?>...]]';
+				post_content += "\r\n" + '[[' + jQuery( '#shortlinks_hidden_slug' ).val() + ' <?php echo TS_('Read more'); ?>...]]';
 			}
 			if( post_content != '' )
 			{

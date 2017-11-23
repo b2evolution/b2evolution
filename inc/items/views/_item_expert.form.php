@@ -356,9 +356,9 @@ $Form->begin_form( '', '', $params );
 			) );
 	}
 
-	echo '<tr><td class="label" valign="top"><label for="post_urltitle" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL slugs').':</strong></label></td>';
+	echo '<tr><td class="label" valign="top"><label for="post_slugs" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL slugs').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
-	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, '', '<br />'.$edit_slug_link.$tiny_slug_info, array( 'maxlength' => 210, 'style' => 'width: 100%;' ) );
+	$Form->text_input( 'post_slugs', $edited_Item->get_slugs(), 40, '', '<br />'.$edit_slug_link.$tiny_slug_info, array( 'maxlength' => 210, 'style' => 'width: 100%;' ) );
 	echo '</td></tr>';
 
 	if( $edited_Item->get_type_setting( 'use_tags' ) != 'never' )

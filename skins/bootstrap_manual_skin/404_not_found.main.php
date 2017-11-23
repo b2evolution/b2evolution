@@ -26,7 +26,7 @@ if( ! empty( $requested_404_title ) )
 { // Initialize a prefilled search form
 	set_param( 's', str_replace( '-', ' ', $requested_404_title ) );
 	set_param( 'sentence', 'OR' );
-	set_param( 'title', '' ); // Empty this param to exclude a filter by post_urltitle
+	set_param( 'title', '' ); // Empty this param to exclude a filter by post_slugs
 }
 
 // This is the main template; it may be used to display very different things.
@@ -185,15 +185,15 @@ siteskin_include( '_site_body_header.inc.php' );
 	echo '<p>'.T_('The manual page you are requesting doesn\'t seem to exist (yet).').'</p>';
 
 	$post_title = '';
-	$post_urltitle = '';
+	$post_slugs = '';
 	if( ! empty( $requested_404_title ) )
-	{ // Set title & urltitle for new post
+	{	// Set title & slug for new post:
 		$post_title = str_replace( ' ', '%20', ucwords( str_replace( '-', ' ', $requested_404_title ) ) );
-		$post_urltitle = $requested_404_title;
+		$post_slugs = $requested_404_title;
 	}
 
 	// Button to create a new page
-	$write_new_post_url = $Blog->get_write_item_url( 0, $post_title, $post_urltitle );
+	$write_new_post_url = $Blog->get_write_item_url( 0, $post_title, $post_slugs );
 	if( ! empty( $write_new_post_url ) )
 	{ // Display button to write a new post
 		echo '<a href="'.$write_new_post_url.'" class="roundbutton roundbutton_text_noicon">'.T_('Create this page now').'</a>';

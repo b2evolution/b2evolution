@@ -225,8 +225,8 @@ function tool_create_sample_posts( $blog_ID, $num_posts )
 		$length = rand(300, 500);
 		$word = generate_random_key( $length, "\n     abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" );
 		$post_content = $content.' '.$word;
-		$urltitle = strtolower( str_replace( array("\n", ' ', '-'), '', substr($word, 50, 20) ) );
-		$urltitle = trim( $urltitle, '-' );
+		$slug = strtolower( str_replace( array("\n", ' ', '-'), '', substr($word, 50, 20) ) );
+		$slug = trim( $slug, '-' );
 
 		$Item = new Item();
 		$Item->set( 'title', 'Generated post '.$i );
@@ -236,7 +236,7 @@ function tool_create_sample_posts( $blog_ID, $num_posts )
 		// Set post main cat ID, from selected blog
 		$Item->set( 'main_cat_ID', $selected_Blog->get_default_cat_ID() );
 		// Random post url slug
-		$Item->set( 'urltitle', $urltitle );
+		$Item->new_slugs = $slug;
 		if( $Item->dbinsert_test() )
 		{
 			$num_posts_created++;

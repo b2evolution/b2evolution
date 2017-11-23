@@ -1229,40 +1229,40 @@ switch( $action )
 
 	case 'mass_save' :
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb ( 'item' );
+		$Session->assert_received_crumb( 'item' );
 
-		init_list_mode ();
-		$ItemList->query ();
+		init_list_mode();
+		$ItemList->query();
 
 		global $DB;
 
 		$update_nr = 0;
 
-		while ( $Item = & $ItemList->get_item () )
+		while( $Item = & $ItemList->get_item() )
 		{	// check user permission
 			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
 
 			// Not allow html content on post titles
 			$title = param ( 'mass_title_' . $Item->ID, 'htmlspecialchars', NULL );
-			$urltitle = param ( 'mass_urltitle_' . $Item->ID, 'string', NULL );
+			$slugs = param ( 'mass_slugs_' . $Item->ID, 'string', NULL );
 			$titletag = param ( 'mass_titletag_' . $Item->ID, 'string', NULL );
 
-			if ($title != NULL)
+			if( $title != NULL )
 			{
-				$Item->set ( 'title', $title );
+				$Item->set( 'title', $title );
 			}
 
-			if ($urltitle != NULL)
+			if( $slugs != NULL )
 			{
-				$Item->set ( 'urltitle', $urltitle );
+				$Item->new_slugs = $slugs;
 			}
 
-			if ($titletag != NULL)
+			if( $titletag != NULL )
 			{
 				$Item->set ( 'titletag', $titletag );
 			}
 
-			if( $Item->dbupdate ())
+			if( $Item->dbupdate() )
 			{
 				$update_nr++;	// successfully updated post number
 			}
@@ -1279,7 +1279,7 @@ switch( $action )
 			$Messages->add( T_('No update executed!') );
 		}
 		// REDIRECT / EXIT
-		header_redirect ( $redirect_to, 303 );
+		header_redirect( $redirect_to, 303 );
 		/* EXITED */
 		break;
 

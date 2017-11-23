@@ -784,10 +784,14 @@ function create_demo_comment( $item_ID, $comment_users , $status = NULL, $commen
 {
 	global $DB, $now;
 
+	$ItemCache = & get_ItemCache();
+	if( ! ( $commented_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) )
+	{
+		return;
+	}
+
 	if( empty( $status ) )
 	{
-		$ItemCache = & get_ItemCache();
-		$commented_Item = $ItemCache->get_by_ID( $item_ID );
 		$commented_Item->load_Blog();
 		$status = $commented_Item->Blog->get_setting( 'new_feedback_status' );
 	}
@@ -812,7 +816,7 @@ function create_demo_comment( $item_ID, $comment_users , $status = NULL, $commen
 
 	// Restrict comment status by parent item:
 	$Comment = new Comment();
-	$Comment->set( 'item_ID', $item_ID );
+	$Comment->set_Item( $commented_Item );
 	$Comment->set( 'status', $status );
 	$Comment->restrict_status( true );
 	$status = $Comment->get( 'status' );

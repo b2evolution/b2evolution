@@ -69,7 +69,7 @@ while( $Item = & $ItemList->get_item() )
 	}
 
 	$Form->text( 'mass_title_'.$Item->ID , htmlspecialchars_decode( $Item->get( 'title' ) ), 70, T_('Title'), '', 255 );
-	$Form->text( 'mass_urltitle_'.$Item->ID, $Item->get_slugs(), 70, T_('URL slugs').$edit_slug_link, '', 255 );
+	$Form->text( 'mass_slugs_'.$Item->ID, $Item->get_slugs(), 70, T_('URL slugs').$edit_slug_link, '', 255 );
 	$Form->text( 'mass_titletag_'.$Item->ID, $Item->get( 'titletag' ), 70, htmlspecialchars( T_('<title> tag') ), '', 255 );
 
 	$Form->end_fieldset();

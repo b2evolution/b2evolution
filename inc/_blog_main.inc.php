@@ -244,7 +244,7 @@ if( $resolve_extra_path )
 						$p = $req_post[1];		// Post to display
 					}
 					else
-					{ // Last param is a string, we'll consider this to be a post urltitle
+					{ // Last param is a string, we'll consider this to be a post slug
 						$title = $last_part;
 						// echo 'post title : ', $title;
 					}

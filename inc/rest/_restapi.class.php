@@ -679,7 +679,7 @@ class RestApi
 			$item_data = array(
 					'id'          => intval( $Item->ID ),
 					'datestart'   => $Item->get( 'datestart' ),
-					'urltitle'    => $Item->get( 'urltitle' ),
+					'urltitle'    => $Item->get_canonical_slug(),
 					'type'        => $Item->get_type_setting( 'name' ),
 					'title'       => $Item->get( 'title' ),
 					'content'     => $Item->get_prerendered_content( 'htmlbody' ),

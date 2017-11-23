@@ -101,10 +101,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	// Add hidden required fields or fields that were set in the init_inskin_editing() function
 	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );
 
-	if( $edited_Item->get( 'urltitle' ) != '' )
-	{	// post_urltitle can be defined from request param
-		$Form->hidden( 'post_urltitle', $edited_Item->get( 'urltitle' ) );
-	}
+	$Form->hidden( 'post_slugs', $edited_Item->get_slugs() );
 
 	if( $action != 'new' )
 	{ // DO NOT ADD HIDDEN FIELDS IF THEY ARE NOT SET

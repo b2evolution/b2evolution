@@ -4205,11 +4205,11 @@ class Blog extends DataObject
 	 *
 	 * @param integer Category ID
 	 * @param string Post title
-	 * @param string Post urltitle
+	 * @param string Post slugs
 	 * @param string Post type usage
 	 * @return string Url to write a new Post
 	 */
-	function get_write_item_url( $cat_ID = 0, $post_title = '', $post_urltitle = '', $post_type_usage = '' )
+	function get_write_item_url( $cat_ID = 0, $post_title = '', $post_slugs = '', $post_type_usage = '' )
 	{
 		$url = '';
 
@@ -4253,9 +4253,9 @@ class Blog extends DataObject
 				{ // Append a post title
 					$url = url_add_param( $url, 'post_title='.$post_title );
 				}
-				if( !empty( $post_urltitle ) )
-				{ // Append a post urltitle
-					$url = url_add_param( $url, 'post_urltitle='.$post_urltitle );
+				if( !empty( $post_slugs ) )
+				{	// Append post slugs:
+					$url = url_add_param( $url, 'post_slugs='.$post_slugs );
 				}
 				if( ! empty( $post_type_usage ) )
 				{ // Append a post type ID
