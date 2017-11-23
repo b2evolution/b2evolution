@@ -207,6 +207,10 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 			$searched_parts = array( 'name' );
 			break;
 
+		case 'file':
+			$searched_parts = array( 'filename', 'title', 'alt', 'description' );
+			break;
+
 		default:
 			debug_die( 'Invalid search type received!' );
 	}
@@ -382,7 +386,8 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
  * @param string original search term
  * @param array all separated words from the search term
  * @param array all quoted parts from the search term
- * @param number max possible score
+ * @param string Author IDs to filter, separated with ',' (comma)
+ * @param string Period to consider
  */
 function search_and_score_comments( $search_term, $keywords, $quoted_parts, $authors = '', $period = 'anytime' )
 {
@@ -472,7 +477,6 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts, $aut
  * @param string original search term
  * @param array all separated words from the search term
  * @param array all quoted parts from the search term
- * @param number max possible score
  */
 function search_and_score_chapters( $search_term, $keywords, $quoted_parts )
 {
@@ -523,7 +527,6 @@ function search_and_score_chapters( $search_term, $keywords, $quoted_parts )
  * @param string original search term
  * @param array all separated words from the search term
  * @param array all quoted parts from the search term
- * @param number max possible score
  */
 function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 {
@@ -569,6 +572,74 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 			'score'      => $final_score,
 			'ID'         => $tag->tag_ID,
 			'name'       => $tag->tag_name.','.$tag->post_count,
+			'scores_map' => $scores_map,
+		);
+	}
+
+	return $search_result;
+}
+
+
+/**
+ * Search and score files
+ *
+ * @param string original search term
+ * @param array all separated words from the search term
+ * @param array all quoted parts from the search term
+ * @param string Author IDs to filter, separated with ',' (comma)
+ */
+function search_and_score_files( $search_term, $keywords, $quoted_parts )
+{
+	global $DB, $Collection, $Blog;
+
+	// Init result array:
+	$search_result = array();
+
+	// Set query conditions:
+	$or = '';
+	$file_where_condition = '';
+	foreach( $keywords as $keyword )
+	{
+		$keyword = $DB->escape( $keyword );
+		$file_where_condition .= $or.' ( file_path LIKE \'%'.$keyword.'%\' OR file_title LIKE \'%'.$keyword.'%\' OR file_alt LIKE \'%'.$keyword.'%\' OR file_desc LIKE \'%'.$keyword.'%\' )';
+		$or = ' OR';
+	}
+
+	// Search between files:
+	$files_SQL = new SQL( 'Get files matching to the search keywords' );
+	$files_SQL->SELECT( 'file_ID, file_path, file_title, file_alt, file_desc, COUNT( DISTINCT link_itm_ID ) AS post_count' );
+	$files_SQL->FROM( 'T_files' );
+	$files_SQL->FROM_add( 'INNER JOIN T_links ON link_file_ID = file_ID' );
+	$files_SQL->FROM_add( 'INNER JOIN T_postcats ON link_itm_ID = postcat_post_ID' );
+	$files_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+	$files_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
+	$files_SQL->WHERE_and( $file_where_condition );
+	$files_SQL->GROUP_BY( 'file_path, file_title, file_alt, file_desc' );
+	$files = $DB->get_results( $files_SQL );
+
+	foreach( $files as $file )
+	{
+		if( $file->post_count == 0 )
+		{	// Count only those files which have at least one post linked to it, Skip this:
+			continue;
+		}
+
+		$scores_map = array();
+		$scores_map['filename'] = score_text( $file->file_path, $search_term, $keywords, $quoted_parts, 3 );
+		$scores_map['title'] = score_text( $file->file_title, $search_term, $keywords, $quoted_parts, 3 );
+		$scores_map['alt'] = score_text( $file->file_alt, $search_term, $keywords, $quoted_parts );
+		$scores_map['description'] = score_text( $file->file_desc, $search_term, $keywords, $quoted_parts );
+
+		$final_score = $scores_map['filename']['score']
+				+ ( isset( $scores_map['title'] ) ? $scores_map['title']['score'] : 0 )
+				+ ( isset( $scores_map['alt'] ) ? $scores_map['alt']['score'] : 0 )
+				+ ( isset( $scores_map['description'] ) ? $scores_map['description']['score'] : 0 );
+
+		$search_result[] = array(
+			'type'       => 'file',
+			'score'      => $final_score,
+			'ID'         => $file->file_ID,
+			'name'       => $file->file_path.','.$file->post_count,
 			'scores_map' => $scores_map,
 		);
 	}
@@ -642,6 +713,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 		$search_type_comment = true;
 		$search_type_category = true;
 		$search_type_tag = true;
+		$search_type_file = true;
 	}
 	else
 	{	// Check what types should be searched:
@@ -650,6 +722,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 		$search_type_comment = in_array( 'comment', $search_types );
 		$search_type_category = in_array( 'category', $search_types );
 		$search_type_tag = in_array( 'tag', $search_types );
+		$search_type_file = in_array( 'file', $search_types );
 	}
 
 	$search_result = array();
@@ -694,6 +767,17 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 		if( $debug )
 		{
 			echo '<p class="text-muted">Just found '.count( $tags_search_result ).' Tags.</p>';
+			evo_flush();
+		}
+	}
+
+	if( $search_type_file )
+	{
+		$files_search_result = search_and_score_files( $search_keywords, $keywords, $quoted_parts );
+		$search_result = array_merge( $search_result, $files_search_result );
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $files_search_result ).' Files.</p>';
 			evo_flush();
 		}
 	}
@@ -810,7 +894,11 @@ function search_result_block( $params = array() )
 		{	// Search tags:
 			$search_types[] = 'tag';
 		}
-		$search_types = count( $search_types ) == 4 ? 'all' : implode( ',', $search_types );
+		if( $Blog->get_setting( 'search_include_files' ) )
+		{ // Search files:
+			$search_types[] = 'file';
+		}
+		$search_types = count( $search_types ) == 5 ? 'all' : implode( ',', $search_types );
 
 		if( $item_type != 'all' )
 		{
@@ -848,6 +936,10 @@ function search_result_block( $params = array() )
 			{
 				echo '<li>'.sprintf( '%d tags', $search_result[0]['nr_of_tags'] ).'</li>';
 			}
+			if( isset( $search_result[0]['nr_of_files'] ) )
+			{
+				echo '<li>'.sprintf( '%d files', $search_result[0]['nr_of_files'] ).'</li>';
+			}
 			echo '</ul>';
 			echo '</div>';
 		}
@@ -864,6 +956,7 @@ function search_result_block( $params = array() )
 			'title_suffix_comment'  => ' ('./* TRANS: noun */ T_('Comment').')',
 			'title_suffix_category' => ' ('./* TRANS: noun */ T_('Category').')',
 			'title_suffix_tag'      => ' ('./* TRANS: noun */ T_('Tag').')',
+			'title_suffix_file'     => ' ('./* TRANS: noun */ T_('File').')',
 			'block_start'           => '',
 			'block_end'             => '',
 			'pagination'            => array(),
@@ -914,6 +1007,7 @@ function search_result_block( $params = array() )
 	$ItemCache = & get_ItemCache();
 	$CommentCache = & get_CommentCache();
 	$ChapterCache = & get_ChapterCache();
+	$FileCache = & get_FileCache();
 
 
 	if( !$search_result_loaded )
@@ -948,6 +1042,10 @@ function search_result_block( $params = array() )
 
 				case 'category':
 					$ChapterCache->load_list( $object_ids );
+					break;
+
+				case 'file':
+					$FileCache->load_list( $object_ids );
 					break;
 
 				// TODO: we'll probably load "tag" objects once we support tag-synonyms.
@@ -1055,6 +1153,18 @@ function search_result_block( $params = array() )
 				$display_params = array(
 					'title'   => '<a href="'.url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name ).'">'.$tag_name.'</a>'.$params['title_suffix_tag'],
 					'excerpt' => sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name ),
+				);
+				break;
+
+			case 'file':
+				// Prepare to display a File:
+
+				$File = $FileCache->get_by_id( $row['ID'], false );
+
+				list( $filename, $post_count ) = explode( ',', $row['name'] );
+				$display_params = array(
+					'title' => $File->get_linkedit_link().$params['title_suffix_file'],
+					'excerpt' => sprintf( T_('%d posts are linked to \'%s\''), $post_count, $filename )
 				);
 				break;
 
@@ -1563,8 +1673,8 @@ function display_score_map( $params )
 	echo '<li>'.sprintf( 'Total: '.$total_score_pattern.' points', $params['score'] ).'</li>';
 	if( $params['best_result'] )
 	{
-		echo '<ul><li>This is the best result. Percentage value is calculated based on the number of matching words and mathcing quoted terms.</li>';
-		echo '<li>Note: In case of the number of mathcing words even case insensitive partial matches are counted.</li>';
+		echo '<ul><li>This is the best result. Percentage value is calculated based on the number of matching words and matching quoted terms.</li>';
+		echo '<li>Note: In case of the number of matching words even case insensitive partial matches are counted.</li>';
 		echo '<li>Percentage = ( Number of matching words + Number of matching quoted terms ) * 100 / ( Number of words in search text + Number of quoted terms in search text )</li></ul>';
 	}
 	else

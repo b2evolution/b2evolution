@@ -41,6 +41,7 @@ $Form->begin_fieldset( T_('Search results').get_manual_link( 'search-results-oth
 	$Form->checklist( array(
 			array( 'search_include_posts', 1, T_('Posts'), $edited_Blog->get_setting( 'search_include_posts' ) ),
 			array( 'search_include_cmnts', 1, T_('Comments'), $edited_Blog->get_setting( 'search_include_cmnts' ) ),
+			array( 'search_include_files', 1, T_('Files'), $edited_Blog->get_setting( 'search_include_files' ) ),
 			array( 'search_include_cats',  1, T_('Categories'), $edited_Blog->get_setting( 'search_include_cats' ) ),
 			array( 'search_include_tags',  1, T_('Tags'), $edited_Blog->get_setting( 'search_include_tags' ) ),
 		), 'search_include', T_('Include') );

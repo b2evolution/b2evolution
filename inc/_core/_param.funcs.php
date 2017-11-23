@@ -213,7 +213,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 
 	// Check if the type is the special array or regexp
 	if( substr( $type, 0, 7 ) == 'array:/' )
-	{ // It is an array type param which may contains elements mathcing to the given regular expression
+	{ // It is an array type param which may contains elements matching to the given regular expression
 		$elements_regexp = substr( $type, 6 );
 		$elements_type = 'string';
 		$type = 'array:regexp';

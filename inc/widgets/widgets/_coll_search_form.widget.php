@@ -188,20 +188,24 @@ class coll_search_form_Widget extends ComponentWidget
 
 		if( $this->disp_params['show_advanced_options'] )
 		{
-			echo '<div style="text-align: left; margin-top: 2em;">';
-			$Form->begin_fieldset( T_('Additional search filters') );
-			$Form->hidden( 'advanced_search', 1 );
-			$Form->text_input( 'search_author', get_param( 'author' ), 25, T_('Author'), '', array( 'title' => T_('Enter author to search for' ) ) );
+			echo '<div style="text-align: left; margin-top: 1em;" class="row">';
+			echo '<div class="col-sm-12 col-md-12 col-lg-5" style="padding-right: 5px;">';
+			echo '<input type="text" name="search_author" id="search_author" value="'.htmlspecialchars( get_param( 'author' ) )
+					.'" class="form-control" title="'.format_to_output( T_('Enter author to search for' ), 'htmlattr' ).'" />';
+			echo '</div>';
 
-			$date_posted_options = array(
-				'week_ago' => T_('Less than a week'),
-				'month_ago' => T_('Less than a month'),
-				'year_ago' => T_('Less than a year'),
-				'anytime' => T_('Any time') );
-			$Form->select_input_array( 'search_date', param( 'search_date', 'string', 'anytime' ), $date_posted_options, T_('Date posted') );
+			$search_date = param( 'search_date', 'string', 'anytime' );
+			echo '<div class="col-sm-12 col-md-12 col-lg-4" style="padding: 0 5px;">';
+			echo '<select name="search_date" id="search_date" class="form-control">';
+			echo '<option value="week_ago"'.( $search_date == 'week_ago' ? ' selected' : '' ).'>'.T_('Less than a week').'</option>';
+			echo '<option value="month_ago"'.( $search_date == 'month_ago' ? ' selected' : '' ).'>'.T_('Less than a month').'</option>';
+			echo '<option value="year_ago"'.( $search_date == 'year_ago' ? ' selected' : '' ).'>'.T_('Less than a year').'</option>';
+			echo '<option value="anytime"'.( $search_date == 'anytime' ? ' selected' : '' ).'>'.T_('Any time').'</option>';
+			echo '</select>';
+			echo '</div>';
+
 
 			$item_type_options = array();
-
 			if( $Blog->get_setting( 'search_include_posts' ) )
 			{
 				$item_type_options['item'] = T_('Posts');
@@ -209,6 +213,10 @@ class coll_search_form_Widget extends ComponentWidget
 			if( $Blog->get_setting( 'search_include_cmnts' ) )
 			{
 				$item_type_options['comment'] = T_('Comments');
+			}
+			if( $Blog->get_setting( 'search_include_files' ) )
+			{
+				$item_type_options['file'] = T_('Files');
 			}
 			if( $Blog->get_setting( 'search_include_cats' ) )
 			{
@@ -222,9 +230,17 @@ class coll_search_form_Widget extends ComponentWidget
 			if( count( $item_type_options ) > 1 )
 			{
 				$item_type_options['all'] = T_('All');
-				$Form->select_input_array( 'search_type', param( 'search_type', 'string', 'all' ), $item_type_options, T_('Type' ) );
+
+				$search_type = param( 'search_type', 'string', 'all' );
+				echo '<div class="col-sm-12 col-md-12 col-lg-3" style="padding-left: 5px;">';
+				echo '<select name="search_type" id="search_type" class="form-control">';
+				foreach( $item_type_options as $key => $value )
+				{
+					echo '<option value="'.format_to_output( $key, 'htmlattr' ).'"'.( $search_type == $key ? ' selected' : '' ).'>'.$value.'</option>';
+				}
+				echo '</select>';
+				echo '</div>';
 			}
-			$Form->end_fieldset();
 			echo '</div>';
 
 			$selected_author_array = param( 'search_author_array', 'array' );
@@ -274,6 +290,20 @@ class coll_search_form_Widget extends ComponentWidget
 									'</div><span></span>' +
 								'</li>';
 						},
+						onAdd: function()
+						{
+							if( this.tokenInput( 'get' ).length > 0 )
+							{
+								jQuery( '#token-input-search_author' ).attr( 'placeholder', '' );
+							}
+						},
+						onDelete: function()
+						{
+							if( this.tokenInput( 'get' ).length === 0 )
+							{
+								jQuery( '#token-input-search_author' ).attr( 'placeholder', '<?php echo T_('Any author' ); ?>' ).css( 'width', '100%' );
+							}
+						},
 						<?php
 						if( param_has_error( 'search_author' ) )
 						{ // Mark this field as error
@@ -284,6 +314,7 @@ class coll_search_form_Widget extends ComponentWidget
 						}
 						<?php } ?>
 					} );
+				jQuery( '#token-input-search_author' ).attr( "placeholder", '<?php echo T_('Any author' ); ?>' ).css( 'width', '100%' );
 			} );
 			</script>
 			<?php
