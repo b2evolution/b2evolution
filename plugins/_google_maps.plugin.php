@@ -953,6 +953,7 @@ function locate()
 		$height = $this->display_param($this->get_widget_setting('height_front', $params));
 		$height = 'height:'.$height;
 
+		$api_key = $this->get_coll_setting( 'api_key', $Blog );
 		?>
 		<div class="map_title"><?php echo $this->get_widget_setting('map_title_coll'.$Blog->ID, $params); ?></div>
 		<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
