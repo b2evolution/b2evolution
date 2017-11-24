@@ -696,7 +696,10 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'widget_page_section_3', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['widget_page_section_3']['wico_ID'];
-		add_basic_widget( $wico_id, 'evo_Gmaps', 'plugin', 10 );
+		add_basic_widget( $wico_id, 'evo_Gmaps', 'plugin', 10, array(
+				'latitude'  => '48.8566573582',
+				'longitude' => '2.35195398331',
+			) );
 	}
 
 

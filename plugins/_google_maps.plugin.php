@@ -149,6 +149,16 @@ class google_maps_plugin extends Plugin
 				'defaultvalue' => 'map',
 				'note' => ''
 				),
+			'latitude' => array(
+				'label' => T_('Latitude'),
+				'type'  => 'float',
+				'note'  => T_('Leave empty to use coordinates of current post.'),
+				),
+			'longitude' => array(
+				'label' => T_('Longitude'),
+				'type'  => 'float',
+				'note'  => T_('Leave empty to use coordinates of current post.'),
+				),
 			), parent::get_widget_param_definitions( $params ) );
 
 		if( $preview && isset( $r['allow_blockcache'] ) )
@@ -960,11 +970,18 @@ function locate()
 			return;
 		}
 
+		// Try to get coordinates from the current Item:
 		$lat = $Item->get_setting( 'latitude' );
 		$lng = $Item->get_setting( 'longitude' );
 		if( empty( $lat ) && empty( $lng ) )
-		{	// Coordinates must be defined for the viewed Item:
-			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because coordinates must be defined for the viewed Item.', $params );
+		{	// Try to get coordinates from widget params:
+			$lat = $this->get_widget_setting( 'latitude', $params );
+			$lng = $this->get_widget_setting( 'longitude', $params );
+		}
+
+		if( empty( $lat ) || empty( $lng ) )
+		{	// Coordinates must be defined for the viewed Item or widget:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because coordinates must be defined for the viewed Item or for the Widget.', $params );
 			return;
 		}
 
