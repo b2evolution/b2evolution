@@ -974,6 +974,8 @@ function locate()
 		$height = $this->display_param($this->get_widget_setting('height_front', $params));
 		$height = 'height:'.$height;
 
+		$api_key = $this->get_coll_setting( 'api_key', $Blog );
+
 		echo $params['block_start'];
 
 		if( ! empty( $widget_title ) )
