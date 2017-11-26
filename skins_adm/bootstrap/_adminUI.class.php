@@ -572,6 +572,26 @@ class AdminUI extends AdminUI_general
 					'radio_oneline_end'      => "</label>\n",
 				);
 
+			case 'accordion_form':
+				return array_merge( $this->get_template( 'Form' ), array(
+						'layout'         => 'accordion',
+						'group_begin'    => '<div class="panel-group accordion-caret $group_class$" role="tablist" aria-multiselectable="true" $group_attribs$>',
+						'group_end'      => '</div>',
+						'fieldset_title' => '<a class="accordion-toggler collapsed" data-toggle="collapse" data-parent="#$group_ID$" href="#$group_item_ID$" aria-expanded="false" aria-controls="$group_item_ID$">$fieldset_title$</a>',
+						'fieldset_begin' =>
+							'<div class="panel panel-default $class$" id="fieldset_wrapper_$id$" $fieldset_attribs$>'."\n"
+								.'<div class="panel-heading" $title_attribs$>'
+									.'<h3 class="panel-title">$fieldset_title$</h3>'
+								.'</div>'."\n"
+								.'<div id="$group_item_id$" class="panel-collapse collapse">'
+									.'<div class="panel-body $class$">'."\n",
+						'fieldset_end'   =>
+									 '</div>' // End of <div class="panel-body...>
+								.'</div>' // End of <div id="$group_item_id$...>
+							.'</div>'."\n", // End of <div class="panel panel-default...>
+					
+					) );
+
 			case 'linespan_form':
 				// Linespan form:
 				return array(
@@ -793,7 +813,7 @@ class AdminUI extends AdminUI_general
 			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
-				$buttons .= '<a href="'.$url_params.'blog='.$l_blog_ID
+				$buttons .= '<a href="'.format_to_output( $url_params.'blog='.$l_blog_ID, 'htmlattr' )
 							.'" class="btn btn-default'.( $l_blog_ID == $blog ? ' active' : '' ).'"';
 
 				if( !is_null($this->coll_list_onclick) )
@@ -821,8 +841,8 @@ class AdminUI extends AdminUI_general
 				{
 					//$select_options .= ' selected="selected"';
 				}
-				$select_options .= '<a href="'.$url_params.'blog='.$l_blog_ID.'">'
-					.$l_Blog->dget( 'shortname', 'formvalue' ).'</a></li>';
+				$select_options .= '<a href="'.format_to_output( $url_params.'blog='.$l_blog_ID, 'htmlattr' ).'">'
+					.$l_Blog->dget( 'shortname', 'htmlbody' ).'</a></li>';
 			}
 		}
 
@@ -833,9 +853,9 @@ class AdminUI extends AdminUI_general
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
 			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
-			$r .= '<a href="'.$this->coll_list_all_url
+			$r .= '<a href="'.format_to_output( $this->coll_list_all_url, 'htmlattr' )
 						.'" class="btn btn-default'.( $blog == 0 ? ' active' : '' ).'">'
-						.$this->coll_list_all_title.'</a> ';
+						.format_to_output( $this->coll_list_all_title, 'htmlbody' ).'</a> ';
 			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 

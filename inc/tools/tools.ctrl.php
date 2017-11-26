@@ -14,10 +14,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $deferred_AdminToolActions;
 
 
-load_funcs('plugins/_plugin.funcs.php');
-load_funcs('tools/model/_maintenance.funcs.php');
-load_funcs('tools/model/_tool.funcs.php');
+load_funcs( 'plugins/_plugin.funcs.php' );
+load_funcs( 'tools/model/_maintenance.funcs.php' );
+load_funcs( 'tools/model/_tool.funcs.php' );
 load_funcs( 'tools/model/_system.funcs.php' );
+//load_funcs( '_core/model/db/_upgrade.funcs.php' );
 
 // load item class
 load_class( 'items/model/_item.class.php', 'Item' );
@@ -84,37 +85,54 @@ if( empty( $tab ) )
 	{
 		case 'del_itemprecache':
 			// Clear pre-rendered item cache (DB)
-			dbm_delete_itemprecache();
+			$template_log_title = T_('Clear pre-rendered item cache (DB)');
+			$template_action = $action;
 			break;
 
 		case 'del_commentprecache':
 			// Clear pre-rendered comment cache (DB)
-			dbm_delete_commentprecache();
+			$template_log_title = T_('Clear pre-rendered comment cache (DB)');
+			$template_action = $action;
 			break;
 
 		case 'del_messageprecache':
 			// Clear pre-rendered message cache (DB)
-			dbm_delete_messageprecache();
+			$template_log_title = T_('Clear pre-rendered message cache (DB)');
+			$template_action = $action;
 			break;
 
 		case 'del_pagecache':
 			// Delete the page cache /blogs/cache
-			dbm_delete_pagecache();
+			$template_log_title = T_('Clear full page caches (/cache/* directories)');
+			$template_action = $action;
 			break;
 
 		case 'del_filecache':
 			// delete the thumbnail cahces .evocache
-			dbm_delete_filecache();
+			$template_log_title = T_('Clear thumbnail caches (?evocache directories)');
+			$template_action = $action;
 			break;
 
 		case 'repair_cache':
 			// Repair cache
-			dbm_repair_cache();
+			$template_log_title = T_('Repair /cache/* directory structure');
+			$template_action = $action;
 			break;
 
-		case 'optimize_tables': // Optimize MyISAM & InnoDB tables
-		case 'check_tables':    // Check ALL database tables
+		case 'optimize_tables':
+			// Optimize MyISAM & InnoDB tables
+			$template_log_title = T_('OPTIMIZE database tables');
+			$template_action = $action;
+			break;
+
+		case 'check_tables':
+			// Check ALL database tables
+			$template_log_title = T_('CHECK database tables');
+			$template_action = $action;
+			break;
+
 		case 'analyze_tables':  // Analize ALL database tables
+			$template_log_title = T_('ANALYZE database tables');
 			$template_action = $action;
 			break;
 
@@ -130,25 +148,32 @@ if( empty( $tab ) )
 
 		case 'delete_orphan_comments':
 			// delete orphan orphan comments with no matching Item
-			dbm_delete_orphan_comments();
+			$template_log_title = T_('Find and delete all orphan Comments (with no matching Item) - Disk &amp; DB.');
+			$template_action = $action;
 			break;
 
 		case 'delete_orphan_comment_uploads':
 			// delete orphan comment upload, older than 24 hours
-			dbm_delete_orphan_comment_uploads();
+			$template_log_title = T_('Find and delete all orphan comment Uploads - Disk &amp; DB.');
+			$template_action = $action;
 			break;
 
 		case 'delete_orphan_files':
 			// delete orphan File objects with no matching file on disk
+			$template_log_title = T_('Find and delete all orphan File objects (with no matching file on disk) - DB only.');
+			$template_action = $action;
+			break;
+
 		case 'delete_orphan_file_roots':
 			// delete orphan file roots with no matching Blog or User entry in the database
+			$template_log_title = T_('Find and delete all orphan file roots (with no matching Collection or User) and all of their content recursively - Disk &amp; DB.');
 			$template_action = $action;
 			break;
 
 		case 'prune_hits_sessions':
 			// Prune old hits & sessions
-			load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
-			Hitlist::dbprune(); // will prune once per day, according to Settings
+			$template_log_title = T_('Prune old hits &amp; sessions (includes OPTIMIZE) - DB only.');
+			$template_action = $action;
 			break;
 
 		case 'create_sample_collections':
@@ -229,6 +254,33 @@ if( empty( $tab ) )
 			$template_action = 'create_sample_posts';
 			break;
 
+		case 'create_sample_revisions':
+			$blog_ID = param( 'blog_ID', 'string', 0 );
+			$min_revisions = param( 'min_revisions', 'string', 0 );
+			$max_revisions = param( 'max_revisions', 'string', 0 );
+
+			if( ! ( param_check_number( 'blog_ID', T_('Blog ID must be a number'), true ) &&
+					param_check_number( 'min_revisions', T_('Minimum number of revisions field must be a number'), true ) &&
+					param_check_number( 'max_revisions', T_('Maximum number of revisions filed must be a number'), true ) ) )
+			{ // param errors
+				$action = 'show_create_revisions';
+				break;
+			}
+
+			// check blog_ID
+			$BlogCache = & get_BlogCache();
+			$selected_Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
+			if( $selected_Blog == NULL )
+			{
+				$Messages->add( T_('Blog ID must be a valid Blog ID!'), 'error' );
+				$action = 'show_create_revisions';
+				break;
+			}
+
+			// Execute a creating of revisions inside template in order to see the process
+			$template_action = 'create_sample_revisions';
+			break;
+
 		case 'create_sample_users':
 			$num_users = param( 'num_users', 'string', 0 );
 			param_check_number( 'num_users', T_('"How many users" field must be a number'), true );
@@ -257,14 +309,20 @@ if( empty( $tab ) )
 
 		case 'recreate_itemslugs':
 			// Recreate all item slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but redirect to the new one.
-			dbm_recreate_itemslugs();
+			$template_log_title = T_('Recreate all item Slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but will redirect to the new ones - DB only.');
+			$template_action = $action;
 			break;
 
 		case 'recreate_autogenerated_excerpts':
 			// Recreating of autogenerated excerpts
+			$template_log_title = T_('Recreate autogenerated excerpts - DB only.');
+			$template_action = $action;
+			break;
+
 		case 'convert_item_content_separators':
 			// Convert item content separators to new format
 			// Execute these actions inside template in order to see the process
+			$template_log_title = T_('Convert item content separators to [teaserbreak] and [pagebreak] - DB only.');
 			$template_action = $action;
 			break;
 
@@ -273,20 +331,26 @@ if( empty( $tab ) )
 
 			if( $confirmed )
 			{
-				$count = $DB->get_var( 'SELECT COUNT(*) FROM T_items__version' );
-				$DB->query( 'TRUNCATE TABLE T_items__version' );
-				if( $count > 0 )
-				{
-					$Messages->add( sprintf( T_('Cleared %d records from the item versions table.'), $count ) );
-				}
-				else
-				{
-					$Messages->add( sprintf( T_('Item versions table already empty.'), $count ), 'note' );
-				}
+				$template_log_title = T_('Remove all Item version - DB only.');
+				$template_action = $action;
 			}
 			else
 			{
-				$action ='show_delete_item_versions';
+				$action = 'show_delete_item_versions';
+			}
+			break;
+
+		case 'resize_all_images':
+			param( 'confirmed', 'integer', 0 );
+
+			if( $confirmed )
+			{
+				$template_log_title = T_('Resize all images in the media directory');
+				$template_action = $action;
+			}
+			else
+			{
+				$action = 'show_resize_all_images';
 			}
 			break;
 
@@ -370,9 +434,16 @@ if( empty( $tab ) )
 			break;
 
 		case 'utf8check':
+			//$template_log_title = T_('Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)');
+			load_funcs('_core/model/db/_upgrade.funcs.php');
+			$template_log_title = T_('Normalizing DB charsets...');
+			$template_action = $action;
+			break;
+
 		case 'utf8upgrade':
 			// Check/Upgrade DB to UTF-8
 			load_funcs('_core/model/db/_upgrade.funcs.php');
+			$template_log_title = T_('Normalizing DB charsets...');
 			$template_action = $action;
 			break;
 
@@ -468,6 +539,10 @@ if( empty( $tab ) )
 			$AdminUI->disp_view( 'tools/views/_create_posts.form.php' );
 			break;
 
+		case 'show_create_revisions':
+			$AdminUI->disp_view( 'tools/views/_create_revisions.form.php' );
+			break;
+
 		case 'show_create_users':
 			$AdminUI->disp_view( 'tools/views/_create_users.form.php' );
 			break;
@@ -482,10 +557,10 @@ if( empty( $tab ) )
 
 		case 'show_create_messages':
 			// Get count users
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get a count of all users' );
 			$SQL->SELECT( 'COUNT( user_ID )' );
 			$SQL->FROM( 'T_users' );
-			$users_count = $DB->get_var( $SQL->get() );
+			$users_count = $DB->get_var( $SQL );
 			$threads_count = $users_count * $users_count - $users_count + 1;
 
 			$AdminUI->disp_view( 'tools/views/_create_messages.form.php' );
@@ -493,6 +568,11 @@ if( empty( $tab ) )
 
 		case 'show_delete_item_versions':
 			$AdminUI->disp_view( 'tools/views/_delete_item_versions.form.php' );
+			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
+			break;
+
+		case 'show_resize_all_images':
+			$AdminUI->disp_view( 'tools/views/_image_resize.form.php' );
 			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
 			break;
 

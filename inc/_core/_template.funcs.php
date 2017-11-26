@@ -200,14 +200,14 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 		{ // Check if current redirect domain is used as absolute URL for at least 1 collection on the system:
 			global $DB;
 
-			$abs_url_coll_SQL = new SQL();
+			$abs_url_coll_SQL = new SQL( 'phpBB: get collection by url' );
 			$abs_url_coll_SQL->SELECT( 'blog_ID' );
 			$abs_url_coll_SQL->FROM( 'T_blogs' );
 			$abs_url_coll_SQL->WHERE( 'blog_access_type = "absolute"' );
 			$abs_url_coll_SQL->WHERE_and( 'blog_siteurl LIKE '.$DB->quote( '%://'.str_replace( '_', '\_', $redirect_to_domain.'/%' ) ) );
 			$abs_url_coll_SQL->LIMIT( '1' );
 
-			$abs_url_coll_ID = $DB->get_var( $abs_url_coll_SQL->get() );
+			$abs_url_coll_ID = $DB->get_var( $abs_url_coll_SQL );
 			if( ! empty( $abs_url_coll_ID ) )
 			{ // We found current redirect goes to a collection domain, Allow this:
 				$allow_collection_redirect = true;
@@ -443,7 +443,7 @@ function get_request_title( $params = array() )
 			'users_text'          => T_('Users'),
 			'closeaccount_text'   => T_('Close account'),
 			'subs_text'           => T_('Notifications & Subscriptions'),
-			'visits_text'         => T_('Profile Visits'),
+			'visits_text'         => T_('Who visited my profile?'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
 			'edit_comment_text'   => T_('Editing comment'),
@@ -556,6 +556,7 @@ function get_request_title( $params = array() )
 
 		case 'visits':
 			// We are requesting the profile visits screen:
+			$user_ID = param( 'user_ID', 'integer', 0 );
 			$r[] = $params['visits_text'];
 			break;
 

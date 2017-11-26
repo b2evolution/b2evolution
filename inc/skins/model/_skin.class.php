@@ -28,6 +28,7 @@ class Skin extends DataObject
 	var $name;
 	var $folder;
 	var $type;
+	var $class;
 
 	/**
 	 * Skin version
@@ -71,6 +72,7 @@ class Skin extends DataObject
 			$this->set( 'folder', $skin_folder );
 			$this->set( 'name', $this->get_default_name() );
 			$this->set( 'type', $this->get_default_type() );
+			$this->set( 'class', get_class( $this ) );
 		}
 		else
 		{	// Wa are loading an object:
@@ -78,6 +80,7 @@ class Skin extends DataObject
 			$this->name = $db_row->skin_name;
 			$this->folder = $db_row->skin_folder;
 			$this->type = $db_row->skin_type;
+			$this->class = $db_row->skin_class;
 		}
 	}
 
@@ -101,8 +104,9 @@ class Skin extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table'=>'T_coll_settings', 'fk'=>'cset_value', 'msg'=>T_('%d blogs using this skin'),
-						'and_condition' => '( cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID" )' ),
+				array( 'table'=>'T_blogs', 'fk'=>'blog_normal_skin_ID', 'fk_short'=>'normal_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
+				array( 'table'=>'T_blogs', 'fk'=>'blog_mobile_skin_ID', 'fk_short'=>'mobile_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
+				array( 'table'=>'T_blogs', 'fk'=>'blog_tablet_skin_ID', 'fk_short'=>'tablet_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
 				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('This skin is set as default skin.'),
 						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" )' ),
 			);
@@ -285,8 +289,20 @@ class Skin extends DataObject
 		global $admin_url, $rsc_url;
 		global $Timer, $Session, $debug, $current_User;
 
+		$params = array_merge( array(
+				'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
+				'container_start' => '',
+				'container_end'   => '',
+			), $params );
+
 		$timer_name = 'skin_container('.$sco_name.')';
 		$Timer->start( $timer_name );
+
+		// Get container code from container name:
+		$container_code = preg_replace( '/[^a-z\d]+/', '_', strtolower( $sco_name ) );
+
+		// Start to get content of widgets:
+		ob_start();
 
 		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
@@ -342,6 +358,22 @@ class Skin extends DataObject
 			echo '</div>';
 		}
 
+		// Store content of widgets to var in order to display them in container wrapper:
+		$container_widgets_content = ob_get_clean();
+
+		if( $params['container_display_if_empty'] || ! empty( $Widget_array ) )
+		{	// Display container wrapper with widgets content if it is not empty or we should display it anyway:
+
+			// Display start of container wrapper:
+			echo str_replace( '$wico_class$', 'evo_container__'.str_replace( ' ', '_', $container_code ), $params['container_start'] );
+
+			// Display widgets of the container:
+			echo $container_widgets_content;
+
+			// Display end of container wrapper:
+			echo $params['container_end'];
+		}
+
 		$Timer->pause( $timer_name );
 	}
 
@@ -357,7 +389,19 @@ class Skin extends DataObject
 	{
 		global $skins_path, $Messages;
 
-		if( ! $dir = @opendir( $skins_path.$folder ) )
+		if( empty( $folder ) )
+		{	// Get files from fallback skins folder:
+			global $basepath;
+			$skin_folder = $this->get_api_version() == 6 ? 'skins_fallback_v6' : 'skins_fallback_v5';
+			$skin_path = $basepath.$skin_folder;
+		}
+		else
+		{	// Get files from given skin folder:
+			$skin_folder = $folder;
+			$skin_path = $skins_path.$skin_folder;
+		}
+
+		if( ! $dir = @opendir( $skin_path ) )
 		{ // Skin directory not found!
 			$Messages->add( T_('Cannot open skin directory.'), 'error' ); // No trans
 			return false;
@@ -374,8 +418,7 @@ class Skin extends DataObject
 				continue;
 			}
 
-			$rf_main_subpath = trim( $folder.'/'.$file, '/' );
-			$af_main_path = $skins_path.$rf_main_subpath;
+			$af_main_path = $skin_path.'/'.$file;
 
 			if( !is_file( $af_main_path ) || ! preg_match( '~\.php$~', $file ) )
 			{ // Not a php template file, go to next:
@@ -384,37 +427,29 @@ class Skin extends DataObject
 
 			if( ! is_readable( $af_main_path ) )
 			{ // Cannot open PHP file:
-				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $skin_folder.'/'.$file ), 'error', T_('File read error:') );
 				continue;
 			}
 
 			$file_contents = @file_get_contents( $af_main_path );
 			if( ! is_string( $file_contents ) )
 			{ // Cannot get contents:
-				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $skin_folder.'/'.$file ), 'error', T_('File read error:') );
 				continue;
 			}
 
-			$files[] = $files;
+			$files[] = $file;
 
 			// DETECT if the file contains containers:
 			// if( ! preg_match_all( '~ \$Skin->container\( .*? (\' (.+?) \' )|(" (.+?) ") ~xmi', $file_contents, $matches ) )
-			if( ! preg_match_all( '~ (\$Skin->|skin_)container\( .*? ((\' (.+?) \')|(" (.+?) ")) ~xmi', $file_contents, $matches ) )
+			if( ! preg_match_all( '~ (\$Skin->|skin_)container\( .*? ([\'"] (.+?) [\'"]) ~xmi', $file_contents, $matches ) )
 			{ // No containers in this file, go to next:
 				continue;
 			}
 
-			// Merge matches from the two regexp parts (due to regexp "|" )
-			$container_list = array_merge( $matches[4], $matches[6] );
-
 			$c = 0;
-			foreach( $container_list as $container )
+			foreach( $matches[3] as $container )
 			{
-				if( empty( $container ) )
-				{ // regexp empty match -- NOT a container:
-					continue;
-				}
-
 				// We have one more container:
 				$c++;
 
@@ -428,7 +463,7 @@ class Skin extends DataObject
 
 			if( $c )
 			{
-				$Messages->add_to_group( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $rf_main_subpath ), 'success', sprintf( T_('Containers found in skin "%s":'), $folder ) );
+				$Messages->add_to_group( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $skin_folder.'/'.$file ), 'success', sprintf( T_('Containers found in skin "%s":'), $skin_folder ) );
 			}
 		}
 
@@ -615,7 +650,7 @@ class Skin extends DataObject
 		}
 
 		// Display skinshot:
-		echo '<div class="'.$disp_params['skinshot_class'].'"'.( $disp_params['highlighted'] ? ' id="fadeout-'.$skin_folder : '' ).'">';
+		echo '<div class="'.$disp_params['skinshot_class'].( $disp_params['highlighted'] ? ' evo_highlight' : '' ).'">';
 		echo '<div class="skinshot_placeholder';
 		if( $disp_params[ 'selected' ] )
 		{
@@ -678,6 +713,23 @@ class Skin extends DataObject
 					{
 						echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
 						echo T_('Install NOW!').'</a>';
+					}
+					if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
+					{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
+						$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
+						$skin_name_after = '</label>';
+					}
+					break;
+
+				case 'upgrade':
+					$link_text = T_('Upgrade NOW!');
+				case 'downgrade':
+					if( empty( $link_text ) ) $link_text = T_('Downgrade NOW!');
+
+					if( ! empty( $skin_url ) )
+					{
+						echo '<a href="'.$skin_url.'" title="'.$link_text.'">';
+						echo $link_text.'</a>';
 					}
 					if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
 					{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
@@ -752,7 +804,7 @@ class Skin extends DataObject
 			return $value;
 		}
 
-		return $this->get_setting_default_value( $parname, $group );
+		return $this->get_setting_default_value( $group.$parname, $group );
 	}
 
 
@@ -765,6 +817,11 @@ class Skin extends DataObject
 	 */
 	function get_setting_default_value( $parname, $group = NULL )
 	{
+		if( ! empty ( $group ) )
+		{
+			$parname = substr( $parname, strlen( $group ) );
+		}
+
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
 		if( isset( $params[ $parname ]['defaultvalue'] ) )
@@ -1906,96 +1963,96 @@ var downloadInterval = setInterval( function()
 	}
 
 
-    /**
-     * Web safe fonts for default skin usage
-     *
-     * Used for font customization
-     */
-    private $font_definitions = array(
-        'system_arial' => array( 'Arial', 'Arial, Helvetica, sans-serif' ),
-        'system_arialblack' => array( 'Arial Black', '\'Arial Black\', Gadget, sans-serif' ),
-        'system_arialnarrow' => array( 'Arial Narrow', '\'Arial Narrow\', sans-serif' ),
-        'system_centrygothic' => array( 'Century Gothic', 'Century Gothic, sans-serif' ),
-        'system_copperplategothiclight' => array( 'Copperplate Gothic Light', 'Copperplate Gothic Light, sans-serif' ),
-        'system_couriernew' => array( 'Courier New', '\'Courier New\', Courier, monospace' ),
-        'system_georgia' => array( 'Georgia', 'Georgia, Serif' ),
-        'system_helveticaneue' => array( 'Helvetica Neue', '\'Helvetica Neue\',Helvetica,Arial,sans-serif' ),
-        'system_impact' => array( 'Impact', 'Impact, Charcoal, sans-serif' ),
-        'system_lucidaconsole' => array( 'Lucida Console', '\'Lucida Console\', Monaco, monospace' ),
-        'system_lucidasansunicode' => array( 'Lucida Sans Unicode', '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif' ),
-        'system_palatinolinotype' => array( 'Palatino Linotype', '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif' ),
-        'system_tahoma' => array( 'Tahoma', 'Tahoma, Geneva, sans-serif' ),
-        'system_timesnewroman' => array( 'Times New Roman', '\'Times New Roman\', Times, serif' ),
-        'system_trebuchetms' => array( 'Trebuchet MS', '\'Trebuchet MS\', Helvetica, sans-serif' ),
-        'system_verdana' => array( 'Verdana', 'Verdana, Geneva, sans-serif' ),
-    );
+	/**
+	 * Web safe fonts for default skin usage
+	 *
+	 * Used for font customization
+	 */
+	private $font_definitions = array(
+			'system_arial' => array( 'Arial', 'Arial, Helvetica, sans-serif' ),
+			'system_arialblack' => array( 'Arial Black', '\'Arial Black\', Gadget, sans-serif' ),
+			'system_arialnarrow' => array( 'Arial Narrow', '\'Arial Narrow\', sans-serif' ),
+			'system_centrygothic' => array( 'Century Gothic', 'Century Gothic, sans-serif' ),
+			'system_copperplategothiclight' => array( 'Copperplate Gothic Light', 'Copperplate Gothic Light, sans-serif' ),
+			'system_couriernew' => array( 'Courier New', '\'Courier New\', Courier, monospace' ),
+			'system_georgia' => array( 'Georgia', 'Georgia, Serif' ),
+			'system_helveticaneue' => array( 'Helvetica Neue', '\'Helvetica Neue\',Helvetica,Arial,sans-serif' ),
+			'system_impact' => array( 'Impact', 'Impact, Charcoal, sans-serif' ),
+			'system_lucidaconsole' => array( 'Lucida Console', '\'Lucida Console\', Monaco, monospace' ),
+			'system_lucidasansunicode' => array( 'Lucida Sans Unicode', '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif' ),
+			'system_palatinolinotype' => array( 'Palatino Linotype', '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif' ),
+			'system_tahoma' => array( 'Tahoma', 'Tahoma, Geneva, sans-serif' ),
+			'system_timesnewroman' => array( 'Times New Roman', '\'Times New Roman\', Times, serif' ),
+			'system_trebuchetms' => array( 'Trebuchet MS', '\'Trebuchet MS\', Helvetica, sans-serif' ),
+			'system_verdana' => array( 'Verdana', 'Verdana, Geneva, sans-serif' ),
+		);
 
 
-    /**
-     * Returns an option list for font customization
-     *
-     * Uses: $this->font_definitions
-     */
-    function get_font_definitions()
-    {
-        // Pull font array keys
-        $font_options = array_keys($this->font_definitions);
+	/**
+	 * Returns an option list for font customization
+	 *
+	 * Uses: $this->font_definitions
+	 */
+	function get_font_definitions()
+	{
+		// Pull font array keys
+		$font_options = array_keys($this->font_definitions);
 
-        // Pull first value from each array key
-        $font_names = array();
-        foreach ($this->font_definitions as $f) {
-            $font_names[] = current($f);
-        }
+		// Pull first value from each array key
+		$font_names = array();
+		foreach ($this->font_definitions as $f) {
+				$font_names[] = current($f);
+		}
 
-        // Create array in format: 'system_arial' => 'arial', etc.
-        $dropdown_option_list = array_combine($font_options, $font_names);
+		// Create array in format: 'system_arial' => 'arial', etc.
+		$dropdown_option_list = array_combine($font_options, $font_names);
 
-        return $dropdown_option_list;
-    }
+		return $dropdown_option_list;
+	}
 
 
-    /**
-     * Returns a CSS code for font customization
-     *
-     * Uses: $this->font_definitions
-     */
-    function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL, $font_weight_param = NULL )
-    {
+	/**
+	 * Returns a CSS code for font customization
+	 *
+	 * Uses: $this->font_definitions
+	 */
+	function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL, $font_weight_param = NULL, $group = NULL )
+	{
 		$font_css = array();
 
 		// Get default font family and font-weight
-		$default_font_family = $this->get_setting_default_value( $font_family_param );
-		$default_font_weight = $this->get_setting_default_value( $font_weight_param );
+		$default_font_family = $this->get_setting_default_value( $font_family_param, $group );
+		$default_font_weight = $this->get_setting_default_value( $font_weight_param, $group );
 
-        // Select the font family CSS string
-		$selected_font_family = $this->get_setting( $font_family_param );
+		// Select the font family CSS string
+		$selected_font_family = $this->get_setting( $font_family_param, $group );
 		if( $selected_font_family != $default_font_family )
 		{
-			$selected_font_css = $this->font_definitions[$selected_font_family][1];
+			$selected_font_css = isset( $this->font_definitions[$selected_font_family] ) ? $this->font_definitions[$selected_font_family] : $this->font_definitions[$default_font_family];
 			$font_css[] = "font-family: $selected_font_css;";
 		}
 
 		// If $text_size_param is passed, add font-size property
 		if( ! is_null( $text_size_param ) )
 		{
-			$selected_text_size = $this->get_setting( $text_size_param );
+			$selected_text_size = $this->get_setting( $text_size_param, $group );
 			$font_css[] = 'font-size: '.$selected_text_size.';';
 		}
 
 		// If $font_weight_param is passed, add font-weight property
 		if( ! is_null( $font_weight_param ) )
 		{
-			$selected_font_weight = $this->get_setting( $font_weight_param );
+			$selected_font_weight = $this->get_setting( $font_weight_param, $group );
 			if( $selected_font_weight != $default_font_weight )
 			{
 				$font_css[] = 'font-weight: '.$selected_font_weight.';';
 			}
 		}
 
-        // Prepare the complete CSS for font customization
+		// Prepare the complete CSS for font customization
 		if( ! empty( $font_css ) )
 		{
-        	$custom_css = "$target_element { ".implode( ' ', $font_css )." }\n";
+			$custom_css = $target_element.' { '.implode( ' ', $font_css )." }\n";
 		}
 		else
 		{
@@ -2003,7 +2060,31 @@ var downloadInterval = setInterval( function()
 		}
 
 		return $custom_css;
-    }
+	}
+
+
+	/**
+	 * Check if we can display a widget container when access is denied to collection by current user
+	 *
+	 * NOTE: To use this function your skin must has a checklist setting 'access_login_containers' with options of widget container keys
+	 *
+	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
+	 * @return boolean TRUE to display
+	 */
+	function show_container_when_access_denied( $container_key )
+	{
+		global $Collection, $Blog;
+
+		if( $Blog->has_access() )
+		{	// If current user has an access to this collection then don't restrict containers:
+			return true;
+		}
+
+		// Get what containers are available for this skin when access is denied or requires login:
+		$access = $this->get_setting( 'access_login_containers' );
+
+		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
+	}
 }
 
 ?>

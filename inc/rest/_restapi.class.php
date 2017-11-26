@@ -437,7 +437,7 @@ class RestApi
 			$SQL->SELECT( '*' );
 			$SQL->FROM( 'T_blogs' );
 			$SQL->ORDER_BY( $sql_order_by );
-			$count_SQL = new SQL();
+			$count_SQL = new SQL( 'Get a count of collections for search request' );
 			$count_SQL->SELECT( 'COUNT( blog_ID )' );
 			$count_SQL->FROM( 'T_blogs' );
 			$count_SQL->ORDER_BY( $sql_order_by );
@@ -514,7 +514,7 @@ class RestApi
 				$count_SQL->WHERE_and( $restrict_available_fileroots_sql );
 			}
 
-			$result_count = intval( $DB->get_var( $count_SQL->get(), 0, NULL, 'Get a count of collections for search request' ) );
+			$result_count = intval( $DB->get_var( $count_SQL ) );
 		}
 
 		// Prepare pagination:
@@ -1254,6 +1254,9 @@ class RestApi
 		// Get param to limit number users per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
 
+		// Get user list params:
+		$api_list_params = param( 'list_params', 'array:string', array() );
+
 		// Alias for filter param 'keywords':
 		$api_q = param( 'q', 'string', NULL );
 		if( $api_q !== NULL )
@@ -1263,8 +1266,7 @@ class RestApi
 
 		// Create result set:
 		load_class( 'users/model/_userlist.class.php', 'UserList' );
-		$UserList = new UserList( 'api_', $api_per_page, '' );
-
+		$UserList = new UserList( 'api_', $api_per_page, '', $api_list_params );
 		$UserList->load_from_Request();
 
 		if( ! empty( $user_filters ) )
@@ -2343,4 +2345,44 @@ class RestApi
 
 
 	/**** MODULE LINKS ---- END ****/
+
+	/**** MODULE TOOLS ---- START ****/
+
+	/**
+	 * Call module to prepare request for tools
+	 */
+	private function module_tools()
+	{
+		if( empty( $this->args[1] ) )
+		{
+			$this->halt( 'Missing tool controller', 'wrong_request', 405 );
+		}
+		else
+		{
+			$tool_controller = $this->args[1];
+
+			if( ! method_exists( $this, 'controller_tool_'.$tool_controller ) )
+			{	// Unknown controller:
+				$this->halt( 'Unknown link controller "'.$tool_controller.'"', 'unknown_controller' );
+				// Exit here.
+			}
+
+			// Call collection controller to prepare current request:
+			$this->{'controller_tool_'.$tool_controller}();
+		}
+	}
+
+
+	/**
+	 * Call tool controller to get available urlname
+	 */
+	private function controller_tool_available_urlname()
+	{
+		$urlname = param( 'urlname', 'string' );
+
+		$this->add_response( 'base', $urlname );
+		$this->add_response( 'urlname', urltitle_validate( $urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
+	}
+
+	/**** MODULE TOOLS ---- END ****/
 }

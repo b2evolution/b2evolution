@@ -301,6 +301,7 @@ function & get_UserFieldCache()
 
 	if( ! isset( $UserFieldCache ) )
 	{	// Cache doesn't exist yet:
+		load_class( 'users/model/_userfield.class.php', 'Userfield' );
 		$UserFieldCache = new DataObjectCache( 'Userfield', false, 'T_users__fielddefs', 'ufdf_', 'ufdf_ID', 'ufdf_name', 'ufdf_name' ); // COPY (FUNC)
 	}
 
@@ -857,7 +858,15 @@ class _core_Module extends Module
 	 */
 	function check_core_group_perm( $permlevel, $permvalue, $permtarget )
 	{
+		global $current_User;
+
 		$perm = false;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'admin', 'normal' ) )
+		{	// Current user must has Normal Back-office Access to view/moderate/edit other users:
+			return $perm;
+		}
+
 		switch ( $permvalue )
 		{
 			case 'edit':
@@ -1271,10 +1280,6 @@ class _core_Module extends Module
 
 			if( $perm_admin_restricted && $working_blog )
 			{
-				if( empty( $write_item_url ) && empty( $edit_item_url ) && empty( $view_item_url ) )
-				{	// Display a restricted message to create new post on this collection:
-					$entries['post']['title'] = T_('You don\'t have permission to post into this blog');
-				}
 
 				// BLOG MENU:
 				$entries['blog'] = array(
@@ -1305,15 +1310,15 @@ class _core_Module extends Module
 					if( $Blog->get( 'type' ) == 'manual' )
 					{ // Manual view
 						global $cat, $Item;
-						if( ! empty( $cat ) && is_number( $cat ) )
-						{	// Set category param from current selected category:
-							$manual_view_cat_param = '&amp;cat_ID='.$cat;
-						}
-						elseif( ! empty( $Item ) &&
+						if( ! empty( $Item ) &&
 						        $Item->ID > 0 &&
 						        ( $item_Chapter = & $Item->get_main_Chapter() ) )
 						{	// Set category param from current selected item/post:
-							$manual_view_cat_param = '&amp;cat_ID='.$item_Chapter->ID;
+							$manual_view_cat_param = '&amp;cat_ID='.$item_Chapter->ID.'&amp;highlight_id='.$Item->ID;
+						}
+						elseif( ! empty( $cat ) && is_number( $cat ) )
+						{	// Set category param from current selected category:
+							$manual_view_cat_param = '&amp;cat_ID='.$cat.'&amp;highlight_cat_id='.$cat;
 						}
 						else
 						{	// No selected category and item/post:
@@ -1390,6 +1395,14 @@ class _core_Module extends Module
 									'comments' => array(
 											'text' => T_('Comments').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments'.$blog_param,
+										),
+									'contact' => array(
+											'text' => T_('Contact form').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=contact'.$blog_param,
+										),
+									'userdir' => array(
+											'text' => T_('User directory').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir'.$blog_param,
 										),
 									'other' => array(
 											'text' => T_('Other displays').'&hellip;',
@@ -1496,20 +1509,19 @@ class _core_Module extends Module
 		if( ! is_admin_page() && ! empty( $Blog ) )
 		{	// Only front-office collection pages:
 
-
-			// Display an option to turn on/off containers display:
-			global $Session;
-			$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
-			$entries['containers'] = array(
-				'text'        => '<span class="fa fa-cubes"></span> '.T_('Widgets'),
-				'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
-				'entry_class' => 'rwdhide',
-				'class'       => ( $containers_status ? 'active' : '' ),
-			);
-
-
 			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// If current user has an access to back-office and to edit collection properties:
+
+				// Display an option to turn on/off containers display:
+				global $Session;
+				$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
+				$entries['containers'] = array(
+					'text'        => '<span class="fa fa-cubes"></span> '.T_('Widgets'),
+					'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
+					'entry_class' => 'rwdhide',
+					'class'       => ( $containers_status ? 'active' : '' ),
+				);
+
 				$entries['skin'] = array(
 					'text' => '<span class="fa fa-sliders"></span> '.T_('Skin'),
 					'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID,
@@ -1530,6 +1542,9 @@ class _core_Module extends Module
 						break;
 					case 'comments':
 						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$Blog->ID;
+						break;
+					case 'msgform':
+						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=contact&amp;blog='.$Blog->ID;
 						break;
 					case 'users':
 						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$Blog->ID;

@@ -690,23 +690,35 @@ class Plugins
 		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 
 		if( $set_type == 'Settings' )
-		{	// If general settings are requested we should also append messages and emails settings:
-			if( empty( $defaults ) )
-			{
+		{	// If general settings are requested we should also append custom, collection, widgets, messages and emails settings:
+			if( ! is_array( $defaults ) )
+			{	// Initialize array for default settings:
 				$defaults = array();
 			}
+
+			// Initialize object for Settings temporary because it may be used in the functions below to get default values:
+			load_class( 'plugins/model/_pluginsettings.class.php', 'PluginSettings' );
+			$Plugin->Settings = new PluginSettings( $Plugin->ID );
+
+			$defaults = array_merge( $defaults, $Plugin->get_custom_setting_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_msg_setting_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_email_setting_definitions( $params ) );
+
+			// Check what other settings are defined for the Plugin,
+			// We should not merge them with $defaults because they are stored in different DB table,
+			// I.e. they are should be initialized in $Plugin->Settings, but we still need this object for a proper settings work:
+			$other_defaults = $Plugin->get_coll_setting_definitions( $params );
+			$other_defaults = array_merge( $other_defaults, $Plugin->get_widget_param_definitions( $params ) );
 		}
 
-		if( empty( $defaults ) )
-		{ // No settings, no need to instantiate.
+		if( empty( $defaults ) && empty( $other_defaults ) )
+		{	// No settings, no need to instantiate:
 			$Timer->pause( 'plugins_inst_'.$set_type );
 			return NULL;
 		}
 
-		if( ! is_array($defaults) )
-		{ // invalid data
+		if( ! is_array( $defaults ) )
+		{	// Invalid format of default settings:
 			$Debuglog->add( $Plugin->classname.'::GetDefault'.$set_type.'() did not return array!', array('plugins', 'error') );
 			return NULL; // fp> correct me if I'm wrong.
 		}
@@ -1510,11 +1522,11 @@ class Plugins
 
 		$Debuglog->add( sprintf( 'Loading plugin %s by class name.', $classname ), 'plugins' );
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Load Plugin data by class name' );
 		$SQL->SELECT( 'plug_ID, plug_priority, plug_classname, plug_code, plug_name, plug_shortdesc, plug_status, plug_version, plug_spam_weight' );
 		$SQL->FROM( 'T_plugins' );
 		$SQL->WHERE( 'plug_classname = '.$DB->quote( $classname ) );
-		if( $plugin = $DB->get_row( $SQL->get(), ARRAY_A ) )
+		if( $plugin = $DB->get_row( $SQL, ARRAY_A ) )
 		{
 			if( isset( $this->index_ID_rows[$plugin['plug_ID']] ) )
 			{ // Plugin already was loaded before

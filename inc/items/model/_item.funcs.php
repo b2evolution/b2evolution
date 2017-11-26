@@ -242,9 +242,10 @@ function init_inskin_editing()
  *                 "*": all blogs
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
+ * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
  * @return Item
  */
-function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
+function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false )
 {
 	global $Collection, $Blog, $cat;
 	global $disp, $disp_detail, $MainList, $FeaturedList;
@@ -328,31 +329,39 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		// SECOND: If no Intro, try to find an Featured post:
 
 		if( isset($Blog) )
+		{
+			if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
+				&& isset($Blog)
+				&& $Blog->get_setting('disp_featured_above_list') )
+			{ // No Intro page was found, try to find a featured post instead:
 
-		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
-			&& isset($Blog)
-			&& $Blog->get_setting('disp_featured_above_list') )
-		{ // No Intro page was found, try to find a featured post instead:
+				$FeaturedList->reset();
 
-			$FeaturedList->reset();
+				$FeaturedList->set_filters( array(
+						'coll_IDs' => $coll_IDs,
+						'featured' => 1,  // Featured posts only
+						// Types will already be reset to defaults here
+					), false /* Do NOT memorize!! */ );
 
-			$FeaturedList->set_filters( array(
-					'coll_IDs' => $coll_IDs,
-					'featured' => 1,  // Featured posts only
-					// Types will already be reset to defaults here
-				), false /* Do NOT memorize!! */ );
-
-			// Run the query:
-			$FeaturedList->query();
+				// Run the query:
+				$FeaturedList->query();
+			}
 		}
 	}
 
 	// Get first Item in the result set.
-	$Item = $FeaturedList->get_item();
+	if( $preview )
+	{ // We only want want a preview of the first item
+		$Item = $FeaturedList->get_by_idx( 0 );
+	}
+	else
+	{
+		$Item = $FeaturedList->get_item();
 
-	if( $Item )
-	{	// Memorize that ID so that it can later be filtered out of normal display:
-		$featured_displayed_item_IDs[] = $Item->ID;
+		if( $Item )
+		{	// Memorize that ID so that it can later be filtered out of normal display:
+			$featured_displayed_item_IDs[] = $Item->ID;
+		}
 	}
 
 	return $Item;
@@ -374,11 +383,12 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
  * @param string The name of the post ID column
  * @param string The name of the DB table to use
  * @param NULL|string The post locale or NULL if there is no specific locale.
+ * @param NULL|string The name of the DB table to use in the message
  * @return string validated url title
  */
 function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
 									$dbSlugFieldName = 'post_urltitle', $dbIDname = 'post_ID',
-									$dbtable = 'T_items__item', $post_locale = NULL )
+									$dbtable = 'T_items__item', $post_locale = NULL, $msg_dbtable = NULL )
 {
 	global $DB, $Messages;
 
@@ -507,7 +517,38 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	if( !empty($orig_title) && $urltitle != $orig_title )
 	{
-		$Messages->add( sprintf(T_('Warning: the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'note' );
+		$msg_table = ! empty( $msg_dbtable ) ? $msg_dbtable : $dbtable;
+		switch( $msg_table )
+		{
+			case 'T_items__item':
+				// post_urltitle
+				$field_type = T_('Post');
+				break;
+
+			case 'T_categories':
+				// cat_urlname
+				$field_type = T_('Category');
+				break;
+
+			case 'T_blogs':
+				// blog_urlname
+				$field_type = T_('Collection');
+				break;
+
+			case 'T_slug':
+				// slug_title
+				$field_type = T_('Slug');
+				break;
+		}
+
+		if( isset( $field_type ) )
+		{
+			$Messages->add_to_group( sprintf( /* TRANS: First %s gets replaced by field type, 2nd %s by title, 3rd %s by urltitle */ T_('URL slug for %s &laquo;%s&raquo; has been changed to &laquo;%s&raquo;.'), $field_type, $title, $urltitle ), 'note', T_('Warning: URL slugs changed:' ) );
+		}
+		else
+		{
+			$Messages->add_to_group( sprintf( T_('URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'note', T_('Warning: URL slugs changed:' ) );
+		}
 	}
 
 	return $urltitle;
@@ -4179,7 +4220,7 @@ function items_manual_results_block( $params = array() )
 
 	$Table = new Table( 'Results', $params['results_param_prefix'] );
 
-	$Table->title = T_('Manual view');
+	$Table->title = T_('Manual view').get_manual_link( 'manual-pages-editor' );
 
 	// Redirect to manual pages after adding chapter
 	$redirect_page = '&amp;redirect_page=manual';
@@ -4233,7 +4274,7 @@ function items_manual_results_block( $params = array() )
 	$Table->display_list_end();
 
 	// Flush fadeout
-	$Session->delete( 'fadeout_array');
+	$Session->delete( 'fadeout_array' );
 
 	echo $Table->params['content_end'];
 
@@ -4304,7 +4345,7 @@ function items_created_results_block( $params = array() )
 	$created_items_Results->no_results_text = $params['results_no_text'];
 
 	// Get a count of the post which current user can delete
-	$deleted_posts_created_count = count( $edited_User->get_deleted_posts( 'created' ) );
+	$deleted_posts_created_count = $edited_User->get_deleted_posts2( 'created', true );
 	if( ( $created_items_Results->get_total_rows() > 0 ) && ( $deleted_posts_created_count > 0 ) )
 	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one item created by user
 		$created_items_Results->global_icon( sprintf( T_('Delete all post created by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_posts_created&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
@@ -4386,6 +4427,8 @@ function items_edited_results_block( $params = array() )
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
 
+	/*
+	// erhsatingin > This query can be quite slow with very large datasets
 	$edited_versions_SQL = new SQL();
 	$edited_versions_SQL->SELECT( 'DISTINCT( iver_itm_ID )' );
 	$edited_versions_SQL->FROM( 'T_items__version' );
@@ -4396,6 +4439,16 @@ function items_edited_results_block( $params = array() )
 	$SQL->FROM( 'T_items__item ' );
 	$SQL->WHERE( '( ( post_lastedit_user_ID = '.$DB->quote( $edited_User->ID ).' ) OR ( post_ID IN ( '.$edited_versions_SQL->get().' ) ) )' );
 	$SQL->WHERE_and( 'post_creator_user_ID != '.$DB->quote( $edited_User->ID ) );
+	*/
+
+	// erhsatingin > still slow but faster than above query
+	$SQL = new SQL();
+	$SQL->SELECT( '*' );
+	$SQL->FROM( 'T_items__item' );
+	$SQL->FROM_add( 'LEFT JOIN ( SELECT iver_itm_ID, COUNT(*) AS counter FROM T_items__version WHERE iver_edit_user_ID = '
+			.$DB->quote( $edited_User->ID ).' GROUP BY iver_itm_ID ) AS a ON a.iver_itm_ID = post_ID' );
+	$SQL->WHERE( '( post_lastedit_user_ID = '.$DB->quote( $edited_User->ID ).' OR a.counter IS NOT NULL )' );
+	$SQL->WHERE_and( 'post_creator_user_ID != '.$DB->quote( $edited_User->ID ) );
 
 	// Create result set:
 	$edited_items_Results = new Results( $SQL->get(), $params['results_param_prefix'], 'D' );
@@ -4404,7 +4457,7 @@ function items_edited_results_block( $params = array() )
 	$edited_items_Results->no_results_text = $params['results_no_text'];
 
 	// Get a count of the post which current user can delete
-	$deleted_posts_edited_count = count( $edited_User->get_deleted_posts( 'edited' ) );
+	$deleted_posts_edited_count = $edited_User->get_deleted_posts2( 'edited', true );
 	if( ( $edited_items_Results->get_total_rows() > 0 ) && ( $deleted_posts_edited_count > 0 ) )
 	{	// Display actino icon to delete all records if at least one record exists & current user can delete at least one item created by user
 		$edited_items_Results->global_icon( sprintf( T_('Delete all post edited by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_posts_edited&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
@@ -4531,7 +4584,7 @@ function load_user_data_for_items( $post_ids = NULL )
 	$SQL->WHERE( 'itud_user_ID = '.$DB->quote( $current_User->ID ) );
 	$SQL->WHERE_and( $post_condition );
 	// Set those post read statuses which were opened before:
-	$data_rows = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+	$data_rows = $DB->get_results( $SQL, ARRAY_A );
 
 	if( empty( $post_ids ) )
 	{	// The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user:
@@ -4575,7 +4628,7 @@ function get_item_numviews( $Item )
 	$SQL->FROM( 'T_items__user_data' );
 	$SQL->WHERE( 'itud_item_ID = '.$Item->ID );
 
-	return $DB->get_var( $SQL->get() );
+	return $DB->get_var( $SQL );
 }
 
 
@@ -4662,7 +4715,7 @@ function items_results( & $items_Results, $params = array() )
 				'order' => $params['field_prefix'].'title',
 				'td_class' => 'tskst_$post_pst_ID$',
 				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].' )%</strong>'.
-				        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@' : '' ),
+				        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\', \'\', NULL, array( \'none\' ) )@' : '' ),
 			);
 	}
 
@@ -5073,7 +5126,11 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	// Redirect to manual pages after adding/editing chapter
 	$redirect_page = '&amp;redirect_page=manual';
 
-	$r = '<tr id="cat-'.$Chapter->ID.'" class="'.$line_class.( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">';
+	// Check if current item's row should be highlighted:
+	$is_highlighted = ( param( 'highlight_cat_id', 'integer', NULL ) == $Chapter->ID ) ||
+		( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) );
+
+	$r = '<tr id="cat-'.$Chapter->ID.'" class="'.$line_class.( $is_highlighted ? ' evo_highlight' : '' ).'">';
 
 	$open_url = $admin_url.'?ctrl=items&amp;tab=manual&amp;blog='.$Chapter->blog_ID;
 	// Name
@@ -5183,7 +5240,11 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
-	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">';
+	// Check if current item's row should be highlighted:
+	$is_highlighted = ( param( 'highlight_id', 'integer', NULL ) == $Item->ID ) ||
+		( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) );
+
+	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( $is_highlighted ? ' evo_highlight' : '' ).'">';
 
 	// Title
 	$edit_url = $Item->ID;

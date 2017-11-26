@@ -390,6 +390,19 @@ function redirect_after_account_activation()
 {
 	global $Settings, $Session, $baseurl;
 
+	if( $Settings->get( 'pass_after_quick_reg' ) )
+	{	// Check if we should redirect to password setting page if no password has been set yet (email capture/quick registration):
+		global $current_User;
+		if( ! is_logged_in() )
+		{	// Try to log in if activation URL is opened for not logged in user yet (e-g for easy activation process):
+			$current_User = & $Session->get_User();
+		}
+		if( is_logged_in() && $current_User->get( 'pass_driver' ) == 'nopass' )
+		{	// If user was registered without password:
+			return get_user_pwdchange_url();
+		}
+	}
+
 	// Get general "Users setting" to determine if we want to return to original page after account activation or to a specific url:
 	$redirect_to = $Settings->get( 'after_email_validation' );
 	if( $redirect_to == 'return_to_original' )
@@ -401,6 +414,10 @@ function redirect_after_account_activation()
 		{ // session redirect_to was not set, initialize $redirect_to to the home page
 			$redirect_to = $baseurl;
 		}
+
+		// Cleanup:
+		$Session->delete( 'core.activateacc.request_ids' );
+		$Session->delete( 'core.activateacc.redirect_to' );
 	}
 
 	return $redirect_to;
@@ -1196,7 +1213,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 	if( $is_admin_page || $is_admin_tab || empty( $current_Blog ) || $current_User->ID != $user_ID )
 	{
 		if( ( $current_User->ID != $user_ID && ! $current_User->check_perm( 'users', 'view' ) ) ||
-		    ( ! $current_User->check_perm( 'admin', 'restricted' ) || ! $current_User->check_status( 'can_access_admin' ) ) )
+				( ! $current_User->check_perm( 'admin', 'restricted' ) || ! $current_User->check_status( 'can_access_admin' ) ) )
 		{ // Use blog url when user has no access to backoffice
 			if( empty( $current_Blog ) )
 			{ // Check if system has at least one blog
@@ -1467,7 +1484,7 @@ function profile_check_params( $params, $User = NULL )
 		else
 		{
 			param_check_valid_login( $dummy_fields[ $params['login'][1] ] );
-			
+
 			if( param_check_valid_login( $dummy_fields[ $params['login'][1] ] ) )
 			{	// If login is valid
 				global $reserved_logins, $current_User;
@@ -2369,7 +2386,7 @@ function check_coll_first_perm( $perm_name, $target_type, $target_ID )
 	$SQL->WHERE_and( $field_perm_name.' = 1' );
 	$SQL->LIMIT( 1 );
 
-	return (bool)$DB->get_var( $SQL->get(), 0 , NULL, $SQL->title );
+	return (bool)$DB->get_var( $SQL );
 }
 
 
@@ -2490,7 +2507,7 @@ function get_user_sub_entries( $is_admin, $user_ID )
 							'text' => T_('Notifications'),
 							'href' => url_add_param( $base_url, $ctrl_param.'subs'.$user_param ) );
 
-		if( $Settings->get( 'enable_visit_tracking' ) == 1 )
+		if( $is_admin && $Settings->get( 'enable_visit_tracking' ) == 1 )
 		{
 			$users_sub_entries['visits'] = array(
 								'text' => T_('Visits'),
@@ -2790,11 +2807,13 @@ function update_user_email_counter( $limit_setting, $last_email_setting, $user_I
  *
  * @param array user ids to send validation email
  * @param boolean true if this email is an account activation reminder, false if the account status was changed right now
+ * @param boolean TRUE if user email is changed
+ * @param string URL, where to redirect the user after he clicked the validation link (gets saved in Session).
  * @return integer the number of successfully sent emails
  */
-function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false )
+function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false, $redirect_to_after = NULL )
 {
-	global $UserSettings, $servertimenow;
+	global $UserSettings, $Session, $servertimenow;
 
 	$UserCache = & get_UserCache();
 
@@ -2871,6 +2890,12 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 			}
 			$UserSettings->dbupdate();
 		}
+	}
+
+	if( $email_sent && isset( $Session ) && $redirect_to_after !== NULL )
+	{	// Set a redirect_to session variable because this way after the account will be activated we will know where to redirect
+		$Session->set( 'core.activateacc.redirect_to', $redirect_to_after  );
+		$Session->dbsave(); // save immediately
 	}
 
 	return $email_sent;
@@ -3205,21 +3230,29 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 
 
 /**
- * Prepare some data for Userfield
+ * Prepare some data of Userfield to html output
  *
- * @param Userfield
+ * @param object User field
  */
 function userfield_prepare( & $userfield )
 {
-	$userfield->uf_varchar = format_to_output( $userfield->uf_varchar, 'formvalue' );
-	if( $userfield->ufdf_type == 'url' )
-	{	// Prepare value for url field
-		$url = $userfield->uf_varchar;
-		if( !preg_match('#://#', $url) )
-		{
-			$url = 'http://'.$url;
-		}
-		$userfield->uf_varchar = '<a href="'.$url.'" target="_blank" rel="nofollow">'.$userfield->uf_varchar.'</a>';
+	$userfield->uf_varchar = format_to_output( $userfield->uf_varchar, 'htmlspecialchars' );
+
+	switch( $userfield->ufdf_type )
+	{
+		case 'url':
+			// Prepare value for url field
+			$url = $userfield->uf_varchar;
+			if( ! preg_match( '#://#', $url ) )
+			{
+				$url = 'http://'.$url;
+			}
+			$userfield->uf_varchar = '<a href="'.$url.'" target="_blank" rel="nofollow">'.$userfield->uf_varchar.'</a>';
+			break;
+
+		case 'text':
+			$userfield->uf_varchar = nl2br( $userfield->uf_varchar );
+			break;
 	}
 }
 
@@ -3707,7 +3740,7 @@ function get_report_from( $user_ID )
 
 
 /**
- * Get an array of user IDs who reported for goven user
+ * Get an array of user IDs who reported for given user
  *
  * @param integer User ID
  * @return array
@@ -3716,12 +3749,12 @@ function get_user_reported_user_IDs( $user_ID )
 {
 	global $DB;
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get an array of user IDs who reported for user #'.$user_ID );
 	$SQL->SELECT( 'DISTINCT( urep_reporter_ID )' );
 	$SQL->FROM( 'T_users__reports' );
 	$SQL->WHERE( 'urep_target_user_ID = '.$DB->quote( $user_ID ) );
 
-	return $DB->get_col( $SQL->get() );
+	return $DB->get_col( $SQL );
 }
 
 
@@ -4028,7 +4061,7 @@ function display_voting_form( $params = array() )
 			$SQL->FROM( 'T_links__vote' );
 			$SQL->WHERE( 'lvot_link_ID = '.$DB->quote( $params['vote_ID'] ) );
 			$SQL->WHERE_and( 'lvot_user_ID = '.$DB->quote( $current_User->ID ) );
-			$vote = $DB->get_row( $SQL->get() );
+			$vote = $DB->get_row( $SQL );
 
 			$params_spam['class'] = 'cboxCheckbox';
 
@@ -4040,7 +4073,7 @@ function display_voting_form( $params = array() )
 				$SQL->FROM( 'T_links__vote' );
 				$SQL->WHERE( 'lvot_link_ID = '.$DB->quote( $params['vote_ID'] ) );
 				$SQL->WHERE_and( 'lvot_like = "1" OR lvot_like = "-1"' );
-				$number_votes = $DB->get_row( $SQL->get() );
+				$number_votes = $DB->get_row( $SQL );
 
 				$num_likes = intval( $number_votes->num_likes );
 				$num_dislikes = intval( $number_votes->num_dislikes );
@@ -4089,7 +4122,7 @@ function display_voting_form( $params = array() )
 
 		case 'comment':
 			// Comment
-			$SQL = new SQL();
+			$SQL = new SQL( 'Check if current User already voted on comment #'.$params['vote_ID'] );
 			$SQL->SELECT( 'cmvt_helpful AS result' );
 			$SQL->FROM( 'T_comments__votes' );
 			$SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $params['vote_ID'] ) );
@@ -4101,13 +4134,13 @@ function display_voting_form( $params = array() )
 
 		case 'item':
 			// Item
-			$SQL = new SQL();
+			$SQL = new SQL( 'Check if current User already voted on Item #'.$params['vote_ID'] );
 			$SQL->SELECT( 'itvt_updown AS result' );
 			$SQL->FROM( 'T_items__votes' );
 			$SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $params['vote_ID'] ) );
 			$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
 			$SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
-			$vote = $DB->get_row( $SQL->get() );
+			$vote = $DB->get_row( $SQL );
 
 			break;
 	}
@@ -4704,12 +4737,12 @@ function check_invitation_code( $invitation_name = 'invitation' )
 		{ // Check invitation code in DB
 			global $DB, $localtimenow;
 
-			$SQL = new SQL();
+			$SQL = new SQL( 'Check invitation code' );
 			$SQL->SELECT( 'ivc_ID' );
 			$SQL->FROM( 'T_users__invitation_code' );
 			$SQL->WHERE( 'ivc_code = '.$DB->quote( $invitation ) );
 			$SQL->WHERE_and( 'ivc_expire_ts > '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ) );
-			$invitation_ID = $DB->get_var( $SQL->get() );
+			$invitation_ID = $DB->get_var( $SQL );
 			if( is_null( $invitation_ID ) )
 			{ // Invitation code doesn't exist in DB or it is expired
 				param_error( $invitation_name, T_('Invitation code is incorrect!') );

@@ -114,14 +114,17 @@ $Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-
 	{
 		switch( $iterator_Skin->get( 'type' ) )
 		{
+			case 'rwd':
 			case 'normal':
 				$normal_skins[ $iterator_Skin->ID ] = $iterator_Skin->get( 'name' );
 				break;
 
+			case 'rwd':
 			case 'mobile':
 				$mobile_skins[ $iterator_Skin->ID ] = $iterator_Skin->get( 'name' );
 				break;
 
+			case 'rwd':
 			case 'tablet':
 				$tablet_skins[ $iterator_Skin->ID ] = $iterator_Skin->get( 'name' );
 				break;

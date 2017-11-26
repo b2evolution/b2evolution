@@ -121,7 +121,9 @@ if( $action != 'view' )
 
 		// current password is not required:
 		//   - password change requested by email
-		if( empty( $reqID ) || $reqID != $Session->get( 'core.changepwd.request_id' ) )
+		//   - password has not been set yet(email capture/quick registration)
+		if( ( empty( $reqID ) || $reqID != $Session->get( 'core.changepwd.request_id' ) ) &&
+		    ( $edited_User->get( 'pass_driver' ) != 'nopass' ) )
 		{
 			if( ! $has_full_access || $edited_User->ID == $current_User->ID )
 			{ // Current user has no full access or editing his own pasword

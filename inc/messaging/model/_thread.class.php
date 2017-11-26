@@ -559,7 +559,7 @@ class Thread extends DataObject
 			return true;
 		}
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Count all users whou are involved in the given thread but not the current User and didn\'t block the current User' );
 
 		$SQL->SELECT( 'count( ts.tsta_user_ID )' );
 		$SQL->FROM( 'T_messaging__threadstatus ts
@@ -572,7 +572,7 @@ class Thread extends DataObject
 		// sender is not blocked or is not present in all recipient's contact list
 		$SQL->WHERE_and( '( mc.mct_blocked IS NULL OR mc.mct_blocked = 0 )' );
 
-		if( $DB->get_var( $SQL->get(), 0, NULL, 'Count all users whou are involved in the given thread but not the current User and didn\'t block the current User' ) > 0 )
+		if( $DB->get_var( $SQL ) > 0 )
 		{ // there is at least one recipient who accept the reply
 			return true;
 		}

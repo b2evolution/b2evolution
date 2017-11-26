@@ -29,10 +29,11 @@ class calendar_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '6.9.3';
+	var $version = '6.9.4';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
+	var $widget_icon = 'calendar';
 
 
   /**

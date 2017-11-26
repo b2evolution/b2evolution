@@ -159,7 +159,7 @@ switch( $display_mode )
 }
 
 // Get Skin used by current Blog:
-$blog_normal_skin_ID = $Blog->get_setting( 'normal_skin_ID' );
+$blog_normal_skin_ID = $Blog->get( 'normal_skin_ID' );
 $SkinCache = & get_SkinCache();
 $Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
 // Make sure containers are loaded for that skin:

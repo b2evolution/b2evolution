@@ -49,7 +49,7 @@ $SQL->SELECT( 'user_ID' );
 $SQL->FROM( 'T_users' );
 $SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 $SQL->WHERE( 'grp_perm_blogs = "editall"' );
-$global_moderator_IDs = $DB->get_col( $SQL->get(), 0, $SQL->title );
+$global_moderator_IDs = $DB->get_col( $SQL );
 
 $not_global_moderators_cond = ( count( $global_moderator_IDs ) ) ? '%s NOT IN ( '.implode( ',', $global_moderator_IDs ).' )' : NULL;
 
@@ -60,7 +60,7 @@ $SQL->FROM( 'T_blogs' );
 $SQL->WHERE( sprintf( $not_global_moderators_cond, 'blog_owner_user_ID' ) );
 $SQL->WHERE_and( sprintf( $alert_colls_cond, 'blog_ID' ) );
 $SQL->GROUP_BY( 'blog_owner_user_ID' );
-$coll_owners = $DB->get_assoc( $SQL->get(), $SQL->title );
+$coll_owners = $DB->get_assoc( $SQL );
 foreach( $coll_owners as $coll_owner_ID => $coll_IDs )
 {
 	$coll_owners[ $coll_owner_ID ] = explode( ',', $coll_IDs );
@@ -189,7 +189,7 @@ foreach( $BlogCache->cache as $alert_Blog )
 	$SQL->WHERE_and( 'post_status IN ( '.$DB->quote( $alert_post_statuses ).' )' );
 	$x_months_ago = date( 'Y-m-d H:i:s', mktime( 0, 0, 0, date( 'n' ) - $alert_Blog->get_setting( 'old_content_alert' ) ) );
 	$SQL->WHERE_and( 'post_datemodified < '.$DB->quote( $x_months_ago ) );
-	$old_posts = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+	$old_posts = $DB->get_results( $SQL );
 
 	if( empty( $old_posts ) )
 	{	// No old posts on the collection:

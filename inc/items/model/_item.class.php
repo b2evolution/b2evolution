@@ -680,6 +680,9 @@ class Item extends ItemLight
 			$this->set( 'ityp_ID', $item_typ_ID );
 		}
 
+		// Check if this Item type usage is not content block in order to hide several fields below:
+		$is_not_content_block = ( $this->get_type_setting( 'usage' ) != 'content-block' );
+
 		// URL associated with Item:
 		$post_url = param( 'post_url', 'string', NULL );
 		$url_error = validate_url( $post_url, 'http-https' );
@@ -767,35 +770,38 @@ class Item extends ItemLight
 			}
 		}
 
-		// <title> TAG:
-		$titletag = param( 'titletag', 'string', NULL );
-		if( $titletag !== NULL )
-		{
-			$this->set_from_Request( 'titletag', 'titletag' );
-		}
-		if( empty( $titletag ) && $this->get_type_setting( 'use_title_tag' ) == 'required' )
-		{ // Title tag must be entered
-			param_check_not_empty( 'titletag', T_('Please provide a title tag.'), '' );
-		}
+		if( $is_not_content_block )
+		{	// Save title tag, meta description and meta keywords for item with type usage except of content block:
+			// <title> TAG:
+			$titletag = param( 'titletag', 'string', NULL );
+			if( $titletag !== NULL )
+			{
+				$this->set_from_Request( 'titletag', 'titletag' );
+			}
+			if( empty( $titletag ) && $this->get_type_setting( 'use_title_tag' ) == 'required' )
+			{ // Title tag must be entered
+				param_check_not_empty( 'titletag', T_('Please provide a title tag.'), '' );
+			}
 
-		// <meta> DESC:
-		$metadesc = param( 'metadesc', 'string', NULL );
-		if( $metadesc !== NULL ) {
-			$this->set_setting( 'metadesc', get_param( 'metadesc' ) );
-		}
-		if( empty( $metadesc ) && $this->get_type_setting( 'use_meta_desc' ) == 'required' )
-		{ // Meta description must be entered
-			param_check_not_empty( 'metadesc', T_('Please provide a meta description.'), '' );
-		}
+			// <meta> DESC:
+			$metadesc = param( 'metadesc', 'string', NULL );
+			if( $metadesc !== NULL ) {
+				$this->set_setting( 'metadesc', get_param( 'metadesc' ) );
+			}
+			if( empty( $metadesc ) && $this->get_type_setting( 'use_meta_desc' ) == 'required' )
+			{ // Meta description must be entered
+				param_check_not_empty( 'metadesc', T_('Please provide a meta description.'), '' );
+			}
 
-		// <meta> KEYWORDS:
-		$metakeywords = param( 'metakeywords', 'string', NULL );
-		if( $metakeywords !== NULL ) {
-			$this->set_setting( 'metakeywords', get_param( 'metakeywords' ) );
-		}
-		if( empty( $metakeywords ) && $this->get_type_setting( 'use_meta_keywds' ) == 'required' )
-		{ // Meta keywords must be entered
-			param_check_not_empty( 'metakeywords', T_('Please provide the meta keywords.'), '' );
+			// <meta> KEYWORDS:
+			$metakeywords = param( 'metakeywords', 'string', NULL );
+			if( $metakeywords !== NULL ) {
+				$this->set_setting( 'metakeywords', get_param( 'metakeywords' ) );
+			}
+			if( empty( $metakeywords ) && $this->get_type_setting( 'use_meta_keywds' ) == 'required' )
+			{ // Meta keywords must be entered
+				param_check_not_empty( 'metakeywords', T_('Please provide the meta keywords.'), '' );
+			}
 		}
 
 		// TAGS:
@@ -818,7 +824,7 @@ class Item extends ItemLight
 
 		// WORKFLOW stuff:
 		$item_Blog = $this->get_Blog();
-		if( $item_Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
+		if( $is_not_content_block && $item_Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
 		{	// Update workflow properties only when it is enabled by collection setting and allowed for current user:
 			$ItemTypeCache = & get_ItemTypeCache();
 			$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
@@ -855,12 +861,17 @@ class Item extends ItemLight
 		// FEATURED checkbox:
 		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
 
-		// HIDE TEASER checkbox:
-		$this->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
-		$goal_ID = param( 'goal_ID', 'integer', NULL );
-		if( $goal_ID !== NULL )
-		{ // Goal ID
-			$this->set_setting( 'goal_ID', $goal_ID, true );
+		if( $is_not_content_block )
+		{	// Save "hide teaser" and goal for item with type usage except of content block:
+			// HIDE TEASER checkbox:
+			$this->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
+
+			// Goal ID:
+			$goal_ID = param( 'goal_ID', 'integer', NULL );
+			if( $goal_ID !== NULL )
+			{	// Save only if it is provided:
+				$this->set_setting( 'goal_ID', $goal_ID, true );
+			}
 		}
 
 		// ORDER:
@@ -908,7 +919,7 @@ class Item extends ItemLight
 					case 'double':
 						$param_type = 'double';
 						$field_value = param( $param_name, 'string', NULL );
-						if( ! preg_match( '/^(\+|-)?[0-9]+(.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
+						if( ! empty( $field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
 						{
 							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
 							$param_error = true;
@@ -1048,22 +1059,25 @@ class Item extends ItemLight
 			param_check_not_empty( 'content', T_('Please enter some text.'), '' );
 		}
 
-		// EXCERPT: (must come after content (in order to handle excerpt_autogenerated))
-		$post_excerpt = param( 'post_excerpt', 'text', NULL );
-		if( $post_excerpt !== NULL )
-		{	// The form has sent an excerpt field:
-			$post_excerpt_autogenerated = param( 'post_excerpt_autogenerated', 'integer', 0 );
-			$this->set_from_Request( 'excerpt_autogenerated' );
-			if( ! $this->get( 'excerpt_autogenerated' ) )
-			{	// The post excerpt must be no longer auto-generated:
-				// NOTE: if the new excerpt is empty, set() will switch back to autogeneration:
-				$this->set_from_Request( 'excerpt' );
+		if( $is_not_content_block )
+		{	// Save excerpt for item with type usage except of content block:
+			// EXCERPT: (must come after content (in order to handle excerpt_autogenerated))
+			$post_excerpt = param( 'post_excerpt', 'text', NULL );
+			if( $post_excerpt !== NULL )
+			{	// The form has sent an excerpt field:
+				$post_excerpt_autogenerated = param( 'post_excerpt_autogenerated', 'integer', 0 );
+				$this->set_from_Request( 'excerpt_autogenerated' );
+				if( ! $this->get( 'excerpt_autogenerated' ) )
+				{	// The post excerpt must be no longer auto-generated:
+					// NOTE: if the new excerpt is empty, set() will switch back to autogeneration:
+					$this->set_from_Request( 'excerpt' );
+				}
 			}
-		}
 
-		if( empty( $post_excerpt ) && $this->get_type_setting( 'use_excerpt' ) == 'required' )
-		{ // Content must be entered (this should happen even if no excerpt field was submitted)
-			param_check_not_empty( 'post_excerpt', T_('Please provide an excerpt.'), '' );
+			if( empty( $post_excerpt ) && $this->get_type_setting( 'use_excerpt' ) == 'required' )
+			{ // Content must be entered (this should happen even if no excerpt field was submitted)
+				param_check_not_empty( 'post_excerpt', T_('Please provide an excerpt.'), '' );
+			}
 		}
 
 		// LOCATION (COUNTRY -> CITY):
@@ -1625,12 +1639,12 @@ class Item extends ItemLight
 		if( $this->ID > 0 )
 		{ // The post is saved, so it can actually have attachments:
 			global $DB;
-			$links_SQL = new SQL();
+			$links_SQL = new SQL( 'Get item links IDs of the inline images' );
 			$links_SQL->SELECT( 'link_ID' );
 			$links_SQL->FROM( 'T_links' );
 			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
 			$links_SQL->WHERE_and( 'link_position = "inline"' );
-			$inline_links_IDs = $DB->get_col( $links_SQL->get(), 0, 'Get item links IDs of the inline images' );
+			$inline_links_IDs = $DB->get_col( $links_SQL );
 
 			$unused_inline_images = array();
 			foreach( $inline_images[2] as $i => $inline_link_ID )
@@ -1686,13 +1700,13 @@ class Item extends ItemLight
 		}
 
 		// Get a number of attachments from DB
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get a number of attachments for user #'.$User->ID.' and post #'.$this->ID );
 		$SQL->SELECT( 'COUNT( link_ID )' );
 		$SQL->FROM( 'T_links' );
 		$SQL->FROM_add( 'INNER JOIN T_comments ON comment_ID = link_cmt_ID' );
 		$SQL->WHERE( 'link_creator_user_ID = '.$DB->quote( $User->ID ) );
 		$SQL->WHERE_and( 'comment_item_ID = '.$DB->quote( $this->ID ) );
-		$cache_item_attachments_number[$User->ID] = (int)$DB->get_var( $SQL->get() );
+		$cache_item_attachments_number[$User->ID] = (int)$DB->get_var( $SQL );
 
 		return $cache_item_attachments_number[$User->ID];
 	}
@@ -2141,9 +2155,6 @@ class Item extends ItemLight
 		// Render all inline tags to HTML code:
 		$output = $this->render_inline_tags( $output, $params );
 
-		// Render Content block tags like [include:123], [include:item-slug] into item/post content:
-		$output = $this->render_content_blocks( $output, $params );
-
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
 				'Item' => $this,
@@ -2267,9 +2278,6 @@ class Item extends ItemLight
 
 		// Render all inline tags to HTML code:
 		$output = $this->render_inline_tags( $output, $params );
-
-		// Render Content block tags like [include:123], [include:item-slug] into item/post content:
-		$output = $this->render_content_blocks( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2506,12 +2514,13 @@ class Item extends ItemLight
 	function render_inline_tags( $content, $params = array() )
 	{
 		$params = array_merge( array(
-				'check_code_block'     => true, // TRUE to find inline tags only outside of codeblocks
-				'render_inline_files'  => true,
-				'render_links'         => true,
-				'render_custom_fields' => true,
-				'render_parent'        => true,
-				'render_collection'    => true,
+				'check_code_block'      => true, // TRUE to find inline tags only outside of codeblocks
+				'render_inline_files'   => true,
+				'render_links'          => true,
+				'render_custom_fields'  => true,
+				'render_parent'         => true,
+				'render_collection'     => true,
+				'render_content_blocks' => true,
 			), $params );
 
 		if( $params['render_inline_files'] )
@@ -2537,6 +2546,11 @@ class Item extends ItemLight
 		if( $params['render_collection'] )
 		{	// Render Collection Data [coll:name], [coll:shortname]:
 			$content = $this->render_collection_data( $content, $params );
+		}
+
+		if( $params['render_content_blocks'] )
+		{	// Render Content block tags like [include:123], [include:item-slug]:
+			$content = $this->render_content_blocks( $content, $params );
 		}
 
 		return $content;
@@ -2896,7 +2910,7 @@ class Item extends ItemLight
 			// Replace inline content block tag with item content:
 			$content = str_replace( $source_tag, $current_tag_item_content, $content );
 
-			// Remove 
+			// Remove
 			array_shift( $content_block_items );
 		}
 
@@ -6090,7 +6104,7 @@ class Item extends ItemLight
 			$urltitles[ $u ] = utf8_trim( $urltitle_value );
 		}
 		$orig_urltitle = implode( ',', array_unique( $urltitles ) );
-		$this->set( 'urltitle', urltitle_validate( $urltitles[0], $this->title, $this->ID, false, 'slug_title', 'slug_itm_ID', 'T_slug', $this->locale ) );
+		$this->set( 'urltitle', urltitle_validate( $urltitles[0], $this->title, $this->ID, false, 'slug_title', 'slug_itm_ID', 'T_slug', $this->locale, 'T_items__item' ) );
 
 		$this->update_renderers_from_Plugins();
 
@@ -7841,7 +7855,7 @@ class Item extends ItemLight
 			$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
 		}
 		$SQL->ORDER_BY( 'slug_order_num' );
-		$slugs = $DB->get_col( $SQL->get() );
+		$slugs = $DB->get_col( $SQL );
 
 		return implode( $separator, $slugs );
 	}
@@ -8010,10 +8024,11 @@ class Item extends ItemLight
 			$SQL->ORDER_BY( 'comment_date DESC' );
 			$SQL->LIMIT( '1' );
 
-			if( $comment_ID = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
+			if( $comment_ID = $DB->get_var( $SQL ) )
 			{	// Load the latest Comment in cache:
 				$CommentCache = & get_CommentCache();
-				$this->latest_Comment = & $CommentCache->get_by_ID( $comment_ID );
+				// WARNING: Do NOT get this object by reference because it may rewrites current updating Comment:
+				$this->latest_Comment = $CommentCache->get_by_ID( $comment_ID );
 			}
 			else
 			{	// Set FALSE to don't call SQL query twice when the item has no comments yet:
@@ -8046,7 +8061,7 @@ class Item extends ItemLight
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->Blog->ID, 'comment' ), 'comment_', $this->Blog->ID, 'blog_comment!' ) );
 		$SQL->GROUP_BY( 'expiry_status, comment_rating' );
 		$SQL->ORDER_BY( 'comment_rating DESC' );
-		$results = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		$results = $DB->get_results( $SQL );
 
 		// init rating arrays
 		$ratings = array();
@@ -8656,7 +8671,7 @@ class Item extends ItemLight
 			$SQL->FROM( 'T_items__user_data' );
 			$SQL->WHERE( 'itud_user_ID = '.$DB->quote( $current_User->ID ) );
 			$SQL->WHERE_and( 'itud_item_ID = '.$DB->quote( $this->ID ) );
-			$cache_items_user_data[ $this->ID ] = $DB->get_row( $SQL->get(), ARRAY_A, NULL, $SQL->title );
+			$cache_items_user_data[ $this->ID ] = $DB->get_row( $SQL, ARRAY_A );
 		}
 
 		if( isset( $cache_items_user_data[ $this->ID ] ) && is_array( $cache_items_user_data[ $this->ID ] ) &&  empty( $cache_items_user_data[ $this->ID ] ) )
@@ -9024,7 +9039,7 @@ class Item extends ItemLight
 		}
 
 		// Get all possible tags that are not related to this item:
-		$other_tags_SQL = new SQL();
+		$other_tags_SQL = new SQL( 'Get all possible tags that are not related to this item' );
 		$other_tags_SQL->SELECT( 'tag_name' );
 		$other_tags_SQL->FROM( 'T_items__tag' );
 		// Get all current tags to exclude from searching:
@@ -9033,7 +9048,7 @@ class Item extends ItemLight
 		{	// If this item has at least one tag, Exclude them:
 			$other_tags_SQL->WHERE( 'tag_name NOT IN ( '.$DB->quote( $item_tags ).' )' );
 		}
-		$other_tags = $DB->get_col( $other_tags_SQL->get(), 0, 'Get all possible tags that are not related to this item' );
+		$other_tags = $DB->get_col( $other_tags_SQL );
 
 		if( count( $other_tags ) == 0 )
 		{	// No tags for searching, Exit here:
@@ -9453,7 +9468,7 @@ class Item extends ItemLight
 		$SQL->FROM( 'T_items__votes' );
 		$SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $this->ID ) );
 		$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
-		$existing_vote = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+		$existing_vote = $DB->get_var( $SQL );
 
 		if( $existing_vote === NULL )
 		{	// Add a new vote for first time:
@@ -9487,7 +9502,7 @@ class Item extends ItemLight
 		$vote_SQL->FROM( 'T_items__votes' );
 		$vote_SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $this->ID ) );
 		$vote_SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
-		$vote = $DB->get_row( $vote_SQL->get(), OBJECT, NULL, $vote_SQL->title );
+		$vote = $DB->get_row( $vote_SQL );
 
 		// These values must be number and not NULL:
 		$vote->votes_sum = intval( $vote->votes_sum );
@@ -9538,7 +9553,7 @@ class Item extends ItemLight
 		$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
 		$SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
 
-		if( $vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title ) )
+		if( $vote = $DB->get_row( $SQL ) )
 		{	// Get a vote for current user and this item:
 			$result['is_voted'] = true;
 			$class_disabled = 'disabled';
@@ -9796,6 +9811,9 @@ class Item extends ItemLight
 		{	// If current User has no permission to refresh a contents last updated date of the requested Item:
 			return false;
 		}
+
+		// Clear latest Comment from previous calling before Comment updating:
+		$this->latest_Comment = NULL;
 
 		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ) ) )
 		{	// Use date from the latest public Comment:

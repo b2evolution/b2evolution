@@ -78,7 +78,7 @@ switch( $action )
 			$edited_Blog = & $BlogCache->get_by_ID( $blog );
 
 			// Set new installed skins for the selected collection:
-			$edited_Blog->set_setting( $skin_type.'_skin_ID', $edited_Skin->ID );
+			$edited_Blog->set( $skin_type.'_skin_ID', $edited_Skin->ID );
 			$edited_Blog->dbupdate();
 
 			$Messages->add( T_('The blog skin has been changed.')
@@ -102,6 +102,46 @@ switch( $action )
 			// Replace a mask by value. Used for install skin on creating of new blog
 			$redirect_to = str_replace( '$skin_ID$', $edited_Skin->ID, $redirect_to );
 		}
+
+		// PREVENT RELOAD & Switch to list mode:
+		header_redirect( $redirect_to );
+		break;
+
+	case 'upgrade':
+	case 'downgrade':
+		param( 'skin_folder', 'string', true );
+		// Check validity of requested skin name:
+		if( preg_match( '~([^-A-Za-z0-9._]|\.\.)~', $skin_folder ) )
+		{
+			debug_die( 'The requested skin name is invalid.' );
+		}
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'skin' );
+
+		// Check permission to edit:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		$SkinCache = & get_SkinCache();
+
+		$new_Skin = & $SkinCache->new_obj( NULL, $skin_folder );
+		$edited_Skin = & $SkinCache->get_by_class( $new_Skin->class );
+		$edited_Skin->set( 'folder', $new_Skin->folder );
+		$edited_Skin->dbupdate();
+
+		if( $action == 'upgrade' )
+		{
+			$Messages->add( T_('Skin has been upgraded to a later version.'), 'success' );
+		}
+		else
+		{
+			$Messages->add( T_('Skin has been downgraded to an earlier version.'), 'success' );
+		}
+
+		$new_installed_skin_IDs = array( $edited_Skin->ID );
+
+		// We want to highlight the edited object on next list display:
+		$Session->set( 'fadeout_array', array( 'skin_ID' => $new_installed_skin_IDs ) );
 
 		// PREVENT RELOAD & Switch to list mode:
 		header_redirect( $redirect_to );
@@ -245,7 +285,7 @@ switch( $action )
 
 		// At some point we may want to remove skin settings from all blogs
 		$DB->query( 'DELETE FROM T_coll_settings
-			WHERE cset_coll_ID = '.$DB->quote( $blog ).'
+				WHERE cset_coll_ID = '.$DB->quote( $blog ).'
 			  AND cset_name REGEXP "^skin'.$skin_ID.'_"' );
 
 		$Messages->add( T_('Skin params have been reset to defaults.'), 'success' );

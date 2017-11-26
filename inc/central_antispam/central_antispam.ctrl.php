@@ -101,7 +101,7 @@ switch( $action )
 				$source_SQL->SELECT( 'casrc_ID, casrc_status' );
 				$source_SQL->FROM( 'T_centralantispam__source' );
 				$source_SQL->WHERE( 'casrc_baseurl = '.$DB->quote( $baseurl ) );
-				$source_row = $DB->get_row( $source_SQL->get(), ARRAY_A, NULL, $source_SQL->title );
+				$source_row = $DB->get_row( $source_SQL, ARRAY_A );
 				$source_ID = empty( $source_row ) ? 0 : intval( $source_row['casrc_ID'] );
 
 				if( empty( $source_ID ) )
@@ -225,7 +225,7 @@ switch( $action )
 		$keywords_SQL->FROM( 'T_antispam__keyword' );
 		$keywords_SQL->WHERE( 'askw_string NOT IN ( SELECT cakw_keyword FROM T_centralantispam__keyword )' );
 		$keywords_SQL->WHERE_and( 'askw_source IN( '.$DB->quote( $import_keywords ).' )' );
-		$new_keywords = $DB->get_results( $keywords_SQL->get(), ARRAY_A, $keywords_SQL->title );
+		$new_keywords = $DB->get_results( $keywords_SQL, ARRAY_A );
 
 		$keywords_imported_count = array();
 		if( count( $new_keywords ) )
@@ -236,7 +236,7 @@ switch( $action )
 			$source_SQL->SELECT( 'casrc_ID, casrc_status' );
 			$source_SQL->FROM( 'T_centralantispam__source' );
 			$source_SQL->WHERE( 'casrc_baseurl = '.$DB->quote( $baseurl ) );
-			$source_row = $DB->get_row( $source_SQL->get(), ARRAY_A, NULL, $source_SQL->title );
+			$source_row = $DB->get_row( $source_SQL, ARRAY_A );
 			$source_ID = empty( $source_row ) ? 0 : intval( $source_row['casrc_ID'] );
 
 			if( empty( $source_ID ) )

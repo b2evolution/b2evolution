@@ -335,13 +335,13 @@ class Link extends DataObject
 		}
 
 		// Try to find at least one another link by same file ID:
-		$SQL = new SQL();
+		$SQL = new SQL( 'Try to find at least one another link by same file ID #'.$File->ID );
 		$SQL->SELECT( 'link_ID' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_file_ID = '.$DB->quote( $File->ID ) );
 		$SQL->WHERE_and( 'link_ID != '.$DB->quote( $this->ID ) );
 		$SQL->LIMIT( '1' );
-		if( $DB->get_var( $SQL->get() ) )
+		if( $DB->get_var( $SQL ) )
 		{	// We cannot delete the file of this link because it is also linked to another object
 			return false;
 		}

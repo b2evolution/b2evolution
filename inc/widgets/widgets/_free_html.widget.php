@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class free_html_Widget extends ComponentWidget
 {
+	var $icon = 'code';
+
 	/**
 	 * Constructor
 	 */

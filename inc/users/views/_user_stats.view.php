@@ -252,24 +252,24 @@ echo '</div>';
 /*** Gender statistics ***/
 
 // Get total values
-$SQL = new SQL();
+$SQL = new SQL( 'Get active users' );
 $SQL->SELECT( 'COUNT( * )' );
 $SQL->FROM( 'T_users' );
 // Active users
 $SQL->WHERE( 'user_status IN( \'activated\', \'autoactivated\' )' );
-$total_cnt_active = $DB->get_var( $SQL->get() );
+$total_cnt_active = $DB->get_var( $SQL );
 
 // Not active users
 $SQL->WHERE( 'user_status NOT IN( \'activated\', \'autoactivated\', \'closed\' )' );
-$total_cnt_notactive = $DB->get_var( $SQL->get() );
+$total_cnt_notactive = $DB->get_var( $SQL, 0, NULL, 'Get not active users' );
 
 // Closed users
 $SQL->WHERE( 'user_status = \'closed\'' );
-$total_cnt_closed = $DB->get_var( $SQL->get() );
+$total_cnt_closed = $DB->get_var( $SQL, 0, NULL, 'Get closed users' );
 
 // Users with pictures
 $SQL->WHERE( 'user_avatar_file_ID IS NOT NULL' );
-$total_cnt_pictured = $DB->get_var( $SQL->get() );
+$total_cnt_pictured = $DB->get_var( $SQL, 0, NULL, 'Get users with pictures' );
 
 // Get all records
 $SQL = new SQL();
@@ -374,7 +374,7 @@ echo '<h2>'.T_('# registrations per day').'</h2>';
 
 global $AdminUI, $user_gender_color;
 
-$SQL = new SQL();
+$SQL = new SQL( 'Get user summary' );
 $SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS users,
 		CONCAT( IF( user_gender IN ( "M", "F" ), user_gender, "G" ), "_", IF( user_status IN ( "activated", "autoactivated" ), "active", ( IF( user_status = "closed", "closed", "notactive" ) ) ) ) AS user_gender_status,
 		EXTRACT(YEAR FROM user_created_datetime) AS year,
@@ -384,7 +384,7 @@ $SQL->FROM( 'T_users' );
 $SQL->WHERE( 'user_created_datetime >= '.$DB->quote( date( 'Y-m-d H:i:s', mktime( date( 'H' ), date( 'i' ), date( 's' ), date( 'm' ) - 1, date( 'd' ), date( 'Y' ) ) ) ) );
 $SQL->GROUP_BY( 'year, month, day, user_gender_status' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC, user_gender_status' );
-$res_users = $DB->get_results( $SQL->get(), ARRAY_A, 'Get user summary' );
+$res_users = $DB->get_results( $SQL, ARRAY_A );
 
 /*
  * Chart

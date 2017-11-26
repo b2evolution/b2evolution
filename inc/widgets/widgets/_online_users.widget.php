@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class online_users_Widget extends ComponentWidget
 {
+	var $icon = 'user-circle-o';
+
 	/**
 	 * Constructor
 	 */

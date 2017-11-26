@@ -90,6 +90,8 @@ switch( $action )
 		$recipient_id = param( 'recipient_id', 'integer', 0 );
 		$recipient_name = param( 'recipient_name', 'string', '' );
 		$subject = param( 'subject', 'string', '' );
+		$subject_other = param( 'subject_other', 'string', '' );
+		$contact_method = param( 'contact_method', 'string', '' );
 		$email_author = param( 'email_author', 'string', '' );
 		$email_author_address = param( 'email_author_address', 'string', '' );
 		$redirect_to = param( 'redirect_to', 'url', '' );
@@ -922,7 +924,7 @@ switch( $action )
 				$SQL->SELECT( 'user_ID' );
 				$SQL->FROM( 'T_users' );
 				$SQL->WHERE( 'user_login = "'.$DB->escape( $login ).'"' );
-				if( $DB->get_var( $SQL->get() ) )
+				if( $DB->get_var( $SQL ) )
 				{	// Login already exists
 					echo 'exists';
 				}

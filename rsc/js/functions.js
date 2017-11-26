@@ -515,7 +515,16 @@ jQuery( document ).ready( function()
 				if( plugin_id )
 				{
 					plugin_id = plugin_id.replace( '_toolbar', '' );
-					var checkbox_obj = jQuery( 'input[type=checkbox][id="renderer_' + plugin_id + '"]' );
+					if( plugin_id.indexOf( 'meta_' ) === 0 )
+					{
+						plugin_id = plugin_id.replace( 'meta_', '' );
+						var checkbox_obj = jQuery( 'input[type=checkbox][id="meta_renderer_' + plugin_id + '"]' );
+					}
+					else
+					{
+						var checkbox_obj = jQuery( 'input[type=checkbox][id="renderer_' + plugin_id + '"]' );
+					}
+
 					if(  checkbox_obj.length > 0 )
 					{
 						checkbox_obj.prop( 'checked', true );

@@ -30,6 +30,7 @@ load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_
 class basic_menu_link_Widget extends generic_menu_link_Widget
 {
 	var $link_types = array();
+	var $icon = 'navicon';
 
 	/**
 	 * Constructor
@@ -62,6 +63,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			'myprofile' => T_('My profile'),
 			'profile' => T_('Edit profile'),
 			'avatar' => T_('Edit profile picture'),
+			'visits' => T_('My visits'),
 
 			'item' => T_('Any item (post, page, etc...)'),
 			'postnew' => T_('New Item'),
@@ -432,6 +434,18 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				$text = T_('Profile picture');
 				// Note: we never highlight this, it will always highlight 'profile' instead:
 				$highlight_current = false;
+				break;
+
+			case 'visits':
+				global $Settings, $current_User;
+				if( ! is_logged_in() || ! $Settings->get( 'enable_visit_tracking' ) )
+				{
+					return false;
+				}
+
+				$url = $current_User->get_visits_url();
+				$text = T_('My visits');
+				$highlight_current = ( $highlight_current && $disp == 'visits' );
 				break;
 
 			case 'users':

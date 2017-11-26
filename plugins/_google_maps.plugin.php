@@ -34,7 +34,7 @@ class google_maps_plugin extends Plugin
 	var $name = 'Google Maps';
 	var $code = 'evo_Gmaps';
 	var $priority = 50;
-	var $version = '6.9.3';
+	var $version = '6.9.4';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -44,6 +44,7 @@ class google_maps_plugin extends Plugin
 	var $number_of_installs = 1;
 	var $group = 'widget';
 	var $subgroup = 'infoitem';
+	var $widget_icon = 'map-marker';
 	var $number_of_widgets ;
 
 
@@ -952,6 +953,7 @@ function locate()
 		$height = $this->display_param($this->get_widget_setting('height_front', $params));
 		$height = 'height:'.$height;
 
+		$api_key = $this->get_coll_setting( 'api_key', $Blog );
 		?>
 		<div class="map_title"><?php echo $this->get_widget_setting('map_title_coll'.$Blog->ID, $params); ?></div>
 		<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>

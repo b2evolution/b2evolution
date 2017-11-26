@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_content_Widget extends ComponentWidget
 {
+	var $icon = 'file-text';
+
 	/**
 	 * Constructor
 	 */

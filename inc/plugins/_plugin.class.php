@@ -268,6 +268,22 @@ class Plugin
 	 */
 	var $template;
 
+	/**
+	 * Plugin actions
+	 * List of actions that the plugin supports
+	 *
+	 * @var array
+	 */
+	var $plugin_actions = array();
+
+	/**
+	 * Widget icon name.
+	 * Use icon name from http://fontawesome.io/icons/
+	 *
+	 * @var string
+	 */
+	var $widget_icon = 'puzzle-piece';
+
 	/**#@-*/
 
 
@@ -3923,7 +3939,29 @@ class Plugin
 			// Name of the setting in the blog settings:
 			$blog_setting_name = 'plugin'.$this->ID.'_'.$parname;
 
-			$value = $Blog->get_setting( $blog_setting_name );
+			if( strpos( $blog_setting_name, '[' ) !== false )
+			{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+				$setting_names = explode( '[', $blog_setting_name );
+				$value = $Blog->get_setting( $setting_names[0] );
+				unset( $setting_names[0] );
+				foreach( $setting_names as $setting_name )
+				{
+					$setting_name = trim( $setting_name, ']' );
+					if( isset( $value[ $setting_name ] ) )
+					{
+						$value = $value[ $setting_name ];
+					}
+					else
+					{
+						$value = NULL;
+						break;
+					}
+				}
+			}
+			else
+			{	// Get normal(not array) setting value:
+				$value = $Blog->get_setting( $blog_setting_name );
+			}
 
 			if( ! is_null( $value ) )
 			{ // We have a value for this param:
@@ -4155,6 +4193,18 @@ class Plugin
 				// Never enabled
 				return false;
 		}
+	}
+
+
+	/**
+	 * This method checks if the plugin can process the requested action
+	 *
+	 * @param string Action
+	 * @return boolean TRUE if the plugin can process the action, otherwise FALSE
+	 */
+	function is_plugin_action( $action )
+	{
+		return in_array( $action, $this->plugin_actions );
 	}
 
 

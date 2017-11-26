@@ -166,7 +166,7 @@ jQuery(document).ready( function()
 
 	current_widgets = getWidgetOrder(); // save current widget order
 
-	doFade( ".fadeout-ffff00" );// highlight any changed widgets
+	doFade( '.evo_highlight' );// highlight any changed widgets
 
 	// Actions for buttons to select several widgets to activate/deactivate them by one action
 	jQuery( '#widget_button_check_all' ).click( function()
@@ -289,7 +289,11 @@ function makeDroppable( selector )
  */
 function doFade( selector )
 {
-	evoFadeSuccess( selector );
+	jQuery( selector ).addClass( 'evo_highlight' );
+	setTimeout( function ()
+	{
+		jQuery( selector ).removeClass( 'evo_highlight' );
+	}, 5000 );
 }
 
 
@@ -443,10 +447,10 @@ function widgetSettings( the_html, wi_type, wi_code )
 	AttachServerRequest( 'widget_checkchanges' ); // send form via hidden iframe
 
 	// Create modal header for bootstrap skin
-	var page_title = jQuery( '#widget_settings' ).find( 'h2.page-title:first' );
+	var page_title = jQuery( '#widget_settings' ).find( 'form > h2.page-title:first' );
 	if( page_title.length > 0 )
 	{
-		var page_title_icons = jQuery( '#widget_settings' ).find( 'span.pull-right:first' );
+		var page_title_icons = page_title.parent().children( 'span.global_icons' );
 		var page_title_icons_html = '';
 		if( page_title_icons.length > 0 )
 		{
@@ -640,7 +644,7 @@ function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_cache_sta
  */
 function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled, wi_cache_status )
 {
-	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><span>'+wi_name+'</span></li>' );
+	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><span class="widget_title">'+wi_name+'</span></li>' );
 	newWidget.find( 'a.widget_name' ).click( function()
 	{
 		return editWidget( wi_ID );
@@ -657,21 +661,21 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 			'</a>'+
 		'</span>' ) );
 
+	// Add checkbox:
+	jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox'+( wi_enabled ? ' widget_checkbox_enabled' : '' )+'">'+
+			'<input type="checkbox" name="widgets[]" value="'+wi_ID.replace( 'wi_ID_', '' )+'" />'+
+		'</span>' ) );
+
 	// Add icon to toggle cache status:
 	var cacheIcon = jQuery( '<span class="widget_cache_status">' + getWidgetCacheIcon( wi_ID, wi_cache_status ) + '</span>' );
-	jQuery( newWidget ).prepend( cacheIcon ); // add widget action icons
+	jQuery( newWidget ).append( cacheIcon ); // add widget action icons
 
 	// Add action icons:
 	var actionIcons = jQuery( '<span class="widget_actions"><a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\' );">'
 				+( wi_enabled ? deactivate_icon_tag : activate_icon_tag )+'</a><a href="#" onclick="return editWidget( \''+wi_ID+'\' );">'
 				+edit_icon_tag+'</a><a href="#" onclick="return deleteWidget( \''+wi_ID+'\' );">'
 				+delete_icon_tag+'</a></span>' );
-	jQuery( newWidget ).prepend( actionIcons ); // add widget action icons
-
-	// Add checkbox:
-	jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox'+( wi_enabled ? ' widget_checkbox_enabled' : '' )+'">'+
-			'<input type="checkbox" name="widgets[]" value="'+wi_ID.replace( 'wi_ID_', '' )+'" />'+
-		'</span>' ) );
+	jQuery( newWidget ).append( actionIcons ); // add widget action icons
 
 	jQuery( '#container_'+container ).append( newWidget );	// add widget to container
 
@@ -711,7 +715,7 @@ function doToggle( wi_ID, wi_enabled )
 	}
 	jQuery( '#wi_ID_' + wi_ID + ' .toggle_action' ).html( wi_enabled ? deactivate_icon_tag : activate_icon_tag );
 
-	evoFadeBg( jQuery( '#wi_ID_' + wi_ID ), new Array( '#FFFF33' ), { speed: 3000 } );
+	doFade( '#wi_ID_' + wi_ID );
 }
 
 /**
@@ -736,7 +740,7 @@ function doToggleCache( wi_ID, wi_cache_status )
 {
 	jQuery( '#wi_ID_' + wi_ID + ' .widget_cache_status' ).html( getWidgetCacheIcon( 'wi_ID_'+wi_ID, wi_cache_status ) );
 
-	evoFadeBg( jQuery( '#wi_ID_' + wi_ID ), new Array( '#FFFF33' ), { speed: 3000 } );
+	doFade( '#wi_ID_' + wi_ID );
 }
 
 /**

@@ -887,7 +887,6 @@ h2.user_title::first-line {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
@@ -1027,7 +1026,6 @@ ul.widget_container li:hover {
 }
 ul.widget_container li > span,
 ul.widget_container li > a {
-  display: inline-block;
   padding: 3px 10px;
   margin: 0;
   border-color: #ddd;

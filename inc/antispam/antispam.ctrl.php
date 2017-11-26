@@ -380,7 +380,7 @@ switch( $action )
 			$Messages->add( T_('New IP Range created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges', 303 ); // Will EXIT
+			header_redirect( '?ctrl=antispam&tab3=ipranges&iprange_ID='.$edited_IPRange->ID.'&action=iprange_edit&filter=new', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'iprange_new';

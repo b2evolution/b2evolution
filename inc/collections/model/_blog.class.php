@@ -86,6 +86,9 @@ class Blog extends DataObject
 	var $media_fullpath = '';
 	var $media_url = '';
 
+	var $normal_skin_ID = NULL;
+	var $mobile_skin_ID = NULL;
+	var $tablet_skin_ID = NULL;
 
 	/**
 	 * The basepath of that collection.
@@ -232,6 +235,9 @@ class Blog extends DataObject
 			$this->media_url = $db_row->blog_media_url;
 			$this->type = isset( $db_row->blog_type ) ? $db_row->blog_type : 'std';
 			$this->order = isset( $db_row->blog_order ) ? $db_row->blog_order : 0;
+			$this->normal_skin_ID = isset( $db_row->blog_normal_skin_ID ) ? $db_row->blog_normal_skin_ID : NULL; // check by isset() to avoid warnings of deleting all tables before new install
+			$this->mobile_skin_ID = isset( $db_row->blog_mobile_skin_ID ) ? $db_row->blog_mobile_skin_ID : NULL; // NULL means the same as normal_skid_ID value
+			$this->tablet_skin_ID = isset( $db_row->blog_tablet_skin_ID ) ? $db_row->blog_tablet_skin_ID : NULL; // NULL means the same as normal_skid_ID value
 		}
 
 		$Timer->pause( 'Blog constructor' );
@@ -471,16 +477,25 @@ class Blog extends DataObject
 
 			// Language / locale:
 			if( param( 'blog_locale', 'string', NULL ) !== NULL )
-			{ // These settings can be hidden when only one locale is enaled in the system
-				$this->set_from_Request( 'locale' );
-				$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
-				$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
-				$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
+			{ // These settings can be hidden when only one locale is enabled in the system
+				if( $this->ID > 0 )
+				{
+					$this->set_from_Request( 'locale' );
+					$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
+					$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
+					$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
+				}
+				else
+				{ // default for new collections
+					$this->set_setting( 'locale_source', 'blog' );
+					$this->set_setting( 'post_locale_source', 'post' );
+					$this->set_setting( 'new_item_locale_source', 'select_coll' );
+				}
 			}
 
 			// Collection permissions:
 			$prev_advanced_perms = $this->get( 'advanced_perms' );
-			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
+			$new_advanced_perms = $this->ID > 0 ? param( 'advanced_perms', 'integer', 0 ) : 0;
 			$prev_allow_access = $this->get_setting( 'allow_access' );
 			$new_allow_access = param( 'blog_allow_access', 'string', '' );
 
@@ -578,8 +593,32 @@ class Blog extends DataObject
 			}
 
 			// Lists of collections:
-			$this->set( 'order', param( 'blog_order', 'integer' ) );
-			$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', 'public' ) );
+			if( $this->ID > 0 )
+			{
+				$this->set( 'order', param( 'blog_order', 'integer' ) );
+				$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', 'public' ) );
+			}
+			else
+			{
+				switch( $new_allow_access )
+				{
+					case 'public':
+						$default_in_bloglist = 'public';
+						break;
+
+					case 'users':
+						$default_in_bloglist = 'logged';
+						break;
+
+					case 'members':
+						$default_in_bloglist = 'member';
+						break;
+
+					default:
+						$default_in_bloglist = 'never';
+				}
+				$this->set( 'in_bloglist', $default_in_bloglist );
+			}
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
@@ -616,6 +655,11 @@ class Blog extends DataObject
 			param( 'rss2_redirect', 'url', NULL );
 			param_check_url( 'rss2_redirect', 'commenting' );
 			$this->set_setting( 'rss2_redirect', get_param( 'rss2_redirect' ) );
+		}
+
+		if( in_array( 'template', $groups ) )
+		{
+			$this->set_setting( 'allow_duplicate', param( 'blog_allow_duplicate', 'integer', 0 ) );
 		}
 
 		if( param( 'image_size', 'string', NULL ) !== NULL )
@@ -686,18 +730,18 @@ class Blog extends DataObject
 
 		if( param( 'normal_skin_ID', 'integer', NULL ) !== NULL )
 		{ // Normal skin ID:
-			$this->set_setting( 'normal_skin_ID', get_param( 'normal_skin_ID' ) );
+			$this->set( 'normal_skin_ID', get_param( 'normal_skin_ID' ) );
 		}
 
 		if( param( 'mobile_skin_ID', 'integer', NULL ) !== NULL )
 		{ // Mobile skin ID:
 			if( get_param( 'mobile_skin_ID' ) == 0 )
 			{ // Don't store this empty setting in DB
-				$this->delete_setting( 'mobile_skin_ID' );
+				$this->set( 'mobile_skin_ID', NULL );
 			}
 			else
 			{ // Set mobile skin
-				$this->set_setting( 'mobile_skin_ID', get_param( 'mobile_skin_ID' ) );
+				$this->set( 'mobile_skin_ID', get_param( 'mobile_skin_ID' ) );
 			}
 		}
 
@@ -705,11 +749,11 @@ class Blog extends DataObject
 		{ // Tablet skin ID:
 			if( get_param( 'tablet_skin_ID' ) == 0 )
 			{ // Don't store this empty setting in DB
-				$this->delete_setting( 'tablet_skin_ID' );
+				$this->set( 'tablet_skin_ID', NULL );
 			}
 			else
 			{ // Set tablet skin
-				$this->set_setting( 'tablet_skin_ID', get_param( 'tablet_skin_ID' ) );
+				$this->set( 'tablet_skin_ID', get_param( 'tablet_skin_ID' ) );
 			}
 		}
 
@@ -750,14 +794,17 @@ class Blog extends DataObject
 			$this->set_from_Request( 'keywords' );
 		}
 
-		if( param( 'blog_tagline', 'string', NULL ) !== NULL )
-		{	// tagline:
-			$this->set( 'tagline', get_param( 'blog_tagline' ) );
-		}
-		if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
-		{	// HTML long description:
-			param_check_html( 'blog_longdesc', T_('Invalid long description') );
-			$this->set( 'longdesc', get_param( 'blog_longdesc' ) );
+		if( $this->ID > 0 )
+		{
+			if( param( 'blog_tagline', 'string', NULL ) !== NULL )
+			{	// tagline:
+				$this->set( 'tagline', get_param( 'blog_tagline' ) );
+			}
+			if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
+			{	// HTML long description:
+				param_check_html( 'blog_longdesc', T_('Invalid long description') );
+				$this->set( 'longdesc', get_param( 'blog_longdesc' ) );
+			}
 		}
 
 		if( param( 'blog_footer_text', 'html', NULL ) !== NULL )
@@ -845,6 +892,23 @@ class Blog extends DataObject
 			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
 			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
 
+			// Set additional order fields
+			$orderby_1 = param( 'orderby_1', 'string', '' );
+			if( empty( $orderby_1 ) )
+			{ // Delete if first additional field is not defined
+				$this->delete_setting( 'orderby_1' );
+				$this->delete_setting( 'orderdir_1' );
+				$this->delete_setting( 'orderby_2' );
+				$this->delete_setting( 'orderdir_2' );
+			}
+			else
+			{
+				$this->set_setting( 'orderby_1', $orderby_1 );
+				$this->set_setting( 'orderdir_1', param( 'orderdir_1', 'string', '' ) );
+				$this->set_setting( 'orderby_2', param( 'orderby_2', 'string', '' ) );
+				$this->set_setting( 'orderdir_2', param( 'orderdir_2', 'string', '' ) );
+			}
+
 			$disp_featured_above_list = param( 'disp_featured_above_list', 'integer', 0 );
 			$this->set_setting( 'disp_featured_above_list', $disp_featured_above_list );
 
@@ -922,6 +986,27 @@ class Blog extends DataObject
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
 		}
 
+		if( in_array( 'contact', $groups ) )
+		{	// we want to load the contact form settings:
+			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
+			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
+			$this->set_setting( 'msgform_recipient_label', param( 'msgform_recipient_label', 'string' ) );
+			$this->set_setting( 'msgform_user_name', param( 'msgform_user_name', 'string' ) );
+			$this->set_setting( 'msgform_require_name', param( 'msgform_require_name', 'integer', 0 ) );
+			$this->set_setting( 'msgform_subject_list', param( 'msgform_subject_list', 'text' ) );
+			$this->set_setting( 'msgform_display_subject', param( 'msgform_display_subject', 'integer', 0 ) );
+			$this->set_setting( 'msgform_require_subject', param( 'msgform_require_subject', 'integer', 0 ) );
+			$msgform_additional_fields = param( 'msgform_additional_fields', 'array:integer', array() );
+			$this->set_setting( 'msgform_additional_fields', implode( ',', $msgform_additional_fields ) );
+			$this->set_setting( 'msgform_contact_method', param( 'msgform_contact_method', 'integer', 0 ) );
+			$this->set_setting( 'msgform_display_message', param( 'msgform_display_message', 'integer', 0 ) );
+			if( get_param( 'msgform_display_message' ) )
+			{	// Update these two fields only if message is allowed:
+				$this->set_setting( 'msgform_require_message', param( 'msgform_require_message', 'integer', 0 ) );
+				$this->set_setting( 'msgform_message_label', param( 'msgform_message_label', 'string' ) );
+			}
+		}
+
 		if( in_array( 'userdir', $groups ) )
 		{ // we want to load the user directory settings:
 			$this->set_setting( 'userdir_picture', param( 'userdir_picture', 'integer', 0 ) );
@@ -967,10 +1052,6 @@ class Blog extends DataObject
 
 			// Archive pages:
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
-
-			// Contact form:
-			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
-			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
 		}
 
 		if( in_array( 'more', $groups ) )
@@ -1141,7 +1222,7 @@ class Blog extends DataObject
 			}
 
 
-			if( ($blog_urlname = param( 'blog_urlname', 'string', NULL )) !== NULL )
+			if( ( $blog_urlname = param( 'blog_urlname', 'string', NULL ) ) !== NULL )
 			{	// check urlname
 				if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL collection name!') ) )
 				{
@@ -1310,22 +1391,36 @@ class Blog extends DataObject
 			}
 
 
-			if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
-			{ // Aggregate list: (can be '*')
-				$aggregate_coll_IDs = get_param( 'aggregate_coll_IDs' );
+			if( $this->type != 'main' || ( $this->type == 'main' && $this->ID > 0 ) )
+			{
+				if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
+				{ // Aggregate list: (can be '*')
+					$aggregate_coll_IDs = get_param( 'aggregate_coll_IDs' );
 
-				if( $aggregate_coll_IDs != '*' )
-				{	// Sanitize the string
-					$aggregate_coll_IDs = sanitize_id_list($aggregate_coll_IDs);
+					if( $aggregate_coll_IDs != '*' )
+					{	// Sanitize the string
+						$aggregate_coll_IDs = sanitize_id_list($aggregate_coll_IDs);
+					}
+
+					// fp> TODO: check perms on each aggregated blog (if changed)
+					// fp> TODO: better interface
+					if( $aggregate_coll_IDs != '*' && !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', $aggregate_coll_IDs ) )
+					{
+						param_error( 'aggregate_coll_IDs', T_('Invalid aggregate collection ID list!') );
+					}
+					$this->set_setting( 'aggregate_coll_IDs', $aggregate_coll_IDs );
 				}
-
-				// fp> TODO: check perms on each aggregated blog (if changed)
-				// fp> TODO: better interface
-				if( $aggregate_coll_IDs != '*' && !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', $aggregate_coll_IDs ) )
+			}
+			elseif( $this->type == 'main' && $this->ID === 0 )
+			{ // Only on new Home/Main collection
+				if( param( 'blog_aggregate', 'integer', 1 ) === 0 )
 				{
-					param_error( 'aggregate_coll_IDs', T_('Invalid aggregate collection ID list!') );
+					$this->set_setting( 'aggregate_coll_IDs', NULL );
 				}
-				$this->set_setting( 'aggregate_coll_IDs', $aggregate_coll_IDs );
+				else
+				{
+					$this->set_setting( 'aggregate_coll_IDs', '*' );
+				}
 			}
 
 
@@ -1488,13 +1583,13 @@ class Blog extends DataObject
 		{
 			if( is_null( $setting ) )
 			{ // just return current favorite status
-				$fav_SQL = new SQL();
+				$fav_SQL = new SQL( 'Check if collection #'.$this->ID.' is a favorite for user #'.$user_ID );
 				$fav_SQL->SELECT( 'COUNT(*)' );
 				$fav_SQL->FROM( 'T_coll_user_favs' );
 				$fav_SQL->WHERE( 'cufv_blog_ID = '.$DB->quote( $this->ID ) );
 				$fav_SQL->WHERE_and( 'cufv_user_ID = '.$DB->quote( $user_ID ) );
 
-				return $DB->get_var( $fav_SQL->get() );
+				return $DB->get_var( $fav_SQL );
 			}
 
 			if( $setting == 1 )
@@ -2648,6 +2743,10 @@ class Blog extends DataObject
 				$disp_param = 'users';
 				break;
 
+			case 'visitsurl':
+				$disp_param = 'visits';
+				break;
+
 			case 'tagsurl':
 				$disp_param = 'tags';
 				break;
@@ -2766,6 +2865,24 @@ class Blog extends DataObject
 					return '';
 				}
 
+			case 'normal_skin_ID':
+			case 'mobile_skin_ID':
+			case 'tablet_skin_ID':
+				$result = parent::get( $parname );
+				if( $result === NULL )
+				{ // Try to get default from the global settings
+					$result = $Settings->get( 'def_'.$parname );
+				}
+
+				if( $parname == 'mobile_skin_ID' || $parname == 'tablet_skin_ID' )
+				{
+					if( empty( $result ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
+					{	// Empty values(NULL, 0, '0', '') means that use the same as normal case:
+						$result = $this->get( 'normal_skin_ID' );
+					}
+				}
+				return $result;
+
 			default:
 				// All other params:
 				return parent::get( $parname );
@@ -2774,7 +2891,7 @@ class Blog extends DataObject
 		if( ! empty( $disp_param ) )
 		{ // Get url depending on value of param 'disp'
 			$this_Blog = & $this;
-			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) )
+			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'visits' ) ) )
 			{ // Check if we can use this blog for messaging actions or we should use spec blog
 				if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
 				{ // Use special blog for messaging actions if it is defined in general settings
@@ -2836,25 +2953,6 @@ class Blog extends DataObject
 
 		switch( $parname )
 		{
-			case 'normal_skin_ID':
-				if( $result === NULL )
-				{ // Try to get default from the global settings
-					$result = $Settings->get( 'def_'.$parname );
-				}
-				break;
-
-			case 'mobile_skin_ID':
-			case 'tablet_skin_ID':
-				if( $result === NULL )
-				{ // Try to get default from the global settings
-					$result = $Settings->get( 'def_'.$parname );
-				}
-				if( ( $result === '0' ) && ! $real_value )
-				{ // 0 value means that use the same as normal case
-					$result = $this->get_setting( 'normal_skin_ID' );
-				}
-				break;
-
 			case 'moderation_statuses':
 			case 'post_moderation_statuses':
 				if( $result === NULL )
@@ -2889,6 +2987,22 @@ class Blog extends DataObject
 					{
 						array_push( $coll_IDs, $this->ID );
 						$result = implode( ',', $coll_IDs );
+					}
+				}
+				break;
+
+			case 'msgform_subject_options':
+				$subject_list = utf8_trim( $this->get_setting( 'msgform_subject_list' ) );
+				$result = array();
+				if( ! empty( $subject_list ) )
+				{
+					$subject_list = explode( "\n", str_replace( "\r", '', $subject_list ) );
+					foreach( $subject_list as $subject_option )
+					{
+						if( utf8_trim( $subject_option ) != '' )
+						{	// Use only not empty line:
+							$result[ $subject_option ] = $subject_option;
+						}
 					}
 				}
 				break;
@@ -2995,10 +3109,10 @@ class Blog extends DataObject
 
 		if( $this->get( 'order' ) == 0 )
 		{ // Set an order as max value of previous order + 1 if it is not defined yet
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get max collection order' );
 			$SQL->SELECT( 'MAX( blog_order )' );
 			$SQL->FROM( 'T_blogs' );
-			$max_order = intval( $DB->get_var( $SQL->get() ) );
+			$max_order = intval( $DB->get_var( $SQL ) );
 			$this->set( 'order', $max_order + 1 );
 		}
 
@@ -3193,7 +3307,7 @@ class Blog extends DataObject
 	 */
 	function duplicate()
 	{
-		global $DB;
+		global $DB, $current_User;
 
 		$DB->begin();
 
@@ -3206,7 +3320,7 @@ class Blog extends DataObject
 		$source_fields_SQL->SELECT( '*' );
 		$source_fields_SQL->FROM( 'T_blogs' );
 		$source_fields_SQL->WHERE( 'blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_fields = $DB->get_row( $source_fields_SQL->get(), ARRAY_A, NULL, $source_fields_SQL->title );
+		$source_fields = $DB->get_row( $source_fields_SQL, ARRAY_A );
 		// Use field values of duplicated collection by default:
 		foreach( $source_fields as $source_field_name => $source_field_value )
 		{
@@ -3228,12 +3342,27 @@ class Blog extends DataObject
 		$source_settings_SQL->SELECT( 'cset_name, cset_value' );
 		$source_settings_SQL->FROM( 'T_coll_settings' );
 		$source_settings_SQL->WHERE( 'cset_coll_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_settings = $DB->get_assoc( $source_settings_SQL->get(), $source_settings_SQL->title );
+		$source_settings = $DB->get_assoc( $source_settings_SQL );
 		// Use setting values of duplicated collection by default:
 		foreach( $source_settings as $source_setting_name => $source_setting_value )
 		{
+			if( $source_setting_name == 'allow_duplicate' )
+			{
+				continue;
+			}
 			$this->set_setting( $source_setting_name, $source_setting_value );
 		}
+
+		$blog_urlname = param( 'blog_urlname', 'string', true );
+		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $duplicated_coll_ID ) )
+		{ // validate the urlname, which was already set by init_by_kind() function
+			// It needs to validated, because the user can not set the blog urlname, and every new blog would have the same urlname without validation.
+			// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
+			$this->set( 'urlname', urltitle_validate( empty( $blog_urlname ) ? $this->get( 'urlname' ) : $blog_urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
+		}
+
+		// Set collection owner to current user
+		$this->set( 'owner_user_ID', $current_User->ID );
 
 		// Call this firstly to find all possible errors before inserting:
 		// Also to set new values from submitted form:
@@ -3286,16 +3415,19 @@ class Blog extends DataObject
 			 WHERE wi_coll_ID = '.$DB->quote( $duplicated_coll_ID ),
 			'Duplicate all widgets from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
 
+		/*
+		// There is currently no use case to duplicate categories if category contents are not duplicated
+
 		// Copy all categories from duplicated collection to new created:
 		$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );
 		$source_cats_SQL->SELECT( '*' );
 		$source_cats_SQL->FROM( 'T_categories' );
 		$source_cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_cats = $DB->get_results( $source_cats_SQL->get(), ARRAY_A, $source_cats_SQL->title );
+		$source_cats = $DB->get_results( $source_cats_SQL, ARRAY_A );
 		$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
 		$ChapterCache = & get_ChapterCache();
 		foreach( $source_cats as $source_cat_fields )
-		{	// Copy each category separately because of uniwue field "cat_urlname":
+		{	// Copy each category separately because of unique field "cat_urlname":
 			$new_Chapter = & $ChapterCache->new_obj( NULL, $this->ID );
 			foreach( $source_cat_fields as $source_cat_field_name => $source_cat_field_value )
 			{
@@ -3324,6 +3456,7 @@ class Blog extends DataObject
 				$new_Chapter->dbupdate();
 			}
 		}
+		*/
 
 		// The duplicating is successful, So commit all above changes:
 		$DB->commit();
@@ -3530,13 +3663,13 @@ class Blog extends DataObject
 			}
 
 			// Check if the requested group still exists in DB:
-			$group_SQL = new SQL();
+			$group_SQL = new SQL( 'Check if the requested group still exists in DB' );
 			$group_SQL->SELECT( 'grp_ID' );
 			$group_SQL->FROM( 'T_groups' );
 			$group_SQL->WHERE( 'grp_ID = '.$DB->quote( $group['ID'] ) );
 			$group_SQL->WHERE_and( 'grp_name = '.$DB->quote( $group['name'] ) );
 			$group_SQL->WHERE_and( 'grp_name = '.$DB->quote( T_( $group['name'], $default_locale ) ) );
-			if( ! $DB->get_var( $group_SQL->get() ) )
+			if( ! $DB->get_var( $group_SQL ) )
 			{	// Skip this group because we cannot find it in DB:
 				continue;
 			}
@@ -3822,26 +3955,26 @@ class Blog extends DataObject
 				{
 					if( $Session->is_mobile_session() )
 					{
-						return $this->get_setting( 'mobile_skin_ID' );
+						return $this->get( 'mobile_skin_ID' );
 					}
 					if( $Session->is_tablet_session() )
 					{
-						return $this->get_setting( 'tablet_skin_ID' );
+						return $this->get( 'tablet_skin_ID' );
 					}
 				}
-				return $this->get_setting( 'normal_skin_ID' );
+				return $this->get( 'normal_skin_ID' );
 
 			case 'normal':
 				// Normal skin
-				return $this->get_setting( 'normal_skin_ID' );
+				return $this->get( 'normal_skin_ID' );
 
 			case 'mobile':
 				// Mobile skin
-				return $this->get_setting( 'mobile_skin_ID' );
+				return $this->get( 'mobile_skin_ID' );
 
 			case 'tablet':
 				// Tablet skin
-				return $this->get_setting( 'tablet_skin_ID' );
+				return $this->get( 'tablet_skin_ID' );
 		}
 
 		// Deny to request invalid skin types
@@ -4544,7 +4677,7 @@ class Blog extends DataObject
 			$SQL->FROM_add( 'INNER JOIN T_items__type ON itc_ityp_ID = ityp_ID' );
 			$SQL->WHERE( 'itc_coll_ID = '.$this->ID );
 
-			$this->enabled_item_types = $DB->get_assoc( $SQL->get(), $SQL->title );
+			$this->enabled_item_types = $DB->get_assoc( $SQL );
 		}
 
 		if( $usage === NULL )
@@ -4765,7 +4898,7 @@ class Blog extends DataObject
 				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
 				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );
 
-			$this->comment_moderator_user_data = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+			$this->comment_moderator_user_data = $DB->get_results( $SQL );
 		}
 
 		return $this->comment_moderator_user_data;
@@ -4910,7 +5043,7 @@ class Blog extends DataObject
 		$posts_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
 		$posts_SQL->WHERE_and( 'post_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
 		$posts_SQL->GROUP_BY( 'post_status' );
-		$posts = $DB->get_assoc( $posts_SQL->get(), $posts_SQL->title );
+		$posts = $DB->get_assoc( $posts_SQL );
 
 		$comments_SQL = new SQL( 'Get how much comments will be updated after new max allowed status of the collection #'.$this->ID );
 		$comments_SQL->SELECT( 'comment_status, COUNT( comment_ID )' );
@@ -4920,7 +5053,7 @@ class Blog extends DataObject
 		$comments_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
 		$comments_SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
 		$comments_SQL->GROUP_BY( 'comment_status' );
-		$comments = $DB->get_assoc( $comments_SQL->get(), $comments_SQL->title );
+		$comments = $DB->get_assoc( $comments_SQL );
 
 		if( empty( $posts ) && empty( $comments ) )
 		{	// All posts and comments have a correct status:
@@ -4993,7 +5126,7 @@ class Blog extends DataObject
 		$ItemList2->query_init();
 
 		// Get a count of the unread topics for current user:
-		$unread_posts_SQL = new SQL();
+		$unread_posts_SQL = new SQL( 'Get a count of the unread topics of collection #'.$this->ID.' for current user' );
 		$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
 		$unread_posts_SQL->FROM( 'T_items__item' );
 		$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__user_data ON post_ID = itud_item_ID AND itud_user_ID = '.$DB->quote( $current_User->ID ) );
@@ -5007,7 +5140,146 @@ class Blog extends DataObject
 		$unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts < post_contents_last_updated_ts' );
 
 		// Execute a query with to know if current user has new data to view:
-		return intval( $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics of collection #'.$this->ID.' for current user' ) );
+		return intval( $DB->get_var( $unread_posts_SQL ) );
+	}
+
+
+	/**
+	 * Get additional fields on disp=msgform
+	 *
+	 * @return array
+	 */
+	function get_msgform_additional_fields()
+	{
+		$msgform_additional_fields = trim( $this->get_setting( 'msgform_additional_fields' ) );
+
+		$saved_additional_fields = array();
+
+		if( empty( $msgform_additional_fields ) )
+		{	// No saved additional fields for this collection:
+			return $saved_additional_fields;
+		}
+
+		// Get data of saved additional fields from DB by IDs:
+		$msgform_additional_fields = explode( ',', $msgform_additional_fields );
+		$UserFieldCache = & get_UserFieldCache();
+		foreach( $msgform_additional_fields as $user_field_ID )
+		{
+			if( $UserField = & $UserFieldCache->get_by_ID( $user_field_ID, false, false ) )
+			{
+				$saved_additional_fields[ $UserField->ID ] = $UserField;
+			}
+		}
+
+		return $saved_additional_fields;
+	}
+
+
+	/**
+	 * Display all selected additional fields on disp=msgform
+	 *
+	 * @param object Form
+	 * @return array
+	 */
+	function display_msgform_additional_fields( $Form )
+	{
+		$msgform_additional_fields = $this->get_msgform_additional_fields();
+
+		foreach( $msgform_additional_fields as $UserField )
+		{
+			$field_value = '';
+			$field_value2 = '';
+			if( is_logged_in() )
+			{	// Get saved field value from the current logged in User:
+				global $current_User;
+				$userfields = $current_User->userfields_by_ID( $UserField->ID );
+
+				if( isset( $userfields[0] ) )
+				{	// Get a value for single field or first of multiple field:
+					$userfield_data = $userfields[0];
+					if( in_array( $UserField->get( 'duplicated' ), array( 'list', 'allowed' ) ) && isset( $userfield_data->list ) )
+					{	// Use only first value of the list field:
+						$field_values = array_values( $userfield_data->list );
+						$field_value = isset( $field_values[0] ) ? $field_values[0] : $userfield_data->uf_varchar;
+						$field_value2 = isset( $field_values[1] ) ? $field_values[1] : '';
+					}
+					else
+					{
+						$field_value = $userfield_data->uf_varchar;
+					}
+				}
+
+				if( isset( $userfields[1] ) )
+				{	// Get a value for second of multiple field:
+					$field_value2 = $userfields[1]->uf_varchar;
+				}
+			}
+
+			// Display single additional field:
+			$this->display_msgform_additional_field( $Form, $UserField, $field_value );
+
+			if( $field_value != '' && in_array( $UserField->get( 'duplicated' ), array( 'allowed', 'list' ) ) )
+			{	// If field is multiple the display one more additional field:
+				$this->display_msgform_additional_field( $Form, $UserField, $field_value2, true );
+			}
+		}
+	}
+
+
+	/**
+	 * Display single additional field on disp=msgform
+	 *
+	 * @param object Form
+	 * @param object UserField
+	 * @param string Field value
+	 * @param boolean Is field duplicated
+	 * @return array
+	 */
+	function display_msgform_additional_field( $Form, $UserField, $field_value = '', $force_not_required = false )
+	{
+		$field_params = array();
+
+		if( ! $force_not_required && $UserField->get( 'required' ) == 'require' )
+		{	// Field is required and it is not a second copy of the field:
+			$field_params['required'] = true;
+		}
+
+		if( $UserField->get( 'suggest' ) == '1' && $UserField->get( 'type' ) == 'word' )
+		{	// Mark field with this tag to suggest a values
+			$field_params['autocomplete'] = 'on';
+		}
+
+		// Field name:
+		$field_name = 'user_fields['.$UserField->ID.']';
+		if( in_array( $UserField->get( 'duplicated' ), array( 'allowed', 'list' ) ) )
+		{	// If field can be duplicated:
+			$field_name .= '[]';
+		}
+
+		// Field icon:
+		$userfield_icon = $UserField->get( 'icon_name' ) ? '<span class="'.$UserField->get( 'icon_name' ).' ufld_'.$UserField->get( 'code' ).' ufld__textcolor"></span> ' : '';
+
+		switch( $UserField->get( 'type' ) )
+		{
+			case 'text':
+				$field_params['cols'] = 38;
+				$Form->textarea_input( $field_name, $field_value, 5, $userfield_icon.$UserField->get( 'name' ), $field_params );
+				break;
+
+			case 'list':
+				$uf_options = explode( "\n", str_replace( "\r", '', $UserField->get( 'options' ) ) );
+				if( $UserField->get( 'required' ) != 'require' )
+				{	// Add an empty value for not required field:
+					$uf_options = array_merge( array( '', '---' ), $uf_options );
+				}
+				$Form->select_input_array( $field_name, $field_value, $uf_options, $userfield_icon.$UserField->get( 'name' ), '', $field_params );
+				break;
+
+			default:
+				$field_params['maxlength'] = 255;
+				$field_params['style'] = 'max-width:90%';
+				$Form->text_input( $field_name, $field_value, ( $UserField->get( 'type' ) == 'url' ? 80 : 40 ), $userfield_icon.$UserField->get( 'name' ), '', $field_params );
+		}
 	}
 }
 

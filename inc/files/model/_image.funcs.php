@@ -739,8 +739,9 @@ if( !function_exists( 'imagerotate' ) )
  * @param integer constrained height
  * @param string mimetype of File
  * @param integer image quality
+ * @return boolean TRUE if the image was successfully resized, otherwise FALSE
  */
-function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_quality = NULL)
+function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_quality = NULL, $output_message = true )
 {
 	global $Settings, $Messages;
 
@@ -765,15 +766,21 @@ function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_
 
 	if( empty( $err ) )
 	{ // Image was resized successfully
-		$Messages->add_to_group( sprintf( T_( '%s was resized to %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', imagesx( $resized_imh ), imagesy( $resized_imh ) ),
-				'success', T_('The following images were resized:') );
+		if( $output_message )
+		{
+			$Messages->add_to_group( sprintf( T_( '%s was resized to %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', imagesx( $resized_imh ), imagesy( $resized_imh ) ),
+					'success', T_('The following images were resized:') );
+		}
 	}
 	else
 	{ // Image was not resized
-		$Messages->add_to_group( sprintf( T_( '%s could not be resized to target resolution of %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', $new_width, $new_height ),
-				'error', T_('Unable to resize the following images:') );
+		if( $output_message )
+		{
+			$Messages->add_to_group( sprintf( T_( '%s could not be resized to target resolution of %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', $new_width, $new_height ),
+					'error', T_('Unable to resize the following images:') );
+		}
 		// Error exists, exit here
-		return;
+		return false;
 	}
 
 	if( $mimetype == 'image/jpeg' )
@@ -783,12 +790,17 @@ function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_
 
 	if( !$resized_imh )
 	{	// Image resource is incorrect
-		return;
+		return false;
 	}
 
 	if( empty( $err ) )
 	{	// Save resized image ( and also rotated image if this operation was done )
 		save_image( $resized_imh, $File->get_full_path(), $mimetype, $image_quality );
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

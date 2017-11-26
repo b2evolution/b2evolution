@@ -76,6 +76,13 @@ class ComponentWidget extends DataObject
 	*/
 	var $Blog = NULL;
 
+	/**
+	 * Widget icon name.
+	 * Use icon name from http://fontawesome.io/icons/
+	 *
+	 * @var string
+	 */
+	var $icon = 'cube';
 
 	/**
 	 * Constructor
@@ -202,27 +209,33 @@ class ComponentWidget extends DataObject
 	 * @return string
 	 */
 	function get_desc_for_list()
-    {
-        $name = $this->get_name();
+	{
+		$name = $this->get_name();
 
-        if( $this->type == 'plugin' )
-        {
-            if ( isset($this->disp_params['title']) && ! empty($this->disp_params['title']) ) {
-                return '<strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
-            }
+		if( $this->type == 'plugin' )
+		{	// Plugin widget:
+			$widget_Plugin = & $this->get_Plugin();
+			$icon = '<span class="fa fa-'.$widget_Plugin->widget_icon.'"></span>';
 
-            return '<strong>'.$name.'</strong> ('.T_('Plugin').')';
-        }
+			if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+			{
+				return $icon.' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+			}
 
-        $short_desc = $this->get_short_desc();
+			return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+		}
 
-        if( $name == $short_desc || empty($short_desc) )
-        {
-            return '<strong>'.$name.'</strong>';
-        }
+		// Normal widget:
+		$short_desc = $this->get_short_desc();
+		$icon = '<span class="fa fa-'.$this->icon.'"></span>';
 
-        return '<strong>'.$short_desc.'</strong> ('.$name.')';
-    }
+		if( $name == $short_desc || empty( $short_desc ) )
+		{
+			return $icon.' <strong>'.$name.'</strong>';
+		}
+
+		return $icon.' <strong>'.$short_desc.'</strong> ('.$name.')';
+	}
 
 
 	/**
@@ -314,8 +327,18 @@ class ComponentWidget extends DataObject
 			}
 		}
 
+		if( ! isset( $r['widget_css_class'] ) ||
+		    ! isset( $r['widget_ID'] ) ||
+		    ! isset( $r['allow_blockcache'] ) )
+		{	// Start fieldset of advanced settings:
+			$r['advanced_layout_start'] = array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Advanced'),
+				);
+		}
+
 		if( ! isset( $r['widget_css_class'] ) )
-		{
+		{	// Widget CSS class:
 			$r['widget_css_class'] = array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
@@ -324,7 +347,7 @@ class ComponentWidget extends DataObject
 		}
 
 		if( ! isset( $r['widget_ID'] ) )
-		{
+		{	// Widget ID:
 			$r['widget_ID'] = array(
 					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
@@ -333,7 +356,7 @@ class ComponentWidget extends DataObject
 		}
 
 		if( ! isset( $r['allow_blockcache'] ) )
-		{
+		{	// Allow widget/block caching:
 			$widget_Blog = & $this->get_Blog();
 			$r['allow_blockcache'] = array(
 					'label' => T_( 'Allow caching' ),
@@ -342,6 +365,15 @@ class ComponentWidget extends DataObject
 							T_('Block caching is disabled for this collection.'),
 					'type' => 'checkbox',
 					'defaultvalue' => true,
+				);
+		}
+
+		if( ! isset( $r['widget_css_class'] ) ||
+		    ! isset( $r['widget_ID'] ) ||
+		    ! isset( $r['allow_blockcache'] ) )
+		{	// End fieldset of advanced settings:
+			$r['advanced_layout_end'] = array(
+					'layout' => 'end_fieldset',
 				);
 		}
 
@@ -376,9 +408,33 @@ class ComponentWidget extends DataObject
 	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
 	{
 		$this->load_param_array();
-		if( isset( $this->param_array[$parname] ) )
-		{	// We have a value for this param:
-			return $this->param_array[$parname];
+
+		if( strpos( $parname, '[' ) !== false )
+		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+			$setting_names = explode( '[', $parname );
+			if( isset( $this->param_array[ $setting_names[0] ] ) )
+			{
+				$setting_value = $this->param_array[ $setting_names[0] ];
+				unset( $setting_names[0] );
+				foreach( $setting_names as $setting_name )
+				{
+					$setting_name = trim( $setting_name, ']' );
+					if( isset( $setting_value[ $setting_name ] ) )
+					{
+						$setting_value = $setting_value[ $setting_name ];
+					}
+					else
+					{
+						$setting_value = NULL;
+						break;
+					}
+				}
+				return $setting_value;
+			}
+		}
+		elseif( isset( $this->param_array[ $parname ] ) )
+		{	// Get normal(not array) setting value:
+			return $this->param_array[ $parname ];
 		}
 
 		// Try default values:
