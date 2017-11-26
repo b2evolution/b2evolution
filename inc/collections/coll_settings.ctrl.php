@@ -872,8 +872,8 @@ if( $action == 'dashboard' )
 
 			echo '<p><strong>'.T_('Welcome to your new collection\'s dashboard!').'</strong></p>';
 			echo '<p>'.sprintf( T_('Write your <a %s>first post</a>  or customize this collection via the <a %s>Settings</a> tab.'), 'href="'.get_dispctrl_url( 'items', 'action=new&amp;blog='.$Blog->ID ).'"', 'href="'.get_dispctrl_url( 'coll_settings', 'tab=general&amp;blog='.$Blog->ID ).'"').'</p>';
-			echo '<p>'.sprintf( T_('You can see your collection\'s front page at any time by clicking "Collection &raquo %s Front Page..." in the b2evolution toolbar at the top of this page.'), $Blog->shortname ).'</p>';
-			echo '<p>'.sprintf( T_('You can come back here at any time by clicking "Collection &raquo %s Dashboard..." in that same evobar.'), $Blog->shortname ).'</p>';
+			echo '<p>'.T_('You can see your collection\'s front page at any time by clicking "Collection &raquo; Front Page..." in the b2evolution toolbar at the top of this page.').'</p>';
+			echo '<p>'.T_('You can come back here at any time by clicking "Collection &raquo; Dashboard..." in that same evobar.').'</p>';
 
 			$block_item_Widget->disp_template_raw( 'block_end' );
 		}
