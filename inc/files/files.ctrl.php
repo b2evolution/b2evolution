@@ -936,7 +936,7 @@ switch( $action )
 			break;
 		}
 
-		if( ! $selected_Filelist->count() && ( ! $source_Filelist || ! $source_Filelist->count() ) )
+		if( ! $selected_Filelist->count() )
 		{ // There is nothing to resize
 			$Messages->add( T_('Nothing selected.'), 'error' );
 			$action = 'list';

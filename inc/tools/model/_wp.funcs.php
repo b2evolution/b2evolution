@@ -175,11 +175,11 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	{ // Remove data from selected blog
 
 		// Get existing categories
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get existing categories of collection #'.$wp_blog_ID );
 		$SQL->SELECT( 'cat_ID' );
 		$SQL->FROM( 'T_categories' );
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $wp_blog_ID ) );
-		$old_categories = $DB->get_col( $SQL->get() );
+		$old_categories = $DB->get_col( $SQL );
 		if( !empty( $old_categories ) )
 		{ // Get existing posts
 			$SQL = new SQL();
@@ -1490,11 +1490,11 @@ function wp_unique_urlname( $source, $table, $field )
 	$url_name_correct = $url_name;
 	do
 	{	// Check for unique url name in DB
-		$SQL = new SQL();
+		$SQL = new SQL( 'WordPress import: Check for unique url name in DB' );
 		$SQL->SELECT( $field );
 		$SQL->FROM( $table );
 		$SQL->WHERE( $field.' = '.$DB->quote( $url_name_correct ) );
-		$category = $DB->get_var( $SQL->get() );
+		$category = $DB->get_var( $SQL );
 		if( $category )
 		{	// Category already exists with such url name; Change it
 			$url_name_correct = $url_name.'-'.$url_number;

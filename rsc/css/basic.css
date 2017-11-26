@@ -1153,3 +1153,16 @@ table.widget_grid div:last-child {
 .ufld_icon_links a {
   text-align: center;
 }
+div.evo_highlight,
+li.evo_highlight,
+tr.evo_highlight td {
+  animation: evo_highlight 5s ease-out;
+}
+@keyframes evo_highlight {
+  from {
+    background-color: #FF6600;
+  }
+  to {
+    background-color: auto;
+  }
+}

@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.3';
+	var $version = '6.9.4';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -427,11 +427,11 @@ class bootstrap_blog_Skin extends Skin
 		}
 		if( $color = $this->get_setting( 'bgimg_link_color' ) )
 		{	// Custom link color on background image:
-			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
+			$custom_css .= '.evo_hasbgimg a:not(.btn) { color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
 		{	// Custom link hover color on background image:
-			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
+			$custom_css .= '.evo_hasbgimg a:not(.btn):hover { color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'current_tab_text_color' ) )
 		{ // Custom current tab text color:
@@ -533,7 +533,7 @@ class bootstrap_blog_Skin extends Skin
 		}
 
 		// Font family customization
-		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight' );
+		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight', 'font' );
 
 		if( ! empty( $custom_css ) )
 		{	// Function for custom_css:
@@ -544,28 +544,6 @@ class bootstrap_blog_Skin extends Skin
 		</style>';
 			add_headline( $custom_css );
 		}
-	}
-
-
-	/**
-	 * Check if we can display a widget container when access is denied to collection by current user
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function show_container_when_access_denied( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
 

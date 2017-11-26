@@ -2211,12 +2211,12 @@ function user_exists( $login )
 {
 	global $DB;
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get a count of users with login '.$login );
 	$SQL->SELECT( 'COUNT(*)' );
 	$SQL->FROM( 'T_users' );
-	$SQL->WHERE( 'user_login = "'.$DB->escape($login).'"' );
+	$SQL->WHERE( 'user_login = '.$DB->quote( $login ) );
 
-	$var = $DB->get_var( $SQL->get() );
+	$var = $DB->get_var( $SQL );
 	return $var > 0 ? true : false; // PHP4 compatibility
 }
 
@@ -4074,7 +4074,7 @@ function mail_autoinsert_user_data( $text, $User = NULL )
  */
 function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
 {
-	global $current_charset;
+	global $current_charset, $current_User;
 
 	if( !empty( $params['locale'] ) )
 	{ // Switch to locale for current email template
@@ -5935,13 +5935,23 @@ function format_to_js( $unformatted )
 
 
 /**
- * Get available sort options for items
+ * Get available cort oprions for items
  *
- * @return array key=>name
+ * @param integer|NULL Collection ID to get only enabled item types for the collection, NULL to get all item types
+ * @param boolean true to enable none option
+ * @param boolean true to also return custom field options, false otherwise
+ * @return array key=>name or array( 'general' => array( key=>name ), 'custom' => array( key=>name ) )
  */
-function get_available_sort_options()
+function get_available_sort_options( $coll_ID = NULL, $allow_none = false, $include_custom_fields = false )
 {
-	return array(
+	$options = array();
+
+	if( $allow_none )
+	{ // Enable none option
+		$options[''] = T_('None');
+	}
+
+	$options = array_merge( $options, array(
 		'datestart'                => T_('Date issued (Default)'),
 		'order'                    => T_('Order (as explicitly specified)'),
 		//'datedeadline'           => T_('Deadline'),
@@ -5954,7 +5964,29 @@ function get_available_sort_options()
 		'priority'                 => T_('Priority'),
 		'numviews'                 => T_('Number of members who have viewed the post (If tracking enabled)'),
 		'RAND'                     => T_('Random order!'),
-	);
+	) );
+
+	if( $include_custom_fields )
+	{	// We need to include custom fields as well:
+		global $DB;
+
+		$SQL = new SQL( 'Get custom fields for items sort options' );
+		$SQL->SELECT( 'DISTINCT( CONCAT( "custom_", itcf_type, "_", itcf_name ) ), itcf_name' );
+		$SQL->FROM( 'T_items__type_custom_field' );
+		$SQL->FROM_add( 'INNER JOIN T_items__type ON ityp_ID = itcf_ityp_ID' );
+		$SQL->WHERE( 'ityp_usage = "post"' );
+		if( ! empty( $coll_ID ) )
+		{	// Restrict by enabled item types for the given collection:
+			$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID' );
+			$SQL->WHERE_and( 'itc_coll_ID = '.$DB->quote( $coll_ID ) );
+		}
+		$custom_fields = $DB->get_assoc( $SQL );
+
+		// Add custom fields as available sort options:
+		return array( 'general' => $options, 'custom' => $custom_fields );
+	}
+
+	return $options;
 }
 
 

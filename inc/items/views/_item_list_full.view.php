@@ -129,7 +129,7 @@ while( $Item = & $ItemList->get_item() )
 		<div class="panel-heading small <?php
 		if( $Item->ID == $highlight )
 		{
-			echo 'fadeout-ffff00" id="fadeout-1';
+			echo ' evo_highlight';
 		}
 		?>">
 			<?php

@@ -191,13 +191,13 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 
 	<div class="row">
 
-		<footer class="col-md-12 center">
+		<footer class="col-md-12">
 
 			<?php
 			if( $Skin->show_container_when_access_denied( 'footer' ) )
 			{ // Display 'Footer' widget container
 			?>
-			<div class="evo_container evo_container__footer">
+			<div class="evo_container evo_container__footer clearfix">
 			<?php
 				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
@@ -209,7 +209,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 			</div>
 			<?php } ?>
 
-			<p>
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

@@ -67,7 +67,7 @@ else
 }
 $SQL->GROUP_BY( 'year, month, day' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC' );
-$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+$res_hits = $DB->get_results( $SQL, ARRAY_A );
 
 /*
  * Chart

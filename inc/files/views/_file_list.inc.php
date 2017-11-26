@@ -721,8 +721,12 @@ $Form->begin_form();
 				$field_options['move_copy'] = T_('Copy/Move to another directory...');
 			}
 
-			if( $mode == 'upload' && isset( $LinkOwner ) && $LinkOwner->type == 'item' )
-			{	// We are uploading in a popup opened by an edit screen
+			if( $mode == 'upload' &&
+			    isset( $LinkOwner ) &&
+			    ( $LinkOwner->type == 'item' ||
+			      ( $LinkOwner->is_temp() && $LinkOwner->link_Object->type == 'item' )
+			    ) )
+			{	// We are uploading in a popup opened by an edit/new item form:
 				$field_options['img_tag'] = T_('Insert IMG/link into post');
 			}
 

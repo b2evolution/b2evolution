@@ -24,6 +24,8 @@ load_class( 'widgets/widgets/_coll_item_list.widget.php' , 'coll_item_list_Widge
  */
 class coll_related_post_list_Widget extends coll_item_list_Widget
 {
+	var $icon = 'list-alt';
+
 	/**
 	 * Constructor
 	 */

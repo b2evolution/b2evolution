@@ -124,8 +124,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 18, array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );
 		}
 		if( $kind == 'forum' )
-		{ // Add menu with User Directory
+		{ // Add menu with User Directory and Profile Visits ONLY for forum
 			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 20, array( 'link_type' => 'users' ) );
+			add_basic_widget( $blog_id, 'Menu', 'basic_menu_link', 'core', 21, array( 'link_type' => 'visits' ) );
 		}
 		// Pages list:
 		add_basic_widget( $blog_id, 'Menu', 'coll_page_list', 'core', 25 );
@@ -273,7 +274,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		}
 		if( $kind == 'forum' )
 		{
-			add_basic_widget( $blog_id, 'Sidebar', 'user_avatars', 'core', 90, 'a:13:{s:5:"title";s:17:"Most Active Users";s:10:"thumb_size";s:14:"crop-top-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"6";s:9:"bubbletip";i:1;s:8:"order_by";s:8:"numposts";s:5:"style";s:6:"simple";s:6:"gender";s:3:"any";s:8:"location";s:3:"any";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
+			add_basic_widget( $blog_id, 'Sidebar', 'user_avatars', 'core', 90, array(
+					'title'           => 'Most Active Users',
+					'limit'           => 6,
+					'order_by'        => 'numposts',
+					'rwd_block_class' => 'col-lg-3 col-md-3 col-sm-4 col-xs-6'
+				) );
 		}
 		add_basic_widget( $blog_id, 'Sidebar', 'coll_xml_feeds', 'core', 100 );
 		add_basic_widget( $blog_id, 'Sidebar', 'mobile_skin_switcher', 'core', 110 );

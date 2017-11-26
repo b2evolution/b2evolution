@@ -50,6 +50,12 @@ if( !empty( $template_action ) )
 			tool_create_sample_posts( $blog_ID, $num_posts );
 			break;
 
+		case 'create_sample_revisions':
+			// Create revisions of exists posts
+			global $blog_ID, $min_revisions, $max_revisions;
+			tool_create_sample_revisions( $blog_ID, $min_revisions, $max_revisions );
+			break;
+
 		case 'create_sample_users':
 			// Create the users and display a process of creating
 			global $user_groups, $num_users, $advanced_user_perms;
@@ -91,6 +97,7 @@ if( $current_User->check_perm('options', 'edit') )
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_collections&amp;'.url_crumb('tools')).'">'.T_('Create sample collections').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_comments&amp;'.url_crumb('tools')).'">'.T_('Create sample comments').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_posts&amp;'.url_crumb('tools')).'">'.T_('Create sample posts').'</a></li>';
+	echo '<li><a href="'.regenerate_url('action', 'action=show_create_revisions&amp;'.url_crumb('tools')).'">'.T_('Create sample post revisions').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_users&amp;'.url_crumb('tools')).'">'.T_('Create sample users').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_hits&amp;'.url_crumb('tools')).'">'.T_('Create sample hit data').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_basedomains&amp;'.url_crumb('tools')).'">'.T_('Create sample base domains').'</a></li>';

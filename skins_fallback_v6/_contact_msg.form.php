@@ -41,7 +41,9 @@ if( ( $unsaved_message_params = get_message_params_from_session() ) == NULL )
 else
 { // set saved message params
 	$subject = $unsaved_message_params[ 'subject' ];
+	$subject_other = $unsaved_message_params[ 'subject_other' ];
 	$message = $unsaved_message_params[ 'message' ];
+	$contact_method = $unsaved_message_params[ 'contact_method' ];
 	$email_author = $unsaved_message_params[ 'sender_name' ];
 	$email_author_address = $unsaved_message_params[ 'sender_address' ];
 }
@@ -65,19 +67,94 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 	$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_htsrv_url() ) );
 
 	if( $Blog->get_setting( 'msgform_display_recipient' ) )
-	{
-		$Form->info( T_('Message to'), $recipient_link );
+	{	// Display recipient:
+		$recipient_label = utf8_trim( $Blog->get_setting( 'msgform_recipient_label' ) );
+		$Form->info( ( empty( $recipient_label ) ? T_('Message to') : $recipient_label ), $recipient_link );
 	}
 
-	// Note: we use funky field names in order to defeat the most basic guestbook spam bots:
-	// email form
-	$Form->text_input( $dummy_fields[ 'name' ], $email_author, 40, T_('From'), T_('Your name.'), array( 'maxlength'=>50, 'class'=>'wide_input', 'required'=>true ) );
-	$Form->text_input( $dummy_fields[ 'email' ], $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'),
-		 array( 'maxlength'=>150, 'class'=>'wide_input', 'required'=>true ) );
+	if( is_logged_in() )
+	{	// Name fields for current logged in user:
+		$edited_user_perms = array( 'edited-user', 'edited-user-required' );
+		switch( $Blog->get_setting( 'msgform_user_name' ) )
+		{
+			case 'fullname':
+				$firstname_editing = $Settings->get( 'firstname_editing' );
+				if( in_array( $firstname_editing, $edited_user_perms ) )
+				{	// First name:
+					$Form->text_input( 'user_firstname', $current_User->get( 'firstname' ), 20, T_('First name'), '', array( 'maxlength' => 50, 'required' => ( $firstname_editing == 'edited-user-required' ) ) );
+				}
 
-	$Form->text_input( $dummy_fields[ 'subject' ], $subject, 255, T_('Subject'), '', array( 'maxlength'=>255, 'class'=>'', 'required'=>true ) );
+				$lastname_editing = $Settings->get( 'lastname_editing' );
+				if( in_array( $lastname_editing, $edited_user_perms ) )
+				{	// Last name:
+					$Form->text_input( 'user_lastname', $current_User->get( 'lastname' ), 20, T_('Last name'), '', array( 'maxlength' => 50, 'required' => ( $lastname_editing == 'edited-user-required' ) ) );
+				}
+				break;
 
-	$Form->textarea( $dummy_fields[ 'content' ], $message, 15, T_('Message'), T_('Plain text only.'), 35, 'wide_textarea', true );
+			case 'nickname':
+				$nickname_editing = $Settings->get( 'nickname_editing' );
+				if( in_array( $nickname_editing, $edited_user_perms ) )
+				{	// Nickname:
+					$Form->text_input( 'user_nickname', $current_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => ( $nickname_editing == 'edited-user-required' ) ) );
+				}
+				break;
+		}
+	}
+	else
+	{	// Name and Email fields for anonymous user:
+		// Note: we use funky field names in order to defeat the most basic guestbook spam bots:
+		$Form->text_input( $dummy_fields['name'], $email_author, 40, T_('From'), T_('Your name.'), array(
+				'maxlength' => 50,
+				'class'     => 'wide_input',
+				'required'  => $Blog->get_setting( 'msgform_require_name' ),
+			) );
+		$Form->text_input( $dummy_fields['email'], $email_author_address, 40, T_('Email'),
+			T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), array(
+				'maxlength' => 150,
+				'class'     => 'wide_input',
+				'required'  => true,
+			) );
+	}
+
+	if( $Blog->get_setting( 'msgform_display_subject' ) )
+	{	// Display a field to enter or select a subject:
+		$subject_options = $Blog->get_setting( 'msgform_subject_options' );
+		if( empty( $subject_options ) )
+		{	// Display only a text input field for subject:
+			$Form->text_input( $dummy_fields['subject'], $subject, 255, T_('Subject'), '', array(
+					'maxlength' => 255,
+					'required'  => $Blog->get_setting( 'msgform_require_subject' ),
+				) );
+		}
+		else
+		{	// Display a select with text input field for subject:
+			$subject_options = array_merge( array( '' => '---' ), $subject_options );
+			$Form->begin_line( T_('Subject'), NULL, '', array( 'required'  => $Blog->get_setting( 'msgform_require_subject' ) ) );
+				$Form->select_input_array( $dummy_fields['subject'], $subject, $subject_options, '' );
+				$Form->text_input( $dummy_fields['subject'].'_other', $subject_other, 50, T_('Other').': ', '', array( 'maxlength' => 255 ) );
+			$Form->end_line();
+		}
+	}
+
+	// Display additional user feilds:
+	$Blog->display_msgform_additional_fields( $Form );
+
+	if( $Blog->get_setting( 'msgform_contact_method' ) )
+	{	// Display a field to select a preferred contact method:
+		$msgform_contact_methods = get_msgform_contact_methods( isset( $recipient_User ) ? $recipient_User : NULL );
+		if( count( $msgform_contact_methods ) > 1 )
+		{	// Only when at least two methods are allowed:
+			$Form->select_input_array( 'contact_method', $contact_method, $msgform_contact_methods, T_('Preferred contact method'), '', array( 'force_keys_as_values' => true ) );
+		}
+	}
+
+	if( $Blog->get_setting( 'msgform_display_message' ) )
+	{	// Display a field to enter a message:
+		$message_label = utf8_trim( $Blog->get_setting( 'msgform_message_label' ) );
+		$Form->textarea( $dummy_fields['content'], $message, 15,
+			( ( empty( $message_label ) ? T_('Message') : $message_label ) ),
+			T_('Plain text only.'), 35, 'wide_textarea', $Blog->get_setting( 'msgform_require_message' ) );
+	}
 
 	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
 		'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );

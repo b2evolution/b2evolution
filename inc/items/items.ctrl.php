@@ -1078,6 +1078,7 @@ switch( $action )
 		{ // Use original $redirect_to:
 			// Set highlight:
 			$Session->set( 'highlight_id', $edited_Item->ID );
+			$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 			$redirect_to = url_add_param( $redirect_to, 'highlight_id='.$edited_Item->ID, '&' );
 		}
 		else
@@ -1493,7 +1494,7 @@ switch( $action )
 			$SQL->SELECT( 'MAX( comment_date )' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$dest_Item->ID );
-			$latest_comment_time = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+			$latest_comment_time = $DB->get_var( $SQL );
 			if( $latest_comment_time !== NULL )
 			{	// If target Item has at lest one comment use new date/time for new appended comments:
 				$append_comment_timestamp = strtotime( $latest_comment_time ) + 60;
@@ -1537,7 +1538,7 @@ switch( $action )
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$edited_Item->ID );
 			$SQL->ORDER_BY( 'comment_date' );
-			$source_comment_IDs = $DB->get_col( $SQL->get(), 0, $SQL->title );
+			$source_comment_IDs = $DB->get_col( $SQL );
 			foreach( $source_comment_IDs as $source_comment_ID )
 			{
 				$DB->query( 'UPDATE T_comments
@@ -1762,10 +1763,14 @@ switch( $action )
 						) );
 				}
 
-				$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $edited_Item->get_permanent_url(),
-						' '.T_('Permalink'), 4, 3, array(
-								'style' => 'margin-right: 3ex',
-						) );
+				$item_permanent_url = $edited_Item->get_permanent_url( '', '', '&amp;', array( 'none' ) );
+				if( $item_permanent_url !== false )
+				{	// Display item permanent URL only if permanent type is not 'none':
+					$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $item_permanent_url,
+							' '.T_('Permalink'), 4, 3, array(
+									'style' => 'margin-right: 3ex',
+							) );
+				}
 
 				$edited_item_url = $edited_Item->get_copy_url();
 				if( ! empty( $edited_item_url ) )
@@ -1967,12 +1972,21 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'mass-edit-screen' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'browse-edit-tab' );
+		switch( get_param( 'tab' ) )
+		{
+			case 'tracker':
+				$AdminUI->set_page_manual_link( 'task-list' );
+				break;
+			case 'manual':
+				$AdminUI->set_page_manual_link( 'manual-pages-editor' );
+				break;
+			case 'type':
+				$AdminUI->set_page_manual_link( $tab_type.'-list' );
+				break;
+			default:
+				$AdminUI->set_page_manual_link( 'browse-edit-tab' );
+		}
 		break;
-}
-if( get_param( 'tab' ) == 'manual' )
-{
-	$AdminUI->set_page_manual_link( 'manual-pages-editor' );
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

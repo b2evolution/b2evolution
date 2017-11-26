@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class poll_Widget extends ComponentWidget
 {
+	var $icon = 'question-circle-o';
+
 	/**
 	 * Constructor
 	 */

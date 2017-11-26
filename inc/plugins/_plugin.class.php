@@ -268,6 +268,22 @@ class Plugin
 	 */
 	var $template;
 
+	/**
+	 * Plugin actions
+	 * List of actions that the plugin supports
+	 *
+	 * @var array
+	 */
+	var $plugin_actions = array();
+
+	/**
+	 * Widget icon name.
+	 * Use icon name from http://fontawesome.io/icons/
+	 *
+	 * @var string
+	 */
+	var $widget_icon = 'puzzle-piece';
+
 	/**#@-*/
 
 
@@ -4177,6 +4193,18 @@ class Plugin
 				// Never enabled
 				return false;
 		}
+	}
+
+
+	/**
+	 * This method checks if the plugin can process the requested action
+	 *
+	 * @param string Action
+	 * @return boolean TRUE if the plugin can process the action, otherwise FALSE
+	 */
+	function is_plugin_action( $action )
+	{
+		return in_array( $action, $this->plugin_actions );
 	}
 
 

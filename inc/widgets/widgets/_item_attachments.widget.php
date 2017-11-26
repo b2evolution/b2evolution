@@ -34,6 +34,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_attachments_Widget extends ComponentWidget
 {
+	var $icon = 'link';
+
 	/**
 	 * Constructor
 	 */

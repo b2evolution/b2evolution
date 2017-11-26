@@ -93,6 +93,78 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 									 );
 			$Form->end_fieldset();
 
+			$SQL = 'SELECT a.* FROM(
+					SELECT blog_ID, blog_name, "normal" AS skin_type, "1" AS skin_type_order
+					FROM T_blogs
+					WHERE blog_normal_skin_ID = '.$edited_Skin->ID.'
+					UNION ALL
+					SELECT blog_ID, blog_name, "mobile" AS skin_type, "2" AS skin_type_order
+					FROM T_blogs
+					WHERE blog_mobile_skin_ID = '.$edited_Skin->ID.'
+					UNION ALL
+					SELECT blog_ID, blog_name, "tablet" AS skin_type, "3" AS skin_type_order
+					FROM T_blogs
+					WHERE blog_tablet_skin_ID = '.$edited_Skin->ID.' ) AS a
+					ORDER BY blog_ID ASC, skin_type_order ASC';
+
+			$count_SQL = 'SELECT SUM( IF( blog_normal_skin_ID = '.$edited_Skin->ID.', 1, 0 )
+					+ IF( blog_mobile_skin_ID = '.$edited_Skin->ID.', 1, 0 )
+					+ IF( blog_tablet_skin_ID = '.$edited_Skin->ID.', 1, 0 ) )
+					FROM T_blogs
+					WHERE blog_normal_skin_ID = '.$edited_Skin->ID.' OR blog_mobile_skin_ID = '.$edited_Skin->ID.' OR blog_tablet_skin_ID = '.$edited_Skin->ID;
+
+			$Results = new Results( $SQL, '', '', 1000, $count_SQL );
+			$Results->title = T_('Used by').'...';
+			$Results->cols[] = array(
+				'th' => T_('Collection ID'),
+				'td_class' => 'shrinkwrap',
+				'td' => '$blog_ID$',
+			);
+
+			function display_skin_setting_link( $row )
+			{
+				if( empty( $row->blog_name ) )
+				{
+					return;
+				}
+				$url_params = 'tab=skin&amp;blog='.$row->blog_ID;
+
+				if( in_array( $row->skin_type, array( 'mobile', 'tablet' ) ) )
+				{
+					$url_params .= '&amp;skin_type='.str_replace( '_skin_ID', '', $row->skin_type );
+				}
+
+				return '<a href="'.get_dispctrl_url( 'coll_settings', $url_params ).'">'.$row->blog_name.'</a>';
+			}
+
+			$Results->cols[] = array(
+				'th' => T_('Collection name'),
+				'td' => '%display_skin_setting_link( {row} )%',
+			);
+
+			function display_skin_type( $skin_type )
+			{
+				switch( $skin_type )
+				{
+					case 'normal':
+						return T_('Normal');
+
+					case 'mobile':
+						return T_('Mobile');
+
+					case 'tablet':
+						return T_('Tablet');
+				}
+			}
+
+			$Results->cols[] = array(
+				'th' => T_('Skin type'),
+				'td' => '%display_skin_type( #skin_type# )%',
+				'td_class' => 'text-center'
+			);
+
+			$Results->display();
+
 		echo '</div>';
 
 	$Form->end_fieldset();

@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_comment_list_Widget extends ComponentWidget
 {
+	var $icon = 'comments-o';
+
 	/**
 	 * Constructor
 	 */

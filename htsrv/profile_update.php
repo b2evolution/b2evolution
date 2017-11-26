@@ -293,7 +293,13 @@ elseif( ! param_errors_detected() )
 	switch( $action )
 	{
 		case 'update':
-			if( $current_User->has_avatar() )
+			if( isset( $current_User->previous_pass_driver ) &&
+			    $current_User->previous_pass_driver == 'nopass' &&
+			    $current_User->previous_pass_driver != $current_User->get( 'pass_driver' ) )
+			{	// Redirect to page as we use after email validation if current user set password first time, e-g after email capture/quick registration:
+				$redirect_to = redirect_after_account_activation();
+			}
+			elseif( $current_User->has_avatar() )
 			{ // Redirect to display user page
 				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&' ) );
 			}

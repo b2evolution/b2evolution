@@ -1919,7 +1919,7 @@ class File extends DataObject
 			}
 			else
 			{
-				debug_die( sprintf( 'File not found: %s', $file_full_path ) );
+				trigger_error( T_('File not found').': <code>'.$file_full_path.'</code>' );
 			}
 		}
 

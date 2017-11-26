@@ -752,7 +752,7 @@ class Session
 			$SQL->ORDER_BY( 'hit_ID ASC' );
 			$SQL->LIMIT( '1' );
 
-			$this->first_hit_params = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+			$this->first_hit_params = $DB->get_row( $SQL );
 		}
 
 		return $this->first_hit_params;

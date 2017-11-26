@@ -62,6 +62,7 @@ switch ( $action )
 		param( 'validation_process', 'string', true );
 		$activate_requests_limit = param_duration( 'activate_requests_limit' );
 		param( 'newusers_findcomments', 'integer', 0 );
+		param( 'pass_after_quick_reg', 'integer', 0 );
 
 		$after_email_validation = param( 'after_email_validation', 'string', 'return_to_original' );
 		if( $after_email_validation != 'return_to_original' )
@@ -140,6 +141,7 @@ switch ( $action )
 					 array( 'validation_process', $validation_process ),
 					 array( 'newusers_findcomments', $newusers_findcomments ),
 					 array( 'after_email_validation', $after_email_validation ),
+					 array( 'pass_after_quick_reg', $pass_after_quick_reg ),
 					 array( 'after_registration', $after_registration ),
 					 array( 'user_minpwdlen', $user_minpwdlen ),
 					 array( 'js_passwd_hashing', $js_passwd_hashing ),

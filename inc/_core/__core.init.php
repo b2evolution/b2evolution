@@ -301,6 +301,7 @@ function & get_UserFieldCache()
 
 	if( ! isset( $UserFieldCache ) )
 	{	// Cache doesn't exist yet:
+		load_class( 'users/model/_userfield.class.php', 'Userfield' );
 		$UserFieldCache = new DataObjectCache( 'Userfield', false, 'T_users__fielddefs', 'ufdf_', 'ufdf_ID', 'ufdf_name', 'ufdf_name' ); // COPY (FUNC)
 	}
 
@@ -1309,15 +1310,15 @@ class _core_Module extends Module
 					if( $Blog->get( 'type' ) == 'manual' )
 					{ // Manual view
 						global $cat, $Item;
-						if( ! empty( $cat ) && is_number( $cat ) )
-						{	// Set category param from current selected category:
-							$manual_view_cat_param = '&amp;cat_ID='.$cat;
-						}
-						elseif( ! empty( $Item ) &&
+						if( ! empty( $Item ) &&
 						        $Item->ID > 0 &&
 						        ( $item_Chapter = & $Item->get_main_Chapter() ) )
 						{	// Set category param from current selected item/post:
-							$manual_view_cat_param = '&amp;cat_ID='.$item_Chapter->ID;
+							$manual_view_cat_param = '&amp;cat_ID='.$item_Chapter->ID.'&amp;highlight_id='.$Item->ID;
+						}
+						elseif( ! empty( $cat ) && is_number( $cat ) )
+						{	// Set category param from current selected category:
+							$manual_view_cat_param = '&amp;cat_ID='.$cat.'&amp;highlight_cat_id='.$cat;
 						}
 						else
 						{	// No selected category and item/post:
@@ -1394,6 +1395,14 @@ class _core_Module extends Module
 									'comments' => array(
 											'text' => T_('Comments').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments'.$blog_param,
+										),
+									'contact' => array(
+											'text' => T_('Contact form').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=contact'.$blog_param,
+										),
+									'userdir' => array(
+											'text' => T_('User directory').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir'.$blog_param,
 										),
 									'other' => array(
 											'text' => T_('Other displays').'&hellip;',
@@ -1533,6 +1542,9 @@ class _core_Module extends Module
 						break;
 					case 'comments':
 						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$Blog->ID;
+						break;
+					case 'msgform':
+						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=contact&amp;blog='.$Blog->ID;
 						break;
 					case 'users':
 						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$Blog->ID;

@@ -276,7 +276,7 @@ class DataObjectCache
 			$SQL->title = 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()';
 		}
 
-		return $this->instantiate_list($DB->get_results( $SQL->get(), OBJECT, $SQL->title ));
+		return $this->instantiate_list( $DB->get_results( $SQL ) );
 	}
 
 

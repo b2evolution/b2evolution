@@ -34,6 +34,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_info_line_Widget extends ComponentWidget
 {
+	var $icon = 'info';
+
 	/**
 	 * Constructor
 	 */

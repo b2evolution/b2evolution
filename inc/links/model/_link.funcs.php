@@ -838,7 +838,7 @@ function link_vote( $link_ID, $user_ID, $vote_action, $checked = 1 )
 	$SQL->FROM( 'T_links__vote' );
 	$SQL->WHERE( 'lvot_link_ID = '.$DB->quote( $link_ID ) );
 	$SQL->WHERE_and( 'lvot_user_ID = '.$DB->quote( $user_ID ) );
-	$existing_vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+	$existing_vote = $DB->get_row( $SQL );
 
 	// Save a voting results in DB:
 	if( empty( $existing_vote ) )

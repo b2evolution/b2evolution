@@ -27,11 +27,13 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for installed skins',
 		"CREATE TABLE T_skins__skin (
 				skin_ID      int(10) unsigned NOT NULL auto_increment,
+				skin_class   varchar(32) NOT NULL,
 				skin_name    varchar(32) NOT NULL,
 				skin_type    enum('normal','feed','sitemap','mobile','tablet','rwd') COLLATE ascii_general_ci NOT NULL default 'normal',
 				skin_folder  varchar(32) NOT NULL,
 				PRIMARY KEY skin_ID (skin_ID),
 				UNIQUE skin_folder( skin_folder ),
+				UNIQUE skin_class( skin_class ),
 				KEY skin_name( skin_name )
 			) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -72,6 +74,9 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_media_url       VARCHAR( 255 ) NULL,
 			blog_type            VARCHAR( 16 ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL,
 			blog_order           int(11) NULL DEFAULT NULL,
+			blog_normal_skin_ID  int(10) unsigned NULL,
+			blog_mobile_skin_ID  int(10) unsigned NULL,
+			blog_tablet_skin_ID  int(10) unsigned NULL,
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -109,6 +114,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cat_urlname         varchar(255) COLLATE ascii_general_ci NOT NULL,
 			cat_blog_ID         int(10) unsigned NOT NULL default 2,
 			cat_image_file_ID   int(10) unsigned NULL,
+			cat_social_media_image_file_ID int(10) unsigned NULL,
 			cat_description     varchar(255) NULL DEFAULT NULL,
 			cat_order           int(11) NULL DEFAULT NULL,
 			cat_subcat_ordering enum('parent', 'alpha', 'manual') COLLATE ascii_general_ci NULL DEFAULT NULL,
@@ -271,7 +277,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			iver_status        ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NULL,
 			iver_title         VARCHAR(255) NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			iver_content       MEDIUMTEXT NULL,
-			INDEX iver_ID_itm_ID ( iver_ID , iver_itm_ID )
+			INDEX iver_ID_itm_ID ( iver_ID , iver_itm_ID ),
+			INDEX iver_edit_user_ID ( iver_edit_user_ID )
 		) ENGINE = innodb ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__status' => array(

@@ -901,7 +901,7 @@ class User extends DataObject
 					$SQL->FROM( 'T_users__fields' );
 					$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
 					$SQL->WHERE( 'uf_user_ID = '.$user_id );
-					$copied_userfields = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+					$copied_userfields = $DB->get_results( $SQL );
 					foreach( $copied_userfields as $copied_userfield )
 					{
 						$uf_val = param( 'uf_'.$copied_userfield->uf_ID, 'raw' );
@@ -1101,10 +1101,13 @@ class User extends DataObject
 				$edited_user_pass2 = preg_replace( '/[<>&]/', '', $edited_user_pass2 );
 			}
 
-			if( $is_new_user || ( !empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) )
-			{ // current password is not required:
+			if( $is_new_user ||
+			    ( ! empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) ||
+			    ( $this->get( 'pass_driver' ) == 'nopass' ) )
+			{	// Current password is not required:
 				//   - new user creating process
 				//   - password change requested by email
+				//   - password has not been set yet(email capture/quick registration)
 
 				if( $request_password_confirmation )
 				{	// Request a password confirmation:
@@ -2009,7 +2012,7 @@ class User extends DataObject
 			$SQL->WHERE( 'comment_author_user_ID = '.$this->ID );
 			$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback" )' );
 			$SQL->GROUP_BY( 'comment_status' );
-			$this->_num_comments = $DB->get_assoc( $SQL->get() );
+			$this->_num_comments = $DB->get_assoc( $SQL );
 
 			// Calc number of comments with all statuses
 			$total_num_comments = 0;
@@ -2119,7 +2122,7 @@ class User extends DataObject
 
 		if( $type == 'received' )
 		{	// Get a count of messages received
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get a count of messages received' );
 			$SQL->SELECT( 'COUNT( msg_ID )' );
 			$SQL->FROM( 'T_messaging__threadstatus' );
 			$SQL->FROM_add( 'LEFT JOIN T_messaging__message ON tsta_thread_ID = msg_thread_ID' );
@@ -2128,13 +2131,13 @@ class User extends DataObject
 		}
 		else
 		{	// Get a count of messages sent
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get a count of messages sent' );
 			$SQL->SELECT( 'COUNT( msg_ID )' );
 			$SQL->FROM( 'T_messaging__message' );
 			$SQL->WHERE( 'msg_author_user_ID = '.$DB->quote( $this->ID ) );
 		}
 
-		return $DB->get_var( $SQL->get() );
+		return $DB->get_var( $SQL );
 	}
 
 
@@ -2335,6 +2338,35 @@ class User extends DataObject
 		return NULL;
 	}
 
+	/**
+	 * Get url visits url
+	 *
+	 * @return string
+	 */
+	function get_visits_url( )
+	{
+		global $Settings;
+
+		if( ! empty( $blog_ID ) )
+		{ // Use blog from param by ID
+			$BlogCache = & get_BlogCache();
+			$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		}
+
+		if( empty( $current_Blog ) )
+		{ // Use current blog
+			global $Collection, $Blog;
+			$current_Blog = & $Blog;
+		}
+
+		if( empty( $current_Blog ) || empty( $Settings ) )
+		{ // Wrong request
+			return NULL;
+		}
+
+		return url_add_param( $current_Blog->get( 'visitsurl' ), 'user_ID='.$this->ID );
+	}
+
 
 	/**
 	 * Get url from defined userfields
@@ -2430,6 +2462,9 @@ class User extends DataObject
 		// Use first password driver from config array for new password updating:
 		$PasswordDriver = get_PasswordDriver();
 
+		// Save temporarily current pass driver to know if it has been chaged:
+		$this->previous_pass_driver = $this->get( 'pass_driver' );
+
 		$this->set( 'pass', $PasswordDriver->hash( $raw_password ) );
 		$this->set( 'salt', $PasswordDriver->get_last_generated_salt() );
 		$this->set( 'pass_driver', $PasswordDriver->get_code() );
@@ -2484,13 +2519,13 @@ class User extends DataObject
 
 			$email_domain = $ematch[1];
 
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get email domain' );
 			$SQL->SELECT( 'dom_ID' );
 			$SQL->FROM( 'T_basedomains' );
 			$SQL->WHERE( 'dom_type = \'email\'' );
 			$SQL->WHERE_and( 'dom_name = '.$DB->quote( $email_domain ) );
 
-			$dom_ID = $DB->get_var( $SQL->get() );
+			$dom_ID = $DB->get_var( $SQL );
 			if( !$dom_ID )
 			{	// The email domains doesn't exist yet, Insert new record
 				$DB->query( 'INSERT INTO T_basedomains ( dom_type, dom_name )
@@ -2793,8 +2828,9 @@ class User extends DataObject
 					break;
 				}
 
-				if( ( $permlevel != 'view' ) &&  $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
-				{ // Comment item is locked and current user is not allowed to edit/moderate locked items comment
+				if( ( ( $permlevel != 'view' ) &&  $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
+						&& ! ( $permlevel == 'delete' && $this->check_perm( 'users', 'edit' ) ) )
+				{ // Comment item is locked, i.e., all of its categories are locked, and current user is not allowed to edit/moderate locked items comment or is not a user admin
 					break;
 				}
 
@@ -2812,7 +2848,8 @@ class User extends DataObject
 				if( $permlevel == 'delete' )
 				{ // permlevel is delete so we have to check the 'blog_del_cmts' permission
 					$perm = $this->check_perm( 'blog_del_cmts', 'edit', false, $blog_ID )
-							|| $this->check_perm( 'recycle_owncmts', $permlevel, false, $Comment );
+							|| $this->check_perm( 'recycle_owncmts', $permlevel, false, $Comment )
+							|| $this->check_perm( 'users', 'edit', false );
 					break;
 				}
 
@@ -2931,8 +2968,10 @@ class User extends DataObject
 				$blog_ID = $Item->get_blog_ID();
 				$check_status = substr( $permname, 10 );
 
-				if( ( $permlevel != 'view' ) && $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
-				{ // Item is locked and current user is not allowed to edit locked items ( only view permission is allowed by default for locked items )
+				if( ( ( $permlevel != 'view' ) && $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
+						&& ! ( $permlevel == 'delete' && $this->check_perm( 'users', 'edit', false ) ) )
+				{ // Item is locked, i.e., it has all of its categories locked, and current user is not allowed to edit locked items
+					// ( only view permission is allowed by default for locked items ) or is not a user admin
 					break;
 				}
 
@@ -2944,7 +2983,8 @@ class User extends DataObject
 
 				if( $permlevel == 'delete' )
 				{ // permlevel is delete so we have to check the 'blog_del_post' permission
-					$perm = $this->check_perm( 'blog_del_post', 'edit', false, $blog_ID );
+					// User admins are allowed to delete posts
+					$perm = $this->check_perm( 'blog_del_post', 'edit', false, $blog_ID ) || $this->check_perm( 'users', 'edit', false );
 					break;
 				}
 
@@ -3027,7 +3067,7 @@ class User extends DataObject
 				if( ( $permlevel == 'moderate' ) && $this->check_perm( 'users', 'moderate' ) )
 				{ // this user has moderator permission, check if the group level is higher then the target user group level
 					$this->get_Group();
-					$User->get_Group;
+					$User->get_Group();
 					$perm = ( $this->Group->level > $User->Group->level );
 					break;
 				}
@@ -3477,7 +3517,7 @@ class User extends DataObject
 		}
 
 		// Count blog ids where this user has the required permissions for the given role
-		$SQL = new SQL();
+		$SQL = new SQL( 'Check user role in all collections' );
 		$SQL->SELECT( 'COUNT( DISTINCT blog_ID )' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND blog_ID = bloguser_blog_ID AND bloguser_user_ID = '.$this->ID.' )' );
@@ -3489,7 +3529,7 @@ class User extends DataObject
 		$SQL->WHERE( 'blog_owner_user_ID = '.$this->ID );
 		$SQL->WHERE_or( $where_clause );
 
-		return $DB->get_var( $SQL->get(), 0, NULL, 'Check user role in all blogs' );
+		return $DB->get_var( $SQL );
 	}
 
 
@@ -3534,7 +3574,7 @@ class User extends DataObject
 			$check_owner_SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
 			$check_owner_SQL->LIMIT( '1' );
 
-			$this->is_collection_owner = ($DB->get_var( $check_owner_SQL->get(), 0, NULL, $check_owner_SQL->title ) ? true : false);
+			$this->is_collection_owner = ($DB->get_var( $check_owner_SQL ) ? true : false);
 		}
 
 		return $this->is_collection_owner;
@@ -3928,6 +3968,8 @@ class User extends DataObject
 	 * If the email could get sent, it saves the used "request_id" into the user's Session.
 	 *
 	 * @param string URL, where to redirect the user after he clicked the validation link (gets saved in Session).
+	 * @param integer Collection ID
+	 * @param boolean TRUE if user email is changed
 	 * @return boolean True, if the email could get sent; false if not
 	 */
 	function send_validate_email( $redirect_to_after, $blog = NULL, $email_changed = false )
@@ -3938,18 +3980,8 @@ class User extends DataObject
 		// Display messages depending on user email status
 		display_user_email_status_message( $this->ID );
 
-		if( $Settings->get( 'validation_process' ) == 'easy' )
-		{ // validation process is set to easy, send and easy activation email
-			return send_easy_validate_emails( array( $this->ID ), false, $email_changed );
-		}
-
-		if( mail_is_blocked( $this->email ) )
-		{ // prevent trying to send an email to a blocked email address ( Note this is checked in the send_easy_validate_emails too )
-			return false;
-		}
-
 		if( empty( $redirect_to_after ) )
-		{ // redirect to was not set
+		{	// If redirect to was not set:
 			$redirect_to_after = param( 'redirect_to', 'url', '' );
 			if( empty( $redirect_to_after ) )
 			{
@@ -3962,6 +3994,18 @@ class User extends DataObject
 					$redirect_to_after = $this->get_userpage_url();
 				}
 			}
+		}
+
+		if( $Settings->get( 'validation_process' ) == 'easy' )
+		{	// Validation process is set to easy, send and easy activation email:
+			return send_easy_validate_emails( array( $this->ID ), false, $email_changed, $redirect_to_after );
+		}
+
+		// Secure validation process:
+
+		if( mail_is_blocked( $this->email ) )
+		{ // prevent trying to send an email to a blocked email address ( Note this is checked in the send_easy_validate_emails too )
+			return false;
 		}
 
 		$request_id = generate_random_key(22);
@@ -4633,22 +4677,26 @@ class User extends DataObject
 
 	/**
 	 * Add a user field
+	 *
+	 * @param integer User field definition ID
+	 * @param string Field value
 	 */
-	function userfield_add( $type, $val )
+	function userfield_add( $uf_ufdf_ID, $val )
 	{
 		global $DB;
-		$this->new_fields[] = $type.', '.$DB->quote( $val );
+		$this->new_fields[] = $uf_ufdf_ID.', '.$DB->quote( $val );
 	}
 
 
 	/**
 	 * Update an user field. Empty fields will be deleted on dbupdate.
+	 *
+	 * @param integer User field ID
+	 * @param string Field value
 	 */
 	function userfield_update( $uf_ID, $val )
 	{
-		global $DB;
-		$this->updated_fields[$uf_ID] = $val;
-		// pre_dump( $uf_ID, $val);
+		$this->updated_fields[ $uf_ID ] = $val;
 	}
 
 
@@ -4680,21 +4728,56 @@ class User extends DataObject
 
 
 	/**
+	 * Get user fields by field definition ID
+	 *
+	 * @param integer Field definition ID
+	 * @return array|false Fields
+	 */
+	function userfields_by_ID( $ufdf_ID )
+	{
+		// Load all user fields once:
+		$this->userfields_load();
+
+		if( ! empty( $this->userfields_by_type[ $ufdf_ID ] ) )
+		{	// Get user fields from cache:
+			$userfields = array();
+			foreach( $this->userfields_by_type[ $ufdf_ID ] as $uf_ID )
+			{
+				if( ! empty( $this->userfields[ $uf_ID ] ) )
+				{
+					$userfields[] = $this->userfields[ $uf_ID ];
+				}
+			}
+			return $userfields;
+		}
+
+		// No fields:
+		return false;
+	}
+
+
+	/**
 	 * Get user field value by ID
 	 *
 	 * @param integer Field ID
+	 * @param boolean TRUE to prepare user field for correct html displaying
 	 * @return string Field value
 	 */
-	function userfield_value_by_ID( $field_ID )
+	function userfield_value_by_ID( $field_ID, $prepare_userfield = true )
 	{
-		global $DB;
-
-		// Load all user fields once
+		// Load all user fields once:
 		$this->userfields_load();
 
 		if( isset( $this->userfields_by_type[ $field_ID ], $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ] ) )
-		{ // Get value from cache
-			return $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ]->uf_varchar;
+		{	// Get value from cache:
+			$userfield = $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ];
+
+			if( $prepare_userfield )
+			{	// Prepare user field for correct html displaying:
+				userfield_prepare( $userfield );
+			}
+
+			return $userfield->uf_varchar;
 		}
 
 		// No field value
@@ -4706,9 +4789,10 @@ class User extends DataObject
 	 * Get user field values by code
 	 *
 	 * @param integer Field code
+	 * @param boolean TRUE to prepare user field for correct html displaying
 	 * @return array Field values
 	 */
-	function userfield_values_by_code( $field_code )
+	function userfield_values_by_code( $field_code, $prepare_userfield = true )
 	{
 		global $DB;
 
@@ -4720,7 +4804,12 @@ class User extends DataObject
 		{ // Get value from cache
 			foreach( $this->userfields_by_code[ $field_code ] as $userfield_ID )
 			{
-				$field_values[] = $this->userfields[ $userfield_ID ]->uf_varchar;
+				$userfield = $this->userfields[ $userfield_ID ];
+				if( $prepare_userfield )
+				{	// Prepare user field for correct html displaying:
+					userfield_prepare( $userfield );
+				}
+				$field_values[] = $userfield->uf_varchar;
 			}
 		}
 
@@ -4758,8 +4847,7 @@ class User extends DataObject
 				{	// Init array
 					$userfield_lists[$userfield->ufdf_ID] = array();
 				}
-				userfield_prepare( $userfield );
-				$userfield_lists[$userfield->ufdf_ID][] = $userfield->uf_varchar;
+				$userfield_lists[$userfield->ufdf_ID][$userfield->uf_ID] = $userfield->uf_varchar;
 			}
 		}
 
@@ -4769,6 +4857,7 @@ class User extends DataObject
 			{ // List style
 				if( isset( $userfield_lists[$userfield->ufdf_ID] ) )
 				{ // Save all data for this field:
+					$userfield->list = $userfield_lists[ $userfield->ufdf_ID ];
 					$userfield->uf_varchar = implode( ', ', $userfield_lists[$userfield->ufdf_ID] );
 					$this->userfields[$userfield->uf_ID] = $userfield;
 					$this->userfields_by_code[$userfield->ufdf_code][] = $userfield->uf_ID;
@@ -4778,7 +4867,6 @@ class User extends DataObject
 			}
 			else
 			{ // Save all data for this field:
-				userfield_prepare( $userfield );
 				$this->userfields[$userfield->uf_ID] = $userfield;
 				$this->userfields_by_code[$userfield->ufdf_code][] = $userfield->uf_ID;
 			}
@@ -4788,6 +4876,9 @@ class User extends DataObject
 
 		// Also make sure the definitions are loaded
 		$this->userfield_defs_load();
+
+		// Set flag to don't call this function twice:
+		$this->userfields_loaded = true;
 	}
 
 
@@ -4819,20 +4910,31 @@ class User extends DataObject
 
 
 	/**
-	* Get first field for a specific type
-	*
-	* @return string or NULL
-	*/
-	function userfieldget_first_for_type( $type_ID )
+	 * Get first field for a specific type
+	 *
+	 * @param integer Field type ID
+	 * @param boolean TRUE to prepare user field for correct html displaying
+	 * @return string or NULL
+	 */
+	function userfieldget_first_for_type( $type_ID, $prepare_userfield = true )
 	{
-		if( !isset($this->userfields_by_type[$type_ID]) )
+		$this->userfields_load();
+
+		if( ! isset( $this->userfields_by_type[ $type_ID ] ) )
 		{
 			return NULL;
 		}
 
-		$idx = $this->userfields_by_type[$type_ID][0];
+		$idx = $this->userfields_by_type[ $type_ID ][0];
 
-		return $this->userfields[$idx]->uf_varchar;
+		$userfield = $this->userfields[ $idx ];
+
+		if( $prepare_userfield )
+		{	// Prepare user field for correct html displaying:
+			userfield_prepare( $userfield );
+		}
+
+		return $userfield->uf_varchar;
 	}
 
 
@@ -5807,6 +5909,128 @@ class User extends DataObject
 
 
 	/**
+	 * Get the posts of this user which current user can delete
+	 *
+	 * @param string Type of the deleted posts
+	 *               'created'        - the posts created by this user
+	 *               'edited'         - the posts edited by this user
+	 *               'created|edited' - the posts created OR edited by this user
+	 * @param boolean Count only the number of posts that the current user can delete
+	 * @return mixed array of Items if $count_only is FALSE otherwise integer
+	 */
+	function get_deleted_posts2( $type, $count_only = false )
+	{
+		global $DB, $current_User;
+
+		$current_User_Group = $current_User->get_Group();
+
+		switch( $type )
+		{
+			case 'created':
+				$where_clause = 'post_creator_user_ID = '.$DB->quote( $this->ID );
+				break;
+
+			case 'edited':
+				$from_add = 'LEFT JOIN ( SELECT iver_itm_ID, COUNT(*) AS counter
+						FROM T_items__version
+						WHERE iver_edit_user_ID = '.$DB->quote( $this->ID ).'
+						GROUP BY iver_itm_ID ) AS b
+							ON b.iver_itm_ID = post_ID ';
+				$where_clause = 'post_creator_user_ID != '.$DB->quote( $this->ID ).' AND ( b.counter > 0 OR post_lastedit_user_ID = '.$DB->quote( $this->ID ).' )';
+				break;
+
+			case 'created|edited':
+				$where_clause = '( post_lastedit_user_ID = '.$DB->quote( $this->ID ).' OR post_creator_user_ID = '.$DB->quote( $this->ID ).' )';
+				break;
+		}
+
+		if( $count_only )
+		{
+			$sql = 'SELECT COUNT( DISTINCT( post_ID ) ) ';
+		}
+		else
+		{
+			$sql = 'SELECT DISTINCT T_items__item.* ';
+		}
+
+		$sql .= 'FROM T_items__item ';
+		if( ! empty( $from_add ) )
+		{
+			$sql .= $from_add;
+		}
+		$sql .= 'LEFT JOIN (
+					SELECT postcat_post_ID,
+						COUNT( * ) AS categories,
+						SUM( IF( cat_lock = 1, 1, 0 ) ) AS locked_categories
+					FROM T_postcats
+					LEFT JOIN T_categories
+						ON cat_ID = postcat_cat_ID
+					GROUP BY postcat_post_ID
+				) AS a
+					ON a.postcat_post_ID = post_ID
+				LEFT JOIN T_postcats AS b
+					ON b.postcat_post_ID = post_ID
+				LEFT JOIN T_categories
+					ON cat_ID = b.postcat_cat_ID
+				LEFT JOIN T_blogs
+					ON blog_ID = cat_blog_ID
+				LEFT JOIN T_coll_user_perms
+					ON bloguser_blog_ID = blog_ID AND bloguser_user_ID = '.$DB->quote( $current_User->ID ).'
+				LEFT JOIN T_coll_group_perms
+					ON bloggroup_blog_ID = blog_ID AND bloggroup_group_ID = '.$DB->quote( $current_User_Group->ID ).'
+				LEFT JOIN T_groups__groupsettings
+					ON gset_grp_ID = bloggroup_group_ID AND gset_name = "perm_users"
+				LEFT JOIN (
+					SELECT
+						bloggroup_blog_ID,
+						SUM( IF( bloggroup_perm_delpost = 1, 1, 0 ) ) AS secondary_grp_perm_delpost,
+						SUM( IF( bloggroup_perm_cats = 1, 1, 0 ) ) AS secondary_grp_perm_cats
+					FROM T_users__secondary_user_groups
+					LEFT JOIN T_groups
+						ON sug_grp_ID = grp_ID
+					LEFT JOIN T_coll_group_perms
+						ON bloggroup_group_ID = grp_ID
+					WHERE
+						sug_user_ID = '.$DB->quote( $current_User->ID ).'
+					GROUP BY
+						bloggroup_blog_ID
+				) AS sg
+					ON sg.bloggroup_blog_ID = blog_ID
+				WHERE
+					'.$where_clause.'
+					AND
+					(
+				 	  ( categories > locked_categories OR ( bloguser_perm_cats = 1 OR bloggroup_perm_cats = 1 OR secondary_grp_perm_cats > 0 ) )
+						AND
+						(
+							( blog_advanced_perms = 0 && blog_owner_user_ID = '.$DB->quote( $current_User->ID ).' )
+							OR
+							( blog_advanced_perms = 1 && ( bloguser_perm_delpost = 1 OR bloggroup_perm_delpost = 1 OR secondary_grp_perm_delpost > 0 ) )
+						)
+						OR
+						( gset_value = "edit" )
+					)';
+
+		if( $count_only )
+		{
+			return $DB->get_var( $sql );
+		}
+		else
+		{
+			$user_Items = $DB->get_results( $sql );
+
+			$deleted_Items = array();
+			foreach( $user_Items as $r => $row )
+			{
+				$deleted_Items[] = new Item( $row );
+			}
+
+			return $deleted_Items;
+		}
+	}
+
+
+	/**
 	 * Delete posts of the user
 	 *
 	 * @param string Type of the deleted posts
@@ -5850,12 +6074,12 @@ class User extends DataObject
 		global $DB;
 
 		// Get the comments of the user
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get the comments of user #'.$this->ID );
 		$SQL->SELECT( 'comment_ID' );
 		$SQL->FROM( 'T_comments' );
 		$SQL->WHERE( 'comment_author_user_ID = '.$DB->quote( $this->ID ) );
 
-		return $DB->get_col( $SQL->get() );
+		return $DB->get_col( $SQL );
 	}
 
 
@@ -6833,12 +7057,12 @@ class User extends DataObject
 	{
 		global $DB;
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get a count of own collections of user #'.$this->ID );
 		$SQL->SELECT( 'COUNT( blog_ID )' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
 
-		return $DB->get_var( $SQL->get() );
+		return $DB->get_var( $SQL );
 	}
 
 

@@ -160,7 +160,7 @@ function get_postcount_in_category( $cat_ID, $blog_ID = NULL )
 		$SQL->WHERE_and( 'post_ityp_ID IS NULL OR ityp_usage = "post"' );
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
 		$SQL->GROUP_BY( 'cat_ID' );
-		$number_of_posts_in_cat[ (string) $blog_ID ] = $DB->get_assoc( $SQL->get() );
+		$number_of_posts_in_cat[ (string) $blog_ID ] = $DB->get_assoc( $SQL );
 	}
 
 	return isset( $number_of_posts_in_cat[(string) $blog_ID][$cat_ID] ) ? (int) $number_of_posts_in_cat[(string) $blog_ID][$cat_ID] : 0;
@@ -237,7 +237,7 @@ function postcats_get_by_IDs( $item_IDs )
 	$SQL->WHERE( 'postcat_post_ID IN ( '.$DB->quote( $not_cached_item_IDs ).' )' );
 	$SQL->ORDER_BY( 'postcat_post_ID, postcat_cat_ID' );
 
-	$items_postcats = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+	$items_postcats = $DB->get_results( $SQL );
 
 	foreach( $items_postcats as $item_postcats )
 	{
@@ -285,7 +285,7 @@ function postcats_get_byID( $post_ID )
 		$SQL->WHERE( 'postcat_post_ID = '.$DB->quote( $post_ID ) );
 		$SQL->ORDER_BY( 'postcat_cat_ID' );
 
-		$cache_postcats[ $post_ID ] = $DB->get_col( $SQL->get(), 0, $SQL->title );
+		$cache_postcats[ $post_ID ] = $DB->get_col( $SQL );
 	}
 
 	return $cache_postcats[ $post_ID ];

@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class content_hierarchy_Widget extends ComponentWidget
 {
+	var $icon = 'sitemap';
+
 	/**
 	 * Constructor
 	 */

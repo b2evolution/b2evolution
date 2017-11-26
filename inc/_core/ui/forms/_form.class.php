@@ -290,6 +290,9 @@ class Form extends Widget
 					$this->title_fmt      = $template['title_fmt'];
 					$this->no_title_fmt   = $template['no_title_fmt'];
 					$this->no_title_no_icons_fmt = isset( $template['no_title_no_icons_fmt'] ) ? $template['no_title_no_icons_fmt'] : '';
+					$this->group_begin    = isset( $template['group_begin'] ) ? $template['group_begin'] : '';
+					$this->group_end      = isset( $template['group_end'] ) ? $template['group_end'] : '';
+					$this->fieldset_title = isset( $template['fieldset_title'] ) ? $template['fieldset_title'] : '';
 					$this->fieldset_begin = $template['fieldset_begin'];
 					$this->fieldset_end   = $template['fieldset_end'];
 					$this->fieldstart     = $template['fieldstart'];
@@ -837,6 +840,58 @@ class Form extends Widget
 
 
 	/**
+	 * Builds a fieldset group tag,
+	 * Used as start of wrapper for fieldsets, e-g on accordion layout
+	 *
+	 * @param string Params
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function begin_group( $params = array() )
+	{
+		$params = array_merge( array(
+				'id'    => 'evo_accordion',
+				'class' => '',
+			), $params );
+
+		$field_params = array();
+
+		if( ! empty( $params['id'] ) )
+		{	// If group id is defined:
+			$field_params['id'] = $params['id'];
+			// Set current group ID, used on building feildset:
+			$this->current_group_ID = $params['id'];
+			$this->current_group_item_num = 1;
+		}
+
+		$r = str_replace( array( '$group_class$', '$group_attribs$' ),
+			array( $params['class'], get_field_attribs_as_string( $field_params ) ),
+			$this->group_begin );
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Ends a fieldset group tag,
+	 * Used as end of wrapper for fieldsets, e-g on accordion layout
+	 *
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function end_group()
+	{
+		$r = $this->group_end;
+
+		if( isset( $this->current_group_ID ) )
+		{	// Unset current group ID and counter of group items:
+			unset( $this->current_group_ID );
+			unset( $this->current_group_item_num );
+		}
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
 	 * Builds a fieldset tag. This is a "fieldset" element by default, but a "th" element
 	 * for table layout.
 	 *
@@ -883,6 +938,19 @@ class Form extends Widget
 		unset( $field_params['fold'] );
 		unset( $field_params['deny_fold'] );
 
+		if( ! empty( $this->fieldset_title ) )
+		{	// Replace text part of fieldset title with provided html code:
+			$fieldset_title = str_replace( '$fieldset_title$', '$1', $this->fieldset_title );
+			$title = preg_replace( '/^([^<]+)/', $fieldset_title, $title );
+		}
+
+		if( isset( $this->current_group_ID ) )
+		{	// If fieldset is grouped, Replace the group masks with values:
+			$group_item_ID = $this->current_group_ID.'_item_'.$this->current_group_item_num;
+			$title = str_replace( array( '$group_ID$', '$group_item_ID$' ), array( $this->current_group_ID, $group_item_ID ), $title );
+			$this->current_group_item_num ++;
+		}
+
 		switch( $this->layout )
 		{
 			case 'table':
@@ -920,6 +988,11 @@ class Form extends Widget
 				else
 				{
 					$r = str_replace( '$title_attribs$', get_field_attribs_as_string( $legend_params ), $r );
+				}
+
+				if( isset( $group_item_ID ) )
+				{	// Replace a mask of current group item ID with value:
+					$r = str_replace( '$group_item_id$', $group_item_ID, $r );
 				}
 
 				// Remove any empty legend tags: they cause a small gap in the fieldset border (FF 2.0.0.11)
@@ -3781,7 +3854,7 @@ class Form extends Widget
 
 			$button_label = ( $counter === 0 ? /* TRANS: verb */ T_('Select') : get_icon( 'new' ).' '.T_('Add') );
 
-			$r .= '<button class="btn btn-sm btn-info file_select_item" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
+			$r .= '<button class="btn btn-sm btn-info file_select_item" data-title="'.$field_params['window_title'].'" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
 
 			$r .= '</div>';
 			$r .= $this->end_field();
@@ -3796,13 +3869,14 @@ class Form extends Widget
 			{
 				$r .= '
 						<script type="text/javascript">
-						var fsel_size, fsel_name, fsel_type, fsel_obj, fsel_replace = false;
+						var fsel_size, fsel_name, fsel_type, fsel_obj, fsel_replace = false, fsel_title;
 
 						function file_select_attachment_window( event_object, replace_item, fm_highlight )
 						{
 							fsel_obj = event_object;
 							fsel_replace = replace_item;
 							field_object = jQuery( event_object ).closest( ".file_select_wrapper" );
+							fsel_title = jQuery( event_object ).data(  "title" );
 							fsel_size = field_object.data( "thumbSize" );
 							fsel_name = field_object.attr( "name" );
 							fsel_type = field_object.data( "fileType" );
@@ -3810,7 +3884,7 @@ class Form extends Widget
 							path = field_object.data( "path" );
 
 							openModalWindow( \'<span class="loader_img loader_user_report absolute_center" title="'.T_('Loading...').'"></span>\',
-								"90%", "80%", true, "'.$field_params['window_title'].'", "", true );
+								"90%", "80%", true, fsel_title, "", true );
 							jQuery.ajax(
 							{
 								type: "POST",

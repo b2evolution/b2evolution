@@ -22,7 +22,7 @@ param( 'tab', 'string', 'site_settings', true );
 
 param_action( 'list' );
 
-if( strpos( $action, 'new' ) !== false )
+if( strpos( $action, 'new' ) !== false || $action == 'copy' )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
@@ -113,16 +113,25 @@ switch( $action )
 		$edited_Blog->set( 'owner_user_ID', $current_User->ID );
 
 		param( 'kind', 'string', true );
+		param( 'blog_urlname', 'string', true );
+
+		if( $kind == 'main' && ! $current_User->check_perm( 'blog_admin', 'editAll', false ) )
+		{ // Non-collection admins should not be able to create home/main collections
+			$Messages->add( sprintf( T_('You don\'t have permission to create a collection of kind %s.'), '<b>&laquo;'.$kind.'&raquo;</b>' ), 'error' );
+			header_redirect( $admin_url.'?ctrl=dashboard' ); // will EXIT
+			// We have EXITed already at this point!!
+		}
+
 		$edited_Blog->init_by_kind( $kind );
 		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		{ // validate the urlname, which was already set by init_by_kind() function
 		 	// It needs to validated, because the user can not set the blog urlname, and every new blog would have the same urlname without validation.
 		 	// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
-			$edited_Blog->set( 'urlname', urltitle_validate( $edited_Blog->get( 'urlname' ) , '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
+			$edited_Blog->set( 'urlname', urltitle_validate( empty( $blog_urlname ) ? $edited_Blog->get( 'urlname' ) : $blog_urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
 		}
 
 		param( 'skin_ID', 'integer', true );
-		$edited_Blog->set_setting( 'normal_skin_ID', $skin_ID );
+		$edited_Blog->set( 'normal_skin_ID', $skin_ID );
 
 		// Check how new content should be created for new collection:
 		param( 'create_demo_contents', 'boolean', NULL );
@@ -162,8 +171,16 @@ switch( $action )
 				global $user_org_IDs;
 
 				load_funcs( 'collections/_demo_content.funcs.php' );
-				param( 'create_demo_org', 'boolean', false );
-				param( 'create_demo_users', 'boolean', false );
+				if( $current_User->check_perm( 'blog_admin', 'editall', false ) )
+				{ // Only collection admins can create demo organization and users
+					param( 'create_demo_org', 'boolean', false );
+					param( 'create_demo_users', 'boolean', false );
+				}
+				else
+				{
+					set_param( 'create_demo_org', false );
+					set_param( 'create_demo_users', false );
+				}
 				$user_org_IDs = NULL;
 
 				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', true ) )
@@ -350,6 +367,10 @@ switch( $action )
 		// Small site logo
 		param( 'notification_logo_file_ID', 'integer', NULL );
 		$Settings->set( 'notification_logo_file_ID', get_param( 'notification_logo_file_ID' ) );
+
+		// Social media boilerplate logo
+		param( 'social_media_image_file_ID', 'integer', NULL );
+		$Settings->set( 'social_media_image_file_ID', get_param( 'social_media_image_file_ID' ) );
 
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );

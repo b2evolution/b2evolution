@@ -63,6 +63,7 @@ class GeneralSettings extends AbstractSettings
 		'notification_short_name' => 'This site', // notification emails will use this as short site name
 		'notification_long_name' => '', // notification emails will use this as long site name
 		'notification_logo_file_ID' => '', // notification emails will use this as url to site logo
+		'social_media_image_file_ID' => '', // social media tags will use this as the default as image
 
 		'email_campaign_send_mode' => 'immediate', // Sending mode for campaign
 		'email_campaign_chunk_size' => 50, // Chunk size of emails to send a campaign at a time
@@ -101,6 +102,7 @@ class GeneralSettings extends AbstractSettings
 		'newusers_level' => '1',
 		'registration_require_gender' => 'hidden',
 		'registration_ask_locale' => '0',
+		'pass_after_quick_reg' => '1',
 
 		// Default user settings
 		'def_enable_PM' => '1',
@@ -174,8 +176,8 @@ class GeneralSettings extends AbstractSettings
 
 		//Default blogs skin setting
 		'def_normal_skin_ID' => '1',                // Default normal skin ID
-		'def_mobile_skin_ID' => '0',                // 0 means same as normal skin
-		'def_tablet_skin_ID' => '0',                // 0 means same as normal skin
+		'def_mobile_skin_ID' => NULL,               // NULL means same as normal skin
+		'def_tablet_skin_ID' => NULL,               // NULL means same as normal skin
 
 		// Post by Email
 		'eblog_enabled' => 0,

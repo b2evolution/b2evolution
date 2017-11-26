@@ -76,11 +76,11 @@ function translation_update_table_pot_row( $string )
 	global $DB;
 
 	// Get original string ID
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get original string ID' );
 	$SQL->SELECT( 'iost_ID' );
 	$SQL->FROM( 'T_i18n_original_string' );
 	$SQL->WHERE( 'iost_string = '.$DB->quote( $string ) );
-	$original_string_ID = $DB->get_var( $SQL->get() );
+	$original_string_ID = $DB->get_var( $SQL );
 
 	if( $original_string_ID )
 	{	// Update already existing string
@@ -167,11 +167,11 @@ function translation_update_table_po_row( $locale, $original_string, $translated
 	global $DB;
 
 	// Get original string ID
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get original string ID' );
 	$SQL->SELECT( 'iost_ID' );
 	$SQL->FROM( 'T_i18n_original_string' );
 	$SQL->WHERE( 'iost_string = '.$DB->quote( $original_string ) );
-	$original_string_ID = $DB->get_var( $SQL->get() );
+	$original_string_ID = $DB->get_var( $SQL );
 
 	if( !$original_string_ID )
 	{	// No original string, Exit here
@@ -179,12 +179,12 @@ function translation_update_table_po_row( $locale, $original_string, $translated
 	}
 
 	// Get translated string
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get translated string' );
 	$SQL->SELECT( 'itst_ID' );
 	$SQL->FROM( 'T_i18n_translated_string' );
 	$SQL->WHERE( 'itst_standard = '.$DB->quote( $translated_string ) );
 	$SQL->WHERE_and( 'itst_iost_ID = '.$DB->quote( $original_string_ID ) );
-	$translated_string_ID = $DB->get_var( $SQL->get() );
+	$translated_string_ID = $DB->get_var( $SQL );
 
 	if( $translated_string_ID )
 	{	// Update already existing string
