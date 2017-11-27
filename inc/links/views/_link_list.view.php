@@ -189,7 +189,7 @@ display_dragdrop_upload_button( array(
 							.'<td class="fm_filename">'
 								.'<div class="qq-upload-file-selector"></div>'
 								.'<div class="qq-progress-bar-container-selector progress" style="margin-bottom: 0;">'
-									.'<div class="qq-progress-bar-selector progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;"></div>'
+									.'<div class="qq-progress-bar-selector progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>'
 								.'</div>'
 							.'</td>'
 							.'<td class="qq-upload-link-id shrinkwrap link_id_cell">&nbsp;</td>'
