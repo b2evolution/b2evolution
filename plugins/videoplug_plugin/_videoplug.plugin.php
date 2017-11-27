@@ -102,7 +102,7 @@ class videoplug_plugin extends Plugin
 		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo|facebook):?[^\[\]]*\]/i' );
 
 		// Replace video tags with html code:
-		$content = replace_content_outcode( '#\[video:(youtube|dailymotion|vimeo|facebook|google|livevideo|ifilm):([^:]+?):?(\d+%?)?:?(\d+%?)?]#',
+		$content = replace_content_outcode( '#\[video:(youtube|dailymotion|vimeo|facebook|google|livevideo|ifilm):([^:\[\]\\\/]*|https?:\/\/.*\.facebook\.com\/[^:]*):?(\d+%?)?:?(\d+%?)?\]#',
 			array( $this, 'parse_video_tag_callback' ), $content, 'replace_content', 'preg_callback' );
 
 		return true;
@@ -137,7 +137,7 @@ class videoplug_plugin extends Plugin
 				break;
 
 			case 'facebook':
-				$video_block = '<iframe src="https://www.facebook.com/plugins/video.php?href='.$m[2].'" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>';
+				$video_block = '<iframe src="https://www.facebook.com/plugins/video.php?href='.urlencode( $m[2] ).'" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>';
 				break;
 
 			default: // google, livevideo, ifilm:
