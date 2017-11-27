@@ -426,7 +426,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								// attach onclick event to remove the whole fieldset:
 								array(
 									'onclick' => "
-										jQuery('#".$parname.'_'.$k_nb."').remove();
+										var element_id = '".$parname.'_'.$k_nb."';
+										element_id = '#'+element_id.replace(/(\[|\])/g, &quot;\\\\$1&quot;);
+										jQuery(element_id).remove();
 										return false;",
 									)
 								).'</span>';
@@ -490,7 +492,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
 							},
 							function(r, status) {
-								jQuery('#".$parname."_add_new').replaceWith(r);
+								var element_id = '".$parname."';
+								element_id = element_id.replace(/(\[|\])/g, &quot;\\\\$1&quot;);
+								jQuery('#'+element_id+'_add_new').replaceWith(r);
 								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
 							}
 						);
