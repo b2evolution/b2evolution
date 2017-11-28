@@ -2439,9 +2439,10 @@ class Comment extends DataObject
 				return false;
 			}
 			$msg_type = 'email';
+			$form_url = url_add_param( $form_url, 'recipient_id=0' );
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id=0&amp;comment_id='.$this->ID.'&amp;post_id='.$this->item_ID
+		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID.'&amp;post_id='.$this->item_ID
 				.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $form_url)) );
 
 		if( $title == '#' )
