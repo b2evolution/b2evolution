@@ -323,11 +323,16 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 			'order'         => 'DESC',
 			'posts'         => 1000,
 			'post_ID_list'  => $exclude_posts,
-			'authors'       => $authors,
+			'authors'       => is_logged_in() ? $authors : NULL,
 		) );
 
 	// Generate query from filters above and count results:
 	$search_ItemList->query_init();
+
+	if( ! is_logged_in() && ! empty( $author ) )
+	{
+		$search_ItemList->ItemQuery->WHERE_and( 'user_login = '.$DB->quote( $authors ) );
+	}
 
 	// Make a custom search query:
 	$search_query = 'SELECT DISTINCT post_ID, post_datestart, post_datemodified, post_title, post_content,'
@@ -424,15 +429,20 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts, $aut
 			'order_by' => 'date',
 			'order' => 'DESC',
 			'comments' => 1000,
-			'author_IDs' => $authors
+			'author_IDs' => is_logged_in() ? $authors : NULL
 		) );
 	$search_CommentList->query_init();
+
+	if( ! is_logged_in() && ! empty( $authors ) )
+	{
+		$search_CommentList->CommentQuery->WHERE_and( 'comment_author = '.$DB->quote( $authors ).' OR user_login = '.$DB->quote( $authors ) );
+	}
 
 	$search_query = 'SELECT comment_ID, post_title, comment_content, comment_date,
 	 	IFNULL(comment_author, user_login) as author'
 		.$search_CommentList->CommentQuery->get_from()
 		.' LEFT JOIN T_items__item ON comment_item_ID = post_ID'
-		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
+		.' LEFT JOIN T_users ON comment_author_user_ID = user_ID'
 		.$search_CommentList->CommentQuery->get_where()
 		.$search_CommentList->CommentQuery->get_group_by()
 		.$search_CommentList->CommentQuery->get_order_by()
@@ -588,9 +598,9 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
  * @param array all quoted parts from the search term
  * @param string Author IDs to filter, separated with ',' (comma)
  */
-function search_and_score_files( $search_term, $keywords, $quoted_parts )
+function search_and_score_files( $search_term, $keywords, $quoted_parts, $authors = '', $period = 'anytime' )
 {
-	global $DB, $Collection, $Blog;
+	global $DB, $Collection, $Blog, $time_difference;
 
 	// Init result array:
 	$search_result = array();
@@ -605,21 +615,76 @@ function search_and_score_files( $search_term, $keywords, $quoted_parts )
 		$or = ' OR';
 	}
 
+	switch( $period )
+	{
+		case 'week_ago':
+			$timestamp_min = strtotime( '-1 week' );
+			$timestamp_max = NULL;
+			break;
+
+		case 'month_ago':
+			$timestamp_min = strtotime( '-1 month' );
+			$timestamp_max = NULL;
+			break;
+
+		case 'year_ago':
+			$timestamp_min = strtotime( '-1 year' );
+			$timestamp_max = NULL;
+			break;
+
+		case 'anytime':
+		default:
+			$timestamp_min = NULL;
+			$timestamp_max = NULL;
+	}
+
 	// Search between files:
 	$files_SQL = new SQL( 'Get files matching to the search keywords' );
-	$files_SQL->SELECT( 'file_ID, file_path, file_title, file_alt, file_desc, COUNT( DISTINCT link_itm_ID ) AS post_count' );
+	$files_SQL->SELECT( 'file_ID, file_path, file_title, file_alt, file_desc, GROUP_CONCAT( DISTINCT link_itm_ID SEPARATOR "," ) AS post_IDs, GROUP_CONCAT( DISTINCT link_cmt_ID SEPARATOR "," ) AS comment_IDs' );
 	$files_SQL->FROM( 'T_files' );
 	$files_SQL->FROM_add( 'INNER JOIN T_links ON link_file_ID = file_ID' );
-	$files_SQL->FROM_add( 'INNER JOIN T_postcats ON link_itm_ID = postcat_post_ID' );
-	$files_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
-	$files_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
+	$files_SQL->FROM_add( 'LEFT JOIN T_postcats AS ipc ON link_itm_ID = ipc.postcat_post_ID' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_items__item ON post_ID = ipc.postcat_post_ID' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_categories AS icat ON ipc.postcat_cat_ID = icat.cat_ID' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_comments ON link_cmt_ID = comment_ID' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_postcats AS cpc ON comment_item_ID = cpc.postcat_post_ID' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_categories AS ccat ON cpc.postcat_cat_ID = ccat.cat_ID' );
+	if( ! empty( $authors ) && ! is_logged_in() )
+	{
+		$files_SQL->FROM_add( 'LEFT JOIN T_users AS iuser ON comment_author_user_ID = iuser.user_ID' );
+		$files_SQL->FROM_add( 'LEFT JOIN T_users AS cuser ON comment_author_user_ID = cuser.user_ID' );
+	}
+	$files_SQL->WHERE( '( icat.cat_blog_ID = '.$DB->quote( $Blog->ID ).' OR ccat.cat_blog_ID = '.$DB->quote( $Blog->ID ).' )' );
 	$files_SQL->WHERE_and( $file_where_condition );
+	if( ! empty( $authors ) )
+	{
+		if( is_logged_in() )
+		{
+			if( preg_match( '/^[0-9]+(,[0-9]+)*$/', $authors ) === false )
+			{
+				debug_die( 'Invalid comment author filter request' );
+			}
+
+			$files_SQL->WHERE_and( '( comment_author_user_ID IN ('.$authors.') OR post_creator_user_ID IN ('.$authors.') )' );
+		}
+		else
+		{
+			$files_SQL->WHERE_and( '( comment_author = '.$DB->quote( $authors ).' OR cuser.user_login = '.$DB->quote( $authors ).' OR iuser.user_login = '.$DB->quote( $authors ).' )' );
+		}
+	}
+	if( $period != 'anytime' )
+	{
+		$date_min = remove_seconds( $timestamp_min + $time_difference );
+		//$date_max = remove_seconds( $timestamp_max + $time_difference );
+		$files_SQL->WHERE_and( '( post_datestart >= '.$DB->quote( $date_min ).' OR comment_date >= '.$DB->quote( $date_min ).' )' );
+		//$files_SQL->WHERE_and( '( post_datestart <= '.$DB->quote( $date_min ).' OR comment_date <= '.$DB->quote( $date_min ).' )' );
+	}
 	$files_SQL->GROUP_BY( 'file_path, file_title, file_alt, file_desc' );
 	$files = $DB->get_results( $files_SQL );
 
 	foreach( $files as $file )
 	{
-		if( $file->post_count == 0 )
+		if( empty( $file->post_IDs ) && empty( $file->comment_IDs ) )
 		{	// Count only those files which have at least one post linked to it, Skip this:
 			continue;
 		}
@@ -639,7 +704,9 @@ function search_and_score_files( $search_term, $keywords, $quoted_parts )
 			'type'       => 'file',
 			'score'      => $final_score,
 			'ID'         => $file->file_ID,
-			'name'       => $file->file_path.','.$file->post_count,
+			'full_path'  => $file->file_path,
+			'post_IDs'   => $file->post_IDs,
+			'comment_IDs'=> $file->comment_IDs,
 			'scores_map' => $scores_map,
 		);
 	}
@@ -755,7 +822,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 		$search_result = array_merge( $search_result, $cats_search_result );
 		if( $debug )
 		{
-			echo '<p class="text-muted">Just found '.count( $cats_search_result ).' Catageories.</p>';
+			echo '<p class="text-muted">Just found '.count( $cats_search_result ).' Categories.</p>';
 			evo_flush();
 		}
 	}
@@ -773,7 +840,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 
 	if( $search_type_file )
 	{
-		$files_search_result = search_and_score_files( $search_keywords, $keywords, $quoted_parts );
+		$files_search_result = search_and_score_files( $search_keywords, $keywords, $quoted_parts, $authors, $period );
 		$search_result = array_merge( $search_result, $files_search_result );
 		if( $debug )
 		{
@@ -1008,7 +1075,7 @@ function search_result_block( $params = array() )
 	$CommentCache = & get_CommentCache();
 	$ChapterCache = & get_ChapterCache();
 	$FileCache = & get_FileCache();
-
+	$FiletypeCache = & get_FiletypeCache();
 
 	if( !$search_result_loaded )
 	{ // Search result objects are not loaded into memory yet, load them
@@ -1160,11 +1227,36 @@ function search_result_block( $params = array() )
 				// Prepare to display a File:
 
 				$File = $FileCache->get_by_id( $row['ID'], false );
+				$FileType = & $File->get_FileType();
+				$link_owners = array();
+				if( ! empty( $row['post_IDs'] ) )
+				{
+					$post_IDs = explode( ',', $row['post_IDs'] );
+					foreach( $post_IDs as $post_ID )
+					{
+						$Item = $ItemCache->get_by_ID( $post_ID, false );
+						$link_owners[] = $Item->get_title( array( 'link_type' => 'permalink' ) );
+					}
+				}
 
-				list( $filename, $post_count ) = explode( ',', $row['name'] );
+				if( ! empty( $row['comment_IDs'] ) )
+				{
+					$comment_IDs = explode( ',', $row['comment_IDs'] );
+					foreach( $comment_IDs as $comment_ID )
+					{
+						$Comment = $CommentCache->get_by_ID( $comment_ID, false );
+						$link_owners[] = $Comment->get_permanent_link( '#item#' );
+					}
+				}
+
+				$file_description = $File->get( 'desc' );
+
 				$display_params = array(
-					'title' => $File->get_linkedit_link().$params['title_suffix_file'],
-					'excerpt' => sprintf( T_('%d posts are linked to \'%s\''), $post_count, $filename )
+					'title' => '<a href="'.$File->get_url().'"'.( $File->get('desc') ? ' title="'.$File->dget('desc', 'htmlattr').'"' : '' ).'>'
+							.( $File->get( 'title' ) ? $File->dget( 'title' ) : $File->dget( 'name' ) ).'</a>'
+							.' ('.T_('File').': '.$File->get_view_link( $File->get_icon() ).' '.$File->get_type().')',
+					'excerpt' => $File->get_url().( ! empty( $file_description ) ? '<div>'.$file_description.'</div>' : '' ),
+					'chapter' => empty( $link_owners ) ? NULL : sprintf( /* TRANS: %s get replaced by list of post and comment links */ T_('In %s'), implode( ', ', $link_owners ) )
 				);
 				break;
 

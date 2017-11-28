@@ -1597,6 +1597,12 @@ class RestApi
 
 		$api_q = param( 'q', 'string', '' );
 
+		if( ! is_logged_in() )
+		{
+			$this->halt( 'You are not allowed to view users.', 'no_access', 403 );
+			// Exit here.
+		}
+
 		// Search users:
 		$users = $this->func_user_search( $api_q, array(
 				'sql_where' => 'user_ID != '.$DB->quote( $current_User->ID ),
@@ -1605,11 +1611,6 @@ class RestApi
 
 		foreach( $users as $User )
 		{
-			if( ! $User->check_status( 'can_receive_pm' ) )
-			{	// This user is probably closed so don't show it:
-				continue;
-			}
-
 			$user_data = array(
 					'id'       => $User->ID,
 					'login'    => $User->get( 'login' ),
