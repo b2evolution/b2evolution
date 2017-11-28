@@ -1394,12 +1394,15 @@ function handle_array_keys_in_plugin_settings( & $a )
 			$new_arr[$k] = $v;
 		}
 
-		// Recurse:
-		foreach( array_keys( $v ) as $rk )
+		if( is_array( $v ) )
 		{
-			if( is_array( $v[$rk] ) )
+			// Recurse:
+			foreach( array_keys( $v ) as $rk )
 			{
-				handle_array_keys_in_plugin_settings($v[$rk]);
+				if( is_array( $v[$rk] ) )
+				{
+					handle_array_keys_in_plugin_settings($v[$rk]);
+				}
 			}
 		}
 	}
