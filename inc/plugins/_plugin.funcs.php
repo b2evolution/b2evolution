@@ -150,25 +150,16 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				if( isset( $parmeta['fold'] ) )
 				{
 					$field_params['fold']  = $parmeta['fold'];
-					unset( $parmeta['fold'] );
 				}
 				
 				if( isset( $parmeta['deny_fold'] ) )
 				{
 					$field_params['deny_fold'] = $parmeta['deny_fold'];
-					unset( $parmeta['deny_fold'] );
-				}
-				
-				if( isset( $parmeta['deny_fold'] ) )
-				{
-					$field_params['deny_fold'] = $parmeta['deny_fold'];
-					unset( $parmeta['deny_fold'] );
 				}
 				
 				if( isset( $parmeta['id'] ) )
 				{
 					$field_params['id'] = $parmeta['id'];
-					unset( $parmeta['id'] );
 				}
 				else
 				{
@@ -178,7 +169,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				if( isset( $parmeta['class'] ) )
 				{
 					$field_params['class'] = $parmeta['class'];
-					unset( $parmeta['class'] );
 				}
 				
 				$Form->begin_fieldset( $fieldset_title.$help_icon, $field_params );
@@ -434,25 +424,16 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				if( isset( $parmeta['fold'] ) )
 				{
 					$field_params['fold']  = $parmeta['fold'];
-					unset( $parmeta['fold'] );
 				}
 				
 				if( isset( $parmeta['deny_fold'] ) )
 				{
 					$field_params['deny_fold'] = $parmeta['deny_fold'];
-					unset( $parmeta['deny_fold'] );
-				}
-				
-				if( isset( $parmeta['deny_fold'] ) )
-				{
-					$field_params['deny_fold'] = $parmeta['deny_fold'];
-					unset( $parmeta['deny_fold'] );
 				}
 				
 				if( isset( $parmeta['id'] ) )
 				{
 					$field_params['id'] = $parmeta['id'];
-					unset( $parmeta['id'] );
 				}
 				else
 				{
@@ -462,7 +443,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				if( isset( $parmeta['class'] ) )
 				{
 					$field_params['class'] = $parmeta['class'];
-					unset( $parmeta['class'] );
 				}
 				
 				$Form->begin_fieldset( $fieldset_title, $field_params );
@@ -512,25 +492,16 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					if( isset( $parmeta['fold'] ) )
 					{
 						$field_params['fold']  = $parmeta['fold'];
-						unset( $parmeta['fold'] );
 					}
 
 					if( isset( $parmeta['deny_fold'] ) )
 					{
 						$field_params['deny_fold'] = $parmeta['deny_fold'];
-						unset( $parmeta['deny_fold'] );
-					}
-
-					if( isset( $parmeta['deny_fold'] ) )
-					{
-						$field_params['deny_fold'] = $parmeta['deny_fold'];
-						unset( $parmeta['deny_fold'] );
 					}
 
 					if( isset( $parmeta['class'] ) )
 					{
 						$field_params['class'] = 'bordered '.$parmeta['class'];
-						unset( $parmeta['class'] );
 					}
 					else
 					{
