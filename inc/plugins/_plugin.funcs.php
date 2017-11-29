@@ -143,7 +143,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		{
 			case 'begin_fieldset':
 				$fieldset_title = $set_label;
-				$Form->begin_fieldset( $fieldset_title.$help_icon );
+				$Form->begin_fieldset( $fieldset_title.$help_icon, isset($parmeta['fold']) ? array( 'fold'  => $parmeta['fold'], 'deny_fold'  => isset( $parmeta['deny_fold'] ) ? $parmeta['deny_fold'] : false, 'id'  => isset( $parmeta['id'] ) ? $parmeta['id'] : $parname ) : array() );
 				break;
 
 			case 'end_fieldset':
@@ -390,7 +390,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				{
 					$fieldset_title .= ' [debug: '.$parname.']';
 				}
-				$Form->begin_fieldset( $fieldset_title );
+				$Form->begin_fieldset( $fieldset_title, isset($parmeta['fold']) ? array( 'fold'  => $parmeta['fold'], 'deny_fold'  => isset( $parmeta['deny_fold'] ) ? $parmeta['deny_fold'] : false, 'id'  => isset( $parmeta['id'] ) ? $parmeta['id'] : $parname ) : array() );
 
 				if( ! empty($params['note']) )
 				{
@@ -431,7 +431,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 									)
 								).'</span>';
 					}
-					$Form->begin_fieldset( '#'.$k_nb.$remove_action, array( 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) );
+					$Form->begin_fieldset( '#'.$k_nb.$remove_action, isset($parmeta['fold']) ? 
+										  array( 'fold'  => $parmeta['fold'], 'deny_fold'  => isset( $parmeta['deny_fold'] ) ? $parmeta['deny_fold'] : false, 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) : array( 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) );
 
 					if( isset($parmeta['key']) )
 					{ // KEY FOR THIS ENTRY:
