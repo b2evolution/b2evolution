@@ -1905,16 +1905,16 @@ function get_msgform_contact_methods( $recipient_User = NULL )
 
 	$contact_methods = array();
 
-	if( is_logged_in() && $recipient_User !== NULL )
-	{	// If current User is logged in and recipient User is defined:
-		if( $current_User->get_msgform_possibility( $recipient_User, 'PM' ) == 'PM' )
-		{	// Suggest PM method only if it is allowed between current and recipient users:
-			$contact_methods['pm'] = T_('Private Message on this Site');
-		}
-		if( $current_User->get_msgform_possibility( NULL, 'email' ) == 'email' )
-		{	// Suggest Email method only if current user allows to receive emails:
-			$contact_methods['email'] = T_('Email');
-		}
+	if( is_logged_in() && $recipient_User !== NULL &&
+	    $current_User->get_msgform_possibility( $recipient_User, 'PM' ) == 'PM' )
+	{	// Suggest PM method only if it is allowed between current and recipient users:
+		$contact_methods['pm'] = T_('Private Message on this Site');
+	}
+
+	if( ! is_logged_in() || $current_User->get_msgform_possibility( NULL, 'email' ) == 'email' )
+	{	// Anonymous user should has email preferred contact method by default,
+		// OR suggest Email method only if current user allows to receive emails:
+		$contact_methods['email'] = T_('Email');
 	}
 
 	if( is_logged_in() )
