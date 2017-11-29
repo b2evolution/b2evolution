@@ -144,7 +144,8 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 		if( $is_creating )
 		{
 			echo '<p>'.T_('The Home collection typically aggregates the contents of all other collections on the site.').'</p>';
-			$Form->radio( 'blog_aggregate', empty( $edited_Blog->get_setting( 'aggregate_coll_IDs' ) ) ? 0 : 1,
+			$aggregate_coll_IDs = $edited_Blog->get_setting( 'aggregate_coll_IDs' );
+			$Form->radio( 'blog_aggregate', empty( $aggregate_coll_IDs ) ? 0 : 1,
 			array(
 				array( 1, T_('Set to aggregate contents of all other collections') ),
 				array( 0, T_('Do not aggregate') ),
