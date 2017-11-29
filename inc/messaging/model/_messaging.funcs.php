@@ -1901,7 +1901,7 @@ function get_thread_prevnext_links( $current_thread_ID, $params = array() )
  */
 function get_msgform_contact_methods( $recipient_User = NULL )
 {
-	global $DB, $current_User;
+	global $DB, $current_User, $Blog;
 
 	$contact_methods = array();
 
@@ -1934,6 +1934,13 @@ function get_msgform_contact_methods( $recipient_User = NULL )
 		{
 			$contact_methods[ $user_field_ID ] = $user_field_name;
 		}
+	}
+
+	// Get additional user fields which are defined for current collection:
+	$msgform_additional_fields = $Blog->get_msgform_additional_fields();
+	foreach( $msgform_additional_fields as $additional_Userfield )
+	{
+		$contact_methods[ $additional_Userfield->ID ] = $additional_Userfield->get_name();
 	}
 
 	return $contact_methods;

@@ -5179,9 +5179,10 @@ class Blog extends DataObject
 	 * Display all selected additional fields on disp=msgform
 	 *
 	 * @param object Form
+	 * @param array Filled user fields from submitted form
 	 * @return array
 	 */
-	function display_msgform_additional_fields( $Form )
+	function display_msgform_additional_fields( $Form, $filled_user_fields = array() )
 	{
 		$msgform_additional_fields = $this->get_msgform_additional_fields();
 
@@ -5189,7 +5190,21 @@ class Blog extends DataObject
 		{
 			$field_value = '';
 			$field_value2 = '';
-			if( is_logged_in() )
+
+			if( ! empty( $filled_user_fields[ $UserField->ID ] ) )
+			{	// Get values from the submitted form:
+				if( is_array( $filled_user_fields[ $UserField->ID ] ) )
+				{	// Multiple field:
+					$field_value = isset( $filled_user_fields[ $UserField->ID ][0] ) ? trim( $filled_user_fields[ $UserField->ID ][0] ) : '';
+					$field_value2 = isset( $filled_user_fields[ $UserField->ID ][1] ) ? trim( $filled_user_fields[ $UserField->ID ][1] ) : '';
+				}
+				else
+				{	// Single field:
+					$field_value = $filled_user_fields[ $UserField->ID ];
+				}
+			}
+
+			if( is_logged_in() && empty( $field_value ) )
 			{	// Get saved field value from the current logged in User:
 				global $current_User;
 				$userfields = $current_User->userfields_by_ID( $UserField->ID );

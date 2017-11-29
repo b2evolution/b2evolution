@@ -352,6 +352,34 @@ if( $update_user_fields )
 	$current_User->dbupdate();
 }
 
+if( intval( $contact_method ) > 0 )
+{	// If preferred contact method is selected as user field:
+	$UserFieldCache = & get_UserFieldCache();
+	$msgform_additional_fields = $Blog->get_msgform_additional_fields();
+	if( isset( $msgform_additional_fields[ $contact_method ] ) &&
+	    $UserField = & $UserFieldCache->get_by_ID( $contact_method, false, false ) )
+	{
+		$contact_method_field_is_filled = false;
+		if( isset( $user_fields[ $contact_method ] ) )
+		{	// Check the entered field for preferred contact method:
+			$entered_user_field = $user_fields[ $contact_method ];
+			$entered_user_field = trim( is_array( $entered_user_field ) ? implode( '', $entered_user_field ) : $entered_user_field );
+			if( ! empty( $entered_user_field ) )
+			{	// Allow to use the selected field for preferred contact method because it has been entered:
+				$contact_method_field_is_filled = true;
+			}
+		}
+		if( ! $contact_method_field_is_filled )
+		{	// If the selected contact method field is not filled:
+			$Messages->add_to_group( sprintf( T_('Please fill the field "%s" because you have selected this as preferred contact method.'), $UserField->get_name() ),'error', T_('Validation errors:') );
+		}
+	}
+	else
+	{	// If the selected contact method is not used as additional field or it doesn't exist in DB:
+		$Messages->add_to_group( T_('You have selected unavailable preferred contact method.'), 'error', T_('Validation errors:') );
+	}
+}
+
 // opt-out links:
 if( $recipient_User )
 { // Member:
@@ -402,8 +430,7 @@ if( $success_message )
 		elseif( intval( $send_contact_method ) > 0 )
 		{	// User field option:
 			$UserFieldCache = & get_UserFieldCache();
-			if( $UserField = & $UserFieldCache->get_by_ID( $send_contact_method, false, false ) &&
-			    ( $UserField->get( 'type' ) == 'email' || $UserField->get( 'type' ) == 'phone' ) )
+			if( $UserField = & $UserFieldCache->get_by_ID( $send_contact_method, false, false ) )
 			{	// Get real name of the selected user field:
 				$send_contact_method = $UserField->get( 'name' );
 				if( is_logged_in() )
@@ -578,6 +605,7 @@ $unsaved_message_params[ 'subject' ] = $subject;
 $unsaved_message_params[ 'subject_other' ] = $subject_other;
 $unsaved_message_params[ 'message' ] = $original_content;
 $unsaved_message_params[ 'contact_method' ] = $contact_method;
+$unsaved_message_params[ 'user_fields' ] = $user_fields;
 save_message_params_to_session( $unsaved_message_params );
 
 if( param_errors_detected() || empty( $redirect_to ) )
