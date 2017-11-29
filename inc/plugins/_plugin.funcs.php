@@ -510,10 +510,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		case 'password':
 			$params['type'] = 'password'; // same as text input, but type=password
 
+		case 'number':
 		case 'float':
 		case 'integer':
 		case 'text':
 			// Default: "text input"
+		
+			if( $parmeta['type'] == 'number' ){ $params['type'] = 'number';}
+			
 			if( isset($parmeta['size']) )
 			{
 				$size = (int)$parmeta['size'];
