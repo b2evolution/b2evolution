@@ -110,44 +110,30 @@ if( $Blog->get_setting( 'msgform_display_message' ) )
 	}
 }
 
-$allow_msgform = '';
 if( ! empty( $recipient_id ) )
-{ // Get the email address for the recipient if a member:
+{	// Get the recipient User by requested ID:
 	$UserCache = & get_UserCache();
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
-
-	// Check if current User allows to be contacted by email:
-	$allow_msgform = $recipient_User->get_msgform_possibility( NULL, 'email' );
-	if( $allow_msgform != 'email' )
-	{ // should be prevented by UI
-		debug_die( 'Invalid recipient or no permission to contact by email!' );
-	}
 }
 elseif( ! empty( $comment_id ) )
-{ // Get the email address for the recipient if a visiting commenter:
+{	// Get the recipient data to send a message to comment's author:
 	$CommentCache = & get_CommentCache();
-	$Comment = $CommentCache->get_by_ID( $comment_id );
-
-	if( empty( $Comment ) )
-	{
-		debug_die( 'Invalid request, comment doesn\'t exists!' );
+	if( ! ( $Comment = & $CommentCache->get_by_ID( $comment_id, false, false ) ) )
+	{	// The requested comment must exists in DB:
+		debug_die( 'Invalid request for message sending because comment #'.$comment_id.' doesn\'t exists in DB!' );
 	}
 
-	if( $recipient_User = & $Comment->get_author_User() )
-	{ // Comment is from a registered user:
-		// Check if current User allows to be contacted by email:
-		$allow_msgform = $recipient_User->get_msgform_possibility( NULL, 'email' );
-		if( $allow_msgform != 'email' )
-		{ // should be prevented by UI
-			debug_die( 'Invalid recipient or no permission to contact by email!' );
+	// Get recipient User if it is a registered user:
+	$recipient_User = & $Comment->get_author_User();
+
+	if( empty( $recipient_User ) )
+	{	// If comment's author is anonymous user:
+		if( empty( $Comment->allow_msgform ) )
+		{	// If anonymous user didn't allow to send email messages:
+			debug_die( 'Author of the comment #'.$comment_id.' does not want to get contacted through the message form!' );
 		}
-	}
-	elseif( empty($Comment->allow_msgform) )
-	{ // should be prevented by UI
-		debug_die( 'Invalid recipient or no permission to contact by email!' );
-	}
-	else
-	{
+
+		// Get the recipient data of the comment's author:
 		$recipient_name = $Comment->get_author_name();
 		$recipient_address = $Comment->get_author_email();
 	}
@@ -366,6 +352,34 @@ if( $update_user_fields )
 	$current_User->dbupdate();
 }
 
+if( intval( $contact_method ) > 0 )
+{	// If preferred contact method is selected as user field:
+	$UserFieldCache = & get_UserFieldCache();
+	$msgform_additional_fields = $Blog->get_msgform_additional_fields();
+	if( isset( $msgform_additional_fields[ $contact_method ] ) &&
+	    $UserField = & $UserFieldCache->get_by_ID( $contact_method, false, false ) )
+	{
+		$contact_method_field_is_filled = false;
+		if( isset( $user_fields[ $contact_method ] ) )
+		{	// Check the entered field for preferred contact method:
+			$entered_user_field = $user_fields[ $contact_method ];
+			$entered_user_field = trim( is_array( $entered_user_field ) ? implode( '', $entered_user_field ) : $entered_user_field );
+			if( ! empty( $entered_user_field ) )
+			{	// Allow to use the selected field for preferred contact method because it has been entered:
+				$contact_method_field_is_filled = true;
+			}
+		}
+		if( ! $contact_method_field_is_filled )
+		{	// If the selected contact method field is not filled:
+			$Messages->add_to_group( sprintf( T_('Please fill the field "%s" because you have selected this as preferred contact method.'), $UserField->get_name() ),'error', T_('Validation errors:') );
+		}
+	}
+	else
+	{	// If the selected contact method is not used as additional field or it doesn't exist in DB:
+		$Messages->add_to_group( T_('You have selected unavailable preferred contact method.'), 'error', T_('Validation errors:') );
+	}
+}
+
 // opt-out links:
 if( $recipient_User )
 { // Member:
@@ -416,8 +430,7 @@ if( $success_message )
 		elseif( intval( $send_contact_method ) > 0 )
 		{	// User field option:
 			$UserFieldCache = & get_UserFieldCache();
-			if( $UserField = & $UserFieldCache->get_by_ID( $send_contact_method, false, false ) &&
-			    ( $UserField->get( 'type' ) == 'email' || $UserField->get( 'type' ) == 'phone' ) )
+			if( $UserField = & $UserFieldCache->get_by_ID( $send_contact_method, false, false ) )
 			{	// Get real name of the selected user field:
 				$send_contact_method = $UserField->get( 'name' );
 				if( is_logged_in() )
@@ -592,6 +605,7 @@ $unsaved_message_params[ 'subject' ] = $subject;
 $unsaved_message_params[ 'subject_other' ] = $subject_other;
 $unsaved_message_params[ 'message' ] = $original_content;
 $unsaved_message_params[ 'contact_method' ] = $contact_method;
+$unsaved_message_params[ 'user_fields' ] = $user_fields;
 save_message_params_to_session( $unsaved_message_params );
 
 if( param_errors_detected() || empty( $redirect_to ) )

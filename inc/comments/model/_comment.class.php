@@ -2439,9 +2439,10 @@ class Comment extends DataObject
 				return false;
 			}
 			$msg_type = 'email';
+			$form_url = url_add_param( $form_url, 'recipient_id=0' );
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id=0&amp;comment_id='.$this->ID.'&amp;post_id='.$this->item_ID
+		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID.'&amp;post_id='.$this->item_ID
 				.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $form_url)) );
 
 		if( $title == '#' )
@@ -4540,11 +4541,6 @@ class Comment extends DataObject
 	 */
 	function reply_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		if( ! is_logged_in( false ) )
-		{
-			return false;
-		}
-
 		if( empty( $this->ID ) )
 		{	// Happens in Preview
 			return false;
@@ -4558,8 +4554,8 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( !$this->Item->can_comment() )
-		{	// The comments are disabled
+		if( ! $this->Item->can_comment( NULL ) )
+		{	// If current User cannot create a comment for the Item:
 			return false;
 		}
 

@@ -2294,7 +2294,7 @@ function is_recursive( /*array*/ & $array, /*array*/ & $alreadySeen = array() )
  */
 function display_ajax_form( $params )
 {
-	global $rsc_url, $ajax_form_number, $required_js;
+	global $rsc_url, $ajax_form_number, $required_js, $b2evo_icons_type;
 
 	if( is_recursive( $params ) )
 	{ // The params array contains recursion, don't try to encode, display error message instead
@@ -2307,6 +2307,11 @@ function display_ajax_form( $params )
 	{	// Send all loaded JS files to ajax request in order to don't load them twice:
 		// yura: It was done because JS of bootstrap modal doesn't work when jquery JS file is loaded twice.
 		$params['required_js'] = $required_js;
+	}
+
+	if( ! isset( $params['b2evo_icons_type'] ) && isset( $b2evo_icons_type ) )
+	{	// Send current icons type to display proper icons on the loaded AJAX form:
+		$params['b2evo_icons_type'] = $b2evo_icons_type;
 	}
 
 	if( empty( $ajax_form_number ) )

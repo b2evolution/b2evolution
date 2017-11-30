@@ -1901,34 +1901,27 @@ function get_thread_prevnext_links( $current_thread_ID, $params = array() )
  */
 function get_msgform_contact_methods( $recipient_User = NULL )
 {
-	global $DB, $current_User;
+	global $DB, $current_User, $Blog;
 
 	$contact_methods = array();
 
 	if( is_logged_in() && $recipient_User !== NULL &&
-	    $current_User->get_msgform_possibility( $recipient_User, 'PM' ) )
+	    $current_User->get_msgform_possibility( $recipient_User, 'PM' ) == 'PM' )
 	{	// Suggest PM method only if it is allowed between current and recipient users:
 		$contact_methods['pm'] = T_('Private Message on this Site');
 	}
 
-	// Email method is allowed for all users:
-	$contact_methods['email'] = T_('Email');
+	if( ! is_logged_in() || $current_User->get_msgform_possibility( NULL, 'email' ) == 'email' )
+	{	// Anonymous user should has email preferred contact method by default,
+		// OR suggest Email method only if current user allows to receive emails:
+		$contact_methods['email'] = T_('Email');
+	}
 
-	if( is_logged_in() )
-	{	// Get additional user fields if they are filled for current user profile:
-		$SQL = new SQL( 'Get preferred contact methods for disp=msgform' );
-		$SQL->SELECT( 'ufdf_id, ufdf_name' );
-		$SQL->FROM( 'T_users__fielddefs' );
-		$SQL->FROM_add( 'INNER JOIN T_users__fields ON uf_ufdf_ID = ufdf_id' );
-		$SQL->FROM_add( 'LEFT JOIN T_users__fieldgroups ON ufgp_ID = ufdf_ufgp_ID' );
-		$SQL->WHERE( 'ufdf_type IN ( "phone", "email" )' );
-		$SQL->WHERE_and( 'uf_user_ID = '.$current_User->ID );
-		$SQL->ORDER_BY( 'ufdf_name' );
-		$user_fields = $DB->get_assoc( $SQL->get(), $SQL->title );
-		foreach( $user_fields as $user_field_ID => $user_field_name )
-		{
-			$contact_methods[ $user_field_ID ] = $user_field_name;
-		}
+	// Get additional user fields which are defined for current collection:
+	$msgform_additional_fields = $Blog->get_msgform_additional_fields();
+	foreach( $msgform_additional_fields as $additional_Userfield )
+	{
+		$contact_methods[ $additional_Userfield->ID ] = $additional_Userfield->get_name();
 	}
 
 	return $contact_methods;
