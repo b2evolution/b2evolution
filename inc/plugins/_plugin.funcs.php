@@ -142,8 +142,36 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		switch( $parmeta['layout'] )
 		{
 			case 'begin_fieldset':
+				
 				$fieldset_title = $set_label;
-				$Form->begin_fieldset( $fieldset_title.$help_icon );
+				
+				$field_params = array();
+				
+				if( isset( $parmeta['fold'] ) )
+				{
+					$field_params['fold']  = $parmeta['fold'];
+				}
+				
+				if( isset( $parmeta['deny_fold'] ) )
+				{
+					$field_params['deny_fold'] = $parmeta['deny_fold'];
+				}
+				
+				if( isset( $parmeta['id'] ) )
+				{
+					$field_params['id'] = $parmeta['id'];
+				}
+				else
+				{
+					$field_params['id'] = $parname;
+				}
+				
+				if( isset( $parmeta['class'] ) )
+				{
+					$field_params['class'] = $parmeta['class'];
+				}
+				
+				$Form->begin_fieldset( $fieldset_title.$help_icon, $field_params );
 				break;
 
 			case 'end_fieldset':
@@ -390,7 +418,34 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				{
 					$fieldset_title .= ' [debug: '.$parname.']';
 				}
-				$Form->begin_fieldset( $fieldset_title );
+				
+				$field_params = array();
+				
+				if( isset( $parmeta['fold'] ) )
+				{
+					$field_params['fold']  = $parmeta['fold'];
+				}
+				
+				if( isset( $parmeta['deny_fold'] ) )
+				{
+					$field_params['deny_fold'] = $parmeta['deny_fold'];
+				}
+				
+				if( isset( $parmeta['id'] ) )
+				{
+					$field_params['id'] = $parmeta['id'];
+				}
+				else
+				{
+					$field_params['id'] = $parname;
+				}
+				
+				if( isset( $parmeta['class'] ) )
+				{
+					$field_params['class'] = $parmeta['class'];
+				}
+				
+				$Form->begin_fieldset( $fieldset_title, $field_params );
 
 				if( ! empty($params['note']) )
 				{
@@ -431,7 +486,31 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 									)
 								).'</span>';
 					}
-					$Form->begin_fieldset( '#'.$k_nb.$remove_action, array( 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) );
+					
+					$field_params = array();
+
+					if( isset( $parmeta['fold'] ) )
+					{
+						$field_params['fold']  = $parmeta['fold'];
+					}
+
+					if( isset( $parmeta['deny_fold'] ) )
+					{
+						$field_params['deny_fold'] = $parmeta['deny_fold'];
+					}
+
+					if( isset( $parmeta['class'] ) )
+					{
+						$field_params['class'] = 'bordered '.$parmeta['class'];
+					}
+					else
+					{
+						$field_params['class'] = 'bordered';
+					}
+					
+					$field_params['id'] = $parname.'_'.$k_nb;
+
+					$Form->begin_fieldset( '#'.$k_nb.$remove_action, $field_params );
 
 					if( isset($parmeta['key']) )
 					{ // KEY FOR THIS ENTRY:
