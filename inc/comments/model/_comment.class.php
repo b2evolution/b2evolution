@@ -4554,8 +4554,8 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( !$this->Item->can_comment() )
-		{	// The comments are disabled
+		if( ! $this->Item->can_comment( NULL ) )
+		{	// If current User cannot create a comment for the Item:
 			return false;
 		}
 
