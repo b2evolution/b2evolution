@@ -456,7 +456,33 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 							$l_value = $set_value[$k][$l_set_name];
 						}
 						else
-						{	// Use default value if it is defined:
+						{	/*
+							*	Use default value if it is defined:
+							*	Updated here: https://github.com/b2evolution/b2evolution/commit/30b6063c3383b6b20c75fd130681a3cca7469195
+							*	but not loading default values for items for type 'input_group' when nested
+							*	this is because key['defaultvalue'] is found deeper in array ie:
+							*
+							*	
+							*	array(3) {
+							*	  ["label"]=>
+							*	  string(3) "label name"
+							*	  ["type"]=>
+							*	  string(11) "input_group" 	<--- we will have a sub set
+							*	  ["inputs"]=>  		<--- sub set array
+							*	  array(1) {
+							*	    ["_color"]=>
+							*	    array(3) {
+							*	      ["label"]=>
+							*	      string(13) "Color Label"
+							*	      ["defaultvalue"]=>
+							*	      string(7) "#fed136" 	<----- This is our default value
+							*	      ["type"]=>
+							*	      string(5) "color"
+							*	    }
+							*	  }
+							*	}
+							*	
+							*/
 							$l_value = isset( $l_set_entry['defaultvalue'] ) ? $l_set_entry['defaultvalue'] : NULL;
 						}
 						// RECURSE:
