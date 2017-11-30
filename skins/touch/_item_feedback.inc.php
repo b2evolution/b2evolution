@@ -293,6 +293,7 @@ if( $Blog->get_setting( 'allow_comments' ) != 'never' && // if enabled by collec
 			'action' => 'get_comment_form',
 			'p' => $Item->ID,
 			'blog' => $Blog->ID,
+			'reply_ID' => param( 'reply_ID', 'integer', 0 ),
 			'disp' => $disp,
 			'params' => $params );
 		display_ajax_form( $json_params );

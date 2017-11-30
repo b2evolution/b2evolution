@@ -4541,11 +4541,6 @@ class Comment extends DataObject
 	 */
 	function reply_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		if( ! is_logged_in( false ) )
-		{
-			return false;
-		}
-
 		if( empty( $this->ID ) )
 		{	// Happens in Preview
 			return false;
@@ -4559,8 +4554,8 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( !$this->Item->can_comment() )
-		{	// The comments are disabled
+		if( ! $this->Item->can_comment( NULL ) )
+		{	// If current User cannot create a comment for the Item:
 			return false;
 		}
 
