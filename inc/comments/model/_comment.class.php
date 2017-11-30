@@ -4541,11 +4541,6 @@ class Comment extends DataObject
 	 */
 	function reply_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		if( ! is_logged_in( false ) )
-		{
-			return false;
-		}
-
 		if( empty( $this->ID ) )
 		{	// Happens in Preview
 			return false;
