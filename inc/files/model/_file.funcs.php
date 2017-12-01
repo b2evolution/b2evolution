@@ -2493,9 +2493,6 @@ function display_dragdrop_upload_button( $params = array() )
 						var progressbar = jQuery( 'tr[qq-file-id=' + id + '] .progress-bar' );
 						var percentCompleted = Math.round( uploadedBytes / totalBytes * 100 ) + '%';
 
-						// Remove transition animation for a more accurate representation of progress
-						progressbar.css( 'transition', 'none' );
-
 						progressbar.css( 'width', percentCompleted );
 						progressbar.text( percentCompleted );
 						<?php
