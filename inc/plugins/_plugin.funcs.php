@@ -456,7 +456,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 							$l_value = $set_value[$k][$l_set_name];
 						}
 						else
-						{	/*
+						{	// Use default value if it is defined:
+							$l_value = isset( $l_set_entry['defaultvalue'] ) ? $l_set_entry['defaultvalue'] : NULL;
+							/*
 							*	Use default value if it is defined:
 							*	Updated here: https://github.com/b2evolution/b2evolution/commit/30b6063c3383b6b20c75fd130681a3cca7469195
 							*	but not loading default values for items for type 'input_group' when nested
@@ -483,7 +485,13 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 							*	}
 							*	
 							*/
-							$l_value = isset( $l_set_entry['defaultvalue'] ) ? $l_set_entry['defaultvalue'] : NULL;
+							if( ! empty( $l_set_entry['inputs'] ) && is_array( $l_set_entry['inputs'] ) )
+							{
+								foreach( $l_set_entry['inputs'] as $l_set_name => $l_set_entry )
+								{
+									$l_value = isset( $l_set_entry['defaultvalue'] ) ? $l_set_entry['defaultvalue'] : NULL;
+								}
+							}
 						}
 						// RECURSE:
 						autoform_display_field( $parname.'['.$k_nb.']['.$l_set_name.']', $l_set_entry, $Form, $set_type, $Obj, $set_target, $l_value );
