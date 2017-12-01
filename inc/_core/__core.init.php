@@ -23,12 +23,12 @@ $default_ctrl = 'settings';
  * Minimum PHP version required for _core module to function properly.
  * This value can't be higher then the application required php version.
  */
-$required_php_version[ '_core' ] = '5.2';
+$required_php_version[ '_core' ] = '5.4';
 
 /**
  * Minimum MYSQL version required for _core module to function properly.
  */
-$required_mysql_version[ '_core' ] = '5.0.3';
+$required_mysql_version[ '_core' ] = '5.1';
 
 /**
  * Aliases for table names:

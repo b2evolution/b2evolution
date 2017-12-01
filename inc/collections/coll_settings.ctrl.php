@@ -206,6 +206,9 @@ switch( $action )
 						header_redirect( $update_redirect_url.'&skin_type='.$skin_type, 303 ); // Will EXIT
 					}
 
+					// Update the folding states for current user:
+					save_fieldset_folding_values( $edited_Blog->ID );
+
 					// Load skin params from request:
 					$edited_Skin->load_params_from_Request();
 
@@ -225,6 +228,9 @@ switch( $action )
 				{
 					$update_redirect_url .= '&plugin_group='.$plugin_group;
 				}
+
+				// Update the folding states for current user:
+				save_fieldset_folding_values( $edited_Blog->ID );
 
 				// Update Plugin params/Settings
 				load_funcs('plugins/_plugin.funcs.php');
