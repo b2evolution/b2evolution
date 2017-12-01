@@ -1137,29 +1137,6 @@ function is_absolute_pathname($path)
 
 
 /**
- * Define sys_get_temp_dir, if not available (PHP 5 >= 5.2.1)
- * @link http://us2.php.net/manual/en/function.sys-get-temp-dir.php#93390
- * @return string NULL on failure
- */
-if ( !function_exists('sys_get_temp_dir'))
-{
-  function sys_get_temp_dir()
-	{
-    if (!empty($_ENV['TMP'])) { return realpath($_ENV['TMP']); }
-    if (!empty($_ENV['TMPDIR'])) { return realpath( $_ENV['TMPDIR']); }
-    if (!empty($_ENV['TEMP'])) { return realpath( $_ENV['TEMP']); }
-    $tempfile=tempnam(__FILE__,'');
-    if (file_exists($tempfile))
-		{
-      unlink($tempfile);
-      return realpath(dirname($tempfile));
-    }
-    return null;
-  }
-}
-
-
-/**
  * Controller helper
  */
 function file_controller_build_tabs()
