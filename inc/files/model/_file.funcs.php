@@ -2493,7 +2493,9 @@ function display_dragdrop_upload_button( $params = array() )
 						var progressbar = jQuery( 'tr[qq-file-id=' + id + '] .progress-bar' );
 						var percentCompleted = Math.round( uploadedBytes / totalBytes * 100 ) + '%';
 
-						progressbar.css( 'width', percentCompleted );
+						//progressbar.style.width = percentCompleted;
+						progressbar.get(0).style.width = percentCompleted; // This should fix jQuery's .css() issue with some browsers
+
 						progressbar.text( percentCompleted );
 						<?php
 						if( $params['resize_frame'] )
