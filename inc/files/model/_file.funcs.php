@@ -2470,10 +2470,9 @@ function display_dragdrop_upload_button( $params = array() )
 						var progressbar = jQuery( 'tr[qq-file-id=' + id + '] .progress-bar' );
 						var percentCompleted = Math.round( uploadedBytes / totalBytes * 100 ) + '%';
 
-						// Remove transition animation for a more accurate representation of progress
-						progressbar.css( 'transition', 'none' );
+						//progressbar.style.width = percentCompleted;
+						progressbar.get(0).style.width = percentCompleted; // This should fix jQuery's .css() issue with some browsers
 
-						progressbar.css( 'width', percentCompleted );
 						progressbar.text( percentCompleted );
 						<?php
 						if( $params['resize_frame'] )
@@ -3061,7 +3060,7 @@ function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 
 	load_class( 'files/model/_fileroot.class.php', 'FileRoot' );
 
-	$abspath = explode( DIRECTORY_SEPARATOR, $abspath );
+	$abspath = preg_split( '#[/\\\\]#', $abspath );
 
 	switch( $abspath[0] )
 	{
