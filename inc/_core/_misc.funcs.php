@@ -7423,8 +7423,8 @@ function get_fieldset_folding_icon( $id, $params = array() )
 	}
 	else
 	{ // Get the fold value from user settings
-		global $UserSettings, $Collection, $Blog;
-		if( empty( $Blog ) )
+		global $UserSettings, $Collection, $Blog, $ctrl;
+		if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
 		{ // Get user setting value
 			$value = intval( $UserSettings->get( 'fold_'.$id ) );
 		}

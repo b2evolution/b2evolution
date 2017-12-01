@@ -476,6 +476,9 @@ switch( $action )
 		param( 'edited_plugin_displayed_events', 'array:string', array() );
 		param( 'edited_plugin_events', 'array:integer', array() );
 
+		// Update the folding states for current user:
+		save_fieldset_folding_values();
+
 		$default_Plugin = & $admin_Plugins->register( $edit_Plugin->classname );
 
 		// Update plugin name:

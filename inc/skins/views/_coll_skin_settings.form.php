@@ -71,4 +71,6 @@ if( $skin_ID )
 
 $Form->end_form( $buttons );
 
+// Enable JS for fieldset folding:
+echo_fieldset_folding_js();
 ?>
