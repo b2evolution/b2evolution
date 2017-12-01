@@ -3083,7 +3083,7 @@ function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 
 	load_class( 'files/model/_fileroot.class.php', 'FileRoot' );
 
-	$abspath = explode( DIRECTORY_SEPARATOR, $abspath );
+	$abspath = preg_split( '#[/\\\\]#', $abspath );
 
 	switch( $abspath[0] )
 	{
