@@ -136,7 +136,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 		}
 	}
 
-	// Display additional user feilds:
+	// Display additional user fields:
 	$Blog->display_msgform_additional_fields( $Form );
 
 	if( $Blog->get_setting( 'msgform_contact_method' ) )

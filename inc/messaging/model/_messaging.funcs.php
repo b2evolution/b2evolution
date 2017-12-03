@@ -1911,6 +1911,8 @@ function get_msgform_contact_methods( $recipient_User = NULL )
 		{	// Suggest PM method only if it is allowed between current and recipient users:
 			$contact_methods['pm'] = T_('Private Message on this Site');
 		}
+
+// TODO: Why are we not checking the RECIPIENT BELOW?:
 		if( $current_User->get_msgform_possibility( NULL, 'email' ) == 'email' )
 		{	// Suggest Email method only if current user allows to receive emails:
 			$contact_methods['email'] = T_('Email');

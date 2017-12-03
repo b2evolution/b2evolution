@@ -3553,7 +3553,9 @@ class User extends DataObject
 	function accepts_email()
 	{
 		global $UserSettings, $Settings;
-		return ( $Settings->get( 'emails_msgform') != 'never' ) && ( $UserSettings->get( 'enable_email', $this->ID ) ) && ( ! empty( $this->email ) );
+		return ( $Settings->get( 'emails_msgform') != 'never' ) 
+			&& ( $UserSettings->get( 'enable_email', $this->ID ) ) 
+			&& ( ! empty( $this->email ) );
 	}
 
 
@@ -3596,23 +3598,25 @@ class User extends DataObject
 		}
 
 		if( is_logged_in() )
-		{ // current User is a registered user
+		{ // current User is a registered user/logged in:
+
 			if( $current_User == NULL )
 			{
 				global $current_User;
 			}
 
+			// Check cross-country restrictions:
 			if( ! $this->is_collection_owner() && has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
-			{ // Contat to this user is not enabled
+			{ // Contact to this user is not enabled
 				return NULL;
 			}
 
 			if( $check_level == 'PM' && $this->accepts_pm() && $current_User->accepts_pm() && ( $this->ID != $current_User->ID ) )
-			{ // both user has permission to send or receive private message and not the same user
-				// check if current_User is allowed to create a new conversation with this user.
+			{	// Both users have permission to send or receive Private Messages and not the same user...
+				// Check if current_User is allowed to create a new conversation with this user:
 				$blocked_contact = check_blocked_contacts( array( $this->ID ) );
 				if( empty( $blocked_contact ) && ! $current_User->must_accept_terms() )
-				{ // user is allowed to send pm to this user, and he didn't reached his new thread limit yet
+				{ // User is allowed to send PM to this user, and he didn't reach his new thread limit yet:
 					return 'PM';
 				}
 			}
@@ -3621,9 +3625,11 @@ class User extends DataObject
 			{ // This User allows email => send email OR Force to allow to contact with this user because he is owner of the selected collection:
 				return 'email';
 			}
+
 		}
 		else
-		{ // current User is not logged in
+		{ // current User is anonymous/not logged in:
+
 			if( $this->is_collection_owner() || $this->accepts_email() )
 			{ // This User allows email => send email OR Force to allow to contact with this user because he is owner of the selected collection:
 				return 'email';
@@ -3634,7 +3640,8 @@ class User extends DataObject
 				return 'login';
 			}
 		}
-		// no messaging option between current_User and this user
+
+		// No messaging option between current_User and this user:
 		return NULL;
 	}
 
