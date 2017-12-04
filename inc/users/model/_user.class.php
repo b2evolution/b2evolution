@@ -3553,8 +3553,8 @@ class User extends DataObject
 	function accepts_email()
 	{
 		global $UserSettings, $Settings;
-		return ( $Settings->get( 'emails_msgform') != 'never' ) 
-			&& ( $UserSettings->get( 'enable_email', $this->ID ) ) 
+		return ( $Settings->get( 'emails_msgform') != 'never' )
+			&& ( $UserSettings->get( 'enable_email', $this->ID ) )
 			&& ( ! empty( $this->email ) );
 	}
 
@@ -5128,16 +5128,12 @@ class User extends DataObject
 	 */
 	function update_status_from_Request( $dbsave, $new_status = NULL )
 	{
-		global $DB, $UserSettings, $current_User, $servertimenow;
+		global $DB, $Settings, $UserSettings, $Messages, $current_User, $servertimenow;
 		global $is_api_request;
 
-		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) )
+		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) && ! ( $Settings->get( 'account_close_enabled' ) && $current_User->ID == $this->ID ) )
 		{	// Only moderators can update user status:
-			return false;
-		}
-
-		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) )
-		{	// Only moderators can update user status:
+			$Messages->add_to_group( T_( 'You do not have permission to perform this action' ), 'error', T_('Close account').':' );
 			return false;
 		}
 
