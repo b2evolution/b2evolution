@@ -2522,7 +2522,6 @@ class User extends DataObject
 			$SQL = new SQL( 'Get email domain' );
 			$SQL->SELECT( 'dom_ID' );
 			$SQL->FROM( 'T_basedomains' );
-			$SQL->WHERE( 'dom_type = \'email\'' );
 			$SQL->WHERE_and( 'dom_name = '.$DB->quote( $email_domain ) );
 
 			$dom_ID = $DB->get_var( $SQL );
