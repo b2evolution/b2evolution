@@ -1911,6 +1911,7 @@ function get_msgform_contact_methods( $recipient_User = NULL )
 		$contact_methods['pm'] = T_('Private Message on this Site');
 	}
 
+// TODO: Why are we not checking the RECIPIENT BELOW?:
 	if( ! is_logged_in() || $current_User->get_msgform_possibility( NULL, 'email' ) == 'email' )
 	{	// Anonymous user should has email preferred contact method by default,
 		// OR suggest Email method only if current user allows to receive emails:
