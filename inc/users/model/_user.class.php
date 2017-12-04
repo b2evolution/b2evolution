@@ -1272,7 +1272,7 @@ class User extends DataObject
 				}
 
 				// set messaging options
-				$enable_PM = param( 'PM', 'integer', ! $is_api_request ? 0 : NULL );
+				$enable_PM = param( 'enable_PM', 'integer', ! $is_api_request ? 0 : NULL );
 				if( isset( $enable_PM ) && $has_messaging_perm )
 				{
 					$UserSettings->set( 'enable_PM', $enable_PM, $this->ID );
@@ -1280,7 +1280,7 @@ class User extends DataObject
 				$emails_msgform = $Settings->get( 'emails_msgform' );
 				if( ( $emails_msgform == 'userset' ) || ( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
 				{ // enable email option is displayed only if user can set or if admin can set and current User is an administrator
-					$UserSettings->set( 'enable_email', param( 'email', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'enable_email', param( 'enable_email', 'integer', 0 ), $this->ID );
 				}
 
 				// Email format
