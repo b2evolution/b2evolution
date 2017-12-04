@@ -2857,6 +2857,11 @@ class Item extends ItemLight
 				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
 				continue;
 			}
+			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
+			{	// Deny to display content block Item with lower status than parent Item:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The visibility level of the content bock "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				continue;
+			}
 			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
 			        ( ! $item_Blog || $content_Item->get( 'creator_user_ID' ) != $item_Blog->get( 'owner_user_ID' ) ) &&
 			        ( ! $item_Blog || $content_Item->get_blog_ID() != $item_Blog->ID )
