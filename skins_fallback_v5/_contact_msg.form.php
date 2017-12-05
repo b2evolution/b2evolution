@@ -74,6 +74,13 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 		$Form->info( ( empty( $recipient_label ) ? T_('Message to') : $recipient_label ), $recipient_link );
 	}
 
+	if( is_logged_in() &&
+	    ! empty( $recipient_User ) &&
+	    $recipient_User->get_msgform_possibility() == 'email' )
+	{	// Display email address of current User if recipient User can recieves messages only by email:
+		$Form->info( T_('Reply to'), $current_User->get( 'email' ) );
+	}
+
 	if( is_logged_in() )
 	{	// Name fields for current logged in user:
 		$edited_user_perms = array( 'edited-user', 'edited-user-required' );
