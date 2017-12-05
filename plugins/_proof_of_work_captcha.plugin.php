@@ -86,13 +86,13 @@ class proof_of_work_captcha_plugin extends Plugin
 				),
 				'api_site_key' => array(
 					'label' => $this->T_('API site key'),
-					'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Site Key (public)'), 'href="https://coinhive.com/settings/sites"', 'coinhive.com' ),
+					'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Site Key (public)'), 'href="https://coinhive.com/settings/sites" target="_blank"', 'coinhive.com' ),
 					'type'  => 'text',
 					'size'  => 40,
 				),
 				'api_secret_key' => array(
 					'label' => $this->T_('API secret key'),
-					'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Secret Key (private)'), 'href="https://coinhive.com/settings/sites"', 'coinhive.com' ),
+					'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Secret Key (private)'), 'href="https://coinhive.com/settings/sites" target="_blank"', 'coinhive.com' ),
 					'type'  => 'text',
 					'size'  => 40,
 				),
@@ -210,7 +210,7 @@ class proof_of_work_captcha_plugin extends Plugin
 		}
 
 		$Form->info( $this->T_('Captcha'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>
-			<div class="coinhive-captcha" data-hashes="1024" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'">
+			<div class="coinhive-captcha" data-hashes="1024" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]">
 				<em>'.$this->T_('Loading Captcha...<br>If it doesn\'t load, please disable Adblock!').'</em>
 			</div>' );
 
