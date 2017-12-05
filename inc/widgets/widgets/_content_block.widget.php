@@ -228,6 +228,7 @@ class content_block_Widget extends ComponentWidget
 		return array(
 				'wi_ID'        => $this->ID, // Cache each widget separately + Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => $widget_Item ? $widget_Item->get_blog_ID() : 0, // Has the content of the displayed blog changed ?
 				'item_ID'      => $widget_Item ? $widget_Item->ID : 0, // Cache each item separately + Has the Item changed?
 			);
 	}
