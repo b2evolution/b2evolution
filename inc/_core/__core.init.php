@@ -1197,7 +1197,6 @@ class _core_Module extends Module
 				$entries['blog'] = array(
 					'text' => T_('Collection'),
 					'href' => $collection_url,
-					'disabled' => true,
 				);
 			}
 

@@ -56,6 +56,8 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
+// Set a selected collection in user settings in order to use a correct last viewed collection URL in back-office:
+set_working_blog( $blog );
 
 if( $debug == 2 || is_logged_in() )
 {	// Allow debug info only for logged-in users OR when debug == 2:

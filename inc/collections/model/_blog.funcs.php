@@ -386,6 +386,11 @@ function set_working_blog( $new_blog_ID )
 {
 	global $blog, $UserSettings;
 
+	if( ! is_logged_in() )
+	{	// User must be logged in to set working collection:
+		return false;
+	}
+
 	if( $new_blog_ID != (int)$UserSettings->get('selected_blog') )
 	{ // Save the new default blog.
 		// fp> Test case 1: dashboard without a blog param should go to last selected blog
