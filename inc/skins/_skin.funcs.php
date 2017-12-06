@@ -566,7 +566,7 @@ function skin_init( $disp )
 
 				if( $allow_msgform == 'login' )
 				{ // user must login first to be able to send a message to this User
-					$Messages->add( T_( 'You must log in before you can contact this user' ) );
+					$Messages->add( sprintf( T_( 'You must log in before you can contact "%s".' ), $recipient_User->get( 'login' ) ) );
 					// Override redirect to param:
 					$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
 					// Redirect to special blog for login actions:
@@ -594,10 +594,6 @@ function skin_init( $disp )
 					if( ( !empty( $current_User ) ) && ( $recipient_id == $current_User->ID ) )
 					{
 						$Messages->add( T_( 'You cannot send a private message to yourself. However you can send yourself an email if you\'d like.' ), 'warning' );
-					}
-					else
-					{
-						$Messages->add( sprintf( T_( 'You cannot send a private message to %s. However you can send them an email if you\'d like.' ), $recipient_User->get( 'login' ) ), 'warning' );
 					}
 				}
 
