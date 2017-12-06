@@ -426,7 +426,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								// attach onclick event to remove the whole fieldset:
 								array(
 									'onclick' => "
-										var element_id = '".$parname.'_'.$k_nb."';
+										var element_id = '".$fieldset_params['id']."';
 										element_id = '#'+element_id.replace(/(\[|\])/g, &quot;\\\\$1&quot;);
 										jQuery(element_id).remove();
 										return false;",
