@@ -1089,10 +1089,12 @@ class Form extends Widget
 	 * @param integer max length of the value (if 0 field_size will be used!)
 	 * @param string the CSS class to use
 	 * @param string input type (only 'text' or 'password' makes sense)
+	 * @param string 'Uppercase'
+	 * @param string placeholder text
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
-											$field_maxlength = 0, $field_class = '', $inputtype = 'text', $force_to = '' )
+											$field_maxlength = 0, $field_class = '', $inputtype = 'text', $force_to = '', $placeholder = '' )
 	{
 		$field_params = array();
 
@@ -1111,6 +1113,10 @@ class Form extends Widget
 		if( $force_to !== '' )
 		{
 			$field_params['force_to'] = $force_to;
+		}
+		if( $placeholder !== '' )
+		{
+			$field_params['placeholder'] = $placeholder;
 		}
 
 		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_note, $field_params );
@@ -2956,13 +2962,20 @@ class Form extends Widget
 	 * @param integer
 	 * @param string
 	 * @param boolean
+	 * @param string Placeholder text
 	 */
-	function textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '', $required = false )
+	function textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '', $required = false, $placeholder = '' )
 	{
 		$field_params = array(
 			'note' => $field_note,
 			'cols' => $field_cols,
 			'class' => $field_class);
+
+		if( $placeholder != '' )
+		{
+			$field_params['placeholder'] = $placeholder;
+		}
+
 		if( $required )
 		{ // Set required only for case TRUE, because in the following code we have a condition "isset($required)" instead of "$required == true"
 			$field_params['required'] = $required;
