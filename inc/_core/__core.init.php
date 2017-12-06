@@ -220,6 +220,7 @@ function & get_CurrencyCache()
 
 	if( ! isset( $CurrencyCache ) )
 	{	// Cache doesn't exist yet:
+		load_class( 'regional/model/_currency.class.php', 'Currency' );
 		$CurrencyCache = new DataObjectCache( 'Currency', true, 'T_regional__currency', 'curr_', 'curr_ID', 'curr_code', 'curr_code');
 	}
 

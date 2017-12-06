@@ -28,6 +28,8 @@ class Country extends DataObject
 	var $status = '';
 	var $block_count = 0;
 
+	var $Currency = NULL;
+
 	/**
 	 * Constructor
 	 *
@@ -135,6 +137,23 @@ class Country extends DataObject
 	function get_name()
 	{
 		return $this->name;
+	}
+
+
+	/**
+	 * Get Currency object of this Country
+	 *
+	 * @return object Currency
+	 */
+	function & get_Currency()
+	{
+		if( $this->Currency === NULL )
+		{	// Initialize Currency for this Country:
+			$CurrencyCache = & get_CurrencyCache();
+			$this->Currency = & $CurrencyCache->get_by_ID( $this->get( 'curr_ID' ), false, false );
+		}
+
+		return $this->Currency;
 	}
 }
 
