@@ -122,6 +122,26 @@ class content_block_Widget extends ComponentWidget
 
 
 	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		global $Collection, $Blog;
+
+		parent::init_display( $params );
+
+		$widget_Item = & $this->get_widget_Item();
+
+		if( ! in_array( $widget_Item->get( 'status' ), get_inskin_statuses( $Blog->ID, 'post' ) ) )
+		{	// Disable block caching for this widget because target Item is not public for current collection:
+			$this->disp_params['allow_blockcache'] = 0;
+		}
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -152,6 +172,10 @@ class content_block_Widget extends ComponentWidget
 				$wrong_item_info .= empty( $this->disp_params['item_slug'] ) ? '' : ' <code>'.$this->disp_params['item_slug'].'</code>';
 			}
 			echo '<p class="red">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>';
+		}
+		elseif( ! $widget_Item->can_be_displayed() )
+		{	// Current user has no permission to view item with such status:
+			echo '<p class="red">'.sprintf( T_('Content block "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
 		}
 		elseif( ( $widget_Blog = & $this->get_Blog() ) && (
 		          ( $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
@@ -197,11 +221,14 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
+		global $Collection, $Blog;
+
 		$widget_Item = & $this->get_widget_Item();
 
 		return array(
 				'wi_ID'        => $this->ID, // Cache each widget separately + Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => $widget_Item ? $widget_Item->get_blog_ID() : 0, // Has the content of the displayed blog changed ?
 				'item_ID'      => $widget_Item ? $widget_Item->ID : 0, // Cache each item separately + Has the Item changed?
 			);
 	}

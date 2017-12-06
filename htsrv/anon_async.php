@@ -108,9 +108,9 @@ switch( $action )
 
 		if( $recipient_id > 0 )
 		{ // Get identity link for existed users
-			$RecipientCache = & get_UserCache();
-			$Recipient = $RecipientCache->get_by_ID( $recipient_id );
-			$recipient_link = $Recipient->get_identity_link( array( 'link_text' => 'nickname' ) );
+			$UserCache = & get_UserCache();
+			$recipient_User = & $UserCache->get_by_ID( $recipient_id );
+			$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'nickname' ) );
 		}
 		else if( $comment_id > 0 )
 		{ // Anonymous Users

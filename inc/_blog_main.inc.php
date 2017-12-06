@@ -68,6 +68,9 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
+// Set a selected collection in user settings in order to use a correct last viewed collection URL in back-office:
+set_working_blog( $blog );
+
 // Do we allow redirection to canonical URL? (allows to force a 'single post' URL for commenting)
 param( 'redir', 'string', 'yes', false );
 

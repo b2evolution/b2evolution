@@ -1901,20 +1901,20 @@ function get_thread_prevnext_links( $current_thread_ID, $params = array() )
  */
 function get_msgform_contact_methods( $recipient_User = NULL )
 {
-	global $DB, $current_User, $Blog;
+	global $Blog;
 
 	$contact_methods = array();
 
-	if( is_logged_in() && $recipient_User !== NULL &&
-	    $current_User->get_msgform_possibility( $recipient_User, 'PM' ) == 'PM' )
-	{	// Suggest PM method only if it is allowed between current and recipient users:
-		$contact_methods['pm'] = T_('Private Message on this Site');
-	}
-
-	if( ! is_logged_in() || $current_User->get_msgform_possibility( NULL, 'email' ) == 'email' )
-	{	// Anonymous user should has email preferred contact method by default,
-		// OR suggest Email method only if current user allows to receive emails:
-		$contact_methods['email'] = T_('Email');
+	if( $recipient_User !== NULL )
+	{	// Check what contact methods are allowed between recipient and current users:
+		if( $recipient_User->get_msgform_possibility( NULL, 'PM' ) == 'PM' )
+		{	// PM method is allowed:
+			$contact_methods['pm'] = T_('Private Message on this Site');
+		}
+		if( $recipient_User->get_msgform_possibility( NULL, 'email' ) == 'email' )
+		{	// Email method is allowed:
+			$contact_methods['email'] = T_('Email');
+		}
 	}
 
 	// Get additional user fields which are defined for current collection:

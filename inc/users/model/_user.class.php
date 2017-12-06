@@ -1272,7 +1272,7 @@ class User extends DataObject
 				}
 
 				// set messaging options
-				$enable_PM = param( 'PM', 'integer', ! $is_api_request ? 0 : NULL );
+				$enable_PM = param( 'enable_PM', 'integer', ! $is_api_request ? 0 : NULL );
 				if( isset( $enable_PM ) && $has_messaging_perm )
 				{
 					$UserSettings->set( 'enable_PM', $enable_PM, $this->ID );
@@ -1280,7 +1280,7 @@ class User extends DataObject
 				$emails_msgform = $Settings->get( 'emails_msgform' );
 				if( ( $emails_msgform == 'userset' ) || ( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
 				{ // enable email option is displayed only if user can set or if admin can set and current User is an administrator
-					$UserSettings->set( 'enable_email', param( 'email', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'enable_email', param( 'enable_email', 'integer', 0 ), $this->ID );
 				}
 
 				// Email format
@@ -2525,7 +2525,6 @@ class User extends DataObject
 			$SQL = new SQL( 'Get email domain' );
 			$SQL->SELECT( 'dom_ID' );
 			$SQL->FROM( 'T_basedomains' );
-			$SQL->WHERE( 'dom_type = \'email\'' );
 			$SQL->WHERE_and( 'dom_name = '.$DB->quote( $email_domain ) );
 
 			$dom_ID = $DB->get_var( $SQL );
@@ -3574,7 +3573,9 @@ class User extends DataObject
 	function accepts_email()
 	{
 		global $UserSettings, $Settings;
-		return ( $Settings->get( 'emails_msgform') != 'never' ) && ( $UserSettings->get( 'enable_email', $this->ID ) ) && ( ! empty( $this->email ) );
+		return ( $Settings->get( 'emails_msgform') != 'never' )
+			&& ( $UserSettings->get( 'enable_email', $this->ID ) )
+			&& ( ! empty( $this->email ) );
 	}
 
 
@@ -3617,23 +3618,25 @@ class User extends DataObject
 		}
 
 		if( is_logged_in() )
-		{ // current User is a registered user
+		{ // current User is a registered user/logged in:
+
 			if( $current_User == NULL )
 			{
 				global $current_User;
 			}
 
+			// Check cross-country restrictions:
 			if( ! $this->is_collection_owner() && has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
-			{ // Contat to this user is not enabled
+			{ // Contact to this user is not enabled
 				return NULL;
 			}
 
 			if( $check_level == 'PM' && $this->accepts_pm() && $current_User->accepts_pm() && ( $this->ID != $current_User->ID ) )
-			{ // both user has permission to send or receive private message and not the same user
-				// check if current_User is allowed to create a new conversation with this user.
+			{	// Both users have permission to send or receive Private Messages and not the same user...
+				// Check if current_User is allowed to create a new conversation with this user:
 				$blocked_contact = check_blocked_contacts( array( $this->ID ) );
 				if( empty( $blocked_contact ) && ! $current_User->must_accept_terms() )
-				{ // user is allowed to send pm to this user, and he didn't reached his new thread limit yet
+				{ // User is allowed to send PM to this user, and he didn't reach his new thread limit yet:
 					return 'PM';
 				}
 			}
@@ -3642,9 +3645,11 @@ class User extends DataObject
 			{ // This User allows email => send email OR Force to allow to contact with this user because he is owner of the selected collection:
 				return 'email';
 			}
+
 		}
 		else
-		{ // current User is not logged in
+		{ // current User is anonymous/not logged in:
+
 			if( $this->is_collection_owner() || $this->accepts_email() )
 			{ // This User allows email => send email OR Force to allow to contact with this user because he is owner of the selected collection:
 				return 'email';
@@ -3655,7 +3660,8 @@ class User extends DataObject
 				return 'login';
 			}
 		}
-		// no messaging option between current_User and this user
+
+		// No messaging option between current_User and this user:
 		return NULL;
 	}
 
@@ -5143,16 +5149,12 @@ class User extends DataObject
 	 */
 	function update_status_from_Request( $dbsave, $new_status = NULL )
 	{
-		global $DB, $UserSettings, $current_User, $servertimenow;
+		global $DB, $Settings, $UserSettings, $Messages, $current_User, $servertimenow;
 		global $is_api_request;
 
-		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) )
+		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) && ! ( $Settings->get( 'account_close_enabled' ) && $current_User->ID == $this->ID ) )
 		{	// Only moderators can update user status:
-			return false;
-		}
-
-		if( ! is_logged_in() || ! $current_User->can_moderate_user( $this->ID ) )
-		{	// Only moderators can update user status:
+			$Messages->add_to_group( T_( 'You do not have permission to perform this action' ), 'error', T_('Close account').':' );
 			return false;
 		}
 
