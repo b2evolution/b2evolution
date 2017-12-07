@@ -103,6 +103,13 @@ class item_content_Widget extends ComponentWidget
 				)
 			), parent::get_param_definitions( $params ) );
 
+		if( isset( $r['allow_blockcache'] ) )
+		{	// Disable "allow blockcache" because item content may includes other items by inline tags like [inline:item-slug]:
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
+
 		return $r;
 	}
 
