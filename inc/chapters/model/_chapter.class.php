@@ -608,6 +608,11 @@ class Chapter extends DataObject
 
 		// The chapter was updated successful
 		$DB->commit();
+
+		// BLOCK CACHE INVALIDATION:
+		$chapter_Blog = $this->get_Blog();
+		BlockCache::invalidate_key( 'cont_coll_ID', $chapter_Blog->ID ); // Content has changed
+
 		return true;
 	}
 

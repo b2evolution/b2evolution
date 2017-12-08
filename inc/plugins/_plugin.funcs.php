@@ -598,6 +598,21 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$params['hide_label'] = $parmeta['hide_label'];
 			}
 
+			if( $parmeta['type'] == 'integer' )
+			{	// Set special type 'number' for integer param to initialize control arrows to allow increase/decrease a value:
+				$params['type'] = 'number';
+				if( isset( $parmeta['valid_range']['min'] ) )
+				{	// Restrict with min value:
+					$params['min'] = $parmeta['valid_range']['min'];
+				}
+				if( isset( $parmeta['valid_range']['max'] ) )
+				{	// Restrict with max value:
+					$params['max'] = $parmeta['valid_range']['max'];
+				}
+				// Input number element doesn't support attribute "size", so we have only one way to set width with style:
+				$params['style'] = 'width:'.( 40 + $size * 8 ).'px';
+			}
+
 			$Form->text_input( $input_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params
 			break;
 
