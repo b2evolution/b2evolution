@@ -36,10 +36,9 @@ $params = array_merge( array(
 		'image_size'                 => 'fit-1280x720',
 		'author_link_text'           => 'auto',
 	), $params );
-
-
-echo '<div class="evo_content_block">'; // Beginning of post display
 ?>
+
+<div class="evo_content_block">
 
 <article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
 
@@ -263,9 +262,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		<?php
 			if( ! $Item->is_intro() && $disp == 'posts' ) // Do NOT apply tags, comments and feedback on intro posts
 			{ // List all tags attached to this post:
-				echo '<footer>';
 		?>
-
+	<footer>
 		<nav>
 		<?php
 			// Link to comments, trackbacks, etc.:
@@ -293,12 +291,9 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 						) );
 		?>
 		</nav>
-			<?php
-				echo '</footer>';
+	</footer>
+		<?php
 			} ?>
-
-	</div><!-- ../evo_post_wrapper -->
-	</section>  <!-- ../content_end_full -->
 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
@@ -337,4 +332,4 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	?>
 </article>
 
-<?php echo '</div>'; // End of post display ?>
+</div><!-- ../evo_content_block -->
