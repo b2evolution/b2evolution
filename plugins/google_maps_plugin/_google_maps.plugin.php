@@ -34,7 +34,7 @@ class google_maps_plugin extends Plugin
 	var $name = 'Google Maps';
 	var $code = 'evo_Gmaps';
 	var $priority = 50;
-	var $version = '6.9.4';
+	var $version = '6.9.5';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
