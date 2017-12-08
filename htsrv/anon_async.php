@@ -616,6 +616,8 @@ switch( $action )
 					{ // Update a vote of current user
 						$Item->set_vote( $field_value );
 						$Item->dbupdate();
+						// Invalidate key for the voted Item:
+						BlockCache::invalidate_key( 'item_ID', $Item->ID );
 					}
 				}
 
