@@ -244,24 +244,23 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 
 $Form->end_fieldset();
 
+// Calculate how much locales are enabled in system
+$number_enabled_locales = 0;
+foreach( $locales as $locale_data )
+{
+	if( $locale_data['enabled'] )
+	{
+		$number_enabled_locales++;
+	}
+	if( $number_enabled_locales > 1 )
+	{ // We need to know we have more than 1 locale is enabled, Stop here
+		break;
+	}
+}
+
 if( ! $is_creating )
 {
 	$Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-settings' ) );
-
-		// Calculate how much locales are enabled in system
-		$number_enabled_locales = 0;
-		foreach( $locales as $locale_data )
-		{
-			if( $locale_data['enabled'] )
-			{
-				$number_enabled_locales++;
-			}
-			if( $number_enabled_locales > 1 )
-			{ // We need to know we have more than 1 locale is enabled, Stop here
-				break;
-			}
-		}
-
 		if( $number_enabled_locales > 1 )
 		{ // More than 1 locale
 			$blog_locale_note = ( $current_User->check_perm( 'options', 'view' ) ) ?
@@ -300,6 +299,16 @@ if( ! $is_creating )
 
 	$Form->end_fieldset();
 }
+else
+{
+	if( $number_enabled_locales > 1 )
+	{
+		$Form->hidden( 'blog_locale', $edited_Blog->get( 'locale' ) );
+		$Form->hidden( 'blog_locale_source', $edited_Blog->get_setting( 'locale_source' ) );
+		$Form->hidden( 'blog_post_locale_source', $edited_Blog->get_setting( 'post_locale_source' ) );
+		$Form->hidden( 'blog_new_item_locale_source', $edited_Blog->get_setting( 'new_item_locale_source' ) );
+	}
+}
 
 
 $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection-permission-settings' ) );
@@ -336,6 +345,10 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 											'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
 											'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ) ),
 			), T_('Permission management'), true );
+	}
+	else
+	{
+		$Form->hidden( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ) );
 	}
 
 	$blog_allow_access = $action == 'copy' ? 'public' : $edited_Blog->get_setting( 'allow_access' );
@@ -377,6 +390,13 @@ if( ! $is_creating )
 		$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This may be displayed in several places of the front-office. This may also be included in the XML feeds. You may use HTML markup here.'), 50 );
 
 	$Form->end_fieldset();
+}
+else
+{
+	$Form->hidden( 'blog_order', $edited_Blog->get( 'order' ) );
+	$Form->hidden( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ) );
+	$Form->hidden( 'blog_tagline', $edited_Blog->get( 'tagline' ) );
+	$Form->hidden( 'blog_longdesc', $edited_Blog->get( 'longdesc' ) );
 }
 
 
