@@ -203,6 +203,8 @@ class CollectionSettings extends AbstractSettings
 		// Contact form settings (disp=msgform):
 			'msgform_display_recipient' => 1, // Display a "Message to:" line
 			'msgform_user_name' => 'none', // Name input for logged in users
+			'msgform_display_avatar' => 1, // Display recipient avatar
+			'msgform_avatar_size' => 'crop-top-48x48', // Recipient avatar size
 			'msgform_require_name' => 1, // Require name
 			'msgform_display_subject' => 1, // Display subject
 			'msgform_require_subject' => 1, // Require subject

@@ -1033,6 +1033,8 @@ class Blog extends DataObject
 			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
 			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
 			$this->set_setting( 'msgform_recipient_label', param( 'msgform_recipient_label', 'string' ) );
+			$this->set_setting( 'msgform_display_avatar', param( 'msgform_display_avatar', 'integer', 0 ) );
+			$this->set_setting( 'msgform_avatar_size', param( 'msgform_avatar_size', 'string' ) );
 			$this->set_setting( 'msgform_user_name', param( 'msgform_user_name', 'string' ) );
 			$this->set_setting( 'msgform_require_name', param( 'msgform_require_name', 'integer', 0 ) );
 			$this->set_setting( 'msgform_subject_list', param( 'msgform_subject_list', 'text' ) );
@@ -5422,6 +5424,48 @@ class Blog extends DataObject
 
 		// Execute a query with to know if current user has new data to view:
 		return intval( $DB->get_var( $unread_posts_SQL ) );
+	}
+
+
+	/**
+	 * Get recipient link on disp=msgform
+	 *
+	 * @return string
+	 */
+	function get_msgform_recipient_link()
+	{
+		$recipient_link = '';
+
+		if( get_param( 'recipient_id' ) > 0 )
+		{	// Get recipient identity link for registered user:
+			$UserCache = & get_UserCache();
+			$recipient_User = & $UserCache->get_by_ID( get_param( 'recipient_id' ) );
+
+			if( $this->get_setting( 'msgform_display_avatar' ) &&
+					$this->get_setting( 'msgform_avatar_size' ) != '' )
+			{	// Display recipient name with avatar:
+				$recipient_link_params = array(
+						'link_text'   => 'avatar_name',
+						'thumb_size'  => $this->get_setting( 'msgform_avatar_size' ),
+						'thumb_class' => 'avatar_before_login_middle',
+					);
+			}
+			else
+			{	// Display only recipient name:
+				$recipient_link_params = array( 'link_text' => 'auto' );
+			}
+			$recipient_link = $recipient_User->get_identity_link( $recipient_link_params );
+		}
+		elseif( get_param( 'comment_id' ) > 0 )
+		{	// Get login name for anonymous user:
+			$CommentCache = & get_CommentCache();
+			$Comment = & $CommentCache->get_by_ID( get_param( 'comment_id' ) );
+			// Set a gender class for anonymous user if the setting is enabled:
+			$gender_class = check_setting( 'gender_colored' ) ? ' nogender' : '';
+			$recipient_link = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$Comment->ID.'">'.$Comment->get_author_name().'</span>';
+		}
+
+		return $recipient_link;
 	}
 
 

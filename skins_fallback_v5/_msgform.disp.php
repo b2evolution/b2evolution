@@ -111,19 +111,6 @@ if( !empty( $Blog ) && ( $Blog->get_ajax_form_enabled() ) )
 }
 else
 {
-	if( ! empty( $recipient_User ) )
-	{ // Get identity link for existed users
-		$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'auto' ) );
-	}
-	else
-	{ // Get login name for anonymous user
-		$gender_class = '';
-		if( check_setting( 'gender_colored' ) )
-		{ // Set a gender class if the setting is ON
-			$gender_class = ' nogender';
-		}
-		$recipient_link = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$comment_id.'">'.$recipient_name.'</span>';
-	}
 	require skin_template_path( '_contact_msg.form.php' );
 }
 
