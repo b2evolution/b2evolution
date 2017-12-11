@@ -224,7 +224,8 @@ echo $params['comment_avatar_before'];
 $Comment->author2( array(
 					'link_text'  => 'only_avatar',
 					'thumb_size' => 'crop-top-80x80',
-					'after_user' => ''
+					'after_user' => '', // After registered user
+					'after'      => '', // After anonymous user
 				) );
 echo $params['comment_avatar_after'];
 

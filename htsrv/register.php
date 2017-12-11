@@ -506,6 +506,14 @@ if( ! empty( $is_quick ) )
 /*
  * Default: registration form:
  */
+
+// Add core.register_user info again to fill up registration form fields later
+$register_user = array(
+	'name' => $login,
+	'email' => $email
+);
+$Session->set( 'core.register_user', $register_user );
+
 if( $inskin && !empty( $Blog ) )
 { // in-skin display
 	$SkinCache = & get_SkinCache();
