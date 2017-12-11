@@ -161,6 +161,12 @@ class files_Module extends Module
 				$permimport = 'none';
 				$permskins = 'none';
 				break;
+			case 4: // Normal Users (group ID 4) have permission by default:
+				$permfiles = 'add';
+				$permshared = 'none';
+				$permimport = 'none';
+				$permskins = 'none';
+				break;
 			default: // Other groups
 				$permfiles = 'none';
 				$permshared = 'none';
