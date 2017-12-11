@@ -106,22 +106,6 @@ switch( $action )
 
 		locale_activate( $Blog->get('locale') );
 
-		if( $recipient_id > 0 )
-		{ // Get identity link for existed users
-			$UserCache = & get_UserCache();
-			$recipient_User = & $UserCache->get_by_ID( $recipient_id );
-			$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'nickname' ) );
-		}
-		else if( $comment_id > 0 )
-		{ // Anonymous Users
-			$gender_class = '';
-			if( check_setting( 'gender_colored' ) )
-			{ // Set a gender class if the setting is ON
-				$gender_class = ' nogender';
-			}
-			$recipient_link = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$comment_id.'">'.$recipient_name.'</span>';
-		}
-
 		$blog_skin_ID = $Blog->get_skin_ID();
 		if( ! empty( $blog_skin_ID ) )
 		{ // check if Blog skin has specific concact message form
