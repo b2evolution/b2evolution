@@ -376,7 +376,7 @@ if( intval( $contact_method ) > 0 )
 	}
 	else
 	{	// If the selected contact method is not used as additional field or it doesn't exist in DB:
-		$Messages->add_to_group( T_('You have selected unavailable preferred contact method.'), 'error', T_('Validation errors:') );
+		$Messages->add_to_group( /* NO TRANS because should never happen */ 'You have selected an unavailable preferred contact method.', 'error', T_('Validation errors:') );
 	}
 }
 
