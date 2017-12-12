@@ -869,8 +869,10 @@ function param_check_valid_login( $var )
 
 
 /**
- * @param string param name
- * @return boolean true if OK
+ * Check if the requested string can be used as user login
+ *
+ * @param string User login
+ * @return boolean TRUE if OK
  */
 function param_check_login( $var, $required = false )
 {
@@ -886,9 +888,9 @@ function param_check_login( $var, $required = false )
  */
 function check_is_login( $login )
 {
-	if( !user_exists( $login ) )
+	if( ! user_exists( $login ) )
 	{
- 		return sprintf( T_( 'There is no user with username &laquo;%s&raquo;.' ), $login );
+		return sprintf( T_( 'There is no user with username &laquo;%s&raquo;.' ), $login );
 	}
 }
 

@@ -710,15 +710,20 @@ $Form->begin_form( '', '', $params );
 	echo '</td></tr>';
 
 	if( $current_User->check_perm( 'users', 'edit' ) )
-	{
+	{	// If current User has full access to edit other users,
+		// Display item's owner:
 		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
-		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.').'<br/>' );
+		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.') );
 		$Form->hidden( 'item_owner_login_displayed', 1 );
+		echo '</td></tr>';
+		// Display a checkbox to create new user:
+		echo '<tr><td></td><td>';
+		echo '<label class="ffield_item_create_user"><input type="checkbox" name="item_create_user" value="1"'.( get_param( 'item_create_user' ) ? ' checked="checked"' : '' ).' /> '.T_('Create new user').'</label>';
 		echo '</td></tr>';
 	}
 
 	if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
-	{ // Dispaly Latitude & Longitude settings
+	{	// Display Latitude & Longitude settings:
 		$field_required = ( $edited_Item->get_type_setting( 'use_coordinates' ) == 'required' ) ? $required_star : '';
 		echo '<tr><td>'.$field_required.'<strong>'.T_('Latitude').':</strong></td><td>';
 		$Form->text( 'item_latitude', $edited_Item->get_setting( 'latitude' ), 10, '' );
