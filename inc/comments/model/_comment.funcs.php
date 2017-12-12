@@ -593,7 +593,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 
 	$params = array_merge( array(
 			'comments_disabled_text_member'     => T_( 'You must be a member of this blog to comment.' ),
-			'comments_disabled_text_registered' => T_( 'You must be logged in to leave a comment.' ),
+			'comments_disabled_text_registered' => T_( 'In order to leave a comment' ),
 			'comments_disabled_text_validated'  => T_( 'You must activate your account before you can leave a comment.' ),
 			'form_comment_text'                 => T_('Comment text'),
 			'form_class_comment'                => 'bComment',
@@ -623,10 +623,12 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	{
 		case 'member':
 			$disabled_text = $params['comments_disabled_text_member'];
+			$form_disabled_text = $disabled_text;
 			break;
 
 		case 'registered':
 			$disabled_text = $params['comments_disabled_text_registered'];
+			$form_disabled_text = T_( 'You must be logged in to leave a comment' );
 			break;
 
 		default:
@@ -644,14 +646,14 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	elseif( $current_User->check_status( 'can_be_validated' ) )
 	{ // logged in but the account is not activated
 		$disabled_text = $params['comments_disabled_text_validated'];
+		$form_disabled_text = $disabled_text;
 		$activateinfo_link = '<a href="'.get_activate_info_url( $item_url, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>';
 	}
 	// else -> user is logged in and account was activated
 
-	$register_link = '';
 	if( ( !$is_logged_in ) && ( $Settings->get( 'newusers_canregister' ) == 'yes' ) && ( $Settings->get( 'registration_is_public' ) ) )
 	{
-		$register_link = '<p>'.sprintf( T_( 'If you have no account yet, you can <a href="%s">register now</a>...<br />(It only takes a few seconds!)' ), get_user_register_url( $item_url, 'reg to post comment' ) ).'</p>';
+		$register_link = '<a class="btn btn-primary btn-sm" href="'.get_user_register_url( $item_url, 'reg to post comment' ).'">'.T_( 'Register now!' ).'</a>';
 	}
 
 	// disabled comment form
@@ -668,8 +670,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	}
 	else
 	{ // not logged in, add login and register links
-		echo $disabled_text.' '.$login_link;
-		echo $register_link;
+		echo $disabled_text.' '.$login_link.( ! empty( $register_link ) ?  ' or '.$register_link : '' );
 	}
 	echo $params['form_params']['comments_disabled_after'];
 
@@ -679,7 +680,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	echo $params['form_params']['fieldstart'];
 	echo $params['form_params']['labelstart'].$params['form_comment_text'].':'.$params['form_params']['labelend'];
 	echo $params['form_params']['inputstart'];
-	echo '<textarea id="p" class="bComment form_textarea_input" rows="5" name="p" cols="40" disabled="disabled">'.$disabled_text.'</textarea>';
+	echo '<textarea id="p" class="bComment form_textarea_input" rows="5" name="p" cols="40" disabled="disabled">'.$form_disabled_text.'</textarea>';
 	echo $params['form_params']['inputend'];
 	echo $params['form_params']['fieldend'];
 	echo $params['form_params']['fieldset_end'];
