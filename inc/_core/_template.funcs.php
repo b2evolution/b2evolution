@@ -1707,6 +1707,10 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 						{
 							ajax_url = restapi_url + "users/logins";
 						}
+						if( jQuery( this ).data( "status" ) )
+						{
+							ajax_url += "&status=" + jQuery( this ).data( "status" );
+						}
 						jQuery( this ).typeahead( null,
 						{
 							displayKey: "login",
@@ -1760,6 +1764,10 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 				else
 				{
 					ajax_url = restapi_url + "users/logins";
+				}
+				if( jQuery( this ).data( "status" ) )
+				{
+					ajax_url += "&status=" + jQuery( this ).data( "status" );
 				}
 				jQuery( this ).hintbox(
 				{

@@ -1325,19 +1325,31 @@ class Form extends Widget
 	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '', $field_params = array() )
 	{
 		$field_params = array_merge( array(
+				'type' => 'text',
 				'note' => $field_note,
 				'size' => 20,
 				'autocapitalize' => 'off',
-				'autocorrect' => 'off'
+				'autocorrect' => 'off',
+				'status' => '', // Restrict users by status, 'all' - get users with all statuses, '' - activated and autoactivated, or custom statuses separated by comma like 'new,activated,autoactivated,closed,deactivated,emailchanged,failedactivation'
 			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$r = $this->begin_field();
 
-		$user_login = empty( $User ) ? '' : $User->login;
+		$field_params['value'] = empty( $User ) ? '' : $User->login;
+		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_text_input form-control autocomplete_login '.$field_class;
+		if( ! empty( $field_params['status'] ) )
+		{
+			$field_params['data-status'] = $field_params['status'];
+		}
 
-		$r .= '<input type="text" class="form_text_input form-control autocomplete_login '.$field_class.'" value="'.$user_login.'" name="'.$field_name.'" id="'.$field_name.'" size="'.$field_params['size'].'" />';
+		// Unset params which should not be used as html attributes:
+		unset( $field_params['status'] );
+		unset( $field_params['autocapitalize'] );
+		unset( $field_params['autocorrect'] );
+
+		$r .= $this->get_input_element( $field_params );
 
 		$r .= $this->end_field();
 

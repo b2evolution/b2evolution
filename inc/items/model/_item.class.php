@@ -903,6 +903,7 @@ class Item extends ItemLight
 						$item_new_User = new User();
 						$item_new_User->set( 'login', $this->creator_user_login );
 						$item_new_User->set( 'email', $this->creator_user_login.'@dummy.null' );
+						$item_new_User->set( 'source', 'created with new post' );
 						$item_new_User->set( 'pass', '' );
 						$item_new_User->set( 'salt', '' );
 						$item_new_User->set( 'pass_driver', 'nopass' );

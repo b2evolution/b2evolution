@@ -713,7 +713,7 @@ $Form->begin_form( '', '', $params );
 	{	// If current User has full access to edit other users,
 		// Display item's owner:
 		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
-		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.') );
+		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.'), '', array( 'status' => 'all' ) );
 		$Form->hidden( 'item_owner_login_displayed', 1 );
 		echo '</td></tr>';
 		// Display a checkbox to create new user:
