@@ -882,9 +882,42 @@ class Item extends ItemLight
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
 		if( $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
 		{	// only admins can change the owner..
-			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) && param_check_login( 'item_owner_login', true ) )
-			{
-				$this->set_creator_by_login( $this->creator_user_login );
+			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) )
+			{	// If valid user login is entered:
+				if( param( 'item_create_user', 'integer', 0 ) )
+				{	// Try to create new user if it is checked on the edit item form:
+					$UserCache = & get_UserCache();
+
+					// Convert new entered login to proper login format:
+					$this->creator_user_login = preg_replace( '/[^a-z0-9 ]/i', '', $this->creator_user_login );
+					$this->creator_user_login = str_replace( ' ', '_', $this->creator_user_login );
+					$this->creator_user_login = utf8_substr( $this->creator_user_login, 0, 20 );
+					set_param( 'item_owner_login', $this->creator_user_login );
+
+					if( ( $creator_User = & $UserCache->get_by_login( $this->creator_user_login ) ) !== false )
+					{	// Display error if user already exists:
+						param_error( 'item_owner_login', sprintf( T_('User "%s" already exists.'), $this->creator_user_login ) );
+					}
+					else
+					{	// Create new user:
+						$item_new_User = new User();
+						$item_new_User->set( 'login', $this->creator_user_login );
+						$item_new_User->set( 'email', $this->creator_user_login.'@dummy.null' );
+						$item_new_User->set( 'pass', '' );
+						$item_new_User->set( 'salt', '' );
+						$item_new_User->set( 'pass_driver', 'nopass' );
+						$item_new_User->dbinsert();
+						// Update user login cache with new created User:
+						$UserCache->cache_login[ $this->creator_user_login ] = $item_new_User;
+						// Uncheck the checkbox to don't suggest create new user on next form updating because the user already has been created with requested login:
+						set_param( 'item_create_user', 0 );
+					}
+				}
+
+				if( param_check_login( 'item_owner_login', true ) )
+				{	// Update item's owner if the user is detected in DB by the entered login:
+					$this->set_creator_by_login( $this->creator_user_login );
+				}
 			}
 		}
 
