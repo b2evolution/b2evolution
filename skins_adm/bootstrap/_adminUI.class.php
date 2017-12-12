@@ -519,9 +519,9 @@ class AdminUI extends AdminUI_general
 					'fieldend_radio'         => "</div>\n\n",
 					'inputclass_radio'       => '',
 					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_start'    => '<div class="radio $radio_option_class$"><label>',
 					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_start'    => '<label class="radio-inline $radio_option_class$">',
 					'radio_oneline_end'      => "</label>\n",
 				);
 
@@ -567,9 +567,9 @@ class AdminUI extends AdminUI_general
 					'fieldend_radio'         => "</div>\n\n",
 					'inputclass_radio'       => '',
 					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_start'    => '<div class="radio $radio_option_class$"><label>',
 					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_start'    => '<label class="radio-inline $radio_option_class$">',
 					'radio_oneline_end'      => "</label>\n",
 				);
 
@@ -640,9 +640,9 @@ class AdminUI extends AdminUI_general
 					'inputend_radio'         => "</div>\n",
 					'inputclass_radio'       => '',
 					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_start'    => '<div class="radio $radio_option_class$"><label>',
 					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_start'    => '<label class="radio-inline $radio_option_class$">',
 					'radio_oneline_end'      => "</label>\n",
 				);
 

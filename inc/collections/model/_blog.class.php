@@ -194,7 +194,7 @@ class Blog extends DataObject
 	 */
 	function __construct( $db_row = NULL )
 	{
-		global $Timer;
+		global $Timer, $Settings;
 
 		$Timer->start( 'Blog constructor' );
 
@@ -207,7 +207,7 @@ class Blog extends DataObject
 			// echo 'Creating blank blog';
 			$this->owner_user_ID = 1; // DB default
 			$this->set( 'locale', $default_locale );
-			$this->set( 'access_type', 'extrapath' );
+			$this->set( 'access_type', $Settings->get( 'coll_access_type' ) );
 			if( is_logged_in() )
 			{	// Set section what is used as default for group of current user:
 				global $current_User;
@@ -3222,7 +3222,7 @@ class Blog extends DataObject
 		}
 		else
 		{ // For all other blogs use "Extra path on index.php"
-			$this->set( 'access_type', 'extrapath' );
+			$this->set( 'access_type', $Settings->get( 'coll_access_type' ) );
 		}
 
 		if( parent::dbinsert() )

@@ -102,7 +102,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-skins') );
+$Form->begin_fieldset( T_('Default Skins for New Collections').get_manual_link( 'collections-default-skins' ) );
 	$normal_skins = array();
 	$mobile_skins = array( 0 => T_('Same as normal skin') );
 	$tablet_skins = array( 0 => T_('Same as normal skin') );
@@ -136,6 +136,40 @@ $Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-
 	$Form->select_input_array( 'def_normal_skin_ID', $Settings->get( 'def_normal_skin_ID' ), $normal_skins, T_('Default normal skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_mobile_skin_ID', $Settings->get( 'def_mobile_skin_ID' ), $mobile_skins, T_('Default mobile phone skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_tablet_skin_ID', $Settings->get( 'def_tablet_skin_ID' ), $tablet_skins, T_('Default tablet skin'), NULL, $field_params );
+$Form->end_fieldset();
+
+// --------------------------------------------
+
+$Form->begin_fieldset( T_('Default URL for New Collections').get_manual_link( 'default-url-for-new -collections' ) );
+
+	global $baseurl, $basehost, $baseprotocol, $baseport;
+	$access_type_options = array(
+		array( 'index.php', T_('Explicit param on index.php'),
+				'<code>'.$baseurl.'index.php?blog=1</code>',
+			),
+		array( 'extrabase', T_('Extra path on baseurl'),
+				'<code>'.$baseurl.'<span class="blog_url_text">urlname</span>/</code> ('.T_('Requires mod_rewrite').')',
+			),
+		array( 'extrapath', T_('Extra path on index.php'),
+				'<code>'.$baseurl.'index.php/<span class="blog_url_text">urlname</span>/</code>',
+			),
+	);
+	if( ! is_valid_ip_format( $basehost ) )
+	{	// Not an IP address, we can use subdomains:
+		$access_type_options[] = array( 'subdom', T_('Subdomain of basehost'),
+				'<code>'.$baseprotocol.'://<span class="blog_url_text">urlname</span>.'.$basehost.$baseport.'/</code>',
+			);
+	}
+	else
+	{	// Don't allow subdomain for IP address:
+		$access_type_options[] = array( 'subdom', T_('Subdomain').':',
+				sprintf( T_('(Not possible for %s)'), $basehost ),
+				'',
+				'disabled="disabled"'
+			);
+	}
+	$Form->radio( 'coll_access_type', $Settings->get( 'coll_access_type' ), $access_type_options, T_('Collection base URL'), true );
+
 $Form->end_fieldset();
 
 // --------------------------------------------

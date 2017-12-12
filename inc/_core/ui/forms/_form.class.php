@@ -3550,15 +3550,6 @@ class Form extends Widget
 			// Merge defaults from $field_params:
 			$loop_radio = array_merge( $field_params, $loop_radio );
 
-			if( $field_lines )
-			{ // Start of radio option for multi line format
-				$r .= $this->radio_newline_start;
-			}
-			else
-			{ // Start of radio option for single line format
-				$r .= $this->radio_oneline_start;
-			}
-
 			// Defaults:
 			if( ! isset( $loop_radio['type'] ) )  $loop_radio['type'] = 'radio';
 			if( ! isset( $loop_radio['class'] ) ) $loop_radio['class'] = $this->inputclass_radio; // 'radio'
@@ -3567,6 +3558,11 @@ class Form extends Widget
 			{ // build unique id:
 				$loop_radio['id'] = Form::get_valid_id( $field_params['name'].'_radio_'.( ++$count_options ) );
 			}
+
+			// Start of radio option for multi/single line format:
+			$r .= str_replace( '$radio_option_class$',
+				( isset( $loop_radio['class'] ) ? $loop_radio['class'] : '' ),
+				( $field_lines ? $this->radio_newline_start : $this->radio_oneline_start ) );
 
 			if( isset($loop_radio['checked']) )
 			{ // convert boolean:
@@ -3644,11 +3640,11 @@ class Form extends Widget
 			}
 			if( isset($l_options[4]) )
 			{ // Convert "inline attribs" to "params" array
-				preg_match_all( '#(\w+)=[\'"](.*)[\'"]#', $l_options[4], $matches, PREG_SET_ORDER );
+				preg_match_all( '#(\w+)=([\'"])(.*?)\2#', $l_options[4], $matches, PREG_SET_ORDER );
 
 				foreach( $matches as $l_set_nr => $l_match )
 				{
-					$new_field_options[$l_key][$l_match[1]] = $l_match[2];
+					$new_field_options[$l_key][$l_match[1]] = $l_match[3];
 				}
 			}
 

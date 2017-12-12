@@ -366,13 +366,19 @@ switch( $action )
 		// Subscribing to new blogs:
 		$Settings->set( 'subscribe_new_blogs', param( 'subscribe_new_blogs', 'string', 'public' ) );
 
-		// Default skins:
+		// Default Skins for New Collections:
 		if( param( 'def_normal_skin_ID', 'integer', NULL ) !== NULL )
 		{ // this can't be NULL
 			$Settings->set( 'def_normal_skin_ID', get_param( 'def_normal_skin_ID' ) );
 		}
 		$Settings->set( 'def_mobile_skin_ID', param( 'def_mobile_skin_ID', 'integer', 0 ) );
 		$Settings->set( 'def_tablet_skin_ID', param( 'def_tablet_skin_ID', 'integer', 0 ) );
+
+		// Default URL for New Collections:
+		if( param( 'coll_access_type', 'string', NULL ) !== NULL )
+		{	// Update only if this param has been sent by submitted form:
+			$Settings->set( 'coll_access_type', get_param( 'coll_access_type' ) );
+		}
 
 		// Comment recycle bin
 		param( 'auto_empty_trash', 'integer', $Settings->get_default('auto_empty_trash'), false, false, true, false );

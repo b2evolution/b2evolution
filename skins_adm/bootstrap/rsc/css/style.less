@@ -68,6 +68,16 @@ td.shrinkwrap {
 	margin: 0;
 }
 
+// Fix vertical alignment for radio with text inputs:
+div.radio.radio-input label {
+	input[type=radio] {
+		margin-top: 10px;
+	}
+	input[type=text].form_text_input {
+		vertical-align: middle;
+	}
+}
+
 // A colored status icon before <select>
 div.status_icon {
 	display: inline-block;
