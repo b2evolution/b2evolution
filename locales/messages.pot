@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-12-12 16:51+0100\n"
+"POT-Creation-Date: 2017-12-12 17:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1136,6 +1136,7 @@ msgstr ""
 msgid "Please fill in your name."
 msgstr ""
 
+#. TRANS because should never happen
 #: ../../../htsrv/comment_post.php:178 ../htsrv/comment_post.php:182
 #: ../../../htsrv/comment_post.php:190 ../htsrv/comment_post.php:199
 #: ../../../htsrv/comment_post.php:217 ../htsrv/comment_post.php:360
@@ -1379,10 +1380,6 @@ msgstr ""
 msgid "Close account"
 msgstr ""
 
-#: ../../../htsrv/login.php:106
-msgid "Unable to close your account. The system cannot update the user's status."
-msgstr ""
-
 #: ../../../htsrv/login.php:121
 msgid "You must enter your username or your email address so we know where to send the password reset email."
 msgstr ""
@@ -1531,10 +1528,6 @@ msgstr ""
 #: ../../../htsrv/message_send.php:374
 #, php-format
 msgid "Please fill the field \"%s\" because you have selected this as preferred contact method."
-msgstr ""
-
-#: ../../../htsrv/message_send.php:379
-msgid "You have selected unavailable preferred contact method."
 msgstr ""
 
 #: ../../../htsrv/message_send.php:420
@@ -1717,17 +1710,8 @@ msgstr ""
 msgid "Out of memory."
 msgstr ""
 
-#: ../../../htsrv/upload_handler.php:135
-#, php-format
-msgid "Server error. Increase post_max_size and upload_max_filesize to %s"
-msgstr ""
-
 #: ../../../htsrv/upload_handler.php:146 ../inc/files/model/_file.funcs.php:1491
 msgid "No file was uploaded."
-msgstr ""
-
-#: ../../../htsrv/upload_handler.php:150
-msgid "Server error. Not a multipart request. Please set forceMultipart to default value (true)."
 msgstr ""
 
 #: ../../../htsrv/upload_handler.php:169
@@ -1750,14 +1734,6 @@ msgstr ""
 #: ../../../htsrv/upload_handler.php:193
 #, php-format
 msgid "File has an invalid extension, it should be one of %s."
-msgstr ""
-
-#: ../../../htsrv/upload_handler.php:205
-msgid "Server error. Chunks directory isn't writable or executable."
-msgstr ""
-
-#: ../../../htsrv/upload_handler.php:253
-msgid "Server error. Uploads directory isn't writable"
 msgstr ""
 
 #: ../../../htsrv/upload_handler.php:270
