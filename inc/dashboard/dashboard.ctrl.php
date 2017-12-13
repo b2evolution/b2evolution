@@ -65,6 +65,9 @@ init_field_editor_js( array(
 		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update_section&order_data=',
 	) );
 
+// Init JS to autcomplete the user logins
+init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 

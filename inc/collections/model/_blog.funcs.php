@@ -1765,13 +1765,40 @@ function blogs_user_results_block( $params = array() )
 
 
 /**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function callback_filter_collectionlist( & $Form )
+{
+	global $cf_name, $cf_owner, $cf_type;
+
+	$UserCache = & get_UserCache();
+	$owner_User = & $UserCache->get_by_login( $cf_owner );
+
+	$Form->text_input( 'cf_name', $cf_name, 40, T_('Name') );
+	$Form->username( 'cf_owner', $owner_User, T_('Owner') );
+
+	$kinds = get_collection_kinds();
+	$collection_types = array();
+	foreach( $kinds as $kind => $value )
+	{
+		$collection_types[$kind] = $value['name'];
+	}
+	$collection_types = array_merge( array(	'' => T_('All') ), $collection_types );
+	$Form->select_input_array( 'cf_type', $cf_type, $collection_types, T_('Type') );
+}
+
+
+/**
  * Display all blogs results table
  *
  * @param array Params
  */
 function blogs_all_results_block( $params = array() )
 {
-	global $admin_url, $current_User;
+	global $admin_url, $current_User, $DB, $Session;
+	global $cf_name, $cf_owner, $cf_type;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -1789,6 +1816,45 @@ function blogs_all_results_block( $params = array() )
 	}
 
 	global $current_User;
+
+	$cf_name = param( 'cf_name', 'string', NULL, true );
+	$cf_owner = param( 'cf_owner', 'string', NULL, true );
+	$cf_type = param( 'cf_type', 'string', NULL, true );
+
+	$collection_filters = $Session->get( 'collection_filters' );
+
+	if( empty( $collection_filters ) )
+	{
+		$collection_filters = array();
+	}
+	if( $cf_name === NULL )
+	{ // Get a param value from Session
+		$cf_name = empty( $collection_filters['name'] ) ? '' : $collection_filters['name'];
+	}
+	else
+	{ // Save new value to Session
+		$collection_filters['name'] = $cf_name;
+	}
+	if( $cf_owner === NULL )
+	{ // Get a param value from Session
+		$cf_owner = empty( $collection_filters['owner'] ) ? '' : $collection_filters['owner'];
+	}
+	else
+	{ // Save new value to Session
+		$collection_filters['owner'] = $cf_owner;
+	}
+	if( $cf_type === NULL )
+	{ // Get a param value from Session
+		$cf_type = empty( $collection_filters['type'] ) ? '' : $collection_filters['type'];
+	}
+	else
+	{ // Save new value to Session
+		$collection_filters['type'] = $cf_type;
+	}
+
+	// Save new filters
+	$Session->set( 'collection_filters', $collection_filters );
+	$Session->dbsave();
 
 	if( is_ajax_content() )
 	{
@@ -1883,11 +1949,34 @@ function blogs_all_results_block( $params = array() )
 		$no_results = $params['results_no_text'];
 	}
 
+	if( ! empty( $cf_name ) )
+	{ // Filter by name
+		$SQL->WHERE_and( '( blog_name LIKE \'%'.$cf_name.'%\' OR blog_shortname LIKE \'%'.$cf_name.'%\' OR blog_urlname LIKE \'%'.$cf_name.'%\' )' );
+	}
+
+	if( ! empty( $cf_owner ) )
+	{
+		$SQL->WHERE_and( 'user_login = '.$DB->quote( $cf_owner ) );
+	}
+
+	if( ! empty( $cf_type ) )
+	{ // Filter by collection type
+		$SQL->WHERE_and( 'blog_type = '.$DB->quote( $cf_type ) );
+	}
+
 	// Create result set:
 	$blogs_Results = new Results( $SQL->get(), $params['results_param_prefix'], '---------A' );
 	$blogs_Results->Cache = & get_BlogCache();
 	$blogs_Results->title = $params['results_title'];
 	$blogs_Results->no_results_text = $no_results;
+
+	$blogs_Results->filter_area = array(
+		'callback' => 'callback_filter_collectionlist',
+		'url_ignore' => 'results_blog_page',
+		'presets'  => array(
+			'all' => array( T_('All'), '?cf_type=&cf_name=&cf_owner=' )
+		)
+	);
 
 	global $admin_url;
 	if( $current_User->check_perm( 'section', 'edit' ) )
