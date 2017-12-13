@@ -102,6 +102,9 @@ class ItemList2 extends ItemListLight
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats, $Item );
 
+		// Set main category to avoid error with new creating Item:
+		$Item->set( 'main_cat_ID', $post_category );
+
 		// Switch to current user's locale to display errors:
 		locale_temp_switch( $current_User->locale );
 
