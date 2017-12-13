@@ -3722,7 +3722,7 @@ div.codeblock > p {
 }
 div.videoblock {
   text-align: center;
-  margin: auto;
+  margin: 1ex auto;
   overflow: auto;
   position: relative;
   max-width: 100%;
