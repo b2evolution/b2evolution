@@ -628,7 +628,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 
 		case 'registered':
 			$disabled_text = $params['comments_disabled_text_registered'];
-			$form_disabled_text = T_( 'You must be logged in to leave a comment' );
+			$form_disabled_text = T_( 'You must be logged in to leave a comment.' );
 			break;
 
 		default:
