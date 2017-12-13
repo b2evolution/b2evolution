@@ -712,7 +712,7 @@ $Form->begin_form( '', '', $params );
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{
 		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
-		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.').'<br/>' );
+		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.'), '', array( 'status' => 'all' ) );
 		$Form->hidden( 'item_owner_login_displayed', 1 );
 		echo '</td></tr>';
 	}

@@ -1633,6 +1633,7 @@ class RestApi
 		}
 
 		$api_q = trim( urldecode( param( 'q', 'string', '' ) ) );
+		$api_status = param( 'status', 'string', '' );
 
 		/**
 		 * sam2kb> The code below decodes percent-encoded unicode string produced by Javascript "escape"
@@ -1656,10 +1657,19 @@ class RestApi
 			// Exit here.
 		}
 
+		$func_user_search_params = array( 'sql_limit' => 10 );
+		if( $api_status == 'all' )
+		{	// Get users with all statuses:
+			$func_user_search_params['sql_where'] = '';
+		}
+		elseif( ! empty( $api_status ) )
+		{	// Restrict users with requested statuses:
+			global $DB;
+			$func_user_search_params['sql_where'] = 'user_status IN ( '.$DB->quote( explode( ',', $api_status ) ).' )';
+		}
+
 		// Search users:
-		$users = $this->func_user_search( $api_q, array(
-				'sql_limit' => 10,
-			) );
+		$users = $this->func_user_search( $api_q, $func_user_search_params );
 
 		$user_logins = array();
 		foreach( $users as $User )
@@ -1683,7 +1693,7 @@ class RestApi
 		global $DB;
 
 		$params = array_merge( array(
-				'sql_where' => '( user_status = "activated" OR user_status = "autoactivated" )',
+				'sql_where' => 'user_status IN ( "activated", "autoactivated" )',
 				'sql_mask'  => '$login$%',
 				'sql_limit' => 0,
 			), $params );
