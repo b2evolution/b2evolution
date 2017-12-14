@@ -207,6 +207,7 @@ class Blog extends DataObject
 			// echo 'Creating blank blog';
 			$this->owner_user_ID = 1; // DB default
 			$this->set( 'locale', $default_locale );
+			// Use access type(Collection base URL) from general settings:
 			$this->set( 'access_type', $Settings->get( 'coll_access_type' ) );
 			if( is_logged_in() )
 			{	// Set section what is used as default for group of current user:
@@ -3214,16 +3215,6 @@ class Blog extends DataObject
 		if( $Settings->get( 'default_blog_ID' ) == -1 || get_setting_Blog( 'default_blog_ID' ) )
 		{	// Don't set a default collection if it is already defined and the collection exists in DB OR back-office page is used for this:
 			$set_default_blog_ID = false;
-		}
-
-		if( $set_default_blog_ID )
-		{	// No default blog yet, Use for first base url as "Default collection in index.php"
-			// We need an URL scheme that uses "index.php" so that permalinks to info pages can work even when .htaccess is not properly configured.
-			$this->set( 'access_type', 'default' );
-		}
-		else
-		{ // For all other blogs use "Extra path on index.php"
-			$this->set( 'access_type', $Settings->get( 'coll_access_type' ) );
 		}
 
 		if( parent::dbinsert() )

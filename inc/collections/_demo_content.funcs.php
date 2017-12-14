@@ -214,7 +214,7 @@ function create_blog(
 		$kind = 'std', // standard blog; notorious variations: "photo", "group", "forum"
 		$allow_rating_items = '',
 		$use_inskin_login = 0,
-		$blog_access_type = 'relative', // Deprecated param for this func, because it is defined in $Blog->dbinsert()
+		$blog_access_type = '#', // '#' - to use default access type from $Settings->get( 'coll_access_type' ) - "Default URL for New Collections", possible values: baseurl, default, index.php, extrabase, extrapath, relative, subdom, absolute
 		$allow_html = true,
 		$in_bloglist = 'public',
 		$owner_user_ID = 1,
@@ -224,6 +224,11 @@ function create_blog(
 	global $default_locale, $install_test_features, $local_installation, $Plugins, $Blog;
 
 	$Collection = $Blog = new Blog( NULL );
+
+	if( $blog_access_type != '#' )
+	{	// Force default new collection URL with a given param:
+		$Blog->set( 'access_type', $blog_access_type );
+	}
 
 	$Blog->set( 'sec_ID', $section_ID );
 
@@ -895,7 +900,6 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 	global $install_test_features, $DB, $admin_url, $timestamp;
 
 	$default_blog_longdesc = T_('This is the long description for the blog named \'%s\'. %s');
-	$default_blog_access_type = 'relative';
 
 	$timestamp = time();
 	$blog_ID = NULL;
@@ -905,7 +909,6 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 		// =======================================================================================================
 		case 'main':
 			$blog_shortname = T_('Home');
-			$blog_home_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
 			$blog_more_longdesc = '<br />
 <br />
 <strong>'.T_('The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.').'</strong>';
@@ -920,7 +923,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'main',
 					'any',
 					1,
-					$blog_home_access_type,
+					'default',
 					true,
 					'never',
 					$owner_ID,
@@ -946,7 +949,6 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			{
 				$blog_shortname = 'Blog';
 			}
-			$blog_a_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
 			$blog_stub = 'a';
 			$blog_a_ID = create_blog(
 					T_('Public Blog'),
@@ -958,7 +960,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'std',
 					'any',
 					1,
-					$blog_a_access_type,
+					'#',
 					true,
 					'public',
 					$owner_ID,
@@ -982,7 +984,6 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			assign_secondary_groups( $owner_ID, array( $blogb_Group->ID ) );
 
 			$blog_shortname = 'Blog B';
-			$blog_b_access_type = ( $install_test_features ) ? 'index.php' : $default_blog_access_type;
 			$blog_stub = 'b';
 
 			$blog_b_ID = create_blog(
@@ -995,7 +996,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'std',
 					'',
 					0,
-					$blog_b_access_type,
+					'#',
 					true,
 					'public',
 					$owner_ID,
@@ -1027,7 +1028,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					T_('This blog shows photos...'),
 					sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
 					3, // Skin ID
-					'photo', '', 0, 'relative', true, 'public',
+					'photo', '', 0, '#', true, 'public',
 					$owner_ID,
 					'public',
 					$section_ID );
@@ -1045,7 +1046,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					T_('Tagline for Forums'),
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 					4, // Skin ID
-					'forum', 'any', 1, 'relative', false, 'public',
+					'forum', 'any', 1, '#', false, 'public',
 					$owner_ID,
 					'public',
 					$section_ID );
@@ -1063,7 +1064,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					T_('Tagline for this online manual'),
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 					5, // Skin ID
-					'manual', 'any', 1, $default_blog_access_type, false, 'public',
+					'manual', 'any', 1, '#', false, 'public',
 					$owner_ID,
 					'public',
 					$section_ID );
@@ -1081,7 +1082,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					T_('Tagline for Tracker'),
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 					4, // Skin ID
-					'group', 'any', 1, $default_blog_access_type, false, 'public',
+					'group', 'any', 1, '#', false, 'public',
 					$owner_ID,
 					'public',
 					$section_ID );
