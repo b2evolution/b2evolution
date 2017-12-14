@@ -5433,8 +5433,7 @@ class Blog extends DataObject
 			$UserCache = & get_UserCache();
 			$recipient_User = & $UserCache->get_by_ID( get_param( 'recipient_id' ) );
 
-			if( $this->get_setting( 'msgform_display_avatar' ) &&
-					$this->get_setting( 'msgform_avatar_size' ) != '' )
+			if( $this->get_setting( 'msgform_display_avatar' ) )
 			{	// Display recipient name with avatar:
 				$recipient_link_params = array(
 						'link_text'   => 'avatar_name',

@@ -115,6 +115,7 @@ $core_componentwidget_defs = array(
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
 			'content_block',          // Content Block
+			'display_item',           // Display Item
 		),
 	'infoitem' => array(
 			'item_info_line',

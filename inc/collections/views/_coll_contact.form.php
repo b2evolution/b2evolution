@@ -41,7 +41,7 @@ $Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'co
 	$Form->end_line();
 	$Form->begin_line( '' );
 		$Form->checkbox( 'msgform_display_avatar', $edited_Blog->get_setting( 'msgform_display_avatar' ), '' );
-		$Form->select_input_array( 'msgform_avatar_size', $edited_Blog->get_setting( 'msgform_avatar_size' ), get_available_thumb_sizes( T_('None') ), T_('Avatar').':', '', array( 'force_keys_as_values' => true ) );
+		$Form->select_input_array( 'msgform_avatar_size', $edited_Blog->get_setting( 'msgform_avatar_size' ), get_available_thumb_sizes(), T_('Avatar').':', '', array( 'force_keys_as_values' => true ) );
 	$Form->end_line();
 	$Form->radio( 'msgform_user_name', $edited_Blog->get_setting( 'msgform_user_name' ), array(
 			array( 'fullname', T_('First + Last Name') ),

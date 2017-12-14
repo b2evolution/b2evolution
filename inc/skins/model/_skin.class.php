@@ -1715,7 +1715,7 @@ var downloadInterval = setInterval( function()
 							'fieldend'       => "</div>\n\n",
 							'labelclass'     => 'control-label col-sm-3',
 							'labelstart'     => '',
-							'labelend'       => "\n",
+							'labelend'       => '',
 							'labelempty'     => '<label class="control-label col-sm-3"></label>',
 							'inputstart'     => '<div class="controls col-sm-9">',
 							'inputend'       => "</div>\n",

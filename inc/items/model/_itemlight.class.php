@@ -1284,7 +1284,8 @@ class ItemLight extends DataObject
 				'target_blog'     => '',
 				'nav_target'      => NULL,
 				'post_navigation' => $def_post_navigation,
-				'title_field'     => 'title',
+				'title_field'     => 'title', // '#' for custom title
+				'custom_title'    => $this->title,
 			), $params );
 
 		// Set post navigation target
@@ -1296,7 +1297,14 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
+		if( $params['title_field'] == '#' )
+		{
+			$title = format_to_output( $params['custom_title'], $params['format'] );
+		}
+		else
+		{
+			$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
+		}
 
 		if( $params['max_length'] != '' )
 		{	// Crop long title
