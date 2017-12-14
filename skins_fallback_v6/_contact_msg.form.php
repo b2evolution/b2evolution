@@ -71,7 +71,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 	if( $Blog->get_setting( 'msgform_display_recipient' ) )
 	{	// Display recipient:
 		$recipient_label = utf8_trim( $Blog->get_setting( 'msgform_recipient_label' ) );
-		$Form->info( ( empty( $recipient_label ) ? T_('Message to') : $recipient_label ), $Blog->get_msgform_recipient_link() );
+		$Form->info_field( ( empty( $recipient_label ) ? T_('Message to') : $recipient_label ), $Blog->get_msgform_recipient_link(), array( 'class' => 'evo_msgform_recipient' ) );
 	}
 
 	if( is_logged_in() &&

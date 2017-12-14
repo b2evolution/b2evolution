@@ -4017,6 +4017,18 @@ a.btn.action_icon.hoverlink {
 .form-inline #criteria_type_A2.large {
   width: 100%;
 }
+.evo_msgform_recipient label.control-label,
+.evo_msgform_recipient div.controls {
+  float: none;
+  display: inline-block;
+  vertical-align: middle;
+  padding-top: 0;
+}
+.evo_msgform_recipient a.login {
+  white-space: normal;
+  text-align: center;
+  display: inline-block;
+}
 #register_form div#ffield_m {
   margin-bottom: 4px;
 }
