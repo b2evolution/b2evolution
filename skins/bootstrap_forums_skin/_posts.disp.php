@@ -239,7 +239,7 @@ elseif( isset( $current_Chapter ) )
 				$register_link = '<a class="btn btn-primary btn-sm" href="'.get_user_register_url( NULL, 'reg to post' ).'">'.T_( 'Register now!' ).'</a>';
 			}
 			echo '<p class="alert alert-warning">';
-			echo T_( 'In order to post a new topic' ).' '.$login_link.( ! empty( $register_link ) ? ' or '.$register_link : '' );
+			echo T_( 'In order to start a new topic' ).' '.$login_link.( ! empty( $register_link ) ? ' or '.$register_link : '' );
 			echo '</p>';
 		}
 
