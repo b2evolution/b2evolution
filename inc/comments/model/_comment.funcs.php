@@ -670,7 +670,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	}
 	else
 	{ // not logged in, add login and register links
-		echo $disabled_text.' '.$login_link.( ! empty( $register_link ) ?  ' or '.$register_link : '' );
+		echo $disabled_text.' '.$login_link.( ! empty( $register_link ) ? ' '.T_('or').' '.$register_link : '' );
 	}
 	echo $params['form_params']['comments_disabled_after'];
 
