@@ -13987,7 +13987,7 @@ msgstr "Vous devez être connecté pour poster un commentaire."
 #: ../../../skins/bootstrap_gallery_skin/_posts.disp.php:70
 #: ../../../skins/photoalbums/_posts.disp.php:29
 msgid "Log in now!"
-msgstr "Se connecter maintenant!"
+msgstr "Connectez-vous maintenant!"
 
 #: ../../../inc/comments/model/_comment.funcs.php:650
 #: ../../../inc/items/model/_item.class.php:1430
