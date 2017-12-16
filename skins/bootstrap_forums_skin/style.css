@@ -648,6 +648,68 @@ main .widget_core_coll_search_form div.compact_search_form input.search_field {
 aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   width: 100%;
 }
+.widget_core_user_login #login_form .form-group {
+  margin: 0;
+}
+.widget_core_user_login #login_form label {
+  text-align: left;
+  width: 160px;
+  padding-left: 0;
+}
+.widget_core_user_login #login_form .controls {
+  padding: 0;
+  width: 100%;
+}
+.widget_core_user_login #login_form .form_text_input.form-control {
+  width: 100%;
+}
+.widget_core_user_login .field_login_btn .panel {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+.widget_core_user_login .field_login_btn .panel .panel-body {
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+.widget_core_user_login .field_login_btn .panel .panel-body #submit_login_form {
+  margin-right: 10px;
+}
+.widget_core_user_login .register_link {
+  display: block;
+  padding-top: 10px;
+}
+.widget_core_user_register #register_form .form-group {
+  margin: 0;
+}
+.widget_core_user_register #register_form label {
+  text-align: left;
+  width: 160px;
+  padding-left: 0;
+}
+.widget_core_user_register #register_form .controls {
+  padding: 0;
+  width: 100%;
+}
+.widget_core_user_register #register_form .form_text_input.form-control {
+  width: 100%;
+}
+.widget_core_user_register .field_register_btn .panel {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+.widget_core_user_register .field_register_btn .panel .panel-body {
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+.widget_core_user_register .field_register_btn .panel .panel-body #submit_login_form {
+  margin-right: 10px;
+}
 .extended_search_form {
   width: 100%;
   display: inline-block;

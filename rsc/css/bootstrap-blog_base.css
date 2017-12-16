@@ -918,10 +918,6 @@ div.container_menu_top input.search_field {
 .widget_core_user_register .input_text {
   width: 96%;
 }
-.widget_core_user_login .submit,
-.widget_core_user_register .submit {
-  font-size: 10px;
-}
 .widget_core_user_login .register_link {
   font-weight: bold;
 }
@@ -1508,6 +1504,7 @@ input.btn-lg {
   margin: 0 1em 1em 0;
 }
 .evo_item_workflow_form .evo_item_workflow_form__fields {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;

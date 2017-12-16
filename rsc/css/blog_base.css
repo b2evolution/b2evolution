@@ -1023,10 +1023,6 @@ div.container_menu_top input.search_field {
 .widget_core_user_register .input_text {
   width: 96%;
 }
-.widget_core_user_login .submit,
-.widget_core_user_register .submit {
-  font-size: 10px;
-}
 .widget_core_user_login .register_link {
   font-weight: bold;
 }
