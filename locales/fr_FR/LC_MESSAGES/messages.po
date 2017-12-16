@@ -40083,11 +40083,11 @@ msgstr ""
 
 #: ../../../plugins/videoplug_plugin/_videoplug.plugin.php:53
 msgid "Video width (px or %)"
-msgstr ""
+msgstr "Largeur video (px ou %)"
 
 #: ../../../plugins/videoplug_plugin/_videoplug.plugin.php:59
 msgid "Video height (px or %)"
-msgstr ""
+msgstr "Hauteur video (px ou %)"
 
 #: ../../../plugins/videoplug_plugin/_videoplug.plugin.php:63
 msgid "Leave empty for a 16/9 aspect ratio"
@@ -41385,7 +41385,7 @@ msgstr "Il n'y a pas de sujet dans ce forum pour l'instant."
 
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:242
 msgid "In order to start a new topic"
-msgstr ""
+msgstr "Afin de lancer un nouveau sujet"
 
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:253
 msgid "You must activate your account before you can post a new topic."
@@ -41633,7 +41633,7 @@ msgstr "Couleur de texte de page"
 #: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:215
 #: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:221
 msgid "Click to select a color."
-msgstr ""
+msgstr "Cliquez pour sélectionner une couleur."
 
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:175
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:175
