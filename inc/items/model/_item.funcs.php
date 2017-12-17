@@ -3350,7 +3350,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  */
 function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $inlist_order = NULL, $display_meta_title = false, $reply_level = 0 )
 {
-	global $current_User, $localtimenow;
+	global $current_User, $localtimenow, $item_id;
 
 	$Item = & $Comment->get_Item();
 	$Collection = $Blog = & $Item->get_Blog();
@@ -3413,6 +3413,11 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 					'text'   => '#text#'
 				) );
 			echo '</div>';
+		}
+
+		if( ! empty( $item_id ) && $Comment->ID > 0 && ! $Comment->is_meta() )
+		{	// Display checkbox to select normal existing comments for action only on view item page:
+			echo '<input type="checkbox" name="selected_comments[]" value="'.$Comment->ID.'" /> ';
 		}
 
 		echo '<span class="bDate">';
@@ -3541,6 +3546,11 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 		$Comment->status();
 		echo '</span>';
 		echo '</div>';
+
+		if( ! empty( $item_id ) && $Comment->ID > 0 && ! $Comment->is_meta() )
+		{	// Display checkbox to select normal existing comments for action only on view item page:
+			echo '<input type="checkbox" name="selected_comments[]" value="'.$Comment->ID.'" /> ';
+		}
 
 		echo '<span class="bDate">';
 		$Comment->date();
