@@ -451,16 +451,49 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 					foreach( $parmeta['entries'] as $l_set_name => $l_set_entry )
 					{
-						if( isset( $set_value[$k][$l_set_name] ) )
-						{	// Use a saved value:
-							$l_value = $set_value[$k][$l_set_name];
+
+						if( isset( $l_set_entry['inputs'] ) )
+						{
+ 							$Form->begin_line( $parmeta['label'], $input_name );	
+							
+							foreach( $l_set_entry['inputs'] as $l_set_input_name => $l_set_input_entry )
+							{
+
+								if( isset( $set_value[$k][$l_set_name.$l_set_input_name] ) )
+								{	// Use a saved value:
+									$l_value = $set_value[$k][$l_set_name.$l_set_input_name];
+								}
+								else
+								{	// Use default value if it is defined:
+
+									$l_value = isset( $l_set_input_entry['defaultvalue'] ) ? $l_set_input_entry['defaultvalue'] : NULL;
+								}
+								
+								// RECURSE:
+								autoform_display_field( $parname.'['.$k_nb.']['.$l_set_name.$l_set_input_name.']', $l_set_input_entry, $Form, $set_type, $Obj, $set_target, $l_value );
+
+							}
+							
+							$Form->end_line();
+
 						}
 						else
-						{	// Use default value if it is defined:
-							$l_value = isset( $l_set_entry['defaultvalue'] ) ? $l_set_entry['defaultvalue'] : NULL;
+						{
+							if( isset( $set_value[$k][$l_set_name] ) )
+							{	// Use a saved value:
+								$l_value = $set_value[$k][$l_set_name];
+							}
+							else
+							{	// Use default value if it is defined:
+
+								$l_value = isset( $l_set_entry['defaultvalue'] ) ? $l_set_entry['defaultvalue'] : NULL;
+							}
+							
+							// RECURSE:
+							autoform_display_field( $parname.'['.$k_nb.']['.$l_set_name.']', $l_set_entry, $Form, $set_type, $Obj, $set_target, $l_value );
+
 						}
-						// RECURSE:
-						autoform_display_field( $parname.'['.$k_nb.']['.$l_set_name.']', $l_set_entry, $Form, $set_type, $Obj, $set_target, $l_value );
+					
 					}
 					$Form->end_fieldset();
 					$k_nb++;
