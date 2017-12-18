@@ -372,23 +372,27 @@ class bootstrap_forums_Skin extends Skin
 
 
 		// If sidebar == true + col-lg
-		if( $layout = $this->get_setting( 'layout_general' ) != 'no_sidebar' )
-		{
-			$custom_css = "@media screen and (min-width: 1200px) {
+		$layout_general = $this->get_setting( 'layout_general' );
+		if( $disp != 'single' && $layout_general != 'no_sidebar' )
+		{	// Css fix for general layout with sidebar:
+			$custom_css .= '@media screen and (min-width: 1200px) {
 				.forums_list .ft_date {
 					white-space: normal;
 					margin-top: 3px;
 				}
+			}'."\n";
+		}
+		$layout_single = $this->get_setting( 'layout_single' );
+		if( $disp == 'single' && $layout_single != 'no_sidebar' )
+		{	// Css fix for single post layout with sidebar:
+			$custom_css .= '@media screen and (min-width: 1200px) {
 				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full,
-				.disp_single .evo_comment .panel-body .evo_comment_text p,
 				.disp_single .post_tags,
 				.disp_single .evo_voting_panel,
-				.disp_single .evo_seen_by
-				{
+				.disp_single .evo_seen_by {
 					padding-left: 15px;
 				}
-				\n
-			}";
+			}'."\n";
 		}
 
 		if( ! empty( $custom_css ) )
