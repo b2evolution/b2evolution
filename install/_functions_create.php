@@ -1592,7 +1592,7 @@ function create_default_newsletters()
 			       ( "Promotions", "I want to receive ADs that may be relevant to my interests." )' );
 
 		// Insert default subscriptions for each user on first newsletter:
-		$DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
+		$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
 			SELECT user_ID, 1 FROM T_users' );
 	}
 

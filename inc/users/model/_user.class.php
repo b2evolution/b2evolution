@@ -3477,9 +3477,12 @@ class User extends DataObject
 				$this->new_fields = array();
 			}
 
-			// Insert default newsletter subscriptions for this user:
-			$def_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', $Settings->get( 'def_newsletters' ) ) );
-			$this->insert_newsletter_subscriptions( $def_newsletters );
+			if( isset( $Settings ) )
+			{	// Insert default newsletter subscriptions for this user,
+				// Only when general settings are defined (to avoid error on install process):
+				$def_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', $Settings->get( 'def_newsletters' ) ) );
+				$this->insert_newsletter_subscriptions( $def_newsletters );
+			}
 
 			// Notify plugins:
 			// A user could be created also in another DB (to synchronize it with b2evo)
