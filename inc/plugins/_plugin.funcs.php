@@ -402,10 +402,26 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			// check if a color field is among the entries
 			foreach( $parmeta['entries'] as $entry )
 			{
-				if( $entry['type'] == 'color' )
+				if( isset( $entry['inputs'] ) )
 				{
-					$has_color_field = true;
-					break;
+					foreach( $entry['inputs'] as $input_entry )
+					{
+						if( isset($input_entry['type']) && $input_entry['type'] == 'color' )
+						{
+							$has_color_field = true;
+							break;
+						}
+					}
+				}
+				else
+				{
+				
+					if( isset($entry['type']) && $entry['type'] == 'color' )
+					{
+						$has_color_field = true;
+						break;
+					}
+				
 				}
 			}
 
