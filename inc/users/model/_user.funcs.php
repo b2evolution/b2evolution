@@ -5258,7 +5258,7 @@ function users_results_block( $params = array() )
 		}
 	}
 
-	global $DB, $UserSettings, $Settings, $action, $admin_url, $action;
+	global $DB, $UserSettings, $Settings, $Session, $action, $admin_url, $action;
 
 	// query which groups have users (in order to prevent deletion of groups which have users)
 	global $usedgroups; // We need this in a callback below
@@ -5377,10 +5377,28 @@ function users_results_block( $params = array() )
 		$UserList->display( $params['display_params'] );
 	}
 
+	$edited_campaign_ID =  $Session->get( 'edited_campaign_ID' );
+	if( !empty( $edited_campaign_ID ) )
+	{ // Get Email Campaign by ID from Session
+		$EmailCampaignCache = & get_EmailCampaignCache();
+		$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $edited_campaign_ID, false, false );
+	}
+
+	if( !empty( $edited_EmailCampaign ) )
+	{
+		$newsletter_button_text = sprintf( T_('User this selection for newsletter "%s"'), $edited_EmailCampaign->get( 'name' ) );
+		$newsletter_button_class = 'btn-primary';
+	}
+	else
+	{
+		$newsletter_button_text = T_('Send newsletter to the current selection');
+		$newsletter_button_class = 'btn-default';
+	}
+
 	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Display newsletter button:
 		echo '<p class="center">';
-		echo '<input type="button" value="'.T_('Send newsletter to the current selection').'" onclick="location.href=\''.$admin_url.'?ctrl=campaigns&amp;action=users&amp;'.url_crumb( 'campaign' ).'\'" class="btn '.( $action == 'newsletter' ? 'btn-primary' :  'btn-default' ).'" />';
+		echo '<input type="button" value="'.format_to_output( $newsletter_button_text, 'htmlattr' ).'" onclick="location.href=\''.$admin_url.'?ctrl=campaigns&amp;action=users&amp;'.url_crumb( 'campaign' ).'\'" class="btn '.$newsletter_button_class.'" />';
 		echo '</p>';
 	}
 }
