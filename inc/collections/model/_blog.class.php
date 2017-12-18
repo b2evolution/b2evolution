@@ -852,6 +852,8 @@ class Blog extends DataObject
 
 			$this->set_setting( 'editing_goto_blog', param( 'editing_goto_blog', 'string', NULL ) );
 
+			$this->set_setting( 'post_anonymous', param( 'post_anonymous', 'integer', 0 ) );
+
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
 
 			param( 'old_content_alert', 'integer', NULL );
