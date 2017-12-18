@@ -230,18 +230,24 @@ elseif( isset( $current_Chapter ) )
 
 	<div class="panel-body comments_link__pagination">
 	<?php
-		if( ! is_logged_in() )
-		{
-			$register_link = '';
-			$login_link = '<a class="btn btn-primary btn-sm" href="'.get_login_url( 'cannot post' ).'">'.T_( 'Log in now!' ).'</a>';
-			if( ( $Settings->get( 'newusers_canregister' ) == 'yes' ) && ( $Settings->get( 'registration_is_public' ) ) )
-			{
-				$register_link = '<a class="btn btn-primary btn-sm" href="'.get_user_register_url( NULL, 'reg to post' ).'">'.T_( 'Register now!' ).'</a>';
+		// ------------------ NEW POST FORM FOR ANONYMOUS USER INCLUDED HERE ------------------
+		if( $single_cat_ID && ! is_logged_in() )
+		{	// Display a new post form:
+			if( $Blog->get_ajax_form_enabled() )
+			{	// Load form by AJAX if it is allowed by collection setting:
+				display_ajax_form( array(
+						'action' => 'get_item_form',
+						'blog'   => $Blog->ID,
+						'cat'    => $single_cat_ID,
+						'params' => $params,
+					) );
 			}
-			echo '<p class="alert alert-warning">';
-			echo T_( 'In order to start a new topic' ).' '.$login_link.( ! empty( $register_link ) ? ' '.T_('or').' '.$register_link : '' );
-			echo '</p>';
+			else
+			{	// Display a form to create new post by anonymous user:
+				skin_include( '_item_new_form.inc.php', $params );
+			}
 		}
+		// ---------------------- END OF NEW POST FORM FOR ANONYMOUS USER ---------------------
 
 		// Buttons to post/reply
 		$Skin->display_post_button( $single_cat_ID );

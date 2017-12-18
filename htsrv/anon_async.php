@@ -63,6 +63,31 @@ $Ajaxlog->add( sprintf( 'action: %s', $action ), 'note' );
 $params = param( 'params', 'array', array() );
 switch( $action )
 {
+	case 'get_item_form':
+		// Display item form:
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		$cat_ID = param( 'cat', 'integer' );
+		$ChapterCache = & get_ItemCache();
+		$Chapter = & $ChapterCache->get_by_ID( $cat_ID );
+		$BlogCache = & get_BlogCache();
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID );
+
+		locale_activate( $Blog->get( 'locale' ) );
+
+		$blog_skin_ID = $Blog->get_skin_ID();
+		if( ! empty( $blog_skin_ID ) )
+		{	// Initialize collection skin folder to check if it has a specific new item form:
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+			$ads_current_skin_path = $skins_path.$Skin->folder.'/';
+		}
+
+		require skin_template_path( '_item_new_form.inc.php' );
+		break;
+
 	case 'get_comment_form':
 		// Display comment form:
 
