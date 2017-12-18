@@ -114,7 +114,6 @@ class UserList extends DataObjectList2
 				'level_min'           => NULL,    // integer, Level min
 				'level_max'           => NULL,    // integer, Level max
 				'org'                 => NULL,    // integer, Organization ID
-				'newsletter'          => NULL,    // integer, Newsletter ID
 		) );
 	}
 
@@ -241,11 +240,6 @@ class UserList extends DataObjectList2
 			 * Restrict by organization
 			 */
 			memorize_param( 'org', 'integer', $this->default_filters['org'], $this->filters['org'] );
-
-			/*
-			 * Restrict by newsletter
-			 */
-			memorize_param( 'newsletter', 'integer', $this->default_filters['newsletter'], $this->filters['newsletter'] );
 
 			/*
 			 * Restrict by user fields
@@ -441,11 +435,6 @@ class UserList extends DataObjectList2
 		 */
 		$this->filters['org'] = param( 'org', 'integer', $this->default_filters['org'], true );
 
-		/*
-		 * Restrict by newsletter ID
-		 */
-		$this->filters['newsletter'] = param( 'newsletter', 'integer', $this->default_filters['newsletter'], true );
-
 		// 'paged'
 		$this->page = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 
@@ -539,7 +528,6 @@ class UserList extends DataObjectList2
 			$org_ID = isset( $this->query_params['where_org_ID'] ) ? $this->query_params['where_org_ID'] : $this->filters['org'];
 			$this->UserQuery->where_organization( $org_ID );
 		}
-		$this->UserQuery->where_newsletter( $this->filters['newsletter'] );
 		if( isset( $this->query_params['where_viewed_user'] ) )
 		{	// Filter by user profile viewed:
 			$this->UserQuery->where_viewed_user( $this->query_params['where_viewed_user'] );

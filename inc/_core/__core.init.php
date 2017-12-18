@@ -73,8 +73,6 @@ $db_config['aliases'] = array(
 		'T_email__log'             => $tableprefix.'email__log',
 		'T_email__returns'         => $tableprefix.'email__returns',
 		'T_email__address'         => $tableprefix.'email__address',
-		'T_email__newsletter'      => $tableprefix.'email__newsletter',
-		'T_email__newsletter_subscription' => $tableprefix.'email__newsletter_subscription',
 		'T_email__campaign'        => $tableprefix.'email__campaign',
 		'T_email__campaign_send'   => $tableprefix.'email__campaign_send',
 		'T_syslog'                 => $tableprefix.'syslog',
@@ -125,7 +123,6 @@ $ctrl_mappings = array(
 		'upload'           => 'files/upload.ctrl.php',
 		'slugs'            => 'slugs/slugs.ctrl.php',
 		'email'            => 'tools/email.ctrl.php',
-		'newsletters'      => 'email_campaigns/newsletters.ctrl.php',
 		'campaigns'        => 'email_campaigns/campaigns.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
 	);
@@ -442,26 +439,6 @@ function & get_EmailAddressCache()
 	}
 
 	return $EmailAddressCache;
-}
-
-
-/**
- * Get the NewsletterCache
- *
- * @param string The text that gets used for the "None" option in the objects options list (Default: T_('Unknown')).
- * @return NewsletterCache
- */
-function & get_NewsletterCache( $allow_none_text = NULL )
-{
-	global $NewsletterCache;
-
-	if( ! isset( $NewsletterCache ) )
-	{	// Cache doesn't exist yet:
-		load_class( 'email_campaigns/model/_newsletter.class.php', 'Newsletter' );
-		$NewsletterCache = new DataObjectCache( 'Newsletter', false, 'T_email__newsletter', 'enlt_', 'enlt_ID', 'enlt_name', 'enlt_name', $allow_none_text );
-	}
-
-	return $NewsletterCache;
 }
 
 
@@ -1100,11 +1077,8 @@ class _core_Module extends Module
 				{
 					$entries['site']['entries']['email'] = array(
 							'text' => T_('Emails'),
-							'href' => $admin_url.'?ctrl=newsletters',
+							'href' => $admin_url.'?ctrl=campaigns',
 							'entries' => array(
-								'newsletters' => array(
-									'text' => T_('Newsletters').'&hellip;',
-									'href' => $admin_url.'?ctrl=newsletters' ),
 								'campaigns' => array(
 									'text' => T_('Campaigns').'&hellip;',
 									'href' => $admin_url.'?ctrl=campaigns' ),
@@ -1958,11 +1932,8 @@ class _core_Module extends Module
 		{ // Permission to view email management:
 			$AdminUI->add_menu_entries( NULL, array( 'email' => array(
 					'text' => T_('Emails'),
-					'href' => '?ctrl=newsletters',
+					'href' => '?ctrl=campaigns',
 					'entries' => array(
-						'newsletters' => array(
-							'text' => T_('Newsletters'),
-							'href' => '?ctrl=newsletters' ),
 						'campaigns' => array(
 							'text' => T_('Campaigns'),
 							'href' => '?ctrl=campaigns' ),

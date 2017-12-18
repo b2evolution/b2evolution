@@ -23,11 +23,11 @@ load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 param_action();
 param( 'tab', 'string', 'info' );
 
-if( param( 'ecmp_ID', 'integer', '', true ) )
-{	// Load Email Campaign object:
+if( param( 'ecmp_ID', 'integer', '', true) )
+{ // Load Email Campaign object
 	$EmailCampaignCache = & get_EmailCampaignCache();
 	if( ( $edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $ecmp_ID, false ) ) === false )
-	{	// We could not find the goal to edit:
+	{ // We could not find the goal to edit:
 		unset( $edited_EmailCampaign );
 		forget_param( 'ecmp_ID' );
 		$action = '';
@@ -37,25 +37,6 @@ if( param( 'ecmp_ID', 'integer', '', true ) )
 
 switch( $action )
 {
-	case 'new':
-		// New Email Campaign form:
-
-		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
-
-		// Check if at least one newsletter is active:
-		$NewsletterCache = & get_NewsletterCache();
-		$NewsletterCache->load_where( 'enlt_active = 1' );
-		if( empty( $NewsletterCache->cache ) )
-		{
-			$Messages->add( T_('You must create an active Newsletter before you can create a new Campaign'), 'error' );
-
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
-			// We have EXITed already at this point!!
-		}
-		break;
-
 	case 'add':
 		// Add Email Campaign...
 
@@ -75,11 +56,12 @@ switch( $action )
 
 		// Save Email Campaign in DB:
 		$new_EmailCampaign->dbinsert();
+		$Session->set( 'edited_campaign_ID', $new_EmailCampaign->ID );
 
-		$Messages->add( T_('The email campaign was created.'), 'success' );
+		$Messages->add( T_('The email campaign was created. Please select the recipients.'), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $admin_url.'?ctrl=campaigns&action=edit&ecmp_ID='.$new_EmailCampaign->ID, 303 ); // Will EXIT
+		header_redirect( $admin_url.'?ctrl=users&action=newsletter', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -121,55 +103,11 @@ switch( $action )
 		// We have EXITed already at this point!!
 		break;
 
-	case 'update_newsletter':
-		// Update Newsletter of Campaign:
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'campaign' );
-
-		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
-
-		$current_tab = param( 'current_tab', 'string', 'info' );
-
-		// Update only newsletter of the edited Email Campaign:
-		param( 'ecmp_enlt_ID', 'integer', NULL );
-		param_string_not_empty( 'ecmp_enlt_ID', T_('Please select a newsletter.') );
-		$edited_EmailCampaign->set_from_Request( 'enlt_ID' );
-
-		// Save changes in DB:
-		$edited_EmailCampaign->dbupdate();
-
-		// Update recipients only if newsletter has been changed:
-		$edited_EmailCampaign->update_recipients( true );
-
-		$Messages->add( T_('Newsletter of the email campaign has been updated.'), 'success' );
-
-		// Redirect after saving:
-		header_redirect( get_campaign_tab_url( $current_tab, $edited_EmailCampaign->ID ), 303 ); // Will EXIT
-		// We have EXITed already at this point!!
-		break;
-
-	case 'hide_wysiwyg_warning':
-	case 'show_wysiwyg_warning':
-		global $UserSettings;
-
-		// Show/hide warning when switching from markup to WYSIWYG
-		$Session->assert_received_crumb( 'campaign' );
-
-		// Check that this action request is not a CSRF hacked request:
-		$UserSettings->set( 'show_wysiwyg_warning_emailcampaign', ( $action == 'show_wysiwyg_warning' ? 1: 0 ) );
-		$UserSettings->dbupdate();
-
-		// REDIRECT / EXIT
-		header_redirect( $admin_url.'?ctrl=campaigns&action=edit&ecmp_ID='.$edited_EmailCampaign->ID.'&tab=compose' );
-		break;
-
 	case 'change_users':
 		$Session->set( 'edited_campaign_ID', $edited_EmailCampaign->ID );
 
 		// Redirect to select users:
-		header_redirect( $admin_url.'?ctrl=users&action=newsletter&filter=new&newsletter='.$edited_EmailCampaign->get( 'enlt_ID' ), 303 ); // Will EXIT
+		header_redirect( $admin_url.'?ctrl=users&action=newsletter', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -182,45 +120,26 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'emails', 'edit', true );
 
-		$newsletter_ID = param( 'newsletter', 'integer', 0 );
-		$NewsletterCache = & get_NewsletterCache();
-		if( ! ( $Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) ) || ! $Newsletter->get( 'active' ) )
-		{	// If the selected newsletter cannot be used for email campaigns (because it doesn't exist or is not active):
-			$Messages->add( T_('Please select another newsletter because it cannot be used for email campaign.'), 'warning' );
-			header_redirect( $admin_url.'?ctrl=users&action=newsletter&filter=new&newsletter='.$newsletter_ID, 303 ); // Will EXIT
-			// We have EXITed already at this point!!
+		// Initialize email campaign from users list page
+		$edited_campaign_ID = $Session->get( 'edited_campaign_ID' );
+		if( !empty( $edited_campaign_ID ) )
+		{ // Get Email Campaign by ID from Session
+			$EmailCampaignCache = & get_EmailCampaignCache();
+			$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $edited_campaign_ID, false, false );
 		}
 
-		// Initialize email campaign from users list page:
-		$edited_EmailCampaign = & get_session_EmailCampaign();
-
-		if( ! $edited_EmailCampaign )
-		{	// Create new email campaign if admin want creates it from free users list:
+		if( empty( $edited_EmailCampaign ) )
+		{ // Create new email campaign if it didn't create before
 			$edited_EmailCampaign = new EmailCampaign();
-			$edited_EmailCampaign->set( 'enlt_ID', $Newsletter->ID );
-			$edited_EmailCampaign->set( 'email_title', $Newsletter->get( 'name' ) );
+			$edited_EmailCampaign->set( 'name', 'New campaign' );
 			$edited_EmailCampaign->dbinsert();
 		}
-		else
-		{	// If email campaign already exists in DB:
-			if( $edited_EmailCampaign->get( 'enlt_ID' ) != $Newsletter->ID )
-			{	// Update newsletter if it was changed on users list filtering:
-				$edited_EmailCampaign->set( 'enlt_ID', $Newsletter->ID );
-				$edited_EmailCampaign->dbupdate();
-			}
-		}
 
-		if( ! $edited_EmailCampaign )
-		{	// If campaign is not defined we cannot assign recipients, Redirect to campaigns list:
-			header_redirect( $admin_url.'?ctrl=campaigns', 303 ); // Will EXIT
-			// We have EXITed already at this point!!
-		}
-
-		// Clear campaign ID from session:
+		// Clear campaign ID from session
 		$Session->delete( 'edited_campaign_ID' );
 
-		// Save recipients for edited email campaign:
-		$edited_EmailCampaign->add_recipients();
+		// Save users for edited email campaign
+		$edited_EmailCampaign->add_users();
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=campaigns&action=edit_users&ecmp_ID='.$edited_EmailCampaign->ID, 303 ); // Will EXIT
@@ -362,21 +281,23 @@ switch( $action )
 {
 	case 'edit':
 	case 'edit_users':
-		if( empty( $edited_EmailCampaign ) )
-		{	// If no edited email campaign - clear action and display list of campaigns:
+		if( empty( $ecmp_ID ) )
+		{ // If empty ID - clear action and display list of campaigns
 			$action = '';
 			break;
 		}
 
 		if( $action == 'edit_users' )
-		{	// Check a recipients count after redirect from users list:
-			if( $edited_EmailCampaign->get_recipients_count( 'filter' ) == 0 )
-			{	// No users in the filterset:
+		{ // Get users info for newsletter only when redirect from user list
+			$users_numbers = get_newsletter_users_numbers();
+
+			if( $users_numbers['all'] == 0 )
+			{ // No users in the filterset, Redirect to users list
 				$Messages->add( T_('No found accounts in filterset. Please try to change the filter of users list.'), 'error' );
 			}
 
-			if( $edited_EmailCampaign->get_recipients_count( 'all' ) == 0 )
-			{	// No users for newsletter:
+			if( $users_numbers['newsletter'] == 0 )
+			{ // No users for newsletter
 				$Messages->add( T_('No found active accounts which accept newsletter email. Please try to change the filter of users list.'), 'note' );
 			}
 
