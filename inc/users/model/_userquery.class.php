@@ -512,6 +512,26 @@ class UserQuery extends SQL
 
 
 	/**
+	 * Select by newsletter ID
+	 *
+	 * @param integer Newsletter ID
+	 */
+	function where_newsletter( $newsletter_ID )
+	{
+		global $DB;
+
+		$newsletter_ID = intval( $newsletter_ID );
+
+		if( empty( $newsletter_ID ) )
+		{
+			return;
+		}
+
+		$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ) );
+	}
+
+
+	/**
 	 * Select by viewed user
 	 *
 	 * @param integer User ID

@@ -377,7 +377,20 @@ if( !$Messages->has_errors() )
 
 			$current_User->check_perm( 'emails', 'edit', true );
 
+			// Memorize action param to keep newsletter mode on change filters:
+			memorize_param( 'action', 'string', true, $action );
+
 			$Messages->add( T_('Please select new recipients for this email campaign.'), 'success' );
+
+			if( ! param( 'newsletter', 'integer', 0 ) )
+			{	// Don't allow all newsletters for selecting of recipients for email campaign:
+				$Messages->add( T_('Any email campaign must be sent to subscribers of a particular newsletter. Please select a newsletter in your filters.'), 'error' );
+
+				if( $edited_EmailCampaign = & get_session_EmailCampaign() )
+				{	// Force newsletter filter by current of email campaign:
+					set_param( 'newsletter', $edited_EmailCampaign->get( 'enlt_ID' ) );
+				}
+			}
 			break;
 	}
 }

@@ -18,13 +18,14 @@ global $admin_url, $UserSettings;
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, ecmp_name, ecmp_email_title, ecmp_sent_ts' );
+$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, enlt_ID, enlt_name, ecmp_email_title, ecmp_sent_ts' );
 $SQL->FROM( 'T_email__campaign' );
-$SQL->GROUP_BY( 'ecmp_ID' );
+$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 
 $count_SQL = new SQL();
 $count_SQL->SELECT( 'SQL_NO_CACHE COUNT( ecmp_ID )' );
 $count_SQL->FROM( 'T_email__campaign' );
+$count_SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 
 $Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
@@ -53,9 +54,9 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Name'),
-		'order' => 'ecmp_name',
-		'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_name$</b></a>',
+		'th' => T_('Subscription'),
+		'order' => 'enlt_name',
+		'td' => '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID=$enlt_ID$"><b>$enlt_name$</b></a>',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'nowrap',
 	);
@@ -63,7 +64,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Email title'),
 		'order' => 'ecmp_email_title',
-		'td' => '$ecmp_email_title$',
+		'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_email_title$</b></a>',
 	);
 
 $Results->cols[] = array(
@@ -80,7 +81,9 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 		'td' => action_icon( T_('Edit this email campaign...'), 'properties', $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$' )
-			.action_icon( T_('Delete this email address!'), 'delete', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=delete&amp;'.url_crumb('campaign') ) )
+			.( $current_User->check_perm( 'emails', 'edit' ) ?
+			// Display an action icon to delete newsletter if current User has a perm:
+			action_icon( T_('Delete this email address!'), 'delete', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=delete&amp;'.url_crumb('campaign') ) ) : '' )
 	);
 
 // Display results:
