@@ -49,6 +49,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 	$params = array();
 
+	
+	$has_folding_attr = false;
+
 	if( $use_value === NULL )
 	{ // outermost level
 		$has_array_type = false; // for adding a note about JS
@@ -142,8 +145,22 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		switch( $parmeta['layout'] )
 		{
 			case 'begin_fieldset':
+		
 				$fieldset_title = $set_label;
-				$Form->begin_fieldset( $fieldset_title.$help_icon );
+				
+ 				$fieldset_params = array();
+ 				if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
+ 				{	// Enable folding for the fieldset:
+ 					$fieldset_params['fold'] = $parmeta['fold'];
+					$has_folding_attr = true;
+ 					if( isset( $parmeta['deny_fold'] ) )
+ 					{	// TRUE to don't allow fold the block and keep it opened always on page loading:
+ 						$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
+ 					}
+ 					// Unique ID of fieldset to store in user  settings or in user per collection settings:
+ 					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
+ 				}
+ 				$Form->begin_fieldset( $fieldset_title.$help_icon, $fieldset_params );	
 				break;
 
 			case 'end_fieldset':
@@ -371,6 +388,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		case 'array:regexp':
 			$has_array_type = true;
 			$has_color_field = false;
+			$has_folding_attr = false;
 
 			// Always use 'fieldset' layout to display it the same way from normal and ajax calls
 			$Form->switch_layout( 'fieldset' );
@@ -390,7 +408,20 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				{
 					$fieldset_title .= ' [debug: '.$parname.']';
 				}
-				$Form->begin_fieldset( $fieldset_title );
+				
+ 				$fieldset_params = array();
+ 				if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
+ 				{	// Enable folding for the fieldset:
+ 					$fieldset_params['fold'] = $parmeta['fold'];
+					$has_folding_attr = true;
+ 					if( isset( $parmeta['deny_fold'] ) )
+ 					{	// TRUE to don't allow fold the block and keep it opened always on page loading:
+ 						$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
+ 					}
+ 					// Unique ID of fieldset to store in user  settings or in user per collection settings:
+ 					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
+ 				}
+ 				$Form->begin_fieldset( $fieldset_title, $fieldset_params );	
 
 				if( ! empty($params['note']) )
 				{
@@ -449,7 +480,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 									)
 								).'</span>';
 					}
-					$Form->begin_fieldset( '#'.$k_nb.$remove_action, array( 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) );
+					
+ 					if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
+ 					{	// Enable folding for the fieldset:
+ 						$fieldset_params['fold'] = $parmeta['fold'];
+						$has_folding_attr = true;
+ 						if( isset( $parmeta['deny_fold'] ) )
+ 						{	// TRUE to don't allow fold the block and keep it opened always on page loading:
+ 							$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
+ 						}
+ 						
+ 					}
+ 					$Form->begin_fieldset( '#'.$k_nb.$remove_action, $fieldset_params );
 
 					if( isset($parmeta['key']) )
 					{ // KEY FOR THIS ENTRY:
@@ -545,6 +587,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								element_id = element_id.replace(/(\[|\])/g, &quot;\\\\$1&quot;);
 								jQuery('#'+element_id+'_add_new').replaceWith(r);
 								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
+								".( $has_folding_attr ? 'evo_initialize_fieldset_folding();' : '' )."
 							}
 						);
 						return false;")
