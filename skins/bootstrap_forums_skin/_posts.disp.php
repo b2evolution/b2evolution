@@ -249,8 +249,6 @@ elseif( isset( $current_Chapter ) )
 		{	// Display a new post form:
 			$params = array_merge( array(
 					'item_new_warning_msg' => T_( 'In order to start a new topic' ),
-					'item_new_form_start'  => '<div class="evo_item_new_form panel panel-default"><div class="panel-heading">'.sprintf( T_('New [%s]'), $Blog->get_default_item_type_name() ).'</div><div class="panel-body">',
-					'item_new_form_end'    => '</div></div>',
 					'item_new_submit_text' => T_('Create topic'),
 				), $params );
 			if( $Blog->get_ajax_form_enabled() )

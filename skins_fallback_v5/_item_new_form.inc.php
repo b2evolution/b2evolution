@@ -39,11 +39,11 @@ if( $Blog->get_setting( 'post_anonymous' ) )
 
 	$Form->hidden( 'mname', 'collections' );
 	$Form->add_crumb( 'collections_create_post' );
-	$Form->hidden( 'cat', $edited_Item->get( 'main_cat_ID' ) );
+	$Form->hidden( 'cat', get_param( 'cat' ) );
 
-	$Form->text_input( $dummy_fields['name'], $edited_Item->get( 'temp_user_name' ), 40, T_('Name'), '', array( 'maxlength' => 100, 'required' => true ) );
+	$Form->text_input( $dummy_fields['name'], ( isset( $edited_Item->temp_user_name ) ? $edited_Item->temp_user_name : '' ), 40, T_('Name'), '', array( 'maxlength' => 100, 'required' => true ) );
 
-	$Form->text_input( $dummy_fields['email'], $edited_Item->get( 'temp_user_email' ), 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), array( 'maxlength' => 255, 'required' => true ) );
+	$Form->text_input( $dummy_fields['email'], ( isset( $edited_Item->temp_user_email ) ? $edited_Item->temp_user_email : '' ), 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), array( 'maxlength' => 255, 'required' => true ) );
 
 	// Title input:
 	$use_title = $edited_Item->get_type_setting( 'use_title' );
