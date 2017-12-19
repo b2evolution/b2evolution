@@ -1010,13 +1010,13 @@ class collections_Module extends Module
 		global $demo_mode, $current_User, $DB, $Session, $Messages;
 		global $UserSettings;
 
-		if( !is_logged_in() )
+		// Init the objects we want to work on.
+		$action = param_action( true );
+
+		if( !is_logged_in() && $action != 'create_post' )
 		{ // user must be logged in
 			bad_request_die( $this->T_( 'You are not logged in.' ) );
 		}
-
-		// Init the objects we want to work on.
-		$action = param_action( true );
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collections_'.$action );
@@ -1234,6 +1234,53 @@ class collections_Module extends Module
 
 				header_redirect();
 				break; // already exited here
+
+			case 'create_post':
+				// Create new post from front-office:
+				global $dummy_fields, $Plugins;
+
+				load_class( 'items/model/_item.class.php', 'Item' );
+
+				// Name:
+				$user_name = param( $dummy_fields['name'], 'string' );
+				param_check_not_empty( $dummy_fields['name'], sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Name') ) );
+
+				// Email:
+				$user_email = param( $dummy_fields['email'], 'string' );
+				param_check_email( $dummy_fields['email'], true );
+
+				// Initialize new Item object:
+				$new_Item = new Item();
+
+				// Set main category:
+				$new_Item->set( 'main_cat_ID', param( 'cat', 'integer', true ) );
+
+				// Set item properties from submitted form:
+				$new_Item->load_from_Request( false, true );
+
+				// Call plugin event for additional checking, e-g captcha:
+				$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $new_Item ) );
+
+				if( param_errors_detected() )
+				{	// If at least one error has been detected:
+
+					// Save temp params only into session Item object to redisplay them on the form after redirect:
+					$new_Item->temp_user_name = $user_name;
+					$new_Item->temp_user_email = $user_email;
+
+					// Save new Item with entered data in Session:
+					set_session_Item( $new_Item );
+
+					// Redirect back to the form:
+					header_redirect();
+				}
+
+				// Auto register new user:
+
+				//$Messages->add( T_('Post has been created.'), 'success' );
+
+				header_redirect();
+				break;
 		}
 	}
 }

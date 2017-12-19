@@ -228,11 +228,31 @@ elseif( isset( $current_Chapter ) )
 ?>
 	</section>
 
-	<div class="panel-body comments_link__pagination">
+	<div class="panel-body">
 	<?php
+		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+		mainlist_page_links( array(
+				'block_start'           => '<div class="comments_link__pagination"><ul class="pagination">',
+				'block_end'             => '</ul></div>',
+				'page_current_template' => '<span>$page_num$</span>',
+				'page_item_before'      => '<li>',
+				'page_item_after'       => '</li>',
+				'page_item_current_before' => '<li class="active">',
+				'page_item_current_after'  => '</li>',
+				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
+			) );
+		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+
 		// ------------------ NEW POST FORM FOR ANONYMOUS USER INCLUDED HERE ------------------
 		if( $single_cat_ID && ! is_logged_in() )
 		{	// Display a new post form:
+			$params = array_merge( array(
+					'item_new_warning_msg' => T_( 'In order to start a new topic' ),
+					'item_new_form_start'  => '<div class="evo_item_new_form panel panel-default"><div class="panel-heading">'.sprintf( T_('New [%s]'), $Blog->get_default_item_type_name() ).'</div><div class="panel-body">',
+					'item_new_form_end'    => '</div></div>',
+					'item_new_submit_text' => T_('Create topic'),
+				), $params );
 			if( $Blog->get_ajax_form_enabled() )
 			{	// Load form by AJAX if it is allowed by collection setting:
 				display_ajax_form( array(
@@ -260,20 +280,6 @@ elseif( isset( $current_Chapter ) )
 				.' <a href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>', 'warning' );
 			$Messages->display();
 		}
-
-		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-		mainlist_page_links( array(
-				'block_start'           => '<ul class="pagination">',
-				'block_end'             => '</ul>',
-				'page_current_template' => '<span>$page_num$</span>',
-				'page_item_before'      => '<li>',
-				'page_item_after'       => '</li>',
-				'page_item_current_before' => '<li class="active">',
-				'page_item_current_after'  => '</li>',
-				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
-				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
-			) );
-		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
 	</div>
 </div>
