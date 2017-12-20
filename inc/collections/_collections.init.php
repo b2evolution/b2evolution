@@ -1263,6 +1263,9 @@ class collections_Module extends Module
 
 				$item_Blog = & $new_Item->get_Blog();
 
+				// Set default status:
+				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status' ) );
+
 				if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $user_email ) ) ) )
 				{	// Don't allow the duplicate emails for users:
 					$Messages->add_to_group( sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),

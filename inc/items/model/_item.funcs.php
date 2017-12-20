@@ -4012,6 +4012,7 @@ function get_session_Item( $item_ID = 0, $force_new = false )
 	}
 	elseif( $force_new )
 	{	// Force to create new Item:
+		load_class( 'items/model/_item.class.php', 'Item' );
 		$edited_Item = new Item();
 		$edited_Item->set( 'main_cat_ID', get_param( 'cat' ) );
 

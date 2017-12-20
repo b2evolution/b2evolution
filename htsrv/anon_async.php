@@ -70,8 +70,6 @@ switch( $action )
 		param( 'b2evo_icons_type', 'string', '' );
 
 		$cat_ID = param( 'cat', 'integer' );
-		$ChapterCache = & get_ItemCache();
-		$Chapter = & $ChapterCache->get_by_ID( $cat_ID );
 		$BlogCache = & get_BlogCache();
 		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID );
 

@@ -15,6 +15,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $Blog, $Settings, $dummy_fields;
 
+if( is_logged_in() )
+{	// This form is allowed only for anonymous users, Exit here:
+	return;
+}
+
 $params = array_merge( array(
 		'item_new_warning_msg'  => T_( 'In order to start a new post' ),
 		'form_params'           => array(), // Use to change a structre of form, i.e. fieldstart, fieldend and etc.
