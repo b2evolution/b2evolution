@@ -36,9 +36,11 @@ $Form->hidden( 'action',  $creating ? 'create' : 'update' );
 
 $Form->checkbox( 'enlt_active', $edited_Newsletter->get( 'active' ), T_('Active') );
 
-$Form->text_input( 'enlt_name', $edited_Newsletter->get( 'name' ), 150, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
+$Form->text_input( 'enlt_name', $edited_Newsletter->get( 'name' ), 30, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 
 $Form->text_input( 'enlt_label', $edited_Newsletter->get( 'label' ), 150, T_('Label'), '', array( 'maxlength' => 255 ) );
+
+$Form->text_input( 'enlt_order', $edited_Newsletter->get( 'order' ), 10, T_('Order'), '', array( 'maxlength' => 11 ) );
 
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )

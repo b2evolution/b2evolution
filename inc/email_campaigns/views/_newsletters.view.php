@@ -17,7 +17,7 @@ global $admin_url, $UserSettings;
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE enlt_ID, enlt_name, enlt_label, enlt_active' );
+$SQL->SELECT( 'SQL_NO_CACHE enlt_ID, enlt_name, enlt_label, enlt_active, enlt_order' );
 $SQL->FROM( 'T_email__newsletter' );
 
 $Results = new Results( $SQL->get(), 'enlt_', 'A' );
@@ -81,6 +81,14 @@ $Results->cols[] = array(
 		'th' => T_('Label'),
 		'order' => 'enlt_label',
 		'td' => '$enlt_label$',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Order'),
+		'order' => 'enlt_order',
+		'td' => '$enlt_order$',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'right',
 	);
 
 $Results->cols[] = array(

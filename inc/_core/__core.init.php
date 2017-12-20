@@ -458,7 +458,7 @@ function & get_NewsletterCache( $allow_none_text = NULL )
 	if( ! isset( $NewsletterCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'email_campaigns/model/_newsletter.class.php', 'Newsletter' );
-		$NewsletterCache = new DataObjectCache( 'Newsletter', false, 'T_email__newsletter', 'enlt_', 'enlt_ID', 'enlt_name', 'enlt_name', $allow_none_text );
+		$NewsletterCache = new DataObjectCache( 'Newsletter', false, 'T_email__newsletter', 'enlt_', 'enlt_ID', 'enlt_name', 'enlt_order', $allow_none_text );
 	}
 
 	return $NewsletterCache;

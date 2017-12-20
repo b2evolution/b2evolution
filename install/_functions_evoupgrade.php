@@ -8835,6 +8835,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12440, 'Upgrading email newsletter subscriptions table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_email__newsletter', 'enlt_order', 'INT NULL DEFAULT NULL' );
+		$DB->query( 'UPDATE T_email__newsletter
+			SET enlt_order = enlt_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
