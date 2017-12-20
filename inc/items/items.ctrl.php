@@ -438,6 +438,7 @@ switch( $action )
 		$new_post_creation_result = false;
 		$CommentCache = & get_CommentCache();
 		$moved_comments_IDs = array();
+		$reattached_comments_IDs = array();
 		foreach( $selected_comments as $s => $selected_comment_ID )
 		{
 			$selected_Comment = & $CommentCache->get_by_ID( $selected_comment_ID, false, false );
@@ -498,7 +499,10 @@ switch( $action )
 				// Set proper parent Comment if comment has been not moved to new Item:
 				$selected_Comment->set_correct_parent_comment();
 				// Update comment with new data:
-				$selected_Comment->dbupdate();
+				if( $selected_Comment->dbupdate() )
+				{
+					$reattached_comments_IDs[] = $selected_Comment->ID;
+				}
 			}
 		}
 
@@ -514,9 +518,17 @@ switch( $action )
 				$child_Comment->set_correct_parent_comment();
 				if( $old_in_reply_to_cmt_ID != $child_Comment->get( 'in_reply_to_cmt_ID' ) )
 				{	// Update only if parent comment has been really corrected:
-					$child_Comment->dbupdate();
+					if( $child_Comment->dbupdate() )
+					{
+						$reattached_comments_IDs[] = $child_Comment->ID;
+					}
 				}
 			}
+		}
+
+		if( count( $reattached_comments_IDs ) )
+		{	// Display a message about the reattached comments:
+			$Messages->add( sprintf( T_('Comments #%s have been attached to new post.'), implode( ',', $reattached_comments_IDs ) ), 'success' );
 		}
 
 		// REDIRECT / EXIT
