@@ -133,7 +133,7 @@ if( $item_id > 0 )
 
 	if( $current_User->check_perm( 'blog_post_statuses', 'edit', true, $blog ) )
 	{	// Display a button to create a post from selected comments:
-		echo ' &nbsp; ';
+		echo ' '.T_('or').' ';
 		$Form->button( array( 'submit', 'actionArray[create_comments_post]', T_('Create new Post'), 'btn-warning' ) );
 	}
 
