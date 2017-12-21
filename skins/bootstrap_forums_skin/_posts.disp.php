@@ -164,8 +164,12 @@ if( count( $chapters ) > 0 )
 }
 
 // ---------------------------------- START OF POSTS ------------------------------------
-if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs ) ||
-   ( isset( $current_Chapter ) && ! $current_Chapter->meta ) /* Note: the meta categories cannot contain the posts */ ) )
+if( isset( $MainList ) &&
+    ( ! isset( $current_Chapter ) || ! $current_Chapter->meta ) && // Note: the meta categories cannot contain the posts
+    ( empty( $single_cat_ID ) || // disp=posts List all posts
+      ! empty( $multi_cat_IDs ) || // Filter for several categories
+      isset( $current_Chapter ) ) // Posts of the current viewed category ($disp_detail = posts-cat)
+  )
 {
 	echo !empty( $chapters ) ? '<br />' : '';
 ?>
