@@ -227,7 +227,9 @@ ol.breadcrumb {
   display: inline-block;
 }
 .forums_list .ft_date {
-  margin-top: 17px;
+  margin-top: 10px;
+  text-align: center;
+  white-space: nowrap;
 }
 .forums_list .ft_workflow_info {
   margin-top: 2px;
@@ -252,10 +254,6 @@ ol.breadcrumb {
 .forums_list .ft_assigned_avatar .ft_assigned_avatar {
   float: none;
   margin-right: 0;
-}
-.forums_list .ft_date {
-  text-align: center;
-  white-space: nowrap;
 }
 .forums_list .ft_date_shrinked,
 .forums_list .ft_date_shrinked_more {
@@ -771,6 +769,10 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   .forums_list .pagination {
     float: right;
     margin-left: 10px;
+  }
+  div.col-md-9.pull-right,
+  aside.col-md-3.pull-left {
+    float: none !important;
   }
 }
 @media screen and (max-width: 767px) {
