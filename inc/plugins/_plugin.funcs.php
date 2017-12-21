@@ -512,7 +512,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 						if( isset( $l_set_entry['inputs'] ) )
 						{
- 							$Form->begin_line( $parmeta['label'], $input_name );	
+ 							$Form->begin_line( $l_set_entry['label'], $input_name );	
 							
 							foreach( $l_set_entry['inputs'] as $l_set_input_name => $l_set_input_entry )
 							{
