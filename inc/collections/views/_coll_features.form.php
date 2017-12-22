@@ -197,7 +197,7 @@ $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' 
 				'title_format'     => 'notes-string',
 				'exclude_statuses' => $exclude_statuses,
 			) );
-		$Form->info( T_('Default status'), $default_status_field, T_('Default status for new posts') );
+		$Form->info( T_('Default status'), $default_status_field, T_('Default status for new posts by anonymous users.') );
 		$Form->hidden( 'default_post_status', $edited_Blog->get_setting('default_post_status') );
 		echo_form_dropdown_js();
 	}
