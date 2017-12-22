@@ -1252,11 +1252,27 @@ class _core_Module extends Module
 				  $edit_item_url = $Item->get_edit_url() )
 				{	// If curent user has a permission to edit a current viewing post:
 					$entries['post'] = array(
-							'text'        => '<span class="fa fa-pencil-square"></span> '.T_('Edit'),
+							'text'        => '<span class="fa fa-pencil-square"></span> '.( $perm_admin_restricted ? T_('Post') : T_('Edit') ),
 							'href'        => $edit_item_url,
 							'title'       => T_('Edit current post'),
 							'entry_class' => 'rwdhide',
 						);
+					if( $perm_admin_restricted )
+					{	// Menu entries to edit and view post in back-office:
+						$entries['post']['entries'] = array(
+							'edit_front' => array(
+								'text' => T_('Edit in Font-Office').'&hellip;',
+								'href' => $edit_item_url,
+							),
+							'edit_back' => array(
+								'text' => T_('Edit in Back-Office').'&hellip;',
+								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
+							),
+							'view_back' => array(
+								'text' => T_('View in Back-Office').'&hellip;',
+								'href' => $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
+							) );
+					}
 					$entries['page']['entries']['edit'] = array(
 							'text'  => T_('Edit contents').'&hellip;',
 							'title' => T_('Edit current post'),

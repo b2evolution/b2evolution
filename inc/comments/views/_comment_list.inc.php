@@ -38,8 +38,11 @@ if( empty( $item_id ) )
 $currentpage = param( 'currentpage', 'integer', 1 );
 $comments_number = param( 'comments_number', 'integer', 0 );
 
-if( $item_id > 0 )
-{	// Allow to select comments for action on item view page:
+// Check if current comments list displays meta comments:
+$is_meta_comments_list = ( isset( $CommentList->filters['types'] ) && in_array( 'meta', $CommentList->filters['types'] ) );
+
+if( $item_id > 0 && ! $is_meta_comments_list && $comments_number > 0 )
+{	// Allow to select ONLY normal comments(EXCLUDE meta comments) for action on item view page:
 	global $blog, $admin_url, $current_User;
 
 	$Form = new Form( $admin_url );
@@ -119,14 +122,9 @@ if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 	echo_comment_pages( $item_id, $currentpage, $comments_number, $comment_params );
 }
 
-if( $item_id > 0 )
-{	// Allow to select comments for action on item view page:
+if( $item_id > 0 && ! $is_meta_comments_list && $comments_number > 0 )
+{	// Allow to select ONLY normal comments(EXCLUDE meta comments) for action on item view page:
 	echo T_('With checked comments').': ';
-
-	if( $current_User->check_perm( 'blog_post_statuses', 'edit', true, $blog ) )
-	{	// Display a button to create a post from selected comments:
-		$Form->button( array( 'submit', 'actionArray[create_comments_post]', T_('Create new Post'), 'btn-warning' ) );
-	}
 
 	// Display a button to change visibility of selected comments:
 	$ItemCache = & get_ItemCache();
@@ -135,6 +133,12 @@ if( $item_id > 0 )
 	$Form->hidden( 'comment_status', $item_status );
 	echo_comment_status_buttons( $Form, NULL, $item_status, 'set_visibility' );
 	echo_status_dropdown_button_js( 'comment' );
+
+	if( $current_User->check_perm( 'blog_post_statuses', 'edit', true, $blog ) )
+	{	// Display a button to create a post from selected comments:
+		echo ' '.T_('or').' ';
+		$Form->button( array( 'submit', 'actionArray[create_comments_post]', T_('Create new Post'), 'btn-warning' ) );
+	}
 
 	$Form->end_form();
 }

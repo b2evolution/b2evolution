@@ -810,7 +810,7 @@ class ItemLight extends DataObject
 					$url_to_edit_post .= '&amp;blog='.$Blog->ID;
 					if( is_admin_page() )
 					{	// Try to set a main category
-						$default_cat_ID = $Blog->get_setting( 'default_cat_ID' );
+						$default_cat_ID = $Blog->get_default_cat_ID();
 						if( !empty( $default_cat_ID ) )
 						{	// If default category is set
 							$this->main_cat_ID = $default_cat_ID;
