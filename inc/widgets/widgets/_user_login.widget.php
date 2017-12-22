@@ -165,6 +165,12 @@ class user_login_Widget extends ComponentWidget
 					'type' => 'text',
 					'defaultvalue' => T_( 'Hello $login$!' ),
 				),
+				'button_class' => array(
+					'label' => T_('Button class'),
+					'note' => T_('Login button class'),
+					'size' => 40,
+					'defaultvalue' => 'btn-primary'
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )

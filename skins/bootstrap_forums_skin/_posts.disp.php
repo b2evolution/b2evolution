@@ -143,7 +143,7 @@ if( count( $chapters ) > 0 )
 			</div>
 			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s topics'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
 			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_commentcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
-			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().' '.locale_shorttimefmt() ); ?></div>
+			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().'<\b\r>'.locale_shorttimefmt() ); ?></div>
 			<!-- Apply this on XS size -->
 			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( locale_datefmt() ); ?></div>
 		</article>
@@ -164,8 +164,12 @@ if( count( $chapters ) > 0 )
 }
 
 // ---------------------------------- START OF POSTS ------------------------------------
-if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs ) ||
-   ( isset( $current_Chapter ) && ! $current_Chapter->meta ) /* Note: the meta categories cannot contain the posts */ ) )
+if( isset( $MainList ) &&
+    ( ! isset( $current_Chapter ) || ! $current_Chapter->meta ) && // Note: the meta categories cannot contain the posts
+    ( empty( $single_cat_ID ) || // disp=posts List all posts
+      ! empty( $multi_cat_IDs ) || // Filter for several categories
+      isset( $current_Chapter ) ) // Posts of the current viewed category ($disp_detail = posts-cat)
+  )
 {
 	echo !empty( $chapters ) ? '<br />' : '';
 ?>
@@ -239,7 +243,7 @@ elseif( isset( $current_Chapter ) )
 				$register_link = '<a class="btn btn-primary btn-sm" href="'.get_user_register_url( NULL, 'reg to post' ).'">'.T_( 'Register now!' ).'</a>';
 			}
 			echo '<p class="alert alert-warning">';
-			echo T_( 'In order to post a new topic' ).' '.$login_link.( ! empty( $register_link ) ? ' or '.$register_link : '' );
+			echo T_( 'In order to start a new topic' ).' '.$login_link.( ! empty( $register_link ) ? ' '.T_('or').' '.$register_link : '' );
 			echo '</p>';
 		}
 

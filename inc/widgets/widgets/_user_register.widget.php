@@ -142,6 +142,12 @@ class user_register_Widget extends ComponentWidget
 					'size' => 40,
 					'defaultvalue' => T_('Sign up!'),
 				),
+				'button_class' => array(
+					'label' => T_('Button class'),
+					'note' => T_('Form submit button class'),
+					'size' => 40,
+					'defaultvalue' => 'btn-primary'
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -265,7 +271,7 @@ class user_register_Widget extends ComponentWidget
 		$Form->begin_fieldset( '', array( 'class' => 'fieldset field_register_btn' ) );
 		$Form->button_input( array(
 				'value' => $this->disp_params['button'],
-				'class' => 'submit' )
+				'class' => $this->disp_params['button_class'].' submit' )
 			);
 		$Form->end_fieldset();
 

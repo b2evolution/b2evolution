@@ -368,8 +368,8 @@ siteskin_include( '_site_body_header.inc.php' );
 	</aside><!-- .col -->
 	<?php } ?>
 
-	<footer class="col-md-12">
-	<?php skin_include( '_legend.inc.php' ); ?>
+	<footer class="col-md-12 clear">
+		<?php skin_include( '_legend.inc.php' ); ?>
 	</footer>
 
 </div><!-- .row -->

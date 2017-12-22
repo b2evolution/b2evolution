@@ -1810,7 +1810,7 @@ a school bus stop where you wouldn\'t really expect it!
 
 			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{
-				$edited_Blog->set_setting( 'default_cat_ID', $cat_forums_forum_group );
+				$edited_Blog->set_setting( 'default_cat_ID', $cat_forums_ann );
 				$edited_Blog->dbupdate();
 			}
 

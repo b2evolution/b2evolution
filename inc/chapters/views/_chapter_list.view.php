@@ -35,7 +35,7 @@ global $Session, $AdminUI;
 
 $result_fadeout = $Session->get( 'fadeout_array' );
 
-$current_default_cat_ID = $Blog->get_setting('default_cat_ID');
+$current_default_cat_ID = $Blog->get_default_cat_ID();
 
 $line_class = 'odd';
 
@@ -71,12 +71,16 @@ function cat_line( $Chapter, $level )
 				</td>';
 
 	// Default
-	if( $current_default_cat_ID == $Chapter->ID )
-	{
+	if( $Chapter->get( 'meta' ) )
+	{	// Deny to use meta chapter as default:
+		$makedef_icon = '';
+	}
+	elseif( $current_default_cat_ID == $Chapter->ID )
+	{	// This chapter is default currently:
 		$makedef_icon = get_icon( 'enabled', 'imgtag', array( 'title' => format_to_output( T_( 'This is the default category' ), 'htmlattr' ) ) );
 	}
 	else
-	{
+	{	// Display action icon to make this chapter default:
 		$makedef_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=make_default&amp;'.url_crumb('element') );
 		$makedef_title = format_to_output( T_('Click to make this the default category'), 'htmlattr' );
 		$makedef_icon = '<a href="'.$makedef_url.'" title="'.$makedef_title.'">'.get_icon( 'disabled', 'imgtag', array( 'title' => $makedef_title ) ).'</a>';
@@ -120,21 +124,32 @@ function cat_line( $Chapter, $level )
 	if( $permission_to_edit )
 	{	// We have permission permission to edit, so display these columns:
 
-		if( $Chapter->meta )
-		{
+		// Meta
+		if( $current_default_cat_ID == $Chapter->ID )
+		{	// Deny to use default chapter as meta:
+			$makemeta_icon = false;
+		}
+		elseif( $Chapter->meta )
+		{	// This chapter is meta:
 			$makemeta_icon = 'enabled';
 			$makemeta_title = format_to_output( T_('Click to revert this from meta category'), 'htmlattr' );
 			$action = 'unset_meta';
 		}
 		else
-		{
+		{	// This chapter is NOT meta:
 			$makemeta_icon = 'disabled';
 			$makemeta_title = format_to_output( T_('Click to make this as meta category'), 'htmlattr' );
 			$action = 'set_meta';
 		}
-		// Meta
-		$makemeta_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action='.$action.'&amp;'.url_crumb('element') );
-		$r .= '<td class="center"><a href="'.$makemeta_url.'" title="'.$makemeta_title.'">'.get_icon( $makemeta_icon, 'imgtag', array( 'title' => $makemeta_title ) ).'</a></td>';
+		if( $makemeta_icon )
+		{	// Display action icon to change meta property of this chapter:
+			$makemeta_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action='.$action.'&amp;'.url_crumb('element') );
+			$r .= '<td class="center"><a href="'.$makemeta_url.'" title="'.$makemeta_title.'">'.get_icon( $makemeta_icon, 'imgtag', array( 'title' => $makemeta_title ) ).'</a></td>';
+		}
+		else
+		{
+			$r .= '<td></td>';
+		}
 
 		// Lock
 		if( $Chapter->lock )
