@@ -1237,7 +1237,7 @@ class collections_Module extends Module
 
 			case 'create_post':
 				// Create new post from front-office:
-				global $dummy_fields, $Plugins, $Blog;
+				global $dummy_fields, $Plugins;
 
 				load_class( 'items/model/_item.class.php', 'Item' );
 
@@ -1349,7 +1349,7 @@ class collections_Module extends Module
 				if( $new_Item->dbinsert() )
 				{	// Successful new item creating:
 					$Messages->add( T_('Post has been created.'), 'success' );
-					$redirect_to = $new_Item->get_permanent_url( '', '', '&' );
+					$redirect_to = $item_Blog->get( 'profileurl', array( 'glue' => '&' ) );
 				}
 				else
 				{	// Error on creating new Item:

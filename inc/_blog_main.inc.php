@@ -497,7 +497,7 @@ param( 'm', 'string', NULL );
 if( empty( $Item ) &&
 		(
 			! is_null( $catsel ) || // Filter by many categories
-			( $disp != 'edit' && ! is_null( $cat ) ) || // Filter by one category
+			( $disp != 'edit' && $disp != 'anonpost' && ! is_null( $cat ) ) || // Filter by one category
 			! is_null( $tag ) || // Filter by tag
 			! empty( $m ) // Filter by date like '201410' (urls from ?disp=arcdir)
 	) )
@@ -828,6 +828,7 @@ if( !empty( $skin ) )
 					'access_denied'         => 'access_denied.main.php',
 					'access_requires_login' => 'access_requires_login.main.php',
 					'activateinfo'          => 'activateinfo.main.php',
+					'anonpost'              => 'anonpost.main.php',
 					'arcdir'                => 'arcdir.main.php',
 					'catdir'                => 'catdir.main.php',
 					'closeaccount'          => 'closeaccount.main.php',

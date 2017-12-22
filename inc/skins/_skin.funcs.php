@@ -1236,6 +1236,32 @@ function skin_init( $disp )
 			$seo_page_type = 'User display';
 			break;
 
+		case 'anonpost':
+			// New item form for anonymous user:
+			if( is_logged_in() )
+			{	// The logged in user has another page to create a post:
+				header_redirect( url_add_param( $Blog->get( 'url', array( 'glue' => '&' ) ), 'disp=edit', '&' ), 302 );
+				// will have exited
+			}
+			elseif( ! $Blog->get_setting( 'post_anonymous' ) )
+			{	// Redirect to the login page if current collection doesn't allow to post by anonymous user:
+				$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit' );
+				$Messages->add( T_( 'You must log in to create & edit posts.' ) );
+				header_redirect( get_login_url( 'cannot create posts', $redirect_to ), 302 );
+				// will have exited
+			}
+
+			// Check if the requested category can be used for new post on the current collection:
+			$ChapterCache = & get_ChapterCache();
+			$Chapter = & $ChapterCache->get_by_ID( param( 'cat', 'integer' ), false, false );
+			if( ! $Chapter || // Not found
+			    $Chapter->get( 'blog_ID' ) != $Blog->ID || // Category from another collection
+			    $Chapter->get( 'meta' ) ) // Meta category cannot be used as post category
+			{	// Use default category instead of the wrong requested:
+				set_param( 'cat', $Blog->get_default_cat_ID() );
+			}
+			break;
+
 		case 'edit':
 			global $current_User, $post_ID;
 
@@ -1668,6 +1694,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_access_denied'         => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
 				'disp_activateinfo'          => '_activateinfo.disp.php',
+				'disp_anonpost'              => '_anonpost.disp.php',
 				'disp_arcdir'                => '_arcdir.disp.php',
 				'disp_catdir'                => '_catdir.disp.php',
 				'disp_closeaccount'          => '_closeaccount.disp.php',

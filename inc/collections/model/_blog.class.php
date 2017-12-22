@@ -4339,8 +4339,10 @@ class Blog extends DataObject
 	{
 		$url = '';
 
-		if( is_logged_in( false ) )
-		{	// Only logged in and activated users can write a Post
+		if( is_logged_in( false ) ||
+		    ( ! is_logged_in() && $this->get_setting( 'post_anonymous' ) ) )
+		{	// Only logged in and activated users can write a Post,
+			// Or anonymous user can post if it is allowed with collection setting:
 			global $current_User;
 
 			$ChapterCache = & get_ChapterCache();
@@ -4349,7 +4351,7 @@ class Blog extends DataObject
 			{ // This category is locked, don't allow to create new post with this cat
 				return '';
 			}
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
+			if( ! is_logged_in() || $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
 			{	// We have permission to add a post with at least one status:
 				if( $this->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
 				{	// We have a mode 'In-skin editing' for the current Blog
@@ -4359,9 +4361,9 @@ class Blog extends DataObject
 					{	// Link to create a Item with predefined category
 						$cat_url_param = '&amp;cat='.$cat_ID;
 					}
-					$url = url_add_param( $this->get( 'url' ), 'disp=edit'.$cat_url_param );
+					$url = url_add_param( $this->get( 'url' ), ( is_logged_in() ? 'disp=edit' : 'disp=anonpost' ).$cat_url_param );
 				}
-				elseif( $current_User->check_perm( 'admin', 'restricted' ) )
+				elseif( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) )
 				{	// Edit a post from Back-office
 					global $admin_url;
 					$url = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$this->ID;

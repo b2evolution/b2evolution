@@ -248,28 +248,18 @@ elseif( isset( $current_Chapter ) )
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 
-		// ------------------ NEW POST FORM FOR ANONYMOUS USER INCLUDED HERE ------------------
-		if( $single_cat_ID && ! is_logged_in() )
-		{	// Display a new post form:
-			$params = array_merge( array(
-					'item_new_warning_msg' => T_( 'In order to start a new topic' ),
-					'item_new_submit_text' => T_('Create topic'),
-				), $params );
-			if( $Blog->get_ajax_form_enabled() )
-			{	// Load form by AJAX if it is allowed by collection setting:
-				display_ajax_form( array(
-						'action' => 'get_item_form',
-						'blog'   => $Blog->ID,
-						'cat'    => $single_cat_ID,
-						'params' => $params,
-					) );
+		if( ! is_logged_in() && ! $Blog->get_setting( 'post_anonymous' ) )
+		{	// Display a warning to log in or register before new post creating:
+			$register_link = '';
+			$login_link = '<a class="btn btn-primary btn-sm" href="'.get_login_url( 'cannot post' ).'">'.T_( 'Log in now!' ).'</a>';
+			if( ( $Settings->get( 'newusers_canregister' ) == 'yes' ) && ( $Settings->get( 'registration_is_public' ) ) )
+			{
+				$register_link = '<a class="btn btn-primary btn-sm" href="'.get_user_register_url( NULL, 'reg to post' ).'">'.T_( 'Register now!' ).'</a>';
 			}
-			else
-			{	// Display a form to create new post by anonymous user:
-				skin_include( '_item_new_form.inc.php', $params );
-			}
+			echo '<p class="alert alert-warning alert-item-new">';
+			echo T_( 'In order to start a new topic' ).' '.$login_link.( ! empty( $register_link ) ? ' '.T_('or').' '.$register_link : '' );
+			echo '</p>';
 		}
-		// ---------------------- END OF NEW POST FORM FOR ANONYMOUS USER ---------------------
 
 		// Buttons to post/reply
 		$Skin->display_post_button( $single_cat_ID );

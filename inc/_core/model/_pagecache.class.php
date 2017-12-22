@@ -229,9 +229,9 @@ class PageCache
 			return false;
 		}
 
-		if( $disp == 'login' || $disp == 'access_requires_login' || $disp == 'register' || $disp == 'lostpassword' )
-		{	// We do NOT want caching for in-skin login, register and lostpassord pages
-			$Debuglog->add( 'Never cache the in-skin login and register pages!', 'pagecache' );
+		if( $disp == 'login' || $disp == 'access_requires_login' || $disp == 'register' || $disp == 'lostpassword' || $disp == 'anonpost' )
+		{	// We do NOT want caching for in-skin login, register, lostpassord pages and new item anonymous form:
+			$Debuglog->add( 'Never cache the in-skin login, register and anonymous new item pages!', 'pagecache' );
 			return false;
 		}
 

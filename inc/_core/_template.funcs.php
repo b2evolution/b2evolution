@@ -421,6 +421,7 @@ function get_request_title( $params = array() )
 			'format'              => 'htmlbody',
 			// Title for each disp:
 			// fp> TODO: Make a global array of $disp => Clear text disp
+			'anonpost_text'       => '#',// # - 'New [Post]' ('Post' is item type name)
 			'arcdir_text'         => T_('Archive Directory'),
 			'catdir_text'         => T_('Category Directory'),
 			'mediaidx_text'       => T_('Photo Index'),
@@ -682,6 +683,17 @@ function get_request_title( $params = array() )
 
 		case 'closeaccount':
 			$r[] = $params['closeaccount_text'];
+			break;
+
+		case 'anonpost':
+			if( $params['anonpost_text'] == '#' )
+			{	// Initialize default auto title:
+				$r[] = sprintf( T_('New [%s]'), $Blog->get_default_item_type_name() );
+			}
+			else
+			{	// Use custom title from param:
+				$r[] = $params['anonpost_text'];
+			}
 			break;
 
 		case 'edit':
