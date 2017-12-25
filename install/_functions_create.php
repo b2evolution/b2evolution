@@ -1794,6 +1794,31 @@ function create_default_posts_location()
 
 
 /**
+ * Create default newsletters
+ */
+function create_default_newsletters()
+{
+	global $DB, $create_sample_contents;
+
+	task_begin( 'Creating default newsletters... ' );
+
+	if( $create_sample_contents )
+	{
+		// Insert default newsletters:
+		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label )
+			VALUES ( "News", "Send me news about this site." ),
+			       ( "Promotions", "I want to receive ADs that may be relevant to my interests." )' );
+
+		// Insert default subscriptions for each user on first newsletter:
+		$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
+			SELECT user_ID, 1 FROM T_users' );
+	}
+
+	task_end();
+}
+
+
+/**
  * Create default email campaigns
  */
 function create_default_email_campaigns()
@@ -1808,7 +1833,7 @@ function create_default_email_campaigns()
 	if( $create_sample_contents )
 	{
 		$EmailCampaign = new EmailCampaign();
-		$EmailCampaign->set( 'name', T_('Markdown Example') );
+		$EmailCampaign->set( 'enlt_ID', 1 );
 		$EmailCampaign->set( 'email_title', T_('Markdown Example') );
 		$EmailCampaign->set( 'email_text', T_('Heading
 =======
@@ -1852,7 +1877,7 @@ The rain---not the reign---in Spain.') );
 			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
 			if( ! empty( $user_IDs ) )
 			{	// Only if we have found the users in DB
-				$EmailCampaign->add_users( $user_IDs );
+				$EmailCampaign->add_recipients( $user_IDs );
 			}
 		}
 	}
