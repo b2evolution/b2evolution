@@ -42,11 +42,13 @@ $Form->begin_fieldset( T_('Newsletter recipients') );
 			'required'     => true,
 			'field_suffix' => '<input type="submit" name="actionArray[update_newsletter]" class="btn btn-default" value="'.format_to_output( T_('Update'), 'htmlattr' ).'" />' ) );
 	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_recipients_count(), '('.T_('Accounts which currently accept this newsletter').')' );
-	$Form->info( T_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter' ),
-		'('.T_('Accounts that match your additional filter')
-		.') <a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'" class="btn btn-default">'.T_('Change filter').'</a>' );
-	$Form->info( T_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive' ), '('.T_('Accounts which have already been sent this newsletter').')' );
-	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_recipients_count( 'wait' ), '('.T_('Accounts which have not been sent this newsletter yet').')' );
+	$Form->info_field( T_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter', true ), array(
+			'class' => 'info_full_height',
+			'note'  => '('.T_('Accounts that match your additional filter').') '
+			           .'<a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'" class="btn btn-default">'.T_('Change filter').'</a>',
+		) );
+	$Form->info( T_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive', true ), '('.T_('Accounts which have already been sent this newsletter').')' );
+	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_recipients_count( 'wait', true ), '('.T_('Accounts which have not been sent this newsletter yet').')' );
 $Form->end_fieldset();
 
 $buttons = array();

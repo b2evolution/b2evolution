@@ -532,6 +532,44 @@ class UserQuery extends SQL
 
 
 	/**
+	 * Select by Email Campaign ID
+	 *
+	 * @param integer Email Campaign ID
+	 * @param string Recipient type of email campaign: 'filter', 'receive', 'wait'
+	 */
+	function where_email_campaign( $ecmp_ID, $recipient_type = '' )
+	{
+		global $DB;
+
+		$ecmp_ID = intval( $ecmp_ID );
+
+		if( empty( $ecmp_ID ) )
+		{
+			return;
+		}
+
+		$this->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_user_ID = user_ID AND csnd_camp_ID = '.$DB->quote( $ecmp_ID ) );
+
+		// Get email log date and time:
+		$this->SELECT_add( ', emlog_timestamp' );
+		$this->FROM_add( 'LEFT JOIN T_email__log ON csnd_emlog_ID = emlog_ID' );
+
+		switch( $recipient_type )
+		{
+			case 'receive':
+				// Get recipients which have already been sent this newsletter:
+				$this->WHERE_and( 'csnd_emlog_ID IS NOT NULL' );
+				break;
+
+			case 'wait':
+				// Get recipients which have not been sent this newsletter yet:
+				$this->WHERE_and( 'csnd_emlog_ID IS NULL' );
+				break;
+		}
+	}
+
+
+	/**
 	 * Select by viewed user
 	 *
 	 * @param integer User ID

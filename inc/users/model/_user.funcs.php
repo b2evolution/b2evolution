@@ -5200,6 +5200,7 @@ function users_results_block( $params = array() )
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'org_ID'               => NULL,
+			'ecmp_ID'              => NULL,
 			'viewed_user'          => NULL,
 			'reg_ip_min'           => NULL,
 			'reg_ip_max'           => NULL,
@@ -5249,6 +5250,7 @@ function users_results_block( $params = array() )
 			'display_sec_groups'   => false,
 			'display_level'        => true,
 			'display_status'       => true,
+			'display_emlog_date'   => false,
 			'display_actions'      => true,
 			'display_org_actions'  => false,
 			'display_newsletter'   => true,
@@ -5294,6 +5296,7 @@ function users_results_block( $params = array() )
 	$default_filters = array(
 			'order'      => $params['results_order'],
 			'org'        => $params['org_ID'],
+			'ecmp'       => $params['ecmp_ID'],
 			'reg_ip_min' => $params['reg_ip_min'],
 			'reg_ip_max' => $params['reg_ip_max'],
 		);
@@ -5461,6 +5464,7 @@ function users_results( & $UserList, $params = array() )
 			'display_sec_groups' => false,
 			'display_level'      => true,
 			'display_status'     => true,
+			'display_emlog_date' => false,
 			'display_actions'    => true,
 			'display_org_actions'=> false,
 			'th_class_avatar'    => 'shrinkwrap small',
@@ -5806,6 +5810,18 @@ function users_results( & $UserList, $params = array() )
 				'order' => 'secondary_groups_count',
 				'default_dir' => 'D',
 				'td' => '%user_td_sec_groups( #user_ID#, #secondary_groups_count# )%',
+			);
+	}
+
+	if( $params['display_emlog_date'] )
+	{ // Display email campaign send date:
+		$UserList->cols[] = array(
+				'th' => T_('Send date'),
+				'th_class' => 'shrinkwrap small',
+				'td_class' => 'center small nowrap',
+				'order' => 'emlog_timestamp',
+				'default_dir' => 'D',
+				'td' => '%user_td_emlog_date( #emlog_timestamp# )%',
 			);
 	}
 
@@ -6244,6 +6260,26 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 		return get_icon( 'bullet_red', 'imgtag', array_merge( array( 'title' => T_('Not accepted') ), $accept_icon_params ) );
 	}
 }
+
+
+/**
+ * Get email campaign send date
+ *
+ * @param string Email log date
+ * @return string
+ */
+function user_td_emlog_date( $emlog_date )
+{
+	if( empty( $emlog_date ) )
+	{
+		return T_('Ready to send');
+	}
+	else
+	{
+		return mysql2localedatetime( $emlog_date );
+	}
+}
+
 
 /**
  * Validate current session is in a password reset process:
