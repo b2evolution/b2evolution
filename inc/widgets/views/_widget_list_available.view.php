@@ -127,6 +127,7 @@ $core_componentwidget_defs = array(
 			'user_register',
 			'user_tools',
 			'online_users',
+			'newsletter_subscription',
 		),
 	'other' => array(
 			'poll',

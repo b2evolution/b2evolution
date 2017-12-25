@@ -94,7 +94,7 @@ class user_register_Widget extends ComponentWidget
 					'label' => T_('Intro text'),
 					'note' => '',
 					'type' => 'textarea',
-					'defaultvalue' => '',
+					'defaultvalue' => T_('Don\'t miss the news!'),
 				),
 				'ask_firstname' => array(
 					'label' => T_('Ask for first name'),
