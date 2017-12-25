@@ -277,11 +277,20 @@ class EmailCampaign extends DataObject
 	 *   'filter'  - Filtered active users which accept newsletter of this campaign
 	 *   'receive' - Users which already received email newsletter
 	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
+	 * @param boolean TRUE to return as link to page with recipients list
 	 * @return integer Number of users
 	 */
-	function get_recipients_count( $type = 'all' )
+	function get_recipients_count( $type = 'all', $link = false )
 	{
-		return count( $this->get_recipients( $type ) );
+		$recipients_count = count( $this->get_recipients( $type ) );
+
+		if( $link )
+		{	// Initialize URL to page with reciepients of this Email Campaign:
+			$campaign_edit_modes = get_campaign_edit_modes( $this->ID );
+			$recipients_count = '<a href="'.$campaign_edit_modes['recipient']['href'].( empty( $type ) ? '' : '&amp;recipient_type='.$type ).'">'.$recipients_count.'</a>';
+		}
+
+		return $recipients_count;
 	}
 
 

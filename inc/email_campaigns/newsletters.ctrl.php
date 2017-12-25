@@ -154,6 +154,49 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
+
+	case 'enable':
+	case 'disable':
+		// Enable/Disable newsletter by default for new registered users:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'newsletter' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		// Make sure we got an enlt_ID:
+		param( 'enlt_ID', 'integer', true );
+
+		$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
+		$enlt_index = array_search( $edited_Newsletter->ID, $def_newsletters );
+
+		$update_def_newsletters = false;
+		if( $action == 'enable' && $enlt_index === false )
+		{	// Enable newsletter:
+			$def_newsletters[] = $edited_Newsletter->ID;
+			$update_def_newsletters = true;
+		}
+		elseif( $action == 'disable' && $enlt_index !== false )
+		{	// Disable newsletter:
+			unset( $def_newsletters[ $enlt_index ] );
+			$update_def_newsletters = true;
+		}
+
+		if( $update_def_newsletters )
+		{	// Update default setting for newsletters:
+			$Settings->set( 'def_newsletters', implode( ',', $def_newsletters ) );
+			$Settings->dbupdate();
+
+			$Messages->add( ( $action == 'enable' ?
+				T_('Newsletter has been enabled by default for new users.') :
+				T_('Newsletter has been disabled by default for new users.') ), 'success' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 

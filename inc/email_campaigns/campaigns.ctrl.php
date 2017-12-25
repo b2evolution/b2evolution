@@ -469,6 +469,11 @@ switch( $action )
 			case 'create_cron':
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_send.form.php' );
 				break;
+
+			case 'recipient':
+				param( 'recipient_type', 'string', '', true );
+				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_recipient.view.php' );
+				break;
 		}
 		break;
 

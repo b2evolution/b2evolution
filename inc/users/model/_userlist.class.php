@@ -115,6 +115,8 @@ class UserList extends DataObjectList2
 				'level_max'           => NULL,    // integer, Level max
 				'org'                 => NULL,    // integer, Organization ID
 				'newsletter'          => NULL,    // integer, Newsletter ID
+				'ecmp'                => NULL,    // integer, Email Campaign ID
+				'recipient_type'      => NULL,    // string, Recipient type of email campaign: 'filter', 'receive', 'wait'
 		) );
 	}
 
@@ -246,6 +248,16 @@ class UserList extends DataObjectList2
 			 * Restrict by newsletter
 			 */
 			memorize_param( 'newsletter', 'integer', $this->default_filters['newsletter'], $this->filters['newsletter'] );
+
+			/*
+			 * Restrict by email campaign
+			 */
+			memorize_param( 'ecmp', 'integer', $this->default_filters['ecmp'], $this->filters['ecmp'] );
+
+			/*
+			 * Restrict by recipient type of email campaign
+			 */
+			memorize_param( 'recipient_type', 'string', $this->default_filters['recipient_type'], $this->filters['recipient_type'] );
 
 			/*
 			 * Restrict by user fields
@@ -446,6 +458,16 @@ class UserList extends DataObjectList2
 		 */
 		$this->filters['newsletter'] = param( 'newsletter', 'integer', $this->default_filters['newsletter'], true );
 
+		/*
+		 * Restrict by email campaign ID
+		 */
+		$this->filters['ecmp'] = param( 'ecmp', 'integer', $this->default_filters['ecmp'], true );
+
+		/*
+		 * Restrict by recipient type of email campaign
+		 */
+		$this->filters['recipient_type'] = param( 'recipient_type', 'string', $this->default_filters['recipient_type'], true );
+
 		// 'paged'
 		$this->page = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 
@@ -540,6 +562,7 @@ class UserList extends DataObjectList2
 			$this->UserQuery->where_organization( $org_ID );
 		}
 		$this->UserQuery->where_newsletter( $this->filters['newsletter'] );
+		$this->UserQuery->where_email_campaign( $this->filters['ecmp'], $this->filters['recipient_type'] );
 		if( isset( $this->query_params['where_viewed_user'] ) )
 		{	// Filter by user profile viewed:
 			$this->UserQuery->where_viewed_user( $this->query_params['where_viewed_user'] );

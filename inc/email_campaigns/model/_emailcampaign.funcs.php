@@ -76,6 +76,16 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		$modes['send']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'send'} );";
 	}
 
+	$url = $edit_url.$glue.'tab=recipient'.$glue.'filter=new';
+	$modes['recipient'] = array(
+		'text' => T_('Recipient list'),
+		'href' => $url
+	);
+	if( $current_User->check_perm( 'emails', 'edit' ) )
+	{ // User must has a permission to edit emails
+		$modes['recipient']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'recipient'} );";
+	}
+
 	return $modes;
 }
 

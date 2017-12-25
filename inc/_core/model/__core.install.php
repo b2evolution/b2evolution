@@ -490,6 +490,7 @@ $schema_queries = array(
 			enlt_name   VARCHAR(255) NOT NULL,
 			enlt_label  VARCHAR(255) NULL,
 			enlt_active TINYINT(1) UNSIGNED DEFAULT 1,
+			enlt_order  INT NULL DEFAULT NULL,
 			PRIMARY KEY (enlt_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 

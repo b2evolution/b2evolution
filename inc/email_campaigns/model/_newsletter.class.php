@@ -31,6 +31,8 @@ class Newsletter extends DataObject
 
 	var $active = 1;
 
+	var $order;
+
 	/**
 	 * Constructor
 	 *
@@ -47,6 +49,7 @@ class Newsletter extends DataObject
 			$this->name = $db_row->enlt_name;
 			$this->label = $db_row->enlt_label;
 			$this->active = $db_row->enlt_active;
+			$this->order = $db_row->enlt_order;
 		}
 	}
 
@@ -97,6 +100,10 @@ class Newsletter extends DataObject
 		// Label:
 		param( 'enlt_label', 'string', NULL );
 		$this->set_from_Request( 'label', 'enlt_label', true );
+
+		// Order:
+		param( 'enlt_order', 'integer', NULL );
+		$this->set_from_Request( 'order', 'enlt_order', true );
 
 		return ! param_errors_detected();
 	}

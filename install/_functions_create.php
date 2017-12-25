@@ -1805,9 +1805,9 @@ function create_default_newsletters()
 	if( $create_sample_contents )
 	{
 		// Insert default newsletters:
-		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label )
-			VALUES ( "News", "Send me news about this site." ),
-			       ( "Promotions", "I want to receive ADs that may be relevant to my interests." )' );
+		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order )
+			VALUES ( "News", "Send me news about this site.", 1 ),
+			       ( "Promotions", "I want to receive ADs that may be relevant to my interests.", 2 )' );
 
 		// Insert default subscriptions for each user on first newsletter:
 		$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
