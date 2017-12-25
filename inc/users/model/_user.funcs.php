@@ -5817,8 +5817,8 @@ function users_results( & $UserList, $params = array() )
 	{ // Display email campaign send date:
 		$UserList->cols[] = array(
 				'th' => T_('Send date'),
-				'th_class' => 'shrinkwrap small',
-				'td_class' => 'center small nowrap',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
 				'order' => 'emlog_timestamp',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #emlog_timestamp# )%',

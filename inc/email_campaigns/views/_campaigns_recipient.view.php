@@ -30,6 +30,9 @@ users_results_block( array(
 		'display_btn_adduser'  => false,
 		'display_btn_addgroup' => false,
 		'display_avatar'       => false,
+		'display_firstname'    => true,
+		'display_lastname'     => true,
+		'display_name'         => false,
 		'display_gender'       => false,
 		'display_country'      => false,
 		'display_blogs'        => false,
@@ -46,5 +49,9 @@ users_results_block( array(
 		'display_actions'      => false,
 		'display_newsletter'   => false,
 		'display_emlog_date'   => true,
+		'th_class_login'       => 'shrinkwrap',
+		'td_class_login'       => '',
+		'th_class_nickname'    => 'shrinkwrap',
+		'td_class_nickname'    => '',
 	) );
 ?>
