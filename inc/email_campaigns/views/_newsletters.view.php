@@ -91,6 +91,41 @@ $Results->cols[] = array(
 		'td_class' => 'right',
 	);
 
+/*
+ * Get a state of enabling newsletter by default for new registered users
+ */
+function newsletters_td_new_users( $enlt_ID )
+{
+	global $Settings;
+
+	$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
+
+	if( in_array( $enlt_ID, $def_newsletters ) )
+	{
+		$title = T_('Disable the newsletter by default for new users');
+		$icon = 'bullet_full';
+		$action = 'disable';
+	}
+	else
+	{
+		$title = T_('Enable the newsletter by default for new users');
+		$icon = 'bullet_empty';
+		$action = 'enable';
+	}
+
+	return action_icon( $title, $icon,
+		regenerate_url( 'ctrl,action', 'ctrl=newsletters&amp;action='.$action
+			.'&amp;enlt_ID='.$enlt_ID
+			.'&amp;'.url_crumb( 'newsletter' ) ) );
+}
+$Results->cols[] = array(
+		'th' => T_('New users'),
+		'order' => 'enlt_ord',
+		'td' => '%newsletters_td_new_users( #enlt_ID# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'center',
+	);
+
 $Results->cols[] = array(
 		'th' => T_('Actions'),
 		'th_class' => 'shrinkwrap',
