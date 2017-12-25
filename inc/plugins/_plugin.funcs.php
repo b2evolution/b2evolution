@@ -85,7 +85,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	// Passthrough some attributes to elements:
 	foreach( $parmeta as $k => $v )
 	{
-		if( in_array( $k, array( 'id', 'class', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength' ) ) )
+		if( in_array( $k, array( 'id', 'class', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength', 'placeholder' ) ) )
 		{
 			$params[$k] = $v;
 		}
@@ -161,6 +161,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
  				}
  				$Form->begin_fieldset( $fieldset_title.$help_icon, $fieldset_params );	
+
 				break;
 
 			case 'end_fieldset':
@@ -423,6 +424,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  				}
  				$Form->begin_fieldset( $fieldset_title, $fieldset_params );	
 
+
 				if( ! empty($params['note']) )
 				{
 					echo '<p class="notes">'.$params['note'].'</p>';
@@ -461,6 +463,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			{ // Display value of the setting. It may be empty, if there's no set yet.
 				foreach( $disp_arrays as $k => $v )
 				{
+					$fieldset_params = array(
+							'class' => 'bordered',
+							// Unique ID of fieldset(Also used to store a folding state in user settings or in user per collection settings):
+							'id'    => isset( $parmeta['id'] ) ? $parmeta['id'] : $parname.'_'.$k_nb,
+						);
 					$remove_action = '';
 					if( ! isset($parmeta['min_count']) || count($set_value) > $parmeta['min_count'] )
 					{ // provide icon to remove this set
@@ -476,11 +483,12 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 										var element_id = '".$fieldset_params['id']."';
 										element_id = '#'+element_id.replace(/(\[|\])/g, &quot;\\\\$1&quot;);
 										jQuery(element_id).remove();
+
 										return false;",
 									)
 								).'</span>';
 					}
-					
+
  					if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
  					{	// Enable folding for the fieldset:
  						$fieldset_params['fold'] = $parmeta['fold'];
@@ -630,6 +638,21 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			if( isset( $parmeta['hide_label'] ) )
 			{ // This param is used to hide a label
 				$params['hide_label'] = $parmeta['hide_label'];
+			}
+
+			if( $parmeta['type'] == 'integer' )
+			{	// Set special type 'number' for integer param to initialize control arrows to allow increase/decrease a value:
+				$params['type'] = 'number';
+				if( isset( $parmeta['valid_range']['min'] ) )
+				{	// Restrict with min value:
+					$params['min'] = $parmeta['valid_range']['min'];
+				}
+				if( isset( $parmeta['valid_range']['max'] ) )
+				{	// Restrict with max value:
+					$params['max'] = $parmeta['valid_range']['max'];
+				}
+				// Input number element doesn't support attribute "size", so we have only one way to set width with style:
+				$params['style'] = 'width:'.( 40 + $size * 8 ).'px';
 			}
 
 			$Form->text_input( $input_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params
@@ -1073,8 +1096,11 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 	if( isset( $parmeta['type'] ) && $parmeta['type'] == 'integer' )
 	{	// Convert to correct integer value:
-		$l_value = intval( $l_value );
-		if( $l_value == 0 && ! empty( $parmeta['allow_empty'] ) &&
+		if( $l_value !== '' )
+		{	// Don't convert empty string '' to integer 0:
+			$l_value = intval( $l_value );
+		}
+		if( empty( $l_value ) && ! empty( $parmeta['allow_empty'] ) &&
 				isset( $parmeta['valid_range'], $parmeta['valid_range']['min'] ) && $parmeta['valid_range']['min'] > 0 )
 		{	// Convert 0 to empty value for integer field if it allows empty values:
 			$l_value = NULL;
@@ -1249,6 +1275,14 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 
 		switch( $meta['type'] )
 		{
+			case 'text':
+				if( isset( $meta['allow_empty'] ) && ! $meta['allow_empty'] && $value === '' )
+				{	// Display error if the text field is required to be not empty:
+					param_error( $param_name, sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), $meta['label'] ), T_('This field cannot be empty.') );
+					return false;
+				}
+				break;
+
 			case 'integer':
 				if( ! preg_match( '~^[-+]?\d+$~', $value ) )
 				{

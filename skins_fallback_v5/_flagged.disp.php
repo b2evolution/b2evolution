@@ -17,7 +17,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // --------------------------------- START OF POSTS -------------------------------------
 // Display message if no post:
-display_if_empty();
+display_if_empty( array(
+		'msg_empty' => sprintf( T_("You haven't flagged any post yet. You can click on the flag icon (%s) on any post in order to save it here for later review."), get_icon( 'flag_off', 'imgtag' ) )
+	) );
 
 while( mainlist_get_item() )
 {	// For each collection post, do everything below up to the closing curly brace "}"

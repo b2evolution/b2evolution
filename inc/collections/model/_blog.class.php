@@ -386,6 +386,7 @@ class Blog extends DataObject
 				$this->set_setting( 'track_unread_content', 1 );
 				$this->set_setting( 'allow_rating_comment_helpfulness', 1 );
 				$this->set_setting( 'category_ordering', 'manual' );
+				$this->set_setting( 'disp_featured_above_list', 1 );
 
 				// Try to find post type "Forum Topic" in DB
 				global $DB;
@@ -478,24 +479,15 @@ class Blog extends DataObject
 			// Language / locale:
 			if( param( 'blog_locale', 'string', NULL ) !== NULL )
 			{ // These settings can be hidden when only one locale is enabled in the system
-				if( $this->ID > 0 )
-				{
-					$this->set_from_Request( 'locale' );
-					$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
-					$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
-					$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
-				}
-				else
-				{ // default for new collections
-					$this->set_setting( 'locale_source', 'blog' );
-					$this->set_setting( 'post_locale_source', 'post' );
-					$this->set_setting( 'new_item_locale_source', 'select_coll' );
-				}
+				$this->set_from_Request( 'locale' );
+				$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
+				$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
+				$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
 			}
 
 			// Collection permissions:
 			$prev_advanced_perms = $this->get( 'advanced_perms' );
-			$new_advanced_perms = $this->ID > 0 ? param( 'advanced_perms', 'integer', 0 ) : 0;
+			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
 			$prev_allow_access = $this->get_setting( 'allow_access' );
 			$new_allow_access = param( 'blog_allow_access', 'string', '' );
 
@@ -593,10 +585,10 @@ class Blog extends DataObject
 			}
 
 			// Lists of collections:
+			$this->set( 'order', param( 'blog_order', 'integer' ) );
 			if( $this->ID > 0 )
 			{
-				$this->set( 'order', param( 'blog_order', 'integer' ) );
-				$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', 'public' ) );
+				$default_in_bloglist = 'public';
 			}
 			else
 			{
@@ -617,8 +609,8 @@ class Blog extends DataObject
 					default:
 						$default_in_bloglist = 'never';
 				}
-				$this->set( 'in_bloglist', $default_in_bloglist );
 			}
+			$this->set( 'in_bloglist', $default_in_bloglist );
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
@@ -794,17 +786,14 @@ class Blog extends DataObject
 			$this->set_from_Request( 'keywords' );
 		}
 
-		if( $this->ID > 0 )
-		{
-			if( param( 'blog_tagline', 'string', NULL ) !== NULL )
-			{	// tagline:
-				$this->set( 'tagline', get_param( 'blog_tagline' ) );
-			}
-			if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
-			{	// HTML long description:
-				param_check_html( 'blog_longdesc', T_('Invalid long description') );
-				$this->set( 'longdesc', get_param( 'blog_longdesc' ) );
-			}
+		if( param( 'blog_tagline', 'string', NULL ) !== NULL )
+		{	// tagline:
+			$this->set( 'tagline', get_param( 'blog_tagline' ) );
+		}
+		if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
+		{	// HTML long description:
+			param_check_html( 'blog_longdesc', T_('Invalid long description') );
+			$this->set( 'longdesc', get_param( 'blog_longdesc' ) );
 		}
 
 		if( param( 'blog_footer_text', 'html', NULL ) !== NULL )
@@ -991,6 +980,8 @@ class Blog extends DataObject
 			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
 			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
 			$this->set_setting( 'msgform_recipient_label', param( 'msgform_recipient_label', 'string' ) );
+			$this->set_setting( 'msgform_display_avatar', param( 'msgform_display_avatar', 'integer', 0 ) );
+			$this->set_setting( 'msgform_avatar_size', param( 'msgform_avatar_size', 'string' ) );
 			$this->set_setting( 'msgform_user_name', param( 'msgform_user_name', 'string' ) );
 			$this->set_setting( 'msgform_require_name', param( 'msgform_require_name', 'integer', 0 ) );
 			$this->set_setting( 'msgform_subject_list', param( 'msgform_subject_list', 'text' ) );
@@ -2381,10 +2372,11 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get default category for current blog
+	 * Get default category ID of the current collection
 	 *
 	 * @todo fp> this is a super lame stub, but it's still better than nothing. Should be user configurable.
 	 *
+	 * @return integer Chapter ID
 	 */
 	function get_default_cat_ID()
 	{
@@ -2392,36 +2384,37 @@ class Blog extends DataObject
 
 		if( empty( $this->default_cat_ID ) )
 		{
-			if( $default_cat_ID = $this->get_setting('default_cat_ID') )
+			if( $default_cat_ID = $this->get_setting( 'default_cat_ID' ) )
 			{	// A specific cat has previosuly been configured as the default:
-				// Try to get it from the DB (to make sure it exists and is in teh right blog):
-				$sql = 'SELECT cat_ID
-				          FROM T_categories
-				         WHERE cat_blog_ID = '.$this->ID.'
-				         	 AND cat_ID = '.$default_cat_ID;
-				$this->default_cat_ID = $DB->get_var( $sql, 0, 0, 'Get default category' );
+				// Try to get it from the DB (to make sure it exists and is in the right collection and not meta):
+				$SQL = new SQL( 'Check default category ID of collection #'.$this->ID );
+				$SQL->SELECT( 'cat_ID' );
+				$SQL->FROM( 'T_categories' );
+				$SQL->WHERE( 'cat_ID = '.$DB->quote( $default_cat_ID ) );
+				$SQL->WHERE_and( 'cat_blog_ID = '.$this->ID );
+				$SQL->WHERE_and( 'cat_meta = 0' );
+				$this->default_cat_ID = $DB->get_var( $SQL );
 			}
 		}
 
 		if( empty( $this->default_cat_ID ) )
 		{	// If the previous query has returned NULL
+			$SQL = new SQL( 'Get auto default category ID of collection #'.$this->ID );
+			$SQL->SELECT( 'cat_ID' );
+			$SQL->FROM( 'T_categories' );
+			$SQL->WHERE( 'cat_blog_ID = '.$this->ID );
+			$SQL->WHERE_and( 'cat_meta = 0' );
+			$SQL->LIMIT( '1' );
 			if( $this->get_setting('category_ordering') == 'manual' )
 			{	// Manual order
-				$select_temp_order = ', IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order';
-				$sql_order = ' ORDER BY cat_parent_ID, temp_order';
+				$SQL->SELECT_add( ', IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order' );
+				$SQL->ORDER_BY( 'cat_parent_ID, temp_order' );
 			}
 			else
 			{	// Alphabetic order
-				$select_temp_order = '';
-				$sql_order = ' ORDER BY cat_parent_ID, cat_name';
+				$SQL->ORDER_BY( 'cat_parent_ID, cat_name' );
 			}
-			$sql = 'SELECT cat_ID'.$select_temp_order.'
-			          FROM T_categories
-			         WHERE cat_blog_ID = '.$this->ID.' AND cat_meta = 0'
-			         .$sql_order
-			         .' LIMIT 1';
-
-			$this->default_cat_ID = $DB->get_var( $sql, 0, 0, 'Get default category' );
+			$this->default_cat_ID = $DB->get_var( $SQL );
 		}
 
 		return $this->default_cat_ID;
@@ -5145,6 +5138,47 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get recipient link on disp=msgform
+	 *
+	 * @return string
+	 */
+	function get_msgform_recipient_link()
+	{
+		$recipient_link = '';
+
+		if( get_param( 'recipient_id' ) > 0 )
+		{	// Get recipient identity link for registered user:
+			$UserCache = & get_UserCache();
+			$recipient_User = & $UserCache->get_by_ID( get_param( 'recipient_id' ) );
+
+			if( $this->get_setting( 'msgform_display_avatar' ) )
+			{	// Display recipient name with avatar:
+				$recipient_link_params = array(
+						'link_text'   => 'avatar_name',
+						'thumb_size'  => $this->get_setting( 'msgform_avatar_size' ),
+						'thumb_class' => 'avatar_before_login_middle',
+					);
+			}
+			else
+			{	// Display only recipient name:
+				$recipient_link_params = array( 'link_text' => 'auto' );
+			}
+			$recipient_link = $recipient_User->get_identity_link( $recipient_link_params );
+		}
+		elseif( get_param( 'comment_id' ) > 0 )
+		{	// Get login name for anonymous user:
+			$CommentCache = & get_CommentCache();
+			$Comment = & $CommentCache->get_by_ID( get_param( 'comment_id' ) );
+			// Set a gender class for anonymous user if the setting is enabled:
+			$gender_class = check_setting( 'gender_colored' ) ? ' nogender' : '';
+			$recipient_link = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$Comment->ID.'">'.$Comment->get_author_name().'</span>';
+		}
+
+		return $recipient_link;
+	}
+
+
+	/**
 	 * Get additional fields on disp=msgform
 	 *
 	 * @return array
@@ -5179,9 +5213,10 @@ class Blog extends DataObject
 	 * Display all selected additional fields on disp=msgform
 	 *
 	 * @param object Form
+	 * @param array Filled user fields from submitted form
 	 * @return array
 	 */
-	function display_msgform_additional_fields( $Form )
+	function display_msgform_additional_fields( $Form, $filled_user_fields = array() )
 	{
 		$msgform_additional_fields = $this->get_msgform_additional_fields();
 
@@ -5189,7 +5224,21 @@ class Blog extends DataObject
 		{
 			$field_value = '';
 			$field_value2 = '';
-			if( is_logged_in() )
+
+			if( ! empty( $filled_user_fields[ $UserField->ID ] ) )
+			{	// Get values from the submitted form:
+				if( is_array( $filled_user_fields[ $UserField->ID ] ) )
+				{	// Multiple field:
+					$field_value = isset( $filled_user_fields[ $UserField->ID ][0] ) ? trim( $filled_user_fields[ $UserField->ID ][0] ) : '';
+					$field_value2 = isset( $filled_user_fields[ $UserField->ID ][1] ) ? trim( $filled_user_fields[ $UserField->ID ][1] ) : '';
+				}
+				else
+				{	// Single field:
+					$field_value = $filled_user_fields[ $UserField->ID ];
+				}
+			}
+
+			if( is_logged_in() && empty( $field_value ) )
 			{	// Get saved field value from the current logged in User:
 				global $current_User;
 				$userfields = $current_User->userfields_by_ID( $UserField->ID );

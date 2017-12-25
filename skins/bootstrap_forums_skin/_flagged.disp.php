@@ -31,13 +31,16 @@ skin_widget( array(
 	) );
 
 // ---------------------------------- START OF POSTS ------------------------------------
-?>
-<div class="panel panel-default forums_list">
-	<section class="table table-hover">
-<?php
+display_if_empty( array(
+	'msg_empty' => sprintf( T_("You haven't flagged any topic yet. You can click on the flag icon (%s) on any topic in order to save it here for later review."), get_icon( 'flag_off', 'imgtag' ) )
+) );
 
 if( $MainList->result_num_rows > 0 )
 {
+?>
+<div class="panel panel-default forums_list">
+	<section class="table table-hover">
+	<?php
 	while( mainlist_get_item() )
 	{ // For each blog post, do everything below up to the closing curly brace "}"
 
@@ -48,8 +51,7 @@ if( $MainList->result_num_rows > 0 )
 			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
-}
-?>
+	?>
 	</section>
 
 	<?php
@@ -70,4 +72,5 @@ if( $MainList->result_num_rows > 0 )
 </div>
 <?php
 // ---------------------------------- END OF POSTS ------------------------------------
+}
 ?>

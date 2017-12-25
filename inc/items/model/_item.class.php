@@ -882,9 +882,43 @@ class Item extends ItemLight
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
 		if( $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
 		{	// only admins can change the owner..
-			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) && param_check_login( 'item_owner_login', true ) )
-			{
-				$this->set_creator_by_login( $this->creator_user_login );
+			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) )
+			{	// If valid user login is entered:
+				if( param( 'item_create_user', 'integer', 0 ) )
+				{	// Try to create new user if it is checked on the edit item form:
+					$UserCache = & get_UserCache();
+
+					// Convert new entered login to proper login format:
+					$this->creator_user_login = preg_replace( '/[^a-z0-9 ]/i', '', $this->creator_user_login );
+					$this->creator_user_login = str_replace( ' ', '_', $this->creator_user_login );
+					$this->creator_user_login = utf8_substr( $this->creator_user_login, 0, 20 );
+					set_param( 'item_owner_login', $this->creator_user_login );
+
+					if( ( $creator_User = & $UserCache->get_by_login( $this->creator_user_login ) ) !== false )
+					{	// Display error if user already exists:
+						param_error( 'item_owner_login', sprintf( T_('User "%s" already exists.'), $this->creator_user_login ) );
+					}
+					else
+					{	// Create new user:
+						$item_new_User = new User();
+						$item_new_User->set( 'login', $this->creator_user_login );
+						$item_new_User->set( 'email', $this->creator_user_login.'@dummy.null' );
+						$item_new_User->set( 'source', 'created alongside post' );
+						$item_new_User->set( 'pass', '' );
+						$item_new_User->set( 'salt', '' );
+						$item_new_User->set( 'pass_driver', 'nopass' );
+						$item_new_User->dbinsert();
+						// Update user login cache with new created User:
+						$UserCache->cache_login[ $this->creator_user_login ] = $item_new_User;
+						// Uncheck the checkbox to don't suggest create new user on next form updating because the user already has been created with requested login:
+						set_param( 'item_create_user', 0 );
+					}
+				}
+
+				if( param_check_login( 'item_owner_login', true ) )
+				{	// Update item's owner if the user is detected in DB by the entered login:
+					$this->set_creator_by_login( $this->creator_user_login );
+				}
 			}
 		}
 
@@ -2832,6 +2866,8 @@ class Item extends ItemLight
 
 		$ItemCache = & get_ItemCache();
 
+		$item_Blog = & $this->get_Blog();
+
 		foreach( $tags[0] as $t => $source_tag )
 		{
 			$item_ID_slug = trim( $tags[1][ $t ] );
@@ -2853,6 +2889,22 @@ class Item extends ItemLight
 				}
 				// Replace inline content block tag with error message about wrong referenced item:
 				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
+				continue;
+			}
+			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
+			{	// Deny to display content block Item with lower status than parent Item:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The visibility level of the content bock "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				continue;
+			}
+			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
+			        ( ! $item_Blog || $content_Item->get( 'creator_user_ID' ) != $item_Blog->get( 'owner_user_ID' ) ) &&
+			        ( ! $item_Blog || $content_Item->get_blog_ID() != $item_Blog->ID )
+			      )
+			{	// We can display a content block item with at least one condition:
+				//  - Content block Item has same owner as owner of parent Item,
+				//  - Content block Item has same owner as owner of parent Item's collection,
+				//  - Content block Item is in same collection as parent Item:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 
@@ -6457,7 +6509,12 @@ class Item extends ItemLight
 
 			$DB->commit();
 
-			$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+			if( empty( $this->AfterItemUpdate_is_executed ) )
+			{	// Execute this event once per request:
+				$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+				// Set flag to know we have already executed this plugin event:
+				$this->AfterItemUpdate_is_executed = true;
+			}
 		}
 
 		if( $db_changed )

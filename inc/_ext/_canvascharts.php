@@ -34,7 +34,7 @@ jQuery( window ).load( function()
 	foreach( $chart['chart_data'] as $i => $data )
 	{
 		if( $i > 0 )
-		{ 
+		{
 			// Legend label
 			$jqplot_legend[] = $data[0];
 			// Data
@@ -76,7 +76,7 @@ jQuery( window ).load( function()
 	} );
 
 	var data = [<?php echo implode( ',', $jqplot_data ); ?>];
-	jQuery.jqplot( 'canvasbarschart', data, {
+	var plot = jQuery.jqplot( 'canvasbarschart', data, {
 		seriesColors: [ '#<?php echo implode( '\', \'#', $chart[ 'series_color' ] ); ?>' ],
 		stackSeries: true,
 		animate: !$.jqplot.use_excanvas,
@@ -151,6 +151,8 @@ jQuery( window ).load( function()
 		}
 		<?php } ?>
 	} );
+
+	jQuery( '#canvasbarschart' ).data( 'plot', plot );
 
 	// Highlight legend
 	jQuery( '#canvasbarschart' ).bind( 'jqplotDataHighlight', function( ev, seriesIndex, pointIndex, data )

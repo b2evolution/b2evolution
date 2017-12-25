@@ -489,6 +489,10 @@ switch( $action )
 		$request_from = param( 'request_from', 'string', 'items' );
 		$comment_type = param( 'comment_type', 'string', 'feedback' );
 
+		// Ininitialize global collection object:
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog );
+
 		// Check minimum permissions ( The comment specific permissions are checked when displaying the comments )
 		$current_User->check_perm( 'blog_ismember', 'view', true, $blog );
 

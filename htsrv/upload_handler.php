@@ -132,7 +132,7 @@ class UploadHandler {
 		if( $this->toBytes( ini_get( 'post_max_size' ) ) < $this->sizeLimit || $this->toBytes( ini_get( 'upload_max_filesize') ) < $this->sizeLimit )
 		{
 			$neededRequestSize = max( 1, $this->sizeLimit / 1024 / 1024 ) . 'M';
-			return array( 'error' => sprintf( T_('Server error. Increase post_max_size and upload_max_filesize to %s'), $neededRequestSize ) );
+			return array( 'error' => sprintf( /* NO TRANS for sysadmins */ 'Server error. Increase post_max_size and upload_max_filesize to %s', $neededRequestSize ) );
 		}
 
 		$type = $_SERVER['CONTENT_TYPE'];
@@ -147,7 +147,7 @@ class UploadHandler {
 		}
 		elseif ( strpos( strtolower( $type ), 'multipart/' ) !== 0 )
 		{
-			return array( 'error' => T_('Server error. Not a multipart request. Please set forceMultipart to default value (true).') );
+			return array( 'error' => /* NO TRANS for sysadmins */ 'Server error. Not a multipart request. Please set forceMultipart to default value (true).' );
 		}
 
 		// Get size and name
@@ -202,7 +202,7 @@ class UploadHandler {
 			$partIndex = ( int ) $_REQUEST['qqpartindex'];
 			if( ! is_writable( $chunksFolder ) )
 			{
-				return array( 'error' => T_('Server error. Chunks directory isn\'t writable or executable.') );
+				return array( 'error' => /* NO TRANS for sysadmins */ 'Server error. Chunks directory isn\'t writable or executable.' );
 			}
 			$targetFolder = $this->chunksFolder.DIRECTORY_SEPARATOR.$uuid;
 			if( ! file_exists( $targetFolder ) )
@@ -250,7 +250,7 @@ class UploadHandler {
 	{
 		if( $this->isInaccessible( $uploadDirectory ) )
 		{
-			return array( 'error' => T_('Server error. Uploads directory isn\'t writable') . ( ( ! $this->isWindows() ) ? " or executable." : "." ) );
+			return array( 'error' => /* NO TRANS for sysadmins */ 'Server error. Uploads directory isn\'t writable'. ( ( ! $this->isWindows() ) ? ' or executable.' : '.' ) );
 		}
 		$targetFolder = $uploadDirectory;
 		$url = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );

@@ -48,6 +48,10 @@ $submit_button = array(
 	'value' => T_('Log in!'),
 	'class' => 'submit' );
 $Form->begin_fieldset( '', array( 'class' => 'fieldset field_login_btn' ) );
+if( $Widget && $Widget->get_param( 'button_class' ) )
+{
+	$submit_button['class'] .= ' '.$Widget->get_param( 'button_class' );
+}
 $Form->button_input( $submit_button );
 if( $Widget && $Widget->get_param('password_link_show') )
 { // Display a link to recovery password

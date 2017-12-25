@@ -143,7 +143,7 @@ if( count( $chapters ) > 0 )
 			</div>
 			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s topics'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
 			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_commentcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
-			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().' '.locale_shorttimefmt() ); ?></div>
+			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().'<\b\r>'.locale_shorttimefmt() ); ?></div>
 			<!-- Apply this on XS size -->
 			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( locale_datefmt() ); ?></div>
 		</article>
@@ -164,8 +164,12 @@ if( count( $chapters ) > 0 )
 }
 
 // ---------------------------------- START OF POSTS ------------------------------------
-if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs ) ||
-   ( isset( $current_Chapter ) && ! $current_Chapter->meta ) /* Note: the meta categories cannot contain the posts */ ) )
+if( isset( $MainList ) &&
+    ( ! isset( $current_Chapter ) || ! $current_Chapter->meta ) && // Note: the meta categories cannot contain the posts
+    ( empty( $single_cat_ID ) || // disp=posts List all posts
+      ! empty( $multi_cat_IDs ) || // Filter for several categories
+      isset( $current_Chapter ) ) // Posts of the current viewed category ($disp_detail = posts-cat)
+  )
 {
 	echo !empty( $chapters ) ? '<br />' : '';
 ?>
@@ -193,9 +197,9 @@ if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs )
 <?php
 
 if( $single_cat_ID )
-{ // Go to grab the featured posts only on pages with defined category:
-	while( $Item = & get_featured_Item() )
-	{ // We have a intro post to display:
+{	// Go to grab the intro/featured posts only on pages with defined category:
+	while( $Item = & get_featured_Item( 'posts', NULL, false, true ) )
+	{	// We have the intro or featured posts to display:
 		// ---------------------- ITEM LIST INCLUDED HERE ------------------------
 		skin_include( '_item_list.inc.php', array(
 				'Item' => $Item
@@ -230,8 +234,22 @@ elseif( isset( $current_Chapter ) )
 
 	<div class="panel-body comments_link__pagination">
 	<?php
+		if( ! is_logged_in() )
+		{
+			$register_link = '';
+			$login_link = '<a class="btn btn-primary btn-sm" href="'.get_login_url( 'cannot post' ).'">'.T_( 'Log in now!' ).'</a>';
+			if( ( $Settings->get( 'newusers_canregister' ) == 'yes' ) && ( $Settings->get( 'registration_is_public' ) ) )
+			{
+				$register_link = '<a class="btn btn-primary btn-sm" href="'.get_user_register_url( NULL, 'reg to post' ).'">'.T_( 'Register now!' ).'</a>';
+			}
+			echo '<p class="alert alert-warning">';
+			echo T_( 'In order to start a new topic' ).' '.$login_link.( ! empty( $register_link ) ? ' '.T_('or').' '.$register_link : '' );
+			echo '</p>';
+		}
+
 		// Buttons to post/reply
 		$Skin->display_post_button( $single_cat_ID );
+
 		if( check_user_status( 'can_be_validated' ) )
 		{	// Display a warning if current user cannot post a topic because he must activate account:
 			global $Messages;

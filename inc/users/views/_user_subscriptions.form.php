@@ -155,7 +155,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Receiving private messages').( is_admin_page() ? get_manual_link( 'user-communications-panel' ) : '' ) );
 
 	$has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
-	$messaging_options = array(	array( 'PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
+	$messaging_options = array(	array( 'enable_PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
 	$emails_msgform = $Settings->get( 'emails_msgform' );
 
 	$email_messaging_note = '';
@@ -173,11 +173,12 @@ $Form->begin_fieldset( T_('Receiving private messages').( is_admin_page() ? get_
 	$msgform_checklist_params = $checklist_params;
 	if( $emails_msgform == 'userset' )
 	{ // user can set
-		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
+		$messaging_options[] = array( 'enable_email', 1, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
 	}
-	elseif( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) )
+	elseif( ( $emails_msgform == 'adminset' ) )
 	{ // only administrator users can set and current User is in 'Administrators' group
-		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ).get_admin_badge( 'user' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
+		$is_disabled_email_method = ( ! $current_User->check_perm( 'users', 'edit' ) );
+		$messaging_options[] = array( 'enable_email', 1, T_( 'emails through a message form that will NOT reveal my email address.' ).get_admin_badge( 'user' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $is_disabled_email_method, $email_messaging_note );
 	}
 	elseif( ! empty( $email_messaging_note ) )
 	{	// Display red message to inform user when he don't have a permission to edit the setting:

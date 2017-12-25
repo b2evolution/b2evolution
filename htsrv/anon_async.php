@@ -64,7 +64,11 @@ $params = param( 'params', 'array', array() );
 switch( $action )
 {
 	case 'get_comment_form':
-		// display comment form
+		// Display comment form:
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
 		$ItemCache = & get_ItemCache();
 		$Item = $ItemCache->get_by_ID( $item_ID );
 		$BlogCache = & get_BlogCache();
@@ -101,22 +105,6 @@ switch( $action )
 		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 		locale_activate( $Blog->get('locale') );
-
-		if( $recipient_id > 0 )
-		{ // Get identity link for existed users
-			$RecipientCache = & get_UserCache();
-			$Recipient = $RecipientCache->get_by_ID( $recipient_id );
-			$recipient_link = $Recipient->get_identity_link( array( 'link_text' => 'nickname' ) );
-		}
-		else if( $comment_id > 0 )
-		{ // Anonymous Users
-			$gender_class = '';
-			if( check_setting( 'gender_colored' ) )
-			{ // Set a gender class if the setting is ON
-				$gender_class = ' nogender';
-			}
-			$recipient_link = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$comment_id.'">'.$recipient_name.'</span>';
-		}
 
 		$blog_skin_ID = $Blog->get_skin_ID();
 		if( ! empty( $blog_skin_ID ) )
@@ -612,6 +600,8 @@ switch( $action )
 					{ // Update a vote of current user
 						$Item->set_vote( $field_value );
 						$Item->dbupdate();
+						// Invalidate key for the voted Item:
+						BlockCache::invalidate_key( 'item_ID', $Item->ID );
 					}
 				}
 

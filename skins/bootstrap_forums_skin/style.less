@@ -247,9 +247,11 @@ ol.breadcrumb {
 			display: inline-block;
 		}
 	}
-	// .ft_date margin is set separately because we handle the same CSS for both .ft_date and .ft_workflow_info, only margin is different
 	.ft_date {
-		margin-top: 17px;
+		// .ft_date margin is set separately because we handle the same CSS for both .ft_date and .ft_workflow_info, only margin is different
+		margin-top: 10px;
+		text-align: center;
+		white-space: nowrap;
 	}
 	// When Enabled "Workflow" option, we use .ft_workflow_info instead of .ft_date
 	.ft_workflow_info {
@@ -274,10 +276,6 @@ ol.breadcrumb {
 			float: none;
 			margin-right: 0;
 		}
-	}
-	.ft_date {
-		text-align: center;
-		white-space: nowrap;
 	}
 	.ft_date_shrinked, .ft_date_shrinked_more {
 		display: none;
@@ -697,6 +695,86 @@ aside .widget_core_coll_search_form {
 	}
 }
 
+// Login widget form
+.widget_core_user_login {
+	#login_form {
+		.form-group {
+			margin: 0;
+		}
+		label {
+			text-align: left;
+			width: 160px;
+			padding-left: 0;
+		}
+		.controls {
+			padding: 0;
+			width: 100%;
+		}
+		.form_text_input.form-control {
+			width: 100%;
+		}
+	}
+
+	.field_login_btn {
+		.panel {
+			margin: 0;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			.panel-body {
+				padding-left: 0;
+				padding-right: 0;
+				padding-bottom: 0;
+				#submit_login_form {
+					margin-right: 10px;
+				}
+			}
+		}
+	}
+	.register_link {
+		display: block;
+		padding-top: 10px;
+	}
+}
+
+// Register widget form
+.widget_core_user_register {
+	#register_form {
+		.form-group {
+			margin: 0;
+		}
+		label {
+			text-align: left;
+			width: 160px;
+			padding-left: 0;
+		}
+		.controls {
+			padding: 0;
+			width: 100%;
+		}
+		.form_text_input.form-control {
+			width: 100%;
+		}
+	}
+
+	.field_register_btn {
+		.panel {
+			margin: 0;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			.panel-body {
+				padding-left: 0;
+				padding-right: 0;
+				padding-bottom: 0;
+				#submit_login_form {
+					margin-right: 10px;
+				}
+			}
+		}
+	}
+}
+
 // Search disp
 .extended_search_form {
 	width: 100%;
@@ -774,6 +852,11 @@ aside .widget_core_coll_search_form {
 	.forums_list .pagination {
 		float: right;
 		margin-left: 10px;
+	}
+	// Remove float properties from main and sidebar columns because they use 100% width on current screen size:
+	// (it was done to fix issue with .ellipsis when sidebar on the left)
+	div.col-md-9.pull-right, aside.col-md-3.pull-left {
+		float: none !important;
 	}
 }
 //@media screen and (min-width: 600px) and (max-width: 767px) {

@@ -25,7 +25,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.9.4';
+	var $version = '6.10.0';
 	var $number_of_installs = 1;
 
 
@@ -332,17 +332,17 @@ class videoplug_plugin extends Plugin
 						case 'youtube':
 							// Allow HD video code with ?hd=1 at the end
 							regexp_ID = /^[a-z0-9_?=-]+$/i;
-							regexp_URL = /^.+(video\/|\/watch\?v=|embed\/|\/)([a-z0-9_?=-]+)$/i;
+							regexp_URL = /^.+(video\/|\/watch\?v=|embed\/|\/)([a-z0-9_?=-]+)(&.+)?$/i;
 							break;
 
 						case 'dailymotion':
 							regexp_ID = /^[a-z0-9]+$/i;
-							regexp_URL = /^(.+\/video\/)?([a-z0-9]+)(_[a-z0-9_-]+)?$/i;
+							regexp_URL = /^(.+\/video\/)?([a-z0-9]+)(_[a-z0-9_-]+)?(\?.+)?$/i;
 							break;
 
 						case 'vimeo':
 							regexp_ID = /^\d+$/;
-							regexp_URL = /^(.+\/)?(\d+)$/;
+							regexp_URL = /^(.+\/)?(\d+)(\?.+)?$/;
 							break;
 
 						case 'facebook':

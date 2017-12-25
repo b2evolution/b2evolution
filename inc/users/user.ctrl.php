@@ -372,6 +372,9 @@ if( !$Messages->has_errors() )
 				}
 				 */
 
+				// Update the folding states for current user:
+				save_fieldset_folding_values();
+
 				if( $UserSettings->dbupdate() )
 				{
 					$Messages->add( T_('User feature settings have been changed.'), 'success');

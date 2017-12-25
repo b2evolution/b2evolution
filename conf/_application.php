@@ -15,13 +15,13 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '6.9.4-stable';
+$app_version = '6.10.0-beta';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2017-11-25';
+$app_date = '2017-12-21';
 
 /**
  * Long version string for checking differences
@@ -42,13 +42,13 @@ $new_db_version = 12360;
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
  * @global array
  */
-$required_php_version = array( 'application' => '5.2' );
+$required_php_version = array( 'application' => '5.4' );
 
 /**
  * Minimum MYSQL version required for b2evolution to function properly. It will contain each module own minimum MYSQL version as well.
  * @global array
  */
-$required_mysql_version = array( 'application' => '5.0.3' );
+$required_mysql_version = array( 'application' => '5.1' );
 
 /**
  * Is displayed on the login screen:

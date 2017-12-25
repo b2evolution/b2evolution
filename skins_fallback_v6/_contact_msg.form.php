@@ -37,6 +37,7 @@ $submit_url = get_htsrv_url().'message_send.php';
 if( ( $unsaved_message_params = get_message_params_from_session() ) == NULL )
 { // set message default to empty string
 	$message = '';
+	$user_fields = array();
 }
 else
 { // set saved message params
@@ -44,6 +45,7 @@ else
 	$subject_other = $unsaved_message_params[ 'subject_other' ];
 	$message = $unsaved_message_params[ 'message' ];
 	$contact_method = $unsaved_message_params[ 'contact_method' ];
+	$user_fields = $unsaved_message_params[ 'user_fields' ];
 	$email_author = $unsaved_message_params[ 'sender_name' ];
 	$email_author_address = $unsaved_message_params[ 'sender_address' ];
 }
@@ -69,7 +71,14 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 	if( $Blog->get_setting( 'msgform_display_recipient' ) )
 	{	// Display recipient:
 		$recipient_label = utf8_trim( $Blog->get_setting( 'msgform_recipient_label' ) );
-		$Form->info( ( empty( $recipient_label ) ? T_('Message to') : $recipient_label ), $recipient_link );
+		$Form->info_field( ( empty( $recipient_label ) ? T_('Message to') : $recipient_label ), $Blog->get_msgform_recipient_link(), array( 'class' => 'evo_msgform_recipient' ) );
+	}
+
+	if( is_logged_in() &&
+	    ! empty( $recipient_User ) &&
+	    $recipient_User->get_msgform_possibility() == 'email' )
+	{	// Display email address of current User if recipient User can recieves messages only by email:
+		$Form->info( T_('Reply to'), $current_User->get( 'email' ) );
 	}
 
 	if( is_logged_in() )
@@ -136,8 +145,8 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 		}
 	}
 
-	// Display additional user feilds:
-	$Blog->display_msgform_additional_fields( $Form );
+	// Display additional user fields:
+	$Blog->display_msgform_additional_fields( $Form, $user_fields );
 
 	if( $Blog->get_setting( 'msgform_contact_method' ) )
 	{	// Display a field to select a preferred contact method:
