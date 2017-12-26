@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-12-26 18:07+0100\n"
+"POT-Creation-Date: 2017-12-26 22:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1621,7 +1621,7 @@ msgid "Invalid unsubscribe link!"
 msgstr ""
 
 #: ../../../htsrv/quick_unsubscribe.php:220
-msgid "You are not subscribed on this newsletter."
+msgid "You are not subscribed to this newsletter."
 msgstr ""
 
 #: ../../../htsrv/quick_upload.php:73
@@ -13610,7 +13610,7 @@ msgid "Newsletter of the email campaign has been updated."
 msgstr ""
 
 #: ../../../inc/email_campaigns/campaigns.ctrl.php:189
-msgid "Please select another newsletter because it cannot be used for email campaign."
+msgid "Selected newsletter cannot be used for email campaign."
 msgstr ""
 
 #: ../../../inc/email_campaigns/campaigns.ctrl.php:244
@@ -13740,7 +13740,7 @@ msgstr ""
 
 #: ../../../inc/email_campaigns/model/_newsletter.class.php:65
 #, php-format
-msgid "%d campaigns are assigned to this newsletter"
+msgid "%d campaigns are linked to this newsletter"
 msgstr ""
 
 #: ../../../inc/email_campaigns/model/_newsletter.class.php:78
