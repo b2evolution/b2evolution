@@ -293,6 +293,8 @@ switch( $action )
 			$new_User->set( 'pass', '' );
 			$new_User->set( 'salt', '' );
 			$new_User->set( 'pass_driver', 'nopass' );
+			// Set newsletters from current widget "Email capture / Quick registration":
+			$new_User->set_newsletter_subscriptions( array_keys( $user_register_Widget->get_param( 'newsletters' ) ) );
 		}
 		else
 		{	// Save an entered password from normal registration form:
@@ -449,6 +451,33 @@ switch( $action )
 		// Autologin the user. This is more comfortable for the user and avoids
 		// extra confusion when account validation is required.
 		$Session->set_User( $new_User );
+
+		// Set redirect_to from current widget:
+		if( isset( $user_register_Widget ) )
+		{	// If widget is defined:
+			$widget_redirect_to = trim( $user_register_Widget->get_param( 'redirect_to' ) );
+			if( ! empty( $widget_redirect_to ) )
+			{	// If a redirect param is defined:
+				if( preg_match( '#^(https?://|/)#i', $widget_redirect_to ) )
+				{	// Use absolute or relative url:
+					$widget_redirect_to_url = $widget_redirect_to;
+				}
+				else
+				{	// Try to find Item by slug:
+					$ItemCache = & get_ItemCache();
+					if( $widget_redirect_Item = & $ItemCache->get_by_urltitle( $widget_redirect_to, false, false ) )
+					{	// Use permanent url of the detected Item by slug:
+						$widget_redirect_to_url = $widget_redirect_Item->get_permanent_url( '', '', '&' );
+					}
+				}
+
+				if( isset( $widget_redirect_to_url ) )
+				{	// Redirect to URL from widget config:
+					header_redirect( $widget_redirect_to_url );
+					// Exit here.
+				}
+			}
+		}
 
 		// Set redirect_to pending from after_registration setting
 		$after_registration = $Settings->get( 'after_registration' );

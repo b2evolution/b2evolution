@@ -2458,6 +2458,10 @@ class User extends DataObject
 			case 'level':
 				return $this->set_param( $parname, 'number', $parvalue, $make_null );
 
+			case 'source':
+				// Limit source with 30 char because of this DB field max length:
+				return $this->set_param( $parname, 'string', utf8_substr( $parvalue, 0, 30 ), $make_null );
+
 			case 'ctry_ID':
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
@@ -3719,11 +3723,19 @@ class User extends DataObject
 				$this->new_fields = array();
 			}
 
+			$insert_newsletters = array();
 			if( isset( $Settings ) )
 			{	// Insert default newsletter subscriptions for this user,
 				// Only when general settings are defined (to avoid error on install process):
-				$def_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', $Settings->get( 'def_newsletters' ) ) );
-				$this->insert_newsletter_subscriptions( $def_newsletters );
+				$insert_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', $Settings->get( 'def_newsletters' ) ) );
+			}
+			if( ! empty( $this->newsletter_subscriptions ) )
+			{	// Also insert additional newsletters(e-g from widget "Email capture / Quick registration"):
+				$insert_newsletters = array_merge( $insert_newsletters, $this->newsletter_subscriptions );
+			}
+			if( ! empty( $insert_newsletters ) )
+			{	// Do insertion if at least one newsletter is selected by default:
+				$this->insert_newsletter_subscriptions( array_unique( $insert_newsletters ) );
 			}
 
 			// Notify plugins:
@@ -7291,8 +7303,8 @@ class User extends DataObject
 	/**
 	 * Insert newsletter subscriptions for this user
 	 *
-	 * @param array Mewsletter IDs
-	 * @return boolean TRUE on success updating
+	 * @param array Newsletter IDs
+	 * @return boolean TRUE on success inserting
 	 */
 	function insert_newsletter_subscriptions( $newsletter_IDs )
 	{

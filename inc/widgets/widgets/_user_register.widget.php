@@ -83,6 +83,29 @@ class user_register_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $Settings;
+
+		// Load all active newsletters:
+		$NewsletterCache = & get_NewsletterCache();
+		$load_where = 'enlt_active = 1';
+		/*$selected_newsletters = $this->get_param( 'newsletters', true );
+		if( empty( $params['infinite_loop'] ) && ! empty( $selected_newsletters ) )
+		{	// Load additional newsletters which are currently used by this widget:
+			global $DB;
+			$load_where .= ' OR enlt_ID IN ( '.$DB->quote( array_keys( $selected_newsletters ) ).' )';
+		}*/
+		$NewsletterCache->load_where( $load_where );
+		// Initialize checkbox options for param "Newsletter":
+		$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
+		foreach( $NewsletterCache->cache as $Newsletter )
+		{
+			$newsletters_options[] = array(
+				$Newsletter->ID,
+				$Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ),
+				in_array( $Newsletter->ID, $def_newsletters ) ? 1 : 0, // checked by default
+			);
+		}
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
@@ -121,8 +144,15 @@ class user_register_Widget extends ComponentWidget
 				'source' => array(
 					'label' => T_('Source code'),
 					'note' => '',
-					'size' => 40,
+					'size' => 30,
+					'maxlength' => 30,
 					'defaultvalue' => 'email capture form',
+				),
+				'newsletters' => array(
+					'label' => T_('Newsletter'),
+					'type' => 'checklist',
+					'options' => $newsletters_options,
+					'note' => T_('News users will also be automatically subscribed to the default newsletters.')
 				),
 				'subscribe_post' => array(
 					'label' => T_('Auto subscribe'),
@@ -147,6 +177,12 @@ class user_register_Widget extends ComponentWidget
 					'note' => T_('Form submit button class'),
 					'size' => 40,
 					'defaultvalue' => 'btn-primary'
+				),
+				'redirect_to' => array(
+					'label' => T_('Redirect to'),
+					'note' => T_('Enter an Item slug or an URL.'),
+					'size' => 100,
+					'defaultvalue' => '',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -242,7 +278,7 @@ class user_register_Widget extends ComponentWidget
 				// Set HTML5 attribute required="required" to display JS error before submit form:
 				$firstname_params['input_required'] = 'required';
 			}
-			$Form->text_input( 'firstname', $firstname_value, 18, T_('First name'), '', $firstname_params );
+			$Form->text_input( 'firstname', $firstname_value, 18, T_('Your first name'), '', $firstname_params );
 		}
 
 		if( $this->disp_params['ask_lastname'] != 'no' )
@@ -259,7 +295,7 @@ class user_register_Widget extends ComponentWidget
 				// Set HTML5 attribute required="required" to display JS error before submit form:
 				$lastname_params['input_required'] = 'required';
 			}
-			$Form->text_input( 'lastname', $lastname_value, 18, T_('Last name'), '', $lastname_params );
+			$Form->text_input( 'lastname', $lastname_value, 18, T_('Your last name'), '', $lastname_params );
 		}
 
 		// E-mail
