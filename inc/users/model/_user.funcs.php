@@ -5386,7 +5386,7 @@ function users_results_block( $params = array() )
 
 	if( !empty( $edited_EmailCampaign ) )
 	{
-		$newsletter_button_text = sprintf( T_('User this selection for newsletter "%s"'), $edited_EmailCampaign->get( 'name' ) );
+		$newsletter_button_text = sprintf( T_('Use this selection for newsletter "%s"'), $edited_EmailCampaign->get( 'name' ) );
 		$newsletter_button_class = 'btn-primary';
 	}
 	else
