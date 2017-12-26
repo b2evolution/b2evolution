@@ -62,7 +62,7 @@ class Newsletter extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table'=>'T_email__campaign', 'fk'=>'ecmp_enlt_ID', 'msg'=>T_('%d campaigns are assigned to this newsletter') ),
+				array( 'table'=>'T_email__campaign', 'fk'=>'ecmp_enlt_ID', 'msg'=>T_('%d campaigns are linked to this newsletter') ),
 			);
 	}
 
