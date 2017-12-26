@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-12-16 01:07+0100\n"
+"POT-Creation-Date: 2017-12-26 02:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Alexander Osokin <alex.osokin@gmail.com>, 2017\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/fplanque/teams/23/ru_RU/)\n"
@@ -43,7 +43,7 @@ msgid "Copy"
 msgstr "Копировать"
 
 #: ../../../conf/_icons.php:71 ../inc/chapters/views/_chapter.form.php:49
-#: ../../../inc/chapters/views/_chapter_list.view.php:173
+#: ../../../inc/chapters/views/_chapter_list.view.php:188
 #: ../../../inc/files/views/_file_list.inc.php:492
 #: ../../../inc/files/views/_file_move_copy.form.php:26
 #: ../../../inc/files/views/_file_move_copy.form.php:34
@@ -62,7 +62,7 @@ msgstr "Удалить"
 
 #: ../../../conf/_icons.php:79 ../conf/_icons.php:478
 #: ../../../htsrv/comment_review.php:206
-#: ../../../inc/chapters/views/_chapter_list.view.php:176
+#: ../../../inc/chapters/views/_chapter_list.view.php:191
 #: ../../../inc/comments/model/_comment.class.php:1568
 #: ../../../inc/files/model/_file.funcs.php:2297
 #: ../../../inc/files/views/_file_delete.form.php:28
@@ -116,7 +116,7 @@ msgid "Collapse"
 msgstr "Свернуть"
 
 #: ../../../conf/_icons.php:307
-#: ../inc/chapters/views/_chapter_list.view.php:234
+#: ../inc/chapters/views/_chapter_list.view.php:249
 #: ../../../inc/collections/coll_settings.ctrl.php:620
 #: ../../../inc/cron/views/_cronjob_list.view.php:171
 #: ../../../inc/items/views/_item_list_full.view.php:403
@@ -158,7 +158,7 @@ msgstr "Информация"
 #: ../../../inc/tools/views/_email_address.view.php:65
 #: ../../../inc/tools/views/_email_return.view.php:84
 #: ../../../inc/tools/views/_email_sent.view.php:84
-#: ../../../inc/users/model/_user.funcs.php:5981
+#: ../../../inc/users/model/_user.funcs.php:5999
 #: ../../../inc/users/views/_user_admin.form.php:142
 #: ../../../inc/users/views/_user_admin.form.php:144
 #: ../../../inc/users/views/_user_identity.form.php:148
@@ -194,8 +194,8 @@ msgstr "Email"
 msgid "WWW"
 msgstr "WWW"
 
-#: ../../../conf/_icons.php:363 ../inc/users/model/_user.funcs.php:5740
-#: ../../../inc/users/model/_user.funcs.php:5741
+#: ../../../conf/_icons.php:363 ../inc/users/model/_user.funcs.php:5758
+#: ../../../inc/users/model/_user.funcs.php:5759
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:305
 #: ../../../skins/touch/_item_comment_form.inc.php:245
 #: ../../../skins_email/comment_new.txt.php:67
@@ -207,7 +207,7 @@ msgstr "Сайт"
 #: ../../../conf/_icons.php:372 ../conf/_icons.php:380 ../conf/_icons.php:388
 #: ../../../inc/_core/ui/forms/_form.class.php:2850
 #: ../../../inc/central_antispam/model/_central_antispam.funcs.php:25
-#: ../../../inc/chapters/views/_chapter_list.view.php:175
+#: ../../../inc/chapters/views/_chapter_list.view.php:190
 #: ../../../inc/collections/collections.ctrl.php:71
 #: ../../../inc/files/views/_file_list.inc.php:799
 #: ../../../inc/items/views/_file_create_posts.form.php:154
@@ -860,7 +860,7 @@ msgstr "Для ввода несколькох значений,<br/> пожал
 msgid "Comment cannot be updated!"
 msgstr "Комментарий не может быть обновлен!"
 
-#: ../../../htsrv/anon_async.php:1118 ../inc/users/model/_user.funcs.php:5574
+#: ../../../htsrv/anon_async.php:1118 ../inc/users/model/_user.funcs.php:5592
 #: ../../../inc/users/views/_organization_user.form.php:42
 #: ../../../inc/users/views/_organization_user_edit.form.php:49
 #: ../../../inc/users/views/_organization_user_edit.form.php:53
@@ -878,14 +878,14 @@ msgstr "Роль"
 msgid "Organization"
 msgstr "Организация"
 
-#: ../../../htsrv/anon_async.php:1197 ../inc/users/model/_user.funcs.php:5480
-#: ../../../inc/users/model/_user.funcs.php:6209
+#: ../../../htsrv/anon_async.php:1197 ../inc/users/model/_user.funcs.php:5498
+#: ../../../inc/users/model/_user.funcs.php:6227
 #: ../../../inc/users/views/_organization_user.form.php:38
 #: ../../../inc/users/views/_organization_user_edit.form.php:43
 msgid "Accepted"
 msgstr "Принято"
 
-#: ../../../htsrv/anon_async.php:1201 ../inc/users/model/_user.funcs.php:6213
+#: ../../../htsrv/anon_async.php:1201 ../inc/users/model/_user.funcs.php:6231
 msgid "Not accepted"
 msgstr "Не принято"
 
@@ -980,7 +980,7 @@ msgstr "действие: %s"
 #: ../inc/antispam/views/_antispam_ipranges.form.php:50
 #: ../../../inc/antispam/views/_antispam_settings.form.php:89
 #: ../../../inc/chapters/views/_chapter.form.php:87
-#: ../../../inc/chapters/views/_chapter_list.view.php:340
+#: ../../../inc/chapters/views/_chapter_list.view.php:355
 #: ../../../inc/chapters/views/_chapter_move.form.php:49
 #: ../../../inc/collections/views/_coll_advanced.form.php:213
 #: ../../../inc/collections/views/_coll_comments.form.php:301
@@ -2400,7 +2400,7 @@ msgstr "Система"
 #: ../../../inc/sessions/views/_stats_topips.view.php:82
 #: ../../../inc/tools/system.ctrl.php:32
 #: ../../../inc/tools/views/_email_address.view.php:113
-#: ../../../inc/users/model/_user.funcs.php:5805
+#: ../../../inc/users/model/_user.funcs.php:5823
 #: ../../../inc/users/views/_user_admin.form.php:152
 #: ../../../inc/users/views/_user_admin.form.php:157
 #: ../../../inc/users/views/_user_admin.form.php:405
@@ -2584,7 +2584,7 @@ msgid "Workflow view"
 msgstr "Документооборот"
 
 #: ../../../inc/_core/__core.init.php:1342 ../inc/_core/__core.init.php:1392
-#: ../../../inc/chapters/views/_chapter_list.view.php:275
+#: ../../../inc/chapters/views/_chapter_list.view.php:290
 #: ../../../inc/collections/_collections.init.php:732
 #: ../../../inc/collections/_collections.init.php:779
 #: ../../../inc/collections/coll_settings.ctrl.php:570
@@ -2604,7 +2604,7 @@ msgid "Posts"
 msgstr "Записи"
 
 #: ../../../inc/_core/__core.init.php:1364
-#: ../inc/chapters/chapters.ctrl.php:470
+#: ../inc/chapters/chapters.ctrl.php:482
 #: ../../../inc/collections/_collections.init.php:751
 #: ../../../inc/collections/views/_coll_other.form.php:44
 #: ../../../inc/collections/views/_coll_perm_view.funcs.php:843
@@ -3342,7 +3342,7 @@ msgstr "ID блога"
 #. TRANS: file name
 #: ../../../inc/_core/_misc.funcs.php:6003
 #: ../../../inc/chapters/views/_chapter.form.php:56
-#: ../../../inc/chapters/views/_chapter_list.view.php:249
+#: ../../../inc/chapters/views/_chapter_list.view.php:264
 #: ../../../inc/chapters/views/_chapter_move.form.php:40
 #: ../../../inc/collections/model/_blog.funcs.php:2020
 #: ../../../inc/collections/views/_coll_user_dir.form.php:56
@@ -3672,7 +3672,7 @@ msgstr "Карта сайта"
 #: ../../../inc/_core/_template.funcs.php:430
 #: ../../../inc/collections/views/_coll_contact.form.php:35
 #: ../../../inc/collections/views/_coll_home.form.php:45
-#: ../../../inc/users/model/_user.funcs.php:5735
+#: ../../../inc/users/model/_user.funcs.php:5753
 #: ../../../inc/widgets/widgets/_basic_menu_link.widget.php:370
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:260
 #: ../../../skins/asevo/_body_footer.inc.php:33
@@ -4151,7 +4151,7 @@ msgstr "Введите ваше имя пользователя (или email а
 #: ../../../inc/maintenance/views/_upgrade_svn.form.php:28
 #: ../../../inc/messaging/views/_contact_list.view.php:286
 #: ../../../inc/users/model/_user.class.php:6677
-#: ../../../inc/users/model/_user.funcs.php:5515
+#: ../../../inc/users/model/_user.funcs.php:5533
 #: ../../../inc/users/views/_user_identity.form.php:251
 #: ../../../inc/users/views/_user_identity.form.php:466
 #: ../../../install/_functions_install.php:282
@@ -5571,8 +5571,8 @@ msgstr "Действия"
 
 #: ../../../inc/antispam/model/_antispam.funcs.php:460
 #: ../../../inc/chapters/model/_chapter.class.php:787
-#: ../../../inc/chapters/views/_chapter_list.view.php:94
-#: ../../../inc/chapters/views/_chapter_list.view.php:170
+#: ../../../inc/chapters/views/_chapter_list.view.php:98
+#: ../../../inc/chapters/views/_chapter_list.view.php:185
 #: ../../../inc/collections/coll_settings.ctrl.php:172
 #: ../../../inc/comments/model/_comment.class.php:1401
 #: ../../../inc/items/model/_item.class.php:4802
@@ -5716,7 +5716,7 @@ msgstr "Затронутые пользователи"
 #: ../../../inc/antispam/views/_antispam_ban.form.php:205
 #: ../../../inc/collections/views/_coll_user_dir.form.php:47
 #: ../../../inc/users/model/_user.class.php:6680
-#: ../../../inc/users/model/_user.funcs.php:5526
+#: ../../../inc/users/model/_user.funcs.php:5544
 #: ../../../inc/users/views/_settings.form.php:62
 #: ../../../inc/users/views/_user_identity.form.php:256
 #: ../../../inc/users/views/_user_identity.form.php:467
@@ -5731,7 +5731,7 @@ msgstr "Имя"
 #: ../../../inc/antispam/views/_antispam_ban.form.php:206
 #: ../../../inc/collections/views/_coll_user_dir.form.php:48
 #: ../../../inc/users/model/_user.class.php:6681
-#: ../../../inc/users/model/_user.funcs.php:5535
+#: ../../../inc/users/model/_user.funcs.php:5553
 #: ../../../inc/users/views/_settings.form.php:64
 #: ../../../inc/users/views/_user_identity.form.php:262
 #: ../../../inc/users/views/_user_identity.form.php:468
@@ -5746,7 +5746,7 @@ msgstr "Фамилия"
 #: ../../../inc/collections/views/_coll_user_dir.form.php:49
 #: ../../../inc/messaging/views/_contact_list.view.php:304
 #: ../../../inc/users/model/_user.class.php:6679
-#: ../../../inc/users/model/_user.funcs.php:5547
+#: ../../../inc/users/model/_user.funcs.php:5565
 #: ../../../inc/users/views/_settings.form.php:60
 #: ../../../inc/users/views/_user_identity.form.php:268
 #: ../../../inc/users/views/_user_identity.form.php:469
@@ -5876,7 +5876,7 @@ msgstr "Сессии, соединенные через этот IP Диапаз
 #: ../../../inc/antispam/views/_antispam_ipranges.view.php:85
 #: ../../../inc/central_antispam/views/_keywords.view.php:91
 #: ../../../inc/central_antispam/views/_sources.view.php:45
-#: ../../../inc/chapters/views/_chapter_list.view.php:238
+#: ../../../inc/chapters/views/_chapter_list.view.php:253
 #: ../../../inc/collections/model/_blog.funcs.php:1997
 #: ../../../inc/collections/views/_coll_perm_view.funcs.php:704
 #: ../../../inc/cron/views/_cronjob_list.view.php:230
@@ -5895,7 +5895,7 @@ msgstr "Сессии, соединенные через этот IP Диапаз
 #: ../../../inc/tools/views/_email_address.view.php:98
 #: ../../../inc/tools/views/_email_return.view.php:94
 #: ../../../inc/tools/views/_email_sent.view.php:94
-#: ../../../inc/users/model/_user.funcs.php:5492
+#: ../../../inc/users/model/_user.funcs.php:5510
 #: ../../../inc/users/views/_group.form.php:102
 #: ../../../inc/users/views/_group.view.php:57
 #: ../../../inc/users/views/_invitation.view.php:41
@@ -5960,7 +5960,7 @@ msgstr "Редактировать этот IP диапазон..."
 #: ../../../inc/antispam/views/_antispam_list.view.php:180
 #: ../../../inc/central_antispam/views/_keywords.view.php:180
 #: ../../../inc/central_antispam/views/_sources.view.php:85
-#: ../../../inc/chapters/views/_chapter_list.view.php:282
+#: ../../../inc/chapters/views/_chapter_list.view.php:297
 #: ../../../inc/collections/model/_blog.funcs.php:2110
 #: ../../../inc/collections/model/_blog.funcs.php:2120
 #: ../../../inc/comments/model/_comment.funcs.php:1353
@@ -6006,8 +6006,8 @@ msgstr "Редактировать этот IP диапазон..."
 #: ../../../inc/tools/views/_email_address.view.php:214
 #: ../../../inc/tools/views/_email_return.view.php:136
 #: ../../../inc/users/model/_user.funcs.php:5174
-#: ../../../inc/users/model/_user.funcs.php:5834
-#: ../../../inc/users/model/_user.funcs.php:5844
+#: ../../../inc/users/model/_user.funcs.php:5852
+#: ../../../inc/users/model/_user.funcs.php:5862
 #: ../../../inc/users/views/_group.view.php:173
 #: ../../../inc/users/views/_invitation.view.php:119
 #: ../../../inc/users/views/_organization.view.php:126
@@ -6089,7 +6089,7 @@ msgstr "Центральный"
 
 #: ../../../inc/antispam/views/_antispam_list.view.php:100
 #: ../../../inc/antispam/views/_antispam_list.view.php:143
-#: ../../../inc/users/model/_user.funcs.php:5675
+#: ../../../inc/users/model/_user.funcs.php:5693
 #: ../../../inc/users/views/_invitation.view.php:97
 #: ../../../inc/users/views/_user_identity.form.php:450
 msgid "Source"
@@ -6573,12 +6573,17 @@ msgstr "Рубрика &laquo;%s&raquo; удалена."
 msgid "Cannot delete element &laquo;%s&raquo;"
 msgstr "Невозможно удалить элемент &laquo;%s&raquo;"
 
-#: ../../../inc/chapters/chapters.ctrl.php:388
+#: ../../../inc/chapters/chapters.ctrl.php:372
+#: ../inc/chapters/chapters.ctrl.php:385
+msgid "Meta category cannot be used as default!"
+msgstr ""
+
+#: ../../../inc/chapters/chapters.ctrl.php:400
 #, php-format
 msgid "The category &laquo;%s&raquo; was made as meta category."
 msgstr "Рубрика &laquo;%s&raquo; была преобразована в мета рубрику."
 
-#: ../../../inc/chapters/chapters.ctrl.php:393
+#: ../../../inc/chapters/chapters.ctrl.php:405
 #: ../../../inc/chapters/model/_chapter.class.php:340
 #, php-format
 msgid ""
@@ -6588,38 +6593,38 @@ msgstr ""
 "Рубрика &laquo;%s&raquo; не может быть мета рубрикой. Вы должны сначала "
 "переместить записи, которые она содержит."
 
-#: ../../../inc/chapters/chapters.ctrl.php:408
+#: ../../../inc/chapters/chapters.ctrl.php:420
 #, php-format
 msgid "The category &laquo;%s&raquo; was reverted from meta category."
 msgstr "Мета рубрика &laquo;%s&raquo; была преобразована в нормальную."
 
-#: ../../../inc/chapters/chapters.ctrl.php:412
+#: ../../../inc/chapters/chapters.ctrl.php:424
 #, php-format
 msgid "The category &laquo;%s&raquo; couldn't be reverted from meta category."
 msgstr ""
 "Мета рубрика &laquo;%s&raquo; не может быть преобразована в нормальную."
 
-#: ../../../inc/chapters/chapters.ctrl.php:426
+#: ../../../inc/chapters/chapters.ctrl.php:438
 #, php-format
 msgid "The category &laquo;%s&raquo; was locked."
 msgstr "Рубрика &laquo;%s&raquo; была заблокирована."
 
-#: ../../../inc/chapters/chapters.ctrl.php:430
+#: ../../../inc/chapters/chapters.ctrl.php:442
 #, php-format
 msgid "The category &laquo;%s&raquo; couldn't be locked."
 msgstr "Рубрика &laquo;%s&raquo; не может быть заблокирована."
 
-#: ../../../inc/chapters/chapters.ctrl.php:444
+#: ../../../inc/chapters/chapters.ctrl.php:456
 #, php-format
 msgid "The category &laquo;%s&raquo; was unlocked."
 msgstr "Рубрика &laquo;%s&raquo; была разблокирована."
 
-#: ../../../inc/chapters/chapters.ctrl.php:448
+#: ../../../inc/chapters/chapters.ctrl.php:460
 #, php-format
 msgid "The category &laquo;%s&raquo; couldn't be unlocked."
 msgstr "Рубрика &laquo;%s&raquo; не может быть разблокирована."
 
-#: ../../../inc/chapters/chapters.ctrl.php:469
+#: ../../../inc/chapters/chapters.ctrl.php:481
 #: ../../../inc/collections/_collections.init.php:667
 #: ../../../inc/collections/_collections.init.php:680
 #: ../../../inc/collections/_demo_content.funcs.php:1939
@@ -6634,7 +6639,7 @@ msgstr "Рубрика &laquo;%s&raquo; не может быть разблок�
 #: ../../../inc/items/model/_item.funcs.php:2261
 #: ../inc/skins/skins.ctrl.php:325
 #: ../../../inc/skins/views/_skin_list.view.php:63
-#: ../../../inc/users/model/_user.funcs.php:5663
+#: ../../../inc/users/model/_user.funcs.php:5681
 #: ../../../inc/users/views/_group.form.php:152
 #: ../inc/widgets/widgets.ctrl.php:613
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:105
@@ -6643,7 +6648,7 @@ msgstr "Рубрика &laquo;%s&raquo; не может быть разблок�
 msgid "Collections"
 msgstr "Коллекции"
 
-#: ../../../inc/chapters/chapters.ctrl.php:516
+#: ../../../inc/chapters/chapters.ctrl.php:528
 #, php-format
 msgid "Delete element &laquo;%s&raquo;?"
 msgstr "Удалить элемент &laquo;%s&raquo; ?"
@@ -6677,12 +6682,12 @@ msgid "Edit this chapter..."
 msgstr "Редактировать эту рубрику..."
 
 #: ../../../inc/chapters/views/_chapter.form.php:36
-#: ../../../inc/chapters/views/_chapter_list.view.php:235
+#: ../../../inc/chapters/views/_chapter_list.view.php:250
 msgid "New category"
 msgstr "Новая рубрика"
 
 #: ../../../inc/chapters/views/_chapter.form.php:49
-#: ../../../inc/chapters/views/_chapter_list.view.php:173
+#: ../../../inc/chapters/views/_chapter_list.view.php:188
 #: ../../../inc/items/model/_item.funcs.php:5188
 msgid "Move to a different blog..."
 msgstr "Переместить в другой блог..."
@@ -6692,7 +6697,7 @@ msgid "Parent category"
 msgstr "Родительская рубрика"
 
 #: ../../../inc/chapters/views/_chapter.form.php:58
-#: ../../../inc/chapters/views/_chapter_list.view.php:252
+#: ../../../inc/chapters/views/_chapter_list.view.php:267
 #: ../../../inc/items/model/_item.funcs.php:4237
 msgid "URL \"slug\""
 msgstr "Короткая ссылка"
@@ -6727,7 +6732,7 @@ msgid "For manual ordering of the categories."
 msgstr "Для ручной сортировки рубрик."
 
 #: ../../../inc/chapters/views/_chapter.form.php:71
-#: ../../../inc/chapters/views/_chapter_list.view.php:256
+#: ../../../inc/chapters/views/_chapter_list.view.php:271
 #: ../../../inc/collections/model/_blog.funcs.php:2089
 #: ../../../inc/collections/views/_coll_general.form.php:374
 #: ../../../inc/items/model/_item.funcs.php:4240
@@ -6747,13 +6752,13 @@ msgid "Same as parent"
 msgstr "Такой же как родитель"
 
 #: ../../../inc/chapters/views/_chapter.form.php:76
-#: ../../../inc/chapters/views/_chapter_list.view.php:337
+#: ../../../inc/chapters/views/_chapter_list.view.php:352
 #: ../../../inc/items/views/_item_list_manual.view.php:43
 msgid "Alphabetically"
 msgstr "По алфавиту"
 
 #: ../../../inc/chapters/views/_chapter.form.php:77
-#: ../../../inc/chapters/views/_chapter_list.view.php:338
+#: ../../../inc/chapters/views/_chapter_list.view.php:353
 #: ../../../inc/items/views/_item_list_manual.view.php:44
 msgid "Manually"
 msgstr "Вручную"
@@ -6788,46 +6793,46 @@ msgstr ""
 msgid "Locked category"
 msgstr "Заблокированная рубрика"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:76
+#: ../../../inc/chapters/views/_chapter_list.view.php:80
 msgid "This is the default category"
 msgstr "Это категория по умолчанию"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:81
+#: ../../../inc/chapters/views/_chapter_list.view.php:85
 msgid "Click to make this the default category"
 msgstr "Нажмите, чтобы сделать эту рубрику \"рубрикой по умолчанию\""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:117
+#: ../../../inc/chapters/views/_chapter_list.view.php:121
 #: ../../../inc/items/model/_item.funcs.php:5168
 #: ../../../inc/items/model/_item.funcs.php:5291
 msgid "Alphabetic"
 msgstr "По алфавиту"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:126
+#: ../../../inc/chapters/views/_chapter_list.view.php:135
 msgid "Click to revert this from meta category"
 msgstr "Нажмите для преобразования мета рубрики в нормальную"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:132
+#: ../../../inc/chapters/views/_chapter_list.view.php:141
 msgid "Click to make this as meta category"
 msgstr "Нажмите, чтобы преобразовать в мета рубрику"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:143
+#: ../../../inc/chapters/views/_chapter_list.view.php:158
 msgid "Unlock category"
 msgstr "Разблокировать рубрику"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:149
+#: ../../../inc/chapters/views/_chapter_list.view.php:164
 msgid "Lock category"
 msgstr "Заблокировать рубрику"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:232
+#: ../../../inc/chapters/views/_chapter_list.view.php:247
 #, php-format
 msgid "Categories for blog: %s"
 msgstr "Рубрики блога: %s"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:235
+#: ../../../inc/chapters/views/_chapter_list.view.php:250
 msgid "Create a new category..."
 msgstr "Создать новую рубрику..."
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:241
+#: ../../../inc/chapters/views/_chapter_list.view.php:256
 #: ../../../inc/collections/_collections.init.php:803
 #: ../../../inc/collections/coll_settings.ctrl.php:1046
 #: ../../../inc/collections/views/_coll_advanced.form.php:140
@@ -6837,7 +6842,7 @@ msgstr "Создать новую рубрику..."
 msgid "Default"
 msgstr "По умолчанию"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:245
+#: ../../../inc/chapters/views/_chapter_list.view.php:260
 #: ../../../inc/files/model/_file.funcs.php:2000
 #: ../../../inc/items/model/_item.funcs.php:4233
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:97
@@ -6846,31 +6851,31 @@ msgstr "По умолчанию"
 msgid "Image"
 msgstr "Изображение"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:263
+#: ../../../inc/chapters/views/_chapter_list.view.php:278
 #: ../../../inc/comments/model/_comment.class.php:3266
 msgid "Meta"
 msgstr "Мета"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:268
+#: ../../../inc/chapters/views/_chapter_list.view.php:283
 msgid "Lock"
 msgstr "Заблокировано"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:330
+#: ../../../inc/chapters/views/_chapter_list.view.php:345
 #: ../../../inc/items/views/_item_list_manual.view.php:35
 msgid "Category order"
 msgstr "Порядок рубрики"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:339
+#: ../../../inc/chapters/views/_chapter_list.view.php:354
 #: ../../../inc/items/views/_item_list_manual.view.php:45
 msgid "Note: can be overridden for sub-categories"
 msgstr "Примечание: можно переопределить для под-рубрик"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:339
+#: ../../../inc/chapters/views/_chapter_list.view.php:354
 #: ../../../inc/items/views/_item_list_manual.view.php:45
 msgid "Sort categories"
 msgstr "Сортировать рубрики"
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:346
+#: ../../../inc/chapters/views/_chapter_list.view.php:361
 #: ../../../inc/items/views/_item_list_manual.view.php:52
 #, php-format
 msgid ""
@@ -6962,7 +6967,7 @@ msgstr "Панель Управления Коллекции"
 
 #: ../../../inc/collections/_collections.init.php:807
 #: ../../../inc/collections/views/_coll_user_dir.form.php:64
-#: ../../../inc/users/model/_user.funcs.php:5645
+#: ../../../inc/users/model/_user.funcs.php:5663
 msgid "Phone"
 msgstr "Телефон"
 
@@ -8929,7 +8934,7 @@ msgstr "Вы должны указать подкаталог в медиа па
 msgid "Invalid subdirectory &laquo;%s&raquo;."
 msgstr "Недопустимый подкаталог &laquo;%s&raquo;."
 
-#: ../../../inc/collections/model/_blog.class.php:2471
+#: ../../../inc/collections/model/_blog.class.php:2473
 #, php-format
 msgid ""
 "Media directory &laquo;%s&raquo; could not be created, because the parent "
@@ -8938,29 +8943,29 @@ msgstr ""
 "Медиа папка &laquo;%s&raquo; не может быть создана, потому что родительская "
 "папка недоступна для записи или не существует."
 
-#: ../../../inc/collections/model/_blog.class.php:2472
+#: ../../../inc/collections/model/_blog.class.php:2474
 msgid "Media directory file permission error"
 msgstr "Ошибка файловых прав медиа папки"
 
-#: ../../../inc/collections/model/_blog.class.php:2480
+#: ../../../inc/collections/model/_blog.class.php:2482
 #, php-format
 msgid "Media directory &laquo;%s&raquo; could not be created."
 msgstr "Медиа директория &laquo;%s&raquo; не может быть создана."
 
-#: ../../../inc/collections/model/_blog.class.php:2481
+#: ../../../inc/collections/model/_blog.class.php:2483
 msgid "Media directory creation error"
 msgstr "Ошибка создания медиа папки"
 
-#: ../../../inc/collections/model/_blog.class.php:2489
+#: ../../../inc/collections/model/_blog.class.php:2491
 msgid "Collection media directories created:"
 msgstr "Медиа папки коллекции созданы:"
 
-#: ../../../inc/collections/model/_blog.class.php:2489
+#: ../../../inc/collections/model/_blog.class.php:2491
 #, php-format
 msgid "Media directory &laquo;%s&raquo; has been created with permissions %s."
 msgstr "Медиа папка &laquo;%s&raquo; создана с разрешениями %s."
 
-#: ../../../inc/collections/model/_blog.class.php:2919
+#: ../../../inc/collections/model/_blog.class.php:2921
 #, php-format
 msgid ""
 "ATTENTION: advanced <a href=\"%s\">user</a> & <a href=\"%s\">group</a> "
@@ -8971,21 +8976,21 @@ msgstr ""
 "href=\"%s\">групп</a> включены, и поэтому некоторые залогиненные "
 "пользователи могут иметь меньше прав, чем анонимные пользователи."
 
-#: ../../../inc/collections/model/_blog.class.php:3208
-#: ../../../inc/collections/model/_blog.class.php:3246
-#: ../../../inc/collections/model/_blog.class.php:3252
-#: ../../../inc/collections/model/_blog.class.php:3265
+#: ../../../inc/collections/model/_blog.class.php:3210
+#: ../../../inc/collections/model/_blog.class.php:3248
+#: ../../../inc/collections/model/_blog.class.php:3254
+#: ../../../inc/collections/model/_blog.class.php:3267
 msgid "New collection created:"
 msgstr "Новая коллекция создана:"
 
-#: ../../../inc/collections/model/_blog.class.php:3208
+#: ../../../inc/collections/model/_blog.class.php:3210
 #, php-format
 msgid ""
 "The new collection has been associated with the stub file &laquo;%s&raquo;."
 msgstr ""
 "Новый коллекция была ассоциирована с файлом-заглушкой &laquo;%s&raquo;."
 
-#: ../../../inc/collections/model/_blog.class.php:3212
+#: ../../../inc/collections/model/_blog.class.php:3214
 #, php-format
 msgid ""
 "No stub file named &laquo;%s&raquo; was found. You must create it for the "
@@ -8995,20 +9000,20 @@ msgstr ""
 "текущими настройками ссылок, вам необходимо создать эту заглушку. Вы также "
 "можете изменить адрес блога если не хотите создавать файл."
 
-#: ../../../inc/collections/model/_blog.class.php:3242
+#: ../../../inc/collections/model/_blog.class.php:3244
 #: ../../../inc/tools/model/_wp.funcs.php:574
 msgid "Uncategorized"
 msgstr "Без рубрики"
 
-#: ../../../inc/collections/model/_blog.class.php:3246
+#: ../../../inc/collections/model/_blog.class.php:3248
 msgid "A default category has been created for this collection."
 msgstr "Стандартная рубрика была создана для этой коллекции."
 
-#: ../../../inc/collections/model/_blog.class.php:3252
+#: ../../../inc/collections/model/_blog.class.php:3254
 msgid "Default widgets have been set-up for this collection."
 msgstr "Стандартные виджеты были установлены для этой коллекции."
 
-#: ../../../inc/collections/model/_blog.class.php:3280
+#: ../../../inc/collections/model/_blog.class.php:3282
 #, php-format
 msgid ""
 "ATTENTION: We have set some advanced permissions for this collection. Please"
@@ -9019,32 +9024,32 @@ msgstr ""
 "Пожалуйста, проверьте <a %s>Права пользователя </a> и <a %s>Права Группы</a>"
 " сейчас."
 
-#: ../../../inc/collections/model/_blog.class.php:3769
+#: ../../../inc/collections/model/_blog.class.php:3771
 msgid "Deleted blog's files"
 msgstr "Удалены файлы блога"
 
-#: ../../../inc/collections/model/_blog.class.php:4492
+#: ../../../inc/collections/model/_blog.class.php:4494
 #: ../../../inc/rest/_restapi.class.php:367
 msgid "You need to log in before you can access this section."
 msgstr "Вам надо авторизоваться для доступа к этому разделу."
 
-#: ../../../inc/collections/model/_blog.class.php:4518
+#: ../../../inc/collections/model/_blog.class.php:4520
 #: ../../../inc/rest/_restapi.class.php:376
 msgid ""
 "You are not a member of this section, therefore you are not allowed to "
 "access it."
 msgstr "Вы не член этого раздела, поэтому вам не разрешен доступ к нему."
 
-#: ../../../inc/collections/model/_blog.class.php:4578
+#: ../../../inc/collections/model/_blog.class.php:4580
 msgid "The old media dir could not be removed, please remove it manually!"
 msgstr ""
 "Старая медиа папка не может удалиться, пожалуйста, удалите ее вручную!"
 
-#: ../../../inc/collections/model/_blog.class.php:4583
+#: ../../../inc/collections/model/_blog.class.php:4585
 msgid "Blog media folder is not empty, you cannot change it to \"None\"."
 msgstr "Медиа папка блога не пуста, вы не можете изменить ее на \"Нет\"."
 
-#: ../../../inc/collections/model/_blog.class.php:4594
+#: ../../../inc/collections/model/_blog.class.php:4596
 #, php-format
 msgid ""
 "Folder %s already exists, it cannot be used for several media locations."
@@ -9052,13 +9057,13 @@ msgstr ""
 "Папка %s уже существует, она не может использоваться для нескольких медиа "
 "размещений."
 
-#: ../../../inc/collections/model/_blog.class.php:4599
+#: ../../../inc/collections/model/_blog.class.php:4601
 #, php-format
 msgid "Please use another folder name, because %s is reserved."
 msgstr ""
 "Пожалуйста, используйте другое имя папки, потому что %s зарезервировано."
 
-#: ../../../inc/collections/model/_blog.class.php:4614
+#: ../../../inc/collections/model/_blog.class.php:4616
 #, php-format
 msgid ""
 "Please use another folder name, because %s is already used for another media"
@@ -9067,7 +9072,7 @@ msgstr ""
 "Пожалуйста, используйте другое имя папки, потому что %s уже используется для"
 " другого медиа размещения."
 
-#: ../../../inc/collections/model/_blog.class.php:4627
+#: ../../../inc/collections/model/_blog.class.php:4629
 #, php-format
 msgid ""
 "Could not delete the old media folder \"%s\", please try to delete it "
@@ -9076,7 +9081,7 @@ msgstr ""
 "Невозможно удалить старую директорию %s. Пожалуйста, попробуйте удалить ее "
 "вручную."
 
-#: ../../../inc/collections/model/_blog.class.php:4632
+#: ../../../inc/collections/model/_blog.class.php:4634
 #, php-format
 msgid ""
 "Could not move the media folder content from \"%s\" to the new \"%s\" "
@@ -9085,7 +9090,7 @@ msgstr ""
 "Невозможно переместить содержимое медиа папки из \"%s\" в новое размещение "
 "\"%s\"."
 
-#: ../../../inc/collections/model/_blog.class.php:4641
+#: ../../../inc/collections/model/_blog.class.php:4643
 msgid ""
 "The media directory and all of its content were successfully moved to the "
 "new location."
@@ -9093,7 +9098,7 @@ msgstr ""
 "Медиа папка и все ее содержимое были успешно перемещены в новое "
 "местоположение."
 
-#: ../../../inc/collections/model/_blog.class.php:4810
+#: ../../../inc/collections/model/_blog.class.php:4812
 #, php-format
 msgid ""
 "The expected item type(s) named %s have not been found. All item types have "
@@ -9102,7 +9107,7 @@ msgstr ""
 "Ожидаемый тип записи(ей) с именем %s не был обнаружен. Все типы записей были"
 " включены для этой коллекции."
 
-#: ../../../inc/collections/model/_blog.class.php:4909
+#: ../../../inc/collections/model/_blog.class.php:4911
 #: ../../../inc/collections/views/_coll_comments.form.php:63
 #: ../../../inc/collections/views/_coll_comments.form.php:99
 #: ../../../inc/collections/views/_coll_comments.form.php:120
@@ -9110,7 +9115,7 @@ msgstr ""
 msgid "Members only"
 msgstr "Только участники"
 
-#: ../../../inc/collections/model/_blog.class.php:4913
+#: ../../../inc/collections/model/_blog.class.php:4915
 #: ../../../inc/collections/model/_blog.funcs.php:1137
 #: ../../../inc/collections/model/_blog.funcs.php:1158
 #: ../../../inc/collections/model/_blog.funcs.php:1252
@@ -9118,11 +9123,11 @@ msgstr "Только участники"
 msgid "Private"
 msgstr "Личное"
 
-#: ../../../inc/collections/model/_blog.class.php:4917
+#: ../../../inc/collections/model/_blog.class.php:4919
 msgid "Community only"
 msgstr "Только сообщество"
 
-#: ../../../inc/collections/model/_blog.class.php:4920
+#: ../../../inc/collections/model/_blog.class.php:4922
 #: ../../../inc/collections/model/_blog.funcs.php:1133
 #: ../../../inc/collections/model/_blog.funcs.php:1154
 #: ../../../inc/collections/model/_blog.funcs.php:1248
@@ -12998,7 +13003,7 @@ msgid "Single post URLs"
 msgstr "URL одиночных записей"
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:50
-#: ../../../inc/users/model/_user.funcs.php:5559
+#: ../../../inc/users/model/_user.funcs.php:5577
 #: ../../../skins_email/account_activated.html.php:47
 #: ../../../skins_email/account_activated.txt.php:43
 #: ../../../skins_email/account_new.html.php:44
@@ -13027,7 +13032,7 @@ msgstr "Полное имя"
 #: ../../../inc/users/model/_user.class.php:6683
 #: ../../../inc/users/model/_user.funcs.php:3325
 #: ../../../inc/users/model/_user.funcs.php:3332
-#: ../../../inc/users/model/_user.funcs.php:5598
+#: ../../../inc/users/model/_user.funcs.php:5616
 #: ../../../inc/users/views/_settings.form.php:72
 #: ../../../inc/users/views/_user_identity.form.php:290
 #: ../../../inc/users/views/_user_identity.form.php:481
@@ -13061,7 +13066,7 @@ msgstr "Оба"
 #: ../../../inc/regional/views/_subregion_list.view.php:168
 #: ../../../inc/users/model/_user.class.php:6684
 #: ../../../inc/users/model/_user.funcs.php:3341
-#: ../../../inc/users/model/_user.funcs.php:5612
+#: ../../../inc/users/model/_user.funcs.php:5630
 #: ../../../inc/users/views/_settings.form.php:74
 #: ../../../inc/users/views/_user_identity.form.php:306
 #: ../../../inc/users/views/_user_identity.form.php:487
@@ -13077,7 +13082,7 @@ msgstr "Регион"
 #: ../../../inc/regional/views/_subregion.form.php:32
 #: ../../../inc/users/model/_user.class.php:6685
 #: ../../../inc/users/model/_user.funcs.php:3349
-#: ../../../inc/users/model/_user.funcs.php:5623
+#: ../../../inc/users/model/_user.funcs.php:5641
 #: ../../../inc/users/views/_settings.form.php:76
 #: ../../../inc/users/views/_user_identity.form.php:319
 #: ../../../inc/users/views/_user_identity.form.php:493
@@ -13090,7 +13095,7 @@ msgstr "Субрегион"
 #: ../../../inc/regional/views/_city.form.php:32
 #: ../../../inc/users/model/_user.class.php:6686
 #: ../../../inc/users/model/_user.funcs.php:3356
-#: ../../../inc/users/model/_user.funcs.php:5634
+#: ../../../inc/users/model/_user.funcs.php:5652
 #: ../../../inc/users/views/_settings.form.php:78
 #: ../../../inc/users/views/_user_identity.form.php:332
 #: ../../../inc/users/views/_user_identity.form.php:499
@@ -13098,7 +13103,7 @@ msgid "City"
 msgstr "Город"
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:65
-#: ../../../inc/users/model/_user.funcs.php:5654
+#: ../../../inc/users/model/_user.funcs.php:5672
 msgid "Social links"
 msgstr "Социальные ссылки"
 
@@ -13849,7 +13854,7 @@ msgstr "Войти сейчас!"
 
 #: ../../../inc/comments/model/_comment.funcs.php:647
 #: ../../../inc/items/model/_item.class.php:1396
-#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:240
+#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:244
 msgid "More info &raquo;"
 msgstr "Подробнее &raquo;"
 
@@ -18204,7 +18209,7 @@ msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:8728
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:64
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:442
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:408
 #: ../../../skins/pureforums_skin/_legend.inc.php:64
 msgid "New topic"
 msgstr "Новый топик"
@@ -18373,8 +18378,8 @@ msgstr "Выбрать дополнительную рубрику"
 #: ../../../inc/items/model/_item.funcs.php:1420
 #: ../../../inc/items/model/_itemlight.class.php:599
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:533
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:451
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:462
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:417
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:428
 msgid "Locked"
 msgstr "Заблокирована"
 
@@ -20470,7 +20475,7 @@ msgid "View this user..."
 msgstr "Просмотреть этого пользователя..."
 
 #: ../../../inc/links/model/_linkuser.class.php:41
-#: ../../../inc/users/model/_user.funcs.php:6130
+#: ../../../inc/users/model/_user.funcs.php:6148
 #: ../../../inc/users/registration.ctrl.php:107
 msgid "Edit this user..."
 msgstr "Редактировать этого  пользователя..."
@@ -22551,7 +22556,7 @@ msgid "Select this contact"
 msgstr "Выбрать этот контакт"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:257
-#: ../../../inc/users/model/_user.funcs.php:5503
+#: ../../../inc/users/model/_user.funcs.php:5521
 msgid "Picture"
 msgstr "Фото"
 
@@ -22586,7 +22591,7 @@ msgid "Rename this group to"
 msgstr "Переименовать эту группу в"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:484
-#: ../../../inc/users/model/_user.funcs.php:5889
+#: ../../../inc/users/model/_user.funcs.php:5907
 #: ../../../inc/users/views/_group.view.php:163
 #: ../../../inc/users/views/_userfields.view.php:161
 msgid "Delete this group"
@@ -27395,9 +27400,9 @@ msgstr "Группа пользователей"
 
 #: ../../../inc/tools/mtimport.ctrl.php:335
 #: ../inc/users/model/_user.funcs.php:3365
-#: ../../../inc/users/model/_user.funcs.php:5791
-#: ../../../inc/users/model/_user.funcs.php:5822
-#: ../../../inc/users/model/_user.funcs.php:5926
+#: ../../../inc/users/model/_user.funcs.php:5809
+#: ../../../inc/users/model/_user.funcs.php:5840
+#: ../../../inc/users/model/_user.funcs.php:5944
 #: ../../../inc/users/views/_group.view.php:76
 #: ../../../inc/users/views/_invitation.view.php:89
 msgid "Level"
@@ -30024,7 +30029,7 @@ msgid "User #%s has no permission to edit user #%s!"
 msgstr "Пользователь #%s не имеет прав для редактирования пользователя #%s!"
 
 #: ../../../inc/users/model/_user.class.php:6682
-#: ../../../inc/users/model/_user.funcs.php:5585
+#: ../../../inc/users/model/_user.funcs.php:5603
 #: ../../../inc/users/views/_registration.form.php:162
 #: ../../../inc/users/views/_user_identity.form.php:475
 #: ../../../inc/users/views/_user_stats.view.php:325
@@ -30155,7 +30160,7 @@ msgid "You have reported this user"
 msgstr "Вы пожаловались на этого пользователя"
 
 #: ../../../inc/users/model/_user.funcs.php:2429
-#: ../../../inc/users/model/_user.funcs.php:6141
+#: ../../../inc/users/model/_user.funcs.php:6159
 msgid "Delete this user!"
 msgstr "Удалить этого пользователя!"
 
@@ -30620,7 +30625,7 @@ msgid "Add user to organization"
 msgstr "Добавить пользователя в организацию"
 
 #: ../../../inc/users/model/_user.funcs.php:4666
-#: ../../../inc/users/model/_user.funcs.php:6169
+#: ../../../inc/users/model/_user.funcs.php:6187
 msgid "Edit membership"
 msgstr "Редактировать участие"
 
@@ -30724,86 +30729,91 @@ msgstr "Добавить группу"
 msgid "Create a new group..."
 msgstr "Создать новую группу..."
 
-#: ../../../inc/users/model/_user.funcs.php:5383
+#: ../../../inc/users/model/_user.funcs.php:5389
+#, php-format
+msgid "Use this selection for newsletter \"%s\""
+msgstr ""
+
+#: ../../../inc/users/model/_user.funcs.php:5394
 msgid "Send newsletter to the current selection"
 msgstr "Отправить рассылку текущей выборке"
 
-#: ../../../inc/users/model/_user.funcs.php:5468
+#: ../../../inc/users/model/_user.funcs.php:5486
 msgid "default group for new users"
 msgstr "группа по умолчанию для новых пользователей"
 
-#: ../../../inc/users/model/_user.funcs.php:5668
+#: ../../../inc/users/model/_user.funcs.php:5686
 msgid "View personal blogs"
 msgstr "Личные блоги"
 
-#: ../../../inc/users/model/_user.funcs.php:5687
+#: ../../../inc/users/model/_user.funcs.php:5705
 msgid "Registered"
 msgstr "Зарегистрирован"
 
-#: ../../../inc/users/model/_user.funcs.php:5699
+#: ../../../inc/users/model/_user.funcs.php:5717
 msgid "RC"
 msgstr "СР"
 
-#: ../../../inc/users/model/_user.funcs.php:5700
+#: ../../../inc/users/model/_user.funcs.php:5718
 msgid "Registration country"
 msgstr "Страна регистрации"
 
-#: ../../../inc/users/model/_user.funcs.php:5711
+#: ../../../inc/users/model/_user.funcs.php:5729
 msgid "Profile update"
 msgstr "Профиль обновлен"
 
-#: ../../../inc/users/model/_user.funcs.php:5723
+#: ../../../inc/users/model/_user.funcs.php:5741
 msgid "Last Visit"
 msgstr "Последний визит"
 
-#: ../../../inc/users/model/_user.funcs.php:5749
+#: ../../../inc/users/model/_user.funcs.php:5767
 msgid "Rep"
 msgstr "Жалобы"
 
-#: ../../../inc/users/model/_user.funcs.php:5761
+#: ../../../inc/users/model/_user.funcs.php:5779
 msgid "Primary<br />Group"
 msgstr "Основная<br />Группа"
 
-#: ../../../inc/users/model/_user.funcs.php:5772
+#: ../../../inc/users/model/_user.funcs.php:5790
 msgid "Sec.<br />Groups"
 msgstr "Втор.<br />Группы"
 
-#: ../../../inc/users/model/_user.funcs.php:5854
+#: ../../../inc/users/model/_user.funcs.php:5872
 msgid "Last visit on your profile"
 msgstr "Последнее посещение на вашем профиле"
 
-#: ../../../inc/users/model/_user.funcs.php:5883
+#: ../../../inc/users/model/_user.funcs.php:5901
 #: ../../../inc/users/views/_group.view.php:157
 #: ../../../inc/users/views/_userfields.view.php:156
 msgid "Edit this group..."
 msgstr "Редактировать эту группу..."
 
-#: ../../../inc/users/model/_user.funcs.php:5885
+#: ../../../inc/users/model/_user.funcs.php:5903
 #: ../../../inc/users/views/_group.view.php:159
 #: ../../../inc/users/views/_userfields.view.php:157
 msgid "Duplicate this group..."
 msgstr "Дублировать эту группу..."
 
-#: ../../../inc/users/model/_user.funcs.php:5997
+#: ../../../inc/users/model/_user.funcs.php:6015
 msgid "Private Message"
 msgstr "Личное сообщение"
 
-#: ../../../inc/users/model/_user.funcs.php:6138
+#: ../../../inc/users/model/_user.funcs.php:6156
 msgid "Duplicate this user..."
 msgstr "Дублировать этого пользователя..."
 
-#: ../../../inc/users/model/_user.funcs.php:6173
+#: ../../../inc/users/model/_user.funcs.php:6191
 msgid "Remove user from organization"
 msgstr "Удалить пользователя из организации"
 
-#: ../../../inc/users/model/_user.funcs.php:6290
+#: ../../../inc/users/model/_user.funcs.php:6308
 #: ../../../inc/users/views/_user_admin.form.php:454
 #, php-format
 msgid "Add domain %s"
 msgstr "Добавить домен %s"
 
-#: ../../../inc/users/model/_user.funcs.php:6291
-#: ../../../inc/users/model/_user.funcs.php:6295
+#: ../../../inc/users/model/_user.funcs.php:6309
+#: ../../../inc/users/model/_user.funcs.php:6313
 msgid "Domain status"
 msgstr "Статус домена"
 
@@ -40898,7 +40908,7 @@ msgstr "Редактировать введение"
 
 #: ../../../skins/bootstrap_forums_skin/_front.disp.php:112
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:96
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:451
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:417
 #: ../../../skins/pureforums_skin/_front.disp.php:58
 #: ../../../skins/pureforums_skin/_posts.disp.php:67
 #: ../../../skins/pureforums_skin/_skin.class.php:299
@@ -41062,7 +41072,7 @@ msgid "Sticky"
 msgstr "Прилеплены"
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:55
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:462
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:428
 #: ../../../skins/pureforums_skin/_item_list.inc.php:53
 #: ../../../skins/pureforums_skin/_skin.class.php:310
 msgid "This topic is locked: you cannot edit posts or make replies."
@@ -41107,12 +41117,12 @@ msgstr "Подфорум (содержит несколько топиков)"
 msgid "Locked topic"
 msgstr "Заблокированный топик"
 
-#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:224
+#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:228
 #: ../../../skins/pureforums_skin/_posts.disp.php:199
 msgid "There is no topic in this forum yet."
 msgstr "В этом форуме пока еще нет топиков."
 
-#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:239
+#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:243
 msgid "You must activate your account before you can post a new topic."
 msgstr ""
 "Вы должны активировать ваш аккаунт, прежде чем вы сможете постить новые "
@@ -41179,31 +41189,31 @@ msgstr "Отображать Статус и Автора Записи."
 msgid "Display Assignee (with Priority color coding) & Status"
 msgstr "Отображать Назначенного (с цветом приоритета) и Статус"
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:442
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:408
 #: ../../../skins/pureforums_skin/_edit.disp.php:54
 #: ../../../skins/pureforums_skin/index.main.php:196
 msgid "Post a new topic"
 msgstr "Создать новый топик"
 
 #. TRANS: verb
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:467
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:433
 msgid "Reply"
 msgstr "Ответить"
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:467
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:433
 #: ../../../skins/pureforums_skin/_skin.class.php:315
 msgid "Reply to topic"
 msgstr "Ответить на топик"
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:597
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:563
 msgid "New Topics"
 msgstr "Новые Топики"
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:602
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:568
 msgid "Recent Topics"
 msgstr "Последние Топики"
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:660
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:626
 #: ../../../skins/pureforums_skin/_item_comment.inc.php:164
 msgid "Is this reply helpful?"
 msgstr "Этот ответ полезный?"
