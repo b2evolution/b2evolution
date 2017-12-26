@@ -1219,9 +1219,14 @@ class collections_Module extends Module
 				$WidgetCache = & get_WidgetCache();
 				$Widget = & $WidgetCache->get_by_ID( $widget_ID );
 
-				// Get newsletterof the requested widget:
+				// Check newsletter of the requested widget:
 				$NewsletterCache = & get_NewsletterCache();
-				$Newsletter = & $NewsletterCache->get_by_ID( $Widget->get_param( 'enlt_ID' ) );
+				if( ! ( $Newsletter = & $NewsletterCache->get_by_ID( $Widget->get_param( 'enlt_ID' ), false, false ) ) ||
+				    ! $Newsletter->get( 'active' ) )
+				{	// Display an error when newsletter is not found or not active:
+					$Messages->add( T_('Newsletter subscription widget references an inactive newsletter.'), 'error' );
+					header_redirect();
+				}
 
 				if( param( 'subscribe', 'string', NULL ) === NULL )
 				{	// Unsubscribe from newsletter:

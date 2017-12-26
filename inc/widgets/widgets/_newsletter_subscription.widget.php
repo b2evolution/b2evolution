@@ -85,8 +85,8 @@ class newsletter_subscription_Widget extends ComponentWidget
 	{
 		// Load all active newsletters or if newsletter is currently used by this widget:
 		$NewsletterCache = & get_NewsletterCache();
-		$NewsletterCache->load_where( 'enlt_active = 1
-			OR enlt_ID = '.intval( $this->get_param( 'enlt_ID' ) ) );
+		$NewsletterCache->load_where( 'enlt_active = 1'.
+			( empty( $params['infinite_loop'] ) ? ' OR enlt_ID = '.intval( $this->get_param( 'enlt_ID', true ) ) : '' ) );
 
 		$r = array_merge( array(
 				'title' => array(
@@ -98,8 +98,14 @@ class newsletter_subscription_Widget extends ComponentWidget
 				'intro' => array(
 					'label' => T_('Intro text'),
 					'note' => '',
-					'type' => 'textarea',
+					'type' => 'html_textarea',
 					'defaultvalue' => T_('Don\'t miss the news!'),
+				),
+				'bottom' => array(
+					'label' => T_('Bottom note'),
+					'note' => '',
+					'type' => 'html_textarea',
+					'defaultvalue' => '',
 				),
 				'enlt_ID' => array(
 					'label' => T_('Newsletter'),
@@ -161,13 +167,6 @@ class newsletter_subscription_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$NewsletterCache = & get_NewsletterCache();
-		if( ! ( $widget_Newsletter = & $NewsletterCache->get_by_ID( $this->disp_params['enlt_ID'], false, false ) ) ||
-		    ! $widget_Newsletter->get( 'active' ) )
-		{	// Don't display when newsletter is not found or not active:
-			return false;
-		}
-
 		if( isset( $this->BlockCache ) )
 		{	// Do NOT cache some of these links are using a redirect_to param, which makes it page dependent.
 			// Note: also beware of the source param.
@@ -184,44 +183,58 @@ class newsletter_subscription_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		if( ! empty( $this->disp_params['intro'] ) )
-		{	// Display intro text:
-			echo '<p>'.$this->disp_params['intro'].'</p>';
-		}
-
-		$Form = new Form( get_htsrv_url().'action.php' );
-
-		$Form->begin_form();
-
-		$Form->add_crumb( 'collections_newsletter_widget' );
-		$Form->hidden( 'mname', 'collections' );
-		$Form->hidden( 'action', 'newsletter_widget' );
-		$Form->hidden( 'widget', $this->ID );
-		$Form->hidden( 'redirect_to', $redirect_to );
-
-		$user_newsletter_subscriptions = $current_User->get_newsletter_subscriptions();
-
-		// Display a button to subscribe⁄unsubscribe:
-		echo '<div class="center">';
-		if( in_array( $widget_Newsletter->ID, $user_newsletter_subscriptions ) )
-		{	// If current user is already subscribed:
-			$Form->button_input( array(
-					'name'  => 'unsubscribe',
-					'value' => $this->disp_params['button_subscribed'],
-					'class' => $this->disp_params['button_subscribed_class'].' submit' )
-				);
+		$NewsletterCache = & get_NewsletterCache();
+		if( ! ( $widget_Newsletter = & $NewsletterCache->get_by_ID( $this->disp_params['enlt_ID'], false, false ) ) ||
+		    ! $widget_Newsletter->get( 'active' ) )
+		{	// Display an error when newsletter is not found or not active:
+			echo '<div class="red">'.T_('Newsletter subscription widget references an inactive newsletter.').'</div>';
 		}
 		else
-		{	// If current user is not subscribed yet:
-			$Form->button_input( array(
-					'name'  => 'subscribe',
-					'value' => $this->disp_params['button_notsubscribed'],
-					'class' => $this->disp_params['button_notsubscribed_class'].' submit' )
-				);
-		}
-		echo '</div>';
+		{	// Display a form to subscribe⁄unsubscribe:
+			if( trim( $this->disp_params['intro'] ) !== '' )
+			{	// Display intro text:
+				echo '<p>'.$this->disp_params['intro'].'</p>';
+			}
 
-		$Form->end_form();
+			$Form = new Form( get_htsrv_url().'action.php' );
+
+			$Form->begin_form();
+
+			$Form->add_crumb( 'collections_newsletter_widget' );
+			$Form->hidden( 'mname', 'collections' );
+			$Form->hidden( 'action', 'newsletter_widget' );
+			$Form->hidden( 'widget', $this->ID );
+			$Form->hidden( 'redirect_to', $redirect_to );
+
+			$user_newsletter_subscriptions = $current_User->get_newsletter_subscriptions();
+
+			// Display a button to subscribe⁄unsubscribe:
+			echo '<div class="center">';
+			if( in_array( $widget_Newsletter->ID, $user_newsletter_subscriptions ) )
+			{	// If current user is already subscribed:
+				$Form->button_input( array(
+						'name'  => 'unsubscribe',
+						'value' => $this->disp_params['button_subscribed'],
+						'class' => $this->disp_params['button_subscribed_class'].' submit' )
+					);
+			}
+			else
+			{	// If current user is not subscribed yet:
+				$Form->button_input( array(
+						'name'  => 'subscribe',
+						'value' => $this->disp_params['button_notsubscribed'],
+						'class' => $this->disp_params['button_notsubscribed_class'].' submit' )
+					);
+			}
+			echo '</div>';
+
+			$Form->end_form();
+
+			if( trim( $this->disp_params['bottom'] ) !== '' )
+			{	// Display bottom note:
+				echo '<p class="margin-top">'.$this->disp_params['bottom'].'</p>';
+			}
+		}
 
 		echo $this->disp_params['block_body_end'];
 

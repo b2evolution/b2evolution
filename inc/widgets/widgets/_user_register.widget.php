@@ -93,7 +93,7 @@ class user_register_Widget extends ComponentWidget
 				'intro' => array(
 					'label' => T_('Intro text'),
 					'note' => '',
-					'type' => 'textarea',
+					'type' => 'html_textarea',
 					'defaultvalue' => T_('Don\'t miss the news!'),
 				),
 				'ask_firstname' => array(
@@ -212,7 +212,7 @@ class user_register_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		if( ! empty( $this->disp_params['intro'] ) )
+		if( trim( $this->disp_params['intro'] ) !== '' )
 		{ // Intro text
 			echo '<p>'.$this->disp_params['intro'].'</p>';
 		}

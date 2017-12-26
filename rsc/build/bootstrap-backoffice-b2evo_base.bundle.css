@@ -2123,6 +2123,9 @@ ol {
 .text-normal {
   font-weight: normal;
 }
+p.margin-top {
+  margin: 10px 0 0 0;
+}
 .table-hover > tbody > tr:hover {
   background-color: #ffc;
 }
