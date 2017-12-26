@@ -8843,6 +8843,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12450, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_email__campaign', 'ecmp_auto_sent_ts', 'TIMESTAMP NULL AFTER ecmp_sent_ts' );
+		db_add_col( 'T_email__campaign', 'ecmp_auto_send', 'ENUM("no", "subscription", "sequence") COLLATE ascii_general_ci NOT NULL DEFAULT "no"' );
+		db_add_col( 'T_email__campaign', 'ecmp_sequence', 'INT UNSIGNED NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
