@@ -3264,7 +3264,7 @@ function userfield_prepare( & $userfield )
  */
 function callback_filter_userlist( & $Form )
 {
-	global $Settings, $current_User, $Collection, $Blog, $edited_Organization;
+	global $Settings, $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
 
 	$Form->hidden( 'filter', 'new' );
 
@@ -3377,8 +3377,8 @@ function callback_filter_userlist( & $Form )
 		}
 	}
 
-	if( is_admin_page() )
-	{	// Filter by newsletter only on back-office:
+	if( is_admin_page() && empty( $edited_Newsletter ) && empty( $edited_EmailCampaign ) )
+	{	// Filter by newsletter only on back-office and don't display on newsletter and email campaign edit forms:
 		$NewsletterCache = & get_NewsletterCache( T_('All') );
 		$NewsletterCache->load_all();
 		if( count( $NewsletterCache->cache ) > 0 )
@@ -5200,6 +5200,7 @@ function users_results_block( $params = array() )
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'org_ID'               => NULL,
+			'enlt_ID'              => NULL,
 			'ecmp_ID'              => NULL,
 			'viewed_user'          => NULL,
 			'reg_ip_min'           => NULL,
@@ -5297,6 +5298,7 @@ function users_results_block( $params = array() )
 	$default_filters = array(
 			'order'      => $params['results_order'],
 			'org'        => $params['org_ID'],
+			'newsletter' => $params['enlt_ID'],
 			'ecmp'       => $params['ecmp_ID'],
 			'reg_ip_min' => $params['reg_ip_min'],
 			'reg_ip_max' => $params['reg_ip_max'],

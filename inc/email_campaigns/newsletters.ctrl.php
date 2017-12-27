@@ -241,6 +241,7 @@ switch( $action )
 	case 'new':
 	case 'edit':
 		// Display a form of new/edited newsletter:
+		memorize_param( 'action', 'string', '' );
 		$AdminUI->disp_view( 'email_campaigns/views/_newsletters.form.php' );
 		break;
 
