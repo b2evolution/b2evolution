@@ -472,6 +472,8 @@ switch( $action )
 
 			case 'recipient':
 				param( 'recipient_type', 'string', '', true );
+				memorize_param( 'action', 'string', '' );
+				memorize_param( 'tab', 'string', '' );
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_recipient.view.php' );
 				break;
 		}

@@ -47,6 +47,7 @@ users_results_block( array(
 		'display_status'       => false,
 		'display_actions'      => false,
 		'display_newsletter'   => false,
+		'display_enlt_status'  => true,
 		'display_emlog_date'   => true,
 		'th_class_login'       => 'shrinkwrap',
 		'td_class_login'       => '',

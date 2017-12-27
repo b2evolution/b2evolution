@@ -54,7 +54,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Subscription'),
+		'th' => T_('Newsletter'),
 		'order' => 'enlt_name',
 		'td' => '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID=$enlt_ID$"><b>$enlt_name$</b></a>',
 		'th_class' => 'shrinkwrap',

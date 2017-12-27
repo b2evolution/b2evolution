@@ -5250,6 +5250,7 @@ function users_results_block( $params = array() )
 			'display_sec_groups'   => false,
 			'display_level'        => true,
 			'display_status'       => true,
+			'display_enlt_status'  => false,
 			'display_emlog_date'   => false,
 			'display_actions'      => true,
 			'display_org_actions'  => false,
@@ -5280,7 +5281,7 @@ function users_results_block( $params = array() )
 
 	// Create result set:
 	load_class( 'users/model/_userlist.class.php', 'UserList' );
-	$UserList = new UserList( $params['filterset_name'], $UserSettings->get('results_per_page'), $params['results_param_prefix'], array(
+	$UserList = new UserList( $params['filterset_name'], 2/*$UserSettings->get('results_per_page')*/, $params['results_param_prefix'], array(
 			'join_group'          => $params['join_group'],
 			'join_sec_groups'     => $params['display_sec_groups'],
 			'join_city'           => $params['join_city'],
@@ -5810,6 +5811,17 @@ function users_results( & $UserList, $params = array() )
 				'order' => 'secondary_groups_count',
 				'default_dir' => 'D',
 				'td' => '%user_td_sec_groups( #user_ID#, #secondary_groups_count# )%',
+			);
+	}
+
+	if( $params['display_enlt_status'] )
+	{ // Display newsletter status:
+		$UserList->cols[] = array(
+				'th' => T_('Status'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'nowrap',
+				'order' => 'enls_user_ID',
+				'td' => '~conditional( #enls_user_ID# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
 			);
 	}
 
