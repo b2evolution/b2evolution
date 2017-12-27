@@ -556,13 +556,13 @@ class UserQuery extends SQL
 
 		switch( $recipient_type )
 		{
-			case 'receive':
-				// Get recipients which have already been sent this newsletter:
+			case 'sent':
+				// Get recipients which have already been received this newsletter:
 				$this->WHERE_and( 'csnd_emlog_ID IS NOT NULL' );
 				break;
 
-			case 'wait':
-				// Get recipients which have not been sent this newsletter yet:
+			case 'readytosend':
+				// Get recipients which have not been received this newsletter yet:
 				$this->WHERE_and( 'csnd_emlog_ID IS NULL' );
 				break;
 		}

@@ -287,7 +287,20 @@ class EmailCampaign extends DataObject
 		if( $link )
 		{	// Initialize URL to page with reciepients of this Email Campaign:
 			$campaign_edit_modes = get_campaign_edit_modes( $this->ID );
-			$recipients_count = '<a href="'.$campaign_edit_modes['recipient']['href'].( empty( $type ) ? '' : '&amp;recipient_type='.$type ).'">'.$recipients_count.'</a>';
+			switch( $type )
+			{
+				case 'receive':
+					$recipient_type = 'sent';
+					break;
+				case 'wait':
+					$recipient_type = 'readytosend';
+					break;
+				case 'filter':
+				default:
+					$recipient_type = 'filtered';
+					break;
+			}
+			$recipients_count = '<a href="'.$campaign_edit_modes['recipient']['href'].( empty( $type ) ? '' : '&amp;recipient_type='.$recipient_type ).'">'.$recipients_count.'</a>';
 		}
 
 		return $recipients_count;

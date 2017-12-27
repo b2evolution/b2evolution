@@ -140,7 +140,7 @@ class UserSettings extends AbstractSettings
 		'enable_email' => 1,
 
 		'notification_email_limit' => 3, // How many notification email is allowed per day for this user
-		'newsletter_limit' => 1, // How many newsletter email is allowed per day for this user
+		'newsletter_limit' => 3, // How many newsletter email is allowed per day for this user
 	);
 
 

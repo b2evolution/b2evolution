@@ -25,7 +25,6 @@ users_results_block( array(
 		'results_title'        => T_('Recipients of this campaign').get_manual_link( 'email-campaign-recipients' ),
 		'results_order'        => '/emlog_timestamp/D',
 		'page_url'             => get_dispctrl_url( 'campaigns', 'action=edit&amp;tab=recipient&amp;ecmp_ID='.$edited_EmailCampaign->ID.'&amp;recipient_type='.get_param( 'recipient_type' ) ),
-		'display_filters'      => false,
 		'display_ID'           => false,
 		'display_btn_adduser'  => false,
 		'display_btn_addgroup' => false,

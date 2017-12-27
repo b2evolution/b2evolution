@@ -816,7 +816,7 @@ if( $display_mode != 'js')
 			$AdminUI->set_page_manual_link( 'user-preferences-tab' );
 			break;
 		case 'subs':
-			$AdminUI->breadcrumbpath_add( T_('Notifications'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			$AdminUI->breadcrumbpath_add( T_('Emails'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-notifications-tab' );

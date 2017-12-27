@@ -143,7 +143,7 @@ switch( $action )
 		// Update recipients only if newsletter has been changed:
 		$edited_EmailCampaign->update_recipients( true );
 
-		$Messages->add( T_('Newsletter of the email campaign has been updated.'), 'success' );
+		$Messages->add( T_('Campaign has been attached to a different newsletter.'), 'success' );
 
 		// Redirect after saving:
 		header_redirect( get_campaign_tab_url( $current_tab, $edited_EmailCampaign->ID ), 303 ); // Will EXIT

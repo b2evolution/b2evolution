@@ -116,7 +116,7 @@ class UserList extends DataObjectList2
 				'org'                 => NULL,    // integer, Organization ID
 				'newsletter'          => NULL,    // integer, Newsletter ID
 				'ecmp'                => NULL,    // integer, Email Campaign ID
-				'recipient_type'      => NULL,    // string, Recipient type of email campaign: 'filter', 'receive', 'wait'
+				'recipient_type'      => NULL,    // string, Recipient type of email campaign: 'filtered', 'sent', 'readytosend'
 		) );
 	}
 

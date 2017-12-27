@@ -188,9 +188,10 @@ switch( $action )
 			$Settings->set( 'def_newsletters', implode( ',', $def_newsletters ) );
 			$Settings->dbupdate();
 
-			$Messages->add( ( $action == 'enable' ?
-				T_('Newsletter has been enabled by default for new users.') :
-				T_('Newsletter has been disabled by default for new users.') ), 'success' );
+			$Messages->add( sprintf( ( $action == 'enable' ?
+				T_('New users will be automatically subscribed to newsletter: %s') :
+				T_('New users will no longer be automatically subscribed to newsletter: %s') ),
+				'"'.$edited_Newsletter->get( 'name' ).'"' ), 'success' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
