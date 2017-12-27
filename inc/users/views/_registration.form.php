@@ -169,9 +169,9 @@ $Form->begin_fieldset( T_('Other options').get_manual_link('other-registration-s
 					array( 'required', T_('Required') ),
 				), T_('Gender'), true );
 
-	if( $Settings->get( 'after_registration' ) == 'return_to_original' )
+	if( $Settings->get( 'after_registration' ) == 'return_to_original' || $Settings->get( 'after_registration' ) == 'specific_slug' )
 	{ // return to original url
-		$after_registration = 'return_to_original';
+		$after_registration = $Settings->get( 'after_registration' );
 		$after_registration_url = url_add_param( $baseurl, 'disp=profile' );
 	}
 	else
@@ -184,7 +184,11 @@ $Form->begin_fieldset( T_('Other options').get_manual_link('other-registration-s
 					array( 'specific_url', T_( 'Go to specific URL' ).':', '',
 						'<input type="text" id="specific_after_registration_url" class="form_text_input form-control" name="specific_after_registration_url" size="50" maxlength="120" value="'
 						.format_to_output( $after_registration_url, 'formvalue' ).'"
-						onfocus="document.getElementsByName(\'after_registration\')[1].checked=true;" />' )
+						onfocus="document.getElementsByName(\'after_registration\')[1].checked=true;" />' ),
+					array( 'specific_slug', T_( 'Go to specific slug' ).':', '',
+						'<input type="text" id="specific_after_registration_slug" class="form_text_input form-control" name="specific_after_registration_slug" size="50" maxlength="120" value="'
+						.format_to_output( $Settings->get( 'after_registration_slug' ), 'formvalue' ).'"
+						onfocus="document.getElementsByName(\'after_registration\')[2].checked=true;" />' )
 				), T_( 'After registration' ), true );
 
 $Form->end_fieldset();

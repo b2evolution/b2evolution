@@ -495,6 +495,16 @@ switch( $action )
 				}
 			}
 		}
+		elseif( $after_registration == 'specific_slug' )
+		{	// Return to the specific slug which is set in the registration settings form:
+			$SlugCache = get_SlugCache();
+			if( ( $Slug = & $SlugCache->get_by_name( $Settings->get( 'after_registration_slug' ), false, false ) ) &&
+			    ( $slug_Item = & $Slug->get_object() ) &&
+			    ( $slug_Item instanceof Item ) )
+			{	// Use permanent URL of the slug Item:
+				$redirect_to = $slug_Item->get_permanent_url( '', '', '&' );
+			}
+		}
 		else
 		{ // Return to the specific URL which is set in the registration settings form
 			$redirect_to = $after_registration;
