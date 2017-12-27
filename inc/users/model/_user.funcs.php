@@ -5281,7 +5281,7 @@ function users_results_block( $params = array() )
 
 	// Create result set:
 	load_class( 'users/model/_userlist.class.php', 'UserList' );
-	$UserList = new UserList( $params['filterset_name'], 2/*$UserSettings->get('results_per_page')*/, $params['results_param_prefix'], array(
+	$UserList = new UserList( $params['filterset_name'], $UserSettings->get('results_per_page'), $params['results_param_prefix'], array(
 			'join_group'          => $params['join_group'],
 			'join_sec_groups'     => $params['display_sec_groups'],
 			'join_city'           => $params['join_city'],
