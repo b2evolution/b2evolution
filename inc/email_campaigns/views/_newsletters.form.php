@@ -56,4 +56,43 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 }
 $Form->end_form( $buttons );
 
+if( $edited_Newsletter->ID > 0 )
+{	// Display users which are subscribed to this Newsletter:
+	users_results_block( array(
+			'enlt_ID'              => $edited_Newsletter->ID,
+			'filterset_name'       => 'nltsub_'.$edited_Newsletter->ID,
+			'results_param_prefix' => 'nltsub_',
+			'results_title'        => T_('Subscribers').get_manual_link( 'newsletter-subscribers' ),
+			'results_order'        => '/enls_last_sent_manual_ts/D',
+			'page_url'             => get_dispctrl_url( 'newsletters', 'action=edit&amp;enlt_ID='.$edited_Newsletter->ID ),
+			'display_ID'           => false,
+			'display_btn_adduser'  => false,
+			'display_btn_addgroup' => false,
+			'display_avatar'       => false,
+			'display_firstname'    => true,
+			'display_lastname'     => true,
+			'display_name'         => false,
+			'display_gender'       => false,
+			'display_country'      => false,
+			'display_blogs'        => false,
+			'display_source'       => false,
+			'display_regdate'      => false,
+			'display_regcountry'   => false,
+			'display_update'       => false,
+			'display_lastvisit'    => false,
+			'display_contact'      => false,
+			'display_reported'     => false,
+			'display_group'        => false,
+			'display_level'        => false,
+			'display_status'       => false,
+			'display_actions'      => false,
+			'display_newsletter'   => false,
+			'display_enls_sent_manual' => true,
+			'display_enls_send_count'  => true,
+			'th_class_login'       => 'shrinkwrap',
+			'td_class_login'       => '',
+			'th_class_nickname'    => 'shrinkwrap',
+			'td_class_nickname'    => '',
+		) );
+}
 ?>

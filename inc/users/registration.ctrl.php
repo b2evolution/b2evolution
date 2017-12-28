@@ -71,10 +71,17 @@ switch ( $action )
 		}
 
 		$after_registration = param( 'after_registration', 'string', 'return_to_original' );
-		if( $after_registration != 'return_to_original' )
+		$after_registration_slug = param( 'specific_after_registration_slug', 'string', '' );
+		switch( $after_registration )
 		{
-			$after_registration = param( 'specific_after_registration_url', 'url', NULL );
-			param_check_url( 'specific_after_registration_url', 'http-https' );
+			case 'specific_url':
+				$after_registration = param( 'specific_after_registration_url', 'url', NULL );
+				param_check_url( 'specific_after_registration_url', 'http-https' );
+				break;
+
+			case 'specific_slug':
+				param_check_not_empty( 'specific_after_registration_slug', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Go to specific slug') ) );
+				break;
 		}
 
 		param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimum password length must be between %d and %d.') );
@@ -141,6 +148,7 @@ switch ( $action )
 					 array( 'after_email_validation', $after_email_validation ),
 					 array( 'pass_after_quick_reg', $pass_after_quick_reg ),
 					 array( 'after_registration', $after_registration ),
+					 array( 'after_registration_slug', $after_registration_slug ),
 					 array( 'user_minpwdlen', $user_minpwdlen ),
 					 array( 'js_passwd_hashing', $js_passwd_hashing ),
 					 array( 'http_auth_require', $http_auth_require ),

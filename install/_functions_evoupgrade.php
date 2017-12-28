@@ -8835,7 +8835,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12440, 'Upgrading email newsletter subscriptions table...' ) )
+	if( upg_task_start( 12440, 'Upgrading email newsletters table...' ) )
 	{	// part of 6.10.0-beta
 		db_add_col( 'T_email__newsletter', 'enlt_order', 'INT NULL DEFAULT NULL' );
 		$DB->query( 'UPDATE T_email__newsletter
@@ -8843,7 +8843,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12450, 'Upgrading email campaigns table...' ) )
+	if( upg_task_start( 12450, 'Upgrading email newsletter subscriptions table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_email__newsletter_subscription', 'enls_last_sent_manual_ts', 'TIMESTAMP NULL' );
+		db_add_col( 'T_email__newsletter_subscription', 'enls_send_count', 'INT UNSIGNED NOT NULL DEFAULT 0' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12460, 'Upgrading email campaigns table...' ) )
 	{	// part of 6.10.0-beta
 		db_add_col( 'T_email__campaign', 'ecmp_auto_sent_ts', 'TIMESTAMP NULL AFTER ecmp_sent_ts' );
 		db_add_col( 'T_email__campaign', 'ecmp_auto_send', 'ENUM("no", "subscription", "sequence") COLLATE ascii_general_ci NOT NULL DEFAULT "no"' );

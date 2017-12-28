@@ -202,17 +202,17 @@ $Form->begin_fieldset( T_('Newsletter subscriptions').( is_admin_page() ? get_ma
 		{
 			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ) );
 		}
-		$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Newsletter' ), false, false, $checklist_params );
+		$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Newsletters' ), false, false, $checklist_params );
 	}
 
 	// Limit newsletters:
 	if( $is_admin_page )
 	{ // Back office view
-		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('emails per day').'</b>' ) );
+		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Never send me more than' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('newsletter emails per day, all newsletters combined.').'</b>' ) );
 	}
 	else
 	{ // Front office view
-		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to %s emails per day' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
+		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Never send me more than %s newsletter emails per day, all newsletters combined.' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
 	}
 
 $Form->end_fieldset();

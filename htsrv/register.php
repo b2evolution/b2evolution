@@ -293,8 +293,28 @@ switch( $action )
 			$new_User->set( 'pass', '' );
 			$new_User->set( 'salt', '' );
 			$new_User->set( 'pass_driver', 'nopass' );
-			// Set newsletters from current widget "Email capture / Quick registration":
-			$new_User->set_newsletter_subscriptions( array_keys( $user_register_Widget->get_param( 'newsletters' ) ) );
+			// Set newsletters subscriptions from current widget "Email capture / Quick registration":
+			$widget_newsletters = $user_register_Widget->disp_params['newsletters'];
+			foreach( $widget_newsletters as $widget_newsletter_ID => $widget_newsletter_is_enabled )
+			{
+				if( ! $widget_newsletter_is_enabled )
+				{	// Remove disabled newsletter from list:
+					unset( $widget_newsletters[ $widget_newsletter_ID ] );
+				}
+			}
+			if( isset( $widget_newsletters['default'] ) )
+			{	// Set also default newsletters for new users:
+				$new_User->insert_default_newsletters = true;
+				unset( $widget_newsletters['default'] );
+			}
+			else
+			{	// Don't use default newsletters for new users because it is disabled by widget:
+				$new_User->insert_default_newsletters = false;
+			}
+			if( count( $widget_newsletters ) )
+			{	// If at least one newsletter is selected in widget params:
+				$new_User->set_newsletter_subscriptions( array_keys( $widget_newsletters ) );
+			}
 		}
 		else
 		{	// Save an entered password from normal registration form:
@@ -455,7 +475,7 @@ switch( $action )
 		// Set redirect_to from current widget:
 		if( isset( $user_register_Widget ) )
 		{	// If widget is defined:
-			$widget_redirect_to = trim( $user_register_Widget->get_param( 'redirect_to' ) );
+			$widget_redirect_to = trim( $user_register_Widget->disp_params['redirect_to'] );
 			if( ! empty( $widget_redirect_to ) )
 			{	// If a redirect param is defined:
 				if( preg_match( '#^(https?://|/)#i', $widget_redirect_to ) )
@@ -493,6 +513,16 @@ switch( $action )
 				{
 					$redirect_to = $baseurl;
 				}
+			}
+		}
+		elseif( $after_registration == 'specific_slug' )
+		{	// Return to the specific slug which is set in the registration settings form:
+			$SlugCache = get_SlugCache();
+			if( ( $Slug = & $SlugCache->get_by_name( $Settings->get( 'after_registration_slug' ), false, false ) ) &&
+			    ( $slug_Item = & $Slug->get_object() ) &&
+			    ( $slug_Item instanceof Item ) )
+			{	// Use permanent URL of the slug Item:
+				$redirect_to = $slug_Item->get_permanent_url( '', '', '&' );
 			}
 		}
 		else

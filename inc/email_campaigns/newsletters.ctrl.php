@@ -168,7 +168,7 @@ switch( $action )
 		// Make sure we got an enlt_ID:
 		param( 'enlt_ID', 'integer', true );
 
-		$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
+		$def_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', $Settings->get( 'def_newsletters' ) ) );
 		$enlt_index = array_search( $edited_Newsletter->ID, $def_newsletters );
 
 		$update_def_newsletters = false;
@@ -185,12 +185,13 @@ switch( $action )
 
 		if( $update_def_newsletters )
 		{	// Update default setting for newsletters:
-			$Settings->set( 'def_newsletters', implode( ',', $def_newsletters ) );
+			$Settings->set( 'def_newsletters', trim( implode( ',', $def_newsletters ), ',' ) );
 			$Settings->dbupdate();
 
-			$Messages->add( ( $action == 'enable' ?
-				T_('Newsletter has been enabled by default for new users.') :
-				T_('Newsletter has been disabled by default for new users.') ), 'success' );
+			$Messages->add( sprintf( ( $action == 'enable' ?
+				T_('New users will be automatically subscribed to newsletter: %s') :
+				T_('New users will no longer be automatically subscribed to newsletter: %s') ),
+				'"'.$edited_Newsletter->get( 'name' ).'"' ), 'success' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
@@ -240,6 +241,7 @@ switch( $action )
 	case 'new':
 	case 'edit':
 		// Display a form of new/edited newsletter:
+		memorize_param( 'action', 'string', '' );
 		$AdminUI->disp_view( 'email_campaigns/views/_newsletters.form.php' );
 		break;
 

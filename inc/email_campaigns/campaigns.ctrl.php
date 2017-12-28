@@ -143,7 +143,7 @@ switch( $action )
 		// Update recipients only if newsletter has been changed:
 		$edited_EmailCampaign->update_recipients( true );
 
-		$Messages->add( T_('Newsletter of the email campaign has been updated.'), 'success' );
+		$Messages->add( T_('Campaign has been attached to a different newsletter.'), 'success' );
 
 		// Redirect after saving:
 		header_redirect( get_campaign_tab_url( $current_tab, $edited_EmailCampaign->ID ), 303 ); // Will EXIT
@@ -186,7 +186,7 @@ switch( $action )
 		$NewsletterCache = & get_NewsletterCache();
 		if( ! ( $Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) ) || ! $Newsletter->get( 'active' ) )
 		{	// If the selected newsletter cannot be used for email campaigns (because it doesn't exist or is not active):
-			$Messages->add( T_('Please select another newsletter because it cannot be used for email campaign.'), 'warning' );
+			$Messages->add( T_('Selected newsletter cannot be used for email campaign.'), 'warning' );
 			header_redirect( $admin_url.'?ctrl=users&action=newsletter&filter=new&newsletter='.$newsletter_ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
@@ -472,6 +472,8 @@ switch( $action )
 
 			case 'recipient':
 				param( 'recipient_type', 'string', '', true );
+				memorize_param( 'action', 'string', '' );
+				memorize_param( 'tab', 'string', '' );
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_recipient.view.php' );
 				break;
 		}

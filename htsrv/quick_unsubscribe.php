@@ -217,7 +217,7 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 				}
 				else
 				{	// Display a message is the user is not subscribed on the requested newsletter:
-					$msg = T_('You are not subscribed on this newsletter.');
+					$msg = T_('You are not subscribed to this newsletter.');
 				}
 				break;
 

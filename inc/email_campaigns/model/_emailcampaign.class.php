@@ -246,31 +246,57 @@ class EmailCampaign extends DataObject
 
 		// Get users from DB:
 		$users_SQL = new SQL( 'Get recipients of campaign #'.$this->ID );
-		$users_SQL->SELECT( 'user_ID, csnd_emlog_ID, csnd_user_ID' );
+		$users_SQL->SELECT( 'user_ID, csnd_emlog_ID, csnd_user_ID, enls_user_ID' );
 		$users_SQL->FROM( 'T_users' );
-		$users_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID' );
-		$users_SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON ( csnd_camp_ID = '.$DB->quote( $this->ID ).' AND ( csnd_user_ID = user_ID OR csnd_user_ID IS NULL ) )' );
-		$users_SQL->WHERE( 'enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
-		$users_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+		$users_SQL->FROM_add( 'INNER JOIN T_email__campaign_send ON ( csnd_camp_ID = '.$DB->quote( $this->ID ).' AND ( csnd_user_ID = user_ID OR csnd_user_ID IS NULL ) )' );
+		$users_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+		$users_SQL->WHERE( 'user_status IN ( "activated", "autoactivated" )' );
 		$users = $DB->get_results( $users_SQL->get(), OBJECT, $users_SQL->title );
 
 		$this->users['all'] = array();
 		$this->users['filter'] = array();
 		$this->users['receive'] = array();
 		$this->users['wait'] = array();
+		$this->users['unsub_all'] = array();
+		$this->users['unsub_filter'] = array();
+		$this->users['unsub_receive'] = array();
+		$this->users['unsub_wait'] = array();
 
 		foreach( $users as $user_data )
 		{
-			$this->users['all'][] = $user_data->user_ID;
+			if( $user_data->enls_user_ID === NULL )
+			{	// This user is unsubscribed from newsletter of this email campaign:
+				$this->users['unsub_all'][] = $user_data->user_ID;
+			}
+			else
+			{	// This user is subscribed to newsletter of this email campaign:
+				$this->users['all'][] = $user_data->user_ID;
+			}
 			if( $user_data->csnd_emlog_ID > 0 )
 			{	// This user already received newsletter email:
-				$this->users['receive'][] = $user_data->user_ID;
-				$this->users['filter'][] = $user_data->user_ID;
+				if( $user_data->enls_user_ID === NULL )
+				{	// This user is unsubscribed from newsletter of this email campaign:
+					$this->users['unsub_receive'][] = $user_data->user_ID;
+					$this->users['unsub_filter'][] = $user_data->user_ID;
+				}
+				else
+				{	// This user is subscribed to newsletter of this email campaign:
+					$this->users['receive'][] = $user_data->user_ID;
+					$this->users['filter'][] = $user_data->user_ID;
+				}
 			}
 			elseif( $user_data->csnd_user_ID > 0 )
 			{	// This user didn't receive email yet:
-				$this->users['wait'][] = $user_data->user_ID;
-				$this->users['filter'][] = $user_data->user_ID;
+				if( $user_data->enls_user_ID === NULL )
+				{	// This user is unsubscribed from newsletter of this email campaign:
+					$this->users['unsub_wait'][] = $user_data->user_ID;
+					$this->users['unsub_filter'][] = $user_data->user_ID;
+				}
+				else
+				{	// This user is subscribed to newsletter of this email campaign:
+					$this->users['wait'][] = $user_data->user_ID;
+					$this->users['filter'][] = $user_data->user_ID;
+				}
 			}
 		}
 
@@ -296,7 +322,26 @@ class EmailCampaign extends DataObject
 		if( $link )
 		{	// Initialize URL to page with reciepients of this Email Campaign:
 			$campaign_edit_modes = get_campaign_edit_modes( $this->ID );
-			$recipients_count = '<a href="'.$campaign_edit_modes['recipient']['href'].( empty( $type ) ? '' : '&amp;recipient_type='.$type ).'">'.$recipients_count.'</a>';
+			switch( $type )
+			{
+				case 'receive':
+					$recipient_type = 'sent';
+					break;
+				case 'wait':
+					$recipient_type = 'readytosend';
+					break;
+				case 'filter':
+				default:
+					$recipient_type = 'filtered';
+					break;
+			}
+
+			$unsub_recipients_count = count( $this->get_recipients( 'unsub_'.$type ) );
+			if( $unsub_recipients_count > 0 )
+			{	// If unsubscribed users exist:
+				$recipients_count = $recipients_count.' ('.T_('still subscribed').') + '.$unsub_recipients_count.' ('.T_('unsubscribed').')';
+			}
+			$recipients_count = '<a href="'.$campaign_edit_modes['recipient']['href'].( empty( $type ) ? '' : '&amp;recipient_type='.$recipient_type ).'">'.$recipients_count.'</a>';
 		}
 
 		return $recipients_count;
@@ -552,7 +597,17 @@ class EmailCampaign extends DataObject
 		}
 		else
 		{ // Send a newsletter to real user
-			return send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, false, array(), $email_address );
+			$r = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, false, array(), $email_address );
+			if( $r )
+			{	// Update last sending data for newsletter per user:
+				global $DB, $servertimenow;
+				$DB->query( 'UPDATE T_email__newsletter_subscription
+					SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $servertimenow ) ).',
+					    enls_send_count = enls_send_count + 1
+					WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
+					  AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+			}
+			return $r;
 		}
 	}
 

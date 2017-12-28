@@ -102,13 +102,13 @@ function newsletters_td_new_users( $enlt_ID )
 
 	if( in_array( $enlt_ID, $def_newsletters ) )
 	{
-		$title = T_('Disable the newsletter by default for new users');
+		$title = T_('Auto-subscribe new users to this newsletter.');
 		$icon = 'bullet_full';
 		$action = 'disable';
 	}
 	else
 	{
-		$title = T_('Enable the newsletter by default for new users');
+		$title = T_('Do NOT auto-subscribe new users to this newsletter.');
 		$icon = 'bullet_empty';
 		$action = 'enable';
 	}

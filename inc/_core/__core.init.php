@@ -1818,7 +1818,7 @@ class _core_Module extends Module
 		if( ! empty( $user_subs_url ) )
 		{ // Display this menu item only when url is available to current user
 			$userprefs_entries['subs'] = array(
-					'text' => T_('Notifications').'&hellip;',
+					'text' => T_('Emails').'&hellip;',
 					'href' => $user_subs_url,
 				);
 		}

@@ -2504,7 +2504,7 @@ function get_user_sub_entries( $is_admin, $user_ID )
 							'href' => url_add_param( $base_url, $ctrl_param.'userprefs'.$user_param ) );
 
 		$users_sub_entries['subs'] = array(
-							'text' => T_('Notifications'),
+							'text' => T_('Emails'),
 							'href' => url_add_param( $base_url, $ctrl_param.'subs'.$user_param ) );
 
 		if( $is_admin && $Settings->get( 'enable_visit_tracking' ) == 1 )
@@ -3264,7 +3264,7 @@ function userfield_prepare( & $userfield )
  */
 function callback_filter_userlist( & $Form )
 {
-	global $Settings, $current_User, $Collection, $Blog, $edited_Organization;
+	global $Settings, $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
 
 	$Form->hidden( 'filter', 'new' );
 
@@ -3377,8 +3377,8 @@ function callback_filter_userlist( & $Form )
 		}
 	}
 
-	if( is_admin_page() )
-	{	// Filter by newsletter only on back-office:
+	if( is_admin_page() && empty( $edited_Newsletter ) && empty( $edited_EmailCampaign ) )
+	{	// Filter by newsletter only on back-office and don't display on newsletter and email campaign edit forms:
 		$NewsletterCache = & get_NewsletterCache( T_('All') );
 		$NewsletterCache->load_all();
 		if( count( $NewsletterCache->cache ) > 0 )
@@ -5200,6 +5200,7 @@ function users_results_block( $params = array() )
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'org_ID'               => NULL,
+			'enlt_ID'              => NULL,
 			'ecmp_ID'              => NULL,
 			'viewed_user'          => NULL,
 			'reg_ip_min'           => NULL,
@@ -5250,7 +5251,10 @@ function users_results_block( $params = array() )
 			'display_sec_groups'   => false,
 			'display_level'        => true,
 			'display_status'       => true,
+			'display_enlt_status'  => false,
 			'display_emlog_date'   => false,
+			'display_enls_sent_manual' => false,
+			'display_enls_send_count'  => false,
 			'display_actions'      => true,
 			'display_org_actions'  => false,
 			'display_newsletter'   => true,
@@ -5296,6 +5300,7 @@ function users_results_block( $params = array() )
 	$default_filters = array(
 			'order'      => $params['results_order'],
 			'org'        => $params['org_ID'],
+			'newsletter' => $params['enlt_ID'],
 			'ecmp'       => $params['ecmp_ID'],
 			'reg_ip_min' => $params['reg_ip_min'],
 			'reg_ip_max' => $params['reg_ip_max'],
@@ -5465,6 +5470,8 @@ function users_results( & $UserList, $params = array() )
 			'display_level'      => true,
 			'display_status'     => true,
 			'display_emlog_date' => false,
+			'display_enls_sent_manual' => false,
+			'display_enls_send_count'  => false,
 			'display_actions'    => true,
 			'display_org_actions'=> false,
 			'th_class_avatar'    => 'shrinkwrap small',
@@ -5813,6 +5820,17 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
+	if( $params['display_enlt_status'] )
+	{ // Display newsletter status:
+		$UserList->cols[] = array(
+				'th' => T_('Status'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'nowrap',
+				'order' => 'enls_user_ID',
+				'td' => '~conditional( #enls_user_ID# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
+			);
+	}
+
 	if( $params['display_emlog_date'] )
 	{ // Display email campaign send date:
 		$UserList->cols[] = array(
@@ -5822,6 +5840,30 @@ function users_results( & $UserList, $params = array() )
 				'order' => 'emlog_timestamp',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #emlog_timestamp# )%',
+			);
+	}
+
+	if( $params['display_enls_sent_manual'] )
+	{ // Display email campaign send date:
+		$UserList->cols[] = array(
+				'th' => T_('Last sent'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'enls_last_sent_manual_ts',
+				'default_dir' => 'D',
+				'td' => '%mysql2localedatetime( #enls_last_sent_manual_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_send_count'] )
+	{ // Display email campaign send date:
+		$UserList->cols[] = array(
+				'th' => T_('# of emails sent'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'right',
+				'order' => 'enls_send_count',
+				'default_dir' => 'D',
+				'td' => '$enls_send_count$',
 			);
 	}
 
@@ -6443,7 +6485,7 @@ function get_PasswordDriver( $driver_code = '' )
 			$driver_file_path = 'users/model/passwords/'.$drv_key.'.php';
 			if( file_exists( $inc_path.$driver_file_path ) )
 			{	// Class file exists on the disk
-				$driver_class_name = str_replace( ' ', '', lcfirst( ucwords( str_replace( '_', ' ', $drv_key ) ) ) ).'PasswordDriver';
+				$driver_class_name = str_replace( ' ', '', utf8_lcfirst( ucwords( str_replace( '_', ' ', $drv_key ) ) ) ).'PasswordDriver';
 				// Load the class:
 				load_class( $driver_file_path, $driver_class_name );
 
