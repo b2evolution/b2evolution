@@ -5858,7 +5858,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_enls_send_count'] )
 	{ // Display email campaign send date:
 		$UserList->cols[] = array(
-				'th' => T_('# of emails sent'),
+				'th' => T_('# of campaigns sent'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'right',
 				'order' => 'enls_send_count',

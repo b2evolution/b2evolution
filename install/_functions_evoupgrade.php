@@ -8864,6 +8864,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{	// part of 6.10.0-beta
 		db_add_col( 'T_email__newsletter_subscription', 'enls_last_sent_manual_ts', 'TIMESTAMP NULL' );
 		db_add_col( 'T_email__newsletter_subscription', 'enls_send_count', 'INT UNSIGNED NOT NULL DEFAULT 0' );
+		$DB->query( 'UPDATE T_email__newsletter_subscription
+			SET enls_send_count = (
+					SELECT COUNT( csnd_camp_ID )
+					  FROM T_email__campaign_send
+					 WHERE csnd_user_ID = enls_user_ID
+					   AND csnd_emlog_ID IS NOT NULL
+				),
+				enls_last_sent_manual_ts = (
+					SELECT MAX( emlog_timestamp )
+					  FROM T_email__campaign_send
+					 INNER JOIN T_email__log ON emlog_ID = csnd_emlog_ID
+					 WHERE csnd_user_ID = enls_user_ID
+				)' );
 		upg_task_end();
 	}
 
