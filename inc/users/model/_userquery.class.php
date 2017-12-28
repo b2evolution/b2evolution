@@ -527,6 +527,7 @@ class UserQuery extends SQL
 			return;
 		}
 
+		$this->SELECT_add( ', enls_last_sent_manual_ts, enls_send_count' );
 		$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ) );
 	}
 

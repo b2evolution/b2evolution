@@ -578,7 +578,17 @@ class EmailCampaign extends DataObject
 		}
 		else
 		{ // Send a newsletter to real user
-			return send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, false, array(), $email_address );
+			$r = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, false, array(), $email_address );
+			if( $r )
+			{	// Update last sending data for newsletter per user:
+				global $DB, $servertimenow;
+				$DB->query( 'UPDATE T_email__newsletter_subscription
+					SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $servertimenow ) ).',
+					    enls_send_count = enls_send_count + 1
+					WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
+					  AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+			}
+			return $r;
 		}
 	}
 

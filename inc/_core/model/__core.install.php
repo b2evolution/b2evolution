@@ -497,8 +497,10 @@ $schema_queries = array(
 	'T_email__newsletter_subscription' => array(
 		'Creating email newsletter subscriptions table',
 		"CREATE TABLE T_email__newsletter_subscription (
-			enls_user_ID INT UNSIGNED NOT NULL,
-			enls_enlt_ID INT UNSIGNED NOT NULL,
+			enls_user_ID             INT UNSIGNED NOT NULL,
+			enls_enlt_ID             INT UNSIGNED NOT NULL,
+			enls_last_sent_manual_ts TIMESTAMP NULL,
+			enls_send_count          INT UNSIGNED NOT NULL DEFAULT 0,
 			PRIMARY KEY (enls_user_ID, enls_enlt_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
