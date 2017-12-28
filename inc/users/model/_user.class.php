@@ -165,10 +165,16 @@ class User extends DataObject
 	var $PasswordDriver;
 
 	/**
-	 * IDs of newsletters which this user is subscribed on
+	 * IDs of newsletters which this user is subscribed to
 	 * @var array
 	 */
 	var $newsletter_subscriptions;
+
+	/**
+	 * IDs of old newsletters which this user was subscribed before updating
+	 * @var array
+	 */
+	var $old_newsletter_subscriptions;
 
 	/**
 	 * TRUE if user's newsletter subscriptions were updated during user updating
@@ -7231,7 +7237,7 @@ class User extends DataObject
 	 */
 	function set_newsletter_subscriptions( $new_subscriptions )
 	{
-		$prev_subscriptions = $this->get_newsletter_subscriptions();
+		$this->old_newsletter_subscriptions = $this->get_newsletter_subscriptions();
 
 		if( ! is_array( $new_subscriptions ) )
 		{	// This must be an array:
@@ -7253,15 +7259,15 @@ class User extends DataObject
 		}
 
 		// Check if subscriptions were updated:
-		if( count( $prev_subscriptions ) != count( $new_subscriptions ) )
+		if( count( $this->old_newsletter_subscriptions ) != count( $new_subscriptions ) )
 		{	// If a count of subscriptions are not equals then mark they are updated:
 			$this->newsletter_subscriptions_updated = true;
 		}
 		else
 		{
 			sort( $new_subscriptions );
-			sort( $prev_subscriptions );
-			if( $prev_subscriptions != $new_subscriptions )
+			sort( $this->old_newsletter_subscriptions );
+			if( $this->old_newsletter_subscriptions != $new_subscriptions )
 			{	// If subscriptions were really updated:
 				$this->newsletter_subscriptions_updated = true;
 			}
@@ -7297,7 +7303,12 @@ class User extends DataObject
 			'Clear newsletter subscriptions of user #'.$this->ID.' before updating to new' );
 
 		// Insert newsletter subscriptions for this user:
-		return $this->insert_newsletter_subscriptions( $this->newsletter_subscriptions );
+		$r = $this->insert_newsletter_subscriptions( $this->newsletter_subscriptions );
+
+		// Reset flag to don't call this twice:
+		$this->newsletter_subscriptions_updated = false;
+
+		return $r;
 	}
 
 
@@ -7326,10 +7337,54 @@ class User extends DataObject
 		{
 			$newsletter_subscription_rows[] = '( '.$this->ID.', '.$newsletter_ID.' )';
 		}
+
 		// Insert subscriptions:
-		return $DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
+		$r = $DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
 			VALUES '.implode( ',', $newsletter_subscription_rows ),
 			'Insert newsletter subscriptions for user #'.$this->ID );
+
+		if( $r )
+		{	// Send emails of campaigns which must be sent at subscription:
+			$this->send_auto_subscriptions( $newsletter_IDs );
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Send emails of campaign which must be sent at subscription
+	 *
+	 * @param array Newsletters IDs
+	 */
+	function send_auto_subscriptions( $newsletter_IDs )
+	{
+		global $DB;
+
+		if( ! isset( $this->old_newsletter_subscriptions ) || ! is_array( $this->old_newsletter_subscriptions ) )
+		{	// Initialize array for old subscriptions if it has not been defined before:
+			$this->old_newsletter_subscriptions = $this->get_newsletter_subscriptions();
+		}
+
+		// Detect really new subscriptions in order to send email of campaign which must be sent at subscription:
+		$new_subscriptions = array_diff( $newsletter_IDs, $this->old_newsletter_subscriptions );
+
+		if( count( $new_subscriptions ) )
+		{	// User is really subscribing to new newsletters:
+			$SQL = new SQL( 'Get email campaigns(of newsletters #'.implode( ',', $new_subscriptions ).') which must be sent at subscription' );
+			$SQL->SELECT( '*' );
+			$SQL->FROM( 'T_email__campaign' );
+			$SQL->WHERE( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' )' );
+			$SQL->WHERE_and( 'ecmp_auto_send = "subscription"' );
+			$EmailCampaignCache = & get_EmailCampaignCache();
+			$EmailCampaignCache->clear();
+			$EmailCampaignCache->load_by_sql( $SQL );
+
+			foreach( $EmailCampaignCache->cache as $EmailCampaign )
+			{	// Send an email of the campaign at subscription:
+				$EmailCampaign->send_all_emails( false, array( $this->ID ) );
+			}
+		}
 	}
 }
 

@@ -615,17 +615,25 @@ class EmailCampaign extends DataObject
 	/**
 	 * Send email newsletter for all users of this campaign
 	 *
-	 * @param boolean
+	 * @param boolean TRUE to print out messages
+	 * @param array Force users instead of users which are ready to receive this email campaign
 	 */
-	function send_all_emails( $display_messages = true )
+	function send_all_emails( $display_messages = true, $user_IDs = NULL )
 	{
 		global $DB, $localtimenow, $mail_log_insert_ID, $Settings, $Messages;
 
-		// Send emails only for users which still don't receive emails:
-		$user_IDs = $this->get_recipients( 'wait' );
+		if( $user_IDs === NULL )
+		{	// Send emails only for users which still don't receive emails:
+			$user_IDs = $this->get_recipients( 'wait' );
+		}
+		else
+		{	// Exclude users which already received this email campaign to avoid double sending even with forcing user IDs:
+			$receive_user_IDs = $this->get_recipients( 'receive' );
+			$user_IDs = array_diff( $user_IDs, $receive_user_IDs );
+		}
 
 		if( empty( $user_IDs ) )
-		{ // No users, Exit here
+		{	// No users, Exit here:
 			return;
 		}
 
@@ -635,10 +643,7 @@ class EmailCampaign extends DataObject
 		$this->set( 'sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
 		$this->dbupdate();
 
-		if( $display_messages )
-		{ // We need in this cache when display the messages
-			$UserCache = & get_UserCache();
-		}
+		$UserCache = & get_UserCache();
 
 		// Get chunk size to limit a sending at a time:
 		$email_campaign_chunk_size = intval( $Settings->get( 'email_campaign_chunk_size' ) );
@@ -668,10 +673,8 @@ class EmailCampaign extends DataObject
 
 			if( $result )
 			{	// Email newsletter was sent for user successfully:
-				$DB->query( 'UPDATE T_email__campaign_send
-						SET csnd_emlog_ID = '.$DB->quote( $mail_log_insert_ID ).'
-					WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
-						AND csnd_user_ID = '.$DB->quote( $user_ID ) );
+				$DB->query( 'REPLACE INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_emlog_ID )
+					VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $mail_log_insert_ID ).' )' );
 
 				// Update arrays where we store which users received email and who waiting it now:
 				$this->users['receive'][] = $user_ID;
@@ -710,19 +713,22 @@ class EmailCampaign extends DataObject
 
 		$DB->commit();
 
-		$Messages->clear();
-		$wait_count = count( $this->users['wait'] );
-		if( $wait_count > 0 )
-		{	// Some recipients still wait this newsletter:
-			$Messages->add( sprintf( T_('Emails have been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
-					$email_campaign_chunk_size, $email_skip_count, $wait_count ), 'warning' );
+		if( $display_messages )
+		{	// Print the messages:
+			$Messages->clear();
+			$wait_count = count( $this->users['wait'] );
+			if( $wait_count > 0 )
+			{	// Some recipients still wait this newsletter:
+				$Messages->add( sprintf( T_('Emails have been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
+						$email_campaign_chunk_size, $email_skip_count, $wait_count ), 'warning' );
+			}
+			else
+			{	// All recipients received this bewsletter:
+				$Messages->add( T_('Emails have been sent to all recipients of this campaign.'), 'success' );
+			}
+			echo '<br />';
+			$Messages->display();
 		}
-		else
-		{	// All recipients received this bewsletter:
-			$Messages->add( T_('Emails have been sent to all recipients of this campaign.'), 'success' );
-		}
-		echo '<br />';
-		$Messages->display();
 	}
 
 

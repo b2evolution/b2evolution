@@ -1238,9 +1238,14 @@ class collections_Module extends Module
 				}
 				else
 				{	// Subscribe to newsletter:
+					$current_User->old_newsletter_subscriptions = $current_User->get_newsletter_subscriptions();
 					$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
 						VALUES ( '.$DB->quote( $current_User->ID ).', '.$DB->quote( $Newsletter->ID ).' )',
 						'Subscribe user #'.$current_User->ID.' to newsletter #'.$Newsletter->ID );
+
+					// Send emails of campaigns which must be sent at subscription:
+					$current_User->send_auto_subscriptions( array( $Newsletter->ID ) );
+
 					$Messages->add( T_('You have successfully subscribed.'), 'success' );
 				}
 
