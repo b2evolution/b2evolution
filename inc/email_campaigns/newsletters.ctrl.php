@@ -168,7 +168,7 @@ switch( $action )
 		// Make sure we got an enlt_ID:
 		param( 'enlt_ID', 'integer', true );
 
-		$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
+		$def_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', $Settings->get( 'def_newsletters' ) ) );
 		$enlt_index = array_search( $edited_Newsletter->ID, $def_newsletters );
 
 		$update_def_newsletters = false;
@@ -185,7 +185,7 @@ switch( $action )
 
 		if( $update_def_newsletters )
 		{	// Update default setting for newsletters:
-			$Settings->set( 'def_newsletters', implode( ',', $def_newsletters ) );
+			$Settings->set( 'def_newsletters', trim( implode( ',', $def_newsletters ), ',' ) );
 			$Settings->dbupdate();
 
 			$Messages->add( sprintf( ( $action == 'enable' ?

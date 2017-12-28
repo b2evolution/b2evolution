@@ -3724,10 +3724,11 @@ class User extends DataObject
 			}
 
 			$insert_newsletters = array();
-			if( isset( $Settings ) )
+			if( isset( $Settings ) && ( ! isset( $this->insert_default_newsletters ) || $this->insert_default_newsletters ) )
 			{	// Insert default newsletter subscriptions for this user,
-				// Only when general settings are defined (to avoid error on install process):
-				$insert_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', $Settings->get( 'def_newsletters' ) ) );
+				// Only when general settings are defined (to avoid error on install process),
+				// And if it is not disabled for exmaple by widget "Email capture / Quick registration",
+				$insert_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', trim( $Settings->get( 'def_newsletters' ), ',' ) ) );
 			}
 			if( ! empty( $this->newsletter_subscriptions ) )
 			{	// Also insert additional newsletters(e-g from widget "Email capture / Quick registration"):

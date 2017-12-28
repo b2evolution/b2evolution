@@ -105,6 +105,11 @@ class user_register_Widget extends ComponentWidget
 				in_array( $Newsletter->ID, $def_newsletters ) ? 1 : 0, // checked by default
 			);
 		}
+		$newsletters_options[] = array(
+			'default',
+			T_('Also subscribe user to all default newsletters for new users.'),
+			1, // checked by default
+		);
 
 		$r = array_merge( array(
 				'title' => array(
@@ -149,10 +154,10 @@ class user_register_Widget extends ComponentWidget
 					'defaultvalue' => 'email capture form',
 				),
 				'newsletters' => array(
-					'label' => T_('Newsletter'),
+					'label' => T_('Newsletters'),
 					'type' => 'checklist',
 					'options' => $newsletters_options,
-					'note' => T_('News users will also be automatically subscribed to the default newsletters.')
+					'note' => ''
 				),
 				'subscribe_post' => array(
 					'label' => T_('Auto subscribe'),
