@@ -1330,6 +1330,40 @@ class collections_Module extends Module
 				header_redirect();
 				break; // already exited here
 
+			case 'newsletter_widget':
+				// Subscribe⁄Unsubscribe to/from newsletter from widget:
+				$widget_ID = param( 'widget', 'integer', true );
+				$WidgetCache = & get_WidgetCache();
+				$Widget = & $WidgetCache->get_by_ID( $widget_ID );
+
+				// Check newsletter of the requested widget:
+				$NewsletterCache = & get_NewsletterCache();
+				if( ! ( $Newsletter = & $NewsletterCache->get_by_ID( $Widget->get_param( 'enlt_ID' ), false, false ) ) ||
+				    ! $Newsletter->get( 'active' ) )
+				{	// Display an error when newsletter is not found or not active:
+					$Messages->add( T_('Newsletter subscription widget references an inactive newsletter.'), 'error' );
+					header_redirect();
+				}
+
+				if( param( 'subscribe', 'string', NULL ) === NULL )
+				{	// Unsubscribe from newsletter:
+					$DB->query( 'DELETE FROM T_email__newsletter_subscription
+						WHERE enls_user_ID = '.$DB->quote( $current_User->ID ).'
+						  AND enls_enlt_ID = '.$DB->quote( $Newsletter->ID ),
+						'Unsubscribe user #'.$current_User->ID.' from newsletter #'.$Newsletter->ID );
+					$Messages->add( T_('You have successfully unsubscribed.'), 'success' );
+				}
+				else
+				{	// Subscribe to newsletter:
+					$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
+						VALUES ( '.$DB->quote( $current_User->ID ).', '.$DB->quote( $Newsletter->ID ).' )',
+						'Subscribe user #'.$current_User->ID.' to newsletter #'.$Newsletter->ID );
+					$Messages->add( T_('You have successfully subscribed.'), 'success' );
+				}
+
+				header_redirect();
+				break; // already exited here
+
 			case 'refresh_contents_last_updated':
 				// Refresh last touched date of the Item:
 

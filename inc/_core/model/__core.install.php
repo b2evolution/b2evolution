@@ -52,7 +52,7 @@ $schema_queries = array(
 		"CREATE TABLE T_groups__groupsettings (
 			gset_grp_ID INT(11) UNSIGNED NOT NULL,
 			gset_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL,
-			gset_value VARCHAR(255) NULL,
+			gset_value VARCHAR(10000) NULL,
 			PRIMARY KEY (gset_grp_ID, gset_name)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -60,7 +60,7 @@ $schema_queries = array(
 		'Creating table for Settings',
 		"CREATE TABLE T_settings (
 			set_name VARCHAR(50) COLLATE ascii_general_ci NOT NULL,
-			set_value VARCHAR(5000) NULL,
+			set_value VARCHAR(10000) NULL,
 			PRIMARY KEY ( set_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -283,8 +283,8 @@ $schema_queries = array(
 		'Creating user settings table',
 		"CREATE TABLE T_users__usersettings (
 			uset_user_ID INT(11) UNSIGNED NOT NULL,
-			uset_name    VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
-			uset_value   VARCHAR( 255 ) NULL,
+			uset_name    VARCHAR(50) COLLATE ascii_general_ci NOT NULL,
+			uset_value   VARCHAR(10000) NULL,
 			PRIMARY KEY ( uset_user_ID, uset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -493,13 +493,34 @@ $schema_queries = array(
 			UNIQUE                      emadr_address (emadr_address)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
+	'T_email__newsletter' => array(
+		'Creating email newsletters table',
+		"CREATE TABLE T_email__newsletter (
+			enlt_ID     INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			enlt_name   VARCHAR(255) NOT NULL,
+			enlt_label  VARCHAR(255) NULL,
+			enlt_active TINYINT(1) UNSIGNED DEFAULT 1,
+			enlt_order  INT NULL DEFAULT NULL,
+			PRIMARY KEY (enlt_ID)
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_email__newsletter_subscription' => array(
+		'Creating email newsletter subscriptions table',
+		"CREATE TABLE T_email__newsletter_subscription (
+			enls_user_ID             INT UNSIGNED NOT NULL,
+			enls_enlt_ID             INT UNSIGNED NOT NULL,
+			enls_last_sent_manual_ts TIMESTAMP NULL,
+			enls_send_count          INT UNSIGNED NOT NULL DEFAULT 0,
+			PRIMARY KEY (enls_user_ID, enls_enlt_ID)
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
+
 	'T_email__campaign' => array(
 		'Creating email campaigns table',
 		"CREATE TABLE T_email__campaign (
-			ecmp_ID              INT NOT NULL AUTO_INCREMENT,
+			ecmp_ID              INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			ecmp_date_ts         TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			ecmp_name            VARCHAR(255) NOT NULL,
-			ecmp_email_title     VARCHAR(255) NULL,
+			ecmp_enlt_ID         INT UNSIGNED NOT NULL,
+			ecmp_email_title     VARCHAR(255) NOT NULL,
 			ecmp_email_html      TEXT NULL,
 			ecmp_email_text      TEXT NULL,
 			ecmp_email_plaintext TEXT NULL,

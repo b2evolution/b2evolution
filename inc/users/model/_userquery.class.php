@@ -512,6 +512,70 @@ class UserQuery extends SQL
 
 
 	/**
+	 * Select by newsletter ID
+	 *
+	 * @param integer Newsletter ID
+	 */
+	function where_newsletter( $newsletter_ID )
+	{
+		global $DB;
+
+		$newsletter_ID = intval( $newsletter_ID );
+
+		if( empty( $newsletter_ID ) )
+		{
+			return;
+		}
+
+		$this->SELECT_add( ', enls_last_sent_manual_ts, enls_send_count' );
+		$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ) );
+	}
+
+
+	/**
+	 * Select by Email Campaign ID
+	 *
+	 * @param integer Email Campaign ID
+	 * @param string Recipient type of email campaign: 'filter', 'receive', 'wait'
+	 */
+	function where_email_campaign( $ecmp_ID, $recipient_type = '' )
+	{
+		global $DB;
+
+		$ecmp_ID = intval( $ecmp_ID );
+
+		if( empty( $ecmp_ID ) )
+		{
+			return;
+		}
+
+		$this->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_user_ID = user_ID AND csnd_camp_ID = '.$DB->quote( $ecmp_ID ) );
+
+		// Get email log date and time:
+		$this->SELECT_add( ', emlog_timestamp, enls_user_ID' );
+		$this->FROM_add( 'LEFT JOIN T_email__log ON csnd_emlog_ID = emlog_ID' );
+
+		// Get subscription status:
+		$this->SELECT_add( ', enls_user_ID' );
+		$this->FROM_add( 'LEFT JOIN T_email__campaign ON ecmp_ID = csnd_camp_ID' );
+		$this->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_enlt_ID = ecmp_enlt_ID AND enls_user_ID = user_ID' );
+
+		switch( $recipient_type )
+		{
+			case 'sent':
+				// Get recipients which have already been received this newsletter:
+				$this->WHERE_and( 'csnd_emlog_ID IS NOT NULL' );
+				break;
+
+			case 'readytosend':
+				// Get recipients which have not been received this newsletter yet:
+				$this->WHERE_and( 'csnd_emlog_ID IS NULL' );
+				break;
+		}
+	}
+
+
+	/**
 	 * Select by viewed user
 	 *
 	 * @param integer User ID

@@ -369,7 +369,7 @@ switch( $action )
 		// Make category as default:
 		if( $edited_Chapter->get( 'meta' ) )
 		{	// If category is meta:
-			$Messages->add( T_('Meta catagory cannot be default!'), 'error' );
+			$Messages->add( T_('Meta category cannot be used as default!'), 'error' );
 			break;
 		}
 
@@ -382,7 +382,7 @@ switch( $action )
 
 		if( $edited_Blog->get_default_cat_ID() == $edited_Chapter->ID )
 		{	// If category is default:
-			$Messages->add( T_('Meta catagory cannot be default!'), 'error' );
+			$Messages->add( T_('Meta category cannot be used as default!'), 'error' );
 			header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}

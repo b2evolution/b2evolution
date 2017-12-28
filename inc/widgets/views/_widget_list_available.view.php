@@ -144,6 +144,7 @@ $core_componentwidget_defs = array(
 			'org_members',
 			'user_login',
 			'user_register',
+			'newsletter_subscription',
 			'user_tools',
 			'online_users',
 		),
