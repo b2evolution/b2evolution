@@ -226,13 +226,22 @@ function db_add_col( $table, $col_name, $col_desc )
 {
 	global $DB;
 
-	if( db_col_exists($table, $col_name) )
+	if( db_col_exists( $table, $col_name ) )
 	{ // Column exists already, make sure it's the same.
-		$DB->query( 'ALTER TABLE '.$table.' MODIFY COLUMN '.$col_name.' '.$col_desc );
+		db_modify_col( $table, $col_name, $col_desc );
 		return false;
 	}
 
 	$DB->query( 'ALTER TABLE '.$table.' ADD COLUMN '.$col_name.' '.$col_desc );
+}
+
+/**
+ * Modify a column
+ */
+function db_modify_col( $table, $col_name, $col_desc )
+{
+	global $DB;
+	$DB->query( 'ALTER TABLE '.$table.' MODIFY COLUMN '.$col_name.' '.$col_desc );
 }
 
 
@@ -8710,6 +8719,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		db_add_index( 'T_skins__skin', 'skin_class', 'skin_class', 'UNIQUE' );
 
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12365, 'Upgrading settings tables...' ) )
+	{	// part of 6.9.4
+		db_modify_col( 'T_settings',              'set_value',  'VARCHAR(10000) NULL' );
+		db_modify_col( 'T_groups__groupsettings', 'gset_value', 'VARCHAR(10000) NULL' );
+		db_modify_col( 'T_users__usersettings',   'uset_value', 'VARCHAR(10000) NULL' );
 		upg_task_end();
 	}
 

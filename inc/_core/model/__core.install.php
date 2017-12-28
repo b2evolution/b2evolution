@@ -52,7 +52,7 @@ $schema_queries = array(
 		"CREATE TABLE T_groups__groupsettings (
 			gset_grp_ID INT(11) UNSIGNED NOT NULL,
 			gset_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL,
-			gset_value VARCHAR(255) NULL,
+			gset_value VARCHAR(10000) NULL,
 			PRIMARY KEY (gset_grp_ID, gset_name)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -60,7 +60,7 @@ $schema_queries = array(
 		'Creating table for Settings',
 		"CREATE TABLE T_settings (
 			set_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL,
-			set_value VARCHAR(5000) NULL,
+			set_value VARCHAR(10000) NULL,
 			PRIMARY KEY ( set_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -283,8 +283,8 @@ $schema_queries = array(
 		'Creating user settings table',
 		"CREATE TABLE T_users__usersettings (
 			uset_user_ID INT(11) UNSIGNED NOT NULL,
-			uset_name    VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
-			uset_value   VARCHAR( 255 ) NULL,
+			uset_name    VARCHAR(50) COLLATE ascii_general_ci NOT NULL,
+			uset_value   VARCHAR(10000) NULL,
 			PRIMARY KEY ( uset_user_ID, uset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
