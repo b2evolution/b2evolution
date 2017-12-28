@@ -214,7 +214,7 @@ class UserSettings extends AbstractSettings
 		}
 
 		// Limit value with max possible length:
-		$value = utf8_substr( $value, 0, 255 );
+		$value = utf8_substr( $value, 0, 10000 );
 
 		return parent::setx( $user_ID, $setting, $value );
 	}

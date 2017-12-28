@@ -100,6 +100,9 @@ class ItemSettings extends AbstractSettings
 	 */
 	function set( $col_key1, $col_key2, $value )
 	{
+		// Limit value with max possible length:
+		$value = utf8_substr( $value, 0, 10000 );
+
 		return parent::setx( $col_key1, $col_key2, $value );
 	}
 }
