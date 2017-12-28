@@ -596,8 +596,10 @@ class EmailCampaign extends DataObject
 			}
 		}
 		else
-		{ // Send a newsletter to real user
-			$r = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, false, array(), $email_address );
+		{	// Send a newsletter to real user:
+			// Force email sending to not activated users if email campaign is configurated to auto sending (e-g to send email on auto subscription on registration):
+			$force_on_non_activated = in_array( $this->get( 'auto_send' ), array( 'subscription', 'sequence' ) );
+			$r = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, $force_on_non_activated, array(), $email_address );
 			if( $r )
 			{	// Update last sending data for newsletter per user:
 				global $DB, $servertimenow;
