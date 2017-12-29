@@ -310,6 +310,16 @@ elseif( ! param_errors_detected() )
 						}
 					}
 				}
+				elseif( $after_registration == 'specific_slug' )
+				{	// Return to the specific slug which is set in the registration settings form:
+					$SlugCache = get_SlugCache();
+					if( ( $Slug = & $SlugCache->get_by_name( $Settings->get( 'after_registration_slug' ), false, false ) ) &&
+							( $slug_Item = & $Slug->get_object() ) &&
+							( $slug_Item instanceof Item ) )
+					{	// Use permanent URL of the slug Item:
+						$redirect_to = $slug_Item->get_permanent_url( '', '', '&' );
+					}
+				}
 				else
 				{	// Return to the specific URL which is set in the registration settings form:
 					$redirect_to = $after_registration;
@@ -321,13 +331,14 @@ elseif( ! param_errors_detected() )
 			{	// Redirect to page as we use after email validation if current user set password first time, e-g after email capture/quick registration:
 				$redirect_to = redirect_after_account_activation();
 			}
-			elseif( $current_User->has_avatar() )
-			{ // Redirect to display user page
-				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&' ) );
-			}
-			else
-			{ // Redirect to upload avatar
+			elseif( ! $current_User->has_avatar() )
+			{	// Redirect to upload avatar if it is not uploaded yet:
 				$redirect_to = get_user_avatar_url();
+			}
+
+			if( empty( $redirect_to ) )
+			{	// Redirect to display user page for cases when redirect param cannot be defined above by some reason:
+				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&' ) );
 			}
 			break;
 		case 'upload_avatar':
