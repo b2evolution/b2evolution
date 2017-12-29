@@ -1230,18 +1230,17 @@ class collections_Module extends Module
 
 				if( param( 'subscribe', 'string', NULL ) === NULL )
 				{	// Unsubscribe from newsletter:
-					$DB->query( 'DELETE FROM T_email__newsletter_subscription
-						WHERE enls_user_ID = '.$DB->quote( $current_User->ID ).'
-						  AND enls_enlt_ID = '.$DB->quote( $Newsletter->ID ),
-						'Unsubscribe user #'.$current_User->ID.' from newsletter #'.$Newsletter->ID );
-					$Messages->add( T_('You have successfully unsubscribed.'), 'success' );
+					if( $current_User->unsubscribe( $Newsletter->ID ) )
+					{
+						$Messages->add( T_('You have successfully unsubscribed.'), 'success' );
+					}
 				}
 				else
 				{	// Subscribe to newsletter:
-					$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
-						VALUES ( '.$DB->quote( $current_User->ID ).', '.$DB->quote( $Newsletter->ID ).' )',
-						'Subscribe user #'.$current_User->ID.' to newsletter #'.$Newsletter->ID );
-					$Messages->add( T_('You have successfully subscribed.'), 'success' );
+					if( $current_User->subscribe( $Newsletter->ID ) )
+					{
+						$Messages->add( T_('You have successfully subscribed.'), 'success' );
+					}
 				}
 
 				header_redirect();

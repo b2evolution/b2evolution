@@ -60,6 +60,7 @@ if( $edited_Newsletter->ID > 0 )
 {	// Display users which are subscribed to this Newsletter:
 	users_results_block( array(
 			'enlt_ID'              => $edited_Newsletter->ID,
+			'enls_subscribed'      => NULL,
 			'filterset_name'       => 'nltsub_'.$edited_Newsletter->ID,
 			'results_param_prefix' => 'nltsub_',
 			'results_title'        => T_('Subscribers').get_manual_link( 'newsletter-subscribers' ),
@@ -87,8 +88,11 @@ if( $edited_Newsletter->ID > 0 )
 			'display_status'       => false,
 			'display_actions'      => false,
 			'display_newsletter'   => false,
-			'display_enls_sent_manual' => true,
-			'display_enls_send_count'  => true,
+			'display_enls_subscribed'      => true,
+			'display_enls_subscribed_ts'   => true,
+			'display_enls_unsubscribed_ts' => true,
+			'display_enls_sent_manual'     => true,
+			'display_enls_send_count'      => true,
 			'th_class_login'       => 'shrinkwrap',
 			'td_class_login'       => '',
 			'th_class_nickname'    => 'shrinkwrap',

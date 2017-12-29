@@ -8880,6 +8880,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12460, 'Upgrading email newsletter subscriptions table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_email__newsletter_subscription', 'enls_subscribed', 'TINYINT(1) UNSIGNED DEFAULT 1' );
+		db_add_col( 'T_email__newsletter_subscription', 'enls_subscribed_ts', 'TIMESTAMP NULL' );
+		db_add_col( 'T_email__newsletter_subscription', 'enls_unsubscribed_ts', 'TIMESTAMP NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

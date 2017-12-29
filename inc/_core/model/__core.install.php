@@ -501,6 +501,9 @@ $schema_queries = array(
 			enls_enlt_ID             INT UNSIGNED NOT NULL,
 			enls_last_sent_manual_ts TIMESTAMP NULL,
 			enls_send_count          INT UNSIGNED NOT NULL DEFAULT 0,
+			enls_subscribed          TINYINT(1) UNSIGNED DEFAULT 1,
+			enls_subscribed_ts       TIMESTAMP NULL,
+			enls_unsubscribed_ts     TIMESTAMP NULL,
 			PRIMARY KEY (enls_user_ID, enls_enlt_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 

@@ -126,7 +126,7 @@ class EmailCampaign extends DataObject
 			$new_users_SQL = new SQL( 'Get recipients of newsletter #'.$this->get( 'enlt_ID' ) );
 			$new_users_SQL->SELECT( 'user_ID' );
 			$new_users_SQL->FROM( 'T_users' );
-			$new_users_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID' );
+			$new_users_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_subscribed = 1' );
 			$new_users_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $filtered_users_IDs ).' )' );
 			$new_users_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
 			$new_users_SQL->WHERE_and( 'enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
@@ -240,7 +240,7 @@ class EmailCampaign extends DataObject
 		$users_SQL->SELECT( 'user_ID, csnd_emlog_ID, csnd_user_ID, enls_user_ID' );
 		$users_SQL->FROM( 'T_users' );
 		$users_SQL->FROM_add( 'INNER JOIN T_email__campaign_send ON ( csnd_camp_ID = '.$DB->quote( $this->ID ).' AND ( csnd_user_ID = user_ID OR csnd_user_ID IS NULL ) )' );
-		$users_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+		$users_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_subscribed = 1 AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
 		$users_SQL->WHERE( 'user_status IN ( "activated", "autoactivated" )' );
 		$users = $DB->get_results( $users_SQL->get(), OBJECT, $users_SQL->title );
 
@@ -446,7 +446,8 @@ class EmailCampaign extends DataObject
 		$DB->query( 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID )
 			SELECT '.$this->ID.', enls_user_ID
 			  FROM T_email__newsletter_subscription
-			 WHERE enls_enlt_ID = '.$this->get( 'enlt_ID' ) );
+			 WHERE enls_enlt_ID = '.$this->get( 'enlt_ID' ).'
+			   AND enls_subscribed = 1' );
 	}
 
 
