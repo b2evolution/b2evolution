@@ -515,8 +515,9 @@ class UserQuery extends SQL
 	 * Select by newsletter ID
 	 *
 	 * @param integer Newsletter ID
+	 * @param boolean|NULL TRUE - only users with active subscription, FALSE - only unsubscribed users, NULL - both
 	 */
-	function where_newsletter( $newsletter_ID )
+	function where_newsletter( $newsletter_ID, $is_subscribed = true)
 	{
 		global $DB;
 
@@ -527,8 +528,14 @@ class UserQuery extends SQL
 			return;
 		}
 
-		$this->SELECT_add( ', enls_last_sent_manual_ts, enls_send_count' );
-		$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ) );
+		$restrict_is_subscribed = '';
+		if( $is_subscribed !== NULL )
+		{	// Get only subscribed or unsubscribed users:
+			$restrict_is_subscribed = ' AND enls_subscribed = '.( $is_subscribed ? '1' : '0' );
+		}
+
+		$this->SELECT_add( ', enls_last_sent_manual_ts, enls_send_count, enls_subscribed, enls_subscribed_ts, enls_unsubscribed_ts' );
+		$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ).$restrict_is_subscribed );
 	}
 
 
@@ -558,7 +565,7 @@ class UserQuery extends SQL
 		// Get subscription status:
 		$this->SELECT_add( ', enls_user_ID' );
 		$this->FROM_add( 'LEFT JOIN T_email__campaign ON ecmp_ID = csnd_camp_ID' );
-		$this->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_enlt_ID = ecmp_enlt_ID AND enls_user_ID = user_ID' );
+		$this->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_enlt_ID = ecmp_enlt_ID AND enls_user_ID = user_ID AND enls_subscribed = 1' );
 
 		switch( $recipient_type )
 		{

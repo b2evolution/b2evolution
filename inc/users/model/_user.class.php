@@ -3178,6 +3178,11 @@ class User extends DataObject
 
 			default:
 				// Check pluggable permissions using user permission check function
+				if( $permname == 'perm_users' && ! $this->check_perm( 'admin', 'normal' ) )
+				{	// User must has Normal Back-office Access to view/moderate/edit other users:
+					$perm = false;
+					break;
+				}
 				$this->get_Group();
 				$perm = Module::check_perm( $permname, $permlevel, $perm_target, 'user_func', $this->Group );
 				if( $perm === true || $perm === NULL )
@@ -3751,13 +3756,13 @@ class User extends DataObject
 				// And if it is not disabled for exmaple by widget "Email capture / Quick registration",
 				$insert_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', trim( $Settings->get( 'def_newsletters' ), ',' ) ) );
 			}
-			if( ! empty( $this->newsletter_subscriptions ) )
+			if( ! empty( $this->new_newsletter_subscriptions ) )
 			{	// Also insert additional newsletters(e-g from widget "Email capture / Quick registration"):
-				$insert_newsletters = array_merge( $insert_newsletters, $this->newsletter_subscriptions );
+				$insert_newsletters = array_merge( $insert_newsletters, $this->new_newsletter_subscriptions );
 			}
 			if( ! empty( $insert_newsletters ) )
-			{	// Do insertion if at least one newsletter is selected by default:
-				$this->insert_newsletter_subscriptions( array_unique( $insert_newsletters ) );
+			{	// Do subscribing if at least one newsletter is selected by default:
+				$this->subscribe( array_unique( $insert_newsletters ) );
 			}
 
 			// Notify plugins:
@@ -7222,9 +7227,10 @@ class User extends DataObject
 	/**
 	 * Get IDs of newsletters which this user is subscribed on
 	 *
+	 * @param string Type: 'subscribed', 'unsubscribed', 'all'
 	 * @return array
 	 */
-	function get_newsletter_subscriptions()
+	function get_newsletter_subscriptions( $type = 'subscribed' )
 	{
 		if( empty( $this->ID ) )
 		{	// Only created user can has the newsletter subscriptions:
@@ -7235,14 +7241,49 @@ class User extends DataObject
 		{	// Initialize newsletter subscriptions array only on first request:
 			global $DB;
 
+			$this->newsletter_subscriptions = array(
+					'subscribed'   => array(),
+					'unsubscribed' => array(),
+				);
+
 			$SQL = new SQL( 'Get newsletter subscriptions of user #'.$this->ID );
-			$SQL->SELECT( 'enls_enlt_ID' );
+			$SQL->SELECT( 'enls_enlt_ID, enls_subscribed' );
 			$SQL->FROM( 'T_email__newsletter_subscription' );
 			$SQL->WHERE( 'enls_user_ID = '.$this->ID );
-			$this->newsletter_subscriptions = $DB->get_col( $SQL->get(), 0, $SQL->title );
+			$newsletter_subscriptions = $DB->get_assoc( $SQL );
+			foreach( $newsletter_subscriptions as $newsletter_ID => $is_subscribed )
+			{
+				if( $is_subscribed )
+				{
+					$this->newsletter_subscriptions['subscribed'][] = $newsletter_ID;
+				}
+				else
+				{
+					$this->newsletter_subscriptions['unsubscribed'][] = $newsletter_ID;
+				}
+			}
 		}
 
-		return $this->newsletter_subscriptions;
+		if( $type == 'all' )
+		{
+			return array_merge( $this->newsletter_subscriptions['subscribed'], $this->newsletter_subscriptions['unsubscribed'] );
+		}
+		else
+		{
+			return $this->newsletter_subscriptions[ $type ];
+		}
+	}
+
+
+	/**
+	 * Check if this user is subscribed to requested newsletter
+	 *
+	 * @param integer Newsletter ID
+	 * @return boolean
+	 */
+	function is_subscribed( $newsletter_ID )
+	{
+		return in_array( $newsletter_ID, $this->get_newsletter_subscriptions() );
 	}
 
 
@@ -7290,14 +7331,14 @@ class User extends DataObject
 		}
 
 		// Set new subscriptions:
-		$this->newsletter_subscriptions = $new_subscriptions;
+		$this->new_newsletter_subscriptions = $new_subscriptions;
 	}
 
 
 	/**
 	 * Update newsletter subscriptions of this user
 	 *
-	 * @return boolean TRUE on success updating
+	 * @return integer|boolean # of rows affected or false if error
 	 */
 	function update_newsletter_subscriptions()
 	{
@@ -7311,47 +7352,114 @@ class User extends DataObject
 			return false;
 		}
 
-		global $DB;
-
-		// Clear newsletter subscriptions before updating:
-		$DB->query( 'DELETE FROM T_email__newsletter_subscription
-			WHERE enls_user_ID = '.$this->ID,
-			'Clear newsletter subscriptions of user #'.$this->ID.' before updating to new' );
-
 		// Insert newsletter subscriptions for this user:
-		return $this->insert_newsletter_subscriptions( $this->newsletter_subscriptions );
+		$r = $this->subscribe( $this->new_newsletter_subscriptions );
+
+		// Unsubscribe from unchecked newsletters:
+		$r += $this->unsubscribe( array_diff( $this->get_newsletter_subscriptions( 'all' ), $this->new_newsletter_subscriptions ) );
+
+		// Unset flag to don't run this twice:
+		$this->newsletter_subscriptions_updated = false;
+
+		return $r;
 	}
 
 
 	/**
-	 * Insert newsletter subscriptions for this user
+	 * Subscribe to newsletter
 	 *
-	 * @param array Newsletter IDs
-	 * @return boolean TRUE on success inserting
+	 * @param array|integer Newsletter IDs
+	 * @return integer|boolean # of rows affected or false if error
 	 */
-	function insert_newsletter_subscriptions( $newsletter_IDs )
+	function subscribe( $newsletter_IDs )
 	{
+		global $DB, $localtimenow;
+
+		if( empty( $this->ID ) )
+		{	// Only created user can has the newsletter subscriptions:
+			return;
+		}
+
+		if( empty( $newsletter_IDs ) )
+		{	// No subscriptions:
+			return;
+		}
+
+		$DB->begin();
+
+		if( ! is_array( $newsletter_IDs ) )
+		{	// Convert single newsletter ID to array:
+			$newsletter_IDs = array( $newsletter_IDs );
+		}
+
+		// Decide what newsletter subsciptions should be inserted into DB and what should be updated:
+		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'all' );
+		$insert_newsletter_IDs = array_diff( $newsletter_IDs, $newsletter_subscriptions );
+		$update_newsletter_IDs = array_intersect( $newsletter_IDs, $newsletter_subscriptions );
+
+		$r = 0;
+
+		if( count( $insert_newsletter_IDs ) )
+		{	// If new records should be inserted:
+			$insert_newsletter_sql_values = array();
+			foreach( $insert_newsletter_IDs as $insert_newsletter_ID )
+			{
+				$insert_newsletter_sql_values[] = '( '.$DB->quote( $this->ID ).', '.$DB->quote( $insert_newsletter_ID ).', 1, '.$DB->quote( date2mysql( $localtimenow ) ).' )';
+			}
+			$r += $DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID, enls_subscribed, enls_subscribed_ts )
+				VALUES '.implode( ', ', $insert_newsletter_sql_values ),
+				'Subscribe(insert new subscriptions) user #'.$this->ID.' to newsletters #'.implode( ',', $insert_newsletter_IDs ) );
+		}
+
+		if( count( $update_newsletter_IDs ) )
+		{	// If previous unsubscriptions should be subscribed again:
+			$r += $DB->query( 'UPDATE T_email__newsletter_subscription
+			SET enls_subscribed = 1,
+			    enls_subscribed_ts = '.$DB->quote( date2mysql( $localtimenow ) ).'
+			WHERE enls_user_ID = '.$DB->quote( $this->ID ).'
+			  AND enls_enlt_ID IN ( '.$DB->quote( $update_newsletter_IDs ).' )
+			  AND enls_subscribed = 0',
+			'Subscribe(update unsubscriptions) user #'.$this->ID.' to newsletters #'.implode( ',', $update_newsletter_IDs ) );
+		}
+
+		$DB->commit();
+
+		return $r;
+	}
+
+
+	/**
+	 * Unsubscribe from newsletter
+	 *
+	 * @param array|integer Newsletter IDs
+	 * @return integer|boolean # of rows affected or false if error
+	 */
+	function unsubscribe( $newsletter_IDs )
+	{
+		global $DB, $localtimenow;
+
 		if( empty( $this->ID ) )
 		{	// Only created user can has the newsletter subscriptions:
 			return false;
 		}
 
 		if( empty( $newsletter_IDs ) )
-		{	// No new subscriptions to insert:
-			return true;
+		{	// No subscriptions:
+			return false;
 		}
 
-		global $DB;
-
-		$newsletter_subscription_rows = array();
-		foreach( $newsletter_IDs as $newsletter_ID )
-		{
-			$newsletter_subscription_rows[] = '( '.$this->ID.', '.$newsletter_ID.' )';
+		if( ! is_array( $newsletter_IDs ) )
+		{	// Convert single newsletter ID to array:
+			$newsletter_IDs = array( $newsletter_IDs );
 		}
-		// Insert subscriptions:
-		return $DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
-			VALUES '.implode( ',', $newsletter_subscription_rows ),
-			'Insert newsletter subscriptions for user #'.$this->ID );
+
+		return $DB->query( 'UPDATE T_email__newsletter_subscription
+			SET enls_subscribed = 0,
+			    enls_unsubscribed_ts = '.$DB->quote( date2mysql( $localtimenow ) ).'
+			WHERE enls_user_ID = '.$DB->quote( $this->ID ).'
+			  AND enls_enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )
+			  AND enls_subscribed = 1',
+			'Unsubscribe user #'.$this->ID.' from newsletters #'.implode( ',', $newsletter_IDs ) );
 	}
 }
 

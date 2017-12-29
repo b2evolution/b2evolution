@@ -5206,6 +5206,7 @@ function users_results_block( $params = array() )
 	$params = array_merge( array(
 			'org_ID'               => NULL,
 			'enlt_ID'              => NULL,
+			'enls_subscribed'      => 1,
 			'ecmp_ID'              => NULL,
 			'viewed_user'          => NULL,
 			'reg_ip_min'           => NULL,
@@ -5258,8 +5259,11 @@ function users_results_block( $params = array() )
 			'display_status'       => true,
 			'display_enlt_status'  => false,
 			'display_emlog_date'   => false,
-			'display_enls_sent_manual' => false,
-			'display_enls_send_count'  => false,
+			'display_enls_subscribed'      => false,
+			'display_enls_subscribed_ts'   => false,
+			'display_enls_unsubscribed_ts' => false,
+			'display_enls_sent_manual'     => false,
+			'display_enls_send_count'      => false,
 			'display_actions'      => true,
 			'display_org_actions'  => false,
 			'display_newsletter'   => true,
@@ -5306,6 +5310,7 @@ function users_results_block( $params = array() )
 			'order'      => $params['results_order'],
 			'org'        => $params['org_ID'],
 			'newsletter' => $params['enlt_ID'],
+			'newsletter_subscribed' => $params['enls_subscribed'],
 			'ecmp'       => $params['ecmp_ID'],
 			'reg_ip_min' => $params['reg_ip_min'],
 			'reg_ip_max' => $params['reg_ip_max'],
@@ -5475,8 +5480,11 @@ function users_results( & $UserList, $params = array() )
 			'display_level'      => true,
 			'display_status'     => true,
 			'display_emlog_date' => false,
-			'display_enls_sent_manual' => false,
-			'display_enls_send_count'  => false,
+			'display_enls_subscribed'      => false,
+			'display_enls_subscribed_ts'   => false,
+			'display_enls_unsubscribed_ts' => false,
+			'display_enls_sent_manual'     => false,
+			'display_enls_send_count'      => false,
 			'display_actions'    => true,
 			'display_org_actions'=> false,
 			'th_class_avatar'    => 'shrinkwrap small',
@@ -5848,6 +5856,42 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
+	if( $params['display_enls_subscribed'] )
+	{ // Display status of user subscription:
+		$UserList->cols[] = array(
+				'th' => T_('Subscribed'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center',
+				'order' => 'enls_subscribed',
+				'default_dir' => 'D',
+				'td' => '~conditional( #enls_subscribed#, \''.format_to_output( T_('yes'), 'htmlattr' ).'\', \''.format_to_output( T_('no'), 'htmlattr' ).'\' )~',
+			);
+	}
+
+	if( $params['display_enls_subscribed_ts'] )
+	{ // Display subscription date:
+		$UserList->cols[] = array(
+				'th' => T_('Subscribed'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'enls_subscribed_ts',
+				'default_dir' => 'D',
+				'td' => '%mysql2localedatetime( #enls_subscribed_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_unsubscribed_ts'] )
+	{ // Display unsubscription date:
+		$UserList->cols[] = array(
+				'th' => T_('Unsubscribed'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'enls_unsubscribed_ts',
+				'default_dir' => 'D',
+				'td' => '%mysql2localedatetime( #enls_unsubscribed_ts# )%',
+			);
+	}
+
 	if( $params['display_enls_sent_manual'] )
 	{ // Display email campaign send date:
 		$UserList->cols[] = array(
@@ -5863,7 +5907,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_enls_send_count'] )
 	{ // Display email campaign send date:
 		$UserList->cols[] = array(
-				'th' => T_('# of emails sent'),
+				'th' => T_('# of campaigns sent'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'right',
 				'order' => 'enls_send_count',

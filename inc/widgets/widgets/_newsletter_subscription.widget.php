@@ -206,11 +206,9 @@ class newsletter_subscription_Widget extends ComponentWidget
 			$Form->hidden( 'widget', $this->ID );
 			$Form->hidden( 'redirect_to', $redirect_to );
 
-			$user_newsletter_subscriptions = $current_User->get_newsletter_subscriptions();
-
 			// Display a button to subscribe⁄unsubscribe:
 			echo '<div class="center">';
-			if( in_array( $widget_Newsletter->ID, $user_newsletter_subscriptions ) )
+			if( $current_User->is_subscribed( $widget_Newsletter->ID ) )
 			{	// If current user is already subscribed:
 				$Form->button_input( array(
 						'name'  => 'unsubscribe',

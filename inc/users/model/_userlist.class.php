@@ -115,6 +115,7 @@ class UserList extends DataObjectList2
 				'level_max'           => NULL,    // integer, Level max
 				'org'                 => NULL,    // integer, Organization ID
 				'newsletter'          => NULL,    // integer, Newsletter ID
+				'newsletter_subscribed' => 1,     // 1 - only users with active subscription, 0 - only unsubscribed users, NULL - both
 				'ecmp'                => NULL,    // integer, Email Campaign ID
 				'recipient_type'      => NULL,    // string, Recipient type of email campaign: 'filtered', 'sent', 'readytosend'
 		) );
@@ -248,6 +249,11 @@ class UserList extends DataObjectList2
 			 * Restrict by newsletter
 			 */
 			memorize_param( 'newsletter', 'integer', $this->default_filters['newsletter'], $this->filters['newsletter'] );
+
+			/*
+			 * Restrict by newsletter subscription activity
+			 */
+			memorize_param( 'newsletter_subscribed', 'integer', $this->default_filters['newsletter_subscribed'], $this->filters['newsletter_subscribed'] );
 
 			/*
 			 * Restrict by email campaign
@@ -459,6 +465,11 @@ class UserList extends DataObjectList2
 		$this->filters['newsletter'] = param( 'newsletter', 'integer', $this->default_filters['newsletter'], true );
 
 		/*
+		 * Restrict by newsletter subscription activity
+		 */
+		$this->filters['newsletter_subscribed'] = param( 'newsletter_subscribed', 'integer', $this->default_filters['newsletter_subscribed'], true );
+
+		/*
 		 * Restrict by email campaign ID
 		 */
 		$this->filters['ecmp'] = param( 'ecmp', 'integer', $this->default_filters['ecmp'], true );
@@ -561,7 +572,7 @@ class UserList extends DataObjectList2
 			$org_ID = isset( $this->query_params['where_org_ID'] ) ? $this->query_params['where_org_ID'] : $this->filters['org'];
 			$this->UserQuery->where_organization( $org_ID );
 		}
-		$this->UserQuery->where_newsletter( $this->filters['newsletter'] );
+		$this->UserQuery->where_newsletter( $this->filters['newsletter'], $this->filters['newsletter_subscribed']  );
 		$this->UserQuery->where_email_campaign( $this->filters['ecmp'], $this->filters['recipient_type'] );
 		if( isset( $this->query_params['where_viewed_user'] ) )
 		{	// Filter by user profile viewed:
