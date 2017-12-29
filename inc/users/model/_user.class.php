@@ -419,6 +419,210 @@ class User extends DataObject
 
 
 	/**
+	 * Load data from registration form
+	 *
+	 * @return boolean true if loaded data seems valid.
+	 */
+	function load_from_register_form()
+	{
+		global $DB, $Settings, $UserSettings, $GroupCache, $Messages, $action;
+		global $current_User, $Session, $localtimenow;
+		global $is_api_request;
+
+		// TRUE when we create new user:
+		$is_new_user = ( $this->ID == 0 );
+
+		// TRUE if we should request a second password to confirm:
+		// (Don't request it when we create new user from REST API)
+		$request_password_confirmation = ! ( $is_api_request && $is_new_user );
+
+		$has_full_access = $current_User->check_perm( 'users', 'edit' );
+		$has_moderate_access = $current_User->check_perm( 'users', 'moderate' );
+
+		// ---- Login checking / START ----
+		// TODO: Must be factorized with code from $this->load_from_Request()!
+		$edited_user_login = param( 'edited_user_login', 'string', NULL );
+		if( ! $is_api_request || ( $is_api_request && ( isset( $edited_user_login ) || $is_new_user ) ) )
+		{ // login specifically included in API request
+			if( empty( $edited_user_login ) )
+			{	// Empty login
+				param_error( 'edited_user_login', T_('Please enter your login.') );
+			}
+			if( param_check_valid_login( 'edited_user_login' ) )
+			{	// If login is valid
+				global $reserved_logins;
+				if( $edited_user_login != $this->get( 'login' ) &&
+				    ! empty( $reserved_logins ) &&
+				    in_array( $edited_user_login, $reserved_logins ) &&
+				    ( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit', false ) ) )
+				{	// If login has been changed and new entered login is reserved and current User cannot use this:
+					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
+				}
+			}
+		}
+		else
+		{
+			set_param( 'edited_user_login', $this->login );
+			$edited_user_login = $this->login;
+		}
+
+		$UserCache = & get_UserCache();
+		$UserLogin = $UserCache->get_by_login( $edited_user_login );
+		if( $UserLogin && $UserLogin->ID != $this->ID )
+		{	// The login is already registered
+			$login_error_message = T_( 'This login already exists.' );
+			if( $current_User->check_perm( 'users', 'edit' ) )
+			{
+				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
+					$edited_user_login,
+					'href="'.get_user_settings_url( 'profile', $UserLogin->ID ).'"' );
+			}
+			param_error( 'edited_user_login', $login_error_message );
+		}
+
+		if( !param_has_error( 'edited_user_login' ) )
+		{	// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
+			$this->set_from_Request( 'login', 'edited_user_login', true, 'utf8_strtolower' );
+		}
+		// ---- Login checking / END ----
+
+		// ---- Password checking / START ----
+		// TODO: Must be factorized with code from $this->load_from_Request()!
+		$reqID = param( 'reqID', 'string', '' );
+
+		global $edited_user_pass1, $edited_user_pass2;
+
+		$edited_user_pass1 = param( 'edited_user_pass1', 'string', true );
+		// Remove the invalid chars from password var:
+		$edited_user_pass1 = preg_replace( '/[<>&]/', '', $edited_user_pass1 );
+
+		if( $request_password_confirmation )
+		{	// Request a password confirmation:
+			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
+			// Remove the invalid chars from password var:
+			$edited_user_pass2 = preg_replace( '/[<>&]/', '', $edited_user_pass2 );
+		}
+
+		if( $is_new_user ||
+				( ! empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) ||
+				( $this->get( 'pass_driver' ) == 'nopass' ) )
+		{	// Current password is not required:
+			//   - new user creating process
+			//   - password change requested by email
+			//   - password has not been set yet(email capture/quick registration)
+
+			if( $request_password_confirmation )
+			{	// Request a password confirmation:
+				if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
+				{ // We can set password
+					$this->set_password( $edited_user_pass2 );
+				}
+			}
+			else
+			{	// Don't request a password confirmation and use only first entered password (Used on REST API):
+				$this->set_password( $edited_user_pass1 );
+			}
+		}
+		else
+		{
+			// ******* Password edit form ****** //
+
+			$current_user_pass = param( 'current_user_pass', 'string', true );
+
+			if( $this->ID != $current_User->ID )
+			{ // Set the messages when admin changes a password of other user
+				$checkpwd_params = array(
+						'msg_pass_new'   => T_('Please enter new password.'),
+						'msg_pass_twice' => T_('Please enter new password twice.'),
+					);
+			}
+			else
+			{ // Use default messages
+				$checkpwd_params = array();
+			}
+
+			if( ! strlen( $current_user_pass ) )
+			{
+				param_error( 'current_user_pass' , T_('Please enter your current password.') );
+				param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen'), $checkpwd_params );
+			}
+			else
+			{
+				if( $has_full_access && $this->ID != $current_User->ID )
+				{	// Admin is changing a password of other user, Check a password of current admin
+					$pass_User = $current_User;
+				}
+				else
+				{	// User is changing own password
+					$pass_User = $this;
+				}
+				if( $pass_User->check_password( $current_user_pass ) )
+				{
+					if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen'), $checkpwd_params ) )
+					{ // We can set password
+						$this->set_password( $edited_user_pass2 );
+					}
+				}
+				else
+				{
+					param_error('current_user_pass' , T_('Your current password is incorrect.') );
+					param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen'), $checkpwd_params );
+				}
+			}
+
+		}
+
+		if( $_POST['edited_user_pass1'] != trim( $_POST['edited_user_pass1'] ) ||
+				$_POST['edited_user_pass2'] != trim( $_POST['edited_user_pass2'] ) )
+		{ // If new password was entered with spaces then inform user about this
+			$Messages->add( T_('The leading and traling spaces have been trimmed from the new password.'), 'warning' );
+		}
+		// ---- Password checking / END ----
+
+		// Email is always required:
+		$edited_user_email = utf8_strtolower( param( 'edited_user_email', 'string', true ) );
+		param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
+		param_check_email( 'edited_user_email', true );
+		$this->set_email( $edited_user_email );
+
+		// Other fields:
+		$country = param( 'country', 'integer', '' );
+		$firstname = param( 'firstname', 'string', '' );
+		$gender = param( 'gender', 'string', NULL );
+		$locale = param( 'locale', 'string', '' );
+
+		// Set params:
+		$paramsList = array();
+		if( $Settings->get( 'registration_require_country' ) )
+		{	// Set and check country:
+			$this->set( 'ctry_ID', $country );
+			$paramsList['country'] = $country;
+		}
+		if( $Settings->get( 'registration_require_firstname' ) )
+		{	// Set and check first name:
+			$this->set( 'firstname', $firstname );
+			$paramsList['firstname'] = $firstname;
+		}
+		if( $Settings->get( 'registration_require_gender' ) == 'required' || $Settings->get( 'registration_require_gender' ) == 'optional' )
+		{	// Set or check gender:
+			$this->set( 'gender', $gender );
+			if( $Settings->get( 'registration_require_gender' ) == 'required' )
+			{	// Check gender because it is mandatory:
+				$paramsList['gender'] = $gender;
+			}
+		}
+		if( $Settings->get( 'registration_ask_locale' ) )
+		{	// Only update locale without checking:
+			$this->set( 'locale', $locale );
+		}
+		// Check profile params:
+		profile_check_params( $paramsList );
+
+		return ! param_errors_detected();
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -702,33 +906,33 @@ class User extends DataObject
 				}
 			}
 
-			$lastname_editing = $Settings->get( 'lastname_editing' );
-			if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $can_edit_users ) )
-			{	// User has a permissions to save Lastname
-				$edited_user_lastname = param( 'edited_user_lastname', 'string', ! $is_api_request || $lastname_editing == 'edited-user-required' ? true : NULL );
-				if( isset( $edited_user_lastname ) )
-				{
-					if( $lastname_editing == 'edited-user-required' )
-					{	// Last name is required
-						param_check_not_empty( 'edited_user_lastname', T_('Please enter last name.') );
+				$lastname_editing = $Settings->get( 'lastname_editing' );
+				if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $can_edit_users ) )
+				{	// User has a permissions to save Lastname
+					$edited_user_lastname = param( 'edited_user_lastname', 'string', ! $is_api_request || $lastname_editing == 'edited-user-required' ? true : NULL );
+					if( isset( $edited_user_lastname ) )
+					{
+						if( $lastname_editing == 'edited-user-required' )
+						{	// Last name is required
+							param_check_not_empty( 'edited_user_lastname', T_('Please enter last name.') );
+						}
+						$this->set_from_Request('lastname', 'edited_user_lastname', true);
 					}
-					$this->set_from_Request('lastname', 'edited_user_lastname', true);
 				}
-			}
 
-			$nickname_editing = $Settings->get( 'nickname_editing' );
-			if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $can_edit_users ) )
-			{	// User has a permissions to save Nickname
-				$edited_user_nickname = param( 'edited_user_nickname', 'string', ! $is_api_request || $nickname_editing == 'edited-user-required' ? true : NULL );
-				if( isset( $edited_user_nickname ) )
-				{
-					if( $nickname_editing == 'edited-user-required' )
-					{	// Nickname is required
-						param_check_not_empty( 'edited_user_nickname', T_('Please enter your nickname.') );
+				$nickname_editing = $Settings->get( 'nickname_editing' );
+				if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $can_edit_users ) )
+				{	// User has a permissions to save Nickname
+					$edited_user_nickname = param( 'edited_user_nickname', 'string', ! $is_api_request || $nickname_editing == 'edited-user-required' ? true : NULL );
+					if( isset( $edited_user_nickname ) )
+					{
+						if( $nickname_editing == 'edited-user-required' )
+						{	// Nickname is required
+							param_check_not_empty( 'edited_user_nickname', T_('Please enter your nickname.') );
+						}
+						$this->set_from_Request('nickname', 'edited_user_nickname', true);
 					}
-					$this->set_from_Request('nickname', 'edited_user_nickname', true);
 				}
-			}
 
 			$gender_editing = $Settings->get( 'registration_require_gender' );
 			if( $this->ID == $current_User->ID || ( $gender_editing != 'hidden' && $can_edit_users ) )
@@ -5027,6 +5231,9 @@ class User extends DataObject
 		// check if is admin form
 		$is_admin_form = param( 'admin_form', 'boolean', false );
 
+		// check if is a register finish form:
+		$is_register_finish_form = ( param( 'user_tab', 'string', '' ) == 'register_finish' );
+
 		// memorize user status ( activated or not )
 		$user_was_activated = $this->check_status( 'is_validated' );
 		$user_old_email = $this->email;
@@ -5044,8 +5251,17 @@ class User extends DataObject
 			}
 		}
 
-		// load data from request
-		if( !$this->load_from_Request() )
+		if( $is_register_finish_form )
+		{	// load data from register form:
+			$load_result = $this->load_from_register_form();
+		}
+		else
+		{	// load data from request:
+			$load_result = $this->load_from_Request();
+		}
+
+		
+		if( ! $load_result )
 		{	// We have found validation errors:
 			if( $is_new_user || ( $is_admin_form && ( $this->ID != 1 ) ) )
 			{ // update user status settings but not save

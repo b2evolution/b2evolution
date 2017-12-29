@@ -1124,16 +1124,16 @@ class collections_Module extends Module
 	 */
 	function handle_htsrv_action()
 	{
-		global $demo_mode, $current_User, $DB, $Session, $Messages;
+		global $demo_mode, $current_User, $DB, $Session, $Messages, $localtimenow;
 		global $UserSettings;
-
-		if( !is_logged_in() )
-		{ // user must be logged in
-			bad_request_die( $this->T_( 'You are not logged in.' ) );
-		}
 
 		// Init the objects we want to work on.
 		$action = param_action( true );
+
+		if( !is_logged_in() && $action != 'create_post' )
+		{ // user must be logged in
+			bad_request_die( $this->T_( 'You are not logged in.' ) );
+		}
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collections_'.$action );
@@ -1384,6 +1384,135 @@ class collections_Module extends Module
 
 				header_redirect();
 				break; // already exited here
+
+			case 'create_post':
+				// Create new post from front-office:
+				global $dummy_fields, $Plugins;
+
+				load_class( 'items/model/_item.class.php', 'Item' );
+
+				// Name:
+				$user_name = param( $dummy_fields['name'], 'string' );
+				param_check_not_empty( $dummy_fields['name'], sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Name') ) );
+
+				// Email:
+				$user_email = param( $dummy_fields['email'], 'string' );
+				param_check_email( $dummy_fields['email'], true );
+
+				// Stop a request from the blocked IP addresses or Domains
+				antispam_block_request();
+
+				// Stop a request from the blocked email address or its domain:
+				antispam_block_by_email( $user_email );
+
+				// Initialize new Item object:
+				$new_Item = new Item();
+
+				// Set main category:
+				$new_Item->set( 'main_cat_ID', param( 'cat', 'integer', true ) );
+
+				$item_Blog = & $new_Item->get_Blog();
+
+				// Set default status:
+				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status' ) );
+
+				if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $user_email ) ) ) )
+				{	// Don't allow the duplicate emails for users:
+					$Messages->add_to_group( sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
+						'href="'.$item_Blog->get( 'loginurl' ).'"',
+						'href="'.$item_Blog->get( 'lostpasswordurl' ).'"' ), 'error', T_('Validation errors:') );
+				}
+
+				// Set item properties from submitted form:
+				$new_Item->load_from_Request( false, true );
+
+				// Call plugin event for additional checking, e-g captcha:
+				$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $new_Item ) );
+
+				if( param_errors_detected() )
+				{	// If at least one error has been detected:
+
+					// Save temp params only into session Item object to redisplay them on the form after redirect:
+					$new_Item->temp_user_name = $user_name;
+					$new_Item->temp_user_email = $user_email;
+
+					// Save new Item with entered data in Session:
+					set_session_Item( $new_Item );
+
+					// Redirect back to the form:
+					header_redirect();
+				}
+
+				// START: Auto register new user:
+				// Set unique user login from entered user name:
+				$max_login_length = 20;
+				$login = preg_replace( '/[^a-z0-9 ]/i', '', $user_name );
+				if( trim( $login ) == '' )
+				{	// Get login from entered user email:
+					$login = preg_replace( '/^([^@]+)@.+$/i', '$1', $user_email );
+					$login = preg_replace( '/[^a-z0-9 ]/i', '', $login );
+				}
+				$login = str_replace( ' ', '_', $login );
+				$login = utf8_substr( $login, 0, $max_login_length );
+
+				$exist_user_SQL = new SQL( 'Check if user exists with name from new item form' );
+				$exist_user_SQL->SELECT( 'user_ID' );
+				$exist_user_SQL->FROM( 'T_users' );
+				$exist_user_SQL->WHERE( 'user_login = '.$DB->quote( $login ) );
+				$user_unique_num = '';
+				$unique_login = $login;
+				while( $DB->get_var( $exist_user_SQL ) )
+				{	// Check while we find unique user login:
+					$user_unique_num++;
+					$unique_login = $login.$user_unique_num;
+					if( strlen( $unique_login ) > $max_login_length )
+					{	// Restrict user login with max db column length:
+						$unique_login = utf8_substr( $login, 0, $max_login_length - strlen( $user_unique_num ) ).$user_unique_num;
+					}
+					$exist_user_SQL->WHERE( 'user_login = '.$DB->quote( $unique_login ) );
+				}
+
+				$new_User = new User();
+				$new_User->set( 'firstname', $user_name );
+				$new_User->set( 'login', $unique_login );
+				$new_User->set_email( $user_email );
+				$new_User->set( 'pass', '' );
+				$new_User->set( 'salt', '' );
+				$new_User->set( 'pass_driver', 'nopass' );
+				$new_User->set( 'source', 'auto reg on new post' );
+				$new_User->set_datecreated( $localtimenow );
+				if( $new_User->dbinsert() )
+				{	// Insert system log about user's registration
+					syslog_insert( 'User auto registration on new item', 'info', 'user', $new_User->ID );
+					report_user_create( $new_User );
+				}
+
+				// Autologin the user. This is more comfortable for the user and avoids
+				// extra confusion when account validation is required.
+				$Session->set_User( $new_User );
+
+				// END: Auto register new user:
+
+				// Set creator User for new creating Item:
+				$new_Item->set_creator_User( $new_User );
+
+				if( $new_Item->dbinsert() )
+				{	// Successful new item creating:
+					$Messages->add( T_('Post has been created.'), 'success' );
+					$Messages->add( T_('Please set a password now so you can log in to this site next time you visit.'), 'error' );
+					$redirect_to = $item_Blog->get( 'register_finishurl', array( 'glue' => '&' ) );
+				}
+				else
+				{	// Error on creating new Item:
+					$Messages->add( T_('Couldn\'t create the new post'), 'error' );
+					$redirect_to = NULL;
+				}
+
+				// Delete Item from Session:
+				delete_session_Item( 0 );
+
+				header_redirect( $redirect_to );
+				break;
 		}
 	}
 }
