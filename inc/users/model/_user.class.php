@@ -5168,8 +5168,8 @@ class User extends DataObject
 		// check if is admin form
 		$is_admin_form = param( 'admin_form', 'boolean', false );
 
-		// check if is user data form:
-		$is_userdata_form = ( param( 'user_tab', 'string', '' ) == 'userdata' );
+		// check if is a register finish form:
+		$is_register_finish_form = ( param( 'user_tab', 'string', '' ) == 'register_finish' );
 
 		// memorize user status ( activated or not )
 		$user_was_activated = $this->check_status( 'is_validated' );
@@ -5188,7 +5188,7 @@ class User extends DataObject
 			}
 		}
 
-		if( $is_userdata_form )
+		if( $is_register_finish_form )
 		{	// load data from register form:
 			$load_result = $this->load_from_register_form();
 		}

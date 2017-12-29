@@ -293,7 +293,7 @@ elseif( ! param_errors_detected() )
 	switch( $action )
 	{
 		case 'update':
-			if( $user_tab == 'userdata' )
+			if( $user_tab == 'register_finish' )
 			{	// After submitting quick data we should redirect user to page like after registration:
 				$after_registration = $Settings->get( 'after_registration' );
 				if( $after_registration == 'return_to_original' )

@@ -1350,7 +1350,7 @@ class collections_Module extends Module
 				{	// Successful new item creating:
 					$Messages->add( T_('Post has been created.'), 'success' );
 					$Messages->add( T_('Please set a password now so you can log in to this site next time you visit.'), 'error' );
-					$redirect_to = $item_Blog->get( 'userdataurl', array( 'glue' => '&' ) );
+					$redirect_to = $item_Blog->get( 'register_finishurl', array( 'glue' => '&' ) );
 				}
 				else
 				{	// Error on creating new Item:

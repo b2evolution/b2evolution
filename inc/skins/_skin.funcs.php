@@ -1185,7 +1185,7 @@ function skin_init( $disp )
 			break;
 
 		case 'profile':
-		case 'userdata':
+		case 'register_finish':
 		case 'avatar':
 			$action = param_action();
 			if( $action == 'crop' && is_logged_in() )
@@ -1721,7 +1721,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_pwdchange'             => '_profile.disp.php',
 				'disp_userprefs'             => '_profile.disp.php',
 				'disp_subs'                  => '_profile.disp.php',
-				'disp_userdata'              => '_profile.disp.php',
+				'disp_register_finish'       => '_profile.disp.php',
 				'disp_visits'                => '_visits.disp.php',
 				'disp_register'              => '_register.disp.php',
 				'disp_search'                => '_search.disp.php',

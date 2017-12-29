@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI view for the user properties.
+ * This file implements the UI view for the user register finish form.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -59,7 +59,7 @@ $Form->begin_form( 'bComment' );
 
 $Form->add_crumb( 'user' );
 $Form->hidden_ctrl();
-$Form->hidden( 'user_tab', 'userdata' );
+$Form->hidden( 'user_tab', 'register_finish' );
 
 $Form->hidden( 'user_ID', $edited_User->ID );
 if( isset( $Blog ) )
@@ -159,7 +159,7 @@ if( $Settings->get( 'registration_ask_locale' ) )
 }
 
 $Form->end_form( array(
-		array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ),
+		array( '', 'actionArray[update]', T_('Finish Registration!'), 'SaveButton' ),
 	) );
 
 // Display javascript password strength indicator bar

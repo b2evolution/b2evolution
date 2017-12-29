@@ -68,7 +68,7 @@ else
 	}
 }
 
-if( $params['display_profile_tabs'] && $disp != 'userdata' )
+if( $params['display_profile_tabs'] && $disp != 'register_finish' )
 { // Display profile tabs
 	echo $params['profile_tabs']['block_start'];
 	$entries = get_user_sub_entries( false, NULL );
@@ -97,8 +97,8 @@ if( $params['display_profile_tabs'] && $disp != 'userdata' )
 // Display form
 switch( $disp )
 {
-	case 'userdata':
-		require $inc_path.'users/views/_user_data.form.php';
+	case 'register_finish':
+		require $inc_path.'users/views/_user_register_finish.form.php';
 		break;
 	case 'profile':
 		require $inc_path.'users/views/_user_identity.form.php';

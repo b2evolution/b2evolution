@@ -2730,8 +2730,8 @@ class Blog extends DataObject
 				$params['url_suffix'] .= '#subs';
 				break;
 
-			case 'userdataurl':
-				$disp_param = 'userdata';
+			case 'register_finishurl':
+				$disp_param = 'register_finish';
 				break;
 
 			case 'userurl':
@@ -2890,7 +2890,7 @@ class Blog extends DataObject
 		if( ! empty( $disp_param ) )
 		{ // Get url depending on value of param 'disp'
 			$this_Blog = & $this;
-			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'userdata', 'visits' ) ) )
+			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits' ) ) )
 			{ // Check if we can use this blog for messaging actions or we should use spec blog
 				if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
 				{ // Use special blog for messaging actions if it is defined in general settings

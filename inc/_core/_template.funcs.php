@@ -433,14 +433,14 @@ function get_request_title( $params = array() )
 			'contacts_text'       => T_('Contacts'),
 			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
 			'register_text'       => T_('Register'),
-			'req_activate_email'    => T_('Account activation'),
+			'register_finish_text'=> T_('Finish Registration'),
+			'req_activate_email'  => T_('Account activation'),
 			'account_activation'  => T_('Account activation'),
 			'lostpassword_text'   => T_('Lost your password?'),
 			'profile_text'        => T_('User Profile'),
 			'avatar_text'         => T_('Profile picture'),
 			'pwdchange_text'      => T_('Password change'),
 			'userprefs_text'      => T_('User preferences'),
-			'userdata_text'       => T_('User Profile'),
 			'user_text'           => T_('User: %s'),
 			'users_text'          => T_('Users'),
 			'closeaccount_text'   => T_('Close account'),
@@ -556,9 +556,9 @@ function get_request_title( $params = array() )
 			$r[] = $params['subs_text'];
 			break;
 
-		case 'userdata':
-			// We are requesting the user data:
-			$r[] = $params['userdata_text'];
+		case 'register_finish':
+			// We are requesting the register finish form:
+			$r[] = $params['register_finish_text'];
 			break;
 
 		case 'visits':
