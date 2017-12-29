@@ -3157,6 +3157,11 @@ class User extends DataObject
 
 			default:
 				// Check pluggable permissions using user permission check function
+				if( $permname == 'perm_users' && ! $this->check_perm( 'admin', 'normal' ) )
+				{	// User must has Normal Back-office Access to view/moderate/edit other users:
+					$perm = false;
+					break;
+				}
 				$this->get_Group();
 				$perm = Module::check_perm( $permname, $permlevel, $perm_target, 'user_func', $this->Group );
 				if( $perm === true || $perm === NULL )
