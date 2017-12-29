@@ -1349,6 +1349,7 @@ class collections_Module extends Module
 				if( $new_Item->dbinsert() )
 				{	// Successful new item creating:
 					$Messages->add( T_('Post has been created.'), 'success' );
+					$Messages->add( T_('Please set a password now so you can log in to this site next time you visit.'), 'error' );
 					$redirect_to = $item_Blog->get( 'userdataurl', array( 'glue' => '&' ) );
 				}
 				else

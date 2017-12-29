@@ -141,7 +141,7 @@ if( user_country_visible() )
 $firstname_editing = $Settings->get( 'firstname_editing' );
 if( in_array( $firstname_editing, $edited_user_perms ) )
 {	// Firstname is visible:
-	$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 18, T_('First name'), T_('Your real first name.'), array( 'maxlength' => 50, 'class' => 'input_text', 'required' => true ) );
+	$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 18, T_('First name'), T_('Your real first name.'), array( 'maxlength' => 50, 'class' => 'input_text', 'required' => ( $firstname_editing == 'edited-user-required' ) ) );
 }
 
 $registration_require_gender = $Settings->get( 'registration_require_gender' );

@@ -293,8 +293,29 @@ elseif( ! param_errors_detected() )
 	switch( $action )
 	{
 		case 'update':
-			if( $user_tab != 'userdata' && // Exclude update from disp=userdata
-			    isset( $current_User->previous_pass_driver ) &&
+			if( $user_tab == 'userdata' )
+			{	// After submitting quick data we should redirect user to page like after registration:
+				$after_registration = $Settings->get( 'after_registration' );
+				if( $after_registration == 'return_to_original' )
+				{	// Return to original page ( where user was before the registration process ):
+					if( empty( $redirect_to ) )
+					{	// redirect_to param was not set
+						if( ! empty( $Blog ) )
+						{
+							$redirect_to = $Blog->gen_blogurl();
+						}
+						else
+						{
+							$redirect_to = $baseurl;
+						}
+					}
+				}
+				else
+				{	// Return to the specific URL which is set in the registration settings form:
+					$redirect_to = $after_registration;
+				}
+			}
+			elseif( isset( $current_User->previous_pass_driver ) &&
 			    $current_User->previous_pass_driver == 'nopass' &&
 			    $current_User->previous_pass_driver != $current_User->get( 'pass_driver' ) )
 			{	// Redirect to page as we use after email validation if current user set password first time, e-g after email capture/quick registration:
