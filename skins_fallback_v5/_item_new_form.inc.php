@@ -41,24 +41,26 @@ $Form->hidden( 'mname', 'collections' );
 $Form->add_crumb( 'collections_create_post' );
 $Form->hidden( 'cat', get_param( 'cat' ) );
 
-$Form->text_input( $dummy_fields['name'], ( isset( $new_Item->temp_user_name ) ? $new_Item->temp_user_name : '' ), 40, T_('Name'), '', array( 'maxlength' => 100, 'required' => true ) );
+$Form->switch_layout( 'none' );
+echo '<table width="100%" class="compose_layout">';
+$Form->labelstart = '<tr><th width="1%" class="label">';
+$Form->labelend = '</th>';
+$Form->inputstart = '<td>';
+$Form->inputend = '</td></tr>';
 
-$Form->text_input( $dummy_fields['email'], ( isset( $new_Item->temp_user_email ) ? $new_Item->temp_user_email : '' ), 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), array( 'maxlength' => 255, 'required' => true ) );
+$Form->text_input( $dummy_fields['name'], ( isset( $new_Item->temp_user_name ) ? $new_Item->temp_user_name : '' ), 40, T_('Name'), '', array( 'maxlength' => 100, 'required' => true, 'style' => 'width:auto' ) );
+
+$Form->text_input( $dummy_fields['email'], ( isset( $new_Item->temp_user_email ) ? $new_Item->temp_user_email : '' ), 40, T_('Email'), T_('Your email address will <strong>not</strong> be revealed on this site.'), array( 'maxlength' => 255, 'required' => true, 'style' => 'width:auto' ) );
 
 // Title input:
 $use_title = $new_Item->get_type_setting( 'use_title' );
 if( $use_title != 'never' )
 {
-	$Form->switch_layout( 'none' );
-	echo '<table width="100%" class="compose_layout"><tr>';
-	$Form->labelstart = '<th width="1%" class="label">';
-	$Form->labelend = '</th>';
-	$Form->inputstart = '<td>';
-	$Form->inputend = '</td>';
 	$Form->text_input( 'post_title', $new_Item->get( 'title' ), 20, T_('Title'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;', 'required' => ( $use_title == 'required' ) ) );
-	echo '</tr></table>';
-	$Form->switch_layout( NULL );
 }
+
+echo '</table>';
+$Form->switch_layout( NULL );
 
 if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 {	// Display textarea for a post text:
