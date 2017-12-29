@@ -469,6 +469,7 @@ class User extends DataObject
 		}
 		// ---- Login checking / END ----
 
+		$is_userdata_form = ( param( 'user_tab', 'string', '' ) == 'userdata' );
 		$is_identity_form = param( 'identity_form', 'boolean', false );
 		$is_admin_form = param( 'admin_form', 'boolean', false );
 		$has_full_access = $current_User->check_perm( 'users', 'edit' );
@@ -653,27 +654,11 @@ class User extends DataObject
 			}
 		}
 
-		// ******* Identity form ******* //
-		if( $is_identity_form || ( $is_api_request && $is_new_user ) )
+		// ******* Identity and userdata forms ******* //
+		if( $is_identity_form || $is_userdata_form || ( $is_api_request && $is_new_user ) )
 		{
 			$can_edit_users = $current_User->check_perm( 'users', 'edit' );
 			$edited_user_perms = array( 'edited-user', 'edited-user-required' );
-
-			global $edited_user_age_min, $edited_user_age_max;
-			$age_min = param( 'edited_user_age_min', 'string', ! $is_api_request ? true : NULL );
-			$age_max = param( 'edited_user_age_max', 'string', ! $is_api_request ? true : NULL );
-
-			if( isset( $age_min ) && isset( $age_max ) )
-			{
-				param_check_interval( 'edited_user_age_min', 'edited_user_age_max', T_('Age must be a number.'), T_('The first age must be lower than (or equal to) the second.') );
-				if( !param_has_error( 'edited_user_age_min' ) && $Settings->get( 'minimum_age' ) > 0 &&
-						!empty( $edited_user_age_min ) && $edited_user_age_min < $Settings->get( 'minimum_age' ) )
-				{	// Limit user by minimum age
-					param_error( 'edited_user_age_min', sprintf( T_('You must be at least %d years old to use this service.'), $Settings->get( 'minimum_age' ) ) );
-				}
-				$this->set_from_Request( 'age_min', 'edited_user_age_min', true );
-				$this->set_from_Request( 'age_max', 'edited_user_age_max', true );
-			}
 
 			$firstname_editing = $Settings->get( 'firstname_editing' );
 			if( ( in_array( $firstname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $can_edit_users ) )
@@ -689,31 +674,57 @@ class User extends DataObject
 				}
 			}
 
-			$lastname_editing = $Settings->get( 'lastname_editing' );
-			if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $can_edit_users ) )
-			{	// User has a permissions to save Lastname
-				$edited_user_lastname = param( 'edited_user_lastname', 'string', ! $is_api_request || $lastname_editing == 'edited-user-required' ? true : NULL );
-				if( isset( $edited_user_lastname ) )
-				{
-					if( $lastname_editing == 'edited-user-required' )
-					{	// Last name is required
-						param_check_not_empty( 'edited_user_lastname', T_('Please enter last name.') );
-					}
-					$this->set_from_Request('lastname', 'edited_user_lastname', true);
-				}
+			if( $is_userdata_form )
+			{	// Email is always required of user disp=userdata:
+				$edited_user_email = utf8_strtolower( param( 'edited_user_email', 'string', true ) );
+				param_check_not_empty( 'edited_user_email', T_('Please enter your e-mail address.') );
+				param_check_email( 'edited_user_email', true );
+				$this->set_email( $edited_user_email );
 			}
-
-			$nickname_editing = $Settings->get( 'nickname_editing' );
-			if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $can_edit_users ) )
-			{	// User has a permissions to save Nickname
-				$edited_user_nickname = param( 'edited_user_nickname', 'string', ! $is_api_request || $nickname_editing == 'edited-user-required' ? true : NULL );
-				if( isset( $edited_user_nickname ) )
-				{
-					if( $nickname_editing == 'edited-user-required' )
-					{	// Nickname is required
-						param_check_not_empty( 'edited_user_nickname', T_('Please enter your nickname.') );
+			else
+			{	// This fields are not displayed on disp=userdata:
+				$lastname_editing = $Settings->get( 'lastname_editing' );
+				if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $can_edit_users ) )
+				{	// User has a permissions to save Lastname
+					$edited_user_lastname = param( 'edited_user_lastname', 'string', ! $is_api_request || $lastname_editing == 'edited-user-required' ? true : NULL );
+					if( isset( $edited_user_lastname ) )
+					{
+						if( $lastname_editing == 'edited-user-required' )
+						{	// Last name is required
+							param_check_not_empty( 'edited_user_lastname', T_('Please enter last name.') );
+						}
+						$this->set_from_Request('lastname', 'edited_user_lastname', true);
 					}
-					$this->set_from_Request('nickname', 'edited_user_nickname', true);
+				}
+
+				$nickname_editing = $Settings->get( 'nickname_editing' );
+				if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $can_edit_users ) )
+				{	// User has a permissions to save Nickname
+					$edited_user_nickname = param( 'edited_user_nickname', 'string', ! $is_api_request || $nickname_editing == 'edited-user-required' ? true : NULL );
+					if( isset( $edited_user_nickname ) )
+					{
+						if( $nickname_editing == 'edited-user-required' )
+						{	// Nickname is required
+							param_check_not_empty( 'edited_user_nickname', T_('Please enter your nickname.') );
+						}
+						$this->set_from_Request('nickname', 'edited_user_nickname', true);
+					}
+				}
+
+				global $edited_user_age_min, $edited_user_age_max;
+				$age_min = param( 'edited_user_age_min', 'string', ! $is_api_request ? true : NULL );
+				$age_max = param( 'edited_user_age_max', 'string', ! $is_api_request ? true : NULL );
+
+				if( isset( $age_min ) && isset( $age_max ) )
+				{
+					param_check_interval( 'edited_user_age_min', 'edited_user_age_max', T_('Age must be a number.'), T_('The first age must be lower than (or equal to) the second.') );
+					if( !param_has_error( 'edited_user_age_min' ) && $Settings->get( 'minimum_age' ) > 0 &&
+							!empty( $edited_user_age_min ) && $edited_user_age_min < $Settings->get( 'minimum_age' ) )
+					{	// Limit user by minimum age
+						param_error( 'edited_user_age_min', sprintf( T_('You must be at least %d years old to use this service.'), $Settings->get( 'minimum_age' ) ) );
+					}
+					$this->set_from_Request( 'age_min', 'edited_user_age_min', true );
+					$this->set_from_Request( 'age_max', 'edited_user_age_max', true );
 				}
 			}
 
@@ -734,8 +745,8 @@ class User extends DataObject
 			if( user_country_visible() )
 			{ // Save country
 				$country_is_required = ( $Settings->get( 'location_country' ) == 'required' && countries_exist() );
-				$edited_user_ctry_ID = param( 'edited_user_ctry_ID', 'integer', ! $is_api_request || $country_is_required ? true : NULL);
-				if( isset( $edited_user_ctry_ID ) )
+				$edited_user_ctry_ID = param( 'edited_user_ctry_ID', 'integer', ! $is_api_request || $country_is_required ? true : NULL );
+				if( isset( $edited_user_ctry_ID ) || $country_is_required )
 				{
 					if( $country_is_required && $can_edit_users && $edited_user_ctry_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -748,7 +759,10 @@ class User extends DataObject
 					$this->set_from_Request( 'ctry_ID', 'edited_user_ctry_ID', true );
 				}
 			}
+		}
 
+		if( $is_identity_form || ( $is_api_request && $is_new_user ) )
+		{	// Continue identity form without userdata form:
 			if( user_region_visible() )
 			{ // Save region
 				$region_is_required = ( $Settings->get( 'location_region' ) == 'required' && regions_exist( $edited_user_ctry_ID ) );
@@ -1084,7 +1098,7 @@ class User extends DataObject
 		// ******* Password form ******* //
 
 		$is_password_form = param( 'password_form', 'boolean', false );
-		if( $is_password_form || $is_new_user )
+		if( $is_password_form || $is_userdata_form || $is_new_user )
 		{
 			$reqID = param( 'reqID', 'string', '' );
 
@@ -1185,10 +1199,10 @@ class User extends DataObject
 
 		$is_preferences_form = param( 'preferences_form', 'boolean', false );
 
-		if( $is_preferences_form )
+		if( $is_preferences_form || $is_userdata_form )
 		{
 			// Other preferences
-			$preferred_locale = param( 'edited_user_locale', 'string', ! $is_api_request );
+			$preferred_locale = param( 'edited_user_locale', 'string', ! $is_api_request && ! $is_userdata_form );
 			if( isset( $preferred_locale ) )
 			{
 				$this->set_from_Request('locale', 'edited_user_locale', true);

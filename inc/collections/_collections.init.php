@@ -1349,7 +1349,7 @@ class collections_Module extends Module
 				if( $new_Item->dbinsert() )
 				{	// Successful new item creating:
 					$Messages->add( T_('Post has been created.'), 'success' );
-					$redirect_to = $item_Blog->get( 'profileurl', array( 'glue' => '&' ) );
+					$redirect_to = $item_Blog->get( 'userdataurl', array( 'glue' => '&' ) );
 				}
 				else
 				{	// Error on creating new Item:

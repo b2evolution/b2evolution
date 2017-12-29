@@ -293,7 +293,8 @@ elseif( ! param_errors_detected() )
 	switch( $action )
 	{
 		case 'update':
-			if( isset( $current_User->previous_pass_driver ) &&
+			if( $user_tab != 'userdata' && // Exclude update from disp=userdata
+			    isset( $current_User->previous_pass_driver ) &&
 			    $current_User->previous_pass_driver == 'nopass' &&
 			    $current_User->previous_pass_driver != $current_User->get( 'pass_driver' ) )
 			{	// Redirect to page as we use after email validation if current user set password first time, e-g after email capture/quick registration:

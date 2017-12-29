@@ -440,6 +440,7 @@ function get_request_title( $params = array() )
 			'avatar_text'         => T_('Profile picture'),
 			'pwdchange_text'      => T_('Password change'),
 			'userprefs_text'      => T_('User preferences'),
+			'userdata_text'       => T_('User Profile'),
 			'user_text'           => T_('User: %s'),
 			'users_text'          => T_('Users'),
 			'closeaccount_text'   => T_('Close account'),
@@ -553,6 +554,11 @@ function get_request_title( $params = array() )
 		case 'subs':
 			// We are requesting the subscriptions screen:
 			$r[] = $params['subs_text'];
+			break;
+
+		case 'userdata':
+			// We are requesting the user data:
+			$r[] = $params['userdata_text'];
 			break;
 
 		case 'visits':
@@ -3112,6 +3118,122 @@ function display_password_indicator( $params = array() )
 		}
 	} );
 </script>";
+}
+
+
+/*
+ * Display javascript code to edit password
+ *
+ * @param array Params
+ */
+function display_password_js_edit()
+{
+	global $Settings;
+
+	echo '<script type="text/javascript">
+jQuery( "#current_user_pass" ).keyup( function()
+{
+	var error_obj = jQuery( this ).parent().find( "span.field_error" );
+	if( error_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			error_obj.show();
+		}
+		else
+		{
+			error_obj.hide();
+		}
+	}
+
+	user_pass_clear_style( "#current_user_pass" );
+} );
+
+jQuery( "#edited_user_pass1, #edited_user_pass2" ).keyup( function()
+{
+	var minpass_obj = jQuery( this ).parent().find( ".pass_check_min" );
+	if( minpass_obj.length )
+	{ // Hide/Show a message about min pass length
+		if( jQuery.trim( jQuery( this ).val() ).length >= '.intval( $Settings->get('user_minpwdlen') ).' )
+		{
+			minpass_obj.hide();
+		}
+		else
+		{
+			minpass_obj.show();
+		}
+	}
+
+	var diff_obj = jQuery( ".pass_check_diff" );
+	if( diff_obj.length && jQuery( "#edited_user_pass1" ).val() == jQuery( " #edited_user_pass2" ).val() )
+	{ // Hide message about different passwords
+		diff_obj.hide();
+	}
+
+	// Hide message about that new password must be entered
+	var new_obj = jQuery( this ).parent().find( ".pass_check_new" );
+	if( new_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			new_obj.show();
+		}
+		else
+		{
+			new_obj.hide();
+		}
+	}
+
+	// Hide message about that new password must be entered twice
+	var twice_obj = jQuery( this ).parent().find( ".pass_check_twice" );
+	if( twice_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			twice_obj.show();
+		}
+		else
+		{
+			twice_obj.hide();
+		}
+	}
+
+	var warning_obj = jQuery( this ).parent().find( ".pass_check_warning" );
+	if( jQuery.trim( jQuery( this ).val() ) != jQuery( this ).val() )
+	{ // Password contains the leading and trailing spaces
+		if( ! warning_obj.length )
+		{
+			jQuery( this ).parent().append( "<span class=\"pass_check_warning notes field_error\">.'.TS_('The leading and trailing spaces will be trimmed.').'</span>" );
+		}
+	}
+	else if( warning_obj.length )
+	{ // No spaces, Remove warning
+		warning_obj.remove();
+	}
+
+	user_pass_clear_style( "#edited_user_pass1, #edited_user_pass2" );
+} );
+
+/**
+ * Hide/Show error style of input depending on visibility of the error messages
+ *
+ * @param string jQuery selector
+ */
+function user_pass_clear_style( obj_selector )
+{
+	jQuery( obj_selector ).each( function()
+	{
+		if( jQuery( this ).parent().find( "span.field_error span:visible" ).length )
+		{
+			jQuery( this ).addClass( "field_error" );
+		}
+		else
+		{
+			jQuery( this ).removeClass( "field_error" );
+		}
+	} );
+}
+</script>';
 }
 
 

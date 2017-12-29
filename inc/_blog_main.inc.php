@@ -855,6 +855,7 @@ if( !empty( $skin ) )
 					'pwdchange'             => 'pwdchange.main.php',
 					'userprefs'             => 'userprefs.main.php',
 					'subs'                  => 'subs.main.php',
+					'userdata'              => 'userdata.main.php',
 					'visits'                => 'visits.main.php',
 					'register'              => 'register.main.php',
 					'search'                => 'search.main.php',
