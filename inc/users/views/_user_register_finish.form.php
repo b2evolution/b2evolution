@@ -86,7 +86,7 @@ $Form->text_input( 'edited_user_login', $edited_User->login, 22, /* TRANS: noun 
 //   - password change requested by email
 //   - password has not been set yet(email capture/quick registration)
 if( ( empty( $reqID ) || $reqID != $Session->get( 'core.changepwd.request_id' ) ) &&
-		( $edited_User->get( 'pass_driver' ) != 'nopass' ) )
+		( $edited_User->get( 'pass_driver' ) != 'nopass' && ( ! isset( $edited_User->previous_pass_driver ) || $edited_User->previous_pass_driver != 'nopass' ) ) )
 {
 	if( ! $current_User->check_perm( 'users', 'edit' ) || $edited_User->ID == $current_User->ID )
 	{	// Current user has no full access or editing his own password
