@@ -52,6 +52,7 @@ ol.breadcrumb {
 }
 .forums_list .comments_link__pagination {
   text-align: center;
+  margin-bottom: 15px;
 }
 .forums_list .comments_link__pagination .post_button {
   float: left;
@@ -61,7 +62,6 @@ ol.breadcrumb {
   display: inline-block;
   vertical-align: top;
   margin: 0 auto;
-  margin-left: -76px;
 }
 .forums_list .panel-heading:not(:first-child) {
   border-top: 1px solid #ddd;
@@ -1102,7 +1102,9 @@ a.to_top {
 .evo_comment_avatar > a:hover {
   background-color: transparent !important;
 }
-.comments_link__pagination .alert {
+.alert.alert-item-new {
   margin: 0;
-  text-align: left;
+}
+.panel.evo_item_new_form {
+  margin-bottom: 0;
 }

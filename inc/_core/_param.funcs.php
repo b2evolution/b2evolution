@@ -2368,20 +2368,20 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 	{
 		case 'posting':
 		case 'xmlrpc_posting':
-			$Group = $User->get_Group();
+			$Group = $User ? $User->get_Group() : false;
 			if( $context == 'posting' )
 			{
-				$xhtmlvalidation  = ($Group->perm_xhtmlvalidation == 'always');
+				$xhtmlvalidation  = ( $Group && $Group->perm_xhtmlvalidation == 'always' );
 			}
 			else
 			{
-				$xhtmlvalidation  = ($Group->perm_xhtmlvalidation_xmlrpc == 'always');
+				$xhtmlvalidation  = ( $Group && $Group->perm_xhtmlvalidation_xmlrpc == 'always' );
 			}
-			$allow_css_tweaks = $Group->perm_xhtml_css_tweaks;
-			$allow_javascript = $Group->perm_xhtml_javascript;
-			$allow_iframes    = $Group->perm_xhtml_iframes;
-			$allow_objects    = $Group->perm_xhtml_objects;
-			$bypass_antispam  = $Group->perm_bypass_antispam;
+			$allow_css_tweaks = $Group && $Group->perm_xhtml_css_tweaks;
+			$allow_javascript = $Group && $Group->perm_xhtml_javascript;
+			$allow_iframes    = $Group && $Group->perm_xhtml_iframes;
+			$allow_objects    = $Group && $Group->perm_xhtml_objects;
+			$bypass_antispam  = $Group && $Group->perm_bypass_antispam;
 			break;
 
 		case 'commenting':
