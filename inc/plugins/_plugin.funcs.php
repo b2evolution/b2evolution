@@ -402,7 +402,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			// check if a color field is among the entries
 			foreach( $parmeta['entries'] as $entry )
 			{
-				if( $entry['type'] == 'color' )
+				if( isset( $entry['type'] ) && $entry['type'] == 'color' )
 				{
 					$has_color_field = true;
 					break;
@@ -977,8 +977,11 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 	if( isset( $parmeta['type'] ) && $parmeta['type'] == 'integer' )
 	{	// Convert to correct integer value:
-		$l_value = intval( $l_value );
-		if( $l_value == 0 && ! empty( $parmeta['allow_empty'] ) &&
+		if( $l_value !== '' )
+		{	// Don't convert empty string '' to integer 0:
+			$l_value = intval( $l_value );
+		}
+		if( empty( $l_value ) && ! empty( $parmeta['allow_empty'] ) &&
 				isset( $parmeta['valid_range'], $parmeta['valid_range']['min'] ) && $parmeta['valid_range']['min'] > 0 )
 		{	// Convert 0 to empty value for integer field if it allows empty values:
 			$l_value = NULL;
@@ -1153,6 +1156,14 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 
 		switch( $meta['type'] )
 		{
+			case 'text':
+				if( isset( $meta['allow_empty'] ) && ! $meta['allow_empty'] && $value === '' )
+				{	// Display error if the text field is required to be not empty:
+					param_error( $param_name, sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), $meta['label'] ), T_('This field cannot be empty.') );
+					return false;
+				}
+				break;
+
 			case 'integer':
 				if( ! preg_match( '~^[-+]?\d+$~', $value ) )
 				{

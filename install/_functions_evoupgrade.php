@@ -226,13 +226,22 @@ function db_add_col( $table, $col_name, $col_desc )
 {
 	global $DB;
 
-	if( db_col_exists($table, $col_name) )
+	if( db_col_exists( $table, $col_name ) )
 	{ // Column exists already, make sure it's the same.
-		$DB->query( 'ALTER TABLE '.$table.' MODIFY COLUMN '.$col_name.' '.$col_desc );
+		db_modify_col( $table, $col_name, $col_desc );
 		return false;
 	}
 
 	$DB->query( 'ALTER TABLE '.$table.' ADD COLUMN '.$col_name.' '.$col_desc );
+}
+
+/**
+ * Modify a column
+ */
+function db_modify_col( $table, $col_name, $col_desc )
+{
+	global $DB;
+	$DB->query( 'ALTER TABLE '.$table.' MODIFY COLUMN '.$col_name.' '.$col_desc );
 }
 
 
@@ -8633,6 +8642,72 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12358, 'Remove skins with duplicating class names...' ) )
+	{	// part of 6.9.4
+		// Get skins with duplicating class names which will have a conflict in 12360:
+		$skins_SQL = new SQL( 'Get skins with duplicating class names' );
+		$skins_SQL->SELECT( 's2.skin_ID, s1.skin_ID' );
+		$skins_SQL->FROM( 'T_skins__skin AS s1' );
+		$skins_SQL->FROM_add( 'INNER JOIN T_skins__skin AS s2 ON s1.skin_folder = CONCAT( s2.skin_folder, "_skin" )' );
+		// Array key is ID of old skin, Array value is ID of new skin with folder suffix "_skin":
+		$duplicating_skins = $DB->get_assoc( $skins_SQL );
+
+		if( count( $duplicating_skins ) > 0 )
+		{
+			// Get collections with old skin format folder(wihtout suffix "_skin"):
+			$old_skins = array_keys( $duplicating_skins );
+			$skin_fields = array( 'blog_normal_skin_ID', 'blog_mobile_skin_ID', 'blog_tablet_skin_ID' );
+			$blog_SQL = new SQL( 'Get collection with dupplicating skin class names' );
+			$blog_SQL->SELECT( 'blog_ID, blog_normal_skin_ID, blog_mobile_skin_ID, blog_tablet_skin_ID' );
+			$blog_SQL->FROM( 'T_blogs' );
+			foreach( $skin_fields as $skin_field )
+			{
+				$blog_SQL->WHERE_or( $skin_field.' IN ( '.$DB->quote( $old_skins ).' )' );
+			}
+			$old_skin_colls = $DB->get_results( $blog_SQL );
+
+			// Update collections:
+			foreach( $old_skin_colls as $old_skin_coll )
+			{
+				$coll_update_fields = array();
+				$coll_settings_update_fields = array();
+				foreach( $skin_fields as $skin_field )
+				{
+					if( isset( $duplicating_skins[ $old_skin_coll->$skin_field ] ) )
+					{	// If the skin is old folder format then use skin ID of new format skin folder:
+						$coll_update_fields[] = $skin_field.' = '.$duplicating_skins[ $old_skin_coll->$skin_field ];
+						$coll_settings_update_fields[] = $skin_field.' = '.$duplicating_skins[ $old_skin_coll->$skin_field ];
+					}
+				}
+				// Update collection skin IDs:
+				$DB->query( 'UPDATE T_blogs
+					  SET '.implode( ', ', $coll_update_fields ).'
+					WHERE blog_ID = '.$old_skin_coll->blog_ID );
+			}
+
+			foreach( $duplicating_skins as $old_skin_ID => $new_skin_ID )
+			{
+				// Update custom skin settings of collections:
+				$DB->query( 'UPDATE T_coll_settings
+					  SET cset_name = CONCAT( '.$DB->quote( 'skin'.$new_skin_ID.'_' ).', SUBSTRING( cset_name, '.( strlen( 'skin'.$old_skin_ID.'_' ) + 1 ).' ) )
+					WHERE cset_name LIKE "skin'.$old_skin_ID.'_%" ' );
+				// Update default skins:
+				$DB->query( 'UPDATE T_settings
+					  SET set_value = '.$new_skin_ID.'
+					WHERE set_name LIKE "%_skin_ID"
+					  AND set_value LIKE '.$old_skin_ID );
+			}
+
+			// Remove duplicating skins with old format folders:
+			$DB->query( 'DELETE FROM T_skins__skin
+				WHERE skin_ID IN ( '.$DB->quote( $old_skins ).' )' );
+			$DB->query( 'DELETE FROM T_skins__container
+				WHERE sco_skin_ID IN ( '.$DB->quote( $old_skins ).' )' );
+		}
+
+		upg_task_end();
+	}
+
 	if( upg_task_start( 12360, 'Upgrading skin table...' ) )
 	{ // part of 6.9.4
 		db_add_col( 'T_skins__skin', 'skin_class', 'varchar(32) NOT NULL AFTER skin_ID' );
@@ -8644,6 +8719,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		db_add_index( 'T_skins__skin', 'skin_class', 'skin_class', 'UNIQUE' );
 
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12365, 'Upgrading settings tables...' ) )
+	{	// part of 6.9.4
+		db_modify_col( 'T_settings',              'set_value',  'VARCHAR(10000) NULL' );
+		db_modify_col( 'T_groups__groupsettings', 'gset_value', 'VARCHAR(10000) NULL' );
+		db_modify_col( 'T_users__usersettings',   'uset_value', 'VARCHAR(10000) NULL' );
 		upg_task_end();
 	}
 

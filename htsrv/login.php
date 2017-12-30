@@ -103,7 +103,7 @@ switch( $action )
 		}
 		else
 		{ // db update was unsuccessful
-			$Messages->add( T_( 'Unable to close your account. Please contact to system administrator.' ) );
+			$Messages->add_to_group( 'Unexpected error. Unable to close your account.', 'error', T_('Close account').':' );
 		}
 
 		header_redirect();

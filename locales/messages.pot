@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-11-26 01:12+0100\n"
+"POT-Creation-Date: 2017-12-26 02:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,7 +42,7 @@ msgid "Copy"
 msgstr ""
 
 #: ../../../conf/_icons.php:71 ../inc/chapters/views/_chapter.form.php:49
-#: ../../../inc/chapters/views/_chapter_list.view.php:173
+#: ../../../inc/chapters/views/_chapter_list.view.php:188
 #: ../../../inc/files/views/_file_list.inc.php:492
 #: ../../../inc/files/views/_file_move_copy.form.php:26
 #: ../../../inc/files/views/_file_move_copy.form.php:34
@@ -54,24 +54,24 @@ msgstr ""
 
 #. TRANS: Delete
 #: ../../../conf/_icons.php:78 ../conf/_icons.php:477
-#: ../../../inc/messaging/model/_messaging.funcs.php:2127
+#: ../../../inc/messaging/model/_messaging.funcs.php:2120
 #: ../../../inc/messaging/views/_message_list.view.php:234
 msgid "Del"
 msgstr ""
 
 #: ../../../conf/_icons.php:79 ../conf/_icons.php:478
 #: ../../../htsrv/comment_review.php:206
-#: ../../../inc/chapters/views/_chapter_list.view.php:176
+#: ../../../inc/chapters/views/_chapter_list.view.php:191
 #: ../../../inc/comments/model/_comment.class.php:1568
 #: ../../../inc/files/model/_file.funcs.php:2297
 #: ../../../inc/files/views/_file_delete.form.php:28
 #: ../../../inc/files/views/_file_delete.form.php:53
 #: ../../../inc/files/views/_file_duplicates.view.php:149
 #: ../../../inc/files/views/_file_list.inc.php:494 ../inc/items/items.ctrl.php:1760
-#: ../../../inc/messaging/model/_messaging.funcs.php:2294
-#: ../../../inc/messaging/model/_messaging.funcs.php:2299
+#: ../../../inc/messaging/model/_messaging.funcs.php:2287
+#: ../../../inc/messaging/model/_messaging.funcs.php:2292
+#: ../../../inc/messaging/model/_messaging.funcs.php:2421
 #: ../../../inc/messaging/model/_messaging.funcs.php:2428
-#: ../../../inc/messaging/model/_messaging.funcs.php:2435
 #: ../../../inc/users/model/_user.funcs.php:2429
 #: ../../../inc/users/views/_user_avatar.form.php:223
 #: ../../../skins_fallback_v5/_user.disp.php:271
@@ -113,7 +113,7 @@ msgstr ""
 msgid "Collapse"
 msgstr ""
 
-#: ../../../conf/_icons.php:307 ../inc/chapters/views/_chapter_list.view.php:234
+#: ../../../conf/_icons.php:307 ../inc/chapters/views/_chapter_list.view.php:249
 #: ../../../inc/collections/coll_settings.ctrl.php:620
 #: ../../../inc/cron/views/_cronjob_list.view.php:171
 #: ../../../inc/items/views/_item_list_full.view.php:403
@@ -146,16 +146,16 @@ msgstr ""
 msgid "Info"
 msgstr ""
 
-#: ../../../conf/_icons.php:355 ../htsrv/message_send.php:410
+#: ../../../conf/_icons.php:355 ../htsrv/message_send.php:424
 #: ../../../inc/comments/model/_comment.funcs.php:1299
 #: ../../../inc/comments/views/_comment.form.php:128
-#: ../../../inc/messaging/model/_messaging.funcs.php:1915
+#: ../../../inc/messaging/model/_messaging.funcs.php:1916
 #: ../../../inc/messaging/views/_contact_list.view.php:334
 #: ../../../inc/sessions/views/_stats_refdomains.view.php:153
 #: ../../../inc/tools/views/_email_address.view.php:65
 #: ../../../inc/tools/views/_email_return.view.php:84
 #: ../../../inc/tools/views/_email_sent.view.php:84
-#: ../../../inc/users/model/_user.funcs.php:5981
+#: ../../../inc/users/model/_user.funcs.php:5999
 #: ../../../inc/users/views/_user_admin.form.php:142
 #: ../../../inc/users/views/_user_admin.form.php:144
 #: ../../../inc/users/views/_user_identity.form.php:148
@@ -176,11 +176,11 @@ msgstr ""
 #: ../../../skins_email/comment_new.txt.php:79
 #: ../../../skins_email/comment_spam.html.php:51
 #: ../../../skins_email/comment_spam.txt.php:63
-#: ../../../skins_fallback_v5/_contact_msg.form.php:111
+#: ../../../skins_fallback_v5/_contact_msg.form.php:120
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:58
 #: ../../../skins_fallback_v5/_item_comment_form.inc.php:303
 #: ../../../skins_fallback_v5/_register.disp.php:179
-#: ../../../skins_fallback_v6/_contact_msg.form.php:111
+#: ../../../skins_fallback_v6/_contact_msg.form.php:120
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:80
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:317
 #: ../../../skins_fallback_v6/_register.disp.php:179
@@ -191,8 +191,8 @@ msgstr ""
 msgid "WWW"
 msgstr ""
 
-#: ../../../conf/_icons.php:363 ../inc/users/model/_user.funcs.php:5740
-#: ../../../inc/users/model/_user.funcs.php:5741
+#: ../../../conf/_icons.php:363 ../inc/users/model/_user.funcs.php:5758
+#: ../../../inc/users/model/_user.funcs.php:5759
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:305
 #: ../../../skins/touch/_item_comment_form.inc.php:245
 #: ../../../skins_email/comment_new.txt.php:67
@@ -202,9 +202,9 @@ msgid "Website"
 msgstr ""
 
 #: ../../../conf/_icons.php:372 ../conf/_icons.php:380 ../conf/_icons.php:388
-#: ../../../inc/_core/ui/forms/_form.class.php:2838
+#: ../../../inc/_core/ui/forms/_form.class.php:2850
 #: ../../../inc/central_antispam/model/_central_antispam.funcs.php:25
-#: ../../../inc/chapters/views/_chapter_list.view.php:175
+#: ../../../inc/chapters/views/_chapter_list.view.php:190
 #: ../../../inc/collections/collections.ctrl.php:71
 #: ../../../inc/files/views/_file_list.inc.php:799
 #: ../../../inc/items/views/_file_create_posts.form.php:154
@@ -413,8 +413,8 @@ msgid "Online Manual"
 msgstr ""
 
 #: ../../../conf/_icons.php:674 ../inc/_core/__core.init.php:1243
-#: ../../../inc/comments/model/_comment.class.php:2523
-#: ../../../inc/comments/model/_comment.class.php:2531
+#: ../../../inc/comments/model/_comment.class.php:2524
+#: ../../../inc/comments/model/_comment.class.php:2532
 #: ../../../inc/items/items.ctrl.php:1770
 #: ../../../inc/items/model/_itemlight.class.php:1185
 #: ../../../inc/items/model/_itemlight.class.php:1193
@@ -584,9 +584,9 @@ msgid "Log as a search instead"
 msgstr ""
 
 #: ../../../conf/_icons.php:1047 ../conf/_icons.php:1055 ../conf/_icons.php:1063
-#: ../../../conf/_icons.php:1072 ../inc/_core/ui/forms/_form.class.php:3855
-#: ../../../inc/_core/ui/forms/_form.class.php:3986
-#: ../../../inc/_core/ui/forms/_form.class.php:4033
+#: ../../../conf/_icons.php:1072 ../inc/_core/ui/forms/_form.class.php:3867
+#: ../../../inc/_core/ui/forms/_form.class.php:3998
+#: ../../../inc/_core/ui/forms/_form.class.php:4045
 #: ../../../inc/collections/views/_coll_contact.form.php:62
 #: ../../../inc/locales/views/_translation.form.php:43
 #: ../../../inc/messaging/views/_contact_list.view.php:460
@@ -608,21 +608,21 @@ msgid "Action for selected elements"
 msgstr ""
 
 #: ../../../conf/_icons.php:1097 ../htsrv/viewfile.php:152
-#: ../../../inc/users/model/_user.class.php:5357
+#: ../../../inc/users/model/_user.class.php:5359
 msgid "Rotate this picture 90&deg; to the right"
 msgstr ""
 
 #: ../../../conf/_icons.php:1103 ../htsrv/viewfile.php:150
-#: ../../../inc/users/model/_user.class.php:5355
+#: ../../../inc/users/model/_user.class.php:5357
 msgid "Rotate this picture 90&deg; to the left"
 msgstr ""
 
 #: ../../../conf/_icons.php:1109 ../htsrv/viewfile.php:151
-#: ../../../inc/users/model/_user.class.php:5356
+#: ../../../inc/users/model/_user.class.php:5358
 msgid "Rotate this picture 180&deg;"
 msgstr ""
 
-#: ../../../conf/_icons.php:1115 ../inc/users/model/_user.class.php:5528
+#: ../../../conf/_icons.php:1115 ../inc/users/model/_user.class.php:5530
 msgid "Crop this picture"
 msgstr ""
 
@@ -739,46 +739,46 @@ msgstr ""
 msgid "You are not logged in."
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:174 ../skins_fallback_v5/_user.disp.php:43
+#: ../../../htsrv/anon_async.php:178 ../skins_fallback_v5/_user.disp.php:43
 #: ../../../skins_fallback_v6/_user.disp.php:43
 msgid "Edit in Back-Office"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:180 ../skins_fallback_v5/_user.disp.php:274
+#: ../../../htsrv/anon_async.php:184 ../skins_fallback_v5/_user.disp.php:274
 #: ../../../skins_fallback_v6/_user.disp.php:275
 msgid "Delete Spammer"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:194
+#: ../../../htsrv/anon_async.php:198
 msgid "This account has been closed."
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:288
+#: ../../../htsrv/anon_async.php:292
 #, php-format
 msgid "%d to %d years old "
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:293
+#: ../../../htsrv/anon_async.php:297
 #, php-format
 msgid "%d years old "
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:320
+#: ../../../htsrv/anon_async.php:324
 msgid "This user is not registered on this site."
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:326
+#: ../../../htsrv/anon_async.php:330
 msgid "Send a message"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:334
+#: ../../../htsrv/anon_async.php:338
 msgid "This account has been deleted."
 msgstr ""
 
 #. TRANS: verb
-#: ../../../htsrv/anon_async.php:785 ../inc/_core/ui/forms/_form.class.php:3855
-#: ../../../inc/_core/ui/forms/_form.class.php:3986
-#: ../../../inc/_core/ui/forms/_form.class.php:4033
+#: ../../../htsrv/anon_async.php:791 ../inc/_core/ui/forms/_form.class.php:3867
+#: ../../../inc/_core/ui/forms/_form.class.php:3998
+#: ../../../inc/_core/ui/forms/_form.class.php:4045
 #: ../../../inc/files/views/_file_list.inc.php:345
 #: ../../../inc/files/views/_file_list.inc.php:608
 #: ../../../inc/tools/views/_phpbb_groups.form.php:84
@@ -786,12 +786,12 @@ msgstr ""
 msgid "Select"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:787 ../inc/users/model/_user.funcs.php:3410
+#: ../../../htsrv/anon_async.php:793 ../inc/users/model/_user.funcs.php:3410
 msgid "Specific criteria"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:801 ../htsrv/anon_async.php:828
-#: ../../../htsrv/anon_async.php:851 ../htsrv/quick_upload.php:372
+#: ../../../htsrv/anon_async.php:807 ../htsrv/anon_async.php:834
+#: ../../../htsrv/anon_async.php:857 ../htsrv/quick_upload.php:372
 #: ../../../inc/_core/__core.init.php:146 ../inc/_core/__core.init.php:167
 #: ../../../inc/_core/__core.init.php:186 ../inc/_core/__core.init.php:205
 #: ../../../inc/_core/__core.init.php:493
@@ -832,15 +832,15 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:881
+#: ../../../htsrv/anon_async.php:887
 msgid "To enter multiple values,<br />please click on (+)"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:1053
+#: ../../../htsrv/anon_async.php:1059
 msgid "Comment cannot be updated!"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:1112 ../inc/users/model/_user.funcs.php:5574
+#: ../../../htsrv/anon_async.php:1118 ../inc/users/model/_user.funcs.php:5592
 #: ../../../inc/users/views/_organization_user.form.php:42
 #: ../../../inc/users/views/_organization_user_edit.form.php:49
 #: ../../../inc/users/views/_organization_user_edit.form.php:53
@@ -850,7 +850,7 @@ msgstr ""
 msgid "Role"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:1127 ../inc/users/model/_user.funcs.php:3376
+#: ../../../htsrv/anon_async.php:1133 ../inc/users/model/_user.funcs.php:3376
 #: ../../../inc/users/organizations.ctrl.php:41
 #: ../../../inc/users/views/_organization.form.php:38
 #: ../../../inc/users/views/_user_identity.form.php:410
@@ -858,18 +858,18 @@ msgstr ""
 msgid "Organization"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:1191 ../inc/users/model/_user.funcs.php:5480
-#: ../../../inc/users/model/_user.funcs.php:6209
+#: ../../../htsrv/anon_async.php:1197 ../inc/users/model/_user.funcs.php:5498
+#: ../../../inc/users/model/_user.funcs.php:6227
 #: ../../../inc/users/views/_organization_user.form.php:38
 #: ../../../inc/users/views/_organization_user_edit.form.php:43
 msgid "Accepted"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:1195 ../inc/users/model/_user.funcs.php:6213
+#: ../../../htsrv/anon_async.php:1201 ../inc/users/model/_user.funcs.php:6231
 msgid "Not accepted"
 msgstr ""
 
-#: ../../../htsrv/anon_async.php:1536
+#: ../../../htsrv/anon_async.php:1542
 msgid "Incorrect action!"
 msgstr ""
 
@@ -909,12 +909,12 @@ msgstr ""
 msgid "An email has been sent to you, with a link to confirm your request not to receive emails through the comments you have made on this blog."
 msgstr ""
 
-#: ../../../htsrv/anon_unsubscribe.php:75 ../htsrv/message_send.php:544
+#: ../../../htsrv/anon_unsubscribe.php:75 ../htsrv/message_send.php:557
 msgid "Sorry, could not send email."
 msgstr ""
 
 #: ../../../htsrv/anon_unsubscribe.php:76 ../htsrv/login.php:235
-#: ../../../htsrv/login.php:560 ../htsrv/message_send.php:545
+#: ../../../htsrv/login.php:560 ../htsrv/message_send.php:558
 #: ../../../htsrv/register.php:440 ../inc/email_campaigns/campaigns.ctrl.php:203
 msgid "Possible reason: the PHP mail() function may have been disabled on the server."
 msgstr ""
@@ -935,13 +935,13 @@ msgstr ""
 #: ../../../htsrv/async.php:337 ../inc/antispam/views/_antispam_ipranges.form.php:50
 #: ../../../inc/antispam/views/_antispam_settings.form.php:89
 #: ../../../inc/chapters/views/_chapter.form.php:87
-#: ../../../inc/chapters/views/_chapter_list.view.php:340
+#: ../../../inc/chapters/views/_chapter_list.view.php:355
 #: ../../../inc/chapters/views/_chapter_move.form.php:49
 #: ../../../inc/collections/views/_coll_advanced.form.php:213
 #: ../../../inc/collections/views/_coll_comments.form.php:301
 #: ../../../inc/collections/views/_coll_contact.form.php:75
 #: ../../../inc/collections/views/_coll_features.form.php:290
-#: ../../../inc/collections/views/_coll_general.form.php:382
+#: ../../../inc/collections/views/_coll_general.form.php:403
 #: ../../../inc/collections/views/_coll_group_perm.form.php:112
 #: ../../../inc/collections/views/_coll_home.form.php:74
 #: ../../../inc/collections/views/_coll_more.form.php:123
@@ -957,8 +957,8 @@ msgstr ""
 #: ../../../inc/comments/model/_comment.funcs.php:284
 #: ../../../inc/comments/model/_comment.funcs.php:362
 #: ../../../inc/cron/views/_cronjob.form.php:87
-#: ../../../inc/files/model/_file.funcs.php:3026
-#: ../../../inc/files/model/_file.funcs.php:3045
+#: ../../../inc/files/model/_file.funcs.php:3028
+#: ../../../inc/files/model/_file.funcs.php:3047
 #: ../../../inc/files/views/_file_browse_set.form.php:76
 #: ../../../inc/files/views/_file_edit.form.php:37
 #: ../../../inc/files/views/_file_properties.form.php:83
@@ -1013,7 +1013,7 @@ msgstr ""
 #: ../../../inc/users/views/_user_advanced.form.php:244
 #: ../../../inc/users/views/_user_identity.form.php:625
 #: ../../../inc/users/views/_user_preferences.form.php:219
-#: ../../../inc/users/views/_user_subscriptions.form.php:471
+#: ../../../inc/users/views/_user_subscriptions.form.php:472
 #: ../../../inc/users/views/_userfield.form.php:74
 #: ../../../inc/users/views/_userfieldsgroup.form.php:52
 #: ../../../inc/widgets/views/_widget.form.php:133 ../install/debug.php:360
@@ -1099,11 +1099,11 @@ msgid "None"
 msgstr ""
 
 #: ../../../htsrv/async.php:898 ../htsrv/async.php:929 ../htsrv/async.php:950
-#: ../../../inc/_core/_misc.funcs.php:7675 ../inc/_core/_template.funcs.php:2270
-#: ../../../inc/_core/_template.funcs.php:3107
-#: ../../../inc/_core/ui/forms/_form.class.php:3886
+#: ../../../inc/_core/_misc.funcs.php:7675 ../inc/_core/_template.funcs.php:2283
+#: ../../../inc/_core/_template.funcs.php:3120
+#: ../../../inc/_core/ui/forms/_form.class.php:3898
 #: ../../../inc/comments/model/_comment_js.funcs.php:367
-#: ../../../inc/files/model/_file.funcs.php:3023
+#: ../../../inc/files/model/_file.funcs.php:3025
 #: ../../../inc/items/model/_item.funcs.php:3892
 #: ../../../inc/items/views/_item_expert.form.php:846
 #: ../../../inc/links/model/_link.funcs.php:236
@@ -1131,19 +1131,21 @@ msgstr ""
 msgid "You cannot leave comments on this post!"
 msgstr ""
 
-#: ../../../htsrv/comment_post.php:178 ../htsrv/message_send.php:227
+#: ../../../htsrv/comment_post.php:178 ../htsrv/message_send.php:213
 #: ../../../inc/xmlrpc/model/_xmlrpcs.funcs.php:1050
 msgid "Please fill in your name."
 msgstr ""
 
+#. TRANS because should never happen
 #: ../../../htsrv/comment_post.php:178 ../htsrv/comment_post.php:182
 #: ../../../htsrv/comment_post.php:190 ../htsrv/comment_post.php:199
 #: ../../../htsrv/comment_post.php:217 ../htsrv/comment_post.php:360
 #: ../../../htsrv/message_send.php:95 ../htsrv/message_send.php:102
-#: ../../../htsrv/message_send.php:109 ../htsrv/message_send.php:171
-#: ../../../htsrv/message_send.php:187 ../htsrv/message_send.php:206
-#: ../../../htsrv/message_send.php:227 ../htsrv/message_send.php:231
-#: ../../../htsrv/message_send.php:238 ../htsrv/message_send.php:298
+#: ../../../htsrv/message_send.php:109 ../htsrv/message_send.php:157
+#: ../../../htsrv/message_send.php:173 ../htsrv/message_send.php:192
+#: ../../../htsrv/message_send.php:213 ../htsrv/message_send.php:217
+#: ../../../htsrv/message_send.php:224 ../htsrv/message_send.php:284
+#: ../../../htsrv/message_send.php:374 ../htsrv/message_send.php:379
 #: ../../../htsrv/trackback.php:118 ../htsrv/trackback.php:146
 #: ../../../inc/_core/_param.funcs.php:1642 ../inc/_core/_param.funcs.php:2479
 #: ../../../inc/_core/_param.funcs.php:2523 ../inc/_core/_param.funcs.php:2534
@@ -1156,7 +1158,7 @@ msgstr ""
 msgid "Validation errors:"
 msgstr ""
 
-#: ../../../htsrv/comment_post.php:182 ../htsrv/message_send.php:231
+#: ../../../htsrv/comment_post.php:182 ../htsrv/message_send.php:217
 #: ../../../inc/xmlrpc/model/_xmlrpcs.funcs.php:1054
 msgid "Please fill in your email."
 msgstr ""
@@ -1165,7 +1167,7 @@ msgstr ""
 msgid "Supplied name is invalid."
 msgstr ""
 
-#: ../../../htsrv/comment_post.php:199 ../htsrv/message_send.php:238
+#: ../../../htsrv/comment_post.php:199 ../htsrv/message_send.php:224
 #: ../../../inc/xmlrpc/model/_xmlrpcs.funcs.php:1069
 msgid "Supplied email address is invalid."
 msgstr ""
@@ -1223,7 +1225,7 @@ msgid "Your comment has been submitted. It will appear once it has been approved
 msgstr ""
 
 #: ../../../htsrv/comment_post.php:611
-msgid "ATTENTION: Create a user account now so that other users can contact you after reading your comment."
+msgid "ATTENTION: Register a user account now so that you can get notified of replies to your comments."
 msgstr ""
 
 #: ../../../htsrv/comment_review.php:42 ../htsrv/comment_review.php:46
@@ -1369,12 +1371,13 @@ msgstr ""
 msgid "Since you are an Admin with User management privileges, you cannot close your own account!"
 msgstr ""
 
-#: ../../../htsrv/login.php:99 ../inc/users/model/_user.class.php:5184
+#: ../../../htsrv/login.php:99 ../inc/users/model/_user.class.php:5186
 msgid "User account closed"
 msgstr ""
 
-#: ../../../htsrv/login.php:106
-msgid "Unable to close your account. Please contact to system administrator."
+#: ../../../htsrv/login.php:106 ../inc/_core/_template.funcs.php:444
+#: ../../../inc/users/model/_user.class.php:5135
+msgid "Close account"
 msgstr ""
 
 #: ../../../htsrv/login.php:121
@@ -1424,7 +1427,7 @@ msgid "Invalid password change request! Please try again..."
 msgstr ""
 
 #: ../../../htsrv/login.php:376 ../htsrv/login.php:426
-#: ../../../inc/skins/_skin.funcs.php:1182
+#: ../../../inc/skins/_skin.funcs.php:1175
 msgid "Your account has already been activated."
 msgstr ""
 
@@ -1481,7 +1484,7 @@ msgid "Your user account has no associated email address; therefore we cannot ac
 msgstr ""
 
 #: ../../../htsrv/login.php:659 ../inc/_core/_template.funcs.php:437
-#: ../../../inc/_core/_template.funcs.php:2506
+#: ../../../inc/_core/_template.funcs.php:2519
 msgid "Lost your password?"
 msgstr ""
 
@@ -1503,46 +1506,51 @@ msgstr ""
 msgid "The supplied message is invalid / appears to be spam."
 msgstr ""
 
-#: ../../../htsrv/message_send.php:171 ../inc/users/model/_user.class.php:686
+#: ../../../htsrv/message_send.php:157 ../inc/users/model/_user.class.php:686
 #: ../../../inc/users/model/_user.funcs.php:1523
 msgid "Please enter your first name."
 msgstr ""
 
-#: ../../../htsrv/message_send.php:187 ../inc/users/model/_user.funcs.php:1529
+#: ../../../htsrv/message_send.php:173 ../inc/users/model/_user.funcs.php:1529
 msgid "Please enter your last name."
 msgstr ""
 
-#: ../../../htsrv/message_send.php:206 ../inc/users/model/_user.class.php:714
+#: ../../../htsrv/message_send.php:192 ../inc/users/model/_user.class.php:714
 msgid "Please enter your nickname."
 msgstr ""
 
 #. TRANS: %s contains error details
-#: ../../../htsrv/message_send.php:298 ../inc/_core/_param.funcs.php:943
+#: ../../../htsrv/message_send.php:284 ../inc/_core/_param.funcs.php:943
 #, php-format
 msgid "Supplied URL is invalid. (%s)"
 msgstr ""
 
-#: ../../../htsrv/message_send.php:406
-#: ../../../inc/messaging/model/_messaging.funcs.php:1911
+#: ../../../htsrv/message_send.php:374
+#, php-format
+msgid "Please fill the field \"%s\" because you have selected this as preferred contact method."
+msgstr ""
+
+#: ../../../htsrv/message_send.php:420
+#: ../../../inc/messaging/model/_messaging.funcs.php:1912
 msgid "Private Message on this Site"
 msgstr ""
 
-#: ../../../htsrv/message_send.php:467
+#: ../../../htsrv/message_send.php:480
 #: ../../../inc/collections/views/_coll_contact.form.php:64
 #: ../../../skins_email/contact_message_new.html.php:81
 #: ../../../skins_email/contact_message_new.txt.php:48
-#: ../../../skins_fallback_v5/_contact_msg.form.php:147
-#: ../../../skins_fallback_v6/_contact_msg.form.php:147
+#: ../../../skins_fallback_v5/_contact_msg.form.php:156
+#: ../../../skins_fallback_v6/_contact_msg.form.php:156
 msgid "Preferred contact method"
 msgstr ""
 
-#: ../../../htsrv/message_send.php:568
+#: ../../../htsrv/message_send.php:581
 #: ../../../inc/messaging/model/_messaging.funcs.php:201
 #: ../../../inc/messaging/model/_messaging.funcs.php:243
 msgid "Your private message has been sent."
 msgstr ""
 
-#: ../../../htsrv/message_send.php:572
+#: ../../../htsrv/message_send.php:585
 #, php-format
 msgid "You have successfully sent an email to %s."
 msgstr ""
@@ -1577,7 +1585,7 @@ msgstr ""
 msgid "The report was removed."
 msgstr ""
 
-#: ../../../htsrv/profile_update.php:257 ../inc/skins/_skin.funcs.php:763
+#: ../../../htsrv/profile_update.php:257 ../inc/skins/_skin.funcs.php:756
 msgid "You must activate your account before you can manage your contacts. <b>See below:</b>"
 msgstr ""
 
@@ -1702,17 +1710,8 @@ msgstr ""
 msgid "Out of memory."
 msgstr ""
 
-#: ../../../htsrv/upload_handler.php:135
-#, php-format
-msgid "Server error. Increase post_max_size and upload_max_filesize to %s"
-msgstr ""
-
 #: ../../../htsrv/upload_handler.php:146 ../inc/files/model/_file.funcs.php:1491
 msgid "No file was uploaded."
-msgstr ""
-
-#: ../../../htsrv/upload_handler.php:150
-msgid "Server error. Not a multipart request. Please set forceMultipart to default value (true)."
 msgstr ""
 
 #: ../../../htsrv/upload_handler.php:169
@@ -1735,14 +1734,6 @@ msgstr ""
 #: ../../../htsrv/upload_handler.php:193
 #, php-format
 msgid "File has an invalid extension, it should be one of %s."
-msgstr ""
-
-#: ../../../htsrv/upload_handler.php:205
-msgid "Server error. Chunks directory isn't writable or executable."
-msgstr ""
-
-#: ../../../htsrv/upload_handler.php:253
-msgid "Server error. Uploads directory isn't writable"
 msgstr ""
 
 #: ../../../htsrv/upload_handler.php:270
@@ -1770,7 +1761,7 @@ msgid "File"
 msgstr ""
 
 #: ../../../htsrv/viewfile.php:187 ../inc/_core/_misc.funcs.php:5958
-#: ../../../inc/collections/views/_coll_general.form.php:181
+#: ../../../inc/collections/views/_coll_general.form.php:182
 #: ../../../inc/files/views/_file_links.view.php:98
 #: ../../../inc/items/model/_item.funcs.php:4714
 #: ../../../inc/items/views/_item_expert.form.php:153
@@ -1809,7 +1800,7 @@ msgid "Title"
 msgstr ""
 
 #: ../../../htsrv/viewfile.php:191 ../inc/chapters/views/_chapter.form.php:66
-#: ../../../inc/collections/views/_coll_general.form.php:372
+#: ../../../inc/collections/views/_coll_general.form.php:386
 #: ../../../inc/items/views/_itemtype.form.php:55
 #: ../../../inc/maintenance/views/_upgrade.form.php:41
 #: ../../../inc/plugins/views/_plugin_list.view.php:188
@@ -2194,7 +2185,7 @@ msgstr ""
 #: ../../../inc/sessions/views/_stats_topips.view.php:82
 #: ../../../inc/tools/system.ctrl.php:32
 #: ../../../inc/tools/views/_email_address.view.php:113
-#: ../../../inc/users/model/_user.funcs.php:5805
+#: ../../../inc/users/model/_user.funcs.php:5823
 #: ../../../inc/users/views/_user_admin.form.php:152
 #: ../../../inc/users/views/_user_admin.form.php:157
 #: ../../../inc/users/views/_user_admin.form.php:405
@@ -2370,7 +2361,7 @@ msgid "Workflow view"
 msgstr ""
 
 #: ../../../inc/_core/__core.init.php:1342 ../inc/_core/__core.init.php:1392
-#: ../../../inc/chapters/views/_chapter_list.view.php:275
+#: ../../../inc/chapters/views/_chapter_list.view.php:290
 #: ../../../inc/collections/_collections.init.php:732
 #: ../../../inc/collections/_collections.init.php:779
 #: ../../../inc/collections/coll_settings.ctrl.php:570
@@ -2388,7 +2379,7 @@ msgstr ""
 msgid "Posts"
 msgstr ""
 
-#: ../../../inc/_core/__core.init.php:1364 ../inc/chapters/chapters.ctrl.php:470
+#: ../../../inc/_core/__core.init.php:1364 ../inc/chapters/chapters.ctrl.php:482
 #: ../../../inc/collections/_collections.init.php:751
 #: ../../../inc/collections/views/_coll_other.form.php:44
 #: ../../../inc/collections/views/_coll_perm_view.funcs.php:843
@@ -2682,8 +2673,8 @@ msgstr ""
 #: ../../../inc/sessions/views/_stats_summary.view.php:178
 #: ../../../inc/sessions/views/_stats_summary.view.php:229
 #: ../../../inc/sessions/views/_stats_view.funcs.php:234
-#: ../../../inc/tools/email.ctrl.php:579 ../inc/users/model/_user.class.php:4264
-#: ../../../inc/users/model/_user.class.php:5158
+#: ../../../inc/tools/email.ctrl.php:579 ../inc/users/model/_user.class.php:4270
+#: ../../../inc/users/model/_user.class.php:5160
 #: ../../../inc/users/model/_user.funcs.php:3280
 #: ../../../inc/users/model/_user.funcs.php:3719
 #: ../../../inc/users/model/_user.funcs.php:5319
@@ -2691,9 +2682,9 @@ msgstr ""
 #: ../../../inc/widgets/views/_widget_list_available.view.php:58
 #: ../../../skins_adm/bootstrap/_adminUI.class.php:870
 #: ../../../skins_fallback_v5/_closeaccount.disp.php:42
-#: ../../../skins_fallback_v5/_contact_msg.form.php:134
+#: ../../../skins_fallback_v5/_contact_msg.form.php:143
 #: ../../../skins_fallback_v5/_register.disp.php:209
-#: ../../../skins_fallback_v6/_contact_msg.form.php:134
+#: ../../../skins_fallback_v6/_contact_msg.form.php:143
 #: ../../../skins_fallback_v6/_register.disp.php:209
 msgid "Other"
 msgstr ""
@@ -3001,7 +2992,7 @@ msgstr ""
 
 #: ../../../inc/_core/_misc.funcs.php:5332
 #: ../../../inc/collections/_demo_content.funcs.php:1996
-#: ../../../inc/collections/model/_blog.class.php:404
+#: ../../../inc/collections/model/_blog.class.php:405
 #: ../../../inc/collections/model/_blog.funcs.php:443
 #: ../../../inc/collections/model/_blog.funcs.php:2212
 #: ../../../inc/cron/_cron.funcs.php:183
@@ -3047,7 +3038,7 @@ msgid "Contents last updated"
 msgstr ""
 
 #: ../../../inc/_core/_misc.funcs.php:5963 ../inc/_core/_misc.funcs.php:6007
-#: ../../../inc/collections/views/_coll_general.form.php:191
+#: ../../../inc/collections/views/_coll_general.form.php:192
 msgid "URL \"filename\""
 msgstr ""
 
@@ -3093,7 +3084,7 @@ msgstr ""
 #. TRANS: file name
 #: ../../../inc/_core/_misc.funcs.php:6003
 #: ../../../inc/chapters/views/_chapter.form.php:56
-#: ../../../inc/chapters/views/_chapter_list.view.php:249
+#: ../../../inc/chapters/views/_chapter_list.view.php:264
 #: ../../../inc/chapters/views/_chapter_move.form.php:40
 #: ../../../inc/collections/model/_blog.funcs.php:2020
 #: ../../../inc/collections/views/_coll_user_dir.form.php:56
@@ -3155,12 +3146,12 @@ msgid "Name"
 msgstr ""
 
 #: ../../../inc/_core/_misc.funcs.php:6004
-#: ../../../inc/collections/views/_coll_general.form.php:186
+#: ../../../inc/collections/views/_coll_general.form.php:187
 msgid "Short name"
 msgstr ""
 
 #: ../../../inc/_core/_misc.funcs.php:6005
-#: ../../../inc/collections/views/_coll_general.form.php:374
+#: ../../../inc/collections/views/_coll_general.form.php:388
 msgid "Tagline"
 msgstr ""
 
@@ -3194,7 +3185,7 @@ msgstr ""
 msgid "This can only be edited by users with the User Admin permission."
 msgstr ""
 
-#: ../../../inc/_core/_param.funcs.php:184 ../inc/skins/_skin.funcs.php:1367
+#: ../../../inc/_core/_param.funcs.php:184 ../inc/skins/_skin.funcs.php:1360
 #, php-format
 msgid "Parameter &laquo;%s&raquo; is required!"
 msgstr ""
@@ -3206,12 +3197,12 @@ msgstr ""
 msgid "Illegal value received for parameter &laquo;%s&raquo;!"
 msgstr ""
 
-#: ../../../inc/_core/_param.funcs.php:662
+#: ../../../inc/_core/_param.funcs.php:662 ../inc/plugins/_plugin.funcs.php:1162
 #, php-format
 msgid "The field &laquo;%s&raquo; cannot be empty."
 msgstr ""
 
-#: ../../../inc/_core/_param.funcs.php:663
+#: ../../../inc/_core/_param.funcs.php:663 ../inc/plugins/_plugin.funcs.php:1162
 msgid "This field cannot be empty."
 msgstr ""
 
@@ -3401,7 +3392,7 @@ msgstr ""
 #: ../../../inc/_core/_template.funcs.php:430
 #: ../../../inc/collections/views/_coll_contact.form.php:35
 #: ../../../inc/collections/views/_coll_home.form.php:45
-#: ../../../inc/users/model/_user.funcs.php:5735
+#: ../../../inc/users/model/_user.funcs.php:5753
 #: ../../../inc/widgets/widgets/_basic_menu_link.widget.php:370
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:260
 #: ../../../skins/asevo/_body_footer.inc.php:33
@@ -3479,7 +3470,7 @@ msgstr ""
 msgid "Login "
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:434 ../inc/_core/_template.funcs.php:2523
+#: ../../../inc/_core/_template.funcs.php:434 ../inc/_core/_template.funcs.php:2536
 #: ../../../inc/users/model/_user.funcs.php:641
 #: ../../../inc/widgets/widgets/_basic_menu_link.widget.php:418
 #: ../../../skins/bootstrap_blog_skin/index.main.php:247
@@ -3531,10 +3522,6 @@ msgstr ""
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:1026
 #, php-format
 msgid "User: %s"
-msgstr ""
-
-#: ../../../inc/_core/_template.funcs.php:444
-msgid "Close account"
 msgstr ""
 
 #: ../../../inc/_core/_template.funcs.php:445
@@ -3831,37 +3818,37 @@ msgstr ""
 msgid "Wed"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2248
+#: ../../../inc/_core/_template.funcs.php:2256
 msgid "This section can't be displayed because wrong params were created by the skin."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2270
+#: ../../../inc/_core/_template.funcs.php:2283
 msgid "Form is loading..."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2333
+#: ../../../inc/_core/_template.funcs.php:2346
 msgid "This section can only be displayed by javascript enabled browsers."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2372
+#: ../../../inc/_core/_template.funcs.php:2385
 #: ../../../skins_fallback_v5/_login.disp.php:64
 #: ../../../skins_fallback_v6/_login.disp.php:64
 msgid "Abort login!"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2492
+#: ../../../inc/_core/_template.funcs.php:2505
 msgid "Enter your username (or email address)."
 msgstr ""
 
 #. TRANS: noun
-#: ../../../inc/_core/_template.funcs.php:2492 ../inc/_core/_template.funcs.php:2729
+#: ../../../inc/_core/_template.funcs.php:2505 ../inc/_core/_template.funcs.php:2742
 #: ../../../inc/antispam/views/_antispam_ban.form.php:204
 #: ../../../inc/collections/views/_coll_user_dir.form.php:46
 #: ../../../inc/collections/views/_coll_user_perm.form.php:115
 #: ../../../inc/maintenance/views/_upgrade_svn.form.php:28
 #: ../../../inc/messaging/views/_contact_list.view.php:286
-#: ../../../inc/users/model/_user.class.php:6675
-#: ../../../inc/users/model/_user.funcs.php:5515
+#: ../../../inc/users/model/_user.class.php:6677
+#: ../../../inc/users/model/_user.funcs.php:5533
 #: ../../../inc/users/views/_user_identity.form.php:251
 #: ../../../inc/users/views/_user_identity.form.php:466
 #: ../../../install/_functions_install.php:282
@@ -3882,11 +3869,11 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2498 ../inc/_core/_template.funcs.php:2733
+#: ../../../inc/_core/_template.funcs.php:2511 ../inc/_core/_template.funcs.php:2746
 msgid "Username (or email address)"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2511 ../inc/_core/_template.funcs.php:2516
+#: ../../../inc/_core/_template.funcs.php:2524 ../inc/_core/_template.funcs.php:2529
 #: ../../../inc/maintenance/views/_upgrade_svn.form.php:29
 #: ../../../inc/settings/views/_eblog.form.php:106
 #: ../../../inc/tools/views/_email_return_settings.form.php:86
@@ -3902,144 +3889,144 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2526
+#: ../../../inc/_core/_template.funcs.php:2539
 #: ../../../skins_fallback_v5/_widget_login.form.php:48
 msgid "Log in!"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2534
+#: ../../../inc/_core/_template.funcs.php:2547
 msgid "No account yet? Register here"
 msgstr ""
 
 #. TRANS: Text for submit button to request an activation link by email
-#: ../../../inc/_core/_template.funcs.php:2736
+#: ../../../inc/_core/_template.funcs.php:2749
 msgid "Send me a recovery email!"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2738
+#: ../../../inc/_core/_template.funcs.php:2751
 msgid "How to reset your password:"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2740
+#: ../../../inc/_core/_template.funcs.php:2753
 msgid "Please enter your login (or email address) above."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2741
+#: ../../../inc/_core/_template.funcs.php:2754
 msgid "An email will be sent to your registered email address immediately."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2742
+#: ../../../inc/_core/_template.funcs.php:2755
 msgid "As soon as you receive the email, click on the link therein to reset your password."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2743
+#: ../../../inc/_core/_template.funcs.php:2756
 msgid "Your browser will open a page where you can set a new password."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2745
+#: ../../../inc/_core/_template.funcs.php:2758
 msgid "Important: for security reasons, you must do steps 1 and 4 on the same computer and same web browser. Do not close your browser in between."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2747
+#: ../../../inc/_core/_template.funcs.php:2760
 msgid "Back to login form"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2836
+#: ../../../inc/_core/_template.funcs.php:2849
 msgid "Please confirm your email address below:"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2842
+#: ../../../inc/_core/_template.funcs.php:2855
 #: ../../../inc/widgets/widgets/_user_register.widget.php:261
 #: ../../../install/_functions_install.php:1856 ../install/index.php:618
 msgid "Your email"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2846
+#: ../../../inc/_core/_template.funcs.php:2859
 msgid "Send me a new activation email now!"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2881
+#: ../../../inc/_core/_template.funcs.php:2894
 #, php-format
 msgid "Open your email account for %s and find a message we sent you on %s at %s with the following title:"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2882
+#: ../../../inc/_core/_template.funcs.php:2895
 #, php-format
 msgid "Activate your account: %s"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2884
+#: ../../../inc/_core/_template.funcs.php:2897
 #, php-format
 msgid "NOTE: If you don't find it, check your \"Junk\", \"Spam\" or \"Unsolicited email\" folders. If you really can't find it, <a %s>request a new activation email</a>."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2885
+#: ../../../inc/_core/_template.funcs.php:2898
 #, php-format
 msgid "Add us (%s) to your contacts to make sure you receive future email notifications, especially when someone sends you a private message."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2886
+#: ../../../inc/_core/_template.funcs.php:2899
 msgid "Click on the activation link in the email."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2887
+#: ../../../inc/_core/_template.funcs.php:2900
 #: ../../../skins_email/account_activate.html.php:92
 #: ../../../skins_email/account_activate.txt.php:92
 msgid "If this does not work, please copy/paste that link into the address bar of your browser."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2888
+#: ../../../inc/_core/_template.funcs.php:2901
 #, php-format
 msgid "If you need assistance, please send an email to %s"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2935
+#: ../../../inc/_core/_template.funcs.php:2948
 #, php-format
 msgid "Since you are an admin user, you can activate your account (%s) by a single click."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:2939
+#: ../../../inc/_core/_template.funcs.php:2952
 msgid "Activate my account!"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:3036
+#: ../../../inc/_core/_template.funcs.php:3049
 msgid "Very weak"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:3051
+#: ../../../inc/_core/_template.funcs.php:3064
 msgid "Weak"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:3055
+#: ../../../inc/_core/_template.funcs.php:3068
 msgid "So-so"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:3059
-#: ../../../inc/comments/model/_comment.class.php:3139
+#: ../../../inc/_core/_template.funcs.php:3072
+#: ../../../inc/comments/model/_comment.class.php:3140
 msgid "Good"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:3063
+#: ../../../inc/_core/_template.funcs.php:3076
 msgid "Great!"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:3074
+#: ../../../inc/_core/_template.funcs.php:3087
 msgid "Estimated crack time"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:3082
+#: ../../../inc/_core/_template.funcs.php:3095
 msgid "The second password is different from the first."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:3108 ../inc/_core/_template.funcs.php:3112
+#: ../../../inc/_core/_template.funcs.php:3121 ../inc/_core/_template.funcs.php:3125
 msgid "This username is available."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:3109 ../inc/_core/_template.funcs.php:3113
+#: ../../../inc/_core/_template.funcs.php:3122 ../inc/_core/_template.funcs.php:3126
 msgid "This username is already in use. Please choose another one."
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:3111
+#: ../../../inc/_core/_template.funcs.php:3124
 #: ../../../skins_fallback_v5/_register.disp.php:143
 #: ../../../skins_fallback_v5/_register.disp.php:145
 #: ../../../skins_fallback_v6/_register.disp.php:143
@@ -4047,33 +4034,33 @@ msgstr ""
 msgid "Choose an username"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:3168
+#: ../../../inc/_core/_template.funcs.php:3181
 msgid "Do you want discard your changes for this order field?"
 msgstr ""
 
 #. TRANS: Abbr. for "Bytes"
-#: ../../../inc/_core/_template.funcs.php:3352 ../inc/files/model/_file.funcs.php:52
-#: ../../../inc/users/model/_user.class.php:6538
+#: ../../../inc/_core/_template.funcs.php:3365 ../inc/files/model/_file.funcs.php:52
+#: ../../../inc/users/model/_user.class.php:6540
 msgid "B."
 msgstr ""
 
 #. TRANS: Abbr. for "Kilobytes"
-#: ../../../inc/_core/_template.funcs.php:3353 ../inc/files/model/_file.funcs.php:53
+#: ../../../inc/_core/_template.funcs.php:3366 ../inc/files/model/_file.funcs.php:53
 msgid "KB"
 msgstr ""
 
 #. TRANS: Abbr. for Megabytes
-#: ../../../inc/_core/_template.funcs.php:3354 ../inc/files/model/_file.funcs.php:54
+#: ../../../inc/_core/_template.funcs.php:3367 ../inc/files/model/_file.funcs.php:54
 msgid "MB"
 msgstr ""
 
 #. TRANS: Abbr. for Gigabytes
-#: ../../../inc/_core/_template.funcs.php:3355 ../inc/files/model/_file.funcs.php:55
+#: ../../../inc/_core/_template.funcs.php:3368 ../inc/files/model/_file.funcs.php:55
 msgid "GB"
 msgstr ""
 
 #. TRANS: Abbr. for Terabytes
-#: ../../../inc/_core/_template.funcs.php:3356 ../inc/files/model/_file.funcs.php:56
+#: ../../../inc/_core/_template.funcs.php:3369 ../inc/files/model/_file.funcs.php:56
 msgid "TB"
 msgstr ""
 
@@ -4396,55 +4383,55 @@ msgstr ""
 msgid "Change Order"
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:1741
+#: ../../../inc/_core/ui/forms/_form.class.php:1753
 msgid "second(s)"
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:1742
+#: ../../../inc/_core/ui/forms/_form.class.php:1754
 msgid "minute(s)"
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:1743
+#: ../../../inc/_core/ui/forms/_form.class.php:1755
 msgid "hour(s)"
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:1744
+#: ../../../inc/_core/ui/forms/_form.class.php:1756
 msgid "day(s)"
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:1745
+#: ../../../inc/_core/ui/forms/_form.class.php:1757
 msgid "month(s)"
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:1746
+#: ../../../inc/_core/ui/forms/_form.class.php:1758
 msgid "year(s)"
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:2131
+#: ../../../inc/_core/ui/forms/_form.class.php:2143
 msgid "You have modified this form but you haven't submitted it yet.\\nYou are about to lose your edits.\\nAre you sure?"
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:2135
+#: ../../../inc/_core/ui/forms/_form.class.php:2147
 #, php-format
 msgid "You have modified the form \\\"%s\\\"\\nbut you haven't submitted it yet.\\nYou are about to lose your edits.\\nAre you sure?"
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:3700
+#: ../../../inc/_core/ui/forms/_form.class.php:3712
 msgid " to "
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:3799
+#: ../../../inc/_core/ui/forms/_form.class.php:3811
 #: ../../../inc/_core/ui/forms/_form.funcs.php:327
 msgid "Remove file"
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:3800
+#: ../../../inc/_core/ui/forms/_form.class.php:3812
 #: ../../../inc/_core/ui/forms/_form.funcs.php:328
 #: ../../../inc/_core/ui/forms/_form.funcs.php:362
 msgid "Select another"
 msgstr ""
 
-#: ../../../inc/_core/ui/forms/_form.class.php:3805
+#: ../../../inc/_core/ui/forms/_form.class.php:3817
 #: ../../../inc/items/views/_item_list_full.view.php:663
 #: ../../../inc/links/views/_link_list.inc.php:162
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:374
@@ -4802,8 +4789,8 @@ msgstr ""
 msgid "Invalid login attempts:"
 msgstr ""
 
-#: ../../../inc/_init_login.inc.php:353 ../inc/skins/_skin.funcs.php:1063
-#: ../../../inc/skins/_skin.funcs.php:1103
+#: ../../../inc/_init_login.inc.php:353 ../inc/skins/_skin.funcs.php:1056
+#: ../../../inc/skins/_skin.funcs.php:1096
 msgid "Wrong Login/Password provided by browser (HTTP Auth)."
 msgstr ""
 
@@ -5151,9 +5138,9 @@ msgid "Action"
 msgstr ""
 
 #: ../../../inc/antispam/model/_antispam.funcs.php:460
-#: ../../../inc/chapters/model/_chapter.class.php:782
-#: ../../../inc/chapters/views/_chapter_list.view.php:94
-#: ../../../inc/chapters/views/_chapter_list.view.php:170
+#: ../../../inc/chapters/model/_chapter.class.php:787
+#: ../../../inc/chapters/views/_chapter_list.view.php:98
+#: ../../../inc/chapters/views/_chapter_list.view.php:185
 #: ../../../inc/collections/coll_settings.ctrl.php:172
 #: ../../../inc/comments/model/_comment.class.php:1401
 #: ../../../inc/items/model/_item.class.php:4802
@@ -5293,29 +5280,29 @@ msgstr ""
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:205
 #: ../../../inc/collections/views/_coll_user_dir.form.php:47
-#: ../../../inc/users/model/_user.class.php:6678
-#: ../../../inc/users/model/_user.funcs.php:5526
+#: ../../../inc/users/model/_user.class.php:6680
+#: ../../../inc/users/model/_user.funcs.php:5544
 #: ../../../inc/users/views/_settings.form.php:62
 #: ../../../inc/users/views/_user_identity.form.php:256
 #: ../../../inc/users/views/_user_identity.form.php:467
 #: ../../../inc/widgets/widgets/_user_register.widget.php:239
-#: ../../../skins_fallback_v5/_contact_msg.form.php:84
+#: ../../../skins_fallback_v5/_contact_msg.form.php:93
 #: ../../../skins_fallback_v5/_register.disp.php:200
-#: ../../../skins_fallback_v6/_contact_msg.form.php:84
+#: ../../../skins_fallback_v6/_contact_msg.form.php:93
 #: ../../../skins_fallback_v6/_register.disp.php:200
 msgid "First name"
 msgstr ""
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:206
 #: ../../../inc/collections/views/_coll_user_dir.form.php:48
-#: ../../../inc/users/model/_user.class.php:6679
-#: ../../../inc/users/model/_user.funcs.php:5535
+#: ../../../inc/users/model/_user.class.php:6681
+#: ../../../inc/users/model/_user.funcs.php:5553
 #: ../../../inc/users/views/_settings.form.php:64
 #: ../../../inc/users/views/_user_identity.form.php:262
 #: ../../../inc/users/views/_user_identity.form.php:468
 #: ../../../inc/widgets/widgets/_user_register.widget.php:256
-#: ../../../skins_fallback_v5/_contact_msg.form.php:90
-#: ../../../skins_fallback_v6/_contact_msg.form.php:90
+#: ../../../skins_fallback_v5/_contact_msg.form.php:99
+#: ../../../skins_fallback_v6/_contact_msg.form.php:99
 msgid "Last name"
 msgstr ""
 
@@ -5323,13 +5310,13 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_contact.form.php:42
 #: ../../../inc/collections/views/_coll_user_dir.form.php:49
 #: ../../../inc/messaging/views/_contact_list.view.php:304
-#: ../../../inc/users/model/_user.class.php:6677
-#: ../../../inc/users/model/_user.funcs.php:5547
+#: ../../../inc/users/model/_user.class.php:6679
+#: ../../../inc/users/model/_user.funcs.php:5565
 #: ../../../inc/users/views/_settings.form.php:60
 #: ../../../inc/users/views/_user_identity.form.php:268
 #: ../../../inc/users/views/_user_identity.form.php:469
-#: ../../../skins_fallback_v5/_contact_msg.form.php:98
-#: ../../../skins_fallback_v6/_contact_msg.form.php:98
+#: ../../../skins_fallback_v5/_contact_msg.form.php:107
+#: ../../../skins_fallback_v6/_contact_msg.form.php:107
 msgid "Nickname"
 msgstr ""
 
@@ -5449,7 +5436,7 @@ msgstr ""
 #: ../../../inc/antispam/views/_antispam_ipranges.view.php:85
 #: ../../../inc/central_antispam/views/_keywords.view.php:91
 #: ../../../inc/central_antispam/views/_sources.view.php:45
-#: ../../../inc/chapters/views/_chapter_list.view.php:238
+#: ../../../inc/chapters/views/_chapter_list.view.php:253
 #: ../../../inc/collections/model/_blog.funcs.php:1997
 #: ../../../inc/collections/views/_coll_perm_view.funcs.php:704
 #: ../../../inc/cron/views/_cronjob_list.view.php:230
@@ -5467,7 +5454,7 @@ msgstr ""
 #: ../../../inc/tools/views/_email_address.view.php:98
 #: ../../../inc/tools/views/_email_return.view.php:94
 #: ../../../inc/tools/views/_email_sent.view.php:94
-#: ../../../inc/users/model/_user.funcs.php:5492
+#: ../../../inc/users/model/_user.funcs.php:5510
 #: ../../../inc/users/views/_group.form.php:102
 #: ../../../inc/users/views/_group.view.php:57
 #: ../../../inc/users/views/_invitation.view.php:41
@@ -5532,7 +5519,7 @@ msgstr ""
 #: ../../../inc/antispam/views/_antispam_list.view.php:180
 #: ../../../inc/central_antispam/views/_keywords.view.php:180
 #: ../../../inc/central_antispam/views/_sources.view.php:85
-#: ../../../inc/chapters/views/_chapter_list.view.php:282
+#: ../../../inc/chapters/views/_chapter_list.view.php:297
 #: ../../../inc/collections/model/_blog.funcs.php:2110
 #: ../../../inc/collections/model/_blog.funcs.php:2120
 #: ../../../inc/comments/model/_comment.funcs.php:1353
@@ -5578,8 +5565,8 @@ msgstr ""
 #: ../../../inc/tools/views/_email_address.view.php:214
 #: ../../../inc/tools/views/_email_return.view.php:136
 #: ../../../inc/users/model/_user.funcs.php:5174
-#: ../../../inc/users/model/_user.funcs.php:5834
-#: ../../../inc/users/model/_user.funcs.php:5844
+#: ../../../inc/users/model/_user.funcs.php:5852
+#: ../../../inc/users/model/_user.funcs.php:5862
 #: ../../../inc/users/views/_group.view.php:173
 #: ../../../inc/users/views/_invitation.view.php:119
 #: ../../../inc/users/views/_organization.view.php:126
@@ -5653,7 +5640,7 @@ msgstr ""
 
 #: ../../../inc/antispam/views/_antispam_list.view.php:100
 #: ../../../inc/antispam/views/_antispam_list.view.php:143
-#: ../../../inc/users/model/_user.funcs.php:5675
+#: ../../../inc/users/model/_user.funcs.php:5693
 #: ../../../inc/users/views/_invitation.view.php:97
 #: ../../../inc/users/views/_user_identity.form.php:450
 msgid "Source"
@@ -6095,48 +6082,52 @@ msgstr ""
 msgid "Cannot delete element &laquo;%s&raquo;"
 msgstr ""
 
-#: ../../../inc/chapters/chapters.ctrl.php:388
+#: ../../../inc/chapters/chapters.ctrl.php:372 ../inc/chapters/chapters.ctrl.php:385
+msgid "Meta category cannot be used as default!"
+msgstr ""
+
+#: ../../../inc/chapters/chapters.ctrl.php:400
 #, php-format
 msgid "The category &laquo;%s&raquo; was made as meta category."
 msgstr ""
 
-#: ../../../inc/chapters/chapters.ctrl.php:393
+#: ../../../inc/chapters/chapters.ctrl.php:405
 #: ../../../inc/chapters/model/_chapter.class.php:340
 #, php-format
 msgid "The category &laquo;%s&raquo; cannot be set as meta category. You must remove the posts it contains first."
 msgstr ""
 
-#: ../../../inc/chapters/chapters.ctrl.php:408
+#: ../../../inc/chapters/chapters.ctrl.php:420
 #, php-format
 msgid "The category &laquo;%s&raquo; was reverted from meta category."
 msgstr ""
 
-#: ../../../inc/chapters/chapters.ctrl.php:412
+#: ../../../inc/chapters/chapters.ctrl.php:424
 #, php-format
 msgid "The category &laquo;%s&raquo; couldn't be reverted from meta category."
 msgstr ""
 
-#: ../../../inc/chapters/chapters.ctrl.php:426
+#: ../../../inc/chapters/chapters.ctrl.php:438
 #, php-format
 msgid "The category &laquo;%s&raquo; was locked."
 msgstr ""
 
-#: ../../../inc/chapters/chapters.ctrl.php:430
+#: ../../../inc/chapters/chapters.ctrl.php:442
 #, php-format
 msgid "The category &laquo;%s&raquo; couldn't be locked."
 msgstr ""
 
-#: ../../../inc/chapters/chapters.ctrl.php:444
+#: ../../../inc/chapters/chapters.ctrl.php:456
 #, php-format
 msgid "The category &laquo;%s&raquo; was unlocked."
 msgstr ""
 
-#: ../../../inc/chapters/chapters.ctrl.php:448
+#: ../../../inc/chapters/chapters.ctrl.php:460
 #, php-format
 msgid "The category &laquo;%s&raquo; couldn't be unlocked."
 msgstr ""
 
-#: ../../../inc/chapters/chapters.ctrl.php:469
+#: ../../../inc/chapters/chapters.ctrl.php:481
 #: ../../../inc/collections/_collections.init.php:667
 #: ../../../inc/collections/_collections.init.php:680
 #: ../../../inc/collections/_demo_content.funcs.php:1939
@@ -6150,7 +6141,7 @@ msgstr ""
 #: ../../../inc/items/item_types.ctrl.php:288 ../inc/items/items.ctrl.php:426
 #: ../../../inc/items/model/_item.funcs.php:2261 ../inc/skins/skins.ctrl.php:325
 #: ../../../inc/skins/views/_skin_list.view.php:63
-#: ../../../inc/users/model/_user.funcs.php:5663
+#: ../../../inc/users/model/_user.funcs.php:5681
 #: ../../../inc/users/views/_group.form.php:152 ../inc/widgets/widgets.ctrl.php:613
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:105
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:144
@@ -6158,7 +6149,7 @@ msgstr ""
 msgid "Collections"
 msgstr ""
 
-#: ../../../inc/chapters/chapters.ctrl.php:516
+#: ../../../inc/chapters/chapters.ctrl.php:528
 #, php-format
 msgid "Delete element &laquo;%s&raquo;?"
 msgstr ""
@@ -6187,17 +6178,17 @@ msgstr ""
 msgid "Please enter a name."
 msgstr ""
 
-#: ../../../inc/chapters/model/_chapter.class.php:783
+#: ../../../inc/chapters/model/_chapter.class.php:788
 msgid "Edit this chapter..."
 msgstr ""
 
 #: ../../../inc/chapters/views/_chapter.form.php:36
-#: ../../../inc/chapters/views/_chapter_list.view.php:235
+#: ../../../inc/chapters/views/_chapter_list.view.php:250
 msgid "New category"
 msgstr ""
 
 #: ../../../inc/chapters/views/_chapter.form.php:49
-#: ../../../inc/chapters/views/_chapter_list.view.php:173
+#: ../../../inc/chapters/views/_chapter_list.view.php:188
 #: ../../../inc/items/model/_item.funcs.php:5188
 msgid "Move to a different blog..."
 msgstr ""
@@ -6207,7 +6198,7 @@ msgid "Parent category"
 msgstr ""
 
 #: ../../../inc/chapters/views/_chapter.form.php:58
-#: ../../../inc/chapters/views/_chapter_list.view.php:252
+#: ../../../inc/chapters/views/_chapter_list.view.php:267
 #: ../../../inc/items/model/_item.funcs.php:4237
 msgid "URL \"slug\""
 msgstr ""
@@ -6242,9 +6233,9 @@ msgid "For manual ordering of the categories."
 msgstr ""
 
 #: ../../../inc/chapters/views/_chapter.form.php:71
-#: ../../../inc/chapters/views/_chapter_list.view.php:256
+#: ../../../inc/chapters/views/_chapter_list.view.php:271
 #: ../../../inc/collections/model/_blog.funcs.php:2089
-#: ../../../inc/collections/views/_coll_general.form.php:360
+#: ../../../inc/collections/views/_coll_general.form.php:374
 #: ../../../inc/items/model/_item.funcs.php:4240
 #: ../../../inc/items/views/_item_expert.form.php:708
 #: ../../../inc/items/views/_item_list_full.view.php:154
@@ -6262,13 +6253,13 @@ msgid "Same as parent"
 msgstr ""
 
 #: ../../../inc/chapters/views/_chapter.form.php:76
-#: ../../../inc/chapters/views/_chapter_list.view.php:337
+#: ../../../inc/chapters/views/_chapter_list.view.php:352
 #: ../../../inc/items/views/_item_list_manual.view.php:43
 msgid "Alphabetically"
 msgstr ""
 
 #: ../../../inc/chapters/views/_chapter.form.php:77
-#: ../../../inc/chapters/views/_chapter_list.view.php:338
+#: ../../../inc/chapters/views/_chapter_list.view.php:353
 #: ../../../inc/items/views/_item_list_manual.view.php:44
 msgid "Manually"
 msgstr ""
@@ -6293,46 +6284,46 @@ msgstr ""
 msgid "Locked category"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:76
+#: ../../../inc/chapters/views/_chapter_list.view.php:80
 msgid "This is the default category"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:81
+#: ../../../inc/chapters/views/_chapter_list.view.php:85
 msgid "Click to make this the default category"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:117
+#: ../../../inc/chapters/views/_chapter_list.view.php:121
 #: ../../../inc/items/model/_item.funcs.php:5168
 #: ../../../inc/items/model/_item.funcs.php:5291
 msgid "Alphabetic"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:126
+#: ../../../inc/chapters/views/_chapter_list.view.php:135
 msgid "Click to revert this from meta category"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:132
+#: ../../../inc/chapters/views/_chapter_list.view.php:141
 msgid "Click to make this as meta category"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:143
+#: ../../../inc/chapters/views/_chapter_list.view.php:158
 msgid "Unlock category"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:149
+#: ../../../inc/chapters/views/_chapter_list.view.php:164
 msgid "Lock category"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:232
+#: ../../../inc/chapters/views/_chapter_list.view.php:247
 #, php-format
 msgid "Categories for blog: %s"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:235
+#: ../../../inc/chapters/views/_chapter_list.view.php:250
 msgid "Create a new category..."
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:241
+#: ../../../inc/chapters/views/_chapter_list.view.php:256
 #: ../../../inc/collections/_collections.init.php:803
 #: ../../../inc/collections/coll_settings.ctrl.php:1046
 #: ../../../inc/collections/views/_coll_advanced.form.php:140
@@ -6342,7 +6333,7 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:245
+#: ../../../inc/chapters/views/_chapter_list.view.php:260
 #: ../../../inc/files/model/_file.funcs.php:2000
 #: ../../../inc/items/model/_item.funcs.php:4233
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:97
@@ -6351,31 +6342,31 @@ msgstr ""
 msgid "Image"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:263
-#: ../../../inc/comments/model/_comment.class.php:3265
+#: ../../../inc/chapters/views/_chapter_list.view.php:278
+#: ../../../inc/comments/model/_comment.class.php:3266
 msgid "Meta"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:268
+#: ../../../inc/chapters/views/_chapter_list.view.php:283
 msgid "Lock"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:330
+#: ../../../inc/chapters/views/_chapter_list.view.php:345
 #: ../../../inc/items/views/_item_list_manual.view.php:35
 msgid "Category order"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:339
+#: ../../../inc/chapters/views/_chapter_list.view.php:354
 #: ../../../inc/items/views/_item_list_manual.view.php:45
 msgid "Note: can be overridden for sub-categories"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:339
+#: ../../../inc/chapters/views/_chapter_list.view.php:354
 #: ../../../inc/items/views/_item_list_manual.view.php:45
 msgid "Sort categories"
 msgstr ""
 
-#: ../../../inc/chapters/views/_chapter_list.view.php:346
+#: ../../../inc/chapters/views/_chapter_list.view.php:361
 #: ../../../inc/items/views/_item_list_manual.view.php:52
 #, php-format
 msgid "<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sblogs settings%s."
@@ -6404,7 +6395,7 @@ msgstr ""
 #: ../../../inc/collections/_collections.init.php:507
 #: ../../../inc/collections/model/_blog.funcs.php:2392
 #: ../../../inc/collections/views/_coll_comments.form.php:269
-#: ../../../inc/collections/views/_coll_general.form.php:366
+#: ../../../inc/collections/views/_coll_general.form.php:380
 #: ../../../inc/items/views/_itemtype.form.php:76
 #: ../../../inc/sessions/views/_stats_settings.form.php:52
 msgid "Never"
@@ -6454,7 +6445,7 @@ msgstr ""
 
 #: ../../../inc/collections/_collections.init.php:807
 #: ../../../inc/collections/views/_coll_user_dir.form.php:64
-#: ../../../inc/users/model/_user.funcs.php:5645
+#: ../../../inc/users/model/_user.funcs.php:5663
 msgid "Phone"
 msgstr ""
 
@@ -6741,7 +6732,7 @@ msgid "Change this as you like"
 msgstr ""
 
 #: ../../../inc/collections/_demo_content.funcs.php:946
-#: ../../../inc/collections/model/_blog.class.php:435
+#: ../../../inc/collections/model/_blog.class.php:436
 msgid "Public Blog"
 msgstr ""
 
@@ -6775,7 +6766,7 @@ msgid "Tagline for Forums"
 msgstr ""
 
 #: ../../../inc/collections/_demo_content.funcs.php:1047
-#: ../../../inc/collections/model/_blog.class.php:403
+#: ../../../inc/collections/model/_blog.class.php:404
 msgid "Manual Title"
 msgstr ""
 
@@ -7880,7 +7871,7 @@ msgstr ""
 msgid "Tracker"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:436
+#: ../../../inc/collections/model/_blog.class.php:437
 #: ../../../inc/collections/model/_blog.funcs.php:427
 #: ../../../inc/collections/model/_blog.funcs.php:2208
 #: ../../../inc/skins/views/_skin_list_available.view.php:103
@@ -7888,114 +7879,114 @@ msgstr ""
 msgid "Blog"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:519
+#: ../../../inc/collections/model/_blog.class.php:511
 #, php-format
 msgid "You changed the access setting of this collection from \"%s\" to \"%s\". This will also:"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:523
+#: ../../../inc/collections/model/_blog.class.php:515
 #, php-format
 msgid "change %d posts from \"%s\" to \"%s\""
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:527
+#: ../../../inc/collections/model/_blog.class.php:519
 #, php-format
 msgid "change %d comments from \"%s\" to \"%s\""
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:645
+#: ../../../inc/collections/model/_blog.class.php:637
 msgid "Invalid category prefix."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:680
+#: ../../../inc/collections/model/_blog.class.php:672
 msgid "Invalid tag prefix."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:767
+#: ../../../inc/collections/model/_blog.class.php:759
 msgid "Download delay must be numeric (0-10)."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:775
+#: ../../../inc/collections/model/_blog.class.php:767
 #, php-format
 msgid "Items per feed must be between %d and %d."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:783
+#: ../../../inc/collections/model/_blog.class.php:775
 #, php-format
 msgid "Comments per feed must be between %d and %d."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:805
+#: ../../../inc/collections/model/_blog.class.php:795
 msgid "Invalid long description"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:812
+#: ../../../inc/collections/model/_blog.class.php:801
 msgid "Invalid blog footer"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:817
+#: ../../../inc/collections/model/_blog.class.php:806
 msgid "Invalid single post footer"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:822
+#: ../../../inc/collections/model/_blog.class.php:811
 msgid "Invalid RSS footer"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:827
+#: ../../../inc/collections/model/_blog.class.php:816
 msgid "Invalid Blog Notes"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:830
+#: ../../../inc/collections/model/_blog.class.php:819
 #, php-format
 msgid "Max credits must be between %d and %d."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:855
+#: ../../../inc/collections/model/_blog.class.php:844
 msgid "Please enter a specific post ID"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:869
+#: ../../../inc/collections/model/_blog.class.php:858
 msgid "Stale content alert must be configured with a number of months."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:889
+#: ../../../inc/collections/model/_blog.class.php:878
 #, php-format
 msgid "Items/days per page must be between %d and %d."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1038
+#: ../../../inc/collections/model/_blog.class.php:1027
 #, php-format
 msgid "Number of search results per page must be between %d and %d."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1047
+#: ../../../inc/collections/model/_blog.class.php:1036
 #, php-format
 msgid "Number of shown comments must be between %d and %d."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1114
+#: ../../../inc/collections/model/_blog.class.php:1103
 #, php-format
 msgid "Comments per page must be between %d and %d."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1193
+#: ../../../inc/collections/model/_blog.class.php:1182
 msgid "Invalid Custom meta tag/css section."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1193
-#: ../../../inc/collections/model/_blog.class.php:1199
-#: ../../../inc/collections/model/_blog.class.php:1205
+#: ../../../inc/collections/model/_blog.class.php:1182
+#: ../../../inc/collections/model/_blog.class.php:1188
+#: ../../../inc/collections/model/_blog.class.php:1194
 #: ../../../inc/items/model/_itemtype.class.php:201
 #, php-format
 msgid "You can loosen this restriction in the <a %s>Group settings</a>."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1199
-#: ../../../inc/collections/model/_blog.class.php:1205
+#: ../../../inc/collections/model/_blog.class.php:1188
+#: ../../../inc/collections/model/_blog.class.php:1194
 msgid "Invalid Custom javascript section."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1215
+#: ../../../inc/collections/model/_blog.class.php:1204
 #: ../../../inc/polls/model/_poll.class.php:97
 #: ../../../inc/users/model/_organization.class.php:116
 #: ../../../inc/users/organizations.ctrl.php:226
@@ -8004,238 +7995,238 @@ msgstr ""
 msgid "User &laquo;%s&raquo; does not exist!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1227
+#: ../../../inc/collections/model/_blog.class.php:1216
 msgid "You must provide an URL collection name!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1231
+#: ../../../inc/collections/model/_blog.class.php:1220
 #, php-format
 msgid "The url name %s is invalid."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1241
+#: ../../../inc/collections/model/_blog.class.php:1230
 #, php-format
 msgid "The URL name %s is already in use by another collection. Please choose another name."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1269
-#: ../../../inc/collections/model/_blog.class.php:1365
+#: ../../../inc/collections/model/_blog.class.php:1258
+#: ../../../inc/collections/model/_blog.class.php:1354
 #, php-format
 msgid "%s is an invalid absolute URL"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1269
+#: ../../../inc/collections/model/_blog.class.php:1258
 #: ../../../inc/collections/views/_coll_urls.form.php:80
 #: ../../../inc/collections/views/_coll_urls.form.php:191
 msgid "Collection base URL"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1270
+#: ../../../inc/collections/model/_blog.class.php:1259
 msgid "You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one '/' sign after the domain name!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1278
+#: ../../../inc/collections/model/_blog.class.php:1267
 msgid "Blog Folder URL"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1279
+#: ../../../inc/collections/model/_blog.class.php:1268
 msgid "You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1308
+#: ../../../inc/collections/model/_blog.class.php:1297
 msgid "The custom cookie domain must be a parent of the collection domain."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1323
+#: ../../../inc/collections/model/_blog.class.php:1312
 msgid "The custom cookie path must be a parent of the collection path."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1357
+#: ../../../inc/collections/model/_blog.class.php:1346
 #, php-format
 msgid "Absolute URL for %s cannot be empty!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1365
+#: ../../../inc/collections/model/_blog.class.php:1354
 #, php-format
 msgid "Absolute URL for %s"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1366
+#: ../../../inc/collections/model/_blog.class.php:1355
 msgid "You must provide an absolute URL (starting with <code>http://</code>, <code>https://</code> or <code>//</code>) and it must ending with '/' sign!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1375
+#: ../../../inc/collections/model/_blog.class.php:1364
 msgid "WARNING: you will be loading your assets from a different domain. This may cause problems if you don't know exactly what you are doing. Please check the Assets URLs panel below."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1382
-#: ../../../inc/collections/model/_blog.class.php:1387
+#: ../../../inc/collections/model/_blog.class.php:1371
+#: ../../../inc/collections/model/_blog.class.php:1376
 #, php-format
 msgid "WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1409
+#: ../../../inc/collections/model/_blog.class.php:1398
 msgid "Invalid aggregate collection ID list!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1444
-#: ../../../inc/collections/model/_blog.class.php:1448
-#: ../../../inc/collections/model/_blog.class.php:1456
-#: ../../../inc/collections/model/_blog.class.php:1465
-#: ../../../inc/collections/model/_blog.class.php:1472
-#: ../../../inc/collections/model/_blog.class.php:1480
+#: ../../../inc/collections/model/_blog.class.php:1433
+#: ../../../inc/collections/model/_blog.class.php:1437
+#: ../../../inc/collections/model/_blog.class.php:1445
+#: ../../../inc/collections/model/_blog.class.php:1454
+#: ../../../inc/collections/model/_blog.class.php:1461
+#: ../../../inc/collections/model/_blog.class.php:1469
 msgid "Media dir location"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1444
+#: ../../../inc/collections/model/_blog.class.php:1433
 msgid "You must provide the full path of the media directory."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1449
+#: ../../../inc/collections/model/_blog.class.php:1438
 msgid "You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1465
+#: ../../../inc/collections/model/_blog.class.php:1454
 msgid "You must provide the media subdirectory."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:1472
+#: ../../../inc/collections/model/_blog.class.php:1461
 #, php-format
 msgid "Invalid subdirectory &laquo;%s&raquo;."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2482
+#: ../../../inc/collections/model/_blog.class.php:2473
 #, php-format
 msgid "Media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2483
+#: ../../../inc/collections/model/_blog.class.php:2474
 msgid "Media directory file permission error"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2491
+#: ../../../inc/collections/model/_blog.class.php:2482
 #, php-format
 msgid "Media directory &laquo;%s&raquo; could not be created."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2492
+#: ../../../inc/collections/model/_blog.class.php:2483
 msgid "Media directory creation error"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2500
+#: ../../../inc/collections/model/_blog.class.php:2491
 msgid "Collection media directories created:"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2500
+#: ../../../inc/collections/model/_blog.class.php:2491
 #, php-format
 msgid "Media directory &laquo;%s&raquo; has been created with permissions %s."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:2930
+#: ../../../inc/collections/model/_blog.class.php:2921
 #, php-format
 msgid "ATTENTION: advanced <a href=\"%s\">user</a> & <a href=\"%s\">group</a> permissions are enabled and some logged in users may have less permissions than anonymous users."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:3219
-#: ../../../inc/collections/model/_blog.class.php:3257
-#: ../../../inc/collections/model/_blog.class.php:3263
-#: ../../../inc/collections/model/_blog.class.php:3276
+#: ../../../inc/collections/model/_blog.class.php:3210
+#: ../../../inc/collections/model/_blog.class.php:3248
+#: ../../../inc/collections/model/_blog.class.php:3254
+#: ../../../inc/collections/model/_blog.class.php:3267
 msgid "New collection created:"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:3219
+#: ../../../inc/collections/model/_blog.class.php:3210
 #, php-format
 msgid "The new collection has been associated with the stub file &laquo;%s&raquo;."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:3223
+#: ../../../inc/collections/model/_blog.class.php:3214
 #, php-format
 msgid "No stub file named &laquo;%s&raquo; was found. You must create it for the blog to function properly with the current settings."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:3253
+#: ../../../inc/collections/model/_blog.class.php:3244
 #: ../../../inc/tools/model/_wp.funcs.php:574
 msgid "Uncategorized"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:3257
+#: ../../../inc/collections/model/_blog.class.php:3248
 msgid "A default category has been created for this collection."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:3263
+#: ../../../inc/collections/model/_blog.class.php:3254
 msgid "Default widgets have been set-up for this collection."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:3291
+#: ../../../inc/collections/model/_blog.class.php:3282
 #, php-format
 msgid "ATTENTION: We have set some advanced permissions for this collection. Please verify the <a %s>User permissions</a> and the <a %s>Group permissions</a> now."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:3780
+#: ../../../inc/collections/model/_blog.class.php:3771
 msgid "Deleted blog's files"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4503
+#: ../../../inc/collections/model/_blog.class.php:4494
 #: ../../../inc/rest/_restapi.class.php:367
 msgid "You need to log in before you can access this section."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4529
+#: ../../../inc/collections/model/_blog.class.php:4520
 #: ../../../inc/rest/_restapi.class.php:376
 msgid "You are not a member of this section, therefore you are not allowed to access it."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4589
+#: ../../../inc/collections/model/_blog.class.php:4580
 msgid "The old media dir could not be removed, please remove it manually!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4594
+#: ../../../inc/collections/model/_blog.class.php:4585
 msgid "Blog media folder is not empty, you cannot change it to \"None\"."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4605
+#: ../../../inc/collections/model/_blog.class.php:4596
 #, php-format
 msgid "Folder %s already exists, it cannot be used for several media locations."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4610
+#: ../../../inc/collections/model/_blog.class.php:4601
 #, php-format
 msgid "Please use another folder name, because %s is reserved."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4625
+#: ../../../inc/collections/model/_blog.class.php:4616
 #, php-format
 msgid "Please use another folder name, because %s is already used for another media location."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4638
+#: ../../../inc/collections/model/_blog.class.php:4629
 #, php-format
 msgid "Could not delete the old media folder \"%s\", please try to delete it manually."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4643
+#: ../../../inc/collections/model/_blog.class.php:4634
 #, php-format
 msgid "Could not move the media folder content from \"%s\" to the new \"%s\" location."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4652
+#: ../../../inc/collections/model/_blog.class.php:4643
 msgid "The media directory and all of its content were successfully moved to the new location."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4821
+#: ../../../inc/collections/model/_blog.class.php:4812
 #, php-format
 msgid "The expected item type(s) named %s have not been found. All item types have been enabled for this collection."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4920
+#: ../../../inc/collections/model/_blog.class.php:4911
 #: ../../../inc/collections/views/_coll_comments.form.php:63
 #: ../../../inc/collections/views/_coll_comments.form.php:99
 #: ../../../inc/collections/views/_coll_comments.form.php:120
-#: ../../../inc/collections/views/_coll_general.form.php:346
+#: ../../../inc/collections/views/_coll_general.form.php:360
 msgid "Members only"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4924
+#: ../../../inc/collections/model/_blog.class.php:4915
 #: ../../../inc/collections/model/_blog.funcs.php:1137
 #: ../../../inc/collections/model/_blog.funcs.php:1158
 #: ../../../inc/collections/model/_blog.funcs.php:1252
@@ -8243,11 +8234,11 @@ msgstr ""
 msgid "Private"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4928
+#: ../../../inc/collections/model/_blog.class.php:4919
 msgid "Community only"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.class.php:4931
+#: ../../../inc/collections/model/_blog.class.php:4922
 #: ../../../inc/collections/model/_blog.funcs.php:1133
 #: ../../../inc/collections/model/_blog.funcs.php:1154
 #: ../../../inc/collections/model/_blog.funcs.php:1248
@@ -8616,7 +8607,7 @@ msgstr ""
 #: ../../../inc/comments/model/_comment.funcs.php:1173
 #: ../../../inc/items/model/_item.funcs.php:4351
 #: ../../../inc/items/model/_item.funcs.php:4463
-#: ../../../inc/messaging/model/_messaging.funcs.php:2005
+#: ../../../inc/messaging/model/_messaging.funcs.php:1998
 msgid "Delete all"
 msgstr ""
 
@@ -8684,8 +8675,8 @@ msgstr ""
 
 #. TRANS: file owner
 #: ../../../inc/collections/model/_blog.funcs.php:2049
-#: ../../../inc/collections/views/_coll_general.form.php:319
-#: ../../../inc/collections/views/_coll_general.form.php:325
+#: ../../../inc/collections/views/_coll_general.form.php:329
+#: ../../../inc/collections/views/_coll_general.form.php:335
 #: ../../../inc/collections/views/_coll_perm_view.funcs.php:590
 #: ../../../inc/files/views/_file_list.inc.php:144
 #: ../../../inc/items/views/_item_expert.form.php:714
@@ -9020,7 +9011,7 @@ msgid "This is is used in meta tag description and RSS feeds. NO HTML!"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:172
-#: ../../../inc/collections/views/_coll_general.form.php:182
+#: ../../../inc/collections/views/_coll_general.form.php:183
 #, php-format
 msgid "%s characters"
 msgstr ""
@@ -9505,8 +9496,8 @@ msgid "Label"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_contact.form.php:38
-#: ../../../skins_fallback_v5/_contact_msg.form.php:72
-#: ../../../skins_fallback_v6/_contact_msg.form.php:72
+#: ../../../skins_fallback_v5/_contact_msg.form.php:74
+#: ../../../skins_fallback_v6/_contact_msg.form.php:74
 msgid "Message to"
 msgstr ""
 
@@ -9590,8 +9581,8 @@ msgstr ""
 #: ../../../inc/messaging/views/_thread.form.php:109
 #: ../../../inc/messaging/views/_thread.form.php:307
 #: ../../../inc/tools/views/_email_return_details.view.php:34
-#: ../../../skins_fallback_v5/_contact_msg.form.php:155
-#: ../../../skins_fallback_v6/_contact_msg.form.php:155
+#: ../../../skins_fallback_v5/_contact_msg.form.php:164
+#: ../../../skins_fallback_v6/_contact_msg.form.php:164
 msgid "Message"
 msgstr ""
 
@@ -10040,76 +10031,76 @@ msgstr ""
 msgid "The Home collection typically aggregates the contents of all other collections on the site."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:149
+#: ../../../inc/collections/views/_coll_general.form.php:150
 msgid "Set to aggregate contents of all other collections"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:150
+#: ../../../inc/collections/views/_coll_general.form.php:151
 msgid "Do not aggregate"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:151
+#: ../../../inc/collections/views/_coll_general.form.php:152
 msgid "Aggregate"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:158
+#: ../../../inc/collections/views/_coll_general.form.php:159
 msgid "Demo contents"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:161
+#: ../../../inc/collections/views/_coll_general.form.php:162
 msgid "Initialize this collection with some demo contents"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:162
+#: ../../../inc/collections/views/_coll_general.form.php:163
 msgid "Create an empty collection"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:163
+#: ../../../inc/collections/views/_coll_general.form.php:164
 msgid "New contents"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:167
+#: ../../../inc/collections/views/_coll_general.form.php:168
 msgid "Create a demo organization if none exists."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:167
+#: ../../../inc/collections/views/_coll_general.form.php:168
 msgid "Create demo organization"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:173
+#: ../../../inc/collections/views/_coll_general.form.php:174
 msgid "Create demo users"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:173
+#: ../../../inc/collections/views/_coll_general.form.php:174
 msgid "Create demo users as comment authors."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:178
+#: ../../../inc/collections/views/_coll_general.form.php:179
 msgid "General parameters"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:181
+#: ../../../inc/collections/views/_coll_general.form.php:182
 msgid "Will be displayed on top of the blog."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:186
+#: ../../../inc/collections/views/_coll_general.form.php:187
 msgid "Will be used in selection menus and throughout the admin interface."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:192
+#: ../../../inc/collections/views/_coll_general.form.php:193
 #, php-format
 msgid "\"slug\" used to uniquely identify this blog in URLs. Also used as <a %s>default media folder</a>."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:197
+#: ../../../inc/collections/views/_coll_general.form.php:198
 msgid "URL Name"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:197
+#: ../../../inc/collections/views/_coll_general.form.php:198
 msgid "Used to uniquely identify this blog in URLs."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:248
+#: ../../../inc/collections/views/_coll_general.form.php:263
 msgid "Language / locale"
 msgstr ""
 
@@ -10172,106 +10163,106 @@ msgstr ""
 msgid "Go to <a %s>Regional Settings</a> to enable additional locales."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:304
+#: ../../../inc/collections/views/_coll_general.form.php:314
 #: ../../../inc/users/views/_group_coll_perm.form.php:65
 msgid "Collection permissions"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:319
+#: ../../../inc/collections/views/_coll_general.form.php:329
 msgid "Login of this blog's owner."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:333
+#: ../../../inc/collections/views/_coll_general.form.php:343
 #, php-format
 msgid "(the owner above has most permissions on this collection, except %s)"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:333
+#: ../../../inc/collections/views/_coll_general.form.php:343
 #: ../../../inc/tools/views/_create_collections.form.php:33
 msgid "Simple permissions"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:334
+#: ../../../inc/collections/views/_coll_general.form.php:344
 #, php-format
 msgid "(you can assign granular <a %s>user</a> and <a %s>group</a> permissions for this collection)"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:334
+#: ../../../inc/collections/views/_coll_general.form.php:344
 #: ../../../inc/tools/views/_create_collections.form.php:34
 msgid "Advanced permissions"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:337
+#: ../../../inc/collections/views/_coll_general.form.php:347
 #: ../../../inc/tools/tools.ctrl.php:186
 #: ../../../inc/tools/views/_create_collections.form.php:35
 msgid "Permission management"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:343
+#: ../../../inc/collections/views/_coll_general.form.php:357
 #: ../../../inc/tools/views/_create_collections.form.php:39
 msgid "Everyone (Public Blog)"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:344
+#: ../../../inc/collections/views/_coll_general.form.php:358
 msgid "Community only (Logged-in users only)"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:347
+#: ../../../inc/collections/views/_coll_general.form.php:361
 msgid "Only the owner"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:348
+#: ../../../inc/collections/views/_coll_general.form.php:362
 #, php-format
 msgid "(Assign membership in <a %s>user</a> and <a %s>group</a> permissions for this collection)"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:351
+#: ../../../inc/collections/views/_coll_general.form.php:365
 msgid "(Private collection)"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:352
+#: ../../../inc/collections/views/_coll_general.form.php:366
 #: ../../../inc/tools/tools.ctrl.php:192
 #: ../../../inc/tools/views/_create_collections.form.php:42
 msgid "Allow access to"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:358
+#: ../../../inc/collections/views/_coll_general.form.php:372
 msgid "Lists of collections"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:363
+#: ../../../inc/collections/views/_coll_general.form.php:377
 msgid "Always (Public)"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:364
+#: ../../../inc/collections/views/_coll_general.form.php:378
 msgid "For logged-in users only"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:365
+#: ../../../inc/collections/views/_coll_general.form.php:379
 msgid "For members only"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:367
+#: ../../../inc/collections/views/_coll_general.form.php:381
 msgid "Select when you want this blog to appear in the list of blogs on this system."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:367
+#: ../../../inc/collections/views/_coll_general.form.php:381
 msgid "Show in front-office list"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:374
+#: ../../../inc/collections/views/_coll_general.form.php:388
 msgid "This is typically displayed by a widget right under the collection name in the front-office."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:376
+#: ../../../inc/collections/views/_coll_general.form.php:390
 msgid "Long Description"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:376
+#: ../../../inc/collections/views/_coll_general.form.php:390
 msgid "This may be displayed in several places of the front-office. This may also be included in the XML feeds. You may use HTML markup here."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:382
+#: ../../../inc/collections/views/_coll_general.form.php:403
 #, php-format
 msgid "Save and duplicate all settings from %s"
 msgstr ""
@@ -10569,7 +10560,7 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_perm_view.funcs.php:714
 #: ../../../inc/files/views/_file_list.inc.php:149
 #: ../../../inc/messaging/views/_contact_list.view.php:121
-#: ../../../inc/users/groups.ctrl.php:66 ../inc/users/model/_user.class.php:6676
+#: ../../../inc/users/groups.ctrl.php:66 ../inc/users/model/_user.class.php:6678
 #: ../../../inc/users/views/_invitation.view.php:81
 #: ../../../inc/users/views/_userfield.form.php:39
 msgid "Group"
@@ -11414,7 +11405,7 @@ msgstr ""
 
 #: ../../../inc/collections/views/_coll_settings_blog.form.php:107
 #: ../../../inc/collections/views/_coll_settings_blog.form.php:108
-#: ../../../inc/skins/_skin.funcs.php:2556 ../inc/skins/views/_coll_skin.view.php:86
+#: ../../../inc/skins/_skin.funcs.php:2549 ../inc/skins/views/_coll_skin.view.php:86
 msgid "Same as normal skin"
 msgstr ""
 
@@ -11790,7 +11781,7 @@ msgid "Single post URLs"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:50
-#: ../../../inc/users/model/_user.funcs.php:5559
+#: ../../../inc/users/model/_user.funcs.php:5577
 #: ../../../skins_email/account_activated.html.php:47
 #: ../../../skins_email/account_activated.txt.php:43
 #: ../../../skins_email/account_new.html.php:44
@@ -11816,10 +11807,10 @@ msgstr ""
 #: ../../../inc/regional/views/_subregion_list.view.php:150
 #: ../../../inc/regional/views/_subregion_list.view.php:163
 #: ../../../inc/sessions/views/_stats_topips.view.php:74
-#: ../../../inc/users/model/_user.class.php:6681
+#: ../../../inc/users/model/_user.class.php:6683
 #: ../../../inc/users/model/_user.funcs.php:3325
 #: ../../../inc/users/model/_user.funcs.php:3332
-#: ../../../inc/users/model/_user.funcs.php:5598
+#: ../../../inc/users/model/_user.funcs.php:5616
 #: ../../../inc/users/views/_settings.form.php:72
 #: ../../../inc/users/views/_user_identity.form.php:290
 #: ../../../inc/users/views/_user_identity.form.php:481
@@ -11850,9 +11841,9 @@ msgstr ""
 #: ../../../inc/regional/views/_subregion_list.view.php:134
 #: ../../../inc/regional/views/_subregion_list.view.php:155
 #: ../../../inc/regional/views/_subregion_list.view.php:168
-#: ../../../inc/users/model/_user.class.php:6682
+#: ../../../inc/users/model/_user.class.php:6684
 #: ../../../inc/users/model/_user.funcs.php:3341
-#: ../../../inc/users/model/_user.funcs.php:5612
+#: ../../../inc/users/model/_user.funcs.php:5630
 #: ../../../inc/users/views/_settings.form.php:74
 #: ../../../inc/users/views/_user_identity.form.php:306
 #: ../../../inc/users/views/_user_identity.form.php:487
@@ -11866,9 +11857,9 @@ msgstr ""
 #: ../../../inc/regional/views/_city_list.view.php:169
 #: ../../../inc/regional/views/_city_list.view.php:187
 #: ../../../inc/regional/views/_subregion.form.php:32
-#: ../../../inc/users/model/_user.class.php:6683
+#: ../../../inc/users/model/_user.class.php:6685
 #: ../../../inc/users/model/_user.funcs.php:3349
-#: ../../../inc/users/model/_user.funcs.php:5623
+#: ../../../inc/users/model/_user.funcs.php:5641
 #: ../../../inc/users/views/_settings.form.php:76
 #: ../../../inc/users/views/_user_identity.form.php:319
 #: ../../../inc/users/views/_user_identity.form.php:493
@@ -11878,9 +11869,9 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_user_dir.form.php:62
 #: ../../../inc/items/model/_item.funcs.php:3914 ../inc/regional/cities.ctrl.php:44
 #: ../../../inc/regional/views/_city.form.php:32
-#: ../../../inc/users/model/_user.class.php:6684
+#: ../../../inc/users/model/_user.class.php:6686
 #: ../../../inc/users/model/_user.funcs.php:3356
-#: ../../../inc/users/model/_user.funcs.php:5634
+#: ../../../inc/users/model/_user.funcs.php:5652
 #: ../../../inc/users/views/_settings.form.php:78
 #: ../../../inc/users/views/_user_identity.form.php:332
 #: ../../../inc/users/views/_user_identity.form.php:499
@@ -11888,7 +11879,7 @@ msgid "City"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:65
-#: ../../../inc/users/model/_user.funcs.php:5654
+#: ../../../inc/users/model/_user.funcs.php:5672
 msgid "Social links"
 msgstr ""
 
@@ -12232,24 +12223,24 @@ msgstr ""
 msgid "Publish this comment!"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:2451
+#: ../../../inc/comments/model/_comment.class.php:2452
 msgid "Send email to comment author"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:2455
+#: ../../../inc/comments/model/_comment.class.php:2456
 msgid "Send message to comment author"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:2540
+#: ../../../inc/comments/model/_comment.class.php:2541
 msgid "Permanent link to this comment"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:2838
-#: ../../../inc/comments/model/_comment.class.php:2844
+#: ../../../inc/comments/model/_comment.class.php:2839
+#: ../../../inc/comments/model/_comment.class.php:2845
 msgid "Posted by "
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:2900
+#: ../../../inc/comments/model/_comment.class.php:2901
 #: ../../../inc/items/model/_item.class.php:3716
 #: ../../../inc/items/views/_item_list_full.view.php:306
 #: ../../../inc/links/views/_link_list.inc.php:32
@@ -12260,8 +12251,8 @@ msgstr ""
 #: ../../../skins/bootstrap_gallery_skin/single.main.php:260
 #: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:136
 #: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:170
-#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:202
-#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:236
+#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:201
+#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:235
 #: ../../../skins/pureforums_skin/_edit.disp.php:396
 #: ../../../skins/pureforums_skin/_edit_comment.disp.php:169
 #: ../../../skins_email/comment_new.html.php:93
@@ -12278,87 +12269,87 @@ msgstr ""
 msgid "Attachments"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:2912
+#: ../../../inc/comments/model/_comment.class.php:2913
 #: ../../../inc/links/views/_link_list.view.php:93
 msgid "Link ID"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:2926
+#: ../../../inc/comments/model/_comment.class.php:2927
 #: ../../../inc/items/model/_item.class.php:3734
 #: ../../../inc/messaging/model/_message.class.php:1251
 msgid "Download file"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:2937
+#: ../../../inc/comments/model/_comment.class.php:2938
 #: ../../../inc/items/model/_item.class.php:3852
 #: ../../../inc/messaging/model/_message.class.php:1390
 msgid "Missing attachment!"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3002
+#: ../../../inc/comments/model/_comment.class.php:3003
 #, php-format
 msgid "Comment from %s"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3006
+#: ../../../inc/comments/model/_comment.class.php:3007
 #, php-format
 msgid "Trackback from %s"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3010
+#: ../../../inc/comments/model/_comment.class.php:3011
 #, php-format
 msgid "Pingback from %s"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3019
+#: ../../../inc/comments/model/_comment.class.php:3020
 #, php-format
 msgid "<a %s>Meta comment</a> from %s"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3136
+#: ../../../inc/comments/model/_comment.class.php:3137
 msgid "Bad"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3137
+#: ../../../inc/comments/model/_comment.class.php:3138
 #: ../../../inc/comments/views/_comments_sidebar.view.php:148
 msgid "Poor"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3138
+#: ../../../inc/comments/model/_comment.class.php:3139
 msgid "Average"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3140
+#: ../../../inc/comments/model/_comment.class.php:3141
 #: ../../../inc/comments/views/_comments_sidebar.view.php:160
 msgid "Excellent"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3213
+#: ../../../inc/comments/model/_comment.class.php:3214
 #: ../../../inc/comments/views/_comments_sidebar.view.php:131
 msgid "No rating"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3442
+#: ../../../inc/comments/model/_comment.class.php:3443
 #: ../../../inc/items/model/_item.class.php:6897
 msgid "Marking email notifications for members as sent."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3442
-#: ../../../inc/comments/model/_comment.class.php:3448
-#: ../../../inc/comments/model/_comment.class.php:3460
-#: ../../../inc/comments/model/_comment.class.php:3504
-#: ../../../inc/comments/model/_comment.class.php:3594
-#: ../../../inc/comments/model/_comment.class.php:3628
-#: ../../../inc/comments/model/_comment.class.php:3636
-#: ../../../inc/comments/model/_comment.class.php:3642
-#: ../../../inc/comments/model/_comment.class.php:3648
-#: ../../../inc/comments/model/_comment.class.php:3652
-#: ../../../inc/comments/model/_comment.class.php:3656
-#: ../../../inc/comments/model/_comment.class.php:3683
-#: ../../../inc/comments/model/_comment.class.php:3689
-#: ../../../inc/comments/model/_comment.class.php:3694
-#: ../../../inc/comments/model/_comment.class.php:3980
-#: ../../../inc/comments/model/_comment.class.php:3984
+#: ../../../inc/comments/model/_comment.class.php:3443
+#: ../../../inc/comments/model/_comment.class.php:3449
+#: ../../../inc/comments/model/_comment.class.php:3461
+#: ../../../inc/comments/model/_comment.class.php:3505
+#: ../../../inc/comments/model/_comment.class.php:3595
+#: ../../../inc/comments/model/_comment.class.php:3629
+#: ../../../inc/comments/model/_comment.class.php:3637
+#: ../../../inc/comments/model/_comment.class.php:3643
+#: ../../../inc/comments/model/_comment.class.php:3649
+#: ../../../inc/comments/model/_comment.class.php:3653
+#: ../../../inc/comments/model/_comment.class.php:3657
+#: ../../../inc/comments/model/_comment.class.php:3684
+#: ../../../inc/comments/model/_comment.class.php:3690
+#: ../../../inc/comments/model/_comment.class.php:3695
+#: ../../../inc/comments/model/_comment.class.php:3981
+#: ../../../inc/comments/model/_comment.class.php:3985
 #: ../../../inc/items/model/_item.class.php:6897
 #: ../../../inc/items/model/_item.class.php:6903
 #: ../../../inc/items/model/_item.class.php:6909
@@ -12390,131 +12381,131 @@ msgstr ""
 msgid "Sending notifications:"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3448
+#: ../../../inc/comments/model/_comment.class.php:3449
 #: ../../../inc/items/model/_item.class.php:6903
 msgid "Marking email notifications for community as sent."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3460
+#: ../../../inc/comments/model/_comment.class.php:3461
 #: ../../../inc/items/model/_item.class.php:6921
 msgid "All possible notifications have already been sent: skipping notifications..."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3504
+#: ../../../inc/comments/model/_comment.class.php:3505
 msgid "Scheduling email notifications for subscribers."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3594
+#: ../../../inc/comments/model/_comment.class.php:3595
 #: ../../../inc/items/model/_item.class.php:7123
 #, php-format
 msgid "Sending %d email notifications to moderators."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3628
+#: ../../../inc/comments/model/_comment.class.php:3629
 #: ../../../inc/items/model/_item.class.php:7158
 msgid "Skipping email notifications to subscribers because subscriptions are turned Off for this collection."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3636
+#: ../../../inc/comments/model/_comment.class.php:3637
 #: ../../../inc/items/model/_item.class.php:7173
 #, php-format
 msgid "Skipping email notifications to subscribers because status is still: %s."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3642
+#: ../../../inc/comments/model/_comment.class.php:3643
 #: ../../../inc/items/model/_item.class.php:7179
 msgid "Skipping email notifications to subscribers."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3648
+#: ../../../inc/comments/model/_comment.class.php:3649
 #: ../../../inc/items/model/_item.class.php:7185
 msgid "Force sending email notifications to subscribers..."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3652
+#: ../../../inc/comments/model/_comment.class.php:3653
 #: ../../../inc/items/model/_item.class.php:7189
 msgid "Force sending email notifications to subscribed members..."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3656
+#: ../../../inc/comments/model/_comment.class.php:3657
 #: ../../../inc/items/model/_item.class.php:7193
 msgid "Force sending email notifications to other subscribers..."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3683
+#: ../../../inc/comments/model/_comment.class.php:3684
 #: ../../../inc/items/model/_item.class.php:7231
 msgid "Skipping email notifications to subscribers because they were already notified."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3689
+#: ../../../inc/comments/model/_comment.class.php:3690
 #: ../../../inc/items/model/_item.class.php:7237
 msgid "Skipping email notifications to subscribed members."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3694
+#: ../../../inc/comments/model/_comment.class.php:3695
 #: ../../../inc/items/model/_item.class.php:7242
 msgid "Skipping email notifications to other subscribers."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3980
+#: ../../../inc/comments/model/_comment.class.php:3981
 #: ../../../inc/items/model/_item.class.php:7402
 #, php-format
 msgid "Sending %d email notifications to subscribed members."
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:3984
+#: ../../../inc/comments/model/_comment.class.php:3985
 #: ../../../inc/items/model/_item.class.php:7406
 #, php-format
 msgid "Sending %d email notifications to other subscribers."
 msgstr ""
 
 #. TRANS: Subject of the mail to send on new trackbacks. First %s is the blog's shortname, the second %s is the item's title.
-#: ../../../inc/comments/model/_comment.class.php:4073
+#: ../../../inc/comments/model/_comment.class.php:4074
 #, php-format
 msgid "[%s] New trackback on \"%s\""
 msgstr ""
 
 #. TRANS: Subject of the mail to send on new meta comments. First %s is author login, the second %s is the item's title.
-#: ../../../inc/comments/model/_comment.class.php:4078
+#: ../../../inc/comments/model/_comment.class.php:4079
 #, php-format
 msgid "%s posted a new meta comment on \"%s\""
 msgstr ""
 
 #. TRANS: Subject of the mail to send on new comments to moderators. First %s is blog name, the second %s is the item's title.
-#: ../../../inc/comments/model/_comment.class.php:4087
+#: ../../../inc/comments/model/_comment.class.php:4088
 #, php-format
 msgid "[%s] New comment awaiting moderation on \"%s\""
 msgstr ""
 
 #. TRANS: Subject of the mail to send on new comments to moderators. First %s is blog name, the second %s is the item's title.
-#: ../../../inc/comments/model/_comment.class.php:4092
+#: ../../../inc/comments/model/_comment.class.php:4093
 #, php-format
 msgid "[%s] New comment may need moderation on \"%s\""
 msgstr ""
 
 #. TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title.
-#: ../../../inc/comments/model/_comment.class.php:4098
+#: ../../../inc/comments/model/_comment.class.php:4099
 #, php-format
 msgid "[%s] New comment on \"%s\""
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:4198
+#: ../../../inc/comments/model/_comment.class.php:4199
 #, php-format
 msgid "[%s] Spam comment may need moderation on \"%s\""
 msgstr ""
 
+#: ../../../inc/comments/model/_comment.class.php:4567
 #: ../../../inc/comments/model/_comment.class.php:4571
-#: ../../../inc/comments/model/_comment.class.php:4575
 #: ../../../inc/comments/model/_comment.funcs.php:898
 msgid "Reply to this comment"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:4571
+#: ../../../inc/comments/model/_comment.class.php:4567
 #: ../../../inc/comments/model/_comment.funcs.php:906
 msgid "You are currently replying to this comment"
 msgstr ""
 
-#: ../../../inc/comments/model/_comment.class.php:4879
+#: ../../../inc/comments/model/_comment.class.php:4875
 #, php-format
 msgid "Since the parent post of this comment have its visibility set to \"%s\", the visibility of this comment will be restricted to \"%s\"."
 msgstr ""
@@ -12608,7 +12599,7 @@ msgstr ""
 
 #: ../../../inc/comments/model/_comment.funcs.php:647
 #: ../../../inc/items/model/_item.class.php:1396
-#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:240
+#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:244
 msgid "More info &raquo;"
 msgstr ""
 
@@ -13208,8 +13199,8 @@ msgid "It was not necessary to send any reminder!"
 msgstr ""
 
 #: ../../../inc/cron/jobs/_unread_message_reminder.job.php:126
-#: ../../../inc/messaging/model/_messaging.funcs.php:2205
-#: ../../../inc/messaging/model/_messaging.funcs.php:2210
+#: ../../../inc/messaging/model/_messaging.funcs.php:2198
+#: ../../../inc/messaging/model/_messaging.funcs.php:2203
 msgid "You have unread messages"
 msgstr ""
 
@@ -13232,15 +13223,15 @@ msgstr ""
 
 #: ../../../inc/cron/model/_decode_returned_emails.funcs.php:473
 #: ../../../inc/cron/model/_post_by_mail.funcs.php:595
-#: ../../../inc/messaging/model/_messaging.funcs.php:2094
+#: ../../../inc/messaging/model/_messaging.funcs.php:2087
 #: ../../../inc/messaging/views/_thread.form.php:97
 #: ../../../inc/tools/views/_email_sent.view.php:149
 #: ../../../inc/tools/views/_email_sent_details.view.php:44
 #: ../../../skins/pureforums_skin/_edit.disp.php:217
-#: ../../../skins_fallback_v5/_contact_msg.form.php:124
-#: ../../../skins_fallback_v5/_contact_msg.form.php:132
-#: ../../../skins_fallback_v6/_contact_msg.form.php:124
-#: ../../../skins_fallback_v6/_contact_msg.form.php:132
+#: ../../../skins_fallback_v5/_contact_msg.form.php:133
+#: ../../../skins_fallback_v5/_contact_msg.form.php:141
+#: ../../../skins_fallback_v6/_contact_msg.form.php:133
+#: ../../../skins_fallback_v6/_contact_msg.form.php:141
 msgid "Subject"
 msgstr ""
 
@@ -14146,7 +14137,7 @@ msgstr ""
 #: ../../../inc/files/files.ctrl.php:1090 ../inc/files/files.ctrl.php:1343
 #: ../../../inc/files/files.ctrl.php:1418 ../inc/files/files.ctrl.php:1454
 #: ../../../inc/files/files.ctrl.php:1503 ../inc/files/views/_file_list.inc.php:872
-#: ../../../inc/rest/_restapi.class.php:2094
+#: ../../../inc/rest/_restapi.class.php:2104
 msgid "Nothing selected."
 msgstr ""
 
@@ -14711,69 +14702,69 @@ msgstr ""
 msgid "Uploading {total_size}..."
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2541
+#: ../../../inc/files/model/_file.funcs.php:2543
 msgid "Upload ERROR"
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2548
+#: ../../../inc/files/model/_file.funcs.php:2550
 msgid "Server dropped the connection."
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2579
+#: ../../../inc/files/model/_file.funcs.php:2581
 msgid "Upload OK"
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2617
+#: ../../../inc/files/model/_file.funcs.php:2619
 msgid "Upload Conflict"
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2634
+#: ../../../inc/files/model/_file.funcs.php:2636
 msgid "Use this new file to replace the old file"
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2635
+#: ../../../inc/files/model/_file.funcs.php:2637
 msgid "Revert"
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2641
+#: ../../../inc/files/model/_file.funcs.php:2643
 msgid "(Old File)"
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2847
+#: ../../../inc/files/model/_file.funcs.php:2849
 msgid "The new file name is empty!"
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2851
+#: ../../../inc/files/model/_file.funcs.php:2853
 msgid "The old file name is empty!"
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2878
+#: ../../../inc/files/model/_file.funcs.php:2880
 #, php-format
 msgid "The new file could not be renamed to %s"
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2883
+#: ../../../inc/files/model/_file.funcs.php:2885
 #, php-format
 msgid "The original file could not be renamed to %s. The new file is now named %s."
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2888
+#: ../../../inc/files/model/_file.funcs.php:2890
 #, php-format
 msgid "The new file could not be renamed to %s. It is now named %s."
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2896
+#: ../../../inc/files/model/_file.funcs.php:2898
 #, php-format
 msgid "%s has been replaced with the new version!"
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:2992
+#: ../../../inc/files/model/_file.funcs.php:2994
 #, php-format
 msgid "Unable to create temporary upload file. PHP needs write permissions on %s or %s."
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:3025
-#: ../../../inc/files/model/_file.funcs.php:3044
+#: ../../../inc/files/model/_file.funcs.php:3027
+#: ../../../inc/files/model/_file.funcs.php:3046
 #: ../../../inc/files/views/_file_properties.form.php:34
 msgid "File properties"
 msgstr ""
@@ -16205,12 +16196,12 @@ msgid "Workflow feature has not been enabled for this collection."
 msgstr ""
 
 #: ../../../inc/items/items.ctrl.php:1723 ../inc/items/items.ctrl.php:1828
-#: ../../../inc/skins/_skin.funcs.php:1281
+#: ../../../inc/skins/_skin.funcs.php:1274
 msgid "Since this blog has no categories, you cannot post into it."
 msgstr ""
 
 #: ../../../inc/items/items.ctrl.php:1727 ../inc/items/items.ctrl.php:1832
-#: ../../../inc/skins/_skin.funcs.php:1285
+#: ../../../inc/skins/_skin.funcs.php:1278
 #, php-format
 msgid "You must <a %s>create categories</a> first."
 msgstr ""
@@ -16713,7 +16704,7 @@ msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:8728
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:64
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:442
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:408
 #: ../../../skins/pureforums_skin/_legend.inc.php:64
 msgid "New topic"
 msgstr ""
@@ -16864,8 +16855,8 @@ msgstr ""
 #: ../../../inc/items/model/_item.funcs.php:1420
 #: ../../../inc/items/model/_itemlight.class.php:599
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:533
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:451
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:462
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:417
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:428
 msgid "Locked"
 msgstr ""
 
@@ -17884,7 +17875,7 @@ msgstr ""
 #: ../../../inc/widgets/widgets/_item_small_print.widget.php:209
 #: ../../../skins/asevo/_item_block.inc.php:69
 #: ../../../skins/bootstrap_photoblog_skin/_catdir.disp.php:140
-#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:146
+#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:145
 #: ../../../skins/dating_mood/_item_block.inc.php:53
 #: ../../../skins_fallback_v5/_item_comment_wp.inc.php:61
 #: ../../../skins_fallback_v5/_item_comment_wp.inc.php:76
@@ -17980,22 +17971,22 @@ msgid "Send comment"
 msgstr ""
 
 #: ../../../inc/items/views/_item_list_full.view.php:711
-#: ../../../skins/touch/_item_feedback.inc.php:326
+#: ../../../skins/touch/_item_feedback.inc.php:327
 #: ../../../skins_email/comment_new.html.php:164
 #: ../../../skins_email/comment_new.txt.php:163
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:446
-#: ../../../skins_fallback_v6/_item_feedback.inc.php:527
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:447
+#: ../../../skins_fallback_v6/_item_feedback.inc.php:528
 msgid "You are receiving notifications when anyone comments on any post."
 msgstr ""
 
 #: ../../../inc/items/views/_item_list_full.view.php:712
 #: ../../../inc/items/views/_item_list_full.view.php:720
-#: ../../../skins/touch/_item_feedback.inc.php:327
-#: ../../../skins/touch/_item_feedback.inc.php:335
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:447
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:461
-#: ../../../skins_fallback_v6/_item_feedback.inc.php:528
-#: ../../../skins_fallback_v6/_item_feedback.inc.php:536
+#: ../../../skins/touch/_item_feedback.inc.php:328
+#: ../../../skins/touch/_item_feedback.inc.php:336
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:448
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:462
+#: ../../../skins_fallback_v6/_item_feedback.inc.php:529
+#: ../../../skins_fallback_v6/_item_feedback.inc.php:537
 msgid "Click here to manage your subscriptions."
 msgstr ""
 
@@ -18009,21 +18000,21 @@ msgid "This is your post. You are receiving notifications when anyone comments o
 msgstr ""
 
 #: ../../../inc/items/views/_item_list_full.view.php:727
-#: ../../../skins/touch/_item_feedback.inc.php:342
+#: ../../../skins/touch/_item_feedback.inc.php:343
 #: ../../../skins_fallback_v5/_item_feedback.inc.php:66
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:70
 msgid "You will be notified by email when someone comments here."
 msgstr ""
 
 #: ../../../inc/items/views/_item_list_full.view.php:728
-#: ../../../skins/touch/_item_feedback.inc.php:343
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:469
-#: ../../../skins_fallback_v6/_item_feedback.inc.php:544
+#: ../../../skins/touch/_item_feedback.inc.php:344
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:470
+#: ../../../skins_fallback_v6/_item_feedback.inc.php:545
 msgid "Click here to unsubscribe."
 msgstr ""
 
 #: ../../../inc/items/views/_item_list_full.view.php:732
-#: ../../../skins/touch/_item_feedback.inc.php:347
+#: ../../../skins/touch/_item_feedback.inc.php:348
 #: ../../../skins_fallback_v5/_item_feedback.inc.php:67
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:71
 msgid "Notify me by email when someone comments here."
@@ -18551,19 +18542,19 @@ msgstr ""
 msgid "Requested link owner object does not exist any longer."
 msgstr ""
 
-#: ../../../inc/links/links.ctrl.php:182 ../inc/rest/_restapi.class.php:2057
+#: ../../../inc/links/links.ctrl.php:182 ../inc/rest/_restapi.class.php:2067
 msgid "Link has been moved up."
 msgstr ""
 
-#: ../../../inc/links/links.ctrl.php:184 ../inc/rest/_restapi.class.php:2058
+#: ../../../inc/links/links.ctrl.php:184 ../inc/rest/_restapi.class.php:2068
 msgid "Link has been moved down."
 msgstr ""
 
-#: ../../../inc/links/links.ctrl.php:193 ../inc/rest/_restapi.class.php:2064
+#: ../../../inc/links/links.ctrl.php:193 ../inc/rest/_restapi.class.php:2074
 msgid "Link order has not been changed."
 msgstr ""
 
-#: ../../../inc/links/links.ctrl.php:236 ../inc/rest/_restapi.class.php:2222
+#: ../../../inc/links/links.ctrl.php:236 ../inc/rest/_restapi.class.php:2232
 msgid "The attachments have been sorted by file name."
 msgstr ""
 
@@ -18866,7 +18857,7 @@ msgid "View this user..."
 msgstr ""
 
 #: ../../../inc/links/model/_linkuser.class.php:41
-#: ../../../inc/users/model/_user.funcs.php:6130
+#: ../../../inc/users/model/_user.funcs.php:6148
 #: ../../../inc/users/registration.ctrl.php:107
 msgid "Edit this user..."
 msgstr ""
@@ -20366,16 +20357,16 @@ msgstr ""
 msgid "Delete thread &laquo;%s&raquo;?"
 msgstr ""
 
-#: ../../../inc/messaging/contacts.ctrl.php:75 ../inc/skins/_skin.funcs.php:864
+#: ../../../inc/messaging/contacts.ctrl.php:75 ../inc/skins/_skin.funcs.php:857
 #, php-format
 msgid "%d contacts have been added to the &laquo;%s&raquo; group."
 msgstr ""
 
-#: ../../../inc/messaging/contacts.ctrl.php:88 ../inc/skins/_skin.funcs.php:892
+#: ../../../inc/messaging/contacts.ctrl.php:88 ../inc/skins/_skin.funcs.php:885
 msgid "The group has been renamed."
 msgstr ""
 
-#: ../../../inc/messaging/contacts.ctrl.php:101 ../inc/skins/_skin.funcs.php:913
+#: ../../../inc/messaging/contacts.ctrl.php:101 ../inc/skins/_skin.funcs.php:906
 msgid "The group has been deleted."
 msgstr ""
 
@@ -20558,55 +20549,55 @@ msgstr ""
 msgid "The user has logged in in the last %d days, so we will space out notifications by %d days."
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1949
+#: ../../../inc/messaging/model/_messaging.funcs.php:1942
 msgid "Threads with private messages sent by the user"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1950
+#: ../../../inc/messaging/model/_messaging.funcs.php:1943
 msgid "User has not sent any private messages"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2005
+#: ../../../inc/messaging/model/_messaging.funcs.php:1998
 #, php-format
 msgid "Delete all private messages sent by %s"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2037
+#: ../../../inc/messaging/model/_messaging.funcs.php:2030
 msgid "Messaging"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2038
+#: ../../../inc/messaging/model/_messaging.funcs.php:2031
 #, php-format
 msgid "User has sent %s private messages"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2084
+#: ../../../inc/messaging/model/_messaging.funcs.php:2077
 msgid "Between"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2084
+#: ../../../inc/messaging/model/_messaging.funcs.php:2077
 msgid "With"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2105
+#: ../../../inc/messaging/model/_messaging.funcs.php:2098
 msgid "Last msg"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2115
+#: ../../../inc/messaging/model/_messaging.funcs.php:2108
 #: ../../../inc/messaging/views/_message_list.view.php:222
 #: ../../../inc/messaging/views/_thread.form.php:315
 msgid "Read?"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2171
+#: ../../../inc/messaging/model/_messaging.funcs.php:2164
 msgid "Deleted user(s)"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2202
+#: ../../../inc/messaging/model/_messaging.funcs.php:2195
 msgid "Conversation left"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2224
+#: ../../../inc/messaging/model/_messaging.funcs.php:2217
 msgid "Show messages..."
 msgstr ""
 
@@ -20672,8 +20663,8 @@ msgstr ""
 msgid "Settings were updated."
 msgstr ""
 
-#: ../../../inc/messaging/threads.ctrl.php:64 ../inc/skins/_skin.funcs.php:778
-#: ../../../inc/skins/_skin.funcs.php:965 ../inc/users/model/_user.funcs.php:4873
+#: ../../../inc/messaging/threads.ctrl.php:64 ../inc/skins/_skin.funcs.php:771
+#: ../../../inc/skins/_skin.funcs.php:958 ../inc/users/model/_user.funcs.php:4873
 #: ../../../inc/users/model/_user.funcs.php:5007
 msgid "Please specify your country before attempting to contact other users."
 msgstr ""
@@ -20699,7 +20690,7 @@ msgid "Select this contact"
 msgstr ""
 
 #: ../../../inc/messaging/views/_contact_list.view.php:257
-#: ../../../inc/users/model/_user.funcs.php:5503
+#: ../../../inc/users/model/_user.funcs.php:5521
 msgid "Picture"
 msgstr ""
 
@@ -20734,7 +20725,7 @@ msgid "Rename this group to"
 msgstr ""
 
 #: ../../../inc/messaging/views/_contact_list.view.php:484
-#: ../../../inc/users/model/_user.funcs.php:5889
+#: ../../../inc/users/model/_user.funcs.php:5907
 #: ../../../inc/users/views/_group.view.php:163
 #: ../../../inc/users/views/_userfields.view.php:161
 msgid "Delete this group"
@@ -20776,8 +20767,8 @@ msgstr ""
 
 #: ../../../inc/messaging/views/_message_list.view.php:349
 #: ../../../inc/messaging/views/_thread.form.php:152
-#: ../../../skins_fallback_v5/_contact_msg.form.php:166
-#: ../../../skins_fallback_v6/_contact_msg.form.php:166
+#: ../../../skins_fallback_v5/_contact_msg.form.php:175
+#: ../../../skins_fallback_v6/_contact_msg.form.php:175
 msgid "Send message"
 msgstr ""
 
@@ -20832,8 +20823,8 @@ msgstr ""
 #: ../../../inc/messaging/views/_msg_settings_templates.form.php:56
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:127
 #: ../../../inc/sessions/views/_stats_search_keywords.view.php:178
-#: ../../../skins_fallback_v5/_contact_msg.form.php:106
-#: ../../../skins_fallback_v6/_contact_msg.form.php:106
+#: ../../../skins_fallback_v5/_contact_msg.form.php:115
+#: ../../../skins_fallback_v6/_contact_msg.form.php:115
 msgid "From"
 msgstr ""
 
@@ -20975,62 +20966,62 @@ msgstr ""
 msgid "Note: before adding a new set you have to save any changes."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1121
+#: ../../../inc/plugins/_plugin.funcs.php:1124
 #, php-format
 msgid "Too many entries in the \"%s\" set. It must have %d at most."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1127
+#: ../../../inc/plugins/_plugin.funcs.php:1130
 #, php-format
 msgid "Too few entries in the \"%s\" set. It must have %d at least."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1159 ../inc/plugins/_plugin.funcs.php:1167
+#: ../../../inc/plugins/_plugin.funcs.php:1170 ../inc/plugins/_plugin.funcs.php:1178
 #, php-format
 msgid "The value for &laquo;%s&raquo; must be numeric."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1159 ../inc/plugins/_plugin.funcs.php:1167
+#: ../../../inc/plugins/_plugin.funcs.php:1170 ../inc/plugins/_plugin.funcs.php:1178
 msgid "The value must be numeric."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1178 ../inc/plugins/_plugin.funcs.php:1189
-#: ../../../inc/plugins/_plugin.funcs.php:1223 ../inc/plugins/_plugin.funcs.php:1237
-#: ../../../inc/plugins/_plugin.funcs.php:1272
+#: ../../../inc/plugins/_plugin.funcs.php:1189 ../inc/plugins/_plugin.funcs.php:1200
+#: ../../../inc/plugins/_plugin.funcs.php:1234 ../inc/plugins/_plugin.funcs.php:1248
+#: ../../../inc/plugins/_plugin.funcs.php:1283
 #, php-format
 msgid "Invalid option &laquo;%s&raquo;."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1286
+#: ../../../inc/plugins/_plugin.funcs.php:1297
 msgid "The value is too long."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1296
+#: ../../../inc/plugins/_plugin.funcs.php:1307
 #, php-format
 msgid "The value is invalid. It must match the regular expression &laquo;%s&raquo;."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1328
+#: ../../../inc/plugins/_plugin.funcs.php:1339
 #, php-format
 msgid "The value is invalid. It must be in the range from %s to %s."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1332
+#: ../../../inc/plugins/_plugin.funcs.php:1343
 #, php-format
 msgid "The value is invalid. It must be smaller than or equal to %s."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1336
+#: ../../../inc/plugins/_plugin.funcs.php:1347
 #, php-format
 msgid "The value is invalid. It must be greater than or equal to %s."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1454
+#: ../../../inc/plugins/_plugin.funcs.php:1465
 msgid "The database has been updated."
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.funcs.php:1458
-#: ../../../install/_functions_evoupgrade.php:8854
+#: ../../../inc/plugins/_plugin.funcs.php:1469
+#: ../../../install/_functions_evoupgrade.php:8920
 msgid "The DB schema has been changed since confirmation."
 msgstr ""
 
@@ -21286,7 +21277,7 @@ msgid "The plugin needs the following database changes."
 msgstr ""
 
 #: ../../../inc/plugins/plugins.ctrl.php:920
-#: ../../../install/_functions_evoupgrade.php:8891
+#: ../../../install/_functions_evoupgrade.php:8957
 msgid "The following database changes will be carried out. If you are not sure what this means, it will probably be alright."
 msgstr ""
 
@@ -23539,159 +23530,155 @@ msgstr ""
 msgid "The requested chapter was not found"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:577
-msgid "You must log in before you can contact this user"
+#: ../../../inc/skins/_skin.funcs.php:569
+#, php-format
+msgid "You must log in before you can contact \"%s\"."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:586
+#: ../../../inc/skins/_skin.funcs.php:583
 #, php-format
 msgid "You must activate your account before you can send a private message to %s. However you can send them an email if you'd like. <a %s>More info &raquo;</a>"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:590
+#: ../../../inc/skins/_skin.funcs.php:587
 msgid "You must activate your account before you can contact a user. <b>See below:</b>"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:599
+#: ../../../inc/skins/_skin.funcs.php:596
 msgid "You cannot send a private message to yourself. However you can send yourself an email if you'd like."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:603
-#, php-format
-msgid "You cannot send a private message to %s. However you can send them an email if you'd like."
-msgstr ""
-
-#: ../../../inc/skins/_skin.funcs.php:617
+#: ../../../inc/skins/_skin.funcs.php:610
 #, php-format
 msgid "The user \"%s\" does not want to be contacted through the message form."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:621
+#: ../../../inc/skins/_skin.funcs.php:614
 msgid "This commentator does not want to get contacted through the message form."
 msgstr ""
 
 #. TRANS: Used as mail subject; %s gets replaced by an item's title
-#: ../../../inc/skins/_skin.funcs.php:649
+#: ../../../inc/skins/_skin.funcs.php:642
 #, php-format
 msgid "Comment on %s"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:649 ../inc/skins/_skin.funcs.php:662
+#: ../../../inc/skins/_skin.funcs.php:642 ../inc/skins/_skin.funcs.php:655
 msgid "Re:"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:701 ../inc/skins/_skin.funcs.php:927
+#: ../../../inc/skins/_skin.funcs.php:694 ../inc/skins/_skin.funcs.php:920
 msgid "You must log in to read your messages."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:711 ../inc/skins/_skin.funcs.php:936
+#: ../../../inc/skins/_skin.funcs.php:704 ../inc/skins/_skin.funcs.php:929
 msgid "You must activate your account before you can read & send messages. <b>See below:</b>"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:753
+#: ../../../inc/skins/_skin.funcs.php:746
 msgid "You must log in to manage your contacts."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:809
+#: ../../../inc/skins/_skin.funcs.php:802
 #, php-format
 msgid "User has been added to the &laquo;%s&raquo; group."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:828
+#: ../../../inc/skins/_skin.funcs.php:821
 msgid "Contact was unblocked."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1074
+#: ../../../inc/skins/_skin.funcs.php:1067
 msgid "You are logged in but your account is not activated. You will find instructions about activating your account below:"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1080 ../inc/skins/_skin.funcs.php:1113
-#: ../../../inc/skins/_skin.funcs.php:1133 ../skins_fallback_v5/_login.disp.php:19
+#: ../../../inc/skins/_skin.funcs.php:1073 ../inc/skins/_skin.funcs.php:1106
+#: ../../../inc/skins/_skin.funcs.php:1126 ../skins_fallback_v5/_login.disp.php:19
 #: ../../../skins_fallback_v5/_register.disp.php:46
 #: ../../../skins_fallback_v6/_login.disp.php:19
 #: ../../../skins_fallback_v6/_register.disp.php:46
 msgid "You are already logged in"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1149
+#: ../../../inc/skins/_skin.funcs.php:1142
 msgid "You must log in before you can activate your account."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1256
+#: ../../../inc/skins/_skin.funcs.php:1249
 msgid "You must log in to create & edit posts."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1266
+#: ../../../inc/skins/_skin.funcs.php:1259
 msgid "You must activate your account before you can create & edit posts. <b>See below:</b>"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1272
+#: ../../../inc/skins/_skin.funcs.php:1265
 msgid "You are not allowed to create & edit posts!"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1304
+#: ../../../inc/skins/_skin.funcs.php:1297
 msgid "You must log in to edit comments."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1314
+#: ../../../inc/skins/_skin.funcs.php:1307
 msgid "You must activate your account before you can edit comments. <b>See below:</b>"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1374 ../inc/users/model/_user.funcs.php:4922
+#: ../../../inc/skins/_skin.funcs.php:1367 ../inc/users/model/_user.funcs.php:4922
 msgid "You must log in to view this user profile."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1384
+#: ../../../inc/skins/_skin.funcs.php:1377
 msgid "You must activate your account before you can view this user profile. <b>See below:</b>"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1389 ../inc/users/model/_user.funcs.php:4954
+#: ../../../inc/skins/_skin.funcs.php:1382 ../inc/users/model/_user.funcs.php:4954
 msgid "Your account status currently does not permit to view this user profile."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1401 ../inc/users/model/_user.funcs.php:4975
+#: ../../../inc/skins/_skin.funcs.php:1394 ../inc/users/model/_user.funcs.php:4975
 msgid "The requested user does not exist!"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1408 ../inc/users/model/_user.funcs.php:4990
+#: ../../../inc/skins/_skin.funcs.php:1401 ../inc/users/model/_user.funcs.php:4990
 msgid "The requested user account is closed!"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1444
+#: ../../../inc/skins/_skin.funcs.php:1437
 msgid "This feature is disabled."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:1514
+#: ../../../inc/skins/_skin.funcs.php:1507
 #: ../../../skins_adm/_adminUI_general.class.php:169
 #: ../../../skins_adm/bootstrap/_adminUI.class.php:96
 msgid "Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:2569 ../inc/skins/views/_skin.form.php:44
+#: ../../../inc/skins/_skin.funcs.php:2562 ../inc/skins/views/_skin.form.php:44
 #: ../../../inc/skins/views/_skin.form.php:79
 msgid "Skin name"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:2575 ../inc/skins/views/_skin.form.php:51
+#: ../../../inc/skins/_skin.funcs.php:2568 ../inc/skins/views/_skin.form.php:51
 msgid "Skin version"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:2581 ../inc/skins/views/_skin.form.php:57
+#: ../../../inc/skins/_skin.funcs.php:2574 ../inc/skins/views/_skin.form.php:57
 #: ../../../inc/skins/views/_skin.form.php:91 ../inc/skins/views/_skin.form.php:161
 #: ../../../inc/skins/views/_skin_list.view.php:56
 #: ../../../inc/skins/views/_skin_list_available.view.php:89
 msgid "Skin type"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:2595 ../inc/skins/views/_skin.form.php:71
+#: ../../../inc/skins/_skin.funcs.php:2588 ../inc/skins/views/_skin.form.php:71
 msgid "Containers"
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:2607
+#: ../../../inc/skins/_skin.funcs.php:2600
 msgid "This skin does not provide any configurable settings."
 msgstr ""
 
-#: ../../../inc/skins/_skin.funcs.php:2628
+#: ../../../inc/skins/_skin.funcs.php:2621
 msgid "Skin settings"
 msgstr ""
 
@@ -25115,9 +25102,9 @@ msgid "User group"
 msgstr ""
 
 #: ../../../inc/tools/mtimport.ctrl.php:335 ../inc/users/model/_user.funcs.php:3365
-#: ../../../inc/users/model/_user.funcs.php:5791
-#: ../../../inc/users/model/_user.funcs.php:5822
-#: ../../../inc/users/model/_user.funcs.php:5926
+#: ../../../inc/users/model/_user.funcs.php:5809
+#: ../../../inc/users/model/_user.funcs.php:5840
+#: ../../../inc/users/model/_user.funcs.php:5944
 #: ../../../inc/users/views/_group.view.php:76
 #: ../../../inc/users/views/_invitation.view.php:89
 msgid "Level"
@@ -27121,53 +27108,53 @@ msgstr ""
 msgid "The user's directory &laquo;%s&raquo; has been created with permissions %s."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:3174
+#: ../../../inc/users/model/_user.class.php:3173
 #, php-format
 msgid "Group/user permission denied by %s!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:3657
+#: ../../../inc/users/model/_user.class.php:3663
 msgid "You are not allowed to contact with this user."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:3663
+#: ../../../inc/users/model/_user.class.php:3669
 msgid "You cannot send a private message to yourself."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:3666
+#: ../../../inc/users/model/_user.class.php:3672
 msgid "This user can only be contacted through private messages, but you are not allowed to send private message to this user."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:3669
+#: ../../../inc/users/model/_user.class.php:3675
 msgid "This user can only be contacted through private messages but you are not allowed to send any private messages."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:3672
+#: ../../../inc/users/model/_user.class.php:3678
 msgid "This user does not wish to be contacted directly."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:4022
+#: ../../../inc/users/model/_user.class.php:4028
 #: ../../../inc/users/model/_user.funcs.php:2861
 msgid "Activate your account: $login$"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:4082
-#: ../../../inc/users/model/_user.class.php:5223
+#: ../../../inc/users/model/_user.class.php:4088
+#: ../../../inc/users/model/_user.class.php:5225
 #: ../../../skins_email/account_activated.html.php:31
 #: ../../../skins_email/account_activated.txt.php:30
 msgid "New user account activated"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:4144
+#: ../../../inc/users/model/_user.class.php:4150
 msgid "Send email to user"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:4149
+#: ../../../inc/users/model/_user.class.php:4155
 msgid "Send message to user"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:4258
-#: ../../../inc/users/model/_user.class.php:6709
+#: ../../../inc/users/model/_user.class.php:4264
+#: ../../../inc/users/model/_user.class.php:6711
 #: ../../../inc/users/views/_user_identity.form.php:275
 #: ../../../skins_email/account_activated.html.php:82
 #: ../../../skins_email/account_activated.txt.php:78
@@ -27178,8 +27165,8 @@ msgstr ""
 msgid "A man"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:4261
-#: ../../../inc/users/model/_user.class.php:6709
+#: ../../../inc/users/model/_user.class.php:4267
+#: ../../../inc/users/model/_user.class.php:6711
 #: ../../../inc/users/views/_user_identity.form.php:276
 #: ../../../skins_email/account_activated.html.php:86
 #: ../../../skins_email/account_activated.txt.php:82
@@ -27190,204 +27177,208 @@ msgstr ""
 msgid "A woman"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:4954
-#: ../../../inc/users/model/_user.class.php:5384
-#: ../../../inc/users/model/_user.class.php:5595
-#: ../../../inc/users/model/_user.class.php:5646
+#: ../../../inc/users/model/_user.class.php:4960
+#: ../../../inc/users/model/_user.class.php:5386
+#: ../../../inc/users/model/_user.class.php:5597
+#: ../../../inc/users/model/_user.class.php:5648
 #: ../../../plugins/twitter_plugin/_twitter.plugin.php:512
 msgid "You are only allowed to update your own profile!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:4997
+#: ../../../inc/users/model/_user.class.php:5003
 msgid "New user has been created."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5002
+#: ../../../inc/users/model/_user.class.php:5008
 msgid "Password has been changed."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5014
+#: ../../../inc/users/model/_user.class.php:5020
 #, php-format
 msgid "You cannot choose the new login \"%s\" (cannot rename user fileroot)"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5021
+#: ../../../inc/users/model/_user.class.php:5027
 msgid "Profile has been updated."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5062
+#: ../../../inc/users/model/_user.class.php:5068
 msgid "User status couldn't be updated!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5071
+#: ../../../inc/users/model/_user.class.php:5077
 #, php-format
 msgid "Because the Account Activation Process is set to <a %s>Secure</a>, the user will have to request a new activation email next time he tries to log in."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5087
+#: ../../../inc/users/model/_user.class.php:5093
 #, php-format
 msgid "An email has been sent to your email address (%s). Please click on the link therein to activate your account. <a %s>More info &raquo;</a>"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5091
+#: ../../../inc/users/model/_user.class.php:5097
 #, php-format
 msgid "An account activation email has been sent to %s"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5108 ../inc/users/user.ctrl.php:377
+#: ../../../inc/users/model/_user.class.php:5114 ../inc/users/user.ctrl.php:377
 #: ../../../inc/users/user.ctrl.php:483
 msgid "User feature settings have been changed."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5268
-#: ../../../inc/users/model/_user.class.php:5548
+#: ../../../inc/users/model/_user.class.php:5135 ../inc/widgets/widgets.ctrl.php:148
+msgid "You do not have permission to perform this action"
+msgstr ""
+
+#: ../../../inc/users/model/_user.class.php:5270
+#: ../../../inc/users/model/_user.class.php:5550
 msgid "You are not allowed to update this profile!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5274
-#: ../../../inc/users/model/_user.class.php:5283
-#: ../../../inc/users/model/_user.class.php:5289
-#: ../../../inc/users/model/_user.class.php:5601
+#: ../../../inc/users/model/_user.class.php:5276
+#: ../../../inc/users/model/_user.class.php:5285
+#: ../../../inc/users/model/_user.class.php:5291
+#: ../../../inc/users/model/_user.class.php:5603
 msgid "Profile picture could not be changed!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5307
+#: ../../../inc/users/model/_user.class.php:5309
 msgid "Profile picture has been restored."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5311
-#: ../../../inc/users/model/_user.class.php:5683
+#: ../../../inc/users/model/_user.class.php:5313
+#: ../../../inc/users/model/_user.class.php:5685
 msgid "Profile picture has been changed."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5392
+#: ../../../inc/users/model/_user.class.php:5394
 msgid "You did not specify a file."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5402
+#: ../../../inc/users/model/_user.class.php:5404
 msgid "The requested file does not exist!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5410
+#: ../../../inc/users/model/_user.class.php:5412
 msgid "The requested file doesn't belong to this user."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5445
+#: ../../../inc/users/model/_user.class.php:5447
 msgid "Profile picture could not be rotated!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5449
+#: ../../../inc/users/model/_user.class.php:5451
 msgid "Profile picture has been rotated."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5482
+#: ../../../inc/users/model/_user.class.php:5484
 msgid "Profile picture could not be cropped!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5486
+#: ../../../inc/users/model/_user.class.php:5488
 msgid "Profile picture has been cropped."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5559
+#: ../../../inc/users/model/_user.class.php:5561
 msgid "Profile picture is not found!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5572
+#: ../../../inc/users/model/_user.class.php:5574
 msgid "Profile picture has been forbidden."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5576
+#: ../../../inc/users/model/_user.class.php:5578
 msgid "Profile picture has been removed."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5630
+#: ../../../inc/users/model/_user.class.php:5632
 msgid "Profile picture has been deleted."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5656
+#: ../../../inc/users/model/_user.class.php:5658
 msgid "You don't have permission to selected user file root."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5668
+#: ../../../inc/users/model/_user.class.php:5670
 msgid "It seems you are trying to upload the same profile picture twice."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5687
+#: ../../../inc/users/model/_user.class.php:5689
 msgid "New picture has been uploaded."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:5697
+#: ../../../inc/users/model/_user.class.php:5699
 msgid "The file you uploaded does not seem to be an image."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6238
+#: ../../../inc/users/model/_user.class.php:6240
 #, php-format
 msgid "%s (%s%% are public)"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6295
+#: ../../../inc/users/model/_user.class.php:6297
 #, php-format
 msgid "%s has posted %s comments (%s%% of which are public). %s of these comments have been found useful by %s different users."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6296
+#: ../../../inc/users/model/_user.class.php:6298
 #, php-format
 msgid "%s has posted %s comments (%s%% of which are public).<br />%s voted useful by %s different users.<br />%s voted NOT useful by %s different users.<br />%s considered OK by %s different users.<br />%s considered SPAM by %s different users."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6414
+#: ../../../inc/users/model/_user.class.php:6416
 #, php-format
 msgid "%s has uploaded %s photos. %s of these photos have been liked by %s different users."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6415
+#: ../../../inc/users/model/_user.class.php:6417
 #, php-format
 msgid "%s has uploaded %s photos.<br />%s voted up (liked) by %s different users.<br />%s voted down by %s different users.<br />%s considered INAPPROPRIATE by %s different users.<br />%s considered SPAM by %s different users."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6416
+#: ../../../inc/users/model/_user.class.php:6418
 #, php-format
 msgid "%s has uploaded %s audio files."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6417
+#: ../../../inc/users/model/_user.class.php:6419
 #, php-format
 msgid "%s has uploaded %s video files."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6418
+#: ../../../inc/users/model/_user.class.php:6420
 #, php-format
 msgid "%s has uploaded %s other files."
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6532
+#: ../../../inc/users/model/_user.class.php:6534
 #, php-format
 msgid "%s has uploaded a total of %s"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6559
+#: ../../../inc/users/model/_user.class.php:6561
 #, php-format
 msgid "%s successfully reported %s spams and/or spammers!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6646
+#: ../../../inc/users/model/_user.class.php:6648
 #, php-format
 msgid "User #%s has no permission to edit user #%s!"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6680
-#: ../../../inc/users/model/_user.funcs.php:5585
+#: ../../../inc/users/model/_user.class.php:6682
+#: ../../../inc/users/model/_user.funcs.php:5603
 #: ../../../inc/users/views/_registration.form.php:162
 #: ../../../inc/users/views/_user_identity.form.php:475
 #: ../../../inc/users/views/_user_stats.view.php:325
 msgid "Gender"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6729
+#: ../../../inc/users/model/_user.class.php:6731
 msgid "User profile changed"
 msgstr ""
 
-#: ../../../inc/users/model/_user.class.php:6824
+#: ../../../inc/users/model/_user.class.php:6826
 #, php-format
 msgid "You are already a member of \"%s\"."
 msgstr ""
@@ -27502,7 +27493,7 @@ msgid "You have reported this user"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:2429
-#: ../../../inc/users/model/_user.funcs.php:6141
+#: ../../../inc/users/model/_user.funcs.php:6159
 msgid "Delete this user!"
 msgstr ""
 
@@ -27916,7 +27907,7 @@ msgid "Add user to organization"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:4666
-#: ../../../inc/users/model/_user.funcs.php:6169
+#: ../../../inc/users/model/_user.funcs.php:6187
 msgid "Edit membership"
 msgstr ""
 
@@ -28014,86 +28005,91 @@ msgstr ""
 msgid "Create a new group..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5383
+#: ../../../inc/users/model/_user.funcs.php:5389
+#, php-format
+msgid "Use this selection for newsletter \"%s\""
+msgstr ""
+
+#: ../../../inc/users/model/_user.funcs.php:5394
 msgid "Send newsletter to the current selection"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5468
+#: ../../../inc/users/model/_user.funcs.php:5486
 msgid "default group for new users"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5668
+#: ../../../inc/users/model/_user.funcs.php:5686
 msgid "View personal blogs"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5687
+#: ../../../inc/users/model/_user.funcs.php:5705
 msgid "Registered"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5699
+#: ../../../inc/users/model/_user.funcs.php:5717
 msgid "RC"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5700
+#: ../../../inc/users/model/_user.funcs.php:5718
 msgid "Registration country"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5711
+#: ../../../inc/users/model/_user.funcs.php:5729
 msgid "Profile update"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5723
+#: ../../../inc/users/model/_user.funcs.php:5741
 msgid "Last Visit"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5749
+#: ../../../inc/users/model/_user.funcs.php:5767
 msgid "Rep"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5761
+#: ../../../inc/users/model/_user.funcs.php:5779
 msgid "Primary<br />Group"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5772
+#: ../../../inc/users/model/_user.funcs.php:5790
 msgid "Sec.<br />Groups"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5854
+#: ../../../inc/users/model/_user.funcs.php:5872
 msgid "Last visit on your profile"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5883
+#: ../../../inc/users/model/_user.funcs.php:5901
 #: ../../../inc/users/views/_group.view.php:157
 #: ../../../inc/users/views/_userfields.view.php:156
 msgid "Edit this group..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5885
+#: ../../../inc/users/model/_user.funcs.php:5903
 #: ../../../inc/users/views/_group.view.php:159
 #: ../../../inc/users/views/_userfields.view.php:157
 msgid "Duplicate this group..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5997
+#: ../../../inc/users/model/_user.funcs.php:6015
 msgid "Private Message"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:6138
+#: ../../../inc/users/model/_user.funcs.php:6156
 msgid "Duplicate this user..."
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:6173
+#: ../../../inc/users/model/_user.funcs.php:6191
 msgid "Remove user from organization"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:6290
+#: ../../../inc/users/model/_user.funcs.php:6308
 #: ../../../inc/users/views/_user_admin.form.php:454
 #, php-format
 msgid "Add domain %s"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:6291
-#: ../../../inc/users/model/_user.funcs.php:6295
+#: ../../../inc/users/model/_user.funcs.php:6309
+#: ../../../inc/users/model/_user.funcs.php:6313
 msgid "Domain status"
 msgstr ""
 
@@ -29065,18 +29061,18 @@ msgstr ""
 
 #: ../../../inc/users/views/_registration.form.php:79
 #: ../../../inc/users/views/_user_subscriptions.form.php:176
-#: ../../../inc/users/views/_user_subscriptions.form.php:180
+#: ../../../inc/users/views/_user_subscriptions.form.php:181
 msgid "emails through a message form that will NOT reveal my email address."
 msgstr ""
 
 #: ../../../inc/users/views/_registration.form.php:81
-#: ../../../inc/users/views/_user_subscriptions.form.php:186
+#: ../../../inc/users/views/_user_subscriptions.form.php:187
 msgid "Other users can send me"
 msgstr ""
 
 #. TRANS: Here we imply "Notify me when:"
 #: ../../../inc/users/views/_registration.form.php:84
-#: ../../../inc/users/views/_user_subscriptions.form.php:404
+#: ../../../inc/users/views/_user_subscriptions.form.php:405
 msgid "I receive a private message."
 msgstr ""
 
@@ -29091,25 +29087,25 @@ msgstr ""
 
 #. TRANS: Here we imply "Notify me when:"
 #: ../../../inc/users/views/_registration.form.php:86
-#: ../../../inc/users/views/_user_subscriptions.form.php:409
+#: ../../../inc/users/views/_user_subscriptions.form.php:410
 msgid "a comment is published on one of <strong>my</strong> posts."
 msgstr ""
 
 #. TRANS: Here we imply "Notify me when:"
 #: ../../../inc/users/views/_registration.form.php:87
-#: ../../../inc/users/views/_user_subscriptions.form.php:414
+#: ../../../inc/users/views/_user_subscriptions.form.php:415
 msgid "a comment is posted and I have permissions to moderate it."
 msgstr ""
 
 #. TRANS: Here we imply "Notify me when:"
 #: ../../../inc/users/views/_registration.form.php:88
-#: ../../../inc/users/views/_user_subscriptions.form.php:415
+#: ../../../inc/users/views/_user_subscriptions.form.php:416
 msgid "a comment is modified and I have permissions to moderate it."
 msgstr ""
 
 #. TRANS: Here we imply "Notify me when:"
 #: ../../../inc/users/views/_registration.form.php:89
-#: ../../../inc/users/views/_user_subscriptions.form.php:416
+#: ../../../inc/users/views/_user_subscriptions.form.php:417
 msgid "a comment is reported as spam and I have permissions to moderate it."
 msgstr ""
 
@@ -29120,38 +29116,38 @@ msgstr ""
 
 #. TRANS: Here we imply "Notify me when:"
 #: ../../../inc/users/views/_registration.form.php:91
-#: ../../../inc/users/views/_user_subscriptions.form.php:428
+#: ../../../inc/users/views/_user_subscriptions.form.php:429
 msgid "a post is created and I have permissions to moderate it."
 msgstr ""
 
 #. TRANS: Here we imply "Notify me when:"
 #: ../../../inc/users/views/_registration.form.php:92
-#: ../../../inc/users/views/_user_subscriptions.form.php:429
+#: ../../../inc/users/views/_user_subscriptions.form.php:430
 msgid "a post is modified and I have permissions to moderate it."
 msgstr ""
 
 #: ../../../inc/users/views/_registration.form.php:94
-#: ../../../inc/users/views/_user_subscriptions.form.php:451
+#: ../../../inc/users/views/_user_subscriptions.form.php:452
 msgid "Notify me by email whenever"
 msgstr ""
 
 #: ../../../inc/users/views/_registration.form.php:97
-#: ../../../inc/users/views/_user_subscriptions.form.php:194
+#: ../../../inc/users/views/_user_subscriptions.form.php:195
 msgid "Each message contains an easy 1 click unsubscribe link."
 msgstr ""
 
 #: ../../../inc/users/views/_registration.form.php:97
-#: ../../../inc/users/views/_user_subscriptions.form.php:194
+#: ../../../inc/users/views/_user_subscriptions.form.php:195
 msgid "Send me news about this site."
 msgstr ""
 
 #: ../../../inc/users/views/_registration.form.php:98
-#: ../../../inc/users/views/_user_subscriptions.form.php:195
+#: ../../../inc/users/views/_user_subscriptions.form.php:196
 msgid "I want to receive ADs that may be relevant to my interests."
 msgstr ""
 
 #: ../../../inc/users/views/_registration.form.php:100
-#: ../../../inc/users/views/_user_subscriptions.form.php:197
+#: ../../../inc/users/views/_user_subscriptions.form.php:198
 msgid "Newsletter"
 msgstr ""
 
@@ -29161,13 +29157,13 @@ msgstr ""
 
 #: ../../../inc/users/views/_registration.form.php:102
 #: ../../../inc/users/views/_registration.form.php:103
-#: ../../../inc/users/views/_user_subscriptions.form.php:202
-#: ../../../inc/users/views/_user_subscriptions.form.php:457
+#: ../../../inc/users/views/_user_subscriptions.form.php:203
+#: ../../../inc/users/views/_user_subscriptions.form.php:458
 msgid "emails per day"
 msgstr ""
 
 #: ../../../inc/users/views/_registration.form.php:103
-#: ../../../inc/users/views/_user_subscriptions.form.php:202
+#: ../../../inc/users/views/_user_subscriptions.form.php:203
 msgid "Limit newsletters to"
 msgstr ""
 
@@ -30261,129 +30257,129 @@ msgstr ""
 msgid "You are the owner of %d collections. Visitors of these collections will <b>always</b> be able to contact you through a message form if needed (your email address will NOT be revealed)."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:191
+#: ../../../inc/users/views/_user_subscriptions.form.php:192
 msgid "Newsletter subscriptions"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:206
+#: ../../../inc/users/views/_user_subscriptions.form.php:207
 #, php-format
 msgid "Limit newsletters to %s emails per day"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:216
+#: ../../../inc/users/views/_user_subscriptions.form.php:217
 msgid "Collection subscriptions"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:261
+#: ../../../inc/users/views/_user_subscriptions.form.php:262
 msgid "Notify me of any new post in this collection"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:265
+#: ../../../inc/users/views/_user_subscriptions.form.php:266
 msgid "Notify me of any new comment in this collection"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:274
+#: ../../../inc/users/views/_user_subscriptions.form.php:275
 msgid "In order to subscribe to a new blog, go to the relevant blog and subscribe from there."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:287
+#: ../../../inc/users/views/_user_subscriptions.form.php:288
 msgid "Sorry, no blogs available to subscribe."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:295
+#: ../../../inc/users/views/_user_subscriptions.form.php:296
 msgid "Subscribe to"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:299
+#: ../../../inc/users/views/_user_subscriptions.form.php:300
 msgid "Also available"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:306
+#: ../../../inc/users/views/_user_subscriptions.form.php:307
 msgid "Subscribe to this collection"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:335
+#: ../../../inc/users/views/_user_subscriptions.form.php:336
 msgid "Individual post subscriptions"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:354
+#: ../../../inc/users/views/_user_subscriptions.form.php:355
 msgid "You are not subscribed to any updates on specific posts yet."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:361
+#: ../../../inc/users/views/_user_subscriptions.form.php:362
 msgid "You are subscribed to be notified of all new comments on the following posts"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:393
+#: ../../../inc/users/views/_user_subscriptions.form.php:394
 msgid "To subscribe to notifications on a specifc post, go to that post and click \"Notify me when someone comments\" at the end of the comment list."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:398
+#: ../../../inc/users/views/_user_subscriptions.form.php:399
 msgid "Receiving notifications"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:405
+#: ../../../inc/users/views/_user_subscriptions.form.php:406
 #, php-format
 msgid "I have unread private messages for more than %s."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:405
+#: ../../../inc/users/views/_user_subscriptions.form.php:406
 #, php-format
 msgid "This notification is sent only once every %s days."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:420
+#: ../../../inc/users/views/_user_subscriptions.form.php:421
 msgid "a meta comment is posted."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:424
+#: ../../../inc/users/views/_user_subscriptions.form.php:425
 #, php-format
 msgid "comments are awaiting moderation for more than %s."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:430
+#: ../../../inc/users/views/_user_subscriptions.form.php:431
 #, php-format
 msgid "posts are awaiting moderation for more than %s."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:431
+#: ../../../inc/users/views/_user_subscriptions.form.php:432
 msgid "there are stale posts and I have permission to moderate them."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:435
+#: ../../../inc/users/views/_user_subscriptions.form.php:436
 #, php-format
 msgid "my account was deactivated or is not activated for more than %s."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:439
+#: ../../../inc/users/views/_user_subscriptions.form.php:440
 msgid "a new user has registered."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:440
+#: ../../../inc/users/views/_user_subscriptions.form.php:441
 msgid "an account was activated."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:441
+#: ../../../inc/users/views/_user_subscriptions.form.php:442
 msgid "an account was closed."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:442
+#: ../../../inc/users/views/_user_subscriptions.form.php:443
 msgid "an account was reported."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:443
+#: ../../../inc/users/views/_user_subscriptions.form.php:444
 msgid "an account was changed."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:447
+#: ../../../inc/users/views/_user_subscriptions.form.php:448
 msgid "a scheduled task ends with an error or timeout."
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:457
+#: ../../../inc/users/views/_user_subscriptions.form.php:458
 msgid "Limit notifications to"
 msgstr ""
 
-#: ../../../inc/users/views/_user_subscriptions.form.php:461
+#: ../../../inc/users/views/_user_subscriptions.form.php:462
 #, php-format
 msgid "Limit notifications to %s emails per day"
 msgstr ""
@@ -30700,10 +30696,6 @@ msgstr ""
 #: ../../../inc/widgets/views/_widget_list_available.view.php:163
 #: ../../../inc/widgets/views/_widget_list_available.view.php:176
 msgid "Add this widget to the container"
-msgstr ""
-
-#: ../../../inc/widgets/widgets.ctrl.php:148
-msgid "You do not have permission to perform this action"
 msgstr ""
 
 #: ../../../inc/widgets/widgets.ctrl.php:188
@@ -32515,7 +32507,7 @@ msgstr ""
 #. TRANS: category name(s)
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:317
 #: ../../../skins/bootstrap_photoblog_skin/_catdir.disp.php:147
-#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:153
+#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:152
 msgid "in"
 msgstr ""
 
@@ -33406,19 +33398,19 @@ msgstr ""
 msgid "Linkblog"
 msgstr ""
 
-#: ../../../install/_functions_evoupgrade.php:8839
+#: ../../../install/_functions_evoupgrade.php:8905
 msgid "The database schema is up to date."
 msgstr ""
 
-#: ../../../install/_functions_evoupgrade.php:8880
+#: ../../../install/_functions_evoupgrade.php:8946
 msgid "Upgrade database"
 msgstr ""
 
-#: ../../../install/_functions_evoupgrade.php:8889
+#: ../../../install/_functions_evoupgrade.php:8955
 msgid "The version number is correct, but we have detected changes in the database schema. This can happen if you've been using development versions directly off GitHub..."
 msgstr ""
 
-#: ../../../install/_functions_evoupgrade.php:8903
+#: ../../../install/_functions_evoupgrade.php:8969
 msgid "Try to Repair/Upgrade database now!"
 msgstr ""
 
@@ -34728,94 +34720,6 @@ msgstr ""
 msgid "**bold** \\\\italics\\\\ //italics// __underline__ ##tt## %%codeblock%%"
 msgstr ""
 
-#: ../../../plugins/_google_maps.plugin.php:58
-#: ../../../plugins/_google_maps.plugin.php:230
-msgid "Google Maps plugin"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:59
-msgid "This plugin displays positions on a map."
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:77
-msgid "Map height on edit post page"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:82
-#: ../../../plugins/_google_maps.plugin.php:146
-msgid "Map default view "
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:84
-#: ../../../plugins/_google_maps.plugin.php:148
-msgid "Map"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:84
-#: ../../../plugins/_google_maps.plugin.php:148
-msgid "Satellite"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:106
-msgid "API key"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:109
-#, php-format
-msgid "Visit the <a %s>Google Maps API</a> documentation site for instructions on how to obtain an API key"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:130
-#: ../../../plugins/_google_maps.plugin.php:132
-msgid "Widget title"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:131
-msgid "Google maps Widget"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:136
-msgid "Map width on page"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:138
-msgid "100% width if left empty"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:141
-msgid "Map height on page"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:240
-#, php-format
-msgid "You must turn on the <b>\"Use coordinates\"</b> setting in Post Type settings <a %s>Settings</a> tab so the Google Maps plugin can save its coordinates."
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:249
-#, php-format
-msgid "You must specify a valid Google Maps API key in the Plugins settings <a %s>Collection Settings</a> tab to use the plugin."
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:352
-msgid "<b>Search for an address</b> (may be approximate)"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:353
-msgid "Locate on map"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:358
-msgid "Drag the pin to the exact location you want:"
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:1013
-msgid "Google Maps plugin sucessfully installed."
-msgstr ""
-
-#: ../../../plugins/_google_maps.plugin.php:1023
-msgid "Google Maps plugin sucessfully un-installed."
-msgstr ""
-
 #: ../../../plugins/_ping_b2evonet.plugin.php:51
 msgid "Ping b2evolution.net"
 msgstr ""
@@ -35560,6 +35464,98 @@ msgstr ""
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:1088
 #, php-format
 msgid "Count of users without profile country: %s"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:58
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:230
+msgid "Google Maps plugin"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:59
+msgid "This plugin displays positions on a map."
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:77
+msgid "Map height on edit post page"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:82
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:146
+msgid "Map default view "
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:84
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:148
+msgid "Map"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:84
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:148
+msgid "Satellite"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:106
+msgid "API key"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:109
+#, php-format
+msgid "Visit the <a %s>Google Maps API</a> documentation site for instructions on how to obtain an API key"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:130
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:132
+msgid "Widget title"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:131
+msgid "Google maps Widget"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:136
+msgid "Map width on page"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:138
+msgid "100% width if left empty"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:141
+msgid "Map height on page"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:240
+#, php-format
+msgid "You must turn on the <b>\"Use coordinates\"</b> setting in Post Type settings <a %s>Settings</a> tab so the Google Maps plugin can save its coordinates."
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:247
+#, php-format
+msgid "You must specify a valid Google Maps API key in the Plugins settings <a %s>Collection Settings</a> tab to use the plugin."
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:350
+msgid "<b>Search for an address</b> (may be approximate)"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:351
+msgid "Locate on map"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:356
+msgid "Drag the pin to the exact location you want:"
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:943
+msgid "Please configure an API key to see a live map."
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:1029
+msgid "Google Maps plugin sucessfully installed."
+msgstr ""
+
+#: ../../../plugins/google_maps_plugin/_google_maps.plugin.php:1039
+msgid "Google Maps plugin sucessfully un-installed."
 msgstr ""
 
 #: ../../../plugins/html5_mediaelementjs_plugin/_html5_mediaelementjs.plugin.php:186
@@ -36354,7 +36350,7 @@ msgstr ""
 #: ../../../skins/bootstrap_gallery_legacy/single.main.php:241
 #: ../../../skins/bootstrap_gallery_skin/single.main.php:238
 #: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:111
-#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:181
+#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:180
 #: ../../../skins/dating_mood/_item_block.inc.php:84
 #: ../../../skins/evopress/single.main.php:135
 #: ../../../skins/photoalbums/_item_block.inc.php:62
@@ -37208,14 +37204,14 @@ msgstr ""
 #: ../../../skins/bootstrap_gallery_skin/_catdir.disp.php:42
 #: ../../../skins/bootstrap_gallery_skin/_posts.disp.php:33
 #: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:62
-#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:113
+#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:112
 #: ../../../skins_fallback_v6/_item_block.inc.php:81
 msgid "Edit Intro"
 msgstr ""
 
 #: ../../../skins/bootstrap_forums_skin/_front.disp.php:112
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:96
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:451
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:417
 #: ../../../skins/pureforums_skin/_front.disp.php:58
 #: ../../../skins/pureforums_skin/_posts.disp.php:67
 #: ../../../skins/pureforums_skin/_skin.class.php:299
@@ -37267,27 +37263,27 @@ msgstr ""
 #. TRANS: Widget container name
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:219
 #: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:156
-#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:222
+#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:221
 #: ../../../skins_fallback_v6/_item_block.inc.php:176
 msgid "Item Page"
 msgstr ""
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:268
-#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:258
+#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:259
 #: ../../../skins/pureforums_skin/_item_block.inc.php:158
 #: ../../../skins/pureforums_skin/_item_comment.inc.php:136
 msgid "Back to top"
 msgstr ""
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:283
-#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:273
+#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:274
 #: ../../../skins/pureforums_skin/_item_block.inc.php:176
 #: ../../../skins/pureforums_skin/_item_comment.inc.php:158
 msgid "Quote"
 msgstr ""
 
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:283
-#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:273
+#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:274
 #: ../../../skins/pureforums_skin/_item_block.inc.php:176
 #: ../../../skins/pureforums_skin/_item_comment.inc.php:158
 msgid "Reply with quote"
@@ -37347,13 +37343,13 @@ msgstr ""
 msgid "Pingback"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:288
-#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:291
+#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:289
+#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:292
 #: ../../../skins/pureforums_skin/_item_comment.inc.php:186
 msgid "Edit this reply"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:300
+#: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:301
 #: ../../../skins/pureforums_skin/_item_comment.inc.php:195
 msgid "Delete this reply"
 msgstr ""
@@ -37377,7 +37373,7 @@ msgid "Sticky"
 msgstr ""
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:55
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:462
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:428
 #: ../../../skins/pureforums_skin/_item_list.inc.php:53
 #: ../../../skins/pureforums_skin/_skin.class.php:310
 msgid "This topic is locked: you cannot edit posts or make replies."
@@ -37420,12 +37416,12 @@ msgstr ""
 msgid "Locked topic"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:224
+#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:228
 #: ../../../skins/pureforums_skin/_posts.disp.php:199
 msgid "There is no topic in this forum yet."
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:239
+#: ../../../skins/bootstrap_forums_skin/_posts.disp.php:243
 msgid "You must activate your account before you can post a new topic."
 msgstr ""
 
@@ -37488,31 +37484,31 @@ msgstr ""
 msgid "Display Assignee (with Priority color coding) & Status"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:442
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:408
 #: ../../../skins/pureforums_skin/_edit.disp.php:54
 #: ../../../skins/pureforums_skin/index.main.php:196
 msgid "Post a new topic"
 msgstr ""
 
 #. TRANS: verb
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:467
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:433
 msgid "Reply"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:467
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:433
 #: ../../../skins/pureforums_skin/_skin.class.php:315
 msgid "Reply to topic"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:597
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:563
 msgid "New Topics"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:602
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:568
 msgid "Recent Topics"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:660
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:626
 #: ../../../skins/pureforums_skin/_item_comment.inc.php:164
 msgid "Is this reply helpful?"
 msgstr ""
@@ -37843,7 +37839,7 @@ msgid "Check this to show previous/next page links to navigate inside the <b>cur
 msgstr ""
 
 #: ../../../skins/bootstrap_photoblog_skin/_catdir.disp.php:133
-#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:139
+#: ../../../skins/bootstrap_photoblog_skin/_item_block.inc.php:138
 msgid "posted on "
 msgstr ""
 
@@ -39196,18 +39192,23 @@ msgstr ""
 msgid "I changed my mind, don't close my account."
 msgstr ""
 
-#: ../../../skins_fallback_v5/_contact_msg.form.php:106
-#: ../../../skins_fallback_v6/_contact_msg.form.php:106
+#: ../../../skins_fallback_v5/_contact_msg.form.php:81
+#: ../../../skins_fallback_v6/_contact_msg.form.php:81
+msgid "Reply to"
+msgstr ""
+
+#: ../../../skins_fallback_v5/_contact_msg.form.php:115
+#: ../../../skins_fallback_v6/_contact_msg.form.php:115
 msgid "Your name."
 msgstr ""
 
-#: ../../../skins_fallback_v5/_contact_msg.form.php:112
-#: ../../../skins_fallback_v6/_contact_msg.form.php:112
+#: ../../../skins_fallback_v5/_contact_msg.form.php:121
+#: ../../../skins_fallback_v6/_contact_msg.form.php:121
 msgid "Your email address. (Will <strong>not</strong> be displayed on this site.)"
 msgstr ""
 
-#: ../../../skins_fallback_v5/_contact_msg.form.php:156
-#: ../../../skins_fallback_v6/_contact_msg.form.php:156
+#: ../../../skins_fallback_v5/_contact_msg.form.php:165
+#: ../../../skins_fallback_v6/_contact_msg.form.php:165
 msgid "Plain text only."
 msgstr ""
 

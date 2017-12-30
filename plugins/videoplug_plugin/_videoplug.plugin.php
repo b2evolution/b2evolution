@@ -25,7 +25,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.9.4';
+	var $version = '6.9.5';
 	var $number_of_installs = 1;
 
 
@@ -102,7 +102,7 @@ class videoplug_plugin extends Plugin
 		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo|facebook):?[^\[\]]*\]/i' );
 
 		// Replace video tags with html code:
-		$content = replace_content_outcode( '#\[video:(youtube|dailymotion|vimeo|facebook|google|livevideo|ifilm):([^:]+?):?(\d+%?)?:?(\d+%?)?]#',
+		$content = replace_content_outcode( '#\[video:(youtube|dailymotion|vimeo|facebook|google|livevideo|ifilm):([^:\[\]\\\/]*|https?:\/\/.*\.facebook\.com\/[^:]*):?(\d+%?)?:?(\d+%?)?\]#',
 			array( $this, 'parse_video_tag_callback' ), $content, 'replace_content', 'preg_callback' );
 
 		return true;
@@ -137,7 +137,7 @@ class videoplug_plugin extends Plugin
 				break;
 
 			case 'facebook':
-				$video_block = '<iframe src="https://www.facebook.com/plugins/video.php?href='.$m[2].'" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>';
+				$video_block = '<iframe src="https://www.facebook.com/plugins/video.php?href='.urlencode( $m[2] ).'" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>';
 				break;
 
 			default: // google, livevideo, ifilm:
@@ -332,17 +332,17 @@ class videoplug_plugin extends Plugin
 						case 'youtube':
 							// Allow HD video code with ?hd=1 at the end
 							regexp_ID = /^[a-z0-9_?=-]+$/i;
-							regexp_URL = /^.+(video\/|\/watch\?v=|embed\/|\/)([a-z0-9_?=-]+)$/i;
+							regexp_URL = /^.+(video\/|\/watch\?v=|embed\/|\/)([a-z0-9_?=-]+)(&.+)?$/i;
 							break;
 
 						case 'dailymotion':
 							regexp_ID = /^[a-z0-9]+$/i;
-							regexp_URL = /^(.+\/video\/)?([a-z0-9]+)(_[a-z0-9_-]+)?$/i;
+							regexp_URL = /^(.+\/video\/)?([a-z0-9]+)(_[a-z0-9_-]+)?(\?.+)?$/i;
 							break;
 
 						case 'vimeo':
 							regexp_ID = /^\d+$/;
-							regexp_URL = /^(.+\/)?(\d+)$/;
+							regexp_URL = /^(.+\/)?(\d+)(\?.+)?$/;
 							break;
 
 						case 'facebook':

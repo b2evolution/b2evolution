@@ -1626,13 +1626,8 @@ class RestApi
 	{
 		global $current_User;
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'view' ) )
-		{	// Check permission: Current user must have at least view permission to see users login:
-			$this->halt( 'You are not allowed to view users.', 'no_access', 403 );
-			// Exit here.
-		}
-
 		$api_q = trim( urldecode( param( 'q', 'string', '' ) ) );
+		$api_status = param( 'status', 'string', '' );
 
 		/**
 		 * sam2kb> The code below decodes percent-encoded unicode string produced by Javascript "escape"
@@ -1656,15 +1651,30 @@ class RestApi
 			// Exit here.
 		}
 
+		$func_user_search_params = array( 'sql_limit' => 10 );
+		if( $api_status == 'all' )
+		{	// Get users with all statuses:
+			$func_user_search_params['sql_where'] = '';
+		}
+		elseif( ! empty( $api_status ) )
+		{	// Restrict users with requested statuses:
+			global $DB;
+			$func_user_search_params['sql_where'] = 'user_status IN ( '.$DB->quote( explode( ',', $api_status ) ).' )';
+		}
+
 		// Search users:
-		$users = $this->func_user_search( $api_q, array(
-				'sql_limit' => 10,
-			) );
+		$users = $this->func_user_search( $api_q, $func_user_search_params );
+
+		// Check if current user can see other users with ALL statuses:
+		$can_view_all_users = ( is_logged_in() && $current_User->check_perm( 'users', 'view' ) );
 
 		$user_logins = array();
 		foreach( $users as $User )
 		{
-			$user_logins[] = $User->get( 'login' );
+			if( $can_view_all_users || in_array( $User->get( 'status' ), array( 'activated', 'autoactivated' ) ) )
+			{	// Allow to see this user only if current User has a permission to see users with current status:
+				$user_logins[] = $User->get( 'login' );
+			}
 		}
 
 		// Send users logins array as response:
@@ -1683,7 +1693,7 @@ class RestApi
 		global $DB;
 
 		$params = array_merge( array(
-				'sql_where' => '( user_status = "activated" OR user_status = "autoactivated" )',
+				'sql_where' => 'user_status IN ( "activated", "autoactivated" )',
 				'sql_mask'  => '$login$%',
 				'sql_limit' => 0,
 			), $params );

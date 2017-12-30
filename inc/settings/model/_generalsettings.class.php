@@ -428,6 +428,9 @@ C message size exceeds',
 	 */
 	function set( $setting, $value )
 	{
+		// Limit value with max possible length:
+		$value = utf8_substr( $value, 0, 10000 );
+
 		return parent::setx( $setting, $value );
 	}
 

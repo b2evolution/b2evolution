@@ -34,7 +34,7 @@ class google_maps_plugin extends Plugin
 	var $name = 'Google Maps';
 	var $code = 'evo_Gmaps';
 	var $priority = 50;
-	var $version = '6.9.4';
+	var $version = '6.9.5';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -243,10 +243,8 @@ class google_maps_plugin extends Plugin
 		}
 
 		if( empty( $api_key ) )
-		{
-			$url = $admin_url.'?ctrl=coll_settings&tab=plugins&blog='.$Blog->ID.'&plugin_group=widget';
-
-			echo sprintf( T_('You must specify a valid Google Maps API key in the Plugins settings <a %s>Collection Settings</a> tab to use the plugin.'), 'href="'.$url.'"' );
+		{	// Display message if google API key is not defined:
+			echo sprintf( T_('You must specify a valid Google Maps API key in the Plugins settings <a %s>Collection Settings</a> tab to use the plugin.'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$Blog->ID.'&amp;plugin_group=widget"' );
 			$params['Form']->end_fieldset();
 			return;
 		}
@@ -920,13 +918,32 @@ function locate()
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
+		global $Collection, $Blog;
+
 		require_js( '#jquery#', 'blog' );
+
+		$api_key = $this->get_coll_setting( 'api_key', $Blog );
+		if( empty( $api_key ) )
+		{	// Load css to display map image with message to set google API key:
+			$this->require_css( 'css/style.css' );
+		}
 	}
 
 
 	function SkinTag( & $params )
 	{
-		global $Collection, $Blog, $Item;
+		global $Collection, $Blog, $Item, $admin_url;
+
+		$api_key = $this->get_coll_setting( 'api_key', $Blog );
+
+		if( empty( $api_key ) )
+		{	// Display message if google API key is not defined:
+			echo '<div class="evo_plugin__google_maps_no_key">'
+					.'<img src="'.$this->get_plugin_url().'/img/google_maps.jpg" />'
+					.'<div><div>'.T_('Please configure an API key to see a live map.').'</div></div>'
+				.'</div>';
+			return;
+		}
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
@@ -953,7 +970,6 @@ function locate()
 		$height = $this->display_param($this->get_widget_setting('height_front', $params));
 		$height = 'height:'.$height;
 
-		$api_key = $this->get_coll_setting( 'api_key', $Blog );
 		?>
 		<div class="map_title"><?php echo $this->get_widget_setting('map_title_coll'.$Blog->ID, $params); ?></div>
 		<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
