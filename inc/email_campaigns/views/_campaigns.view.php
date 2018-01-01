@@ -18,7 +18,7 @@ global $admin_url, $UserSettings;
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, enlt_ID, enlt_name, ecmp_email_title, ecmp_sent_ts' );
+$SQL->SELECT( 'SQL_NO_CACHE *' );
 $SQL->FROM( 'T_email__campaign' );
 $SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 
@@ -28,7 +28,7 @@ $count_SQL->FROM( 'T_email__campaign' );
 $count_SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 
 $Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
-
+$Results->Cache = & get_EmailCampaignCache();
 $Results->title = T_('Email campaigns').get_manual_link( 'email-campaigns' );
 
 if( $current_User->check_perm( 'emails', 'edit' ) )
@@ -68,12 +68,29 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Sent'),
+		'th' => T_('Sending'),
+		'order' => 'ecmp_auto_send',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'nowrap',
+		'td' => '%{Obj}->get_sending_title()%',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Sent manually'),
 		'order' => 'ecmp_sent_ts',
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'timestamp compact_data',
 		'td' => '%mysql2localedatetime_spans( #ecmp_sent_ts# )%',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Sent automatically'),
+		'order' => 'ecmp_auto_sent_ts',
+		'default_dir' => 'D',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'timestamp compact_data',
+		'td' => '%mysql2localedatetime_spans( #ecmp_auto_sent_ts# )%',
 	);
 
 $Results->cols[] = array(

@@ -165,7 +165,7 @@ class User extends DataObject
 	var $PasswordDriver;
 
 	/**
-	 * IDs of newsletters which this user is subscribed on
+	 * IDs of newsletters which this user is subscribed to
 	 * @var array
 	 */
 	var $newsletter_subscriptions;
@@ -7603,6 +7603,9 @@ class User extends DataObject
 			$r += $DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID, enls_subscribed, enls_subscribed_ts )
 				VALUES '.implode( ', ', $insert_newsletter_sql_values ),
 				'Subscribe(insert new subscriptions) user #'.$this->ID.' to newsletters #'.implode( ',', $insert_newsletter_IDs ) );
+
+			// Send emails of campaigns which must be sent at subscription:
+			$this->send_auto_subscriptions( $insert_newsletter_IDs );
 		}
 
 		if( count( $update_newsletter_IDs ) )
@@ -7654,6 +7657,38 @@ class User extends DataObject
 			  AND enls_enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )
 			  AND enls_subscribed = 1',
 			'Unsubscribe user #'.$this->ID.' from newsletters #'.implode( ',', $newsletter_IDs ) );
+	}
+
+
+	/**
+	 * Send emails of campaign which must be sent at subscription
+	 *
+	 * @param array Newsletters IDs
+	 */
+	function send_auto_subscriptions( $newsletter_IDs )
+	{
+		global $DB;
+
+		// Additional check to know what newsletter is really new, in order to exclude the updating subscritptions:
+		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'all' );
+		$new_subscriptions = array_diff( $newsletter_IDs, $newsletter_subscriptions );
+
+		if( count( $new_subscriptions ) )
+		{	// User is really subscribing to new newsletters:
+			$SQL = new SQL( 'Get email campaigns(of newsletters #'.implode( ',', $new_subscriptions ).') which must be sent at subscription' );
+			$SQL->SELECT( '*' );
+			$SQL->FROM( 'T_email__campaign' );
+			$SQL->WHERE( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' )' );
+			$SQL->WHERE_and( 'ecmp_auto_send = "subscription"' );
+			$EmailCampaignCache = & get_EmailCampaignCache();
+			$EmailCampaignCache->clear();
+			$EmailCampaignCache->load_by_sql( $SQL );
+
+			foreach( $EmailCampaignCache->cache as $EmailCampaign )
+			{	// Send an email of the campaign at subscription:
+				$EmailCampaign->send_all_emails( false, array( $this->ID ) );
+			}
+		}
 	}
 }
 
