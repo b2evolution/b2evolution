@@ -958,7 +958,7 @@ function create_default_countries( $table_name = 'T_regional__country', $set_pre
 		preg_match('#.*?-(.*)#', strtolower($current_locale),$result);
 
 		$DB->query( "UPDATE $table_name
-			SET ctry_preferred = 1, ctry_status = 'trusted'
+			SET ctry_preferred = 1
 			WHERE ctry_code = '".$DB->escape($result[1])."'" );
 	}
 	task_end();
