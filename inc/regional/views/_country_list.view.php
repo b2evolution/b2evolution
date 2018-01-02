@@ -43,7 +43,7 @@ if( ! empty( $status ) )
 	{
 		$SQL->WHERE_and( 'ctry_status IS NULL' );
 	}
-	else
+	elseif( $status != -1 )
 	{
 		$SQL->WHERE_and( 'ctry_status = '.$DB->quote( $status ) );
 	}
