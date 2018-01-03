@@ -3265,6 +3265,7 @@ function userfield_prepare( & $userfield )
 function callback_filter_userlist( & $Form )
 {
 	global $Settings, $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
+	global $registered_min, $registered_max;
 
 	$Form->hidden( 'filter', 'new' );
 
@@ -3284,11 +3285,7 @@ function callback_filter_userlist( & $Form )
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{ // Show "Reported users" filter only for users with edit user permission
 			$Form->checkbox( 'reported', get_param('reported'), T_('Reported users') );
-			$Form->checkbox( 'custom_sender_email', get_param('custom_sender_email'), T_('Users with custom sender address') );
-			$Form->checkbox( 'custom_sender_name', get_param('custom_sender_name'), T_('Users with custom sender name') );
 		}
-
-		$Form->select_input_array( 'account_status', get_param('account_status'), get_user_statuses( T_('All') ), T_('Account status') );
 
 		// Primary group:
 		$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_level DESC, grp_name ASC' );
@@ -3312,6 +3309,14 @@ function callback_filter_userlist( & $Form )
 		$Form->select_input_array( 'group2', get_param('group2'), $group_options_array,
 			sprintf( T_('<span %s>Secondary</span> Group'), 'class="label label-info"' ),
 			'', array( 'force_keys_as_values' => true ) );
+
+		$Form->select_input_array( 'account_status', get_param('account_status'), get_user_statuses( T_('All') ), T_('Account status') );
+
+		// Filter by registered date
+		$Form->begin_line( T_('Registered from'), 'registered_min' );
+		$Form->date_input( 'registered_min', $registered_min, '' );
+		$Form->date_input( 'registered_max', $registered_max, T_('to') );
+		$Form->end_line();
 	}
 
 	$location_filter_displayed = false;
@@ -3418,6 +3423,15 @@ function callback_filter_userlist( & $Form )
 		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
 
 		$Form->select( 'criteria_type[]', $type, 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
+	}
+
+	if( is_admin_page() )
+	{
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{
+			$Form->checkbox( 'custom_sender_email', get_param('custom_sender_email'), T_('Users with custom sender address') );
+			$Form->checkbox( 'custom_sender_name', get_param('custom_sender_name'), T_('Users with custom sender name') );
+		}
 	}
 
 	if( user_region_visible() )

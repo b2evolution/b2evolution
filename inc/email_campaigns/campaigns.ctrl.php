@@ -434,6 +434,11 @@ if( $action == 'edit' )
 		require_js( '#jquery#' );
 		require_js( 'jquery/jquery.sortable.min.js' );
 	}
+	elseif( $tab == 'recipient' )
+	{
+		// Initialize date picker
+		init_datepicker_js();
+	}
 }
 else
 { // List of campaigns

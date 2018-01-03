@@ -576,6 +576,11 @@ if( $display_mode != 'js' )
 	}
 }
 
+if( in_array( $action, array( 'iprange_edit' ) ) )
+{ // Initialize date picker
+	init_datepicker_js();
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 

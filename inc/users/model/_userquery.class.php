@@ -294,6 +294,35 @@ class UserQuery extends SQL
 
 
 	/**
+	 * Restrict to user registration date
+	 *
+	 * @param date Registration from date
+	 * @param date Registration to date
+	 */
+	function where_registered_date( $min_date = NULL, $max_date = NULL )
+	{
+		global $DB;
+
+		if( empty( $min_date ) && empty( $max_date ) )
+		{
+			return;
+		}
+
+		if( ! empty( $min_date ) )
+		{
+			$this->WHERE_and( 'DATE(user_created_datetime) >= '.$DB->quote( $min_date ) );
+		}
+
+		if( ! empty( $max_date ) )
+		{
+			$this->WHERE_and( 'DATE(user_created_datetime) <= '.$DB->quote( $max_date ) );
+		}
+
+		return;
+	}
+
+
+	/**
 	 * Restrict to reported users
 	 *
 	 * @param boolean is reported
