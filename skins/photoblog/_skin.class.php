@@ -21,7 +21,7 @@ class photoblog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.5';
+	var $version = '6.9.6';
 
  	/**
 	 * Get default name for the skin.

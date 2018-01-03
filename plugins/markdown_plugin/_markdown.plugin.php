@@ -22,7 +22,7 @@ class markdown_plugin extends Plugin
 	var $code = 'b2evMark';
 	var $name = 'Markdown';
 	var $priority = 20;
-	var $version = '6.9.5';
+	var $version = '6.9.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;

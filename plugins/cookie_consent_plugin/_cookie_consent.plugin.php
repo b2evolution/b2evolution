@@ -23,7 +23,7 @@ class cookie_consent_plugin extends Plugin
 	var $priority = 1;
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.9.5';
+	var $version = '6.9.6';
 	var $number_of_installs = 1;
 
 
