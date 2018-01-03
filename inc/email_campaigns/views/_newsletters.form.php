@@ -57,7 +57,13 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 $Form->end_form( $buttons );
 
 if( $edited_Newsletter->ID > 0 )
-{	// Display users which are subscribed to this Newsletter:
+{	// Display campaigns attached to this Newsletter:
+	campaign_results_block( array(
+			'enlt_ID'               => $edited_Newsletter->ID,
+			'display_create_button' => false
+		) );
+
+	// Display users which are subscribed to this Newsletter:
 	users_results_block( array(
 			'enlt_ID'              => $edited_Newsletter->ID,
 			'enls_subscribed'      => NULL,

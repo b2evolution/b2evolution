@@ -18,6 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $current_User->check_perm( 'emails', 'view', true );
 
 load_class( 'email_campaigns/model/_newsletter.class.php', 'Newsletter' );
+load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 
 param_action();
 
