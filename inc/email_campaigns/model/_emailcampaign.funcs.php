@@ -136,6 +136,28 @@ function get_campaign_tab_url( $current_tab, $campaign_ID, $type = 'current', $g
 
 
 /**
+ * Queue user to receive to email campaign
+ *
+ * @param integer Campaign ID
+ * @param integer User ID to queue
+ */
+function queue_campaign_user( $campaign_ID, $user_ID )
+{
+	global $DB;
+
+	if( empty( $campaign_ID ) || empty( $user_ID ) )
+	{
+		return;
+	}
+
+	$DB->query( 'UPDATE T_email__campaign_send
+			SET csnd_emlog_ID = NULL
+			WHERE csnd_camp_ID = '.$DB->quote( $campaign_ID ).'
+			AND csnd_user_ID = '.$DB->quote( $user_ID ) );
+}
+
+
+/**
  * Get EmailCampaign object from object which is used to select recipients
  *
  * @return object EmailCampaign

@@ -354,6 +354,15 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=crontab&action=view&cjob_ID='.$email_campaign_Cronjob->ID, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
+
+	case 'queue':
+		param( 'ecmp_ID', 'integer', NULL );
+		param( 'user_ID', 'integer', NULL );
+
+		queue_campaign_user( $ecmp_ID, $user_ID );
+		header_redirect( get_campaign_tab_url( 'recipient', $edited_EmailCampaign->ID ), 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 

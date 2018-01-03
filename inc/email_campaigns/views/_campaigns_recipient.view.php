@@ -46,6 +46,7 @@ users_results_block( array(
 		'display_level'        => false,
 		'display_status'       => false,
 		'display_actions'      => false,
+		'display_campaign_actions' => true,
 		'display_newsletter'   => false,
 		'display_enlt_status'  => true,
 		'display_emlog_date'   => true,

@@ -5481,6 +5481,7 @@ function users_results( & $UserList, $params = array() )
 			'display_enls_sent_manual'     => false,
 			'display_enls_send_count'      => false,
 			'display_actions'    => true,
+			'display_campaign_actions' => false,
 			'display_org_actions'=> false,
 			'th_class_avatar'    => 'shrinkwrap small',
 			'td_class_avatar'    => 'shrinkwrap center small',
@@ -5981,6 +5982,16 @@ function users_results( & $UserList, $params = array() )
 				);
 		}
 
+		if( $params['display_campaign_actions'] )
+		{
+			$UserList->cols[] = array(
+					'th' => T_('Actions'),
+					'th_class' => 'small',
+					'td_class' => 'shrinkwrap small',
+					'td' => '%user_td_campaign_actions( '.intval( $params['ecmp_ID'] ).', #user_ID#, #emlog_timestamp# )%'
+				);
+		}
+
 		if( $params['viewed_user'] )
 		{
 			$UserList->cols[] = array(
@@ -6310,6 +6321,35 @@ function user_td_org_actions( $org_ID, $user_ID )
 		$r .= get_icon( 'edit', 'noimg' );
 	}
 
+
+	return $r;
+}
+
+
+/**
+ * Get link to email campaign related actions
+ *
+ * @param integer Campaign ID
+ * @param integer User ID
+ * @param string Email log date
+ */
+function user_td_campaign_actions( $campaign_ID, $user_ID, $emlog_date )
+{
+	global $current_User, $admin_url;
+
+	$r = '';
+
+	if( $current_User->can_moderate_user( $user_ID ) )
+	{ // Current user can moderate this user
+		if( ! empty( $emlog_date ) && ! empty( $campaign_ID ) && ! empty( $user_ID ) )
+		{
+			$r .= action_icon( T_('Queue again'), 'email', $admin_url.'?ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign') );
+		}
+	}
+	else
+	{
+		$r .= get_icon( 'edit', 'noimg' );
+	}
 
 	return $r;
 }

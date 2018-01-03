@@ -457,7 +457,7 @@ class EmailCampaign extends DataObject
 			  FROM T_email__newsletter_subscription
 			 WHERE enls_enlt_ID = '.$this->get( 'enlt_ID' ).'
 				 AND enls_subscribed = 1
-			 ON DUPLICATE KEY UPDATE csnd_camp_ID = csnd_camp_id, csnd_user_ID = csnd_user_ID' );
+			 ON DUPLICATE KEY UPDATE csnd_camp_ID = csnd_camp_ID, csnd_user_ID = csnd_user_ID' );
 	}
 
 
