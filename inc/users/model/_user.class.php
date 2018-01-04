@@ -1230,18 +1230,25 @@ class User extends DataObject
 				{
 					// A selected blog to subscribe
 					$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
-					// Get checkbox values:
-					$sub_items    = param( 'sub_items_new',    'integer', 0 );
-					$sub_comments = param( 'sub_comments_new', 'integer', 0 );
+
+					$sub_items    = 1;
+					$sub_comments = 0; // We normally subscribe to new posts only
 
 					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
-					if( $subscribe_blog_ID && ( $sub_items || $sub_comments ) )
+					if( $subscribe_blog_ID )
 					{ // We need to record values:
 						$BlogCache = & get_BlogCache();
 						$subscribe_Blog = & $BlogCache->get_by_ID( $subscribe_blog_ID, false, false );
 
 						if( $subscribe_Blog->has_access( $this ) )
 						{ // user has access to the collection
+
+							// erhsatingin > it seems we do need to check if subscription is allowed, at least for new posts
+							if( ! $subscribe_Blog->get_setting( 'allow_subscriptions' ) )
+							{ // Subscription to new posts is not allowed so we subscribe to new comments instead
+								$sub_comments = 1;
+							}
+
 							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
 								VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
 
