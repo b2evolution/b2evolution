@@ -6357,7 +6357,7 @@ function user_td_campaign_actions( $campaign_ID, $user_ID, $emlog_date )
 	{ // Current user can moderate this user
 		if( ! empty( $emlog_date ) && ! empty( $campaign_ID ) && ! empty( $user_ID ) )
 		{
-			$r .= action_icon( T_('Queue again'), 'email', $admin_url.'?ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign') );
+			$r .= action_icon( T_('Queue again'), 'rewind', $admin_url.'?ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign') );
 		}
 	}
 	else

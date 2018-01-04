@@ -912,6 +912,13 @@ function get_icon_info( $name )
 			'glyph' => 'play',
 			'fa' => 'play'
 		);
+		case 'rewind': return array( // Used to resend email campaign ( rewind user back to previous state )
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'rewind',
+			'fa' => 'backward',
+		);
 
 		case 'feed': return array(
 			'alt'	 => T_('XML Feed'),
