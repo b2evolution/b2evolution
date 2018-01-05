@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE
  *
@@ -958,7 +958,7 @@ function create_default_countries( $table_name = 'T_regional__country', $set_pre
 		preg_match('#.*?-(.*)#', strtolower($current_locale),$result);
 
 		$DB->query( "UPDATE $table_name
-			SET ctry_preferred = 1, ctry_status = 'trusted'
+			SET ctry_preferred = 1
 			WHERE ctry_code = '".$DB->escape($result[1])."'" );
 	}
 	task_end();

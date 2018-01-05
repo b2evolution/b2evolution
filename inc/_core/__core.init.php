@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -1137,6 +1137,10 @@ class _core_Module extends Module
 				$entries['site']['entries']['system']['entries']['maintenance'] = array(
 						'text' => T_('Maintenance').'&hellip;',
 						'href' => $admin_url.'?ctrl=tools',
+					);
+				$entries['site']['entries']['system']['entries']['auto_upgrade'] = array(
+						'text' => T_('Auto-Upgrade').'&hellip;',
+						'href' => $admin_url.'?ctrl=upgrade',
 					);
 				$entries['site']['entries']['system']['entries']['syslog'] = array(
 						'text' => T_('System log'),
