@@ -440,7 +440,7 @@ elseif( $confirmed )
 
 					if( ! $edited_User->subscribe( $newsletter_ID ) )
 					{	// Display a message is the user is not subscribed on the requested newsletter:
-						$error_msg = T_('You are not subscribed to this newsletter.');
+						$error_msg = T_('You are already subscribed to this newsletter.');
 					}
 					break;
 
@@ -554,12 +554,12 @@ switch( $type )
 
 	case 'creator':
 		// unsubscribe from the user own posts
-		$type_str = T_("Notifications on user's own post");
+		$type_str = T_("Notifications on new comments in your posts");
 		break;
 
 	case 'cmt_moderation_reminder':
 		// unsubscribe from comment moderation reminder notifications
-		$type_str = T_('Comment moderation reminders');
+		$type_str = T_('Reminders on comments awaiting moderation for more than 1 day');
 		break;
 
 	case 'comment_moderator':
@@ -575,17 +575,17 @@ switch( $type )
 
 	case 'comment_moderator_spam':
 		// unsubscribe from spam comment may need moderation notifications:
-		$type_str = T_('Notifications on Spam comment that need moderation');
+		$type_str = T_('Notifications on reported spam comment that need moderation');
 		break;
 
 	case 'pst_moderation_reminder':
 		// unsubscribe from post moderation reminder notifications
-		$type_str = T_('Post moderation reminders');
+		$type_str = T_('Reminders on posts awaiting moderation for more than 1 day');
 		break;
 
 	case 'pst_stale_alert':
 		// unsubscribe from stale posts alert notifications:
-		$type_str = T_('Stale posts alert notifications');
+		$type_str = T_('Reminders on stale posts that need moderation');
 		break;
 
 	case 'post_moderator':
@@ -600,12 +600,12 @@ switch( $type )
 
 	case 'unread_msg':
 		// unsubscribe from unread messages reminder
-		$type_str = T_('Unread messages reminders');
+		$type_str = T_('Unread private messages reminders');
 		break;
 
 	case 'new_msg':
 		// unsubscribe from new messages notification
-		$type_str = T_('New messages notifications');
+		$type_str = T_('New private messages notifications');
 		break;
 
 	case 'account_activation':
@@ -657,7 +657,7 @@ switch( $type )
 
 	case 'cronjob_error':
 		// unsubscribe from cron job error notifications
-		$type_str = T_('Cron job error notifications');
+		$type_str = T_('Notification on scheduled tasks that failed or timed out');
 		break;
 
 	case 'meta_comment':
@@ -789,7 +789,7 @@ else
 	echo '<h2 class="user_title text-center">'.$avatar_tag.' '.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).'</h2>';
 
 	echo '<p class="text-center">'.( isset( $unsubscribed ) ? T_('has been unsubscribed from') :  T_('from these emails').':' ).'</p>';
-	echo '<p class="text-center"><span>'.$type_str.'</span></p>';
+	echo '<p class="text-center"><strong>'.$type_str.'</strong></p>';
 
 	// Submit button:
 	if( isset( $unsubscribed ) )
