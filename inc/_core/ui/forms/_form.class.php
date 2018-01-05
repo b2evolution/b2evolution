@@ -3366,7 +3366,7 @@ class Form extends Widget
 	 */
 	function add_crumb( $crumb_name )
 	{
-		$this->hidden( 'crumb_'.$crumb_name, get_crumb($crumb_name) );
+		$this->hidden( 'crumb_'.$crumb_name, get_crumb( $crumb_name ) );
 	}
 
 
