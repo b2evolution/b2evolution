@@ -772,24 +772,36 @@ else
 		$Form->hidden( 'newletter', $newsletter_ID );
 	}
 
-	if( isset( $resubscribed ) )
-	{
-		echo '<p class="text-center">';
-		echo T_('You have re-subscribed');
-		echo '</p>';
-	}
-	elseif( ! isset( $unsubscribed ) )
+	if( ! isset( $unsubscribed ) && ! isset( $resubscribed ) )
 	{
 		echo '<p class="text-center">';
 		echo T_('You are about to unsubscribe');
 		echo '</p>';
 	}
 
-	$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-top-64x64', '', '', true );
+	$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-top-64x64', 'img-circle', '', true );
 	echo '<h2 class="user_title text-center">'.$avatar_tag.' '.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).'</h2>';
 
-	echo '<p class="text-center">'.( isset( $unsubscribed ) ? T_('has been unsubscribed from') :  T_('from these emails').':' ).'</p>';
+	echo '<p class="text-center">';
+	if( isset( $unsubscribed ) )
+	{
+		echo T_('has been unsubscribed from');
+	}
+	elseif( isset( $resubscribed ) )
+	{
+		echo T_('has been re-subscribed to');
+	}
+	else
+	{
+		echo T_('from these emails').':';
+	}
 	echo '<p class="text-center"><strong>'.$type_str.'</strong></p>';
+
+	echo '<div style="margin-top: 2em;">';
+	if( isset( $unsubscribed ) || isset( $resubscribed ) )
+	{
+		echo '<p class="text-center">'.T_('If this is a mistake you can click below').':</p>';
+	}
 
 	// Submit button:
 	if( isset( $unsubscribed ) )
@@ -804,8 +816,8 @@ else
 		$Form->hidden( 'action', 'unsubscribe' );
 		$submit_button = array( array( 'name' => 'unsubscribe', 'value' => T_('Unsubscribe!'), 'class' => 'search btn-danger btn-lg' ) );
 	}
-
 	$Form->buttons_input( $submit_button );
+	echo '</div>';
 }
 $Form->end_form();
 
