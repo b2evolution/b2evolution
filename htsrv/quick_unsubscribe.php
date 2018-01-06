@@ -782,13 +782,14 @@ else
 	$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-top-64x64', 'img-circle', '', true );
 	echo '<h2 class="user_title text-center">'.$avatar_tag.' '.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).'</h2>';
 
-	echo '<p class="text-center">';
 	if( isset( $unsubscribed ) )
 	{
+		echo '<p class="text-center text-danger">';
 		echo T_('has been unsubscribed from');
 	}
 	elseif( isset( $resubscribed ) )
 	{
+		echo '<p class="text-center text-success">';
 		echo T_('has been re-subscribed to');
 	}
 	else
