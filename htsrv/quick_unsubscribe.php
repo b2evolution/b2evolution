@@ -794,8 +794,10 @@ else
 	}
 	else
 	{
+		echo '<p class="text-center">';
 		echo T_('from these emails').':';
 	}
+	echo '</p>';
 	echo '<p class="text-center"><strong>'.$type_str.'</strong></p>';
 
 	echo '<div style="margin-top: 2em;">';
