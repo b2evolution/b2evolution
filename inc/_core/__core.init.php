@@ -1139,7 +1139,7 @@ class _core_Module extends Module
 						'href' => $admin_url.'?ctrl=tools',
 					);
 				$entries['site']['entries']['system']['entries']['auto_upgrade'] = array(
-						'text' => T_('Auto-Upgrade').'&hellip;',
+						'text' => T_('Auto Upgrade').'&hellip;',
 						'href' => $admin_url.'?ctrl=upgrade',
 					);
 				$entries['site']['entries']['system']['entries']['syslog'] = array(
