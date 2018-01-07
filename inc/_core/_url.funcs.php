@@ -615,7 +615,7 @@ function url_crumb( $crumb_name )
  * @param string crumb_name
  * @return string
  */
-function get_crumb($crumb_name)
+function get_crumb( $crumb_name )
 {
 	global $Session;
 	return isset( $Session ) ? $Session->create_crumb( $crumb_name ) : '';
