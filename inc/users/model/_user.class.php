@@ -663,7 +663,7 @@ class User extends DataObject
 			$age_min = param( 'edited_user_age_min', 'string', ! $is_api_request ? true : NULL );
 			$age_max = param( 'edited_user_age_max', 'string', ! $is_api_request ? true : NULL );
 
-			if( isset( $age_min ) && isset( $age_max ) )
+			if( isset( $age_min ) && isset( $age_max ) || $is_identity_form )
 			{
 				param_check_interval( 'edited_user_age_min', 'edited_user_age_max', T_('Age must be a number.'), T_('The first age must be lower than (or equal to) the second.') );
 				if( !param_has_error( 'edited_user_age_min' ) && $Settings->get( 'minimum_age' ) > 0 &&
@@ -679,7 +679,7 @@ class User extends DataObject
 			if( ( in_array( $firstname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $can_edit_users ) )
 			{	// User has a permissions to save Firstname
 				$edited_user_firstname = param( 'edited_user_firstname', 'string', ! $is_api_request || $firstname_editing == 'edited-user-required' ? true : NULL );
-				if( isset( $edited_user_firstname ) )
+				if( isset( $edited_user_firstname ) || $is_identity_form )
 				{
 					if( $firstname_editing == 'edited-user-required' )
 					{	// First name is required
@@ -693,7 +693,7 @@ class User extends DataObject
 			if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $can_edit_users ) )
 			{	// User has a permissions to save Lastname
 				$edited_user_lastname = param( 'edited_user_lastname', 'string', ! $is_api_request || $lastname_editing == 'edited-user-required' ? true : NULL );
-				if( isset( $edited_user_lastname ) )
+				if( isset( $edited_user_lastname ) || $is_identity_form )
 				{
 					if( $lastname_editing == 'edited-user-required' )
 					{	// Last name is required
@@ -707,7 +707,7 @@ class User extends DataObject
 			if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $can_edit_users ) )
 			{	// User has a permissions to save Nickname
 				$edited_user_nickname = param( 'edited_user_nickname', 'string', ! $is_api_request || $nickname_editing == 'edited-user-required' ? true : NULL );
-				if( isset( $edited_user_nickname ) )
+				if( isset( $edited_user_nickname ) || $is_identity_form )
 				{
 					if( $nickname_editing == 'edited-user-required' )
 					{	// Nickname is required
@@ -721,7 +721,7 @@ class User extends DataObject
 			if( $this->ID == $current_User->ID || ( $gender_editing != 'hidden' && $can_edit_users ) )
 			{
 				$edited_user_gender = param( 'edited_user_gender', 'string' );
-				if( isset( $edited_user_gender ) )
+				if( isset( $edited_user_gender ) || $is_identity_form )
 				{
 					param_check_gender( 'edited_user_gender', $gender_editing == 'required' );
 					$this->set_from_Request('gender', 'edited_user_gender', true);
@@ -734,8 +734,8 @@ class User extends DataObject
 			if( user_country_visible() )
 			{ // Save country
 				$country_is_required = ( $Settings->get( 'location_country' ) == 'required' && countries_exist() );
-				$edited_user_ctry_ID = param( 'edited_user_ctry_ID', 'integer', ! $is_api_request || $country_is_required ? true : NULL);
-				if( isset( $edited_user_ctry_ID ) )
+				$edited_user_ctry_ID = param( 'edited_user_ctry_ID', 'integer', ! $is_api_request || $country_is_required ? true : NULL );
+				if( isset( $edited_user_ctry_ID ) || $is_identity_form )
 				{
 					if( $country_is_required && $can_edit_users && $edited_user_ctry_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -753,7 +753,7 @@ class User extends DataObject
 			{ // Save region
 				$region_is_required = ( $Settings->get( 'location_region' ) == 'required' && regions_exist( $edited_user_ctry_ID ) );
 				$edited_user_rgn_ID = param( 'edited_user_rgn_ID', 'integer', ! $is_api_request || $region_is_required ? true : NULL );
-				if( isset( $edited_user_rgn_ID ) )
+				if( isset( $edited_user_rgn_ID ) || $is_identity_form  )
 				{
 					if( $region_is_required && $can_edit_users && $edited_user_rgn_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -771,7 +771,7 @@ class User extends DataObject
 			{ // Save subregion
 				$subregion_is_required = ( $Settings->get( 'location_subregion' ) == 'required' && subregions_exist( $edited_user_rgn_ID ) );
 				$edited_user_subrg_ID = param( 'edited_user_subrg_ID', 'integer', ! $is_api_request || $subregion_is_required ? true : NULL );
-				if( isset( $edited_user_subrg_ID ) )
+				if( isset( $edited_user_subrg_ID ) || $is_identity_form  )
 				{
 					if( $subregion_is_required && $can_edit_users && $edited_user_subrg_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -789,7 +789,7 @@ class User extends DataObject
 			{ // Save city
 				$city_is_required = ( $Settings->get( 'location_city' ) == 'required' && cities_exist( $edited_user_ctry_ID, $edited_user_rgn_ID, $edited_user_subrg_ID ) );
 				$edited_user_city_ID = param( 'edited_user_city_ID', 'integer', ! $is_api_request || $city_is_required ? true : NULL );
-				if( isset( $edited_user_city_ID ) )
+				if( isset( $edited_user_city_ID ) || $is_identity_form )
 				{
 					if( $city_is_required && $can_edit_users && $edited_user_city_ID == 0 )
 					{ // Display a note message if user can edit all users
