@@ -505,6 +505,7 @@ elseif( $confirmed )
 	}
 }
 
+$notification_prefix = T_( 'Notify me by email whenever' );
 switch( $type )
 {
 	case 'coll_comment':
@@ -518,7 +519,7 @@ switch( $type )
 			$BlogCache = & get_BlogCache();
 			$Blog = $BlogCache->get_by_ID( $coll_ID );
 
-			$type_str = sprintf( /* TRANS: %s gets replaced with collection name */ T_("Notifications on new comments in '%s' collection"), $Blog->get_shortname() );
+			$type_str = T_('Notify me of any new comment in this collection').':<br /><a href="'.$Blog->get( 'url' ).'">'.$Blog->get_shortname().'</a>';
 		}
 		break;
 
@@ -533,7 +534,7 @@ switch( $type )
 			$BlogCache = & get_BlogCache();
 			$Blog = $BlogCache->get_by_ID( $coll_ID );
 
-			$type_str = sprintf( /* TRANS: %s gets replaced with collection name */ T_("Notifications on new posts in '%s' collection"), $Blog->get_shortname() );
+			$type_str = T_('Notify me of any new post in this collection').':<br/><a href="'.$Blog->get( 'url' ).'">'.$Blog->get_shortname().'</a>';
 		}
 		break;
 
@@ -548,69 +549,73 @@ switch( $type )
 			$ItemCache = & get_ItemCache();
 			$Item = $ItemCache->get_by_ID( $post_ID );
 
-			$type_str = sprintf( /* TRANS: %s gets replaced with post title */ T_("Update notifications on '%s' post"), $Item->get_title() );
+			$type_str = T_('Notify me by email when someone comments here.').'<br/>'.$Item->get_title();
 		}
 		break;
 
 	case 'creator':
 		// unsubscribe from the user own posts
-		$type_str = T_("Notifications on new comments in your posts");
+		$type_str = $notification_prefix.': '.T_('a comment is published on one of <strong>my</strong> posts.');
 		break;
 
 	case 'cmt_moderation_reminder':
 		// unsubscribe from comment moderation reminder notifications
-		$type_str = T_('Reminders on comments awaiting moderation for more than 1 day');
+		global $comment_moderation_reminder_threshold;
+		$type_str = $notification_prefix.': '.sprintf( T_('comments are awaiting moderation for more than %s.'), seconds_to_period( $comment_moderation_reminder_threshold ) );
 		break;
 
 	case 'comment_moderator':
 	case 'moderator': // Note: This was not chaned to 'comment_moderator' to make sure old emails unsubscribe link are also work
 		// unsubscribe from new comment may need moderation notifications:
-		$type_str = T_('Notifications on new comments that need moderation');
+		$type_str = $notification_prefix.': '.T_('a comment is posted and I have permissions to moderate it.');
 		break;
 
 	case 'comment_moderator_edit':
 		// unsubscribe from updated comment may need moderation notifications:
-		$type_str = T_('Notifications on updated comments that need moderation');
+		$type_str = $notification_prefix.': '.T_('a comment is modified and I have permissions to moderate it.');
 		break;
 
 	case 'comment_moderator_spam':
 		// unsubscribe from spam comment may need moderation notifications:
-		$type_str = T_('Notifications on reported spam comment that need moderation');
+		$type_str = $notification_prefix.': '.T_('a comment is reported as spam and I have permissions to moderate it.');
 		break;
 
 	case 'pst_moderation_reminder':
 		// unsubscribe from post moderation reminder notifications
-		$type_str = T_('Reminders on posts awaiting moderation for more than 1 day');
+		global $post_moderation_reminder_threshold;
+		$type_str = $notification_prefix.': '.sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $post_moderation_reminder_threshold ) );
 		break;
 
 	case 'pst_stale_alert':
 		// unsubscribe from stale posts alert notifications:
-		$type_str = T_('Reminders on stale posts that need moderation');
+		$type_str = $notification_prefix.': '.T_('there are stale posts and I have permission to moderate them.');
 		break;
 
 	case 'post_moderator':
 		// unsubscribe from new post moderation notifications:
-		$type_str = T_('New post moderation notifications');
+		$type_str = $notification_prefix.': '.T_('a post is created and I have permissions to moderate it.');
 		break;
 
 	case 'post_moderator_edit':
 		// unsubscribe from updated post moderation notifications:
-		$type_str = T_('Updated post moderation notifications');
+		$type_str = $notification_prefix.': '.T_('a post is modified and I have permissions to moderate it.');
 		break;
 
 	case 'unread_msg':
 		// unsubscribe from unread messages reminder
-		$type_str = T_('Unread private messages reminders');
+		global $unread_messsage_reminder_threshold;
+		$type_str = $notification_prefix.': '.sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $unread_messsage_reminder_threshold ) );
 		break;
 
 	case 'new_msg':
 		// unsubscribe from new messages notification
-		$type_str = T_('New private messages notifications');
+		$type_str = $notification_prefix.': '.T_('I receive a private message.');
 		break;
 
 	case 'account_activation':
 		// unsubscribe from account activation reminder
-		$type_str = T_('Account activation reminders');
+		global $activate_account_reminder_threshold;
+		$type_str = $notification_prefix.': '.sprintf( T_('my account was deactivated or is not activated for more than %s.'), seconds_to_period( $activate_account_reminder_threshold ) );
 		break;
 
 	case 'newsletter':
@@ -627,42 +632,42 @@ switch( $type )
 
 	case 'user_registration':
 		// unsubscribe from new user registration notifications
-		$type_str = T_('New user registration notifications');
+		$type_str = $notification_prefix.': '.T_( 'a new user has registered.' );
 		break;
 
 	case 'account_activated':
 		// unsubscribe from account activated notifications
-		$type_str = T_('Account activated notifications');
+		$type_str = $notification_prefix.': '.T_( 'an account was activated.' );
 		break;
 
 	case 'account_closed':
 		// unsubscribe from account closed notifications
-		$type_str = T_('Account closed notifications');
+		$type_str = $notification_prefix.': '.T_( 'an account was closed.' );
 		break;
 
 	case 'account_reported':
 		// unsubscribe from account reported notifications
-		$type_str = T_('Account reported notifications');
+		$type_str = $notification_prefix.': '.T_( 'an account was reported.' );
 		break;
 
 	case 'account_changed':
 		// unsubscribe from account changed notifications
-		$type_str = T_('Account changed notifications');
+		$type_str = $notification_prefix.': '.T_( 'an account was changed.' );
 		break;
 
 	case 'msgform':
 		// turn off allow emails through b2evo message forms
-		$type_str = T_('Emails through b2evo message forms');
+		$type_str = T_( 'emails through a message form that will NOT reveal my email address.' );
 		break;
 
 	case 'cronjob_error':
 		// unsubscribe from cron job error notifications
-		$type_str = T_('Notification on scheduled tasks that failed or timed out');
+		$type_str = $notification_prefix.': '.T_( 'a scheduled task ends with an error or timeout.' );
 		break;
 
 	case 'meta_comment':
 		// unsubscribe from meta comment notifications
-		$type_str = T_('Meta comment notifications');
+		$type_str = $notification_prefix.': '.T_('a meta comment is posted.');
 		break;
 
 	default:
@@ -769,7 +774,7 @@ else
 
 	if( $type == 'newsletter' && ! empty( $newsletter_ID ) )
 	{
-		$Form->hidden( 'newletter', $newsletter_ID );
+		$Form->hidden( 'newsletter', $newsletter_ID );
 	}
 
 	if( ! isset( $unsubscribed ) && ! isset( $resubscribed ) )
