@@ -369,29 +369,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$has_array_type = true;
 			$has_color_field = false;
 			
-			if( substr_count( $parname, '[' ) % 2 )
-			{ // this refers to a specific array type set (with index pos at the end), e.g. when adding a field through AJAX:
-				$pos_last_bracket = strrpos($parname, '[');
-				$k_nb = substr( $parname, $pos_last_bracket+1, -1 );
-				$disp_arrays = array( '' => $set_value ); // empty key..
-				$parname = substr($parname, 0, $pos_last_bracket);
+			echo '<div id="'.$parname.'_add_new">';
+
+			if( ! empty($params['note']) )
+			{
+				echo '<p class="notes">'.$params['note'].'</p>';
 			}
-			else
-			{ // display all values hold in this set:
-				$disp_whole_set = true;
-				$disp_arrays = $set_value;
-				
-				echo '<div id="'.$parname.'_add_new">';
-			
-				if( ! empty($params['note']) )
-				{
-					echo '<p class="notes">'.$params['note'].'</p>';
-				}
-				
-				echo '</div>';
-				
-				$k_nb = 0;
-			}
+
+			echo '</div>';
 			
 			// check if a color field is among the entries
 			foreach( $parmeta['entries'] as $entry )
@@ -419,11 +404,15 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				}
 			}
 			
-			
 			if( ! isset( $parmeta['entries'] ) ) break;
 			
 			$options = array();
 			$field_options = '';
+			
+			if( isset( $parmeta['defaultvalue'] ) && $parmeta['defaultvalue'] == '' || !  isset( $parmeta['defaultvalue'] ) )
+			{
+				$options[''] = T_('~ Please Select ~'); // add a call to action when no default value is selected
+			}
 			
 			foreach( $parmeta['entries'] as $entry )
 			{
@@ -433,7 +422,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					$label = T_('Disabled');
 					
 					// integer | html_textarea | textarea | text | checkbox | checklist | radio | fileselect | password | color
-					
 					switch( $entry['type'] )
 					{
 						case 'integer':
@@ -487,174 +475,134 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 			}
 			
+			$selected = ' selected="selected"';
+			
 			foreach( $options as $type => $label )
 			{
 				$field_options .= '<option';
 
 				if( isset( $parmeta['defaultvalue'] ) && $parmeta['defaultvalue'] == $type )
 				{
-					$field_options .= ' selected="selected"';
+					$field_options .= $selected;
 				}
 
 				$field_options .= ' value="'.$type.'">'.$label.'</option>';
 			}
 			
 			$field_label =  T_('Add a field of type');
-			
 			$field_name = $parmeta['label'];
 			$button_add_field = '';
-			
 			$user_ID = $set_type == 'UserSettings' ? $set_target->ID : '';
 			
-			if( is_array( $set_value ) && ! empty($set_value) )
-			{ // Display value of the setting. It may be empty, if there's no set yet.
-				foreach( $disp_arrays as $k => $v )
-				{
- 					$fieldset_params = array(
- 							'class' => 'bordered',
- 							// Unique ID of fieldset(Also used to store a folding state in user settings or in user per collection settings):
- 							'id'    => isset( $parmeta['id'] ) ? $parmeta['id'] : $parname.'_'.$k_nb,
- 						); 		
-					
-					$remove_action = '';
-					if( ! isset($parmeta['min_count']) || count($set_value) > $parmeta['min_count'] )
-					{ // provide icon to remove this set
-						$remove_action = '<span class="">'.action_icon(
+			if( isset( $parmeta['max_number'] ) && $parmeta['max_number'] )
+			{ // no max_number defined or not reached: display link to add a new set
+				$max_number = $parmeta['max_number'];
+			}
+			else
+			{
+				$max_number = 0; // Set 0 as infinite
+			}
+			
+			$limit = ( $max_number > 0 ) ? "if( $.isNumeric($max_number) && $max_number !== 0 && $max_number >= idx ) return false;" : "";
+			
+			global $Blog;
+
+			$set_path = $parname.'[0]';
+			
+			$remove_action = action_icon(
 								T_('Remove'),
 								'minus',
-								regenerate_url( 'action', array('action=del_settings_set&amp;set_path='.$parname.'['.$k.']'.( $set_type == 'UserSettings' ? '&amp;user_ID='.$user_ID : '' ), 'plugin_ID='.$Obj->ID) ),
+								regenerate_url( 'action', array('action=del_settings_set1&amp;set_path='.$parname.'['.$k.']'.( $set_type == 'UserSettings' ? '&amp;user_ID='.$user_ID : '' ), 'plugin_ID='.$Obj->ID) ),
 								T_('Remove'),
-								5, 3, /* icon/text prio */
-								// attach onclick event to remove the whole fieldset:
-								array(
-									'onclick' => "
-										var element_id = '".$fieldset_params['id']."';
-										element_id = '#'+element_id.replace(/(\[|\])/g, &quot;\\\\$1&quot;);
-										jQuery(element_id).remove();
-										return false;",
-									)
-								).'</span>';
-					}
-					
+								5, 3, 
+								array( 'onclick' => "var element_id = \'#ID#\';element_id = element_id.replace(/(\[|\])/g, &quot;\\\\$1&quot;);jQuery(element_id).remove();return false;")
+								
+								);
+			
+			$remove_action = format_to_output($remove_action, 'htmlspecialchars');
+			
+			$button_add_field .= action_icon(
+				sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
+				'add',
+				regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param('user_ID') : '' ), 'plugin_ID='.$Obj->ID) ),
+				T_(' Add'),
+				5, 3, /* icon/text prio */
+				// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
+				array('onclick'=>"
 
-					if( isset($parmeta['key']) )
-					{ // KEY FOR THIS ENTRY:
-						if( ! strlen($k) && isset($parmeta['key']['defaultvalue']) )
-						{ // key is not given/set and we have a default:
-							$l_value = $parmeta['key']['defaultvalue'];
+					var oThis = this, idx = $('#".$parname."_add_new').children('.form-group').length;
+
+					$limit
+
+					var field_id = jQuery('#$parname option:selected').val();
+
+					if( field_id == '' )
+					{	// Mark select element of field types as error
+						field_type_error( '".TS_('Please select a field type.')."' );
+						// We should stop the ajax request without field_id
+						return false;
+					}
+					else
+					{	// Remove an error class from the field
+						field_type_error_clear();
+					}
+
+					function field_type_error( message )
+					{	// Add an error message for the 'field of type' select
+						jQuery( '#$parname' ).addClass( 'field_error' );
+						var span_error = jQuery( '#$parname' ).siblings( 'span.field_error' );
+						if( span_error.length > 0 )
+						{	// Replace a content of the existing span element
+							span_error.html( message );
 						}
 						else
-						{
-							$l_value = $k;
+						{	// Create a new span element for error message
+							jQuery( '#$parname' ).next().after( '<span style=\'padding: 0px 15px;\' class=\'field_error\'>' + message + '</span>' );
 						}
-						// RECURSE:
-						autoform_display_field( $parname.'['.$k_nb.'][__key__]', $parmeta['key'], $Form, $set_type, $Obj, $set_target, $l_value );
-					}
-					
-					foreach( $parmeta['entries'] as $l_set_name => $l_set_entry )
-					{
-						if( isset( $l_set_entry['inputs'] ) )
-						{
-							
- 							$Form->begin_line( $l_set_entry['label'], $input_name );	
-							
-							foreach( $l_set_entry['inputs'] as $l_set_input_name => $l_set_input_entry )
-							{
+					};
 
-								if( isset( $set_value[$k][$l_set_name.$l_set_input_name] ) )
-								{	// Use a saved value:
-									$l_value = $set_value[$k][$l_set_name.$l_set_input_name];
-								}
-								else
-								{	// Use default value if it is defined:
+					function field_type_error_clear()
+					{	// Remove an error style from the 'field of type' select
+						jQuery( '#$parname' ).removeClass( 'field_error' )
+						.siblings( 'span.field_error' ).remove();
+					};
 
-									$l_value = isset( $l_set_input_entry['defaultvalue'] ) ? $l_set_input_entry['defaultvalue'] : NULL;
 
-								}
-								// RECURSE:
-								autoform_display_field( $parname.'['.$k_nb.']['.$l_set_name.$l_set_input_name.']', $l_set_input_entry, $Form, $set_type, $Obj, $set_target, $l_value );
+					jQuery.get('".get_htsrv_url()."async.php', {
+							action: 'add_plugin_sett_selected',
+							plugin_ID: '{$Obj->ID}',
+							set_type: '$set_type',
+							set_path: '$set_path',
+							parname: '$parname',
+							index: idx,
+							field_id: field_id
+							".( isset( $Blog ) ? ',blog: '.$Blog->ID : '' )."
+							".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
+						},
+						function(r, status) {
 
-							}
-							
-							$Form->end_line();
+							var element_id = '".$parname."';
+							element_id = element_id.replace(/(\[|\])/g, &quot;\\\\$1&quot;);
+							jQuery('#'+element_id+'_add_new').append(r);
+							var id = '#ffield_edit_plugin_".$Obj->ID."_set_".$parname."_'+(idx+1)+'_',
+								remove_action = '".$remove_action."';
+							remove_action = remove_action.replace(/(\#ID\#)/, id);
+							jQuery(id).children('.controls').append(remove_action);
 
-						}
-						else
-						{
 
-							if( isset( $set_value[$k][$l_set_name] ) )
-							{	// Use a saved value:
-								$l_value = $set_value[$k][$l_set_name];
-							}
-							else
-							{	// Use default value if it is defined:
+							".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
+							".( $has_folding_attr ? 'evo_initialize_fieldset_folding();' : '' )."
 
-								$l_value = isset( $l_set_entry['defaultvalue'] ) ? $l_set_entry['defaultvalue'] : NULL;
+						});
+					return false;",
 
-							}
-							
-							// RECURSE:
-							autoform_display_field( $parname.'['.$k_nb.']['.$l_set_name.']', $l_set_entry, $Form, $set_type, $Obj, $set_target, $l_value );
-
-						}
-						
-						
-					}
-					
-					$k_nb++;
-				}
-			}
-			
-			// TODO: fix this for AJAX callbacks, when removing and re-adding items (dh):
-			if( ! isset( $parmeta['max_number'] ) || $parmeta['max_number'] > ($k_nb) )
-			{ // no max_number defined or not reached: display link to add a new set
-				global $Blog;
+					 'class'=> "btn btn-default")
+				);
 				
-				$set_path = $parname.'['.$k_nb.']';
-				/*
-				*	ac> We need to know which Option is Selected!
-				*/
-				
-				$button_add_field .= action_icon(
-					sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
-					'add',
-					regenerate_url( 'action', array('action=add_plugin_sett_selected', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param('user_ID') : '' ), 'plugin_ID='.$Obj->ID) ),
-					T_(' Add'),
-					5, 3, /* icon/text prio */
-					// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
-					array('onclick'=>"
-						var oThis = this;
-						jQuery.get('".get_htsrv_url()."async.php', {
-								action: 'add_plugin_sett_selected',
-								plugin_ID: '{$Obj->ID}',
-								set_type: '$set_type',
-								set_path: '$set_path',
-								parname: '$parname',
-								option_selected: $('#$parname option:selected').val()
-								".( isset( $Blog ) ? ',blog: '.$Blog->ID : '' )."
-								".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
-							},
-							function(r, status) {
-							
-								var element_id = '".$parname."';
-								element_id = element_id.replace(/(\[|\])/g, &quot;\\\\$1&quot;);
-								jQuery('#'+element_id+'_add_new').append(r);
-								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
-								".( $has_folding_attr ? 'evo_initialize_fieldset_folding();' : '' )."
-							
-							}
-						);
-						return false;",
-						 
-						 'class'=> "btn btn-default")
-					);
-				
-			}
-			
 			$field_params = array( 'field_suffix' => $button_add_field, 'id' => $parname );
 			
 			$Form->select_input_options( $field_name, $field_options, $field_label, '', $field_params );
-	
+			
 			break;
 			
 		case 'array':
