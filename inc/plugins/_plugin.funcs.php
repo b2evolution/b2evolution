@@ -489,8 +489,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$field_options .= ' value="'.$type.'">'.$label.'</option>';
 			}
 			
-			$field_label =  T_('Add a field of type');
-			$field_name = $parmeta['label'];
+			$field_label =  isset($parmeta['label']) && ! empty($parmeta['label']) ? $parmeta['label'] : T_('Add a field of type');
+			$field_name = $parname;
 			$button_add_field = '';
 			$user_ID = $set_type == 'UserSettings' ? $set_target->ID : '';
 			
