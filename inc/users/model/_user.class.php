@@ -5245,7 +5245,7 @@ class User extends DataObject
 			$load_result = $this->load_from_Request();
 		}
 
-		
+
 		if( ! $load_result )
 		{	// We have found validation errors:
 			if( $is_new_user || ( $is_admin_form && ( $this->ID != 1 ) ) )

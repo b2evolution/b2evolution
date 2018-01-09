@@ -189,6 +189,13 @@ class user_register_Widget extends ComponentWidget
 					'size' => 100,
 					'defaultvalue' => '',
 				),
+
+				// Hidden, used by emailcapture shorttag
+				'inline' => array(
+					'label' => 'Internal: Display inline',
+					'defaultvalue' => 0,
+					'no_edit' => true
+				)
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -269,12 +276,32 @@ class user_register_Widget extends ComponentWidget
 		$Form->hidden( 'widget', $this->ID );
 		$Form->hidden( 'redirect_to', $redirect_to );
 
+		if( $this->disp_params['inline'] == 1 )
+		{
+			$Form->hidden( 'inline', 1 );
+			$Form->hidden( 'source', $this->disp_params['source'] );
+			$Form->hidden( 'ask_firstname', $this->disp_params['ask_firstname'] );
+			$Form->hidden( 'ask_lastname', $this->disp_params['ask_lastname'] );
+			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe_post'] );
+			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe_comment'] );
+
+			$newsletters = array();
+			foreach( $this->disp_params['newsletters'] as $loop_newsletter )
+			{
+				if( $loop_newsletter[2] == 1 )
+				{
+					$newsletters[] = $loop_newsletter[0];
+				}
+			}
+			$Form->hidden( 'newsletters', implode( ',', $newsletters ) );
+		}
+
 		if( $this->disp_params['ask_firstname'] != 'no' )
 		{ // First name
 			$firstname_value = isset( $widget_param_input_values['firstname'] ) ? $widget_param_input_values['firstname'] : '';
 			$firstname_params = array(
 					'maxlength' => 50,
-					'class' => 'input_text'
+					'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' )
 				);
 			if( $this->disp_params['ask_firstname'] == 'required' )
 			{	// Params if first name is required:
@@ -291,7 +318,7 @@ class user_register_Widget extends ComponentWidget
 			$lastname_value = isset( $widget_param_input_values['lastname'] ) ? $widget_param_input_values['lastname'] : '';
 			$lastname_params = array(
 					'maxlength' => 50,
-					'class' => 'input_text'
+					'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' )
 				);
 			if( $this->disp_params['ask_lastname'] == 'required' )
 			{	// Params if first name is required:
@@ -305,7 +332,7 @@ class user_register_Widget extends ComponentWidget
 
 		// E-mail
 		$email_value = isset( $widget_param_input_values[ $dummy_fields['email'] ] ) ? $widget_param_input_values[ $dummy_fields['email'] ] : '';
-		$Form->text_input( $dummy_fields['email'], $email_value, 50, T_('Your email'), '', array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true, 'input_required' => 'required' ) );
+		$Form->text_input( $dummy_fields['email'], $email_value, 50, T_('Your email'), '', array( 'maxlength' => 255, 'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ), 'required' => true, 'input_required' => 'required' ) );
 
 		// Submit button
 		$Form->begin_fieldset( '', array( 'class' => 'fieldset field_register_btn' ) );

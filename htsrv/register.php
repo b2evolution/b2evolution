@@ -114,8 +114,9 @@ switch( $action )
 
 		// Use this boolean var to know when quick registration is used
 		$is_quick = ( $action == 'quick_register' );
+		$is_inline = param( 'inline', 'integer', 0 ) == 1;
 
-		if( $is_quick )
+		if( $is_quick || $is_inline )
 		{ // Check if we can use a quick registration now:
 			if( $Settings->get( 'newusers_canregister' ) != 'yes' || ! $Settings->get( 'quick_registration' ) )
 			{ // Display error message when quick registration is disabled
@@ -125,19 +126,51 @@ switch( $action )
 
 			param( 'widget', 'integer', 0 );
 
-			if( empty( $Blog ) || empty( $widget ) )
+			if( empty( $Blog ) || ( empty( $widget ) && ! $is_inline ) )
 			{ // Don't use a quick registration if the request goes from not blog page
 				debug_die( 'Quick registration is currently disabled on this system.' );
 				break;
 			}
 
-			$WidgetCache = & get_WidgetCache();
-			if( ! $user_register_Widget = & $WidgetCache->get_by_ID( $widget, false, false ) ||
-			    $user_register_Widget->code != 'user_register' ||
-			    $user_register_Widget->get( 'coll_ID' ) != $Blog->ID )
-			{ // Wrong or hacked request!
-				debug_die( 'Quick registration is currently disabled on this system.' );
-				break;
+			if( empty( $widget ) && $is_inline )
+			{ // Request from shorttag
+				$source = param( 'source', 'string', true );
+				$ask_firstname = param( 'ask_firstname', 'string', true );
+				$ask_lastname = param( 'ask_lastname', 'string', true );
+				$subscribe_posts = param( 'subscribe_post', 'integer', true );
+				$subscribe_comments = param( 'subscribe_comment', 'integer', true );
+				$newsletters = param( 'newsletters', 'string', true );
+				$newsletters = explode( ',', $newsletters );
+				$widget_newsletters = array();
+				foreach( $newsletters as $loop_newsletter_ID )
+				{
+					$widget_newsletters[$loop_newsletter_ID] = 1;
+				}
+				$widget_redirect_to = param( 'redirect_to', 'string', true );
+			}
+			else
+			{
+				$WidgetCache = & get_WidgetCache();
+				$user_register_Widget = & $WidgetCache->get_by_ID( $widget, false, false );
+				if( ! $user_register_Widget ||
+						$user_register_Widget->code != 'user_register' ||
+						$user_register_Widget->get( 'coll_ID' ) != $Blog->ID )
+				{ // Wrong or hacked request!
+					debug_die( 'Quick registration is currently disabled on this system.' );
+					break;
+				}
+
+				// Initialize the widget settings
+				$user_register_Widget->init_display( array() );
+
+				// Get a source from widget setting
+				$source = $user_register_Widget->disp_params['source'];
+				$ask_firstname = $user_register_Widget->disp_params['ask_firstname'];
+				$ask_lastname = $user_register_Widget->disp_params['ask_lastname'];
+				$subscribe_posts = $user_register_Widget->disp_params['subscribe_post'];
+				$subscribe_comments = $user_register_Widget->disp_params['subscribe_comment'];
+				$widget_newsletters = $user_register_Widget->disp_params['newsletters'];
+				$widget_redirect_to = trim( $user_register_Widget->disp_params['redirect_to'] );
 			}
 
 			if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $email ) ) ) )
@@ -148,21 +181,15 @@ switch( $action )
 				break;
 			}
 
-			// Initialize the widget settings
-			$user_register_Widget->init_display( array() );
-
-			// Get a source from widget setting
-			$source = $user_register_Widget->disp_params['source'];
-
 			// Check what fields should be required by current widget
 			$registration_require_country = false;
 			$registration_require_gender = false;
-			$registration_require_firstname = ( $user_register_Widget->disp_params['ask_firstname'] == 'required' );
-			$registration_require_lastname = ( $user_register_Widget->disp_params['ask_lastname'] == 'required' );
+			$registration_require_firstname = ( $ask_firstname == 'required' );
+			$registration_require_lastname = ( $ask_lastname == 'required' );
 
 			// Check what subscriptions should be activated by current widget
-			$auto_subscribe_posts = ! empty( $user_register_Widget->disp_params['subscribe_post'] );
-			$auto_subscribe_comments = ! empty( $user_register_Widget->disp_params['subscribe_comment'] );
+			$auto_subscribe_posts = ! empty( $subscribe_posts  );
+			$auto_subscribe_comments = ! empty( $subscribe_comments );
 		}
 
 		if( ! $is_quick )
@@ -294,7 +321,6 @@ switch( $action )
 			$new_User->set( 'salt', '' );
 			$new_User->set( 'pass_driver', 'nopass' );
 			// Set newsletters subscriptions from current widget "Email capture / Quick registration":
-			$widget_newsletters = $user_register_Widget->disp_params['newsletters'];
 			foreach( $widget_newsletters as $widget_newsletter_ID => $widget_newsletter_is_enabled )
 			{
 				if( ! $widget_newsletter_is_enabled )
@@ -475,7 +501,6 @@ switch( $action )
 		// Set redirect_to from current widget:
 		if( isset( $user_register_Widget ) )
 		{	// If widget is defined:
-			$widget_redirect_to = trim( $user_register_Widget->disp_params['redirect_to'] );
 			if( ! empty( $widget_redirect_to ) )
 			{	// If a redirect param is defined:
 				if( preg_match( '#^(https?://|/)#i', $widget_redirect_to ) )

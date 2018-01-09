@@ -138,6 +138,13 @@ class newsletter_subscription_Widget extends ComponentWidget
 					'size' => 40,
 					'defaultvalue' => 'btn-success'
 				),
+
+				// Hidden, used by subscribe shorttag
+				'inline' => array(
+					'label' => 'Internal: Display inline',
+					'defaultvalue' => 0,
+					'no_edit' => true,
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -205,6 +212,12 @@ class newsletter_subscription_Widget extends ComponentWidget
 			$Form->hidden( 'action', 'newsletter_widget' );
 			$Form->hidden( 'widget', $this->ID );
 			$Form->hidden( 'redirect_to', $redirect_to );
+
+			if( $this->disp_params['inline'] == 1 )
+			{
+				$Form->hidden( 'inline', 1 );
+				$Form->hidden( 'newsletter', $this->disp_params['enlt_ID'] );
+			}
 
 			// Display a button to subscribe⁄unsubscribe:
 			echo '<div class="center">';
