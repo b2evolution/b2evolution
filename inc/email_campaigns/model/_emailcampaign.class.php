@@ -132,7 +132,7 @@ class EmailCampaign extends DataObject
 		{	// If users are found in the filterset
 
 			// Get all active users which accept email newsletter of this campaign:
-			$new_users_SQL = new SQL( 'Get recipients of newsletter #'.$this->get( 'enlt_ID' ) );
+			$new_users_SQL = new SQL( 'Get recipients of list #'.$this->get( 'enlt_ID' ) );
 			$new_users_SQL->SELECT( 'user_ID' );
 			$new_users_SQL->FROM( 'T_users' );
 			$new_users_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_subscribed = 1' );
@@ -491,7 +491,7 @@ class EmailCampaign extends DataObject
 
 		if( param( 'ecmp_enlt_ID', 'integer', NULL ) !== NULL )
 		{	// Newsletter ID:
-			param_string_not_empty( 'ecmp_enlt_ID', T_('Please select a newsletter.') );
+			param_string_not_empty( 'ecmp_enlt_ID', T_('Please select a list.') );
 			$this->newsletter_is_changed = ( get_param( 'ecmp_enlt_ID' ) != $this->get( 'enlt_ID' ) );
 			$this->set_from_Request( 'enlt_ID' );
 		}
@@ -722,7 +722,7 @@ class EmailCampaign extends DataObject
 				{ // Failed, Email was NOT sent
 					if( ! check_allow_new_email( 'newsletter_limit', 'last_newsletter', $user_ID ) )
 					{ // Newsletter email is limited today for this user
-						echo '<span class="orange">'.sprintf( T_('User %s has already received max # of newsletters today.'), $User->get_identity_link() ).'</span><br />';
+						echo '<span class="orange">'.sprintf( T_('User %s has already received max # of lists today.'), $User->get_identity_link() ).'</span><br />';
 					}
 					else
 					{ // Another error

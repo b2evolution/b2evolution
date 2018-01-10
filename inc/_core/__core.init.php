@@ -1096,7 +1096,7 @@ class _core_Module extends Module
 							'href' => $admin_url.'?ctrl=newsletters',
 							'entries' => array(
 								'newsletters' => array(
-									'text' => T_('Newsletters').'&hellip;',
+									'text' => T_('Lists').'&hellip;',
 									'href' => $admin_url.'?ctrl=newsletters' ),
 								'campaigns' => array(
 									'text' => T_('Campaigns').'&hellip;',
@@ -1974,7 +1974,7 @@ class _core_Module extends Module
 					'href' => '?ctrl=newsletters',
 					'entries' => array(
 						'newsletters' => array(
-							'text' => T_('Newsletters'),
+							'text' => T_('Lists'),
 							'href' => '?ctrl=newsletters' ),
 						'campaigns' => array(
 							'text' => T_('Campaigns'),

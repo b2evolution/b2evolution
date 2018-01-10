@@ -44,7 +44,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 	 */
 	function get_help_url()
 	{
-		return get_manual_url( 'newsletter-subscription-widget' );
+		return get_manual_url( 'list-subscription-widget' );
 	}
 
 
@@ -53,7 +53,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Newsletter subscription');
+		return T_('List subscription');
 	}
 
 
@@ -71,7 +71,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display a form for newsletter subscription.');
+		return T_('Display a form for list subscription.');
 	}
 
 
@@ -93,7 +93,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 					'label' => T_('Block title'),
 					'note' => T_('Title to display in your skin.'),
 					'size' => 40,
-					'defaultvalue' => T_('Get our newsletter!'),
+					'defaultvalue' => T_('Get our list!'),
 				),
 				'intro' => array(
 					'label' => T_('Intro text'),
@@ -108,7 +108,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 					'defaultvalue' => '',
 				),
 				'enlt_ID' => array(
-					'label' => T_('Newsletter'),
+					'label' => T_('List'),
 					'note' => '',
 					'type' => 'select',
 					'options' => array( ''  => T_('None') ) + $NewsletterCache->get_option_array(),
@@ -194,7 +194,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 		if( ! ( $widget_Newsletter = & $NewsletterCache->get_by_ID( $this->disp_params['enlt_ID'], false, false ) ) ||
 		    ! $widget_Newsletter->get( 'active' ) )
 		{	// Display an error when newsletter is not found or not active:
-			echo '<div class="red">'.T_('Newsletter subscription widget references an inactive newsletter.').'</div>';
+			echo '<div class="red">'.T_('List subscription widget references an inactive list.').'</div>';
 		}
 		else
 		{	// Display a form to subscribe⁄unsubscribe:

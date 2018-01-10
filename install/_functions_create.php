@@ -1744,7 +1744,7 @@ function create_demo_contents()
 		       ( 1, "Photo Galleries",         2 ),
 		       ( 1, "Forums",                  3 ),
 		       ( 1, "Online Manuals",          4 ),
-		       ( 1, "Newsletters / E-mailing", 5 ),
+		       ( 1, "Lists / E-mailing", 5 ),
 		       ( 1, "Easy Maintenance",        6 )' );
 	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
 		VALUES ( 1, 5, 1 ),
@@ -1800,7 +1800,7 @@ function create_default_newsletters()
 {
 	global $DB, $create_sample_contents;
 
-	task_begin( 'Creating default newsletters... ' );
+	task_begin( 'Creating default lists... ' );
 
 	if( $create_sample_contents )
 	{

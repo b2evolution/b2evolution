@@ -271,7 +271,7 @@ function campaign_results_block( $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Newsletter'),
+			'th' => T_('List'),
 			'order' => 'enlt_name',
 			'td' => '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID=$enlt_ID$"><b>$enlt_name$</b></a>',
 			'th_class' => 'shrinkwrap',

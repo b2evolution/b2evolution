@@ -62,7 +62,7 @@ class Newsletter extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table'=>'T_email__campaign', 'fk'=>'ecmp_enlt_ID', 'msg'=>T_('%d campaigns are linked to this newsletter') ),
+				array( 'table'=>'T_email__campaign', 'fk'=>'ecmp_enlt_ID', 'msg'=>T_('%d campaigns are linked to this list') ),
 			);
 	}
 
@@ -93,7 +93,7 @@ class Newsletter extends DataObject
 
 		if( param( 'enlt_name', 'string', NULL ) !== NULL )
 		{	// Name:
-			param_string_not_empty( 'enlt_name', T_('Please enter a newsletter name.') );
+			param_string_not_empty( 'enlt_name', T_('Please enter a list name.') );
 			$this->set_from_Request( 'name' );
 		}
 

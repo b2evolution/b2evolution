@@ -107,7 +107,7 @@ class user_register_Widget extends ComponentWidget
 		}
 		$newsletters_options[] = array(
 			'default',
-			T_('Also subscribe user to all default newsletters for new users.'),
+			T_('Also subscribe user to all default lists for new users.'),
 			1, // checked by default
 		);
 
@@ -116,7 +116,7 @@ class user_register_Widget extends ComponentWidget
 					'label' => T_('Block title'),
 					'note' => T_('Title to display in your skin.'),
 					'size' => 40,
-					'defaultvalue' => T_('Get our newsletter!'),
+					'defaultvalue' => T_('Get our list!'),
 				),
 				'intro' => array(
 					'label' => T_('Intro text'),
@@ -154,7 +154,7 @@ class user_register_Widget extends ComponentWidget
 					'defaultvalue' => 'email capture form',
 				),
 				'newsletters' => array(
-					'label' => T_('Newsletters'),
+					'label' => T_('Lists'),
 					'type' => 'checklist',
 					'options' => $newsletters_options,
 					'note' => ''

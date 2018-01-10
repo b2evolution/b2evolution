@@ -30,7 +30,7 @@ if( param( 'enlt_ID', 'integer', '', true ) )
 		unset( $edited_Newsletter );
 		forget_param( 'enlt_ID' );
 		$action = '';
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Newsletter') ), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('List') ), 'error' );
 	}
 }
 
@@ -61,7 +61,7 @@ switch( $action )
 
 			// Insert in DB:
 			$edited_Newsletter->dbinsert();
-			$Messages->add( T_('Newsletter has been created.'), 'success' );
+			$Messages->add( T_('List has been created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
@@ -89,7 +89,7 @@ switch( $action )
 
 			// Update in DB:
 			$edited_Newsletter->dbupdate();
-			$Messages->add( T_('Newsletter has been updated.'), 'success' );
+			$Messages->add( T_('List has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
@@ -113,7 +113,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Newsletter "%s" has been deleted.'), $edited_Newsletter->dget( 'name' ) );
+			$msg = sprintf( T_('List "%s" has been deleted.'), $edited_Newsletter->dget( 'name' ) );
 			$edited_Newsletter->dbdelete();
 			unset( $edited_Newsletter );
 			forget_param( 'enlt_ID' );
@@ -124,7 +124,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Newsletter->check_delete( sprintf( T_('Cannot delete newsletter "%s"'), $edited_Newsletter->dget( 'name' ) ) ) )
+			if( ! $edited_Newsletter->check_delete( sprintf( T_('Cannot delete list "%s"'), $edited_Newsletter->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -148,8 +148,8 @@ switch( $action )
 		$edited_Newsletter->dbupdate();
 
 		$Messages->add( ( $action == 'activate' ?
-			T_('Newsletter has been activated.') :
-			T_('Newsletter has been disactivated.') ), 'success' );
+			T_('List has been activated.') :
+			T_('List has been disactivated.') ), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
@@ -190,8 +190,8 @@ switch( $action )
 			$Settings->dbupdate();
 
 			$Messages->add( sprintf( ( $action == 'enable' ?
-				T_('New users will be automatically subscribed to newsletter: %s') :
-				T_('New users will no longer be automatically subscribed to newsletter: %s') ),
+				T_('New users will be automatically subscribed to list: %s') :
+				T_('New users will no longer be automatically subscribed to list: %s') ),
 				'"'.$edited_Newsletter->get( 'name' ).'"' ), 'success' );
 		}
 
@@ -204,17 +204,17 @@ switch( $action )
 
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=newsletters' );
-$AdminUI->breadcrumbpath_add( T_('Newsletters'), $admin_url.'?ctrl=newsletters' );
+$AdminUI->breadcrumbpath_add( T_('Lists'), $admin_url.'?ctrl=newsletters' );
 
 // Set an url for manual page:
 switch( $action )
 {
 	case 'new':
 	case 'edit':
-		$AdminUI->set_page_manual_link( 'editing-an-email-newsletter' );
+		$AdminUI->set_page_manual_link( 'editing-an-email-list' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'email-newsletters' );
+		$AdminUI->set_page_manual_link( 'email-lists' );
 		break;
 }
 
@@ -241,7 +241,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Newsletter->confirm_delete(
-				sprintf( T_('Delete newsletter "%s"?'), $edited_Newsletter->dget( 'name' ) ),
+				sprintf( T_('Delete list "%s"?'), $edited_Newsletter->dget( 'name' ) ),
 				'newsletter', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':

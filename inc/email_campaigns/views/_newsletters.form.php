@@ -22,12 +22,12 @@ $Form = new Form( NULL, 'newsletter_form', 'post', 'compact' );
 
 if( ! $creating && $current_User->check_perm( 'emails', 'edit' ) )
 {	// Display a button to delete existing newsletter if current User has a perm:
-	$Form->global_icon( T_('Delete this newsletter!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb( 'newsletter' ) ) );
+	$Form->global_icon( T_('Delete this list!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb( 'newsletter' ) ) );
 }
 // Display a button to close the newsletter form:
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,enlt_ID' ) );
 
-$Form->begin_form( 'fform', ( $creating ?  T_('Create newsletter') : T_('Newsletter') ).get_manual_link( 'editing-an-email-newsletter' ) );
+$Form->begin_form( 'fform', ( $creating ?  T_('Create list') : T_('List') ).get_manual_link( 'editing-an-email-list' ) );
 
 $Form->add_crumb( 'newsletter' );
 $Form->hidden( 'ctrl', 'newsletters' );
@@ -69,7 +69,7 @@ if( $edited_Newsletter->ID > 0 )
 			'enls_subscribed'      => NULL,
 			'filterset_name'       => 'nltsub_'.$edited_Newsletter->ID,
 			'results_param_prefix' => 'nltsub_',
-			'results_title'        => T_('Subscribers').get_manual_link( 'newsletter-subscribers' ),
+			'results_title'        => T_('Subscribers').get_manual_link( 'list-subscribers' ),
 			'results_order'        => '/enls_last_sent_manual_ts/D',
 			'page_url'             => get_dispctrl_url( 'newsletters', 'action=edit&amp;enlt_ID='.$edited_Newsletter->ID ),
 			'display_ID'           => false,

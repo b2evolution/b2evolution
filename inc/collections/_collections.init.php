@@ -1234,7 +1234,7 @@ class collections_Module extends Module
 						! ( $Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) ) ||
 						! $Newsletter->get( 'active' ) )
 				{	// Display an error when newsletter is not found or not active:
-					$Messages->add( T_('Newsletter subscription widget references an inactive newsletter.'), 'error' );
+					$Messages->add( T_('List subscription widget references an inactive list.'), 'error' );
 					header_redirect();
 				}
 

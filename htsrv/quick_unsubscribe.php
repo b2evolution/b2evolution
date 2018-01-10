@@ -206,7 +206,7 @@ elseif( $confirmed )
 
 					if( ! $edited_User->unsubscribe( $newsletter_ID ) )
 					{	// Display a message is the user is not subscribed on the requested newsletter:
-						$error_msg = T_('You are not subscribed to this newsletter.');
+						$error_msg = T_('You are not subscribed to this list.');
 					}
 					break;
 
@@ -440,7 +440,7 @@ elseif( $confirmed )
 
 					if( ! $edited_User->subscribe( $newsletter_ID ) )
 					{	// Display a message is the user is not subscribed on the requested newsletter:
-						$error_msg = T_('You are already subscribed to this newsletter.');
+						$error_msg = T_('You are already subscribed to this list.');
 					}
 					break;
 

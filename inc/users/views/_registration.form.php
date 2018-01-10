@@ -49,7 +49,7 @@ $Form->begin_fieldset( T_('Default user permissions').get_manual_link('default-u
 
 	$disabled_param_links = array();
 	if( $Settings->get( 'newusers_canregister' ) == 'no' )
-	{ // Disable the field below when registration is not allowed 
+	{ // Disable the field below when registration is not allowed
 		$disabled_param_links['disabled'] = 'disabled';
 	}
 	$Form->checkbox_input( 'registration_is_public', $Settings->get( 'registration_is_public' ), T_('Registration links'), array_merge( array( 'note' => T_('Check to show self-registration links to the public.' ) ), $disabled_param_links ) );
@@ -108,7 +108,7 @@ $Form->begin_fieldset( T_('Default user settings').get_manual_link('default-user
 	}
 
 	$Form->text_input( 'notification_email_limit', $Settings->get( 'def_notification_email_limit' ), 3, T_( 'Limit notification emails to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
-	$Form->text_input( 'newsletter_limit', $Settings->get( 'def_newsletter_limit' ), 3, T_( 'Limit newsletters to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
+	$Form->text_input( 'newsletter_limit', $Settings->get( 'def_newsletter_limit' ), 3, T_( 'Limit lists to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
 
 $Form->end_fieldset();
 

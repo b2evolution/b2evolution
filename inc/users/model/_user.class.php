@@ -341,14 +341,14 @@ class User extends DataObject
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
 				array( 'table' => 'T_files', 'fk'=>'file_creator_user_ID', 'and_condition'=>'file_root_type != "user"', 'msg'=>T_('%d files will lose their creator ID.') ),
-				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d newsletter emails for this user') ),
+				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d list emails for this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_target_user_ID', 'msg'=>T_('%d reports about this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_reporter_ID', 'msg'=>T_('%d reports created by this user') ),
 				array( 'table'=>'T_users__user_org', 'fk'=>'uorg_user_ID', 'msg'=>T_('%d organization membership') ),
 				array( 'table'=>'T_polls__answer', 'fk'=>'pans_user_ID', 'msg'=>T_('%d poll answers') ),
 				array( 'table'=>'T_users__secondary_user_groups', 'fk'=>'sug_user_ID', 'msg'=>T_('%d secondary groups') ),
 				array( 'table'=>'T_users__profile_visits', 'fk'=>'upv_visited_user_ID', 'msg'=>T_('%d profile visits') ),
-				array( 'table'=>'T_email__newsletter_subscription', 'fk'=>'enls_user_ID', 'msg'=>T_('%d newsletter subscriptions') ),
+				array( 'table'=>'T_email__newsletter_subscription', 'fk'=>'enls_user_ID', 'msg'=>T_('%d list subscriptions') ),
 			);
 	}
 
@@ -1568,7 +1568,7 @@ class User extends DataObject
 				// Emails limit per day
 				param_integer_range( 'edited_user_notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.'), ! $is_api_request );
 				$UserSettings->set( 'notification_email_limit', param( 'edited_user_notification_email_limit', 'integer', 0 ), $this->ID );
-				param_integer_range( 'edited_user_newsletter_limit', 0, 999, T_('Newsletter limit must be between %d and %d.'), ! $is_api_request );
+				param_integer_range( 'edited_user_newsletter_limit', 0, 999, T_('List limit must be between %d and %d.'), ! $is_api_request );
 				$UserSettings->set( 'newsletter_limit', param( 'edited_user_newsletter_limit', 'integer', 0 ), $this->ID );
 
 				// If notifications are temporarily disabled, no subscription options should be lost when user saves.
@@ -7447,7 +7447,7 @@ class User extends DataObject
 					'unsubscribed' => array(),
 				);
 
-			$SQL = new SQL( 'Get newsletter subscriptions of user #'.$this->ID );
+			$SQL = new SQL( 'Get list subscriptions of user #'.$this->ID );
 			$SQL->SELECT( 'enls_enlt_ID, enls_subscribed' );
 			$SQL->FROM( 'T_email__newsletter_subscription' );
 			$SQL->WHERE( 'enls_user_ID = '.$this->ID );
@@ -7609,7 +7609,7 @@ class User extends DataObject
 			}
 			$r += $DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID, enls_subscribed, enls_subscribed_ts )
 				VALUES '.implode( ', ', $insert_newsletter_sql_values ),
-				'Subscribe(insert new subscriptions) user #'.$this->ID.' to newsletters #'.implode( ',', $insert_newsletter_IDs ) );
+				'Subscribe(insert new subscriptions) user #'.$this->ID.' to lists #'.implode( ',', $insert_newsletter_IDs ) );
 
 			// Send emails of campaigns which must be sent at subscription:
 			$this->send_auto_subscriptions( $insert_newsletter_IDs );
@@ -7623,7 +7623,7 @@ class User extends DataObject
 			WHERE enls_user_ID = '.$DB->quote( $this->ID ).'
 			  AND enls_enlt_ID IN ( '.$DB->quote( $update_newsletter_IDs ).' )
 			  AND enls_subscribed = 0',
-			'Subscribe(update unsubscriptions) user #'.$this->ID.' to newsletters #'.implode( ',', $update_newsletter_IDs ) );
+			'Subscribe(update unsubscriptions) user #'.$this->ID.' to lists #'.implode( ',', $update_newsletter_IDs ) );
 		}
 
 		$DB->commit();
@@ -7663,7 +7663,7 @@ class User extends DataObject
 			WHERE enls_user_ID = '.$DB->quote( $this->ID ).'
 			  AND enls_enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )
 			  AND enls_subscribed = 1',
-			'Unsubscribe user #'.$this->ID.' from newsletters #'.implode( ',', $newsletter_IDs ) );
+			'Unsubscribe user #'.$this->ID.' from lists #'.implode( ',', $newsletter_IDs ) );
 	}
 
 
@@ -7682,7 +7682,7 @@ class User extends DataObject
 
 		if( count( $new_subscriptions ) )
 		{	// User is really subscribing to new newsletters:
-			$SQL = new SQL( 'Get email campaigns(of newsletters #'.implode( ',', $new_subscriptions ).') which must be sent at subscription' );
+			$SQL = new SQL( 'Get email campaigns(of lists #'.implode( ',', $new_subscriptions ).') which must be sent at subscription' );
 			$SQL->SELECT( '*' );
 			$SQL->FROM( 'T_email__campaign' );
 			$SQL->WHERE( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' )' );

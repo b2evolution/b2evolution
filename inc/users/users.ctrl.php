@@ -384,7 +384,7 @@ if( !$Messages->has_errors() )
 
 			if( ! param( 'newsletter', 'integer', 0 ) )
 			{	// Don't allow all newsletters for selecting of recipients for email campaign:
-				$Messages->add( T_('Any email campaign must be sent to subscribers of a particular newsletter. Please select a newsletter in your filters.'), 'error' );
+				$Messages->add( T_('Any email campaign must be sent to subscribers of a particular list. Please select a list in your filters.'), 'error' );
 
 				load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 				if( $edited_EmailCampaign = & get_session_EmailCampaign() )

@@ -22,11 +22,11 @@ $SQL->FROM( 'T_email__newsletter' );
 
 $Results = new Results( $SQL->get(), 'enlt_', 'A' );
 
-$Results->title = T_('Newsletters').get_manual_link( 'email-newsletters' );
+$Results->title = T_('Lists').get_manual_link( 'email-lists' );
 
 if( $current_User->check_perm( 'emails', 'edit' ) )
 {	// Display a button to add newsletter if current User has a perm:
-	$Results->global_icon( T_('Create new newsletter').'...', 'new', $admin_url.'?ctrl=newsletters&amp;action=new', T_('Create new newsletter').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+	$Results->global_icon( T_('Create new list').'...', 'new', $admin_url.'?ctrl=newsletters&amp;action=new', T_('Create new list').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->cols[] = array(
@@ -43,11 +43,11 @@ function newsletters_td_active( $enlt_ID, $enlt_active )
 
 	if( $enlt_active )
 	{	// If newsletter is active:
-		$active_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The newsletter is active.') ) );
+		$active_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The list is active.') ) );
 	}
 	else
 	{	// If newsletter is NOT active:
-		$active_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The newsletter is not active.') ) );
+		$active_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The list is not active.') ) );
 	}
 
 	if( $current_User->check_perm( 'emails', 'edit' ) )
@@ -102,13 +102,13 @@ function newsletters_td_new_users( $enlt_ID )
 
 	if( in_array( $enlt_ID, $def_newsletters ) )
 	{
-		$title = T_('Auto-subscribe new users to this newsletter.');
+		$title = T_('Auto-subscribe new users to this list.');
 		$icon = 'bullet_full';
 		$action = 'disable';
 	}
 	else
 	{
-		$title = T_('Do NOT auto-subscribe new users to this newsletter.');
+		$title = T_('Do NOT auto-subscribe new users to this list.');
 		$icon = 'bullet_empty';
 		$action = 'enable';
 	}
@@ -130,10 +130,10 @@ $Results->cols[] = array(
 		'th' => T_('Actions'),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
-		'td' => action_icon( T_('Edit this newsletter...'), 'properties', $admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID=$enlt_ID$' )
+		'td' => action_icon( T_('Edit this list...'), 'properties', $admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID=$enlt_ID$' )
 			.( $current_User->check_perm( 'emails', 'edit' ) ?
 			// Display an action icon to delete newsletter if current User has a perm:
-			action_icon( T_('Delete this newsletter!'), 'delete', regenerate_url( 'enlt_ID,action', 'enlt_ID=$enlt_ID$&amp;action=delete&amp;'.url_crumb( 'newsletter' ) ) ): '' )
+			action_icon( T_('Delete this list!'), 'delete', regenerate_url( 'enlt_ID,action', 'enlt_ID=$enlt_ID$&amp;action=delete&amp;'.url_crumb( 'newsletter' ) ) ): '' )
 	);
 
 // Display results:

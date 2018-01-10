@@ -5437,12 +5437,12 @@ function users_results_block( $params = array() )
 
 	if( !empty( $edited_EmailCampaign ) )
 	{
-		$newsletter_button_text = sprintf( T_('Use this selection for newsletter "%s"'), $edited_EmailCampaign->get( 'name' ) );
+		$newsletter_button_text = sprintf( T_('Use this selection for list "%s"'), $edited_EmailCampaign->get( 'name' ) );
 		$newsletter_button_class = 'btn-primary';
 	}
 	else
 	{
-		$newsletter_button_text = T_('Send newsletter to the current selection');
+		$newsletter_button_text = T_('Send list to the current selection');
 		$newsletter_button_class = 'btn-default';
 	}
 
