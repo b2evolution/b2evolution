@@ -919,6 +919,13 @@ function get_icon_info( $name )
 			'glyph' => 'rewind',
 			'fa' => 'backward',
 		);
+		case 'forward': return array( // Used to skip email campaign for user
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'forward',
+			'fa' => 'forward',
+		);
 
 		case 'feed': return array(
 			'alt'	 => T_('XML Feed'),

@@ -8896,6 +8896,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12480, 'Upgrading email campaign send data table...' ) )
+	{ // part of 6.10.0-beta
+		$DB->query( 'ALTER TABLE T_email__campaign_send
+				ADD csnd_status ENUM("ready_to_send", "ready_to_resend", "sent", "send_error", "skipped" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ready_to_send" AFTER csnd_user_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

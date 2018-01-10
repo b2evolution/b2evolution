@@ -585,6 +585,7 @@ class UserQuery extends SQL
 			return;
 		}
 
+		$this->SELECT_add( ', csnd_status' );
 		$this->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_user_ID = user_ID AND csnd_camp_ID = '.$DB->quote( $ecmp_ID ) );
 
 		// Get email log date and time:
@@ -598,14 +599,18 @@ class UserQuery extends SQL
 
 		switch( $recipient_type )
 		{
+			case 'ready_to_send':
+			case 'ready_to_resend':
 			case 'sent':
-				// Get recipients which have already been received this newsletter:
-				$this->WHERE_and( 'csnd_emlog_ID IS NOT NULL' );
+			case 'send_error':
+			case 'skipped':
+				// Get recipients which have already received this newsletter:
+				$this->WHERE_and( 'csnd_status = "'.$recipient_type.'"' );
 				break;
 
 			case 'readytosend':
-				// Get recipients which have not been received this newsletter yet:
-				$this->WHERE_and( 'csnd_emlog_ID IS NULL' );
+				// Get recipients which have not received this newsletter yet:
+				$this->WHERE_and( 'csnd_status IN ( "ready_to_send", "ready_to_resend" )' );
 				break;
 		}
 	}

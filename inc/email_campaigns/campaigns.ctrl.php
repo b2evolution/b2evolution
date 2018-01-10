@@ -363,6 +363,15 @@ switch( $action )
 		header_redirect( get_campaign_tab_url( 'recipient', $edited_EmailCampaign->ID ), 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
+
+	case 'skip':
+		param( 'ecmp_ID', 'integer', NULL );
+		param( 'user_ID', 'integer', NULL );
+
+		skip_campaign_user( $ecmp_ID, $user_ID );
+		header_redirect( get_campaign_tab_url( 'recipient', $edited_EmailCampaign->ID ), 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 

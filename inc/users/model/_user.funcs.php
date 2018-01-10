@@ -3391,6 +3391,19 @@ function callback_filter_userlist( & $Form )
 			$Form->select_input_object( 'newsletter', get_param( 'newsletter' ), $NewsletterCache, T_('Subscribed to'), array( 'allow_none' => true ) );
 		}
 	}
+
+	if( is_admin_page() && $edited_EmailCampaign )
+	{
+		$campaign_send_status = array(
+				'' => T_('All'),
+				'ready_to_send' => T_('Ready to send'),
+				'ready_to_resend' => T_('Ready to resend'),
+				'sent' => T_('Sent'),
+				'send_error' => T_('Send error'),
+				'skipped' => T_('Skipped')
+			);
+		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, T_('Campaign Status'), '', array( 'allow_none' => true ) );
+	}
 	echo '<br />';
 
 	$criteria_types = param( 'criteria_type', 'array:integer' );
@@ -5267,6 +5280,7 @@ function users_results_block( $params = array() )
 			'display_level'        => true,
 			'display_status'       => true,
 			'display_enlt_status'  => false,
+			'display_camp_status'  => false,
 			'display_emlog_date'   => false,
 			'display_enls_subscribed'      => false,
 			'display_enls_subscribed_ts'   => false,
@@ -5414,7 +5428,7 @@ function users_results_block( $params = array() )
 		$UserList->display( $params['display_params'] );
 	}
 
-	$edited_campaign_ID =  $Session->get( 'edited_campaign_ID' );
+	$edited_campaign_ID = $Session->get( 'edited_campaign_ID' );
 	if( !empty( $edited_campaign_ID ) )
 	{ // Get Email Campaign by ID from Session
 		$EmailCampaignCache = & get_EmailCampaignCache();
@@ -5488,6 +5502,7 @@ function users_results( & $UserList, $params = array() )
 			'display_sec_groups' => false,
 			'display_level'      => true,
 			'display_status'     => true,
+			'display_camp_status' => false,
 			'display_emlog_date' => false,
 			'display_enls_subscribed'      => false,
 			'display_enls_subscribed_ts'   => false,
@@ -5844,13 +5859,24 @@ function users_results( & $UserList, $params = array() )
 	}
 
 	if( $params['display_enlt_status'] )
-	{ // Display newsletter status:
+	{ // Display list status:
 		$UserList->cols[] = array(
-				'th' => T_('Status'),
+				'th' => T_('List Status'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'nowrap',
 				'order' => 'enls_user_ID',
 				'td' => '~conditional( #enls_user_ID# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
+			);
+	}
+
+	if( $params['display_camp_status'] )
+	{ // Display campaign status
+		$UserList->cols[] = array(
+				'th' => T_('Campaign Status'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'csnd_status',
+				'td' => '%user_td_campaign_status( #csnd_status# )%'
 			);
 	}
 
@@ -6002,7 +6028,7 @@ function users_results( & $UserList, $params = array() )
 					'th' => T_('Actions'),
 					'th_class' => 'small',
 					'td_class' => 'shrinkwrap small',
-					'td' => '%user_td_campaign_actions( '.intval( $params['ecmp_ID'] ).', #user_ID#, #emlog_timestamp# )%'
+					'td' => '%user_td_campaign_actions( '.intval( $params['ecmp_ID'] ).', #user_ID#, #csnd_status# )%'
 				);
 		}
 
@@ -6345,9 +6371,9 @@ function user_td_org_actions( $org_ID, $user_ID )
  *
  * @param integer Campaign ID
  * @param integer User ID
- * @param string Email log date
+ * @param string Campaign send status
  */
-function user_td_campaign_actions( $campaign_ID, $user_ID, $emlog_date )
+function user_td_campaign_actions( $campaign_ID, $user_ID, $csnd_status )
 {
 	global $current_User, $admin_url;
 
@@ -6355,10 +6381,10 @@ function user_td_campaign_actions( $campaign_ID, $user_ID, $emlog_date )
 
 	if( $current_User->can_moderate_user( $user_ID ) )
 	{ // Current user can moderate this user
-		if( ! empty( $emlog_date ) && ! empty( $campaign_ID ) && ! empty( $user_ID ) )
-		{
-			$r .= action_icon( T_('Queue again'), 'rewind', $admin_url.'?ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign') );
-		}
+		$r .= action_icon( T_('Queue again'), 'rewind', $admin_url.'?ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign'),
+				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'ready_to_send', 'ready_to_resend' ) )  ? ' invisible' : '' ) ) );
+		$r .= action_icon( T_('Skip'), 'forward', $admin_url.'?ctrl=campaigns&amp;action=skip&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign'),
+				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'sent', 'send_error', 'skipped' ) ) ? ' invisible' : '' ) ) );
 	}
 	else
 	{
@@ -6403,6 +6429,34 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 
 
 /**
+ * Get user campaign status
+ */
+function user_td_campaign_status( $csnd_status )
+{
+	switch( $csnd_status )
+	{
+		case 'ready_to_send':
+			return T_('Ready to send');
+
+		case 'ready_to_resend':
+			return T_('Ready to resend');
+
+		case 'sent':
+			return T_('Sent');
+
+		case 'send_error':
+			return T_('Send error');
+
+		case 'skipped':
+			return T_('Skipped');
+
+		default:
+			return T_('Unknown');
+	}
+}
+
+
+/**
  * Get email campaign send date
  *
  * @param string Email log date
@@ -6410,14 +6464,12 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
  */
 function user_td_emlog_date( $emlog_date )
 {
-	if( empty( $emlog_date ) )
-	{
-		return T_('Ready to send');
-	}
-	else
+	if( ! empty( $emlog_date ) )
 	{
 		return mysql2localedatetime( $emlog_date );
 	}
+
+	return NULL;
 }
 
 

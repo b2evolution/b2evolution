@@ -151,7 +151,29 @@ function queue_campaign_user( $campaign_ID, $user_ID )
 	}
 
 	$DB->query( 'UPDATE T_email__campaign_send
-			SET csnd_emlog_ID = NULL
+			SET csnd_status = IF( csnd_emlog_ID IS NULL, "ready_to_send", "ready_to_resend" )
+			WHERE csnd_camp_ID = '.$DB->quote( $campaign_ID ).'
+			AND csnd_user_ID = '.$DB->quote( $user_ID ) );
+}
+
+
+/**
+ * Skip user from receiving email campaign
+ *
+ * @param integer Campaign ID
+ * @param integer User ID to skip
+ */
+function skip_campaign_user( $campaign_ID, $user_ID )
+{
+	global $DB;
+
+	if( empty( $campaign_ID ) || empty( $user_ID ) )
+	{
+		return;
+	}
+
+	$DB->query( 'UPDATE T_email__campaign_send
+			SET csnd_status = "skipped"
 			WHERE csnd_camp_ID = '.$DB->quote( $campaign_ID ).'
 			AND csnd_user_ID = '.$DB->quote( $user_ID ) );
 }
