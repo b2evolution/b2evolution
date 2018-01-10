@@ -4157,13 +4157,23 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 						'use_style' => true,
 						'protocol'  => 'http:',
 					) );
+
+				$firstname = $User->get( 'firstname' );
+				$lastname = $User->get( 'lastname' );
+				$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
+				$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
 			}
 			else
 			{
 				$username = $User->get_username();
 				$user_login = $User->login;
+				$firstname = $User->get( 'firstname' );
+				$lastname = $User->get( 'lastname' );
+				$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
+				$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
 			}
-			$formated_message = str_replace( array( '$login$', '$username$' ), array( $user_login, $username ) , $formated_message );
+			$formated_message = str_replace( array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$' ),
+					array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login ) , $formated_message );
 		}
 
 		$template_message .= $formated_message;
