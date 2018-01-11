@@ -69,6 +69,8 @@ $db_config['aliases'] = array(
 		'T_users__user_org'        => $tableprefix.'users__user_org',
 		'T_users__secondary_user_groups' => $tableprefix.'users__secondary_user_groups',
 		'T_users__profile_visits'  => $tableprefix.'users__profile_visits',
+		'T_users__tag'             => $tableprefix.'users__tag',
+		'T_users__usertag'         => $tableprefix.'users__usertag',
 		'T_slug'                   => $tableprefix.'slug',
 		'T_email__log'             => $tableprefix.'email__log',
 		'T_email__returns'         => $tableprefix.'email__returns',
@@ -116,6 +118,7 @@ $ctrl_mappings = array(
 		'userfields'       => 'users/userfields.ctrl.php',
 		'userfieldsgroups' => 'users/userfieldsgroups.ctrl.php',
 		'usersettings'     => 'users/settings.ctrl.php',
+		'usertags'         => 'users/usertags.ctrl.php',
 		'registration'     => 'users/registration.ctrl.php',
 		'invitations'      => 'users/invitations.ctrl.php',
 		'display'          => 'users/display.ctrl.php',
@@ -328,6 +331,24 @@ function & get_UserFieldGroupCache()
 	}
 
 	return $UserFieldGroupCache;
+}
+
+
+/**
+ * Get the UserTagCache
+ *
+ * @return UserTagCache
+ */
+function & get_UserTagCache()
+{
+	global $UserTagCache;
+
+	if( ! isset( $UserTagCache ) )
+	{
+		$UserTagCache = new DataObjectCache( 'UserTag', false, 'T_users__tag', 'utag_', 'utag_ID', 'utag_name', 'utag_name' ); // COPY (FUNC)
+	}
+
+	return $UserTagCache;
 }
 
 
@@ -1951,6 +1972,9 @@ class _core_Module extends Module
 								'href' => '?ctrl=accountclose' ),
 							),
 						),
+						'usertags' => array(
+							'text' => T_('User Tags'),
+							'href' => '?ctrl=usertags' ),
 				);
 		}
 
