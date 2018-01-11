@@ -13,6 +13,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @var AdminUI_general
+ */
+global $AdminUI;
+
+$AdminUI->set_path( 'email', 'newletters' );
 
 // Check permission:
 $current_User->check_perm( 'emails', 'view', true );
@@ -21,6 +27,8 @@ load_class( 'email_campaigns/model/_newsletter.class.php', 'Newsletter' );
 load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 
 param_action();
+
+$tab = param( 'tab', 'string', 'general', true );
 
 if( param( 'enlt_ID', 'integer', '', true ) )
 {	// Load Newsletter object:
@@ -205,24 +213,63 @@ switch( $action )
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=newsletters' );
 $AdminUI->breadcrumbpath_add( T_('Lists'), $admin_url.'?ctrl=newsletters' );
+if( ! empty( $edited_Newsletter ) )
+{
+	if( $edited_Newsletter->ID > 0 )
+	{	// Edit newsletter
+		$AdminUI->breadcrumbpath_add( $edited_Newsletter->dget( 'name' ), '?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$edited_Newsletter->ID );
+	}
+	else
+	{	// New newsletter
+		$AdminUI->breadcrumbpath_add( $edited_Newsletter->dget( 'name' ), '?ctrl=newsletters&amp;action=new' );
+	}
+}
 
 // Set an url for manual page:
 switch( $action )
 {
 	case 'new':
 	case 'edit':
-		$AdminUI->set_page_manual_link( 'editing-an-email-list' );
+		if( $edited_Newsletter->ID > 0 )
+		{ // Add menu level 3 entries:
+			$AdminUI->add_menu_entries( array( 'email', 'newsletters' ), array(
+					'general' => array(
+						'text' => T_('General'),
+						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=general&amp;enlt_ID='.$edited_Newsletter->ID ),
+					'campaigns' => array(
+						'text' => T_('Campaigns'),
+						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID='.$edited_Newsletter->ID ),
+					'subscribers' => array(
+						'text' => T_('Subscribers'),
+						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=subscribers&amp;enlt_ID='.$edited_Newsletter->ID )
+				) );
+		}
+
+		switch( $tab )
+		{
+			case 'campaigns':
+				$AdminUI->set_page_manual_link( 'email-list-campaigns' );
+				$AdminUI->set_path( 'email', 'newsletters', 'campaigns' );
+				break;
+
+			case 'subscribers':
+				// Initialize date picker for _newsletters_subscribers.view.php
+				init_datepicker_js();
+				$AdminUI->set_page_manual_link( 'email-list-subscribers' );
+				$AdminUI->set_path( 'email', 'newsletters', 'subscribers' );
+				break;
+
+			default:
+			case 'general':
+				$AdminUI->set_page_manual_link( 'editing-an-email-list' );
+				$AdminUI->set_path( 'email', 'newsletters', 'general' );
+		}
 		break;
+
 	default:
 		$AdminUI->set_page_manual_link( 'email-lists' );
+		$AdminUI->set_path( 'email', 'newsletters' );
 		break;
-}
-
-$AdminUI->set_path( 'email', 'newsletters' );
-
-if( in_array( $action, array( 'edit' ) ) )
-{ // Initialize date picker for cronjob.form.php
-	init_datepicker_js();
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -246,9 +293,22 @@ switch( $action )
 		/* no break */
 	case 'new':
 	case 'edit':
-		// Display a form of new/edited newsletter:
 		memorize_param( 'action', 'string', '' );
-		$AdminUI->disp_view( 'email_campaigns/views/_newsletters.form.php' );
+
+		switch( $tab )
+		{
+			case 'campaigns':
+				$AdminUI->disp_view( 'email_campaigns/views/_newsletters_campaign.view.php' );
+				break;
+
+			case 'subscribers':
+				$AdminUI->disp_view( 'email_campaigns/views/_newsletters_subscriber.view.php' );
+				break;
+
+			case 'general':
+			default:
+				$AdminUI->disp_view( 'email_campaigns/views/_newsletters.form.php' );
+		}
 		break;
 
 	default:
