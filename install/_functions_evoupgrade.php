@@ -8900,6 +8900,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{ // part of 6.10.0-beta
 		$DB->query( 'ALTER TABLE T_email__campaign_send
 				ADD csnd_status ENUM("ready_to_send", "ready_to_resend", "sent", "send_error", "skipped" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ready_to_send" AFTER csnd_user_ID' );
+
+		$DB->query( 'UPDATE T_email__campaign_send
+				SET csnd_status = IF( csnd_emlog_ID IS NULL, "ready_to_send", "sent" )' );
 		upg_task_end();
 	}
 
