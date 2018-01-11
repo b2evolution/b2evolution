@@ -212,26 +212,12 @@ function campaign_results_block( $params = array() )
 
 	// Create result set:
 	$SQL = new SQL();
-	$SQL->SELECT( 'SQL_NO_CACHE *' );
-	$SQL->FROM( 'T_email__campaign' );
-	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
-	$SQL->FROM_add( 'LEFT JOIN (
-										SELECT csnd_camp_ID, COUNT(*) AS send_count
-										FROM T_email__campaign_send
-										WHERE csnd_emlog_ID IS NOT NULL
-										GROUP BY csnd_camp_ID
-									) AS sent
-										ON sent.csnd_camp_ID = ecmp_ID' );
-
-	/* The query below might be more efficient:
-	$SQL = new SQL();
 	$SQL->SELECT( 'SQL_NO_CACHE T_email__campaign.*, T_email__newsletter.*, SUM(IF(csnd_emlog_ID IS NOT NULL, 1, 0)) AS send_count' );
 	$SQL->FROM( 'T_email__campaign' );
 	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 	$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
 	$SQL->WHERE( 1 );
 	$SQL->GROUP_BY( 'ecmp_ID' );
-	*/
 
 	$count_SQL = new SQL();
 	$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( ecmp_ID )' );
