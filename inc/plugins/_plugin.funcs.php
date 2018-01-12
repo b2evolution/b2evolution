@@ -515,7 +515,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								regenerate_url( 'action', array('action=del_settings_set1&amp;set_path='.$parname.'['.$k.']'.( $set_type == 'UserSettings' ? '&amp;user_ID='.$user_ID : '' ), 'plugin_ID='.$Obj->ID) ),
 								T_('Remove'),
 								5, 3, 
-								array( 'onclick' => "var element_id = \'#ID#\';element_id = element_id.replace(/(\[|\])/g, &quot;\\\\$1&quot;);jQuery(element_id).remove();return false;")
+								array( 'onclick' => "jQuery(this).closest(\'.form-group\').remove();return false;")
 								
 								);
 			
@@ -580,19 +580,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 							".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
 						},
 						function(r, status) {
-
-							var element_id = '".$parname."';
-							element_id = element_id.replace(/(\[|\])/g, &quot;\\\\$1&quot;);
-							jQuery('#'+element_id+'_add_new').append(r);
-							var id = '#ffield_edit_plugin_".$Obj->ID."_set_".$parname."_'+(idx+1)+'_',
-								remove_action = '".$remove_action."';
-							remove_action = remove_action.replace(/(\#ID\#)/, id);
-							jQuery(id).children('.controls').append(remove_action);
-
-
-							".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
-							".( $has_folding_attr ? 'evo_initialize_fieldset_folding();' : '' )."
-
+								var html = jQuery.parseHTML( r );
+								jQuery(html).find('.controls').append(jQuery.parseHTML( '".$remove_action."' ));
+								jQuery('#".$parname."_add_new').append(html);
+								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
 						});
 					return false;",
 
