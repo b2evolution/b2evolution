@@ -447,6 +447,9 @@ if( $action == 'edit' )
 	{
 		// Initialize date picker
 		init_datepicker_js();
+
+		// Initialize user tag input
+		init_tokeninput_js();
 	}
 }
 else

@@ -365,6 +365,35 @@ class UserQuery extends SQL
 
 
 	/**
+	 * Restrict to users with tag
+	 *
+	 * @param string User tag
+	 */
+	function where_tag( $user_tag )
+	{
+		global $DB;
+
+		if( empty( $user_tag ) )
+		{
+			return;
+		}
+
+		$tags = array_map( 'trim', explode( ',', $user_tag ) );
+		$this->FROM_add( 'LEFT JOIN (
+					SELECT uutg_user_ID, GROUP_CONCAT( DISTINCT utag_name ) AS tags
+					FROM T_users__tag
+					LEFT JOIN T_users__usertag ON uutg_emtag_ID = utag_ID
+					WHERE utag_name IN ('.$DB->quote( $tags ).')
+					GROUP BY uutg_user_ID
+				) AS tags
+				ON tags.uutg_user_ID = user_ID' );
+
+		sort( $tags );
+		$this->WHERE_and( 'tags.tags = '.$DB->quote( implode( ',', array_unique( $tags ) ) ) );
+	}
+
+
+	/**
 	 * Restrict with primary user group
 	 *
 	 * @param integer Primary user group ID

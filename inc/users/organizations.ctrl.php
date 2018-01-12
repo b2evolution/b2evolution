@@ -302,6 +302,8 @@ if( $display_mode != 'js')
 		$AdminUI->set_page_manual_link( 'organization-form' );
 		// Init JS to autcomplete the user logins:
 		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+		// Initialize user tag input
+		init_tokeninput_js();
 	}
 	else
 	{	// Set an url for manual page:

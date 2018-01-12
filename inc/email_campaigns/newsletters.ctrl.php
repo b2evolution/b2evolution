@@ -255,6 +255,8 @@ switch( $action )
 			case 'subscribers':
 				// Initialize date picker for _newsletters_subscribers.view.php
 				init_datepicker_js();
+				// Initialize user tag input
+				init_tokeninput_js();
 				$AdminUI->set_page_manual_link( 'email-list-subscribers' );
 				$AdminUI->set_path( 'email', 'newsletters', 'subscribers' );
 				break;

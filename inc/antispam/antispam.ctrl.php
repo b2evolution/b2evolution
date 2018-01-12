@@ -534,6 +534,7 @@ if( $display_mode != 'js' )
 			// Set an url for manual page:
 			if( $action == 'iprange_new' || $action == 'iprange_edit' )
 			{
+				init_tokeninput_js();
 				$AdminUI->set_page_manual_link( 'ip-range-editing' );
 			}
 			else

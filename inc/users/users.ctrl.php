@@ -421,6 +421,9 @@ if( $tab == 'stats' )
 }
 else
 {	// Users list
+
+	// Initialize user tag input
+	init_tokeninput_js();
 	$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
 	$AdminUI->top_block = get_user_quick_search_form();
 	if( $current_User->check_perm( 'users', 'moderate', false ) )

@@ -120,6 +120,7 @@ class UserList extends DataObjectList2
 				'newsletter_subscribed' => 1,     // 1 - only users with active subscription, 0 - only unsubscribed users, NULL - both
 				'ecmp'                => NULL,    // integer, Email Campaign ID
 				'recipient_type'      => NULL,    // string, Recipient type of email campaign: 'filtered', 'sent', 'readytosend'
+				'user_tag'            => NULL,    // string, User tag
 		) );
 	}
 
@@ -272,6 +273,11 @@ class UserList extends DataObjectList2
 			 * Restrict by recipient type of email campaign
 			 */
 			memorize_param( 'recipient_type', 'string', $this->default_filters['recipient_type'], $this->filters['recipient_type'] );
+
+			/*
+			 * Restrict by user tag
+			 */
+			memorize_param( 'user_tag', 'string', $this->default_filters['user_tag'], $this->filters['user_tag'] );
 
 			/*
 			 * Restrict by user fields
@@ -493,6 +499,11 @@ class UserList extends DataObjectList2
 		 */
 		$this->filters['recipient_type'] = param( 'recipient_type', 'string', $this->default_filters['recipient_type'], true );
 
+		/*
+		 * Restrict by user tag
+		 */
+		$this->filters['user_tag'] = param( 'user_tag', 'string', $this->default_filters['user_tag'], true );
+
 		// 'paged'
 		$this->page = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 
@@ -602,6 +613,7 @@ class UserList extends DataObjectList2
 			global $Settings;
 			$this->UserQuery->where_group_level( $Settings->get('allow_anonymous_user_level_min'), $Settings->get('allow_anonymous_user_level_max') );
 		}
+		$this->UserQuery->where_tag( $this->filters['user_tag'] );
 
 		if( isset( $this->query_params['order_by_login_length'] ) && in_array( $this->query_params['order_by_login_length'], array( 'A', 'D' ) ) )
 		{

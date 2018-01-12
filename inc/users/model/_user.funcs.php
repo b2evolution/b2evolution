@@ -3392,6 +3392,61 @@ function callback_filter_userlist( & $Form )
 		}
 	}
 
+	$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, T_('Tag'), '', array(
+		'maxlength' => 255,
+		'input_prefix' => '<div class="input-group" style="width: 350px;">',
+		'input_suffix'=> '</div>'	) );
+	?>
+	<script type="text/javascript">
+	function init_autocomplete_tags( selector )
+	{
+		var tags = jQuery( selector ).val();
+		var tags_json = new Array();
+		if( tags.length > 0 )
+		{ // Get tags from <input>
+			tags = tags.split( ',' );
+			for( var t in tags )
+			{
+				tags_json.push( { id: tags[t], name: tags[t] } );
+			}
+		}
+
+		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
+		{
+			theme: 'facebook',
+			queryParam: 's',
+			propertyToSearch: 'name',
+			tokenValue: 'name',
+			preventDuplicates: true,
+			prePopulate: tags_json,
+			hintText: '<?php echo TS_('Type in a tag') ?>',
+			noResultsText: '<?php echo TS_('No results') ?>',
+			searchingText: '<?php echo TS_('Searching...') ?>',
+			jsonContainer: 'tags',
+		} );
+	}
+
+	jQuery( document ).ready( function()
+	{
+		jQuery( '#user_tag' ).hide();
+		init_autocomplete_tags( '#user_tag' );
+		<?php
+			// Don't submit a form by Enter when user is editing the tags
+			echo get_prevent_key_enter_js( '#token-input-user_tag' );
+		?>
+	} );
+	</script>
+	<?php
+
+	if( is_admin_page() )
+	{
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{
+			$Form->checkbox( 'custom_sender_email', get_param('custom_sender_email'), T_('Users with custom sender address') );
+			$Form->checkbox( 'custom_sender_name', get_param('custom_sender_name'), T_('Users with custom sender name') );
+		}
+	}
+
 	if( is_admin_page() && $edited_EmailCampaign )
 	{
 		$campaign_send_status = array(
@@ -3436,15 +3491,6 @@ function callback_filter_userlist( & $Form )
 		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
 
 		$Form->select( 'criteria_type[]', $type, 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
-	}
-
-	if( is_admin_page() )
-	{
-		if( $current_User->check_perm( 'users', 'edit' ) )
-		{
-			$Form->checkbox( 'custom_sender_email', get_param('custom_sender_email'), T_('Users with custom sender address') );
-			$Form->checkbox( 'custom_sender_name', get_param('custom_sender_name'), T_('Users with custom sender name') );
-		}
 	}
 
 	if( user_region_visible() )
