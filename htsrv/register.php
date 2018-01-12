@@ -170,6 +170,7 @@ switch( $action )
 				$subscribe_posts = $user_register_Widget->disp_params['subscribe_post'];
 				$subscribe_comments = $user_register_Widget->disp_params['subscribe_comment'];
 				$widget_newsletters = $user_register_Widget->disp_params['newsletters'];
+				$widget_tags = $user_register_Widget->disp_params['usertags'];
 				$widget_redirect_to = trim( $user_register_Widget->disp_params['redirect_to'] );
 			}
 
@@ -340,6 +341,12 @@ switch( $action )
 			if( count( $widget_newsletters ) )
 			{	// If at least one newsletter is selected in widget params:
 				$new_User->set_newsletter_subscriptions( array_keys( $widget_newsletters ) );
+			}
+
+			// Set user tags from current widget "Email capture / Quick registration":
+			if( ! empty( $widget_tags ) )
+			{
+				$new_User->set_tags_from_string( $widget_tags );
 			}
 		}
 		else

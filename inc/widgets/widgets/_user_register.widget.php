@@ -153,6 +153,11 @@ class user_register_Widget extends ComponentWidget
 					'maxlength' => 30,
 					'defaultvalue' => 'email capture form',
 				),
+				'usertags' => array(
+					'label' => T_('Tag user with'),
+					'size' => 30,
+					'maxlength' => 255,
+				),
 				'newsletters' => array(
 					'label' => T_('Lists'),
 					'type' => 'checklist',

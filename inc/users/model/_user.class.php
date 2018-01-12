@@ -345,6 +345,7 @@ class User extends DataObject
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_target_user_ID', 'msg'=>T_('%d reports about this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_reporter_ID', 'msg'=>T_('%d reports created by this user') ),
 				array( 'table'=>'T_users__user_org', 'fk'=>'uorg_user_ID', 'msg'=>T_('%d organization membership') ),
+				array( 'table'=>'T_users__usertag', 'fk'=>'uutg_user_ID', 'msg'=>T_('%d links to tags') ),
 				array( 'table'=>'T_polls__answer', 'fk'=>'pans_user_ID', 'msg'=>T_('%d poll answers') ),
 				array( 'table'=>'T_users__secondary_user_groups', 'fk'=>'sug_user_ID', 'msg'=>T_('%d secondary groups') ),
 				array( 'table'=>'T_users__profile_visits', 'fk'=>'upv_visited_user_ID', 'msg'=>T_('%d profile visits') ),
@@ -867,6 +868,13 @@ class User extends DataObject
 						$Domain->dbsave();
 					}
 				}
+			}
+
+			// Tags
+			$user_tags = param( 'user_tags', 'string', NULL );
+			if( $user_tags != NULL )
+			{
+				$this->set_tags_from_string( get_param( 'user_tags' ) );
 			}
 		}
 
@@ -3955,6 +3963,11 @@ class User extends DataObject
 				$this->subscribe( array_unique( $insert_newsletters ) );
 			}
 
+			if( $result )
+			{ // Let's handle the tags
+				$this->insert_update_tags( 'insert' );
+			}
+
 			// Notify plugins:
 			// A user could be created also in another DB (to synchronize it with b2evo)
 			$Plugins->trigger_event( 'AfterUserInsert', $params = array( 'User' => & $this ) );
@@ -4041,6 +4054,11 @@ class User extends DataObject
 
 		// Update newsletter subscriptions:
 		$this->update_newsletter_subscriptions();
+
+		if( $result && isset( $this->dbchanges_flags['tags'] ) )
+		{ // Let's handle the tags:
+			$this->insert_update_tags( 'update' );
+		}
 
 		// Notify plugins:
 		// Example: An authentication plugin could synchronize/update the password of the user.
@@ -7593,7 +7611,7 @@ class User extends DataObject
 			$newsletter_IDs = array( $newsletter_IDs );
 		}
 
-		// Decide what newsletter subsciptions should be inserted into DB and what should be updated:
+		// Decide what newsletter subscriptions should be inserted into DB and what should be updated:
 		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'all' );
 		$insert_newsletter_IDs = array_diff( $newsletter_IDs, $newsletter_subscriptions );
 		$update_newsletter_IDs = array_intersect( $newsletter_IDs, $newsletter_subscriptions );
@@ -7696,6 +7714,99 @@ class User extends DataObject
 				$EmailCampaign->send_all_emails( false, array( $this->ID ) );
 			}
 		}
+	}
+
+
+	/**
+	 * Save tags to DB
+	 *
+	 * @param string 'insert' | 'update'
+	 */
+	function insert_update_tags( $mode )
+	{
+		global $DB;
+
+		if( isset( $this->tags ) )
+		{ // Okay the tags are defined:
+
+			$DB->begin();
+
+			if( $mode == 'update' )
+			{	// delete previous tag associations:
+				// Note: actual tags never get deleted
+				$DB->query( 'DELETE FROM T_users__usertag
+											WHERE uutg_user_ID = '.$this->ID, 'delete previous tags' );
+			}
+
+			if( ! empty( $this->tags ) )
+			{
+				// Find the tags that are already in the DB
+				$query = 'SELECT utag_name
+										FROM T_users__tag
+									 WHERE utag_name IN ('.$DB->quote( $this->tags ).')';
+				$existing_tags = $DB->get_col( $query, 0, 'Find existing tags' );
+
+				$new_tags = array_diff( $this->tags, $existing_tags );
+
+				if( ! empty( $new_tags ) )
+				{ // insert new tags:
+					$query = "INSERT INTO T_users__tag( utag_name ) VALUES ";
+					foreach( $new_tags as $tag )
+					{
+						$query .= '( '.$DB->quote($tag).' ),';
+					}
+					$query = substr( $query, 0, strlen( $query ) - 1 );
+					$DB->query( $query, 'insert new tags' );
+				}
+
+				// ASSOC:
+				$query = 'INSERT INTO T_users__usertag( uutg_user_ID, uutg_emtag_ID )
+								  SELECT '.$this->ID.', utag_ID
+									  FROM T_users__tag
+									 WHERE utag_name IN ('.$DB->quote( $this->tags ).')';
+				$DB->query( $query, 'Make tag associations!' );
+			}
+
+			$DB->commit();
+		}
+	}
+
+
+	/**
+	 * Split tags by comma or semicolon
+	 *
+	 * @param string The tags, separated by comma or semicolon
+	 */
+	function set_tags_from_string( $tags )
+	{
+		// Mark that tags has been updated, even if it is not sure because we do not want to execute extra db query
+		$this->dbchanges_flags['tags'] = true;
+
+		if( $tags === '' )
+		{
+			$this->tags = array();
+			return;
+		}
+
+		$this->tags = preg_split( '/\s*[;,]+\s*/', $tags, -1, PREG_SPLIT_NO_EMPTY );
+		foreach( $this->tags as $t => $tag )
+		{
+			if( substr( $tag, 0, 1 ) == '-' )
+			{ // Prevent chars '-' in first position
+				$tag = preg_replace( '/^-+/', '', $tag );
+			}
+			if( empty( $tag ) )
+			{ // Don't save empty tag
+				unset( $this->tags[ $t ] );
+			}
+			else
+			{ // Save the modifications for each tag
+				$this->tags[ $t ] = $tag;
+			}
+		}
+
+		// Remove the duplicate tags
+		$this->tags = array_unique( $this->tags );
 	}
 }
 
