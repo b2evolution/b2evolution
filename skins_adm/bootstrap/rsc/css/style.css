@@ -615,6 +615,13 @@ fieldset ul {
   color: #000;
   font-weight: normal;
 }
+#user_admin_tags {
+  width: 500px;
+}
+#user_admin_tags ul.token-input-list-facebook {
+  width: 100%;
+  max-width: 100%;
+}
 #item_locations label {
   width: auto;
   float: right;

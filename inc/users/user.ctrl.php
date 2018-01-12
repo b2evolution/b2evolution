@@ -92,6 +92,8 @@ if( ! is_null( $user_ID ) )
 			$Messages->add( T_('Visit tracking is not enabled.') );
 			header_redirect( '?ctrl=users&user_tab=profile&user_ID='.$current_User->ID, 403 );
 		}
+
+		$user_tags = implode( ', ', $edited_User->get_tags() );
 	}
 }
 elseif( $action != 'new' )
@@ -839,6 +841,8 @@ if( $display_mode != 'js')
 			init_colorpicker_js();
 			break;
 		case 'admin':
+			// Initialize user tag input
+			init_tokeninput_js();
 			$AdminUI->breadcrumbpath_add( T_('Admin'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			load_funcs( 'tools/model/_email.funcs.php' );
 			load_funcs( 'sessions/model/_hitlog.funcs.php' );

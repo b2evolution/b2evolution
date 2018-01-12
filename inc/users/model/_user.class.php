@@ -871,10 +871,10 @@ class User extends DataObject
 			}
 
 			// Tags
-			$user_tags = param( 'user_tags', 'string', NULL );
+			$user_tags = param( 'edited_user_tags', 'string', NULL );
 			if( $user_tags != NULL )
 			{
-				$this->set_tags_from_string( get_param( 'user_tags' ) );
+				$this->set_tags_from_string( get_param( 'edited_user_tags' ) );
 			}
 		}
 
@@ -5312,6 +5312,12 @@ class User extends DataObject
 				}
 			}
 
+			if( isset( $this->dbchanges_flags['tags'] ) )
+			{ // Let's handle the tags:
+				//die( var_dump( $this->tags ) );
+				$this->insert_update_tags( 'update' );
+			}
+
 			if( $update_success )
 			{
 				$user_field_url = $this->get_field_url( true );
@@ -7715,6 +7721,25 @@ class User extends DataObject
 				$EmailCampaign->send_all_emails( false, array( $this->ID ) );
 			}
 		}
+	}
+
+
+	/**
+	 * Retrieves all tags assigned to user
+	 *
+	 * @return array of tags
+	 */
+	function get_tags()
+	{
+		global $DB;
+
+		$tags_SQL = new SQL( 'Get tags' );
+		$tags_SQL->SELECT( 'utag_name' );
+		$tags_SQL->FROM( 'T_users__tag' );
+		$tags_SQL->FROM_add( 'INNER JOIN T_users__usertag ON uutg_emtag_ID = utag_ID' );
+		$tags_SQL->WHERE( 'uutg_user_ID = '.$DB->quote( $this->ID ) );
+
+		return $DB->get_col( $tags_SQL );
 	}
 
 
