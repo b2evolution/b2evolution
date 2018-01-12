@@ -4055,7 +4055,8 @@ class User extends DataObject
 		// Update newsletter subscriptions:
 		$this->update_newsletter_subscriptions();
 
-		if( $result && isset( $this->dbchanges_flags['tags'] ) )
+		// Update user tags:
+		if( isset( $this->dbchanges_flags['tags'] ) )
 		{ // Let's handle the tags:
 			$this->insert_update_tags( 'update' );
 		}

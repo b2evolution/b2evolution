@@ -53,7 +53,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('List subscription');
+		return T_('Newsletter/Email list subscription');
 	}
 
 
@@ -125,6 +125,11 @@ class newsletter_subscription_Widget extends ComponentWidget
 					'note' => T_('Form submit button class'),
 					'size' => 40,
 					'defaultvalue' => 'btn-danger'
+				),
+				'usertags' => array(
+					'label' => T_('On subscription, tag user with'),
+					'size' => 30,
+					'maxlength' => 255,
 				),
 				'button_subscribed' => array(
 					'label' => T_('Button title when subscribed'),

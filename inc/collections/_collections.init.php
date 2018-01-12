@@ -1222,6 +1222,7 @@ class collections_Module extends Module
 				{ // Request from widget
 					$Widget = & $WidgetCache->get_by_ID( $widget_ID );
 					$newsletter_ID = $Widget->get_param( 'enlt_ID' );
+					$user_tags = $Widget->get_param( 'usertags' );
 				}
 				elseif( param( 'inline', 'integer', 0 ) == 1 )
 				{ // Request from subscribe shorttag
@@ -1249,6 +1250,11 @@ class collections_Module extends Module
 				{	// Subscribe to newsletter:
 					if( $current_User->subscribe( $Newsletter->ID ) )
 					{
+						if( ! empty( $user_tags ) )
+						{
+							$current_User->set_tags_from_string( $user_tags );
+							$current_User->dbupdate();
+						}
 						$Messages->add( T_('You have successfully subscribed.'), 'success' );
 					}
 				}
