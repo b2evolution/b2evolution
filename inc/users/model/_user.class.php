@@ -7731,15 +7731,20 @@ class User extends DataObject
 	 */
 	function get_tags()
 	{
-		global $DB;
+		if( ! isset( $this->tags ) )
+		{
+			global $DB;
 
-		$tags_SQL = new SQL( 'Get tags' );
-		$tags_SQL->SELECT( 'utag_name' );
-		$tags_SQL->FROM( 'T_users__tag' );
-		$tags_SQL->FROM_add( 'INNER JOIN T_users__usertag ON uutg_emtag_ID = utag_ID' );
-		$tags_SQL->WHERE( 'uutg_user_ID = '.$DB->quote( $this->ID ) );
+			$tags_SQL = new SQL( 'Get tags' );
+			$tags_SQL->SELECT( 'utag_name' );
+			$tags_SQL->FROM( 'T_users__tag' );
+			$tags_SQL->FROM_add( 'INNER JOIN T_users__usertag ON uutg_emtag_ID = utag_ID' );
+			$tags_SQL->WHERE( 'uutg_user_ID = '.$DB->quote( $this->ID ) );
 
-		return $DB->get_col( $tags_SQL );
+			$this->tags = $DB->get_col( $tags_SQL );
+		}
+
+		return $this->tags;
 	}
 
 
@@ -7828,6 +7833,49 @@ class User extends DataObject
 			else
 			{ // Save the modifications for each tag
 				$this->tags[ $t ] = $tag;
+			}
+		}
+
+		// Remove the duplicate tags
+		$this->tags = array_unique( $this->tags );
+	}
+
+
+	/**
+	 * Append user tags
+	 *
+	 * @param string/array comma separated tags or array of tags
+	 */
+	function add_tags( $tags )
+	{
+		if( empty( $tags ) )
+		{
+			return;
+		}
+
+		if( ! is_array( $tags ) )
+		{
+			$tags = preg_split( '/\s*[;,]+\s*/', $tags, -1, PREG_SPLIT_NO_EMPTY );
+		}
+
+		$this->get_tags();
+		foreach( $tags as $t => $tag )
+		{
+			// Replace ; and , in case $tags parameter was passed as an array
+			$tag = str_replace( array( ';', ',' ), ' ', $tag );
+
+			if( substr( $tag, 0, 1 ) == '-' )
+			{ // Prevent chars '-' in first position
+				$tag = preg_replace( '/^-+/', '', $tag );
+			}
+			if( empty( $tag ) )
+			{ // Don't save empty tag
+				unset( $tags[ $t ] );
+			}
+			else
+			{ // Append the tag and mark that tags has been updated
+				$this->dbchanges_flags['tags'] = true;
+				$this->tags[] = $tag;
 			}
 		}
 
