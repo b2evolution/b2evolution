@@ -3947,6 +3947,7 @@ class User extends DataObject
 				$this->new_fields = array();
 			}
 
+			// NEWSLETTERS: 
 			$insert_newsletters = array();
 			if( isset( $Settings ) && ( ! isset( $this->insert_default_newsletters ) || $this->insert_default_newsletters ) )
 			{	// Insert default newsletter subscriptions for this user,
@@ -3962,7 +3963,11 @@ class User extends DataObject
 			{	// Do subscribing if at least one newsletter is selected by default:
 				$this->subscribe( array_unique( $insert_newsletters ) );
 			}
+			// Unset flag in order not to run this twice:
+			$this->newsletter_subscriptions_updated = false;
 
+
+			// USER TAGS:
 			if( $result )
 			{ // Let's handle the tags
 				$this->insert_update_tags( 'insert' );
@@ -4053,6 +4058,7 @@ class User extends DataObject
 		}
 
 		// Update newsletter subscriptions:
+// TODO: fp>yura: why do we call a function instead of inlining code? It is inlined in dbinsert()! Can this function be called from ANY other place?
 		$this->update_newsletter_subscriptions();
 
 		// Update user tags:
@@ -7564,6 +7570,8 @@ class User extends DataObject
 	/**
 	 * Update newsletter subscriptions of this user
 	 *
+// TODO: fp>yura: when can this function be called? Can it be called at ANY other time than dbupdate?
+	 *
 	 * @return integer|boolean # of rows affected or false if error
 	 */
 	function update_newsletter_subscriptions()
@@ -7584,7 +7592,7 @@ class User extends DataObject
 		// Unsubscribe from unchecked newsletters:
 		$r += $this->unsubscribe( array_diff( $this->get_newsletter_subscriptions( 'all' ), $this->new_newsletter_subscriptions ) );
 
-		// Unset flag to don't run this twice:
+		// Unset flag in order not to run this twice:
 		$this->newsletter_subscriptions_updated = false;
 
 		return $r;
