@@ -97,7 +97,7 @@ if( $edited_UserTag->ID > 0 )
 		global $current_User, $edited_UserTag;
 
 		// Display the edit icon if current user has the rights:
-		$r = action_icon( T_('Edit this user...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=user&amp;user_ID='.$User->ID.'&amp;user_tab=profile' ) );
+		$r = action_icon( T_('Edit this user...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=user&amp;user_ID='.$User->ID.'&amp;user_tab=admin' ) );
 
 		if( $current_User->check_perm( 'users', 'moderate', false, $User ) )
 		{ // Display the unlink icon if current user has the rights:
