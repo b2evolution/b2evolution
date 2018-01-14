@@ -918,6 +918,12 @@ class Skin extends DataObject
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
 
+		// Convert array values into string for DB storage
+		if( is_array( $parvalue ) )
+		{
+			$parvalue = serialize( $parvalue );
+		}
+
 		$Blog->set_setting( $blog_setting_name, $parvalue );
 	}
 
