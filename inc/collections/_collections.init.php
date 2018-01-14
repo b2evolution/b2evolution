@@ -1252,7 +1252,7 @@ class collections_Module extends Module
 					{
 						if( ! empty( $insert_user_tags ) )
 						{
-							$current_User->add_tags( $insert_user_tags );
+							$current_User->add_usertags( $insert_user_tags );
 							$current_User->dbupdate();
 						}
 						$Messages->add( T_('You have successfully subscribed.'), 'success' );

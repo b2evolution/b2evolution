@@ -874,7 +874,7 @@ class User extends DataObject
 			$user_tags = param( 'edited_user_tags', 'string', NULL );
 			if( $user_tags != NULL )
 			{
-				$this->set_tags_from_string( get_param( 'edited_user_tags' ) );
+				$this->set_usertags_from_string( get_param( 'edited_user_tags' ) );
 			}
 		}
 
@@ -3947,7 +3947,7 @@ class User extends DataObject
 				$this->new_fields = array();
 			}
 
-			// NEWSLETTERS: 
+			// NEWSLETTERS:
 			$insert_newsletters = array();
 			if( isset( $Settings ) && ( ! isset( $this->insert_default_newsletters ) || $this->insert_default_newsletters ) )
 			{	// Insert default newsletter subscriptions for this user,
@@ -3970,7 +3970,7 @@ class User extends DataObject
 			// USER TAGS:
 			if( $result )
 			{ // Let's handle the tags
-				$this->insert_update_tags( 'insert' );
+				$this->insert_update_user_tags( 'insert' );
 			}
 
 			// Notify plugins:
@@ -4062,9 +4062,9 @@ class User extends DataObject
 		$this->update_newsletter_subscriptions();
 
 		// Update user tags:
-		if( isset( $this->dbchanges_flags['tags'] ) )
+		if( isset( $this->dbchanges_flags['user_tags'] ) )
 		{ // Let's handle the tags:
-			$this->insert_update_tags( 'update' );
+			$this->insert_update_user_tags( 'update' );
 		}
 
 		// Notify plugins:
@@ -5318,10 +5318,10 @@ class User extends DataObject
 				}
 			}
 
-			if( isset( $this->dbchanges_flags['tags'] ) )
+			if( isset( $this->dbchanges_flags['user_tags'] ) )
 			{ // Let's handle the tags:
 				//die( var_dump( $this->tags ) );
-				$this->insert_update_tags( 'update' );
+				$this->insert_update_user_tags( 'update' );
 			}
 
 			if( $update_success )
@@ -7737,9 +7737,9 @@ class User extends DataObject
 	 *
 	 * @return array of tags
 	 */
-	function get_tags()
+	function get_usertags()
 	{
-		if( ! isset( $this->tags ) )
+		if( ! isset( $this->user_tags ) )
 		{
 			global $DB;
 
@@ -7749,10 +7749,10 @@ class User extends DataObject
 			$tags_SQL->FROM_add( 'INNER JOIN T_users__usertag ON uutg_emtag_ID = utag_ID' );
 			$tags_SQL->WHERE( 'uutg_user_ID = '.$DB->quote( $this->ID ) );
 
-			$this->tags = $DB->get_col( $tags_SQL );
+			$this->user_tags = $DB->get_col( $tags_SQL );
 		}
 
-		return $this->tags;
+		return $this->user_tags;
 	}
 
 
@@ -7761,11 +7761,11 @@ class User extends DataObject
 	 *
 	 * @param string 'insert' | 'update'
 	 */
-	function insert_update_tags( $mode )
+	function insert_update_user_tags( $mode )
 	{
 		global $DB;
 
-		if( isset( $this->tags ) )
+		if( isset( $this->user_tags ) )
 		{ // Okay the tags are defined:
 
 			$DB->begin();
@@ -7777,22 +7777,22 @@ class User extends DataObject
 											WHERE uutg_user_ID = '.$this->ID, 'delete previous tags' );
 			}
 
-			if( ! empty( $this->tags ) )
+			if( ! empty( $this->user_tags ) )
 			{
 				// Find the tags that are already in the DB
 				$query = 'SELECT utag_name
 										FROM T_users__tag
-									 WHERE utag_name IN ('.$DB->quote( $this->tags ).')';
+									 WHERE utag_name IN ('.$DB->quote( $this->user_tags ).')';
 				$existing_tags = $DB->get_col( $query, 0, 'Find existing tags' );
 
-				$new_tags = array_diff( $this->tags, $existing_tags );
+				$new_tags = array_diff( $this->user_tags, $existing_tags );
 
 				if( ! empty( $new_tags ) )
 				{ // insert new tags:
 					$query = "INSERT INTO T_users__tag( utag_name ) VALUES ";
 					foreach( $new_tags as $tag )
 					{
-						$query .= '( '.$DB->quote($tag).' ),';
+						$query .= '( '.$DB->quote( $tag ).' ),';
 					}
 					$query = substr( $query, 0, strlen( $query ) - 1 );
 					$DB->query( $query, 'insert new tags' );
@@ -7802,7 +7802,7 @@ class User extends DataObject
 				$query = 'INSERT INTO T_users__usertag( uutg_user_ID, uutg_emtag_ID )
 								  SELECT '.$this->ID.', utag_ID
 									  FROM T_users__tag
-									 WHERE utag_name IN ('.$DB->quote( $this->tags ).')';
+									 WHERE utag_name IN ('.$DB->quote( $this->user_tags ).')';
 				$DB->query( $query, 'Make tag associations!' );
 			}
 
@@ -7816,36 +7816,36 @@ class User extends DataObject
 	 *
 	 * @param string The tags, separated by comma or semicolon
 	 */
-	function set_tags_from_string( $tags )
+	function set_usertags_from_string( $user_tags )
 	{
 		// Mark that tags has been updated, even if it is not sure because we do not want to execute extra db query
-		$this->dbchanges_flags['tags'] = true;
+		$this->dbchanges_flags['user_tags'] = true;
 
-		if( $tags === '' )
+		if( $user_tags === '' )
 		{
-			$this->tags = array();
+			$this->user_tags = array();
 			return;
 		}
 
-		$this->tags = preg_split( '/\s*[;,]+\s*/', $tags, -1, PREG_SPLIT_NO_EMPTY );
-		foreach( $this->tags as $t => $tag )
+		$this->user_tags = preg_split( '/\s*[;,]+\s*/', $user_tags, -1, PREG_SPLIT_NO_EMPTY );
+		foreach( $this->user_tags as $t => $user_tag )
 		{
-			if( substr( $tag, 0, 1 ) == '-' )
+			if( substr( $user_tag, 0, 1 ) == '-' )
 			{ // Prevent chars '-' in first position
-				$tag = preg_replace( '/^-+/', '', $tag );
+				$user_tag = preg_replace( '/^-+/', '', $user_tag );
 			}
-			if( empty( $tag ) )
+			if( empty( $user_tag ) )
 			{ // Don't save empty tag
-				unset( $this->tags[ $t ] );
+				unset( $this->user_tags[ $t ] );
 			}
 			else
 			{ // Save the modifications for each tag
-				$this->tags[ $t ] = $tag;
+				$this->user_tags[ $t ] = $user_tag;
 			}
 		}
 
 		// Remove the duplicate tags
-		$this->tags = array_unique( $this->tags );
+		$this->user_tags = array_unique( $this->user_tags );
 	}
 
 
@@ -7854,41 +7854,41 @@ class User extends DataObject
 	 *
 	 * @param string/array comma separated tags or array of tags
 	 */
-	function add_tags( $tags )
+	function add_usertags( $user_tags )
 	{
-		if( empty( $tags ) )
+		if( empty( $user_tags ) )
 		{
 			return;
 		}
 
-		if( ! is_array( $tags ) )
+		if( ! is_array( $user_tags ) )
 		{
-			$tags = preg_split( '/\s*[;,]+\s*/', $tags, -1, PREG_SPLIT_NO_EMPTY );
+			$user_tags = preg_split( '/\s*[;,]+\s*/', $user_tags, -1, PREG_SPLIT_NO_EMPTY );
 		}
 
-		$this->get_tags();
-		foreach( $tags as $t => $tag )
+		$this->get_usertags();
+		foreach( $user_tags as $t => $user_tag )
 		{
 			// Replace ; and , in case $tags parameter was passed as an array
-			$tag = str_replace( array( ';', ',' ), ' ', $tag );
+			$user_tag = str_replace( array( ';', ',' ), ' ', $user_tag );
 
-			if( substr( $tag, 0, 1 ) == '-' )
+			if( substr( $user_tag, 0, 1 ) == '-' )
 			{ // Prevent chars '-' in first position
-				$tag = preg_replace( '/^-+/', '', $tag );
+				$user_tag = preg_replace( '/^-+/', '', $user_tag );
 			}
-			if( empty( $tag ) )
+			if( empty( $user_tag ) )
 			{ // Don't save empty tag
-				unset( $tags[ $t ] );
+				unset( $user_tags[ $t ] );
 			}
 			else
 			{ // Append the tag and mark that tags has been updated
-				$this->dbchanges_flags['tags'] = true;
-				$this->tags[] = $tag;
+				$this->dbchanges_flags['user_tags'] = true;
+				$this->user_tags[] = $user_tag;
 			}
 		}
 
 		// Remove the duplicate tags
-		$this->tags = array_unique( $this->tags );
+		$this->user_tags = array_unique( $this->user_tags );
 	}
 }
 

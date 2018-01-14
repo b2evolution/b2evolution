@@ -1066,7 +1066,7 @@ function get_user_subs_url()
  * @param string What display as link text: avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
  * @return NULL|string NULL if this user or the profile tab doesn't exists, the identity link otherwise.
  */
-function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'profile', $link_text = 'avatar' )
+function get_user_identity_link( $user_login, $user_ID = NULL, $user_tab = 'profile', $link_text = 'avatar' )
 {
 	$UserCache = & get_UserCache();
 
@@ -1088,7 +1088,7 @@ function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'p
 		return NULL;
 	}
 
-	return $User->get_identity_link( array( 'profile_tab' => $profile_tab, 'link_text' => $link_text ) );
+	return $User->get_identity_link( array( 'user_tab' => $user_tab, 'link_text' => $link_text ) );
 }
 
 

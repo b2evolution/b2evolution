@@ -346,7 +346,7 @@ switch( $action )
 			// Set user tags from current widget "Email capture / Quick registration":
 			if( ! empty( $widget_tags ) )
 			{
-				$new_User->set_tags_from_string( $widget_tags );
+				$new_User->set_usertags_from_string( $widget_tags );
 			}
 		}
 		else

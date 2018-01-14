@@ -83,7 +83,7 @@ if( $edited_UserTag->ID > 0 )
 	$Results->cols[] = array(
 			'th'    => T_('Login'),
 			'order' => 'user_login',
-			'td'    => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "login" )%',
+			'td'    => '%get_user_identity_link( #user_login#, #user_ID#, "admin", "login" )%',
 		);
 
 	$Results->cols[] = array(

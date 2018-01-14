@@ -93,7 +93,7 @@ if( ! is_null( $user_ID ) )
 			header_redirect( '?ctrl=users&user_tab=profile&user_ID='.$current_User->ID, 403 );
 		}
 
-		$user_tags = implode( ', ', $edited_User->get_tags() );
+		$user_tags = implode( ', ', $edited_User->get_usertags() );
 	}
 }
 elseif( $action != 'new' )
