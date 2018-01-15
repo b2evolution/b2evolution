@@ -3963,9 +3963,6 @@ class User extends DataObject
 			{	// Do subscribing if at least one newsletter is selected by default:
 				$this->subscribe( array_unique( $insert_newsletters ) );
 			}
-			// Unset flag in order not to run this twice:
-			$this->newsletter_subscriptions_updated = false;
-
 
 			// USER TAGS:
 			if( $result )
@@ -4058,8 +4055,13 @@ class User extends DataObject
 		}
 
 		// Update newsletter subscriptions:
-// TODO: fp>yura: why do we call a function instead of inlining code? It is inlined in dbinsert()! Can this function be called from ANY other place?
-		$this->update_newsletter_subscriptions();
+		if( $this->newsletter_subscriptions_updated )
+		{	// Only if they have been changed:
+			// Insert newsletter subscriptions for this user:
+			$this->subscribe( $this->new_newsletter_subscriptions );
+			// Unsubscribe from unchecked newsletters:
+			$this->unsubscribe( array_diff( $this->get_newsletter_subscriptions( 'all' ), $this->new_newsletter_subscriptions ) );
+		}
 
 		// Update user tags:
 		if( isset( $this->dbchanges_flags['user_tags'] ) )
@@ -7568,38 +7570,6 @@ class User extends DataObject
 
 
 	/**
-	 * Update newsletter subscriptions of this user
-	 *
-// TODO: fp>yura: when can this function be called? Can it be called at ANY other time than dbupdate?
-	 *
-	 * @return integer|boolean # of rows affected or false if error
-	 */
-	function update_newsletter_subscriptions()
-	{
-		if( empty( $this->ID ) )
-		{	// Only created user can has the newsletter subscriptions:
-			return false;
-		}
-
-		if( ! $this->newsletter_subscriptions_updated )
-		{	// Nothing to update:
-			return false;
-		}
-
-		// Insert newsletter subscriptions for this user:
-		$r = $this->subscribe( $this->new_newsletter_subscriptions );
-
-		// Unsubscribe from unchecked newsletters:
-		$r += $this->unsubscribe( array_diff( $this->get_newsletter_subscriptions( 'all' ), $this->new_newsletter_subscriptions ) );
-
-		// Unset flag in order not to run this twice:
-		$this->newsletter_subscriptions_updated = false;
-
-		return $r;
-	}
-
-
-	/**
 	 * Subscribe to newsletter
 	 *
 	 * @param array|integer Newsletter IDs
@@ -7660,6 +7630,9 @@ class User extends DataObject
 		}
 
 		$DB->commit();
+
+		// Unset flag in order not to run this twice:
+		$this->newsletter_subscriptions_updated = false;
 
 		return $r;
 	}
