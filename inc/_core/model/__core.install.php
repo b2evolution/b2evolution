@@ -554,6 +554,24 @@ $schema_queries = array(
 			PRIMARY KEY   csnd_PK ( csnd_camp_ID, csnd_user_ID )
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
+	'T_automation__automation' => array(
+		'Creating automation table',
+		"CREATE TABLE T_automation__automation (
+			autm_ID            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			autm_name          VARCHAR(255) NOT NULL,
+			autm_status        ENUM('paused', 'active') DEFAULT 'paused',
+			autm_first_step_ID INT UNSIGNED NULL DEFAULT NULL,
+			PRIMARY KEY        (autm_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__step' => array(
+		'Creating automation step table',
+		"CREATE TABLE T_automation__step (
+			step_ID      INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			step_autm_ID INT UNSIGNED NOT NULL,
+			PRIMARY KEY  (step_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
 	'T_syslog' => array(
 		'Creating system log table',
 		"CREATE TABLE T_syslog (

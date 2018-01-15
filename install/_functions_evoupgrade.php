@@ -8931,6 +8931,22 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12510, 'Creating automation tables...' ) )
+	{	// part of 6.10.0-beta
+		db_create_table( 'T_automation__automation', '
+			autm_ID            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			autm_name          VARCHAR(255) NOT NULL,
+			autm_status        ENUM("paused", "active") DEFAULT "paused",
+			autm_first_step_ID INT UNSIGNED NULL DEFAULT NULL,
+			PRIMARY KEY        (autm_ID)' );
+
+		db_create_table( 'T_automation__step', '
+			step_ID      INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			step_autm_ID INT UNSIGNED NOT NULL,
+			PRIMARY KEY  (step_ID)' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

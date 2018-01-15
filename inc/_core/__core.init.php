@@ -79,6 +79,8 @@ $db_config['aliases'] = array(
 		'T_email__newsletter_subscription' => $tableprefix.'email__newsletter_subscription',
 		'T_email__campaign'        => $tableprefix.'email__campaign',
 		'T_email__campaign_send'   => $tableprefix.'email__campaign_send',
+		'T_automation__automation' => $tableprefix.'automation__automation',
+		'T_automation__step'       => $tableprefix.'automation__step',
 		'T_syslog'                 => $tableprefix.'syslog',
 	);
 
@@ -130,6 +132,7 @@ $ctrl_mappings = array(
 		'email'            => 'tools/email.ctrl.php',
 		'newsletters'      => 'email_campaigns/newsletters.ctrl.php',
 		'campaigns'        => 'email_campaigns/campaigns.ctrl.php',
+		'automations'      => 'automations/automations.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
 	);
 
@@ -520,6 +523,25 @@ function & get_EmailCampaignPrerenderingCache()
 	}
 
 	return $EmailCampaignPrerenderingCache;
+}
+
+
+/**
+ * Get the AutomationCache
+ *
+ * @return AutomationCache
+ */
+function & get_AutomationCache()
+{
+	global $AutomationCache;
+
+	if( ! isset( $AutomationCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'automations/model/_automation.class.php', 'Automation' );
+		$AutomationCache = new DataObjectCache( 'Automation', false, 'T_automation__automation', 'autm_', 'autm_ID' );
+	}
+
+	return $AutomationCache;
 }
 
 
@@ -2052,6 +2074,15 @@ class _core_Module extends Module
 							'text' => T_('Addresses'),
 							'href' => '?ctrl=email' ),
 						) ) ) );
+
+			if( $perm_options )
+			{	// If current user has a permissions to view options:
+				$AdminUI->add_menu_entries( 'email', array(
+						'automations' => array(
+							'text' => T_('Automations'),
+							'href' => '?ctrl=automations' ),
+					), 'campaigns' );
+			}
 
 			if( $current_User->check_perm( 'emails', 'edit' ) )
 			{	// Allow to test a returned email only if user has a permission to edit email settings:
