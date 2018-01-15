@@ -94,7 +94,6 @@ class EmailCampaign extends DataObject
 			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 			$this->auto_send = $db_row->ecmp_auto_send;
-			$this->sequence = $db_row->ecmp_sequence;
 		}
 	}
 
@@ -523,11 +522,6 @@ class EmailCampaign extends DataObject
 		if( param( 'ecmp_auto_send', 'string', NULL ) !== NULL )
 		{	// Auto send:
 			$this->set_from_Request( 'auto_send' );
-			if( $this->get( 'auto_send' ) == 'sequence' )
-			{	// Day in sequence:
-				param( 'ecmp_sequence', 'integer', NULL );
-				$this->set_from_Request( 'sequence', NULL, true );
-			}
 		}
 
 		return ! param_errors_detected();
@@ -619,7 +613,7 @@ class EmailCampaign extends DataObject
 		else
 		{	// Send a newsletter to real user:
 			// Force email sending to not activated users if email campaign is configurated to auto sending (e-g to send email on auto subscription on registration):
-			$force_on_non_activated = in_array( $this->get( 'auto_send' ), array( 'subscription', 'sequence' ) );
+			$force_on_non_activated = ( $this->get( 'auto_send' ) == 'subscription' );
 			$r = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, $force_on_non_activated, array(), $email_address );
 			if( $r )
 			{	// Update last sending data for newsletter per user:
@@ -893,13 +887,11 @@ class EmailCampaign extends DataObject
 		$titles = array(
 				'no'           => T_('Manual'),
 				'subscription' => T_('At subscription'),
-				'sequence'     => T_('Sequence'),
 			);
 
 		if( isset( $titles[ $this->get( 'auto_send' ) ] ) )
 		{
-			return $titles[ $this->get( 'auto_send' ) ]
-				.( $this->get( 'auto_send' ) == 'sequence' ? ': '.$this->get( 'sequence' ) : '' );
+			return $titles[ $this->get( 'auto_send' ) ];
 		}
 
 		// Unknown sending method
