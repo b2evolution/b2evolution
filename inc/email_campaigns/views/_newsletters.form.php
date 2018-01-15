@@ -42,6 +42,10 @@ $Form->text_input( 'enlt_label', $edited_Newsletter->get( 'label' ), 150, T_('La
 
 $Form->text_input( 'enlt_order', $edited_Newsletter->get( 'order' ), 10, T_('Order'), '', array( 'maxlength' => 11 ) );
 
+$AutomationCache = & get_AutomationCache();
+$AutomationCache->load_all();
+$Form->select_input_object( 'enlt_default_autm_ID', $edited_Newsletter->get( 'default_autm_ID' ), $AutomationCache, T_('Default automation'), array( 'allow_none' => true ) );
+
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 {	// Display a button to create/update newsletter if current User has a perm:

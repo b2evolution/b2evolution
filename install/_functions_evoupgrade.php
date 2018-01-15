@@ -8947,6 +8947,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12520, 'Creating automation user state table...' ) )
+	{	// part of 6.10.0-beta
+		db_create_table( 'T_automation__user_state', '
+			aust_autm_ID      INT UNSIGNED NOT NULL,
+			aust_user_ID      INT UNSIGNED NOT NULL,
+			aust_next_step_ID INT UNSIGNED NOT NULL,
+			aust_next_exec_ts TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+			PRIMARY KEY       (aust_autm_ID, aust_user_ID)' );
+		db_add_col( 'T_email__newsletter', 'enlt_default_autm_ID', 'INT UNSIGNED NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

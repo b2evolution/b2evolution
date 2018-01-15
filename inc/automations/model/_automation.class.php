@@ -112,6 +112,17 @@ class Automation extends DataObject
 		$DB->rollback();
 		return false;
 	}
+
+
+	/**
+	 * Get name of automation
+	 *
+	 * @return string Name of automation
+	 */
+	function get_name()
+	{
+		return $this->get( 'name' );
+	}
 }
 
 ?>
