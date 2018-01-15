@@ -1303,19 +1303,22 @@ class _core_Module extends Module
 						);
 					if( $perm_admin_restricted )
 					{	// Menu entries to edit and view post in back-office:
-						$entries['post']['entries'] = array(
-							'edit_front' => array(
-								'text' => T_('Edit in Font-Office').'&hellip;',
-								'href' => $edit_item_url,
-							),
-							'edit_back' => array(
+						$entries['post']['entries'] = array();
+						if( $Blog->get_setting( 'in_skin_editing' ) )
+						{	// If collection allows to edit posts in front-office:
+							$entries['post']['entries']['edit_front'] = array(
+									'text' => T_('Edit in Front-Office').'&hellip;',
+									'href' => $edit_item_url,
+								);
+						}
+						$entries['post']['entries']['edit_back'] = array(
 								'text' => T_('Edit in Back-Office').'&hellip;',
 								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
-							),
-							'view_back' => array(
+							);
+						$entries['post']['entries']['view_back'] = array(
 								'text' => T_('View in Back-Office').'&hellip;',
 								'href' => $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
-							) );
+							);
 					}
 					$entries['page']['entries']['edit'] = array(
 							'text'  => T_('Edit contents').'&hellip;',
