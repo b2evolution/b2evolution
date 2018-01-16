@@ -568,9 +568,20 @@ $schema_queries = array(
 	'T_automation__step' => array(
 		'Creating automation step table',
 		"CREATE TABLE T_automation__step (
-			step_ID      INT UNSIGNED NOT NULL AUTO_INCREMENT,
-			step_autm_ID INT UNSIGNED NOT NULL,
-			PRIMARY KEY  (step_ID)
+			step_ID                    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			step_autm_ID               INT UNSIGNED NOT NULL,
+			step_order                 INT NOT NULL DEFAULT 1,
+			step_label                 VARCHAR(255) NULL,
+			step_type                  ENUM('if_condition', 'send_campaign') COLLATE ascii_general_ci NOT NULL DEFAULT 'if_condition',
+			step_info                  TEXT NULL,
+			step_yes_next_step_ID      INT UNSIGNED NULL,
+			step_yes_next_step_delay   INT UNSIGNED NULL,
+			step_no_next_step_ID       INT UNSIGNED NULL,
+			step_no_next_step_delay    INT UNSIGNED NULL,
+			step_error_next_step_ID    INT UNSIGNED NULL,
+			step_error_next_step_delay INT UNSIGNED NULL,
+			PRIMARY KEY                (step_ID),
+			UNIQUE                     step_autm_ID_order (step_autm_ID, step_order)
 		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_automation__user_state' => array(

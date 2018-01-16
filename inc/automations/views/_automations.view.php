@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $admin_url;
 
-$SQL = new SQL();
+$SQL = new SQL( 'Get all automations' );
 $SQL->SELECT( 'autm_ID, autm_name, autm_status' );
 $SQL->FROM( 'T_automation__automation' );
 

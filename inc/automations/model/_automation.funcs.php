@@ -41,4 +41,63 @@ function autm_get_status_title( $status )
 
 	return isset( $statuses[ $status ] ) ? $statuses[ $status ] : $status;
 }
+
+
+/**
+ * Get array of type titles for automation step
+ *
+ * @return array Status titles
+ */
+function step_get_type_titles()
+{
+	return array(
+			'if_condition'  => T_('IF Condition'),
+			'send_campaign' => T_('Send Campaign'),
+		);
+}
+
+
+/**
+ * Get type title of automation step by type value
+ *
+ * @param string Status value
+ * @return string Status title
+ */
+function step_get_type_title( $type )
+{
+	$types = step_get_type_titles();
+
+	return isset( $types[ $type ] ) ? $types[ $type ] : $type;
+}
+
+
+/**
+ * Helper function to display step info on Results table
+ *
+ * @param string Step label
+ * @param string Step type
+ * @return string
+ */
+function step_td_label( $step_label, $step_type )
+{
+	return ( empty( $step_label ) ? step_get_type_title( $step_type ) : $step_label );
+}
+
+
+/**
+ * Helper function to display step info on Results table
+ *
+ * @param integer Next step ID
+ * @param integer Next step delay
+ * @return string
+ */
+function step_td_next_step( $next_step_ID, $next_step_delay )
+{
+	if( empty( $next_step_ID ) )
+	{	// No defined next step:
+		return '';
+	}
+
+	return $next_step_ID.' '.seconds_to_period( $next_step_delay );
+}
 ?>

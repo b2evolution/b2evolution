@@ -26,6 +26,16 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 class AutomationStep extends DataObject
 {
 	var $autm_ID;
+	var $order;
+	var $label;
+	var $type;
+	var $info;
+	var $yes_next_step_ID;
+	var $yes_next_step_delay;
+	var $no_next_step_ID;
+	var $no_next_step_delay;
+	var $error_next_step_ID;
+	var $error_next_step_delay;
 
 	var $Automation;
 
@@ -43,6 +53,16 @@ class AutomationStep extends DataObject
 		{
 			$this->ID = $db_row->step_ID;
 			$this->autm_ID = $db_row->step_autm_ID;
+			$this->order = $db_row->step_order;
+			$this->label = $db_row->step_label;
+			$this->type = $db_row->step_type;
+			$this->info = $db_row->step_info;
+			$this->yes_next_step_ID = $db_row->step_yes_next_step_ID;
+			$this->yes_next_step_delay = $db_row->step_yes_next_step_delay;
+			$this->no_next_step_ID = $db_row->step_no_next_step_ID;
+			$this->no_next_step_delay = $db_row->step_no_next_step_delay;
+			$this->error_next_step_ID = $db_row->step_error_next_step_ID;
+			$this->error_next_step_delay = $db_row->step_error_next_step_delay;
 		}
 	}
 
@@ -72,6 +92,36 @@ class AutomationStep extends DataObject
 				// TODO:
 				//array( 'table' => 'T_automation__user_state', 'fk' => 'aust_autm_ID', 'msg' => T_('%d automation user states') ),
 			);
+	}
+
+
+	/**
+	 * Load data from Request form fields.
+	 *
+	 * @return boolean true if loaded data seems valid.
+	 */
+	function load_from_Request()
+	{
+		if( empty( $this->ID ) )
+		{	// Set Automation only for new creating Step:
+			param( 'autm_ID', 'integer', true );
+			$this->set_from_Request( 'autm_ID', 'autm_ID' );
+		}
+
+		// Order:
+		param_string_not_empty( 'step_order', T_('Please enter a step order.') );
+		// TODO: Check for unique order per automation!
+		$this->set_from_Request( 'order' );
+	
+		// Label:
+		param( 'step_label', 'string', NULL );
+		$this->set_from_Request( 'order', NULL, true );
+
+		// Type:
+		param_string_not_empty( 'step_type', T_('Please select a step type.') );
+		$this->set_from_Request( 'type' );
+
+		return ! param_errors_detected();
 	}
 
 

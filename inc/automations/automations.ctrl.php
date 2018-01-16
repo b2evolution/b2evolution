@@ -16,6 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_funcs( 'automations/model/_automation.funcs.php' );
 load_class( 'automations/model/_automation.class.php', 'Automation' );
+load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
 
 // Check permission:
 $current_User->check_perm( 'options', 'view', true );
@@ -34,6 +35,18 @@ if( param( 'autm_ID', 'integer', '', true ) )
 	}
 }
 
+if( param( 'step_ID', 'integer', '', true ) )
+{	// Load AutomationStep object:
+	$AutomationStepCache = & get_AutomationStepCache();
+	if( ( $edited_AutomationStep = & $AutomationStepCache->get_by_ID( $step_ID, false ) ) === false )
+	{	// We could not find the automation step to edit:
+		unset( $edited_AutomationStep );
+		forget_param( 'autm_ID' );
+		$action = '';
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Automation step') ), 'error' );
+	}
+}
+
 switch( $action )
 {
 	case 'new':
@@ -44,6 +57,25 @@ switch( $action )
 
 		// Create object of new Automation:
 		$edited_Automation = new Automation();
+		break;
+
+	case 'edit':
+	case 'edit_step':
+		// Edit Automation/Step forms:
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+		break;
+
+	case 'new_step':
+		// New Automation Step form:
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Create object of new Automation:
+		$edited_AutomationStep = new AutomationStep();
+		$edited_AutomationStep->set( 'autm_ID', $autm_ID );
 		break;
  
 	case 'create':
@@ -117,6 +149,78 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 		break;
+ 
+	case 'create_step':
+		// Create new Automation Step:
+		$edited_AutomationStep = new AutomationStep();
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check that current user has permission to create automation steps:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// load data from request
+		if( $edited_AutomationStep->load_from_Request() )
+		{	// We could load data from form without errors:
+			// Insert in DB:
+			$edited_AutomationStep->dbinsert();
+			$Messages->add( T_('New automation step has been created.'), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		$action = 'new';
+		break;
+
+	case 'update_step':
+		// Update Automation Step:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check that current user has permission to edit automation steps:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Make sure we got an pqst_ID:
+		param( 'autm_ID', 'integer', true );
+
+		// load data from request:
+		if( $edited_AutomationStep->load_from_Request() )
+		{	// We could load data from form without errors:
+			// Update automation step in DB:
+			$edited_AutomationStep->dbupdate();
+			$Messages->add( T_('Automation step has been updated.'), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		$action = 'edit';
+		break;
+
+	case 'delete_step':
+		// Delete Automation Step:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Make sure we got an autm_ID:
+		param( 'autm_ID', 'integer', true );
+
+		if( $edited_AutomationStep->dbdelete() )
+		{
+			$Messages->add( T_('Automation step has been deleted.'), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		break;
 }
 
 
@@ -155,6 +259,12 @@ switch( $action )
 	case 'edit':
 		// Display a form of automation:
 		$AdminUI->disp_view( 'automations/views/_automation.form.php' );
+		break;
+
+	case 'new_step':
+	case 'edit_step':
+		// Display a form of automation step:
+		$AdminUI->disp_view( 'automations/views/_automation_step.form.php' );
 		break;
 
 	default:
