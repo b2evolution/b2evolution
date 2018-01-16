@@ -110,7 +110,7 @@ class polls_plugin extends Plugin
 			foreach( $inlines[0] as $i => $current_poll_tag )
 			{
 				$poll_ID = $inlines[1][$i];
-				$poll_title = 'Poll';
+				$poll_title = T_('Poll');
 				if( ! empty( $inlines[2][$i] ) && ! empty( $inlines[3][$i] ) )
 				{
 					$poll_title = $inlines[3][$i];

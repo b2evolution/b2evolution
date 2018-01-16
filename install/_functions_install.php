@@ -768,6 +768,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'custom_tags_plugin', true );
 	}
+
+	if( $old_db_version < 11760 )
+	{
+		install_plugin( 'polls_plugin' );
+	}
 }
 
 
