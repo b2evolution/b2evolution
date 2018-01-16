@@ -257,11 +257,13 @@ class EmailCampaign extends DataObject
 		$this->users['filter'] = array();
 		$this->users['receive'] = array();
 		$this->users['skipped'] = array();
+		$this->users['error'] = array();
 		$this->users['wait'] = array();
 		$this->users['unsub_all'] = array();
 		$this->users['unsub_filter'] = array();
 		$this->users['unsub_receive'] = array();
 		$this->users['unsub_skipped'] = array();
+		$this->users['unsub_error'] = array();
 		$this->users['unsub_wait'] = array();
 
 		foreach( $users as $user_data )
@@ -298,6 +300,19 @@ class EmailCampaign extends DataObject
 				else
 				{	// This user is subscribed to newsletter of this email campaign:
 					$this->users['skipped'][] = $user_data->user_ID;
+					$this->users['filter'][] = $user_data->user_ID;
+				}
+			}
+			elseif( $user_data->csnd_status == 'send_error' )
+			{ // We encountered a send error the last time we attempted to send email,:
+				if( $user_data->enls_user_ID === NULL )
+				{	// This user is unsubscribed from newsletter of this email campaign:
+					$this->users['unsub_error'][] = $user_data->user_ID;
+					$this->users['unsub_filter'][] = $user_data->user_ID;
+				}
+				else
+				{	// This user is subscribed to newsletter of this email campaign:
+					$this->users['error'][] = $user_data->user_ID;
 					$this->users['filter'][] = $user_data->user_ID;
 				}
 			}
@@ -667,6 +682,7 @@ class EmailCampaign extends DataObject
 
 		$email_success_count = 0;
 		$email_skip_count = 0;
+		$email_error_count = 0;
 		foreach( $user_IDs as $user_ID )
 		{
 			if( $email_campaign_chunk_size > 0 && $email_success_count >= $email_campaign_chunk_size )
@@ -701,12 +717,28 @@ class EmailCampaign extends DataObject
 				}
 				$email_success_count++;
 			}
+			elseif( $User->get_email_status() == 'prmerror' )
+			{ // Unable to send email due to permanent error
+				$DB->query( 'REPLACE INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
+					VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "send_error", '.$DB->quote( $mail_log_insert_ID ).' )' );
+
+				// Update arrays where we store which users received email and who waiting it now:
+				$this->users['error'][] = $user_ID;
+				if( ( $wait_user_ID_key = array_search( $user_ID, $this->users['wait'] ) ) !== false )
+				{
+					unset( $this->users['wait'][ $wait_user_ID_key ] );
+				}
+				$email_error_count++;
+
+				// This email sending was skipped:
+				$email_skip_count++;
+			}
 			else
 			{	// This email sending was skipped:
 				$email_skip_count++;
 			}
 
-			if( $display_messages )
+			if( $display_messages === true || $display_messages === 'cron_job' )
 			{	// Print the messages:
 				if( $result === true )
 				{ // Success
@@ -716,11 +748,39 @@ class EmailCampaign extends DataObject
 				{ // Failed, Email was NOT sent
 					if( ! check_allow_new_email( 'newsletter_limit', 'last_newsletter', $user_ID ) )
 					{ // Newsletter email is limited today for this user
-						echo '<span class="orange">'.sprintf( T_('User %s has already received max # of lists today.'), $User->get_identity_link() ).'</span><br />';
+						$error_msg = '<span class="orange">'.sprintf( T_('User %s has already received max # of lists today.'), $User->get_identity_link() ).'</span><br />';
+						if( $display_messages === 'cron_job' )
+						{
+							$Messages->add( $error_msg, 'warning' );
+						}
+						else
+						{
+							echo $error_msg;
+						}
+					}
+					elseif( $User->get_email_status() == 'prmerror' )
+					{ // Email has permanent error
+						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).' ('.T_('Reason').': '.T_('Permanent error').')</span><br />';
+						if( $display_messages === 'cron_job' )
+						{
+							$Messages->add( $error_msg, 'error' );
+						}
+						else
+						{
+							echo $error_msg;
+						}
 					}
 					else
 					{ // Another error
-						echo '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).'</span><br />';
+						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).'</span><br />';
+						if( $display_messages === 'cron_job' )
+						{
+							$Messages->add( $error_msg, 'error' );
+						}
+						else
+						{
+							echo $error_msg;
+						}
 					}
 				}
 
@@ -730,9 +790,12 @@ class EmailCampaign extends DataObject
 
 		$DB->commit();
 
-		if( $display_messages )
+		if( $display_messages === true || $display_messages === 'cron_job' )
 		{	// Print the messages:
-			$Messages->clear();
+			if( $display_messages !== 'cron_job' )
+			{
+				$Messages->clear();
+			}
 			$wait_count = count( $this->users['wait'] );
 			$skipped_count = count( $this->users['skipped'] ); // Recipients that are marked skipped for this campaign
 			if( $wait_count > 0 )

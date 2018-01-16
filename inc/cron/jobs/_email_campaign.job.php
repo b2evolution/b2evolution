@@ -22,7 +22,7 @@ $EmailCampaignCache = & get_EmailCampaignCache();
 $EmailCampaign = & $EmailCampaignCache->get_by_ID( $ecmp_ID );
 
 // Send newsletters:
-$EmailCampaign->send_all_emails();
+$EmailCampaign->send_all_emails( 'cron_job' );
 
 // Create a scheduled job to send newsletters to next chunk of waiting users:
 $EmailCampaign->create_cron_job( true );
