@@ -287,6 +287,7 @@ class user_register_Widget extends ComponentWidget
 			$Form->hidden( 'source', $this->disp_params['source'] );
 			$Form->hidden( 'ask_firstname', $this->disp_params['ask_firstname'] );
 			$Form->hidden( 'ask_lastname', $this->disp_params['ask_lastname'] );
+			$Form->hidden( 'usertags', $this->disp_params['usertags'] );
 			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe_post'] );
 			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe_comment'] );
 

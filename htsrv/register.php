@@ -137,6 +137,7 @@ switch( $action )
 				$source = param( 'source', 'string', true );
 				$ask_firstname = param( 'ask_firstname', 'string', true );
 				$ask_lastname = param( 'ask_lastname', 'string', true );
+				$user_tags = param( 'usertags', 'string', NULL );
 				$subscribe_posts = param( 'subscribe_post', 'integer', true );
 				$subscribe_comments = param( 'subscribe_comment', 'integer', true );
 				$newsletters = param( 'newsletters', 'string', true );
@@ -170,7 +171,7 @@ switch( $action )
 				$subscribe_posts = $user_register_Widget->disp_params['subscribe_post'];
 				$subscribe_comments = $user_register_Widget->disp_params['subscribe_comment'];
 				$widget_newsletters = $user_register_Widget->disp_params['newsletters'];
-				$widget_tags = $user_register_Widget->disp_params['usertags'];
+				$user_tags = $user_register_Widget->disp_params['usertags'];
 				$widget_redirect_to = trim( $user_register_Widget->disp_params['redirect_to'] );
 			}
 
@@ -344,9 +345,9 @@ switch( $action )
 			}
 
 			// Set user tags from current widget "Email capture / Quick registration":
-			if( ! empty( $widget_tags ) )
+			if( ! empty( $user_tags ) )
 			{
-				$new_User->set_usertags_from_string( $widget_tags );
+				$new_User->add_usertags( $user_tags );
 			}
 		}
 		else

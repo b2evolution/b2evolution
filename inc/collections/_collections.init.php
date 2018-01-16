@@ -1227,6 +1227,7 @@ class collections_Module extends Module
 				elseif( param( 'inline', 'integer', 0 ) == 1 )
 				{ // Request from subscribe shorttag
 					$newsletter_ID = param( 'newsletter', 'integer', 0 );
+					$insert_user_tags = param( 'usertags', 'string', NULL );
 				}
 
 				// Check newsletter of the requested widget:
