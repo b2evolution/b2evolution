@@ -18,6 +18,14 @@ $params = array_merge( array(
 
 if( $params['include_greeting'] )
 { // Display the greeting message
-	echo T_( 'Hello $username$!' )."\n\n";
+	if( ! empty( $params['newsletter'] ) )
+	{ // This is a newsletter
+		echo T_('Hello $firstname_and_login$!')."\n\n";
+		echo T_('Here are some news')."...\n\n";
+	}
+	else
+	{
+		echo T_('Hello $username$!')."\n\n";
+	}
 }
 ?>

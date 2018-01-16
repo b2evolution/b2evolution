@@ -47,7 +47,11 @@ $Form->begin_fieldset( sprintf( T_('Review message for: %s'), $edited_EmailCampa
 echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	echo '<div class="floatleft" style="width:50%">';
 	echo '<p><b>'.T_('HTML message').':</b></p>';
-	$html_mail_template = mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ), 'include_greeting' => false ), $current_User );
+	$html_mail_template = mail_template( 'newsletter', 'html', array(
+		'message_html' => $edited_EmailCampaign->get( 'email_html' ),
+		'include_greeting' => true,
+		'newsletter' => $edited_EmailCampaign->get( 'enlt_ID' )
+	), $current_User );
 	// Clear all html tags that may break styles of main html page:
 	$html_mail_template = preg_replace( '#</?(html|head|meta|body)[^>]*>#i', '', $html_mail_template );
 	echo '<div style="overflow:auto">'.$html_mail_template.'</div>';
@@ -55,7 +59,12 @@ echo '<div style="display:table;width:100%;table-layout:fixed;">';
 
 	echo '<div class="floatright" style="width:49%">';
 	echo '<p><b>'.T_('Plain-text message').':</b></p>';
-	echo '<div style="font-family:monospace;overflow:auto">'.nl2br( mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_plaintext' ), 'include_greeting' => false ), $current_User ) ).'</div>';
+	echo '<div style="font-family:monospace;overflow:auto">'.nl2br(
+		mail_template( 'newsletter', 'text', array(
+			'message_text' => $edited_EmailCampaign->get( 'email_plaintext' ),
+			'include_greeting' => true,
+			'newsletter' => $edited_EmailCampaign->get( 'enlt_ID' )
+		), $current_User ) ).'</div>';
 	echo '</div>';
 echo '</div>';
 $Form->end_fieldset();

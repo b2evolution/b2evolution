@@ -586,7 +586,7 @@ class EmailCampaign extends DataObject
 	function send_email( $user_ID, $email_address = '', $mode = '' )
 	{
 		$newsletter_params = array(
-				'include_greeting' => false,
+				'include_greeting' => true,
 				'message_html'     => $this->get( 'email_html' ),
 				'message_text'     => $this->get( 'email_plaintext' ),
 				'newsletter'       => $this->get( 'enlt_ID' ),

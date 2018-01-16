@@ -60,6 +60,14 @@ else
 <?php
 if( $params['include_greeting'] )
 { // Display the greeting message
+	if( !empty( $params['newsletter'] ) )
+	{	// This is a newsletter
+		echo '<p'.emailskin_style( '.p' ).'>'.T_('Hello $firstname_and_login$!').'</p>';
+		echo '<p'.emailskin_style( '.p' ).'>'.T_('Here are some news').'...</p>';
+	}
+	else
+	{
+		echo '<p'.emailskin_style( '.p' ).'>'.T_('Hello $username$!').'</p>';
+	}
+}
 ?>
-<p<?php echo emailskin_style( '.p' ); ?>><?php echo T_( 'Hello $username$!' ); ?></p>
-<?php } ?>
