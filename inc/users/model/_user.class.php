@@ -350,6 +350,7 @@ class User extends DataObject
 				array( 'table'=>'T_users__secondary_user_groups', 'fk'=>'sug_user_ID', 'msg'=>T_('%d secondary groups') ),
 				array( 'table'=>'T_users__profile_visits', 'fk'=>'upv_visited_user_ID', 'msg'=>T_('%d profile visits') ),
 				array( 'table'=>'T_email__newsletter_subscription', 'fk'=>'enls_user_ID', 'msg'=>T_('%d list subscriptions') ),
+				array( 'table'=>'T_automation__user_state', 'fk'=>'aust_user_ID', 'msg'=>T_('%d automation user states') ),
 			);
 	}
 
@@ -7577,7 +7578,7 @@ class User extends DataObject
 	 */
 	function subscribe( $newsletter_IDs )
 	{
-		global $DB, $localtimenow;
+		global $DB, $localtimenow, $servertimenow;
 
 		if( empty( $this->ID ) )
 		{	// Only created user can has the newsletter subscriptions:
@@ -7628,6 +7629,16 @@ class User extends DataObject
 			  AND enls_subscribed = 0',
 			'Subscribe(update unsubscriptions) user #'.$this->ID.' to lists #'.implode( ',', $update_newsletter_IDs ) );
 		}
+
+		// Insert user states for newsletters with automations:
+		$automations_SQL = new SQL( 'Get automations of the subscribed newsletters' );
+		$automations_SQL->SELECT( 'DISTINCT autm_ID, '.$this->ID.', autm_first_step_ID, '.$DB->quote( date2mysql( $servertimenow ) ) );
+		$automations_SQL->FROM( 'T_email__newsletter' );
+		$automations_SQL->FROM_add( 'INNER JOIN T_automation__automation ON enlt_default_autm_ID = autm_ID' );
+		$automations_SQL->WHERE( 'enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )' );
+		$automations_SQL->WHERE_and( 'autm_ID NOT IN ( SELECT aust_autm_ID FROM T_automation__user_state WHERE aust_user_ID = '.$this->ID.' )' );// Exclude already added automation user states
+		$DB->query( 'INSERT INTO T_automation__user_state ( aust_autm_ID, aust_user_ID, aust_next_step_ID, aust_next_exec_ts ) '.$automations_SQL->get(),
+			'Insert automation user states on subscribe to newsletters #'.implode( ',', $newsletter_IDs ).' for user #'.$this->ID );
 
 		$DB->commit();
 

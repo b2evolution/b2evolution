@@ -547,6 +547,25 @@ function & get_AutomationCache()
 
 
 /**
+ * Get the AutomationStepCache
+ *
+ * @return AutomationStepCache
+ */
+function & get_AutomationStepCache()
+{
+	global $AutomationStepCache;
+
+	if( ! isset( $AutomationStepCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
+		$AutomationStepCache = new DataObjectCache( 'AutomationStep', false, 'T_automation__step', 'step_', 'step_ID' );
+	}
+
+	return $AutomationStepCache;
+}
+
+
+/**
  * Get the CronjobCache
  *
  * @return CronjobCache
@@ -2250,6 +2269,12 @@ class _core_Module extends Module
 				'name'   => T_('Send reminders about non-activated accounts'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_activate_account_reminder.job.php',
+				'params' => NULL,
+			),
+			'execute-automations' => array(
+				'name'   => T_('Execute automations'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_execute_automations.job.php',
 				'params' => NULL,
 			),
 		);

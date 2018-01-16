@@ -50,6 +50,19 @@ class Automation extends DataObject
 
 
 	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table' => 'T_email__newsletter', 'fk' => 'enlt_default_autm_ID', 'msg' => T_('%d lists use this automation') ),
+			);
+	}
+
+
+	/**
 	 * Get delete cascade settings
 	 *
 	 * @return array
@@ -58,6 +71,7 @@ class Automation extends DataObject
 	{
 		return array(
 				array( 'table' => 'T_automation__step', 'fk' => 'step_autm_ID', 'msg' => T_('%d steps') ),
+				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_autm_ID', 'msg' => T_('%d automation user states') ),
 			);
 	}
 
@@ -122,6 +136,31 @@ class Automation extends DataObject
 	function get_name()
 	{
 		return $this->get( 'name' );
+	}
+
+
+	/**
+	 * Get user states for current time(automation steps which should be executed immediately)
+	 *
+	 * @return array Array( user_ID => next_step_ID )
+	 */
+	function get_user_states()
+	{
+		global $DB, $servertimenow;
+
+		if( empty( $this->ID ) )
+		{	// Automation must be stored in DB:
+			return array();
+		}
+
+		$SQL = new SQL( 'Get user states for current time of automation #'.$this->ID );
+		$SQL->SELECT( 'aust_user_ID, aust_next_step_ID' );
+		$SQL->FROM( 'T_automation__user_state' );
+		$SQL->WHERE( 'aust_autm_ID = '.$this->ID );
+		$SQL->WHERE_and( 'aust_next_step_ID IS NOT NULL ' );
+		$SQL->WHERE_and( 'aust_next_exec_ts > '.$DB->quote( date2mysql( $servertimenow ) ) );
+
+		return $DB->get_assoc( $SQL );
 	}
 }
 

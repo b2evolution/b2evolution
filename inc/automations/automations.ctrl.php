@@ -110,7 +110,7 @@ switch( $action )
 
 		if( $edited_Automation->dbdelete() )
 		{
-			$Messages->add( T_('The automation has been deleted.'), 'success' );
+			$Messages->add( T_('Automation has been deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=automations', 303 ); // Will EXIT
