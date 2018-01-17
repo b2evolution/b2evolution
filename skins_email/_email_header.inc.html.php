@@ -14,7 +14,8 @@ global $Settings, $emailskins_path;
 
 // Default params:
 $params = array_merge( array(
-		'include_greeting' => true
+		'include_greeting' => true,
+		'recipient_User'   => NULL,
 	), $params );
 ?>
 <html>
@@ -62,12 +63,35 @@ if( $params['include_greeting'] )
 { // Display the greeting message
 	if( !empty( $params['newsletter'] ) )
 	{	// This is a newsletter
-		echo '<p'.emailskin_style( '.p' ).'>'.T_('Hello $firstname_and_login$!').'</p>';
+		if( ! empty( $recipient_User ) )
+		{
+			echo '<p'.emailskin_style( '.p' ).'>'.T_('Hello $firstname_and_login$!').'</p>';
+		}
+		elseif( ! empty( $params['anonymous_recipient_name'] ) )
+		{
+			echo '<p'.emailskin_style( '.p' ).'>'.T_('Hello $name$!').'</p>';
+		}
+		else
+		{
+			echo '<p'.emailskin_style( '.p' ).'>'.T_('Hello').'!</p>';
+		}
+
 		echo '<p'.emailskin_style( '.p' ).'>'.T_('Here are some news').'...</p>';
 	}
 	else
 	{
-		echo '<p'.emailskin_style( '.p' ).'>'.T_('Hello $username$!').'</p>';
+		if( ! empty( $recipient_User ) )
+		{
+			echo '<p'.emailskin_style( '.p' ).'>'.T_('Hello $name$!').'</p>';
+		}
+		elseif( ! empty( $params['anonymous_recipient_name'] ) )
+		{
+			echo '<p'.emailskin_style( '.p' ).'>'.T_('Hello $username$!').'</p>';
+		}
+		else
+		{
+			echo '<p'.emailskin_style( '.p' ).'>'.T_('Hello').'!</p>';
+		}
 	}
 }
 ?>

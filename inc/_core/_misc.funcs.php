@@ -4173,7 +4173,11 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 				$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
 			}
 			$formated_message = str_replace( array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$' ),
-					array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login ) , $formated_message );
+					array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login ), $formated_message );
+		}
+		elseif( ! empty( $params['anonymous_recipient_name'] ) )
+		{
+			$formated_message = str_replace( '$name$', $params['anonymous_recipient_name'], $formated_message );
 		}
 
 		$template_message .= $formated_message;

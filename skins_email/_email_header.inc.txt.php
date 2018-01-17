@@ -13,19 +13,43 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
-		'include_greeting' => true
+		'include_greeting' => true,
+		'recipient_User' => NULL,
 	), $params );
 
 if( $params['include_greeting'] )
 { // Display the greeting message
 	if( ! empty( $params['newsletter'] ) )
 	{ // This is a newsletter
-		echo T_('Hello $firstname_and_login$!')."\n\n";
+		if( ! empty( $recipient_User ) )
+		{
+			echo T_('Hello $firstname_and_login$!')."\n\n";
+		}
+		elseif( ! empty( $params['anonymous_recipient_name'] ) )
+		{
+			echo T_('Hello $name$!')."\n\n";
+		}
+		else
+		{
+			echo T_('Hello')."!\n\n";
+		}
+
 		echo T_('Here are some news')."...\n\n";
 	}
 	else
 	{
-		echo T_('Hello $username$!')."\n\n";
+		if( ! empty( $recipient_User ) )
+		{
+			echo T_('Hello $username$!')."\n\n";
+		}
+		elseif( ! empty( $params['anonymous_recipient_name'] ) )
+		{
+			echo T_('Hello $name$!')."\n\n";
+		}
+		else
+		{
+			echo T_('Hello')."!\n\n";
+		}
 	}
 }
 ?>
