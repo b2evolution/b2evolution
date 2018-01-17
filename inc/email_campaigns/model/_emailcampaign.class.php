@@ -114,6 +114,17 @@ class EmailCampaign extends DataObject
 
 
 	/**
+	 * Get name of this campaign, it is used for `<select>` by cache object
+	 *
+	 * @return string
+	 */
+	function get_name()
+	{
+		return $this->get( 'email_title' );
+	}
+
+
+	/**
 	 * Add recipients for this campaign into DB
 	 *
 	 * @param array|NULL Array of user IDs, NULL - to get user IDs from current filterset of users list

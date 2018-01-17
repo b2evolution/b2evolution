@@ -49,8 +49,14 @@ $Form->text_input( 'step_label', $edited_AutomationStep->get( 'label' ), 40, T_(
 
 $Form->select_input_array( 'step_type', $edited_AutomationStep->get( 'type' ), step_get_type_titles(), T_('Type'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
 
+$EmailCampaignCache = & get_EmailCampaignCache();
+$EmailCampaignCache->load_all();
+$Form->select_input_object( 'step_email_campaign',
+	( $edited_AutomationStep->get( 'type' ) == 'send_campaign' ? $edited_AutomationStep->get( 'info' ) : '' ),
+	$EmailCampaignCache, T_('Email Campaign'), array( 'allow_none' => true, 'required' => true ) );
+
 // Load all steps of the edited step's automation excluding current step:
-$AutomationStepCache = get_AutomationStepCache();
+$AutomationStepCache = & get_AutomationStepCache();
 $AutomationStepCache->clear();
 $AutomationStepCache->load_where( 'step_autm_ID = '.$step_Automation->ID
 	.( $creating ? '' : ' AND step_ID != '.$edited_AutomationStep->ID ) );
@@ -74,3 +80,25 @@ $Form->end_form( array(
 		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' )
 	) );
 ?>
+<script type="text/javascript">
+// Display additional info fields depending on step type:
+function step_type_display_info( step_type )
+{
+	jQuery( '#ffield_step_email_campaign' ).hide();
+
+	switch( step_type )
+	{
+		case 'send_campaign':
+			jQuery( '#ffield_step_email_campaign' ).show();
+			break;
+	}
+}
+jQuery( '#step_type' ).change( function()
+{
+	step_type_display_info( jQuery( this ).val() );
+} );
+jQuery( document ).ready( function()
+{
+	step_type_display_info( jQuery( '#step_type' ).val() );
+} );
+</script>

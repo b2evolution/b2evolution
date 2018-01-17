@@ -125,22 +125,24 @@ class AutomationStep extends DataObject
 			set_param( 'step_order', $DB->get_var( $max_order_SQL ) );
 		}
 		$this->set_from_Request( 'order' );
-		// Check for unique order per Automation:
-		$check_order_SQL = new SQL( 'Check unique step order for Automation #'.$this->get( 'autm_ID' ) );
-		$check_order_SQL->SELECT( 'step_ID' );
-		$check_order_SQL->FROM( 'T_automation__step' );
-		$check_order_SQL->WHERE( 'step_autm_ID = '.$this->get( 'autm_ID' ) );
-		$check_order_SQL->WHERE_and( 'step_order = '.$this->get( 'order' ) );
-		if( $this->ID > 0 )
-		{	// Exclude this Step:
-			$check_order_SQL->WHERE_and( 'step_ID != '.$this->ID );
-		}
-		if( $existing_step_ID = $DB->get_var( $check_order_SQL ) )
-		{	// Display error because of duplicated order in the same Automation:
-			global $admin_url;
-			param_error( 'step_order',
-				sprintf( T_('Step with such order already exists for current automation. Do you want to <a %s>edit that step</a>?'),
-					'href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$existing_step_ID.'"' ) );
+		if( $this->get( 'order' ) > 0 )
+		{	// Check for unique order per Automation:
+			$check_order_SQL = new SQL( 'Check unique step order for Automation #'.$this->get( 'autm_ID' ) );
+			$check_order_SQL->SELECT( 'step_ID' );
+			$check_order_SQL->FROM( 'T_automation__step' );
+			$check_order_SQL->WHERE( 'step_autm_ID = '.$this->get( 'autm_ID' ) );
+			$check_order_SQL->WHERE_and( 'step_order = '.$this->get( 'order' ) );
+			if( $this->ID > 0 )
+			{	// Exclude this Step:
+				$check_order_SQL->WHERE_and( 'step_ID != '.$this->ID );
+			}
+			if( $existing_step_ID = $DB->get_var( $check_order_SQL ) )
+			{	// Display error because of duplicated order in the same Automation:
+				global $admin_url;
+				param_error( 'step_order',
+					sprintf( T_('Step with such order already exists for current automation. Do you want to <a %s>edit that step</a>?'),
+						'href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$existing_step_ID.'"' ) );
+			}
 		}
 		param_check_range( 'step_order', -2147483646, 2147483647, sprintf( T_('Step order must be numeric (%d - %d).'), -2147483646, 2147483647 ) );
 	
@@ -151,6 +153,19 @@ class AutomationStep extends DataObject
 		// Type:
 		param_string_not_empty( 'step_type', T_('Please select a step type.') );
 		$this->set_from_Request( 'type' );
+		// Save additional info depending on step type:
+		switch( $this->get( 'type' ) )
+		{
+			case 'send_campaign':
+				// Email campaign:
+				param( 'step_email_campaign', 'integer', NULL );
+				param_check_number( 'step_email_campaign', T_('Please select an email campaign.'), true );
+				$this->set( 'info', get_param( 'step_email_campaign' ) );
+				break;
+
+			default:
+				$this->set( 'info', NULL, true );
+		}
 
 		// Next step if YES:
 		param( 'step_yes_next_step_ID', 'integer', NULL );
