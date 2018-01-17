@@ -558,7 +558,7 @@ function & get_AutomationStepCache()
 	if( ! isset( $AutomationStepCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
-		$AutomationStepCache = new DataObjectCache( 'AutomationStep', false, 'T_automation__step', 'step_', 'step_ID' );
+		$AutomationStepCache = new DataObjectCache( 'AutomationStep', false, 'T_automation__step', 'step_', 'step_ID', NULL, 'step_order' );
 	}
 
 	return $AutomationStepCache;

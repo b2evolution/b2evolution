@@ -102,6 +102,8 @@ class AutomationStep extends DataObject
 	 */
 	function load_from_Request()
 	{
+		global $DB, $admin_url;
+
 		if( empty( $this->ID ) )
 		{	// Set Automation only for new creating Step:
 			param( 'autm_ID', 'integer', true );
@@ -109,17 +111,76 @@ class AutomationStep extends DataObject
 		}
 
 		// Order:
-		param_string_not_empty( 'step_order', T_('Please enter a step order.') );
-		// TODO: Check for unique order per automation!
+		$step_order = param( 'step_order', 'integer', NULL );
+		if( $this->ID > 0 )
+		{	// Order is required for edited step:
+			param_string_not_empty( 'step_order', T_('Please enter a step order.') );
+		}
+		elseif( $step_order === NULL )
+		{	// Set order for new creating step automatically:
+			$max_order_SQL = new SQL( 'Get max step order for Automation #'.$this->get( 'autm_ID' ) );
+			$max_order_SQL->SELECT( 'MAX( step_order ) + 1' );
+			$max_order_SQL->FROM( 'T_automation__step' );
+			$max_order_SQL->WHERE( 'step_autm_ID = '.$this->get( 'autm_ID' ) );
+			set_param( 'step_order', $DB->get_var( $max_order_SQL ) );
+		}
 		$this->set_from_Request( 'order' );
+		// Check for unique order per Automation:
+		$check_order_SQL = new SQL( 'Check unique step order for Automation #'.$this->get( 'autm_ID' ) );
+		$check_order_SQL->SELECT( 'step_ID' );
+		$check_order_SQL->FROM( 'T_automation__step' );
+		$check_order_SQL->WHERE( 'step_autm_ID = '.$this->get( 'autm_ID' ) );
+		$check_order_SQL->WHERE_and( 'step_order = '.$this->get( 'order' ) );
+		if( $this->ID > 0 )
+		{	// Exclude this Step:
+			$check_order_SQL->WHERE_and( 'step_ID != '.$this->ID );
+		}
+		if( $existing_step_ID = $DB->get_var( $check_order_SQL ) )
+		{	// Display error because of duplicated order in the same Automation:
+			global $admin_url;
+			param_error( 'step_order',
+				sprintf( T_('Step with such order already exists for current automation. Do you want to <a %s>edit that step</a>?'),
+					'href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$existing_step_ID.'"' ) );
+		}
+		param_check_range( 'step_order', -2147483646, 2147483647, sprintf( T_('Step order must be numeric (%d - %d).'), -2147483646, 2147483647 ) );
 	
 		// Label:
 		param( 'step_label', 'string', NULL );
-		$this->set_from_Request( 'order', NULL, true );
+		$this->set_from_Request( 'label', NULL, true );
 
 		// Type:
 		param_string_not_empty( 'step_type', T_('Please select a step type.') );
 		$this->set_from_Request( 'type' );
+
+		// Next step if YES:
+		param( 'step_yes_next_step_ID', 'integer', NULL );
+		$this->set_from_Request( 'yes_next_step_ID', NULL, true );
+		$step_yes_next_step_delay = param_duration( 'step_yes_next_step_delay' );
+		if( empty( $step_yes_next_step_delay ) )
+		{
+			$step_yes_next_step_delay = NULL;
+		}
+		$this->set( 'yes_next_step_delay', $step_yes_next_step_delay, true );
+
+		// Next step if NO:
+		param( 'step_no_next_step_ID', 'integer', NULL );
+		$this->set_from_Request( 'no_next_step_ID', NULL, true );
+		$step_no_next_step_delay = param_duration( 'step_no_next_step_delay' );
+		if( empty( $step_no_next_step_delay ) )
+		{
+			$step_no_next_step_delay = NULL;
+		}
+		$this->set( 'no_next_step_delay', $step_no_next_step_delay, true );
+
+		// Next step if Error:
+		param( 'step_error_next_step_ID', 'integer', NULL );
+		$this->set_from_Request( 'error_next_step_ID', NULL, true );
+		$step_error_next_step_delay = param_duration( 'step_error_next_step_delay' );
+		if( empty( $step_error_next_step_delay ) )
+		{
+			$step_error_next_step_delay = NULL;
+		}
+		$this->set( 'error_next_step_delay', $step_error_next_step_delay, true );
 
 		return ! param_errors_detected();
 	}
@@ -153,6 +214,17 @@ class AutomationStep extends DataObject
 
 		// TODO:
 		echo 'Executing Step #'.$this->ID.' of Automation: #'.$Automation->ID.' for User #'.$user_ID.'...<br>'."\r\n";
+	}
+
+
+	/**
+	 * Get name of automation step, it is used for `<select>` with $AutomationStepCache
+	 *
+	 * @return string
+	 */
+	function get_name()
+	{
+		return '#'.$this->get( 'order' ).' - '.step_td_label( $this->get( 'label' ), $this->get( 'type' ) );
 	}
 }
 

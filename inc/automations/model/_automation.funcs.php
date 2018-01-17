@@ -85,19 +85,59 @@ function step_td_label( $step_label, $step_type )
 
 
 /**
- * Helper function to display step info on Results table
+ * Helper function to display next step info on Results table
  *
  * @param integer Next step ID
  * @param integer Next step delay
  * @return string
  */
-function step_td_next_step( $next_step_ID, $next_step_delay )
+function step_td_next_step( $next_step_order, $next_step_delay )
 {
-	if( empty( $next_step_ID ) )
+	if( empty( $next_step_order ) )
 	{	// No defined next step:
 		return '';
 	}
 
-	return $next_step_ID.' '.seconds_to_period( $next_step_delay );
+	return $next_step_order.' ('.seconds_to_period( $next_step_delay ).')';
+}
+
+
+/**
+ * Helper function to display step actions on Results table
+ *
+ * @param integer Step ID
+ * @param boolean Is first step?
+ * @param boolean Is last step?
+ * @return string
+ */
+function step_td_actions( $step_ID, $is_first_step, $is_last_step )
+{
+	global $admin_url;
+
+	$r = '';
+
+	if( $is_first_step )
+	{	// First step cannot be moved up, print out blank icon:
+		$r .= get_icon( 'move_up', 'noimg' );
+	}
+	else
+	{	// Display action icon to move step up:
+		$r .= action_icon( T_('Move up'), 'move_up', regenerate_url( 'step_ID,action', 'step_ID='.$step_ID.'&amp;action=move_step_up&amp;'.url_crumb( 'automationstep' ) ) );
+	}
+
+	if( $is_last_step )
+	{	// Last step cannot be moved down, print out blank icon:
+		$r .= get_icon( 'move_down', 'noimg' );
+	}
+	else
+	{	// Display action icon to move step down:
+		$r .= action_icon( T_('Move down'), 'move_down', regenerate_url( 'step_ID,action', 'step_ID='.$step_ID.'&amp;action=move_step_down&amp;'.url_crumb( 'automationstep' ) ) );
+	}
+
+	$r .= action_icon( T_('Edit this step'), 'edit', $admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID );
+
+	$r .= action_icon( T_('Delete this step!'), 'delete', regenerate_url( 'step_ID,action', 'step_ID='.$step_ID.'&amp;action=delete_step&amp;'.url_crumb( 'automationstep' ) ) );
+
+	return $r;
 }
 ?>

@@ -21,7 +21,7 @@ load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
 // Check permission:
 $current_User->check_perm( 'options', 'view', true );
 
-param_action();
+param_action( '', true );
 
 if( param( 'autm_ID', 'integer', '', true ) )
 {	// Load Automation object:
@@ -111,7 +111,7 @@ switch( $action )
 		// Check that current user has permission to edit automations:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		// Make sure we got an pqst_ID:
+		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
 
 		// load data from request:
@@ -149,6 +149,83 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 		break;
+
+	case 'move_step_up':
+	case 'move_step_down':
+		// Move up/down Automation Step:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check that current user has permission to create automation steps:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Make sure we got an step_ID:
+		param( 'step_ID', 'integer', true );
+
+		if( $action == 'move_step_up' )
+		{	// Set variables for "move up" action
+			$order_condition = '<';
+			$order_direction = 'DESC';
+		}
+		else
+		{	// move down
+			$order_condition = '>';
+			$order_direction = 'ASC';
+		}
+
+		$DB->begin( 'SERIALIZABLE' );
+
+		// Get near step, We should swap the order with this step:
+		$SQL = new SQL( 'Get near Step to reorder it with moved Step #'.$edited_AutomationStep->ID );
+		$SQL->SELECT( 'step_ID, step_order' );
+		$SQL->FROM( 'T_automation__step' );
+		$SQL->WHERE( 'step_autm_ID = '.$edited_AutomationStep->get( 'autm_ID' ) );
+		$SQL->WHERE_and( 'step_order '.$order_condition.' '.$edited_AutomationStep->get( 'order' ) );
+		$SQL->ORDER_BY( 'step_order '.$order_direction );
+		$SQL->LIMIT( 1 );
+		$swaped_step = $DB->get_row( $SQL );
+
+		if( empty( $swaped_step ) )
+		{	// Current step is first or last in group, no change ordering:
+			$DB->commit(); // This is required only to not leave open transaction
+			$action = 'edit'; // To keep same opened page
+			break;
+		}
+
+		// Switch orders of the steps:
+		$result = true;
+		for( $i = 0; $i < 2; $i++ )
+		{	// We can swap orders only in two SQL queries to avoid error of duplicate entry because of step_order is unique index per Automation:
+			// By first SQL query we update the step orders to reserved values which cannot be assigned on edit form by user:
+			$step_order_1 = ( $i == 0 ? -2147483647 : $swaped_step->step_order );
+			$step_order_2 = ( $i == 0 ? -2147483648 : $edited_AutomationStep->get( 'order' ) );
+			$result = ( $result !== false ) && $DB->query( 'UPDATE T_automation__step
+				SET step_order = CASE 
+					WHEN step_ID = '.$edited_AutomationStep->ID.' THEN '.$step_order_1.'
+					WHEN step_ID = '.$swaped_step->step_ID.'    THEN '.$step_order_2.'
+					ELSE step_order
+				END
+				WHERE step_ID IN ( '.$edited_AutomationStep->ID.', '.$swaped_step->step_ID.' )' );
+		}
+
+		if( $result !== false )
+		{	// Update was successful:
+			$DB->commit();
+			$Messages->add( T_('Order has been changed.'), 'success' );
+			// We want to highlight the moved Step on next list display:
+			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
+		}
+		else
+		{	// Couldn't update successfully, probably because of concurrent modification
+			// Note: In this case we may try again to execute the same queries.
+			$DB->rollback();
+			// The message is not localized because it may appear very rarely
+			$Messages->add( 'Order could not be changed. Please try again.', 'error' );
+		}
+
+		$action = 'edit'; // To keep same opened page
+		break;
  
 	case 'create_step':
 		// Create new Automation Step:
@@ -171,7 +248,7 @@ switch( $action )
 			header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
-		$action = 'new';
+		$action = 'new_step';
 		break;
 
 	case 'update_step':
@@ -183,8 +260,8 @@ switch( $action )
 		// Check that current user has permission to edit automation steps:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		// Make sure we got an pqst_ID:
-		param( 'autm_ID', 'integer', true );
+		// Make sure we got an step_ID:
+		param( 'step_ID', 'integer', true );
 
 		// load data from request:
 		if( $edited_AutomationStep->load_from_Request() )
@@ -197,7 +274,7 @@ switch( $action )
 			header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
-		$action = 'edit';
+		$action = 'edit_step';
 		break;
 
 	case 'delete_step':
