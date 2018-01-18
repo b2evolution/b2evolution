@@ -509,7 +509,7 @@ $schema_queries = array(
 			enlt_label  VARCHAR(255) NULL,
 			enlt_active TINYINT(1) UNSIGNED DEFAULT 1,
 			enlt_order  INT NULL DEFAULT NULL,
-			enlt_default_autm_ID INT UNSIGNED NULL DEFAULT NULL,
+			enlt_default_autm_ID INT UNSIGNED NULL,
 			PRIMARY KEY (enlt_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
@@ -561,7 +561,7 @@ $schema_queries = array(
 			autm_ID            INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			autm_name          VARCHAR(255) NOT NULL,
 			autm_status        ENUM('paused', 'active') DEFAULT 'paused',
-			autm_first_step_ID INT UNSIGNED NULL DEFAULT NULL,
+			autm_first_step_ID INT UNSIGNED NULL,
 			PRIMARY KEY        (autm_ID)
 		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
 
@@ -589,8 +589,8 @@ $schema_queries = array(
 		"CREATE TABLE T_automation__user_state (
 			aust_autm_ID      INT UNSIGNED NOT NULL,
 			aust_user_ID      INT UNSIGNED NOT NULL,
-			aust_next_step_ID INT UNSIGNED NOT NULL,
-			aust_next_exec_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			aust_next_step_ID INT UNSIGNED NULL,
+			aust_next_exec_ts TIMESTAMP NULL,
 			PRIMARY KEY       (aust_autm_ID, aust_user_ID)
 		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
 

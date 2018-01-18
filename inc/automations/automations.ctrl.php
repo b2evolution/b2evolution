@@ -297,6 +297,11 @@ switch( $action )
 			header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
+
+		// Display the same edit automation page with steps list because step cannot be deleted by some restriciton:
+		$action = 'edit';
+		// We want to highlight the Step which cannot de leted on next list display:
+		$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 		break;
 }
 

@@ -248,11 +248,23 @@ class EmailCampaign extends DataObject
 	 */
 	function get_recipients( $type = 'all' )
 	{
+		// Make sure all recipients are loaded into cache:
+		$this->load_recipients();
+
+		return $this->users[ $type ];
+	}
+
+
+	/**
+	 * Load all recipient user IDs of this campaign into cache array $this->users
+	 */
+	function load_recipients()
+	{
 		global $DB;
 
-		if( ! is_null( $this->users ) )
-		{	// Get users from cache:
-			return $this->users[ $type ];
+		if( $this->users !== NULL )
+		{	// Recipients already were loaded into cache:
+			return;
 		}
 
 		// Get users from DB:
@@ -264,16 +276,18 @@ class EmailCampaign extends DataObject
 		$users_SQL->WHERE( 'user_status IN ( "activated", "autoactivated" )' );
 		$users = $DB->get_results( $users_SQL->get(), OBJECT, $users_SQL->title );
 
-		$this->users['all'] = array();
-		$this->users['filter'] = array();
-		$this->users['receive'] = array();
-		$this->users['skipped'] = array();
-		$this->users['wait'] = array();
-		$this->users['unsub_all'] = array();
-		$this->users['unsub_filter'] = array();
-		$this->users['unsub_receive'] = array();
-		$this->users['unsub_skipped'] = array();
-		$this->users['unsub_wait'] = array();
+		$this->users = array(
+				'all'           => array(),
+				'filter'        => array(),
+				'receive'       => array(),
+				'skipped'       => array(),
+				'wait'          => array(),
+				'unsub_all'     => array(),
+				'unsub_filter'  => array(),
+				'unsub_receive' => array(),
+				'unsub_skipped' => array(),
+				'unsub_wait'    => array(),
+			);
 
 		foreach( $users as $user_data )
 		{
@@ -326,8 +340,6 @@ class EmailCampaign extends DataObject
 				}
 			}
 		}
-
-		return $this->users[ $type ];
 	}
 
 
@@ -614,29 +626,53 @@ class EmailCampaign extends DataObject
 			if( $test_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
 			{ // Send a test email only when test user exists
 				$message = mail_template( 'newsletter', 'auto', $newsletter_params, $test_User );
-				return send_mail( $email_address, NULL, $this->get( 'email_title' ), $message, NULL, NULL, $headers );
+				$result = send_mail( $email_address, NULL, $this->get( 'email_title' ), $message, NULL, NULL, $headers );
 			}
 			else
 			{ // No test user found
-				return false;
+				$result = false;
 			}
 		}
 		else
 		{	// Send a newsletter to real user:
+			global $DB, $servertimenow, $mail_log_insert_ID;
+
 			// Force email sending to not activated users if email campaign is configurated to auto sending (e-g to send email on auto subscription on registration):
 			$force_on_non_activated = ( $this->get( 'auto_send' ) == 'subscription' );
-			$r = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, $force_on_non_activated, array(), $email_address );
-			if( $r )
+			$result = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, $force_on_non_activated, array(), $email_address );
+			if( $result )
 			{	// Update last sending data for newsletter per user:
-				global $DB, $servertimenow;
 				$DB->query( 'UPDATE T_email__newsletter_subscription
 					SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $servertimenow ) ).',
 					    enls_send_count = enls_send_count + 1
 					WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
 					  AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
 			}
-			return $r;
+
+			if( empty( $mail_log_insert_ID ) )
+			{	// ID of last inserted mail log is defined in function mail_log()
+				// If it was not inserted we cannot mark this user as received this email campaign:
+				$result = false;
+			}
+
+			if( $result )
+			{	// Email newsletter was sent for user successfully:
+				$DB->query( 'REPLACE INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
+					VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "sent", '.$DB->quote( $mail_log_insert_ID ).' )' );
+
+				// Make sure all recipients are loaded into cache:
+				$this->load_recipients();
+
+				// Update arrays where we store which users received email and who waiting it now:
+				$this->users['receive'][] = $user_ID;
+				if( ( $wait_user_ID_key = array_search( $user_ID, $this->users['wait'] ) ) !== false )
+				{
+					unset( $this->users['wait'][ $wait_user_ID_key ] );
+				}
+			}
 		}
+
+		return $result;
 	}
 
 
@@ -648,7 +684,7 @@ class EmailCampaign extends DataObject
 	 */
 	function send_all_emails( $display_messages = true, $user_IDs = NULL )
 	{
-		global $DB, $localtimenow, $mail_log_insert_ID, $Settings, $Messages;
+		global $DB, $localtimenow, $Settings, $Messages;
 
 		if( $user_IDs === NULL )
 		{	// Send emails only for users which still don't receive emails:
@@ -693,23 +729,8 @@ class EmailCampaign extends DataObject
 			// Send email to user:
 			$result = $this->send_email( $user_ID );
 
-			if( empty( $mail_log_insert_ID ) )
-			{	// ID of last inserted mail log is defined in function mail_log()
-				// If it was not inserted we cannot mark this user as received this newsletter:
-				$result = false;
-			}
-
 			if( $result )
 			{	// Email newsletter was sent for user successfully:
-				$DB->query( 'REPLACE INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
-					VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "sent", '.$DB->quote( $mail_log_insert_ID ).' )' );
-
-				// Update arrays where we store which users received email and who waiting it now:
-				$this->users['receive'][] = $user_ID;
-				if( ( $wait_user_ID_key = array_search( $user_ID, $this->users['wait'] ) ) !== false )
-				{
-					unset( $this->users['wait'][ $wait_user_ID_key ] );
-				}
 				$email_success_count++;
 			}
 			else

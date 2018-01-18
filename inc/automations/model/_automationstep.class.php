@@ -37,7 +37,11 @@ class AutomationStep extends DataObject
 	var $error_next_step_ID;
 	var $error_next_step_delay;
 
-	var $Automation;
+	var $Automation = NULL;
+
+	var $yes_next_AutomationStep = NULL;
+	var $no_next_AutomationStep = NULL;
+	var $error_next_AutomationStep = NULL;
 
 	/**
 	 * Constructor
@@ -75,22 +79,10 @@ class AutomationStep extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				// TODO:
-				//array( 'table' => 'T_email__newsletter', 'fk' => 'enlt_default_autm_ID', 'msg' => T_('%d lists use this automation') ),
-			);
-	}
-
-
-	/**
-	 * Get delete cascade settings
-	 *
-	 * @return array
-	 */
-	static function get_delete_cascades()
-	{
-		return array(
-				// TODO:
-				//array( 'table' => 'T_automation__user_state', 'fk' => 'aust_autm_ID', 'msg' => T_('%d automation user states') ),
+				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_next_step_ID', 'msg' => T_('%d automation user states') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_yes_next_step_ID', 'msg' => T_('it is used %d times as next step if YES') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_no_next_step_ID', 'msg' => T_('it is used %d times as next step if NO') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_error_next_step_ID', 'msg' => T_('it is used %d times as next step if ERROR') ),
 			);
 	}
 
@@ -167,35 +159,28 @@ class AutomationStep extends DataObject
 				$this->set( 'info', NULL, true );
 		}
 
-		// Next step if YES:
-		param( 'step_yes_next_step_ID', 'integer', NULL );
-		$this->set_from_Request( 'yes_next_step_ID', NULL, true );
-		$step_yes_next_step_delay = param_duration( 'step_yes_next_step_delay' );
-		if( empty( $step_yes_next_step_delay ) )
+		// Next steps:
+		$next_steps = array(
+				'yes_next_step_ID'   => 'yes_next_step_delay',
+				'no_next_step_ID'    => 'no_next_step_delay',
+				'error_next_step_ID' => 'error_next_step_delay',
+			);
+		foreach( $next_steps as $next_step_ID_name => $next_step_delay_name )
 		{
-			$step_yes_next_step_delay = NULL;
+			param( 'step_'.$next_step_ID_name, 'integer', NULL );
+			$this->set_from_Request( $next_step_ID_name, NULL, true );
+			$step_yes_next_step_delay = param_duration( 'step_'.$next_step_delay_name );
+			if( empty( $step_yes_next_step_delay ) )
+			{
+				$step_yes_next_step_delay = NULL;
+			}
+			$this->set( $next_step_delay_name, $step_yes_next_step_delay, true );
+			if( $this->get( $next_step_ID_name ) > 0 && $this->get( $next_step_ID_name ) == $this->ID )
+			{	// If next step is same as this current,
+				// Don't translate this error message because it cannot happens:
+				param_error( 'step_'.$next_step_ID_name, 'Current step cannot be used as next step!' );
+			}
 		}
-		$this->set( 'yes_next_step_delay', $step_yes_next_step_delay, true );
-
-		// Next step if NO:
-		param( 'step_no_next_step_ID', 'integer', NULL );
-		$this->set_from_Request( 'no_next_step_ID', NULL, true );
-		$step_no_next_step_delay = param_duration( 'step_no_next_step_delay' );
-		if( empty( $step_no_next_step_delay ) )
-		{
-			$step_no_next_step_delay = NULL;
-		}
-		$this->set( 'no_next_step_delay', $step_no_next_step_delay, true );
-
-		// Next step if Error:
-		param( 'step_error_next_step_ID', 'integer', NULL );
-		$this->set_from_Request( 'error_next_step_ID', NULL, true );
-		$step_error_next_step_delay = param_duration( 'step_error_next_step_delay' );
-		if( empty( $step_error_next_step_delay ) )
-		{
-			$step_error_next_step_delay = NULL;
-		}
-		$this->set( 'error_next_step_delay', $step_error_next_step_delay, true );
 
 		return ! param_errors_detected();
 	}
@@ -208,7 +193,7 @@ class AutomationStep extends DataObject
 	 */
 	function & get_Automation()
 	{
-		if( ! isset( $this->Automation ) )
+		if( $this->Automation === NULL )
 		{	// Initialize Automation object only first time and store in cache:
 			$AutomationCache = & get_AutomationCache();
 			$this->Automation = & $AutomationCache->get_by_ID( $this->get( 'autm_ID' ), false, false );
@@ -219,16 +204,172 @@ class AutomationStep extends DataObject
 
 
 	/**
+	 * Get YES next Step object of this Step
+	 *
+	 * @return object|NULL|boolean Reference on cached object Automation Step, NULL - if request with empty ID, FALSE - if requested object does not exist
+	 */
+	function & get_yes_next_AutomationStep()
+	{
+		if( $this->yes_next_AutomationStep === NULL )
+		{	// Load next Step into cache object:
+			$AutomationStepCache = & get_AutomationStepCache();
+			$this->yes_next_AutomationStep = & $AutomationStepCache->get_by_ID( $this->get( 'yes_next_step_ID' ), false, false );
+		}
+
+		return $this->yes_next_AutomationStep;
+	}
+
+
+	/**
+	 * Get NO next Step object of this Step
+	 *
+	 * @return object|NULL|boolean Reference on cached object Automation Step, NULL - if request with empty ID, FALSE - if requested object does not exist
+	 */
+	function & get_no_next_AutomationStep()
+	{
+		if( $this->no_next_AutomationStep === NULL )
+		{	// Load next Step into cache object:
+			$AutomationStepCache = & get_AutomationStepCache();
+			$this->no_next_AutomationStep = & $AutomationStepCache->get_by_ID( $this->get( 'no_next_step_ID' ), false, false );
+		}
+
+		return $this->no_next_AutomationStep;
+	}
+
+
+	/**
+	 * Get ERROR next Step object of this Step
+	 *
+	 * @return object|NULL|boolean Reference on cached object Automation Step, NULL - if request with empty ID, FALSE - if requested object does not exist
+	 */
+	function & get_error_next_AutomationStep()
+	{
+		if( $this->error_next_AutomationStep === NULL )
+		{	// Load next Step into cache object:
+			$AutomationStepCache = & get_AutomationStepCache();
+			$this->error_next_AutomationStep = & $AutomationStepCache->get_by_ID( $this->get( 'error_next_step_ID' ), false, false );
+		}
+
+		return $this->error_next_AutomationStep;
+	}
+
+
+	/**
 	 * Execute action for this step
 	 *
 	 * @param integer User ID
+	 * @param array Additional params
 	 */
-	function execute_action( $user_ID )
+	function execute_action( $user_ID, $params = array() )
 	{
+		global $DB, $servertimenow;
+
+		$params = array_merge( array(
+				'print_log' => true,
+			), $params );
+
+		load_funcs( 'automations/model/_automation.funcs.php' );
+
 		$Automation = & $this->get_Automation();
 
-		// TODO:
-		echo 'Executing Step #'.$this->ID.' of Automation: #'.$Automation->ID.' for User #'.$user_ID.'...<br>'."\r\n";
+		if( $params['print_log'] )
+		{	// Print log:
+			global $is_cli;
+			$nl = empty( $is_cli ) ? '<br>' : "\r\n";
+
+			echo 'Executing Step #'.$this->get( 'order' )
+				.'('.step_get_type_title( $this->get( 'type' ) ).( $this->get( 'label' ) == '' ? '' : '"'.$this->get( 'label' ).'"' ).')'
+				.' of Automation: #'.$Automation->ID.'('.$Automation->get( 'name' ).')'
+				.' for User #'.$user_ID.'...'.$nl;
+		}
+
+		// Retrun ERROR result by default for all unknown cases:
+		$step_result = 'ERROR';
+
+		switch( $this->get( 'type' ) )
+		{
+			case 'send_campaign':
+				// Send email campaign
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				if( $step_EmailCampaign = & $EmailCampaignCache->get_by_ID( $this->get( 'info' ), false, false ) )
+				{
+					$user_is_waiting_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'wait' ) );
+					$user_received_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'receive' ) );
+					if( ! $user_is_waiting_email && ! $user_received_email )
+					{	// If user is not waiting this email campaign and didn't receive:
+						$step_result = 'NO';
+					}
+					elseif( $user_received_email || $step_EmailCampaign->send_email( $user_ID ) )
+					{	// If user already received this email before OR email has been sent to user successfully now:
+						$step_result = 'YES';
+					}
+					else
+					{	// Some error on sending of email to user:
+						// - problem with php mail function;
+						// - user cannot receive such email because of day limit;
+						// - user is not activated yet.
+						$step_result = 'ERROR';
+					}
+				}
+				else
+				{	// Wrong stored email campaign for this step:
+					$step_result = 'ERROR';
+				}
+				break;
+
+			default:
+				echo '- No implemented action'.$nl;
+				break;
+		}
+
+		switch( $step_result )
+		{
+			case 'YES':
+				$next_AutomationStep = & $this->get_yes_next_AutomationStep();
+				$next_delay = $this->get( 'yes_next_step_delay' );
+				break;
+
+			case 'NO':
+				$next_AutomationStep = & $this->get_no_next_AutomationStep();
+				$next_delay = $this->get( 'no_next_step_delay' );
+				break;
+
+			case 'ERROR':
+				$next_AutomationStep = & $this->get_error_next_AutomationStep();
+				$next_delay = $this->get( 'error_next_step_delay' );
+				break;
+		}
+
+		if( $next_AutomationStep )
+		{	// Use data for next step:
+			$next_step_ID = $next_AutomationStep->ID;
+			$next_exec_ts = date2mysql( $servertimenow + $next_delay );
+		}
+		else
+		{	// This was the end Step of the Automation:
+			$next_step_ID = NULL;
+			$next_exec_ts = NULL;
+		}
+		// Update data for next step or finish it:
+		$DB->query( 'UPDATE T_automation__user_state
+			  SET aust_next_step_ID = '.$DB->quote( $next_step_ID ).',
+			      aust_next_exec_ts = '.$DB->quote( $next_exec_ts ).'
+			WHERE aust_autm_ID = '.$DB->quote( $Automation->ID ).'
+			  AND aust_user_ID = '.$DB->quote( $user_ID ) );
+
+		if( $params['print_log'] )
+		{	// Print log:
+			echo ' - Next step: '.( $next_AutomationStep
+					? '#'.$next_AutomationStep->get( 'order' )
+						.'('.step_get_type_title( $this->get( 'type' ) ).( $this->get( 'label' ) == '' ? '' : ' "'.$this->get( 'label' ).'"' ).')'
+						.' delay: '.seconds_to_period( $next_delay ).', '.$next_exec_ts
+					: 'NO(this is last step)' ).$nl;
+		}
+
+		if( $params['print_log'] )
+		{	// Print log:
+			echo 'Result: '.$step_result.'.'.$nl.$nl;
+		}
 	}
 
 
