@@ -5149,7 +5149,8 @@ function generate_login_from_string( $login )
 	global $Settings;
 
 	// Normalize login
-	$login = normalizer_normalize( $login );
+	load_funcs('locales/_charset.funcs.php');
+	$login = replace_special_chars( $login );
 
 	if( $Settings->get( 'strict_logins' ) )
 	{ // We allow only the plain ACSII characters, digits, the chars _ and .

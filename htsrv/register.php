@@ -290,11 +290,11 @@ switch( $action )
 				$login = array();
 				if( ! empty( $firstname ) )
 				{
-					$login[] = $firstname;
+					$login[] = trim( $firstname );
 				}
 				if( ! empty( $lastname ) )
 				{
-					$login[] = $lastname;
+					$login[] = trim( $lastname );
 				}
 				$login = preg_replace( '/[\s\-]+/', '_', utf8_strtolower( implode( '_', $login ) ) );
 				$login = generate_login_from_string( $login );
