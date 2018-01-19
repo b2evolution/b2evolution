@@ -5139,6 +5139,50 @@ function get_base_domain( $url )
 
 
 /**
+ * Generate login from string
+ *
+ * @param string string to generate login from
+ * @return string login
+ */
+function generate_login_from_string( $login )
+{
+	global $Settings;
+
+	// Normalize login
+	$login = normalizer_normalize( $login );
+
+	if( $Settings->get( 'strict_logins' ) )
+	{ // We allow only the plain ACSII characters, digits, the chars _ and .
+		$login = preg_replace( '/[^A-Za-z0-9_.]/', '', $login );
+	}
+	else
+	{ // We allow any character that is not explicitly forbidden in Step 1
+		// Enforce additional limitations
+		$login = preg_replace( '|%([a-fA-F0-9][a-fA-F0-9])|', '', $login ); // Kill octets
+		$login = preg_replace( '/&.+?;/', '', $login ); // Kill entities
+	}
+
+	$login = preg_replace( '/^usr_/i', '', $login );
+
+	if( ! empty( $login ) )
+	{
+		// Check and search free login name if current is already in use
+		$login_name = $login;
+		$login_number = 1;
+		$UserCache = & get_UserCache();
+		while( $UserCache->get_by_login( $login_name ) )
+		{
+			$login_name = $login.$login_number;
+			$login_number++;
+		}
+		$login = $login_name;
+	}
+
+	return $login;
+}
+
+
+/**
  * Generate a valid key of size $length.
  *
  * @param integer length of key

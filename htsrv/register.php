@@ -269,31 +269,38 @@ switch( $action )
 
 		if( $is_quick && ! $Messages->has_errors() )
 		{	// Generate a login for quick registration:
-			// Get the login from email address:
-			$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
-			$login = preg_replace( '/[\'"><@\s]/', '', $login );
-			if( $Settings->get( 'strict_logins' ) )
-			{ // We allow only the plain ACSII characters, digits, the chars _ and .
-				$login = preg_replace( '/[^A-Za-z0-9_.]/', '', $login );
+
+			if( ! empty( $firstname ) || ! empty( $lastname ) )
+			{ // Firstname or lastname given, let's use these:
+				$login = array();
+				if( ! empty( $firstname ) )
+				{
+					$login[] = $firstname;
+				}
+				if( ! empty( $lastname ) )
+				{
+					$login[] = $lastname;
+				}
+				$login = preg_replace( '/[\s\-]+/', '_', utf8_strtolower( implode( '_', $login ) ) );
+				$login = generate_login_from_string( $login );
 			}
 			else
-			{ // We allow any character that is not explicitly forbidden in Step 1
-				// Enforce additional limitations
-				$login = preg_replace( '|%([a-fA-F0-9][a-fA-F0-9])|', '', $login ); // Kill octets
-				$login = preg_replace( '/&.+?;/', '', $login ); // Kill entities
-			}
-			$login = preg_replace( '/^usr_/i', '', $login );
+			{ // Get the login from email address:
+				$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
+				$login = preg_replace( '/[\'"><@\s]/', '', $login );
 
-			// Check and search free login name if current is busy
-			$login_name = $login;
-			$login_number = 1;
-			$UserCache = & get_UserCache();
-			while( empty( $login_name ) || $UserCache->get_by_login( $login_name ) )
-			{
-				$login_name = $login.$login_number;
-				$login_number++;
+				if( strpos( $login, '.' ) )
+				{ // Get only the part before the "." if it has one
+					$temp_login = $login;
+					$login = substr( $login, 0, strpos( $login, '.' ) );
+					$login = generate_login_from_string( $login );
+
+					if( empty( $login ) )
+					{ // Resulting login empty, use full email address
+						$login = generate_login_from_string( $temp_login );
+					}
+				}
 			}
-			$login = $login_name;
 		}
 
 		if( ! $is_quick )
