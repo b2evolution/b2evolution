@@ -315,6 +315,10 @@ switch( $action )
 						$login = generate_login_from_string( $temp_login );
 					}
 				}
+				else
+				{
+					$login = generate_login_from_string( $login );
+				}
 			}
 		}
 
