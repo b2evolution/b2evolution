@@ -16,6 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
+load_funcs( 'automations/model/_automation.funcs.php' );
 
 
 /**
@@ -268,8 +269,6 @@ class AutomationStep extends DataObject
 				'print_log' => true,
 			), $params );
 
-		load_funcs( 'automations/model/_automation.funcs.php' );
-
 		$Automation = & $this->get_Automation();
 
 		if( $params['print_log'] )
@@ -295,11 +294,11 @@ class AutomationStep extends DataObject
 				{
 					$user_is_waiting_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'wait' ) );
 					$user_received_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'receive' ) );
-					if( ! $user_is_waiting_email && ! $user_received_email )
-					{	// If user is not waiting this email campaign and didn't receive:
+					if( $user_received_email )
+					{	// If user already received this email:
 						$step_result = 'NO';
 					}
-					elseif( $user_received_email || $step_EmailCampaign->send_email( $user_ID ) )
+					elseif( $user_is_waiting_email && $step_EmailCampaign->send_email( $user_ID ) )
 					{	// If user already received this email before OR email has been sent to user successfully now:
 						$step_result = 'YES';
 					}
@@ -318,10 +317,19 @@ class AutomationStep extends DataObject
 				break;
 
 			default:
-				echo '- No implemented action'.$nl;
+				if( $params['print_log'] )
+				{	// Print log:
+					echo ' - No implemented action'.$nl;
+				}
 				break;
 		}
 
+		if( $params['print_log'] )
+		{	// Print log:
+			echo ' - Result: '.$this->get_result_title( $step_result ).'.'.$nl;
+		}
+
+		// Get data for next step:
 		switch( $step_result )
 		{
 			case 'YES':
@@ -341,7 +349,7 @@ class AutomationStep extends DataObject
 		}
 
 		if( $next_AutomationStep )
-		{	// Use data for next step:
+		{	// Use data for next step if it is defined:
 			$next_step_ID = $next_AutomationStep->ID;
 			$next_exec_ts = date2mysql( $servertimenow + $next_delay );
 		}
@@ -351,24 +359,25 @@ class AutomationStep extends DataObject
 			$next_exec_ts = NULL;
 		}
 		// Update data for next step or finish it:
-		$DB->query( 'UPDATE T_automation__user_state
+		/*$DB->query( 'UPDATE T_automation__user_state
 			  SET aust_next_step_ID = '.$DB->quote( $next_step_ID ).',
 			      aust_next_exec_ts = '.$DB->quote( $next_exec_ts ).'
 			WHERE aust_autm_ID = '.$DB->quote( $Automation->ID ).'
-			  AND aust_user_ID = '.$DB->quote( $user_ID ) );
+			  AND aust_user_ID = '.$DB->quote( $user_ID ),
+			'Update data for next Step after executing Step #'.$this->ID );*/
 
 		if( $params['print_log'] )
 		{	// Print log:
-			echo ' - Next step: '.( $next_AutomationStep
-					? '#'.$next_AutomationStep->get( 'order' )
+			echo ( $next_AutomationStep
+					? '- Next step: #'.$next_AutomationStep->get( 'order' )
 						.'('.step_get_type_title( $this->get( 'type' ) ).( $this->get( 'label' ) == '' ? '' : ' "'.$this->get( 'label' ).'"' ).')'
 						.' delay: '.seconds_to_period( $next_delay ).', '.$next_exec_ts
-					: 'NO(this is last step)' ).$nl;
+					: ' - There is no next step configured.' ).$nl;
 		}
 
 		if( $params['print_log'] )
 		{	// Print log:
-			echo 'Result: '.$step_result.'.'.$nl.$nl;
+			echo $nl;
 		}
 	}
 
@@ -381,6 +390,20 @@ class AutomationStep extends DataObject
 	function get_name()
 	{
 		return '#'.$this->get( 'order' ).' - '.step_td_label( $this->get( 'label' ), $this->get( 'type' ) );
+	}
+
+
+	/**
+	 * Get result title depending on step type
+	 *
+	 * NOTE! Return string is not translatable, Use funcs T_(), TS_() and etc. in that place where you use this func.
+	 *
+	 * @param string Result: YES, NO, ERROR
+	 * @return string Result title
+	 */
+	function get_result_title( $result )
+	{
+		return step_get_result_title( $this->get( 'type' ), $result );
 	}
 }
 

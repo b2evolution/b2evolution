@@ -23,9 +23,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function autm_get_status_titles()
 {
 	return array(
-			'paused' => T_('Paused'),
-			'active' => T_('Active'),
-		);
+		'paused' => T_('Paused'),
+		'active' => T_('Active'),
+	);
 }
 
 
@@ -46,28 +46,67 @@ function autm_get_status_title( $status )
 /**
  * Get array of type titles for automation step
  *
- * @return array Status titles
+ * @return array Type titles
  */
 function step_get_type_titles()
 {
 	return array(
-			'if_condition'  => T_('IF Condition'),
-			'send_campaign' => T_('Send Campaign'),
-		);
+		'if_condition'  => T_('IF Condition'),
+		'send_campaign' => T_('Send Campaign'),
+	);
 }
 
 
 /**
  * Get type title of automation step by type value
  *
- * @param string Status value
- * @return string Status title
+ * @param string Type value
+ * @return string Type title
  */
 function step_get_type_title( $type )
 {
 	$types = step_get_type_titles();
 
 	return isset( $types[ $type ] ) ? $types[ $type ] : $type;
+}
+
+
+/**
+ * Get array of result titles for automation step
+ *
+ * @return array Result titles per step type
+ */
+function step_get_result_titles()
+{
+	return array(
+		'if_condition' => array(
+			'YES'   => NT_('YES'),
+			'NO'    => NT_('NO'),
+			'ERROR' => NT_('ERROR'),
+		),
+		'send_campaign' => array(
+			'YES'   => NT_('Email SENT'),
+			'NO'    => NT_('Email was ALREADY sent'),
+			'ERROR' => NT_('ERROR'),
+		),
+	);
+}
+
+
+/**
+ * Get result title of automation step by step type and result value
+ *
+ * NOTE! Return string is not translatable, Use funcs T_(), TS_() and etc. in that place where you use this func.
+ *
+ * @param string Step type: 'if_condition', 'send_campaign
+ * @param string Step result: 'YES', 'NO', 'ERROR'
+ * @return string Result title
+ */
+function step_get_result_title( $type, $result )
+{
+	$results = step_get_result_titles();
+
+	return isset( $results[ $type ][ $result ] ) ? $results[ $type ][ $result ] : $result;
 }
 
 

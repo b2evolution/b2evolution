@@ -61,17 +61,17 @@ $AutomationStepCache->clear();
 $AutomationStepCache->load_where( 'step_autm_ID = '.$step_Automation->ID
 	.( $creating ? '' : ' AND step_ID != '.$edited_AutomationStep->ID ) );
 
-$Form->begin_line( T_('Next step if YES') );
+$Form->begin_line( sprintf( T_('Next step if %s'), '<span id="step_result_title_yes">'.$edited_AutomationStep->get_result_title( 'YES' ).'</span>' ) );
 	$Form->select_input_object( 'step_yes_next_step_ID', $edited_AutomationStep->get( 'yes_next_step_ID' ), $AutomationStepCache, '', array( 'allow_none' => true ) );
 	$Form->duration_input( 'step_yes_next_step_delay', $edited_AutomationStep->get( 'yes_next_step_delay' ), T_('Delay') );
 $Form->end_line();
 
-$Form->begin_line( T_('Next step if NO') );
+$Form->begin_line( sprintf( T_('Next step if %s'), '<span id="step_result_title_no">'.$edited_AutomationStep->get_result_title( 'NO' ).'</span>' ) );
 	$Form->select_input_object( 'step_no_next_step_ID', $edited_AutomationStep->get( 'no_next_step_ID' ), $AutomationStepCache, '', array( 'allow_none' => true ) );
 	$Form->duration_input( 'step_no_next_step_delay', $edited_AutomationStep->get( 'no_next_step_delay' ), T_('Delay') );
 $Form->end_line();
 
-$Form->begin_line( T_('Next step if Error') );
+$Form->begin_line( sprintf( T_('Next step if %s'), '<span id="step_result_title_error">'.$edited_AutomationStep->get_result_title( 'ERROR' ).'</span>' ) );
 	$Form->select_input_object( 'step_error_next_step_ID', $edited_AutomationStep->get( 'error_next_step_ID' ), $AutomationStepCache, '', array( 'allow_none' => true ) );
 	$Form->duration_input( 'step_error_next_step_delay', $edited_AutomationStep->get( 'error_next_step_delay' ), T_('Delay') );
 $Form->end_line();
@@ -81,8 +81,8 @@ $Form->end_form( array(
 	) );
 ?>
 <script type="text/javascript">
-// Display additional info fields depending on step type:
-function step_type_display_info( step_type )
+// Update form depending on step type:
+function step_type_update_info( step_type )
 {
 	jQuery( '#ffield_step_email_campaign' ).hide();
 
@@ -90,15 +90,25 @@ function step_type_display_info( step_type )
 	{
 		case 'send_campaign':
 			jQuery( '#ffield_step_email_campaign' ).show();
+			jQuery( '#step_result_title_yes' ).html( '<?php echo TS_( step_get_result_title( 'send_campaign', 'YES' ) ); ?>' );
+			jQuery( '#step_result_title_no' ).html( '<?php echo TS_( step_get_result_title( 'send_campaign', 'NO' ) ); ?>' );
+			jQuery( '#step_result_title_error' ).html( '<?php echo TS_( step_get_result_title( 'send_campaign', 'ERROR' ) ); ?>' );
+			break;
+
+		case 'if_condition':
+		default:
+			jQuery( '#step_result_title_yes' ).html( '<?php echo TS_( step_get_result_title( 'if_condition', 'YES' ) ); ?>' );
+			jQuery( '#step_result_title_no' ).html( '<?php echo TS_( step_get_result_title( 'if_condition', 'NO' ) ); ?>' );
+			jQuery( '#step_result_title_error' ).html( '<?php echo TS_( step_get_result_title( 'if_condition', 'ERROR' ) ); ?>' );
 			break;
 	}
 }
 jQuery( '#step_type' ).change( function()
 {
-	step_type_display_info( jQuery( this ).val() );
+	step_type_update_info( jQuery( this ).val() );
 } );
 jQuery( document ).ready( function()
 {
-	step_type_display_info( jQuery( '#step_type' ).val() );
+	step_type_update_info( jQuery( '#step_type' ).val() );
 } );
 </script>
