@@ -50,6 +50,7 @@ $Form->text_input( 'step_label', $edited_AutomationStep->get( 'label' ), 40, T_(
 $Form->select_input_array( 'step_type', $edited_AutomationStep->get( 'type' ), step_get_type_titles(), T_('Type'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
 
 $Form->info_field( T_('IF Condition'), '<div id="step_if_condition"></div>', array( 'class' => 'ffield_step_if_condition' ) );
+$Form->hidden( 'step_if_condition', '' );
 
 $EmailCampaignCache = & get_EmailCampaignCache();
 $EmailCampaignCache->load_all();
@@ -114,33 +115,51 @@ jQuery( '#step_type' ).change( function()
 jQuery( document ).ready( function()
 {
 	step_type_update_info( jQuery( '#step_type' ).val() );
+
+	// Initialize Query Builder for the field "IF Condition":
+	jQuery( '#step_if_condition' ).queryBuilder(
+	{
+		plugins: ['bt-tooltip-errors'],
+		icons: {
+			add_group: 'fa fa-plus-circle',
+			add_rule: 'fa fa-plus',
+			remove_group: 'fa fa-close',
+			remove_rule: 'fa fa-close',
+			error: 'fa fa-warning',
+		},
+
+		filters: [
+		{
+			id: 'user_has_tag',
+			label: '<?php echo TS_('User tag' ); ?>',
+			type: 'string',
+			operators: ['equal', 'not_equal'],
+		},
+		{
+			id: 'date',
+			label: '<?php echo TS_('Date' ); ?>',
+			type: 'date',
+			operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
+			plugin: 'datepicker',
+		}
+		],
+	} );
+
+	// Prefill the field "IF Condition" with stored data from DB:
+	jQuery( '#step_if_condition' ).queryBuilder( 'setRulesFromSQL', '<?php echo ( $edited_AutomationStep->get( 'type' ) == 'if_condition' ? format_to_js( $edited_AutomationStep->get( 'info' ) ) : '' ); ?>' );
 } );
 
-jQuery( '#step_if_condition' ).queryBuilder(
+// Prepare form submit to convert "IF Condition" field to SQL format:
+jQuery( 'form' ).on( 'submit', function()
 {
-	plugins: ['bt-tooltip-errors'],
-	icons: {
-		add_group: 'fa fa-plus-circle',
-		add_rule: 'fa fa-plus',
-		remove_group: 'fa fa-close',
-		remove_rule: 'fa fa-close',
-		error: 'fa fa-warning',
-	},
-
-	filters: [
-	{
-		id: 'user_has_tag',
-		label: '<?php echo TS_('User tag' ); ?>',
-		type: 'string',
-		operators: ['equal', 'not_equal'],
-	},
-	{
-		id: 'date',
-		label: '<?php echo TS_('Date' ); ?>',
-		type: 'date',
-		operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
-		plugin: 'datepicker',
+	var result = jQuery( '#step_if_condition' ).queryBuilder( 'getSQL' );
+	if( result === null )
+	{	// Stop submitting on wrong SQL:
+		return false;
 	}
-	],
+	else
+	{	// Set SQL to hidden field before submitting:
+		jQuery( 'input[name=step_if_condition]' ).val( result.sql );
+	}
 } );
 </script>

@@ -1835,6 +1835,7 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
 	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
 	require_js( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
+	require_js( 'jquery/query-builder/sql-parser.min.js', $relative_to ); // dependency
 
 	require_js( 'jquery/query-builder/query-builder.min.js', $relative_to );
 	require_css( 'jquery/jquery.query-builder.default.css', $relative_to );

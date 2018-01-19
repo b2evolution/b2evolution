@@ -149,6 +149,12 @@ class AutomationStep extends DataObject
 		// Save additional info depending on step type:
 		switch( $this->get( 'type' ) )
 		{
+			case 'if_condition':
+				// IF Condition:
+				param_string_not_empty( 'step_if_condition', T_('Please set a condition.') );
+				$this->set( 'info', get_param( 'step_if_condition' ) );
+				break;
+
 			case 'send_campaign':
 				// Email campaign:
 				param( 'step_email_campaign', 'integer', NULL );
