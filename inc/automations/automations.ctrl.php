@@ -324,6 +324,11 @@ switch( $action )
 
 $AdminUI->set_path( 'email', 'automations' );
 
+if( in_array( $action, array( 'new_step', 'edit_step' ) ) )
+{	// Load jQuery QueryBuilder plugin files:
+	init_querybuilder_js( 'rsc_url' );
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 

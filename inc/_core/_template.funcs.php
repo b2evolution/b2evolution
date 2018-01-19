@@ -1826,6 +1826,33 @@ function init_jqplot_js( $relative_to = 'rsc_url' )
 
 
 /**
+ * Initialize JavaScript variables for jQuery QueryBuilder plugin
+ */
+function init_querybuilder_js( $relative_to = 'rsc_url' )
+{
+	global $current_locale;
+
+	require_js( '#jquery#', $relative_to ); // dependency
+	require_js( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
+	require_js( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
+
+	require_js( 'jquery/query-builder/query-builder.min.js', $relative_to );
+	require_css( 'jquery/jquery.query-builder.default.css', $relative_to );
+
+	// Load language file if such file exists:
+	$query_builder_langs = array( 'ar', 'az', 'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fa-IR', 'fr', 'he', 'it', 'nl', 'no', 'pl', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sq', 'tr', 'ua', 'zh-CN' );
+	if( in_array( $current_locale, $query_builder_langs ) )
+	{	// Load lang by full locale name like "en-US":
+		require_js( 'jquery/query-builder/i18n/query-builder.'.$current_locale.'.js', $relative_to );
+	}
+	elseif( in_array( substr( $current_locale, 0, 2 ), $query_builder_langs ) )
+	{	// Load lang by locale code like "en":
+		require_js( 'jquery/query-builder/i18n/query-builder.'.substr( $current_locale, 0, 2 ).'.js', $relative_to );
+	}
+}
+
+
+/**
  * Outputs the collected HTML HEAD lines.
  * @see add_headline()
  * @return string

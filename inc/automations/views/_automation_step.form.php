@@ -49,6 +49,8 @@ $Form->text_input( 'step_label', $edited_AutomationStep->get( 'label' ), 40, T_(
 
 $Form->select_input_array( 'step_type', $edited_AutomationStep->get( 'type' ), step_get_type_titles(), T_('Type'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
 
+$Form->info_field( T_('IF Condition'), '<div id="step_if_condition"></div>', array( 'class' => 'ffield_step_if_condition' ) );
+
 $EmailCampaignCache = & get_EmailCampaignCache();
 $EmailCampaignCache->load_all();
 $Form->select_input_object( 'step_email_campaign',
@@ -84,7 +86,7 @@ $Form->end_form( array(
 // Update form depending on step type:
 function step_type_update_info( step_type )
 {
-	jQuery( '#ffield_step_email_campaign' ).hide();
+	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition' ).hide();
 
 	switch( step_type )
 	{
@@ -96,6 +98,8 @@ function step_type_update_info( step_type )
 			break;
 
 		case 'if_condition':
+			jQuery( '.ffield_step_if_condition' ).show();
+
 		default:
 			jQuery( '#step_result_title_yes' ).html( '<?php echo TS_( step_get_result_title( 'if_condition', 'YES' ) ); ?>' );
 			jQuery( '#step_result_title_no' ).html( '<?php echo TS_( step_get_result_title( 'if_condition', 'NO' ) ); ?>' );
@@ -110,5 +114,33 @@ jQuery( '#step_type' ).change( function()
 jQuery( document ).ready( function()
 {
 	step_type_update_info( jQuery( '#step_type' ).val() );
+} );
+
+jQuery( '#step_if_condition' ).queryBuilder(
+{
+	plugins: ['bt-tooltip-errors'],
+	icons: {
+		add_group: 'fa fa-plus-circle',
+		add_rule: 'fa fa-plus',
+		remove_group: 'fa fa-close',
+		remove_rule: 'fa fa-close',
+		error: 'fa fa-warning',
+	},
+
+	filters: [
+	{
+		id: 'user_has_tag',
+		label: '<?php echo TS_('User tag' ); ?>',
+		type: 'string',
+		operators: ['equal', 'not_equal'],
+	},
+	{
+		id: 'date',
+		label: '<?php echo TS_('Date' ); ?>',
+		type: 'date',
+		operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
+		plugin: 'datepicker',
+	}
+	],
 } );
 </script>
