@@ -2162,7 +2162,7 @@ function is_valid_login( $login, $force_strict_logins = false )
 	}
 
 	// Step 2
-	if( ($strict_logins || $force_strict_logins) && ! preg_match( '~^[A-Za-z0-9_.]+$~', $login ) )
+	if( ($strict_logins || $force_strict_logins) && ! preg_match( '~^[A-Za-z0-9_.\-]+$~', $login ) )
 	{	// WARNING: allowing special chars like latin 1 accented chars ( \xDF-\xF6\xF8-\xFF ) will create issues with
 		// user media directory names (tested on Max OS X) -- Do no allow any of this until we have a clean & safe media dir name generator.
 
@@ -5153,8 +5153,8 @@ function generate_login_from_string( $login )
 	$login = replace_special_chars( $login );
 
 	if( $Settings->get( 'strict_logins' ) )
-	{ // We allow only the plain ACSII characters, digits, the chars _ and .
-		$login = preg_replace( '/[^A-Za-z0-9_.]/', '', $login );
+	{ // We allow only the plain ACSII characters, digits, the chars _ and . and -
+		$login = preg_replace( '/[^A-Za-z0-9_.\-]/', '', $login );
 	}
 	else
 	{ // We allow any character that is not explicitly forbidden in Step 1

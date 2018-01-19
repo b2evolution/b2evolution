@@ -1346,11 +1346,11 @@ class collections_Module extends Module
 				// START: Auto register new user:
 				// Set unique user login from entered user name:
 				$max_login_length = 20;
-				$login = preg_replace( '/[^a-z0-9 ]/i', '', $user_name );
+				$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $user_name );
 				if( trim( $login ) == '' )
 				{	// Get login from entered user email:
 					$login = preg_replace( '/^([^@]+)@.+$/i', '$1', $user_email );
-					$login = preg_replace( '/[^a-z0-9 ]/i', '', $login );
+					$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $login );
 				}
 				$login = str_replace( ' ', '_', $login );
 				$login = utf8_substr( $login, 0, $max_login_length );

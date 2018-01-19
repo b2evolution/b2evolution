@@ -91,7 +91,7 @@ if( $display_invitation == 'deny' )
 
 if( $register_user = $Session->get('core.register_user') )
 {	// Get an user data from predefined session (after adding of a comment)
-	$login = preg_replace( '/[^a-z0-9 ]/i', '', $register_user['name'] );
+	$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $register_user['name'] );
 	$login = str_replace( ' ', '_', $login );
 	$login = utf8_substr( $login, 0, 20 );
 	$email = $register_user['email'];
@@ -296,7 +296,7 @@ switch( $action )
 				{
 					$login[] = trim( $lastname );
 				}
-				$login = preg_replace( '/[\s\-]+/', '_', utf8_strtolower( implode( '_', $login ) ) );
+				$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( implode( '_', $login ) ) );
 				$login = generate_login_from_string( $login );
 			}
 			else

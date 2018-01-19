@@ -855,7 +855,7 @@ function param_check_valid_login( $var )
 		}
 		elseif( ! isset( $Settings ) || $Settings->get('strict_logins') )
 		{
-			$msg = T_('Logins can only contain letters, digits and the following characters: _ .');
+			$msg = T_('Logins can only contain letters, digits and the following characters: _ . -');
 		}
 		else
 		{

@@ -890,7 +890,7 @@ class Item extends ItemLight
 					$UserCache = & get_UserCache();
 
 					// Convert new entered login to proper login format:
-					$this->creator_user_login = preg_replace( '/[^a-z0-9 ]/i', '', $this->creator_user_login );
+					$this->creator_user_login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $this->creator_user_login );
 					$this->creator_user_login = str_replace( ' ', '_', $this->creator_user_login );
 					$this->creator_user_login = utf8_substr( $this->creator_user_login, 0, 20 );
 					set_param( 'item_owner_login', $this->creator_user_login );
