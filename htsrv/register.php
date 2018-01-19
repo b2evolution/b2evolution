@@ -103,18 +103,33 @@ switch( $action )
 {
 	case 'register':
 	case 'quick_register':
+		// Use this boolean var to know when quick registration is used
+		$is_quick = ( $action == 'quick_register' );
+		$is_inline = param( 'inline', 'integer', 0 ) == 1;
+
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
+
+		// Make sure email is valid first and that it only contains ASCII characters
+		if( ! is_email( $email )  )
+		{
+			param_error( $dummy_fields['email'], T_('The email address is invalid.') );
+		}
+
+		if( $Messages->has_errors() )
+		{ // Stop registration if the errors exist
+			if( $is_quick || $is_inline )
+			{ // We will need the following parameter for the session data that will be set later
+				param( 'widget', 'integer', 0 );
+			}
+			break;
+		}
 
 		// Stop a request from the blocked email address or its domain:
 		antispam_block_by_email( $email );
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'regform' );
-
-		// Use this boolean var to know when quick registration is used
-		$is_quick = ( $action == 'quick_register' );
-		$is_inline = param( 'inline', 'integer', 0 ) == 1;
 
 		if( $is_quick || $is_inline )
 		{ // Check if we can use a quick registration now:
