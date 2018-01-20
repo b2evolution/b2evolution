@@ -486,7 +486,7 @@ switch( $action )
 			case 'compose':
 				if( $edited_EmailCampaign->get( 'email_text' ) == '' && !param_errors_detected() )
 				{ // Set default value for HTML message
-					$edited_EmailCampaign->set( 'email_text', 'Hello $login$!'."\r\n\r\n".'This is our list...' );
+					$edited_EmailCampaign->set( 'email_text', sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...') );
 				}
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_compose.form.php' );
 				break;

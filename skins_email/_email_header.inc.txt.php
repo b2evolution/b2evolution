@@ -19,37 +19,6 @@ $params = array_merge( array(
 
 if( $params['include_greeting'] )
 { // Display the greeting message
-	if( ! empty( $params['newsletter'] ) )
-	{ // This is a newsletter
-		if( ! empty( $recipient_User ) )
-		{
-			echo T_('Hello $firstname_and_login$!')."\n\n";
-		}
-		elseif( ! empty( $params['anonymous_recipient_name'] ) )
-		{
-			echo T_('Hello $name$!')."\n\n";
-		}
-		else
-		{
-			echo T_('Hello')."!\n\n";
-		}
-
-		echo T_('Here are some news')."...\n\n";
-	}
-	else
-	{
-		if( ! empty( $recipient_User ) )
-		{
-			echo T_('Hello $username$!')."\n\n";
-		}
-		elseif( ! empty( $params['anonymous_recipient_name'] ) )
-		{
-			echo T_('Hello $name$!')."\n\n";
-		}
-		else
-		{
-			echo T_('Hello')."!\n\n";
-		}
-	}
+	echo sprintf( T_( 'Hello %s!' ), '$username$' )."\n\n";
 }
 ?>
