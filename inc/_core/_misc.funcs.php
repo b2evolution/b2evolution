@@ -5150,7 +5150,7 @@ function generate_login_from_string( $login )
 
 	// Normalize login
 	load_funcs('locales/_charset.funcs.php');
-	$login = replace_special_chars( $login );
+	$login = replace_special_chars( $login, NULL, true );
 
 	if( $Settings->get( 'strict_logins' ) )
 	{ // We allow only the plain ACSII characters, digits, the chars _ and . and -
@@ -5165,6 +5165,13 @@ function generate_login_from_string( $login )
 
 	$login = preg_replace( '/^usr_/i', '', $login );
 
+	// Trim to allowed login length
+	$max_login_length = 20;
+	if( strlen( $login ) > $max_login_length )
+	{
+		$login = substr( $login, 0, $max_login_length );
+	}
+
 	if( ! empty( $login ) )
 	{
 		// Check and search free login name if current is already in use
@@ -5173,7 +5180,15 @@ function generate_login_from_string( $login )
 		$UserCache = & get_UserCache();
 		while( $UserCache->get_by_login( $login_name ) )
 		{
-			$login_name = $login.$login_number;
+			$num_suffix_length = strlen( $login_number );
+			if( strlen( $login_name ) + $num_suffix_length > $max_login_length )
+			{
+				$login_name = substr( $login, 0, $max_login_length - $num_suffix_length ).$login_number;
+			}
+			else
+			{
+				$login_name = $login.$login_number;
+			}
 			$login_number++;
 		}
 		$login = $login_name;
