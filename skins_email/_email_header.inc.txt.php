@@ -13,11 +13,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
-		'include_greeting' => true
+		'include_greeting' => true,
+		'recipient_User' => NULL,
 	), $params );
 
 if( $params['include_greeting'] )
 { // Display the greeting message
-	echo T_( 'Hello $username$!' )."\n\n";
+	echo sprintf( T_( 'Hello %s!' ), '$username$' )."\n\n";
 }
 ?>

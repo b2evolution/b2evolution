@@ -890,7 +890,7 @@ class Item extends ItemLight
 					$UserCache = & get_UserCache();
 
 					// Convert new entered login to proper login format:
-					$this->creator_user_login = preg_replace( '/[^a-z0-9 ]/i', '', $this->creator_user_login );
+					$this->creator_user_login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $this->creator_user_login );
 					$this->creator_user_login = str_replace( ' ', '_', $this->creator_user_login );
 					$this->creator_user_login = utf8_substr( $this->creator_user_login, 0, 20 );
 					set_param( 'item_owner_login', $this->creator_user_login );
@@ -2637,7 +2637,13 @@ class Item extends ItemLight
 						$button_subscribed = '';
 						$button_notloggedin = '';
 
-						$newsletter_ID = intval( $widget_params[0] );
+						preg_match( '/(\d+)(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
+						$newsletter_ID = intval( $newsletter_ID_tags[1] );
+						if( isset( $newsletter_ID_tags[2] ) )
+						{
+							$user_tags = $newsletter_ID_tags[2];
+						}
+
 						if( isset( $widget_params[1] ) )
 						{
 							$button_notsubscribed = $widget_params[1];
@@ -2671,6 +2677,10 @@ class Item extends ItemLight
 						{
 							$params['button_subscribed'] = $button_subscribed;
 						}
+						if( ! empty( $user_tags ) )
+						{
+							$params['usertags'] = $user_tags;
+						}
 
 						if( ! empty( $button_notloggedin ) && ! is_logged_in() )
 						{ // Email capture widget does not display if user is not logged in
@@ -2693,7 +2703,15 @@ class Item extends ItemLight
 						$fields_to_display = array();
 						$button_text = '';
 
-						$newsletter_ID = intval( $widget_params[0] );
+						preg_match( '/(\d+)?(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
+						if( isset( $newsletter_ID_tags[1] ) )
+						{
+							$newsletter_ID = intval( $newsletter_ID_tags[1] );
+						}
+						if( isset( $newsletter_ID_tags[2] ) )
+						{
+							$user_tags = $newsletter_ID_tags[2];
+						}
 						if( isset( $widget_params[1] ) )
 						{
 							$fields_to_display = explode( '+', $widget_params[1] );
@@ -2710,6 +2728,7 @@ class Item extends ItemLight
 							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',
 							'ask_lastname' => in_array( 'lastname', $fields_to_display ) ? 'required' : 'no',
 							'source' => 'Page: '.$this->get( 'urltitle' ),
+							'usertags' => isset( $user_tags ) ? $user_tags : NULL,
 							'subscribe_post' => 0,
 							'subscribe_comment' => 0,
 							'button_class' => 'btn-primary',

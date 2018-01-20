@@ -14,7 +14,8 @@ global $Settings, $emailskins_path;
 
 // Default params:
 $params = array_merge( array(
-		'include_greeting' => true
+		'include_greeting' => true,
+		'recipient_User'   => NULL,
 	), $params );
 ?>
 <html>
@@ -61,5 +62,5 @@ else
 if( $params['include_greeting'] )
 { // Display the greeting message
 ?>
-<p<?php echo emailskin_style( '.p' ); ?>><?php echo T_( 'Hello $username$!' ); ?></p>
+<p<?php echo emailskin_style( '.p' ); ?>><?php echo sprintf( T_( 'Hello %s!' ), '$username$' ); ?></p>
 <?php } ?>

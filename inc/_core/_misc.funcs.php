@@ -2162,7 +2162,7 @@ function is_valid_login( $login, $force_strict_logins = false )
 	}
 
 	// Step 2
-	if( ($strict_logins || $force_strict_logins) && ! preg_match( '~^[A-Za-z0-9_.]+$~', $login ) )
+	if( ($strict_logins || $force_strict_logins) && ! preg_match( '~^[A-Za-z0-9_.\-]+$~', $login ) )
 	{	// WARNING: allowing special chars like latin 1 accented chars ( \xDF-\xF6\xF8-\xFF ) will create issues with
 		// user media directory names (tested on Max OS X) -- Do no allow any of this until we have a clean & safe media dir name generator.
 
@@ -4173,7 +4173,11 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 				$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
 			}
 			$formated_message = str_replace( array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$' ),
-					array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login ) , $formated_message );
+					array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login ), $formated_message );
+		}
+		elseif( ! empty( $params['anonymous_recipient_name'] ) )
+		{
+			$formated_message = str_replace( '$name$', $params['anonymous_recipient_name'], $formated_message );
 		}
 
 		$template_message .= $formated_message;
@@ -5131,6 +5135,51 @@ function get_base_domain( $url )
 	$domain = preg_replace( '~^www[0-9]*\.~i', '', $domain );
 
 	return $domain;
+}
+
+
+/**
+ * Generate login from string
+ *
+ * @param string string to generate login from
+ * @return string login
+ */
+function generate_login_from_string( $login )
+{
+	global $Settings;
+
+	// Normalize login
+	load_funcs('locales/_charset.funcs.php');
+	$login = replace_special_chars( $login );
+
+	if( $Settings->get( 'strict_logins' ) )
+	{ // We allow only the plain ACSII characters, digits, the chars _ and . and -
+		$login = preg_replace( '/[^A-Za-z0-9_.\-]/', '', $login );
+	}
+	else
+	{ // We allow any character that is not explicitly forbidden in Step 1
+		// Enforce additional limitations
+		$login = preg_replace( '|%([a-fA-F0-9][a-fA-F0-9])|', '', $login ); // Kill octets
+		$login = preg_replace( '/&.+?;/', '', $login ); // Kill entities
+	}
+
+	$login = preg_replace( '/^usr_/i', '', $login );
+
+	if( ! empty( $login ) )
+	{
+		// Check and search free login name if current is already in use
+		$login_name = $login;
+		$login_number = 1;
+		$UserCache = & get_UserCache();
+		while( $UserCache->get_by_login( $login_name ) )
+		{
+			$login_name = $login.$login_number;
+			$login_number++;
+		}
+		$login = $login_name;
+	}
+
+	return $login;
 }
 
 

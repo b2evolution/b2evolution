@@ -1227,6 +1227,7 @@ class collections_Module extends Module
 				elseif( param( 'inline', 'integer', 0 ) == 1 )
 				{ // Request from subscribe shorttag
 					$newsletter_ID = param( 'newsletter', 'integer', 0 );
+					$insert_user_tags = param( 'usertags', 'string', NULL );
 				}
 
 				// Check newsletter of the requested widget:
@@ -1345,11 +1346,11 @@ class collections_Module extends Module
 				// START: Auto register new user:
 				// Set unique user login from entered user name:
 				$max_login_length = 20;
-				$login = preg_replace( '/[^a-z0-9 ]/i', '', $user_name );
+				$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $user_name );
 				if( trim( $login ) == '' )
 				{	// Get login from entered user email:
 					$login = preg_replace( '/^([^@]+)@.+$/i', '$1', $user_email );
-					$login = preg_replace( '/[^a-z0-9 ]/i', '', $login );
+					$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $login );
 				}
 				$login = str_replace( ' ', '_', $login );
 				$login = utf8_substr( $login, 0, $max_login_length );

@@ -91,7 +91,7 @@ if( $display_invitation == 'deny' )
 
 if( $register_user = $Session->get('core.register_user') )
 {	// Get an user data from predefined session (after adding of a comment)
-	$login = preg_replace( '/[^a-z0-9 ]/i', '', $register_user['name'] );
+	$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $register_user['name'] );
 	$login = str_replace( ' ', '_', $login );
 	$login = utf8_substr( $login, 0, 20 );
 	$email = $register_user['email'];
@@ -103,18 +103,33 @@ switch( $action )
 {
 	case 'register':
 	case 'quick_register':
+		// Use this boolean var to know when quick registration is used
+		$is_quick = ( $action == 'quick_register' );
+		$is_inline = param( 'inline', 'integer', 0 ) == 1;
+
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
+
+		// Make sure email is valid first and that it only contains ASCII characters
+		if( ! is_email( $email )  )
+		{
+			param_error( $dummy_fields['email'], T_('The email address is invalid.') );
+		}
+
+		if( $Messages->has_errors() )
+		{ // Stop registration if the errors exist
+			if( $is_quick || $is_inline )
+			{ // We will need the following parameter for the session data that will be set later
+				param( 'widget', 'integer', 0 );
+			}
+			break;
+		}
 
 		// Stop a request from the blocked email address or its domain:
 		antispam_block_by_email( $email );
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'regform' );
-
-		// Use this boolean var to know when quick registration is used
-		$is_quick = ( $action == 'quick_register' );
-		$is_inline = param( 'inline', 'integer', 0 ) == 1;
 
 		if( $is_quick || $is_inline )
 		{ // Check if we can use a quick registration now:
@@ -137,6 +152,7 @@ switch( $action )
 				$source = param( 'source', 'string', true );
 				$ask_firstname = param( 'ask_firstname', 'string', true );
 				$ask_lastname = param( 'ask_lastname', 'string', true );
+				$user_tags = param( 'usertags', 'string', NULL );
 				$subscribe_posts = param( 'subscribe_post', 'integer', true );
 				$subscribe_comments = param( 'subscribe_comment', 'integer', true );
 				$newsletters = param( 'newsletters', 'string', true );
@@ -170,7 +186,7 @@ switch( $action )
 				$subscribe_posts = $user_register_Widget->disp_params['subscribe_post'];
 				$subscribe_comments = $user_register_Widget->disp_params['subscribe_comment'];
 				$widget_newsletters = $user_register_Widget->disp_params['newsletters'];
-				$widget_tags = $user_register_Widget->disp_params['usertags'];
+				$user_tags = $user_register_Widget->disp_params['usertags'];
 				$widget_redirect_to = trim( $user_register_Widget->disp_params['redirect_to'] );
 			}
 
@@ -268,31 +284,42 @@ switch( $action )
 
 		if( $is_quick && ! $Messages->has_errors() )
 		{	// Generate a login for quick registration:
-			// Get the login from email address:
-			$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
-			$login = preg_replace( '/[\'"><@\s]/', '', $login );
-			if( $Settings->get( 'strict_logins' ) )
-			{ // We allow only the plain ACSII characters, digits, the chars _ and .
-				$login = preg_replace( '/[^A-Za-z0-9_.]/', '', $login );
+
+			if( ! empty( $firstname ) || ! empty( $lastname ) )
+			{ // Firstname or lastname given, let's use these:
+				$login = array();
+				if( ! empty( $firstname ) )
+				{
+					$login[] = trim( $firstname );
+				}
+				if( ! empty( $lastname ) )
+				{
+					$login[] = trim( $lastname );
+				}
+				$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( implode( '_', $login ) ) );
+				$login = generate_login_from_string( $login );
 			}
 			else
-			{ // We allow any character that is not explicitly forbidden in Step 1
-				// Enforce additional limitations
-				$login = preg_replace( '|%([a-fA-F0-9][a-fA-F0-9])|', '', $login ); // Kill octets
-				$login = preg_replace( '/&.+?;/', '', $login ); // Kill entities
-			}
-			$login = preg_replace( '/^usr_/i', '', $login );
+			{ // Get the login from email address:
+				$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
+				$login = preg_replace( '/[\'"><@\s]/', '', $login );
 
-			// Check and search free login name if current is busy
-			$login_name = $login;
-			$login_number = 1;
-			$UserCache = & get_UserCache();
-			while( empty( $login_name ) || $UserCache->get_by_login( $login_name ) )
-			{
-				$login_name = $login.$login_number;
-				$login_number++;
+				if( strpos( $login, '.' ) )
+				{ // Get only the part before the "." if it has one
+					$temp_login = $login;
+					$login = substr( $login, 0, strpos( $login, '.' ) );
+					$login = generate_login_from_string( $login );
+
+					if( empty( $login ) )
+					{ // Resulting login empty, use full email address
+						$login = generate_login_from_string( $temp_login );
+					}
+				}
+				else
+				{
+					$login = generate_login_from_string( $login );
+				}
 			}
-			$login = $login_name;
 		}
 
 		if( ! $is_quick )
@@ -344,9 +371,9 @@ switch( $action )
 			}
 
 			// Set user tags from current widget "Email capture / Quick registration":
-			if( ! empty( $widget_tags ) )
+			if( ! empty( $user_tags ) )
 			{
-				$new_User->set_usertags_from_string( $widget_tags );
+				$new_User->add_usertags( $user_tags );
 			}
 		}
 		else

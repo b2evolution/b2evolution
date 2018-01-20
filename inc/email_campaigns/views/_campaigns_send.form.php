@@ -55,7 +55,7 @@ echo '<div style="display:table;width:100%;table-layout:fixed;">';
 
 	echo '<div class="floatright" style="width:49%">';
 	echo '<p><b>'.T_('Plain-text message').':</b></p>';
-	echo '<div style="font-family:monospace;overflow:auto">'.nl2br( mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_plaintext' ), 'include_greeting' => false ), $current_User ) ).'</div>';
+	echo '<div style="font-family:monospace;overflow:auto">'.nl2br(	mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_plaintext' ), 'include_greeting' => false ), $current_User ) ).'</div>';
 	echo '</div>';
 echo '</div>';
 $Form->end_fieldset();

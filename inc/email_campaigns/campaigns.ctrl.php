@@ -390,12 +390,12 @@ switch( $action )
 		{	// Check a recipients count after redirect from users list:
 			if( $edited_EmailCampaign->get_recipients_count( 'filter' ) == 0 )
 			{	// No users in the filterset:
-				$Messages->add( T_('No found accounts in filterset. Please try to change the filter of users list.'), 'error' );
+				$Messages->add( T_('No account matches the filterset. Please try to change the filters.'), 'error' );
 			}
 
 			if( $edited_EmailCampaign->get_recipients_count( 'all' ) == 0 )
 			{	// No users for newsletter:
-				$Messages->add( T_('No found active accounts which accept list email. Please try to change the filter of users list.'), 'note' );
+				$Messages->add( T_('No active account accepts email from this list. Please try to change the filters.'), 'note' );
 			}
 
 			$action = 'edit';
@@ -486,7 +486,7 @@ switch( $action )
 			case 'compose':
 				if( $edited_EmailCampaign->get( 'email_text' ) == '' && !param_errors_detected() )
 				{ // Set default value for HTML message
-					$edited_EmailCampaign->set( 'email_text', 'Hello $login$!'."\r\n\r\n".'This is our list...' );
+					$edited_EmailCampaign->set( 'email_text', sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...') );
 				}
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_compose.form.php' );
 				break;

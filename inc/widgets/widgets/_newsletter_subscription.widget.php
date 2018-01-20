@@ -222,6 +222,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 			{
 				$Form->hidden( 'inline', 1 );
 				$Form->hidden( 'newsletter', $this->disp_params['enlt_ID'] );
+				$Form->hidden( 'usertags', $this->disp_params['usertags'] );
 			}
 
 			// Display a button to subscribe⁄unsubscribe:
