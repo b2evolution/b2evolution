@@ -176,7 +176,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' ) );
 
-	$Form->checkbox( 'post_anonymous', $edited_Blog->get_setting( 'post_anonymous' ), T_('New posts by anonymous users'), T_('Check to allow anonymous users to create new posts (useful for Forums). NOTE: a user accoutn will be automatically created when they post.') );
+	$Form->checkbox( 'post_anonymous', $edited_Blog->get_setting( 'post_anonymous' ), T_('New posts by anonymous users'), T_('Check to allow anonymous users to create new posts (useful for Forums). NOTE: a user account will be automatically created when they post.') );
 
 	// Get max allowed visibility status:
 	$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
