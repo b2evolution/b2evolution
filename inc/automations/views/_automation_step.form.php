@@ -143,23 +143,22 @@ jQuery( document ).ready( function()
 			plugin: 'datepicker',
 		}
 		],
+		// Prefill the field "IF Condition" with stored data from DB:
+		rules: <?php echo ( ( $edited_AutomationStep->get( 'type' ) == 'if_condition' && $edited_AutomationStep->get( 'info' ) != '' ) ? $edited_AutomationStep->get( 'info' ) : 'null' ); ?>
 	} );
-
-	// Prefill the field "IF Condition" with stored data from DB:
-	jQuery( '#step_if_condition' ).queryBuilder( 'setRulesFromSQL', '<?php echo ( $edited_AutomationStep->get( 'type' ) == 'if_condition' ? format_to_js( $edited_AutomationStep->get( 'info' ) ) : '' ); ?>' );
 } );
 
 // Prepare form submit to convert "IF Condition" field to SQL format:
 jQuery( 'form' ).on( 'submit', function()
 {
-	var result = jQuery( '#step_if_condition' ).queryBuilder( 'getSQL' );
+	var result = jQuery( '#step_if_condition' ).queryBuilder( 'getRules' );
 	if( result === null )
 	{	// Stop submitting on wrong SQL:
 		return false;
 	}
 	else
-	{	// Set SQL to hidden field before submitting:
-		jQuery( 'input[name=step_if_condition]' ).val( result.sql );
+	{	// Set query rules to hidden field before submitting:
+		jQuery( 'input[name=step_if_condition]' ).val( JSON.stringify( result ) );
 	}
 } );
 </script>

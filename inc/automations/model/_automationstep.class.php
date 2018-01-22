@@ -293,6 +293,28 @@ class AutomationStep extends DataObject
 
 		switch( $this->get( 'type' ) )
 		{
+			case 'if_condition':
+				$condition_sql_query = $this->get_sql_from_condition();
+				if( empty( $condition_sql_query ) )
+				{	// Wrong condition of this step:
+					$step_result = 'ERROR';
+					break;
+				}
+				$check_user_SQL = new SQL( '' );
+				$check_user_SQL->SELECT( 'user_ID' );
+				$check_user_SQL->FROM( 'T_users' );
+				$check_user_SQL->WHERE( 'user_ID = '.$DB->quote( $user_ID ) );
+				$check_user_SQL->WHERE_and( $condition_sql_query );
+				if( $DB->get_var( $check_user_SQL ) )
+				{	// The user is matched to condition of this step:
+					$step_result = 'YES';
+				}
+				else
+				{	// The user is NOT matched to condition of this step:
+					$step_result = 'NO';
+				}
+				break;
+
 			case 'send_campaign':
 				// Send email campaign
 				$EmailCampaignCache = & get_EmailCampaignCache();
@@ -410,6 +432,105 @@ class AutomationStep extends DataObject
 	function get_result_title( $result )
 	{
 		return step_get_result_title( $this->get( 'type' ), $result );
+	}
+
+
+	/**
+	 * Get SQL query from "IF Condition"
+	 *
+	 * return string SQL query
+	 */
+	function get_sql_from_condition()
+	{
+		if( $this->get( 'type' ) != 'if_condition' )
+		{	// This is allowed only for step type "IF Condition":
+			return '';
+		}
+
+		$json_object = json_decode( $this->get( 'info' ) );
+
+		if( $json_object === NULL || ! isset( $json_object->valid ) || $json_object->valid !== true )
+		{	// Wrong object, Skip it:
+			return '';
+		}
+
+		return $this->parse_condition_object_to_sql( $json_object );
+	}
+
+
+	/**
+	 * Parse JSON object to SQL query
+	 * Used recursively to find
+	 *
+	 * @param object JSON object of step type "IF Condition"
+	 * @return string
+	 */
+	function parse_condition_object_to_sql( $json_object )
+	{
+		global $DB;
+
+		if( ! isset( $json_object->condition ) || ! in_array( $json_object->condition, array( 'AND', 'OR' ) ) || empty( $json_object->rules ) )
+		{	// Wrong json object params, Skip it:
+			return '';
+		}
+
+		// array of available fields with operators:
+		// key is field name in JSON object, value is array( field/column name in DB, array of valid operators)
+		$valid_fields = array(
+				'user_has_tag' => array( 'user_login', array( 'equal', 'not_equal' ) ),
+				'date'         => array( 'user_created_datetime', array( 'equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between' ) ),
+			);
+		// Array to convert operator names to SQL format:
+		$operators = array(
+				'equal'            => '=',
+				'not_equal'        => '!=',
+				'less'             => '<',
+				'less_or_equal'    => '<=',
+				'greater'          => '>',
+				'greater_or_equal' => '>=',
+				'between'          => array( 'BETWEEN', 'AND' ),
+				'not_between'      => array( 'NOT BETWEEN', 'AND' ),
+			);
+
+		$conditions = array();
+		foreach( $json_object->rules as $rule )
+		{
+			if( isset( $rule->rules ) && is_array( $rule->rules ) )
+			{	// This is a group of conditions, Run this function recursively:
+				$multi_cond = $this->parse_condition_object_to_sql( $rule );
+				if( ! empty( $multi_cond ) )
+				{	// Append group of conditions only if it is not empty:
+					$conditions[] = $multi_cond;
+				}
+			}
+			else
+			{	// This is a single field, Build condition from field name and value:
+				if( ! isset( $valid_fields[ $rule->field ] ) ||
+				    ! in_array( $rule->operator, $valid_fields[ $rule->field ][1] ) )
+				{	// Skip unknown field or operator:
+					continue;
+				}
+				if( is_array( $operators[ $rule->operator ] ) )
+				{	// Operator for multiple values like 'between'(field BETWEEN value_1 AND value_2):
+					if( ! is_array( $rule->value ) || count( $rule->value ) != count( $operators[ $rule->operator ] ) )
+					{	// Skip field with wrong values for the operator:
+						continue;
+					}
+					$multi_cond = $valid_fields[ $rule->field ][0];
+					foreach( $operators[ $rule->operator ] as $m => $m_operator )
+					{
+						$multi_cond .= ' '.$m_operator.' '.$DB->quote( $rule->value[ $m ] );
+					}
+					$conditions[] = $multi_cond;
+				}
+				else
+				{	// Single operator like 'equal'(field = value ):
+					$conditions[] = $valid_fields[ $rule->field ][0].' '.$operators[ $rule->operator ].' '.$DB->quote( $rule->value );
+				}
+			}
+		}
+
+		return count( $conditions ) ? '( '.implode( ' '.$json_object->condition.' ', $conditions ).' )' : '';
 	}
 }
 
