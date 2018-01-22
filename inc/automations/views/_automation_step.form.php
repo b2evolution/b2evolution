@@ -61,21 +61,24 @@ $Form->select_input_object( 'step_email_campaign',
 // Load all steps of the edited step's automation excluding current step:
 $AutomationStepCache = & get_AutomationStepCache();
 $AutomationStepCache->clear();
-$AutomationStepCache->load_where( 'step_autm_ID = '.$step_Automation->ID
-	.( $creating ? '' : ' AND step_ID != '.$edited_AutomationStep->ID ) );
+$AutomationStepCache->load_where( 'step_autm_ID = '.$step_Automation->ID );
+$next_step_prepend_options = array(
+		'' => T_('Continue'),
+		-1 => T_('STOP'),
+	);
 
 $Form->begin_line( sprintf( T_('Next step if %s'), '<span id="step_result_title_yes">'.$edited_AutomationStep->get_result_title( 'YES' ).'</span>' ) );
-	$Form->select_input_object( 'step_yes_next_step_ID', $edited_AutomationStep->get( 'yes_next_step_ID' ), $AutomationStepCache, '', array( 'allow_none' => true ) );
+	$Form->select_input_object( 'step_yes_next_step_ID', $edited_AutomationStep->get( 'yes_next_step_ID' ), $AutomationStepCache, '', array( 'prepend_options' => $next_step_prepend_options ) );
 	$Form->duration_input( 'step_yes_next_step_delay', $edited_AutomationStep->get( 'yes_next_step_delay' ), T_('Delay') );
 $Form->end_line();
 
 $Form->begin_line( sprintf( T_('Next step if %s'), '<span id="step_result_title_no">'.$edited_AutomationStep->get_result_title( 'NO' ).'</span>' ) );
-	$Form->select_input_object( 'step_no_next_step_ID', $edited_AutomationStep->get( 'no_next_step_ID' ), $AutomationStepCache, '', array( 'allow_none' => true ) );
+	$Form->select_input_object( 'step_no_next_step_ID', $edited_AutomationStep->get( 'no_next_step_ID' ), $AutomationStepCache, '', array( 'prepend_options' => $next_step_prepend_options ) );
 	$Form->duration_input( 'step_no_next_step_delay', $edited_AutomationStep->get( 'no_next_step_delay' ), T_('Delay') );
 $Form->end_line();
 
 $Form->begin_line( sprintf( T_('Next step if %s'), '<span id="step_result_title_error">'.$edited_AutomationStep->get_result_title( 'ERROR' ).'</span>' ) );
-	$Form->select_input_object( 'step_error_next_step_ID', $edited_AutomationStep->get( 'error_next_step_ID' ), $AutomationStepCache, '', array( 'allow_none' => true ) );
+	$Form->select_input_object( 'step_error_next_step_ID', $edited_AutomationStep->get( 'error_next_step_ID' ), $AutomationStepCache, '', array( 'prepend_options' => $next_step_prepend_options ) );
 	$Form->duration_input( 'step_error_next_step_delay', $edited_AutomationStep->get( 'error_next_step_delay' ), T_('Delay') );
 $Form->end_line();
 
@@ -148,17 +151,20 @@ jQuery( document ).ready( function()
 	} );
 } );
 
-// Prepare form submit to convert "IF Condition" field to SQL format:
+// Prepare form before submitting:
 jQuery( 'form' ).on( 'submit', function()
 {
-	var result = jQuery( '#step_if_condition' ).queryBuilder( 'getRules' );
-	if( result === null )
-	{	// Stop submitting on wrong SQL:
-		return false;
-	}
-	else
-	{	// Set query rules to hidden field before submitting:
-		jQuery( 'input[name=step_if_condition]' ).val( JSON.stringify( result ) );
+	if( jQuery( '#step_type' ).val() == 'if_condition' )
+	{	// Convert "IF Condition" field to JSON format:
+		var result = jQuery( '#step_if_condition' ).queryBuilder( 'getRules' );
+		if( result === null )
+		{	// Stop submitting on wrong SQL:
+			return false;
+		}
+		else
+		{	// Set query rules to hidden field before submitting:
+			jQuery( 'input[name=step_if_condition]' ).val( JSON.stringify( result ) );
+		}
 	}
 } );
 </script>

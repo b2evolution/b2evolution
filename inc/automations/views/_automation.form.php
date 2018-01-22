@@ -93,7 +93,7 @@ if( $edited_Automation->ID > 0 )
 			'th_group' => T_('Next'),
 			'th'       => T_('Yes'),
 			'order'    => 'step_label',
-			'td'       => '%step_td_next_step( #step_yes_next_step_order#, #step_yes_next_step_delay# )%',
+			'td'       => '%step_td_next_step( #step_ID#,  #step_yes_next_step_ID#, #step_yes_next_step_order#, #step_yes_next_step_delay#, #step_type# )%',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'nowrap',
 		);
@@ -102,7 +102,7 @@ if( $edited_Automation->ID > 0 )
 			'th_group' => T_('Next'),
 			'th'       => T_('No'),
 			'order'    => 'step_label',
-			'td'       => '%step_td_next_step( #step_no_next_step_order#, #step_no_next_step_delay# )%',
+			'td'       => '%step_td_next_step( #step_ID#, #step_no_next_step_ID#, #step_no_next_step_order#, #step_no_next_step_delay#, #step_type# )%',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'nowrap',
 		);
@@ -111,7 +111,7 @@ if( $edited_Automation->ID > 0 )
 			'th_group' => T_('Next'),
 			'th'       => T_('Error'),
 			'order'    => 'step_label',
-			'td'       => '%step_td_next_step( #step_error_next_step_order#, #step_error_next_step_delay# )%',
+			'td'       => '%step_td_next_step( #step_ID#, #step_error_next_step_ID#, #step_error_next_step_order#, #step_error_next_step_delay#, #step_type# )%',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'nowrap',
 		);

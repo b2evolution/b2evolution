@@ -126,15 +126,25 @@ function step_td_label( $step_label, $step_type )
 /**
  * Helper function to display next step info on Results table
  *
+ * @param integer Step ID
  * @param integer Next step ID
+ * @param integer Next step order
  * @param integer Next step delay
  * @return string
  */
-function step_td_next_step( $next_step_order, $next_step_delay )
+function step_td_next_step( $step_ID, $next_step_ID, $next_step_order, $next_step_delay )
 {
-	if( empty( $next_step_order ) )
-	{	// No defined next step:
-		return '';
+	if( empty( $next_step_ID ) )
+	{	// Next ordered step:
+		return '<span class="green">'.T_('Continue').' ('.seconds_to_period( $next_step_delay ).')</span>';
+	}
+	elseif( $next_step_ID == '-1' )
+	{	// Stop workflow:
+		return '<span class="red">'.T_('STOP').'</span>';
+	}
+	elseif( $next_step_ID == $step_ID )
+	{	// Loop:
+		return '<span class="orange">'.T_('Loop').' ('.seconds_to_period( $next_step_delay ).')</span>';
 	}
 
 	return $next_step_order.' ('.seconds_to_period( $next_step_delay ).')';

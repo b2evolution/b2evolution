@@ -89,6 +89,65 @@ class AutomationStep extends DataObject
 
 
 	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		if( $r = parent::dbinsert() )
+		{
+			// Update next steps to default values:
+			$next_steps = array(
+					'yes_next_step_ID'   => 'yes_next_step_delay',
+					'no_next_step_ID'    => 'no_next_step_delay',
+					'error_next_step_ID' => 'error_next_step_delay',
+				);
+			foreach( $next_steps as $next_step_ID_name => $next_step_delay_name )
+			{
+				if( $this->get( $next_step_ID_name ) === NULL && $this->get( $next_step_delay_name ) === NULL )
+				{	// Try to set default next steps and delays if they are not selected on creating new step:
+					switch( $this->get( 'type' ) )
+					{
+						case 'if_condition':
+							switch( $next_step_ID_name )
+							{
+								case 'no_next_step_ID':
+								case 'error_next_step_ID':
+									$this->set( $next_step_ID_name, -1 ); // STOP
+									// 0 seconds
+									break;
+							}
+							break;
+
+						case 'send_campaign':
+							switch( $next_step_ID_name )
+							{
+								case 'yes_next_step_ID':
+									// Continue to next ordered step
+									$this->set( $next_step_delay_name, 259200/* 3 days */ );
+									break;
+								case 'no_next_step_ID':
+									$this->set( $next_step_ID_name, -1 ); // STOP
+									// 0 seconds
+									break;
+								case 'error_next_step_ID':
+									$this->set( $next_step_ID_name, $this->ID ); // Loop
+									$this->set( $next_step_delay_name, 604800/* 7 days */ );
+									break;
+							}
+							break;
+					}
+				}
+			}
+			$r = $this->dbupdate();
+		}
+
+		return $r;
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -176,17 +235,12 @@ class AutomationStep extends DataObject
 		{
 			param( 'step_'.$next_step_ID_name, 'integer', NULL );
 			$this->set_from_Request( $next_step_ID_name, NULL, true );
-			$step_yes_next_step_delay = param_duration( 'step_'.$next_step_delay_name );
-			if( empty( $step_yes_next_step_delay ) )
+			$step_next_step_delay = param_duration( 'step_'.$next_step_delay_name );
+			if( empty( $step_next_step_delay ) )
 			{
-				$step_yes_next_step_delay = NULL;
+				$step_next_step_delay = NULL;
 			}
-			$this->set( $next_step_delay_name, $step_yes_next_step_delay, true );
-			if( $this->get( $next_step_ID_name ) > 0 && $this->get( $next_step_ID_name ) == $this->ID )
-			{	// If next step is same as this current,
-				// Don't translate this error message because it cannot happens:
-				param_error( 'step_'.$next_step_ID_name, 'Current step cannot be used as next step!' );
-			}
+			$this->set( $next_step_delay_name, $step_next_step_delay, true );
 		}
 
 		return ! param_errors_detected();

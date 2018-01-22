@@ -158,7 +158,7 @@ class Automation extends DataObject
 		$SQL->FROM( 'T_automation__user_state' );
 		$SQL->WHERE( 'aust_autm_ID = '.$this->ID );
 		$SQL->WHERE_and( 'aust_next_step_ID IS NOT NULL ' );
-		$SQL->WHERE_and( 'aust_next_exec_ts < '.$DB->quote( date2mysql( $servertimenow ) ) );
+		$SQL->WHERE_and( 'aust_next_exec_ts <= '.$DB->quote( date2mysql( $servertimenow ) ) );
 
 		return $DB->get_assoc( $SQL );
 	}
