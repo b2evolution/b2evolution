@@ -265,16 +265,65 @@ class AutomationStep extends DataObject
 
 
 	/**
+	 * Get next Step object of this Step by step ID
+	 *
+	 * @param integer Step ID
+	 * @return object|boolean Next Automation Step OR
+	 *                        FALSE - if automation should be stopped after this Step
+	 *                                because either it is configured for STOP action
+	 *                                            or it is the latest step of the automation
+	 */
+	function & get_next_AutomationStep_by_ID( $next_step_ID )
+	{
+		$next_step_ID = intval( $next_step_ID );
+
+		$next_AutomationStep = false;
+
+		$AutomationStepCache = & get_AutomationStepCache();
+		if( $next_step_ID > 0 )
+		{	// Get a next Step by defined ID:
+			$next_AutomationStep = & $AutomationStepCache->get_by_ID( $next_step_ID, false, false );
+		}
+
+		if( $next_step_ID == -1 )
+		{	// Stop workflow when option is selected to "STOP":
+			$next_AutomationStep = false;
+		}
+		elseif( $next_step_ID == 0 || ! $next_AutomationStep )
+		{	// Get next ordered Step when option is selected to "Continue" OR Step cannot be found by ID in DB:
+			global $DB;
+			$next_ordered_step_SQL = new SQL( 'Get next ordered Step after current Step #'.$this->ID );
+			$next_ordered_step_SQL->SELECT( 'step_ID' );
+			$next_ordered_step_SQL->FROM( 'T_automation__step' );
+			$next_ordered_step_SQL->WHERE( 'step_autm_ID = '.$DB->quote( $this->get( 'autm_ID' ) ) );
+			$next_ordered_step_SQL->WHERE_and( 'step_order > '.$DB->quote( $this->get( 'order' ) ) );
+			$next_ordered_step_SQL->ORDER_BY( 'step_order ASC' );
+			$next_ordered_step_SQL->LIMIT( 1 );
+			$next_ordered_step_ID = $DB->get_var( $next_ordered_step_SQL );
+			$next_AutomationStep = & $AutomationStepCache->get_by_ID( $next_ordered_step_ID, false, false );
+			if( empty( $next_AutomationStep ) )
+			{	// If it is the latest Step of the Automation:
+				$next_AutomationStep = false;
+			}
+		}
+
+		return $next_AutomationStep;
+	}
+
+
+	/**
 	 * Get YES next Step object of this Step
 	 *
-	 * @return object|NULL|boolean Reference on cached object Automation Step, NULL - if request with empty ID, FALSE - if requested object does not exist
+	 * @return object|boolean Next Automation Step OR
+	 *                        FALSE - if automation should be stopped after this Step
+	 *                                because either it is configured for STOP action
+	 *                                            or it is the latest step of the automation
 	 */
 	function & get_yes_next_AutomationStep()
 	{
 		if( $this->yes_next_AutomationStep === NULL )
 		{	// Load next Step into cache object:
-			$AutomationStepCache = & get_AutomationStepCache();
-			$this->yes_next_AutomationStep = & $AutomationStepCache->get_by_ID( $this->get( 'yes_next_step_ID' ), false, false );
+			$this->yes_next_AutomationStep = & $this->get_next_AutomationStep_by_ID( $this->get( 'yes_next_step_ID' ) );
 		}
 
 		return $this->yes_next_AutomationStep;
@@ -284,14 +333,16 @@ class AutomationStep extends DataObject
 	/**
 	 * Get NO next Step object of this Step
 	 *
-	 * @return object|NULL|boolean Reference on cached object Automation Step, NULL - if request with empty ID, FALSE - if requested object does not exist
+	 * @return object|boolean Next Automation Step OR
+	 *                        FALSE - if automation should be stopped after this Step
+	 *                                because either it is configured for STOP action
+	 *                                            or it is the latest step of the automation
 	 */
 	function & get_no_next_AutomationStep()
 	{
 		if( $this->no_next_AutomationStep === NULL )
 		{	// Load next Step into cache object:
-			$AutomationStepCache = & get_AutomationStepCache();
-			$this->no_next_AutomationStep = & $AutomationStepCache->get_by_ID( $this->get( 'no_next_step_ID' ), false, false );
+			$this->no_next_AutomationStep = & $this->get_next_AutomationStep_by_ID( $this->get( 'no_next_step_ID' ) );
 		}
 
 		return $this->no_next_AutomationStep;
@@ -301,14 +352,16 @@ class AutomationStep extends DataObject
 	/**
 	 * Get ERROR next Step object of this Step
 	 *
-	 * @return object|NULL|boolean Reference on cached object Automation Step, NULL - if request with empty ID, FALSE - if requested object does not exist
+	 * @return object|boolean Next Automation Step OR
+	 *                        FALSE - if automation should be stopped after this Step
+	 *                                because either it is configured for STOP action
+	 *                                            or it is the latest step of the automation
 	 */
 	function & get_error_next_AutomationStep()
 	{
 		if( $this->error_next_AutomationStep === NULL )
 		{	// Load next Step into cache object:
-			$AutomationStepCache = & get_AutomationStepCache();
-			$this->error_next_AutomationStep = & $AutomationStepCache->get_by_ID( $this->get( 'error_next_step_ID' ), false, false );
+			$this->error_next_AutomationStep = & $this->get_next_AutomationStep_by_ID( $this->get( 'error_next_step_ID' ) );
 		}
 
 		return $this->error_next_AutomationStep;
