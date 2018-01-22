@@ -87,7 +87,7 @@ function step_get_result_titles()
 		'send_campaign' => array(
 			'YES'   => NT_('Email SENT'),
 			'NO'    => NT_('Email was ALREADY sent'),
-			'ERROR' => NT_('ERROR'),
+			'ERROR' => NT_('ERROR: Email cannot be sent'),
 		),
 	);
 }
@@ -105,6 +105,45 @@ function step_get_result_titles()
 function step_get_result_title( $type, $result )
 {
 	$results = step_get_result_titles();
+
+	return isset( $results[ $type ][ $result ] ) ? $results[ $type ][ $result ] : $result;
+}
+
+
+/**
+ * Get array of result labels for automation step
+ *
+ * @return array Result labels per step type
+ */
+function step_get_result_labels()
+{
+	return array(
+		'if_condition' => array(
+			'YES'   => NT_('Next step if YES'),
+			'NO'    => NT_('Next step if NO'),
+			'ERROR' => NT_('Next step if ERROR'),
+		),
+		'send_campaign' => array(
+			'YES'   => NT_('Next step if Email SENT'),
+			'NO'    => NT_('Next step if Email was ALREADY sent'),
+			'ERROR' => NT_('Next step if ERROR: Email cannot be sent'),
+		),
+	);
+}
+
+
+/**
+ * Get result label of automation step by step type and result value
+ *
+ * NOTE! Return string is not translatable, Use funcs T_(), TS_() and etc. in that place where you use this func.
+ *
+ * @param string Step type: 'if_condition', 'send_campaign
+ * @param string Step result: 'YES', 'NO', 'ERROR'
+ * @return string Result label
+ */
+function step_get_result_label( $type, $result )
+{
+	$results = step_get_result_labels();
 
 	return isset( $results[ $type ][ $result ] ) ? $results[ $type ][ $result ] : $result;
 }
