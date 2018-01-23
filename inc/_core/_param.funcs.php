@@ -1054,28 +1054,14 @@ function param_date( $var, $err_msg, $required, $default = '', $date_format = NU
 
 
 /**
- * Check if param is an ISO date.
+ * Format date from entered form in format of current user locale to ISO format(YYYY-MM-DD) in order to store in DB
  *
- * NOTE: for tokens like e.g. "D" (abbr. weekday), T_() gets used and it uses the current locale!
- *
- * @param string param name
- * @param string error message
- * @param boolean Is a non-empty date required?
- * @param string date format (php format)
- * @return boolean|string false if not OK, ISO date if OK
+ * @param string Date
+ * @param string Source date format, NULL - to use format of current locale
+ * @return string|boolean Formated date OR FALSE if date cannot be converted
  */
-function param_check_date( $var, $err_msg, $required = false, $date_format = NULL )
+function format_input_date_to_iso( $date, $date_format = NULL )
 {
-	if( empty( $GLOBALS[$var] ) )
-	{ // empty is OK if not required:
-		if( $required )
-		{
-			param_error( $var, $err_msg );
-			return false;
-		}
-		return '';
-	}
-
 	if( empty( $date_format ) )
 	{	// Use locale input date format:
 		$date_format = locale_input_datefmt();
@@ -1109,7 +1095,7 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 	// echo $date_format.'...'.$date_regexp;
 
 	// Check that the numbers match the date pattern:
-	if( preg_match( $date_regexp, $GLOBALS[$var], $numbers ) )
+	if( preg_match( $date_regexp, $date, $numbers ) )
 	{	// Date does match pattern:
 		//pre_dump( $numbers );
 
@@ -1163,6 +1149,39 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 
 			return $iso_date;
 		}
+	}
+
+	return false;
+}
+
+
+/**
+ * Check if param is an ISO date.
+ *
+ * NOTE: for tokens like e.g. "D" (abbr. weekday), T_() gets used and it uses the current locale!
+ *
+ * @param string param name
+ * @param string error message
+ * @param boolean Is a non-empty date required?
+ * @param string date format (php format)
+ * @return boolean|string false if not OK, ISO date if OK
+ */
+function param_check_date( $var, $err_msg, $required = false, $date_format = NULL )
+{
+	if( empty( $GLOBALS[$var] ) )
+	{ // empty is OK if not required:
+		if( $required )
+		{
+			param_error( $var, $err_msg );
+			return false;
+		}
+		return '';
+	}
+
+	$iso_date = format_input_date_to_iso( $GLOBALS[$var], $date_format );
+	if( $iso_date !== false )
+	{	// Return iso date if it is converted successfully:
+		return $iso_date;
 	}
 
 	// Date did not pass all tests:

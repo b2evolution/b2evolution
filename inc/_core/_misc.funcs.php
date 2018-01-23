@@ -8448,6 +8448,13 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	return $inlines;
 }
 
+
+/**
+ * Convert date format from locale for jQuery datepicker plugin
+ *
+ * @param string Date format of locale from DB; for example: Y-m-d
+ * @return string Date format for jQuery datepicker plugin; for example: yy-mm-dd
+ */
 function php_to_jquery_date_format( $php_format )
 {
 	$tokens = array(
@@ -8515,5 +8522,68 @@ function php_to_jquery_date_format( $php_format )
 	}
 
 	return $js_format;
+}
+
+
+/**
+ * Get date format from current locale for jQuery datepicker plugin
+ * 
+ * @return string Date format; for example: yy-mm-dd
+ */
+function jquery_datepicker_datefmt()
+{
+	return php_to_jquery_date_format( locale_input_datefmt() );
+}
+
+
+/**
+ * Get month names as string of JavaScript array for jQuery datepicker plugin
+ * 
+ * @return string
+ */
+function jquery_datepicker_month_names()
+{
+	$months = array(
+			TS_('January'),
+			TS_('February'),
+			TS_('March'),
+			TS_('April'),
+			TS_('May'),
+			TS_('June'),
+			TS_('July'),
+			TS_('August'),
+			TS_('September'),
+			TS_('October'),
+			TS_('November'),
+			TS_('December')
+		);
+
+	return '[\''.implode( '\', \'', $months ).'\']';
+}
+
+
+/**
+ * Get week day names as string of JavaScript array for jQuery datepicker plugin
+ * 
+ * @return string
+ */
+function jquery_datepicker_day_names()
+{
+	$days = array(
+			TS_('Sun'),
+			TS_('Mon'),
+			TS_('Tue'),
+			TS_('Wed'),
+			TS_('Thu'),
+			TS_('Fri'),
+			TS_('Sat')
+		);
+
+	foreach( $days as $d => $day )
+	{
+		$days[ $d ] = utf8_substr( $day, 0, 2 );
+	}
+
+	return '[\''.implode( '\', \'', $days ).'\']';
 }
 ?>

@@ -148,6 +148,39 @@ class AutomationStep extends DataObject
 
 
 	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		switch( $parname )
+		{
+			case 'if_condition_js_object':
+				if( $this->get( 'type' ) == 'if_condition' && $this->get( 'info' ) != '' )
+				{	// Format values(like dates) of the field "IF Condition" from MySQL DB format to current locale format:
+					$json_object = json_decode( $this->get( 'info' ) );
+
+					if( $json_object === NULL || ! isset( $json_object->valid ) || $json_object->valid !== true )
+					{	// Wrong object, Return null:
+						return 'null';
+					}
+
+					return json_encode( $this->format_condition_object( $json_object, 'from_mysql' ) );
+				}
+				else
+				{	// No stored object, Return null:
+					return 'null';
+				}
+				
+		}
+
+		return parent::get( $parname );
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -211,7 +244,7 @@ class AutomationStep extends DataObject
 			case 'if_condition':
 				// IF Condition:
 				param_string_not_empty( 'step_if_condition', T_('Please set a condition.') );
-				$this->set( 'info', get_param( 'step_if_condition' ) );
+				$this->set( 'info', $this->format_condition_to_mysql( get_param( 'step_if_condition' ) ) );
 				break;
 
 			case 'send_campaign':
@@ -567,7 +600,7 @@ class AutomationStep extends DataObject
 
 	/**
 	 * Parse JSON object to SQL query
-	 * Used recursively to find
+	 * Used recursively to find all sub grouped conditions
 	 *
 	 * @param object JSON object of step type "IF Condition"
 	 * @return string
@@ -638,6 +671,100 @@ class AutomationStep extends DataObject
 		}
 
 		return count( $conditions ) ? '( '.implode( ' '.$json_object->condition.' ', $conditions ).' )' : '';
+	}
+
+
+	/**
+	 * Format values(like dates) of the field "IF Condition" to store in MySQL DB
+	 *
+	 * @param string Source condition
+	 * @return string Condition with formatted values for MySQL DB
+	 */
+	function format_condition_to_mysql( $condition )
+	{
+		if( $this->get( 'type' ) != 'if_condition' )
+		{	// This is allowed only for step type "IF Condition":
+			return '';
+		}
+
+		$json_object = json_decode( $condition );
+
+		if( $json_object === NULL || ! isset( $json_object->valid ) || $json_object->valid !== true )
+		{	// Wrong object:
+			return '';
+		}
+
+		return json_encode( $this->format_condition_object( $json_object, 'to_mysql' ) );
+	}
+
+
+	/**
+	 * Format JSON object to/from DB format
+	 * Used recursively to find all sub grouped conditions
+	 *
+	 * @param object JSON object of step type "IF Condition"
+	 * @param string Format action: 'to_mysql', 'from_mysql'
+	 * @return string
+	 */
+	function format_condition_object( $json_object, $action )
+	{
+		if( empty( $json_object->rules ) )
+		{	// No rules, Skip it:
+			return $json_object;
+		}
+
+		foreach( $json_object->rules as $r => $rule )
+		{
+			if( isset( $rule->rules ) && is_array( $rule->rules ) )
+			{	// This is a group of conditions, Run this function recursively:
+				$json_object->rules[ $r ] = $this->format_condition_object( $rule, $action );
+			}
+			else
+			{	// This is a single field, Format condition only for this field:
+				if( is_array( $rule->value ) )
+				{	// Field with multiple values like 'between'(field BETWEEN value_1 AND value_2):
+					foreach( $rule->value as $v => $rule_value )
+					{
+						$rule->value[ $v ] = $this->format_condition_rule_value( $rule_value, $rule->type, $action );
+					}
+				}
+				else
+				{	// Field with single value like 'equal'(field = value):
+					$rule->value = $this->format_condition_rule_value( $rule->value, $rule->type, $action );
+				}
+				$json_object->rules[ $r ] = $rule;
+			}
+		}
+
+		return $json_object;
+	}
+
+
+	/**
+	 * Format rule value to/from DB format
+	 *
+	 * @param string Rule value
+	 * @param string Rule type
+	 * @param string Format action: 'to_mysql', 'from_mysql'
+	 */
+	function format_condition_rule_value( $rule_value, $rule_type, $action )
+	{
+		switch( $rule_type )
+		{
+			case 'date':
+				switch( $action )
+				{
+					case 'to_mysql':
+						$formatted_date = format_input_date_to_iso( $rule_value );
+						return $formatted_date ? $formatted_date : $rule_value;
+
+					case 'from_mysql':
+						return mysql2date( locale_input_datefmt(), $rule_value );
+				}
+				break;
+		}
+
+		return $rule_value;
 	}
 }
 

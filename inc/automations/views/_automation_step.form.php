@@ -144,10 +144,19 @@ jQuery( document ).ready( function()
 			type: 'date',
 			operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
 			plugin: 'datepicker',
+			plugin_config: {
+				dateFormat: '<?php echo jquery_datepicker_datefmt(); ?>',
+				monthNames: <?php echo jquery_datepicker_month_names(); ?>,
+				dayNamesMin: <?php echo jquery_datepicker_day_names(); ?>,
+				firstDay: '<?php echo locale_startofweek(); ?>',
+			},
+			validation: {
+				format: '<?php echo strtoupper( jquery_datepicker_datefmt() ); ?>'
+			},
 		}
 		],
 		// Prefill the field "IF Condition" with stored data from DB:
-		rules: <?php echo ( ( $edited_AutomationStep->get( 'type' ) == 'if_condition' && $edited_AutomationStep->get( 'info' ) != '' ) ? $edited_AutomationStep->get( 'info' ) : 'null' ); ?>
+		rules: <?php echo $edited_AutomationStep->get( 'if_condition_js_object' ); ?>
 	} );
 } );
 

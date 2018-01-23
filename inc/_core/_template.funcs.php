@@ -1556,26 +1556,11 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 	require_js( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
-	$datefmt = locale_input_datefmt();
-	//$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
-	$datefmt = php_to_jquery_date_format( $datefmt );
 	add_js_headline( 'jQuery(document).ready( function(){
-		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
-						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",
-						  "'.T_('July').'", "'.T_('August').'", "'.T_('September').'",
-						  "'.T_('October').'", "'.T_('November').'", "'.T_('December').'"];
-
-		var dayNamesMin = ["'.T_('Sun').'", "'.T_('Mon').'", "'.T_('Tue').'",
-						  "'.T_('Wed').'", "'.T_('Thu').'", "'.T_('Fri').'", "'.T_('Sat').'"];
-
-		var docHead = document.getElementsByTagName("head")[0];
-		for (i=0;i<dayNamesMin.length;i++)
-			dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
-
 		jQuery(".form_date_input").datepicker({
-			dateFormat: "'.$datefmt.'",
-			monthNames: monthNames,
-			dayNamesMin: dayNamesMin,
+			dateFormat: "'.jquery_datepicker_datefmt().'",
+			monthNames: '.jquery_datepicker_month_names().',
+			dayNamesMin: '.jquery_datepicker_day_names().',
 			firstDay: '.locale_startofweek().'
 		})
 	})' );
@@ -1835,6 +1820,7 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
 	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
 	require_js( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
+	require_js( 'jquery/query-builder/moment.js', $relative_to ); // dependency
 
 	require_js( 'jquery/query-builder/query-builder.min.js', $relative_to );
 	require_css( 'jquery/jquery.query-builder.default.css', $relative_to );
