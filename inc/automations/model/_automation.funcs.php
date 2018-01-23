@@ -186,7 +186,7 @@ function step_td_next_step( $step_ID, $next_step_ID, $next_step_order, $next_ste
 		return '<span class="orange">'.T_('Loop').' ('.seconds_to_period( $next_step_delay ).')</span>';
 	}
 
-	return $next_step_order.' ('.seconds_to_period( $next_step_delay ).')';
+	return sprintf( T_('Go to step %d'), intval( $next_step_order ) ).' ('.seconds_to_period( $next_step_delay ).')';
 }
 
 

@@ -431,65 +431,62 @@ class AutomationStep extends DataObject
 		// Retrun ERROR result by default for all unknown cases:
 		$step_result = 'ERROR';
 
-		switch( $this->get( 'type' ) )
-		{
-			case 'if_condition':
-				$condition_sql_query = $this->get_sql_from_condition();
-				if( empty( $condition_sql_query ) )
-				{	// Wrong condition of this step:
-					$step_result = 'ERROR';
-					break;
-				}
-				$check_user_SQL = new SQL( '' );
-				$check_user_SQL->SELECT( 'user_ID' );
-				$check_user_SQL->FROM( 'T_users' );
-				$check_user_SQL->WHERE( 'user_ID = '.$DB->quote( $user_ID ) );
-				$check_user_SQL->WHERE_and( $condition_sql_query );
-				if( $DB->get_var( $check_user_SQL ) )
-				{	// The user is matched to condition of this step:
-					$step_result = 'YES';
-				}
-				else
-				{	// The user is NOT matched to condition of this step:
-					$step_result = 'NO';
-				}
-				break;
-
-			case 'send_campaign':
-				// Send email campaign
-				$EmailCampaignCache = & get_EmailCampaignCache();
-				if( $step_EmailCampaign = & $EmailCampaignCache->get_by_ID( $this->get( 'info' ), false, false ) )
-				{
-					$user_is_waiting_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'wait' ) );
-					$user_received_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'receive' ) );
-					if( $user_received_email )
-					{	// If user already received this email:
-						$step_result = 'NO';
-					}
-					elseif( $user_is_waiting_email && $step_EmailCampaign->send_email( $user_ID ) )
-					{	// If user already received this email before OR email has been sent to user successfully now:
+		$UserCache = & get_UserCache();
+		if( $step_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
+		{	// Allow to execute action only if User is detected in DB:
+			switch( $this->get( 'type' ) )
+			{
+				case 'if_condition':
+					if( $this->check_if_condition( $step_User, $if_condition_log ) )
+					{	// The user is matched to condition of this step:
 						$step_result = 'YES';
 					}
 					else
-					{	// Some error on sending of email to user:
-						// - problem with php mail function;
-						// - user cannot receive such email because of day limit;
-						// - user is not activated yet.
+					{	// The user is NOT matched to condition of this step:
+						$step_result = 'NO';
+					}
+					if( $params['print_log'] )
+					{	// Print log:
+						echo ' - Log: '.$if_condition_log.$nl;
+					}
+					break;
+
+				case 'send_campaign':
+					// Send email campaign
+					$EmailCampaignCache = & get_EmailCampaignCache();
+					if( $step_EmailCampaign = & $EmailCampaignCache->get_by_ID( $this->get( 'info' ), false, false ) )
+					{
+						$user_is_waiting_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'wait' ) );
+						$user_received_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'receive' ) );
+						if( $user_received_email )
+						{	// If user already received this email:
+							$step_result = 'NO';
+						}
+						elseif( $user_is_waiting_email && $step_EmailCampaign->send_email( $user_ID ) )
+						{	// If user already received this email before OR email has been sent to user successfully now:
+							$step_result = 'YES';
+						}
+						else
+						{	// Some error on sending of email to user:
+							// - problem with php mail function;
+							// - user cannot receive such email because of day limit;
+							// - user is not activated yet.
+							$step_result = 'ERROR';
+						}
+					}
+					else
+					{	// Wrong stored email campaign for this step:
 						$step_result = 'ERROR';
 					}
-				}
-				else
-				{	// Wrong stored email campaign for this step:
-					$step_result = 'ERROR';
-				}
-				break;
+					break;
 
-			default:
-				if( $params['print_log'] )
-				{	// Print log:
-					echo ' - No implemented action'.$nl;
-				}
-				break;
+				default:
+					if( $params['print_log'] )
+					{	// Print log:
+						echo ' - No implemented action'.$nl;
+					}
+					break;
+			}
 		}
 
 		if( $params['print_log'] )
@@ -527,12 +524,12 @@ class AutomationStep extends DataObject
 			$next_exec_ts = NULL;
 		}
 		// Update data for next step or finish it:
-		$DB->query( 'UPDATE T_automation__user_state
+		/*$DB->query( 'UPDATE T_automation__user_state
 			  SET aust_next_step_ID = '.$DB->quote( $next_step_ID ).',
 			      aust_next_exec_ts = '.$DB->quote( $next_exec_ts ).'
 			WHERE aust_autm_ID = '.$DB->quote( $Automation->ID ).'
 			  AND aust_user_ID = '.$DB->quote( $user_ID ),
-			'Update data for next Step after executing Step #'.$this->ID );
+			'Update data for next Step after executing Step #'.$this->ID );*/
 
 		if( $params['print_log'] )
 		{	// Print log:
@@ -576,52 +573,52 @@ class AutomationStep extends DataObject
 
 
 	/**
-	 * Get SQL query from "IF Condition"
+	 * Check result of "IF Condition"
 	 *
-	 * return string SQL query
+	 * @param object User
+	 * @param string Log into this param
+	 * @return boolean TRUE if condition is matched for given user, otherwise FALSE
 	 */
-	function get_sql_from_condition()
+	function check_if_condition( $step_User, & $log )
 	{
 		if( $this->get( 'type' ) != 'if_condition' )
 		{	// This is allowed only for step type "IF Condition":
-			return '';
+			return false;
 		}
 
 		$json_object = json_decode( $this->get( 'info' ) );
 
 		if( $json_object === NULL || ! isset( $json_object->valid ) || $json_object->valid !== true )
-		{	// Wrong object, Skip it:
-			return '';
+		{	// Wrong object, Return false:
+			return false;
 		}
 
-		return $this->parse_condition_object_to_sql( $json_object );
+		return $this->check_if_condition_object( $json_object, $step_User, $log );
 	}
 
 
 	/**
-	 * Parse JSON object to SQL query
+	 * Check result of "IF Condition" object(one group of rules)
 	 * Used recursively to find all sub grouped conditions
 	 *
 	 * @param object JSON object of step type "IF Condition"
-	 * @return string
+	 * @param object User
+	 * @param string Log into this param
+	 * @return boolean TRUE if condition is matched for given user, otherwise FALSE
 	 */
-	function parse_condition_object_to_sql( $json_object )
+	function check_if_condition_object( $json_object, $step_User, & $log )
 	{
-		global $DB;
+		global $is_cli;
 
 		if( ! isset( $json_object->condition ) || ! in_array( $json_object->condition, array( 'AND', 'OR' ) ) || empty( $json_object->rules ) )
 		{	// Wrong json object params, Skip it:
-			return '';
+			return false;
 		}
 
-		// array of available fields with operators:
-		// key is field name in JSON object, value is array( field/column name in DB, array of valid operators)
-		$valid_fields = array(
-				'user_has_tag' => array( 'user_login', array( 'equal', 'not_equal' ) ),
-				'date'         => array( 'user_created_datetime', array( 'equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between' ) ),
-			);
-		// Array to convert operator names to SQL format:
-		$operators = array(
+		// Log:
+		$log .= ' ('.$json_object->condition;
+		// Array to convert operator names to log format:
+		$log_operators = array(
 				'equal'            => '=',
 				'not_equal'        => '!=',
 				'less'             => '<',
@@ -631,46 +628,128 @@ class AutomationStep extends DataObject
 				'between'          => array( 'BETWEEN', 'AND' ),
 				'not_between'      => array( 'NOT BETWEEN', 'AND' ),
 			);
+		$log_bold_start = empty( $is_cli ) ? '<b>' : '*';
+		$log_bold_end = empty( $is_cli ) ? '</b>' : '*';
 
-		$conditions = array();
+		if( $json_object->condition == 'AND' )
+		{	// Default result for group with operator 'AND':
+			$conditions_result = true;
+			$stop_result = false;
+		}
+		else
+		{	// Default result for group with operator 'OR':
+			$conditions_result = false;
+			$stop_result = true;
+		}
+
 		foreach( $json_object->rules as $rule )
 		{
+			if( $conditions_result == $stop_result )
+			{	// Skip this rule because previous rules already returned the end result for current condition(AND|OR):
+				$log .= ', '.$log_bold_start.'ignored'.$log_bold_end;
+				continue;
+			}
+
 			if( isset( $rule->rules ) && is_array( $rule->rules ) )
 			{	// This is a group of conditions, Run this function recursively:
-				$multi_cond = $this->parse_condition_object_to_sql( $rule );
-				if( ! empty( $multi_cond ) )
-				{	// Append group of conditions only if it is not empty:
-					$conditions[] = $multi_cond;
-				}
+				$rule_result = $this->check_if_condition_object( $rule, $step_User, $log );
 			}
 			else
-			{	// This is a single field, Build condition from field name and value:
-				if( ! isset( $valid_fields[ $rule->field ] ) ||
-				    ! in_array( $rule->operator, $valid_fields[ $rule->field ][1] ) )
-				{	// Skip unknown field or operator:
-					continue;
-				}
-				if( is_array( $operators[ $rule->operator ] ) )
-				{	// Operator for multiple values like 'between'(field BETWEEN value_1 AND value_2):
-					if( ! is_array( $rule->value ) || count( $rule->value ) != count( $operators[ $rule->operator ] ) )
-					{	// Skip field with wrong values for the operator:
-						continue;
-					}
-					$multi_cond = $valid_fields[ $rule->field ][0];
-					foreach( $operators[ $rule->operator ] as $m => $m_operator )
+			{	// This is a single field:
+				$rule_result = $this->check_if_condition_rule( $rule, $step_User, $log );
+				// Log:
+				$log .= ', '.$rule->field.' ';
+				if( is_array( $log_operators[ $rule->operator ] ) )
+				{	// Multiple operator and values:
+					foreach( $log_operators[ $rule->operator ] as $o => $operator )
 					{
-						$multi_cond .= ' '.$m_operator.' '.$DB->quote( $rule->value[ $m ] );
+						$log .= ' '.$operator.' "'.$rule->value[ $o ].'"';
 					}
-					$conditions[] = $multi_cond;
 				}
 				else
-				{	// Single operator like 'equal'(field = value ):
-					$conditions[] = $valid_fields[ $rule->field ][0].' '.$operators[ $rule->operator ].' '.$DB->quote( $rule->value );
+				{	// Single operator and value:
+					$log .= ' '.$log_operators[ $rule->operator ].' "'.$rule->value.'"';
 				}
+				$log .= ': '.$log_bold_start.( $rule_result ? 'TRUE' : 'FALSE' ).$log_bold_end;
+			}
+
+			// Append current result with previous results:
+			if( $json_object->condition == 'AND' )
+			{	// AND condition:
+				$conditions_result = $conditions_result && $rule_result;
+			}
+			else
+			{	// OR condition:
+				$conditions_result = $conditions_result || $rule_result;
 			}
 		}
 
-		return count( $conditions ) ? '( '.implode( ' '.$json_object->condition.' ', $conditions ).' )' : '';
+		// Log:
+		$log .= ') : '.$log_bold_start.( $conditions_result ? 'TRUE' : 'FALSE' ).$log_bold_end;
+
+		return $conditions_result;
+	}
+
+
+	/**
+	 * Check rule of "IF Condition" for given User
+	 *
+	 * @param object Rule, object with properties: field, value, operator
+	 * @param object User
+	 * @return boolean TRUE if condition is matched for given user, otherwise FALSE
+	 */
+	function check_if_condition_rule( $rule, $step_User )
+	{
+		switch( $rule->field )
+		{
+			case 'user_has_tag':
+				// Check if User has a tag:
+				$user_tags = $step_User->get_usertags();
+				switch( $rule->operator )
+				{
+					case 'equal':
+						return in_array( $rule->value, $user_tags );
+					case 'not_equal':
+						return ! in_array( $rule->value, $user_tags );
+				}
+				break;
+
+			case 'date':
+				// Check current date:
+				global $localtimenow;
+				if( is_array( $rule->value ) )
+				{
+					$rule_date_ts = strtotime( $rule->value[0] );
+					$rule_date_ts2 = strtotime( $rule->value[1] );
+				}
+				else
+				{
+					$rule_date_ts = strtotime( $rule->value );
+				}
+				switch( $rule->operator )
+				{
+					case 'equal':
+						return $localtimenow == $rule_date_ts;
+					case 'not_equal':
+						return $localtimenow != $rule_date_ts;
+					case 'less':
+						return $localtimenow < $rule_date_ts;
+					case 'less_or_equal':
+						return $localtimenow <= $rule_date_ts;
+					case 'greater':
+						return $localtimenow > $rule_date_ts;
+					case 'greater_or_equal':
+						return $localtimenow >= $rule_date_ts;
+					case 'between':
+						return $localtimenow >= $rule_date_ts && $localtimenow <= $rule_date_ts2;
+					case 'not_between':
+						return $localtimenow < $rule_date_ts && $localtimenow > $rule_date_ts2;
+				}
+				break;
+		}
+
+		// Unknown field or operator:
+		return false;
 	}
 
 
