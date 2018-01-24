@@ -460,7 +460,7 @@ $schema_queries = array(
 		'Creating email log table',
 		"CREATE TABLE T_email__log (
 			emlog_ID        INT(10) UNSIGNED NOT NULL auto_increment,
-			emlog_key       VARCHAR(32) NOT NULL DEFAULT '',
+			emlog_key       VARCHAR(32) NULL DEFAULT NULL,
 			emlog_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			emlog_user_ID   INT(10) UNSIGNED DEFAULT NULL,
 			emlog_to        VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,

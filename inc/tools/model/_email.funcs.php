@@ -300,7 +300,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 	$DB->query( 'INSERT INTO T_email__log
 		( emlog_key, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers )
 		VALUES
-		( '.$DB->quote( $email_key ).',
+		( '.( empty( $email_key ) ? 'NULL' : $DB->quote( $email_key ) ).',
 			'.$DB->quote( date2mysql( $servertimenow ) ).',
 		  '.$DB->quote( $user_ID ).',
 		  '.$DB->quote( $to ).',
