@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -1334,14 +1334,26 @@ class collections_Module extends Module
 				// Subscribe⁄Unsubscribe to/from newsletter from widget:
 				$widget_ID = param( 'widget', 'integer', true );
 				$WidgetCache = & get_WidgetCache();
-				$Widget = & $WidgetCache->get_by_ID( $widget_ID );
+
+				if( $widget_ID )
+				{ // Request from widget
+					$Widget = & $WidgetCache->get_by_ID( $widget_ID );
+					$newsletter_ID = $Widget->get_param( 'enlt_ID' );
+					$insert_user_tags = $Widget->get_param( 'usertags' );
+				}
+				elseif( param( 'inline', 'integer', 0 ) == 1 )
+				{ // Request from subscribe shorttag
+					$newsletter_ID = param( 'newsletter', 'integer', 0 );
+					$insert_user_tags = param( 'usertags', 'string', NULL );
+				}
 
 				// Check newsletter of the requested widget:
 				$NewsletterCache = & get_NewsletterCache();
-				if( ! ( $Newsletter = & $NewsletterCache->get_by_ID( $Widget->get_param( 'enlt_ID' ), false, false ) ) ||
-				    ! $Newsletter->get( 'active' ) )
+				if( empty( $newsletter_ID ) ||
+						! ( $Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) ) ||
+						! $Newsletter->get( 'active' ) )
 				{	// Display an error when newsletter is not found or not active:
-					$Messages->add( T_('Newsletter subscription widget references an inactive newsletter.'), 'error' );
+					$Messages->add( T_('List subscription widget references an inactive list.'), 'error' );
 					header_redirect();
 				}
 
@@ -1356,6 +1368,11 @@ class collections_Module extends Module
 				{	// Subscribe to newsletter:
 					if( $current_User->subscribe( $Newsletter->ID ) )
 					{
+						if( ! empty( $insert_user_tags ) )
+						{
+							$current_User->add_usertags( $insert_user_tags );
+							$current_User->dbupdate();
+						}
 						$Messages->add( T_('You have successfully subscribed.'), 'success' );
 					}
 				}
@@ -1386,7 +1403,7 @@ class collections_Module extends Module
 				break; // already exited here
 
 			case 'create_post':
-				// Create new post from front-office:
+				// Create new post from front-office by anonymous user:
 				global $dummy_fields, $Plugins;
 
 				load_class( 'items/model/_item.class.php', 'Item' );
@@ -1414,7 +1431,7 @@ class collections_Module extends Module
 				$item_Blog = & $new_Item->get_Blog();
 
 				// Set default status:
-				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status' ) );
+				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status_anon' ) );
 
 				if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $user_email ) ) ) )
 				{	// Don't allow the duplicate emails for users:
@@ -1446,11 +1463,11 @@ class collections_Module extends Module
 				// START: Auto register new user:
 				// Set unique user login from entered user name:
 				$max_login_length = 20;
-				$login = preg_replace( '/[^a-z0-9 ]/i', '', $user_name );
+				$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $user_name );
 				if( trim( $login ) == '' )
 				{	// Get login from entered user email:
 					$login = preg_replace( '/^([^@]+)@.+$/i', '$1', $user_email );
-					$login = preg_replace( '/[^a-z0-9 ]/i', '', $login );
+					$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $login );
 				}
 				$login = str_replace( ' ', '_', $login );
 				$login = utf8_substr( $login, 0, $max_login_length );

@@ -37,25 +37,23 @@ $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-c
 	$Form->radio_input( 'ecmp_auto_send', $edited_EmailCampaign->get( 'auto_send' ), array(
 			array( 'value' => 'no',           'label' => T_('No (Manual sending only)') ),
 			array( 'value' => 'subscription', 'label' =>  T_('At subscription') ),
-			array( 'value' => 'sequence',     'label' => T_('As part of a sequence') ),
 		), T_('Auto send'), array( 'lines' => true ) );
-	$Form->text_input( 'ecmp_sequence', $edited_EmailCampaign->get( 'sequence' ), 10, T_('Day in sequence') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Newsletter recipients') );
+$Form->begin_fieldset( T_('List recipients') );
 	$NewsletterCache = & get_NewsletterCache();
 	$NewsletterCache->load_where( 'enlt_active = 1 OR enlt_ID = '.intval( $edited_EmailCampaign->get( 'enlt_ID' ) ) );
 	$Form->select_input_object( 'ecmp_enlt_ID', $edited_EmailCampaign->get( 'enlt_ID' ), $NewsletterCache, T_('Send to subscribers of'), array(
 			'required'     => true,
 			'field_suffix' => '<input type="submit" name="actionArray[update_newsletter]" class="btn btn-default" value="'.format_to_output( T_('Update'), 'htmlattr' ).'" />' ) );
-	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_recipients_count(), '('.T_('Accounts which currently accept this newsletter').')' );
+	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_recipients_count(), '('.T_('Accounts which currently accept this list').')' );
 	$Form->info_field( T_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter', true ), array(
 			'class' => 'info_full_height',
 			'note'  => '('.T_('Accounts that match your additional filter').') '
 			           .'<a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'" class="btn btn-default">'.T_('Change filter').'</a>',
 		) );
-	$Form->info( T_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive', true ), '('.T_('Accounts which have already been sent this newsletter').')' );
-	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_recipients_count( 'wait', true ), '('.T_('Accounts which have not been sent this newsletter yet').')' );
+	$Form->info( T_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive', true ), '('.T_('Accounts which have already been sent this list').')' );
+	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_recipients_count( 'wait', true ), '('.T_('Accounts which have not been sent this list yet').')' );
 $Form->end_fieldset();
 
 $buttons = array();
@@ -66,23 +64,3 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 $Form->end_form( $buttons );
 
 ?>
-<script type="text/javascript">
-jQuery( document ).ready( function()
-{
-	jQuery( 'input[name=ecmp_auto_send]' ).click( function() {
-		visible_ecmp_sequence( jQuery( this ) );
-	} );
-	visible_ecmp_sequence( jQuery( 'input[name=ecmp_auto_send]:checked' ) );
-} );
-function visible_ecmp_sequence( obj )
-{
-	if( obj.val() == 'sequence' )
-	{
-		jQuery( '#ffield_ecmp_sequence' ).show();
-	}
-	else
-	{
-		jQuery( '#ffield_ecmp_sequence' ).hide();
-	}
-}
-</script>

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -615,7 +615,7 @@ function url_crumb( $crumb_name )
  * @param string crumb_name
  * @return string
  */
-function get_crumb($crumb_name)
+function get_crumb( $crumb_name )
 {
 	global $Session;
 	return isset( $Session ) ? $Session->create_crumb( $crumb_name ) : '';

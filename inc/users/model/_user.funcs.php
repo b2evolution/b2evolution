@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -1071,7 +1071,7 @@ function get_user_subs_url()
  * @param string What display as link text: avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
  * @return NULL|string NULL if this user or the profile tab doesn't exists, the identity link otherwise.
  */
-function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'profile', $link_text = 'avatar' )
+function get_user_identity_link( $user_login, $user_ID = NULL, $user_tab = 'profile', $link_text = 'avatar' )
 {
 	$UserCache = & get_UserCache();
 
@@ -1093,7 +1093,7 @@ function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'p
 		return NULL;
 	}
 
-	return $User->get_identity_link( array( 'profile_tab' => $profile_tab, 'link_text' => $link_text ) );
+	return $User->get_identity_link( array( 'user_tab' => $user_tab, 'link_text' => $link_text ) );
 }
 
 
@@ -3270,6 +3270,7 @@ function userfield_prepare( & $userfield )
 function callback_filter_userlist( & $Form )
 {
 	global $Settings, $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
+	global $registered_min, $registered_max;
 
 	$Form->hidden( 'filter', 'new' );
 
@@ -3289,11 +3290,7 @@ function callback_filter_userlist( & $Form )
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{ // Show "Reported users" filter only for users with edit user permission
 			$Form->checkbox( 'reported', get_param('reported'), T_('Reported users') );
-			$Form->checkbox( 'custom_sender_email', get_param('custom_sender_email'), T_('Users with custom sender address') );
-			$Form->checkbox( 'custom_sender_name', get_param('custom_sender_name'), T_('Users with custom sender name') );
 		}
-
-		$Form->select_input_array( 'account_status', get_param('account_status'), get_user_statuses( T_('All') ), T_('Account status') );
 
 		// Primary group:
 		$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_level DESC, grp_name ASC' );
@@ -3317,6 +3314,14 @@ function callback_filter_userlist( & $Form )
 		$Form->select_input_array( 'group2', get_param('group2'), $group_options_array,
 			sprintf( T_('<span %s>Secondary</span> Group'), 'class="label label-info"' ),
 			'', array( 'force_keys_as_values' => true ) );
+
+		$Form->select_input_array( 'account_status', get_param('account_status'), get_user_statuses( T_('All') ), T_('Account status') );
+
+		// Filter by registered date
+		$Form->begin_line( T_('Registered from'), 'registered_min' );
+		$Form->date_input( 'registered_min', $registered_min, '' );
+		$Form->date_input( 'registered_max', $registered_max, T_('to') );
+		$Form->end_line();
 	}
 
 	$location_filter_displayed = false;
@@ -3390,6 +3395,74 @@ function callback_filter_userlist( & $Form )
 		{
 			$Form->select_input_object( 'newsletter', get_param( 'newsletter' ), $NewsletterCache, T_('Subscribed to'), array( 'allow_none' => true ) );
 		}
+	}
+
+	$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, T_('Tag'), '', array(
+		'maxlength' => 255,
+		'input_prefix' => '<div class="input-group" style="width: 350px;">',
+		'input_suffix'=> '</div>'	) );
+	?>
+	<script type="text/javascript">
+	function init_autocomplete_tags( selector )
+	{
+		var tags = jQuery( selector ).val();
+		var tags_json = new Array();
+		if( tags.length > 0 )
+		{ // Get tags from <input>
+			tags = tags.split( ',' );
+			for( var t in tags )
+			{
+				tags_json.push( { id: tags[t], name: tags[t] } );
+			}
+		}
+
+		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
+		{
+			theme: 'facebook',
+			queryParam: 's',
+			propertyToSearch: 'name',
+			tokenValue: 'name',
+			preventDuplicates: true,
+			prePopulate: tags_json,
+			hintText: '<?php echo TS_('Type in a tag') ?>',
+			noResultsText: '<?php echo TS_('No results') ?>',
+			searchingText: '<?php echo TS_('Searching...') ?>',
+			jsonContainer: 'tags',
+		} );
+	}
+
+	jQuery( document ).ready( function()
+	{
+		jQuery( '#user_tag' ).hide();
+		init_autocomplete_tags( '#user_tag' );
+		<?php
+			// Don't submit a form by Enter when user is editing the tags
+			echo get_prevent_key_enter_js( '#token-input-user_tag' );
+		?>
+	} );
+	</script>
+	<?php
+
+	if( is_admin_page() )
+	{
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{
+			$Form->checkbox( 'custom_sender_email', get_param('custom_sender_email'), T_('Users with custom sender address') );
+			$Form->checkbox( 'custom_sender_name', get_param('custom_sender_name'), T_('Users with custom sender name') );
+		}
+	}
+
+	if( is_admin_page() && $edited_EmailCampaign )
+	{
+		$campaign_send_status = array(
+				'' => T_('All'),
+				'ready_to_send' => T_('Ready to send'),
+				'ready_to_resend' => T_('Ready to resend'),
+				'sent' => T_('Sent'),
+				'send_error' => T_('Send error'),
+				'skipped' => T_('Skipped')
+			);
+		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, T_('Campaign Status'), '', array( 'allow_none' => true ) );
 	}
 	echo '<br />';
 
@@ -5258,6 +5331,7 @@ function users_results_block( $params = array() )
 			'display_level'        => true,
 			'display_status'       => true,
 			'display_enlt_status'  => false,
+			'display_camp_status'  => false,
 			'display_emlog_date'   => false,
 			'display_enls_subscribed'      => false,
 			'display_enls_subscribed_ts'   => false,
@@ -5405,7 +5479,7 @@ function users_results_block( $params = array() )
 		$UserList->display( $params['display_params'] );
 	}
 
-	$edited_campaign_ID =  $Session->get( 'edited_campaign_ID' );
+	$edited_campaign_ID = $Session->get( 'edited_campaign_ID' );
 	if( !empty( $edited_campaign_ID ) )
 	{ // Get Email Campaign by ID from Session
 		$EmailCampaignCache = & get_EmailCampaignCache();
@@ -5414,12 +5488,12 @@ function users_results_block( $params = array() )
 
 	if( !empty( $edited_EmailCampaign ) )
 	{
-		$newsletter_button_text = sprintf( T_('Use this selection for newsletter "%s"'), $edited_EmailCampaign->get( 'name' ) );
+		$newsletter_button_text = sprintf( T_('Use this selection for list "%s"'), $edited_EmailCampaign->get( 'name' ) );
 		$newsletter_button_class = 'btn-primary';
 	}
 	else
 	{
-		$newsletter_button_text = T_('Send newsletter to the current selection');
+		$newsletter_button_text = T_('Send list to the current selection');
 		$newsletter_button_class = 'btn-default';
 	}
 
@@ -5479,6 +5553,7 @@ function users_results( & $UserList, $params = array() )
 			'display_sec_groups' => false,
 			'display_level'      => true,
 			'display_status'     => true,
+			'display_camp_status' => false,
 			'display_emlog_date' => false,
 			'display_enls_subscribed'      => false,
 			'display_enls_subscribed_ts'   => false,
@@ -5486,6 +5561,7 @@ function users_results( & $UserList, $params = array() )
 			'display_enls_sent_manual'     => false,
 			'display_enls_send_count'      => false,
 			'display_actions'    => true,
+			'display_campaign_actions' => false,
 			'display_org_actions'=> false,
 			'th_class_avatar'    => 'shrinkwrap small',
 			'td_class_avatar'    => 'shrinkwrap center small',
@@ -5834,13 +5910,24 @@ function users_results( & $UserList, $params = array() )
 	}
 
 	if( $params['display_enlt_status'] )
-	{ // Display newsletter status:
+	{ // Display list status:
 		$UserList->cols[] = array(
-				'th' => T_('Status'),
+				'th' => T_('List Status'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'nowrap',
 				'order' => 'enls_user_ID',
 				'td' => '~conditional( #enls_user_ID# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
+			);
+	}
+
+	if( $params['display_camp_status'] )
+	{ // Display campaign status
+		$UserList->cols[] = array(
+				'th' => T_('Campaign Status'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'csnd_status',
+				'td' => '%user_td_campaign_status( #csnd_status# )%'
 			);
 	}
 
@@ -5983,6 +6070,16 @@ function users_results( & $UserList, $params = array() )
 					'th_class' => 'small',
 					'td_class' => 'shrinkwrap small',
 					'td' => '%user_td_org_actions( '.intval( $params['org_ID'] ).', #user_ID# )%'
+				);
+		}
+
+		if( $params['display_campaign_actions'] )
+		{
+			$UserList->cols[] = array(
+					'th' => T_('Actions'),
+					'th_class' => 'small',
+					'td_class' => 'shrinkwrap small',
+					'td' => '%user_td_campaign_actions( '.intval( $params['ecmp_ID'] ).', #user_ID#, #csnd_status# )%'
 				);
 		}
 
@@ -6321,6 +6418,35 @@ function user_td_org_actions( $org_ID, $user_ID )
 
 
 /**
+ * Get link to email campaign related actions
+ *
+ * @param integer Campaign ID
+ * @param integer User ID
+ * @param string Campaign send status
+ */
+function user_td_campaign_actions( $campaign_ID, $user_ID, $csnd_status )
+{
+	global $current_User, $admin_url;
+
+	$r = '';
+
+	if( $current_User->can_moderate_user( $user_ID ) )
+	{ // Current user can moderate this user
+		$r .= action_icon( T_('Queue again'), 'rewind', $admin_url.'?ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign'),
+				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'ready_to_send', 'ready_to_resend' ) )  ? ' invisible' : '' ) ) );
+		$r .= action_icon( T_('Skip'), 'forward', $admin_url.'?ctrl=campaigns&amp;action=skip&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign'),
+				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'sent', 'send_error', 'skipped' ) ) ? ' invisible' : '' ) ) );
+	}
+	else
+	{
+		$r .= get_icon( 'edit', 'noimg' );
+	}
+
+	return $r;
+}
+
+
+/**
  * Get an HTML icon to display if organization is accepted by admib or isn't.
  *
  * @param boolean TRUE if the organization is accepted to the user
@@ -6354,6 +6480,34 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 
 
 /**
+ * Get user campaign status
+ */
+function user_td_campaign_status( $csnd_status )
+{
+	switch( $csnd_status )
+	{
+		case 'ready_to_send':
+			return T_('Ready to send');
+
+		case 'ready_to_resend':
+			return T_('Ready to resend');
+
+		case 'sent':
+			return T_('Sent');
+
+		case 'send_error':
+			return T_('Send error');
+
+		case 'skipped':
+			return T_('Skipped');
+
+		default:
+			return T_('Unknown');
+	}
+}
+
+
+/**
  * Get email campaign send date
  *
  * @param string Email log date
@@ -6361,14 +6515,12 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
  */
 function user_td_emlog_date( $emlog_date )
 {
-	if( empty( $emlog_date ) )
-	{
-		return T_('Ready to send');
-	}
-	else
+	if( ! empty( $emlog_date ) )
 	{
 		return mysql2localedatetime( $emlog_date );
 	}
+
+	return NULL;
 }
 
 

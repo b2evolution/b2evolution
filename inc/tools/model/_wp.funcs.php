@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -51,7 +51,7 @@ function wpxml_get_import_data( $XML_file_path )
 		if( unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
 		{	// If ZIP archive is unpacked successfully:
 
-			// 
+			//
 			$XML_file_path = false;
 
 			// Find valid XML file in ZIP package:
@@ -338,7 +338,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		foreach( $xml_data['authors'] as $author )
 		{
 			// Replace unauthorized chars of username:
-			$author_login = preg_replace( '/([^a-z0-9_])/i', '_', $author['author_login'] );
+			$author_login = preg_replace( '/([^a-z0-9_\-\.])/i', '_', $author['author_login'] );
 			$author_login = utf8_substr( utf8_strtolower( $author_login ), 0, 20 );
 
 			if( empty( $existing_users[ $author_login ] ) )
@@ -1576,7 +1576,7 @@ function wp_get_regional_data( $country_code, $region, $subregion, $city )
 
 /**
  * Get available files to import from the folder /media/import/
- * 
+ *
  * @return array Files
  */
 function wpxml_get_import_files()

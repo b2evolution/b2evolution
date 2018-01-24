@@ -58,6 +58,13 @@
 .widget_core_user_register #register_form .form_text_input.form-control {
   width: 100%;
 }
+.widget_core_user_register #register_form .form_text_input.form-control .inline_widget {
+  width: 250px;
+}
+.widget_core_user_register #register_form .form_text_input.form-control.inline_widget {
+  width: 100%;
+  max-width: 250px;
+}
 .widget_core_user_register .field_register_btn .panel {
   margin: 0;
   border: none;

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -890,7 +890,7 @@ class Item extends ItemLight
 					$UserCache = & get_UserCache();
 
 					// Convert new entered login to proper login format:
-					$this->creator_user_login = preg_replace( '/[^a-z0-9 ]/i', '', $this->creator_user_login );
+					$this->creator_user_login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $this->creator_user_login );
 					$this->creator_user_login = str_replace( ' ', '_', $this->creator_user_login );
 					$this->creator_user_login = utf8_substr( $this->creator_user_login, 0, 20 );
 					set_param( 'item_owner_login', $this->creator_user_login );
@@ -2556,6 +2556,7 @@ class Item extends ItemLight
 				'render_parent'         => true,
 				'render_collection'     => true,
 				'render_content_blocks' => true,
+				'render_inline_widgets' => true,
 			), $params );
 
 		if( $params['render_inline_files'] )
@@ -2586,6 +2587,192 @@ class Item extends ItemLight
 		if( $params['render_content_blocks'] )
 		{	// Render Content block tags like [include:123], [include:item-slug]:
 			$content = $this->render_content_blocks( $content, $params );
+		}
+
+		if( $params['render_inline_widgets'] )
+		{ // Render subscription related tags
+			$content = $this->render_inline_widgets( $content, $params );
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Convert inline widget tags like [subscribe] and [emailcapture] into HTML tags
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_inline_widgets( $content, $params )
+	{
+		global $Settings;
+
+		load_funcs( 'skins/_skin.funcs.php' );
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_collection_data() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_inline_widgets' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of widgets:
+		preg_match_all( '/\[(subscribe|emailcapture):([^\]]*)\]/i', $content, $tags );
+
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one widget tag is found in content:
+			foreach( $tags[0] as $t => $source_tag )
+			{	// Render URL custom field as html:
+				$field_Item = $this;
+				$widget_html = $source_tag;
+
+				$widget_params = explode( ':', $tags[2][$t] );
+				switch( $tags[1][$t] )
+				{
+					case 'subscribe':
+						$button_notsubscribed = '';
+						$button_subscribed = '';
+						$button_notloggedin = '';
+
+						preg_match( '/(\d+)(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
+						$newsletter_ID = intval( $newsletter_ID_tags[1] );
+						if( isset( $newsletter_ID_tags[2] ) )
+						{
+							$user_tags = $newsletter_ID_tags[2];
+						}
+
+						if( isset( $widget_params[1] ) )
+						{
+							$button_notsubscribed = $widget_params[1];
+						}
+
+						if( isset( $widget_params[2] ) )
+						{
+							$button_subscribed = $widget_params[2];
+						}
+
+						if( isset( $widget_params[3] ) )
+						{
+							$button_notloggedin = $widget_params[3];
+						}
+
+						$params = array(
+							'widget' => 'newsletter_subscription',
+							'title' => '',
+							'intro' => '',
+							'bottom' => '',
+							'enlt_ID' => $newsletter_ID,
+							'button_notsubscribed_class' => 'btn-danger',
+							'button_subscribed_class' => 'btn-success',
+							'inline' => 1
+						);
+						if( ! empty( $button_notsubscribed ) )
+						{
+							$params['button_notsubscribed'] = $button_notsubscribed;
+						}
+						if( ! empty( $button_subscribed ) )
+						{
+							$params['button_subscribed'] = $button_subscribed;
+						}
+						if( ! empty( $user_tags ) )
+						{
+							$params['usertags'] = $user_tags;
+						}
+
+						if( ! empty( $button_notloggedin ) && ! is_logged_in() )
+						{ // Email capture widget does not display if user is not logged in
+							$redirect_to = regenerate_url( '', '', '', '&' );
+							$widget_html = '<div class="center">';
+							$widget_html .= '<a href="'.get_login_url( 'inline subscribe', $redirect_to ).'" class="btn btn-primary">'.$button_notloggedin.'</a>';
+							$widget_html .= '</div>';
+						}
+						else
+						{
+							ob_start();
+							skin_widget( $params );
+							$widget_html = ob_get_contents();
+							ob_end_clean();
+						}
+
+						break;
+
+					case 'emailcapture':
+						$fields_to_display = array();
+						$button_text = '';
+
+						preg_match( '/(\d+)?(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
+						if( isset( $newsletter_ID_tags[1] ) )
+						{
+							$newsletter_ID = intval( $newsletter_ID_tags[1] );
+						}
+						if( isset( $newsletter_ID_tags[2] ) )
+						{
+							$user_tags = $newsletter_ID_tags[2];
+						}
+						if( isset( $widget_params[1] ) )
+						{
+							$fields_to_display = explode( '+', $widget_params[1] );
+						}
+						if( isset( $widget_params[2] ) )
+						{
+							$button_text = $widget_params[2];
+						}
+
+						$params = array(
+							'widget' => 'user_register',
+							'title' => '',
+							'intro' => '',
+							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',
+							'ask_lastname' => in_array( 'lastname', $fields_to_display ) ? 'required' : 'no',
+							'source' => 'Page: '.$this->get( 'urltitle' ),
+							'usertags' => isset( $user_tags ) ? $user_tags : NULL,
+							'subscribe_post' => 0,
+							'subscribe_comment' => 0,
+							'button_class' => 'btn-primary',
+							'inline' => 1
+						);
+
+						$NewsletterCache = & get_NewsletterCache();
+						$load_where = 'enlt_active = 1';
+						$NewsletterCache->load_where( $load_where );
+						// Initialize checkbox options for param "Newsletter":
+						$newsletters_options = array();
+						$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
+						foreach( $NewsletterCache->cache as $Newsletter )
+						{
+							$newsletters_options[] = array(
+								$Newsletter->ID,
+								$Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ),
+								$Newsletter->ID == $newsletter_ID ? 1 : 0, // checked if specified newsletter ID
+							);
+						}
+						$newsletters_options[] = array(
+							'default',
+							T_('Also subscribe user to all default newsletters for new users.'),
+							empty( $newsletter_ID ) ? 1 : 0, // checked if no specific newsletter ID specified
+						);
+						$params['newsletters'] = $newsletters_options;
+
+						if( ! empty ( $button_text ) )
+						{
+							$params['button'] = $button_text;
+						}
+
+						ob_start();
+						skin_widget( $params );
+						$widget_html = ob_get_contents();
+						ob_end_clean();
+						break;
+
+					default:
+						$widget_html = 'xxx';
+				}
+
+				$content = substr_replace( $content, $widget_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
+			}
 		}
 
 		return $content;

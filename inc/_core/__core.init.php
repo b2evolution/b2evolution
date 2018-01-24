@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -70,6 +70,8 @@ $db_config['aliases'] = array(
 		'T_users__user_org'        => $tableprefix.'users__user_org',
 		'T_users__secondary_user_groups' => $tableprefix.'users__secondary_user_groups',
 		'T_users__profile_visits'  => $tableprefix.'users__profile_visits',
+		'T_users__tag'             => $tableprefix.'users__tag',
+		'T_users__usertag'         => $tableprefix.'users__usertag',
 		'T_slug'                   => $tableprefix.'slug',
 		'T_email__log'             => $tableprefix.'email__log',
 		'T_email__returns'         => $tableprefix.'email__returns',
@@ -117,6 +119,7 @@ $ctrl_mappings = array(
 		'userfields'       => 'users/userfields.ctrl.php',
 		'userfieldsgroups' => 'users/userfieldsgroups.ctrl.php',
 		'usersettings'     => 'users/settings.ctrl.php',
+		'usertags'         => 'users/usertags.ctrl.php',
 		'registration'     => 'users/registration.ctrl.php',
 		'invitations'      => 'users/invitations.ctrl.php',
 		'display'          => 'users/display.ctrl.php',
@@ -330,6 +333,24 @@ function & get_UserFieldGroupCache()
 	}
 
 	return $UserFieldGroupCache;
+}
+
+
+/**
+ * Get the UserTagCache
+ *
+ * @return UserTagCache
+ */
+function & get_UserTagCache()
+{
+	global $UserTagCache;
+
+	if( ! isset( $UserTagCache ) )
+	{
+		$UserTagCache = new DataObjectCache( 'UserTag', false, 'T_users__tag', 'utag_', 'utag_ID', 'utag_name', 'utag_name' ); // COPY (FUNC)
+	}
+
+	return $UserTagCache;
 }
 
 
@@ -1114,7 +1135,7 @@ class _core_Module extends Module
 							'href' => $admin_url.'?ctrl=newsletters',
 							'entries' => array(
 								'newsletters' => array(
-									'text' => T_('Newsletters').'&hellip;',
+									'text' => T_('Lists').'&hellip;',
 									'href' => $admin_url.'?ctrl=newsletters' ),
 								'campaigns' => array(
 									'text' => T_('Campaigns').'&hellip;',
@@ -1184,7 +1205,7 @@ class _core_Module extends Module
 						'href' => $admin_url.'?ctrl=tools',
 					);
 				$entries['site']['entries']['system']['entries']['auto_upgrade'] = array(
-						'text' => T_('Auto-Upgrade').'&hellip;',
+						'text' => T_('Auto Upgrade').'&hellip;',
 						'href' => $admin_url.'?ctrl=upgrade',
 					);
 				$entries['site']['entries']['system']['entries']['syslog'] = array(
@@ -1300,19 +1321,22 @@ class _core_Module extends Module
 						);
 					if( $perm_admin_restricted )
 					{	// Menu entries to edit and view post in back-office:
-						$entries['post']['entries'] = array(
-							'edit_front' => array(
-								'text' => T_('Edit in Font-Office').'&hellip;',
-								'href' => $edit_item_url,
-							),
-							'edit_back' => array(
+						$entries['post']['entries'] = array();
+						if( $Blog->get_setting( 'in_skin_editing' ) )
+						{	// If collection allows to edit posts in front-office:
+							$entries['post']['entries']['edit_front'] = array(
+									'text' => T_('Edit in Front-Office').'&hellip;',
+									'href' => $edit_item_url,
+								);
+						}
+						$entries['post']['entries']['edit_back'] = array(
 								'text' => T_('Edit in Back-Office').'&hellip;',
 								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
-							),
-							'view_back' => array(
+							);
+						$entries['post']['entries']['view_back'] = array(
 								'text' => T_('View in Back-Office').'&hellip;',
 								'href' => $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
-							) );
+							);
 					}
 					$entries['page']['entries']['edit'] = array(
 							'text'  => T_('Edit contents').'&hellip;',
@@ -1977,6 +2001,9 @@ class _core_Module extends Module
 								'href' => '?ctrl=accountclose' ),
 							),
 						),
+						'usertags' => array(
+							'text' => T_('User Tags'),
+							'href' => '?ctrl=usertags' ),
 				);
 		}
 
@@ -2000,7 +2027,7 @@ class _core_Module extends Module
 					'href' => '?ctrl=newsletters',
 					'entries' => array(
 						'newsletters' => array(
-							'text' => T_('Newsletters'),
+							'text' => T_('Lists'),
 							'href' => '?ctrl=newsletters' ),
 						'campaigns' => array(
 							'text' => T_('Campaigns'),

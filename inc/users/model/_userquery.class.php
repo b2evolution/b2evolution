@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -294,6 +294,35 @@ class UserQuery extends SQL
 
 
 	/**
+	 * Restrict to user registration date
+	 *
+	 * @param date Registration from date
+	 * @param date Registration to date
+	 */
+	function where_registered_date( $min_date = NULL, $max_date = NULL )
+	{
+		global $DB;
+
+		if( empty( $min_date ) && empty( $max_date ) )
+		{
+			return;
+		}
+
+		if( ! empty( $min_date ) )
+		{
+			$this->WHERE_and( 'DATE(user_created_datetime) >= '.$DB->quote( $min_date ) );
+		}
+
+		if( ! empty( $max_date ) )
+		{
+			$this->WHERE_and( 'DATE(user_created_datetime) <= '.$DB->quote( $max_date ) );
+		}
+
+		return;
+	}
+
+
+	/**
 	 * Restrict to reported users
 	 *
 	 * @param boolean is reported
@@ -332,6 +361,35 @@ class UserQuery extends SQL
 			$this->FROM_add( ' LEFT JOIN T_users__usersettings as custom_sender_name ON custom_sender_name.uset_user_ID = user_ID AND custom_sender_name.uset_name = "notification_sender_name"' );
 			$this->WHERE_and( 'custom_sender_name.uset_value IS NOT NULL AND custom_sender_name.uset_value <> '.$DB->quote( $Settings->get( 'notification_sender_name' ) ) );
 		}
+	}
+
+
+	/**
+	 * Restrict to users with tag
+	 *
+	 * @param string User tag
+	 */
+	function where_tag( $user_tag )
+	{
+		global $DB;
+
+		if( empty( $user_tag ) )
+		{
+			return;
+		}
+
+		$tags = array_map( 'trim', explode( ',', $user_tag ) );
+		$this->FROM_add( 'LEFT JOIN (
+					SELECT uutg_user_ID, GROUP_CONCAT( DISTINCT utag_name ) AS tags
+					FROM T_users__tag
+					LEFT JOIN T_users__usertag ON uutg_emtag_ID = utag_ID
+					WHERE utag_name IN ('.$DB->quote( $tags ).')
+					GROUP BY uutg_user_ID
+				) AS tags
+				ON tags.uutg_user_ID = user_ID' );
+
+		sort( $tags );
+		$this->WHERE_and( 'tags.tags = '.$DB->quote( implode( ',', array_unique( $tags ) ) ) );
 	}
 
 
@@ -556,6 +614,7 @@ class UserQuery extends SQL
 			return;
 		}
 
+		$this->SELECT_add( ', csnd_status' );
 		$this->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_user_ID = user_ID AND csnd_camp_ID = '.$DB->quote( $ecmp_ID ) );
 
 		// Get email log date and time:
@@ -569,14 +628,18 @@ class UserQuery extends SQL
 
 		switch( $recipient_type )
 		{
+			case 'ready_to_send':
+			case 'ready_to_resend':
 			case 'sent':
-				// Get recipients which have already been received this newsletter:
-				$this->WHERE_and( 'csnd_emlog_ID IS NOT NULL' );
+			case 'send_error':
+			case 'skipped':
+				// Get recipients which have already received this newsletter:
+				$this->WHERE_and( 'csnd_status = "'.$recipient_type.'"' );
 				break;
 
 			case 'readytosend':
-				// Get recipients which have not been received this newsletter yet:
-				$this->WHERE_and( 'csnd_emlog_ID IS NULL' );
+				// Get recipients which have not received this newsletter yet:
+				$this->WHERE_and( 'csnd_status IN ( "ready_to_send", "ready_to_resend" )' );
 				break;
 		}
 	}

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE
  *
@@ -1753,7 +1753,7 @@ function create_demo_contents()
 		       ( 1, "Photo Galleries",         2 ),
 		       ( 1, "Forums",                  3 ),
 		       ( 1, "Online Manuals",          4 ),
-		       ( 1, "Newsletters / E-mailing", 5 ),
+		       ( 1, "Lists / E-mailing", 5 ),
 		       ( 1, "Easy Maintenance",        6 )' );
 	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
 		VALUES ( 1, 5, 1 ),
@@ -1809,7 +1809,7 @@ function create_default_newsletters()
 {
 	global $DB, $create_sample_contents;
 
-	task_begin( 'Creating default newsletters... ' );
+	task_begin( 'Creating default lists... ' );
 
 	if( $create_sample_contents )
 	{

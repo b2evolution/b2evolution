@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -8893,6 +8893,41 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_email__campaign', 'ecmp_auto_sent_ts', 'TIMESTAMP NULL AFTER ecmp_sent_ts' );
 		db_add_col( 'T_email__campaign', 'ecmp_auto_send', 'ENUM("no", "subscription", "sequence") COLLATE ascii_general_ci NOT NULL DEFAULT "no"' );
 		db_add_col( 'T_email__campaign', 'ecmp_sequence', 'INT UNSIGNED NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12480, 'Upgrading email campaign send data table...' ) )
+	{ // part of 6.10.0-beta
+		$DB->query( 'ALTER TABLE T_email__campaign_send
+				ADD csnd_status ENUM("ready_to_send", "ready_to_resend", "sent", "send_error", "skipped" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ready_to_send" AFTER csnd_user_ID' );
+
+		$DB->query( 'UPDATE T_email__campaign_send
+				SET csnd_status = IF( csnd_emlog_ID IS NULL, "ready_to_send", "sent" )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12490, 'Creating user tags and user-to-tag tables...' ) )
+	{	// part of 6.10.0-beta
+		db_create_table( 'T_users__tag', "
+			utag_ID INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			utag_name VARCHAR(200) NOT NULL,
+			PRIMARY KEY (utag_ID),
+			UNIQUE utag_name(utag_name)",
+			'ENGINE = innodb' );
+
+		db_create_table( 'T_users__usertag', "
+			uutg_user_ID INT(11) UNSIGNED NOT NULL,
+			uutg_emtag_ID INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY (uutg_user_ID, uutg_emtag_ID),
+			UNIQUE taguser(uutg_emtag_ID, uutg_user_ID)",
+			'ENGINE = innodb' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12500, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.10.0-beta
+		db_modify_col( 'T_email__campaign', 'ecmp_auto_send', 'ENUM("no", "subscription") COLLATE ascii_general_ci NOT NULL DEFAULT "no"' );
+		db_drop_col( 'T_email__campaign', 'ecmp_sequence' );
 		upg_task_end();
 	}
 

@@ -13,13 +13,22 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @var AdminUI_general
+ */
+global $AdminUI;
+
+$AdminUI->set_path( 'email', 'newletters' );
 
 // Check permission:
 $current_User->check_perm( 'emails', 'view', true );
 
 load_class( 'email_campaigns/model/_newsletter.class.php', 'Newsletter' );
+load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 
 param_action();
+
+$tab = param( 'tab', 'string', 'general', true );
 
 if( param( 'enlt_ID', 'integer', '', true ) )
 {	// Load Newsletter object:
@@ -29,7 +38,7 @@ if( param( 'enlt_ID', 'integer', '', true ) )
 		unset( $edited_Newsletter );
 		forget_param( 'enlt_ID' );
 		$action = '';
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Newsletter') ), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('List') ), 'error' );
 	}
 }
 
@@ -60,7 +69,7 @@ switch( $action )
 
 			// Insert in DB:
 			$edited_Newsletter->dbinsert();
-			$Messages->add( T_('Newsletter has been created.'), 'success' );
+			$Messages->add( T_('List has been created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
@@ -88,7 +97,7 @@ switch( $action )
 
 			// Update in DB:
 			$edited_Newsletter->dbupdate();
-			$Messages->add( T_('Newsletter has been updated.'), 'success' );
+			$Messages->add( T_('List has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
@@ -112,7 +121,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Newsletter "%s" has been deleted.'), $edited_Newsletter->dget( 'name' ) );
+			$msg = sprintf( T_('List "%s" has been deleted.'), $edited_Newsletter->dget( 'name' ) );
 			$edited_Newsletter->dbdelete();
 			unset( $edited_Newsletter );
 			forget_param( 'enlt_ID' );
@@ -123,7 +132,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Newsletter->check_delete( sprintf( T_('Cannot delete newsletter "%s"'), $edited_Newsletter->dget( 'name' ) ) ) )
+			if( ! $edited_Newsletter->check_delete( sprintf( T_('Cannot delete list "%s"'), $edited_Newsletter->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -147,8 +156,8 @@ switch( $action )
 		$edited_Newsletter->dbupdate();
 
 		$Messages->add( ( $action == 'activate' ?
-			T_('Newsletter has been activated.') :
-			T_('Newsletter has been disactivated.') ), 'success' );
+			T_('List has been activated.') :
+			T_('List has been disactivated.') ), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
@@ -189,8 +198,8 @@ switch( $action )
 			$Settings->dbupdate();
 
 			$Messages->add( sprintf( ( $action == 'enable' ?
-				T_('New users will be automatically subscribed to newsletter: %s') :
-				T_('New users will no longer be automatically subscribed to newsletter: %s') ),
+				T_('New users will be automatically subscribed to list: %s') :
+				T_('New users will no longer be automatically subscribed to list: %s') ),
 				'"'.$edited_Newsletter->get( 'name' ).'"' ), 'success' );
 		}
 
@@ -203,21 +212,67 @@ switch( $action )
 
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=newsletters' );
-$AdminUI->breadcrumbpath_add( T_('Newsletters'), $admin_url.'?ctrl=newsletters' );
+$AdminUI->breadcrumbpath_add( T_('Lists'), $admin_url.'?ctrl=newsletters' );
+if( ! empty( $edited_Newsletter ) )
+{
+	if( $edited_Newsletter->ID > 0 )
+	{	// Edit newsletter
+		$AdminUI->breadcrumbpath_add( $edited_Newsletter->dget( 'name' ), '?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$edited_Newsletter->ID );
+	}
+	else
+	{	// New newsletter
+		$AdminUI->breadcrumbpath_add( $edited_Newsletter->dget( 'name' ), '?ctrl=newsletters&amp;action=new' );
+	}
+}
 
 // Set an url for manual page:
 switch( $action )
 {
 	case 'new':
 	case 'edit':
-		$AdminUI->set_page_manual_link( 'editing-an-email-newsletter' );
+		if( $edited_Newsletter->ID > 0 )
+		{ // Add menu level 3 entries:
+			$AdminUI->add_menu_entries( array( 'email', 'newsletters' ), array(
+					'general' => array(
+						'text' => T_('General'),
+						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=general&amp;enlt_ID='.$edited_Newsletter->ID ),
+					'campaigns' => array(
+						'text' => T_('Campaigns'),
+						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID='.$edited_Newsletter->ID ),
+					'subscribers' => array(
+						'text' => T_('Subscribers'),
+						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=subscribers&amp;enlt_ID='.$edited_Newsletter->ID )
+				) );
+		}
+
+		switch( $tab )
+		{
+			case 'campaigns':
+				$AdminUI->set_page_manual_link( 'email-list-campaigns' );
+				$AdminUI->set_path( 'email', 'newsletters', 'campaigns' );
+				break;
+
+			case 'subscribers':
+				// Initialize date picker for _newsletters_subscribers.view.php
+				init_datepicker_js();
+				// Initialize user tag input
+				init_tokeninput_js();
+				$AdminUI->set_page_manual_link( 'email-list-subscribers' );
+				$AdminUI->set_path( 'email', 'newsletters', 'subscribers' );
+				break;
+
+			default:
+			case 'general':
+				$AdminUI->set_page_manual_link( 'editing-an-email-list' );
+				$AdminUI->set_path( 'email', 'newsletters', 'general' );
+		}
 		break;
+
 	default:
-		$AdminUI->set_page_manual_link( 'email-newsletters' );
+		$AdminUI->set_page_manual_link( 'email-lists' );
+		$AdminUI->set_path( 'email', 'newsletters' );
 		break;
 }
-
-$AdminUI->set_path( 'email', 'newsletters' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -235,14 +290,27 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Newsletter->confirm_delete(
-				sprintf( T_('Delete newsletter "%s"?'), $edited_Newsletter->dget( 'name' ) ),
+				sprintf( T_('Delete list "%s"?'), $edited_Newsletter->dget( 'name' ) ),
 				'newsletter', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
 	case 'edit':
-		// Display a form of new/edited newsletter:
 		memorize_param( 'action', 'string', '' );
-		$AdminUI->disp_view( 'email_campaigns/views/_newsletters.form.php' );
+
+		switch( $tab )
+		{
+			case 'campaigns':
+				$AdminUI->disp_view( 'email_campaigns/views/_newsletters_campaign.view.php' );
+				break;
+
+			case 'subscribers':
+				$AdminUI->disp_view( 'email_campaigns/views/_newsletters_subscriber.view.php' );
+				break;
+
+			case 'general':
+			default:
+				$AdminUI->disp_view( 'email_campaigns/views/_newsletters.form.php' );
+		}
 		break;
 
 	default:

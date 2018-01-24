@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -527,6 +527,7 @@ if( $success_message )
 		if( empty( $recipient_User ) )
 		{	// Send email to visitor/anonymous:
 			// Get a message text from template file
+			$email_template_params['anonymous_recipient_name'] = $recipient_name;
 			$message = mail_template( 'contact_message_new', 'text', $email_template_params );
 			$success_message = send_mail( $recipient_address, $recipient_name, $send_subject, $message, NULL, NULL, array( 'Reply-To' => $sender_address ) );
 		}

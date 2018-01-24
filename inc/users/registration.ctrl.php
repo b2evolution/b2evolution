@@ -53,7 +53,7 @@ switch ( $action )
 		param( 'notify_edit_pst_moderation', 'integer', 0 );
 		param( 'def_newsletters', 'array:integer', array() );
 		param_integer_range( 'notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.') );
-		param_integer_range( 'newsletter_limit', 0, 999, T_('Newsletter limit must be between %d and %d.') );
+		param_integer_range( 'newsletter_limit', 0, 999, T_('List limit must be between %d and %d.') );
 
 		// UPDATE account activation by email
 		param( 'newusers_mustvalidate', 'integer', 0 );

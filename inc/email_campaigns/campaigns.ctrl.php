@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -48,7 +48,7 @@ switch( $action )
 		$NewsletterCache->load_where( 'enlt_active = 1' );
 		if( empty( $NewsletterCache->cache ) )
 		{
-			$Messages->add( T_('You must create an active Newsletter before you can create a new Campaign'), 'error' );
+			$Messages->add( T_('You must create an active List before you can create a new Campaign'), 'error' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
@@ -134,7 +134,7 @@ switch( $action )
 
 		// Update only newsletter of the edited Email Campaign:
 		param( 'ecmp_enlt_ID', 'integer', NULL );
-		param_string_not_empty( 'ecmp_enlt_ID', T_('Please select a newsletter.') );
+		param_string_not_empty( 'ecmp_enlt_ID', T_('Please select a list.') );
 		$edited_EmailCampaign->set_from_Request( 'enlt_ID' );
 
 		// Save changes in DB:
@@ -143,7 +143,7 @@ switch( $action )
 		// Update recipients only if newsletter has been changed:
 		$edited_EmailCampaign->update_recipients( true );
 
-		$Messages->add( T_('Campaign has been attached to a different newsletter.'), 'success' );
+		$Messages->add( T_('Campaign has been attached to a different list.'), 'success' );
 
 		// Redirect after saving:
 		header_redirect( get_campaign_tab_url( $current_tab, $edited_EmailCampaign->ID ), 303 ); // Will EXIT
@@ -186,7 +186,7 @@ switch( $action )
 		$NewsletterCache = & get_NewsletterCache();
 		if( ! ( $Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) ) || ! $Newsletter->get( 'active' ) )
 		{	// If the selected newsletter cannot be used for email campaigns (because it doesn't exist or is not active):
-			$Messages->add( T_('Selected newsletter cannot be used for email campaign.'), 'warning' );
+			$Messages->add( T_('Selected list cannot be used for email campaign.'), 'warning' );
 			header_redirect( $admin_url.'?ctrl=users&action=newsletter&filter=new&newsletter='.$newsletter_ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
@@ -354,6 +354,24 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=crontab&action=view&cjob_ID='.$email_campaign_Cronjob->ID, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
+
+	case 'queue':
+		param( 'ecmp_ID', 'integer', NULL );
+		param( 'user_ID', 'integer', NULL );
+
+		queue_campaign_user( $ecmp_ID, $user_ID );
+		header_redirect( get_campaign_tab_url( 'recipient', $edited_EmailCampaign->ID ), 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'skip':
+		param( 'ecmp_ID', 'integer', NULL );
+		param( 'user_ID', 'integer', NULL );
+
+		skip_campaign_user( $ecmp_ID, $user_ID );
+		header_redirect( get_campaign_tab_url( 'recipient', $edited_EmailCampaign->ID ), 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 
@@ -372,12 +390,12 @@ switch( $action )
 		{	// Check a recipients count after redirect from users list:
 			if( $edited_EmailCampaign->get_recipients_count( 'filter' ) == 0 )
 			{	// No users in the filterset:
-				$Messages->add( T_('No found accounts in filterset. Please try to change the filter of users list.'), 'error' );
+				$Messages->add( T_('No account matches the filterset. Please try to change the filters.'), 'error' );
 			}
 
 			if( $edited_EmailCampaign->get_recipients_count( 'all' ) == 0 )
 			{	// No users for newsletter:
-				$Messages->add( T_('No found active accounts which accept newsletter email. Please try to change the filter of users list.'), 'note' );
+				$Messages->add( T_('No active account accepts email from this list. Please try to change the filters.'), 'note' );
 			}
 
 			$action = 'edit';
@@ -425,6 +443,14 @@ if( $action == 'edit' )
 		require_js( '#jquery#' );
 		require_js( 'jquery/jquery.sortable.min.js' );
 	}
+	elseif( $tab == 'recipient' )
+	{
+		// Initialize date picker
+		init_datepicker_js();
+
+		// Initialize user tag input
+		init_tokeninput_js();
+	}
 }
 else
 { // List of campaigns
@@ -460,7 +486,7 @@ switch( $action )
 			case 'compose':
 				if( $edited_EmailCampaign->get( 'email_text' ) == '' && !param_errors_detected() )
 				{ // Set default value for HTML message
-					$edited_EmailCampaign->set( 'email_text', 'Hello $login$!'."\r\n\r\n".'This is our newsletter...' );
+					$edited_EmailCampaign->set( 'email_text', sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...') );
 				}
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_compose.form.php' );
 				break;

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -341,14 +341,15 @@ class User extends DataObject
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
 				array( 'table' => 'T_files', 'fk'=>'file_creator_user_ID', 'and_condition'=>'file_root_type != "user"', 'msg'=>T_('%d files will lose their creator ID.') ),
-				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d newsletter emails for this user') ),
+				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d list emails for this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_target_user_ID', 'msg'=>T_('%d reports about this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_reporter_ID', 'msg'=>T_('%d reports created by this user') ),
 				array( 'table'=>'T_users__user_org', 'fk'=>'uorg_user_ID', 'msg'=>T_('%d organization membership') ),
+				array( 'table'=>'T_users__usertag', 'fk'=>'uutg_user_ID', 'msg'=>T_('%d links to tags') ),
 				array( 'table'=>'T_polls__answer', 'fk'=>'pans_user_ID', 'msg'=>T_('%d poll answers') ),
 				array( 'table'=>'T_users__secondary_user_groups', 'fk'=>'sug_user_ID', 'msg'=>T_('%d secondary groups') ),
 				array( 'table'=>'T_users__profile_visits', 'fk'=>'upv_visited_user_ID', 'msg'=>T_('%d profile visits') ),
-				array( 'table'=>'T_email__newsletter_subscription', 'fk'=>'enls_user_ID', 'msg'=>T_('%d newsletter subscriptions') ),
+				array( 'table'=>'T_email__newsletter_subscription', 'fk'=>'enls_user_ID', 'msg'=>T_('%d list subscriptions') ),
 			);
 	}
 
@@ -868,6 +869,13 @@ class User extends DataObject
 					}
 				}
 			}
+
+			// Tags
+			$user_tags = param( 'edited_user_tags', 'string', NULL );
+			if( $user_tags != NULL )
+			{
+				$this->set_usertags_from_string( get_param( 'edited_user_tags' ) );
+			}
 		}
 
 		// ******* Identity form ******* //
@@ -880,7 +888,7 @@ class User extends DataObject
 			$age_min = param( 'edited_user_age_min', 'string', ! $is_api_request ? true : NULL );
 			$age_max = param( 'edited_user_age_max', 'string', ! $is_api_request ? true : NULL );
 
-			if( isset( $age_min ) && isset( $age_max ) )
+			if( isset( $age_min ) && isset( $age_max ) || $is_identity_form )
 			{
 				param_check_interval( 'edited_user_age_min', 'edited_user_age_max', T_('Age must be a number.'), T_('The first age must be lower than (or equal to) the second.') );
 				if( !param_has_error( 'edited_user_age_min' ) && $Settings->get( 'minimum_age' ) > 0 &&
@@ -896,7 +904,7 @@ class User extends DataObject
 			if( ( in_array( $firstname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $can_edit_users ) )
 			{	// User has a permissions to save Firstname
 				$edited_user_firstname = param( 'edited_user_firstname', 'string', ! $is_api_request || $firstname_editing == 'edited-user-required' ? true : NULL );
-				if( isset( $edited_user_firstname ) )
+				if( isset( $edited_user_firstname ) || $is_identity_form )
 				{
 					if( $firstname_editing == 'edited-user-required' )
 					{	// First name is required
@@ -906,39 +914,39 @@ class User extends DataObject
 				}
 			}
 
-				$lastname_editing = $Settings->get( 'lastname_editing' );
-				if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $can_edit_users ) )
-				{	// User has a permissions to save Lastname
-					$edited_user_lastname = param( 'edited_user_lastname', 'string', ! $is_api_request || $lastname_editing == 'edited-user-required' ? true : NULL );
-					if( isset( $edited_user_lastname ) )
-					{
-						if( $lastname_editing == 'edited-user-required' )
-						{	// Last name is required
-							param_check_not_empty( 'edited_user_lastname', T_('Please enter last name.') );
-						}
-						$this->set_from_Request('lastname', 'edited_user_lastname', true);
+			$lastname_editing = $Settings->get( 'lastname_editing' );
+			if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $can_edit_users ) )
+			{	// User has a permissions to save Lastname
+				$edited_user_lastname = param( 'edited_user_lastname', 'string', ! $is_api_request || $lastname_editing == 'edited-user-required' ? true : NULL );
+				if( isset( $edited_user_lastname ) || $is_identity_form )
+				{
+					if( $lastname_editing == 'edited-user-required' )
+					{	// Last name is required
+						param_check_not_empty( 'edited_user_lastname', T_('Please enter last name.') );
 					}
+					$this->set_from_Request('lastname', 'edited_user_lastname', true);
 				}
+			}
 
-				$nickname_editing = $Settings->get( 'nickname_editing' );
-				if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $can_edit_users ) )
-				{	// User has a permissions to save Nickname
-					$edited_user_nickname = param( 'edited_user_nickname', 'string', ! $is_api_request || $nickname_editing == 'edited-user-required' ? true : NULL );
-					if( isset( $edited_user_nickname ) )
-					{
-						if( $nickname_editing == 'edited-user-required' )
-						{	// Nickname is required
-							param_check_not_empty( 'edited_user_nickname', T_('Please enter your nickname.') );
-						}
-						$this->set_from_Request('nickname', 'edited_user_nickname', true);
+			$nickname_editing = $Settings->get( 'nickname_editing' );
+			if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $can_edit_users ) )
+			{	// User has a permissions to save Nickname
+				$edited_user_nickname = param( 'edited_user_nickname', 'string', ! $is_api_request || $nickname_editing == 'edited-user-required' ? true : NULL );
+				if( isset( $edited_user_nickname ) || $is_identity_form )
+				{
+					if( $nickname_editing == 'edited-user-required' )
+					{	// Nickname is required
+						param_check_not_empty( 'edited_user_nickname', T_('Please enter your nickname.') );
 					}
+					$this->set_from_Request('nickname', 'edited_user_nickname', true);
 				}
+			}
 
 			$gender_editing = $Settings->get( 'registration_require_gender' );
 			if( $this->ID == $current_User->ID || ( $gender_editing != 'hidden' && $can_edit_users ) )
 			{
 				$edited_user_gender = param( 'edited_user_gender', 'string' );
-				if( isset( $edited_user_gender ) )
+				if( isset( $edited_user_gender ) || $is_identity_form )
 				{
 					param_check_gender( 'edited_user_gender', $gender_editing == 'required' );
 					$this->set_from_Request('gender', 'edited_user_gender', true);
@@ -951,8 +959,8 @@ class User extends DataObject
 			if( user_country_visible() )
 			{ // Save country
 				$country_is_required = ( $Settings->get( 'location_country' ) == 'required' && countries_exist() );
-				$edited_user_ctry_ID = param( 'edited_user_ctry_ID', 'integer', ! $is_api_request || $country_is_required ? true : NULL);
-				if( isset( $edited_user_ctry_ID ) )
+				$edited_user_ctry_ID = param( 'edited_user_ctry_ID', 'integer', ! $is_api_request || $country_is_required ? true : NULL );
+				if( isset( $edited_user_ctry_ID ) || $is_identity_form )
 				{
 					if( $country_is_required && $can_edit_users && $edited_user_ctry_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -970,7 +978,7 @@ class User extends DataObject
 			{ // Save region
 				$region_is_required = ( $Settings->get( 'location_region' ) == 'required' && regions_exist( $edited_user_ctry_ID ) );
 				$edited_user_rgn_ID = param( 'edited_user_rgn_ID', 'integer', ! $is_api_request || $region_is_required ? true : NULL );
-				if( isset( $edited_user_rgn_ID ) )
+				if( isset( $edited_user_rgn_ID ) || $is_identity_form  )
 				{
 					if( $region_is_required && $can_edit_users && $edited_user_rgn_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -988,7 +996,7 @@ class User extends DataObject
 			{ // Save subregion
 				$subregion_is_required = ( $Settings->get( 'location_subregion' ) == 'required' && subregions_exist( $edited_user_rgn_ID ) );
 				$edited_user_subrg_ID = param( 'edited_user_subrg_ID', 'integer', ! $is_api_request || $subregion_is_required ? true : NULL );
-				if( isset( $edited_user_subrg_ID ) )
+				if( isset( $edited_user_subrg_ID ) || $is_identity_form  )
 				{
 					if( $subregion_is_required && $can_edit_users && $edited_user_subrg_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -1006,7 +1014,7 @@ class User extends DataObject
 			{ // Save city
 				$city_is_required = ( $Settings->get( 'location_city' ) == 'required' && cities_exist( $edited_user_ctry_ID, $edited_user_rgn_ID, $edited_user_subrg_ID ) );
 				$edited_user_city_ID = param( 'edited_user_city_ID', 'integer', ! $is_api_request || $city_is_required ? true : NULL );
-				if( isset( $edited_user_city_ID ) )
+				if( isset( $edited_user_city_ID ) || $is_identity_form )
 				{
 					if( $city_is_required && $can_edit_users && $edited_user_city_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -1447,18 +1455,25 @@ class User extends DataObject
 				{
 					// A selected blog to subscribe
 					$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
-					// Get checkbox values:
-					$sub_items    = param( 'sub_items_new',    'integer', 0 );
-					$sub_comments = param( 'sub_comments_new', 'integer', 0 );
+
+					$sub_items    = 1;
+					$sub_comments = 0; // We normally subscribe to new posts only
 
 					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
-					if( $subscribe_blog_ID && ( $sub_items || $sub_comments ) )
+					if( $subscribe_blog_ID )
 					{ // We need to record values:
 						$BlogCache = & get_BlogCache();
 						$subscribe_Blog = & $BlogCache->get_by_ID( $subscribe_blog_ID, false, false );
 
 						if( $subscribe_Blog->has_access( $this ) )
 						{ // user has access to the collection
+
+							// erhsatingin > it seems we do need to check if subscription is allowed, at least for new posts
+							if( ! $subscribe_Blog->get_setting( 'allow_subscriptions' ) )
+							{ // Subscription to new posts is not allowed so we subscribe to new comments instead
+								$sub_comments = 1;
+							}
+
 							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
 								VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
 
@@ -1561,7 +1576,7 @@ class User extends DataObject
 				// Emails limit per day
 				param_integer_range( 'edited_user_notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.'), ! $is_api_request );
 				$UserSettings->set( 'notification_email_limit', param( 'edited_user_notification_email_limit', 'integer', 0 ), $this->ID );
-				param_integer_range( 'edited_user_newsletter_limit', 0, 999, T_('Newsletter limit must be between %d and %d.'), ! $is_api_request );
+				param_integer_range( 'edited_user_newsletter_limit', 0, 999, T_('List limit must be between %d and %d.'), ! $is_api_request );
 				$UserSettings->set( 'newsletter_limit', param( 'edited_user_newsletter_limit', 'integer', 0 ), $this->ID );
 
 				// If notifications are temporarily disabled, no subscription options should be lost when user saves.
@@ -3953,6 +3968,7 @@ class User extends DataObject
 				$this->new_fields = array();
 			}
 
+			// NEWSLETTERS:
 			$insert_newsletters = array();
 			if( isset( $Settings ) && ( ! isset( $this->insert_default_newsletters ) || $this->insert_default_newsletters ) )
 			{	// Insert default newsletter subscriptions for this user,
@@ -3967,6 +3983,12 @@ class User extends DataObject
 			if( ! empty( $insert_newsletters ) )
 			{	// Do subscribing if at least one newsletter is selected by default:
 				$this->subscribe( array_unique( $insert_newsletters ) );
+			}
+
+			// USER TAGS:
+			if( $result )
+			{ // Let's handle the tags
+				$this->insert_update_user_tags( 'insert' );
 			}
 
 			// Notify plugins:
@@ -4055,7 +4077,19 @@ class User extends DataObject
 		}
 
 		// Update newsletter subscriptions:
-		$this->update_newsletter_subscriptions();
+		if( $this->newsletter_subscriptions_updated )
+		{	// Only if they have been changed:
+			// Insert newsletter subscriptions for this user:
+			$this->subscribe( $this->new_newsletter_subscriptions );
+			// Unsubscribe from unchecked newsletters:
+			$this->unsubscribe( array_diff( $this->get_newsletter_subscriptions( 'all' ), $this->new_newsletter_subscriptions ) );
+		}
+
+		// Update user tags:
+		if( isset( $this->dbchanges_flags['user_tags'] ) )
+		{ // Let's handle the tags:
+			$this->insert_update_user_tags( 'update' );
+		}
 
 		// Notify plugins:
 		// Example: An authentication plugin could synchronize/update the password of the user.
@@ -5260,7 +5294,7 @@ class User extends DataObject
 			$load_result = $this->load_from_Request();
 		}
 
-		
+
 		if( ! $load_result )
 		{	// We have found validation errors:
 			if( $is_new_user || ( $is_admin_form && ( $this->ID != 1 ) ) )
@@ -5306,6 +5340,12 @@ class User extends DataObject
 					$Messages->add( T_('Profile has been updated.'), 'success' );
 					syslog_insert( sprintf( 'User %s was renamed to %s', '[['.$user_old_login.']]', '[['.$this->login.']]' ), 'info', 'user', $this->ID );
 				}
+			}
+
+			if( isset( $this->dbchanges_flags['user_tags'] ) )
+			{ // Let's handle the tags:
+				//die( var_dump( $this->tags ) );
+				$this->insert_update_user_tags( 'update' );
 			}
 
 			if( $update_success )
@@ -7462,7 +7502,7 @@ class User extends DataObject
 					'unsubscribed' => array(),
 				);
 
-			$SQL = new SQL( 'Get newsletter subscriptions of user #'.$this->ID );
+			$SQL = new SQL( 'Get list subscriptions of user #'.$this->ID );
 			$SQL->SELECT( 'enls_enlt_ID, enls_subscribed' );
 			$SQL->FROM( 'T_email__newsletter_subscription' );
 			$SQL->WHERE( 'enls_user_ID = '.$this->ID );
@@ -7552,36 +7592,6 @@ class User extends DataObject
 
 
 	/**
-	 * Update newsletter subscriptions of this user
-	 *
-	 * @return integer|boolean # of rows affected or false if error
-	 */
-	function update_newsletter_subscriptions()
-	{
-		if( empty( $this->ID ) )
-		{	// Only created user can has the newsletter subscriptions:
-			return false;
-		}
-
-		if( ! $this->newsletter_subscriptions_updated )
-		{	// Nothing to update:
-			return false;
-		}
-
-		// Insert newsletter subscriptions for this user:
-		$r = $this->subscribe( $this->new_newsletter_subscriptions );
-
-		// Unsubscribe from unchecked newsletters:
-		$r += $this->unsubscribe( array_diff( $this->get_newsletter_subscriptions( 'all' ), $this->new_newsletter_subscriptions ) );
-
-		// Unset flag to don't run this twice:
-		$this->newsletter_subscriptions_updated = false;
-
-		return $r;
-	}
-
-
-	/**
 	 * Subscribe to newsletter
 	 *
 	 * @param array|integer Newsletter IDs
@@ -7608,7 +7618,7 @@ class User extends DataObject
 			$newsletter_IDs = array( $newsletter_IDs );
 		}
 
-		// Decide what newsletter subsciptions should be inserted into DB and what should be updated:
+		// Decide what newsletter subscriptions should be inserted into DB and what should be updated:
 		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'all' );
 		$insert_newsletter_IDs = array_diff( $newsletter_IDs, $newsletter_subscriptions );
 		$update_newsletter_IDs = array_intersect( $newsletter_IDs, $newsletter_subscriptions );
@@ -7624,7 +7634,7 @@ class User extends DataObject
 			}
 			$r += $DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID, enls_subscribed, enls_subscribed_ts )
 				VALUES '.implode( ', ', $insert_newsletter_sql_values ),
-				'Subscribe(insert new subscriptions) user #'.$this->ID.' to newsletters #'.implode( ',', $insert_newsletter_IDs ) );
+				'Subscribe(insert new subscriptions) user #'.$this->ID.' to lists #'.implode( ',', $insert_newsletter_IDs ) );
 
 			// Send emails of campaigns which must be sent at subscription:
 			$this->send_auto_subscriptions( $insert_newsletter_IDs );
@@ -7638,10 +7648,13 @@ class User extends DataObject
 			WHERE enls_user_ID = '.$DB->quote( $this->ID ).'
 			  AND enls_enlt_ID IN ( '.$DB->quote( $update_newsletter_IDs ).' )
 			  AND enls_subscribed = 0',
-			'Subscribe(update unsubscriptions) user #'.$this->ID.' to newsletters #'.implode( ',', $update_newsletter_IDs ) );
+			'Subscribe(update unsubscriptions) user #'.$this->ID.' to lists #'.implode( ',', $update_newsletter_IDs ) );
 		}
 
 		$DB->commit();
+
+		// Unset flag in order not to run this twice:
+		$this->newsletter_subscriptions_updated = false;
 
 		return $r;
 	}
@@ -7678,7 +7691,7 @@ class User extends DataObject
 			WHERE enls_user_ID = '.$DB->quote( $this->ID ).'
 			  AND enls_enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )
 			  AND enls_subscribed = 1',
-			'Unsubscribe user #'.$this->ID.' from newsletters #'.implode( ',', $newsletter_IDs ) );
+			'Unsubscribe user #'.$this->ID.' from lists #'.implode( ',', $newsletter_IDs ) );
 	}
 
 
@@ -7697,7 +7710,7 @@ class User extends DataObject
 
 		if( count( $new_subscriptions ) )
 		{	// User is really subscribing to new newsletters:
-			$SQL = new SQL( 'Get email campaigns(of newsletters #'.implode( ',', $new_subscriptions ).') which must be sent at subscription' );
+			$SQL = new SQL( 'Get email campaigns(of lists #'.implode( ',', $new_subscriptions ).') which must be sent at subscription' );
 			$SQL->SELECT( '*' );
 			$SQL->FROM( 'T_email__campaign' );
 			$SQL->WHERE( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' )' );
@@ -7711,6 +7724,166 @@ class User extends DataObject
 				$EmailCampaign->send_all_emails( false, array( $this->ID ) );
 			}
 		}
+	}
+
+
+	/**
+	 * Retrieves all tags assigned to user
+	 *
+	 * @return array of tags
+	 */
+	function get_usertags()
+	{
+		if( ! isset( $this->user_tags ) )
+		{
+			global $DB;
+
+			$tags_SQL = new SQL( 'Get tags' );
+			$tags_SQL->SELECT( 'utag_name' );
+			$tags_SQL->FROM( 'T_users__tag' );
+			$tags_SQL->FROM_add( 'INNER JOIN T_users__usertag ON uutg_emtag_ID = utag_ID' );
+			$tags_SQL->WHERE( 'uutg_user_ID = '.$DB->quote( $this->ID ) );
+
+			$this->user_tags = $DB->get_col( $tags_SQL );
+		}
+
+		return $this->user_tags;
+	}
+
+
+	/**
+	 * Save tags to DB
+	 *
+	 * @param string 'insert' | 'update'
+	 */
+	function insert_update_user_tags( $mode )
+	{
+		global $DB;
+
+		if( isset( $this->user_tags ) )
+		{ // Okay the tags are defined:
+
+			$DB->begin();
+
+			if( $mode == 'update' )
+			{	// delete previous tag associations:
+				// Note: actual tags never get deleted
+				$DB->query( 'DELETE FROM T_users__usertag
+											WHERE uutg_user_ID = '.$this->ID, 'delete previous tags' );
+			}
+
+			if( ! empty( $this->user_tags ) )
+			{
+				// Find the tags that are already in the DB
+				$query = 'SELECT utag_name
+										FROM T_users__tag
+									 WHERE utag_name IN ('.$DB->quote( $this->user_tags ).')';
+				$existing_tags = $DB->get_col( $query, 0, 'Find existing tags' );
+
+				$new_tags = array_diff( $this->user_tags, $existing_tags );
+
+				if( ! empty( $new_tags ) )
+				{ // insert new tags:
+					$query = "INSERT INTO T_users__tag( utag_name ) VALUES ";
+					foreach( $new_tags as $tag )
+					{
+						$query .= '( '.$DB->quote( $tag ).' ),';
+					}
+					$query = substr( $query, 0, strlen( $query ) - 1 );
+					$DB->query( $query, 'insert new tags' );
+				}
+
+				// ASSOC:
+				$query = 'INSERT INTO T_users__usertag( uutg_user_ID, uutg_emtag_ID )
+								  SELECT '.$this->ID.', utag_ID
+									  FROM T_users__tag
+									 WHERE utag_name IN ('.$DB->quote( $this->user_tags ).')';
+				$DB->query( $query, 'Make tag associations!' );
+			}
+
+			$DB->commit();
+		}
+	}
+
+
+	/**
+	 * Split tags by comma or semicolon
+	 *
+	 * @param string The tags, separated by comma or semicolon
+	 */
+	function set_usertags_from_string( $user_tags )
+	{
+		// Mark that tags has been updated, even if it is not sure because we do not want to execute extra db query
+		$this->dbchanges_flags['user_tags'] = true;
+
+		if( $user_tags === '' )
+		{
+			$this->user_tags = array();
+			return;
+		}
+
+		$this->user_tags = preg_split( '/\s*[;,]+\s*/', $user_tags, -1, PREG_SPLIT_NO_EMPTY );
+		foreach( $this->user_tags as $t => $user_tag )
+		{
+			if( substr( $user_tag, 0, 1 ) == '-' )
+			{ // Prevent chars '-' in first position
+				$user_tag = preg_replace( '/^-+/', '', $user_tag );
+			}
+			if( empty( $user_tag ) )
+			{ // Don't save empty tag
+				unset( $this->user_tags[ $t ] );
+			}
+			else
+			{ // Save the modifications for each tag
+				$this->user_tags[ $t ] = $user_tag;
+			}
+		}
+
+		// Remove the duplicate tags
+		$this->user_tags = array_unique( $this->user_tags );
+	}
+
+
+	/**
+	 * Append user tags
+	 *
+	 * @param string/array comma separated tags or array of tags
+	 */
+	function add_usertags( $user_tags )
+	{
+		if( empty( $user_tags ) )
+		{
+			return;
+		}
+
+		if( ! is_array( $user_tags ) )
+		{
+			$user_tags = preg_split( '/\s*[;,]+\s*/', $user_tags, -1, PREG_SPLIT_NO_EMPTY );
+		}
+
+		$this->get_usertags();
+		foreach( $user_tags as $t => $user_tag )
+		{
+			// Replace ; and , in case $tags parameter was passed as an array
+			$user_tag = str_replace( array( ';', ',' ), ' ', $user_tag );
+
+			if( substr( $user_tag, 0, 1 ) == '-' )
+			{ // Prevent chars '-' in first position
+				$user_tag = preg_replace( '/^-+/', '', $user_tag );
+			}
+			if( empty( $user_tag ) )
+			{ // Don't save empty tag
+				unset( $user_tags[ $t ] );
+			}
+			else
+			{ // Append the tag and mark that tags has been updated
+				$this->dbchanges_flags['user_tags'] = true;
+				$this->user_tags[] = $user_tag;
+			}
+		}
+
+		// Remove the duplicate tags
+		$this->user_tags = array_unique( $this->user_tags );
 	}
 }
 

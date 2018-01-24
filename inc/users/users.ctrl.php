@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -384,7 +384,7 @@ if( !$Messages->has_errors() )
 
 			if( ! param( 'newsletter', 'integer', 0 ) )
 			{	// Don't allow all newsletters for selecting of recipients for email campaign:
-				$Messages->add( T_('Any email campaign must be sent to subscribers of a particular newsletter. Please select a newsletter in your filters.'), 'error' );
+				$Messages->add( T_('Any email campaign must be sent to subscribers of a particular list. Please select a list in your filters.'), 'error' );
 
 				load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 				if( $edited_EmailCampaign = & get_session_EmailCampaign() )
@@ -421,6 +421,9 @@ if( $tab == 'stats' )
 }
 else
 {	// Users list
+
+	// Initialize user tag input
+	init_tokeninput_js();
 	$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
 	$AdminUI->top_block = get_user_quick_search_form();
 	if( $current_User->check_perm( 'users', 'moderate', false ) )
@@ -432,6 +435,9 @@ else
 	// Set an url for manual page:
 	$AdminUI->set_page_manual_link( 'users-users' );
 }
+
+// Initialize date picker
+init_datepicker_js();
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -205,12 +205,30 @@ $schema_queries = array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_users__profile_visits' => array(
-		'Crating table for profile visits',
+		'Creating table for profile visits',
 		"CREATE TABLE T_users__profile_visits (
 			upv_visited_user_ID INT(11) UNSIGNED NOT NULL,
 			upv_visitor_user_ID INT(11) UNSIGNED NOT NULL,
 			upv_last_visit_ts   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__tag' => array(
+		'Creating table for user tags',
+		"CREATE TABLE T_users__tag (
+			utag_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			utag_name VARCHAR(200) NOT NULL,
+			PRIMARY KEY (utag_ID),
+			UNIQUE  utag_name(utag_name)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__usertag' => array(
+		'Creating table for User-to-Tag relationships',
+		"CREATE TABLE T_users__usertag (
+			uutg_user_ID INT(11) UNSIGNED NOT NULL,
+			uutg_emtag_ID INT(11)  UNSIGNED NOT NULL,
+			PRIMARY KEY (uutg_user_ID, uutg_emtag_ID),
+			UNIQUE taguser(uutg_emtag_ID, uutg_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_i18n_original_string' => array(
@@ -532,8 +550,7 @@ $schema_queries = array(
 			ecmp_renderers       VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0,
 			ecmp_send_ctsk_ID    INT(10) UNSIGNED NULL DEFAULT NULL,
-			ecmp_auto_send       ENUM('no', 'subscription', 'sequence') COLLATE ascii_general_ci NOT NULL DEFAULT 'no',
-			ecmp_sequence        INT UNSIGNED NULL DEFAULT NULL,
+			ecmp_auto_send       ENUM('no', 'subscription') COLLATE ascii_general_ci NOT NULL DEFAULT 'no',
 			PRIMARY KEY          (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
@@ -542,6 +559,7 @@ $schema_queries = array(
 		"CREATE TABLE T_email__campaign_send (
 			csnd_camp_ID  INT(11) UNSIGNED NOT NULL,
 			csnd_user_ID  INT(11) UNSIGNED NOT NULL,
+			csnd_status   ENUM('ready_to_send', 'ready_to_resend', 'sent', 'send_error', 'skipped' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ready_to_send',
 			csnd_emlog_ID INT(11) UNSIGNED NULL,
 			PRIMARY KEY   csnd_PK ( csnd_camp_ID, csnd_user_ID )
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),

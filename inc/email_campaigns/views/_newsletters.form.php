@@ -22,12 +22,12 @@ $Form = new Form( NULL, 'newsletter_form', 'post', 'compact' );
 
 if( ! $creating && $current_User->check_perm( 'emails', 'edit' ) )
 {	// Display a button to delete existing newsletter if current User has a perm:
-	$Form->global_icon( T_('Delete this newsletter!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb( 'newsletter' ) ) );
+	$Form->global_icon( T_('Delete this list!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb( 'newsletter' ) ) );
 }
 // Display a button to close the newsletter form:
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,enlt_ID' ) );
 
-$Form->begin_form( 'fform', ( $creating ?  T_('Create newsletter') : T_('Newsletter') ).get_manual_link( 'editing-an-email-newsletter' ) );
+$Form->begin_form( 'fform', ( $creating ?  T_('Create list') : T_('List') ).get_manual_link( 'editing-an-email-list' ) );
 
 $Form->add_crumb( 'newsletter' );
 $Form->hidden( 'ctrl', 'newsletters' );
@@ -55,48 +55,4 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 	}
 }
 $Form->end_form( $buttons );
-
-if( $edited_Newsletter->ID > 0 )
-{	// Display users which are subscribed to this Newsletter:
-	users_results_block( array(
-			'enlt_ID'              => $edited_Newsletter->ID,
-			'enls_subscribed'      => NULL,
-			'filterset_name'       => 'nltsub_'.$edited_Newsletter->ID,
-			'results_param_prefix' => 'nltsub_',
-			'results_title'        => T_('Subscribers').get_manual_link( 'newsletter-subscribers' ),
-			'results_order'        => '/enls_last_sent_manual_ts/D',
-			'page_url'             => get_dispctrl_url( 'newsletters', 'action=edit&amp;enlt_ID='.$edited_Newsletter->ID ),
-			'display_ID'           => false,
-			'display_btn_adduser'  => false,
-			'display_btn_addgroup' => false,
-			'display_avatar'       => false,
-			'display_firstname'    => true,
-			'display_lastname'     => true,
-			'display_name'         => false,
-			'display_gender'       => false,
-			'display_country'      => false,
-			'display_blogs'        => false,
-			'display_source'       => false,
-			'display_regdate'      => false,
-			'display_regcountry'   => false,
-			'display_update'       => false,
-			'display_lastvisit'    => false,
-			'display_contact'      => false,
-			'display_reported'     => false,
-			'display_group'        => false,
-			'display_level'        => false,
-			'display_status'       => false,
-			'display_actions'      => false,
-			'display_newsletter'   => false,
-			'display_enls_subscribed'      => true,
-			'display_enls_subscribed_ts'   => true,
-			'display_enls_unsubscribed_ts' => true,
-			'display_enls_sent_manual'     => true,
-			'display_enls_send_count'      => true,
-			'th_class_login'       => 'shrinkwrap',
-			'td_class_login'       => '',
-			'th_class_nickname'    => 'shrinkwrap',
-			'td_class_nickname'    => '',
-		) );
-}
 ?>
