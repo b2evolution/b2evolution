@@ -620,16 +620,17 @@ class AutomationStep extends DataObject
 		// Array to convert operator names to log format:
 		$log_operators = array(
 				'equal'            => '=',
-				'not_equal'        => '!=',
+				'not_equal'        => $is_cli ? '!=' : '&#8800;',
 				'less'             => '<',
-				'less_or_equal'    => '<=',
+				'less_or_equal'    => $is_cli ? '<=' : '&#8804;',
 				'greater'          => '>',
-				'greater_or_equal' => '>=',
+				'greater_or_equal' => $is_cli ? '>=' : '&#8805;',
 				'between'          => array( 'BETWEEN', 'AND' ),
 				'not_between'      => array( 'NOT BETWEEN', 'AND' ),
 			);
-		$log_bold_start = empty( $is_cli ) ? '<b>' : '*';
-		$log_bold_end = empty( $is_cli ) ? '</b>' : '*';
+		$log_bold_start = $is_cli ? '*' : '<b>';
+		$log_bold_end = $is_cli ? '*' : '</b>';
+		$log_rule_separator = ', ';
 
 		if( $json_object->condition == 'AND' )
 		{	// Default result for group with operator 'AND':
@@ -646,19 +647,20 @@ class AutomationStep extends DataObject
 		{
 			if( $conditions_result == $stop_result )
 			{	// Skip this rule because previous rules already returned the end result for current condition(AND|OR):
-				$log .= ', '.$log_bold_start.'ignored'.$log_bold_end;
+				$log .= $log_rule_separator.$log_bold_start.'ignored'.$log_bold_end;
 				continue;
 			}
 
 			if( isset( $rule->rules ) && is_array( $rule->rules ) )
 			{	// This is a group of conditions, Run this function recursively:
+				$log .= $log_rule_separator;
 				$rule_result = $this->check_if_condition_object( $rule, $step_User, $log );
 			}
 			else
 			{	// This is a single field:
 				$rule_result = $this->check_if_condition_rule( $rule, $step_User, $log );
 				// Log:
-				$log .= ', '.$rule->field.' ';
+				$log .= $log_rule_separator.$rule->field.' ';
 				if( is_array( $log_operators[ $rule->operator ] ) )
 				{	// Multiple operator and values:
 					foreach( $log_operators[ $rule->operator ] as $o => $operator )

@@ -130,6 +130,16 @@ jQuery( document ).ready( function()
 			remove_rule: 'fa fa-close',
 			error: 'fa fa-warning',
 		},
+		lang: {
+			operators: {
+				equal: '=',
+				not_equal: '&#8800;',
+				less: '<',
+				less_or_equal: '&#8804;',
+				greater: '>',
+				greater_or_equal: '&#8805;',
+			}
+		},
 
 		filters: [
 		{
