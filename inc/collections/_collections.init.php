@@ -1286,7 +1286,7 @@ class collections_Module extends Module
 				break; // already exited here
 
 			case 'create_post':
-				// Create new post from front-office:
+				// Create new post from front-office by anonymous user:
 				global $dummy_fields, $Plugins;
 
 				load_class( 'items/model/_item.class.php', 'Item' );
@@ -1314,7 +1314,7 @@ class collections_Module extends Module
 				$item_Blog = & $new_Item->get_Blog();
 
 				// Set default status:
-				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status' ) );
+				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status_anon' ) );
 
 				if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $user_email ) ) ) )
 				{	// Don't allow the duplicate emails for users:

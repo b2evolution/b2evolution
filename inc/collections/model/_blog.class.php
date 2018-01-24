@@ -855,6 +855,7 @@ class Blog extends DataObject
 			$this->set_setting( 'post_anonymous', param( 'post_anonymous', 'integer', 0 ) );
 
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
+			$this->set_setting( 'default_post_status_anon', param( 'default_post_status_anon', 'string', NULL ) );
 
 			param( 'old_content_alert', 'integer', NULL );
 			param_check_range( 'old_content_alert', 1, 12, T_('Stale content alert must be configured with a number of months.').'(1 - 12)', false );
