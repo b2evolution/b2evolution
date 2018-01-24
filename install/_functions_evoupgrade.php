@@ -8931,6 +8931,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12510, 'Upgrading email log table...' ) )
+	{ // part of 6.10.0-beta
+		db_add_col( 'T_email__log', 'emlog_key', 'VARCHAR(32) NOT NULL DEFAULT "" AFTER emlog_ID' );
+		db_add_col( 'T_email__log', 'emlog_last_open_ts', 'TIMESTAMP NULL AFTER emlog_message' );
+		db_add_col( 'T_email__log', 'emlog_last_click_ts', 'TIMESTAMP NULL AFTER emlog_last_open_ts' );
+		db_add_index( 'T_email__log', 'emlog_key', 'emlog_key', 'UNIQUE' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
