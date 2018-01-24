@@ -1361,7 +1361,7 @@ class collections_Module extends Module
 				{	// Unsubscribe from newsletter:
 					if( $current_User->unsubscribe( $Newsletter->ID ) )
 					{
-						$Messages->add( T_('You have successfully unsubscribed.'), 'success' );
+						$Messages->add( sprintf( T_('You have unsubscribed and you will no longer receive emails from %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
 					}
 				}
 				else
@@ -1373,7 +1373,7 @@ class collections_Module extends Module
 							$current_User->add_usertags( $insert_user_tags );
 							$current_User->dbupdate();
 						}
-						$Messages->add( T_('You have successfully subscribed.'), 'success' );
+						$Messages->add( sprintf( T_('You have successfully subscribed to: %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
 					}
 				}
 

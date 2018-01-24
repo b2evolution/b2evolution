@@ -5333,6 +5333,7 @@ function users_results_block( $params = array() )
 			'display_enlt_status'  => false,
 			'display_camp_status'  => false,
 			'display_emlog_date'   => false,
+			'display_email_tracking' => false,
 			'display_enls_subscribed'      => false,
 			'display_enls_subscribed_ts'   => false,
 			'display_enls_unsubscribed_ts' => false,
@@ -5555,6 +5556,7 @@ function users_results( & $UserList, $params = array() )
 			'display_status'     => true,
 			'display_camp_status' => false,
 			'display_emlog_date' => false,
+			'display_email_tracking' => false,
 			'display_enls_subscribed'      => false,
 			'display_enls_subscribed_ts'   => false,
 			'display_enls_unsubscribed_ts' => false,
@@ -5940,6 +5942,27 @@ function users_results( & $UserList, $params = array() )
 				'order' => 'emlog_timestamp',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #emlog_timestamp# )%',
+			);
+	}
+
+	if( $params['display_email_tracking'] )
+	{
+		$UserList->cols[] = array(
+				'th' => T_('Last opened'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'emlog_last_open_ts',
+				'default_dir' => 'D',
+				'td' => '%user_td_emlog_date( #emlog_last_open_ts# )%',
+			);
+
+		$UserList->cols[] = array(
+				'th' => T_('Last clicked'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'emlog_last_click_ts',
+				'default_dir' => 'D',
+				'td' => '%user_td_emlog_date( #emlog_last_click_ts# )%',
 			);
 	}
 

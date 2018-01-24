@@ -268,8 +268,9 @@ function emlog_result_info( $result, $params = array() )
  * @param string Message
  * @param string Headers
  * @param string Result type ( 'ok', 'error', 'blocked', 'simulated' )
+ * @param string Key for email tracking
  */
-function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
+function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_key = NULL )
 {
 	global $DB, $servertimenow;
 
@@ -286,11 +287,21 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
 
 	$to = utf8_strtolower( $to );
 
+	if( empty( $email_key ) )
+	{
+		do
+		{
+			$email_key = generate_random_key();
+		}
+		while( email_key_exists( $email_key ) );
+	}
+
 	// Insert mail log
 	$DB->query( 'INSERT INTO T_email__log
-		( emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers )
+		( emlog_key, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers )
 		VALUES
-		( '.$DB->quote( date2mysql( $servertimenow ) ).',
+		( '.( empty( $email_key ) ? 'NULL' : $DB->quote( $email_key ) ).',
+			'.$DB->quote( date2mysql( $servertimenow ) ).',
 		  '.$DB->quote( $user_ID ).',
 		  '.$DB->quote( $to ).',
 		  '.$DB->quote( $result ).',
@@ -1125,5 +1136,55 @@ function php_email_sending_test()
 	$Settings->set( 'force_email_sending', $force_email_sending );
 
 	return $test_mail_messages;
+}
+
+
+/**
+ * Check if email key is already in use
+ *
+ * @param string Email key
+ * @return boolean True if key already in use, False otherwise
+ */
+function email_key_exists( $key )
+{
+	global $DB;
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'COUNT(*)' );
+	$SQL->FROM( 'T_email__log' );
+	$SQL->WHERE( 'emlog_key = '.$DB->quote( $key ) );
+
+	$count = $DB->get_var( $SQL );
+
+	return $count > 0;
+}
+
+
+/**
+ * Adds email tracking to message string
+ *
+ * @param string Message
+ * @param string Email key
+ * @return string Message with email tracking
+ */
+function add_email_tracking( $message, $email_key )
+{
+	// Add email tracking
+	if( empty( $email_key ) )
+	{
+		debug_die( 'No email key specified.' );
+	}
+
+	// Add email open tracking to first image
+	$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
+	$callback = new EmailTrackingHelper( 'img', $email_key );
+	$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message, 1 );
+
+	// Add link click tracking
+	$re = '/(<a\b.+\bhref=")([^"]*)(")/';
+	$callback = new EmailTrackingHelper( 'link', $email_key );
+	$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
+
+	return $message;
 }
 ?>

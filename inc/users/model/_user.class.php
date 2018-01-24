@@ -3968,23 +3968,6 @@ class User extends DataObject
 				$this->new_fields = array();
 			}
 
-			// NEWSLETTERS:
-			$insert_newsletters = array();
-			if( isset( $Settings ) && ( ! isset( $this->insert_default_newsletters ) || $this->insert_default_newsletters ) )
-			{	// Insert default newsletter subscriptions for this user,
-				// Only when general settings are defined (to avoid error on install process),
-				// And if it is not disabled for exmaple by widget "Email capture / Quick registration",
-				$insert_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', trim( $Settings->get( 'def_newsletters' ), ',' ) ) );
-			}
-			if( ! empty( $this->new_newsletter_subscriptions ) )
-			{	// Also insert additional newsletters(e-g from widget "Email capture / Quick registration"):
-				$insert_newsletters = array_merge( $insert_newsletters, $this->new_newsletter_subscriptions );
-			}
-			if( ! empty( $insert_newsletters ) )
-			{	// Do subscribing if at least one newsletter is selected by default:
-				$this->subscribe( array_unique( $insert_newsletters ) );
-			}
-
 			// USER TAGS:
 			if( $result )
 			{ // Let's handle the tags
@@ -4026,6 +4009,24 @@ class User extends DataObject
 		}
 
 		$DB->commit();
+
+		// NEWSLETTERS:
+		// NOTE: We MUST subscribe user only after COMMIT otherwise some error may rollback of new user inserting but email campaign may be already sent at subscription!
+		$insert_newsletters = array();
+		if( isset( $Settings ) && ( ! isset( $this->insert_default_newsletters ) || $this->insert_default_newsletters ) )
+		{	// Insert default newsletter subscriptions for this user,
+			// Only when general settings are defined (to avoid error on install process),
+			// And if it is not disabled for exmaple by widget "Email capture / Quick registration",
+			$insert_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', trim( $Settings->get( 'def_newsletters' ), ',' ) ) );
+		}
+		if( ! empty( $this->new_newsletter_subscriptions ) )
+		{	// Also insert additional newsletters(e-g from widget "Email capture / Quick registration"):
+			$insert_newsletters = array_merge( $insert_newsletters, $this->new_newsletter_subscriptions );
+		}
+		if( ! empty( $insert_newsletters ) )
+		{	// Do subscribing if at least one newsletter is selected by default:
+			$this->subscribe( array_unique( $insert_newsletters ) );
+		}
 
 		return $result;
 	}

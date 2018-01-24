@@ -3725,6 +3725,25 @@ function user_get_notification_sender( $user_ID, $setting )
 }
 
 
+class EmailTrackingHelper
+{
+	private $type;
+	private $key;
+
+	function __construct( $type, $key )
+	{
+		$this->type = $type;
+		$this->key = $key;
+	}
+
+	public function callback( $matches )
+	{
+		$passthrough_url = get_htsrv_url().'email_passthrough.php?type='.$this->type.'&email_key='.$this->key.'&redirect_to=';
+		return $matches[1].$passthrough_url.rawurlencode( $matches[2] ).$matches[3];
+	}
+}
+
+
 /**
  * Sends an email, wrapping PHP's mail() function.
  * ALL emails sent by b2evolution must be sent through this function (for consistency and for logging)
@@ -3770,6 +3789,16 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$message = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $message );
 	// Remove secret content marks from the message
 	$message_data = str_replace( array( '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
+
+	// Generate email key
+	do
+	{
+		$email_key = generate_random_key();
+	}
+	while( email_key_exists( $email_key ) );
+
+	// Add email tracking only to message that will be sent. Message string that will be sent to mail log should NOT contain email tracking code!
+	$message_data['full'] = add_email_tracking( $message_data['full'], $email_key );
 
 	// Memorize email address
 	$to_email_address = $to;
@@ -3886,7 +3915,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	{ // Check if the email address is blocked
 		$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
 
-		mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked' );
+		mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked', $email_key );
 
 		return false;
 	}
@@ -3904,7 +3933,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	{	// The message has not been sent successfully
 		if( $debug > 1 )
 		{ // We agree to die for debugging...
-			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
+			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
 
 			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
 		}
@@ -3912,7 +3941,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		{ // Soft debugging only....
 			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
 
-			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
+			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
 
 			return false;
 		}
@@ -3920,7 +3949,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
 
-	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ) );
+	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $email_key );
 
 	return true;
 }
