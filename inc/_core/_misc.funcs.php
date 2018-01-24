@@ -3890,7 +3890,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	if( mail_is_blocked( $to_email_address ) )
 	{ // Check if the email address is blocked
-		$mail_log_message = 'Sending mail to "'.$to_email_address.'" FAILED, because this email marked with spam or permanent errors.';
+		$mail_log_message = 'Sending mail to "'.$to_email_address.'" FAILED, because this email is marked with spam or permanent errors.';
 		$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
 
 		mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked' );
