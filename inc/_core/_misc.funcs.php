@@ -3918,8 +3918,8 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		}
 		else
 		{ // Soft debugging only$mail_log_error_message
-			$mail_log_error_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
-			$Debuglog->add( htmlspecialchars( $last_mail_error_message ), 'error' );
+			$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
+			$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
 
 			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
 
