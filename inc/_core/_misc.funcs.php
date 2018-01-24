@@ -3751,6 +3751,12 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 {
 	global $servertimenow, $email_send_simulate_only;
 
+	/**
+	 * @var string|NULL This global var stores ID of the last mail log message
+	 */
+	global $mail_log_message;
+	$mail_log_message = NULL;
+
 	// Stop a request from the blocked IP addresses or Domains
 	antispam_block_request();
 
@@ -3884,7 +3890,8 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	if( mail_is_blocked( $to_email_address ) )
 	{ // Check if the email address is blocked
-		$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
+		$mail_log_message = 'Sending mail to "'.$to_email_address.'" FAILED, because this email marked with spam or permanent errors.';
+		$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
 
 		mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked' );
 
@@ -3906,11 +3913,13 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		{ // We agree to die for debugging...
 			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
 
-			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
+			$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
+			debug_die( htmlspecialchars( $mail_log_message ) );
 		}
 		else
-		{ // Soft debugging only....
-			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
+		{ // Soft debugging only$mail_log_error_message
+			$mail_log_error_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
+			$Debuglog->add( htmlspecialchars( $last_mail_error_message ), 'error' );
 
 			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
 
@@ -3918,7 +3927,8 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		}
 	}
 
-	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
+	$mail_log_message = 'Sent mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
+	$Debuglog->add( htmlspecialchars( $mail_log_message ) );
 
 	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ) );
 

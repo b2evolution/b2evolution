@@ -87,7 +87,7 @@ function step_get_result_titles()
 		'send_campaign' => array(
 			'YES'   => NT_('Email SENT'),
 			'NO'    => NT_('Email was ALREADY sent'),
-			'ERROR' => NT_('ERROR: Email cannot be sent'),
+			'ERROR' => NT_('ERROR: Email cannot be sent: %s'),
 		),
 	);
 }

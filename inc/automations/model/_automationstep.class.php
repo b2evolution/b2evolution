@@ -409,7 +409,7 @@ class AutomationStep extends DataObject
 	 */
 	function execute_action( $user_ID, $params = array() )
 	{
-		global $DB, $servertimenow;
+		global $DB, $servertimenow, $mail_log_message;
 
 		$params = array_merge( array(
 				'print_log' => true,
@@ -472,11 +472,13 @@ class AutomationStep extends DataObject
 							// - user cannot receive such email because of day limit;
 							// - user is not activated yet.
 							$step_result = 'ERROR';
+							$additional_result_message = empty( $mail_log_message ) ? 'Email could not be sent by unknown reason.' : $mail_log_message;
 						}
 					}
 					else
 					{	// Wrong stored email campaign for this step:
 						$step_result = 'ERROR';
+						$additional_result_message = 'Email Campaign #'.$this->get( 'info' ).' is not found in DB.';
 					}
 					break;
 
@@ -488,10 +490,18 @@ class AutomationStep extends DataObject
 					break;
 			}
 		}
+		else
+		{	// Wrong user:
+			$additional_result_message = 'User #'.$user_ID.' is not found in DB.';
+		}
 
 		if( $params['print_log'] )
 		{	// Print log:
-			echo ' - Result: '.$this->get_result_title( $step_result ).'.'.$nl;
+			if( $step_result == 'ERROR' && empty( $additional_result_message ) )
+			{	// Set default additional error message:
+				$additional_result_message = 'Unknown error';
+			}
+			echo ' - Result: '.$this->get_result_title( $step_result, $additional_result_message ).'.'.$nl;
 		}
 
 		// Get data for next step:
@@ -564,11 +574,19 @@ class AutomationStep extends DataObject
 	 * NOTE! Return string is not translatable, Use funcs T_(), TS_() and etc. in that place where you use this func.
 	 *
 	 * @param string Result: YES, NO, ERROR
+	 * @param string Additional message, for example: some error message
 	 * @return string Result title
 	 */
-	function get_result_title( $result )
+	function get_result_title( $result, $additional_message = '' )
 	{
-		return step_get_result_title( $this->get( 'type' ), $result );
+		$result_title = step_get_result_title( $this->get( 'type' ), $result );
+
+		if( strpos( $result_title, '%s' ) !== false )
+		{	// Replace mask with additional message like error:
+			$result_title = sprintf( $result_title, '"'.$additional_message.'"' );
+		}
+
+		return $result_title;
 	}
 
 
