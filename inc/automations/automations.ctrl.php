@@ -316,6 +316,8 @@ switch( $action )
 	case 'new':
 	case 'edit':
 		$AdminUI->set_page_manual_link( 'automation-form' );
+		// Init JS to autcomplete the user logins
+		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'automations-list' );

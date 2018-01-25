@@ -8947,6 +8947,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			autm_name          VARCHAR(255) NOT NULL,
 			autm_status        ENUM("paused", "active") DEFAULT "paused",
 			autm_first_step_ID INT UNSIGNED NULL,
+			autm_enlt_ID       INT UNSIGNED NOT NULL,
+			autm_owner_user_ID INT UNSIGNED NOT NULL,
 			PRIMARY KEY        (autm_ID)' );
 
 		db_create_table( 'T_automation__step', '

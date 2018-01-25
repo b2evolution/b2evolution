@@ -34,6 +34,15 @@ $Form->text_input( 'autm_name', $edited_Automation->get( 'name' ), 40, T_('Name'
 
 $Form->select_input_array( 'autm_status', $edited_Automation->get( 'status' ), autm_get_status_titles(), T_('Status'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
 
+$NewsletterCache = & get_NewsletterCache();
+$NewsletterCache->load_all();
+$Form->select_input_object( 'autm_enlt_ID', $edited_Automation->get( 'enlt_ID' ), $NewsletterCache, T_('Tied to List'), array(
+		'required'   => true,
+		'allow_none' => true,
+		'note'       => T_('Users will exit this automation when they unsubscribe from this list'),
+	) );
+$Form->username( 'autm_owner_login', $edited_Automation->get_owner_User(), T_('Owner'), '', '', array( 'required' => true ) );
+
 $Form->end_form( array(
 		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' )
 	) );
@@ -125,4 +134,16 @@ if( $edited_Automation->ID > 0 )
 
 	$Results->display( NULL, 'session' );
 }
+
+// Display date/time when next scheduled job will executes automations:
+$SQL = new SQL( 'Get next scheduled job for executing automations' );
+$SQL->SELECT( 'ctsk_start_datetime' );
+$SQL->FROM( 'T_cron__task' );
+$SQL->FROM_add( 'LEFT JOIN T_cron__log ON ctsk_ID = clog_ctsk_ID' );
+$SQL->WHERE( 'ctsk_key = "execute-automations"' );
+$SQL->WHERE_and( 'clog_ctsk_ID IS NULL' );
+$SQL->ORDER_BY( 'ctsk_start_datetime ASC, ctsk_ID ASC' );
+$SQL->LIMIT( 1 );
+$next_automations_date_time = $DB->get_var( $SQL );
+echo '<p class="note">'.sprintf( T_('Next scheduled job for executing automations: %s'), $next_automations_date_time ? mysql2localedatetime( $next_automations_date_time ) : T_('Unknown') ).'</p>';
 ?>

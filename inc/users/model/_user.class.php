@@ -7675,13 +7675,25 @@ class User extends DataObject
 			$newsletter_IDs = array( $newsletter_IDs );
 		}
 
-		return $DB->query( 'UPDATE T_email__newsletter_subscription
+		$r = $DB->query( 'UPDATE T_email__newsletter_subscription
 			SET enls_subscribed = 0,
 			    enls_unsubscribed_ts = '.$DB->quote( date2mysql( $localtimenow ) ).'
 			WHERE enls_user_ID = '.$DB->quote( $this->ID ).'
 			  AND enls_enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )
 			  AND enls_subscribed = 1',
 			'Unsubscribe user #'.$this->ID.' from lists #'.implode( ',', $newsletter_IDs ) );
+
+		if( $r )
+		{	// If user has been unsubscribed from at least one newsletter,
+			// Then this user must automatically exit all automations tied to those newsletters:
+			$DB->query( 'DELETE T_automation__user_state FROM T_automation__user_state
+				INNER JOIN T_automation__automation ON autm_ID = aust_autm_ID
+				WHERE aust_user_ID = '.$DB->quote( $this->ID ).'
+				  AND autm_enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )',
+				'Exit user automatically from all automations tied to lists #'.implode( ',', $newsletter_IDs ) );
+		}
+
+		return $r;
 	}
 
 

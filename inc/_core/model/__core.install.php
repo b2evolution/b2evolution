@@ -566,6 +566,8 @@ $schema_queries = array(
 			autm_name          VARCHAR(255) NOT NULL,
 			autm_status        ENUM('paused', 'active') DEFAULT 'paused',
 			autm_first_step_ID INT UNSIGNED NULL,
+			autm_enlt_ID       INT UNSIGNED NOT NULL,
+			autm_owner_user_ID INT UNSIGNED NOT NULL,
 			PRIMARY KEY        (autm_ID)
 		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
 

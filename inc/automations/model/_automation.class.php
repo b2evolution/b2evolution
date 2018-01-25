@@ -28,6 +28,10 @@ class Automation extends DataObject
 	var $name;
 	var $status;
 	var $first_step_ID;
+	var $enlt_ID;
+	var $owner_user_ID;
+
+	var $owner_User = NULL;
 
 	/**
 	 * Constructor
@@ -39,12 +43,22 @@ class Automation extends DataObject
 		// Call parent constructor:
 		parent::__construct( 'T_automation__automation', 'autm_', 'autm_ID' );
 
-		if( $db_row !== NULL )
+		if( $db_row === NULL )
+		{
+			if( is_logged_in() )
+			{	// Use current User for new creating Automation:
+				global $current_User;
+				$this->owner_user_ID = $current_User->ID;
+			}
+		}
+		else
 		{
 			$this->ID = $db_row->autm_ID;
 			$this->name = $db_row->autm_name;
 			$this->status = $db_row->autm_status;
 			$this->first_step_ID = $db_row->autm_first_step_ID;
+			$this->enlt_ID = $db_row->autm_enlt_ID;
+			$this->owner_user_ID = $db_row->autm_owner_user_ID;
 		}
 	}
 
@@ -90,6 +104,25 @@ class Automation extends DataObject
 		// Status:
 		param_string_not_empty( 'autm_status', T_('Please select an automation status.') );
 		$this->set_from_Request( 'status' );
+
+		// Tied to List:
+		param( 'autm_enlt_ID', 'integer', NULL );
+		param_check_number( 'autm_enlt_ID', T_('Please select an automation list.'), true );
+		$this->set_from_Request( 'enlt_ID' );
+
+		// Owner:
+		$autm_owner_login = param( 'autm_owner_login', 'string', NULL );
+		$UserCache = & get_UserCache();
+		$owner_User = & $UserCache->get_by_login( $autm_owner_login );
+		if( empty( $owner_User ) )
+		{
+			param_error( 'owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $autm_owner_login ) );
+		}
+		else
+		{
+			$this->set( 'owner_user_ID', $owner_User->ID );
+			$this->owner_User = & $owner_User;
+		}
 
 		return ! param_errors_detected();
 	}
@@ -161,6 +194,23 @@ class Automation extends DataObject
 		$SQL->WHERE_and( 'aust_next_exec_ts <= '.$DB->quote( date2mysql( $servertimenow ) ) );
 
 		return $DB->get_assoc( $SQL );
+	}
+
+
+	/**
+	 * Get owner User
+	 *
+	 * @return object|NULL|boolean Reference on cached owner User object, NULL - if request with empty ID, FALSE - if requested owner User does not exist
+	 */
+	function & get_owner_User()
+	{
+		if( $this->owner_User === NULL )
+		{	// Load owner User into cache var:
+			$UserCache = & get_UserCache();
+			$this->owner_User = & $UserCache->get_by_ID( $this->owner_user_ID, false, false );
+		}
+
+		return $this->owner_User;
 	}
 }
 
