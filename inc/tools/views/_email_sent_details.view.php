@@ -51,11 +51,16 @@ if( !empty( $mail_contents ) )
 {
 	if( !empty( $mail_contents['text'] ) )
 	{ // Display Plain Text content
+		$plain_text_content = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $mail_contents['text']['content'] );
+
 		$Form->info( T_('Text content'), $mail_contents['text']['type']
-				.'<pre class="email_log_scroll"><span>'.htmlspecialchars( $mail_contents['text']['content'] ).'</span></pre>' );
+				.'<pre class="email_log_scroll"><span>'.htmlspecialchars( $plain_text_content ).'</span></pre>' );
 	}
 	if( !empty( $mail_contents['html'] ) )
 	{ // Display HTML content
+
+		$html_content = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $mail_contents['html']['content'] );
+
 		if( ! empty( $mail_contents['html']['head_style'] ) )
 		{ // Print out all styles of email message
 			echo '<style>'.$mail_contents['html']['head_style'].'</style>';
@@ -63,11 +68,11 @@ if( !empty( $mail_contents ) )
 		$div_html_class = empty( $mail_contents['html']['body_class'] ) ? '' : ' '.$mail_contents['html']['body_class'];
 		$div_html_style = empty( $mail_contents['html']['body_style'] ) ? '' : ' style="'.$mail_contents['html']['body_style'].'"';
 		$Form->info( T_('HTML content'), $mail_contents['html']['type']
-				.'<div class="email_log_html'.$div_html_class.'"'.$div_html_style.'>'.$mail_contents['html']['content'].'</div>' );
+				.'<div class="email_log_html'.$div_html_class.'"'.$div_html_style.'>'.$html_content.'</div>' );
 	}
 }
-
-$Form->info( T_('Raw email source'), '<pre class="email_log_scroll"><span>'.htmlspecialchars($MailLog->emlog_message).'</span></pre>' );
+$emlog_message = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $MailLog->emlog_message );
+$Form->info( T_('Raw email source'), '<pre class="email_log_scroll"><span>'.htmlspecialchars( $emlog_message ).'</span></pre>' );
 
 $Form->end_form();
 

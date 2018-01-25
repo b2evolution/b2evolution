@@ -287,20 +287,11 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 
 	$to = utf8_strtolower( $to );
 
-	if( empty( $email_key ) )
-	{
-		do
-		{
-			$email_key = generate_random_key();
-		}
-		while( email_key_exists( $email_key ) );
-	}
-
 	// Insert mail log
 	$DB->query( 'INSERT INTO T_email__log
 		( emlog_key, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers )
 		VALUES
-		( '.( empty( $email_key ) ? 'NULL' : $DB->quote( $email_key ) ).',
+		( '.( empty( $email_key ) ? generate_random_key() : $DB->quote( $email_key ) ).',
 			'.$DB->quote( date2mysql( $servertimenow ) ).',
 		  '.$DB->quote( $user_ID ).',
 		  '.$DB->quote( $to ).',
@@ -321,6 +312,36 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 			    emadr_sent_count = emadr_sent_count + 1,
 			    emadr_sent_last_returnerror = emadr_sent_last_returnerror + 1,
 			    emadr_last_sent_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $servertimenow ) ) );
+	}
+}
+
+
+function update_mail_log( $email_ID, $result, $message )
+{
+	global $DB, $servertimenow;
+	$valid_results = array( 'ok', 'error', 'blocked', 'simulated', 'ready_to_send' );
+	if( ! in_array( $result, $valid_results ) )
+	{
+		debug_die( 'Invalid email log result!' );
+	}
+
+	$DB->query( 'UPDATE T_email__log
+			SET emlog_result = '.$DB->quote( $result )
+			.', emlog_message = '.$DB->quote( $message )
+			.', emlog_timestamp = '.$DB->quote( date2mysql( $servertimenow ) )
+			.' WHERE emlog_ID = '.$DB->quote( $email_ID ) );
+
+	if( $result == 'ok' )
+	{ // Save a report about sending of this message in the table T_email__address
+		// The mail sending was a success. Update last sent date and increase a counter
+		$to = $DB->get_var( 'SELECT emlog_to from T_email__log WHERE emlog_ID = '.$DB->quote( $email_ID ) );
+
+		$DB->query( 'INSERT INTO T_email__address ( emadr_address, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_sent_ts )
+			VALUES( '.$DB->quote( $to ).', 1, 1, '.$DB->quote( date2mysql( $servertimenow ) ).' )
+			ON DUPLICATE KEY UPDATE
+					emadr_sent_count = emadr_sent_count + 1,
+					emadr_sent_last_returnerror = emadr_sent_last_returnerror + 1,
+					emadr_last_sent_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $servertimenow ) ) );
 	}
 }
 
@@ -1140,34 +1161,13 @@ function php_email_sending_test()
 
 
 /**
- * Check if email key is already in use
- *
- * @param string Email key
- * @return boolean True if key already in use, False otherwise
- */
-function email_key_exists( $key )
-{
-	global $DB;
-
-	$SQL = new SQL();
-	$SQL->SELECT( 'COUNT(*)' );
-	$SQL->FROM( 'T_email__log' );
-	$SQL->WHERE( 'emlog_key = '.$DB->quote( $key ) );
-
-	$count = $DB->get_var( $SQL );
-
-	return $count > 0;
-}
-
-
-/**
  * Adds email tracking to message string
  *
  * @param string Message
  * @param string Email key
  * @return string Message with email tracking
  */
-function add_email_tracking( $message, $email_key )
+function add_email_tracking( $message, $email_ID, $email_key )
 {
 	// Add email tracking
 	if( empty( $email_key ) )
@@ -1177,12 +1177,12 @@ function add_email_tracking( $message, $email_key )
 
 	// Add email open tracking to first image
 	$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
-	$callback = new EmailTrackingHelper( 'img', $email_key );
+	$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key );
 	$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message, 1 );
 
 	// Add link click tracking
 	$re = '/(<a\b.+\bhref=")([^"]*)(")/';
-	$callback = new EmailTrackingHelper( 'link', $email_key );
+	$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key );
 	$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
 
 	return $message;
