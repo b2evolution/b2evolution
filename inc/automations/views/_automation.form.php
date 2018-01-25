@@ -87,7 +87,7 @@ if( $edited_Automation->ID > 0 )
 			'th'          => T_('# of users queued'),
 			'order'       => 'num_users_queued',
 			'default_dir' => 'D',
-			'td'          => '$num_users_queued$',
+			'td'          => '%step_td_num_users_queued( #step_ID#, #num_users_queued# )%',
 			'th_class'    => 'shrinkwrap',
 			'td_class'    => 'right',
 		);
@@ -95,7 +95,7 @@ if( $edited_Automation->ID > 0 )
 	$Results->cols[] = array(
 			'th'    => T_('Label'),
 			'order' => 'step_label',
-			'td'    => '%step_td_label( #step_label#, #step_type# )%',
+			'td'    => '%step_td_label( #step_ID#, #step_label#, #step_type# )%',
 		);
 
 	$Results->cols[] = array(

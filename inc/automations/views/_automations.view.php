@@ -46,7 +46,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th'       => T_('Status'),
 		'order'    => 'autm_status',
-		'td'       => '%autm_get_status_title( #autm_status# )%',
+		'td'       => '%autm_td_status( #autm_ID#, #autm_status# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 	);
@@ -62,6 +62,6 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		);
 }
 
-$Results->display();
+$Results->display( NULL, 'session' );
 
 ?>

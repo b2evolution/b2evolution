@@ -44,6 +44,30 @@ function autm_get_status_title( $status )
 
 
 /**
+ * Helper function to display step label on Results table
+ *
+ * @param integer Automation ID
+ * @param string Automation status
+ * @return string
+ */
+function autm_td_status( $autm_ID, $autm_status )
+{
+	global $admin_url, $current_User;
+
+	$r = autm_get_status_title( $autm_status );
+
+	if( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+	{	// Display action icon to toggle automation status:
+		$r .= ' '.action_icon( '', ( $autm_status == 'active' ? 'pause' : 'play' ),
+			$admin_url.'?ctrl=automations&amp;action='.( $autm_status == 'active' ? 'status_paused' : 'status_active' )
+				.'&amp;autm_ID='.$autm_ID.'&amp;'.url_crumb( 'automation' ) );
+	}
+
+	return $r;
+}
+
+
+/**
  * Get array of type titles for automation step
  *
  * @return array Type titles
@@ -152,13 +176,39 @@ function step_get_result_label( $type, $result )
 /**
  * Helper function to display step info on Results table
  *
+ * @param integer Step ID
+ * @param integer Number of user queued
+ * @return string
+ */
+function step_td_num_users_queued( $step_ID, $num_users_queued )
+{
+	if( $num_users_queued > 0 )
+	{
+		global $admin_url;
+		$num_users_queued = '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID.'">'
+				.$num_users_queued
+			.'</a>';
+	}
+
+	return $num_users_queued;
+}
+
+
+/**
+ * Helper function to display step label on Results table
+ *
+ * @param integer Step ID
  * @param string Step label
  * @param string Step type
  * @return string
  */
-function step_td_label( $step_label, $step_type )
+function step_td_label( $step_ID, $step_label, $step_type )
 {
-	return ( empty( $step_label ) ? step_get_type_title( $step_type ) : $step_label );
+	global $admin_url;
+
+	return '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID.'">'
+			.( empty( $step_label ) ? step_get_type_title( $step_type ) : $step_label )
+		.'</a>';
 }
 
 

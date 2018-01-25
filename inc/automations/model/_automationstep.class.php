@@ -546,7 +546,9 @@ class AutomationStep extends DataObject
 	 */
 	function get_name()
 	{
-		return '#'.$this->get( 'order' ).' - '.step_td_label( $this->get( 'label' ), $this->get( 'type' ) );
+		$step_label = utf8_trim( $this->get( 'label' ) );
+		return '#'.$this->get( 'order' ).' - '
+			.( empty( $step_label ) ? step_get_type_title( $this->get( 'type' ) ) : $step_label );
 	}
 
 

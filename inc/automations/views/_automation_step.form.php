@@ -85,6 +85,34 @@ $Form->end_line();
 $Form->end_form( array(
 		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' )
 	) );
+
+if( $edited_AutomationStep->ID > 0 )
+{	// Display numbers of users queued for the edited Automation Step:
+	$SQL = new SQL( 'Get all users queued for automation step #'.$edited_AutomationStep->ID );
+	$SQL->SELECT( 'aust_user_ID, aust_next_exec_ts' );
+	$SQL->FROM( 'T_automation__user_state' );
+	$SQL->WHERE( 'aust_next_step_ID = '.$edited_AutomationStep->ID );
+
+	$Results = new Results( $SQL->get(), 'aust_', '-A' );
+
+	$Results->title = T_('Users queued').get_manual_link( 'automation-step-users-queued' );
+
+	$Results->cols[] = array(
+			'th'    => T_('User'),
+			'order' => 'aust_user_ID',
+			'td'    => '%get_user_identity_link( "", #aust_user_ID# )%',
+		);
+
+	$Results->cols[] = array(
+			'th'       => T_('Next execution time'),
+			'order'    => 'aust_next_exec_ts',
+			'td'       => '%mysql2localedatetime( #aust_next_exec_ts# )%',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'nowrap',
+		);
+
+	$Results->display();
+}
 ?>
 <script type="text/javascript">
 // Update form depending on step type:
