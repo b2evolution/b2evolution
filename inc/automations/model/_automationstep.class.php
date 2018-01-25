@@ -405,28 +405,22 @@ class AutomationStep extends DataObject
 	 * Execute action for this step
 	 *
 	 * @param integer User ID
-	 * @param array Additional params
+	 * @param string Log process into this param
 	 */
-	function execute_action( $user_ID, $params = array() )
+	function execute_action( $user_ID, & $process_log )
 	{
 		global $DB, $servertimenow, $mail_log_message;
 
-		$params = array_merge( array(
-				'print_log' => true,
-			), $params );
-
 		$Automation = & $this->get_Automation();
 
-		if( $params['print_log'] )
-		{	// Print log:
-			global $is_cli;
-			$nl = empty( $is_cli ) ? '<br>' : "\r\n";
+		$log_nl = "\n";
+		$log_point = ' - ';
 
-			echo 'Executing Step #'.$this->get( 'order' )
-				.'('.step_get_type_title( $this->get( 'type' ) ).( $this->get( 'label' ) == '' ? '' : '"'.$this->get( 'label' ).'"' ).')'
-				.' of Automation: #'.$Automation->ID.'('.$Automation->get( 'name' ).')'
-				.' for User #'.$user_ID.'...'.$nl;
-		}
+		// Log:
+		$process_log = $log_nl.'Executing Step #'.$this->get( 'order' )
+			.'('.step_get_type_title( $this->get( 'type' ) ).( $this->get( 'label' ) == '' ? '' : '"'.$this->get( 'label' ).'"' ).')'
+			.' of Automation: #'.$Automation->ID.'('.$Automation->get( 'name' ).')'
+			.' for User #'.$user_ID.'...'.$log_nl;
 
 		// Retrun ERROR result by default for all unknown cases:
 		$step_result = 'ERROR';
@@ -446,10 +440,8 @@ class AutomationStep extends DataObject
 					{	// The user is NOT matched to condition of this step:
 						$step_result = 'NO';
 					}
-					if( $params['print_log'] )
-					{	// Print log:
-						echo ' - Log: '.$if_condition_log.$nl;
-					}
+					// Log:
+					$process_log .= $log_point.'Log: '.$if_condition_log.$log_nl;
 					break;
 
 				case 'send_campaign':
@@ -484,10 +476,8 @@ class AutomationStep extends DataObject
 					break;
 
 				default:
-					if( $params['print_log'] )
-					{	// Print log:
-						echo ' - No implemented action'.$nl;
-					}
+					// Log:
+					$process_log .= $log_point.'No implemented action'.$log_nl;
 					break;
 			}
 		}
@@ -496,14 +486,12 @@ class AutomationStep extends DataObject
 			$additional_result_message = 'User #'.$user_ID.' is not found in DB.';
 		}
 
-		if( $params['print_log'] )
-		{	// Print log:
-			if( $step_result == 'ERROR' && empty( $additional_result_message ) )
-			{	// Set default additional error message:
-				$additional_result_message = 'Unknown error';
-			}
-			echo ' - Result: '.$this->get_result_title( $step_result, $additional_result_message ).'.'.$nl;
+		// Log:
+		if( $step_result == 'ERROR' && empty( $additional_result_message ) )
+		{	// Set default additional error message:
+			$additional_result_message = 'Unknown error';
 		}
+		$process_log .= $log_point.'Result: '.$this->get_result_title( $step_result, $additional_result_message ).'.'.$log_nl;
 
 		// Get data for next step:
 		switch( $step_result )
@@ -542,19 +530,12 @@ class AutomationStep extends DataObject
 			  AND aust_user_ID = '.$DB->quote( $user_ID ),
 			'Update data for next Step after executing Step #'.$this->ID );
 
-		if( $params['print_log'] )
-		{	// Print log:
-			echo ( $next_AutomationStep
-					? '- Next step: #'.$next_AutomationStep->get( 'order' )
-						.'('.step_get_type_title( $this->get( 'type' ) ).( $this->get( 'label' ) == '' ? '' : ' "'.$this->get( 'label' ).'"' ).')'
-						.' delay: '.seconds_to_period( $next_delay ).', '.$next_exec_ts
-					: ' - There is no next step configured.' ).$nl;
-		}
-
-		if( $params['print_log'] )
-		{	// Print log:
-			echo $nl;
-		}
+		// Log:
+		$process_log .= ( $next_AutomationStep
+				? $log_point.'Next step: #'.$next_AutomationStep->get( 'order' )
+					.'('.step_get_type_title( $this->get( 'type' ) ).( $this->get( 'label' ) == '' ? '' : ' "'.$this->get( 'label' ).'"' ).')'
+					.' delay: '.seconds_to_period( $next_delay ).', '.$next_exec_ts
+				: $log_point.'There is no next step configured.' ).$log_nl;
 	}
 
 
@@ -595,10 +576,10 @@ class AutomationStep extends DataObject
 	 * Check result of "IF Condition"
 	 *
 	 * @param object User
-	 * @param string Log into this param
+	 * @param string Log process into this param
 	 * @return boolean TRUE if condition is matched for given user, otherwise FALSE
 	 */
-	function check_if_condition( $step_User, & $log )
+	function check_if_condition( $step_User, & $process_log )
 	{
 		if( $this->get( 'type' ) != 'if_condition' )
 		{	// This is allowed only for step type "IF Condition":
@@ -612,7 +593,7 @@ class AutomationStep extends DataObject
 			return false;
 		}
 
-		return $this->check_if_condition_object( $json_object, $step_User, $log );
+		return $this->check_if_condition_object( $json_object, $step_User, $process_log );
 	}
 
 
@@ -622,33 +603,31 @@ class AutomationStep extends DataObject
 	 *
 	 * @param object JSON object of step type "IF Condition"
 	 * @param object User
-	 * @param string Log into this param
+	 * @param string Log process into this param
 	 * @return boolean TRUE if condition is matched for given user, otherwise FALSE
 	 */
-	function check_if_condition_object( $json_object, $step_User, & $log )
+	function check_if_condition_object( $json_object, $step_User, & $process_log )
 	{
-		global $is_cli;
-
 		if( ! isset( $json_object->condition ) || ! in_array( $json_object->condition, array( 'AND', 'OR' ) ) || empty( $json_object->rules ) )
 		{	// Wrong json object params, Skip it:
 			return false;
 		}
 
 		// Log:
-		$log .= ' ('.$json_object->condition;
+		$process_log .= ' ('.$json_object->condition;
 		// Array to convert operator names to log format:
 		$log_operators = array(
 				'equal'            => '=',
-				'not_equal'        => $is_cli ? '!=' : '&#8800;',
+				'not_equal'        => '&#8800;',
 				'less'             => '<',
-				'less_or_equal'    => $is_cli ? '<=' : '&#8804;',
+				'less_or_equal'    => '&#8804;',
 				'greater'          => '>',
-				'greater_or_equal' => $is_cli ? '>=' : '&#8805;',
+				'greater_or_equal' => '&#8805;',
 				'between'          => array( 'BETWEEN', 'AND' ),
 				'not_between'      => array( 'NOT BETWEEN', 'AND' ),
 			);
-		$log_bold_start = $is_cli ? '*' : '<b>';
-		$log_bold_end = $is_cli ? '*' : '</b>';
+		$log_bold_start = '<b>';
+		$log_bold_end = '</b>';
 		$log_rule_separator = ', ';
 
 		if( $json_object->condition == 'AND' )
@@ -666,32 +645,32 @@ class AutomationStep extends DataObject
 		{
 			if( $conditions_result == $stop_result )
 			{	// Skip this rule because previous rules already returned the end result for current condition(AND|OR):
-				$log .= $log_rule_separator.$log_bold_start.'ignored'.$log_bold_end;
+				$process_log .= $log_rule_separator.$log_bold_start.'ignored'.$log_bold_end;
 				continue;
 			}
 
 			if( isset( $rule->rules ) && is_array( $rule->rules ) )
 			{	// This is a group of conditions, Run this function recursively:
-				$log .= $log_rule_separator;
-				$rule_result = $this->check_if_condition_object( $rule, $step_User, $log );
+				$process_log .= $log_rule_separator;
+				$rule_result = $this->check_if_condition_object( $rule, $step_User, $process_log );
 			}
 			else
 			{	// This is a single field:
-				$rule_result = $this->check_if_condition_rule( $rule, $step_User, $log );
+				$rule_result = $this->check_if_condition_rule( $rule, $step_User, $process_log );
 				// Log:
-				$log .= $log_rule_separator.$rule->field.' ';
+				$process_log .= $log_rule_separator.$rule->field.' ';
 				if( is_array( $log_operators[ $rule->operator ] ) )
 				{	// Multiple operator and values:
 					foreach( $log_operators[ $rule->operator ] as $o => $operator )
 					{
-						$log .= ' '.$operator.' "'.$rule->value[ $o ].'"';
+						$process_log .= ' '.$operator.' "'.$rule->value[ $o ].'"';
 					}
 				}
 				else
 				{	// Single operator and value:
-					$log .= ' '.$log_operators[ $rule->operator ].' "'.$rule->value.'"';
+					$process_log .= ' '.$log_operators[ $rule->operator ].' "'.$rule->value.'"';
 				}
-				$log .= ': '.$log_bold_start.( $rule_result ? 'TRUE' : 'FALSE' ).$log_bold_end;
+				$process_log .= ': '.$log_bold_start.( $rule_result ? 'TRUE' : 'FALSE' ).$log_bold_end;
 			}
 
 			// Append current result with previous results:
@@ -706,7 +685,7 @@ class AutomationStep extends DataObject
 		}
 
 		// Log:
-		$log .= ') : '.$log_bold_start.( $conditions_result ? 'TRUE' : 'FALSE' ).$log_bold_end;
+		$process_log .= ') : '.$log_bold_start.( $conditions_result ? 'TRUE' : 'FALSE' ).$log_bold_end;
 
 		return $conditions_result;
 	}

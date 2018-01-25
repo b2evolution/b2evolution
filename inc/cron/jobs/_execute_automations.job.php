@@ -15,11 +15,14 @@ $AutomationCache->load_where( 'autm_status = "active"' );
 
 if( count( $AutomationCache->cache ) == 0 )
 {	// No active automations
-	$result_message = T_('No active automations found');
+	$result_message = 'No active automations found.';
 }
 else
 {	// At least one active automation exists:
 	$AutomationStepCache = & get_AutomationStepCache();
+
+	$result_message = sprintf( '%s active automations:', count( $AutomationCache->cache ) )."\n";
+
 	foreach( $AutomationCache->cache as $Automation )
 	{
 		// Find what steps should be executed immediately:
@@ -33,12 +36,11 @@ else
 			if( $AutomationStep = & $AutomationStepCache->get_by_ID( $automation_step_ID, false, false ) )
 			{
 				// Execute Step action for given User:
-				$AutomationStep->execute_action( $automation_user_ID );
+				$AutomationStep->execute_action( $automation_user_ID, $process_log );
+				$result_message .= $process_log;
 			}
 		}
 	}
-
-	$result_message = sprintf( T_('%s active automations.'), count( $AutomationCache->cache ) );
 }
 
 return 1; /* ok */

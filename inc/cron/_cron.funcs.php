@@ -52,7 +52,7 @@ function cron_log( $message, $level = 0 )
  */
 function call_job( $job_key, $job_params = array() )
 {
-	global $DB, $inc_path, $Plugins, $admin_url;
+	global $DB, $inc_path, $Plugins, $admin_url, $is_web;
 
 	global $result_message, $result_status, $timestop, $time_difference;
 
@@ -129,9 +129,21 @@ function call_job( $job_key, $job_params = array() )
 		$cron_log_level = 1;
 	}
 
+	if( $is_web )
+	{	// Is web interface?
+		$result_message_text = str_replace( "\n", "<br>\n", $result_message_text );
+	}
+	else
+	{	// Is CLI mode?
+		$result_message_text = str_replace(
+			array( '<br>', '<b>', '</b>', '&#8800;', '&#8804;', '&#8805;' ),
+			array( "\n", '*', '*', '!=', '<=', '>=' ),
+			$result_message_text );
+	}
+
 	$timestop = time() + $time_difference;
 	cron_log( 'Task finished at '.date( 'H:i:s', $timestop ).' with status: '.$result_status
-		."\nMessage: $result_message_text", $cron_log_level );
+		.( $is_web ? '<br>' : "\n" ).'Message: '.$result_message_text, $cron_log_level );
 
 	return $error_message;
 }
