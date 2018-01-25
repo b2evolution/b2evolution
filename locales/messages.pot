@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2018-01-20 03:09+0100\n"
+"POT-Creation-Date: 2018-01-21 03:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -104,12 +104,12 @@ msgid "New window"
 msgstr ""
 
 #: ../../../conf/_icons.php:264 ../conf/_icons.php:288
-#: ../../../inc/_core/_misc.funcs.php:7507
+#: ../../../inc/_core/_misc.funcs.php:7522
 msgid "Expand"
 msgstr ""
 
 #: ../../../conf/_icons.php:276 ../conf/_icons.php:297
-#: ../../../inc/_core/_misc.funcs.php:7501
+#: ../../../inc/_core/_misc.funcs.php:7516
 msgid "Collapse"
 msgstr ""
 
@@ -304,7 +304,7 @@ msgid "Cleanup"
 msgstr ""
 
 #: ../../../conf/_icons.php:510 ../inc/_core/_misc.funcs.php:3142
-#: ../../../inc/_core/_misc.funcs.php:7431 ../inc/_core/_template.funcs.php:1251
+#: ../../../inc/_core/_misc.funcs.php:7446 ../inc/_core/_template.funcs.php:1251
 #: ../../../inc/files/model/_file.funcs.php:2282
 #: ../../../inc/users/model/_user.funcs.php:2447
 msgid "Close"
@@ -1086,7 +1086,7 @@ msgid "No status"
 msgstr ""
 
 #. TRANS: the default value for option lists where "None" is allowed
-#: ../../../htsrv/async.php:827 ../inc/_core/_misc.funcs.php:6010
+#: ../../../htsrv/async.php:827 ../inc/_core/_misc.funcs.php:6025
 #: ../../../inc/_core/model/dataobjects/_dataobjectcache.class.php:161
 #: ../../../inc/_core/ui/results/_resultsel.class.php:304
 #: ../../../inc/collections/views/_coll_advanced.form.php:139
@@ -1110,7 +1110,7 @@ msgid "None"
 msgstr ""
 
 #: ../../../htsrv/async.php:902 ../htsrv/async.php:933 ../htsrv/async.php:954
-#: ../../../inc/_core/_misc.funcs.php:7432 ../inc/_core/_template.funcs.php:2301
+#: ../../../inc/_core/_misc.funcs.php:7447 ../inc/_core/_template.funcs.php:2301
 #: ../../../inc/_core/_template.funcs.php:3254
 #: ../../../inc/_core/ui/forms/_form.class.php:3911
 #: ../../../inc/comments/model/_comment_js.funcs.php:367
@@ -1959,7 +1959,7 @@ msgstr ""
 msgid "File"
 msgstr ""
 
-#: ../../../htsrv/viewfile.php:187 ../inc/_core/_misc.funcs.php:6017
+#: ../../../htsrv/viewfile.php:187 ../inc/_core/_misc.funcs.php:6032
 #: ../../../inc/collections/views/_coll_general.form.php:182
 #: ../../../inc/files/views/_file_links.view.php:98
 #: ../../../inc/items/model/_item.funcs.php:4740
@@ -3018,10 +3018,6 @@ msgid "Send reminders about non-activated accounts"
 msgstr ""
 
 #: ../../../inc/_core/_misc.funcs.php:1414
-#: ../../../skins_email/_email_header.inc.html.php:76
-#: ../../../skins_email/_email_header.inc.html.php:93
-#: ../../../skins_email/_email_header.inc.txt.php:34
-#: ../../../skins_email/_email_header.inc.txt.php:51
 msgid "Hello"
 msgstr ""
 
@@ -3220,7 +3216,7 @@ msgstr ""
 msgid "You have sent too much data (too many large files?) for the server to process (%s sent / %s maximum). Please try again by sending less data/files at a time."
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:5391
+#: ../../../inc/_core/_misc.funcs.php:5406
 #: ../../../inc/collections/_demo_content.funcs.php:1996
 #: ../../../inc/collections/model/_blog.class.php:405
 #: ../../../inc/collections/model/_blog.funcs.php:448
@@ -3232,49 +3228,49 @@ msgstr ""
 msgid "Manual"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:5393 ../inc/cron/_cron.funcs.php:183
+#: ../../../inc/_core/_misc.funcs.php:5408 ../inc/cron/_cron.funcs.php:183
 #: ../../../inc/widgets/views/_widget.form.php:35
 msgid "Open relevant page in online manual"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:5954
+#: ../../../inc/_core/_misc.funcs.php:5969
 #, php-format
 msgid "This action can only be performed with HTTP_REFERER = %s"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6014
+#: ../../../inc/_core/_misc.funcs.php:6029
 msgid "Date issued (Default)"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6015
+#: ../../../inc/_core/_misc.funcs.php:6030
 msgid "Order (as explicitly specified)"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6018
+#: ../../../inc/_core/_misc.funcs.php:6033
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:159
 msgid "Date created"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6019
+#: ../../../inc/_core/_misc.funcs.php:6034
 msgid "Date last modified"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6020
+#: ../../../inc/_core/_misc.funcs.php:6035
 msgid "Date last touched"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6021
+#: ../../../inc/_core/_misc.funcs.php:6036
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:171
 msgid "Contents last updated"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6022 ../inc/_core/_misc.funcs.php:6066
+#: ../../../inc/_core/_misc.funcs.php:6037 ../inc/_core/_misc.funcs.php:6081
 #: ../../../inc/collections/views/_coll_general.form.php:192
 msgid "URL \"filename\""
 msgstr ""
 
 #. TRANS: abbrev for Priority
-#: ../../../inc/_core/_misc.funcs.php:6023
+#: ../../../inc/_core/_misc.funcs.php:6038
 #: ../../../inc/collections/views/_coll_plugin_settings.form.php:89
 #: ../../../inc/items/views/_item_expert.form.php:619
 #: ../../../inc/items/views/_item_list_full.view.php:188
@@ -3291,19 +3287,19 @@ msgstr ""
 msgid "Priority"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6024
+#: ../../../inc/_core/_misc.funcs.php:6039
 msgid "Number of members who have viewed the post (If tracking enabled)"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6025 ../inc/_core/_misc.funcs.php:6067
+#: ../../../inc/_core/_misc.funcs.php:6040 ../inc/_core/_misc.funcs.php:6082
 msgid "Random order!"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6060
+#: ../../../inc/_core/_misc.funcs.php:6075
 msgid "Order (Default)"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6061
+#: ../../../inc/_core/_misc.funcs.php:6076
 #: ../../../inc/comments/views/_trash_comments.view.php:42
 #: ../../../inc/cron/model/_post_by_mail.funcs.php:381
 #: ../../../inc/tools/views/_create_comments.form.php:28
@@ -3313,7 +3309,7 @@ msgid "Blog ID"
 msgstr ""
 
 #. TRANS: file name
-#: ../../../inc/_core/_misc.funcs.php:6062
+#: ../../../inc/_core/_misc.funcs.php:6077
 #: ../../../inc/chapters/views/_chapter.form.php:56
 #: ../../../inc/chapters/views/_chapter_list.view.php:264
 #: ../../../inc/chapters/views/_chapter_move.form.php:40
@@ -3377,43 +3373,43 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6063
+#: ../../../inc/_core/_misc.funcs.php:6078
 #: ../../../inc/collections/views/_coll_general.form.php:187
 msgid "Short name"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6064
+#: ../../../inc/_core/_misc.funcs.php:6079
 #: ../../../inc/collections/views/_coll_general.form.php:388
 msgid "Tagline"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6065
+#: ../../../inc/_core/_misc.funcs.php:6080
 #: ../../../inc/collections/views/_coll_advanced.form.php:171
 msgid "Short Description"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6999
+#: ../../../inc/_core/_misc.funcs.php:7014
 #, php-format
 msgid "(Please check UNIX file permissions on the parent folder. %s)"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:7208
+#: ../../../inc/_core/_misc.funcs.php:7223
 msgid "Click to edit"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:7787
+#: ../../../inc/_core/_misc.funcs.php:7802
 msgid "Coll. Admin"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:7791
+#: ../../../inc/_core/_misc.funcs.php:7806
 msgid "This can only be edited by users with the Collection Admin permission."
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:7802
+#: ../../../inc/_core/_misc.funcs.php:7817
 msgid "User Admin"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:7806
+#: ../../../inc/_core/_misc.funcs.php:7821
 msgid "This can only be edited by users with the User Admin permission."
 msgstr ""
 
@@ -10207,7 +10203,7 @@ msgid "Post moderation"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_features.form.php:179
-msgid "Check to allow anonymous users to create new posts (useful for Forums). NOTE: a user accoutn will be automatically created when they post."
+msgid "Check to allow anonymous users to create new posts (useful for Forums). NOTE: a user account will be automatically created when they post."
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_features.form.php:179
@@ -13919,15 +13915,27 @@ msgid "Sorry, you don't have permission to view scheduled jobs."
 msgstr ""
 
 #: ../../../inc/email_campaigns/campaigns.ctrl.php:393
-msgid "No found accounts in filterset. Please try to change the filter of users list."
+msgid "No account matches the filterset. Please try to change the filters."
 msgstr ""
 
 #: ../../../inc/email_campaigns/campaigns.ctrl.php:398
-msgid "No found active accounts which accept list email. Please try to change the filter of users list."
+msgid "No active account accepts email from this list. Please try to change the filters."
 msgstr ""
 
 #: ../../../inc/email_campaigns/campaigns.ctrl.php:428
 msgid "Edit campaign"
+msgstr ""
+
+#: ../../../inc/email_campaigns/campaigns.ctrl.php:489
+#: ../../../inc/widgets/widgets/_user_login.widget.php:166
+#: ../../../skins_email/_email_header.inc.html.php:65
+#: ../../../skins_email/_email_header.inc.txt.php:22
+#, php-format
+msgid "Hello %s!"
+msgstr ""
+
+#: ../../../inc/email_campaigns/campaigns.ctrl.php:489
+msgid "Here are some news..."
 msgstr ""
 
 #: ../../../inc/email_campaigns/model/_emailcampaign.class.php:109
@@ -14200,12 +14208,12 @@ msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:46
 #: ../../../inc/email_campaigns/views/_campaigns_new.form.php:27
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:75
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:66
 msgid "Send to subscribers of"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:48
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:77
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:68
 #: ../../../inc/items/views/_item_list_full.view.php:784
 #: ../../../inc/maintenance/views/_upgrade.form.php:40
 #: ../../../inc/widgets/widgets/_coll_subscription.widget.php:163
@@ -14214,47 +14222,47 @@ msgid "Update"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:49
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:78
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:69
 msgid "Accounts which currently accept this list"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:49
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:78
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:69
 msgid "Currently selected recipients"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:50
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:79
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:70
 msgid "After additional filter"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:52
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:81
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:72
 msgid "Accounts that match your additional filter"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:53
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:82
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:73
 msgid "Change filter"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:55
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:84
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:75
 msgid "Accounts which have already been sent this list"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:55
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:84
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:75
 msgid "Already received"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:56
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:86
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:77
 msgid "Accounts which have not been sent this list yet"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:56
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:86
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:77
 #: ../../../inc/users/model/_user.funcs.php:3454
 #: ../../../inc/users/model/_user.funcs.php:6485
 msgid "Ready to send"
@@ -14294,42 +14302,42 @@ msgstr ""
 msgid "HTML message"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:61
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:57
 msgid "Plain-text message"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:72
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:63
 msgid "Campaign recipients"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:85
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:76
 msgid "Accounts which will be skipped from receiving this list"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:85
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:76
 msgid "Manually skipped"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:94
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:85
 msgid "See scheduled send jobs for this campaign"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:99
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:90
 #, php-format
 msgid "Start a job to send campaign to %s users"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:105
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:96
 #, php-format
 msgid "Send campaign to %s users now"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:117
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:119
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:108
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:110
 msgid "Send test email"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:118
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:109
 #: ../../../inc/tools/views/_email_address.form.php:27
 #: ../../../inc/tools/views/_email_address.form.php:33
 #: ../../../inc/users/model/_userfield.class.php:95
@@ -14340,7 +14348,7 @@ msgstr ""
 msgid "Email address"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:118
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:109
 msgid "Fill your email address and press button \"Send test email\" if you want to test this list"
 msgstr ""
 
@@ -26557,7 +26565,7 @@ msgid "Edit this email address..."
 msgstr ""
 
 #: ../../../inc/tools/views/_email_other.form.php:42
-msgid "Campaign/List throttling"
+msgid "Email campaign throttling"
 msgstr ""
 
 #: ../../../inc/tools/views/_email_other.form.php:46
@@ -33892,10 +33900,6 @@ msgstr ""
 msgid "Greeting text to display"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_login.widget.php:166
-msgid "Hello $login$!"
-msgstr ""
-
 #: ../../../inc/widgets/widgets/_user_login.widget.php:169
 #: ../../../inc/widgets/widgets/_user_register.widget.php:186
 msgid "Button class"
@@ -39247,28 +39251,6 @@ msgstr ""
 #: ../../../skins_email/_email_footer.inc.txt.php:36
 #, php-format
 msgid "To edit your email notification preferences, click here: %s"
-msgstr ""
-
-#: ../../../skins_email/_email_header.inc.html.php:68
-#: ../../../skins_email/_email_header.inc.txt.php:26
-msgid "Hello $firstname_and_login$!"
-msgstr ""
-
-#: ../../../skins_email/_email_header.inc.html.php:72
-#: ../../../skins_email/_email_header.inc.html.php:85
-#: ../../../skins_email/_email_header.inc.txt.php:30
-#: ../../../skins_email/_email_header.inc.txt.php:47
-msgid "Hello $name$!"
-msgstr ""
-
-#: ../../../skins_email/_email_header.inc.html.php:79
-#: ../../../skins_email/_email_header.inc.txt.php:37
-msgid "Here are some news"
-msgstr ""
-
-#: ../../../skins_email/_email_header.inc.html.php:89
-#: ../../../skins_email/_email_header.inc.txt.php:43
-msgid "Hello $username$!"
 msgstr ""
 
 #: ../../../skins_email/account_activate.html.php:43

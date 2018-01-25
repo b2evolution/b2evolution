@@ -3725,6 +3725,25 @@ function user_get_notification_sender( $user_ID, $setting )
 }
 
 
+class EmailTrackingHelper
+{
+	private $type;
+	private $key;
+
+	function __construct( $type, $key )
+	{
+		$this->type = $type;
+		$this->key = $key;
+	}
+
+	public function callback( $matches )
+	{
+		$passthrough_url = get_htsrv_url().'email_passthrough.php?type='.$this->type.'&email_key='.$this->key.'&redirect_to=';
+		return $matches[1].$passthrough_url.rawurlencode( $matches[2] ).$matches[3];
+	}
+}
+
+
 /**
  * Sends an email, wrapping PHP's mail() function.
  * ALL emails sent by b2evolution must be sent through this function (for consistency and for logging)
@@ -3776,6 +3795,16 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$message = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $message );
 	// Remove secret content marks from the message
 	$message_data = str_replace( array( '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
+
+	// Generate email key
+	do
+	{
+		$email_key = generate_random_key();
+	}
+	while( email_key_exists( $email_key ) );
+
+	// Add email tracking only to message that will be sent. Message string that will be sent to mail log should NOT contain email tracking code!
+	$message_data['full'] = add_email_tracking( $message_data['full'], $email_key );
 
 	// Memorize email address
 	$to_email_address = $to;
@@ -3893,7 +3922,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$mail_log_message = 'Sending mail to "'.$to_email_address.'" FAILED, because this email is marked with spam or permanent errors.';
 		$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
 
-		mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked' );
+		mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked', $email_key );
 
 		return false;
 	}
@@ -3911,7 +3940,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	{	// The message has not been sent successfully
 		if( $debug > 1 )
 		{ // We agree to die for debugging...
-			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
+			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
 
 			$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
 			debug_die( htmlspecialchars( $mail_log_message ) );
@@ -3921,7 +3950,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 			$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
 			$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
 
-			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
+			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
 
 			return false;
 		}
@@ -3930,7 +3959,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$mail_log_message = 'Sent mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
 	$Debuglog->add( htmlspecialchars( $mail_log_message ) );
 
-	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ) );
+	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $email_key );
 
 	return true;
 }
@@ -5160,7 +5189,7 @@ function generate_login_from_string( $login )
 
 	// Normalize login
 	load_funcs('locales/_charset.funcs.php');
-	$login = replace_special_chars( $login );
+	$login = replace_special_chars( $login, NULL, true );
 
 	if( $Settings->get( 'strict_logins' ) )
 	{ // We allow only the plain ACSII characters, digits, the chars _ and . and -
@@ -5175,6 +5204,13 @@ function generate_login_from_string( $login )
 
 	$login = preg_replace( '/^usr_/i', '', $login );
 
+	// Trim to allowed login length
+	$max_login_length = 20;
+	if( strlen( $login ) > $max_login_length )
+	{
+		$login = substr( $login, 0, $max_login_length );
+	}
+
 	if( ! empty( $login ) )
 	{
 		// Check and search free login name if current is already in use
@@ -5183,7 +5219,15 @@ function generate_login_from_string( $login )
 		$UserCache = & get_UserCache();
 		while( $UserCache->get_by_login( $login_name ) )
 		{
-			$login_name = $login.$login_number;
+			$num_suffix_length = strlen( $login_number );
+			if( strlen( $login_name ) + $num_suffix_length > $max_login_length )
+			{
+				$login_name = substr( $login, 0, $max_login_length - $num_suffix_length ).$login_number;
+			}
+			else
+			{
+				$login_name = $login.$login_number;
+			}
 			$login_number++;
 		}
 		$login = $login_name;

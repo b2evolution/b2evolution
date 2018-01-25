@@ -651,8 +651,7 @@ switch( $action )
 		$edited_Item->set_creator_location( 'subregion' );
 		$edited_Item->set_creator_location( 'city' );
 
-		$def_status = get_highest_publish_status( 'post', $Blog->ID, false );
-		$edited_Item->status = param( 'post_status', 'string', $def_status );		// 'published' or 'draft' or ...
+		$edited_Item->status = param( 'post_status', 'string', $Blog->get_setting( 'default_post_status' ) );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );

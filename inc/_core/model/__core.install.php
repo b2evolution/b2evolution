@@ -460,6 +460,7 @@ $schema_queries = array(
 		'Creating email log table',
 		"CREATE TABLE T_email__log (
 			emlog_ID        INT(10) UNSIGNED NOT NULL auto_increment,
+			emlog_key       VARCHAR(32) NULL DEFAULT NULL,
 			emlog_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			emlog_user_ID   INT(10) UNSIGNED DEFAULT NULL,
 			emlog_to        VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
@@ -467,7 +468,10 @@ $schema_queries = array(
 			emlog_subject   VARCHAR(255) DEFAULT NULL,
 			emlog_headers   TEXT DEFAULT NULL,
 			emlog_message   MEDIUMTEXT DEFAULT NULL,
-			PRIMARY KEY     (emlog_ID)
+			emlog_last_open_ts TIMESTAMP NULL,
+			emlog_last_click_ts TIMESTAMP NULL,
+			PRIMARY KEY     (emlog_ID),
+			UNIQUE emlog_key (emlog_key)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_email__returns' => array(

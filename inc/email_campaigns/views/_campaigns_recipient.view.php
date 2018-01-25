@@ -51,6 +51,7 @@ users_results_block( array(
 		'display_enlt_status'  => true,
 		'display_camp_status'  => true,
 		'display_emlog_date'   => true,
+		'display_email_tracking' => true,
 		'th_class_login'       => 'shrinkwrap',
 		'td_class_login'       => '',
 		'th_class_nickname'    => 'shrinkwrap',

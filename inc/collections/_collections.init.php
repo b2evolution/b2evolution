@@ -1244,7 +1244,7 @@ class collections_Module extends Module
 				{	// Unsubscribe from newsletter:
 					if( $current_User->unsubscribe( $Newsletter->ID ) )
 					{
-						$Messages->add( T_('You have successfully unsubscribed.'), 'success' );
+						$Messages->add( sprintf( T_('You have unsubscribed and you will no longer receive emails from %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
 					}
 				}
 				else
@@ -1256,7 +1256,7 @@ class collections_Module extends Module
 							$current_User->add_usertags( $insert_user_tags );
 							$current_User->dbupdate();
 						}
-						$Messages->add( T_('You have successfully subscribed.'), 'success' );
+						$Messages->add( sprintf( T_('You have successfully subscribed to: %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
 					}
 				}
 
@@ -1286,7 +1286,7 @@ class collections_Module extends Module
 				break; // already exited here
 
 			case 'create_post':
-				// Create new post from front-office:
+				// Create new post from front-office by anonymous user:
 				global $dummy_fields, $Plugins;
 
 				load_class( 'items/model/_item.class.php', 'Item' );
@@ -1314,7 +1314,7 @@ class collections_Module extends Module
 				$item_Blog = & $new_Item->get_Blog();
 
 				// Set default status:
-				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status' ) );
+				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status_anon' ) );
 
 				if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $user_email ) ) ) )
 				{	// Don't allow the duplicate emails for users:

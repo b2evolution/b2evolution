@@ -71,7 +71,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display a form for list subscription.');
+		return T_('Display a button to register to/unregister from a Newsletter (logged-in users only).');
 	}
 
 
@@ -89,66 +89,104 @@ class newsletter_subscription_Widget extends ComponentWidget
 			( empty( $params['infinite_loop'] ) ? ' OR enlt_ID = '.intval( $this->get_param( 'enlt_ID', true ) ) : '' ) );
 
 		$r = array_merge( array(
-				'title' => array(
-					'label' => T_('Block title'),
-					'note' => T_('Title to display in your skin.'),
-					'size' => 40,
-					'defaultvalue' => T_('Get our list!'),
+				'general_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('General settings')
 				),
-				'intro' => array(
-					'label' => T_('Intro text'),
-					'note' => '',
-					'type' => 'html_textarea',
-					'defaultvalue' => T_('Don\'t miss the news!'),
+					'enlt_ID' => array(
+						'label' => T_('List'),
+						'note' => '',
+						'type' => 'select',
+						'options' => array( ''  => T_('None') ) + $NewsletterCache->get_option_array(),
+						'defaultvalue' => '',
+					),
+					'usertags' => array(
+						'label' => T_('On subscription, tag user with'),
+						'size' => 30,
+						'maxlength' => 255,
+					),
+					// Hidden, used by subscribe shorttag
+					'inline' => array(
+						'label' => 'Internal: Display inline',
+						'defaultvalue' => 0,
+						'no_edit' => true,
+					),
+				'general_layout_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'bottom' => array(
-					'label' => T_('Bottom note'),
-					'note' => '',
-					'type' => 'html_textarea',
-					'defaultvalue' => '',
+				'no_subs_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('If user is not subscribed yet:')
 				),
-				'enlt_ID' => array(
-					'label' => T_('List'),
-					'note' => '',
-					'type' => 'select',
-					'options' => array( ''  => T_('None') ) + $NewsletterCache->get_option_array(),
-					'defaultvalue' => '',
+					'title' => array(
+						'label' => T_('Block title'),
+						'note' => T_('Title to display in your skin.'),
+						'size' => 40,
+						'defaultvalue' => T_('Get our list!'),
+					),
+					'intro' => array(
+						'label' => T_('Intro text'),
+						'note' => '',
+						'type' => 'html_textarea',
+						'defaultvalue' => T_('Don\'t miss the news!'),
+					),
+					'button_notsubscribed' => array(
+						'label' => T_('Button title'),
+						'note' => T_('Text that appears on the form submit button.'),
+						'size' => 40,
+						'defaultvalue' => T_('Subscribe Now!'),
+					),
+					'button_notsubscribed_class' => array(
+						'label' => T_('Button class'),
+						'note' => T_('Form submit button class'),
+						'size' => 40,
+						'defaultvalue' => 'btn-danger'
+					),
+					'bottom' => array(
+						'label' => T_('Bottom note'),
+						'note' => '',
+						'type' => 'html_textarea',
+						'defaultvalue' => '',
+					),
+				'no_subs_layout_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'button_notsubscribed' => array(
-					'label' => T_('Button title when not subscribed'),
-					'note' => T_('Text that appears on the form submit button.'),
-					'size' => 40,
-					'defaultvalue' => T_('Subscribe Now!'),
+				'yes_subs_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('If user is already subscribed:')
 				),
-				'button_notsubscribed_class' => array(
-					'label' => T_('Button class when not subscribed'),
-					'note' => T_('Form submit button class'),
-					'size' => 40,
-					'defaultvalue' => 'btn-danger'
-				),
-				'usertags' => array(
-					'label' => T_('On subscription, tag user with'),
-					'size' => 30,
-					'maxlength' => 255,
-				),
-				'button_subscribed' => array(
-					'label' => T_('Button title when subscribed'),
-					'note' => T_('Text that appears on the form submit button.'),
-					'size' => 40,
-					'defaultvalue' => T_('Subscribed'),
-				),
-				'button_subscribed_class' => array(
-					'label' => T_('Button class when subscribed'),
-					'note' => T_('Form submit button class'),
-					'size' => 40,
-					'defaultvalue' => 'btn-success'
-				),
-
-				// Hidden, used by subscribe shorttag
-				'inline' => array(
-					'label' => 'Internal: Display inline',
-					'defaultvalue' => 0,
-					'no_edit' => true,
+					'title_subscribed' => array(
+						'label' => T_('Block title'),
+						'note' => T_('Title to display in your skin.'),
+						'size' => 40,
+						'defaultvalue' => T_('Get our list!'),
+					),
+					'intro_subscribed' => array(
+						'label' => T_('Intro text'),
+						'note' => '',
+						'type' => 'html_textarea',
+						'defaultvalue' => T_('Don\'t miss the news!'),
+					),
+					'button_subscribed' => array(
+						'label' => T_('Button title'),
+						'note' => T_('Text that appears on the form submit button.'),
+						'size' => 40,
+						'defaultvalue' => T_('Subscribed'),
+					),
+					'button_subscribed_class' => array(
+						'label' => T_('Button class'),
+						'note' => T_('Form submit button class'),
+						'size' => 40,
+						'defaultvalue' => 'btn-success'
+					),
+					'bottom_subscribed' => array(
+						'label' => T_('Bottom note'),
+						'note' => '',
+						'type' => 'html_textarea',
+						'defaultvalue' => '',
+					),
+				'yes_subs_layout_end' => array(
+					'layout' => 'end_fieldset',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -191,21 +229,45 @@ class newsletter_subscription_Widget extends ComponentWidget
 
 		$redirect_to = param( 'redirect_to', 'url', regenerate_url( '', '', '', '&' ) );
 
-		$this->disp_title();
-
-		echo $this->disp_params['block_body_start'];
 
 		$NewsletterCache = & get_NewsletterCache();
 		if( ! ( $widget_Newsletter = & $NewsletterCache->get_by_ID( $this->disp_params['enlt_ID'], false, false ) ) ||
 		    ! $widget_Newsletter->get( 'active' ) )
 		{	// Display an error when newsletter is not found or not active:
+			$this->disp_title();
+			echo $this->disp_params['block_body_start'];
 			echo '<div class="red">'.T_('List subscription widget references an inactive list.').'</div>';
+			echo $this->disp_params['block_body_end'];
 		}
 		else
 		{	// Display a form to subscribe⁄unsubscribe:
-			if( trim( $this->disp_params['intro'] ) !== '' )
+
+			if( $current_User->is_subscribed( $widget_Newsletter->ID ) )
+			{	// If current user is already subscribed:
+				$title = $this->disp_params['title_subscribed'];
+				$intro = $this->disp_params['intro_subscribed'];
+				$button_name = 'unsubscribe';
+				$button_title = $this->disp_params['button_subscribed'];
+				$button_class = $this->disp_params['button_subscribed_class'];
+				$bottom = $this->disp_params['bottom_subscribed'];
+			}
+			else
+			{	// If current user is not subscribed yet:
+				$title = $this->disp_params['title'];
+				$intro = $this->disp_params['intro'];
+				$button_name = 'subscribe';
+				$button_title = $this->disp_params['button_notsubscribed'];
+				$button_class = $this->disp_params['button_notsubscribed_class'];
+				$bottom = $this->disp_params['bottom'];
+			}
+
+			$this->disp_title( $title );
+
+			echo $this->disp_params['block_body_start'];
+
+			if( trim( $intro ) !== '' )
 			{	// Display intro text:
-				echo '<p>'.$this->disp_params['intro'].'</p>';
+				echo '<p>'.$intro.'</p>';
 			}
 
 			$Form = new Form( get_htsrv_url().'action.php' );
@@ -227,33 +289,22 @@ class newsletter_subscription_Widget extends ComponentWidget
 
 			// Display a button to subscribe⁄unsubscribe:
 			echo '<div class="center">';
-			if( $current_User->is_subscribed( $widget_Newsletter->ID ) )
-			{	// If current user is already subscribed:
-				$Form->button_input( array(
-						'name'  => 'unsubscribe',
-						'value' => $this->disp_params['button_subscribed'],
-						'class' => $this->disp_params['button_subscribed_class'].' submit' )
-					);
-			}
-			else
-			{	// If current user is not subscribed yet:
-				$Form->button_input( array(
-						'name'  => 'subscribe',
-						'value' => $this->disp_params['button_notsubscribed'],
-						'class' => $this->disp_params['button_notsubscribed_class'].' submit' )
-					);
-			}
+			$Form->button_input( array(
+					'name'  => $button_name,
+					'value' => $button_title,
+					'class' => $button_class.' submit' )
+				);
 			echo '</div>';
 
 			$Form->end_form();
 
-			if( trim( $this->disp_params['bottom'] ) !== '' )
+			if( trim( $bottom ) !== '' )
 			{	// Display bottom note:
-				echo '<p class="margin-top">'.$this->disp_params['bottom'].'</p>';
+				echo '<p class="margin-top">'.$bottom.'</p>';
 			}
-		}
 
-		echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_body_end'];
+		}
 
 		echo $this->disp_params['block_end'];
 

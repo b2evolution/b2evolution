@@ -8931,7 +8931,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12510, 'Creating automation tables...' ) )
+	if( upg_task_start( 12510, 'Upgrading email log table...' ) )
+	{ // part of 6.10.0-beta
+		db_add_col( 'T_email__log', 'emlog_key', 'VARCHAR(32) NULL DEFAULT NULL AFTER emlog_ID' );
+		db_add_col( 'T_email__log', 'emlog_last_open_ts', 'TIMESTAMP NULL AFTER emlog_message' );
+		db_add_col( 'T_email__log', 'emlog_last_click_ts', 'TIMESTAMP NULL AFTER emlog_last_open_ts' );
+		db_add_index( 'T_email__log', 'emlog_key', 'emlog_key', 'UNIQUE' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12520, 'Creating automation tables...' ) )
 	{	// part of 6.10.0-beta
 		db_create_table( 'T_automation__automation', '
 			autm_ID            INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -8958,7 +8967,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12520, 'Creating automation user state table...' ) )
+	if( upg_task_start( 12530, 'Creating automation user state table...' ) )
 	{	// part of 6.10.0-beta
 		db_create_table( 'T_automation__user_state', '
 			aust_autm_ID      INT UNSIGNED NOT NULL,

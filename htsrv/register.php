@@ -296,7 +296,7 @@ switch( $action )
 				{
 					$login[] = trim( $lastname );
 				}
-				$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( implode( '_', $login ) ) );
+				$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( implode( '.', $login ) ) );
 				$login = generate_login_from_string( $login );
 			}
 			else
