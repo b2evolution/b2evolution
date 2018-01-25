@@ -1752,6 +1752,13 @@ class Form extends Widget
 	 */
 	function duration_input( $field_prefix, $duration, $field_label, $from_subfield = 'days', $to_subfield = 'minutes', $field_params = array() )
 	{
+		$field_params = array_merge( array(
+				'allow_none_value' => true,
+				'none_value_label' => '---',
+				'allow_none_title' => true,
+				'none_title_label' => '---',
+			), $field_params );
+
 		$this->handle_common_params( $field_params, $field_prefix, $field_label );
 
 		$periods_values = array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 50 );
@@ -1804,7 +1811,10 @@ class Form extends Widget
 
 		// Display <select> with periods values
 		$r .= "\n".'<select name="'.$field_prefix.'_value" id="'.Form::get_valid_id( $field_prefix ).'_value"'.$field_class.'>';
-		$r .= '<option value="0"'.( 0 == $current_value ? ' selected="selected"' : '' ).">---</option>\n";
+		if( $field_params['allow_none_value'] )
+		{	// Allow null value:
+			$r .= '<option value="0"'.( 0 == $current_value ? ' selected="selected"' : '' ).'>'.$field_params['none_value_label'].'</option>'."\n";
+		}
 		foreach( $periods_values as $period_value )
 		{
 			$r .= '<option value="'.$period_value.'"'.( $current_value == $period_value ? ' selected="selected"' : '' ).'>'.$period_value."</option>\n";
@@ -1813,7 +1823,10 @@ class Form extends Widget
 
 		// Display <select> with periods titles
 		$r .= "\n".'<select name="'.$field_prefix.'_name" id="'.Form::get_valid_id( $field_prefix ).'_name"'.$field_class.'>';
-		$r .= '<option value="0"'.( '' == $current_period ? ' selected="selected"' : '' ).">---</option>\n";
+		if( $field_params['allow_none_title'] )
+		{	// Allow none period name:
+			$r .= '<option value="0"'.( '' == $current_period ? ' selected="selected"' : '' ).'>'.$field_params['none_title_label'].'</option>'."\n";
+		}
 		foreach( $periods as $period )
 		{
 			$r .= '<option value="'.$period['name'].'"'.( $current_period == $period['name'] ? ' selected="selected"' : '' ).'>'.$period['title']."</option>\n";

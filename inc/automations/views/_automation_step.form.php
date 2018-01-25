@@ -69,17 +69,26 @@ $next_step_prepend_options = array(
 
 $Form->begin_line( '<span id="step_result_label_yes">'.T_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'YES' ) ).'</span>' );
 	$Form->select_input_object( 'step_yes_next_step_ID', $edited_AutomationStep->get( 'yes_next_step_ID' ), $AutomationStepCache, '', array( 'prepend_options' => $next_step_prepend_options ) );
-	$Form->duration_input( 'step_yes_next_step_delay', $edited_AutomationStep->get( 'yes_next_step_delay' ), T_('Delay') );
+	$Form->duration_input( 'step_yes_next_step_delay', $edited_AutomationStep->get( 'yes_next_step_delay' ), T_('Delay'), 'days', 'minutes', array(
+			'none_value_label' => '0',
+			'allow_none_title' => false,
+		)  );
 $Form->end_line();
 
 $Form->begin_line( '<span id="step_result_label_no">'.T_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'NO' ) ).'</span>' );
 	$Form->select_input_object( 'step_no_next_step_ID', $edited_AutomationStep->get( 'no_next_step_ID' ), $AutomationStepCache, '', array( 'prepend_options' => $next_step_prepend_options ) );
-	$Form->duration_input( 'step_no_next_step_delay', $edited_AutomationStep->get( 'no_next_step_delay' ), T_('Delay') );
+	$Form->duration_input( 'step_no_next_step_delay', $edited_AutomationStep->get( 'no_next_step_delay' ), T_('Delay'), 'days', 'minutes', array(
+			'none_value_label' => '0',
+			'allow_none_title' => false,
+		) );
 $Form->end_line();
 
 $Form->begin_line( '<span id="step_result_label_error">'.T_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'ERROR' ) ).'</span>' );
 	$Form->select_input_object( 'step_error_next_step_ID', $edited_AutomationStep->get( 'error_next_step_ID' ), $AutomationStepCache, '', array( 'prepend_options' => $next_step_prepend_options ) );
-	$Form->duration_input( 'step_error_next_step_delay', $edited_AutomationStep->get( 'error_next_step_delay' ), T_('Delay') );
+	$Form->duration_input( 'step_error_next_step_delay', $edited_AutomationStep->get( 'error_next_step_delay' ), T_('Delay'), 'days', 'minutes', array(
+			'none_value_label' => '0',
+			'allow_none_title' => false,
+		)  );
 $Form->end_line();
 
 $Form->end_form( array(
@@ -115,7 +124,23 @@ if( $edited_AutomationStep->ID > 0 )
 }
 ?>
 <script type="text/javascript">
-// Update form depending on step type:
+// Suggest default values only for new creating Step:
+<?php if( $edited_AutomationStep->ID > 0 ) { ?>
+set_default_next_step_data = false;
+<?php } else { ?>
+set_default_next_step_data = true;
+jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID,' +
+				'#step_yes_next_step_delay_value, #step_no_next_step_delay_value, #step_error_next_step_delay_value' +
+				'#step_yes_next_step_delay_name, #step_no_next_step_delay_name, #step_error_next_step_delay_name' ).change( function()
+{	// Stop to suggest default values if at least one setting of next steps is chagned by user:
+	set_default_next_step_data = false;
+} );
+<?php } ?>
+/**
+ * Update form depending on step type
+ *
+ * @param string Step type
+ */ 
 function step_type_update_info( step_type )
 {
 	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition' ).hide();
@@ -127,6 +152,16 @@ function step_type_update_info( step_type )
 			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'send_campaign', 'YES' ) ); ?>' );
 			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'send_campaign', 'NO' ) ); ?>' );
 			jQuery( '#step_result_label_error' ).html( '<?php echo TS_( step_get_result_label( 'send_campaign', 'ERROR' ) ); ?>' );
+			if( set_default_next_step_data )
+			{	// Suggest default values:
+				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID' ).val( '' );
+				jQuery( '#step_yes_next_step_delay_value' ).val( '3' );
+				jQuery( '#step_yes_next_step_delay_name' ).val( 'day' );
+				jQuery( '#step_no_next_step_delay_value' ).val( '0' );
+				jQuery( '#step_no_next_step_delay_name' ).val( 'second' );
+				jQuery( '#step_error_next_step_delay_value' ).val( '7' );
+				jQuery( '#step_error_next_step_delay_name' ).val( 'day' );
+			}
 			break;
 
 		case 'if_condition':
@@ -136,6 +171,13 @@ function step_type_update_info( step_type )
 			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'if_condition', 'YES' ) ); ?>' );
 			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'if_condition', 'NO' ) ); ?>' );
 			jQuery( '#step_result_label_error' ).html( '<?php echo TS_( step_get_result_label( 'if_condition', 'ERROR' ) ); ?>' );
+			if( set_default_next_step_data )
+			{	// Suggest default values:
+				jQuery( '#step_yes_next_step_ID' ).val( '' );
+				jQuery( '#step_no_next_step_ID, #step_error_next_step_ID' ).val( '-1' );
+				jQuery( '#step_yes_next_step_delay_value, #step_no_next_step_delay_value, #step_error_next_step_delay_value' ).val( '0' );
+				jQuery( '#step_yes_next_step_delay_name, #step_no_next_step_delay_name, #step_error_next_step_delay_name' ).val( 'second' );
+			}
 			break;
 	}
 }
