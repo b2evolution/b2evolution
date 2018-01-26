@@ -22,6 +22,7 @@ require_once $inc_path.'_main.inc.php';
 global $DB, $Session, $modules, $localtimenow;
 
 param( 'type', 'string', true );
+param( 'email_ID', 'integer', true );
 param( 'email_key', 'string', true );
 param( 'redirect_to', 'url', '' );
 
@@ -30,7 +31,7 @@ switch( $type )
 	case 'link':
 		$DB->query( 'UPDATE T_email__log
 				SET emlog_last_click_ts = '.$DB->quote( date2mysql( $localtimenow ) )
-				.' WHERE emlog_key = '.$DB->quote( $email_key ) );
+				.' WHERE emlog_ID = '.$DB->quote( $email_ID ).' AND emlog_key = '.$DB->quote( $email_key ) );
 
 		// Redirect
 		if( empty( $redirect_to ) )
@@ -48,7 +49,7 @@ switch( $type )
 	case 'img':
 		$DB->query( 'UPDATE T_email__log
 				SET emlog_last_open_ts = '.$DB->quote( date2mysql( $localtimenow ) )
-				.' WHERE emlog_key = '.$DB->quote( $email_key ) );
+				.' WHERE emlog_ID = '.$DB->quote( $email_ID ).' AND emlog_key = '.$DB->quote( $email_key ) );
 
 		if( ! empty( $redirect_to ) )
 		{

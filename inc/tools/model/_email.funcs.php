@@ -185,11 +185,13 @@ function emadr_get_status_icon( $status )
 /**
  * Get result info of email log
  *
- * @param string Result ( 'ok', 'error', 'blocked', 'simulated' )
+ * @param string Result ( 'ok', 'error', 'blocked', 'simulated', 'ready_to_send' )
  * @param boolean Params
+ * @param string Latest timestamp when email was opened
+ * @param string Latest timestamp when a link in the email was clicked
  * @return string Result info
  */
-function emlog_result_info( $result, $params = array() )
+function emlog_result_info( $result, $params = array(), $last_open = NULL, $last_click = NULL )
 {
 	$params = array_merge( array(
 			'display_icon'  => true,	// Display icon
@@ -205,11 +207,25 @@ function emlog_result_info( $result, $params = array() )
 		case 'ok':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_green', 'imgtag', array( 'alt' => T_('Ok') ) );
+				if( empty( $last_open ) && empty( $last_click ) )
+				{
+					$result_info .= get_icon( 'bullet_green', 'imgtag', array( 'alt' => T_('Ok') ) );
+				}
+				else
+				{
+					$result_info .= get_icon( 'bullet_light_blue', 'imgtag', array( 'alt' => T_('Read') ) );
+				}
 			}
 			if( $params['display_text'] )
 			{
-				$result_info .= ' '.T_('Ok');
+				if( empty( $last_open ) && empty( $last_click ) )
+				{
+					$result_info .= ' '.T_('Ok');
+				}
+				else
+				{
+					$result_info .= ' './* TRANS: Email was already opened */ T_('Read');
+				}
 			}
 			break;
 
@@ -246,11 +262,22 @@ function emlog_result_info( $result, $params = array() )
 		case 'simulated':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_light_blue', 'imgtag', array( 'alt' => T_('Simulated') ) );
+				$result_info .= get_icon( 'bullet_magenta', 'imgtag', array( 'alt' => T_('Simulated') ) );
 			}
 			if( $params['display_text'] )
 			{
 				$result_info .= ' '.T_('Simulated');
+			}
+			break;
+
+		case 'ready_to_send':
+			if( $params['display_icon'] )
+			{
+				$result_info .= get_icon( 'bullet_empty', 'imgtag', array( 'alt' => T_('Ready to send') ) );
+			}
+			if( $params['display_text'] )
+			{
+				$result_info .= ' '.T_('Ready to send');
 			}
 			break;
 	}
@@ -287,20 +314,11 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 
 	$to = utf8_strtolower( $to );
 
-	if( empty( $email_key ) )
-	{
-		do
-		{
-			$email_key = generate_random_key();
-		}
-		while( email_key_exists( $email_key ) );
-	}
-
 	// Insert mail log
 	$DB->query( 'INSERT INTO T_email__log
 		( emlog_key, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers )
 		VALUES
-		( '.( empty( $email_key ) ? 'NULL' : $DB->quote( $email_key ) ).',
+		( '.( empty( $email_key ) ? generate_random_key() : $DB->quote( $email_key ) ).',
 			'.$DB->quote( date2mysql( $servertimenow ) ).',
 		  '.$DB->quote( $user_ID ).',
 		  '.$DB->quote( $to ).',
@@ -321,6 +339,36 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 			    emadr_sent_count = emadr_sent_count + 1,
 			    emadr_sent_last_returnerror = emadr_sent_last_returnerror + 1,
 			    emadr_last_sent_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $servertimenow ) ) );
+	}
+}
+
+
+function update_mail_log( $email_ID, $result, $message )
+{
+	global $DB, $servertimenow;
+	$valid_results = array( 'ok', 'error', 'blocked', 'simulated', 'ready_to_send' );
+	if( ! in_array( $result, $valid_results ) )
+	{
+		debug_die( 'Invalid email log result!' );
+	}
+
+	$DB->query( 'UPDATE T_email__log
+			SET emlog_result = '.$DB->quote( $result )
+			.', emlog_message = '.$DB->quote( $message )
+			.', emlog_timestamp = '.$DB->quote( date2mysql( $servertimenow ) )
+			.' WHERE emlog_ID = '.$DB->quote( $email_ID ) );
+
+	if( $result == 'ok' )
+	{ // Save a report about sending of this message in the table T_email__address
+		// The mail sending was a success. Update last sent date and increase a counter
+		$to = $DB->get_var( 'SELECT emlog_to from T_email__log WHERE emlog_ID = '.$DB->quote( $email_ID ) );
+
+		$DB->query( 'INSERT INTO T_email__address ( emadr_address, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_sent_ts )
+			VALUES( '.$DB->quote( $to ).', 1, 1, '.$DB->quote( date2mysql( $servertimenow ) ).' )
+			ON DUPLICATE KEY UPDATE
+					emadr_sent_count = emadr_sent_count + 1,
+					emadr_sent_last_returnerror = emadr_sent_last_returnerror + 1,
+					emadr_last_sent_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $servertimenow ) ) );
 	}
 }
 
@@ -1140,50 +1188,61 @@ function php_email_sending_test()
 
 
 /**
- * Check if email key is already in use
- *
- * @param string Email key
- * @return boolean True if key already in use, False otherwise
- */
-function email_key_exists( $key )
-{
-	global $DB;
-
-	$SQL = new SQL();
-	$SQL->SELECT( 'COUNT(*)' );
-	$SQL->FROM( 'T_email__log' );
-	$SQL->WHERE( 'emlog_key = '.$DB->quote( $key ) );
-
-	$count = $DB->get_var( $SQL );
-
-	return $count > 0;
-}
-
-
-/**
  * Adds email tracking to message string
  *
  * @param string Message
  * @param string Email key
  * @return string Message with email tracking
  */
-function add_email_tracking( $message, $email_key )
+function add_email_tracking( $message, $email_ID, $email_key )
 {
-	// Add email tracking
+	global $track_email_click_html, $track_email_click_plain_text;
+
+	if( empty( $email_ID ) )
+	{
+		debug_die( 'No email ID specified.' );
+	}
+
 	if( empty( $email_key ) )
 	{
 		debug_die( 'No email key specified.' );
 	}
 
+	// Plain text content
+	if( ! isset( $track_email_click_plain_text ) || $track_email_click_plain_text == 1 )
+	{
+		preg_match( '/(?<=\$message_body_text_start\$)(?s)(.*)(?=\$message_body_text_end\$)/', $message, $matches );
+		$plain_text_content = $matches[0];
+
+		// Add link click tracking
+		//$re = '/(<a\b.+\bhref=")([^"]*)(")/';
+		$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#';
+		$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text' );
+		$plain_text_content = preg_replace_callback( $re, array( $callback, 'callback' ), $plain_text_content );
+
+		$message = preg_replace( '/(?<=\$message_body_text_start\$)(?s)(.*)(?=\$message_body_text_end\$)/', $plain_text_content, $message );
+	}
+
+	// HTML content
+	preg_match( '/(?<=\$message_body_html_start\$)(?s)(.*)(?=\$message_body_html_end\$)/', $message, $matches );
+	$html_content = $matches[0];
+
 	// Add email open tracking to first image
 	$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
-	$callback = new EmailTrackingHelper( 'img', $email_key );
-	$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message, 1 );
+	$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key );
+	$html_content = preg_replace_callback( $re, array( $callback, 'callback' ), $html_content, 1 );
 
-	// Add link click tracking
-	$re = '/(<a\b.+\bhref=")([^"]*)(")/';
-	$callback = new EmailTrackingHelper( 'link', $email_key );
-	$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
+	if( ! isset( $track_email_click_html ) || $track_email_click_html == 1  )
+	{
+		// Add link click tracking
+		$re = '/(<a\b.+\bhref=")([^"]*)(")/';
+		$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key );
+		$html_content = preg_replace_callback( $re, array( $callback, 'callback' ), $html_content );
+	}
+
+	$message = preg_replace( '/(?<=\$message_body_html_start\$)(?s)(.*)(?=\$message_body_html_end\$)/', $html_content, $message );
+
+	$message = str_replace( array( '$message_body_text_start$', '$message_body_text_end$', '$message_body_html_start$', '$message_body_html_end$' ), '', $message );
 
 	return $message;
 }

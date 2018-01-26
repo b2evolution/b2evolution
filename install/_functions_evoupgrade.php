@@ -8933,10 +8933,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 12510, 'Upgrading email log table...' ) )
 	{ // part of 6.10.0-beta
-		db_add_col( 'T_email__log', 'emlog_key', 'VARCHAR(32) NULL DEFAULT NULL AFTER emlog_ID' );
+		db_modify_col( 'T_email__log', 'emlog_result', 'ENUM( "ok", "error", "blocked", "simulated", "ready_to_send" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ok"' );
+		db_add_col( 'T_email__log', 'emlog_key', 'CHAR(32) NULL DEFAULT NULL AFTER emlog_ID' );
 		db_add_col( 'T_email__log', 'emlog_last_open_ts', 'TIMESTAMP NULL AFTER emlog_message' );
 		db_add_col( 'T_email__log', 'emlog_last_click_ts', 'TIMESTAMP NULL AFTER emlog_last_open_ts' );
-		db_add_index( 'T_email__log', 'emlog_key', 'emlog_key', 'UNIQUE' );
+
+		// Populate emlog_key of existing records
+		$DB->query( 'UPDATE T_email__log
+				SET emlog_key = MD5( CONCAT(emlog_ID, emlog_subject) )
+				WHERE emlog_key IS NULL' );
 		upg_task_end();
 	}
 
