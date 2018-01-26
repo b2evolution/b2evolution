@@ -21,7 +21,7 @@ $Form->global_icon( T_('Cancel viewing!'), 'close', regenerate_url( 'blog' ) );
 
 $Form->begin_form( 'fform', sprintf( T_('Mail log ID#%s'), $MailLog->emlog_ID ) );
 
-$Form->info( T_('Result'), emlog_result_info( $MailLog->emlog_result ) );
+$Form->info( T_('Result'), emlog_result_info( $MailLog->emlog_result, array(), $MailLog->emlog_last_open_ts, $MailLog->emlog_last_click_ts ) );
 
 $Form->info( T_('Date'), mysql2localedatetime_spans( $MailLog->emlog_timestamp ) );
 
@@ -52,14 +52,19 @@ if( !empty( $mail_contents ) )
 	if( !empty( $mail_contents['text'] ) )
 	{ // Display Plain Text content
 		$plain_text_content = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $mail_contents['text']['content'] );
+		$plain_text_content = preg_replace( '~\$secret_email_key_start\$.*\$secret_email_key_end\$~', '***secret-content-removed***', $plain_text_content );
+		$plain_text_content = str_replace( array( '$message_body_text_start$', '$message_body_text_end$' ), '', $plain_text_content );
 
 		$Form->info( T_('Text content'), $mail_contents['text']['type']
 				.'<pre class="email_log_scroll"><span>'.htmlspecialchars( $plain_text_content ).'</span></pre>' );
 	}
+
 	if( !empty( $mail_contents['html'] ) )
 	{ // Display HTML content
 
 		$html_content = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $mail_contents['html']['content'] );
+		$html_content = preg_replace( '~\$secret_email_key_start\$.*\$secret_email_key_end\$~', '***secret-content-removed***', $html_content );
+		$html_content = str_replace( array( '$message_body_html_start$', '$message_body_html_end$' ), '', $html_content );
 
 		if( ! empty( $mail_contents['html']['head_style'] ) )
 		{ // Print out all styles of email message
@@ -72,6 +77,8 @@ if( !empty( $mail_contents ) )
 	}
 }
 $emlog_message = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $MailLog->emlog_message );
+$emlog_message = preg_replace( '~\$secret_email_key_start\$.*\$secret_email_key_end\$~', '***secret-content-removed***', $emlog_message );
+$emlog_message = str_replace( array( '$message_body_text_start$', '$message_body_text_end$', '$message_body_html_start$', '$message_body_html_end$' ), '', $emlog_message );
 $Form->info( T_('Raw email source'), '<pre class="email_log_scroll"><span>'.htmlspecialchars( $emlog_message ).'</span></pre>' );
 
 $Form->end_form();

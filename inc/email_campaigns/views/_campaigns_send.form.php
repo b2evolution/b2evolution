@@ -18,6 +18,7 @@ global $admin_url, $tab;
 global $current_User, $Session, $Settings;
 global $edited_EmailCampaign;
 global $template_action;
+global $track_email_click_html, $track_email_click_plain_text;
 
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
@@ -50,12 +51,15 @@ echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	$html_mail_template = mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ), 'include_greeting' => false ), $current_User );
 	// Clear all html tags that may break styles of main html page:
 	$html_mail_template = preg_replace( '#</?(html|head|meta|body)[^>]*>#i', '', $html_mail_template );
+	$html_mail_template = str_replace( array( '$message_body_html_start$', '$message_body_html_end$' ), '', $html_mail_template );
 	echo '<div style="overflow:auto">'.$html_mail_template.'</div>';
 	echo '</div>';
 
 	echo '<div class="floatright" style="width:49%">';
 	echo '<p><b>'.T_('Plain-text message').':</b></p>';
-	echo '<div style="font-family:monospace;overflow:auto">'.nl2br(	mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_plaintext' ), 'include_greeting' => false ), $current_User ) ).'</div>';
+	$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_plaintext' ), 'include_greeting' => false ), $current_User );
+	$text_mail_template = str_replace( array( '$message_body_text_start$', '$message_body_text_end$' ), '', $text_mail_template );
+	echo '<div style="font-family:monospace;overflow:auto">'.nl2br( $text_mail_template ).'</div>';
 	echo '</div>';
 echo '</div>';
 $Form->end_fieldset();
@@ -78,6 +82,10 @@ $Form->begin_fieldset( T_('Campaign recipients').get_manual_link( 'campaign-reci
 
 	if( $edited_EmailCampaign->get_recipients_count( 'wait' ) > 0 )
 	{	// Display message to send emails only when users exist for this campaign:
+		$Form->checklist( array(
+				array( 'track_email_click_html', 1, T_('track clickthroughs in HTML version'), 1 ),
+				array( 'track_email_click_plain_text', 1, T_('track clickthroughs in plain text version'), 1 )
+			), 'track_email', T_('Track email') );
 		if( $Settings->get( 'email_campaign_send_mode' ) == 'cron' )
 		{	// Asynchronous sending mode:
 			if( $edited_EmailCampaign->get_Cronjob() )
