@@ -231,7 +231,7 @@ jQuery( document ).ready( function()
 		},
 		{
 			id: 'date',
-			label: '<?php echo TS_('Date' ); ?>',
+			label: '<?php echo TS_('Current date' ); ?>',
 			type: 'date',
 			operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
 			plugin: 'datepicker',

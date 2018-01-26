@@ -634,6 +634,10 @@ class AutomationStep extends DataObject
 				'between'          => array( 'BETWEEN', 'AND' ),
 				'not_between'      => array( 'NOT BETWEEN', 'AND' ),
 			);
+		$log_fields = array(
+				'user_has_tag' => 'User tag',
+				'date'         => 'Current date',
+			);
 		$log_bold_start = '<b>';
 		$log_bold_end = '</b>';
 		$log_rule_separator = ', ';
@@ -666,7 +670,7 @@ class AutomationStep extends DataObject
 			{	// This is a single field:
 				$rule_result = $this->check_if_condition_rule( $rule, $step_User, $process_log );
 				// Log:
-				$process_log .= $log_rule_separator.$rule->field.' ';
+				$process_log .= $log_rule_separator.$log_fields[ $rule->field ].' ';
 				if( is_array( $log_operators[ $rule->operator ] ) )
 				{	// Multiple operator and values:
 					foreach( $log_operators[ $rule->operator ] as $o => $operator )
