@@ -617,6 +617,7 @@ fieldset ul {
 }
 #user_admin_tags {
   width: 500px;
+  max-width: 100%;
 }
 #user_admin_tags ul.token-input-list-facebook {
   width: 100%;
@@ -894,7 +895,6 @@ h2.user_title::first-line {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;

@@ -48,7 +48,7 @@ class Automation extends DataObject
 			if( is_logged_in() )
 			{	// Use current User for new creating Automation:
 				global $current_User;
-				$this->owner_user_ID = $current_User->ID;
+				$this->owner_User = $current_User;
 			}
 		}
 		else

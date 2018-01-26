@@ -870,11 +870,12 @@ class User extends DataObject
 					}
 				}
 			}
+		}
 
-			// Tags
-			$user_tags = param( 'edited_user_tags', 'string', NULL );
-			if( $user_tags != NULL )
-			{
+		if( $has_full_access )
+		{	// If current user has full access to edit other users:
+			if( param( 'edited_user_tags', 'string', NULL ) !== NULL )
+			{	// Update user tags if they has been submitted:
 				$this->set_usertags_from_string( get_param( 'edited_user_tags' ) );
 			}
 		}

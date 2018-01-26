@@ -139,58 +139,6 @@ else
 
 $Form->end_fieldset(); // user permissions
 
-$Form->begin_fieldset( T_('Tags').get_manual_link('user-admin-tags') );
-
-	$Form->text_input( 'edited_user_tags', param( 'edited_user_tags', 'string', $user_tags ), 40, T_('Tags'), '', array(
-		'maxlength' => 255,
-		'style'     => 'width: 100%;',
-		'input_prefix' => '<div id="user_admin_tags" class="input-group">',
-		'input_suffix' => '</div>',
-	) );
-	?>
-	<script type="text/javascript">
-	function init_autocomplete_tags( selector )
-	{
-		var tags = jQuery( selector ).val();
-		var tags_json = new Array();
-		if( tags.length > 0 )
-		{ // Get tags from <input>
-			tags = tags.split( ',' );
-			for( var t in tags )
-			{
-				tags_json.push( { id: tags[t], name: tags[t] } );
-			}
-		}
-
-		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
-		{
-			theme: 'facebook',
-			queryParam: 's',
-			propertyToSearch: 'name',
-			tokenValue: 'name',
-			preventDuplicates: true,
-			prePopulate: tags_json,
-			hintText: '<?php echo TS_('Type in a tag') ?>',
-			noResultsText: '<?php echo TS_('No results') ?>',
-			searchingText: '<?php echo TS_('Searching...') ?>',
-			jsonContainer: 'tags',
-		} );
-	}
-
-	jQuery( document ).ready( function()
-	{
-		jQuery( '#edited_user_tags' ).hide();
-		init_autocomplete_tags( '#edited_user_tags' );
-		<?php
-			// Don't submit a form by Enter when user is editing the tags
-			echo get_prevent_key_enter_js( '#token-input-edited_user_tags' );
-		?>
-	} );
-	</script>
-	<?php
-
-$Form->end_fieldset(); // user tags
-
 $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 
 	$Form->begin_line( T_('Email') );

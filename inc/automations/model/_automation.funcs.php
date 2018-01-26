@@ -204,11 +204,17 @@ function step_td_num_users_queued( $step_ID, $num_users_queued )
  */
 function step_td_label( $step_ID, $step_label, $step_type )
 {
-	global $admin_url;
+	global $current_User;
 
-	return '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID.'">'
-			.( empty( $step_label ) ? step_get_type_title( $step_type ) : $step_label )
-		.'</a>';
+	$step_label = ( empty( $step_label ) ? step_get_type_title( $step_type ) : $step_label );
+
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{
+		global $admin_url;
+		$step_label = '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID.'"><b>'.$step_label.'</b></a>';
+	}
+
+	return $step_label;
 }
 
 
