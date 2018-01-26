@@ -1099,6 +1099,12 @@ switch( $action )
 
 		echo get_install_format_text( '<h2>'.T_('Upgrading b2evolution...').'</h2>', 'h2' );
 
+		display_install_messages( sprintf( '<p>%s<ol><li>%s</li><li>%s</li><li>%s</li></ol></p>',
+				T_('IMPORTANT: if this upgrade procedure fails, do this:'),
+				T_('Make a screenshot showing as much context as possible, and save it in case you need support.'),
+				T_('Reload the page. The upgrade script is designed to recover from unexpected stops and may be able to pick up where it left off.'),
+				sprintf( T_('If needed see <a %s>this man page</a>' ), 'href="http://b2evolution.net/man/auto-upgrade-procedure"' ) ), 'warning' );
+
 		if( $htaccess != 'skip' )
 		{
 			echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
