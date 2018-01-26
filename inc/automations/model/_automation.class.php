@@ -85,7 +85,7 @@ class Automation extends DataObject
 	{
 		return array(
 				array( 'table' => 'T_automation__step', 'fk' => 'step_autm_ID', 'msg' => T_('%d steps') ),
-				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_autm_ID', 'msg' => T_('%d automation user states') ),
+				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_autm_ID', 'msg' => T_('%d states of User in Automation') ),
 			);
 	}
 
@@ -102,7 +102,7 @@ class Automation extends DataObject
 		$this->set_from_Request( 'name' );
 
 		// Status:
-		param_string_not_empty( 'autm_status', T_('Please select an automation status.') );
+		param_string_not_empty( 'autm_status', 'Please select an automation status.' );
 		$this->set_from_Request( 'status' );
 
 		// Tied to List:

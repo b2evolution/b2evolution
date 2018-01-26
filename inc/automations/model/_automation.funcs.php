@@ -150,7 +150,7 @@ function step_get_result_labels()
 		'send_campaign' => array(
 			'YES'   => NT_('Next step if Email SENT'),
 			'NO'    => NT_('Next step if Email was ALREADY sent'),
-			'ERROR' => NT_('Next step if ERROR: Email cannot be sent'),
+			'ERROR' => NT_('Next step if Email cannot be sent'),
 		),
 	);
 }

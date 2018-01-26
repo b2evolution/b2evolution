@@ -80,7 +80,7 @@ class AutomationStep extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_next_step_ID', 'msg' => T_('%d automation user states') ),
+				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_next_step_ID', 'msg' => T_('%d states of User in Automation') ),
 				array( 'table' => 'T_automation__step', 'fk' => 'step_yes_next_step_ID', 'msg' => T_('it is used %d times as next step if YES') ),
 				array( 'table' => 'T_automation__step', 'fk' => 'step_no_next_step_ID', 'msg' => T_('it is used %d times as next step if NO') ),
 				array( 'table' => 'T_automation__step', 'fk' => 'step_error_next_step_ID', 'msg' => T_('it is used %d times as next step if ERROR') ),
@@ -169,7 +169,7 @@ class AutomationStep extends DataObject
 		$step_order = param( 'step_order', 'integer', NULL );
 		if( $this->ID > 0 )
 		{	// Order is required for edited step:
-			param_string_not_empty( 'step_order', T_('Please enter a step order.') );
+			param_string_not_empty( 'step_order', T_('Please enter a step order number.') );
 		}
 		elseif( $step_order === NULL )
 		{	// Set order for new creating step automatically:
@@ -195,7 +195,7 @@ class AutomationStep extends DataObject
 			{	// Display error because of duplicated order in the same Automation:
 				global $admin_url;
 				param_error( 'step_order',
-					sprintf( T_('Step with such order already exists for current automation. Do you want to <a %s>edit that step</a>?'),
+					sprintf( T_('Another step with the same order number already exists in the current automation. Do you want to <a %s>edit that step</a>?'),
 						'href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$existing_step_ID.'"' ) );
 			}
 		}
@@ -206,7 +206,7 @@ class AutomationStep extends DataObject
 		$this->set_from_Request( 'label', NULL, true );
 
 		// Type:
-		param_string_not_empty( 'step_type', T_('Please select a step type.') );
+		param_string_not_empty( 'step_type', 'Please select a step type.' );
 		$this->set_from_Request( 'type' );
 		// Save additional info depending on step type:
 		switch( $this->get( 'type' ) )
