@@ -389,15 +389,27 @@ class AutomationStep extends DataObject
 	 */
 	function execute_action( $user_ID, & $process_log )
 	{
-		global $DB, $servertimenow, $mail_log_message;
+		global $DB, $servertimenow, $mail_log_message, $executed_automation_steps;
+
+		// Initialize array to store executed steps per user in order to avoid infinite loops:
+		if( ! isset( $executed_automation_steps ) )
+		{
+			$executed_automation_steps = array();
+		}
+		if( ! isset( $executed_automation_steps[ $user_ID ] ) )
+		{
+			$executed_automation_steps[ $user_ID ] = array();
+		}
 
 		$Automation = & $this->get_Automation();
 
 		$log_nl = "\n";
 		$log_point = ' - ';
+		$log_bold_start = '<b>';
+		$log_bold_end = '</b>';
 
 		// Log:
-		$process_log = $log_nl.'Executing Step #'.$this->get( 'order' )
+		$process_log .= 'Executing Step #'.$this->get( 'order' )
 			.'('.step_get_type_title( $this->get( 'type' ) ).( $this->get( 'label' ) == '' ? '' : '"'.$this->get( 'label' ).'"' ).')'
 			.' of Automation: #'.$Automation->ID.'('.$Automation->get( 'name' ).')'
 			.' for User #'.$user_ID.'...'.$log_nl;
@@ -516,6 +528,20 @@ class AutomationStep extends DataObject
 					.'('.step_get_type_title( $this->get( 'type' ) ).( $this->get( 'label' ) == '' ? '' : ' "'.$this->get( 'label' ).'"' ).')'
 					.' delay: '.seconds_to_period( $next_delay ).', '.$next_exec_ts
 				: $log_point.'There is no next step configured.' ).$log_nl;
+
+		if( $next_delay == 0 && $next_AutomationStep )
+		{	// If delay for next step is 0 seconds then we must execute such step right now:
+			if( in_array( $this->ID, $executed_automation_steps[ $user_ID ] ) )
+			{	// Don't run this next step because it was already executed for the user:
+				$process_log .= $log_point.$log_bold_start.'Next step cannot be executed immediately to avoid infinite loop!'.$log_bold_end.$log_nl;
+			}
+			else
+			{	// Run next step because it is not executed yet for the user:
+				$executed_automation_steps[ $user_ID ][] = $this->ID;
+				$process_log .= $log_point.$log_bold_start.'Run next step immediately: '.$log_bold_end;
+				$next_AutomationStep->execute_action( $user_ID, $process_log );
+			}
+		}
 	}
 
 
