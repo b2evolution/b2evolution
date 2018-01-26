@@ -3731,17 +3731,34 @@ class EmailTrackingHelper
 	private $email_ID;
 	private $key;
 
-	function __construct( $type, $email_ID, $key )
+	function __construct( $type, $email_ID, $key, $mode = 'HTML' )
 	{
 		$this->type = $type;
 		$this->email_ID = $email_ID;
 		$this->key = $key;
+		$this->mode = $mode;
 	}
 
 	public function callback( $matches )
 	{
-		$passthrough_url = get_htsrv_url().'email_passthrough.php?email_ID='.$this->email_ID.'&type='.$this->type.'&email_key=$secret_content_start$'.$this->key.'$secret_content_end$&redirect_to=';
-		return $matches[1].$passthrough_url.rawurlencode( $matches[2] ).$matches[3];
+		$passthrough_url = get_htsrv_url().'email_passthrough.php?email_ID='.$this->email_ID.'&type='.$this->type.'&email_key=$secret_email_key_start$'.$this->key.'$secret_email_key_end$&redirect_to=';
+
+		switch( $this->mode )
+		{
+			case 'HTML':
+				if( preg_match( '~(\$secret_content_start\$)(.*)(\$secret_content_end\$)~', $matches[2], $submatches ) )
+				{
+					return $matches[1].$passthrough_url.'$secret_content_start$'.rawurlencode( $submatches[2] ).'$secret_content_end$'.$matches[3];
+				}
+				return $matches[1].$passthrough_url.rawurlencode( $matches[2] ).$matches[3];
+
+			case 'plain_text':
+				if( preg_match( '~(\$secret_content_start\$)(.*)(\$secret_content_end\$)~', $matches[0], $submatches ) )
+				{
+					return $passthrough_url.'$secret_content_start$'.rawurlencode( $submatches[2] ).'$secret_content_end$';
+				}
+				return $passthrough_url.rawurlencode( $matches[0] );
+		}
 	}
 }
 
@@ -3907,7 +3924,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	{
 		$message = add_email_tracking( $message, $mail_log_insert_ID, $email_key );
 		$message_data['full'] = add_email_tracking( $message_data['full'], $mail_log_insert_ID, $email_key );
-		$message_data = str_replace( array( '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
+		$message_data = str_replace( array( '$secret_email_key_start$', '$secret_email_key_end$' ), '', $message_data );
 
 		if( mail_is_blocked( $to_email_address ) )
 		{ // Check if the email address is blocked
@@ -4171,6 +4188,8 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			$template_message .= $template_headers[ $format ]."\n\n";
 		}
 
+		$template_message .= '$message_body_'.$format.'_start$';
+
 		// Get mail template
 		ob_start();
 		emailskin_include( $template_name.$ext, $params );
@@ -4217,6 +4236,9 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		}
 
 		$template_message .= $formated_message;
+
+		$template_message .= '$message_body_'.$format.'_end$';
+
 		if( isset( $template_contents ) )
 		{ // Multipart content
 			$template_contents[ $format ] = $formated_message;

@@ -294,6 +294,11 @@ switch( $action )
 
 	case 'send':
 	case 'create_cron':
+		global $track_email_click_html, $track_email_click_plain_text;
+
+		param( 'track_email_click_html', 'boolean', 0 );
+		param( 'track_email_click_plain_text', 'boolean', 0 );
+
 		// Send newsletter email for all users of this campaign OR create cron job to do this later:
 
 		// Check that this action request is not a CSRF hacked request:
