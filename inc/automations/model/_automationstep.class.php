@@ -97,14 +97,20 @@ class AutomationStep extends DataObject
 	{
 		if( $r = parent::dbinsert() )
 		{
-			// Update next steps to default values:
-			if( $this->get( 'type' ) == 'send_campaign' &&
-			    $this->get( 'error_next_step_ID' ) === NULL &&
-			    $this->get( 'error_next_step_delay' ) == 604800/* 7 days */ )
-			{	// If error next step is saved with default values then use current new created Step for loop:
-				$this->set( 'error_next_step_ID', $this->ID ); // Loop
-				$r = $this->dbupdate();
+			// Update next steps with selected option "Current Step" to ID of this new inserted Step:
+			$next_steps = array(
+				'yes_next_step_ID',
+				'no_next_step_ID',
+				'error_next_step_ID',
+			);
+			foreach( $next_steps as $next_step_ID_name )
+			{
+				if( get_param( 'step_'.$next_step_ID_name ) == 'current' )
+				{
+					$this->set( $next_step_ID_name, $this->ID ); // Loop
+				}
 			}
+			$this->dbupdate();
 		}
 
 		return $r;
@@ -230,8 +236,17 @@ class AutomationStep extends DataObject
 			);
 		foreach( $next_steps as $next_step_ID_name => $next_step_delay_name )
 		{
-			param( 'step_'.$next_step_ID_name, 'integer', NULL );
-			$this->set_from_Request( $next_step_ID_name, NULL, true );
+			$next_step_ID = param( 'step_'.$next_step_ID_name, 'string', NULL );
+			if( $next_step_ID === '' )
+			{
+				$next_step_ID = NULL;
+			}
+			if( $this->ID == 0 && $next_step_ID == 'current' )
+			{	// Set temporary next step ID to NULL(Continue) for new creating Step,
+				// then after inserting this will be converted to ID of new inserting step:
+				$next_step_ID = NULL;
+			}
+			$this->set( $next_step_ID_name, $next_step_ID, NULL );
 			$step_next_step_delay = param_duration( 'step_'.$next_step_delay_name );
 			if( empty( $step_next_step_delay ) )
 			{

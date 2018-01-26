@@ -61,11 +61,21 @@ $Form->select_input_object( 'step_email_campaign',
 // Load all steps of the edited step's automation excluding current step:
 $AutomationStepCache = & get_AutomationStepCache();
 $AutomationStepCache->clear();
-$AutomationStepCache->load_where( 'step_autm_ID = '.$step_Automation->ID );
+$AutomationStepCache->load_where( 'step_autm_ID = '.$step_Automation->ID
+	.( $edited_AutomationStep->ID > 0 ? ' AND step_ID != '.$edited_AutomationStep->ID : '' ) );
 $next_step_prepend_options = array(
 		'' => T_('Continue'),
 		-1 => T_('STOP'),
 	);
+if( $edited_AutomationStep->ID > 0 )
+{	// Display special label for option with current Step:
+	$next_step_prepend_options[ $edited_AutomationStep->ID ] = T_('Current Step');
+}
+else
+{	// If new step is creating we should use special key because we don't know step ID here,
+	// On inserting new Step we replace this temp key with real ID of new inserted Step:
+	$next_step_prepend_options['current'] = T_('Current Step');
+}
 
 $Form->begin_line( '<span id="step_result_label_yes">'.T_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'YES' ) ).'</span>' );
 	$Form->select_input_object( 'step_yes_next_step_ID', $edited_AutomationStep->get( 'yes_next_step_ID' ), $AutomationStepCache, '', array( 'prepend_options' => $next_step_prepend_options ) );
@@ -155,6 +165,7 @@ function step_type_update_info( step_type )
 			if( set_default_next_step_data )
 			{	// Suggest default values:
 				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID' ).val( '' );
+				jQuery( '#step_error_next_step_ID' ).val( 'current' );
 				jQuery( '#step_yes_next_step_delay_value' ).val( '3' );
 				jQuery( '#step_yes_next_step_delay_name' ).val( 'day' );
 				jQuery( '#step_no_next_step_delay_value' ).val( '0' );
