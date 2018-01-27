@@ -20,8 +20,12 @@ if( !isset( $display_params ) )
 }
 
 users_results_block( array(
+		'results_title'      => T_('Users'),
+		'display_user_count' => true,
 		'display_sec_groups' => true,
 		'display_params'     => $display_params,
+		'display_contact'    => false,
+		'display_email'      => true,
 	) );
 
 if( is_admin_page() )
