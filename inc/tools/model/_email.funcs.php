@@ -1198,6 +1198,8 @@ function add_email_tracking( $message, $email_ID, $email_key )
 {
 	global $track_email_click_html, $track_email_click_plain_text;
 
+	load_class( 'tools/model/_emailtrackinghelper.class.php', 'EmailTrackingHelper' );
+
 	if( empty( $email_ID ) )
 	{
 		debug_die( 'No email ID specified.' );
