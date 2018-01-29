@@ -58,6 +58,10 @@ ul, ol {
 	font-weight: normal;
 }
 
+p.margin-top {
+	margin: 10px 0 0 0;
+}
+
 // Use yellow color on hover table rows intead of grey standard color:
 .table-hover > tbody > tr:hover {
 	background-color: #ffc;
@@ -211,13 +215,9 @@ a.btn.action_icon {
 	}
 	// Table on the edit post form where Title/Language  & Advanced Properties are located
 	.compose_layout {
-		margin-bottom: 15px;
 		td {
-			padding: 0 2px 2px 0;
+			padding: 0 2px 15px 0;
 			vertical-align: middle;
-		}
-		tr:last-child td {
-			padding-bottom: 0;
 		}
 		th.label, td.label {
 			display: table-cell;
@@ -308,6 +308,20 @@ a.btn.action_icon {
 		&.large {
 			width: 100%;
 		}
+	}
+}
+// Vertical alignment for recipient field on contact form:
+.evo_msgform_recipient {
+	label.control-label, div.controls {
+		float: none;
+		display: inline-block;
+		vertical-align: middle;
+		padding-top: 0;
+	}
+	a.login {
+		white-space: normal;
+		text-align: center;
+		display: inline-block;
 	}
 }
 // Fix password fields and indicator on register forms

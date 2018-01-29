@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -1066,7 +1066,7 @@ function get_user_subs_url()
  * @param string What display as link text: avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
  * @return NULL|string NULL if this user or the profile tab doesn't exists, the identity link otherwise.
  */
-function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'profile', $link_text = 'avatar' )
+function get_user_identity_link( $user_login, $user_ID = NULL, $user_tab = 'profile', $link_text = 'avatar' )
 {
 	$UserCache = & get_UserCache();
 
@@ -1088,7 +1088,7 @@ function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'p
 		return NULL;
 	}
 
-	return $User->get_identity_link( array( 'profile_tab' => $profile_tab, 'link_text' => $link_text ) );
+	return $User->get_identity_link( array( 'user_tab' => $user_tab, 'link_text' => $link_text ) );
 }
 
 
@@ -1179,7 +1179,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 		$is_admin_tab = false;
 	}
 
-	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'visits', 'report' ) ) ) )
+	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits', 'report' ) ) ) )
 	{
 		debug_die( 'Not supported user tab!' );
 	}
@@ -1237,7 +1237,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 				{ // Deny all admin tabs for such users
 					$user_tab = 'user';
 				}
-				if( in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) )
+				if( in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish' ) ) )
 				{
 					return $current_Blog->get( $user_tab.'url' );
 				}
@@ -1258,7 +1258,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 		return $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;user_ID='.$user_ID;
 	}
 
-	if( ! empty( $current_Blog ) && in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) )
+	if( ! empty( $current_Blog ) && in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish' ) ) )
 	{
 		return $current_Blog->get( $user_tab.'url' );
 	}
@@ -2504,7 +2504,7 @@ function get_user_sub_entries( $is_admin, $user_ID )
 							'href' => url_add_param( $base_url, $ctrl_param.'userprefs'.$user_param ) );
 
 		$users_sub_entries['subs'] = array(
-							'text' => T_('Notifications'),
+							'text' => T_('Emails'),
 							'href' => url_add_param( $base_url, $ctrl_param.'subs'.$user_param ) );
 
 		if( $is_admin && $Settings->get( 'enable_visit_tracking' ) == 1 )
@@ -3264,7 +3264,8 @@ function userfield_prepare( & $userfield )
  */
 function callback_filter_userlist( & $Form )
 {
-	global $Settings, $current_User, $Collection, $Blog, $edited_Organization;
+	global $Settings, $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
+	global $registered_min, $registered_max;
 
 	$Form->hidden( 'filter', 'new' );
 
@@ -3284,11 +3285,7 @@ function callback_filter_userlist( & $Form )
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{ // Show "Reported users" filter only for users with edit user permission
 			$Form->checkbox( 'reported', get_param('reported'), T_('Reported users') );
-			$Form->checkbox( 'custom_sender_email', get_param('custom_sender_email'), T_('Users with custom sender address') );
-			$Form->checkbox( 'custom_sender_name', get_param('custom_sender_name'), T_('Users with custom sender name') );
 		}
-
-		$Form->select_input_array( 'account_status', get_param('account_status'), get_user_statuses( T_('All') ), T_('Account status') );
 
 		// Primary group:
 		$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_level DESC, grp_name ASC' );
@@ -3312,6 +3309,14 @@ function callback_filter_userlist( & $Form )
 		$Form->select_input_array( 'group2', get_param('group2'), $group_options_array,
 			sprintf( T_('<span %s>Secondary</span> Group'), 'class="label label-info"' ),
 			'', array( 'force_keys_as_values' => true ) );
+
+		$Form->select_input_array( 'account_status', get_param('account_status'), get_user_statuses( T_('All') ), T_('Account status') );
+
+		// Filter by registered date
+		$Form->begin_line( T_('Registered from'), 'registered_min' );
+		$Form->date_input( 'registered_min', $registered_min, '' );
+		$Form->date_input( 'registered_max', $registered_max, T_('to') );
+		$Form->end_line();
 	}
 
 	$location_filter_displayed = false;
@@ -3375,6 +3380,84 @@ function callback_filter_userlist( & $Form )
 		{
 			$Form->select_input_object( 'org', get_param('org'), $OrganizationCache, T_('Organization'), array( 'allow_none' => true ) );
 		}
+	}
+
+	if( is_admin_page() && empty( $edited_Newsletter ) && empty( $edited_EmailCampaign ) )
+	{	// Filter by newsletter only on back-office and don't display on newsletter and email campaign edit forms:
+		$NewsletterCache = & get_NewsletterCache( T_('All') );
+		$NewsletterCache->load_all();
+		if( count( $NewsletterCache->cache ) > 0 )
+		{
+			$Form->select_input_object( 'newsletter', get_param( 'newsletter' ), $NewsletterCache, T_('Subscribed to'), array( 'allow_none' => true ) );
+		}
+	}
+
+	$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, T_('Tag'), '', array(
+		'maxlength' => 255,
+		'input_prefix' => '<div class="input-group" style="width: 350px;">',
+		'input_suffix'=> '</div>'	) );
+	?>
+	<script type="text/javascript">
+	function init_autocomplete_tags( selector )
+	{
+		var tags = jQuery( selector ).val();
+		var tags_json = new Array();
+		if( tags.length > 0 )
+		{ // Get tags from <input>
+			tags = tags.split( ',' );
+			for( var t in tags )
+			{
+				tags_json.push( { id: tags[t], name: tags[t] } );
+			}
+		}
+
+		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
+		{
+			theme: 'facebook',
+			queryParam: 's',
+			propertyToSearch: 'name',
+			tokenValue: 'name',
+			preventDuplicates: true,
+			prePopulate: tags_json,
+			hintText: '<?php echo TS_('Type in a tag') ?>',
+			noResultsText: '<?php echo TS_('No results') ?>',
+			searchingText: '<?php echo TS_('Searching...') ?>',
+			jsonContainer: 'tags',
+		} );
+	}
+
+	jQuery( document ).ready( function()
+	{
+		jQuery( '#user_tag' ).hide();
+		init_autocomplete_tags( '#user_tag' );
+		<?php
+			// Don't submit a form by Enter when user is editing the tags
+			echo get_prevent_key_enter_js( '#token-input-user_tag' );
+		?>
+	} );
+	</script>
+	<?php
+
+	if( is_admin_page() )
+	{
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{
+			$Form->checkbox( 'custom_sender_email', get_param('custom_sender_email'), T_('Users with custom sender address') );
+			$Form->checkbox( 'custom_sender_name', get_param('custom_sender_name'), T_('Users with custom sender name') );
+		}
+	}
+
+	if( is_admin_page() && $edited_EmailCampaign )
+	{
+		$campaign_send_status = array(
+				'' => T_('All'),
+				'ready_to_send' => T_('Ready to send'),
+				'ready_to_resend' => T_('Ready to resend'),
+				'sent' => T_('Sent'),
+				'send_error' => T_('Send error'),
+				'skipped' => T_('Skipped')
+			);
+		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, T_('Campaign Status'), '', array( 'allow_none' => true ) );
 	}
 	echo '<br />';
 
@@ -5190,6 +5273,9 @@ function users_results_block( $params = array() )
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'org_ID'               => NULL,
+			'enlt_ID'              => NULL,
+			'enls_subscribed'      => 1,
+			'ecmp_ID'              => NULL,
 			'viewed_user'          => NULL,
 			'reg_ip_min'           => NULL,
 			'reg_ip_max'           => NULL,
@@ -5204,6 +5290,7 @@ function users_results_block( $params = array() )
 			'join_country'         => true,
 			'keywords_fields'      => NULL,
 			'where_status_closed'  => NULL,
+			'display_user_count'   => false, // user count beside the title
 			'display_params'       => array(),
 			'display_orgstatus'    => false,
 			'display_filters'      => true,
@@ -5239,6 +5326,15 @@ function users_results_block( $params = array() )
 			'display_sec_groups'   => false,
 			'display_level'        => true,
 			'display_status'       => true,
+			'display_enlt_status'  => false,
+			'display_camp_status'  => false,
+			'display_emlog_date'   => false,
+			'display_email_tracking' => false,
+			'display_enls_subscribed'      => false,
+			'display_enls_subscribed_ts'   => false,
+			'display_enls_unsubscribed_ts' => false,
+			'display_enls_sent_manual'     => false,
+			'display_enls_send_count'      => false,
 			'display_actions'      => true,
 			'display_org_actions'  => false,
 			'display_newsletter'   => true,
@@ -5258,7 +5354,7 @@ function users_results_block( $params = array() )
 		}
 	}
 
-	global $DB, $UserSettings, $Settings, $action, $admin_url, $action;
+	global $DB, $UserSettings, $Settings, $Session, $action, $admin_url, $action;
 
 	// query which groups have users (in order to prevent deletion of groups which have users)
 	global $usedgroups; // We need this in a callback below
@@ -5284,6 +5380,9 @@ function users_results_block( $params = array() )
 	$default_filters = array(
 			'order'      => $params['results_order'],
 			'org'        => $params['org_ID'],
+			'newsletter' => $params['enlt_ID'],
+			'newsletter_subscribed' => $params['enls_subscribed'],
+			'ecmp'       => $params['ecmp_ID'],
 			'reg_ip_min' => $params['reg_ip_min'],
 			'reg_ip_max' => $params['reg_ip_max'],
 		);
@@ -5308,6 +5407,12 @@ function users_results_block( $params = array() )
 
 	// Execute query
 	$UserList->query();
+
+	// Display number of rows in the title
+	if( $params['display_user_count'] )
+	{
+		$UserList->title .= ' ('.$UserList->get_total_rows().')';
+	}
 
 
 	if( $params['display_filters'] )
@@ -5377,10 +5482,31 @@ function users_results_block( $params = array() )
 		$UserList->display( $params['display_params'] );
 	}
 
-	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
+	$edited_campaign_ID = $Session->get( 'edited_campaign_ID' );
+	if( !empty( $edited_campaign_ID ) )
+	{ // Get Email Campaign by ID from Session
+		$EmailCampaignCache = & get_EmailCampaignCache();
+		$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $edited_campaign_ID, false, false );
+	}
+
+	if( !empty( $edited_EmailCampaign ) )
+	{
+		$newsletter_button_text = sprintf( T_('Use this selection for list "%s"'), $edited_EmailCampaign->get( 'name' ) );
+		$newsletter_button_class = 'btn-primary';
+	}
+	else
+	{
+		$newsletter_button_text = T_('Send list to the current selection');
+		$newsletter_button_class = 'btn-default';
+	}
+
+	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 && ! empty( $UserList->filters['newsletter'] ) )
 	{	// Display newsletter button:
 		echo '<p class="center">';
-		echo '<input type="button" value="'.T_('Send newsletter to the current selection').'" onclick="location.href=\''.$admin_url.'?ctrl=campaigns&amp;action=users&amp;'.url_crumb( 'campaign' ).'\'" class="btn '.( $action == 'newsletter' ? 'btn-primary' :  'btn-default' ).'" />';
+		echo '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=users&amp;newsletter='.$UserList->filters['newsletter'].'&amp;'.url_crumb( 'campaign' ).'"'
+			.' class="btn '.$newsletter_button_class.'">'
+				.format_to_output( $newsletter_button_text )
+			.'</a>';
 		echo '</p>';
 	}
 }
@@ -5407,6 +5533,7 @@ function users_results( & $UserList, $params = array() )
 			'display_nickname'   => true,
 			'display_name'       => true,
 			'order_name'         => 'user_lastname, user_firstname',
+			'display_email'      => false,
 			'display_role'       => false,
 			'display_gender'     => true,
 			'display_country'    => true,
@@ -5430,7 +5557,16 @@ function users_results( & $UserList, $params = array() )
 			'display_sec_groups' => false,
 			'display_level'      => true,
 			'display_status'     => true,
+			'display_camp_status' => false,
+			'display_emlog_date' => false,
+			'display_email_tracking' => false,
+			'display_enls_subscribed'      => false,
+			'display_enls_subscribed_ts'   => false,
+			'display_enls_unsubscribed_ts' => false,
+			'display_enls_sent_manual'     => false,
+			'display_enls_send_count'      => false,
 			'display_actions'    => true,
+			'display_campaign_actions' => false,
 			'display_org_actions'=> false,
 			'th_class_avatar'    => 'shrinkwrap small',
 			'td_class_avatar'    => 'shrinkwrap center small',
@@ -5566,6 +5702,16 @@ function users_results( & $UserList, $params = array() )
 			$col['order'] = $params['order_name'];
 		}
 		$UserList->cols[] = $col;
+	}
+
+	if( $params['display_email'] )
+	{
+		$UserList->cols[] = array(
+			'th' => T_('Email'),
+			'th_class' => 'small',
+			'td_class' => 'small',
+			'td' => '$user_email$'
+		);
 	}
 
 	if( $params['display_role'] )
@@ -5778,6 +5924,121 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
+	if( $params['display_enlt_status'] )
+	{ // Display list status:
+		$UserList->cols[] = array(
+				'th' => T_('List Status'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'nowrap',
+				'order' => 'enls_user_ID',
+				'td' => '~conditional( #enls_user_ID# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
+			);
+	}
+
+	if( $params['display_camp_status'] )
+	{ // Display campaign status
+		$UserList->cols[] = array(
+				'th' => T_('Campaign Status'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'csnd_status',
+				'td' => '%user_td_campaign_status( #csnd_status# )%'
+			);
+	}
+
+	if( $params['display_emlog_date'] )
+	{ // Display email campaign send date:
+		$UserList->cols[] = array(
+				'th' => T_('Send date'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'emlog_timestamp',
+				'default_dir' => 'D',
+				'td' => '%user_td_emlog_date( #emlog_timestamp# )%',
+			);
+	}
+
+	if( $params['display_email_tracking'] )
+	{
+		$UserList->cols[] = array(
+				'th' => T_('Last opened'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'emlog_last_open_ts',
+				'default_dir' => 'D',
+				'td' => '%user_td_emlog_date( #emlog_last_open_ts# )%',
+			);
+
+		$UserList->cols[] = array(
+				'th' => T_('Last clicked'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'emlog_last_click_ts',
+				'default_dir' => 'D',
+				'td' => '%user_td_emlog_date( #emlog_last_click_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_subscribed'] )
+	{ // Display status of user subscription:
+		$UserList->cols[] = array(
+				'th' => T_('Subscribed'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center',
+				'order' => 'enls_subscribed',
+				'default_dir' => 'D',
+				'td' => '~conditional( #enls_subscribed#, \''.format_to_output( T_('yes'), 'htmlattr' ).'\', \''.format_to_output( T_('no'), 'htmlattr' ).'\' )~',
+			);
+	}
+
+	if( $params['display_enls_subscribed_ts'] )
+	{ // Display subscription date:
+		$UserList->cols[] = array(
+				'th' => T_('Subscribed'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'enls_subscribed_ts',
+				'default_dir' => 'D',
+				'td' => '%mysql2localedatetime( #enls_subscribed_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_unsubscribed_ts'] )
+	{ // Display unsubscription date:
+		$UserList->cols[] = array(
+				'th' => T_('Unsubscribed'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'enls_unsubscribed_ts',
+				'default_dir' => 'D',
+				'td' => '%mysql2localedatetime( #enls_unsubscribed_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_sent_manual'] )
+	{ // Display email campaign send date:
+		$UserList->cols[] = array(
+				'th' => T_('Last sent'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center nowrap',
+				'order' => 'enls_last_sent_manual_ts',
+				'default_dir' => 'D',
+				'td' => '%mysql2localedatetime( #enls_last_sent_manual_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_send_count'] )
+	{ // Display email campaign send date:
+		$UserList->cols[] = array(
+				'th' => T_('# of campaigns sent'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'right',
+				'order' => 'enls_send_count',
+				'default_dir' => 'D',
+				'td' => '$enls_send_count$',
+			);
+	}
+
 	if( is_logged_in() && ! $current_User->check_perm( 'users', 'moderate', false ) )
 	{ // Current user has no permissions to moderate the users
 		if( isset( $userlist_col_reputaion ) )
@@ -5845,6 +6106,16 @@ function users_results( & $UserList, $params = array() )
 					'th_class' => 'small',
 					'td_class' => 'shrinkwrap small',
 					'td' => '%user_td_org_actions( '.intval( $params['org_ID'] ).', #user_ID# )%'
+				);
+		}
+
+		if( $params['display_campaign_actions'] )
+		{
+			$UserList->cols[] = array(
+					'th' => T_('Actions'),
+					'th_class' => 'small',
+					'td_class' => 'shrinkwrap small',
+					'td' => '%user_td_campaign_actions( '.intval( $params['ecmp_ID'] ).', #user_ID#, #csnd_status# )%'
 				);
 		}
 
@@ -6183,6 +6454,35 @@ function user_td_org_actions( $org_ID, $user_ID )
 
 
 /**
+ * Get link to email campaign related actions
+ *
+ * @param integer Campaign ID
+ * @param integer User ID
+ * @param string Campaign send status
+ */
+function user_td_campaign_actions( $campaign_ID, $user_ID, $csnd_status )
+{
+	global $current_User, $admin_url;
+
+	$r = '';
+
+	if( $current_User->can_moderate_user( $user_ID ) )
+	{ // Current user can moderate this user
+		$r .= action_icon( T_('Queue again'), 'rewind', $admin_url.'?ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign'),
+				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'ready_to_send', 'ready_to_resend' ) )  ? ' invisible' : '' ) ) );
+		$r .= action_icon( T_('Skip'), 'forward', $admin_url.'?ctrl=campaigns&amp;action=skip&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign'),
+				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'sent', 'send_error', 'skipped' ) ) ? ' invisible' : '' ) ) );
+	}
+	else
+	{
+		$r .= get_icon( 'edit', 'noimg' );
+	}
+
+	return $r;
+}
+
+
+/**
  * Get an HTML icon to display if organization is accepted by admib or isn't.
  *
  * @param boolean TRUE if the organization is accepted to the user
@@ -6213,6 +6513,52 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 		return get_icon( 'bullet_red', 'imgtag', array_merge( array( 'title' => T_('Not accepted') ), $accept_icon_params ) );
 	}
 }
+
+
+/**
+ * Get user campaign status
+ */
+function user_td_campaign_status( $csnd_status )
+{
+	switch( $csnd_status )
+	{
+		case 'ready_to_send':
+			return T_('Ready to send');
+
+		case 'ready_to_resend':
+			return T_('Ready to resend');
+
+		case 'sent':
+			return T_('Sent');
+
+		case 'send_error':
+			return T_('Send error');
+
+		case 'skipped':
+			return T_('Skipped');
+
+		default:
+			return T_('Unknown');
+	}
+}
+
+
+/**
+ * Get email campaign send date
+ *
+ * @param string Email log date
+ * @return string
+ */
+function user_td_emlog_date( $emlog_date )
+{
+	if( ! empty( $emlog_date ) )
+	{
+		return mysql2localedatetime( $emlog_date );
+	}
+
+	return NULL;
+}
+
 
 /**
  * Validate current session is in a password reset process:
@@ -6376,7 +6722,7 @@ function get_PasswordDriver( $driver_code = '' )
 			$driver_file_path = 'users/model/passwords/'.$drv_key.'.php';
 			if( file_exists( $inc_path.$driver_file_path ) )
 			{	// Class file exists on the disk
-				$driver_class_name = str_replace( ' ', '', lcfirst( ucwords( str_replace( '_', ' ', $drv_key ) ) ) ).'PasswordDriver';
+				$driver_class_name = str_replace( ' ', '', utf8_lcfirst( ucwords( str_replace( '_', ' ', $drv_key ) ) ) ).'PasswordDriver';
 				// Load the class:
 				load_class( $driver_file_path, $driver_class_name );
 

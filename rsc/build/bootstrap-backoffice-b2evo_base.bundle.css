@@ -2049,7 +2049,7 @@ div.codeblock > p {
 }
 div.videoblock {
   text-align: center;
-  margin: auto;
+  margin: 1ex auto;
   overflow: auto;
   position: relative;
   max-width: 100%;
@@ -2122,6 +2122,9 @@ ol {
 }
 .text-normal {
   font-weight: normal;
+}
+p.margin-top {
+  margin: 10px 0 0 0;
 }
 .table-hover > tbody > tr:hover {
   background-color: #ffc;
@@ -2249,15 +2252,9 @@ a.btn.action_icon.hoverlink {
   vertical-align: top;
   margin-left: 7px;
 }
-.form-horizontal .compose_layout {
-  margin-bottom: 15px;
-}
 .form-horizontal .compose_layout td {
-  padding: 0 2px 2px 0;
+  padding: 0 2px 15px 0;
   vertical-align: middle;
-}
-.form-horizontal .compose_layout tr:last-child td {
-  padding-bottom: 0;
 }
 .form-horizontal .compose_layout th.label,
 .form-horizontal .compose_layout td.label {
@@ -2343,6 +2340,18 @@ a.btn.action_icon.hoverlink {
 .form-inline .form-group.large,
 .form-inline #criteria_type_A2.large {
   width: 100%;
+}
+.evo_msgform_recipient label.control-label,
+.evo_msgform_recipient div.controls {
+  float: none;
+  display: inline-block;
+  vertical-align: middle;
+  padding-top: 0;
+}
+.evo_msgform_recipient a.login {
+  white-space: normal;
+  text-align: center;
+  display: inline-block;
 }
 #register_form div#ffield_m {
   margin-bottom: 4px;

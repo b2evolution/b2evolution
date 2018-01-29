@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -141,6 +141,9 @@ $Plugins->trigger_event( 'WidgetEndSettingsForm', array(
 	) );
 
 $Form->end_form();
+
+// Enable JS for fieldset folding:
+echo_fieldset_folding_js();
 
 if( $display_mode == 'js' )
 {	// Reset previous and Initialize new bozo validator for each new opened widget edit form in popup window,

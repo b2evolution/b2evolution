@@ -49,7 +49,7 @@ $Form->begin_fieldset( T_('Default user permissions').get_manual_link('default-u
 
 	$disabled_param_links = array();
 	if( $Settings->get( 'newusers_canregister' ) == 'no' )
-	{ // Disable the field below when registration is not allowed 
+	{ // Disable the field below when registration is not allowed
 		$disabled_param_links['disabled'] = 'disabled';
 	}
 	$Form->checkbox_input( 'registration_is_public', $Settings->get( 'registration_is_public' ), T_('Registration links'), array_merge( array( 'note' => T_('Check to show self-registration links to the public.' ) ), $disabled_param_links ) );
@@ -93,14 +93,22 @@ $Form->begin_fieldset( T_('Default user settings').get_manual_link('default-user
 	);
 	$Form->checklist( $notify_options, 'default_user_notification', T_( 'Notify me by email whenever' ) );
 
-	$newsletter_options = array(
-		array( 'newsletter_news', 1, T_( 'Send me news about this site.' ).' <span class="note">'.T_('Each message contains an easy 1 click unsubscribe link.').'</span>', $Settings->get( 'def_newsletter_news' ) ),
-		array( 'newsletter_ads', 1, T_( 'I want to receive ADs that may be relevant to my interests.' ), $Settings->get( 'def_newsletter_ads' ) )
-	);
-	$Form->checklist( $newsletter_options, 'default_user_newsletter', T_( 'Newsletter' ) );
+	$NewsletterCache = & get_NewsletterCache();
+	$NewsletterCache->load_where( 'enlt_active = 1' );
+
+	if( count( $NewsletterCache->cache ) )
+	{	// If at least one newsletter is active:
+		$def_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', $Settings->get( 'def_newsletters' ) ) );
+		$newsletter_options = array();
+		foreach( $NewsletterCache->cache as $Newsletter )
+		{
+			$newsletter_options[] = array( 'def_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $def_newsletters ) );
+		}
+		$Form->checklist( $newsletter_options, 'def_newsletters', T_( 'Newsletter' ) );
+	}
 
 	$Form->text_input( 'notification_email_limit', $Settings->get( 'def_notification_email_limit' ), 3, T_( 'Limit notification emails to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
-	$Form->text_input( 'newsletter_limit', $Settings->get( 'def_newsletter_limit' ), 3, T_( 'Limit newsletters to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
+	$Form->text_input( 'newsletter_limit', $Settings->get( 'def_newsletter_limit' ), 3, T_( 'Limit lists to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
 
 $Form->end_fieldset();
 
@@ -161,9 +169,9 @@ $Form->begin_fieldset( T_('Other options').get_manual_link('other-registration-s
 					array( 'required', T_('Required') ),
 				), T_('Gender'), true );
 
-	if( $Settings->get( 'after_registration' ) == 'return_to_original' )
+	if( $Settings->get( 'after_registration' ) == 'return_to_original' || $Settings->get( 'after_registration' ) == 'specific_slug' )
 	{ // return to original url
-		$after_registration = 'return_to_original';
+		$after_registration = $Settings->get( 'after_registration' );
 		$after_registration_url = url_add_param( $baseurl, 'disp=profile' );
 	}
 	else
@@ -176,7 +184,11 @@ $Form->begin_fieldset( T_('Other options').get_manual_link('other-registration-s
 					array( 'specific_url', T_( 'Go to specific URL' ).':', '',
 						'<input type="text" id="specific_after_registration_url" class="form_text_input form-control" name="specific_after_registration_url" size="50" maxlength="120" value="'
 						.format_to_output( $after_registration_url, 'formvalue' ).'"
-						onfocus="document.getElementsByName(\'after_registration\')[1].checked=true;" />' )
+						onfocus="document.getElementsByName(\'after_registration\')[1].checked=true;" />' ),
+					array( 'specific_slug', T_( 'Go to specific slug' ).':', '',
+						'<input type="text" id="specific_after_registration_slug" class="form_text_input form-control" name="specific_after_registration_slug" size="50" maxlength="120" value="'
+						.format_to_output( $Settings->get( 'after_registration_slug' ), 'formvalue' ).'"
+						onfocus="document.getElementsByName(\'after_registration\')[2].checked=true;" />' )
 				), T_( 'After registration' ), true );
 
 $Form->end_fieldset();

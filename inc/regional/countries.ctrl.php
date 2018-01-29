@@ -123,11 +123,6 @@ switch( $action )
 		{	// Enable country by setting flag to true.
 			$edited_Country->set( 'preferred', 1 );
 			$Messages->add( sprintf( T_('Added to preferred countries (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
-
-			if( ! $edited_Country->get( 'status' ) )
-			{ // If the country status is empty ( which means 'unknown' ) and the coutnry was marked as prefrerred, than the status must be changed to 'trusted'
-				$edited_Country->set( 'status', 'trusted' );
-			}
 		}
 
 		// Update db with new flag value.

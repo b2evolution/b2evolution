@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -42,7 +42,7 @@ function display_container( $container, $legend_suffix = '' )
 
 	$Table = new Table();
 
-	$Table->title = '<span class="container_name">'.T_($container).'</span>'.$legend_suffix;
+	$Table->title = '<span class="container_name" data-container-name="'.format_to_output( $container, 'htmlattr' ).'">'.T_($container).'</span>'.$legend_suffix;
 
 	// Table ID - fp> needs to be handled cleanly by Table object
 	$table_id = str_replace( array( ' ', ':' ), array( '_', '-' ), $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better

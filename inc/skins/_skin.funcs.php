@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -566,15 +566,12 @@ function skin_init( $disp )
 
 				if( $allow_msgform == 'login' )
 				{ // user must login first to be able to send a message to this User
-					$disp = 'login';
-					param( 'action', 'string', 'req_login' );
-					// override redirect to param
+					$Messages->add( sprintf( T_( 'You must log in before you can contact "%s".' ), $recipient_User->get( 'login' ) ) );
+					// Override redirect to param:
 					$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
-					if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
-					{ // Redirect to special blog for messaging actions if it is defined in general settings
-						header_redirect( url_add_param( $msg_Blog->get( 'msgformurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
-					}
-					$Messages->add( T_( 'You must log in before you can contact this user' ) );
+					// Redirect to special blog for login actions:
+					header_redirect( url_add_param( $Blog->get( 'loginurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
+					// Exit here.
 				}
 				elseif( ( $allow_msgform == 'PM' ) && check_user_status( 'can_be_validated' ) )
 				{ // user is not activated
@@ -597,10 +594,6 @@ function skin_init( $disp )
 					if( ( !empty( $current_User ) ) && ( $recipient_id == $current_User->ID ) )
 					{
 						$Messages->add( T_( 'You cannot send a private message to yourself. However you can send yourself an email if you\'d like.' ), 'warning' );
-					}
-					else
-					{
-						$Messages->add( sprintf( T_( 'You cannot send a private message to %s. However you can send them an email if you\'d like.' ), $recipient_User->get( 'login' ) ), 'warning' );
 					}
 				}
 
@@ -1192,6 +1185,7 @@ function skin_init( $disp )
 			break;
 
 		case 'profile':
+		case 'register_finish':
 		case 'avatar':
 			$action = param_action();
 			if( $action == 'crop' && is_logged_in() )
@@ -1241,6 +1235,32 @@ function skin_init( $disp )
 			$UserList->load_from_Request();
 
 			$seo_page_type = 'User display';
+			break;
+
+		case 'anonpost':
+			// New item form for anonymous user:
+			if( is_logged_in() )
+			{	// The logged in user has another page to create a post:
+				header_redirect( url_add_param( $Blog->get( 'url', array( 'glue' => '&' ) ), 'disp=edit', '&' ), 302 );
+				// will have exited
+			}
+			elseif( ! $Blog->get_setting( 'post_anonymous' ) )
+			{	// Redirect to the login page if current collection doesn't allow to post by anonymous user:
+				$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit' );
+				$Messages->add( T_( 'You must log in to create & edit posts.' ) );
+				header_redirect( get_login_url( 'cannot create posts', $redirect_to ), 302 );
+				// will have exited
+			}
+
+			// Check if the requested category can be used for new post on the current collection:
+			$ChapterCache = & get_ChapterCache();
+			$Chapter = & $ChapterCache->get_by_ID( param( 'cat', 'integer' ), false, false );
+			if( ! $Chapter || // Not found
+			    $Chapter->get( 'blog_ID' ) != $Blog->ID || // Category from another collection
+			    $Chapter->get( 'meta' ) ) // Meta category cannot be used as post category
+			{	// Use default category instead of the wrong requested:
+				set_param( 'cat', $Blog->get_default_cat_ID() );
+			}
 			break;
 
 		case 'edit':
@@ -1675,6 +1695,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_access_denied'         => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
 				'disp_activateinfo'          => '_activateinfo.disp.php',
+				'disp_anonpost'              => '_anonpost.disp.php',
 				'disp_arcdir'                => '_arcdir.disp.php',
 				'disp_catdir'                => '_catdir.disp.php',
 				'disp_closeaccount'          => '_closeaccount.disp.php',
@@ -1700,6 +1721,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_pwdchange'             => '_profile.disp.php',
 				'disp_userprefs'             => '_profile.disp.php',
 				'disp_subs'                  => '_profile.disp.php',
+				'disp_register_finish'       => '_profile.disp.php',
 				'disp_visits'                => '_visits.disp.php',
 				'disp_register'              => '_register.disp.php',
 				'disp_search'                => '_search.disp.php',

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -385,6 +385,11 @@ function get_working_blog()
 function set_working_blog( $new_blog_ID )
 {
 	global $blog, $UserSettings;
+
+	if( ! is_logged_in() )
+	{	// User must be logged in to set working collection:
+		return false;
+	}
 
 	if( $new_blog_ID != (int)$UserSettings->get('selected_blog') )
 	{ // Save the new default blog.
@@ -801,6 +806,9 @@ function check_allow_disp( $disp )
 				return;
 			}
 			break;
+		case 'register_finish':
+			// don't display activate account error notification on register finish form:
+			return;
 		default:
 			break;
 	}

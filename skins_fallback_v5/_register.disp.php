@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  */
@@ -76,7 +76,7 @@ if( $params['display_form_messages'] )
 
 // Save trigger page
 $session_registration_trigger_url = $Session->get( 'registration_trigger_url' );
-if( empty( $session_registration_trigger_url/*$Session->get( 'registration_trigger_url' )*/ ) && isset( $_SERVER['HTTP_REFERER'] ) )
+if( empty( $session_registration_trigger_url ) && isset( $_SERVER['HTTP_REFERER'] ) )
 {	// Trigger page still is not defined
 	$Session->set( 'registration_trigger_url', $_SERVER['HTTP_REFERER'] );
 }
@@ -91,7 +91,7 @@ $return_to = param( 'return_to', 'url', '' );
 
 if( $register_user = $Session->get('core.register_user') )
 {	// Get an user data from predefined session (after adding of a comment)
-	$login = preg_replace( '/[^a-z0-9 ]/i', '', $register_user['name'] );
+	$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $register_user['name'] );
 	$login = str_replace( ' ', '_', $login );
 	$login = substr( $login, 0, 20 );
 	$email = $register_user['email'];
@@ -140,9 +140,9 @@ elseif( $display_invitation == 'info' )
 }
 
 // Login
-$Form->text_input( $dummy_fields['login'], $login, 22, /* TRANS: noun */ T_('Login'), $params['register_use_placeholders'] ? '' : T_('Choose an username').'.',
+$Form->text_input( $dummy_fields['login'], $login, 22, /* TRANS: noun */ T_('Login'), $params['register_use_placeholders'] ? '' : T_('Choose a username').'.',
 	array(
-			'placeholder'  => $params['register_use_placeholders'] ? T_('Choose an username') : '',
+			'placeholder'  => $params['register_use_placeholders'] ? T_('Choose a username') : '',
 			'maxlength'    => 20,
 			'class'        => 'input_text',
 			'required'     => true,

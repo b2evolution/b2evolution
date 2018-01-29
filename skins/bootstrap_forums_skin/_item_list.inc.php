@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -46,7 +46,7 @@ if( $Item->is_featured() || $Item->is_intro() )
 { // Special icon for featured & intro posts
 	$status_icon = 'fa-bullhorn';
 	$status_alt = T_('Sticky topic / Announcement');
-	$status_title = '<strong>'.T_('Sticky').':</strong> ';
+	$status_title = '<strong>'.( $Item->is_intro() ? T_('Intro') : T_('Sticky') ).':</strong> ';
 	$legend_icons['topic_sticky'] = 1;
 }
 elseif( $Item->comment_status == 'closed' || $Item->comment_status == 'disabled' || $Item->is_locked() )

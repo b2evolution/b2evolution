@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -139,11 +139,8 @@ class UserSettings extends AbstractSettings
 		'enable_PM' => 1,
 		'enable_email' => 1,
 
-		'newsletter_news' => 1, // Send news
-		'newsletter_ads'  => 0, // Send ADs
-
 		'notification_email_limit' => 3, // How many notification email is allowed per day for this user
-		'newsletter_limit' => 1, // How many newsletter email is allowed per day for this user
+		'newsletter_limit' => 3, // How many newsletter email is allowed per day for this user
 	);
 
 
@@ -212,6 +209,9 @@ class UserSettings extends AbstractSettings
 
 			$user_ID = $current_User->ID;
 		}
+
+		// Limit value with max possible length:
+		$value = utf8_substr( $value, 0, 10000 );
 
 		return parent::setx( $user_ID, $setting, $value );
 	}

@@ -302,10 +302,17 @@ if( $display_mode != 'js')
 		$AdminUI->set_page_manual_link( 'organization-form' );
 		// Init JS to autcomplete the user logins:
 		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+		// Initialize user tag input
+		init_tokeninput_js();
 	}
 	else
 	{	// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'organizations' );
+	}
+
+	if( in_array( $action, array( 'edit' ) ) )
+	{ // Initialize date picker
+		init_datepicker_js();
 	}
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -229,9 +229,9 @@ class PageCache
 			return false;
 		}
 
-		if( $disp == 'login' || $disp == 'access_requires_login' || $disp == 'register' || $disp == 'lostpassword' )
-		{	// We do NOT want caching for in-skin login, register and lostpassord pages
-			$Debuglog->add( 'Never cache the in-skin login and register pages!', 'pagecache' );
+		if( $disp == 'login' || $disp == 'access_requires_login' || $disp == 'register' || $disp == 'lostpassword' || $disp == 'anonpost' )
+		{	// We do NOT want caching for in-skin login, register, lostpassord pages and new item anonymous form:
+			$Debuglog->add( 'Never cache the in-skin login, register and anonymous new item pages!', 'pagecache' );
 			return false;
 		}
 

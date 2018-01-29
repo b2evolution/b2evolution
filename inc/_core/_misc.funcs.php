@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -2162,7 +2162,7 @@ function is_valid_login( $login, $force_strict_logins = false )
 	}
 
 	// Step 2
-	if( ($strict_logins || $force_strict_logins) && ! preg_match( '~^[A-Za-z0-9_.]+$~', $login ) )
+	if( ($strict_logins || $force_strict_logins) && ! preg_match( '~^[A-Za-z0-9_.\-]+$~', $login ) )
 	{	// WARNING: allowing special chars like latin 1 accented chars ( \xDF-\xF6\xF8-\xFF ) will create issues with
 		// user media directory names (tested on Max OS X) -- Do no allow any of this until we have a clean & safe media dir name generator.
 
@@ -3376,7 +3376,7 @@ function debug_info( $force = false, $force_clean = false )
 
 		foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
 			'memory_get_usage' => array( 'display' => 'Memory usage', 'high' => 8000000 ),
-			'memory_get_peak_usage' /* PHP 5.2 */ => array( 'display' => 'Memory peak usage', 'high' => 8000000 ) ) as $l_func => $l_var )
+			'memory_get_peak_usage' => array( 'display' => 'Memory peak usage', 'high' => 8000000 ) ) as $l_func => $l_var )
 		{
 			if( function_exists( $l_func ) )
 			{
@@ -3754,7 +3754,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	// Stop a request from the blocked IP addresses or Domains
 	antispam_block_request();
 
-	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode;
+	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $mail_log_insert_ID;
 
 	$message_data = $message;
 	if( is_array( $message_data ) && isset( $message_data['full'] ) )
@@ -3766,10 +3766,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$message_data = array( 'full' => $message );
 	}
 
-	// Replace secret content in the mail logs message body
-	$message = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $message );
-	// Remove secret content marks from the message
-	$message_data = str_replace( array( '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
 
 	// Memorize email address
 	$to_email_address = $to;
@@ -3882,47 +3878,66 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$additional_parameters = '';
 	}
 
-	if( mail_is_blocked( $to_email_address ) )
-	{ // Check if the email address is blocked
-		$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
+	// Create initial email log with empty message
+	$email_key = generate_random_key();
+	mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key );
 
-		mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked' );
+	if( ! empty( $mail_log_insert_ID ) )
+	{
+		$message = add_email_tracking( $message, $mail_log_insert_ID, $email_key );
+		$message_data['full'] = add_email_tracking( $message_data['full'], $mail_log_insert_ID, $email_key );
+		$message_data = str_replace( array( '$secret_email_key_start$', '$secret_email_key_end$', '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
 
-		return false;
-	}
+		if( mail_is_blocked( $to_email_address ) )
+		{ // Check if the email address is blocked
+			$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
 
-	if( $email_send_simulate_only )
-	{	// The email sending is turned on simulation mode, Don't send a real message:
-		$send_mail_result = true;
-	}
-	else
-	{	// Send email message on real mode:
-		$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
-	}
-
-	if( ! $send_mail_result )
-	{	// The message has not been sent successfully
-		if( $debug > 1 )
-		{ // We agree to die for debugging...
-			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
-
-			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
-		}
-		else
-		{ // Soft debugging only....
-			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
-
-			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
+			//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked', $email_key );
+			update_mail_log( $mail_log_insert_ID, 'blocked', $message );
 
 			return false;
 		}
+
+		if( $email_send_simulate_only )
+		{	// The email sending is turned on simulation mode, Don't send a real message:
+			$send_mail_result = true;
+		}
+		else
+		{	// Send email message on real mode:
+			$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
+		}
+
+		if( ! $send_mail_result )
+		{	// The message has not been sent successfully
+			if( $debug > 1 )
+			{ // We agree to die for debugging...
+				//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
+				update_mail_log( $mail_log_insert_ID, 'error', $message );
+
+				debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
+			}
+			else
+			{ // Soft debugging only....
+				$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
+
+				//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
+				update_mail_log( $mail_log_insert_ID, 'error', $message );
+
+				return false;
+			}
+		}
+
+		$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
+
+		//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $email_key );
+		update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
+
+		return true;
 	}
-
-	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
-
-	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ) );
-
-	return true;
+	else
+	{
+		return false;
+	}
 }
 
 
@@ -4135,6 +4150,8 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			$template_message .= $template_headers[ $format ]."\n\n";
 		}
 
+		$template_message .= '$message_body_'.$format.'_start$';
+
 		// Get mail template
 		ob_start();
 		emailskin_include( $template_name.$ext, $params );
@@ -4157,16 +4174,33 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 						'use_style' => true,
 						'protocol'  => 'http:',
 					) );
+
+				$firstname = $User->get( 'firstname' );
+				$lastname = $User->get( 'lastname' );
+				$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
+				$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
 			}
 			else
 			{
 				$username = $User->get_username();
 				$user_login = $User->login;
+				$firstname = $User->get( 'firstname' );
+				$lastname = $User->get( 'lastname' );
+				$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
+				$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
 			}
-			$formated_message = str_replace( array( '$login$', '$username$' ), array( $user_login, $username ) , $formated_message );
+			$formated_message = str_replace( array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$' ),
+					array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login ), $formated_message );
+		}
+		elseif( ! empty( $params['anonymous_recipient_name'] ) )
+		{
+			$formated_message = str_replace( '$name$', $params['anonymous_recipient_name'], $formated_message );
 		}
 
 		$template_message .= $formated_message;
+
+		$template_message .= '$message_body_'.$format.'_end$';
+
 		if( isset( $template_contents ) )
 		{ // Multipart content
 			$template_contents[ $format ] = $formated_message;
@@ -5121,6 +5155,66 @@ function get_base_domain( $url )
 	$domain = preg_replace( '~^www[0-9]*\.~i', '', $domain );
 
 	return $domain;
+}
+
+
+/**
+ * Generate login from string
+ *
+ * @param string string to generate login from
+ * @return string login
+ */
+function generate_login_from_string( $login )
+{
+	global $Settings;
+
+	// Normalize login
+	load_funcs('locales/_charset.funcs.php');
+	$login = replace_special_chars( $login, NULL, true );
+
+	if( $Settings->get( 'strict_logins' ) )
+	{ // We allow only the plain ACSII characters, digits, the chars _ and . and -
+		$login = preg_replace( '/[^A-Za-z0-9_.\-]/', '', $login );
+	}
+	else
+	{ // We allow any character that is not explicitly forbidden in Step 1
+		// Enforce additional limitations
+		$login = preg_replace( '|%([a-fA-F0-9][a-fA-F0-9])|', '', $login ); // Kill octets
+		$login = preg_replace( '/&.+?;/', '', $login ); // Kill entities
+	}
+
+	$login = preg_replace( '/^usr_/i', '', $login );
+
+	// Trim to allowed login length
+	$max_login_length = 20;
+	if( strlen( $login ) > $max_login_length )
+	{
+		$login = substr( $login, 0, $max_login_length );
+	}
+
+	if( ! empty( $login ) )
+	{
+		// Check and search free login name if current is already in use
+		$login_name = $login;
+		$login_number = 1;
+		$UserCache = & get_UserCache();
+		while( $UserCache->get_by_login( $login_name ) )
+		{
+			$num_suffix_length = strlen( $login_number );
+			if( strlen( $login_name ) + $num_suffix_length > $max_login_length )
+			{
+				$login_name = substr( $login, 0, $max_login_length - $num_suffix_length ).$login_number;
+			}
+			else
+			{
+				$login_name = $login.$login_number;
+			}
+			$login_number++;
+		}
+		$login = $login_name;
+	}
+
+	return $login;
 }
 
 
@@ -6595,72 +6689,6 @@ function sanitize_id_list( $str, $return_array = false, $quote = false )
 
 
 /**
- * Create json_encode function if it does not exist ( PHP < 5.2.0 )
- *
- * @return string
- */
-if ( !function_exists( 'json_encode' ) )
-{
-	function json_encode( $a = false )
-	{
-		if( is_null( $a ) )
-		{
-			return 'null';
-		}
-		if( $a === false )
-		{
-			return 'false';
-		}
-		if( $a === true )
-		{
-			return 'true';
-		}
-		if( is_scalar( $a ) )
-		{
-			if( is_float( $a ) )
-			{ // Always use "." for floats.
-				return floatval( str_replace( ",", ".", strval( $a ) ) );
-			}
-
-			if( is_string( $a ) )
-			{
-				$jsonReplaces = array( array( "\\", "/", "\n", "\t", "\r", "\b", "\f", '"' ), array( '\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"' ) );
-				return '"'.str_replace( $jsonReplaces[0], $jsonReplaces[1], $a ).'"';
-			}
-
-			return $a;
-		}
-		$isList = true;
-		for( $i = 0, reset($a); $i < count($a); $i++, next($a) )
-		{
-			if( key($a) !== $i )
-			{
-				$isList = false;
-				break;
-			}
-		}
-		$result = array();
-		if( $isList )
-		{
-			foreach( $a as $v )
-			{
-				$result[] = json_encode($v);
-			}
-			return '['.join( ',', $result ).']';
-		}
-		else
-		{
-			foreach( $a as $k => $v )
-			{
-				$result[] = json_encode($k).':'.json_encode($v);
-			}
-			return '{'.join( ',', $result ).'}';
-		}
-	}
-}
-
-
-/**
  * A wrapper for json_encode function
  * We need to pass valid UTF-8 string to json_encode, otherwise it may return NULL
  *
@@ -6803,83 +6831,6 @@ function no_trailing_slash( $path )
 
 
 /**
- * Provide sys_get_temp_dir for older versions of PHP (< 5.2.1)
- *
- * @return string path to system temporary directory
- */
-if( !function_exists( 'sys_get_temp_dir' ) )
-{
-	function sys_get_temp_dir()
-	{
-		// Try to get from environment variable
-		if( !empty($_ENV['TMP']) )
-		{
-			return realpath( $_ENV['TMP'] );
-		}
-		elseif( !empty($_ENV['TMPDIR']) )
-		{
-			return realpath( $_ENV['TMPDIR'] );
-		}
-		elseif( !empty($_ENV['TEMP']) )
-		{
-			return realpath( $_ENV['TEMP'] );
-		}
-		else
-		{	// Detect by creating a temporary file
-
-			// Try to use system's temporary directory as random name shouldn't exist
-			$temp_file = tempnam( sha1(uniqid(rand()), true), '' );
-			if( $temp_file )
-			{
-				$temp_dir = realpath( dirname($temp_file) );
-				unlink($temp_file);
-				return $temp_dir;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-}
-
-
-/**
- * Provide inet_pton for older versions of PHP (< 5.1.0 linux & < 5.3.0 windows)
- *
- * Converts a human readable IP address to its packed in_addr representation
- * @param string A human readable IPv4 or IPv6 address
- * @return string The in_addr representation of the given address, or FALSE if a syntactically invalid address is given (for example, an IPv4 address without dots or an IPv6 address without colons
- */
-if( !function_exists( 'inet_pton' ) )
-{
-	function inet_pton( $ip )
-	{
-		if( strpos( $ip, '.' ) !== FALSE )
-		{	// IPv4
-			$ip = pack( 'N', ip2long( $ip ) );
-		}
-		elseif( strpos( $ip, ':' ) !== FALSE )
-		{	// IPv6
-			$ip = explode( ':', $ip );
-			$res = str_pad( '', ( 4 * ( 8 - count( $ip ) ) ), '0000', STR_PAD_LEFT );
-			foreach( $ip as $seg )
-			{
-				$res .= str_pad( $seg, 4, '0', STR_PAD_LEFT );
-			}
-			$ip = pack( 'H'.strlen( $res ), $res );
-		}
-		else
-		{	// Invalid IP address
-			$ip = FALSE;
-		}
-
-		return $ip;
-	}
-}
-
-
-/**
  * Convert integer to IP address
  *
  * @param integer Number
@@ -6960,156 +6911,6 @@ function is_ip_url_domain( $url )
 
 	// Check if host is IP address:
 	return is_valid_ip_format( $url_data['host'] );
-}
-
-
-/**
- * Provide array_combine for older versions of PHP (< 5.0.0)
- *
- * Creates an array by using one array for keys and another for its values
- * @param array Keys
- * @param array Values
- * @return array Combined array, FALSE if the number of elements for each array isn't equal.
- */
-if( !function_exists( 'array_combine' ) )
-{
-	function array_combine( $arr1, $arr2 )
-	{
-		if( count( $arr1 ) != count( $arr2 ) )
-		{
-			return false;
-		}
-
-		$out = array();
-		foreach( $arr1 as $key1 => $value1 )
-		{
-			$out[$value1] = $arr2[$key1];
-		}
-		return $out;
-	}
-}
-
-
-/**
- * Provide array_combine for older versions of PHP (< 5.0.0)
- *
- * List of already/potentially sent HTTP responsee headers(),
- * CANNOT be implemented
- */
-if( !function_exists( 'headers_list' ) )
-{
-	function headers_list()
-	{
-		return array();
-	}
-}
-
-
-/**
- * Provide array_fill_keys for older versions of PHP (< 5.2.0)
- *
- * Fills an array with the value of the value parameter, using the values of the keys array as keys.
- * @param array Keys
- * @param mixed Value
- * @return array Filled array
- */
-if( !function_exists( 'array_fill_keys' ) )
-{
-	function array_fill_keys( $array, $value )
-	{
-		$filled_array = array();
-		foreach( $array as $key )
-		{
-			$filled_array[$key] = $value;
-		}
-
-		return $filled_array;
-	}
-}
-
-
-/**
- * Provide htmlspecialchars_decode for older versions of PHP (< 5.1.0)
- *
- * Convert special HTML entities back to characters
- * @param string Text to decode
- * @return string The decoded text
- */
-if( !function_exists( 'htmlspecialchars_decode' ) )
-{
-	function htmlspecialchars_decode( $text )
-	{
-		return strtr( $text, array_flip( get_html_translation_table( HTML_SPECIALCHARS ) ) );
-	}
-}
-
-
-/**
- * Provide array_walk_recursive for older versions of PHP (< 5.1.0)
- *
- * Apply a user function recursively to every member of an array
- * @param array The input array
- * @param string Funcname
- * @param string If the optional userdata parameter is supplied, it will be passed as the third parameter to the callback funcname.
- * @return TRUE on success or FALSE on failure
- */
-if( !function_exists( 'array_walk_recursive' ) )
-{
-	function array_walk_recursive( &$input, $funcname, $userdata = '' )
-	{
-		if( !is_callable( $funcname ) )
-		{
-			return false;
-		}
-
-		if( !is_array( $input ) )
-		{
-			return false;
-		}
-
-		foreach( $input AS $key => $value )
-		{
-			if( is_array( $input[$key] ) )
-			{
-				array_walk_recursive( $input[$key], $funcname, $userdata );
-			}
-			else
-			{
-				$saved_value = $value;
-				if( !empty( $userdata ) )
-				{
-					$funcname( $value, $key, $userdata );
-				}
-				else
-				{
-					$funcname( $value, $key );
-				}
-
-				if( $value != $saved_value )
-				{
-					$input[$key] = $value;
-				}
-			}
-		}
-
-		return true;
-	}
-}
-
-
-/**
- * Provide hex2bin for older versions of PHP (< 5.4)
- *
- * Decodes a hexadecimally encoded binary string
- * @param string Hexadecimal representation of data
- * @return string The binary representation of the given data or FALSE on failure
- */
-if( !function_exists( 'hex2bin' ) )
-{
-	function hex2bin( $hex )
-	{
-		return pack( 'H*', $hex );
-	}
 }
 
 
@@ -7374,7 +7175,7 @@ function get_cookie_path()
  * @param string DEPRECATED: The path on the server in which the cookie will be available on
  * @param string DEPRECATED: The domain that the cookie is available
  * @param boolean Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
- * @param boolean (Added in PHP 5.2.0) When TRUE the cookie will be made accessible only through the HTTP protocol
+ * @param boolean When TRUE the cookie will be made accessible only through the HTTP protocol
  */
 function evo_setcookie( $name, $value = '', $expire = 0, $dummy = '', $dummy2 = '', $secure = false, $httponly = false )
 {
@@ -7412,21 +7213,12 @@ function evo_sendcookies()
 		return;
 	}
 
-	$php_version_52 = version_compare( phpversion(), '5.2', '>=' );
-
 	$current_cookie_domain = get_cookie_domain();
 	$current_cookie_path = get_cookie_path();
 
 	foreach( $evo_cookies as $evo_cookie_name => $evo_cookie )
 	{
-		if( $php_version_52 )
-		{	// Use HTTP-only setting since PHP 5.2.0:
-			setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'], $evo_cookie['httponly'] );
-		}
-		else
-		{	// PHP < 5.2 doesn't support HTTP-only:
-			setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'] );
-		}
+		setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'], $evo_cookie['httponly'] );
 
 		// Unset to don't send cookie twice:
 		unset( $evo_cookies[ $evo_cookie_name ] );
@@ -7725,8 +7517,8 @@ function get_fieldset_folding_icon( $id, $params = array() )
 	}
 	else
 	{ // Get the fold value from user settings
-		global $UserSettings, $Collection, $Blog;
-		if( empty( $Blog ) )
+		global $UserSettings, $Collection, $Blog, $ctrl;
+		if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
 		{ // Get user setting value
 			$value = intval( $UserSettings->get( 'fold_'.$id ) );
 		}

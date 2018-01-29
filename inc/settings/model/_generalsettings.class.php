@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -98,7 +98,8 @@ class GeneralSettings extends AbstractSettings
 		'activate_requests_limit' => '300', // Only one activation email can be sent to the same email address in the given interval ( value is in seconds )
 		'newusers_findcomments' => '1',
 		'after_email_validation' => 'return_to_original', // where to redirect after account activation. Values: return_to_original, or the previously set specific url
-		'after_registration' => 'return_to_original', // where to redirect after new user registration. Values: return_to_original redirect_to url, or return to the previously set specific url
+		'after_registration' => 'return_to_original', // where to redirect after new user registration. Values: 'return_to_original' redirect_to url, or 'slug', or return to the previously set specific url
+		'after_registration_slug' => '', // Slug value for after_registration == 'slug'
 		'newusers_level' => '1',
 		'registration_require_gender' => 'hidden',
 		'registration_ask_locale' => '0',
@@ -116,10 +117,9 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_meta_comments' => '1',
 		'def_notify_post_moderation' => '1',
 		'def_notify_edit_pst_moderation' => '1',
-		'def_newsletter_news' => '1',
-		'def_newsletter_ads' => '0',
+		'def_newsletters' => '1',
 		'def_notification_email_limit' => '3',
-		'def_newsletter_limit' => '1',
+		'def_newsletter_limit' => '3',
 
 		'allow_avatars' => 1,
 		'min_picture_size' => 160, // minimum profile picture dimensions in pixels (width and height)
@@ -428,6 +428,9 @@ C message size exceeds',
 	 */
 	function set( $setting, $value )
 	{
+		// Limit value with max possible length:
+		$value = utf8_substr( $value, 0, 10000 );
+
 		return parent::setx( $setting, $value );
 	}
 

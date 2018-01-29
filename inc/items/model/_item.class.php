@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -735,7 +735,8 @@ class Item extends ItemLight
 
 		// ISSUE DATE / TIMESTAMP:
 		$this->load_Blog();
-		if( $current_User->check_perm( 'admin', 'restricted' ) &&
+		if( is_logged_in() &&
+		    $current_User->check_perm( 'admin', 'restricted' ) &&
 		    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) )
 		{ // Allow to update timestamp fields only if user has a permission to edit such fields
 		  //    and also if user has an access to back-office
@@ -805,7 +806,7 @@ class Item extends ItemLight
 		}
 
 		// TAGS:
-		if( $current_User->check_perm( 'admin', 'restricted' ) )
+		if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) )
 		{ // User should has an access to back-office to edit tags
 			$item_tags = param( 'item_tags', 'string', NULL );
 			if( $item_tags !== NULL )
@@ -824,7 +825,7 @@ class Item extends ItemLight
 
 		// WORKFLOW stuff:
 		$item_Blog = $this->get_Blog();
-		if( $is_not_content_block && $item_Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
+		if( $is_not_content_block && $item_Blog->get_setting( 'use_workflow' ) && is_logged_in() && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
 		{	// Update workflow properties only when it is enabled by collection setting and allowed for current user:
 			$ItemTypeCache = & get_ItemTypeCache();
 			$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
@@ -880,11 +881,45 @@ class Item extends ItemLight
 
 		// OWNER:
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
-		if( $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
+		if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
 		{	// only admins can change the owner..
-			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) && param_check_login( 'item_owner_login', true ) )
-			{
-				$this->set_creator_by_login( $this->creator_user_login );
+			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) )
+			{	// If valid user login is entered:
+				if( param( 'item_create_user', 'integer', 0 ) )
+				{	// Try to create new user if it is checked on the edit item form:
+					$UserCache = & get_UserCache();
+
+					// Convert new entered login to proper login format:
+					$this->creator_user_login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $this->creator_user_login );
+					$this->creator_user_login = str_replace( ' ', '_', $this->creator_user_login );
+					$this->creator_user_login = utf8_substr( $this->creator_user_login, 0, 20 );
+					set_param( 'item_owner_login', $this->creator_user_login );
+
+					if( ( $creator_User = & $UserCache->get_by_login( $this->creator_user_login ) ) !== false )
+					{	// Display error if user already exists:
+						param_error( 'item_owner_login', sprintf( T_('User "%s" already exists.'), $this->creator_user_login ) );
+					}
+					else
+					{	// Create new user:
+						$item_new_User = new User();
+						$item_new_User->set( 'login', $this->creator_user_login );
+						$item_new_User->set( 'email', $this->creator_user_login.'@dummy.null' );
+						$item_new_User->set( 'source', 'created alongside post' );
+						$item_new_User->set( 'pass', '' );
+						$item_new_User->set( 'salt', '' );
+						$item_new_User->set( 'pass_driver', 'nopass' );
+						$item_new_User->dbinsert();
+						// Update user login cache with new created User:
+						$UserCache->cache_login[ $this->creator_user_login ] = $item_new_User;
+						// Uncheck the checkbox to don't suggest create new user on next form updating because the user already has been created with requested login:
+						set_param( 'item_create_user', 0 );
+					}
+				}
+
+				if( param_check_login( 'item_owner_login', true ) )
+				{	// Update item's owner if the user is detected in DB by the entered login:
+					$this->set_creator_by_login( $this->creator_user_login );
+				}
 			}
 		}
 
@@ -2521,6 +2556,7 @@ class Item extends ItemLight
 				'render_parent'         => true,
 				'render_collection'     => true,
 				'render_content_blocks' => true,
+				'render_inline_widgets' => true,
 			), $params );
 
 		if( $params['render_inline_files'] )
@@ -2551,6 +2587,192 @@ class Item extends ItemLight
 		if( $params['render_content_blocks'] )
 		{	// Render Content block tags like [include:123], [include:item-slug]:
 			$content = $this->render_content_blocks( $content, $params );
+		}
+
+		if( $params['render_inline_widgets'] )
+		{ // Render subscription related tags
+			$content = $this->render_inline_widgets( $content, $params );
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Convert inline widget tags like [subscribe] and [emailcapture] into HTML tags
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_inline_widgets( $content, $params )
+	{
+		global $Settings;
+
+		load_funcs( 'skins/_skin.funcs.php' );
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_collection_data() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_inline_widgets' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of widgets:
+		preg_match_all( '/\[(subscribe|emailcapture):([^\]]*)\]/i', $content, $tags );
+
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one widget tag is found in content:
+			foreach( $tags[0] as $t => $source_tag )
+			{	// Render URL custom field as html:
+				$field_Item = $this;
+				$widget_html = $source_tag;
+
+				$widget_params = explode( ':', $tags[2][$t] );
+				switch( $tags[1][$t] )
+				{
+					case 'subscribe':
+						$button_notsubscribed = '';
+						$button_subscribed = '';
+						$button_notloggedin = '';
+
+						preg_match( '/(\d+)(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
+						$newsletter_ID = intval( $newsletter_ID_tags[1] );
+						if( isset( $newsletter_ID_tags[2] ) )
+						{
+							$user_tags = $newsletter_ID_tags[2];
+						}
+
+						if( isset( $widget_params[1] ) )
+						{
+							$button_notsubscribed = $widget_params[1];
+						}
+
+						if( isset( $widget_params[2] ) )
+						{
+							$button_subscribed = $widget_params[2];
+						}
+
+						if( isset( $widget_params[3] ) )
+						{
+							$button_notloggedin = $widget_params[3];
+						}
+
+						$params = array(
+							'widget' => 'newsletter_subscription',
+							'title' => '',
+							'intro' => '',
+							'bottom' => '',
+							'enlt_ID' => $newsletter_ID,
+							'button_notsubscribed_class' => 'btn-danger',
+							'button_subscribed_class' => 'btn-success',
+							'inline' => 1
+						);
+						if( ! empty( $button_notsubscribed ) )
+						{
+							$params['button_notsubscribed'] = $button_notsubscribed;
+						}
+						if( ! empty( $button_subscribed ) )
+						{
+							$params['button_subscribed'] = $button_subscribed;
+						}
+						if( ! empty( $user_tags ) )
+						{
+							$params['usertags'] = $user_tags;
+						}
+
+						if( ! empty( $button_notloggedin ) && ! is_logged_in() )
+						{ // Email capture widget does not display if user is not logged in
+							$redirect_to = regenerate_url( '', '', '', '&' );
+							$widget_html = '<div class="center">';
+							$widget_html .= '<a href="'.get_login_url( 'inline subscribe', $redirect_to ).'" class="btn btn-primary">'.$button_notloggedin.'</a>';
+							$widget_html .= '</div>';
+						}
+						else
+						{
+							ob_start();
+							skin_widget( $params );
+							$widget_html = ob_get_contents();
+							ob_end_clean();
+						}
+
+						break;
+
+					case 'emailcapture':
+						$fields_to_display = array();
+						$button_text = '';
+
+						preg_match( '/(\d+)?(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
+						if( isset( $newsletter_ID_tags[1] ) )
+						{
+							$newsletter_ID = intval( $newsletter_ID_tags[1] );
+						}
+						if( isset( $newsletter_ID_tags[2] ) )
+						{
+							$user_tags = $newsletter_ID_tags[2];
+						}
+						if( isset( $widget_params[1] ) )
+						{
+							$fields_to_display = explode( '+', $widget_params[1] );
+						}
+						if( isset( $widget_params[2] ) )
+						{
+							$button_text = $widget_params[2];
+						}
+
+						$params = array(
+							'widget' => 'user_register',
+							'title' => '',
+							'intro' => '',
+							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',
+							'ask_lastname' => in_array( 'lastname', $fields_to_display ) ? 'required' : 'no',
+							'source' => 'Page: '.$this->get( 'urltitle' ),
+							'usertags' => isset( $user_tags ) ? $user_tags : NULL,
+							'subscribe_post' => 0,
+							'subscribe_comment' => 0,
+							'button_class' => 'btn-primary',
+							'inline' => 1
+						);
+
+						$NewsletterCache = & get_NewsletterCache();
+						$load_where = 'enlt_active = 1';
+						$NewsletterCache->load_where( $load_where );
+						// Initialize checkbox options for param "Newsletter":
+						$newsletters_options = array();
+						$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
+						foreach( $NewsletterCache->cache as $Newsletter )
+						{
+							$newsletters_options[] = array(
+								$Newsletter->ID,
+								$Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ),
+								$Newsletter->ID == $newsletter_ID ? 1 : 0, // checked if specified newsletter ID
+							);
+						}
+						$newsletters_options[] = array(
+							'default',
+							T_('Also subscribe user to all default newsletters for new users.'),
+							empty( $newsletter_ID ) ? 1 : 0, // checked if no specific newsletter ID specified
+						);
+						$params['newsletters'] = $newsletters_options;
+
+						if( ! empty ( $button_text ) )
+						{
+							$params['button'] = $button_text;
+						}
+
+						ob_start();
+						skin_widget( $params );
+						$widget_html = ob_get_contents();
+						ob_end_clean();
+						break;
+
+					default:
+						$widget_html = 'xxx';
+				}
+
+				$content = substr_replace( $content, $widget_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
+			}
 		}
 
 		return $content;
@@ -2832,6 +3054,8 @@ class Item extends ItemLight
 
 		$ItemCache = & get_ItemCache();
 
+		$item_Blog = & $this->get_Blog();
+
 		foreach( $tags[0] as $t => $source_tag )
 		{
 			$item_ID_slug = trim( $tags[1][ $t ] );
@@ -2853,6 +3077,22 @@ class Item extends ItemLight
 				}
 				// Replace inline content block tag with error message about wrong referenced item:
 				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
+				continue;
+			}
+			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
+			{	// Deny to display content block Item with lower status than parent Item:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The visibility level of the content bock "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				continue;
+			}
+			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
+			        ( ! $item_Blog || $content_Item->get( 'creator_user_ID' ) != $item_Blog->get( 'owner_user_ID' ) ) &&
+			        ( ! $item_Blog || $content_Item->get_blog_ID() != $item_Blog->ID )
+			      )
+			{	// We can display a content block item with at least one condition:
+				//  - Content block Item has same owner as owner of parent Item,
+				//  - Content block Item has same owner as owner of parent Item's collection,
+				//  - Content block Item is in same collection as parent Item:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 
@@ -6457,7 +6697,12 @@ class Item extends ItemLight
 
 			$DB->commit();
 
-			$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+			if( empty( $this->AfterItemUpdate_is_executed ) )
+			{	// Execute this event once per request:
+				$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+				// Set flag to know we have already executed this plugin event:
+				$this->AfterItemUpdate_is_executed = true;
+			}
 		}
 
 		if( $db_changed )

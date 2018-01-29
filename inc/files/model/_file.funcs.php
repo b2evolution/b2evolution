@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -1133,29 +1133,6 @@ function is_absolute_pathname($path)
 	{ // unix
 		return ( $path[0] == '/' );
 	}
-}
-
-
-/**
- * Define sys_get_temp_dir, if not available (PHP 5 >= 5.2.1)
- * @link http://us2.php.net/manual/en/function.sys-get-temp-dir.php#93390
- * @return string NULL on failure
- */
-if ( !function_exists('sys_get_temp_dir'))
-{
-  function sys_get_temp_dir()
-	{
-    if (!empty($_ENV['TMP'])) { return realpath($_ENV['TMP']); }
-    if (!empty($_ENV['TMPDIR'])) { return realpath( $_ENV['TMPDIR']); }
-    if (!empty($_ENV['TEMP'])) { return realpath( $_ENV['TEMP']); }
-    $tempfile=tempnam(__FILE__,'');
-    if (file_exists($tempfile))
-		{
-      unlink($tempfile);
-      return realpath(dirname($tempfile));
-    }
-    return null;
-  }
 }
 
 
@@ -2493,7 +2470,9 @@ function display_dragdrop_upload_button( $params = array() )
 						var progressbar = jQuery( 'tr[qq-file-id=' + id + '] .progress-bar' );
 						var percentCompleted = Math.round( uploadedBytes / totalBytes * 100 ) + '%';
 
-						progressbar.css( 'width', percentCompleted );
+						//progressbar.style.width = percentCompleted;
+						progressbar.get(0).style.width = percentCompleted; // This should fix jQuery's .css() issue with some browsers
+
 						progressbar.text( percentCompleted );
 						<?php
 						if( $params['resize_frame'] )
@@ -3081,7 +3060,7 @@ function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 
 	load_class( 'files/model/_fileroot.class.php', 'FileRoot' );
 
-	$abspath = explode( DIRECTORY_SEPARATOR, $abspath );
+	$abspath = preg_split( '#[/\\\\]#', $abspath );
 
 	switch( $abspath[0] )
 	{

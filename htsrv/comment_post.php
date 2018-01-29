@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -608,7 +608,7 @@ if( $Comment->ID )
 	{
 		if( $Settings->get( 'newusers_canregister' ) == 'yes' && $Settings->get( 'registration_is_public' ) && $Comment->Item->Blog->get_setting( 'comments_register' ) )
 		{ // Redirect to the registration form
-			$Messages->add( T_('ATTENTION: Create a user account now so that other users can contact you after reading your comment.'), 'error' );
+			$Messages->add( T_('ATTENTION: Register a user account now so that you can get notified of replies to your comments.'), 'error' );
 
 			$register_user = array(
 				'name' => $Comment->author,

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -27,7 +27,7 @@ class EmailCampaign extends DataObject
 {
 	var $date_ts;
 
-	var $name;
+	var $enlt_ID;
 
 	var $email_title;
 
@@ -39,15 +39,24 @@ class EmailCampaign extends DataObject
 
 	var $sent_ts;
 
+	var $auto_sent_ts;
+
 	var $use_wysiwyg = 0;
 
 	var $send_ctsk_ID;
 
+	var $auto_send = 'no';
+
+	var $sequence;
+
+	var $Newsletter = NULL;
+
 	/**
 	 * @var array|NULL User IDs which assigned for this email campaign
-	 *   'all'    - All users which assigned to this campaign
-	 *   'accept' - Users which already receive email newsletter
-	 *   'wait'   - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
+	 *   'all'     - All active users which accept newsletter of this campaign
+	 *   'filter'  - Filtered active users which accept newsletter of this campaign
+	 *   'receive' - Users which already received email newsletter
+	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
 	 */
 	var $users = NULL;
 
@@ -74,15 +83,17 @@ class EmailCampaign extends DataObject
 		{
 			$this->ID = $db_row->ecmp_ID;
 			$this->date_ts = $db_row->ecmp_date_ts;
-			$this->name = $db_row->ecmp_name;
+			$this->enlt_ID = $db_row->ecmp_enlt_ID;
 			$this->email_title = $db_row->ecmp_email_title;
 			$this->email_html = $db_row->ecmp_email_html;
 			$this->email_text = $db_row->ecmp_email_text;
 			$this->email_plaintext = $db_row->ecmp_email_plaintext;
 			$this->sent_ts = $db_row->ecmp_sent_ts;
+			$this->auto_sent_ts = $db_row->ecmp_auto_sent_ts;
 			$this->renderers = $db_row->ecmp_renderers;
 			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
+			$this->auto_send = $db_row->ecmp_auto_send;
 		}
 	}
 
@@ -103,43 +114,47 @@ class EmailCampaign extends DataObject
 
 
 	/**
-	 * Add users for this campaign in DB
+	 * Add recipients for this campaign into DB
 	 *
 	 * @param array|NULL Array of user IDs, NULL - to get user IDs from current filterset of users list
 	 */
-	function add_users( $new_users_IDs = NULL )
+	function add_recipients( $filtered_users_IDs = NULL )
 	{
 		global $DB;
 
-		if( $new_users_IDs === NULL )
+		if( $filtered_users_IDs === NULL )
 		{	// Get user IDs from current filterset of users list:
-			$new_users_IDs = get_filterset_user_IDs();
+			$filtered_users_IDs = get_filterset_user_IDs();
 		}
 
-		if( count( $new_users_IDs ) )
-		{ // Users are found in the filterset
+		if( count( $filtered_users_IDs ) )
+		{	// If users are found in the filterset
 
-			// Get all active users which accept newsletter email
-			$new_users_SQL = get_newsletter_users_sql( $new_users_IDs );
-			$new_users = $DB->get_col( $new_users_SQL->get() );
+			// Get all active users which accept email newsletter of this campaign:
+			$new_users_SQL = new SQL( 'Get recipients of list #'.$this->get( 'enlt_ID' ) );
+			$new_users_SQL->SELECT( 'user_ID' );
+			$new_users_SQL->FROM( 'T_users' );
+			$new_users_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_subscribed = 1' );
+			$new_users_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $filtered_users_IDs ).' )' );
+			$new_users_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+			$new_users_SQL->WHERE_and( 'enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+			$new_users = $DB->get_col( $new_users_SQL->get(), 0, $new_users_SQL->title );
 
-			// Remove the users which didn't accept email before
-			$DB->query( 'DELETE FROM T_email__campaign_send
-				WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
-				 AND csnd_emlog_ID IS NULL' );
+			// Remove the filtered recipients which didn't receive email newsletter yet:
+			$this->remove_recipients();
 
-			// Get users which already accept newsletter email
-			$old_users = $this->get_users( 'accept' );
+			// Get users which already received email newsletter:
+			$old_users = $this->get_recipients( 'receive' );
 
-			// Exclude old users from new users (To store value of csnd_emlog_ID)
+			// Exclude old users from new users (To store value of csnd_emlog_ID):
 			$new_users = array_diff( $new_users, $old_users );
 
 			if( count( $new_users ) )
-			{ // Insert new users for this campaign
-				$insert_SQL = 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID ) VALUES';
+			{	// Insert new users for this campaign:
+				$insert_SQL = 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status ) VALUES';
 				foreach( $new_users as $user_ID )
 				{
-					$insert_SQL .= "\n".'( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).' ),';
+					$insert_SQL .= "\n".'( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "ready_to_send" ),';
 				}
 				$DB->query( substr( $insert_SQL, 0, -1 ) );
 			}
@@ -148,44 +163,171 @@ class EmailCampaign extends DataObject
 
 
 	/**
-	 * Get user IDs of this campaign
+	 * Remove the filtered recipients which didn't receive email newsletter yet
+	 */
+	function remove_recipients()
+	{
+		if( empty( $this->ID ) )
+		{	// Email campaign must be created in DB:
+			return;
+		}
+
+		global $DB;
+
+		$DB->query( 'DELETE FROM T_email__campaign_send
+			WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
+			  AND csnd_emlog_ID IS NULL' );
+	}
+
+
+	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		switch( $parname )
+		{
+			case 'name':
+				if( $Newsletter = & $this->get_Newsletter() )
+				{	// Get name of newsletter:
+					return $Newsletter->get( 'name' );
+				}
+				else
+				{	// Get email title of this campaign:
+					return $this->get( 'email_title' );
+				}
+				break;
+
+			default:
+				return parent::get( $parname );
+		}
+	}
+
+
+	/**
+	 * Get Newsletter object of this email campaign
+	 *
+	 * @return object Newsletter
+	 */
+	function & get_Newsletter()
+	{
+		if( ! isset( $this->Newsletter ) )
+		{	// Initialize Newsletter:
+			$NewsletterCache = & get_NewsletterCache();
+			$this->Newsletter = & $NewsletterCache->get_by_ID( $this->get( 'enlt_ID', false, false ) );
+		}
+
+		return $this->Newsletter;
+	}
+
+
+	/**
+	 * Get recipient user IDs of this campaign
 	 *
 	 * @param string Type of users:
-	 *   'all'    - All users which assigned to this campaign
-	 *   'accept' - Users which already receive email newsletter
-	 *   'wait'   - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
+	 *   'all'     - All active users which accept newsletter of this campaign
+	 *   'filter'  - Filtered active users which accept newsletter of this campaign
+	 *   'receive' - Users which already received email newsletter
+	 *   'skipped' - Users which will not receive email newsletter
+	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
 	 * @return array user IDs
 	 */
-	function get_users( $type = 'all' )
+	function get_recipients( $type = 'all' )
 	{
 		global $DB;
 
-		if( !is_null( $this->users ) )
-		{ // Get users from cache
+		if( ! is_null( $this->users ) )
+		{	// Get users from cache:
 			return $this->users[ $type ];
 		}
 
-		// Get users from DB
-		$users_SQL = new SQL();
-		$users_SQL->SELECT( 'csnd_user_ID, csnd_emlog_ID' );
-		$users_SQL->FROM( 'T_email__campaign_send' );
-		$users_SQL->WHERE( 'csnd_camp_ID = '.$DB->quote( $this->ID ) );
-		$users = $DB->get_assoc( $users_SQL->get() );
+		// Get users from DB:
+		$users_SQL = new SQL( 'Get recipients of campaign #'.$this->ID );
+		$users_SQL->SELECT( 'user_ID, csnd_emlog_ID, csnd_user_ID, csnd_status, enls_user_ID' );
+		$users_SQL->FROM( 'T_users' );
+		$users_SQL->FROM_add( 'INNER JOIN T_email__campaign_send ON ( csnd_camp_ID = '.$DB->quote( $this->ID ).' AND ( csnd_user_ID = user_ID OR csnd_user_ID IS NULL ) )' );
+		$users_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_subscribed = 1 AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+		$users_SQL->WHERE( 'user_status IN ( "activated", "autoactivated" )' );
+		$users = $DB->get_results( $users_SQL->get(), OBJECT, $users_SQL->title );
 
 		$this->users['all'] = array();
-		$this->users['accept'] = array();
+		$this->users['filter'] = array();
+		$this->users['receive'] = array();
+		$this->users['skipped'] = array();
+		$this->users['error'] = array();
 		$this->users['wait'] = array();
+		$this->users['unsub_all'] = array();
+		$this->users['unsub_filter'] = array();
+		$this->users['unsub_receive'] = array();
+		$this->users['unsub_skipped'] = array();
+		$this->users['unsub_error'] = array();
+		$this->users['unsub_wait'] = array();
 
-		foreach( $users as $user_ID => $emlog_ID )
+		foreach( $users as $user_data )
 		{
-			$this->users['all'][] = $user_ID;
-			if( $emlog_ID > 0 )
-			{ // This user already accepted newsletter email
-				$this->users['accept'][] = $user_ID;
+			if( $user_data->enls_user_ID === NULL )
+			{	// This user is unsubscribed from newsletter of this email campaign:
+				$this->users['unsub_all'][] = $user_data->user_ID;
 			}
 			else
-			{ // This user didn't still accept email
-				$this->users['wait'][] = $user_ID;
+			{	// This user is subscribed to newsletter of this email campaign:
+				$this->users['all'][] = $user_data->user_ID;
+			}
+
+			if( $user_data->csnd_status == 'sent' )
+			{	// This user already received newsletter email:
+				if( $user_data->enls_user_ID === NULL )
+				{	// This user is unsubscribed from newsletter of this email campaign:
+					$this->users['unsub_receive'][] = $user_data->user_ID;
+					$this->users['unsub_filter'][] = $user_data->user_ID;
+				}
+				else
+				{	// This user is subscribed to newsletter of this email campaign:
+					$this->users['receive'][] = $user_data->user_ID;
+					$this->users['filter'][] = $user_data->user_ID;
+				}
+			}
+			elseif( $user_data->csnd_status == 'skipped' )
+			{ // This user will be skipped from receiving newsletter email:
+				if( $user_data->enls_user_ID === NULL )
+				{	// This user is unsubscribed from newsletter of this email campaign:
+					$this->users['unsub_skipped'][] = $user_data->user_ID;
+					$this->users['unsub_filter'][] = $user_data->user_ID;
+				}
+				else
+				{	// This user is subscribed to newsletter of this email campaign:
+					$this->users['skipped'][] = $user_data->user_ID;
+					$this->users['filter'][] = $user_data->user_ID;
+				}
+			}
+			elseif( $user_data->csnd_status == 'send_error' )
+			{ // We encountered a send error the last time we attempted to send email,:
+				if( $user_data->enls_user_ID === NULL )
+				{	// This user is unsubscribed from newsletter of this email campaign:
+					$this->users['unsub_error'][] = $user_data->user_ID;
+					$this->users['unsub_filter'][] = $user_data->user_ID;
+				}
+				else
+				{	// This user is subscribed to newsletter of this email campaign:
+					$this->users['error'][] = $user_data->user_ID;
+					$this->users['filter'][] = $user_data->user_ID;
+				}
+			}
+			elseif( $user_data->csnd_user_ID > 0 ) // Includes failed email attempts
+			{	// This user didn't receive email yet:
+				if( $user_data->enls_user_ID === NULL )
+				{	// This user is unsubscribed from newsletter of this email campaign:
+					$this->users['unsub_wait'][] = $user_data->user_ID;
+					$this->users['unsub_filter'][] = $user_data->user_ID;
+				}
+				else
+				{	// This user is subscribed to newsletter of this email campaign:
+					$this->users['wait'][] = $user_data->user_ID;
+					$this->users['filter'][] = $user_data->user_ID;
+				}
 			}
 		}
 
@@ -194,17 +336,48 @@ class EmailCampaign extends DataObject
 
 
 	/**
-	 * Get the users number of this campaign
+	 * Get the recipients number of this campaign
 	 *
 	 * @param string Type of users:
-	 *   'all'    - All users which assigned to this campaign
-	 *   'accept' - Users which already receive email newsletter
-	 *   'wait'   - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
+	 *   'all'     - All active users which accept newsletter of this campaign
+	 *   'filter'  - Filtered active users which accept newsletter of this campaign
+	 *   'receive' - Users which already received email newsletter
+	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
+	 * @param boolean TRUE to return as link to page with recipients list
 	 * @return integer Number of users
 	 */
-	function get_users_count( $type = 'all' )
+	function get_recipients_count( $type = 'all', $link = false )
 	{
-		return count( $this->get_users( $type ) );
+		$recipients_count = count( $this->get_recipients( $type ) );
+
+		if( $link )
+		{	// Initialize URL to page with reciepients of this Email Campaign:
+			$campaign_edit_modes = get_campaign_edit_modes( $this->ID );
+			switch( $type )
+			{
+				case 'receive':
+					$recipient_type = 'sent';
+					break;
+				case 'skipped':
+					$recipient_type = 'skipped';
+				case 'wait':
+					$recipient_type = 'readytosend';
+					break;
+				case 'filter':
+				default:
+					$recipient_type = 'filtered';
+					break;
+			}
+
+			$unsub_recipients_count = count( $this->get_recipients( 'unsub_'.$type ) );
+			if( $unsub_recipients_count > 0 )
+			{	// If unsubscribed users exist:
+				$recipients_count = $recipients_count.' ('.T_('still subscribed').') + '.$unsub_recipients_count.' ('.T_('unsubscribed').')';
+			}
+			$recipients_count = '<a href="'.$campaign_edit_modes['recipient']['href'].( empty( $type ) ? '' : '&amp;recipient_type='.$recipient_type ).'">'.$recipients_count.'</a>';
+		}
+
+		return $recipients_count;
 	}
 
 
@@ -215,9 +388,15 @@ class EmailCampaign extends DataObject
 	 */
 	function dbinsert()
 	{
+		// Update the message fields:
 		$this->update_message_fields();
 
-		return parent::dbinsert();
+		$r = parent::dbinsert();
+
+		// Update recipients:
+		$this->update_recipients();
+
+		return $r;
 	}
 
 
@@ -228,9 +407,15 @@ class EmailCampaign extends DataObject
 	 */
 	function dbupdate()
 	{
+		// Update the message fields:
 		$this->update_message_fields();
 
-		return parent::dbupdate();
+		$r = parent::dbupdate();
+
+		// Update recipients only if newsletter has been changed:
+		$this->update_recipients();
+
+		return $r;
 	}
 
 
@@ -278,6 +463,38 @@ class EmailCampaign extends DataObject
 
 
 	/**
+	 * Update recipients after newsletter of this email campaign was changed
+	 *
+	 * @param boolean TRUE to force the updating
+	 */
+	function update_recipients( $force_update = false )
+	{
+		if( empty( $this->ID ) )
+		{	// Email campaign must be created in DB:
+			return;
+		}
+
+		if( ! $force_update && empty( $this->newsletter_is_changed ) )
+		{	// Newsletter of this email campaign was not changed, Don't update recipients:
+			return;
+		}
+
+		global $DB;
+
+		// Remove the filtered recipients of previous newsletter which didn't receive it yet:
+		$this->remove_recipients();
+
+		// Insert recipients of current newsletter:
+		$DB->query( 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status )
+			SELECT '.$this->ID.', enls_user_ID, "ready_to_send"
+			  FROM T_email__newsletter_subscription
+			 WHERE enls_enlt_ID = '.$this->get( 'enlt_ID' ).'
+				 AND enls_subscribed = 1
+			 ON DUPLICATE KEY UPDATE csnd_camp_ID = csnd_camp_ID, csnd_user_ID = csnd_user_ID' );
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -286,20 +503,21 @@ class EmailCampaign extends DataObject
 	{
 		global $Plugins;
 
-		if( param( 'ecmp_name', 'string', NULL ) !== NULL )
-		{ // Name
-			param_string_not_empty( 'ecmp_name', T_('Please enter a campaign name.') );
-			$this->set_from_Request( 'name' );
+		if( param( 'ecmp_enlt_ID', 'integer', NULL ) !== NULL )
+		{	// Newsletter ID:
+			param_string_not_empty( 'ecmp_enlt_ID', T_('Please select a list.') );
+			$this->newsletter_is_changed = ( get_param( 'ecmp_enlt_ID' ) != $this->get( 'enlt_ID' ) );
+			$this->set_from_Request( 'enlt_ID' );
 		}
 
 		if( param( 'ecmp_email_title', 'string', NULL ) !== NULL )
-		{ // Email title
+		{	// Email title:
 			param_string_not_empty( 'ecmp_email_title', T_('Please enter an email title.') );
 			$this->set_from_Request( 'email_title' );
 		}
 
 		if( param( 'ecmp_email_html', 'html', NULL ) !== NULL )
-		{ // Email HTML message
+		{	// Email HTML message:
 			param_check_html( 'ecmp_email_html', T_('Please enter an HTML message.') );
 			$this->set_from_Request( 'email_html' );
 		}
@@ -314,6 +532,11 @@ class EmailCampaign extends DataObject
 		if( param( 'ecmp_email_text', 'html', NULL ) !== NULL )
 		{	// Save original message:
 			$this->set_from_Request( 'email_text' );
+		}
+
+		if( param( 'ecmp_auto_send', 'string', NULL ) !== NULL )
+		{	// Auto send:
+			$this->set_from_Request( 'auto_send' );
 		}
 
 		return ! param_errors_detected();
@@ -354,7 +577,7 @@ class EmailCampaign extends DataObject
 			$result = false;
 		}
 
-		if( $mode != 'test' && count( $this->get_users( 'wait' ) ) == 0 )
+		if( $mode != 'test' && count( $this->get_recipients( 'wait' ) ) == 0 )
 		{ // No users found which wait this newsletter
 			if( $display_messages )
 			{
@@ -381,6 +604,7 @@ class EmailCampaign extends DataObject
 				'include_greeting' => false,
 				'message_html'     => $this->get( 'email_html' ),
 				'message_text'     => $this->get( 'email_plaintext' ),
+				'newsletter'       => $this->get( 'enlt_ID' ),
 			);
 
 		if( $mode == 'test' )
@@ -402,8 +626,20 @@ class EmailCampaign extends DataObject
 			}
 		}
 		else
-		{ // Send a newsletter to real user
-			return send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, false, array(), $email_address );
+		{	// Send a newsletter to real user:
+			// Force email sending to not activated users if email campaign is configurated to auto sending (e-g to send email on auto subscription on registration):
+			$force_on_non_activated = ( $this->get( 'auto_send' ) == 'subscription' );
+			$r = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, $force_on_non_activated, array(), $email_address );
+			if( $r )
+			{	// Update last sending data for newsletter per user:
+				global $DB, $servertimenow;
+				$DB->query( 'UPDATE T_email__newsletter_subscription
+					SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $servertimenow ) ).',
+					    enls_send_count = enls_send_count + 1
+					WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
+					  AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+			}
+			return $r;
 		}
 	}
 
@@ -411,17 +647,25 @@ class EmailCampaign extends DataObject
 	/**
 	 * Send email newsletter for all users of this campaign
 	 *
-	 * @param boolean
+	 * @param boolean TRUE to print out messages
+	 * @param array Force users instead of users which are ready to receive this email campaign
 	 */
-	function send_all_emails( $display_messages = true )
+	function send_all_emails( $display_messages = true, $user_IDs = NULL )
 	{
 		global $DB, $localtimenow, $mail_log_insert_ID, $Settings, $Messages;
 
-		// Send emails only for users which still don't accept emails
-		$user_IDs = $this->get_users( 'wait' );
+		if( $user_IDs === NULL )
+		{	// Send emails only for users which still don't receive emails:
+			$user_IDs = $this->get_recipients( 'wait' );
+		}
+		else
+		{	// Exclude users which already received this email campaign to avoid double sending even with forcing user IDs:
+			$receive_user_IDs = $this->get_recipients( 'receive' );
+			$user_IDs = array_diff( $user_IDs, $receive_user_IDs );
+		}
 
 		if( empty( $user_IDs ) )
-		{ // No users, Exit here
+		{	// No users, Exit here:
 			return;
 		}
 
@@ -431,16 +675,14 @@ class EmailCampaign extends DataObject
 		$this->set( 'sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
 		$this->dbupdate();
 
-		if( $display_messages )
-		{ // We need in this cache when display the messages
-			$UserCache = & get_UserCache();
-		}
+		$UserCache = & get_UserCache();
 
 		// Get chunk size to limit a sending at a time:
 		$email_campaign_chunk_size = intval( $Settings->get( 'email_campaign_chunk_size' ) );
 
 		$email_success_count = 0;
 		$email_skip_count = 0;
+		$email_error_count = 0;
 		foreach( $user_IDs as $user_ID )
 		{
 			if( $email_campaign_chunk_size > 0 && $email_success_count >= $email_campaign_chunk_size )
@@ -464,25 +706,39 @@ class EmailCampaign extends DataObject
 
 			if( $result )
 			{	// Email newsletter was sent for user successfully:
-				$DB->query( 'UPDATE T_email__campaign_send
-						SET csnd_emlog_ID = '.$DB->quote( $mail_log_insert_ID ).'
-					WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
-						AND csnd_user_ID = '.$DB->quote( $user_ID ) );
+				$DB->query( 'REPLACE INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
+					VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "sent", '.$DB->quote( $mail_log_insert_ID ).' )' );
 
-				// Update arrays where we store which users accepted email and who waiting it now:
-				$this->users['accept'][] = $user_ID;
+				// Update arrays where we store which users received email and who waiting it now:
+				$this->users['receive'][] = $user_ID;
 				if( ( $wait_user_ID_key = array_search( $user_ID, $this->users['wait'] ) ) !== false )
 				{
 					unset( $this->users['wait'][ $wait_user_ID_key ] );
 				}
 				$email_success_count++;
 			}
+			elseif( $User->get_email_status() == 'prmerror' )
+			{ // Unable to send email due to permanent error
+				$DB->query( 'REPLACE INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
+					VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "send_error", '.$DB->quote( $mail_log_insert_ID ).' )' );
+
+				// Update arrays where we store which users received email and who waiting it now:
+				$this->users['error'][] = $user_ID;
+				if( ( $wait_user_ID_key = array_search( $user_ID, $this->users['wait'] ) ) !== false )
+				{
+					unset( $this->users['wait'][ $wait_user_ID_key ] );
+				}
+				$email_error_count++;
+
+				// This email sending was skipped:
+				$email_skip_count++;
+			}
 			else
 			{	// This email sending was skipped:
 				$email_skip_count++;
 			}
 
-			if( $display_messages )
+			if( $display_messages === true || $display_messages === 'cron_job' )
 			{	// Print the messages:
 				if( $result === true )
 				{ // Success
@@ -492,11 +748,39 @@ class EmailCampaign extends DataObject
 				{ // Failed, Email was NOT sent
 					if( ! check_allow_new_email( 'newsletter_limit', 'last_newsletter', $user_ID ) )
 					{ // Newsletter email is limited today for this user
-						echo '<span class="orange">'.sprintf( T_('User %s has already received max # of newsletters today.'), $User->get_identity_link() ).'</span><br />';
+						$error_msg = '<span class="orange">'.sprintf( T_('User %s has already received max # of lists today.'), $User->get_identity_link() ).'</span><br />';
+						if( $display_messages === 'cron_job' )
+						{
+							$Messages->add( $error_msg, 'warning' );
+						}
+						else
+						{
+							echo $error_msg;
+						}
+					}
+					elseif( $User->get_email_status() == 'prmerror' )
+					{ // Email has permanent error
+						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).' ('.T_('Reason').': '.T_('Permanent error').')</span><br />';
+						if( $display_messages === 'cron_job' )
+						{
+							$Messages->add( $error_msg, 'error' );
+						}
+						else
+						{
+							echo $error_msg;
+						}
 					}
 					else
 					{ // Another error
-						echo '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).'</span><br />';
+						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).'</span><br />';
+						if( $display_messages === 'cron_job' )
+						{
+							$Messages->add( $error_msg, 'error' );
+						}
+						else
+						{
+							echo $error_msg;
+						}
 					}
 				}
 
@@ -506,19 +790,26 @@ class EmailCampaign extends DataObject
 
 		$DB->commit();
 
-		$Messages->clear();
-		$wait_count = count( $this->users['wait'] );
-		if( $wait_count > 0 )
-		{	// Some recipients still wait this newsletter:
-			$Messages->add( sprintf( T_('Emails have been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
-					$email_campaign_chunk_size, $email_skip_count, $wait_count ), 'warning' );
+		if( $display_messages === true || $display_messages === 'cron_job' )
+		{	// Print the messages:
+			if( $display_messages !== 'cron_job' )
+			{
+				$Messages->clear();
+			}
+			$wait_count = count( $this->users['wait'] );
+			$skipped_count = count( $this->users['skipped'] ); // Recipients that are marked skipped for this campaign
+			if( $wait_count > 0 )
+			{	// Some recipients still wait this newsletter:
+				$Messages->add( sprintf( T_('Emails have been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
+						$email_campaign_chunk_size, $email_skip_count + $skipped_count, $wait_count ), 'warning' );
+			}
+			else
+			{	// All recipients received this bewsletter:
+				$Messages->add( T_('Emails have been sent to all recipients of this campaign.'), 'success' );
+			}
+			echo '<br />';
+			$Messages->display();
 		}
-		else
-		{	// All recipients received this bewsletter:
-			$Messages->add( T_('Emails have been sent to all recipients of this campaign.'), 'success' );
-		}
-		echo '<br />';
-		$Messages->display();
 	}
 
 
@@ -599,7 +890,7 @@ class EmailCampaign extends DataObject
 			return false;
 		}
 
-		if( $this->get_users_count( 'wait' ) > 0 )
+		if( $this->get_recipients_count( 'wait' ) > 0 )
 		{	// Create cron job only when at least one user is waiting a newsletter of this email campaing:
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
 			$email_campaign_Cronjob = new Cronjob();
@@ -646,6 +937,28 @@ class EmailCampaign extends DataObject
 		$this->dbupdate();
 
 		return true;
+	}
+
+
+	/**
+	 * Get title of sending method
+	 *
+	 * @return string
+	 */
+	function get_sending_title()
+	{
+		$titles = array(
+				'no'           => T_('Manual'),
+				'subscription' => T_('At subscription'),
+			);
+
+		if( isset( $titles[ $this->get( 'auto_send' ) ] ) )
+		{
+			return $titles[ $this->get( 'auto_send' ) ];
+		}
+
+		// Unknown sending method
+		return $this->get( 'auto_send' );
 	}
 }
 

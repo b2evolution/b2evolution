@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -243,12 +243,13 @@ function init_inskin_editing()
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
  * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
+ * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts
  * @return Item
  */
-function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false )
+function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false, $load_featured = false )
 {
 	global $Collection, $Blog, $cat;
-	global $disp, $disp_detail, $MainList, $FeaturedList;
+	global $disp, $disp_detail, $MainList, $FeaturedList, $featured_list_type;
 	global $featured_displayed_item_IDs;
 
 	if( $disp != $restrict_disp || !isset($MainList) )
@@ -256,6 +257,14 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 		$Item = NULL;
 		return $Item;
 	}
+
+	if( $featured_list_type != $load_featured )
+	{	// Reset a featured list if previous request was to load another type:
+		$FeaturedList = NULL;
+	}
+
+	// Save current list type in global var:
+	$featured_list_type = $load_featured;
 
 	if( !isset( $FeaturedList ) )
 	{	// Don't repeat if we've done this already -- Initialize the featured list only first time this function is called in a skin:
@@ -319,7 +328,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		$FeaturedList->set_filters( array(
 				'coll_IDs' => $coll_IDs,
-				'itemtype_usage' => $restrict_to_types_usage,
+				'itemtype_usage' => $restrict_to_types_usage.( $load_featured ? ',*featured*' : '' ),
 			), false /* Do NOT memorize!! */ );
 		// pre_dump( $FeaturedList->filters );
 		// Run the query:
@@ -328,24 +337,22 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		// SECOND: If no Intro, try to find an Featured post:
 
-		if( isset($Blog) )
-		{
-			if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
-				&& isset($Blog)
-				&& $Blog->get_setting('disp_featured_above_list') )
-			{ // No Intro page was found, try to find a featured post instead:
+		if( ! $load_featured && // Don't try to load featured posts twice,
+		    $FeaturedList->result_num_rows == 0 && // If no intro post has been load above,
+		    $restrict_disp != 'front' && // Exclude front page,
+		    $Blog->get_setting( 'disp_featured_above_list' ) ) // If the collection setting "Featured post above list" is enabled.
+		{	// No Intro page was found, try to find a featured post instead:
 
-				$FeaturedList->reset();
+			$FeaturedList->reset();
 
-				$FeaturedList->set_filters( array(
-						'coll_IDs' => $coll_IDs,
-						'featured' => 1,  // Featured posts only
-						// Types will already be reset to defaults here
-					), false /* Do NOT memorize!! */ );
+			$FeaturedList->set_filters( array(
+					'coll_IDs' => $coll_IDs,
+					'featured' => 1,  // Featured posts only
+					// Types will already be reset to defaults here
+				), false /* Do NOT memorize!! */ );
 
-				// Run the query:
-				$FeaturedList->query();
-			}
+			// Run the query:
+			$FeaturedList->query();
 		}
 	}
 
@@ -3343,7 +3350,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  */
 function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $inlist_order = NULL, $display_meta_title = false, $reply_level = 0 )
 {
-	global $current_User, $localtimenow;
+	global $current_User, $localtimenow, $item_id;
 
 	$Item = & $Comment->get_Item();
 	$Collection = $Blog = & $Item->get_Blog();
@@ -3406,6 +3413,11 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 					'text'   => '#text#'
 				) );
 			echo '</div>';
+		}
+
+		if( ! empty( $item_id ) && $Comment->ID > 0 && ! $Comment->is_meta() )
+		{	// Display checkbox to select normal existing comments for action only on view item page:
+			echo '<input type="checkbox" name="selected_comments[]" value="'.$Comment->ID.'" /> ';
 		}
 
 		echo '<span class="bDate">';
@@ -3534,6 +3546,11 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 		$Comment->status();
 		echo '</span>';
 		echo '</div>';
+
+		if( ! empty( $item_id ) && $Comment->ID > 0 && ! $Comment->is_meta() )
+		{	// Display checkbox to select normal existing comments for action only on view item page:
+			echo '<input type="checkbox" name="selected_comments[]" value="'.$Comment->ID.'" /> ';
+		}
 
 		echo '<span class="bDate">';
 		$Comment->date();
@@ -3970,16 +3987,17 @@ function set_session_Item( $Item )
  * Get object Item from Session
  *
  * @param integer Item ID
+ * @param boolean TRUE - to force a creating of new Item if it is not saved in Session yet
  * @return object Item
  */
-function get_session_Item( $item_ID = 0 )
+function get_session_Item( $item_ID = 0, $force_new = false )
 {
 	global $Session;
 
 	$edited_items = $Session->get( 'edited_items' );
 
-	if( isset( $edited_items[ $item_ID ] ) && is_object( $edited_items[ $item_ID ] ) )
-	{
+	if( isset( $edited_items[ $item_ID ] ) && ( $edited_items[ $item_ID ] instanceof Item ) )
+	{	// Get Item from Session:
 		$edited_Item = $edited_items[ $item_ID ];
 
 		// Reload main Chapter
@@ -3989,6 +4007,14 @@ function get_session_Item( $item_ID = 0 )
 		// Reload Post Type
 		$edited_Item->ItemType = NULL;
 		$edited_Item->get_ItemType();
+
+		return $edited_Item;
+	}
+	elseif( $force_new )
+	{	// Force to create new Item:
+		load_class( 'items/model/_item.class.php', 'Item' );
+		$edited_Item = new Item();
+		$edited_Item->set( 'main_cat_ID', get_param( 'cat' ) );
 
 		return $edited_Item;
 	}

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -144,7 +144,8 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 		if( $is_creating )
 		{
 			echo '<p>'.T_('The Home collection typically aggregates the contents of all other collections on the site.').'</p>';
-			$Form->radio( 'blog_aggregate', empty( $edited_Blog->get_setting( 'aggregate_coll_IDs' ) ) ? 0 : 1,
+			$aggregate_coll_IDs = $edited_Blog->get_setting( 'aggregate_coll_IDs' );
+			$Form->radio( 'blog_aggregate', empty( $aggregate_coll_IDs ) ? 0 : 1,
 			array(
 				array( 1, T_('Set to aggregate contents of all other collections') ),
 				array( 0, T_('Do not aggregate') ),
@@ -243,24 +244,23 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 
 $Form->end_fieldset();
 
+// Calculate how much locales are enabled in system
+$number_enabled_locales = 0;
+foreach( $locales as $locale_data )
+{
+	if( $locale_data['enabled'] )
+	{
+		$number_enabled_locales++;
+	}
+	if( $number_enabled_locales > 1 )
+	{ // We need to know we have more than 1 locale is enabled, Stop here
+		break;
+	}
+}
+
 if( ! $is_creating )
 {
 	$Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-settings' ) );
-
-		// Calculate how much locales are enabled in system
-		$number_enabled_locales = 0;
-		foreach( $locales as $locale_data )
-		{
-			if( $locale_data['enabled'] )
-			{
-				$number_enabled_locales++;
-			}
-			if( $number_enabled_locales > 1 )
-			{ // We need to know we have more than 1 locale is enabled, Stop here
-				break;
-			}
-		}
-
 		if( $number_enabled_locales > 1 )
 		{ // More than 1 locale
 			$blog_locale_note = ( $current_User->check_perm( 'options', 'view' ) ) ?
@@ -299,6 +299,16 @@ if( ! $is_creating )
 
 	$Form->end_fieldset();
 }
+else
+{
+	if( $number_enabled_locales > 1 )
+	{
+		$Form->hidden( 'blog_locale', $edited_Blog->get( 'locale' ) );
+		$Form->hidden( 'blog_locale_source', $edited_Blog->get_setting( 'locale_source' ) );
+		$Form->hidden( 'blog_post_locale_source', $edited_Blog->get_setting( 'post_locale_source' ) );
+		$Form->hidden( 'blog_new_item_locale_source', $edited_Blog->get_setting( 'new_item_locale_source' ) );
+	}
+}
 
 
 $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection-permission-settings' ) );
@@ -335,6 +345,10 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 											'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
 											'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ) ),
 			), T_('Permission management'), true );
+	}
+	else
+	{
+		$Form->hidden( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ) );
 	}
 
 	$blog_allow_access = $action == 'copy' ? 'public' : $edited_Blog->get_setting( 'allow_access' );
@@ -376,6 +390,13 @@ if( ! $is_creating )
 		$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This may be displayed in several places of the front-office. This may also be included in the XML feeds. You may use HTML markup here.'), 50 );
 
 	$Form->end_fieldset();
+}
+else
+{
+	$Form->hidden( 'blog_order', $edited_Blog->get( 'order' ) );
+	$Form->hidden( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ) );
+	$Form->hidden( 'blog_tagline', $edited_Blog->get( 'tagline' ) );
+	$Form->hidden( 'blog_longdesc', $edited_Blog->get( 'longdesc' ) );
 }
 
 

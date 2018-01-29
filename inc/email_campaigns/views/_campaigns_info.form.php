@@ -14,11 +14,15 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url, $tab;
-global $users_numbers, $edited_EmailCampaign;
+global $admin_url, $tab, $edited_EmailCampaign;
 
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
+
+if( $current_User->check_perm( 'emails', 'edit' ) )
+{	// Print out this fake button on top in order to use submit action "save" on press "Enter" key:
+	echo '<input type="submit" name="actionArray[save]" style="position:absolute;left:-1000px" />';
+}
 
 $Form->add_crumb( 'campaign' );
 $Form->hidden( 'ctrl', 'campaigns' );
@@ -26,21 +30,30 @@ $Form->hidden( 'current_tab', $tab );
 $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 
 $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-campaign' ) );
-	$Form->text_input( 'ecmp_name', $edited_EmailCampaign->get( 'name' ), 60, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ) == '' ? $edited_EmailCampaign->get( 'name' ) : $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
 	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ) ) );
-	$Form->info( T_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ) ) : T_('Not sent yet') );
+	$Form->info( T_('Last sent manually'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ) ) : T_('Not sent yet') );
+	$Form->info( T_('Last sent automatically'), $edited_EmailCampaign->get( 'auto_sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'auto_sent_ts' ) ) : T_('Not sent yet') );
+	$Form->radio_input( 'ecmp_auto_send', $edited_EmailCampaign->get( 'auto_send' ), array(
+			array( 'value' => 'no',           'label' => T_('No (Manual sending only)') ),
+			array( 'value' => 'subscription', 'label' =>  T_('At subscription') ),
+		), T_('Auto send'), array( 'lines' => true ) );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Newsletter recipients') );
-	if( !empty( $users_numbers ) )
-	{ // We know this data only one time after selecting users
-		$Form->info( T_('Accounts in filterset'), $users_numbers['all'] );
-		$Form->info( T_('Active accounts in filterset'), $users_numbers['active'] );
-	}
-	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_users_count(), '('.T_('Accounts which accept newsletter emails').') - <a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'">'.T_('Change selection').' &gt;&gt;</a>' );
-	$Form->info( T_('Already received'), $edited_EmailCampaign->get_users_count( 'accept' ), '('.T_('Accounts which have already been sent this newsletter').')' );
-	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_users_count( 'wait' ), '('.T_('Accounts which have not been sent this newsletter yet').')' );
+$Form->begin_fieldset( T_('List recipients') );
+	$NewsletterCache = & get_NewsletterCache();
+	$NewsletterCache->load_where( 'enlt_active = 1 OR enlt_ID = '.intval( $edited_EmailCampaign->get( 'enlt_ID' ) ) );
+	$Form->select_input_object( 'ecmp_enlt_ID', $edited_EmailCampaign->get( 'enlt_ID' ), $NewsletterCache, T_('Send to subscribers of'), array(
+			'required'     => true,
+			'field_suffix' => '<input type="submit" name="actionArray[update_newsletter]" class="btn btn-default" value="'.format_to_output( T_('Update'), 'htmlattr' ).'" />' ) );
+	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_recipients_count(), '('.T_('Accounts which currently accept this list').')' );
+	$Form->info_field( T_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter', true ), array(
+			'class' => 'info_full_height',
+			'note'  => '('.T_('Accounts that match your additional filter').') '
+			           .'<a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'" class="btn btn-default">'.T_('Change filter').'</a>',
+		) );
+	$Form->info( T_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive', true ), '('.T_('Accounts which have already been sent this list').')' );
+	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_recipients_count( 'wait', true ), '('.T_('Accounts which have not been sent this list yet').')' );
 $Form->end_fieldset();
 
 $buttons = array();

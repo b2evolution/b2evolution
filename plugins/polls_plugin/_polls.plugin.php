@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -23,7 +23,7 @@ class polls_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.9.4';
+	var $version = '6.10.0';
 	var $number_of_installs = 1;
 
 
@@ -110,7 +110,7 @@ class polls_plugin extends Plugin
 			foreach( $inlines[0] as $i => $current_poll_tag )
 			{
 				$poll_ID = $inlines[1][$i];
-				$poll_title = 'Poll';
+				$poll_title = T_('Poll');
 				if( ! empty( $inlines[2][$i] ) && ! empty( $inlines[3][$i] ) )
 				{
 					$poll_title = $inlines[3][$i];

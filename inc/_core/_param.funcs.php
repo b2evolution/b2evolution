@@ -15,7 +15,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -855,7 +855,7 @@ function param_check_valid_login( $var )
 		}
 		elseif( ! isset( $Settings ) || $Settings->get('strict_logins') )
 		{
-			$msg = T_('Logins can only contain letters, digits and the following characters: _ .');
+			$msg = T_('Logins can only contain letters, digits and the following characters: _ . -');
 		}
 		else
 		{
@@ -869,8 +869,10 @@ function param_check_valid_login( $var )
 
 
 /**
- * @param string param name
- * @return boolean true if OK
+ * Check if the requested string can be used as user login
+ *
+ * @param string User login
+ * @return boolean TRUE if OK
  */
 function param_check_login( $var, $required = false )
 {
@@ -886,9 +888,9 @@ function param_check_login( $var, $required = false )
  */
 function check_is_login( $login )
 {
-	if( !user_exists( $login ) )
+	if( ! user_exists( $login ) )
 	{
- 		return sprintf( T_( 'There is no user with username &laquo;%s&raquo;.' ), $login );
+		return sprintf( T_( 'There is no user with username &laquo;%s&raquo;.' ), $login );
 	}
 }
 
@@ -2366,20 +2368,20 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 	{
 		case 'posting':
 		case 'xmlrpc_posting':
-			$Group = $User->get_Group();
+			$Group = $User ? $User->get_Group() : false;
 			if( $context == 'posting' )
 			{
-				$xhtmlvalidation  = ($Group->perm_xhtmlvalidation == 'always');
+				$xhtmlvalidation  = ( $Group && $Group->perm_xhtmlvalidation == 'always' );
 			}
 			else
 			{
-				$xhtmlvalidation  = ($Group->perm_xhtmlvalidation_xmlrpc == 'always');
+				$xhtmlvalidation  = ( $Group && $Group->perm_xhtmlvalidation_xmlrpc == 'always' );
 			}
-			$allow_css_tweaks = $Group->perm_xhtml_css_tweaks;
-			$allow_javascript = $Group->perm_xhtml_javascript;
-			$allow_iframes    = $Group->perm_xhtml_iframes;
-			$allow_objects    = $Group->perm_xhtml_objects;
-			$bypass_antispam  = $Group->perm_bypass_antispam;
+			$allow_css_tweaks = $Group && $Group->perm_xhtml_css_tweaks;
+			$allow_javascript = $Group && $Group->perm_xhtml_javascript;
+			$allow_iframes    = $Group && $Group->perm_xhtml_iframes;
+			$allow_objects    = $Group && $Group->perm_xhtml_objects;
+			$bypass_antispam  = $Group && $Group->perm_bypass_antispam;
 			break;
 
 		case 'commenting':

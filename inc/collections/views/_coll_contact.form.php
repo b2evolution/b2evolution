@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -20,6 +20,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Blog;
 
+// Load to use function get_available_thumb_sizes():
+load_funcs( 'files/model/_image.funcs.php' );
 
 $Form = new Form( NULL, 'coll_contact_checkchanges' );
 
@@ -37,11 +39,15 @@ $Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'co
 		$Form->checkbox( 'msgform_display_recipient', $edited_Blog->get_setting( 'msgform_display_recipient' ), '' );
 		$Form->text_input( 'msgform_recipient_label', $edited_Blog->get_setting( 'msgform_recipient_label' ), 40, T_('Label').':', T_('Leave empty for default').': "'.T_('Message to').'".' );
 	$Form->end_line();
+	$Form->begin_line( '' );
+		$Form->checkbox( 'msgform_display_avatar', $edited_Blog->get_setting( 'msgform_display_avatar' ), '' );
+		$Form->select_input_array( 'msgform_avatar_size', $edited_Blog->get_setting( 'msgform_avatar_size' ), get_available_thumb_sizes(), T_('Avatar').':', '', array( 'force_keys_as_values' => true ) );
+	$Form->end_line();
 	$Form->radio( 'msgform_user_name', $edited_Blog->get_setting( 'msgform_user_name' ), array(
 			array( 'fullname', T_('First + Last Name') ),
 			array( 'nickname', T_('Nickname') ),
 			array( 'none',     T_('None') ),
-		), T_('Name input for logged in users') );
+		), T_('Sender name input for logged in users') );
 	$Form->checkbox( 'msgform_require_name', $edited_Blog->get_setting( 'msgform_require_name' ), T_('Require name'), T_('Check to require name.') );
 	$Form->textarea( 'msgform_subject_list', $edited_Blog->get_setting( 'msgform_subject_list' ), 10, T_('Subject option list'), T_('Enter one option per line. Max length 255 symbols.') );
 	$Form->checkbox( 'msgform_display_subject', $edited_Blog->get_setting( 'msgform_display_subject' ), T_('Free subject input'), T_('Check to display "Subject:" or "Other:" in case pre-filled options are provided above.') );

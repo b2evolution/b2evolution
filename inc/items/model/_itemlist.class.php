@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -101,6 +101,9 @@ class ItemList2 extends ItemListLight
 
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats, $Item );
+
+		// Set main category to avoid error with new creating Item:
+		$Item->set( 'main_cat_ID', $post_category );
 
 		// Switch to current user's locale to display errors:
 		locale_temp_switch( $current_User->locale );

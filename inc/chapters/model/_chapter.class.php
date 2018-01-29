@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -89,6 +89,11 @@ class Chapter extends DataObject
 	 * Category image
  	 */
 	var $image_file_ID;
+
+	/**
+	 * Social media image
+	 */
+	var $social_media_image_file_ID;
 
 	/**
 	 * Constructor
@@ -608,6 +613,11 @@ class Chapter extends DataObject
 
 		// The chapter was updated successful
 		$DB->commit();
+
+		// BLOCK CACHE INVALIDATION:
+		$chapter_Blog = $this->get_Blog();
+		BlockCache::invalidate_key( 'cont_coll_ID', $chapter_Blog->ID ); // Content has changed
+
 		return true;
 	}
 

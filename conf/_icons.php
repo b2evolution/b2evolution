@@ -912,6 +912,20 @@ function get_icon_info( $name )
 			'glyph' => 'play',
 			'fa' => 'play'
 		);
+		case 'rewind': return array( // Used to resend email campaign ( rewind user back to previous state )
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'rewind',
+			'fa' => 'backward',
+		);
+		case 'forward': return array( // Used to skip email campaign for user
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'forward',
+			'fa' => 'forward',
+		);
 
 		case 'feed': return array(
 			'alt'	 => T_('XML Feed'),

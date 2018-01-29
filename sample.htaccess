@@ -68,6 +68,9 @@ AcceptPathInfo On
 	# Redirect to REST API controller:
 	RewriteRule ^api/v(\d+)/(.+)$ htsrv/rest.php?api_version=$1&api_request=$2 [QSA,L]
 
+	# Redirect tracking links:
+	RewriteRule ^go/(.+)$ htsrv/track.php?key=$1 [QSA,L]
+
 	# Redirect any .htm .html or no-extension-file that's not an existing file or directory to index.php:
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteCond %{REQUEST_FILENAME} !-f

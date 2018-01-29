@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -155,7 +155,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Receiving private messages').( is_admin_page() ? get_manual_link( 'user-communications-panel' ) : '' ) );
 
 	$has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
-	$messaging_options = array(	array( 'PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
+	$messaging_options = array(	array( 'enable_PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
 	$emails_msgform = $Settings->get( 'emails_msgform' );
 
 	$email_messaging_note = '';
@@ -173,11 +173,12 @@ $Form->begin_fieldset( T_('Receiving private messages').( is_admin_page() ? get_
 	$msgform_checklist_params = $checklist_params;
 	if( $emails_msgform == 'userset' )
 	{ // user can set
-		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
+		$messaging_options[] = array( 'enable_email', 1, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
 	}
-	elseif( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) )
+	elseif( ( $emails_msgform == 'adminset' ) )
 	{ // only administrator users can set and current User is in 'Administrators' group
-		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ).get_admin_badge( 'user' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
+		$is_disabled_email_method = ( ! $current_User->check_perm( 'users', 'edit' ) );
+		$messaging_options[] = array( 'enable_email', 1, T_( 'emails through a message form that will NOT reveal my email address.' ).get_admin_badge( 'user' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $is_disabled_email_method, $email_messaging_note );
 	}
 	elseif( ! empty( $email_messaging_note ) )
 	{	// Display red message to inform user when he don't have a permission to edit the setting:
@@ -188,22 +189,30 @@ $Form->begin_fieldset( T_('Receiving private messages').( is_admin_page() ? get_
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Newsletter subscriptions').( is_admin_page() ? get_manual_link( 'user-newsletters-panel' ) : '' ) );
+$Form->begin_fieldset( T_('List subscriptions').( is_admin_page() ? get_manual_link( 'user-lists-panel' ) : '' ) );
 
-	$newsletter_options = array(
-		array( 'edited_user_newsletter_news', 1, T_( 'Send me news about this site.' ).' <span class="note">'.T_('Each message contains an easy 1 click unsubscribe link.').'</span>', $UserSettings->get( 'newsletter_news',  $edited_User->ID ) ),
-		array( 'edited_user_newsletter_ads', 1, T_( 'I want to receive ADs that may be relevant to my interests.' ), $UserSettings->get( 'newsletter_ads',  $edited_User->ID ) )
-	);
-	$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Newsletter' ), false, false, $checklist_params );
+	$NewsletterCache = & get_NewsletterCache();
+	$NewsletterCache->load_where( 'enlt_active = 1' );
+
+	if( count( $NewsletterCache->cache ) )
+	{	// If at least one newsletter is active:
+		$user_newsletter_subscriptions = $edited_User->get_newsletter_subscriptions();
+		$newsletter_options = array();
+		foreach( $NewsletterCache->cache as $Newsletter )
+		{
+			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ) );
+		}
+		$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Lists' ), false, false, $checklist_params );
+	}
 
 	// Limit newsletters:
 	if( $is_admin_page )
 	{ // Back office view
-		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('emails per day').'</b>' ) );
+		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Never send me more than' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('list emails per day, all lists combined.').'</b>' ) );
 	}
 	else
 	{ // Front office view
-		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to %s emails per day' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
+		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Never send me more than %s list emails per day, all lists combined.' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
 	}
 
 $Form->end_fieldset();
@@ -216,20 +225,23 @@ if( $notifications_mode != 'off' )
 	$Form->begin_fieldset( T_('Collection subscriptions').( is_admin_page() ? get_manual_link( 'user-coll-subscriptions-panel' ) : '' ), array( 'id' => 'subs' ) );
 
 			// Get those blogs for which we have already subscriptions (for this user)
-			$sql = 'SELECT DISTINCT blog_ID, blog_shortname,
-						MAX( IF( sub_items IS NULL, IF( opt.cset_name = "opt_out_subscription", 1, 0 ), sub_items ) ) AS sub_items,
-						MAX( IF( sub_comments IS NULL, IF( opt.cset_name = "opt_out_comment_subscription", 1, 0 ), sub_comments ) ) AS sub_comments
-					FROM T_blogs
-					INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = "1" )
-					LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name IN ( "opt_out_subscription", "opt_out_comment_subscription" ) )
-					LEFT JOIN T_subscriptions ON ( sub_coll_ID = blog_ID AND sub_user_ID = '.$edited_User->ID.' )
-					LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
-					LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
-					LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
-					LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
-					WHERE ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR sub_user_ID = '.$edited_User->ID.' )
-						AND ( sub_items <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )
-						AND ( CASE opt.cset_value WHEN 1 THEN blog_advanced_perms = 1 ELSE TRUE END )';
+			$sql = 'SELECT blog_ID, blog_shortname,
+								MAX( IF( sub_items IS NULL, IF( opt.cset_name = "opt_out_subscription", 1, 0 ), sub_items ) ) AS sub_items,
+								MAX( IF( sub_comments IS NULL, IF( opt.cset_name = "opt_out_comment_subscription", 1, 0 ), sub_comments ) ) AS sub_comments
+							FROM T_blogs
+							LEFT JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_subscriptions" )
+							LEFT JOIN T_coll_settings AS subc ON ( subc.cset_coll_ID = blog_ID AND subc.cset_name = "allow_comment_subscriptions" )
+							LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name IN ( "opt_out_subscription", "opt_out_comment_subscription" ) )
+							LEFT JOIN T_subscriptions ON ( sub_coll_ID = blog_ID AND sub_user_ID = '.$edited_User->ID.' )
+							LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
+							LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
+							LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+							LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+							WHERE ( ( sub.cset_value = 1 OR sub.cset_value IS NULL ) OR ( subc.cset_value = 1 OR subc.cset_value IS NULL ) )
+								AND ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR sub_user_ID = '.$edited_User->ID.' )
+								AND ( sub_items <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )
+								AND ( CASE opt.cset_value WHEN 1 THEN blog_advanced_perms = 1 ELSE TRUE END )
+							GROUP BY blog_ID, blog_shortname';
 			$blog_subs = $DB->get_results( $sql );
 
 			$BlogCache = & get_BlogCache();
@@ -299,9 +311,8 @@ if( $notifications_mode != 'off' )
 				$Form->begin_line( T_('Also available') );
 			}
 
-				$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
-				$subscribe_items_new = $Form->hidden( 'sub_items_new', 1 );
-				$subscribe_blogs_button = $Form->button( array(
+				$Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
+				$Form->button( array(
 					'name'  => 'actionArray[subscribe]',
 					'value' => T_('Subscribe to this collection'),
 					'style' => 'margin-left:10px;'
@@ -320,13 +331,6 @@ if( $notifications_mode != 'off' )
 					break;
 				}
 			}
-
-			foreach( $BlogCache->cache as $subscribe_Blog )
-			{	// These hidden fields are used only by JS to know what subscription settings are enabled for each collection:
-				$enabled_subs_settings = $subscribe_Blog->get_setting( 'allow_subscriptions' ) ? 'p' : '';
-				$enabled_subs_settings .= $subscribe_Blog->get_setting( 'allow_comment_subscriptions' ) ? 'c' : '';
-				$Form->hidden( 'coll_subs_settings_'.$subscribe_Blog->ID, $enabled_subs_settings );
-			}
 		}
 	}
 	$Form->end_fieldset();
@@ -338,14 +342,15 @@ if( $notifications_mode != 'off' )
 				FROM T_items__item
 				INNER JOIN T_categories ON cat_ID = post_main_cat_ID
 				INNER JOIN T_blogs ON blog_ID = cat_blog_ID
-				INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = "1" )
+				LEFT JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_item_subscriptions" )
 				LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name = "opt_out_item_subscription" )
 				LEFT JOIN T_items__subscriptions ON ( isub_item_ID = post_ID AND isub_user_ID = '.$edited_User->ID.' )
 				LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
 				LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
 				LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
 				LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
-				WHERE ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' )
+				WHERE ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR isub_user_ID = '.$edited_User->ID.' )
+					AND ( sub.cset_value = "1" OR sub.cset_coll_ID IS NULL )
 					AND ( isub_comments <> 0 OR isub_item_ID IS NULL )';
 		$individual_posts_subs = $DB->get_results( $sql );
 		$subs_item_IDs = array();
@@ -472,31 +477,3 @@ if( $action != 'view' )
 }
 
 $Form->end_form();
-
-?>
-<script type="text/javascript">
-jQuery( document ).ready( function()
-{
-	jQuery( 'select#subscribe_blog' ).change( function()
-	{	// Enable/Disable collection additional subscription checkboxes depending on settings:
-		var coll_ID = jQuery( this ).val();
-		var coll_settings = jQuery( 'input[name=coll_subs_settings_' + coll_ID + ']' ).val();
-		if( coll_settings == 'pc' || coll_settings == 'p' )
-		{	// Enable if subscription is allowed for new posts:
-			jQuery( 'input[name=sub_items_new]' ).removeAttr( 'disabled' );
-		}
-		else
-		{	// Disable otherwise:
-			jQuery( 'input[name=sub_items_new]' ).attr( 'disabled', 'disabled' );
-		}
-		if( coll_settings == 'pc' || coll_settings == 'c' )
-		{ // Enable if subscription is allowed for new comments:
-			jQuery( 'input[name=sub_comments_new]' ).removeAttr( 'disabled' );
-		}
-		else
-		{	// Disable otherwise:
-			jQuery( 'input[name=sub_comments_new]' ).attr( 'disabled', 'disabled' );
-		}
-	} );
-} );
-</script>

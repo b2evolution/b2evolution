@@ -2851,7 +2851,7 @@ a.comment_reply_current {
   text-align: center;
   font-weight: bold;
   color: #FF0000;
-  margin-top: 10px;
+  margin: 10px 0;
 }
 a.comment_reply_current:hover {
   color: #0066CC;
@@ -2927,10 +2927,6 @@ div.container_menu_top input.search_field {
 .widget_core_user_login .input_text,
 .widget_core_user_register .input_text {
   width: 96%;
-}
-.widget_core_user_login .submit,
-.widget_core_user_register .submit {
-  font-size: 10px;
 }
 .widget_core_user_login .register_link {
   font-weight: bold;
@@ -3133,13 +3129,45 @@ div.item_location {
 #ffield_item_tags ul.token-input-list-facebook {
   width: 100%;
 }
-.evo_content_block span[class*=status_] {
+.evo_content_block span.status_published,
+.evo_content_block span.status_community,
+.evo_content_block span.status_protected,
+.evo_content_block span.status_review,
+.evo_content_block span.status_private,
+.evo_content_block span.status_draft,
+.evo_content_block span.status_deprecated,
+.evo_content_block span.status_redirected,
+.evo_content_block span.status_trash {
   background: transparent;
   width: 75px;
   height: 75px;
   display: block;
   position: relative;
   overflow: hidden;
+}
+.evo_content_block span.status_published span,
+.evo_content_block span.status_community span,
+.evo_content_block span.status_protected span,
+.evo_content_block span.status_review span,
+.evo_content_block span.status_private span,
+.evo_content_block span.status_draft span,
+.evo_content_block span.status_deprecated span,
+.evo_content_block span.status_redirected span,
+.evo_content_block span.status_trash span {
+  display: block;
+  width: 120px;
+  text-align: center;
+  padding: 3px 0;
+  position: relative;
+  font-size: 9pt;
+  top: 15px;
+  left: -12px;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476)";
+  /* IE8 */
 }
 .note.status_draft span,
 .evo_status__draft {
@@ -3191,22 +3219,6 @@ div.item_location {
   color: #fff !important;
   background-color: #5bc0de !important;
 }
-.evo_content_block span[class*=status_] span {
-  display: block;
-  width: 120px;
-  text-align: center;
-  padding: 3px 0;
-  position: relative;
-  font-size: 9pt;
-  top: 15px;
-  left: -12px;
-  -webkit-transform: rotate(45deg);
-  -moz-transform: rotate(45deg);
-  -o-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476)";
-  /* IE8 */
-}
 div.results .status_draft span,
 div.results .status_review span,
 div.results .status_community span,
@@ -3228,7 +3240,15 @@ div.results .status_meta span {
 }
 @media \0screen {
   /* IE8 */
-  .evo_content_block span[class*=status_] span {
+  .evo_content_block span.status_published span,
+  .evo_content_block span.status_community span,
+  .evo_content_block span.status_protected span,
+  .evo_content_block span.status_review span,
+  .evo_content_block span.status_private span,
+  .evo_content_block span.status_draft span,
+  .evo_content_block span.status_deprecated span,
+  .evo_content_block span.status_redirected span,
+  .evo_content_block span.status_trash span {
     top: -15px;
     left: -2px;
   }
@@ -3722,7 +3742,7 @@ div.codeblock > p {
 }
 div.videoblock {
   text-align: center;
-  margin: auto;
+  margin: 1ex auto;
   overflow: auto;
   position: relative;
   max-width: 100%;
@@ -3795,6 +3815,9 @@ ol {
 }
 .text-normal {
   font-weight: normal;
+}
+p.margin-top {
+  margin: 10px 0 0 0;
 }
 .table-hover > tbody > tr:hover {
   background-color: #ffc;
@@ -3922,15 +3945,9 @@ a.btn.action_icon.hoverlink {
   vertical-align: top;
   margin-left: 7px;
 }
-.form-horizontal .compose_layout {
-  margin-bottom: 15px;
-}
 .form-horizontal .compose_layout td {
-  padding: 0 2px 2px 0;
+  padding: 0 2px 15px 0;
   vertical-align: middle;
-}
-.form-horizontal .compose_layout tr:last-child td {
-  padding-bottom: 0;
 }
 .form-horizontal .compose_layout th.label,
 .form-horizontal .compose_layout td.label {
@@ -4016,6 +4033,18 @@ a.btn.action_icon.hoverlink {
 .form-inline .form-group.large,
 .form-inline #criteria_type_A2.large {
   width: 100%;
+}
+.evo_msgform_recipient label.control-label,
+.evo_msgform_recipient div.controls {
+  float: none;
+  display: inline-block;
+  vertical-align: middle;
+  padding-top: 0;
+}
+.evo_msgform_recipient a.login {
+  white-space: normal;
+  text-align: center;
+  display: inline-block;
 }
 #register_form div#ffield_m {
   margin-bottom: 4px;

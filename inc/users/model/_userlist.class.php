@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -100,6 +100,8 @@ class UserList extends DataObjectList2
 				'gender'              => NULL,    // string: 'M', 'F', 'O', 'MF', 'MO', 'FO' or 'MFO'
 				'status_activated'    => NULL,    // string: 'activated'
 				'account_status'      => NULL,    // string: 'new', 'activated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
+				'registered_min'      => NULL,    // date: Registered date from
+				'registered_max'      => NULL,    // date: Registered date to
 				'reported'            => NULL,    // integer: 1 to show only reported users
 				'custom_sender_email' => NULL,    // integer: 1 to show only users with custom notifcation sender email address
 				'custom_sender_name'  => NULL,    // integer: 1 to show only users with custom notifaction sender name
@@ -114,6 +116,11 @@ class UserList extends DataObjectList2
 				'level_min'           => NULL,    // integer, Level min
 				'level_max'           => NULL,    // integer, Level max
 				'org'                 => NULL,    // integer, Organization ID
+				'newsletter'          => NULL,    // integer, Newsletter ID
+				'newsletter_subscribed' => 1,     // 1 - only users with active subscription, 0 - only unsubscribed users, NULL - both
+				'ecmp'                => NULL,    // integer, Email Campaign ID
+				'recipient_type'      => NULL,    // string, Recipient type of email campaign: 'filtered', 'sent', 'readytosend'
+				'user_tag'            => NULL,    // string, User tag
 		) );
 	}
 
@@ -202,6 +209,12 @@ class UserList extends DataObjectList2
 			memorize_param( 'account_status', 'string', $this->default_filters['account_status'], $this->filters['account_status'] );
 
 			/*
+			 * Restrict by registration date
+			 */
+			memorize_param( 'registered_min', 'date', $this->default_filters['registered_min'], $this->filters['registered_min'] );
+			memorize_param( 'registered_max', 'date', $this->default_filters['registered_max'], $this->filters['registered_max'] );
+
+			/*
 			 * Restrict by reported state ( was reported or not )
 			 */
 			memorize_param( 'reported', 'integer', $this->default_filters['reported'], $this->filters['reported'] );
@@ -240,6 +253,31 @@ class UserList extends DataObjectList2
 			 * Restrict by organization
 			 */
 			memorize_param( 'org', 'integer', $this->default_filters['org'], $this->filters['org'] );
+
+			/*
+			 * Restrict by newsletter
+			 */
+			memorize_param( 'newsletter', 'integer', $this->default_filters['newsletter'], $this->filters['newsletter'] );
+
+			/*
+			 * Restrict by newsletter subscription activity
+			 */
+			memorize_param( 'newsletter_subscribed', 'integer', $this->default_filters['newsletter_subscribed'], $this->filters['newsletter_subscribed'] );
+
+			/*
+			 * Restrict by email campaign
+			 */
+			memorize_param( 'ecmp', 'integer', $this->default_filters['ecmp'], $this->filters['ecmp'] );
+
+			/*
+			 * Restrict by recipient type of email campaign
+			 */
+			memorize_param( 'recipient_type', 'string', $this->default_filters['recipient_type'], $this->filters['recipient_type'] );
+
+			/*
+			 * Restrict by user tag
+			 */
+			memorize_param( 'user_tag', 'string', $this->default_filters['user_tag'], $this->filters['user_tag'] );
 
 			/*
 			 * Restrict by user fields
@@ -375,6 +413,12 @@ class UserList extends DataObjectList2
 		}
 
 		/*
+		 * Restrict by registration date
+		 */
+		$this->filters['registered_min'] = param_date( 'registered_min', T_('Invalid_date'), false, NULL );
+		$this->filters['registered_max'] = param_date( 'registered_max', T_('Invalid_date'), false, NULL );
+
+		/*
 		 * Restrict by reported state ( was reported or not )
 		 */
 		$this->filters['reported'] = param( 'reported', 'integer', $this->default_filters['reported'], true );
@@ -434,6 +478,31 @@ class UserList extends DataObjectList2
 		 * Restrict by organization ID
 		 */
 		$this->filters['org'] = param( 'org', 'integer', $this->default_filters['org'], true );
+
+		/*
+		 * Restrict by newsletter ID
+		 */
+		$this->filters['newsletter'] = param( 'newsletter', 'integer', $this->default_filters['newsletter'], true );
+
+		/*
+		 * Restrict by newsletter subscription activity
+		 */
+		$this->filters['newsletter_subscribed'] = param( 'newsletter_subscribed', 'integer', $this->default_filters['newsletter_subscribed'], true );
+
+		/*
+		 * Restrict by email campaign ID
+		 */
+		$this->filters['ecmp'] = param( 'ecmp', 'integer', $this->default_filters['ecmp'], true );
+
+		/*
+		 * Restrict by recipient type of email campaign
+		 */
+		$this->filters['recipient_type'] = param( 'recipient_type', 'string', $this->default_filters['recipient_type'], true );
+
+		/*
+		 * Restrict by user tag
+		 */
+		$this->filters['user_tag'] = param( 'user_tag', 'string', $this->default_filters['user_tag'], true );
 
 		// 'paged'
 		$this->page = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
@@ -512,6 +581,7 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_gender( $this->filters['gender'] );
 		$this->UserQuery->where_status( $this->filters['status_activated'] );
 		$this->UserQuery->where_status( $this->filters['account_status'], true, true );
+		$this->UserQuery->where_registered_date( $this->filters['registered_min'], $this->filters['registered_max'] );
 		$this->UserQuery->where_reported( $this->filters['reported'] );
 		$this->UserQuery->where_custom_sender( $this->filters['custom_sender_email'], $this->filters['custom_sender_name'] );
 		$this->UserQuery->where_group( $this->filters['group'] );
@@ -528,6 +598,8 @@ class UserList extends DataObjectList2
 			$org_ID = isset( $this->query_params['where_org_ID'] ) ? $this->query_params['where_org_ID'] : $this->filters['org'];
 			$this->UserQuery->where_organization( $org_ID );
 		}
+		$this->UserQuery->where_newsletter( $this->filters['newsletter'], $this->filters['newsletter_subscribed']  );
+		$this->UserQuery->where_email_campaign( $this->filters['ecmp'], $this->filters['recipient_type'] );
 		if( isset( $this->query_params['where_viewed_user'] ) )
 		{	// Filter by user profile viewed:
 			$this->UserQuery->where_viewed_user( $this->query_params['where_viewed_user'] );
@@ -541,6 +613,7 @@ class UserList extends DataObjectList2
 			global $Settings;
 			$this->UserQuery->where_group_level( $Settings->get('allow_anonymous_user_level_min'), $Settings->get('allow_anonymous_user_level_max') );
 		}
+		$this->UserQuery->where_tag( $this->filters['user_tag'] );
 
 		if( isset( $this->query_params['order_by_login_length'] ) && in_array( $this->query_params['order_by_login_length'], array( 'A', 'D' ) ) )
 		{

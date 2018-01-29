@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -13,12 +13,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for files module to function properly
  */
-$required_php_version[ 'files' ] = '5.2';
+$required_php_version[ 'files' ] = '5.4';
 
 /**
  * Minimum MYSQL version required for files module to function properly
  */
-$required_mysql_version[ 'files' ] = '5.0.3';
+$required_mysql_version[ 'files' ] = '5.1';
 
 /**
  * Aliases for table names:
@@ -158,6 +158,12 @@ class files_Module extends Module
 			case 3: // Editors (group ID 3) have permission by default:
 				$permfiles = 'edit_allowed';
 				$permshared = 'view';
+				$permimport = 'none';
+				$permskins = 'none';
+				break;
+			case 4: // Normal Users (group ID 4) have permission by default:
+				$permfiles = 'add';
+				$permshared = 'none';
 				$permimport = 'none';
 				$permskins = 'none';
 				break;

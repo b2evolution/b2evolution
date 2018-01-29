@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -259,9 +259,12 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
+		// Update the folding states for current user:
+		save_fieldset_folding_values( $Blog->ID );
+
 		$edited_ComponentWidget->load_from_Request();
 
-		if(	! param_errors_detected() )
+		if( ! param_errors_detected() )
 		{ // Update settings:
 			$edited_ComponentWidget->dbupdate();
 			$Messages->add( T_('Widget settings have been updated'), 'success' );

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -475,6 +475,9 @@ switch( $action )
 		param( 'edited_plugin_apply_rendering' );
 		param( 'edited_plugin_displayed_events', 'array:string', array() );
 		param( 'edited_plugin_events', 'array:integer', array() );
+
+		// Update the folding states for current user:
+		save_fieldset_folding_values();
 
 		$default_Plugin = & $admin_Plugins->register( $edit_Plugin->classname );
 

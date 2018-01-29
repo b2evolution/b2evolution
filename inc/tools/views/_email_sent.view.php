@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -41,7 +41,7 @@ param( 'email', 'string', '', true );
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE emlog_ID, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject' );
+$SQL->SELECT( 'SQL_NO_CACHE emlog_ID, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_last_open_ts, emlog_last_click_ts' );
 $SQL->FROM( 'T_email__log' );
 
 $count_SQL = new SQL();
@@ -110,7 +110,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Result'),
 		'order' => 'emlog_result',
-		'td' => '%emlog_result_info( #emlog_result#, array( \'link_blocked\' => true, \'email\' => #emlog_to# ) )%',
+		'td' => '%emlog_result_info( #emlog_result#, array( \'link_blocked\' => true, \'email\' => #emlog_to# ), #emlog_last_open_ts#, #emlog_last_click_ts# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'nowrap'
 	);
@@ -149,6 +149,24 @@ $Results->cols[] = array(
 		'th' => T_('Subject'),
 		'order' => 'emlog_subject',
 		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID=$emlog_ID$">%htmlspecialchars(#emlog_subject#)%</a>',
+	);
+
+$Results->cols[] = array(
+		'order' => 'emlog_last_open_ts',
+		'default_dir' => 'D',
+		'th' => T_('Last opened'),
+		'th_class' => 'shrinkwrap',
+		'td' => '%mysql2localedatetime_spans( #emlog_last_open_ts# )%',
+		'td_class' => 'timestamp compact_data'
+	);
+
+$Results->cols[] = array(
+		'order' => 'emlog_last_click_ts',
+		'default_dir' => 'D',
+		'th' => T_('Last clicked'),
+		'th_class' => 'shrinkwrap',
+		'td' => '%mysql2localedatetime_spans( #emlog_last_click_ts# )%',
+		'td_class' => 'timestamp compact_data'
 	);
 
 

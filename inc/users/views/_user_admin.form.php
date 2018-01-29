@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -21,7 +21,7 @@ global $edited_User, $UserSettings, $Settings, $Plugins;
 
 global $current_User;
 
-global $servertimenow, $admin_url;
+global $servertimenow, $admin_url, $user_tags;
 
 if( !$current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
@@ -139,6 +139,58 @@ else
 
 $Form->end_fieldset(); // user permissions
 
+$Form->begin_fieldset( T_('Tags').get_manual_link('user-admin-tags') );
+
+	$Form->text_input( 'edited_user_tags', param( 'edited_user_tags', 'string', $user_tags ), 40, T_('Tags'), '', array(
+		'maxlength' => 255,
+		'style'     => 'width: 100%;',
+		'input_prefix' => '<div id="user_admin_tags" class="input-group">',
+		'input_suffix' => '</div>',
+	) );
+	?>
+	<script type="text/javascript">
+	function init_autocomplete_tags( selector )
+	{
+		var tags = jQuery( selector ).val();
+		var tags_json = new Array();
+		if( tags.length > 0 )
+		{ // Get tags from <input>
+			tags = tags.split( ',' );
+			for( var t in tags )
+			{
+				tags_json.push( { id: tags[t], name: tags[t] } );
+			}
+		}
+
+		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
+		{
+			theme: 'facebook',
+			queryParam: 's',
+			propertyToSearch: 'name',
+			tokenValue: 'name',
+			preventDuplicates: true,
+			prePopulate: tags_json,
+			hintText: '<?php echo TS_('Type in a tag') ?>',
+			noResultsText: '<?php echo TS_('No results') ?>',
+			searchingText: '<?php echo TS_('Searching...') ?>',
+			jsonContainer: 'tags',
+		} );
+	}
+
+	jQuery( document ).ready( function()
+	{
+		jQuery( '#edited_user_tags' ).hide();
+		init_autocomplete_tags( '#edited_user_tags' );
+		<?php
+			// Don't submit a form by Enter when user is editing the tags
+			echo get_prevent_key_enter_js( '#token-input-edited_user_tags' );
+		?>
+	} );
+	</script>
+	<?php
+
+$Form->end_fieldset(); // user tags
+
 $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 
 	$Form->begin_line( T_('Email') );
@@ -234,7 +286,7 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 	$last_newsletter = $UserSettings->get( 'last_newsletter', $edited_User->ID );
 	if( empty( $last_newsletter ) )
 	{ // Newsletter to the edited User was not sent yet
-		$Form->info_field( T_('Latest newsletter'), T_('None yet') );
+		$Form->info_field( T_('Latest list'), T_('None yet') );
 	}
 	else
 	{ // At least one newsletter was sent
@@ -242,10 +294,10 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 		$counter_separator = strpos( $last_newsletter, '_' );
 		$last_newsletter_timestamp = substr( $last_newsletter, 0, $counter_separator );
 		$last_newsletter_date = format_to_output( date2mysql( $last_newsletter_timestamp ) );
-		$Form->info_field( T_('Latest newsletter'), $last_newsletter_date );
+		$Form->info_field( T_('Latest list'), $last_newsletter_date );
 		$newsletter_counter = ( date( 'Ymd', $servertimenow ) == date( 'Ymd', $last_newsletter_timestamp ) ) ? substr( $last_newsletter, $counter_separator + 1 ) : 0;
 		$newsletter_limit = $UserSettings->get( 'newsletter_limit',  $edited_User->ID );
-		$Form->info_field( T_('Newsletters already sent today'), sprintf( T_('%d out of a maximum allowed of %d'), $newsletter_counter, $newsletter_limit ) );
+		$Form->info_field( T_('Lists already sent today'), sprintf( T_('%d out of a maximum allowed of %d'), $newsletter_counter, $newsletter_limit ) );
 	}
 $Form->end_fieldset(); // Email info
 

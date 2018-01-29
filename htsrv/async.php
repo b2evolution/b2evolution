@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -488,6 +488,10 @@ switch( $action )
 		$currentpage = param( 'currentpage', 'string', 1 );
 		$request_from = param( 'request_from', 'string', 'items' );
 		$comment_type = param( 'comment_type', 'string', 'feedback' );
+
+		// Ininitialize global collection object:
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check minimum permissions ( The comment specific permissions are checked when displaying the comments )
 		$current_User->check_perm( 'blog_ismember', 'view', true, $blog );

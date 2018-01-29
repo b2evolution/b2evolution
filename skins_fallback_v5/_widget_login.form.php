@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  */
@@ -48,6 +48,10 @@ $submit_button = array(
 	'value' => T_('Log in!'),
 	'class' => 'submit' );
 $Form->begin_fieldset( '', array( 'class' => 'fieldset field_login_btn' ) );
+if( $Widget && $Widget->get_param( 'button_class' ) )
+{
+	$submit_button['class'] .= ' '.$Widget->get_param( 'button_class' );
+}
 $Form->button_input( $submit_button );
 if( $Widget && $Widget->get_param('password_link_show') )
 { // Display a link to recovery password
