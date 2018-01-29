@@ -96,6 +96,14 @@ class proof_of_work_captcha_plugin extends Plugin
 					'type'  => 'text',
 					'size'  => 40,
 				),
+				'hash_num' => array(
+					'label'        => $this->T_('Number of hashes'),
+					'type'         => 'integer',
+					'defaultvalue' => 1024,
+					'valid_range'  => array(
+						'min' => 1,
+					),
+				),
 			);
 	}
 
@@ -209,8 +217,8 @@ class proof_of_work_captcha_plugin extends Plugin
 			}
 		}
 
-		$Form->info( $this->T_('Captcha'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>
-			<div class="coinhive-captcha" data-hashes="1024" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]">
+		$Form->info( $this->T_('Antispam'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>
+			<div class="coinhive-captcha" data-hashes="'.format_to_output( $this->Settings->get( 'hash_num' ), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]">
 				<em>'.$this->T_('Loading Captcha...<br>If it doesn\'t load, please disable Adblock!').'</em>
 			</div>' );
 
