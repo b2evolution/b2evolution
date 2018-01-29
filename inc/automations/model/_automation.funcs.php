@@ -77,6 +77,7 @@ function step_get_type_titles()
 	return array(
 		'if_condition'  => T_('IF Condition'),
 		'send_campaign' => T_('Send Campaign'),
+		'notify_owner'  => T_('Notify owner'),
 	);
 }
 
@@ -112,6 +113,11 @@ function step_get_result_titles()
 			'YES'   => NT_('Email SENT'),
 			'NO'    => NT_('Email was ALREADY sent'),
 			'ERROR' => NT_('ERROR: Email cannot be sent: %s'),
+		),
+		'notify_owner' => array(
+			'YES'   => NT_('Notification SENT'),
+			'NO'    => '',
+			'ERROR' => NT_('ERROR: Notification cannot be sent: %s'),
 		),
 	);
 }
@@ -151,6 +157,11 @@ function step_get_result_labels()
 			'YES'   => NT_('Next step if Email SENT'),
 			'NO'    => NT_('Next step if Email was ALREADY sent'),
 			'ERROR' => NT_('Next step if Email cannot be sent'),
+		),
+		'notify_owner' => array(
+			'YES'   => NT_('Next step if Notification SENT'),
+			'NO'    => '',
+			'ERROR' => NT_('Next step if Notification cannot be sent'),
 		),
 	);
 }
@@ -225,10 +236,17 @@ function step_td_label( $step_ID, $step_label, $step_type )
  * @param integer Next step ID
  * @param integer Next step order
  * @param integer Next step delay
+ * @param string Step type
+ * @param string Next step result
  * @return string
  */
-function step_td_next_step( $step_ID, $next_step_ID, $next_step_order, $next_step_delay )
+function step_td_next_step( $step_ID, $next_step_ID, $next_step_order, $next_step_delay, $step_type, $next_step_result )
 {
+	if( $step_type == 'notify_owner' && $next_step_result == 'no' )
+	{	// Such type has no next step for this result
+		return '';
+	}
+
 	if( empty( $next_step_ID ) )
 	{	// Next ordered step:
 		return '<span class="green">'.T_('Continue').' ('.seconds_to_period( $next_step_delay ).')</span>';

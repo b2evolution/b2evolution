@@ -224,6 +224,13 @@ class AutomationStep extends DataObject
 				$this->set( 'info', get_param( 'step_email_campaign' ) );
 				break;
 
+			case 'notify_owner':
+				// Notify owner:
+				param( 'step_notification_message', 'text' );
+				param_check_not_empty( 'step_notification_message', T_('Please enter a notification message.') );
+				$this->set( 'info', get_param( 'step_notification_message' ) );
+				break;
+
 			default:
 				$this->set( 'info', NULL, true );
 		}
@@ -432,7 +439,7 @@ class AutomationStep extends DataObject
 							$step_result = 'NO';
 						}
 						elseif( $user_is_waiting_email && $step_EmailCampaign->send_email( $user_ID ) )
-						{	// If user already received this email before OR email has been sent to user successfully now:
+						{	// If email has been sent to user successfully now:
 							$step_result = 'YES';
 						}
 						else
@@ -441,13 +448,61 @@ class AutomationStep extends DataObject
 							// - user cannot receive such email because of day limit;
 							// - user is not activated yet.
 							$step_result = 'ERROR';
-							$additional_result_message = empty( $mail_log_message ) ? 'Email could not be sent by unknown reason.' : $mail_log_message;
+							$additional_result_message = empty( $mail_log_message ) ? 'Unknown error' : $mail_log_message;
 						}
 					}
 					else
 					{	// Wrong stored email campaign for this step:
 						$step_result = 'ERROR';
 						$additional_result_message = 'Email Campaign #'.$this->get( 'info' ).' is not found in DB.';
+					}
+					break;
+
+				case 'notify_owner':
+					// Notify owner of automation:
+					if( ! ( $owner_User = & $Automation->get_owner_User() ) )
+					{	// If owner User is not detected in DB:
+						$step_result = 'ERROR';
+						$additional_result_message = 'Owner User #'.$this->get( 'owner_user_ID' ).' is not found in DB.';
+						break;
+					}
+
+					$notification_message = str_replace( array(
+							'$step_number$',
+							'$step_ID$',
+							'$automation_name$',
+							'$automation_ID$',
+						),
+						array(
+							$this->get( 'order' ),
+							$this->ID,
+							'"'.$Automation->get( 'name' ).'"',
+							$Automation->ID,
+						),
+						$this->get( 'info' ) );
+
+					$step_user_login_html = $step_User->get_colored_login( array(
+							'mask'      => '$avatar$ $login$',
+							'use_style' => true,
+							'protocol'  => 'http:',
+						) );
+
+					$email_template_params = array(
+						'message_html' => str_replace( '$login$', $step_user_login_html, $notification_message ),
+						'message_text' => nl2br( str_replace( '$login$', $step_User->get( 'login' ), $notification_message ) ),
+					);
+
+					if( send_mail_to_User( $owner_User->ID, sprintf( T_('Notification of automation %s'), '"'.$Automation->get( 'name' ).'"' ), 'automation_owner_notification', $email_template_params ) )
+					{	// If email has been sent to user successfully now:
+						$step_result = 'YES';
+					}
+					else
+					{	// Some error on sending of email to user:
+						// - problem with php mail function;
+						// - user cannot receive such email because of day limit;
+						// - user is not activated yet.
+						$step_result = 'ERROR';
+						$additional_result_message = empty( $mail_log_message ) ? 'Unknown error' : $mail_log_message;
 					}
 					break;
 
@@ -512,11 +567,12 @@ class AutomationStep extends DataObject
 			WHERE aust_autm_ID = '.$DB->quote( $Automation->ID ).'
 			  AND aust_user_ID = '.$DB->quote( $user_ID ),
 			'Update data for next Step after executing Step #'.$this->ID );
+		
 
 		// Log:
 		$process_log .= ( $next_AutomationStep
 				? $log_point.'Next step: #'.$next_AutomationStep->get( 'order' )
-					.'('.step_get_type_title( $this->get( 'type' ) ).( $this->get( 'label' ) == '' ? '' : ' "'.$this->get( 'label' ).'"' ).')'
+					.'('.step_get_type_title( $next_AutomationStep->get( 'type' ) ).( $next_AutomationStep->get( 'label' ) == '' ? '' : ' "'.$next_AutomationStep->get( 'label' ).'"' ).')'
 					.' delay: '.seconds_to_period( $next_delay ).', '.$next_exec_ts
 				: $log_point.'There is no next step configured.' ).$log_nl;
 

@@ -451,6 +451,10 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	{ // edited user has permission to edit options, save notification preferences
 		$notify_options[] = array( 'edited_user_notify_cronjob_error', 1, T_( 'a scheduled task ends with an error or timeout.' ), $UserSettings->get( 'notify_cronjob_error',  $edited_User->ID ), $disabled );
 	}
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{	// current User is an administrator
+		$notify_options[] = array( 'edited_user_notify_automation_owner', 1, T_('one of my automations wants to notify me.'), $UserSettings->get( 'notify_automation_owner', $edited_User->ID ), $disabled );
+	}
 	if( !empty( $notify_options ) )
 	{
 		$Form->checklist( $notify_options, 'edited_user_notification', T_( 'Notify me by email whenever' ), false, false, $checklist_params );

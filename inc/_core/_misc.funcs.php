@@ -3998,6 +3998,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'account_closed':
 			case 'account_reported':
 			case 'account_changed':
+			case 'automation_owner_notification':
 				// this is a notificaiton email
 				$email_limit_setting = 'notification_email_limit';
 				$email_counter_setting = 'last_notification_email';

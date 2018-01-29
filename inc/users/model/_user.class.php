@@ -1552,7 +1552,7 @@ class User extends DataObject
 					$UserSettings->set( 'send_pst_moderation_reminder', param( 'edited_user_send_pst_moderation_reminder', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_stale_alert', param( 'edited_user_send_pst_stale_alert', 'integer', 0 ), $this->ID );
 				}
-				if( $this->grp_ID == 1 )
+				if( $current_User->check_perm( 'users', 'edit' ) )
 				{
 					$UserSettings->set( 'send_activation_reminder', param( 'edited_user_send_activation_reminder', 'integer', 0 ), $this->ID );
 				}
@@ -1569,6 +1569,11 @@ class User extends DataObject
 				if( $this->check_perm( 'options', 'edit' ) )
 				{ // edited user has permission to edit options, save notification preferences
 					$UserSettings->set( 'notify_cronjob_error', param( 'edited_user_notify_cronjob_error', 'integer', 0 ), $this->ID );
+				}
+
+				if( $current_User->check_perm( 'users', 'edit' ) )
+				{
+					$UserSettings->set( 'notify_automation_owner', param( 'edited_user_notify_automation_owner', 'integer', 0 ), $this->ID );
 				}
 
 				// Newsletters:
