@@ -80,7 +80,6 @@ class AutomationStep extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table' => 'T_automation__automation', 'fk' => 'autm_first_step_ID', 'msg' => T_('This is a first step of Automation') ),
 				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_next_step_ID', 'msg' => T_('%d states of User in Automation') ),
 				array( 'table' => 'T_automation__step', 'fk' => 'step_yes_next_step_ID', 'msg' => T_('it is used %d times as next step if YES') ),
 				array( 'table' => 'T_automation__step', 'fk' => 'step_no_next_step_ID', 'msg' => T_('it is used %d times as next step if NO') ),
@@ -237,23 +236,8 @@ class AutomationStep extends DataObject
 			);
 		foreach( $next_steps as $next_step_ID_name => $next_step_delay_name )
 		{
-			$next_step_ID = param( 'step_'.$next_step_ID_name, 'string', NULL );
-			if( $next_step_ID === '' )
-			{
-				$next_step_ID = NULL;
-			}
-			if( $this->ID == 0 && $next_step_ID == 'current' )
-			{	// Set temporary next step ID to NULL(Continue) for new creating Step,
-				// then after inserting this will be converted to ID of new inserting step:
-				$next_step_ID = NULL;
-			}
-			$this->set( $next_step_ID_name, $next_step_ID, NULL );
-			$step_next_step_delay = param_duration( 'step_'.$next_step_delay_name );
-			if( empty( $step_next_step_delay ) )
-			{
-				$step_next_step_delay = NULL;
-			}
-			$this->set( $next_step_delay_name, $step_next_step_delay, true );
+			$this->set( $next_step_ID_name, intval( param( 'step_'.$next_step_ID_name, 'string' ) ) );
+			$this->set( $next_step_delay_name, param_duration( 'step_'.$next_step_delay_name ) );
 		}
 
 		return ! param_errors_detected();
@@ -507,7 +491,14 @@ class AutomationStep extends DataObject
 		if( $next_AutomationStep )
 		{	// Use data for next step if it is defined:
 			$next_step_ID = $next_AutomationStep->ID;
-			$next_exec_ts = date2mysql( $servertimenow + $next_delay );
+			if( $next_delay == 0 && in_array( $next_AutomationStep->ID, $executed_automation_steps[ $user_ID ] ) )
+			{	// Force a delay of infinite loop to 4 hour:
+				$next_exec_ts = date2mysql( $servertimenow + ( 3600 * 4 ) );
+			}
+			else
+			{	// Use normal delay of next step:
+				$next_exec_ts = date2mysql( $servertimenow + $next_delay );
+			}
 		}
 		else
 		{	// This was the end Step of the Automation:
@@ -531,9 +522,9 @@ class AutomationStep extends DataObject
 
 		if( $next_delay == 0 && $next_AutomationStep )
 		{	// If delay for next step is 0 seconds then we must execute such step right now:
-			if( in_array( $this->ID, $executed_automation_steps[ $user_ID ] ) )
+			if( in_array( $next_AutomationStep->ID, $executed_automation_steps[ $user_ID ] ) )
 			{	// Don't run this next step because it was already executed for the user:
-				$process_log .= $log_point.$log_bold_start.'Next step cannot be executed immediately to avoid infinite loop!'.$log_bold_end.$log_nl;
+				$process_log .= $log_point.$log_bold_start.'Next step rescheduled with a 4 hour delay to avoid infinite loop!'.$log_bold_end.$log_nl;
 			}
 			else
 			{	// Run next step because it is not executed yet for the user:

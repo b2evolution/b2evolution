@@ -23,7 +23,7 @@ global $current_User;
 
 global $servertimenow, $admin_url, $user_tags;
 
-if( ! $current_User->check_perm( 'users', 'edit' ) )
+if( ! $current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
 	debug_die( T_( 'You have no permission to see this tab!' ) );
 }

@@ -27,7 +27,6 @@ class Automation extends DataObject
 {
 	var $name;
 	var $status;
-	var $first_step_ID;
 	var $enlt_ID;
 	var $owner_user_ID;
 
@@ -56,7 +55,6 @@ class Automation extends DataObject
 			$this->ID = $db_row->autm_ID;
 			$this->name = $db_row->autm_name;
 			$this->status = $db_row->autm_status;
-			$this->first_step_ID = $db_row->autm_first_step_ID;
 			$this->enlt_ID = $db_row->autm_enlt_ID;
 			$this->owner_user_ID = $db_row->autm_owner_user_ID;
 		}
@@ -142,14 +140,16 @@ class Automation extends DataObject
 		if( parent::dbinsert() )
 		{	// If the automation has been inserted successful:
 
-			// Insert the first step automatically:
-			if( $DB->query( 'INSERT INTO T_automation__step ( step_autm_ID ) VALUES ( '.$this->ID.' )' ) )
+			// Create first step automatically:
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $this->ID );
+			$AutomationStep->set( 'type', 'if_condition' );
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 0 ); // 0 seconds
+			$AutomationStep->set( 'no_next_step_ID', -1, true ); // STOP
+			$AutomationStep->set( 'error_next_step_ID', -1, true ); // STOP
+			if( $AutomationStep->dbinsert() )
 			{	// If first step has been inserted successfully:
-
-				// Set first step ID for new inserted automation:
-				$this->set( 'first_step_ID', $DB->insert_id );
-				$this->dbupdate();
-
 				$DB->commit();
 				return true;
 			}

@@ -7633,12 +7633,19 @@ class User extends DataObject
 		}
 
 		// Insert user states for newsletters with automations:
+		$first_step_SQL = new SQL( 'Get first step of automation' );
+		$first_step_SQL->SELECT( 'step_ID' );
+		$first_step_SQL->FROM( 'T_automation__step' );
+		$first_step_SQL->WHERE( 'step_autm_ID = autm_ID' );
+		$first_step_SQL->ORDER_BY( 'step_order ASC' );
+		$first_step_SQL->LIMIT( 1 );
 		$automations_SQL = new SQL( 'Get automations of the subscribed newsletters' );
-		$automations_SQL->SELECT( 'DISTINCT autm_ID, '.$this->ID.', autm_first_step_ID, '.$DB->quote( date2mysql( $servertimenow ) ) );
+		$automations_SQL->SELECT( 'DISTINCT autm_ID, '.$this->ID.', ( '.$first_step_SQL->get().' ), '.$DB->quote( date2mysql( $servertimenow ) ) );
 		$automations_SQL->FROM( 'T_email__newsletter' );
 		$automations_SQL->FROM_add( 'INNER JOIN T_automation__automation ON enlt_default_autm_ID = autm_ID' );
+		$automations_SQL->FROM_add( 'LEFT JOIN T_automation__user_state ON aust_autm_ID = autm_ID AND aust_user_ID = '.$this->ID );
 		$automations_SQL->WHERE( 'enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )' );
-		$automations_SQL->WHERE_and( 'autm_ID NOT IN ( SELECT aust_autm_ID FROM T_automation__user_state WHERE aust_user_ID = '.$this->ID.' )' );// Exclude already added automation user states
+		$automations_SQL->WHERE_and( 'aust_autm_ID IS NULL' );// Exclude already added automation user states
 		$DB->query( 'INSERT INTO T_automation__user_state ( aust_autm_ID, aust_user_ID, aust_next_step_ID, aust_next_exec_ts ) '.$automations_SQL->get(),
 			'Insert automation user states on subscribe to newsletters #'.implode( ',', $newsletter_IDs ).' for user #'.$this->ID );
 

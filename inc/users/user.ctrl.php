@@ -762,7 +762,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'user' );
 
 			// Check edit permissions:
-			$current_User->check_perm( 'users', 'edit', true );
+			$current_User->can_moderate_user( $edited_User->ID, true );
 
 			param( 'autm_ID', 'integer', true );
 
@@ -771,12 +771,18 @@ if( !$Messages->has_errors() )
 			$automation_title = ( $user_Automation ? '"'.$user_Automation->get( 'name' ).'"' : '#'.$autm_ID );
 
 			// A new automation for the User:
-			$automation_SQL = new SQL( '' );
-			$automation_SQL->SELECT( 'DISTINCT autm_ID, '.$edited_User->ID.', autm_first_step_ID, '.$DB->quote( date2mysql( $servertimenow ) ) );
+			$first_step_SQL = new SQL( 'Get first step of automation' );
+			$first_step_SQL->SELECT( 'step_ID' );
+			$first_step_SQL->FROM( 'T_automation__step' );
+			$first_step_SQL->WHERE( 'step_autm_ID = autm_ID' );
+			$first_step_SQL->ORDER_BY( 'step_order ASC' );
+			$first_step_SQL->LIMIT( 1 );
+			$automation_SQL = new SQL( 'Get automation data ot insert user state' );
+			$automation_SQL->SELECT( 'DISTINCT autm_ID, '.$edited_User->ID.', ( '.$first_step_SQL->get().' ), '.$DB->quote( date2mysql( $servertimenow ) ) );
 			$automation_SQL->FROM( 'T_automation__automation' );
 			$automation_SQL->FROM_add( 'LEFT JOIN T_automation__user_state ON aust_autm_ID = autm_ID AND aust_user_ID = '.$edited_User->ID );
-			$automation_SQL->WHERE_and( 'aust_autm_ID IS NULL' );
-			$automation_SQL->WHERE_and( 'autm_ID = '.$DB->quote( $autm_ID ) );// Exclude already added automation user states
+			$automation_SQL->WHERE_and( 'aust_autm_ID IS NULL' );// Exclude already added automation user states
+			$automation_SQL->WHERE_and( 'autm_ID = '.$DB->quote( $autm_ID ) );
 			$r = $DB->query( 'INSERT INTO T_automation__user_state ( aust_autm_ID, aust_user_ID, aust_next_step_ID, aust_next_exec_ts ) '.$automation_SQL->get(),
 				'Insert new Automation #'.$autm_ID.' for user #'.$edited_User->ID );
 
@@ -802,7 +808,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'user' );
 
 			// Check edit permissions:
-			$current_User->check_perm( 'users', 'edit', true );
+			$current_User->can_moderate_user( $edited_User->ID, true );
 
 			param( 'autm_ID', 'integer', true );
 

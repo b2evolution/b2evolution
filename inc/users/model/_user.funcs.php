@@ -2509,8 +2509,8 @@ function get_user_sub_entries( $is_admin, $user_ID )
 
 		if( $is_admin )
 		{	// Show this only in backoffice:
-			if( $current_User->check_perm( 'users', 'edit' ) )
-			{	// For admins:
+			if( $current_User->can_moderate_user( $user_ID ) )
+			{	// For moderators:
 				$users_sub_entries['marketing'] = array(
 								'text' => T_('Marketing'),
 								'href' => url_add_param( $base_url, $ctrl_param.'marketing'.$user_param ) );
