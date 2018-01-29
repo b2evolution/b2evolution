@@ -224,10 +224,26 @@ jQuery( document ).ready( function()
 
 		filters: [
 		{
-			id: 'user_has_tag',
+			id: 'user_tag',
 			label: '<?php echo TS_('User tag' ); ?>',
 			type: 'string',
 			operators: ['equal', 'not_equal'],
+		},
+		{
+			id: 'user_status',
+			label: '<?php echo TS_('User Account status' ); ?>',
+			type: 'string',
+			operators: ['equal', 'not_equal'],
+			input: 'select',
+			values: {
+			<?php
+				$user_statuses = get_user_statuses();
+				foreach( $user_statuses as $user_status_key => $user_status_title )
+				{
+					echo '\''.$user_status_key.'\': \''.format_to_js( $user_status_title ).'\', ';
+				}
+			?>
+			}
 		},
 		{
 			id: 'date',
@@ -244,6 +260,53 @@ jQuery( document ).ready( function()
 			validation: {
 				format: '<?php echo strtoupper( jquery_datepicker_datefmt() ); ?>'
 			},
+		},
+		{
+			id: 'time',
+			label: '<?php echo TS_('Current time' ); ?>',
+			type: 'time',
+			operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
+			placeholder: '23:59',
+			validation: {
+				format: 'HH:mm'
+			},
+		},
+		{
+			id: 'day',
+			label: '<?php echo TS_('Current day of the week' ); ?>',
+			type: 'integer',
+			operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
+			input: 'select',
+			values: {
+				1: '<?php echo TS_('Monday'); ?>',
+				2: '<?php echo TS_('Tuesday'); ?>',
+				3: '<?php echo TS_('Wednesday'); ?>',
+				4: '<?php echo TS_('Thursday'); ?>',
+				5: '<?php echo TS_('Friday'); ?>',
+				6: '<?php echo TS_('Saturday'); ?>',
+				7: '<?php echo TS_('Sunday'); ?>'
+			}
+		},
+		{
+			id: 'month',
+			label: '<?php echo TS_('Current month' ); ?>',
+			type: 'integer',
+			operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
+			input: 'select',
+			values: {
+				1: '<?php echo TS_('January'); ?>',
+				2: '<?php echo TS_('February'); ?>',
+				3: '<?php echo TS_('March'); ?>',
+				4: '<?php echo TS_('April'); ?>',
+				5: '<?php echo TS_('May '); ?>',
+				6: '<?php echo TS_('June'); ?>',
+				7: '<?php echo TS_('July'); ?>',
+				8: '<?php echo TS_('August'); ?>',
+				9: '<?php echo TS_('September'); ?>',
+				10: '<?php echo TS_('October'); ?>',
+				11: '<?php echo TS_('November'); ?>',
+				12: '<?php echo TS_('December'); ?>'
+			}
 		}
 		],
 		// Prefill the field "IF Condition" with stored data from DB:

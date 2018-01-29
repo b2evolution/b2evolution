@@ -622,12 +622,42 @@ class AutomationStep extends DataObject
 				'less_or_equal'    => '&#8804;',
 				'greater'          => '>',
 				'greater_or_equal' => '&#8805;',
-				'between'          => array( 'BETWEEN', 'AND' ),
-				'not_between'      => array( 'NOT BETWEEN', 'AND' ),
+				'between'          => array( '&#8805;', 'AND &#8804;' ),
+				'not_between'      => array( '<', 'OR >' ),
 			);
 		$log_fields = array(
-				'user_has_tag' => 'User tag',
-				'date'         => 'Current date',
+				'user_tag'    => 'User tag',
+				'user_status' => 'User Account status',
+				'date'        => 'Current date',
+				'time'        => 'Current time',
+				'day'         => 'Current day of the week',
+				'month'       => 'Current month',
+			);
+		$log_values = array(
+				'day' => array(
+					1 => 'Monday',
+					2 => 'Tuesday',
+					3 => 'Wednesday',
+					4 => 'Thursday',
+					5 => 'Friday',
+					6 => 'Saturday',
+					7 => 'Sunday'
+				),
+				'month' => array(
+					1 => 'January',
+					2 => 'February',
+					3 => 'March',
+					4 => 'April',
+					5 => 'May',
+					6 => 'June',
+					7 => 'July',
+					8 => 'August',
+					9 => 'September',
+					10 => 'October',
+					11 => 'November',
+					12 => 'December'
+				),
+				'user_status' => get_user_statuses(),
 			);
 		$log_bold_start = '<b>';
 		$log_bold_end = '</b>';
@@ -666,12 +696,12 @@ class AutomationStep extends DataObject
 				{	// Multiple operator and values:
 					foreach( $log_operators[ $rule->operator ] as $o => $operator )
 					{
-						$process_log .= ' '.$operator.' "'.$rule->value[ $o ].'"';
+						$process_log .= ' '.$operator.' "'.( isset( $log_values[ $rule->field ][ $rule->value[ $o ] ] ) ? $log_values[ $rule->field ][ $rule->value[ $o ] ] : $rule->value[ $o ] ).'"';
 					}
 				}
 				else
 				{	// Single operator and value:
-					$process_log .= ' '.$log_operators[ $rule->operator ].' "'.$rule->value.'"';
+					$process_log .= ' '.$log_operators[ $rule->operator ].' "'.( isset( $log_values[ $rule->field ][ $rule->value ] ) ? $log_values[ $rule->field ][ $rule->value ] : $rule->value ).'"';
 				}
 				$process_log .= ': '.$log_bold_start.( $rule_result ? 'TRUE' : 'FALSE' ).$log_bold_end;
 			}
@@ -705,7 +735,7 @@ class AutomationStep extends DataObject
 	{
 		switch( $rule->field )
 		{
-			case 'user_has_tag':
+			case 'user_tag':
 				// Check if User has a tag:
 				$user_tags = $step_User->get_usertags();
 				switch( $rule->operator )
@@ -717,41 +747,76 @@ class AutomationStep extends DataObject
 				}
 				break;
 
-			case 'date':
-				// Check current date:
-				global $localtimenow;
-				if( is_array( $rule->value ) )
-				{
-					$rule_date_ts = strtotime( $rule->value[0] );
-					$rule_date_ts2 = strtotime( $rule->value[1] );
-				}
-				else
-				{
-					$rule_date_ts = strtotime( $rule->value );
-				}
+			case 'user_status':
+				// Check User status:
 				switch( $rule->operator )
 				{
 					case 'equal':
-						return $localtimenow == $rule_date_ts;
+						return $step_User->get( 'status' ) == $rule->value;
 					case 'not_equal':
-						return $localtimenow != $rule_date_ts;
-					case 'less':
-						return $localtimenow < $rule_date_ts;
-					case 'less_or_equal':
-						return $localtimenow <= $rule_date_ts;
-					case 'greater':
-						return $localtimenow > $rule_date_ts;
-					case 'greater_or_equal':
-						return $localtimenow >= $rule_date_ts;
-					case 'between':
-						return $localtimenow >= $rule_date_ts && $localtimenow <= $rule_date_ts2;
-					case 'not_between':
-						return $localtimenow < $rule_date_ts && $localtimenow > $rule_date_ts2;
+						return $step_User->get( 'status' ) != $rule->value;
 				}
 				break;
+
+			case 'date':
+				// Check current date:
+				return $this->check_if_condition_rule_date_value( $rule, 'Y-m-d' );
+
+			case 'time':
+				// Check current time:
+				return $this->check_if_condition_rule_date_value( $rule, 'H:i' );
+
+			case 'day':
+				// Check current day of week:
+				return $this->check_if_condition_rule_date_value( $rule, 'w' );
+
+			case 'month':
+				// Check current month:
+				return $this->check_if_condition_rule_date_value( $rule, 'm' );
 		}
 
 		// Unknown field or operator:
+		return false;
+	}
+
+
+	/**
+	 * Check rule of "IF Condition" for date value
+	 *
+	 * @param object Rule, object with properties: field, value, operator
+	 * @param string Date format like Y-m-d, H:i, w, m
+	 * @return boolean TRUE if condition is matched for current date, otherwise FALSE
+	 */
+	function check_if_condition_rule_date_value( $rule, $date_format )
+	{
+		global $localtimenow;
+
+		$date_value = date( $date_format, $localtimenow );
+		if( $date_format == 'w' && $date_value === '0' )
+		{	// Use 7 for Sunday:
+			$date_value = '7';
+		}
+
+		switch( $rule->operator )
+		{
+			case 'equal':
+				return $date_value == $rule->value;
+			case 'not_equal':
+				return $date_value != $rule->value;
+			case 'less':
+				return $date_value < $rule->value;
+			case 'less_or_equal':
+				return $date_value <= $rule->value;
+			case 'greater':
+				return $date_value > $rule->value;
+			case 'greater_or_equal':
+				return $date_value >= $rule->value;
+			case 'between':
+				return $date_value >= $rule->value[0] && $date_value <= $rule->value[1];
+			case 'not_between':
+				return $date_value < $rule->value[0] || $date_value > $rule->value[1];
+		}
+
 		return false;
 	}
 
