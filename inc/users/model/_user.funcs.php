@@ -5319,6 +5319,7 @@ function users_results_block( $params = array() )
 			'join_country'         => true,
 			'keywords_fields'      => NULL,
 			'where_status_closed'  => NULL,
+			'display_user_count'   => false, // user count beside the title
 			'display_params'       => array(),
 			'display_orgstatus'    => false,
 			'display_filters'      => true,
@@ -5435,6 +5436,12 @@ function users_results_block( $params = array() )
 
 	// Execute query
 	$UserList->query();
+
+	// Display number of rows in the title
+	if( $params['display_user_count'] )
+	{
+		$UserList->title .= ' ('.$UserList->get_total_rows().')';
+	}
 
 
 	if( $params['display_filters'] )
@@ -5555,6 +5562,7 @@ function users_results( & $UserList, $params = array() )
 			'display_nickname'   => true,
 			'display_name'       => true,
 			'order_name'         => 'user_lastname, user_firstname',
+			'display_email'      => false,
 			'display_role'       => false,
 			'display_gender'     => true,
 			'display_country'    => true,
@@ -5723,6 +5731,16 @@ function users_results( & $UserList, $params = array() )
 			$col['order'] = $params['order_name'];
 		}
 		$UserList->cols[] = $col;
+	}
+
+	if( $params['display_email'] )
+	{
+		$UserList->cols[] = array(
+			'th' => T_('Email'),
+			'th_class' => 'small',
+			'td_class' => 'small',
+			'td' => '$user_email$'
+		);
 	}
 
 	if( $params['display_role'] )

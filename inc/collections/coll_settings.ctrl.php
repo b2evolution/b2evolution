@@ -621,12 +621,15 @@ if( $action == 'dashboard' )
 				$Timer->resume( 'Panel: Comments Awaiting Moderation' );
 				echo '<!-- Start of Comments Awaiting Moderation Block -->';
 				$opentrash_link = get_opentrash_link( true, false, array(
-						'class' => 'btn btn-default'
+						'class'  => 'btn btn-default btn-sm',
+						'before' => '',
+						'after'  => '',
 					) );
-				$refresh_link = '<span class="pull-right panel_heading_action_icons">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \'dashboard\' ); return false;', 'class' => 'btn btn-default btn-sm' ) ).'</span> ';
+				$refresh_link = action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \'dashboard\' ); return false;', 'class' => 'btn btn-default btn-sm' ) );
 
 				$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
-				$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
+				$block_item_Widget->title = '<span class="pull-right panel_heading_action_icons">'.$opentrash_link.$refresh_link.'</span>'.
+					T_('Comments awaiting moderation').
 					' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;'.$show_statuses_param.'" style="text-decoration:none">'.
 					'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>'.
 					get_manual_link( 'dashboard-comments-awaiting-moderation' );
