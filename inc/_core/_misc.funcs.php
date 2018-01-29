@@ -3725,44 +3725,6 @@ function user_get_notification_sender( $user_ID, $setting )
 }
 
 
-class EmailTrackingHelper
-{
-	private $type;
-	private $email_ID;
-	private $key;
-
-	function __construct( $type, $email_ID, $key, $mode = 'HTML' )
-	{
-		$this->type = $type;
-		$this->email_ID = $email_ID;
-		$this->key = $key;
-		$this->mode = $mode;
-	}
-
-	public function callback( $matches )
-	{
-		$passthrough_url = get_htsrv_url().'email_passthrough.php?email_ID='.$this->email_ID.'&type='.$this->type.'&email_key=$secret_email_key_start$'.$this->key.'$secret_email_key_end$&redirect_to=';
-
-		switch( $this->mode )
-		{
-			case 'HTML':
-				if( preg_match( '~(\$secret_content_start\$)(.*)(\$secret_content_end\$)~', $matches[2], $submatches ) )
-				{
-					return $matches[1].$passthrough_url.'$secret_content_start$'.rawurlencode( $submatches[2] ).'$secret_content_end$'.$matches[3];
-				}
-				return $matches[1].$passthrough_url.rawurlencode( $matches[2] ).$matches[3];
-
-			case 'plain_text':
-				if( preg_match( '~(\$secret_content_start\$)(.*)(\$secret_content_end\$)~', $matches[0], $submatches ) )
-				{
-					return $passthrough_url.'$secret_content_start$'.rawurlencode( $submatches[2] ).'$secret_content_end$';
-				}
-				return $passthrough_url.rawurlencode( $matches[0] );
-		}
-	}
-}
-
-
 /**
  * Sends an email, wrapping PHP's mail() function.
  * ALL emails sent by b2evolution must be sent through this function (for consistency and for logging)
