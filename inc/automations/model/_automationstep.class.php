@@ -242,6 +242,13 @@ class AutomationStep extends DataObject
 				$this->set( 'info', get_param( 'step_usertag' ) );
 				break;
 
+			case 'subscribe':
+			case 'unsubscribe':
+				// Subscribe/Unsubscribe:
+				param( 'step_newsletter', 'integer', true );
+				$this->set( 'info', get_param( 'step_newsletter' ) );
+				break;
+
 			default:
 				$this->set( 'info', NULL, true );
 		}
@@ -558,6 +565,28 @@ class AutomationStep extends DataObject
 					}
 					break;
 
+				case 'subscribe':
+				case 'unsubscribe':
+					// Subscribe/Unsubscribe User to List:
+					$NewsletterCache = & get_NewsletterCache();
+					if( $Newsletter = & $NewsletterCache->get_by_ID( intval( $this->get( 'info' ) ), false, false ) )
+					{	// If List/Newsletter exists:
+						if( $this->get( 'type' ) == 'subscribe' )
+						{	// Subscribe:
+							$affected_subscriprions_num = $step_User->subscribe( $Newsletter->ID );
+						}
+						else
+						{	// Unsubscribe:
+							$affected_subscriprions_num = $step_User->unsubscribe( $Newsletter->ID );
+						}
+						$step_result = ( $affected_subscriprions_num ? 'YES' : 'NO' );
+					}
+					else
+					{	// If List/Newsletter does not exist:
+						$step_result = 'ERROR';
+					}
+					break;
+
 				default:
 					// Log:
 					$process_log .= $log_point.'No implemented action'.$log_nl;
@@ -619,7 +648,6 @@ class AutomationStep extends DataObject
 			WHERE aust_autm_ID = '.$DB->quote( $Automation->ID ).'
 			  AND aust_user_ID = '.$DB->quote( $user_ID ),
 			'Update data for next Step after executing Step #'.$this->ID );
-		
 
 		// Log:
 		$process_log .= ( $next_AutomationStep
@@ -799,7 +827,7 @@ class AutomationStep extends DataObject
 			{	// This is a single field:
 				$rule_result = $this->check_if_condition_rule( $rule, $step_User, $process_log );
 				// Log:
-				$process_log .= $log_rule_separator.$log_fields[ $rule->field ].' ';
+				$process_log .= $log_rule_separator.( isset( $log_fields[ $rule->field ] ) ? $log_fields[ $rule->field ] : $rule->field ).' ';
 				if( is_array( $log_operators[ $rule->operator ] ) )
 				{	// Multiple operator and values:
 					foreach( $log_operators[ $rule->operator ] as $o => $operator )

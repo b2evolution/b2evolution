@@ -7589,12 +7589,12 @@ class User extends DataObject
 
 		if( empty( $this->ID ) )
 		{	// Only created user can has the newsletter subscriptions:
-			return;
+			return false;
 		}
 
 		if( empty( $newsletter_IDs ) )
 		{	// No subscriptions:
-			return;
+			return false;
 		}
 
 		$DB->begin();

@@ -80,6 +80,8 @@ function step_get_type_titles()
 		'notify_owner'   => T_('Notify owner'),
 		'add_usertag'    => T_('Add Usertag'),
 		'remove_usertag' => T_('Remove Usertag'),
+		'subscribe'      => T_('Subscribe User to List'),
+		'unsubscribe'    => T_('Unsubscribe User from List'),
 	);
 }
 
@@ -130,6 +132,16 @@ function step_get_result_titles()
 			'YES'   => NT_('Tag was removed'),
 			'NO'    => NT_('User didn\'t have that tag'),
 			'ERROR' => NT_('ERROR: %s'),
+		),
+		'subscribe' => array(
+			'YES'   => NT_('User was subscribed'),
+			'NO'    => NT_('User was already subscribed'),
+			'ERROR' => NT_('List does not exist'),
+		),
+		'unsubscribe' => array(
+			'YES'   => NT_('User was unsubscribed'),
+			'NO'    => NT_('User was already unsubscribed'),
+			'ERROR' => NT_('List does not exist'),
 		),
 	);
 }
@@ -184,6 +196,16 @@ function step_get_result_labels()
 			'YES'   => NT_('Next step if Tag was removed'),
 			'NO'    => NT_('Next step if User didn\'t have that tag'),
 			'ERROR' => '',
+		),
+		'subscribe' => array(
+			'YES'   => NT_('Next step if User was subscribed'),
+			'NO'    => NT_('Next step if User was already subscribed'),
+			'ERROR' => NT_('Next step if List does not exist'),
+		),
+		'unsubscribe' => array(
+			'YES'   => NT_('Next step if User was unsubscribed'),
+			'NO'    => NT_('Next step if User was already unsubscribed'),
+			'ERROR' => NT_('Next step if List does not exist'),
 		),
 	);
 }

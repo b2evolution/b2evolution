@@ -71,6 +71,12 @@ $Form->textarea_input( 'step_notification_message', (
 $Form->text_input( 'step_usertag', ( in_array( $edited_AutomationStep->get( 'type' ), array( 'add_usertag', 'remove_usertag' ) ) ? $edited_AutomationStep->get( 'info' ) : '' ),
 	80, T_('Usertag'), '', array( 'maxlength' => 200 ) );
 
+// Newsletter:
+$NewsletterCache = & get_NewsletterCache();
+$newsletter_ID = ( in_array( $edited_AutomationStep->get( 'type' ), array( 'subscribe', 'unsubscribe' ) ) ? intval( $edited_AutomationStep->get( 'info' ) ) : 0 );
+$NewsletterCache->load_where( 'enlt_active = 1 OR enlt_ID = '.$newsletter_ID );
+$Form->select_input_object( 'step_newsletter', $newsletter_ID, $NewsletterCache, T_('List'), array( 'required' => true, 'allow_none' => true ) );
+
 // Load all steps of the edited step's automation excluding current step:
 $AutomationStepCache = & get_AutomationStepCache();
 $AutomationStepCache->clear();
@@ -166,7 +172,7 @@ jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID
  */ 
 function step_type_update_info( step_type )
 {
-	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition, #ffield_step_notification_message, #ffield_step_usertag' ).hide();
+	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition, #ffield_step_notification_message, #ffield_step_usertag, #ffield_step_newsletter' ).hide();
 	jQuery( '#ffield_step_no_next' ).show();
 	jQuery( '#ffield_step_error_next' ).show();
 
@@ -207,10 +213,11 @@ function step_type_update_info( step_type )
 			break;
 
 		case 'add_usertag':
+		case 'remove_usertag':
 			jQuery( '#ffield_step_usertag' ).show();
 			jQuery( '#ffield_step_error_next' ).hide();
-			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'add_usertag', 'YES' ) ); ?>' );
-			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'add_usertag', 'NO' ) ); ?>' );
+			jQuery( '#step_result_label_yes' ).html( step_type == 'add_usertag' ? '<?php echo TS_( step_get_result_label( 'add_usertag', 'YES' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'remove_usertag', 'YES' ) ); ?>' );
+			jQuery( '#step_result_label_no' ).html( step_type == 'add_usertag' ? '<?php echo TS_( step_get_result_label( 'add_usertag', 'NO' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'remove_usertag', 'NO' ) ); ?>' );
 			if( set_default_next_step_data )
 			{	// Suggest default values:
 				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID' ).val( '' );
@@ -219,16 +226,20 @@ function step_type_update_info( step_type )
 			}
 			break;
 
-		case 'remove_usertag':
-			jQuery( '#ffield_step_usertag' ).show();
-			jQuery( '#ffield_step_error_next' ).hide();
-			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'remove_usertag', 'YES' ) ); ?>' );
-			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'remove_usertag', 'NO' ) ); ?>' );
+		case 'subscribe':
+		case 'unsubscribe':
+			jQuery( '#ffield_step_newsletter' ).show();
+			jQuery( '#step_result_label_yes' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'YES' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'YES' ) ); ?>' );
+			jQuery( '#step_result_label_no' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'NO' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'NO' ) ); ?>' );
+			jQuery( '#step_result_label_error' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'ERROR' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'ERROR' ) ); ?>' );
 			if( set_default_next_step_data )
 			{	// Suggest default values:
 				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID' ).val( '' );
 				jQuery( '#step_yes_next_step_delay_value, #step_no_next_step_delay_value' ).val( '0' );
 				jQuery( '#step_yes_next_step_delay_name, #step_no_next_step_delay_name' ).val( 'second' );
+				jQuery( '#step_error_next_step_ID' ).val( 'current' );
+				jQuery( '#step_error_next_step_delay_value' ).val( '7' );
+				jQuery( '#step_error_next_step_delay_name' ).val( 'day' );
 			}
 			break;
 
