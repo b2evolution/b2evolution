@@ -7900,6 +7900,40 @@ class User extends DataObject
 		// Remove the duplicate tags
 		$this->user_tags = array_unique( $this->user_tags );
 	}
+
+
+	/**
+	 * Remove user tags
+	 *
+	 * @param string/array comma separated tags or array of tags
+	 */
+	function remove_usertags( $user_tags )
+	{
+		if( empty( $user_tags ) )
+		{
+			return;
+		}
+
+		if( ! is_array( $user_tags ) )
+		{
+			$user_tags = preg_split( '/\s*[;,]+\s*/', $user_tags, -1, PREG_SPLIT_NO_EMPTY );
+		}
+
+		$this->get_usertags();
+
+		foreach( $user_tags as $t => $user_tag )
+		{
+			if( empty( $user_tag ) )
+			{	// Skip empty tag:
+				continue;
+			}
+			elseif( ( $user_tag_index = array_search( $user_tag, $this->user_tags ) ) !== false )
+			{	// Remove user tag from array:
+				$this->dbchanges_flags['user_tags'] = true;
+				unset( $this->user_tags[ $user_tag_index ] );
+			}
+		}
+	}
 }
 
 ?>

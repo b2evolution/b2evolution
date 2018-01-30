@@ -67,6 +67,10 @@ $Form->textarea_input( 'step_notification_message', (
 		: 'The User $login$ has reached step $step_number$ (ID: $step_ID$) in automation $automation_name$ (ID: $automation_ID$)'
 	), 10, T_('Notification message') );
 
+// Usertag:
+$Form->text_input( 'step_usertag', ( in_array( $edited_AutomationStep->get( 'type' ), array( 'add_usertag', 'remove_usertag' ) ) ? $edited_AutomationStep->get( 'info' ) : '' ),
+	80, T_('Usertag'), '', array( 'maxlength' => 200 ) );
+
 // Load all steps of the edited step's automation excluding current step:
 $AutomationStepCache = & get_AutomationStepCache();
 $AutomationStepCache->clear();
@@ -162,8 +166,9 @@ jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID
  */ 
 function step_type_update_info( step_type )
 {
-	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition, #ffield_step_notification_message' ).hide();
+	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition, #ffield_step_notification_message, #ffield_step_usertag' ).hide();
 	jQuery( '#ffield_step_no_next' ).show();
+	jQuery( '#ffield_step_error_next' ).show();
 
 	switch( step_type )
 	{
@@ -189,7 +194,6 @@ function step_type_update_info( step_type )
 			jQuery( '#ffield_step_notification_message' ).show();
 			jQuery( '#ffield_step_no_next' ).hide();
 			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'notify_owner', 'YES' ) ); ?>' );
-			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'notify_owner', 'NO' ) ); ?>' );
 			jQuery( '#step_result_label_error' ).html( '<?php echo TS_( step_get_result_label( 'notify_owner', 'ERROR' ) ); ?>' );
 			if( set_default_next_step_data )
 			{	// Suggest default values:
@@ -199,6 +203,32 @@ function step_type_update_info( step_type )
 				jQuery( '#step_error_next_step_ID' ).val( 'current' );
 				jQuery( '#step_error_next_step_delay_value' ).val( '4' );
 				jQuery( '#step_error_next_step_delay_name' ).val( 'hour' );
+			}
+			break;
+
+		case 'add_usertag':
+			jQuery( '#ffield_step_usertag' ).show();
+			jQuery( '#ffield_step_error_next' ).hide();
+			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'add_usertag', 'YES' ) ); ?>' );
+			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'add_usertag', 'NO' ) ); ?>' );
+			if( set_default_next_step_data )
+			{	// Suggest default values:
+				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID' ).val( '' );
+				jQuery( '#step_yes_next_step_delay_value, #step_no_next_step_delay_value' ).val( '0' );
+				jQuery( '#step_yes_next_step_delay_name, #step_no_next_step_delay_name' ).val( 'second' );
+			}
+			break;
+
+		case 'remove_usertag':
+			jQuery( '#ffield_step_usertag' ).show();
+			jQuery( '#ffield_step_error_next' ).hide();
+			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'remove_usertag', 'YES' ) ); ?>' );
+			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'remove_usertag', 'NO' ) ); ?>' );
+			if( set_default_next_step_data )
+			{	// Suggest default values:
+				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID' ).val( '' );
+				jQuery( '#step_yes_next_step_delay_value, #step_no_next_step_delay_value' ).val( '0' );
+				jQuery( '#step_yes_next_step_delay_name, #step_no_next_step_delay_name' ).val( 'second' );
 			}
 			break;
 

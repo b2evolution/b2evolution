@@ -75,9 +75,11 @@ function autm_td_status( $autm_ID, $autm_status )
 function step_get_type_titles()
 {
 	return array(
-		'if_condition'  => T_('IF Condition'),
-		'send_campaign' => T_('Send Campaign'),
-		'notify_owner'  => T_('Notify owner'),
+		'if_condition'   => T_('IF Condition'),
+		'send_campaign'  => T_('Send Campaign'),
+		'notify_owner'   => T_('Notify owner'),
+		'add_usertag'    => T_('Add Usertag'),
+		'remove_usertag' => T_('Remove Usertag'),
 	);
 }
 
@@ -107,7 +109,7 @@ function step_get_result_titles()
 		'if_condition' => array(
 			'YES'   => NT_('YES'),
 			'NO'    => NT_('NO'),
-			'ERROR' => NT_('ERROR'),
+			'ERROR' => NT_('ERROR: %s'),
 		),
 		'send_campaign' => array(
 			'YES'   => NT_('Email SENT'),
@@ -118,6 +120,16 @@ function step_get_result_titles()
 			'YES'   => NT_('Notification SENT'),
 			'NO'    => '',
 			'ERROR' => NT_('ERROR: Notification cannot be sent: %s'),
+		),
+		'add_usertag' => array(
+			'YES'   => NT_('Tag was added'),
+			'NO'    => NT_('User was already tagged'),
+			'ERROR' => NT_('ERROR: %s'),
+		),
+		'remove_usertag' => array(
+			'YES'   => NT_('Tag was removed'),
+			'NO'    => NT_('User didn\'t have that tag'),
+			'ERROR' => NT_('ERROR: %s'),
 		),
 	);
 }
@@ -162,6 +174,16 @@ function step_get_result_labels()
 			'YES'   => NT_('Next step if Notification SENT'),
 			'NO'    => '',
 			'ERROR' => NT_('Next step if Notification cannot be sent'),
+		),
+		'add_usertag' => array(
+			'YES'   => NT_('Next step if Tag was added'),
+			'NO'    => NT_('Next step if User was already tagged'),
+			'ERROR' => '',
+		),
+		'remove_usertag' => array(
+			'YES'   => NT_('Next step if Tag was removed'),
+			'NO'    => NT_('Next step if User didn\'t have that tag'),
+			'ERROR' => '',
 		),
 	);
 }
@@ -236,14 +258,12 @@ function step_td_label( $step_ID, $step_label, $step_type )
  * @param integer Next step ID
  * @param integer Next step order
  * @param integer Next step delay
- * @param string Step type
- * @param string Next step result
  * @return string
  */
-function step_td_next_step( $step_ID, $next_step_ID, $next_step_order, $next_step_delay, $step_type, $next_step_result )
+function step_td_next_step( $step_ID, $next_step_ID, $next_step_order, $next_step_delay )
 {
-	if( $step_type == 'notify_owner' && $next_step_result == 'no' )
-	{	// Such type has no next step for this result
+	if( $next_step_ID === NULL )
+	{	// If next step is not used:
 		return '';
 	}
 

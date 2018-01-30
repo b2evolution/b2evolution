@@ -231,6 +231,17 @@ class AutomationStep extends DataObject
 				$this->set( 'info', get_param( 'step_notification_message' ) );
 				break;
 
+			case 'add_usertag':
+			case 'remove_usertag':
+				// Add/Remove usertag:
+				param_string_not_empty( 'step_usertag', T_('Please enter an user tag.') );
+				if( preg_match( '/(^-|[;,])/', get_param( 'step_usertag' ) ) )
+				{	// If usertag has a not allowed char:
+					param_error( 'step_usertag', sprintf( T_('Usertag cannot start with %s and contain chars %s'), '<code>-</code>', '<code>;,</code>' ) );
+				}
+				$this->set( 'info', get_param( 'step_usertag' ) );
+				break;
+
 			default:
 				$this->set( 'info', NULL, true );
 		}
@@ -243,8 +254,17 @@ class AutomationStep extends DataObject
 			);
 		foreach( $next_steps as $next_step_ID_name => $next_step_delay_name )
 		{
-			$this->set( $next_step_ID_name, intval( param( 'step_'.$next_step_ID_name, 'string' ) ) );
-			$this->set( $next_step_delay_name, param_duration( 'step_'.$next_step_delay_name ) );
+			if( ( $this->get( 'type' ) == 'notify_owner' && $next_step_ID_name == 'no_next_step_ID' ) ||
+			    ( in_array( $this->get( 'type' ), array( 'add_usertag', 'remove_usertag' ) ) && $next_step_ID_name == 'error_next_step_ID' ) )
+			{	// Some next steps are not used depending on step type:
+				$this->set( $next_step_ID_name, NULL, true );
+				$this->set( $next_step_delay_name, NULL, true );
+			}
+			else
+			{
+				$this->set( $next_step_ID_name, intval( param( 'step_'.$next_step_ID_name, 'string' ) ) );
+				$this->set( $next_step_delay_name, param_duration( 'step_'.$next_step_delay_name ) );
+			}
 		}
 
 		return ! param_errors_detected();
@@ -503,6 +523,38 @@ class AutomationStep extends DataObject
 						// - user is not activated yet.
 						$step_result = 'ERROR';
 						$additional_result_message = empty( $mail_log_message ) ? 'Unknown error' : $mail_log_message;
+					}
+					break;
+
+				case 'add_usertag':
+					// Add usertag:
+					$usertags = $step_User->get_usertags();
+					$new_usertag = $this->get( 'info' );
+					if( in_array( $new_usertag, $usertags ) )
+					{	// If step User was already tagged:
+						$step_result = 'NO';
+					}
+					else
+					{	// Add new usertag:
+						$step_User->add_usertags( $new_usertag );
+						$step_User->dbupdate();
+						$step_result = 'YES';
+					}
+					break;
+
+				case 'remove_usertag':
+					// Remove usertag:
+					$usertags = $step_User->get_usertags();
+					$del_usertag = $this->get( 'info' );
+					if( ! in_array( $del_usertag, $usertags ) )
+					{	// if step User didn't have that tag:
+						$step_result = 'NO';
+					}
+					else
+					{	// Remove usertag:
+						$step_result = 'YES';
+						$step_User->remove_usertags( $del_usertag );
+						$step_User->dbupdate();
 					}
 					break;
 
