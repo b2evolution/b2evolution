@@ -120,9 +120,8 @@ $SQL = new SQL( 'Get automations for the edited User #'.$edited_User->ID );
 $SQL->SELECT( 'autm_ID, autm_name, step_ID, step_label, step_type, step_order, aust_next_exec_ts' );
 $SQL->FROM( 'T_automation__user_state' );
 $SQL->FROM_add( 'INNER JOIN T_automation__automation ON aust_autm_ID = autm_ID' );
-$SQL->FROM_add( 'INNER JOIN T_automation__step ON aust_next_step_ID = step_ID' );
+$SQL->FROM_add( 'LEFT JOIN T_automation__step ON aust_next_step_ID = step_ID' );
 $SQL->WHERE( 'aust_user_ID = '.$edited_User->ID );
-$SQL->WHERE_and( 'aust_next_step_ID IS NOT NULL ' );
 
 $Results = new Results( $SQL->get(), 'ustep_', '--A' );
 
@@ -143,8 +142,8 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th'    => T_('Next step'),
-		'order' => 'step_label',
-		'td'    => '#$step_order$ - %step_td_label( #step_ID#, #step_label#, #step_type# )%',
+		'order' => 'step_order, step_label',
+		'td'    => '%step_td_user_state( #step_ID#, #step_label#, #step_type#, #step_order# )%',
 	);
 
 $Results->cols[] = array(

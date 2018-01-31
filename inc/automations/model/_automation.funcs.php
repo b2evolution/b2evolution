@@ -344,4 +344,24 @@ function step_td_actions( $step_ID, $is_first_step, $is_last_step )
 
 	return $r;
 }
+
+
+/**
+ * Helper function to display step state of user on Results table
+ *
+ * @param integer|NULL Step ID
+ * @param string Step label
+ * @param string Step type
+ * @param string Step order
+ * @return string
+ */
+function step_td_user_state( $step_ID, $step_label, $step_type, $step_order )
+{
+	if( $step_ID === NULL )
+	{	// If all steps for automation were completed for user:
+		return T_('Finished');
+	}
+
+	return '#'.$step_order.' - '.step_td_label( $step_ID, $step_label, $step_type );
+}
 ?>
