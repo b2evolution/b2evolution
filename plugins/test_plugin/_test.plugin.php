@@ -1911,6 +1911,31 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called before comment textarea of the front-office comment form.
+	 *
+	 * You might want to use this to inject antispam payload to use in
+	 * in {@link GetSpamKarmaForComment()} or modify the Comment according
+	 * to it in {@link BeforeCommentFormInsert()}.
+	 *
+	 * @see Plugin::DisplayCommentFormFieldset()
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object
+	 *   - 'Item': the Item for which the comment is meant
+	 */
+	function DisplayCommentFormFieldsetAboveComment( & $params )
+	{
+		$params['Form']->begin_fieldset( 'TEST plugin' );
+		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the DisplayCommentFormFieldsetAboveComment event.' );
+		$params['Form']->end_fieldset( 'Foo' );
+
+		$params['form_type'] = 'comment';
+		$this->CaptchaPayload( $params );
+
+		return true;
+	}
+
+
+	/**
 	 * Event handler: Called in the submit button section of the
 	 * front-office comment form.
 	 *
@@ -2216,6 +2241,30 @@ class test_plugin extends Plugin
 	{
 		$params['Form']->begin_fieldset( 'TEST plugin' );
 		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the DisplayMessageFormFieldset event.' );
+		$params['Form']->end_fieldset( 'Foo' );
+
+		return true;
+	}
+
+
+	/**
+	 * Event handler: Called before message textarea of the front-office comment form, which
+	 * allows to send an email to a user/commentator.
+	 *
+	 * You might want to use this to inject antispam payload to use in
+	 * in {@link MessageFormSent()}.
+	 *
+	 * @see Plugin::DisplayMessageFormFieldset()
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object
+	 *   - 'recipient_ID': ID of the user (if any)
+	 *   - 'item_ID': ID of the item where the user clicked the msgform icon (if any)
+	 *   - 'comment_ID': ID of the comment where the user clicked the msgform icon (if any)
+	 */
+	function DisplayMessageFormFieldsetAboveMessage( & $params )
+	{
+		$params['Form']->begin_fieldset( 'TEST plugin' );
+		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the DisplayMessageFormFieldsetAboveMessage event.' );
 		$params['Form']->end_fieldset( 'Foo' );
 
 		return true;

@@ -322,6 +322,8 @@ function validateCommentForm(form)
 		$Form->info_field( '', $params['policy_text'] );
 	}
 
+	$Plugins->trigger_event( 'DisplayCommentFormFieldsetAboveComment', array( 'Form' => & $Form, 'Item' => & $Item ) );
+
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:

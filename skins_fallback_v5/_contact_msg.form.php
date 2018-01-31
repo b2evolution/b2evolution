@@ -125,6 +125,14 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 			) );
 	}
 
+	$Plugins->trigger_event( 'DisplayMessageFormFieldsetAboveMessage', array(
+			'Form'              => & $Form,
+			'recipient_ID'      => & $recipient_id,
+			'item_ID'           => $post_id,
+			'comment_ID'        => $comment_id,
+			'form_use_fieldset' => false,
+		) );
+
 	if( $Blog->get_setting( 'msgform_display_subject' ) )
 	{	// Display a field to enter or select a subject:
 		$subject_options = $Blog->get_setting( 'msgform_subject_options' );
@@ -165,8 +173,13 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 			T_('Plain text only.'), 35, 'wide_textarea', $Blog->get_setting( 'msgform_require_message' ) );
 	}
 
-	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
-		'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
+	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array(
+			'Form'              => & $Form,
+			'recipient_ID'      => & $recipient_id,
+			'item_ID'           => $post_id,
+			'comment_ID'        => $comment_id,
+			'form_use_fieldset' => false,
+		) );
 
 	// Form buttons:
 	echo $Form->begin_field( NULL, '' );

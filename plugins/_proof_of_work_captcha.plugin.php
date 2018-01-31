@@ -218,7 +218,7 @@ class proof_of_work_captcha_plugin extends Plugin
 		}
 
 		$Form->info( $this->T_('Antispam'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>
-			<div class="coinhive-captcha" data-hashes="'.format_to_output( $this->Settings->get( 'hash_num' ), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]">
+			<div class="coinhive-captcha" data-hashes="'.format_to_output( $this->Settings->get( 'hash_num' ), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]:not([name$=\'[preview]\'])">
 				<em>'.$this->T_('Loading Captcha...<br>If it doesn\'t load, please disable Adblock!').'</em>
 			</div>' );
 
@@ -241,7 +241,7 @@ class proof_of_work_captcha_plugin extends Plugin
 	/**
 	 * We display our captcha with comment forms.
 	 */
-	function DisplayCommentFormFieldset( & $params )
+	function DisplayCommentFormFieldsetAboveComment( & $params )
 	{
 		$params['form_type'] = 'comment';
 		$this->CaptchaPayload( $params );
@@ -289,7 +289,7 @@ class proof_of_work_captcha_plugin extends Plugin
 	/**
 	 * We display our captcha with the message form.
 	 */
-	function DisplayMessageFormFieldset( & $params )
+	function DisplayMessageFormFieldsetAboveMessage( & $params )
 	{
 		$params['form_type'] = 'message';
 		$this->CaptchaPayload( $params );
