@@ -1103,7 +1103,7 @@ switch( $action )
 				T_('IMPORTANT: if this upgrade procedure fails, do this:'),
 				T_('Make a screenshot showing as much context as possible, and save it in case you need support.'),
 				T_('Reload the page. The upgrade script is designed to recover from unexpected stops and may be able to pick up where it left off.'),
-				sprintf( T_('If needed see <a %s>this man page</a>' ), 'href="http://b2evolution.net/man/auto-upgrade-procedure"' ) ), 'warning' );
+				sprintf( T_('If needed, see <a %s>this man page &raquo;</a>' ), 'href="http://b2evolution.net/man/auto-upgrade-procedure"' ) ), 'info' );
 
 		if( $htaccess != 'skip' )
 		{
