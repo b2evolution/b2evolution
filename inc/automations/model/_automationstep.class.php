@@ -547,6 +547,8 @@ class AutomationStep extends DataObject
 						$step_User->dbupdate();
 						$step_result = 'YES';
 					}
+					// Display tag name in log:
+					$additional_result_message = $new_usertag;
 					break;
 
 				case 'remove_usertag':
@@ -563,6 +565,8 @@ class AutomationStep extends DataObject
 						$step_User->remove_usertags( $del_usertag );
 						$step_User->dbupdate();
 					}
+					// Display tag name in log:
+					$additional_result_message = $del_usertag;
 					break;
 
 				case 'subscribe':
@@ -580,6 +584,8 @@ class AutomationStep extends DataObject
 							$affected_subscriprions_num = $step_User->unsubscribe( $Newsletter->ID );
 						}
 						$step_result = ( $affected_subscriprions_num ? 'YES' : 'NO' );
+						// Display newsletter name in log:
+						$additional_result_message = $Newsletter->get( 'name' );
 					}
 					else
 					{	// If List/Newsletter does not exist:
@@ -688,15 +694,15 @@ class AutomationStep extends DataObject
 	/**
 	 * Get result title depending on step type
 	 *
-	 * NOTE! Return string is not translatable, Use funcs T_(), TS_() and etc. in that place where you use this func.
-	 *
 	 * @param string Result: YES, NO, ERROR
 	 * @param string Additional message, for example: some error message
 	 * @return string Result title
 	 */
 	function get_result_title( $result, $additional_message = '' )
 	{
-		$result_title = step_get_result_title( $this->get( 'type' ), $result );
+		$result_titles = step_get_result_titles();
+
+		$result_title = isset( $result_titles[ $this->get( 'type' ) ][ $result ] ) ? $result_titles[ $this->get( 'type' ) ][ $result ] : $result;
 
 		if( strpos( $result_title, '%s' ) !== false )
 		{	// Replace mask with additional message like error:

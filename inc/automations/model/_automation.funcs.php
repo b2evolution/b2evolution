@@ -109,58 +109,41 @@ function step_get_result_titles()
 {
 	return array(
 		'if_condition' => array(
-			'YES'   => NT_('YES'),
-			'NO'    => NT_('NO'),
-			'ERROR' => NT_('ERROR: %s'),
+			'YES'   => 'YES',
+			'NO'    => 'NO',
+			'ERROR' => 'ERROR: %s',
 		),
 		'send_campaign' => array(
-			'YES'   => NT_('Email SENT'),
-			'NO'    => NT_('Email was ALREADY sent'),
-			'ERROR' => NT_('ERROR: Email cannot be sent: %s'),
+			'YES'   => 'Email SENT',
+			'NO'    => 'Email was ALREADY sent',
+			'ERROR' => 'ERROR: Email cannot be sent: %s',
 		),
 		'notify_owner' => array(
-			'YES'   => NT_('Notification SENT'),
+			'YES'   => 'Notification SENT',
 			'NO'    => '',
-			'ERROR' => NT_('ERROR: Notification cannot be sent: %s'),
+			'ERROR' => 'ERROR: Notification cannot be sent: %s',
 		),
 		'add_usertag' => array(
-			'YES'   => NT_('Tag was added'),
-			'NO'    => NT_('User was already tagged'),
-			'ERROR' => NT_('ERROR: %s'),
+			'YES'   => 'Tag %s was added',
+			'NO'    => 'User already has the tag: %s',
+			'ERROR' => 'ERROR: %s',
 		),
 		'remove_usertag' => array(
-			'YES'   => NT_('Tag was removed'),
-			'NO'    => NT_('User didn\'t have that tag'),
-			'ERROR' => NT_('ERROR: %s'),
+			'YES'   => 'Tag %s was removed',
+			'NO'    => 'User didn\'t have the tag: %s',
+			'ERROR' => 'ERROR: %s',
 		),
 		'subscribe' => array(
-			'YES'   => NT_('User was subscribed'),
-			'NO'    => NT_('User was already subscribed'),
-			'ERROR' => NT_('List does not exist'),
+			'YES'   => 'User was subscribed to: %s',
+			'NO'    => 'User was already subscribed to: %s',
+			'ERROR' => 'List does not exist',
 		),
 		'unsubscribe' => array(
-			'YES'   => NT_('User was unsubscribed'),
-			'NO'    => NT_('User was already unsubscribed'),
-			'ERROR' => NT_('List does not exist'),
+			'YES'   => 'User was unsubscribed from: %s',
+			'NO'    => 'User was already unsubscribed from: %s',
+			'ERROR' => 'List does not exist',
 		),
 	);
-}
-
-
-/**
- * Get result title of automation step by step type and result value
- *
- * NOTE! Return string is not translatable, Use funcs T_(), TS_() and etc. in that place where you use this func.
- *
- * @param string Step type: 'if_condition', 'send_campaign
- * @param string Step result: 'YES', 'NO', 'ERROR'
- * @return string Result title
- */
-function step_get_result_title( $type, $result )
-{
-	$results = step_get_result_titles();
-
-	return isset( $results[ $type ][ $result ] ) ? $results[ $type ][ $result ] : $result;
 }
 
 
