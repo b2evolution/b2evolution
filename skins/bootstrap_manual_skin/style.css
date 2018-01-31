@@ -295,3 +295,6 @@ ol.breadcrumb {
 .cat_title .btn-group .btn {
   float: none;
 }
+.evo_content_block .evo_comment .evo_comment_footer .action_btn_group {
+  float: right;
+}

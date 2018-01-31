@@ -467,3 +467,6 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   cursor: pointer;
   opacity: 0.9;
 }
+.evo_content_block .evo_comment .evo_comment_footer .action_btn_group {
+  float: right;
+}
