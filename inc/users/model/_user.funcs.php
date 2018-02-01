@@ -4585,7 +4585,7 @@ function echo_user_deldata_js( $params = array() )
  * Initialize JavaScript for AJAX loading of popup window to add user to automation
  * @param array Params
  */
-function echo_user_automation_js( $params = array() )
+function echo_user_automation_js()
 {
 	global $admin_url;
 

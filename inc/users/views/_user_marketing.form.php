@@ -127,7 +127,7 @@ $Results = new Results( $SQL->get(), 'ustep_', '--A' );
 
 $Results->global_icon( T_('Add user to an automation...'), 'new', regenerate_url( 'action,user_tab', 'action=new_automation&amp;user_tab=automation' ), T_('Add user to an automation...'), 3, 4, array(
 		'class' => 'action_icon btn-primary',
-		'onclick' => 'return user_automation( '.$edited_User->ID.' )'
+		'onclick' => 'return add_user_automation( '.$edited_User->ID.' )'
 	) );
 
 $Results->title = T_('Automations').get_manual_link( 'user-automations' );

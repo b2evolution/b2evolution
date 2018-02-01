@@ -1164,6 +1164,22 @@ class _core_Module extends Module
 								'campaigns' => array(
 									'text' => T_('Campaigns').'&hellip;',
 									'href' => $admin_url.'?ctrl=campaigns' ),
+								)
+						);
+				}
+
+				if( $perm_options )
+				{	// If current user has a permissions to view options:
+					$entries['site']['entries']['email']['entries'] += array(
+							'automations' => array(
+								'text' => T_('Automations').'&hellip;',
+								'href' => $admin_url.'?ctrl=automations',
+						) );
+				}
+
+				if( $perm_emails )
+				{
+					$entries['site']['entries']['email']['entries'] += array(
 								'settings' => array(
 									'text' => T_('Settings').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
@@ -1176,8 +1192,7 @@ class _core_Module extends Module
 								'return' => array(
 									'text' => T_('Returned').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
-								)
-						);
+								);
 				}
 
 				$entries['site']['entries']['system'] = array(

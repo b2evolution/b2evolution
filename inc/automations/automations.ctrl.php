@@ -22,6 +22,7 @@ load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
 $current_User->check_perm( 'options', 'view', true );
 
 param_action( '', true );
+param( 'display_mode', 'string', 'normal' );
 
 if( param( 'autm_ID', 'integer', '', true ) )
 {	// Load Automation object:
@@ -178,7 +179,35 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=automations', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
-	
+
+	case 'requeue':
+		// Requeue Automation for finished steps:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automation' );
+
+		// Check that current user has permission to edit automations:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Make sure we got IDs:
+		param( 'autm_ID', 'integer', true );
+		param( 'step_ID', 'integer', true );
+
+		$requeued_users_num = intval( $DB->query( 'UPDATE T_automation__user_state
+			  SET aust_next_step_ID = '.$DB->quote( $step_ID ).',
+			      aust_next_exec_ts = '.$DB->quote( date2mysql( $servertimenow ) ).'
+			WHERE aust_autm_ID = '.$edited_Automation->ID.'
+			  AND aust_next_step_ID IS NULL' ) );
+
+		if( $requeued_users_num )
+		{
+			$Messages->add( sprintf( T_('Automation has been requeued for %d users.'), $requeued_users_num ), 'success' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 
 	case 'move_step_up':
 	case 'move_step_down':
@@ -256,7 +285,7 @@ switch( $action )
 
 		$action = 'edit'; // To keep same opened page
 		break;
- 
+
 	case 'create_step':
 		// Create new Automation Step:
 		$edited_AutomationStep = new AutomationStep();
@@ -333,6 +362,35 @@ switch( $action )
 		// We want to highlight the Step which cannot de leted on next list display:
 		$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 		break;
+
+	case 'reduce_step_delay':
+		// Reduce step delay for specific user:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		param( 'user_ID', 'integer', true );
+		$UserCache = & get_UserCache();
+		$step_User = & $UserCache->get_by_ID( $user_ID );
+
+		// Change execution time to NOW:
+		$r = $DB->query( 'UPDATE T_automation__user_state
+			  SET aust_next_exec_ts = '.$DB->quote( date2mysql( $servertimenow ) ).'
+			WHERE aust_next_step_ID = '.$edited_AutomationStep->ID.'
+			  AND aust_user_ID = '.$step_User->ID );
+
+		if( $r )
+		{
+			$Messages->add( sprintf( T_('Execution time has been changed to now for user %s.'), '"'.$step_User->dget( 'login' ).'"' ), 'success' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=automations&action=edit_step&step_ID='.$edited_AutomationStep->ID, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 
@@ -361,16 +419,19 @@ if( in_array( $action, array( 'new_step', 'edit_step' ) ) )
 	init_querybuilder_js( 'rsc_url' );
 }
 
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
+if( $display_mode != 'js' )
+{
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
 
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
 
-// Begin payload block:
-$AdminUI->disp_payload_begin();
+	// Begin payload block:
+	$AdminUI->disp_payload_begin();
 
-evo_flush();
+	evo_flush();
+}
 
 switch( $action )
 {
@@ -378,6 +439,14 @@ switch( $action )
 	case 'edit':
 		// Display a form of automation:
 		$AdminUI->disp_view( 'automations/views/_automation.form.php' );
+		break;
+
+	case 'requeue_form':
+		// Display a form to requeue automation:
+		$AdminUI->disp_view( 'automations/views/_automation_requeue.form.php' );
+		// Do not append Debuglog & Debug JSlog to response!
+		$debug = false;
+		$debug_jslog = false;
 		break;
 
 	case 'new_step':
@@ -392,10 +461,12 @@ switch( $action )
 		break;
 }
 
-// End payload block:
-$AdminUI->disp_payload_end();
+if( $display_mode != 'js' )
+{
+	// End payload block:
+	$AdminUI->disp_payload_end();
 
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>

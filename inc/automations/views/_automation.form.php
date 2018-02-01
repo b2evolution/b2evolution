@@ -15,7 +15,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $edited_Automation, $action, $highlight_step_ID;
+global $edited_Automation, $action;
+
+// Display breadcrumb:
+autm_display_breadcrumb();
 
 // Determine if we are creating or updating:
 $creating = is_create_action( $action );
@@ -50,6 +53,13 @@ $Form->end_form( array(
 
 if( $edited_Automation->ID > 0 )
 {	// Display steps of the edited Automation:
+	$finished_SQL = new SQL();
+	$finished_SQL->SELECT( 'COUNT( aust_user_ID )' );
+	$finished_SQL->FROM( 'T_automation__user_state' );
+	$finished_SQL->WHERE( 'aust_autm_ID = '.$edited_Automation->ID );
+	$finished_SQL->WHERE_and( 'aust_next_step_ID IS NULL' );
+	$finished_users = $DB->get_var( $finished_SQL );
+
 	$SQL = new SQL( 'Get all steps of automation #'.$edited_Automation->ID );
 	$SQL->SELECT( 'step.*' );
 	$SQL->SELECT_add( ', next_yes.step_order AS step_yes_next_step_order, next_no.step_order AS step_no_next_step_order, next_error.step_order AS step_error_next_step_order' );
@@ -81,6 +91,7 @@ if( $edited_Automation->ID > 0 )
 			'td'       => '$step_order$',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
+			'total'    => T_('Finished'),
 		);
 
 	$Results->cols[] = array(
@@ -90,12 +101,15 @@ if( $edited_Automation->ID > 0 )
 			'td'          => '%step_td_num_users_queued( #step_ID#, #num_users_queued# )%',
 			'th_class'    => 'shrinkwrap',
 			'td_class'    => 'right',
+			'total'       => $finished_users,
+			'total_class' => 'right',
 		);
 
 	$Results->cols[] = array(
 			'th'    => T_('Label'),
 			'order' => 'step_label',
 			'td'    => '%step_td_label( #step_ID#, #step_label#, #step_type# )%',
+			'total' => T_('These users have finished the current automation'),
 		);
 
 	$Results->cols[] = array(
@@ -126,13 +140,18 @@ if( $edited_Automation->ID > 0 )
 		);
 
 	$Results->cols[] = array(
-			'th'       => T_('Actions'),
-			'td'       => '%step_td_actions( #step_ID#, #is_first_step#, #is_last_step# )%',
-			'th_class' => 'shrinkwrap',
-			'td_class' => 'shrinkwrap',
+			'th'          => T_('Actions'),
+			'td'          => '%step_td_actions( #step_ID#, #is_first_step#, #is_last_step# )%',
+			'th_class'    => 'shrinkwrap',
+			'td_class'    => 'shrinkwrap',
+			'total'       => ( $finished_users > 0 ? '<a href="#" class="btn btn-info btn-xs" onclick="return requeue_automation( '.$edited_Automation->ID.' )">'.T_('Requeue').'</a>' : '' ),
+			'total_class' => 'center',
 		);
 
 	$Results->display( NULL, 'session' );
+
+	// Init JS for form to requeue automation:
+	echo_requeue_automation_js();
 }
 
 // Display date/time when next scheduled job will executes automations:

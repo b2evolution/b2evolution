@@ -15,10 +15,13 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $edited_AutomationStep, $action;
+global $edited_AutomationStep, $action, $admin_url;
 
 // Get Automation of the creating/editing Step:
 $step_Automation = & $edited_AutomationStep->get_Automation();
+
+// Display breadcrumb:
+autm_display_breadcrumb();
 
 // Determine if we are creating or updating:
 $creating = is_create_action( $action );
@@ -147,6 +150,13 @@ if( $edited_AutomationStep->ID > 0 )
 			'td'       => '%mysql2localedatetime( #aust_next_exec_ts# )%',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'nowrap',
+		);
+
+	$Results->cols[] = array(
+			'th'       => T_('Actions'),
+			'td'       => action_icon( T_('Change execution time to now'), 'fast-forward', $admin_url.'?ctrl=automations&amp;action=reduce_step_delay&amp;step_ID='.$edited_AutomationStep->ID.'&amp;user_ID=$aust_user_ID$&amp;'.url_crumb( 'automationstep' ) ),
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
 		);
 
 	$Results->display();

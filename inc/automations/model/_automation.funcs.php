@@ -16,6 +16,29 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Display breadcrumb for automation controller
+ */
+function autm_display_breadcrumb()
+{
+	global $admin_url, $edited_Automation, $edited_AutomationStep;
+
+	echo '<nav aria-label="breadcrumb"><ol class="breadcrumb" style="margin-left:0">';
+	echo '<li class="breadcrumb-item"><a href="'.$admin_url.'?ctrl=automations">All</a></li>';
+	if( isset( $edited_Automation ) && $edited_Automation->ID > 0 )
+	{	// Automation:
+		echo '<li class="breadcrumb-item active">'.$edited_Automation->dget( 'name' ).'</li>';
+	}
+	if( isset( $edited_AutomationStep ) && $edited_AutomationStep->ID > 0 )
+	{	// Automation step:
+		$step_Automation = & $edited_AutomationStep->get_Automation();
+		echo '<li class="breadcrumb-item"><a href="'.$admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID.'">'.$step_Automation->dget( 'name' ).'</a></li>';
+		echo '<li class="breadcrumb-item active">'.T_('Step').' #'.$edited_AutomationStep->dget( 'order' ).'</li>';
+	}
+	echo '</ol></nav>';
+}
+
+
+/**
  * Get array of status titles for automation
  *
  * @return array Status titles
@@ -346,5 +369,26 @@ function step_td_user_state( $step_ID, $step_label, $step_type, $step_order )
 	}
 
 	return '#'.$step_order.' - '.step_td_label( $step_ID, $step_label, $step_type );
+}
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to add user to automation
+ * @param array Params
+ */
+function echo_requeue_automation_js()
+{
+	global $admin_url;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_requeue_automation_for_finished_steps = \''.TS_('Requeue automation for finished steps').get_manual_link( 'requeue-automation-for-finished-steps' ).'\';
+		var evo_js_lang_requeue = \''.TS_('Requeue').'\';
+		var evo_js_requeue_automation_ajax_url = \''.$admin_url.'\';
+	</script>';
 }
 ?>
