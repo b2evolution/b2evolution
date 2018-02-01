@@ -176,6 +176,7 @@ echo '<div class="action_btn_group">';
 	echo '<span class="'.button_class( 'group' ).'">';
 		$delete_button_is_displayed = is_logged_in() && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
 		$Comment->moderation_links( array(
+			'text' => '#',
 			'ajax_button' => true,
 			'class'       => button_class( 'text' ),
 			'redirect_to' => $comment_redirect_url,

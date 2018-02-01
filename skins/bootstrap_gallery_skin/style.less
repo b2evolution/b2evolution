@@ -394,6 +394,29 @@ text-align: center;
 }
 .evo_post_content {
 	padding-top: 15px;
+	.evo_comment {
+		.evo_comment_footer {
+			.action_btn_group {
+				float: right;
+				.btn-group {
+					font-size: 0px;
+					color: red !important;
+				}
+			}
+		}
+
+		.comment_edit_btn {
+			margin-right: 5px;
+		}
+
+		// Fix buttons for comment actions
+		.btn-group {
+			>.btn.first-child {
+				border-top-left-radius: 3px !important;
+				border-bottom-left-radius: 3px !important;
+			}
+		}
+	}
 }
 .single-image {
 	display: inline-block;
