@@ -512,7 +512,6 @@ $schema_queries = array(
 			enlt_label  VARCHAR(255) NULL,
 			enlt_active TINYINT(1) UNSIGNED DEFAULT 1,
 			enlt_order  INT NULL DEFAULT NULL,
-			enlt_default_autm_ID INT UNSIGNED NULL,
 			PRIMARY KEY (enlt_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
@@ -566,6 +565,7 @@ $schema_queries = array(
 			autm_status        ENUM('paused', 'active') DEFAULT 'paused',
 			autm_enlt_ID       INT UNSIGNED NOT NULL,
 			autm_owner_user_ID INT UNSIGNED NOT NULL,
+			autm_autostart     TINYINT(1) UNSIGNED DEFAULT 1,
 			PRIMARY KEY        (autm_ID)
 		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
 

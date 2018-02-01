@@ -163,6 +163,7 @@ switch( $action )
 
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
+		param( 'enlt_ID', 'integer', NULL );
 
 		// Change automation status depending on action:
 		$edited_Automation->set( 'status', ( $action == 'status_paused' ? 'paused' : 'active' ) );
@@ -176,7 +177,37 @@ switch( $action )
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $admin_url.'?ctrl=automations', 303 ); // Will EXIT
+		header_redirect( $enlt_ID > 0 ? $admin_url.'?ctrl=newsletters&tab=automations&action=edit&enlt_ID='.$enlt_ID : $admin_url.'?ctrl=automations', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'autostart_disable':
+	case 'autostart_enable':
+		// Toggle Automation auto start:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automation' );
+
+		// Check that current user has permission to edit automations:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Make sure we got an autm_ID:
+		param( 'autm_ID', 'integer', true );
+		param( 'enlt_ID', 'integer', NULL );
+
+		// Change automation status depending on action:
+		$edited_Automation->set( 'autostart', ( $action == 'autostart_disable' ? 0 : 1 ) );
+
+		// Update automation in DB:
+		if( $edited_Automation->dbupdate() )
+		{
+			$Messages->add( T_('Automation auto start has been changed.'), 'success' );
+			// We want to highlight the moved Step on next list display:
+			$Session->set( 'fadeout_array', array( 'autm_ID' => array( $edited_Automation->ID ) ) );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $enlt_ID > 0 ? $admin_url.'?ctrl=newsletters&tab=automations&action=edit&enlt_ID='.$enlt_ID : $admin_url.'?ctrl=automations', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 

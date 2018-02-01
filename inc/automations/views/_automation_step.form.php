@@ -154,7 +154,7 @@ if( $edited_AutomationStep->ID > 0 )
 
 	$Results->cols[] = array(
 			'th'       => T_('Actions'),
-			'td'       => action_icon( T_('Change execution time to now'), 'fast-forward', $admin_url.'?ctrl=automations&amp;action=reduce_step_delay&amp;step_ID='.$edited_AutomationStep->ID.'&amp;user_ID=$aust_user_ID$&amp;'.url_crumb( 'automationstep' ) ),
+			'td'       => action_icon( T_('Change execution time to now'), 'forward', $admin_url.'?ctrl=automations&amp;action=reduce_step_delay&amp;step_ID='.$edited_AutomationStep->ID.'&amp;user_ID=$aust_user_ID$&amp;'.url_crumb( 'automationstep' ) ),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
 		);

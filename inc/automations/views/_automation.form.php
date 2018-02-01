@@ -35,6 +35,8 @@ $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',autm_ID' : '' ) )
 
 $Form->text_input( 'autm_name', $edited_Automation->get( 'name' ), 40, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 
+$Form->checkbox( 'autm_autostart', $edited_Automation->get( 'autostart' ), T_('Auto start') );
+
 $Form->select_input_array( 'autm_status', $edited_Automation->get( 'status' ), autm_get_status_titles(), T_('Status'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
 
 $NewsletterCache = & get_NewsletterCache();

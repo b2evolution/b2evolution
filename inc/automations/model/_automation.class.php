@@ -29,6 +29,7 @@ class Automation extends DataObject
 	var $status;
 	var $enlt_ID;
 	var $owner_user_ID;
+	var $autostart = 1;
 
 	var $owner_User = NULL;
 
@@ -57,20 +58,8 @@ class Automation extends DataObject
 			$this->status = $db_row->autm_status;
 			$this->enlt_ID = $db_row->autm_enlt_ID;
 			$this->owner_user_ID = $db_row->autm_owner_user_ID;
+			$this->autostart = $db_row->autm_autostart;
 		}
-	}
-
-
-	/**
-	 * Get delete restriction settings
-	 *
-	 * @return array
-	 */
-	static function get_delete_restrictions()
-	{
-		return array(
-				array( 'table' => 'T_email__newsletter', 'fk' => 'enlt_default_autm_ID', 'msg' => T_('%d lists use this automation') ),
-			);
 	}
 
 
@@ -121,6 +110,10 @@ class Automation extends DataObject
 			$this->set( 'owner_user_ID', $owner_User->ID );
 			$this->owner_User = & $owner_User;
 		}
+
+		// Auto start:
+		param( 'autm_autostart', 'integer', 0 );
+		$this->set_from_Request( 'autostart' );
 
 		return ! param_errors_detected();
 	}

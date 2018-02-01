@@ -933,13 +933,6 @@ function get_icon_info( $name )
 			'glyph' => 'forward',
 			'fa' => 'forward',
 		);
-		case 'fast-forward': return array( // Used to change execution time to now for automation step user state
-			'alt' => '',
-			'size' => array( 0, 0 ),
-			'xy' => array( 0, 0 ),
-			'glyph' => 'fast-forward',
-			'fa' => 'fast-forward',
-		);
 
 		case 'feed': return array(
 			'alt'	 => T_('XML Feed'),

@@ -33,8 +33,6 @@ class Newsletter extends DataObject
 
 	var $order;
 
-	var $default_autm_ID;
-
 	/**
 	 * Constructor
 	 *
@@ -52,7 +50,6 @@ class Newsletter extends DataObject
 			$this->label = $db_row->enlt_label;
 			$this->active = $db_row->enlt_active;
 			$this->order = $db_row->enlt_order;
-			$this->default_autm_ID = $db_row->enlt_default_autm_ID;
 		}
 	}
 
@@ -108,10 +105,6 @@ class Newsletter extends DataObject
 		// Order:
 		param( 'enlt_order', 'integer', NULL );
 		$this->set_from_Request( 'order', 'enlt_order', true );
-
-		// Default automation ID:
-		param( 'enlt_default_autm_ID', 'integer', NULL );
-		$this->set_from_Request( 'default_autm_ID', 'enlt_default_autm_ID', true );
 
 		return ! param_errors_detected();
 	}

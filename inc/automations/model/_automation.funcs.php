@@ -67,13 +67,50 @@ function autm_get_status_title( $status )
 
 
 /**
- * Helper function to display step label on Results table
+ * Helper function to display automation auto start on Results table
+ *
+ * @param integer Automation ID
+ * @param string Automation auto start
+ * @param string Additional URL params
+ * @return string
+ */
+function autm_td_autostart( $autm_ID, $autm_autostart, $url_params = '' )
+{
+	global $current_User;
+
+	$autostart_icon = get_icon( $autm_autostart ? 'bullet_black' : 'bullet_empty_grey' );
+
+	if( $autm_autostart )
+	{	// If automation is auto started:
+		$autostart_icon = get_icon( 'bullet_black', 'imgtag', array( 'title' => T_('The automation is auto started.') ) );
+	}
+	else
+	{	// If automation is NOT auto started:
+		$autostart_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The automation is not auto started.') ) );
+	}
+
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{	// Make icon to action link if current User has a perm to edit this:
+		global $admin_url;
+		return '<a href="'.$admin_url.'?ctrl=automations&amp;action='.( $autm_autostart ? 'autostart_disable' : 'autostart_enable' )
+			.'&amp;autm_ID='.$autm_ID.'&amp;'.url_crumb( 'automation' ).$url_params.'">'.$autostart_icon.'</a>';
+	}
+	else
+	{	// Simple icon without link:
+		return $autostart_icon;
+	}
+}
+
+
+/**
+ * Helper function to display automation status on Results table
  *
  * @param integer Automation ID
  * @param string Automation status
+ * @param string Additional URL params
  * @return string
  */
-function autm_td_status( $autm_ID, $autm_status )
+function autm_td_status( $autm_ID, $autm_status, $url_params = '' )
 {
 	global $admin_url, $current_User;
 
@@ -83,7 +120,7 @@ function autm_td_status( $autm_ID, $autm_status )
 	{	// Display action icon to toggle automation status:
 		$r .= ' '.action_icon( '', ( $autm_status == 'active' ? 'pause' : 'play' ),
 			$admin_url.'?ctrl=automations&amp;action='.( $autm_status == 'active' ? 'status_paused' : 'status_active' )
-				.'&amp;autm_ID='.$autm_ID.'&amp;'.url_crumb( 'automation' ) );
+				.'&amp;autm_ID='.$autm_ID.'&amp;'.url_crumb( 'automation' ).$url_params );
 	}
 
 	return $r;
@@ -390,5 +427,98 @@ function echo_requeue_automation_js()
 		var evo_js_lang_requeue = \''.TS_('Requeue').'\';
 		var evo_js_requeue_automation_ajax_url = \''.$admin_url.'\';
 	</script>';
+}
+
+
+/**
+ * Display the campaigns results table
+ *
+ * @param array Params
+ */
+function automation_results_block( $params = array() )
+{
+	global $admin_url, $current_User, $DB;
+
+	$params = array_merge( array(
+		'enlt_ID'               => NULL, // Newsletter ID
+		'results_title'         => T_('Automations').get_manual_link( 'automations-list' ),
+		'results_prefix'        => 'autm_',
+		'display_create_button' => true
+	), $params );
+
+	// Additional URL param, e-g to change status from newsletter page:
+	$url_params = '';
+
+	$SQL = new SQL( 'Get automations' );
+	$SQL->SELECT( 'autm_ID, autm_name, autm_status, autm_autostart, enlt_ID, enlt_name' );
+	$SQL->FROM( 'T_automation__automation' );
+	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON enlt_ID = autm_enlt_ID' );
+	if( $params['enlt_ID'] > 0 )
+	{	// Restrict by newsletter:
+		$SQL->WHERE( 'autm_enlt_ID = '.$params['enlt_ID'] );
+		$url_params = '&amp;enlt_ID='.$params['enlt_ID'];
+	}
+
+	$Results = new Results( $SQL->get(), $params['results_prefix'], 'A', NULL );
+
+	if( $params['display_create_button'] && $current_User->check_perm( 'options', 'edit' ) )
+	{	// User must has a permission to add new automation:
+		$Results->global_icon( T_('New automation'), 'new', regenerate_url( 'action', 'action=new' ), T_('New automation').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+	}
+
+	$Results->title = $params['results_title'];
+
+	$Results->cols[] = array(
+			'th'       => T_('ID'),
+			'order'    => 'autm_ID',
+			'td'       => '$autm_ID$',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+		);
+
+	$Results->cols[] = array(
+			'th'    => T_('Name'),
+			'order' => 'autm_name',
+			'td'    => ( $current_User->check_perm( 'options', 'edit' )
+				? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID=$autm_ID$"><b>$autm_name$</b></a>'
+				: '$autm_name$' ),
+		);
+
+	$Results->cols[] = array(
+			'th'    => T_('Tied to List'),
+			'order' => 'enlt_name',
+			'td'    => ( $current_User->check_perm( 'emails', 'edit' )
+				? '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID=$enlt_ID$"><b>$enlt_name$</b></a>'
+				: '$enlt_name$' ),
+		);
+
+	$Results->cols[] = array(
+			'th'    => T_('Auto start'),
+			'order' => 'enlt_name',
+			'td'    => '%autm_td_autostart( #autm_ID#, #autm_autostart#, "'.$url_params.'" )%',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+		);
+
+	$Results->cols[] = array(
+			'th'       => T_('Status'),
+			'order'    => 'autm_status',
+			'td'       => '%autm_td_status( #autm_ID#, #autm_status#, "'.$url_params.'" )%',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+		);
+
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{	// Display actions column only if current user has a permission to edit options:
+		$Results->cols[] = array(
+				'th'       => T_('Actions'),
+				'td'       => action_icon( T_('Edit this automation'), 'edit', $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID=$autm_ID$' )
+										 .action_icon( T_('Delete this automation!'), 'delete', regenerate_url( 'autm_ID,action', 'autm_ID=$autm_ID$&amp;action=delete&amp;'.url_crumb( 'automation' ) ) ),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+			);
+	}
+
+	$Results->display( NULL, 'session' );
 }
 ?>

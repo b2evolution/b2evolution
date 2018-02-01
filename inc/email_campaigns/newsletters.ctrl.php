@@ -239,6 +239,9 @@ switch( $action )
 					'campaigns' => array(
 						'text' => T_('Campaigns'),
 						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID='.$edited_Newsletter->ID ),
+					'automations' => array(
+						'text' => T_('Automations'),
+						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=automations&amp;enlt_ID='.$edited_Newsletter->ID ),
 					'subscribers' => array(
 						'text' => T_('Subscribers'),
 						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=subscribers&amp;enlt_ID='.$edited_Newsletter->ID )
@@ -250,6 +253,11 @@ switch( $action )
 			case 'campaigns':
 				$AdminUI->set_page_manual_link( 'email-list-campaigns' );
 				$AdminUI->set_path( 'email', 'newsletters', 'campaigns' );
+				break;
+
+			case 'automations':
+				$AdminUI->set_page_manual_link( 'email-list-automations' );
+				$AdminUI->set_path( 'email', 'newsletters', 'automations' );
 				break;
 
 			case 'subscribers':
@@ -301,6 +309,17 @@ switch( $action )
 		{
 			case 'campaigns':
 				$AdminUI->disp_view( 'email_campaigns/views/_newsletters_campaign.view.php' );
+				break;
+
+			case 'automations':
+				load_funcs( 'automations/model/_automation.funcs.php' );
+				// Display automations tied to this Newsletter:
+				automation_results_block( array(
+						'enlt_ID'               => $edited_Newsletter->ID,
+						'results_title'         => T_('Automations').get_manual_link( 'email-list-automations' ),
+						'results_prefix'        => 'enltautm_',
+						'display_create_button' => false,
+					) );
 				break;
 
 			case 'subscribers':

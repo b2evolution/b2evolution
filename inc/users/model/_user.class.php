@@ -7647,9 +7647,10 @@ class User extends DataObject
 		$automations_SQL = new SQL( 'Get automations of the subscribed newsletters' );
 		$automations_SQL->SELECT( 'DISTINCT autm_ID, '.$this->ID.', ( '.$first_step_SQL->get().' ), '.$DB->quote( date2mysql( $servertimenow ) ) );
 		$automations_SQL->FROM( 'T_email__newsletter' );
-		$automations_SQL->FROM_add( 'INNER JOIN T_automation__automation ON enlt_default_autm_ID = autm_ID' );
+		$automations_SQL->FROM_add( 'INNER JOIN T_automation__automation ON enlt_ID = autm_enlt_ID' );
 		$automations_SQL->FROM_add( 'LEFT JOIN T_automation__user_state ON aust_autm_ID = autm_ID AND aust_user_ID = '.$this->ID );
 		$automations_SQL->WHERE( 'enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )' );
+		$automations_SQL->WHERE_and( 'autm_autostart = 1' );
 		$automations_SQL->WHERE_and( 'aust_autm_ID IS NULL' );// Exclude already added automation user states
 		$DB->query( 'INSERT INTO T_automation__user_state ( aust_autm_ID, aust_user_ID, aust_next_step_ID, aust_next_exec_ts ) '.$automations_SQL->get(),
 			'Insert automation user states on subscribe to newsletters #'.implode( ',', $newsletter_IDs ).' for user #'.$this->ID );

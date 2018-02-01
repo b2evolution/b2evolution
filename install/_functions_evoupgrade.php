@@ -8953,6 +8953,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			autm_status        ENUM("paused", "active") DEFAULT "paused",
 			autm_enlt_ID       INT UNSIGNED NOT NULL,
 			autm_owner_user_ID INT UNSIGNED NOT NULL,
+			autm_autostart     TINYINT(1) UNSIGNED DEFAULT 1,
 			PRIMARY KEY        (autm_ID)' );
 
 		db_create_table( 'T_automation__step', '
@@ -8981,7 +8982,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			aust_next_step_ID INT UNSIGNED NULL,
 			aust_next_exec_ts TIMESTAMP NULL,
 			PRIMARY KEY       (aust_autm_ID, aust_user_ID)' );
-		db_add_col( 'T_email__newsletter', 'enlt_default_autm_ID', 'INT UNSIGNED NULL' );
 		upg_task_end();
 	}
 
