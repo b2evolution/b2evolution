@@ -200,10 +200,6 @@ class AutomationStep extends DataObject
 			}
 		}
 		param_check_range( 'step_order', -2147483646, 2147483647, sprintf( T_('Step order must be numeric (%d - %d).'), -2147483646, 2147483647 ) );
-	
-		// Label:
-		param( 'step_label', 'string', NULL );
-		$this->set_from_Request( 'label', NULL, true );
 
 		// Type:
 		param_string_not_empty( 'step_type', 'Please select a step type.' );
@@ -273,6 +269,9 @@ class AutomationStep extends DataObject
 				$this->set( $next_step_delay_name, param_duration( 'step_'.$next_step_delay_name ) );
 			}
 		}
+
+		// Label:
+		$this->set_label();
 
 		return ! param_errors_detected();
 	}
@@ -428,7 +427,7 @@ class AutomationStep extends DataObject
 
 		// Log:
 		$process_log .= 'Executing Step #'.$this->get( 'order' )
-			.'('.step_get_type_title( $this->get( 'type' ) ).( $this->get( 'label' ) == '' ? '' : '"'.$this->get( 'label' ).'"' ).')'
+			.'('.step_get_type_title( $this->get( 'type' ) ).': '.$this->get( 'label' ).')'
 			.' of Automation: #'.$Automation->ID.'('.$Automation->get( 'name' ).')'
 			.' for User #'.$user_ID.'...'.$log_nl;
 
@@ -716,7 +715,7 @@ class AutomationStep extends DataObject
 	/**
 	 * Check result of "IF Condition"
 	 *
-	 * @param object User
+	 * @param object|NULL User, NULL to get only log as scheme of current condition without checking
 	 * @param string Log process into this param
 	 * @return boolean TRUE if condition is matched for given user, otherwise FALSE
 	 */
@@ -743,7 +742,7 @@ class AutomationStep extends DataObject
 	 * Used recursively to find all sub grouped conditions
 	 *
 	 * @param object JSON object of step type "IF Condition"
-	 * @param object User
+	 * @param object|NULL User, NULL to get only log as scheme of current condition without checking
 	 * @param string Log process into this param
 	 * @return boolean TRUE if condition is matched for given user, otherwise FALSE
 	 */
@@ -754,8 +753,12 @@ class AutomationStep extends DataObject
 			return false;
 		}
 
+		// If user is not given we cannot do a checking,
+		// Used to autogenerate step label:
+		$check_result = ( $step_User !== NULL );
+
 		// Log:
-		$process_log .= ' ('.$json_object->condition;
+		$process_log .= ' ('.( $check_result ? $json_object->condition : ' ' );
 		// Array to convert operator names to log format:
 		$log_operators = array(
 				'equal'            => '=',
@@ -816,9 +819,14 @@ class AutomationStep extends DataObject
 			$stop_result = true;
 		}
 
-		foreach( $json_object->rules as $rule )
+		foreach( $json_object->rules as $r => $rule )
 		{
-			if( $conditions_result == $stop_result )
+			if( ! $check_result )
+			{
+				$log_rule_separator = $r > 0 ? ' '.$json_object->condition.' ' : '';
+			}
+
+			if( $check_result && $conditions_result == $stop_result )
 			{	// Skip this rule because previous rules already returned the end result for current condition(AND|OR):
 				$process_log .= $log_rule_separator.$log_bold_start.'ignored'.$log_bold_end;
 				continue;
@@ -831,9 +839,12 @@ class AutomationStep extends DataObject
 			}
 			else
 			{	// This is a single field:
-				$rule_result = $this->check_if_condition_rule( $rule, $step_User, $process_log );
+				if( $check_result )
+				{
+					$rule_result = $this->check_if_condition_rule( $rule, $step_User, $process_log );
+				}
 				// Log:
-				$process_log .= $log_rule_separator.( isset( $log_fields[ $rule->field ] ) ? $log_fields[ $rule->field ] : $rule->field ).' ';
+				$process_log .= $log_rule_separator.( isset( $log_fields[ $rule->field ] ) ? $log_fields[ $rule->field ] : $rule->field );
 				if( is_array( $log_operators[ $rule->operator ] ) )
 				{	// Multiple operator and values:
 					foreach( $log_operators[ $rule->operator ] as $o => $operator )
@@ -845,22 +856,29 @@ class AutomationStep extends DataObject
 				{	// Single operator and value:
 					$process_log .= ' '.$log_operators[ $rule->operator ].' "'.( isset( $log_values[ $rule->field ][ $rule->value ] ) ? $log_values[ $rule->field ][ $rule->value ] : $rule->value ).'"';
 				}
-				$process_log .= ': '.$log_bold_start.( $rule_result ? 'TRUE' : 'FALSE' ).$log_bold_end;
+				if( $check_result )
+				{
+					$process_log .= ': '.$log_bold_start.( $rule_result ? 'TRUE' : 'FALSE' ).$log_bold_end;
+				}
 			}
 
 			// Append current result with previous results:
 			if( $json_object->condition == 'AND' )
 			{	// AND condition:
-				$conditions_result = $conditions_result && $rule_result;
+				$conditions_result = $check_result ? ( $conditions_result && $rule_result ) : true;
 			}
 			else
 			{	// OR condition:
-				$conditions_result = $conditions_result || $rule_result;
+				$conditions_result = $check_result ? ( $conditions_result || $rule_result ) : false;
 			}
 		}
 
 		// Log:
-		$process_log .= ') : '.$log_bold_start.( $conditions_result ? 'TRUE' : 'FALSE' ).$log_bold_end;
+		$process_log .= ( $check_result ? '' : ' ' ).')';
+		if( $check_result )
+		{
+			$process_log .= ' : '.$log_bold_start.( $conditions_result ? 'TRUE' : 'FALSE' ).$log_bold_end;
+		}
 
 		return $conditions_result;
 	}
@@ -1054,6 +1072,58 @@ class AutomationStep extends DataObject
 		}
 
 		return $rule_value;
+	}
+
+
+	/**
+	 * Set label generated automatically
+	 *
+	 * @param string Label
+	 */
+	function set_label()
+	{
+		$label = '';
+
+		switch( $this->get( 'type' ) )
+		{
+			case 'if_condition':
+				// Get log of conditions without results:
+				$this->check_if_condition( NULL, $label );
+				break;
+
+			case 'send_campaign':
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( $this->get( 'info' ), false, false ) )
+				{	// Use name of Email Campaign:
+					$label = $EmailCampaign->get( 'email_title' );
+				}
+				break;
+
+			case 'notify_owner':
+				if( ( $step_Automation = & $this->get_Automation() ) &&
+				    ( $automation_owner_User = & $step_Automation->get_owner_User() ) )
+				{	// User login of owner:
+					$label = $automation_owner_User->get( 'login' );
+				}
+				break;
+
+			case 'subscribe':
+			case 'unsubscribe':
+				$NewsletterCache = & get_NewsletterCache();
+				if( $Newsletter = & $NewsletterCache->get_by_ID( $this->get( 'info' ), false, false ) )
+				{	// Use name of Newsletter/List:
+					$label = $Newsletter->get( 'name' );
+				}
+				break;
+
+			case 'add_usertag':
+			case 'remove_usertag':
+			default:
+				$label = $this->get( 'info' );
+				break;
+		}
+
+		$this->set( 'label', utf8_substr( $label, 0, 500 ) );
 	}
 }
 

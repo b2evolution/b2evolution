@@ -304,7 +304,7 @@ function step_td_label( $step_ID, $step_label, $step_type )
 {
 	global $current_User;
 
-	$step_label = ( empty( $step_label ) ? step_get_type_title( $step_type ) : $step_label );
+	$step_label = step_get_type_title( $step_type ).': '.$step_label;
 
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{
