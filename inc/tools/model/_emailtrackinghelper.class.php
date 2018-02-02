@@ -29,37 +29,76 @@ load_funcs('_core/_misc.funcs.php');
  */
 class EmailTrackingHelper
 {
-	private $type;
+	private $url_type;
 	private $email_ID;
 	private $key;
 
-	function __construct( $type, $email_ID, $key, $mode = 'HTML' )
+	function __construct( $url_type, $email_ID, $key, $content_type = 'HTML' )
 	{
-		$this->type = $type;
+		$this->url_type = $url_type;
 		$this->email_ID = $email_ID;
 		$this->key = $key;
-		$this->mode = $mode;
+		$this->content_type = $content_type;
 	}
 
 	public function callback( $matches )
 	{
-		$passthrough_url = get_htsrv_url().'email_passthrough.php?email_ID='.$this->email_ID.'&type='.$this->type.'&email_key=$secret_email_key_start$'.$this->key.'$secret_email_key_end$&redirect_to=';
+		$passthrough_url = get_htsrv_url().'email_passthrough.php?email_ID='.$this->email_ID.'&type='.$this->url_type.'&email_key=$email_key_start$'.$this->key.'$email_key_end$&redirect_to=';
 
-		switch( $this->mode )
+		switch( $this->content_type )
 		{
 			case 'HTML':
-				if( preg_match( '~(\$secret_content_start\$)(.*)(\$secret_content_end\$)~', $matches[2], $submatches ) )
-				{
-					return $matches[1].$passthrough_url.'$secret_content_start$'.rawurlencode( $submatches[2] ).'$secret_content_end$'.$matches[3];
+				/**
+				 * $matches
+				 *  1 - <a href="
+				 *  2 - HREF URL
+				 *  3 - "
+				 */
+				$redirect_url = $matches[2];
+				if( preg_match_all( '~(\$secret_content_start\$)(.*?)(\$secret_content_end\$)~', $redirect_url, $secret_contents ) )
+				{ // Preserve secret content markers
+					for( $i = 0, $n = count( $secret_contents[2] ); $i < $n; $i++ )
+					{
+						$redirect_url = str_replace( '$secret_content_start$'.$secret_contents[2][$i].'$secret_content_end$', '_____'.md5( $secret_contents[2][$i] ).'_____', $redirect_url );
+					}
+
+					$redirect_url = rawurlencode( $redirect_url );
+
+					for( $i = 0, $n = count( $secret_contents[2] ); $i < $n; $i++ )
+					{
+						$secret_content = '$secret_content_start$'.rawurlencode( $secret_contents[2][$i] ).'$secret_content_end$';
+						$redirect_url = str_replace( '_____'.md5( $secret_contents[2][$i] ).'_____', $secret_content, $redirect_url );
+					}
+
+					return $matches[1].$passthrough_url.$redirect_url.$matches[3];
 				}
-				return $matches[1].$passthrough_url.rawurlencode( $matches[2] ).$matches[3];
+
+				return $matches[1].$passthrough_url.rawurlencode( $redirect_url ).$matches[3];
 
 			case 'plain_text':
-				if( preg_match( '~(\$secret_content_start\$)(.*)(\$secret_content_end\$)~', $matches[0], $submatches ) )
-				{
-					return $passthrough_url.'$secret_content_start$'.rawurlencode( $submatches[2] ).'$secret_content_end$';
+				$redirect_url = $matches[0];
+				if( preg_match_all( '~(\$secret_content_start\$)(.*?)(\$secret_content_end\$)~', $redirect_url, $secret_contents ) )
+				{ // Preserve secret content markers
+					for( $i = 0, $n = count( $secret_contents[2] ); $i < $n; $i++ )
+					{
+						$redirect_url = str_replace( '$secret_content_start$'.$secret_contents[2][$i].'$secret_content_end$', '_____'.md5( $secret_contents[2][$i] ).'_____', $redirect_url );
+					}
+
+					$redirect_url = rawurlencode( $redirect_url );
+
+					for( $i = 0, $n = count( $secret_contents[2] ); $i < $n; $i++ )
+					{
+						$secret_content = '$secret_content_start$'.rawurlencode( $secret_contents[2][$i] ).'$secret_content_end$';
+						$redirect_url = str_replace( '_____'.md5( $secret_contents[2][$i] ).'_____', $secret_content, $redirect_url );
+					}
+
+					return $passthrough_url.$redirect_url;
 				}
-				return $passthrough_url.rawurlencode( $matches[0] );
+
+				return $passthrough_url.rawurlencode( $redirect_url );
+
+			default:
+				debug_die( 'Invalid content type' );
 		}
 	}
 }
