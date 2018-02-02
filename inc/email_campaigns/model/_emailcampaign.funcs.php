@@ -212,12 +212,21 @@ function campaign_results_block( $params = array() )
 
 	// Create result set:
 	$SQL = new SQL();
-	$SQL->SELECT( 'SQL_NO_CACHE T_email__campaign.*, T_email__newsletter.*, SUM(IF(csnd_emlog_ID IS NOT NULL, 1, 0)) AS send_count' );
+	$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
+			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
+			enlt_ID, enlt_name, el.send_count, el.open_count, el.click_count' );
 	$SQL->FROM( 'T_email__campaign' );
 	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 	$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
+	$SQL->FROM_add( 'LEFT JOIN (
+			SELECT emlog_ID,
+				COUNT( * ) AS send_count,
+				SUM( IF( emlog_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
+				SUM( IF( emlog_last_click_ts IS NULL, 0, 1 ) ) AS click_count
+			FROM T_email__log ) AS el ON el.emlog_ID = csnd_emlog_ID' );
 	$SQL->WHERE( 1 );
-	$SQL->GROUP_BY( 'ecmp_ID' );
+	$SQL->GROUP_BY( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
+			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send' );
 
 	$count_SQL = new SQL();
 	$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( ecmp_ID )' );
@@ -303,6 +312,24 @@ function campaign_results_block( $params = array() )
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
 			'td' =>'$send_count$'
+		);
+
+	$Results->cols[] = array(
+			'th' => T_('Open count'),
+			'order' => 'open_count',
+			'default_dir' => 'D',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'center',
+			'td' =>'$open_count$'
+		);
+
+	$Results->cols[] = array(
+			'th' => T_('Click count'),
+			'order' => 'click_count',
+			'default_dir' => 'D',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'center',
+			'td' =>'$click_count$'
 		);
 
 	$Results->cols[] = array(
