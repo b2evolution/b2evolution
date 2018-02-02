@@ -2646,7 +2646,13 @@ class User extends DataObject
 		if( isset( $this->cache_perms[$cache_permname][$permlevel][$cache_target_ID] ) )
 		{	// Permission is available in Cache:
 			$Debuglog->add( "Got perm [$cache_permname][$permlevel][$cache_target_ID] from cache", 'perms' );
-			return $this->cache_perms[$cache_permname][$permlevel][$cache_target_ID];
+			$perm = $this->cache_perms[$cache_permname][$permlevel][$cache_target_ID];
+			if( ! $perm && $assert )
+			{	// We can't let this go on!
+				global $app_name;
+				debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name )." ($permname:$permlevel:".( is_object( $perm_target ) ? get_class( $perm_target ).'('.$perm_target_ID.')' : ( is_array( $perm_target ) ? implode( ', ', $perm_target ) : $perm_target ) ).")" );
+			}
+			return $perm;
 		}
 
 
