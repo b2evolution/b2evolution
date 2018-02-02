@@ -30,6 +30,11 @@ param_action();
 
 $tab = param( 'tab', 'string', 'general', true );
 
+if( $tab == 'automations' )
+{	// Check other permission for automations:
+	$current_User->check_perm( 'options', 'view', true );
+}
+
 if( param( 'enlt_ID', 'integer', '', true ) )
 {	// Load Newsletter object:
 	$NewsletterCache = & get_NewsletterCache();
@@ -239,13 +244,18 @@ switch( $action )
 					'campaigns' => array(
 						'text' => T_('Campaigns'),
 						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID='.$edited_Newsletter->ID ),
-					'automations' => array(
-						'text' => T_('Automations'),
-						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=automations&amp;enlt_ID='.$edited_Newsletter->ID ),
 					'subscribers' => array(
 						'text' => T_('Subscribers'),
 						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=subscribers&amp;enlt_ID='.$edited_Newsletter->ID )
 				) );
+			if( $current_User->check_perm( 'options', 'view' ) )
+			{	// If current user has a permissions to view options:
+				$AdminUI->add_menu_entries( array( 'email', 'newsletters' ), array(
+						'automations' => array(
+							'text' => T_('Automations'),
+							'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=automations&amp;enlt_ID='.$edited_Newsletter->ID ),
+					), 'campaigns' );
+			}
 		}
 
 		switch( $tab )

@@ -572,7 +572,7 @@ class AutomationStep extends DataObject
 				case 'unsubscribe':
 					// Subscribe/Unsubscribe User to List:
 					$NewsletterCache = & get_NewsletterCache();
-					if( $Newsletter = & $NewsletterCache->get_by_ID( intval( $this->get( 'info' ) ), false, false ) )
+					if( $Newsletter = & $NewsletterCache->get_by_ID( $this->get( 'info' ), false, false ) )
 					{	// If List/Newsletter exists:
 						if( $this->get( 'type' ) == 'subscribe' )
 						{	// Subscribe:
@@ -589,6 +589,7 @@ class AutomationStep extends DataObject
 					else
 					{	// If List/Newsletter does not exist:
 						$step_result = 'ERROR';
+						$additional_result_message = 'List #'.$this->get( 'info' ).' is not found in DB.';
 					}
 					break;
 
@@ -684,7 +685,7 @@ class AutomationStep extends DataObject
 	 */
 	function get_name()
 	{
-		$step_label = utf8_trim( $this->get( 'label' ) );
+		$step_label = utf8_substr( utf8_trim( $this->get( 'label' ) ), 0, 100 );
 		return '#'.$this->get( 'order' ).' - '
 			.( empty( $step_label ) ? step_get_type_title( $this->get( 'type' ) ) : $step_label );
 	}
@@ -1123,7 +1124,7 @@ class AutomationStep extends DataObject
 				break;
 		}
 
-		$this->set( 'label', utf8_substr( $label, 0, 500 ) );
+		$this->set( 'label', utf8_substr( utf8_trim( $label ), 0, 500 ) );
 	}
 }
 
