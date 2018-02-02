@@ -400,6 +400,11 @@ switch( $action )
 		break;
 
 	case 'blocked_new':
+		// Form to create new Email Address:
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
 		// Init Email Address to show on the form
 		$edited_EmailAddress = new EmailAddress();
 		break;
@@ -409,6 +414,9 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'email_blocked' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
 
 		$action = 'blocked_edit';
 		if( !isset( $edited_EmailAddress ) )
@@ -435,6 +443,9 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'email_blocked' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
 
 		// Make sure we got an emadr_ID:
 		param( 'emadr_ID', 'integer', true );
