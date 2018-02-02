@@ -3892,7 +3892,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	{
 		$message = add_email_tracking( $message, $mail_log_insert_ID, $email_key );
 		$message_data['full'] = add_email_tracking( $message_data['full'], $mail_log_insert_ID, $email_key );
-		$message_data = str_replace( array( '$secret_email_key_start$', '$secret_email_key_end$', '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
+		$message_data = str_replace( array( '$email_key_start$', '$email_key_end$', '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
 
 		if( mail_is_blocked( $to_email_address ) )
 		{ // Check if the email address is blocked

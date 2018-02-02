@@ -2330,6 +2330,11 @@ class Comment extends DataObject
 			), $params
 		);
 
+		if( $params['text'] == '#' )
+		{
+			$params['text'] = $action_icon;
+		}
+
 		echo $this->get_moderation_link( $params );
 		return true;
 	}
