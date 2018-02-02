@@ -71,7 +71,10 @@ if( !empty( $plugins_settings_content ) )
 	//$Form->end_fieldset();
 }
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+if( $current_User->check_perm( 'emails', 'edit' ) )
+{
+	$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+}
 
 $Form->end_form();
 
