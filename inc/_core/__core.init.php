@@ -1089,9 +1089,9 @@ class _core_Module extends Module
 		$perm_admin_restricted = $current_User->check_perm( 'admin', 'restricted' );
 		$perm_users_view = $current_User->check_perm( 'users', 'view' );
 		$perm_options = $current_User->check_perm( 'options', 'view' );
-		$perm_spam = $perm_options && $current_User->check_perm( 'spamblacklist', 'view' );
+		$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
 		$perm_emails = $current_User->check_perm( 'emails', 'view' );
-		$perm_maintenance = $current_User->check_perm( 'perm_maintenance', 'upgrade' );
+		$perm_maintenance = $current_User->check_perm( 'maintenance', 'upgrade' );
 		$entries = NULL;
 
 		$working_blog = get_working_blog();
