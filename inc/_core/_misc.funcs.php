@@ -3756,17 +3756,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $mail_log_insert_ID;
 
-	$message_data = $message;
-	if( is_array( $message_data ) && isset( $message_data['full'] ) )
-	{ // If content is multipart
-		$message = $message_data['full'];
-	}
-	elseif( is_string( $message_data ) )
-	{ // Convert $message_data to array
-		$message_data = array( 'full' => $message );
-	}
-
-
 	// Memorize email address
 	$to_email_address = $to;
 
@@ -3791,12 +3780,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	{
 		$from_name = user_get_notification_sender( $user_ID, 'name' );
 	}
-
-	// Pass these data for SMTP mailer
-	$message_data['to_email'] = $to;
-	$message_data['to_name'] = empty( $to_name ) ? NULL : $to_name;
-	$message_data['from_email'] = $from;
-	$message_data['from_name'] = empty( $from_name ) ? NULL : $from_name;
 
 	$return_path = $Settings->get( 'notification_return_path' );
 
@@ -3847,6 +3830,27 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	// COMPACT HEADERS:
 	$headerstring = get_mail_headers( $headers, $NL );
 
+	// Create initial email log with empty message
+	$email_key = generate_random_key();
+	mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key );
+
+	$message = str_replace( array( '$email_key$', '$mail_log_ID$' ), array( $email_key, $mail_log_insert_ID ), $message );
+	$message_data = $message;
+	if( is_array( $message_data ) && isset( $message_data['full'] ) )
+	{ // If content is multipart
+		$message = $message_data['full'];
+	}
+	elseif( is_string( $message_data ) )
+	{ // Convert $message_data to array
+		$message_data = array( 'full' => $message );
+	}
+
+	// Pass these data for SMTP mailer
+	$message_data['to_email'] = $to;
+	$message_data['to_name'] = empty( $to_name ) ? NULL : $to_name;
+	$message_data['from_email'] = $from;
+	$message_data['from_name'] = empty( $from_name ) ? NULL : $from_name;
+
 	// Set an additional parameter for the return path:
 	switch( $Settings->get( 'sendmail_params' ) )
 	{
@@ -3872,67 +3876,54 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$additional_parameters = '';
 	}
 
-	// Create initial email log with empty message:
-	$email_key = generate_random_key();
-	mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key );
+	// Remove markers from message that will be sent to actual email
+	$message_data = str_replace( array( '$email_key_start$', '$email_key_end$', '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
 
-	if( ! empty( $mail_log_insert_ID ) )
-	{
-// fp>erwin : not super urgent but I don't like it that you add tracking twice (waste of resources). Is it possible to optimize by changing order of code?
-		$message = add_email_tracking( $message, $mail_log_insert_ID, $email_key );
-		$message_data['full'] = add_email_tracking( $message_data['full'], $mail_log_insert_ID, $email_key );
-		$message_data = str_replace( array( '$email_key_start$', '$email_key_end$', '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
+	if( mail_is_blocked( $to_email_address ) )
+	{ // Check if the email address is blocked
+		$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
 
-		if( mail_is_blocked( $to_email_address ) )
-		{ // Check if the email address is blocked
-			$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
+		//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked', $email_key );
+		update_mail_log( $mail_log_insert_ID, 'blocked', $message );
 
-			//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked', $email_key );
-			update_mail_log( $mail_log_insert_ID, 'blocked', $message );
+		return false;
+	}
+
+	if( $email_send_simulate_only )
+	{	// The email sending is turned on simulation mode, Don't send a real message:
+		$send_mail_result = true;
+	}
+	else
+	{	// Send email message on real mode:
+		$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
+	}
+
+	if( ! $send_mail_result )
+	{	// The message has not been sent successfully
+		if( $debug > 1 )
+		{ // We agree to die for debugging...
+			//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
+			update_mail_log( $mail_log_insert_ID, 'error', $message );
+
+			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
+		}
+		else
+		{ // Soft debugging only....
+			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
+
+			//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
+			update_mail_log( $mail_log_insert_ID, 'error', $message );
 
 			return false;
 		}
-
-		if( $email_send_simulate_only )
-		{	// The email sending is in simulation mode, Don't send a real message:
-			$send_mail_result = true;
-		}
-		else
-		{	// Send email message on real mode:
-			$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
-		}
-
-		if( ! $send_mail_result )
-		{	// The message has not been sent successfully
-			if( $debug > 1 )
-			{ // We agree to die for debugging...
-				//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
-				update_mail_log( $mail_log_insert_ID, 'error', $message );
-
-				debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
-			}
-			else
-			{ // Soft debugging only....
-				$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
-
-				//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
-				update_mail_log( $mail_log_insert_ID, 'error', $message );
-
-				return false;
-			}
-		}
-
-		$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
-
-		//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $email_key );
-		update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
-
-		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
+
+	//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $email_key );
+	update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
+
+	return true;
 }
 
 
@@ -4145,8 +4136,6 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			$template_message .= $template_headers[ $format ]."\n\n";
 		}
 
-		$template_message .= '$message_body_'.$format.'_start$';
-
 		// Get mail template
 		ob_start();
 		emailskin_include( $template_name.$ext, $params );
@@ -4192,9 +4181,8 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			$formated_message = str_replace( '$name$', $params['anonymous_recipient_name'], $formated_message );
 		}
 
+		$formated_message = add_email_tracking( $formated_message, '$mail_log_ID$', '$email_key$', $format );
 		$template_message .= $formated_message;
-
-		$template_message .= '$message_body_'.$format.'_end$';
 
 		if( isset( $template_contents ) )
 		{ // Multipart content
@@ -8545,5 +8533,17 @@ function php_to_jquery_date_format( $php_format )
 	}
 
 	return $js_format;
+}
+
+
+/**
+ * Check if given string is HTML
+ *
+ * @param string String to check if HTML
+ * @return boolean True if string is HTML
+ */
+function is_html( $string )
+{
+	return $string != strip_tags( $string ) ? true : false;
 }
 ?>

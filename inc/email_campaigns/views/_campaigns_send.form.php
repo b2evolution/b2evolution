@@ -49,16 +49,16 @@ echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	echo '<div class="floatleft" style="width:50%">';
 	echo '<p><b>'.T_('HTML message').':</b></p>';
 	$html_mail_template = mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ), 'include_greeting' => false ), $current_User );
+	$html_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $html_mail_template );
 	// Clear all html tags that may break styles of main html page:
 	$html_mail_template = preg_replace( '#</?(html|head|meta|body)[^>]*>#i', '', $html_mail_template );
-	$html_mail_template = str_replace( array( '$message_body_html_start$', '$message_body_html_end$' ), '', $html_mail_template );
 	echo '<div style="overflow:auto">'.$html_mail_template.'</div>';
 	echo '</div>';
 
 	echo '<div class="floatright" style="width:49%">';
 	echo '<p><b>'.T_('Plain-text message').':</b></p>';
 	$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_plaintext' ), 'include_greeting' => false ), $current_User );
-	$text_mail_template = str_replace( array( '$message_body_text_start$', '$message_body_text_end$' ), '', $text_mail_template );
+	$text_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $text_mail_template );
 	echo '<div style="font-family:monospace;overflow:auto">'.nl2br( $text_mail_template ).'</div>';
 	echo '</div>';
 echo '</div>';
@@ -85,7 +85,7 @@ $Form->begin_fieldset( T_('Campaign recipients').get_manual_link( 'campaign-reci
 		$Form->checklist( array(
 				array( 'track_email_click_html', 1, T_('track clickthroughs in HTML version'), 1 ),
 				array( 'track_email_click_plain_text', 1, T_('track clickthroughs in plain text version'), 1 )
-			), 'track_email', T_('Track email') );
+			), 'track_email', T_('Track email opens') );
 		if( $Settings->get( 'email_campaign_send_mode' ) == 'cron' )
 		{	// Asynchronous sending mode:
 			if( $edited_EmailCampaign->get_Cronjob() )
@@ -114,6 +114,10 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
 
 	$Form->begin_fieldset( T_('Send test email').get_manual_link( 'campaign-send-test-panel' ) );
+		$Form->checklist( array(
+			array( 'track_test_email_click_html', 1, T_('track clickthroughs in HTML version'), 1 ),
+			array( 'track_test_email_click_plain_text', 1, T_('track clickthroughs in plain text version'), 1 )
+		), 'track_test_email', T_('Track email opens') );
 		$Form->text_input( 'test_email_address', $Session->get( 'test_campaign_email' ), 30, T_('Email address'), T_('Fill your email address and press button "Send test email" if you want to test this list'), array( 'maxlength' => 255 ) );
 		$test_button = array( array( 'name' => 'actionArray[test]', 'value' => T_('Send test email'), 'class' => 'SaveButton btn btn-primary' ) );
 		$Form->buttons_input( $test_button );

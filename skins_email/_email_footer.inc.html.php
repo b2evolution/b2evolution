@@ -37,17 +37,15 @@ if( ! empty( $params['recipient_User'] ) )
 }
 echo "</p>\n";
 
-if( ! empty( $params['recipient_User'] ) )
-{
-	echo '<p'.emailskin_style( '.p' ).'><b>'.T_( 'Too many emails?' ).'</b><br />'."\n";
-	echo sprintf( T_('To configure the emails you receive, click here: <a %s>edit notification preferences</a>.'), 'href="'.get_notifications_url( '&amp;', $recipient_user_ID ).'"'.emailskin_style( '.a' ) );
-	if( !empty( $params['unsubscribe_text'] ) )
-	{ // Display the unsubscribe message with link
-		echo "<br />\n";
-		echo $params['unsubscribe_text'];
-	}
-	echo "</p>\n";
+echo '<p'.emailskin_style( '.p' ).'><b>'.T_( 'Too many emails?' ).'</b><br />'."\n";
+echo sprintf( T_('To configure the emails you receive, click here: <a %s>edit notification preferences</a>.'), 'href="'.get_notifications_url( '&amp;', $recipient_user_ID ).'"'.emailskin_style( '.a' ) );
+if( !empty( $params['unsubscribe_text'] ) )
+{ // Display the unsubscribe message with link
+	echo "<br />\n";
+	echo $params['unsubscribe_text'];
 }
+echo "</p>\n";
+
 echo '<p'.emailskin_style( '.p+p.center' ).'><img'.emailskin_style( '.img+img.b2evo' ).' src="'.$rsc_url.'img/powered-by-b2evolution-120t.gif" alt="Powered by b2evolution" /></p>';
 ?>
 

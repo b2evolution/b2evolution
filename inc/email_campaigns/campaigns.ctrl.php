@@ -251,6 +251,10 @@ switch( $action )
 
 	case 'test':
 		// Send test email
+		global $track_email_click_html, $track_email_click_plain_text;
+
+		$track_email_click_html = param( 'track_test_email_click_html', 'boolean', 0 );
+		$track_email_click_plain_text = param( 'track_test_email_click_plain_text', 'boolean', 0 );
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'campaign' );
