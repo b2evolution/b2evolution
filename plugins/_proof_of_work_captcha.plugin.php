@@ -107,7 +107,16 @@ class proof_of_work_captcha_plugin extends Plugin
 					'type'         => 'integer',
 					'defaultvalue' => 1024,
 					'valid_range'  => array(
-						'min' => 1,
+						'min' => 256,
+					),
+				),
+				'hash_num_suspect' => array(
+					'label'        => $this->T_('Number of hashes for suspected countries'),
+					'note'         => $this->T_('Plugin "GeoIP" must be enabled for using of this setting.'),
+					'type'         => 'integer',
+					'defaultvalue' => 10240,
+					'valid_range'  => array(
+						'min' => 256,
 					),
 				),
 			);
@@ -209,6 +218,18 @@ class proof_of_work_captcha_plugin extends Plugin
 			return;
 		}
 
+		$Plugins_admin = & get_Plugins_admin();
+		if( ( $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) ) &&
+		    ( $Country = $geoip_Plugin->get_country_by_IP( get_ip_list( true ) ) ) &&
+		    ( $Country->get( 'status' ) == 'suspect' ) )
+		{	// Use special setting when country can be detected by IP address and it is suspected:
+			$plugin_hash_num = $this->Settings->get( 'hash_num_suspect' );
+		}
+		else
+		{	// Use normal setting for number of hashes:
+			$plugin_hash_num = $this->Settings->get( 'hash_num' );
+		}
+
 		if( ! isset( $params['Form'] ) )
 		{	// there's no Form where we add to, but we create our own form:
 			$Form = new Form( regenerate_url() );
@@ -224,7 +245,7 @@ class proof_of_work_captcha_plugin extends Plugin
 		}
 
 		$Form->info( $this->T_('Antispam'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>
-			<div class="coinhive-captcha" data-hashes="'.format_to_output( $this->Settings->get( 'hash_num' ), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]:not([name$=\'[preview]\'])">
+			<div class="coinhive-captcha" data-hashes="'.format_to_output( $plugin_hash_num, 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]:not([name$=\'[preview]\'])">
 				<em>'.$this->T_('Loading Captcha...<br>If it doesn\'t load, please disable Adblock!').'</em>
 			</div>' );
 
