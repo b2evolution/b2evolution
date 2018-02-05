@@ -66,6 +66,12 @@ class proof_of_work_captcha_plugin extends Plugin
 		global $Settings;
 
 		return array(
+				'use_for_anonymous_item' => array(
+					'label' => $this->T_('Use for anonymous item forms'),
+					'defaultvalue' => 1,
+					'note' => $this->T_('Should this plugin be used for anonymous users on item forms?'),
+					'type' => 'checkbox',
+				),
 				'use_for_anonymous_comment' => array(
 					'label' => $this->T_('Use for anonymous comment forms'),
 					'defaultvalue' => 1,
@@ -175,7 +181,7 @@ class proof_of_work_captcha_plugin extends Plugin
 		}
 
 		// Display error message if captcha verifying has been failed:
-		$Messages->add( $this->T_('Captcha has not been verified successfully!'), 'error' );
+		$Messages->add_to_group( $this->T_('Antispam has not been verified successfully!'), 'error', T_('Validation errors:') );
 
 		return false;
 	}
@@ -235,6 +241,31 @@ class proof_of_work_captcha_plugin extends Plugin
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * We display our captcha with item forms.
+	 */
+	function DisplayItemFormFieldset( & $params )
+	{
+		$params['form_type'] = 'comment';
+		$this->CaptchaPayload( $params );
+	}
+
+
+	/**
+	 * Validate the answer against our stored one.
+	 *
+	 * In case of error we add a message of category 'error' which prevents the item from
+	 * being posted.
+	 *
+	 * @param array Associative array of parameters.
+	 */
+	function AdminBeforeItemEditCreate( & $params )
+	{
+		$params['form_type'] = 'item';
+		$this->CaptchaValidated( $params );
 	}
 
 
@@ -321,6 +352,13 @@ class proof_of_work_captcha_plugin extends Plugin
 	{
 		switch( $form_type )
 		{
+			case 'item':
+				if( !is_logged_in() )
+				{
+					return $this->Settings->get( 'use_for_anonymous_item' );
+				}
+				break;
+
 			case 'comment':
 				if( !is_logged_in() )
 				{
