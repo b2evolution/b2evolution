@@ -30,15 +30,13 @@ if( ! empty( $params['recipient_User'] ) )
 }
 echo "\n\n";
 
-if( ! empty( $params['recipient_User'] ) )
-{
-	echo T_( 'Too many emails?' )."\n";
-	echo sprintf( T_('To edit your email notification preferences, click here: %s'), get_notifications_url( '&', $recipient_user_ID ) );
-	if( !empty( $params['unsubscribe_text'] ) )
-	{ // Display the unsubscribe message with link
-		echo "\n".$params['unsubscribe_text'];
-	}
-	echo "\n\n";
+echo T_( 'Too many emails?' )."\n";
+echo sprintf( T_('To edit your email notification preferences, click here: %s'), get_notifications_url( '&', $recipient_user_ID ) );
+if( !empty( $params['unsubscribe_text'] ) )
+{ // Display the unsubscribe message with link
+	echo "\n".$params['unsubscribe_text'];
 }
+echo "\n\n";
+
 echo 'Powered by b2evolution'."\n";
 ?>

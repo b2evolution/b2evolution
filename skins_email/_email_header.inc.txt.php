@@ -19,6 +19,6 @@ $params = array_merge( array(
 
 if( $params['include_greeting'] )
 { // Display the greeting message
-	echo sprintf( T_( 'Hello %s!' ), '$username$' )."\n\n";
+	echo sprintf( T_( 'Hello %s!' ), empty( $params['recipient_User'] ) ? '$name$' : '$username$' )."\n\n";
 }
 ?>

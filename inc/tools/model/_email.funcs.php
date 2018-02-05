@@ -304,6 +304,8 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 	/**
 	 * @var integer|NULL This global var stores ID of the last inserted mail log
 	 */
+// TODO fp>erwin: why do we need a global below? Why don't we just return $DB->insert_id; ?
+// erwin>fp: I agree that we should just return $DB->insert_id but this is how it was done before and I never changed it for fear of breaking something somewhere.
 	global $mail_log_insert_ID;
 	$mail_log_insert_ID = NULL;
 
@@ -816,7 +818,7 @@ function evo_mail( $to, $subject, $message, $headers = array(), $additional_para
 			// SMTP sending is preferred:
 			$result = evo_mail_smtp( $to, $subject, $message_data, $headers );
 			if( ! $result && $Settings->get( 'force_email_sending' ) )
-			{	// SMTP sending was failed, Try to send email by php "mail" function:
+			{	// SMTP sending failed, Fallback to sending email by php "mail" function:
 				$result = evo_mail_php( $to, $subject, $message, $headers, $additional_parameters );
 			}
 			break;
@@ -826,7 +828,7 @@ function evo_mail( $to, $subject, $message, $headers = array(), $additional_para
 			// PHP "mail" function is preferred:
 			$result = evo_mail_php( $to, $subject, $message, $headers, $additional_parameters );
 			if( ! $result && $Settings->get( 'force_email_sending' ) )
-			{	// "mail" function was failed, Try to send email by SMTP Swift Mailer:
+			{	// "mail" function failed, Fallback to sending email by SMTP Swift Mailer:
 				$result = evo_mail_smtp( $to, $subject, $message_data, $headers );
 			}
 			break;
@@ -1194,7 +1196,7 @@ function php_email_sending_test()
  * @param string Email key
  * @return string Message with email tracking
  */
-function add_email_tracking( $message, $email_ID, $email_key )
+function add_email_tracking( $message, $email_ID, $email_key, $content_type = 'auto' )
 {
 	global $track_email_click_html, $track_email_click_plain_text;
 
@@ -1210,42 +1212,48 @@ function add_email_tracking( $message, $email_ID, $email_key )
 		debug_die( 'No email key specified.' );
 	}
 
-	// Plain text content
-	if( ! isset( $track_email_click_plain_text ) || $track_email_click_plain_text == 1 )
+	if( $content_type == 'auto' )
 	{
-		preg_match( '/(?<=\$message_body_text_start\$)(?s)(.*)(?=\$message_body_text_end\$)/', $message, $matches );
-		$plain_text_content = $matches[0];
-
-		// Add link click tracking
-		//$re = '/(<a\b.+\bhref=")([^"]*)(")/';
-		$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#';
-		$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text' );
-		$plain_text_content = preg_replace_callback( $re, array( $callback, 'callback' ), $plain_text_content );
-
-		$message = preg_replace( '/(?<=\$message_body_text_start\$)(?s)(.*)(?=\$message_body_text_end\$)/', $plain_text_content, $message );
+		if( is_html( $message ) )
+		{
+			$content_type = 'html';
+		}
+		else
+		{
+			$content_type = 'text';
+		}
 	}
 
-	// HTML content
-	preg_match( '/(?<=\$message_body_html_start\$)(?s)(.*)(?=\$message_body_html_end\$)/', $message, $matches );
-	$html_content = $matches[0];
-
-	// Add email open tracking to first image
-	$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
-	$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key );
-	$html_content = preg_replace_callback( $re, array( $callback, 'callback' ), $html_content, 1 );
-
-	if( ! isset( $track_email_click_html ) || $track_email_click_html == 1  )
+	switch( $content_type )
 	{
-		// Add link click tracking
-		$re = '/(<a\b.+\bhref=")([^"]*)(")/';
-		$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key );
-		$html_content = preg_replace_callback( $re, array( $callback, 'callback' ), $html_content );
+		case 'text':
+			// Add link click tracking
+			if( ! isset( $track_email_click_plain_text ) || $track_email_click_plain_text == 1 )
+			{
+				$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#';
+				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text' );
+				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
+			}
+			return $message;
+
+		case 'html':
+			// Add email open tracking to first image
+			$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
+			$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key );
+			$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message, 1 );
+
+			if( ! isset( $track_email_click_html ) || $track_email_click_html == 1  )
+			{
+				// Add link click tracking
+				$re = '/(<a\b.+\bhref=")([^"]*)(")/';
+				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key );
+				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
+			}
+			return $message;
+
+		default:
+			debug_die( 'Invalid content type' );
 	}
 
-	$message = preg_replace( '/(?<=\$message_body_html_start\$)(?s)(.*)(?=\$message_body_html_end\$)/', $html_content, $message );
-
-	$message = str_replace( array( '$message_body_text_start$', '$message_body_text_end$', '$message_body_html_start$', '$message_body_html_end$' ), '', $message );
-
-	return $message;
 }
 ?>

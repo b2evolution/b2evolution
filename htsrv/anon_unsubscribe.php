@@ -59,6 +59,7 @@ switch( $type )
 				.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')
 				."\n\n"
 				.T_('If it was not you that requested this, simply ignore this email.');
+			$message = add_email_tracking( $message, '$mail_log_ID$', '$email_key$' );
 
 			if( send_mail( $anon_email, NULL, T_('Confirm opt-out for emails through message form'), $message ) )
 			{

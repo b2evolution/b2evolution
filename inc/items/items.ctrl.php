@@ -1649,7 +1649,7 @@ switch( $action )
 		$ItemCache = & get_ItemCache();
 		if( ! ( $dest_Item = & $ItemCache->get_by_ID( $dest_post_ID, false, false ) ) )
 		{	// If Item doesn't exist in DB:
-			$Messages->add( T_('Wrong selected item for merging, please try again.'), 'error' );
+			$Messages->add( 'Item to merge does not exist any more.'), 'error' );
 			// REDIRECT / EXIT
 			header_redirect();
 		}

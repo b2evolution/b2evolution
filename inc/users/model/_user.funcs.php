@@ -5956,7 +5956,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Send date'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'center nowrap',
+				'td_class' => 'timestamp compact_data',
 				'order' => 'emlog_timestamp',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #emlog_timestamp# )%',
@@ -5968,7 +5968,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last opened'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'center nowrap',
+				'td_class' => 'timestamp compact_data',
 				'order' => 'emlog_last_open_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #emlog_last_open_ts# )%',
@@ -5977,7 +5977,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last clicked'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'center nowrap',
+				'td_class' => 'timestamp compact_data',
 				'order' => 'emlog_last_click_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #emlog_last_click_ts# )%',
@@ -6033,7 +6033,7 @@ function users_results( & $UserList, $params = array() )
 	}
 
 	if( $params['display_enls_send_count'] )
-	{ // Display email campaign send date:
+	{ // Display email campaign send count:
 		$UserList->cols[] = array(
 				'th' => T_('# of campaigns sent'),
 				'th_class' => 'shrinkwrap',
@@ -6558,7 +6558,7 @@ function user_td_emlog_date( $emlog_date )
 {
 	if( ! empty( $emlog_date ) )
 	{
-		return mysql2localedatetime( $emlog_date );
+		return mysql2localedatetime_spans( $emlog_date );
 	}
 
 	return NULL;
