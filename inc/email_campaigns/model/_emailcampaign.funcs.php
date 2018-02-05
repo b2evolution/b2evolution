@@ -215,7 +215,7 @@ function campaign_results_block( $params = array() )
 	$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
 			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
 			enlt_ID, enlt_name,
-			COUNT(*) AS send_count,
+			SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS send_count,
 			SUM( IF( emlog_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
 			SUM( IF( emlog_last_click_ts IS NULL, 0, 1 ) ) AS click_count' );
 	$SQL->FROM( 'T_email__campaign' );
