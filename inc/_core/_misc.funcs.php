@@ -3828,12 +3828,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
 
-	// Convert encoding of message (from internal encoding to the one of the message):
-	// fp> why do we actually convert to $current_charset?
-	// dh> I do not remember. Appears to make sense sending it unconverted in $evo_charset.
-	// asimo> converting the message creates wrong output, no need for conversion, however this needs further investigation
-	// $message = convert_charset( $message, $current_charset, $evo_charset );
-
 	if( !isset( $headers['Content-Type'] ) )
 	{	// Specify charset and content-type of email
 		$headers['Content-Type'] = 'text/plain; charset='.$current_charset;
@@ -3878,12 +3872,13 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$additional_parameters = '';
 	}
 
-	// Create initial email log with empty message
+	// Create initial email log with empty message:
 	$email_key = generate_random_key();
 	mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key );
 
 	if( ! empty( $mail_log_insert_ID ) )
 	{
+// fp>erwin : not super urgent but I don't like it that you add tracking twice (waste of resources). Is it possible to optimize by changing order of code?
 		$message = add_email_tracking( $message, $mail_log_insert_ID, $email_key );
 		$message_data['full'] = add_email_tracking( $message_data['full'], $mail_log_insert_ID, $email_key );
 		$message_data = str_replace( array( '$email_key_start$', '$email_key_end$', '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
@@ -3899,7 +3894,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		}
 
 		if( $email_send_simulate_only )
-		{	// The email sending is turned on simulation mode, Don't send a real message:
+		{	// The email sending is in simulation mode, Don't send a real message:
 			$send_mail_result = true;
 		}
 		else

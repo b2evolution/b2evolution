@@ -816,7 +816,7 @@ function evo_mail( $to, $subject, $message, $headers = array(), $additional_para
 			// SMTP sending is preferred:
 			$result = evo_mail_smtp( $to, $subject, $message_data, $headers );
 			if( ! $result && $Settings->get( 'force_email_sending' ) )
-			{	// SMTP sending was failed, Try to send email by php "mail" function:
+			{	// SMTP sending failed, Fallback to sending email by php "mail" function:
 				$result = evo_mail_php( $to, $subject, $message, $headers, $additional_parameters );
 			}
 			break;
@@ -826,7 +826,7 @@ function evo_mail( $to, $subject, $message, $headers = array(), $additional_para
 			// PHP "mail" function is preferred:
 			$result = evo_mail_php( $to, $subject, $message, $headers, $additional_parameters );
 			if( ! $result && $Settings->get( 'force_email_sending' ) )
-			{	// "mail" function was failed, Try to send email by SMTP Swift Mailer:
+			{	// "mail" function failed, Fallback to sending email by SMTP Swift Mailer:
 				$result = evo_mail_smtp( $to, $subject, $message_data, $headers );
 			}
 			break;
