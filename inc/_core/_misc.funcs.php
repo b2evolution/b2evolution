@@ -4024,7 +4024,9 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 
 		// Autoinsert user's data
 		$subject = mail_autoinsert_user_data( $subject, $User );
-		$message = mail_autoinsert_user_data( $message, $User );
+
+		// erhsatingin > moved to mail_template()
+		//$message = mail_autoinsert_user_data( $message, $User );
 
 		$to_email = !empty( $force_email_address ) ? $force_email_address : $User->email;
 
@@ -4175,6 +4177,8 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			}
 			$formated_message = str_replace( array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$' ),
 					array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login ), $formated_message );
+
+			$formated_message = mail_autoinsert_user_data( $formated_message, $User );
 		}
 		elseif( ! empty( $params['anonymous_recipient_name'] ) )
 		{

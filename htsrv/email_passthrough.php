@@ -39,6 +39,9 @@ switch( $type )
 			$redirect_to = $baseurl;
 		}
 
+		// erhsatingin > Is this acceptable? This seems like an ugly hack...
+		$redirect_to = str_replace( '&amp;', '&', $redirect_to );
+
 		// header_redirect can prevent redirection depending on some advanced settings like $allow_redirects_to_different_domain!
 		// header_redirect( $redirect_to, 303 ); // Will EXIT
 		header( 'Location: '.$redirect_to, true, 303 ); // explictly setting the status is required for (fast)cgi
