@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2018-01-21 03:30+0100\n"
+"POT-Creation-Date: 2018-02-05 01:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Alexander Osokin <alex.osokin@gmail.com>, 2017\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/fplanque/teams/23/ru_RU/)\n"
@@ -69,7 +69,7 @@ msgstr "Удалить"
 #: ../../../inc/files/views/_file_delete.form.php:53
 #: ../../../inc/files/views/_file_duplicates.view.php:149
 #: ../../../inc/files/views/_file_list.inc.php:494
-#: ../inc/items/items.ctrl.php:1927
+#: ../inc/items/items.ctrl.php:1926
 #: ../../../inc/messaging/model/_messaging.funcs.php:2287
 #: ../../../inc/messaging/model/_messaging.funcs.php:2292
 #: ../../../inc/messaging/model/_messaging.funcs.php:2421
@@ -106,24 +106,24 @@ msgid "New window"
 msgstr "Новое окно"
 
 #: ../../../conf/_icons.php:264 ../conf/_icons.php:288
-#: ../../../inc/_core/_misc.funcs.php:7522
+#: ../../../inc/_core/_misc.funcs.php:7542
 msgid "Expand"
 msgstr "Развернуть"
 
 #: ../../../conf/_icons.php:276 ../conf/_icons.php:297
-#: ../../../inc/_core/_misc.funcs.php:7516
+#: ../../../inc/_core/_misc.funcs.php:7536
 msgid "Collapse"
 msgstr "Свернуть"
 
 #: ../../../conf/_icons.php:307
 #: ../inc/chapters/views/_chapter_list.view.php:249
-#: ../../../inc/collections/coll_settings.ctrl.php:626
+#: ../../../inc/collections/coll_settings.ctrl.php:628
 #: ../../../inc/cron/views/_cronjob_list.view.php:171
 #: ../../../inc/items/views/_item_list_full.view.php:403
 #: ../../../inc/links/model/_link.funcs.php:201
 #: ../../../inc/links/model/_link.funcs.php:202
 #: ../../../inc/tools/views/_wpxml_file.form.php:41
-#: ../../../inc/users/model/_user.funcs.php:5445
+#: ../../../inc/users/model/_user.funcs.php:5453
 msgid "Refresh"
 msgstr "Обновить"
 
@@ -155,10 +155,11 @@ msgstr "Информация"
 #: ../../../inc/messaging/model/_messaging.funcs.php:1916
 #: ../../../inc/messaging/views/_contact_list.view.php:334
 #: ../../../inc/sessions/views/_stats_refdomains.view.php:153
-#: ../../../inc/tools/views/_email_address.view.php:65
+#: ../../../inc/tools/views/_email_address.view.php:68
 #: ../../../inc/tools/views/_email_return.view.php:84
 #: ../../../inc/tools/views/_email_sent.view.php:84
-#: ../../../inc/users/model/_user.funcs.php:6211
+#: ../../../inc/users/model/_user.funcs.php:5710
+#: ../../../inc/users/model/_user.funcs.php:6252
 #: ../../../inc/users/views/_user_admin.form.php:194
 #: ../../../inc/users/views/_user_admin.form.php:196
 #: ../../../inc/users/views/_user_identity.form.php:148
@@ -196,8 +197,8 @@ msgstr "Email"
 msgid "WWW"
 msgstr "WWW"
 
-#: ../../../conf/_icons.php:363 ../inc/users/model/_user.funcs.php:5866
-#: ../../../inc/users/model/_user.funcs.php:5867
+#: ../../../conf/_icons.php:363 ../inc/users/model/_user.funcs.php:5886
+#: ../../../inc/users/model/_user.funcs.php:5887
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:305
 #: ../../../skins/touch/_item_comment_form.inc.php:245
 #: ../../../skins_email/comment_new.txt.php:67
@@ -252,14 +253,14 @@ msgstr "Выберите"
 
 #: ../../../conf/_icons.php:425 ../conf/_icons.php:432
 #: ../../../inc/_core/__core.init.php:1299
-#: ../../../inc/collections/coll_settings.ctrl.php:814
+#: ../../../inc/collections/coll_settings.ctrl.php:817
 #: ../../../inc/comments/_comments.ctrl.php:243
 #: ../../../inc/dashboard/model/_dashboard.funcs.php:374
 #: ../../../inc/dashboard/model/_dashboard.funcs.php:518
 #: ../../../inc/files/_files.init.php:237 ../inc/files/_files.init.php:253
 #: ../../../inc/files/_files.init.php:268
 #: ../inc/files/views/_file_links.view.php:44
-#: ../../../inc/items/items.ctrl.php:788 ../inc/items/items.ctrl.php:885
+#: ../../../inc/items/items.ctrl.php:787 ../inc/items/items.ctrl.php:884
 #: ../../../inc/items/model/_item.funcs.php:3499
 #: ../../../inc/items/views/_item_list_full.view.php:328
 #: ../../../inc/locales/_locale_settings.form.php:296
@@ -308,7 +309,7 @@ msgid "Cleanup"
 msgstr "Очистить"
 
 #: ../../../conf/_icons.php:510 ../inc/_core/_misc.funcs.php:3142
-#: ../../../inc/_core/_misc.funcs.php:7446
+#: ../../../inc/_core/_misc.funcs.php:7466
 #: ../inc/_core/_template.funcs.php:1251
 #: ../../../inc/files/model/_file.funcs.php:2282
 #: ../../../inc/users/model/_user.funcs.php:2447
@@ -421,9 +422,9 @@ msgid "Online Manual"
 msgstr "Онлайн руководство"
 
 #: ../../../conf/_icons.php:674 ../inc/_core/__core.init.php:1287
-#: ../../../inc/comments/model/_comment.class.php:2576
-#: ../../../inc/comments/model/_comment.class.php:2584
-#: ../../../inc/items/items.ctrl.php:1937
+#: ../../../inc/comments/model/_comment.class.php:2581
+#: ../../../inc/comments/model/_comment.class.php:2589
+#: ../../../inc/items/items.ctrl.php:1936
 #: ../../../inc/items/model/_itemlight.class.php:1185
 #: ../../../inc/items/model/_itemlight.class.php:1193
 #: ../../../inc/items/views/_item_list_full.view.php:139
@@ -431,8 +432,8 @@ msgstr "Онлайн руководство"
 msgid "Permalink"
 msgstr "Постоянная ссылка"
 
-#: ../../../conf/_icons.php:681 ../inc/items/items.ctrl.php:1957
-#: ../../../inc/items/items.ctrl.php:1958
+#: ../../../conf/_icons.php:681 ../inc/items/items.ctrl.php:1956
+#: ../../../inc/items/items.ctrl.php:1957
 #: ../../../inc/items/views/_item_list_full.view.php:298
 msgid "History"
 msgstr "История"
@@ -454,7 +455,7 @@ msgstr "Разрешить только для администраторов"
 #: ../../../inc/collections/_collections.init.php:740
 #: ../../../inc/collections/_collections.init.php:782
 #: ../../../inc/collections/coll_settings.ctrl.php:592
-#: ../../../inc/collections/coll_settings.ctrl.php:1010
+#: ../../../inc/collections/coll_settings.ctrl.php:1013
 #: ../../../inc/collections/views/_coll_other.form.php:43
 #: ../../../inc/comments/_comments.ctrl.php:197
 #: ../../../inc/dashboard/dashboard.ctrl.php:137
@@ -622,21 +623,21 @@ msgid "Action for selected elements"
 msgstr "Действие для выбранных элементов"
 
 #: ../../../conf/_icons.php:1111 ../htsrv/viewfile.php:152
-#: ../../../inc/users/model/_user.class.php:5656
+#: ../../../inc/users/model/_user.class.php:5663
 msgid "Rotate this picture 90&deg; to the right"
 msgstr "Повернуть это фото на 90&deg; по часовой стрелке"
 
 #: ../../../conf/_icons.php:1117 ../htsrv/viewfile.php:150
-#: ../../../inc/users/model/_user.class.php:5654
+#: ../../../inc/users/model/_user.class.php:5661
 msgid "Rotate this picture 90&deg; to the left"
 msgstr "Повернуть это фото на 90&deg; против часовой стрелки"
 
 #: ../../../conf/_icons.php:1123 ../htsrv/viewfile.php:151
-#: ../../../inc/users/model/_user.class.php:5655
+#: ../../../inc/users/model/_user.class.php:5662
 msgid "Rotate this picture 180&deg;"
 msgstr "Повернуть это фото на 180&deg;"
 
-#: ../../../conf/_icons.php:1129 ../inc/users/model/_user.class.php:5827
+#: ../../../conf/_icons.php:1129 ../inc/users/model/_user.class.php:5834
 msgid "Crop this picture"
 msgstr "Обрезать это изображение"
 
@@ -648,10 +649,10 @@ msgstr "Почтовое уведомление"
 #: ../../../conf/_icons.php:1144 ../inc/_core/__core.init.php:1266
 #: ../../../inc/_core/__core.init.php:1299 ../inc/_core/__core.init.php:1334
 #: ../../../inc/collections/_search.funcs.php:806
-#: ../../../inc/collections/model/_blog.class.php:5369
+#: ../../../inc/collections/model/_blog.class.php:5370
 #: ../../../inc/comments/model/_comment.funcs.php:1272
-#: ../../../inc/items/items.ctrl.php:787 ../inc/items/items.ctrl.php:884
-#: ../../../inc/items/items.ctrl.php:2017
+#: ../../../inc/items/items.ctrl.php:786 ../inc/items/items.ctrl.php:883
+#: ../../../inc/items/items.ctrl.php:2016
 #: ../inc/items/model/_item.funcs.php:532
 #: ../../../inc/items/model/_itemtypecache.class.php:93
 #: ../../../inc/items/views/_file_create_posts.form.php:126
@@ -727,25 +728,25 @@ msgstr "Блог #%d"
 msgid "Add a new collection"
 msgstr "Добавить новую коллекцию"
 
-#: ../../../default.php:171 ../install/index.php:1338
+#: ../../../default.php:171 ../install/index.php:1344
 #: ../../../skins_adm/conf_error.main.php:78
 #: ../../../skins_adm/conf_error.main.template.php:73
 msgid "GitHub page"
 msgstr "GitHub страница"
 
-#: ../../../default.php:173 ../install/index.php:1340
+#: ../../../default.php:173 ../install/index.php:1346
 #: ../../../skins_adm/conf_error.main.php:80
 #: ../../../skins_adm/conf_error.main.template.php:75
 msgid "Find a host"
 msgstr "Найти хостинг"
 
-#: ../../../default.php:174 ../install/debug.php:388 ../install/index.php:1341
+#: ../../../default.php:174 ../install/debug.php:388 ../install/index.php:1347
 #: ../../../skins_adm/conf_error.main.php:81
 #: ../../../skins_adm/conf_error.main.template.php:76
 msgid "Online manual"
 msgstr "Онлайн руководство"
 
-#: ../../../default.php:175 ../install/index.php:1342
+#: ../../../default.php:175 ../install/index.php:1348
 #: ../../../skins_adm/conf_error.main.php:82
 #: ../../../skins_adm/conf_error.main.template.php:77
 msgid "Help forums"
@@ -842,7 +843,7 @@ msgstr "Определенные критерии"
 #: ../../../inc/tools/model/_email.funcs.php:25
 #: ../../../inc/tools/model/_system.funcs.php:442
 #: ../../../inc/tools/model/_system.funcs.php:472
-#: ../../../inc/users/model/_user.funcs.php:6500
+#: ../../../inc/users/model/_user.funcs.php:6541
 #: ../../../inc/users/views/_user_identity.form.php:303
 #: ../../../inc/users/views/_user_identity.form.php:316
 #: ../../../inc/users/views/_user_identity.form.php:329
@@ -866,7 +867,7 @@ msgstr "Для ввода несколькох значений,<br/> пожал
 msgid "Comment cannot be updated!"
 msgstr "Комментарий не может быть обновлен!"
 
-#: ../../../htsrv/anon_async.php:1125 ../inc/users/model/_user.funcs.php:5700
+#: ../../../htsrv/anon_async.php:1125 ../inc/users/model/_user.funcs.php:5720
 #: ../../../inc/users/views/_organization_user.form.php:42
 #: ../../../inc/users/views/_organization_user_edit.form.php:49
 #: ../../../inc/users/views/_organization_user_edit.form.php:53
@@ -884,14 +885,14 @@ msgstr "Роль"
 msgid "Organization"
 msgstr "Организация"
 
-#: ../../../htsrv/anon_async.php:1204 ../inc/users/model/_user.funcs.php:5606
-#: ../../../inc/users/model/_user.funcs.php:6468
+#: ../../../htsrv/anon_async.php:1204 ../inc/users/model/_user.funcs.php:5616
+#: ../../../inc/users/model/_user.funcs.php:6509
 #: ../../../inc/users/views/_organization_user.form.php:38
 #: ../../../inc/users/views/_organization_user_edit.form.php:43
 msgid "Accepted"
 msgstr "Принято"
 
-#: ../../../htsrv/anon_async.php:1208 ../inc/users/model/_user.funcs.php:6472
+#: ../../../htsrv/anon_async.php:1208 ../inc/users/model/_user.funcs.php:6513
 msgid "Not accepted"
 msgstr "Не принято"
 
@@ -991,7 +992,7 @@ msgstr "действие: %s"
 #: ../../../inc/collections/views/_coll_advanced.form.php:213
 #: ../../../inc/collections/views/_coll_comments.form.php:301
 #: ../../../inc/collections/views/_coll_contact.form.php:81
-#: ../../../inc/collections/views/_coll_features.form.php:292
+#: ../../../inc/collections/views/_coll_features.form.php:301
 #: ../../../inc/collections/views/_coll_general.form.php:403
 #: ../../../inc/collections/views/_coll_group_perm.form.php:112
 #: ../../../inc/collections/views/_coll_home.form.php:74
@@ -1049,7 +1050,7 @@ msgstr "действие: %s"
 #: ../inc/slugs/views/_slug.form.php:45
 #: ../../../inc/tools/views/_email_address.form.php:54
 #: ../../../inc/tools/views/_email_other.form.php:60
-#: ../../../inc/tools/views/_email_renderers.form.php:74
+#: ../../../inc/tools/views/_email_renderers.form.php:76
 #: ../../../inc/tools/views/_email_return_settings.form.php:111
 #: ../../../inc/tools/views/_email_settings.form.php:83
 #: ../../../inc/tools/views/_email_smtp.form.php:133
@@ -1084,7 +1085,7 @@ msgstr "Сохранить Изменения!"
 #: ../../../inc/files/views/_file_create_zip.form.php:45
 #: ../../../inc/files/views/_file_download.form.php:42
 #: ../../../inc/files/views/_file_list.inc.php:660
-#: ../inc/items/items.ctrl.php:1981
+#: ../inc/items/items.ctrl.php:1980
 #: ../../../inc/items/views/_itemtag.form.php:37
 #: ../../../inc/links/views/_link_list.view.php:199
 #: ../../../inc/links/views/_link_list.view.php:202
@@ -1106,7 +1107,7 @@ msgstr "Сохранить Изменения!"
 #: ../../../inc/users/views/_usertag.form.php:37
 #: ../../../inc/widgets/views/_widget_list_available.view.php:18
 #: ../../../install/index.php:780 ../install/index.php:923
-#: ../install/index.php:1291
+#: ../install/index.php:1297
 #: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:416
 msgid "Cancel"
 msgstr "Отмена"
@@ -1134,7 +1135,7 @@ msgid "No status"
 msgstr "Нет статуса"
 
 #. TRANS: the default value for option lists where "None" is allowed
-#: ../../../htsrv/async.php:827 ../inc/_core/_misc.funcs.php:6025
+#: ../../../htsrv/async.php:827 ../inc/_core/_misc.funcs.php:6045
 #: ../../../inc/_core/model/dataobjects/_dataobjectcache.class.php:161
 #: ../../../inc/_core/ui/results/_resultsel.class.php:304
 #: ../../../inc/collections/views/_coll_advanced.form.php:139
@@ -1151,14 +1152,14 @@ msgstr "Нет статуса"
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:123
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:136
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:148
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:114
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:100
 #: ../../../inc/widgets/widgets/_org_members.widget.php:181
 #: ../../../plugins/shortlinks_plugin/_shortlinks.plugin.php:1006
 msgid "None"
 msgstr "Нет"
 
 #: ../../../htsrv/async.php:902 ../htsrv/async.php:933 ../htsrv/async.php:954
-#: ../../../inc/_core/_misc.funcs.php:7447
+#: ../../../inc/_core/_misc.funcs.php:7467
 #: ../inc/_core/_template.funcs.php:2301
 #: ../../../inc/_core/_template.funcs.php:3254
 #: ../../../inc/_core/ui/forms/_form.class.php:3911
@@ -1429,23 +1430,23 @@ msgstr "Спам Карма"
 msgid "Content"
 msgstr "Содержимое"
 
-#: ../../../htsrv/item_edit.php:193 ../inc/items/items.ctrl.php:948
+#: ../../../htsrv/item_edit.php:193 ../inc/items/items.ctrl.php:947
 msgid "Content must not be empty."
 msgstr "Содержимое не должно быть пустым."
 
 #: ../../../htsrv/item_edit.php:227 ../htsrv/item_edit.php:299
-#: ../../../inc/items/items.ctrl.php:1017 ../inc/items/items.ctrl.php:1187
+#: ../../../inc/items/items.ctrl.php:1016 ../inc/items/items.ctrl.php:1186
 msgid "Post not publicly published: skipping trackback..."
 msgstr "Запись опубликована не для всех: пропуск трекбека..."
 
 #: ../../../htsrv/item_edit.php:239
 #: ../inc/collections/_collections.init.php:1401
-#: ../../../inc/items/items.ctrl.php:1029
+#: ../../../inc/items/items.ctrl.php:1028
 msgid "Post has been created."
 msgstr "Запись создана."
 
-#: ../../../htsrv/item_edit.php:311 ../inc/items/items.ctrl.php:1199
-#: ../../../inc/items/items.ctrl.php:1504
+#: ../../../htsrv/item_edit.php:311 ../inc/items/items.ctrl.php:1198
+#: ../../../inc/items/items.ctrl.php:1503
 msgid "Post has been updated."
 msgstr "Запись обновлена."
 
@@ -1469,12 +1470,12 @@ msgstr ""
 "Пока вы - Администратор с правами управления Пользователями, вы не можете "
 "закрыть свой собственный аккаунт!"
 
-#: ../../../htsrv/login.php:99 ../inc/users/model/_user.class.php:5483
+#: ../../../htsrv/login.php:99 ../inc/users/model/_user.class.php:5490
 msgid "User account closed"
 msgstr "Учетная запись пользователя закрыта"
 
 #: ../../../htsrv/login.php:106 ../inc/_core/_template.funcs.php:446
-#: ../../../inc/users/model/_user.class.php:5432
+#: ../../../inc/users/model/_user.class.php:5439
 msgid "Close account"
 msgstr "Закрыть аккаунт"
 
@@ -2148,7 +2149,7 @@ msgstr "Предпросмотр"
 msgid "File"
 msgstr "Файл"
 
-#: ../../../htsrv/viewfile.php:187 ../inc/_core/_misc.funcs.php:6032
+#: ../../../htsrv/viewfile.php:187 ../inc/_core/_misc.funcs.php:6052
 #: ../../../inc/collections/views/_coll_general.form.php:182
 #: ../../../inc/files/views/_file_links.view.php:98
 #: ../../../inc/items/model/_item.funcs.php:4740
@@ -2365,15 +2366,15 @@ msgstr ""
 #: ../../../inc/_core/__core.init.php:761 ../inc/_core/__core.init.php:1126
 #: ../../../inc/_core/__core.init.php:1510 ../inc/_core/__core.init.php:1955
 #: ../../../inc/_core/__core.init.php:2010 ../inc/_core/__core.init.php:2123
-#: ../../../inc/antispam/antispam.ctrl.php:502
+#: ../../../inc/antispam/antispam.ctrl.php:501
 #: ../../../inc/collections/_collections.init.php:821
-#: ../../../inc/collections/coll_settings.ctrl.php:982
-#: ../../../inc/collections/coll_settings.ctrl.php:1059
-#: ../../../inc/collections/coll_settings.ctrl.php:1066
-#: ../../../inc/collections/coll_settings.ctrl.php:1073
-#: ../../../inc/collections/coll_settings.ctrl.php:1082
-#: ../../../inc/collections/coll_settings.ctrl.php:1090
-#: ../../../inc/collections/coll_settings.ctrl.php:1100
+#: ../../../inc/collections/coll_settings.ctrl.php:985
+#: ../../../inc/collections/coll_settings.ctrl.php:1062
+#: ../../../inc/collections/coll_settings.ctrl.php:1069
+#: ../../../inc/collections/coll_settings.ctrl.php:1076
+#: ../../../inc/collections/coll_settings.ctrl.php:1085
+#: ../../../inc/collections/coll_settings.ctrl.php:1093
+#: ../../../inc/collections/coll_settings.ctrl.php:1103
 #: ../../../inc/collections/collections.ctrl.php:463
 #: ../../../inc/files/file_settings.ctrl.php:189
 #: ../../../inc/files/file_types.ctrl.php:194
@@ -2385,7 +2386,7 @@ msgstr ""
 #: ../../../inc/messaging/msg_settings.ctrl.php:126
 #: ../../../inc/sessions/_sessions.init.php:208
 #: ../../../inc/sessions/_sessions.init.php:375
-#: ../inc/sessions/stats.ctrl.php:487 ../../../inc/tools/email.ctrl.php:544
+#: ../inc/sessions/stats.ctrl.php:487 ../../../inc/tools/email.ctrl.php:555
 #: ../inc/users/account_close.ctrl.php:63
 #: ../../../inc/users/display.ctrl.php:103
 #: ../inc/users/invitations.ctrl.php:202
@@ -2400,8 +2401,9 @@ msgstr "Настройки"
 
 #: ../../../inc/_core/__core.init.php:770 ../inc/_core/__core.init.php:1161
 #: ../../../inc/_core/__core.init.php:2094
-#: ../inc/antispam/antispam.ctrl.php:492
+#: ../inc/antispam/antispam.ctrl.php:491
 #: ../../../inc/sessions/stats.ctrl.php:502
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:220
 msgid "Antispam"
 msgstr "Антиспам"
 
@@ -2438,7 +2440,7 @@ msgstr "Уведомления о модерации записей"
 #: ../../../inc/_core/_template.funcs.php:445
 #: ../../../inc/collections/views/_coll_home.form.php:51
 #: ../../../inc/dashboard/dashboard.ctrl.php:109
-#: ../../../inc/tools/views/_email_address.view.php:206
+#: ../../../inc/tools/views/_email_address.view.php:209
 #: ../../../inc/users/account_close.ctrl.php:62
 #: ../inc/users/display.ctrl.php:102 ../../../inc/users/groups.ctrl.php:240
 #: ../inc/users/invitations.ctrl.php:201
@@ -2449,6 +2451,7 @@ msgstr "Уведомления о модерации записей"
 #: ../inc/users/userfields.ctrl.php:246
 #: ../../../inc/users/userfieldsgroups.ctrl.php:177
 #: ../inc/users/users.ctrl.php:412 ../../../inc/users/usertags.ctrl.php:261
+#: ../../../inc/users/views/_user_list.view.php:23
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:55
 #: ../../../skins_fallback_v5/_users.disp.php:38
 msgid "Users"
@@ -2535,9 +2538,9 @@ msgstr "Панель управления Сайта"
 
 #: ../../../inc/_core/__core.init.php:1116 ../inc/_core/__core.init.php:1842
 #: ../../../inc/_core/__core.init.php:2000
-#: ../../../inc/email_campaigns/campaigns.ctrl.php:408
+#: ../../../inc/email_campaigns/campaigns.ctrl.php:413
 #: ../../../inc/email_campaigns/newsletters.ctrl.php:214
-#: ../../../inc/tools/email.ctrl.php:454
+#: ../../../inc/tools/email.ctrl.php:465
 #: ../inc/users/model/_user.funcs.php:2507
 #: ../../../inc/users/user.ctrl.php:821
 msgid "Emails"
@@ -2552,31 +2555,31 @@ msgid "Lists"
 msgstr ""
 
 #: ../../../inc/_core/__core.init.php:1123 ../inc/_core/__core.init.php:2007
-#: ../../../inc/email_campaigns/campaigns.ctrl.php:409
+#: ../../../inc/email_campaigns/campaigns.ctrl.php:414
 #: ../../../inc/email_campaigns/newsletters.ctrl.php:240
 msgid "Campaigns"
 msgstr "Кампании"
 
 #: ../../../inc/_core/__core.init.php:1129 ../inc/_core/__core.init.php:2052
-#: ../../../inc/tools/email.ctrl.php:474
+#: ../../../inc/tools/email.ctrl.php:485
 msgid "Addresses"
 msgstr "Адреса"
 
 #: ../../../inc/_core/__core.init.php:1132 ../inc/_core/__core.init.php:2027
 #: ../../../inc/items/views/_item_expert.form.php:883
-#: ../../../inc/tools/email.ctrl.php:459
+#: ../../../inc/tools/email.ctrl.php:470
 #: ../inc/users/model/_user.funcs.php:3456
-#: ../../../inc/users/model/_user.funcs.php:6491
+#: ../../../inc/users/model/_user.funcs.php:6532
 msgid "Sent"
 msgstr "Отправленные"
 
 #: ../../../inc/_core/__core.init.php:1135 ../inc/_core/__core.init.php:2041
-#: ../../../inc/tools/email.ctrl.php:486
+#: ../../../inc/tools/email.ctrl.php:497
 msgid "Returned"
 msgstr "Возвращенные"
 
 #: ../../../inc/_core/__core.init.php:1142 ../inc/_core/__core.init.php:2071
-#: ../../../inc/antispam/antispam.ctrl.php:491
+#: ../../../inc/antispam/antispam.ctrl.php:490
 #: ../inc/cron/cronjobs.ctrl.php:208 ../../../inc/locales/locales.ctrl.php:527
 #: ../inc/locales/translation.ctrl.php:134
 #: ../../../inc/maintenance/backup.ctrl.php:48
@@ -2621,8 +2624,8 @@ msgstr "Система"
 #: ../../../inc/sessions/views/_stats_refdomains.view.php:185
 #: ../../../inc/sessions/views/_stats_topips.view.php:82
 #: ../../../inc/tools/system.ctrl.php:32
-#: ../../../inc/tools/views/_email_address.view.php:113
-#: ../../../inc/users/model/_user.funcs.php:6025
+#: ../../../inc/tools/views/_email_address.view.php:116
+#: ../../../inc/users/model/_user.funcs.php:6066
 #: ../../../inc/users/views/_user_admin.form.php:204
 #: ../../../inc/users/views/_user_admin.form.php:209
 #: ../../../inc/users/views/_user_admin.form.php:457
@@ -2673,10 +2676,10 @@ msgstr "Темы"
 #: ../../../inc/_core/__core.init.php:1178 ../inc/_core/__core.init.php:1526
 #: ../../../inc/_core/__core.init.php:2014 ../inc/_core/__core.init.php:2169
 #: ../../../inc/collections/_collections.init.php:834
-#: ../../../inc/collections/coll_settings.ctrl.php:1074
+#: ../../../inc/collections/coll_settings.ctrl.php:1077
 #: ../../../inc/items/views/_item_expert.form.php:746
 #: ../../../inc/maintenance/model/_backup.class.php:66
-#: ../../../inc/tools/email.ctrl.php:587
+#: ../../../inc/tools/email.ctrl.php:598
 msgid "Plugins"
 msgstr "Плагины"
 
@@ -2765,7 +2768,7 @@ msgstr "Страница"
 msgid "No blog is currently selected"
 msgstr "Не выбран ни один блог"
 
-#: ../../../inc/_core/__core.init.php:1289 ../inc/items/items.ctrl.php:1936
+#: ../../../inc/_core/__core.init.php:1289 ../inc/items/items.ctrl.php:1935
 #: ../../../inc/items/model/_itemlight.class.php:1203
 #: ../../../inc/slugs/views/_slug_list.view.php:185
 #: ../../../skins/basic/index.main.php:156
@@ -2808,13 +2811,13 @@ msgstr "%s Первая Страница"
 msgid "%s Dashboard"
 msgstr "%s Панель управления"
 
-#: ../../../inc/_core/__core.init.php:1391 ../inc/items/items.ctrl.php:1827
+#: ../../../inc/_core/__core.init.php:1391 ../inc/items/items.ctrl.php:1826
 #: ../../../inc/items/model/_item.funcs.php:1559
 #: ../../../inc/items/model/_item.funcs.php:4249
 msgid "Manual view"
 msgstr "Руководство"
 
-#: ../../../inc/_core/__core.init.php:1399 ../inc/items/items.ctrl.php:1846
+#: ../../../inc/_core/__core.init.php:1399 ../inc/items/items.ctrl.php:1845
 #: ../../../inc/items/model/_item.funcs.php:1551
 msgid "Workflow view"
 msgstr "Документооборот"
@@ -2824,7 +2827,7 @@ msgstr "Документооборот"
 #: ../../../inc/collections/_collections.init.php:732
 #: ../../../inc/collections/_collections.init.php:779
 #: ../../../inc/collections/coll_settings.ctrl.php:576
-#: ../../../inc/collections/coll_settings.ctrl.php:1003
+#: ../../../inc/collections/coll_settings.ctrl.php:1006
 #: ../../../inc/collections/views/_coll_other.form.php:42
 #: ../../../inc/dashboard/dashboard.ctrl.php:124
 #: ../inc/items/items.ctrl.php:593
@@ -2869,13 +2872,13 @@ msgstr "Рубрики"
 
 #: ../../../inc/_core/__core.init.php:1447 ../inc/_core/__core.init.php:1620
 #: ../../../inc/collections/_collections.init.php:772
-#: ../../../inc/collections/coll_settings.ctrl.php:995
-#: ../../../inc/collections/coll_settings.ctrl.php:1002
-#: ../../../inc/collections/coll_settings.ctrl.php:1009
-#: ../../../inc/collections/coll_settings.ctrl.php:1016
-#: ../../../inc/collections/coll_settings.ctrl.php:1023
-#: ../../../inc/collections/coll_settings.ctrl.php:1030
-#: ../../../inc/collections/coll_settings.ctrl.php:1037
+#: ../../../inc/collections/coll_settings.ctrl.php:998
+#: ../../../inc/collections/coll_settings.ctrl.php:1005
+#: ../../../inc/collections/coll_settings.ctrl.php:1012
+#: ../../../inc/collections/coll_settings.ctrl.php:1019
+#: ../../../inc/collections/coll_settings.ctrl.php:1026
+#: ../../../inc/collections/coll_settings.ctrl.php:1033
+#: ../../../inc/collections/coll_settings.ctrl.php:1040
 #: ../../../inc/collections/views/_coll_perm_view.funcs.php:854
 #: ../../../inc/collections/views/_coll_user_perm.form.php:240
 #: ../../../inc/items/views/_itemtype.form.php:83
@@ -2884,21 +2887,21 @@ msgstr "Возможности"
 
 #: ../../../inc/_core/__core.init.php:1451
 #: ../../../inc/collections/_collections.init.php:776
-#: ../../../inc/collections/coll_settings.ctrl.php:996
+#: ../../../inc/collections/coll_settings.ctrl.php:999
 #: ../../../inc/collections/views/_coll_home.form.php:34
 msgid "Front page"
 msgstr "Первая страница"
 
 #: ../../../inc/_core/__core.init.php:1463
 #: ../../../inc/collections/_collections.init.php:785
-#: ../../../inc/collections/coll_settings.ctrl.php:1017
+#: ../../../inc/collections/coll_settings.ctrl.php:1020
 #: ../../../inc/collections/views/_coll_contact.form.php:36
 msgid "Contact form"
 msgstr "Контактная форма"
 
 #: ../../../inc/_core/__core.init.php:1467
 #: ../../../inc/collections/_collections.init.php:788
-#: ../../../inc/collections/coll_settings.ctrl.php:1024
+#: ../../../inc/collections/coll_settings.ctrl.php:1027
 #: ../../../inc/collections/views/_coll_other.form.php:129
 #: ../../../inc/collections/views/_coll_user_dir.form.php:34
 #: ../../../inc/widgets/widgets/_basic_menu_link.widget.php:58
@@ -2908,20 +2911,20 @@ msgstr "Список пользователей"
 
 #: ../../../inc/_core/__core.init.php:1471
 #: ../../../inc/collections/_collections.init.php:791
-#: ../../../inc/collections/coll_settings.ctrl.php:1031
+#: ../../../inc/collections/coll_settings.ctrl.php:1034
 msgid "Other displays"
 msgstr "Другие страницы"
 
 #: ../../../inc/_core/__core.init.php:1475
 #: ../../../inc/collections/_collections.init.php:794
-#: ../../../inc/collections/coll_settings.ctrl.php:1038
+#: ../../../inc/collections/coll_settings.ctrl.php:1041
 #: ../../../plugins/_archives.plugin.php:154
 msgid "More"
 msgstr "Больше"
 
 #: ../../../inc/_core/__core.init.php:1481 ../inc/_core/__core.init.php:1589
 #: ../../../inc/collections/_collections.init.php:799
-#: ../../../inc/collections/coll_settings.ctrl.php:1044
+#: ../../../inc/collections/coll_settings.ctrl.php:1047
 #: ../../../inc/skins/skins.ctrl.php:326
 #: ../../../plugins/flowplayer_plugin/_flowplayer.plugin.php:106
 #: ../../../plugins/html5_mediaelementjs_plugin/_html5_mediaelementjs.plugin.php:180
@@ -2945,7 +2948,7 @@ msgstr "Показать контейнеры"
 
 #: ../../../inc/_core/__core.init.php:1514
 #: ../../../inc/collections/_collections.init.php:825
-#: ../../../inc/collections/coll_settings.ctrl.php:983
+#: ../../../inc/collections/coll_settings.ctrl.php:986
 #: ../../../inc/email_campaigns/newsletters.ctrl.php:237
 #: ../../../inc/items/views/_itemstatus.form.php:36
 #: ../../../inc/items/views/_itemtype.form.php:45
@@ -2957,13 +2960,13 @@ msgstr "Основные"
 
 #: ../../../inc/_core/__core.init.php:1518
 #: ../../../inc/collections/_collections.init.php:828
-#: ../../../inc/collections/coll_settings.ctrl.php:1060
+#: ../../../inc/collections/coll_settings.ctrl.php:1063
 msgid "URLs"
 msgstr "URL"
 
 #: ../../../inc/_core/__core.init.php:1522
 #: ../../../inc/collections/_collections.init.php:831
-#: ../../../inc/collections/coll_settings.ctrl.php:1067
+#: ../../../inc/collections/coll_settings.ctrl.php:1070
 msgid "SEO"
 msgstr "SEO"
 
@@ -3129,12 +3132,12 @@ msgid "User Tags"
 msgstr ""
 
 #: ../../../inc/_core/__core.init.php:2017 ../inc/_core/__core.init.php:2034
-#: ../../../inc/tools/email.ctrl.php:560
+#: ../../../inc/tools/email.ctrl.php:571
 msgid "Envelope"
 msgstr "Письмо"
 
 #: ../../../inc/_core/__core.init.php:2020 ../inc/_core/__core.init.php:2037
-#: ../../../inc/tools/email.ctrl.php:567
+#: ../../../inc/tools/email.ctrl.php:578
 msgid "SMTP gateway"
 msgstr "SMTP шлюз"
 
@@ -3144,12 +3147,12 @@ msgstr "SMTP шлюз"
 #: ../../../inc/sessions/views/_stats_summary.view.php:178
 #: ../../../inc/sessions/views/_stats_summary.view.php:229
 #: ../../../inc/sessions/views/_stats_view.funcs.php:234
-#: ../../../inc/tools/email.ctrl.php:579
-#: ../inc/users/model/_user.class.php:4549
-#: ../../../inc/users/model/_user.class.php:5457
+#: ../../../inc/tools/email.ctrl.php:590
+#: ../inc/users/model/_user.class.php:4556
+#: ../../../inc/users/model/_user.class.php:5464
 #: ../../../inc/users/model/_user.funcs.php:3281
 #: ../../../inc/users/model/_user.funcs.php:3802
-#: ../../../inc/users/model/_user.funcs.php:5416
+#: ../../../inc/users/model/_user.funcs.php:5424
 #: ../../../inc/users/views/_user_identity.form.php:277
 #: ../../../inc/users/views/_user_register_finish.form.php:152
 #: ../../../inc/widgets/views/_widget_list_available.view.php:58
@@ -3166,26 +3169,26 @@ msgstr "Дополнительно"
 msgid "Send Log"
 msgstr "Лог отправки"
 
-#: ../../../inc/_core/__core.init.php:2045 ../inc/tools/email.ctrl.php:500
+#: ../../../inc/_core/__core.init.php:2045 ../inc/tools/email.ctrl.php:511
 msgid "Return Log"
 msgstr "Лог возврата"
 
-#: ../../../inc/_core/__core.init.php:2048 ../inc/tools/email.ctrl.php:507
+#: ../../../inc/_core/__core.init.php:2048 ../inc/tools/email.ctrl.php:518
 msgid "POP/IMAP Settings"
 msgstr "POP/IMAP Настройки"
 
-#: ../../../inc/_core/__core.init.php:2060 ../inc/tools/email.ctrl.php:535
+#: ../../../inc/_core/__core.init.php:2060 ../inc/tools/email.ctrl.php:546
 msgid "Test"
 msgstr "Протестировать"
 
 #: ../../../inc/_core/__core.init.php:2098
-#: ../inc/antispam/antispam.ctrl.php:516
+#: ../inc/antispam/antispam.ctrl.php:515
 msgid "Blacklist"
 msgstr "Черный список"
 
 #: ../../../inc/_core/__core.init.php:2105
-#: ../inc/antispam/antispam.ctrl.php:485
-#: ../../../inc/antispam/antispam.ctrl.php:532
+#: ../inc/antispam/antispam.ctrl.php:484
+#: ../../../inc/antispam/antispam.ctrl.php:531
 #: ../../../inc/antispam/views/_antispam_ipranges.view.php:65
 #: ../../../inc/sessions/_sessions.init.php:296
 msgid "IP Ranges"
@@ -3198,7 +3201,7 @@ msgid "Countries"
 msgstr "Страны"
 
 #: ../../../inc/_core/__core.init.php:2117
-#: ../inc/antispam/antispam.ctrl.php:558
+#: ../inc/antispam/antispam.ctrl.php:557
 #: ../../../inc/sessions/_sessions.init.php:166
 #: ../../../inc/sessions/_sessions.init.php:202
 #: ../../../inc/sessions/_sessions.init.php:327
@@ -3207,7 +3210,7 @@ msgid "Referring domains"
 msgstr "Ссылающиеся домены"
 
 #: ../../../inc/_core/__core.init.php:2130
-#: ../inc/antispam/antispam.ctrl.php:509
+#: ../inc/antispam/antispam.ctrl.php:508
 #: ../../../inc/collections/_collections.init.php:929
 #: ../../../inc/tools/tools.ctrl.php:501
 #: ../skins/touch/_body_header.inc.php:40
@@ -3482,7 +3485,7 @@ msgstr ""
 "обработки (%s отправлено / %s максимум ). Пожалуйста, попробуйте снова "
 "отправить меньше данных/файлов за один раз."
 
-#: ../../../inc/_core/_misc.funcs.php:5406
+#: ../../../inc/_core/_misc.funcs.php:5426
 #: ../../../inc/collections/_demo_content.funcs.php:1996
 #: ../../../inc/collections/model/_blog.class.php:405
 #: ../../../inc/collections/model/_blog.funcs.php:448
@@ -3494,49 +3497,49 @@ msgstr ""
 msgid "Manual"
 msgstr "Руководство"
 
-#: ../../../inc/_core/_misc.funcs.php:5408 ../inc/cron/_cron.funcs.php:183
+#: ../../../inc/_core/_misc.funcs.php:5428 ../inc/cron/_cron.funcs.php:183
 #: ../../../inc/widgets/views/_widget.form.php:35
 msgid "Open relevant page in online manual"
 msgstr "Открыть соответствующую страницу в онлайн руководстве"
 
-#: ../../../inc/_core/_misc.funcs.php:5969
+#: ../../../inc/_core/_misc.funcs.php:5989
 #, php-format
 msgid "This action can only be performed with HTTP_REFERER = %s"
 msgstr "Это действие может быть выполнено только с HTTP_REFERER = %s"
 
-#: ../../../inc/_core/_misc.funcs.php:6029
+#: ../../../inc/_core/_misc.funcs.php:6049
 msgid "Date issued (Default)"
 msgstr "Дата появления (по умолчанию)"
 
-#: ../../../inc/_core/_misc.funcs.php:6030
+#: ../../../inc/_core/_misc.funcs.php:6050
 msgid "Order (as explicitly specified)"
 msgstr "Порядку (явно указан в записи)"
 
-#: ../../../inc/_core/_misc.funcs.php:6033
+#: ../../../inc/_core/_misc.funcs.php:6053
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:159
 msgid "Date created"
 msgstr "Дата создания"
 
-#: ../../../inc/_core/_misc.funcs.php:6034
+#: ../../../inc/_core/_misc.funcs.php:6054
 msgid "Date last modified"
 msgstr "Дата последнего изменения"
 
-#: ../../../inc/_core/_misc.funcs.php:6035
+#: ../../../inc/_core/_misc.funcs.php:6055
 msgid "Date last touched"
 msgstr "Дата последних обновлений"
 
-#: ../../../inc/_core/_misc.funcs.php:6036
+#: ../../../inc/_core/_misc.funcs.php:6056
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:171
 msgid "Contents last updated"
 msgstr "Последний обновленный контент"
 
-#: ../../../inc/_core/_misc.funcs.php:6037 ../inc/_core/_misc.funcs.php:6081
+#: ../../../inc/_core/_misc.funcs.php:6057 ../inc/_core/_misc.funcs.php:6101
 #: ../../../inc/collections/views/_coll_general.form.php:192
 msgid "URL \"filename\""
 msgstr "Короткая ссылка"
 
 #. TRANS: abbrev for Priority
-#: ../../../inc/_core/_misc.funcs.php:6038
+#: ../../../inc/_core/_misc.funcs.php:6058
 #: ../../../inc/collections/views/_coll_plugin_settings.form.php:89
 #: ../../../inc/items/views/_item_expert.form.php:619
 #: ../../../inc/items/views/_item_list_full.view.php:188
@@ -3553,21 +3556,21 @@ msgstr "Короткая ссылка"
 msgid "Priority"
 msgstr "Приоритет"
 
-#: ../../../inc/_core/_misc.funcs.php:6039
+#: ../../../inc/_core/_misc.funcs.php:6059
 msgid "Number of members who have viewed the post (If tracking enabled)"
 msgstr ""
 "Количество участников, которые просмотрели эту запись(если отслеживание "
 "включено)"
 
-#: ../../../inc/_core/_misc.funcs.php:6040 ../inc/_core/_misc.funcs.php:6082
+#: ../../../inc/_core/_misc.funcs.php:6060 ../inc/_core/_misc.funcs.php:6102
 msgid "Random order!"
 msgstr "Случайный порядок!"
 
-#: ../../../inc/_core/_misc.funcs.php:6075
+#: ../../../inc/_core/_misc.funcs.php:6095
 msgid "Order (Default)"
 msgstr "Порядок (По умолчанию)"
 
-#: ../../../inc/_core/_misc.funcs.php:6076
+#: ../../../inc/_core/_misc.funcs.php:6096
 #: ../../../inc/comments/views/_trash_comments.view.php:42
 #: ../../../inc/cron/model/_post_by_mail.funcs.php:381
 #: ../../../inc/tools/views/_create_comments.form.php:28
@@ -3577,7 +3580,7 @@ msgid "Blog ID"
 msgstr "ID блога"
 
 #. TRANS: file name
-#: ../../../inc/_core/_misc.funcs.php:6077
+#: ../../../inc/_core/_misc.funcs.php:6097
 #: ../../../inc/chapters/views/_chapter.form.php:56
 #: ../../../inc/chapters/views/_chapter_list.view.php:264
 #: ../../../inc/chapters/views/_chapter_move.form.php:40
@@ -3641,45 +3644,45 @@ msgstr "ID блога"
 msgid "Name"
 msgstr "Имя"
 
-#: ../../../inc/_core/_misc.funcs.php:6078
+#: ../../../inc/_core/_misc.funcs.php:6098
 #: ../../../inc/collections/views/_coll_general.form.php:187
 msgid "Short name"
 msgstr "Название"
 
-#: ../../../inc/_core/_misc.funcs.php:6079
+#: ../../../inc/_core/_misc.funcs.php:6099
 #: ../../../inc/collections/views/_coll_general.form.php:388
 msgid "Tagline"
 msgstr "Подзаголовок"
 
-#: ../../../inc/_core/_misc.funcs.php:6080
+#: ../../../inc/_core/_misc.funcs.php:6100
 #: ../../../inc/collections/views/_coll_advanced.form.php:171
 msgid "Short Description"
 msgstr "Краткое описание"
 
-#: ../../../inc/_core/_misc.funcs.php:7014
+#: ../../../inc/_core/_misc.funcs.php:7034
 #, php-format
 msgid "(Please check UNIX file permissions on the parent folder. %s)"
 msgstr "(Пожалуйста, проверьте UNIX права доступа у родительской папки. %s)"
 
-#: ../../../inc/_core/_misc.funcs.php:7223
+#: ../../../inc/_core/_misc.funcs.php:7243
 msgid "Click to edit"
 msgstr "Нажмите для редактирования"
 
-#: ../../../inc/_core/_misc.funcs.php:7802
+#: ../../../inc/_core/_misc.funcs.php:7822
 msgid "Coll. Admin"
 msgstr "Админ Колл."
 
-#: ../../../inc/_core/_misc.funcs.php:7806
+#: ../../../inc/_core/_misc.funcs.php:7826
 msgid "This can only be edited by users with the Collection Admin permission."
 msgstr ""
 "Это может быть отредактировано только пользователями с правами Админа "
 "Коллекции."
 
-#: ../../../inc/_core/_misc.funcs.php:7817
+#: ../../../inc/_core/_misc.funcs.php:7837
 msgid "User Admin"
 msgstr "Админ Польз."
 
-#: ../../../inc/_core/_misc.funcs.php:7821
+#: ../../../inc/_core/_misc.funcs.php:7841
 msgid "This can only be edited by users with the User Admin permission."
 msgstr ""
 "Это может быть отредактировано только пользователями с правами Админа "
@@ -3905,7 +3908,7 @@ msgstr "Карта сайта"
 #: ../../../inc/_core/_template.funcs.php:431
 #: ../../../inc/collections/views/_coll_contact.form.php:37
 #: ../../../inc/collections/views/_coll_home.form.php:45
-#: ../../../inc/users/model/_user.funcs.php:5861
+#: ../../../inc/users/model/_user.funcs.php:5881
 #: ../../../inc/widgets/widgets/_basic_menu_link.widget.php:370
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:260
 #: ../../../skins/asevo/_body_footer.inc.php:33
@@ -4127,7 +4130,7 @@ msgstr "ПРЕДПРОСМОТР"
 #: ../../../inc/_core/_template.funcs.php:697
 #: ../inc/_core/_template.funcs.php:723
 #: ../../../inc/collections/collections.ctrl.php:99
-#: ../inc/items/items.ctrl.php:687
+#: ../inc/items/items.ctrl.php:686
 #: ../../../inc/skins/views/_coll_sel_skin.view.php:20
 #: ../../../skins_fallback_v5/_item_new_form.inc.php:25
 #: ../../../skins_fallback_v6/_item_new_form.inc.php:20
@@ -4165,7 +4168,7 @@ msgstr "Перейти на экран расширенного редактир
 #: ../../../inc/files/views/_file_edit.form.php:23
 #: ../../../inc/files/views/_file_permissions.form.php:28
 #: ../../../inc/files/views/_filetype.form.php:33
-#: ../inc/items/items.ctrl.php:1981
+#: ../inc/items/items.ctrl.php:1980
 #: ../../../inc/items/views/_item_mass.form.php:53
 #: ../../../inc/items/views/_item_mass_edit.view.php:34
 #: ../../../inc/items/views/_itemstatus.form.php:29
@@ -4394,8 +4397,8 @@ msgstr "Введите ваше имя пользователя (или email а
 #: ../../../inc/collections/views/_coll_user_perm.form.php:115
 #: ../../../inc/maintenance/views/_upgrade_svn.form.php:28
 #: ../../../inc/messaging/views/_contact_list.view.php:286
-#: ../../../inc/users/model/_user.class.php:6974
-#: ../../../inc/users/model/_user.funcs.php:5641
+#: ../../../inc/users/model/_user.class.php:6981
+#: ../../../inc/users/model/_user.funcs.php:5651
 #: ../../../inc/users/views/_user_identity.form.php:251
 #: ../../../inc/users/views/_user_identity.form.php:466
 #: ../../../inc/users/views/_user_register_finish.form.php:73
@@ -4585,7 +4588,7 @@ msgid "So-so"
 msgstr "Так себе"
 
 #: ../../../inc/_core/_template.funcs.php:3090
-#: ../../../inc/comments/model/_comment.class.php:3192
+#: ../../../inc/comments/model/_comment.class.php:3197
 msgid "Good"
 msgstr "Хорошо"
 
@@ -4631,7 +4634,7 @@ msgstr "Вы хотите отменить ваши изменения для э
 #. TRANS: Abbr. for "Bytes"
 #: ../../../inc/_core/_template.funcs.php:3499
 #: ../inc/files/model/_file.funcs.php:52
-#: ../../../inc/users/model/_user.class.php:6837
+#: ../../../inc/users/model/_user.class.php:6844
 msgid "B."
 msgstr "б."
 
@@ -4813,7 +4816,7 @@ msgstr "ЭТО НЕОБРАТИМО!"
 #: ../../../inc/plugins/plugins.ctrl.php:985
 #: ../../../inc/tools/views/_delete_item_versions.form.php:32
 #: ../../../inc/tools/views/_image_resize.form.php:34
-#: ../install/index.php:1221
+#: ../install/index.php:1227
 msgid "I am sure!"
 msgstr "Я уверен!"
 
@@ -4821,7 +4824,7 @@ msgstr "Я уверен!"
 #: ../../../inc/_core/ui/results/_resultsel.class.php:544
 #: ../../../inc/collections/_collections.init.php:1095
 #: ../../../inc/collections/views/_coll_general.form.php:87
-#: ../../../inc/messaging/_messaging.init.php:655 ../install/index.php:1226
+#: ../../../inc/messaging/_messaging.init.php:655 ../install/index.php:1232
 msgid "CANCEL"
 msgstr "ОТМЕНА"
 
@@ -4882,7 +4885,7 @@ msgstr "Запись"
 
 #: ../../../inc/_core/model/dataobjects/_dataobjectlist2.class.php:387
 #: ../../../inc/_core/model/dataobjects/_dataobjectlist2.class.php:439
-#: ../../../inc/antispam/antispam.ctrl.php:68
+#: ../../../inc/antispam/antispam.ctrl.php:67
 #: ../../../inc/central_antispam/central_antispam.ctrl.php:36
 #: ../../../inc/central_antispam/central_antispam.ctrl.php:50
 #: ../../../inc/chapters/chapters.ctrl.php:66
@@ -5479,12 +5482,12 @@ msgstr ""
 msgid "You are now logged in as <b>%s</b>"
 msgstr "Вы залогинены сейчас как <b>%s</b>"
 
-#: ../../../inc/antispam/antispam.ctrl.php:68
+#: ../../../inc/antispam/antispam.ctrl.php:67
 #: ../../../inc/antispam/views/_antispam_ipranges.form.php:31
 msgid "IP Range"
 msgstr "IP Диапазон"
 
-#: ../../../inc/antispam/antispam.ctrl.php:100
+#: ../../../inc/antispam/antispam.ctrl.php:99
 #, php-format
 msgid ""
 "The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 "
@@ -5493,90 +5496,90 @@ msgstr ""
 "Ключевое слово [%s] слишком коротко, оно должно содержать минимум 5 "
 "символов!"
 
-#: ../../../inc/antispam/antispam.ctrl.php:115
-#: ../inc/antispam/antispam.ctrl.php:135
-#: ../../../inc/antispam/antispam.ctrl.php:142
+#: ../../../inc/antispam/antispam.ctrl.php:114
+#: ../inc/antispam/antispam.ctrl.php:134
+#: ../../../inc/antispam/antispam.ctrl.php:141
 msgid "Banning keyword:"
 msgstr "Запрещенное ключевое слово:"
 
-#: ../../../inc/antispam/antispam.ctrl.php:115
+#: ../../../inc/antispam/antispam.ctrl.php:114
 #, php-format
 msgid "Deleted %d logged hits matching &laquo;%s&raquo;."
 msgstr "Удалено %d записанных хитов, совпадающих с &laquo;%s&raquo;."
 
-#: ../../../inc/antispam/antispam.ctrl.php:135
+#: ../../../inc/antispam/antispam.ctrl.php:134
 #, php-format
 msgid "Deleted %d comments matching &laquo;%s&raquo;."
 msgstr "Удалено %d комментариев, совпадающих с  &laquo; %s &raquo;."
 
-#: ../../../inc/antispam/antispam.ctrl.php:142
+#: ../../../inc/antispam/antispam.ctrl.php:141
 #, php-format
 msgid "The keyword &laquo;%s&raquo; has been blacklisted locally."
 msgstr "Ключевое слово &laquo;%s&raquo; добавлено в локальный черный список."
 
-#: ../../../inc/antispam/antispam.ctrl.php:146
+#: ../../../inc/antispam/antispam.ctrl.php:145
 #, php-format
 msgid "Failed to add the keyword %s to black list locally."
 msgstr "Ошибка при добавлении ключевого слова %s в черный список локально."
 
-#: ../../../inc/antispam/antispam.ctrl.php:157
+#: ../../../inc/antispam/antispam.ctrl.php:156
 msgid "Please select at least one action to ban the keyword."
 msgstr ""
 "Пожалуйста, выберите, по крайней мере, одно действие, чтобы запретить "
 "ключевое слово."
 
-#: ../../../inc/antispam/antispam.ctrl.php:175
+#: ../../../inc/antispam/antispam.ctrl.php:174
 msgid "Open Antispam Blacklist"
 msgstr "Открыть Список Антиспама"
 
-#: ../../../inc/antispam/antispam.ctrl.php:195
+#: ../../../inc/antispam/antispam.ctrl.php:194
 #, php-format
 msgid "Removing entry #%d from the ban list..."
 msgstr "Удаление записи #%d из черного списка..."
 
-#: ../../../inc/antispam/antispam.ctrl.php:238
-#: ../inc/antispam/antispam.ctrl.php:241
+#: ../../../inc/antispam/antispam.ctrl.php:237
+#: ../inc/antispam/antispam.ctrl.php:240
 msgid "The threshold must be between -100 and 100."
 msgstr "Порог должен быть между -100 и 100."
 
-#: ../../../inc/antispam/antispam.ctrl.php:263
+#: ../../../inc/antispam/antispam.ctrl.php:262
 msgid "Spam weight has to be in the range of 0-100."
 msgstr "Вес спама должен быть в диапазоне 0-100."
 
-#: ../../../inc/antispam/antispam.ctrl.php:291
+#: ../../../inc/antispam/antispam.ctrl.php:290
 #: ../inc/sessions/stats.ctrl.php:145 ../../../inc/tools/email.ctrl.php:127
 #: ../inc/tools/email.ctrl.php:265
 msgid "Settings updated."
 msgstr "Настройки обновлены."
 
-#: ../../../inc/antispam/antispam.ctrl.php:329
+#: ../../../inc/antispam/antispam.ctrl.php:328
 #, php-format
 msgid "Deleted %d comments"
 msgstr "Удалено %d комментариев"
 
-#: ../../../inc/antispam/antispam.ctrl.php:361
+#: ../../../inc/antispam/antispam.ctrl.php:360
 #, php-format
 msgid "Deleted %d logged hits"
 msgstr "Удалено %d хитов"
 
-#: ../../../inc/antispam/antispam.ctrl.php:380
+#: ../../../inc/antispam/antispam.ctrl.php:379
 msgid "New IP Range created."
 msgstr "Новый IP Диапазон создан."
 
-#: ../../../inc/antispam/antispam.ctrl.php:406
+#: ../../../inc/antispam/antispam.ctrl.php:405
 msgid "IP Range updated."
 msgstr "IP Диапазон обновлен."
 
-#: ../../../inc/antispam/antispam.ctrl.php:429
+#: ../../../inc/antispam/antispam.ctrl.php:428
 msgid "IP Range deleted."
 msgstr "IP Диапазон удален."
 
-#: ../../../inc/antispam/antispam.ctrl.php:450
+#: ../../../inc/antispam/antispam.ctrl.php:449
 #: ../../../inc/antispam/model/_antispam.funcs.php:1042
 msgid "Please select at least one blog."
 msgstr "Пожалуйста, выберите, по крайней мере, один блог."
 
-#: ../../../inc/antispam/antispam.ctrl.php:475
+#: ../../../inc/antispam/antispam.ctrl.php:474
 #: ../../../inc/antispam/views/_antispam_ipranges.view.php:80
 #: ../../../inc/antispam/views/_antispam_list.view.php:96
 #: ../../../inc/central_antispam/views/_keywords.view.php:81
@@ -5585,7 +5588,7 @@ msgstr "Пожалуйста, выберите, по крайней мере, о
 #: ../../../inc/files/views/_file_duplicates.view.php:113
 #: ../../../inc/files/views/_file_likes.view.php:68
 #: ../../../inc/files/views/_file_suspicious.view.php:98
-#: ../../../inc/items/items.ctrl.php:1811
+#: ../../../inc/items/items.ctrl.php:1810
 #: ../inc/items/model/_item.funcs.php:1543
 #: ../../../inc/items/views/_itemtags.view.php:86
 #: ../../../inc/locales/views/_translation.view.php:105
@@ -5620,7 +5623,7 @@ msgstr "Пожалуйста, выберите, по крайней мере, о
 #: ../../../inc/sessions/views/_stats_view.funcs.php:248
 #: ../../../inc/skins/views/_skin_list_available.view.php:101
 #: ../../../inc/slugs/views/_slug_list.view.php:85
-#: ../../../inc/tools/views/_email_address.view.php:76
+#: ../../../inc/tools/views/_email_address.view.php:79
 #: ../../../inc/tools/views/_email_return.view.php:89
 #: ../../../inc/tools/views/_email_sent.view.php:89
 #: ../../../inc/users/model/_user.funcs.php:3307
@@ -5643,7 +5646,7 @@ msgstr "Пожалуйста, выберите, по крайней мере, о
 msgid "All"
 msgstr "Все"
 
-#: ../../../inc/antispam/antispam.ctrl.php:483
+#: ../../../inc/antispam/antispam.ctrl.php:482
 #: ../../../inc/collections/views/_coll_perm_view.funcs.php:887
 #: ../../../inc/collections/views/_coll_user_perm.form.php:273
 #: ../../../inc/sessions/_sessions.init.php:259
@@ -5652,14 +5655,14 @@ msgstr "Все"
 msgid "Analytics"
 msgstr "Статистика"
 
-#: ../../../inc/antispam/antispam.ctrl.php:484
+#: ../../../inc/antispam/antispam.ctrl.php:483
 #: ../../../inc/sessions/_sessions.init.php:199
 #: ../../../inc/sessions/_sessions.init.php:340
 #: ../inc/sessions/stats.ctrl.php:441
 msgid "IPs"
 msgstr "IP адреса"
 
-#: ../../../inc/antispam/antispam.ctrl.php:529
+#: ../../../inc/antispam/antispam.ctrl.php:528
 msgid "You have no permission to edit this IP range!"
 msgstr "У вас нет прав для редактирования этого IP диапазона!"
 
@@ -5768,7 +5771,7 @@ msgstr "Удалить следующие %s %s комментариев:"
 #: ../../../inc/collections/views/_coll_other.form.php:39
 #: ../../../inc/comments/model/_comment.funcs.php:1283
 #: ../../../inc/comments/views/_comment.form.php:228
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:251
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:260
 #: ../../../inc/items/model/_item.funcs.php:4693
 #: ../../../inc/items/views/_item_history.view.php:131
 #: ../../../inc/items/views/_item_history_details.view.php:26
@@ -5865,9 +5868,9 @@ msgstr "Подозреваемый"
 #: ../../../inc/regional/model/_regional.funcs.php:735
 #: ../../../inc/regional/views/_country_list.view.php:167
 #: ../../../inc/sessions/model/_hitlog.funcs.php:791
-#: ../../../inc/tools/model/_email.funcs.php:230
-#: ../../../inc/tools/model/_email.funcs.php:237
-#: ../../../inc/tools/model/_email.funcs.php:241
+#: ../../../inc/tools/model/_email.funcs.php:246
+#: ../../../inc/tools/model/_email.funcs.php:253
+#: ../../../inc/tools/model/_email.funcs.php:257
 msgid "Blocked"
 msgstr "Блокировано"
 
@@ -5974,8 +5977,8 @@ msgstr "Затронутые пользователи"
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:207
 #: ../../../inc/collections/views/_coll_user_dir.form.php:47
-#: ../../../inc/users/model/_user.class.php:6977
-#: ../../../inc/users/model/_user.funcs.php:5652
+#: ../../../inc/users/model/_user.class.php:6984
+#: ../../../inc/users/model/_user.funcs.php:5662
 #: ../../../inc/users/views/_settings.form.php:62
 #: ../../../inc/users/views/_user_identity.form.php:256
 #: ../../../inc/users/views/_user_identity.form.php:467
@@ -5989,8 +5992,8 @@ msgstr "Имя"
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:208
 #: ../../../inc/collections/views/_coll_user_dir.form.php:48
-#: ../../../inc/users/model/_user.class.php:6978
-#: ../../../inc/users/model/_user.funcs.php:5661
+#: ../../../inc/users/model/_user.class.php:6985
+#: ../../../inc/users/model/_user.funcs.php:5671
 #: ../../../inc/users/views/_settings.form.php:64
 #: ../../../inc/users/views/_user_identity.form.php:262
 #: ../../../inc/users/views/_user_identity.form.php:468
@@ -6003,8 +6006,8 @@ msgstr "Фамилия"
 #: ../../../inc/collections/views/_coll_contact.form.php:48
 #: ../../../inc/collections/views/_coll_user_dir.form.php:49
 #: ../../../inc/messaging/views/_contact_list.view.php:304
-#: ../../../inc/users/model/_user.class.php:6976
-#: ../../../inc/users/model/_user.funcs.php:5673
+#: ../../../inc/users/model/_user.class.php:6983
+#: ../../../inc/users/model/_user.funcs.php:5683
 #: ../../../inc/users/views/_settings.form.php:60
 #: ../../../inc/users/views/_user_identity.form.php:268
 #: ../../../inc/users/views/_user_identity.form.php:469
@@ -6141,7 +6144,7 @@ msgstr "Сессии, соединенные через этот IP Диапаз
 #: ../../../inc/collections/model/_blog.funcs.php:2005
 #: ../../../inc/collections/views/_coll_perm_view.funcs.php:704
 #: ../../../inc/cron/views/_cronjob_list.view.php:230
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:243
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:252
 #: ../../../inc/email_campaigns/views/_newsletters.view.php:33
 #: ../../../inc/items/views/_item_edit_type.form.php:71
 #: ../../../inc/items/views/_item_history.view.php:123
@@ -6154,10 +6157,10 @@ msgstr "Сессии, соединенные через этот IP Диапаз
 #: ../../../inc/sessions/views/_stats_goalcats.view.php:39
 #: ../../../inc/sessions/views/_stats_goals.view.php:104
 #: ../../../inc/sessions/views/_stats_sessions_list.view.php:78
-#: ../../../inc/tools/views/_email_address.view.php:98
+#: ../../../inc/tools/views/_email_address.view.php:101
 #: ../../../inc/tools/views/_email_return.view.php:94
 #: ../../../inc/tools/views/_email_sent.view.php:94
-#: ../../../inc/users/model/_user.funcs.php:5618
+#: ../../../inc/users/model/_user.funcs.php:5628
 #: ../../../inc/users/views/_group.form.php:102
 #: ../../../inc/users/views/_group.view.php:57
 #: ../../../inc/users/views/_invitation.view.php:41
@@ -6228,7 +6231,7 @@ msgstr "Редактировать этот IP диапазон..."
 #: ../../../inc/comments/model/_comment.funcs.php:1393
 #: ../../../inc/comments/views/_trash_comments.view.php:64
 #: ../../../inc/cron/views/_cronjob_list.view.php:318
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:309
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:336
 #: ../../../inc/email_campaigns/views/_newsletters.view.php:130
 #: ../../../inc/files/views/_file_links.view.php:106
 #: ../../../inc/files/views/_file_list.inc.php:152
@@ -6266,12 +6269,12 @@ msgstr "Редактировать этот IP диапазон..."
 #: ../../../inc/sessions/views/_stats_refdomains.view.php:219
 #: ../../../inc/skins/views/_skin_list.view.php:80
 #: ../../../inc/slugs/views/_slug_list.view.php:217
-#: ../../../inc/tools/views/_email_address.view.php:214
+#: ../../../inc/tools/views/_email_address.view.php:217
 #: ../../../inc/tools/views/_email_return.view.php:136
 #: ../../../inc/users/model/_user.funcs.php:5257
-#: ../../../inc/users/model/_user.funcs.php:6054
-#: ../../../inc/users/model/_user.funcs.php:6064
-#: ../../../inc/users/model/_user.funcs.php:6074
+#: ../../../inc/users/model/_user.funcs.php:6095
+#: ../../../inc/users/model/_user.funcs.php:6105
+#: ../../../inc/users/model/_user.funcs.php:6115
 #: ../../../inc/users/views/_group.view.php:173
 #: ../../../inc/users/views/_invitation.view.php:119
 #: ../../../inc/users/views/_organization.view.php:126
@@ -6282,11 +6285,11 @@ msgstr "Редактировать этот IP диапазон..."
 msgid "Actions"
 msgstr "Действия"
 
-#: ../../../inc/antispam/views/_antispam_ipranges.view.php:178
+#: ../../../inc/antispam/views/_antispam_ipranges.view.php:180
 msgid "Add a new IP range..."
 msgstr "Добавить новый IP диапазон..."
 
-#: ../../../inc/antispam/views/_antispam_ipranges.view.php:178
+#: ../../../inc/antispam/views/_antispam_ipranges.view.php:180
 msgid "New IP range"
 msgstr "Новый IP диапазон"
 
@@ -6355,7 +6358,7 @@ msgstr "Центральный"
 
 #: ../../../inc/antispam/views/_antispam_list.view.php:100
 #: ../../../inc/antispam/views/_antispam_list.view.php:143
-#: ../../../inc/users/model/_user.funcs.php:5801
+#: ../../../inc/users/model/_user.funcs.php:5821
 #: ../../../inc/users/views/_invitation.view.php:97
 #: ../../../inc/users/views/_user_identity.form.php:450
 msgid "Source"
@@ -6895,7 +6898,7 @@ msgstr "Рубрика &laquo;%s&raquo; не может быть разблок�
 #: ../../../inc/collections/_collections.init.php:680
 #: ../../../inc/collections/_demo_content.funcs.php:1939
 #: ../../../inc/collections/coll_settings.ctrl.php:427
-#: ../../../inc/collections/coll_settings.ctrl.php:977
+#: ../../../inc/collections/coll_settings.ctrl.php:980
 #: ../../../inc/collections/collections.ctrl.php:462
 #: ../../../inc/collections/collections.ctrl.php:480
 #: ../../../inc/collections/collections.ctrl.php:503
@@ -6905,7 +6908,7 @@ msgstr "Рубрика &laquo;%s&raquo; не может быть разблок�
 #: ../../../inc/items/model/_item.funcs.php:2268
 #: ../inc/skins/skins.ctrl.php:325
 #: ../../../inc/skins/views/_skin_list.view.php:63
-#: ../../../inc/users/model/_user.funcs.php:5789
+#: ../../../inc/users/model/_user.funcs.php:5809
 #: ../../../inc/users/views/_group.form.php:152
 #: ../inc/widgets/widgets.ctrl.php:616
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:105
@@ -7102,7 +7105,7 @@ msgstr "Создать новую рубрику..."
 
 #: ../../../inc/chapters/views/_chapter_list.view.php:256
 #: ../../../inc/collections/_collections.init.php:803
-#: ../../../inc/collections/coll_settings.ctrl.php:1052
+#: ../../../inc/collections/coll_settings.ctrl.php:1055
 #: ../../../inc/collections/views/_coll_advanced.form.php:140
 #: ../../../inc/files/views/_file_permissions.form.php:39
 #: ../../../inc/skins/skins.ctrl.php:327 ../plugins/_calendar.plugin.php:72
@@ -7120,7 +7123,7 @@ msgid "Image"
 msgstr "Изображение"
 
 #: ../../../inc/chapters/views/_chapter_list.view.php:278
-#: ../../../inc/comments/model/_comment.class.php:3318
+#: ../../../inc/comments/model/_comment.class.php:3323
 msgid "Meta"
 msgstr "Мета"
 
@@ -7235,7 +7238,7 @@ msgstr "Панель Управления Коллекции"
 
 #: ../../../inc/collections/_collections.init.php:807
 #: ../../../inc/collections/views/_coll_user_dir.form.php:64
-#: ../../../inc/users/model/_user.funcs.php:5771
+#: ../../../inc/users/model/_user.funcs.php:5791
 msgid "Phone"
 msgstr "Телефон"
 
@@ -7401,7 +7404,6 @@ msgid "Could not subscribe to notifications."
 msgstr "Не удалось подписаться на рассылку уведомлений."
 
 #: ../../../inc/collections/_collections.init.php:1201
-#: ../../../inc/collections/_collections.init.php:1247
 msgid "You have successfully unsubscribed."
 msgstr "Ваша подписка успешно удалена."
 
@@ -7410,12 +7412,18 @@ msgid "You have successfully subscribed to notifications."
 msgstr "Вы успешно подписались на рассылку уведомлений."
 
 #: ../../../inc/collections/_collections.init.php:1239
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:202
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:239
 msgid "List subscription widget references an inactive list."
 msgstr ""
 
+#: ../../../inc/collections/_collections.init.php:1247
+#, php-format
+msgid "You have unsubscribed and you will no longer receive emails from %s."
+msgstr ""
+
 #: ../../../inc/collections/_collections.init.php:1259
-msgid "You have successfully subscribed."
+#, php-format
+msgid "You have successfully subscribed to: %s."
 msgstr ""
 
 #: ../../../inc/collections/_collections.init.php:1276
@@ -7433,7 +7441,7 @@ msgid ""
 msgstr ""
 
 #: ../../../inc/collections/_collections.init.php:1407
-#: ../../../inc/files/files.ctrl.php:1175 ../inc/items/items.ctrl.php:969
+#: ../../../inc/files/files.ctrl.php:1175 ../inc/items/items.ctrl.php:968
 msgid "Couldn't create the new post"
 msgstr "Нельзя создать новую запись"
 
@@ -8573,10 +8581,11 @@ msgstr ""
 #: ../../../inc/links/model/_linkcomment.class.php:160
 #: ../../../inc/sessions/views/_stats_refdomains.form.php:43
 #: ../../../inc/sessions/views/_stats_refdomains.view.php:170
-#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:89
+#: ../../../skins/bootstrap_gallery_legacy/_item_comment.inc.php:90
+#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:92
 #: ../../../skins_fallback_v5/_item_comment.inc.php:89
 #: ../../../skins_fallback_v5/_item_comment_wp.inc.php:57
-#: ../../../skins_fallback_v6/_item_comment.inc.php:87
+#: ../../../skins_fallback_v6/_item_comment.inc.php:90
 msgid "Comment"
 msgstr "Комментарий"
 
@@ -8702,49 +8711,49 @@ msgstr "Просмотреть в Публичной Части"
 msgid "Collection metrics"
 msgstr "Метрика коллекции"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:626
+#: ../../../inc/collections/coll_settings.ctrl.php:628
 #: ../../../inc/items/views/_item_list_full.view.php:402
 msgid "Refresh comment list"
 msgstr "Обновить список комментариев"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:629
+#: ../../../inc/collections/coll_settings.ctrl.php:632
 msgid "Comments awaiting moderation"
 msgstr "Комментарии ожидают одобрения модератором"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:737
+#: ../../../inc/collections/coll_settings.ctrl.php:740
 msgid "Latest Meta Comments"
 msgstr "Последние Мета Комментарии"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:784
-#: ../../../inc/items/items.ctrl.php:681
+#: ../../../inc/collections/coll_settings.ctrl.php:787
+#: ../../../inc/items/items.ctrl.php:680
 #: ../inc/items/model/_item.class.php:8978
 msgid "New post"
 msgstr "Новая запись"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:784
+#: ../../../inc/collections/coll_settings.ctrl.php:787
 #: ../../../inc/items/model/_item.funcs.php:4839
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:65
 msgid "Write a new post..."
 msgstr "Создать новую запись..."
 
-#: ../../../inc/collections/coll_settings.ctrl.php:788
+#: ../../../inc/collections/coll_settings.ctrl.php:791
 msgid "Recently edited posts"
 msgstr "Недавно отредактированные записи"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:849
+#: ../../../inc/collections/coll_settings.ctrl.php:852
 #: ../../../inc/dashboard/model/_dashboard.funcs.php:532
 msgid "No title"
 msgstr "Без заголовка"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:876
+#: ../../../inc/collections/coll_settings.ctrl.php:879
 msgid "Getting started"
 msgstr "Приступим"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:879
+#: ../../../inc/collections/coll_settings.ctrl.php:882
 msgid "Welcome to your new collection's dashboard!"
 msgstr "Добро пожаловать в панель управления вашей новой коллекции!"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:880
+#: ../../../inc/collections/coll_settings.ctrl.php:883
 #, php-format
 msgid ""
 "Write your <a %s>first post</a>  or customize this collection via the <a "
@@ -8753,7 +8762,7 @@ msgstr ""
 "Напишите вашу <a %s>первую запись</a>  или настройке эту коллекцию через "
 "вкладку <a %s>Настройки</a>."
 
-#: ../../../inc/collections/coll_settings.ctrl.php:881
+#: ../../../inc/collections/coll_settings.ctrl.php:884
 msgid ""
 "You can see your collection's front page at any time by clicking "
 "\"Collection &raquo; Front Page...\" in the b2evolution toolbar at the top "
@@ -8763,7 +8772,7 @@ msgstr ""
 "\"Коллекция &raquo; Первая Страница...\" на панели инструментов b2evolution,"
 " сверху этой страницы."
 
-#: ../../../inc/collections/coll_settings.ctrl.php:882
+#: ../../../inc/collections/coll_settings.ctrl.php:885
 msgid ""
 "You can come back here at any time by clicking \"Collection &raquo; "
 "Dashboard...\" in that same evobar."
@@ -8771,27 +8780,27 @@ msgstr ""
 "Вы можете вернуться сюда в любое время нажав \"Коллекция &raquo;  Панель "
 "управления...\" на той же панели evobar."
 
-#: ../../../inc/collections/coll_settings.ctrl.php:987
+#: ../../../inc/collections/coll_settings.ctrl.php:990
 #: ../../../inc/collections/views/_coll_general.form.php:94
 #: ../../../inc/collections/views/_coll_type.form.php:35
 msgid "Collection type"
 msgstr "Тип коллекции"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:1047
+#: ../../../inc/collections/coll_settings.ctrl.php:1050
 msgid "Skin selection"
 msgstr "Выбор темы"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:1083
+#: ../../../inc/collections/coll_settings.ctrl.php:1086
 msgid "Advanced settings"
 msgstr "Дополнительные настройки"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:1091
+#: ../../../inc/collections/coll_settings.ctrl.php:1094
 #: ../../../inc/collections/views/_coll_user_perm.form.php:86
 #: ../../../inc/users/views/_user_admin.form.php:63
 msgid "User permissions"
 msgstr "Разрешения пользователей"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:1101
+#: ../../../inc/collections/coll_settings.ctrl.php:1104
 #: ../../../inc/collections/views/_coll_group_perm.form.php:79
 msgid "Group permissions"
 msgstr "Разрешения групп"
@@ -9046,50 +9055,50 @@ msgstr "Максимальное количество ссылок должно 
 msgid "Please enter a specific post ID"
 msgstr "Пожалуйста, введите ID специальной записи"
 
-#: ../../../inc/collections/model/_blog.class.php:860
+#: ../../../inc/collections/model/_blog.class.php:861
 msgid "Stale content alert must be configured with a number of months."
 msgstr ""
 "Оповещение об устаревшем контенте должно быть сконфигурировано как "
 "количество месяцев."
 
-#: ../../../inc/collections/model/_blog.class.php:880
+#: ../../../inc/collections/model/_blog.class.php:881
 #, php-format
 msgid "Items/days per page must be between %d and %d."
 msgstr "Количество записей / дней на страницу должно быть между %d и %d."
 
-#: ../../../inc/collections/model/_blog.class.php:1031
+#: ../../../inc/collections/model/_blog.class.php:1032
 #, php-format
 msgid "Number of search results per page must be between %d and %d."
 msgstr "Количество результатов поиска на страницу должно быть между %d и %d."
 
-#: ../../../inc/collections/model/_blog.class.php:1040
+#: ../../../inc/collections/model/_blog.class.php:1041
 #, php-format
 msgid "Number of shown comments must be between %d and %d."
 msgstr "Количество комментариев для показа должно быть между %d и %d."
 
-#: ../../../inc/collections/model/_blog.class.php:1107
+#: ../../../inc/collections/model/_blog.class.php:1108
 #, php-format
 msgid "Comments per page must be between %d and %d."
 msgstr "Количество комментариев на страницу должно быть между %d и %d."
 
-#: ../../../inc/collections/model/_blog.class.php:1186
+#: ../../../inc/collections/model/_blog.class.php:1187
 msgid "Invalid Custom meta tag/css section."
 msgstr "Неверная пользовательская мета тэг/css секция."
 
-#: ../../../inc/collections/model/_blog.class.php:1186
-#: ../../../inc/collections/model/_blog.class.php:1192
-#: ../../../inc/collections/model/_blog.class.php:1198
+#: ../../../inc/collections/model/_blog.class.php:1187
+#: ../../../inc/collections/model/_blog.class.php:1193
+#: ../../../inc/collections/model/_blog.class.php:1199
 #: ../../../inc/items/model/_itemtype.class.php:201
 #, php-format
 msgid "You can loosen this restriction in the <a %s>Group settings</a>."
 msgstr "Вы можете отменить это ограничение в <a %s>Настройках группы</a>."
 
-#: ../../../inc/collections/model/_blog.class.php:1192
-#: ../../../inc/collections/model/_blog.class.php:1198
+#: ../../../inc/collections/model/_blog.class.php:1193
+#: ../../../inc/collections/model/_blog.class.php:1199
 msgid "Invalid Custom javascript section."
 msgstr "Неверная Пользовательская секция javascript."
 
-#: ../../../inc/collections/model/_blog.class.php:1208
+#: ../../../inc/collections/model/_blog.class.php:1209
 #: ../../../inc/polls/model/_poll.class.php:97
 #: ../../../inc/users/model/_organization.class.php:116
 #: ../../../inc/users/organizations.ctrl.php:226
@@ -9098,16 +9107,16 @@ msgstr "Неверная Пользовательская секция javascrip
 msgid "User &laquo;%s&raquo; does not exist!"
 msgstr "Пользователь &laquo;%s&raquo; не существует!"
 
-#: ../../../inc/collections/model/_blog.class.php:1220
+#: ../../../inc/collections/model/_blog.class.php:1221
 msgid "You must provide an URL collection name!"
 msgstr "Вы должны указать ссылку коллекции!"
 
-#: ../../../inc/collections/model/_blog.class.php:1224
+#: ../../../inc/collections/model/_blog.class.php:1225
 #, php-format
 msgid "The url name %s is invalid."
 msgstr "Недопустимое url имя %s."
 
-#: ../../../inc/collections/model/_blog.class.php:1234
+#: ../../../inc/collections/model/_blog.class.php:1235
 #, php-format
 msgid ""
 "The URL name %s is already in use by another collection. Please choose "
@@ -9115,19 +9124,19 @@ msgid ""
 msgstr ""
 "URL имя %s уже используется другой коллекцией. Пожалуйста, выберите другое."
 
-#: ../../../inc/collections/model/_blog.class.php:1262
-#: ../../../inc/collections/model/_blog.class.php:1358
+#: ../../../inc/collections/model/_blog.class.php:1263
+#: ../../../inc/collections/model/_blog.class.php:1359
 #, php-format
 msgid "%s is an invalid absolute URL"
 msgstr "%s является недопустимым абсолютным URL"
 
-#: ../../../inc/collections/model/_blog.class.php:1262
+#: ../../../inc/collections/model/_blog.class.php:1263
 #: ../../../inc/collections/views/_coll_urls.form.php:80
 #: ../../../inc/collections/views/_coll_urls.form.php:191
 msgid "Collection base URL"
 msgstr "Базовый URL коллекции"
 
-#: ../../../inc/collections/model/_blog.class.php:1263
+#: ../../../inc/collections/model/_blog.class.php:1264
 msgid ""
 "You must provide an absolute URL (starting with <code>http://</code> or "
 "<code>https://</code>) and it must contain at least one '/' sign after the "
@@ -9137,11 +9146,11 @@ msgstr ""
 "или <code>https://</code>) и он должен содержать, по крайней мере, один знак"
 " '/' после имени домена!"
 
-#: ../../../inc/collections/model/_blog.class.php:1271
+#: ../../../inc/collections/model/_blog.class.php:1272
 msgid "Blog Folder URL"
 msgstr "URL папки блога"
 
-#: ../../../inc/collections/model/_blog.class.php:1272
+#: ../../../inc/collections/model/_blog.class.php:1273
 msgid ""
 "You must provide a relative URL (without <code>http://</code> or "
 "<code>https://</code>)!"
@@ -9149,27 +9158,27 @@ msgstr ""
 "Вы должны указать относительный URL (без <code>http://</code> или "
 "<code>https://</code>)!"
 
-#: ../../../inc/collections/model/_blog.class.php:1301
+#: ../../../inc/collections/model/_blog.class.php:1302
 msgid "The custom cookie domain must be a parent of the collection domain."
 msgstr ""
 "Пользовательский cookie домен должен быть родительским доменом коллекции."
 
-#: ../../../inc/collections/model/_blog.class.php:1316
+#: ../../../inc/collections/model/_blog.class.php:1317
 msgid "The custom cookie path must be a parent of the collection path."
 msgstr ""
 "Пользовательский cookie путь должен быть родительским путем коллекции."
 
-#: ../../../inc/collections/model/_blog.class.php:1350
+#: ../../../inc/collections/model/_blog.class.php:1351
 #, php-format
 msgid "Absolute URL for %s cannot be empty!"
 msgstr "Абсолютный URL для %s не может быть пустым!"
 
-#: ../../../inc/collections/model/_blog.class.php:1358
+#: ../../../inc/collections/model/_blog.class.php:1359
 #, php-format
 msgid "Absolute URL for %s"
 msgstr "Абсолютный URL для %s"
 
-#: ../../../inc/collections/model/_blog.class.php:1359
+#: ../../../inc/collections/model/_blog.class.php:1360
 msgid ""
 "You must provide an absolute URL (starting with <code>http://</code>, "
 "<code>https://</code> or <code>//</code>) and it must ending with '/' sign!"
@@ -9178,7 +9187,7 @@ msgstr ""
 "<code>https://</code> или <code>//</code) и он должен оканчиваться на знак "
 "'/'!"
 
-#: ../../../inc/collections/model/_blog.class.php:1368
+#: ../../../inc/collections/model/_blog.class.php:1369
 msgid ""
 "WARNING: you will be loading your assets from a different domain. This may "
 "cause problems if you don't know exactly what you are doing. Please check "
@@ -9188,8 +9197,8 @@ msgstr ""
 "вызвать проблемы, если вы не знаете точно, что вы делаете. Пожалуйста, "
 "проверьте панель Ссылки активов ниже."
 
-#: ../../../inc/collections/model/_blog.class.php:1375
-#: ../../../inc/collections/model/_blog.class.php:1380
+#: ../../../inc/collections/model/_blog.class.php:1376
+#: ../../../inc/collections/model/_blog.class.php:1381
 #, php-format
 msgid ""
 "WARNING: your %s and %s assets URL seem to be configured in a potentially "
@@ -9198,24 +9207,24 @@ msgstr ""
 "ВНИМАНИЕ: ваши ссылки активов %s и %s похоже, настроены в потенциально "
 "нежелательном способе. Пожалуйста, проверьте ваши Ссылки активов ниже."
 
-#: ../../../inc/collections/model/_blog.class.php:1402
+#: ../../../inc/collections/model/_blog.class.php:1403
 msgid "Invalid aggregate collection ID list!"
 msgstr "Недопустимый ID списка коллекции сборки!"
 
-#: ../../../inc/collections/model/_blog.class.php:1437
-#: ../../../inc/collections/model/_blog.class.php:1441
-#: ../../../inc/collections/model/_blog.class.php:1449
-#: ../../../inc/collections/model/_blog.class.php:1458
-#: ../../../inc/collections/model/_blog.class.php:1465
-#: ../../../inc/collections/model/_blog.class.php:1473
+#: ../../../inc/collections/model/_blog.class.php:1438
+#: ../../../inc/collections/model/_blog.class.php:1442
+#: ../../../inc/collections/model/_blog.class.php:1450
+#: ../../../inc/collections/model/_blog.class.php:1459
+#: ../../../inc/collections/model/_blog.class.php:1466
+#: ../../../inc/collections/model/_blog.class.php:1474
 msgid "Media dir location"
 msgstr "Расположение папки медиа"
 
-#: ../../../inc/collections/model/_blog.class.php:1437
+#: ../../../inc/collections/model/_blog.class.php:1438
 msgid "You must provide the full path of the media directory."
 msgstr "Вы должны указать полный путь к медиа папке."
 
-#: ../../../inc/collections/model/_blog.class.php:1442
+#: ../../../inc/collections/model/_blog.class.php:1443
 msgid ""
 "You must provide an absolute URL (starting with <code>http://</code> or "
 "<code>https://</code>)!"
@@ -9223,16 +9232,16 @@ msgstr ""
 "Вы должны указать абсолютный URL (начинающийся с <code>http://</code> или "
 "<code>https://</code>)!"
 
-#: ../../../inc/collections/model/_blog.class.php:1458
+#: ../../../inc/collections/model/_blog.class.php:1459
 msgid "You must provide the media subdirectory."
 msgstr "Вы должны указать подкаталог в медиа папке."
 
-#: ../../../inc/collections/model/_blog.class.php:1465
+#: ../../../inc/collections/model/_blog.class.php:1466
 #, php-format
 msgid "Invalid subdirectory &laquo;%s&raquo;."
 msgstr "Недопустимый подкаталог &laquo;%s&raquo;."
 
-#: ../../../inc/collections/model/_blog.class.php:2477
+#: ../../../inc/collections/model/_blog.class.php:2478
 #, php-format
 msgid ""
 "Media directory &laquo;%s&raquo; could not be created, because the parent "
@@ -9241,29 +9250,29 @@ msgstr ""
 "Медиа папка &laquo;%s&raquo; не может быть создана, потому что родительская "
 "папка недоступна для записи или не существует."
 
-#: ../../../inc/collections/model/_blog.class.php:2478
+#: ../../../inc/collections/model/_blog.class.php:2479
 msgid "Media directory file permission error"
 msgstr "Ошибка файловых прав медиа папки"
 
-#: ../../../inc/collections/model/_blog.class.php:2486
+#: ../../../inc/collections/model/_blog.class.php:2487
 #, php-format
 msgid "Media directory &laquo;%s&raquo; could not be created."
 msgstr "Медиа директория &laquo;%s&raquo; не может быть создана."
 
-#: ../../../inc/collections/model/_blog.class.php:2487
+#: ../../../inc/collections/model/_blog.class.php:2488
 msgid "Media directory creation error"
 msgstr "Ошибка создания медиа папки"
 
-#: ../../../inc/collections/model/_blog.class.php:2495
+#: ../../../inc/collections/model/_blog.class.php:2496
 msgid "Collection media directories created:"
 msgstr "Медиа папки коллекции созданы:"
 
-#: ../../../inc/collections/model/_blog.class.php:2495
+#: ../../../inc/collections/model/_blog.class.php:2496
 #, php-format
 msgid "Media directory &laquo;%s&raquo; has been created with permissions %s."
 msgstr "Медиа папка &laquo;%s&raquo; создана с разрешениями %s."
 
-#: ../../../inc/collections/model/_blog.class.php:2929
+#: ../../../inc/collections/model/_blog.class.php:2930
 #, php-format
 msgid ""
 "ATTENTION: advanced <a href=\"%s\">user</a> & <a href=\"%s\">group</a> "
@@ -9274,21 +9283,21 @@ msgstr ""
 "href=\"%s\">групп</a> включены, и поэтому некоторые залогиненные "
 "пользователи могут иметь меньше прав, чем анонимные пользователи."
 
-#: ../../../inc/collections/model/_blog.class.php:3218
-#: ../../../inc/collections/model/_blog.class.php:3256
-#: ../../../inc/collections/model/_blog.class.php:3262
-#: ../../../inc/collections/model/_blog.class.php:3275
+#: ../../../inc/collections/model/_blog.class.php:3219
+#: ../../../inc/collections/model/_blog.class.php:3257
+#: ../../../inc/collections/model/_blog.class.php:3263
+#: ../../../inc/collections/model/_blog.class.php:3276
 msgid "New collection created:"
 msgstr "Новая коллекция создана:"
 
-#: ../../../inc/collections/model/_blog.class.php:3218
+#: ../../../inc/collections/model/_blog.class.php:3219
 #, php-format
 msgid ""
 "The new collection has been associated with the stub file &laquo;%s&raquo;."
 msgstr ""
 "Новый коллекция была ассоциирована с файлом-заглушкой &laquo;%s&raquo;."
 
-#: ../../../inc/collections/model/_blog.class.php:3222
+#: ../../../inc/collections/model/_blog.class.php:3223
 #, php-format
 msgid ""
 "No stub file named &laquo;%s&raquo; was found. You must create it for the "
@@ -9298,20 +9307,20 @@ msgstr ""
 "текущими настройками ссылок, вам необходимо создать эту заглушку. Вы также "
 "можете изменить адрес блога если не хотите создавать файл."
 
-#: ../../../inc/collections/model/_blog.class.php:3252
+#: ../../../inc/collections/model/_blog.class.php:3253
 #: ../../../inc/tools/model/_wp.funcs.php:574
 msgid "Uncategorized"
 msgstr "Без рубрики"
 
-#: ../../../inc/collections/model/_blog.class.php:3256
+#: ../../../inc/collections/model/_blog.class.php:3257
 msgid "A default category has been created for this collection."
 msgstr "Стандартная рубрика была создана для этой коллекции."
 
-#: ../../../inc/collections/model/_blog.class.php:3262
+#: ../../../inc/collections/model/_blog.class.php:3263
 msgid "Default widgets have been set-up for this collection."
 msgstr "Стандартные виджеты были установлены для этой коллекции."
 
-#: ../../../inc/collections/model/_blog.class.php:3290
+#: ../../../inc/collections/model/_blog.class.php:3291
 #, php-format
 msgid ""
 "ATTENTION: We have set some advanced permissions for this collection. Please"
@@ -9322,32 +9331,32 @@ msgstr ""
 "Пожалуйста, проверьте <a %s>Права пользователя </a> и <a %s>Права Группы</a>"
 " сейчас."
 
-#: ../../../inc/collections/model/_blog.class.php:3779
+#: ../../../inc/collections/model/_blog.class.php:3780
 msgid "Deleted blog's files"
 msgstr "Удалены файлы блога"
 
-#: ../../../inc/collections/model/_blog.class.php:4504
+#: ../../../inc/collections/model/_blog.class.php:4505
 #: ../../../inc/rest/_restapi.class.php:367
 msgid "You need to log in before you can access this section."
 msgstr "Вам надо авторизоваться для доступа к этому разделу."
 
-#: ../../../inc/collections/model/_blog.class.php:4530
+#: ../../../inc/collections/model/_blog.class.php:4531
 #: ../../../inc/rest/_restapi.class.php:376
 msgid ""
 "You are not a member of this section, therefore you are not allowed to "
 "access it."
 msgstr "Вы не член этого раздела, поэтому вам не разрешен доступ к нему."
 
-#: ../../../inc/collections/model/_blog.class.php:4590
+#: ../../../inc/collections/model/_blog.class.php:4591
 msgid "The old media dir could not be removed, please remove it manually!"
 msgstr ""
 "Старая медиа папка не может удалиться, пожалуйста, удалите ее вручную!"
 
-#: ../../../inc/collections/model/_blog.class.php:4595
+#: ../../../inc/collections/model/_blog.class.php:4596
 msgid "Blog media folder is not empty, you cannot change it to \"None\"."
 msgstr "Медиа папка блога не пуста, вы не можете изменить ее на \"Нет\"."
 
-#: ../../../inc/collections/model/_blog.class.php:4606
+#: ../../../inc/collections/model/_blog.class.php:4607
 #, php-format
 msgid ""
 "Folder %s already exists, it cannot be used for several media locations."
@@ -9355,13 +9364,13 @@ msgstr ""
 "Папка %s уже существует, она не может использоваться для нескольких медиа "
 "размещений."
 
-#: ../../../inc/collections/model/_blog.class.php:4611
+#: ../../../inc/collections/model/_blog.class.php:4612
 #, php-format
 msgid "Please use another folder name, because %s is reserved."
 msgstr ""
 "Пожалуйста, используйте другое имя папки, потому что %s зарезервировано."
 
-#: ../../../inc/collections/model/_blog.class.php:4626
+#: ../../../inc/collections/model/_blog.class.php:4627
 #, php-format
 msgid ""
 "Please use another folder name, because %s is already used for another media"
@@ -9370,7 +9379,7 @@ msgstr ""
 "Пожалуйста, используйте другое имя папки, потому что %s уже используется для"
 " другого медиа размещения."
 
-#: ../../../inc/collections/model/_blog.class.php:4639
+#: ../../../inc/collections/model/_blog.class.php:4640
 #, php-format
 msgid ""
 "Could not delete the old media folder \"%s\", please try to delete it "
@@ -9379,7 +9388,7 @@ msgstr ""
 "Невозможно удалить старую директорию %s. Пожалуйста, попробуйте удалить ее "
 "вручную."
 
-#: ../../../inc/collections/model/_blog.class.php:4644
+#: ../../../inc/collections/model/_blog.class.php:4645
 #, php-format
 msgid ""
 "Could not move the media folder content from \"%s\" to the new \"%s\" "
@@ -9388,7 +9397,7 @@ msgstr ""
 "Невозможно переместить содержимое медиа папки из \"%s\" в новое размещение "
 "\"%s\"."
 
-#: ../../../inc/collections/model/_blog.class.php:4653
+#: ../../../inc/collections/model/_blog.class.php:4654
 msgid ""
 "The media directory and all of its content were successfully moved to the "
 "new location."
@@ -9396,7 +9405,7 @@ msgstr ""
 "Медиа папка и все ее содержимое были успешно перемещены в новое "
 "местоположение."
 
-#: ../../../inc/collections/model/_blog.class.php:4822
+#: ../../../inc/collections/model/_blog.class.php:4823
 #, php-format
 msgid ""
 "The expected item type(s) named %s have not been found. All item types have "
@@ -9405,7 +9414,7 @@ msgstr ""
 "Ожидаемый тип записи(ей) с именем %s не был обнаружен. Все типы записей были"
 " включены для этой коллекции."
 
-#: ../../../inc/collections/model/_blog.class.php:4921
+#: ../../../inc/collections/model/_blog.class.php:4922
 #: ../../../inc/collections/views/_coll_comments.form.php:63
 #: ../../../inc/collections/views/_coll_comments.form.php:99
 #: ../../../inc/collections/views/_coll_comments.form.php:120
@@ -9413,7 +9422,7 @@ msgstr ""
 msgid "Members only"
 msgstr "Только участники"
 
-#: ../../../inc/collections/model/_blog.class.php:4925
+#: ../../../inc/collections/model/_blog.class.php:4926
 #: ../../../inc/collections/model/_blog.funcs.php:1145
 #: ../../../inc/collections/model/_blog.funcs.php:1166
 #: ../../../inc/collections/model/_blog.funcs.php:1260
@@ -9421,11 +9430,11 @@ msgstr "Только участники"
 msgid "Private"
 msgstr "Личное"
 
-#: ../../../inc/collections/model/_blog.class.php:4929
+#: ../../../inc/collections/model/_blog.class.php:4930
 msgid "Community only"
 msgstr "Только сообщество"
 
-#: ../../../inc/collections/model/_blog.class.php:4932
+#: ../../../inc/collections/model/_blog.class.php:4933
 #: ../../../inc/collections/model/_blog.funcs.php:1141
 #: ../../../inc/collections/model/_blog.funcs.php:1162
 #: ../../../inc/collections/model/_blog.funcs.php:1256
@@ -10114,13 +10123,13 @@ msgid "It is recommended to keep pings disabled."
 msgstr "Рекомендуется держать пинги отключенными."
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:46
-#: ../../../inc/collections/views/_coll_features.form.php:256
+#: ../../../inc/collections/views/_coll_features.form.php:265
 #: ../../../inc/collections/views/_coll_more.form.php:112
 msgid "This collection is for logged in users only."
 msgstr "Эта коллекция используется только для авторизованных пользователей."
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:50
-#: ../../../inc/collections/views/_coll_features.form.php:260
+#: ../../../inc/collections/views/_coll_features.form.php:269
 #: ../../../inc/collections/views/_coll_more.form.php:116
 msgid "This collection is for members only."
 msgstr "Эта коллекция используется только для ее участников."
@@ -10231,7 +10240,7 @@ msgid "Use in-skin login form every time it's possible"
 msgstr "Использовать форму входа в теме блога всегда, когда это возможно"
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:132
-#: ../../../inc/items/items.ctrl.php:1974 ../inc/items/items.ctrl.php:1975
+#: ../../../inc/items/items.ctrl.php:1973 ../inc/items/items.ctrl.php:1974
 msgid "In-skin editing"
 msgstr "Редактирование из блога"
 
@@ -10335,7 +10344,7 @@ msgid "same as above"
 msgstr "те же, что и выше"
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:181
-#: ../../../inc/items/items.ctrl.php:2386
+#: ../../../inc/items/items.ctrl.php:2385
 #: ../inc/sessions/views/_goal.form.php:66
 msgid "Notes"
 msgstr "Примечания"
@@ -10698,7 +10707,7 @@ msgid "Status for new Anonymous comments"
 msgstr "Статус для новых комментариев от анонимных пользователей"
 
 #: ../../../inc/collections/views/_coll_comments.form.php:266
-#: ../../../inc/collections/views/_coll_features.form.php:244
+#: ../../../inc/collections/views/_coll_features.form.php:253
 msgid "\"Require moderation\" statuses"
 msgstr "Статусы \"Требующие модерации\""
 
@@ -10725,12 +10734,12 @@ msgid "Comment quick moderation"
 msgstr "Быстрая модерация комментариев"
 
 #: ../../../inc/collections/views/_coll_comments.form.php:275
-#: ../../../inc/collections/views/_coll_features.form.php:253
+#: ../../../inc/collections/views/_coll_features.form.php:262
 msgid "RSS/Atom feeds"
 msgstr "RSS/Atom ленты"
 
 #: ../../../inc/collections/views/_coll_comments.form.php:277
-#: ../../../inc/collections/views/_coll_features.form.php:263
+#: ../../../inc/collections/views/_coll_features.form.php:272
 msgid "No feeds"
 msgstr "Нет лент"
 
@@ -10760,7 +10769,7 @@ msgid ""
 msgstr "Сколько последних комментариев вы хотите включить в ленты RSS и Atom?"
 
 #: ../../../inc/collections/views/_coll_comments.form.php:287
-#: ../../../inc/collections/views/_coll_features.form.php:282
+#: ../../../inc/collections/views/_coll_features.form.php:291
 #: ../../../inc/collections/views/_coll_more.form.php:41
 msgid "Subscriptions"
 msgstr "Подписки"
@@ -10775,13 +10784,13 @@ msgstr ""
 "новом комментарии."
 
 #: ../../../inc/collections/views/_coll_comments.form.php:288
-#: ../../../inc/collections/views/_coll_features.form.php:283
+#: ../../../inc/collections/views/_coll_features.form.php:292
 #: ../../../inc/collections/views/_coll_more.form.php:53
 msgid "Email subscriptions"
 msgstr "Email подписки"
 
 #: ../../../inc/collections/views/_coll_comments.form.php:289
-#: ../../../inc/collections/views/_coll_features.form.php:284
+#: ../../../inc/collections/views/_coll_features.form.php:293
 #: ../../../inc/collections/views/_coll_more.form.php:51
 msgid ""
 "Allow users to subscribe and receive email notifications for comments on a "
@@ -11002,14 +11011,14 @@ msgstr "Показывать типы записей"
 
 #: ../../../inc/collections/views/_coll_features.form.php:91
 #: ../../../inc/collections/views/_coll_features.form.php:102
-#: ../../../inc/users/model/_user.funcs.php:5949
+#: ../../../inc/users/model/_user.funcs.php:5990
 #: ../../../inc/users/views/_user_preferences.form.php:210
 msgid "yes"
 msgstr "да"
 
 #: ../../../inc/collections/views/_coll_features.form.php:92
 #: ../../../inc/collections/views/_coll_features.form.php:103
-#: ../../../inc/users/model/_user.funcs.php:5949
+#: ../../../inc/users/model/_user.funcs.php:5990
 #: ../../../inc/users/views/_user_preferences.form.php:210
 msgid "no"
 msgstr "нет"
@@ -11044,7 +11053,7 @@ msgid "No Teaser images will be displayed on default skins"
 msgstr "Вступительные изображения не будут отображаться на стандартных темах"
 
 #: ../../../inc/collections/views/_coll_features.form.php:111
-#: ../../../inc/collections/views/_coll_features.form.php:265
+#: ../../../inc/collections/views/_coll_features.form.php:274
 #: ../../../inc/collections/views/_coll_other.form.php:76
 #: ../../../inc/collections/views/_coll_other.form.php:89
 #: ../../../inc/collections/views/_coll_other.form.php:102
@@ -11058,7 +11067,7 @@ msgid "Post excerpts"
 msgstr "Выдержки из записей"
 
 #: ../../../inc/collections/views/_coll_features.form.php:112
-#: ../../../inc/collections/views/_coll_features.form.php:266
+#: ../../../inc/collections/views/_coll_features.form.php:275
 #: ../../../inc/collections/views/_coll_other.form.php:77
 #: ../../../inc/collections/views/_coll_other.form.php:90
 #: ../../../inc/collections/views/_coll_other.form.php:103
@@ -11098,7 +11107,7 @@ msgid "All images will be displayed"
 msgstr "Все изображения будут отображаться"
 
 #: ../../../inc/collections/views/_coll_features.form.php:113
-#: ../../../inc/collections/views/_coll_features.form.php:267
+#: ../../../inc/collections/views/_coll_features.form.php:276
 #: ../../../inc/collections/views/_coll_other.form.php:78
 #: ../../../inc/collections/views/_coll_other.form.php:91
 #: ../../../inc/collections/views/_coll_other.form.php:104
@@ -11277,19 +11286,26 @@ msgid "New posts by anonymous users"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_features.form.php:200
-#: ../../../inc/collections/views/_coll_features.form.php:206
-msgid "Default status"
-msgstr "Статус по умолчанию"
-
-#: ../../../inc/collections/views/_coll_features.form.php:200
-msgid "Default status for new posts by anonymous users."
+#: ../../../inc/collections/views/_coll_features.form.php:214
+msgid "Default status for new posts in backoffice"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_features.form.php:206
-msgid "Default status for new posts"
-msgstr "Статус по умолчанию для новых записей"
+#: ../../../inc/collections/views/_coll_features.form.php:200
+#: ../../../inc/collections/views/_coll_features.form.php:214
+msgid "Typically Draft if you want to make sure you don't publish by mistake."
+msgstr ""
 
-#: ../../../inc/collections/views/_coll_features.form.php:244
+#: ../../../inc/collections/views/_coll_features.form.php:208
+#: ../../../inc/collections/views/_coll_features.form.php:215
+msgid "Default status for new anonymous posts"
+msgstr ""
+
+#: ../../../inc/collections/views/_coll_features.form.php:208
+#: ../../../inc/collections/views/_coll_features.form.php:215
+msgid "Typically Review if you want to prevent Spam."
+msgstr ""
+
+#: ../../../inc/collections/views/_coll_features.form.php:253
 msgid ""
 "Posts with the selected statuses will be considered to require moderation. "
 "They will trigger \"moderation required\" notifications and will appear as "
@@ -11299,7 +11315,7 @@ msgstr ""
 " вызывать уведомления \"требуется модерация\", и будут появляться в качестве"
 " таковых на панели управления коллекции."
 
-#: ../../../inc/collections/views/_coll_features.form.php:246
+#: ../../../inc/collections/views/_coll_features.form.php:255
 msgid ""
 "Posts that have not been updated within the set delay will be reported to "
 "content moderators. Leave empty if you don't want such alerts."
@@ -11308,41 +11324,41 @@ msgstr ""
 "сообщаться модераторам контента. Оставьте пустым, если вы не хотите получать"
 " такие оповещения."
 
-#: ../../../inc/collections/views/_coll_features.form.php:246
+#: ../../../inc/collections/views/_coll_features.form.php:255
 msgid "Stale content alert"
 msgstr "Оповещение об устаревшем контенте"
 
-#: ../../../inc/collections/views/_coll_features.form.php:246
+#: ../../../inc/collections/views/_coll_features.form.php:255
 msgid "months"
 msgstr "месяцы"
 
-#: ../../../inc/collections/views/_coll_features.form.php:256
-#: ../../../inc/collections/views/_coll_features.form.php:260
+#: ../../../inc/collections/views/_coll_features.form.php:265
+#: ../../../inc/collections/views/_coll_features.form.php:269
 msgid "It is recommended to keep feeds disabled."
 msgstr "Рекомендуется держать ленты отключенными."
 
-#: ../../../inc/collections/views/_coll_features.form.php:264
+#: ../../../inc/collections/views/_coll_features.form.php:273
 msgid "Titles only"
 msgstr "Только заголовки"
 
-#: ../../../inc/collections/views/_coll_features.form.php:268
+#: ../../../inc/collections/views/_coll_features.form.php:277
 msgid "How much content do you want to make available in post feeds?"
 msgstr "Какую часть записи вы хотите показывать в лентах?"
 
-#: ../../../inc/collections/views/_coll_features.form.php:268
+#: ../../../inc/collections/views/_coll_features.form.php:277
 msgid "Post feed contents"
 msgstr "Содержимое ленты записей"
 
-#: ../../../inc/collections/views/_coll_features.form.php:270
+#: ../../../inc/collections/views/_coll_features.form.php:279
 msgid ""
 "How many of the latest posts do you want to include in RSS & Atom feeds?"
 msgstr "Сколько последних записей вы хотите включить в ленты RSS и Atom?"
 
-#: ../../../inc/collections/views/_coll_features.form.php:270
+#: ../../../inc/collections/views/_coll_features.form.php:279
 msgid "Posts in feeds"
 msgstr "Записей в лентах RSS/Atom"
 
-#: ../../../inc/collections/views/_coll_features.form.php:276
+#: ../../../inc/collections/views/_coll_features.form.php:285
 #: ../../../inc/widgets/widgets/_coll_avatar.widget.php:83
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:246
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:124
@@ -11351,7 +11367,7 @@ msgstr "Записей в лентах RSS/Atom"
 msgid "Image size"
 msgstr "Размер изображения"
 
-#: ../../../inc/collections/views/_coll_features.form.php:283
+#: ../../../inc/collections/views/_coll_features.form.php:292
 #: ../../../inc/collections/views/_coll_more.form.php:47
 msgid ""
 "Allow users to subscribe and receive email notifications for each new post."
@@ -11359,15 +11375,15 @@ msgstr ""
 "Разрешать пользователям подписываться и получать email уведомления о каждой "
 "новой записи."
 
-#: ../../../inc/collections/views/_coll_features.form.php:288
+#: ../../../inc/collections/views/_coll_features.form.php:297
 msgid "Aggregation"
 msgstr "Сборка"
 
-#: ../../../inc/collections/views/_coll_features.form.php:289
+#: ../../../inc/collections/views/_coll_features.form.php:298
 msgid "Collections to aggregate"
 msgstr "Коллекции для сборки"
 
-#: ../../../inc/collections/views/_coll_features.form.php:289
+#: ../../../inc/collections/views/_coll_features.form.php:298
 msgid ""
 "List collection IDs separated by ',', '*' for all collections or leave empty"
 " for current collection."
@@ -11375,7 +11391,7 @@ msgstr ""
 "Список ID коллекций, разделенных ',', '*' для всех коллекций или оставьте "
 "пустым для текущей коллекции."
 
-#: ../../../inc/collections/views/_coll_features.form.php:289
+#: ../../../inc/collections/views/_coll_features.form.php:298
 msgid "Note: Current collection is always part of the aggregation."
 msgstr "Примечание: Текущая коллекция всегда является частью сборки."
 
@@ -11702,7 +11718,7 @@ msgstr "Сохранить и дублировать все настройки �
 #: ../../../inc/items/views/_itemtags.view.php:60
 #: ../../../inc/sessions/views/_stats_refdomains.view.php:110
 #: ../../../inc/slugs/views/_slug_list.view.php:59
-#: ../../../inc/users/model/_user.funcs.php:5430
+#: ../../../inc/users/model/_user.funcs.php:5438
 #: ../../../inc/users/views/_group_coll_perm.form.php:59
 #: ../../../inc/users/views/_usertags.view.php:60
 msgid "Reset filters"
@@ -11710,7 +11726,7 @@ msgstr "Сбросить фильтры"
 
 #: ../../../inc/collections/views/_coll_group_perm.form.php:86
 #: ../../../inc/collections/views/_coll_user_perm.form.php:93
-#: ../../../inc/users/model/_user.funcs.php:5413
+#: ../../../inc/users/model/_user.funcs.php:5421
 #: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:158
 msgid "All users"
 msgstr "Все пользователи"
@@ -12016,7 +12032,7 @@ msgstr "Не участники"
 #: ../../../inc/files/views/_file_list.inc.php:149
 #: ../../../inc/messaging/views/_contact_list.view.php:121
 #: ../../../inc/users/groups.ctrl.php:66
-#: ../inc/users/model/_user.class.php:6975
+#: ../inc/users/model/_user.class.php:6982
 #: ../../../inc/users/views/_invitation.view.php:81
 #: ../../../inc/users/views/_userfield.form.php:39
 msgid "Group"
@@ -13324,7 +13340,7 @@ msgid "Single post URLs"
 msgstr "URL одиночных записей"
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:50
-#: ../../../inc/users/model/_user.funcs.php:5685
+#: ../../../inc/users/model/_user.funcs.php:5695
 #: ../../../inc/users/views/_usertag.form.php:90
 #: ../../../skins_email/account_activated.html.php:47
 #: ../../../skins_email/account_activated.txt.php:43
@@ -13351,10 +13367,10 @@ msgstr "Полное имя"
 #: ../../../inc/regional/views/_subregion_list.view.php:150
 #: ../../../inc/regional/views/_subregion_list.view.php:163
 #: ../../../inc/sessions/views/_stats_topips.view.php:74
-#: ../../../inc/users/model/_user.class.php:6980
+#: ../../../inc/users/model/_user.class.php:6987
 #: ../../../inc/users/model/_user.funcs.php:3330
 #: ../../../inc/users/model/_user.funcs.php:3337
-#: ../../../inc/users/model/_user.funcs.php:5724
+#: ../../../inc/users/model/_user.funcs.php:5744
 #: ../../../inc/users/views/_settings.form.php:72
 #: ../../../inc/users/views/_user_identity.form.php:290
 #: ../../../inc/users/views/_user_identity.form.php:481
@@ -13387,9 +13403,9 @@ msgstr "Оба"
 #: ../../../inc/regional/views/_subregion_list.view.php:134
 #: ../../../inc/regional/views/_subregion_list.view.php:155
 #: ../../../inc/regional/views/_subregion_list.view.php:168
-#: ../../../inc/users/model/_user.class.php:6981
+#: ../../../inc/users/model/_user.class.php:6988
 #: ../../../inc/users/model/_user.funcs.php:3346
-#: ../../../inc/users/model/_user.funcs.php:5738
+#: ../../../inc/users/model/_user.funcs.php:5758
 #: ../../../inc/users/views/_settings.form.php:74
 #: ../../../inc/users/views/_user_identity.form.php:306
 #: ../../../inc/users/views/_user_identity.form.php:487
@@ -13403,9 +13419,9 @@ msgstr "Регион"
 #: ../../../inc/regional/views/_city_list.view.php:169
 #: ../../../inc/regional/views/_city_list.view.php:187
 #: ../../../inc/regional/views/_subregion.form.php:32
-#: ../../../inc/users/model/_user.class.php:6982
+#: ../../../inc/users/model/_user.class.php:6989
 #: ../../../inc/users/model/_user.funcs.php:3354
-#: ../../../inc/users/model/_user.funcs.php:5749
+#: ../../../inc/users/model/_user.funcs.php:5769
 #: ../../../inc/users/views/_settings.form.php:76
 #: ../../../inc/users/views/_user_identity.form.php:319
 #: ../../../inc/users/views/_user_identity.form.php:493
@@ -13416,9 +13432,9 @@ msgstr "Субрегион"
 #: ../../../inc/items/model/_item.funcs.php:3931
 #: ../inc/regional/cities.ctrl.php:44
 #: ../../../inc/regional/views/_city.form.php:32
-#: ../../../inc/users/model/_user.class.php:6983
+#: ../../../inc/users/model/_user.class.php:6990
 #: ../../../inc/users/model/_user.funcs.php:3361
-#: ../../../inc/users/model/_user.funcs.php:5760
+#: ../../../inc/users/model/_user.funcs.php:5780
 #: ../../../inc/users/views/_settings.form.php:78
 #: ../../../inc/users/views/_user_identity.form.php:332
 #: ../../../inc/users/views/_user_identity.form.php:499
@@ -13426,7 +13442,7 @@ msgid "City"
 msgstr "Город"
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:65
-#: ../../../inc/users/model/_user.funcs.php:5780
+#: ../../../inc/users/model/_user.funcs.php:5800
 msgid "Social links"
 msgstr "Социальные ссылки"
 
@@ -13594,14 +13610,14 @@ msgstr "Успешно"
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:774
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:780
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:786
-#: ../../../inc/tools/model/_email.funcs.php:989
-#: ../../../inc/tools/model/_email.funcs.php:990
-#: ../../../inc/tools/model/_email.funcs.php:1021
-#: ../../../inc/tools/model/_email.funcs.php:1022
-#: ../../../inc/tools/model/_email.funcs.php:1073
-#: ../../../inc/tools/model/_email.funcs.php:1074
-#: ../../../inc/tools/model/_email.funcs.php:1118
-#: ../../../inc/tools/model/_email.funcs.php:1119
+#: ../../../inc/tools/model/_email.funcs.php:1048
+#: ../../../inc/tools/model/_email.funcs.php:1049
+#: ../../../inc/tools/model/_email.funcs.php:1080
+#: ../../../inc/tools/model/_email.funcs.php:1081
+#: ../../../inc/tools/model/_email.funcs.php:1132
+#: ../../../inc/tools/model/_email.funcs.php:1133
+#: ../../../inc/tools/model/_email.funcs.php:1177
+#: ../../../inc/tools/model/_email.funcs.php:1178
 #: ../inc/tools/system.ctrl.php:92 ../../../inc/tools/system.ctrl.php:702
 #: ../inc/tools/system.ctrl.php:744
 #: ../../../install/_functions_create.php:1348
@@ -13779,24 +13795,24 @@ msgstr "Полезность:"
 msgid "Publish this comment!"
 msgstr "Опубликовать этот комментарий!"
 
-#: ../../../inc/comments/model/_comment.class.php:2504
+#: ../../../inc/comments/model/_comment.class.php:2509
 msgid "Send email to comment author"
 msgstr "Послать email автору комментария"
 
-#: ../../../inc/comments/model/_comment.class.php:2508
+#: ../../../inc/comments/model/_comment.class.php:2513
 msgid "Send message to comment author"
 msgstr "Послать сообщение автору комментария"
 
-#: ../../../inc/comments/model/_comment.class.php:2593
+#: ../../../inc/comments/model/_comment.class.php:2598
 msgid "Permanent link to this comment"
 msgstr "Постоянная ссылка на этот комментарий"
 
-#: ../../../inc/comments/model/_comment.class.php:2891
-#: ../../../inc/comments/model/_comment.class.php:2897
+#: ../../../inc/comments/model/_comment.class.php:2896
+#: ../../../inc/comments/model/_comment.class.php:2902
 msgid "Posted by "
 msgstr "Автор: "
 
-#: ../../../inc/comments/model/_comment.class.php:2953
+#: ../../../inc/comments/model/_comment.class.php:2958
 #: ../../../inc/items/model/_item.class.php:3956
 #: ../../../inc/items/views/_item_list_full.view.php:306
 #: ../../../inc/links/views/_link_list.inc.php:32
@@ -13827,87 +13843,87 @@ msgstr "Автор: "
 msgid "Attachments"
 msgstr "Вложения"
 
-#: ../../../inc/comments/model/_comment.class.php:2965
+#: ../../../inc/comments/model/_comment.class.php:2970
 #: ../../../inc/links/views/_link_list.view.php:93
 msgid "Link ID"
 msgstr "ID связки"
 
-#: ../../../inc/comments/model/_comment.class.php:2979
+#: ../../../inc/comments/model/_comment.class.php:2984
 #: ../../../inc/items/model/_item.class.php:3974
 #: ../../../inc/messaging/model/_message.class.php:1251
 msgid "Download file"
 msgstr "Скачать файл"
 
-#: ../../../inc/comments/model/_comment.class.php:2990
+#: ../../../inc/comments/model/_comment.class.php:2995
 #: ../../../inc/items/model/_item.class.php:4092
 #: ../../../inc/messaging/model/_message.class.php:1390
 msgid "Missing attachment!"
 msgstr "Потерянное вложение!"
 
-#: ../../../inc/comments/model/_comment.class.php:3055
+#: ../../../inc/comments/model/_comment.class.php:3060
 #, php-format
 msgid "Comment from %s"
 msgstr "Комментарий от %s"
 
-#: ../../../inc/comments/model/_comment.class.php:3059
+#: ../../../inc/comments/model/_comment.class.php:3064
 #, php-format
 msgid "Trackback from %s"
 msgstr "Трекбек от %s"
 
-#: ../../../inc/comments/model/_comment.class.php:3063
+#: ../../../inc/comments/model/_comment.class.php:3068
 #, php-format
 msgid "Pingback from %s"
 msgstr "Пинг от %s"
 
-#: ../../../inc/comments/model/_comment.class.php:3072
+#: ../../../inc/comments/model/_comment.class.php:3077
 #, php-format
 msgid "<a %s>Meta comment</a> from %s"
 msgstr "<a %s>Мета комментарий</a> из %s"
 
-#: ../../../inc/comments/model/_comment.class.php:3189
+#: ../../../inc/comments/model/_comment.class.php:3194
 msgid "Bad"
 msgstr "Плохо"
 
-#: ../../../inc/comments/model/_comment.class.php:3190
+#: ../../../inc/comments/model/_comment.class.php:3195
 #: ../../../inc/comments/views/_comments_sidebar.view.php:148
 msgid "Poor"
 msgstr "Слабо"
 
-#: ../../../inc/comments/model/_comment.class.php:3191
+#: ../../../inc/comments/model/_comment.class.php:3196
 msgid "Average"
 msgstr "Нормально"
 
-#: ../../../inc/comments/model/_comment.class.php:3193
+#: ../../../inc/comments/model/_comment.class.php:3198
 #: ../../../inc/comments/views/_comments_sidebar.view.php:160
 msgid "Excellent"
 msgstr "Отлично"
 
-#: ../../../inc/comments/model/_comment.class.php:3266
+#: ../../../inc/comments/model/_comment.class.php:3271
 #: ../../../inc/comments/views/_comments_sidebar.view.php:131
 msgid "No rating"
 msgstr "Без оценки"
 
-#: ../../../inc/comments/model/_comment.class.php:3495
+#: ../../../inc/comments/model/_comment.class.php:3500
 #: ../../../inc/items/model/_item.class.php:7142
 msgid "Marking email notifications for members as sent."
 msgstr "Маркировка email уведомлений для участников как уже отправленные."
 
-#: ../../../inc/comments/model/_comment.class.php:3495
-#: ../../../inc/comments/model/_comment.class.php:3501
-#: ../../../inc/comments/model/_comment.class.php:3513
-#: ../../../inc/comments/model/_comment.class.php:3557
-#: ../../../inc/comments/model/_comment.class.php:3647
-#: ../../../inc/comments/model/_comment.class.php:3681
-#: ../../../inc/comments/model/_comment.class.php:3689
-#: ../../../inc/comments/model/_comment.class.php:3695
-#: ../../../inc/comments/model/_comment.class.php:3701
-#: ../../../inc/comments/model/_comment.class.php:3705
-#: ../../../inc/comments/model/_comment.class.php:3709
-#: ../../../inc/comments/model/_comment.class.php:3736
-#: ../../../inc/comments/model/_comment.class.php:3742
+#: ../../../inc/comments/model/_comment.class.php:3500
+#: ../../../inc/comments/model/_comment.class.php:3506
+#: ../../../inc/comments/model/_comment.class.php:3518
+#: ../../../inc/comments/model/_comment.class.php:3562
+#: ../../../inc/comments/model/_comment.class.php:3652
+#: ../../../inc/comments/model/_comment.class.php:3686
+#: ../../../inc/comments/model/_comment.class.php:3694
+#: ../../../inc/comments/model/_comment.class.php:3700
+#: ../../../inc/comments/model/_comment.class.php:3706
+#: ../../../inc/comments/model/_comment.class.php:3710
+#: ../../../inc/comments/model/_comment.class.php:3714
+#: ../../../inc/comments/model/_comment.class.php:3741
 #: ../../../inc/comments/model/_comment.class.php:3747
-#: ../../../inc/comments/model/_comment.class.php:4033
-#: ../../../inc/comments/model/_comment.class.php:4037
+#: ../../../inc/comments/model/_comment.class.php:3752
+#: ../../../inc/comments/model/_comment.class.php:4038
+#: ../../../inc/comments/model/_comment.class.php:4042
 #: ../../../inc/items/model/_item.class.php:7142
 #: ../../../inc/items/model/_item.class.php:7148
 #: ../../../inc/items/model/_item.class.php:7154
@@ -13939,28 +13955,28 @@ msgstr "Маркировка email уведомлений для участни�
 msgid "Sending notifications:"
 msgstr "Отправка уведомлений:"
 
-#: ../../../inc/comments/model/_comment.class.php:3501
+#: ../../../inc/comments/model/_comment.class.php:3506
 #: ../../../inc/items/model/_item.class.php:7148
 msgid "Marking email notifications for community as sent."
 msgstr "Маркировка email уведомлений для сообщества как уже отправленные."
 
-#: ../../../inc/comments/model/_comment.class.php:3513
+#: ../../../inc/comments/model/_comment.class.php:3518
 #: ../../../inc/items/model/_item.class.php:7166
 msgid ""
 "All possible notifications have already been sent: skipping notifications..."
 msgstr "Все возможные уведомления уже были отправлены: пропуск уведомлений..."
 
-#: ../../../inc/comments/model/_comment.class.php:3557
+#: ../../../inc/comments/model/_comment.class.php:3562
 msgid "Scheduling email notifications for subscribers."
 msgstr "Назначение email уведомлений для подписчиков."
 
-#: ../../../inc/comments/model/_comment.class.php:3647
+#: ../../../inc/comments/model/_comment.class.php:3652
 #: ../../../inc/items/model/_item.class.php:7368
 #, php-format
 msgid "Sending %d email notifications to moderators."
 msgstr "Отправка %d email уведомлений модераторам."
 
-#: ../../../inc/comments/model/_comment.class.php:3681
+#: ../../../inc/comments/model/_comment.class.php:3686
 #: ../../../inc/items/model/_item.class.php:7403
 msgid ""
 "Skipping email notifications to subscribers because subscriptions are turned"
@@ -13969,34 +13985,34 @@ msgstr ""
 "Пропуск email уведомлений подписчикам, потому что подписки выключены для "
 "этой коллекции."
 
-#: ../../../inc/comments/model/_comment.class.php:3689
+#: ../../../inc/comments/model/_comment.class.php:3694
 #: ../../../inc/items/model/_item.class.php:7418
 #, php-format
 msgid ""
 "Skipping email notifications to subscribers because status is still: %s."
 msgstr "Пропуск email уведомлений подписчикам, потому что статус все еще: %s."
 
-#: ../../../inc/comments/model/_comment.class.php:3695
+#: ../../../inc/comments/model/_comment.class.php:3700
 #: ../../../inc/items/model/_item.class.php:7424
 msgid "Skipping email notifications to subscribers."
 msgstr "Пропуск email уведомлений подписчикам."
 
-#: ../../../inc/comments/model/_comment.class.php:3701
+#: ../../../inc/comments/model/_comment.class.php:3706
 #: ../../../inc/items/model/_item.class.php:7430
 msgid "Force sending email notifications to subscribers..."
 msgstr "Форсирование отправки email уведомлений подписчикам..."
 
-#: ../../../inc/comments/model/_comment.class.php:3705
+#: ../../../inc/comments/model/_comment.class.php:3710
 #: ../../../inc/items/model/_item.class.php:7434
 msgid "Force sending email notifications to subscribed members..."
 msgstr "Форсирование отправки email уведомлений подписанным участникам..."
 
-#: ../../../inc/comments/model/_comment.class.php:3709
+#: ../../../inc/comments/model/_comment.class.php:3714
 #: ../../../inc/items/model/_item.class.php:7438
 msgid "Force sending email notifications to other subscribers..."
 msgstr "Форсирование отправки email другим подписчикам..."
 
-#: ../../../inc/comments/model/_comment.class.php:3736
+#: ../../../inc/comments/model/_comment.class.php:3741
 #: ../../../inc/items/model/_item.class.php:7476
 msgid ""
 "Skipping email notifications to subscribers because they were already "
@@ -14004,23 +14020,23 @@ msgid ""
 msgstr ""
 "Пропуск email уведомлений подписчикам, потому что они уже были уведомлены."
 
-#: ../../../inc/comments/model/_comment.class.php:3742
+#: ../../../inc/comments/model/_comment.class.php:3747
 #: ../../../inc/items/model/_item.class.php:7482
 msgid "Skipping email notifications to subscribed members."
 msgstr "Пропуск email уведомлений подписанным участникам."
 
-#: ../../../inc/comments/model/_comment.class.php:3747
+#: ../../../inc/comments/model/_comment.class.php:3752
 #: ../../../inc/items/model/_item.class.php:7487
 msgid "Skipping email notifications to other subscribers."
 msgstr "Пропуск email уведомлений другим подписчикам."
 
-#: ../../../inc/comments/model/_comment.class.php:4033
+#: ../../../inc/comments/model/_comment.class.php:4038
 #: ../../../inc/items/model/_item.class.php:7647
 #, php-format
 msgid "Sending %d email notifications to subscribed members."
 msgstr "Отправка %d email уведомлений подписанным участникам."
 
-#: ../../../inc/comments/model/_comment.class.php:4037
+#: ../../../inc/comments/model/_comment.class.php:4042
 #: ../../../inc/items/model/_item.class.php:7651
 #, php-format
 msgid "Sending %d email notifications to other subscribers."
@@ -14028,56 +14044,56 @@ msgstr "Отправка %d email уведомлений другим подпи
 
 #. TRANS: Subject of the mail to send on new trackbacks. First %s is the
 #. blog's shortname, the second %s is the item's title.
-#: ../../../inc/comments/model/_comment.class.php:4126
+#: ../../../inc/comments/model/_comment.class.php:4131
 #, php-format
 msgid "[%s] New trackback on \"%s\""
 msgstr "[%s] Новый трекбек на \"%s\""
 
 #. TRANS: Subject of the mail to send on new meta comments. First %s is author
 #. login, the second %s is the item's title.
-#: ../../../inc/comments/model/_comment.class.php:4131
+#: ../../../inc/comments/model/_comment.class.php:4136
 #, php-format
 msgid "%s posted a new meta comment on \"%s\""
 msgstr "%s опубликовал новый мета комментарий в \"%s\""
 
 #. TRANS: Subject of the mail to send on new comments to moderators. First %s
 #. is blog name, the second %s is the item's title.
-#: ../../../inc/comments/model/_comment.class.php:4140
+#: ../../../inc/comments/model/_comment.class.php:4145
 #, php-format
 msgid "[%s] New comment awaiting moderation on \"%s\""
 msgstr "[%s] Новый комментарий ожидает модерации. Запись \"%s\""
 
 #. TRANS: Subject of the mail to send on new comments to moderators. First %s
 #. is blog name, the second %s is the item's title.
-#: ../../../inc/comments/model/_comment.class.php:4145
+#: ../../../inc/comments/model/_comment.class.php:4150
 #, php-format
 msgid "[%s] New comment may need moderation on \"%s\""
 msgstr "[%s] Новый комментарий может нуждаться в модерации в \"%s\""
 
 #. TRANS: Subject of the mail to send on new comments to subscribed users.
 #. First %s is blog name, the second %s is the item's title.
-#: ../../../inc/comments/model/_comment.class.php:4151
+#: ../../../inc/comments/model/_comment.class.php:4156
 #, php-format
 msgid "[%s] New comment on \"%s\""
 msgstr "[%s] Новый комментарий на \"%s\""
 
-#: ../../../inc/comments/model/_comment.class.php:4251
+#: ../../../inc/comments/model/_comment.class.php:4256
 #, php-format
 msgid "[%s] Spam comment may need moderation on \"%s\""
 msgstr "[%s] Спам комментарий может нуждаться в модерации в \"%s\""
 
-#: ../../../inc/comments/model/_comment.class.php:4619
-#: ../../../inc/comments/model/_comment.class.php:4623
+#: ../../../inc/comments/model/_comment.class.php:4624
+#: ../../../inc/comments/model/_comment.class.php:4628
 #: ../../../inc/comments/model/_comment.funcs.php:938
 msgid "Reply to this comment"
 msgstr "Ответить на этот комментарий"
 
-#: ../../../inc/comments/model/_comment.class.php:4619
+#: ../../../inc/comments/model/_comment.class.php:4624
 #: ../../../inc/comments/model/_comment.funcs.php:946
 msgid "You are currently replying to this comment"
 msgstr "В настоящий момент вы отвечаете на этот комментарий"
 
-#: ../../../inc/comments/model/_comment.class.php:4927
+#: ../../../inc/comments/model/_comment.class.php:4932
 #, php-format
 msgid ""
 "Since the parent post of this comment have its visibility set to \"%s\", the"
@@ -14316,12 +14332,13 @@ msgstr "Содержимое комментария"
 #: ../../../inc/comments/views/_comment.form.php:85
 #: ../../../skins/_atom/comments.main.php:87
 #: ../skins/_rdf/comments.main.php:97 ../../../skins/_rss/comments.main.php:81
-#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:62
+#: ../../../skins/bootstrap_gallery_legacy/_item_comment.inc.php:63
+#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:65
 #: ../../../skins/pureforums_skin/_edit_comment.disp.php:71
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:44
 #: ../../../skins_fallback_v5/_item_comment.inc.php:68
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:66
-#: ../../../skins_fallback_v6/_item_comment.inc.php:60
+#: ../../../skins_fallback_v6/_item_comment.inc.php:63
 msgid "In response to"
 msgstr "В ответ на"
 
@@ -15048,8 +15065,8 @@ msgid "Timed out"
 msgstr "Время вышло"
 
 #: ../../../inc/cron/views/_cronjob_list.view.php:192
-#: ../../../inc/tools/model/_email.funcs.php:219
-#: ../../../inc/tools/model/_email.funcs.php:223
+#: ../../../inc/tools/model/_email.funcs.php:235
+#: ../../../inc/tools/model/_email.funcs.php:239
 #: ../inc/tools/system.ctrl.php:211
 #: ../../../inc/tools/views/_email_return.view.php:130
 #: ../../../inc/tools/views/_email_return_details.view.php:30
@@ -15214,25 +15231,25 @@ msgstr "Извините, тестовое email сообщение не мож�
 msgid "One test email was sent to email address: %s"
 msgstr "Одно тестовое email сообщение было отправлено на email адрес: %s"
 
-#: ../../../inc/email_campaigns/campaigns.ctrl.php:348
+#: ../../../inc/email_campaigns/campaigns.ctrl.php:353
 msgid "Sorry, you don't have permission to view scheduled jobs."
 msgstr "Извините, у вас нет разрешения к просмотру запланированных задач."
 
-#: ../../../inc/email_campaigns/campaigns.ctrl.php:393
+#: ../../../inc/email_campaigns/campaigns.ctrl.php:398
 msgid "No account matches the filterset. Please try to change the filters."
 msgstr ""
 
-#: ../../../inc/email_campaigns/campaigns.ctrl.php:398
+#: ../../../inc/email_campaigns/campaigns.ctrl.php:403
 msgid ""
 "No active account accepts email from this list. Please try to change the "
 "filters."
 msgstr ""
 
-#: ../../../inc/email_campaigns/campaigns.ctrl.php:428
+#: ../../../inc/email_campaigns/campaigns.ctrl.php:433
 msgid "Edit campaign"
 msgstr "Редактировать кампанию"
 
-#: ../../../inc/email_campaigns/campaigns.ctrl.php:489
+#: ../../../inc/email_campaigns/campaigns.ctrl.php:494
 #: ../../../inc/widgets/widgets/_user_login.widget.php:166
 #: ../../../skins_email/_email_header.inc.html.php:65
 #: ../../../skins_email/_email_header.inc.txt.php:22
@@ -15240,7 +15257,7 @@ msgstr "Редактировать кампанию"
 msgid "Hello %s!"
 msgstr ""
 
-#: ../../../inc/email_campaigns/campaigns.ctrl.php:489
+#: ../../../inc/email_campaigns/campaigns.ctrl.php:494
 msgid "Here are some news..."
 msgstr ""
 
@@ -15369,54 +15386,62 @@ msgstr ""
 msgid "Email campaigns"
 msgstr "Email кампании"
 
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:239
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:248
 msgid "Create new campaign"
 msgstr "Создать новую кампанию"
 
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:260
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:269
 #: ../../../inc/email_campaigns/newsletters.ctrl.php:41
 #: ../../../inc/email_campaigns/views/_newsletters.form.php:30
 #: ../../../inc/users/users.ctrl.php:427
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:84
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:99
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:111
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:97
 #: ../../../inc/widgets/widgets/_org_members.widget.php:118
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:71
 msgid "List"
 msgstr "Список"
 
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:268
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:277
 #: ../../../inc/email_campaigns/views/_campaigns_compose.form.php:29
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:33
 #: ../../../inc/email_campaigns/views/_campaigns_new.form.php:28
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:43
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:44
 msgid "Email title"
 msgstr "Email заголовок"
 
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:274
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:283
 #: ../../../inc/tools/views/_email_other.form.php:49
 msgid "Sending"
 msgstr "Отправка"
 
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:282
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:291
 msgid "Sent manually"
 msgstr ""
 
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:291
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:300
 msgid "Sent automatically"
 msgstr ""
 
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:300
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:309
 msgid "Send count"
 msgstr ""
 
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:312
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:318
+msgid "Open count"
+msgstr ""
+
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:327
+msgid "Click count"
+msgstr ""
+
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:339
 #: ../../../inc/links/model/_linkemailcampaign.class.php:43
 msgid "Edit this email campaign..."
 msgstr "Редактировать эту email кампанию..."
 
-#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:315
-#: ../../../inc/tools/views/_email_address.view.php:219
+#: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:342
+#: ../../../inc/tools/views/_email_address.view.php:223
 msgid "Delete this email address!"
 msgstr "Удалить этот email адрес!"
 
@@ -15494,7 +15519,7 @@ msgid "Save & continue"
 msgstr "Сохранить и продолжить"
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:34
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:44
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:45
 msgid "Campaign created"
 msgstr "Кампания создана"
 
@@ -15504,7 +15529,7 @@ msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:35
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:36
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:45
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:46
 msgid "Not sent yet"
 msgstr "Пока еще не отправлено"
 
@@ -15526,12 +15551,12 @@ msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:46
 #: ../../../inc/email_campaigns/views/_campaigns_new.form.php:27
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:66
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:70
 msgid "Send to subscribers of"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:48
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:68
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:72
 #: ../../../inc/items/views/_item_list_full.view.php:784
 #: ../../../inc/maintenance/views/_upgrade.form.php:40
 #: ../../../inc/widgets/widgets/_coll_subscription.widget.php:163
@@ -15540,49 +15565,51 @@ msgid "Update"
 msgstr "Обновить"
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:49
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:69
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:73
 msgid "Accounts which currently accept this list"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:49
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:69
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:73
 msgid "Currently selected recipients"
 msgstr "Выбранные получатели в данный момент"
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:50
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:70
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:74
 msgid "After additional filter"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:52
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:72
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:76
 msgid "Accounts that match your additional filter"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:53
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:73
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:77
 msgid "Change filter"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:55
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:75
-msgid "Accounts which have already been sent this list"
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:79
+msgid "Accounts which have already been sent this campaign"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:55
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:75
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:79
 msgid "Already received"
 msgstr "Уже получившие"
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:56
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:77
-msgid "Accounts which have not been sent this list yet"
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:81
+msgid "Accounts which have not been sent this campaign yet"
 msgstr ""
 
 #: ../../../inc/email_campaigns/views/_campaigns_info.form.php:56
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:77
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:81
+#: ../../../inc/tools/model/_email.funcs.php:276
+#: ../../../inc/tools/model/_email.funcs.php:280
 #: ../../../inc/users/model/_user.funcs.php:3454
-#: ../../../inc/users/model/_user.funcs.php:6485
+#: ../../../inc/users/model/_user.funcs.php:6526
 msgid "Ready to send"
 msgstr "Готово к отправке"
 
@@ -15602,60 +15629,72 @@ msgstr ""
 msgid "Recipients of this campaign"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:37
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:38
 msgid "Send report"
 msgstr "Отчет отправки"
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:42
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:43
 #, php-format
 msgid "Review message for: %s"
 msgstr "Пересмотреть сообщение для: %s"
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:45
-#: ../../../inc/users/model/_user.funcs.php:5980
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:46
+#: ../../../inc/users/model/_user.funcs.php:6021
 msgid "Last sent"
 msgstr "Последнее отправленное"
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:49
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:50
 msgid "HTML message"
 msgstr "HTML сообщение"
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:57
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:59
 msgid "Plain-text message"
 msgstr "Простое текстовое сообщение"
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:63
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:67
 msgid "Campaign recipients"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:76
-msgid "Accounts which will be skipped from receiving this list"
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:80
+msgid "Accounts which will be skipped from receiving this campaign"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:76
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:80
 msgid "Manually skipped"
 msgstr ""
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:85
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:86
+msgid "track clickthroughs in HTML version"
+msgstr ""
+
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:87
+msgid "track clickthroughs in plain text version"
+msgstr ""
+
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:88
+msgid "Track email"
+msgstr ""
+
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:93
 msgid "See scheduled send jobs for this campaign"
 msgstr "Смотреть запланированные задачи отправки для этой кампании"
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:90
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:98
 #, php-format
 msgid "Start a job to send campaign to %s users"
 msgstr "Начать задачу для отправки кампании %s пользователям"
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:96
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:104
 #, php-format
 msgid "Send campaign to %s users now"
 msgstr "Отправить кампанию %s пользователям сейчас"
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:108
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:110
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:116
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:118
 msgid "Send test email"
 msgstr "Отправить тестовый email"
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:109
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:117
 #: ../../../inc/tools/views/_email_address.form.php:27
 #: ../../../inc/tools/views/_email_address.form.php:33
 #: ../../../inc/users/model/_userfield.class.php:95
@@ -15666,7 +15705,7 @@ msgstr "Отправить тестовый email"
 msgid "Email address"
 msgstr "Email адрес"
 
-#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:109
+#: ../../../inc/email_campaigns/views/_campaigns_send.form.php:117
 msgid ""
 "Fill your email address and press button \"Send test email\" if you want to "
 "test this list"
@@ -16587,8 +16626,8 @@ msgid "Yes"
 msgstr "Да"
 
 #: ../../../inc/files/model/_file.funcs.php:2299
-#: ../../../inc/tools/model/_email.funcs.php:208
 #: ../../../inc/tools/model/_email.funcs.php:212
+#: ../../../inc/tools/model/_email.funcs.php:223
 msgid "Ok"
 msgstr "Ok"
 
@@ -17963,7 +18002,7 @@ msgid "New Post Status has been created."
 msgstr "Новый Статус Записи был создан"
 
 #: ../../../inc/items/item_statuses.ctrl.php:138
-#: ../inc/items/items.ctrl.php:1376
+#: ../inc/items/items.ctrl.php:1375
 msgid "Post status has been updated."
 msgstr "Статус записей был обновлен."
 
@@ -18155,30 +18194,30 @@ msgstr ""
 msgid "Visibility of %d comments could not be updated to %s."
 msgstr ""
 
-#: ../../../inc/items/items.ctrl.php:742
+#: ../../../inc/items/items.ctrl.php:741
 #, php-format
 msgid "Duplicate %s"
 msgstr "Дублирование %s"
 
-#: ../../../inc/items/items.ctrl.php:785 ../inc/items/items.ctrl.php:882
+#: ../../../inc/items/items.ctrl.php:784 ../inc/items/items.ctrl.php:881
 #, php-format
 msgid "Editing post #%d: %s"
 msgstr "Редактирование записи #%d: %s"
 
-#: ../../../inc/items/items.ctrl.php:818
+#: ../../../inc/items/items.ctrl.php:817
 msgid "You have no permission to view history for this item."
 msgstr "У вас нет прав на просмотр истории этой записи."
 
-#: ../../../inc/items/items.ctrl.php:861
+#: ../../../inc/items/items.ctrl.php:860
 #, php-format
 msgid "Item has been restored from revision #%s"
 msgstr "Запись была восстановлена из ревизии #%s"
 
-#: ../../../inc/items/items.ctrl.php:993
+#: ../../../inc/items/items.ctrl.php:992
 msgid "You have no permission to duplicate the original post."
 msgstr "У вас нет прав на копирование оригинальной записи."
 
-#: ../../../inc/items/items.ctrl.php:1151
+#: ../../../inc/items/items.ctrl.php:1150
 #, php-format
 msgid ""
 "Please note: this item is also cross-posted to the following other "
@@ -18187,11 +18226,11 @@ msgstr ""
 "Обратите внимание: эта запись также размещена в следующих других "
 "категориях/коллекциях: %s"
 
-#: ../../../inc/items/items.ctrl.php:1177
+#: ../../../inc/items/items.ctrl.php:1176
 msgid "The post couldn't be updated."
 msgstr "Запись не может быть обновлена."
 
-#: ../../../inc/items/items.ctrl.php:1299
+#: ../../../inc/items/items.ctrl.php:1298
 msgid ""
 "The current item status is no longer valid for the new item type and has "
 "been reset."
@@ -18199,105 +18238,100 @@ msgstr ""
 "Текущий статус записи больше недействителен для нового типа записи и был "
 "сброшен."
 
-#: ../../../inc/items/items.ctrl.php:1317
+#: ../../../inc/items/items.ctrl.php:1316
 msgid "Post type has been updated."
 msgstr "Тип записей был обновлен."
 
-#: ../../../inc/items/items.ctrl.php:1366
+#: ../../../inc/items/items.ctrl.php:1365
 #: ../inc/items/model/_item.class.php:732
 msgid "Advanced properties panel"
 msgstr "Панель дополнительных свойств"
 
-#: ../../../inc/items/items.ctrl.php:1366 ../inc/items/items.ctrl.php:1367
+#: ../../../inc/items/items.ctrl.php:1365 ../inc/items/items.ctrl.php:1366
 #: ../../../inc/items/model/_item.class.php:732
 #: ../../../inc/items/model/_item.class.php:733
 msgid "If you want to redirect this post, you must specify an URL!"
 msgstr "Если вы хотите перенаправить эту запись, вы должны определить URL!"
 
-#: ../../../inc/items/items.ctrl.php:1442
+#: ../../../inc/items/items.ctrl.php:1441
 msgid "One post has been updated!"
 msgstr "Одна запись была обновлена!"
 
-#: ../../../inc/items/items.ctrl.php:1443
+#: ../../../inc/items/items.ctrl.php:1442
 #, php-format
 msgid "%d posts have been updated!"
 msgstr "%d записей были обновлены!"
 
-#: ../../../inc/items/items.ctrl.php:1447
+#: ../../../inc/items/items.ctrl.php:1446
 msgid "No update executed!"
 msgstr "Записи не изменены!"
 
-#: ../../../inc/items/items.ctrl.php:1492
+#: ../../../inc/items/items.ctrl.php:1491
 msgid "Post has been published."
 msgstr "Запись опубликована."
 
-#: ../../../inc/items/items.ctrl.php:1495
+#: ../../../inc/items/items.ctrl.php:1494
 msgid "The post is now visible by the community."
 msgstr "Запись сейчас видна сообществом."
 
-#: ../../../inc/items/items.ctrl.php:1498
+#: ../../../inc/items/items.ctrl.php:1497
 msgid "The post is now visible by the members."
 msgstr "Запись сейчас видна участниками блога."
 
-#: ../../../inc/items/items.ctrl.php:1501
+#: ../../../inc/items/items.ctrl.php:1500
 msgid "The post is now visible by moderators."
 msgstr "Запись сейчас видна модераторами."
 
-#: ../../../inc/items/items.ctrl.php:1551
+#: ../../../inc/items/items.ctrl.php:1550
 msgid "Post has been restricted."
 msgstr "Запись была ограничена."
 
-#: ../../../inc/items/items.ctrl.php:1572
+#: ../../../inc/items/items.ctrl.php:1571
 msgid "Post has been deprecated."
 msgstr "Запись отклонена."
 
-#: ../../../inc/items/items.ctrl.php:1601
+#: ../../../inc/items/items.ctrl.php:1600
 msgid "Post has been deleted."
 msgstr "Запись удалена."
 
-#: ../../../inc/items/items.ctrl.php:1653
-msgid "Wrong selected item for merging, please try again."
-msgstr ""
-"Неправильно выбранная запись для объединения, пожалуйста попробуйте еще раз."
-
-#: ../../../inc/items/items.ctrl.php:1730
+#: ../../../inc/items/items.ctrl.php:1729
 #, php-format
 msgid "Item #%d has been appended to current Item."
 msgstr "Запись #%d была присоединена к текущей записи."
 
-#: ../../../inc/items/items.ctrl.php:1731
+#: ../../../inc/items/items.ctrl.php:1730
 #, php-format
 msgid "Item #%d has been merged to current Item."
 msgstr "Запись #%d была объединена с текущей записью."
 
-#: ../../../inc/items/items.ctrl.php:1769
+#: ../../../inc/items/items.ctrl.php:1768
 msgid "Workflow feature has not been enabled for this collection."
 msgstr "Документооборот не был включен для этой коллекции."
 
-#: ../../../inc/items/items.ctrl.php:1890 ../inc/items/items.ctrl.php:1995
+#: ../../../inc/items/items.ctrl.php:1889 ../inc/items/items.ctrl.php:1994
 #: ../../../inc/skins/_skin.funcs.php:1301
 msgid "Since this blog has no categories, you cannot post into it."
 msgstr "Поскольку это блог не имеет рубрик, вы не можете писать в него."
 
-#: ../../../inc/items/items.ctrl.php:1894 ../inc/items/items.ctrl.php:1999
+#: ../../../inc/items/items.ctrl.php:1893 ../inc/items/items.ctrl.php:1998
 #: ../../../inc/skins/_skin.funcs.php:1305
 #, php-format
 msgid "You must <a %s>create categories</a> first."
 msgstr "Вы должны <a %s>создать рубрики</a> для начала."
 
-#: ../../../inc/items/items.ctrl.php:1926
+#: ../../../inc/items/items.ctrl.php:1925
 #: ../inc/items/model/_item.class.php:4830
 msgid "Delete this post"
 msgstr "Удалить эту запись"
 
-#: ../../../inc/items/items.ctrl.php:1928
+#: ../../../inc/items/items.ctrl.php:1927
 #: ../inc/items/model/_item.class.php:4845
 #: ../../../skins/bootstrap_forums_skin/_item_block.inc.php:315
 #: ../../../skins/pureforums_skin/_item_block.inc.php:200
 msgid "You are about to delete this post!\\nThis cannot be undone!"
 msgstr "Вы собираетесь удалить эту запись! \\nЭто необратимо!"
 
-#: ../../../inc/items/items.ctrl.php:1945
+#: ../../../inc/items/items.ctrl.php:1944
 #: ../inc/items/model/_item.class.php:4924
 #: ../../../inc/items/model/_item.class.php:4928
 #: ../../../inc/items/model/_item.class.php:4936
@@ -18305,17 +18339,17 @@ msgstr "Вы собираетесь удалить эту запись! \\nЭт�
 msgid "Duplicate this post..."
 msgstr "Дублировать эту запись..."
 
-#: ../../../inc/items/items.ctrl.php:1946
+#: ../../../inc/items/items.ctrl.php:1945
 #: ../inc/items/model/_item.class.php:4924
 #: ../../../inc/items/model/_item.class.php:4932
 msgid "Duplicate..."
 msgstr "Дублировать..."
 
-#: ../../../inc/items/items.ctrl.php:2012 ../inc/items/items.ctrl.php:2018
+#: ../../../inc/items/items.ctrl.php:2011 ../inc/items/items.ctrl.php:2017
 msgid "View post & comments"
 msgstr "Просмотр записей и комментариев"
 
-#: ../../../inc/items/items.ctrl.php:2024
+#: ../../../inc/items/items.ctrl.php:2023
 msgid "Browse blog"
 msgstr "Обзор блога"
 
@@ -21137,7 +21171,7 @@ msgid "View this user..."
 msgstr "Просмотреть этого пользователя..."
 
 #: ../../../inc/links/model/_linkuser.class.php:41
-#: ../../../inc/users/model/_user.funcs.php:6360
+#: ../../../inc/users/model/_user.funcs.php:6401
 #: ../../../inc/users/registration.ctrl.php:113
 #: ../../../inc/users/views/_usertag.form.php:100
 msgid "Edit this user..."
@@ -22469,7 +22503,7 @@ msgstr "Примечание: Интерфейс пользователя буд
 msgid "Continue to installer"
 msgstr "Продолжить установку"
 
-#: ../../../inc/maintenance/upgrade.ctrl.php:517 ../install/index.php:1167
+#: ../../../inc/maintenance/upgrade.ctrl.php:517 ../install/index.php:1173
 msgid "Upgrade failed!"
 msgstr "Обновление прервано!"
 
@@ -23214,7 +23248,7 @@ msgid "Select this contact"
 msgstr "Выбрать этот контакт"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:257
-#: ../../../inc/users/model/_user.funcs.php:5629
+#: ../../../inc/users/model/_user.funcs.php:5639
 msgid "Picture"
 msgstr "Фото"
 
@@ -23249,7 +23283,7 @@ msgid "Rename this group to"
 msgstr "Переименовать эту группу в"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:484
-#: ../../../inc/users/model/_user.funcs.php:6119
+#: ../../../inc/users/model/_user.funcs.php:6160
 #: ../../../inc/users/views/_group.view.php:163
 #: ../../../inc/users/views/_userfields.view.php:161
 msgid "Delete this group"
@@ -23339,6 +23373,7 @@ msgstr ""
 
 #: ../../../inc/messaging/views/_msg_settings.form.php:29
 #: ../../../inc/settings/views/_eblog.form.php:59
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:94
 msgid "General settings"
 msgstr "Основные настройки"
 
@@ -23584,7 +23619,7 @@ msgid "The database has been updated."
 msgstr "База данных обновлена."
 
 #: ../../../inc/plugins/_plugin.funcs.php:1521
-#: ../../../install/_functions_evoupgrade.php:9138
+#: ../../../install/_functions_evoupgrade.php:9152
 msgid "The DB schema has been changed since confirmation."
 msgstr "Структура базы данных была изменена после подтверждения."
 
@@ -23871,7 +23906,7 @@ msgid "The plugin needs the following database changes."
 msgstr "Плагин требует следующих изменений в базе данных."
 
 #: ../../../inc/plugins/plugins.ctrl.php:923
-#: ../../../install/_functions_evoupgrade.php:9175
+#: ../../../install/_functions_evoupgrade.php:9189
 msgid ""
 "The following database changes will be carried out. If you are not sure what"
 " this means, it will probably be alright."
@@ -26985,27 +27020,27 @@ msgstr "Соединение с этим SMTP сервером было прот
 msgid "The connection with this SMTP server has failed."
 msgstr "Соединение с этим SMTP сервером не удалась."
 
-#: ../../../inc/tools/email.ctrl.php:425
+#: ../../../inc/tools/email.ctrl.php:433
 msgid "The email address was updated."
 msgstr "Email адрес был обновлен."
 
-#: ../../../inc/tools/email.ctrl.php:444
+#: ../../../inc/tools/email.ctrl.php:455
 msgid "The email address was deleted."
 msgstr "Email адрес был удален."
 
-#: ../../../inc/tools/email.ctrl.php:518
+#: ../../../inc/tools/email.ctrl.php:529
 msgid ""
 "There is no scheduled job configured to process your Return Path inbox."
 msgstr ""
 "Нет запланированной задачи, сконфигурированной для обработки вашего ящика с "
 "возвращенными письмами."
 
-#: ../../../inc/tools/email.ctrl.php:521
+#: ../../../inc/tools/email.ctrl.php:532
 #, php-format
 msgid "<a %s>Click here</a> to create such a job."
 msgstr "<a %s>Нажмите сюда</a>, чтобы создать такую задачу."
 
-#: ../../../inc/tools/email.ctrl.php:574
+#: ../../../inc/tools/email.ctrl.php:585
 msgid "Your external SMTP Server is not enabled."
 msgstr "Ваш внешний SMTP Сервер не включен."
 
@@ -27029,27 +27064,34 @@ msgstr "Подозрительный 3"
 msgid "Spammer"
 msgstr "Спамер"
 
-#: ../../../inc/tools/model/_email.funcs.php:249
-#: ../../../inc/tools/model/_email.funcs.php:253
+#. TRANS: Email was already opened
+#: ../../../inc/tools/model/_email.funcs.php:216
+#: ../../../inc/tools/model/_email.funcs.php:227
+#: ../inc/tools/system.ctrl.php:634 ../../../inc/tools/system.ctrl.php:645
+msgid "Read"
+msgstr "Читать"
+
+#: ../../../inc/tools/model/_email.funcs.php:265
+#: ../../../inc/tools/model/_email.funcs.php:269
 msgid "Simulated"
 msgstr "Симулированный"
 
-#: ../../../inc/tools/model/_email.funcs.php:482
+#: ../../../inc/tools/model/_email.funcs.php:541
 #, php-format
 msgid "We could not send %d email to %s because this address is blocked."
 msgstr ""
 "Мы не можем отправить %d email сообщений на %s, потому что этот адрес "
 "заблокирован."
 
-#: ../../../inc/tools/model/_email.funcs.php:610
+#: ../../../inc/tools/model/_email.funcs.php:669
 msgid "SMTP gateway is not enabled."
 msgstr "SMTP шлюз не включен."
 
-#: ../../../inc/tools/model/_email.funcs.php:617
+#: ../../../inc/tools/model/_email.funcs.php:676
 msgid "SMTP Host and Port Number must be defined to enable SMTP gateway."
 msgstr "SMTP Хост и Номер Порта должны быть заданы для включения SMTP шлюза."
 
-#: ../../../inc/tools/model/_email.funcs.php:635
+#: ../../../inc/tools/model/_email.funcs.php:694
 #, php-format
 msgid ""
 "Encryption Method %s must be available on this system in order to enable "
@@ -27058,22 +27100,22 @@ msgstr ""
 "Метод Шифрования %s должен быть доступен на этой системе, для того чтобы "
 "включить SMTP шлюз."
 
-#: ../../../inc/tools/model/_email.funcs.php:981
+#: ../../../inc/tools/model/_email.funcs.php:1040
 msgid "Check SMTP settings..."
 msgstr "Проверка SMTP настроек... "
 
-#: ../../../inc/tools/model/_email.funcs.php:1008
+#: ../../../inc/tools/model/_email.funcs.php:1067
 msgid "Test SMTP connection..."
 msgstr "Тестирование SMTP соединения... "
 
-#: ../../../inc/tools/model/_email.funcs.php:1050
+#: ../../../inc/tools/model/_email.funcs.php:1109
 #, php-format
 msgid "Attempting to send a text email to \"%s\" via external SMTP server..."
 msgstr ""
 "Попытка отправить текстовое email сообщение на \"%s\" через внешний SMTP "
 "сервер..."
 
-#: ../../../inc/tools/model/_email.funcs.php:1095
+#: ../../../inc/tools/model/_email.funcs.php:1154
 #, php-format
 msgid "Attempting to send a text email to \"%s\" via PHP..."
 msgstr "Попытка отправить текстовое email сообщение на \"%s\" с помощью PHP..."
@@ -28061,9 +28103,9 @@ msgstr "Группа пользователей"
 
 #: ../../../inc/tools/mtimport.ctrl.php:335
 #: ../inc/users/model/_user.funcs.php:3370
-#: ../../../inc/users/model/_user.funcs.php:6011
-#: ../../../inc/users/model/_user.funcs.php:6042
-#: ../../../inc/users/model/_user.funcs.php:6156
+#: ../../../inc/users/model/_user.funcs.php:6052
+#: ../../../inc/users/model/_user.funcs.php:6083
+#: ../../../inc/users/model/_user.funcs.php:6197
 #: ../../../inc/users/views/_group.view.php:76
 #: ../../../inc/users/views/_invitation.view.php:89
 msgid "Level"
@@ -28519,10 +28561,6 @@ msgid ""
 msgstr ""
 "Вы не сможете автоматически генерировать миниатюры для изображений PNG."
 
-#: ../../../inc/tools/system.ctrl.php:634 ../inc/tools/system.ctrl.php:645
-msgid "Read"
-msgstr "Читать"
-
 #: ../../../inc/tools/system.ctrl.php:643
 msgid ""
 "You will not be able to automatically generate thumbnails for GIF images."
@@ -28957,12 +28995,12 @@ msgid "New email address"
 msgstr "Новый email адрес"
 
 #: ../../../inc/tools/views/_email_address.form.php:38
-#: ../../../inc/tools/views/_email_address.view.php:126
+#: ../../../inc/tools/views/_email_address.view.php:129
 msgid "Last sent date"
 msgstr "Дата последней отправки"
 
 #: ../../../inc/tools/views/_email_address.form.php:40
-#: ../../../inc/tools/views/_email_address.view.php:135
+#: ../../../inc/tools/views/_email_address.view.php:138
 msgid "Sent count"
 msgstr "Кол-во отправлений"
 
@@ -28971,7 +29009,7 @@ msgid "Sent count since last error"
 msgstr "Кол-во отправлений после последней ошибки"
 
 #: ../../../inc/tools/views/_email_address.form.php:44
-#: ../../../inc/tools/views/_email_address.view.php:153
+#: ../../../inc/tools/views/_email_address.view.php:156
 msgid "Last error date"
 msgstr "Дата последней ошибки"
 
@@ -28991,77 +29029,77 @@ msgstr "Кол-во спам ошибок"
 msgid "Other errors count"
 msgstr "Кол-во других ошибок"
 
-#: ../../../inc/tools/views/_email_address.view.php:56
+#: ../../../inc/tools/views/_email_address.view.php:58
 msgid "Add an email address"
 msgstr "Добавить email адрес"
 
-#: ../../../inc/tools/views/_email_address.view.php:56
+#: ../../../inc/tools/views/_email_address.view.php:58
 msgid "Create a new email address..."
 msgstr "Создать новый email адрес..."
 
-#: ../../../inc/tools/views/_email_address.view.php:77
+#: ../../../inc/tools/views/_email_address.view.php:80
 msgid "Errors"
 msgstr "Ошибки"
 
-#: ../../../inc/tools/views/_email_address.view.php:78
+#: ../../../inc/tools/views/_email_address.view.php:81
 msgid "Need Attention"
 msgstr "Требуют Внимания"
 
-#: ../../../inc/tools/views/_email_address.view.php:106
+#: ../../../inc/tools/views/_email_address.view.php:109
 #: ../../../inc/tools/views/_email_return.view.php:115
 #: ../../../inc/tools/views/_email_return_details.view.php:28
 msgid "Address"
 msgstr "Адрес"
 
-#: ../../../inc/tools/views/_email_address.view.php:125
-#: ../../../inc/tools/views/_email_address.view.php:134
-#: ../../../inc/tools/views/_email_address.view.php:143
+#: ../../../inc/tools/views/_email_address.view.php:128
+#: ../../../inc/tools/views/_email_address.view.php:137
+#: ../../../inc/tools/views/_email_address.view.php:146
 msgid "Send messages"
 msgstr "Сообщения отправки"
 
-#: ../../../inc/tools/views/_email_address.view.php:144
+#: ../../../inc/tools/views/_email_address.view.php:147
 msgid "Since last error"
 msgstr "С момента последней ошибки"
 
-#: ../../../inc/tools/views/_email_address.view.php:152
-#: ../../../inc/tools/views/_email_address.view.php:161
-#: ../../../inc/tools/views/_email_address.view.php:170
-#: ../../../inc/tools/views/_email_address.view.php:179
-#: ../../../inc/tools/views/_email_address.view.php:188
-#: ../../../inc/tools/views/_email_address.view.php:197
+#: ../../../inc/tools/views/_email_address.view.php:155
+#: ../../../inc/tools/views/_email_address.view.php:164
+#: ../../../inc/tools/views/_email_address.view.php:173
+#: ../../../inc/tools/views/_email_address.view.php:182
+#: ../../../inc/tools/views/_email_address.view.php:191
+#: ../../../inc/tools/views/_email_address.view.php:200
 msgid "Returned error messages"
 msgstr "Ошибки возвращенных сообщений"
 
-#: ../../../inc/tools/views/_email_address.view.php:162
+#: ../../../inc/tools/views/_email_address.view.php:165
 msgid "Count"
 msgstr "Количество"
 
-#: ../../../inc/tools/views/_email_address.view.php:171
+#: ../../../inc/tools/views/_email_address.view.php:174
 msgid "Permanent errors"
 msgstr "Постоянные ошибки"
 
-#: ../../../inc/tools/views/_email_address.view.php:180
+#: ../../../inc/tools/views/_email_address.view.php:183
 msgid "Temporary errors"
 msgstr "Временные ошибки"
 
-#: ../../../inc/tools/views/_email_address.view.php:189
+#: ../../../inc/tools/views/_email_address.view.php:192
 msgid "Spam errors"
 msgstr "Спам ошибки"
 
-#: ../../../inc/tools/views/_email_address.view.php:198
+#: ../../../inc/tools/views/_email_address.view.php:201
 msgid "Other errors"
 msgstr "Другие ошибки"
 
-#: ../../../inc/tools/views/_email_address.view.php:209
+#: ../../../inc/tools/views/_email_address.view.php:212
 #: ../../../inc/tools/views/_email_return.view.php:140
 msgid "Go to users list with this email address"
 msgstr "Перейти на список пользователей с этим email адресом"
 
-#: ../../../inc/tools/views/_email_address.view.php:217
+#: ../../../inc/tools/views/_email_address.view.php:220
 msgid "Filter the returned emails by this email address..."
 msgstr "Отфильтровать возвращенные email сообщения по этому email адресу..."
 
-#: ../../../inc/tools/views/_email_address.view.php:218
+#: ../../../inc/tools/views/_email_address.view.php:222
 msgid "Edit this email address..."
 msgstr "Редактировать этот email адрес..."
 
@@ -29235,6 +29273,16 @@ msgstr "Отправленные email сообщения"
 msgid "To"
 msgstr "Кому"
 
+#: ../../../inc/tools/views/_email_sent.view.php:157
+#: ../../../inc/users/model/_user.funcs.php:5964
+msgid "Last opened"
+msgstr ""
+
+#: ../../../inc/tools/views/_email_sent.view.php:166
+#: ../../../inc/users/model/_user.funcs.php:5973
+msgid "Last clicked"
+msgstr ""
+
 #: ../../../inc/tools/views/_email_sent_details.view.php:22
 #, php-format
 msgid "Mail log ID#%s"
@@ -29244,15 +29292,15 @@ msgstr "Лог сообщения с ID#%s"
 msgid "To User"
 msgstr "Пользователю"
 
-#: ../../../inc/tools/views/_email_sent_details.view.php:54
+#: ../../../inc/tools/views/_email_sent_details.view.php:58
 msgid "Text content"
 msgstr "Текстовое содержимое"
 
-#: ../../../inc/tools/views/_email_sent_details.view.php:65
+#: ../../../inc/tools/views/_email_sent_details.view.php:75
 msgid "HTML content"
 msgstr "HTML содержимое"
 
-#: ../../../inc/tools/views/_email_sent_details.view.php:70
+#: ../../../inc/tools/views/_email_sent_details.view.php:82
 msgid "Raw email source"
 msgstr "Исходный код email сообщения"
 
@@ -29478,7 +29526,7 @@ msgstr "Создать тестовые сообщения"
 msgid "Log for"
 msgstr "Лог для"
 
-#: ../../../inc/tools/views/_misc_tools.view.php:144 ../install/index.php:1290
+#: ../../../inc/tools/views/_misc_tools.view.php:144 ../install/index.php:1296
 msgid "Proceed with normalization procedure!"
 msgstr "Продолжить процедуру нормализации!"
 
@@ -30383,20 +30431,21 @@ msgid ""
 "The user's directory &laquo;%s&raquo; has been created with permissions %s."
 msgstr "Папка пользователя  &laquo;%s&raquo; создана с разрешениями %s."
 
-#: ../../../inc/users/model/_user.class.php:3414
+#: ../../../inc/users/model/_user.class.php:2882
+#: ../../../inc/users/model/_user.class.php:3420
 #, php-format
 msgid "Group/user permission denied by %s!"
 msgstr "Доступ для группы / пользователя запрещен %s!"
 
-#: ../../../inc/users/model/_user.class.php:3904
+#: ../../../inc/users/model/_user.class.php:3910
 msgid "You are not allowed to contact with this user."
 msgstr "Вам не разрешено контактировать с этим пользователей."
 
-#: ../../../inc/users/model/_user.class.php:3910
+#: ../../../inc/users/model/_user.class.php:3916
 msgid "You cannot send a private message to yourself."
 msgstr "Вы не можете отправлять личные сообщения самому себе."
 
-#: ../../../inc/users/model/_user.class.php:3913
+#: ../../../inc/users/model/_user.class.php:3919
 msgid ""
 "This user can only be contacted through private messages, but you are not "
 "allowed to send private message to this user."
@@ -30404,7 +30453,7 @@ msgstr ""
 "Контакт с этим пользователем возможен только через личные сообщения, но вам "
 "не разрешено отправлять личные сообщения этому пользователю."
 
-#: ../../../inc/users/model/_user.class.php:3916
+#: ../../../inc/users/model/_user.class.php:3922
 msgid ""
 "This user can only be contacted through private messages but you are not "
 "allowed to send any private messages."
@@ -30412,32 +30461,32 @@ msgstr ""
 "Этот пользователь принимает только личные сообщения, но у вас нет разрешений"
 " на их отправку."
 
-#: ../../../inc/users/model/_user.class.php:3919
+#: ../../../inc/users/model/_user.class.php:3925
 msgid "This user does not wish to be contacted directly."
 msgstr "Этот пользователь не желает получать сообщения."
 
-#: ../../../inc/users/model/_user.class.php:4307
+#: ../../../inc/users/model/_user.class.php:4314
 #: ../../../inc/users/model/_user.funcs.php:2861
 msgid "Activate your account: $login$"
 msgstr "Активируйте ваш аккаунт: $login$"
 
-#: ../../../inc/users/model/_user.class.php:4367
-#: ../../../inc/users/model/_user.class.php:5522
+#: ../../../inc/users/model/_user.class.php:4374
+#: ../../../inc/users/model/_user.class.php:5529
 #: ../../../skins_email/account_activated.html.php:31
 #: ../../../skins_email/account_activated.txt.php:30
 msgid "New user account activated"
 msgstr "Активирован новый пользователь"
 
-#: ../../../inc/users/model/_user.class.php:4429
+#: ../../../inc/users/model/_user.class.php:4436
 msgid "Send email to user"
 msgstr "Послать email пользователю"
 
-#: ../../../inc/users/model/_user.class.php:4434
+#: ../../../inc/users/model/_user.class.php:4441
 msgid "Send message to user"
 msgstr "Отправить сообщение пользователю"
 
-#: ../../../inc/users/model/_user.class.php:4543
-#: ../../../inc/users/model/_user.class.php:7008
+#: ../../../inc/users/model/_user.class.php:4550
+#: ../../../inc/users/model/_user.class.php:7015
 #: ../../../inc/users/views/_user_identity.form.php:275
 #: ../../../inc/users/views/_user_register_finish.form.php:150
 #: ../../../skins_email/account_activated.html.php:82
@@ -30449,8 +30498,8 @@ msgstr "Отправить сообщение пользователю"
 msgid "A man"
 msgstr "Мужчина"
 
-#: ../../../inc/users/model/_user.class.php:4546
-#: ../../../inc/users/model/_user.class.php:7008
+#: ../../../inc/users/model/_user.class.php:4553
+#: ../../../inc/users/model/_user.class.php:7015
 #: ../../../inc/users/views/_user_identity.form.php:276
 #: ../../../inc/users/views/_user_register_finish.form.php:151
 #: ../../../skins_email/account_activated.html.php:86
@@ -30462,38 +30511,38 @@ msgstr "Мужчина"
 msgid "A woman"
 msgstr "Женщина"
 
-#: ../../../inc/users/model/_user.class.php:5239
-#: ../../../inc/users/model/_user.class.php:5683
-#: ../../../inc/users/model/_user.class.php:5894
-#: ../../../inc/users/model/_user.class.php:5945
+#: ../../../inc/users/model/_user.class.php:5246
+#: ../../../inc/users/model/_user.class.php:5690
+#: ../../../inc/users/model/_user.class.php:5901
+#: ../../../inc/users/model/_user.class.php:5952
 #: ../../../plugins/twitter_plugin/_twitter.plugin.php:512
 msgid "You are only allowed to update your own profile!"
 msgstr "Вам разрешено изменять только свой собственный профиль!"
 
-#: ../../../inc/users/model/_user.class.php:5294
+#: ../../../inc/users/model/_user.class.php:5301
 msgid "New user has been created."
 msgstr "Создан новый пользователь."
 
-#: ../../../inc/users/model/_user.class.php:5299
+#: ../../../inc/users/model/_user.class.php:5306
 msgid "Password has been changed."
 msgstr "Пароль изменен."
 
-#: ../../../inc/users/model/_user.class.php:5311
+#: ../../../inc/users/model/_user.class.php:5318
 #, php-format
 msgid "You cannot choose the new login \"%s\" (cannot rename user fileroot)"
 msgstr ""
 "Вы не можете изменить свой логин \"%s\" (неудалось переименовать папку "
 "пользователя)"
 
-#: ../../../inc/users/model/_user.class.php:5318
+#: ../../../inc/users/model/_user.class.php:5325
 msgid "Profile has been updated."
 msgstr "Профиль обновлен."
 
-#: ../../../inc/users/model/_user.class.php:5365
+#: ../../../inc/users/model/_user.class.php:5372
 msgid "User status couldn't be updated!"
 msgstr "Статус пользователя нельзя обновить!"
 
-#: ../../../inc/users/model/_user.class.php:5374
+#: ../../../inc/users/model/_user.class.php:5381
 #, php-format
 msgid ""
 "Because the Account Activation Process is set to <a %s>Secure</a>, the user "
@@ -30503,7 +30552,7 @@ msgstr ""
 "пользователь должен будет запросить новый email активации в следующий раз, "
 "когда он попытается войти."
 
-#: ../../../inc/users/model/_user.class.php:5390
+#: ../../../inc/users/model/_user.class.php:5397
 #, php-format
 msgid ""
 "An email has been sent to your email address (%s). Please click on the link "
@@ -30513,108 +30562,108 @@ msgstr ""
 " на ссылку в нем для активации вашего аккаунта. <a %s>Больше информации "
 "&raquo;</a>"
 
-#: ../../../inc/users/model/_user.class.php:5394
+#: ../../../inc/users/model/_user.class.php:5401
 #, php-format
 msgid "An account activation email has been sent to %s"
 msgstr "Email для активации аккаунта был выслан на %s"
 
-#: ../../../inc/users/model/_user.class.php:5411
+#: ../../../inc/users/model/_user.class.php:5418
 #: ../inc/users/user.ctrl.php:382 ../../../inc/users/user.ctrl.php:488
 msgid "User feature settings have been changed."
 msgstr "Пользовательские настройки были изменены."
 
-#: ../../../inc/users/model/_user.class.php:5432
+#: ../../../inc/users/model/_user.class.php:5439
 #: ../inc/widgets/widgets.ctrl.php:148
 msgid "You do not have permission to perform this action"
 msgstr "У вас нет прав на выполнение этого действия"
 
-#: ../../../inc/users/model/_user.class.php:5567
-#: ../../../inc/users/model/_user.class.php:5847
+#: ../../../inc/users/model/_user.class.php:5574
+#: ../../../inc/users/model/_user.class.php:5854
 msgid "You are not allowed to update this profile!"
 msgstr "Вам не разрешено изменять этот профиль!"
 
-#: ../../../inc/users/model/_user.class.php:5573
-#: ../../../inc/users/model/_user.class.php:5582
-#: ../../../inc/users/model/_user.class.php:5588
-#: ../../../inc/users/model/_user.class.php:5900
+#: ../../../inc/users/model/_user.class.php:5580
+#: ../../../inc/users/model/_user.class.php:5589
+#: ../../../inc/users/model/_user.class.php:5595
+#: ../../../inc/users/model/_user.class.php:5907
 msgid "Profile picture could not be changed!"
 msgstr "Фото пользователя не может быть изменено!"
 
-#: ../../../inc/users/model/_user.class.php:5606
+#: ../../../inc/users/model/_user.class.php:5613
 msgid "Profile picture has been restored."
 msgstr "Фото пользователя было восстановлено."
 
-#: ../../../inc/users/model/_user.class.php:5610
-#: ../../../inc/users/model/_user.class.php:5982
+#: ../../../inc/users/model/_user.class.php:5617
+#: ../../../inc/users/model/_user.class.php:5989
 msgid "Profile picture has been changed."
 msgstr "Фото пользователя было изменено."
 
-#: ../../../inc/users/model/_user.class.php:5691
+#: ../../../inc/users/model/_user.class.php:5698
 msgid "You did not specify a file."
 msgstr "Вы не указали файл."
 
-#: ../../../inc/users/model/_user.class.php:5701
+#: ../../../inc/users/model/_user.class.php:5708
 msgid "The requested file does not exist!"
 msgstr "Запрошенный файл не существует!"
 
-#: ../../../inc/users/model/_user.class.php:5709
+#: ../../../inc/users/model/_user.class.php:5716
 msgid "The requested file doesn't belong to this user."
 msgstr "Запрошенный файл не принадлежит этому пользователю."
 
-#: ../../../inc/users/model/_user.class.php:5744
+#: ../../../inc/users/model/_user.class.php:5751
 msgid "Profile picture could not be rotated!"
 msgstr "Фото пользователя не может быть повернуто!"
 
-#: ../../../inc/users/model/_user.class.php:5748
+#: ../../../inc/users/model/_user.class.php:5755
 msgid "Profile picture has been rotated."
 msgstr "Фото пользователя было повернуто."
 
-#: ../../../inc/users/model/_user.class.php:5781
+#: ../../../inc/users/model/_user.class.php:5788
 msgid "Profile picture could not be cropped!"
 msgstr "Фото пользователя не может быть обрезано!"
 
-#: ../../../inc/users/model/_user.class.php:5785
+#: ../../../inc/users/model/_user.class.php:5792
 msgid "Profile picture has been cropped."
 msgstr "Фото пользователя было обрезано."
 
-#: ../../../inc/users/model/_user.class.php:5858
+#: ../../../inc/users/model/_user.class.php:5865
 msgid "Profile picture is not found!"
 msgstr "Фото пользователя не найдено!"
 
-#: ../../../inc/users/model/_user.class.php:5871
+#: ../../../inc/users/model/_user.class.php:5878
 msgid "Profile picture has been forbidden."
 msgstr "Фото пользователя было запрещено."
 
-#: ../../../inc/users/model/_user.class.php:5875
+#: ../../../inc/users/model/_user.class.php:5882
 msgid "Profile picture has been removed."
 msgstr "Фото пользователя было удалено."
 
-#: ../../../inc/users/model/_user.class.php:5929
+#: ../../../inc/users/model/_user.class.php:5936
 msgid "Profile picture has been deleted."
 msgstr "Фото пользователя было удалено."
 
-#: ../../../inc/users/model/_user.class.php:5955
+#: ../../../inc/users/model/_user.class.php:5962
 msgid "You don't have permission to selected user file root."
 msgstr "У вас нет доступа к выбранной директории пользователя."
 
-#: ../../../inc/users/model/_user.class.php:5967
+#: ../../../inc/users/model/_user.class.php:5974
 msgid "It seems you are trying to upload the same profile picture twice."
 msgstr "Кажется, вы пытаетесь загрузить одно и тоже фото дважды. "
 
-#: ../../../inc/users/model/_user.class.php:5986
+#: ../../../inc/users/model/_user.class.php:5993
 msgid "New picture has been uploaded."
 msgstr "Новое фото было загружено."
 
-#: ../../../inc/users/model/_user.class.php:5996
+#: ../../../inc/users/model/_user.class.php:6003
 msgid "The file you uploaded does not seem to be an image."
 msgstr "Загруженный вами файл не является изображением."
 
-#: ../../../inc/users/model/_user.class.php:6537
+#: ../../../inc/users/model/_user.class.php:6544
 #, php-format
 msgid "%s (%s%% are public)"
 msgstr "%s (%s%% опубликовано)"
 
-#: ../../../inc/users/model/_user.class.php:6594
+#: ../../../inc/users/model/_user.class.php:6601
 #, php-format
 msgid ""
 "%s has posted %s comments (%s%% of which are public). %s of these comments "
@@ -30623,7 +30672,7 @@ msgstr ""
 "%s написал %s комментариев (%s%% из которых опубликованы). %s из этих "
 "комментариев были отмечены полезными %s различными пользователями."
 
-#: ../../../inc/users/model/_user.class.php:6595
+#: ../../../inc/users/model/_user.class.php:6602
 #, php-format
 msgid ""
 "%s has posted %s comments (%s%% of which are public).<br />%s voted useful "
@@ -30637,7 +30686,7 @@ msgstr ""
 "разными пользователями.<br />%s посчитаны как СПАМ %s разными "
 "пользователями."
 
-#: ../../../inc/users/model/_user.class.php:6713
+#: ../../../inc/users/model/_user.class.php:6720
 #, php-format
 msgid ""
 "%s has uploaded %s photos. %s of these photos have been liked by %s "
@@ -30645,7 +30694,7 @@ msgid ""
 msgstr ""
 "%s загрузил %s фотографий. %s их них понравились %s различным пользователям."
 
-#: ../../../inc/users/model/_user.class.php:6714
+#: ../../../inc/users/model/_user.class.php:6721
 #, php-format
 msgid ""
 "%s has uploaded %s photos.<br />%s voted up (liked) by %s different "
@@ -30658,49 +30707,49 @@ msgstr ""
 "пользователями.<br />%s посчитано НЕУМЕСТНЫМИ %s разными пользователями.<br "
 "/>%s посчитано СПАМОМ %s разными пользователями."
 
-#: ../../../inc/users/model/_user.class.php:6715
+#: ../../../inc/users/model/_user.class.php:6722
 #, php-format
 msgid "%s has uploaded %s audio files."
 msgstr "%s загрузил %s аудио файлов."
 
-#: ../../../inc/users/model/_user.class.php:6716
+#: ../../../inc/users/model/_user.class.php:6723
 #, php-format
 msgid "%s has uploaded %s video files."
 msgstr "%s загрузил %s видео файлов."
 
-#: ../../../inc/users/model/_user.class.php:6717
+#: ../../../inc/users/model/_user.class.php:6724
 #, php-format
 msgid "%s has uploaded %s other files."
 msgstr "%s загрузил %s других файлов."
 
-#: ../../../inc/users/model/_user.class.php:6831
+#: ../../../inc/users/model/_user.class.php:6838
 #, php-format
 msgid "%s has uploaded a total of %s"
 msgstr "%s загрузил в итоге %s"
 
-#: ../../../inc/users/model/_user.class.php:6858
+#: ../../../inc/users/model/_user.class.php:6865
 #, php-format
 msgid "%s successfully reported %s spams and/or spammers!"
 msgstr "%s сообщил о %s спам случаях и/или спамерах!"
 
-#: ../../../inc/users/model/_user.class.php:6945
+#: ../../../inc/users/model/_user.class.php:6952
 #, php-format
 msgid "User #%s has no permission to edit user #%s!"
 msgstr "Пользователь #%s не имеет прав для редактирования пользователя #%s!"
 
-#: ../../../inc/users/model/_user.class.php:6979
-#: ../../../inc/users/model/_user.funcs.php:5711
+#: ../../../inc/users/model/_user.class.php:6986
+#: ../../../inc/users/model/_user.funcs.php:5731
 #: ../../../inc/users/views/_registration.form.php:170
 #: ../../../inc/users/views/_user_identity.form.php:475
 #: ../../../inc/users/views/_user_stats.view.php:325
 msgid "Gender"
 msgstr "Пол"
 
-#: ../../../inc/users/model/_user.class.php:7028
+#: ../../../inc/users/model/_user.class.php:7035
 msgid "User profile changed"
 msgstr "Профиль пользователя изменен"
 
-#: ../../../inc/users/model/_user.class.php:7123
+#: ../../../inc/users/model/_user.class.php:7130
 #, php-format
 msgid "You are already a member of \"%s\"."
 msgstr "Вы уже участник \"%s\"."
@@ -30820,7 +30869,7 @@ msgid "You have reported this user"
 msgstr "Вы пожаловались на этого пользователя"
 
 #: ../../../inc/users/model/_user.funcs.php:2429
-#: ../../../inc/users/model/_user.funcs.php:6371
+#: ../../../inc/users/model/_user.funcs.php:6412
 msgid "Delete this user!"
 msgstr "Удалить этого пользователя!"
 
@@ -30955,7 +31004,7 @@ msgid "Restrict to members of this blog"
 msgstr "Ограничить для участников этого блога"
 
 #: ../../../inc/users/model/_user.funcs.php:3279
-#: ../../../inc/users/model/_user.funcs.php:5414
+#: ../../../inc/users/model/_user.funcs.php:5422
 #: ../../../inc/users/views/_user_stats.view.php:158
 #: ../../../inc/users/views/_user_stats.view.php:159
 #: ../../../inc/users/views/_user_stats.view.php:160
@@ -30967,7 +31016,7 @@ msgid "Men"
 msgstr "Мужчина"
 
 #: ../../../inc/users/model/_user.funcs.php:3280
-#: ../../../inc/users/model/_user.funcs.php:5415
+#: ../../../inc/users/model/_user.funcs.php:5423
 #: ../../../inc/users/views/_user_stats.view.php:152
 #: ../../../inc/users/views/_user_stats.view.php:153
 #: ../../../inc/users/views/_user_stats.view.php:154
@@ -30979,7 +31028,7 @@ msgid "Women"
 msgstr "Женщина"
 
 #: ../../../inc/users/model/_user.funcs.php:3287
-#: ../../../inc/users/model/_user.funcs.php:5424
+#: ../../../inc/users/model/_user.funcs.php:5432
 msgid "Reported users"
 msgstr "Пользователи с жалобами"
 
@@ -31031,22 +31080,22 @@ msgid "Users with custom sender name"
 msgstr "Пользователи с измененным именем отправителя"
 
 #: ../../../inc/users/model/_user.funcs.php:3455
-#: ../../../inc/users/model/_user.funcs.php:6488
+#: ../../../inc/users/model/_user.funcs.php:6529
 msgid "Ready to resend"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:3457
-#: ../../../inc/users/model/_user.funcs.php:6494
+#: ../../../inc/users/model/_user.funcs.php:6535
 msgid "Send error"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:3458
-#: ../../../inc/users/model/_user.funcs.php:6497
+#: ../../../inc/users/model/_user.funcs.php:6538
 msgid "Skipped"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:3460
-#: ../../../inc/users/model/_user.funcs.php:5921
+#: ../../../inc/users/model/_user.funcs.php:5941
 msgid "Campaign Status"
 msgstr ""
 
@@ -31308,7 +31357,7 @@ msgid "Add user to organization"
 msgstr "Добавить пользователя в организацию"
 
 #: ../../../inc/users/model/_user.funcs.php:4749
-#: ../../../inc/users/model/_user.funcs.php:6399
+#: ../../../inc/users/model/_user.funcs.php:6440
 msgid "Edit membership"
 msgstr "Редактировать участие"
 
@@ -31385,153 +31434,153 @@ msgstr "Удалить эту жалобу!"
 msgid "No users"
 msgstr "Нет пользователей"
 
-#: ../../../inc/users/model/_user.funcs.php:5421
+#: ../../../inc/users/model/_user.funcs.php:5429
 msgid "Activated users"
 msgstr "Активированные пользователи"
 
-#: ../../../inc/users/model/_user.funcs.php:5445
+#: ../../../inc/users/model/_user.funcs.php:5453
 msgid "Refresh users list..."
 msgstr "Обновить список пользователей..."
 
-#: ../../../inc/users/model/_user.funcs.php:5451
-#: ../../../inc/users/model/_user.funcs.php:5465
+#: ../../../inc/users/model/_user.funcs.php:5459
+#: ../../../inc/users/model/_user.funcs.php:5473
 msgid "Add user"
 msgstr "Добавить пользователя"
 
-#: ../../../inc/users/model/_user.funcs.php:5451
+#: ../../../inc/users/model/_user.funcs.php:5459
 msgid "Create a new user..."
 msgstr "Создать нового пользователя..."
 
-#: ../../../inc/users/model/_user.funcs.php:5455
+#: ../../../inc/users/model/_user.funcs.php:5463
 #: ../../../inc/users/views/_group.view.php:53
 msgid "Add group"
 msgstr "Добавить группу"
 
-#: ../../../inc/users/model/_user.funcs.php:5455
+#: ../../../inc/users/model/_user.funcs.php:5463
 #: ../../../inc/users/views/_group.view.php:53
 msgid "Create a new group..."
 msgstr "Создать новую группу..."
 
-#: ../../../inc/users/model/_user.funcs.php:5486
+#: ../../../inc/users/model/_user.funcs.php:5494
 #, php-format
 msgid "Use this selection for list \"%s\""
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5491
+#: ../../../inc/users/model/_user.funcs.php:5499
 msgid "Send list to the current selection"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5594
+#: ../../../inc/users/model/_user.funcs.php:5604
 msgid "default group for new users"
 msgstr "группа по умолчанию для новых пользователей"
 
-#: ../../../inc/users/model/_user.funcs.php:5794
+#: ../../../inc/users/model/_user.funcs.php:5814
 msgid "View personal blogs"
 msgstr "Личные блоги"
 
-#: ../../../inc/users/model/_user.funcs.php:5813
+#: ../../../inc/users/model/_user.funcs.php:5833
 msgid "Registered"
 msgstr "Зарегистрирован"
 
-#: ../../../inc/users/model/_user.funcs.php:5825
+#: ../../../inc/users/model/_user.funcs.php:5845
 msgid "RC"
 msgstr "СР"
 
-#: ../../../inc/users/model/_user.funcs.php:5826
+#: ../../../inc/users/model/_user.funcs.php:5846
 msgid "Registration country"
 msgstr "Страна регистрации"
 
-#: ../../../inc/users/model/_user.funcs.php:5837
+#: ../../../inc/users/model/_user.funcs.php:5857
 msgid "Profile update"
 msgstr "Профиль обновлен"
 
-#: ../../../inc/users/model/_user.funcs.php:5849
+#: ../../../inc/users/model/_user.funcs.php:5869
 msgid "Last Visit"
 msgstr "Последний визит"
 
-#: ../../../inc/users/model/_user.funcs.php:5875
+#: ../../../inc/users/model/_user.funcs.php:5895
 msgid "Rep"
 msgstr "Жалобы"
 
-#: ../../../inc/users/model/_user.funcs.php:5887
+#: ../../../inc/users/model/_user.funcs.php:5907
 msgid "Primary<br />Group"
 msgstr "Основная<br />Группа"
 
-#: ../../../inc/users/model/_user.funcs.php:5898
+#: ../../../inc/users/model/_user.funcs.php:5918
 msgid "Sec.<br />Groups"
 msgstr "Втор.<br />Группы"
 
-#: ../../../inc/users/model/_user.funcs.php:5910
+#: ../../../inc/users/model/_user.funcs.php:5930
 msgid "List Status"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5914
+#: ../../../inc/users/model/_user.funcs.php:5934
 msgid "Still subscribed"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5914
-#: ../../../inc/users/model/_user.funcs.php:5968
+#: ../../../inc/users/model/_user.funcs.php:5934
+#: ../../../inc/users/model/_user.funcs.php:6009
 msgid "Unsubscribed"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5932
+#: ../../../inc/users/model/_user.funcs.php:5952
 msgid "Send date"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5944
-#: ../../../inc/users/model/_user.funcs.php:5956
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:138
+#: ../../../inc/users/model/_user.funcs.php:5985
+#: ../../../inc/users/model/_user.funcs.php:5997
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:174
 msgid "Subscribed"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:5992
+#: ../../../inc/users/model/_user.funcs.php:6033
 msgid "# of campaigns sent"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:6084
+#: ../../../inc/users/model/_user.funcs.php:6125
 msgid "Last visit on your profile"
 msgstr "Последнее посещение на вашем профиле"
 
-#: ../../../inc/users/model/_user.funcs.php:6113
+#: ../../../inc/users/model/_user.funcs.php:6154
 #: ../../../inc/users/views/_group.view.php:157
 #: ../../../inc/users/views/_userfields.view.php:156
 msgid "Edit this group..."
 msgstr "Редактировать эту группу..."
 
-#: ../../../inc/users/model/_user.funcs.php:6115
+#: ../../../inc/users/model/_user.funcs.php:6156
 #: ../../../inc/users/views/_group.view.php:159
 #: ../../../inc/users/views/_userfields.view.php:157
 msgid "Duplicate this group..."
 msgstr "Дублировать эту группу..."
 
-#: ../../../inc/users/model/_user.funcs.php:6227
+#: ../../../inc/users/model/_user.funcs.php:6268
 msgid "Private Message"
 msgstr "Личное сообщение"
 
-#: ../../../inc/users/model/_user.funcs.php:6368
+#: ../../../inc/users/model/_user.funcs.php:6409
 msgid "Duplicate this user..."
 msgstr "Дублировать этого пользователя..."
 
-#: ../../../inc/users/model/_user.funcs.php:6403
+#: ../../../inc/users/model/_user.funcs.php:6444
 msgid "Remove user from organization"
 msgstr "Удалить пользователя из организации"
 
-#: ../../../inc/users/model/_user.funcs.php:6430
+#: ../../../inc/users/model/_user.funcs.php:6471
 msgid "Queue again"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:6432
+#: ../../../inc/users/model/_user.funcs.php:6473
 msgid "Skip"
 msgstr ""
 
-#: ../../../inc/users/model/_user.funcs.php:6595
+#: ../../../inc/users/model/_user.funcs.php:6636
 #: ../../../inc/users/views/_user_admin.form.php:506
 #, php-format
 msgid "Add domain %s"
 msgstr "Добавить домен %s"
 
-#: ../../../inc/users/model/_user.funcs.php:6596
-#: ../../../inc/users/model/_user.funcs.php:6600
+#: ../../../inc/users/model/_user.funcs.php:6637
+#: ../../../inc/users/model/_user.funcs.php:6641
 msgid "Domain status"
 msgstr "Статус домена"
 
@@ -32046,7 +32095,8 @@ msgstr ""
 " свой аккаунт."
 
 #: ../../../inc/users/views/_account_close_setting.form.php:44
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:99
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:128
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:165
 #: ../../../inc/widgets/widgets/_user_register.widget.php:122
 msgid "Intro text"
 msgstr "Текст перед формой"
@@ -34376,7 +34426,7 @@ msgstr "Виджет был включен."
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:194
 #: ../../../inc/widgets/widgets/_item_seen_by.widget.php:108
 #: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:188
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:159
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:197
 #: ../../../inc/widgets/widgets/_profile_menu_link.widget.php:128
 #: ../../../inc/widgets/widgets/_user_login.widget.php:180
 #: ../../../inc/widgets/widgets/_user_register.widget.php:210
@@ -34778,7 +34828,8 @@ msgstr "Список рубрик; при нажатии фильтрует бл
 #: ../../../inc/widgets/widgets/_display_item.widget.php:90
 #: ../../../inc/widgets/widgets/_free_html.widget.php:97
 #: ../../../inc/widgets/widgets/_free_text.widget.php:115
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:93
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:122
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:159
 #: ../../../inc/widgets/widgets/_online_users.widget.php:80
 #: ../../../inc/widgets/widgets/_org_members.widget.php:99
 #: ../../../inc/widgets/widgets/_poll.widget.php:78
@@ -34918,7 +34969,8 @@ msgstr "Показать рубрики"
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:64
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:88
 #: ../../../inc/widgets/widgets/_coll_subscription.widget.php:90
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:94
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:123
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:160
 #: ../../../inc/widgets/widgets/_online_users.widget.php:81
 #: ../../../inc/widgets/widgets/_org_members.widget.php:100
 #: ../../../inc/widgets/widgets/_poll.widget.php:79
@@ -36492,57 +36544,67 @@ msgid "Newsletter/Email list subscription"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:74
-msgid "Display a form for list subscription."
+msgid ""
+"Display a button to register to/unregister from a Newsletter (logged-in "
+"users only)."
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:96
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:104
+msgid "On subscription, tag user with"
+msgstr ""
+
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:119
+msgid "If user is not subscribed yet:"
+msgstr ""
+
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:125
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:162
 #: ../../../inc/widgets/widgets/_user_register.widget.php:119
 msgid "Get our list!"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:102
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:131
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:168
 #: ../../../inc/widgets/widgets/_user_register.widget.php:125
 msgid "Don't miss the news!"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:105
-msgid "Bottom note"
-msgstr ""
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:134
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:171
+#: ../../../inc/widgets/widgets/_user_register.widget.php:180
+msgid "Button title"
+msgstr "Заголовок кнопки"
 
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:118
-msgid "Button title when not subscribed"
-msgstr ""
-
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:119
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:136
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:135
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:172
 #: ../../../inc/widgets/widgets/_user_register.widget.php:181
 msgid "Text that appears on the form submit button."
 msgstr "Текст, который появляется на кнопке формы."
 
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:121
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:137
 msgid "Subscribe Now!"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:124
-msgid "Button class when not subscribed"
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:140
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:177
+#: ../../../inc/widgets/widgets/_user_login.widget.php:169
+#: ../../../inc/widgets/widgets/_user_register.widget.php:186
+msgid "Button class"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:125
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:142
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:141
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:178
 #: ../../../inc/widgets/widgets/_user_register.widget.php:187
 msgid "Form submit button class"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:130
-msgid "On subscription, tag user with"
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:146
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:183
+msgid "Bottom note"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:135
-msgid "Button title when subscribed"
-msgstr ""
-
-#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:141
-msgid "Button class when subscribed"
+#: ../../../inc/widgets/widgets/_newsletter_subscription.widget.php:156
+msgid "If user is already subscribed:"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_online_users.widget.php:55
@@ -36962,11 +37024,6 @@ msgstr "Показывать приветствие"
 msgid "Greeting text to display"
 msgstr "Текст приветствия для отображения"
 
-#: ../../../inc/widgets/widgets/_user_login.widget.php:169
-#: ../../../inc/widgets/widgets/_user_register.widget.php:186
-msgid "Button class"
-msgstr ""
-
 #: ../../../inc/widgets/widgets/_user_login.widget.php:170
 msgid "Login button class"
 msgstr ""
@@ -37014,10 +37071,6 @@ msgid "check to auto subscribe new user to current collection comments"
 msgstr ""
 "отметьте, чтобы автоматически подписывать новых пользователей на комментарии"
 " текущей коллекции"
-
-#: ../../../inc/widgets/widgets/_user_register.widget.php:180
-msgid "Button title"
-msgstr "Заголовок кнопки"
 
 #: ../../../inc/widgets/widgets/_user_register.widget.php:183
 msgid "Sign up!"
@@ -37277,15 +37330,15 @@ msgstr "Невозможно обновить пока вы не сделает�
 msgid "Linkblog"
 msgstr "Блог ссылок"
 
-#: ../../../install/_functions_evoupgrade.php:9123
+#: ../../../install/_functions_evoupgrade.php:9137
 msgid "The database schema is up to date."
 msgstr "Структура базы данных в актуальном состоянии."
 
-#: ../../../install/_functions_evoupgrade.php:9164
+#: ../../../install/_functions_evoupgrade.php:9178
 msgid "Upgrade database"
 msgstr "Обновить базу данных"
 
-#: ../../../install/_functions_evoupgrade.php:9173
+#: ../../../install/_functions_evoupgrade.php:9187
 msgid ""
 "The version number is correct, but we have detected changes in the database "
 "schema. This can happen if you've been using development versions directly "
@@ -37295,7 +37348,7 @@ msgstr ""
 " Это может происходить, если вы используете версию разработчиков прямо из "
 "GitHub..."
 
-#: ../../../install/_functions_evoupgrade.php:9187
+#: ../../../install/_functions_evoupgrade.php:9201
 msgid "Try to Repair/Upgrade database now!"
 msgstr "Попробовать Восстановить/Обновить базу данных сейчас!"
 
@@ -37854,13 +37907,13 @@ msgstr ""
 "Сброс основных настроек в настоящее время запрещен из соображений "
 "безопасности."
 
-#: ../../../install/index.php:558 ../install/index.php:1200
+#: ../../../install/index.php:558 ../install/index.php:1206
 #, php-format
 msgid "To enable it, please go to the %s file and change: %s to %s"
 msgstr ""
 "Чтобы разрешить сброс, пожалуйста измените в файле %s строку: %s на %s"
 
-#: ../../../install/index.php:559 ../install/index.php:1201
+#: ../../../install/index.php:559 ../install/index.php:1207
 msgid "Then reload this page and a reset option will appear."
 msgstr "Затем обновите эту страницу, и опция сброса настроек появится."
 
@@ -38141,11 +38194,11 @@ msgstr "Установка в процессе"
 msgid "Installing b2evolution..."
 msgstr "Установка b2evolution..."
 
-#: ../../../install/index.php:1037 ../install/index.php:1194
+#: ../../../install/index.php:1037 ../install/index.php:1200
 msgid "Deleting b2evolution tables from the database..."
 msgstr "Удаление таблиц из базы данных b2evolution..."
 
-#: ../../../install/index.php:1065 ../install/index.php:1104
+#: ../../../install/index.php:1065 ../install/index.php:1110
 msgid "Checking files..."
 msgstr "Проверка файлов..."
 
@@ -38157,7 +38210,28 @@ msgstr "Обновление в процессе"
 msgid "Upgrading b2evolution..."
 msgstr "Обновление b2evolution..."
 
-#: ../../../install/index.php:1121
+#: ../../../install/index.php:1103
+msgid "IMPORTANT: if this upgrade procedure fails, do this:"
+msgstr ""
+
+#: ../../../install/index.php:1104
+msgid ""
+"Make a screenshot showing as much context as possible, and save it in case "
+"you need support."
+msgstr ""
+
+#: ../../../install/index.php:1105
+msgid ""
+"Reload the page. The upgrade script is designed to recover from unexpected "
+"stops and may be able to pick up where it left off."
+msgstr ""
+
+#: ../../../install/index.php:1106
+#, php-format
+msgid "If needed, see <a %s>this man page &raquo;</a>"
+msgstr ""
+
+#: ../../../install/index.php:1127
 #, php-format
 msgid ""
 "WARNING: the max_execution_time is set to %s seconds in php.ini and cannot "
@@ -38170,15 +38244,15 @@ msgstr ""
 "вызывающему сбой при обновлении</a>. Если это случилось, пожалуйста, "
 "разместите скриншот/снимок экрана на <a href=%s>форуме</a>."
 
-#: ../../../install/index.php:1124
+#: ../../../install/index.php:1130
 msgid "Upgrading data in existing b2evolution database..."
 msgstr "Обновление существующей базы данных b2evolution..."
 
-#: ../../../install/index.php:1156
+#: ../../../install/index.php:1162
 msgid "Upgrade completed successfully!"
 msgstr "Обновление успешно завершено!"
 
-#: ../../../install/index.php:1157
+#: ../../../install/index.php:1163
 #, php-format
 msgid ""
 "Now you can <a %s>log in</a> with your usual b2evolution username and "
@@ -38187,11 +38261,11 @@ msgstr ""
 "Теперь вы можете <a %s>авторизоваться</a> с вашим обычным b2evolution именем"
 " пользователя и паролем."
 
-#: ../../../install/index.php:1191
+#: ../../../install/index.php:1197
 msgid "Deletion in progress"
 msgstr "Удаление в процессе"
 
-#: ../../../install/index.php:1199
+#: ../../../install/index.php:1205
 msgid ""
 "If you have installed b2evolution tables before and wish to start anew, you "
 "must delete the b2evolution tables before you can start a new installation. "
@@ -38204,7 +38278,7 @@ msgstr ""
 "соображений безопасности."
 
 #. TRANS: %s gets replaced by app name, usually "b2evolution"
-#: ../../../install/index.php:1213
+#: ../../../install/index.php:1219
 #, php-format
 msgid ""
 "Are you sure you want to delete your existing %s tables?\n"
@@ -38213,7 +38287,7 @@ msgstr ""
 "Вы уверены, что хотите удалить существующие таблицы %s?\\nВы сохранили базу "
 "данных?"
 
-#: ../../../install/index.php:1309
+#: ../../../install/index.php:1315
 msgid "Conversion in progress"
 msgstr "Преобразование в процессе"
 
@@ -38609,28 +38683,34 @@ msgid "Should this plugin be used for anonymous users on item forms?"
 msgstr ""
 
 #: ../../../plugins/_captcha_qstn.plugin.php:76
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:70
 msgid "Use for anonymous comment forms"
 msgstr "Использовать для форм комментариев анонимных пользователей"
 
 #: ../../../plugins/_captcha_qstn.plugin.php:78
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:72
 msgid "Should this plugin be used for anonymous users on comment forms?"
 msgstr ""
 "Использовать ли этот плагин для анонимных пользователей на формах "
 "комментариев?"
 
 #: ../../../plugins/_captcha_qstn.plugin.php:82
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:76
 msgid "Use for new registration forms"
 msgstr "Использовать для форм новых регистраций"
 
 #: ../../../plugins/_captcha_qstn.plugin.php:84
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:78
 msgid "Should this plugin be used on registration forms?"
 msgstr "Использовать ли этот плагин для форм регистраций?"
 
 #: ../../../plugins/_captcha_qstn.plugin.php:88
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:82
 msgid "Use for anonymous messaging forms"
 msgstr "Использовать для форм сообщений анонимных пользователей"
 
 #: ../../../plugins/_captcha_qstn.plugin.php:90
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:84
 msgid "Should this plugin be used for anonymous users on messaging forms?"
 msgstr ""
 "Использовать ли этот плагин для анонимных пользователей на формах сообщений?"
@@ -38674,6 +38754,7 @@ msgid "Please answer the question above"
 msgstr "Пожалуйста, ответьте на вопрос выше"
 
 #: ../../../plugins/_captcha_qstn.plugin.php:466
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:227
 msgid "Validate me"
 msgstr "Проверь меня"
 
@@ -38980,6 +39061,49 @@ msgstr ""
 msgid "Pings a service that relays the ping to the most common services."
 msgstr ""
 "Пингует сервис, который передает ваш пинг наиболее подходящим сервисам."
+
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:49
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:50
+msgid "Proof of Work Captcha"
+msgstr ""
+
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:88
+msgid "API site key"
+msgstr ""
+
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:89
+msgid "Site Key (public)"
+msgstr ""
+
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:89
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:95
+#, php-format
+msgid "Use \"%s\" which is generated for your site on <a %s>%s</a>"
+msgstr ""
+
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:94
+msgid "API secret key"
+msgstr ""
+
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:95
+msgid "Secret Key (private)"
+msgstr ""
+
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:100
+msgid "Number of hashes"
+msgstr ""
+
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:121
+msgid "To enable this plugin you should enter API keys!"
+msgstr ""
+
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:178
+msgid "Captcha has not been verified successfully!"
+msgstr ""
+
+#: ../../../plugins/_proof_of_work_captcha.plugin.php:222
+msgid "Loading Captcha...<br>If it doesn't load, please disable Adblock!"
+msgstr ""
 
 #: ../../../plugins/_quicktags.plugin.php:34
 msgid "Easy HTML tags inserting"
@@ -41823,51 +41947,63 @@ msgstr "Одиночная боковая панель"
 
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:92
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:149
-#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:82
+#: ../../../skins/bootstrap_gallery_legacy/_item_comment.inc.php:83
+#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:85
 #: ../../../skins/photoalbums/_item_comment.inc.php:57
 #: ../../../skins_fallback_v5/_item_comment.inc.php:82
-#: ../../../skins_fallback_v6/_item_comment.inc.php:80
+#: ../../../skins_fallback_v6/_item_comment.inc.php:83
 msgid "PREVIEW Comment from:"
 msgstr "ПРЕДПРОСМОТР комментариев от:"
 
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:185
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:196
-#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:88
-#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:114
-#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:125
+#: ../../../skins/bootstrap_gallery_legacy/_item_comment.inc.php:89
+#: ../../../skins/bootstrap_gallery_legacy/_item_comment.inc.php:115
+#: ../../../skins/bootstrap_gallery_legacy/_item_comment.inc.php:126
+#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:91
+#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:117
+#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:128
 #: ../../../skins_fallback_v5/_item_comment.inc.php:88
 #: ../../../skins_fallback_v5/_item_comment.inc.php:114
 #: ../../../skins_fallback_v5/_item_comment.inc.php:125
-#: ../../../skins_fallback_v6/_item_comment.inc.php:86
-#: ../../../skins_fallback_v6/_item_comment.inc.php:112
-#: ../../../skins_fallback_v6/_item_comment.inc.php:123
+#: ../../../skins_fallback_v6/_item_comment.inc.php:89
+#: ../../../skins_fallback_v6/_item_comment.inc.php:115
+#: ../../../skins_fallback_v6/_item_comment.inc.php:126
 msgid "from:"
 msgstr "от:"
 
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:186
-#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:115
+#: ../../../skins/bootstrap_gallery_legacy/_item_comment.inc.php:116
+#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:118
 #: ../../../skins_fallback_v5/_item_comment.inc.php:115
 #: ../../../skins_fallback_v5/_item_comment_wp.inc.php:73
-#: ../../../skins_fallback_v6/_item_comment.inc.php:113
+#: ../../../skins_fallback_v6/_item_comment.inc.php:116
 msgid "Trackback"
 msgstr "Трекбек"
 
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:197
-#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:126
+#: ../../../skins/bootstrap_gallery_legacy/_item_comment.inc.php:127
+#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:129
 #: ../../../skins_fallback_v5/_item_comment.inc.php:126
 #: ../../../skins_fallback_v5/_item_comment_wp.inc.php:83
-#: ../../../skins_fallback_v6/_item_comment.inc.php:124
+#: ../../../skins_fallback_v6/_item_comment.inc.php:127
 msgid "Pingback"
 msgstr "Пинг"
 
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:289
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:292
+#: ../../../skins/bootstrap_gallery_legacy/_item_comment.inc.php:174
+#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:175
 #: ../../../skins/pureforums_skin/_item_comment.inc.php:186
+#: ../../../skins_fallback_v6/_item_comment.inc.php:174
 msgid "Edit this reply"
 msgstr "Редактировать этот ответ"
 
 #: ../../../skins/bootstrap_forums_skin/_item_comment.inc.php:301
+#: ../../../skins/bootstrap_gallery_legacy/_item_comment.inc.php:184
+#: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:185
 #: ../../../skins/pureforums_skin/_item_comment.inc.php:195
+#: ../../../skins_fallback_v6/_item_comment.inc.php:183
 msgid "Delete this reply"
 msgstr "Удалить это ответ"
 
