@@ -26,6 +26,9 @@ param( 'email_ID', 'integer', true );
 param( 'email_key', 'string', true );
 param( 'redirect_to', 'url', '' );
 
+// erhsatingin > Is this acceptable? This seems like an ugly hack...
+$redirect_to = str_replace( '&amp;', '&', $redirect_to );
+
 switch( $type )
 {
 	case 'link':
@@ -38,9 +41,6 @@ switch( $type )
 		{	// If a redirect param was not defined on submitted form then redirect to site url:
 			$redirect_to = $baseurl;
 		}
-
-		// erhsatingin > Is this acceptable? This seems like an ugly hack...
-		$redirect_to = str_replace( '&amp;', '&', $redirect_to );
 
 		// header_redirect can prevent redirection depending on some advanced settings like $allow_redirects_to_different_domain!
 		// header_redirect( $redirect_to, 303 ); // Will EXIT

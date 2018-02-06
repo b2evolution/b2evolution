@@ -305,7 +305,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 	 * @var integer|NULL This global var stores ID of the last inserted mail log
 	 */
 // TODO fp>erwin: why do we need a global below? Why don't we just return $DB->insert_id; ?
-// erwin>fp: I agree that we should just return $DB->insert_id but this is how it was done before and I never changed it for fear of breaking something somewhere.
+// erwin>fp: this function is called within send_mail() and in EmailCampaign::send_all_emails(), the global is used to update the T_email__campaign_send values after the send_mail() call
 	global $mail_log_insert_ID;
 	$mail_log_insert_ID = NULL;
 
