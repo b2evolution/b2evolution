@@ -213,7 +213,7 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
 				}
 				else
 				{
-					$result_info .= get_icon( 'bullet_light_blue', 'imgtag', array( 'alt' => T_('Read') ) );
+					$result_info .= get_icon( 'bullet_light_blue', 'imgtag', array( 'alt' => T_('Opened') ) );
 				}
 			}
 			if( $params['display_text'] )
@@ -224,7 +224,7 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
 				}
 				else
 				{
-					$result_info .= ' './* TRANS: Email was already opened */ T_('Read');
+					$result_info .= ' './* TRANS: Email was already opened */ T_('Opened');
 				}
 			}
 			break;
