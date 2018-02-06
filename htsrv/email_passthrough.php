@@ -26,6 +26,9 @@ param( 'email_ID', 'integer', true );
 param( 'email_key', 'string', true );
 param( 'redirect_to', 'url', '' );
 
+// erhsatingin > Is this acceptable? This seems like an ugly hack...
+$redirect_to = str_replace( '&amp;', '&', $redirect_to );
+
 switch( $type )
 {
 	case 'link':

@@ -3756,6 +3756,21 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $mail_log_insert_ID;
 
+	$message_data = $message;
+	if( is_array( $message_data ) && isset( $message_data['full'] ) )
+	{ // If content is multipart
+		$message = $message_data['full'];
+	}
+	elseif( is_string( $message_data ) )
+	{ // Convert $message_data to array
+		$message_data = array( 'full' => $message );
+	}
+
+	// Replace secret content in the mail logs message body
+	$message = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $message );
+	// Remove secret content marks from the message
+	$message_data = str_replace( array( '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
+
 	// Memorize email address
 	$to_email_address = $to;
 
@@ -3780,6 +3795,12 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	{
 		$from_name = user_get_notification_sender( $user_ID, 'name' );
 	}
+
+	// Pass these data for SMTP mailer
+	$message_data['to_email'] = $to;
+	$message_data['to_name'] = empty( $to_name ) ? NULL : $to_name;
+	$message_data['from_email'] = $from;
+	$message_data['from_name'] = empty( $from_name ) ? NULL : $from_name;
 
 	$return_path = $Settings->get( 'notification_return_path' );
 
@@ -3834,22 +3855,9 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$email_key = generate_random_key();
 	mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key );
 
+	// Replace tracking code placeholders
 	$message = str_replace( array( '$email_key$', '$mail_log_ID$' ), array( $email_key, $mail_log_insert_ID ), $message );
-	$message_data = $message;
-	if( is_array( $message_data ) && isset( $message_data['full'] ) )
-	{ // If content is multipart
-		$message = $message_data['full'];
-	}
-	elseif( is_string( $message_data ) )
-	{ // Convert $message_data to array
-		$message_data = array( 'full' => $message );
-	}
-
-	// Pass these data for SMTP mailer
-	$message_data['to_email'] = $to;
-	$message_data['to_name'] = empty( $to_name ) ? NULL : $to_name;
-	$message_data['from_email'] = $from;
-	$message_data['from_name'] = empty( $from_name ) ? NULL : $from_name;
+	$message_data = str_replace( array( '$email_key$', '$mail_log_ID$' ), array( $email_key, $mail_log_insert_ID ), $message_data );
 
 	// Set an additional parameter for the return path:
 	switch( $Settings->get( 'sendmail_params' ) )
@@ -3876,14 +3884,13 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$additional_parameters = '';
 	}
 
-	// Remove markers from message that will be sent to actual email
-	$message_data = str_replace( array( '$email_key_start$', '$email_key_end$', '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
+	// Remove email key markers from message that will be sent to actual email
+	$message_data = str_replace( array( '$email_key_start$', '$email_key_end$' ), '', $message_data );
 
 	if( mail_is_blocked( $to_email_address ) )
 	{ // Check if the email address is blocked
 		$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
 
-		//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked', $email_key );
 		update_mail_log( $mail_log_insert_ID, 'blocked', $message );
 
 		return false;
@@ -3902,7 +3909,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	{	// The message has not been sent successfully
 		if( $debug > 1 )
 		{ // We agree to die for debugging...
-			//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
 			update_mail_log( $mail_log_insert_ID, 'error', $message );
 
 			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
@@ -3911,7 +3917,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		{ // Soft debugging only....
 			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
 
-			//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error', $email_key );
 			update_mail_log( $mail_log_insert_ID, 'error', $message );
 
 			return false;
@@ -3920,7 +3925,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
 
-	//mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $email_key );
 	update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
 
 	return true;
@@ -4024,7 +4028,9 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 
 		// Autoinsert user's data
 		$subject = mail_autoinsert_user_data( $subject, $User );
-		$message = mail_autoinsert_user_data( $message, $User );
+
+		// erhsatingin > moved to mail_template()
+		//$message = mail_autoinsert_user_data( $message, $User );
 
 		$to_email = !empty( $force_email_address ) ? $force_email_address : $User->email;
 
@@ -4050,15 +4056,44 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
  * @param object User
  * @return string Text
 */
-function mail_autoinsert_user_data( $text, $User = NULL )
+function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text' )
 {
 	if( !$User )
 	{	// No user
 		return $text;
 	}
 
-	$rpls_from = array( '$login$' , '$email$', '$user_ID$', '$unsubscribe_key$' );
-	$rpls_to = array( $User->login, $User->email, $User->ID, '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$' );
+	if( $format == 'html' )
+	{
+		$username = $User->get_colored_login( array(
+				'mask'      => '$avatar$ $login$',
+				'login_text'=> 'name',
+				'use_style' => true,
+				'protocol'  => 'http:',
+			) );
+
+		$user_login = $User->get_colored_login( array(
+				'mask'      => '$avatar$ $login$',
+				'use_style' => true,
+				'protocol'  => 'http:',
+			) );
+	}
+	else
+	{
+		$username = $User->get_username();
+		$user_login = $User->login;
+	}
+
+	$firstname = $User->get( 'firstname' );
+	$lastname = $User->get( 'lastname' );
+	$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
+	$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
+	$user_email = $User->email;
+	$user_ID = $User->ID;
+	$unsubscribe_key = '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$';
+
+	$rpls_from = array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$' );
+	$rpls_to = array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key );
 
 	return str_replace( $rpls_from, $rpls_to, $text );
 }
@@ -4142,39 +4177,8 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		$formated_message .= ob_get_clean();
 
 		if( ! empty( $User ) )
-		{ // Replace $login$ with gender colored link + icon in HTML format,
-		  //   and with simple login text in PLAIN TEXT format
-			if( $format == 'html' )
-			{
-				$username = $User->get_colored_login( array(
-						'mask'      => '$avatar$ $login$',
-						'login_text'=> 'name',
-						'use_style' => true,
-						'protocol'  => 'http:',
-					) );
-
-				$user_login = $User->get_colored_login( array(
-						'mask'      => '$avatar$ $login$',
-						'use_style' => true,
-						'protocol'  => 'http:',
-					) );
-
-				$firstname = $User->get( 'firstname' );
-				$lastname = $User->get( 'lastname' );
-				$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
-				$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
-			}
-			else
-			{
-				$username = $User->get_username();
-				$user_login = $User->login;
-				$firstname = $User->get( 'firstname' );
-				$lastname = $User->get( 'lastname' );
-				$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
-				$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
-			}
-			$formated_message = str_replace( array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$' ),
-					array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login ), $formated_message );
+		{ // Replace $login$ with gender colored link + icon in HTML format, and with simple login text in PLAIN TEXT format
+			$formated_message = mail_autoinsert_user_data( $formated_message, $User, $format );
 		}
 		elseif( ! empty( $params['anonymous_recipient_name'] ) )
 		{
