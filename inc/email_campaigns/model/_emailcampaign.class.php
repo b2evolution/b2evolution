@@ -619,10 +619,13 @@ class EmailCampaign extends DataObject
 	 * @param integer User ID
 	 * @param string Email address
 	 * @param string Mode: 'test' - to send test email newsletter
+	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
 	 * @return boolean TRUE on success
 	 */
-	function send_email( $user_ID, $email_address = '', $mode = '' )
+	function send_email( $user_ID, $email_address = '', $mode = '', $update_sent_ts = false )
 	{
+		global $localtimenow;
+
 		$newsletter_params = array(
 				'include_greeting' => false,
 				'message_html'     => $this->get( 'email_html' ),
@@ -687,6 +690,17 @@ class EmailCampaign extends DataObject
 			}
 		}
 
+		if( $update_sent_ts == 'auto' )
+		{	// Update auto date of sending:
+			$this->set( 'auto_sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
+			$this->dbupdate();
+		}
+		elseif( $update_sent_ts == 'manual' )
+		{	// Update manual date of sending:
+			$this->set( 'sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
+			$this->dbupdate();
+		}
+
 		return $result;
 	}
 
@@ -696,8 +710,9 @@ class EmailCampaign extends DataObject
 	 *
 	 * @param boolean TRUE to print out messages
 	 * @param array Force users instead of users which are ready to receive this email campaign
+	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
 	 */
-	function send_all_emails( $display_messages = true, $user_IDs = NULL )
+	function send_all_emails( $display_messages = true, $user_IDs = NULL, $update_sent_ts = 'auto' )
 	{
 		global $DB, $localtimenow, $Settings, $Messages;
 
@@ -717,10 +732,6 @@ class EmailCampaign extends DataObject
 		}
 
 		$DB->begin();
-
-		// Update date of sending
-		$this->set( 'sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
-		$this->dbupdate();
 
 		$UserCache = & get_UserCache();
 
@@ -818,6 +829,17 @@ class EmailCampaign extends DataObject
 
 				evo_flush();
 			}
+		}
+
+		if( $update_sent_ts == 'auto' )
+		{	// Update auto date of sending:
+			$this->set( 'auto_sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
+			$this->dbupdate();
+		}
+		elseif( $update_sent_ts == 'manual' )
+		{	// Update manual date of sending:
+			$this->set( 'sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
+			$this->dbupdate();
 		}
 
 		$DB->commit();

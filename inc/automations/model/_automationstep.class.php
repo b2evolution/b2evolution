@@ -464,7 +464,7 @@ class AutomationStep extends DataObject
 						{	// If user already received this email:
 							$step_result = 'NO';
 						}
-						elseif( $user_is_waiting_email && $step_EmailCampaign->send_email( $user_ID ) )
+						elseif( $user_is_waiting_email && $step_EmailCampaign->send_email( $user_ID, '', '', 'auto' ) )
 						{	// If email has been sent to user successfully now:
 							$step_result = 'YES';
 						}
