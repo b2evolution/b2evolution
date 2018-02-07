@@ -354,7 +354,7 @@ switch( $action )
 			break;
 		}
 
-		if( $current_User->check_perm( 'options', 'view' ) )
+		if( ! $current_User->check_perm( 'options', 'view' ) )
 		{	// No access to view cron jobs:
 			$Messages->add( T_('Sorry, you don\'t have permission to view scheduled jobs.' ), 'warning' );
 			$action = 'edit';
