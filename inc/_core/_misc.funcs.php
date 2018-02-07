@@ -4112,6 +4112,10 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 {
 	global $current_charset, $current_User;
 
+	$params = array_merge( array(
+			'add_email_tracking' => true
+		), $params );
+
 	if( !empty( $params['locale'] ) )
 	{ // Switch to locale for current email template
 		locale_temp_switch( $params['locale'] );
@@ -4185,7 +4189,10 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			$formated_message = str_replace( '$name$', $params['anonymous_recipient_name'], $formated_message );
 		}
 
-		$formated_message = add_email_tracking( $formated_message, '$mail_log_ID$', '$email_key$', $format );
+		if( $params['add_email_tracking'] )
+		{
+			$formated_message = add_email_tracking( $formated_message, '$mail_log_ID$', '$email_key$', $format );
+		}
 		$template_message .= $formated_message;
 
 		if( isset( $template_contents ) )

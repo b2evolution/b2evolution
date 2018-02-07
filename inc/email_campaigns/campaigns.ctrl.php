@@ -251,8 +251,9 @@ switch( $action )
 
 	case 'test':
 		// Send test email
-		global $track_email_click_html, $track_email_click_plain_text;
+		global $track_email_image_load, $track_email_click_html, $track_email_click_plain_text;
 
+		$track_email_image_load = param( 'track_test_email_image_load', 'boolean', 0 );
 		$track_email_click_html = param( 'track_test_email_click_html', 'boolean', 0 );
 		$track_email_click_plain_text = param( 'track_test_email_click_plain_text', 'boolean', 0 );
 
@@ -298,8 +299,9 @@ switch( $action )
 
 	case 'send':
 	case 'create_cron':
-		global $track_email_click_html, $track_email_click_plain_text;
+		global $track_email_image_load, $track_email_click_html, $track_email_click_plain_text;
 
+		param( 'track_email_image_load', 'boolean', 0 );
 		param( 'track_email_click_html', 'boolean', 0 );
 		param( 'track_email_click_plain_text', 'boolean', 0 );
 

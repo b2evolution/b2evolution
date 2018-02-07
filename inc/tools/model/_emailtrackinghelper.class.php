@@ -41,9 +41,14 @@ class EmailTrackingHelper
 		$this->content_type = $content_type;
 	}
 
+	public function get_passthrough_url()
+	{
+		return get_htsrv_url().'email_passthrough.php?email_ID='.$this->email_ID.'&type='.$this->url_type.'&email_key=$email_key_start$'.$this->key.'$email_key_end$&redirect_to=';
+	}
+
 	public function callback( $matches )
 	{
-		$passthrough_url = get_htsrv_url().'email_passthrough.php?email_ID='.$this->email_ID.'&type='.$this->url_type.'&email_key=$email_key_start$'.$this->key.'$email_key_end$&redirect_to=';
+		$passthrough_url = $this->get_passthrough_url();
 
 		switch( $this->content_type )
 		{

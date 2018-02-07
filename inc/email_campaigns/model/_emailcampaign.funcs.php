@@ -216,6 +216,8 @@ function campaign_results_block( $params = array() )
 			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
 			enlt_ID, enlt_name,
 			SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS send_count,
+			SUM( IF( emlog_last_open_ts IS NOT NULL OR emlog_last_click_ts IS NOT NULL, 1, 0 ) ) /
+				SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS open_rate,
 			SUM( IF( emlog_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
 			SUM( IF( emlog_last_click_ts IS NULL, 0, 1 ) ) AS click_count' );
 	$SQL->FROM( 'T_email__campaign' );
@@ -313,7 +315,16 @@ function campaign_results_block( $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Open count'),
+			'th' => T_('Open rate'),
+			'order' => 'open_rate',
+			'default_dir' => 'D',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'center',
+			'td' =>'%number_format( #open_rate# * 100, 2 )%%'
+		);
+
+	$Results->cols[] = array(
+			'th' => T_('Image load count'),
 			'order' => 'open_count',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',

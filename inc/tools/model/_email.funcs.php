@@ -209,18 +209,18 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
 			{
 				if( empty( $last_open ) && empty( $last_click ) )
 				{
-					$result_info .= get_icon( 'bullet_green', 'imgtag', array( 'alt' => T_('Ok') ) );
+					$result_info .= get_icon( 'bullet_black', 'imgtag', array( 'alt' => T_('Sent') ) );
 				}
 				else
 				{
-					$result_info .= get_icon( 'bullet_light_blue', 'imgtag', array( 'alt' => T_('Opened') ) );
+					$result_info .= get_icon( 'bullet_green', 'imgtag', array( 'alt' => T_('Opened') ) );
 				}
 			}
 			if( $params['display_text'] )
 			{
 				if( empty( $last_open ) && empty( $last_click ) )
 				{
-					$result_info .= ' '.T_('Ok');
+					$result_info .= ' '.T_('Sent');
 				}
 				else
 				{
@@ -232,7 +232,7 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
 		case 'error':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_red', 'imgtag', array( 'alt' => T_('Error') ) );
+				$result_info .= get_icon( 'bullet_orange', 'imgtag', array( 'alt' => T_('Error') ) );
 			}
 			if( $params['display_text'] )
 			{
@@ -243,7 +243,7 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
 		case 'blocked':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_black', 'imgtag', array( 'alt' => T_('Blocked') ) );
+				$result_info .= get_icon( 'bullet_red', 'imgtag', array( 'alt' => T_('Blocked') ) );
 			}
 			if( $params['display_text'] )
 			{
@@ -262,11 +262,25 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
 		case 'simulated':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_magenta', 'imgtag', array( 'alt' => T_('Simulated') ) );
+				if( empty( $last_open ) && empty( $last_click ) )
+				{
+					$result_info .= get_icon( 'bullet_magenta', 'imgtag', array( 'alt' => T_('Simulated') ) );
+				}
+				else
+				{
+					$result_info .= get_icon( 'bullet_green', 'imgtag', array( 'alt' => T_('Opened') ) );
+				}
 			}
 			if( $params['display_text'] )
 			{
-				$result_info .= ' '.T_('Simulated');
+				if( empty( $last_open ) && empty( $last_click ) )
+				{
+					$result_info .= ' '.T_('Simulated');
+				}
+				else
+				{
+					$result_info .= ' './* TRANS: Email was already opened */ T_('Opened');
+				}
 			}
 			break;
 
@@ -1198,7 +1212,8 @@ function php_email_sending_test()
  */
 function add_email_tracking( $message, $email_ID, $email_key, $content_type = 'auto' )
 {
-	global $track_email_click_html, $track_email_click_plain_text;
+	global $rsc_url;
+	global $track_email_image_load, $track_email_click_html, $track_email_click_plain_text;
 
 	load_class( 'tools/model/_emailtrackinghelper.class.php', 'EmailTrackingHelper' );
 
@@ -1237,10 +1252,19 @@ function add_email_tracking( $message, $email_ID, $email_key, $content_type = 'a
 			return $message;
 
 		case 'html':
-			// Add email open tracking to first image
-			$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
-			$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key );
-			$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message, 1 );
+			if( ! isset( $track_email_image_load ) || $track_email_image_load == 1 )
+			{
+				// Add email open tracking to first image
+				$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
+				$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key );
+				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message, 1 );
+
+				/*
+				// Add web beacon
+				$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key );
+				$message .= "\n".'<img src="'.$callback->get_passthrough_url().$rsc_url.'img/blank.gif" />';
+				*/
+			}
 
 			if( ! isset( $track_email_click_html ) || $track_email_click_html == 1  )
 			{

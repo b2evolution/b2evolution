@@ -108,7 +108,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Result'),
+		'th' => T_('Status'),
 		'order' => 'emlog_result',
 		'td' => '%emlog_result_info( #emlog_result#, array( \'link_blocked\' => true, \'email\' => #emlog_to# ), #emlog_last_open_ts#, #emlog_last_click_ts# )%',
 		'th_class' => 'shrinkwrap',
