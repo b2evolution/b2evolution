@@ -101,9 +101,9 @@ echo $notify_message;
 
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 
-echo get_link_tag( $Comment->get_permanent_url( '&', '#comments' ), T_( 'Read full comment' ), 'div.buttons a+a.button_green' )."\n";
+echo get_link_tag( $Comment->get_permanent_url( '&', '#comments' ), T_( 'Read full comment' ), 'div.buttons a+a.btn-primary' )."\n";
 
-echo get_link_tag( $admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID, T_('Edit comment'), 'div.buttons a+a.button_gray' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID, T_('Edit comment'), 'div.buttons a+a.btn-default' )."\n";
 
 echo "</div>\n";
 
