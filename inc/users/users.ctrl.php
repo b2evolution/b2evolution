@@ -372,8 +372,8 @@ if( !$Messages->has_errors() )
 			/* EXITED */
 			break;
 
-		case 'newsletter':
-			// This is a redirect from email campaign controller to select the recipients:
+		case 'campaign':
+			// Select the recipients for email campaign:
 
 			$current_User->check_perm( 'emails', 'edit', true );
 
@@ -382,16 +382,24 @@ if( !$Messages->has_errors() )
 
 			$Messages->add( T_('Please select new recipients for this email campaign.'), 'success' );
 
-			if( ! param( 'newsletter', 'integer', 0 ) )
-			{	// Don't allow all newsletters for selecting of recipients for email campaign:
-				$Messages->add( T_('Any email campaign must be sent to subscribers of a particular list. Please select a list in your filters.'), 'error' );
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+			if( ! ( $edited_EmailCampaign = & get_session_EmailCampaign() ) )
+			{	// Initialize Email Campaign once and store in Session:
 
-				load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
-				if( $edited_EmailCampaign = & get_session_EmailCampaign() )
-				{	// Force newsletter filter by current of email campaign:
-					set_param( 'newsletter', $edited_EmailCampaign->get( 'enlt_ID' ) );
-				}
+				// ID of Email Campaign is required and should be memorized:
+				param( 'ecmp_ID', 'integer', true );
+
+				// Get Email Campaign by ID:
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $ecmp_ID );
+
+				// Save Email Campaign ID in Session:
+				$Session->set( 'edited_campaign_ID', $edited_EmailCampaign->ID );
 			}
+
+			// Set users filter "Subscribed to":
+			set_param( 'newsletter', $edited_EmailCampaign->get( 'enlt_ID' ) );
+			set_param( 'filter', 'new' );
 			break;
 	}
 }
