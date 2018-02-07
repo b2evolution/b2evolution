@@ -207,8 +207,23 @@ else
 		// The job may need to know its ID and name (to set logical locks for example):
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
-		// EXECUTE
-		$error_message = call_job( $task->ctsk_key, $cron_params );
+		// Try to execute cron job:
+		set_error_handler(
+			function( $errno, $errstr, $errfile, $errline )
+			{
+				throw new ErrorException( $errstr, $errno, 0, $errfile, $errline );
+			}
+		);
+		try
+		{	// EXECUTE CRON JOB:
+			$error_message = call_job( $task->ctsk_key, $cron_params );
+		}
+		catch( Exception $ex )
+		{	// Unknown error:
+			$result_status = 'error';
+			$error_message = $ex->getMessage();
+		}
+		restore_error_handler();
 
 		if( !empty( $error_message ) )
 		{
