@@ -264,7 +264,7 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
 			{
 				if( empty( $last_open ) && empty( $last_click ) )
 				{
-					$result_info .= get_icon( 'bullet_magenta', 'imgtag', array( 'alt' => T_('Simulated') ) );
+					$result_info .= get_icon( 'bullet_gray', 'imgtag', array( 'alt' => T_('Simulated') ) );
 				}
 				else
 				{

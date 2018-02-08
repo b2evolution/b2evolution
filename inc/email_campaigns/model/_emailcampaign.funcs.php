@@ -320,11 +320,11 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%number_format( #open_rate# * 100, 2 )%%'
+			'td' =>'%number_format( #open_rate# * 100, 1 )%%'
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Image load count'),
+			'th' => /* TRANS: Image load count */ T_('Img loads'),
 			'order' => 'open_count',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
@@ -333,7 +333,7 @@ function campaign_results_block( $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Click count'),
+			'th' => T_('Link clicks'),
 			'order' => 'click_count',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
