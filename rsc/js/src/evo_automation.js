@@ -39,6 +39,37 @@ function add_user_automation( user_ID )
 
 
 /**
+ * Open modal window to add users list to automation
+ *
+ * @return boolean FALSE to prevent onclick event of the link
+ */
+function add_userlist_automation()
+{
+	openModalWindow( '<span class="loader_img loader_add_userlist_automation absolute_center" title="' + evo_js_lang_loading + '"></span>',
+		'auto', '', true,
+		evo_js_lang_add_current_selection_to_automation, evo_js_lang_add_selected_users_to_automation, true );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: evo_js_userlist_automation_ajax_url,
+		data:
+		{
+			'ctrl': 'users',
+			'action': 'automation',
+			'display_mode': 'js',
+		},
+		success: function( result )
+		{
+			openModalWindow( result, 'auto', '', true,
+			evo_js_lang_add_current_selection_to_automation, evo_js_lang_add_selected_users_to_automation );
+		}
+	} );
+
+	return false;
+}
+
+
+/**
  * Open modal window to add user to automation
  *
  * @param integer User ID

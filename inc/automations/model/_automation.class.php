@@ -31,6 +31,7 @@ class Automation extends DataObject
 	var $owner_user_ID;
 	var $autostart = 1;
 
+	var $Newsletter = NULL;
 	var $owner_User = NULL;
 
 	/**
@@ -204,6 +205,119 @@ class Automation extends DataObject
 		}
 
 		return $this->owner_User;
+	}
+
+
+	/**
+	 * Get Newsletter
+	 *
+	 * @return object|NULL|boolean Reference on cached owner User object, NULL - if request with empty ID, FALSE - if requested owner User does not exist
+	 */
+	function & get_Newsletter()
+	{
+		if( $this->Newsletter === NULL )
+		{	// Load Newsletter into cache var:
+			$NewsletterCache = & get_NewsletterCache();
+			$this->Newsletter = & $NewsletterCache->get_by_ID( $this->get( 'enlt_ID' ), false, false );
+		}
+
+		return $this->Newsletter;
+	}
+
+
+	/**
+	 * Add users to this automation
+	 *
+	 * @param array IDs of users
+	 * @param array Params
+	 * @return integer Number of added users
+	 */
+	function add_users( $user_IDs, $params = array() )
+	{
+		global $DB, $servertimenow;
+
+		$params = array_merge( array(
+				'users_no_subs'   => 'ignore', // Action for users who are not subscribed to Newsletter of this Automation: 'ignore' - Ignore, 'add' - Add anyway
+				'users_automated' => 'ignore', // Action for users who are already in this Automation: 'ignore' - Ignore, 'requeue' - Requeue to Start
+				'users_new'       => 'add', // Action for new users: 'ignore' - Ignore, 'add' - Add to automation
+			), $params );
+
+		$added_users_num = 0;
+
+		if( empty( $this->ID ) )
+		{	// Automation must be stored in DB:
+			return $added_users_num;
+		}
+
+		if( empty( $user_IDs ) )
+		{	// No users to add:
+			return $added_users_num;
+		}
+
+		if( $params['users_no_subs'] == 'ignore' )
+		{	// Ignore not subscribed users to this Automation:
+			$no_subs_SQL = new SQL( 'Get not subscribed users of the Automation #'.$this->ID );
+			$no_subs_SQL->SELECT( 'user_ID' );
+			$no_subs_SQL->FROM( 'T_users' );
+			$no_subs_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$this->get( 'enlt_ID' ) );
+			$no_subs_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $user_IDs ).' )' );
+			$no_subs_SQL->WHERE_and( 'enls_subscribed = 0 OR enls_user_ID IS NULL' );
+			// Remove not subscribed users from array:
+			$user_IDs = array_diff( $user_IDs, $DB->get_col( $no_subs_SQL ) );
+		}
+		// else: Add not subscribed users anyway
+
+		$automated_SQL = new SQL( 'Get users of the Automated #'.$this->ID );
+		$automated_SQL->SELECT( 'aust_user_ID' );
+		$automated_SQL->FROM( 'T_automation__user_state' );
+		$automated_SQL->WHERE( 'aust_autm_ID = '.$this->ID );
+		$automated_SQL->WHERE_and( 'aust_user_ID IN ( '.$DB->quote( $user_IDs ).' )' );
+		$automated_user_IDs = $DB->get_col( $automated_SQL );
+
+		// Remove already automated users from array:
+		$user_IDs = array_diff( $user_IDs, $automated_user_IDs );
+
+
+		if( count( $automated_user_IDs ) || count( $user_IDs ) )
+		{	// Get first Step of this Automation:
+			$first_step_SQL = new SQL( 'Get first step of automation #'.$this->ID );
+			$first_step_SQL->SELECT( 'step_ID' );
+			$first_step_SQL->FROM( 'T_automation__step' );
+			$first_step_SQL->WHERE( 'step_autm_ID = '.$this->ID );
+			$first_step_SQL->ORDER_BY( 'step_order ASC' );
+			$first_step_SQL->LIMIT( 1 );
+			$first_step_ID = intval( $DB->get_var( $first_step_SQL ) );
+		}
+
+		if( empty( $first_step_ID ) )
+		{	// No detected first step or no users to add or requeue:
+			return $added_users_num;
+		}
+
+		if( $params['users_automated'] == 'requeue' && count( $automated_user_IDs ) )
+		{	// Requeue already automated users to first Step:
+			$added_users_num += $DB->query( 'UPDATE T_automation__user_state 
+				  SET aust_next_step_ID = '.$DB->quote( $first_step_ID ).',
+				      aust_next_exec_ts = '.$DB->quote( date2mysql( $servertimenow ) ).'
+				WHERE aust_autm_ID = '.$DB->quote( $this->ID ).'
+				  AND aust_user_ID IN ( '.$DB->quote( $automated_user_IDs ).' )',
+				'Requeue already automated users to first Step from users list' );
+		}
+		// else:  Ignore already automated users
+
+		if( $params['users_new'] == 'add' && count( $user_IDs ) )
+		{	// Add new users to this Automation:
+			$insert_sql = array();
+			foreach( $user_IDs as $user_ID )
+			{
+				$insert_sql[] = '( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $first_step_ID ).', '.$DB->quote( date2mysql( $servertimenow ) ).' )';
+			}
+			$added_users_num += $DB->query( 'INSERT INTO T_automation__user_state ( aust_autm_ID, aust_user_ID, aust_next_step_ID, aust_next_exec_ts )
+				VALUES '.implode( ', ', $insert_sql ),
+				'Insert automation user states from users list' );
+		}
+
+		return $added_users_num;
 	}
 }
 

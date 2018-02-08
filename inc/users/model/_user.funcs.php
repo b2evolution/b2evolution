@@ -4604,6 +4604,28 @@ function echo_user_automation_js()
 
 
 /**
+ * Initialize JavaScript for AJAX loading of popup window to add users list to automation
+ * @param array Params
+ */
+function echo_userlist_automation_js()
+{
+	global $admin_url;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_add_current_selection_to_automation = \''.TS_('Add current selection to an Automation...').get_manual_link( 'add-users-list-to-automation' ).'\';
+		var evo_js_lang_add_selected_users_to_automation = \''.TS_('Add selected users to "%s"').'\';
+		var evo_js_userlist_automation_ajax_url = \''.$admin_url.'\';
+		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+	</script>';
+}
+
+
+/**
  * Display user report form
  *
  * @param array Params
@@ -5367,6 +5389,7 @@ function users_results_block( $params = array() )
 			'display_actions'      => true,
 			'display_org_actions'  => false,
 			'display_newsletter'   => true,
+			'display_automation'   => false,
 			'force_check_user'     => false,
 		), $params );
 
@@ -5511,36 +5534,44 @@ function users_results_block( $params = array() )
 		$UserList->display( $params['display_params'] );
 	}
 
-	$edited_campaign_ID = $Session->get( 'edited_campaign_ID' );
-	if( !empty( $edited_campaign_ID ) )
-	{ // Get Email Campaign by ID from Session
-		$EmailCampaignCache = & get_EmailCampaignCache();
-		$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $edited_campaign_ID, false, false );
-	}
+	$user_list_buttons = array();
 
-	if( !empty( $edited_EmailCampaign ) )
-	{
-		$campaign_button_text = sprintf( T_('Use this selection for campaign "%s"'), $edited_EmailCampaign->get( 'email_title' ) );
-		$campaign_button_class = 'btn-primary';
-		$campaign_action = 'update_users';
-		$campaign_ID_param = '&amp;ecmp_ID='.$edited_EmailCampaign->ID;
-	}
-	else
-	{
-		$campaign_button_text = T_('Create new Email Campaign for the current selection');
-		$campaign_button_class = 'btn-default';
-		$campaign_action = 'create_for_users';
-		$campaign_ID_param = '';
+	if( $params['display_automation'] && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) && $UserList->result_num_rows > 0 )
+	{	// Button to add users to an automation:
+		$user_list_buttons[] = '<a href="#" class="btn btn-primary" onclick="return add_userlist_automation()">'
+				.format_to_output( T_('Add current selection to an Automation...') )
+			.'</a>';
+		// Init JS for form to add user to automation:
+		echo_userlist_automation_js();
 	}
 
 	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 && ! empty( $UserList->filters['newsletter'] ) )
-	{	// Display newsletter button:
-		echo '<p class="center">';
-		echo '<a href="'.$admin_url.'?ctrl=campaigns&amp;action='.$campaign_action.$campaign_ID_param.'&amp;newsletter='.$UserList->filters['newsletter'].'&amp;'.url_crumb( 'campaign' ).'"'
+	{	// Button to change users of email campaign OR Create new email campaign for current selection:
+		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+		if( $edited_EmailCampaign = & get_session_EmailCampaign() )
+		{
+			$campaign_button_text = sprintf( T_('Use this selection for campaign "%s"'), $edited_EmailCampaign->get( 'email_title' ) );
+			$campaign_button_class = 'btn-primary';
+			$campaign_action = 'update_users';
+			$campaign_ID_param = '&amp;ecmp_ID='.$edited_EmailCampaign->ID;
+		}
+		else
+		{
+			$campaign_button_text = T_('Create new Email Campaign for the current selection');
+			$campaign_button_class = 'btn-default';
+			$campaign_action = 'create_for_users';
+			$campaign_ID_param = '';
+		}
+
+		$user_list_buttons[] = '<a href="'.$admin_url.'?ctrl=campaigns&amp;action='.$campaign_action.$campaign_ID_param.'&amp;newsletter='.$UserList->filters['newsletter'].'&amp;'.url_crumb( 'campaign' ).'"'
 			.' class="btn '.$campaign_button_class.'">'
 				.format_to_output( $campaign_button_text )
 			.'</a>';
-		echo '</p>';
+	}
+
+	if( count( $user_list_buttons ) )
+	{	// Display action buttons for users list:
+		echo '<p class="center">'.implode( ' ', $user_list_buttons ).'</p>';
 	}
 }
 

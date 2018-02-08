@@ -189,7 +189,7 @@ function & get_session_EmailCampaign()
 	global $Session;
 
 	$EmailCampaignCache = & get_EmailCampaignCache();
-	$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( intval( $Session->get( 'edited_campaign_ID' ) ), false, false );
+	$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $Session->get( 'edited_campaign_ID' ), false, false );
 
 	return $edited_EmailCampaign;
 }

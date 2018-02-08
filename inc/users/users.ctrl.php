@@ -25,6 +25,8 @@ param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kil
 
 param_action( 'list' );
 
+param( 'display_mode', 'string', 'normal' );
+
 $tab = param( 'tab', 'string', '' );
 
 $AdminUI->set_path( 'users', $tab == 'stats' ? 'stats' : 'users' );
@@ -401,6 +403,35 @@ if( !$Messages->has_errors() )
 			set_param( 'newsletter', $edited_EmailCampaign->get( 'enlt_ID' ) );
 			set_param( 'filter', 'new' );
 			break;
+
+		case 'add_automation':
+			// Add selected users to automation:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'options', 'view', true );
+
+			param( 'autm_ID', 'integer', true );
+
+			$AutomationCache = & get_AutomationCache();
+			$Automation = & $AutomationCache->get_by_ID( $autm_ID );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+			$added_users_num = $Automation->add_users( get_filterset_user_IDs(), array(
+					'users_no_subs'   => param( 'users_no_subs', 'string', 'ignore' ),
+					'users_automated' => param( 'users_automated', 'string', 'ignore' ),
+					'users_new'       => param( 'users_new', 'string', 'ignore' ),
+				) );
+
+			$Messages->add( sprintf( T_('%d users have been added or requeued for automation "%s"'), $added_users_num, $Automation->get( 'name' ) ), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
 	}
 }
 
@@ -447,11 +478,14 @@ else
 // Initialize date picker
 init_datepicker_js();
 
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
+if( $display_mode != 'js')
+{
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
 
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
+}
 
 /*
  * Display appropriate payload:
@@ -522,6 +556,21 @@ switch( $action )
 		echo_user_report_window();
 		break;
 
+	case 'automation':
+		// Display a form to add users selection to automation:
+
+		// Do not append Debuglog & Debug JSlog to response!
+		$debug = false;
+		$debug_jslog = false;
+
+		$AdminUI->disp_payload_begin();
+
+		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+		$AdminUI->disp_view( 'users/views/_user_list_automation.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
 	case 'promote':
 	default:
 		// Display user list:
@@ -538,8 +587,9 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 }
 
-
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
+if( $display_mode != 'js')
+{
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>
