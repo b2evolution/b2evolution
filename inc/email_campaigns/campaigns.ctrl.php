@@ -165,15 +165,8 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=campaigns&action=edit&ecmp_ID='.$edited_EmailCampaign->ID.'&tab=compose' );
 		break;
 
-	case 'change_users':
-		$Session->set( 'edited_campaign_ID', $edited_EmailCampaign->ID );
-
-		// Redirect to select users:
-		header_redirect( $admin_url.'?ctrl=users&action=newsletter&filter=new&newsletter='.$edited_EmailCampaign->get( 'enlt_ID' ), 303 ); // Will EXIT
-		// We have EXITed already at this point!!
-		break;
-
-	case 'users':
+	case 'create_for_users':
+	case 'update_users':
 		// Select new users for campaigns, Go from controller 'users'
 
 		// Check that this action request is not a CSRF hacked request:
@@ -191,17 +184,17 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 
-		// Initialize email campaign from users list page:
-		$edited_EmailCampaign = & get_session_EmailCampaign();
-
-		if( ! $edited_EmailCampaign )
+		if( $action == 'create_for_users' )
 		{	// Create new email campaign if admin want creates it from free users list:
 			$edited_EmailCampaign = new EmailCampaign();
 			$edited_EmailCampaign->set( 'enlt_ID', $Newsletter->ID );
 			$edited_EmailCampaign->set( 'email_title', $Newsletter->get( 'name' ) );
 			$edited_EmailCampaign->dbinsert();
+			$Messages->add( T_('New email campaign has been created for the users selection.'), 'success' );
 		}
-		else
+		elseif( $action == 'update_users' &&
+		    ( $edited_EmailCampaign || ( $edited_EmailCampaign = & get_session_EmailCampaign() ) )
+		  )
 		{	// If email campaign already exists in DB:
 			if( $edited_EmailCampaign->get( 'enlt_ID' ) != $Newsletter->ID )
 			{	// Update newsletter if it was changed on users list filtering:
@@ -221,6 +214,11 @@ switch( $action )
 
 		// Save recipients for edited email campaign:
 		$edited_EmailCampaign->add_recipients();
+
+		if( $action == 'update_users' )
+		{	// Display a message for updating of users selection:
+			$Messages->add( T_('Users selection has been updated for this email campaign.'), 'success' );
+		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=campaigns&action=edit_users&ecmp_ID='.$edited_EmailCampaign->ID, 303 ); // Will EXIT
@@ -354,7 +352,7 @@ switch( $action )
 			break;
 		}
 
-		if( $current_User->check_perm( 'options', 'view' ) )
+		if( ! $current_User->check_perm( 'options', 'view' ) )
 		{	// No access to view cron jobs:
 			$Messages->add( T_('Sorry, you don\'t have permission to view scheduled jobs.' ), 'warning' );
 			$action = 'edit';

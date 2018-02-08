@@ -706,8 +706,7 @@ class EmailCampaign extends DataObject
 
 			if( $result )
 			{	// Email newsletter was sent for user successfully:
-				$DB->query( 'REPLACE INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
-					VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "sent", '.$DB->quote( $mail_log_insert_ID ).' )' );
+				$this->update_user_send_status( $user_ID, 'sent', $mail_log_insert_ID );
 
 				// Update arrays where we store which users received email and who waiting it now:
 				$this->users['receive'][] = $user_ID;
@@ -719,8 +718,7 @@ class EmailCampaign extends DataObject
 			}
 			elseif( $User->get_email_status() == 'prmerror' )
 			{ // Unable to send email due to permanent error
-				$DB->query( 'REPLACE INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
-					VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "send_error", '.$DB->quote( $mail_log_insert_ID ).' )' );
+				$this->update_user_send_status( $user_ID, 'send_error', $mail_log_insert_ID );
 
 				// Update arrays where we store which users received email and who waiting it now:
 				$this->users['error'][] = $user_ID;
@@ -742,7 +740,15 @@ class EmailCampaign extends DataObject
 			{	// Print the messages:
 				if( $result === true )
 				{ // Success
-					echo sprintf( T_('Email was sent to user: %s'), $User->get_identity_link() ).'<br />';
+					$result_msg = sprintf( T_('Email was sent to user: %s'), $User->get_identity_link() ).'<br />';
+					if( $display_messages === 'cron_job' )
+					{
+						$Messages->add( $result_msg, 'success' );
+					}
+					else
+					{
+						echo $result_msg;
+					}
 				}
 				else
 				{ // Failed, Email was NOT sent
@@ -809,6 +815,41 @@ class EmailCampaign extends DataObject
 			}
 			echo '<br />';
 			$Messages->display();
+		}
+	}
+
+
+	/**
+	 * Update status of sending email campaign for user
+	 *
+	 * @param integer User Id
+	 * @param string Status
+	 * @param integer|NULL Mail log ID
+	 */
+	function update_user_send_status( $user_ID, $status, $mail_log_ID )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Email Campaign must be stored in DB:
+			return;
+		}
+
+		// Get all send statuses per users of this email campaign from cache or DB table T_email__campaign_send once:
+		$all_user_IDs = $this->get_recipients( 'all' );
+
+		if( in_array( $user_ID, $all_user_IDs ) )
+		{	// Update user send status for this email campaign:
+			$DB->query( 'UPDATE T_email__campaign_send
+				SET csnd_status = '.$DB->quote( $status ).',
+				    csnd_emlog_ID = '.$DB->quote( $mail_log_ID ).'
+				WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
+				  AND csnd_user_ID = '.$DB->quote( $user_ID ) );
+		}
+		else
+		{	// Insert new record for user send status:
+			$DB->query( 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
+				VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $status ).', '.$DB->quote( $mail_log_ID ).' )' );
 		}
 	}
 

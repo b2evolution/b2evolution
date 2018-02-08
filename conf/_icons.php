@@ -592,6 +592,13 @@ function get_icon_info( $name )
 			'fa' => 'circle-thin',
 			'color' => '#CCC'
 		);
+		case 'bullet_gray': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 0, 192 ),
+			'fa' => 'circle',
+			'color' => '#BBB'
+		);
 		case 'bullet_magenta': return array(
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),

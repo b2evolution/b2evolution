@@ -5491,21 +5491,25 @@ function users_results_block( $params = array() )
 
 	if( !empty( $edited_EmailCampaign ) )
 	{
-		$newsletter_button_text = sprintf( T_('Use this selection for list "%s"'), $edited_EmailCampaign->get( 'name' ) );
-		$newsletter_button_class = 'btn-primary';
+		$campaign_button_text = sprintf( T_('Use this selection for campaign "%s"'), $edited_EmailCampaign->get( 'email_title' ) );
+		$campaign_button_class = 'btn-primary';
+		$campaign_action = 'update_users';
+		$campaign_ID_param = '&amp;ecmp_ID='.$edited_EmailCampaign->ID;
 	}
 	else
 	{
-		$newsletter_button_text = T_('Send list to the current selection');
-		$newsletter_button_class = 'btn-default';
+		$campaign_button_text = T_('Create new Email Campaign for the current selection');
+		$campaign_button_class = 'btn-default';
+		$campaign_action = 'create_for_users';
+		$campaign_ID_param = '';
 	}
 
 	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 && ! empty( $UserList->filters['newsletter'] ) )
 	{	// Display newsletter button:
 		echo '<p class="center">';
-		echo '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=users&amp;newsletter='.$UserList->filters['newsletter'].'&amp;'.url_crumb( 'campaign' ).'"'
-			.' class="btn '.$newsletter_button_class.'">'
-				.format_to_output( $newsletter_button_text )
+		echo '<a href="'.$admin_url.'?ctrl=campaigns&amp;action='.$campaign_action.$campaign_ID_param.'&amp;newsletter='.$UserList->filters['newsletter'].'&amp;'.url_crumb( 'campaign' ).'"'
+			.' class="btn '.$campaign_button_class.'">'
+				.format_to_output( $campaign_button_text )
 			.'</a>';
 		echo '</p>';
 	}
