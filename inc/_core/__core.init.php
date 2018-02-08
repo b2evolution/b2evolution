@@ -79,6 +79,9 @@ $db_config['aliases'] = array(
 		'T_email__newsletter_subscription' => $tableprefix.'email__newsletter_subscription',
 		'T_email__campaign'        => $tableprefix.'email__campaign',
 		'T_email__campaign_send'   => $tableprefix.'email__campaign_send',
+		'T_automation__automation' => $tableprefix.'automation__automation',
+		'T_automation__step'       => $tableprefix.'automation__step',
+		'T_automation__user_state' => $tableprefix.'automation__user_state',
 		'T_syslog'                 => $tableprefix.'syslog',
 	);
 
@@ -130,6 +133,7 @@ $ctrl_mappings = array(
 		'email'            => 'tools/email.ctrl.php',
 		'newsletters'      => 'email_campaigns/newsletters.ctrl.php',
 		'campaigns'        => 'email_campaigns/campaigns.ctrl.php',
+		'automations'      => 'automations/automations.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
 	);
 
@@ -520,6 +524,44 @@ function & get_EmailCampaignPrerenderingCache()
 	}
 
 	return $EmailCampaignPrerenderingCache;
+}
+
+
+/**
+ * Get the AutomationCache
+ *
+ * @return AutomationCache
+ */
+function & get_AutomationCache()
+{
+	global $AutomationCache;
+
+	if( ! isset( $AutomationCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'automations/model/_automation.class.php', 'Automation' );
+		$AutomationCache = new DataObjectCache( 'Automation', false, 'T_automation__automation', 'autm_', 'autm_ID' );
+	}
+
+	return $AutomationCache;
+}
+
+
+/**
+ * Get the AutomationStepCache
+ *
+ * @return AutomationStepCache
+ */
+function & get_AutomationStepCache()
+{
+	global $AutomationStepCache;
+
+	if( ! isset( $AutomationStepCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
+		$AutomationStepCache = new DataObjectCache( 'AutomationStep', false, 'T_automation__step', 'step_', 'step_ID', NULL, 'step_order' );
+	}
+
+	return $AutomationStepCache;
 }
 
 
@@ -1122,6 +1164,22 @@ class _core_Module extends Module
 								'campaigns' => array(
 									'text' => T_('Campaigns').'&hellip;',
 									'href' => $admin_url.'?ctrl=campaigns' ),
+								)
+						);
+				}
+
+				if( $perm_options )
+				{	// If current user has a permissions to view options:
+					$entries['site']['entries']['email']['entries'] += array(
+							'automations' => array(
+								'text' => T_('Automations').'&hellip;',
+								'href' => $admin_url.'?ctrl=automations',
+						) );
+				}
+
+				if( $perm_emails )
+				{
+					$entries['site']['entries']['email']['entries'] += array(
 								'settings' => array(
 									'text' => T_('Settings').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
@@ -1134,8 +1192,7 @@ class _core_Module extends Module
 								'return' => array(
 									'text' => T_('Returned').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
-								)
-						);
+								);
 				}
 
 				$entries['site']['entries']['system'] = array(
@@ -2053,6 +2110,15 @@ class _core_Module extends Module
 							'href' => '?ctrl=email' ),
 						) ) ) );
 
+			if( $perm_options )
+			{	// If current user has a permissions to view options:
+				$AdminUI->add_menu_entries( 'email', array(
+						'automations' => array(
+							'text' => T_('Automations'),
+							'href' => '?ctrl=automations' ),
+					), 'campaigns' );
+			}
+
 			if( $current_User->check_perm( 'emails', 'edit' ) )
 			{	// Allow to test a returned email only if user has a permission to edit email settings:
 				$AdminUI->add_menu_entries( array( 'email', 'return' ), array(
@@ -2218,6 +2284,12 @@ class _core_Module extends Module
 				'name'   => T_('Send reminders about non-activated accounts'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_activate_account_reminder.job.php',
+				'params' => NULL,
+			),
+			'execute-automations' => array(
+				'name'   => T_('Execute automations'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_execute_automations.job.php',
 				'params' => NULL,
 			),
 		);

@@ -30,6 +30,11 @@ param_action();
 
 $tab = param( 'tab', 'string', 'general', true );
 
+if( $tab == 'automations' )
+{	// Check other permission for automations:
+	$current_User->check_perm( 'options', 'view', true );
+}
+
 if( param( 'enlt_ID', 'integer', '', true ) )
 {	// Load Newsletter object:
 	$NewsletterCache = & get_NewsletterCache();
@@ -243,6 +248,14 @@ switch( $action )
 						'text' => T_('Subscribers'),
 						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=subscribers&amp;enlt_ID='.$edited_Newsletter->ID )
 				) );
+			if( $current_User->check_perm( 'options', 'view' ) )
+			{	// If current user has a permissions to view options:
+				$AdminUI->add_menu_entries( array( 'email', 'newsletters' ), array(
+						'automations' => array(
+							'text' => T_('Automations'),
+							'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=automations&amp;enlt_ID='.$edited_Newsletter->ID ),
+					), 'campaigns' );
+			}
 		}
 
 		switch( $tab )
@@ -250,6 +263,11 @@ switch( $action )
 			case 'campaigns':
 				$AdminUI->set_page_manual_link( 'email-list-campaigns' );
 				$AdminUI->set_path( 'email', 'newsletters', 'campaigns' );
+				break;
+
+			case 'automations':
+				$AdminUI->set_page_manual_link( 'email-list-automations' );
+				$AdminUI->set_path( 'email', 'newsletters', 'automations' );
 				break;
 
 			case 'subscribers':
@@ -301,6 +319,17 @@ switch( $action )
 		{
 			case 'campaigns':
 				$AdminUI->disp_view( 'email_campaigns/views/_newsletters_campaign.view.php' );
+				break;
+
+			case 'automations':
+				load_funcs( 'automations/model/_automation.funcs.php' );
+				// Display automations tied to this Newsletter:
+				automation_results_block( array(
+						'enlt_ID'               => $edited_Newsletter->ID,
+						'results_title'         => T_('Automations').get_manual_link( 'email-list-automations' ),
+						'results_prefix'        => 'enltautm_',
+						'display_create_button' => false,
+					) );
 				break;
 
 			case 'subscribers':

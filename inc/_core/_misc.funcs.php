@@ -3751,6 +3751,12 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 {
 	global $servertimenow, $email_send_simulate_only;
 
+	/**
+	 * @var string|NULL This global var stores ID of the last mail log message
+	 */
+	global $mail_log_message;
+	$mail_log_message = NULL;
+
 	// Stop a request from the blocked IP addresses or Domains
 	antispam_block_request();
 
@@ -3889,7 +3895,8 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	if( mail_is_blocked( $to_email_address ) )
 	{ // Check if the email address is blocked
-		$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
+		$mail_log_message = 'Sending mail to "'.$to_email_address.'" FAILED, because this email is marked with spam or permanent errors.';
+		$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
 
 		update_mail_log( $mail_log_insert_ID, 'blocked', $message );
 
@@ -3911,11 +3918,13 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		{ // We agree to die for debugging...
 			update_mail_log( $mail_log_insert_ID, 'error', $message );
 
-			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
+			$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
+			debug_die( htmlspecialchars( $mail_log_message ) );
 		}
 		else
 		{ // Soft debugging only....
-			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
+			$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
+			$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
 
 			update_mail_log( $mail_log_insert_ID, 'error', $message );
 
@@ -3923,7 +3932,8 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		}
 	}
 
-	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
+		$mail_log_message = 'Sent mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
+		$Debuglog->add( htmlspecialchars( $mail_log_message ) );
 
 	update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
 
@@ -3978,6 +3988,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'account_closed':
 			case 'account_reported':
 			case 'account_changed':
+			case 'automation_owner_notification':
 				// this is a notificaiton email
 				$email_limit_setting = 'notification_email_limit';
 				$email_counter_setting = 'last_notification_email';
@@ -8477,6 +8488,13 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	return $inlines;
 }
 
+
+/**
+ * Convert date format from locale for jQuery datepicker plugin
+ *
+ * @param string Date format of locale from DB; for example: Y-m-d
+ * @return string Date format for jQuery datepicker plugin; for example: yy-mm-dd
+ */
 function php_to_jquery_date_format( $php_format )
 {
 	$tokens = array(
@@ -8556,5 +8574,68 @@ function php_to_jquery_date_format( $php_format )
 function is_html( $string )
 {
 	return $string != strip_tags( $string ) ? true : false;
+}
+
+
+/**
+ * Get date format from current locale for jQuery datepicker plugin
+ * 
+ * @return string Date format; for example: yy-mm-dd
+ */
+function jquery_datepicker_datefmt()
+{
+	return php_to_jquery_date_format( locale_input_datefmt() );
+}
+
+
+/**
+ * Get month names as string of JavaScript array for jQuery datepicker plugin
+ * 
+ * @return string
+ */
+function jquery_datepicker_month_names()
+{
+	$months = array(
+			TS_('January'),
+			TS_('February'),
+			TS_('March'),
+			TS_('April'),
+			TS_('May'),
+			TS_('June'),
+			TS_('July'),
+			TS_('August'),
+			TS_('September'),
+			TS_('October'),
+			TS_('November'),
+			TS_('December')
+		);
+
+	return '[\''.implode( '\', \'', $months ).'\']';
+}
+
+
+/**
+ * Get week day names as string of JavaScript array for jQuery datepicker plugin
+ * 
+ * @return string
+ */
+function jquery_datepicker_day_names()
+{
+	$days = array(
+			TS_('Sun'),
+			TS_('Mon'),
+			TS_('Tue'),
+			TS_('Wed'),
+			TS_('Thu'),
+			TS_('Fri'),
+			TS_('Sat')
+		);
+
+	foreach( $days as $d => $day )
+	{
+		$days[ $d ] = utf8_substr( $day, 0, 2 );
+	}
+
+	return '[\''.implode( '\', \'', $days ).'\']';
 }
 ?>

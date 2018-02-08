@@ -557,6 +557,47 @@ $schema_queries = array(
 			PRIMARY KEY   csnd_PK ( csnd_camp_ID, csnd_user_ID )
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
+	'T_automation__automation' => array(
+		'Creating automation table',
+		"CREATE TABLE T_automation__automation (
+			autm_ID            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			autm_name          VARCHAR(255) NOT NULL,
+			autm_status        ENUM('paused', 'active') DEFAULT 'paused',
+			autm_enlt_ID       INT UNSIGNED NOT NULL,
+			autm_owner_user_ID INT UNSIGNED NOT NULL,
+			autm_autostart     TINYINT(1) UNSIGNED DEFAULT 1,
+			PRIMARY KEY        (autm_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__step' => array(
+		'Creating automation step table',
+		"CREATE TABLE T_automation__step (
+			step_ID                    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			step_autm_ID               INT UNSIGNED NOT NULL,
+			step_order                 INT NOT NULL DEFAULT 1,
+			step_label                 VARCHAR(500) NULL,
+			step_type                  ENUM('if_condition', 'send_campaign', 'notify_owner', 'add_usertag', 'remove_usertag', 'subscribe', 'unsubscribe') COLLATE ascii_general_ci NOT NULL DEFAULT 'if_condition',
+			step_info                  TEXT NULL,
+			step_yes_next_step_ID      INT NULL,
+			step_yes_next_step_delay   INT UNSIGNED NULL,
+			step_no_next_step_ID       INT NULL,
+			step_no_next_step_delay    INT UNSIGNED NULL,
+			step_error_next_step_ID    INT NULL,
+			step_error_next_step_delay INT UNSIGNED NULL,
+			PRIMARY KEY                (step_ID),
+			UNIQUE                     step_autm_ID_order (step_autm_ID, step_order)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__user_state' => array(
+		'Creating automation user state table',
+		"CREATE TABLE T_automation__user_state (
+			aust_autm_ID      INT UNSIGNED NOT NULL,
+			aust_user_ID      INT UNSIGNED NOT NULL,
+			aust_next_step_ID INT UNSIGNED NULL,
+			aust_next_exec_ts TIMESTAMP NULL,
+			PRIMARY KEY       (aust_autm_ID, aust_user_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
 	'T_syslog' => array(
 		'Creating system log table',
 		"CREATE TABLE T_syslog (

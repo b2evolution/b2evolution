@@ -1170,7 +1170,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 		debug_die( 'Active user not found.' );
 	}
 
-	if( in_array( $user_tab, array( 'advanced', 'admin', 'sessions', 'activity' ) ) )
+	if( in_array( $user_tab, array( 'marketing', 'advanced', 'admin', 'sessions', 'activity' ) ) )
 	{
 		$is_admin_tab = true;
 	}
@@ -2507,15 +2507,22 @@ function get_user_sub_entries( $is_admin, $user_ID )
 							'text' => T_('Emails'),
 							'href' => url_add_param( $base_url, $ctrl_param.'subs'.$user_param ) );
 
-		if( $is_admin && $Settings->get( 'enable_visit_tracking' ) == 1 )
-		{
-			$users_sub_entries['visits'] = array(
+		if( $is_admin )
+		{	// Show this only in backoffice:
+			if( $current_User->can_moderate_user( $user_ID ) )
+			{	// For moderators:
+				$users_sub_entries['marketing'] = array(
+								'text' => T_('Marketing'),
+								'href' => url_add_param( $base_url, $ctrl_param.'marketing'.$user_param ) );
+			}
+
+			if( $Settings->get( 'enable_visit_tracking' ) == 1 )
+			{	// If visit tracking is enabled:
+				$users_sub_entries['visits'] = array(
 								'text' => T_('Visits'),
 								'href' => url_add_param( $base_url, $ctrl_param.'visits'.$user_param ) );
-		}
+			}
 
-		if( $is_admin )
-		{	// show this only in backoffice
 			$users_sub_entries['advanced'] = array(
 								'text' => T_('Advanced'),
 								'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=advanced'.$user_param ) );
@@ -4569,6 +4576,28 @@ function echo_user_deldata_js( $params = array() )
 		var evo_js_lang_delete_user_data = \''.TS_('Delete user data').get_manual_link( 'delete-user-data' ).'\';
 		var evo_js_lang_delete_selected_data = \''.TS_('Delete selected data').'\';
 		var evo_js_user_deldata_ajax_url = \''.$admin_url.'\';
+		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+	</script>';
+}
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to add user to automation
+ * @param array Params
+ */
+function echo_user_automation_js()
+{
+	global $admin_url;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_add_user_to_automation = \''.TS_('Add user to an automation...').get_manual_link( 'add-user-to-automation' ).'\';
+		var evo_js_lang_add = \''.TS_('Add').'\';
+		var evo_js_user_automation_ajax_url = \''.$admin_url.'\';
 		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
 	</script>';
 }

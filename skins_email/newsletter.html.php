@@ -1,6 +1,6 @@
 <?php
 /**
- * This is used when sendinf the newsletter - HTML VERSION
+ * This is used when sending the newsletter - HTML VERSION
  *
  * For more info about email skins, see: http://b2evolution.net/man/themes-templates-skins/email-skins/
  *

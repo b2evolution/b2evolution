@@ -8945,6 +8945,46 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12520, 'Creating automation tables...' ) )
+	{	// part of 6.10.0-beta
+		db_create_table( 'T_automation__automation', '
+			autm_ID            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			autm_name          VARCHAR(255) NOT NULL,
+			autm_status        ENUM("paused", "active") DEFAULT "paused",
+			autm_enlt_ID       INT UNSIGNED NOT NULL,
+			autm_owner_user_ID INT UNSIGNED NOT NULL,
+			autm_autostart     TINYINT(1) UNSIGNED DEFAULT 1,
+			PRIMARY KEY        (autm_ID)' );
+
+		db_create_table( 'T_automation__step', '
+			step_ID                    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			step_autm_ID               INT UNSIGNED NOT NULL,
+			step_order                 INT NOT NULL DEFAULT 1,
+			step_label                 VARCHAR(500) NULL,
+			step_type                  ENUM("if_condition", "send_campaign", "notify_owner", "add_usertag", "remove_usertag", "subscribe", "unsubscribe") COLLATE ascii_general_ci NOT NULL DEFAULT "if_condition",
+			step_info                  TEXT NULL,
+			step_yes_next_step_ID      INT NULL,
+			step_yes_next_step_delay   INT UNSIGNED NULL,
+			step_no_next_step_ID       INT NULL,
+			step_no_next_step_delay    INT UNSIGNED NULL,
+			step_error_next_step_ID    INT NULL,
+			step_error_next_step_delay INT UNSIGNED NULL,
+			PRIMARY KEY                (step_ID),
+			UNIQUE                     step_autm_ID_order (step_autm_ID, step_order)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12530, 'Creating automation user state table...' ) )
+	{	// part of 6.10.0-beta
+		db_create_table( 'T_automation__user_state', '
+			aust_autm_ID      INT UNSIGNED NOT NULL,
+			aust_user_ID      INT UNSIGNED NOT NULL,
+			aust_next_step_ID INT UNSIGNED NULL,
+			aust_next_exec_ts TIMESTAMP NULL,
+			PRIMARY KEY       (aust_autm_ID, aust_user_ID)' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

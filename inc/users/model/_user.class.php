@@ -350,6 +350,7 @@ class User extends DataObject
 				array( 'table'=>'T_users__secondary_user_groups', 'fk'=>'sug_user_ID', 'msg'=>T_('%d secondary groups') ),
 				array( 'table'=>'T_users__profile_visits', 'fk'=>'upv_visited_user_ID', 'msg'=>T_('%d profile visits') ),
 				array( 'table'=>'T_email__newsletter_subscription', 'fk'=>'enls_user_ID', 'msg'=>T_('%d list subscriptions') ),
+				array( 'table'=>'T_automation__user_state', 'fk'=>'aust_user_ID', 'msg'=>T_('%d states of User in Automation') ),
 			);
 	}
 
@@ -869,11 +870,12 @@ class User extends DataObject
 					}
 				}
 			}
+		}
 
-			// Tags
-			$user_tags = param( 'edited_user_tags', 'string', NULL );
-			if( $user_tags != NULL )
-			{
+		if( $has_full_access )
+		{	// If current user has full access to edit other users:
+			if( param( 'edited_user_tags', 'string', NULL ) !== NULL )
+			{	// Update user tags if they has been submitted:
 				$this->set_usertags_from_string( get_param( 'edited_user_tags' ) );
 			}
 		}
@@ -1550,7 +1552,7 @@ class User extends DataObject
 					$UserSettings->set( 'send_pst_moderation_reminder', param( 'edited_user_send_pst_moderation_reminder', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_stale_alert', param( 'edited_user_send_pst_stale_alert', 'integer', 0 ), $this->ID );
 				}
-				if( $this->grp_ID == 1 )
+				if( $current_User->check_perm( 'users', 'edit' ) )
 				{
 					$UserSettings->set( 'send_activation_reminder', param( 'edited_user_send_activation_reminder', 'integer', 0 ), $this->ID );
 				}
@@ -1567,6 +1569,11 @@ class User extends DataObject
 				if( $this->check_perm( 'options', 'edit' ) )
 				{ // edited user has permission to edit options, save notification preferences
 					$UserSettings->set( 'notify_cronjob_error', param( 'edited_user_notify_cronjob_error', 'integer', 0 ), $this->ID );
+				}
+
+				if( $current_User->check_perm( 'users', 'edit' ) )
+				{
+					$UserSettings->set( 'notify_automation_owner', param( 'edited_user_notify_automation_owner', 'integer', 0 ), $this->ID );
 				}
 
 				// Newsletters:
@@ -7584,16 +7591,16 @@ class User extends DataObject
 	 */
 	function subscribe( $newsletter_IDs )
 	{
-		global $DB, $localtimenow;
+		global $DB, $localtimenow, $servertimenow;
 
 		if( empty( $this->ID ) )
 		{	// Only created user can has the newsletter subscriptions:
-			return;
+			return false;
 		}
 
 		if( empty( $newsletter_IDs ) )
 		{	// No subscriptions:
-			return;
+			return false;
 		}
 
 		$DB->begin();
@@ -7636,6 +7643,24 @@ class User extends DataObject
 			'Subscribe(update unsubscriptions) user #'.$this->ID.' to lists #'.implode( ',', $update_newsletter_IDs ) );
 		}
 
+		// Insert user states for newsletters with automations:
+		$first_step_SQL = new SQL( 'Get first step of automation' );
+		$first_step_SQL->SELECT( 'step_ID' );
+		$first_step_SQL->FROM( 'T_automation__step' );
+		$first_step_SQL->WHERE( 'step_autm_ID = autm_ID' );
+		$first_step_SQL->ORDER_BY( 'step_order ASC' );
+		$first_step_SQL->LIMIT( 1 );
+		$automations_SQL = new SQL( 'Get automations of the subscribed newsletters' );
+		$automations_SQL->SELECT( 'DISTINCT autm_ID, '.$this->ID.', ( '.$first_step_SQL->get().' ), '.$DB->quote( date2mysql( $servertimenow ) ) );
+		$automations_SQL->FROM( 'T_email__newsletter' );
+		$automations_SQL->FROM_add( 'INNER JOIN T_automation__automation ON enlt_ID = autm_enlt_ID' );
+		$automations_SQL->FROM_add( 'LEFT JOIN T_automation__user_state ON aust_autm_ID = autm_ID AND aust_user_ID = '.$this->ID );
+		$automations_SQL->WHERE( 'enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )' );
+		$automations_SQL->WHERE_and( 'autm_autostart = 1' );
+		$automations_SQL->WHERE_and( 'aust_autm_ID IS NULL' );// Exclude already added automation user states
+		$DB->query( 'INSERT INTO T_automation__user_state ( aust_autm_ID, aust_user_ID, aust_next_step_ID, aust_next_exec_ts ) '.$automations_SQL->get(),
+			'Insert automation user states on subscribe to newsletters #'.implode( ',', $newsletter_IDs ).' for user #'.$this->ID );
+
 		$DB->commit();
 
 		// Unset flag in order not to run this twice:
@@ -7670,13 +7695,25 @@ class User extends DataObject
 			$newsletter_IDs = array( $newsletter_IDs );
 		}
 
-		return $DB->query( 'UPDATE T_email__newsletter_subscription
+		$r = $DB->query( 'UPDATE T_email__newsletter_subscription
 			SET enls_subscribed = 0,
 			    enls_unsubscribed_ts = '.$DB->quote( date2mysql( $localtimenow ) ).'
 			WHERE enls_user_ID = '.$DB->quote( $this->ID ).'
 			  AND enls_enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )
 			  AND enls_subscribed = 1',
 			'Unsubscribe user #'.$this->ID.' from lists #'.implode( ',', $newsletter_IDs ) );
+
+		if( $r )
+		{	// If user has been unsubscribed from at least one newsletter,
+			// Then this user must automatically exit all automations tied to those newsletters:
+			$DB->query( 'DELETE T_automation__user_state FROM T_automation__user_state
+				INNER JOIN T_automation__automation ON autm_ID = aust_autm_ID
+				WHERE aust_user_ID = '.$DB->quote( $this->ID ).'
+				  AND autm_enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )',
+				'Exit user automatically from all automations tied to lists #'.implode( ',', $newsletter_IDs ) );
+		}
+
+		return $r;
 	}
 
 
@@ -7869,6 +7906,40 @@ class User extends DataObject
 
 		// Remove the duplicate tags
 		$this->user_tags = array_unique( $this->user_tags );
+	}
+
+
+	/**
+	 * Remove user tags
+	 *
+	 * @param string/array comma separated tags or array of tags
+	 */
+	function remove_usertags( $user_tags )
+	{
+		if( empty( $user_tags ) )
+		{
+			return;
+		}
+
+		if( ! is_array( $user_tags ) )
+		{
+			$user_tags = preg_split( '/\s*[;,]+\s*/', $user_tags, -1, PREG_SPLIT_NO_EMPTY );
+		}
+
+		$this->get_usertags();
+
+		foreach( $user_tags as $t => $user_tag )
+		{
+			if( empty( $user_tag ) )
+			{	// Skip empty tag:
+				continue;
+			}
+			elseif( ( $user_tag_index = array_search( $user_tag, $this->user_tags ) ) !== false )
+			{	// Remove user tag from array:
+				$this->dbchanges_flags['user_tags'] = true;
+				unset( $this->user_tags[ $user_tag_index ] );
+			}
+		}
 	}
 }
 

@@ -919,6 +919,13 @@ function get_icon_info( $name )
 			'glyph' => 'play',
 			'fa' => 'play'
 		);
+		case 'pause': return array( // used to pause automation
+			'alt'  => '||',
+			'size' => array( 14, 14 ),
+			'xy' => array( 64, 128 ),
+			'glyph' => 'pause',
+			'fa' => 'pause'
+		);
 		case 'rewind': return array( // Used to resend email campaign ( rewind user back to previous state )
 			'alt' => '',
 			'size' => array( 0, 0 ),
