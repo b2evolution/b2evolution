@@ -261,13 +261,16 @@ class newsletter_subscription_Widget extends ComponentWidget
 				$bottom = $this->disp_params['bottom'];
 			}
 
-			$this->disp_title( $title );
+			if( ! $this->disp_params['inline'] )
+			{ // Do not display when inline
+				$this->disp_title( $title );
 
-			echo $this->disp_params['block_body_start'];
+				echo $this->disp_params['block_body_start'];
 
-			if( trim( $intro ) !== '' )
-			{	// Display intro text:
-				echo '<p>'.$intro.'</p>';
+				if( trim( $intro ) !== '' )
+				{	// Display intro text:
+					echo '<p>'.$intro.'</p>';
+				}
 			}
 
 			$Form = new Form( get_htsrv_url().'action.php' );
@@ -298,7 +301,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 
 			$Form->end_form();
 
-			if( trim( $bottom ) !== '' )
+			if( trim( $bottom ) !== '' && ! $this->disp_params['inline'] )
 			{	// Display bottom note:
 				echo '<p class="margin-top">'.$bottom.'</p>';
 			}
