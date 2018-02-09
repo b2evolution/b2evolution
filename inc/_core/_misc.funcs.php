@@ -4122,9 +4122,15 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text' )
 function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
 {
 	global $current_charset, $current_User;
+	global $track_email_image_load, $track_email_click_html, $track_email_click_plain_text;
 
 	$params = array_merge( array(
-			'add_email_tracking' => true
+			'add_email_tracking' => true,
+			'template_parts' => array(
+					'header' => NULL,
+					'footer' => NULL
+				),
+			'default_template_tag' => NULL
 		), $params );
 
 	if( !empty( $params['locale'] ) )
@@ -4202,8 +4208,25 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 
 		if( $params['add_email_tracking'] )
 		{
-			$formated_message = add_email_tracking( $formated_message, '$mail_log_ID$', '$email_key$', $format );
+			$tracking_params = array(
+					'content_type' => $format,
+					'image_load' => isset( $$track_email_image_load ) ? $$track_email_image_load : true,
+					'link_click_html' => isset( $track_email_click_html ) ? $track_email_click_html : true ,
+					'link_click_text' => isset( $track_email_click_plain_text ) ? $track_email_click_plain_text : true,
+					'template_parts' => $params['template_parts'],
+					'default_template_tag' => $params['default_template_tag']
+				);
+			$formated_message = add_email_tracking( $formated_message, '$mail_log_ID$', '$email_key$', $tracking_params );
 		}
+
+		// Remove template parts markers
+		$template_part_markers = array();
+		foreach( $params['template_parts'] as $part => $row )
+		{
+			$template_part_markers[] = '$template-content-'.$part.'-start$';
+			$template_part_markers[] = '$template-content-'.$part.'-end$';
+		}
+		$formated_message = str_replace( $template_part_markers, '', $formated_message  );
 		$template_message .= $formated_message;
 
 		if( isset( $template_contents ) )
@@ -4241,7 +4264,7 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
  * @param string Template name
  * @param array Params
  */
-function emailskin_include( $template_name, $params = array() )
+function emailskin_include( $template_name, $params = array(), $template_part = NULL )
 {
 	global $emailskins_path, $rsc_url;
 
@@ -4261,7 +4284,15 @@ function emailskin_include( $template_name, $params = array() )
 	if( file_exists( $template_path ) )
 	{ // Include custom template file if it exists
 		$Debuglog->add( 'emailskin_include: '.rel_path_to_base( $template_path ), 'skins' );
+		if( ! empty( $template_part ) )
+		{
+			echo '$template-content-'.$template_part.'-start$';
+		}
 		require $template_path;
+		if( ! empty( $template_part ) )
+		{
+			echo '$template-content-'.$template_part.'-end$';
+		}
 		// This template is customized, Don't include standard template
 		$is_customized = true;
 	}
@@ -4272,7 +4303,15 @@ function emailskin_include( $template_name, $params = array() )
 		if( file_exists( $template_path ) )
 		{ // Include standard template file if it exists
 			$Debuglog->add( 'emailskin_include: '.rel_path_to_base( $template_path ), 'skins' );
+			if( ! empty( $template_part ) )
+			{
+				echo '$template-content-'.$template_part.'-start$';
+			}
 			require $template_path;
+			if( ! empty( $template_part ) )
+			{
+				echo '$template-content-'.$template_part.'-end$';
+			}
 		}
 	}
 
@@ -8579,7 +8618,7 @@ function is_html( $string )
 
 /**
  * Get date format from current locale for jQuery datepicker plugin
- * 
+ *
  * @return string Date format; for example: yy-mm-dd
  */
 function jquery_datepicker_datefmt()
@@ -8590,7 +8629,7 @@ function jquery_datepicker_datefmt()
 
 /**
  * Get month names as string of JavaScript array for jQuery datepicker plugin
- * 
+ *
  * @return string
  */
 function jquery_datepicker_month_names()
@@ -8616,7 +8655,7 @@ function jquery_datepicker_month_names()
 
 /**
  * Get week day names as string of JavaScript array for jQuery datepicker plugin
- * 
+ *
  * @return string
  */
 function jquery_datepicker_day_names()

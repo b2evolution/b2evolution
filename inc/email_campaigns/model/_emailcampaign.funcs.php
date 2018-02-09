@@ -213,7 +213,7 @@ function campaign_results_block( $params = array() )
 	// Create result set:
 	$SQL = new SQL();
 	$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
-			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
+			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag,
 			enlt_ID, enlt_name,
 			SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS send_count,
 			SUM( IF( emlog_last_open_ts IS NOT NULL OR emlog_last_click_ts IS NOT NULL, 1, 0 ) ) /
@@ -226,7 +226,7 @@ function campaign_results_block( $params = array() )
 	$SQL->FROM_add( 'LEFT JOIN T_email__log ON emlog_ID = csnd_emlog_ID' );
 	$SQL->WHERE( 1 );
 	$SQL->GROUP_BY( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
-			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, enlt_ID, enlt_name' );
+			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag, enlt_ID, enlt_name' );
 
 	$count_SQL = new SQL();
 	$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( ecmp_ID )' );

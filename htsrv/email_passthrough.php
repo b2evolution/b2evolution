@@ -24,6 +24,7 @@ global $DB, $Session, $modules, $localtimenow;
 param( 'type', 'string', true );
 param( 'email_ID', 'integer', true );
 param( 'email_key', 'string', true );
+param( 'tag', 'integer', NULL );
 param( 'redirect_to', 'url', '' );
 
 // erhsatingin > Is this acceptable? This seems like an ugly hack...
@@ -32,9 +33,34 @@ $redirect_to = str_replace( '&amp;', '&', $redirect_to );
 switch( $type )
 {
 	case 'link':
-		$DB->query( 'UPDATE T_email__log
-				SET emlog_last_click_ts = '.$DB->quote( date2mysql( $localtimenow ) )
-				.' WHERE emlog_ID = '.$DB->quote( $email_ID ).' AND emlog_key = '.$DB->quote( $email_key ) );
+		$email_log = $DB->get_row( 'SELECT * FROM T_email__log WHERE emlog_ID = '.$DB->quote( $email_ID ).' AND emlog_key = '.$DB->quote( $email_key ), ARRAY_A );
+
+		if( $email_log )
+		{
+			if( ! empty( $email_log['emlog_user_ID'] ) && $tag === 1 )
+			{
+				$ecmp_ID = $DB->get_var( 'SELECT csnd_camp_ID FROM T_email__campaign_send WHERE csnd_emlog_ID = '.$DB->quote( $email_ID ) );
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				if( ! empty( $ecmp_ID ) && $edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $ecmp_ID, false ) )
+				{
+					$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag' );
+					if( ! empty( $assigned_user_tag ) )
+					{
+						$UserCache = & get_UserCache();
+						if( $email_User = & $UserCache->get_by_ID( $email_log['emlog_user_ID'] ) )
+						{
+							$email_User->add_usertags( $edited_EmailCampaign->get( 'user_tag' ) );
+							$email_User->dbupdate();
+						}
+					}
+				}
+			}
+
+			$DB->query( 'UPDATE T_email__log
+					SET emlog_last_click_ts = '.$DB->quote( date2mysql( $localtimenow ) )
+					.' WHERE emlog_ID = '.$DB->quote( $email_ID ).' AND emlog_key = '.$DB->quote( $email_key ) );
+
+		}
 
 		// Redirect
 		if( empty( $redirect_to ) )

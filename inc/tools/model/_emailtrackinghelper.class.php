@@ -32,18 +32,27 @@ class EmailTrackingHelper
 	private $url_type;
 	private $email_ID;
 	private $key;
+	private $tag;
 
-	function __construct( $url_type, $email_ID, $key, $content_type = 'HTML' )
+	function __construct( $url_type, $email_ID, $key, $content_type = 'html', $tag = NULL )
 	{
 		$this->url_type = $url_type;
 		$this->email_ID = $email_ID;
 		$this->key = $key;
 		$this->content_type = $content_type;
+		$this->tag = $tag;
 	}
 
 	public function get_passthrough_url()
 	{
-		return get_htsrv_url().'email_passthrough.php?email_ID='.$this->email_ID.'&type='.$this->url_type.'&email_key=$email_key_start$'.$this->key.'$email_key_end$&redirect_to=';
+		$url = get_htsrv_url().'email_passthrough.php?email_ID='.$this->email_ID.'&type='.$this->url_type.'&email_key=$email_key_start$'.$this->key.'$email_key_end$';
+		if( isset( $this->tag ) )
+		{
+			$url .= '&tag='.$this->tag;
+		}
+		$url .=	'&redirect_to=';
+
+		return $url;
 	}
 
 	public function callback( $matches )
@@ -52,7 +61,7 @@ class EmailTrackingHelper
 
 		switch( $this->content_type )
 		{
-			case 'HTML':
+			case 'html':
 				/**
 				 * $matches
 				 *  1 - <a href="

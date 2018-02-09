@@ -460,6 +460,10 @@ if( $action == 'edit' )
 		// Initialize user tag input
 		init_tokeninput_js();
 	}
+	elseif( $tab == 'info' )
+	{
+		init_tokeninput_js();
+	}
 }
 else
 { // List of campaigns

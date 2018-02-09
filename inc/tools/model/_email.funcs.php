@@ -1210,10 +1210,21 @@ function php_email_sending_test()
  * @param string Email key
  * @return string Message with email tracking
  */
-function add_email_tracking( $message, $email_ID, $email_key, $content_type = 'auto' )
+function add_email_tracking( $message, $email_ID, $email_key, $params = array() )
 {
 	global $rsc_url;
-	global $track_email_image_load, $track_email_click_html, $track_email_click_plain_text;
+
+	$params = array_merge( array(
+			'content_type' => 'auto',
+			'image_load' => true,
+			'link_click_html' => true,
+			'link_click_text' => true,
+			'template_parts' => array(
+					'header' => 0,
+					'footer' => 0,
+				),
+			'default_template_tag' => NULL
+		), $params );
 
 	load_class( 'tools/model/_emailtrackinghelper.class.php', 'EmailTrackingHelper' );
 
@@ -1227,7 +1238,7 @@ function add_email_tracking( $message, $email_ID, $email_key, $content_type = 'a
 		debug_die( 'No email key specified.' );
 	}
 
-	if( $content_type == 'auto' )
+	if( $params['content_type'] == 'auto' )
 	{
 		if( is_html( $message ) )
 		{
@@ -1238,25 +1249,48 @@ function add_email_tracking( $message, $email_ID, $email_key, $content_type = 'a
 			$content_type = 'text';
 		}
 	}
+	else
+	{
+		$content_type = $params['content_type'];
+	}
+
+	$template_message = $message;
+	$template_parts = array();
+	foreach( $params['template_parts'] as $part => $tag )
+	{
+		$re = '~\$template-content-'.$part.'-start\$.*?\$template-content-'.$part.'-end\$~s';
+		preg_match_all( $re, $message, $matches, PREG_SET_ORDER );
+		foreach( $matches as $match )
+		{
+			$key = '#'.rand();
+			$template_parts[$key] = array(
+				'message' => $match[0],
+				'part' => $part,
+				'tag' => $tag );
+
+			$count = 1;
+			$message = str_replace( $match[0], '$template-part-'.$key.'$', $message, $count );
+		}
+	}
 
 	switch( $content_type )
 	{
 		case 'text':
 			// Add link click tracking
-			if( ! isset( $track_email_click_plain_text ) || $track_email_click_plain_text == 1 )
+			if( $params['link_click_text'] )
 			{
 				$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#';
-				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text' );
+				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text', $params['default_template_tag'] );
 				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
 			}
-			return $message;
+			break;
 
 		case 'html':
-			if( ! isset( $track_email_image_load ) || $track_email_image_load == 1 )
+			if( $params['image_load'] )
 			{
 				// Add email open tracking to first image
 				$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
-				$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key );
+				$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key, 'html' );
 				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message, 1 );
 
 				/*
@@ -1266,18 +1300,59 @@ function add_email_tracking( $message, $email_ID, $email_key, $content_type = 'a
 				*/
 			}
 
-			if( ! isset( $track_email_click_html ) || $track_email_click_html == 1  )
+			if( $params['link_click_html'] )
 			{
 				// Add link click tracking
 				$re = '/(<a\b.+\bhref=")([^"]*)(")/';
-				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key );
+				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'html', $params['default_template_tag'] );
 				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
 			}
-			return $message;
+			break;
 
 		default:
 			debug_die( 'Invalid content type' );
 	}
+
+	foreach( $template_parts as $key => $row )
+	{
+		switch( $content_type )
+		{
+			case 'text':
+				// Add link click tracking
+				if( $params['link_click_text'] )
+				{
+					$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#';
+					$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text', $row['tag'] );
+					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'] );
+				}
+				break;
+
+			case 'html':
+				if( $params['image_load'] )
+				{
+					// Add email open tracking to first image
+					$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
+					$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key, 'html' );
+					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'], 1 );
+				}
+
+				if( $params['link_click_html'] )
+				{
+					// Add link click tracking
+					$re = '/(<a\b.+\bhref=")([^"]*)(")/';
+					$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'html', $row['tag'] );
+					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'] );
+				}
+				break;
+
+			default:
+				debug_die( 'Invalid content type' );
+		}
+		$count = 1;
+		$message = str_replace( '$template-part-'.$key.'$', $template_parts[$key]['message'], $message, $count );
+	}
+
+	return $message;
 
 }
 ?>

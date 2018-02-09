@@ -544,6 +544,7 @@ $schema_queries = array(
 			ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0,
 			ecmp_send_ctsk_ID    INT(10) UNSIGNED NULL DEFAULT NULL,
 			ecmp_auto_send       ENUM('no', 'subscription') COLLATE ascii_general_ci NOT NULL DEFAULT 'no',
+			ecmp_user_tag        VARCHAR(255) NULL,
 			PRIMARY KEY          (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 

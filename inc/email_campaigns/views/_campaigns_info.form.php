@@ -38,6 +38,53 @@ $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-c
 			array( 'value' => 'no',           'label' => T_('No (Manual sending only)') ),
 			array( 'value' => 'subscription', 'label' =>  T_('At subscription') ),
 		), T_('Auto send'), array( 'lines' => true ) );
+	$Form->text_input( 'ecmp_user_tag', param( 'ecmp_user_tag', 'string', $edited_EmailCampaign->get( 'user_tag' ) ), 60, T_('Tag users who click on content links with'), '', array(
+		'maxlength' => 255,
+		'style'     => 'width: 100%;',
+		'input_prefix' => '<div id="user_admin_tags" class="input-group">',
+		'input_suffix' => '</div>',
+	) );
+	?>
+	<script type="text/javascript">
+	function init_autocomplete_tags( selector )
+	{
+		var tags = jQuery( selector ).val();
+		var tags_json = new Array();
+		if( tags.length > 0 )
+		{ // Get tags from <input>
+			tags = tags.split( ',' );
+			for( var t in tags )
+			{
+				tags_json.push( { id: tags[t], name: tags[t] } );
+			}
+		}
+
+		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
+		{
+			theme: 'facebook',
+			queryParam: 's',
+			propertyToSearch: 'name',
+			tokenValue: 'name',
+			preventDuplicates: true,
+			prePopulate: tags_json,
+			hintText: '<?php echo TS_('Type in a tag') ?>',
+			noResultsText: '<?php echo TS_('No results') ?>',
+			searchingText: '<?php echo TS_('Searching...') ?>',
+			jsonContainer: 'tags',
+		} );
+	}
+
+	jQuery( document ).ready( function()
+	{
+		jQuery( '#ecmp_user_tag' ).hide();
+		init_autocomplete_tags( '#ecmp_user_tag' );
+		<?php
+			// Don't submit a form by Enter when user is editing the tags
+			echo get_prevent_key_enter_js( '#token-input-ecmp_user_tag' );
+		?>
+	} );
+	</script>
+	<?php
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('List recipients') );

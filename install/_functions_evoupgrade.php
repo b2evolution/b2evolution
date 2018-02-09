@@ -8985,6 +8985,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12540, 'Upgrading email campaigns table...' ) )
+	{ // part of 6.10.0-beta
+		db_add_col( 'T_email__campaign', 'ecmp_user_tag', 'VARCHAR(255) NULL AFTER ecmp_auto_send' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

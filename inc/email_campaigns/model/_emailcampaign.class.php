@@ -41,6 +41,8 @@ class EmailCampaign extends DataObject
 
 	var $auto_sent_ts;
 
+	var $user_tag;
+
 	var $use_wysiwyg = 0;
 
 	var $send_ctsk_ID;
@@ -94,6 +96,7 @@ class EmailCampaign extends DataObject
 			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 			$this->auto_send = $db_row->ecmp_auto_send;
+			$this->user_tag = $db_row->ecmp_user_tag;
 		}
 	}
 
@@ -562,6 +565,11 @@ class EmailCampaign extends DataObject
 			$this->set_from_Request( 'auto_send' );
 		}
 
+		if( param( 'ecmp_user_tag', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag' );
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -631,6 +639,11 @@ class EmailCampaign extends DataObject
 				'message_html'     => $this->get( 'email_html' ),
 				'message_text'     => $this->get( 'email_plaintext' ),
 				'newsletter'       => $this->get( 'enlt_ID' ),
+				'template_parts'   => array(
+						'header' => 0,
+						'footer' => 0
+					),
+				'default_template_tag' => 1
 			);
 
 		if( $mode == 'test' )
@@ -708,7 +721,7 @@ class EmailCampaign extends DataObject
 	 */
 	function send_all_emails( $display_messages = true, $user_IDs = NULL, $update_sent_ts = 'auto' )
 	{
-		global $DB, $localtimenow, $Settings, $Messages;
+		global $DB, $localtimenow, $Settings, $Messages, $mail_log_insert_ID;
 
 		if( $user_IDs === NULL )
 		{	// Send emails only for users which still don't receive emails:
