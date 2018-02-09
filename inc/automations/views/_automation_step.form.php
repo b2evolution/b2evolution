@@ -83,10 +83,7 @@ $AutomationStepCache = & get_AutomationStepCache();
 $AutomationStepCache->clear();
 $AutomationStepCache->load_where( 'step_autm_ID = '.$step_Automation->ID
 	.( $edited_AutomationStep->ID > 0 ? ' AND step_ID != '.$edited_AutomationStep->ID : '' ) );
-$next_step_prepend_options = array(
-		'' => T_('Continue'),
-		-1 => T_('STOP'),
-	);
+$next_step_prepend_options = array( '' => T_('Continue') );
 if( $edited_AutomationStep->ID > 0 )
 {	// Display special label for option with current Step:
 	$next_step_prepend_options[ $edited_AutomationStep->ID ] = T_('Loop');
@@ -96,6 +93,7 @@ else
 	// On inserting new Step we replace this temp key with real ID of new inserted Step:
 	$next_step_prepend_options['loop'] = T_('Loop');
 }
+$next_step_prepend_options[-1] = T_('STOP');
 
 $Form->begin_line( '<span id="step_result_label_yes">'.T_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'YES' ) ).'</span>', 'step_yes_next' );
 	$Form->select_input_object( 'step_yes_next_step_ID', $edited_AutomationStep->get( 'yes_next_step_ID' ), $AutomationStepCache, '', array( 'prepend_options' => $next_step_prepend_options ) );
