@@ -89,12 +89,12 @@ $next_step_prepend_options = array(
 	);
 if( $edited_AutomationStep->ID > 0 )
 {	// Display special label for option with current Step:
-	$next_step_prepend_options[ $edited_AutomationStep->ID ] = T_('Current Step');
+	$next_step_prepend_options[ $edited_AutomationStep->ID ] = T_('Loop');
 }
 else
 {	// If new step is creating we should use special key because we don't know step ID here,
 	// On inserting new Step we replace this temp key with real ID of new inserted Step:
-	$next_step_prepend_options['current'] = T_('Current Step');
+	$next_step_prepend_options['loop'] = T_('Loop');
 }
 
 $Form->begin_line( '<span id="step_result_label_yes">'.T_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'YES' ) ).'</span>', 'step_yes_next' );
@@ -194,7 +194,7 @@ function step_type_update_info( step_type )
 			if( set_default_next_step_data )
 			{	// Suggest default values:
 				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID' ).val( '' );
-				jQuery( '#step_error_next_step_ID' ).val( 'current' );
+				jQuery( '#step_error_next_step_ID' ).val( 'loop' );
 				jQuery( '#step_yes_next_step_delay_value' ).val( '3' );
 				jQuery( '#step_yes_next_step_delay_name' ).val( 'day' );
 				jQuery( '#step_no_next_step_delay_value' ).val( '0' );
@@ -214,7 +214,7 @@ function step_type_update_info( step_type )
 				jQuery( '#step_yes_next_step_ID' ).val( '' );
 				jQuery( '#step_yes_next_step_delay_value' ).val( '0' );
 				jQuery( '#step_yes_next_step_delay_name' ).val( 'second' );
-				jQuery( '#step_error_next_step_ID' ).val( 'current' );
+				jQuery( '#step_error_next_step_ID' ).val( 'loop' );
 				jQuery( '#step_error_next_step_delay_value' ).val( '4' );
 				jQuery( '#step_error_next_step_delay_name' ).val( 'hour' );
 			}
@@ -245,7 +245,7 @@ function step_type_update_info( step_type )
 				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID' ).val( '' );
 				jQuery( '#step_yes_next_step_delay_value, #step_no_next_step_delay_value' ).val( '0' );
 				jQuery( '#step_yes_next_step_delay_name, #step_no_next_step_delay_name' ).val( 'second' );
-				jQuery( '#step_error_next_step_ID' ).val( 'current' );
+				jQuery( '#step_error_next_step_ID' ).val( 'loop' );
 				jQuery( '#step_error_next_step_delay_value' ).val( '7' );
 				jQuery( '#step_error_next_step_delay_name' ).val( 'day' );
 			}
@@ -260,9 +260,12 @@ function step_type_update_info( step_type )
 			if( set_default_next_step_data )
 			{	// Suggest default values:
 				jQuery( '#step_yes_next_step_ID' ).val( '' );
-				jQuery( '#step_no_next_step_ID, #step_error_next_step_ID' ).val( '-1' );
+				jQuery( '#step_no_next_step_ID' ).val( 'loop' );
+				jQuery( '#step_error_next_step_ID' ).val( '-1' );
 				jQuery( '#step_yes_next_step_delay_value, #step_no_next_step_delay_value, #step_error_next_step_delay_value' ).val( '0' );
 				jQuery( '#step_yes_next_step_delay_name, #step_no_next_step_delay_name, #step_error_next_step_delay_name' ).val( 'second' );
+				jQuery( '#step_no_next_step_delay_value' ).val( '12' );
+				jQuery( '#step_no_next_step_delay_name' ).val( 'hour' );
 			}
 			break;
 	}

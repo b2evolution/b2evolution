@@ -97,7 +97,7 @@ class AutomationStep extends DataObject
 	{
 		if( $r = parent::dbinsert() )
 		{
-			// Update next steps with selected option "Current Step" to ID of this new inserted Step:
+			// Update next steps with selected option "Loop" to ID of this new inserted Step:
 			$next_steps = array(
 				'yes_next_step_ID',
 				'no_next_step_ID',
@@ -105,7 +105,7 @@ class AutomationStep extends DataObject
 			);
 			foreach( $next_steps as $next_step_ID_name )
 			{
-				if( get_param( 'step_'.$next_step_ID_name ) == 'current' )
+				if( get_param( 'step_'.$next_step_ID_name ) == 'loop' )
 				{
 					$this->set( $next_step_ID_name, $this->ID ); // Loop
 				}
@@ -425,18 +425,20 @@ class AutomationStep extends DataObject
 		$log_bold_start = '<b>';
 		$log_bold_end = '</b>';
 
+		$UserCache = & get_UserCache();
+		$step_User = & $UserCache->get_by_ID( $user_ID, false, false );
+
 		// Log:
-		$process_log .= 'Executing Step #'.$this->get( 'order' )
+		$process_log .= 'Executing '.$log_bold_start.'Step #'.$this->get( 'order' ).$log_bold_end
 			.'('.step_get_type_title( $this->get( 'type' ) ).': '.$this->get( 'label' ).')'
-			.' of Automation: #'.$Automation->ID.'('.$Automation->get( 'name' ).')'
-			.' for User #'.$user_ID.'...'.$log_nl;
+			.' of '.$log_bold_start.'Automation: #'.$Automation->ID.$log_bold_end.'('.$Automation->get( 'name' ).')'
+			.' for '.$log_bold_start.'User #'.$user_ID.$log_bold_end.( $step_User ? '('.$step_User->get( 'login' ).')' : '' ).'...'.$log_nl;
 
 		// Retrun ERROR result by default for all unknown cases:
 		$step_result = 'ERROR';
 		$additional_result_message = '';
 
-		$UserCache = & get_UserCache();
-		if( $step_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
+		if( $step_User )
 		{	// Allow to execute action only if User is detected in DB:
 			switch( $this->get( 'type' ) )
 			{
@@ -601,7 +603,7 @@ class AutomationStep extends DataObject
 		}
 		else
 		{	// Wrong user:
-			$additional_result_message = 'User #'.$user_ID.' is not found in DB.';
+			$additional_result_message = $log_bold_start.'User #'.$user_ID.$log_bold_end.' is not found in DB.';
 		}
 
 		// Log:
@@ -648,12 +650,12 @@ class AutomationStep extends DataObject
 			$next_exec_ts = NULL;
 		}
 		// Update data for next step or finish it:
-		$DB->query( 'UPDATE T_automation__user_state
+		/*$DB->query( 'UPDATE T_automation__user_state
 			  SET aust_next_step_ID = '.$DB->quote( $next_step_ID ).',
 			      aust_next_exec_ts = '.$DB->quote( $next_exec_ts ).'
 			WHERE aust_autm_ID = '.$DB->quote( $Automation->ID ).'
 			  AND aust_user_ID = '.$DB->quote( $user_ID ),
-			'Update data for next Step after executing Step #'.$this->ID );
+			'Update data for next Step after executing Step #'.$this->ID );*/
 
 		// Log:
 		$process_log .= ( $next_AutomationStep

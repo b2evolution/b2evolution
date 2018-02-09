@@ -23,16 +23,18 @@ function autm_display_breadcrumb()
 	global $admin_url, $edited_Automation, $edited_AutomationStep;
 
 	echo '<nav aria-label="breadcrumb"><ol class="breadcrumb" style="margin-left:0">';
-	echo '<li class="breadcrumb-item"><a href="'.$admin_url.'?ctrl=automations">All</a></li>';
-	if( isset( $edited_Automation ) && $edited_Automation->ID > 0 )
-	{	// Automation:
-		echo '<li class="breadcrumb-item active">'.$edited_Automation->dget( 'name' ).'</li>';
-	}
-	if( isset( $edited_AutomationStep ) && $edited_AutomationStep->ID > 0 )
+	echo '<li class="breadcrumb-item'.( isset( $edited_Automation ) || isset( $edited_AutomationStep ) ? '' : ' active' ).'">'
+			.( isset( $edited_Automation ) || isset( $edited_AutomationStep ) ? '<a href="'.$admin_url.'?ctrl=automations">'.T_('All').'</a>' : T_('All') )
+		.'</li>';
+	if( isset( $edited_AutomationStep ) )
 	{	// Automation step:
 		$step_Automation = & $edited_AutomationStep->get_Automation();
 		echo '<li class="breadcrumb-item"><a href="'.$admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID.'">'.$step_Automation->dget( 'name' ).'</a></li>';
-		echo '<li class="breadcrumb-item active">'.T_('Step').' #'.$edited_AutomationStep->dget( 'order' ).'</li>';
+		echo '<li class="breadcrumb-item active">'.( $edited_AutomationStep->ID > 0 ? T_('Step').' #'.$edited_AutomationStep->dget( 'order' ) : T_('New step') ).'</li>';
+	}
+	elseif( isset( $edited_Automation ) )
+	{	// Automation:
+		echo '<li class="breadcrumb-item active">'.( $edited_Automation->ID > 0 ? $edited_Automation->dget( 'name' ) : T_('New automation') ).'</li>';
 	}
 	echo '</ol></nav>';
 }
@@ -450,16 +452,24 @@ function automation_results_block( $params = array() )
 	$url_params = '';
 
 	$SQL = new SQL( 'Get automations' );
-	$SQL->SELECT( 'autm_ID, autm_name, autm_status, autm_autostart, enlt_ID, enlt_name' );
+	$SQL->SELECT( 'autm_ID, autm_name, autm_status, autm_autostart, enlt_ID, enlt_name, COUNT( aust_user_ID ) AS autm_users_num' );
 	$SQL->FROM( 'T_automation__automation' );
+	$SQL->FROM_add( 'LEFT JOIN T_automation__user_state ON aust_autm_ID = autm_ID' );
 	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON enlt_ID = autm_enlt_ID' );
+	$SQL->GROUP_BY( 'autm_ID' );
+
+	$count_SQL = new SQL( 'Get a count of automations' );
+	$count_SQL->SELECT( 'COUNT( autm_ID )' );
+	$count_SQL->FROM( 'T_automation__automation' );
+
 	if( $params['enlt_ID'] > 0 )
 	{	// Restrict by newsletter:
 		$SQL->WHERE( 'autm_enlt_ID = '.$params['enlt_ID'] );
+		$count_SQL->WHERE( 'autm_enlt_ID = '.$params['enlt_ID'] );
 		$url_params = '&amp;enlt_ID='.$params['enlt_ID'];
 	}
 
-	$Results = new Results( $SQL->get(), $params['results_prefix'], 'A', NULL );
+	$Results = new Results( $SQL->get(), $params['results_prefix'], 'A', NULL, $count_SQL->get() );
 
 	if( $params['display_create_button'] && $current_User->check_perm( 'options', 'edit' ) )
 	{	// User must has a permission to add new automation:
@@ -490,6 +500,15 @@ function automation_results_block( $params = array() )
 			'td'    => ( $current_User->check_perm( 'emails', 'edit' )
 				? '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID=$enlt_ID$"><b>$enlt_name$</b></a>'
 				: '$enlt_name$' ),
+		);
+
+	$Results->cols[] = array(
+			'th'          => T_('Users'),
+			'order'       => 'autm_users_num',
+			'td'          => '$autm_users_num$',
+			'th_class'    => 'shrinkwrap',
+			'td_class'    => 'shrinkwrap',
+			'default_dir' => 'D',
 		);
 
 	$Results->cols[] = array(

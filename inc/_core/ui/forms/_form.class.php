@@ -1761,7 +1761,7 @@ class Form extends Widget
 
 		$this->handle_common_params( $field_params, $field_prefix, $field_label );
 
-		$periods_values = array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 50 );
+		$periods_values = array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 50 );
 		$periods = array(
 			array( 'name' => 'second', 'title' => T_('second(s)'), 'seconds' => 1,        'size' => 1 ), // 1 seconds
 			array( 'name' => 'minute', 'title' => T_('minute(s)'), 'seconds' => 50,       'size' => 60 ), // 50 seconds

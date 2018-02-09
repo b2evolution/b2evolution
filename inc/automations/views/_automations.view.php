@@ -15,6 +15,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+// Display breadcrumb:
+autm_display_breadcrumb();
+
 // Display automations:
 automation_results_block();
 ?>

@@ -140,8 +140,10 @@ class Automation extends DataObject
 			$AutomationStep->set( 'type', 'if_condition' );
 			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
 			$AutomationStep->set( 'yes_next_step_delay', 0 ); // 0 seconds
-			$AutomationStep->set( 'no_next_step_ID', -1, true ); // STOP
-			$AutomationStep->set( 'error_next_step_ID', -1, true ); // STOP
+			set_param( 'step_no_next_step_ID', 'loop' );
+			$AutomationStep->set( 'no_next_step_ID', NULL, true ); // Loop
+			$AutomationStep->set( 'no_next_step_delay', 43200 ); // 12 hours
+			$AutomationStep->set( 'error_next_step_ID', -1 ); // STOP
 			if( $AutomationStep->dbinsert() )
 			{	// If first step has been inserted successfully:
 				$DB->commit();

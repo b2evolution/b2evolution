@@ -28,6 +28,8 @@ else
 		// Find what steps should be executed immediately:
 		$automation_user_states = $Automation->get_user_states();
 
+		$result_message .= "\n".'<b>Automation #'.$Automation->ID.'</b>('.$Automation->get( 'name' ).'): '.count( $automation_user_states ).' users awaiting execution'."\n";
+
 		// Preload all required steps by single query into cache:
 		$AutomationStepCache->load_list( $automation_user_states );
 
