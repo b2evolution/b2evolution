@@ -675,18 +675,12 @@ class EmailCampaign extends DataObject
 
 			if( $result )
 			{	// Email newsletter was sent for user successfully:
-				$DB->query( 'REPLACE INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
-					VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "sent", '.$DB->quote( $mail_log_insert_ID ).' )' );
-
-				// Make sure all recipients are loaded into cache:
-				$this->load_recipients();
-
-				// Update arrays where we store which users received email and who waiting it now:
-				$this->users['receive'][] = $user_ID;
-				if( ( $wait_user_ID_key = array_search( $user_ID, $this->users['wait'] ) ) !== false )
-				{
-					unset( $this->users['wait'][ $wait_user_ID_key ] );
-				}
+				$this->update_user_send_status( $user_ID, 'sent' );
+			}
+			elseif( ( $User = & $UserCache->get_by_ID( $user_ID, false, false ) ) &&
+			        $User->get_email_status() == 'prmerror' )
+			{	// Unable to send email due to permanent error:
+				$this->update_user_send_status( $user_ID, 'send_error' );
 			}
 		}
 
@@ -758,28 +752,11 @@ class EmailCampaign extends DataObject
 
 			if( $result )
 			{	// Email newsletter was sent for user successfully:
-				$this->update_user_send_status( $user_ID, 'sent', $mail_log_insert_ID );
-
-				// Update arrays where we store which users received email and who waiting it now:
-				$this->users['receive'][] = $user_ID;
-				if( ( $wait_user_ID_key = array_search( $user_ID, $this->users['wait'] ) ) !== false )
-				{
-					unset( $this->users['wait'][ $wait_user_ID_key ] );
-				}
 				$email_success_count++;
 			}
 			elseif( $User->get_email_status() == 'prmerror' )
-			{ // Unable to send email due to permanent error
-				$this->update_user_send_status( $user_ID, 'send_error', $mail_log_insert_ID );
-
-				// Update arrays where we store which users received email and who waiting it now:
-				$this->users['error'][] = $user_ID;
-				if( ( $wait_user_ID_key = array_search( $user_ID, $this->users['wait'] ) ) !== false )
-				{
-					unset( $this->users['wait'][ $wait_user_ID_key ] );
-				}
+			{	// Unable to send email due to permanent error:
 				$email_error_count++;
-
 				// This email sending was skipped:
 				$email_skip_count++;
 			}
@@ -886,16 +863,21 @@ class EmailCampaign extends DataObject
 	 * Update status of sending email campaign for user
 	 *
 	 * @param integer User Id
-	 * @param string Status
-	 * @param integer|NULL Mail log ID
+	 * @param string Status: 'ready_to_send','ready_to_resend','sent','send_error','skipped'
+	 * @param integer|NULL Mail log ID, NULL - to use log ID of last sending email
 	 */
-	function update_user_send_status( $user_ID, $status, $mail_log_ID )
+	function update_user_send_status( $user_ID, $status, $mail_log_ID = NULL )
 	{
-		global $DB;
+		global $DB, $mail_log_insert_ID;
 
 		if( empty( $this->ID ) )
 		{	// Email Campaign must be stored in DB:
 			return;
+		}
+
+		if( $mail_log_ID === NULL && isset( $mail_log_insert_ID ) )
+		{	// Use log ID of last sending email:
+			$mail_log_ID = $mail_log_insert_ID;
 		}
 
 		// Get all send statuses per users of this email campaign from cache or DB table T_email__campaign_send once:
@@ -903,7 +885,7 @@ class EmailCampaign extends DataObject
 
 		if( in_array( $user_ID, $all_user_IDs ) )
 		{	// Update user send status for this email campaign:
-			$DB->query( 'UPDATE T_email__campaign_send
+			$r = $DB->query( 'UPDATE T_email__campaign_send
 				SET csnd_status = '.$DB->quote( $status ).',
 				    csnd_emlog_ID = '.$DB->quote( $mail_log_ID ).'
 				WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
@@ -911,8 +893,35 @@ class EmailCampaign extends DataObject
 		}
 		else
 		{	// Insert new record for user send status:
-			$DB->query( 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
+			$r = $DB->query( 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
 				VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $status ).', '.$DB->quote( $mail_log_ID ).' )' );
+		}
+
+		if( $r )
+		{	// Update the CACHE array where we store email sending status for users:
+			$statuses_keys = array(
+					'ready_to_send'   => 'wait',
+					'ready_to_resend' => 'wait',
+					'sent'            => 'receive',
+					'send_error'      => 'error',
+					'skipped'         => 'skipped',
+				);
+			$this->users['all'][] = $user_ID;
+			if( isset( $statuses_keys[ $status ] ) )
+			{	// Add user ID to filtered array:
+				$this->users['filter'][] = $user_ID;
+			}
+			foreach( $statuses_keys as $email_status => $array_key )
+			{
+				if( $email_status == $status )
+				{	// Add user ID to proper cache array:
+					$this->users[ $array_key ][] = $user_ID;
+				}
+				elseif( ( $unset_user_ID_key = array_search( $user_ID, $this->users[ $array_key ] ) ) !== false )
+				{	// Remove user ID from previous status cache array:
+					unset( $this->users[ $array_key ][ $unset_user_ID_key ] );
+				}
+			}
 		}
 	}
 
