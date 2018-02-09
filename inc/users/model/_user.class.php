@@ -7665,6 +7665,9 @@ class User extends DataObject
 		// Unset flag in order not to run this twice:
 		$this->newsletter_subscriptions_updated = false;
 
+		// Update the CACHE array where we store who are subscribed already in order to avoid a duplicate entry error on second calling of this function:
+		$this->newsletter_subscriptions['subscribed'] = array_merge( $this->newsletter_subscriptions['subscribed'], $newsletter_IDs );
+
 		return $r;
 	}
 
