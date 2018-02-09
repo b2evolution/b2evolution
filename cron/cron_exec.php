@@ -208,12 +208,13 @@ else
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
 		// Try to execute cron job:
-		/*set_error_handler(
+		set_error_handler(
 			function( $errno, $errstr, $errfile, $errline )
 			{
 				throw new ErrorException( $errstr, $errno, 0, $errfile, $errline );
-			}
-		);*/
+			},
+			E_ERROR | E_WARNING
+		);
 		try
 		{	// EXECUTE CRON JOB:
 			$error_message = call_job( $task->ctsk_key, $cron_params );
@@ -226,9 +227,9 @@ else
 				.'Line: '.$ex->getLine().', '
 				.'Message: '.$ex->getMessage();
 			$result_message .= $error_message;
-			echo $error_message;
+			echo $result_message;
 		}
-		//restore_error_handler();
+		restore_error_handler();
 
 		if( !empty( $error_message ) )
 		{
