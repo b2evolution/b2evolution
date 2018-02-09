@@ -311,7 +311,7 @@ class DB
 	 *    - 'port': the port on which the database listens
 	 *    - 'socket': the MySQL socket file
 	 *    - 'show_errors': Display SQL errors? (true/false); Default: don't change member default ({@link $show_errors})
-	 *    - 'halt_on_error': Halt on error? (true/false); Default: don't change member default ({@link $halt_on_error})
+	 *    - 'halt_on_error': Halt on error? (true/false/'throw_exception'); Default: don't change member default ({@link $halt_on_error})
 	 *    - 'table_options': sets {@link $table_options}
 	 *    - 'use_transactions': sets {@link $use_transactions}
 	 *    - 'aliases': Aliases for tables (array( alias => table name )); Default: no aliases.
@@ -691,7 +691,7 @@ class DB
 			return;
 		}
 
-		if( $this->halt_on_error && ! $this->show_errors )
+		if( $this->halt_on_error && $this->halt_on_error !== 'throw_exception' && ! $this->show_errors )
 		{ // do not show errors, just die:
 			die();
 		}
@@ -722,13 +722,20 @@ class DB
 
 		if( $this->halt_on_error )
 		{
-			if( function_exists('debug_die') )
+			if( $this->halt_on_error === 'throw_exception' )
 			{
-				debug_die( $err_msg );
+				throw new Exception( $err_msg );
 			}
 			else
 			{
-				die( $err_msg );
+				if( function_exists('debug_die') )
+				{
+					debug_die( $err_msg );
+				}
+				else
+				{
+					die( $err_msg );
+				}
 			}
 		}
 		elseif( $this->show_errors )

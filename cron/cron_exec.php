@@ -208,6 +208,7 @@ else
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
 		// Try to execute cron job:
+		$DB->halt_on_error = 'throw_exception';
 		set_error_handler(
 			function( $errno, $errstr, $errfile, $errline )
 			{
@@ -222,7 +223,7 @@ else
 		catch( Exception $ex )
 		{	// Unknown error:
 			$result_status = 'error';
-			$error_message = 'b2evolution caught an EXPECTED ERROR: '
+			$error_message = 'b2evolution caught an UNEXPECTED ERROR: '
 				.'File: '.$ex->getFile().', '
 				.'Line: '.$ex->getLine().', '
 				.'Message: '.$ex->getMessage();
