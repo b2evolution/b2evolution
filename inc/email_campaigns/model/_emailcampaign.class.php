@@ -646,6 +646,8 @@ class EmailCampaign extends DataObject
 				'default_template_tag' => 1
 			);
 
+		$UserCache = & get_UserCache();
+
 		if( $mode == 'test' )
 		{ // Send a test newsletter
 			global $current_User;
@@ -653,7 +655,6 @@ class EmailCampaign extends DataObject
 			$newsletter_params['boundary'] = 'b2evo-'.md5( rand() );
 			$headers = array( 'Content-Type' => 'multipart/mixed; boundary="'.$newsletter_params['boundary'].'"' );
 
-			$UserCache = & get_UserCache();
 			if( $test_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
 			{ // Send a test email only when test user exists
 				$message = mail_template( 'newsletter', 'auto', $newsletter_params, $test_User );
