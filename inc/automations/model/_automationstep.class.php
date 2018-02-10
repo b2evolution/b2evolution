@@ -476,7 +476,14 @@ class AutomationStep extends DataObject
 							// - user cannot receive such email because of day limit;
 							// - user is not activated yet.
 							$step_result = 'ERROR';
-							$additional_result_message = empty( $mail_log_message ) ? 'Unknown error' : $mail_log_message;
+							if( $user_is_waiting_email )
+							{	// If user is really waiting email but some error on sending:
+								$additional_result_message = empty( $mail_log_message ) ? 'Unknown error' : $mail_log_message;
+							}
+							else
+							{	// If user just doesn't wait this email:
+								$additional_result_message = 'User #'.$step_User->ID.'('.$step_User->get( 'login' ).') is not waiting the Email Campaign #'.$step_EmailCampaign->ID.'('.$step_EmailCampaign->get( 'email_title' ).'), probably user is not activated.';
+							}
 						}
 					}
 					else
@@ -673,7 +680,7 @@ class AutomationStep extends DataObject
 			else
 			{	// Run next step because it is not executed yet for the user:
 				$executed_automation_steps[ $user_ID ][] = $this->ID;
-				$process_log .= $log_point.$log_bold_start.'Run next step immediately: '.$log_bold_end;
+				$process_log .= $log_point.$log_bold_start.'Run next step immediately:'.$log_nl.$log_bold_end;
 				$next_AutomationStep->execute_action( $user_ID, $process_log );
 			}
 		}

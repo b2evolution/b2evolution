@@ -3914,26 +3914,21 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	if( ! $send_mail_result )
 	{	// The message has not been sent successfully
+		$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
+		update_mail_log( $mail_log_insert_ID, 'error', $message );
 		if( $debug > 1 )
 		{ // We agree to die for debugging...
-			update_mail_log( $mail_log_insert_ID, 'error', $message );
-
-			$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
 			debug_die( htmlspecialchars( $mail_log_message ) );
 		}
 		else
 		{ // Soft debugging only....
-			$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
 			$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
-
-			update_mail_log( $mail_log_insert_ID, 'error', $message );
-
 			return false;
 		}
 	}
 
-		$mail_log_message = 'Sent mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
-		$Debuglog->add( htmlspecialchars( $mail_log_message ) );
+	$mail_log_message = 'Sent mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
+	$Debuglog->add( htmlspecialchars( $mail_log_message ) );
 
 	update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
 
@@ -3958,16 +3953,24 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 {
 	global $UserSettings, $Settings, $current_charset;
 
+	/**
+	 * @var string|NULL This global var stores ID of the last mail log message
+	 */
+	global $mail_log_message;
+	$mail_log_message = NULL;
+
 	$UserCache = & get_UserCache();
 	if( $User = $UserCache->get_by_ID( $user_ID ) )
 	{
 		if( !$User->check_status( 'can_receive_any_message' ) )
 		{ // user status doesn't allow to receive nor emails nor private messages
+			$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user status "'.$User->get( 'status' ).'" doesn\'t allow to receive any message.';
 			return false;
 		}
 
 		if( !( $User->check_status( 'is_validated' ) || $force_on_non_activated ) )
 		{ // user is not activated and non activated users should not receive emails, unless force_on_non_activated is turned on
+			$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user is not validated with status "'.$User->get( 'status' ).'".';
 			return false;
 		}
 
@@ -3994,6 +3997,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				$email_counter_setting = 'last_notification_email';
 				if( !check_allow_new_email( $email_limit_setting, $email_counter_setting, $User->ID ) )
 				{ // more notification email is not allowed today
+					$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user is already limited to receive more notifications for TODAY.';
 					return false;
 				}
 				break;
@@ -4003,6 +4007,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				$email_counter_setting = 'last_newsletter';
 				if( !check_allow_new_email( $email_limit_setting, $email_counter_setting, $User->ID ) )
 				{ // more newsletter email is not allowed today
+					$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user is already limited to receive more newsletters for TODAY.';
 					return false;
 				}
 				break;

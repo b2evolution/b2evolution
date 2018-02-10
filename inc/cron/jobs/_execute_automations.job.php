@@ -43,7 +43,11 @@ else
 				$result_message .= $process_log;
 			}
 		}
+
+		$result_message .= "\n".'All users successfully processed in <b>Automation #'.$Automation->ID.'</b>'."\n";
 	}
+
+	$result_message .= "\n".'All automations successfully processed'."\n";
 }
 
 return 1; /* ok */
