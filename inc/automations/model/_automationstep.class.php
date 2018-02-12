@@ -81,9 +81,9 @@ class AutomationStep extends DataObject
 	{
 		return array(
 				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_next_step_ID', 'msg' => T_('%d states of User in Automation') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_yes_next_step_ID', 'msg' => T_('it is used %d times as next step if YES') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_no_next_step_ID', 'msg' => T_('it is used %d times as next step if NO') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_error_next_step_ID', 'msg' => T_('it is used %d times as next step if ERROR') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_yes_next_step_ID', 'msg' => T_('Step is used as Next Step %d times') + T_('("YES" column)') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_no_next_step_ID', 'msg' => T_('Step is used as Next Step %d times') + T_('("NO" column)') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_error_next_step_ID', 'msg' => T_('Step is used as Next Step %d times') + T_('("ERROR" column)') ),
 			);
 	}
 

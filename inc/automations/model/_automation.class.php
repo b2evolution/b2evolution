@@ -121,43 +121,6 @@ class Automation extends DataObject
 
 
 	/**
-	 * Insert object into DB based on previously recorded changes.
-	 *
-	 * @return boolean true on success
-	 */
-	function dbinsert()
-	{
-		global $DB;
-
-		$DB->begin( 'SERIALIZABLE' );
-
-		if( parent::dbinsert() )
-		{	// If the automation has been inserted successful:
-
-			// Create first step automatically:
-			$AutomationStep = new AutomationStep();
-			$AutomationStep->set( 'autm_ID', $this->ID );
-			$AutomationStep->set( 'type', 'if_condition' );
-			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
-			$AutomationStep->set( 'yes_next_step_delay', 0 ); // 0 seconds
-			set_param( 'step_no_next_step_ID', 'loop' );
-			$AutomationStep->set( 'no_next_step_ID', NULL, true ); // Loop
-			$AutomationStep->set( 'no_next_step_delay', 43200 ); // 12 hours
-			$AutomationStep->set( 'error_next_step_ID', -1 ); // STOP
-			if( $AutomationStep->dbinsert() )
-			{	// If first step has been inserted successfully:
-				$DB->commit();
-				return true;
-			}
-		}
-
-		// Could not insert the automation object:
-		$DB->rollback();
-		return false;
-	}
-
-
-	/**
 	 * Get name of automation
 	 *
 	 * @return string Name of automation
