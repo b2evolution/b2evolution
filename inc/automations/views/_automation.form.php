@@ -100,10 +100,10 @@ if( $edited_Automation->ID > 0 )
 			'th'          => T_('# of users queued'),
 			'order'       => 'num_users_queued',
 			'default_dir' => 'D',
-			'td'          => '%step_td_num_users_queued( #step_ID#, #num_users_queued# )%',
+			'td'          => '%step_td_num_users_queued( #step_ID#, #step_autm_ID#, #num_users_queued#, #step_order# )%',
 			'th_class'    => 'shrinkwrap',
 			'td_class'    => 'right',
-			'total'       => $finished_users,
+			'total'       => $finished_users.( $finished_users > 0 ? ' <a href="#" class="btn btn-info btn-xs" onclick="return requeue_automation( '.$edited_Automation->ID.' )">'.T_('Requeue').'</a>' : '' ),
 			'total_class' => 'right',
 		);
 
@@ -142,12 +142,10 @@ if( $edited_Automation->ID > 0 )
 		);
 
 	$Results->cols[] = array(
-			'th'          => T_('Actions'),
-			'td'          => '%step_td_actions( #step_ID#, #is_first_step#, #is_last_step# )%',
-			'th_class'    => 'shrinkwrap',
-			'td_class'    => 'shrinkwrap',
-			'total'       => ( $finished_users > 0 ? '<a href="#" class="btn btn-info btn-xs" onclick="return requeue_automation( '.$edited_Automation->ID.' )">'.T_('Requeue').'</a>' : '' ),
-			'total_class' => 'center',
+			'th'       => T_('Actions'),
+			'td'       => '%step_td_actions( #step_ID#, #is_first_step#, #is_last_step# )%',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
 		);
 
 	$Results->display( NULL, 'session' );

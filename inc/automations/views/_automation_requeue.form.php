@@ -28,6 +28,10 @@ $Form->begin_form( 'fform' );
 $Form->add_crumb( 'automation' );
 $Form->hidden_ctrl();
 $Form->hidden( 'autm_ID', $edited_Automation->ID );
+// To requeue by specific step:
+$Form->hidden( 'source_step_ID', param( 'source_step_ID', 'integer', NULL ) );
+// To requeue only a specific user:
+$Form->hidden( 'source_user_ID', param( 'source_user_ID', 'integer', NULL ) );
 
 $Form->begin_fieldset( T_('Requeue automation for finished steps').get_manual_link( 'requeue-automation-for-finished-steps' ), array( 'style' => 'width:420px' ) );
 
@@ -36,7 +40,7 @@ $Form->begin_fieldset( T_('Requeue automation for finished steps').get_manual_li
 	$automation_cache_SQL = $AutomationStepCache->get_SQL_object();
 	$automation_cache_SQL->WHERE_and( 'step_autm_ID = '.$edited_Automation->ID );
 	$AutomationStepCache->load_by_sql( $automation_cache_SQL );
-	$Form->select_input_object( 'step_ID', '', $AutomationStepCache, T_('Step'), array( 'required' => true ) );
+	$Form->select_input_object( 'target_step_ID', '', $AutomationStepCache, T_('Step'), array( 'required' => true ) );
 
 	echo '<p class="center">';
 	$Form->button( array( '', 'actionArray[requeue]', T_('Requeue'), 'SaveButton' ) );

@@ -222,13 +222,29 @@ switch( $action )
 
 		// Make sure we got IDs:
 		param( 'autm_ID', 'integer', true );
-		param( 'step_ID', 'integer', true );
+		param( 'target_step_ID', 'integer', true );
+
+		// Additional options to requeue a specific step or user:
+		param( 'source_step_ID', 'integer', NULL );
+		param( 'source_user_ID', 'integer', NULL );
+		if( $source_user_ID > 0 )
+		{	// Requeue only one specific user:
+			$requeue_sql_where = 'aust_user_ID = '.$DB->quote( $source_user_ID );
+		}
+		elseif( $source_step_ID > 0 )
+		{	// Requeue a specific step:
+			$requeue_sql_where = 'aust_next_step_ID = '.$DB->quote( $source_step_ID );
+		}
+		else
+		{	// Requeue all finished steps:
+			$requeue_sql_where = 'aust_next_step_ID IS NULL';
+		}
 
 		$requeued_users_num = intval( $DB->query( 'UPDATE T_automation__user_state
-			  SET aust_next_step_ID = '.$DB->quote( $step_ID ).',
+			  SET aust_next_step_ID = '.$DB->quote( $target_step_ID ).',
 			      aust_next_exec_ts = '.$DB->quote( date2mysql( $servertimenow ) ).'
 			WHERE aust_autm_ID = '.$edited_Automation->ID.'
-			  AND aust_next_step_ID IS NULL' ) );
+			  AND '.$requeue_sql_where ) );
 
 		if( $requeued_users_num )
 		{
@@ -236,7 +252,14 @@ switch( $action )
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
+		if( $source_user_ID > 0 )
+		{	// Redirect to an edit page of the requeued step:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit_step&step_ID='.$target_step_ID, 303 ); // Will EXIT
+		}
+		else
+		{	// Redirect to an edit page of Automation:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
+		}
 		// We have EXITed already at this point!!
 		break;
 

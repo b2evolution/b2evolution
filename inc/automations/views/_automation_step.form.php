@@ -126,11 +126,17 @@ $Form->end_form( array(
 if( $edited_AutomationStep->ID > 0 )
 {	// Display numbers of users queued for the edited Automation Step:
 	$SQL = new SQL( 'Get all users queued for automation step #'.$edited_AutomationStep->ID );
-	$SQL->SELECT( 'aust_user_ID, aust_next_exec_ts' );
+	$SQL->SELECT( 'aust_autm_ID, aust_user_ID, aust_next_exec_ts, user_login' );
 	$SQL->FROM( 'T_automation__user_state' );
+	$SQL->FROM_add( 'INNER JOIN T_users ON user_ID = aust_user_ID' );
 	$SQL->WHERE( 'aust_next_step_ID = '.$edited_AutomationStep->ID );
 
-	$Results = new Results( $SQL->get(), 'aust_', '-A' );
+	$count_SQL = new SQL( 'Get a count of users queued for automation step #'.$edited_AutomationStep->ID );
+	$count_SQL->SELECT( 'COUNT( aust_user_ID )' );
+	$count_SQL->FROM( 'T_automation__user_state' );
+	$count_SQL->WHERE( 'aust_next_step_ID = '.$edited_AutomationStep->ID );
+
+	$Results = new Results( $SQL->get(), 'aust_', '-A', NULL, $count_SQL->get() );
 
 	$Results->title = T_('Users queued').get_manual_link( 'automation-step-users-queued' );
 
@@ -150,12 +156,16 @@ if( $edited_AutomationStep->ID > 0 )
 
 	$Results->cols[] = array(
 			'th'       => T_('Actions'),
-			'td'       => action_icon( T_('Change execution time to now'), 'forward', $admin_url.'?ctrl=automations&amp;action=reduce_step_delay&amp;step_ID='.$edited_AutomationStep->ID.'&amp;user_ID=$aust_user_ID$&amp;'.url_crumb( 'automationstep' ) ),
+			'td'       => action_icon( T_('Change execution time to now'), 'forward', $admin_url.'?ctrl=automations&amp;action=reduce_step_delay&amp;step_ID='.$edited_AutomationStep->ID.'&amp;user_ID=$aust_user_ID$&amp;'.url_crumb( 'automationstep' ) )
+				.' <a href="#" class="btn btn-info btn-xs" onclick="return requeue_automation( $aust_autm_ID$, '.$edited_AutomationStep->ID.', '.$edited_AutomationStep->get( 'order' ).', $aust_user_ID$, \\\'$user_login$\\\' )">'.T_('Requeue').'</a>',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
 		);
 
 	$Results->display();
+
+	// Init JS for form to requeue automation:
+	echo_requeue_automation_js();
 }
 ?>
 <script type="text/javascript">

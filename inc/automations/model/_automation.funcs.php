@@ -277,17 +277,20 @@ function step_get_result_label( $type, $result )
  * Helper function to display step info on Results table
  *
  * @param integer Step ID
+ * @param integer Automation ID
  * @param integer Number of user queued
+ * @param integer Step order
  * @return string
  */
-function step_td_num_users_queued( $step_ID, $num_users_queued )
+function step_td_num_users_queued( $step_ID, $autm_ID, $num_users_queued, $step_order )
 {
 	if( $num_users_queued > 0 )
 	{
 		global $admin_url;
 		$num_users_queued = '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID.'">'
 				.$num_users_queued
-			.'</a>';
+			.'</a>'
+			.' <a href="#" class="btn btn-info btn-xs" onclick="return requeue_automation( '.$autm_ID.', '.$step_ID.', '.$step_order.' )">'.T_('Requeue').'</a>';
 	}
 
 	return $num_users_queued;
@@ -426,6 +429,8 @@ function echo_requeue_automation_js()
 	echo '<script type="text/javascript">
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_requeue_automation_for_finished_steps = \''.TS_('Requeue automation for finished steps').get_manual_link( 'requeue-automation-for-finished-steps' ).'\';
+		var evo_js_lang_requeue_automation_for_step_users = \''.TS_('Requeue automation for users of step #%s').get_manual_link( 'requeue-automation-for-step' ).'\';
+		var evo_js_lang_requeue_automation_for_user = \''.TS_('Requeue automation for user "%s"').get_manual_link( 'requeue-automation-for-user' ).'\';
 		var evo_js_lang_requeue = \''.TS_('Requeue').'\';
 		var evo_js_requeue_automation_ajax_url = \''.$admin_url.'\';
 	</script>';
