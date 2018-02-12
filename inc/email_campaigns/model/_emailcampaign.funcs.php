@@ -219,7 +219,8 @@ function campaign_results_block( $params = array() )
 			SUM( IF( emlog_last_open_ts IS NOT NULL OR emlog_last_click_ts IS NOT NULL, 1, 0 ) ) /
 				SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS open_rate,
 			SUM( IF( emlog_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
-			SUM( IF( emlog_last_click_ts IS NULL, 0, 1 ) ) AS click_count' );
+			SUM( IF( emlog_last_click_ts IS NULL, 0, 1 ) ) AS click_count,
+			SUM( csnd_clicked_unsubscribe ) AS unsubscribe_click_count' );
 	$SQL->FROM( 'T_email__campaign' );
 	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 	$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
@@ -339,6 +340,15 @@ function campaign_results_block( $params = array() )
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
 			'td' =>'$click_count$'
+		);
+
+	$Results->cols[] = array(
+			'th' => T_('Unsub clicks'),
+			'order' => 'unsubscribe_click_count',
+			'default_dir' => 'D',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'center',
+			'td' =>'$unsubscribe_click_count$'
 		);
 
 	$Results->cols[] = array(

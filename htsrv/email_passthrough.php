@@ -37,20 +37,31 @@ switch( $type )
 
 		if( $email_log )
 		{
-			if( ! empty( $email_log['emlog_user_ID'] ) && $tag === 1 )
+			if( ! empty( $email_log['emlog_user_ID'] ) )
 			{
 				$ecmp_ID = $DB->get_var( 'SELECT csnd_camp_ID FROM T_email__campaign_send WHERE csnd_emlog_ID = '.$DB->quote( $email_ID ) );
 				$EmailCampaignCache = & get_EmailCampaignCache();
 				if( ! empty( $ecmp_ID ) && $edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $ecmp_ID, false ) )
 				{
-					$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag' );
-					if( ! empty( $assigned_user_tag ) )
+					$UserCache = & get_UserCache();
+					if( $email_User = & $UserCache->get_by_ID( $email_log['emlog_user_ID'] ) )
 					{
-						$UserCache = & get_UserCache();
-						if( $email_User = & $UserCache->get_by_ID( $email_log['emlog_user_ID'] ) )
+						switch( $tag )
 						{
-							$email_User->add_usertags( $edited_EmailCampaign->get( 'user_tag' ) );
-							$email_User->dbupdate();
+							case 1: // Add usertag
+								$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag' );
+								if( ! empty( $assigned_user_tag ) )
+								{
+									$email_User->add_usertags( $edited_EmailCampaign->get( 'user_tag' ) );
+									$email_User->dbupdate();
+								}
+								break;
+
+							case 2: // Update clicked_unsubscribe
+								$DB->query( 'UPDATE T_email__campaign_send
+										SET csnd_clicked_unsubscribe = 1
+										WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
+								break;
 						}
 					}
 				}
@@ -59,7 +70,6 @@ switch( $type )
 			$DB->query( 'UPDATE T_email__log
 					SET emlog_last_click_ts = '.$DB->quote( date2mysql( $localtimenow ) )
 					.' WHERE emlog_ID = '.$DB->quote( $email_ID ).' AND emlog_key = '.$DB->quote( $email_key ) );
-
 		}
 
 		// Redirect
