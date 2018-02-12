@@ -2087,6 +2087,9 @@ class _core_Module extends Module
 								'log' => array(
 									'text' => T_('Send Log'),
 									'href' => '?ctrl=email&amp;tab=sent' ),
+								'stats' => array(
+									'text' => T_('Stats'),
+									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=stats' ),
 								'envelope' => array(
 									'text' => T_('Envelope'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab2=sent&amp;tab3=envelope' ),

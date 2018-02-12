@@ -469,16 +469,31 @@ switch( $tab )
 	case 'sent':
 		$AdminUI->breadcrumbpath_add( T_('Sent'), '?ctrl=email&amp;tab='.$tab );
 
-		$tab3 = 'log';
+		switch( $tab3 )
+		{
+			case 'stats':
+				$AdminUI->breadcrumbpath_add( T_('Stats'), '?ctrl=email&amp;tab=sent&amp;tab3='.$tab3 );
 
-		$emlog_ID = param( 'emlog_ID', 'integer', 0 );
-		if( empty( $emlog_ID ) )
-		{ // Initialize date picker on list page
-			init_datepicker_js();
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-statistics-summary' );
+
+				// Init jqPlot charts
+				init_jqplot_js();
+				break;
+
+			default:
+				$tab3 = 'log';
+
+				$emlog_ID = param( 'emlog_ID', 'integer', 0 );
+				if( empty( $emlog_ID ) )
+				{ // Initialize date picker on list page
+					init_datepicker_js();
+				}
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'sent-emails' );
 		}
 
-		// Set an url for manual page:
-		$AdminUI->set_page_manual_link( 'sent-emails' );
 		break;
 
 	case 'addresses':
@@ -628,20 +643,29 @@ evo_flush();
 switch( $tab )
 {
 	case 'sent':
-		if( $emlog_ID > 0 )
-		{	// Display a details of selected email log
-			$MailLog = $DB->get_row( '
-				SELECT *
-				  FROM T_email__log
-				 WHERE emlog_ID = '.$DB->quote( $emlog_ID ) );
-			if( $MailLog )
-			{	// The mail log exists with selected ID
-				$AdminUI->disp_view( 'tools/views/_email_sent_details.view.php' );
+		switch( $tab3 )
+		{
+			case 'stats':
+				// Display a list of email logs:
+				$AdminUI->disp_view( 'tools/views/_email_stats.view.php' );
 				break;
-			}
+
+			default:
+				if( $emlog_ID > 0 )
+				{	// Display a details of selected email log
+					$MailLog = $DB->get_row( '
+						SELECT *
+							FROM T_email__log
+						WHERE emlog_ID = '.$DB->quote( $emlog_ID ) );
+					if( $MailLog )
+					{	// The mail log exists with selected ID
+						$AdminUI->disp_view( 'tools/views/_email_sent_details.view.php' );
+						break;
+					}
+				}
+				// Display a list of email logs:
+				$AdminUI->disp_view( 'tools/views/_email_sent.view.php' );
 		}
-		// Display a list of email logs:
-		$AdminUI->disp_view( 'tools/views/_email_sent.view.php' );
 		break;
 
 	case 'addresses':

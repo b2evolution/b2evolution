@@ -1227,6 +1227,7 @@ function get_hits_summary_mode()
  * @param string End date of hits log in format 'YYYY-mm-dd'
  * @return array Fixed hits data
  */
+// erwin> replaced with a more generic fill_empty_days() in _misc.funcs.php
 function fill_empty_hit_days( $hits_data, $start_date, $end_date )
 {
 	$fixed_hits_data = array();

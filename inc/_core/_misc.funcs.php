@@ -8682,4 +8682,100 @@ function jquery_datepicker_day_names()
 
 	return '[\''.implode( '\', \'', $days ).'\']';
 }
+
+
+/**
+ * Find the dates without data and fill them with 0 to display on graph and table
+ *
+ * @param array Source data
+ * @param array Default data, e.g. array( 'hits' => 0 )
+ * @param string Start date of log in format 'YYYY-mm-dd'
+ * @param string End date of log in format 'YYYY-mm-dd'
+ * @return array Fixed data
+ */
+function fill_empty_days( $data, $default_data, $start_date, $end_date )
+{
+	$fixed_data = array();
+	$start_date = date( 'Y-n-j', strtotime( $start_date) );
+	$end_date = date( 'Y-n-j', strtotime( $end_date) );
+
+	if( empty( $data ) )
+	{
+		return $fixed_data;
+	}
+
+	// Get additional fields which must be exist in each array item of new filled empty day below:
+	$additional_fields = array_diff_key( $data[0], array( 'year' => 0, 'month' => 0, 'day' => 0 ) );
+
+	// Check if data array contains start and end dates:
+	$start_date_is_contained = empty( $start_date );
+	$end_date_is_contained = empty( $end_date );
+
+	if( ! $start_date_is_contained || ! $end_date_is_contained )
+	{
+		foreach( $data as $row )
+		{
+			$this_date = $row['year'].'-'.$row['month'].'-'.$row['day'];
+			if( $this_date == $start_date )
+			{	// The start date is detected:
+				$start_date_is_contained = true;
+			}
+			if( $this_date == $end_date )
+			{	// The start date is detected:
+				$end_date_is_contained = true;
+			}
+			if( $start_date_is_contained && $end_date_is_contained )
+			{	// Stop array searching here because we have found the dates:
+				break;
+			}
+		}
+	}
+
+	if( ! $start_date_is_contained )
+	{	// Add item to array with 0 for start date if stats has no data for the date:
+		array_push( $data, array_merge( array(
+				'year'     => date( 'Y', strtotime( $start_date ) ),
+				'month'    => date( 'n', strtotime( $start_date ) ),
+				'day'      => date( 'j', strtotime( $start_date ) ),
+		), $default_data ) + $additional_fields );
+	}
+	if( ! $end_date_is_contained )
+	{	// Add item to array with 0 for end date if stats has no data for the date:
+		array_unshift( $data, array_merge( array(
+				'year'     => date( 'Y', strtotime( $end_date ) ),
+				'month'    => date( 'n', strtotime( $end_date ) ),
+				'day'      => date( 'j', strtotime( $end_date ) ),
+		), $default_data ) + $additional_fields );
+	}
+
+	foreach( $data as $row )
+	{
+		$this_date = $row['year'].'-'.$row['month'].'-'.$row['day'];
+
+		if( isset( $prev_date ) && $prev_date != $this_date )
+		{	// If data are from another day:
+			$prev_time = strtotime( $prev_date ) - 86400;
+			$this_time = strtotime( $this_date );
+
+			if( $prev_time != $this_time )
+			{	// If previous date is not previous day(it means some day has no data):
+				$empty_days = ( $prev_time - $this_time ) / 86400;
+				for( $d = 0; $d < $empty_days; $d++ )
+				{	// Add each empty day to array with default data:
+					$empty_day = $prev_time - $d * 86400;
+					$fixed_data[] = array_merge( array(
+							'year'     => date( 'Y', $empty_day ),
+							'month'    => date( 'n', $empty_day ),
+							'day'      => date( 'j', $empty_day ),
+					), $default_data ) + $additional_fields;
+				}
+			}
+		}
+
+		$prev_date = $row['year'].'-'.$row['month'].'-'.$row['day'];
+		$fixed_data[] = $row;
+	}
+
+	return $fixed_data;
+}
 ?>
