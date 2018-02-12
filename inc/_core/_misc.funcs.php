@@ -2820,7 +2820,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 function debug_die( $additional_info = '', $params = array() )
 {
 	global $debug, $baseurl;
-	global $log_app_errors, $app_name, $is_cli, $display_errors_on_production, $is_api_request;
+	global $log_app_errors, $app_name, $is_cli, $display_errors_on_production, $is_api_request, $is_cron_job_executing;
 
 	$params = array_merge( array(
 		'status'     => '500 Internal Server Error',
@@ -2848,6 +2848,15 @@ function debug_die( $additional_info = '', $params = array() )
 			) );
 
 		die(1); // Error code 1. Note: This will still call the shutdown function.
+	}
+	elseif( $is_cron_job_executing )
+	{	// If debug die has been called during cron job executing:
+		$cron_job_error = '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">'
+				.'<h3>Additional information about this error:</h3>'
+				.$additional_info
+			.'</div>'
+			.debug_get_backtrace();
+		throw new Exception( str_replace( "\n", '', $cron_job_error ) );
 	}
 	elseif( $is_cli )
 	{ // Command line interface, e.g. in cron_exec.php:

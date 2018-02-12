@@ -485,4 +485,45 @@ function cron_job_sql_query( $fields = 'key,name' )
 
 	return $name_query;
 }
+
+
+/**
+ * Shutdown function to save log of the interrupted cron job by unexpected error:
+ */
+function cron_job_shutdown()
+{
+	global $result_message, $ctsk_ID, $DB;
+
+	if( empty( $ctsk_ID ) )
+	{	// Run rgus function to detect only interrupted corn jobs:
+		return;
+	}
+
+	if( empty( $result_message ) )
+	{	// Initialize result message of current executing cron job:
+		$result_message = '';
+	}
+
+	// Get last error:
+	$last_error = error_get_last();
+
+	// Append error info to cron job log:
+	$result_message .= "\n".'b2evolution caught an UNEXPECTED ERROR: '
+		.( $last_error
+			? '<b>File:</b> '.$last_error['file'].', '
+			 .'<b>Line:</b> '.$last_error['line'].', '
+			 .'<b>Message:</b> '.$last_error['message']
+			: 'Unknown'
+		);
+
+	// We must rollback any started transaction in order to proper update cron job log below:
+	$DB->rollback();
+
+	$DB->query( 'UPDATE T_cron__log
+		  SET clog_status = "error",
+		      clog_realstop_datetime = '.$DB->quote( date2mysql( time() ) ).',
+		      clog_messages = '.$DB->quote( $result_message ).'
+		WHERE clog_ctsk_ID = '.$ctsk_ID,
+		'Record task as finished with error by shutdown function.' );
+}
 ?>

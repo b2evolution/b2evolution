@@ -30,6 +30,11 @@ if( $Settings->get( 'system_lock' ) )
  */
 load_funcs( 'cron/_cron.funcs.php' );
 
+// Register shutdown function to catch fatal errors:
+register_shutdown_function( 'cron_job_shutdown' );
+// Mark this script as cron job executing in order to catch function debug_die() here and store error log in cron log:
+$is_cron_job_executing = true;
+
 /**
  * @global integer Quietness.
  *         1 suppresses trivial/informative messages,
@@ -208,29 +213,22 @@ else
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
 		// Try to execute cron job:
-		$DB->halt_on_error = 'throw_exception';
-		set_error_handler(
-			function( $errno, $errstr, $errfile, $errline )
-			{
-				throw new ErrorException( $errstr, $errno, 0, $errfile, $errline );
-			},
-			E_ERROR | E_WARNING
-		);
 		try
 		{	// EXECUTE CRON JOB:
 			$error_message = call_job( $task->ctsk_key, $cron_params );
 		}
 		catch( Exception $ex )
-		{	// Unknown error:
+		{	// Unexpected error:
 			$result_status = 'error';
-			$error_message = 'b2evolution caught an UNEXPECTED ERROR: '
-				.'File: '.$ex->getFile().', '
-				.'Line: '.$ex->getLine().', '
-				.'Message: '.$ex->getMessage();
+			$error_message = "\n".'b2evolution caught an UNEXPECTED ERROR: '
+				.'<b>File:</b> '.$ex->getFile().', '
+				.'<b>Line:</b> '.$ex->getLine().', '
+				.'<b>Message:</b> '.$ex->getMessage();
 			$result_message .= $error_message;
-			echo $result_message;
+			echo nl2br( $result_message );
+			// We must rollback any started transaction in order to proper update cron job log below:
+			$DB->rollback();
 		}
-		restore_error_handler();
 
 		if( !empty( $error_message ) )
 		{
@@ -264,6 +262,9 @@ else
 							WHERE clog_ctsk_ID = '.$ctsk_ID;
 		$DB->query( $sql, 'Record task as finished.' );
 	}
+
+	// Unset ID of the executed cron job to 
+	unset( $ctsk_ID );
 }
 
 

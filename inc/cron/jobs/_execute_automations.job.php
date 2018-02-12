@@ -38,9 +38,8 @@ else
 			if( $AutomationStep = & $AutomationStepCache->get_by_ID( $automation_step_ID, false, false ) )
 			{
 				// Execute Step action for given User:
-				$process_log = "\n";
-				$AutomationStep->execute_action( $automation_user_ID, $process_log );
-				$result_message .= $process_log;
+				$result_message .= "\n";
+				$AutomationStep->execute_action( $automation_user_ID, $result_message );
 			}
 		}
 
