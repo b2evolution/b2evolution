@@ -48,7 +48,6 @@ if( ! extension_loaded('imap') )
 	return 2; // error
 }
 
-load_funcs( '_core/_param.funcs.php' );
 load_class( '_ext/mime_parser/rfc822_addresses.php', 'rfc822_addresses_class' );
 load_class( '_ext/mime_parser/mime_parser.php', 'mime_parser_class' );
 
