@@ -488,6 +488,49 @@ function cron_job_sql_query( $fields = 'key,name' )
 
 
 /**
+ * Error handler for cron job
+ *
+ * @return boolean FALSE - to continue normal error handler, TRUE - to don't run normal error handler
+ */
+function cron_job_error_handler()
+{
+	$last_error = error_get_last();
+
+	if( $last_error['type'] === E_ERROR )
+	{	// If last error is fatal:
+		global $result_message, $error_message, $DB;
+
+		if( empty( $result_message ) )
+		{	// Initialize result message of current executing cron job:
+			$result_message = '';
+		}
+
+		// Append error info to cron job log:
+		$new_error_message = "\n".'b2evolution caught an UNEXPECTED ERROR: '
+			.( $last_error
+				? '<b>File:</b> '.$last_error['file'].', '
+				 .'<b>Line:</b> '.$last_error['line'].', '
+				 .'<b>Message:</b> '.$last_error['message']
+				: 'Unknown'
+			);
+		if( $new_error_message !== $error_message )
+		{	// Update only really new error, in order to exclude duplicates:
+			$error_message = $new_error_message;
+			$result_message .= $error_message;
+		}
+
+		// We must rollback any started transaction in order to proper update a log of the interrupted cron job:
+		$DB->rollback();
+
+		return true;
+	}
+
+	// To continue normal error handler:
+	return false;
+}
+
+
+/**
  * Shutdown function to save log of the interrupted cron job by unexpected error:
  */
 function cron_job_shutdown()
@@ -499,25 +542,8 @@ function cron_job_shutdown()
 		return;
 	}
 
-	if( empty( $result_message ) )
-	{	// Initialize result message of current executing cron job:
-		$result_message = '';
-	}
-
-	// Get last error:
-	$last_error = error_get_last();
-
-	// Append error info to cron job log:
-	$result_message .= "\n".'b2evolution caught an UNEXPECTED ERROR: '
-		.( $last_error
-			? '<b>File:</b> '.$last_error['file'].', '
-			 .'<b>Line:</b> '.$last_error['line'].', '
-			 .'<b>Message:</b> '.$last_error['message']
-			: 'Unknown'
-		);
-
-	// We must rollback any started transaction in order to proper update cron job log below:
-	$DB->rollback();
+	// Run error handler to store info of last error in $result_message:
+	cron_job_error_handler();
 
 	$DB->query( 'UPDATE T_cron__log
 		  SET clog_status = "error",

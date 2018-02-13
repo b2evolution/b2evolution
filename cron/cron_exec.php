@@ -213,6 +213,7 @@ else
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
 		// Try to execute cron job:
+		set_error_handler( 'cron_job_error_handler' );
 		try
 		{	// EXECUTE CRON JOB:
 			$error_message = call_job( $task->ctsk_key, $cron_params );
@@ -229,6 +230,7 @@ else
 			// We must rollback any started transaction in order to proper update cron job log below:
 			$DB->rollback();
 		}
+		restore_error_handler();
 
 		if( !empty( $error_message ) )
 		{
