@@ -14,12 +14,12 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 $email_status_colors = array(
-		'ready_to_send' => 'FFF000',
-		'ok'            => '000000',
-		'simulated'     => 'BBBBBB',
 		'opened'        => '5CB85C',
-		'error'         => 'FF6600',
+		'ok'            => '000000',
 		'blocked'       => 'FF0000',
+		'error'         => 'FF6600',
+		'ready_to_send' => 'FFF000',
+		'simulated'     => 'BBBBBB',
 	);
 
 echo '<h2 class="page-title">'.T_('Email statistics').get_manual_link('email_summary').'</h2>';
@@ -57,12 +57,12 @@ if( $res_counts )
 	$last_date = 0;
 
 	$col_mapping = array(
-			'ready_to_send' => 1,
+			'opened'        => 1,
 			'ok'            => 2,
-			'simulated'     => 3,
-			'opened'        => 4,
-			'error'         => 5,
-			'blocked'       => 6,
+			'blocked'       => 3,
+			'error'         => 4,
+			'ready_to_send' => 5,
+			'simulated'     => 6,
 		);
 
 	$chart['chart_data'][0] = array();
@@ -98,21 +98,24 @@ if( $res_counts )
 	}
 
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], T_('Ready to send') );
+	array_unshift( $chart[ 'chart_data' ][ 1 ], T_('Opened') );
 	array_unshift( $chart[ 'chart_data' ][ 2 ], T_('Sent') );
-	array_unshift( $chart[ 'chart_data' ][ 3 ], T_('Simulated') );
-	array_unshift( $chart[ 'chart_data' ][ 4 ], T_('Opened') );
-	array_unshift( $chart[ 'chart_data' ][ 5 ], T_('Error') );
-	array_unshift( $chart[ 'chart_data' ][ 6 ], T_('Blocked') );
+	array_unshift( $chart[ 'chart_data' ][ 3 ], T_('Blocked') );
+	array_unshift( $chart[ 'chart_data' ][ 4 ], T_('Error') );
+	array_unshift( $chart[ 'chart_data' ][ 5 ], T_('Ready to send') );
+	array_unshift( $chart[ 'chart_data' ][ 6 ], T_('Simulated') );
+
+
+
 
 
 	$chart[ 'series_color' ] = array (
-		$email_status_colors['ready_to_send'],
-		$email_status_colors['ok'],
-		$email_status_colors['simulated'],
 		$email_status_colors['opened'],
-		$email_status_colors['error'],
+		$email_status_colors['ok'],
 		$email_status_colors['blocked'],
+		$email_status_colors['error'],
+		$email_status_colors['ready_to_send'],
+		$email_status_colors['simulated'],
 	);
 
 	$chart[ 'canvas_bg' ] = array( 'width'  => '100%', 'height' => 355 );
@@ -142,12 +145,12 @@ $last_date = 0;
 echo '<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">';
 echo '<tr>';
 echo '<th class="firstcol">'.T_('Date').'</th>';
-echo '<th style="background-color: #'.$email_status_colors['ready_to_send'].'">'.T_('Ready to send').'</th>';
-echo '<th style="color: #FFFFFF; background-color: #'.$email_status_colors['ok'].'">'.T_('Sent').'</th>';
-echo '<th style="background-color: #'.$email_status_colors['simulated'].'">'.T_('Simulated').'</th>';
 echo '<th style="background-color: #'.$email_status_colors['opened'].'">'.T_('Opened').'</th>';
-echo '<th style="background-color: #'.$email_status_colors['error'].'">'.T_('Error').'</th>';
+echo '<th style="color: #FFFFFF; background-color: #'.$email_status_colors['ok'].'">'.T_('Sent').'</th>';
 echo '<th style="background-color: #'.$email_status_colors['blocked'].'">'.T_('Blocked').'</th>';
+echo '<th style="background-color: #'.$email_status_colors['error'].'">'.T_('Error').'</th>';
+echo '<th style="background-color: #'.$email_status_colors['ready_to_send'].'">'.T_('Ready to send').'</th>';
+echo '<th style="background-color: #'.$email_status_colors['simulated'].'">'.T_('Simulated').'</th>';
 echo '<th class="lastcol">'.T_('Total').'</th>';
 echo '</tr>';
 
@@ -164,12 +167,12 @@ foreach( $res_counts as $row_stats )
 			<td class="firstcol right"><?php
 				echo date( 'D '.locale_datefmt(), $last_date );
 			?></td>
-			<td class="right"><?php echo $email_count['ready_to_send']; ?></td>
-			<td class="right"><?php echo $email_count['ok']; ?></td>
-			<td class="right"><?php echo $email_count['simulated']; ?></td>
 			<td class="right"><?php echo $email_count['opened']; ?></td>
-			<td class="right"><?php echo $email_count['error']; ?></td>
+			<td class="right"><?php echo $email_count['ok']; ?></td>
 			<td class="right"><?php echo $email_count['blocked']; ?></td>
+			<td class="right"><?php echo $email_count['error']; ?></td>
+			<td class="right"><?php echo $email_count['ready_to_send']; ?></td>
+			<td class="right"><?php echo $email_count['simulated']; ?></td>
 			<td class="lastcol right"><?php echo array_sum( $email_count ); ?></td>
 		</tr>
 		<?php
@@ -199,12 +202,12 @@ if( $last_date != 0 )
 			<td class="firstcol right"><?php
 			echo date( 'D '.locale_datefmt(), $this_date );
 			?></td>
-			<td class="right"><?php echo $email_count['ready_to_send']; ?></td>
-			<td class="right"><?php echo $email_count['ok']; ?></td>
-			<td class="right"><?php echo $email_count['simulated']; ?></td>
 			<td class="right"><?php echo $email_count['opened']; ?></td>
-			<td class="right"><?php echo $email_count['error']; ?></td>
+			<td class="right"><?php echo $email_count['ok']; ?></td>
 			<td class="right"><?php echo $email_count['blocked']; ?></td>
+			<td class="right"><?php echo $email_count['error']; ?></td>
+			<td class="right"><?php echo $email_count['ready_to_send']; ?></td>
+			<td class="right"><?php echo $email_count['simulated']; ?></td>
 			<td class="lastcol right"><?php echo array_sum( $email_count ); ?></td>
 		</tr>
 	<?php
@@ -215,12 +218,12 @@ if( $last_date != 0 )
 
 <tr class="total">
 	<td class="firstcol"><?php echo T_('Total') ?></td>
-	<td class="right"><?php echo $total_count['ready_to_send']; ?></td>
-	<td class="right"><?php echo $total_count['ok']; ?></td>
-	<td class="right"><?php echo $total_count['simulated']; ?></td>
 	<td class="right"><?php echo $total_count['opened']; ?></td>
-	<td class="right"><?php echo $total_count['error']; ?></td>
+	<td class="right"><?php echo $total_count['ok']; ?></td>
 	<td class="right"><?php echo $total_count['blocked']; ?></td>
+	<td class="right"><?php echo $total_count['error']; ?></td>
+	<td class="right"><?php echo $total_count['ready_to_send']; ?></td>
+	<td class="right"><?php echo $total_count['simulated']; ?></td>
 	<td class="lastcol right"><?php echo array_sum( $total_count ); ?></td>
 </tr>
 
