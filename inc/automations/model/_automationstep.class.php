@@ -81,9 +81,9 @@ class AutomationStep extends DataObject
 	{
 		return array(
 				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_next_step_ID', 'msg' => T_('%d states of User in Automation') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_yes_next_step_ID', 'msg' => T_('Step is used as Next Step %d times') + T_('("YES" column)') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_no_next_step_ID', 'msg' => T_('Step is used as Next Step %d times') + T_('("NO" column)') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_error_next_step_ID', 'msg' => T_('Step is used as Next Step %d times') + T_('("ERROR" column)') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_yes_next_step_ID', 'and_condition' => 'step_yes_next_step_ID != step_ID', 'msg' => T_('Step is used as Next Step %d times').' '.T_('("YES" column)') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_no_next_step_ID', 'and_condition' => 'step_no_next_step_ID != step_ID', 'msg' => T_('Step is used as Next Step %d times').' '.T_('("NO" column)') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_error_next_step_ID', 'and_condition' => 'step_error_next_step_ID != step_ID', 'msg' => T_('Step is used as Next Step %d times').' '.T_('("ERROR" column)') ),
 			);
 	}
 
@@ -174,10 +174,10 @@ class AutomationStep extends DataObject
 		elseif( $step_order === NULL )
 		{	// Set order for new creating step automatically:
 			$max_order_SQL = new SQL( 'Get max step order for Automation #'.$this->get( 'autm_ID' ) );
-			$max_order_SQL->SELECT( 'MAX( step_order ) + 1' );
+			$max_order_SQL->SELECT( 'MAX( step_order )' );
 			$max_order_SQL->FROM( 'T_automation__step' );
 			$max_order_SQL->WHERE( 'step_autm_ID = '.$this->get( 'autm_ID' ) );
-			set_param( 'step_order', $DB->get_var( $max_order_SQL ) );
+			set_param( 'step_order', $DB->get_var( $max_order_SQL ) + 1 );
 		}
 		$this->set_from_Request( 'order' );
 		if( $this->get( 'order' ) > 0 )
@@ -466,7 +466,7 @@ class AutomationStep extends DataObject
 						{	// If user already received this email:
 							$step_result = 'NO';
 						}
-						elseif( $user_is_waiting_email && $step_EmailCampaign->send_email( $user_ID, '', '', 'auto' ) )
+						elseif( $user_is_waiting_email && $step_EmailCampaign->send_email( $user_ID, '', '', 'auto', $Automation->get( 'enlt_ID' ) ) )
 						{	// If email has been sent to user successfully now:
 							$step_result = 'YES';
 						}
