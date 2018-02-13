@@ -46,6 +46,7 @@ $Form->select_input_object( 'autm_enlt_ID', $edited_Automation->get( 'enlt_ID' )
 		'allow_none' => true,
 		'note'       => T_('Users will exit this automation when they unsubscribe from this list'),
 	) );
+
 $Form->username( 'autm_owner_login', $edited_Automation->get_owner_User(), T_('Owner'), '', '', array( 'required' => true ) );
 
 $Form->end_form( array(

@@ -787,6 +787,7 @@ class AutomationStep extends DataObject
 				'time'        => 'Current time',
 				'day'         => 'Current day of the week',
 				'month'       => 'Current month',
+				'listsend_last_sent_to_user' => 'Last sent list to user',
 			);
 		$log_values = array(
 				'day' => array(
@@ -855,7 +856,32 @@ class AutomationStep extends DataObject
 				}
 				// Log:
 				$process_log .= $log_rule_separator.( isset( $log_fields[ $rule->field ] ) ? $log_fields[ $rule->field ] : $rule->field );
-				if( is_array( $log_operators[ $rule->operator ] ) )
+				if( $rule->field == 'listsend_last_sent_to_user' )
+				{	// Special value for listsend_last fields:
+					$value = explode( ':', $rule->value );
+					$period = ( isset( $value[0] ) ? intval( $value[0] ) : '0' )
+						.( isset( $value[1] ) ? ' '.$value[1].'s' : '' );
+					$rule_newsletter_ID = isset( $value[2] ) ? intval( $value[2] ) : 0;
+					$newsletter = ' for ';
+					if( $rule_newsletter_ID )
+					{
+						$NewsletterCache = & get_NewsletterCache();
+						if( $rule_Newsletter = & $NewsletterCache->get_by_ID( $rule_newsletter_ID, false, false ) )
+						{
+							$newsletter .= 'List: "'.$rule_Newsletter->get( 'name' ).'"';
+						}
+						else
+						{
+							$newsletter .= 'List: Error: NOT FOUND IN DB!';
+						}
+					}
+					else
+					{
+						$newsletter .= 'any list tied to step automation';
+					}
+					$process_log .= ' '.$log_operators[ $rule->operator ].' "'.$period.$newsletter.'"';
+				}
+				elseif( is_array( $log_operators[ $rule->operator ] ) )
 				{	// Multiple operator and values:
 					foreach( $log_operators[ $rule->operator ] as $o => $operator )
 					{
@@ -943,6 +969,69 @@ class AutomationStep extends DataObject
 			case 'month':
 				// Check current month:
 				return $this->check_if_condition_rule_date_value( $rule, 'm' );
+
+			case 'listsend_last_sent_to_user':
+				// Check last sent list to user:
+				$value = explode( ':', $rule->value );
+				$period_value = ( isset( $value[0] ) ? intval( $value[0] ) : 0 );
+				if( $period_value > 0 )
+				{	// Check this condition only if period > 0 seconds:
+					global $DB, $servertimenow;
+
+					// Calculate a value depending on period:
+					$periods = array(
+						'second' => 1,        // 1 second
+						'minute' => 60,       // 60 seconds
+						'hour'   => 3600,     // 60 minutes
+						'day'    => 86400,    // 24 hours
+						'month'  => 2592000,  // 30 days
+						'year'   => 31536000, // 365 days
+					);
+					$period_name = ( isset( $value[1] ) ? $value[1] : false );
+					if( $period_name && isset( $periods[ $period_name ] ) )
+					{
+						$period_value *= $periods[ $period_name ];
+					}
+					$rule_value_time = $servertimenow - $period_value;
+
+					$NewsletterCache = & get_NewsletterCache();
+					if( $rule_Newsletter = & $NewsletterCache->get_by_ID( ( isset( $value[2] ) ? intval( $value[2] ) : 0 ), false, false ) )
+					{	// Check only on selected list:
+						$rule_newsletters = array( $rule_Newsletter->ID );
+					}
+					else
+					{	// Check any list tied to step automation:
+						$step_Automation = & $this->get_Automation();
+						$rule_newsletters = array( $step_Automation->get( 'enlt_ID' ) );
+					}
+
+					$SQL = new SQL( 'Get last sent date for IF Condition "Last sent list to user"' );
+					$SQL->SELECT( 'emlog_timestamp' );
+					$SQL->FROM( 'T_email__campaign_send' );
+					$SQL->FROM_add( 'INNER JOIN T_email__campaign ON csnd_camp_ID = ecmp_ID' );
+					$SQL->FROM_add( 'INNER JOIN T_email__log ON emlog_ID = csnd_emlog_ID' );
+					$SQL->WHERE( 'csnd_user_ID = '.$DB->quote( $step_User->ID ) );
+					$SQL->WHERE_and( 'ecmp_enlt_ID IN ( '.$DB->quote( $rule_newsletters ).' )' );
+					$SQL->ORDER_BY( 'emlog_timestamp' );
+					$SQL->LIMIT( 1 );
+					$last_sent_time = strtotime( $DB->get_var( $SQL ) );
+
+					switch( $rule->operator )
+					{
+						case 'less':
+							return $rule_value_time < $last_sent_time;
+						case 'less_or_equal':
+							return $rule_value_time <= $last_sent_time;
+						case 'greater':
+							return $rule_value_time > $last_sent_time;
+						case 'greater_or_equal':
+							return $rule_value_time >= $last_sent_time;
+					}
+				}
+				else
+				{	// No reason to check if period is 0 seconds:
+					return true;
+				}
 		}
 
 		// Unknown field or operator:

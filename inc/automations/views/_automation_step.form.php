@@ -100,7 +100,7 @@ $Form->begin_line( '<span id="step_result_label_yes">'.T_( step_get_result_label
 	$Form->duration_input( 'step_yes_next_step_delay', $edited_AutomationStep->get( 'yes_next_step_delay' ), T_('Delay'), 'days', 'minutes', array(
 			'none_value_label' => '0',
 			'allow_none_title' => false,
-		)  );
+		) );
 $Form->end_line();
 
 $Form->begin_line( '<span id="step_result_label_no">'.T_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'NO' ) ).'</span>', 'step_no_next' );
@@ -116,8 +116,23 @@ $Form->begin_line( '<span id="step_result_label_error">'.T_( step_get_result_lab
 	$Form->duration_input( 'step_error_next_step_delay', $edited_AutomationStep->get( 'error_next_step_delay' ), T_('Delay'), 'days', 'minutes', array(
 			'none_value_label' => '0',
 			'allow_none_title' => false,
-		)  );
+		) );
 $Form->end_line();
+
+// These form input vars are used to build elements for "IF Condition", see JS code below:
+$Form->switch_layout( 'none' );
+$Form->output = false;
+$form_duration_selector = $Form->duration_input( '$duration_selector$', '', '', 'days', 'minutes', array(
+		'none_value_label' => '0',
+		'allow_none_title' => false,
+	) );
+$NewsletterCache = & get_NewsletterCache();
+$NewsletterCache->none_option_text = T_('Any');
+$NewsletterCache->clear();
+$NewsletterCache->load_where( 'enlt_ID = '.$step_Automation->get( 'enlt_ID' ) );
+$form_newsletter_selector = $Form->select_input_object( '$newsletter_selector$', '', $NewsletterCache, '', array( 'allow_none' => true ) );
+$Form->output = true;
+$Form->switch_layout( NULL );
 
 $Form->end_form( array(
 		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' )
@@ -392,6 +407,40 @@ jQuery( document ).ready( function()
 				10: '<?php echo TS_('October'); ?>',
 				11: '<?php echo TS_('November'); ?>',
 				12: '<?php echo TS_('December'); ?>'
+			}
+		},
+		{
+			id: 'listsend_last_sent_to_user',
+			label: '<?php echo TS_('Last sent list to user' ); ?>',
+			operators: ['less', 'less_or_equal', 'greater', 'greater_or_equal'],
+			validation: {
+				allow_empty_value: true
+			},
+			input: function evo_query_builder_list_period_selector_input( rule, input_name )
+			{
+				input_name = input_name.replace( /_value_0$/, '' );
+
+				var form_duration_selector = '<?php echo format_to_js( $form_duration_selector ); ?>'
+					.replace( /\$duration_selector\$_value/g, input_name + '_value' )
+					.replace( /\$duration_selector\$_name/g, input_name + '_period' );
+
+				var form_newsletter_selector = '<?php echo TS_('List').': '.format_to_js( $form_newsletter_selector ); ?>'
+					.replace( /\$newsletter_selector\$/g, input_name + '_newsletter' )
+
+				return form_duration_selector + form_newsletter_selector;
+			},
+			valueGetter: function( rule )
+			{
+				return rule.$el.find('.rule-value-container [name$=_value]').val()
+					+ ':' + rule.$el.find('.rule-value-container [name$=_period]').val()
+					+ ':' + rule.$el.find('.rule-value-container [name$=_newsletter]').val();
+			},
+			valueSetter: function( rule, value )
+			{
+				var val = value.split( ':' );
+				rule.$el.find( '.rule-value-container [name$=_value]' ).val( val[0] ).trigger( 'change' );
+				rule.$el.find( '.rule-value-container [name$=_period]' ).val( val[1] ).trigger( 'change' );
+				rule.$el.find( '.rule-value-container [name$=_newsletter]' ).val( val[2] ).trigger( 'change' );
 			}
 		}
 		],
