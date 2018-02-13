@@ -1249,7 +1249,7 @@ class collections_Module extends Module
 				}
 				else
 				{	// Subscribe to newsletter:
-					if( $current_User->subscribe( $Newsletter->ID ) )
+					if( $current_User->is_subscribed( $Newsletter->ID ) || $current_User->subscribe( $Newsletter->ID ) )
 					{
 						if( ! empty( $insert_user_tags ) )
 						{

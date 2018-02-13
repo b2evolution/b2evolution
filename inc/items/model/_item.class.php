@@ -2683,6 +2683,7 @@ class Item extends ItemLight
 						if( ! empty( $user_tags ) )
 						{
 							$params['usertags'] = $user_tags;
+							$params['unsubscribed_if_not_tagged'] = true;
 						}
 
 						if( ! empty( $button_notloggedin ) && ! is_logged_in() )
