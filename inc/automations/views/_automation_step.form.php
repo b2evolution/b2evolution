@@ -302,6 +302,9 @@ jQuery( document ).ready( function()
 	step_type_update_info( jQuery( '#step_type' ).val() );
 
 	// Initialize Query Builder for the field "IF Condition":
+	var operators_equal = ['equal', 'not_equal'];
+	var operators_default = ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'];
+	var operators_listsend = ['less', 'less_or_equal', 'greater', 'greater_or_equal'];
 	jQuery( '#step_if_condition' ).queryBuilder(
 	{
 		plugins: ['bt-tooltip-errors'],
@@ -328,13 +331,13 @@ jQuery( document ).ready( function()
 			id: 'user_tag',
 			label: '<?php echo TS_('User tag' ); ?>',
 			type: 'string',
-			operators: ['equal', 'not_equal'],
+			operators: operators_equal,
 		},
 		{
 			id: 'user_status',
 			label: '<?php echo TS_('User Account status' ); ?>',
 			type: 'string',
-			operators: ['equal', 'not_equal'],
+			operators: operators_equal,
 			input: 'select',
 			values: {
 			<?php
@@ -350,7 +353,7 @@ jQuery( document ).ready( function()
 			id: 'date',
 			label: '<?php echo TS_('Current date' ); ?>',
 			type: 'date',
-			operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
+			operators: operators_default,
 			plugin: 'datepicker',
 			plugin_config: {
 				dateFormat: '<?php echo jquery_datepicker_datefmt(); ?>',
@@ -366,7 +369,7 @@ jQuery( document ).ready( function()
 			id: 'time',
 			label: '<?php echo TS_('Current time' ); ?>',
 			type: 'time',
-			operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
+			operators: operators_default,
 			placeholder: '23:59',
 			validation: {
 				format: 'HH:mm'
@@ -376,7 +379,7 @@ jQuery( document ).ready( function()
 			id: 'day',
 			label: '<?php echo TS_('Current day of the week' ); ?>',
 			type: 'integer',
-			operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
+			operators: operators_default,
 			input: 'select',
 			values: {
 				1: '<?php echo TS_('Monday'); ?>',
@@ -392,7 +395,7 @@ jQuery( document ).ready( function()
 			id: 'month',
 			label: '<?php echo TS_('Current month' ); ?>',
 			type: 'integer',
-			operators: ['equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between'],
+			operators: operators_default,
 			input: 'select',
 			values: {
 				1: '<?php echo TS_('January'); ?>',
@@ -412,42 +415,68 @@ jQuery( document ).ready( function()
 		{
 			id: 'listsend_last_sent_to_user',
 			label: '<?php echo TS_('Last sent list to user' ); ?>',
-			operators: ['less', 'less_or_equal', 'greater', 'greater_or_equal'],
+			operators: operators_listsend,
 			validation: {
 				allow_empty_value: true
 			},
-			input: function evo_query_builder_list_period_selector_input( rule, input_name )
-			{
-				input_name = input_name.replace( /_value_0$/, '' );
-
-				var form_duration_selector = '<?php echo format_to_js( $form_duration_selector ); ?>'
-					.replace( /\$duration_selector\$_value/g, input_name + '_value' )
-					.replace( /\$duration_selector\$_name/g, input_name + '_period' );
-
-				var form_newsletter_selector = '<?php echo TS_('List').': '.format_to_js( $form_newsletter_selector ); ?>'
-					.replace( /\$newsletter_selector\$/g, input_name + '_newsletter' )
-
-				return form_duration_selector + form_newsletter_selector;
+			input: evo_query_builder_listsend_selectors,
+			valueGetter: evo_query_builder_listsend_value_getter,
+			valueSetter: evo_query_builder_listsend_value_setter
+		},
+		{
+			id: 'listsend_last_opened_by_user',
+			label: '<?php echo TS_('Last opened list by user' ); ?>',
+			operators: operators_listsend,
+			validation: {
+				allow_empty_value: true
 			},
-			valueGetter: function( rule )
-			{
-				return rule.$el.find('.rule-value-container [name$=_value]').val()
-					+ ':' + rule.$el.find('.rule-value-container [name$=_period]').val()
-					+ ':' + rule.$el.find('.rule-value-container [name$=_newsletter]').val();
+			input: evo_query_builder_listsend_selectors,
+			valueGetter: evo_query_builder_listsend_value_getter,
+			valueSetter: evo_query_builder_listsend_value_setter
+		},
+		{
+			id: 'listsend_last_clicked_by_user',
+			label: '<?php echo TS_('Last clicked list by user' ); ?>',
+			operators: operators_listsend,
+			validation: {
+				allow_empty_value: true
 			},
-			valueSetter: function( rule, value )
-			{
-				var val = value.split( ':' );
-				rule.$el.find( '.rule-value-container [name$=_value]' ).val( val[0] ).trigger( 'change' );
-				rule.$el.find( '.rule-value-container [name$=_period]' ).val( val[1] ).trigger( 'change' );
-				rule.$el.find( '.rule-value-container [name$=_newsletter]' ).val( val[2] ).trigger( 'change' );
-			}
+			input: evo_query_builder_listsend_selectors,
+			valueGetter: evo_query_builder_listsend_value_getter,
+			valueSetter: evo_query_builder_listsend_value_setter
 		}
 		],
 		// Prefill the field "IF Condition" with stored data from DB:
 		rules: <?php echo $edited_AutomationStep->get( 'if_condition_js_object' ); ?>
 	} );
 } );
+
+function evo_query_builder_listsend_selectors( rule, input_name )
+{
+	input_name = input_name.replace( /_value_0$/, '' );
+
+	var form_duration_selector = '<?php echo format_to_js( $form_duration_selector ); ?>'
+		.replace( /\$duration_selector\$_value/g, input_name + '_value' )
+		.replace( /\$duration_selector\$_name/g, input_name + '_period' );
+
+	var form_newsletter_selector = '<?php echo TS_('List').': '.format_to_js( $form_newsletter_selector ); ?>'
+		.replace( /\$newsletter_selector\$/g, input_name + '_newsletter' )
+
+	return form_duration_selector + form_newsletter_selector;
+}
+function evo_query_builder_listsend_value_getter( rule )
+{
+	return rule.$el.find('.rule-value-container [name$=_value]').val()
+		+ ':' + rule.$el.find('.rule-value-container [name$=_period]').val()
+		+ ':' + rule.$el.find('.rule-value-container [name$=_newsletter]').val();
+}
+function evo_query_builder_listsend_value_setter( rule, value )
+{
+	var val = value.split( ':' );
+	rule.$el.find( '.rule-value-container [name$=_value]' ).val( val[0] ).trigger( 'change' );
+	rule.$el.find( '.rule-value-container [name$=_period]' ).val( val[1] ).trigger( 'change' );
+	rule.$el.find( '.rule-value-container [name$=_newsletter]' ).val( val[2] ).trigger( 'change' );
+}
 
 // Prepare form before submitting:
 jQuery( 'form' ).on( 'submit', function()

@@ -787,7 +787,9 @@ class AutomationStep extends DataObject
 				'time'        => 'Current time',
 				'day'         => 'Current day of the week',
 				'month'       => 'Current month',
-				'listsend_last_sent_to_user' => 'Last sent list to user',
+				'listsend_last_sent_to_user'    => 'Last sent list to user',
+				'listsend_last_opened_by_user'  => 'Last opened list by user',
+				'listsend_last_clicked_by_user' => 'Last clicked list by user',
 			);
 		$log_values = array(
 				'day' => array(
@@ -856,27 +858,27 @@ class AutomationStep extends DataObject
 				}
 				// Log:
 				$process_log .= $log_rule_separator.( isset( $log_fields[ $rule->field ] ) ? $log_fields[ $rule->field ] : $rule->field );
-				if( $rule->field == 'listsend_last_sent_to_user' )
-				{	// Special value for listsend_last fields:
+				if( in_array( $rule->field, array( 'listsend_last_sent_to_user', 'listsend_last_opened_by_user', 'listsend_last_clicked_by_user' ) ) )
+				{	// Special value for list send fields:
 					$value = explode( ':', $rule->value );
 					$period = ( isset( $value[0] ) ? intval( $value[0] ) : '0' )
-						.( isset( $value[1] ) ? ' '.$value[1].'s' : '' );
+						.( isset( $value[1] ) ? ' '.$value[1].'s' : '' ).' ago';
 					$rule_newsletter_ID = isset( $value[2] ) ? intval( $value[2] ) : 0;
 					$newsletter = ' for ';
 					if( $rule_newsletter_ID )
-					{
+					{	// Specific newsletter is selected:
 						$NewsletterCache = & get_NewsletterCache();
 						if( $rule_Newsletter = & $NewsletterCache->get_by_ID( $rule_newsletter_ID, false, false ) )
-						{
-							$newsletter .= 'List: "'.$rule_Newsletter->get( 'name' ).'"';
+						{	// Display a name of the selected newsletter:
+							$newsletter .= 'List: '.$rule_Newsletter->get( 'name' ).'';
 						}
 						else
-						{
+						{	// If newsletter was deleted from DB:
 							$newsletter .= 'List: Error: NOT FOUND IN DB!';
 						}
 					}
 					else
-					{
+					{	// Any newsletter should be used for this condition rule:
 						$newsletter .= 'any list tied to step automation';
 					}
 					$process_log .= ' '.$log_operators[ $rule->operator ].' "'.$period.$newsletter.'"';
@@ -972,66 +974,15 @@ class AutomationStep extends DataObject
 
 			case 'listsend_last_sent_to_user':
 				// Check last sent list to user:
-				$value = explode( ':', $rule->value );
-				$period_value = ( isset( $value[0] ) ? intval( $value[0] ) : 0 );
-				if( $period_value > 0 )
-				{	// Check this condition only if period > 0 seconds:
-					global $DB, $servertimenow;
+				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'emlog_timestamp' );
 
-					// Calculate a value depending on period:
-					$periods = array(
-						'second' => 1,        // 1 second
-						'minute' => 60,       // 60 seconds
-						'hour'   => 3600,     // 60 minutes
-						'day'    => 86400,    // 24 hours
-						'month'  => 2592000,  // 30 days
-						'year'   => 31536000, // 365 days
-					);
-					$period_name = ( isset( $value[1] ) ? $value[1] : false );
-					if( $period_name && isset( $periods[ $period_name ] ) )
-					{
-						$period_value *= $periods[ $period_name ];
-					}
-					$rule_value_time = $servertimenow - $period_value;
+			case 'listsend_last_opened_by_user':
+				// Check last opened list by user:
+				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'emlog_last_open_ts' );
 
-					$NewsletterCache = & get_NewsletterCache();
-					if( $rule_Newsletter = & $NewsletterCache->get_by_ID( ( isset( $value[2] ) ? intval( $value[2] ) : 0 ), false, false ) )
-					{	// Check only on selected list:
-						$rule_newsletters = array( $rule_Newsletter->ID );
-					}
-					else
-					{	// Check any list tied to step automation:
-						$step_Automation = & $this->get_Automation();
-						$rule_newsletters = array( $step_Automation->get( 'enlt_ID' ) );
-					}
-
-					$SQL = new SQL( 'Get last sent date for IF Condition "Last sent list to user"' );
-					$SQL->SELECT( 'emlog_timestamp' );
-					$SQL->FROM( 'T_email__campaign_send' );
-					$SQL->FROM_add( 'INNER JOIN T_email__campaign ON csnd_camp_ID = ecmp_ID' );
-					$SQL->FROM_add( 'INNER JOIN T_email__log ON emlog_ID = csnd_emlog_ID' );
-					$SQL->WHERE( 'csnd_user_ID = '.$DB->quote( $step_User->ID ) );
-					$SQL->WHERE_and( 'ecmp_enlt_ID IN ( '.$DB->quote( $rule_newsletters ).' )' );
-					$SQL->ORDER_BY( 'emlog_timestamp' );
-					$SQL->LIMIT( 1 );
-					$last_sent_time = strtotime( $DB->get_var( $SQL ) );
-
-					switch( $rule->operator )
-					{
-						case 'less':
-							return $rule_value_time < $last_sent_time;
-						case 'less_or_equal':
-							return $rule_value_time <= $last_sent_time;
-						case 'greater':
-							return $rule_value_time > $last_sent_time;
-						case 'greater_or_equal':
-							return $rule_value_time >= $last_sent_time;
-					}
-				}
-				else
-				{	// No reason to check if period is 0 seconds:
-					return true;
-				}
+			case 'listsend_last_clicked_by_user':
+				// Check last clicked list by user:
+				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'emlog_last_click_ts' );
 		}
 
 		// Unknown field or operator:
@@ -1077,6 +1028,80 @@ class AutomationStep extends DataObject
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Check rule of "IF Condition" for list send value
+	 *
+	 * @param object Rule, object with properties: field, value, operator
+	 * @param integer Step User ID
+	 * @param string DB field name for checking: 'emlog_timestamp', 'emlog_last_open_ts', 'emlog_last_click_ts'
+	 * @return boolean TRUE if condition is matched for current date, otherwise FALSE
+	 */
+	function check_if_condition_rule_listsend_value( $rule, $step_user_ID, $check_db_field_name )
+	{
+		$value = explode( ':', $rule->value );
+		$period_value = ( isset( $value[0] ) ? intval( $value[0] ) : 0 );
+
+		if( $period_value > 0 )
+		{	// Check this condition only if period > 0 seconds:
+			global $DB, $servertimenow;
+
+			// Calculate a time ago depending on period:
+			$periods = array(
+				'second' => 1,        // 1 second
+				'minute' => 60,       // 60 seconds
+				'hour'   => 3600,     // 60 minutes
+				'day'    => 86400,    // 24 hours
+				'month'  => 2592000,  // 30 days
+				'year'   => 31536000, // 365 days
+			);
+			$period_name = ( isset( $value[1] ) ? $value[1] : false );
+			if( $period_name && isset( $periods[ $period_name ] ) )
+			{
+				$period_value *= $periods[ $period_name ];
+			}
+			$rule_value_time = $servertimenow - $period_value;
+
+			$NewsletterCache = & get_NewsletterCache();
+			if( $rule_Newsletter = & $NewsletterCache->get_by_ID( ( isset( $value[2] ) ? intval( $value[2] ) : 0 ), false, false ) )
+			{	// Check only on selected list:
+				$rule_newsletters = array( $rule_Newsletter->ID );
+			}
+			else
+			{	// Check any list tied to step automation:
+				$step_Automation = & $this->get_Automation();
+				$rule_newsletters = array( $step_Automation->get( 'enlt_ID' ) );
+			}
+
+			$SQL = new SQL( 'Get last time for IF Condition "Last sent/opened/clicked list" ('.$check_db_field_name.')' );
+			$SQL->SELECT( $check_db_field_name );
+			$SQL->FROM( 'T_email__campaign_send' );
+			$SQL->FROM_add( 'INNER JOIN T_email__campaign ON csnd_camp_ID = ecmp_ID' );
+			$SQL->FROM_add( 'INNER JOIN T_email__log ON emlog_ID = csnd_emlog_ID' );
+			$SQL->WHERE( 'csnd_user_ID = '.$DB->quote( $step_user_ID ) );
+			$SQL->WHERE_and( 'ecmp_enlt_ID IN ( '.$DB->quote( $rule_newsletters ).' )' );
+			$SQL->ORDER_BY( $check_db_field_name );
+			$SQL->LIMIT( 1 );
+			$last_time = strtotime( $DB->get_var( $SQL ) );
+
+			switch( $rule->operator )
+			{
+				case 'less':
+					return $rule_value_time < $last_time;
+				case 'less_or_equal':
+					return $rule_value_time <= $last_time;
+				case 'greater':
+					return $rule_value_time > $last_time;
+				case 'greater_or_equal':
+					return $rule_value_time >= $last_time;
+			}
+		}
+		else
+		{	// No reason to check if period is 0 seconds:
+			return true;
+		}
 	}
 
 
