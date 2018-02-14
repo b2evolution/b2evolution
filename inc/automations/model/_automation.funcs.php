@@ -137,13 +137,14 @@ function autm_td_status( $autm_ID, $autm_status, $url_params = '' )
 function step_get_type_titles()
 {
 	return array(
-		'if_condition'   => T_('IF Condition'),
-		'send_campaign'  => T_('Send Campaign'),
-		'notify_owner'   => T_('Notify owner'),
-		'add_usertag'    => T_('Add Usertag'),
-		'remove_usertag' => T_('Remove Usertag'),
-		'subscribe'      => T_('Subscribe User to List'),
-		'unsubscribe'    => T_('Unsubscribe User from List'),
+		'if_condition'     => T_('IF Condition'),
+		'send_campaign'    => T_('Send Campaign'),
+		'notify_owner'     => T_('Notify owner'),
+		'add_usertag'      => T_('Add Usertag'),
+		'remove_usertag'   => T_('Remove Usertag'),
+		'subscribe'        => T_('Subscribe User to List'),
+		'unsubscribe'      => T_('Unsubscribe User from List'),
+		'start_automation' => T_('Start new automation'),
 	);
 }
 
@@ -205,6 +206,11 @@ function step_get_result_titles()
 			'NO'    => 'User was already unsubscribed from: %s',
 			'ERROR' => 'List does not exist',
 		),
+		'start_automation' => array(
+			'YES'   => 'User started new automation %s successfully',
+			'NO'    => 'Users was already in the other automation %s',
+			'ERROR' => 'Automation does not exist',
+		),
 	);
 }
 
@@ -251,6 +257,11 @@ function step_get_result_labels()
 			'YES'   => NT_('Next step if User was unsubscribed'),
 			'NO'    => NT_('Next step if User was already unsubscribed'),
 			'ERROR' => NT_('Next step if List does not exist'),
+		),
+		'start_automation' => array(
+			'YES'   => NT_('Next step if User started new automation successfully'),
+			'NO'    => NT_('Next step if Users was already in the other automation'),
+			'ERROR' => NT_('Next step if Automation does not exist'),
 		),
 	);
 }

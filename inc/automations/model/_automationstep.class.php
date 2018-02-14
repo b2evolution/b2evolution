@@ -242,7 +242,15 @@ class AutomationStep extends DataObject
 			case 'unsubscribe':
 				// Subscribe/Unsubscribe:
 				param( 'step_newsletter', 'integer', true );
+				param_check_not_empty( 'step_newsletter', T_('Please select a list.') );
 				$this->set( 'info', get_param( 'step_newsletter' ) );
+				break;
+
+			case 'start_automation':
+				// Start new automation:
+				param( 'step_automation', 'integer', true );
+				param_check_not_empty( 'step_automation', T_('Please select an automation.') );
+				$this->set( 'info', get_param( 'step_automation' ) );
 				break;
 
 			default:
@@ -599,6 +607,27 @@ class AutomationStep extends DataObject
 					{	// If List/Newsletter does not exist:
 						$step_result = 'ERROR';
 						$additional_result_message = 'List #'.$this->get( 'info' ).' is not found in DB.';
+					}
+					break;
+
+				case 'start_automation':
+					// Start new Automation:
+					$AutomationCache = & get_AutomationCache();
+					if( $new_Automation = & $AutomationCache->get_by_ID( $this->get( 'info' ), false, false ) )
+					{	// If Automation exists:
+						$added_users_num = $new_Automation->add_users( array( $step_User->ID ), array(
+								'users_no_subs'   => 'add',    // Add anyway users who are not subscribed to Newsletter of the Automation
+								'users_automated' => 'ignore', // Ignore users who are already in the Automation
+								'users_new'       => 'add',    // Add new users
+							) );
+						$step_result = ( $added_users_num ? 'YES' : 'NO' );
+						// Display newsletter name in log:
+						$additional_result_message = $new_Automation->get( 'name' );
+					}
+					else
+					{	// If List/Newsletter does not exist:
+						$step_result = 'ERROR';
+						$additional_result_message = 'Automation #'.$this->get( 'info' ).' is not found in DB.';
 					}
 					break;
 
@@ -1237,6 +1266,14 @@ class AutomationStep extends DataObject
 				if( $Newsletter = & $NewsletterCache->get_by_ID( $this->get( 'info' ), false, false ) )
 				{	// Use name of Newsletter/List:
 					$label = $Newsletter->get( 'name' );
+				}
+				break;
+
+			case 'start_automation':
+				$AutomationCache = & get_AutomationCache();
+				if( $Automation = & $AutomationCache->get_by_ID( $this->get( 'info' ), false, false ) )
+				{	// Use name of Automation:
+					$label = $Automation->get( 'name' );
 				}
 				break;
 

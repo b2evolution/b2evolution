@@ -78,6 +78,12 @@ $newsletter_ID = ( in_array( $edited_AutomationStep->get( 'type' ), array( 'subs
 $NewsletterCache->load_where( 'enlt_active = 1 OR enlt_ID = '.$newsletter_ID );
 $Form->select_input_object( 'step_newsletter', $newsletter_ID, $NewsletterCache, T_('List'), array( 'required' => true, 'allow_none' => true ) );
 
+// Automation:
+$AutomationCache = & get_AutomationCache();
+$AutomationCache->load_all();
+$automation_ID = ( $edited_AutomationStep->get( 'type' ) == 'start_automation' ? intval( $edited_AutomationStep->get( 'info' ) ) : 0 );
+$Form->select_input_object( 'step_automation', $automation_ID, $AutomationCache, T_('Automation'), array( 'required' => true, 'allow_none' => true ) );
+
 // Load all steps of the edited step's automation excluding current step:
 $AutomationStepCache = & get_AutomationStepCache();
 $AutomationStepCache->clear();
@@ -203,7 +209,7 @@ jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID
  */ 
 function step_type_update_info( step_type )
 {
-	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition, #ffield_step_notification_message, #ffield_step_usertag, #ffield_step_newsletter' ).hide();
+	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition, #ffield_step_notification_message, #ffield_step_usertag, #ffield_step_newsletter, #ffield_step_automation' ).hide();
 	jQuery( '#ffield_step_no_next' ).show();
 	jQuery( '#ffield_step_error_next' ).show();
 
@@ -263,6 +269,21 @@ function step_type_update_info( step_type )
 			jQuery( '#step_result_label_yes' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'YES' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'YES' ) ); ?>' );
 			jQuery( '#step_result_label_no' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'NO' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'NO' ) ); ?>' );
 			jQuery( '#step_result_label_error' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'ERROR' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'ERROR' ) ); ?>' );
+			if( set_default_next_step_data )
+			{	// Suggest default values:
+				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID' ).val( '' );
+				jQuery( '#step_yes_next_step_delay_value, #step_no_next_step_delay_value' ).val( '0' );
+				jQuery( '#step_yes_next_step_delay_name, #step_no_next_step_delay_name' ).val( 'second' );
+				jQuery( '#step_error_next_step_ID' ).val( 'loop' );
+				jQuery( '#step_error_next_step_delay_value' ).val( '7' );
+				jQuery( '#step_error_next_step_delay_name' ).val( 'day' );
+			}
+			break;
+
+		case 'start_automation':
+			jQuery( '#ffield_step_automation' ).show();
+			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'start_automation', 'YES' ) ); ?>' );
+			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'start_automation', 'NO' ) ); ?>' );
 			if( set_default_next_step_data )
 			{	// Suggest default values:
 				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID' ).val( '' );

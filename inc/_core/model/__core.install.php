@@ -578,7 +578,7 @@ $schema_queries = array(
 			step_autm_ID               INT UNSIGNED NOT NULL,
 			step_order                 INT NOT NULL DEFAULT 1,
 			step_label                 VARCHAR(500) NULL,
-			step_type                  ENUM('if_condition', 'send_campaign', 'notify_owner', 'add_usertag', 'remove_usertag', 'subscribe', 'unsubscribe') COLLATE ascii_general_ci NOT NULL DEFAULT 'if_condition',
+			step_type                  ENUM('if_condition', 'send_campaign', 'notify_owner', 'add_usertag', 'remove_usertag', 'subscribe', 'unsubscribe', 'start_automation') COLLATE ascii_general_ci NOT NULL DEFAULT 'if_condition',
 			step_info                  TEXT NULL,
 			step_yes_next_step_ID      INT NULL,
 			step_yes_next_step_delay   INT UNSIGNED NULL,
