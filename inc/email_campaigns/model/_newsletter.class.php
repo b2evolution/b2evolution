@@ -63,7 +63,7 @@ class Newsletter extends DataObject
 	{
 		return array(
 				array( 'table' => 'T_email__campaign', 'fk' => 'ecmp_enlt_ID', 'msg' => T_('%d campaigns are linked to this list') ),
-				array( 'table' => 'T_automation__automation', 'fk' => 'autm_enlt_ID', 'msg' => T_('%d automations use this list') ),
+				array( 'table' => 'T_automation__newsletter', 'fk' => 'aunl_enlt_ID', 'msg' => T_('%d automations use this list') ),
 			);
 	}
 

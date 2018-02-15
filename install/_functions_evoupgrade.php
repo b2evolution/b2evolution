@@ -9003,6 +9003,25 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12570, 'Creating automation newsletter table...' ) )
+	{	// part of 6.10.0-beta
+		db_create_table( 'T_automation__newsletter', '
+			aunl_autm_ID   INT UNSIGNED NOT NULL,
+			aunl_enlt_ID   INT UNSIGNED NOT NULL,
+			aunl_autostart TINYINT(1) UNSIGNED DEFAULT 1,
+			aunl_autoexit  TINYINT(1) UNSIGNED DEFAULT 1,
+			PRIMARY KEY    (aunl_autm_ID, aunl_enlt_ID)' );
+		// Copy single tied newsletter links from automations table to new created table:
+		$DB->query( 'INSERT INTO T_automation__newsletter
+			( aunl_autm_ID, aunl_enlt_ID, aunl_autostart )
+			SELECT autm_ID, autm_enlt_ID, autm_autostart
+			  FROM T_automation__automation' );
+		// Remove old columns:
+		db_drop_col( 'T_automation__automation', 'autm_enlt_ID' );
+		db_drop_col( 'T_automation__automation', 'autm_autostart' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

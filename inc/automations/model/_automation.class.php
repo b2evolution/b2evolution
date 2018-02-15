@@ -27,11 +27,9 @@ class Automation extends DataObject
 {
 	var $name;
 	var $status;
-	var $enlt_ID;
 	var $owner_user_ID;
-	var $autostart = 1;
 
-	var $Newsletter = NULL;
+	var $newsletters = NULL;
 	var $owner_User = NULL;
 
 	/**
@@ -57,9 +55,7 @@ class Automation extends DataObject
 			$this->ID = $db_row->autm_ID;
 			$this->name = $db_row->autm_name;
 			$this->status = $db_row->autm_status;
-			$this->enlt_ID = $db_row->autm_enlt_ID;
 			$this->owner_user_ID = $db_row->autm_owner_user_ID;
-			$this->autostart = $db_row->autm_autostart;
 		}
 	}
 
@@ -74,7 +70,91 @@ class Automation extends DataObject
 		return array(
 				array( 'table' => 'T_automation__step', 'fk' => 'step_autm_ID', 'msg' => T_('%d steps') ),
 				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_autm_ID', 'msg' => T_('%d states of User in Automation') ),
+				array( 'table' => 'T_automation__newsletter', 'fk' => 'aunl_autm_ID', 'msg' => T_('%d Lists tied with Automation') ),
 			);
+	}
+
+
+	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		if( $r = parent::dbinsert() )
+		{
+			// Update newsletters links with this Automation:
+			$this->update_newsletters();
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true on success
+	 */
+	function dbupdate()
+	{
+		$r = parent::dbupdate();
+
+		// NOTE: Don't a result of dbupdate() to update newsletters links,
+		// because it can be false if ONLY newsletters links have been changed to the edit submitted form:
+		// Update newsletters links with this Automation:
+		$this->update_newsletters();
+
+		return $r;
+	}
+
+
+	/**
+	 * Update newsletters links with Automation
+	 *
+	 * @return integer|boolean A count of new inserted links between automation and newsletters, FALSE - on wrong insert data
+	 */
+	function update_newsletters()
+	{
+		if( empty( $this->update_newsletters ) )
+		{	// This action is not requested:
+			return false;
+		}
+
+		if( empty( $this->newsletters ) )
+		{	// At least one newsletter must be defined:
+			return false;
+		}
+
+		$sql_newsletters_values = array();
+		foreach( $this->newsletters as $newsletter )
+		{
+			$newsletter_ID = intval( $newsletter['ID'] );
+			if( empty( $newsletter_ID ) )
+			{	// Skip wrong newsletter data:
+				continue;
+			}
+			// Build array with newsletter ID as key to avoid duplicate entry mysql error:
+			$sql_newsletters_values[ $newsletter_ID ] = '( '.$this->ID.', '.$newsletter_ID.', '.intval( $newsletter['autostart'] ).', '.intval( $newsletter['autoexit'] ).' )';
+		}
+
+		if( empty( $sql_newsletters_values ) )
+		{	// At least one newsletter must be inserted:
+			return false;
+		}
+
+		global $DB;
+
+		// Delete previous newsletter links:
+		$DB->query( 'DELETE FROM T_automation__newsletter
+			WHERE aunl_autm_ID = '.$this->ID );
+
+		// Insert new newsletter links for this automation:
+		$r = $DB->query( 'INSERT INTO T_automation__newsletter ( aunl_autm_ID, aunl_enlt_ID, aunl_autostart, aunl_autoexit ) 
+			VALUES '.implode( ', ', $sql_newsletters_values ) );
+
+		return $r;
 	}
 
 
@@ -93,10 +173,40 @@ class Automation extends DataObject
 		param_string_not_empty( 'autm_status', 'Please select an automation status.' );
 		$this->set_from_Request( 'status' );
 
-		// Tied to List:
-		param( 'autm_enlt_ID', 'integer', NULL );
-		param_check_number( 'autm_enlt_ID', T_('Please select an automation list.'), true );
-		$this->set_from_Request( 'enlt_ID' );
+		// Tied to Lists:
+		$prev_newsletters = $this->get_newsletters();
+		$updated_newsletters = array();
+		$aunl_enlt_IDs = param( 'aunl_enlt_ID', 'array:integer', array() );
+		foreach( $aunl_enlt_IDs as $n => $aunl_enlt_ID )
+		{
+			if( $aunl_enlt_ID > 0 )
+			{
+				$updated_newsletters[ $aunl_enlt_ID ] = array(
+						'ID'        => (string)$aunl_enlt_ID,
+						'autostart' => (string)param( 'aunl_autostart_'.$n, 'integer', 0 ),
+						'autoexit'  => (string)param( 'aunl_autoexit_'.$n, 'integer', 0 ),
+					);
+			}
+		}
+		if( empty( $updated_newsletters ) )
+		{	// Display an error and fill first required tied list:
+			param_error( 'aunl_enlt_ID[]', T_('Please select an automation list.') );
+			$this->newsletters = array( array(
+					'ID'        => '0',
+					'autostart' => param( 'aunl_autostart_0', 'integer', 0 ),
+					'autoexit'  => param( 'aunl_autoexit_0', 'integer', 0 ),
+				) );
+		}
+		else
+		{	// Update newsletters array with new entered values:
+			ksort( $updated_newsletters ); // sort in order to compare with array generated from DB
+			$updated_newsletters = array_values( $updated_newsletters );
+			if( $prev_newsletters !== $updated_newsletters )
+			{	// Set flag to update newsletters:
+				$this->update_newsletters = true;
+				$this->newsletters = $updated_newsletters;
+			}
+		}
 
 		// Owner:
 		$autm_owner_login = param( 'autm_owner_login', 'string', NULL );
@@ -111,10 +221,6 @@ class Automation extends DataObject
 			$this->set( 'owner_user_ID', $owner_User->ID );
 			$this->owner_User = & $owner_User;
 		}
-
-		// Auto start:
-		param( 'autm_autostart', 'integer', 0 );
-		$this->set_from_Request( 'autostart' );
 
 		return ! param_errors_detected();
 	}
@@ -176,17 +282,72 @@ class Automation extends DataObject
 	/**
 	 * Get Newsletter
 	 *
-	 * @return object|NULL|boolean Reference on cached owner User object, NULL - if request with empty ID, FALSE - if requested owner User does not exist
+	 * @param integer Number of newsletter
+	 * @return object|NULL|boolean Reference on cached Newsletter object, NULL - if request with empty ID, FALSE - if requested Newsletter does not exist
 	 */
-	function & get_Newsletter()
+	function & get_Newsletter( $number = 1 )
 	{
-		if( $this->Newsletter === NULL )
-		{	// Load Newsletter into cache var:
-			$NewsletterCache = & get_NewsletterCache();
-			$this->Newsletter = & $NewsletterCache->get_by_ID( $this->get( 'enlt_ID' ), false, false );
+		$newsletters = $this->get_newsletters();
+
+		if( ! isset( $newsletters[ $number ] ) || ! isset( $newsletters[ $number ]['ID'] ) )
+		{	// No detected newsletter by number:
+			$r = false;
+			return $r;
 		}
 
-		return $this->Newsletter;
+		// Get Newsletter from DB or cache:
+		$NewsletterCache = & get_NewsletterCache();
+		$Newsletter = & $NewsletterCache->get_by_ID( $newsletters[ $number ]['ID'], false, false );
+
+		return $Newsletter;
+	}
+
+
+	/**
+	 * Get settings of all newsletters for this Automation
+	 *
+	 * @return array Newsletters array of array with keys: 'ID', 'autostart', 'autoexit'
+	 */
+	function get_newsletters()
+	{
+		if( $this->newsletters === NULL )
+		{	// Load newsletters settings once:
+			if( empty( $this->ID ) )
+			{	// Set default first newsletter setting:
+				$this->newsletters = array( array( 'ID' => '', 'autostart' => 1, 'autoexit' => 1 ) );
+			}
+			else
+			{	// Get newsletters settings from DB:
+				global $DB;
+				$SQL = new SQL( 'Load newsletters settings for Automation #'.$this->ID );
+				$SQL->SELECT( 'aunl_enlt_ID AS ID, aunl_autostart AS autostart, aunl_autoexit AS autoexit' );
+				$SQL->FROM( 'T_automation__newsletter' );
+				$SQL->WHERE( 'aunl_autm_ID = '.$this->ID );
+				$SQL->ORDER_BY( 'aunl_enlt_ID' );
+				$this->newsletters = $DB->get_results( $SQL, ARRAY_A );
+			}
+		}
+
+		return $this->newsletters;
+	}
+
+
+	/**
+	 * Get IDs of all newsletters of this Automation
+	 *
+	 * @return array Newsletters IDs
+	 */
+	function get_newsletter_IDs()
+	{
+		$newsletters = $this->get_newsletters();
+
+		$newsletter_IDs = array();
+		foreach( $newsletters as $newsletter )
+		{
+			$newsletter_IDs[] = $newsletter['ID'];
+		}
+
+		return $newsletter_IDs;
 	}
 
 
@@ -221,10 +382,15 @@ class Automation extends DataObject
 
 		if( $params['users_no_subs'] == 'ignore' )
 		{	// Ignore not subscribed users to this Automation:
+
+			// TODO: Temp solution to use only first Newsletter for unsubscribe link in email footer:
+			$newsletter_IDs = $this->get_newsletter_IDs();
+			$first_newsletter_ID = isset( $newsletter_IDs[0] ) ? $newsletter_IDs[0] : 0;
+
 			$no_subs_SQL = new SQL( 'Get not subscribed users of the Automation #'.$this->ID );
 			$no_subs_SQL->SELECT( 'user_ID' );
 			$no_subs_SQL->FROM( 'T_users' );
-			$no_subs_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$this->get( 'enlt_ID' ) );
+			$no_subs_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$first_newsletter_ID );
 			$no_subs_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $user_IDs ).' )' );
 			$no_subs_SQL->WHERE_and( 'enls_subscribed = 0 OR enls_user_ID IS NULL' );
 			// Remove not subscribed users from array:

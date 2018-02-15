@@ -69,37 +69,33 @@ function autm_get_status_title( $status )
 
 
 /**
- * Helper function to display automation auto start on Results table
+ * Helper function to display the tied lists to automation on Results table
  *
- * @param integer Automation ID
- * @param string Automation auto start
- * @param string Additional URL params
+ * @param string Newsletters data separated by "<", also ID and name are separated by ":"
  * @return string
  */
-function autm_td_autostart( $autm_ID, $autm_autostart, $url_params = '' )
+function autm_td_tied_lists( $newsletters )
 {
 	global $current_User;
 
-	$autostart_icon = get_icon( $autm_autostart ? 'bullet_black' : 'bullet_empty_grey' );
-
-	if( $autm_autostart )
-	{	// If automation is auto started:
-		$autostart_icon = get_icon( 'bullet_black', 'imgtag', array( 'title' => T_('The automation is auto started.') ) );
-	}
-	else
-	{	// If automation is NOT auto started:
-		$autostart_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The automation is not auto started.') ) );
-	}
-
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{	// Make icon to action link if current User has a perm to edit this:
 		global $admin_url;
-		return '<a href="'.$admin_url.'?ctrl=automations&amp;action='.( $autm_autostart ? 'autostart_disable' : 'autostart_enable' )
-			.'&amp;autm_ID='.$autm_ID.'&amp;'.url_crumb( 'automation' ).$url_params.'">'.$autostart_icon.'</a>';
+		$r = '';
+		$newsletters = explode( '<', $newsletters );
+		foreach( $newsletters as $n => $newsletter )
+		{
+			if( preg_match( '#^(\d+):(.+)$#', $newsletter, $newsletter ) )
+			{
+				$r .= '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit'
+					.'&amp;enlt_ID='.$newsletter[1].'"><b>'.$newsletter[2].'</b></a>, ';
+			}
+		}
+		return substr( $r, 0, -2 );
 	}
 	else
-	{	// Simple icon without link:
-		return $autostart_icon;
+	{	// Newsletter names without link:
+		return str_replace( '<', ', ', $newsletter_names );
 	}
 }
 
@@ -468,10 +464,15 @@ function automation_results_block( $params = array() )
 	$url_params = '';
 
 	$SQL = new SQL( 'Get automations' );
-	$SQL->SELECT( 'autm_ID, autm_name, autm_status, autm_autostart, enlt_ID, enlt_name, COUNT( aust_user_ID ) AS autm_users_num' );
+	$SQL->SELECT( 'autm_ID, autm_name, autm_status, enlt_ID, enlt_name, COUNT( aust_user_ID ) AS autm_users_num' );
+	$SQL->SELECT_add( ', ( SELECT GROUP_CONCAT( en.enlt_ID, ":", en.enlt_name SEPARATOR "<" )
+		 FROM T_automation__newsletter AS an
+		INNER JOIN T_email__newsletter en ON en.enlt_ID = an.aunl_enlt_ID
+		WHERE autm_ID = an.aunl_autm_ID ) AS newsletters' );
 	$SQL->FROM( 'T_automation__automation' );
 	$SQL->FROM_add( 'LEFT JOIN T_automation__user_state ON aust_autm_ID = autm_ID' );
-	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON enlt_ID = autm_enlt_ID' );
+	$SQL->FROM_add( 'INNER JOIN T_automation__newsletter ON autm_ID = aunl_autm_ID' );
+	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON enlt_ID = aunl_enlt_ID' );
 	$SQL->GROUP_BY( 'autm_ID' );
 
 	$count_SQL = new SQL( 'Get a count of automations' );
@@ -480,8 +481,9 @@ function automation_results_block( $params = array() )
 
 	if( $params['enlt_ID'] > 0 )
 	{	// Restrict by newsletter:
-		$SQL->WHERE( 'autm_enlt_ID = '.$params['enlt_ID'] );
-		$count_SQL->WHERE( 'autm_enlt_ID = '.$params['enlt_ID'] );
+		$SQL->WHERE( 'aunl_enlt_ID = '.$params['enlt_ID'] );
+		$count_SQL->FROM_add( 'INNER JOIN T_automation__newsletter ON autm_ID = aunl_autm_ID' );
+		$count_SQL->WHERE( 'aunl_enlt_ID = '.$params['enlt_ID'] );
 		$url_params = '&amp;enlt_ID='.$params['enlt_ID'];
 	}
 
@@ -511,11 +513,9 @@ function automation_results_block( $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th'    => T_('Tied to List'),
-			'order' => 'enlt_name',
-			'td'    => ( $current_User->check_perm( 'emails', 'edit' )
-				? '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID=$enlt_ID$"><b>$enlt_name$</b></a>'
-				: '$enlt_name$' ),
+			'th'    => T_('Tied to Lists'),
+			'order' => 'newsletters',
+			'td'    => '%autm_td_tied_lists( #newsletters# )%',
 		);
 
 	$Results->cols[] = array(
@@ -525,14 +525,6 @@ function automation_results_block( $params = array() )
 			'th_class'    => 'shrinkwrap',
 			'td_class'    => 'shrinkwrap',
 			'default_dir' => 'D',
-		);
-
-	$Results->cols[] = array(
-			'th'    => T_('Auto start'),
-			'order' => 'enlt_name',
-			'td'    => '%autm_td_autostart( #autm_ID#, #autm_autostart#, "'.$url_params.'" )%',
-			'th_class' => 'shrinkwrap',
-			'td_class' => 'shrinkwrap',
 		);
 
 	$Results->cols[] = array(

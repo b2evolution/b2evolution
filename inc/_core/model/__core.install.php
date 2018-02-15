@@ -565,10 +565,18 @@ $schema_queries = array(
 			autm_ID            INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			autm_name          VARCHAR(255) NOT NULL,
 			autm_status        ENUM('paused', 'active') DEFAULT 'paused',
-			autm_enlt_ID       INT UNSIGNED NOT NULL,
 			autm_owner_user_ID INT UNSIGNED NOT NULL,
-			autm_autostart     TINYINT(1) UNSIGNED DEFAULT 1,
 			PRIMARY KEY        (autm_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__newsletter' => array(
+		'Creating automation newsletter table',
+		"CREATE TABLE T_automation__newsletter (
+			aunl_autm_ID   INT UNSIGNED NOT NULL,
+			aunl_enlt_ID   INT UNSIGNED NOT NULL,
+			aunl_autostart TINYINT(1) UNSIGNED DEFAULT 1,
+			aunl_autoexit  TINYINT(1) UNSIGNED DEFAULT 1,
+			PRIMARY KEY    (aunl_autm_ID, aunl_enlt_ID)
 		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_automation__step' => array(

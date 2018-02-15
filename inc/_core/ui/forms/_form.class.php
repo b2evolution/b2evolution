@@ -4580,13 +4580,15 @@ class Form extends Widget
 	{
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
-		echo $this->begin_field( $field_name, $field_label, false, $field_type );
+		$r = $this->begin_field( $field_name, $field_label, false, $field_type );
 
 		// Switch layout to keep all fields in one line:
 		$this->switch_layout( 'none' );
 
 		// Set TRUE to mark all calls of the next fields as lined:
 		$this->is_lined_fields = true;
+
+		return $this->display_or_return( $r );
 	}
 
 
@@ -4601,9 +4603,11 @@ class Form extends Widget
 	{
 		$this->handle_common_params( $field_params );
 
+		$r = '';
+
 		if( !is_null( $suffix_text ) )
 		{ // Display a suffix:
-			echo $suffix_text;
+			$r .= $suffix_text;
 		}
 
 		// Stop "lined" mode:
@@ -4613,7 +4617,9 @@ class Form extends Widget
 		$this->switch_layout( NULL );
 
 		// End field:
-		echo $this->end_field( $field_type );
+		$r .= $this->end_field( $field_type );
+
+		return $this->display_or_return( $r );
 	}
 }
 

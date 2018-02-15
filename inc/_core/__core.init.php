@@ -80,6 +80,7 @@ $db_config['aliases'] = array(
 		'T_email__campaign'        => $tableprefix.'email__campaign',
 		'T_email__campaign_send'   => $tableprefix.'email__campaign_send',
 		'T_automation__automation' => $tableprefix.'automation__automation',
+		'T_automation__newsletter' => $tableprefix.'automation__newsletter',
 		'T_automation__step'       => $tableprefix.'automation__step',
 		'T_automation__user_state' => $tableprefix.'automation__user_state',
 		'T_syslog'                 => $tableprefix.'syslog',

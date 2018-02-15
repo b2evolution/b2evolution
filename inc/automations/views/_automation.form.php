@@ -35,17 +35,32 @@ $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',autm_ID' : '' ) )
 
 $Form->text_input( 'autm_name', $edited_Automation->get( 'name' ), 40, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 
-$Form->checkbox( 'autm_autostart', $edited_Automation->get( 'autostart' ), T_('Auto start') );
-
 $Form->select_input_array( 'autm_status', $edited_Automation->get( 'status' ), autm_get_status_titles(), T_('Status'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
 
+// Tied Lists:
 $NewsletterCache = & get_NewsletterCache();
 $NewsletterCache->load_all();
-$Form->select_input_object( 'autm_enlt_ID', $edited_Automation->get( 'enlt_ID' ), $NewsletterCache, T_('Tied to List'), array(
-		'required'   => true,
-		'allow_none' => true,
-		'note'       => T_('Users will exit this automation when they unsubscribe from this list'),
-	) );
+$newsletters = $edited_Automation->get_newsletters();
+foreach( $newsletters as $n => $newsletter )
+{
+	$Form->begin_line( T_('Tied to List').' <span class="evo_tied_list_number">'.( $n + 1 ).'</span>', '', '', array( 'required' => true ) );
+		$Form->select_input_object( 'aunl_enlt_ID[]', $newsletter['ID'], $NewsletterCache, '', array( 'allow_none' => true ) );
+		$Form->checkbox_input( 'aunl_autostart', $newsletter['autostart'], '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto start on list subscribe').'</label> &nbsp; ' ) );
+		$Form->checkbox_input( 'aunl_autoexit', $newsletter['autoexit'], '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto exit on list unsubscribe').'</label>'
+			.' &nbsp; <a href="#" class="evo_remove_tied_list">'.get_icon( 'minus' ).'</a>' ) );
+	$Form->end_line();
+}
+// Initialize a template to add more newsletter fields by JS code below:
+$Form->output = false;
+$newsletter_fields = $Form->begin_line( T_('Tied to List').' <span class="evo_tied_list_number"></span>', '', '', array( 'required' => true ) )
+		.$Form->select_input_object( 'aunl_enlt_ID[]', '', $NewsletterCache, '', array( 'allow_none' => true ) )
+		.$Form->checkbox_input( 'aunl_autostart', 1, '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto start on list subscribe').'</label> &nbsp; ' ) )
+		.$Form->checkbox_input( 'aunl_autoexit', 1, '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto exit on list unsubscribe').'</label>'
+			.' &nbsp; <a href="#" class="evo_remove_tied_list">'.get_icon( 'minus' ).'</a>' ) )
+	.$Form->end_line();
+$Form->output = true;
+// Display a button to add more newsletter:
+$Form->info( '', '<button class="btn btn-default" type="button" id="evo_add_tied_list">'.get_icon( 'add' ).' '.T_('Tie to an additional list...').'</button>' );
 
 $Form->username( 'autm_owner_login', $edited_Automation->get_owner_User(), T_('Owner'), '', '', array( 'required' => true ) );
 
@@ -167,3 +182,52 @@ $SQL->LIMIT( 1 );
 $next_automations_date_time = $DB->get_var( $SQL );
 echo '<p class="note">'.sprintf( T_('Next scheduled job for executing automations: %s'), $next_automations_date_time ? mysql2localedatetime( $next_automations_date_time ) : T_('Unknown') ).'</p>';
 ?>
+<script type="text/javascript">
+jQuery( '#evo_add_tied_list' ).click( function()
+{
+	var list_num = jQuery( '[name="aunl_enlt_ID[]"]' ).length + 1;
+	jQuery( this ).closest( 'div.form-group' ).before( '<?php echo format_to_js( $newsletter_fields ); ?>'.replace( '$num$', list_num ) );
+	evo_automation_update_tied_list();
+} );
+jQuery( document ).on( 'click', '.evo_remove_tied_list', function()
+{
+	jQuery( this ).closest( 'div.form-group' ).remove();
+	evo_automation_update_tied_list();
+	return false;
+} );
+jQuery( document ).ready( function()
+{
+	evo_automation_update_tied_list();
+} );
+function evo_automation_update_tied_list()
+{
+	var list_number = 1;
+	jQuery( '.evo_tied_list_number' ).each( function()
+	{	// Reorder numbers of tied lists:
+		jQuery( this ).html( list_number++ );
+	} );
+	if( list_number <= 2 )
+	{	// Single tied list is required and cannot be deleted:
+		jQuery( '.evo_remove_tied_list' ).hide();
+		jQuery( '.evo_tied_list_number' ).parent().find( '.label_field_required' ).show();
+	}
+	else
+	{	// Multiple tied lists are not required and can be deleted:
+		jQuery( '.evo_remove_tied_list' ).show();
+		jQuery( '.evo_tied_list_number' ).parent().find( '.label_field_required' ).hide();
+	}
+}
+jQuery( 'form#automation_checkchanges' ).submit( function()
+{
+	var list_number = 0;
+	jQuery( '[name=aunl_autostart]' ).each( function()
+	{
+		jQuery( this ).attr( 'name', 'aunl_autostart_' + ( list_number++ ) );
+	} );
+	list_number = 0;
+	jQuery( '[name=aunl_autoexit]' ).each( function()
+	{
+		jQuery( this ).attr( 'name', 'aunl_autoexit_' + ( list_number++ ) );
+	} );
+} );
+</script>

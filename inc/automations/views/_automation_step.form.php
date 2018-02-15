@@ -135,7 +135,8 @@ $form_duration_selector = $Form->duration_input( '$duration_selector$', '', '', 
 $NewsletterCache = & get_NewsletterCache();
 $NewsletterCache->none_option_text = T_('Any');
 $NewsletterCache->clear();
-$NewsletterCache->load_where( 'enlt_ID = '.$step_Automation->get( 'enlt_ID' ) );
+global $DB;
+$NewsletterCache->load_where( 'enlt_ID IN ( '.$DB->quote( $step_Automation->get_newsletter_IDs() ).' )' );
 $form_newsletter_selector = $Form->select_input_object( '$newsletter_selector$', '', $NewsletterCache, '', array( 'allow_none' => true ) );
 $Form->output = true;
 $Form->switch_layout( NULL );
@@ -284,6 +285,7 @@ function step_type_update_info( step_type )
 			jQuery( '#ffield_step_automation' ).show();
 			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'start_automation', 'YES' ) ); ?>' );
 			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'start_automation', 'NO' ) ); ?>' );
+			jQuery( '#step_result_label_error' ).html( '<?php echo TS_( step_get_result_label( 'start_automation', 'ERROR' ) ); ?>' );
 			if( set_default_next_step_data )
 			{	// Suggest default values:
 				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID' ).val( '' );

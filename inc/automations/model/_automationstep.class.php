@@ -470,11 +470,16 @@ class AutomationStep extends DataObject
 					{
 						$user_is_waiting_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'wait' ) );
 						$user_received_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'receive' ) );
+
+						// TODO: Temp solution to use only first Newsletter for unsubscribe link in email footer:
+						$newsletter_IDs = $Automation->get_newsletter_IDs();
+						$first_newsletter_ID = isset( $newsletter_IDs[0] ) ? $newsletter_IDs[0] : NULL;
+
 						if( $user_received_email )
 						{	// If user already received this email:
 							$step_result = 'NO';
 						}
-						elseif( $user_is_waiting_email && $step_EmailCampaign->send_email( $user_ID, '', '', 'auto', $Automation->get( 'enlt_ID' ) ) )
+						elseif( $user_is_waiting_email && $step_EmailCampaign->send_email( $user_ID, '', '', 'auto', $first_newsletter_ID ) )
 						{	// If email has been sent to user successfully now:
 							$step_result = 'YES';
 						}
@@ -1101,7 +1106,7 @@ class AutomationStep extends DataObject
 			else
 			{	// Check any list tied to step automation:
 				$step_Automation = & $this->get_Automation();
-				$rule_newsletters = array( $step_Automation->get( 'enlt_ID' ) );
+				$rule_newsletters = $step_Automation->get_newsletter_IDs();
 			}
 
 			$SQL = new SQL( 'Get last time for IF Condition "Last sent/opened/clicked list" ('.$check_db_field_name.')' );
