@@ -151,8 +151,21 @@ function param_format( $value, $type = 'raw' )
 function param( $var, $type = 'raw', $default = '', $memorize = false,
 								$override = false, $use_default = true, $strict_typing = 'allow_empty' )
 {
-	global $Debuglog, $debug, $evo_charset, $io_charset;
+	global $Debuglog, $debug, $evo_charset, $io_charset, $is_cli;
 	// NOTE: we use $GLOBALS[$var] instead of $$var, because otherwise it would conflict with param names which are used as function params ("var", "type", "default", ..)!
+
+	if( $is_cli )
+	{	// For CLI mode use only default values:
+		if( in_array( $type, array( 'array', 'array:integer', 'array:string', 'array:array:integer', 'array:array:string' ) ) && $default === '' )
+		{	// Change default '' into array() to avoid a notice:
+			$default = array();
+		}
+		$GLOBALS[$var] = remove_magic_quotes( $default );
+		$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
+
+		return $GLOBALS[$var];
+		// EXIT HERE, Don't do other code below for params from CLI mode.
+	}
 
 	/*
 	 * STEP 1 : Set the variable
