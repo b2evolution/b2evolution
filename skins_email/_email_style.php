@@ -147,6 +147,68 @@ $emailskins_styles = array(
 	background: #ebebeb linear-gradient(#f9f9f9, #ebebeb);
 	background: #ebebeb -webkit-linear-gradient(#f9f9f9, #ebebeb);
 	background: #ebebeb -moz-linear-gradient(#f9f9f9, #ebebeb);
-'
+',
+
+'div.btn a' => '
+	margin: 3px;
+	padding: 6px 14px;
+	border-radius: 4px;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 1em;
+',
+'a.btn' => '
+	padding: 6px 12px;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	user-select: none;
+	background-image: none;
+	border: 1px solid transparent;
+	border-radius: 4px;
+',
+'a.btn-primary' => '
+	color: #fff;
+	background-color: #337ab7;
+	border-color: #2e6da4;
+	padding: 6px 12px;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	user-select: none;
+	background-image: none;
+	border: 1px solid #2e6da4;
+	border-radius: 4px;
+',
+'a.btn-warning' => '
+	color: #fff;
+	background-color: #f0ad4e;
+	border-color: #eea236;
+	padding: 6px 12px;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	user-select: none;
+	background-image: none;
+	border: 1px solid #eea236;
+	border-radius: 4px;
+',
+'a.btn-default' => '
+	color: #333;
+	background-color: #fff;
+	border-color: #ccc;
+	padding: 6px 12px;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	user-select: none;
+	background-image: none;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+',
 );
 ?>

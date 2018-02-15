@@ -1,0 +1,218 @@
+<?php
+/**
+ * This file implements the Email Elements plugin for b2evolution
+ *
+ * Email Elements
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ *
+ * @package plugins
+ */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+class email_elements_plugin extends Plugin
+{
+	var $code = 'b2evEmailEl';
+	var $name = 'Email Elements';
+	var $priority = 50;
+	var $version = '6.10.0';
+	var $group = 'rendering';
+	var $short_desc;
+	var $long_desc;
+	var $help_topic = 'email-elements-plugin';
+	var $number_of_installs = 1;
+
+
+	/**
+	 * Init
+	 */
+	function PluginInit( & $params )
+	{
+		$this->short_desc = T_('Email Elements');
+		$this->long_desc = T_('Enables users to add UI elements to emails.');
+	}
+
+
+	/**
+	 * Define here the default collection/blog settings that are to be made available in the backoffice
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_params = array_merge( $params, array( 'default_post_rendering' => 'never' ) );
+		return parent::get_coll_setting_definitions( $default_params );
+	}
+
+
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		// set params to allow rendering for emails by default:
+		$default_params = array_merge( $params, array( 'default_email_rendering' => 'opt-out' ) );
+		return parent::get_email_setting_definitions( $default_params );
+	}
+
+
+	/**
+	 * Display Toolbar
+	 *
+	 * @param object Blog
+	 */
+	function DisplayCodeToolbar( $params = array() )
+	{
+		global $Hit, $baseurl, $debug;
+
+		if( $Hit->is_lynx() )
+		{	// let's deactivate toolbar on Lynx, because they don't work there:
+			return false;
+		}
+
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
+		$js_code_prefix = $params['js_prefix'].$this->code;
+
+		// Load js to work with textarea:
+		require_js( 'functions.js', 'blog', true, true );
+
+		// Initialize JavaScript to build and open window:
+		echo_modalwindow_js();
+
+		?><script type="text/javascript">
+		//<![CDATA[
+		function email_elements_toolbar( title, prefix )
+		{
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>'
+
+				// Button element
+				+ '<input type="button" title="<?php echo TS_('Button') ?>"'
+				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button" value="<?php echo TS_('Button') ?>" />'
+
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
+
+				jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
+		}
+
+		<?php echo $js_code_prefix;?>_insert_button = function()
+		{
+			var r = '<form id="email_element_button_wrapper" class="form">'
+					+ '<div class="form-group"><label class="control-label"><?php echo T_('URL');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_url" /></div></div>'
+					+ '<div class="form-group"><label class="control-label"><?php echo T_('Text');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_text" /></div></div>'
+					+ '</form>';
+
+			openModalWindow( r, '550px', '', true,
+					'<?php echo TS_('Add link button'); ?>', // Window title
+					[ '-', 'email_element_button_buttons' ],
+					true );
+
+			// Set max-height to keep the action buttons on screen:
+			var modal_window = jQuery( '#email_element_button_wrapper' ).parent();
+			var modal_height = jQuery( window ).height() - 20;
+
+			if( modal_window.hasClass( 'modal-body' ) )
+			{	// Extract heights of header and footer:
+				modal_height -= 55 + 64 +
+					parseInt( modal_window.css( 'padding-top' ) ) + parseInt( modal_window.css( 'padding-bottom' ) );
+			}
+			modal_window.css( {
+				'display': 'block',
+				'overflow': 'auto',
+				'max-height': modal_height
+			} );
+
+			// Add insert button
+			var buttons_side_obj = jQuery( '.email_element_button_buttons' ).length ?
+						jQuery( '.email_element_button_buttons' ) :
+						jQuery( '#email_element_button_buttons' );
+			buttons_side_obj.after( '<button id="email_element_button_insert" class="btn btn-primary"><?php echo T_('Insert');?></button>' );
+
+			// To prevent link default event:
+			return false;
+		}
+
+		// Insert a button short tag to textarea
+		jQuery( document ).on( 'click', '#email_element_button_insert', function()
+		{
+			var url = jQuery( 'input[name=button_url]', '#email_element_button_wrapper' ).val();
+			var text = jQuery( 'input[name=button_text]', '#email_element_button_wrapper' ).val();
+			var myField = <?php echo $params['js_prefix']; ?>b2evoCanvas;
+
+			// Insert tag text in area
+			textarea_wrap_selection( myField, '[button:' + url + ']'+text+'[/button]', '', 0 );
+			// Close main modal window
+			closeModalWindow();
+
+			// To prevent link default event
+			return false;
+		} );
+
+		//]]>
+		</script><?php
+
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_after' );
+		?>
+		<script type="text/javascript">email_elements_toolbar( '<?php echo TS_('Email Elements:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script>
+		<?php
+
+		return true;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{	// Print toolbar on screen:
+			return $this->DisplayCodeToolbar( $params );
+		}
+		return false;
+	}
+
+
+	/**
+	 * Dummy placeholder. Without it the plugin would ne be considered to be a renderer...
+	 *
+	 * @see Plugin::RenderItemAsHtml
+	 */
+	function RenderItemAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		$search_pattern = '#\[button:([^\[\]]*?)](.*?)\[\/button]#';
+		preg_match_all( $search_pattern, $content, $matches );
+
+		if( ! empty( $matches[0] ) )
+		{
+			foreach( $matches[0] as $i => $current_element )
+			{
+				$url = trim( $matches[1][$i] );
+				$button_text = trim( $matches[2][$i] );
+
+				$link_tag = get_link_tag( $url, $button_text, 'div.btn a+a.btn-default' );
+
+				$content = str_replace( $current_element, $link_tag, $content );
+			}
+		}
+
+		return true;
+	}
+}
