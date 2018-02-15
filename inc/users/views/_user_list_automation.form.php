@@ -41,6 +41,8 @@ $AutomationCache = & get_AutomationCache();
 $AutomationCache->load_all();
 $Form->select_input_object( 'autm_ID', '', $AutomationCache, T_('Select automation'), array( 'allow_none' => true, 'required' => true ) );
 
+$Form->select_input_array( 'enlt_ID', '', array(), T_('Select email list'), '', array( 'allow_none' => true, 'required' => true ) );
+
 echo '<span class="loader_img loader_userlist_automation_data" title="'.T_('Loading...').'" style="display:none"></span>';
 echo '<div id="userlist_automation_details">';
 
@@ -72,14 +74,13 @@ $Form->end_form();
 <script type="text/javascript">
 jQuery( document ).ready( function()
 {
-	jQuery( '.modal-footer .btn-primary, #userlist_automation_details' ).addClass( 'hidden' );
+	jQuery( '.modal-footer .btn-primary, #userlist_automation_details, #ffield_enlt_ID' ).addClass( 'hidden' );
 	jQuery( '#autm_ID' ).change( function()
 	{
-		jQuery( '.modal-footer .btn-primary, #userlist_automation_details' ).addClass( 'hidden' );
+		jQuery( '.modal-footer .btn-primary, #userlist_automation_details, #ffield_enlt_ID' ).addClass( 'hidden' );
 		if( jQuery( this ).val() != '' )
 		{	// If automation is selected:
 			jQuery( '.loader_userlist_automation_data' ).show();
-			var automation_name = jQuery( this ).find( 'option:selected' ).html();
 			jQuery.ajax(
 			{	// Request data for selected automation:
 				type: 'POST',
@@ -91,8 +92,41 @@ jQuery( document ).ready( function()
 					'crumb_users': '<?php echo get_crumb( 'users' ); ?>',
 				},
 				success: function( result )
+				{	// Display selector with newsletters tied to selected automation:
+					result = JSON.parse( result );
+					var newsletters_options = '<option value=""><?php echo TS_('None'); ?></option>';
+					for( var newsletter_ID in result.newsletters )
+					{
+						newsletters_options += '<option value="' + newsletter_ID + '">' + result.newsletters[ newsletter_ID ] + '</option>';
+					}
+					jQuery( '#enlt_ID' ).html( newsletters_options );
+					jQuery( '#ffield_enlt_ID' ).removeClass( 'hidden' );
+					jQuery( '.loader_userlist_automation_data' ).hide();
+				}
+			} );
+		}
+	} );
+	jQuery( '#enlt_ID' ).change( function()
+	{
+		jQuery( '.modal-footer .btn-primary, #userlist_automation_details' ).addClass( 'hidden' );
+		if( jQuery( this ).val() != '' )
+		{	// If newsletter is selected:
+			jQuery( '.loader_userlist_automation_data' ).show();
+			var automation_name = jQuery( '#autm_ID' ).find( 'option:selected' ).html();
+			jQuery.ajax(
+			{	// Request data for selected automation and newsletter:
+				type: 'POST',
+				url: '<?php echo get_htsrv_url(); ?>async.php',
+				data:
+				{
+					'action': 'get_userlist_automation',
+					'autm_ID': jQuery( '#autm_ID' ).val(),
+					'enlt_ID': jQuery( this ).val(),
+					'crumb_users': '<?php echo get_crumb( 'users' ); ?>',
+				},
+				success: function( result )
 				{	// Display additional form field before adding:
-					result = JSON.parse( result ) ;
+					result = JSON.parse( result );
 					jQuery( '#autm_automation_name' ).html( automation_name );
 					jQuery( '#autm_newsletter_name' ).html( result.newsletter_name );
 					jQuery( '#autm_users_no_subs_num' ).html( result.users_no_subs_num );

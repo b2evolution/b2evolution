@@ -366,6 +366,7 @@ class Automation extends DataObject
 				'users_no_subs'   => 'ignore', // Action for users who are not subscribed to Newsletter of this Automation: 'ignore' - Ignore, 'add' - Add anyway
 				'users_automated' => 'ignore', // Action for users who are already in this Automation: 'ignore' - Ignore, 'requeue' - Requeue to Start
 				'users_new'       => 'add', // Action for new users: 'ignore' - Ignore, 'add' - Add to automation
+				'newsletter_IDs'   => NULL, // Newsletter IDs to ignore not subscribed users, NULL - to use any tied newsletter
 			), $params );
 
 		$added_users_num = 0;
@@ -383,20 +384,28 @@ class Automation extends DataObject
 		if( $params['users_no_subs'] == 'ignore' )
 		{	// Ignore not subscribed users to this Automation:
 
-			// TODO: Temp solution to use only first Newsletter for unsubscribe link in email footer:
-			$newsletter_IDs = $this->get_newsletter_IDs();
-			$first_newsletter_ID = isset( $newsletter_IDs[0] ) ? $newsletter_IDs[0] : 0;
+			// Get newsletter IDs:
+			$newsletter_IDs = ( $params['newsletter_IDs'] === NULL ? $this->get_newsletter_IDs() : $params['newsletter_IDs'] );
+			if( ! is_array( $newsletter_IDs ) )
+			{	// If single newsletter is given:
+				$newsletter_IDs = array( $newsletter_IDs );
+			}
 
 			$no_subs_SQL = new SQL( 'Get not subscribed users of the Automation #'.$this->ID );
 			$no_subs_SQL->SELECT( 'user_ID' );
 			$no_subs_SQL->FROM( 'T_users' );
-			$no_subs_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$first_newsletter_ID );
+			$no_subs_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )' );
 			$no_subs_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $user_IDs ).' )' );
 			$no_subs_SQL->WHERE_and( 'enls_subscribed = 0 OR enls_user_ID IS NULL' );
 			// Remove not subscribed users from array:
 			$user_IDs = array_diff( $user_IDs, $DB->get_col( $no_subs_SQL ) );
 		}
 		// else: Add not subscribed users anyway
+
+		if( empty( $user_IDs ) )
+		{	// No users to add, Stop here:
+			return $added_users_num;
+		}
 
 		$automated_SQL = new SQL( 'Get users of the Automated #'.$this->ID );
 		$automated_SQL->SELECT( 'aust_user_ID' );

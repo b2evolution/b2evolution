@@ -414,6 +414,7 @@ if( !$Messages->has_errors() )
 			$current_User->check_perm( 'options', 'view', true );
 
 			param( 'autm_ID', 'integer', true );
+			param( 'enlt_ID', 'integer', true );
 
 			$AutomationCache = & get_AutomationCache();
 			$Automation = & $AutomationCache->get_by_ID( $autm_ID );
@@ -424,6 +425,7 @@ if( !$Messages->has_errors() )
 					'users_no_subs'   => param( 'users_no_subs', 'string', 'ignore' ),
 					'users_automated' => param( 'users_automated', 'string', 'ignore' ),
 					'users_new'       => param( 'users_new', 'string', 'ignore' ),
+					'newsletter_IDs'  => $enlt_ID,
 				) );
 
 			$Messages->add( sprintf( T_('%d users have been added or requeued for automation "%s"'), $added_users_num, $Automation->get( 'name' ) ), 'success' );
