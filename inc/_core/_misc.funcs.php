@@ -8316,8 +8316,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 								// Get the IMG tag without link for email content:
 								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
 										'image_link_to' => false,
-										'image_size' => 'fit',
-										'tag_size' => '1024x650',
 										'image_style' => 'border: none; max-width: 100%; height: auto;',
 										'add_loadimg' => false,
 									) ) );
