@@ -903,7 +903,7 @@ class EmailCampaign extends DataObject
 	 */
 	function update_user_send_status( $user_ID, $status, $mail_log_ID = NULL )
 	{
-		global $DB, $mail_log_insert_ID;
+		global $DB, $mail_log_insert_ID, $servertimenow;
 
 		if( empty( $this->ID ) )
 		{	// Email Campaign must be stored in DB:
@@ -920,16 +920,20 @@ class EmailCampaign extends DataObject
 
 		if( in_array( $user_ID, $all_user_IDs ) )
 		{	// Update user send status for this email campaign:
+			$last_sent_ts_field_value = ( $mail_log_ID === NULL ? '' : ', csnd_last_sent_ts = '.$DB->quote( date2mysql( $servertimenow ) ) );
 			$r = $DB->query( 'UPDATE T_email__campaign_send
 				SET csnd_status = '.$DB->quote( $status ).',
 				    csnd_emlog_ID = '.$DB->quote( $mail_log_ID ).'
+				    '.$last_sent_ts_field_value.'
 				WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
 				  AND csnd_user_ID = '.$DB->quote( $user_ID ) );
 		}
 		else
 		{	// Insert new record for user send status:
-			$r = $DB->query( 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID )
-				VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $status ).', '.$DB->quote( $mail_log_ID ).' )' );
+			$last_sent_ts_field = ( $mail_log_ID === NULL ? '' : ', csnd_last_sent_ts' );
+			$last_sent_ts_value = ( $mail_log_ID === NULL ? '' : ', '.$DB->quote( date2mysql( $servertimenow ) ) );
+			$r = $DB->query( 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID'.$last_sent_ts_field.' )
+				VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $status ).', '.$DB->quote( $mail_log_ID ).$last_sent_ts_value.' )' );
 		}
 
 		if( $r )

@@ -618,8 +618,7 @@ class UserQuery extends SQL
 		$this->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_user_ID = user_ID AND csnd_camp_ID = '.$DB->quote( $ecmp_ID ) );
 
 		// Get email log date and time:
-		$this->SELECT_add( ', emlog_timestamp, enls_user_ID, emlog_last_open_ts, emlog_last_click_ts' );
-		$this->FROM_add( 'LEFT JOIN T_email__log ON csnd_emlog_ID = emlog_ID' );
+		$this->SELECT_add( ', csnd_last_sent_ts, enls_user_ID, csnd_last_open_ts, csnd_last_click_ts' );
 
 		// Get subscription status:
 		$this->SELECT_add( ', enls_user_ID' );

@@ -551,11 +551,14 @@ $schema_queries = array(
 	'T_email__campaign_send' => array(
 		'Creating email campaign send data table',
 		"CREATE TABLE T_email__campaign_send (
-			csnd_camp_ID  INT(11) UNSIGNED NOT NULL,
-			csnd_user_ID  INT(11) UNSIGNED NOT NULL,
-			csnd_status   ENUM('ready_to_send', 'ready_to_resend', 'sent', 'send_error', 'skipped' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ready_to_send',
-			csnd_emlog_ID INT(11) UNSIGNED NULL,
+			csnd_camp_ID             INT(11) UNSIGNED NOT NULL,
+			csnd_user_ID             INT(11) UNSIGNED NOT NULL,
+			csnd_status              ENUM('ready_to_send', 'ready_to_resend', 'sent', 'send_error', 'skipped' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ready_to_send',
+			csnd_emlog_ID            INT(11) UNSIGNED NULL,
 			csnd_clicked_unsubscribe TINYINT(1) UNSIGNED DEFAULT 0,
+			csnd_last_sent_ts        TIMESTAMP NULL,
+			csnd_last_open_ts        TIMESTAMP NULL,
+			csnd_last_click_ts       TIMESTAMP NULL,
 			PRIMARY KEY   csnd_PK ( csnd_camp_ID, csnd_user_ID )
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 

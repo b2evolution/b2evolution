@@ -246,6 +246,71 @@ function db_modify_col( $table, $col_name, $col_desc )
 
 
 /**
+ * ADD/MODIFY/DROP columns by single SQL query
+ *
+ * @param string Table name
+ * @param array Array: key - action('ADD','MODIFY','DROP'),
+ *                     value is array of columns: key - column name, value - column description or column name for DROP action
+ */
+function db_upgrade_cols( $table, $cols )
+{
+	global $DB;
+
+	if( empty( $cols ) )
+	{	// No columns
+		return;
+	}
+
+	// Get existing columns of the given db table in order to avoid errors on add duplicated column or on drop unexisting column:
+	$existing_columns = $DB->get_results( 'SHOW COLUMNS FROM '.$table );
+	foreach( $existing_columns as $c => $col )
+	{
+		$existing_columns[ $c ] = strtolower( $col->Field );
+	}
+
+	$upgrade_sql_query = '';
+	foreach( $cols as $action => $cols_data )
+	{
+		foreach( $cols_data as $col_name => $col_desc )
+		{
+			switch( $action )
+			{
+				case 'ADD':
+				case 'MODIFY':
+					if( in_array( strtolower( $col_name ), $existing_columns ) )
+					{	// Modify the existing column:
+						$upgrade_sql_query .= ' MODIFY COLUMN ';
+					}
+					else
+					{	// Add new column:
+						$upgrade_sql_query .= ' ADD COLUMN ';
+					}
+					$upgrade_sql_query .= '`'.$col_name.'` '.$col_desc.',';
+					break;
+
+				case 'DROP':
+					$col_name = $col_desc;
+					if( in_array( strtolower( $col_name ), $existing_columns ) )
+					{	// Allow to drop only really existing column:
+						$upgrade_sql_query .= ' DROP COLUMN `'.$col_name.'`,';
+					}
+					// ELSE skip not existing column
+					break;
+
+				default:
+					debug_die( 'Invalid DB upgrade action "'.$action.'"' );
+			}
+		}
+	}
+
+	if( ! empty( $upgrade_sql_query ) )
+	{	// Run upgrade SQL query only if at least one column should be upgraded:
+		$DB->query( 'ALTER TABLE '.$table.substr( $upgrade_sql_query, 0, -1 ) );
+	}
+}
+
+
+/**
  * Add an INDEX. If another index with the same name already exists, it will
  * get dropped before.
  */
@@ -9017,8 +9082,27 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			SELECT autm_ID, autm_enlt_ID, autm_autostart
 			  FROM T_automation__automation' );
 		// Remove old columns:
-		db_drop_col( 'T_automation__automation', 'autm_enlt_ID' );
-		db_drop_col( 'T_automation__automation', 'autm_autostart' );
+		db_upgrade_cols( 'T_automation__automation', array(
+			'DROP' => array( 'autm_enlt_ID', 'autm_autostart' ),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12580, 'Upgrading email campaign send data table...' ) )
+	{	// part of 6.10.0-beta
+		db_upgrade_cols( 'T_email__campaign_send', array(
+			'ADD' => array(
+				'csnd_last_sent_ts'  => 'TIMESTAMP NULL',
+				'csnd_last_open_ts'  => 'TIMESTAMP NULL',
+				'csnd_last_click_ts' => 'TIMESTAMP NULL',
+			),
+		) );
+		// Update new added tables from email log table:
+		$DB->query( 'UPDATE T_email__campaign_send
+			INNER JOIN T_email__log ON csnd_emlog_ID = emlog_ID
+			  SET csnd_last_sent_ts = emlog_timestamp,
+			      csnd_last_open_ts = emlog_last_open_ts,
+			      csnd_last_click_ts = emlog_last_click_ts' );
 		upg_task_end();
 	}
 

@@ -390,6 +390,48 @@ function update_mail_log( $email_ID, $result, $message )
 
 
 /**
+ * Update time field of mail log row and related tables like email campaign and newsletters
+ *
+ * @param string Type: 'open', 'click'
+ * @param integer Email log ID
+ * @param integer Email log key
+ */
+function update_mail_log_time( $type, $emlog_ID, $emlog_key )
+{
+	global $DB, $localtimenow;
+
+	switch( $type )
+	{
+		case 'open':
+			$log_time_field = 'emlog_last_open_ts';
+			$campaign_time_field = 'csnd_last_open_ts';
+			break;
+
+		case 'click':
+			$log_time_field = 'emlog_last_click_ts';
+			$campaign_time_field = 'csnd_last_click_ts';
+			break;
+
+		default:
+			debug_die( 'Invalid mail log time type "'.$type.'"' );
+	}
+
+	// Update last time for email log:
+	$r = $DB->query( 'UPDATE T_email__log
+		  SET '.$log_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
+		WHERE emlog_ID = '.$DB->quote( $emlog_ID ).'
+		  AND emlog_key = '.$DB->quote( $emlog_key ) );
+
+	if( $r )
+	{	// Update last time for email campaign per user:
+		$DB->query( 'UPDATE T_email__campaign_send
+			  SET '.$campaign_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
+			WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ) );
+	}
+}
+
+
+/**
  * Load the blocked emails from DB in cache
  *
  * @param array User IDs

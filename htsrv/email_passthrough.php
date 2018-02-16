@@ -67,9 +67,8 @@ switch( $type )
 				}
 			}
 
-			$DB->query( 'UPDATE T_email__log
-					SET emlog_last_click_ts = '.$DB->quote( date2mysql( $localtimenow ) )
-					.' WHERE emlog_ID = '.$DB->quote( $email_ID ).' AND emlog_key = '.$DB->quote( $email_key ) );
+			// Update last click time for current email log and related tables like email campaign and newsletters:
+			update_mail_log_time( 'click', $email_ID, $email_key );
 		}
 
 		// Redirect
@@ -86,9 +85,8 @@ switch( $type )
 		break;
 
 	case 'img':
-		$DB->query( 'UPDATE T_email__log
-				SET emlog_last_open_ts = '.$DB->quote( date2mysql( $localtimenow ) )
-				.' WHERE emlog_ID = '.$DB->quote( $email_ID ).' AND emlog_key = '.$DB->quote( $email_key ) );
+		// Update last open time for current email log and related tables like email campaign and newsletters:
+		update_mail_log_time( 'open', $email_ID, $email_key );
 
 		if( ! empty( $redirect_to ) )
 		{

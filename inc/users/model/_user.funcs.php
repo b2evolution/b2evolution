@@ -6016,9 +6016,9 @@ function users_results( & $UserList, $params = array() )
 				'th' => T_('Send date'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'timestamp compact_data',
-				'order' => 'emlog_timestamp',
+				'order' => 'csnd_last_sent_ts',
 				'default_dir' => 'D',
-				'td' => '%user_td_emlog_date( #emlog_timestamp# )%',
+				'td' => '%user_td_emlog_date( #csnd_last_sent_ts# )%',
 			);
 	}
 
@@ -6028,18 +6028,18 @@ function users_results( & $UserList, $params = array() )
 				'th' => T_('Last opened'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'timestamp compact_data',
-				'order' => 'emlog_last_open_ts',
+				'order' => 'csnd_last_open_ts',
 				'default_dir' => 'D',
-				'td' => '%user_td_emlog_date( #emlog_last_open_ts# )%',
+				'td' => '%user_td_emlog_date( #csnd_last_open_ts# )%',
 			);
 
 		$UserList->cols[] = array(
 				'th' => T_('Last clicked'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'timestamp compact_data',
-				'order' => 'emlog_last_click_ts',
+				'order' => 'csnd_last_click_ts',
 				'default_dir' => 'D',
-				'td' => '%user_td_emlog_date( #emlog_last_click_ts# )%',
+				'td' => '%user_td_emlog_date( #csnd_last_click_ts# )%',
 			);
 	}
 
