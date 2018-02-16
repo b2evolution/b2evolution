@@ -459,6 +459,39 @@ class Automation extends DataObject
 
 		return $added_users_num;
 	}
+
+
+	/**
+	 * Check if user is subscribed to at least one tied Newsletter of this Automation
+	 *
+	 * @param integer User ID
+	 * @return integer|boolean ID of first tied newsletter where the requested user is subscribed, FALSE - user is not subscribed
+	 */
+	function is_user_subscribed( $user_ID )
+	{
+		$newsletter_IDs = $this->get_newsletter_IDs();
+
+		if( empty( $newsletter_IDs ) )
+		{	// No automation newsletters found:
+			return false;
+		}
+
+		$NewsletterCache = & get_NewsletterCache();
+		// Preload all automation newsletters by single query:
+		$NewsletterCache->load_list( $newsletter_IDs );
+
+		foreach( $newsletter_IDs as $newsletter_ID )
+		{
+			if( ( $automation_Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) ) &&
+			    in_array( $user_ID, $automation_Newsletter->get_user_IDs() ) )
+			{	// If user is subscribed to first tied newsletter, Stop find other subscriptions:
+				return $automation_Newsletter->ID;
+			}
+		}
+
+		// User is not subscribed to any tied newsletter of this Automation:
+		return false;
+	}
 }
 
 ?>

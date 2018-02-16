@@ -468,19 +468,13 @@ class AutomationStep extends DataObject
 					$EmailCampaignCache = & get_EmailCampaignCache();
 					if( $step_EmailCampaign = & $EmailCampaignCache->get_by_ID( $this->get( 'info' ), false, false ) )
 					{
-						$user_is_waiting_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'wait' ) );
-						$user_received_email = in_array( $user_ID, $step_EmailCampaign->get_recipients( 'receive' ) );
-
-						// TODO: Temp solution to use only first Newsletter for unsubscribe link in email footer:
-						$newsletter_IDs = $Automation->get_newsletter_IDs();
-						$first_newsletter_ID = isset( $newsletter_IDs[0] ) ? $newsletter_IDs[0] : NULL;
-
-						if( $user_received_email )
+						if( in_array( $user_ID, $step_EmailCampaign->get_recipients( 'full_receive' ) ) )
 						{	// If user already received this email:
 							$step_result = 'NO';
 						}
-						elseif( $user_is_waiting_email && $step_EmailCampaign->send_email( $user_ID, '', '', 'auto', $first_newsletter_ID ) )
-						{	// If email has been sent to user successfully now:
+						elseif( ( $user_subscribed_newsletter_ID = $Automation->is_user_subscribed( $user_ID ) ) &&
+						        $step_EmailCampaign->send_email( $user_ID, '', '', 'auto', $user_subscribed_newsletter_ID ) )
+						{	// If user is subscribed to at least one newsletter of this Automation AND email has been sent to user successfully now:
 							$step_result = 'YES';
 						}
 						else
@@ -489,13 +483,13 @@ class AutomationStep extends DataObject
 							// - user cannot receive such email because of day limit;
 							// - user is not activated yet.
 							$step_result = 'ERROR';
-							if( $user_is_waiting_email )
-							{	// If user is really waiting email but some error on sending:
+							if( $user_subscribed_newsletter_ID )
+							{	// If user is subscribed but some error on email sending:
 								$additional_result_message = empty( $mail_log_message ) ? 'Unknown error' : $mail_log_message;
 							}
 							else
 							{	// If user just doesn't wait this email:
-								$additional_result_message = 'User #'.$step_User->ID.'('.$step_User->get( 'login' ).') is not waiting the Email Campaign #'.$step_EmailCampaign->ID.'('.$step_EmailCampaign->get( 'email_title' ).'), probably user is not activated.';
+								$additional_result_message = 'User #'.$step_User->ID.'('.$step_User->get( 'login' ).') is not subscribed to email lists of the Automation';
 							}
 						}
 					}

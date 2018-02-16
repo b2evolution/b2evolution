@@ -247,6 +247,8 @@ class EmailCampaign extends DataObject
 	 *   'receive' - Users which already received email newsletter
 	 *   'skipped' - Users which will not receive email newsletter
 	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
+	 *   Use same keys with prefix 'unsub_' for users are NOT subscribed to Newsletter of this Email Campaign,
+	 *   Use same keys with prefix 'full_' for users which are linked with this Email Campaign somehow,
 	 * @return array user IDs
 	 */
 	function get_recipients( $type = 'all' )
@@ -254,7 +256,21 @@ class EmailCampaign extends DataObject
 		// Make sure all recipients are loaded into cache:
 		$this->load_recipients();
 
-		return $this->users[ $type ];
+		if( isset( $this->users[ $type ] ) )
+		{	// Get subscribed OR unsubscribed users:
+			return $this->users[ $type ];
+		}
+		elseif( substr( $type, 0, 5 ) === 'full_' )
+		{	// Get subscribed AND unsubscribed users:
+			$type_key = substr( $type, 5 );
+			if( isset( $this->users[ $type_key ], $this->users[ 'unsub_'.$type_key ] ) )
+			{
+				return array_merge( $this->users[ $type_key ], $this->users[ 'unsub_'.$type_key ] );
+			}
+		}
+
+		// Unknown type:
+		debug_die( 'Unknown recipients type "'.$type.'" for Email Campaign #'.$this->ID );
 	}
 
 
@@ -280,18 +296,22 @@ class EmailCampaign extends DataObject
 		$users = $DB->get_results( $users_SQL->get(), OBJECT, $users_SQL->title );
 
 		$this->users = array(
+				// Users are subscribed to Newsletter of this Email Campaign:
 				'all'           => array(),
 				'filter'        => array(),
 				'receive'       => array(),
 				'skipped'       => array(),
 				'error'         => array(),
 				'wait'          => array(),
+				// Users are NOT subscribed to Newsletter of this Email Campaign:
 				'unsub_all'     => array(),
 				'unsub_filter'  => array(),
 				'unsub_receive' => array(),
 				'unsub_skipped' => array(),
 				'unsub_error'   => array(),
 				'unsub_wait'    => array(),
+				// All Users which are linked with this Email Campaign somehow:
+				// Use prefix 'full_' like 'full_all', 'full_filter' and etc.
 			);
 
 		foreach( $users as $user_data )
@@ -896,7 +916,7 @@ class EmailCampaign extends DataObject
 		}
 
 		// Get all send statuses per users of this email campaign from cache or DB table T_email__campaign_send once:
-		$all_user_IDs = $this->get_recipients( 'all' );
+		$all_user_IDs = $this->get_recipients( 'full_all' );
 
 		if( in_array( $user_ID, $all_user_IDs ) )
 		{	// Update user send status for this email campaign:
