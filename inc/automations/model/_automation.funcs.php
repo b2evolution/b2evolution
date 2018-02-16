@@ -85,10 +85,13 @@ function autm_td_tied_lists( $newsletters )
 		$newsletters = explode( '<', $newsletters );
 		foreach( $newsletters as $n => $newsletter )
 		{
-			if( preg_match( '#^(\d+):(.+)$#', $newsletter, $newsletter ) )
+			if( preg_match( '#^(\d+):([01]):([01]):(.+)$#', $newsletter, $newsletter ) )
 			{
 				$r .= '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit'
-					.'&amp;enlt_ID='.$newsletter[1].'"><b>'.$newsletter[2].'</b></a>, ';
+					.'&amp;enlt_ID='.$newsletter[1].'"><b>'.$newsletter[4].'</b></a>'
+					.( $newsletter[2] ? ' <span class="btn btn-success btn-xs" title="'.format_to_js( T_('auto start on list subscribe') ).'">'./* TRANS: Auto Start automation on list subscribe */T_('AS').'</span>': '' )
+					.( $newsletter[3] ? ' <span class="btn btn-danger btn-xs" title="'.format_to_js( T_('auto exit on list unsubscribe') ).'">'./* TRANS: Auto Exit automation on list unsubscribe */T_('AE').'</span>': '' )
+					.', ';
 			}
 		}
 		return substr( $r, 0, -2 );
@@ -465,7 +468,7 @@ function automation_results_block( $params = array() )
 
 	$SQL = new SQL( 'Get automations' );
 	$SQL->SELECT( 'autm_ID, autm_name, autm_status, enlt_ID, enlt_name, COUNT( aust_user_ID ) AS autm_users_num' );
-	$SQL->SELECT_add( ', ( SELECT GROUP_CONCAT( en.enlt_ID, ":", en.enlt_name SEPARATOR "<" )
+	$SQL->SELECT_add( ', ( SELECT GROUP_CONCAT( en.enlt_ID, ":", an.aunl_autostart, ":", an.aunl_autoexit, ":", en.enlt_name SEPARATOR "<" )
 		 FROM T_automation__newsletter AS an
 		INNER JOIN T_email__newsletter en ON en.enlt_ID = an.aunl_enlt_ID
 		WHERE autm_ID = an.aunl_autm_ID ) AS newsletters' );
