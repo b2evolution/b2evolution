@@ -37,6 +37,7 @@ switch( $type )
 
 		if( $email_log )
 		{
+			$skip_click_tracking = false;
 			if( ! empty( $email_log['emlog_user_ID'] ) )
 			{
 				$ecmp_ID = $DB->get_var( 'SELECT csnd_camp_ID FROM T_email__campaign_send WHERE csnd_emlog_ID = '.$DB->quote( $email_ID ) );
@@ -61,14 +62,19 @@ switch( $type )
 								$DB->query( 'UPDATE T_email__campaign_send
 										SET csnd_clicked_unsubscribe = 1
 										WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
+
+								// Do not track click
+								$skip_click_tracking = true;
 								break;
 						}
 					}
 				}
 			}
 
-			// Update last click time for current email log and related tables like email campaign and newsletters:
-			update_mail_log_time( 'click', $email_ID, $email_key );
+			if( ! $skip_click_tracking )
+			{ // Update last click time for current email log and related tables like email campaign and newsletters:
+				update_mail_log_time( 'click', $email_ID, $email_key );
+			}
 		}
 
 		// Redirect

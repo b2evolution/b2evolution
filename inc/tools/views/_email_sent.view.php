@@ -41,8 +41,9 @@ param( 'email', 'string', '', true );
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE emlog_ID, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_last_open_ts, emlog_last_click_ts' );
+$SQL->SELECT( 'SQL_NO_CACHE emlog_ID, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_last_open_ts, emlog_last_click_ts, emlog_camp_ID, ecmp_email_title' );
 $SQL->FROM( 'T_email__log' );
+$SQL->FROM_add( 'LEFT JOIN T_email__campaign ON ecmp_ID = emlog_camp_ID' );
 
 $count_SQL = new SQL();
 $count_SQL->SELECT( 'SQL_NO_CACHE COUNT(emlog_ID)' );
@@ -149,6 +150,12 @@ $Results->cols[] = array(
 		'th' => T_('Subject'),
 		'order' => 'emlog_subject',
 		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID=$emlog_ID$">%htmlspecialchars(#emlog_subject#)%</a>',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Email campaign'),
+		'order' => 'ecmp_email_title',
+		'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$emlog_camp_ID$">$ecmp_email_title$</a>',
 	);
 
 $Results->cols[] = array(

@@ -470,6 +470,7 @@ $schema_queries = array(
 			emlog_message   MEDIUMTEXT DEFAULT NULL,
 			emlog_last_open_ts TIMESTAMP NULL,
 			emlog_last_click_ts TIMESTAMP NULL,
+			emlog_camp_ID   INT UNSIGNED NULL DEFAULT NULL,
 			PRIMARY KEY     (emlog_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 

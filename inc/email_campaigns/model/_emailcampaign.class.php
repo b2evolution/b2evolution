@@ -653,7 +653,8 @@ class EmailCampaign extends DataObject
 	 */
 	function send_email( $user_ID, $email_address = '', $mode = '', $update_sent_ts = false, $newsletter_ID = NULL )
 	{
-		global $localtimenow;
+		global $localtimenow, $mail_log_campaign_ID;
+		$mail_log_campaign_ID = $this->ID;
 
 		$newsletter_params = array(
 				'include_greeting' => false,
@@ -729,6 +730,8 @@ class EmailCampaign extends DataObject
 			$this->set( 'sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
 			$this->dbupdate();
 		}
+
+		$mail_log_campaign_ID = NULL;
 
 		return $result;
 	}
