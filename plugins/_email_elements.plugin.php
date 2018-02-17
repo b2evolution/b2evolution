@@ -207,7 +207,7 @@ class email_elements_plugin extends Plugin
 				$url = trim( $matches[1][$i] );
 				$button_text = trim( $matches[2][$i] );
 
-				$link_tag = get_link_tag( $url, $button_text, 'div.btn a+a.btn-default' );
+				$link_tag = get_link_tag( $url, $button_text, 'div.btn a+a.btn-primary' );
 
 				$content = str_replace( $current_element, $link_tag, $content );
 			}

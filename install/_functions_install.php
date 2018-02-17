@@ -737,7 +737,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'wikitables_plugin' );
 		install_plugin( 'markdown_plugin' );
 		install_plugin( 'infodots_plugin', $install_test_features );
-		install_plugin( 'email_elements_plugin' );
 		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Info dots renderer"' );
@@ -773,6 +772,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	if( $old_db_version < 11760 )
 	{
 		install_plugin( 'polls_plugin' );
+	}
+
+	if( $old_db_version < 12580 )
+	{
+		install_plugin( 'email_elements_plugin' );
 	}
 }
 
