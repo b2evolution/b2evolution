@@ -1405,7 +1405,7 @@ class Form extends Widget
 			case "y": return "yy"; // year, 00-99
 			case "Y": return "yyyy"; // year, XXXX
 			default:
-				return $m[0];
+				return $matches[0];
 		}
 	}
 
