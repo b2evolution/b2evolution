@@ -195,6 +195,9 @@ class Organization extends DataObject
 			case 'org_role':
 				$users_SQL->ORDER_BY( 'uorg_role ASC, user_ID ASC' );
 				break;
+			case 'org_priority':
+				$users_SQL->ORDER_BY( 'uorg_priority ASC, user_ID ASC' );
+				break;
 			case 'username':
 				$users_SQL->ORDER_BY( 'user_login ASC, user_ID ASC' );
 				break;

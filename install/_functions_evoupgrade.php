@@ -6304,12 +6304,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		set_upgrade_checkpoint( '11380' );
 	}
 
-	if( $old_db_version < 11390 )
+	if( $old_db_version < 11390 )// Version?
 	{ // part 18.i trunk aka 11th part of "i7"
 
 		task_begin( 'Upgrading table of relations users with organizations... ' );
 		$DB->query( 'ALTER TABLE T_users__user_org
-			ADD COLUMN uorg_role VARCHAR(255) NULL' );
+			ADD COLUMN uorg_role VARCHAR(255) NULL
+			ADD COLUMN uorg_priority INT(11) NULL' );
 		task_end();
 
 		set_upgrade_checkpoint( '11390' );

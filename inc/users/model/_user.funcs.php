@@ -5597,6 +5597,17 @@ function users_results( & $UserList, $params = array() )
 		);
 	}
 
+	if( $params['display_priority'] )
+	{ // Display organizational role
+		$UserList->cols[] = array(
+			'th' => T_('Priority'),
+			'th_class' => 'small',
+			'td_class' => 'small',
+			'order' => 'uorg_priority',
+			'td' => '<a href="#" style="font-weight: 700;" onclick="return user_edit( '.intval( $params['org_ID'] ).', $user_ID$ )">$priority$</a>',
+		);
+	}
+
 	if( $params['display_gender'] )
 	{ // Display gender
 		$UserList->cols[] = array(
