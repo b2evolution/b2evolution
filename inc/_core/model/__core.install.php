@@ -583,6 +583,7 @@ $schema_queries = array(
 			aunl_enlt_ID   INT UNSIGNED NOT NULL,
 			aunl_autostart TINYINT(1) UNSIGNED DEFAULT 1,
 			aunl_autoexit  TINYINT(1) UNSIGNED DEFAULT 1,
+			aunl_order     INT NOT NULL DEFAULT 1,
 			PRIMARY KEY    (aunl_autm_ID, aunl_enlt_ID)
 		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
 

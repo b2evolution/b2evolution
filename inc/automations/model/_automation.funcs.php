@@ -468,7 +468,7 @@ function automation_results_block( $params = array() )
 
 	$SQL = new SQL( 'Get automations' );
 	$SQL->SELECT( 'autm_ID, autm_name, autm_status, enlt_ID, enlt_name, COUNT( aust_user_ID ) AS autm_users_num' );
-	$SQL->SELECT_add( ', ( SELECT GROUP_CONCAT( en.enlt_ID, ":", an.aunl_autostart, ":", an.aunl_autoexit, ":", en.enlt_name SEPARATOR "<" )
+	$SQL->SELECT_add( ', ( SELECT GROUP_CONCAT( en.enlt_ID, ":", an.aunl_autostart, ":", an.aunl_autoexit, ":", en.enlt_name ORDER BY an.aunl_order SEPARATOR "<" )
 		 FROM T_automation__newsletter AS an
 		INNER JOIN T_email__newsletter en ON en.enlt_ID = an.aunl_enlt_ID
 		WHERE autm_ID = an.aunl_autm_ID ) AS newsletters' );

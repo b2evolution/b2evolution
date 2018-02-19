@@ -128,6 +128,7 @@ class Automation extends DataObject
 		}
 
 		$sql_newsletters_values = array();
+		$aunl_order = 1;
 		foreach( $this->newsletters as $newsletter )
 		{
 			$newsletter_ID = intval( $newsletter['ID'] );
@@ -136,7 +137,7 @@ class Automation extends DataObject
 				continue;
 			}
 			// Build array with newsletter ID as key to avoid duplicate entry mysql error:
-			$sql_newsletters_values[ $newsletter_ID ] = '( '.$this->ID.', '.$newsletter_ID.', '.intval( $newsletter['autostart'] ).', '.intval( $newsletter['autoexit'] ).' )';
+			$sql_newsletters_values[ $newsletter_ID ] = '( '.$this->ID.', '.$newsletter_ID.', '.intval( $newsletter['autostart'] ).', '.intval( $newsletter['autoexit'] ).', '.( $aunl_order++ ).' )';
 		}
 
 		if( empty( $sql_newsletters_values ) )
@@ -151,7 +152,7 @@ class Automation extends DataObject
 			WHERE aunl_autm_ID = '.$this->ID );
 
 		// Insert new newsletter links for this automation:
-		$r = $DB->query( 'INSERT INTO T_automation__newsletter ( aunl_autm_ID, aunl_enlt_ID, aunl_autostart, aunl_autoexit ) 
+		$r = $DB->query( 'INSERT INTO T_automation__newsletter ( aunl_autm_ID, aunl_enlt_ID, aunl_autostart, aunl_autoexit, aunl_order ) 
 			VALUES '.implode( ', ', $sql_newsletters_values ) );
 
 		return $r;
@@ -199,7 +200,6 @@ class Automation extends DataObject
 		}
 		else
 		{	// Update newsletters array with new entered values:
-			ksort( $updated_newsletters ); // sort in order to compare with array generated from DB
 			$updated_newsletters = array_values( $updated_newsletters );
 			if( $prev_newsletters !== $updated_newsletters )
 			{	// Set flag to update newsletters:
@@ -323,7 +323,7 @@ class Automation extends DataObject
 				$SQL->SELECT( 'aunl_enlt_ID AS ID, aunl_autostart AS autostart, aunl_autoexit AS autoexit' );
 				$SQL->FROM( 'T_automation__newsletter' );
 				$SQL->WHERE( 'aunl_autm_ID = '.$this->ID );
-				$SQL->ORDER_BY( 'aunl_enlt_ID' );
+				$SQL->ORDER_BY( 'aunl_order' );
 				$this->newsletters = $DB->get_results( $SQL, ARRAY_A );
 			}
 		}

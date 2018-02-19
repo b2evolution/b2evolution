@@ -9140,6 +9140,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12620, 'Upgrading automation newsletter table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_automation__newsletter', 'aunl_order', 'INT NOT NULL DEFAULT 1' );
+		$DB->query( 'UPDATE T_automation__newsletter
+			SET aunl_order = aunl_enlt_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
