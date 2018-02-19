@@ -73,7 +73,8 @@ class apnic_handler
 
 			$r['registered'] = 'yes';
 
-			while (list($key,$val) = each($contacts))
+			//while (list($key,$val) = each($contacts))
+			foreach( $contacts as $key => $val )
 				if (isset($rb[$key]))
 					{
 					if (is_array($rb[$key]))
