@@ -1002,15 +1002,15 @@ class AutomationStep extends DataObject
 
 			case 'listsend_last_sent_to_user':
 				// Check last sent list to user:
-				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'csnd_last_sent_ts' );
+				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_sent_manual_ts' );
 
 			case 'listsend_last_opened_by_user':
 				// Check last opened list by user:
-				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'csnd_last_open_ts' );
+				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_open_ts' );
 
 			case 'listsend_last_clicked_by_user':
 				// Check last clicked list by user:
-				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'csnd_last_click_ts' );
+				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_click_ts' );
 		}
 
 		// Unknown field or operator:
@@ -1064,7 +1064,7 @@ class AutomationStep extends DataObject
 	 *
 	 * @param object Rule, object with properties: field, value, operator
 	 * @param integer Step User ID
-	 * @param string DB field name for checking: 'csnd_last_sent_ts', 'csnd_last_open_ts', 'csnd_last_click_ts'
+	 * @param string DB field name for checking: 'enls_last_sent_manual_ts', 'enls_last_open_ts', 'enls_last_click_ts'
 	 * @return boolean TRUE if condition is matched for current date, otherwise FALSE
 	 */
 	function check_if_condition_rule_listsend_value( $rule, $step_user_ID, $check_db_field_name )
@@ -1105,10 +1105,9 @@ class AutomationStep extends DataObject
 
 			$SQL = new SQL( 'Get last time for IF Condition "Last sent/opened/clicked list" ('.$check_db_field_name.')' );
 			$SQL->SELECT( $check_db_field_name );
-			$SQL->FROM( 'T_email__campaign_send' );
-			$SQL->FROM_add( 'INNER JOIN T_email__campaign ON csnd_camp_ID = ecmp_ID' );
-			$SQL->WHERE( 'csnd_user_ID = '.$DB->quote( $step_user_ID ) );
-			$SQL->WHERE_and( 'ecmp_enlt_ID IN ( '.$DB->quote( $rule_newsletters ).' )' );
+			$SQL->FROM( 'T_email__newsletter_subscription' );
+			$SQL->WHERE( 'enls_user_ID = '.$DB->quote( $step_user_ID ) );
+			$SQL->WHERE_and( 'enls_enlt_ID IN ( '.$DB->quote( $rule_newsletters ).' )' );
 			$SQL->ORDER_BY( $check_db_field_name );
 			$SQL->LIMIT( 1 );
 			$last_time = strtotime( $DB->get_var( $SQL ) );

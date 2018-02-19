@@ -409,11 +409,13 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 		case 'open':
 			$log_time_field = 'emlog_last_open_ts';
 			$campaign_time_field = 'csnd_last_open_ts';
+			$newsletter_time_field = 'enls_last_open_ts';
 			break;
 
 		case 'click':
 			$log_time_field = 'emlog_last_click_ts';
 			$campaign_time_field = 'csnd_last_click_ts';
+			$newsletter_time_field = 'enls_last_click_ts';
 			break;
 
 		default:
@@ -431,6 +433,13 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 		$DB->query( 'UPDATE T_email__campaign_send
 			  SET '.$campaign_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
 			WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ) );
+
+		// Update last time for user subscriptions of all automation newsletters:
+		$DB->query( 'UPDATE T_email__newsletter_subscription
+			INNER JOIN T_automation__newsletter ON aunl_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
+			INNER JOIN T_email__log ON aunl_autm_ID = emlog_autm_ID AND enls_user_ID = emlog_user_ID
+			  SET '.$newsletter_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
+			WHERE emlog_ID = '.$DB->quote( $emlog_ID ) );
 	}
 }
 

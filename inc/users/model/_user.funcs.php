@@ -5385,6 +5385,8 @@ function users_results_block( $params = array() )
 			'display_enls_subscribed_ts'   => false,
 			'display_enls_unsubscribed_ts' => false,
 			'display_enls_sent_manual'     => false,
+			'display_enls_last_open'       => false,
+			'display_enls_last_click'      => false,
 			'display_enls_send_count'      => false,
 			'display_actions'      => true,
 			'display_org_actions'  => false,
@@ -5628,6 +5630,8 @@ function users_results( & $UserList, $params = array() )
 			'display_enls_subscribed_ts'   => false,
 			'display_enls_unsubscribed_ts' => false,
 			'display_enls_sent_manual'     => false,
+			'display_enls_last_open'       => false,
+			'display_enls_last_click'      => false,
 			'display_enls_send_count'      => false,
 			'display_actions'    => true,
 			'display_campaign_actions' => false,
@@ -6088,6 +6092,30 @@ function users_results( & $UserList, $params = array() )
 				'order' => 'enls_last_sent_manual_ts',
 				'default_dir' => 'D',
 				'td' => '%mysql2localedatetime( #enls_last_sent_manual_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_last_open'] )
+	{	// Display newsletter last opened time:
+		$UserList->cols[] = array(
+				'th' => T_('Last opened'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'timestamp compact_data',
+				'order' => 'enls_last_open_ts',
+				'default_dir' => 'D',
+				'td' => '%user_td_emlog_date( #enls_last_open_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_last_click'] )
+	{	// Display newsletter last clicked time:
+		$UserList->cols[] = array(
+				'th' => T_('Last clicked'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'timestamp compact_data',
+				'order' => 'enls_last_click_ts',
+				'default_dir' => 'D',
+				'td' => '%user_td_emlog_date( #enls_last_click_ts# )%',
 			);
 	}
 

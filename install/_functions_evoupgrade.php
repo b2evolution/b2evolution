@@ -277,9 +277,17 @@ function db_upgrade_cols( $table, $cols )
 			{
 				case 'ADD':
 				case 'MODIFY':
+				case 'CHANGE':
 					if( in_array( strtolower( $col_name ), $existing_columns ) )
 					{	// Modify the existing column:
-						$upgrade_sql_query .= ' MODIFY COLUMN ';
+						if( $action == 'CHANGE' )
+						{	// Change a column, e-g rename it:
+							$upgrade_sql_query .= ' CHANGE COLUMN ';
+						}
+						else
+						{	// Modify a column, update only 
+							$upgrade_sql_query .= ' MODIFY COLUMN ';
+						}
 					}
 					else
 					{	// Add new column:
@@ -9118,6 +9126,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 12600, 'Upgrading email log table...' ) )
 	{	// part of 6.10.0-beta
 		db_add_col( 'T_email__log', 'emlog_autm_ID', 'INT UNSIGNED DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12610, 'Upgrading email newsletter subscriptions table...' ) )
+	{	// part of 6.10.0-beta
+		db_upgrade_cols( 'T_email__newsletter_subscription', array(
+			'ADD' => array(
+				'enls_last_open_ts'  => 'TIMESTAMP NULL AFTER enls_last_sent_manual_ts',
+				'enls_last_click_ts' => 'TIMESTAMP NULL AFTER enls_last_open_ts',
+			),
+		) );
 		upg_task_end();
 	}
 
