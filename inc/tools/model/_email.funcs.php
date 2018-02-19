@@ -310,8 +310,10 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
  * @param string Headers
  * @param string Result type ( 'ok', 'error', 'blocked', 'simulated' )
  * @param string Key for email tracking
+ * @param integer Email Campaign ID
+ * @param integer Automation ID
  */
-function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_key = NULL )
+function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_key = NULL, $email_campaign_ID = NULL, $automation_ID = NULL )
 {
 	global $DB, $servertimenow;
 
@@ -320,7 +322,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 	 */
 // TODO fp>erwin: why do we need a global below? Why don't we just return $DB->insert_id; ?
 // erwin>fp: this function is called within send_mail() and in EmailCampaign::send_all_emails(), the global is used to update the T_email__campaign_send values after the send_mail() call
-	global $mail_log_insert_ID, $mail_log_campaign_ID;
+	global $mail_log_insert_ID;
 	$mail_log_insert_ID = NULL;
 
 	if( empty( $user_ID ) )
@@ -332,7 +334,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 
 	// Insert mail log
 	$DB->query( 'INSERT INTO T_email__log
-		( emlog_key, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers, emlog_camp_ID )
+		( emlog_key, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers, emlog_camp_ID, emlog_autm_ID )
 		VALUES
 		( '.( empty( $email_key ) ? generate_random_key() : $DB->quote( $email_key ) ).',
 			'.$DB->quote( date2mysql( $servertimenow ) ).',
@@ -342,7 +344,8 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 		  '.$DB->quote( utf8_substr( $subject, 0, 255 ) ).',
 		  '.$DB->quote( $message ).',
 		  '.$DB->quote( $headers ).',
-		  '.( empty( $mail_log_campaign_ID ) ? 'NULL' : $DB->quote( $mail_log_campaign_ID ) ).' )' );
+		  '.$DB->quote( $email_campaign_ID ).',
+		  '.$DB->quote( $automation_ID ).' )' );
 
 	// Store ID of new inserted mail log
 	$mail_log_insert_ID = $DB->insert_id;

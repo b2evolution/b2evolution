@@ -649,18 +649,20 @@ class EmailCampaign extends DataObject
 	 * @param string Mode: 'test' - to send test email newsletter
 	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
 	 * @param integer Newsletter ID, used for unsubscribe link in email footer, NULL - to use Newsletter ID of this Email Campaign
+	 * @param integer Automation ID, used to store in mail log
 	 * @return boolean TRUE on success
 	 */
-	function send_email( $user_ID, $email_address = '', $mode = '', $update_sent_ts = false, $newsletter_ID = NULL )
+	function send_email( $user_ID, $email_address = '', $mode = '', $update_sent_ts = false, $newsletter_ID = NULL, $automation_ID = NULL )
 	{
-		global $localtimenow, $mail_log_campaign_ID;
-		$mail_log_campaign_ID = $this->ID;
+		global $localtimenow;
 
 		$newsletter_params = array(
 				'include_greeting' => false,
 				'message_html'     => $this->get( 'email_html' ),
 				'message_text'     => $this->get( 'email_plaintext' ),
 				'newsletter'       => ( $newsletter_ID === NULL ? $this->get( 'enlt_ID' ) : $newsletter_ID ),
+				'ecmp_ID'          => $this->ID,
+				'autm_ID'          => $automation_ID,
 				'template_parts'   => array(
 						'header' => 0,
 						'footer' => 0
@@ -730,8 +732,6 @@ class EmailCampaign extends DataObject
 			$this->set( 'sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
 			$this->dbupdate();
 		}
-
-		$mail_log_campaign_ID = NULL;
 
 		return $result;
 	}

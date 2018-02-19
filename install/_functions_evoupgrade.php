@@ -9107,11 +9107,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12590, 'Upgrading email log table...' ) )
-	{
+	{	// part of 6.10.0-beta
 		db_add_col( 'T_email__log', 'emlog_camp_ID', 'INT UNSIGNED NULL DEFAULT NULL AFTER emlog_last_click_ts' );
 		$DB->query( 'UPDATE T_email__log
 				INNER JOIN T_email__campaign_send ON csnd_emlog_ID = emlog_ID
 				SET emlog_camp_ID = csnd_camp_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12600, 'Upgrading email log table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_email__log', 'emlog_autm_ID', 'INT UNSIGNED DEFAULT NULL' );
 		upg_task_end();
 	}
 

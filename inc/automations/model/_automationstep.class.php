@@ -473,7 +473,7 @@ class AutomationStep extends DataObject
 							$step_result = 'NO';
 						}
 						elseif( ( $user_subscribed_newsletter_ID = $Automation->is_user_subscribed( $user_ID ) ) &&
-						        $step_EmailCampaign->send_email( $user_ID, '', '', 'auto', $user_subscribed_newsletter_ID ) )
+						        $step_EmailCampaign->send_email( $user_ID, '', '', 'auto', $user_subscribed_newsletter_ID, $Automation->ID ) )
 						{	// If user is subscribed to at least one newsletter of this Automation AND email has been sent to user successfully now:
 							$step_result = 'YES';
 						}

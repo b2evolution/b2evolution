@@ -89,8 +89,8 @@ function autm_td_tied_lists( $newsletters )
 			{
 				$r .= '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit'
 					.'&amp;enlt_ID='.$newsletter[1].'"><b>'.$newsletter[4].'</b></a>'
-					.( $newsletter[2] ? ' <span class="btn btn-success btn-xs" title="'.format_to_js( T_('auto start on list subscribe') ).'">'./* TRANS: Auto Start automation on list subscribe */T_('AS').'</span>': '' )
-					.( $newsletter[3] ? ' <span class="btn btn-danger btn-xs" title="'.format_to_js( T_('auto exit on list unsubscribe') ).'">'./* TRANS: Auto Exit automation on list unsubscribe */T_('AE').'</span>': '' )
+					.( $newsletter[2] ? ' <span class="label label-success" title="'.format_to_js( T_('auto start on list subscribe') ).'">'./* TRANS: Auto Start automation on list subscribe */T_('AS').'</span>': '' )
+					.( $newsletter[3] ? ' <span class="label label-danger" title="'.format_to_js( T_('auto exit on list unsubscribe') ).'">'./* TRANS: Auto Exit automation on list unsubscribe */T_('AE').'</span>': '' )
 					.', ';
 			}
 		}

@@ -3763,9 +3763,11 @@ function user_get_notification_sender( $user_ID, $setting )
  * @param string From name.
  * @param array Additional headers ( headername => value ). Take care of injection!
  * @param integer User ID
+ * @param integer Email Campaign ID
+ * @param integer Automation ID
  * @return boolean True if mail could be sent (not necessarily delivered!), false if not - (return value of {@link mail()})
  */
-function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL )
+function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL, $email_campaign_ID = NULL, $automation_ID = NULL )
 {
 	global $servertimenow, $email_send_simulate_only;
 
@@ -3877,7 +3879,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	// Create initial email log with empty message
 	$email_key = generate_random_key();
-	mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key );
+	mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key, $email_campaign_ID, $automation_ID );
 
 	// Replace tracking code placeholders
 	$message = str_replace( array( '$email_key$', '$mail_log_ID$' ), array( $email_key, $mail_log_insert_ID ), $message );
@@ -4068,7 +4070,11 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 
 		$to_email = !empty( $force_email_address ) ? $force_email_address : $User->email;
 
-		if( send_mail( $to_email, NULL, $subject, $message, NULL, NULL, $headers, $user_ID ) )
+		// Params for email log:
+		$email_campaign_ID = empty( $template_params['ecmp_ID'] ) ? NULL : $template_params['ecmp_ID'];
+		$automation_ID = empty( $template_params['autm_ID'] ) ? NULL : $template_params['autm_ID'];
+
+		if( send_mail( $to_email, NULL, $subject, $message, NULL, NULL, $headers, $user_ID, $email_campaign_ID, $automation_ID ) )
 		{ // email was sent, update last email settings;
 			if( isset( $email_limit_setting, $email_counter_setting ) )
 			{ // User Settings(email counters) need to be updated
