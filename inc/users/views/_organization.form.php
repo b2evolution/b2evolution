@@ -67,6 +67,12 @@ $Form->begin_form( 'fform', ( $creating ? T_('New organization') : T_('Organizat
 				array( 'owner', T_('can be edited by organization owner only') )
 			), T_('Role in organization'), true );
 
+	$Form->radio( 'org_perm_priority', $edited_Organization->get( 'perm_priority' ),
+			array(
+				array( 'owner and member', T_('can be edited by user and organization owner') ),
+				array( 'owner', T_('can be edited by organization owner only') )
+			), T_('Priority in organization'), true );
+
 
 $buttons = array();
 if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )

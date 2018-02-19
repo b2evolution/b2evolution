@@ -5604,7 +5604,7 @@ function users_results( & $UserList, $params = array() )
 			'th_class' => 'small',
 			'td_class' => 'small',
 			'order' => 'uorg_priority',
-			'td' => '<a href="#" style="font-weight: 700;" onclick="return user_edit( '.intval( $params['org_ID'] ).', $user_ID$ )">$priority$</a>',
+			'td' => '<a href="#" style="font-weight: 700;" onclick="return user_edit( '.intval( $params['org_ID'] ).', $user_ID$ )">$uorg_priority$</a>',
 		);
 	}
 

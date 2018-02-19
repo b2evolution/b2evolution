@@ -415,9 +415,11 @@ if( $action != 'view' )
 			else
 			{ // Allow to update the organization fields
 				$perm_edit_org_role = false;
+				$perm_edit_org_priority = false;
 				if( ! empty( $org_ID ) )
 				{
 					$perm_edit_org_role = ( $user_Organization->owner_user_ID == $current_User->ID ) || ( $user_Organization->perm_role == 'owner and member' && $org_data['accepted'] );
+					$perm_edit_org_priority = ( $user_Organization->owner_user_ID == $current_User->ID ) || ( $user_Organization->perm_priority == 'owner and member' && $org_data['accepted'] );
 				}
 
 				$Form->output = false;
@@ -430,6 +432,15 @@ if( $action != 'view' )
 				else
 				{
 					$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; ';
+				}
+				if( $perm_edit_org_priority )
+				{
+					$org_priority_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.
+							$Form->text_input( 'org_priorities[]', $org_data['priority'], 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+				}
+				else
+				{
+					$org_priority_input = ( empty( $org_data['priority'] ) ? '' : ' &nbsp; <strong>'.T_('Priority').':</strong> '.$org_data['priority'] ).' &nbsp; ';
 				}
 				$Form->switch_layout( NULL );
 				$Form->output = true;
