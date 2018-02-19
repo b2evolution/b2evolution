@@ -1081,28 +1081,7 @@ function format_input_date_to_iso( $date, $date_format = NULL )
 	}
 
 	// Convert PHP date format to regexp pattern:
-	$date_regexp = '~^'.preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
-		if( $m[1] == "\\\" ) return $m[2]; // escaped
-		switch( $m[2] )
-		{
-			case "d": return "([0-3]\\d)"; // day, 01-31
-			case "j": return "([1-3]?\\d)"; // day, 1-31
-			case "l": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday"])))).")";
-			case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
-			case "e": // b2evo extension!
-				return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
-			case "S": return "(st|nd|rd|th)?"; // english suffix for day. Made optional as jQuery formatDate does not support this format.
-
-			case "m": return "([0-1]\\d)"; // month, 01-12
-			case "n": return "(1?\\d)"; // month, 1-12
-			case "F": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month"])))).")"; //  A full textual representation of a month, such as January or March
-			case "M": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month_abbrev"])))).")";
-
-			case "y": return "(\\d\\d)"; // year, 00-99
-			case "Y": return "(\\d{4})"; // year, XXXX
-			default:
-				return $m[0];
-		}' ), $date_format ).'$~i'; // case-insensitive?
+	$date_regexp = '~^'.preg_replace_callback( '~(\\\)?(\w)~', '_format_input_date_to_iso_callback', $date_format ).'$~i'; // case-insensitive?
 	// Allow additional spaces, e.g. "03  May 2007" when format is "d F Y":
 	$date_regexp = preg_replace( '~ +~', '\s+', $date_regexp );
 	// echo $date_format.'...'.$date_regexp;
@@ -1165,6 +1144,35 @@ function format_input_date_to_iso( $date, $date_format = NULL )
 	}
 
 	return false;
+}
+
+
+/**
+ * Callback for preg_replace_callback in format_input_date_to_iso()
+ */
+function _format_input_date_to_iso_callback( $matches )
+{
+	if( $m[1] == "\\" ) return $m[2]; // escaped
+	switch( $m[2] )
+	{
+		case "d": return "([0-3]\\d)"; // day, 01-31
+		case "j": return "([1-3]?\\d)"; // day, 1-31
+		case "l": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday"])))).")";
+		case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
+		case "e": // b2evo extension!
+			return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
+		case "S": return "(st|nd|rd|th)?"; // english suffix for day. Made optional as jQuery formatDate does not support this format.
+
+		case "m": return "([0-1]\\d)"; // month, 01-12
+		case "n": return "(1?\\d)"; // month, 1-12
+		case "F": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month"])))).")"; //  A full textual representation of a month, such as January or March
+		case "M": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month_abbrev"])))).")";
+
+		case "y": return "(\\d\\d)"; // year, 00-99
+		case "Y": return "(\\d{4})"; // year, XXXX
+		default:
+			return $m[0];
+	}
 }
 
 

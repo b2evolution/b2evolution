@@ -907,7 +907,7 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 			$where[] = $allowed_statuses_cond;
 		}
 	}
-	elseif( count( $show_statuses ) )
+	elseif( is_array( $show_statuses ) && count( $show_statuses ) )
 	{ // we are not filtering so all status are allowed, add allowed statuses condition
 		$where[] = $dbprefix.'status IN ( \''.implode( '\',\'', $show_statuses ).'\' )';
 	}

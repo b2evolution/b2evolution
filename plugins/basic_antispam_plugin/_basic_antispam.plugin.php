@@ -308,6 +308,34 @@ class basic_antispam_plugin extends Plugin
 
 
 	/**
+	 * Callback for preg_replace_callback ini apply_nofollow()
+	 */
+	private static function _apply_nofollow_callback( $matches )
+	{
+		if( preg_match( '~\brel=([\'"])(.*?)\1~', $matches[2], $match ) )
+		{ // there is already a rel attrib:
+			$rel_values = explode( " ", $match[2] );
+
+			if( ! in_array( 'nofollow', $rel_values ) )
+			{
+				$rel_values[] = 'nofollow';
+			}
+
+			return $matches[1]
+				.preg_replace(
+					'~\brel=([\'"]).*?\1~',
+					'rel=$1'.implode( " ", $rel_values ).'$1',
+					$matches[2] )
+				.">";
+		}
+		else
+		{
+			return $matches[1].$matches[2].' rel="nofollow">';
+		}
+	}
+
+
+	/**
 	 * Do we want to apply rel="nofollow" tag?
 	 *
 	 * @return boolean
@@ -329,27 +357,7 @@ class basic_antispam_plugin extends Plugin
 			return;
 		}
 
-		$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', create_function( '$m', '
-				if( preg_match( \'~\brel=([\\\'"])(.*?)\1~\', $m[2], $match ) )
-				{ // there is already a rel attrib:
-					$rel_values = explode( " ", $match[2] );
-
-					if( ! in_array( \'nofollow\', $rel_values ) )
-					{
-						$rel_values[] = \'nofollow\';
-					}
-
-					return $m[1]
-						.preg_replace(
-							\'~\brel=([\\\'"]).*?\1~\',
-							\'rel=$1\'.implode( " ", $rel_values ).\'$1\',
-							$m[2] )
-						.">";
-				}
-				else
-				{
-					return $m[1].$m[2].\' rel="nofollow">\';
-				}' ), $data );
+		$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', array( 'basic_antispam_plugin', '_apply_nofollow_callback' ), $data );
 	}
 
 

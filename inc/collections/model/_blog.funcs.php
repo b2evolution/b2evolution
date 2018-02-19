@@ -1121,6 +1121,15 @@ function get_inskin_statuses_options( & $edited_Blog, $type )
 
 
 /**
+ * Callback for array_map in get_visibility_status()
+ */
+function _get_visibility_statuses_callback( $val )
+{
+	return implode( " ", $val );
+}
+
+
+/**
  * Get available post statuses
  *
  * @param string Statuses format, defaults to translated statuses
@@ -1151,7 +1160,7 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 
 			if( $format == 'notes-string' )
 			{	// String notes
-				$r = array_map( create_function('$v', 'return implode(" ", $v);'), $r );
+				$r = array_map( '_get_visibility_statuses_callback', $r );
 			}
 			break;
 
