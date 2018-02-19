@@ -1152,8 +1152,8 @@ function format_input_date_to_iso( $date, $date_format = NULL )
  */
 function _format_input_date_to_iso_callback( $matches )
 {
-	if( $m[1] == "\\" ) return $m[2]; // escaped
-	switch( $m[2] )
+	if( $matches[1] == "\\" ) return $matches[2]; // escaped
+	switch( $matches[2] )
 	{
 		case "d": return "([0-3]\\d)"; // day, 01-31
 		case "j": return "([1-3]?\\d)"; // day, 1-31
@@ -1171,7 +1171,7 @@ function _format_input_date_to_iso_callback( $matches )
 		case "y": return "(\\d\\d)"; // year, 00-99
 		case "Y": return "(\\d{4})"; // year, XXXX
 		default:
-			return $m[0];
+			return $matches[0];
 	}
 }
 
