@@ -7746,7 +7746,7 @@ class User extends DataObject
 
 			foreach( $EmailCampaignCache->cache as $EmailCampaign )
 			{	// Send an email of the campaign at subscription:
-				$EmailCampaign->send_all_emails( false, array( $this->ID ) );
+				$EmailCampaign->send_all_emails( false, array( $this->ID ), 'auto' );
 			}
 		}
 	}

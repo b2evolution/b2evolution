@@ -744,7 +744,7 @@ class EmailCampaign extends DataObject
 	 * @param array Force users instead of users which are ready to receive this email campaign
 	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
 	 */
-	function send_all_emails( $display_messages = true, $user_IDs = NULL, $update_sent_ts = 'auto' )
+	function send_all_emails( $display_messages = true, $user_IDs = NULL, $update_sent_ts = 'manual' )
 	{
 		global $DB, $localtimenow, $Settings, $Messages, $mail_log_insert_ID;
 

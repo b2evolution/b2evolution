@@ -36,7 +36,7 @@ $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 if( !empty( $template_action ) && $template_action == 'send_campaign' )
 { // Execute action to send campaign to all users
 	$Form->begin_fieldset( T_('Send report') );
-	$edited_EmailCampaign->send_all_emails( true, NULL, 'manual' );
+	$edited_EmailCampaign->send_all_emails();
 	$Form->end_fieldset();
 }
 
