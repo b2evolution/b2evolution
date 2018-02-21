@@ -3113,14 +3113,21 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		{
 			$key = key( $this->me['struct'] );
 			$value = current( $this->me['struct'] );
-			next( $this->me['struct'] );
 
-			//return each($this->me['struct']);
-			return array(
-				0 => $key,
-				1 => $value,
-				'key' => $key,
-				'value' => $value );
+			if( ! is_null( $key ) )
+			{
+				next( $this->me['struct'] );
+				//return each($this->me['struct']);
+				return array(
+					0 => $key,
+					1 => $value,
+					'key' => $key,
+					'value' => $value );
+			}
+			else
+			{
+				return FALSE;
+			}
 		}
 
 		// DEPRECATED! this code looks like it is very fragile and has not been fixed
