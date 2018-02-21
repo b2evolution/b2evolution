@@ -117,7 +117,7 @@ $Form->end_form();
 
 // Display numbers of users queued for the edited Automation Step:
 $SQL = new SQL( 'Get automations for the edited User #'.$edited_User->ID );
-$SQL->SELECT( 'autm_ID, autm_name, step_ID, step_label, step_type, step_order, aust_next_exec_ts' );
+$SQL->SELECT( 'autm_ID, autm_name, step_ID, step_label, step_type, step_info, step_order, aust_next_exec_ts' );
 $SQL->FROM( 'T_automation__user_state' );
 $SQL->FROM_add( 'INNER JOIN T_automation__automation ON aust_autm_ID = autm_ID' );
 $SQL->FROM_add( 'LEFT JOIN T_automation__step ON aust_next_step_ID = step_ID' );
@@ -143,7 +143,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th'    => T_('Next step'),
 		'order' => 'step_order, step_label',
-		'td'    => '%step_td_user_state( #step_ID#, #step_label#, #step_type#, #step_order# )%',
+		'td'    => '%step_td_user_state( #step_ID#, #step_label#, #step_type#, #step_info#, #step_order# )%',
 	);
 
 $Results->cols[] = array(
@@ -156,7 +156,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th'       => T_('Actions'),
-		'td'       => action_icon( T_('Remove from this automation'), 'delete', $admin_url.'?ctrl=user&amp;action=remove_automation&amp;user_ID='.$edited_User->ID.'&amp;autm_ID=$autm_ID$&amp;'.url_crumb( 'user' ) ),
+		'td'       => action_icon( T_('Remove this user from automation'), 'delete', $admin_url.'?ctrl=user&amp;action=remove_automation&amp;user_ID='.$edited_User->ID.'&amp;autm_ID=$autm_ID$&amp;'.url_crumb( 'user' ) ),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 	);

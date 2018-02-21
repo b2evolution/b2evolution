@@ -220,6 +220,8 @@ switch( $action )
 		if( $requeued_users_num )
 		{
 			$Messages->add( sprintf( T_('Automation has been requeued for %d users.'), $requeued_users_num ), 'success' );
+			// We want to highlight the reduced Step on list display:
+			$Session->set( 'fadeout_array', array( 'aust_user_ID' => array( $source_user_ID ) ) );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
@@ -393,10 +395,10 @@ switch( $action )
 		break;
 
 	case 'reduce_step_delay':
-		// Reduce step delay for specific user:
+		// Reduce step delay for a specific user:
 
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'automationstep' );
+		$Session->assert_received_crumb( 'automation' );
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -408,16 +410,86 @@ switch( $action )
 		// Change execution time to NOW:
 		$r = $DB->query( 'UPDATE T_automation__user_state
 			  SET aust_next_exec_ts = '.$DB->quote( date2mysql( $servertimenow ) ).'
-			WHERE aust_next_step_ID = '.$edited_AutomationStep->ID.'
-			  AND aust_user_ID = '.$step_User->ID );
+			WHERE aust_autm_ID = '.$edited_Automation->ID.'
+			  AND aust_user_ID = '.$step_User->ID.'
+			  AND aust_next_step_ID IS NOT NULL' ); // exclude finished steps
 
 		if( $r )
-		{
+		{	// Display a result message if user really has been affected:
 			$Messages->add( sprintf( T_('Execution time has been changed to now for user %s.'), '"'.$step_User->dget( 'login' ).'"' ), 'success' );
+			// We want to highlight the reduced Step on list display:
+			$Session->set( 'fadeout_array', array( 'aust_user_ID' => array( $step_User->ID ) ) );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $admin_url.'?ctrl=automations&action=edit_step&step_ID='.$edited_AutomationStep->ID, 303 ); // Will EXIT
+		if( isset( $edited_AutomationStep ) )
+		{	// Redirect to a page of Step edit form:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit_step&step_ID='.$edited_AutomationStep->ID, 303 ); // Will EXIT
+		}
+		else
+		{	// Redirect to a page of Automation users:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=users&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
+		}
+		// We have EXITed already at this point!!
+		break;
+
+	case 'stop_user':
+		// Stop automation for a specific user:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automation' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		param( 'user_ID', 'integer', true );
+		$UserCache = & get_UserCache();
+		$step_User = & $UserCache->get_by_ID( $user_ID );
+
+		// Change execution time to NOW:
+		$r = $DB->query( 'UPDATE T_automation__user_state
+			  SET aust_next_step_ID = NULL,
+			      aust_next_exec_ts = NULL
+			WHERE aust_autm_ID = '.$edited_Automation->ID.'
+			  AND aust_user_ID = '.$step_User->ID );
+
+		if( $r )
+		{	// Display a result message if user really has been affected:
+			$Messages->add( sprintf( T_('Automation has been stopped for user %s.'), '"'.$step_User->dget( 'login' ).'"' ), 'success' );
+			// We want to highlight the reduced Step on list display:
+			$Session->set( 'fadeout_array', array( 'aust_user_ID' => array( $step_User->ID ) ) );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=users&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'remove_user':
+		// Remove a specific user from automation:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automation' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		param( 'user_ID', 'integer', true );
+		$UserCache = & get_UserCache();
+		$step_User = & $UserCache->get_by_ID( $user_ID );
+
+		// Change execution time to NOW:
+		$r = $DB->query( 'DELETE FROM T_automation__user_state
+			WHERE aust_autm_ID = '.$edited_Automation->ID.'
+			  AND aust_user_ID = '.$step_User->ID );
+
+		if( $r )
+		{	// Display a result message if user really has been affected:
+			$Messages->add( sprintf( T_('User %s has been removed from this automation.'), '"'.$step_User->dget( 'login' ).'"' ), 'success' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=users&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 }

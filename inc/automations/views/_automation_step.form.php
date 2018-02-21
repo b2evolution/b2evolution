@@ -183,7 +183,7 @@ if( $edited_AutomationStep->ID > 0 )
 			'td_class' => 'shrinkwrap',
 		);
 
-	$Results->display();
+	$Results->display( NULL, 'session' );
 
 	// Init JS for form to requeue automation:
 	echo_requeue_automation_js();

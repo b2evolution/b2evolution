@@ -75,7 +75,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th'    => T_('Label'),
 		'order' => 'step_label',
-		'td'    => '%step_td_label( #step_ID#, #step_label#, #step_type# )%',
+		'td'    => '%step_td_label( #step_ID#, #step_label#, #step_type#, #step_info# )%',
 		'total' => T_('These users have finished the current automation (STOP state)'),
 	);
 

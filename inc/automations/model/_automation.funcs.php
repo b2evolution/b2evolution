@@ -110,9 +110,10 @@ function autm_td_tied_lists( $newsletters )
  * @param integer Step order
  * @param string Step label
  * @param string Step type
+ * @param string Step info
  * @return string
  */
-function autm_td_users_step( $step_ID, $step_order, $step_label, $step_type )
+function autm_td_users_step( $step_ID, $step_order, $step_label, $step_type, $step_info )
 {
 	if( $step_ID === NULL )
 	{
@@ -120,7 +121,7 @@ function autm_td_users_step( $step_ID, $step_order, $step_label, $step_type )
 	}
 	else
 	{
-		return '#'.$step_order.' '.step_td_label( $step_ID, $step_label, $step_type );
+		return '#'.$step_order.' '.step_td_label( $step_ID, $step_label, $step_type, $step_info );
 	}
 }
 
@@ -141,16 +142,28 @@ function autm_td_users_actions( $autm_ID, $user_ID, $user_login, $step_ID, $step
 
 	$r = '';
 
+	// If step order is defined we call this from step edit form, otherwise from tab "Automation" -> "Users":
+	$is_step_edit_form = ( $step_order !== NULL );
+
+	// Append step ID to know the action is from step edit form:
+	$step_action_url = $admin_url.'?ctrl=automations&amp;autm_ID='.$autm_ID.( $is_step_edit_form ? '&amp;step_ID='.$step_ID : '' ).'&amp;user_ID='.$user_ID.'&amp;'.url_crumb( 'automation' ).'&amp;action=';
+
 	if( $step_ID > 0 )
 	{	// Only for active step(excluding finished step):
 
 		// Change execution time:
-		$r .= action_icon( T_('Change execution time to now'), 'forward', $admin_url.'?ctrl=automations&amp;action=reduce_step_delay&amp;step_ID='.$step_ID.'&amp;user_ID='.$user_ID.'&amp;'.url_crumb( 'automationstep' ) );
+		$r .= action_icon( T_('Change execution time to now'), 'forward', $step_action_url.'reduce_step_delay' );
+
+		// Stop automation :
+		$r .= action_icon( T_('Stop automation for this user'), 'stop_square', $step_action_url.'stop_user' );
 	}
+
+	// Remove user from automation:
+	$r .= action_icon( T_('Remove this user from automation'), 'remove', $step_action_url.'remove_user' );
 
 	// Requeue:
 	$r .= ' <a href="#" class="btn btn-info btn-xs"'
-		.' onclick="return requeue_automation( '.$autm_ID.', '.( /*YES we should send step ID only when step ORDER is defined*/$step_order === NULL ? '0' : $step_ID ).', '.( $step_order === NULL ? '0' : $step_order ).', '.$user_ID.', \''.$user_login.'\' )">'
+		.' onclick="return requeue_automation( '.$autm_ID.', '.( $is_step_edit_form ? $step_ID : '0' ).', '.( $is_step_edit_form ? $step_order : '0' ).', '.$user_ID.', \''.$user_login.'\' )">'
 			.T_('Requeue')
 		.'</a>';
 
@@ -368,21 +381,61 @@ function step_td_num_users_queued( $step_ID, $autm_ID, $num_users_queued, $step_
  * @param integer Step ID
  * @param string Step label
  * @param string Step type
+ * @param string Step info
  * @return string
  */
-function step_td_label( $step_ID, $step_label, $step_type )
+function step_td_label( $step_ID, $step_label, $step_type, $step_info )
 {
-	global $current_User;
+	global $current_User, $admin_url;
 
-	$step_label = step_get_type_title( $step_type ).': '.$step_label;
+	$step_type_title = step_get_type_title( $step_type );
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	// Display step type title as:
+	$r = $current_User->check_perm( 'options', 'edit' )
+		// link to edit page if current user has a permission:
+		? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID.'"><b>'.$step_type_title.'</b></a>: '
+		// plain text if current user has no permission:
+		: $step_type_title.': ';
+
+	switch( $step_type )
 	{
-		global $admin_url;
-		$step_label = '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID.'"><b>'.$step_label.'</b></a>';
+		case 'send_campaign':
+			// Display email campaign title as:
+			$r .= $current_User->check_perm( 'emails', 'edit' )
+				// link to edit page if current user has a permission:
+				? '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;tab=send&amp;ecmp_ID='.intval( $step_info ).'">'.$step_label.'</a>'
+				// plain text if current user has no permission:
+				: $step_label;
+			break;
+
+		case 'subscribe':
+		case 'unsubscribe':
+			// Display newsletter name as:
+			$r .= $current_User->check_perm( 'emails', 'edit' )
+				// link to edit page if current user has a permission:
+				? '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.intval( $step_info ).'">'.$step_label.'</a>'
+				// plain text if current user has no permission:
+				: $step_label;
+			break;
+
+		case 'start_automation':
+			// Display automation name as:
+			$r .= $current_User->check_perm( 'options', 'edit' )
+				// link to edit page if current user has a permission:
+				? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit&amp;tab=settings&amp;autm_ID='.intval( $step_info ).'">'.$step_label.'</a>'
+				// plain text if current user has no permission:
+				: $step_label;
+			break;
+
+		default:
+			$r = $current_User->check_perm( 'options', 'edit' )
+				// link to edit page if current user has a permission:
+				? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID.'"><b>'.$step_type_title.'</b>: '.$step_label.'</a>'
+				// plain text if current user has no permission:
+				: $step_type_title.': '.$step_label;
 	}
 
-	return $step_label;
+	return $r;
 }
 
 
@@ -465,17 +518,18 @@ function step_td_actions( $step_ID, $is_first_step, $is_last_step )
  * @param integer|NULL Step ID
  * @param string Step label
  * @param string Step type
+ * @param string Step info
  * @param string Step order
  * @return string
  */
-function step_td_user_state( $step_ID, $step_label, $step_type, $step_order )
+function step_td_user_state( $step_ID, $step_label, $step_type, $step_info, $step_order )
 {
 	if( $step_ID === NULL )
 	{	// If all steps for automation were completed for user:
 		return T_('Finished');
 	}
 
-	return '#'.$step_order.' - '.step_td_label( $step_ID, $step_label, $step_type );
+	return '#'.$step_order.' - '.step_td_label( $step_ID, $step_label, $step_type, $step_info );
 }
 
 

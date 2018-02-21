@@ -1170,6 +1170,15 @@ function get_icon_info( $name )
 			'color' => '#C00'
 		);
 
+		case 'stop_square': return array(
+			'alt'  => T_('Stop'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 64, 128 ),
+			'glyph' => 'stop',
+			'fa' => 'stop',
+			'color' => '#C00'
+		);
+
 		case 'lightning': return array(
 			'alt'  => T_('Kill spam'),
 			'size' => array( 10, 16 ),

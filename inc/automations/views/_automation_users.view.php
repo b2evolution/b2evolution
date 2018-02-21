@@ -21,7 +21,7 @@ global $edited_Automation, $admin_url;
 autm_display_breadcrumb();
 
 $SQL = new SQL( 'Get all users queued for automation #'.$edited_Automation->ID );
-$SQL->SELECT( 'aust_autm_ID, aust_user_ID, aust_next_step_ID, aust_next_exec_ts, user_login, step_ID, IF( step_ID IS NULL, 2147483648, step_order ) AS step_order, step_label, step_type' );
+$SQL->SELECT( 'aust_autm_ID, aust_user_ID, aust_next_step_ID, aust_next_exec_ts, user_login, step_ID, IF( step_ID IS NULL, 2147483648, step_order ) AS step_order, step_label, step_type, step_info' );
 $SQL->FROM( 'T_automation__user_state' );
 $SQL->FROM_add( 'INNER JOIN T_users ON user_ID = aust_user_ID' );
 $SQL->FROM_add( 'LEFT JOIN T_automation__step ON step_ID = aust_next_step_ID' );
@@ -44,7 +44,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th'    => T_('Step'),
 		'order' => 'step_order, user_login',
-		'td'    => '%autm_td_users_step( #aust_next_step_ID#, #step_order#, #step_label#, #step_type# )%',
+		'td'    => '%autm_td_users_step( #aust_next_step_ID#, #step_order#, #step_label#, #step_type#, #step_info# )%',
 	);
 
 $Results->cols[] = array(
@@ -62,7 +62,7 @@ $Results->cols[] = array(
 		'td_class' => 'shrinkwrap',
 	);
 
-$Results->display();
+$Results->display( NULL, 'session' );
 
 // Init JS for form to requeue automation:
 echo_requeue_automation_js();
