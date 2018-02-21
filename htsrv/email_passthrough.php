@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
-global $DB, $Session, $modules, $localtimenow;
+global $DB, $Session, $modules;
 
 param( 'type', 'string', true );
 param( 'email_ID', 'integer', true );

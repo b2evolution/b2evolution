@@ -315,7 +315,7 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
  */
 function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_key = NULL, $email_campaign_ID = NULL, $automation_ID = NULL )
 {
-	global $DB, $servertimenow;
+	global $DB, $servertimenow, $localtimenow;
 
 	/**
 	 * @var integer|NULL This global var stores ID of the last inserted mail log
@@ -337,7 +337,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 		( emlog_key, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers, emlog_camp_ID, emlog_autm_ID )
 		VALUES
 		( '.( empty( $email_key ) ? generate_random_key() : $DB->quote( $email_key ) ).',
-			'.$DB->quote( date2mysql( $servertimenow ) ).',
+			'.$DB->quote( date2mysql( $localtimenow ) ).',
 		  '.$DB->quote( $user_ID ).',
 		  '.$DB->quote( $to ).',
 		  '.$DB->quote( $result ).',
@@ -365,7 +365,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 
 function update_mail_log( $email_ID, $result, $message )
 {
-	global $DB, $servertimenow;
+	global $DB, $servertimenow, $localtimenow;
 	$valid_results = array( 'ok', 'error', 'blocked', 'simulated', 'ready_to_send' );
 	if( ! in_array( $result, $valid_results ) )
 	{
@@ -375,7 +375,7 @@ function update_mail_log( $email_ID, $result, $message )
 	$DB->query( 'UPDATE T_email__log
 			SET emlog_result = '.$DB->quote( $result )
 			.', emlog_message = '.$DB->quote( $message )
-			.', emlog_timestamp = '.$DB->quote( date2mysql( $servertimenow ) )
+			.', emlog_timestamp = '.$DB->quote( date2mysql( $localtimenow ) )
 			.' WHERE emlog_ID = '.$DB->quote( $email_ID ) );
 
 	if( $result == 'ok' )

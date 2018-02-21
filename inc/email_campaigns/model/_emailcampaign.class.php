@@ -691,7 +691,7 @@ class EmailCampaign extends DataObject
 		}
 		else
 		{	// Send a newsletter to real user:
-			global $DB, $servertimenow, $mail_log_insert_ID;
+			global $DB, $mail_log_insert_ID;
 
 			// Force email sending to not activated users if email campaign is configurated to auto sending (e-g to send email on auto subscription on registration):
 			$force_on_non_activated = ( $this->get( 'auto_send' ) == 'subscription' );
@@ -699,7 +699,7 @@ class EmailCampaign extends DataObject
 			if( $result )
 			{	// Update last sending data for newsletter per user:
 				$DB->query( 'UPDATE T_email__newsletter_subscription
-					SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $servertimenow ) ).',
+					SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $localtimenow ) ).',
 					    enls_send_count = enls_send_count + 1
 					WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
 					  AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
