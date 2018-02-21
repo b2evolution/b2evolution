@@ -3111,12 +3111,16 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		*/
 		function structeach()
 		{
+			$key = key( $this->me['struct'] );
+			$value = current( $this->me['struct'] );
+			next( $this->me['struct'] );
+
 			//return each($this->me['struct']);
 			return array(
-				0 => key( $this->me['struct'] ),
-				1 => current( $this->me['struct'] ),
-				'key' => key( $this->me['struct'] ),
-				'value' => current( $this->me['struct'] ) );
+				0 => $key,
+				1 => $value,
+				'key' => $key,
+				'value' => $value );
 		}
 
 		// DEPRECATED! this code looks like it is very fragile and has not been fixed
