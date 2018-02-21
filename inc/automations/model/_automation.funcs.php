@@ -88,7 +88,7 @@ function autm_td_tied_lists( $newsletters )
 			if( preg_match( '#^(\d+):([01]):([01]):(.+)$#', $newsletter, $newsletter ) )
 			{
 				$r .= '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit'
-					.'&amp;enlt_ID='.$newsletter[1].'"><b>'.$newsletter[4].'</b></a>'
+					.'&amp;enlt_ID='.$newsletter[1].'">'.$newsletter[4].'</a>'
 					.( $newsletter[2] ? ' <span class="label label-success" title="'.format_to_js( T_('auto start on list subscribe') ).'">'./* TRANS: Auto Start automation on list subscribe */T_('AS').'</span>': '' )
 					.( $newsletter[3] ? ' <span class="label label-danger" title="'.format_to_js( T_('auto exit on list unsubscribe') ).'">'./* TRANS: Auto Exit automation on list unsubscribe */T_('AE').'</span>': '' )
 					.', ';
@@ -100,6 +100,61 @@ function autm_td_tied_lists( $newsletters )
 	{	// Newsletter names without link:
 		return str_replace( '<', ', ', $newsletter_names );
 	}
+}
+
+
+/**
+ * Helper function to display the step of automation users on Results table
+ *
+ * @param integer Step ID
+ * @param integer Step order
+ * @param string Step label
+ * @param string Step type
+ * @return string
+ */
+function autm_td_users_step( $step_ID, $step_order, $step_label, $step_type )
+{
+	if( $step_ID === NULL )
+	{
+		return T_('Finished');
+	}
+	else
+	{
+		return '#'.$step_order.' '.step_td_label( $step_ID, $step_label, $step_type );
+	}
+}
+
+
+/**
+ * Helper function to display automation actions per user on Results table
+ *
+ * @param integer Automation ID
+ * @param integer User ID
+ * @param string User login
+ * @param integer Step ID
+ * @param integer|NULL Step order
+ * @return string
+ */
+function autm_td_users_actions( $autm_ID, $user_ID, $user_login, $step_ID, $step_order = NULL )
+{
+	global $admin_url;
+
+	$r = '';
+
+	if( $step_ID > 0 )
+	{	// Only for active step(excluding finished step):
+
+		// Change execution time:
+		$r .= action_icon( T_('Change execution time to now'), 'forward', $admin_url.'?ctrl=automations&amp;action=reduce_step_delay&amp;step_ID='.$step_ID.'&amp;user_ID='.$user_ID.'&amp;'.url_crumb( 'automationstep' ) );
+	}
+
+	// Requeue:
+	$r .= ' <a href="#" class="btn btn-info btn-xs"'
+		.' onclick="return requeue_automation( '.$autm_ID.', '.( /*YES we should send step ID only when step ORDER is defined*/$step_order === NULL ? '0' : $step_ID ).', '.( $step_order === NULL ? '0' : $step_order ).', '.$user_ID.', \''.$user_login.'\' )">'
+			.T_('Requeue')
+		.'</a>';
+
+	return $r;
 }
 
 
@@ -467,7 +522,7 @@ function automation_results_block( $params = array() )
 	$url_params = '';
 
 	$SQL = new SQL( 'Get automations' );
-	$SQL->SELECT( 'autm_ID, autm_name, autm_status, enlt_ID, enlt_name, COUNT( aust_user_ID ) AS autm_users_num' );
+	$SQL->SELECT( 'autm_ID, autm_name, autm_status, enlt_ID, enlt_name, COUNT( DISTINCT aust_user_ID ) AS autm_users_num' );
 	$SQL->SELECT_add( ', ( SELECT GROUP_CONCAT( en.enlt_ID, ":", an.aunl_autostart, ":", an.aunl_autoexit, ":", en.enlt_name ORDER BY an.aunl_order SEPARATOR "<" )
 		 FROM T_automation__newsletter AS an
 		INNER JOIN T_email__newsletter en ON en.enlt_ID = an.aunl_enlt_ID

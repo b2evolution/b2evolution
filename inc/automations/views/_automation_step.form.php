@@ -178,8 +178,7 @@ if( $edited_AutomationStep->ID > 0 )
 
 	$Results->cols[] = array(
 			'th'       => T_('Actions'),
-			'td'       => action_icon( T_('Change execution time to now'), 'forward', $admin_url.'?ctrl=automations&amp;action=reduce_step_delay&amp;step_ID='.$edited_AutomationStep->ID.'&amp;user_ID=$aust_user_ID$&amp;'.url_crumb( 'automationstep' ) )
-				.' <a href="#" class="btn btn-info btn-xs" onclick="return requeue_automation( $aust_autm_ID$, '.$edited_AutomationStep->ID.', '.$edited_AutomationStep->get( 'order' ).', $aust_user_ID$, \\\'$user_login$\\\' )">'.T_('Requeue').'</a>',
+			'td'       => '%autm_td_users_actions( #aust_autm_ID#, #aust_user_ID#, #user_login#, '.$edited_AutomationStep->ID.', '.$edited_AutomationStep->get( 'order' ).' )%',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
 		);

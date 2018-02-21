@@ -23,6 +23,7 @@ $current_User->check_perm( 'options', 'view', true );
 
 param_action( '', true );
 param( 'display_mode', 'string', 'normal' );
+param( 'tab', 'string', 'settings', true );
 
 if( param( 'autm_ID', 'integer', '', true ) )
 {	// Load Automation object:
@@ -222,13 +223,17 @@ switch( $action )
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		if( $source_user_ID > 0 )
+		if( $source_step_ID > 0 && $source_user_ID > 0 )
 		{	// Redirect to an edit page of the requeued step:
 			header_redirect( $admin_url.'?ctrl=automations&action=edit_step&step_ID='.$target_step_ID, 303 ); // Will EXIT
 		}
+		elseif( $source_user_ID > 0 )
+		{	// Redirect to a page of Automation users:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=users&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
+		}
 		else
-		{	// Redirect to an edit page of Automation:
-			header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
+		{	// Redirect to a page of Automation steps:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
 		}
 		// We have EXITed already at this point!!
 		break;
@@ -328,7 +333,7 @@ switch( $action )
 			$Messages->add( T_('New automation step has been created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'new_step';
@@ -354,7 +359,7 @@ switch( $action )
 			$Messages->add( T_('Automation step has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'edit_step';
@@ -377,7 +382,7 @@ switch( $action )
 			$Messages->add( T_('Automation step has been deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=automations&action=edit&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 
@@ -422,21 +427,63 @@ $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=campaigns' );
 $AdminUI->breadcrumbpath_add( T_('Automations'), $admin_url.'?ctrl=automations' );
 
+$AdminUI->set_path( 'email', 'automations' );
+
 // Set an url for manual page:
 switch( $action )
 {
 	case 'new':
 	case 'edit':
-		$AdminUI->set_page_manual_link( 'automation-form' );
-		// Init JS to autcomplete the user logins
-		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+	case 'new_step':
+	case 'edit_step':
+		if( $action != 'new' )
+		{	// Add menu level 3 entries:
+			if( empty( $edited_Automation ) )
+			{	// Get Automation of the edited Step:
+				$edited_Automation = & $edited_AutomationStep->get_Automation();
+				set_param( 'tab', 'steps' );
+			}
+			$AdminUI->add_menu_entries( array( 'email', 'automations' ), array(
+					'settings' => array(
+						'text' => T_('Settings'),
+						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=settings&amp;autm_ID='.$edited_Automation->ID ),
+					'steps' => array(
+						'text' => T_('Steps'),
+						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=steps&amp;autm_ID='.$edited_Automation->ID ),
+					'users' => array(
+						'text' => T_('Users'),
+						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=users&amp;autm_ID='.$edited_Automation->ID ),
+				) );
+		}
+		else
+		{	// Don't add level 3 entries for new creating automation, and force tab only for settings:
+			set_param( 'tab', 'settings' );
+		}
+
+		switch( $tab )
+		{
+			case 'steps':
+				$AdminUI->set_page_manual_link( 'automation-steps' );
+				$AdminUI->set_path( 'email', 'automations', 'steps' );
+				break;
+
+			case 'users':
+				$AdminUI->set_page_manual_link( 'automation-users-queued' );
+				$AdminUI->set_path( 'email', 'automations', 'users' );
+				break;
+
+			default:
+			case 'settings':
+				$AdminUI->set_page_manual_link( 'automation-form-settings' );
+				$AdminUI->set_path( 'email', 'automations', 'settings' );
+				// Init JS to autcomplete the user logins
+				init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+		}
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'automations-list' );
 		break;
 }
-
-$AdminUI->set_path( 'email', 'automations' );
 
 if( in_array( $action, array( 'new_step', 'edit_step' ) ) )
 {	// Load jQuery QueryBuilder plugin files:
@@ -462,7 +509,20 @@ switch( $action )
 	case 'new':
 	case 'edit':
 		// Display a form of automation:
-		$AdminUI->disp_view( 'automations/views/_automation.form.php' );
+		switch( $tab )
+		{
+			case 'steps':
+				$AdminUI->disp_view( 'automations/views/_automation_steps.view.php' );
+				break;
+
+			case 'users':
+				$AdminUI->disp_view( 'automations/views/_automation_users.view.php' );
+				break;
+
+			case 'settings':
+			default:
+				$AdminUI->disp_view( 'automations/views/_automation.form.php' );
+		}
 		break;
 
 	case 'requeue_form':
