@@ -34,6 +34,11 @@ class Newsletter extends DataObject
 	var $order;
 
 	/**
+	 * @var array IDs of subscribed users
+	 */
+	var $user_IDs = NULL;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -62,7 +67,8 @@ class Newsletter extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table'=>'T_email__campaign', 'fk'=>'ecmp_enlt_ID', 'msg'=>T_('%d campaigns are linked to this list') ),
+				array( 'table' => 'T_email__campaign', 'fk' => 'ecmp_enlt_ID', 'msg' => T_('%d campaigns are linked to this list') ),
+				array( 'table' => 'T_automation__newsletter', 'fk' => 'aunl_enlt_ID', 'msg' => T_('%d automations use this list') ),
 			);
 	}
 
@@ -117,6 +123,33 @@ class Newsletter extends DataObject
 	function get_name()
 	{
 		return $this->get( 'name' );
+	}
+
+
+	/**
+	 * Get IDs of users which are subscribed on this newsletter
+	 *
+	 * @return array User IDs
+	 */
+	function get_user_IDs()
+	{
+		if( empty( $this->ID ) )
+		{
+			return array();
+		}
+
+		if( $this->user_IDs === NULL )
+		{	// Load user IDs from DB once and store in cache array:
+			global $DB;
+			$SQL = new SQL( 'Get IDs of users which are subscribed on the newsletter #'.$this->ID );
+			$SQL->SELECT( 'enls_user_ID' );
+			$SQL->FROM( 'T_email__newsletter_subscription' );
+			$SQL->WHERE( 'enls_enlt_ID = '.$this->ID );
+			$SQL->WHERE_and( 'enls_subscribed = 1' );
+			$this->user_IDs = $DB->get_col( $SQL );
+		}
+
+		return $this->user_IDs;
 	}
 }
 

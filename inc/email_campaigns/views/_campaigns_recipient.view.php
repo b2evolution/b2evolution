@@ -23,7 +23,7 @@ users_results_block( array(
 		'filterset_name'       => 'ecmp_'.$edited_EmailCampaign->ID,
 		'results_param_prefix' => 'ecmp_',
 		'results_title'        => T_('Recipients of this campaign').get_manual_link( 'email-campaign-recipients' ),
-		'results_order'        => '/emlog_timestamp/D',
+		'results_order'        => '/csnd_last_sent_ts/D',
 		'page_url'             => get_dispctrl_url( 'campaigns', 'action=edit&amp;tab=recipient&amp;ecmp_ID='.$edited_EmailCampaign->ID.'&amp;recipient_type='.get_param( 'recipient_type' ) ),
 		'display_ID'           => false,
 		'display_btn_adduser'  => false,

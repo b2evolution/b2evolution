@@ -1175,7 +1175,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 		debug_die( 'Active user not found.' );
 	}
 
-	if( in_array( $user_tab, array( 'advanced', 'admin', 'sessions', 'activity' ) ) )
+	if( in_array( $user_tab, array( 'marketing', 'advanced', 'admin', 'sessions', 'activity' ) ) )
 	{
 		$is_admin_tab = true;
 	}
@@ -2512,15 +2512,22 @@ function get_user_sub_entries( $is_admin, $user_ID )
 							'text' => T_('Emails'),
 							'href' => url_add_param( $base_url, $ctrl_param.'subs'.$user_param ) );
 
-		if( $is_admin && $Settings->get( 'enable_visit_tracking' ) == 1 )
-		{
-			$users_sub_entries['visits'] = array(
+		if( $is_admin )
+		{	// Show this only in backoffice:
+			if( $current_User->can_moderate_user( $user_ID ) )
+			{	// For moderators:
+				$users_sub_entries['marketing'] = array(
+								'text' => T_('Marketing'),
+								'href' => url_add_param( $base_url, $ctrl_param.'marketing'.$user_param ) );
+			}
+
+			if( $Settings->get( 'enable_visit_tracking' ) == 1 )
+			{	// If visit tracking is enabled:
+				$users_sub_entries['visits'] = array(
 								'text' => T_('Visits'),
 								'href' => url_add_param( $base_url, $ctrl_param.'visits'.$user_param ) );
-		}
+			}
 
-		if( $is_admin )
-		{	// show this only in backoffice
 			$users_sub_entries['advanced'] = array(
 								'text' => T_('Advanced'),
 								'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=advanced'.$user_param ) );
@@ -4580,6 +4587,50 @@ function echo_user_deldata_js( $params = array() )
 
 
 /**
+ * Initialize JavaScript for AJAX loading of popup window to add user to automation
+ * @param array Params
+ */
+function echo_user_automation_js()
+{
+	global $admin_url;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_add_user_to_automation = \''.TS_('Add user to an automation...').get_manual_link( 'add-user-to-automation' ).'\';
+		var evo_js_lang_add = \''.TS_('Add').'\';
+		var evo_js_user_automation_ajax_url = \''.$admin_url.'\';
+		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+	</script>';
+}
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to add users list to automation
+ * @param array Params
+ */
+function echo_userlist_automation_js()
+{
+	global $admin_url;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_add_current_selection_to_automation = \''.TS_('Add current selection to an Automation...').get_manual_link( 'add-users-list-to-automation' ).'\';
+		var evo_js_lang_add_selected_users_to_automation = \''.TS_('Add selected users to "%s"').'\';
+		var evo_js_userlist_automation_ajax_url = \''.$admin_url.'\';
+		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+	</script>';
+}
+
+
+/**
  * Display user report form
  *
  * @param array Params
@@ -5339,10 +5390,13 @@ function users_results_block( $params = array() )
 			'display_enls_subscribed_ts'   => false,
 			'display_enls_unsubscribed_ts' => false,
 			'display_enls_sent_manual'     => false,
+			'display_enls_last_open'       => false,
+			'display_enls_last_click'      => false,
 			'display_enls_send_count'      => false,
 			'display_actions'      => true,
 			'display_org_actions'  => false,
 			'display_newsletter'   => true,
+			'display_automation'   => false,
 			'force_check_user'     => false,
 		), $params );
 
@@ -5487,32 +5541,44 @@ function users_results_block( $params = array() )
 		$UserList->display( $params['display_params'] );
 	}
 
-	$edited_campaign_ID = $Session->get( 'edited_campaign_ID' );
-	if( !empty( $edited_campaign_ID ) )
-	{ // Get Email Campaign by ID from Session
-		$EmailCampaignCache = & get_EmailCampaignCache();
-		$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $edited_campaign_ID, false, false );
-	}
+	$user_list_buttons = array();
 
-	if( !empty( $edited_EmailCampaign ) )
-	{
-		$newsletter_button_text = sprintf( T_('Use this selection for list "%s"'), $edited_EmailCampaign->get( 'name' ) );
-		$newsletter_button_class = 'btn-primary';
-	}
-	else
-	{
-		$newsletter_button_text = T_('Send list to the current selection');
-		$newsletter_button_class = 'btn-default';
+	if( $params['display_automation'] && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) && $UserList->result_num_rows > 0 )
+	{	// Button to add users to an automation:
+		$user_list_buttons[] = '<a href="#" class="btn btn-primary" onclick="return add_userlist_automation()">'
+				.format_to_output( T_('Add current selection to an Automation...') )
+			.'</a>';
+		// Init JS for form to add user to automation:
+		echo_userlist_automation_js();
 	}
 
 	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 && ! empty( $UserList->filters['newsletter'] ) )
-	{	// Display newsletter button:
-		echo '<p class="center">';
-		echo '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=users&amp;newsletter='.$UserList->filters['newsletter'].'&amp;'.url_crumb( 'campaign' ).'"'
-			.' class="btn '.$newsletter_button_class.'">'
-				.format_to_output( $newsletter_button_text )
+	{	// Button to change users of email campaign OR Create new email campaign for current selection:
+		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+		if( $edited_EmailCampaign = & get_session_EmailCampaign() )
+		{
+			$campaign_button_text = sprintf( T_('Use this selection for campaign "%s"'), $edited_EmailCampaign->get( 'email_title' ) );
+			$campaign_button_class = 'btn-primary';
+			$campaign_action = 'update_users';
+			$campaign_ID_param = '&amp;ecmp_ID='.$edited_EmailCampaign->ID;
+		}
+		else
+		{
+			$campaign_button_text = T_('Create new Email Campaign for the current selection');
+			$campaign_button_class = 'btn-default';
+			$campaign_action = 'create_for_users';
+			$campaign_ID_param = '';
+		}
+
+		$user_list_buttons[] = '<a href="'.$admin_url.'?ctrl=campaigns&amp;action='.$campaign_action.$campaign_ID_param.'&amp;newsletter='.$UserList->filters['newsletter'].'&amp;'.url_crumb( 'campaign' ).'"'
+			.' class="btn '.$campaign_button_class.'">'
+				.format_to_output( $campaign_button_text )
 			.'</a>';
-		echo '</p>';
+	}
+
+	if( count( $user_list_buttons ) )
+	{	// Display action buttons for users list:
+		echo '<p class="center">'.implode( ' ', $user_list_buttons ).'</p>';
 	}
 }
 
@@ -5569,6 +5635,8 @@ function users_results( & $UserList, $params = array() )
 			'display_enls_subscribed_ts'   => false,
 			'display_enls_unsubscribed_ts' => false,
 			'display_enls_sent_manual'     => false,
+			'display_enls_last_open'       => false,
+			'display_enls_last_click'      => false,
 			'display_enls_send_count'      => false,
 			'display_actions'    => true,
 			'display_campaign_actions' => false,
@@ -5957,9 +6025,9 @@ function users_results( & $UserList, $params = array() )
 				'th' => T_('Send date'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'timestamp compact_data',
-				'order' => 'emlog_timestamp',
+				'order' => 'csnd_last_sent_ts',
 				'default_dir' => 'D',
-				'td' => '%user_td_emlog_date( #emlog_timestamp# )%',
+				'td' => '%user_td_emlog_date( #csnd_last_sent_ts# )%',
 			);
 	}
 
@@ -5969,18 +6037,18 @@ function users_results( & $UserList, $params = array() )
 				'th' => T_('Last opened'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'timestamp compact_data',
-				'order' => 'emlog_last_open_ts',
+				'order' => 'csnd_last_open_ts',
 				'default_dir' => 'D',
-				'td' => '%user_td_emlog_date( #emlog_last_open_ts# )%',
+				'td' => '%user_td_emlog_date( #csnd_last_open_ts# )%',
 			);
 
 		$UserList->cols[] = array(
 				'th' => T_('Last clicked'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'timestamp compact_data',
-				'order' => 'emlog_last_click_ts',
+				'order' => 'csnd_last_click_ts',
 				'default_dir' => 'D',
-				'td' => '%user_td_emlog_date( #emlog_last_click_ts# )%',
+				'td' => '%user_td_emlog_date( #csnd_last_click_ts# )%',
 			);
 	}
 
@@ -6029,6 +6097,30 @@ function users_results( & $UserList, $params = array() )
 				'order' => 'enls_last_sent_manual_ts',
 				'default_dir' => 'D',
 				'td' => '%mysql2localedatetime( #enls_last_sent_manual_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_last_open'] )
+	{	// Display newsletter last opened time:
+		$UserList->cols[] = array(
+				'th' => T_('Last opened'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'timestamp compact_data',
+				'order' => 'enls_last_open_ts',
+				'default_dir' => 'D',
+				'td' => '%user_td_emlog_date( #enls_last_open_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_last_click'] )
+	{	// Display newsletter last clicked time:
+		$UserList->cols[] = array(
+				'th' => T_('Last clicked'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'timestamp compact_data',
+				'order' => 'enls_last_click_ts',
+				'default_dir' => 'D',
+				'td' => '%user_td_emlog_date( #enls_last_click_ts# )%',
 			);
 	}
 

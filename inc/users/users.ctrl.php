@@ -25,6 +25,8 @@ param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kil
 
 param_action( 'list' );
 
+param( 'display_mode', 'string', 'normal' );
+
 $tab = param( 'tab', 'string', '' );
 
 $AdminUI->set_path( 'users', $tab == 'stats' ? 'stats' : 'users' );
@@ -372,8 +374,8 @@ if( !$Messages->has_errors() )
 			/* EXITED */
 			break;
 
-		case 'newsletter':
-			// This is a redirect from email campaign controller to select the recipients:
+		case 'campaign':
+			// Select the recipients for email campaign:
 
 			$current_User->check_perm( 'emails', 'edit', true );
 
@@ -382,16 +384,55 @@ if( !$Messages->has_errors() )
 
 			$Messages->add( T_('Please select new recipients for this email campaign.'), 'success' );
 
-			if( ! param( 'newsletter', 'integer', 0 ) )
-			{	// Don't allow all newsletters for selecting of recipients for email campaign:
-				$Messages->add( T_('Any email campaign must be sent to subscribers of a particular list. Please select a list in your filters.'), 'error' );
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+			if( ! ( $edited_EmailCampaign = & get_session_EmailCampaign() ) )
+			{	// Initialize Email Campaign once and store in Session:
 
-				load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
-				if( $edited_EmailCampaign = & get_session_EmailCampaign() )
-				{	// Force newsletter filter by current of email campaign:
-					set_param( 'newsletter', $edited_EmailCampaign->get( 'enlt_ID' ) );
-				}
+				// ID of Email Campaign is required and should be memorized:
+				param( 'ecmp_ID', 'integer', true );
+
+				// Get Email Campaign by ID:
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $ecmp_ID );
+
+				// Save Email Campaign ID in Session:
+				$Session->set( 'edited_campaign_ID', $edited_EmailCampaign->ID );
 			}
+
+			// Set users filter "Subscribed to":
+			set_param( 'newsletter', $edited_EmailCampaign->get( 'enlt_ID' ) );
+			set_param( 'filter', 'new' );
+			break;
+
+		case 'add_automation':
+			// Add selected users to automation:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'options', 'view', true );
+
+			param( 'autm_ID', 'integer', true );
+			param( 'enlt_ID', 'integer', true );
+
+			$AutomationCache = & get_AutomationCache();
+			$Automation = & $AutomationCache->get_by_ID( $autm_ID );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+			$added_users_num = $Automation->add_users( get_filterset_user_IDs(), array(
+					'users_no_subs'   => param( 'users_no_subs', 'string', 'ignore' ),
+					'users_automated' => param( 'users_automated', 'string', 'ignore' ),
+					'users_new'       => param( 'users_new', 'string', 'ignore' ),
+					'newsletter_IDs'  => $enlt_ID,
+				) );
+
+			$Messages->add( sprintf( T_('%d users have been added or requeued for automation "%s"'), $added_users_num, $Automation->get( 'name' ) ), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 			break;
 	}
 }
@@ -439,11 +480,14 @@ else
 // Initialize date picker
 init_datepicker_js();
 
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
+if( $display_mode != 'js')
+{
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
 
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
+}
 
 /*
  * Display appropriate payload:
@@ -514,6 +558,21 @@ switch( $action )
 		echo_user_report_window();
 		break;
 
+	case 'automation':
+		// Display a form to add users selection to automation:
+
+		// Do not append Debuglog & Debug JSlog to response!
+		$debug = false;
+		$debug_jslog = false;
+
+		$AdminUI->disp_payload_begin();
+
+		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+		$AdminUI->disp_view( 'users/views/_user_list_automation.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
 	case 'promote':
 	default:
 		// Display user list:
@@ -530,8 +589,9 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 }
 
-
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
+if( $display_mode != 'js')
+{
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>

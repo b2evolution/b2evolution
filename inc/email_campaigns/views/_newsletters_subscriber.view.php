@@ -52,6 +52,8 @@ if( $edited_Newsletter->ID > 0 )
 		'display_enls_subscribed_ts'   => true,
 		'display_enls_unsubscribed_ts' => true,
 		'display_enls_sent_manual'     => true,
+		'display_enls_last_open'       => true,
+		'display_enls_last_click'      => true,
 		'display_enls_send_count'      => true,
 		'th_class_login'       => 'shrinkwrap',
 		'td_class_login'       => '',

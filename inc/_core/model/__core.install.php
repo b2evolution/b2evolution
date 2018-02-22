@@ -469,18 +469,20 @@ $schema_queries = array(
 	'T_email__log' => array(
 		'Creating email log table',
 		"CREATE TABLE T_email__log (
-			emlog_ID        INT(10) UNSIGNED NOT NULL auto_increment,
-			emlog_key       CHAR(32) NULL DEFAULT NULL,
-			emlog_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			emlog_user_ID   INT(10) UNSIGNED DEFAULT NULL,
-			emlog_to        VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
-			emlog_result    ENUM( 'ok', 'error', 'blocked', 'simulated', 'ready_to_send' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
-			emlog_subject   VARCHAR(255) DEFAULT NULL,
-			emlog_headers   TEXT DEFAULT NULL,
-			emlog_message   MEDIUMTEXT DEFAULT NULL,
-			emlog_last_open_ts TIMESTAMP NULL,
+			emlog_ID            INT(10) UNSIGNED NOT NULL auto_increment,
+			emlog_key           CHAR(32) NULL DEFAULT NULL,
+			emlog_timestamp     TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			emlog_user_ID       INT(10) UNSIGNED DEFAULT NULL,
+			emlog_to            VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
+			emlog_result        ENUM( 'ok', 'error', 'blocked', 'simulated', 'ready_to_send' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
+			emlog_subject       VARCHAR(255) DEFAULT NULL,
+			emlog_headers       TEXT DEFAULT NULL,
+			emlog_message       MEDIUMTEXT DEFAULT NULL,
+			emlog_last_open_ts  TIMESTAMP NULL,
 			emlog_last_click_ts TIMESTAMP NULL,
-			PRIMARY KEY     (emlog_ID)
+			emlog_camp_ID       INT UNSIGNED NULL DEFAULT NULL,
+			emlog_autm_ID       INT UNSIGNED DEFAULT NULL,
+			PRIMARY KEY         (emlog_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_email__returns' => array(
@@ -531,6 +533,8 @@ $schema_queries = array(
 			enls_user_ID             INT UNSIGNED NOT NULL,
 			enls_enlt_ID             INT UNSIGNED NOT NULL,
 			enls_last_sent_manual_ts TIMESTAMP NULL,
+			enls_last_open_ts        TIMESTAMP NULL,
+			enls_last_click_ts       TIMESTAMP NULL,
 			enls_send_count          INT UNSIGNED NOT NULL DEFAULT 0,
 			enls_subscribed          TINYINT(1) UNSIGNED DEFAULT 1,
 			enls_subscribed_ts       TIMESTAMP NULL,
@@ -554,18 +558,73 @@ $schema_queries = array(
 			ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0,
 			ecmp_send_ctsk_ID    INT(10) UNSIGNED NULL DEFAULT NULL,
 			ecmp_auto_send       ENUM('no', 'subscription') COLLATE ascii_general_ci NOT NULL DEFAULT 'no',
+			ecmp_user_tag        VARCHAR(255) NULL,
 			PRIMARY KEY          (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_email__campaign_send' => array(
 		'Creating email campaign send data table',
 		"CREATE TABLE T_email__campaign_send (
-			csnd_camp_ID  INT(11) UNSIGNED NOT NULL,
-			csnd_user_ID  INT(11) UNSIGNED NOT NULL,
-			csnd_status   ENUM('ready_to_send', 'ready_to_resend', 'sent', 'send_error', 'skipped' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ready_to_send',
-			csnd_emlog_ID INT(11) UNSIGNED NULL,
+			csnd_camp_ID             INT(11) UNSIGNED NOT NULL,
+			csnd_user_ID             INT(11) UNSIGNED NOT NULL,
+			csnd_status              ENUM('ready_to_send', 'ready_to_resend', 'sent', 'send_error', 'skipped' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ready_to_send',
+			csnd_emlog_ID            INT(11) UNSIGNED NULL,
+			csnd_clicked_unsubscribe TINYINT(1) UNSIGNED DEFAULT 0,
+			csnd_last_sent_ts        TIMESTAMP NULL,
+			csnd_last_open_ts        TIMESTAMP NULL,
+			csnd_last_click_ts       TIMESTAMP NULL,
 			PRIMARY KEY   csnd_PK ( csnd_camp_ID, csnd_user_ID )
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__automation' => array(
+		'Creating automation table',
+		"CREATE TABLE T_automation__automation (
+			autm_ID            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			autm_name          VARCHAR(255) NOT NULL,
+			autm_status        ENUM('paused', 'active') DEFAULT 'paused',
+			autm_owner_user_ID INT UNSIGNED NOT NULL,
+			PRIMARY KEY        (autm_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__newsletter' => array(
+		'Creating automation newsletter table',
+		"CREATE TABLE T_automation__newsletter (
+			aunl_autm_ID   INT UNSIGNED NOT NULL,
+			aunl_enlt_ID   INT UNSIGNED NOT NULL,
+			aunl_autostart TINYINT(1) UNSIGNED DEFAULT 1,
+			aunl_autoexit  TINYINT(1) UNSIGNED DEFAULT 1,
+			aunl_order     INT NOT NULL DEFAULT 1,
+			PRIMARY KEY    (aunl_autm_ID, aunl_enlt_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__step' => array(
+		'Creating automation step table',
+		"CREATE TABLE T_automation__step (
+			step_ID                    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			step_autm_ID               INT UNSIGNED NOT NULL,
+			step_order                 INT NOT NULL DEFAULT 1,
+			step_label                 VARCHAR(500) NULL,
+			step_type                  ENUM('if_condition', 'send_campaign', 'notify_owner', 'add_usertag', 'remove_usertag', 'subscribe', 'unsubscribe', 'start_automation') COLLATE ascii_general_ci NOT NULL DEFAULT 'if_condition',
+			step_info                  TEXT NULL,
+			step_yes_next_step_ID      INT NULL,
+			step_yes_next_step_delay   INT UNSIGNED NULL,
+			step_no_next_step_ID       INT NULL,
+			step_no_next_step_delay    INT UNSIGNED NULL,
+			step_error_next_step_ID    INT NULL,
+			step_error_next_step_delay INT UNSIGNED NULL,
+			PRIMARY KEY                (step_ID),
+			UNIQUE                     step_autm_ID_order (step_autm_ID, step_order)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__user_state' => array(
+		'Creating automation user state table',
+		"CREATE TABLE T_automation__user_state (
+			aust_autm_ID      INT UNSIGNED NOT NULL,
+			aust_user_ID      INT UNSIGNED NOT NULL,
+			aust_next_step_ID INT UNSIGNED NULL,
+			aust_next_exec_ts TIMESTAMP NULL,
+			PRIMARY KEY       (aust_autm_ID, aust_user_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_syslog' => array(
 		'Creating system log table',

@@ -623,6 +623,7 @@ fieldset ul {
 }
 #user_admin_tags {
   width: 500px;
+  max-width: 100%;
 }
 #user_admin_tags ul.token-input-list-facebook {
   width: 100%;

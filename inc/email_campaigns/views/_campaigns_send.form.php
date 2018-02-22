@@ -18,7 +18,7 @@ global $admin_url, $tab;
 global $current_User, $Session, $Settings;
 global $edited_EmailCampaign;
 global $template_action;
-global $track_email_click_html, $track_email_click_plain_text;
+global $track_email_image_load, $track_email_click_html, $track_email_click_plain_text;
 
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
@@ -48,8 +48,9 @@ $Form->begin_fieldset( sprintf( T_('Review message for: %s'), $edited_EmailCampa
 echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	echo '<div class="floatleft" style="width:50%">';
 	echo '<p><b>'.T_('HTML message').':</b></p>';
-	$html_mail_template = mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ), 'include_greeting' => false ), $current_User );
+	$html_mail_template = mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ), 'include_greeting' => false, 'add_email_tracking' => false ), $current_User );
 	$html_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $html_mail_template );
+	$html_mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $html_mail_template );
 	// Clear all html tags that may break styles of main html page:
 	$html_mail_template = preg_replace( '#</?(html|head|meta|body)[^>]*>#i', '', $html_mail_template );
 	echo '<div style="overflow:auto">'.$html_mail_template.'</div>';
@@ -57,8 +58,9 @@ echo '<div style="display:table;width:100%;table-layout:fixed;">';
 
 	echo '<div class="floatright" style="width:49%">';
 	echo '<p><b>'.T_('Plain-text message').':</b></p>';
-	$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_plaintext' ), 'include_greeting' => false ), $current_User );
+	$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_plaintext' ), 'include_greeting' => false, 'add_email_tracking' => false ), $current_User );
 	$text_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $text_mail_template );
+	$text_mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $text_mail_template );
 	echo '<div style="font-family:monospace;overflow:auto">'.nl2br( $text_mail_template ).'</div>';
 	echo '</div>';
 echo '</div>';
@@ -74,7 +76,7 @@ $Form->begin_fieldset( T_('Campaign recipients').get_manual_link( 'campaign-reci
 	$Form->info_field( T_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter', true ), array(
 			'class' => 'info_full_height',
 			'note'  => '('.T_('Accounts that match your additional filter').') '
-			           .'<a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'" class="btn btn-default">'.T_('Change filter').'</a>',
+			           .'<a href="'.$admin_url.'?ctrl=users&amp;action=campaign&amp;ecmp_ID='.$edited_EmailCampaign->ID.'" class="btn btn-default">'.T_('Change filter').'</a>',
 		) );
 	$Form->info( T_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive', true ), '('.T_('Accounts which have already been sent this campaign').')' );
 	$Form->info( T_('Manually skipped'), $edited_EmailCampaign->get_recipients_count( 'skipped', true ), '('.T_('Accounts which will be skipped from receiving this campaign').')' );
@@ -83,6 +85,7 @@ $Form->begin_fieldset( T_('Campaign recipients').get_manual_link( 'campaign-reci
 	if( $edited_EmailCampaign->get_recipients_count( 'wait' ) > 0 )
 	{	// Display message to send emails only when users exist for this campaign:
 		$Form->checklist( array(
+				array( 'track_email_image_load', 1, T_('track image loads in HTML version'), 1 ),
 				array( 'track_email_click_html', 1, T_('track clickthroughs in HTML version'), 1 ),
 				array( 'track_email_click_plain_text', 1, T_('track clickthroughs in plain text version'), 1 )
 			), 'track_email', T_('Track email opens') );
@@ -115,6 +118,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 
 	$Form->begin_fieldset( T_('Send test email').get_manual_link( 'campaign-send-test-panel' ) );
 		$Form->checklist( array(
+			array( 'track_test_email_image_load', 1, T_('track image loads in HTML version'), 1 ),
 			array( 'track_test_email_click_html', 1, T_('track clickthroughs in HTML version'), 1 ),
 			array( 'track_test_email_click_plain_text', 1, T_('track clickthroughs in plain text version'), 1 )
 		), 'track_test_email', T_('Track email opens') );

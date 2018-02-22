@@ -11,7 +11,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // ---------------------------- EMAIL HEADER INCLUDED HERE ----------------------------
-emailskin_include( '_email_header.inc.txt.php', $params );
+emailskin_include( '_email_header.inc.txt.php', $params, 'header' );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
 // Default params:
@@ -27,6 +27,6 @@ $params['unsubscribe_text'] = T_( 'If you don\'t want to receive this list anymo
 		get_htsrv_url().'quick_unsubscribe.php?type=newsletter&newsletter='.$params['newsletter'].'&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
-emailskin_include( '_email_footer.inc.txt.php', $params );
+emailskin_include( '_email_footer.inc.txt.php', $params, 'footer' );
 // ------------------------------- END OF EMAIL FOOTER --------------------------------
 ?>

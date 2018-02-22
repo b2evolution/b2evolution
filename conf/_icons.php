@@ -592,6 +592,13 @@ function get_icon_info( $name )
 			'fa' => 'circle-thin',
 			'color' => '#CCC'
 		);
+		case 'bullet_gray': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 0, 192 ),
+			'fa' => 'circle',
+			'color' => '#BBB'
+		);
 		case 'bullet_magenta': return array(
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
@@ -912,6 +919,13 @@ function get_icon_info( $name )
 			'glyph' => 'play',
 			'fa' => 'play'
 		);
+		case 'pause': return array( // used to pause automation
+			'alt'  => '||',
+			'size' => array( 14, 14 ),
+			'xy' => array( 64, 128 ),
+			'glyph' => 'pause',
+			'fa' => 'pause'
+		);
 		case 'rewind': return array( // Used to resend email campaign ( rewind user back to previous state )
 			'alt' => '',
 			'size' => array( 0, 0 ),
@@ -1153,6 +1167,15 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 64, 128 ),
 			'fa' => 'hand-paper-o',
+			'color' => '#C00'
+		);
+
+		case 'stop_square': return array(
+			'alt'  => T_('Stop'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 64, 128 ),
+			'glyph' => 'stop',
+			'fa' => 'stop',
 			'color' => '#C00'
 		);
 

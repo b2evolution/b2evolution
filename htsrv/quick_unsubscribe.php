@@ -252,6 +252,12 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
+				case 'automation_owner_notification':
+					// unsubscribe from automation step owner notifications:
+					$UserSettings->set( 'notify_automation_owner', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				case 'meta_comment':
 					// unsubscribe from meta comment notifications
 					$UserSettings->set( 'notify_meta_comments', '0', $edited_User->ID );
@@ -486,6 +492,12 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
+				case 'automation_owner_notification':
+					// unsubscribe from automation step owner notifications:
+					$UserSettings->set( 'notify_automation_owner', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				case 'meta_comment':
 					// unsubscribe from meta comment notifications
 					$UserSettings->set( 'notify_meta_comments', '1', $edited_User->ID );
@@ -663,6 +675,11 @@ switch( $type )
 	case 'cronjob_error':
 		// unsubscribe from cron job error notifications
 		$type_str = $notification_prefix.': '.T_( 'a scheduled task ends with an error or timeout.' );
+		break;
+
+	case 'automation_owner_notification':
+		// unsubscribe from automation step owner notifications:
+		$type_str = $notification_prefix.': '.T_( 'one of my automations wants to notify me.' );
 		break;
 
 	case 'meta_comment':

@@ -105,6 +105,11 @@ class newsletter_subscription_Widget extends ComponentWidget
 						'size' => 30,
 						'maxlength' => 255,
 					),
+					'unsubscribed_if_not_tagged' => array(
+						'type' => 'checkbox',
+						'note' => T_('Treat user has not subscribed if he is not tagged yet'),
+						'defaultvalue' => false,
+					),
 					// Hidden, used by subscribe shorttag
 					'inline' => array(
 						'label' => 'Internal: Display inline',
@@ -241,8 +246,26 @@ class newsletter_subscription_Widget extends ComponentWidget
 		}
 		else
 		{	// Display a form to subscribe⁄unsubscribe:
+			$check_tag = false;
+			if( $this->disp_params['unsubscribed_if_not_tagged'] && ! empty( $this->disp_params['usertags'] ) )
+			{
+				$check_tag = true;
+				$list_user_tags = explode( ',', $this->disp_params['usertags'] );
+				$user_tags = $current_User->get_usertags();
+				$is_tagged = true;
+				foreach( $list_user_tags as $tag )
+				{
+					if( ! in_array( trim( $tag ), $user_tags ) )
+					{
+						$is_tagged = false;
+						break;
+					}
+				}
+			}
 
-			if( $current_User->is_subscribed( $widget_Newsletter->ID ) )
+			$is_subscribed = $current_User->is_subscribed( $widget_Newsletter->ID ) && ( ! $check_tag || ( $check_tag && $is_tagged ) );
+
+			if( $is_subscribed )
 			{	// If current user is already subscribed:
 				$title = $this->disp_params['title_subscribed'];
 				$intro = $this->disp_params['intro_subscribed'];
@@ -261,13 +284,16 @@ class newsletter_subscription_Widget extends ComponentWidget
 				$bottom = $this->disp_params['bottom'];
 			}
 
-			$this->disp_title( $title );
+			if( ! $this->disp_params['inline'] )
+			{ // Do not display when inline
+				$this->disp_title( $title );
 
-			echo $this->disp_params['block_body_start'];
+				echo $this->disp_params['block_body_start'];
 
-			if( trim( $intro ) !== '' )
-			{	// Display intro text:
-				echo '<p>'.$intro.'</p>';
+				if( trim( $intro ) !== '' )
+				{	// Display intro text:
+					echo '<p>'.$intro.'</p>';
+				}
 			}
 
 			$Form = new Form( get_htsrv_url().'action.php' );
@@ -298,7 +324,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 
 			$Form->end_form();
 
-			if( trim( $bottom ) !== '' )
+			if( trim( $bottom ) !== '' && ! $this->disp_params['inline'] )
 			{	// Display bottom note:
 				echo '<p class="margin-top">'.$bottom.'</p>';
 			}

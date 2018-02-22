@@ -798,6 +798,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'polls_plugin' );
 	}
+
+	if( $old_db_version < 12580 )
+	{
+		install_plugin( 'email_elements_plugin' );
+	}
 }
 
 

@@ -332,9 +332,8 @@ class videoplug_plugin extends Plugin
 					{
 						case 'youtube':
 							// Allow HD video code with ?hd=1 at the end
-							regexp_ID = /^[a-z0-9_?=-]+$/i;
-							//regexp_URL = /^.+(video\/|\/watch\?v=|embed\/|\/)([a-z0-9_?=-]+)(&.+)?$/i;
-							regexp_URL = /^.+(video\/|\/watch\?v=|embed\/|\/)([a-z0-9]+)\??(.+)?$/i;
+							regexp_ID = /^[a-z0-9_-]+$/i;
+							regexp_URL = /^(.+youtube(?:-nocookie)?\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|.+youtu\.be\/)([a-z0-9_-]{11})((?:\?|&).*)?/i;
 							break;
 
 						case 'dailymotion':
@@ -371,8 +370,9 @@ class videoplug_plugin extends Plugin
 								if( tag == 'youtube' )
 								{
 									var params = video_ID.replace( regexp_URL, '$3' ).trim();
-									params = params.replace( /^&/, '' );
+									params = params.replace( /^[&\?]/, '' );
 									params = params.replace( /&$/, '' );
+									params = params.replace( /rel=\d+&?/, '' ); // remove rel=
 									video_ID = video_ID.replace( regexp_URL, '$2' );
 									if( params.length )
 									{

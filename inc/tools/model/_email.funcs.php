@@ -209,18 +209,18 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
 			{
 				if( empty( $last_open ) && empty( $last_click ) )
 				{
-					$result_info .= get_icon( 'bullet_green', 'imgtag', array( 'alt' => T_('Ok') ) );
+					$result_info .= get_icon( 'bullet_black', 'imgtag', array( 'alt' => T_('Sent') ) );
 				}
 				else
 				{
-					$result_info .= get_icon( 'bullet_light_blue', 'imgtag', array( 'alt' => T_('Opened') ) );
+					$result_info .= get_icon( 'bullet_green', 'imgtag', array( 'alt' => T_('Opened') ) );
 				}
 			}
 			if( $params['display_text'] )
 			{
 				if( empty( $last_open ) && empty( $last_click ) )
 				{
-					$result_info .= ' '.T_('Ok');
+					$result_info .= ' '.T_('Sent');
 				}
 				else
 				{
@@ -232,7 +232,7 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
 		case 'error':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_red', 'imgtag', array( 'alt' => T_('Error') ) );
+				$result_info .= get_icon( 'bullet_orange', 'imgtag', array( 'alt' => T_('Error') ) );
 			}
 			if( $params['display_text'] )
 			{
@@ -243,7 +243,7 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
 		case 'blocked':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_black', 'imgtag', array( 'alt' => T_('Blocked') ) );
+				$result_info .= get_icon( 'bullet_red', 'imgtag', array( 'alt' => T_('Blocked') ) );
 			}
 			if( $params['display_text'] )
 			{
@@ -262,11 +262,25 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
 		case 'simulated':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_magenta', 'imgtag', array( 'alt' => T_('Simulated') ) );
+				if( empty( $last_open ) && empty( $last_click ) )
+				{
+					$result_info .= get_icon( 'bullet_gray', 'imgtag', array( 'alt' => T_('Simulated') ) );
+				}
+				else
+				{
+					$result_info .= get_icon( 'bullet_green', 'imgtag', array( 'alt' => T_('Opened') ) );
+				}
 			}
 			if( $params['display_text'] )
 			{
-				$result_info .= ' '.T_('Simulated');
+				if( empty( $last_open ) && empty( $last_click ) )
+				{
+					$result_info .= ' '.T_('Simulated');
+				}
+				else
+				{
+					$result_info .= ' './* TRANS: Email was already opened */ T_('Opened');
+				}
 			}
 			break;
 
@@ -296,10 +310,12 @@ function emlog_result_info( $result, $params = array(), $last_open = NULL, $last
  * @param string Headers
  * @param string Result type ( 'ok', 'error', 'blocked', 'simulated' )
  * @param string Key for email tracking
+ * @param integer Email Campaign ID
+ * @param integer Automation ID
  */
-function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_key = NULL )
+function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_key = NULL, $email_campaign_ID = NULL, $automation_ID = NULL )
 {
-	global $DB, $servertimenow;
+	global $DB, $servertimenow, $localtimenow;
 
 	/**
 	 * @var integer|NULL This global var stores ID of the last inserted mail log
@@ -318,16 +334,18 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 
 	// Insert mail log
 	$DB->query( 'INSERT INTO T_email__log
-		( emlog_key, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers )
+		( emlog_key, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers, emlog_camp_ID, emlog_autm_ID )
 		VALUES
 		( '.( empty( $email_key ) ? generate_random_key() : $DB->quote( $email_key ) ).',
-			'.$DB->quote( date2mysql( $servertimenow ) ).',
+			'.$DB->quote( date2mysql( $localtimenow ) ).',
 		  '.$DB->quote( $user_ID ).',
 		  '.$DB->quote( $to ).',
 		  '.$DB->quote( $result ).',
 		  '.$DB->quote( utf8_substr( $subject, 0, 255 ) ).',
 		  '.$DB->quote( $message ).',
-		  '.$DB->quote( $headers ).' )' );
+		  '.$DB->quote( $headers ).',
+		  '.$DB->quote( $email_campaign_ID ).',
+		  '.$DB->quote( $automation_ID ).' )' );
 
 	// Store ID of new inserted mail log
 	$mail_log_insert_ID = $DB->insert_id;
@@ -347,7 +365,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_
 
 function update_mail_log( $email_ID, $result, $message )
 {
-	global $DB, $servertimenow;
+	global $DB, $servertimenow, $localtimenow;
 	$valid_results = array( 'ok', 'error', 'blocked', 'simulated', 'ready_to_send' );
 	if( ! in_array( $result, $valid_results ) )
 	{
@@ -357,7 +375,7 @@ function update_mail_log( $email_ID, $result, $message )
 	$DB->query( 'UPDATE T_email__log
 			SET emlog_result = '.$DB->quote( $result )
 			.', emlog_message = '.$DB->quote( $message )
-			.', emlog_timestamp = '.$DB->quote( date2mysql( $servertimenow ) )
+			.', emlog_timestamp = '.$DB->quote( date2mysql( $localtimenow ) )
 			.' WHERE emlog_ID = '.$DB->quote( $email_ID ) );
 
 	if( $result == 'ok' )
@@ -371,6 +389,58 @@ function update_mail_log( $email_ID, $result, $message )
 					emadr_sent_count = emadr_sent_count + 1,
 					emadr_sent_last_returnerror = emadr_sent_last_returnerror + 1,
 					emadr_last_sent_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $servertimenow ) ) );
+	}
+}
+
+
+/**
+ * Update time field of mail log row and related tables like email campaign and newsletters
+ *
+ * @param string Type: 'open', 'click'
+ * @param integer Email log ID
+ * @param integer Email log key
+ */
+function update_mail_log_time( $type, $emlog_ID, $emlog_key )
+{
+	global $DB, $localtimenow;
+
+	switch( $type )
+	{
+		case 'open':
+			$log_time_field = 'emlog_last_open_ts';
+			$campaign_time_field = 'csnd_last_open_ts';
+			$newsletter_time_field = 'enls_last_open_ts';
+			break;
+
+		case 'click':
+			$log_time_field = 'emlog_last_click_ts';
+			$campaign_time_field = 'csnd_last_click_ts';
+			$newsletter_time_field = 'enls_last_click_ts';
+			break;
+
+		default:
+			debug_die( 'Invalid mail log time type "'.$type.'"' );
+	}
+
+	// Update last time for email log:
+	$r = $DB->query( 'UPDATE T_email__log
+		  SET '.$log_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
+		WHERE emlog_ID = '.$DB->quote( $emlog_ID ).'
+		  AND emlog_key = '.$DB->quote( $emlog_key ) );
+
+	if( $r )
+	{	// Update last time for email campaign per user:
+		$DB->query( 'UPDATE T_email__campaign_send
+			  SET '.$campaign_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
+			WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ) );
+
+		// Update last time for user subscriptions of all automation newsletters:
+		$DB->query( 'UPDATE T_email__newsletter_subscription
+			INNER JOIN T_automation__newsletter ON aunl_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
+			INNER JOIN T_email__log ON aunl_autm_ID = emlog_autm_ID AND enls_user_ID = emlog_user_ID
+			  SET '.$newsletter_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
+			WHERE emlog_ID = '.$DB->quote( $emlog_ID ).'
+			  AND enls_last_sent_manual_ts IS NOT NULL' );// When user really received an email from the Newsletter(to avoid subscriptions after email was sent)
 	}
 }
 
@@ -1196,9 +1266,21 @@ function php_email_sending_test()
  * @param string Email key
  * @return string Message with email tracking
  */
-function add_email_tracking( $message, $email_ID, $email_key, $content_type = 'auto' )
+function add_email_tracking( $message, $email_ID, $email_key, $params = array() )
 {
-	global $track_email_click_html, $track_email_click_plain_text;
+	global $rsc_url;
+
+	$params = array_merge( array(
+			'content_type' => 'auto',
+			'image_load' => true,
+			'link_click_html' => true,
+			'link_click_text' => true,
+			'template_parts' => array(
+					'header' => 0,
+					'footer' => 0,
+				),
+			'default_template_tag' => NULL
+		), $params );
 
 	load_class( 'tools/model/_emailtrackinghelper.class.php', 'EmailTrackingHelper' );
 
@@ -1212,7 +1294,7 @@ function add_email_tracking( $message, $email_ID, $email_key, $content_type = 'a
 		debug_die( 'No email key specified.' );
 	}
 
-	if( $content_type == 'auto' )
+	if( $params['content_type'] == 'auto' )
 	{
 		if( is_html( $message ) )
 		{
@@ -1223,37 +1305,110 @@ function add_email_tracking( $message, $email_ID, $email_key, $content_type = 'a
 			$content_type = 'text';
 		}
 	}
+	else
+	{
+		$content_type = $params['content_type'];
+	}
+
+	$template_message = $message;
+	$template_parts = array();
+	foreach( $params['template_parts'] as $part => $tag )
+	{
+		$re = '~\$template-content-'.$part.'-start\$.*?\$template-content-'.$part.'-end\$~s';
+		preg_match_all( $re, $message, $matches, PREG_SET_ORDER );
+		foreach( $matches as $match )
+		{
+			$key = '#'.rand();
+			$template_parts[$key] = array(
+				'message' => $match[0],
+				'part' => $part,
+				'tag' => $tag );
+
+			$count = 1;
+			$message = str_replace( $match[0], '$template-part-'.$key.'$', $message, $count );
+		}
+	}
 
 	switch( $content_type )
 	{
 		case 'text':
 			// Add link click tracking
-			if( ! isset( $track_email_click_plain_text ) || $track_email_click_plain_text == 1 )
+			if( $params['link_click_text'] )
 			{
 				$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#';
-				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text' );
+				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text', $params['default_template_tag'] );
 				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
 			}
-			return $message;
+			break;
 
 		case 'html':
-			// Add email open tracking to first image
-			$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
-			$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key );
-			$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message, 1 );
+			if( $params['image_load'] )
+			{
+				// Add email open tracking to first image
+				$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
+				$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key, 'html' );
+				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message, 1 );
 
-			if( ! isset( $track_email_click_html ) || $track_email_click_html == 1  )
+				/*
+				// Add web beacon
+				$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key );
+				$message .= "\n".'<img src="'.$callback->get_passthrough_url().$rsc_url.'img/blank.gif" />';
+				*/
+			}
+
+			if( $params['link_click_html'] )
 			{
 				// Add link click tracking
 				$re = '/(<a\b.+\bhref=")([^"]*)(")/';
-				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key );
+				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'html', $params['default_template_tag'] );
 				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
 			}
-			return $message;
+			break;
 
 		default:
 			debug_die( 'Invalid content type' );
 	}
+
+	foreach( $template_parts as $key => $row )
+	{
+		switch( $content_type )
+		{
+			case 'text':
+				// Add link click tracking
+				if( $params['link_click_text'] )
+				{
+					$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#';
+					$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text', $row['tag'] );
+					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'] );
+				}
+				break;
+
+			case 'html':
+				if( $params['image_load'] )
+				{
+					// Add email open tracking to first image
+					$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
+					$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key, 'html' );
+					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'], 1 );
+				}
+
+				if( $params['link_click_html'] )
+				{
+					// Add link click tracking
+					$re = '/(<a\b.+\bhref=")([^"]*)(")/';
+					$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'html', $row['tag'] );
+					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'] );
+				}
+				break;
+
+			default:
+				debug_die( 'Invalid content type' );
+		}
+		$count = 1;
+		$message = str_replace( '$template-part-'.$key.'$', $template_parts[$key]['message'], $message, $count );
+	}
+
+	return $message;
 
 }
 ?>

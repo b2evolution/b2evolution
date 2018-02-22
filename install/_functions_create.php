@@ -1200,7 +1200,8 @@ function create_default_jobs( $is_upgrade = false )
 	global $DB, $localtimenow;
 
 	// get tomorrow date
-	$date = date2mysql( $localtimenow + 86400 );
+	$today = date2mysql( $localtimenow );
+	$tomorrow = date2mysql( $localtimenow + 86400 );
 	$ctsk_params = $DB->quote( 'N;' );
 	$next_sunday = date2mysql( strtotime( 'next Sunday',  $localtimenow + 86400 ) );
 
@@ -1217,24 +1218,26 @@ function create_default_jobs( $is_upgrade = false )
 	$messages_reminder_key    = 'send-unread-messages-reminders';
 	$post_reminder_key        = 'send-unmoderated-posts-reminders';
 	$alert_old_contents_key   = 'monthly-alert-old-contents';
+	$execute_automations_key  = 'execute-automations';
 
 	// init insert values
 	$insert_values = array(
 			// run unread messages reminder in every 29 minutes
-			$messages_reminder_key    => "( ".$DB->quote( form_date( $date, '01:00:00' ) ).", 1740,  ".$DB->quote( $messages_reminder_key ).", ".$ctsk_params." )",
+			$messages_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:00:00' ) ).", 1740,  ".$DB->quote( $messages_reminder_key ).", ".$ctsk_params." )",
 			// run activate account reminder in every 31 minutes
-			$activate_reminder_key    => "( ".$DB->quote( form_date( $date, '01:30:00' ) ).", 1860,  ".$DB->quote( $activate_reminder_key ).", ".$ctsk_params." )",
-			$prune_pagecache_key      => "( ".$DB->quote( form_date( $date, '02:00:00' ) ).", 86400, ".$DB->quote( $prune_pagecache_key ).", ".$ctsk_params." )",
-			$process_hitlog_key       => "( ".$DB->quote( form_date( $date, '02:30:00' ) ).", 86400, ".$DB->quote( $process_hitlog_key ).", ".$ctsk_params." )",
-			$prune_sessions_key       => "( ".$DB->quote( form_date( $date, '03:00:00' ) ).", 86400, ".$DB->quote( $prune_sessions_key ).", ".$ctsk_params." )",
-			$poll_antispam_key        => "( ".$DB->quote( form_date( $date, '04:00:00' ) ).", 86400, ".$DB->quote( $poll_antispam_key ).", ".$ctsk_params." )",
-			$comment_reminder_key     => "( ".$DB->quote( form_date( $date, '04:30:00' ) ).", 86400, ".$DB->quote( $comment_reminder_key ).", ".$ctsk_params." )",
-			$cleanup_jobs_key         => "( ".$DB->quote( form_date( $date, '05:00:00' ) ).", 86400, ".$DB->quote( $cleanup_jobs_key ).", ".$ctsk_params." )",
-			$prune_comments_key       => "( ".$DB->quote( form_date( $date, '05:30:00' ) ).", 86400, ".$DB->quote( $prune_comments_key ).", ".$ctsk_params." )",
-			$light_db_maintenance_key => "( ".$DB->quote( form_date( $date, '06:00:00' ) ).", 86400, ".$DB->quote( $light_db_maintenance_key ).", ".$ctsk_params." )",
+			$activate_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:30:00' ) ).", 1860,  ".$DB->quote( $activate_reminder_key ).", ".$ctsk_params." )",
+			$prune_pagecache_key      => "( ".$DB->quote( form_date( $tomorrow, '02:00:00' ) ).", 86400, ".$DB->quote( $prune_pagecache_key ).", ".$ctsk_params." )",
+			$process_hitlog_key       => "( ".$DB->quote( form_date( $tomorrow, '02:30:00' ) ).", 86400, ".$DB->quote( $process_hitlog_key ).", ".$ctsk_params." )",
+			$prune_sessions_key       => "( ".$DB->quote( form_date( $tomorrow, '03:00:00' ) ).", 86400, ".$DB->quote( $prune_sessions_key ).", ".$ctsk_params." )",
+			$poll_antispam_key        => "( ".$DB->quote( form_date( $tomorrow, '04:00:00' ) ).", 86400, ".$DB->quote( $poll_antispam_key ).", ".$ctsk_params." )",
+			$comment_reminder_key     => "( ".$DB->quote( form_date( $tomorrow, '04:30:00' ) ).", 86400, ".$DB->quote( $comment_reminder_key ).", ".$ctsk_params." )",
+			$cleanup_jobs_key         => "( ".$DB->quote( form_date( $tomorrow, '05:00:00' ) ).", 86400, ".$DB->quote( $cleanup_jobs_key ).", ".$ctsk_params." )",
+			$prune_comments_key       => "( ".$DB->quote( form_date( $tomorrow, '05:30:00' ) ).", 86400, ".$DB->quote( $prune_comments_key ).", ".$ctsk_params." )",
+			$light_db_maintenance_key => "( ".$DB->quote( form_date( $tomorrow, '06:00:00' ) ).", 86400, ".$DB->quote( $light_db_maintenance_key ).", ".$ctsk_params." )",
 			$heavy_db_maintenance_key => "( ".$DB->quote( form_date( $next_sunday, '06:30:00' ) ).", 604800, ".$DB->quote( $heavy_db_maintenance_key ).", ".$ctsk_params." )",
-			$post_reminder_key        => "( ".$DB->quote( form_date( $date, '07:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
+			$post_reminder_key        => "( ".$DB->quote( form_date( $tomorrow, '07:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
 			$alert_old_contents_key   => "( ".$DB->quote( form_date( $next_sunday, '07:30:00' ) ).", 604800, ".$DB->quote( $alert_old_contents_key ).", ".$ctsk_params." )",
+			$execute_automations_key  => "( ".$DB->quote( form_date( $today, '00:00:00' ) ).", 300, ".$DB->quote( $execute_automations_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
 	{ // Check if these jobs already exist, and don't create another

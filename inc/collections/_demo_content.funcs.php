@@ -1222,11 +1222,11 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item->set_tags_from_string( 'photo' );
 				$edited_Item->insert( $owner_ID, T_('About this site'), T_('<p>This blog platform is powered by b2evolution.</p>
 
-	<p>You are currently looking at an info page about this site.</p>
+<p>You are currently looking at an info page about this site.</p>
 
-	<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>
+<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>
 
-	<p>If needed, skins can format info pages differently from regular posts.</p>'), $now, $cat_home_b2evo,
+<p>If needed, skins can format info pages differently from regular posts.</p>'), $now, $cat_home_b2evo,
 						array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 				$edit_File = new File( 'shared', 1, 'logos/b2evolution_1016x208_wbg.png' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -1325,7 +1325,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item = new Item();
 				$edited_Item->insert( $owner_ID, T_('First Post'), T_('<p>This is the first post in the "[coll:shortname]" collection.</p>
 
-	<p>It appears in a single category.</p>'), $now, $cat_ann_a );
+<p>It appears in a single category.</p>'), $now, $cat_ann_a );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				// Insert a post:
@@ -1334,7 +1334,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item = new Item();
 				$edited_Item->insert( $owner_ID, T_('Second post'), T_('<p>This is the second post in the "[coll:shortname]" collection.</p>
 
-	<p>It appears in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a ) );
+<p>It appears in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a ) );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
 

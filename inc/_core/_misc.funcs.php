@@ -733,7 +733,7 @@ function convert_chars( $content, $flag = 'html' )
 		// fp> why do we actually bother doing this:?
 		$content = preg_replace_callback(
 			'/[\x80-\xff]/',
-			create_function( '$j', 'return "&#".ord($j[0]).";";' ),
+			'_convert_chars_callback',
 			$content);
 	}
 
@@ -756,6 +756,15 @@ function convert_chars( $content, $flag = 'html' )
 	}
 
 	return( $content );
+}
+
+
+/**
+ * Callback for preg_replace_callback in convert_chars()
+ */
+function _convert_chars_callback( $matches )
+{
+	return "&#".ord( $matches[0] ).";";
 }
 
 
@@ -2820,7 +2829,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 function debug_die( $additional_info = '', $params = array() )
 {
 	global $debug, $baseurl;
-	global $log_app_errors, $app_name, $is_cli, $display_errors_on_production, $is_api_request;
+	global $log_app_errors, $app_name, $is_cli, $display_errors_on_production, $is_api_request, $is_cron_job_executing;
 
 	$params = array_merge( array(
 		'status'     => '500 Internal Server Error',
@@ -2848,6 +2857,15 @@ function debug_die( $additional_info = '', $params = array() )
 			) );
 
 		die(1); // Error code 1. Note: This will still call the shutdown function.
+	}
+	elseif( $is_cron_job_executing )
+	{	// If debug die has been called during cron job executing:
+		$cron_job_error = '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">'
+				.'<h3>Additional information about this error:</h3>'
+				.$additional_info
+			.'</div>'
+			.debug_get_backtrace();
+		throw new Exception( str_replace( "\n", '', $cron_job_error ) );
 	}
 	elseif( $is_cli )
 	{ // Command line interface, e.g. in cron_exec.php:
@@ -3745,11 +3763,19 @@ function user_get_notification_sender( $user_ID, $setting )
  * @param string From name.
  * @param array Additional headers ( headername => value ). Take care of injection!
  * @param integer User ID
+ * @param integer Email Campaign ID
+ * @param integer Automation ID
  * @return boolean True if mail could be sent (not necessarily delivered!), false if not - (return value of {@link mail()})
  */
-function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL )
+function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL, $email_campaign_ID = NULL, $automation_ID = NULL )
 {
 	global $servertimenow, $email_send_simulate_only;
+
+	/**
+	 * @var string|NULL This global var stores ID of the last mail log message
+	 */
+	global $mail_log_message;
+	$mail_log_message = NULL;
 
 	// Stop a request from the blocked IP addresses or Domains
 	antispam_block_request();
@@ -3853,7 +3879,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	// Create initial email log with empty message
 	$email_key = generate_random_key();
-	mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key );
+	mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key, $email_campaign_ID, $automation_ID );
 
 	// Replace tracking code placeholders
 	$message = str_replace( array( '$email_key$', '$mail_log_ID$' ), array( $email_key, $mail_log_insert_ID ), $message );
@@ -3889,7 +3915,8 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	if( mail_is_blocked( $to_email_address ) )
 	{ // Check if the email address is blocked
-		$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
+		$mail_log_message = 'Sending mail to "'.$to_email_address.'" FAILED, because this email is marked with spam or permanent errors.';
+		$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
 
 		update_mail_log( $mail_log_insert_ID, 'blocked', $message );
 
@@ -3907,23 +3934,21 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	if( ! $send_mail_result )
 	{	// The message has not been sent successfully
+		$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
+		update_mail_log( $mail_log_insert_ID, 'error', $message );
 		if( $debug > 1 )
 		{ // We agree to die for debugging...
-			update_mail_log( $mail_log_insert_ID, 'error', $message );
-
-			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
+			debug_die( htmlspecialchars( $mail_log_message ) );
 		}
 		else
 		{ // Soft debugging only....
-			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
-
-			update_mail_log( $mail_log_insert_ID, 'error', $message );
-
+			$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
 			return false;
 		}
 	}
 
-	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
+	$mail_log_message = 'Sent mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
+	$Debuglog->add( htmlspecialchars( $mail_log_message ) );
 
 	update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
 
@@ -3948,16 +3973,24 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 {
 	global $UserSettings, $Settings, $current_charset;
 
+	/**
+	 * @var string|NULL This global var stores ID of the last mail log message
+	 */
+	global $mail_log_message;
+	$mail_log_message = NULL;
+
 	$UserCache = & get_UserCache();
 	if( $User = $UserCache->get_by_ID( $user_ID ) )
 	{
 		if( !$User->check_status( 'can_receive_any_message' ) )
 		{ // user status doesn't allow to receive nor emails nor private messages
+			$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user status "'.$User->get( 'status' ).'" doesn\'t allow to receive any message.';
 			return false;
 		}
 
 		if( !( $User->check_status( 'is_validated' ) || $force_on_non_activated ) )
 		{ // user is not activated and non activated users should not receive emails, unless force_on_non_activated is turned on
+			$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user is not validated with status "'.$User->get( 'status' ).'".';
 			return false;
 		}
 
@@ -3978,11 +4011,13 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'account_closed':
 			case 'account_reported':
 			case 'account_changed':
+			case 'automation_owner_notification':
 				// this is a notificaiton email
 				$email_limit_setting = 'notification_email_limit';
 				$email_counter_setting = 'last_notification_email';
 				if( !check_allow_new_email( $email_limit_setting, $email_counter_setting, $User->ID ) )
 				{ // more notification email is not allowed today
+					$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user is already limited to receive more notifications for TODAY.';
 					return false;
 				}
 				break;
@@ -3992,6 +4027,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				$email_counter_setting = 'last_newsletter';
 				if( !check_allow_new_email( $email_limit_setting, $email_counter_setting, $User->ID ) )
 				{ // more newsletter email is not allowed today
+					$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user is already limited to receive more newsletters for TODAY.';
 					return false;
 				}
 				break;
@@ -4034,7 +4070,11 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 
 		$to_email = !empty( $force_email_address ) ? $force_email_address : $User->email;
 
-		if( send_mail( $to_email, NULL, $subject, $message, NULL, NULL, $headers, $user_ID ) )
+		// Params for email log:
+		$email_campaign_ID = empty( $template_params['ecmp_ID'] ) ? NULL : $template_params['ecmp_ID'];
+		$automation_ID = empty( $template_params['autm_ID'] ) ? NULL : $template_params['autm_ID'];
+
+		if( send_mail( $to_email, NULL, $subject, $message, NULL, NULL, $headers, $user_ID, $email_campaign_ID, $automation_ID ) )
 		{ // email was sent, update last email settings;
 			if( isset( $email_limit_setting, $email_counter_setting ) )
 			{ // User Settings(email counters) need to be updated
@@ -4111,6 +4151,16 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text' )
 function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
 {
 	global $current_charset, $current_User;
+	global $track_email_image_load, $track_email_click_html, $track_email_click_plain_text;
+
+	$params = array_merge( array(
+			'add_email_tracking' => true,
+			'template_parts' => array(
+					'header' => NULL,
+					'footer' => NULL
+				),
+			'default_template_tag' => NULL
+		), $params );
 
 	if( !empty( $params['locale'] ) )
 	{ // Switch to locale for current email template
@@ -4185,7 +4235,27 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			$formated_message = str_replace( '$name$', $params['anonymous_recipient_name'], $formated_message );
 		}
 
-		$formated_message = add_email_tracking( $formated_message, '$mail_log_ID$', '$email_key$', $format );
+		if( $params['add_email_tracking'] )
+		{
+			$tracking_params = array(
+					'content_type' => $format,
+					'image_load' => isset( $$track_email_image_load ) ? $$track_email_image_load : true,
+					'link_click_html' => isset( $track_email_click_html ) ? $track_email_click_html : true ,
+					'link_click_text' => isset( $track_email_click_plain_text ) ? $track_email_click_plain_text : true,
+					'template_parts' => $params['template_parts'],
+					'default_template_tag' => $params['default_template_tag']
+				);
+			$formated_message = add_email_tracking( $formated_message, '$mail_log_ID$', '$email_key$', $tracking_params );
+		}
+
+		// Remove template parts markers
+		$template_part_markers = array();
+		foreach( $params['template_parts'] as $part => $row )
+		{
+			$template_part_markers[] = '$template-content-'.$part.'-start$';
+			$template_part_markers[] = '$template-content-'.$part.'-end$';
+		}
+		$formated_message = str_replace( $template_part_markers, '', $formated_message  );
 		$template_message .= $formated_message;
 
 		if( isset( $template_contents ) )
@@ -4223,7 +4293,7 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
  * @param string Template name
  * @param array Params
  */
-function emailskin_include( $template_name, $params = array() )
+function emailskin_include( $template_name, $params = array(), $template_part = NULL )
 {
 	global $emailskins_path, $rsc_url;
 
@@ -4243,7 +4313,15 @@ function emailskin_include( $template_name, $params = array() )
 	if( file_exists( $template_path ) )
 	{ // Include custom template file if it exists
 		$Debuglog->add( 'emailskin_include: '.rel_path_to_base( $template_path ), 'skins' );
+		if( ! empty( $template_part ) )
+		{
+			echo '$template-content-'.$template_part.'-start$';
+		}
 		require $template_path;
+		if( ! empty( $template_part ) )
+		{
+			echo '$template-content-'.$template_part.'-end$';
+		}
 		// This template is customized, Don't include standard template
 		$is_customized = true;
 	}
@@ -4254,7 +4332,15 @@ function emailskin_include( $template_name, $params = array() )
 		if( file_exists( $template_path ) )
 		{ // Include standard template file if it exists
 			$Debuglog->add( 'emailskin_include: '.rel_path_to_base( $template_path ), 'skins' );
+			if( ! empty( $template_part ) )
+			{
+				echo '$template-content-'.$template_part.'-start$';
+			}
 			require $template_path;
+			if( ! empty( $template_part ) )
+			{
+				echo '$template-content-'.$template_part.'-end$';
+			}
 		}
 	}
 
@@ -8249,7 +8335,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							case 'EmailCampaign':
 								// Get the IMG tag without link for email content:
 								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-										'image_link_to' => false
+										'image_link_to' => false,
+										'image_style' => 'border: none; max-width: 100%; height: auto;',
+										'add_loadimg' => false,
 									) ) );
 								break;
 
@@ -8261,8 +8349,18 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					}
 					elseif( $inline_type == 'inline' )
 					{	// Generate simple IMG tag with resized image size:
-						$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
-							( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '' );
+						switch( $object_class )
+						{
+							case 'EmailCampaign':
+								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
+										( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '', '', 1, NULL,
+										'border: none; max-width: 100%; height: auto;', false );
+								break;
+
+							default:
+								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
+										( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '' );
+						}
 					}
 				}
 				else
@@ -8348,7 +8446,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						case 'EmailCampaign':
 							// Get the IMG tag without link for email content:
 							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-									'image_link_to' => false
+									'image_link_to' => false,
+									'image_style' => 'border: none; max-width: 100%; height: auto;',
+									'add_loadimg' => false
 								) ) );
 							break;
 
@@ -8475,6 +8575,13 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	return $inlines;
 }
 
+
+/**
+ * Convert date format from locale for jQuery datepicker plugin
+ *
+ * @param string Date format of locale from DB; for example: Y-m-d
+ * @return string Date format for jQuery datepicker plugin; for example: yy-mm-dd
+ */
 function php_to_jquery_date_format( $php_format )
 {
 	$tokens = array(
@@ -8621,5 +8728,164 @@ function initialize_debug_modes()
 			$Session->delete( 'display_includes_'.$blog );
 		}
 	}
+}
+
+
+/**
+ * Get date format from current locale for jQuery datepicker plugin
+ *
+ * @return string Date format; for example: yy-mm-dd
+ */
+function jquery_datepicker_datefmt()
+{
+	return php_to_jquery_date_format( locale_input_datefmt() );
+}
+
+
+/**
+ * Get month names as string of JavaScript array for jQuery datepicker plugin
+ *
+ * @return string
+ */
+function jquery_datepicker_month_names()
+{
+	$months = array(
+			TS_('January'),
+			TS_('February'),
+			TS_('March'),
+			TS_('April'),
+			TS_('May'),
+			TS_('June'),
+			TS_('July'),
+			TS_('August'),
+			TS_('September'),
+			TS_('October'),
+			TS_('November'),
+			TS_('December')
+		);
+
+	return '[\''.implode( '\', \'', $months ).'\']';
+}
+
+
+/**
+ * Get week day names as string of JavaScript array for jQuery datepicker plugin
+ *
+ * @return string
+ */
+function jquery_datepicker_day_names()
+{
+	$days = array(
+			TS_('Sun'),
+			TS_('Mon'),
+			TS_('Tue'),
+			TS_('Wed'),
+			TS_('Thu'),
+			TS_('Fri'),
+			TS_('Sat')
+		);
+
+	foreach( $days as $d => $day )
+	{
+		$days[ $d ] = utf8_substr( $day, 0, 2 );
+	}
+
+	return '[\''.implode( '\', \'', $days ).'\']';
+}
+
+
+/**
+ * Find the dates without data and fill them with 0 to display on graph and table
+ *
+ * @param array Source data
+ * @param array Default data, e.g. array( 'hits' => 0 )
+ * @param string Start date of log in format 'YYYY-mm-dd'
+ * @param string End date of log in format 'YYYY-mm-dd'
+ * @return array Fixed data
+ */
+function fill_empty_days( $data, $default_data, $start_date, $end_date )
+{
+	$fixed_data = array();
+	$start_date = date( 'Y-n-j', strtotime( $start_date) );
+	$end_date = date( 'Y-n-j', strtotime( $end_date) );
+
+	if( empty( $data ) )
+	{
+		return $fixed_data;
+	}
+
+	// Get additional fields which must be exist in each array item of new filled empty day below:
+	$additional_fields = array_diff_key( $data[0], array( 'year' => 0, 'month' => 0, 'day' => 0 ) );
+
+	// Check if data array contains start and end dates:
+	$start_date_is_contained = empty( $start_date );
+	$end_date_is_contained = empty( $end_date );
+
+	if( ! $start_date_is_contained || ! $end_date_is_contained )
+	{
+		foreach( $data as $row )
+		{
+			$this_date = $row['year'].'-'.$row['month'].'-'.$row['day'];
+			if( $this_date == $start_date )
+			{	// The start date is detected:
+				$start_date_is_contained = true;
+			}
+			if( $this_date == $end_date )
+			{	// The start date is detected:
+				$end_date_is_contained = true;
+			}
+			if( $start_date_is_contained && $end_date_is_contained )
+			{	// Stop array searching here because we have found the dates:
+				break;
+			}
+		}
+	}
+
+	if( ! $start_date_is_contained )
+	{	// Add item to array with 0 for start date if stats has no data for the date:
+		array_push( $data, array_merge( array(
+				'year'     => date( 'Y', strtotime( $start_date ) ),
+				'month'    => date( 'n', strtotime( $start_date ) ),
+				'day'      => date( 'j', strtotime( $start_date ) ),
+		), $default_data ) + $additional_fields );
+	}
+	if( ! $end_date_is_contained )
+	{	// Add item to array with 0 for end date if stats has no data for the date:
+		array_unshift( $data, array_merge( array(
+				'year'     => date( 'Y', strtotime( $end_date ) ),
+				'month'    => date( 'n', strtotime( $end_date ) ),
+				'day'      => date( 'j', strtotime( $end_date ) ),
+		), $default_data ) + $additional_fields );
+	}
+
+	foreach( $data as $row )
+	{
+		$this_date = $row['year'].'-'.$row['month'].'-'.$row['day'];
+
+		if( isset( $prev_date ) && $prev_date != $this_date )
+		{	// If data are from another day:
+			$prev_time = strtotime( $prev_date ) - 86400;
+			$this_time = strtotime( $this_date );
+
+			if( $prev_time != $this_time )
+			{	// If previous date is not previous day(it means some day has no data):
+				$empty_days = ( $prev_time - $this_time ) / 86400;
+				for( $d = 0; $d < $empty_days; $d++ )
+				{	// Add each empty day to array with default data:
+					$empty_day = $prev_time - $d * 86400;
+					$fixed_data[] = array_merge( array(
+							'year'     => date( 'Y', $empty_day ),
+							'month'    => date( 'n', $empty_day ),
+							'day'      => date( 'j', $empty_day ),
+					), $default_data ) + $additional_fields;
+				}
+			}
+		}
+
+		$prev_date = $row['year'].'-'.$row['month'].'-'.$row['day'];
+		$fixed_data[] = $row;
+	}
+
+	return $fixed_data;
 }
 ?>

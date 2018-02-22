@@ -32,22 +32,46 @@ class EmailTrackingHelper
 	private $url_type;
 	private $email_ID;
 	private $key;
+	private $tag;
 
-	function __construct( $url_type, $email_ID, $key, $content_type = 'HTML' )
+	function __construct( $url_type, $email_ID, $key, $content_type = 'html', $tag = NULL )
 	{
 		$this->url_type = $url_type;
 		$this->email_ID = $email_ID;
 		$this->key = $key;
 		$this->content_type = $content_type;
+		$this->tag = $tag;
+	}
+
+	public function get_passthrough_url( $params = array() )
+	{
+		$params = array_merge( array(
+				'url_type' => $this->url_type,
+				'email_ID' => $this->email_ID,
+				'key' => $this->key,
+				'content_type' => $this->content_type,
+				'tag' => $this->tag,
+			), $params );
+
+		$url = get_htsrv_url().'email_passthrough.php?email_ID='.$params['email_ID'].'&type='.$params['url_type'].'&email_key=$email_key_start$'.$params['key'].'$email_key_end$';
+		if( isset( $this->tag ) )
+		{
+			$url .= '&tag='.$params['tag'];
+		}
+		$url .=	'&redirect_to=';
+
+		return $url;
 	}
 
 	public function callback( $matches )
 	{
-		$passthrough_url = get_htsrv_url().'email_passthrough.php?email_ID='.$this->email_ID.'&type='.$this->url_type.'&email_key=$email_key_start$'.$this->key.'$email_key_end$&redirect_to=';
+		$passthrough_url = $this->get_passthrough_url();
+
+		$unsubscribe_link_re = '/quick_unsubscribe\.php(?:[^\<\>])+type=(newsletter)/';
 
 		switch( $this->content_type )
 		{
-			case 'HTML':
+			case 'html':
 				/**
 				 * $matches
 				 *  1 - <a href="
@@ -55,6 +79,14 @@ class EmailTrackingHelper
 				 *  3 - "
 				 */
 				$redirect_url = $matches[2];
+				if( preg_match( $unsubscribe_link_re, $redirect_url, $match ) )
+				{
+					if( $match[1] == 'newsletter' )
+					{
+						$passthrough_url = $this->get_passthrough_url( array( 'tag' => 2 ) );
+					}
+				}
+
 				if( preg_match_all( '~(\$secret_content_start\$)(.*?)(\$secret_content_end\$)~', $redirect_url, $secret_contents ) )
 				{ // Preserve secret content markers
 					for( $i = 0, $n = count( $secret_contents[2] ); $i < $n; $i++ )
@@ -77,6 +109,14 @@ class EmailTrackingHelper
 
 			case 'plain_text':
 				$redirect_url = $matches[0];
+				if( preg_match( $unsubscribe_link_re, $redirect_url, $match ) )
+				{
+					if( $match[1] == 'newsletter' )
+					{
+						$passthrough_url = $this->get_passthrough_url( array( 'tag' => 2 ) );
+					}
+				}
+
 				if( preg_match_all( '~(\$secret_content_start\$)(.*?)(\$secret_content_end\$)~', $redirect_url, $secret_contents ) )
 				{ // Preserve secret content markers
 					for( $i = 0, $n = count( $secret_contents[2] ); $i < $n; $i++ )

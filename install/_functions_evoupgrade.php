@@ -246,6 +246,79 @@ function db_modify_col( $table, $col_name, $col_desc )
 
 
 /**
+ * ADD/MODIFY/DROP columns by single SQL query
+ *
+ * @param string Table name
+ * @param array Array: key - action('ADD','MODIFY','DROP'),
+ *                     value is array of columns: key - column name, value - column description or column name for DROP action
+ */
+function db_upgrade_cols( $table, $cols )
+{
+	global $DB;
+
+	if( empty( $cols ) )
+	{	// No columns
+		return;
+	}
+
+	// Get existing columns of the given db table in order to avoid errors on add duplicated column or on drop unexisting column:
+	$existing_columns = $DB->get_results( 'SHOW COLUMNS FROM '.$table );
+	foreach( $existing_columns as $c => $col )
+	{
+		$existing_columns[ $c ] = strtolower( $col->Field );
+	}
+
+	$upgrade_sql_query = '';
+	foreach( $cols as $action => $cols_data )
+	{
+		foreach( $cols_data as $col_name => $col_desc )
+		{
+			switch( $action )
+			{
+				case 'ADD':
+				case 'MODIFY':
+				case 'CHANGE':
+					if( in_array( strtolower( $col_name ), $existing_columns ) )
+					{	// Modify the existing column:
+						if( $action == 'CHANGE' )
+						{	// Change a column, e-g rename it:
+							$upgrade_sql_query .= ' CHANGE COLUMN ';
+						}
+						else
+						{	// Modify a column, update only 
+							$upgrade_sql_query .= ' MODIFY COLUMN ';
+						}
+					}
+					else
+					{	// Add new column:
+						$upgrade_sql_query .= ' ADD COLUMN ';
+					}
+					$upgrade_sql_query .= '`'.$col_name.'` '.$col_desc.',';
+					break;
+
+				case 'DROP':
+					$col_name = $col_desc;
+					if( in_array( strtolower( $col_name ), $existing_columns ) )
+					{	// Allow to drop only really existing column:
+						$upgrade_sql_query .= ' DROP COLUMN `'.$col_name.'`,';
+					}
+					// ELSE skip not existing column
+					break;
+
+				default:
+					debug_die( 'Invalid DB upgrade action "'.$action.'"' );
+			}
+		}
+	}
+
+	if( ! empty( $upgrade_sql_query ) )
+	{	// Run upgrade SQL query only if at least one column should be upgraded:
+		$DB->query( 'ALTER TABLE '.$table.substr( $upgrade_sql_query, 0, -1 ) );
+	}
+}
+
+
+/**
  * Add an INDEX. If another index with the same name already exists, it will
  * get dropped before.
  */
@@ -8942,6 +9015,136 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'UPDATE T_email__log
 				SET emlog_key = MD5( CONCAT(emlog_ID, emlog_subject) )
 				WHERE emlog_key IS NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12520, 'Creating automation tables...' ) )
+	{	// part of 6.10.0-beta
+		db_create_table( 'T_automation__automation', '
+			autm_ID            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			autm_name          VARCHAR(255) NOT NULL,
+			autm_status        ENUM("paused", "active") DEFAULT "paused",
+			autm_enlt_ID       INT UNSIGNED NOT NULL,
+			autm_owner_user_ID INT UNSIGNED NOT NULL,
+			autm_autostart     TINYINT(1) UNSIGNED DEFAULT 1,
+			PRIMARY KEY        (autm_ID)' );
+
+		db_create_table( 'T_automation__step', '
+			step_ID                    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			step_autm_ID               INT UNSIGNED NOT NULL,
+			step_order                 INT NOT NULL DEFAULT 1,
+			step_label                 VARCHAR(500) NULL,
+			step_type                  ENUM("if_condition", "send_campaign", "notify_owner", "add_usertag", "remove_usertag", "subscribe", "unsubscribe") COLLATE ascii_general_ci NOT NULL DEFAULT "if_condition",
+			step_info                  TEXT NULL,
+			step_yes_next_step_ID      INT NULL,
+			step_yes_next_step_delay   INT UNSIGNED NULL,
+			step_no_next_step_ID       INT NULL,
+			step_no_next_step_delay    INT UNSIGNED NULL,
+			step_error_next_step_ID    INT NULL,
+			step_error_next_step_delay INT UNSIGNED NULL,
+			PRIMARY KEY                (step_ID),
+			UNIQUE                     step_autm_ID_order (step_autm_ID, step_order)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12530, 'Creating automation user state table...' ) )
+	{	// part of 6.10.0-beta
+		db_create_table( 'T_automation__user_state', '
+			aust_autm_ID      INT UNSIGNED NOT NULL,
+			aust_user_ID      INT UNSIGNED NOT NULL,
+			aust_next_step_ID INT UNSIGNED NULL,
+			aust_next_exec_ts TIMESTAMP NULL,
+			PRIMARY KEY       (aust_autm_ID, aust_user_ID)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12540, 'Upgrading email campaigns table...' ) )
+	{ // part of 6.10.0-beta
+		db_add_col( 'T_email__campaign', 'ecmp_user_tag', 'VARCHAR(255) NULL AFTER ecmp_auto_send' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12550, 'Upgrading email campaign send data table...' ) )
+	{ // part of 6.10.0-beta
+		db_add_col( 'T_email__campaign_send', 'csnd_clicked_unsubscribe', 'TINYINT(1) UNSIGNED DEFAULT 0 AFTER csnd_emlog_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12560, 'Upgrading automation step table...' ) )
+	{	// part of 6.10.0-beta
+		db_modify_col( 'T_automation__step', 'step_type', 'ENUM("if_condition", "send_campaign", "notify_owner", "add_usertag", "remove_usertag", "subscribe", "unsubscribe", "start_automation") COLLATE ascii_general_ci NOT NULL DEFAULT "if_condition"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12570, 'Creating automation newsletter table...' ) )
+	{	// part of 6.10.0-beta
+		db_create_table( 'T_automation__newsletter', '
+			aunl_autm_ID   INT UNSIGNED NOT NULL,
+			aunl_enlt_ID   INT UNSIGNED NOT NULL,
+			aunl_autostart TINYINT(1) UNSIGNED DEFAULT 1,
+			aunl_autoexit  TINYINT(1) UNSIGNED DEFAULT 1,
+			PRIMARY KEY    (aunl_autm_ID, aunl_enlt_ID)' );
+		// Copy single tied newsletter links from automations table to new created table:
+		$DB->query( 'INSERT INTO T_automation__newsletter
+			( aunl_autm_ID, aunl_enlt_ID, aunl_autostart )
+			SELECT autm_ID, autm_enlt_ID, autm_autostart
+			  FROM T_automation__automation' );
+		// Remove old columns:
+		db_upgrade_cols( 'T_automation__automation', array(
+			'DROP' => array( 'autm_enlt_ID', 'autm_autostart' ),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12580, 'Upgrading email campaign send data table...' ) )
+	{	// part of 6.10.0-beta
+		db_upgrade_cols( 'T_email__campaign_send', array(
+			'ADD' => array(
+				'csnd_last_sent_ts'  => 'TIMESTAMP NULL',
+				'csnd_last_open_ts'  => 'TIMESTAMP NULL',
+				'csnd_last_click_ts' => 'TIMESTAMP NULL',
+			),
+		) );
+		// Update new added tables from email log table:
+		$DB->query( 'UPDATE T_email__campaign_send
+			INNER JOIN T_email__log ON csnd_emlog_ID = emlog_ID
+			  SET csnd_last_sent_ts = emlog_timestamp,
+			      csnd_last_open_ts = emlog_last_open_ts,
+			      csnd_last_click_ts = emlog_last_click_ts' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12590, 'Upgrading email log table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_email__log', 'emlog_camp_ID', 'INT UNSIGNED NULL DEFAULT NULL AFTER emlog_last_click_ts' );
+		$DB->query( 'UPDATE T_email__log
+				INNER JOIN T_email__campaign_send ON csnd_emlog_ID = emlog_ID
+				SET emlog_camp_ID = csnd_camp_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12600, 'Upgrading email log table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_email__log', 'emlog_autm_ID', 'INT UNSIGNED DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12610, 'Upgrading email newsletter subscriptions table...' ) )
+	{	// part of 6.10.0-beta
+		db_upgrade_cols( 'T_email__newsletter_subscription', array(
+			'ADD' => array(
+				'enls_last_open_ts'  => 'TIMESTAMP NULL AFTER enls_last_sent_manual_ts',
+				'enls_last_click_ts' => 'TIMESTAMP NULL AFTER enls_last_open_ts',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12620, 'Upgrading automation newsletter table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_automation__newsletter', 'aunl_order', 'INT NOT NULL DEFAULT 1' );
+		$DB->query( 'UPDATE T_automation__newsletter
+			SET aunl_order = aunl_enlt_ID' );
 		upg_task_end();
 	}
 

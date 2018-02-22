@@ -52,7 +52,7 @@ function cron_log( $message, $level = 0 )
  */
 function call_job( $job_key, $job_params = array() )
 {
-	global $DB, $inc_path, $Plugins, $admin_url;
+	global $DB, $inc_path, $Plugins, $admin_url, $is_web;
 
 	global $result_message, $result_status, $timestop, $time_difference;
 
@@ -129,9 +129,21 @@ function call_job( $job_key, $job_params = array() )
 		$cron_log_level = 1;
 	}
 
+	if( $is_web )
+	{	// Is web interface?
+		$result_message_text = str_replace( "\n", "<br>\n", $result_message_text );
+	}
+	else
+	{	// Is CLI mode?
+		$result_message_text = str_replace(
+			array( '<br>', '<b>', '</b>', '&#8800;', '&#8804;', '&#8805;' ),
+			array( "\n", '*', '*', '!=', '<=', '>=' ),
+			$result_message_text );
+	}
+
 	$timestop = time() + $time_difference;
 	cron_log( 'Task finished at '.date( 'H:i:s', $timestop ).' with status: '.$result_status
-		."\nMessage: $result_message_text", $cron_log_level );
+		.( $is_web ? '<br>' : "\n" ).'Message: '.$result_message_text, $cron_log_level );
 
 	return $error_message;
 }
@@ -472,5 +484,72 @@ function cron_job_sql_query( $fields = 'key,name' )
 	}
 
 	return $name_query;
+}
+
+
+/**
+ * Error handler for cron job
+ *
+ * @return boolean FALSE - to continue normal error handler, TRUE - to don't run normal error handler
+ */
+function cron_job_error_handler()
+{
+	$last_error = error_get_last();
+
+	if( $last_error['type'] === E_ERROR )
+	{	// If last error is fatal:
+		global $result_message, $error_message, $DB;
+
+		if( empty( $result_message ) )
+		{	// Initialize result message of current executing cron job:
+			$result_message = '';
+		}
+
+		// Append error info to cron job log:
+		$new_error_message = "\n".'b2evolution caught an UNEXPECTED ERROR: '
+			.( $last_error
+				? '<b>File:</b> '.$last_error['file'].', '
+				 .'<b>Line:</b> '.$last_error['line'].', '
+				 .'<b>Message:</b> '.$last_error['message']
+				: 'Unknown'
+			);
+		if( $new_error_message !== $error_message )
+		{	// Update only really new error, in order to exclude duplicates:
+			$error_message = $new_error_message;
+			$result_message .= $error_message;
+		}
+
+		// We must rollback any started transaction in order to proper update a log of the interrupted cron job:
+		$DB->rollback();
+
+		return true;
+	}
+
+	// To continue normal error handler:
+	return false;
+}
+
+
+/**
+ * Shutdown function to save log of the interrupted cron job by unexpected error:
+ */
+function cron_job_shutdown()
+{
+	global $result_message, $ctsk_ID, $DB;
+
+	if( empty( $ctsk_ID ) )
+	{	// Run rgus function to detect only interrupted corn jobs:
+		return;
+	}
+
+	// Run error handler to store info of last error in $result_message:
+	cron_job_error_handler();
+
+	$DB->query( 'UPDATE T_cron__log
+		  SET clog_status = "error",
+		      clog_realstop_datetime = '.$DB->quote( date2mysql( time() ) ).',
+		      clog_messages = '.$DB->quote( $result_message ).'
+		WHERE clog_ctsk_ID = '.$ctsk_ID,
+		'Record task as finished with error by shutdown function.' );
 }
 ?>

@@ -151,8 +151,21 @@ function param_format( $value, $type = 'raw' )
 function param( $var, $type = 'raw', $default = '', $memorize = false,
 								$override = false, $use_default = true, $strict_typing = 'allow_empty' )
 {
-	global $Debuglog, $debug, $evo_charset, $io_charset;
+	global $Debuglog, $debug, $evo_charset, $io_charset, $is_cli;
 	// NOTE: we use $GLOBALS[$var] instead of $$var, because otherwise it would conflict with param names which are used as function params ("var", "type", "default", ..)!
+
+	if( $is_cli )
+	{	// For CLI mode use only default values:
+		if( in_array( $type, array( 'array', 'array:integer', 'array:string', 'array:array:integer', 'array:array:string' ) ) && $default === '' )
+		{	// Change default '' into array() to avoid a notice:
+			$default = array();
+		}
+		$GLOBALS[$var] = remove_magic_quotes( $default );
+		$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
+
+		return $GLOBALS[$var];
+		// EXIT HERE, Don't do other code below for params from CLI mode.
+	}
 
 	/*
 	 * STEP 1 : Set the variable
@@ -1054,62 +1067,27 @@ function param_date( $var, $err_msg, $required, $default = '', $date_format = NU
 
 
 /**
- * Check if param is an ISO date.
+ * Format date from entered form in format of current user locale to ISO format(YYYY-MM-DD) in order to store in DB
  *
- * NOTE: for tokens like e.g. "D" (abbr. weekday), T_() gets used and it uses the current locale!
- *
- * @param string param name
- * @param string error message
- * @param boolean Is a non-empty date required?
- * @param string date format (php format)
- * @return boolean|string false if not OK, ISO date if OK
+ * @param string Date
+ * @param string Source date format, NULL - to use format of current locale
+ * @return string|boolean Formated date OR FALSE if date cannot be converted
  */
-function param_check_date( $var, $err_msg, $required = false, $date_format = NULL )
+function format_input_date_to_iso( $date, $date_format = NULL )
 {
-	if( empty( $GLOBALS[$var] ) )
-	{ // empty is OK if not required:
-		if( $required )
-		{
-			param_error( $var, $err_msg );
-			return false;
-		}
-		return '';
-	}
-
 	if( empty( $date_format ) )
 	{	// Use locale input date format:
 		$date_format = locale_input_datefmt();
 	}
 
 	// Convert PHP date format to regexp pattern:
-	$date_regexp = '~^'.preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
-		if( $m[1] == "\\\" ) return $m[2]; // escaped
-		switch( $m[2] )
-		{
-			case "d": return "([0-3]\\d)"; // day, 01-31
-			case "j": return "([1-3]?\\d)"; // day, 1-31
-			case "l": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday"])))).")";
-			case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
-			case "e": // b2evo extension!
-				return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
-			case "S": return "(st|nd|rd|th)?"; // english suffix for day. Made optional as jQuery formatDate does not support this format.
-
-			case "m": return "([0-1]\\d)"; // month, 01-12
-			case "n": return "(1?\\d)"; // month, 1-12
-			case "F": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month"])))).")"; //  A full textual representation of a month, such as January or March
-			case "M": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month_abbrev"])))).")";
-
-			case "y": return "(\\d\\d)"; // year, 00-99
-			case "Y": return "(\\d{4})"; // year, XXXX
-			default:
-				return $m[0];
-		}' ), $date_format ).'$~i'; // case-insensitive?
+	$date_regexp = '~^'.preg_replace_callback( '~(\\\)?(\w)~', '_format_input_date_to_iso_callback', $date_format ).'$~i'; // case-insensitive?
 	// Allow additional spaces, e.g. "03  May 2007" when format is "d F Y":
 	$date_regexp = preg_replace( '~ +~', '\s+', $date_regexp );
 	// echo $date_format.'...'.$date_regexp;
 
 	// Check that the numbers match the date pattern:
-	if( preg_match( $date_regexp, $GLOBALS[$var], $numbers ) )
+	if( preg_match( $date_regexp, $date, $numbers ) )
 	{	// Date does match pattern:
 		//pre_dump( $numbers );
 
@@ -1163,6 +1141,68 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 
 			return $iso_date;
 		}
+	}
+
+	return false;
+}
+
+
+/**
+ * Callback for preg_replace_callback in format_input_date_to_iso()
+ */
+function _format_input_date_to_iso_callback( $matches )
+{
+	if( $matches[1] == "\\" ) return $matches[2]; // escaped
+	switch( $matches[2] )
+	{
+		case "d": return "([0-3]\\d)"; // day, 01-31
+		case "j": return "([1-3]?\\d)"; // day, 1-31
+		case "l": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday"])))).")";
+		case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
+		case "e": // b2evo extension!
+			return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
+		case "S": return "(st|nd|rd|th)?"; // english suffix for day. Made optional as jQuery formatDate does not support this format.
+
+		case "m": return "([0-1]\\d)"; // month, 01-12
+		case "n": return "(1?\\d)"; // month, 1-12
+		case "F": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month"])))).")"; //  A full textual representation of a month, such as January or March
+		case "M": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month_abbrev"])))).")";
+
+		case "y": return "(\\d\\d)"; // year, 00-99
+		case "Y": return "(\\d{4})"; // year, XXXX
+		default:
+			return $matches[0];
+	}
+}
+
+
+/**
+ * Check if param is an ISO date.
+ *
+ * NOTE: for tokens like e.g. "D" (abbr. weekday), T_() gets used and it uses the current locale!
+ *
+ * @param string param name
+ * @param string error message
+ * @param boolean Is a non-empty date required?
+ * @param string date format (php format)
+ * @return boolean|string false if not OK, ISO date if OK
+ */
+function param_check_date( $var, $err_msg, $required = false, $date_format = NULL )
+{
+	if( empty( $GLOBALS[$var] ) )
+	{ // empty is OK if not required:
+		if( $required )
+		{
+			param_error( $var, $err_msg );
+			return false;
+		}
+		return '';
+	}
+
+	$iso_date = format_input_date_to_iso( $GLOBALS[$var], $date_format );
+	if( $iso_date !== false )
+	{	// Return iso date if it is converted successfully:
+		return $iso_date;
 	}
 
 	// Date did not pass all tests:

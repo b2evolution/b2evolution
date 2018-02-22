@@ -964,6 +964,66 @@ switch( $action )
 		echo 'ok';
 		break;
 
+	case 'get_userlist_automation':
+		// Get automation data for current users list selection:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'users' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'view', true );
+
+		param( 'autm_ID', 'integer', true );
+		param( 'enlt_ID', 'integer', NULL );
+
+		$AutomationCache = & get_AutomationCache();
+		$Automation = & $AutomationCache->get_by_ID( $autm_ID );
+
+		$NewsletterCache = & get_NewsletterCache();
+
+		$autm_data = array();
+
+		if( $enlt_ID === NULL )
+		{	// Get newsletters tied to the automation:
+			$NewsletterCache->load_list( $Automation->get_newsletter_IDs() );
+			$autm_data['newsletters'] = array();
+			foreach( $NewsletterCache->cache as $automation_Newsletter )
+			{
+				$autm_data['newsletters'][ $automation_Newsletter->ID ] = $automation_Newsletter->get( 'name' );
+			}
+		}
+		else
+		{	// Get automation data for selected newsletter:
+			$automation_Newsletter = & $NewsletterCache->get_by_ID( $enlt_ID );
+
+			$autm_data['newsletter_name'] = $automation_Newsletter->get( 'name' );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+			$filterset_user_IDs = get_filterset_user_IDs();
+
+			$no_subs_SQL = new SQL( 'Get a count of not subscribed users' );
+			$no_subs_SQL->SELECT( 'COUNT( user_ID )' );
+			$no_subs_SQL->FROM( 'T_users' );
+			$no_subs_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$automation_Newsletter->ID );
+			$no_subs_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $filterset_user_IDs ).' )' );
+			$no_subs_SQL->WHERE_and( 'enls_subscribed = 0 OR enls_user_ID IS NULL' );
+			$autm_data['users_no_subs_num'] = intval( $DB->get_var( $no_subs_SQL ) );
+
+			$automated_SQL = new SQL( 'Get a count of automated users' );
+			$automated_SQL->SELECT( 'COUNT( user_ID )' );
+			$automated_SQL->FROM( 'T_users' );
+			$automated_SQL->FROM_add( 'INNER JOIN T_automation__user_state ON aust_user_ID = user_ID' );
+			$automated_SQL->WHERE( 'aust_autm_ID = '.$Automation->ID );
+			$automated_SQL->WHERE_and( 'user_ID IN ( '.$DB->quote( $filterset_user_IDs ).' )' );
+			$autm_data['users_automated_num'] = intval( $DB->get_var( $automated_SQL ) );
+
+			$autm_data['users_new_num'] = count( $filterset_user_IDs ) - $autm_data['users_automated_num'];
+		}
+
+		echo evo_json_encode( $autm_data );
+
+		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
+
 	default:
 		$incorrect_action = true;
 		break;

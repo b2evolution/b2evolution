@@ -2664,6 +2664,9 @@ class Item extends ItemLight
 							'title' => '',
 							'intro' => '',
 							'bottom' => '',
+							'title_subscribed' => '',
+							'intro_subscribed' => '',
+							'bottom_subscribed' => '',
 							'enlt_ID' => $newsletter_ID,
 							'button_notsubscribed_class' => 'btn-danger',
 							'button_subscribed_class' => 'btn-success',
@@ -2680,6 +2683,7 @@ class Item extends ItemLight
 						if( ! empty( $user_tags ) )
 						{
 							$params['usertags'] = $user_tags;
+							$params['unsubscribed_if_not_tagged'] = true;
 						}
 
 						if( ! empty( $button_notloggedin ) && ! is_logged_in() )
