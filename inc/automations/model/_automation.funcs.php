@@ -159,7 +159,7 @@ function autm_td_users_actions( $autm_ID, $user_ID, $user_login, $step_ID, $step
 	}
 
 	// Remove user from automation:
-	$r .= action_icon( T_('Remove this user from automation'), 'remove', $step_action_url.'remove_user' );
+	$r .= action_icon( T_('Remove this user from automation'), 'remove', $step_action_url.'remove_user', '', 0, 0, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to remove this user from automation?').'\');' ) );
 
 	// Requeue:
 	$r .= ' <a href="#" class="btn btn-info btn-xs"'
