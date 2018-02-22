@@ -29,8 +29,13 @@ $step_result_labels = step_get_result_labels();
 // Print out HTML boxes for steps and Initialise steps data to build connectors between steps by JS code below:
 $steps = array();
 echo '<div class="evo_automation__diagram_canvas jtk-surface jtk-surface-nopan" id="evo_automation__diagram_canvas">';
-foreach( $AutomationStepCache->cache as $s => $AutomationStep )
+$s = 0;
+$j = 0;
+foreach( $AutomationStepCache->cache as $AutomationStep )
 {
+	$j = ( $j >= 4 ? 1 : ++$j );// $j has only 4 values: 1,2,3,4
+	$s++;
+
 	$step = array(
 			'id'         => 'step_'.$AutomationStep->ID,
 			'next_steps' => array(),
@@ -51,7 +56,7 @@ foreach( $AutomationStepCache->cache as $s => $AutomationStep )
 	$steps[ $AutomationStep->ID ] = $step;
 
 	// Set auto positions of step box when they are not stored in DB yet:
-	$x = ( $s % 2 ? 10 : 70 ).'%';
+	$x = ( $s % 2 ? ( $j == 3 ? 70 : 10 ) : ( $j == 4 ? 10 : 70 ) ).'%';
 	$y = 200 * ( $s % 2 ? $s : $s - 1 ).'px';
 
 	$step_attrs = array(
@@ -148,6 +153,7 @@ jsPlumb.ready( function ()
 	point_source_error.connectorOverlays[0][1].width = 10;
 	point_source_error.connectorOverlays[0][1].length = 10;
 	point_source_error.connectorOverlays[1][1].cssClass = 'jtk-label jtk-label-error';
+	point_source_error.connectorOverlays[1][1].location = 0.5;
 	// Target black point:
 	var point_target = {
 		endpoint: 'Dot',
