@@ -525,6 +525,9 @@ switch( $action )
 					'users' => array(
 						'text' => T_('Users'),
 						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=users&amp;autm_ID='.$edited_Automation->ID ),
+					'diagram' => array(
+						'text' => T_('Diagram view'),
+						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=diagram&amp;autm_ID='.$edited_Automation->ID ),
 				) );
 		}
 		else
@@ -542,6 +545,15 @@ switch( $action )
 			case 'users':
 				$AdminUI->set_page_manual_link( 'automation-users-queued' );
 				$AdminUI->set_path( 'email', 'automations', 'users' );
+				break;
+
+			case 'diagram':
+				$AdminUI->set_page_manual_link( 'automation-diagram-view' );
+				$AdminUI->set_path( 'email', 'automations', 'diagram' );
+				// Load files to draw diagram by plugin jsPlumb:
+				require_js( 'jquery/jsplumb/jsplumb.min.js', 'rsc_url' );
+				require_css( 'jquery/jsplumb/jsplumbtoolkit-defaults.css', 'rsc_url' );
+				require_css( 'jquery/jsplumb/jsplumbtoolkit-b2evo.css', 'rsc_url' );
 				break;
 
 			default:
@@ -589,6 +601,10 @@ switch( $action )
 
 			case 'users':
 				$AdminUI->disp_view( 'automations/views/_automation_users.view.php' );
+				break;
+
+			case 'diagram':
+				$AdminUI->disp_view( 'automations/views/_automation_diagram.view.php' );
 				break;
 
 			case 'settings':
