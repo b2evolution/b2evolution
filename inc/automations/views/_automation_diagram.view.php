@@ -20,33 +20,76 @@ global $edited_Automation;
 // Display breadcrumb:
 autm_display_breadcrumb();
 
-?>
-<div class="evo_automation__diagram_canvas jtk-surface jtk-surface-nopan" id="evo_automation__diagram_canvas">
-	<div class="evo_automation__diagram_step_box" id="step_1"
-		style="top:80px;left:50%"
-		data-info-yes="YES (5s)"
-		data-info-no="NO (1m)"
-		data-info-error="ERROR (50mn)">
-		<b>#1 IF Condition:</b><br>(Current date > "2018-01-23" AND User has tag = "moderator")</div>
-	<div class="evo_automation__diagram_step_box" id="step_2"
-		style="top:290px;left:33%"
-		data-info-yes="Email SENT (0s)"
-		data-info-no="Email was ALREADY sent (34s)"
-		data-info-error="ERROR: Email cannot be sent (1mn)">
-		<b>#2 Send Campaign</b><br>Markdown Example</div>
-	<div class="evo_automation__diagram_step_box" id="step_3"
-		style="top:42em;left:50%"
-		data-info-yes="Notification SENT (23d)"
-		data-info-error="ERROR: Notification cannot be sent (5m)">
-		<b>#3 Notify Owner:</b><br>administrator</div>
-	<div class="evo_automation__diagram_step_box" id="step_4"
-		style="top: 23em;left: 67%"
-		data-info-yes="Tag was added (5h)"
-		data-info-no="User already has the tag (1y)">
-		<b>#4 Add user tag:</b><br>"very long user tag name for testing"</div>
-</div>
+$AutomationStepCache = & get_AutomationStepCache();
+$AutomationStepCache->load_where( 'step_autm_ID = '.$edited_Automation->ID );
 
+$step_results = array( 'YES', 'NO', 'ERROR' );
+$step_result_labels = step_get_result_labels();
+
+// Print out HTML boxes for steps and Initialise steps data to build connectors between steps by JS code below:
+$steps = array();
+echo '<div class="evo_automation__diagram_canvas jtk-surface jtk-surface-nopan" id="evo_automation__diagram_canvas">';
+foreach( $AutomationStepCache->cache as $s => $AutomationStep )
+{
+	$step = array(
+			'id'         => 'step_'.$AutomationStep->ID,
+			'next_steps' => array(),
+		);
+	// Fill data of next steps to initialise connectors between step boxes by JS code below:
+	if( $yes_next_AutomationStep = & $AutomationStep->get_yes_next_AutomationStep() )
+	{	// Next YES step:
+		$step['next_steps']['yes'] = $yes_next_AutomationStep->ID;
+	}
+	if( $no_next_AutomationStep = & $AutomationStep->get_no_next_AutomationStep() )
+	{	// Next NO step:
+		$step['next_steps']['no'] = $no_next_AutomationStep->ID;
+	}
+	if( $error_next_AutomationStep = & $AutomationStep->get_error_next_AutomationStep() )
+	{	// Next ERROR step:
+		$step['next_steps']['error'] = $error_next_AutomationStep->ID;
+	}
+	$steps[ $AutomationStep->ID ] = $step;
+
+	// Set auto positions of step box when they are not stored in DB yet:
+	$x = ( $s % 2 ? 10 : 70 ).'%';
+	$y = 200 * ( $s % 2 ? $s : $s - 1 ).'px';
+
+	$step_attrs = array(
+			'id'         => $step['id'],
+			'style'      => 'left:'.$x.';top:'.$y,
+			'class'      => 'evo_automation__diagram_step_box',
+		);
+
+	$step_type_result_labels = $step_result_labels[ $AutomationStep->get( 'type' ) ];
+
+	foreach( $step_results as $step_result )
+	{	// Initialize step data for each result type(YES|NO|ERROR):
+		if( ! empty( $step_type_result_labels[ $step_result ] ) )
+		{
+			$step_attrs['data-info-'.strtolower( $step_result ) ] = str_replace( 'Next step if ', '', $step_type_result_labels[ $step_result ] )
+				.' ('.seconds_to_period( $AutomationStep->get( strtolower( $step_result ).'_next_step_delay' ), true ).')';
+		}
+	}
+
+	// Print box of step with data:
+	echo '<div'.get_field_attribs_as_string( $step_attrs ).'>'
+		.'<b>#'.$AutomationStep->get( 'order' ).' '.step_get_type_title( $AutomationStep->get( 'type' ) ).':</b><br>'
+			.$AutomationStep->get( 'label' )
+		.'</div>'."\n";
+}
+echo '</div>';
+?>
 <script type="text/javascript">
+jQuery( document ).ready( function()
+{	// CSS fix to make diagram canvas full height:
+	var evo_diagram_canvas_parent = jQuery( '#evo_automation__diagram_canvas' );
+	while( evo_diagram_canvas_parent.length > 0 )
+	{
+		evo_diagram_canvas_parent.css( 'height', '100%' );
+		evo_diagram_canvas_parent = evo_diagram_canvas_parent.parent();
+	}
+} );
+
 jsPlumb.ready( function ()
 {
 	var instance = jsPlumb.getInstance(
@@ -143,40 +186,43 @@ jsPlumb.ready( function ()
 		} );
 	} );
 
-	function evo_jsplumb_init_step_box( toId )
+	var evo_jsplumb_init_step_box = function( step_box_ID )
 	{
-		if( jQuery( '#' + toId ).data( 'info-yes' ) != undefined )
+		if( jQuery( '#' + step_box_ID ).data( 'info-yes' ) != undefined )
 		{	// Add "YES" red source point:
-			instance.addEndpoint( toId, point_source_yes, { anchor: [ 0.33, 1, 0, 1 ], uuid: toId + '_yes' } );
+			instance.addEndpoint( step_box_ID, point_source_yes, { anchor: [ 0.33, 1, 0, 1 ], uuid: step_box_ID + '_yes' } );
 		}
-		if( jQuery( '#' + toId ).data( 'info-no' ) != undefined )
+		if( jQuery( '#' + step_box_ID ).data( 'info-no' ) != undefined )
 		{	// Add "NO" blue source point:
-			instance.addEndpoint( toId, point_source_no, { anchor: [ 0.67, 1, 0, 1 ], uuid: toId + '_no' } );
+			instance.addEndpoint( step_box_ID, point_source_no, { anchor: [ 0.67, 1, 0, 1 ], uuid: step_box_ID + '_no' } );
 		}
-		if( jQuery( '#' + toId ).data( 'info-error' ) != undefined )
+		if( jQuery( '#' + step_box_ID ).data( 'info-error' ) != undefined )
 		{	// Add "ERROR" red source point:
-			instance.addEndpoint( toId, point_source_error, { anchor: 'RightMiddle', uuid: toId + '_error' } );
+			instance.addEndpoint( step_box_ID, point_source_error, { anchor: 'RightMiddle', uuid: step_box_ID + '_error' } );
 		}
 		// Add target black point:
-		instance.addEndpoint( toId, point_target, { anchor: 'TopCenter', uuid: toId } );
+		instance.addEndpoint( step_box_ID, point_target, { anchor: 'TopCenter', uuid: step_box_ID } );
 		// Make whole step box is traget place to connect:
-		instance.makeTarget( toId, { anchor: 'TopCenter', endpoint: 'Blank' } );
+		instance.makeTarget( step_box_ID, { anchor: 'TopCenter', endpoint: 'Blank' } );
 	};
 
 	// Initialise step boxes:
-	evo_jsplumb_init_step_box( 'step_1' );
-	evo_jsplumb_init_step_box( 'step_2' );
-	evo_jsplumb_init_step_box( 'step_3' );
-	evo_jsplumb_init_step_box( 'step_4' );
+	<?php
+	foreach( $steps as $step_ID => $step_data )
+	{
+		echo 'evo_jsplumb_init_step_box( \'step_'.$step_ID.'\' );'."\n\t";
+	}
+	?>
 
 	// Initialise connections between steps:
-	instance.connect( { uuids: ['step_1_yes', 'step_2'] } );
-	instance.connect( { uuids: ['step_1_no', 'step_4'] } );
-	instance.connect( { uuids: ['step_1_error', 'step_1'] } );
-	instance.connect( { uuids: ['step_2_yes', 'step_3'] } );
-	instance.connect( { uuids: ['step_2_no', 'step_2'] } );
-	instance.connect( { uuids: ['step_2_error', 'step_2'] } );
-	instance.connect( { uuids: ['step_4_yes', 'step_3'] } );
-	instance.connect( { uuids: ['step_4_no', 'step_3'] } );
+	<?php
+	foreach( $steps as $step_ID => $step_data )
+	{
+		foreach( $step_data['next_steps'] as $next_step_type => $next_step_ID )
+		{
+			echo 'instance.connect( { uuids: [\'step_'.$step_ID.'_'.$next_step_type.'\', \'step_'.$next_step_ID.'\'] } );'."\n\t";
+		}
+	}
+	?>
 } );
 </script>
