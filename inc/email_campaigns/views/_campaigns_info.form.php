@@ -41,9 +41,22 @@ $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-c
 	$Form->text_input( 'ecmp_user_tag', param( 'ecmp_user_tag', 'string', $edited_EmailCampaign->get( 'user_tag' ) ), 60, T_('Tag users who click on content links with'), '', array(
 		'maxlength' => 255,
 		'style'     => 'width: 100%;',
-		'input_prefix' => '<div id="user_admin_tags" class="input-group">',
+		'input_prefix' => '<div id="user_admin_tags" class="input-group user_admin_tags">',
 		'input_suffix' => '</div>',
 	) );
+	$Form->text_input( 'ecmp_user_tag_like', param( 'ecmp_user_tag_like', 'string', $edited_EmailCampaign->get( 'user_tag_like' ) ), 60, T_('Tag users who liked the email with'), '', array(
+		'maxlength' => 255,
+		'style'     => 'width: 100%;',
+		'input_prefix' => '<div id="user_admin_tags_like" class="input-group user_admin_tags">',
+		'input_suffix' => '</div>',
+	) );
+	$Form->text_input( 'ecmp_user_tag_dislike', param( 'ecmp_user_tag_dislike', 'string', $edited_EmailCampaign->get( 'user_tag_dislike' ) ), 60, T_('Tag users who disliked the email with'), '', array(
+		'maxlength' => 255,
+		'style'     => 'width: 100%;',
+		'input_prefix' => '<div id="user_admin_tags_dislike" class="input-group user_admin_tags">',
+		'input_suffix' => '</div>',
+	) );
+
 	?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
@@ -76,11 +89,13 @@ $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-c
 
 	jQuery( document ).ready( function()
 	{
-		jQuery( '#ecmp_user_tag' ).hide();
+		jQuery( '#ecmp_user_tag, #ecmp_user_tag_like, #ecmp_user_tag_dislike' ).hide();
 		init_autocomplete_tags( '#ecmp_user_tag' );
+		init_autocomplete_tags( '#ecmp_user_tag_like' );
+		init_autocomplete_tags( '#ecmp_user_tag_dislike' );
 		<?php
 			// Don't submit a form by Enter when user is editing the tags
-			echo get_prevent_key_enter_js( '#token-input-ecmp_user_tag' );
+			echo get_prevent_key_enter_js( '#token-input-ecmp_user_tag, #token-input-ecmp_user_tag_like, #token-input-ecmp_user_tag_dislike' );
 		?>
 	} );
 	</script>

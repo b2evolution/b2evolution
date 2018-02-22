@@ -43,6 +43,10 @@ class EmailCampaign extends DataObject
 
 	var $user_tag;
 
+	var $user_tag_like;
+
+	var $user_tag_dislike;
+
 	var $use_wysiwyg = 0;
 
 	var $send_ctsk_ID;
@@ -97,6 +101,8 @@ class EmailCampaign extends DataObject
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 			$this->auto_send = $db_row->ecmp_auto_send;
 			$this->user_tag = $db_row->ecmp_user_tag;
+			$this->user_tag_like = $db_row->ecmp_user_tag_like;
+			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
 		}
 	}
 
@@ -588,6 +594,16 @@ class EmailCampaign extends DataObject
 		if( param( 'ecmp_user_tag', 'string', NULL ) !== NULL )
 		{ // User tag:
 			$this->set_from_Request( 'user_tag' );
+		}
+
+		if( param( 'ecmp_user_tag_like', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_like' );
+		}
+
+		if( param( 'ecmp_user_tag_dislike', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_dislike' );
 		}
 
 		return ! param_errors_detected();

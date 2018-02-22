@@ -285,7 +285,7 @@ function db_upgrade_cols( $table, $cols )
 							$upgrade_sql_query .= ' CHANGE COLUMN ';
 						}
 						else
-						{	// Modify a column, update only 
+						{	// Modify a column, update only
 							$upgrade_sql_query .= ' MODIFY COLUMN ';
 						}
 					}
@@ -9145,6 +9145,23 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_automation__newsletter', 'aunl_order', 'INT NOT NULL DEFAULT 1' );
 		$DB->query( 'UPDATE T_automation__newsletter
 			SET aunl_order = aunl_enlt_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12630, 'Upgrading email campaign send data table...' ) )
+	{
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_user_tag_like' => 'VARCHAR(255) NULL AFTER ecmp_user_tag',
+				'ecmp_user_tag_dislike' => 'VARCHAR(255) NULL AFTER ecmp_user_tag_like',
+			),
+		) );
+
+		db_upgrade_cols( 'T_email__campaign_send', array(
+			'ADD' => array(
+				'csnd_like' => 'TINYINT(1) NULL DEFAULT NULL AFTER csnd_last_click_ts'
+			),
+		) );
 		upg_task_end();
 	}
 

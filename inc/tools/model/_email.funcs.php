@@ -1335,7 +1335,7 @@ function add_email_tracking( $message, $email_ID, $email_key, $params = array() 
 			// Add link click tracking
 			if( $params['link_click_text'] )
 			{
-				$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#';
+				$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#i';
 				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text', $params['default_template_tag'] );
 				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
 			}
@@ -1345,7 +1345,7 @@ function add_email_tracking( $message, $email_ID, $email_key, $params = array() 
 			if( $params['image_load'] )
 			{
 				// Add email open tracking to first image
-				$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
+				$re = '/(<img\b.+\bsrc=")([^"]*?)(")/iU';
 				$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key, 'html' );
 				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message, 1 );
 
@@ -1359,7 +1359,7 @@ function add_email_tracking( $message, $email_ID, $email_key, $params = array() 
 			if( $params['link_click_html'] )
 			{
 				// Add link click tracking
-				$re = '/(<a\b.+\bhref=")([^"]*)(")/';
+				$re = '/(<a\b.+\bhref=")([^"]*?)(")/iU';
 				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'html', $params['default_template_tag'] );
 				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
 			}
@@ -1377,7 +1377,7 @@ function add_email_tracking( $message, $email_ID, $email_key, $params = array() 
 				// Add link click tracking
 				if( $params['link_click_text'] )
 				{
-					$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#';
+					$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#i';
 					$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text', $row['tag'] );
 					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'] );
 				}
@@ -1387,7 +1387,7 @@ function add_email_tracking( $message, $email_ID, $email_key, $params = array() 
 				if( $params['image_load'] )
 				{
 					// Add email open tracking to first image
-					$re = '/(<img\b.+\bsrc=")([^"]*)(")/';
+					$re = '/(<img\b.+\bsrc=")([^"]*?)(")/iU';
 					$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key, 'html' );
 					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'], 1 );
 				}
@@ -1395,7 +1395,7 @@ function add_email_tracking( $message, $email_ID, $email_key, $params = array() 
 				if( $params['link_click_html'] )
 				{
 					// Add link click tracking
-					$re = '/(<a\b.+\bhref=")([^"]*)(")/';
+					$re = '/(<a\b.+\bhref=")([^"]*?)(")/iU';
 					$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'html', $row['tag'] );
 					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'] );
 				}
