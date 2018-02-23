@@ -390,7 +390,9 @@ class User extends DataObject
 	 * Used when try to delete an user which has at least one poll question
 	 *
 	 * @param array restriction
-	 * @return string message with link to objects
+	 * @return string|boolean Message with link to objects,
+	 *                        Empty string if no restriction for current table,
+	 *                        FALSE - if no rule for current table
 	 */
 	function get_restriction_link( $restriction )
 	{
@@ -414,10 +416,14 @@ class User extends DataObject
 				}
 				return $msg;
 			}
+			else
+			{	// No restriction for current table:
+				return '';
+			}
 		}
 
-		// no restriction
-		return '';
+		// No rule for current table:
+		return false;
 	}
 
 
