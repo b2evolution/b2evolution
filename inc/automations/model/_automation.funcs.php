@@ -603,7 +603,8 @@ function automation_results_block( $params = array() )
 
 	if( $params['display_create_button'] && $current_User->check_perm( 'options', 'edit' ) )
 	{	// User must has a permission to add new automation:
-		$Results->global_icon( T_('New automation'), 'new', regenerate_url( 'action', 'action=new' ), T_('New automation').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		//$Results->global_icon( T_('New automation'), 'new', regenerate_url( 'action', 'action=new' ), T_('New automation').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		$Results->global_icon( T_('New automation'), 'new', $admin_url.'?ctrl=automations&amp;action=new'.( isset( $params['enlt_ID'] ) ? '&amp;enlt_ID='.$params['enlt_ID'] : '' ), T_('New automation').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
 
 	$Results->title = $params['results_title'];

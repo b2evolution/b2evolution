@@ -589,7 +589,7 @@ class AdminUI extends AdminUI_general
 									 '</div>' // End of <div class="panel-body...>
 								.'</div>' // End of <div id="$group_item_id$...>
 							.'</div>'."\n", // End of <div class="panel panel-default...>
-					
+
 					) );
 
 			case 'linespan_form':
