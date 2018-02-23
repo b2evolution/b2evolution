@@ -247,7 +247,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 	// Display input element:
 	$input_name = $Obj->get_param_prefix().$parname;
-	if( substr($parmeta['type'], 0, 6) == 'select' && ! empty($parmeta['multiple']) )
+	if( $parmeta['type'] != 'select_input' && substr($parmeta['type'], 0, 6) == 'select' && ! empty($parmeta['multiple']) )
 	{ // a "multiple" select:
 		$input_name .= '[]';
 	}
