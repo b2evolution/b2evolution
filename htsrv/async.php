@@ -235,7 +235,7 @@ switch( $action )
 
 		param( 'plugin_ID', 'integer', true );
 		param( 'set_type', 'string', '' ); // 'Settings', 'UserSettings', 'CollSettings', 'MsgSettings', 'EmailSettings', 'Skin', 'Widget'
-		param( 'option_selected', 'string', '' ); 
+		param( 'field_id', 'string', '' ); 
 		param( 'parname', 'string', '' ); 
 		
 		if( ! in_array( $set_type, array( 'Settings', 'UserSettings', 'CollSettings', 'MsgSettings', 'EmailSettings', 'Skin', 'Widget' ) ) )
@@ -295,7 +295,7 @@ switch( $action )
 		
 		$Form = new Form(); // fake Form to display plugin setting
 		
-		autoform_display_field( $parname, $r['set_meta']['entries']['_'.$option_selected], $Form, $set_type, $plugin_Object, $target_Object, $r['set_node']['_'.$option_selected] );
+		autoform_display_field( $parname, $r['set_meta']['entries']['_'.$field_id], $Form, $set_type, $plugin_Object, $target_Object, $r['set_node']['_'.$field_id] );
 		
 		break;
 		
