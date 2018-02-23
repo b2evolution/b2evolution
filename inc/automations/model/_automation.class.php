@@ -492,6 +492,97 @@ class Automation extends DataObject
 		// User is not subscribed to any tied newsletter of this Automation:
 		return false;
 	}
+
+
+	/**
+	 * Get steps data for diagram view
+	 *
+	 * @return array Steps
+	 */
+	function get_diagram_steps_data()
+	{
+		$steps = array();
+
+		$AutomationStepCache = & get_AutomationStepCache();
+		$AutomationStepCache->load_where( 'step_autm_ID = '.$this->ID );
+
+		if( empty( $AutomationStepCache->cache ) )
+		{	// Automation has no steps yet:
+			return $steps;
+		}
+
+		$step_results = array( 'YES', 'NO', 'ERROR' );
+		$step_result_labels = step_get_result_labels();
+
+		foreach( $AutomationStepCache->cache as $AutomationStep )
+		{
+			$step = array(
+					'order'      => $AutomationStep->get( 'order' ),
+					'type'       => $AutomationStep->get( 'type' ),
+					'label'      => $AutomationStep->get( 'label' ),
+					'next_steps' => array(),
+				);
+			// Fill data of next steps to initialise connectors between step boxes by JS code below:
+			if( $yes_next_AutomationStep = & $AutomationStep->get_yes_next_AutomationStep() )
+			{	// Next YES step:
+				$step['next_steps']['yes'] = $yes_next_AutomationStep->ID;
+			}
+			if( $no_next_AutomationStep = & $AutomationStep->get_no_next_AutomationStep() )
+			{	// Next NO step:
+				$step['next_steps']['no'] = $no_next_AutomationStep->ID;
+			}
+			if( $error_next_AutomationStep = & $AutomationStep->get_error_next_AutomationStep() )
+			{	// Next ERROR step:
+				$step['next_steps']['error'] = $error_next_AutomationStep->ID;
+			}
+
+			$step['attrs'] = array(
+					'id'    => 'step_'.$AutomationStep->ID,
+					'class' => 'evo_automation__diagram_step_box',
+				);
+
+			$step_type_result_labels = $step_result_labels[ $AutomationStep->get( 'type' ) ];
+
+			foreach( $step_results as $step_result )
+			{	// Initialize step data for each result type(YES|NO|ERROR):
+				if( ! empty( $step_type_result_labels[ $step_result ] ) )
+				{
+					$step['attrs']['data-info-'.strtolower( $step_result ) ] = str_replace( 'Next step if ', '', $step_type_result_labels[ $step_result ] )
+						.' ('.seconds_to_period( $AutomationStep->get( strtolower( $step_result ).'_next_step_delay' ), true ).')';
+				}
+			}
+
+			$steps[ $AutomationStep->ID ] = $step;
+		}
+
+		// Set default positions for step boxes when they are not stored in DB yet:
+		$this->set_diagram_default_steps_positions( $steps );
+
+		return $steps;
+	}
+
+
+	/**
+	 * Set default steps positions for diagram view
+	 *
+	 * @param array Steps data
+	 */
+	function set_diagram_default_steps_positions( & $steps )
+	{
+		$s = 0;
+		$j = 0;
+		foreach( $steps as $step_ID => $step )
+		{
+			$j = ( $j >= 4 ? 1 : ++$j );// $j has only 4 values: 1,2,3,4
+			$s++;
+
+			// Set auto positions of step box:
+			$x = ( $s % 2 ? ( $j == 3 ? 70 : 10 ) : ( $j == 4 ? 10 : 70 ) ).'%';
+			$y = 200 * ( $s % 2 ? $s : $s - 1 ).'px';
+
+			$steps[ $step_ID ]['attrs']['style'] = 'left:'.$x.';top:'.$y;
+		}
+	}
 }
 
 ?>
