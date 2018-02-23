@@ -749,6 +749,8 @@ class DataObject
 				else
 				{ // count and show how many object is connected
 					$extra_condition = ( isset( $restriction['and_condition'] ) ) ? ' AND '.$restriction['and_condition'] : '';
+					// Replace a mask of $this_ID$ with value of current onject ID, useful to exclude/include current object:
+					$extra_condition = str_replace( '$this_ID$', $this->ID, $extra_condition );
 					$count = $DB->get_var(
 					'SELECT COUNT(*)
 					   FROM '.$restriction['table'].'

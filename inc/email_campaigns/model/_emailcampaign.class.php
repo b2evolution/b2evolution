@@ -123,6 +123,19 @@ class EmailCampaign extends DataObject
 
 
 	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table' => 'T_automation__step', 'fk' => 'step_info', 'and_condition' => 'step_type = "send_campaign"', 'msg' => T_('%d automation steps use this email campaign') ),
+			);
+	}
+
+
+	/**
 	 * Get name of this campaign, it is used for `<select>` by cache object
 	 *
 	 * @return string

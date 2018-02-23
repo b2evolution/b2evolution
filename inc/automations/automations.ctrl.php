@@ -142,13 +142,23 @@ switch( $action )
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
 
-		if( $edited_Automation->dbdelete() )
-		{
-			$Messages->add( T_('Automation has been deleted.'), 'success' );
-
+		if( param( 'confirm', 'integer', 0 ) )
+		{	// Delete from DB if confirmed:
+			$msg = sprintf( T_('The automation "%s" has been deleted.'), $edited_Automation->dget( 'name' ) );
+			$edited_Automation->dbdelete();
+			unset( $edited_Automation );
+			forget_param( 'autm_ID' );
+			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=automations', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
+		}
+		else
+		{	// Check for restrictions if not confirmed yet:
+			if( ! $edited_Automation->check_delete( sprintf( T_('Cannot delete automation "%s"'), $edited_Automation->dget( 'name' ) ) ) )
+			{	// There are restrictions:
+				$action = 'view';
+			}
 		}
 		break;
 
@@ -506,6 +516,7 @@ switch( $action )
 {
 	case 'new':
 	case 'edit':
+	case 'delete':
 	case 'new_step':
 	case 'edit_step':
 		if( $action != 'new' )
@@ -578,6 +589,12 @@ if( $display_mode != 'js' )
 
 switch( $action )
 {
+	case 'delete':
+		// We need to ask for confirmation:
+		$edited_Automation->confirm_delete(
+				sprintf( T_('Delete automation "%s"?'), $edited_Automation->dget( 'name' ) ),
+				'automation', $action, get_memorized( 'action' ) );
+		/* no break */
 	case 'new':
 	case 'edit':
 		// Display a form of automation:
