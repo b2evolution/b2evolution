@@ -413,6 +413,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  
  			echo '</div>';
  			
+			
+					/*
+					*	Count Entries, if it contain only one then instead of a dropdown list, simply use a button?
+					*/
+			
  			// check if a color field is among the entries
  			foreach( $parmeta['entries'] as $entry )
  			{
@@ -444,19 +449,39 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  			$options = array();
  			$field_options = '';
  			
- 			if( isset( $parmeta['defaultvalue'] ) && $parmeta['defaultvalue'] == '' || !  isset( $parmeta['defaultvalue'] ) )
- 			{
- 				$options[''] = T_('~ Please Select ~'); // add a call to action when no default value is selected
- 			}
+			
+			$use_single_button = false;
+			
+			if( count( $parmeta['entries'] ) == 1 )
+			{
+				$use_single_button = true;
+			}
+			
+			
+			if( ! $use_single_button )
+			{
+				if( isset( $parmeta['defaultvalue'] ) && $parmeta['defaultvalue'] == '' || !  isset( $parmeta['defaultvalue'] ) )
+				{
+					$options[''] = T_('~ Please Select ~'); // add a call to action when no default value is selected
+				}
+			}
  			
  			foreach( $parmeta['entries'] as $entry )
  			{
  				
  				if( isset( $entry['type'] ) )
  				{
+					
+					$field_type = $entry['type'];
+					
  					$label = T_('Disabled');
  					
  					// integer | html_textarea | textarea | text | checkbox | checklist | radio | fileselect | password | color
+					
+					/*
+					*	ac> ultimately we want the user to be able to supply custom labels
+					*		does it make sense?
+					*/
  					switch( $entry['type'] )
  					{
  						case 'integer':
@@ -539,6 +564,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  			}
  			
  			$limit = ( $max_number > 0 ) ? "if( $.isNumeric($max_number) && $max_number !== 0 && $max_number >= k_nb ) return false;" : "";
+			
+			
+			$js = ( $use_single_button ) ? "var entry_type = '$field_type'":"var entry_type = jQuery('#$parname option:selected').val();";
+			
  			
  			global $Blog;
  
@@ -567,13 +596,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  
  					var oThis = this, k_nb = $('#".$parname."_add_new').children('.form-group').length;
  
- 					console.log('".$parname."');
- 
- 					var entry_type = jQuery('#$parname option:selected').val();
+ 					$js
 					
-					
- 					console.log(entry_type);
- 
  					if( entry_type == '' )
  					{	// Mark select element of field types as error
  						field_type_error( '".TS_('Please select a field type.')."' );
@@ -628,10 +652,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  					 'class'=> "btn btn-default")
  				);
  				
- 			$field_params = array( 'field_suffix' => $button_add_field, 'id' => $parname );
  			
- 			$Form->select_input_options( $field_name, $field_options, $field_label, '', $field_params );
  			
+			if( $use_single_button )
+			{
+				$Form->info_field( $set_label, '', array( 'field_suffix' => $button_add_field, 'id' => $parname) );
+			}
+			else
+			{
+				$field_params = array( 'field_suffix' => $button_add_field, 'id' => $parname );
+				$Form->select_input_options( $field_name, $field_options, $field_label, '', $field_params );
+			}
+			
  			break;
  
 		case 'array':
