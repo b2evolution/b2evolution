@@ -5778,6 +5778,7 @@ function users_results( & $UserList, $params = array() )
 			'th' => T_('Email'),
 			'th_class' => 'small',
 			'td_class' => 'small',
+			'order' => 'user_email',
 			'td' => '$user_email$'
 		);
 	}
