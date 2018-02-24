@@ -386,7 +386,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		{ // IP range exists in DB
 			$iprange_status = $IPRange->get( 'status' );
 			$iprange_name = $IPRange->get_name();
-			if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) )
+			if( $current_User->check_perm( 'spamblacklist', 'view' ) )
 			{	// Display IP range as link to edit form if current user has the permissions:
 				$iprange_name = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'.$iprange_name.'</a>';
 			}

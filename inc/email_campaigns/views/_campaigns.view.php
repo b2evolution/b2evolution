@@ -75,13 +75,16 @@ $Results->cols[] = array(
 		'td' => '%mysql2localedatetime_spans( #ecmp_sent_ts# )%',
 	);
 
-$Results->cols[] = array(
-		'th' => T_('Actions'),
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap',
-		'td' => action_icon( T_('Edit this email campaign...'), 'properties', $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$' )
-			.action_icon( T_('Delete this email address!'), 'delete', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=delete&amp;'.url_crumb('campaign') ) )
-	);
+if( $current_User->check_perm( 'emails', 'edit' ) )
+{	// User must has a permission to edit emails
+	$Results->cols[] = array(
+			'th' => T_('Actions'),
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+			'td' => action_icon( T_('Edit this email campaign...'), 'properties', $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$' )
+				.action_icon( T_('Delete this email address!'), 'delete', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=delete&amp;'.url_crumb('campaign') ) )
+		);
+}
 
 // Display results:
 $Results->display();

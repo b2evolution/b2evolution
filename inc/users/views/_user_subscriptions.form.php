@@ -303,9 +303,8 @@ if( $notifications_mode != 'off' )
 				$Form->begin_line( T_('Also available') );
 			}
 
-				$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
-				$subscribe_items_new = $Form->hidden( 'sub_items_new', 1 );
-				$subscribe_blogs_button = $Form->button( array(
+				$Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
+				$Form->button( array(
 					'name'  => 'actionArray[subscribe]',
 					'value' => T_('Subscribe to this collection'),
 					'style' => 'margin-left:10px;'
@@ -323,13 +322,6 @@ if( $notifications_mode != 'off' )
 				{
 					break;
 				}
-			}
-
-			foreach( $BlogCache->cache as $subscribe_Blog )
-			{	// These hidden fields are used only by JS to know what subscription settings are enabled for each collection:
-				$enabled_subs_settings = $subscribe_Blog->get_setting( 'allow_subscriptions' ) ? 'p' : '';
-				$enabled_subs_settings .= $subscribe_Blog->get_setting( 'allow_comment_subscriptions' ) ? 'c' : '';
-				$Form->hidden( 'coll_subs_settings_'.$subscribe_Blog->ID, $enabled_subs_settings );
 			}
 		}
 	}
@@ -476,31 +468,3 @@ if( $action != 'view' )
 }
 
 $Form->end_form();
-
-?>
-<script type="text/javascript">
-jQuery( document ).ready( function()
-{
-	jQuery( 'select#subscribe_blog' ).change( function()
-	{	// Enable/Disable collection additional subscription checkboxes depending on settings:
-		var coll_ID = jQuery( this ).val();
-		var coll_settings = jQuery( 'input[name=coll_subs_settings_' + coll_ID + ']' ).val();
-		if( coll_settings == 'pc' || coll_settings == 'p' )
-		{	// Enable if subscription is allowed for new posts:
-			jQuery( 'input[name=sub_items_new]' ).removeAttr( 'disabled' );
-		}
-		else
-		{	// Disable otherwise:
-			jQuery( 'input[name=sub_items_new]' ).attr( 'disabled', 'disabled' );
-		}
-		if( coll_settings == 'pc' || coll_settings == 'c' )
-		{ // Enable if subscription is allowed for new comments:
-			jQuery( 'input[name=sub_comments_new]' ).removeAttr( 'disabled' );
-		}
-		else
-		{	// Disable otherwise:
-			jQuery( 'input[name=sub_comments_new]' ).attr( 'disabled', 'disabled' );
-		}
-	} );
-} );
-</script>

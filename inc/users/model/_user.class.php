@@ -374,7 +374,9 @@ class User extends DataObject
 	 * Used when try to delete an user which has at least one poll question
 	 *
 	 * @param array restriction
-	 * @return string message with link to objects
+	 * @return string|boolean Message with link to objects,
+	 *                        Empty string if no restriction for current table,
+	 *                        FALSE - if no rule for current table
 	 */
 	function get_restriction_link( $restriction )
 	{
@@ -398,10 +400,14 @@ class User extends DataObject
 				}
 				return $msg;
 			}
+			else
+			{	// No restriction for current table:
+				return '';
+			}
 		}
 
-		// no restriction
-		return '';
+		// No rule for current table:
+		return false;
 	}
 
 
@@ -663,7 +669,7 @@ class User extends DataObject
 			$age_min = param( 'edited_user_age_min', 'string', ! $is_api_request ? true : NULL );
 			$age_max = param( 'edited_user_age_max', 'string', ! $is_api_request ? true : NULL );
 
-			if( isset( $age_min ) && isset( $age_max ) )
+			if( isset( $age_min ) && isset( $age_max ) || $is_identity_form )
 			{
 				param_check_interval( 'edited_user_age_min', 'edited_user_age_max', T_('Age must be a number.'), T_('The first age must be lower than (or equal to) the second.') );
 				if( !param_has_error( 'edited_user_age_min' ) && $Settings->get( 'minimum_age' ) > 0 &&
@@ -679,7 +685,7 @@ class User extends DataObject
 			if( ( in_array( $firstname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $can_edit_users ) )
 			{	// User has a permissions to save Firstname
 				$edited_user_firstname = param( 'edited_user_firstname', 'string', ! $is_api_request || $firstname_editing == 'edited-user-required' ? true : NULL );
-				if( isset( $edited_user_firstname ) )
+				if( isset( $edited_user_firstname ) || $is_identity_form )
 				{
 					if( $firstname_editing == 'edited-user-required' )
 					{	// First name is required
@@ -693,7 +699,7 @@ class User extends DataObject
 			if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $can_edit_users ) )
 			{	// User has a permissions to save Lastname
 				$edited_user_lastname = param( 'edited_user_lastname', 'string', ! $is_api_request || $lastname_editing == 'edited-user-required' ? true : NULL );
-				if( isset( $edited_user_lastname ) )
+				if( isset( $edited_user_lastname ) || $is_identity_form )
 				{
 					if( $lastname_editing == 'edited-user-required' )
 					{	// Last name is required
@@ -707,7 +713,7 @@ class User extends DataObject
 			if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $can_edit_users ) )
 			{	// User has a permissions to save Nickname
 				$edited_user_nickname = param( 'edited_user_nickname', 'string', ! $is_api_request || $nickname_editing == 'edited-user-required' ? true : NULL );
-				if( isset( $edited_user_nickname ) )
+				if( isset( $edited_user_nickname ) || $is_identity_form )
 				{
 					if( $nickname_editing == 'edited-user-required' )
 					{	// Nickname is required
@@ -721,7 +727,7 @@ class User extends DataObject
 			if( $this->ID == $current_User->ID || ( $gender_editing != 'hidden' && $can_edit_users ) )
 			{
 				$edited_user_gender = param( 'edited_user_gender', 'string' );
-				if( isset( $edited_user_gender ) )
+				if( isset( $edited_user_gender ) || $is_identity_form )
 				{
 					param_check_gender( 'edited_user_gender', $gender_editing == 'required' );
 					$this->set_from_Request('gender', 'edited_user_gender', true);
@@ -734,8 +740,8 @@ class User extends DataObject
 			if( user_country_visible() )
 			{ // Save country
 				$country_is_required = ( $Settings->get( 'location_country' ) == 'required' && countries_exist() );
-				$edited_user_ctry_ID = param( 'edited_user_ctry_ID', 'integer', ! $is_api_request || $country_is_required ? true : NULL);
-				if( isset( $edited_user_ctry_ID ) )
+				$edited_user_ctry_ID = param( 'edited_user_ctry_ID', 'integer', ! $is_api_request || $country_is_required ? true : NULL );
+				if( isset( $edited_user_ctry_ID ) || $is_identity_form )
 				{
 					if( $country_is_required && $can_edit_users && $edited_user_ctry_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -753,7 +759,7 @@ class User extends DataObject
 			{ // Save region
 				$region_is_required = ( $Settings->get( 'location_region' ) == 'required' && regions_exist( $edited_user_ctry_ID ) );
 				$edited_user_rgn_ID = param( 'edited_user_rgn_ID', 'integer', ! $is_api_request || $region_is_required ? true : NULL );
-				if( isset( $edited_user_rgn_ID ) )
+				if( isset( $edited_user_rgn_ID ) || $is_identity_form  )
 				{
 					if( $region_is_required && $can_edit_users && $edited_user_rgn_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -771,7 +777,7 @@ class User extends DataObject
 			{ // Save subregion
 				$subregion_is_required = ( $Settings->get( 'location_subregion' ) == 'required' && subregions_exist( $edited_user_rgn_ID ) );
 				$edited_user_subrg_ID = param( 'edited_user_subrg_ID', 'integer', ! $is_api_request || $subregion_is_required ? true : NULL );
-				if( isset( $edited_user_subrg_ID ) )
+				if( isset( $edited_user_subrg_ID ) || $is_identity_form  )
 				{
 					if( $subregion_is_required && $can_edit_users && $edited_user_subrg_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -789,7 +795,7 @@ class User extends DataObject
 			{ // Save city
 				$city_is_required = ( $Settings->get( 'location_city' ) == 'required' && cities_exist( $edited_user_ctry_ID, $edited_user_rgn_ID, $edited_user_subrg_ID ) );
 				$edited_user_city_ID = param( 'edited_user_city_ID', 'integer', ! $is_api_request || $city_is_required ? true : NULL );
-				if( isset( $edited_user_city_ID ) )
+				if( isset( $edited_user_city_ID ) || $is_identity_form )
 				{
 					if( $city_is_required && $can_edit_users && $edited_user_city_ID == 0 )
 					{ // Display a note message if user can edit all users
@@ -1230,18 +1236,25 @@ class User extends DataObject
 				{
 					// A selected blog to subscribe
 					$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
-					// Get checkbox values:
-					$sub_items    = param( 'sub_items_new',    'integer', 0 );
-					$sub_comments = param( 'sub_comments_new', 'integer', 0 );
+
+					$sub_items    = 1;
+					$sub_comments = 0; // We normally subscribe to new posts only
 
 					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
-					if( $subscribe_blog_ID && ( $sub_items || $sub_comments ) )
+					if( $subscribe_blog_ID )
 					{ // We need to record values:
 						$BlogCache = & get_BlogCache();
 						$subscribe_Blog = & $BlogCache->get_by_ID( $subscribe_blog_ID, false, false );
 
 						if( $subscribe_Blog->has_access( $this ) )
 						{ // user has access to the collection
+
+							// erhsatingin > it seems we do need to check if subscription is allowed, at least for new posts
+							if( ! $subscribe_Blog->get_setting( 'allow_subscriptions' ) )
+							{ // Subscription to new posts is not allowed so we subscribe to new comments instead
+								$sub_comments = 1;
+							}
+
 							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
 								VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
 
@@ -2639,7 +2652,13 @@ class User extends DataObject
 		if( isset( $this->cache_perms[$cache_permname][$permlevel][$cache_target_ID] ) )
 		{	// Permission is available in Cache:
 			$Debuglog->add( "Got perm [$cache_permname][$permlevel][$cache_target_ID] from cache", 'perms' );
-			return $this->cache_perms[$cache_permname][$permlevel][$cache_target_ID];
+			$perm = $this->cache_perms[$cache_permname][$permlevel][$cache_target_ID];
+			if( ! $perm && $assert )
+			{	// We can't let this go on!
+				global $app_name;
+				debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name )." ($permname:$permlevel:".( is_object( $perm_target ) ? get_class( $perm_target ).'('.$perm_target_ID.')' : ( is_array( $perm_target ) ? implode( ', ', $perm_target ) : $perm_target ) ).")" );
+			}
+			return $perm;
 		}
 
 
