@@ -63,16 +63,27 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	if( isset( $parmeta['group'] ) )
 	{
 		$group = $parmeta['group'];
-		if( substr( $group, -1 ) === ']' )
-		{	// If group name is in array format like "edit_plugin_1_set_sample_sets[0][group_name]",
-			// then param name must be like "edit_plugin_1_set_sample_sets[0][group_name_param_name]":
-			$parname = substr( $group, 0, strlen( $group ) - 1 ).$parname.']';
+		// used for groups created through the 'select_input' object
+		if( isset( $parmeta['group_type'] ) && $parmeta['group_type'] == 'select_input' )
+		{
+			$parname = substr( $group, 0, strlen( $group ) - 1 ).']['.$parname.']';
 		}
 		else
-		{	// If group name is simple like "group_name",
-			// then param name must be like "group_name_param_name"
-			$parname = $group.$parname;
+		{
+		
+			if( substr( $group, -1 ) === ']' )
+			{	// If group name is in array format like "edit_plugin_1_set_sample_sets[0][group_name]",
+				// then param name must be like "edit_plugin_1_set_sample_sets[0][group_name_param_name]":
+				$parname = substr( $group, 0, strlen( $group ) - 1 ).$parname.']';
+			}
+			else
+			{	// If group name is simple like "group_name",
+				// then param name must be like "group_name_param_name"
+				$parname = $group.$parname;
+			}
+		
 		}
+		
 	}
 	else
 	{
@@ -364,7 +375,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 			
  		case 'select_input':
- 			
+			
  			$has_array_type = true;
  			$has_color_field = false;
 			
@@ -378,33 +389,65 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$parname = substr($parname, 0, $pos_last_bracket);
 			}
 			
+			/*
+			*	Start (Display of saved entries)
+			*/			
  			echo '<div id="'.$parname.'_add_new">';
 				
 			if( is_array( $set_value ) )
 			{
-				foreach( $set_value as $set_name => $set_value )
+
+				foreach( $set_value as $n => $m )
 				{
-					foreach( $parmeta['entries'] as $entry_name => $entry_value )
+					
+					foreach( $parmeta['entries'] as $entry_name => $entry_meta )
 					{
-						if( $set_name == $entry_name )
+						// If is used multiple times
+						foreach( $set_value[$n] as $set_name => $set_meta )
 						{
-							if( is_array( $set_value ) )
+							if( $set_name == $entry_name )
 							{
-								foreach( $set_value as $k => $v )
+								
+								if( isset( $entry_meta['inputs'] ) )
+								{				
+
+									$Form->begin_line( $entry_meta['label'], $input_name );
+
+									foreach( $entry_meta['inputs'] as $input_name => $input_meta )
+									{
+										if( isset( $set_value[$n][$entry_name][$input_name] ) )
+										{	// Use a saved value:
+											$l_value = $set_value[$n][$entry_name][$input_name];
+										}
+										else
+										{	// Use default value if it is defined:
+
+											$l_value = isset( $input_meta['defaultvalue'] ) ? $input_meta['defaultvalue'] : NULL;
+										}
+										// RECURSE:$parname.'['.$entry_name.$input_name.']['.$k.']'
+										autoform_display_field( $parname.'['.$n.']['.$entry_name.']['.$input_name.']', $input_meta, $Form, $set_type, $Obj, $set_target, $l_value );
+
+									}
+
+									$Form->end_line();
+								}
+								else
 								{
-									//pre_dump($entry_value);
-									autoform_display_field( $parname.'['.$entry_name.']['.$k.']', $entry_value, $Form, $set_type, $Obj, $set_target, $v );
+									
+									autoform_display_field( $parname.'['.$n.']['.$entry_name.']', $entry_meta, $Form, $set_type, $Obj, $set_target, $set_meta );
 
 								}
-								
-							}
 							
+							}
 						}
 
 					}
 					
+						
 				}
+
 			}
+			
 
  			if( ! empty($params['note']) )
  			{
@@ -412,11 +455,15 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  			}
  
  			echo '</div>';
- 			
 			
-					/*
-					*	Count Entries, if it contain only one then instead of a dropdown list, simply use a button?
-					*/
+			
+			/*
+			*	End (Display of saved entries)
+			*/		
+			
+			
+			//Count Entries, if it contain only one then instead of a dropdown list, simply use a button?
+			
 			
  			// check if a color field is among the entries
  			foreach( $parmeta['entries'] as $entry )
