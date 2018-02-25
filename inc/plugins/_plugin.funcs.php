@@ -389,6 +389,20 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$parname = substr($parname, 0, $pos_last_bracket);
 			}
 			
+			
+ 			$remove_action = action_icon(
+ 								T_('Remove'),
+ 								'minus',
+ 								regenerate_url( 'action', array('action=del_settings_set&amp;set_path='.$parname.'[0]'.( $set_type == 'UserSettings' ? '&amp;user_ID='.$user_ID : '' ), 'plugin_ID='.$Obj->ID) ),
+ 								T_('Remove'),
+ 								5, 3, 
+ 								array( 'onclick' => "jQuery(this).closest(\'.form-group\').remove();return false;")
+ 								
+ 								);
+ 			
+ 			$remove_action = format_to_output( $remove_action, 'htmlspecialchars');
+			
+ 			
 			/*
 			*	Start (Display of saved entries)
 			*/			
@@ -456,6 +470,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  
  			echo '</div>';
 			
+			
+			
+			echo '<script type="text/javascript">
+			
+			var removeButton =  $("<span>").html("'.$remove_action.'").text();
+			
+			jQuery( document ).ready( function()
+					{ jQuery("#'.$parname.'_add_new").children(".form-group").each( function(){ 
+					
+					jQuery(this).find(".controls").append(removeButton);
+					
+					})});</script>';
 			
 			/*
 			*	End (Display of saved entries)
@@ -525,54 +551,50 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  					
  					// integer | html_textarea | textarea | text | checkbox | checklist | radio | fileselect | password | color
 					
-					/*
-					*	ac> ultimately we want the user to be able to supply custom labels
-					*		does it make sense?
-					*/
  					switch( $entry['type'] )
  					{
  						case 'integer':
- 							$label = T_('Number input');
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Number input');
  						break;
  							
  						case 'html_textarea':
- 							$label = T_('Html input');
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Html input');
  						break;
  							
  						case 'textarea':
- 							$label = T_('Multi-line text input');
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Multi-line text input');
  						break;
  							
  						case 'text':
- 							$label = T_('Text input');
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Text input');
  						break;
  							
  						case 'checkbox':
- 							$label = T_('Checkbox');
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Checkbox');
  						break;
  							
  						case 'checklist':
- 							$label = T_('Checklist');
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Checklist');
  						break;
  							
  						case 'radio':
- 							$label = T_('Radio input');
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Radio input');
  						break;
  							
  						case 'fileselect':
- 							$label = T_('File select');
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('File select');
  						break;
  							
  						case 'password':
- 							$label = T_('Password input');
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Password input');
  						break;
  							
  						case 'color':
- 							$label = T_('Color input');
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Color input');
  						break;
  							
  						case 'input_group':	
- 							$label = T_('Input Group');
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Input Group');
  							break;
  							
  					}
@@ -587,6 +609,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  			foreach( $options as $type => $label )
  			{
  				$field_options .= '<option';
+				
+				
  
  				if( isset( $parmeta['defaultvalue'] ) && $parmeta['defaultvalue'] == $type )
  				{
@@ -619,18 +643,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  			global $Blog;
  
  			$set_path = $parname.'[0]';
- 			
- 			$remove_action = action_icon(
- 								T_('Remove'),
- 								'minus',
- 								regenerate_url( 'action', array('action=del_settings_set1&amp;set_path='.$parname.'['.$k.']'.( $set_type == 'UserSettings' ? '&amp;user_ID='.$user_ID : '' ), 'plugin_ID='.$Obj->ID) ),
- 								T_('Remove'),
- 								5, 3, 
- 								array( 'onclick' => "jQuery(this).closest(\'.form-group\').remove();return false;")
- 								
- 								);
- 			
- 			$remove_action = format_to_output( $remove_action, 'htmlspecialchars');
  			
  			$button_add_field .= action_icon(
  				sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
@@ -691,7 +703,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  						function(r, status) {
  								var html = jQuery.parseHTML( r );
  								jQuery(html).find('.controls').append(jQuery.parseHTML( '".$remove_action."' ));
- 								jQuery('#".$parname."_add_new').append(html);
+ 								jQuery('#".$parname."_add_new').children('.form-group').last().after(html);
  								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
  						});
  					return false;",
@@ -712,7 +724,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 			
  			break;
- 
 		case 'array':
 		case 'array:integer':
 		case 'array:array:integer':
