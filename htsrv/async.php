@@ -295,16 +295,46 @@ switch( $action )
  		$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $set_path, /* create: */ false );
  		
  		$Form = new Form(); // fake Form to display plugin setting
-		$k_nb++;
+		
+		$k_nb++; //advance the field number
 		
 		
-		foreach( $r['set_meta']['entries'] as $entry_name => $entry_value )
+		
+		/*
+		*	When the action is called (user clicked the Add button) all items listed  under [entries] will be added; 
+		*	to avoid this and only add the selected item (when the call is made) we pass the [type:selected] via a param
+		*	here we will cycle trough the items, and if the items['type'] matches the passed param['type'] we can target the correct requested item only while ignoring the others
+		*	
+		*	[parent reference] & [child reference] 	: defined by the plugin/widget/skin settings
+		*	[iteration] 						  	: defined by the user
+		*
+		*	we use function: autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
+		*	$parname = the item [parent reference] + [child reference] + [iteration] (because the parent+child combination may be requested multiple times )
+		*	$parmeta = the item (defined by the plugin settings) and selected (by the user) we want to display ['set_meta']['entries']['entry_name']
+		*
+		*	[iteration] :	is an integer value that should present a natuaral progression (auto increment)
+		*					JavaScript counts the items that exists at the time the action call is made and then passed the result in a param that is accessed here
+		*					the iteration is then advanced for this call
+		*
+		*
+		*	['group_type'] : with inputs a group is usually injected, we use this param to tell groups where the inputs originated
+		*
+		*/
+		
+		//cycle through avaiable items
+		foreach( $r['set_meta']['entries'] as $entry_name => $entry_meta )
 		{
-		
-			if( isset( $entry_value['type'] ) && $entry_type == $entry_value['type'] )
-			{
-				autoform_display_field( $parname.'['.$entry_name.']['.$k_nb.']', $r['set_meta']['entries'][$entry_name], $Form, $set_type, $plugin_Object, $target_Object, $r['set_node'][$entry_name] );
+			// if the passed param['type'] is set (exists) and it matches items['type']
+			if( isset( $entry_meta['type'] ) && $entry_meta['type'] == $entry_type )
+			{			
 				
+				if( isset( $entry_meta['inputs'] ) )
+				{
+					$r['set_meta']['entries'][$entry_name]['group_type'] = 'select_input'; // inject group type
+				}
+				
+				autoform_display_field( $parname.'['.$k_nb.']['.$entry_name.']', $r['set_meta']['entries'][$entry_name], $Form, $set_type, $plugin_Object, $target_Object, $r['set_node'][$entry_name] );
+				//this call has only one item (the selected item), the rest is ignored, so break out alltogether
 				break 2;
 			}
 		
