@@ -309,7 +309,7 @@ switch( $action )
 		*	[iteration] 						  	: defined by the user
 		*
 		*	we use function: autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
-		*	$parname = the item [parent reference] + [child reference] + [iteration] (because the parent+child combination may be requested multiple times )
+		*	$parname = the item [parent reference] + [iteration] + [child reference] (because the parent >> child combination may be requested multiple times )
 		*	$parmeta = the item (defined by the plugin settings) and selected (by the user) we want to display ['set_meta']['entries']['entry_name']
 		*
 		*	[iteration] :	is an integer value that should present a natuaral progression (auto increment)
@@ -317,7 +317,7 @@ switch( $action )
 		*					the iteration is then advanced for this call
 		*
 		*
-		*	['group_type'] : with inputs a group is usually injected, we use this param to tell groups where the inputs originated
+		*	['group_type'] : with inputs a group is usually injected, we use this param to tell groups where the inputs originated because the ['group'] logic is applied differently for 'select_inputs' (only)
 		*
 		*/
 		
