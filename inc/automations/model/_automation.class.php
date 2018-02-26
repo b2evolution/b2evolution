@@ -591,20 +591,56 @@ class Automation extends DataObject
 		{	// Start with first step:
 			$steps[ $step_ID ]['xy'] = array( 3, 1 );
 			// Call next steps recursively:
-			$this->set_diagram_default_step_position( $steps, $step['next_steps'], NULL, $steps[ $step_ID ]['xy'] );
+			$this->set_diagram_default_step_position( $step_ID, $steps );
 			break;
+		}
+
+		// Find all steps which are not linked with other steps:
+		$unlinked_row = 1;
+		$unlinked_steps = array();
+		foreach( $steps as $step_ID => $step )
+		{
+			if( isset( $step['xy'] ) )
+			{	// Step is linked:
+				if( $unlinked_row < $step['xy'][1] )
+				{	// Define last row:
+					$unlinked_row = $step['xy'][1];
+				}
+			}
+			else
+			{	// Step is not linked:
+				$unlinked_steps[] = $step_ID;
+			}
+		}
+		// Set position for unlinked steps at the end of diagram:
+		$unlinked_col = 1;
+		$unlinked_row++;
+		foreach( $unlinked_steps as $unlinked_step_ID )
+		{
+			if( isset( $steps[ $unlinked_step_ID ]['xy'] ) )
+			{	// Skip step with already defined position:
+				continue;
+			}
+			$steps[ $unlinked_step_ID ]['xy'] = array( $unlinked_col, $unlinked_row );
+			// Call next steps recursively:
+			$this->set_diagram_default_step_position( $unlinked_step_ID, $steps );
+			// Set next column:
+			$unlinked_col++;
+			if( $unlinked_col > 5 )
+			{	// Switch to next row:
+				$unlinked_col = 1;
+				$unlinked_row++;
+			}
 		}
 
 		foreach( $steps as $step_ID => $step )
 		{
-			if( isset( $step['xy'] ) )
-			{	// Convert row and column to CSS coordinates:
-				$x = ( 16 * $step['xy'][0] ).'%';
-				$y = ( 250 * $step['xy'][1] - 150 ).'px';
-				$steps[ $step_ID ]['attrs']['style'] = 'left:'.$x.';top:'.$y;
-				// Remove temp vars of numbers of row and columns:
-				unset( $steps[ $step_ID ]['xy'] );
-			}
+			// Convert row and column to CSS coordinates:
+			$x = ( ( 19 * ( $step['xy'][0] - 1 ) ) + 4 ).'%';
+			$y = ( ( 250 * $step['xy'][1] ) - 150 ).'px';
+			$steps[ $step_ID ]['attrs']['style'] = 'left:'.$x.';top:'.$y;
+			// Remove temp vars of numbers of row and columns:
+			unset( $steps[ $step_ID ]['xy'] );
 		}
 	}
 
@@ -612,53 +648,58 @@ class Automation extends DataObject
 	/**
 	 * Set default step positions for diagram view recursively
 	 *
+	 * @param integer Parent step ID
 	 * @param array Steps
-	 * @param integer Next step IDs: 'yes', 'no', 'error'
-	 * @param string Type of parent step
-	 * @param array 0 - X: Column of parent step(1,2,3,4,5), 1 - Y: Row of parent step(from 1 to infinity)
 	 * @return array Step
 	 */
-	function set_diagram_default_step_position( & $steps, $next_step_IDs, $parent_step_type = NULL, $parent_xy = NULL )
+	function set_diagram_default_step_position( $parent_step_ID, & $steps )
 	{
-		// Flag to know if we should set a position at least to one next step:
-		$set_xy = false;
+		if( empty( $steps[ $parent_step_ID ]['next_steps'] ) )
+		{	// No next steps, Finish branch:
+			return;
+		}
 
-		foreach( $next_step_IDs as $next_result => $next_step_ID )
+		// Count how many next steps current step has without defined position:
+		$new_next_step_IDs = array();
+		foreach( $steps[ $parent_step_ID ]['next_steps'] as $next_result => $next_step_ID )
 		{
-			if( ! isset( $steps[ $next_step_ID ] ) )
-			{	// Skip not found step:
-				continue;
+			if( isset( $steps[ $next_step_ID ] ) &&
+			    ! isset( $steps[ $next_step_ID ]['xy'] ) &&
+			    $parent_step_ID != $next_step_ID &&
+			    ! in_array( $next_step_ID, $new_next_step_IDs ) )
+			{	// Exclude next steps with already defined position:
+				//unset( $next_step_IDs[ $next_result ] );
+				$new_next_step_IDs[ $next_result ] = $next_step_ID;
 			}
+		}
+		$new_next_steps_count = count( $new_next_step_IDs );
 
-			if( isset( $steps[ $next_step_ID ]['xy'] ) )
-			{	// Skip steps with already defined position:
-				continue;
-			}
+		if( $new_next_steps_count == 0 )
+		{	// No next steps without defined position, Finish branch:
+			return;
+		}
 
-			// We still can set position at least to one of next step:
-			$set_xy = true;
+		// Get column and row of parent step:
+		list( $parent_col, $parent_row ) = $steps[ $parent_step_ID ]['xy'];
 
-			// Use same column as previous step box:
-			$current_col = $parent_xy[0];
-			// Use next row after previous step box:
-			$current_row = $parent_xy[1] + 1;
+		// Use next row after previous step box:
+		$current_row = $parent_row + 1;
+		// Set column for first next step:
+		if( $new_next_steps_count == 3 && $parent_col == 5 )
+		{	// If parent step is located in last column we should start first next step in shifted to 2 columns to the left:
+			$current_col = $parent_col - 2;
+		}
+		elseif( $new_next_steps_count == 1 )
+		{	// Use same column as previous step box for single new next step
+			$current_col = $parent_col;
+		}
+		else
+		{	// Shift to the left for 2 or 3 new next steps:
+			$current_col = $parent_col - 1;
+		}
 
-			if( $next_result == 'yes' )
-			{
-				if( $parent_step_type == 'if_condition' )
-				{	// Shift to the left the "NO" next step of "IF Condition" step:
-					$current_col -= 1;
-				}
-			}
-			elseif( $next_result == 'no' && $parent_step_type == 'if_condition' )
-			{	// Shift to the right the "NO" next step of "IF Condition" step:
-				$current_col += 1;
-			}
-			else
-			{	// Skip other cases:
-				continue;
-			}
-
+		foreach( $new_next_step_IDs as $next_result => $next_step_ID )
+		{
 			if( $current_col < 1 )
 			{	// Min column is 1:
 				$current_col = 1;
@@ -668,30 +709,23 @@ class Automation extends DataObject
 				$current_col = 5;
 			}
 
-			// Set row and column:
+			// Define row and column:
 			$steps[ $next_step_ID ]['xy'] = array( $current_col, $current_row );
+
+			if( $new_next_steps_count == 1 )
+			{	// Don't calculate column for next steps because of single next step:
+				break;
+			}
+
+			// Set column for next step:
+			$current_col += ( $new_next_steps_count == 3 || ( $new_next_steps_count == 2 && $parent_col == 1 ) ? 1 : 2 );
 		}
 
-		if( isset( $next_step_IDs['yes'], $steps[ $next_step_IDs['yes'] ] ) )
-		{	// Use next "YES" step:
-			$next_step = $steps[ $next_step_IDs['yes'] ];
-			
-		}
-		elseif( $set_xy )
-		{	// Try to set position to next "NO"/"ERROR" step if current step has no defined next "YES" step:
-			if( isset( $next_step_IDs['no'], $steps[ $next_step_IDs['no'] ] ) )
-			{	// Use next "NO" step:
-				$next_step = $steps[ $next_step_IDs['no'] ];
-			}
-			elseif( isset( $next_step_IDs['error'], $steps[ $next_step_IDs['error'] ] ) )
-			{	// Use next "ERROR" step:
-				$next_step = $steps[ $next_step_IDs['error'] ];
-			}
-		}
-
-		if( isset( $next_step ) )
+		// Note: we should run recursive function only after defined position for all next steps of current parent step:
+		foreach( $new_next_step_IDs as $next_result => $next_step_ID )
 		{	// Set positions to next step recursively:
-			$this->set_diagram_default_step_position( $steps, $next_step['next_steps'], $next_step['type'], $next_step['xy'] );
+			$next_step = $steps[ $next_step_ID ];
+			$this->set_diagram_default_step_position( $next_step_ID, $steps );
 		}
 	}
 }
