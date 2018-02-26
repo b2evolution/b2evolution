@@ -17,9 +17,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $edited_Automation, $action;
 
-// Display breadcrumb:
-autm_display_breadcrumb();
-
 // Determine if we are creating or updating:
 $creating = is_create_action( $action );
 

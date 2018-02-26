@@ -248,7 +248,7 @@ function campaign_results_block( $params = array() )
 
 	if( $current_User->check_perm( 'emails', 'edit' ) && $params['display_create_button'] )
 	{ // User must has a permission to edit emails
-		$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new', T_('Create new campaign').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new'.( isset( $params['enlt_ID'] ) ? '&amp;enlt_ID='.$params['enlt_ID'] : '' ), T_('Create new campaign').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
 
 	$Results->cols[] = array(
@@ -323,7 +323,7 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%number_format( #open_rate# * 100, 1 )%%'
+			'td' =>'%empty( #send_count# ) ? "" : number_format( #open_rate# * 100, 1 )%%'
 		);
 
 	$Results->cols[] = array(
@@ -332,7 +332,7 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'$open_count$'
+			'td' =>'%empty( #send_count# ) ? "" : #open_count#%'
 		);
 
 	$Results->cols[] = array(
@@ -341,21 +341,21 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'$click_count$'
+			'td' =>'%empty( #send_count# ) ? "" : #click_count#%'
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Likes'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'$like_count$'
+			'td' =>'%empty( #send_count# ) ? "" : #like_count#%'
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Dislikes'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'$dislike_count$'
+			'td' =>'%empty( #send_count# ) ? "" : #dislike_count#%'
 		);
 
 	$Results->cols[] = array(
@@ -364,7 +364,7 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'$unsubscribe_click_count$'
+			'td' =>'%empty( #send_count# ) ? "" : #unsubscribe_click_count#%'
 		);
 
 	$Results->cols[] = array(

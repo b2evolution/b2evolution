@@ -2784,7 +2784,9 @@ class File extends DataObject
 	 * Used when try to delete a file, which is attached to a post, or to a user
 	 *
 	 * @param array restriction
-	 * @return string message with links to objects
+	 * @return string|boolean Message with link to objects,
+	 *                        Empty string if no restriction for current table,
+	 *                        FALSE - if no rule for current table
 	 */
 	function get_restriction_link( $restriction )
 	{

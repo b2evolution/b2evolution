@@ -20,9 +20,6 @@ global $edited_AutomationStep, $action, $admin_url;
 // Get Automation of the creating/editing Step:
 $step_Automation = & $edited_AutomationStep->get_Automation();
 
-// Display breadcrumb:
-autm_display_breadcrumb();
-
 // Determine if we are creating or updating:
 $creating = is_create_action( $action );
 
@@ -206,7 +203,7 @@ jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID
  * Update form depending on step type
  *
  * @param string Step type
- */ 
+ */
 function step_type_update_info( step_type )
 {
 	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition, #ffield_step_notification_message, #ffield_step_usertag, #ffield_step_newsletter, #ffield_step_automation' ).hide();

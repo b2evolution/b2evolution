@@ -218,16 +218,26 @@ switch( $action )
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=newsletters' );
 $AdminUI->breadcrumbpath_add( T_('Lists'), $admin_url.'?ctrl=newsletters' );
+
+$AdminUI->display_breadcrumbpath_init( false );
+
 if( ! empty( $edited_Newsletter ) )
 {
+	$AdminUI->display_breadcrumbpath_add( T_('Lists'), $admin_url.'?ctrl=newsletters' );
 	if( $edited_Newsletter->ID > 0 )
 	{	// Edit newsletter
 		$AdminUI->breadcrumbpath_add( $edited_Newsletter->dget( 'name' ), '?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$edited_Newsletter->ID );
+		$AdminUI->display_breadcrumbpath_add( $edited_Newsletter->dget( 'name' ) );
 	}
 	else
 	{	// New newsletter
 		$AdminUI->breadcrumbpath_add( $edited_Newsletter->dget( 'name' ), '?ctrl=newsletters&amp;action=new' );
+		$AdminUI->display_breadcrumbpath_add( T_('New list') );
 	}
+}
+else
+{
+	$AdminUI->display_breadcrumbpath_add( T_('Lists') );
 }
 
 // Set an url for manual page:
@@ -328,7 +338,6 @@ switch( $action )
 						'enlt_ID'               => $edited_Newsletter->ID,
 						'results_title'         => T_('Automations').get_manual_link( 'email-list-automations' ),
 						'results_prefix'        => 'enltautm_',
-						'display_create_button' => false,
 					) );
 				break;
 

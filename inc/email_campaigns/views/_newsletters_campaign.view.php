@@ -20,6 +20,5 @@ if( $edited_Newsletter->ID > 0 )
 {	// Display campaigns attached to this Newsletter:
 	campaign_results_block( array(
 			'enlt_ID'               => $edited_Newsletter->ID,
-			'display_create_button' => false
 		) );
 }

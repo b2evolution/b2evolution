@@ -17,9 +17,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $edited_Automation;
 
-// Display breadcrumb:
-autm_display_breadcrumb();
-
 $finished_SQL = new SQL( 'Get a count of finished users of automation #'.$edited_Automation->ID );
 $finished_SQL->SELECT( 'COUNT( aust_user_ID )' );
 $finished_SQL->FROM( 'T_automation__user_state' );

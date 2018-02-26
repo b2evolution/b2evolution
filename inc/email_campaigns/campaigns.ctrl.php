@@ -237,13 +237,23 @@ switch( $action )
 		// Make sure we got an ecmp_ID:
 		param( 'ecmp_ID', 'integer', true );
 
-		if( $edited_EmailCampaign->dbdelete() )
-		{
-			$Messages->add( T_('The email campaign was deleted.'), 'success' );
-
+		if( param( 'confirm', 'integer', 0 ) )
+		{	// Delete from DB if confirmed:
+			$msg = sprintf( T_('The email campaign "%s" has been deleted.'), $edited_EmailCampaign->dget( 'email_title' ) );
+			$edited_EmailCampaign->dbdelete();
+			unset( $edited_EmailCampaign );
+			forget_param( 'ecmp_ID' );
+			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=campaigns', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
+		}
+		else
+		{	// Check for restrictions if not confirmed yet:
+			if( ! $edited_EmailCampaign->check_delete( sprintf( T_('Cannot delete email campaign "%s"'), $edited_EmailCampaign->dget( 'email_title' ) ) ) )
+			{	// There are restrictions:
+				$action = 'view';
+			}
 		}
 		break;
 
@@ -417,19 +427,24 @@ $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=campaigns' );
 $AdminUI->breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
 
+$AdminUI->display_breadcrumbpath_init();
+
 // Set an url for manual page:
 switch( $action )
 {
 	case 'new':
 	case 'edit':
 		$AdminUI->set_page_manual_link( 'creating-an-email-campaign' );
+		$AdminUI->display_breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
+		$AdminUI->display_breadcrumbpath_add( isset( $edited_EmailCampaign ) ? $edited_EmailCampaign->get( 'email_title' ) : T_('New Campaign') );
 		break;
 	default:
+	$AdminUI->display_breadcrumbpath_add( T_('Campaigns') );
 		$AdminUI->set_page_manual_link( 'email-campaigns' );
 		break;
 }
 
-if( $action == 'edit' )
+if( $action == 'edit' || $action == 'delete' )
 { // Build special tabs in edit mode of the campaign
 	$AdminUI->set_path( 'email', 'campaigns', $tab );
 	$campaign_edit_modes = get_campaign_edit_modes( $ecmp_ID );
@@ -488,6 +503,12 @@ switch( $action )
 		$AdminUI->disp_view( 'email_campaigns/views/_campaigns_new.form.php' );
 		break;
 
+	case 'delete':
+		// We need to ask for confirmation:
+		$edited_EmailCampaign->confirm_delete(
+				sprintf( T_('Delete email campaign "%s"?'), $edited_EmailCampaign->dget( 'email_title' ) ),
+				'campaign', $action, get_memorized( 'action' ) );
+		/* no break */
 	case 'edit':
 		// Display a form to edit email campaign:
 		switch( $tab )

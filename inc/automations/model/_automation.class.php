@@ -70,7 +70,20 @@ class Automation extends DataObject
 		return array(
 				array( 'table' => 'T_automation__step', 'fk' => 'step_autm_ID', 'msg' => T_('%d steps') ),
 				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_autm_ID', 'msg' => T_('%d states of User in Automation') ),
-				array( 'table' => 'T_automation__newsletter', 'fk' => 'aunl_autm_ID', 'msg' => T_('%d Lists tied with Automation') ),
+				array( 'table' => 'T_automation__newsletter', 'fk' => 'aunl_autm_ID', 'msg' => T_('%d automation associations with lists') ),
+			);
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table' => 'T_automation__step', 'fk' => 'step_info', 'and_condition' => 'step_type = "start_automation" AND step_autm_ID != $this_ID$', 'msg' => T_('Automation is used by %s steps of other automations') ),
 			);
 	}
 

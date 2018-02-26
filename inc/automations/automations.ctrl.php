@@ -79,7 +79,7 @@ switch( $action )
 		$edited_AutomationStep = new AutomationStep();
 		$edited_AutomationStep->set( 'autm_ID', $autm_ID );
 		break;
- 
+
 	case 'create':
 		// Create new Automation:
 		$edited_Automation = new Automation();
@@ -142,13 +142,23 @@ switch( $action )
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
 
-		if( $edited_Automation->dbdelete() )
-		{
-			$Messages->add( T_('Automation has been deleted.'), 'success' );
-
+		if( param( 'confirm', 'integer', 0 ) )
+		{	// Delete from DB if confirmed:
+			$msg = sprintf( T_('The automation "%s" has been deleted.'), $edited_Automation->dget( 'name' ) );
+			$edited_Automation->dbdelete();
+			unset( $edited_Automation );
+			forget_param( 'autm_ID' );
+			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=automations', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
+		}
+		else
+		{	// Check for restrictions if not confirmed yet:
+			if( ! $edited_Automation->check_delete( sprintf( T_('Cannot delete automation "%s"'), $edited_Automation->dget( 'name' ) ) ) )
+			{	// There are restrictions:
+				$action = 'view';
+			}
 		}
 		break;
 
@@ -291,7 +301,7 @@ switch( $action )
 			$step_order_1 = ( $i == 0 ? -2147483647 : $swaped_step->step_order );
 			$step_order_2 = ( $i == 0 ? -2147483648 : $edited_AutomationStep->get( 'order' ) );
 			$result = ( $result !== false ) && $DB->query( 'UPDATE T_automation__step
-				SET step_order = CASE 
+				SET step_order = CASE
 					WHEN step_ID = '.$edited_AutomationStep->ID.' THEN '.$step_order_1.'
 					WHEN step_ID = '.$swaped_step->step_ID.'    THEN '.$step_order_2.'
 					ELSE step_order
@@ -499,6 +509,8 @@ $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=campaigns' );
 $AdminUI->breadcrumbpath_add( T_('Automations'), $admin_url.'?ctrl=automations' );
 
+$AdminUI->display_breadcrumbpath_init();
+
 $AdminUI->set_path( 'email', 'automations' );
 
 // Set an url for manual page:
@@ -506,8 +518,10 @@ switch( $action )
 {
 	case 'new':
 	case 'edit':
+	case 'delete':
 	case 'new_step':
 	case 'edit_step':
+		$AdminUI->display_breadcrumbpath_add( T_('Automations'), $admin_url.'?ctrl=automations' );
 		if( $action != 'new' )
 		{	// Add menu level 3 entries:
 			if( empty( $edited_Automation ) )
@@ -529,10 +543,15 @@ switch( $action )
 						'text' => T_('Diagram view'),
 						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=diagram&amp;autm_ID='.$edited_Automation->ID ),
 				) );
+			if( in_array( $action, array( 'edit', 'delete' ) ) )
+			{
+				$AdminUI->display_breadcrumbpath_add( $edited_Automation->dget( 'name' ) );
+			}
 		}
 		else
 		{	// Don't add level 3 entries for new creating automation, and force tab only for settings:
 			set_param( 'tab', 'settings' );
+			$AdminUI->display_breadcrumbpath_add( T_('New automation') );
 		}
 
 		switch( $tab )
@@ -565,13 +584,25 @@ switch( $action )
 		}
 		break;
 	default:
+		$AdminUI->display_breadcrumbpath_add( T_('Automations') );
 		$AdminUI->set_page_manual_link( 'automations-list' );
 		break;
 }
 
 if( in_array( $action, array( 'new_step', 'edit_step' ) ) )
 {	// Load jQuery QueryBuilder plugin files:
+	$step_Automation = & $edited_AutomationStep->get_Automation();
 	init_querybuilder_js( 'rsc_url' );
+	if( $action == 'new_step' )
+	{
+		$AdminUI->display_breadcrumbpath_add( $edited_Automation->dget( 'name' ), $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID );
+		$AdminUI->display_breadcrumbpath_add( T_('New step') );
+	}
+	else
+	{
+		$AdminUI->display_breadcrumbpath_add( $edited_Automation->dget( 'name' ), $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID );
+		$AdminUI->display_breadcrumbpath_add( T_('Step').' #'.$edited_AutomationStep->dget( 'order' ) );
+	}
 }
 
 if( $display_mode != 'js' )
@@ -590,6 +621,12 @@ if( $display_mode != 'js' )
 
 switch( $action )
 {
+	case 'delete':
+		// We need to ask for confirmation:
+		$edited_Automation->confirm_delete(
+				sprintf( T_('Delete automation "%s"?'), $edited_Automation->dget( 'name' ) ),
+				'automation', $action, get_memorized( 'action' ) );
+		/* no break */
 	case 'new':
 	case 'edit':
 		// Display a form of automation:

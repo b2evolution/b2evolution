@@ -5778,6 +5778,7 @@ function users_results( & $UserList, $params = array() )
 			'th' => T_('Email'),
 			'th_class' => 'small',
 			'td_class' => 'small',
+			'order' => 'user_email',
 			'td' => '$user_email$'
 		);
 	}
@@ -6044,6 +6045,14 @@ function users_results( & $UserList, $params = array() )
 				'order' => 'csnd_last_click_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #csnd_last_click_ts# )%',
+			);
+
+		$UserList->cols[] = array(
+				'th' => T_('Liked'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center',
+				'order' => 'csnd_like',
+				'td' => '%user_td_liked_email( #csnd_like# )%'
 			);
 	}
 
@@ -6649,6 +6658,28 @@ function user_td_emlog_date( $emlog_date )
 	}
 
 	return NULL;
+}
+
+
+/**
+ * Get email campaign recipient like status
+ *
+ * @param integer Email recipient like
+ * @return string Thumb up/down icon
+ */
+function user_td_liked_email( $csnd_like )
+{
+	switch( $csnd_like )
+	{
+		case -1:
+			return get_icon( 'thumb_down' );
+
+		case 1:
+			return get_icon( 'thumb_up' );
+
+		default:
+			return NULL;
+	}
 }
 
 
