@@ -1043,6 +1043,8 @@ class User extends DataObject
 			$organizations = param( 'organizations', 'array:string' );
 			$org_roles = param( 'org_roles', 'array:string' );
 			$this->update_organizations( $organizations, $org_roles );
+			$org_priorities = param( 'org_priorities', 'array:string' );
+			$this->update_organizations( $organizations, $org_priorities );
 			// ---- Organizations / END ----
 
 
@@ -7062,7 +7064,7 @@ class User extends DataObject
 		{ // Get the organizations from DB
 			global $DB;
 			$SQL = new SQL();
-			$SQL->SELECT( 'org_ID, org_name, uorg_accepted, uorg_role' );
+			$SQL->SELECT( 'org_ID, org_name, uorg_accepted, uorg_role, uorg_priority' );
 			$SQL->FROM( 'T_users__user_org' );
 			$SQL->FROM_add( 'INNER JOIN T_users__organization ON org_ID = uorg_org_ID' );
 			$SQL->WHERE( 'uorg_user_ID = '.$DB->quote( $this->ID ) );
@@ -7075,6 +7077,7 @@ class User extends DataObject
 						'name'     => $organization->org_name,
 						'accepted' => $organization->uorg_accepted,
 						'role'     => $organization->uorg_role,
+						'priority'     => $organization->uorg_priority,
 					);
 			}
 		}
@@ -7163,10 +7166,17 @@ class User extends DataObject
 
 		if( count( $insert_orgs ) > 0 )
 		{ // Insert new records with user-org relations
-			$insert_org_SQL = 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role ) VALUES ';
+			$insert_org_SQL = 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role, uorg_priority ) VALUES ';
 			$o = 0;
 			foreach( $insert_orgs as $insert_org_ID => $insert_org_role )
 			{
+				$insert_orgs_priority = '0';
+				
+				if( isset( $curr_orgs[ $insert_org_ID ] ) && isset( $curr_orgs[ $insert_org_ID ]['priority'] ) )
+				{ // If we are updating - Don't change the accept status
+					$insert_orgs_priority = $curr_orgs[ $insert_org_ID ]['priority'];
+				}
+				
 				if( isset( $curr_orgs[ $insert_org_ID ] ) )
 				{ // If we are updating - Don't change the accept status
 					$insert_orgs_accepted = $curr_orgs[ $insert_org_ID ]['accepted'];
@@ -7191,7 +7201,7 @@ class User extends DataObject
 				{ // separator
 					$insert_org_SQL .= ', ';
 				}
-				$insert_org_SQL .= '( '.$this->ID.', '.$DB->quote( $insert_org_ID ).', '.$insert_orgs_accepted.', '.$DB->quote( $insert_org_role ).' )';
+				$insert_org_SQL .= '( '.$this->ID.', '.$DB->quote( $insert_org_ID ).', '.$insert_orgs_accepted.', '.$DB->quote( $insert_org_role ).', '.$DB->quote( $insert_org_priority ).' )';
 				$o++;
 			}
 			$DB->query( $insert_org_SQL );

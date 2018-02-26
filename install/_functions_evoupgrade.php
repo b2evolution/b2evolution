@@ -6377,12 +6377,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		set_upgrade_checkpoint( '11380' );
 	}
 
-	if( $old_db_version < 11390 )
+	if( $old_db_version < 11390 )// Version?
 	{ // part 18.i trunk aka 11th part of "i7"
 
 		task_begin( 'Upgrading table of relations users with organizations... ' );
 		$DB->query( 'ALTER TABLE T_users__user_org
-			ADD COLUMN uorg_role VARCHAR(255) NULL' );
+			ADD COLUMN uorg_role VARCHAR(255) NULL
+			ADD COLUMN uorg_priority INT(11) NULL' );
 		task_end();
 
 		set_upgrade_checkpoint( '11390' );
@@ -7374,6 +7375,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 11705, 'Upgrading users organization table...' ) )
 	{	// part of 6.7.0
 		db_add_col( 'T_users__organization', 'org_perm_role', "ENUM('owner and member', 'owner') COLLATE ascii_general_ci NOT NULL DEFAULT 'owner and member' AFTER org_accept" );
+		db_add_col( 'T_users__organization', 'org_perm_priority', "ENUM('owner and member', 'owner') COLLATE ascii_general_ci NOT NULL DEFAULT 'owner and member' AFTER org_perm_role" );
 		upg_task_end();
 	}
 

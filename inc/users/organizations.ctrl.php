@@ -229,12 +229,13 @@ switch( $action )
 
 		$accepted = param( 'accepted', 'string', '1' );
 		$role = param( 'role', 'string', '' );
+		$priority = param( 'priority', 'integer', NULL );
 		$edit_mode = param( 'edit_mode', 'boolean' );
 
 		if( ! param_errors_detected() )
 		{	// Link user only when request has no errors:
-			$result = $DB->query( 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role )
-				VALUES ( '.$login_User->ID.', '.$edited_Organization->ID.', '.$accepted.', '.$DB->quote( $role ).' ) ' );
+			$result = $DB->query( 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role, uorg_priority )
+				VALUES ( '.$login_User->ID.', '.$edited_Organization->ID.', '.$accepted.', '.$DB->quote( $role ).', '.$DB->quote( $priority ).' ) ' );
 			if( $result )
 			{	// Display a message after successful linking:
 				if( $edit_mode )

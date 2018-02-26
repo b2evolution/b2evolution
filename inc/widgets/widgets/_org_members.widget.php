@@ -158,6 +158,12 @@ class org_members_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
+				'display_priority' => array(
+					'label' => T_('Priority in organization'),
+					'note' => T_('Check this to display the priority of the members in the organization'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+				),
 				'display_icons' => array(
 					'label' => T_('Contact icons'),
 					'note' => T_('Check this to display icons for User Field URLs with an icon.'),
@@ -287,7 +293,14 @@ class org_members_Widget extends ComponentWidget
 						$organizations_data = $org_User->get_organizations_data();
 						echo '<div class="evo_org_role text-muted">'.$organizations_data[$org_ID]['role'].'</div>';
 					}
-
+					
+					// Organizational priority
+					if( $this->disp_params['display_priority'] == 1 )
+					{
+						$organizations_data = $org_User->get_organizations_data();
+						echo '<div class="evo_org_priority text-muted">'.$organizations_data[$org_ID]['priority'].'</div>';
+					}
+					
 					if( $this->disp_params['display_icons'] )
 					{ // Display user links as icons
 						$url_fields = $org_User->userfields_by_type( 'url' );

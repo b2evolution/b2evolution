@@ -219,6 +219,7 @@ function create_default_data()
 			'group_ID'  => $admins_Group->ID,
 			'org_IDs'   => $user_org_IDs,
 			'org_roles' => array( 'King of Spades' ),
+			'org_priorities' => array( 0 ),
 			'fields'    => array(
 					'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
 					'Website'     => 'http://b2evolution.net/',

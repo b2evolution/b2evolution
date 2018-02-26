@@ -182,6 +182,7 @@ $schema_queries = array(
 			org_url           VARCHAR(2000) NULL,
 			org_accept        ENUM( 'yes', 'owner', 'no' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'owner',
 			org_perm_role     ENUM( 'owner and member', 'owner' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'owner and member',
+			org_perm_priority     ENUM( 'owner and member', 'owner' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'owner and member',
 			PRIMARY KEY ( org_ID ),
 			UNIQUE org_name ( org_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -193,6 +194,7 @@ $schema_queries = array(
 			uorg_org_ID   INT(11) UNSIGNED NOT NULL,
 			uorg_accepted TINYINT(1) DEFAULT 0,
 			uorg_role     VARCHAR(255) NULL,
+			uorg_priority INT(11) NULL,
 			PRIMARY KEY ( uorg_user_ID, uorg_org_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
