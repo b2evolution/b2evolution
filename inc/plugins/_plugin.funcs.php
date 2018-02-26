@@ -701,9 +701,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  							".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
  						},
  						function(r, status) {
- 								var html = jQuery.parseHTML( r );
+								var html = jQuery.parseHTML( r );
  								jQuery(html).find('.controls').append(jQuery.parseHTML( '".$remove_action."' ));
- 								jQuery('#".$parname."_add_new').children('.form-group').last().after(html);
+								var container = jQuery('#".$parname."_add_new');
+								if( container.children('.form-group').length === 0 ) {	container.append(html);}
+								else { container.children('.form-group').last().after(html);}						
  								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
  						});
  					return false;",
