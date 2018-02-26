@@ -396,7 +396,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  								regenerate_url( 'action', array('action=del_settings_set&amp;set_path='.$parname.'[0]'.( $set_type == 'UserSettings' ? '&amp;user_ID='.$user_ID : '' ), 'plugin_ID='.$Obj->ID) ),
  								T_('Remove'),
  								5, 3, 
- 								array( 'onclick' => "jQuery(this).closest(\'.form-group\').remove();return false;")
+ 								array( 'onclick' => "jQuery(this).closest(\'.form-group\').remove();return false;", 'style' => 'padding: 10px 10px;' )
  								
  								);
  			
@@ -557,8 +557,12 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Number input');
  						break;
  							
- 						case 'html_textarea':
+ 						case 'html_input':
  							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Html input');
+ 						break;
+ 							
+ 						case 'html_textarea':
+ 							$label = (isset( $entry['label'] ) && ! empty($entry['label'] ) ) ? $entry['label'] : T_('Html text area');
  						break;
  							
  						case 'textarea':
@@ -701,11 +705,48 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  							".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
  						},
  						function(r, status) {
-								var html = jQuery.parseHTML( r );
- 								jQuery(html).find('.controls').append(jQuery.parseHTML( '".$remove_action."' ));
+						
+								var html = jQuery.parseHTML( r ), 
+									controls = jQuery(html).find('.controls'),
+									removeButton = jQuery.parseHTML( '".$remove_action."' );
+									
+									switch( entry_type )
+									{
+										case 'checkbox':
+											$(removeButton).css('vertical-align','top'); // align
+										break;
+										case 'radio':
+											$(removeButton).css('vertical-align','bottom'); // align
+										break;
+										case 'checklist':
+											$(removeButton).css('display','block'); // align
+										break;
+										default:
+											$(removeButton).css('vertical-align','middle'); // align
+										break;
+									
+									}
+									
+								if( controls.children('div').length > 0 )
+								{	// this should target checkboxes
+									
+									controls.children().last().append(removeButton)
+								}
+								else
+								{
+									controls.append(removeButton);	
+								}
+								
 								var container = jQuery('#".$parname."_add_new');
-								if( container.children('.form-group').length === 0 ) {	container.append(html);}
-								else { container.children('.form-group').last().after(html);}						
+								
+								if( container.children('.form-group').length === 0 )
+								{
+									container.append(html);
+								}
+								else
+								{
+									container.children('.form-group').last().after(html);
+								}						
  								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
  						});
  					return false;",
