@@ -305,17 +305,38 @@ class AutomationStep extends DataObject
 	/**
 	 * Get next Step object of this Step by step ID
 	 *
-	 * @param integer Step ID
+	 * @param integer Step type: 'yes', 'no', 'error'
 	 * @return object|boolean Next Automation Step OR
 	 *                        FALSE - if automation should be stopped after this Step
 	 *                                because either it is configured for STOP action
 	 *                                            or it is the latest step of the automation
 	 */
-	function & get_next_AutomationStep_by_ID( $next_step_ID )
+	function & get_next_AutomationStep_by_type( $next_step_type )
 	{
-		$next_step_ID = intval( $next_step_ID );
+		switch( $next_step_type )
+		{
+			case 'YES':
+				$next_step_ID = $this->get( 'yes_next_step_ID' );
+				break;
+			case 'NO':
+				$next_step_ID = $this->get( 'no_next_step_ID' );
+				break;
+			case 'ERROR':
+				$next_step_ID = $this->get( 'error_next_step_ID' );
+				break;
+			default:
+				debug_die( 'Invalid automation next step type "'.$next_step_type.'"' );
+		}
 
 		$next_AutomationStep = false;
+
+		$possible_step_type_results = step_get_result_labels();
+		if( empty( $possible_step_type_results[ $this->get( 'type' ) ][ $next_step_type ] ) )
+		{	// If the requested result(YES, NO or ERROR) is not supported by current step type:
+			return $next_AutomationStep;
+		}
+
+		$next_step_ID = intval( $next_step_ID );
 
 		$AutomationStepCache = & get_AutomationStepCache();
 		if( $next_step_ID > 0 )
@@ -361,7 +382,7 @@ class AutomationStep extends DataObject
 	{
 		if( $this->yes_next_AutomationStep === NULL )
 		{	// Load next Step into cache object:
-			$this->yes_next_AutomationStep = & $this->get_next_AutomationStep_by_ID( $this->get( 'yes_next_step_ID' ) );
+			$this->yes_next_AutomationStep = & $this->get_next_AutomationStep_by_type( 'YES' );
 		}
 
 		return $this->yes_next_AutomationStep;
@@ -380,7 +401,7 @@ class AutomationStep extends DataObject
 	{
 		if( $this->no_next_AutomationStep === NULL )
 		{	// Load next Step into cache object:
-			$this->no_next_AutomationStep = & $this->get_next_AutomationStep_by_ID( $this->get( 'no_next_step_ID' ) );
+			$this->no_next_AutomationStep = & $this->get_next_AutomationStep_by_type( 'NO' );
 		}
 
 		return $this->no_next_AutomationStep;
@@ -399,7 +420,7 @@ class AutomationStep extends DataObject
 	{
 		if( $this->error_next_AutomationStep === NULL )
 		{	// Load next Step into cache object:
-			$this->error_next_AutomationStep = & $this->get_next_AutomationStep_by_ID( $this->get( 'error_next_step_ID' ) );
+			$this->error_next_AutomationStep = & $this->get_next_AutomationStep_by_type( 'ERROR' );
 		}
 
 		return $this->error_next_AutomationStep;
