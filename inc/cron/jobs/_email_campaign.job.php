@@ -27,7 +27,7 @@ $EmailCampaign->send_all_emails( 'cron_job' );
 // Create a scheduled job to send newsletters to next chunk of waiting users:
 $EmailCampaign->create_cron_job( true );
 
-$result_message = $Messages->get_string( '', '', "\n" );
+$result_message = $Messages->get_string( '', '', "\n", false );
 if( empty( $result_message ) )
 {
 	$result_message = T_('Done').'.';

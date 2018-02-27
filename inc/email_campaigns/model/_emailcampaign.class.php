@@ -836,52 +836,52 @@ class EmailCampaign extends DataObject
 			{	// Print the messages:
 				if( $result === true )
 				{ // Success
-					$result_msg = sprintf( T_('Email was sent to user: %s'), $User->get_identity_link() ).'<br />';
+					$result_msg = sprintf( T_('Email was sent to user: %s'), $User->get_identity_link() );
 					if( $display_messages === 'cron_job' )
 					{
 						$Messages->add( $result_msg, 'success' );
 					}
 					else
 					{
-						echo $result_msg;
+						echo $result_msg.'<br />';
 					}
 				}
 				else
 				{ // Failed, Email was NOT sent
 					if( ! check_allow_new_email( 'newsletter_limit', 'last_newsletter', $user_ID ) )
 					{ // Newsletter email is limited today for this user
-						$error_msg = '<span class="orange">'.sprintf( T_('User %s has already received max # of lists today.'), $User->get_identity_link() ).'</span><br />';
+						$error_msg = '<span class="orange">'.sprintf( T_('User %s has already received max # of lists today.'), $User->get_identity_link() ).'</span>';
 						if( $display_messages === 'cron_job' )
 						{
 							$Messages->add( $error_msg, 'warning' );
 						}
 						else
 						{
-							echo $error_msg;
+							echo $error_msg.'<br />';
 						}
 					}
 					elseif( $User->get_email_status() == 'prmerror' )
 					{ // Email has permanent error
-						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).' ('.T_('Reason').': '.T_('Permanent error').')</span><br />';
+						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).' ('.T_('Reason').': '.T_('Permanent error').')</span>';
 						if( $display_messages === 'cron_job' )
 						{
 							$Messages->add( $error_msg, 'error' );
 						}
 						else
 						{
-							echo $error_msg;
+							echo $error_msg.'<br />';
 						}
 					}
 					else
 					{ // Another error
-						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).'</span><br />';
+						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).'</span>';
 						if( $display_messages === 'cron_job' )
 						{
 							$Messages->add( $error_msg, 'error' );
 						}
 						else
 						{
-							echo $error_msg;
+							echo $error_msg.'<br />';
 						}
 					}
 				}
@@ -913,15 +913,27 @@ class EmailCampaign extends DataObject
 			$skipped_count = count( $this->users['skipped'] ); // Recipients that are marked skipped for this campaign
 			if( $wait_count > 0 )
 			{	// Some recipients still wait this newsletter:
-				$Messages->add( sprintf( T_('Emails have been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
-						$email_campaign_chunk_size, $email_skip_count + $skipped_count, $wait_count ), 'warning' );
+				$warning_msg = sprintf( T_('Emails have been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
+						$email_campaign_chunk_size, $email_skip_count + $skipped_count, $wait_count );
+				if( $display_messages === 'cron_job' )
+				{
+					$warning_msg = "\n".'<span class="orange">'.$warning_msg.'</span>'."\n";
+				}
+				$Messages->add( $warning_msg, 'warning' );
 			}
 			else
 			{	// All recipients received this bewsletter:
-				$Messages->add( T_('Emails have been sent to all recipients of this campaign.'), 'success' );
+				$success_msg = T_('Emails have been sent to all recipients of this campaign.');
+				if( $display_messages === 'cron_job' )
+				{
+					$success_msg = "\n".$success_msg."\n";
+				}
+				$Messages->add( $success_msg, 'success' );
 			}
-			echo '<br />';
-			$Messages->display();
+			if( $display_messages !== 'cron_job' )
+			{	// Print out messages right now:
+				$Messages->display();
+			}
 		}
 	}
 
