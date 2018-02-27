@@ -792,6 +792,9 @@ class EmailCampaign extends DataObject
 			return;
 		}
 
+		// It it important to randomize order so that it is not always the same users who get the news first and the same users who the get news last:
+		shuffle( $user_IDs );
+
 		$DB->begin();
 
 		$UserCache = & get_UserCache();
