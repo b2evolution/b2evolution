@@ -824,15 +824,13 @@ class EmailCampaign extends DataObject
 			{	// Email newsletter was sent for user successfully:
 				$email_success_count++;
 			}
-			elseif( $User->get_email_status() == 'prmerror' )
-			{	// Unable to send email due to permanent error:
-				$email_error_count++;
-				// This email sending was skipped:
-				$email_skip_count++;
-			}
 			else
 			{	// This email sending was skipped:
 				$email_skip_count++;
+				if( $User->get_email_status() == 'prmerror' )
+				{	// Unable to send email due to permanent error:
+					$email_error_count++;
+				}
 			}
 
 			if( $display_messages === true || $display_messages === 'cron_job' )
@@ -1094,11 +1092,35 @@ class EmailCampaign extends DataObject
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
 			$email_campaign_Cronjob = new Cronjob();
 
+			$additional_message = '';
+
 			$start_datetime = $servertimenow;
 			if( $next_chunk )
 			{	// Send next chunk only after delay:
-				global $Settings;
-				$start_datetime += $Settings->get( 'email_campaign_cron_repeat' );
+
+				// We should know if all waiting users are not limited by max newsletters for today:
+				$user_IDs = $this->get_recipients( 'wait' );
+				$all_waiting_users_limited = ( count( $user_IDs ) > 0 );
+				foreach( $user_IDs as $user_ID )
+				{
+					if( check_allow_new_email( 'newsletter_limit', 'last_newsletter', $user_ID ) )
+					{	// Newsletter email is NOT limited today for this user:
+						$all_waiting_users_limited = false;
+						// Stop searching other users because at least one user can receive newsletter today:
+						break;
+					}
+				}
+
+				if( $all_waiting_users_limited )
+				{	// Force a delay between chunks if all waiting users are limited to receive more newsletters for today:
+					$start_datetime += 21600; // 6 hours
+					$additional_message = ' '.T_('Delaying next run by 6 hours because all remaining recipients cannot accept additional emails for the current day.');
+				}
+				else
+				{	// Use a delay between chunks from general setting:
+					global $Settings;
+					$start_datetime += $Settings->get( 'email_campaign_cron_repeat' );
+				}
 			}
 			$email_campaign_Cronjob->set( 'start_datetime', date2mysql( $start_datetime ) );
 
@@ -1123,7 +1145,7 @@ class EmailCampaign extends DataObject
 			// Memorize the cron job ID which is going to handle this email campaign:
 			$this->set( 'send_ctsk_ID', $email_campaign_Cronjob->ID );
 
-			$Messages->add( T_('A scheduled job has been created for this campaign.'), 'success' );
+			$Messages->add( T_('A scheduled job has been created for this campaign.').$additional_message, 'success' );
 		}
 		else
 		{	// If no waiting users then don't create a cron job and reset ID of previous cron job:
