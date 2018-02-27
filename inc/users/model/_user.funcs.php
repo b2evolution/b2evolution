@@ -384,6 +384,53 @@ function get_notifications_url( $glue = '&amp;', $user_ID = NULL )
 
 
 /**
+ * Get URL where to redirect, after successful registration
+ *
+ * @param boolean Is in skin registration?
+ * @return string Redirect URL
+ */
+function get_redirect_after_registration( $inskin = true )
+{
+	global $Settings, $Blog;
+
+	$redirect_to = param( 'redirect_to', 'url', '' );
+
+	$after_registration = $Settings->get( 'after_registration' );
+
+	if( $after_registration == 'return_to_original' )
+	{	// Return to original page ( where user was before the registration process ):
+		if( empty( $redirect_to ) )
+		{ // redirect_to param was not set
+			if( $inskin && ! empty( $Blog ) )
+			{
+				$redirect_to = $Blog->gen_blogurl();
+			}
+			else
+			{
+				$redirect_to = $baseurl;
+			}
+		}
+	}
+	elseif( $after_registration == 'specific_slug' )
+	{	// Return to the specific slug which is set in the registration settings form:
+		$SlugCache = get_SlugCache();
+		if( ( $Slug = & $SlugCache->get_by_name( $Settings->get( 'after_registration_slug' ), false, false ) ) &&
+				( $slug_Item = & $Slug->get_object() ) &&
+				( $slug_Item instanceof Item ) )
+		{	// Use permanent URL of the slug Item:
+			$redirect_to = $slug_Item->get_permanent_url( '', '', '&' );
+		}
+	}
+	else
+	{	// Return to the specific URL which is set in the registration settings form:
+		$redirect_to = $after_registration;
+	}
+
+	return $redirect_to;
+}
+
+
+/**
  * Get url where to redirect, after successful account activation
  */
 function redirect_after_account_activation()

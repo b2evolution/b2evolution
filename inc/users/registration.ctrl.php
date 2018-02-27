@@ -95,6 +95,7 @@ switch ( $action )
 		param( 'js_passwd_hashing', 'integer', 0 );
 		param( 'passwd_special', 'integer', 0 );
 		param( 'strict_logins', 'integer', 0 );
+		param( 'registration_after_quick', 'string', '' );
 		param( 'registration_require_country', 'integer', 0 );
 		param( 'registration_require_firstname', 'integer', 0 );
 		param( 'registration_ask_locale', 'integer', 0 );
@@ -155,6 +156,7 @@ switch ( $action )
 					 array( 'http_auth_accept', $http_auth_accept ),
 					 array( 'passwd_special', $passwd_special ),
 					 array( 'strict_logins', $strict_logins ),
+					 array( 'registration_after_quick', $registration_after_quick ),
 					 array( 'registration_require_country', $registration_require_country ),
 					 array( 'registration_require_firstname', $registration_require_firstname ),
 					 array( 'registration_ask_locale', $registration_ask_locale ),
