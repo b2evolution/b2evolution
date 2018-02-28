@@ -1097,7 +1097,7 @@ class EmailCampaign extends DataObject
 			$start_datetime = $servertimenow;
 			if( $next_chunk )
 			{	// Send next chunk only after delay:
-
+				global $Settings;
 				// We should know if all waiting users are not limited by max newsletters for today:
 				$user_IDs = $this->get_recipients( 'wait' );
 				$all_waiting_users_limited = ( count( $user_IDs ) > 0 );
@@ -1113,12 +1113,11 @@ class EmailCampaign extends DataObject
 
 				if( $all_waiting_users_limited )
 				{	// Force a delay between chunks if all waiting users are limited to receive more newsletters for today:
-					$start_datetime += 21600; // 6 hours
-					$additional_message = ' '.T_('Delaying next run by 6 hours because all remaining recipients cannot accept additional emails for the current day.');
+					$start_datetime += $Settings->get( 'email_campaign_cron_limited' );
+					$additional_message = ' '.sprintf( T_('Delaying next run by %s because all remaining recipients cannot accept additional emails for the current day.'), seconds_to_period( $Settings->get( 'email_campaign_cron_limited' ) ) );
 				}
 				else
 				{	// Use a delay between chunks from general setting:
-					global $Settings;
 					$start_datetime += $Settings->get( 'email_campaign_cron_repeat' );
 				}
 			}
