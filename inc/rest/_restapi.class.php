@@ -601,6 +601,7 @@ class RestApi
 
 		// Get param to limit number posts per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
+		$page = param( 'page', 'integer', 1 );
 
 		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/items/<id>":
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
@@ -609,7 +610,14 @@ class RestApi
 
 		if( $post_ID )
 		{	// Get only one requested post:
-			$ItemList2->set_filters( array( 'post_ID' => $post_ID ), true, true );
+			if( ctype_digit( ( string ) $post_ID ) )
+			{ // Get by post ID
+				$ItemList2->set_filters( array( 'post_ID' => $post_ID ), true, true );
+			}
+			else
+			{ // Get by url slug
+				$ItemList2->set_filters( array( 'post_title' => $post_ID ), true, true );
+			}
 		}
 		else
 		{	// Load all available params from request to filter the posts list:
@@ -618,7 +626,7 @@ class RestApi
 
 		if( $ItemList2->filters['types'] == $ItemList2->default_filters['types'] )
 		{	// Allow all post types by default for this request:
-			$ItemList2->set_filters( array( 'itemtype_usage' => NULL ), true, true );
+			$ItemList2->set_filters( array( 'itemtype_usage' => NULL, 'page' => $page ), true, true );
 		}
 
 		if( ! empty( $force_filters ) )
