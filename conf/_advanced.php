@@ -999,4 +999,8 @@ $enable_blacklist_server_API = false;
 
 // This is for plugins to add CS files to the TinyMCE editor window:
 $tinymce_content_css = array();
+
+// Remote skin repository
+$skin_repository_restapi_url = 'http://skins.b2evolution.net/htsrv/rest.php?api_request=';
+$skin_repository_collection = 'skins';
 ?>
