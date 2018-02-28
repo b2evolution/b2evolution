@@ -1399,7 +1399,7 @@ class collections_Module extends Module
 				if( $new_Item->dbinsert() )
 				{	// Successful new item creating:
 					$Messages->add( T_('Post has been created.'), 'success' );
-					$Messages->add( T_('Please set a password now so you can log in to this site next time you visit.'), 'error' );
+					$Messages->add( T_('Please double check your email address and choose a password so that you can log in next time you visit us.'), 'warning' );
 					$redirect_to = $item_Blog->get( 'register_finishurl', array( 'glue' => '&' ) );
 				}
 				else

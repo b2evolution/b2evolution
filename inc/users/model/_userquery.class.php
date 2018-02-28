@@ -564,7 +564,7 @@ class UserQuery extends SQL
 		}
 
 		// Join Organization table
-		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role' );
+		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role, uorg_priority' );
 		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
 	}
 

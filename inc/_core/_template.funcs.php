@@ -89,6 +89,42 @@ function headers_content_mightcache( $type = 'text/html', $max_age = '#', $chars
 
 
 /**
+ * Get URL to return
+ *
+ * @return string URL
+ */
+function get_returnto_url()
+{
+	global $Hit, $Blog, $baseurl, $ReqHost;
+
+	// See if there's a redirect_to request param given:
+	$redirect_to = param( 'redirect_to', 'url', '' );
+
+	if( empty( $redirect_to ) )
+	{	// If default redirect_to param is not defined:
+		if( ! empty( $Hit->referer ) )
+		{	// Use referer page:
+			$redirect_to = $Hit->referer;
+		}
+		elseif( isset( $Blog ) && is_object( $Blog ) )
+		{	// Use collection default page URL:
+			$redirect_to = $Blog->get( 'url' );
+		}
+		else
+		{	// Use base URL:
+			$redirect_to = $baseurl;
+		}
+	}
+	elseif( $redirect_to[0] == '/' )
+	{	// relative URL, prepend current host:
+		$redirect_to = $ReqHost.$redirect_to;
+	}
+
+	return $redirect_to;
+}
+
+
+/**
  * Sends HTTP header to redirect to the previous location (which can be given as function parameter, GET parameter (redirect_to),
  * is taken from {@link Hit::$referer} or {@link $baseurl}).
  *
@@ -114,32 +150,10 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	global $Session, $Debuglog, $Messages;
 	global $http_response_code, $allow_redirects_to_different_domain;
 
-	// TODO: fp> get this out to the caller, make a helper func like get_returnto_url()
-	if( empty($redirect_to) )
-	{ // see if there's a redirect_to request param given:
-		$redirect_to = param( 'redirect_to', 'url', '' );
-
-		if( empty($redirect_to) )
-		{
-			if( ! empty($Hit->referer) )
-			{
-				$redirect_to = $Hit->referer;
-			}
-			elseif( isset($Blog) && is_object($Blog) )
-			{
-				$redirect_to = $Blog->get('url');
-			}
-			else
-			{
-				$redirect_to = $baseurl;
-			}
-		}
-		elseif( $redirect_to[0] == '/' )
-		{ // relative URL, prepend current host:
-			$redirect_to = $ReqHost.$redirect_to;
-		}
+	if( empty( $redirect_to ) )
+	{	// Use automatic return URL if a redirect URL is not defined:
+		$redirect_to = get_returnto_url();
 	}
-	// <fp
 
 	$Debuglog->add('Preparing to redirect to: '.$redirect_to, 'request' );
 

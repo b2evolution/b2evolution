@@ -1123,6 +1123,7 @@ switch( $action )
 		$Form->output = false;
 		$Form->switch_layout( 'none' );
 		$org_suffix = ' &nbsp; <strong>'.T_('Role').':</strong> '.$Form->text_input( 'org_roles[]', '', 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+		$org_suffix .= ' &nbsp; <strong>'.T_('Priority').':</strong> '.$Form->text_input( 'org_priorities[]', '', 10, '', '', array( 'type' => 'number', 'min' => -2147483648, 'max' => 2147483647 ) ).' &nbsp; ';
 		$Form->switch_layout( NULL );
 		$Form->output = true;
 

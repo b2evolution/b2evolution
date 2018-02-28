@@ -116,12 +116,13 @@ switch( $action )
 			param_error( $dummy_fields['email'], T_('The email address is invalid.') );
 		}
 
+		if( $is_quick || $is_inline )
+		{	// We will need the following parameter for the session data that will be set later:
+			param( 'widget', 'integer', 0 );
+		}
+
 		if( $Messages->has_errors() )
-		{ // Stop registration if the errors exist
-			if( $is_quick || $is_inline )
-			{ // We will need the following parameter for the session data that will be set later
-				param( 'widget', 'integer', 0 );
-			}
+		{	// Stop registration if the errors exist:
 			break;
 		}
 
@@ -138,8 +139,6 @@ switch( $action )
 				$Messages->add( T_('Quick registration is currently disabled on this system.'), 'error' );
 				break;
 			}
-
-			param( 'widget', 'integer', 0 );
 
 			if( empty( $Blog ) || ( empty( $widget ) && ! $is_inline ) )
 			{ // Don't use a quick registration if the request goes from not blog page
@@ -549,45 +548,30 @@ switch( $action )
 						$widget_redirect_to_url = $widget_redirect_Item->get_permanent_url( '', '', '&' );
 					}
 				}
+			}
 
-				if( isset( $widget_redirect_to_url ) )
-				{	// Redirect to URL from widget config:
-					header_redirect( $widget_redirect_to_url );
-					// Exit here.
+			if( $Settings->get( 'registration_after_quick' ) == 'regform' )
+			{	// If we should display additional registration screen after quick registration:
+				if( empty( $Blog ) )
+				{	// Use widget collection if global collection is not defined:
+					$Blog = & $user_register_Widget->get_Blog();
 				}
+				$Messages->add( T_('Please double check your email address and choose a password so that you can log in next time you visit us.'), 'warning' );
+				$widget_redirect_to_url = $Blog->get( 'register_finishurl', array(
+						'glue'       => '&',
+						'url_suffix' => 'redirect_to='.rawurlencode( empty( $widget_redirect_to_url ) ? get_returnto_url() : $widget_redirect_to_url ),
+					) );
+			}
+
+			if( isset( $widget_redirect_to_url ) )
+			{	// Redirect to URL from widget config:
+				header_redirect( $widget_redirect_to_url );
+				// Exit here.
 			}
 		}
 
-		// Set redirect_to pending from after_registration setting
-		$after_registration = $Settings->get( 'after_registration' );
-		if( $after_registration == 'return_to_original' )
-		{ // Return to original page ( where user was before the registration process )
-			if( empty( $redirect_to ) )
-			{ // redirect_to param was not set
-				if( $inskin && !empty( $Blog ) )
-				{
-					$redirect_to = $Blog->gen_blogurl();
-				}
-				else
-				{
-					$redirect_to = $baseurl;
-				}
-			}
-		}
-		elseif( $after_registration == 'specific_slug' )
-		{	// Return to the specific slug which is set in the registration settings form:
-			$SlugCache = get_SlugCache();
-			if( ( $Slug = & $SlugCache->get_by_name( $Settings->get( 'after_registration_slug' ), false, false ) ) &&
-			    ( $slug_Item = & $Slug->get_object() ) &&
-			    ( $slug_Item instanceof Item ) )
-			{	// Use permanent URL of the slug Item:
-				$redirect_to = $slug_Item->get_permanent_url( '', '', '&' );
-			}
-		}
-		else
-		{ // Return to the specific URL which is set in the registration settings form
-			$redirect_to = $after_registration;
-		}
+		// Set redirect_to pending from after_registration setting:
+		$redirect_to = get_redirect_after_registration( $inskin );
 
 		header_redirect( $redirect_to );
 		break;

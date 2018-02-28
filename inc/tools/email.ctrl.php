@@ -247,6 +247,9 @@ switch( $action )
 
 				// Delay between chunks:
 				$Settings->set( 'email_campaign_cron_repeat', param_duration( 'email_campaign_cron_repeat' ) );
+
+				// Delay between chunks in case all remaining recipients have reached max # of emails for the current day:
+				$Settings->set( 'email_campaign_cron_limited', param_duration( 'email_campaign_cron_limited' ) );
 				break;
 
 			default:

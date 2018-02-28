@@ -1042,7 +1042,8 @@ class User extends DataObject
 			// ---- Organizations / START ----
 			$organizations = param( 'organizations', 'array:string' );
 			$org_roles = param( 'org_roles', 'array:string' );
-			$this->update_organizations( $organizations, $org_roles );
+			$org_priorities = param( 'org_priorities', 'array:string' );
+			$this->update_organizations( $organizations, $org_roles, $org_priorities );
 			// ---- Organizations / END ----
 
 
@@ -7062,7 +7063,7 @@ class User extends DataObject
 		{ // Get the organizations from DB
 			global $DB;
 			$SQL = new SQL();
-			$SQL->SELECT( 'org_ID, org_name, uorg_accepted, uorg_role' );
+			$SQL->SELECT( 'org_ID, org_name, uorg_accepted, uorg_role, uorg_priority' );
 			$SQL->FROM( 'T_users__user_org' );
 			$SQL->FROM_add( 'INNER JOIN T_users__organization ON org_ID = uorg_org_ID' );
 			$SQL->WHERE( 'uorg_user_ID = '.$DB->quote( $this->ID ) );
@@ -7075,6 +7076,7 @@ class User extends DataObject
 						'name'     => $organization->org_name,
 						'accepted' => $organization->uorg_accepted,
 						'role'     => $organization->uorg_role,
+						'priority' => $organization->uorg_priority,
 					);
 			}
 		}
@@ -7110,9 +7112,10 @@ class User extends DataObject
 	 *
 	 * @param array Organization IDs
 	 * @param array Organization roles
+	 * @param array Organization priorities
 	 * @param boolean TRUE to auto accept user to organization (Used on install demo users)
 	 */
-	function update_organizations( $organization_IDs, $organization_roles = array(), $force_accept = false )
+	function update_organizations( $organization_IDs, $organization_roles = array(), $organization_priorities = array(), $force_accept = false )
 	{
 		global $DB, $current_User, $Messages;
 
@@ -7121,7 +7124,6 @@ class User extends DataObject
 		$curr_orgs = $this->get_organizations_data();
 		$curr_org_IDs = array_keys( $curr_orgs );
 		$insert_orgs = array();
-		$n = 0;
 		foreach( $organization_IDs as $o => $organization_ID )
 		{
 			$organization_ID = intval( $organization_ID );
@@ -7144,28 +7146,40 @@ class User extends DataObject
 			}
 			elseif( in_array( $organization_ID, $curr_org_IDs ) )
 			{ // User is already in this organization
-				if( $perm_edit_orgs || ! $curr_orgs[ $organization_ID ]['accepted'] )
-				{ // Update if current user has permission or it is not accepted yet by admin
-					$insert_orgs[ $organization_ID ] = ( empty( $organization_roles[ $n ] ) ? NULL : $organization_roles[ $n ] );
-					$n++;
+				if( $user_Organization->perm_role == 'owner and member' ||
+				    $user_Organization->owner_user_ID == $current_User->ID ||
+				    ! $curr_orgs[ $organization_ID ]['accepted'] )
+				{	// Update role if current user has permission or it is not accepted yet by admin
+					$insert_orgs[ $organization_ID ]['role'] = ( empty( $organization_roles[ $o ] ) ? NULL : $organization_roles[ $o ] );
 				}
 				else
-				{ // Don't updated by current user
-					$insert_orgs[ $organization_ID ] = $curr_orgs[ $organization_ID ]['role'];
+				{	// Don't updated role by current user:
+					$insert_orgs[ $organization_ID ]['role'] = $curr_orgs[ $organization_ID ]['role'];
+				}
+
+				if( $user_Organization->perm_priority == 'owner and member' ||
+				    $user_Organization->owner_user_ID == $current_User->ID ||
+				    ! $curr_orgs[ $organization_ID ]['accepted'] )
+				{	// Update priority if current user has permission or it is not accepted yet by admin
+					$insert_orgs[ $organization_ID ]['priority'] = ( empty( $organization_priorities[ $o ] ) ? NULL : $organization_priorities[ $o ] );
+				}
+				else
+				{	// Don't updated priority by current user
+					$insert_orgs[ $organization_ID ]['priority'] = $curr_orgs[ $organization_ID ]['priority'];
 				}
 			}
 			else
 			{ // Insert user in new organization
-				$insert_orgs[ $organization_ID ] = ( empty( $organization_roles[ $n ] ) ? NULL : $organization_roles[ $n ] );
-				$n++;
+				$insert_orgs[ $organization_ID ]['role'] = ( empty( $organization_roles[ $o ] ) ? NULL : $organization_roles[ $o ] );
+				$insert_orgs[ $organization_ID ]['priority'] = ( empty( $organization_priorities[ $o ] ) ? NULL : $organization_priorities[ $o ] );
 			}
 		}
 
 		if( count( $insert_orgs ) > 0 )
 		{ // Insert new records with user-org relations
-			$insert_org_SQL = 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role ) VALUES ';
+			$insert_org_SQL = 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role, uorg_priority ) VALUES ';
 			$o = 0;
-			foreach( $insert_orgs as $insert_org_ID => $insert_org_role )
+			foreach( $insert_orgs as $insert_org_ID => $insert_org_data )
 			{
 				if( isset( $curr_orgs[ $insert_org_ID ] ) )
 				{ // If we are updating - Don't change the accept status
@@ -7191,7 +7205,7 @@ class User extends DataObject
 				{ // separator
 					$insert_org_SQL .= ', ';
 				}
-				$insert_org_SQL .= '( '.$this->ID.', '.$DB->quote( $insert_org_ID ).', '.$insert_orgs_accepted.', '.$DB->quote( $insert_org_role ).' )';
+				$insert_org_SQL .= '( '.$this->ID.', '.$DB->quote( $insert_org_ID ).', '.$insert_orgs_accepted.', '.$DB->quote( $insert_org_data['role'] ).', '.$DB->quote( $insert_org_data['priority'] ).' )';
 				$o++;
 			}
 			$DB->query( $insert_org_SQL );

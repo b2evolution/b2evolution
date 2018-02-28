@@ -9149,7 +9149,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12630, 'Upgrading email campaign send data table...' ) )
-	{
+	{	// part of 6.10.0-beta
 		db_upgrade_cols( 'T_email__campaign', array(
 			'ADD' => array(
 				'ecmp_user_tag_like' => 'VARCHAR(255) NULL AFTER ecmp_user_tag',
@@ -9162,6 +9162,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				'csnd_like' => 'TINYINT(1) NULL DEFAULT NULL AFTER csnd_last_click_ts'
 			),
 		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12640, 'Upgrading user organizations tables...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_users__organization', 'org_perm_priority', 'ENUM( "owner and member", "owner" ) COLLATE ascii_general_ci NOT NULL DEFAULT "owner and member"' );
+		db_add_col( 'T_users__user_org', 'uorg_priority', 'INT(11) NULL' );
 		upg_task_end();
 	}
 

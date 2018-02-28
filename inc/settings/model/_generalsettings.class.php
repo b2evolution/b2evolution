@@ -67,7 +67,8 @@ class GeneralSettings extends AbstractSettings
 
 		'email_campaign_send_mode' => 'immediate', // Sending mode for campaign
 		'email_campaign_chunk_size' => 50, // Chunk size of emails to send a campaign at a time
-		'email_campaign_cron_repeat' => 300, // Delay between chunks on scheduled campaign job runs
+		'email_campaign_cron_repeat' => 300, // 5 minutes: Delay between chunks on scheduled campaign job runs
+		'email_campaign_cron_limited' => 21600, // 6 hours: Delay between chunks on scheduled campaign job runs in case all remaining recipients have reached max # of emails for the current day
 
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',
@@ -101,6 +102,7 @@ class GeneralSettings extends AbstractSettings
 		'after_registration' => 'return_to_original', // where to redirect after new user registration. Values: 'return_to_original' redirect_to url, or 'slug', or return to the previously set specific url
 		'after_registration_slug' => '', // Slug value for after_registration == 'slug'
 		'newusers_level' => '1',
+		'registration_after_quick' => 'regform',
 		'registration_require_gender' => 'hidden',
 		'registration_ask_locale' => '0',
 		'pass_after_quick_reg' => '1',
