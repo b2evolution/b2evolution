@@ -78,7 +78,23 @@ $display_workflow = ( $disp == 'posts' ) &&
 		<!-- Thread icon -->
 		<div class="ft_status_topic">
 			<a href="<?php echo $Item->permanent_url(); ?>">
-				<i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"></i>
+				<?php
+				switch( $Item->get_read_status() )
+				{
+					case 'new':
+						echo '<i class="icon_new fa '.$status_icon.' new" title="'.$status_alt.'"></i>';
+						break;
+
+					case 'updated':
+						echo '<i class="icon fa '.$status_icon.' updated" title="'.$status_alt.'"></i>';
+						break;
+
+					case 'read':
+					default:
+						echo '<i class="icon fa '.$status_icon.'" title="'.$status_alt.'"></i>';
+						break;
+				}
+				?>
 			</a>
 		</div>
 
@@ -91,9 +107,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 						echo $status_title;
 
 						if( $Item->Blog->get_setting( 'track_unread_content' ) )
-						{ // Display icon about unread status
-							$Item->display_unread_status();
-							// Update legend array to display the unread status icons in footer legend:
+						{ // Update legend array to display the unread status icons in footer legend:
 							switch( $Item->get_read_status() )
 							{
 								case 'new':
