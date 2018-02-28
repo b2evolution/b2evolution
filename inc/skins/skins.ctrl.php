@@ -297,6 +297,82 @@ switch( $action )
 		header_redirect( '?ctrl=coll_settings&tab=skin&blog='.$blog.'&skin_type='.$skin_type, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
+
+	case 'check_update':
+		// Check for skin update
+
+		global $skin_repository_restapi_url, $skin_repository_collection;
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'skin' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		$template_action = 'check_update';
+		$action = 'list';
+
+		param( 'skin_ID', 'integer', true );
+
+		$SkinCache = & get_SkinCache();
+		$edited_Skin = $SkinCache->get_by_ID( $skin_ID );
+
+		if( $edited_Skin )
+		{
+			$skin_urltitle = str_replace( '_', '-', strtolower( $edited_Skin->class ) );
+			$skin_data = json_decode( fetch_remote_page( $skin_repository_restapi_url.'collections/'.$skin_repository_collection.'/posts/'.$skin_urltitle, $info ) );
+
+			if( isset( $skin_data->code ) && $skin_data->code == 'post_invalid_id' )
+			{
+				$Messages->add( T_('Skin not available in remote repository'), 'error' );
+			}
+			else
+			{
+				$skin_updates = array();
+				foreach( $skin_data->attachments as $attachment )
+				{
+					if( preg_match( '/(.*)?\.zip$/', $attachment->name, $match ) )
+					{ // Process only *.zip files
+						list( $base_skin, $skin_version ) = get_skin_folder_base_version( $match[1] );
+						if( $loop_Skin = $SkinCache->get_by_class( $base_skin, false ) )
+						{
+							if( evo_version_compare( $skin_version, $edited_Skin->version, '>' ) )
+							{ // Add only updates with skin version > current skin's version
+								$skin_updates[] = array(
+										'name' => $attachment->name,
+										'class' => $base_skin,
+										'url' => $attachment->url,
+										'version' => $skin_version
+									);
+							}
+						}
+					}
+				}
+
+				if( ! empty( $skin_updates ) )
+				{ // There are skin updates available
+					$template_action = 'show_skin_updates';
+				}
+				else
+				{
+					$Messages->add( sprintf( T_('No update available for %s skin'), $edited_Skin->name ), 'note' );
+				}
+			}
+
+			$action = 'list';
+		}
+		break;
+
+	case 'download_use_skin':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'skin' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		$template_action = 'download_skin_update';
+		$action = 'list';
+		break;
 }
 
 

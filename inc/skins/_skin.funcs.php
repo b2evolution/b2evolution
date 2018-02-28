@@ -2784,18 +2784,142 @@ function get_skin_version( $skin_ID )
  */
 function get_skin_folder_base_version( $skin_folder )
 {
-	preg_match( '/-((\d+\.)?(\d+\.)?(\*|\d+))$/', $skin_folder, $matches );
+	preg_match( '/-v?((\d+\.)?(\d+\.)?(\*|\d+))(?:-stable)?$/', $skin_folder, $matches );
 	if( ! empty( $matches ) )
 	{
 		$base_skin = substr( $skin_folder, 0, strlen( $matches[0] ) * -1 );
-		$skin_version = isset( $matches[2] ) ? $matches[1] : 0;
+		$skin_version = isset( $matches[2] ) ? $matches[1] : '0';
 	}
 	else
 	{
 		$base_skin = $skin_folder;
-		$skin_version = 0;
+		$skin_version = '0';
 	}
 
 	return array( $base_skin, $skin_version );
+}
+
+function download_skin_update( $download_url, $upgrade_file )
+{
+	global $skins_path;
+	list( $base_skin, $skin_version ) = get_skin_folder_base_version( preg_replace( '/(.*)\.zip$/', '$1', $upgrade_file ) );
+	$upgrade_file = $skins_path.$upgrade_file;
+	$target_dir = $skins_path.$base_skin.'-'.$skin_version.'/';
+
+	$skip_download = false;
+	$skip_unzip = false;
+	$skip_change_skin = false;
+	$download_success = true;
+	$unzip_success = true;
+
+	if( file_exists( $upgrade_file ) )
+	{ // The downloading file already exists
+		echo '<p>'.sprintf( T_( 'The package %s is already downloaded.' ), $upgrade_file ).'</p>';
+		$skip_download = true;
+		evo_flush();
+	}
+
+	if( file_exists( $target_dir ) )
+	{
+		echo '<p>'.sprintf( T_( 'The skin folder %s already exists.' ), $target_dir ).'</p>';
+		$skip_download = true;
+		$skip_unzip = true;
+		evo_flush();
+	}
+
+	// Download file
+	if( ! $skip_download )
+	{
+		// Set maximum execution time
+		set_max_execution_time( 1800 ); // 30 minutes
+
+		echo '<p>'.sprintf( T_( 'Downloading package to &laquo;<strong>%s</strong>&raquo;...' ), $skins_path );
+		evo_flush();
+
+		// Download
+		$file_contents = fetch_remote_page( $download_url, $info, 1800 );
+
+		if( $info['status'] != 200 || empty( $file_contents ) )
+		{
+			$download_success = false;
+			echo '</p><p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $download_url ).'</p>';
+		}
+		elseif( ! save_to_file( $file_contents, $upgrade_file, 'w' ) )
+		{
+			$download_success = false;
+			echo '</p><p style="color:red">'.sprintf( T_( 'Unable to create file: &laquo;%s&raquo;' ), $upgrade_file ).'</p>';
+
+			if( file_exists( $upgrade_file ) )
+			{ // Remove file from disk
+				if( ! @unlink( $upgrade_file ) )
+				{
+					echo '<p style="color:red">'.sprintf( T_( 'Unable to remove file: &laquo;%s&raquo;' ), $upgrade_file ).'</p>';
+				}
+			}
+		}
+		else
+		{ // The package is downloaded successfully
+			echo ' OK '.bytesreadable( filesize( $upgrade_file ), false, false ).'.</p>';
+		}
+		evo_flush();
+	}
+
+	// Unzip downloaded file
+	if( $download_success && ! $skip_unzip )
+	{
+		$temp_dir = $skins_path.generate_random_key().'/';
+		// Set maximum execution time
+		set_max_execution_time( 1800 ); // 30 minutes
+
+		echo '<p>'.sprintf( T_( 'Unpacking package to &laquo;<strong>%s</strong>&raquo;...' ), $target_dir );
+		evo_flush();
+
+		// Unpack package
+		if( $unzip_success = unpack_archive( $upgrade_file, $temp_dir, true ) )
+		{
+			echo ' OK.</p>';
+			if( file_exists( $temp_dir.$base_skin ) )
+			{
+				rename( $temp_dir.$base_skin, $target_dir );
+			}
+			else
+			{
+				echo '</p>';
+				echo '<p style="color:red">'.sprintf( T_('Package does not contain skin folder &laquo;%s&raquo;'), $base_skin ).'</p>';
+			}
+			if( ! rmdir_r( $temp_dir ) )
+			{
+				echo '<p style="color:red">'.sprintf( T_( 'Unable to remove file: &laquo;%s&raquo;' ), $temp_dir ).'</p>';
+			}
+		}
+		else
+		{
+			echo '</p>';
+		}
+		evo_flush();
+	}
+
+	// Upgrade skin
+	if( $unzip_success && ! $skip_change_skin )
+	{
+		$skin_folder = $base_skin.'-'.$skin_version;
+		$SkinCache = & get_SkinCache();
+
+		$new_Skin = & $SkinCache->new_obj( NULL, $skin_folder );
+		$edited_Skin = & $SkinCache->get_by_class( $new_Skin->class, false );
+		if( $edited_Skin )
+		{
+			$edited_Skin->set( 'folder', $new_Skin->folder );
+			$edited_Skin->dbupdate();
+			$SkinCache->remove_by_ID( $edited_Skin->ID );
+			echo '<p>'.T_('Skin has been upgraded to a later version.').'</p>';
+		}
+		else
+		{
+			$edited_Skin = & skin_install( $skin_folder );
+			echo '<p>'.T_('The selected skins have been installed.').'</p>';
+		}
+		evo_flush();
+	}
 }
 ?>
