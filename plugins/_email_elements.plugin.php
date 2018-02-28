@@ -98,22 +98,48 @@ class email_elements_plugin extends Plugin
 				// Button element
 				+ '<input type="button" title="<?php echo TS_('Button') ?>"'
 				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button" value="<?php echo TS_('Button') ?>" />'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|button" value="<?php echo TS_('Button') ?>" />'
+
+				// Like Button element
+				+ '<input type="button" title="<?php echo TS_('Like') ?>"'
+				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|like" value="<?php echo TS_('Like') ?>" />'
+
+				// Dislike Button element
+				+ '<input type="button" title="<?php echo TS_('Dislike') ?>"'
+				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|dislike" value="<?php echo TS_('Dislike') ?>" />'
 
 				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
 				jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
-		<?php echo $js_code_prefix;?>_insert_button = function()
+		<?php echo $js_code_prefix;?>_insert_button = function( type )
 		{
+			var modal_window_title;
 			var r = '<form id="email_element_button_wrapper" class="form">'
 					+ '<div class="form-group"><label class="control-label"><?php echo T_('URL');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_url" /></div></div>'
 					+ '<div class="form-group"><label class="control-label"><?php echo T_('Text');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_text" /></div></div>'
 					+ '</form>';
 
+			switch( type )
+			{
+				case 'button':
+					modal_window_title = '<?php echo TS_('Add a link button');?>';
+					break;
+
+				case 'like':
+					modal_window_title = '<?php echo TS_('Add a like button');?>';
+					break;
+
+				case 'dislike':
+					modal_window_title = '<?php echo TS_('Add a dislike button');?>';
+					break;
+			}
+
 			openModalWindow( r, '550px', '', true,
-					'<?php echo TS_('Add link button'); ?>', // Window title
+					modal_window_title, // Window title
 					[ '-', 'email_element_button_buttons' ],
 					true );
 
@@ -136,7 +162,7 @@ class email_elements_plugin extends Plugin
 			var buttons_side_obj = jQuery( '.email_element_button_buttons' ).length ?
 						jQuery( '.email_element_button_buttons' ) :
 						jQuery( '#email_element_button_buttons' );
-			buttons_side_obj.after( '<button id="email_element_button_insert" class="btn btn-primary"><?php echo T_('Insert');?></button>' );
+			buttons_side_obj.after( '<button id="email_element_button_insert" class="btn btn-primary" data-function="' + type + '"><?php echo T_('Insert');?></button>' );
 
 			// To prevent link default event:
 			return false;
@@ -145,12 +171,28 @@ class email_elements_plugin extends Plugin
 		// Insert a button short tag to textarea
 		jQuery( document ).on( 'click', '#email_element_button_insert', function()
 		{
+			var type = jQuery( this ).data( 'function' );
 			var url = jQuery( 'input[name=button_url]', '#email_element_button_wrapper' ).val();
 			var text = jQuery( 'input[name=button_text]', '#email_element_button_wrapper' ).val();
 			var myField = <?php echo $params['js_prefix']; ?>b2evoCanvas;
+			var shortTag;
 
 			// Insert tag text in area
-			textarea_wrap_selection( myField, '[button:' + url + ']'+text+'[/button]', '', 0 );
+			switch( type )
+			{
+				case 'button':
+					shortTag = '[button:' + url + ']'+text+'[/button]';
+					break;
+
+				case 'like':
+					shortTag = '[like:' + url + ']'+text+'[/like]';
+					break;
+
+				case 'dislike':
+					shortTag = '[dislike:' + url + ']'+text+'[/dislike]'
+					break;
+			}
+			textarea_wrap_selection( myField, shortTag, '', 0 );
 			// Close main modal window
 			closeModalWindow();
 
@@ -195,19 +237,50 @@ class email_elements_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
+		return false;
+	}
+
+
+	/**
+	 * Perform rendering of email
+	 *
+	 * @see Plugin::RenderEmailAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
 		$content = & $params['data'];
 
-		$search_pattern = '#\[button:([^\[\]]*?)](.*?)\[\/button]#';
+		$search_pattern = '#\[(button|like|dislike):([^\[\]]*?)](.*?)\[\/\1]#';
 		preg_match_all( $search_pattern, $content, $matches );
 
 		if( ! empty( $matches[0] ) )
 		{
 			foreach( $matches[0] as $i => $current_element )
 			{
-				$url = trim( $matches[1][$i] );
-				$button_text = trim( $matches[2][$i] );
+				switch( $matches[1][$i] )
+				{
+					case 'button':
+						$url = trim( $matches[2][$i] );
+						$button_text = trim( $matches[3][$i] );
 
-				$link_tag = get_link_tag( $url, $button_text, 'div.btn a+a.btn-primary' );
+						$link_tag = get_link_tag( $url, $button_text, 'div.btn a+a.btn-primary' );
+						break;
+
+					case 'like':
+					case 'dislike':
+						$url = trim( $matches[2][$i] );
+						$button_text = trim( $matches[3][$i] );
+						if( empty( $button_text ) || empty( $url ) )
+						{
+							$link_tag = '';
+						}
+						else
+						{
+							$url = url_add_param( $url, array( 'evo_mail_function' => $matches[1][$i] ) );
+							$link_tag = get_link_tag( $url, $button_text, 'div.btn a+a.btn-'.( $matches[1][$i] == 'like' ? 'success' : 'danger' ) );
+						}
+						break;
+				}
 
 				$content = str_replace( $current_element, $link_tag, $content );
 			}

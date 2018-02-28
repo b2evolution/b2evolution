@@ -69,6 +69,7 @@ class Newsletter extends DataObject
 		return array(
 				array( 'table' => 'T_email__campaign', 'fk' => 'ecmp_enlt_ID', 'msg' => T_('%d campaigns are linked to this list') ),
 				array( 'table' => 'T_automation__newsletter', 'fk' => 'aunl_enlt_ID', 'msg' => T_('%d automations use this list') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_info', 'and_condition' => 'step_type IN ( "subscribe", "unsubscribe" )', 'msg' => T_('%d automation steps use this list') ),
 			);
 	}
 

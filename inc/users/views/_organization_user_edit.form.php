@@ -53,6 +53,15 @@ $Form->begin_form( 'fform' );
 		$Form->info_field( T_('Role'), $org_data[$org_ID]['role'] );
 	}
 
+	if( ( $edited_Organization->owner_user_ID == $current_User->ID ) || ( $edited_Organization->perm_priority == 'owner and member' && $org_data[$org_ID]['accepted'] ) )
+	{	// Display edit field if current user has a permission to edit role:
+		$Form->text_input( 'priority', $org_data[$org_ID]['priority'], 10, T_('Priority'), '', array( 'type' => 'number', 'min' => -2147483648, 'max' => 2147483647 ) );
+	}
+	else
+	{	// Otherwise display info field with role value:
+		$Form->info_field( T_('Priority'), $org_data[$org_ID]['priority'] );
+	}
+
 $buttons = array();
 if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
 {	// Display a button to update the poll question only if current user has a permission:

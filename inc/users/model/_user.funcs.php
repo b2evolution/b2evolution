@@ -384,6 +384,53 @@ function get_notifications_url( $glue = '&amp;', $user_ID = NULL )
 
 
 /**
+ * Get URL where to redirect, after successful registration
+ *
+ * @param boolean Is in skin registration?
+ * @return string Redirect URL
+ */
+function get_redirect_after_registration( $inskin = true )
+{
+	global $Settings, $Blog;
+
+	$redirect_to = param( 'redirect_to', 'url', '' );
+
+	$after_registration = $Settings->get( 'after_registration' );
+
+	if( $after_registration == 'return_to_original' )
+	{	// Return to original page ( where user was before the registration process ):
+		if( empty( $redirect_to ) )
+		{ // redirect_to param was not set
+			if( $inskin && ! empty( $Blog ) )
+			{
+				$redirect_to = $Blog->gen_blogurl();
+			}
+			else
+			{
+				$redirect_to = $baseurl;
+			}
+		}
+	}
+	elseif( $after_registration == 'specific_slug' )
+	{	// Return to the specific slug which is set in the registration settings form:
+		$SlugCache = get_SlugCache();
+		if( ( $Slug = & $SlugCache->get_by_name( $Settings->get( 'after_registration_slug' ), false, false ) ) &&
+				( $slug_Item = & $Slug->get_object() ) &&
+				( $slug_Item instanceof Item ) )
+		{	// Use permanent URL of the slug Item:
+			$redirect_to = $slug_Item->get_permanent_url( '', '', '&' );
+		}
+	}
+	else
+	{	// Return to the specific URL which is set in the registration settings form:
+		$redirect_to = $after_registration;
+	}
+
+	return $redirect_to;
+}
+
+
+/**
  * Get url where to redirect, after successful account activation
  */
 function redirect_after_account_activation()
@@ -5362,6 +5409,7 @@ function users_results_block( $params = array() )
 			'display_nickname'     => true,
 			'display_name'         => true,
 			'display_role'         => false,
+			'display_priority'     => false,
 			'display_gender'       => true,
 			'display_country'      => true,
 			'display_region'       => false,
@@ -5606,6 +5654,7 @@ function users_results( & $UserList, $params = array() )
 			'order_name'         => 'user_lastname, user_firstname',
 			'display_email'      => false,
 			'display_role'       => false,
+			'display_priority'   => false,
 			'display_gender'     => true,
 			'display_country'    => true,
 			'display_country_type' => 'both', // 'both', 'flag', 'name'
@@ -5783,6 +5832,7 @@ function users_results( & $UserList, $params = array() )
 			'th' => T_('Email'),
 			'th_class' => 'small',
 			'td_class' => 'small',
+			'order' => 'user_email',
 			'td' => '$user_email$'
 		);
 	}
@@ -5795,6 +5845,17 @@ function users_results( & $UserList, $params = array() )
 			'td_class' => 'small',
 			'order' => 'uorg_role',
 			'td' => '<a href="#" style="font-weight: 700;" onclick="return user_edit( '.intval( $params['org_ID'] ).', $user_ID$ )">$uorg_role$</a>',
+		);
+	}
+
+	if( $params['display_priority'] )
+	{	// Display organizational priority:
+		$UserList->cols[] = array(
+			'th' => T_('Priority'),
+			'th_class' => 'small',
+			'td_class' => 'small',
+			'order' => 'uorg_priority',
+			'td' => '<a href="#" style="font-weight: 700;" onclick="return user_edit( '.intval( $params['org_ID'] ).', $user_ID$ )">$uorg_priority$</a>',
 		);
 	}
 
@@ -6049,6 +6110,14 @@ function users_results( & $UserList, $params = array() )
 				'order' => 'csnd_last_click_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #csnd_last_click_ts# )%',
+			);
+
+		$UserList->cols[] = array(
+				'th' => T_('Liked'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center',
+				'order' => 'csnd_like',
+				'td' => '%user_td_liked_email( #csnd_like# )%'
 			);
 	}
 
@@ -6654,6 +6723,28 @@ function user_td_emlog_date( $emlog_date )
 	}
 
 	return NULL;
+}
+
+
+/**
+ * Get email campaign recipient like status
+ *
+ * @param integer Email recipient like
+ * @return string Thumb up/down icon
+ */
+function user_td_liked_email( $csnd_like )
+{
+	switch( $csnd_like )
+	{
+		case -1:
+			return get_icon( 'thumb_down' );
+
+		case 1:
+			return get_icon( 'thumb_up' );
+
+		default:
+			return NULL;
+	}
 }
 
 

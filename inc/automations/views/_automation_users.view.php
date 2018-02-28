@@ -17,9 +17,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $edited_Automation, $admin_url;
 
-// Display breadcrumb:
-autm_display_breadcrumb();
-
 $SQL = new SQL( 'Get all users queued for automation #'.$edited_Automation->ID );
 $SQL->SELECT( 'aust_autm_ID, aust_user_ID, aust_next_step_ID, aust_next_exec_ts, user_login, step_ID, IF( step_ID IS NULL, 2147483648, step_order ) AS step_order, step_label, step_type, step_info' );
 $SQL->FROM( 'T_automation__user_state' );

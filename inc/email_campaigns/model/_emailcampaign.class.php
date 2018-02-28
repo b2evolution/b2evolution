@@ -43,6 +43,10 @@ class EmailCampaign extends DataObject
 
 	var $user_tag;
 
+	var $user_tag_like;
+
+	var $user_tag_dislike;
+
 	var $use_wysiwyg = 0;
 
 	var $send_ctsk_ID;
@@ -97,6 +101,8 @@ class EmailCampaign extends DataObject
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 			$this->auto_send = $db_row->ecmp_auto_send;
 			$this->user_tag = $db_row->ecmp_user_tag;
+			$this->user_tag_like = $db_row->ecmp_user_tag_like;
+			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
 		}
 	}
 
@@ -112,6 +118,19 @@ class EmailCampaign extends DataObject
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_camp_ID', 'msg'=>T_('%d links with users') ),
 				array( 'table'=>'T_links', 'fk'=>'link_ecmp_ID', 'msg'=>T_('%d links to destination email campaigns'),
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
+			);
+	}
+
+
+	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table' => 'T_automation__step', 'fk' => 'step_info', 'and_condition' => 'step_type = "send_campaign"', 'msg' => T_('%d automation steps use this email campaign') ),
 			);
 	}
 
@@ -590,6 +609,16 @@ class EmailCampaign extends DataObject
 			$this->set_from_Request( 'user_tag' );
 		}
 
+		if( param( 'ecmp_user_tag_like', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_like' );
+		}
+
+		if( param( 'ecmp_user_tag_dislike', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_dislike' );
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -763,6 +792,9 @@ class EmailCampaign extends DataObject
 			return;
 		}
 
+		// It it important to randomize order so that it is not always the same users who get the news first and the same users who the get news last:
+		shuffle( $user_IDs );
+
 		$DB->begin();
 
 		$UserCache = & get_UserCache();
@@ -792,67 +824,65 @@ class EmailCampaign extends DataObject
 			{	// Email newsletter was sent for user successfully:
 				$email_success_count++;
 			}
-			elseif( $User->get_email_status() == 'prmerror' )
-			{	// Unable to send email due to permanent error:
-				$email_error_count++;
-				// This email sending was skipped:
-				$email_skip_count++;
-			}
 			else
 			{	// This email sending was skipped:
 				$email_skip_count++;
+				if( $User->get_email_status() == 'prmerror' )
+				{	// Unable to send email due to permanent error:
+					$email_error_count++;
+				}
 			}
 
 			if( $display_messages === true || $display_messages === 'cron_job' )
 			{	// Print the messages:
 				if( $result === true )
 				{ // Success
-					$result_msg = sprintf( T_('Email was sent to user: %s'), $User->get_identity_link() ).'<br />';
+					$result_msg = sprintf( T_('Email was sent to user: %s'), $User->get_identity_link() );
 					if( $display_messages === 'cron_job' )
 					{
 						$Messages->add( $result_msg, 'success' );
 					}
 					else
 					{
-						echo $result_msg;
+						echo $result_msg.'<br />';
 					}
 				}
 				else
 				{ // Failed, Email was NOT sent
 					if( ! check_allow_new_email( 'newsletter_limit', 'last_newsletter', $user_ID ) )
 					{ // Newsletter email is limited today for this user
-						$error_msg = '<span class="orange">'.sprintf( T_('User %s has already received max # of lists today.'), $User->get_identity_link() ).'</span><br />';
+						$error_msg = '<span class="orange">'.sprintf( T_('User %s has already received max # of lists today.'), $User->get_identity_link() ).'</span>';
 						if( $display_messages === 'cron_job' )
 						{
 							$Messages->add( $error_msg, 'warning' );
 						}
 						else
 						{
-							echo $error_msg;
+							echo $error_msg.'<br />';
 						}
 					}
 					elseif( $User->get_email_status() == 'prmerror' )
 					{ // Email has permanent error
-						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).' ('.T_('Reason').': '.T_('Permanent error').')</span><br />';
+						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).' ('.T_('Reason').': '.T_('Permanent error').')</span>';
 						if( $display_messages === 'cron_job' )
 						{
 							$Messages->add( $error_msg, 'error' );
 						}
 						else
 						{
-							echo $error_msg;
+							echo $error_msg.'<br />';
 						}
 					}
 					else
 					{ // Another error
-						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).'</span><br />';
+						$error_msg = '<span class="red">'.sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).'</span>';
 						if( $display_messages === 'cron_job' )
 						{
 							$Messages->add( $error_msg, 'error' );
 						}
 						else
 						{
-							echo $error_msg;
+							echo $error_msg.'<br />';
 						}
 					}
 				}
@@ -884,15 +914,27 @@ class EmailCampaign extends DataObject
 			$skipped_count = count( $this->users['skipped'] ); // Recipients that are marked skipped for this campaign
 			if( $wait_count > 0 )
 			{	// Some recipients still wait this newsletter:
-				$Messages->add( sprintf( T_('Emails have been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
-						$email_campaign_chunk_size, $email_skip_count + $skipped_count, $wait_count ), 'warning' );
+				$warning_msg = sprintf( T_('Emails have been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
+						$email_campaign_chunk_size, $email_skip_count + $skipped_count, $wait_count );
+				if( $display_messages === 'cron_job' )
+				{
+					$warning_msg = "\n".'<span class="orange">'.$warning_msg.'</span>'."\n";
+				}
+				$Messages->add( $warning_msg, 'warning' );
 			}
 			else
 			{	// All recipients received this bewsletter:
-				$Messages->add( T_('Emails have been sent to all recipients of this campaign.'), 'success' );
+				$success_msg = T_('Emails have been sent to all recipients of this campaign.');
+				if( $display_messages === 'cron_job' )
+				{
+					$success_msg = "\n".$success_msg."\n";
+				}
+				$Messages->add( $success_msg, 'success' );
 			}
-			echo '<br />';
-			$Messages->display();
+			if( $display_messages !== 'cron_job' )
+			{	// Print out messages right now:
+				$Messages->display();
+			}
 		}
 	}
 
@@ -1050,11 +1092,35 @@ class EmailCampaign extends DataObject
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
 			$email_campaign_Cronjob = new Cronjob();
 
+			$additional_message = '';
+
 			$start_datetime = $servertimenow;
 			if( $next_chunk )
 			{	// Send next chunk only after delay:
-				global $Settings;
-				$start_datetime += $Settings->get( 'email_campaign_cron_repeat' );
+
+				// We should know if all waiting users are not limited by max newsletters for today:
+				$user_IDs = $this->get_recipients( 'wait' );
+				$all_waiting_users_limited = ( count( $user_IDs ) > 0 );
+				foreach( $user_IDs as $user_ID )
+				{
+					if( check_allow_new_email( 'newsletter_limit', 'last_newsletter', $user_ID ) )
+					{	// Newsletter email is NOT limited today for this user:
+						$all_waiting_users_limited = false;
+						// Stop searching other users because at least one user can receive newsletter today:
+						break;
+					}
+				}
+
+				if( $all_waiting_users_limited )
+				{	// Force a delay between chunks if all waiting users are limited to receive more newsletters for today:
+					$start_datetime += 21600; // 6 hours
+					$additional_message = ' '.T_('Delaying next run by 6 hours because all remaining recipients cannot accept additional emails for the current day.');
+				}
+				else
+				{	// Use a delay between chunks from general setting:
+					global $Settings;
+					$start_datetime += $Settings->get( 'email_campaign_cron_repeat' );
+				}
 			}
 			$email_campaign_Cronjob->set( 'start_datetime', date2mysql( $start_datetime ) );
 
@@ -1079,7 +1145,7 @@ class EmailCampaign extends DataObject
 			// Memorize the cron job ID which is going to handle this email campaign:
 			$this->set( 'send_ctsk_ID', $email_campaign_Cronjob->ID );
 
-			$Messages->add( T_('A scheduled job has been created for this campaign.'), 'success' );
+			$Messages->add( T_('A scheduled job has been created for this campaign.').$additional_message, 'success' );
 		}
 		else
 		{	// If no waiting users then don't create a cron job and reset ID of previous cron job:

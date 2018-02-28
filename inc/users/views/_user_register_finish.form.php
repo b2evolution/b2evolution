@@ -60,7 +60,7 @@ $Form->begin_form( 'bComment' );
 $Form->add_crumb( 'user' );
 $Form->hidden_ctrl();
 $Form->hidden( 'user_tab', 'register_finish' );
-
+$Form->hidden( 'redirect_to', param( 'redirect_to', 'url', NULL ) );
 $Form->hidden( 'user_ID', $edited_User->ID );
 if( isset( $Blog ) )
 {

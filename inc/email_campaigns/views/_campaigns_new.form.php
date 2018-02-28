@@ -14,6 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+$enlt_ID = param( 'enlt_ID', 'integer' );
 $Form = new Form( NULL, 'campaign' );
 $Form->begin_form( 'fform' );
 
@@ -24,7 +25,7 @@ $Form->hidden( 'action', 'add' );
 $Form->begin_fieldset( T_('New campaign').get_manual_link( 'creating-an-email-campaign' ) );
 	$NewsletterCache = & get_NewsletterCache();
 	$NewsletterCache->load_where( 'enlt_active = 1' );
-	$Form->select_input_object( 'ecmp_enlt_ID', '', $NewsletterCache, T_('Send to subscribers of'), array( 'required' => true ) );
+	$Form->select_input_object( 'ecmp_enlt_ID', $enlt_ID, $NewsletterCache, T_('Send to subscribers of'), array( 'required' => true ) );
 	$Form->text_input( 'ecmp_email_title', '', 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
 $Form->end_fieldset();
 

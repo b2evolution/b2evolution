@@ -66,6 +66,36 @@ switch( $type )
 								// Do not track click
 								$skip_click_tracking = true;
 								break;
+
+							case 3: // Vote like and add appropriate usertag
+								$DB->query( 'UPDATE T_email__campaign_send
+										SET csnd_like = 1
+										WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
+
+								$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag_like' );
+								if( ! empty( $assigned_user_tag ) )
+								{
+									$email_User->add_usertags( $assigned_user_tag );
+									$email_User->dbupdate();
+								}
+								// Do not track click
+								$skip_click_tracking = true;
+								break;
+
+							case 4: // Vote dislike and add appropriate usertag
+								$DB->query( 'UPDATE T_email__campaign_send
+								SET csnd_like = -1
+								WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
+
+								$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag_dislike' );
+								if( ! empty( $assigned_user_tag ) )
+								{
+									$email_User->add_usertags( $assigned_user_tag );
+									$email_User->dbupdate();
+								}
+								// Do not track click
+								$skip_click_tracking = true;
+								break;
 						}
 					}
 				}

@@ -386,6 +386,7 @@ function create_user( $params = array() )
 			'group_ID'  => NULL,
 			'org_IDs'   => NULL, // array of organization IDs
 			'org_roles' => NULL, // array of organization roles
+			'org_priorities' => NULL, // array of organization priorities
 			'fields'    => NULL, // array of additional user fields
 			'datecreated' => $timestamp++
 		), $params );
@@ -421,8 +422,8 @@ function create_user( $params = array() )
 	}
 
 	if( ! empty( $params['org_IDs'] ) )
-	{ // Add user to organizations
-		$User->update_organizations( $params['org_IDs'], $params['org_roles'], true );
+	{	// Add user to organizations:
+		$User->update_organizations( $params['org_IDs'], $params['org_roles'], $params['org_priorities'], true );
 	}
 
 	if( ! empty( $params['fields'] ) )
@@ -551,12 +552,14 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 	{
 		// Get current user's organization data
 		$org_roles = array();
+		$org_priorities = array();
 		$org_data = $current_User->get_organizations_data();
-		if( isset( $org_data[$demo_org_ID] ) )
+		if( isset( $org_data[ $demo_org_ID ] ) )
 		{
-			$org_roles = array( $org_data[$demo_org_ID]['role'] );
+			$org_roles = array( $org_data[ $demo_org_ID ]['role'] );
+			$org_priorities = array( $org_data[ $demo_org_ID ]['priority'] );
 		}
-		$current_User->update_organizations( array( $demo_org_ID ), $org_roles, true);
+		$current_User->update_organizations( array( $demo_org_ID ), $org_roles, $org_priorities, true );
 	}
 
 	return $Organization;

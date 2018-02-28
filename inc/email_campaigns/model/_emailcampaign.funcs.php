@@ -213,14 +213,16 @@ function campaign_results_block( $params = array() )
 	// Create result set:
 	$SQL = new SQL();
 	$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
-			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag,
+			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag, ecmp_user_tag_like, ecmp_user_tag_dislike,
 			enlt_ID, enlt_name,
 			SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS send_count,
-			SUM( IF( emlog_last_open_ts IS NOT NULL OR emlog_last_click_ts IS NOT NULL, 1, 0 ) ) /
+			SUM( IF( emlog_last_open_ts IS NOT NULL OR emlog_last_click_ts IS NOT NULL OR csnd_like IS NOT NULL, 1, 0 ) ) /
 				SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS open_rate,
 			SUM( IF( emlog_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
 			SUM( IF( emlog_last_click_ts IS NULL, 0, 1 ) ) AS click_count,
-			SUM( csnd_clicked_unsubscribe ) AS unsubscribe_click_count' );
+			SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
+			SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
+			SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsubscribe_click_count' );
 	$SQL->FROM( 'T_email__campaign' );
 	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 	$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
@@ -246,7 +248,7 @@ function campaign_results_block( $params = array() )
 
 	if( $current_User->check_perm( 'emails', 'edit' ) && $params['display_create_button'] )
 	{ // User must has a permission to edit emails
-		$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new', T_('Create new campaign').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new'.( isset( $params['enlt_ID'] ) ? '&amp;enlt_ID='.$params['enlt_ID'] : '' ), T_('Create new campaign').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
 
 	$Results->cols[] = array(
@@ -321,7 +323,7 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%number_format( #open_rate# * 100, 1 )%%'
+			'td' =>'%empty( #send_count# ) ? "" : number_format( #open_rate# * 100, 1 )%%'
 		);
 
 	$Results->cols[] = array(
@@ -330,7 +332,7 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'$open_count$'
+			'td' =>'%empty( #send_count# ) ? "" : #open_count#%'
 		);
 
 	$Results->cols[] = array(
@@ -339,7 +341,21 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'$click_count$'
+			'td' =>'%empty( #send_count# ) ? "" : #click_count#%'
+		);
+
+	$Results->cols[] = array(
+			'th' => T_('Likes'),
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'center',
+			'td' =>'%empty( #send_count# ) ? "" : #like_count#%'
+		);
+
+	$Results->cols[] = array(
+			'th' => T_('Dislikes'),
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'center',
+			'td' =>'%empty( #send_count# ) ? "" : #dislike_count#%'
 		);
 
 	$Results->cols[] = array(
@@ -348,7 +364,7 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'$unsubscribe_click_count$'
+			'td' =>'%empty( #send_count# ) ? "" : #unsubscribe_click_count#%'
 		);
 
 	$Results->cols[] = array(

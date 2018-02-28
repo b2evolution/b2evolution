@@ -106,13 +106,19 @@ $Results->cols[] = array(
 		'td'       => '%tag_td_name( #utag_ID#, #utag_name# )%',
 	);
 
+function tag_td_count( $utag_name, $utag_count )
+{
+	global $admin_url;
+	$r = '<a href="'.$admin_url.'?ctrl=users&amp;user_tag='.$utag_name.'&amp;filter=new'.'">'.$utag_count.'</a>';
+	return $r;
+}
 $Results->cols[] = array(
 		'th'          => T_('Used'),
 		'th_class'    => 'shrinkwrap',
 		'td_class'    => 'shrinkwrap',
 		'order'       => 'tag_count',
 		'default_dir' => 'D',
-		'td'          => '$tag_count$',
+		'td'          => '%tag_td_count( #utag_name#, #tag_count# )%',
 	);
 
 

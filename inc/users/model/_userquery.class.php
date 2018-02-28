@@ -564,7 +564,7 @@ class UserQuery extends SQL
 		}
 
 		// Join Organization table
-		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role' );
+		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role, uorg_priority' );
 		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
 	}
 
@@ -618,7 +618,7 @@ class UserQuery extends SQL
 		$this->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_user_ID = user_ID AND csnd_camp_ID = '.$DB->quote( $ecmp_ID ) );
 
 		// Get email log date and time:
-		$this->SELECT_add( ', csnd_last_sent_ts, enls_user_ID, csnd_last_open_ts, csnd_last_click_ts' );
+		$this->SELECT_add( ', csnd_last_sent_ts, enls_user_ID, csnd_last_open_ts, csnd_last_click_ts, csnd_like' );
 
 		// Get subscription status:
 		$this->SELECT_add( ', enls_user_ID' );

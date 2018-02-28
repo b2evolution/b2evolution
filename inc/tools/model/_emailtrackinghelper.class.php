@@ -63,11 +63,46 @@ class EmailTrackingHelper
 		return $url;
 	}
 
+
+	private function _cleanup_email_param_marker( $match, $url )
+	{
+		// Remove email function marker in the URL
+		$first_char = mb_substr( $match[0], 0, 1 );
+		$last_char = mb_substr( $match[0], -1 );
+		switch( $first_char )
+		{
+			case '&':
+				if( $last_char == '&' )
+				{
+					$url = str_replace( $match[0], '&', $url );
+				}
+				else
+				{
+					$url = str_replace( $match[0], '', $url );
+				}
+				break;
+
+			case '?':
+				if( $last_char == '&' )
+				{
+					$url = str_replace( $match[0], '?', $url );
+				}
+				else
+				{
+					$url = str_replace( $match[0], '', $url );
+				}
+				break;
+		}
+
+		return $url;
+	}
+
 	public function callback( $matches )
 	{
 		$passthrough_url = $this->get_passthrough_url();
 
 		$unsubscribe_link_re = '/quick_unsubscribe\.php(?:[^\<\>])+type=(newsletter)/';
+		$email_func_re = '/(?:\?|&)evo_mail_function=(like|dislike)&?/';
 
 		switch( $this->content_type )
 		{
@@ -79,12 +114,29 @@ class EmailTrackingHelper
 				 *  3 - "
 				 */
 				$redirect_url = $matches[2];
+				//pre_dump( $matches );
 				if( preg_match( $unsubscribe_link_re, $redirect_url, $match ) )
 				{
 					if( $match[1] == 'newsletter' )
 					{
 						$passthrough_url = $this->get_passthrough_url( array( 'tag' => 2 ) );
 					}
+				}
+				elseif( preg_match( $email_func_re, $redirect_url, $match ) )
+				{
+					switch( $match[1] )
+					{
+						case 'like':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 3 ) );
+							break;
+
+						case 'dislike':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 4 ) );
+							break;
+					}
+
+					// Remove email function marker in the URL
+					$redirect_url = $this->_cleanup_email_param_marker( $match, $redirect_url );
 				}
 
 				if( preg_match_all( '~(\$secret_content_start\$)(.*?)(\$secret_content_end\$)~', $redirect_url, $secret_contents ) )
@@ -115,6 +167,22 @@ class EmailTrackingHelper
 					{
 						$passthrough_url = $this->get_passthrough_url( array( 'tag' => 2 ) );
 					}
+				}
+				elseif( preg_match( $email_func_re, $redirect_url, $match ) )
+				{
+					switch( $match[1] )
+					{
+						case 'like':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 3 ) );
+							break;
+
+						case 'dislike':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 4 ) );
+							break;
+					}
+
+					// Remove email function marker in the URL
+					$redirect_url = $this->_cleanup_email_param_marker( $match, $redirect_url );
 				}
 
 				if( preg_match_all( '~(\$secret_content_start\$)(.*?)(\$secret_content_end\$)~', $redirect_url, $secret_contents ) )
