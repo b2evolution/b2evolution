@@ -1138,6 +1138,7 @@ class EmailCampaign extends DataObject
 				if( $all_waiting_users_limited )
 				{	// Force a delay between chunks if all waiting users are limited to receive more newsletters for today:
 					$start_datetime += $Settings->get( 'email_campaign_cron_limited' );
+					// TRANS: %s is a time period like 58 minutes, 1 hour, 12 days, 1 year and etc.
 					$additional_message = ' '.sprintf( T_('Delaying next run by %s because all remaining recipients cannot accept additional emails for the current day.'), seconds_to_period( $Settings->get( 'email_campaign_cron_limited' ) ) );
 				}
 				else
