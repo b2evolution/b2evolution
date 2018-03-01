@@ -9172,6 +9172,26 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12650, 'Upgrading email campaign table...' ) )
+	{ // part of 6.10.0-beta
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_user_tag_cta1' => 'VARCHAR(255) NULL AFTER ecmp_user_tag',
+				'ecmp_user_tag_cta2' => 'VARCHAR(255) NULL AFTER ecmp_user_tag_cta1',
+				'ecmp_user_tag_cta3' => 'VARCHAR(255) NULL AFTER ecmp_user_tag_cta2',
+			),
+		) );
+
+		db_upgrade_cols( 'T_email__campaign_send', array(
+			'ADD' => array(
+				'csnd_cta1' => 'TINYINT(1) NULL DEFAULT NULL AFTER csnd_like',
+				'csnd_cta2' => 'TINYINT(1) NULL DEFAULT NULL AFTER csnd_cta1',
+				'csnd_cta3' => 'TINYINT(1) NULL DEFAULT NULL AFTER csnd_cta2',
+			),
+		) );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

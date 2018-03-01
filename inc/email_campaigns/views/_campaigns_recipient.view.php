@@ -21,13 +21,18 @@ echo '<div class="well">';
 // Create result set:
 $SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
-		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag, ecmp_user_tag_like, ecmp_user_tag_dislike,
+		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
+		ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
 		enlt_ID, enlt_name,
 		SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS send_count,
-		SUM( IF( emlog_last_open_ts IS NOT NULL OR emlog_last_click_ts IS NOT NULL OR csnd_like IS NOT NULL, 1, 0 ) ) /
+		SUM( IF( emlog_last_open_ts IS NOT NULL OR emlog_last_click_ts IS NOT NULL OR
+			csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) /
 			SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS open_rate,
 		SUM( IF( emlog_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
 		SUM( IF( emlog_last_click_ts IS NULL, 0, 1 ) ) AS click_count,
+		SUM( IF( csnd_cta1 = 1, 1, 0 ) ) AS cta1_count,
+		SUM( IF( csnd_cta2 = 1, 1, 0 ) ) AS cta2_count,
+		SUM( IF( csnd_cta3 = 1, 1, 0 ) ) AS cta3_count,
 		SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
 		SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
 		SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsubscribe_click_count' );
@@ -105,6 +110,27 @@ $Results->cols[] = array(
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'td' =>'%empty( #send_count# ) ? "" : #click_count#%'
+);
+
+$Results->cols[] = array(
+	'th' => /* TRANS: Call To Action 1*/ T_('CTA1'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'center',
+	'td' =>'%empty( #send_count# ) ? "" : #cta1_count#%'
+);
+
+$Results->cols[] = array(
+	'th' => /* TRANS: Call To Action 2*/ T_('CTA2'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'center',
+	'td' =>'%empty( #send_count# ) ? "" : #cta2_count#%'
+);
+
+$Results->cols[] = array(
+	'th' => /* TRANS: Call To Action 3*/ T_('CTA3'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'center',
+	'td' =>'%empty( #send_count# ) ? "" : #cta3_count#%'
 );
 
 $Results->cols[] = array(

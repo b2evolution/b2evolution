@@ -6108,6 +6108,30 @@ function users_results( & $UserList, $params = array() )
 			);
 
 		$UserList->cols[] = array(
+				'th' => /* TRANS: Call To Action 1*/ T_('CTA1'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center',
+				'order' => 'csnd_cta1',
+				'td' => '%user_td_cta( #csnd_cta1# )%'
+			);
+
+		$UserList->cols[] = array(
+				'th' => /* TRANS: Call To Action 2*/ T_('CTA2'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center',
+				'order' => 'csnd_cta2',
+				'td' => '%user_td_cta( #csnd_cta2# )%'
+			);
+
+		$UserList->cols[] = array(
+				'th' => /* TRANS: Call To Action 3*/ T_('CTA3'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'center',
+				'order' => 'csnd_cta3',
+				'td' => '%user_td_cta( #csnd_cta3# )%'
+			);
+
+		$UserList->cols[] = array(
 				'th' => T_('Liked'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'center',
@@ -6717,6 +6741,22 @@ function user_td_emlog_date( $emlog_date )
 		return mysql2localedatetime_spans( $emlog_date );
 	}
 
+	return NULL;
+}
+
+
+/**
+ * Get an HTML icon if CTA field is clicked
+ *
+ * @param integer 1 if CTA field was clicked
+ * @return string
+ */
+function user_td_cta( $cta )
+{
+	if( (int)$cta === 1 )
+	{
+		return get_icon( 'allowback' );
+	}
 	return NULL;
 }
 

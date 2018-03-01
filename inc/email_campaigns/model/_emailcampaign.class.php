@@ -43,6 +43,12 @@ class EmailCampaign extends DataObject
 
 	var $user_tag;
 
+	var $user_tag_cta1;
+
+	var $user_tag_cta2;
+
+	var $user_tag_cta3;
+
 	var $user_tag_like;
 
 	var $user_tag_dislike;
@@ -101,6 +107,9 @@ class EmailCampaign extends DataObject
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 			$this->auto_send = $db_row->ecmp_auto_send;
 			$this->user_tag = $db_row->ecmp_user_tag;
+			$this->user_tag_cta1 = $db_row->ecmp_user_tag_cta1;
+			$this->user_tag_cta2 = $db_row->ecmp_user_tag_cta2;
+			$this->user_tag_cta3 = $db_row->ecmp_user_tag_cta3;
 			$this->user_tag_like = $db_row->ecmp_user_tag_like;
 			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
 		}
@@ -607,6 +616,21 @@ class EmailCampaign extends DataObject
 		if( param( 'ecmp_user_tag', 'string', NULL ) !== NULL )
 		{ // User tag:
 			$this->set_from_Request( 'user_tag' );
+		}
+
+		if( param( 'ecmp_user_tag_cta1', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_cta1' );
+		}
+
+		if( param( 'ecmp_user_tag_cta2', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_cta2' );
+		}
+
+		if( param( 'ecmp_user_tag_cta3', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_cta3' );
 		}
 
 		if( param( 'ecmp_user_tag_like', 'string', NULL ) !== NULL )
