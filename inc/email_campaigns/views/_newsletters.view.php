@@ -24,7 +24,11 @@ $SQL->FROM( 'T_email__newsletter' );
 $SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_enlt_ID = enlt_ID' );
 $SQL->GROUP_BY( 'enlt_ID, enlt_name, enlt_label, enlt_active, enlt_order' );
 
-$Results = new Results( $SQL->get(), 'enlt_', 'A' );
+$count_SQL = new SQL();
+$count_SQL->SELECT( 'SQL_NO_CACHE COUNT(enlt_ID)' );
+$count_SQL->FROM( 'T_email__newsletter' );
+
+$Results = new Results( $SQL->get(), 'enlt_', 'A', NULL, $count_SQL->get() );
 
 $Results->title = T_('Lists').get_manual_link( 'email-lists' );
 
