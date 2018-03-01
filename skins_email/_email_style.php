@@ -39,6 +39,8 @@ $emailskins_styles = array(
 	background-color: #f4f4f4;
 	margin: 0;
 	width: 100%;
+	font-size: 14px;
+	line-height: 20px;
 ',
 'body.email' =>'
 	padding: 0;
