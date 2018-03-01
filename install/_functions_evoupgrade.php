@@ -9192,6 +9192,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12660, 'Updating user settings table...' ) )
+	{	// part of 6.10.0-beta
+		$DB->query( 'REPLACE INTO T_users__usersettings ( uset_user_ID, uset_name, uset_value )
+			SELECT user_ID, "welcome_message_sent", 1
+			  FROM T_users
+			 WHERE user_status IN ( "activated", "autoactivated" ) ' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
