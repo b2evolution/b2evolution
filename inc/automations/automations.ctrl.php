@@ -536,12 +536,12 @@ switch( $action )
 					'steps' => array(
 						'text' => T_('Steps'),
 						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=steps&amp;autm_ID='.$edited_Automation->ID ),
-					'users' => array(
-						'text' => T_('Users'),
-						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=users&amp;autm_ID='.$edited_Automation->ID ),
 					'diagram' => array(
 						'text' => T_('Diagram view'),
 						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=diagram&amp;autm_ID='.$edited_Automation->ID ),
+					'users' => array(
+						'text' => T_('Users'),
+						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=users&amp;autm_ID='.$edited_Automation->ID ),
 				) );
 			if( in_array( $action, array( 'edit', 'delete' ) ) )
 			{
