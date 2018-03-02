@@ -467,6 +467,29 @@ switch( $action )
 		$action = 'edit_step';
 		break;
 
+	case 'update_step_position':
+		// Update step position on automation diagram:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		param( 'pos', 'array:integer' );
+
+		if( count( $pos ) != 2 )
+		{	// Position array must contains 2 values: row|x and column|y:
+			debug_die( 'Wrong step position!' );
+		}
+
+		// Update step position:
+		$edited_AutomationStep->set( 'diagram', implode( ':', $pos ) );
+		$edited_AutomationStep->dbupdate();
+
+		// Exit here because we don't need UI for this AJAX action:
+		exit;
+
 	case 'delete_step':
 		// Delete Automation Step:
 

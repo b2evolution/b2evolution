@@ -565,6 +565,17 @@ class Automation extends DataObject
 				}
 			}
 
+			// Get stored position from DB:
+			$position = $AutomationStep->get( 'diagram' );
+			if( $position !== NULL )
+			{
+				$position = explode( ':', $position );
+				if( count( $position ) == 2 )
+				{
+					$step['attrs']['style'] = 'left:'.$position[0].'px;top:'.$position[1].'px';
+				}
+			}
+
 			$steps[ $AutomationStep->ID ] = $step;
 		}
 
@@ -638,9 +649,12 @@ class Automation extends DataObject
 
 		foreach( $this->diagram_steps as $step_ID => $step )
 		{	// Convert row and column to CSS coordinates:
-			$x = ( ( 19 * ( $step['xy'][0] - 1 ) ) + 4 ).'%';
-			$y = ( ( 250 * $step['xy'][1] ) - 150 ).'px';
-			$this->diagram_steps[ $step_ID ]['attrs']['style'] = 'left:'.$x.';top:'.$y;
+			if( ! isset( $step['attrs']['style'] ) )
+			{
+				$x = ( ( 19 * ( $step['xy'][0] - 1 ) ) + 4 ).'%';
+				$y = ( ( 250 * $step['xy'][1] ) - 150 ).'px';
+				$this->diagram_steps[ $step_ID ]['attrs']['style'] = 'left:'.$x.';top:'.$y;
+			}
 		}
 
 		// Update steps array with array with defined CSS coordinates:

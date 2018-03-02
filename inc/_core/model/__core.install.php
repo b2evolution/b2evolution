@@ -613,6 +613,7 @@ $schema_queries = array(
 			step_no_next_step_delay    INT UNSIGNED NULL,
 			step_error_next_step_ID    INT NULL,
 			step_error_next_step_delay INT UNSIGNED NULL,
+			step_diagram               VARCHAR(64) NULL,
 			PRIMARY KEY                (step_ID),
 			UNIQUE                     step_autm_ID_order (step_autm_ID, step_order)
 		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),

@@ -15,10 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $edited_Automation;
-
-// Display breadcrumb:
-autm_display_breadcrumb();
+global $edited_Automation, $admin_url;
 
 // Print out HTML boxes for steps and Initialise steps data to build connectors between steps by JS code below:
 echo '<div class="evo_automation__diagram_canvas jtk-surface jtk-surface-nopan" id="evo_automation__diagram_canvas">';
@@ -125,7 +122,26 @@ jsPlumb.ready( function ()
 		} );
 
 		// Make all step boxes draggable:
-		instance.draggable( jsPlumb.getSelector( '.evo_automation__diagram_step_box' ), { grid: [20, 20] } );
+		instance.draggable( jsPlumb.getSelector( '.evo_automation__diagram_step_box' ),
+		{
+			grid: [20, 20],
+			stop: function( e )
+			{
+				jQuery.ajax(
+				{
+					type: 'POST',
+					url: '<?php echo $admin_url; ?>',
+					data:
+					{
+						'ctrl': 'automations',
+						'action': 'update_step_position',
+						'step_ID': e.el.id.replace( 'step_', '' ),
+						'pos': e.pos,
+						'crumb_automationstep': '<?php echo get_crumb( 'automationstep' ); ?>',
+					}
+				} );
+			}
+		} );
 
 		instance.bind( 'connectionDrag', function (connection)
 		{

@@ -37,6 +37,7 @@ class AutomationStep extends DataObject
 	var $no_next_step_delay;
 	var $error_next_step_ID;
 	var $error_next_step_delay;
+	var $diagram;
 
 	var $Automation = NULL;
 
@@ -68,6 +69,7 @@ class AutomationStep extends DataObject
 			$this->no_next_step_delay = $db_row->step_no_next_step_delay;
 			$this->error_next_step_ID = $db_row->step_error_next_step_ID;
 			$this->error_next_step_delay = $db_row->step_error_next_step_delay;
+			$this->diagram = $db_row->step_diagram;
 		}
 	}
 
