@@ -20,7 +20,7 @@ global $UserSettings, $edited_EmailCampaign;
 echo '<div class="well">';
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
+$SQL->SELECT( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
 		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
 		ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
 		enlt_ID, enlt_name,
@@ -45,9 +45,8 @@ $SQL->GROUP_BY( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_ema
 		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag, enlt_ID, enlt_name' );
 
 $count_SQL = new SQL();
-$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( ecmp_ID )' );
+$count_SQL->SELECT( 'COUNT( ecmp_ID )' );
 $count_SQL->FROM( 'T_email__campaign' );
-$count_SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 
 if( isset( $params['enlt_ID'] ) )
 {
@@ -100,7 +99,7 @@ $Results->cols[] = array(
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
-	'td' =>'%empty( #send_count# ) ? "" : #open_count#%'
+	'td' =>'%campaign_td_recipient_action( {row}, "img_loaded" )%',
 );
 
 $Results->cols[] = array(
@@ -109,42 +108,42 @@ $Results->cols[] = array(
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
-	'td' =>'%empty( #send_count# ) ? "" : #click_count#%'
+	'td' =>'%campaign_td_recipient_action( {row}, "link_clicked" )%',
 );
 
 $Results->cols[] = array(
 	'th' => /* TRANS: Call To Action 1*/ T_('CTA1'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
-	'td' =>'%empty( #send_count# ) ? "" : #cta1_count#%'
+	'td' =>'%campaign_td_recipient_action( {row}, "cta1" )%',
 );
 
 $Results->cols[] = array(
 	'th' => /* TRANS: Call To Action 2*/ T_('CTA2'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
-	'td' =>'%empty( #send_count# ) ? "" : #cta2_count#%'
+	'td' =>'%campaign_td_recipient_action( {row}, "cta2" )%',
 );
 
 $Results->cols[] = array(
 	'th' => /* TRANS: Call To Action 3*/ T_('CTA3'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
-	'td' =>'%empty( #send_count# ) ? "" : #cta3_count#%'
+	'td' =>'%campaign_td_recipient_action( {row}, "cta3" )%',
 );
 
 $Results->cols[] = array(
 	'th' => T_('Likes'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
-	'td' =>'%empty( #send_count# ) ? "" : #like_count#%'
+	'td' =>'%campaign_td_recipient_action( {row}, "liked" )%',
 );
 
 $Results->cols[] = array(
 	'th' => T_('Dislikes'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
-	'td' =>'%empty( #send_count# ) ? "" : #dislike_count#%'
+	'td' =>'%campaign_td_recipient_action( {row}, "disliked" )%',
 );
 
 $Results->cols[] = array(
@@ -153,20 +152,25 @@ $Results->cols[] = array(
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
-	'td' =>'%empty( #send_count# ) ? "" : #unsubscribe_click_count#%'
+	'td' =>'%campaign_td_recipient_action( {row}, "clicked_unsubscribe" )%',
 );
 
 $Results->display();
 echo '</div>';
 
 // Display recipients of this email campaign:
+$recipient_type = param( 'recipient_type', 'string' );
+$recipient_action = param( 'recipient_action', 'string' );
+
 users_results_block( array(
 		'ecmp_ID'              => $edited_EmailCampaign->ID,
 		'filterset_name'       => 'ecmp_'.$edited_EmailCampaign->ID,
 		'results_param_prefix' => 'ecmp_',
 		'results_title'        => T_('Recipients of this campaign').get_manual_link( 'email-campaign-recipients' ),
 		'results_order'        => '/csnd_last_sent_ts/D',
-		'page_url'             => get_dispctrl_url( 'campaigns', 'action=edit&amp;tab=recipient&amp;ecmp_ID='.$edited_EmailCampaign->ID.'&amp;recipient_type='.get_param( 'recipient_type' ) ),
+		'page_url'             => get_dispctrl_url( 'campaigns', 'action=edit&amp;tab=recipient&amp;ecmp_ID='.$edited_EmailCampaign->ID.
+				( empty( $recipient_type ) ? '' : '&amp;recipient_type='.$recipient_type ).
+				( empty( $recipient_action ) ? '' : '&amp;recipient_action='.$recipient_action ) ),
 		'display_ID'           => false,
 		'display_btn_adduser'  => false,
 		'display_btn_addgroup' => false,

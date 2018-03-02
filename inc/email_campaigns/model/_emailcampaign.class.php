@@ -216,9 +216,11 @@ class EmailCampaign extends DataObject
 
 		global $DB;
 
+		// Manually skipped users are considered to have already received the email newsletter already
 		$DB->query( 'DELETE FROM T_email__campaign_send
 			WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
-			  AND csnd_emlog_ID IS NULL' );
+				AND csnd_emlog_ID IS NULL
+				AND NOT csnd_status = "skipped"' );
 	}
 
 
@@ -434,8 +436,9 @@ class EmailCampaign extends DataObject
 					break;
 				case 'skipped':
 					$recipient_type = 'skipped';
+					break;
 				case 'wait':
-					$recipient_type = 'readytosend';
+					$recipient_type = 'ready_to_send';
 					break;
 				case 'filter':
 				default:

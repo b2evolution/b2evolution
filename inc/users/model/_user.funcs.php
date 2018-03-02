@@ -3506,7 +3506,6 @@ function callback_filter_userlist( & $Form )
 		$campaign_send_status = array(
 				'' => T_('All'),
 				'ready_to_send' => T_('Ready to send'),
-				'ready_to_resend' => T_('Ready to resend'),
 				'sent' => T_('Sent'),
 				'send_error' => T_('Send error'),
 				'skipped' => T_('Skipped')
@@ -6653,9 +6652,9 @@ function user_td_campaign_actions( $campaign_ID, $user_ID, $csnd_status )
 
 	if( $current_User->can_moderate_user( $user_ID ) )
 	{ // Current user can moderate this user
-		$r .= action_icon( T_('Queue again'), 'rewind', $admin_url.'?ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign'),
+		$r .= action_icon( T_('Queue again'), 'rewind', regenerate_url( 'ctrl,action,filter', 'ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient' ),
 				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'ready_to_send', 'ready_to_resend' ) )  ? ' invisible' : '' ) ) );
-		$r .= action_icon( T_('Skip'), 'forward', $admin_url.'?ctrl=campaigns&amp;action=skip&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient&amp;'.url_crumb('campaign'),
+		$r .= action_icon( T_('Skip'), 'forward', regenerate_url( 'ctrl,action,filter', 'ctrl=campaigns&amp;action=skip&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient' ),
 				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'sent', 'send_error', 'skipped' ) ) ? ' invisible' : '' ) ) );
 	}
 	else

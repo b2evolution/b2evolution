@@ -196,6 +196,67 @@ function & get_session_EmailCampaign()
 
 
 /**
+ * Display link to filtered userlist
+ *
+ * @param Object EmailCampaign object
+ * @param String Recipient action on email campaign
+ * @return String <a> tag
+ */
+function campaign_td_recipient_action( $row, $recipient_action )
+{
+	global $admin_url;
+
+	if( empty( $row->send_count ) )
+	{
+		return NULL;
+	}
+
+	$url = $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID='.$row->ecmp_ID.'&amp;tab=recipient&amp;filter=new';
+
+	switch( $recipient_action )
+	{
+		case 'img_loaded':
+			$text = $row->open_count;
+			break;
+
+		case 'link_clicked':
+			$text = $row->click_count;
+			break;
+
+		case 'cta1':
+			$text = $row->cta1_count;
+			break;
+
+		case 'cta2':
+			$text = $row->cta2_count;
+			break;
+
+		case 'cta3':
+			$text = $row->cta3_count;
+			break;
+
+		case 'liked':
+			$text = $row->like_count;
+			$class = 'text-success';
+			break;
+
+		case 'disliked':
+			$text = $row->dislike_count;
+			$class = 'text-danger';
+			break;
+
+		case 'clicked_unsubscribe':
+			$text = $row->unsubscribe_click_count;
+			$class = 'text-danger';
+			break;
+	}
+
+	return '<a href="'.$url.( empty( $recipient_action ) ? '' : '&amp;recipient_action='.$recipient_action ).'"'.
+			( empty( $class ) ? '': ' class="'.$class.'"' ).'>'.$text.'</a>';
+}
+
+
+/**
  * Display the campaigns results table
  *
  * @param array Params
@@ -212,7 +273,7 @@ function campaign_results_block( $params = array() )
 
 	// Create result set:
 	$SQL = new SQL();
-	$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
+	$SQL->SELECT( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
 			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
 			ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
 			enlt_ID, enlt_name,
@@ -237,7 +298,7 @@ function campaign_results_block( $params = array() )
 			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag, enlt_ID, enlt_name' );
 
 	$count_SQL = new SQL();
-	$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( ecmp_ID )' );
+	$count_SQL->SELECT( 'COUNT( ecmp_ID )' );
 	$count_SQL->FROM( 'T_email__campaign' );
 	$count_SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 
@@ -337,7 +398,7 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #open_count#%'
+			'td' =>'%campaign_td_recipient_action( {row}, "img_loaded" )%',
 		);
 
 	$Results->cols[] = array(
@@ -346,42 +407,43 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #click_count#%'
+			'td' =>'%campaign_td_recipient_action( {row}, "link_clicked" )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => /* TRANS: Call To Action 1*/ T_('CTA1'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #cta1_count#%'
+			'td' =>'%campaign_td_recipient_action( {row}, "cta1" )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => /* TRANS: Call To Action 2*/ T_('CTA2'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #cta2_count#%'
+			'td' =>'%campaign_td_recipient_action( {row}, "cta2" )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => /* TRANS: Call To Action 3*/ T_('CTA3'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #cta3_count#%'
+			'td' =>'%campaign_td_recipient_action( {row}, "cta3" )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Likes'),
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #like_count#%'
+			'td_class' => 'center text-success',
+			'td' =>'%campaign_td_recipient_action( {row}, "liked" )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Dislikes'),
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #dislike_count#%'
+			'td_class' => 'center text-danger',
+			//'td' =>'%empty( #send_count# ) ? "" : #dislike_count#%'
+			'td' =>'%campaign_td_recipient_action( {row}, "disliked" )%',
 		);
 
 	$Results->cols[] = array(
@@ -389,8 +451,9 @@ function campaign_results_block( $params = array() )
 			'order' => 'unsubscribe_click_count',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #unsubscribe_click_count#%'
+			'td_class' => 'center text-danger',
+			//'td' =>'%empty( #send_count# ) ? "" : #unsubscribe_click_count#%'
+			'td' => '%campaign_td_recipient_action( {row}, "clicked_unsubscribe" )%'
 		);
 
 	$Results->cols[] = array(

@@ -17,7 +17,7 @@ global $admin_url, $UserSettings;
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE enlt_ID, enlt_name, enlt_label, enlt_active, enlt_order,
+$SQL->SELECT( 'enlt_ID, enlt_name, enlt_label, enlt_active, enlt_order,
 		SUM( IF( enls_subscribed = 1, 1, 0 ) ) AS subscribed,
 		SUM( IF( enls_subscribed = 0, 1, 0 ) ) AS unsubscribed' );
 $SQL->FROM( 'T_email__newsletter' );
@@ -25,7 +25,7 @@ $SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_enlt_ID = en
 $SQL->GROUP_BY( 'enlt_ID, enlt_name, enlt_label, enlt_active, enlt_order' );
 
 $count_SQL = new SQL();
-$count_SQL->SELECT( 'SQL_NO_CACHE COUNT(enlt_ID)' );
+$count_SQL->SELECT( 'COUNT(enlt_ID)' );
 $count_SQL->FROM( 'T_email__newsletter' );
 
 $Results = new Results( $SQL->get(), 'enlt_', 'A', NULL, $count_SQL->get() );
