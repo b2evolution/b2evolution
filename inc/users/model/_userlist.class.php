@@ -120,6 +120,7 @@ class UserList extends DataObjectList2
 				'newsletter_subscribed' => 1,     // 1 - only users with active subscription, 0 - only unsubscribed users, NULL - both
 				'ecmp'                => NULL,    // integer, Email Campaign ID
 				'recipient_type'      => NULL,    // string, Recipient type of email campaign: 'filtered', 'sent', 'readytosend'
+				'recipient_action'    => NULL,    // string, Recipient action on email campaign: 'img_loaded', 'link_clicked', 'cta1', 'cta2', 'cta3', 'liked', 'disliked', 'clicked_unsubscribe'
 				'user_tag'            => NULL,    // string, User tag
 		) );
 	}
@@ -273,6 +274,11 @@ class UserList extends DataObjectList2
 			 * Restrict by recipient type of email campaign
 			 */
 			memorize_param( 'recipient_type', 'string', $this->default_filters['recipient_type'], $this->filters['recipient_type'] );
+
+			/*
+			 * Restrict by recipient action on email campaign
+			 */
+			memorize_param( 'recipient_action', 'string', $this->default_filters['recipient_action'], $this->filters['recipient_action'] );
 
 			/*
 			 * Restrict by user tag
@@ -500,6 +506,11 @@ class UserList extends DataObjectList2
 		$this->filters['recipient_type'] = param( 'recipient_type', 'string', $this->default_filters['recipient_type'], true );
 
 		/*
+		 * Restrict by recipient action on email campaign
+		 */
+		$this->filters['recipient_action'] = param( 'recipient_action', 'string', $this->default_filters['recipient_action'], true );
+
+		/*
 		 * Restrict by user tag
 		 */
 		$this->filters['user_tag'] = param( 'user_tag', 'string', $this->default_filters['user_tag'], true );
@@ -599,7 +610,7 @@ class UserList extends DataObjectList2
 			$this->UserQuery->where_organization( $org_ID );
 		}
 		$this->UserQuery->where_newsletter( $this->filters['newsletter'], $this->filters['newsletter_subscribed']  );
-		$this->UserQuery->where_email_campaign( $this->filters['ecmp'], $this->filters['recipient_type'] );
+		$this->UserQuery->where_email_campaign( $this->filters['ecmp'], $this->filters['recipient_type'], $this->filters['recipient_action'] );
 		if( isset( $this->query_params['where_viewed_user'] ) )
 		{	// Filter by user profile viewed:
 			$this->UserQuery->where_viewed_user( $this->query_params['where_viewed_user'] );

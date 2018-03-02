@@ -24,6 +24,8 @@ class email_elements_plugin extends Plugin
 	var $help_topic = 'email-elements-plugin';
 	var $number_of_installs = 1;
 
+	var $cta_numbers = array( 1, 2, 3 );
+	var $cta_button_types = array( 'primary', 'success', 'warning', 'danger', 'info', 'default', 'link' );
 
 	/**
 	 * Init
@@ -110,6 +112,11 @@ class email_elements_plugin extends Plugin
 				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
 				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|dislike" value="<?php echo TS_('Dislike') ?>" />'
 
+				// Call to Action Button element
+				+ '<input type="button" title="<?php echo TS_('Call to Action') ?>"'
+				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|cta" value="<?php echo TS_('Call to Action') ?>" />'
+
 				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
 				jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
@@ -118,8 +125,34 @@ class email_elements_plugin extends Plugin
 		<?php echo $js_code_prefix;?>_insert_button = function( type )
 		{
 			var modal_window_title;
-			var r = '<form id="email_element_button_wrapper" class="form">'
-					+ '<div class="form-group"><label class="control-label"><?php echo T_('URL');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_url" /></div></div>'
+			var r = '<form id="email_element_button_wrapper" class="form">';
+
+			if( type == 'cta' )
+			{
+				r += '<div class="form-group"><label class="control-label"><?php echo T_('CTA number');?></label><div class="controls">'
+						+ '<select class="form-control" name="cta_num" style="width: auto;">'
+						<?php
+						foreach( $this->cta_numbers as $cta_num )
+						{
+							echo '+ \'<option value="'.$cta_num.'">'.$cta_num.'</option>\'';
+						}
+						?>
+						+ '</select>'
+						+ '</div></div>';
+
+				r += '<div class="form-group"><label class="control-label"><?php echo T_('Button type');?></label><div class="controls">'
+						+ '<select class="form-control" name="button_type" style="width: auto;">'
+						<?php
+						foreach( $this->cta_button_types as $button_type )
+						{
+							echo '+ \'<option value="'.$button_type.'">'.$button_type.'</option>\'';
+						}
+						?>
+						+ '</select>'
+						+ '</div></div>';
+			}
+
+			r += '<div class="form-group"><label class="control-label"><?php echo T_('URL');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_url" /></div></div>'
 					+ '<div class="form-group"><label class="control-label"><?php echo T_('Text');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_text" /></div></div>'
 					+ '</form>';
 
@@ -135,6 +168,10 @@ class email_elements_plugin extends Plugin
 
 				case 'dislike':
 					modal_window_title = '<?php echo TS_('Add a dislike button');?>';
+					break;
+
+				case 'cta':
+					modal_window_title = '<?php echo TS_('Add a call to action button');?>';
 					break;
 			}
 
@@ -190,6 +227,12 @@ class email_elements_plugin extends Plugin
 
 				case 'dislike':
 					shortTag = '[dislike:' + url + ']'+text+'[/dislike]'
+					break;
+
+				case 'cta':
+					var cta_num = jQuery( 'select[name=cta_num]', '#email_element_button_wrapper' ).val();
+					var button_type = jQuery( 'select[name=button_type]', '#email_element_button_wrapper' ).val();
+					shortTag = '[cta:' + cta_num + ':' + button_type + ':' + url + ']'+text+'[/cta]'
 					break;
 			}
 			textarea_wrap_selection( myField, shortTag, '', 0 );
@@ -250,7 +293,7 @@ class email_elements_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$search_pattern = '#\[(button|like|dislike):([^\[\]]*?)](.*?)\[\/\1]#';
+		$search_pattern = '#\[(button|like|dislike|cta):([^\[\]]*?)](.*?)\[\/\1]#';
 		preg_match_all( $search_pattern, $content, $matches );
 
 		if( ! empty( $matches[0] ) )
@@ -279,6 +322,37 @@ class email_elements_plugin extends Plugin
 							$url = url_add_param( $url, array( 'evo_mail_function' => $matches[1][$i] ) );
 							$link_tag = get_link_tag( $url, $button_text, 'div.btn a+a.btn-'.( $matches[1][$i] == 'like' ? 'success' : 'danger' ) );
 						}
+						break;
+
+					case 'cta':
+						$options = explode( ':', $matches[2][$i], 3 );
+						$cta_num = trim( $options[0] );
+						$button_type = trim( $options[1] );
+						$url = trim( $options[2] );
+						$text = trim( $matches[3][$i] );
+
+						if( ! in_array( $cta_num, $this->cta_numbers ) )
+						{
+							$link_tag = '<span style="color: red;">'.T_('Invalid CTA number parameter').'</span>';
+							break;
+						}
+
+						if( ! in_array( $button_type, $this->cta_button_types ) )
+						{
+							$link_tag = '<span style="color: red;">'.T_('Invalid CTA button type parameter').'</span>';
+							break;
+						}
+
+						if( empty( $text ) || empty( $url ) )
+						{
+							$link_tag = '';
+						}
+						else
+						{
+							$url = url_add_param( $url, array( 'evo_mail_function' => $matches[1][$i].$cta_num ) );
+							$link_tag = get_link_tag( $url, $text, $button_type == 'link' ? '' : 'div.btn a+a.btn-'.$button_type );
+						}
+
 						break;
 				}
 

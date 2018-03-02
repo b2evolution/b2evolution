@@ -379,8 +379,9 @@ switch( $action )
 		param( 'user_ID', 'integer', NULL );
 
 		queue_campaign_user( $ecmp_ID, $user_ID );
-		header_redirect( get_campaign_tab_url( 'recipient', $edited_EmailCampaign->ID ), 303 ); // Will EXIT
-		// We have EXITed already at this point!!
+
+		// Set this var to display again the same form where we can review and send campaign
+		$action = 'edit';
 		break;
 
 	case 'skip':
@@ -388,8 +389,9 @@ switch( $action )
 		param( 'user_ID', 'integer', NULL );
 
 		skip_campaign_user( $ecmp_ID, $user_ID );
-		header_redirect( get_campaign_tab_url( 'recipient', $edited_EmailCampaign->ID ), 303 ); // Will EXIT
-		// We have EXITed already at this point!!
+
+		// Set this var to display again the same form where we can review and send campaign
+		$action = 'edit';
 		break;
 }
 

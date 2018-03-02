@@ -43,6 +43,12 @@ class EmailCampaign extends DataObject
 
 	var $user_tag;
 
+	var $user_tag_cta1;
+
+	var $user_tag_cta2;
+
+	var $user_tag_cta3;
+
 	var $user_tag_like;
 
 	var $user_tag_dislike;
@@ -101,6 +107,9 @@ class EmailCampaign extends DataObject
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 			$this->auto_send = $db_row->ecmp_auto_send;
 			$this->user_tag = $db_row->ecmp_user_tag;
+			$this->user_tag_cta1 = $db_row->ecmp_user_tag_cta1;
+			$this->user_tag_cta2 = $db_row->ecmp_user_tag_cta2;
+			$this->user_tag_cta3 = $db_row->ecmp_user_tag_cta3;
 			$this->user_tag_like = $db_row->ecmp_user_tag_like;
 			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
 		}
@@ -207,9 +216,11 @@ class EmailCampaign extends DataObject
 
 		global $DB;
 
+		// Manually skipped users are considered to have already received the email newsletter already
 		$DB->query( 'DELETE FROM T_email__campaign_send
 			WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
-			  AND csnd_emlog_ID IS NULL' );
+				AND csnd_emlog_ID IS NULL
+				AND NOT csnd_status = "skipped"' );
 	}
 
 
@@ -425,8 +436,9 @@ class EmailCampaign extends DataObject
 					break;
 				case 'skipped':
 					$recipient_type = 'skipped';
+					break;
 				case 'wait':
-					$recipient_type = 'readytosend';
+					$recipient_type = 'ready_to_send';
 					break;
 				case 'filter':
 				default:
@@ -607,6 +619,21 @@ class EmailCampaign extends DataObject
 		if( param( 'ecmp_user_tag', 'string', NULL ) !== NULL )
 		{ // User tag:
 			$this->set_from_Request( 'user_tag' );
+		}
+
+		if( param( 'ecmp_user_tag_cta1', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_cta1' );
+		}
+
+		if( param( 'ecmp_user_tag_cta2', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_cta2' );
+		}
+
+		if( param( 'ecmp_user_tag_cta3', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_cta3' );
 		}
 
 		if( param( 'ecmp_user_tag_like', 'string', NULL ) !== NULL )
@@ -1114,6 +1141,7 @@ class EmailCampaign extends DataObject
 				if( $all_waiting_users_limited )
 				{	// Force a delay between chunks if all waiting users are limited to receive more newsletters for today:
 					$start_datetime += $Settings->get( 'email_campaign_cron_limited' );
+					// TRANS: %s is a time period like 58 minutes, 1 hour, 12 days, 1 year and etc.
 					$additional_message = ' '.sprintf( T_('Delaying next run by %s because all remaining recipients cannot accept additional emails for the current day.'), seconds_to_period( $Settings->get( 'email_campaign_cron_limited' ) ) );
 				}
 				else

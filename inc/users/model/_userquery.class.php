@@ -603,7 +603,7 @@ class UserQuery extends SQL
 	 * @param integer Email Campaign ID
 	 * @param string Recipient type of email campaign: 'filter', 'receive', 'wait'
 	 */
-	function where_email_campaign( $ecmp_ID, $recipient_type = '' )
+	function where_email_campaign( $ecmp_ID, $recipient_type = '', $recipient_action = '' )
 	{
 		global $DB;
 
@@ -618,7 +618,7 @@ class UserQuery extends SQL
 		$this->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_user_ID = user_ID AND csnd_camp_ID = '.$DB->quote( $ecmp_ID ) );
 
 		// Get email log date and time:
-		$this->SELECT_add( ', csnd_last_sent_ts, enls_user_ID, csnd_last_open_ts, csnd_last_click_ts, csnd_like' );
+		$this->SELECT_add( ', csnd_last_sent_ts, enls_user_ID, csnd_last_open_ts, csnd_last_click_ts, csnd_like, csnd_cta1, csnd_cta2, csnd_cta3' );
 
 		// Get subscription status:
 		$this->SELECT_add( ', enls_user_ID' );
@@ -628,17 +628,50 @@ class UserQuery extends SQL
 		switch( $recipient_type )
 		{
 			case 'ready_to_send':
-			case 'ready_to_resend':
+				// Get recipients which have already received this newsletter:
+				$this->WHERE_and( 'csnd_status IN ( "ready_to_send", "ready_to_resend" )' );
+				break;
+
 			case 'sent':
 			case 'send_error':
 			case 'skipped':
 				// Get recipients which have already received this newsletter:
 				$this->WHERE_and( 'csnd_status = "'.$recipient_type.'"' );
 				break;
+		}
 
-			case 'readytosend':
-				// Get recipients which have not received this newsletter yet:
-				$this->WHERE_and( 'csnd_status IN ( "ready_to_send", "ready_to_resend" )' );
+		switch( $recipient_action )
+		{
+			case 'img_loaded':
+				$this->WHERE_and( 'csnd_last_open_ts IS NOT NULL' );
+				break;
+
+			case 'link_clicked':
+				$this->WHERE_and( 'csnd_last_click_ts IS NOT NULL' );
+				break;
+
+			case 'cta1':
+				$this->WHERE_and( 'csnd_cta1 = 1' );
+				break;
+
+			case 'cta2':
+				$this->WHERE_and( 'csnd_cta2 = 1' );
+				break;
+
+			case 'cta3':
+				$this->WHERE_and( 'csnd_cta3 = 1' );
+				break;
+
+			case 'liked':
+				$this->WHERE_and( 'csnd_like = 1' );
+				break;
+
+			case 'disliked':
+				$this->WHERE_and( 'csnd_cta1 = -1' );
+				break;
+
+			case 'clicked_unsubsubcribe':
+				$this->WHERE_and( 'clicked_unsubscribe = 1' );
 				break;
 		}
 	}
