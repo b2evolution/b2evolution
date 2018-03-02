@@ -506,6 +506,8 @@ function step_td_actions( $step_ID, $is_first_step, $is_last_step )
 
 	$r .= action_icon( T_('Edit this step'), 'edit', $admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID );
 
+	$r .= action_icon( T_('Duplicate step right below current one'), 'copy', $admin_url.'?ctrl=automations&amp;action=copy_step&amp;step_ID='.$step_ID );
+
 	$r .= action_icon( T_('Delete this step!'), 'delete', regenerate_url( 'step_ID,action', 'step_ID='.$step_ID.'&amp;action=delete_step&amp;'.url_crumb( 'automationstep' ) ) );
 
 	return $r;
