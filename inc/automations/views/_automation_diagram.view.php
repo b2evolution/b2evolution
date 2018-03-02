@@ -17,9 +17,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $edited_Automation, $admin_url;
 
-// Print out HTML boxes for steps and Initialise steps data to build connectors between steps by JS code below:
-echo '<div class="evo_automation__diagram_canvas jtk-surface jtk-surface-nopan" id="evo_automation__diagram_canvas">';
+// Get data of all steps for diagram view:
 $steps = $edited_Automation->get_diagram_steps_data();
+
+if( count( $steps ) > 0 )
+{	// Display a button to reset a diagram layout to default positions:
+	echo '<a href="'.$admin_url.'?ctrl=automations&amp;action=reset_diagram&amp;autm_ID='.$edited_Automation->ID.'&amp;'.url_crumb( 'automationstep' ).'"'
+				.' class="btn btn-danger pull-right" onclick="return confirm( \''.TS_('Are you sure want to reset steps to default positions?').'\' )">'
+			.T_('Reset layout')
+		.'</a>';
+}
+
+// Print out HTML boxes for steps and Initialise steps data to build connectors between steps by JS code below:
+echo '<div class="evo_automation__diagram_canvas jtk-surface jtk-surface-nopan clear" id="evo_automation__diagram_canvas">';
 foreach( $steps as $step )
 {
 	// Print box of step with data:
@@ -34,7 +44,7 @@ echo '</div>';
 <script type="text/javascript">
 jQuery( document ).ready( function()
 {	// CSS fix to make diagram canvas full height:
-	jQuery( '#evo_automation__diagram_canvas' ).css( 'height', jQuery( window ).height() - 305 );
+	jQuery( '#evo_automation__diagram_canvas' ).css( 'height', jQuery( window ).height() - 343	 );
 	/*var evo_diagram_canvas_parent = jQuery( '#evo_automation__diagram_canvas' ).parent();
 	while( evo_diagram_canvas_parent.length > 0 )
 	{

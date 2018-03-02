@@ -490,6 +490,27 @@ switch( $action )
 		// Exit here because we don't need UI for this AJAX action:
 		exit;
 
+	case 'reset_diagram':
+		// Reset steps positions on automation diagram to default positions:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Reset positions of all steps of the edited Automation:
+		$DB->query( 'UPDATE T_automation__step
+			  SET step_diagram = NULL
+			WHERE step_autm_ID = '.$DB->quote( $edited_Automation->ID ) );
+
+		$Messages->add( T_('Diagram layout has been reseted.'), 'success' );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=diagram&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
 	case 'delete_step':
 		// Delete Automation Step:
 
