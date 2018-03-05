@@ -9439,6 +9439,42 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13120, 'Converting columns to ASCII...' ) )
+	{	// part of 7.0.0-alpha
+		db_modify_col( 'T_automation__automation', 'autm_status', 'ENUM("paused", "active") COLLATE ascii_general_ci DEFAULT "paused"' );
+		db_upgrade_cols( 'T_blogs', array(
+			'MODIFY' => array(
+				'blog_locale'        => 'VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT "en-EU"',
+				'blog_http_protocol' => 'ENUM( "always_redirect", "allow_both" ) COLLATE ascii_general_ci DEFAULT "always_redirect"',
+			),
+		) );
+		db_modify_col( 'T_comments', 'comment_notif_flags', 'SET("moderators_notified","members_notified","community_notified") COLLATE ascii_general_ci NOT NULL DEFAULT ""' );
+		db_modify_col( 'T_email__log', 'emlog_key', 'CHAR(32) COLLATE ascii_general_ci NULL DEFAULT NULL' );
+		db_upgrade_cols( 'T_filetypes', array(
+			'MODIFY' => array(
+				'ftyp_mimetype' => 'varchar(50) COLLATE ascii_general_ci NOT NULL',
+				'ftyp_icon'     => 'varchar(20) COLLATE ascii_general_ci default NULL',
+			),
+		) );
+		db_upgrade_cols( 'T_hitlog', array(
+			'MODIFY' => array(
+				'hit_disp'   => 'VARCHAR(30) COLLATE ascii_general_ci DEFAULT NULL',
+				'hit_action' => 'VARCHAR(30) COLLATE ascii_general_ci DEFAULT NULL',
+			),
+		) );
+		db_modify_col( 'T_i18n_translated_string', 'itst_locale', 'varchar(20) COLLATE ascii_general_ci NOT NULL default ""' );
+		db_upgrade_cols( 'T_items__item', array(
+			'MODIFY' => array(
+				'post_locale'              => 'VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT "en-EU"',
+				'post_notifications_flags' => 'SET("moderators_notified","members_notified","community_notified","pings_sent") COLLATE ascii_general_ci NOT NULL DEFAULT ""',
+			),
+		) );
+		db_modify_col( 'T_locales', 'loc_locale', 'varchar(20) COLLATE ascii_general_ci NOT NULL default ""' );
+		db_modify_col( 'T_skins__skin', 'skin_class', 'varchar(32) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_users', 'user_locale', 'varchar(20) COLLATE ascii_general_ci DEFAULT "en-EU" NOT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

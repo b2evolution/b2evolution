@@ -45,13 +45,13 @@ $schema_queries['T_files'] = array(
 $schema_queries['T_filetypes'] = array(
 		'Creating table for file types',
 		"CREATE TABLE T_filetypes (
-			ftyp_ID int(11) unsigned NOT NULL auto_increment,
+			ftyp_ID         int(11) unsigned NOT NULL auto_increment,
 			ftyp_extensions varchar(30) COLLATE ascii_general_ci NOT NULL,
-			ftyp_name varchar(30) NOT NULL,
-			ftyp_mimetype varchar(50) NOT NULL,
-			ftyp_icon varchar(20) default NULL,
-			ftyp_viewtype varchar(10) COLLATE ascii_general_ci NOT NULL,
-			ftyp_allowed enum('any','registered','admin') COLLATE ascii_general_ci NOT NULL default 'admin',
+			ftyp_name       varchar(30) NOT NULL,
+			ftyp_mimetype   varchar(50) COLLATE ascii_general_ci NOT NULL,
+			ftyp_icon       varchar(20) COLLATE ascii_general_ci default NULL,
+			ftyp_viewtype   varchar(10) COLLATE ascii_general_ci NOT NULL,
+			ftyp_allowed    enum('any','registered','admin') COLLATE ascii_general_ci NOT NULL default 'admin',
 			PRIMARY KEY (ftyp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 

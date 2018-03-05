@@ -89,7 +89,7 @@ $schema_queries = array(
 			user_nickname varchar(50) NULL,
 			user_url varchar(255) NULL,
 			user_level int unsigned DEFAULT 0 NOT NULL,
-			user_locale varchar(20) DEFAULT 'en-EU' NOT NULL,
+			user_locale varchar(20) COLLATE ascii_general_ci DEFAULT 'en-EU' NOT NULL,
 			user_unsubscribe_key CHAR(32) COLLATE ascii_general_ci NOT NULL default '' COMMENT 'A specific key, it is used when a user wants to unsubscribe from a post comments without signing in',
 			user_gender char(1) COLLATE ascii_general_ci NULL,
 			user_age_min int unsigned NULL,
@@ -247,7 +247,7 @@ $schema_queries = array(
 		"CREATE TABLE T_i18n_translated_string (
 			itst_ID       int(10) unsigned NOT NULL auto_increment,
 			itst_iost_ID  int(10) unsigned NOT NULL,
-			itst_locale   varchar(20) NOT NULL default '',
+			itst_locale   varchar(20) COLLATE ascii_general_ci NOT NULL default '',
 			itst_standard varchar(10000) NOT NULL default '',
 			itst_custom   varchar(10000) NULL,
 			itst_inpofile tinyint(1) NOT NULL DEFAULT 0,
@@ -258,7 +258,7 @@ $schema_queries = array(
 	'T_locales' => array(
 		'Creating table for Locales',
 		"CREATE TABLE T_locales (
-			loc_locale varchar(20) NOT NULL default '',
+			loc_locale varchar(20) COLLATE ascii_general_ci NOT NULL default '',
 			loc_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'y-m-d',
 			loc_longdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y-m-d',
 			loc_extdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y M d',
@@ -472,7 +472,7 @@ $schema_queries = array(
 		'Creating email log table',
 		"CREATE TABLE T_email__log (
 			emlog_ID            INT(10) UNSIGNED NOT NULL auto_increment,
-			emlog_key           CHAR(32) NULL DEFAULT NULL,
+			emlog_key           CHAR(32) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			emlog_timestamp     TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			emlog_user_ID       INT(10) UNSIGNED DEFAULT NULL,
 			emlog_to            VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
@@ -592,7 +592,7 @@ $schema_queries = array(
 		"CREATE TABLE T_automation__automation (
 			autm_ID            INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			autm_name          VARCHAR(255) NOT NULL,
-			autm_status        ENUM('paused', 'active') DEFAULT 'paused',
+			autm_status        ENUM('paused', 'active') COLLATE ascii_general_ci DEFAULT 'paused',
 			autm_owner_user_ID INT UNSIGNED NOT NULL,
 			PRIMARY KEY        (autm_ID)
 		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
