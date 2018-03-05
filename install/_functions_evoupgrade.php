@@ -9475,6 +9475,102 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13130, 'Converting columns to utf8mb4...' ) )
+	{	// part of 7.0.0-alpha
+		// Modify indexes with max 767 chars(191 * 4 bytes):
+		db_add_index( 'T_users__organization', 'org_name', 'org_name(191)', 'UNIQUE' );
+		db_add_index( 'T_users__tag', 'utag_name', 'utag_name(191)', 'UNIQUE' );
+		db_add_index( 'T_users__fields', 'uf_varchar', 'uf_varchar(191)' );
+		db_add_index( 'T_users__organization', 'org_name', 'org_name(191)', 'UNIQUE' );
+		db_add_index( 'T_users__tag', 'utag_name', 'utag_name(191)', 'UNIQUE' );
+
+		// These columns must be updated from utf8_general_ci to utf8mb4_unicode_ci:
+		$tables = array(
+			'T_antispam__keyword'          => array( 'askw_string' ),
+			'T_automation__automation'     => array( 'autm_name' ),
+			'T_automation__step'           => array( 'step_label', 'step_info' ),
+			'T_basedomains'                => array( 'dom_comment' ),
+			'T_blogs'                      => array( 'blog_shortname', 'blog_name', 'blog_tagline', 'blog_shortdesc', 'blog_longdesc', 'blog_notes', 'blog_keywords' ),
+			'T_categories'                 => array( 'cat_name', 'cat_description' ),
+			'T_coll_settings'              => array( 'cset_value' ),
+			'T_comments'                   => array( 'comment_author', 'comment_content' ),
+			'T_comments__prerendering'     => array( 'cmpr_content_prerendered' ),
+			'T_cron__log'                  => array( 'clog_messages' ),
+			'T_cron__task'                 => array( 'ctsk_name', 'ctsk_params' ),
+			'T_email__campaign'            => array( 'ecmp_email_title', 'ecmp_email_html', 'ecmp_email_text', 'ecmp_email_plaintext', 'ecmp_user_tag', 'ecmp_user_tag_cta1', 'ecmp_user_tag_cta2', 'ecmp_user_tag_cta3', 'ecmp_user_tag_like', 'ecmp_user_tag_dislike' ),
+			'T_email__log'                 => array( 'emlog_subject', 'emlog_headers', 'emlog_message' ),
+			'T_email__newsletter'          => array( 'enlt_name', 'enlt_label' ),
+			'T_email__returns'             => array( 'emret_errormsg', 'emret_headers', 'emret_message' ),
+			'T_files'                      => array( 'file_title', 'file_alt', 'file_desc' ),
+			'T_filetypes'                  => array( 'ftyp_name' ),
+			'T_groups'                     => array( 'grp_name' ), 
+			'T_groups__groupsettings'      => array( 'gset_value' ),
+			'T_hitlog'                     => array( 'hit_keyphrase' ),
+			'T_i18n_original_string'       => array( 'iost_string' ),
+			'T_items__item'                => array( 'post_content', 'post_excerpt', 'post_title', 'post_titletag' ),
+			'T_items__item_settings'       => array( 'iset_value' ),
+			'T_items__prerendering'        => array( 'itpr_content_prerendered' ),
+			'T_items__status'              => array( 'pst_name' ),
+			'T_items__type'                => array( 'ityp_name', 'ityp_description', 'ityp_instruction', 'ityp_comment_form_msg' ),
+			'T_items__type_custom_field'   => array( 'itcf_label', 'itcf_note' ),
+			'T_items__version'             => array( 'iver_title', 'iver_content' ),
+			'T_locales'                    => array( 'loc_name', 'loc_messages', 'loc_transliteration_map' ),
+			'T_messaging__contact_groups'  => array( 'cgr_name' ),
+			'T_messaging__message'         => array( 'msg_text' ),
+			'T_messaging__prerendering'    => array( 'mspr_content_prerendered' ),
+			'T_messaging__thread'          => array( 'thrd_title' ),
+			'T_plugingroupsettings'        => array( 'pgset_value' ),
+			'T_plugins'                    => array( 'plug_name', 'plug_shortdesc' ),
+			'T_pluginsettings'             => array( 'pset_value' ),
+			'T_pluginusersettings'         => array( 'puset_value' ),
+			'T_polls__option'              => array( 'popt_option_text' ),
+			'T_polls__question'            => array( 'pqst_question_text' ),
+			'T_regional__city'             => array( 'city_name' ),
+			'T_regional__country'          => array( 'ctry_name' ),
+			'T_regional__currency'         => array( 'curr_shortcut', 'curr_name' ),
+			'T_regional__region'           => array( 'rgn_name' ),
+			'T_regional__subregion'        => array( 'subrg_name' ),
+			'T_section'                    => array( 'sec_name' ),
+			'T_settings'                   => array( 'set_value' ),
+			'T_skins__skin'                => array( 'skin_name' ),
+			'T_syslog'                     => array( 'slg_message' ),
+			'T_track__goal'                => array( 'goal_name', 'goal_notes' ),
+			'T_track__goalcat'             => array( 'gcat_name' ),
+			'T_track__goalhit'             => array( 'ghit_params' ),
+			'T_users'                      => array( 'user_firstname', 'user_lastname', 'user_nickname' ),
+			'T_users__fielddefs'           => array( 'ufdf_name', 'ufdf_options', 'ufdf_bubbletip' ),
+			'T_users__fieldgroups'         => array( 'ufgp_name' ),
+			'T_users__fields'              => array( 'uf_varchar' ),
+			'T_users__organization'        => array( 'org_name' ),
+			'T_users__reports'             => array( 'urep_info' ),
+			'T_users__tag'                 => array( 'utag_name' ),
+			'T_users__usersettings'        => array( 'uset_value' ),
+			'T_users__user_org'            => array( 'uorg_role' ),
+			'T_widget__container'          => array( 'wico_name' ),
+			'T_widget__widget'             => array( 'wi_params' ),
+		);
+
+		// Run updating:
+		foreach( $tables as $table => $columns )
+		{
+			$columns = $DB->get_results( 'SHOW FULL COLUMNS FROM `'.$table.'` WHERE field IN ( "'.implode( '", "', $columns ).'" )' );
+			$col_definitions = array();
+			foreach( $columns as $col )
+			{	// Update a column character set explicitly to utf8mb4:
+				$col_definition = $col->Field.
+					' '.$col->Type.' COLLATE utf8mb4_unicode_ci'.
+					( ( $col->Null == 'NO' ) ? ' NOT' : '' ).' NULL'.
+					( isset( $col->Default ) ? ' DEFAULT "'.$col->Default.'"' : '' ).
+					( isset( $col->Extra ) ? ' '.$col->Extra : '' ).
+					( isset( $col->Comment ) ? ' COMMENT "'.$col->Comment.'"' : '' );
+				$col_definitions[] = 'MODIFY '.$col_definition;
+			}
+			$DB->query( 'ALTER TABLE `'.$table.'` '.implode( ', ', $col_definitions ) );
+		}
+
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

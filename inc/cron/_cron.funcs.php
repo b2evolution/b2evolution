@@ -451,7 +451,7 @@ function cron_job_sql_query( $fields = 'key,name' )
 	// We need to set the collation explicitly if the current db connection charset is utf-8 in order to avoid "Illegal mix of collation" issue
 	// Basically this is a hack which should be reviewed when the charset issues are fixed generally.
 	// TODO: asimo>Review this temporary solution after the charset issues were fixed.
-	$default_collation = ( $DB->connection_charset == 'utf8' ) ? ' COLLATE utf8_general_ci' : '';
+	$default_collation = ( $DB->connection_charset == 'utf8' ) ? ' COLLATE utf8mb4_unicode_ci' : '';
 
 	$name_query = '';
 	if( !empty( $cron_jobs_config ) )

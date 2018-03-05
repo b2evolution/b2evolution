@@ -28,7 +28,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_polls__question (
 			pqst_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			pqst_owner_user_ID INT(11) UNSIGNED NOT NULL,
-			pqst_question_text VARCHAR(2000) NULL,
+			pqst_question_text VARCHAR(2000) COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY (pqst_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -37,7 +37,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_polls__option (
 			popt_ID          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			popt_pqst_ID     INT(11) UNSIGNED NOT NULL,
-			popt_option_text VARCHAR(2000) NULL,
+			popt_option_text VARCHAR(2000) COLLATE utf8mb4_unicode_ci NULL,
 			popt_order       INT(11) NOT NULL,
 			PRIMARY KEY (popt_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

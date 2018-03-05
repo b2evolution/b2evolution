@@ -28,7 +28,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_skins__skin (
 				skin_ID      int(10) unsigned NOT NULL auto_increment,
 				skin_class   varchar(32) COLLATE ascii_general_ci NOT NULL,
-				skin_name    varchar(32) NOT NULL,
+				skin_name    varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
 				skin_type    enum('normal','feed','sitemap','mobile','tablet','rwd') COLLATE ascii_general_ci NOT NULL default 'normal',
 				skin_folder  varchar(32) NOT NULL,
 				PRIMARY KEY skin_ID (skin_ID),
@@ -42,20 +42,20 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_blogs (
 			blog_ID              int(11) unsigned NOT NULL auto_increment,
 			blog_sec_ID          INT(11) UNSIGNED NOT NULL DEFAULT 1,
-			blog_shortname       varchar(255) NULL default '',
-			blog_name            varchar(255) NOT NULL default '',
+			blog_shortname       varchar(255) COLLATE utf8mb4_unicode_ci NULL default '',
+			blog_name            varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL default '',
 			blog_owner_user_ID   int(11) unsigned NOT NULL default 1,
 			blog_advanced_perms  TINYINT(1) NOT NULL default 0,
-			blog_tagline         varchar(250) NULL default '',
-			blog_shortdesc       varchar(250) NULL default '',
-			blog_longdesc        TEXT NULL DEFAULT NULL,
+			blog_tagline         varchar(250) COLLATE utf8mb4_unicode_ci NULL default '',
+			blog_shortdesc       varchar(250) COLLATE utf8mb4_unicode_ci NULL default '',
+			blog_longdesc        TEXT COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			blog_locale          VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'en-EU',
 			blog_access_type     VARCHAR(10) COLLATE ascii_general_ci NOT NULL DEFAULT 'extrapath',
 			blog_http_protocol   ENUM( 'always_redirect', 'allow_both' ) COLLATE ascii_general_ci DEFAULT 'always_redirect',
 			blog_siteurl         varchar(120) NOT NULL default '',
 			blog_urlname         VARCHAR(255) COLLATE ascii_general_ci NOT NULL DEFAULT 'urlname',
-			blog_notes           TEXT NULL,
-			blog_keywords        tinytext,
+			blog_notes           TEXT COLLATE utf8mb4_unicode_ci NULL,
+			blog_keywords        tinytext COLLATE utf8mb4_unicode_ci,
 			blog_allowtrackbacks TINYINT(1) NOT NULL default 0,
 			blog_allowblogcss    TINYINT(1) NOT NULL default 1,
 			blog_allowusercss    TINYINT(1) NOT NULL default 1,
@@ -78,7 +78,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating sections table',
 		"CREATE TABLE T_section (
 			sec_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			sec_name          VARCHAR(255) NOT NULL,
+			sec_name          VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
 			sec_order         INT(11) NOT NULL,
 			sec_owner_user_ID INT(11) UNSIGNED NOT NULL default 1,
 			PRIMARY KEY ( sec_ID )
@@ -89,7 +89,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_coll_settings (
 			cset_coll_ID INT(11) UNSIGNED NOT NULL,
 			cset_name    VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
-			cset_value   VARCHAR( 10000 ) NULL COMMENT 'The AdSense plugin wants to store very long snippets of HTML',
+			cset_value   VARCHAR( 10000 ) COLLATE utf8mb4_unicode_ci NULL COMMENT 'The AdSense plugin wants to store very long snippets of HTML',
 			PRIMARY KEY ( cset_coll_ID, cset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -99,7 +99,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			wico_ID        INT(10) UNSIGNED auto_increment,
 			wico_code      VARCHAR(32) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			wico_skin_type ENUM( 'normal', 'mobile', 'tablet' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'normal',
-			wico_name      VARCHAR( 40 ) NOT NULL,
+			wico_name      VARCHAR( 40 ) COLLATE utf8mb4_unicode_ci NOT NULL,
 			wico_coll_ID   INT(10) NULL DEFAULT NULL,
 			wico_order     INT(10) NOT NULL,
 			wico_main      TINYINT(1) NOT NULL DEFAULT 0,
@@ -116,7 +116,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			wi_enabled    TINYINT(1) NOT NULL DEFAULT 1,
 			wi_type       ENUM( 'core', 'plugin' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'core',
 			wi_code       VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
-			wi_params     TEXT NULL,
+			wi_params     TEXT COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY ( wi_ID ),
 			UNIQUE wi_order( wi_wico_ID, wi_order )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -126,12 +126,12 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_categories (
 			cat_ID              int(10) unsigned NOT NULL auto_increment,
 			cat_parent_ID       int(10) unsigned NULL,
-			cat_name            varchar(255) NOT NULL,
+			cat_name            varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
 			cat_urlname         varchar(255) COLLATE ascii_general_ci NOT NULL,
 			cat_blog_ID         int(10) unsigned NOT NULL default 2,
 			cat_image_file_ID   int(10) unsigned NULL,
 			cat_social_media_image_file_ID int(10) unsigned NULL,
-			cat_description     varchar(255) NULL DEFAULT NULL,
+			cat_description     varchar(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			cat_order           int(11) NULL DEFAULT NULL,
 			cat_subcat_ordering enum('parent', 'alpha', 'manual') COLLATE ascii_general_ci NULL DEFAULT NULL,
 			cat_meta            tinyint(1) NOT NULL DEFAULT 0,
@@ -163,14 +163,14 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_pst_ID                 int(11) unsigned NULL,
 			post_ityp_ID                int(10) unsigned NOT NULL DEFAULT 1,
 			post_locale                 VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'en-EU',
-			post_content                MEDIUMTEXT NULL,
-			post_excerpt                text NULL,
+			post_content                MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
+			post_excerpt                text COLLATE utf8mb4_unicode_ci NULL,
 			post_excerpt_autogenerated  TINYINT(1) NOT NULL DEFAULT 1,
-			post_title                  VARCHAR(255) NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			post_title                  VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			post_urltitle               VARCHAR(210) COLLATE ascii_general_ci NOT NULL,
 			post_canonical_slug_ID      int(10) unsigned NULL DEFAULT NULL,
 			post_tiny_slug_ID           int(10) unsigned NULL DEFAULT NULL,
-			post_titletag               VARCHAR(255) NULL DEFAULT NULL,
+			post_titletag               VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			post_url                    VARCHAR(255) NULL DEFAULT NULL,
 			post_main_cat_ID            int(11) unsigned NOT NULL,
 			post_notifications_status   ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq',
@@ -219,14 +219,14 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_status             ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'draft' NOT NULL,
 			comment_in_reply_to_cmt_ID INT(10) unsigned NULL,
 			comment_author_user_ID     int unsigned NULL default NULL,
-			comment_author             varchar(100) NULL,
+			comment_author             varchar(100) COLLATE utf8mb4_unicode_ci NULL,
 			comment_author_email       varchar(255) COLLATE ascii_general_ci NULL,
 			comment_author_url         varchar(255) NULL,
 			comment_author_IP          varchar(45) COLLATE ascii_general_ci NOT NULL default '',"/* IPv4 mapped IPv6 addresses maximum length is 45 chars: ex. ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190 */."
 			comment_IP_ctry_ID         int(10) unsigned NULL,
 			comment_date               TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			comment_last_touched_ts    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			comment_content            text NOT NULL,
+			comment_content            text COLLATE utf8mb4_unicode_ci NOT NULL,
 			comment_renderers          VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			comment_rating             TINYINT(1) NULL DEFAULT NULL,
 			comment_featured           TINYINT(1) NOT NULL DEFAULT 0,
@@ -267,7 +267,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
 			itpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
 			itpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
-			itpr_content_prerendered      MEDIUMTEXT NULL,
+			itpr_content_prerendered      MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
 			itpr_datemodified             TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -278,7 +278,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cmpr_cmt_ID                   INT(11) UNSIGNED NOT NULL,
 			cmpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
 			cmpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
-			cmpr_content_prerendered      MEDIUMTEXT NULL,
+			cmpr_content_prerendered      MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
 			cmpr_datemodified             TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY (cmpr_cmt_ID, cmpr_format)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -291,8 +291,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			iver_edit_user_ID  INT UNSIGNED NULL,
 			iver_edit_datetime TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			iver_status        ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NULL,
-			iver_title         VARCHAR(255) NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
-			iver_content       MEDIUMTEXT NULL,
+			iver_title         VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			iver_content       MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
 			INDEX iver_ID_itm_ID ( iver_ID , iver_itm_ID ),
 			INDEX iver_edit_user_ID ( iver_edit_user_ID )
 		) ENGINE = innodb ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -301,7 +301,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for Post Statuses',
 		"CREATE TABLE T_items__status (
 			pst_ID   int(11) unsigned not null AUTO_INCREMENT,
-			pst_name varchar(30)      not null,
+			pst_name varchar(30) COLLATE utf8mb4_unicode_ci not null,
 			primary key ( pst_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -309,13 +309,13 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for Post Types',
 		"CREATE TABLE T_items__type (
 			ityp_ID                INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			ityp_name              VARCHAR(30) NOT NULL,
-			ityp_description       TEXT NULL DEFAULT NULL,
+			ityp_name              VARCHAR(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+			ityp_description       TEXT COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			ityp_usage             VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'post',
 			ityp_template_name     VARCHAR(40) NULL DEFAULT NULL,
 			ityp_front_instruction TINYINT DEFAULT 0,
 			ityp_back_instruction  TINYINT DEFAULT 0,
-			ityp_instruction       TEXT NULL DEFAULT NULL,
+			ityp_instruction       TEXT COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			ityp_use_title         ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'required',
 			ityp_use_url           ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_podcast           TINYINT(1) DEFAULT 0,
@@ -337,7 +337,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_use_coordinates   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
 			ityp_use_custom_fields TINYINT DEFAULT 1,
 			ityp_use_comments      TINYINT DEFAULT 1,
-			ityp_comment_form_msg         TEXT NULL DEFAULT NULL,
+			ityp_comment_form_msg         TEXT COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			ityp_allow_comment_form_msg   TINYINT DEFAULT 0,
 			ityp_allow_closing_comments   TINYINT DEFAULT 1,
 			ityp_allow_disabling_comments TINYINT DEFAULT 0,
@@ -351,11 +351,11 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_items__type_custom_field (
 			itcf_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			itcf_ityp_ID INT(11) UNSIGNED NOT NULL,
-			itcf_label   VARCHAR(255) NOT NULL,
+			itcf_label   VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
 			itcf_name    VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
 			itcf_type    ENUM( 'double', 'varchar', 'text', 'html', 'url' ) COLLATE ascii_general_ci NOT NULL,
 			itcf_order   INT NULL,
-			itcf_note    VARCHAR(255) NULL DEFAULT NULL,
+			itcf_note    VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			PRIMARY KEY ( itcf_ID ),
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -409,7 +409,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_items__item_settings (
 			iset_item_ID  int(10) unsigned NOT NULL,
 			iset_name     varchar( 50 ) COLLATE ascii_general_ci NOT NULL,
-			iset_value    varchar( 10000 ) NULL,
+			iset_value    varchar( 10000 ) COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY ( iset_item_ID, iset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
