@@ -9172,6 +9172,35 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12650, 'Upgrading email campaign table...' ) )
+	{ // part of 6.10.0-beta
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_user_tag_cta1' => 'VARCHAR(255) NULL AFTER ecmp_user_tag',
+				'ecmp_user_tag_cta2' => 'VARCHAR(255) NULL AFTER ecmp_user_tag_cta1',
+				'ecmp_user_tag_cta3' => 'VARCHAR(255) NULL AFTER ecmp_user_tag_cta2',
+			),
+		) );
+
+		db_upgrade_cols( 'T_email__campaign_send', array(
+			'ADD' => array(
+				'csnd_cta1' => 'TINYINT(1) NULL DEFAULT NULL AFTER csnd_like',
+				'csnd_cta2' => 'TINYINT(1) NULL DEFAULT NULL AFTER csnd_cta1',
+				'csnd_cta3' => 'TINYINT(1) NULL DEFAULT NULL AFTER csnd_cta2',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12660, 'Updating user settings table...' ) )
+	{	// part of 6.10.0-beta
+		$DB->query( 'REPLACE INTO T_users__usersettings ( uset_user_ID, uset_name, uset_value )
+			SELECT user_ID, "welcome_message_sent", 1
+			  FROM T_users
+			 WHERE user_status IN ( "activated", "autoactivated" ) ' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

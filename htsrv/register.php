@@ -147,7 +147,7 @@ switch( $action )
 			}
 
 			if( empty( $widget ) && $is_inline )
-			{ // Request from shorttag
+			{	// Set params for a request from inline tag "[emailcapture:]" :
 				$source = param( 'source', 'string', true );
 				$ask_firstname = param( 'ask_firstname', 'string', true );
 				$ask_lastname = param( 'ask_lastname', 'string', true );
@@ -164,7 +164,7 @@ switch( $action )
 				$widget_redirect_to = param( 'redirect_to', 'string', true );
 			}
 			else
-			{
+			{	// Set params for a request from widget quick registration:
 				$WidgetCache = & get_WidgetCache();
 				$user_register_Widget = & $WidgetCache->get_by_ID( $widget, false, false );
 				if( ! $user_register_Widget ||
@@ -531,9 +531,8 @@ switch( $action )
 		// extra confusion when account validation is required.
 		$Session->set_User( $new_User );
 
-		// Set redirect_to from current widget:
-		if( isset( $user_register_Widget ) )
-		{	// If widget is defined:
+		if( $is_quick )
+		{	// Set redirect_to after quick registration from widget or inline tag "[emailcapture:]":
 			if( ! empty( $widget_redirect_to ) )
 			{	// If a redirect param is defined:
 				if( preg_match( '#^(https?://|/)#i', $widget_redirect_to ) )
@@ -552,10 +551,6 @@ switch( $action )
 
 			if( $Settings->get( 'registration_after_quick' ) == 'regform' )
 			{	// If we should display additional registration screen after quick registration:
-				if( empty( $Blog ) )
-				{	// Use widget collection if global collection is not defined:
-					$Blog = & $user_register_Widget->get_Blog();
-				}
 				$Messages->add( T_('Please double check your email address and choose a password so that you can log in next time you visit us.'), 'warning' );
 				$widget_redirect_to_url = $Blog->get( 'register_finishurl', array(
 						'glue'       => '&',

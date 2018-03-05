@@ -102,7 +102,7 @@ class EmailTrackingHelper
 		$passthrough_url = $this->get_passthrough_url();
 
 		$unsubscribe_link_re = '/quick_unsubscribe\.php(?:[^\<\>])+type=(newsletter)/';
-		$email_func_re = '/(?:\?|&)evo_mail_function=(like|dislike)&?/';
+		$email_func_re = '/(?:\?|&)evo_mail_function=(like|dislike|cta(?:1|2|3))&?/';
 
 		switch( $this->content_type )
 		{
@@ -132,6 +132,18 @@ class EmailTrackingHelper
 
 						case 'dislike':
 							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 4 ) );
+							break;
+
+						case 'cta1':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 5 ) );
+							break;
+
+						case 'cta2':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 6 ) );
+							break;
+
+						case 'cta3':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 7 ) );
 							break;
 					}
 
@@ -178,6 +190,18 @@ class EmailTrackingHelper
 
 						case 'dislike':
 							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 4 ) );
+							break;
+
+						case 'cta1':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 5 ) );
+							break;
+
+						case 'cta2':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 6 ) );
+							break;
+
+						case 'cta3':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 7 ) );
 							break;
 					}
 

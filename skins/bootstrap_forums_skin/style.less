@@ -67,6 +67,23 @@ ol.breadcrumb {
 	}
 }
 
+.fa.icon_new {
+	text-align: center;
+	background: #FFF;
+	border: 2px solid #FF6600;
+	.border-radius(50%);
+	width: 21px;
+	height: 21px;
+	line-height: 18px;
+	font-size: 12px;
+	&.big {
+		width: 28px;
+		height: 28px;
+		line-height: 25px;
+		font-size: 16px;
+	}
+}
+
 // Forums table list
 .forums_list {
 	//Disp=posts pagination
@@ -174,6 +191,12 @@ ol.breadcrumb {
 		float: left;
 		.fa.fa-comments {
 			color: #000000;
+			&.updated {
+				color: #990000;
+			}
+			&.new {
+				color: #FF6600;
+			}
 		}
 		.fa.fa-comments:hover {
 			color: inherit;
@@ -396,6 +419,15 @@ ol.breadcrumb {
 .legend-item {
 	margin: 0px 5px 12px 5px;
 	display: inline-block;
+	.fa.fa-comments {
+		color: #000000;
+		&.updated {
+			color: #990000;
+		}
+		&.new {
+			color: #FF6600;
+		}
+	}
 }
 ul.legend {
 	list-style: none;

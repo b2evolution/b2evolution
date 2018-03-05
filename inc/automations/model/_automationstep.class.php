@@ -914,7 +914,7 @@ class AutomationStep extends DataObject
 						.( isset( $value[1] ) ? ' '.$value[1].'s' : '' ).' ago';
 					$rule_newsletter_ID = isset( $value[2] ) ? intval( $value[2] ) : 0;
 					$newsletter = ' for ';
-					if( $rule_newsletter_ID )
+					if( $rule_newsletter_ID > 0 )
 					{	// Specific newsletter is selected:
 						$NewsletterCache = & get_NewsletterCache();
 						if( $rule_Newsletter = & $NewsletterCache->get_by_ID( $rule_newsletter_ID, false, false ) )
@@ -926,8 +926,12 @@ class AutomationStep extends DataObject
 							$newsletter .= 'List: Error: NOT FOUND IN DB!';
 						}
 					}
-					else
+					elseif( $rule_newsletter_ID == -1 )
 					{	// Any newsletter should be used for this condition rule:
+						$newsletter .= 'any list';
+					}
+					else
+					{	// Any tied newsletter should be used for this condition rule:
 						$newsletter .= 'any list tied to step automation';
 					}
 					$process_log .= ' '.$log_operators[ $rule->operator ].' "'.$period.$newsletter.'"';
@@ -1113,10 +1117,22 @@ class AutomationStep extends DataObject
 			}
 			$rule_value_time = $servertimenow - $period_value;
 
-			$NewsletterCache = & get_NewsletterCache();
-			if( $rule_Newsletter = & $NewsletterCache->get_by_ID( ( isset( $value[2] ) ? intval( $value[2] ) : 0 ), false, false ) )
-			{	// Check only on selected list:
-				$rule_newsletters = array( $rule_Newsletter->ID );
+			$rule_newsletter_ID = ( isset( $value[2] ) ? intval( $value[2] ) : 0 );
+			if( $rule_newsletter_ID > 0 )
+			{	// Check for a selected list:
+				$NewsletterCache = & get_NewsletterCache();
+				if( $rule_Newsletter = & $NewsletterCache->get_by_ID( $rule_newsletter_ID, false, false ) )
+				{	// Check only for a selected list:
+					$rule_newsletters = $rule_Newsletter->ID;
+				}
+				else
+				{	// If a selected list has been removed from DB:
+					$rule_newsletters = -1;
+				}
+			}
+			elseif( $rule_newsletter_ID == -1 )
+			{	// Check for ALL lists:
+				$rule_newsletters = false;
 			}
 			else
 			{	// Check any list tied to step automation:
@@ -1128,7 +1144,10 @@ class AutomationStep extends DataObject
 			$SQL->SELECT( $check_db_field_name );
 			$SQL->FROM( 'T_email__newsletter_subscription' );
 			$SQL->WHERE( 'enls_user_ID = '.$DB->quote( $step_user_ID ) );
-			$SQL->WHERE_and( 'enls_enlt_ID IN ( '.$DB->quote( $rule_newsletters ).' )' );
+			if( $rule_newsletters !== false )
+			{	// Check only for the selected rule lists:
+				$SQL->WHERE_and( 'enls_enlt_ID IN ( '.$DB->quote( $rule_newsletters ).' )' );
+			}
 			$SQL->ORDER_BY( $check_db_field_name );
 			$SQL->LIMIT( 1 );
 			$last_time = strtotime( $DB->get_var( $SQL ) );

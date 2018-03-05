@@ -72,7 +72,22 @@ switch( $type )
 										SET csnd_like = 1
 										WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
 
-								$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag_like' );
+								// Add tag for like and for "clicked content"
+								$assigned_user_tag = implode( ',', array( $edited_EmailCampaign->get( 'user_tag_like' ), $edited_EmailCampaign->get( 'user_tag' ) ) );
+								if( ! empty( $assigned_user_tag ) )
+								{
+									$email_User->add_usertags( $assigned_user_tag );
+									$email_User->dbupdate();
+								}
+								break;
+
+							case 4: // Vote dislike and add appropriate usertag
+								$DB->query( 'UPDATE T_email__campaign_send
+								SET csnd_like = -1
+								WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
+
+								// Add tag for dislike only
+								$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag_dislike' );
 								if( ! empty( $assigned_user_tag ) )
 								{
 									$email_User->add_usertags( $assigned_user_tag );
@@ -82,19 +97,22 @@ switch( $type )
 								$skip_click_tracking = true;
 								break;
 
-							case 4: // Vote dislike and add appropriate usertag
-								$DB->query( 'UPDATE T_email__campaign_send
-								SET csnd_like = -1
-								WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
+							case 5: // Call to Action 1
+							case 6: // Call to Action 2
+							case 7: // Call to Action 3
+								$cta_num = (int)$tag - 4;
 
-								$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag_dislike' );
+								$DB->query( 'UPDATE T_email__campaign_send
+										SET csnd_cta'.$cta_num.' = 1
+										WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
+
+								// Assign tag for CTA and for "clicked content"
+								$assigned_user_tag = implode( ',', array( $edited_EmailCampaign->get( 'user_tag_cta'.$cta_num ), $edited_EmailCampaign->get( 'user_tag' ) ) );
 								if( ! empty( $assigned_user_tag ) )
 								{
 									$email_User->add_usertags( $assigned_user_tag );
 									$email_User->dbupdate();
 								}
-								// Do not track click
-								$skip_click_tracking = true;
 								break;
 						}
 					}

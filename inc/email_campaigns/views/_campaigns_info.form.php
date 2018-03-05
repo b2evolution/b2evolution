@@ -44,6 +44,24 @@ $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-c
 		'input_prefix' => '<div id="user_admin_tags" class="input-group user_admin_tags">',
 		'input_suffix' => '</div>',
 	) );
+	$Form->text_input( 'ecmp_user_tag_cta1', param( 'ecmp_user_tag_cta1', 'string', $edited_EmailCampaign->get( 'user_tag_cta1' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 1 with'), '', array(
+		'maxlength' => 255,
+		'style'     => 'width: 100%;',
+		'input_prefix' => '<div id="user_admin_tags_cta1" class="input-group user_admin_tags">',
+		'input_suffix' => '</div>',
+	) );
+	$Form->text_input( 'ecmp_user_tag_cta2', param( 'ecmp_user_tag_cta2', 'string', $edited_EmailCampaign->get( 'user_tag_cta2' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 2 with'), '', array(
+		'maxlength' => 255,
+		'style'     => 'width: 100%;',
+		'input_prefix' => '<div id="user_admin_tags_cta2" class="input-group user_admin_tags">',
+		'input_suffix' => '</div>',
+	) );
+	$Form->text_input( 'ecmp_user_tag_cta3', param( 'ecmp_user_tag_cta3', 'string', $edited_EmailCampaign->get( 'user_tag_cta3' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 3 with'), '', array(
+		'maxlength' => 255,
+		'style'     => 'width: 100%;',
+		'input_prefix' => '<div id="user_admin_tags_cta3" class="input-group user_admin_tags">',
+		'input_suffix' => '</div>',
+	) );
 	$Form->text_input( 'ecmp_user_tag_like', param( 'ecmp_user_tag_like', 'string', $edited_EmailCampaign->get( 'user_tag_like' ) ), 60, T_('Tag users who liked the email with'), '', array(
 		'maxlength' => 255,
 		'style'     => 'width: 100%;',
@@ -89,13 +107,16 @@ $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-c
 
 	jQuery( document ).ready( function()
 	{
-		jQuery( '#ecmp_user_tag, #ecmp_user_tag_like, #ecmp_user_tag_dislike' ).hide();
+		jQuery( '#ecmp_user_tag, #ecmp_user_tag_cta1, #ecmp_user_tag_cta2, #ecmp_user_tag_cta3, #ecmp_user_tag_like, #ecmp_user_tag_dislike' ).hide();
 		init_autocomplete_tags( '#ecmp_user_tag' );
+		init_autocomplete_tags( '#ecmp_user_tag_cta1' );
+		init_autocomplete_tags( '#ecmp_user_tag_cta2' );
+		init_autocomplete_tags( '#ecmp_user_tag_cta3' );
 		init_autocomplete_tags( '#ecmp_user_tag_like' );
 		init_autocomplete_tags( '#ecmp_user_tag_dislike' );
 		<?php
 			// Don't submit a form by Enter when user is editing the tags
-			echo get_prevent_key_enter_js( '#token-input-ecmp_user_tag, #token-input-ecmp_user_tag_like, #token-input-ecmp_user_tag_dislike' );
+			echo get_prevent_key_enter_js( '#token-input-ecmp_user_tag, #token-input-ecmp_user_tag_cta1, #token-input-ecmp_user_tag_cta2, #token-input-ecmp_user_tag_cta3, #token-input-ecmp_user_tag_like, #token-input-ecmp_user_tag_dislike' );
 		?>
 	} );
 	</script>

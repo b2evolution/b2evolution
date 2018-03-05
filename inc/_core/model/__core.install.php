@@ -561,6 +561,9 @@ $schema_queries = array(
 			ecmp_send_ctsk_ID     INT(10) UNSIGNED NULL DEFAULT NULL,
 			ecmp_auto_send        ENUM('no', 'subscription') COLLATE ascii_general_ci NOT NULL DEFAULT 'no',
 			ecmp_user_tag         VARCHAR(255) NULL,
+			ecmp_user_tag_cta1    VARCHAR(255) NULL,
+			ecmp_user_tag_cta2    VARCHAR(255) NULL,
+			ecmp_user_tag_cta3    VARCHAR(255) NULL,
 			ecmp_user_tag_like    VARCHAR(255) NULL,
 			ecmp_user_tag_dislike VARCHAR(255) NULL,
 			PRIMARY KEY           (ecmp_ID)
@@ -578,6 +581,9 @@ $schema_queries = array(
 			csnd_last_open_ts        TIMESTAMP NULL,
 			csnd_last_click_ts       TIMESTAMP NULL,
 			csnd_like                TINYINT(1) NULL DEFAULT NULL,
+			csnd_cta1                TINYINT(1) NULL DEFAULT NULL,
+			csnd_cta2                TINYINT(1) NULL DEFAULT NULL,
+			csnd_cta3                TINYINT(1) NULL DEFAULT NULL,
 			PRIMARY KEY   csnd_PK ( csnd_camp_ID, csnd_user_ID )
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 

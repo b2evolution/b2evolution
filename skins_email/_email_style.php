@@ -39,6 +39,8 @@ $emailskins_styles = array(
 	background-color: #f4f4f4;
 	margin: 0;
 	width: 100%;
+	font-size: 14px;
+	line-height: 20px;
 ',
 'body.email' =>'
 	padding: 0;
@@ -213,7 +215,7 @@ $emailskins_styles = array(
 'a.btn-success' => '
 	color: #fff;
 	background-color: #449d44;
-	border-color: #398439;
+	border-color: #4cae4c;
 	padding: 6px 12px;
 	text-align: center;
 	white-space: nowrap;
@@ -221,7 +223,7 @@ $emailskins_styles = array(
 	cursor: pointer;
 	user-select: none;
 	background-image: none;
-	border: 1px solid #ccc;
+	border: 1px solid #4cae4c;
 	border-radius: 4px;
 ',
 'a.btn-danger' => '
@@ -235,7 +237,21 @@ $emailskins_styles = array(
 	cursor: pointer;
 	user-select: none;
 	background-image: none;
-	border: 1px solid #ccc;
+	border: 1px solid #d43f3a;
+	border-radius: 4px;
+',
+'a.btn-info' => '
+	color: #fff;
+	background-color: #5bc0de;
+	border-color: #46b8da;
+	padding: 6px 12px;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	user-select: none;
+	background-image: none;
+	border: 1px solid #46b8da;
 	border-radius: 4px;
 ',
 );
