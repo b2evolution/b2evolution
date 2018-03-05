@@ -367,29 +367,39 @@ class UserQuery extends SQL
 	/**
 	 * Restrict to users with tag
 	 *
-	 * @param string User tag
+	 * @param string User should have all of these tags
+	 * @param string User should not have any of these tags
 	 */
-	function where_tag( $user_tag )
+	function where_tag( $user_tag = NULL, $not_user_tag = NULL)
 	{
 		global $DB;
 
-		if( empty( $user_tag ) )
+		if( empty( $user_tag ) && empty( $not_user_tag ) )
 		{
 			return;
 		}
 
-		$tags = array_map( 'trim', explode( ',', $user_tag ) );
+		$tags = array_unique( array_map( 'trim', explode( ',', $user_tag ) ) );
+		$not_tags = array_unique( array_map( 'trim', explode( ',', $not_user_tag ) ) );
+		$all_tags = array_merge( $tags, $not_tags );
+
 		$this->FROM_add( 'LEFT JOIN (
-					SELECT uutg_user_ID, GROUP_CONCAT( DISTINCT utag_name ) AS tags
+					SELECT uutg_user_ID,
+						GROUP_CONCAT( DISTINCT IF( utag_name IN ('.$DB->quote( $tags ).'), utag_name, NULL ) ORDER BY utag_name ) AS tags,
+						GROUP_CONCAT( DISTINCT IF( utag_name IN ('.$DB->quote( $not_tags ).'), utag_name, NULL ) ) AS not_tags
 					FROM T_users__tag
 					LEFT JOIN T_users__usertag ON uutg_emtag_ID = utag_ID
-					WHERE utag_name IN ('.$DB->quote( $tags ).')
+					WHERE utag_name IN ('.$DB->quote( $all_tags ).')
 					GROUP BY uutg_user_ID
 				) AS tags
 				ON tags.uutg_user_ID = user_ID' );
 
-		sort( $tags );
-		$this->WHERE_and( 'tags.tags = '.$DB->quote( implode( ',', array_unique( $tags ) ) ) );
+		if( ! empty( $user_tag ) )
+		{
+			sort( $tags );
+			$this->WHERE_and( 'tags.tags = '.$DB->quote( implode( ',', array_unique( $tags ) ) ) );
+		}
+		$this->WHERE_and( 'tags.not_tags IS NULL' );
 	}
 
 

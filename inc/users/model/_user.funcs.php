@@ -3445,11 +3445,16 @@ function callback_filter_userlist( & $Form )
 			$Form->select_input_object( 'newsletter', get_param( 'newsletter' ), $NewsletterCache, T_('Subscribed to'), array( 'allow_none' => true ) );
 		}
 	}
-
-	$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, T_('Tag'), '', array(
-		'maxlength' => 255,
-		'input_prefix' => '<div class="input-group" style="width: 350px;">',
-		'input_suffix'=> '</div>'	) );
+	$Form->begin_line( T_('Has all these tags'), 'user_tag' );
+		$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
+			'maxlength' => 255,
+			'input_prefix' => '<div class="input-group" style="width: 310px;">',
+			'input_suffix'=> '</div>'	) );
+		$Form->text_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
+			'maxlength' => 255,
+			'input_prefix' => '<div class="input-group" style="width: 350px;">',
+			'input_suffix'=> '</div>'	) );
+	$Form->end_line();
 	?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
@@ -3484,9 +3489,10 @@ function callback_filter_userlist( & $Form )
 	{
 		jQuery( '#user_tag' ).hide();
 		init_autocomplete_tags( '#user_tag' );
+		init_autocomplete_tags( '#not_user_tag' );
 		<?php
 			// Don't submit a form by Enter when user is editing the tags
-			echo get_prevent_key_enter_js( '#token-input-user_tag' );
+			echo get_prevent_key_enter_js( '#token-input-user_tag, #token-input-not_user_tag' );
 		?>
 	} );
 	</script>

@@ -122,6 +122,7 @@ class UserList extends DataObjectList2
 				'recipient_type'      => NULL,    // string, Recipient type of email campaign: 'filtered', 'sent', 'readytosend'
 				'recipient_action'    => NULL,    // string, Recipient action on email campaign: 'img_loaded', 'link_clicked', 'cta1', 'cta2', 'cta3', 'liked', 'disliked', 'clicked_unsubscribe'
 				'user_tag'            => NULL,    // string, User tag
+				'not_user_tag'        => NULL,    // string, User tag
 		) );
 	}
 
@@ -284,6 +285,11 @@ class UserList extends DataObjectList2
 			 * Restrict by user tag
 			 */
 			memorize_param( 'user_tag', 'string', $this->default_filters['user_tag'], $this->filters['user_tag'] );
+
+			/*
+			 * Restrict by user tag
+			 */
+			memorize_param( 'not_user_tag', 'string', $this->default_filters['not_user_tag'], $this->filters['not_user_tag'] );
 
 			/*
 			 * Restrict by user fields
@@ -515,6 +521,11 @@ class UserList extends DataObjectList2
 		 */
 		$this->filters['user_tag'] = param( 'user_tag', 'string', $this->default_filters['user_tag'], true );
 
+		/*
+		 * Restrict by user tag
+		 */
+		$this->filters['not_user_tag'] = param( 'not_user_tag', 'string', $this->default_filters['user_tag'], true );
+
 		// 'paged'
 		$this->page = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 
@@ -624,7 +635,7 @@ class UserList extends DataObjectList2
 			global $Settings;
 			$this->UserQuery->where_group_level( $Settings->get('allow_anonymous_user_level_min'), $Settings->get('allow_anonymous_user_level_max') );
 		}
-		$this->UserQuery->where_tag( $this->filters['user_tag'] );
+		$this->UserQuery->where_tag( $this->filters['user_tag'], $this->filters['not_user_tag'] );
 
 		if( isset( $this->query_params['order_by_login_length'] ) && in_array( $this->query_params['order_by_login_length'], array( 'A', 'D' ) ) )
 		{
