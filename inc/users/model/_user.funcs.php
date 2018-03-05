@@ -3448,11 +3448,11 @@ function callback_filter_userlist( & $Form )
 	$Form->begin_line( T_('Has all these tags'), 'user_tag' );
 		$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
 			'maxlength' => 255,
-			'input_prefix' => '<div class="input-group" style="width: 310px;">',
+			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
 			'input_suffix'=> '</div>'	) );
 		$Form->text_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
 			'maxlength' => 255,
-			'input_prefix' => '<div class="input-group" style="width: 350px;">',
+			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
 			'input_suffix'=> '</div>'	) );
 	$Form->end_line();
 	?>
