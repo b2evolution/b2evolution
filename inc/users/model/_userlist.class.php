@@ -649,6 +649,11 @@ class UserList extends DataObjectList2
 		{
 			$this->UserQuery->ORDER_BY( $this->get_order_field_list() );
 		}
+
+		if( ! empty( $this->query_params['where_duplicate_email'] ) )
+		{
+			$this->UserQuery->where_duplicate_email();
+		}
 	}
 
 
@@ -711,6 +716,11 @@ class UserList extends DataObjectList2
 			{	// Initialize count of secondary groups (used on order by this field):
 				$step1_SQL->SELECT_add( ', COUNT( DISTINCT sug_count.sug_grp_ID ) AS secondary_groups_count' );
 			}
+			if( ! empty( $this->query_params['where_duplicate_email'] ) )
+			{
+				$step1_SQL->SELECT_add( ', email_user_count' );
+			}
+
 			$step1_SQL->FROM( $this->UserQuery->get_from( '' ) );
 			$step1_SQL->WHERE( $this->UserQuery->get_where( '' ) );
 			$step1_SQL->GROUP_BY( $this->UserQuery->get_group_by( '' ) );
