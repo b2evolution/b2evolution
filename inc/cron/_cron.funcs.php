@@ -42,6 +42,87 @@ function cron_log( $message, $level = 0 )
 
 
 /**
+ * Append cron log and store in DB each 1 second OR 4096 bytes of the log message
+ *
+ * @param string Message
+ */
+function cron_log_append( $message )
+{
+	global $result_message, $cron_log_last_time, $cron_log_buffer_size, $cron_log_actions_num;
+
+	if( ! isset( $result_message ) )
+	{	// Initialize a var for cron log message:
+		$result_message = '';
+	}
+
+	if( ! isset( $cron_log_buffer_size ) )
+	{	// Initialize a var to count a cron log message length:
+		$cron_log_buffer_size = 0;
+	}
+
+	if( ! isset( $cron_log_actions_num ) )
+	{	// Initialize a var to count cron log actions:
+		$cron_log_actions_num = 0;
+	}
+
+	// Append new message to the cron log:
+	$result_message .= $message;
+
+	// Update buffer size:
+	$cron_log_buffer_size += strlen( $message );
+
+	if( $cron_log_buffer_size >= 4096 ||
+	    ( isset( $cron_log_last_time ) && ( time() - $cron_log_last_time ) >= 1 ) )
+	{	// If log buffer >= 4096 OR last time execution >= 1 second:
+		if( $cron_log_buffer_size >= 4096 )
+		{	// Reset buffer size to count a next portion:
+			$cron_log_buffer_size = 0;
+		}
+
+		// We nust update cron log in DB in order to don't lost it on unexpected crash:
+		global $DB, $ctsk_ID, $time_difference;
+		if( ! empty( $ctsk_ID ) )
+		{	// We can update only cron job which is executing right now:
+			$DB->query( 'UPDATE T_cron__log
+				  SET clog_messages = '.$DB->quote( $result_message ).',
+				      clog_actions_num = '.$DB->quote( $cron_log_actions_num ).',
+				      clog_realstop_datetime = '.$DB->quote( date2mysql( time() + $time_difference ) ).'
+				WHERE clog_ctsk_ID = '.$ctsk_ID.'
+				  AND clog_status = "started"',
+				'Update a log message of the executing cron job #'.$ctsk_ID );
+		}
+	}
+
+	// Update a time global var to compare with next time:
+	$cron_log_last_time = time();
+
+	sleep(1);
+}
+
+
+/**
+ * Count a number of cron job actions and append cron log
+ *
+ * @param string Message
+ */
+function cron_log_action_end( $message )
+{
+	global $cron_log_actions_num;
+
+	if( ! isset( $cron_log_actions_num ) )
+	{	// Initialize a var to count cron log actions:
+		$cron_log_actions_num = 0;
+	}
+
+	// Mark this as separate action:
+	$cron_log_actions_num++;
+
+	// Append cron log:
+	cron_log_append( $message );
+}
+
+
+/**
  * Call a cron job.
  *
  * @param string Key of the job
@@ -538,7 +619,7 @@ function cron_job_shutdown()
 	global $result_message, $ctsk_ID, $DB;
 
 	if( empty( $ctsk_ID ) )
-	{	// Run rgus function to detect only interrupted corn jobs:
+	{	// Run this function to detect only interrupted cron jobs:
 		return;
 	}
 

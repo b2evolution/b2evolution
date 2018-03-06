@@ -9201,6 +9201,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12670, 'Upgrading cron logs table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_cron__log', 'clog_actions_num', 'INT UNSIGNED NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
