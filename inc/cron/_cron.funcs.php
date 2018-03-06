@@ -95,8 +95,6 @@ function cron_log_append( $message )
 
 	// Update a time global var to compare with next time:
 	$cron_log_last_time = time();
-
-	sleep(1);
 }
 
 
