@@ -35,14 +35,8 @@ function dre_msg( $message, $cron = false )
 	$dre_messages[] = $message;
 
 	if( $cron )
-	{	// We are in cron mode
-		if( $is_web )
-		{	// Separate a message with newline when we call a cron from browser:
-			$message .= '<br />';
-		}
-
-		// Log the message in global variable $result_message:
-		$result_message .= $message."\n";
+	{	// Append a message to cron log if we are in cron mode:
+		cron_log_append( $message );
 	}
 }
 
@@ -388,6 +382,11 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			dre_msg( sprintf( ('Marking message for deletion from inbox: %s'), $index ), $cron );
 			imap_delete( $mbox, $index );
 			++$del_cntr;
+		}
+
+		if( $cron )
+		{	// Mark the end of action for cron log:
+			cron_log_action_end( '' );
 		}
 	}
 

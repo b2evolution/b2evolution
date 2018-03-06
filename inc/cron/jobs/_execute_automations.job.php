@@ -7,8 +7,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $DB, $result_message, $servertimenow;
-
 // Get IDs of active automations:
 $AutomationCache = & get_AutomationCache();
 $AutomationCache->load_where( 'autm_status = "active"' );
@@ -21,14 +19,14 @@ else
 {	// At least one active automation exists:
 	$AutomationStepCache = & get_AutomationStepCache();
 
-	cron_log_append( sprintf( '%s active automations:', count( $AutomationCache->cache ) )."\n" );
+	cron_log_append( sprintf( '%s active automations:', count( $AutomationCache->cache ) ) );
 
 	foreach( $AutomationCache->cache as $Automation )
 	{
 		// Find what steps should be executed immediately:
 		$automation_user_states = $Automation->get_user_states();
 
-		cron_log_append( "\n".'<b>Automation #'.$Automation->ID.'</b>('.$Automation->get( 'name' ).'): '.count( $automation_user_states ).' users awaiting execution'."\n" );
+		cron_log_append( "\n".'<b>Automation #'.$Automation->ID.'</b>('.$Automation->get( 'name' ).'): '.count( $automation_user_states ).' users awaiting execution' );
 
 		// Preload all required steps by single query into cache:
 		$AutomationStepCache->load_list( $automation_user_states );
@@ -44,10 +42,10 @@ else
 			}
 		}
 
-		cron_log_append( "\n".'All users successfully processed in <b>Automation #'.$Automation->ID.'</b>'."\n" );
+		cron_log_append( "\n".'All users successfully processed in <b>Automation #'.$Automation->ID.'</b>' );
 	}
 
-	cron_log_append( "\n".'All automations successfully processed'."\n" );
+	cron_log_append( "\n".'All automations successfully processed' );
 }
 
 return 1; /* ok */

@@ -44,9 +44,11 @@ function cron_log( $message, $level = 0 )
 /**
  * Append cron log and store in DB each 1 second OR 4096 bytes of the log message
  *
- * @param string Message
+ * @param string Message text
+ * @param string Message type: 'success', 'warning', 'error', 'note', NULL - to use default text without addition style color
+ * @param string New line
  */
-function cron_log_append( $message )
+function cron_log_append( $message, $type = NULL, $nl = "\n" )
 {
 	global $result_message, $cron_log_last_time, $cron_log_buffer_size, $cron_log_actions_num;
 
@@ -63,6 +65,29 @@ function cron_log_append( $message )
 	if( ! isset( $cron_log_actions_num ) )
 	{	// Initialize a var to count cron log actions:
 		$cron_log_actions_num = 0;
+	}
+
+	if( ! empty( $message ) )
+	{
+		// Set style for message depending on type:
+		switch( $type )
+		{
+			case 'success':
+				$message = '<span class="green">'.$message.'</span>';
+				break;
+			case 'error':
+				$message = '<span class="red">'.$message.'</span>';
+				break;
+			case 'warning':
+				$message = '<span class="orange">'.$message.'</span>';
+				break;
+			case 'note':
+				$message = '<span class="grey">'.$message.'</span>';
+				break;
+		}
+
+		// Append new line:
+		$message .= $nl;
 	}
 
 	// Append new message to the cron log:
@@ -102,8 +127,10 @@ function cron_log_append( $message )
  * Count a number of cron job actions and append cron log
  *
  * @param string Message
+ * @param string Message type: 'success', 'warning', 'error', 'note'
+ * @param string New line
  */
-function cron_log_action_end( $message )
+function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
 {
 	global $cron_log_actions_num;
 
@@ -116,7 +143,7 @@ function cron_log_action_end( $message )
 	$cron_log_actions_num++;
 
 	// Append cron log:
-	cron_log_append( $message );
+	cron_log_append( $message, $type, $nl );
 }
 
 
