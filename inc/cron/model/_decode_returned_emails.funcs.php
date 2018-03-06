@@ -23,7 +23,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function dre_msg( $message, $cron = false )
 {
-	global $is_web, $result_message, $dre_messages;
+	global $is_web, $dre_messages;
 
 	if( ! is_array( $dre_messages ) )
 	{	// Initialize global array first time:

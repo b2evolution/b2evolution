@@ -706,12 +706,12 @@ class AutomationStep extends DataObject
 			$next_exec_ts = NULL;
 		}
 		// Update data for next step or finish it:
-		/*$DB->query( 'UPDATE T_automation__user_state
+		$DB->query( 'UPDATE T_automation__user_state
 			  SET aust_next_step_ID = '.$DB->quote( $next_step_ID ).',
 			      aust_next_exec_ts = '.$DB->quote( $next_exec_ts ).'
 			WHERE aust_autm_ID = '.$DB->quote( $Automation->ID ).'
 			  AND aust_user_ID = '.$DB->quote( $user_ID ),
-			'Update data for next Step after executing Step #'.$this->ID );*/
+			'Update data for next Step after executing Step #'.$this->ID );
 
 		// Log:
 		$process_log .= ( $next_AutomationStep
