@@ -20,6 +20,25 @@ global $edited_Automation, $admin_url;
 // Get data of all steps for diagram view:
 $steps = $edited_Automation->get_diagram_steps_data();
 
+// Check if current automation is active:
+$is_automation_active = ( $edited_Automation->get( 'status' ) == 'active' );
+
+// Display a button to play/pause current Automation:
+if( $is_automation_active )
+{	// To pause:
+	echo action_icon( T_('Pause'), 'pause',
+		$admin_url.'?ctrl=automations&amp;tab='.get_param( 'tab' ).'&amp;action=status_paused&amp;autm_ID='.$edited_Automation->ID.'&amp;'.url_crumb( 'automation' ),
+		' '.T_('Pause'), 3, 4, array( 'class' => 'btn btn-danger' ) )
+	.' <span class="red">('.T_('RUNNING').')</span>';
+}
+else
+{	// To play:
+	echo action_icon( T_('Play'), 'pause',
+		$admin_url.'?ctrl=automations&amp;tab='.get_param( 'tab' ).'&amp;action=status_active&amp;autm_ID='.$edited_Automation->ID.'&amp;'.url_crumb( 'automation' ),
+		' '.T_('Play'), 3, 4, array( 'class' => 'btn btn-success' ) )
+	.' <span class="orange">('.T_('PAUSED').')</span>';
+}
+
 if( count( $steps ) > 0 )
 {	// Display a button to reset a diagram layout to default positions:
 	echo '<a href="'.$admin_url.'?ctrl=automations&amp;action=reset_diagram&amp;autm_ID='.$edited_Automation->ID.'&amp;'.url_crumb( 'automationstep' ).'"'
@@ -45,12 +64,6 @@ echo '</div>';
 jQuery( document ).ready( function()
 {	// CSS fix to make diagram canvas full height:
 	jQuery( '#evo_automation__diagram_canvas' ).css( 'height', jQuery( window ).height() - 343	 );
-	/*var evo_diagram_canvas_parent = jQuery( '#evo_automation__diagram_canvas' ).parent();
-	while( evo_diagram_canvas_parent.length > 0 )
-	{
-		evo_diagram_canvas_parent.css( 'height', '100%' );
-		evo_diagram_canvas_parent = evo_diagram_canvas_parent.parent();
-	}*/
 } );
 
 jsPlumb.ready( function ()
@@ -58,7 +71,8 @@ jsPlumb.ready( function ()
 	var instance = jsPlumb.getInstance(
 	{
 		DragOptions: { cursor: 'pointer', zIndex: 2000 },
-		Container: 'evo_automation__diagram_canvas'
+		Container: 'evo_automation__diagram_canvas',
+		<?php echo $is_automation_active ? 'ConnectionsDetachable: false,' : ''; ?>
 	} );
 
 	// General properties for connectors and source points:
@@ -66,7 +80,7 @@ jsPlumb.ready( function ()
 		endpoint: 'Dot',
 		paintStyle: { radius: 7 },
 		hoverPaintStyle: { radius: 10 },
-		isSource: true,
+		isSource: <?php echo $is_automation_active ? 'false' : 'true'; ?>,
 		connector: [ 'Flowchart', { gap: 5, cornerRadius: 10, alwaysRespectStubs: true } ],
 		connectorStyle: {
 			strokeWidth: 4,
@@ -136,7 +150,7 @@ jsPlumb.ready( function ()
 		{
 			grid: [20, 20],
 			stop: function( e )
-			{
+			{	// Store the changed step box position in DB by AJAX:
 				jQuery.ajax(
 				{
 					type: 'POST',
@@ -154,20 +168,46 @@ jsPlumb.ready( function ()
 		} );
 
 		instance.bind( 'connectionDrag', function (connection)
-		{
-			b2evo_source_ID = connection.sourceId;
-			b2evo_source_type = connection.endpoints[0].connectionType;
-			console.log( 'connection ' + connection.id + ' is being dragged. suspendedElement is ', connection.suspendedElement, ' of type ', connection.suspendedElementType );
-		});
-		instance.bind( 'connectionDragStop', function (connection) {
-			//alert( 'Source: ' + b2evo_source_ID + '(' + b2evo_source_type + ')' + '\n' + 'Target: ' + ( connection.target === null ? 'NULL' : connection.targetId ) );
-			console.log( connection );
-			console.log( 'connection ' + connection.id + ' was dragged' );
-		});
-		instance.bind( 'connectionMoved', function( params )
-		{
-			console.log( 'connection ' + params.connection.id + ' was moved' );
+		{	// Store vars to know what connector has been dragged in the event "connectionDragStop" below:
+			b2evo_diagram_source_step_ID = connection.sourceId.replace( /^step_/, '' );
+			b2evo_diagram_connection_type = connection.endpoints[0].connectionType;
+			b2evo_diagram_target_step_ID = ( connection.target === null || ! connection.targetId.match( /^step_/g ) ? 0 : connection.targetId.replace( /^step_/, '' ) );
 		} );
+
+		instance.bind( 'connectionDragStop', function (connection)
+		{
+			// Get new target step ID:
+			var updated_target_step_ID = ( connection.target === null || ! connection.targetId.match( /^step_/g ) ? 0 : connection.targetId.replace( /^step_/, '' ) );
+
+			if( b2evo_diagram_target_step_ID != updated_target_step_ID )
+			{	// If the target step has been really changed to another:
+				jQuery.ajax(
+				{	// Store the changed steps connection in DB by AJAX:
+					type: 'POST',
+					url: '<?php echo $admin_url; ?>',
+					data:
+					{
+						'ctrl': 'automations',
+						'action': 'update_step_connection',
+						'step_ID': b2evo_diagram_source_step_ID,
+						'connection_type': b2evo_diagram_connection_type,
+						'target_step_ID': updated_target_step_ID,
+						'crumb_automationstep': '<?php echo get_crumb( 'automationstep' ); ?>',
+					}
+				} );
+			}
+		} );
+
+		<?php
+		if( $is_automation_active )
+		{	// Display an alert message if user tries to change a connector for active Automation:
+		?>
+		instance.bind( 'endpointClick', function()
+		{	// Display an alert message if user tries to change a connector for active Automation:
+			alert( '<?php echo TS_('You should pause this Automation in order to edit it.'); ?>' );
+		} );
+		<?php } ?>
+
 	} );
 
 	var evo_jsplumb_init_step_box = function( step_box_ID )
@@ -186,7 +226,7 @@ jsPlumb.ready( function ()
 		}
 		// Add target black point:
 		instance.addEndpoint( step_box_ID, point_target, { anchor: 'TopCenter', uuid: step_box_ID } );
-		// Make whole step box is traget place to connect:
+		// Make whole step box is a target place to connect:
 		instance.makeTarget( step_box_ID, { anchor: 'TopCenter', endpoint: 'Blank' } );
 	};
 

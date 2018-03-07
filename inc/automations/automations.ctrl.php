@@ -201,9 +201,9 @@ switch( $action )
 		{	// A list of automations on the edited List page:
 			$redirect_to = $admin_url.'?ctrl=newsletters&tab=automations&action=edit&enlt_ID='.$enlt_ID;
 		}
-		elseif( $tab == 'steps' )
+		elseif( $tab == 'steps' || $tab == 'diagram' )
 		{	// Tab "Steps" of the edited Automation page:
-			$redirect_to = $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_Automation->ID;
+			$redirect_to = $admin_url.'?ctrl=automations&action=edit&tab='.$tab.'&autm_ID='.$edited_Automation->ID;
 		}
 		else
 		{	// A list of all automations:
@@ -485,6 +485,48 @@ switch( $action )
 
 		// Update step position:
 		$edited_AutomationStep->set( 'diagram', implode( ':', $pos ) );
+		$edited_AutomationStep->dbupdate();
+
+		// Exit here because we don't need UI for this AJAX action:
+		exit;
+
+	case 'update_step_connection':
+		// Update steps connection on automation diagram:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		param( 'connection_type', 'string', true );
+
+		if( ! in_array( $connection_type, array( 'yes', 'no', 'error' ) ) )
+		{	// Wrong connection type:
+			debug_die( 'Wrong step connection type!' );
+		}
+
+		// Set correct ID for next/target Step:
+		param( 'target_step_ID', 'integer' );
+		if( $target_step_ID > 0 )
+		{	// If step has been connected with target Step:
+			$target_AutomationStep = & $AutomationStepCache->get_by_ID( $target_step_ID );
+			if( $edited_AutomationStep->get_next_ordered_step_ID() == $target_AutomationStep->ID )
+			{	// If target Step is the next ordered Step we should use an option "Continue":
+				$target_step_ID = 0;
+			}
+			else
+			{	// Some other next target Step:
+				$target_step_ID = $target_AutomationStep->ID;
+			}
+		}
+		else
+		{	// if step has been disconnected:
+			$target_step_ID = -1;
+		}
+
+		// Update step connection or disconnection between the requested Steps:
+		$edited_AutomationStep->set( $connection_type.'_next_step_ID', $target_step_ID, true );
 		$edited_AutomationStep->dbupdate();
 
 		// Exit here because we don't need UI for this AJAX action:

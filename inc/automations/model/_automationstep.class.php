@@ -352,16 +352,7 @@ class AutomationStep extends DataObject
 		}
 		elseif( $next_step_ID == 0 || ! $next_AutomationStep )
 		{	// Get next ordered Step when option is selected to "Continue" OR Step cannot be found by ID in DB:
-			global $DB;
-			$next_ordered_step_SQL = new SQL( 'Get next ordered Step after current Step #'.$this->ID );
-			$next_ordered_step_SQL->SELECT( 'step_ID' );
-			$next_ordered_step_SQL->FROM( 'T_automation__step' );
-			$next_ordered_step_SQL->WHERE( 'step_autm_ID = '.$DB->quote( $this->get( 'autm_ID' ) ) );
-			$next_ordered_step_SQL->WHERE_and( 'step_order > '.$DB->quote( $this->get( 'order' ) ) );
-			$next_ordered_step_SQL->ORDER_BY( 'step_order ASC' );
-			$next_ordered_step_SQL->LIMIT( 1 );
-			$next_ordered_step_ID = $DB->get_var( $next_ordered_step_SQL );
-			$next_AutomationStep = & $AutomationStepCache->get_by_ID( $next_ordered_step_ID, false, false );
+			$next_AutomationStep = & $AutomationStepCache->get_by_ID( $this->get_next_ordered_step_ID(), false, false );
 			if( empty( $next_AutomationStep ) )
 			{	// If it is the latest Step of the Automation:
 				$next_AutomationStep = false;
@@ -369,6 +360,32 @@ class AutomationStep extends DataObject
 		}
 
 		return $next_AutomationStep;
+	}
+
+
+	/**
+	 * Get ID of the next ordered Step after this Step
+	 *
+	 * @return integer|NULL Step ID or NULL if this is the latest
+	 */
+	function get_next_ordered_step_ID()
+	{
+		if( empty( $this->ID ) )
+		{	// New creating step is the latest by default:
+			return NULL;
+		}
+
+		global $DB;
+
+		$next_ordered_step_SQL = new SQL( 'Get next ordered Step after current Step #'.$this->ID );
+		$next_ordered_step_SQL->SELECT( 'step_ID' );
+		$next_ordered_step_SQL->FROM( 'T_automation__step' );
+		$next_ordered_step_SQL->WHERE( 'step_autm_ID = '.$DB->quote( $this->get( 'autm_ID' ) ) );
+		$next_ordered_step_SQL->WHERE_and( 'step_order > '.$DB->quote( $this->get( 'order' ) ) );
+		$next_ordered_step_SQL->ORDER_BY( 'step_order ASC' );
+		$next_ordered_step_SQL->LIMIT( 1 );
+
+		return $DB->get_var( $next_ordered_step_SQL );
 	}
 
 
