@@ -47,15 +47,17 @@ class UserQuery extends SQL
 
 		// Params to build query
 		$params = array_merge( array(
-				'join_group'     => true,
-				'join_sec_groups'=> false,
-				'join_session'   => false,
-				'join_country'   => true,
-				'join_region'    => false,
-				'join_subregion' => false,
-				'join_city'      => true,
-				'join_colls'     => true,
-				'grouped'        => false,
+				'join_group'       => true,
+				'join_sec_groups'  => false,
+				'join_session'     => false,
+				'join_country'     => true,
+				'join_region'      => false,
+				'join_subregion'   => false,
+				'join_city'        => true,
+				'join_colls'       => true,
+				'join_lists'       => false,
+				'join_user_tags'   => false,
+				'grouped'          => false,
 			), $params );
 
 		$this->SELECT( 'user_ID, user_login, user_nickname, user_lastname, user_firstname, user_gender, user_source, user_created_datetime, user_profileupdate_date, user_lastseen_ts, user_level, user_status, user_avatar_file_ID, user_email, user_url, user_age_min, user_age_max, user_pass, user_salt, user_pass_driver, user_locale, user_unsubscribe_key, user_reg_ctry_ID, user_ctry_ID, user_rgn_ID, user_subrg_ID, user_city_ID, user_grp_ID' );
@@ -117,6 +119,26 @@ class UserQuery extends SQL
 			{
 				$this->SELECT_add( ', 0 AS nb_blogs' );
 			}
+		}
+
+		if( $params['join_user_tags'] )
+		{
+			$this->SELECT_add( ', user_tags' );
+			$this->FROM_add( 'LEFT JOIN (
+						SELECT uutg_user_ID, GROUP_CONCAT( uutg_emtag_ID ) AS user_tags, COUNT(*) AS user_tag_count
+						FROM T_users__usertag
+						GROUP BY uutg_user_ID
+					) AS user_tags ON user_tags.uutg_user_ID = user_ID' );
+		}
+
+		if( $params['join_lists'] )
+		{
+			$this->SELECT_add( ', subscribed_list' );
+			$this->FROM_add( 'LEFT JOIN (
+						SELECT enls_user_ID, GROUP_CONCAT( enls_enlt_ID ) AS subscribed_list, COUNT(*) AS subscribed_list_count
+						FROM T_email__newsletter_subscription
+						GROUP BY enls_user_ID
+					) AS subscribed_lists on subscribed_lists.enls_user_ID = user_ID' );
 		}
 
 		$this->WHERE( 'user_ID IS NOT NULL' );
@@ -367,29 +389,39 @@ class UserQuery extends SQL
 	/**
 	 * Restrict to users with tag
 	 *
-	 * @param string User tag
+	 * @param string User should have all of these tags
+	 * @param string User should not have any of these tags
 	 */
-	function where_tag( $user_tag )
+	function where_tag( $user_tag = NULL, $not_user_tag = NULL)
 	{
 		global $DB;
 
-		if( empty( $user_tag ) )
+		if( empty( $user_tag ) && empty( $not_user_tag ) )
 		{
 			return;
 		}
 
-		$tags = array_map( 'trim', explode( ',', $user_tag ) );
+		$tags = array_unique( array_map( 'trim', explode( ',', $user_tag ) ) );
+		$not_tags = array_unique( array_map( 'trim', explode( ',', $not_user_tag ) ) );
+		$all_tags = array_merge( $tags, $not_tags );
+
 		$this->FROM_add( 'LEFT JOIN (
-					SELECT uutg_user_ID, GROUP_CONCAT( DISTINCT utag_name ) AS tags
+					SELECT uutg_user_ID,
+						GROUP_CONCAT( DISTINCT IF( utag_name IN ('.$DB->quote( $tags ).'), utag_name, NULL ) ORDER BY utag_name ) AS tags,
+						GROUP_CONCAT( DISTINCT IF( utag_name IN ('.$DB->quote( $not_tags ).'), utag_name, NULL ) ) AS not_tags
 					FROM T_users__tag
 					LEFT JOIN T_users__usertag ON uutg_emtag_ID = utag_ID
-					WHERE utag_name IN ('.$DB->quote( $tags ).')
+					WHERE utag_name IN ('.$DB->quote( $all_tags ).')
 					GROUP BY uutg_user_ID
 				) AS tags
 				ON tags.uutg_user_ID = user_ID' );
 
-		sort( $tags );
-		$this->WHERE_and( 'tags.tags = '.$DB->quote( implode( ',', array_unique( $tags ) ) ) );
+		if( ! empty( $user_tag ) )
+		{
+			sort( $tags );
+			$this->WHERE_and( 'tags.tags = '.$DB->quote( implode( ',', array_unique( $tags ) ) ) );
+		}
+		$this->WHERE_and( 'tags.not_tags IS NULL' );
 	}
 
 
@@ -747,6 +779,17 @@ class UserQuery extends SQL
 
 		$this->WHERE_and( 'user_level >= '.$DB->quote( $user_level_min ) );
 		$this->WHERE_and( 'user_level <= '.$DB->quote( $user_level_max ) );
+	}
+
+
+	/**
+	 * Restrict to users with duplicate emails
+	 */
+	function where_duplicate_email()
+	{
+		$this->SELECT_add( ', email_user_count' );
+		$this->FROM_add( 'LEFT JOIN ( SELECT user_email AS dup_email, COUNT(*) AS email_user_count FROM T_users GROUP BY user_email ) AS dup_emails ON dup_emails.dup_email = T_users.user_email' );
+		$this->WHERE_and( 'email_user_count > 1' );
 	}
 
 }

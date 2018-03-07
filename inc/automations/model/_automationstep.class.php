@@ -450,9 +450,9 @@ class AutomationStep extends DataObject
 	 * Execute action for this step
 	 *
 	 * @param integer User ID
-	 * @param string Log process into this param
+	 * @return string A process log
 	 */
-	function execute_action( $user_ID, & $process_log )
+	function execute_action( $user_ID )
 	{
 		global $DB, $servertimenow, $mail_log_message, $executed_automation_steps;
 
@@ -477,7 +477,7 @@ class AutomationStep extends DataObject
 		$step_User = & $UserCache->get_by_ID( $user_ID, false, false );
 
 		// Log:
-		$process_log .= 'Executing '.$log_bold_start.'Step #'.$this->get( 'order' ).$log_bold_end
+		$process_log = 'Executing '.$log_bold_start.'Step #'.$this->get( 'order' ).$log_bold_end
 			.'('.step_get_type_title( $this->get( 'type' ) ).': '.$this->get( 'label' ).')'
 			.' of '.$log_bold_start.'Automation: #'.$Automation->ID.$log_bold_end.'('.$Automation->get( 'name' ).')'
 			.' for '.$log_bold_start.'User #'.$user_ID.$log_bold_end.( $step_User ? '('.$step_User->get( 'login' ).')' : '' ).'...'.$log_nl;
@@ -752,6 +752,8 @@ class AutomationStep extends DataObject
 				$next_AutomationStep->execute_action( $user_ID, $process_log );
 			}
 		}
+
+		return $process_log;
 	}
 
 

@@ -542,10 +542,10 @@ if( $action == 'dashboard' )
 
 		$AdminUI->disp_payload_begin();
 		echo '<div class="row">';
-			echo '<div class="col-xs-12 col-sm-2 col-sm-push-10 text-right">';
+			echo '<div class="col-xs-12 col-sm-3 col-sm-push-9 col-lg-2 col-lg-push-10 text-right">';
 			echo action_icon( TS_('View in Front-Office'), '', $Blog->get( 'url' ), T_('View in Front-Office'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 			echo '</div>';
-			echo '<h2 class="col-xs-12 col-sm-10 col-sm-pull-2 page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).' <span class="text-muted" style="font-size: 0.6em;">('./* TRANS: abbr. for "Collection" */ T_('Collection').' #'.$Blog->ID.')</span>'.'</h2>';
+			echo '<h2 class="col-xs-12 col-sm-9 col-sm-pull-3 col-lg-10 col-lg-pull-2 page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).' <span class="text-muted" style="font-size: 0.6em;">('./* TRANS: abbr. for "Collection" */ T_('Collection').' #'.$Blog->ID.')</span>'.'</h2>';
 		echo '</div>';
 		load_funcs( 'collections/model/_blog_js.funcs.php' );
 		echo '<div class="row browse">';
@@ -611,7 +611,7 @@ if( $action == 'dashboard' )
 		if( $have_comments_to_moderate || $have_posts_to_moderate )
 		{
 			echo '<!-- Start of Block Group 2 -->';
-			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-0 col-lg-6 col-lg-pull-0 floatleft">';
+			echo '<div class="col-xs-12 col-sm-12 '.( $perm_options_edit ? 'col-md-9' : 'col-md-12' ).' col-md-pull-0 col-lg-6 col-lg-pull-0 floatleft">';
 
 			// Comments Awaiting Moderation Block
 			if( $have_comments_to_moderate )
@@ -676,25 +676,15 @@ if( $action == 'dashboard' )
 		echo '<!-- Start of Block Group 3 -->';
 		if( $perm_options_edit )
 		{
-			if( $have_comments_to_moderate || $have_posts_to_moderate )
-			{
-				echo '<div class="col-xs-12 col-sm-12 col-md-12 col-md-pull-0 col-lg-6 col-lg-pull-0 coll-dashboard-block-3">';
-			}
-			else
-			{
-				echo '<div class="col-xs-12 col-sm-12 col-md-12 col-md-pull-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '2' : '0' ).' col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '9' ).' col-lg-pull-0 coll-dashboard-block-3">';
-			}
+			echo '<div class="col-xs-12 col-sm-12 '
+				.( $have_comments_to_moderate ? 'col-md-12' : 'col-md-9' ).' col-md-pull-0 '
+				.( $have_comments_to_moderate || $have_posts_to_moderate ? 'col-lg-6' : 'col-lg-9' )
+				.' col-lg-pull-0 coll-dashboard-block-3">';
 		}
 		else
 		{
-			if( $have_comments_to_moderate || $have_posts_to_moderate )
-			{
-				echo '<div class="col-xs-12 col-sm-12 col-md-12 col-md-pull-0 col-lg-6 col-lg-pull-0">';
-			}
-			else
-			{
-				echo '<div class="col-xs-12 col-sm-12 col-md-12">';
-			}
+			echo '<div class="col-xs-12 col-sm-12 col-md-12'
+				.( $have_comments_to_moderate || $have_posts_to_moderate ? ' col-md-pull-0 col-lg-6 col-lg-pull-0' : '' ).'">';
 		}
 
 		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )

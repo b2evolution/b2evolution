@@ -62,7 +62,7 @@ $Form->begin_fieldset( T_('Tags').get_manual_link('user-marketing-tags') );
 	$Form->text_input( 'edited_user_tags', param( 'edited_user_tags', 'string', $user_tags ), 40, T_('Tags'), '', array(
 		'maxlength' => 255,
 		'style'     => 'width: 100%;',
-		'input_prefix' => '<div id="user_admin_tags" class="input-group">',
+		'input_prefix' => '<div class="input-group user_admin_tags" style="width: 100%">',
 		'input_suffix' => '</div>',
 	) );
 	?>

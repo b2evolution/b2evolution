@@ -35,7 +35,7 @@ $moderation_blogs = $DB->get_col( $SQL->get() );
 
 if( empty( $moderation_blogs ) )
 { // There are no blogs where exists draft posts older then the threshold ( 24 hours by default )
-	$result_message = sprintf( 'No posts have been awaiting moderation for more than %s.', seconds_to_period( $post_moderation_reminder_threshold ) );
+	cron_log_append( sprintf( 'No posts have been awaiting moderation for more than %s.', seconds_to_period( $post_moderation_reminder_threshold ) ) );
 	return 1;
 }
 
@@ -169,7 +169,7 @@ $loaded_ids = $UserCache->get_ID_array();
 
 if( empty( $loaded_ids ) )
 { // UserCache result is empty which means nobody wants to receive notifications
-	$result_message = sprintf( 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have posts pending moderation!' );
+	cron_log_append( 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have posts pending moderation!' );
 	return 1;
 }
 
@@ -341,6 +341,6 @@ foreach( $loaded_ids as $moderator_ID )
 	locale_restore_previous();
 }
 
-$result_message = sprintf( '%d moderators have been notified!', $mail_sent );
+cron_log_append( sprintf( '%d moderators have been notified!', $mail_sent ) );
 return 1; /*OK*/
 ?>

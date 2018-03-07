@@ -16,7 +16,7 @@ $DB->halt_on_error = false;
 
 if( $Settings->get( 'auto_prune_stats_mode' ) != 'cron' )
 { // Autopruning is NOT requested
-	$result_message = T_('Auto pruning is not set to run as a scheduled task');
+	cron_log_append( T_('Auto pruning is not set to run as a scheduled task') );
 	return 2;
 }
 
@@ -48,7 +48,7 @@ if( empty( $result ) )
 }
 elseif( isset( $result['message'] ) )
 { // Get a message from result for report
-	$result_message = $result['message'];
+	cron_log_append( $result['message'] );
 	if( isset( $result['result'] ) && $result['result'] == 'ok' )
 	{
 		return 1; /* ok */

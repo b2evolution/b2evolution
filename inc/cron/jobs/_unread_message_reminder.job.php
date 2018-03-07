@@ -55,7 +55,7 @@ $users_to_remind = $DB->get_assoc( $query, 0, 'Find users who need to be reminde
 
 if( empty( $users_to_remind ) )
 { // There is no user to remind
-	$result_message = T_( 'It was not necessary to send any reminder!' );
+	cron_log_append( T_( 'It was not necessary to send any reminder!' ) );
 	return 1;
 }
 
@@ -98,7 +98,7 @@ foreach( $users_to_remind as $user_ID => $last_reminder_ts )
 
 if( empty( $users_to_remind_ids ) )
 { // There is no user to remind after we have filtered out those ussers who haven't logged in since a long time
-	$result_message = T_( 'It was not necessary to send any reminder!' );
+	cron_log_append( T_( 'It was not necessary to send any reminder!' ) );
 	return 1;
 }
 
@@ -133,6 +133,6 @@ foreach( $users_to_remind_ids as $user_ID )
 	locale_restore_previous();
 }
 
-$result_message = sprintf( T_('%d reminder emails were sent!'), $reminder_sent );
+cron_log_append( sprintf( T_('%d reminder emails were sent!'), $reminder_sent ) );
 return 1; /* ok */
 ?>

@@ -3445,11 +3445,16 @@ function callback_filter_userlist( & $Form )
 			$Form->select_input_object( 'newsletter', get_param( 'newsletter' ), $NewsletterCache, T_('Subscribed to'), array( 'allow_none' => true ) );
 		}
 	}
-
-	$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, T_('Tag'), '', array(
-		'maxlength' => 255,
-		'input_prefix' => '<div class="input-group" style="width: 350px;">',
-		'input_suffix'=> '</div>'	) );
+	$Form->begin_line( T_('Has all these tags'), 'user_tag' );
+		$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
+			'maxlength' => 255,
+			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
+			'input_suffix'=> '</div>'	) );
+		$Form->text_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
+			'maxlength' => 255,
+			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
+			'input_suffix'=> '</div>'	) );
+	$Form->end_line();
 	?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
@@ -3484,9 +3489,10 @@ function callback_filter_userlist( & $Form )
 	{
 		jQuery( '#user_tag' ).hide();
 		init_autocomplete_tags( '#user_tag' );
+		init_autocomplete_tags( '#not_user_tag' );
 		<?php
 			// Don't submit a form by Enter when user is editing the tags
-			echo get_prevent_key_enter_js( '#token-input-user_tag' );
+			echo get_prevent_key_enter_js( '#token-input-user_tag, #token-input-not_user_tag' );
 		?>
 	} );
 	</script>
@@ -5414,6 +5420,8 @@ function users_results_block( $params = array() )
 			'display_soclinks'     => false,
 			'display_blogs'        => true,
 			'display_source'       => true,
+			'display_subscribed_list' => false,
+			'display_user_tags'    => false,
 			'display_regdate'      => true,
 			'display_regcountry'   => true,
 			'display_update'       => true,
@@ -5440,6 +5448,7 @@ function users_results_block( $params = array() )
 			'display_newsletter'   => true,
 			'display_automation'   => false,
 			'force_check_user'     => false,
+			'where_duplicate_email' => false,
 		), $params );
 
 	global $current_User;
@@ -5473,10 +5482,13 @@ function users_results_block( $params = array() )
 			'join_subregion'      => $params['display_subregion'],
 			'join_country'        => $params['join_country'],
 			'join_colls'          => $params['display_blogs'],
+			'join_user_tags'      => $params['display_user_tags'],
+			'join_lists'          => $params['display_subscribed_list'],
 			'keywords_fields'     => $params['keywords_fields'],
 			'where_status_closed' => $params['where_status_closed'],
 			'where_org_ID'        => $params['org_ID'],
 			'where_viewed_user'   => $params['viewed_user'],
+			'where_duplicate_email' => $params['where_duplicate_email'],
 		) );
 	$default_filters = array(
 			'order'      => $params['results_order'],
@@ -5659,6 +5671,8 @@ function users_results( & $UserList, $params = array() )
 			'display_soclinks'   => false,
 			'display_blogs'      => true,
 			'display_source'     => true,
+			'display_subscribed_list' => false,
+			'display_user_tags'  => false,
 			'display_regdate'    => true,
 			'display_regcountry' => true,
 			'display_update'     => true,
@@ -5952,6 +5966,25 @@ function users_results( & $UserList, $params = array() )
 				'order' => 'user_source',
 				'default_dir' => 'D',
 				'td' => '$user_source$',
+			);
+	}
+
+	if( $params['display_subscribed_list'] )
+	{
+		$UserList->cols[] = array(
+				'th' => T_('Subscribed List'),
+				'td' =>  '%user_td_subscribed_list( #subscribed_list# )%',
+				'order' => 'subscribed_list_count'
+
+			);
+	}
+
+	if( $params['display_user_tags'] )
+	{
+		$UserList->cols[] = array(
+				'th' => T_('User tags'),
+				'td' => '%user_td_user_tags( #user_tags# )%',
+				'order' => 'user_tag_count',
 			);
 	}
 
@@ -6469,6 +6502,70 @@ function user_td_status( $user_status, $user_ID )
 
 	return $status_content;
 }
+
+
+/**
+ * Get list of subscribed newsletters/list
+ *
+ * @param string Comma delimited list of newsletter IDs
+ * @return string
+ */
+function user_td_subscribed_list( $lists )
+{
+	global $current_User, $admin_url;
+	$NewsletterCache = & get_NewsletterCache();
+	$lists = explode( ',', $lists );
+	$r = '<ul>';
+	foreach( $lists as $list_ID )
+	{
+		$loop_List = $NewsletterCache->get_by_ID( $list_ID );
+		if( $current_User->check_perm( 'options', 'edit' ) )
+		{
+			$r .= '<li><a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'">'.$loop_List->get( 'name' ).'</a></li>';
+		}
+		else
+		{
+			$r .= '<li>'.$loop_List->get( 'name' ).'</li>';
+		}
+	}
+	$r .= '</ul>';
+
+	return $r;
+}
+
+
+/**
+ * Get list of user tags
+ *
+ * @param string Comma delimited list of user tags
+ * @return string
+ */
+function user_td_user_tags( $tags )
+{
+	global $current_User, $admin_url;
+
+	$tags = explode( ',', $tags );
+	$tag_links = array();
+
+	$UserTagCache = & get_UserTagCache();
+	foreach( $tags as $tag_ID )
+	{
+		$loop_Tag = $UserTagCache->get_by_ID( $tag_ID );
+
+		if( $current_User->check_perm( 'options', 'edit' ) )
+		{
+			$tag_links[] = '<a href="'.$admin_url.'?ctrl=usertags&amp;utag_ID='.$tag_ID.'&amp;action=edit">'.$loop_Tag->dget( 'name' ).'</a>';
+		}
+		else
+		{
+			$tag_links[] = $loop_Tag->dget( 'name' );
+		}
+	}
+	$r = implode( ', ', $tag_links );
+
+	return $r;
+}
+
 
 /**
  * Get a flag of registration country with a link to user's sessions page
