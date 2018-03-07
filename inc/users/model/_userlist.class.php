@@ -427,8 +427,8 @@ class UserList extends DataObjectList2
 		/*
 		 * Restrict by registration date
 		 */
-		$this->filters['registered_min'] = param_date( 'registered_min', T_('Invalid_date'), false, NULL );
-		$this->filters['registered_max'] = param_date( 'registered_max', T_('Invalid_date'), false, NULL );
+		$this->filters['registered_min'] = param_date( 'registered_min', T_('Invalid date'), false, NULL );
+		$this->filters['registered_max'] = param_date( 'registered_max', T_('Invalid date'), false, NULL );
 
 		/*
 		 * Restrict by reported state ( was reported or not )
