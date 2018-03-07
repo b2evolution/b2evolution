@@ -864,15 +864,15 @@ function param_check_valid_login( $var )
 	{
 		if( $check === 'usr' )
 		{	// Special case, the login is valid however we forbid it's usage.
-			$msg = T_('Logins cannot start with "usr_", this prefix is reserved for system use.');
+			$msg = sprintf( T_('Logins cannot start with %s, this prefix is reserved for system use.'), '<code>usr_</code>' );
 		}
 		elseif( ! isset( $Settings ) || $Settings->get('strict_logins') )
 		{
-			$msg = T_('Logins can only contain letters, digits and the following characters: _ . -');
+			$msg = sprintf( T_('Logins can only contain letters, digits and the following characters: %s'), '<code>_</code> <code>.</code> <code>-</code>' );
 		}
 		else
 		{
-			$msg = sprintf( T_('Logins cannot contain whitespace and the following characters: %s'), '\', ", >, <, @, &' );
+			$msg = sprintf( T_('Logins cannot contain whitespace and the following characters: %s'), '<code>\'</code> <code>"</code> <code>></code> <code><</code> <code>@</code> <code>&</code>' );
 		}
 		param_error( $var, $msg );
 		return false;

@@ -1095,6 +1095,14 @@ function get_icon_info( $name )
 			'fa' => 'plus-circle',
 			'color' => '#337ab7'
 		);
+		case 'add__cyan': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#60b9e1'
+		);
 
 		case 'add__yellow': return array(
 			'alt'  => T_('Add'),
