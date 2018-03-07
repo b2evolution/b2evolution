@@ -28,8 +28,9 @@ param_action( 'list' );
 param( 'display_mode', 'string', 'normal' );
 
 $tab = param( 'tab', 'string', '' );
+$tab3 = param( 'tab3', 'string', '', true );
 
-$AdminUI->set_path( 'users', $tab == 'stats' ? 'stats' : 'users' );
+$AdminUI->set_path( 'users', $tab == 'stats' ? 'stats' : 'users', $tab3 == 'duplicates' ? 'duplicates' : 'list' );
 
 if( !$current_User->check_perm( 'users', 'view' ) )
 { // User has no permissions to view: he can only edit his profile
@@ -462,19 +463,32 @@ if( $tab == 'stats' )
 }
 else
 {	// Users list
-
-	// Initialize user tag input
 	init_tokeninput_js();
-	$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
-	$AdminUI->top_block = get_user_quick_search_form();
-	if( $current_User->check_perm( 'users', 'moderate', false ) )
-	{	// Include to edit user level
-		require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
-	}
-	load_funcs( 'regional/model/_regional.funcs.php' );
 
-	// Set an url for manual page:
-	$AdminUI->set_page_manual_link( 'users-users' );
+	switch( $tab3 )
+	{
+		case 'duplicates':
+			//$AdminUI->set_path( 'users', 'duplicates' );
+			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users&amp;tab3='.$tab3 );
+			break;
+
+		default:
+			//$AdminUI->set_path( 'users', 'list' );
+
+			// Initialize user tag input
+
+			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
+			$AdminUI->top_block = get_user_quick_search_form();
+			if( $current_User->check_perm( 'users', 'moderate', false ) )
+			{	// Include to edit user level
+				require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			}
+			load_funcs( 'regional/model/_regional.funcs.php' );
+
+			// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'users-users' );
+	}
+
 }
 
 // Initialize date picker
@@ -584,7 +598,16 @@ switch( $action )
 		}
 		else
 		{
-			$AdminUI->disp_view( 'users/views/_user_list.view.php' );
+			switch( $tab3 )
+			{
+				case 'duplicates':
+					$AdminUI->disp_view( 'users/views/_duplicate_email_user_list.view.php' );
+					break;
+
+				default:
+					$AdminUI->disp_view( 'users/views/_user_list.view.php' );
+			}
+
 		}
 		$AdminUI->disp_payload_end();
 }

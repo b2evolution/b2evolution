@@ -67,7 +67,8 @@ class GeneralSettings extends AbstractSettings
 
 		'email_campaign_send_mode' => 'immediate', // Sending mode for campaign
 		'email_campaign_chunk_size' => 50, // Chunk size of emails to send a campaign at a time
-		'email_campaign_cron_repeat' => 300, // Delay between chunks on scheduled campaign job runs
+		'email_campaign_cron_repeat' => 300, // 5 minutes: Delay between chunks on scheduled campaign job runs
+		'email_campaign_cron_limited' => 21600, // 6 hours: Delay between chunks on scheduled campaign job runs in case all remaining recipients have reached max # of emails for the current day
 
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',

@@ -32,7 +32,7 @@ $BlogCache->load_by_sql( $SQL );
 
 if( empty( $BlogCache->cache ) )
 {	// There are no collections where we should find old posts to alert for moderators
-	$result_message = 'No collection with alert on old contents.';
+	cron_log_append( 'No collection with alert on old contents.' );
 	return 1;
 }
 
@@ -171,7 +171,7 @@ $UserCache->load_by_sql( $SQL );
 
 if( empty( $UserCache->cache ) )
 {	// UserCache result is empty which means nobody wants to receive alert on old contents:
-	$result_message = 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have stale posts!';
+	cron_log_append( 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have stale posts!' );
 	return 1;
 }
 
@@ -269,11 +269,11 @@ foreach( $BlogCache->cache as $alert_Blog )
 
 if( count( $mail_moderator_sent ) )
 {
-	$result_message = sprintf( '%s moderators have been alerted on old contents of %s collections!', count( $mail_moderator_sent ), $mail_coll_sent );
+	cron_log_append( sprintf( '%s moderators have been alerted on old contents of %s collections!', count( $mail_moderator_sent ), $mail_coll_sent ) );
 }
 else
 {
-	$result_message = 'No moderators have been alerted on old contents!';
+	cron_log_append( 'No moderators have been alerted on old contents!' );
 }
 
 return 1; /*OK*/

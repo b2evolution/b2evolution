@@ -60,11 +60,11 @@ if( $disp != 'front' && $disp != 'single' && isset( $MainList ) && $MainList->re
 	{	// If tracking of unread content is enabled:
 		$legends[] = array(
 				'topic_new' => array(
-					'system_icon' => 'bullet_orange',
+					'icon'        => 'icon_new fa-comments new',
 					'title'       => T_('New topic'),
 				),
 				'topic_updated' => array(
-					'system_icon' => 'bullet_brown',
+					'icon'        => 'fa-comments updated',
 					'title'       => T_('Updated topic'),
 				),
 			);

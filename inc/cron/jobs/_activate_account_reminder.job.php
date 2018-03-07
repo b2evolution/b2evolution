@@ -12,7 +12,7 @@ global $servertimenow, $baseurl, $activate_account_reminder_config, $activate_ac
 
 if( $Settings->get( 'validation_process' ) != 'easy' )
 {
-	$result_message = sprintf( T_( 'With secure activation process sending reminder emails is not permitted!' ) );
+	cron_log_append( T_( 'With secure activation process sending reminder emails is not permitted!' ), 'error' );
 	return 2; /* error */
 }
 
@@ -30,7 +30,7 @@ $status_condition = '( user_status = "new" OR user_status = "emailchanged" OR us
 $number_of_max_reminders = ( count( $activate_account_reminder_config ) - 1 );
 if( $number_of_max_reminders < 1 )
 { // The config array is wrong, it must have at least two elements
-	$result_message = sprintf( T_('The job advanced configuration is wrong, can\'t send reminders!') );
+	cron_log_append( T_('The job advanced configuration is wrong, can\'t send reminders!'), 'error' );
 	return 3; /* error */
 }
 $reminder_date = date2mysql( $servertimenow - $activate_account_reminder_config[0] );
@@ -80,6 +80,6 @@ $DB->query( 'UPDATE T_users
 		WHERE ( uset_name = "last_activation_email" AND uset_value IS NOT NULL AND uset_value < '.$DB->quote( $failed_activation_date ).' )
 			AND ( user_created_datetime < '.$DB->quote( $failed_activation_date ).' ) AND '.$status_condition );
 
-$result_message = sprintf( T_( '%d account activation reminder emails were sent!' ), $reminder_sent );
+cron_log_append( sprintf( T_( '%d account activation reminder emails were sent!' ), $reminder_sent ) );
 return 1; /* ok */
 ?>

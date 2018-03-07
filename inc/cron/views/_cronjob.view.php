@@ -55,6 +55,7 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 			$Form->info( T_('Real start time'), mysql2localedatetime( $cjob_row->clog_realstart_datetime ) );
 			$Form->info( T_('Real stop time'), mysql2localedatetime( $cjob_row->clog_realstop_datetime ) );
 			$Form->info( T_('Duration'), seconds_to_period( $duration_seconds ) );
+			$Form->info( T_('# of actions'), $cjob_row->clog_actions_num );
 			$cron_messages_data = @unserialize( $cjob_row->clog_messages );
 			if( !is_array( $cron_messages_data ) )
 			{	// Simple messages

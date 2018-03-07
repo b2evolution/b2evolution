@@ -465,7 +465,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
  */
 function display_link_position( & $row )
 {
-	global $LinkOwner;
+	global $LinkOwner, $current_File;
 
 	$r = '';
 
@@ -523,6 +523,15 @@ function display_link_position( & $row )
 						'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\' )',
 						'style'   => 'cursor:default;'
 					) );
+
+			if( $current_File->is_dir() )
+			{
+				$r .= ' '.get_icon( 'add__cyan', 'imgtag', array(
+							'title'   => sprintf( T_('Insert %s tag into the post'), '[folder:]' ),
+							'onclick' => 'evo_link_insert_inline( \'folder\', '.$row->link_ID.', \'\' )',
+							'style'   => 'cursor:default;'
+						) );
+			}
 		}
 	}
 

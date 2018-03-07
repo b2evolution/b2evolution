@@ -157,6 +157,9 @@ else
 	$ctsk_ID = $task->ctsk_ID;
 	$ctsk_name = cron_job_name( $task->ctsk_key, $task->ctsk_name, $task->ctsk_params );
 
+	// Initialize a var to count a number of cron job actions:
+	$cron_log_actions_num = NULL;
+
 	cron_log( 'Requesting lock on task #'.$ctsk_ID.' ['.$ctsk_name.']', 0 );
 
 	$DB->halt_on_error = false;
@@ -260,7 +263,8 @@ else
 		$sql = ' UPDATE T_cron__log
 								SET clog_status = '.$DB->quote( $result_status ).',
 										clog_realstop_datetime = '.$DB->quote( date2mysql( $timestop ) ).',
-										clog_messages = '.$DB->quote( $result_message ) /* May be NULL */.'
+										clog_messages = '.$DB->quote( $result_message ) /* May be NULL */.',
+										clog_actions_num = '.$DB->quote( $cron_log_actions_num ).'
 							WHERE clog_ctsk_ID = '.$ctsk_ID;
 		$DB->query( $sql, 'Record task as finished.' );
 	}

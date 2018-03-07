@@ -28,7 +28,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $DB, $result_message;
+global $Settings, $DB;
 global $dre_messages, $dre_emails, $email_cntr, $del_cntr, $is_cron_mode;
 
 // Are we in cron job mode?

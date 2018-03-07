@@ -63,10 +63,16 @@ switch( $action )
 
 	case 'edit':
 	case 'edit_step':
+	case 'copy_step':
 		// Edit Automation/Step forms:
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
+
+		if( $action == 'copy_step' )
+		{	// Clear an order of the duplicating step in order to set this automatically right below current one:
+			$edited_AutomationStep->set( 'order', '' );
+		}
 		break;
 
 	case 'new_step':
@@ -182,13 +188,30 @@ switch( $action )
 		// Update automation in DB:
 		if( $edited_Automation->dbupdate() )
 		{
-			$Messages->add( T_('Automation status has been changed.'), 'success' );
+				$Messages->add( ( $action == 'status_paused'
+						? T_('Automation has been paused.')
+						: T_('Automation has been activated.')
+					), 'success' );
 			// We want to highlight the moved Step on next list display:
 			$Session->set( 'fadeout_array', array( 'autm_ID' => array( $edited_Automation->ID ) ) );
 		}
 
+		// Set a redirect to page back where the status has been changes:
+		if( $enlt_ID > 0 )
+		{	// A list of automations on the edited List page:
+			$redirect_to = $admin_url.'?ctrl=newsletters&tab=automations&action=edit&enlt_ID='.$enlt_ID;
+		}
+		elseif( $tab == 'steps' )
+		{	// Tab "Steps" of the edited Automation page:
+			$redirect_to = $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_Automation->ID;
+		}
+		else
+		{	// A list of all automations:
+			$redirect_to = $admin_url.'?ctrl=automations';
+		}
+
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $enlt_ID > 0 ? $admin_url.'?ctrl=newsletters&tab=automations&action=edit&enlt_ID='.$enlt_ID : $admin_url.'?ctrl=automations', 303 ); // Will EXIT
+		header_redirect( $redirect_to, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -329,7 +352,6 @@ switch( $action )
 
 	case 'create_step':
 		// Create new Automation Step:
-		$edited_AutomationStep = new AutomationStep();
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'automationstep' );
@@ -337,18 +359,84 @@ switch( $action )
 		// Check that current user has permission to create automation steps:
 		$current_User->check_perm( 'options', 'edit', true );
 
+		$edited_AutomationStep = new AutomationStep();
+
+		$entered_step_order = param( 'step_order', 'integer', NULL );
+
 		// load data from request
 		if( $edited_AutomationStep->load_from_Request() )
 		{	// We could load data from form without errors:
 			// Insert in DB:
 			$edited_AutomationStep->dbinsert();
 			$Messages->add( T_('New automation step has been created.'), 'success' );
+			// We want to highlight the moved Step on next list display:
+			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'new_step';
+		$edited_AutomationStep->set( 'order', $entered_step_order );
+		break;
+
+	case 'duplicate_step':
+		// Duplicate Automation Step:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check that current user has permission to create automation steps:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		$duplicated_step_ID = $edited_AutomationStep->ID;
+		$duplicated_step_order = $edited_AutomationStep->get( 'order' );
+
+		$edited_AutomationStep = new AutomationStep();
+
+		$entered_step_order = param( 'step_order', 'integer', NULL );
+
+		// Load data from request:
+		if( $edited_AutomationStep->load_from_Request() )
+		{	// We could load data from form without errors:
+			// Insert in DB:
+			$edited_AutomationStep->dbinsert();
+
+			if( empty( $entered_step_order ) )
+			{	// Move the new created step right after the duplicated step:
+				$SQL = new SQL( 'Get steps of automation #'.$edited_AutomationStep->get( 'autm_ID' ).' before insert new step right below duplicated one' );
+				$SQL->SELECT( 'step_order' );
+				$SQL->FROM( 'T_automation__step' );
+				$SQL->WHERE( 'step_autm_ID = '.$DB->quote( $edited_AutomationStep->get( 'autm_ID' ) ) );
+				$SQL->WHERE_and( 'step_order > '.$DB->quote( $duplicated_step_order ) );
+				$SQL->ORDER_BY( 'step_order' );
+				$steps = $DB->get_col( $SQL );
+				if( ! empty( $steps ) && $steps[0] == $duplicated_step_order + 1 )
+				{	// If the duplicated step is NOT last AND the next order number is NOT free
+					// then we should shift all next steps down and use next order for new created step:
+					$DB->query( 'UPDATE T_automation__step
+						  SET step_order = step_order + 1
+						WHERE step_autm_ID = '.$DB->quote( $edited_AutomationStep->get( 'autm_ID' ) ).'
+						  AND step_order > '.$DB->quote( $duplicated_step_order ).'
+						ORDER BY step_order DESC' );
+					$DB->query( 'UPDATE T_automation__step
+						  SET step_order = '.( $duplicated_step_order + 1 ).'
+						WHERE step_ID = '.$DB->quote( $edited_AutomationStep->ID ) );
+				}
+			}
+
+			$Messages->add( T_('Automation step has been duplicated.'), 'success' );
+			// We want to highlight the moved Step on next list display:
+			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		// If errors, Display the step form again to fix them:
+		$action = 'copy_step';
+		$edited_AutomationStep->ID = $duplicated_step_ID;
+		$edited_AutomationStep->set( 'order', $entered_step_order );
 		break;
 
 	case 'update_step':
@@ -369,6 +457,8 @@ switch( $action )
 			// Update automation step in DB:
 			$edited_AutomationStep->dbupdate();
 			$Messages->add( T_('Automation step has been updated.'), 'success' );
+			// We want to highlight the moved Step on next list display:
+			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
@@ -521,6 +611,7 @@ switch( $action )
 	case 'delete':
 	case 'new_step':
 	case 'edit_step':
+	case 'copy_step':
 		$AdminUI->display_breadcrumbpath_add( T_('Automations'), $admin_url.'?ctrl=automations' );
 		if( $action != 'new' )
 		{	// Add menu level 3 entries:
@@ -577,18 +668,21 @@ switch( $action )
 		break;
 }
 
-if( in_array( $action, array( 'new_step', 'edit_step' ) ) )
+if( in_array( $action, array( 'new_step', 'edit_step', 'copy_step' ) ) )
 {	// Load jQuery QueryBuilder plugin files:
 	$step_Automation = & $edited_AutomationStep->get_Automation();
 	init_querybuilder_js( 'rsc_url' );
+	$AdminUI->display_breadcrumbpath_add( $edited_Automation->dget( 'name' ), $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID );
 	if( $action == 'new_step' )
 	{
-		$AdminUI->display_breadcrumbpath_add( $edited_Automation->dget( 'name' ), $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID );
 		$AdminUI->display_breadcrumbpath_add( T_('New step') );
+	}
+	elseif( $action == 'copy_step' )
+	{
+		$AdminUI->display_breadcrumbpath_add( T_('Duplicate step').' #'.get_param( 'step_ID' ) );
 	}
 	else
 	{
-		$AdminUI->display_breadcrumbpath_add( $edited_Automation->dget( 'name' ), $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID );
 		$AdminUI->display_breadcrumbpath_add( T_('Step').' #'.$edited_AutomationStep->dget( 'order' ) );
 	}
 }
@@ -644,6 +738,7 @@ switch( $action )
 
 	case 'new_step':
 	case 'edit_step':
+	case 'copy_step':
 		// Display a form of automation step:
 		$AdminUI->disp_view( 'automations/views/_automation_step.form.php' );
 		break;

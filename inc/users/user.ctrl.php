@@ -959,7 +959,7 @@ if( $display_mode != 'js')
 	$AdminUI->disp_html_head();
 
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-	$AdminUI->disp_body_top();
+	$AdminUI->disp_body_top( true, array( 'display_menu3' => false ) );
 }
 
 /*

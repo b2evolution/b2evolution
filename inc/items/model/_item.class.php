@@ -3085,7 +3085,7 @@ class Item extends ItemLight
 			}
 			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
 			{	// Deny to display content block Item with lower status than parent Item:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The visibility level of the content bock "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&

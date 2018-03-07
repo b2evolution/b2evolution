@@ -8119,7 +8119,7 @@ function render_inline_files( $content, $Object, $params = array() )
 	$content = move_short_tags( $content );
 
 	// Find all matches with inline tags
-	preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
+	preg_match_all( '/\[(image|file|inline|video|audio|thumbnail|folder):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
 
 	if( !empty( $inlines[0] ) )
 	{	// There are inline tags in the content...
@@ -8139,7 +8139,7 @@ function render_inline_files( $content, $Object, $params = array() )
 
 
 /**
- * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:] into HTML tags
+ * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:|folder:] into HTML tags
  *
  * @param object Source object: Item, EmailCampaign
  * @param array Inline tags
@@ -8210,7 +8210,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 	foreach( $tags as $current_inline )
 	{
-		preg_match("/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i", $current_inline, $inline);
+		preg_match("/\[(image|file|inline|video|audio|thumbnail|folder):(\d+)(:?)([^\]]*)\]/i", $current_inline, $inline);
 
 		if( empty( $inline ) )
 		{
@@ -8218,7 +8218,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 			continue;
 		}
 
-		$inline_type = $inline[1]; // image|file|inline|video|audio|thumbnail
+		$inline_type = $inline[1]; // image|file|inline|video|audio|thumbnail|folder
 		$current_link_ID = (int) $inline[2];
 
 		if( empty( $current_link_ID ) )
@@ -8563,6 +8563,50 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				}
 				else
 				{ // not a video file, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			case 'folder':
+				if( $File->is_dir() )
+				{
+					$image_folder_params = array(
+						'before_gallery'        => '<div class="bGallery">',
+						'after_gallery'         => '</div>',
+						'gallery_table_start'   => '',//'<table cellpadding="0" cellspacing="3" border="0" class="image_index">',
+						'gallery_table_end'     => '',//'</table>',
+						'gallery_row_start'     => '',//"\n<tr>",
+						'gallery_row_end'       => '',//"\n</tr>",
+						'gallery_cell_start'    => '<div class="evo_post_gallery__image">',//"\n\t".'<td valign="top"><div class="bGallery-thumbnail">',
+						'gallery_cell_end'      => '</div>',//'</div></td>',
+						'gallery_image_size'    => 'crop-80x80',
+						'gallery_image_limit'   => 1000,
+						'gallery_colls'         => 5,
+						'gallery_order'         => '', // 'ASC', 'DESC', 'RAND'
+						'gallery_link_rel'      => '#', // '#' - Use default 'lightbox[g'.$this->ID.']' to make one "gallery" per directory
+					);
+
+					if( ! empty( $inline[3] ) ) // check if second colon is present
+					{
+						global $thumbnail_sizes;
+
+						// Get the file caption
+						$options = explode( ':', $inline[4] );
+
+						if( ! empty( $options[0] ) && isset( $thumbnail_sizes[$options[0]] ) )
+						{ // thumbnail image size
+							$image_folder_params['gallery_image_size'] = $options[0];
+						}
+
+						if( ! empty( $options[1] ) && preg_match( '/^\d+$/', $options[1] ) )
+						{ // limit number of images
+							$image_folder_params['gallery_image_limit'] = (int) $options[1];
+						}
+					}
+					$inlines[$current_inline] = $File->get_gallery( $image_folder_params );
+				}
+				else
+				{
 					$inlines[$current_inline] = $current_inline;
 				}
 				break;

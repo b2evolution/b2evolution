@@ -29,12 +29,12 @@ $edit_automation_url = regenerate_url( 'action,step_ID', 'action=edit&amp;autm_I
 
 $Form->global_icon( T_('Cancel editing').'!', 'close', $edit_automation_url );
 
-$Form->begin_form( 'fform', sprintf( $creating ? T_('New step') : T_('Step') ).get_manual_link( 'automation-step-form' ) );
+$Form->begin_form( 'fform', sprintf( $creating ? ( $edited_AutomationStep->ID > 0 ? T_('Duplicate step') : T_('New step') ) : T_('Step') ).get_manual_link( 'automation-step-form' ) );
 
 $Form->add_crumb( 'automationstep' );
-$Form->hidden( 'action', $creating ? 'create_step' : 'update_step' );
+$Form->hidden( 'action', $creating ? ( $edited_AutomationStep->ID > 0 ? 'duplicate_step' : 'create_step' ) : 'update_step' );
 $Form->hidden( 'autm_ID', $step_Automation->ID );
-$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',step_ID' : '' ) ) );
+$Form->hiddens_by_key( get_memorized( 'action'.( $creating && $edited_AutomationStep->ID == 0 ? ',step_ID' : '' ) ) );
 
 $Form->info( T_('Automation'), '<a href="'.$edit_automation_url.'">'.$step_Automation->get( 'name' ).'</a>' );
 
@@ -85,9 +85,9 @@ $Form->select_input_object( 'step_automation', $automation_ID, $AutomationCache,
 $AutomationStepCache = & get_AutomationStepCache();
 $AutomationStepCache->clear();
 $AutomationStepCache->load_where( 'step_autm_ID = '.$step_Automation->ID
-	.( $edited_AutomationStep->ID > 0 ? ' AND step_ID != '.$edited_AutomationStep->ID : '' ) );
+	.( ! $creating ? ' AND step_ID != '.$edited_AutomationStep->ID : '' ) );
 $next_step_prepend_options = array( '' => T_('Continue') );
-if( $edited_AutomationStep->ID > 0 )
+if( ! $creating )
 {	// Display special label for option with current Step:
 	$next_step_prepend_options[ $edited_AutomationStep->ID ] = T_('Loop');
 }
@@ -130,11 +130,14 @@ $form_duration_selector = $Form->duration_input( '$duration_selector$', '', '', 
 		'allow_none_title' => false,
 	) );
 $NewsletterCache = & get_NewsletterCache();
-$NewsletterCache->none_option_text = T_('Any');
 $NewsletterCache->clear();
 global $DB;
 $NewsletterCache->load_where( 'enlt_ID IN ( '.$DB->quote( $step_Automation->get_newsletter_IDs() ).' )' );
-$form_newsletter_selector = $Form->select_input_object( '$newsletter_selector$', '', $NewsletterCache, '', array( 'allow_none' => true ) );
+$lastsent_list_prepend_options = array(
+		-1 => T_('Any list'),
+		'' => T_('Any list tied to step automation'),
+	);
+$form_newsletter_selector = $Form->select_input_object( '$newsletter_selector$', '', $NewsletterCache, '', array( 'prepend_options' => $lastsent_list_prepend_options ) );
 $Form->output = true;
 $Form->switch_layout( NULL );
 
@@ -142,7 +145,7 @@ $Form->end_form( array(
 		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' )
 	) );
 
-if( $edited_AutomationStep->ID > 0 )
+if( ! $creating )
 {	// Display numbers of users queued for the edited Automation Step:
 	$SQL = new SQL( 'Get all users queued for automation step #'.$edited_AutomationStep->ID );
 	$SQL->SELECT( 'aust_autm_ID, aust_user_ID, aust_next_exec_ts, user_login' );

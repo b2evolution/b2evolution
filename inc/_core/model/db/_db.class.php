@@ -457,6 +457,9 @@ class DB
 		// Force MySQL strict mode
 		$this->query( 'SET sql_mode = "TRADITIONAL"', 'Force MySQL "strict" mode (and make sure server is not configured with a weird incompatible mode)' );
 
+		// Support 4-byte chars:
+		$this->query( 'SET NAMES utf8mb4' );
+
 		if( $this->debug_profile_queries )
 		{
 			// dh> this will fail, if it is not supported, but has to be enabled manually anyway.

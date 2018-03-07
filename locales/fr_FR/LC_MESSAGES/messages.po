@@ -11403,7 +11403,7 @@ msgstr "Posts par utilisateurs anonymes"
 #: ../../../inc/collections/views/_coll_features.form.php:200
 #: ../../../inc/collections/views/_coll_features.form.php:214
 msgid "Default status for new posts in backoffice"
-msgstr ""
+msgstr "Statut par défaut pour les posts dans le back-office"
 
 #: ../../../inc/collections/views/_coll_features.form.php:200
 #: ../../../inc/collections/views/_coll_features.form.php:214
@@ -11413,7 +11413,7 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_features.form.php:208
 #: ../../../inc/collections/views/_coll_features.form.php:215
 msgid "Default status for new anonymous posts"
-msgstr ""
+msgstr "Statut par défaut pour les posts anonymes"
 
 #: ../../../inc/collections/views/_coll_features.form.php:208
 #: ../../../inc/collections/views/_coll_features.form.php:215
@@ -14194,7 +14194,7 @@ msgstr "%s a posté un nouveau commentaire meta sur \"%s\""
 #: ../../../inc/comments/model/_comment.class.php:4145
 #, php-format
 msgid "[%s] New comment awaiting moderation on \"%s\""
-msgstr "[%s] Commentaires en attente de modération sur \"%s\""
+msgstr "[%s] Nouveau commentaire en attente de modération sur \"%s\""
 
 #. TRANS: Subject of the mail to send on new comments to moderators. First %s
 #. is blog name, the second %s is the item's title.
@@ -15574,11 +15574,11 @@ msgstr "Nombre d'envois"
 
 #: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:318
 msgid "Open count"
-msgstr ""
+msgstr "Ouvertures"
 
 #: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:327
 msgid "Click count"
-msgstr ""
+msgstr "Clicks"
 
 #: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:339
 #: ../../../inc/links/model/_linkemailcampaign.class.php:43
@@ -34356,7 +34356,7 @@ msgstr "Dernières réponses"
 #: ../../../inc/widgets/_widgets.funcs.php:115
 #: ../../../install/_functions_evoupgrade.php:2178
 msgid "Latest pages"
-msgstr "Dernière pages"
+msgstr "Dernières pages"
 
 #: ../../../inc/widgets/_widgets.funcs.php:120
 #: ../../../skins/bootstrap_manual_skin/index.main.php:36
@@ -39980,7 +39980,7 @@ msgstr "Détecter le pays à l'enregistrement"
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:118
 msgid "Auto select current country in list"
-msgstr "Choisissez automatiquement votre pays dans la liste actuelle"
+msgstr "Sélectionner automatiquement le pays actuel dans la liste"
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:119
 msgid "Hide country selector if a country has been detected"
