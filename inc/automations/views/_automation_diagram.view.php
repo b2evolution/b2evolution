@@ -33,7 +33,7 @@ if( $is_automation_active )
 }
 else
 {	// To play:
-	echo action_icon( T_('Play'), 'pause',
+	echo action_icon( T_('Play'), 'play',
 		$admin_url.'?ctrl=automations&amp;tab='.get_param( 'tab' ).'&amp;action=status_active&amp;autm_ID='.$edited_Automation->ID.'&amp;'.url_crumb( 'automation' ),
 		' '.T_('Play'), 3, 4, array( 'class' => 'btn btn-success' ) )
 	.' <span class="orange">('.T_('PAUSED').')</span>';
