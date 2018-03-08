@@ -8565,40 +8565,17 @@ function render_inline_tags( $Object, $tags, $params = array() )
 			case 'folder':
 				if( $File->is_dir() )
 				{
-					$image_folder_params = array(
-						'before_gallery'        => '<div class="bGallery">',
-						'after_gallery'         => '</div>',
-						'gallery_table_start'   => '',//'<table cellpadding="0" cellspacing="3" border="0" class="image_index">',
-						'gallery_table_end'     => '',//'</table>',
-						'gallery_row_start'     => '',//"\n<tr>",
-						'gallery_row_end'       => '',//"\n</tr>",
-						'gallery_cell_start'    => '<div class="evo_post_gallery__image">',//"\n\t".'<td valign="top"><div class="bGallery-thumbnail">',
-						'gallery_cell_end'      => '</div>',//'</div></td>',
-						'gallery_image_size'    => 'crop-80x80',
-						'gallery_image_limit'   => 1000,
-						'gallery_colls'         => 5,
-						'gallery_order'         => '', // 'ASC', 'DESC', 'RAND'
-						'gallery_link_rel'      => '#', // '#' - Use default 'lightbox[g'.$this->ID.']' to make one "gallery" per directory
-					);
+					$current_folder_params = $params;
 
 					if( ! empty( $inline[3] ) ) // check if second colon is present
 					{
-						global $thumbnail_sizes;
-
-						// Get the file caption
-						$options = explode( ':', $inline[4] );
-
-						if( ! empty( $options[0] ) && isset( $thumbnail_sizes[$options[0]] ) )
-						{ // thumbnail image size
-							$image_folder_params['gallery_image_size'] = $options[0];
-						}
-
-						if( ! empty( $options[1] ) && preg_match( '/^\d+$/', $options[1] ) )
+						if( preg_match( '/^\d+$/', $inline[4] ) )
 						{ // limit number of images
-							$image_folder_params['gallery_image_limit'] = (int) $options[1];
+							$current_folder_params['gallery_image_limit'] = (int) $inline[4];
 						}
 					}
-					$inlines[$current_inline] = $File->get_gallery( $image_folder_params );
+
+					$inlines[$current_inline] = $File->get_gallery( $current_folder_params );
 				}
 				else
 				{
