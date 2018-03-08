@@ -113,6 +113,7 @@ $unread_threads = get_users_unread_threads( $users_to_remind_ids, NULL, 'array',
 list( $threads_link ) = get_messages_link_to();
 
 $reminder_sent = 0;
+$reminder_failed = 0;
 foreach( $users_to_remind_ids as $user_ID )
 {
 	// send reminder email
@@ -128,11 +129,19 @@ foreach( $users_to_remind_ids as $user_ID )
 		$UserSettings->set( 'last_unread_messages_reminder', date2mysql( $servertimenow ), $user_ID );
 		// save UserSettings after each email, because the cron task mail fail and users won't be updated!
 		$UserSettings->dbupdate();
+		cron_log_action_end( 'User '.$notify_User->get_identity_link().' has been notified' );
 		$reminder_sent++;
+	}
+	else
+	{	// Log failed mail sending:
+		global $mail_log_message;
+		cron_log_action_end( 'User '.$notify_User->get_identity_link().' could not be notified because of error: '
+			.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
+		$reminder_failed++;
 	}
 	locale_restore_previous();
 }
 
-cron_log_append( sprintf( T_('%d reminder emails were sent!'), $reminder_sent ) );
+cron_log_append( ( ( $reminder_sent + $reminder_failed ) ? "\n" : '' ).sprintf( T_('%d reminder emails were sent!'), $reminder_sent ) );
 return 1; /* ok */
 ?>

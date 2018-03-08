@@ -216,6 +216,7 @@ foreach( $blog_comments as $row )
 }
 
 $mail_sent = 0;
+$mail_failed = 0;
 $params = array();
 
 // Collect comments data for global moderators
@@ -329,12 +330,20 @@ foreach( $loaded_ids as $moderator_ID )
 	// Change locale here to localize the email subject and content
 	locale_temp_switch( $moderator_User->get( 'locale' ) );
 	if( send_mail_to_User( $moderator_ID, T_( 'Comment moderation reminder' ), 'comments_unmoderated_reminder', $params, false ) )
-	{
+	{	// Log success mail sending:
+		cron_log_action_end( 'User '.$moderator_User->get_identity_link().' has been notified' );
 		$mail_sent++;
+	}
+	else
+	{	// Log failed mail sending:
+		global $mail_log_message;
+		cron_log_action_end( 'User '.$moderator_User->get_identity_link().' could not be notified because of error: '
+			.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
+		$mail_failed++;
 	}
 	locale_restore_previous();
 }
 
-cron_log_append( sprintf( T_( '%d moderators have been notified!' ), $mail_sent ) );
+cron_log_append( ( ( $mail_sent + $mail_failed ) ? "\n" : '' ).sprintf( T_( '%d moderators have been notified!' ), $mail_sent ) );
 return 1; /*OK*/
 ?>
