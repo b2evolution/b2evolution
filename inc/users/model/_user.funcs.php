@@ -6513,22 +6513,31 @@ function user_td_status( $user_status, $user_ID )
 function user_td_subscribed_list( $lists )
 {
 	global $current_User, $admin_url;
+
+	if( empty( $lists ) )
+	{
+		return NULL;
+	}
+
 	$NewsletterCache = & get_NewsletterCache();
 	$lists = explode( ',', $lists );
-	$r = '<ul>';
+	$lists_links = array();
+
 	foreach( $lists as $list_ID )
 	{
-		$loop_List = $NewsletterCache->get_by_ID( $list_ID );
-		if( $current_User->check_perm( 'options', 'edit' ) )
+		if( $loop_List = $NewsletterCache->get_by_ID( $list_ID, false ) )
 		{
-			$r .= '<li><a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'">'.$loop_List->get( 'name' ).'</a></li>';
-		}
-		else
-		{
-			$r .= '<li>'.$loop_List->get( 'name' ).'</li>';
+			if( $current_User->check_perm( 'options', 'edit' ) )
+			{
+				$lists_array[] = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'">'.$loop_List->get( 'name' ).'</a>';
+			}
+			else
+			{
+				$lists_array[] = $loop_List->get( 'name' );
+			}
 		}
 	}
-	$r .= '</ul>';
+	$r = implode( ', ', $lists_array );
 
 	return $r;
 }
@@ -6544,21 +6553,27 @@ function user_td_user_tags( $tags )
 {
 	global $current_User, $admin_url;
 
+	if( empty( $tags ) )
+	{
+		return NULL;
+	}
+
 	$tags = explode( ',', $tags );
 	$tag_links = array();
 
 	$UserTagCache = & get_UserTagCache();
 	foreach( $tags as $tag_ID )
 	{
-		$loop_Tag = $UserTagCache->get_by_ID( $tag_ID );
-
-		if( $current_User->check_perm( 'options', 'edit' ) )
+		if( $loop_Tag = $UserTagCache->get_by_ID( $tag_ID, false ) )
 		{
-			$tag_links[] = '<a href="'.$admin_url.'?ctrl=usertags&amp;utag_ID='.$tag_ID.'&amp;action=edit">'.$loop_Tag->dget( 'name' ).'</a>';
-		}
-		else
-		{
-			$tag_links[] = $loop_Tag->dget( 'name' );
+			if( $current_User->check_perm( 'options', 'edit' ) )
+			{
+				$tag_links[] = '<a href="'.$admin_url.'?ctrl=usertags&amp;utag_ID='.$tag_ID.'&amp;action=edit">'.$loop_Tag->dget( 'name' ).'</a>';
+			}
+			else
+			{
+				$tag_links[] = $loop_Tag->dget( 'name' );
+			}
 		}
 	}
 	$r = implode( ', ', $tag_links );

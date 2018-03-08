@@ -137,6 +137,7 @@ class UserQuery extends SQL
 			$this->FROM_add( 'LEFT JOIN (
 						SELECT enls_user_ID, GROUP_CONCAT( enls_enlt_ID ) AS subscribed_list, COUNT(*) AS subscribed_list_count
 						FROM T_email__newsletter_subscription
+						WHERE enls_subscribed = 1
 						GROUP BY enls_user_ID
 					) AS subscribed_lists on subscribed_lists.enls_user_ID = user_ID' );
 		}
