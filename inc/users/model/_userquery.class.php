@@ -132,12 +132,11 @@ class UserQuery extends SQL
 		}
 
 		if( $params['join_lists'] )
-		{
+		{ // subscribed_list contains comma-separated list of newsletter IDs, "negative" IDs are unsubscribed to newsletter lists
 			$this->SELECT_add( ', subscribed_list' );
 			$this->FROM_add( 'LEFT JOIN (
-						SELECT enls_user_ID, GROUP_CONCAT( enls_enlt_ID ) AS subscribed_list, COUNT(*) AS subscribed_list_count
+						SELECT enls_user_ID, GROUP_CONCAT( IF( enls_subscribed = 1, enls_enlt_ID, CONCAT( "-", enls_enlt_ID ) ) ) AS subscribed_list, COUNT(*) AS subscribed_list_count
 						FROM T_email__newsletter_subscription
-						WHERE enls_subscribed = 1
 						GROUP BY enls_user_ID
 					) AS subscribed_lists on subscribed_lists.enls_user_ID = user_ID' );
 		}

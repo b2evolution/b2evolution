@@ -6525,11 +6525,19 @@ function user_td_subscribed_list( $lists )
 
 	foreach( $lists as $list_ID )
 	{
+		$unsubscribed_list = false;
+		if( $list_ID[0] == '-' )
+		{
+			$unsubscribed_list = true;
+			$list_ID = trim( $list_ID, '-' );
+		}
+
 		if( $loop_List = $NewsletterCache->get_by_ID( $list_ID, false ) )
 		{
 			if( $current_User->check_perm( 'options', 'edit' ) )
 			{
-				$lists_array[] = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'">'.$loop_List->get( 'name' ).'</a>';
+				$lists_array[] = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'"'
+						.($unsubscribed_list ? ' style="text-decoration: line-through;"' : '' ).'>'.$loop_List->get( 'name' ).'</a>';
 			}
 			else
 			{
