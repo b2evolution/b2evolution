@@ -4105,12 +4105,6 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			if( isset( $email_limit_setting, $email_counter_setting ) )
 			{ // User Settings(email counters) need to be updated
 				update_user_email_counter( $email_limit_setting, $email_counter_setting, $user_ID );
-				$EmailCampaignCache = & get_EmailCampaignCache();
-				if( $email_campaign_ID && $edited_Campaign = $EmailCampaignCache->get_by_ID( $email_campaign_ID, false ) )
-				{
-					$User->add_usertags( $edited_Campaign->get( 'user_tag_sendsuccess' ) );
-					$User->dbupdate();
-				}
 			}
 			return true;
 		}

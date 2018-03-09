@@ -62,7 +62,7 @@ $Form->begin_fieldset( T_('List recipients') );
 			'input_suffix' => '</span>',
 		) );
 		$Form->info( '', '<span id="skipped_tag_count">'.$edited_EmailCampaign->get_recipients_count( 'skipped_tag' ).'</span>', T_('users will be skipped').' '.
-				action_icon( T_('Refresh'), 'refresh', '#', NULL, NULL, NULL, array( 'onclick' => 'return updateCampaignRecipients('.format_to_js( $edited_EmailCampaign->ID ).')' ) ) );
+				action_icon( T_('Refresh'), 'refresh', '#', NULL, NULL, NULL, array( 'onclick' => 'return update_campaign_recipients_count( '.$edited_EmailCampaign->ID.' )' ) ) );
 	$Form->end_line();
 	$Form->info( T_('Ready to send'), '<span id="ready_to_send_count">'.$edited_EmailCampaign->get_recipients_count( 'wait', true ).'</span>', '('.T_('Accounts which meet all criteria to receive this campaign').')' );
 	$Form->text_input( 'ecmp_user_tag_sendsuccess', param( 'ecmp_user_tag_sendsuccess', 'string', $edited_EmailCampaign->get( 'user_tag_sendsuccess' ) ), 60, T_('On successful send, tag users with'), '', array(
@@ -141,25 +141,30 @@ $Form->begin_fieldset( T_('Click tracking') );
 		} );
 	}
 
-	function updateCampaignRecipients( campaignID )
+	function update_campaign_recipients_count( ecmp_ID )
 	{
-		var ajax_url = '<?php echo get_htsrv_url().'async.php?action=update_campaign_recipients&'.url_crumb( 'campaign' );?>';
-		var skip_tags = jQuery( '#ecmp_user_tag_sendskip' ).val();
-		var skipped_tag_el = jQuery( '#skipped_tag_count' );
-		var ready_to_send_el = jQuery( '#ready_to_send_count' );
-
 		jQuery.ajax(
-		{
+		{	// Update a number of Email Campaign recipients on the HTML form depending on current entered skip tags:
 			type: "GET",
 			dataType: "JSON",
-			url: ajax_url,
-			data: { ecmp_ID: campaignID, skip_tags: skip_tags },
+			url: '<?php echo get_htsrv_url().'async.php'; ?>',
+			data:
+			{
+				action: 'get_campaign_recipients',
+				ecmp_ID: ecmp_ID,
+				skip_tags: jQuery( '#ecmp_user_tag_sendskip' ).val(),
+				'crumb_campaign': '<?php echo get_crumb( 'campaign' ); ?>',
+			},
 			success: function( data )
 			{
 				if( data.status == 'ok' )
-				{
-					skipped_tag_el.html( data.skipped_tag );
-					ready_to_send_el.html( data.wait );
+				{	// Update the recipient numbers:
+					jQuery( '#skipped_tag_count' ).html( data.skipped_tag );
+					jQuery( '#ready_to_send_count' ).html( data.wait );
+				}
+				else
+				{	// Display an error:
+					alert( data.error );
 				}
 			}
 		} );

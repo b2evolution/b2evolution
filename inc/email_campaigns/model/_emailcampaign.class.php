@@ -390,7 +390,7 @@ class EmailCampaign extends DataObject
 				}
 			}
 			elseif( check_usertags( $user_data->user_ID, explode( ',', $this->get( 'user_tag_sendskip' ) ), 'has_any' ) )
-			{
+			{	// This user will be skipped from receiving newsletter email because of skip tags:
 				if( $user_data->enls_user_ID === NULL )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_skipped_tag'][] = $user_data->user_ID;
@@ -638,12 +638,12 @@ class EmailCampaign extends DataObject
 		}
 
 		if( param( 'ecmp_user_tag_sendskip', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_sendskip' );
 		}
 
 		if( param( 'ecmp_user_tag_sendsuccess', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_sendsuccess' );
 		}
 
@@ -790,6 +790,16 @@ class EmailCampaign extends DataObject
 					    enls_send_count = enls_send_count + 1
 					WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
 					  AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+				// Add tags to user after successful email sending:
+				$user_tag_sendsuccess = trim( $this->get( 'user_tag_sendsuccess' ) );
+				if( ! empty( $user_tag_sendsuccess ) )
+				{	// Only if at least one tag is defined:
+					if( $User = & $UserCache->get_by_ID( $user_ID, false, false ) )
+					{
+						$User->add_usertags( $user_tag_sendsuccess );
+						$User->dbupdate();
+					}
+				}
 			}
 
 			if( empty( $mail_log_insert_ID ) )
