@@ -2863,9 +2863,10 @@ function update_user_email_counter( $limit_setting, $last_email_setting, $user_I
  * @param boolean true if this email is an account activation reminder, false if the account status was changed right now
  * @param boolean TRUE if user email is changed
  * @param string URL, where to redirect the user after he clicked the validation link (gets saved in Session).
+ * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
  * @return integer the number of successfully sent emails
  */
-function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false, $redirect_to_after = NULL )
+function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false, $redirect_to_after = NULL, $log_messages = false )
 {
 	global $UserSettings, $Session, $servertimenow;
 
@@ -2943,6 +2944,16 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 				$UserSettings->set( 'activation_reminder_count', $reminder_sent_to_user + 1, $User->ID );
 			}
 			$UserSettings->dbupdate();
+			if( $log_messages == 'cron_job' )
+			{	// Log success mail sending for cron job:
+				cron_log_action_end( 'User '.$User->get_identity_link().' has been notified' );
+			}
+		}
+		elseif( $log_messages == 'cron_job' )
+		{	// Log failed mail sending for cron job:
+			global $mail_log_message;
+			cron_log_action_end( 'User '.$User->get_identity_link().' could not be notified because of error: '
+				.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
 		}
 	}
 
