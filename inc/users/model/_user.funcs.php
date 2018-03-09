@@ -2957,6 +2957,37 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 
 
 /**
+ * Check the specified tags against the user's existing tags
+ *
+ * @param integer User ID
+ * @param array Tags to test
+ * @param string Type of test: 'has_any', 'has_all', 'has_none'
+ * @return boolean Test result
+ */
+function check_usertags( $user_ID, $test_tags = array(), $type = 'has_any' )
+{
+	$UserCache = & get_UserCache();
+	$edited_User = $UserCache->get_by_ID( $user_ID );
+	$user_tags = $edited_User->get_usertags();
+
+	switch( $type )
+	{
+		case 'has_any':
+			return count( array_intersect( $user_tags, $test_tags ) ) > 0;
+
+		case 'has_all':
+			return count( array_intersect( $user_tags, $test_tags ) ) == count( $test_tags );
+
+		case 'has_none':
+			return count( array_intersect( $user_tags, $test_tags ) ) === 0;
+
+		default:
+			debug_die( 'Invalid test type for usertags' );
+	}
+}
+
+
+/**
  * Get account activation reminder informaton for the given user. This is used on the user admin settings form.
  *
  * @param $edited_User

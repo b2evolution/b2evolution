@@ -41,6 +41,10 @@ class EmailCampaign extends DataObject
 
 	var $auto_sent_ts;
 
+	var $user_tag_sendskip;
+
+	var $user_tag_sendsuccess;
+
 	var $user_tag;
 
 	var $user_tag_cta1;
@@ -106,6 +110,8 @@ class EmailCampaign extends DataObject
 			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 			$this->auto_send = $db_row->ecmp_auto_send;
+			$this->user_tag_sendskip = $db_row->ecmp_user_tag_sendskip;
+			$this->user_tag_sendsuccess = $db_row->ecmp_user_tag_sendsuccess;
 			$this->user_tag = $db_row->ecmp_user_tag;
 			$this->user_tag_cta1 = $db_row->ecmp_user_tag_cta1;
 			$this->user_tag_cta2 = $db_row->ecmp_user_tag_cta2;
@@ -327,19 +333,21 @@ class EmailCampaign extends DataObject
 
 		$this->users = array(
 				// Users are subscribed to Newsletter of this Email Campaign:
-				'all'           => array(),
-				'filter'        => array(),
-				'receive'       => array(),
-				'skipped'       => array(),
-				'error'         => array(),
-				'wait'          => array(),
+				'all'               => array(),
+				'filter'            => array(),
+				'receive'           => array(),
+				'skipped'           => array(),
+				'skipped_tag'       => array(),
+				'error'             => array(),
+				'wait'              => array(),
 				// Users are NOT subscribed to Newsletter of this Email Campaign:
-				'unsub_all'     => array(),
-				'unsub_filter'  => array(),
-				'unsub_receive' => array(),
-				'unsub_skipped' => array(),
-				'unsub_error'   => array(),
-				'unsub_wait'    => array(),
+				'unsub_all'         => array(),
+				'unsub_filter'      => array(),
+				'unsub_receive'     => array(),
+				'unsub_skipped'     => array(),
+				'unsub_skipped_tag' => array(),
+				'unsub_error'       => array(),
+				'unsub_wait'        => array(),
 				// All Users which are linked with this Email Campaign somehow:
 				// Use prefix 'full_' like 'full_all', 'full_filter' and etc.
 			);
@@ -378,6 +386,19 @@ class EmailCampaign extends DataObject
 				else
 				{	// This user is subscribed to newsletter of this email campaign:
 					$this->users['skipped'][] = $user_data->user_ID;
+					$this->users['filter'][] = $user_data->user_ID;
+				}
+			}
+			elseif( check_usertags( $user_data->user_ID, explode( ',', $this->get( 'user_tag_sendskip' ) ), 'has_any' ) )
+			{
+				if( $user_data->enls_user_ID === NULL )
+				{	// This user is unsubscribed from newsletter of this email campaign:
+					$this->users['unsub_skipped_tag'][] = $user_data->user_ID;
+					$this->users['unsub_filter'][] = $user_data->user_ID;
+				}
+				else
+				{	// This user is subscribed to newsletter of this email campaign:
+					$this->users['skipped_tag'][] = $user_data->user_ID;
 					$this->users['filter'][] = $user_data->user_ID;
 				}
 			}
@@ -614,6 +635,16 @@ class EmailCampaign extends DataObject
 		if( param( 'ecmp_auto_send', 'string', NULL ) !== NULL )
 		{	// Auto send:
 			$this->set_from_Request( 'auto_send' );
+		}
+
+		if( param( 'ecmp_user_tag_sendskip', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_sendskip' );
+		}
+
+		if( param( 'ecmp_user_tag_sendsuccess', 'string', NULL ) !== NULL )
+		{ // User tag:
+			$this->set_from_Request( 'user_tag_sendsuccess' );
 		}
 
 		if( param( 'ecmp_user_tag', 'string', NULL ) !== NULL )
