@@ -796,7 +796,7 @@ class EmailCampaign extends DataObject
 	/**
 	 * Send email newsletter for all users of this campaign
 	 *
-	 * @param boolean TRUE to print out messages
+	 * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
 	 * @param array Force users instead of users which are ready to receive this email campaign
 	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
 	 */
