@@ -59,6 +59,8 @@ $AdminUI->breadcrumbpath_add( $export_Module->T_('System'), '?ctrl=system' );
 $AdminUI->breadcrumbpath_add( $export_Module->T_('Maintenance'), '?ctrl=tools' );
 $AdminUI->breadcrumbpath_add( $export_Module->T_('Export'), '?ctrl=exportxml' );
 
+$AdminUI->set_page_manual_link( 'export-xml-zip' );
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -88,9 +90,4 @@ $AdminUI->disp_payload_end();
 
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
-
-/*
- * $Log: xml.ctrl.php,v $
- *
- */
 ?>

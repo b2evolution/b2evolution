@@ -29,20 +29,16 @@ $Form->begin_form( 'fform' );
 $Form->add_crumb( 'exportxml' );
 $Form->hidden_ctrl();
 
-$Form->begin_fieldset( 'Export to XML file' );
-
-echo $export_Module->T_('When you click the button below XML file will be created to save to your computer.');
+$Form->begin_fieldset( T_('Export to XML/ZIP file').get_manual_link( 'export-xml-zip' ) );
 
 $BlogCache = & get_BlogCache();
 $BlogCache->none_option_text = '&nbsp;';
 
-$Form->select_input_object( 'blog_ID', param( 'blog_ID', 'integer', 0 ), $BlogCache, T_('Blog for export'), array(
-		'note' => T_('The data of this blog will be used for export.'),
-		'allow_none' => true, 'required' => true ) );
+$Form->select_input_object( 'blog_ID', param( 'blog_ID', 'integer', 0 ), $BlogCache, T_('Collection'), array( 'allow_none' => true, 'required' => true ) );
 
 $Form->checkbox_input( 'options[all]', isset( $options['all'] ) || empty( $options ) ? 1 : 0, $export_Module->T_('Select what to export'), array( 'input_suffix' => '&nbsp;<label for="options_all_">'.$export_Module->T_('All content').'</label>', 'note' => $export_Module->T_('This will contain all users, categories, posts, comments and tags.' ), 'required' => true ) );
 
-$Form->checkbox_input( 'options[user]', isset( $options['user'] ) ? 1 : 0, '', array( 'input_suffix' => '&nbsp;<label for="options_user_">'.$export_Module->T_('Users').'</label>' ) );
+$Form->checkbox_input( 'options[user]', isset( $options['user'] ) ? 1 : 0, '', array( 'input_suffix' => '&nbsp;<label for="options_user_">'.$export_Module->T_('All users').'</label>' ) );
 
 $Form->checkbox_input( 'options[pass]', isset( $options['pass'] ) ? 1 : 0, '', array( 'input_suffix' => '&nbsp;<label for="options_pass_">'.$export_Module->T_('Include (md5-hashed) user passwords in export').'</label>', 'input_prefix' => '&nbsp; &nbsp; ' ) );
 
@@ -54,11 +50,11 @@ $Form->checkbox_input( 'options[post]', isset( $options['post'] ) ? 1 : 0, '', a
 
 $Form->checkbox_input( 'options[comment]', isset( $options['comment'] ) ? 1 : 0, '', array( 'input_suffix' => '&nbsp;<label for="options_comment_">'.$export_Module->T_('Comments').'</label>', 'input_prefix' => '&nbsp; &nbsp; ' ) );
 
-$Form->checkbox_input( 'options[file]', isset( $options['file'] ) ? 1 : 0, '', array( 'input_suffix' => '&nbsp;<label for="options_file_">'.$export_Module->T_('Files').'</label>', 'input_prefix' => '&nbsp; &nbsp; ' ) );
+$Form->checkbox_input( 'options[file]', isset( $options['file'] ) ? 1 : 0, '', array( 'input_suffix' => '&nbsp;<label for="options_file_">'.$export_Module->T_('Include attached files').'</label>', 'input_prefix' => '&nbsp; &nbsp; ', 'note' => T_('will be included in ZIP file') ) );
 
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'actionArray[export]', $export_Module->T_('Download XML file'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray[export]', $export_Module->T_('Download XML/ZIP file'), 'SaveButton' ) ) );
 
 ?>
 <script type="text/javascript">
@@ -108,9 +104,3 @@ jQuery( 'input[name^=options]' ).click( function()
 	}
 } );
 </script>
-<?php
-/*
- * $Log: _xml.form.php,v $
- *
- */
-?>
