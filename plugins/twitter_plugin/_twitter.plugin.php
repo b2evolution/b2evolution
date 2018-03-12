@@ -593,6 +593,8 @@ class twitter_plugin extends Plugin
 
 	function send_a_tweet( $content, & $Item, & $xmlrpcresp )
 	{
+		global $Messages;
+
 		// Uses either plugin CollSettings or UserSettings
 		$oauth = $this->get_oauth_info( array(
 				'user_ID'	=> $Item->get_creator_User()->ID,
@@ -660,9 +662,13 @@ class twitter_plugin extends Plugin
 			$xmlrpcresp = 'Unknown error while posting "'.htmlspecialchars( $msg ).'" to account @'.$oauth['contact'];
 			return false;
 		}
-		elseif( !empty($result->error) )
+		elseif( !empty( $result->errors ) )
 		{
 			$xmlrpcresp = $result->error;
+			foreach( $result->errors as $error )
+			{
+				$Messages->add_to_group( sprintf( T_('Error: %s'), $error->code ).'. '.$error->message, 'error', T_('Twitter plugin').':' );
+			}
 			return false;
 		}
 
