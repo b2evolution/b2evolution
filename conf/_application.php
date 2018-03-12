@@ -85,5 +85,6 @@ $modules = array(
 		'messaging',
 		'maintenance',
 		// 'central_antispam',		// will also require $enable_blacklist_server_API = true;
+		'export',
 	);
 ?>
