@@ -69,7 +69,7 @@ $UserCache->clear();
 $UserCache->load_by_sql( $SQL );
 
 // Send activation reminder to every user loaded into the UserCache ( there are only not activated users )
-$reminder_sent = send_easy_validate_emails( $UserCache->get_ID_array() );
+$reminder_sent = send_easy_validate_emails( $UserCache->get_ID_array(), true, false, NULL, 'cron_job' );
 
 // Set failed activation status for all users who didn't receive activation reminder or account validation email in the last seven days,
 // and user was created more then a week, and have received at least one activation email.
@@ -80,6 +80,6 @@ $DB->query( 'UPDATE T_users
 		WHERE ( uset_name = "last_activation_email" AND uset_value IS NOT NULL AND uset_value < '.$DB->quote( $failed_activation_date ).' )
 			AND ( user_created_datetime < '.$DB->quote( $failed_activation_date ).' ) AND '.$status_condition );
 
-cron_log_append( sprintf( T_( '%d account activation reminder emails were sent!' ), $reminder_sent ) );
+cron_log_append( ( empty( $result_message ) ? '' : "\n" ).sprintf( T_( '%d account activation reminder emails were sent!' ), $reminder_sent ) );
 return 1; /* ok */
 ?>

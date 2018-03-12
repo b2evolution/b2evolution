@@ -548,26 +548,28 @@ $schema_queries = array(
 	'T_email__campaign' => array(
 		'Creating email campaigns table',
 		"CREATE TABLE T_email__campaign (
-			ecmp_ID               INT UNSIGNED NOT NULL AUTO_INCREMENT,
-			ecmp_date_ts          TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			ecmp_enlt_ID          INT UNSIGNED NOT NULL,
-			ecmp_email_title      VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-			ecmp_email_html       TEXT NULL COLLATE utf8mb4_unicode_ci,
-			ecmp_email_text       TEXT NULL COLLATE utf8mb4_unicode_ci,
-			ecmp_email_plaintext  TEXT NULL COLLATE utf8mb4_unicode_ci,
-			ecmp_sent_ts          TIMESTAMP NULL,
-			ecmp_auto_sent_ts     TIMESTAMP NULL,
-			ecmp_renderers        VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
-			ecmp_use_wysiwyg      TINYINT(1) NOT NULL DEFAULT 0,
-			ecmp_send_ctsk_ID     INT(10) UNSIGNED NULL DEFAULT NULL,
-			ecmp_auto_send        ENUM('no', 'subscription') COLLATE ascii_general_ci NOT NULL DEFAULT 'no',
-			ecmp_user_tag         VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
-			ecmp_user_tag_cta1    VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
-			ecmp_user_tag_cta2    VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
-			ecmp_user_tag_cta3    VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
-			ecmp_user_tag_like    VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
-			ecmp_user_tag_dislike VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
-			PRIMARY KEY           (ecmp_ID)
+			ecmp_ID                   INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			ecmp_date_ts              TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			ecmp_enlt_ID              INT UNSIGNED NOT NULL,
+			ecmp_email_title          VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+			ecmp_email_html           TEXT NULL COLLATE utf8mb4_unicode_ci,
+			ecmp_email_text           TEXT NULL COLLATE utf8mb4_unicode_ci,
+			ecmp_email_plaintext      TEXT NULL COLLATE utf8mb4_unicode_ci,
+			ecmp_sent_ts              TIMESTAMP NULL,
+			ecmp_auto_sent_ts         TIMESTAMP NULL,
+			ecmp_renderers            VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			ecmp_use_wysiwyg          TINYINT(1) NOT NULL DEFAULT 0,
+			ecmp_send_ctsk_ID         INT(10) UNSIGNED NULL DEFAULT NULL,
+			ecmp_auto_send            ENUM('no', 'subscription') COLLATE ascii_general_ci NOT NULL DEFAULT 'no',
+			ecmp_user_tag_sendskip    VARCHAR(255) NULL,
+			ecmp_user_tag_sendsuccess VARCHAR(255) NULL,
+			ecmp_user_tag             VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
+			ecmp_user_tag_cta1        VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
+			ecmp_user_tag_cta2        VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
+			ecmp_user_tag_cta3        VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
+			ecmp_user_tag_like        VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
+			ecmp_user_tag_dislike     VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
+			PRIMARY KEY               (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_email__campaign_send' => array(

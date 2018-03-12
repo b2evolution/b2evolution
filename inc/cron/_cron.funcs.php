@@ -242,8 +242,8 @@ function call_job( $job_key, $job_params = array() )
 	else
 	{	// Is CLI mode?
 		$result_message_text = str_replace(
-			array( '<br>', '<b>', '</b>', '&#8800;', '&#8804;', '&#8805;' ),
-			array( "\n", '*', '*', '!=', '<=', '>=' ),
+			array( '<br>', '<b>', '</b>', '<code>', '</code>', '&#8800;', '&#8804;', '&#8805;' ),
+			array( "\n", '*', '*', '`', '`', '!=', '<=', '>=' ),
 			$result_message_text );
 	}
 

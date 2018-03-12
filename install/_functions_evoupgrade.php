@@ -9207,6 +9207,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12680, 'Upgrading email campaign table...' ) )
+	{	// part of 6.10.0-beta
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_user_tag_sendskip' => 'VARCHAR(255) NULL AFTER ecmp_auto_send',
+				'ecmp_user_tag_sendsuccess' => 'VARCHAR(255) NULL AFTER ecmp_user_tag_sendskip',
+			),
+		) );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

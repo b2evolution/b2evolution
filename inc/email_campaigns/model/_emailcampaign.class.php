@@ -41,6 +41,10 @@ class EmailCampaign extends DataObject
 
 	var $auto_sent_ts;
 
+	var $user_tag_sendskip;
+
+	var $user_tag_sendsuccess;
+
 	var $user_tag;
 
 	var $user_tag_cta1;
@@ -106,6 +110,8 @@ class EmailCampaign extends DataObject
 			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 			$this->auto_send = $db_row->ecmp_auto_send;
+			$this->user_tag_sendskip = $db_row->ecmp_user_tag_sendskip;
+			$this->user_tag_sendsuccess = $db_row->ecmp_user_tag_sendsuccess;
 			$this->user_tag = $db_row->ecmp_user_tag;
 			$this->user_tag_cta1 = $db_row->ecmp_user_tag_cta1;
 			$this->user_tag_cta2 = $db_row->ecmp_user_tag_cta2;
@@ -327,19 +333,21 @@ class EmailCampaign extends DataObject
 
 		$this->users = array(
 				// Users are subscribed to Newsletter of this Email Campaign:
-				'all'           => array(),
-				'filter'        => array(),
-				'receive'       => array(),
-				'skipped'       => array(),
-				'error'         => array(),
-				'wait'          => array(),
+				'all'               => array(),
+				'filter'            => array(),
+				'receive'           => array(),
+				'skipped'           => array(),
+				'skipped_tag'       => array(),
+				'error'             => array(),
+				'wait'              => array(),
 				// Users are NOT subscribed to Newsletter of this Email Campaign:
-				'unsub_all'     => array(),
-				'unsub_filter'  => array(),
-				'unsub_receive' => array(),
-				'unsub_skipped' => array(),
-				'unsub_error'   => array(),
-				'unsub_wait'    => array(),
+				'unsub_all'         => array(),
+				'unsub_filter'      => array(),
+				'unsub_receive'     => array(),
+				'unsub_skipped'     => array(),
+				'unsub_skipped_tag' => array(),
+				'unsub_error'       => array(),
+				'unsub_wait'        => array(),
 				// All Users which are linked with this Email Campaign somehow:
 				// Use prefix 'full_' like 'full_all', 'full_filter' and etc.
 			);
@@ -378,6 +386,19 @@ class EmailCampaign extends DataObject
 				else
 				{	// This user is subscribed to newsletter of this email campaign:
 					$this->users['skipped'][] = $user_data->user_ID;
+					$this->users['filter'][] = $user_data->user_ID;
+				}
+			}
+			elseif( check_usertags( $user_data->user_ID, explode( ',', $this->get( 'user_tag_sendskip' ) ), 'has_any' ) )
+			{	// This user will be skipped from receiving newsletter email because of skip tags:
+				if( $user_data->enls_user_ID === NULL )
+				{	// This user is unsubscribed from newsletter of this email campaign:
+					$this->users['unsub_skipped_tag'][] = $user_data->user_ID;
+					$this->users['unsub_filter'][] = $user_data->user_ID;
+				}
+				else
+				{	// This user is subscribed to newsletter of this email campaign:
+					$this->users['skipped_tag'][] = $user_data->user_ID;
 					$this->users['filter'][] = $user_data->user_ID;
 				}
 			}
@@ -616,6 +637,16 @@ class EmailCampaign extends DataObject
 			$this->set_from_Request( 'auto_send' );
 		}
 
+		if( param( 'ecmp_user_tag_sendskip', 'string', NULL ) !== NULL )
+		{	// User tag:
+			$this->set_from_Request( 'user_tag_sendskip' );
+		}
+
+		if( param( 'ecmp_user_tag_sendsuccess', 'string', NULL ) !== NULL )
+		{	// User tag:
+			$this->set_from_Request( 'user_tag_sendsuccess' );
+		}
+
 		if( param( 'ecmp_user_tag', 'string', NULL ) !== NULL )
 		{ // User tag:
 			$this->set_from_Request( 'user_tag' );
@@ -759,6 +790,16 @@ class EmailCampaign extends DataObject
 					    enls_send_count = enls_send_count + 1
 					WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
 					  AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+				// Add tags to user after successful email sending:
+				$user_tag_sendsuccess = trim( $this->get( 'user_tag_sendsuccess' ) );
+				if( ! empty( $user_tag_sendsuccess ) )
+				{	// Only if at least one tag is defined:
+					if( $User = & $UserCache->get_by_ID( $user_ID, false, false ) )
+					{
+						$User->add_usertags( $user_tag_sendsuccess );
+						$User->dbupdate();
+					}
+				}
 			}
 
 			if( empty( $mail_log_insert_ID ) )
@@ -796,7 +837,7 @@ class EmailCampaign extends DataObject
 	/**
 	 * Send email newsletter for all users of this campaign
 	 *
-	 * @param boolean TRUE to print out messages
+	 * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
 	 * @param array Force users instead of users which are ready to receive this email campaign
 	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
 	 */

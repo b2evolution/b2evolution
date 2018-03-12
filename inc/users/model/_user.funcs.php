@@ -2868,9 +2868,10 @@ function update_user_email_counter( $limit_setting, $last_email_setting, $user_I
  * @param boolean true if this email is an account activation reminder, false if the account status was changed right now
  * @param boolean TRUE if user email is changed
  * @param string URL, where to redirect the user after he clicked the validation link (gets saved in Session).
+ * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
  * @return integer the number of successfully sent emails
  */
-function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false, $redirect_to_after = NULL )
+function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false, $redirect_to_after = NULL, $log_messages = false )
 {
 	global $UserSettings, $Session, $servertimenow;
 
@@ -2948,6 +2949,16 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 				$UserSettings->set( 'activation_reminder_count', $reminder_sent_to_user + 1, $User->ID );
 			}
 			$UserSettings->dbupdate();
+			if( $log_messages == 'cron_job' )
+			{	// Log success mail sending for cron job:
+				cron_log_action_end( 'User '.$User->get_identity_link().' has been notified' );
+			}
+		}
+		elseif( $log_messages == 'cron_job' )
+		{	// Log failed mail sending for cron job:
+			global $mail_log_message;
+			cron_log_action_end( 'User '.$User->get_identity_link().' could not be notified because of error: '
+				.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
 		}
 	}
 
@@ -2958,6 +2969,37 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 	}
 
 	return $email_sent;
+}
+
+
+/**
+ * Check the specified tags against the user's existing tags
+ *
+ * @param integer User ID
+ * @param array Tags to test
+ * @param string Type of test: 'has_any', 'has_all', 'has_none'
+ * @return boolean Test result
+ */
+function check_usertags( $user_ID, $test_tags = array(), $type = 'has_any' )
+{
+	$UserCache = & get_UserCache();
+	$edited_User = $UserCache->get_by_ID( $user_ID );
+	$user_tags = $edited_User->get_usertags();
+
+	switch( $type )
+	{
+		case 'has_any':
+			return count( array_intersect( $user_tags, $test_tags ) ) > 0;
+
+		case 'has_all':
+			return count( array_intersect( $user_tags, $test_tags ) ) == count( $test_tags );
+
+		case 'has_none':
+			return count( array_intersect( $user_tags, $test_tags ) ) === 0;
+
+		default:
+			debug_die( 'Invalid test type for usertags' );
+	}
 }
 
 
@@ -6518,22 +6560,39 @@ function user_td_status( $user_status, $user_ID )
 function user_td_subscribed_list( $lists )
 {
 	global $current_User, $admin_url;
+
+	if( empty( $lists ) )
+	{
+		return NULL;
+	}
+
 	$NewsletterCache = & get_NewsletterCache();
 	$lists = explode( ',', $lists );
-	$r = '<ul>';
+	$lists_links = array();
+
 	foreach( $lists as $list_ID )
 	{
-		$loop_List = $NewsletterCache->get_by_ID( $list_ID );
-		if( $current_User->check_perm( 'options', 'edit' ) )
+		$unsubscribed_list = false;
+		if( $list_ID[0] == '-' )
 		{
-			$r .= '<li><a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'">'.$loop_List->get( 'name' ).'</a></li>';
+			$unsubscribed_list = true;
+			$list_ID = trim( $list_ID, '-' );
 		}
-		else
+
+		if( $loop_List = $NewsletterCache->get_by_ID( $list_ID, false ) )
 		{
-			$r .= '<li>'.$loop_List->get( 'name' ).'</li>';
+			if( $current_User->check_perm( 'options', 'edit' ) )
+			{
+				$lists_array[] = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'"'
+						.($unsubscribed_list ? ' style="text-decoration: line-through;"' : '' ).'>'.$loop_List->get( 'name' ).'</a>';
+			}
+			else
+			{
+				$lists_array[] = $loop_List->get( 'name' );
+			}
 		}
 	}
-	$r .= '</ul>';
+	$r = implode( ', ', $lists_array );
 
 	return $r;
 }
@@ -6549,21 +6608,27 @@ function user_td_user_tags( $tags )
 {
 	global $current_User, $admin_url;
 
+	if( empty( $tags ) )
+	{
+		return NULL;
+	}
+
 	$tags = explode( ',', $tags );
 	$tag_links = array();
 
 	$UserTagCache = & get_UserTagCache();
 	foreach( $tags as $tag_ID )
 	{
-		$loop_Tag = $UserTagCache->get_by_ID( $tag_ID );
-
-		if( $current_User->check_perm( 'options', 'edit' ) )
+		if( $loop_Tag = $UserTagCache->get_by_ID( $tag_ID, false ) )
 		{
-			$tag_links[] = '<a href="'.$admin_url.'?ctrl=usertags&amp;utag_ID='.$tag_ID.'&amp;action=edit">'.$loop_Tag->dget( 'name' ).'</a>';
-		}
-		else
-		{
-			$tag_links[] = $loop_Tag->dget( 'name' );
+			if( $current_User->check_perm( 'options', 'edit' ) )
+			{
+				$tag_links[] = '<a href="'.$admin_url.'?ctrl=usertags&amp;utag_ID='.$tag_ID.'&amp;action=edit">'.$loop_Tag->dget( 'name' ).'</a>';
+			}
+			else
+			{
+				$tag_links[] = $loop_Tag->dget( 'name' );
+			}
 		}
 	}
 	$r = implode( ', ', $tag_links );
