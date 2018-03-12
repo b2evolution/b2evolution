@@ -2,9 +2,7 @@
 /**
  * This is the init file for the export module
  *
- * @copyright (c)2003-2012 by Francois PLANQUE - {@link http://fplanque.net/}
- *
- * @version $Id: _export.init.php 444 2012-05-10 10:20:13Z attila $
+ * @copyright (c)2003-2018 by Francois PLANQUE - {@link http://fplanque.net/}
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 

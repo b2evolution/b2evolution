@@ -1,4 +1,17 @@
 <?php
+/**
+ * This file implements export functions.
+ *
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
+ *
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ *
+ * @package evocore
+ */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
@@ -28,6 +41,7 @@ function export_xml( $blog_ID, $option )
 	// What to export
 	$export_users = false;
 	$export_passwords = false;
+	$export_avatars = false;
 	$export_categories = false;
 	$export_tags = false;
 	$export_posts = false;
@@ -38,6 +52,7 @@ function export_xml( $blog_ID, $option )
 	{	// Export all contents
 		$export_users = true;
 		$export_passwords = true;
+		$export_avatars = true;
 		$export_categories = true;
 		$export_tags = true;
 		$export_posts = true;
@@ -52,6 +67,10 @@ function export_xml( $blog_ID, $option )
 			if( !empty( $option['pass'] ) )
 			{
 				$export_passwords = true;
+			}
+			if( !empty( $option['avatar'] ) )
+			{
+				$export_avatars = true;
 			}
 		}
 		if( !empty( $option['cat'] ) )
@@ -76,7 +95,7 @@ function export_xml( $blog_ID, $option )
 		}
 	}
 
-	if( $export_files )
+	if( $export_files || $export_avatars )
 	{ // The files will be exported
 		global $media_path;
 		// Store here the files of all posts and comments
@@ -195,6 +214,11 @@ function export_xml( $blog_ID, $option )
 				$users_xml_data[ $u ]['evo:author_lastseen_ts'] = $User->get( 'lastseen_ts' );
 				$users_xml_data[ $u ]['evo:author_created_from_ipv4'] = int2ip( $UserSettings->get( 'created_fromIPv4' ) );
 				$users_xml_data[ $u ]['evo:author_profileupdate_date'] = $User->get( 'profileupdate_date' );
+
+				if( $export_avatars )
+				{	// Export the avatars:
+					export_xml_files( 'user', $users_xml_data[ $u ], $files_xml_data );
+				}
 
 				// Clear users cache to keep memory free
 				$UserCache->clear();
@@ -430,72 +454,8 @@ function export_xml( $blog_ID, $option )
 					}
 
 					if( $export_files )
-					{ // Export the files
-						// Get all links of the item
-						$links_SQL = new SQL();
-						$links_SQL->SELECT( '*' );
-						$links_SQL->FROM( 'T_links' );
-						$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $Item->ID ) );
-						$links = $DB->get_results( $links_SQL->get() );
-
-						$link_files_IDs = array();
-						if( count( $links ) > 0 )
-						{
-							$posts_xml_data[$i]['evo:link'] = array();
-
-							foreach( $links as $link )
-							{
-								$posts_xml_data[$i]['evo:link'][] = array(
-										'value' => array(
-											'evo:link_ID'               => $link->link_ID,
-											'evo:link_datecreated'      => $link->link_datecreated,
-											'evo:link_datemodified'     => $link->link_datemodified,
-											'evo:link_creator_user_ID'  => $link->link_creator_user_ID,
-											'evo:link_lastedit_user_ID' => $link->link_lastedit_user_ID,
-											'evo:link_itm_ID'           => $link->link_itm_ID,
-											'evo:link_cmt_ID'           => $link->link_cmt_ID,
-											'evo:link_usr_ID'           => $link->link_usr_ID,
-											'evo:link_file_ID'          => $link->link_file_ID,
-											'evo:link_ltype_ID'         => $link->link_ltype_ID,
-											'evo:link_position'         => $link->link_position,
-											'evo:link_order'            => $link->link_order
-										)
-									);
-
-								if( ! in_array( $link->link_file_ID, $link_files_IDs ) )
-								{
-									$link_files_IDs[] = $link->link_file_ID;
-								}
-							}
-						}
-
-						if( count( $link_files_IDs ) )
-						{ // Files tags
-							foreach( $link_files_IDs as $file_ID )
-							{
-								if( isset( $files_xml_data[ $file_ID ] ) ||
-								    ! ( $File = & $FileCache->get_by_ID( $file_ID, false, false ) ) )
-								{ // Skip if File is already in array OR when it is invalid
-									continue;
-								}
-
-								$FileRoot = & $File->get_FileRoot();
-
-								$files_xml_data[ $File->ID ] = array(
-										'evo:file_ID'        => $File->ID,
-										'evo:file_root_type' => $FileRoot->type,
-										'evo:file_root_ID'   => $FileRoot->in_type_ID,
-										'evo:file_path'      => $File->get_rdfp_rel_path(),
-										'evo:file_title'     => xml_cdata( $File->title ),
-										'evo:file_alt'       => xml_cdata( $File->alt ),
-										'evo:file_desc'      => xml_cdata( $File->desc ),
-										'evo:zip_path'       => preg_replace( '~^'.str_replace( '~', '\~', $media_path ).'~', '', $FileRoot->ads_path ),
-									);
-
-								// Clear a cache to keep memory free
-								$FileCache->clear();
-							}
-						}
+					{	// Export the files:
+						export_xml_files( 'item', $posts_xml_data[ $i ], $files_xml_data );
 					}
 				}
 
@@ -530,7 +490,7 @@ function export_xml( $blog_ID, $option )
 	$XML .= '</channel>'.$nl;
 	$XML .= '</rss>';
 
-	if( $export_files && count( $files_xml_data ) )
+	if( ( $export_files || $export_users ) && count( $files_xml_data ) )
 	{ // If files are exported we should download them inside ZIP file
 		load_class( '_ext/_zip_archives.php', 'zip_file' );
 
@@ -585,6 +545,105 @@ function export_xml( $blog_ID, $option )
 
 	// Stop here to don't print out next content!
 	exit(0);
+}
+
+
+/**
+ * Export file data
+ *
+ * @param string Type: 'item', 'user'
+ * @param array XML data of the current row (updated by reference)
+ * @param array XML data of the attached files (updated by reference)
+ */
+function export_xml_files( $type, & $row_xml_data, & $files_xml_data )
+{
+	global $DB;
+
+	switch( $type )
+	{
+		case 'item':
+			$link_field_ID_name = 'link_itm_ID';
+			$link_field_ID_value = $row_xml_data['wp:post_id'];
+			break;
+
+		case 'user':
+			$link_field_ID_name = 'link_usr_ID';
+			$link_field_ID_value = $row_xml_data['wp:author_id'];
+			break;
+
+		default:
+			debug_die( 'Invalid type "'.$type.'" for export files!' );
+	}
+
+	// Get all links of the User:
+	$links_SQL = new SQL( 'Get the links for export' );
+	$links_SQL->SELECT( '*' );
+	$links_SQL->FROM( 'T_links' );
+	$links_SQL->WHERE( $link_field_ID_name.' = '.$DB->quote( $link_field_ID_value ) );
+	$links = $DB->get_results( $links_SQL );
+
+	$link_files_IDs = array();
+	if( count( $links ) > 0 )
+	{
+		$row_xml_data['evo:link'] = array();
+
+		foreach( $links as $link )
+		{
+			$row_xml_data['evo:link'][] = array(
+					'value' => array(
+						'evo:link_ID'               => $link->link_ID,
+						'evo:link_datecreated'      => $link->link_datecreated,
+						'evo:link_datemodified'     => $link->link_datemodified,
+						'evo:link_creator_user_ID'  => $link->link_creator_user_ID,
+						'evo:link_lastedit_user_ID' => $link->link_lastedit_user_ID,
+						'evo:link_itm_ID'           => $link->link_itm_ID,
+						'evo:link_cmt_ID'           => $link->link_cmt_ID,
+						'evo:link_usr_ID'           => $link->link_usr_ID,
+						'evo:link_file_ID'          => $link->link_file_ID,
+						'evo:link_ltype_ID'         => $link->link_ltype_ID,
+						'evo:link_position'         => $link->link_position,
+						'evo:link_order'            => $link->link_order
+					)
+				);
+
+			if( ! in_array( $link->link_file_ID, $link_files_IDs ) )
+			{
+				$link_files_IDs[] = $link->link_file_ID;
+			}
+		}
+	}
+
+	if( count( $link_files_IDs ) )
+	{	// Files tags:
+		global $media_path;
+
+		$FileCache = & get_FileCache();
+
+		foreach( $link_files_IDs as $file_ID )
+		{
+			if( isset( $files_xml_data[ $file_ID ] ) ||
+					! ( $File = & $FileCache->get_by_ID( $file_ID, false, false ) ) )
+			{ // Skip if File is already in array OR when it is invalid
+				continue;
+			}
+
+			$FileRoot = & $File->get_FileRoot();
+
+			$files_xml_data[ $File->ID ] = array(
+					'evo:file_ID'        => $File->ID,
+					'evo:file_root_type' => $FileRoot->type,
+					'evo:file_root_ID'   => $FileRoot->in_type_ID,
+					'evo:file_path'      => $File->get_rdfp_rel_path(),
+					'evo:file_title'     => xml_cdata( $File->title ),
+					'evo:file_alt'       => xml_cdata( $File->alt ),
+					'evo:file_desc'      => xml_cdata( $File->desc ),
+					'evo:zip_path'       => preg_replace( '~^'.str_replace( '~', '\~', $media_path ).'~', '', $FileRoot->ads_path ),
+				);
+
+			// Clear a cache to keep memory free:
+			$FileCache->clear();
+		}
+	}
 }
 
 
