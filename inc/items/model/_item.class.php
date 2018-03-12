@@ -6049,7 +6049,8 @@ class Item extends ItemLight
 		$this->set( 'title', $post_title );
 		$this->set( 'urltitle', $post_urltitle );
 		$this->set( 'content', $post_content );
-		$this->set( 'datestart', $post_timestamp );
+		//$this->set( 'datestart', $post_timestamp );
+		$this->set( 'datestart', date( 'Y-m-d H:i:s' ) ); // Use current time temporarily, we'll update this later
 
 		$this->set( 'main_cat_ID', $main_cat_ID );
 		$this->set( 'extra_cat_IDs', $extra_cat_IDs );
@@ -6064,6 +6065,9 @@ class Item extends ItemLight
 
 		// INSERT INTO DB:
 		$this->dbinsert();
+
+		// Update post_datestart using FROM_UNIXTIME to prevent invalid datetime values during DST spring forward - fall back
+		$DB->query( 'UPDATE T_items__item SET post_datestart = FROM_UNIXTIME('.strtotime( $post_timestamp ).') WHERE post_ID = '.$DB->quote( $this->ID ) );
 
 		return $this->ID;
 	}

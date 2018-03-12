@@ -362,7 +362,7 @@ function create_user( $params = array() )
 	global $timestamp;
 	global $random_password, $admin_email;
 	global $default_locale, $default_country;
-	global $Messages;
+	global $Messages, $DB;
 
 	$params = array_merge( array(
 			'login'     => '',
@@ -405,12 +405,16 @@ function create_user( $params = array() )
 	}
 	$User->set( 'gender', $params['gender'] );
 	$User->set_Group( $Group );
-	$User->set_datecreated( $params['datecreated'] );
+	//$User->set_datecreated( $params['datecreated'] );
+	$User->set_datecreated( time() ); // Use current time temporarily, we'll update these later
 
 	if( ! $User->dbinsert( false ) )
 	{ // Don't continue if user creating has been failed
 		return false;
 	}
+
+	// Update user_created_datetime using FROM_UNIXTIME to prevent invalid datetime values during DST spring forward - fall back
+	$DB->query( 'UPDATE T_users SET user_created_datetime = FROM_UNIXTIME('.$params['datecreated'].') WHERE user_login = '.$DB->quote( $params['login'] ) );
 
 	if( ! empty( $params['org_IDs'] ) )
 	{ // Add user to organizations
@@ -866,14 +870,13 @@ Admins and moderators can very quickly approve or reject comments from the colle
 		$comment_timestamp = time();
 	}
 
-	$now = date( 'Y-m-d H:i:s', $comment_timestamp );
-
+	// We are using FROM_UNIXTIME to prevent invalid datetime during DST spring forward - fall back
 	$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status,
 			comment_author_user_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP,
 			comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
 			VALUES( '.$DB->quote( $item_ID ).', '.$DB->quote( $status ).', '
 			.$DB->quote( $user_ID ).', '.$DB->quote( $author ).', '.$DB->quote( $author_email ).', '.$DB->quote( $author_email_url ).', "127.0.0.1", '
-			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished", "moderators_notified,members_notified,community_notified" )' );
+			.'FROM_UNIXTIME('.$comment_timestamp.'), FROM_UNIXTIME('.$comment_timestamp.'), '.$DB->quote( $content ).', "default", "finished", "moderators_notified,members_notified,community_notified" )' );
 }
 
 
