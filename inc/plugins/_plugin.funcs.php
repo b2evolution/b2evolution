@@ -539,13 +539,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				}
 			}
  			
- 			foreach( $parmeta['entries'] as $entry )
+			$entry_field_name = '';
+ 			foreach( $parmeta['entries'] as $index => $entry )
  			{
  				
  				if( isset( $entry['type'] ) )
  				{
 					
-					$field_type = $entry['type'];
+					$entry_field_name = $index;
 					
  					$label = T_('Disabled');
  					
@@ -603,9 +604,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  							
  					}
  					
- 					$options[$entry['type']] = $label;
+ 					$options[$index] = $label;
  				}
- 			
+				
  			}
  			
  			$selected = ' selected="selected"';
@@ -629,20 +630,12 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  			$button_add_field = '';
  			$user_ID = $set_type == 'UserSettings' ? $set_target->ID : '';
  			
- 			if( isset( $parmeta['max_number'] ) && $parmeta['max_number'] )
- 			{ // no max_number defined or not reached: display link to add a new set
- 				$max_number = $parmeta['max_number'];
- 			}
- 			else
- 			{
- 				$max_number = 0; // Set 0 as infinite
- 			}
- 			
- 			$limit = ( $max_number > 0 ) ? "if( $.isNumeric($max_number) && $max_number !== 0 && $max_number >= k_nb ) return false;" : "";
+			 			$parmeta_entries = format_to_output( json_encode($parmeta['entries']), 'htmlspecialchars');
 			
-			
-			$js = ( $use_single_button ) ? "var entry_type = '$field_type'":"var entry_type = jQuery('#$parname option:selected').val();";
-			
+			$js = '';
+			$js .= "var entry_name = ( '$use_single_button' ) ? $entry_field_name : jQuery('#$parname option:selected').val();";
+			$js .= "var parmeta_entries = $parmeta_entries, entry_type = parmeta_entries[entry_name].type, entry_max = ( parmeta_entries[entry_name].max_number !== 'undefined' ) ? parmeta_entries[entry_name].max_number:0;";
+ 			$js .= "if( entry_type > 0 ){ if( $.isNumeric(entry_max) && entry_max !== 0 && entry_max >= k_nb ) console.log('Max return');return false; }";
  			
  			global $Blog;
  
@@ -700,6 +693,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  							set_path: '$set_path',
  							parname: '$parname',
  							k_nb: k_nb,
+ 							entry_name: entry_name,
  							entry_type: entry_type
  							".( isset( $Blog ) ? ',blog: '.$Blog->ID : '' )."
  							".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
