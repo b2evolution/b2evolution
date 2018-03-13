@@ -1752,7 +1752,7 @@ function skin_include( $template_name, $params = array() )
 			}
 		}
 
-		// Allow skin overrides as well as additional disp modes (This can be used in the famou shopping cart scenario...)
+		// Allow skin overrides as well as additional disp modes (This can be used in the famous shopping cart scenario):
 		$disp_handlers = array_merge( $disp_handlers, $params );
 
 		if( !isset( $disp_handlers['disp_'.$disp] ) )

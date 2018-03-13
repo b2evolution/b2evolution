@@ -219,7 +219,7 @@ class PageCache
 
 		if( ! $this->is_enabled )
 		{	// We do NOT want caching for this page
-			$Debuglog->add( 'Cache not enabled. No lookup nor caching performed.', 'pagecache' );
+			$Debuglog->add( 'Cache not enabled. No lookup or caching performed.', 'pagecache' );
 			return false;
 		}
 

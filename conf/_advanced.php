@@ -11,7 +11,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 
 /**
- * Display debugging informations?
+ * Display debugging information?
  *
  * 0 = no
  * 1 = yes
@@ -35,7 +35,7 @@ $debug_jslog = 'pwd';
  */
 $debug_pwd = '';
 
-// Most of the time you'll want to see all errors, including notices, to alert you on potential issues:
+// Most of the time you'll want to see all errors, including notices, to alert you of potential issues:
 // b2evo should run without any notices! (same for plugins!)
 error_reporting( E_ALL | E_STRICT );
 /**
@@ -49,7 +49,7 @@ $display_errors_on_production = true;
 
 /**
  * Do you want to display the "Dev" menu in the evobar?
- * This allows to display the dev menu without necessarily enabling debugging.
+ * This allows you to display the dev menu without necessarily enabling debugging.
  * This is useful for skin development on local machines.
  *
  * @var boolean - set to 1 to display the dev menu in the evobar.
@@ -78,7 +78,7 @@ $log_app_errors = 1;
 
 
 /**
- * Allows to force the timezone used by PHP (in case it's not properly configured in php.ini)
+ * Allows forcing the timezone used by PHP (in case it's not properly configured in php.ini)
  * See: http://b2evolution.net/man/date_default_timezone-forcing-a-timezone
  */
 $date_default_timezone = '';
@@ -140,7 +140,7 @@ $thumbnail_sizes = array(
 $demo_mode = false;
 
 /**
- * If enabled, this will create more demo contents and enable more features during install.
+ * If enabled, this will create more demo content and enable more features during install.
  * This may result in an overloaded/bloated blog.
  *
  * @global boolean
@@ -151,7 +151,7 @@ $allow_install_test_features = false;
 /**
  * URL of the Home link at the top left.
  *
- * By default this is the base url. And unless you do a complex installation, there is no need to change this.
+ * By default this is the base url. There is no need to change this, unless you do a complex installation.
  */
 $home_url = $baseurl;
 
@@ -195,7 +195,7 @@ else
 /**
  * Short name of this system (will be used for cookies and notification emails).
  *
- * Change this only if you install mutliple b2evolution instances on the same server or same domain.
+ * Change this only if you install multiple b2evolution instances on the same server or same domain.
  *
  * WARNING: don't play with this or you'll have tons of cookies sent away and your users will have issues!
  *
@@ -359,7 +359,7 @@ $pagecache_max_age = 900;
 
 
 /**
- * Dummy field names to obfuscate spamboots
+ * Dummy field names to obfuscate spambots
  *
  * We use funky field names to defeat the most basic spambots in the front office public forms
  */
@@ -393,7 +393,7 @@ $dummy_fields = array(
 /**
  * Location of the configuration files.
  *
- * Note: This folder NEEDS to by accessible by PHP only.
+ * Note: This folder NEEDS to be accessible by PHP only.
  *
  * @global string $conf_subdir
  */
@@ -410,7 +410,7 @@ $basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/';
 /**
  * Location of the include folder.
  *
- * Note: This folder NEEDS to by accessible by PHP only.
+ * Note: This folder NEEDS to be accessible by PHP only.
  *
  * @global string $inc_subdir
  */
@@ -421,7 +421,7 @@ $misc_inc_path = $inc_path.'_misc/';	   	// You should not need to change this
 /**
  * Location of the HTml SeRVices folder.
  *
- * Note: This folder NEEDS to by accessible through HTTP.
+ * Note: This folder NEEDS to be accessible through HTTP.
  *
  * @global string $htsrv_subdir
  * @global string $htsrv_path
@@ -461,7 +461,7 @@ $restapi_url = $htsrv_url.$restapi_script; // You should not need to change this
 /**
  * Location of the RSC folder.
  *
- * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
+ * Note: This folder NEEDS to be accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $rsc_subdir
  * @global string $rsc_path
@@ -476,7 +476,7 @@ $rsc_uri = $basesubpath.$rsc_subdir;
 /**
  * Location of the skins folder.
  *
- * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
+ * Note: This folder NEEDS to be accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $skins_subdir
  * @global string $skins_path
@@ -489,7 +489,7 @@ $skins_url = $assets_baseurl.$skins_subdir;     // You should not need to change
 /**
  * Location of the site skins folder.
  *
- * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
+ * Note: This folder NEEDS to be accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $siteskins_subdir
  */
@@ -500,7 +500,7 @@ $siteskins_url = $assets_baseurl.$siteskins_subdir;    // You should not need to
 /**
  * Location of the email skins folder.
  *
- * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
+ * Note: This folder NEEDS to be accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $emailskins_subdir
  */
@@ -517,7 +517,7 @@ $admin_url = $baseurl.$dispatcher;
 /**
  * Location of the admin skins folder.
  *
- * Note: This folder NEEDS to by accessible by both PHP AND through HTTP. It MAY be replicated on a CDN.
+ * Note: This folder NEEDS to be accessible by both PHP AND through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $adminskins_subdir
  */
@@ -528,7 +528,7 @@ $adminskins_url = $assets_baseurl.$adminskins_subdir;   // You should not need t
 /**
  * Location of the locales folder.
  *
- * Note: This folder NEEDS to by accessible by PHP AND MAY NEED to be accessible through HTTP.
+ * Note: This folder NEEDS to be accessible by PHP AND MAY NEED to be accessible through HTTP.
  * Exact requirements depend on future uses like localized icons.
  *
  * @global string $locales_subdir
@@ -539,7 +539,7 @@ $locales_path = $basepath.$locales_subdir;  // You should not need to change thi
 /**
  * Location of the plugins.
  *
- * Note: This folder NEEDS to by accessible by PHP AND MAY NEED to be accessible through HTTP.
+ * Note: This folder NEEDS to be accessible by PHP AND MAY NEED to be accessible through HTTP.
  * Exact requirements depend on installed plugins.
  *
  * @global string $plugins_subdir
@@ -553,7 +553,7 @@ $plugins_url = $baseurl.$plugins_subdir;    // You should not need to change thi
 /**
  * Location of the cron folder.
  *
- * Note: Depebding on how you will set up cron execution, this folder may or may not NEED to be accessible by PHP through HTTP.
+ * Note: Depending on how you set up cron execution, this folder may or may not NEED to be accessible by PHP through HTTP.
  *
  * @global string $cron_subdir
  */
@@ -619,7 +619,7 @@ $upgrade_path = $basepath.$upgrade_subdir;  // You should not need to change thi
 
 
 /**
- * Do you want to allow public access to the media dir?
+ * Do you want to allow public access to the media directory?
  *
  * WARNING: If you set this to false, evocore will use /htsrv/getfile.php as a stub
  * to access files and getfile.php will check the User permisssion to view files.
@@ -634,7 +634,7 @@ $public_access_to_media = true;
 
 /**
  * Do you want to stay in the current blog when you click on a post title or permalink,
- * even if the post main cat belongs to another blog?
+ * even if the post main category belongs to another blog?
  *
  * @global boolean
  */
@@ -648,7 +648,7 @@ $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php',
 
 /**
  * The admin can configure the regexp for valid file names in the Settings interface
- * However if the following values are set to non empty, the admin will not be able to customize these values.
+ * However if the following values are set to non-empty, the admin will not be able to customize these values.
  */
 $force_regexp_filename = '';
 $force_regexp_dirname = '';
@@ -659,9 +659,9 @@ $force_regexp_dirname = '';
 $filename_max_length = 64;
 
 /**
- * The maximum length of a file absolute path. Creating folders/files with longer path then this value is not allowed.
- * Note: 247 is the max length of an absolute path what the php file operation functions can handle on windows.
- * On unix systems the file path length is not an issue, so there we can allow a higher value.
+ * The maximum length of a file absolute path. Creating folders/files with a longer path then this value is not allowed.
+ * NOTE: 247 is the max length of an absolute path which is what the php file operation functions can handle on windows.
+ * On unix systems the file path length is not an issue, so we can allow a higher value.
  * The OS independent max length is 767, because that is what b2evolution can handle correctly.
  */
 $dirpath_max_length = ( ( ( strtoupper( substr( PHP_OS, 0, 3 ) ) ) === 'WIN' ) ? ( 247 - 35 /* the maximum additional path length because of the _evocache folder */ ) : 767 ) - $filename_max_length;
@@ -699,9 +699,9 @@ $pwdchange_request_delay = 300; // 5 minutes
 /**
  * Enabled password drivers.
  * List what drivers must be enabled on your server.
- * By default only first driver(which is support by server configuration) will be used to store new updated passwords in DB.
+ * By default only first driver (which is supported by server configuration) will be used to store new updated passwords in DB.
  *
- *   possible driver valuse:
+ * Possible driver valuse:
  *     - evo_salted
  *     - bcrypt_2y
  *     - bcrypt
@@ -721,50 +721,50 @@ $enabled_password_drivers = array(
 
 /**
  * Account activation reminder settings.
- * Each element of the array is given in seconds
- * Assume that the number of element in the array below is n then the following must be followed:
+ * Each element of the array is given in seconds.
+ * Assume that the number of elements in the array below is n then the following must be followed:
  * n must be greater then 1; n - 1 will be the max number of account activation reminder emails.
- * The first element of the array ( in position 0 ) shows the time in seconds when the firs reminder email must be sent after the new user was registered, or the user status was changed to new, deactivated or emailchanged status
- * Each element between the postion [1 -> (n - 1)) shows the time in seconds when the next reminder email must be sent after the previous one
+ * The first element of the array ( in position 0 ) shows the time in seconds when the first reminder email must be sent after the new user was registered, or the user status was changed to 'new', 'deactivated' or 'emailchanged' status
+ * Each element between the position [1 -> (n - 1)) shows the time in seconds when the next reminder email must be sent after the previous one.
  * The last element of the array shows when an account status will be set to 'failedactivation' if it was not activated after the last reminder email. This value must be the highest value of the array!
  *
  * E.g. $activate_account_reminder_config = array( 86400, 129600, 388800, 604800 ); = array( 1 day, 1.5 days, 4.5 days, 7 days )
- * At most 3 reminder will be sent, the first 1 day after the registration or deactivation, the seond in 1.5 days after the first one, and the third one after 2.5 days after the second one.
- * 7 days after the last reminder email the account status will be set to 'failedactivation' and no more reminder will be sent.
+ * At most 3 reminders will be sent, the first 1 day after the registration or deactivation, the second in 1.5 days after the first one, and the third one after 2.5 days after the second one.
+ * 7 days after the last reminder email the account status will be set to 'failedactivation' and no more reminders will be sent.
  */
 $activate_account_reminder_config = array( 86400/* one day */, 129600/* 1.5 days */, 388800/* 4.5 days */, 604800/* 7 days */ );
 
 
 /**
  * Account activation reminder threshold given in seconds.
- * A user may receive Account activation reminder if the account was created at least x ( = threshold value defined below ) seconds ago.
+ * A user may receive an account activation reminder if the account was created at least x ( threshold value defined below ) seconds ago.
  */
 $activate_account_reminder_threshold = 86400; // 24 hours
 
 
 /**
  * Comment moderation reminder threshold given in seconds.
- * A moderator user may receive Comment moderation reminder if there are comments awaiting moderation which were created at least x ( = threshold value defined below ) seconds ago.
+ * A moderator user may receive a comment moderation reminder if there are comments awaiting moderation which were created at least x ( threshold value defined below ) seconds ago.
  */
 $comment_moderation_reminder_threshold = 86400; // 24 hours
 
 
 /**
  * Post moderation reminder threshold given in seconds.
- * A moderator user may receive Post moderation reminder if there are posts awaiting moderation which were created at least x ( = threshold value defined below ) seconds ago.
+ * A moderator user may receive a post moderation reminder if there are posts awaiting moderation which were created at least x ( threshold value defined below ) seconds ago.
  */
 $post_moderation_reminder_threshold = 86400; // 24 hours
 
 
 /**
  * Unread private messages reminder threshold given in seconds.
- * A user may receive unread message reminder if it has unread private messages at least as old as this threshold value.
+ * A user may receive an unread message reminder if it has unread private messages at least as old as this threshold value.
  */
 $unread_messsage_reminder_threshold = 86400; // 24 hours
 
 
 /**
- * Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
+ * An unread message reminder is sent every y days unless the user logged in during the last x days.
  * The array below is in x => y format.
  * The values of this array must be ascendant.
  */
@@ -781,7 +781,7 @@ $unread_message_reminder_delay = array(
 
 /**
  * Cleanup scheduled jobs threshold given in days.
- * The scheduled jobs older than x ( = threshold value ) days will be removed
+ * The scheduled jobs older than x ( threshold value ) days will be removed
  */
 $cleanup_jobs_threshold = 45;
 
@@ -790,17 +790,17 @@ $cleanup_jobs_threshold = 45;
  * Enable a workaround to allow accessing posts with URL titles ending with
  * a dash (workaround for old bug).
  *
- * In b2evolution v2.4.5 new tag URLs were introduced: You could choose
+ * In b2evolution v2.4.5 new tag URLs were introduced. You could choose
  * to have tag URLs ending with a dash. This lead to problems with post
- * URL titles accidentially ending with a dash (today, URL titles cannot
- * end with a dash anymore): Instead of displaying the post, the post
+ * URL titles accidentally ending with a dash (today, URL titles cannot
+ * end with a dash anymore). Instead of displaying the post, the post
  * title was handled as a tag name. When this setting is enabled, all tag
  * names which are exactly 40 chars long and end with a dash are handled
- * in the following way:
- * Try to find a post with the given tag name as the URL title. If there
- * is a matching post, display it; otherwise, display the normal tag page.
+ * in the following way: try to find a post with the given tag name as the
+ * URL title, if there is a matching post, display it; otherwise, display
+ * the normal tag page.
  *
- * Note: If you use a 39 chars-long tag name, have an URL title which is
+ * Note: If you use a 39 char-long tag name, have an URL title which is
  * the same as the tag *but* additionally has a dash at the end and you
  * use the dash as a tag URL "marker", you won't be able to access either
  * the post or the tag page, depending on the value of this setting.
@@ -828,9 +828,9 @@ $failed_logins_lockout = 600; // 10 minutes
 
 
 /**
- * Deny registering new accounts with these reserved logins;
- * Also deny changing user logins to one of these;
- * Only admins with permission to create new users can use these:
+ * Deny registering new accounts with these reserved logins.
+ * Also deny changing user logins to one of these.
+ * Only admins with permission to create new users can use these.
  */
 $reserved_logins = array( 'admin', 'admins', 'administrator', 'administrators', 'moderator', 'moderators', 'webmaster', 'postmaster', 'mailer', 'mail', 'support', 'owner', 'sysop', 'root', 'system', 'web', 'site', 'website', 'server' );
 
@@ -852,25 +852,25 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 /**
  * Turn this on to simulate email sends instead of really sending them through SMTP.
  * This is useful if you are debugging a production database on a development machine.
- * It will prevent from sending test notifications to real user accounts.
+ * It will prevent sending test notifications to real user accounts.
  * You will still be able to see the emails that would have been sent through the Emails > Sent tab in the back-office.
  */
 $email_send_simulate_only = false;
 
 
 /**
- * Would you like to use CDNs as definied in the array $library_cdn_urls below
+ * Would you like to use CDNs as defined in the array $library_cdn_urls below
  * or do you prefer to load all files from the local source as defined in the array $library_local_urls below?
  *
  * @global boolean $use_cdns
  */
-$use_cdns = false;		// Use false by default so b2evo works on intranets, local tests on laptops and in countries with firewalls...
+$use_cdns = false;		// Use false by default so b2evo works on intranets, local tests on laptops and in countries with firewalls.
 
 /**
  * Which CDN do you want to use for loading common libraries?
  *
  * If you don't want to use a CDN and want to use the local version, comment out the line.
- * Each line starts with the js or css alias.
+ * Each line starts with the JS or CSS alias.
  * The first string is the production (minified URL), the second is the development URL (optional).
  * By default, only the most trusted CDNs are enabled while the other ones are commented out.
  */
@@ -913,7 +913,7 @@ $library_cdn_urls = array(
 /**
  * The aliases for all local JS and CSS files that are used when CDN url is not defined in $library_cdn_urls
  *
- * Each line starts with the js or css alias.
+ * Each line starts with the JS or CSS alias.
  * The first string is the production (minified URL), the second is the development URL (optional).
  */
 $library_local_urls = array(
@@ -954,13 +954,13 @@ $library_local_urls = array(
 
 
 /**
- * Allow to send outbound pings on localhost
+ * Allow sending outbound pings on localhost
  */
 $allow_post_pings_on_localhost = false;
 
 
 /**
- * Proxy configuration for all outgoing connections (like pinging b2evolution.net or twitter, etc...)
+ * Proxy configuration for all outgoing connections ( like pinging b2evolution.net or twitter, etc )
  * Leave empty if you don't want to use a proxy.
  */
 $outgoing_proxy_hostname = '';
@@ -972,8 +972,8 @@ $outgoing_proxy_password = '';
 /**
  * Check for old browsers like IE and display info message.
  * Set to false if you don't want this check and never inform users if they use an old browser.
- * Note: new default is false because it's easy to annoy IE users with that and they wan't do anything about their enterprise settings that makes them advertsie an older IE than they really have
- *       On our end though we'll send an 'IE-Edge' header and it will make the IE on the other end behva ethe best it can...
+ * Note: New default is false because it's easy to annoy IE users with that and they wan't do anything about their enterprise settings that makes them advertsie an older IE than they really have.
+ *       On our end though we'll send an 'IE-Edge' header and it will make the IE on the other end behave as best it can.
  */
 $check_browser_version = false;
 

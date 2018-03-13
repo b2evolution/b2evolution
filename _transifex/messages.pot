@@ -31068,7 +31068,7 @@ msgid "You are subscribed to be notified of all new comments on the following po
 msgstr ""
 
 #: ../../../inc/users/views/_user_subscriptions.form.php:398
-msgid "To subscribe to notifications on a specifc post, go to that post and click \"Notify me when someone comments\" at the end of the comment list."
+msgid "To subscribe to notifications on a specific post, go to that post and click \"Notify me when someone comments\" at the end of the comment list."
 msgstr ""
 
 #: ../../../inc/users/views/_user_subscriptions.form.php:403

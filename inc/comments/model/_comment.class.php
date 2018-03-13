@@ -3932,7 +3932,7 @@ class Comment extends DataObject
 		}
 		else
 		{	// Get the notify users for META comments:
-			$meta_SQL = new SQL( 'Select users which have permission to the edited_Item #'.$comment_Item->ID.' meta comments and would like to recieve notifications' );
+			$meta_SQL = new SQL( 'Select users which have permission to the edited_Item #'.$comment_Item->ID.' meta comments and would like to receive notifications' );
 			$meta_SQL->SELECT( 'user_ID, "meta_comment"' );
 			$meta_SQL->FROM( 'T_users' );
 			$meta_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
@@ -3973,7 +3973,7 @@ class Comment extends DataObject
 			}
 			$meta_SQL->WHERE_and( $users_with_item_edit_perms );
 
-			// Select users which have permission to the edited_Item meta comments and would like to recieve notifications:
+			// Select users which have permission to the edited_Item meta comments and would like to receive notifications:
 			$notify_users = $DB->get_assoc( $meta_SQL );
 		}
 

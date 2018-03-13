@@ -4004,7 +4004,7 @@ function user_send_report_message( $report_user_IDs, $reported_user_login )
 	global $Settings, $UserSettings;
 
 	if( empty( $report_user_IDs ) )
-	{ // No users to recieve PM
+	{ // No users to receive PM
 		return false;
 	}
 
@@ -4032,7 +4032,7 @@ function user_send_report_message( $report_user_IDs, $reported_user_login )
 	}
 
 	if( empty( $report_user_IDs ) )
-	{ // No users to recieve PM
+	{ // No users to receive PM
 		return false;
 	}
 

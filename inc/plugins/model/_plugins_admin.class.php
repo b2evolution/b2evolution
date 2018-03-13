@@ -1582,7 +1582,7 @@ class Plugins_admin extends Plugins
 	/**
 	 * UnFilter (post) contents by calling the relevant filter plugins.
 	 *
-	 * This is the opposite of filter_content. It is used to restore some specifcs before editing text.
+	 * This is the opposite of filter_content. It is used to restore some specifics before editing text.
 	 * For example, this can be used to replace complex sequences of tags with a custome meta-tag,
 	 * e-g: <strong> can become <s> for convenient editing.
 	 *

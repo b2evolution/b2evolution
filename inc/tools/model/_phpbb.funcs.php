@@ -1892,7 +1892,7 @@ function phpbb_import_messages()
 			if( !isset( $users_IDs[ (string) $message->to_user_id ] ) )
 			{	// The message has the incorrect user's ID by some reason
 				$phpbb_missing_users++;
-				//phpbb_log( sprintf( '<br />'.T_('Skipped message: %s. Incorrect reciever user ID: %s. <b>Content:</b> %s'), $message->id, $message->to_user_id, substr( $message->subject, 0, 250 ).' ...' ), 'error', ' ' );
+				//phpbb_log( sprintf( '<br />'.T_('Skipped message: %s. Incorrect receiver user ID: %s. <b>Content:</b> %s'), $message->id, $message->to_user_id, substr( $message->subject, 0, 250 ).' ...' ), 'error', ' ' );
 				continue;
 			}
 

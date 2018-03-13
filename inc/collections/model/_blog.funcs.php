@@ -599,7 +599,7 @@ function init_requested_blog( $use_blog_param_first = true )
 	// If we want to give priority to ?blog=123..
 	if( $use_blog_param_first == true )
 	{	// Check if a specific blog has been requested in the URL:
-		$Debuglog->add( 'Checking for epxlicit "blog" param', 'detectblog' );
+		$Debuglog->add( 'Checking for explicit "blog" param', 'detectblog' );
 		$blog = param( 'blog', 'integer', '', true );
 
 		if( !empty($blog) )
@@ -659,7 +659,7 @@ function init_requested_blog( $use_blog_param_first = true )
 	// If we did NOT give priority to ?blog=123, check for param now:
 	if( $use_blog_param_first == false )
 	{	// Check if a specific blog has been requested in the URL:
-		$Debuglog->add( 'Checking for epxlicit "blog" param', 'detectblog' );
+		$Debuglog->add( 'Checking for explicit "blog" param', 'detectblog' );
 		$blog = param( 'blog', 'integer', '', true );
 
 		if( !empty($blog) )

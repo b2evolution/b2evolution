@@ -34041,7 +34041,7 @@ msgstr ""
 
 #: ../../../inc/users/views/_user_subscriptions.form.php:398
 msgid ""
-"To subscribe to notifications on a specifc post, go to that post and click "
+"To subscribe to notifications on a specific post, go to that post and click "
 "\"Notify me when someone comments\" at the end of the comment list."
 msgstr ""
 "Um Benachrichtigungen für bestimmte Einträge zu abonnieren, gehen Sie auf "
