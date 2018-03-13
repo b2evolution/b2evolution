@@ -133,7 +133,8 @@ function export_xml( $blog_ID, $option )
 	$XML .= '	<wp:wxr_version>1.2</wp:wxr_version>'.$nl;
 	$XML .= '	<evo:export_version>1.0</evo:export_version>'.$nl;
 	$XML .= '	<wp:base_site_url>'.xml_cdata( $baseurl ).'</wp:base_site_url>'.$nl;
-	$XML .= '	<wp:base_blog_url>'.xml_cdata( $Blog->gen_blogurl() ).'</wp:base_blog_url>'.$nl.$nl;
+	$XML .= '	<wp:base_blog_url>'.xml_cdata( $Blog->gen_blogurl() ).'</wp:base_blog_url>'.$nl;
+	$XML .= '	<generator>http://b2evolution.net/</generator>'.$nl.$nl;
 
 	if( $export_users )
 	{ // Export users
@@ -214,6 +215,7 @@ function export_xml( $blog_ID, $option )
 				$users_xml_data[ $u ]['evo:author_lastseen_ts'] = $User->get( 'lastseen_ts' );
 				$users_xml_data[ $u ]['evo:author_created_from_ipv4'] = int2ip( $UserSettings->get( 'created_fromIPv4' ) );
 				$users_xml_data[ $u ]['evo:author_profileupdate_date'] = $User->get( 'profileupdate_date' );
+				$users_xml_data[ $u ]['evo:author_avatar_file_ID'] = $User->get( 'avatar_file_ID' );
 
 				if( $export_avatars )
 				{	// Export the avatars:
@@ -224,7 +226,7 @@ function export_xml( $blog_ID, $option )
 				$UserCache->clear();
 			}
 
-			$XML .= get_xml_tags( 'wp:author', $users_xml_data ).$nl;
+			$XML .= get_xml_tags( 'wp:author', $users_xml_data );
 		}
 	}
 
@@ -280,8 +282,6 @@ function export_xml( $blog_ID, $option )
 			$XML .= get_xml_tags( 'wp:tag', $tags_xml_data );
 		}
 	}
-
-	$XML .= $nl.'	<generator>http://b2evolution.net/</generator>'.$nl.$nl;
 
 	if( $export_posts )
 	{ // Export posts
@@ -459,32 +459,14 @@ function export_xml( $blog_ID, $option )
 					}
 				}
 
-				$XML .= get_xml_tags( 'item', $posts_xml_data, array(
-						'tag_start_after'  => $nl,
-						'tag_end_before'   => '	',
-						'field_before'     => '		',
-						'field_after'      => $nl,
-						'sub_field_start'  => $nl,
-						'sub_field_before' => '			',
-						'sub_field_after'  => $nl,
-						'sub_field_end'    => '		'
-					) );
+				$XML .= get_xml_tags( 'item', $posts_xml_data );
 			}
 		}
 	}
 
 	if( ! empty( $files_xml_data ) )
 	{ // Append all files tags at the end(after items)
-		$XML .= get_xml_tags( 'file', $files_xml_data, array(
-				'tag_start_after'  => $nl,
-				'tag_end_before'   => '	',
-				'field_before'     => '		',
-				'field_after'      => $nl,
-				'sub_field_start'  => $nl,
-				'sub_field_before' => '			',
-				'sub_field_after'  => $nl,
-				'sub_field_end'    => '		'
-			) );
+		$XML .= get_xml_tags( 'file', $files_xml_data );
 	}
 
 	$XML .= '</channel>'.$nl;
@@ -658,16 +640,18 @@ function export_xml_files( $type, & $row_xml_data, & $files_xml_data )
 function get_xml_tags( $tag_name, $data, $params = array() )
 {
 	$params = array_merge( array(
+			'block_before'     => '',
+			'block_after'      => "\r\n",
 			'tag_start_before' => '	',
-			'tag_start_after'  => '',
-			'tag_end_before'   => '',
+			'tag_start_after'  => "\r\n",
+			'tag_end_before'   => '	',
 			'tag_end_after'    => "\r\n",
-			'field_before'     => '',
-			'field_after'      => '',
-			'sub_field_start'  => '',
-			'sub_field_before' => '',
-			'sub_field_after'  => '',
-			'sub_field_end'    => ''
+			'field_before'     => '		',
+			'field_after'      => "\r\n",
+			'sub_field_start'  => "\r\n",
+			'sub_field_before' => '			',
+			'sub_field_after'  => "\r\n",
+			'sub_field_end'    => '		',
 		), $params );
 
 	$XML = '';
@@ -735,6 +719,11 @@ function get_xml_tags( $tag_name, $data, $params = array() )
 		$XML .= $params['tag_end_before'];
 		$XML .= '</'.$tag_name.'>';
 		$XML .= $params['tag_end_after'];
+	}
+
+	if( ! empty( $XML ) )
+	{
+		$XML = $params['block_before'].$XML.$params['block_after'];
 	}
 
 	return $XML;
