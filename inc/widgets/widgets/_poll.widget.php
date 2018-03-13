@@ -151,15 +151,30 @@ class poll_Widget extends ComponentWidget
 					$max_poll_options_percent = $Poll->get_max_poll_options_percent();
 				}
 
+				$user_vote = $Poll->get_user_vote();
 				echo '<table class="evo_poll__table">';
 				foreach( $poll_options as $poll_option )
 				{
 					echo '<tr>';
-					echo '<td class="evo_poll__selector"><input type="radio" id="poll_answer_'.$poll_option->ID.'"'
-							.' name="poll_answer" value="'.$poll_option->ID.'"'
-							.( $user_vote_option_ID == $poll_option->ID ? ' checked="checked"' : '' ).' /></td>';
+					if( $Poll->max_answers > 1 )
+					{
+						$max_answer_reached = false;
+						if( count( $user_vote ) >= $Poll->max_answers )
+						{
+							$max_answer_reached = true;
+						}
+						echo '<td class="evo_poll__selector"><input type="checkbox" id="poll_answer_'.$poll_option->ID.'"'
+								.' name="poll_answer[]" value="'.$poll_option->ID.'"'
+								.( $user_vote && in_array( $poll_option->ID, $user_vote ) ? ' checked="checked"' : ( $max_answer_reached ? ' disabled="disabled"' : '' ) ).' /></td>';
+					}
+					else
+					{
+						echo '<td class="evo_poll__selector"><input type="radio" id="poll_answer_'.$poll_option->ID.'"'
+								.' name="poll_answer[]" value="'.$poll_option->ID.'"'
+								.( $user_vote && in_array( $poll_option->ID, $user_vote ) ? ' checked="checked"' : '' ).' /></td>';
+					}
 					echo '<td class="evo_poll__title"><label for="poll_answer_'.$poll_option->ID.'">'.$poll_option->option_text.'</label></td>';
-					if( $user_vote_option_ID )
+					if( $user_vote )
 					{	// If current user already voted on this poll, Display the voting results:
 						// Calculate a percent for style relating on max percent:
 						$style_percent = $max_poll_options_percent > 0 ? ceil( $poll_option->percent / $max_poll_options_percent * 100 ) : 0;
@@ -169,6 +184,33 @@ class poll_Widget extends ComponentWidget
 					echo '</tr>';
 				}
 				echo '</table>';
+
+				if( $Poll->max_answers > 1 )
+				{
+				?>
+				<script type="text/javascript">
+					var maxAnswers = <?php echo $Poll->max_answers;?>;
+
+					function onPollSelect()
+					{
+						var table = jQuery( this ).closest( '.evo_poll__table' );
+						var pollOptions  = jQuery( '.evo_poll__selector input', table );
+						if( jQuery( '.evo_poll__selector input:checked', table ).length < maxAnswers )
+						{
+							jQuery( '.evo_poll__selector input[type=checkbox]:disabled', table ).removeAttr( 'disabled' );
+						}
+						else
+						{
+							jQuery( '.evo_poll__selector input[type=checkbox]:not(:checked)', table ).attr( 'disabled', true );
+						}
+					}
+
+					jQuery( document ).ready( function() {
+						jQuery( '.evo_poll__selector input[type="checkbox"]' ).on( 'click', onPollSelect );
+					} );
+				</script>
+				<?php
+				}
 
 				if( is_logged_in() )
 				{	// Display a button to vote:

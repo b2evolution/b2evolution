@@ -39,7 +39,7 @@ if( ! empty( $poll_owner_login ) )
 
 
 $SQL = new SQL();
-$SQL->SELECT( 'pqst_ID, pqst_owner_user_ID, pqst_question_text' );
+$SQL->SELECT( 'pqst_ID, pqst_owner_user_ID, pqst_question_text, pqst_max_answers' );
 $SQL->FROM( 'T_polls__question' );
 if( ! $perm_poll_view )
 {	// If current user has no permission to view all polls, Display only the owner's polls:
