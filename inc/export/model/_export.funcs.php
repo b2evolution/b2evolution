@@ -16,24 +16,50 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Export blog's data to XML file
+ * Export collection or user data to XML/ZIP file
  *
- * @param integer Blog ID
- * @param array Option
+ * @param array Params
  */
-function export_xml( $blog_ID, $option )
+function export_xml( $params )
 {
 	global $DB, $app_name, $app_version, $baseurl;
 
-	// Blog
-	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog_ID, false );
-	if( !$Blog )
-	{	// Bad request
-		return;
-	}
+	$params = array_merge( array(
+			'blog_ID' => NULL,
+			'user_ID' => NULL,
+			'options' => array(
+					// What should be exported:
+					'all'       => false, // All content of the options below
+					'user'      => false, // All users
+						'pass'    => false, // Passwords of the users
+						'avatar'  => false, // Profile pictures of the users
+					'cat'       => false, // Categories
+					'tag'       => false, // Tags
+					'post'      => false, // Posts/Items
+						'comment' => false, // Comments
+						'file'    => false, // Attachments of the Posts/Items
+				),
+		), $params );
 
 	$UserCache = & get_UserCache();
+
+	if( $params['blog_ID'] !== NULL )
+	{	// Export collection data:
+		$BlogCache = & get_BlogCache();
+		$export_Blog = & $BlogCache->get_by_ID( $params['blog_ID'] );
+		$file_name = $export_Blog->dget( 'name' );
+		$xml_locale = $export_Blog->get( 'locale' );
+	}
+	elseif( $params['user_ID'] !== NULL )
+	{	// Export user data:
+		$export_User = & $UserCache->get_by_ID( $params['user_ID'] );
+		$file_name = $export_User->get( 'login' );
+		$xml_locale = $export_User->get( 'locale' );
+	}
+	else
+	{	// Stop wrong request:
+		debug_die( 'Wrong export request with unknown collection and user!' );
+	}
 
 	// New line
 	$nl = "\r\n";
@@ -48,7 +74,7 @@ function export_xml( $blog_ID, $option )
 	$export_comments = false;
 	$export_files = false;
 
-	if( !empty( $option['all'] ) )
+	if( !empty( $params['options']['all'] ) )
 	{	// Export all contents
 		$export_users = true;
 		$export_passwords = true;
@@ -61,34 +87,34 @@ function export_xml( $blog_ID, $option )
 	}
 	else
 	{	// Export only selected contents
-		if( !empty( $option['user'] ) )
+		if( !empty( $params['options']['user'] ) )
 		{
 			$export_users = true;
-			if( !empty( $option['pass'] ) )
+			if( !empty( $params['options']['pass'] ) )
 			{
 				$export_passwords = true;
 			}
-			if( !empty( $option['avatar'] ) )
+			if( !empty( $params['options']['avatar'] ) )
 			{
 				$export_avatars = true;
 			}
 		}
-		if( !empty( $option['cat'] ) )
+		if( !empty( $params['options']['cat'] ) )
 		{
 			$export_categories = true;
 		}
-		if( !empty( $option['tag'] ) )
+		if( !empty( $params['options']['tag'] ) )
 		{
 			$export_tags = true;
 		}
-		if( !empty( $option['post'] ) )
+		if( !empty( $params['options']['post'] ) )
 		{
 			$export_posts = true;
-			if( !empty( $option['comment'] ) )
+			if( !empty( $params['options']['comment'] ) )
 			{
 				$export_comments = true;
 			}
-			if( !empty( $option['file'] ) )
+			if( !empty( $params['options']['file'] ) )
 			{
 				$export_files = true;
 			}
@@ -104,7 +130,7 @@ function export_xml( $blog_ID, $option )
 		$FileCache = & get_FileCache();
 	}
 
-	$file_name = format_to_output( strtolower( str_replace( ' ', '_', $Blog->dget( 'name' ) ) ), 'text' ) .'.b2evolution.'.date( 'Y-m-d' );
+	$file_name = format_to_output( strtolower( str_replace( ' ', '_', $file_name ) ), 'text' ) .'.b2evolution.'.date( 'Y-m-d' );
 	$xml_file_name = $file_name.'.xml';
 
 	$XML = '<?xml version="1.0" encoding="UTF-8" ?>'.$nl;
@@ -125,19 +151,25 @@ function export_xml( $blog_ID, $option )
 	'>'.$nl.$nl;
 
 	$XML .= '<channel>'.$nl;
-	$XML .= '	<title>'.xml_cdata( $Blog->get_name() ).'</title>'.$nl;
-	$XML .= '	<link>'.xml_cdata( $Blog->gen_blogurl() ).'</link>'.$nl;
-	$XML .= '	<description>'.xml_cdata( $Blog->get( 'longdesc' ) ).'</description>'.$nl;
-	$XML .= '	<pubDate>'.date( 'r' ).'</pubDate>'.$nl;
-	$XML .= '	<language>'.$Blog->get( 'locale' ).'</language>'.$nl;
+	if( isset( $export_Blog ) )
+	{
+		$XML .= '	<title>'.xml_cdata( $export_Blog->get_name() ).'</title>'.$nl;
+		$XML .= '	<link>'.xml_cdata( $export_Blog->gen_blogurl() ).'</link>'.$nl;
+		$XML .= '	<description>'.xml_cdata( $export_Blog->get( 'longdesc' ) ).'</description>'.$nl;
+		$XML .= '	<pubDate>'.date( 'r' ).'</pubDate>'.$nl;
+	}
+	$XML .= '	<language>'.$xml_locale.'</language>'.$nl;
 	$XML .= '	<wp:wxr_version>1.2</wp:wxr_version>'.$nl;
 	$XML .= '	<evo:export_version>1.0</evo:export_version>'.$nl;
 	$XML .= '	<wp:base_site_url>'.xml_cdata( $baseurl ).'</wp:base_site_url>'.$nl;
-	$XML .= '	<wp:base_blog_url>'.xml_cdata( $Blog->gen_blogurl() ).'</wp:base_blog_url>'.$nl;
+	if( isset( $export_Blog ) )
+	{
+		$XML .= '	<wp:base_blog_url>'.xml_cdata( $export_Blog->gen_blogurl() ).'</wp:base_blog_url>'.$nl;
+	}
 	$XML .= '	<generator>http://b2evolution.net/</generator>'.$nl.$nl;
 
 	if( $export_users )
-	{ // Export users
+	{	// Export users:
 		global $UserSettings;
 
 		load_class( 'regional/model/_country.class.php', 'Country' );
@@ -146,8 +178,12 @@ function export_xml( $blog_ID, $option )
 		$users_SQL = new SQL();
 		$users_SQL->SELECT( 'user_ID' );
 		$users_SQL->FROM( 'T_users' );
+		if( isset( $export_User ) )
+		{	// Export only single User:
+			$users_SQL->WHERE( 'user_ID = '.$export_User->ID );
+		}
 		$users_SQL->ORDER_BY( 'user_ID' );
-		$users_IDs = $DB->get_col( $users_SQL->get(), 0, 'Get all users to export' );
+		$users_IDs = $DB->get_col( $users_SQL->get(), 0, ( isset( $export_User ) ? 'Get user #'.$export_User->ID.' to export' : 'Get all users to export' ) );
 
 		if( count( $users_IDs ) > 0 )
 		{
@@ -236,7 +272,7 @@ function export_xml( $blog_ID, $option )
 		$cats_SQL->SELECT( 'c1.cat_ID, c1.cat_parent_ID, c1.cat_name, c1.cat_urlname, c2.cat_urlname AS parent_urlname, c1.cat_description, c1.cat_order' );
 		$cats_SQL->FROM( 'T_categories c1' );
 		$cats_SQL->FROM_add( 'LEFT OUTER JOIN T_categories c2 ON c1.cat_parent_ID = c2.cat_ID' );
-		$cats_SQL->WHERE( 'c1.cat_blog_ID = '.$DB->quote( $blog_ID ) );
+		$cats_SQL->WHERE( 'c1.cat_blog_ID = '.$DB->quote( $export_Blog->ID ) );
 		$cats_SQL->ORDER_BY( 'cat_parent_ID, cat_ID' );
 		$cats = $DB->get_results( $cats_SQL->get() );
 
@@ -288,7 +324,7 @@ function export_xml( $blog_ID, $option )
 		$cats_SQL = new SQL( 'Get all categories IDs of current Blog' );
 		$cats_SQL->SELECT( 'cat_ID' );
 		$cats_SQL->FROM( 'T_categories' );
-		$cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
+		$cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $export_Blog->ID ) );
 		$cats_IDs = $DB->get_col( $cats_SQL->get() );
 
 		if( count( $cats_IDs ) > 0 )
@@ -472,7 +508,7 @@ function export_xml( $blog_ID, $option )
 	$XML .= '</channel>'.$nl;
 	$XML .= '</rss>';
 
-	if( ( $export_files || $export_users ) && count( $files_xml_data ) )
+	if( ( $export_files || $export_avatars ) && count( $files_xml_data ) )
 	{ // If files are exported we should download them inside ZIP file
 		load_class( '_ext/_zip_archives.php', 'zip_file' );
 

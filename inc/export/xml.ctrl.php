@@ -13,6 +13,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $export_Module;
 
+// Check permission:
+$current_User->check_perm( 'options', 'edit', true );
+
 load_funcs( 'export/model/_export.funcs.php' );
 load_funcs( 'locales/_charset.funcs.php' );
 
@@ -46,7 +49,11 @@ switch( $action )
 		// Do not append Debug JSlog to XML file!
 		$debug_jslog = false;
 
-		export_xml( $blog_ID, $options );
+		// Export collection data:
+		export_xml( array(
+				'blog_ID' => $blog_ID,
+				'options' => $options,
+			) );
 }
 
 // Highlight the requested tab (if valid):

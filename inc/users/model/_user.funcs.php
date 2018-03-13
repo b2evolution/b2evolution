@@ -1222,7 +1222,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 		debug_die( 'Active user not found.' );
 	}
 
-	if( in_array( $user_tab, array( 'marketing', 'advanced', 'admin', 'sessions', 'activity' ) ) )
+	if( in_array( $user_tab, array( 'marketing', 'advanced', 'admin', 'sessions', 'activity', 'export' ) ) )
 	{
 		$is_admin_tab = true;
 	}
@@ -2595,6 +2595,13 @@ function get_user_sub_entries( $is_admin, $user_ID )
 				$users_sub_entries['activity'] = array(
 									'text' => $current_User->ID == $user_ID ? T_('My Activity') : T_('User Activity'),
 									'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=activity'.$user_param ) );
+			}
+
+			if( isset( $GLOBALS['export_Module'] ) && $current_User->can_moderate_user( $user_ID ) )
+			{	// Allow to export if current User can moderate the User:
+				$users_sub_entries['export'] = array(
+								'text' => T_('Export'),
+								'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=export'.$user_param ) );
 			}
 		}
 	}
