@@ -11,6 +11,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// Check permission:
+$current_User->check_perm( 'options', 'edit', true );
+
 load_funcs( 'tools/model/_phpbb.funcs.php' );
 
 param( 'action', 'string' );

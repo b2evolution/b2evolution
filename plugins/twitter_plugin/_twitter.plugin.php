@@ -664,10 +664,13 @@ class twitter_plugin extends Plugin
 		}
 		elseif( !empty( $result->errors ) )
 		{
-			$xmlrpcresp = $result->error;
+			$xmlrpcresp = array();
 			foreach( $result->errors as $error )
 			{
-				$Messages->add_to_group( sprintf( T_('Error: %s'), $error->code ).'. '.$error->message, 'error', T_('Twitter plugin').':' );
+				$xmlrpcresp[] = array(
+					'message' => sprintf( T_('Error: %s'), $error->code ).'. '.$error->message,
+					'type' => 'error',
+					'title' => T_('Twitter plugin').':' );
 			}
 			return false;
 		}
