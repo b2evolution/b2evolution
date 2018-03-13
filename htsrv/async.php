@@ -236,6 +236,7 @@ switch( $action )
  		param( 'plugin_ID', 'integer', true );
  		param( 'set_type', 'string', '' ); // 'Settings', 'UserSettings', 'CollSettings', 'MsgSettings', 'EmailSettings', 'Skin', 'Widget'
  		param( 'entry_type', 'string', '' ); 
+		param( 'entry_name', 'string', '' ); 
  		param( 'parname', 'string', '' ); 
  		param( 'k_nb', 'integer', true );
  		
@@ -321,24 +322,24 @@ switch( $action )
 		*
 		*/
 		
-		//cycle through avaiable items
-		foreach( $r['set_meta']['entries'] as $entry_name => $entry_meta )
-		{
-			// if the passed param['type'] is set (exists) and it matches items['type']
-			if( isset( $entry_meta['type'] ) && $entry_meta['type'] == $entry_type )
-			{			
-				
-				if( isset( $entry_meta['inputs'] ) )
+		//cycle through avaiable items:
+				foreach( $r['set_meta']['entries'] as $l_entry_name => $l_entry_meta )
 				{
-					$r['set_meta']['entries'][$entry_name]['group_type'] = 'select_input'; // inject group type
+					// if the passed param['type'] is set (exists) and it matches items['type'] and key matches $entry_name
+					if( isset( $l_entry_meta['type'] ) && $l_entry_meta['type'] == $entry_type && $entry_name == $l_entry_name )
+					{			
+
+						if( isset( $l_entry_meta['inputs'] ) )
+						{
+							$r['set_meta']['entries'][$l_entry_name]['group_type'] = 'select_input'; // inject group type
+						}
+						
+						$this->autoform_display_field( $parname.'['.$k_nb.']['.$l_entry_name.']', $r['set_meta']['entries'][$l_entry_name], $Form, $Product, NULL, $r['set_node'][$l_entry_name] );
+						//this call has only one item (the selected item), the rest is ignored, so break out alltogether
+						break 2;
+					}
+
 				}
-				
-				autoform_display_field( $parname.'['.$k_nb.']['.$entry_name.']', $r['set_meta']['entries'][$entry_name], $Form, $set_type, $plugin_Object, $target_Object, $r['set_node'][$entry_name] );
-				//this call has only one item (the selected item), the rest is ignored, so break out alltogether
-				break 2;
-			}
-		
-		}
 
  		break;
 		
