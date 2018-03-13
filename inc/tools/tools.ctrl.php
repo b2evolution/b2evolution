@@ -13,6 +13,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $deferred_AdminToolActions;
 
+// Check permission:
+$current_User->check_perm( 'options', 'view', true );
 
 load_funcs( 'plugins/_plugin.funcs.php' );
 load_funcs( 'tools/model/_maintenance.funcs.php' );
@@ -32,6 +34,11 @@ if( $current_User->check_perm( 'options', 'edit' ) &&
 
 param( 'tab', 'string', '', true );
 param( 'tab3', 'string', 'tools', true );
+
+if( $tab3 == 'import' )
+{	// Check permission for import pages:
+	$current_User->check_perm( 'options', 'edit', true );
+}
 
 $tab_Plugin = NULL;
 $tab_plugin_ID = false;
