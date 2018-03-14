@@ -748,9 +748,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  						},
  						function(r, status) {
 						
-								var html = jQuery.parseHTML( r ), 
+								var html = jQuery.parseHTML( r, document, true ), 
 									controls = jQuery(html).find('.controls'),
-									removeButton = jQuery.parseHTML( '".$remove_action."' );
+									removeButton = jQuery.parseHTML( '".$remove_action."', document, true );
 									
 									switch( entry_type )
 									{
