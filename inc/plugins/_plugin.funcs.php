@@ -63,7 +63,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	if( isset( $parmeta['group'] ) )
 	{
 		$group = $parmeta['group'];
-		if( substr( $group, -1 ) === ']' )
+		if( isset( $parmeta['group_type'] ) && $parmeta['group_type'] == 'select_input' )
+		{	// It is used for groups created through the 'select_input' object:
+			$parname = substr( $group, 0, strlen( $group ) - 1 ).']['.$parname.']';
+		}
+		elseif( substr( $group, -1 ) === ']' )
 		{	// If group name is in array format like "edit_plugin_1_set_sample_sets[0][group_name]",
 			// then param name must be like "edit_plugin_1_set_sample_sets[0][group_name_param_name]":
 			$parname = substr( $group, 0, strlen( $group ) - 1 ).$parname.']';
@@ -258,7 +262,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 	// Display input element:
 	$input_name = $Obj->get_param_prefix().$parname;
-	if( substr($parmeta['type'], 0, 6) == 'select' && ! empty($parmeta['multiple']) )
+	if( $parmeta['type'] != 'select_input' && substr( $parmeta['type'], 0, 6 ) == 'select' && ! empty( $parmeta['multiple'] ) )
 	{ // a "multiple" select:
 		$input_name .= '[]';
 	}
@@ -372,6 +376,383 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				}
 			}
 			$Form->radio_input( $input_name, $set_value, $options, $set_label, $params );
+			break;
+
+		case 'select_input':
+			$has_array_type = true;
+			$has_color_field = false;
+
+			$k_nb = 0;
+
+			$l_parname = $parname;
+
+			if( substr_count( $parname, '[' ) % 2 )
+			{	// this refers to a specific array type set (with index pos at the end), e.g. when adding a field through AJAX:
+				$pos_last_bracket = strrpos($parname, '[');
+				$parname = substr($parname, 0, $pos_last_bracket);
+			}
+
+			$remove_button = format_to_output( action_icon( T_('Remove'), 'minus',
+					regenerate_url( 'action', array( 'action=del_settings_set&amp;set_path='.$parname.'[0]'.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param( 'user_ID' ) : '' ), 'plugin_ID='.$Obj->ID ) ),
+					T_('Remove'), 5, 3,
+					array( 'onclick' => "jQuery(this).closest(\'.form-group\').remove();return false;", 'style' => 'padding:10px 10px' )
+				), 'htmlspecialchars' );
+
+			/**** Start (Display of saved entries): ****/
+			echo '<div id="'.$parname.'_add_new">';
+
+			if( is_array( $set_value ) )
+			{
+				
+
+				foreach( $set_value as $sv => $sv_data )
+				{
+					if( count( $sv_data ) > 1 )
+					{	// Grouped field:
+						if( ! isset( $multiple_par_entries ) )
+						{	// Initialize array with multiple fields:
+							$multiple_par_entries = array();
+							foreach( $parmeta['entries'] as $entry_name => $entry_meta )
+							{
+								if( isset( $entry_meta['inputs'] ) && is_array( $entry_meta['inputs'] ))
+								{
+									$multiple_par_entries[ $entry_name ] = array_keys( $entry_meta['inputs'] );
+								}
+							}
+						}
+						$current_multiple_par_entry_name = NULL;
+						foreach( $multiple_par_entries as $entry_name => $input_names )
+						{
+							foreach( $input_names as $input_name )
+							{
+								if( isset( $sv_data[ $entry_name.$input_name ] ) )
+								{
+									$current_multiple_par_entry_name = $entry_name;
+									break 2;
+								}
+							}
+						}
+						if( isset( $parmeta['entries'][ $current_multiple_par_entry_name ]['inputs'] ) )
+						{
+							$entry_meta = $parmeta['entries'][ $current_multiple_par_entry_name ];
+							$Form->begin_line( $entry_meta['label'], $input_name );
+							
+							foreach( $entry_meta['inputs'] as $input_name => $input_meta )
+							{
+								if( isset( $sv_data[ $current_multiple_par_entry_name.$input_name ] ) )
+								{	// Use a saved value:
+									$l_value = $sv_data[ $current_multiple_par_entry_name.$input_name ];
+								}
+								else
+								{	// Use default value if it is defined:
+									$l_value = isset( $input_meta['defaultvalue'] ) ? $input_meta['defaultvalue'] : NULL;
+								}
+								// RECURSE:$parname.'['.$current_multiple_par_entry_name.$input_name.']['.$k.']'
+								//pre_dump( $parname.'['.$sv.']['.$current_multiple_par_entry_name.']['.$input_name.']' );
+								autoform_display_field( $parname.'['.$sv.']['.$current_multiple_par_entry_name.']['.$input_name.']', $input_meta, $Form, $set_type, $Obj, $set_target, $l_value );
+							}
+							$Form->end_line();
+						}
+					}
+					else
+					{	// Single field:
+						list( $set_value_entry_name ) = array_keys( $sv_data );
+						autoform_display_field( $parname.'['.$sv.']['.$set_value_entry_name.']', $parmeta['entries'][ $set_value_entry_name ], $Form, $set_type, $Obj, $set_target, $sv_data[ $set_value_entry_name ] );
+					}
+				}
+			}
+
+			/*if( is_array( $set_value ) )
+			{
+				foreach( $set_value as $n => $m )
+				{
+					foreach( $parmeta['entries'] as $entry_name => $entry_meta )
+					{
+						// If is used multiple times
+						foreach( $set_value[$n] as $set_name => $set_meta )
+						{
+							if( $set_name == $entry_name )
+							{
+								if( isset( $entry_meta['inputs'] ) )
+								{
+									$Form->begin_line( $entry_meta['label'], $input_name );
+									foreach( $entry_meta['inputs'] as $input_name => $input_meta )
+									{
+										if( isset( $set_value[$n][$entry_name][$input_name] ) )
+										{	// Use a saved value:
+											$l_value = $set_value[$n][$entry_name][$input_name];
+										}
+										else
+										{	// Use default value if it is defined:
+											$l_value = isset( $input_meta['defaultvalue'] ) ? $input_meta['defaultvalue'] : NULL;
+										}
+										// RECURSE:$parname.'['.$entry_name.$input_name.']['.$k.']'
+										autoform_display_field( $parname.'['.$n.']['.$entry_name.']['.$input_name.']', $input_meta, $Form, $set_type, $Obj, $set_target, $l_value );
+									}
+									$Form->end_line();
+								}
+								else
+								{
+									autoform_display_field( $parname.'['.$n.']['.$entry_name.']', $entry_meta, $Form, $set_type, $Obj, $set_target, $set_meta );
+								}
+							}
+						}
+					}
+				}
+			}*/
+ 
+			echo '</div>';
+
+			echo '<script type="text/javascript">
+			jQuery( document ).ready( function()
+			{
+				var removeButton =  jQuery( "<span>" ).html( "'.$remove_button.'" ).text();
+				jQuery( "#'.$parname.'_add_new" ).children( ".form-group" ).each( function()
+				{
+					jQuery( this ).find( ".controls" ).append( removeButton );
+				} );
+			} );
+			</script>';
+			/****  End (Display of saved entries). ****/
+
+			// Count Entries, if it contain only one then instead of a dropdown list, simply use a button?
+
+			// Check if a color field is among the entries:
+			foreach( $parmeta['entries'] as $entry )
+			{
+				if( isset( $entry['inputs'] ) )
+				{
+					foreach( $entry['inputs'] as $input_entry )
+					{
+						if( isset( $input_entry['type'] ) && $input_entry['type'] == 'color' )
+						{
+							$has_color_field = true;
+							break;
+						}
+					}
+				}
+				else
+				{
+					if( isset( $entry['type'] ) && $entry['type'] == 'color' )
+					{
+						$has_color_field = true;
+						break;
+					}
+				}
+			}
+
+			if( ! isset( $parmeta['entries'] ) )
+			{
+				break;
+			}
+
+			$options = array();
+			$field_options = '';
+			$use_single_button = false;
+
+			if( count( $parmeta['entries'] ) == 1 )
+			{
+				$use_single_button = true;
+			}
+
+			if( ! $use_single_button )
+			{
+				if( isset( $parmeta['defaultvalue'] ) && $parmeta['defaultvalue'] == '' || !  isset( $parmeta['defaultvalue'] ) )
+				{
+					$options[''] = '~ '.T_('Select').' ~'; // add a call to action when no default value is selected
+				}
+			}
+
+			$entry_field_name = '';
+			foreach( $parmeta['entries'] as $index => $entry )
+			{
+				if( isset( $entry['type'] ) )
+				{
+					$entry_field_name = $index;
+					if( empty( $entry['label'] ) )
+					{	// Use default label:
+						switch( $entry['type'] )
+						{
+							case 'integer':
+								$label = 'Number input';
+								break;
+							case 'html_input':
+								$label = 'Html input';
+								break;
+							case 'html_textarea':
+								$label = 'Html text area';
+								break;
+							case 'textarea':
+								$label = 'Multi-line text input';
+								break;
+							case 'text':
+								$label = 'Text input';
+								break;
+							case 'checkbox':
+								$label = 'Checkbox';
+								break;
+							case 'checklist':
+								$label = 'Checklist';
+								break;
+							case 'radio':
+								$label = 'Radio input';
+								break;
+							case 'fileselect':
+								$label = 'File select';
+								break;
+							case 'password':
+								$label = 'Password input';
+								break;
+							case 'color':
+								$label = 'Color input';
+								break;
+							case 'input_group':
+								$label = 'Input Group';
+								break;
+							default:
+								$label = $entry['type'];
+								break;
+						}
+					}
+					else
+					{	// Use defined label:
+						$label = $entry['label'];
+					}
+					$options[ $index ] = $label;
+				}
+			}
+
+			foreach( $options as $type => $label )
+			{
+				$field_options .= '<option'
+					.( isset( $parmeta['defaultvalue'] ) && $parmeta['defaultvalue'] == $type ? ' selected="selected"' : '' )
+					.' value="'.$type.'">'.$label.'</option>';
+			}
+
+			$field_label =  ! empty( $parmeta['label'] ) ? $parmeta['label'] : T_('Add a field of type');
+			$field_name = $parname;
+			$button_add_field = '';
+			$user_ID = $set_type == 'UserSettings' ? $set_target->ID : '';
+
+			$parmeta_entries = format_to_output( json_encode( $parmeta['entries'] ), 'htmlspecialchars' );
+
+			global $Blog;
+ 
+			$set_path = $parname.'[0]';
+
+			$button_add_field .= action_icon( T_('Add'), 'add',
+				regenerate_url( 'action', array( 'action=add_settings_set', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param( 'user_ID' ) : '' ), 'plugin_ID='.$Obj->ID ) ),
+				T_('Add'), 5, 3,
+				// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
+				array( 'onclick'=> "
+					var oThis = this, k_nb = $('#".$parname."_add_new').children('.form-group').length; 
+					var entry_name = ( '$use_single_button' ) ? $entry_field_name : jQuery('#$parname option:selected').val();
+					var parmeta_entries = $parmeta_entries, entry_type = parmeta_entries[entry_name].type, entry_max = ( parmeta_entries[entry_name].max_number !== 'undefined' ) ? parmeta_entries[entry_name].max_number:0;
+					if( entry_type > 0 ){ if( $.isNumeric(entry_max) && entry_max !== 0 && entry_max >= k_nb ) console.log('Max return');return false; }
+
+					if( entry_type == '' )
+					{	// Mark select element of field types as error
+						field_type_error( '".TS_('Please select a field type.')."' );
+						// We should stop the ajax request without entry_type
+						return false;
+					}
+					else
+					{	// Remove an error class from the field
+						field_type_error_clear();
+					}
+
+					function field_type_error( message )
+					{	// Add an error message for the 'field of type' select
+						jQuery( '#$parname' ).addClass( 'field_error' );
+						var span_error = jQuery( '#$parname' ).siblings( 'span.field_error' );
+						if( span_error.length > 0 )
+						{	// Replace a content of the existing span element
+							span_error.html( message );
+						}
+						else
+						{	// Create a new span element for error message
+							jQuery( '#$parname' ).next().after( '<span style=\'padding: 0px 15px;\' class=\'field_error\'>' + message + '</span>' );
+						}
+					};
+
+					function field_type_error_clear()
+					{	// Remove an error style from the 'field of type' select
+						jQuery( '#$parname' ).removeClass( 'field_error' )
+						.siblings( 'span.field_error' ).remove();
+					};
+
+					jQuery.get('".get_htsrv_url()."async.php',
+					{
+						action: 'add_plugin_sett_set',
+						plugin_ID: '{$Obj->ID}',
+						set_type: '$set_type',
+						set_path: '$set_path',
+						parname: '$parname',
+						k_nb: k_nb,
+						entry_name: entry_name,
+						entry_type: entry_type
+						".( isset( $Blog ) ? ',blog: '.$Blog->ID : '' )."
+						".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
+					},
+					function( r, status )
+					{
+						var html = jQuery.parseHTML( r ),
+						controls = jQuery(html).find('.controls'),
+						removeButton = jQuery.parseHTML( '".$remove_button."' );
+
+						switch( entry_type )
+						{
+							case 'checkbox':
+								$(removeButton).css('vertical-align','top'); // align
+								break;
+							case 'radio':
+								$(removeButton).css('vertical-align','bottom'); // align
+								break;
+							case 'checklist':
+								$(removeButton).css('display','block'); // align
+								break;
+							default:
+								$(removeButton).css('vertical-align','middle'); // align
+								break;
+						}
+
+						if( controls.children('div').length > 0 )
+						{	// this should target checkboxes
+							controls.children().last().append(removeButton)
+						}
+						else
+						{
+							controls.append(removeButton);	
+						}
+
+						var container = jQuery('#".$parname."_add_new');
+						if( container.children('.form-group').length === 0 )
+						{
+							container.append(html);
+						}
+						else
+						{
+							container.children('.form-group').last().after(html);
+						}
+						".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
+					} );
+					return false;",
+					'class'=> "btn btn-default",
+				) );
+
+			$field_params = array(
+					'field_suffix' => $button_add_field.( empty( $params['note'] ) ? '' : '<br /><span class="notes">'.$params['note'].'</span>' ),
+					'id'           => $parname
+				);
+
+			if( $use_single_button )
+			{
+				$Form->info_field( $set_label, '', $field_params );
+			}
+			else
+			{
+				$Form->select_input_options( $field_name, $field_options, $field_label, '', $field_params );
+			}
 			break;
 
 		case 'array':
@@ -622,6 +1003,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
 				{
 					$l_parmeta['group'] = $parname; // inject group
+
+					// ac> This will produce a bug as it will always use a defined defaultvalue
+					// it should be checking for a value, if no value, check for default value
+					$use_value = isset( $l_parmeta['defaultvalue'] ) ? $l_parmeta['defaultvalue'] : NULL;
+
 					autoform_display_field( $l_parname, $l_parmeta, $Form, $set_type, $Obj, $set_target, $use_value );
 				}
 				$Form->end_line();
