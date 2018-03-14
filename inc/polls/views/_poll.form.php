@@ -51,6 +51,11 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New poll') : T_('Poll') ).get_man
 		$Form->info( T_('Question'), $edited_Poll->get( 'question_text' ) );
 	}
 
+	if( $perm_poll_edit )
+	{
+		$Form->select_input_array( 'pqst_max_answers', $edited_Poll->get( 'max_answers'), range( 1, 10 ), T_('Allowed answers per user') );
+	}
+
 	if( $creating )
 	{	// Suggest to enter 10 answer options on creating new poll:
 		$answer_options = param( 'answer_options', 'array:string', array() );
@@ -74,7 +79,7 @@ if( $edited_Poll->ID > 0 )
 
 	// Get an options count of the edited poll which has at least one answer:
 	$count_SQL = new SQL( 'Get an options count of the edited poll which has at least one answer' );
-	$count_SQL->SELECT( 'COUNT( pans_ID )' );
+	$count_SQL->SELECT( 'COUNT( pans_pqst_ID )' );
 	$count_SQL->FROM( 'T_polls__answer' );
 	$count_SQL->WHERE( 'pans_pqst_ID = '.$edited_Poll->ID );
 	$poll_options_count = $DB->get_var( $count_SQL );
@@ -86,8 +91,8 @@ if( $edited_Poll->ID > 0 )
 	// Get all options of the edited poll:
 	$SQL = new SQL();
 	$SQL->SELECT( 'popt_ID, popt_pqst_ID, popt_option_text, popt_order,' );
-	$SQL->SELECT_add( 'COUNT( pans_ID ) AS answers_count,' );
-	$SQL->SELECT_add( 'ROUND( COUNT( pans_ID ) / '.$poll_options_count.' * 100 ) AS answers_percent' );
+	$SQL->SELECT_add( 'COUNT( pans_pqst_ID ) AS answers_count,' );
+	$SQL->SELECT_add( 'ROUND( COUNT( pans_pqst_ID ) / '.$poll_options_count.' * 100 ) AS answers_percent' );
 	$SQL->FROM( 'T_polls__option' );
 	$SQL->FROM_add( 'LEFT JOIN T_polls__answer ON pans_popt_ID = popt_ID' );
 	$SQL->WHERE( 'popt_pqst_ID = '.$edited_Poll->ID );

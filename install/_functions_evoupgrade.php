@@ -9218,6 +9218,26 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12690, 'Upgrading polls table...' ) )
+	{ // part of 6.10.0-beta
+		db_add_col( 'T_polls__question', 'pqst_max_answers', 'INT(11) UNSIGNED NOT NULL DEFAULT 1 AFTER pqst_question_text' );
+
+		// Remove autoincrement first
+		$DB->query( 'ALTER TABLE T_polls__answer MODIFY pans_ID INT(11) UNSIGNED NOT NULL' );
+
+		// Drop indexes
+		$DB->query( 'ALTER TABLE T_polls__answer DROP INDEX `PRIMARY`, DROP INDEX pans_pqst_user_ID' );
+
+		// Drop previous primary column
+		db_drop_col( 'T_polls__answer', 'pans_ID' );
+
+		// Add new primary key
+		$DB->query( 'ALTER TABLE T_polls__answer ADD PRIMARY KEY (pans_pqst_ID, pans_user_ID, pans_popt_ID)' );
+
+		upg_task_end();
+	}
+
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
