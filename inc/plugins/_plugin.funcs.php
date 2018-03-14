@@ -634,9 +634,57 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 			$js = '';
 			$js .= "var entry_name = ( '$use_single_button' ) ? $entry_field_name : jQuery('#$parname option:selected').val();";
+			
+			/*
+			*	param_prefix: is defined in Form Class: "ffield_"
+			*	$parname: get from $Obj->get_param_prefix().$parname
+			*	instance: use a fake placeholder "_#_"
+			*	We need to restrict the amount of items added if the param "max_number" is defined
+			*	this can only be done vie JavaScript because of dynamic calls that inserts (or removes)
+			*	items before it is actully saved in $DB.
+			* 	
+			*	logic: 	create array of current items "input_name", 
+			*			extract from "(.form-group).prop('id')" 
+			*			build occurrance array, check against "parmeta_entries[entry_name].max_number"
+			*/
 			$js .= "var parmeta_entries = $parmeta_entries, entry_type = parmeta_entries[entry_name].type, entry_max = ( parmeta_entries[entry_name].max_number !== 'undefined' ) ? parmeta_entries[entry_name].max_number:0;";
- 			$js .= "if( entry_type > 0 ){ if( $.isNumeric(entry_max) && entry_max !== 0 && entry_max >= k_nb ) console.log('Max return');return false; }";
- 			
+			
+			// Get param_prefix used:
+			$js .= "var param_prefix = 'ffield_".$Obj->get_param_prefix().$parname."_#_';";
+			// Create an array with all used input types:
+			$js .= "var disp_entries = $('#".$parname."_add_new').children('.form-group').map(function () {"; 
+			// Strip param_prefix from the string: 
+			$js .= "var r = $(this).prop('id').substring(param_prefix.length);";
+			
+			// Isolate and return the input type from the remaining string:
+			$js .= "return r.substring(1, r.length-1);"; 
+			// End of map
+			$js .= "}).get();";
+			// Create function to build new array with type occurrence {input_name:occurrences}:	
+			$js .= "Array.prototype.occurrence  = function () { var occurrence = {}; this.map( function (a){ if (!(a in this)) { this[a] = 1; } else { this[a] += 1; } return a; }, occurrence );  return occurrence; };";	
+			
+			// Build new array with type occurrence {input_name:occurrences}:
+			$js .= "var disp_entries = disp_entries.occurrence();";
+			
+			$js .= "
+			if( entry_max > 0 )
+			{
+				// Did the user reach maximum amount of entries allowed?
+				if( disp_entries[entry_name] >= entry_max )
+				{";	
+			
+					/*
+					* 	yurabakhtin > Perhaps send a messsage to the user, else it might seem like there is no response on the click action? 
+					*/
+			
+				$js .= "	
+					//Already added the maximum number of items for this type!
+					return false;
+				}
+				//Sure, let\'s add this type!
+			
+			}";
+			
  			global $Blog;
  
  			$set_path = $parname.'[0]';
