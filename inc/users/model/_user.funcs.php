@@ -3488,57 +3488,15 @@ function callback_filter_userlist( & $Form )
 		}
 	}
 	$Form->begin_line( T_('Has all these tags'), 'user_tag' );
-		$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
+		$Form->usertag_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
 			'maxlength' => 255,
 			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
 			'input_suffix'=> '</div>'	) );
-		$Form->text_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
+		$Form->usertag_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
 			'maxlength' => 255,
 			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
 			'input_suffix'=> '</div>'	) );
 	$Form->end_line();
-	?>
-	<script type="text/javascript">
-	function init_autocomplete_tags( selector )
-	{
-		var tags = jQuery( selector ).val();
-		var tags_json = new Array();
-		if( tags.length > 0 )
-		{ // Get tags from <input>
-			tags = tags.split( ',' );
-			for( var t in tags )
-			{
-				tags_json.push( { id: tags[t], name: tags[t] } );
-			}
-		}
-
-		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
-		{
-			theme: 'facebook',
-			queryParam: 's',
-			propertyToSearch: 'name',
-			tokenValue: 'name',
-			preventDuplicates: true,
-			prePopulate: tags_json,
-			hintText: '<?php echo TS_('Type in a tag') ?>',
-			noResultsText: '<?php echo TS_('No results') ?>',
-			searchingText: '<?php echo TS_('Searching...') ?>',
-			jsonContainer: 'tags',
-		} );
-	}
-
-	jQuery( document ).ready( function()
-	{
-		jQuery( '#user_tag' ).hide();
-		init_autocomplete_tags( '#user_tag' );
-		init_autocomplete_tags( '#not_user_tag' );
-		<?php
-			// Don't submit a form by Enter when user is editing the tags
-			echo get_prevent_key_enter_js( '#token-input-user_tag, #token-input-not_user_tag' );
-		?>
-	} );
-	</script>
-	<?php
 
 	if( is_admin_page() )
 	{

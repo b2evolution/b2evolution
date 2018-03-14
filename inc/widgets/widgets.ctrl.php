@@ -611,6 +611,7 @@ if( $display_mode == 'normal' )
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery
 	require_css( 'blog_widgets.css' );
+	init_tokeninput_js();
 
 
 	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );

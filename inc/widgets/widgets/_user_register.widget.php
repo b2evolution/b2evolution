@@ -155,6 +155,7 @@ class user_register_Widget extends ComponentWidget
 				),
 				'usertags' => array(
 					'label' => T_('Tag user with'),
+					'type' => 'usertag',
 					'size' => 30,
 					'maxlength' => 255,
 				),
