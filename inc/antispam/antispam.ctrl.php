@@ -53,6 +53,7 @@ if( isset($filter['off']) )
 }
 
 // Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'spamblacklist', 'view', true );
 
 

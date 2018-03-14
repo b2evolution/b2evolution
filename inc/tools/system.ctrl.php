@@ -17,6 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_funcs( 'tools/model/_system.funcs.php' );
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 if( $current_User->check_perm( 'options', 'edit' ) && system_check_charset_update() )
