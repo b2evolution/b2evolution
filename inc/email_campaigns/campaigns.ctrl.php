@@ -15,6 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'emails', 'view', true );
 
 load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );

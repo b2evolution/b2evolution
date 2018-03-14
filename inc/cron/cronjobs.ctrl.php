@@ -16,6 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_funcs( 'cron/_cron.funcs.php' );
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'options', 'cron' );
