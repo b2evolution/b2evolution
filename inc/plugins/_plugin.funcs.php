@@ -633,7 +633,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			 			$parmeta_entries = format_to_output( json_encode($parmeta['entries']), 'htmlspecialchars');
 			
 			$js = '';
-			$js .= "var entry_name = ( '$use_single_button' ) ? $entry_field_name : jQuery('#$parname option:selected').val();";
+			$js .= "var entry_name = ( '$use_single_button' ) ? $entry_field_name : jQuery('#$parname option:selected').val(),";
+			$js .= "action_msg_container = jQuery( '#".$parname."_action_messages' ); action_msg_container.children().remove();";
 			
 			/*
 			*	param_prefix: is defined in Form Class: "ffield_"
@@ -673,9 +674,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				if( disp_entries[entry_name] >= entry_max )
 				{";	
 			
-				// Max number of entries reached. Send a messsage to the user, else it might seem like there is no response on the click action? 
-					
-				$js .= format_to_output( 'jQuery( \'#'.$parname.'_action_messages\' ).html( \'<div class="action_messages container-fluid"><ul><li><div class="alert alert-dismissible alert-danger fade in">'.TS_('You already added the maximum number of items for this type!').'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div></li></ul></div>\' ); 
+				// Max number of entries reached. Send a messsage to the user, else it might seem like there is no response on the click action? 	
+				$js .= format_to_output( 'action_msg_container.html( \'<div class="action_messages container-fluid"><ul><li><div class="alert alert-dismissible alert-danger fade in">'.TS_('You already added the maximum number of items for this type!').'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div></li></ul></div>\' ); 
 				
 					//Already added the maximum number of items for this type!
 					return false;
