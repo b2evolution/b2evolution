@@ -487,9 +487,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			*	End (Display of saved entries)
 			*/		
 			
-			
-			//Count Entries, if it contain only one then instead of a dropdown list, simply use a button?
-			
+			/**** Start (Display of action messages): ****/
+			echo '<div id="'.$parname.'_action_messages"></div>';
+			/****  End (Display of action messages). ****/
 			
  			// check if a color field is among the entries
  			foreach( $parmeta['entries'] as $entry )
@@ -524,7 +524,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  			
 			
 			$use_single_button = false;
-			
+			//Count Entries, if it contain only one then instead of a dropdown list, simply use a button:
 			if( count( $parmeta['entries'] ) == 1 )
 			{
 				$use_single_button = true;
@@ -673,17 +673,16 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				if( disp_entries[entry_name] >= entry_max )
 				{";	
 			
-					/*
-					* 	yurabakhtin > Perhaps send a messsage to the user, else it might seem like there is no response on the click action? 
-					*/
-			
-				$js .= "	
+				// Max number of entries reached. Send a messsage to the user, else it might seem like there is no response on the click action? 
+					
+				$js .= format_to_output( 'jQuery( \'#'.$parname.'_action_messages\' ).html( \'<div class="action_messages container-fluid"><ul><li><div class="alert alert-dismissible alert-danger fade in">'.TS_('You already added the maximum number of items for this type!').'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div></li></ul></div>\' ); 
+				
 					//Already added the maximum number of items for this type!
 					return false;
 				}
 				//Sure, let\'s add this type!
 			
-			}";
+			}', 'htmlspecialchars' );
 			
  			global $Blog;
  
