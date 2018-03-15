@@ -156,7 +156,9 @@ class poll_Widget extends ComponentWidget
 				}
 
 				$user_vote = $Poll->get_user_vote();
-				echo '<table class="evo_poll__table">';
+				echo '<table class="evo_poll__table"'
+					// Set param to restrict user with max selected answers:
+					.( $Poll->get( 'max_answers' ) > 0 ? ' data-max-answers="'.intval( $Poll->get( 'max_answers' ) ).'"' : '' ).'>';
 				foreach( $poll_options as $poll_option )
 				{
 					echo '<tr>';
@@ -189,31 +191,24 @@ class poll_Widget extends ComponentWidget
 				}
 				echo '</table>';
 
-				if( $Poll->max_answers > 1 )
-				{
+				global $evo_poll_answer_limit_js;
+				if( empty( $evo_poll_answer_limit_js ) && $Poll->get( 'max_answers' ) > 1 )
+				{	// Initialize JS code to restrict max answers per user:
 				?>
 				<script type="text/javascript">
-					var maxAnswers = <?php echo $Poll->max_answers;?>;
-
-					function onPollSelect()
-					{
-						var table = jQuery( this ).closest( '.evo_poll__table' );
-						var pollOptions  = jQuery( '.evo_poll__selector input', table );
-						if( jQuery( '.evo_poll__selector input:checked', table ).length < maxAnswers )
-						{
-							jQuery( '.evo_poll__selector input[type=checkbox]:disabled', table ).removeAttr( 'disabled' );
-						}
-						else
-						{
-							jQuery( '.evo_poll__selector input[type=checkbox]:not(:checked)', table ).attr( 'disabled', true );
-						}
-					}
-
-					jQuery( document ).ready( function() {
-						jQuery( '.evo_poll__selector input[type="checkbox"]' ).on( 'click', onPollSelect );
+				jQuery( document ).ready( function()
+				{
+					jQuery( '.evo_poll__selector input[type="checkbox"]' ).on( 'click', function()
+					{	// Check max possible answers per user for multiple poll:
+						var poll_table = jQuery( this ).closest( '.evo_poll__table' );
+						var is_disabled = ( jQuery( '.evo_poll__selector input:checked', poll_table ).length >= poll_table.data( 'max-answers' ) );
+						jQuery( '.evo_poll__selector input[type=checkbox]:not(:checked)', poll_table ).prop( 'disabled', is_disabled );
 					} );
+				} );
 				</script>
 				<?php
+					// Set flag to don't print out this code twice of the same page with several poll widgets:
+					$evo_poll_answer_limit_js = true;
 				}
 
 				if( is_logged_in() )
