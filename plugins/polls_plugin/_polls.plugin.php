@@ -135,58 +135,44 @@ class polls_plugin extends Plugin
 		}
 
 		// Find all matches with tags of poll data:
-		preg_match_all( '#\[poll:(\d+)(:?)(.*?)]#', $content, $tags );
+		preg_match_all( '#\[poll:(\d+):?([^:\]]*):?(.*?)\]#', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one poll inline tag is found in content:
-			foreach( $tags[0] as $t => $source_tag )
-			{	// Render poll inline tag as html:
-				$poll_ID = $tags[1][$t];
-				$poll_title = T_('Poll');
-				if( ! empty( $tags[2][$t] ) && ! empty( $tags[3][$t] ) )
-				{
-					$poll_title = $tags[3][$t];
-				}
 
-				// Render poll inline tag with widget "Poll":
-				$poll_html = $this->renderPoll( $poll_ID, $poll_title );
+			// Initialize widget "Poll" in order to render poll blocks:
+			load_class( 'widgets/widgets/_poll.widget.php', 'poll_Widget' );
+			$poll_Widget = new poll_Widget();
+
+			foreach( $tags[0] as $t => $source_tag )
+			{	// Render poll inline tag as html with widget "Poll":
+				$poll_title = ( empty( $tags[2][ $t ] ) ? T_('Poll') : $tags[2][ $t ] );
+				$poll_question = ( empty( $tags[3][ $t ] ) ? NULL : $tags[3][ $t ] );
+
+				// Display title only when it doesn't equal "-":
+				$display_title = ( $poll_title !== '-' );
+
+				ob_start();
+				$poll_Widget->display( array(
+						'poll_ID'             => $tags[1][ $t ],
+						'title'               => $poll_title,
+						'poll_question'       => $poll_question,
+						'block_display_title' => $display_title,
+						'block_start'         => $display_title ? '<div class="panel panel-default">' : '',
+						'block_end'           => $display_title ? '</div>' : '',
+						'block_title_start'   => $display_title ? '<div class="panel-heading">' : '',
+						'block_title_end'     => $display_title ? '</div>' : '',
+						'block_body_start'    => $display_title ? '<div class="panel-body">' : '',
+						'block_body_end'      => $display_title ? '</div>' : '',
+					) );
+				$poll_Widget->disp_params = NULL;
 
 				// Replace poll inline tag with the rendered poll html block:
-				$content = substr_replace( $content, $poll_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
+				$content = substr_replace( $content, ob_get_clean(), strpos( $content, $source_tag ), strlen( $source_tag ) );
 			}
 		}
 
 		return $content;
-	}
-
-
-	/**
-	 * Delegates rendering of poll to poll widget
-	 *
-	 * @param integer Poll ID to render
-	 * @param string Optional poll title to display
-	 */
-	function renderPoll( $poll_ID, $poll_title = NULL )
-	{
-		load_class( 'widgets/widgets/_poll.widget.php', 'poll_Widget' );
-
-		$poll_Widget = new poll_Widget();
-
-		ob_start();
-		$poll_Widget->display( array(
-				'poll_ID' => $poll_ID,
-				'title' => $poll_title,
-				'block_display_title' => true,
-				'block_start' => '<div class="panel panel-default">',
-				'block_end' => '</div>',
-				'block_title_start' => '<div class="panel-heading">',
-				'block_title_end' => '</div>',
-				'block_body_start' => '<div class="panel-body">',
-				'block_body_end' => '</div>'
-			) );
-		$output = ob_get_clean();
-
-		return $output;
 	}
 
 

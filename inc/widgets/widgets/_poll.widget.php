@@ -118,7 +118,11 @@ class poll_Widget extends ComponentWidget
 		}
 		else
 		{	// Display a form for voting on poll:
-			echo '<p>'.$Poll->get( 'question_text' ).'</p>';
+			$poll_question = empty( $this->disp_params['poll_question'] ) ? $Poll->get( 'question_text' ) : $this->disp_params['poll_question'];
+			if( $poll_question !== '-' )
+			{	// Display a poll question only when it doesn't equal "-":
+				echo '<p>'.$poll_question.'</p>';
+			}
 
 			$poll_options = $Poll->get_poll_options();
 			if( count( $poll_options ) )
