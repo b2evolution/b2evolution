@@ -1391,9 +1391,26 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 	if( $set_value === NULL )
 	{ // Get the value from request:
 		$l_value = param( $Obj->get_param_prefix().$parname, $l_param_type, $l_param_default );
+		// $l_param_type = 'array', lets skip this for type of 'select_input'
+		if( isset($parmeta['type']) && $parmeta['type'] == 'select_input' )
+		{
+			$l_param_type = 'select_input';
+		}
+		
 		// Store values of unchecked checkboxes manually because their empty values are not passed to a submitted form:
 		switch( $l_param_type )
 		{
+			case 'select_input':
+				// Do nothing:
+				
+				/*
+				*	param types are not passed so in the event of radio | checklist | checkbox types
+				*	empty values will not be passed to a submitted form and there is now way (currently)
+				*	to know that the types are displayed as their empty values aren't saved, this is not an issue
+				*	for form inputs that we know are there (via $parmeta) but this is not the case for 
+				*	type of "select_input" - bottom line [ radio | checklist | checkbox ] types are NOT Supported
+				*/
+				break;
 			case 'array':
 			case 'array:integer':
 			case 'array:array:integer':
