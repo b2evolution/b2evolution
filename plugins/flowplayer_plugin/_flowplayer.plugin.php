@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
@@ -23,7 +23,7 @@ class flowplayer_plugin extends Plugin
 	var $code = 'b2evFlwP';
 	var $name = 'Flowplayer';
 	var $priority = 80;
-	var $version = '6.10.0';
+	var $version = '6.10.1';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'swf', 'mp4', 'ogv', 'webm', 'm3u8' );

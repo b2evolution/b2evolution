@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -21,18 +21,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function pbm_msg( $message, $cron = false )
 {
-	global $is_web, $result_message, $pbm_messages;
+	global $is_web, $pbm_messages;
 
 	// Log all messages to $pbm_messages no matter if we are in cron mode or not
 	// We may use this report later, display or send to the blog owner
 	$pbm_messages[] = $message;
 
 	if( $cron )
-	{	// We are in cron mode, log the message
-		if( $is_web )
-			$message .= '<br />';
-
-		$result_message .= $message."\n";
+	{	// Append a message to cron log if we are in cron mode:
+		cron_log_append( $message );
 	}
 }
 

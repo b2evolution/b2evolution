@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package main
@@ -497,7 +497,7 @@ param( 'm', 'string', NULL );
 if( empty( $Item ) &&
 		(
 			! is_null( $catsel ) || // Filter by many categories
-			( $disp != 'edit' && ! is_null( $cat ) ) || // Filter by one category
+			( $disp != 'edit' && $disp != 'anonpost' && ! is_null( $cat ) ) || // Filter by one category
 			! is_null( $tag ) || // Filter by tag
 			! empty( $m ) // Filter by date like '201410' (urls from ?disp=arcdir)
 	) )
@@ -828,6 +828,7 @@ if( !empty( $skin ) )
 					'access_denied'         => 'access_denied.main.php',
 					'access_requires_login' => 'access_requires_login.main.php',
 					'activateinfo'          => 'activateinfo.main.php',
+					'anonpost'              => 'anonpost.main.php',
 					'arcdir'                => 'arcdir.main.php',
 					'catdir'                => 'catdir.main.php',
 					'closeaccount'          => 'closeaccount.main.php',
@@ -856,6 +857,7 @@ if( !empty( $skin ) )
 					'subs'                  => 'subs.main.php',
 					'visits'                => 'visits.main.php',
 					'register'              => 'register.main.php',
+					'register_finish'       => 'register_finish.main.php',
 					'search'                => 'search.main.php',
 					'single'                => 'single.main.php',
 					'sitemap'               => 'sitemap.main.php',

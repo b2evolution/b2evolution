@@ -3,7 +3,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -615,6 +615,14 @@ fieldset ul {
   color: #000;
   font-weight: normal;
 }
+.user_admin_tags {
+  width: 500px;
+  max-width: 100%;
+}
+.user_admin_tags ul.token-input-list-facebook {
+  width: 100%;
+  max-width: 100%;
+}
 #item_locations label {
   width: auto;
   float: right;
@@ -887,6 +895,7 @@ h2.user_title::first-line {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;

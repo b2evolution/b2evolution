@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -1170,6 +1170,8 @@ class File extends DataObject
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use size defined by the thumbnail
 	 *                        'none' - don't use attributes "width" & "height"
+	 * @param boolean Image style
+	 * @param boolean Add loadimg class
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
@@ -1185,7 +1187,9 @@ class File extends DataObject
 	                  $image_desc = '#',
 	                  $image_link_id = '',
 	                  $image_size_x = 1,
-	                  $tag_size = NULL )
+	                  $tag_size = NULL,
+	                  $image_style = '',
+	                  $add_loadimg = true )
 	{
 		if( $this->is_dir() )
 		{ // We can't reference a directory
@@ -1210,7 +1214,7 @@ class File extends DataObject
 			{
 				$img_attribs = $this->get_img_attribs( $size_name, NULL, NULL, $x_size, $tag_size );
 
-				if( $this->check_image_sizes( $size_name, 64, $img_attribs ) )
+				if( $this->check_image_sizes( $size_name, 64, $img_attribs ) && $add_loadimg )
 				{ // If image larger than 64x64 add class to display animated gif during loading
 					$image_class = trim( $image_class.' loadimg' );
 				}
@@ -1234,6 +1238,11 @@ class File extends DataObject
 				if( $img_attribs['alt'] == '' )
 				{ // Image alt
 					$img_attribs['alt'] = $image_alt;
+				}
+
+				if( $image_style != '' )
+				{ // Image style
+					$img_attribs['style'] = $image_style;
 				}
 
 				// Image tag
@@ -2386,6 +2395,32 @@ class File extends DataObject
 				}
 			}
 		}
+		elseif( $size_name == 'fit' )
+		{ // We want src to link to the original file
+			$img_attribs['src'] = $this->get_url();
+
+			if( $tag_size !== NULL)
+			{ // Get target dimension
+				$tag_size = explode( 'x', $tag_size );
+				if( empty( $tag_size[1] ) )
+				{
+					$tag_size[1] = $tag_size[0];
+				}
+				$size_arr = $this->get_image_size( 'widthheight' );
+
+				if( $size_arr[0] > $tag_size[0] || $size_arr[1] > $tag_size[1] )
+				{ // Scale image to fit
+					$scale = min( $tag_size[0]/$size_arr[0], $tag_size[1]/$size_arr[1] );
+					$img_attribs['width'] = $scale * $size_arr[0];
+					$img_attribs['height'] = $scale * $size_arr[1];
+				}
+				else
+				{ // No need to resize
+					$img_attribs['width'] = $size_arr[0];
+					$img_attribs['height'] = $size_arr[1];
+				}
+			}
+		}
 		else
 		{ // We want src to link to a thumbnail
 			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&', $size_x );
@@ -2749,7 +2784,9 @@ class File extends DataObject
 	 * Used when try to delete a file, which is attached to a post, or to a user
 	 *
 	 * @param array restriction
-	 * @return string message with links to objects
+	 * @return string|boolean Message with link to objects,
+	 *                        Empty string if no restriction for current table,
+	 *                        FALSE - if no rule for current table
 	 */
 	function get_restriction_link( $restriction )
 	{

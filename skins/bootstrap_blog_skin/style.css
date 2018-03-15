@@ -58,6 +58,13 @@
 .widget_core_user_register #register_form .form_text_input.form-control {
   width: 100%;
 }
+.widget_core_user_register #register_form .form_text_input.form-control .inline_widget {
+  width: 250px;
+}
+.widget_core_user_register #register_form .form_text_input.form-control.inline_widget {
+  width: 100%;
+  max-width: 250px;
+}
 .widget_core_user_register .field_register_btn .panel {
   margin: 0;
   border: none;
@@ -280,4 +287,14 @@ footer.row {
 }
 .avatar_main_frame {
   background-color: transparent;
+}
+.evo_content_block .evo_comment .evo_comment_footer .action_btn_group {
+  float: right;
+}
+.evo_content_block .evo_comment .comment_edit_btn {
+  margin-right: 5px;
+}
+.evo_content_block .evo_comment .btn-group > .btn.first-child {
+  border-top-left-radius: 3px !important;
+  border-bottom-left-radius: 3px !important;
 }

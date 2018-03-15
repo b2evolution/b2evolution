@@ -14,7 +14,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -68,7 +68,7 @@ else
 	}
 }
 
-if( $params['display_profile_tabs'] )
+if( $params['display_profile_tabs'] && $disp != 'register_finish' )
 { // Display profile tabs
 	echo $params['profile_tabs']['block_start'];
 	$entries = get_user_sub_entries( false, NULL );
@@ -97,6 +97,9 @@ if( $params['display_profile_tabs'] )
 // Display form
 switch( $disp )
 {
+	case 'register_finish':
+		require $inc_path.'users/views/_user_register_finish.form.php';
+		break;
 	case 'profile':
 		require $inc_path.'users/views/_user_identity.form.php';
 		if( $edited_User->has_avatar() )

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -405,19 +405,24 @@ if( $action != 'view' )
 			if( $org_ID > 0 && ! $perm_edit_orgs && $org_data['accepted'] )
 			{ // Display only info of the assigned organization
 				$Form->infostart = $Form->infostart.$inputstart_icon;
-				$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; ';
+				$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; '
+					.'<input type="hidden" name="org_roles[]" value="" />';
+				$org_priority_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Priority').':</strong> '.$org_data['priority'] ).' &nbsp; '
+						.'<input type="hidden" name="org_priorities[]" value="" />';
 				$org_hidden_fields = '<input type="hidden" name="organizations[]" value="'.$org_ID.'" />';
 				$Form->info_field( T_('Organization'), $org_data['name'], array(
-						'field_suffix' => $org_role_input.$org_add_icon.$org_remove_icon.$org_hidden_fields,
+						'field_suffix' => $org_role_input.$org_priority_input.$org_add_icon.$org_remove_icon.$org_hidden_fields,
 						'name'         => 'organizations[]'
 					) );
 			}
 			else
 			{ // Allow to update the organization fields
 				$perm_edit_org_role = false;
+				$perm_edit_org_priority = false;
 				if( ! empty( $org_ID ) )
 				{
 					$perm_edit_org_role = ( $user_Organization->owner_user_ID == $current_User->ID ) || ( $user_Organization->perm_role == 'owner and member' && $org_data['accepted'] );
+					$perm_edit_org_priority = ( $user_Organization->owner_user_ID == $current_User->ID ) || ( $user_Organization->perm_priority == 'owner and member' && $org_data['accepted'] );
 				}
 
 				$Form->output = false;
@@ -429,7 +434,18 @@ if( $action != 'view' )
 				}
 				else
 				{
-					$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; ';
+					$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; '
+						.'<input type="hidden" name="org_roles[]" value="" />';
+				}
+				if( $perm_edit_org_priority )
+				{
+					$org_priority_input = ' &nbsp; <strong>'.T_('Priority').':</strong> '.
+							$Form->text_input( 'org_priorities[]', $org_data['priority'], 10, '', '', array( 'type' => 'number', 'min' => -2147483648, 'max' => 2147483647 ) ).' &nbsp; ';
+				}
+				else
+				{
+					$org_priority_input = ( empty( $org_data['priority'] ) ? '' : ' &nbsp; <strong>'.T_('Priority').':</strong> '.$org_data['priority'] ).' &nbsp; '
+						.'<input type="hidden" name="org_priorities[]" value="" />';
 				}
 				$Form->switch_layout( NULL );
 				$Form->output = true;
@@ -437,7 +453,7 @@ if( $action != 'view' )
 				$Form->inputstart = $Form->inputstart.$inputstart_icon;
 				$Form->select_input_object( 'organizations[]', $org_ID, $OrganizationCache, T_('Organization'), array(
 						'allow_none'   => $org_allow_none,
-						'field_suffix' => $org_role_input.$org_add_icon.$org_remove_icon
+						'field_suffix' => $org_role_input.$org_priority_input.$org_add_icon.$org_remove_icon
 					) );
 			}
 			$Form->infostart = $form_infostart;

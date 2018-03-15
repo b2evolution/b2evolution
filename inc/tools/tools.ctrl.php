@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author blueyed: Daniel HAHLER
@@ -13,6 +13,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $deferred_AdminToolActions;
 
+// Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
+$current_User->check_perm( 'options', 'view', true );
 
 load_funcs( 'plugins/_plugin.funcs.php' );
 load_funcs( 'tools/model/_maintenance.funcs.php' );
@@ -32,6 +35,11 @@ if( $current_User->check_perm( 'options', 'edit' ) &&
 
 param( 'tab', 'string', '', true );
 param( 'tab3', 'string', 'tools', true );
+
+if( $tab3 == 'import' )
+{	// Check permission for import pages:
+	$current_User->check_perm( 'options', 'edit', true );
+}
 
 $tab_Plugin = NULL;
 $tab_plugin_ID = false;

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -163,7 +163,7 @@ class user_login_Widget extends ComponentWidget
 					'size' => 30,
 					'note' => T_( 'Greeting text to display' ),
 					'type' => 'text',
-					'defaultvalue' => T_( 'Hello $login$!' ),
+					'defaultvalue' => sprintf( T_( 'Hello %s!' ), '$login$' ),
 				),
 				'button_class' => array(
 					'label' => T_('Button class'),

@@ -43,7 +43,7 @@
 	// Important for hiding "Slide down" arrow behind this div
 	position: relative;
 	z-index: 1;
-	
+
 	width: 100%;
 	p {
 		margin-top: 10px;
@@ -544,11 +544,30 @@ body.pictured .secondary_area .widget_core_org_members {
 		text-align: center;
 		opacity: 0.5;
 		transition: 0.1s all;
-		position:relative; 
+		position:relative;
 		left:-50%;
 		&:hover {
 			cursor: pointer;
 			opacity: 0.9;
 		}
+	}
+}
+
+// Comment footer
+.evo_content_block .evo_comment {
+	.evo_comment_footer {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
 	}
 }

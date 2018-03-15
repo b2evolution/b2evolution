@@ -32,7 +32,7 @@ $BlogCache->load_by_sql( $SQL );
 
 if( empty( $BlogCache->cache ) )
 {	// There are no collections where we should find old posts to alert for moderators
-	$result_message = 'No collection with alert on old contents.';
+	cron_log_append( 'No collection with alert on old contents.' );
 	return 1;
 }
 
@@ -171,11 +171,12 @@ $UserCache->load_by_sql( $SQL );
 
 if( empty( $UserCache->cache ) )
 {	// UserCache result is empty which means nobody wants to receive alert on old contents:
-	$result_message = 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have stale posts!';
+	cron_log_append( 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have stale posts!' );
 	return 1;
 }
 
 $mail_moderator_sent = array();
+$mail_moderator_num = 0;
 $mail_coll_sent = 0;
 foreach( $BlogCache->cache as $alert_Blog )
 {
@@ -256,12 +257,21 @@ foreach( $BlogCache->cache as $alert_Blog )
 
 		// Send one email message for each moderator per collection:
 		if( send_mail_to_User( $alert_User->ID, sprintf( T_('Stale contents found in %s'), $alert_Blog->get( 'shortname' ) ), 'posts_stale_alert', $email_params, false ) )
-		{
+		{	// Log success mail sending:
+			cron_log_action_end( 'User '.$alert_User->get_identity_link().' has been alerted' );
 			$mail_moderator_sent[ $alert_User->ID ] = 0;
+		}
+		else
+		{	// Log failed mail sending:
+			global $mail_log_message;
+			cron_log_action_end( 'User '.$alert_User->get_identity_link().' could not be alerted because of error: '
+				.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
 		}
 
 		// Restore locale:
 		locale_restore_previous();
+
+		$mail_moderator_num++;
 	}
 
 	$mail_coll_sent++;
@@ -269,11 +279,11 @@ foreach( $BlogCache->cache as $alert_Blog )
 
 if( count( $mail_moderator_sent ) )
 {
-	$result_message = sprintf( '%s moderators have been alerted on old contents of %s collections!', count( $mail_moderator_sent ), $mail_coll_sent );
+	cron_log_append( ( $mail_moderator_num ? "\n" : '' ).sprintf( '%s moderators have been alerted on old contents of %s collections!', count( $mail_moderator_sent ), $mail_coll_sent ) );
 }
 else
 {
-	$result_message = 'No moderators have been alerted on old contents!';
+	cron_log_append( ( $mail_moderator_num ? "\n" : '' ).'No moderators have been alerted on old contents!' );
 }
 
 return 1; /*OK*/

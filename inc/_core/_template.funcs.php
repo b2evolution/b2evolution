@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -89,6 +89,42 @@ function headers_content_mightcache( $type = 'text/html', $max_age = '#', $chars
 
 
 /**
+ * Get URL to return
+ *
+ * @return string URL
+ */
+function get_returnto_url()
+{
+	global $Hit, $Blog, $baseurl, $ReqHost;
+
+	// See if there's a redirect_to request param given:
+	$redirect_to = param( 'redirect_to', 'url', '' );
+
+	if( empty( $redirect_to ) )
+	{	// If default redirect_to param is not defined:
+		if( ! empty( $Hit->referer ) )
+		{	// Use referer page:
+			$redirect_to = $Hit->referer;
+		}
+		elseif( isset( $Blog ) && is_object( $Blog ) )
+		{	// Use collection default page URL:
+			$redirect_to = $Blog->get( 'url' );
+		}
+		else
+		{	// Use base URL:
+			$redirect_to = $baseurl;
+		}
+	}
+	elseif( $redirect_to[0] == '/' )
+	{	// relative URL, prepend current host:
+		$redirect_to = $ReqHost.$redirect_to;
+	}
+
+	return $redirect_to;
+}
+
+
+/**
  * Sends HTTP header to redirect to the previous location (which can be given as function parameter, GET parameter (redirect_to),
  * is taken from {@link Hit::$referer} or {@link $baseurl}).
  *
@@ -114,32 +150,10 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	global $Session, $Debuglog, $Messages;
 	global $http_response_code, $allow_redirects_to_different_domain;
 
-	// TODO: fp> get this out to the caller, make a helper func like get_returnto_url()
-	if( empty($redirect_to) )
-	{ // see if there's a redirect_to request param given:
-		$redirect_to = param( 'redirect_to', 'url', '' );
-
-		if( empty($redirect_to) )
-		{
-			if( ! empty($Hit->referer) )
-			{
-				$redirect_to = $Hit->referer;
-			}
-			elseif( isset($Blog) && is_object($Blog) )
-			{
-				$redirect_to = $Blog->get('url');
-			}
-			else
-			{
-				$redirect_to = $baseurl;
-			}
-		}
-		elseif( $redirect_to[0] == '/' )
-		{ // relative URL, prepend current host:
-			$redirect_to = $ReqHost.$redirect_to;
-		}
+	if( empty( $redirect_to ) )
+	{	// Use automatic return URL if a redirect URL is not defined:
+		$redirect_to = get_returnto_url();
 	}
-	// <fp
 
 	$Debuglog->add('Preparing to redirect to: '.$redirect_to, 'request' );
 
@@ -421,6 +435,7 @@ function get_request_title( $params = array() )
 			'format'              => 'htmlbody',
 			// Title for each disp:
 			// fp> TODO: Make a global array of $disp => Clear text disp
+			'anonpost_text'       => '#',// # - 'New [Post]' ('Post' is item type name)
 			'arcdir_text'         => T_('Archive Directory'),
 			'catdir_text'         => T_('Category Directory'),
 			'mediaidx_text'       => T_('Photo Index'),
@@ -432,7 +447,8 @@ function get_request_title( $params = array() )
 			'contacts_text'       => T_('Contacts'),
 			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
 			'register_text'       => T_('Register'),
-			'req_activate_email'    => T_('Account activation'),
+			'register_finish_text'=> T_('Finish Registration'),
+			'req_activate_email'  => T_('Account activation'),
 			'account_activation'  => T_('Account activation'),
 			'lostpassword_text'   => T_('Lost your password?'),
 			'profile_text'        => T_('User Profile'),
@@ -552,6 +568,11 @@ function get_request_title( $params = array() )
 		case 'subs':
 			// We are requesting the subscriptions screen:
 			$r[] = $params['subs_text'];
+			break;
+
+		case 'register_finish':
+			// We are requesting the register finish form:
+			$r[] = $params['register_finish_text'];
 			break;
 
 		case 'visits':
@@ -682,6 +703,17 @@ function get_request_title( $params = array() )
 
 		case 'closeaccount':
 			$r[] = $params['closeaccount_text'];
+			break;
+
+		case 'anonpost':
+			if( $params['anonpost_text'] == '#' )
+			{	// Initialize default auto title:
+				$r[] = sprintf( T_('New [%s]'), $Blog->get_default_item_type_name() );
+			}
+			else
+			{	// Use custom title from param:
+				$r[] = $params['anonpost_text'];
+			}
 			break;
 
 		case 'edit':
@@ -1538,26 +1570,11 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 	require_js( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
-	$datefmt = locale_input_datefmt();
-	//$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
-	$datefmt = php_to_jquery_date_format( $datefmt );
 	add_js_headline( 'jQuery(document).ready( function(){
-		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
-						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",
-						  "'.T_('July').'", "'.T_('August').'", "'.T_('September').'",
-						  "'.T_('October').'", "'.T_('November').'", "'.T_('December').'"];
-
-		var dayNamesMin = ["'.T_('Sun').'", "'.T_('Mon').'", "'.T_('Tue').'",
-						  "'.T_('Wed').'", "'.T_('Thu').'", "'.T_('Fri').'", "'.T_('Sat').'"];
-
-		var docHead = document.getElementsByTagName("head")[0];
-		for (i=0;i<dayNamesMin.length;i++)
-			dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
-
 		jQuery(".form_date_input").datepicker({
-			dateFormat: "'.$datefmt.'",
-			monthNames: monthNames,
-			dayNamesMin: dayNamesMin,
+			dateFormat: "'.jquery_datepicker_datefmt().'",
+			monthNames: '.jquery_datepicker_month_names().',
+			dayNamesMin: '.jquery_datepicker_day_names().',
 			firstDay: '.locale_startofweek().'
 		})
 	})' );
@@ -1804,6 +1821,34 @@ function init_jqplot_js( $relative_to = 'rsc_url' )
 	require_js( '#jqplot_donutRenderer#', $relative_to );
 	require_css( '#jqplot_css#', $relative_to );
 	require_css( 'jquery/jquery.jqplot.b2evo.css', $relative_to );
+}
+
+
+/**
+ * Initialize JavaScript variables for jQuery QueryBuilder plugin
+ */
+function init_querybuilder_js( $relative_to = 'rsc_url' )
+{
+	global $current_locale;
+
+	require_js( '#jquery#', $relative_to ); // dependency
+	require_js( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
+	require_js( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
+	require_js( 'jquery/query-builder/moment.js', $relative_to ); // dependency
+
+	require_js( 'jquery/query-builder/query-builder.min.js', $relative_to );
+	require_css( 'jquery/jquery.query-builder.default.css', $relative_to );
+
+	// Load language file if such file exists:
+	$query_builder_langs = array( 'ar', 'az', 'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fa-IR', 'fr', 'he', 'it', 'nl', 'no', 'pl', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sq', 'tr', 'ua', 'zh-CN' );
+	if( in_array( $current_locale, $query_builder_langs ) )
+	{	// Load lang by full locale name like "en-US":
+		require_js( 'jquery/query-builder/i18n/query-builder.'.$current_locale.'.js', $relative_to );
+	}
+	elseif( in_array( substr( $current_locale, 0, 2 ), $query_builder_langs ) )
+	{	// Load lang by locale code like "en":
+		require_js( 'jquery/query-builder/i18n/query-builder.'.substr( $current_locale, 0, 2 ).'.js', $relative_to );
+	}
 }
 
 
@@ -3100,6 +3145,122 @@ function display_password_indicator( $params = array() )
 		}
 	} );
 </script>";
+}
+
+
+/*
+ * Display javascript code to edit password
+ *
+ * @param array Params
+ */
+function display_password_js_edit()
+{
+	global $Settings;
+
+	echo '<script type="text/javascript">
+jQuery( "#current_user_pass" ).keyup( function()
+{
+	var error_obj = jQuery( this ).parent().find( "span.field_error" );
+	if( error_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			error_obj.show();
+		}
+		else
+		{
+			error_obj.hide();
+		}
+	}
+
+	user_pass_clear_style( "#current_user_pass" );
+} );
+
+jQuery( "#edited_user_pass1, #edited_user_pass2" ).keyup( function()
+{
+	var minpass_obj = jQuery( this ).parent().find( ".pass_check_min" );
+	if( minpass_obj.length )
+	{ // Hide/Show a message about min pass length
+		if( jQuery.trim( jQuery( this ).val() ).length >= '.intval( $Settings->get('user_minpwdlen') ).' )
+		{
+			minpass_obj.hide();
+		}
+		else
+		{
+			minpass_obj.show();
+		}
+	}
+
+	var diff_obj = jQuery( ".pass_check_diff" );
+	if( diff_obj.length && jQuery( "#edited_user_pass1" ).val() == jQuery( " #edited_user_pass2" ).val() )
+	{ // Hide message about different passwords
+		diff_obj.hide();
+	}
+
+	// Hide message about that new password must be entered
+	var new_obj = jQuery( this ).parent().find( ".pass_check_new" );
+	if( new_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			new_obj.show();
+		}
+		else
+		{
+			new_obj.hide();
+		}
+	}
+
+	// Hide message about that new password must be entered twice
+	var twice_obj = jQuery( this ).parent().find( ".pass_check_twice" );
+	if( twice_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			twice_obj.show();
+		}
+		else
+		{
+			twice_obj.hide();
+		}
+	}
+
+	var warning_obj = jQuery( this ).parent().find( ".pass_check_warning" );
+	if( jQuery.trim( jQuery( this ).val() ) != jQuery( this ).val() )
+	{ // Password contains the leading and trailing spaces
+		if( ! warning_obj.length )
+		{
+			jQuery( this ).parent().append( "<span class=\"pass_check_warning notes field_error\">.'.TS_('The leading and trailing spaces will be trimmed.').'</span>" );
+		}
+	}
+	else if( warning_obj.length )
+	{ // No spaces, Remove warning
+		warning_obj.remove();
+	}
+
+	user_pass_clear_style( "#edited_user_pass1, #edited_user_pass2" );
+} );
+
+/**
+ * Hide/Show error style of input depending on visibility of the error messages
+ *
+ * @param string jQuery selector
+ */
+function user_pass_clear_style( obj_selector )
+{
+	jQuery( obj_selector ).each( function()
+	{
+		if( jQuery( this ).parent().find( "span.field_error span:visible" ).length )
+		{
+			jQuery( this ).addClass( "field_error" );
+		}
+		else
+		{
+			jQuery( this ).removeClass( "field_error" );
+		}
+	} );
+}
+</script>';
 }
 
 

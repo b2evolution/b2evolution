@@ -792,3 +792,13 @@ div.evo_image_index div:hover {
     display: none !important;
   }
 }
+.evo_post_content .evo_comment .evo_comment_footer .action_btn_group {
+  float: right;
+}
+.evo_post_content .evo_comment .comment_edit_btn {
+  margin-right: 5px;
+}
+.evo_post_content .evo_comment .btn-group > .btn.first-child {
+  border-top-left-radius: 3px !important;
+  border-bottom-left-radius: 3px !important;
+}

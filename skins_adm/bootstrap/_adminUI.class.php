@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin-skin
@@ -165,13 +165,13 @@ class AdminUI extends AdminUI_general
 	 *
 	 * @param boolean Whether or not to display messages.
 	 */
-	function disp_body_top( $display_messages = true )
+	function disp_body_top( $display_messages = true, $params = array() )
 	{
 		global $Messages;
 
 		parent::disp_body_top( $display_messages );
 
-		parent::disp_payload_begin();
+		parent::disp_payload_begin( $params );
 
 		if( $display_messages )
 		{ // Display info & error messages:
@@ -589,7 +589,7 @@ class AdminUI extends AdminUI_general
 									 '</div>' // End of <div class="panel-body...>
 								.'</div>' // End of <div id="$group_item_id$...>
 							.'</div>'."\n", // End of <div class="panel panel-default...>
-					
+
 					) );
 
 			case 'linespan_form':

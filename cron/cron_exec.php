@@ -30,6 +30,11 @@ if( $Settings->get( 'system_lock' ) )
  */
 load_funcs( 'cron/_cron.funcs.php' );
 
+// Register shutdown function to catch fatal errors:
+register_shutdown_function( 'cron_job_shutdown' );
+// Mark this script as cron job executing in order to catch function debug_die() here and store error log in cron log:
+$is_cron_job_executing = true;
+
 /**
  * @global integer Quietness.
  *         1 suppresses trivial/informative messages,
@@ -152,6 +157,9 @@ else
 	$ctsk_ID = $task->ctsk_ID;
 	$ctsk_name = cron_job_name( $task->ctsk_key, $task->ctsk_name, $task->ctsk_params );
 
+	// Initialize a var to count a number of cron job actions:
+	$cron_log_actions_num = NULL;
+
 	cron_log( 'Requesting lock on task #'.$ctsk_ID.' ['.$ctsk_name.']', 0 );
 
 	$DB->halt_on_error = false;
@@ -207,8 +215,25 @@ else
 		// The job may need to know its ID and name (to set logical locks for example):
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
-		// EXECUTE
-		$error_message = call_job( $task->ctsk_key, $cron_params );
+		// Try to execute cron job:
+		set_error_handler( 'cron_job_error_handler' );
+		try
+		{	// EXECUTE CRON JOB:
+			$error_message = call_job( $task->ctsk_key, $cron_params );
+		}
+		catch( Exception $ex )
+		{	// Unexpected error:
+			$result_status = 'error';
+			$error_message = "\n".'b2evolution caught an UNEXPECTED ERROR: '
+				.'<b>File:</b> '.$ex->getFile().', '
+				.'<b>Line:</b> '.$ex->getLine().', '
+				.'<b>Message:</b> '.$ex->getMessage();
+			$result_message .= $error_message;
+			echo nl2br( $result_message );
+			// We must rollback any started transaction in order to proper update cron job log below:
+			$DB->rollback();
+		}
+		restore_error_handler();
 
 		if( !empty( $error_message ) )
 		{
@@ -238,10 +263,14 @@ else
 		$sql = ' UPDATE T_cron__log
 								SET clog_status = '.$DB->quote( $result_status ).',
 										clog_realstop_datetime = '.$DB->quote( date2mysql( $timestop ) ).',
-										clog_messages = '.$DB->quote( $result_message ) /* May be NULL */.'
+										clog_messages = '.$DB->quote( $result_message ) /* May be NULL */.',
+										clog_actions_num = '.$DB->quote( $cron_log_actions_num ).'
 							WHERE clog_ctsk_ID = '.$ctsk_ID;
 		$DB->query( $sql, 'Record task as finished.' );
 	}
+
+	// Unset ID of the executed cron job to 
+	unset( $ctsk_ID );
 }
 
 

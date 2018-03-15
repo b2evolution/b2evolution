@@ -48,7 +48,8 @@ class fastdomain_handler
                   'domain.status' => 'Status:'
 		              );
 
-		while (list($key, $val) = each($data_str))
+		//while (list($key, $val) = each($data_str))
+		foreach( $data_str as $key => $val )
 			{
 			$faststr = strpos($val, ' (FAST-');
 			if ($faststr)
@@ -65,7 +66,8 @@ class fastdomain_handler
 			{
 			reset($r['domain']['nserver']);
 			$endnserver = false;
-			while (list($key, $val) = each($r['domain']['nserver']))
+			//while (list($key, $val) = each($r['domain']['nserver']))
+			foreach( $r['domain']['nserver'] as $key => $val )
 				{
 				if ($val == '=-=-=-=')
 					unset($r['domain']['nserver'][$key]);

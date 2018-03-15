@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @todo dh> AFAICS there are three params used for "item ID": "p", "post_ID"
  *       and "item_ID". This should get cleaned up.
@@ -651,7 +651,7 @@ switch( $action )
 		$edited_Item->set_creator_location( 'subregion' );
 		$edited_Item->set_creator_location( 'city' );
 
-		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
+		$edited_Item->status = param( 'post_status', 'string', $Blog->get_setting( 'default_post_status' ) );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
@@ -1649,7 +1649,7 @@ switch( $action )
 		$ItemCache = & get_ItemCache();
 		if( ! ( $dest_Item = & $ItemCache->get_by_ID( $dest_post_ID, false, false ) ) )
 		{	// If Item doesn't exist in DB:
-			$Messages->add( T_('Wrong selected item for merging, please try again.'), 'error' );
+			$Messages->add( 'Item to merge does not exist any more.', 'error' );
 			// REDIRECT / EXIT
 			header_redirect();
 		}

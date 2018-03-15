@@ -16,6 +16,6 @@ if( $extract_keyphrase_result === true )
 	return 1; /* ok */
 }
 
-$result_message = $extract_keyphrase_result;
+cron_log_append( $extract_keyphrase_result );
 return 2;
 ?>

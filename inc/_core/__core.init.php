@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -69,12 +69,20 @@ $db_config['aliases'] = array(
 		'T_users__user_org'        => $tableprefix.'users__user_org',
 		'T_users__secondary_user_groups' => $tableprefix.'users__secondary_user_groups',
 		'T_users__profile_visits'  => $tableprefix.'users__profile_visits',
+		'T_users__tag'             => $tableprefix.'users__tag',
+		'T_users__usertag'         => $tableprefix.'users__usertag',
 		'T_slug'                   => $tableprefix.'slug',
 		'T_email__log'             => $tableprefix.'email__log',
 		'T_email__returns'         => $tableprefix.'email__returns',
 		'T_email__address'         => $tableprefix.'email__address',
+		'T_email__newsletter'      => $tableprefix.'email__newsletter',
+		'T_email__newsletter_subscription' => $tableprefix.'email__newsletter_subscription',
 		'T_email__campaign'        => $tableprefix.'email__campaign',
 		'T_email__campaign_send'   => $tableprefix.'email__campaign_send',
+		'T_automation__automation' => $tableprefix.'automation__automation',
+		'T_automation__newsletter' => $tableprefix.'automation__newsletter',
+		'T_automation__step'       => $tableprefix.'automation__step',
+		'T_automation__user_state' => $tableprefix.'automation__user_state',
 		'T_syslog'                 => $tableprefix.'syslog',
 	);
 
@@ -114,6 +122,7 @@ $ctrl_mappings = array(
 		'userfields'       => 'users/userfields.ctrl.php',
 		'userfieldsgroups' => 'users/userfieldsgroups.ctrl.php',
 		'usersettings'     => 'users/settings.ctrl.php',
+		'usertags'         => 'users/usertags.ctrl.php',
 		'registration'     => 'users/registration.ctrl.php',
 		'invitations'      => 'users/invitations.ctrl.php',
 		'display'          => 'users/display.ctrl.php',
@@ -123,7 +132,9 @@ $ctrl_mappings = array(
 		'upload'           => 'files/upload.ctrl.php',
 		'slugs'            => 'slugs/slugs.ctrl.php',
 		'email'            => 'tools/email.ctrl.php',
+		'newsletters'      => 'email_campaigns/newsletters.ctrl.php',
 		'campaigns'        => 'email_campaigns/campaigns.ctrl.php',
+		'automations'      => 'automations/automations.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
 	);
 
@@ -329,6 +340,25 @@ function & get_UserFieldGroupCache()
 
 
 /**
+ * Get the UserTagCache
+ *
+ * @return UserTagCache
+ */
+function & get_UserTagCache()
+{
+	global $UserTagCache;
+
+	if( ! isset( $UserTagCache ) )
+	{ // Cache doesn't exist yet
+		load_class( 'users/model/_usertag.class.php', 'UserTag' );
+		$UserTagCache = new DataObjectCache( 'UserTag', false, 'T_users__tag', 'utag_', 'utag_ID', 'utag_name', 'utag_name' ); // COPY (FUNC)
+	}
+
+	return $UserTagCache;
+}
+
+
+/**
  * Get the InvitationCache
  *
  * @return InvitationCache
@@ -443,6 +473,26 @@ function & get_EmailAddressCache()
 
 
 /**
+ * Get the NewsletterCache
+ *
+ * @param string The text that gets used for the "None" option in the objects options list (Default: T_('Unknown')).
+ * @return NewsletterCache
+ */
+function & get_NewsletterCache( $allow_none_text = NULL )
+{
+	global $NewsletterCache;
+
+	if( ! isset( $NewsletterCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'email_campaigns/model/_newsletter.class.php', 'Newsletter' );
+		$NewsletterCache = new DataObjectCache( 'Newsletter', false, 'T_email__newsletter', 'enlt_', 'enlt_ID', 'enlt_name', 'enlt_order', $allow_none_text );
+	}
+
+	return $NewsletterCache;
+}
+
+
+/**
  * Get the EmailCampaignCache
  *
  * @return EmailCampaignCache
@@ -476,6 +526,44 @@ function & get_EmailCampaignPrerenderingCache()
 	}
 
 	return $EmailCampaignPrerenderingCache;
+}
+
+
+/**
+ * Get the AutomationCache
+ *
+ * @return AutomationCache
+ */
+function & get_AutomationCache()
+{
+	global $AutomationCache;
+
+	if( ! isset( $AutomationCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'automations/model/_automation.class.php', 'Automation' );
+		$AutomationCache = new DataObjectCache( 'Automation', false, 'T_automation__automation', 'autm_', 'autm_ID' );
+	}
+
+	return $AutomationCache;
+}
+
+
+/**
+ * Get the AutomationStepCache
+ *
+ * @return AutomationStepCache
+ */
+function & get_AutomationStepCache()
+{
+	global $AutomationStepCache;
+
+	if( ! isset( $AutomationStepCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
+		$AutomationStepCache = new DataObjectCache( 'AutomationStep', false, 'T_automation__step', 'step_', 'step_ID', NULL, 'step_order' );
+	}
+
+	return $AutomationStepCache;
 }
 
 
@@ -859,14 +947,7 @@ class _core_Module extends Module
 	 */
 	function check_core_group_perm( $permlevel, $permvalue, $permtarget )
 	{
-		global $current_User;
-
 		$perm = false;
-
-		if( ! is_logged_in() || ! $current_User->check_perm( 'admin', 'normal' ) )
-		{	// Current user must has Normal Back-office Access to view/moderate/edit other users:
-			return $perm;
-		}
 
 		switch ( $permvalue )
 		{
@@ -1010,9 +1091,9 @@ class _core_Module extends Module
 		$perm_admin_restricted = $current_User->check_perm( 'admin', 'restricted' );
 		$perm_users_view = $current_User->check_perm( 'users', 'view' );
 		$perm_options = $current_User->check_perm( 'options', 'view' );
-		$perm_spam = $perm_options && $current_User->check_perm( 'spamblacklist', 'view' );
+		$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
 		$perm_emails = $current_User->check_perm( 'emails', 'view' );
-		$perm_maintenance = $current_User->check_perm( 'perm_maintenance', 'upgrade' );
+		$perm_maintenance = $current_User->check_perm( 'maintenance', 'upgrade' );
 		$entries = NULL;
 
 		$working_blog = get_working_blog();
@@ -1069,19 +1150,38 @@ class _core_Module extends Module
 			// PLACE HOLDER FOR FILES MODULE:
 			$entries['site']['entries']['files'] = NULL;
 
-			if( $perm_spam || $perm_options || $perm_maintenance || $perm_emails )
+			if( $perm_admin_normal && $perm_options )
 			{
 				$entries['site']['entries'][] = array( 'separator' => true );
 
 				if( $perm_emails )
-				{
+				{	// Emails:
 					$entries['site']['entries']['email'] = array(
 							'text' => T_('Emails'),
-							'href' => $admin_url.'?ctrl=campaigns',
+							'href' => $admin_url.'?ctrl=newsletters',
 							'entries' => array(
+								'newsletters' => array(
+									'text' => T_('Lists').'&hellip;',
+									'href' => $admin_url.'?ctrl=newsletters' ),
 								'campaigns' => array(
 									'text' => T_('Campaigns').'&hellip;',
 									'href' => $admin_url.'?ctrl=campaigns' ),
+								)
+						);
+				}
+
+				if( $perm_options )
+				{	// If current user has a permissions to view options:
+					$entries['site']['entries']['email']['entries'] += array(
+							'automations' => array(
+								'text' => T_('Automations').'&hellip;',
+								'href' => $admin_url.'?ctrl=automations',
+						) );
+				}
+
+				if( $perm_emails )
+				{
+					$entries['site']['entries']['email']['entries'] += array(
 								'settings' => array(
 									'text' => T_('Settings').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
@@ -1094,26 +1194,24 @@ class _core_Module extends Module
 								'return' => array(
 									'text' => T_('Returned').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
-								)
-						);
+								);
 				}
 
+				// System:
 				$entries['site']['entries']['system'] = array(
 						'text' => T_('System'),
 						'href' => $admin_url.'?ctrl=system',
+						'entries' => array(
+							'status' => array(
+								'text' => T_('Status').'&hellip;',
+								'href' => $admin_url.'?ctrl=system',
+							),
+							'crontab' => array(
+								'text' => T_('Scheduler').'&hellip;',
+								'href' => $admin_url.'?ctrl=crontab',
+							),
+						)
 					);
-
-				if( $perm_options )
-				{
-					$entries['site']['entries']['system']['entries']['status'] = array(
-							'text' => T_('Status').'&hellip;',
-							'href' => $admin_url.'?ctrl=system',
-						);
-					$entries['site']['entries']['system']['entries']['crontab'] = array(
-							'text' => T_('Scheduler').'&hellip;',
-							'href' => $admin_url.'?ctrl=crontab',
-						);
-				}
 
 				if( $perm_spam )
 				{
@@ -1122,10 +1220,7 @@ class _core_Module extends Module
 							'href' => $admin_url.'?ctrl=antispam',
 						);
 				}
-			}
 
-			if( $perm_options )
-			{	// Global settings:
 				$entries['site']['entries']['system']['entries']['regional'] = array(
 						'text' => T_('Regional').'&hellip;',
 						'href' => $admin_url.'?ctrl=regional',
@@ -1145,6 +1240,10 @@ class _core_Module extends Module
 				$entries['site']['entries']['system']['entries']['maintenance'] = array(
 						'text' => T_('Maintenance').'&hellip;',
 						'href' => $admin_url.'?ctrl=tools',
+					);
+				$entries['site']['entries']['system']['entries']['auto_upgrade'] = array(
+						'text' => T_('Auto Upgrade').'&hellip;',
+						'href' => $admin_url.'?ctrl=upgrade',
 					);
 				$entries['site']['entries']['system']['entries']['syslog'] = array(
 						'text' => T_('System log'),
@@ -1259,19 +1358,22 @@ class _core_Module extends Module
 						);
 					if( $perm_admin_restricted )
 					{	// Menu entries to edit and view post in back-office:
-						$entries['post']['entries'] = array(
-							'edit_front' => array(
-								'text' => T_('Edit in Font-Office').'&hellip;',
-								'href' => $edit_item_url,
-							),
-							'edit_back' => array(
+						$entries['post']['entries'] = array();
+						if( $Blog->get_setting( 'in_skin_editing' ) )
+						{	// If collection allows to edit posts in front-office:
+							$entries['post']['entries']['edit_front'] = array(
+									'text' => T_('Edit in Front-Office').'&hellip;',
+									'href' => $edit_item_url,
+								);
+						}
+						$entries['post']['entries']['edit_back'] = array(
 								'text' => T_('Edit in Back-Office').'&hellip;',
 								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
-							),
-							'view_back' => array(
+							);
+						$entries['post']['entries']['view_back'] = array(
 								'text' => T_('View in Back-Office').'&hellip;',
 								'href' => $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
-							) );
+							);
 					}
 					$entries['page']['entries']['edit'] = array(
 							'text'  => T_('Edit contents').'&hellip;',
@@ -1792,7 +1894,7 @@ class _core_Module extends Module
 		if( ! empty( $user_subs_url ) )
 		{ // Display this menu item only when url is available to current user
 			$userprefs_entries['subs'] = array(
-					'text' => T_('Notifications').'&hellip;',
+					'text' => T_('Emails').'&hellip;',
 					'href' => $user_subs_url,
 				);
 		}
@@ -1897,7 +1999,16 @@ class _core_Module extends Module
 			$users_entries['entries'] = array(
 					'users' => array(
 						'text' => T_('Users'),
-						'href' => '?ctrl=users' ),
+						'href' => '?ctrl=users',
+						'entries' => array(
+							'list' => array(
+								'text' => T_('List'),
+								'href' => '?ctrl=users' ),
+							'duplicates' => array(
+								'text' => T_('Find duplicates'),
+								'href' => '?ctrl=users&amp;tab3=duplicates' ),
+							),
+						),
 					'groups' => array(
 						'text' => T_('Groups'),
 						'href' => '?ctrl=groups' ),
@@ -1928,6 +2039,9 @@ class _core_Module extends Module
 								'href' => '?ctrl=accountclose' ),
 							),
 						),
+						'usertags' => array(
+							'text' => T_('User Tags'),
+							'href' => '?ctrl=usertags' ),
 				);
 		}
 
@@ -1948,8 +2062,11 @@ class _core_Module extends Module
 		{ // Permission to view email management:
 			$AdminUI->add_menu_entries( NULL, array( 'email' => array(
 					'text' => T_('Emails'),
-					'href' => '?ctrl=campaigns',
+					'href' => '?ctrl=newsletters',
 					'entries' => array(
+						'newsletters' => array(
+							'text' => T_('Lists'),
+							'href' => '?ctrl=newsletters' ),
 						'campaigns' => array(
 							'text' => T_('Campaigns'),
 							'href' => '?ctrl=campaigns' ),
@@ -1977,6 +2094,9 @@ class _core_Module extends Module
 								'log' => array(
 									'text' => T_('Send Log'),
 									'href' => '?ctrl=email&amp;tab=sent' ),
+								'stats' => array(
+									'text' => T_('Stats'),
+									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=stats' ),
 								'envelope' => array(
 									'text' => T_('Envelope'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab2=sent&amp;tab3=envelope' ),
@@ -1999,6 +2119,15 @@ class _core_Module extends Module
 							'text' => T_('Addresses'),
 							'href' => '?ctrl=email' ),
 						) ) ) );
+
+			if( $perm_options )
+			{	// If current user has a permissions to view options:
+				$AdminUI->add_menu_entries( 'email', array(
+						'automations' => array(
+							'text' => T_('Automations'),
+							'href' => '?ctrl=automations' ),
+					), 'campaigns' );
+			}
 
 			if( $current_User->check_perm( 'emails', 'edit' ) )
 			{	// Allow to test a returned email only if user has a permission to edit email settings:
@@ -2165,6 +2294,12 @@ class _core_Module extends Module
 				'name'   => T_('Send reminders about non-activated accounts'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_activate_account_reminder.job.php',
+				'params' => NULL,
+			),
+			'execute-automations' => array(
+				'name'   => T_('Execute automations'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_execute_automations.job.php',
 				'params' => NULL,
 			),
 		);

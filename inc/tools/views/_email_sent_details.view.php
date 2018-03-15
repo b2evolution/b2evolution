@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -21,7 +21,7 @@ $Form->global_icon( T_('Cancel viewing!'), 'close', regenerate_url( 'blog' ) );
 
 $Form->begin_form( 'fform', sprintf( T_('Mail log ID#%s'), $MailLog->emlog_ID ) );
 
-$Form->info( T_('Result'), emlog_result_info( $MailLog->emlog_result ) );
+$Form->info( T_('Result'), emlog_result_info( $MailLog->emlog_result, array(), $MailLog->emlog_last_open_ts, $MailLog->emlog_last_click_ts ) );
 
 $Form->info( T_('Date'), mysql2localedatetime_spans( $MailLog->emlog_timestamp ) );
 
@@ -51,11 +51,19 @@ if( !empty( $mail_contents ) )
 {
 	if( !empty( $mail_contents['text'] ) )
 	{ // Display Plain Text content
+		$plain_text_content = preg_replace( '~\$secret_content_start\$.*?\$secret_content_end\$~', '***secret-content-removed***', $mail_contents['text']['content'] );
+		$plain_text_content = preg_replace( '~\$email_key_start\$(.*?)\$email_key_end\$~', '***prevent-tracking-through-log***$1', $plain_text_content );
+
 		$Form->info( T_('Text content'), $mail_contents['text']['type']
-				.'<pre class="email_log_scroll"><span>'.htmlspecialchars( $mail_contents['text']['content'] ).'</span></pre>' );
+				.'<pre class="email_log_scroll"><span>'.htmlspecialchars( $plain_text_content ).'</span></pre>' );
 	}
+
 	if( !empty( $mail_contents['html'] ) )
 	{ // Display HTML content
+
+		$html_content = preg_replace( '~\$secret_content_start\$.*?\$secret_content_end\$~', '***secret-content-removed***', $mail_contents['html']['content'] );
+		$html_content = preg_replace( '~\$email_key_start\$(.*?)\$email_key_end\$~', '***prevent-tracking-through-log***$1', $html_content );
+
 		if( ! empty( $mail_contents['html']['head_style'] ) )
 		{ // Print out all styles of email message
 			echo '<style>'.$mail_contents['html']['head_style'].'</style>';
@@ -63,11 +71,12 @@ if( !empty( $mail_contents ) )
 		$div_html_class = empty( $mail_contents['html']['body_class'] ) ? '' : ' '.$mail_contents['html']['body_class'];
 		$div_html_style = empty( $mail_contents['html']['body_style'] ) ? '' : ' style="'.$mail_contents['html']['body_style'].'"';
 		$Form->info( T_('HTML content'), $mail_contents['html']['type']
-				.'<div class="email_log_html'.$div_html_class.'"'.$div_html_style.'>'.$mail_contents['html']['content'].'</div>' );
+				.'<div class="email_log_html'.$div_html_class.'"'.$div_html_style.'>'.$html_content.'</div>' );
 	}
 }
-
-$Form->info( T_('Raw email source'), '<pre class="email_log_scroll"><span>'.htmlspecialchars($MailLog->emlog_message).'</span></pre>' );
+$emlog_message = preg_replace( '~\$secret_content_start\$.*?\$secret_content_end\$~', '***secret-content-removed***', $MailLog->emlog_message );
+$emlog_message = preg_replace( '~\$email_key_start\$(.*?)\$email_key_end\$~', '***prevent-tracking-through-log***$1', $emlog_message );
+$Form->info( T_('Raw email source'), '<pre class="email_log_scroll"><span>'.htmlspecialchars( $emlog_message ).'</span></pre>' );
 
 $Form->end_form();
 

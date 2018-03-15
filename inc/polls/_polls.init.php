@@ -281,13 +281,6 @@ class polls_Module extends Module
 			case 'vote':
 				// Vote on poll:
 				$poll_ID = param( 'poll_ID', 'integer', true );
-				$poll_option_ID = param( 'poll_answer', 'integer', 0 );
-
-				if( empty( $poll_option_ID ) )
-				{	// The poll option must be selected:
-					$Messages->add( T_('Please select an answer for the poll.'), 'error' );
-					break;
-				}
 
 				// Check if the requested poll is correct:
 				$PollCache = & get_PollCache();
@@ -298,20 +291,40 @@ class polls_Module extends Module
 					break;
 				}
 
-				// Check if the requested poll option is correct:
-				$PollOptionCache = & get_PollOptionCache();
-				$PollOption = & $PollOptionCache->get_by_ID( $poll_option_ID, false, false );
-				if( ! $PollOption || $PollOption->pqst_ID != $Poll->ID )
-				{	// The requested poll option doesn't exist in DB:
-					$Messages->add( 'Wrong poll request!', 'error' );
+				$poll_option_IDs = param( 'poll_answer', 'array:integer', array() );
+
+				if( empty( $poll_option_IDs ) )
+				{	// The poll option must be selected:
+					$Messages->add( T_('Please select an answer for the poll.'), 'error' );
+					break;
+				}
+				elseif( count( $poll_option_IDs ) > $Poll->max_answers )
+				{
+					$Messages->add( sprintf( T_('You are only allowed to choose a maximum of %d answers for the poll.'), $Poll->max_answers ), 'error' );
 					break;
 				}
 
-				// Vote on the poll by current User:
-				if( $PollOption->vote() )
-				{	// Successful voting:
-					$Messages->add( T_('Your vote has been cast.'), 'success' );
+				// Check if the requested poll option is correct:
+				$PollOptionCache = & get_PollOptionCache();
+				if( ! is_array( $poll_option_IDs ) )
+				{
+					$poll_option_IDs = array( $poll_option_IDs );
 				}
+
+				$Poll->clear_user_votes();
+				foreach( $poll_option_IDs as $poll_option_ID )
+				{
+					$PollOption = & $PollOptionCache->get_by_ID( $poll_option_ID, false, false );
+					if( ! $PollOption || $PollOption->pqst_ID != $Poll->ID )
+					{	// The requested poll option doesn't exist in DB:
+						$Messages->add( 'Wrong poll request!', 'error' );
+						break;
+					}
+
+					// Vote on the poll by current User:
+					$PollOption->vote();
+				}
+				$Messages->add( T_('Your vote has been cast.'), 'success' );
 				break;
 		}
 	}

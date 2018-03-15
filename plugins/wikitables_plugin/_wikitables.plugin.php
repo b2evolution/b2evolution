@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  * @ignore
@@ -22,7 +22,7 @@ class wikitables_plugin extends Plugin
 	var $code = 'b2evWiTa';
 	var $name = 'Wiki Tables';
 	var $priority = 15;
-	var $version = '6.10.0';
+	var $version = '6.10.1';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;

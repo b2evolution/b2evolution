@@ -15,7 +15,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -151,8 +151,21 @@ function param_format( $value, $type = 'raw' )
 function param( $var, $type = 'raw', $default = '', $memorize = false,
 								$override = false, $use_default = true, $strict_typing = 'allow_empty' )
 {
-	global $Debuglog, $debug, $evo_charset, $io_charset;
+	global $Debuglog, $debug, $evo_charset, $io_charset, $is_cli;
 	// NOTE: we use $GLOBALS[$var] instead of $$var, because otherwise it would conflict with param names which are used as function params ("var", "type", "default", ..)!
+
+	if( $is_cli )
+	{	// For CLI mode use only default values:
+		if( in_array( $type, array( 'array', 'array:integer', 'array:string', 'array:array:integer', 'array:array:string' ) ) && $default === '' )
+		{	// Change default '' into array() to avoid a notice:
+			$default = array();
+		}
+		$GLOBALS[$var] = remove_magic_quotes( $default );
+		$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
+
+		return $GLOBALS[$var];
+		// EXIT HERE, Don't do other code below for params from CLI mode.
+	}
 
 	/*
 	 * STEP 1 : Set the variable
@@ -924,15 +937,15 @@ function param_check_valid_login( $var )
 	{
 		if( $check === 'usr' )
 		{	// Special case, the login is valid however we forbid it's usage.
-			$msg = T_('Logins cannot start with "usr_", this prefix is reserved for system use.');
+			$msg = sprintf( T_('Logins cannot start with %s, this prefix is reserved for system use.'), '<code>usr_</code>' );
 		}
 		elseif( ! isset( $Settings ) || $Settings->get('strict_logins') )
 		{
-			$msg = T_('Logins can only contain letters, digits and the following characters: _ .');
+			$msg = sprintf( T_('Logins can only contain letters, digits and the following characters: %s'), '<code>_</code> <code>.</code> <code>-</code>' );
 		}
 		else
 		{
-			$msg = sprintf( T_('Logins cannot contain whitespace and the following characters: %s'), '\', ", >, <, @, &' );
+			$msg = sprintf( T_('Logins cannot contain whitespace and the following characters: %s'), '<code>\'</code> <code>"</code> <code>></code> <code><</code> <code>@</code> <code>&</code>' );
 		}
 		param_error( $var, $msg );
 		return false;
@@ -1127,62 +1140,27 @@ function param_date( $var, $err_msg, $required, $default = '', $date_format = NU
 
 
 /**
- * Check if param is an ISO date.
+ * Format date from entered form in format of current user locale to ISO format(YYYY-MM-DD) in order to store in DB
  *
- * NOTE: for tokens like e.g. "D" (abbr. weekday), T_() gets used and it uses the current locale!
- *
- * @param string param name
- * @param string error message
- * @param boolean Is a non-empty date required?
- * @param string date format (php format)
- * @return boolean|string false if not OK, ISO date if OK
+ * @param string Date
+ * @param string Source date format, NULL - to use format of current locale
+ * @return string|boolean Formated date OR FALSE if date cannot be converted
  */
-function param_check_date( $var, $err_msg, $required = false, $date_format = NULL )
+function format_input_date_to_iso( $date, $date_format = NULL )
 {
-	if( empty( $GLOBALS[$var] ) )
-	{ // empty is OK if not required:
-		if( $required )
-		{
-			param_error( $var, $err_msg );
-			return false;
-		}
-		return '';
-	}
-
 	if( empty( $date_format ) )
 	{	// Use locale input date format:
 		$date_format = locale_input_datefmt();
 	}
 
 	// Convert PHP date format to regexp pattern:
-	$date_regexp = '~^'.preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
-		if( $m[1] == "\\\" ) return $m[2]; // escaped
-		switch( $m[2] )
-		{
-			case "d": return "([0-3]\\d)"; // day, 01-31
-			case "j": return "([1-3]?\\d)"; // day, 1-31
-			case "l": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday"])))).")";
-			case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
-			case "e": // b2evo extension!
-				return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
-			case "S": return "(st|nd|rd|th)?"; // english suffix for day. Made optional as jQuery formatDate does not support this format.
-
-			case "m": return "([0-1]\\d)"; // month, 01-12
-			case "n": return "(1?\\d)"; // month, 1-12
-			case "F": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month"])))).")"; //  A full textual representation of a month, such as January or March
-			case "M": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month_abbrev"])))).")";
-
-			case "y": return "(\\d\\d)"; // year, 00-99
-			case "Y": return "(\\d{4})"; // year, XXXX
-			default:
-				return $m[0];
-		}' ), $date_format ).'$~i'; // case-insensitive?
+	$date_regexp = '~^'.preg_replace_callback( '~(\\\)?(\w)~', '_format_input_date_to_iso_callback', $date_format ).'$~i'; // case-insensitive?
 	// Allow additional spaces, e.g. "03  May 2007" when format is "d F Y":
 	$date_regexp = preg_replace( '~ +~', '\s+', $date_regexp );
 	// echo $date_format.'...'.$date_regexp;
 
 	// Check that the numbers match the date pattern:
-	if( preg_match( $date_regexp, $GLOBALS[$var], $numbers ) )
+	if( preg_match( $date_regexp, $date, $numbers ) )
 	{	// Date does match pattern:
 		//pre_dump( $numbers );
 
@@ -1236,6 +1214,68 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 
 			return $iso_date;
 		}
+	}
+
+	return false;
+}
+
+
+/**
+ * Callback for preg_replace_callback in format_input_date_to_iso()
+ */
+function _format_input_date_to_iso_callback( $matches )
+{
+	if( $matches[1] == "\\" ) return $matches[2]; // escaped
+	switch( $matches[2] )
+	{
+		case "d": return "([0-3]\\d)"; // day, 01-31
+		case "j": return "([1-3]?\\d)"; // day, 1-31
+		case "l": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday"])))).")";
+		case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
+		case "e": // b2evo extension!
+			return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
+		case "S": return "(st|nd|rd|th)?"; // english suffix for day. Made optional as jQuery formatDate does not support this format.
+
+		case "m": return "([0-1]\\d)"; // month, 01-12
+		case "n": return "(1?\\d)"; // month, 1-12
+		case "F": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month"])))).")"; //  A full textual representation of a month, such as January or March
+		case "M": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month_abbrev"])))).")";
+
+		case "y": return "(\\d\\d)"; // year, 00-99
+		case "Y": return "(\\d{4})"; // year, XXXX
+		default:
+			return $matches[0];
+	}
+}
+
+
+/**
+ * Check if param is an ISO date.
+ *
+ * NOTE: for tokens like e.g. "D" (abbr. weekday), T_() gets used and it uses the current locale!
+ *
+ * @param string param name
+ * @param string error message
+ * @param boolean Is a non-empty date required?
+ * @param string date format (php format)
+ * @return boolean|string false if not OK, ISO date if OK
+ */
+function param_check_date( $var, $err_msg, $required = false, $date_format = NULL )
+{
+	if( empty( $GLOBALS[$var] ) )
+	{ // empty is OK if not required:
+		if( $required )
+		{
+			param_error( $var, $err_msg );
+			return false;
+		}
+		return '';
+	}
+
+	$iso_date = format_input_date_to_iso( $GLOBALS[$var], $date_format );
+	if( $iso_date !== false )
+	{	// Return iso date if it is converted successfully:
+		return $iso_date;
 	}
 
 	// Date did not pass all tests:
@@ -2441,20 +2481,20 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 	{
 		case 'posting':
 		case 'xmlrpc_posting':
-			$Group = $User->get_Group();
+			$Group = $User ? $User->get_Group() : false;
 			if( $context == 'posting' )
 			{
-				$xhtmlvalidation  = ($Group->perm_xhtmlvalidation == 'always');
+				$xhtmlvalidation  = ( $Group && $Group->perm_xhtmlvalidation == 'always' );
 			}
 			else
 			{
-				$xhtmlvalidation  = ($Group->perm_xhtmlvalidation_xmlrpc == 'always');
+				$xhtmlvalidation  = ( $Group && $Group->perm_xhtmlvalidation_xmlrpc == 'always' );
 			}
-			$allow_css_tweaks = $Group->perm_xhtml_css_tweaks;
-			$allow_javascript = $Group->perm_xhtml_javascript;
-			$allow_iframes    = $Group->perm_xhtml_iframes;
-			$allow_objects    = $Group->perm_xhtml_objects;
-			$bypass_antispam  = $Group->perm_bypass_antispam;
+			$allow_css_tweaks = $Group && $Group->perm_xhtml_css_tweaks;
+			$allow_javascript = $Group && $Group->perm_xhtml_javascript;
+			$allow_iframes    = $Group && $Group->perm_xhtml_iframes;
+			$allow_objects    = $Group && $Group->perm_xhtml_objects;
+			$bypass_antispam  = $Group && $Group->perm_bypass_antispam;
 			break;
 
 		case 'commenting':

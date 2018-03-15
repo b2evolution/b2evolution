@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -34,7 +34,7 @@ class google_maps_plugin extends Plugin
 	var $name = 'Google Maps';
 	var $code = 'evo_Gmaps';
 	var $priority = 50;
-	var $version = '6.10.0';
+	var $version = '6.10.1';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -357,7 +357,7 @@ class google_maps_plugin extends Plugin
 
 	?>
 	<div id="map_canvas" style="width:100%; <?php echo $height; ?>; margin: 5px 0px;"></div>
-	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
 	<script type="text/javascript">
 	var post_position = 0;
 	<?php
@@ -973,7 +973,7 @@ function locate()
 		?>
 		<div class="map_title"><?php echo $this->get_widget_setting('map_title_coll'.$Blog->ID, $params); ?></div>
 		<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
-		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
 		<script type="text/javascript">
 		<?php
 		$map_type = (string)$this->get_widget_setting('map_type', $params);

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -63,6 +63,29 @@ $Ajaxlog->add( sprintf( 'action: %s', $action ), 'note' );
 $params = param( 'params', 'array', array() );
 switch( $action )
 {
+	case 'get_item_form':
+		// Display item form:
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		$cat_ID = param( 'cat', 'integer' );
+		$BlogCache = & get_BlogCache();
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID );
+
+		locale_activate( $Blog->get( 'locale' ) );
+
+		$blog_skin_ID = $Blog->get_skin_ID();
+		if( ! empty( $blog_skin_ID ) )
+		{	// Initialize collection skin folder to check if it has a specific new item form:
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+			$ads_current_skin_path = $skins_path.$Skin->folder.'/';
+		}
+
+		require skin_template_path( '_item_new_form.inc.php' );
+		break;
+
 	case 'get_comment_form':
 		// Display comment form:
 
@@ -1100,6 +1123,7 @@ switch( $action )
 		$Form->output = false;
 		$Form->switch_layout( 'none' );
 		$org_suffix = ' &nbsp; <strong>'.T_('Role').':</strong> '.$Form->text_input( 'org_roles[]', '', 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+		$org_suffix .= ' &nbsp; <strong>'.T_('Priority').':</strong> '.$Form->text_input( 'org_priorities[]', '', 10, '', '', array( 'type' => 'number', 'min' => -2147483648, 'max' => 2147483647 ) ).' &nbsp; ';
 		$Form->switch_layout( NULL );
 		$Form->output = true;
 

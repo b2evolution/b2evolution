@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -2330,6 +2330,11 @@ class Comment extends DataObject
 			), $params
 		);
 
+		if( $params['text'] == '#' )
+		{
+			$params['text'] = $action_icon;
+		}
+
 		echo $this->get_moderation_link( $params );
 		return true;
 	}
@@ -2888,13 +2893,13 @@ class Comment extends DataObject
 
 				if( empty( $this->ID ) )
 				{ // PREVIEW mode
-					$r = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by ').$this->get_author_name(), $image_link_rel, $params['image_class'], '', '', '#' );
+					$r = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by').' '.$this->get_author_name(), $image_link_rel, $params['image_class'], '', '', '#' );
 				}
 				else
 				{
 					$r = $Link->get_tag( array_merge( array(
 						'image_link_to'    => $image_link_to,
-						'image_link_title' => T_('Posted by ').$this->get_author_name(),
+						'image_link_title' => T_('Posted by').' '.$this->get_author_name(),
 						'image_link_rel'   => $image_link_rel,
 					), $params ) );
 				}

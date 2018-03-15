@@ -459,11 +459,22 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   color: #ffffff;
   text-align: center;
   opacity: 0.5;
-  transition: 0.1s all;
+  -webkit-transition: 0.1s all;
+          transition: 0.1s all;
   position: relative;
   left: -50%;
 }
 .slide_button_wrap #slide_button:hover {
   cursor: pointer;
   opacity: 0.9;
+}
+.evo_content_block .evo_comment .evo_comment_footer .action_btn_group {
+  float: right;
+}
+.evo_content_block .evo_comment .comment_edit_btn {
+  margin-right: 5px;
+}
+.evo_content_block .evo_comment .btn-group > .btn.first-child {
+  border-top-left-radius: 3px !important;
+  border-bottom-left-radius: 3px !important;
 }

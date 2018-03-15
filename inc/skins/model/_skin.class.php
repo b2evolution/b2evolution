@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -918,6 +918,12 @@ class Skin extends DataObject
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
 
+		// Convert array values into string for DB storage
+		if( is_array( $parvalue ) )
+		{
+			$parvalue = serialize( $parvalue );
+		}
+
 		$Blog->set_setting( $blog_setting_name, $parvalue );
 	}
 
@@ -1244,6 +1250,8 @@ class Skin extends DataObject
 					// Specific features for disp=userprefs:
 				case 'disp_subs':
 					// Specific features for disp=subs:
+				case 'disp_register_finish':
+					// Specific features for disp=register_finish:
 
 					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
@@ -2028,8 +2036,8 @@ var downloadInterval = setInterval( function()
 		$selected_font_family = $this->get_setting( $font_family_param, $group );
 		if( $selected_font_family != $default_font_family )
 		{
-			$selected_font_css = isset( $this->font_definitions[$selected_font_family] ) ? $this->font_definitions[$selected_font_family] : $this->font_definitions[$default_font_family];
-			$font_css[] = "font-family: $selected_font_css;";
+			$selected_font_definition = isset( $this->font_definitions[$selected_font_family] ) ? $this->font_definitions[$selected_font_family] : $this->font_definitions[$default_font_family];
+			$font_css[] = "font-family: $selected_font_definition[1];";
 		}
 
 		// If $text_size_param is passed, add font-size property

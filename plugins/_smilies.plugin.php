@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
@@ -29,7 +29,7 @@ class smilies_plugin extends Plugin
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 25;
-	var $version = '6.10.0';
+	var $version = '6.10.1';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
 

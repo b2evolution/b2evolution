@@ -8,8 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( '_core/model/_pagecache.class.php', 'PageCache' );
 
-$result_message = PageCache::prune_page_cache();
-if( empty( $result_message ) )
+if( PageCache::prune_page_cache( 'cron_job' ) )
 {
 	return 1; /* OK */
 }

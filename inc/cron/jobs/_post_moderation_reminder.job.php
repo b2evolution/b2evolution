@@ -35,7 +35,7 @@ $moderation_blogs = $DB->get_col( $SQL->get() );
 
 if( empty( $moderation_blogs ) )
 { // There are no blogs where exists draft posts older then the threshold ( 24 hours by default )
-	$result_message = sprintf( 'No posts have been awaiting moderation for more than %s.', seconds_to_period( $post_moderation_reminder_threshold ) );
+	cron_log_append( sprintf( 'No posts have been awaiting moderation for more than %s.', seconds_to_period( $post_moderation_reminder_threshold ) ) );
 	return 1;
 }
 
@@ -169,7 +169,7 @@ $loaded_ids = $UserCache->get_ID_array();
 
 if( empty( $loaded_ids ) )
 { // UserCache result is empty which means nobody wants to receive notifications
-	$result_message = sprintf( 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have posts pending moderation!' );
+	cron_log_append( 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have posts pending moderation!' );
 	return 1;
 }
 
@@ -222,6 +222,7 @@ foreach( $blog_posts as $row )
 }
 
 $mail_sent = 0;
+$mail_failed = 0;
 $params = array();
 
 // Collect posts data for global moderators
@@ -335,12 +336,20 @@ foreach( $loaded_ids as $moderator_ID )
 	// Change locale here to localize the email subject and content
 	locale_temp_switch( $moderator_User->get( 'locale' ) );
 	if( send_mail_to_User( $moderator_ID, T_( 'Post moderation reminder' ), 'posts_unmoderated_reminder', $params, false ) )
-	{
+	{	// Log success mail sending:
+		cron_log_action_end( 'User '.$moderator_User->get_identity_link().' has been notified' );
 		$mail_sent++;
+	}
+	else
+	{	// Log failed mail sending:
+		global $mail_log_message;
+		cron_log_action_end( 'User '.$moderator_User->get_identity_link().' could not be notified because of error: '
+			.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
+		$mail_failed++;
 	}
 	locale_restore_previous();
 }
 
-$result_message = sprintf( '%d moderators have been notified!', $mail_sent );
+cron_log_append( ( ( $mail_sent + $mail_failed ) ? "\n" : '' ).sprintf( '%d moderators have been notified!', $mail_sent ) );
 return 1; /*OK*/
 ?>

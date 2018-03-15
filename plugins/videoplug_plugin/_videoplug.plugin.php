@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -25,7 +25,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.10.0';
+	var $version = '6.10.1';
 	var $number_of_installs = 1;
 
 
@@ -102,7 +102,7 @@ class videoplug_plugin extends Plugin
 		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo|facebook):?[^\[\]]*\]/i' );
 
 		// Replace video tags with html code:
-		$content = replace_content_outcode( '#\[video:(youtube|dailymotion|vimeo|facebook|google|livevideo|ifilm):([^:\[\]\\\/]*|https?:\/\/.*\.facebook\.com\/[^:]*):?(\d+%?)?:?(\d+%?)?\]#',
+		$content = replace_content_outcode( '#\[video:(youtube|dailymotion|vimeo|facebook|google|livevideo|ifilm):([^:\[\]\\\/]*|https?:\/\/.*\.facebook\.com\/[^:]*):?(\d+%?)?:?(\d+%?)?:?([^:\[\]\\\/]*)\]#',
 			array( $this, 'parse_video_tag_callback' ), $content, 'replace_content', 'preg_callback' );
 
 		return true;
@@ -118,6 +118,7 @@ class videoplug_plugin extends Plugin
 	 *              2 - Video code/key
 	 *              3 - Width
 	 *              4 - Height
+	 *              5 - Extra params
 	 * @return string HTML video code
 	 */
 	function parse_video_tag_callback( $m )
@@ -125,7 +126,7 @@ class videoplug_plugin extends Plugin
 		switch( $m[1] )
 		{
 			case 'youtube':
-				$video_block = '<iframe id="ytplayer" type="text/html" src="//www.youtube.com/embed/'.$m[2].'" allowfullscreen="allowfullscreen" frameborder="0"></iframe>';
+				$video_block = '<iframe id="ytplayer" type="text/html" src="//www.youtube.com/embed/'.$m[2].( ! empty( $m[5] )? '?'.$m[5] : '' ).'" allowfullscreen="allowfullscreen" frameborder="0"></iframe>';
 				break;
 
 			case 'dailymotion':
@@ -331,8 +332,8 @@ class videoplug_plugin extends Plugin
 					{
 						case 'youtube':
 							// Allow HD video code with ?hd=1 at the end
-							regexp_ID = /^[a-z0-9_?=-]+$/i;
-							regexp_URL = /^.+(video\/|\/watch\?v=|embed\/|\/)([a-z0-9_?=-]+)(&.+)?$/i;
+							regexp_ID = /^[a-z0-9_-]+$/i;
+							regexp_URL = /^(.+youtube(?:-nocookie)?\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|.+youtu\.be\/)([a-z0-9_-]{11})((?:\?|&).*)?/i;
 							break;
 
 						case 'dailymotion':
@@ -366,7 +367,22 @@ class videoplug_plugin extends Plugin
 							if( video_ID.match( regexp_URL ) )
 							{	// Valid video URL
 								// Extract ID from URL:
-								video_ID = video_ID.replace( regexp_URL, '$2' );
+								if( tag == 'youtube' )
+								{
+									var params = video_ID.replace( regexp_URL, '$3' ).trim();
+									params = params.replace( /^[&\?]/, '' );
+									params = params.replace( /&$/, '' );
+									params = params.replace( /rel=\d+&?/, '' ); // remove rel=
+									video_ID = video_ID.replace( regexp_URL, '$2' );
+									if( params.length )
+									{
+										video_ID = video_ID + ':::' + params;
+									}
+								}
+								else
+								{
+									video_ID = video_ID.replace( regexp_URL, '$2' );
+								}
 								break;
 							}
 							else

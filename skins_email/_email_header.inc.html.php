@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,8 @@ global $Settings, $emailskins_path;
 
 // Default params:
 $params = array_merge( array(
-		'include_greeting' => true
+		'include_greeting' => true,
+		'recipient_User'   => NULL,
 	), $params );
 ?>
 <html>
@@ -61,5 +62,5 @@ else
 if( $params['include_greeting'] )
 { // Display the greeting message
 ?>
-<p<?php echo emailskin_style( '.p' ); ?>><?php echo T_( 'Hello $username$!' ); ?></p>
+<p<?php echo emailskin_style( '.p' ); ?>><?php echo sprintf( T_( 'Hello %s!' ), empty( $params['recipient_User'] ) ? '$name$' :'$username$' ); ?></p>
 <?php } ?>

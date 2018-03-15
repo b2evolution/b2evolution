@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -21,6 +21,7 @@ global $current_User;
 global $DB;
 
 // Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'emails', 'view', true );
 
 load_class( 'tools/model/_emailaddress.class.php', 'EmailAddress' );
@@ -247,6 +248,9 @@ switch( $action )
 
 				// Delay between chunks:
 				$Settings->set( 'email_campaign_cron_repeat', param_duration( 'email_campaign_cron_repeat' ) );
+
+				// Delay between chunks in case all remaining recipients have reached max # of emails for the current day:
+				$Settings->set( 'email_campaign_cron_limited', param_duration( 'email_campaign_cron_limited' ) );
 				break;
 
 			default:
@@ -400,6 +404,11 @@ switch( $action )
 		break;
 
 	case 'blocked_new':
+		// Form to create new Email Address:
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
 		// Init Email Address to show on the form
 		$edited_EmailAddress = new EmailAddress();
 		break;
@@ -409,6 +418,9 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'email_blocked' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
 
 		$action = 'blocked_edit';
 		if( !isset( $edited_EmailAddress ) )
@@ -436,6 +448,9 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'email_blocked' );
 
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
 		// Make sure we got an emadr_ID:
 		param( 'emadr_ID', 'integer', true );
 
@@ -458,16 +473,31 @@ switch( $tab )
 	case 'sent':
 		$AdminUI->breadcrumbpath_add( T_('Sent'), '?ctrl=email&amp;tab='.$tab );
 
-		$tab3 = 'log';
+		switch( $tab3 )
+		{
+			case 'stats':
+				$AdminUI->breadcrumbpath_add( T_('Stats'), '?ctrl=email&amp;tab=sent&amp;tab3='.$tab3 );
 
-		$emlog_ID = param( 'emlog_ID', 'integer', 0 );
-		if( empty( $emlog_ID ) )
-		{ // Initialize date picker on list page
-			init_datepicker_js();
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-statistics-summary' );
+
+				// Init jqPlot charts
+				init_jqplot_js();
+				break;
+
+			default:
+				$tab3 = 'log';
+
+				$emlog_ID = param( 'emlog_ID', 'integer', 0 );
+				if( empty( $emlog_ID ) )
+				{ // Initialize date picker on list page
+					init_datepicker_js();
+				}
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'sent-emails' );
 		}
 
-		// Set an url for manual page:
-		$AdminUI->set_page_manual_link( 'sent-emails' );
 		break;
 
 	case 'addresses':
@@ -617,20 +647,29 @@ evo_flush();
 switch( $tab )
 {
 	case 'sent':
-		if( $emlog_ID > 0 )
-		{	// Display a details of selected email log
-			$MailLog = $DB->get_row( '
-				SELECT *
-				  FROM T_email__log
-				 WHERE emlog_ID = '.$DB->quote( $emlog_ID ) );
-			if( $MailLog )
-			{	// The mail log exists with selected ID
-				$AdminUI->disp_view( 'tools/views/_email_sent_details.view.php' );
+		switch( $tab3 )
+		{
+			case 'stats':
+				// Display a list of email logs:
+				$AdminUI->disp_view( 'tools/views/_email_stats.view.php' );
 				break;
-			}
+
+			default:
+				if( $emlog_ID > 0 )
+				{	// Display a details of selected email log
+					$MailLog = $DB->get_row( '
+						SELECT *
+							FROM T_email__log
+						WHERE emlog_ID = '.$DB->quote( $emlog_ID ) );
+					if( $MailLog )
+					{	// The mail log exists with selected ID
+						$AdminUI->disp_view( 'tools/views/_email_sent_details.view.php' );
+						break;
+					}
+				}
+				// Display a list of email logs:
+				$AdminUI->disp_view( 'tools/views/_email_sent.view.php' );
 		}
-		// Display a list of email logs:
-		$AdminUI->disp_view( 'tools/views/_email_sent.view.php' );
 		break;
 
 	case 'addresses':

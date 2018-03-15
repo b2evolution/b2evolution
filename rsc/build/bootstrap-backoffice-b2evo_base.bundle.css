@@ -2123,6 +2123,9 @@ ol {
 .text-normal {
   font-weight: normal;
 }
+p.margin-top {
+  margin: 10px 0 0 0;
+}
 .table-hover > tbody > tr:hover {
   background-color: #ffc;
 }
@@ -2249,15 +2252,9 @@ a.btn.action_icon.hoverlink {
   vertical-align: top;
   margin-left: 7px;
 }
-.form-horizontal .compose_layout {
-  margin-bottom: 15px;
-}
 .form-horizontal .compose_layout td {
-  padding: 0 2px 2px 0;
+  padding: 0 2px 15px 0;
   vertical-align: middle;
-}
-.form-horizontal .compose_layout tr:last-child td {
-  padding-bottom: 0;
 }
 .form-horizontal .compose_layout th.label,
 .form-horizontal .compose_layout td.label {

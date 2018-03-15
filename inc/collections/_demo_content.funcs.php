@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -362,7 +362,7 @@ function create_user( $params = array() )
 	global $timestamp;
 	global $random_password, $admin_email;
 	global $default_locale, $default_country;
-	global $Messages;
+	global $Messages, $DB;
 
 	$params = array_merge( array(
 			'login'     => '',
@@ -378,6 +378,7 @@ function create_user( $params = array() )
 			'group_ID'  => NULL,
 			'org_IDs'   => NULL, // array of organization IDs
 			'org_roles' => NULL, // array of organization roles
+			'org_priorities' => NULL, // array of organization priorities
 			'fields'    => NULL, // array of additional user fields
 			'datecreated' => $timestamp++
 		), $params );
@@ -405,16 +406,20 @@ function create_user( $params = array() )
 	}
 	$User->set( 'gender', $params['gender'] );
 	$User->set_Group( $Group );
-	$User->set_datecreated( $params['datecreated'] );
+	//$User->set_datecreated( $params['datecreated'] );
+	$User->set_datecreated( time() ); // Use current time temporarily, we'll update these later
 
 	if( ! $User->dbinsert( false ) )
 	{ // Don't continue if user creating has been failed
 		return false;
 	}
 
+	// Update user_created_datetime using FROM_UNIXTIME to prevent invalid datetime values during DST spring forward - fall back
+	$DB->query( 'UPDATE T_users SET user_created_datetime = FROM_UNIXTIME('.$params['datecreated'].') WHERE user_login = '.$DB->quote( $params['login'] ) );
+
 	if( ! empty( $params['org_IDs'] ) )
-	{ // Add user to organizations
-		$User->update_organizations( $params['org_IDs'], $params['org_roles'], true );
+	{	// Add user to organizations:
+		$User->update_organizations( $params['org_IDs'], $params['org_roles'], $params['org_priorities'], true );
 	}
 
 	if( ! empty( $params['fields'] ) )
@@ -543,12 +548,14 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 	{
 		// Get current user's organization data
 		$org_roles = array();
+		$org_priorities = array();
 		$org_data = $current_User->get_organizations_data();
-		if( isset( $org_data[$demo_org_ID] ) )
+		if( isset( $org_data[ $demo_org_ID ] ) )
 		{
-			$org_roles = array( $org_data[$demo_org_ID]['role'] );
+			$org_roles = array( $org_data[ $demo_org_ID ]['role'] );
+			$org_priorities = array( $org_data[ $demo_org_ID ]['priority'] );
 		}
-		$current_User->update_organizations( array( $demo_org_ID ), $org_roles, true);
+		$current_User->update_organizations( array( $demo_org_ID ), $org_roles, $org_priorities, true );
 	}
 
 	return $Organization;
@@ -866,14 +873,13 @@ Admins and moderators can very quickly approve or reject comments from the colle
 		$comment_timestamp = time();
 	}
 
-	$now = date( 'Y-m-d H:i:s', $comment_timestamp );
-
+	// We are using FROM_UNIXTIME to prevent invalid datetime during DST spring forward - fall back
 	$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status,
 			comment_author_user_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP,
 			comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
 			VALUES( '.$DB->quote( $item_ID ).', '.$DB->quote( $status ).', '
 			.$DB->quote( $user_ID ).', '.$DB->quote( $author ).', '.$DB->quote( $author_email ).', '.$DB->quote( $author_email_url ).', "127.0.0.1", '
-			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished", "moderators_notified,members_notified,community_notified" )' );
+			.'FROM_UNIXTIME('.$comment_timestamp.'), FROM_UNIXTIME('.$comment_timestamp.'), '.$DB->quote( $content ).', "default", "finished", "moderators_notified,members_notified,community_notified" )' );
 }
 
 
@@ -1204,11 +1210,11 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item->set_tags_from_string( 'photo' );
 				$edited_Item->insert( $owner_ID, T_('About this site'), T_('<p>This blog platform is powered by b2evolution.</p>
 
-	<p>You are currently looking at an info page about this site.</p>
+<p>You are currently looking at an info page about this site.</p>
 
-	<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>
+<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>
 
-	<p>If needed, skins can format info pages differently from regular posts.</p>'), $now, $cat_home_b2evo,
+<p>If needed, skins can format info pages differently from regular posts.</p>'), $now, $cat_home_b2evo,
 						array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 				$edit_File = new File( 'shared', 1, 'logos/b2evolution_1016x208_wbg.png' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -1307,7 +1313,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item = new Item();
 				$edited_Item->insert( $owner_ID, T_('First Post'), T_('<p>This is the first post in the "[coll:shortname]" collection.</p>
 
-	<p>It appears in a single category.</p>'), $now, $cat_ann_a );
+<p>It appears in a single category.</p>'), $now, $cat_ann_a );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				// Insert a post:
@@ -1316,7 +1322,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item = new Item();
 				$edited_Item->insert( $owner_ID, T_('Second post'), T_('<p>This is the second post in the "[coll:shortname]" collection.</p>
 
-	<p>It appears in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a ) );
+<p>It appears in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a ) );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
 

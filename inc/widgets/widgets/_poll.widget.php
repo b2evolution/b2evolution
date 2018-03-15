@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -118,7 +118,11 @@ class poll_Widget extends ComponentWidget
 		}
 		else
 		{	// Display a form for voting on poll:
-			echo '<p>'.$Poll->get( 'question_text' ).'</p>';
+			$poll_question = empty( $this->disp_params['poll_question'] ) ? $Poll->get( 'question_text' ) : $this->disp_params['poll_question'];
+			if( $poll_question !== '-' )
+			{	// Display a poll question only when it doesn't equal "-":
+				echo '<p>'.$poll_question.'</p>';
+			}
 
 			$poll_options = $Poll->get_poll_options();
 			if( count( $poll_options ) )
@@ -151,15 +155,32 @@ class poll_Widget extends ComponentWidget
 					$max_poll_options_percent = $Poll->get_max_poll_options_percent();
 				}
 
-				echo '<table class="evo_poll__table">';
+				$user_vote = $Poll->get_user_vote();
+				echo '<table class="evo_poll__table"'
+					// Set param to restrict user with max selected answers:
+					.( $Poll->get( 'max_answers' ) > 0 ? ' data-max-answers="'.intval( $Poll->get( 'max_answers' ) ).'"' : '' ).'>';
 				foreach( $poll_options as $poll_option )
 				{
 					echo '<tr>';
-					echo '<td class="evo_poll__selector"><input type="radio" id="poll_answer_'.$poll_option->ID.'"'
-							.' name="poll_answer" value="'.$poll_option->ID.'"'
-							.( $user_vote_option_ID == $poll_option->ID ? ' checked="checked"' : '' ).' /></td>';
+					if( $Poll->max_answers > 1 )
+					{
+						$max_answer_reached = false;
+						if( count( $user_vote ) >= $Poll->max_answers )
+						{
+							$max_answer_reached = true;
+						}
+						echo '<td class="evo_poll__selector"><input type="checkbox" id="poll_answer_'.$poll_option->ID.'"'
+								.' name="poll_answer[]" value="'.$poll_option->ID.'"'
+								.( $user_vote && in_array( $poll_option->ID, $user_vote ) ? ' checked="checked"' : ( $max_answer_reached ? ' disabled="disabled"' : '' ) ).' /></td>';
+					}
+					else
+					{
+						echo '<td class="evo_poll__selector"><input type="radio" id="poll_answer_'.$poll_option->ID.'"'
+								.' name="poll_answer[]" value="'.$poll_option->ID.'"'
+								.( $user_vote && in_array( $poll_option->ID, $user_vote ) ? ' checked="checked"' : '' ).' /></td>';
+					}
 					echo '<td class="evo_poll__title"><label for="poll_answer_'.$poll_option->ID.'">'.$poll_option->option_text.'</label></td>';
-					if( $user_vote_option_ID )
+					if( $user_vote )
 					{	// If current user already voted on this poll, Display the voting results:
 						// Calculate a percent for style relating on max percent:
 						$style_percent = $max_poll_options_percent > 0 ? ceil( $poll_option->percent / $max_poll_options_percent * 100 ) : 0;
@@ -169,6 +190,39 @@ class poll_Widget extends ComponentWidget
 					echo '</tr>';
 				}
 				echo '</table>';
+
+				global $evo_poll_answer_JS_is_initialized;
+				if( empty( $evo_poll_answer_JS_is_initialized ) && $Poll->get( 'max_answers' ) > 1 )
+				{	// Initialize JS code to restrict max answers per user and Fix answer long text width:
+				?>
+				<script type="text/javascript">
+				jQuery( document ).ready( function()
+				{
+					jQuery( '.evo_poll__selector input[type="checkbox"]' ).on( 'click', function()
+					{	// Check max possible answers per user for multiple poll:
+						var poll_table = jQuery( this ).closest( '.evo_poll__table' );
+						var is_disabled = ( jQuery( '.evo_poll__selector input:checked', poll_table ).length >= poll_table.data( 'max-answers' ) );
+						jQuery( '.evo_poll__selector input[type=checkbox]:not(:checked)', poll_table ).prop( 'disabled', is_disabled );
+					} );
+
+					jQuery( '.evo_poll__table' ).each( function()
+					{	// Fix answer long text width because of labels uses css "white-space:nowrap" by default:
+						var table = jQuery( this );
+						if( table.width() > table.parent().width() )
+						{	// If table width more than parent:
+							jQuery( '.evo_poll__title', table ).css( 'white-space', 'normal' );
+							jQuery( '.evo_poll__title label', table ).css( {
+								'width': Math.floor( table.parent().width() / 2 ) + 'px', // Use 50% of table width for long answers
+								'word-wrap': 'break-word' // Wrap long words
+							} );
+						}
+					} );
+				} );
+				</script>
+				<?php
+					// Set flag to don't print out this code twice of the same page with several poll widgets:
+					$evo_poll_answer_JS_is_initialized = true;
+				}
 
 				if( is_logged_in() )
 				{	// Display a button to vote:

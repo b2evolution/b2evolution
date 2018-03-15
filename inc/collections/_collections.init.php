@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -1007,16 +1007,16 @@ class collections_Module extends Module
 	 */
 	function handle_htsrv_action()
 	{
-		global $demo_mode, $current_User, $DB, $Session, $Messages;
+		global $demo_mode, $current_User, $DB, $Session, $Messages, $localtimenow;
 		global $UserSettings;
-
-		if( !is_logged_in() )
-		{ // user must be logged in
-			bad_request_die( $this->T_( 'You are not logged in.' ) );
-		}
 
 		// Init the objects we want to work on.
 		$action = param_action( true );
+
+		if( !is_logged_in() && $action != 'create_post' )
+		{ // user must be logged in
+			bad_request_die( $this->T_( 'You are not logged in.' ) );
+		}
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collections_'.$action );
@@ -1213,6 +1213,56 @@ class collections_Module extends Module
 				header_redirect();
 				break; // already exited here
 
+			case 'newsletter_widget':
+				// Subscribe⁄Unsubscribe to/from newsletter from widget:
+				$widget_ID = param( 'widget', 'integer', true );
+				$WidgetCache = & get_WidgetCache();
+
+				if( $widget_ID )
+				{ // Request from widget
+					$Widget = & $WidgetCache->get_by_ID( $widget_ID );
+					$newsletter_ID = $Widget->get_param( 'enlt_ID' );
+					$insert_user_tags = $Widget->get_param( 'usertags' );
+				}
+				elseif( param( 'inline', 'integer', 0 ) == 1 )
+				{ // Request from subscribe shorttag
+					$newsletter_ID = param( 'newsletter', 'integer', 0 );
+					$insert_user_tags = param( 'usertags', 'string', NULL );
+				}
+
+				// Check newsletter of the requested widget:
+				$NewsletterCache = & get_NewsletterCache();
+				if( empty( $newsletter_ID ) ||
+						! ( $Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) ) ||
+						! $Newsletter->get( 'active' ) )
+				{	// Display an error when newsletter is not found or not active:
+					$Messages->add( T_('List subscription widget references an inactive list.'), 'error' );
+					header_redirect();
+				}
+
+				if( param( 'subscribe', 'string', NULL ) === NULL )
+				{	// Unsubscribe from newsletter:
+					if( $current_User->unsubscribe( $Newsletter->ID ) )
+					{
+						$Messages->add( sprintf( T_('You have unsubscribed and you will no longer receive emails from %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+					}
+				}
+				else
+				{	// Subscribe to newsletter:
+					if( $current_User->is_subscribed( $Newsletter->ID ) || $current_User->subscribe( $Newsletter->ID ) )
+					{
+						if( ! empty( $insert_user_tags ) )
+						{
+							$current_User->add_usertags( $insert_user_tags );
+							$current_User->dbupdate();
+						}
+						$Messages->add( sprintf( T_('You have successfully subscribed to: %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+					}
+				}
+
+				header_redirect();
+				break; // already exited here
+
 			case 'refresh_contents_last_updated':
 				// Refresh last touched date of the Item:
 
@@ -1234,6 +1284,135 @@ class collections_Module extends Module
 
 				header_redirect();
 				break; // already exited here
+
+			case 'create_post':
+				// Create new post from front-office by anonymous user:
+				global $dummy_fields, $Plugins;
+
+				load_class( 'items/model/_item.class.php', 'Item' );
+
+				// Name:
+				$user_name = param( $dummy_fields['name'], 'string' );
+				param_check_not_empty( $dummy_fields['name'], sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Name') ) );
+
+				// Email:
+				$user_email = param( $dummy_fields['email'], 'string' );
+				param_check_email( $dummy_fields['email'], true );
+
+				// Stop a request from the blocked IP addresses or Domains
+				antispam_block_request();
+
+				// Stop a request from the blocked email address or its domain:
+				antispam_block_by_email( $user_email );
+
+				// Initialize new Item object:
+				$new_Item = new Item();
+
+				// Set main category:
+				$new_Item->set( 'main_cat_ID', param( 'cat', 'integer', true ) );
+
+				$item_Blog = & $new_Item->get_Blog();
+
+				// Set default status:
+				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status_anon' ) );
+
+				if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $user_email ) ) ) )
+				{	// Don't allow the duplicate emails for users:
+					$Messages->add_to_group( sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
+						'href="'.$item_Blog->get( 'loginurl' ).'"',
+						'href="'.$item_Blog->get( 'lostpasswordurl' ).'"' ), 'error', T_('Validation errors:') );
+				}
+
+				// Set item properties from submitted form:
+				$new_Item->load_from_Request( false, true );
+
+				// Call plugin event for additional checking, e-g captcha:
+				$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $new_Item ) );
+
+				if( param_errors_detected() )
+				{	// If at least one error has been detected:
+
+					// Save temp params only into session Item object to redisplay them on the form after redirect:
+					$new_Item->temp_user_name = $user_name;
+					$new_Item->temp_user_email = $user_email;
+
+					// Save new Item with entered data in Session:
+					set_session_Item( $new_Item );
+
+					// Redirect back to the form:
+					header_redirect();
+				}
+
+				// START: Auto register new user:
+				// Set unique user login from entered user name:
+				$max_login_length = 20;
+				$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $user_name );
+				if( trim( $login ) == '' )
+				{	// Get login from entered user email:
+					$login = preg_replace( '/^([^@]+)@.+$/i', '$1', $user_email );
+					$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $login );
+				}
+				$login = str_replace( ' ', '_', $login );
+				$login = utf8_substr( $login, 0, $max_login_length );
+
+				$exist_user_SQL = new SQL( 'Check if user exists with name from new item form' );
+				$exist_user_SQL->SELECT( 'user_ID' );
+				$exist_user_SQL->FROM( 'T_users' );
+				$exist_user_SQL->WHERE( 'user_login = '.$DB->quote( $login ) );
+				$user_unique_num = '';
+				$unique_login = $login;
+				while( $DB->get_var( $exist_user_SQL ) )
+				{	// Check while we find unique user login:
+					$user_unique_num++;
+					$unique_login = $login.$user_unique_num;
+					if( strlen( $unique_login ) > $max_login_length )
+					{	// Restrict user login with max db column length:
+						$unique_login = utf8_substr( $login, 0, $max_login_length - strlen( $user_unique_num ) ).$user_unique_num;
+					}
+					$exist_user_SQL->WHERE( 'user_login = '.$DB->quote( $unique_login ) );
+				}
+
+				$new_User = new User();
+				$new_User->set( 'firstname', $user_name );
+				$new_User->set( 'login', $unique_login );
+				$new_User->set_email( $user_email );
+				$new_User->set( 'pass', '' );
+				$new_User->set( 'salt', '' );
+				$new_User->set( 'pass_driver', 'nopass' );
+				$new_User->set( 'source', 'auto reg on new post' );
+				$new_User->set_datecreated( $localtimenow );
+				if( $new_User->dbinsert() )
+				{	// Insert system log about user's registration
+					syslog_insert( 'User auto registration on new item', 'info', 'user', $new_User->ID );
+					report_user_create( $new_User );
+				}
+
+				// Autologin the user. This is more comfortable for the user and avoids
+				// extra confusion when account validation is required.
+				$Session->set_User( $new_User );
+
+				// END: Auto register new user:
+
+				// Set creator User for new creating Item:
+				$new_Item->set_creator_User( $new_User );
+
+				if( $new_Item->dbinsert() )
+				{	// Successful new item creating:
+					$Messages->add( T_('Post has been created.'), 'success' );
+					$Messages->add( T_('Please double check your email address and choose a password so that you can log in next time you visit us.'), 'warning' );
+					$redirect_to = $item_Blog->get( 'register_finishurl', array( 'glue' => '&' ) );
+				}
+				else
+				{	// Error on creating new Item:
+					$Messages->add( T_('Couldn\'t create the new post'), 'error' );
+					$redirect_to = NULL;
+				}
+
+				// Delete Item from Session:
+				delete_session_Item( 0 );
+
+				header_redirect( $redirect_to );
+				break;
 		}
 	}
 }

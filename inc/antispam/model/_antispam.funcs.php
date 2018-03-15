@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
@@ -213,9 +213,10 @@ function antispam_report_abuse( $abuse_string )
 /**
  * Request abuse list from central blacklist.
  *
+ * @param boolean Is cron job execution?
  * @return boolean true = success, false = error
  */
-function antispam_poll_abuse()
+function antispam_poll_abuse( $is_cron = false )
 {
 	global $Messages, $Settings, $baseurl, $debug, $antispamsrv_protocol, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
 	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
@@ -235,7 +236,15 @@ function antispam_poll_abuse()
 	// Get datetime from last update, because we only want newer stuff...
 	$last_update = $Settings->get( 'antispam_last_update' );
 	// Encode it in the XML-RPC format
-	$Messages->add_to_group( T_('Latest update timestamp').': '.$last_update, 'note', T_('Updating antispam:') );
+	$log_message = T_('Latest update timestamp').': '.$last_update;
+	if( $is_cron )
+	{	// Cron mode:
+		cron_log_append( $log_message );
+	}
+	else
+	{	// Normal mode:
+		$Messages->add_to_group( $log_message, 'note', T_('Updating antispam:') );
+	}
 	$startat = mysql2date( 'Ymd\TH:i:s', $last_update );
 	//$startat = iso8601_encode( mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4)) );
 
@@ -251,7 +260,15 @@ function antispam_poll_abuse()
 								)
 							);
 
-	$Messages->add_to_group( sprintf( T_('Requesting abuse list from %s...'), $antispamsrv_host ), 'note', T_('Updating antispam:') );
+	$log_message = sprintf( T_('Requesting abuse list from %s...'), $antispamsrv_host );
+	if( $is_cron )
+	{	// Cron mode:
+		cron_log_append( $log_message );
+	}
+	else
+	{	// Normal mode:
+		$Messages->add_to_group( $log_message, 'note', T_('Updating antispam:') );
+	}
 
 	$result = $client->send( $message );
 
@@ -263,7 +280,15 @@ function antispam_poll_abuse()
 			$response = xmlrpc_decode_recurse( $response );
 			if( !isset( $response['strings'] ) || !isset( $response['lasttimestamp'] ) )
 			{
-				$Messages->add( T_('Incomplete response.'), 'error' );
+				$log_message = T_('Incomplete response.');
+				if( $is_cron )
+				{	// Cron mode:
+					cron_log_append( $log_message, 'error' );
+				}
+				else
+				{	// Normal mode:
+					$Messages->add_to_group( $log_message, 'error', T_('Updating antispam:') );
+				}
 				$ret = false;
 			}
 			else
@@ -271,7 +296,15 @@ function antispam_poll_abuse()
 				$value = $response['strings'];
 				if( count( $value ) == 0 )
 				{
-					$Messages->add_to_group( T_('No new blacklisted strings are available.'), 'note', T_('Updating antispam:') );
+					$log_message = T_('No new blacklisted strings are available.');
+					if( $is_cron )
+					{	// Cron mode:
+						cron_log_append( $log_message );
+					}
+					else
+					{	// Normal mode:
+						$Messages->add_to_group( $log_message, 'note', T_('Updating antispam:') );
+					}
 				}
 				else
 				{ // We got an array of strings:
@@ -279,29 +312,67 @@ function antispam_poll_abuse()
 					{
 						if( antispam_create( $banned_string, 'central' ) )
 						{ // Creation successed
-							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('OK').'.', 'note', T_('Adding strings to local blacklist:') );
+							$log_message = T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '.T_('OK').'.';
+							if( $is_cron )
+							{	// Cron mode:
+								cron_log_action_end( $log_message, 'success' );
+							}
+							else
+							{	// Normal mode:
+								$Messages->add_to_group( $log_message, 'note', T_('Adding strings to local blacklist:') );
+							}
 						}
 						else
 						{ // Was already handled
-							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('Not necessary! (Already handled)'), 'note', T_('Adding strings to local blacklist:') );
+							$log_message = T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '.T_('Not necessary! (Already handled)');
+							if( $is_cron )
+							{	// Cron mode:
+								cron_log_action_end( $log_message, 'note' );
+							}
+							else
+							{	// Normal mode:
+								$Messages->add_to_group( $log_message, 'note', T_('Adding strings to local blacklist:') );
+							}
 							antispam_update_source( $banned_string, 'central' );
 						}
 					}
 					// Store latest timestamp:
 					$endedat = date('Y-m-d H:i:s', iso8601_decode( $response['lasttimestamp'] ) );
-					$Messages->add( T_('New latest update timestamp').': '.$endedat, 'note', T_('Adding strings to local blacklist:') );
+					$log_message = T_('New latest update timestamp').': '.$endedat;
+					if( $is_cron )
+					{	// Cron mode:
+						cron_log_append( $log_message );
+					}
+					else
+					{	// Normal mode:
+						$Messages->add_to_group( $log_message, 'note', T_('Adding strings to local blacklist:') );
+					}
 
 					$Settings->set( 'antispam_last_update', $endedat );
 					$Settings->dbupdate();
 				}
-				$Messages->add( T_('Done').'.', 'success' );
+				$log_message = T_('Done').'.';
+				if( $is_cron )
+				{	// Cron mode:
+					cron_log_append( $log_message );
+				}
+				else
+				{	// Normal mode:
+					$Messages->add( $log_message, 'success' );
+				}
 			}
 		}
 		else
 		{
-			$Messages->add( T_('Invalid response').'.', 'error' );
+			$log_message = T_('Invalid response').'.';
+			if( $is_cron )
+			{	// Cron mode:
+				cron_log_append( $log_message, 'error' );
+			}
+			else
+			{	// Normal mode:
+				$Messages->add( $log_message, 'error' );
+			}
 			$ret = false;
 		}
 	}

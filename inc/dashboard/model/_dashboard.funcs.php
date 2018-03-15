@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -573,7 +573,7 @@ function display_charts( $chart_data )
 		return;
 	}
 
-	echo '<div style="display: flex; flex-flow: row nowrap;" class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
+	echo '<div style="display:flex;flex-flow:row wrap" class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
 
 	foreach( $chart_data as $chart_item )
 	{

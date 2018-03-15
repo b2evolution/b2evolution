@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -907,7 +907,7 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 			$where[] = $allowed_statuses_cond;
 		}
 	}
-	elseif( count( $show_statuses ) )
+	elseif( is_array( $show_statuses ) && count( $show_statuses ) )
 	{ // we are not filtering so all status are allowed, add allowed statuses condition
 		$where[] = $dbprefix.'status IN ( \''.implode( '\',\'', $show_statuses ).'\' )';
 	}
@@ -3987,16 +3987,17 @@ function set_session_Item( $Item )
  * Get object Item from Session
  *
  * @param integer Item ID
+ * @param boolean TRUE - to force a creating of new Item if it is not saved in Session yet
  * @return object Item
  */
-function get_session_Item( $item_ID = 0 )
+function get_session_Item( $item_ID = 0, $force_new = false )
 {
 	global $Session;
 
 	$edited_items = $Session->get( 'edited_items' );
 
-	if( isset( $edited_items[ $item_ID ] ) && is_object( $edited_items[ $item_ID ] ) )
-	{
+	if( isset( $edited_items[ $item_ID ] ) && ( $edited_items[ $item_ID ] instanceof Item ) )
+	{	// Get Item from Session:
 		$edited_Item = $edited_items[ $item_ID ];
 
 		// Reload main Chapter
@@ -4006,6 +4007,14 @@ function get_session_Item( $item_ID = 0 )
 		// Reload Post Type
 		$edited_Item->ItemType = NULL;
 		$edited_Item->get_ItemType();
+
+		return $edited_Item;
+	}
+	elseif( $force_new )
+	{	// Force to create new Item:
+		load_class( 'items/model/_item.class.php', 'Item' );
+		$edited_Item = new Item();
+		$edited_Item->set( 'main_cat_ID', get_param( 'cat' ) );
 
 		return $edited_Item;
 	}

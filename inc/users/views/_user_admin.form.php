@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -21,7 +21,7 @@ global $edited_User, $UserSettings, $Settings, $Plugins;
 
 global $current_User;
 
-global $servertimenow, $admin_url;
+global $servertimenow, $admin_url, $user_tags;
 
 if( !$current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
@@ -234,7 +234,7 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 	$last_newsletter = $UserSettings->get( 'last_newsletter', $edited_User->ID );
 	if( empty( $last_newsletter ) )
 	{ // Newsletter to the edited User was not sent yet
-		$Form->info_field( T_('Latest newsletter'), T_('None yet') );
+		$Form->info_field( T_('Latest list'), T_('None yet') );
 	}
 	else
 	{ // At least one newsletter was sent
@@ -242,10 +242,10 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 		$counter_separator = strpos( $last_newsletter, '_' );
 		$last_newsletter_timestamp = substr( $last_newsletter, 0, $counter_separator );
 		$last_newsletter_date = format_to_output( date2mysql( $last_newsletter_timestamp ) );
-		$Form->info_field( T_('Latest newsletter'), $last_newsletter_date );
+		$Form->info_field( T_('Latest list'), $last_newsletter_date );
 		$newsletter_counter = ( date( 'Ymd', $servertimenow ) == date( 'Ymd', $last_newsletter_timestamp ) ) ? substr( $last_newsletter, $counter_separator + 1 ) : 0;
 		$newsletter_limit = $UserSettings->get( 'newsletter_limit',  $edited_User->ID );
-		$Form->info_field( T_('Newsletters already sent today'), sprintf( T_('%d out of a maximum allowed of %d'), $newsletter_counter, $newsletter_limit ) );
+		$Form->info_field( T_('Lists already sent today'), sprintf( T_('%d out of a maximum allowed of %d'), $newsletter_counter, $newsletter_limit ) );
 	}
 $Form->end_fieldset(); // Email info
 
@@ -386,7 +386,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		{ // IP range exists in DB
 			$iprange_status = $IPRange->get( 'status' );
 			$iprange_name = $IPRange->get_name();
-			if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) )
+			if( $current_User->check_perm( 'spamblacklist', 'view' ) )
 			{	// Display IP range as link to edit form if current user has the permissions:
 				$iprange_name = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'.$iprange_name.'</a>';
 			}

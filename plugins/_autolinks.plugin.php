@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -28,7 +28,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 63;
-	var $version = '6.10.0';
+	var $version = '6.10.1';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -350,11 +350,11 @@ class autolinks_plugin extends Plugin
 		if( !isset($this->link_array[$coll_ID]) )
 		{	// This blog is not loaded yet:
 			$this->link_array[$coll_ID] = array();
-			$text = $this->setting_autolink_defs_coll_db;
-			if( !empty($text) )
-			{	// Load local user defintions:
-				$this->read_textfield( $text, $coll_ID );
-			}
+		}
+		$text = $this->setting_autolink_defs_coll_db;
+		if( ! empty( $text ) )
+		{	// Load local user defintions:
+			$this->read_textfield( $text, $coll_ID );
 		}
 
 		// Prepare working link array:
@@ -558,7 +558,7 @@ class autolinks_plugin extends Plugin
 			$content = make_clickable( $content, '&amp;', 'make_clickable_callback', $link_attrs, true );
 		}
 
-		if( !empty( $this->replacement_link_array ) )
+		if( ! empty( $this->replacement_link_array ) )
 		{	// Make the desired remaining terms/definitions clickable:
 			$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ), $link_attrs, true );
 		}
@@ -617,7 +617,7 @@ class autolinks_plugin extends Plugin
 		$text_contains_replacement = ( count( array_intersect( $text_words, array_keys( $this->replacement_link_array ) ) ) > 0 );
 		if( $text_contains_replacement )
 		{ // Find word with 3 characters at least:
-			$text = preg_replace_callback( '#(^|\s|[(),;\[{/])([@\p{L}0-9_\-]{3,})([\.,:;!\?\]\)}/]?)#i'.$regexp_modifier, array( & $this, 'replace_callback' ), $text );
+			$text = preg_replace_callback( '#(^|\s|[(),;\'\"\[{/])([@\p{L}0-9_\-\.]{3,})([\.,:;!\'\"\?\]\)}/]?)#i'.$regexp_modifier, array( & $this, 'replace_callback' ), $text );
 		}
 
 		// Cleanup words to be deleted:
@@ -768,15 +768,13 @@ class autolinks_plugin extends Plugin
 	 */
 	function replace_usernames( $content, $search_list, $replace_list )
 	{
-		if( empty( $this->setting_autolink_username ) || empty( $this->current_Blog ) )
+		if( empty( $this->setting_autolink_username ) )
 		{	// No data to correct username linking, Exit here:
 			return $content;
 		}
 
 		if( preg_match_all( $search_list, $content, $user_matches ) )
 		{
-			$blog_url = $this->current_Blog->gen_blogurl();
-
 			// Add this for rel attribute in order to activate bubbletips on usernames
 			$link_attr_rel = 'bubbletip_user_%user_ID%';
 
@@ -800,7 +798,7 @@ class autolinks_plugin extends Plugin
 					if( $User = & $UserCache->get_by_login( $username ) )
 					{	// Replace @usernames
 						$user_link_attrs = str_replace( '%user_ID%', $User->ID, $link_attrs );
-						$user_link = '<a href="'.$this->current_Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$User->ID ) ).'"'.$user_link_attrs.'>'.$user_matches[0][ $u ].'</a>';
+						$user_link = '<a href="'.$User->get_userpage_url().'"'.$user_link_attrs.'>'.$user_matches[0][ $u ].'</a>';
 						$content = preg_replace( '#'.$user_matches[0][ $u ].'#', $user_link, $content, 1 );
 						$this->already_linked_usernames[] = $user_matches[1][ $u ];
 					}

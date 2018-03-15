@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -1098,6 +1098,12 @@ switch( $action )
 		start_install_progress_bar( T_('Upgrade in progress'), get_upgrade_steps_count() );
 
 		echo get_install_format_text( '<h2>'.T_('Upgrading b2evolution...').'</h2>', 'h2' );
+
+		display_install_messages( sprintf( '<p>%s<ol><li>%s</li><li>%s</li><li>%s</li></ol></p>',
+				T_('IMPORTANT: if this upgrade procedure fails, do this:'),
+				T_('Make a screenshot showing as much context as possible, and save it in case you need support.'),
+				T_('Reload the page. The upgrade script is designed to recover from unexpected stops and may be able to pick up where it left off.'),
+				sprintf( T_('If needed, see <a %s>this man page &raquo;</a>' ), 'href="http://b2evolution.net/man/auto-upgrade-procedure"' ) ), 'info' );
 
 		if( $htaccess != 'skip' )
 		{

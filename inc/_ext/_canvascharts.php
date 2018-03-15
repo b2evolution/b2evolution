@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -19,8 +19,9 @@ if( ! defined( 'EVO_MAIN_INIT' ) ) die( 'Please, do not access this page directl
  * Draw the canvas bars chart.
  *
  * @param array Chart bars data
+ * @param string Javascript callback function to execute after rendering
  */
-function CanvasBarsChart( $chart )
+function CanvasBarsChart( $chart, $init_js_callback = NULL )
 {
 ?>
 <div id="canvasbarschart" style="height:<?php echo $chart['canvas_bg']['height']; ?>px;width:<?php echo $chart['canvas_bg']['width']; ?>px;margin:auto auto 35px;"></div>
@@ -153,6 +154,13 @@ jQuery( window ).load( function()
 	} );
 
 	jQuery( '#canvasbarschart' ).data( 'plot', plot );
+
+	<?php
+	if( ! empty( $init_js_callback ) )
+	{
+		echo 'window["'.$init_js_callback.'"]();';
+	}
+	?>
 
 	// Highlight legend
 	jQuery( '#canvasbarschart' ).bind( 'jqplotDataHighlight', function( ev, seriesIndex, pointIndex, data )

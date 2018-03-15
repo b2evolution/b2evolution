@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -23,7 +23,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function dre_msg( $message, $cron = false )
 {
-	global $is_web, $result_message, $dre_messages;
+	global $is_web, $dre_messages;
 
 	if( ! is_array( $dre_messages ) )
 	{	// Initialize global array first time:
@@ -35,14 +35,8 @@ function dre_msg( $message, $cron = false )
 	$dre_messages[] = $message;
 
 	if( $cron )
-	{	// We are in cron mode
-		if( $is_web )
-		{	// Separate a message with newline when we call a cron from browser:
-			$message .= '<br />';
-		}
-
-		// Log the message in global variable $result_message:
-		$result_message .= $message."\n";
+	{	// Append a message to cron log if we are in cron mode:
+		cron_log_append( $message );
 	}
 }
 
@@ -388,6 +382,11 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			dre_msg( sprintf( ('Marking message for deletion from inbox: %s'), $index ), $cron );
 			imap_delete( $mbox, $index );
 			++$del_cntr;
+		}
+
+		if( $cron )
+		{	// Mark the end of action for cron log:
+			cron_log_action_end( '' );
 		}
 	}
 

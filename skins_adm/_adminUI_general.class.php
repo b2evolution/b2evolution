@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -124,11 +124,24 @@ class AdminUI_general extends Menu
 
 
 	/**
+	 * Page bread crumb path
+	 */
+	var $display_breadcrumbpath = array();
+
+
+	/**
 	 * Titles of bread crumb paths
 	 *
 	 * Used to build a html <title> tag
 	 */
 	var $breadcrumb_titles = array();
+
+	/**
+	 * Titles of bread crumb paths
+	 *
+	 * Used to build a html <title> tag
+	 */
+	var $display_breadcrumb_titles = array();
 
 	/**
 	 * Manual link for entire pages, used to get a big scope describing functionalities.
@@ -213,6 +226,11 @@ class AdminUI_general extends Menu
 		$this->page_manual_link = get_manual_link( '', NULL, T_('View manual'), 5 );
 	}
 
+	function display_breadcrumbpath_init()
+	{
+		$this->display_breadcrumbpath = array();
+	}
+
 	/**
 	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
 	*
@@ -241,6 +259,43 @@ class AdminUI_general extends Menu
 
 		$this->breadcrumbpath[] = $html;
 		$this->breadcrumb_titles[] = strip_tags( $text );
+	}
+
+	/**
+	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
+	*
+	* @param string Text
+	* @param string Url
+	* @param string Title for help
+	* @param string Additional attributes for link tag
+	*/
+	function display_breadcrumbpath_add( $text, $url = NULL, $help = NULL, $attrs = '' )
+	{
+		global $Collection, $Blog, $current_User;
+
+		$blog_ID = isset($Blog) ? $Blog->ID : 0;
+		if( ! empty( $url ) )
+		{
+			$url = str_replace( '$blog$', $blog_ID, $url );
+
+			$html = $text;
+			if( $current_User->check_perm( 'admin', 'normal' ) )
+			{
+				$html = '<a href="'.$url.'"'.( !empty( $attrs ) ? ' '.$attrs : '' ).'>'.$text.'</a>';
+			}
+		}
+		else
+		{
+			$html = $text;
+		}
+
+		if( ! empty( $help ) )
+		{
+			$html .= ' <abbr title="'.$help.'">?</abbr>';
+		}
+
+		$this->display_breadcrumbpath[] = $html;
+		$this->display_breadcrumb_titles[] = strip_tags( $text );
 	}
 
 	/**
@@ -287,6 +342,47 @@ class AdminUI_general extends Menu
 			}
 
 			$r .= $params['beforeSel'].$this->breadcrumbpath[$i].$params['afterSel'];
+
+			$r .= $params['after'];
+		}
+
+		return $r;
+	}
+
+	/**
+	 * Get breadcrumb path in html format
+	 *
+	 * @param array Params
+	 * @return string Breadcrumb path links
+	 */
+	function display_breadcrumbpath_get_html( $params = array() )
+	{
+		$params = array_merge( array(
+				'before'     => '<div class="col-md-12"><nav aria-label="breadcrumb"><ol class="breadcrumb" style="margin-left: 0">',
+				'after'      => '</ol></nav></div>',
+				'beforeText' => '',
+				'beforeEach' => '<li class="breadcrumb-item">',
+				'afterEach'  => '</li>',
+				'beforeSel'  => '<li class="breadcrumb-item active">',
+				'afterSel'   => '</li>',
+				'separator'  => '',
+			), $params );
+
+		$r = '';
+
+		if( $count = count( $this->display_breadcrumbpath ) )
+		{
+			$r = $params['before'].$params['beforeText'];
+
+			for( $i=0; $i<$count-1; $i++ )
+			{
+				$r .= $params['beforeEach']
+						.$this->display_breadcrumbpath[$i]
+						.$params['separator']
+					.$params['afterEach'];
+			}
+
+			$r .= $params['beforeSel'].$this->display_breadcrumbpath[$i].$params['afterSel'];
 
 			$r .= $params['after'];
 		}
@@ -623,6 +719,7 @@ class AdminUI_general extends Menu
 		$params = array_merge( array(
 				'display_menu2' => true,
 				'display_menu3' => true,
+				'display_breadcrumb' => true
 			), $params );
 
 		global $Plugins;
@@ -639,6 +736,12 @@ class AdminUI_general extends Menu
 
 			echo $this->replace_vars( $r );
 			//echo ' disp_submenu-END ';
+
+			// Show breadcrumbs
+			if( $params['display_breadcrumb'] )
+			{
+				echo $this->display_breadcrumbpath_get_html();
+			}
 
 			// Show 3rd level menu for settings tab
 			$path1 = $this->get_path(1);

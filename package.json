@@ -1,6 +1,6 @@
 {
   "name": "b2evolution",
-  "version": "6.10.0",
+  "version": "6.10.1",
   "description": "This file is used to define all modules used by grunt. Run 'npm install' or 'npm udapte' to download/update these packages.",
   "license": "GPL v2",
   "devDependencies": {

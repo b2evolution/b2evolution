@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by PROGIDISTRI - {@link http://progidistri.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -1382,6 +1382,63 @@ class Form extends Widget
 
 
 	/**
+	 * Callback for preg_replace_callback in date_input
+	 */
+	private static function _date_input_format_callback( $matches )
+	{
+		if( $matches[1] == "\\" ) return "\\".$matches[0]; // leave escaped
+		switch( $matches[2] )
+		{
+			case "d": return "dd"; // day, 01-31
+			case "j": return "d"; // day, 1-31
+			case "l": return "EE"; // weekday (name)
+			case "D": return "E"; // weekday (abbr)
+			case "S": return "";
+
+			case "e": return ""; // weekday letter, not supported
+
+			case "m": return "MM"; // month, 01-12
+			case "n": return "M"; // month, 1-12
+			case "F": return "MMM"; // full month name; "name or abbr" in date.js
+			case "M": return "NNN"; // month name abbr
+
+			case "y": return "yy"; // year, 00-99
+			case "Y": return "yyyy"; // year, XXXX
+			default:
+				return $matches[0];
+		}
+	}
+
+
+	/**
+	 * Callback for preg_replace_callback in date_input
+	 */
+	private static function _date_input_length_callback( $matches )
+	{
+		if( $matches[1] == "\\" ) return "\\".$matches[0]; // leave escaped
+		switch( $matches[2] )
+		{
+			case "d": return "nn"; // day, 01-31(2)
+			case "j": return "nn"; // day, 1-31(2)
+			case "l": return "XXXXXXXXX"; // weekday (name) - Wednesday(9)
+			case "D": return "XXX"; // weekday (abbr)(3)
+			case "S": return "";
+
+			case "e": return ""; // weekday letter, not supported
+
+			case "m": return "nn"; // month, 01-12(2)
+			case "n": return "nn"; // month, 1-12(2)
+			case "F": return "XXXXXXXXX"; // full month name; "name or abbr" in date.js - September(9)
+			case "M": return "XXX"; // month name abbr(3)
+
+			case "y": return "nn"; // year, 00-99(2)
+			case "Y": return "nnnn"; // year, 1970 to 2038(4)
+			default:
+				return "_"; // (1)
+		}
+	}
+
+	/**
 	 * Builds a date input field.
 	 *
 	 * @param string the name of the input field
@@ -1410,52 +1467,10 @@ class Form extends Widget
 
 		// Convert PHP date format to JS library date format:
 		// NOTE: when editing/extending this here, you probably also have to adjust param_check_date()!
-		$js_date_format = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
-			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
-			switch( $m[2] )
-			{
-				case "d": return "dd"; // day, 01-31
-				case "j": return "d"; // day, 1-31
-				case "l": return "EE"; // weekday (name)
-				case "D": return "E"; // weekday (abbr)
-				case "S": return "";
-
-				case "e": return ""; // weekday letter, not supported
-
-				case "m": return "MM"; // month, 01-12
-				case "n": return "M"; // month, 1-12
-				case "F": return "MMM"; // full month name; "name or abbr" in date.js
-				case "M": return "NNN"; // month name abbr
-
-				case "y": return "yy"; // year, 00-99
-				case "Y": return "yyyy"; // year, XXXX
-				default:
-					return $m[0];
-			}' ), $date_format );
+		$js_date_format = preg_replace_callback( '~(\\\)?(\w)~', array( 'Form', '_date_input_format_callback' ), $date_format );
 
 		// Get max length of each date component
-		$js_date_length = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
-			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
-			switch( $m[2] )
-			{
-				case "d": return "nn"; // day, 01-31(2)
-				case "j": return "nn"; // day, 1-31(2)
-				case "l": return "XXXXXXXXX"; // weekday (name) - Wednesday(9)
-				case "D": return "XXX"; // weekday (abbr)(3)
-				case "S": return "";
-
-				case "e": return ""; // weekday letter, not supported
-
-				case "m": return "nn"; // month, 01-12(2)
-				case "n": return "nn"; // month, 1-12(2)
-				case "F": return "XXXXXXXXX"; // full month name; "name or abbr" in date.js - September(9)
-				case "M": return "XXX"; // month name abbr(3)
-
-				case "y": return "nn"; // year, 00-99(2)
-				case "Y": return "nnnn"; // year, 1970 to 2038(4)
-				default:
-					return "_"; // (1)
-			}' ), $date_format );
+		$js_date_length = preg_replace_callback( '~(\\\)?(\w)~', array( 'Form', '_date_input_length_callback' ), $date_format );
 
 		$field_params['type'] = 'text';
 
@@ -1752,9 +1767,16 @@ class Form extends Widget
 	 */
 	function duration_input( $field_prefix, $duration, $field_label, $from_subfield = 'days', $to_subfield = 'minutes', $field_params = array() )
 	{
+		$field_params = array_merge( array(
+				'allow_none_value' => true,
+				'none_value_label' => '---',
+				'allow_none_title' => true,
+				'none_title_label' => '---',
+			), $field_params );
+
 		$this->handle_common_params( $field_params, $field_prefix, $field_label );
 
-		$periods_values = array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 50 );
+		$periods_values = array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 50 );
 		$periods = array(
 			array( 'name' => 'second', 'title' => T_('second(s)'), 'seconds' => 1,        'size' => 1 ), // 1 seconds
 			array( 'name' => 'minute', 'title' => T_('minute(s)'), 'seconds' => 50,       'size' => 60 ), // 50 seconds
@@ -1804,7 +1826,10 @@ class Form extends Widget
 
 		// Display <select> with periods values
 		$r .= "\n".'<select name="'.$field_prefix.'_value" id="'.Form::get_valid_id( $field_prefix ).'_value"'.$field_class.'>';
-		$r .= '<option value="0"'.( 0 == $current_value ? ' selected="selected"' : '' ).">---</option>\n";
+		if( $field_params['allow_none_value'] )
+		{	// Allow null value:
+			$r .= '<option value="0"'.( 0 == $current_value ? ' selected="selected"' : '' ).'>'.$field_params['none_value_label'].'</option>'."\n";
+		}
 		foreach( $periods_values as $period_value )
 		{
 			$r .= '<option value="'.$period_value.'"'.( $current_value == $period_value ? ' selected="selected"' : '' ).'>'.$period_value."</option>\n";
@@ -1813,7 +1838,10 @@ class Form extends Widget
 
 		// Display <select> with periods titles
 		$r .= "\n".'<select name="'.$field_prefix.'_name" id="'.Form::get_valid_id( $field_prefix ).'_name"'.$field_class.'>';
-		$r .= '<option value="0"'.( '' == $current_period ? ' selected="selected"' : '' ).">---</option>\n";
+		if( $field_params['allow_none_title'] )
+		{	// Allow none period name:
+			$r .= '<option value="0"'.( '' == $current_period ? ' selected="selected"' : '' ).'>'.$field_params['none_title_label'].'</option>'."\n";
+		}
 		foreach( $periods as $period )
 		{
 			$r .= '<option value="'.$period['name'].'"'.( $current_period == $period['name'] ? ' selected="selected"' : '' ).'>'.$period['title']."</option>\n";
@@ -3366,7 +3394,7 @@ class Form extends Widget
 	 */
 	function add_crumb( $crumb_name )
 	{
-		$this->hidden( 'crumb_'.$crumb_name, get_crumb($crumb_name) );
+		$this->hidden( 'crumb_'.$crumb_name, get_crumb( $crumb_name ) );
 	}
 
 
@@ -4567,13 +4595,15 @@ class Form extends Widget
 	{
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
-		echo $this->begin_field( $field_name, $field_label, false, $field_type );
+		$r = $this->begin_field( $field_name, $field_label, false, $field_type );
 
 		// Switch layout to keep all fields in one line:
 		$this->switch_layout( 'none' );
 
 		// Set TRUE to mark all calls of the next fields as lined:
 		$this->is_lined_fields = true;
+
+		return $this->display_or_return( $r );
 	}
 
 
@@ -4588,9 +4618,11 @@ class Form extends Widget
 	{
 		$this->handle_common_params( $field_params );
 
+		$r = '';
+
 		if( !is_null( $suffix_text ) )
 		{ // Display a suffix:
-			echo $suffix_text;
+			$r .= $suffix_text;
 		}
 
 		// Stop "lined" mode:
@@ -4600,7 +4632,9 @@ class Form extends Widget
 		$this->switch_layout( NULL );
 
 		// End field:
-		echo $this->end_field( $field_type );
+		$r .= $this->end_field( $field_type );
+
+		return $this->display_or_return( $r );
 	}
 }
 

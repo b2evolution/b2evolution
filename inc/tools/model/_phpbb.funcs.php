@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -567,7 +567,7 @@ function phpbb_import_users()
 			}
 			else
 			{	// Replace unauthorized chars from username
-				$user_login = preg_replace( '/([^a-z0-9_]+)/i', '_', $phpbb_user->username );
+				$user_login = preg_replace( '/([^a-z0-9_\-\.]+)/i', '_', $phpbb_user->username );
 				$user_login = utf8_substr( utf8_strtolower( $user_login ), 0, 20 );
 				if( $user_login == '_' )
 				{	// If all username chars are unauthorized

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -42,6 +42,112 @@ function cron_log( $message, $level = 0 )
 
 
 /**
+ * Append cron log and store in DB each 1 second OR 4096 bytes of the log message
+ *
+ * @param string Message text
+ * @param string Message type: 'success', 'warning', 'error', 'note', NULL - to use default text without addition style color
+ * @param string New line
+ */
+function cron_log_append( $message, $type = NULL, $nl = "\n" )
+{
+	global $result_message, $cron_log_last_time, $cron_log_buffer_size, $cron_log_actions_num;
+
+	if( ! isset( $result_message ) )
+	{	// Initialize a var for cron log message:
+		$result_message = '';
+	}
+
+	if( ! isset( $cron_log_buffer_size ) )
+	{	// Initialize a var to count a cron log message length:
+		$cron_log_buffer_size = 0;
+	}
+
+	if( ! isset( $cron_log_actions_num ) )
+	{	// Initialize a var to count cron log actions:
+		$cron_log_actions_num = 0;
+	}
+
+	if( ! empty( $message ) )
+	{
+		// Set style for message depending on type:
+		switch( $type )
+		{
+			case 'success':
+				$message = '<span class="green">'.$message.'</span>';
+				break;
+			case 'error':
+				$message = '<span class="red">'.$message.'</span>';
+				break;
+			case 'warning':
+				$message = '<span class="orange">'.$message.'</span>';
+				break;
+			case 'note':
+				$message = '<span class="grey">'.$message.'</span>';
+				break;
+		}
+
+		// Append new line:
+		$message .= $nl;
+	}
+
+	// Append new message to the cron log:
+	$result_message .= $message;
+
+	// Update buffer size:
+	$cron_log_buffer_size += strlen( $message );
+
+	if( $cron_log_buffer_size >= 4096 ||
+	    ( isset( $cron_log_last_time ) && ( time() - $cron_log_last_time ) >= 1 ) )
+	{	// If log buffer >= 4096 OR last time execution >= 1 second:
+		if( $cron_log_buffer_size >= 4096 )
+		{	// Reset buffer size to count a next portion:
+			$cron_log_buffer_size = 0;
+		}
+
+		// We nust update cron log in DB in order to don't lost it on unexpected crash:
+		global $DB, $ctsk_ID, $time_difference;
+		if( ! empty( $ctsk_ID ) )
+		{	// We can update only cron job which is executing right now:
+			$DB->query( 'UPDATE T_cron__log
+				  SET clog_messages = '.$DB->quote( $result_message ).',
+				      clog_actions_num = '.$DB->quote( $cron_log_actions_num ).',
+				      clog_realstop_datetime = '.$DB->quote( date2mysql( time() + $time_difference ) ).'
+				WHERE clog_ctsk_ID = '.$ctsk_ID.'
+				  AND clog_status = "started"',
+				'Update a log message of the executing cron job #'.$ctsk_ID );
+		}
+	}
+
+	// Update a time global var to compare with next time:
+	$cron_log_last_time = time();
+}
+
+
+/**
+ * Count a number of cron job actions and append cron log
+ *
+ * @param string Message
+ * @param string Message type: 'success', 'warning', 'error', 'note'
+ * @param string New line
+ */
+function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
+{
+	global $cron_log_actions_num;
+
+	if( ! isset( $cron_log_actions_num ) )
+	{	// Initialize a var to count cron log actions:
+		$cron_log_actions_num = 0;
+	}
+
+	// Mark this as separate action:
+	$cron_log_actions_num++;
+
+	// Append cron log:
+	cron_log_append( $message, $type, $nl );
+}
+
+
+/**
  * Call a cron job.
  *
  * @param string Key of the job
@@ -52,7 +158,7 @@ function cron_log( $message, $level = 0 )
  */
 function call_job( $job_key, $job_params = array() )
 {
-	global $DB, $inc_path, $Plugins, $admin_url;
+	global $DB, $inc_path, $Plugins, $admin_url, $is_web;
 
 	global $result_message, $result_status, $timestop, $time_difference;
 
@@ -129,9 +235,21 @@ function call_job( $job_key, $job_params = array() )
 		$cron_log_level = 1;
 	}
 
+	if( $is_web )
+	{	// Is web interface?
+		$result_message_text = str_replace( "\n", "<br>\n", $result_message_text );
+	}
+	else
+	{	// Is CLI mode?
+		$result_message_text = str_replace(
+			array( '<br>', '<b>', '</b>', '<code>', '</code>', '&#8800;', '&#8804;', '&#8805;' ),
+			array( "\n", '*', '*', '`', '`', '!=', '<=', '>=' ),
+			$result_message_text );
+	}
+
 	$timestop = time() + $time_difference;
 	cron_log( 'Task finished at '.date( 'H:i:s', $timestop ).' with status: '.$result_status
-		."\nMessage: $result_message_text", $cron_log_level );
+		.( $is_web ? '<br>' : "\n" ).'Message: '.$result_message_text, $cron_log_level );
 
 	return $error_message;
 }
@@ -472,5 +590,72 @@ function cron_job_sql_query( $fields = 'key,name' )
 	}
 
 	return $name_query;
+}
+
+
+/**
+ * Error handler for cron job
+ *
+ * @return boolean FALSE - to continue normal error handler, TRUE - to don't run normal error handler
+ */
+function cron_job_error_handler()
+{
+	$last_error = error_get_last();
+
+	if( $last_error['type'] === E_ERROR )
+	{	// If last error is fatal:
+		global $result_message, $error_message, $DB;
+
+		if( empty( $result_message ) )
+		{	// Initialize result message of current executing cron job:
+			$result_message = '';
+		}
+
+		// Append error info to cron job log:
+		$new_error_message = "\n".'b2evolution caught an UNEXPECTED ERROR: '
+			.( $last_error
+				? '<b>File:</b> '.$last_error['file'].', '
+				 .'<b>Line:</b> '.$last_error['line'].', '
+				 .'<b>Message:</b> '.$last_error['message']
+				: 'Unknown'
+			);
+		if( $new_error_message !== $error_message )
+		{	// Update only really new error, in order to exclude duplicates:
+			$error_message = $new_error_message;
+			$result_message .= $error_message;
+		}
+
+		// We must rollback any started transaction in order to proper update a log of the interrupted cron job:
+		$DB->rollback();
+
+		return true;
+	}
+
+	// To continue normal error handler:
+	return false;
+}
+
+
+/**
+ * Shutdown function to save log of the interrupted cron job by unexpected error:
+ */
+function cron_job_shutdown()
+{
+	global $result_message, $ctsk_ID, $DB;
+
+	if( empty( $ctsk_ID ) )
+	{	// Run this function to detect only interrupted cron jobs:
+		return;
+	}
+
+	// Run error handler to store info of last error in $result_message:
+	cron_job_error_handler();
+
+	$DB->query( 'UPDATE T_cron__log
+		  SET clog_status = "error",
+		      clog_realstop_datetime = '.$DB->quote( date2mysql( time() ) ).',
+		      clog_messages = '.$DB->quote( $result_message ).'
+		WHERE clog_ctsk_ID = '.$ctsk_ID,
+		'Record task as finished with error by shutdown function.' );
 }
 ?>

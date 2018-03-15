@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -23,7 +23,7 @@ class polls_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.10.0';
+	var $version = '6.10.1';
 	var $number_of_installs = 1;
 
 
@@ -102,61 +102,77 @@ class polls_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$search_pattern = '#\[poll:(\d+)(:?)(.*?)]#';
-		preg_match_all( $search_pattern, $content, $inlines );
+		$params['check_code_block'] = true; // TRUE to find inline tags only outside of codeblocks
 
-		if( ! empty( $inlines[0] ) )
-		{
-			foreach( $inlines[0] as $i => $current_poll_tag )
-			{
-				$poll_ID = $inlines[1][$i];
-				$poll_title = 'Poll';
-				if( ! empty( $inlines[2][$i] ) && ! empty( $inlines[3][$i] ) )
-				{
-					$poll_title = $inlines[3][$i];
-				}
-
-				$poll = $this->renderPoll( $poll_ID, $poll_title );
-				if( ! $poll )
-				{
-					$poll = $current_poll_tag;
-				}
-
-				$content = str_replace( $current_poll_tag, $poll, $content );
-			}
-		}
+		$content = $this->render_polls_data( $content, $params );
 
 		return true;
 	}
 
 
 	/**
-	 * Delegates rendering of poll to poll widget
+	 * Convert inline poll tags into HTML tags like:
+	 *    [poll:123] - Display a widget "Poll" with poll ID #123
+	 *    [poll:123:Panel Title] - Use custom panel title instead of default T_('Poll')
+	 *    [poll:123:-] - No title and panel are displayed at all
+	 *    [poll:123:Panel Title:Question message?] - Custom title + Replace poll question from DB with custom question text
+	 *    [poll:123:Panel Title:-] - Custom title + Hide question
+	 *    [poll:123:-:-] - Hide title + Hide question
 	 *
-	 * @param integer Poll ID to render
-	 * @param string Optional poll title to display
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
 	 */
-	function renderPoll( $poll_ID, $poll_title = NULL )
+	function render_polls_data( $content, $params = array() )
 	{
-		load_class( 'widgets/widgets/_poll.widget.php', 'poll_Widget' );
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_polls_data() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_polls_data' ), array( $params ) );
+			return $content;
+		}
 
-		$Poll = new poll_Widget();
+		// Find all matches with tags of poll data:
+		preg_match_all( '#\[poll:(\d+):?([^:\]]*):?(.*?)\]#', $content, $tags );
 
-		ob_start();
-		$Poll->display( array(
-				'poll_ID' => $poll_ID,
-				'title' => $poll_title,
-				'block_display_title' => true,
-				'block_start' => '<div class="panel panel-default">',
-				'block_end' => '</div>',
-				'block_title_start' => '<div class="panel-heading">',
-				'block_title_end' => '</div>',
-				'block_body_start' => '<div class="panel-body">',
-				'block_body_end' => '</div>'
-			) );
-		$output = ob_get_clean();
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one poll inline tag is found in content:
 
-		return $output;
+			// Initialize widget "Poll" in order to render poll blocks:
+			load_class( 'widgets/widgets/_poll.widget.php', 'poll_Widget' );
+			$poll_Widget = new poll_Widget();
+
+			foreach( $tags[0] as $t => $source_tag )
+			{	// Render poll inline tag as html with widget "Poll":
+				$poll_title = ( empty( $tags[2][ $t ] ) ? T_('Poll') : $tags[2][ $t ] );
+				$poll_question = ( empty( $tags[3][ $t ] ) ? NULL : $tags[3][ $t ] );
+
+				// Display title only when it doesn't equal "-":
+				$display_title = ( $poll_title !== '-' );
+
+				ob_start();
+				$poll_Widget->display( array(
+						'poll_ID'             => $tags[1][ $t ],
+						'title'               => $poll_title,
+						'poll_question'       => $poll_question,
+						'block_display_title' => $display_title,
+						'block_start'         => $display_title ? '<div class="panel panel-default">' : '',
+						'block_end'           => $display_title ? '</div>' : '',
+						'block_title_start'   => $display_title ? '<div class="panel-heading">' : '',
+						'block_title_end'     => $display_title ? '</div>' : '',
+						'block_body_start'    => $display_title ? '<div class="panel-body">' : '',
+						'block_body_end'      => $display_title ? '</div>' : '',
+					) );
+				$poll_Widget->disp_params = NULL;
+
+				// Replace poll inline tag with the rendered poll html block:
+				$content = substr_replace( $content, ob_get_clean(), strpos( $content, $source_tag ), strlen( $source_tag ) );
+			}
+		}
+
+		return $content;
 	}
 
 

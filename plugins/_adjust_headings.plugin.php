@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -19,7 +19,7 @@ class adjust_headings_plugin extends Plugin
 	var $code = 'h_levels';
 	var $name = 'Adjust headings';
 	var $priority = 105;
-	var $version = '6.10.0';
+	var $version = '6.10.1';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;

@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -23,7 +23,7 @@ class cookie_consent_plugin extends Plugin
 	var $priority = 1;
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.10.0';
+	var $version = '6.10.1';
 	var $number_of_installs = 1;
 
 

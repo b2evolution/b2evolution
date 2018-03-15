@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -806,6 +806,9 @@ function check_allow_disp( $disp )
 				return;
 			}
 			break;
+		case 'register_finish':
+			// don't display activate account error notification on register finish form:
+			return;
 		default:
 			break;
 	}
@@ -1118,6 +1121,15 @@ function get_inskin_statuses_options( & $edited_Blog, $type )
 
 
 /**
+ * Callback for array_map in get_visibility_status()
+ */
+function _get_visibility_statuses_callback( $val )
+{
+	return implode( " ", $val );
+}
+
+
+/**
  * Get available post statuses
  *
  * @param string Statuses format, defaults to translated statuses
@@ -1148,7 +1160,7 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 
 			if( $format == 'notes-string' )
 			{	// String notes
-				$r = array_map( create_function('$v', 'return implode(" ", $v);'), $r );
+				$r = array_map( '_get_visibility_statuses_callback', $r );
 			}
 			break;
 

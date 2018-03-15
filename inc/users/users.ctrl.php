@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -25,9 +25,12 @@ param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kil
 
 param_action( 'list' );
 
-$tab = param( 'tab', 'string', '' );
+param( 'display_mode', 'string', 'normal' );
 
-$AdminUI->set_path( 'users', $tab == 'stats' ? 'stats' : 'users' );
+$tab = param( 'tab', 'string', '' );
+$tab3 = param( 'tab3', 'string', '', true );
+
+$AdminUI->set_path( 'users', $tab == 'stats' ? 'stats' : 'users', $tab3 == 'duplicates' ? 'duplicates' : 'list' );
 
 if( !$current_User->check_perm( 'users', 'view' ) )
 { // User has no permissions to view: he can only edit his profile
@@ -372,12 +375,65 @@ if( !$Messages->has_errors() )
 			/* EXITED */
 			break;
 
-		case 'newsletter':
-			// This is a redirect from email campaign controller to select the recipients:
+		case 'campaign':
+			// Select the recipients for email campaign:
 
 			$current_User->check_perm( 'emails', 'edit', true );
 
+			// Memorize action param to keep newsletter mode on change filters:
+			memorize_param( 'action', 'string', true, $action );
+
 			$Messages->add( T_('Please select new recipients for this email campaign.'), 'success' );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+			if( ! ( $edited_EmailCampaign = & get_session_EmailCampaign() ) )
+			{	// Initialize Email Campaign once and store in Session:
+
+				// ID of Email Campaign is required and should be memorized:
+				param( 'ecmp_ID', 'integer', true );
+
+				// Get Email Campaign by ID:
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $ecmp_ID );
+
+				// Save Email Campaign ID in Session:
+				$Session->set( 'edited_campaign_ID', $edited_EmailCampaign->ID );
+			}
+
+			// Set users filter "Subscribed to":
+			set_param( 'newsletter', $edited_EmailCampaign->get( 'enlt_ID' ) );
+			set_param( 'filter', 'new' );
+			break;
+
+		case 'add_automation':
+			// Add selected users to automation:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'options', 'view', true );
+
+			param( 'autm_ID', 'integer', true );
+			param( 'enlt_ID', 'integer', true );
+
+			$AutomationCache = & get_AutomationCache();
+			$Automation = & $AutomationCache->get_by_ID( $autm_ID );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+			$added_users_num = $Automation->add_users( get_filterset_user_IDs(), array(
+					'users_no_subs'   => param( 'users_no_subs', 'string', 'ignore' ),
+					'users_automated' => param( 'users_automated', 'string', 'ignore' ),
+					'users_new'       => param( 'users_new', 'string', 'ignore' ),
+					'newsletter_IDs'  => $enlt_ID,
+				) );
+
+			$Messages->add( sprintf( T_('%d users have been added or requeued for automation "%s"'), $added_users_num, $Automation->get( 'name' ) ), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 			break;
 	}
 }
@@ -407,23 +463,45 @@ if( $tab == 'stats' )
 }
 else
 {	// Users list
-	$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
-	$AdminUI->top_block = get_user_quick_search_form();
-	if( $current_User->check_perm( 'users', 'moderate', false ) )
-	{	// Include to edit user level
-		require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
-	}
-	load_funcs( 'regional/model/_regional.funcs.php' );
+	init_tokeninput_js();
 
-	// Set an url for manual page:
-	$AdminUI->set_page_manual_link( 'users-users' );
+	switch( $tab3 )
+	{
+		case 'duplicates':
+			//$AdminUI->set_path( 'users', 'duplicates' );
+			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users&amp;tab3='.$tab3 );
+			break;
+
+		default:
+			//$AdminUI->set_path( 'users', 'list' );
+
+			// Initialize user tag input
+
+			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
+			$AdminUI->top_block = get_user_quick_search_form();
+			if( $current_User->check_perm( 'users', 'moderate', false ) )
+			{	// Include to edit user level
+				require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			}
+			load_funcs( 'regional/model/_regional.funcs.php' );
+
+			// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'users-users' );
+	}
+
 }
 
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
+// Initialize date picker
+init_datepicker_js();
 
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
+if( $display_mode != 'js')
+{
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
+
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
+}
 
 /*
  * Display appropriate payload:
@@ -494,6 +572,21 @@ switch( $action )
 		echo_user_report_window();
 		break;
 
+	case 'automation':
+		// Display a form to add users selection to automation:
+
+		// Do not append Debuglog & Debug JSlog to response!
+		$debug = false;
+		$debug_jslog = false;
+
+		$AdminUI->disp_payload_begin();
+
+		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+		$AdminUI->disp_view( 'users/views/_user_list_automation.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
 	case 'promote':
 	default:
 		// Display user list:
@@ -505,13 +598,23 @@ switch( $action )
 		}
 		else
 		{
-			$AdminUI->disp_view( 'users/views/_user_list.view.php' );
+			switch( $tab3 )
+			{
+				case 'duplicates':
+					$AdminUI->disp_view( 'users/views/_duplicate_email_user_list.view.php' );
+					break;
+
+				default:
+					$AdminUI->disp_view( 'users/views/_user_list.view.php' );
+			}
+
 		}
 		$AdminUI->disp_payload_end();
 }
 
-
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
+if( $display_mode != 'js')
+{
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>

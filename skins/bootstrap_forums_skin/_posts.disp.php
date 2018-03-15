@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -232,17 +232,31 @@ elseif( isset( $current_Chapter ) )
 ?>
 	</section>
 
-	<div class="panel-body comments_link__pagination">
+	<div class="panel-body">
 	<?php
-		if( ! is_logged_in() )
-		{
+		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+		mainlist_page_links( array(
+				'block_start'           => '<div class="comments_link__pagination"><ul class="pagination">',
+				'block_end'             => '</ul></div>',
+				'page_current_template' => '<span>$page_num$</span>',
+				'page_item_before'      => '<li>',
+				'page_item_after'       => '</li>',
+				'page_item_current_before' => '<li class="active">',
+				'page_item_current_after'  => '</li>',
+				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
+			) );
+		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+
+		if( ! is_logged_in() && ! $Blog->get_setting( 'post_anonymous' ) )
+		{	// Display a warning to log in or register before new post creating:
 			$register_link = '';
 			$login_link = '<a class="btn btn-primary btn-sm" href="'.get_login_url( 'cannot post' ).'">'.T_( 'Log in now!' ).'</a>';
 			if( ( $Settings->get( 'newusers_canregister' ) == 'yes' ) && ( $Settings->get( 'registration_is_public' ) ) )
 			{
 				$register_link = '<a class="btn btn-primary btn-sm" href="'.get_user_register_url( NULL, 'reg to post' ).'">'.T_( 'Register now!' ).'</a>';
 			}
-			echo '<p class="alert alert-warning">';
+			echo '<p class="alert alert-warning alert-item-new">';
 			echo T_( 'In order to start a new topic' ).' '.$login_link.( ! empty( $register_link ) ? ' '.T_('or').' '.$register_link : '' );
 			echo '</p>';
 		}
@@ -258,20 +272,6 @@ elseif( isset( $current_Chapter ) )
 				.' <a href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>', 'warning' );
 			$Messages->display();
 		}
-
-		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-		mainlist_page_links( array(
-				'block_start'           => '<ul class="pagination">',
-				'block_end'             => '</ul>',
-				'page_current_template' => '<span>$page_num$</span>',
-				'page_item_before'      => '<li>',
-				'page_item_after'       => '</li>',
-				'page_item_current_before' => '<li class="active">',
-				'page_item_current_after'  => '</li>',
-				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
-				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
-			) );
-		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
 	</div>
 </div>
