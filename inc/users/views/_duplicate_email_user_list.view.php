@@ -45,6 +45,7 @@ users_results_block( array(
 		'display_actions'         => false,
 		'display_user_tags'       => true,
 		'display_subscribed_list' => true,
+		'display_pass_status'     => true,
 		'where_duplicate_email'   => true,
 
 	) );
