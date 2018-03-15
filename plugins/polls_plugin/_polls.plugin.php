@@ -102,31 +102,61 @@ class polls_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$search_pattern = '#\[poll:(\d+)(:?)(.*?)]#';
-		preg_match_all( $search_pattern, $content, $inlines );
+		$params['check_code_block'] = true; // TRUE to find inline tags only outside of codeblocks
 
-		if( ! empty( $inlines[0] ) )
-		{
-			foreach( $inlines[0] as $i => $current_poll_tag )
-			{
-				$poll_ID = $inlines[1][$i];
+		$content = $this->render_polls_data( $content, $params );
+
+		return true;
+	}
+
+
+	/**
+	 * Convert inline poll tags into HTML tags like:
+	 *    [poll:123] - Display a widget "Poll" with poll ID #123
+	 *    [poll:123:Panel Title] - Use custom panel title instead of default T_('Poll')
+	 *    [poll:123:-] - No title and panel are displayed at all
+	 *    [poll:123:Panel Title:Question message?] - Custom title + Replace poll question from DB with custom question text
+	 *    [poll:123:Panel Title:-] - Custom title + Hide question
+	 *    [poll:123:-:-] - Hide title + Hide question
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_polls_data( $content, $params = array() )
+	{
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_polls_data() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_polls_data' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of poll data:
+		preg_match_all( '#\[poll:(\d+)(:?)(.*?)]#', $content, $tags );
+
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one poll inline tag is found in content:
+			foreach( $tags[0] as $t => $source_tag )
+			{	// Render poll inline tag as html:
+				$poll_ID = $tags[1][$t];
 				$poll_title = T_('Poll');
-				if( ! empty( $inlines[2][$i] ) && ! empty( $inlines[3][$i] ) )
+				if( ! empty( $tags[2][$t] ) && ! empty( $tags[3][$t] ) )
 				{
-					$poll_title = $inlines[3][$i];
+					$poll_title = $tags[3][$t];
 				}
 
-				$poll = $this->renderPoll( $poll_ID, $poll_title );
-				if( ! $poll )
-				{
-					$poll = $current_poll_tag;
-				}
+				// Render poll inline tag with widget "Poll":
+				$poll_html = $this->renderPoll( $poll_ID, $poll_title );
 
-				$content = str_replace( $current_poll_tag, $poll, $content );
+				// Replace poll inline tag with the rendered poll html block:
+				$content = substr_replace( $content, $poll_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
 			}
 		}
 
-		return true;
+		return $content;
 	}
 
 
@@ -140,10 +170,10 @@ class polls_plugin extends Plugin
 	{
 		load_class( 'widgets/widgets/_poll.widget.php', 'poll_Widget' );
 
-		$Poll = new poll_Widget();
+		$poll_Widget = new poll_Widget();
 
 		ob_start();
-		$Poll->display( array(
+		$poll_Widget->display( array(
 				'poll_ID' => $poll_ID,
 				'title' => $poll_title,
 				'block_display_title' => true,
