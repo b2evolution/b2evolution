@@ -35,6 +35,13 @@ class Poll extends DataObject
 	var $poll_options;
 
 	/**
+	 * @var array with keys:
+	 *       - 'votes' - a number of votes of this Poll from all voters,
+	 *       - 'voters' - a number of users which voted on at least one option of this poll.
+	 */
+	var $vote_nums = NULL;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -227,6 +234,42 @@ class Poll extends DataObject
 
 
 	/**
+	 * Get numbers of votes and voters for this Poll
+	 *
+	 * @param string|NULL NULL - to return an array of all possible numbers,
+	 *                    'votes' - to return a number of votes of this Poll from all voters,
+	 *                    'voters' - to return a number of users which voted on at least one option of this poll.
+	 * @return array|integer Depends on param $type
+	 */
+	function get_vote_nums( $type = NULL )
+	{
+		global $DB;
+
+		if( $this->vote_nums === NULL )
+		{	// Get from DB once and store in cache array:
+			$nums_SQL = new SQL( 'Get a count of votes and voters for the edited poll #'.$this->ID );
+			$nums_SQL->SELECT( 'COUNT( pans_pqst_ID ) AS votes, COUNT( DISTINCT pans_user_ID ) AS voters' );
+			$nums_SQL->FROM( 'T_polls__answer' );
+			$nums_SQL->WHERE( 'pans_pqst_ID = '.$this->ID );
+			$this->vote_nums = $DB->get_row( $nums_SQL, ARRAY_A );
+		}
+
+		if( $type === NULL )
+		{	// Get all numbers:
+			return $this->vote_nums;
+		}
+		else
+		{	// Get a specific number:
+			if( ! isset( $this->vote_nums[ $type ] ) )
+			{
+				debug_die( 'Wrong param type "'.$type.'" for Poll::get_vote_nums()' );
+			}
+			return $this->vote_nums[ $type ];
+		}
+	}
+
+
+	/**
 	 * Get all options of this poll
 	 *
 	 * @return array PollOption objects
@@ -242,21 +285,17 @@ class Poll extends DataObject
 		{	// Get options from DB only first time, and store them in cache array:
 			global $DB;
 
-			// Get an options count of the edited poll which has at least one answer:
-			$count_SQL = new SQL( 'Get an options count of this poll which has at least one answer' );
-			$count_SQL->SELECT( 'COUNT( pans_pqst_ID )' );
-			$count_SQL->FROM( 'T_polls__answer' );
-			$count_SQL->WHERE( 'pans_pqst_ID = '.$this->ID );
-			$poll_options_count = $DB->get_var( $count_SQL );
-			if( $poll_options_count == 0 )
+			// Get numbers of votes and voters for the edited poll:
+			$poll_voters_num = $this->get_vote_nums( 'voters' );
+			if( $poll_voters_num == 0 )
 			{	// To don't devide by zero
-				$poll_options_count = 1;
+				$poll_voters_num = 1;
 			}
 
 			$SQL = new SQL( 'Get all options of this poll' );
 			$SQL->SELECT( 'popt_ID AS ID, popt_pqst_ID AS pqst_ID, popt_option_text AS option_text,' );
 			//$SQL->SELECT_add( 'COUNT( * ) AS answers_count,' );
-			$SQL->SELECT_add( 'ROUND( COUNT( pans_pqst_ID ) / '.$poll_options_count.' * 100 ) AS percent' );
+			$SQL->SELECT_add( 'ROUND( COUNT( pans_pqst_ID ) / '.$poll_voters_num.' * 100 ) AS percent' );
 			$SQL->FROM( 'T_polls__option' );
 			$SQL->FROM_add( 'LEFT JOIN T_polls__answer ON pans_popt_ID = popt_ID' );
 			$SQL->WHERE( 'popt_pqst_ID = '.$this->ID );

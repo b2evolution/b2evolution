@@ -77,22 +77,14 @@ $Form->end_form( $buttons );
 if( $edited_Poll->ID > 0 )
 {	// Display the answers table only when poll question is already exist in DB:
 
-	// Get an options count of the edited poll which has at least one answer:
-	$count_SQL = new SQL( 'Get an options count of the edited poll which has at least one answer' );
-	$count_SQL->SELECT( 'COUNT( pans_pqst_ID )' );
-	$count_SQL->FROM( 'T_polls__answer' );
-	$count_SQL->WHERE( 'pans_pqst_ID = '.$edited_Poll->ID );
-	$poll_options_count = $DB->get_var( $count_SQL );
-	if( $poll_options_count == 0 )
-	{	// To don't devide by zero
-		$poll_options_count = 1;
-	}
+	// Get numbers of votes and voters for the edited poll:
+	$poll_vote_nums = $edited_Poll->get_vote_nums();
 
 	// Get all options of the edited poll:
 	$SQL = new SQL();
 	$SQL->SELECT( 'popt_ID, popt_pqst_ID, popt_option_text, popt_order,' );
 	$SQL->SELECT_add( 'COUNT( pans_pqst_ID ) AS answers_count,' );
-	$SQL->SELECT_add( 'ROUND( COUNT( pans_pqst_ID ) / '.$poll_options_count.' * 100 ) AS answers_percent' );
+	$SQL->SELECT_add( 'ROUND( COUNT( pans_pqst_ID ) / '.( $poll_vote_nums['voters'] == 0 ? 1 : $poll_vote_nums['voters'] ).' * 100 ) AS answers_percent' );
 	$SQL->FROM( 'T_polls__option' );
 	$SQL->FROM_add( 'LEFT JOIN T_polls__answer ON pans_popt_ID = popt_ID' );
 	$SQL->WHERE( 'popt_pqst_ID = '.$edited_Poll->ID );
@@ -107,7 +99,7 @@ if( $edited_Poll->ID > 0 )
 	// Create result set:
 	$Results = new Results( $SQL->get(), 'pans_', 'A', NULL, $count_SQL->get() );
 
-	$Results->title = T_('Answers').' ('.$Results->get_total_rows().')'.get_manual_link( 'polls-answers-list' );
+	$Results->title = sprintf( T_('%d votes from %d users on %d possible answers'), $poll_vote_nums['votes'], $poll_vote_nums['voters'], $Results->get_total_rows() ).get_manual_link( 'polls-answers-list' );
 	$Results->Cache = get_PollOptionCache();
 
 	$Results->cols[] = array(
