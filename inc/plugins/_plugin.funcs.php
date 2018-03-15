@@ -1186,6 +1186,20 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 		{
 			foreach( $value as $vk => $vv )
 			{
+				// Validate input groups if they exist
+				if( isset( $mv['inputs'] ) )
+				{
+					foreach( $mv['inputs'] as $k => $v )
+					{
+						if( ! isset( $vv[$mk.$k] ) ) 
+							continue;
+
+						if( ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.$k.']', $vv[$mk.$k], $v ) )
+						{
+							$r = false;
+						}
+					}	
+				}
 				if( ! isset( $vv[$mk] ) )
 					continue;
 
