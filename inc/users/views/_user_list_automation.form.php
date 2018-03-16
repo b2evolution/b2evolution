@@ -35,7 +35,7 @@ $Form->hidden_ctrl();
 // A link to close popup window:
 $close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
 
-$Form->begin_fieldset( T_('Add current selection to an Automation...').get_manual_link( 'add-users-list-to-automation' ).$close_icon );
+$Form->begin_fieldset( T_('Add users to Automation...').get_manual_link( 'add-users-list-to-automation' ).$close_icon );
 
 $AutomationCache = & get_AutomationCache();
 $AutomationCache->load_all();
