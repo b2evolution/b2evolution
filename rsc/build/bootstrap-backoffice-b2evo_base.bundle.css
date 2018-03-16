@@ -2433,6 +2433,9 @@ form ul.token-input-list-facebook li.token-input-input-token-facebook {
   border-radius: 4px;
   margin: 0 4px 4px 0;
 }
+body.modal-open div.token-input-dropdown-facebook {
+  z-index: 10002;
+}
 div.results {
   margin-top: 0;
 }

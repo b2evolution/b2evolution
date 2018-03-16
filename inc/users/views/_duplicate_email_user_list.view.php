@@ -30,6 +30,7 @@ users_results_block( array(
 		'display_contact'         => false,
 		'display_email'           => true,
 		'display_automation'      => true,
+		'display_btn_tags'        => true,
 		'display_name'            => false,
 		'display_nickname'        => false,
 		'display_gender'          => false,

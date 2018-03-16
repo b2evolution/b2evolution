@@ -3558,7 +3558,7 @@ function callback_filter_userlist( & $Form )
 				'send_error' => T_('Send error'),
 				'skipped' => T_('Skipped')
 			);
-		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, T_('Campaign Status'), '', array( 'allow_none' => true ) );
+		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, T_('<span class="text-info">Campaign</span> Status'), '', array( 'allow_none' => true ) );
 	}
 	echo '<br />';
 
@@ -4711,10 +4711,31 @@ function echo_userlist_automation_js()
 	// Initialize variables for the file "evo_user_deldata.js":
 	echo '<script type="text/javascript">
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
-		var evo_js_lang_add_current_selection_to_automation = \''.TS_('Add current selection to an Automation...').get_manual_link( 'add-users-list-to-automation' ).'\';
+		var evo_js_lang_add_current_selection_to_automation = \''.TS_('Add users to Automation...').get_manual_link( 'add-users-list-to-automation' ).'\';
 		var evo_js_lang_add_selected_users_to_automation = \''.TS_('Add selected users to "%s"').'\';
 		var evo_js_userlist_automation_ajax_url = \''.$admin_url.'\';
 		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+	</script>';
+}
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to add/remove tags to/from users list
+ * @param array Params
+ */
+function echo_userlist_tags_js()
+{
+	global $admin_url;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_add_remove_tags_to_users = \''.TS_('Add/Remove tags...').get_manual_link( 'add-remove-user-tags' ).'\';
+		var evo_js_lang_make_changes_now = \''.TS_('Make changes now!').'\';
+		var evo_js_userlist_tags_ajax_url = \''.$admin_url.'\';
 	</script>';
 }
 
@@ -5490,6 +5511,7 @@ function users_results_block( $params = array() )
 			'display_org_actions'  => false,
 			'display_newsletter'   => true,
 			'display_automation'   => false,
+			'display_btn_tags'     => false,
 			'force_check_user'     => false,
 			'where_duplicate_email' => false,
 		), $params );
@@ -5638,12 +5660,21 @@ function users_results_block( $params = array() )
 		$UserList->display( $params['display_params'] );
 	}
 
-	$user_list_buttons = array();
+	$user_list_buttons = array( T_('With current filtered list:') );
+
+	if( $params['display_btn_tags'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	{	// Button to add/remove tags from/to users:
+		$user_list_buttons[] = '<a href="#" class="btn btn-default" onclick="return add_remove_userlist_tags()">'
+				.format_to_output( T_('Add/Remove tags...') )
+			.'</a>';
+		// Init JS for form to add/remove tags to/from users:
+		echo_userlist_tags_js();
+	}
 
 	if( $params['display_automation'] && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to add users to an automation:
 		$user_list_buttons[] = '<a href="#" class="btn btn-primary" onclick="return add_userlist_automation()">'
-				.format_to_output( T_('Add current selection to an Automation...') )
+				.format_to_output( T_('Add users to Automation...') )
 			.'</a>';
 		// Init JS for form to add user to automation:
 		echo_userlist_automation_js();
@@ -5661,7 +5692,7 @@ function users_results_block( $params = array() )
 		}
 		else
 		{
-			$campaign_button_text = T_('Create new Email Campaign for the current selection');
+			$campaign_button_text = T_('Add users to new Email Campaign...');
 			$campaign_button_class = 'btn-default';
 			$campaign_action = 'create_for_users';
 			$campaign_ID_param = '';

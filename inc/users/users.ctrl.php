@@ -435,6 +435,42 @@ if( !$Messages->has_errors() )
 			header_redirect( '?ctrl=users', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
+
+		case 'update_tags':
+			// Add/Remove tag to /from selected users:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+			
+			param( 'add_user_tags', 'string', '' );
+			param( 'remove_user_tags', 'string', '' );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+			$UserCache = & get_UserCache();
+			$UserCache->clear();
+			$UserCache->load_list( get_filterset_user_IDs() );
+
+			$updated_users_num = 0;
+			foreach( $UserCache->cache as $filtered_User )
+			{	// Update tags of each filtered User:
+				$filtered_User->add_usertags( $add_user_tags );
+				$filtered_User->remove_usertags( $remove_user_tags );
+				if( $filtered_User->dbupdate() )
+				{
+					$updated_users_num++;
+				}
+			}
+
+			$Messages->add( sprintf( T_('Tags of %d users have been updated'), $updated_users_num ), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
 	}
 }
 
@@ -583,6 +619,20 @@ switch( $action )
 
 		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 		$AdminUI->disp_view( 'users/views/_user_list_automation.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+	case 'edit_tags':
+		// Display a form to add/remove tags to/from users selection:
+
+		// Do not append Debuglog & Debug JSlog to response!
+		$debug = false;
+		$debug_jslog = false;
+
+		$AdminUI->disp_payload_begin();
+
+		$AdminUI->disp_view( 'users/views/_user_list_tags.form.php' );
 
 		$AdminUI->disp_payload_end();
 		break;
