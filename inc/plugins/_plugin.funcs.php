@@ -1056,21 +1056,23 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		$l_value = $set_value;
 	}
 
-	if( isset($parmeta['type']) && strpos( $parmeta['type'], 'array' ) === 0 )
-	{ // make keys (__key__) in arrays unique and remove them
-		handle_array_keys_in_plugin_settings($l_value);
-	}
-
-	if( isset( $parmeta['type'] ) && $parmeta['type'] == 'integer' )
-	{	// Convert to correct integer value:
-		if( $l_value !== '' )
-		{	// Don't convert empty string '' to integer 0:
-			$l_value = intval( $l_value );
+	if( isset( $parmeta['type'] ) )
+	{	// Prepare values before store them in DB:
+		if( strpos( $parmeta['type'], 'array' ) === 0 )
+		{	// Make keys (__key__) in arrays unique and remove them
+			handle_array_keys_in_plugin_settings( $l_value );
 		}
-		if( empty( $l_value ) && ! empty( $parmeta['allow_empty'] ) &&
-				isset( $parmeta['valid_range'], $parmeta['valid_range']['min'] ) && $parmeta['valid_range']['min'] > 0 )
-		{	// Convert 0 to empty value for integer field if it allows empty values:
-			$l_value = NULL;
+		elseif( $parmeta['type'] == 'integer' )
+		{	// Convert to correct integer value:
+			if( $l_value !== '' )
+			{	// Don't convert empty string '' to integer 0:
+				$l_value = intval( $l_value );
+			}
+			if( empty( $l_value ) && ! empty( $parmeta['allow_empty'] ) &&
+					isset( $parmeta['valid_range'], $parmeta['valid_range']['min'] ) && $parmeta['valid_range']['min'] > 0 )
+			{	// Convert 0 to empty value for integer field if it allows empty values:
+				$l_value = NULL;
+			}
 		}
 	}
 
