@@ -315,8 +315,18 @@ class CollectionSettings extends AbstractSettings
 	 */
 	function set( $col_key1, $col_key2, $value )
 	{
-		// Limit value with max possible length:
-		$value = utf8_substr( $value, 0, 10000 );
+		if( is_array( $value ) )
+		{	// Don't crop a serialized value if value is an array,
+			// e-g plugin setting with type "checklist":
+			if( strlen( serialize( $value  ) ) > 10000 )
+			{	// Stop here to avoid DB error on inserting of long value:
+				debug_die( 'Impossible to store long data(>10000 chars) of collection setting "'.$col_key2.'"!' );
+			}
+		}
+		else
+		{	// Limit value with max possible length:
+			$value = utf8_substr( $value, 0, 10000 );
+		}
 
 		return parent::setx( $col_key1, $col_key2, $value );
 	}
