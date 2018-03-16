@@ -14,6 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $deferred_AdminToolActions;
 
 // Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 load_funcs( 'plugins/_plugin.funcs.php' );

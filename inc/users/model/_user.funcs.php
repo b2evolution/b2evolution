@@ -5476,6 +5476,7 @@ function users_results_block( $params = array() )
 			'display_source'       => true,
 			'display_subscribed_list' => false,
 			'display_user_tags'    => false,
+			'display_pass_status'  => false,
 			'display_regdate'      => true,
 			'display_regcountry'   => true,
 			'display_update'       => true,
@@ -5727,6 +5728,7 @@ function users_results( & $UserList, $params = array() )
 			'display_source'     => true,
 			'display_subscribed_list' => false,
 			'display_user_tags'  => false,
+			'display_pass_status'=> false,
 			'display_regdate'    => true,
 			'display_regcountry' => true,
 			'display_update'     => true,
@@ -6024,21 +6026,34 @@ function users_results( & $UserList, $params = array() )
 	}
 
 	if( $params['display_subscribed_list'] )
-	{
+	{	// Display subscribed lists:
 		$UserList->cols[] = array(
 				'th' => T_('Subscribed List'),
 				'td' =>  '%user_td_subscribed_list( #subscribed_list# )%',
-				'order' => 'subscribed_list_count'
-
+				'order' => 'subscribed_list_count',
+				'th_class' => 'small',
 			);
 	}
 
 	if( $params['display_user_tags'] )
-	{
+	{	// Display user tags:
 		$UserList->cols[] = array(
 				'th' => T_('User tags'),
 				'td' => '%user_td_user_tags( #user_tags# )%',
 				'order' => 'user_tag_count',
+				'th_class' => 'small',
+			);
+	}
+
+	if( $params['display_pass_status'] )
+	{	// Display password status:
+		$UserList->cols[] = array(
+				'th'          => T_('Password set?'),
+				'td'          => '%user_td_pass_status( #user_pass_driver# )%',
+				'order'       => 'user_pass_driver',
+				'default_dir' => 'D',
+				'th_class'    => 'shrinkwrap small',
+				'td_class'    => 'center',
 			);
 	}
 
@@ -6602,6 +6617,25 @@ function user_td_subscribed_list( $lists )
 	$r = implode( ', ', $lists_array );
 
 	return $r;
+}
+
+
+/**
+ * Get password status
+ *
+ * @param string Password driver nane
+ * @return string
+ */
+function user_td_pass_status( $pass_driver )
+{
+	if( $pass_driver == 'nopass' )
+	{	// Use didn't set a password yet, e-g in case of email capture widget:
+		return get_icon( 'close', 'imgtag', array( 'title' => T_('No'), 'style' => 'color:#F00' ) );
+	}
+	else
+	{	// Use already set a password:
+		return get_icon( 'allowback', 'imgtag', array( 'title' => T_('Yes') ) );
+	}
 }
 
 

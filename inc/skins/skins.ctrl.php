@@ -30,6 +30,11 @@ if( $action != 'reset_coll' )
 	$current_User->check_perm( 'options', 'view', true );
 }
 
+if( $tab == 'system' )
+{	// Check minimum permission:
+	$current_User->check_perm( 'admin', 'normal', true );
+}
+
 param( 'redirect_to', 'url', $admin_url.'?ctrl=skins&tab='.$tab.( isset( $blog ) ? '&blog='.$blog : '' ) );
 
 if( $tab != 'system' && $tab != 'site_skin' )

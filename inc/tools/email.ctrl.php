@@ -21,6 +21,7 @@ global $current_User;
 global $DB;
 
 // Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'emails', 'view', true );
 
 load_class( 'tools/model/_emailaddress.class.php', 'EmailAddress' );
