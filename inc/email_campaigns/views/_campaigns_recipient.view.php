@@ -44,17 +44,12 @@ $SQL->WHERE( 'ecmp_ID ='.$DB->quote( $edited_EmailCampaign->ID ) );
 $SQL->GROUP_BY( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
 		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag, enlt_ID, enlt_name' );
 
-$count_SQL = new SQL();
-$count_SQL->SELECT( 'COUNT( ecmp_ID )' );
-$count_SQL->FROM( 'T_email__campaign' );
-
 if( isset( $params['enlt_ID'] ) )
 {
 	$SQL->WHERE_and( 'ecmp_enlt_ID = '.$DB->quote( $params['enlt_ID'] ) );
-	$count_SQL->WHERE_and( 'ecmp_enlt_ID = '.$DB->quote( $params['enlt_ID'] ) );
 }
 
-$Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+$Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), 'SELECT 1' );
 $Results->Cache = & get_EmailCampaignCache();
 
 $Results->cols[] = array(
