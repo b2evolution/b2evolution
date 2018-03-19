@@ -193,8 +193,8 @@ else
 				}
 			}
 			$ctsk_name_insert = empty( $task->ctsk_name ) ? 'NULL' : $DB->quote( $task->ctsk_name );
-			$sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_repeat_variation, ctsk_name, ctsk_key, ctsk_params )
-							VALUES( '.$DB->quote( date2mysql( $new_start_datetime ) ).', '.$DB->quote( $task->ctsk_repeat_after ).', '.$DB->quote( $task->ctsk_repeat_variation ).', '
+			$sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_repeat_variation, ctsk_max_exec_time, ctsk_name, ctsk_key, ctsk_params )
+							VALUES( '.$DB->quote( date2mysql( $new_start_datetime ) ).', '.$DB->quote( $task->ctsk_repeat_after ).', '.$DB->quote( $task->ctsk_repeat_variation ).', '.$DB->quote( $task->ctsk_max_exec_time ).', '
 												.$ctsk_name_insert.', '.$DB->quote( $task->ctsk_key ).', '.$DB->quote( $task->ctsk_params ).' )';
 			$DB->query( $sql, 'Schedule repeated task.' );
 		}
@@ -214,6 +214,9 @@ else
 
 		// The job may need to know its ID and name (to set logical locks for example):
 		$cron_params['ctsk_ID'] = $ctsk_ID;
+
+		// Set max execution time for each cron job separately:
+		set_max_execution_time( $task->ctsk_max_exec_time );
 
 		// Try to execute cron job:
 		set_error_handler( 'cron_job_error_handler' );
