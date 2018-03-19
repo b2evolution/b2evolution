@@ -226,6 +226,21 @@ switch( $action )
 		// We have EXITed already at this point!!
 		break;
 
+	case 'duplicate':
+		// Duplicate email campaign
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		if( $edited_EmailCampaign && $edited_EmailCampaign->duplicate() )
+		{
+			$Messages->add( T_('The email campaign has been duplicated.'), 'success' );
+			header_redirect( $admin_url.'?ctrl=campaigns&action=edit&ecmp_ID='.$edited_EmailCampaign->ID ); // will save $Messages into Session
+		}
+		break;
+
 	case 'delete':
 		// Delete Email Campaign...
 
@@ -402,6 +417,7 @@ switch( $action )
 {
 	case 'edit':
 	case 'edit_users':
+	case 'duplicate':
 		if( empty( $edited_EmailCampaign ) )
 		{	// If no edited email campaign - clear action and display list of campaigns:
 			$action = '';
@@ -440,6 +456,11 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'creating-an-email-campaign' );
 		$AdminUI->display_breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
 		$AdminUI->display_breadcrumbpath_add( isset( $edited_EmailCampaign ) ? $edited_EmailCampaign->get( 'email_title' ) : T_('New Campaign') );
+		break;
+	case 'copy':
+		$AdminUI->set_page_manual_link( 'duplicating-an-email-campaign' );
+		$AdminUI->display_breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
+		$AdminUI->display_breadcrumbpath_add( sprintf( T_('Duplicate [%s]'), $edited_EmailCampaign->get( 'email_title' ) ) );
 		break;
 	default:
 	$AdminUI->display_breadcrumbpath_add( T_('Campaigns') );
@@ -485,6 +506,10 @@ if( $action == 'edit' || $action == 'delete' )
 }
 else
 { // List of campaigns
+	if( $action == 'copy' )
+	{
+		init_tokeninput_js();
+	}
 	$AdminUI->set_path( 'email', 'campaigns' );
 }
 
@@ -502,6 +527,7 @@ evo_flush();
 switch( $action )
 {
 	case 'new':
+	case 'copy':
 		// Display a form of new email campaign:
 		$AdminUI->disp_view( 'email_campaigns/views/_campaigns_new.form.php' );
 		break;

@@ -464,7 +464,8 @@ function campaign_results_block( $params = array() )
 			'td' => action_icon( T_('Edit this email campaign...'), 'properties', $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$' )
 				.( $current_User->check_perm( 'emails', 'edit' ) ?
 				// Display an action icon to delete newsletter if current User has a perm:
-				action_icon( T_('Delete this email address!'), 'delete', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=delete&amp;'.url_crumb('campaign') ) ) : '' )
+				action_icon( T_('Duplicate this email campaign...'), 'copy', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=copy' ) )
+				.action_icon( T_('Delete this email campaign!'), 'delete', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=delete&amp;'.url_crumb('campaign') ) ) : '' )
 		);
 
 	// Display results:

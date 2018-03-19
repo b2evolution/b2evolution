@@ -1245,6 +1245,95 @@ class EmailCampaign extends DataObject
 		// Unknown sending method
 		return $this->get( 'auto_send' );
 	}
+
+
+	/**
+	 * Duplicate email campaign
+	 *
+	 * @return boolean True if duplication was successfull, false otherwise
+	 */
+	function duplicate()
+	{
+		global $DB, $localtimenow;
+
+		$DB->begin();
+
+		$duplicated_campaign_ID = $this->ID;
+		$this->ID = 0;
+
+		// Get all fields of the duplicated email campaign:
+		$source_fields_SQL = new SQL( 'Get all fields of the duplicated email campaign #'.$duplicated_campaign_ID );
+		$source_fields_SQL->SELECT( '*' );
+		$source_fields_SQL->FROM( 'T_email__campaign' );
+		$source_fields_SQL->WHERE( 'ecmp_ID = '.$DB->quote( $duplicated_campaign_ID ) );
+		$source_fields = $DB->get_row( $source_fields_SQL, ARRAY_A );
+		// Use field values of duplicated collection by default:
+		foreach( $source_fields as $source_field_name => $source_field_value )
+		{
+			// Cut prefix "ecmp_" of each field:
+			$source_field_name = substr( $source_field_name, 5 );
+			if( $source_field_name == 'ID' )
+			{	// Skip field ID:
+				continue;
+			}
+			if( isset( $this->$source_field_name ) )
+			{	// Unset current value in order to assing new below, especially to update this in array $this->dbchanges:
+				unset( $this->$source_field_name );
+			}
+			$this->set( $source_field_name, $source_field_value );
+		}
+
+		// Call this firstly to find all possible errors before inserting:
+		// Also to set new values from submitted form:
+		if( ! $this->load_from_Request() )
+		{	// Error on handle new values from form:
+			$this->ID = $duplicated_campaign_ID;
+			$DB->rollback();
+			return false;
+		}
+
+		// Set email campaign timestamp to current local time
+		$this->set( 'date_ts', $localtimenow );
+
+		// Reset sent dates
+		$this->set( 'sent_ts', NULL );
+		$this->set( 'auto_sent_ts', NULL );
+
+		// Try insert new collection in DB:
+		if( ! $this->dbinsert() )
+		{	// Error on insert collection in DB:
+			$this->ID = $duplicated_campaign_ID;
+			$DB->rollback();
+			return false;
+		}
+
+		// Copy all files linked to the campaign
+		$DB->query( 'INSERT INTO T_links
+				( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID,
+				link_itm_ID, link_cmt_ID, link_usr_ID, link_ecmp_ID, link_msg_ID, link_tmp_ID, link_file_ID,
+				link_ltype_ID, link_position, link_order )
+			SELECT link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID,
+				link_itm_ID, link_cmt_ID, link_usr_ID, '.$DB->quote( $this->ID ).' AS link_ecmp_ID, link_msg_ID, link_tmp_ID, link_file_ID,
+				link_ltype_ID, link_position, link_order
+			FROM T_links
+			WHERE link_ecmp_ID = '.$DB->quote( $duplicated_campaign_ID ),
+			'Duplicate linked files from email campaign #'.$duplicated_campaign_ID.' to #'.$this->ID );
+
+		// Add newsletter list subscribers as recipients
+		if( $Newsletter = & $this->get_Newsletter() )
+		{
+			$this->add_recipients( $Newsletter->get_user_IDs() );
+		}
+
+		// Duplication is successful, commit all above changes:
+		$DB->commit();
+
+		// Commit changes in cache:
+		$EmailCampaignCache = & get_EmailCampaignCache();
+		$EmailCampaignCache->add( $this );
+
+		return true;
+	}
 }
 
 ?>
