@@ -5733,6 +5733,7 @@ function users_results( & $UserList, $params = array() )
 			'display_name'       => true,
 			'order_name'         => 'user_lastname, user_firstname',
 			'display_email'      => false,
+			'email_link_type'    => NULL,
 			'display_role'       => false,
 			'display_priority'   => false,
 			'display_gender'     => true,
@@ -5916,7 +5917,7 @@ function users_results( & $UserList, $params = array() )
 			'th_class' => 'small',
 			'td_class' => 'small',
 			'order' => 'user_email',
-			'td' => '$user_email$'
+			'td' => '%user_td_email( #user_email#, "'.$params['email_link_type'].'", {row} )%'
 		);
 	}
 
@@ -6048,7 +6049,7 @@ function users_results( & $UserList, $params = array() )
 	{	// Display subscribed lists:
 		$UserList->cols[] = array(
 				'th' => T_('Subscribed List'),
-				'td' =>  '%user_td_subscribed_list( #subscribed_list# )%',
+				'td' =>  '%user_td_subscribed_list( #subscribed_list#, #user_email# )%',
 				'order' => 'subscribed_list_count',
 				'th_class' => 'small',
 			);
@@ -6333,14 +6334,15 @@ function users_results( & $UserList, $params = array() )
 	}
 
 	if( $params['display_enls_send_count'] )
-	{ // Display email campaign send count:
+	{	// Display email campaign send count:
+		global $admin_url;
 		$UserList->cols[] = array(
 				'th' => T_('# of campaigns sent'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'right',
 				'order' => 'enls_send_count',
 				'default_dir' => 'D',
-				'td' => '$enls_send_count$',
+				'td' => '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID=$enls_enlt_ID$&amp;username=$user_login$">$enls_send_count$</a>',
 			);
 	}
 
@@ -6446,6 +6448,29 @@ function get_report_status_text( $status )
 {
 	$statuses = get_report_statuses();
 	return isset( $statuses[ $status ] ) ? $statuses[ $status ] : '';
+}
+
+
+/**
+ * Helper to display email address in cell of users table
+ *
+ * @param string Email address
+ * @param string|NULL Link type: 'newsletter_campaigns'
+ * @param object|NULL Object with user data
+ */
+function user_td_email( $email, $link_type = NULL, $user_row = NULL )
+{
+	$r = $email;
+
+	switch( $link_type )
+	{
+		case 'newsletter_campaigns':
+			global $admin_url;
+			$r = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID='.$user_row->enls_enlt_ID.'&amp;username='.rawurlencode( $email ).'">'.$r.'</a>';
+			break;
+	}
+
+	return $r;
 }
 
 
@@ -6596,9 +6621,10 @@ function user_td_status( $user_status, $user_ID )
  * Get list of subscribed newsletters/list
  *
  * @param string Comma delimited list of newsletter IDs
+ * @param string User email address
  * @return string
  */
-function user_td_subscribed_list( $lists )
+function user_td_subscribed_list( $lists, $user_email = '' )
 {
 	global $current_User, $admin_url;
 
@@ -6622,13 +6648,14 @@ function user_td_subscribed_list( $lists )
 
 		if( $loop_List = $NewsletterCache->get_by_ID( $list_ID, false ) )
 		{
-			if( $current_User->check_perm( 'options', 'edit' ) )
-			{
-				$lists_array[] = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'"'
-						.($unsubscribed_list ? ' style="text-decoration: line-through;"' : '' ).'>'.$loop_List->get( 'name' ).'</a>';
+			if( $current_User->check_perm( 'emails', 'view' ) )
+			{	// Display a newsletter as link if current use has a permission to view newsletters list:
+				$user_email_filter = ( empty( $user_email ) ? '' : '&amp;filter=new&amp;keywords='.rawurlencode( $user_email ) );
+				$lists_array[] = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'&amp;tab=subscribers'.$user_email_filter.'"'
+						.( $unsubscribed_list ? ' style="text-decoration: line-through;"' : '' ).'>'.$loop_List->get( 'name' ).'</a>';
 			}
 			else
-			{
+			{	// Display a newsletter as text if user has no permission:
 				$lists_array[] = $loop_List->get( 'name' );
 			}
 		}

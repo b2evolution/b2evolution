@@ -257,6 +257,17 @@ function campaign_td_recipient_action( $row, $recipient_action )
 
 
 /**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_campaign_results_block( & $Form )
+{
+	$Form->text_input( 'username', get_param( 'username' ), 40, T_('Username or email address') );
+}
+
+
+/**
  * Display the campaigns results table
  *
  * @param array Params
@@ -304,9 +315,27 @@ function campaign_results_block( $params = array() )
 	$count_SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 
 	if( isset( $params['enlt_ID'] ) )
-	{
+	{	// Filter by Newsletter:
 		$SQL->WHERE_and( 'ecmp_enlt_ID = '.$DB->quote( $params['enlt_ID'] ) );
 		$count_SQL->WHERE_and( 'ecmp_enlt_ID = '.$DB->quote( $params['enlt_ID'] ) );
+	}
+
+	$username = param( 'username', 'string', NULL );
+	if( ! empty( $username ) )
+	{	// Filter by user login, first name, last name, nickname:
+		$sql_where = array();
+		$kw_array = explode( ' ', $username );
+		foreach( $kw_array as $kw )
+		{	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
+			$sql_where[] = 'CONCAT_WS( " ", user_login, user_firstname, user_lastname, user_nickname, user_email ) LIKE '.$DB->quote( '%'.$kw.'%' );
+		}
+		$sql_where = implode( ' OR ', $sql_where );
+		$SQL->WHERE_and( $sql_where );
+		$count_SQL->WHERE_and( $sql_where );
+		// Join additional tables for the user columns:
+		$SQL->FROM_add( 'LEFT JOIN T_users ON csnd_user_ID = user_ID' );
+		$count_SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
+		$count_SQL->FROM_add( 'LEFT JOIN T_users ON csnd_user_ID = user_ID' );
 	}
 
 	$Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
@@ -317,6 +346,8 @@ function campaign_results_block( $params = array() )
 	{ // User must has a permission to edit emails
 		$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new'.( isset( $params['enlt_ID'] ) ? '&amp;enlt_ID='.$params['enlt_ID'] : '' ), T_('Create new campaign').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
+
+	$Results->filter_area = array( 'callback' => 'filter_campaign_results_block' );
 
 	$Results->cols[] = array(
 			'th' => T_('ID'),
