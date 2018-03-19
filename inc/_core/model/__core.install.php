@@ -360,6 +360,7 @@ $schema_queries = array(
 			ctsk_start_datetime   TIMESTAMP not null DEFAULT '2000-01-01 00:00:00',
 			ctsk_repeat_after     int(10) unsigned,
 			ctsk_repeat_variation int(10) unsigned DEFAULT 0,
+			ctsk_max_exec_time    INT UNSIGNED DEFAULT 600,
 			ctsk_key              varchar(50) COLLATE ascii_general_ci not null,
 			ctsk_name             varchar(255) null COMMENT 'Specific name of this task. This value is set only if this job name was modified by an admin user',
 			ctsk_params           varchar(255),

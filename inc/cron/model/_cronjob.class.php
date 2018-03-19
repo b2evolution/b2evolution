@@ -27,6 +27,7 @@ class Cronjob extends DataObject
 	var $start_datetime;
 	var $repeat_after = NULL;
 	var $repeat_variation = 0;
+	var $max_exec_time = 600; // 10 minutes
 	var $name;
 	var $key;
 
@@ -52,6 +53,7 @@ class Cronjob extends DataObject
 			$this->start_timestamp  = strtotime( $db_row->ctsk_start_datetime );
 			$this->repeat_after     = $db_row->ctsk_repeat_after;
 			$this->repeat_variation = $db_row->ctsk_repeat_variation;
+			$this->max_exec_time    = $db_row->ctsk_max_exec_time;
 			$this->name             = $db_row->ctsk_name;
 			$this->key              = $db_row->ctsk_key;
 			$this->params           = $db_row->ctsk_params;
@@ -143,6 +145,9 @@ class Cronjob extends DataObject
 
 		// repeat after:
 		$this->set( 'repeat_variation', param_duration( 'cjob_repeat_variation' ) );
+
+		// Max execution time:
+		$this->set( 'max_exec_time', param_duration( 'cjob_max_exec_time' ) );
 
 		// name:
 		if( !empty( $cjob_name ) && $cjob_name != $this->get( 'name' ) )

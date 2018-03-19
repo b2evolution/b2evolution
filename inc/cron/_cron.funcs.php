@@ -394,14 +394,21 @@ function cron_job_name( $job_key, $job_name = '', $job_params = '' )
  */
 function detect_timeout_cron_jobs( $error_task = NULL )
 {
-	global $DB, $time_difference, $cron_timeout_delay, $admin_url;
+	global $DB, $time_difference, $admin_url;
+
+	// Convert time difference to mysql format:
+	$mysql_time_difference = intval( $time_difference );
+	if( $mysql_time_difference >= 0 )
+	{	// Negative value already has a sign "-", but for positive value we must add a sigh "+" for correct mysql operation below:
+		$mysql_time_difference = '+ '.$mysql_time_difference;
+	}
 
 	$SQL = new SQL( 'Find cron timeouts' );
 	$SQL->SELECT( 'ctsk_ID, ctsk_name, ctsk_key' );
 	$SQL->FROM( 'T_cron__log' );
 	$SQL->FROM_add( 'INNER JOIN T_cron__task ON ctsk_ID = clog_ctsk_ID' );
 	$SQL->WHERE( 'clog_status = "started"' );
-	$SQL->WHERE_and( 'clog_realstart_datetime < '.$DB->quote( date2mysql( time() + $time_difference - $cron_timeout_delay ) ) );
+	$SQL->WHERE_and( 'UNIX_TIMESTAMP( clog_realstart_datetime ) < UNIX_TIMESTAMP() - ctsk_max_exec_time '.$mysql_time_difference );
 	$SQL->GROUP_BY( 'ctsk_ID' );
 	$timeout_tasks = $DB->get_results( $SQL );
 

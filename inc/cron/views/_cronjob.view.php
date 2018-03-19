@@ -37,6 +37,7 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 			$Form->info( '', seconds_to_period( $cjob_row->ctsk_repeat_after ) );
 			$Form->info( T_('+/- variation of:'), seconds_to_period( $cjob_row->ctsk_repeat_variation ) );
 		$Form->end_line( NULL, 'info' );
+		$Form->info( T_('Max execution time'), seconds_to_period( $cjob_row->ctsk_max_exec_time ) );
 
 	$Form->end_fieldset();
 

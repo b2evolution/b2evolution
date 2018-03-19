@@ -685,12 +685,6 @@ $debug_xmlrpc_logging = 0;
 
 
 /**
- * Seconds after which a scheduled task is considered to be timed out.
- */
-$cron_timeout_delay = 1800; // 30 minutes
-
-
-/**
  * Password change request delay in seconds. Only one email can be requested for one login or email address in each x seconds defined below.
  */
 $pwdchange_request_delay = 300; // 5 minutes

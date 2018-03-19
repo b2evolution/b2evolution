@@ -125,8 +125,11 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 	global $Settings, $debug;
 	global $pbm_item_files, $pbm_messages, $pbm_items, $post_cntr, $del_cntr, $is_cron_mode;
 
-	// This may take a very long time if there are many messages; No execution time limit:
-	set_max_execution_time(0);
+	if( empty( $is_cron_mode ) )
+	{	// This may take a very long time if there are many messages; No execution time limit:
+		// (don't apply this for cron job because it uses a setting "Max execution time")
+		set_max_execution_time( 0 );
+	}
 
 	// Are we in test mode?
 	$test_mode_on = $Settings->get('eblog_test_mode');
