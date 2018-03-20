@@ -1827,7 +1827,7 @@ function create_default_newsletters()
  */
 function create_default_email_campaigns()
 {
-	global $DB, $create_sample_contents;
+	global $DB, $create_sample_contents, $baseurl;
 
 	task_begin( 'Creating default email campaigns... ' );
 
@@ -1839,6 +1839,7 @@ function create_default_email_campaigns()
 		$EmailCampaign = new EmailCampaign();
 		$EmailCampaign->set( 'enlt_ID', 1 );
 		$EmailCampaign->set( 'name', T_('Markdown Example') );
+		$EmailCampaign->set( 'email_defaultdest', $baseurl );
 		$EmailCampaign->set( 'email_text', T_('Heading
 =======
 
@@ -1874,7 +1875,13 @@ Shopping list:
 * oranges
 * pears
 
-The rain---not the reign---in Spain.') );
+The rain---not the reign---in Spain.
+
+Button examples:
+[button]This is a button[/button]
+[like]I like this[/like] [dislike]I don\'t like this[/dislike]
+[cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
+[cta:1:link]Call to action 1 link only[/cta]') );
 
 		if( $EmailCampaign->dbinsert() )
 		{	// Add recipients after successfull email campaign creating:

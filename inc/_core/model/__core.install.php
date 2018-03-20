@@ -543,6 +543,7 @@ $schema_queries = array(
 			ecmp_enlt_ID              INT UNSIGNED NOT NULL,
 			ecmp_name                 VARCHAR(255) NOT NULL,
 			ecmp_email_title          VARCHAR(255) NOT NULL,
+			ecmp_email_defaultdest    VARCHAR(255) NULL,
 			ecmp_email_html           TEXT NULL,
 			ecmp_email_text           TEXT NULL,
 			ecmp_email_plaintext      TEXT NULL,

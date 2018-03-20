@@ -33,6 +33,8 @@ class EmailCampaign extends DataObject
 
 	var $email_title;
 
+	var $email_defaultdest;
+
 	var $email_html;
 
 	var $email_text;
@@ -104,6 +106,7 @@ class EmailCampaign extends DataObject
 			$this->enlt_ID = $db_row->ecmp_enlt_ID;
 			$this->name = $db_row->ecmp_name;
 			$this->email_title = $db_row->ecmp_email_title;
+			$this->email_defaultdest = $db_row->ecmp_email_defaultdest;
 			$this->email_html = $db_row->ecmp_email_html;
 			$this->email_text = $db_row->ecmp_email_text;
 			$this->email_plaintext = $db_row->ecmp_email_plaintext;
@@ -478,6 +481,8 @@ class EmailCampaign extends DataObject
 	 */
 	function dbinsert()
 	{
+		global $baseurl;
+
 		// Update the message fields:
 		$this->update_message_fields();
 
@@ -485,6 +490,12 @@ class EmailCampaign extends DataObject
 		if( empty( $this->email_title ) && ! empty( $this->name ) )
 		{
 			$this->set( 'email_title', $this->name );
+		}
+
+		// Pre-fill email default destination
+		if( empty( $this->email_defaultdest ) )
+		{
+			$this->set( 'email_defaultdest', $baseurl );
 		}
 
 		$r = parent::dbinsert();
@@ -616,6 +627,19 @@ class EmailCampaign extends DataObject
 		{	// Email title:
 			param_string_not_empty( 'ecmp_email_title', T_('Please enter an email title.') );
 			$this->set_from_Request( 'email_title' );
+		}
+
+		$email_defaultdest = param( 'ecmp_email_defaultdest', 'string', NULL );
+		if( $email_defaultdest !== NULL )
+		{	// Email default destination:
+			if( validate_url( $email_defaultdest ) )
+			{
+				param_error( 'ecmp_email_defaultdest', sprintf( T_('Supplied URL is invalid. (%s)'), htmlspecialchars( $email_defaultdest ) ) );
+			}
+			else
+			{
+				$this->set_from_Request( 'email_defaultdest' );
+			}
 		}
 
 		if( param( 'ecmp_email_html', 'html', NULL ) !== NULL )
