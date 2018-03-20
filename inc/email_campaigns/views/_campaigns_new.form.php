@@ -40,19 +40,19 @@ $Form->begin_fieldset( $fieldset_title );
 	$Form->select_input_object( 'ecmp_enlt_ID', $enlt_ID, $NewsletterCache, T_('Send to subscribers of'), array( 'required' => true ) );
 	if( isset( $edited_EmailCampaign ) )
 	{
-		$email_title = $edited_EmailCampaign->get( 'email_title' ) == '' ? $edited_EmailCampaign->get( 'name' ) : $edited_EmailCampaign->get( 'email_title' );
+		$campaign_name = $edited_EmailCampaign->get( 'name' );
 	}
 	else
 	{
-		$email_title = '';
+		$campaign_name = '';
 	}
-	$Form->text_input( 'ecmp_email_title', $email_title, 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
+	$Form->text_input( 'ecmp_name', $campaign_name, 60, T_('Campaign name'), T_('for internal use'), array( 'maxlength' => 255, 'required' => true ) );
 $Form->end_fieldset();
 
 if( $action == 'copy' )
 {
 	$Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
-	$buttons[] = array( 'submit', 'submit', sprintf( T_('Save and duplicate all settings from %s'), $edited_EmailCampaign->get( 'email_title' ) == '' ? $edited_EmailCampaign->get( 'name' ) : $edited_EmailCampaign->get( 'email_title' ) ), 'SaveButton' );
+	$buttons[] = array( 'submit', 'submit', sprintf( T_('Save and duplicate all settings from %s'), $edited_EmailCampaign->get( 'name' ) ), 'SaveButton' );
 }
 else
 {

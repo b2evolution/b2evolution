@@ -5685,7 +5685,7 @@ function users_results_block( $params = array() )
 		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 		if( $edited_EmailCampaign = & get_session_EmailCampaign() )
 		{
-			$campaign_button_text = sprintf( T_('Use this selection for campaign "%s"'), $edited_EmailCampaign->get( 'email_title' ) );
+			$campaign_button_text = sprintf( T_('Use this selection for campaign "%s"'), $edited_EmailCampaign->get( 'name' ) );
 			$campaign_button_class = 'btn-primary';
 			$campaign_action = 'update_users';
 			$campaign_ID_param = '&amp;ecmp_ID='.$edited_EmailCampaign->ID;

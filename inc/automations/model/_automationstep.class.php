@@ -143,7 +143,7 @@ class AutomationStep extends DataObject
 				{	// No stored object, Return null:
 					return 'null';
 				}
-				
+
 		}
 
 		return parent::get( $parname );
@@ -1287,7 +1287,7 @@ class AutomationStep extends DataObject
 				$EmailCampaignCache = & get_EmailCampaignCache();
 				if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( $this->get( 'info' ), false, false ) )
 				{	// Use name of Email Campaign:
-					$label = $EmailCampaign->get( 'email_title' );
+					$label = $EmailCampaign->get( 'name' );
 				}
 				break;
 

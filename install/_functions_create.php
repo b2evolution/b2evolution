@@ -1838,7 +1838,7 @@ function create_default_email_campaigns()
 	{
 		$EmailCampaign = new EmailCampaign();
 		$EmailCampaign->set( 'enlt_ID', 1 );
-		$EmailCampaign->set( 'email_title', T_('Markdown Example') );
+		$EmailCampaign->set( 'name', T_('Markdown Example') );
 		$EmailCampaign->set( 'email_text', T_('Heading
 =======
 

@@ -373,7 +373,7 @@ function cron_job_name( $job_key, $job_name = '', $job_params = '' )
 					$EmailCampaignCache = & get_EmailCampaignCache();
 					if( $EmailCampaign = $EmailCampaignCache->get_by_ID( $job_params['ecmp_ID'], false, false ) )
 					{
-						$email_campaign_title = $EmailCampaign->get( 'email_title' );
+						$email_campaign_title = $EmailCampaign->get( 'name' );
 					}
 				}
 				$job_name = sprintf( $job_name, $Settings->get( 'email_campaign_chunk_size' ), $email_campaign_title );

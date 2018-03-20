@@ -29,6 +29,8 @@ class EmailCampaign extends DataObject
 
 	var $enlt_ID;
 
+	var $name;
+
 	var $email_title;
 
 	var $email_html;
@@ -100,6 +102,7 @@ class EmailCampaign extends DataObject
 			$this->ID = $db_row->ecmp_ID;
 			$this->date_ts = $db_row->ecmp_date_ts;
 			$this->enlt_ID = $db_row->ecmp_enlt_ID;
+			$this->name = $db_row->ecmp_name;
 			$this->email_title = $db_row->ecmp_email_title;
 			$this->email_html = $db_row->ecmp_email_html;
 			$this->email_text = $db_row->ecmp_email_text;
@@ -157,7 +160,7 @@ class EmailCampaign extends DataObject
 	 */
 	function get_name()
 	{
-		return $this->get( 'email_title' );
+		return $this->get( 'name' );
 	}
 
 
@@ -240,17 +243,6 @@ class EmailCampaign extends DataObject
 	{
 		switch( $parname )
 		{
-			case 'name':
-				if( $Newsletter = & $this->get_Newsletter() )
-				{	// Get name of newsletter:
-					return $Newsletter->get( 'name' );
-				}
-				else
-				{	// Get email title of this campaign:
-					return $this->get( 'email_title' );
-				}
-				break;
-
 			default:
 				return parent::get( $parname );
 		}
@@ -489,6 +481,12 @@ class EmailCampaign extends DataObject
 		// Update the message fields:
 		$this->update_message_fields();
 
+		// Make sure email title is not empty
+		if( empty( $this->email_title ) && ! empty( $this->name ) )
+		{
+			$this->set( 'email_title', $this->name );
+		}
+
 		$r = parent::dbinsert();
 
 		// Update recipients:
@@ -606,6 +604,12 @@ class EmailCampaign extends DataObject
 			param_string_not_empty( 'ecmp_enlt_ID', T_('Please select a list.') );
 			$this->newsletter_is_changed = ( get_param( 'ecmp_enlt_ID' ) != $this->get( 'enlt_ID' ) );
 			$this->set_from_Request( 'enlt_ID' );
+		}
+
+		if( param( 'ecmp_name', 'string', NULL ) !== NULL )
+		{ // Campaign name:
+			param_string_not_empty( 'ecmp_name', T_('Please enter a name.') );
+			$this->set_from_Request( 'name' );
 		}
 
 		if( param( 'ecmp_email_title', 'string', NULL ) !== NULL )

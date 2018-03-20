@@ -284,7 +284,7 @@ function campaign_results_block( $params = array() )
 
 	// Create result set:
 	$SQL = new SQL();
-	$SQL->SELECT( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
+	$SQL->SELECT( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_name, ecmp_email_title, ecmp_email_html, ecmp_email_text,
 			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
 			ecmp_user_tag_sendskip, ecmp_user_tag_sendsuccess,
 			ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
@@ -306,8 +306,10 @@ function campaign_results_block( $params = array() )
 	$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
 	$SQL->FROM_add( 'LEFT JOIN T_email__log ON emlog_ID = csnd_emlog_ID' );
 	$SQL->WHERE( 1 );
-	$SQL->GROUP_BY( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
-			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag, enlt_ID, enlt_name' );
+	$SQL->GROUP_BY( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_name, ecmp_email_title, ecmp_email_html, ecmp_email_text,
+			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
+			ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
+			enlt_ID, enlt_name' );
 
 	$count_SQL = new SQL();
 	$count_SQL->SELECT( 'COUNT( ecmp_ID )' );
@@ -375,9 +377,15 @@ function campaign_results_block( $params = array() )
 		);
 
 	$Results->cols[] = array(
+			'th' => T_('Campaign name'),
+			'order' => 'ecmp_name',
+			'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_name$</b></a>',
+		);
+
+	$Results->cols[] = array(
 			'th' => T_('Email title'),
 			'order' => 'ecmp_email_title',
-			'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_email_title$</b></a>',
+			'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$&amp;tab=compose"><b>$ecmp_email_title$</b></a>',
 		);
 
 	$Results->cols[] = array(

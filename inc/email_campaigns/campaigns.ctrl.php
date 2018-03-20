@@ -189,7 +189,7 @@ switch( $action )
 		{	// Create new email campaign if admin want creates it from free users list:
 			$edited_EmailCampaign = new EmailCampaign();
 			$edited_EmailCampaign->set( 'enlt_ID', $Newsletter->ID );
-			$edited_EmailCampaign->set( 'email_title', $Newsletter->get( 'name' ) );
+			$edited_EmailCampaign->set( 'name', $Newsletter->get( 'name' ) );
 			$edited_EmailCampaign->dbinsert();
 			$Messages->add( T_('New email campaign has been created for the users selection.'), 'success' );
 		}
@@ -255,7 +255,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{	// Delete from DB if confirmed:
-			$msg = sprintf( T_('The email campaign "%s" has been deleted.'), $edited_EmailCampaign->dget( 'email_title' ) );
+			$msg = sprintf( T_('The email campaign "%s" has been deleted.'), $edited_EmailCampaign->dget( 'name' ) );
 			$edited_EmailCampaign->dbdelete();
 			unset( $edited_EmailCampaign );
 			forget_param( 'ecmp_ID' );
@@ -266,7 +266,7 @@ switch( $action )
 		}
 		else
 		{	// Check for restrictions if not confirmed yet:
-			if( ! $edited_EmailCampaign->check_delete( sprintf( T_('Cannot delete email campaign "%s"'), $edited_EmailCampaign->dget( 'email_title' ) ) ) )
+			if( ! $edited_EmailCampaign->check_delete( sprintf( T_('Cannot delete email campaign "%s"'), $edited_EmailCampaign->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -455,12 +455,12 @@ switch( $action )
 	case 'edit':
 		$AdminUI->set_page_manual_link( 'creating-an-email-campaign' );
 		$AdminUI->display_breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
-		$AdminUI->display_breadcrumbpath_add( isset( $edited_EmailCampaign ) ? $edited_EmailCampaign->get( 'email_title' ) : T_('New Campaign') );
+		$AdminUI->display_breadcrumbpath_add( isset( $edited_EmailCampaign ) ? $edited_EmailCampaign->get( 'name' ) : T_('New Campaign') );
 		break;
 	case 'copy':
 		$AdminUI->set_page_manual_link( 'duplicating-an-email-campaign' );
 		$AdminUI->display_breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
-		$AdminUI->display_breadcrumbpath_add( sprintf( T_('Duplicate [%s]'), $edited_EmailCampaign->get( 'email_title' ) ) );
+		$AdminUI->display_breadcrumbpath_add( sprintf( T_('Duplicate [%s]'), $edited_EmailCampaign->get( 'name' ) ) );
 		break;
 	default:
 	$AdminUI->display_breadcrumbpath_add( T_('Campaigns') );
@@ -535,7 +535,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_EmailCampaign->confirm_delete(
-				sprintf( T_('Delete email campaign "%s"?'), $edited_EmailCampaign->dget( 'email_title' ) ),
+				sprintf( T_('Delete email campaign "%s"?'), $edited_EmailCampaign->dget( 'name' ) ),
 				'campaign', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'edit':
