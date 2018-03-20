@@ -116,7 +116,8 @@ class UserList extends DataObjectList2
 				'level_min'           => NULL,    // integer, Level min
 				'level_max'           => NULL,    // integer, Level max
 				'org'                 => NULL,    // integer, Organization ID
-				'newsletter'          => NULL,    // integer, Newsletter ID
+				'newsletter'          => NULL,    // integer, Newsletter ID, users which are subscribed to newsletter
+				'not_newsletter'      => NULL,    // integer, Newsletter ID, users which are NOT subscribed to newsletter
 				'newsletter_subscribed' => 1,     // 1 - only users with active subscription, 0 - only unsubscribed users, NULL - both
 				'ecmp'                => NULL,    // integer, Email Campaign ID
 				'recipient_type'      => NULL,    // string, Recipient type of email campaign: 'filtered', 'sent', 'readytosend'
@@ -260,6 +261,11 @@ class UserList extends DataObjectList2
 			 * Restrict by newsletter
 			 */
 			memorize_param( 'newsletter', 'integer', $this->default_filters['newsletter'], $this->filters['newsletter'] );
+
+			/*
+			 * Restrict by not subscribed newsletter
+			 */
+			memorize_param( 'not_newsletter', 'integer', $this->default_filters['not_newsletter'], $this->filters['not_newsletter'] );
 
 			/*
 			 * Restrict by newsletter subscription activity
@@ -497,6 +503,11 @@ class UserList extends DataObjectList2
 		$this->filters['newsletter'] = param( 'newsletter', 'integer', $this->default_filters['newsletter'], true );
 
 		/*
+		 * Restrict by not subscribed newsletter ID
+		 */
+		$this->filters['not_newsletter'] = param( 'not_newsletter', 'integer', $this->default_filters['not_newsletter'], true );
+
+		/*
 		 * Restrict by newsletter subscription activity
 		 */
 		$this->filters['newsletter_subscribed'] = param( 'newsletter_subscribed', 'integer', $this->default_filters['newsletter_subscribed'], true );
@@ -620,7 +631,8 @@ class UserList extends DataObjectList2
 			$org_ID = isset( $this->query_params['where_org_ID'] ) ? $this->query_params['where_org_ID'] : $this->filters['org'];
 			$this->UserQuery->where_organization( $org_ID );
 		}
-		$this->UserQuery->where_newsletter( $this->filters['newsletter'], $this->filters['newsletter_subscribed']  );
+		$this->UserQuery->where_newsletter( $this->filters['newsletter'], $this->filters['newsletter_subscribed'] );
+		$this->UserQuery->where_not_newsletter( $this->filters['not_newsletter'] );
 		$this->UserQuery->where_email_campaign( $this->filters['ecmp'], $this->filters['recipient_type'], $this->filters['recipient_action'] );
 		if( isset( $this->query_params['where_viewed_user'] ) )
 		{	// Filter by user profile viewed:

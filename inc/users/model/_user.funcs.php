@@ -3484,7 +3484,10 @@ function callback_filter_userlist( & $Form )
 		$NewsletterCache->load_all();
 		if( count( $NewsletterCache->cache ) > 0 )
 		{
-			$Form->select_input_object( 'newsletter', get_param( 'newsletter' ), $NewsletterCache, T_('Subscribed to'), array( 'allow_none' => true ) );
+			$Form->begin_line( T_('Subscribed to') );
+				$Form->select_input_object( 'newsletter', get_param( 'newsletter' ), $NewsletterCache, '', array( 'allow_none' => true ) );
+				$Form->select_input_object( 'not_newsletter', get_param( 'not_newsletter' ), $NewsletterCache, '<label>'./* TRANS: Full sentence is "Subscribed to: <select> and not to: <select>"*/T_('and not to').':</label>', array( 'allow_none' => true ) );
+			$Form->end_line();
 		}
 	}
 	$Form->begin_line( T_('Has all these tags'), 'user_tag' );
@@ -5660,7 +5663,7 @@ function users_results_block( $params = array() )
 		$UserList->display( $params['display_params'] );
 	}
 
-	$user_list_buttons = array( T_('With current filtered list:') );
+	$user_list_buttons = array();
 
 	if( $params['display_btn_tags'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to add/remove tags from/to users:
@@ -5706,7 +5709,7 @@ function users_results_block( $params = array() )
 
 	if( count( $user_list_buttons ) )
 	{	// Display action buttons for users list:
-		echo '<p class="center">'.implode( ' ', $user_list_buttons ).'</p>';
+		echo '<p class="center">'.T_('With current filtered list:').' '.implode( ' ', $user_list_buttons ).'</p>';
 	}
 }
 
