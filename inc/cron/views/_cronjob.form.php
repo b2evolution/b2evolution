@@ -73,8 +73,6 @@ $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit sched
 			}
 		$Form->end_line();
 
-		$Form->duration_input( 'cjob_max_exec_time', $edited_Cronjob->get( 'max_exec_time' ), T_('Max execution time'), 'days', 'minutes', array( 'note' => T_( 'Leave empty for no limit' ) ) );
-
 	$Form->end_fieldset();
 
 	if( !$creating )

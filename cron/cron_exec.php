@@ -106,7 +106,7 @@ if( $is_cli )
 	// Init charset handling - this will also set the encoding for MySQL connection
 	init_charsets( $current_charset );
 }
-else
+elseif( ! is_admin_page() )
 { // This is a web request: (for testing purposes only. Not designed for production)
 
 	// Make sure the response is never cached:
@@ -193,8 +193,8 @@ else
 				}
 			}
 			$ctsk_name_insert = empty( $task->ctsk_name ) ? 'NULL' : $DB->quote( $task->ctsk_name );
-			$sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_repeat_variation, ctsk_max_exec_time, ctsk_name, ctsk_key, ctsk_params )
-							VALUES( '.$DB->quote( date2mysql( $new_start_datetime ) ).', '.$DB->quote( $task->ctsk_repeat_after ).', '.$DB->quote( $task->ctsk_repeat_variation ).', '.$DB->quote( $task->ctsk_max_exec_time ).', '
+			$sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_repeat_variation, ctsk_name, ctsk_key, ctsk_params )
+							VALUES( '.$DB->quote( date2mysql( $new_start_datetime ) ).', '.$DB->quote( $task->ctsk_repeat_after ).', '.$DB->quote( $task->ctsk_repeat_variation ).', '
 												.$ctsk_name_insert.', '.$DB->quote( $task->ctsk_key ).', '.$DB->quote( $task->ctsk_params ).' )';
 			$DB->query( $sql, 'Schedule repeated task.' );
 		}
@@ -216,7 +216,7 @@ else
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
 		// Set max execution time for each cron job separately:
-		set_max_execution_time( $task->ctsk_max_exec_time );
+		set_max_execution_time( $Settings->get( 'cjob_timeout_'.$task->ctsk_key ) );
 
 		// Try to execute cron job:
 		set_error_handler( 'cron_job_error_handler' );
@@ -283,7 +283,7 @@ detect_timeout_cron_jobs( $error_task );
 
 
 
-if( ! $is_cli )
+if( ! $is_cli && ! is_admin_page() )
 { // This is a web request:
 	echo '<p><a href="cron_exec.php">Refresh Now!</a></p>';
 	echo '<p>This page should refresh automatically in 15 seconds...</p>';

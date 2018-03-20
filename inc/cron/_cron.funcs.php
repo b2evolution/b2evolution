@@ -407,8 +407,9 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 	$SQL->SELECT( 'ctsk_ID, ctsk_name, ctsk_key' );
 	$SQL->FROM( 'T_cron__log' );
 	$SQL->FROM_add( 'INNER JOIN T_cron__task ON ctsk_ID = clog_ctsk_ID' );
+	$SQL->FROM_add( 'LEFT JOIN T_settings ON set_name = CONCAT( "cjob_timeout_", ctsk_key )' );
 	$SQL->WHERE( 'clog_status = "started"' );
-	$SQL->WHERE_and( 'UNIX_TIMESTAMP( clog_realstart_datetime ) < UNIX_TIMESTAMP() - ctsk_max_exec_time - 120 '.$mysql_time_difference );
+	$SQL->WHERE_and( 'UNIX_TIMESTAMP( clog_realstart_datetime ) < UNIX_TIMESTAMP() - IFNULL( set_value, 600 ) - 120 '.$mysql_time_difference );
 	$SQL->GROUP_BY( 'ctsk_ID' );
 	$timeout_tasks = $DB->get_results( $SQL );
 

@@ -9250,6 +9250,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12720, 'Upgrading cron tasks table...' ) )
+	{	// part of 6.10.1-stable
+		db_drop_col( 'T_cron__task', 'ctsk_max_exec_time' );
+		// Settings per cron job type like "cjob_timeout_send-non-activated-account-reminders" requires more length:
+		db_modify_col( 'T_settings', 'set_name', 'VARCHAR(64) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
