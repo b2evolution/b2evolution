@@ -624,8 +624,8 @@ class UserQuery extends SQL
 			$restrict_is_subscribed = ' AND enls_subscribed = '.( $is_subscribed ? '1' : '0' );
 		}
 
-		$this->SELECT_add( ', enls.enls_last_sent_manual_ts, enls.enls_last_open_ts, enls.enls_last_click_ts, enls.enls_send_count, enls.enls_subscribed, enls.enls_subscribed_ts, enls.enls_unsubscribed_ts, enls.enls_enlt_ID' );
-		$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription AS enls ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ).$restrict_is_subscribed );
+		$this->SELECT_add( ', enls_last_sent_manual_ts, enls_last_open_ts, enls_last_click_ts, enls_send_count, enls_subscribed, enls_subscribed_ts, enls_unsubscribed_ts, enls_enlt_ID' );
+		$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ).$restrict_is_subscribed );
 	}
 
 
