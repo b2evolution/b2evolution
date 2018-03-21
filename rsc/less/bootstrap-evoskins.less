@@ -1028,3 +1028,23 @@ div.edit_toolbars, div.message_toolbars {
 		}
 	}
 }
+
+// Widgets of container "Login Required" on disp=access_requires_login:
+.disp_access_requires_login {
+	.evo_widget {
+		&.widget_core_free_html.panel {
+			background: none;
+			border: none;
+			box-shadow: none;
+			margin: 0;
+			.panel-body {
+				padding: 0;
+			}
+		}
+		&.widget_core_user_login {
+			min-width: 290px;
+			max-width: 400px;
+			margin: 1.5em auto auto;
+		}
+	}
+}
