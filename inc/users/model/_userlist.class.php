@@ -124,6 +124,8 @@ class UserList extends DataObjectList2
 				'recipient_action'    => NULL,    // string, Recipient action on email campaign: 'img_loaded', 'link_clicked', 'cta1', 'cta2', 'cta3', 'liked', 'disliked', 'clicked_unsubscribe'
 				'user_tag'            => NULL,    // string, User tag
 				'not_user_tag'        => NULL,    // string, User tag
+				'poll'                => NULL,    // integer, Poll ID
+				'poll_option'         => NULL,    // integer, Poll option ID
 		) );
 	}
 
@@ -296,6 +298,16 @@ class UserList extends DataObjectList2
 			 * Restrict by user tag
 			 */
 			memorize_param( 'not_user_tag', 'string', $this->default_filters['not_user_tag'], $this->filters['not_user_tag'] );
+
+			/*
+			 * Restrict by poll
+			 */
+			memorize_param( 'poll', 'integer', $this->default_filters['poll'], $this->filters['poll'] );
+
+			/*
+			 * Restrict by poll option
+			 */
+			memorize_param( 'poll_option', 'integer', $this->default_filters['poll_option'], $this->filters['poll_option'] );
 
 			/*
 			 * Restrict by user fields
@@ -537,6 +549,16 @@ class UserList extends DataObjectList2
 		 */
 		$this->filters['not_user_tag'] = param( 'not_user_tag', 'string', $this->default_filters['user_tag'], true );
 
+		/*
+		 * Restrict by poll answer
+		 */
+		$this->filters['poll'] = param( 'poll', 'integer', $this->default_filters['poll'], true );
+
+		/*
+		 * Restrict by poll option answer
+		 */
+		$this->filters['poll_option'] = param( 'poll_option', 'integer', $this->default_filters['poll_option'], true );
+
 		// 'paged'
 		$this->page = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 
@@ -648,6 +670,10 @@ class UserList extends DataObjectList2
 			$this->UserQuery->where_group_level( $Settings->get('allow_anonymous_user_level_min'), $Settings->get('allow_anonymous_user_level_max') );
 		}
 		$this->UserQuery->where_tag( $this->filters['user_tag'], $this->filters['not_user_tag'] );
+		if( isset( $this->filters['poll'] ) || isset( $this->filters['poll_option'] ) )
+		{
+			$this->UserQuery->where_poll_answered( $this->filters['poll'], $this->filters['poll_option'] );
+		}
 
 		if( isset( $this->query_params['order_by_login_length'] ) && in_array( $this->query_params['order_by_login_length'], array( 'A', 'D' ) ) )
 		{

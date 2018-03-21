@@ -812,6 +812,41 @@ class UserQuery extends SQL
 		$this->WHERE_and( 'email_user_count > 1' );
 	}
 
+
+	/**
+	 * Restrict to users who voted for poll option
+	 *
+	 * @param integer Poll option ID
+	 */
+	function where_poll_answered( $poll_ID = NULL, $poll_option_ID = NULL )
+	{
+		global $DB;
+
+		if( empty( $poll_ID ) && empty( $poll_option_ID ) )
+		{ // No poll answered filter
+			return;
+		}
+
+		if( ! empty( $poll_option_ID ) )
+		{
+			$join_array = array( 'pans_user_ID = user_ID', 'pans_popt_ID = '.$DB->quote( $poll_option_ID ) );
+
+			if( ! empty( $poll_ID ) )
+			{
+				array_unshift( $join_array, 'pans_pqst_ID = '.$DB->quote( $poll_ID ) );
+			}
+			$this->FROM_add( 'INNER JOIN T_polls__answer ON '.implode( ' AND ', $join_array ) );
+		}
+		else
+		{
+			$this->FROM_add( 'INNER JOIN (
+					SELECT pans_user_ID
+					FROM T_polls__answer
+					WHERE pans_pqst_ID = '.$DB->quote( $poll_ID ).'
+					GROUP BY pans_user_ID
+				) AS poll_answers ON poll_answers.pans_user_ID = user_ID' );
+		}
+	}
 }
 
 ?>
