@@ -192,7 +192,7 @@ class poll_Widget extends ComponentWidget
 				echo '</table>';
 
 				global $evo_poll_answer_JS_is_initialized;
-				if( empty( $evo_poll_answer_JS_is_initialized ) && $Poll->get( 'max_answers' ) > 1 )
+				if( empty( $evo_poll_answer_JS_is_initialized ) || $Poll->get( 'max_answers' ) > 1 )
 				{	// Initialize JS code to restrict max answers per user and Fix answer long text width:
 				?>
 				<script type="text/javascript">
