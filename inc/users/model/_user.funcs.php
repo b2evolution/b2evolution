@@ -3500,48 +3500,8 @@ function callback_filter_userlist( & $Form )
 			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
 			'input_suffix'=> '</div>'	) );
 	$Form->end_line();
-	?>
-	<script type="text/javascript">
-	function init_autocomplete_tags( selector )
-	{
-		var tags = jQuery( selector ).val();
-		var tags_json = new Array();
-		if( tags.length > 0 )
-		{ // Get tags from <input>
-			tags = tags.split( ',' );
-			for( var t in tags )
-			{
-				tags_json.push( { id: tags[t], name: tags[t] } );
-			}
-		}
-
-		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
-		{
-			theme: 'facebook',
-			queryParam: 's',
-			propertyToSearch: 'name',
-			tokenValue: 'name',
-			preventDuplicates: true,
-			prePopulate: tags_json,
-			hintText: '<?php echo TS_('Type in a tag') ?>',
-			noResultsText: '<?php echo TS_('No results') ?>',
-			searchingText: '<?php echo TS_('Searching...') ?>',
-			jsonContainer: 'tags',
-		} );
-	}
-
-	jQuery( document ).ready( function()
-	{
-		jQuery( '#user_tag' ).hide();
-		init_autocomplete_tags( '#user_tag' );
-		init_autocomplete_tags( '#not_user_tag' );
-		<?php
-			// Don't submit a form by Enter when user is editing the tags
-			echo get_prevent_key_enter_js( '#token-input-user_tag, #token-input-not_user_tag' );
-		?>
-	} );
-	</script>
-	<?php
+	// Initialize JS to auto complete user tags fields:
+	echo_user_autocomplete_tags_js( '#user_tag, #not_user_tag' );
 
 	if( is_admin_page() )
 	{
@@ -4740,6 +4700,60 @@ function echo_userlist_tags_js()
 		var evo_js_lang_make_changes_now = \''.TS_('Make changes now!').'\';
 		var evo_js_userlist_tags_ajax_url = \''.$admin_url.'\';
 	</script>';
+}
+
+
+/**
+ * JavaScript to initialize auto complete user tags
+ *
+ * @param String Selectors of JavaScript object
+ */
+function echo_user_autocomplete_tags_js( $js_selectors )
+{
+?>
+	<script type="text/javascript">
+	function init_autocomplete_user_tags( selectors )
+	{
+		jQuery( selectors ).each( function()
+		{
+			var tags = jQuery( this ).val();
+			var tags_json = new Array();
+			if( tags.length > 0 )
+			{	// Get tags from <input>:
+				tags = tags.split( ',' );
+				for( var t in tags )
+				{
+					tags_json.push( { id: tags[t], name: tags[t] } );
+				}
+			}
+
+			jQuery( this ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
+			{
+				theme: 'facebook',
+				queryParam: 's',
+				propertyToSearch: 'name',
+				tokenValue: 'name',
+				preventDuplicates: true,
+				prePopulate: tags_json,
+				hintText: '<?php echo TS_('Type in a tag') ?>',
+				noResultsText: '<?php echo TS_('No results') ?>',
+				searchingText: '<?php echo TS_('Searching...') ?>',
+				jsonContainer: 'tags',
+			} );
+		} );
+	}
+
+	jQuery( document ).ready( function()
+	{
+		jQuery( '<?php echo $js_selectors; ?>' ).hide();
+		init_autocomplete_user_tags( '<?php echo $js_selectors; ?>' );
+		<?php
+			// Don't submit a form by Enter when user is editing the tags:
+			echo get_prevent_key_enter_js( str_replace( '#', '#token-input-', $js_selectors ) );
+		?>
+	} );
+	</script>
+<?php
 }
 
 

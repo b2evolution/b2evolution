@@ -111,36 +111,11 @@ $Form->begin_fieldset( T_('Click tracking') );
 		'input_suffix' => '</div>',
 	) );
 
+	// Initialize JS to auto complete user tags fields:
+	echo_user_autocomplete_tags_js( '#ecmp_user_tag_sendskip, #ecmp_user_tag_sendsuccess, #ecmp_user_tag, #ecmp_user_tag_cta1, #ecmp_user_tag_cta2, #ecmp_user_tag_cta3, #ecmp_user_tag_like, #ecmp_user_tag_dislike' );
+
 	?>
 	<script type="text/javascript">
-	function init_autocomplete_tags( selector )
-	{
-		var tags = jQuery( selector ).val();
-		var tags_json = new Array();
-		if( tags.length > 0 )
-		{ // Get tags from <input>
-			tags = tags.split( ',' );
-			for( var t in tags )
-			{
-				tags_json.push( { id: tags[t], name: tags[t] } );
-			}
-		}
-
-		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
-		{
-			theme: 'facebook',
-			queryParam: 's',
-			propertyToSearch: 'name',
-			tokenValue: 'name',
-			preventDuplicates: true,
-			prePopulate: tags_json,
-			hintText: '<?php echo TS_('Type in a tag') ?>',
-			noResultsText: '<?php echo TS_('No results') ?>',
-			searchingText: '<?php echo TS_('Searching...') ?>',
-			jsonContainer: 'tags',
-		} );
-	}
-
 	function update_campaign_recipients_count( ecmp_ID )
 	{
 		jQuery.ajax(
@@ -170,23 +145,6 @@ $Form->begin_fieldset( T_('Click tracking') );
 		} );
 		return false;
 	}
-
-	jQuery( document ).ready( function()
-	{
-		jQuery( '#ecmp_user_tag_sendskip, #ecmp_user_tag_sendsuccess, #ecmp_user_tag, #ecmp_user_tag_cta1, #ecmp_user_tag_cta2, #ecmp_user_tag_cta3, #ecmp_user_tag_like, #ecmp_user_tag_dislike' ).hide();
-		init_autocomplete_tags( '#ecmp_user_tag_sendskip' );
-		init_autocomplete_tags( '#ecmp_user_tag_sendsuccess' );
-		init_autocomplete_tags( '#ecmp_user_tag' );
-		init_autocomplete_tags( '#ecmp_user_tag_cta1' );
-		init_autocomplete_tags( '#ecmp_user_tag_cta2' );
-		init_autocomplete_tags( '#ecmp_user_tag_cta3' );
-		init_autocomplete_tags( '#ecmp_user_tag_like' );
-		init_autocomplete_tags( '#ecmp_user_tag_dislike' );
-		<?php
-			// Don't submit a form by Enter when user is editing the tags
-			echo get_prevent_key_enter_js( '#token-input-ecmp_user_tag_sendskip, #token-input-ecmp_user_tag_sendsuccess, #token-input-ecmp_user_tag, #token-input-ecmp_user_tag_cta1, #token-input-ecmp_user_tag_cta2, #token-input-ecmp_user_tag_cta3, #token-input-ecmp_user_tag_like, #token-input-ecmp_user_tag_dislike' );
-		?>
-	} );
 	</script>
 	<?php
 $Form->end_fieldset();

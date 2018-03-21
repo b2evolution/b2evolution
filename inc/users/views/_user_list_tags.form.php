@@ -54,13 +54,7 @@ $Form->end_fieldset();
 $Form->button( array( '', 'actionArray[update_tags]', T_('Make changes now!'), 'SaveButton' ) );
 
 $Form->end_form();
+
+// Initialize JS to auto complete user tags fields:
+echo_user_autocomplete_tags_js( '#add_user_tags, #remove_user_tags' );
 ?>
-<script type="text/javascript">
-jQuery( '#add_user_tags, #remove_user_tags' ).hide();
-init_autocomplete_tags( '#add_user_tags' );
-init_autocomplete_tags( '#remove_user_tags' );
-<?php
-// Don't submit a form by Enter when user is editing the tags
-echo get_prevent_key_enter_js( '#token-input-add_user_tag' );
-?>
-</script>
