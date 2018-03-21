@@ -21,30 +21,36 @@ echo '<div class="well">';
 // Create result set:
 $SQL = new SQL();
 $SQL->SELECT( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_name, ecmp_email_title, ecmp_email_defaultdest, ecmp_email_html, ecmp_email_text,
-		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
-		ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
-		enlt_ID, enlt_name,
-		SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS send_count,
-		SUM( IF( emlog_last_open_ts IS NOT NULL OR emlog_last_click_ts IS NOT NULL OR
-			csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) /
-			SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS open_rate,
-		SUM( IF( emlog_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
-		SUM( IF( emlog_last_click_ts IS NULL, 0, 1 ) ) AS click_count,
-		SUM( IF( csnd_cta1 = 1, 1, 0 ) ) AS cta1_count,
-		SUM( IF( csnd_cta2 = 1, 1, 0 ) ) AS cta2_count,
-		SUM( IF( csnd_cta3 = 1, 1, 0 ) ) AS cta3_count,
-		SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
-		SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
-		SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsubscribe_click_count' );
+	ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
+	ecmp_user_tag_sendskip, ecmp_user_tag_sendsuccess,
+	ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
+	enlt_ID, enlt_name,
+	sent.send_count, sent.open_rate, sent.open_count, sent.click_count,
+	sent.cta1_count, sent.cta2_count, sent.cta3_count, sent.like_count, sent.dislike_count, sent.unsubscribe_click_count' );
 $SQL->FROM( 'T_email__campaign' );
 $SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
-$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
-$SQL->FROM_add( 'LEFT JOIN T_email__log ON emlog_ID = csnd_emlog_ID' );
+$SQL->FROM_add( 'LEFT JOIN
+	(
+		SELECT
+			csnd_camp_ID,
+			SUM( IF( csnd_last_sent_ts IS NULL, 0, 1 ) ) AS send_count,
+			SUM( IF( csnd_cta1 = 1, 1, 0 ) ) AS cta1_count,
+			SUM( IF( csnd_cta2 = 1, 1, 0 ) ) AS cta2_count,
+			SUM( IF( csnd_cta3 = 1, 1, 0 ) ) AS cta3_count,
+			SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
+			SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
+			SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsubscribe_click_count,
+			SUM( IF( csnd_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
+			SUM( IF( csnd_last_click_ts IS NULL, 0, 1 ) ) AS click_count,
+			SUM( IF( csnd_last_open_ts IS NOT NULL OR csnd_last_click_ts IS NOT NULL OR
+				csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) /
+				SUM( IF( csnd_last_sent_ts IS NULL, 0, 1 ) ) AS open_rate
+		FROM T_email__campaign_send
+		WHERE csnd_emlog_ID IS NOT NULL
+		GROUP BY csnd_camp_ID
+	) AS sent
+		ON sent.csnd_camp_ID = ecmp_ID' );
 $SQL->WHERE( 'ecmp_ID ='.$DB->quote( $edited_EmailCampaign->ID ) );
-$SQL->GROUP_BY( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_name, ecmp_email_title, ecmp_email_defaultdest, ecmp_email_html, ecmp_email_text,
-		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
-		ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
-		enlt_ID, enlt_name' );
 
 if( isset( $params['enlt_ID'] ) )
 {
