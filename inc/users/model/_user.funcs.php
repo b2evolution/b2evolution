@@ -3561,7 +3561,7 @@ function callback_filter_userlist( & $Form )
 				'send_error' => T_('Send error'),
 				'skipped' => T_('Skipped')
 			);
-		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, T_('<span class="text-info">Campaign</span> Status'), '', array( 'allow_none' => true ) );
+		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, '<span class="text-info">'.T_('Campaign Status').'</span>', '', array( 'allow_none' => true ) );
 	}
 	echo '<br />';
 
