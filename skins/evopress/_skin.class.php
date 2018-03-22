@@ -91,6 +91,8 @@ class evopress_Skin extends Skin
 				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
 				'sidebar'                => array( NT_('Sidebar'), 80 ),
 				'404_page'               => array( NT_('404 Page'), 110 ),
+				'login_required'         => array( NT_('Login Required'), 120 ),
+				'access_denied'          => array( NT_('Access Denied'), 130 ),
 			);
 	}
 

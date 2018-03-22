@@ -89,6 +89,8 @@ class asevo_Skin extends Skin
 				'item_page'              => array( NT_('Item Page'), 55 ),
 				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
 				'sidebar'                => array( NT_('Sidebar'), 80 ),
+				'login_required'         => array( NT_('Login Required'), 90 ),
+				'access_denied'          => array( NT_('Access Denied'), 100 ),
 			);
 	}
 

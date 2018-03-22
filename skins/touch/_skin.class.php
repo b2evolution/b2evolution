@@ -62,6 +62,8 @@ class touch_Skin extends Skin
 				'mobile_navigation_menu' => array( NT_('Mobile: Navigation Menu'), 120 ),
 				'mobile_tools_menu'      => array( NT_('Mobile: Tools Menu'), 130 ),
 				'404_page'               => array( NT_('404 Page'), 140 ),
+				'login_required'         => array( NT_('Login Required'), 150 ),
+				'access_denied'          => array( NT_('Access Denied'), 160 ),
 			);
 	}
 

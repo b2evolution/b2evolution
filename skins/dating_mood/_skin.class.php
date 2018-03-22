@@ -91,6 +91,8 @@ class dating_mood_Skin extends Skin
 				'sidebar'                => array( NT_('Sidebar'), 80 ),
 				'footer'                 => array( NT_('Footer'), 100 ),
 				'404_page'               => array( NT_('404 Page'), 110 ),
+				'login_required'         => array( NT_('Login Required'), 120 ),
+				'access_denied'          => array( NT_('Access Denied'), 130 ),
 			);
 	}
 
