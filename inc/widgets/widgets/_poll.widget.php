@@ -121,7 +121,7 @@ class poll_Widget extends ComponentWidget
 			$poll_question = empty( $this->disp_params['poll_question'] ) ? $Poll->get( 'question_text' ) : $this->disp_params['poll_question'];
 			if( $poll_question !== '-' )
 			{	// Display a poll question only when it doesn't equal "-":
-				echo '<p>'.$poll_question.'</p>';
+				echo '<p class="evo_poll__question">'.$poll_question.'</p>';
 			}
 
 			$poll_options = $Poll->get_poll_options();

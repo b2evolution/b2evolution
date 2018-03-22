@@ -146,6 +146,7 @@ h2 {
 
 .wptouch-videos {
 	-ms-transform: translate3d(0,0,0);
+	        -webkit-transform: translate3d(0,0,0);
 	        transform: translate3d(0,0,0);
 }
 
@@ -479,15 +480,19 @@ a.post-arrow {
 	cursor: default;
 	border-radius: 5px;
 	-ms-transform: scale(1.0) rotate(0deg);
+	        -webkit-transform: scale(1.0) rotate(0deg);
 	        transform: scale(1.0) rotate(0deg);
-	transition-duration: 0.3s;
+	-webkit-transition-duration: 0.3s;
+	        transition-duration: 0.3s;
 	-webkit-touch-callout: none;
 }
 
 a.post-arrow-down {
 	-ms-transform: scale(1.0) rotate(90deg);
+	        -webkit-transform: scale(1.0) rotate(90deg);
 	        transform: scale(1.0) rotate(90deg);
-	transition-duration: 0.3s;
+	-webkit-transition-duration: 0.3s;
+	        transition-duration: 0.3s;
 }
 
 a.h2, h2.post-title {
@@ -930,8 +935,10 @@ h3#com-head img#com-arrow {
 	position: relative;
 	top: 1px;
 	-ms-transform: scale(1.0) rotate(0deg);
+	        -webkit-transform: scale(1.0) rotate(0deg);
 	        transform: scale(1.0) rotate(0deg);
-	transition-duration: 0.6s;
+	-webkit-transition-duration: 0.6s;
+	        transition-duration: 0.6s;
 }
 
 .comhead-open {
@@ -943,8 +950,10 @@ h3#com-head img#com-arrow {
 
 .com-arrow-down {
 	-ms-transform: scale(1.0) rotate(90deg) !important;
+	        -webkit-transform: scale(1.0) rotate(90deg) !important;
 	        transform: scale(1.0) rotate(90deg) !important;
-	transition-duration: 0.6s !important;
+	-webkit-transition-duration: 0.6s !important;
+	        transition-duration: 0.6s !important;
 }
 
 ol.commentlist li:first-child {
