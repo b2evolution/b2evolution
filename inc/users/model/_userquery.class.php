@@ -132,10 +132,10 @@ class UserQuery extends SQL
 		}
 
 		if( $params['join_lists'] )
-		{
+		{ // subscribed_list contains comma-separated list of newsletter IDs, "negative" IDs are unsubscribed to newsletter lists
 			$this->SELECT_add( ', subscribed_list' );
 			$this->FROM_add( 'LEFT JOIN (
-						SELECT enls_user_ID, GROUP_CONCAT( enls_enlt_ID ) AS subscribed_list, COUNT(*) AS subscribed_list_count
+						SELECT enls_user_ID, GROUP_CONCAT( IF( enls_subscribed = 1, enls_enlt_ID, CONCAT( "-", enls_enlt_ID ) ) ) AS subscribed_list, COUNT(*) AS subscribed_list_count
 						FROM T_email__newsletter_subscription
 						GROUP BY enls_user_ID
 					) AS subscribed_lists on subscribed_lists.enls_user_ID = user_ID' );
@@ -607,7 +607,7 @@ class UserQuery extends SQL
 	 * @param integer Newsletter ID
 	 * @param boolean|NULL TRUE - only users with active subscription, FALSE - only unsubscribed users, NULL - both
 	 */
-	function where_newsletter( $newsletter_ID, $is_subscribed = true)
+	function where_newsletter( $newsletter_ID, $is_subscribed = true )
 	{
 		global $DB;
 
@@ -624,8 +624,28 @@ class UserQuery extends SQL
 			$restrict_is_subscribed = ' AND enls_subscribed = '.( $is_subscribed ? '1' : '0' );
 		}
 
-		$this->SELECT_add( ', enls_last_sent_manual_ts, enls_last_open_ts, enls_last_click_ts, enls_send_count, enls_subscribed, enls_subscribed_ts, enls_unsubscribed_ts' );
+		$this->SELECT_add( ', enls_last_sent_manual_ts, enls_last_open_ts, enls_last_click_ts, enls_send_count, enls_subscribed, enls_subscribed_ts, enls_unsubscribed_ts, enls_enlt_ID' );
 		$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ).$restrict_is_subscribed );
+	}
+
+
+	/**
+	 * Select by not subscribed newsletter ID
+	 *
+	 * @param integer Newsletter ID
+	 */
+	function where_not_newsletter( $not_newsletter_ID )
+	{
+		global $DB;
+
+		$not_newsletter_ID = intval( $not_newsletter_ID );
+
+		if( empty( $not_newsletter_ID ) )
+		{
+			return;
+		}
+
+		$this->WHERE( 'user_ID NOT IN ( SELECT noenls.enls_user_ID FROM T_email__newsletter_subscription AS noenls WHERE noenls.enls_enlt_ID = '.$DB->quote( $not_newsletter_ID ).' AND noenls.enls_subscribed = 1 )' );
 	}
 
 
@@ -792,6 +812,41 @@ class UserQuery extends SQL
 		$this->WHERE_and( 'email_user_count > 1' );
 	}
 
+
+	/**
+	 * Restrict to users who voted for poll option
+	 *
+	 * @param integer Poll option ID
+	 */
+	function where_poll_answered( $poll_ID = NULL, $poll_option_ID = NULL )
+	{
+		global $DB;
+
+		if( empty( $poll_ID ) && empty( $poll_option_ID ) )
+		{ // No poll answered filter
+			return;
+		}
+
+		if( ! empty( $poll_option_ID ) )
+		{
+			$join_array = array( 'pans_user_ID = user_ID', 'pans_popt_ID = '.$DB->quote( $poll_option_ID ) );
+
+			if( ! empty( $poll_ID ) )
+			{
+				array_unshift( $join_array, 'pans_pqst_ID = '.$DB->quote( $poll_ID ) );
+			}
+			$this->FROM_add( 'INNER JOIN T_polls__answer ON '.implode( ' AND ', $join_array ) );
+		}
+		else
+		{
+			$this->FROM_add( 'INNER JOIN (
+					SELECT pans_user_ID
+					FROM T_polls__answer
+					WHERE pans_pqst_ID = '.$DB->quote( $poll_ID ).'
+					GROUP BY pans_user_ID
+				) AS poll_answers ON poll_answers.pans_user_ID = user_ID' );
+		}
+	}
 }
 
 ?>

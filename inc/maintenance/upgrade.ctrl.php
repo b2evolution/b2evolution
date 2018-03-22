@@ -27,6 +27,7 @@ global $current_User;
 global $basepath, $upgrade_path, $install_path;
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'maintenance', 'upgrade', true );
 
 // Used in the upgrade process

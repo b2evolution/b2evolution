@@ -19,6 +19,7 @@ load_class( 'automations/model/_automation.class.php', 'Automation' );
 load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
 
 // Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 param_action( '', true );

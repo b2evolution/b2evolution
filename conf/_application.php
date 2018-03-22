@@ -21,7 +21,7 @@ $app_version = '7.0.0-alpha';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2018-02-28';
+$app_date = '2018-03-21';
 
 /**
  * Long version string for checking differences
@@ -85,5 +85,6 @@ $modules = array(
 		'messaging',
 		'maintenance',
 		// 'central_antispam',		// will also require $enable_blacklist_server_API = true;
+		'export',
 	);
 ?>

@@ -4213,6 +4213,9 @@ div.other_profile_pictures img {
   display: inline-block;
   margin: 0 1ex 1ex 0;
 }
+.evo_poll__question {
+  font-weight: bold;
+}
 .evo_poll__table {
   margin-bottom: 14px;
   width: 100%;
@@ -4220,6 +4223,9 @@ div.other_profile_pictures img {
 .evo_poll__table td {
   padding: 2px 10px 2px 0;
   vertical-align: top;
+}
+.evo_poll__table td.evo_poll__title label {
+  font-weight: normal;
 }
 .evo_poll__table tr td:last-child {
   padding-right: 0;

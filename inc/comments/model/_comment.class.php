@@ -2893,13 +2893,13 @@ class Comment extends DataObject
 
 				if( empty( $this->ID ) )
 				{ // PREVIEW mode
-					$r = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by ').$this->get_author_name(), $image_link_rel, $params['image_class'], '', '', '#' );
+					$r = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by').' '.$this->get_author_name(), $image_link_rel, $params['image_class'], '', '', '#' );
 				}
 				else
 				{
 					$r = $Link->get_tag( array_merge( array(
 						'image_link_to'    => $image_link_to,
-						'image_link_title' => T_('Posted by ').$this->get_author_name(),
+						'image_link_title' => T_('Posted by').' '.$this->get_author_name(),
 						'image_link_rel'   => $image_link_rel,
 					), $params ) );
 				}

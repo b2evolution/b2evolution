@@ -134,7 +134,7 @@ class content_block_Widget extends ComponentWidget
 
 		$widget_Item = & $this->get_widget_Item();
 
-		if( ! in_array( $widget_Item->get( 'status' ), get_inskin_statuses( $Blog->ID, 'post' ) ) )
+		if( $widget_Item && ! in_array( $widget_Item->get( 'status' ), get_inskin_statuses( $Blog->ID, 'post' ) ) )
 		{	// Disable block caching for this widget because target Item is not public for current collection:
 			$this->disp_params['allow_blockcache'] = 0;
 		}

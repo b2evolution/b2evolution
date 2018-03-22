@@ -101,6 +101,8 @@ class photoblog_Skin extends Skin
 				'item_page'              => array( NT_('Item Page'), 55 ),
 				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
 				'404_page'               => array( NT_('404 Page'), 110 ),
+				'login_required'         => array( NT_('Login Required'), 120 ),
+				'access_denied'          => array( NT_('Access Denied'), 130 ),
 			);
 	}
 

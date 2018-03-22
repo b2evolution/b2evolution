@@ -4002,17 +4002,43 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				{ // this is not a notification email
 					break;
 				}
+			// Check a day notification limit for user settings "Notify me by email whenever":
 			case 'private_message_new':
+				// 'notify_messages' - "I receive a private message."
 			case 'private_messages_unread_reminder':
-			case 'post_new':
+				// 'notify_unread_messages' - "I have unread private messages for more than X seconds."(X = $unread_messsage_reminder_threshold)
 			case 'comment_new':
+				// 'notify_published_comments' - "a comment is published on one of my posts.",
+				// 'notify_comment_moderation' - "a comment is posted and I have permissions to moderate it.",
+				// 'notify_edit_cmt_moderation' - "a comment is modified and I have permissions to moderate it.",
+				// 'notify_meta_comments' - "a meta comment is posted.".
 			case 'comment_spam':
+				// 'notify_spam_cmt_moderation' - "a comment is reported as spam and I have permissions to moderate it."
+			case 'comments_unmoderated_reminder':
+				// 'send_cmt_moderation_reminder' - "comments are awaiting moderation for more than X seconds."(X = $comment_moderation_reminder_threshold)
+			case 'post_new':
+				// 'notify_post_moderation' - "a post is created and I have permissions to moderate it."
+				// 'notify_edit_pst_moderation' - "a post is modified and I have permissions to moderate it."
+			case 'posts_unmoderated_reminder':
+				// 'send_pst_moderation_reminder' - "posts are awaiting moderation for more than X seconds."(X = $post_moderation_reminder_threshold)
+			case 'posts_stale_alert':
+				// 'send_pst_stale_alert' - "there are stale posts and I have permission to moderate them."
+			case 'account_activate':
+				// 'send_activation_reminder' - "my account was deactivated or is not activated for more than X seconds."(X - $activate_account_reminder_threshold)
+			case 'account_new':
+				// 'notify_new_user_registration' - "a new user has registered."
 			case 'account_activated':
+				// 'notify_activated_account' - "an account was activated."
 			case 'account_closed':
+				// 'notify_closed_account' - "an account was closed."
 			case 'account_reported':
+				// 'notify_reported_account' - "an account was reported."
 			case 'account_changed':
+				// 'notify_changed_account' - "an account was changed."
+			case 'scheduled_task_error_report':
+				// 'notify_cronjob_error' - "a scheduled task ends with an error or timeout."
 			case 'automation_owner_notification':
-				// this is a notificaiton email
+				// 'notify_automation_owner' - "one of my automations wants to notify me."
 				$email_limit_setting = 'notification_email_limit';
 				$email_counter_setting = 'last_notification_email';
 				if( !check_allow_new_email( $email_limit_setting, $email_counter_setting, $User->ID ) )
@@ -8570,40 +8596,17 @@ function render_inline_tags( $Object, $tags, $params = array() )
 			case 'folder':
 				if( $File->is_dir() )
 				{
-					$image_folder_params = array(
-						'before_gallery'        => '<div class="bGallery">',
-						'after_gallery'         => '</div>',
-						'gallery_table_start'   => '',//'<table cellpadding="0" cellspacing="3" border="0" class="image_index">',
-						'gallery_table_end'     => '',//'</table>',
-						'gallery_row_start'     => '',//"\n<tr>",
-						'gallery_row_end'       => '',//"\n</tr>",
-						'gallery_cell_start'    => '<div class="evo_post_gallery__image">',//"\n\t".'<td valign="top"><div class="bGallery-thumbnail">',
-						'gallery_cell_end'      => '</div>',//'</div></td>',
-						'gallery_image_size'    => 'crop-80x80',
-						'gallery_image_limit'   => 1000,
-						'gallery_colls'         => 5,
-						'gallery_order'         => '', // 'ASC', 'DESC', 'RAND'
-						'gallery_link_rel'      => '#', // '#' - Use default 'lightbox[g'.$this->ID.']' to make one "gallery" per directory
-					);
+					$current_folder_params = $params;
 
 					if( ! empty( $inline[3] ) ) // check if second colon is present
 					{
-						global $thumbnail_sizes;
-
-						// Get the file caption
-						$options = explode( ':', $inline[4] );
-
-						if( ! empty( $options[0] ) && isset( $thumbnail_sizes[$options[0]] ) )
-						{ // thumbnail image size
-							$image_folder_params['gallery_image_size'] = $options[0];
-						}
-
-						if( ! empty( $options[1] ) && preg_match( '/^\d+$/', $options[1] ) )
+						if( preg_match( '/^\d+$/', $inline[4] ) )
 						{ // limit number of images
-							$image_folder_params['gallery_image_limit'] = (int) $options[1];
+							$current_folder_params['gallery_image_limit'] = (int) $inline[4];
 						}
 					}
-					$inlines[$current_inline] = $File->get_gallery( $image_folder_params );
+
+					$inlines[$current_inline] = $File->get_gallery( $current_folder_params );
 				}
 				else
 				{

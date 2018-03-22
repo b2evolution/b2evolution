@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
-global $DB, $Session, $modules;
+global $DB, $Session, $modules, $Messages;
 
 param( 'type', 'string', true );
 param( 'email_ID', 'integer', true );
@@ -79,6 +79,8 @@ switch( $type )
 									$email_User->add_usertags( $assigned_user_tag );
 									$email_User->dbupdate();
 								}
+
+								$Messages->add( T_('Your vote has been recorded, thank you!'), 'success' );
 								break;
 
 							case 4: // Vote dislike and add appropriate usertag
@@ -95,6 +97,8 @@ switch( $type )
 								}
 								// Do not track click
 								$skip_click_tracking = true;
+
+								$Messages->add( T_('Your vote has been recorded, thank you!'), 'success' );
 								break;
 
 							case 5: // Call to Action 1
@@ -115,6 +119,14 @@ switch( $type )
 								}
 								break;
 						}
+
+						// We are not using header_redirect below so we need to transfer Messages to the next page:
+						if( $Messages->count() )
+						{	// Set Messages into user's session, so they get restored on the next page (after redirect):
+							$Session->set( 'Messages', $Messages );
+						}
+
+						$Session->dbsave();
 					}
 				}
 			}

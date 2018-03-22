@@ -834,6 +834,35 @@ if( !$Messages->has_errors() )
 			header_redirect( '?ctrl=user&user_tab=marketing&user_ID='.$edited_User->ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
+
+		case 'export':
+			// Export user to XML/ZIP file:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $edited_User->ID, true );
+
+			// Do not append Debuglog to XML file!
+			$debug = false;
+
+			// Do not append Debug JSlog to XML file!
+			$debug_jslog = false;
+
+			param( 'options', 'array', array() );
+
+			// Set option to enable export for user:
+			$options['user'] = true;
+
+			// Export collection data:
+			load_funcs( 'export/model/_export.funcs.php' );
+			export_xml( array(
+					'user_ID' => $edited_User->ID,
+					'options' => $options,
+				) );
+			break;
+		
 	}
 }
 
@@ -949,6 +978,12 @@ if( $display_mode != 'js')
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-activity-tab' );
+			break;
+		case 'export':
+			$AdminUI->breadcrumbpath_add( T_('Export'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-export-xml-zip' );
 			break;
 	}
 
@@ -1119,6 +1154,10 @@ switch( $action )
 
 				$AdminUI->disp_view( 'users/views/_user_activity.view.php' );
 				$AdminUI->disp_payload_end();
+				break;
+			case 'export':
+				// Display user export form:
+				$AdminUI->disp_view( 'users/views/_user_export.form.php' );
 				break;
 
 			case 'deldata':

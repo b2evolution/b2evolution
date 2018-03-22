@@ -483,6 +483,23 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	}
 
 
+	/* Login Required */
+	if( array_key_exists( 'login_required', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['login_required']['wico_ID'];
+		add_basic_widget( $wico_id, 'free_html', 'core', 10, array( 'content' => '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>' ) );
+		add_basic_widget( $wico_id, 'user_login', 'core', 20, array( 'title' => T_( 'Log in to your account' ) ) );
+	}
+
+
+	/* Access Denied */
+	if( array_key_exists( 'access_denied', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['access_denied']['wico_ID'];
+		add_basic_widget( $wico_id, 'free_html', 'core', 10, array( 'content' => '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>' ) );
+	}
+
+
 	/* Mobile Footer */
 	if( array_key_exists( 'mobile_footer', $blog_containers ) )
 	{

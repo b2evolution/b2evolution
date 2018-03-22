@@ -257,6 +257,17 @@ function campaign_td_recipient_action( $row, $recipient_action )
 
 
 /**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_campaign_results_block( & $Form )
+{
+	$Form->text_input( 'username', get_param( 'username' ), 40, T_('Username or email address') );
+}
+
+
+/**
  * Display the campaigns results table
  *
  * @param array Params
@@ -273,29 +284,37 @@ function campaign_results_block( $params = array() )
 
 	// Create result set:
 	$SQL = new SQL();
-	$SQL->SELECT( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
-			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
-			ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
-			enlt_ID, enlt_name,
-			SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS send_count,
-			SUM( IF( emlog_last_open_ts IS NOT NULL OR emlog_last_click_ts IS NOT NULL OR
-				csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) /
-				SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS open_rate,
-			SUM( IF( emlog_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
-			SUM( IF( emlog_last_click_ts IS NULL, 0, 1 ) ) AS click_count,
-			SUM( IF( csnd_cta1 = 1, 1, 0 ) ) AS cta1_count,
-			SUM( IF( csnd_cta2 = 1, 1, 0 ) ) AS cta2_count,
-			SUM( IF( csnd_cta3 = 1, 1, 0 ) ) AS cta3_count,
-			SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
-			SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
-			SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsubscribe_click_count' );
+	$SQL->SELECT( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_name, ecmp_email_title, ecmp_email_defaultdest, ecmp_email_html, ecmp_email_text,
+		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
+		ecmp_user_tag_sendskip, ecmp_user_tag_sendsuccess,
+		ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
+		enlt_ID, enlt_name,
+		sent.send_count, sent.open_rate, sent.open_count, sent.click_count,
+		sent.cta1_count, sent.cta2_count, sent.cta3_count, sent.like_count, sent.dislike_count, sent.unsubscribe_click_count' );
 	$SQL->FROM( 'T_email__campaign' );
 	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
-	$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
-	$SQL->FROM_add( 'LEFT JOIN T_email__log ON emlog_ID = csnd_emlog_ID' );
+	$SQL->FROM_add( 'LEFT JOIN
+		(
+			SELECT
+				csnd_camp_ID,
+				SUM( IF( csnd_last_sent_ts IS NULL, 0, 1 ) ) AS send_count,
+				SUM( IF( csnd_cta1 = 1, 1, 0 ) ) AS cta1_count,
+				SUM( IF( csnd_cta2 = 1, 1, 0 ) ) AS cta2_count,
+				SUM( IF( csnd_cta3 = 1, 1, 0 ) ) AS cta3_count,
+				SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
+				SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
+				SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsubscribe_click_count,
+				SUM( IF( csnd_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
+				SUM( IF( csnd_last_click_ts IS NULL, 0, 1 ) ) AS click_count,
+				SUM( IF( csnd_last_open_ts IS NOT NULL OR csnd_last_click_ts IS NOT NULL OR
+					csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) /
+					SUM( IF( csnd_last_sent_ts IS NULL, 0, 1 ) ) AS open_rate
+			FROM T_email__campaign_send
+			WHERE csnd_emlog_ID IS NOT NULL
+			GROUP BY csnd_camp_ID
+		) AS sent
+			ON sent.csnd_camp_ID = ecmp_ID' );
 	$SQL->WHERE( 1 );
-	$SQL->GROUP_BY( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
-			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag, enlt_ID, enlt_name' );
 
 	$count_SQL = new SQL();
 	$count_SQL->SELECT( 'COUNT( ecmp_ID )' );
@@ -303,9 +322,27 @@ function campaign_results_block( $params = array() )
 	$count_SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 
 	if( isset( $params['enlt_ID'] ) )
-	{
+	{	// Filter by Newsletter:
 		$SQL->WHERE_and( 'ecmp_enlt_ID = '.$DB->quote( $params['enlt_ID'] ) );
 		$count_SQL->WHERE_and( 'ecmp_enlt_ID = '.$DB->quote( $params['enlt_ID'] ) );
+	}
+
+	$username = param( 'username', 'string', NULL );
+	if( ! empty( $username ) )
+	{	// Filter by user login, first name, last name, nickname:
+		$sql_where = array();
+		$kw_array = explode( ' ', $username );
+		foreach( $kw_array as $kw )
+		{	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
+			$sql_where[] = 'CONCAT_WS( " ", user_login, user_firstname, user_lastname, user_nickname, user_email ) LIKE '.$DB->quote( '%'.$kw.'%' );
+		}
+		$sql_where = implode( ' OR ', $sql_where );
+		$SQL->WHERE_and( $sql_where );
+		$count_SQL->WHERE_and( $sql_where );
+		// Join additional tables for the user columns:
+		$SQL->FROM_add( 'LEFT JOIN T_users ON csnd_user_ID = user_ID' );
+		$count_SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
+		$count_SQL->FROM_add( 'LEFT JOIN T_users ON csnd_user_ID = user_ID' );
 	}
 
 	$Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
@@ -316,6 +353,8 @@ function campaign_results_block( $params = array() )
 	{ // User must has a permission to edit emails
 		$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new'.( isset( $params['enlt_ID'] ) ? '&amp;enlt_ID='.$params['enlt_ID'] : '' ), T_('Create new campaign').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
+
+	$Results->filter_area = array( 'callback' => 'filter_campaign_results_block' );
 
 	$Results->cols[] = array(
 			'th' => T_('ID'),
@@ -343,9 +382,15 @@ function campaign_results_block( $params = array() )
 		);
 
 	$Results->cols[] = array(
+			'th' => T_('Campaign name'),
+			'order' => 'ecmp_name',
+			'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_name$</b></a>',
+		);
+
+	$Results->cols[] = array(
 			'th' => T_('Email title'),
 			'order' => 'ecmp_email_title',
-			'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_email_title$</b></a>',
+			'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$&amp;tab=compose"><b>$ecmp_email_title$</b></a>',
 		);
 
 	$Results->cols[] = array(
@@ -463,7 +508,8 @@ function campaign_results_block( $params = array() )
 			'td' => action_icon( T_('Edit this email campaign...'), 'properties', $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$' )
 				.( $current_User->check_perm( 'emails', 'edit' ) ?
 				// Display an action icon to delete newsletter if current User has a perm:
-				action_icon( T_('Delete this email address!'), 'delete', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=delete&amp;'.url_crumb('campaign') ) ) : '' )
+				action_icon( T_('Duplicate this email campaign...'), 'copy', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=copy' ) )
+				.action_icon( T_('Delete this email campaign!'), 'delete', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=delete&amp;'.url_crumb('campaign') ) ) : '' )
 		);
 
 	// Display results:

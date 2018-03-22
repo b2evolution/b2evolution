@@ -132,7 +132,7 @@ function cron_log_append( $message, $type = NULL, $nl = "\n" )
  */
 function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
 {
-	global $cron_log_actions_num;
+	global $cron_log_actions_num, $Timer;
 
 	if( ! isset( $cron_log_actions_num ) )
 	{	// Initialize a var to count cron log actions:
@@ -141,6 +141,11 @@ function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
 
 	// Mark this as separate action:
 	$cron_log_actions_num++;
+
+	// Log time:
+	$message .= '<p class="note">Action #'.$cron_log_actions_num.' Finished. Elapsed time since beginning of task: '.$Timer->get_duration( 'cron_exec_action' ).' seconds</p>';
+	// Reset timer for next action:
+	$Timer->start( 'cron_exec_action' );
 
 	// Append cron log:
 	cron_log_append( $message, $type, $nl );
@@ -158,7 +163,7 @@ function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
  */
 function call_job( $job_key, $job_params = array() )
 {
-	global $DB, $inc_path, $Plugins, $admin_url, $is_web;
+	global $DB, $inc_path, $Plugins, $admin_url, $is_web, $Timer;
 
 	global $result_message, $result_status, $timestop, $time_difference;
 
@@ -201,8 +206,15 @@ function call_job( $job_key, $job_params = array() )
 			return $result_message;
 		}
 
+		// Start timer for each separate action,
+		// time is printed out on calling of the function cron_log_action_end()
+		$Timer->start( 'cron_exec_action' );
+
 		// INCLUDE THE JOB FILE AND RUN IT:
 		$error_code = require $controller;
+
+		// Stop timer of each separate action:
+		$Timer->stop( 'cron_exec_action' );
 	}
 
 	if( is_array( $result_message ) )
@@ -242,8 +254,8 @@ function call_job( $job_key, $job_params = array() )
 	else
 	{	// Is CLI mode?
 		$result_message_text = str_replace(
-			array( '<br>', '<b>', '</b>', '&#8800;', '&#8804;', '&#8805;' ),
-			array( "\n", '*', '*', '!=', '<=', '>=' ),
+			array( '<br>', '<b>', '</b>', '<code>', '</code>', '&#8800;', '&#8804;', '&#8805;' ),
+			array( "\n", '*', '*', '`', '`', '!=', '<=', '>=' ),
 			$result_message_text );
 	}
 
@@ -361,7 +373,7 @@ function cron_job_name( $job_key, $job_name = '', $job_params = '' )
 					$EmailCampaignCache = & get_EmailCampaignCache();
 					if( $EmailCampaign = $EmailCampaignCache->get_by_ID( $job_params['ecmp_ID'], false, false ) )
 					{
-						$email_campaign_title = $EmailCampaign->get( 'email_title' );
+						$email_campaign_title = $EmailCampaign->get( 'name' );
 					}
 				}
 				$job_name = sprintf( $job_name, $Settings->get( 'email_campaign_chunk_size' ), $email_campaign_title );
@@ -382,14 +394,22 @@ function cron_job_name( $job_key, $job_name = '', $job_params = '' )
  */
 function detect_timeout_cron_jobs( $error_task = NULL )
 {
-	global $DB, $time_difference, $cron_timeout_delay, $admin_url;
+	global $DB, $time_difference, $admin_url;
+
+	// Convert time difference to mysql format:
+	$mysql_time_difference = intval( $time_difference );
+	if( $mysql_time_difference >= 0 )
+	{	// Negative value already has a sign "-", but for positive value we must add a sigh "+" for correct mysql operation below:
+		$mysql_time_difference = '+ '.$mysql_time_difference;
+	}
 
 	$SQL = new SQL( 'Find cron timeouts' );
 	$SQL->SELECT( 'ctsk_ID, ctsk_name, ctsk_key' );
 	$SQL->FROM( 'T_cron__log' );
 	$SQL->FROM_add( 'INNER JOIN T_cron__task ON ctsk_ID = clog_ctsk_ID' );
+	$SQL->FROM_add( 'LEFT JOIN T_settings ON set_name = CONCAT( "cjob_timeout_", ctsk_key )' );
 	$SQL->WHERE( 'clog_status = "started"' );
-	$SQL->WHERE_and( 'clog_realstart_datetime < '.$DB->quote( date2mysql( time() + $time_difference - $cron_timeout_delay ) ) );
+	$SQL->WHERE_and( 'UNIX_TIMESTAMP( clog_realstart_datetime ) < UNIX_TIMESTAMP() - IFNULL( set_value, 600 ) - 120 '.$mysql_time_difference );
 	$SQL->GROUP_BY( 'ctsk_ID' );
 	$timeout_tasks = $DB->get_results( $SQL );
 
