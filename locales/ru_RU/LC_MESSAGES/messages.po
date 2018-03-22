@@ -44189,7 +44189,7 @@ msgstr "Проблемы содержания"
 
 #: ../../../skins_fallback_v5/_help.disp.php:35
 msgid ""
-"This is an independent website published solely under the reponsibility of "
+"This is an independent website published solely under the responsibility of "
 "its owner."
 msgstr ""
 "Это независимый веб сайт, публикуемый исключительно под ответственность его "

@@ -44419,7 +44419,7 @@ msgstr "Problèmes de contenu"
 
 #: ../../../skins_fallback_v5/_help.disp.php:35
 msgid ""
-"This is an independent website published solely under the reponsibility of "
+"This is an independent website published solely under the responsibility of "
 "its owner."
 msgstr ""
 "Ceci est un site web indépendant publié sous la responsabilité exclusive de "

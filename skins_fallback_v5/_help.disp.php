@@ -32,7 +32,7 @@ if( isset( $Blog ) && $Blog->get_setting( 'allow_access' ) != 'public' )
 
 echo '<h2>'.T_('Content issues').'</h2>';
 
-echo '<p>'.T_('This is an independent website published solely under the reponsibility of its owner.').'</p>';
+echo '<p>'.T_('This is an independent website published solely under the responsibility of its owner.').'</p>';
 
 echo '<p>'.sprintf( T_('In case of concerns with the contents of this website/section, please <a %s>contact the owner of this website/section</a>.'), 'href="'.$Blog->get_contact_url().'"' ).'</p>';
 
