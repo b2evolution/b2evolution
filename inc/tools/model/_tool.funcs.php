@@ -764,9 +764,9 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
  * @param integer Number of email campaigns
  * @param array Newsletter IDs
  */
-function tool_create_sample_campaigns( $num_campaigns, $campaign_lists )
+function tool_create_sample_campaigns( $num_campaigns, $campaign_lists, $send_campaign_emails )
 {
-	global $Messages, $DB, $Debuglog, $baseurl, $email_send_simulate_only;
+	global $Messages, $DB, $Debuglog, $Settings, $UserSettings, $baseurl, $email_send_simulate_only;
 
 	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
 
@@ -788,9 +788,16 @@ function tool_create_sample_campaigns( $num_campaigns, $campaign_lists )
 	$count = 1;
 	$campaign_lists_max_index = count( $campaign_lists ) - 1;
 
+	$DB->begin();
+
 	// Temporarily simulate email sending
 	$temp_email_send_simulate_only = $email_send_simulate_only;
 	$email_send_simulate_only = true;
+
+	// Temporarily increase email campaign chunk size
+	$temp_email_campaign_chunk_size = $Settings->get( 'email_campaign_chunk_size' );
+	$Settings->set( 'email_campaign_chunk_size', 10000 );
+	$Settings->dbupdate();
 
 	for( $i = 1; $i <= $num_campaigns; $i++ )
 	{
@@ -851,25 +858,36 @@ Button examples:
 			}
 			if( ! empty( $loop_user_IDs ) )
 			{	// Only if we have found the users in DB
-				//$EmailCampaign->add_recipients( $loop_user_IDs );
-				$EmailCampaign->send_all_emails( false, $loop_user_IDs );
+				if( $send_campaign_emails )
+				{
+					$EmailCampaign->send_all_emails( false, $loop_user_IDs );
+					// Randomly set values
+					$DB->query( 'UPDATE T_email__campaign_send
+							SET
+								csnd_clicked_unsubscribe = IF( RAND() > 0.95, 1, 0 ),
+								csnd_last_open_ts = IF( RAND() > 0.7, NOW(), NULL ),
+								csnd_last_click_ts = IF( RAND() > 0.7, NOW(), NULL ),
+								csnd_like = IF( RAND() > 0.75, 1, IF( RAND() > 0.8, -1, 0 ) ),
+								csnd_cta1 = IF( RAND() > 0.85, 1, 0 ),
+								csnd_cta2 = IF( RAND() > 0.85, 1, 0 ),
+								csnd_cta3 = IF( RAND() > 0.85, 1, 0 )
+							WHERE
+								csnd_camp_ID = '.$EmailCampaign->ID );
 
-				// Randomly set values
-				$DB->query( 'UPDATE T_email__campaign_send
-						SET
-							csnd_clicked_unsubscribe = IF( RAND() > 0.95, 1, 0 ),
-							csnd_last_open_ts = IF( RAND() > 0.7, NOW(), NULL ),
-							csnd_last_click_ts = IF( RAND() > 0.7, NOW(), NULL ),
-							csnd_like = IF( RAND() > 0.75, 1, IF( RAND() > 0.8, -1, 0 ) ),
-							csnd_cta1 = IF( RAND() > 0.85, 1, 0 ),
-							csnd_cta2 = IF( RAND() > 0.85, 1, 0 ),
-							csnd_cta3 = IF( RAND() > 0.85, 1, 0 )
-						WHERE
-							csnd_camp_ID = '.$EmailCampaign->ID );
+					// Decrement last email count part in 'last_newsletter' user setting. This will bypass the newsletter limit setting of the users.
+					$DB->query( 'UPDATE T_users__usersettings
+							SET uset_value = CONCAT( SUBSTRING_INDEX( uset_value, "_", 1 ), "_", CONVERT( SUBSTRING_INDEX( uset_value, "_", -1 ), SIGNED INTEGER ) - 1 )
+							WHERE uset_name = "last_newsletter" AND uset_user_ID IN ('.$DB->quote( $loop_user_IDs ).')' );
+
+					// We need to reset the user settings so the above update query changes are used
+					$UserSettings->reset();
+				}
+				else
+				{
+					$EmailCampaign->add_recipients( $loop_user_IDs );
+				}
 			}
 		}
-
-		//$Messages->clear();
 
 		if( $count % 20 == 0 )
 		{	// Display a process of creating by one dot for 20 campaigns:
@@ -883,6 +901,12 @@ Button examples:
 
 	// Restore simulate email sending setting
 	$email_send_simulate_only = $temp_email_send_simulate_only;
+
+	// Restore emaili campaign chunk size
+	$Settings->set( 'email_campaign_chunk_size', $temp_email_campaign_chunk_size );
+	$Settings->dbupdate();
+
+	$DB->commit();
 
 	echo ' OK.';
 
