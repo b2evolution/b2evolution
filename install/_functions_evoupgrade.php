@@ -10182,6 +10182,64 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		upg_task_end();
 	}
+
+	if( upg_task_start( 14340, 'Upgrading email campaign table...' ) )//copy of 12680
+	{	// part of 6.10.0-beta
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_user_tag_sendskip' => 'VARCHAR(255) NULL AFTER ecmp_auto_send',
+				'ecmp_user_tag_sendsuccess' => 'VARCHAR(255) NULL AFTER ecmp_user_tag_sendskip',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14350, 'Upgrading polls table...' ) )//copy of 12690
+	{ // part of 6.10.0-beta
+		db_add_col( 'T_polls__question', 'pqst_max_answers', 'INT(11) UNSIGNED NOT NULL DEFAULT 1 AFTER pqst_question_text' );
+
+		// Remove autoincrement first
+		$DB->query( 'ALTER TABLE T_polls__answer MODIFY pans_ID INT(11) UNSIGNED NOT NULL' );
+
+		// Drop indexes
+		$DB->query( 'ALTER TABLE T_polls__answer DROP INDEX `PRIMARY`, DROP INDEX pans_pqst_user_ID' );
+
+		// Drop previous primary column
+		db_drop_col( 'T_polls__answer', 'pans_ID' );
+
+		// Add new primary key
+		$DB->query( 'ALTER TABLE T_polls__answer ADD PRIMARY KEY (pans_pqst_ID, pans_user_ID, pans_popt_ID)' );
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14360, 'Upgrading cron tasks table...' ) )//copy of 12700
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_cron__task', 'ctsk_max_exec_time', 'INT UNSIGNED DEFAULT 600 AFTER ctsk_repeat_variation' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14370, 'Upgrading email campaign table...' ) )//copy of 12710
+	{ // part of 6.10.1-stable
+		db_add_col( 'T_email__campaign', 'ecmp_name', 'VARCHAR(255) NOT NULL AFTER ecmp_enlt_ID' );
+		$DB->query( 'UPDATE T_email__campaign SET ecmp_name = ecmp_email_title' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14380, 'Upgrading cron tasks table...' ) )//copy of 12720
+	{	// part of 6.10.1-stable
+		db_drop_col( 'T_cron__task', 'ctsk_max_exec_time' );
+		// Settings per cron job type like "cjob_timeout_send-non-activated-account-reminders" requires more length:
+		db_modify_col( 'T_settings', 'set_name', 'VARCHAR(64) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14390, 'Upgrading email campaign table...' ) )//copy of 12730
+	{ // part of 6.10.1-stable
+		db_add_col( 'T_email__campaign', 'ecmp_email_defaultdest', 'VARCHAR(255) NULL AFTER ecmp_email_title' );
+		$DB->query( 'UPDATE T_email__campaign SET ecmp_email_defaultdest = '.$DB->quote( $baseurl ) );
+		upg_task_end();
+	}
 	/****************************************************************************
 	 * END OF THE COPIED BLOCKS
 	 ****************************************************************************/
