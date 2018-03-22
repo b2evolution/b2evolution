@@ -106,7 +106,7 @@ if( $is_cli )
 	// Init charset handling - this will also set the encoding for MySQL connection
 	init_charsets( $current_charset );
 }
-else
+elseif( ! is_admin_page() )
 { // This is a web request: (for testing purposes only. Not designed for production)
 
 	// Make sure the response is never cached:
@@ -215,6 +215,9 @@ else
 		// The job may need to know its ID and name (to set logical locks for example):
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
+		// Set max execution time for each cron job separately:
+		set_max_execution_time( $Settings->get( 'cjob_timeout_'.$task->ctsk_key ) );
+
 		// Try to execute cron job:
 		set_error_handler( 'cron_job_error_handler' );
 		try
@@ -280,7 +283,7 @@ detect_timeout_cron_jobs( $error_task );
 
 
 
-if( ! $is_cli )
+if( ! $is_cli && ! is_admin_page() )
 { // This is a web request:
 	echo '<p><a href="cron_exec.php">Refresh Now!</a></p>';
 	echo '<p>This page should refresh automatically in 15 seconds...</p>';

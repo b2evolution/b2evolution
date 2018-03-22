@@ -483,6 +483,15 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	}
 
 
+	/* Login Required */
+	add_basic_widget( $blog_id, 'Login Required', 'free_html', 'core', 10, array( 'content' => '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>' ) );
+	add_basic_widget( $blog_id, 'Login Required', 'user_login', 'core', 20, array( 'title' => T_( 'Log in to your account' ) ) );
+
+
+	/* Access Denied */
+	add_basic_widget( $blog_id, 'Access Denied', 'free_html', 'core', 10, array( 'content' => '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>' ) );
+
+
 	/* Mobile Footer */
 	if( array_key_exists( 'mobile_footer', $blog_containers ) )
 	{

@@ -19,9 +19,10 @@ load_funcs( 'cron/_cron.funcs.php' );
 $current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
-$AdminUI->set_path( 'options', 'cron' );
+$AdminUI->set_path( 'options', 'cron', 'list' );
 
 param( 'action', 'string', 'list' );
+param( 'tab', 'string', 'list' );
 
 if( param( 'ctsk_ID', 'integer', '', true) )
 {// Load cronjob from cache:
@@ -182,6 +183,49 @@ switch( $action )
 		// We have EXITed already at this point!!
 		break;
 
+	case 'settings':
+		// Update settings of cron jobs:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'cronsettings' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		$cron_jobs = get_cron_jobs_config( 'name' );
+		foreach( $cron_jobs as $cron_job_key => $cron_job_name )
+		{
+			// Max execution time:
+			$Settings->set( 'cjob_timeout_'.$cron_job_key, param_duration( 'cjob_timeout_'.$cron_job_key ) );
+
+			// Additional settings:
+			switch( $cron_job_key )
+			{
+				case 'send-email-campaign':
+					if( $current_User->check_perm( 'emails', 'edit' ) )
+					{	// Allow to edit email cron setting "Chunk Size" only if user has a permission:
+						$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
+					}
+
+					// Delay between chunks:
+					$Settings->set( 'email_campaign_cron_repeat', param_duration( 'email_campaign_cron_repeat' ) );
+
+					// Delay between chunks in case all remaining recipients have reached max # of emails for the current day:
+					$Settings->set( 'email_campaign_cron_limited', param_duration( 'email_campaign_cron_limited' ) );
+					break;
+			}
+		}
+
+		// Update settings:
+		$Settings->dbupdate();
+
+		$Messages->add( T_('Scheduler settings have been updated.'), 'success' );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=crontab&tab='.$tab, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
 
 	case 'view':
 		$cjob_ID = param( 'cjob_ID', 'integer', true );
@@ -198,8 +242,10 @@ switch( $action )
 		break;
 
 	case 'list':
-		// Detect timed out tasks:
-		detect_timeout_cron_jobs();
+		if( $tab == 'list' )
+		{	// Detect timed out tasks:
+			detect_timeout_cron_jobs();
+		}
 
 		break;
 }
@@ -223,7 +269,19 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'scheduled-job-info' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'scheduled-jobs-list' );
+		switch( $tab )
+		{
+			case 'settings':
+				$AdminUI->set_path( 'options', 'cron', 'settings' );
+				$AdminUI->set_page_manual_link( 'scheduled-jobs-settings' );
+				break;
+			case 'test':
+				$AdminUI->set_path( 'options', 'cron', 'test' );
+				$AdminUI->set_page_manual_link( 'scheduled-jobs-test' );
+				break;
+			default:
+				$AdminUI->set_page_manual_link( 'scheduled-jobs-list' );
+		}
 		break;
 }
 
@@ -259,7 +317,17 @@ switch( $action )
 
 	default:
 		// Display VIEW:
-		$AdminUI->disp_view( 'cron/views/_cronjob_list.view.php' );
+		switch( $tab )
+		{
+			case 'settings':
+				$AdminUI->disp_view( 'cron/views/_cronjob_settings.form.php' );
+				break;
+			case 'test':
+				$AdminUI->disp_view( 'cron/views/_cronjob_test.view.php' );
+				break;
+			default:
+				$AdminUI->disp_view( 'cron/views/_cronjob_list.view.php' );
+		}
 }
 
 // End payload block:

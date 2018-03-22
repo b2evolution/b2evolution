@@ -121,7 +121,7 @@ class poll_Widget extends ComponentWidget
 			$poll_question = empty( $this->disp_params['poll_question'] ) ? $Poll->get( 'question_text' ) : $this->disp_params['poll_question'];
 			if( $poll_question !== '-' )
 			{	// Display a poll question only when it doesn't equal "-":
-				echo '<p>'.$poll_question.'</p>';
+				echo '<p class="evo_poll__question">'.$poll_question.'</p>';
 			}
 
 			$poll_options = $Poll->get_poll_options();
@@ -192,7 +192,7 @@ class poll_Widget extends ComponentWidget
 				echo '</table>';
 
 				global $evo_poll_answer_JS_is_initialized;
-				if( empty( $evo_poll_answer_JS_is_initialized ) && $Poll->get( 'max_answers' ) > 1 )
+				if( empty( $evo_poll_answer_JS_is_initialized ) || $Poll->get( 'max_answers' ) > 1 )
 				{	// Initialize JS code to restrict max answers per user and Fix answer long text width:
 				?>
 				<script type="text/javascript">

@@ -3844,6 +3844,9 @@ input.btn-lg {
 .evo_item_workflow_form .evo_item_workflow_form__fields .btn {
   margin-bottom: 15px;
 }
+.evo_poll__question {
+  font-weight: bold;
+}
 .evo_poll__table {
   margin-bottom: 14px;
   width: 100%;
@@ -3851,6 +3854,9 @@ input.btn-lg {
 .evo_poll__table td {
   padding: 2px 10px 2px 0;
   vertical-align: top;
+}
+.evo_poll__table td.evo_poll__title label {
+  font-weight: normal;
 }
 .evo_poll__table tr td:last-child {
   padding-right: 0;
@@ -4950,4 +4956,18 @@ div.message_toolbars {
 }
 .accordion-caret .accordion-toggler.collapsed:before {
   content: '\f0da';
+}
+.disp_access_requires_login .evo_widget.widget_core_free_html.panel {
+  background: none;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+}
+.disp_access_requires_login .evo_widget.widget_core_free_html.panel .panel-body {
+  padding: 0;
+}
+.disp_access_requires_login .evo_widget.widget_core_user_login {
+  min-width: 290px;
+  max-width: 400px;
+  margin: 1.5em auto auto;
 }

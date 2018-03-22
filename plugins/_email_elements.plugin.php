@@ -218,21 +218,21 @@ class email_elements_plugin extends Plugin
 			switch( type )
 			{
 				case 'button':
-					shortTag = '[button:' + url + ']'+text+'[/button]';
+					shortTag = '[button' + ( url == '' ? '' : ':' + url ) + ']'+text+'[/button]';
 					break;
 
 				case 'like':
-					shortTag = '[like:' + url + ']'+text+'[/like]';
+					shortTag = '[like' + ( url == '' ? '' : ':' + url ) + ']'+text+'[/like]';
 					break;
 
 				case 'dislike':
-					shortTag = '[dislike:' + url + ']'+text+'[/dislike]'
+					shortTag = '[dislike' + ( url == '' ? '' : ':' + url ) + ']'+text+'[/dislike]'
 					break;
 
 				case 'cta':
 					var cta_num = jQuery( 'select[name=cta_num]', '#email_element_button_wrapper' ).val();
 					var button_type = jQuery( 'select[name=button_type]', '#email_element_button_wrapper' ).val();
-					shortTag = '[cta:' + cta_num + ':' + button_type + ':' + url + ']'+text+'[/cta]'
+					shortTag = '[cta:' + cta_num + ':' + button_type + ( url == '' ? '' : ':' + url ) + ']'+text+'[/cta]'
 					break;
 			}
 			textarea_wrap_selection( myField, shortTag, '', 0 );
@@ -292,8 +292,9 @@ class email_elements_plugin extends Plugin
 	function RenderEmailAsHtml( & $params )
 	{
 		$content = & $params['data'];
+		$default_destination = isset( $params['EmailCampaign'] ) && !empty( $params['EmailCampaign']->email_defaultdest ) ? $params['EmailCampaign']->email_defaultdest : '';
 
-		$search_pattern = '#\[(button|like|dislike|cta):([^\[\]]*?)](.*?)\[\/\1]#';
+		$search_pattern = '#\[(button|like|dislike|cta):?([^\[\]]*?)](.*?)\[\/\1]#';
 		preg_match_all( $search_pattern, $content, $matches );
 
 		if( ! empty( $matches[0] ) )
@@ -306,16 +307,34 @@ class email_elements_plugin extends Plugin
 						$url = trim( $matches[2][$i] );
 						$button_text = trim( $matches[3][$i] );
 
-						$link_tag = get_link_tag( $url, $button_text, 'div.btn a+a.btn-primary' );
+						if( empty( $url ) )
+						{
+							$url = $default_destination;
+						}
+
+						if( empty( $button_text ) || empty( $url ) || validate_url( $url ) )
+						{
+							$link_tag = $current_element;
+						}
+						else
+						{
+							$link_tag = get_link_tag( $url, $button_text, 'div.btn a+a.btn-primary' );
+						}
 						break;
 
 					case 'like':
 					case 'dislike':
 						$url = trim( $matches[2][$i] );
 						$button_text = trim( $matches[3][$i] );
-						if( empty( $button_text ) || empty( $url ) )
+
+						if( empty( $url ) )
 						{
-							$link_tag = '';
+							$url = $default_destination;
+						}
+
+						if( empty( $button_text ) || empty( $url ) || validate_url( $url ) )
+						{
+							$link_tag = $current_element;
 						}
 						else
 						{
@@ -328,24 +347,29 @@ class email_elements_plugin extends Plugin
 						$options = explode( ':', $matches[2][$i], 3 );
 						$cta_num = trim( $options[0] );
 						$button_type = trim( $options[1] );
-						$url = trim( $options[2] );
+						$url = isset( $options[2] ) ? trim( $options[2] ) : '';
 						$text = trim( $matches[3][$i] );
+
+						if( empty( $url ) )
+						{
+							$url = $default_destination;
+						}
 
 						if( ! in_array( $cta_num, $this->cta_numbers ) )
 						{
-							$link_tag = '<span style="color: red;">'.T_('Invalid CTA number parameter').'</span>';
+							$link_tag = $current_element;
 							break;
 						}
 
 						if( ! in_array( $button_type, $this->cta_button_types ) )
 						{
-							$link_tag = '<span style="color: red;">'.T_('Invalid CTA button type parameter').'</span>';
+							$link_tag = $current_element;
 							break;
 						}
 
-						if( empty( $text ) || empty( $url ) )
+						if( empty( $text ) || empty( $url ) || validate_url( $url ) )
 						{
-							$link_tag = '';
+							$link_tag = $current_element;
 						}
 						else
 						{

@@ -2184,10 +2184,26 @@ class _core_Module extends Module
 					$AdminUI->add_menu_entries( 'options', array(
 						'system' => array(
 							'text' => T_('Status'),
-							'href' => '?ctrl=system' ),
+							'href' => $admin_url.'?ctrl=system' ),
 						'cron' => array(
 							'text' => T_('Scheduler'),
-							'href' => '?ctrl=crontab' ) ) );
+							'href' => $admin_url.'?ctrl=crontab',
+							'entries' => array(
+								'list' => array(
+									'text' => T_('List'),
+									'href' => $admin_url.'?ctrl=crontab'
+								),
+								'settings' => array(
+									'text' => T_('Settings'),
+									'href' => $admin_url.'?ctrl=crontab&amp;tab=settings'
+								),
+								'test' => array(
+									'text' => T_('Test'),
+									'href' => $admin_url.'?ctrl=crontab&amp;tab=test'
+								),
+							)
+						)
+					) );
 				}
 				if( $perm_spam )
 				{ // Permission to view antispam:

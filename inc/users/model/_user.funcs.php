@@ -3496,7 +3496,10 @@ function callback_filter_userlist( & $Form )
 		$NewsletterCache->load_all();
 		if( count( $NewsletterCache->cache ) > 0 )
 		{
-			$Form->select_input_object( 'newsletter', get_param( 'newsletter' ), $NewsletterCache, T_('Subscribed to'), array( 'allow_none' => true ) );
+			$Form->begin_line( T_('Subscribed to') );
+				$Form->select_input_object( 'newsletter', get_param( 'newsletter' ), $NewsletterCache, '', array( 'allow_none' => true ) );
+				$Form->select_input_object( 'not_newsletter', get_param( 'not_newsletter' ), $NewsletterCache, '<label>'./* TRANS: Full sentence is "Subscribed to: <select> and not to: <select>"*/T_('and not to').':</label>', array( 'allow_none' => true ) );
+			$Form->end_line();
 		}
 	}
 	$Form->begin_line( T_('Has all these tags'), 'user_tag' );
@@ -3509,48 +3512,8 @@ function callback_filter_userlist( & $Form )
 			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
 			'input_suffix'=> '</div>'	) );
 	$Form->end_line();
-	?>
-	<script type="text/javascript">
-	function init_autocomplete_tags( selector )
-	{
-		var tags = jQuery( selector ).val();
-		var tags_json = new Array();
-		if( tags.length > 0 )
-		{ // Get tags from <input>
-			tags = tags.split( ',' );
-			for( var t in tags )
-			{
-				tags_json.push( { id: tags[t], name: tags[t] } );
-			}
-		}
-
-		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
-		{
-			theme: 'facebook',
-			queryParam: 's',
-			propertyToSearch: 'name',
-			tokenValue: 'name',
-			preventDuplicates: true,
-			prePopulate: tags_json,
-			hintText: '<?php echo TS_('Type in a tag') ?>',
-			noResultsText: '<?php echo TS_('No results') ?>',
-			searchingText: '<?php echo TS_('Searching...') ?>',
-			jsonContainer: 'tags',
-		} );
-	}
-
-	jQuery( document ).ready( function()
-	{
-		jQuery( '#user_tag' ).hide();
-		init_autocomplete_tags( '#user_tag' );
-		init_autocomplete_tags( '#not_user_tag' );
-		<?php
-			// Don't submit a form by Enter when user is editing the tags
-			echo get_prevent_key_enter_js( '#token-input-user_tag, #token-input-not_user_tag' );
-		?>
-	} );
-	</script>
-	<?php
+	// Initialize JS to auto complete user tags fields:
+	echo_user_autocomplete_tags_js( '#user_tag, #not_user_tag' );
 
 	if( is_admin_page() )
 	{
@@ -3570,7 +3533,7 @@ function callback_filter_userlist( & $Form )
 				'send_error' => T_('Send error'),
 				'skipped' => T_('Skipped')
 			);
-		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, T_('<span class="text-info">Campaign</span> Status'), '', array( 'allow_none' => true ) );
+		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, '<span class="text-info">'.T_('Campaign Status').'</span>', '', array( 'allow_none' => true ) );
 	}
 	echo '<br />';
 
@@ -4753,6 +4716,60 @@ function echo_userlist_tags_js()
 
 
 /**
+ * JavaScript to initialize auto complete user tags
+ *
+ * @param String Selectors of JavaScript object
+ */
+function echo_user_autocomplete_tags_js( $js_selectors )
+{
+?>
+	<script type="text/javascript">
+	function init_autocomplete_user_tags( selectors )
+	{
+		jQuery( selectors ).each( function()
+		{
+			var tags = jQuery( this ).val();
+			var tags_json = new Array();
+			if( tags.length > 0 )
+			{	// Get tags from <input>:
+				tags = tags.split( ',' );
+				for( var t in tags )
+				{
+					tags_json.push( { id: tags[t], name: tags[t] } );
+				}
+			}
+
+			jQuery( this ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
+			{
+				theme: 'facebook',
+				queryParam: 's',
+				propertyToSearch: 'name',
+				tokenValue: 'name',
+				preventDuplicates: true,
+				prePopulate: tags_json,
+				hintText: '<?php echo TS_('Type in a tag') ?>',
+				noResultsText: '<?php echo TS_('No results') ?>',
+				searchingText: '<?php echo TS_('Searching...') ?>',
+				jsonContainer: 'tags',
+			} );
+		} );
+	}
+
+	jQuery( document ).ready( function()
+	{
+		jQuery( '<?php echo $js_selectors; ?>' ).hide();
+		init_autocomplete_user_tags( '<?php echo $js_selectors; ?>' );
+		<?php
+			// Don't submit a form by Enter when user is editing the tags:
+			echo get_prevent_key_enter_js( str_replace( '#', '#token-input-', $js_selectors ) );
+		?>
+	} );
+	</script>
+<?php
+}
+
+
+/**
  * Display user report form
  *
  * @param array Params
@@ -5672,7 +5689,7 @@ function users_results_block( $params = array() )
 		$UserList->display( $params['display_params'] );
 	}
 
-	$user_list_buttons = array( T_('With current filtered list:') );
+	$user_list_buttons = array();
 
 	if( $params['display_btn_tags'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to add/remove tags from/to users:
@@ -5697,7 +5714,7 @@ function users_results_block( $params = array() )
 		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 		if( $edited_EmailCampaign = & get_session_EmailCampaign() )
 		{
-			$campaign_button_text = sprintf( T_('Use this selection for campaign "%s"'), $edited_EmailCampaign->get( 'email_title' ) );
+			$campaign_button_text = sprintf( T_('Use this selection for campaign "%s"'), $edited_EmailCampaign->get( 'name' ) );
 			$campaign_button_class = 'btn-primary';
 			$campaign_action = 'update_users';
 			$campaign_ID_param = '&amp;ecmp_ID='.$edited_EmailCampaign->ID;
@@ -5718,7 +5735,7 @@ function users_results_block( $params = array() )
 
 	if( count( $user_list_buttons ) )
 	{	// Display action buttons for users list:
-		echo '<p class="center">'.implode( ' ', $user_list_buttons ).'</p>';
+		echo '<p class="center">'.T_('With current filtered list:').' '.implode( ' ', $user_list_buttons ).'</p>';
 	}
 }
 
@@ -5745,6 +5762,7 @@ function users_results( & $UserList, $params = array() )
 			'display_name'       => true,
 			'order_name'         => 'user_lastname, user_firstname',
 			'display_email'      => false,
+			'email_link_type'    => NULL,
 			'display_role'       => false,
 			'display_priority'   => false,
 			'display_gender'     => true,
@@ -5928,7 +5946,7 @@ function users_results( & $UserList, $params = array() )
 			'th_class' => 'small',
 			'td_class' => 'small',
 			'order' => 'user_email',
-			'td' => '$user_email$'
+			'td' => '%user_td_email( #user_email#, "'.$params['email_link_type'].'", {row} )%'
 		);
 	}
 
@@ -6060,7 +6078,7 @@ function users_results( & $UserList, $params = array() )
 	{	// Display subscribed lists:
 		$UserList->cols[] = array(
 				'th' => T_('Subscribed List'),
-				'td' =>  '%user_td_subscribed_list( #subscribed_list# )%',
+				'td' =>  '%user_td_subscribed_list( #subscribed_list#, #user_email# )%',
 				'order' => 'subscribed_list_count',
 				'th_class' => 'small',
 			);
@@ -6345,14 +6363,15 @@ function users_results( & $UserList, $params = array() )
 	}
 
 	if( $params['display_enls_send_count'] )
-	{ // Display email campaign send count:
+	{	// Display email campaign send count:
+		global $admin_url;
 		$UserList->cols[] = array(
 				'th' => T_('# of campaigns sent'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'right',
 				'order' => 'enls_send_count',
 				'default_dir' => 'D',
-				'td' => '$enls_send_count$',
+				'td' => '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID=$enls_enlt_ID$&amp;username=$user_login$">$enls_send_count$</a>',
 			);
 	}
 
@@ -6458,6 +6477,29 @@ function get_report_status_text( $status )
 {
 	$statuses = get_report_statuses();
 	return isset( $statuses[ $status ] ) ? $statuses[ $status ] : '';
+}
+
+
+/**
+ * Helper to display email address in cell of users table
+ *
+ * @param string Email address
+ * @param string|NULL Link type: 'newsletter_campaigns'
+ * @param object|NULL Object with user data
+ */
+function user_td_email( $email, $link_type = NULL, $user_row = NULL )
+{
+	$r = $email;
+
+	switch( $link_type )
+	{
+		case 'newsletter_campaigns':
+			global $admin_url;
+			$r = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID='.$user_row->enls_enlt_ID.'&amp;username='.rawurlencode( $email ).'">'.$r.'</a>';
+			break;
+	}
+
+	return $r;
 }
 
 
@@ -6608,9 +6650,10 @@ function user_td_status( $user_status, $user_ID )
  * Get list of subscribed newsletters/list
  *
  * @param string Comma delimited list of newsletter IDs
+ * @param string User email address
  * @return string
  */
-function user_td_subscribed_list( $lists )
+function user_td_subscribed_list( $lists, $user_email = '' )
 {
 	global $current_User, $admin_url;
 
@@ -6634,13 +6677,14 @@ function user_td_subscribed_list( $lists )
 
 		if( $loop_List = $NewsletterCache->get_by_ID( $list_ID, false ) )
 		{
-			if( $current_User->check_perm( 'options', 'edit' ) )
-			{
-				$lists_array[] = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'"'
-						.($unsubscribed_list ? ' style="text-decoration: line-through;"' : '' ).'>'.$loop_List->get( 'name' ).'</a>';
+			if( $current_User->check_perm( 'emails', 'view' ) )
+			{	// Display a newsletter as link if current use has a permission to view newsletters list:
+				$user_email_filter = ( empty( $user_email ) ? '' : '&amp;filter=new&amp;keywords='.rawurlencode( $user_email ) );
+				$lists_array[] = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'&amp;tab=subscribers'.$user_email_filter.'"'
+						.( $unsubscribed_list ? ' style="text-decoration: line-through;"' : '' ).'>'.$loop_List->get( 'name' ).'</a>';
 			}
 			else
-			{
+			{	// Display a newsletter as text if user has no permission:
 				$lists_array[] = $loop_List->get( 'name' );
 			}
 		}

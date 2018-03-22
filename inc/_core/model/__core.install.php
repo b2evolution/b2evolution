@@ -59,7 +59,7 @@ $schema_queries = array(
 	'T_settings' => array(
 		'Creating table for Settings',
 		"CREATE TABLE T_settings (
-			set_name VARCHAR(50) COLLATE ascii_general_ci NOT NULL,
+			set_name VARCHAR(64) COLLATE ascii_general_ci NOT NULL,
 			set_value VARCHAR(10000) COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY ( set_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -551,7 +551,9 @@ $schema_queries = array(
 			ecmp_ID                   INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			ecmp_date_ts              TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			ecmp_enlt_ID              INT UNSIGNED NOT NULL,
+			ecmp_name                 VARCHAR(255) NOT NULL,
 			ecmp_email_title          VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+			ecmp_email_defaultdest    VARCHAR(255) NULL,
 			ecmp_email_html           TEXT NULL COLLATE utf8mb4_unicode_ci,
 			ecmp_email_text           TEXT NULL COLLATE utf8mb4_unicode_ci,
 			ecmp_email_plaintext      TEXT NULL COLLATE utf8mb4_unicode_ci,

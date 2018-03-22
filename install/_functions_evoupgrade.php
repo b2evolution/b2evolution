@@ -9237,6 +9237,34 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12700, 'Upgrading cron tasks table...' ) )
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_cron__task', 'ctsk_max_exec_time', 'INT UNSIGNED DEFAULT 600 AFTER ctsk_repeat_variation' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12710, 'Upgrading email campaign table...' ) )
+	{ // part of 6.10.1-stable
+		db_add_col( 'T_email__campaign', 'ecmp_name', 'VARCHAR(255) NOT NULL AFTER ecmp_enlt_ID' );
+		$DB->query( 'UPDATE T_email__campaign SET ecmp_name = ecmp_email_title' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12720, 'Upgrading cron tasks table...' ) )
+	{	// part of 6.10.1-stable
+		db_drop_col( 'T_cron__task', 'ctsk_max_exec_time' );
+		// Settings per cron job type like "cjob_timeout_send-non-activated-account-reminders" requires more length:
+		db_modify_col( 'T_settings', 'set_name', 'VARCHAR(64) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12730, 'Upgrading email campaign table...' ) )
+	{ // part of 6.10.1-stable
+		db_add_col( 'T_email__campaign', 'ecmp_email_defaultdest', 'VARCHAR(255) NULL AFTER ecmp_email_title' );
+		$DB->query( 'UPDATE T_email__campaign SET ecmp_email_defaultdest = '.$DB->quote( $baseurl ) );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

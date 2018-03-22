@@ -440,7 +440,12 @@ C message size exceeds',
 				break;
 
 			default:
-				return parent::getx( $parname );
+				$value = parent::getx( $parname );
+				if( $value === NULL && strpos( $parname, 'cjob_timeout_' ) === 0 )
+				{	// Set default 10 minutes for max execution time of each cron job type:
+					$value = 600;
+				}
+				return $value;
 		}
 	}
 

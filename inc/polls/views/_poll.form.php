@@ -136,12 +136,25 @@ if( $edited_Poll->ID > 0 )
 			'td'    => '%poll_option_td_option( {Obj} )%',
 		);
 
+	/**
+	 * Get the Poll answer as link
+	 *
+	 * @param integer Poll option ID
+	 * @param integer Count of votes for this option
+	 * @return string
+	 */
+	function poll_option_td_answers( $option_ID, $answers_count )
+	{
+		global $edited_Poll, $admin_url;
+		return '<a href="'.$admin_url.'?ctrl=users&amp;poll='.$edited_Poll->ID.'&amp;poll_option='.$option_ID.'&amp;filter=new">'.$answers_count.'</a>';
+	}
+
 	$Results->cols[] = array(
 			'th'       => T_('Answers'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'right',
 			'order'    => 'answers_count',
-			'td'       => '$answers_count$',
+			'td'       => '%poll_option_td_answers( #popt_ID#, #answers_count# )%',
 		);
 
 	/**

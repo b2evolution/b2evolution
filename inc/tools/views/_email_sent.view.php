@@ -41,7 +41,7 @@ param( 'email', 'string', '', true );
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE emlog_ID, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_last_open_ts, emlog_last_click_ts, emlog_camp_ID, ecmp_email_title' );
+$SQL->SELECT( 'SQL_NO_CACHE emlog_ID, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_last_open_ts, emlog_last_click_ts, emlog_camp_ID, ecmp_name' );
 $SQL->FROM( 'T_email__log' );
 $SQL->FROM_add( 'LEFT JOIN T_email__campaign ON ecmp_ID = emlog_camp_ID' );
 
@@ -154,8 +154,8 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('Email campaign'),
-		'order' => 'ecmp_email_title',
-		'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$emlog_camp_ID$">$ecmp_email_title$</a>',
+		'order' => 'ecmp_name',
+		'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$emlog_camp_ID$">$ecmp_name$</a>',
 	);
 
 $Results->cols[] = array(
