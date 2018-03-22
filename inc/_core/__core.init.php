@@ -1150,12 +1150,12 @@ class _core_Module extends Module
 			// PLACE HOLDER FOR FILES MODULE:
 			$entries['site']['entries']['files'] = NULL;
 
-			if( $perm_spam || $perm_options || $perm_maintenance || $perm_emails )
+			if( $perm_admin_normal && $perm_options )
 			{
 				$entries['site']['entries'][] = array( 'separator' => true );
 
 				if( $perm_emails )
-				{
+				{	// Emails:
 					$entries['site']['entries']['email'] = array(
 							'text' => T_('Emails'),
 							'href' => $admin_url.'?ctrl=newsletters',
@@ -1197,22 +1197,21 @@ class _core_Module extends Module
 								);
 				}
 
+				// System:
 				$entries['site']['entries']['system'] = array(
 						'text' => T_('System'),
 						'href' => $admin_url.'?ctrl=system',
+						'entries' => array(
+							'status' => array(
+								'text' => T_('Status').'&hellip;',
+								'href' => $admin_url.'?ctrl=system',
+							),
+							'crontab' => array(
+								'text' => T_('Scheduler').'&hellip;',
+								'href' => $admin_url.'?ctrl=crontab',
+							),
+						)
 					);
-
-				if( $perm_options )
-				{
-					$entries['site']['entries']['system']['entries']['status'] = array(
-							'text' => T_('Status').'&hellip;',
-							'href' => $admin_url.'?ctrl=system',
-						);
-					$entries['site']['entries']['system']['entries']['crontab'] = array(
-							'text' => T_('Scheduler').'&hellip;',
-							'href' => $admin_url.'?ctrl=crontab',
-						);
-				}
 
 				if( $perm_spam )
 				{
@@ -1221,10 +1220,7 @@ class _core_Module extends Module
 							'href' => $admin_url.'?ctrl=antispam',
 						);
 				}
-			}
 
-			if( $perm_options )
-			{	// Global settings:
 				$entries['site']['entries']['system']['entries']['regional'] = array(
 						'text' => T_('Regional').'&hellip;',
 						'href' => $admin_url.'?ctrl=regional',
@@ -2162,10 +2158,26 @@ class _core_Module extends Module
 					$AdminUI->add_menu_entries( 'options', array(
 						'system' => array(
 							'text' => T_('Status'),
-							'href' => '?ctrl=system' ),
+							'href' => $admin_url.'?ctrl=system' ),
 						'cron' => array(
 							'text' => T_('Scheduler'),
-							'href' => '?ctrl=crontab' ) ) );
+							'href' => $admin_url.'?ctrl=crontab',
+							'entries' => array(
+								'list' => array(
+									'text' => T_('List'),
+									'href' => $admin_url.'?ctrl=crontab'
+								),
+								'settings' => array(
+									'text' => T_('Settings'),
+									'href' => $admin_url.'?ctrl=crontab&amp;tab=settings'
+								),
+								'test' => array(
+									'text' => T_('Test'),
+									'href' => $admin_url.'?ctrl=crontab&amp;tab=test'
+								),
+							)
+						)
+					) );
 				}
 				if( $perm_spam )
 				{ // Permission to view antispam:

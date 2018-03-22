@@ -18,6 +18,7 @@ global $dispatcher;
 
 
 // Check permission to display:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 // Memorize this as the last "tab" used in the Blog Settings:

@@ -143,7 +143,7 @@ class AutomationStep extends DataObject
 				{	// No stored object, Return null:
 					return 'null';
 				}
-				
+
 		}
 
 		return parent::get( $parname );
@@ -718,7 +718,7 @@ class AutomationStep extends DataObject
 				? $log_point.'Next step: #'.$next_AutomationStep->get( 'order' )
 					.'('.step_get_type_title( $next_AutomationStep->get( 'type' ) ).( $next_AutomationStep->get( 'label' ) == '' ? '' : ' "'.$next_AutomationStep->get( 'label' ).'"' ).')'
 					.' delay: '.seconds_to_period( $next_delay ).', '.$next_exec_ts
-				: $log_point.'There is no next step configured.' ).$log_nl;
+				: $log_point.'There is no next step configured.' );
 
 		if( $next_delay == 0 && $next_AutomationStep )
 		{	// If delay for next step is 0 seconds then we must execute such step right now:
@@ -729,8 +729,8 @@ class AutomationStep extends DataObject
 			else
 			{	// Run next step because it is not executed yet for the user:
 				$executed_automation_steps[ $user_ID ][] = $this->ID;
-				$process_log .= $log_point.$log_bold_start.'Run next step immediately:'.$log_nl.$log_bold_end;
-				$next_AutomationStep->execute_action( $user_ID, $process_log );
+				$process_log .= $log_nl.$log_point.$log_bold_start.'Run next step immediately:'.$log_nl.$log_bold_end;
+				$process_log .= $next_AutomationStep->execute_action( $user_ID );
 			}
 		}
 
@@ -1287,7 +1287,7 @@ class AutomationStep extends DataObject
 				$EmailCampaignCache = & get_EmailCampaignCache();
 				if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( $this->get( 'info' ), false, false ) )
 				{	// Use name of Email Campaign:
-					$label = $EmailCampaign->get( 'email_title' );
+					$label = $EmailCampaign->get( 'name' );
 				}
 				break;
 

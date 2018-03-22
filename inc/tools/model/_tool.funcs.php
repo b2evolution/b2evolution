@@ -759,6 +759,138 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 
 
 /**
+ * Create sample email campaigns and display a process of creating
+ *
+ * @param integer Number of email campaigns
+ * @param array Newsletter IDs
+ */
+function tool_create_sample_campaigns( $num_campaigns, $campaign_lists )
+{
+	global $Messages, $DB, $Debuglog, $baseurl, $email_send_simulate_only;
+
+	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+
+	echo T_('Creating sample email campaigns...');
+	evo_flush();
+
+	/**
+	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
+	 */
+	$DB->log_queries = false;
+
+	// Load all users IDs:
+	$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users WHERE user_status IN ( "activated", "autoactivated" )' );
+
+	// Load all selected lists in cache:
+	$NewsletterCache = & get_NewsletterCache();
+	$NewsletterCache->load_list( $campaign_lists );
+
+	$count = 1;
+	$campaign_lists_max_index = count( $campaign_lists ) - 1;
+
+	// Temporarily simulate email sending
+	$temp_email_send_simulate_only = $email_send_simulate_only;
+	$email_send_simulate_only = true;
+
+	for( $i = 1; $i <= $num_campaigns; $i++ )
+	{
+		$EmailCampaign = new EmailCampaign();
+		$EmailCampaign->set( 'enlt_ID', $campaign_lists[rand( 0, $campaign_lists_max_index )] );
+		$EmailCampaign->set( 'name', T_('Markdown Example').' '.$i );
+		$EmailCampaign->set( 'email_defaultdest', $baseurl );
+		$EmailCampaign->set( 'email_text', T_('Heading
+=======
+
+Sub-heading
+-----------
+
+### H3 header
+
+#### H4 header ####
+
+> Email-style angle brackets
+> are used for blockquotes.
+
+> > And, they can be nested.
+
+> ##### Headers in blockquotes
+>
+> * You can quote a list.
+> * Etc.
+
+[This is a link](http://b2evolution.net/) if Links are turned on in the markdown plugin settings
+
+Paragraphs are separated by a blank line.
+
+		This is a preformatted
+		code block.
+
+Text attributes *Italic*, **bold**, `monospace`.
+
+Shopping list:
+
+* apples
+* oranges
+* pears
+
+The rain---not the reign---in Spain.
+
+Button examples:
+[button]This is a button[/button]
+[like]I like this[/like] [dislike]I don\'t like this[/dislike]
+[cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
+[cta:1:link]Call to action 1 link only[/cta]') );
+
+		if( $EmailCampaign->dbinsert() )
+		{	// Send email after successfull email campaign creating:
+			$count++;
+			$loop_user_IDs = array_rand( array_flip( $user_IDs ), rand( 1, count( $user_IDs) ) );
+			if( ! is_array( $loop_user_IDs ) )
+			{
+				$loop_user_IDs = array( $loop_user_IDs );
+			}
+			if( ! empty( $loop_user_IDs ) )
+			{	// Only if we have found the users in DB
+				//$EmailCampaign->add_recipients( $loop_user_IDs );
+				$EmailCampaign->send_all_emails( false, $loop_user_IDs );
+
+				// Randomly set values
+				$DB->query( 'UPDATE T_email__campaign_send
+						SET
+							csnd_clicked_unsubscribe = IF( RAND() > 0.95, 1, 0 ),
+							csnd_last_open_ts = IF( RAND() > 0.7, NOW(), NULL ),
+							csnd_last_click_ts = IF( RAND() > 0.7, NOW(), NULL ),
+							csnd_like = IF( RAND() > 0.75, 1, IF( RAND() > 0.8, -1, 0 ) ),
+							csnd_cta1 = IF( RAND() > 0.85, 1, 0 ),
+							csnd_cta2 = IF( RAND() > 0.85, 1, 0 ),
+							csnd_cta3 = IF( RAND() > 0.85, 1, 0 )
+						WHERE
+							csnd_camp_ID = '.$EmailCampaign->ID );
+			}
+		}
+
+		//$Messages->clear();
+
+		if( $count % 20 == 0 )
+		{	// Display a process of creating by one dot for 20 campaigns:
+			echo ' .';
+			evo_flush();
+		}
+
+		// Clear all debug messages, To avoid an error about full memory:
+		$Debuglog->clear( 'all' );
+	}
+
+	// Restore simulate email sending setting
+	$email_send_simulate_only = $temp_email_send_simulate_only;
+
+	echo ' OK.';
+
+	$Messages->add( sprintf( T_('Created %d email campaigns.'), $count - 1 ), 'success' );
+}
+
+
+/**
  * Test a flush function
  */
 function tool_test_flush()

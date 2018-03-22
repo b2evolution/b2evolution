@@ -4126,6 +4126,9 @@ form ul.token-input-list-facebook li.token-input-input-token-facebook {
   border-radius: 4px;
   margin: 0 4px 4px 0;
 }
+body.modal-open div.token-input-dropdown-facebook {
+  z-index: 10002;
+}
 div.results {
   margin-top: 0;
 }
@@ -4668,4 +4671,18 @@ div.message_toolbars {
 }
 .accordion-caret .accordion-toggler.collapsed:before {
   content: '\f0da';
+}
+.disp_access_requires_login .evo_widget.widget_core_free_html.panel {
+  background: none;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+}
+.disp_access_requires_login .evo_widget.widget_core_free_html.panel .panel-body {
+  padding: 0;
+}
+.disp_access_requires_login .evo_widget.widget_core_user_login {
+  min-width: 290px;
+  max-width: 400px;
+  margin: 1.5em auto auto;
 }

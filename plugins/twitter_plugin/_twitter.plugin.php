@@ -47,7 +47,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '6.10.0';
+	var $version = '6.10.1';
 	var $author = 'b2evolution Group';
 
 	/*
@@ -593,6 +593,8 @@ class twitter_plugin extends Plugin
 
 	function send_a_tweet( $content, & $Item, & $xmlrpcresp )
 	{
+		global $Messages;
+
 		// Uses either plugin CollSettings or UserSettings
 		$oauth = $this->get_oauth_info( array(
 				'user_ID'	=> $Item->get_creator_User()->ID,
@@ -660,9 +662,16 @@ class twitter_plugin extends Plugin
 			$xmlrpcresp = 'Unknown error while posting "'.htmlspecialchars( $msg ).'" to account @'.$oauth['contact'];
 			return false;
 		}
-		elseif( !empty($result->error) )
+		elseif( !empty( $result->errors ) )
 		{
-			$xmlrpcresp = $result->error;
+			$xmlrpcresp = array();
+			foreach( $result->errors as $error )
+			{
+				$xmlrpcresp[] = array(
+					'message' => sprintf( T_('Error: %s'), $error->code ).'. '.$error->message,
+					'type' => 'error',
+					'title' => T_('Twitter plugin').':' );
+			}
 			return false;
 		}
 

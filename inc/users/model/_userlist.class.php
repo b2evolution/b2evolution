@@ -116,13 +116,16 @@ class UserList extends DataObjectList2
 				'level_min'           => NULL,    // integer, Level min
 				'level_max'           => NULL,    // integer, Level max
 				'org'                 => NULL,    // integer, Organization ID
-				'newsletter'          => NULL,    // integer, Newsletter ID
+				'newsletter'          => NULL,    // integer, Newsletter ID, users which are subscribed to newsletter
+				'not_newsletter'      => NULL,    // integer, Newsletter ID, users which are NOT subscribed to newsletter
 				'newsletter_subscribed' => 1,     // 1 - only users with active subscription, 0 - only unsubscribed users, NULL - both
 				'ecmp'                => NULL,    // integer, Email Campaign ID
 				'recipient_type'      => NULL,    // string, Recipient type of email campaign: 'filtered', 'sent', 'readytosend'
 				'recipient_action'    => NULL,    // string, Recipient action on email campaign: 'img_loaded', 'link_clicked', 'cta1', 'cta2', 'cta3', 'liked', 'disliked', 'clicked_unsubscribe'
 				'user_tag'            => NULL,    // string, User tag
 				'not_user_tag'        => NULL,    // string, User tag
+				'poll'                => NULL,    // integer, Poll ID
+				'poll_option'         => NULL,    // integer, Poll option ID
 		) );
 	}
 
@@ -262,6 +265,11 @@ class UserList extends DataObjectList2
 			memorize_param( 'newsletter', 'integer', $this->default_filters['newsletter'], $this->filters['newsletter'] );
 
 			/*
+			 * Restrict by not subscribed newsletter
+			 */
+			memorize_param( 'not_newsletter', 'integer', $this->default_filters['not_newsletter'], $this->filters['not_newsletter'] );
+
+			/*
 			 * Restrict by newsletter subscription activity
 			 */
 			memorize_param( 'newsletter_subscribed', 'integer', $this->default_filters['newsletter_subscribed'], $this->filters['newsletter_subscribed'] );
@@ -290,6 +298,16 @@ class UserList extends DataObjectList2
 			 * Restrict by user tag
 			 */
 			memorize_param( 'not_user_tag', 'string', $this->default_filters['not_user_tag'], $this->filters['not_user_tag'] );
+
+			/*
+			 * Restrict by poll
+			 */
+			memorize_param( 'poll', 'integer', $this->default_filters['poll'], $this->filters['poll'] );
+
+			/*
+			 * Restrict by poll option
+			 */
+			memorize_param( 'poll_option', 'integer', $this->default_filters['poll_option'], $this->filters['poll_option'] );
 
 			/*
 			 * Restrict by user fields
@@ -497,6 +515,11 @@ class UserList extends DataObjectList2
 		$this->filters['newsletter'] = param( 'newsletter', 'integer', $this->default_filters['newsletter'], true );
 
 		/*
+		 * Restrict by not subscribed newsletter ID
+		 */
+		$this->filters['not_newsletter'] = param( 'not_newsletter', 'integer', $this->default_filters['not_newsletter'], true );
+
+		/*
 		 * Restrict by newsletter subscription activity
 		 */
 		$this->filters['newsletter_subscribed'] = param( 'newsletter_subscribed', 'integer', $this->default_filters['newsletter_subscribed'], true );
@@ -525,6 +548,16 @@ class UserList extends DataObjectList2
 		 * Restrict by user tag
 		 */
 		$this->filters['not_user_tag'] = param( 'not_user_tag', 'string', $this->default_filters['user_tag'], true );
+
+		/*
+		 * Restrict by poll answer
+		 */
+		$this->filters['poll'] = param( 'poll', 'integer', $this->default_filters['poll'], true );
+
+		/*
+		 * Restrict by poll option answer
+		 */
+		$this->filters['poll_option'] = param( 'poll_option', 'integer', $this->default_filters['poll_option'], true );
 
 		// 'paged'
 		$this->page = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
@@ -620,7 +653,8 @@ class UserList extends DataObjectList2
 			$org_ID = isset( $this->query_params['where_org_ID'] ) ? $this->query_params['where_org_ID'] : $this->filters['org'];
 			$this->UserQuery->where_organization( $org_ID );
 		}
-		$this->UserQuery->where_newsletter( $this->filters['newsletter'], $this->filters['newsletter_subscribed']  );
+		$this->UserQuery->where_newsletter( $this->filters['newsletter'], $this->filters['newsletter_subscribed'] );
+		$this->UserQuery->where_not_newsletter( $this->filters['not_newsletter'] );
 		$this->UserQuery->where_email_campaign( $this->filters['ecmp'], $this->filters['recipient_type'], $this->filters['recipient_action'] );
 		if( isset( $this->query_params['where_viewed_user'] ) )
 		{	// Filter by user profile viewed:
@@ -636,6 +670,10 @@ class UserList extends DataObjectList2
 			$this->UserQuery->where_group_level( $Settings->get('allow_anonymous_user_level_min'), $Settings->get('allow_anonymous_user_level_max') );
 		}
 		$this->UserQuery->where_tag( $this->filters['user_tag'], $this->filters['not_user_tag'] );
+		if( isset( $this->filters['poll'] ) || isset( $this->filters['poll_option'] ) )
+		{
+			$this->UserQuery->where_poll_answered( $this->filters['poll'], $this->filters['poll_option'] );
+		}
 
 		if( isset( $this->query_params['order_by_login_length'] ) && in_array( $this->query_params['order_by_login_length'], array( 'A', 'D' ) ) )
 		{

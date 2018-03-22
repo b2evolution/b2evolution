@@ -6293,7 +6293,8 @@ class Item extends ItemLight
 		$this->set( 'title', $post_title );
 		$this->set( 'urltitle', $post_urltitle );
 		$this->set( 'content', $post_content );
-		$this->set( 'datestart', $post_timestamp );
+		//$this->set( 'datestart', $post_timestamp );
+		$this->set( 'datestart', date( 'Y-m-d H:i:s' ) ); // Use current time temporarily, we'll update this later
 
 		$this->set( 'main_cat_ID', $main_cat_ID );
 		$this->set( 'extra_cat_IDs', $extra_cat_IDs );
@@ -6308,6 +6309,9 @@ class Item extends ItemLight
 
 		// INSERT INTO DB:
 		$this->dbinsert();
+
+		// Update post_datestart using FROM_UNIXTIME to prevent invalid datetime values during DST spring forward - fall back
+		$DB->query( 'UPDATE T_items__item SET post_datestart = FROM_UNIXTIME('.strtotime( $post_timestamp ).') WHERE post_ID = '.$DB->quote( $this->ID ) );
 
 		return $this->ID;
 	}
@@ -7805,7 +7809,9 @@ class Item extends ItemLight
 				if( $Plugin )
 				{
 					$ping_messages = array();
-					$ping_messages[] = sprintf( T_('Pinging %s...'), $Plugin->ping_service_name );
+					$ping_messages[] = array(
+						'message' => sprintf( T_('Pinging %s...'), $Plugin->ping_service_name ),
+						'type' => 'note' );
 					$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
 					$r = $Plugin->ItemSendPing( $params ) && $r;
@@ -7817,8 +7823,14 @@ class Item extends ItemLight
 							// dh> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
 							ob_start();
 							xmlrpc_displayresult( $params['xmlrpcresp'], true );
-							$ping_messages[] = ob_get_contents();
+							$ping_messages[] = array(
+								'message' => ob_get_contents(),
+								'type' => 'note' );
 							ob_end_clean();
+						}
+						elseif( is_array( $params['xmlrpcresp'] ) )
+						{
+							$ping_messages = array_merge( $ping_messages, $params['xmlrpcresp'] );
 						}
 						else
 						{
@@ -7826,7 +7838,52 @@ class Item extends ItemLight
 						}
 					}
 
-					$Messages->add_to_group( implode( '<br />', $ping_messages ), 'note', T_('Sending notifications:') );
+					$current_type = NULL;
+					$current_title = NULL;
+					$current_message = NULL;
+
+					foreach( $ping_messages as $message )
+					{
+						if( is_array( $message ) )
+						{
+							$loop_type = empty( $message['type'] ) ? 'note' : $message['type'];
+							$loop_title = empty( $message['title'] ) ? T_('Sending notifications:') : $message['title'];
+							$loop_message = $message['message'];
+						}
+						else
+						{
+							$loop_type = 'note';
+							$loop_title = T_('Sending notifications:');
+							$loop_message = $message;
+						}
+
+						if( empty( $current_type ) ) $current_type = $loop_type;
+						if( empty( $current_title ) ) $current_title = $loop_title;
+
+						if( $loop_type == $current_type && $loop_title == $current_title )
+						{
+							if( empty( $current_message ) )
+							{
+								$current_message = $loop_message;
+							}
+							else
+							{
+								$current_message .= '<br>'.$loop_message;
+							}
+						}
+						else
+						{
+							$Messages->add_to_group( $current_message, $current_type, $current_title );
+							$current_message = $loop_message;
+							$current_type = $loop_type;
+							$current_title = $loop_title;
+						}
+					}
+
+					if( !empty( $current_message ) )
+					{ // Display last message
+						$Messages->add_to_group( $current_message, $current_type, $current_title );
+					}
 				}
 			}
 		}

@@ -1024,6 +1024,44 @@ switch( $action )
 
 		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
 
+	case 'get_campaign_recipients':
+		// Get recipients of Email Campaign depending on requested skip tags:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'view', true );
+
+		param( 'ecmp_ID', 'integer', true );
+		param( 'skip_tags', 'string', '' );
+
+		$EmailCampaignCache = & get_EmailCampaignCache();
+		if( $edited_Campaign = & $EmailCampaignCache->get_by_ID( $ecmp_ID, false, false ) )
+		{	// If Email Campaign is found in DB:
+
+			// Set temporarily the requested skip tags in order to calculate a count of recipients depending on them:
+			$edited_Campaign->set( 'user_tag_sendskip', $skip_tags );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+			$recipients_data = array(
+				'status'      => 'ok',
+				'skipped_tag' => $edited_Campaign->get_recipients_count( 'skipped_tag' ),
+				'wait'        => $edited_Campaign->get_recipients_count( 'wait' ),
+			);
+		}
+		else
+		{	// Wrong request, unknown Email Campaign:
+			$recipients_data = array(
+				'status' => 'error',
+				'error'  => 'email campaign not found'
+			);
+		}
+
+		echo evo_json_encode( $recipients_data );
+
+		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
+
 	default:
 		$incorrect_action = true;
 		break;
