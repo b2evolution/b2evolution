@@ -172,7 +172,7 @@ jQuery(document).ready( function()
 	// Actions for buttons to select several widgets to activate/deactivate them by one action
 	jQuery( '#widget_button_check_all' ).click( function()
 	{
-		jQuery( this ).closest( 'form' ).find( 'input[type=checkbox]' ).prop( 'checked', true );
+		jQuery( this ).closest( 'form' ).find( 'input[type=checkbox]:enabled' ).prop( 'checked', true );
 	} );
 	jQuery( '#widget_button_uncheck_all' ).click( function()
 	{
@@ -180,13 +180,13 @@ jQuery(document).ready( function()
 	} );
 	jQuery( '#widget_button_check_active' ).click( function()
 	{
-		jQuery( this ).closest( 'form' ).find( '.widget_checkbox.widget_checkbox_enabled input[type=checkbox]' ).prop( 'checked', true );
+		jQuery( this ).closest( 'form' ).find( '.widget_checkbox.widget_checkbox_enabled input[type=checkbox]:enabled' ).prop( 'checked', true );
 		jQuery( this ).closest( 'form' ).find( '.widget_checkbox:not(.widget_checkbox_enabled) input[type=checkbox]' ).prop( 'checked', false );
 	} );
 	jQuery( '#widget_button_check_inactive' ).click( function()
 	{
 		jQuery( this ).closest( 'form' ).find( '.widget_checkbox.widget_checkbox_enabled input[type=checkbox]' ).prop( 'checked', false );
-		jQuery( this ).closest( 'form' ).find( '.widget_checkbox:not(.widget_checkbox_enabled) input[type=checkbox]' ).prop( 'checked', true );
+		jQuery( this ).closest( 'form' ).find( '.widget_checkbox:not(.widget_checkbox_enabled) input[type=checkbox]:enabled' ).prop( 'checked', true );
 	} );
 
 	// Close widget settings or available widgets popup windows if Escape key is pressed:
@@ -658,14 +658,14 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 	// Add state indicator:
 	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state">'+
 			( wi_plugin_disabled ? disabled_plugin_tag :
-			'<a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\' );">'+
+			'<a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\' );">' +
 				( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+
 			'</a>' ) +
 		'</span>' ) );
 
 	// Add checkbox:
-	jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox'+( wi_enabled ? ' widget_checkbox_enabled' : '' )+'">'+
-			'<input type="checkbox" name="widgets[]" value="'+wi_ID.replace( 'wi_ID_', '' )+'" />'+
+	jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox' + ( wi_enabled ? ' widget_checkbox_enabled' : '' ) + '">' +
+			'<input type="checkbox" name="widgets[]" value="'+wi_ID.replace( 'wi_ID_', '' ) + '" ' + ( wi_plugin_disabled ? 'disabled="disabled" ' : '' ) + '/>'+
 		'</span>' ) );
 
 	// Add icon to toggle cache status:
@@ -720,15 +720,14 @@ function doToggle( wi_ID, wi_enabled, wi_plugin_disabled )
 		jQuery( '#wi_ID_' + wi_ID + ' .widget_state' ).html( '<a href="#" class="toggle_state" onclick="return toggleWidget( \'wi_ID_'+wi_ID+'\', \''+crumb_url+'\' );">'+
 					( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+
 				'</a>' );
-		if( wi_enabled )
-		{
-			jQuery( '#wi_ID_' + wi_ID + ' .widget_checkbox' ).addClass( 'widget_checkbox_enabled' );
-		}
-		else
-		{
-			jQuery( '#wi_ID_' + wi_ID + ' .widget_checkbox' ).removeClass( 'widget_checkbox_enabled' );
-		}
-		jQuery( '#wi_ID_' + wi_ID + ' .toggle_action' ).html( wi_enabled ? deactivate_icon_tag : activate_icon_tag );
+	}
+	if( wi_enabled )
+	{
+		jQuery( '#wi_ID_' + wi_ID + ' .widget_checkbox' ).addClass( 'widget_checkbox_enabled' );
+	}
+	else
+	{
+		jQuery( '#wi_ID_' + wi_ID + ' .widget_checkbox' ).removeClass( 'widget_checkbox_enabled' );
 	}
 	jQuery( '#wi_ID_' + wi_ID + ' .toggle_action' ).html( wi_enabled ? deactivate_icon_tag : activate_icon_tag );
 

@@ -142,7 +142,7 @@ function display_container( $container, $legend_suffix = '' )
 			$Table->display_line_start( false, $fadeout );
 
 			$Table->display_col_start();
-			echo '<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" />';
+			echo '<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" '.( $disabled_plugin ? 'disabled="disabled" ' : '' ).'/>';
 			$Table->display_col_end();
 
 			$Table->display_col_start();
