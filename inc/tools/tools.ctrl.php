@@ -451,6 +451,8 @@ if( empty( $tab ) )
 				break;
 			}
 
+			$send_campaign_emails = param( 'send_campaign_emails', 'integer', 0 );
+
 			// Execute a creating of users inside template in order to see a process
 			$template_action = 'create_sample_campaigns';
 			break;

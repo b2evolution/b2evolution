@@ -1528,6 +1528,7 @@ input.btn-lg {
   margin: 0 1em 1em 0;
 }
 .evo_item_workflow_form .evo_item_workflow_form__fields {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
@@ -1551,6 +1552,9 @@ input.btn-lg {
 .evo_item_workflow_form .evo_item_workflow_form__fields .btn {
   margin-bottom: 15px;
 }
+.evo_poll__question {
+  font-weight: bold;
+}
 .evo_poll__table {
   margin-bottom: 14px;
   width: 100%;
@@ -1558,6 +1562,9 @@ input.btn-lg {
 .evo_poll__table td {
   padding: 2px 10px 2px 0;
   vertical-align: top;
+}
+.evo_poll__table td.evo_poll__title label {
+  font-weight: normal;
 }
 .evo_poll__table tr td:last-child {
   padding-right: 0;

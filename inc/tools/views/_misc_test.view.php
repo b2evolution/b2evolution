@@ -82,8 +82,8 @@ if( !empty( $template_action ) )
 
 		case 'create_sample_campaigns':
 			// Create the email campaigns and display a process of creating
-			global $num_campaigns, $campaign_lists;
-			tool_create_sample_campaigns( $num_campaigns, $campaign_lists );
+			global $num_campaigns, $campaign_lists, $send_campaign_emails;
+			tool_create_sample_campaigns( $num_campaigns, $campaign_lists, $send_campaign_emails );
 			break;
 	}
 

@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $num_campaigns, $campaign_lists, $advanced_user_perms;
+global $num_campaigns, $campaign_lists, $send_campaign_emails;
 
 $Form = new Form( NULL, 'create_campaigns', 'campaign', 'compact' );
 
@@ -38,6 +38,8 @@ $Form->begin_form( 'fform',  T_('Create sample email campaigns') );
 	}
 	$Form->checklist( $list_options, 'campaign_lists', T_('Create new email campaigns in'), true, false,
 		array( 'note' => T_('Note: For each campaign it creates, the tool will randomly select between the allowed (checked) options above') ) );
+
+	$Form->checkbox( 'send_campaign_emails', is_null( $send_campaign_emails ) ? false : $send_campaign_emails, T_('Send test email') );
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Create'), 'SaveButton' ) ) );
 ?>
