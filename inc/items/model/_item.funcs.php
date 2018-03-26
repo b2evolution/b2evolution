@@ -181,7 +181,7 @@ function init_inskin_editing()
 
 		load_class( 'items/model/_item.class.php', 'Item' );
 		$edited_Item = new Item();
-		$def_status = get_highest_publish_status( 'post', $Blog->ID, false );
+		$def_status = get_highest_publish_status( 'post', $Blog->ID, false, '', $edited_Item );
 		$edited_Item->set( 'status', $def_status );
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
@@ -1898,7 +1898,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	global $Collection, $Blog, $current_User, $UserSettings;
 	global $next_action, $highest_publish_status; // needs to be passed out for echo_publishnowbutton_js( $action )
 
-	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID );
+	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID, true, '', $edited_Item );
 	if( ! isset( $edited_Item->status ) )
 	{
 		$edited_Item->status = $highest_publish_status;
@@ -1919,7 +1919,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		echo '<span class="edit_actions_text">'.T_('Visibility').get_manual_link( 'visibility-status' ).': </span>';
 
 		// Get those statuses which are not allowed for the current User to create posts in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
 		// Get allowed visibility statuses
 		$status_options = get_visibility_statuses( '', $exclude_statuses );
 
@@ -2006,7 +2006,7 @@ function echo_item_status_buttons( $Form, $edited_Item )
 	global $next_action, $action, $Collection, $Blog;
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
@@ -4994,7 +4994,7 @@ function item_row_status( $Item, $index )
 	$blog_ID = $Item->Blog->ID;
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create', $Item->status ), array( 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create', $Item->status, '', $Item ), array( 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( '', $exclude_statuses );
 
