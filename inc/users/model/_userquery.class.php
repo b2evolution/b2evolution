@@ -141,7 +141,6 @@ class UserQuery extends SQL
 					) AS subscribed_lists on subscribed_lists.enls_user_ID = user_ID' );
 		}
 
-		$this->WHERE( 'user_ID IS NOT NULL' );
 		if( $params['grouped'] )
 		{ // Group by user group
 			$this->GROUP_BY( 'user_ID, grp_ID' );
