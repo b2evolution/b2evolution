@@ -4821,7 +4821,7 @@ class Comment extends DataObject
 		}
 
 		// Restrict status to max allowed for item collection:
-		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->get( 'status' ) );
+		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->get( 'status' ), $comment_Item );
 		if( empty( $item_restricted_status ) )
 		{	// If max allowed status is not detected because for example current User has no perm to item status,
 			// then use current status of the Item in order to restrict max comment status below:
@@ -4923,7 +4923,7 @@ class Comment extends DataObject
 				// Get max allowed for item collection:
 				$comment_Item = & $this->get_Item();
 				$item_Blog = & $comment_Item->get_Blog();
-				$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status );
+				$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status, $comment_Item );
 
 				// Get all visibility status titles:
 				$visibility_statuses = get_visibility_statuses();

@@ -2330,9 +2330,10 @@ class Blog extends DataObject
 	 * @todo make default a Blog param
 	 *
 	 * @param string status to start with. Empty to use default.
+	 * @param object Permission object: Item or Comment
 	 * @return string authorized status; NULL if none
 	 */
-	function get_allowed_item_status( $status = NULL )
+	function get_allowed_item_status( $status = NULL, $perm_target = NULL )
 	{
 		global $current_User;
 
@@ -2347,7 +2348,7 @@ class Blog extends DataObject
 		}
 
 		// Get max allowed visibility status:
-		$max_allowed_status = get_highest_publish_status( 'post', $this->ID, false );
+		$max_allowed_status = get_highest_publish_status( 'post', $this->ID, false, '', $perm_target );
 
 		$visibility_statuses = get_visibility_statuses();
 		$status_is_allowed = false;

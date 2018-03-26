@@ -5305,7 +5305,7 @@ class Item extends ItemLight
 
 		$curr_status_permvalue = get_status_permvalue( $this->status );
 		// get the current User highest publish status for this item Blog
-		list( $highest_status, $publish_text ) = get_highest_publish_status( 'post', $this->get_blog_ID() );
+		list( $highest_status, $publish_text ) = get_highest_publish_status( 'post', $this->get_blog_ID(), true, '', $this );
 		// Get binary value of the highest available status
 		$highest_status_permvalue = get_status_permvalue( $highest_status );
 		if( $curr_status_permvalue >= $highest_status_permvalue || ( $highest_status_permvalue <= get_status_permvalue( 'private' ) ) )
@@ -9387,7 +9387,7 @@ class Item extends ItemLight
 		$current_status = $this->get( 'status' );
 
 		// Checks if the requested item status can be used by current user and if not, get max allowed item status of the collection
-		$restricted_status = $item_Blog->get_allowed_item_status( $current_status );
+		$restricted_status = $item_Blog->get_allowed_item_status( $current_status, $this );
 
 		if( $update_status )
 		{	// Update status to new restricted value:
