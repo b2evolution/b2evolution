@@ -2609,7 +2609,7 @@ class Blog extends DataObject
 		switch( $matches[1] )
 		{
 			case 'year':
-				// for copyrigth year
+				// for copyright year
 				return date( 'Y', $localtimenow );
 
 			case 'owner':
@@ -3895,7 +3895,7 @@ class Blog extends DataObject
 	/**
 	 * Get the short name of the blog
 	 *
-	 * @return sring
+	 * @return string
 	 */
 	function get_shortname()
 	{
