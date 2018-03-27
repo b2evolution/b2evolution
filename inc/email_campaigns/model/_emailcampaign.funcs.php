@@ -179,6 +179,28 @@ function skip_campaign_user( $campaign_ID, $user_ID )
 }
 
 
+function is_unopened_campaign_mail( $email_log_ID, & $send_data = NULL )
+{
+	global $DB;
+
+	$send_data = $DB->get_row( 'SELECT * FROM T_email__campaign_send WHERE csnd_emlog_ID = '.$DB->quote( $email_log_ID ).' LIMIT 1', ARRAY_A );
+
+	if( $send_data )
+	{
+		return empty( $send_data['csnd_last_open_ts'] ) &&
+				empty( $send_data['csnd_last_click_ts'] ) &&
+				empty( $send_data['csnd_like'] ) &&
+				empty( $send_data['csnd_cta1'] ) &&
+				empty( $send_data['csnd_cta2'] ) &&
+				empty( $send_data['csnd_cta3'] );
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+
 /**
  * Get EmailCampaign object from object which is used to select recipients
  *
@@ -206,7 +228,7 @@ function campaign_td_recipient_action( $row, $recipient_action )
 {
 	global $admin_url;
 
-	if( empty( $row->send_count ) )
+	if( empty( $row->ecmp_send_count ) )
 	{
 		return NULL;
 	}
@@ -216,37 +238,37 @@ function campaign_td_recipient_action( $row, $recipient_action )
 	switch( $recipient_action )
 	{
 		case 'img_loaded':
-			$text = $row->open_count;
+			$text = $row->ecmp_img_loads;
 			break;
 
 		case 'link_clicked':
-			$text = $row->click_count;
+			$text = $row->ecmp_link_clicks;
 			break;
 
 		case 'cta1':
-			$text = $row->cta1_count;
+			$text = $row->ecmp_cta1_clicks;
 			break;
 
 		case 'cta2':
-			$text = $row->cta2_count;
+			$text = $row->ecmp_cta2_clicks;
 			break;
 
 		case 'cta3':
-			$text = $row->cta3_count;
+			$text = $row->ecmp_cta3_clicks;
 			break;
 
 		case 'liked':
-			$text = $row->like_count;
+			$text = $row->ecmp_like_count;
 			$class = 'text-success';
 			break;
 
 		case 'disliked':
-			$text = $row->dislike_count;
+			$text = $row->ecmp_dislike_count;
 			$class = 'text-danger';
 			break;
 
 		case 'clicked_unsubscribe':
-			$text = $row->unsubscribe_click_count;
+			$text = $row->ecmp_unsub_clicks;
 			$class = 'text-danger';
 			break;
 	}
@@ -289,31 +311,11 @@ function campaign_results_block( $params = array() )
 		ecmp_user_tag_sendskip, ecmp_user_tag_sendsuccess,
 		ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
 		enlt_ID, enlt_name,
-		sent.send_count, sent.open_rate, sent.open_count, sent.click_count,
-		sent.cta1_count, sent.cta2_count, sent.cta3_count, sent.like_count, sent.dislike_count, sent.unsubscribe_click_count' );
+		ecmp_send_count, ecmp_open_count, ecmp_img_loads, ecmp_link_clicks,
+		ecmp_cta1_clicks, ecmp_cta2_clicks, ecmp_cta3_clicks, ecmp_like_count, ecmp_dislike_count, ecmp_unsub_clicks,
+		IF( ecmp_send_count = 0, 0, ecmp_open_count / ecmp_send_count ) AS open_rate' );
 	$SQL->FROM( 'T_email__campaign' );
 	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
-	$SQL->FROM_add( 'LEFT JOIN
-		(
-			SELECT
-				csnd_camp_ID,
-				SUM( IF( csnd_last_sent_ts IS NULL, 0, 1 ) ) AS send_count,
-				SUM( IF( csnd_cta1 = 1, 1, 0 ) ) AS cta1_count,
-				SUM( IF( csnd_cta2 = 1, 1, 0 ) ) AS cta2_count,
-				SUM( IF( csnd_cta3 = 1, 1, 0 ) ) AS cta3_count,
-				SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
-				SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
-				SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsubscribe_click_count,
-				SUM( IF( csnd_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
-				SUM( IF( csnd_last_click_ts IS NULL, 0, 1 ) ) AS click_count,
-				SUM( IF( csnd_last_open_ts IS NOT NULL OR csnd_last_click_ts IS NOT NULL OR
-					csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) /
-					SUM( IF( csnd_last_sent_ts IS NULL, 0, 1 ) ) AS open_rate
-			FROM T_email__campaign_send
-			WHERE csnd_emlog_ID IS NOT NULL
-			GROUP BY csnd_camp_ID
-		) AS sent
-			ON sent.csnd_camp_ID = ecmp_ID' );
 	$SQL->WHERE( 1 );
 
 	$count_SQL = new SQL();
@@ -425,7 +427,7 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'$send_count$'
+			'td' =>'$ecmp_send_count$'
 		);
 
 	$Results->cols[] = array(
@@ -434,7 +436,7 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : number_format( #open_rate# * 100, 1 )%%'
+			'td' =>'%empty( #ecmp_send_count# ) ? "" : number_format( #open_rate# * 100, 1 )%%'
 		);
 
 	$Results->cols[] = array(

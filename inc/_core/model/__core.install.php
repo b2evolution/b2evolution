@@ -561,6 +561,16 @@ $schema_queries = array(
 			ecmp_user_tag_cta3        VARCHAR(255) NULL,
 			ecmp_user_tag_like        VARCHAR(255) NULL,
 			ecmp_user_tag_dislike     VARCHAR(255) NULL,
+			ecmp_send_count           INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_open_count           INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_img_loads            INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_link_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_cta1_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_cta2_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_cta3_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_like_count           INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_dislike_count        INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_unsub_clicks         INT UNSIGNED NOT NULL DEFAULT 0,
 			PRIMARY KEY               (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
