@@ -323,7 +323,8 @@ switch( $action )
 				$AdminUI->disp_view( 'cron/views/_cronjob_settings.form.php' );
 				break;
 			case 'test':
-				$AdminUI->disp_view( 'cron/views/_cronjob_test.view.php' );
+				// Require this template without function $AdminUI->disp_view() in order to keep all global vars which are used by cron_exec.php:
+				require $inc_path.'cron/views/_cronjob_test.view.php';
 				break;
 			default:
 				$AdminUI->disp_view( 'cron/views/_cronjob_list.view.php' );

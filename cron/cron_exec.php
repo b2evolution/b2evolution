@@ -19,6 +19,10 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  */
 require_once $inc_path .'_main.inc.php';
 
+// Start timer for cron job:
+// (time is printed out after each action, @see cron_log_action_end())
+$Timer->start( 'cron_exec' );
+
 if( $Settings->get( 'system_lock' ) )
 { // System is locked down for maintenance, Stop cron execution
 	echo 'The site is locked for maintenance. All scheduled jobs are postponed. No job was executed.';
@@ -295,4 +299,6 @@ if( ! $is_cli && ! is_admin_page() )
 	<?php
 }
 
+// Stop timer of cron job:
+$Timer->stop( 'cron_exec' );
 ?>

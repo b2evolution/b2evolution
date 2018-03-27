@@ -59,7 +59,7 @@ class User extends DataObject
 	/**
 	 * User account status
 	 *
-	 * 'new', 'activated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
+	 * 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
 	 *
 	 * @var string
 	 */
@@ -3657,13 +3657,13 @@ class User extends DataObject
 				{ // even anonymous users can see users profile, or user wants to check his own profile
 					return true;
 				}
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_view_users':
 				if( $Settings->get( 'allow_anonymous_user_list' ) )
 				{ // even anonymous users can see users list
 					return true;
 				}
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_view_comments':
 			case 'can_view_contacts':
 			case 'can_view_messages':
@@ -3673,13 +3673,13 @@ class User extends DataObject
 			case 'can_edit_post':
 			case 'can_edit_comment':
 			case 'can_edit_contacts':
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_report_user':
 				if( ! empty( $target ) )
 				{
 					$UserCache = & get_UserCache();
 					$target_User = & $UserCache->get_by_ID( $target );
-					return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) )
+					return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) )
 							&& ( ! empty( $target_User ) && ( $target_User->get( 'level' ) <= $this->get( 'level' ) ) );
 				}
 				return false;
@@ -5530,7 +5530,7 @@ class User extends DataObject
 			}
 			else
 			{
-				$new_status_is_active = ( $new_status == 'activated' || $new_status == 'autoactivated' );
+				$new_status_is_active = ( $new_status == 'activated' || $new_status == 'autoactivated' || $new_status == 'manualactivated' );
 				$old_status_is_not_active = false;
 				if( $this->check_status( 'can_be_validated' ) && $new_status_is_active )
 				{ // User was activated

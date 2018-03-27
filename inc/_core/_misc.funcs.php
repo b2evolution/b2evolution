@@ -3724,7 +3724,7 @@ function user_get_notification_sender( $user_ID, $setting )
 	if( $User = & $UserCache->get_by_ID( $user_ID ) )
 	{
 		if( $User->check_status( 'is_validated' ) )
-		{	// User is Activated or Autoactivated
+		{	// User is Activated or Autoactivated or Manually activated
 			global $UserSettings;
 			if( $UserSettings->get( $setting_name, $user_ID ) == '' )
 			{	// The user's setting is not defined yet

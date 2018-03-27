@@ -273,6 +273,14 @@ switch( $action )
 		{
 			case 'js' :	// this is a js call, lets return the settings page -- fp> what do you mean "settings page" ?
 				// fp> wthis will visually live insert the new widget into the container; it probably SHOULD open the edit properties right away
+				if( $edited_ComponentWidget->type == 'plugin' && $edited_ComponentWidget->get_Plugin() == false )
+				{
+					$plugin_disabled = 1;
+				}
+				else
+				{
+					$plugin_disabled = 0;
+				}
 				send_javascript_message( array(
 					'addNewWidgetCallback' => array(
 						$edited_ComponentWidget->ID,
@@ -281,6 +289,7 @@ switch( $action )
 						'<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$edited_ComponentWidget->ID ).'" class="widget_name">'
 							.$edited_ComponentWidget->get_desc_for_list()
 						.'</a> '.$edited_ComponentWidget->get_help_link(),
+						$plugin_disabled,
 						$edited_ComponentWidget->get_cache_status( true ),
 					),
 					// Open widget settings:
@@ -432,6 +441,15 @@ switch( $action )
 		$edited_ComponentWidget->set( 'enabled', (int)! $enabled );
 		$edited_ComponentWidget->dbupdate();
 
+		if( $edited_ComponentWidget->type == 'plugin' && $edited_ComponentWidget->get_Plugin() == false )
+		{
+			$plugin_disabled = 1;
+		}
+		else
+		{
+			$plugin_disabled = 0;
+		}
+
 		if ( $enabled )
 		{
 			$msg = T_( 'Widget has been disabled.' );
@@ -445,7 +463,7 @@ switch( $action )
 		if ( $display_mode == 'js' )
 		{
 			// EXITS:
-			send_javascript_message( array( 'doToggle' => array( $edited_ComponentWidget->ID, (int)! $enabled ) ) );
+			send_javascript_message( array( 'doToggle' => array( $edited_ComponentWidget->ID, (int)! $enabled, $plugin_disabled ) ) );
 		}
 		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
 		break;
@@ -736,6 +754,7 @@ if( $display_mode == 'normal' )
 	var delete_icon_tag = \''.get_icon( 'delete', 'imgtag', array( 'title' => T_( 'Remove this widget!' ) ) ).'\';
 	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) ).'\';
 	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';
+	var disabled_plugin_tag = \''.get_icon( 'warning', 'imgtag', array( 'title' => T_('Inactive / Uninstalled plugin') ) ).'\';
 	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\';
 	var deactivate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => T_( 'Disable this widget!' ) ) ).'\';
 	var cache_enabled_icon_tag = \''.get_icon( 'block_cache_on', 'imgtag', array( 'title' => T_( 'Caching is enabled. Click to disable.' ) ) ).'\';

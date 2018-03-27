@@ -1330,7 +1330,7 @@ class Form extends Widget
 				'size' => 20,
 				'autocapitalize' => 'off',
 				'autocorrect' => 'off',
-				'status' => 'all', // Restrict users by status, 'all' - get users with all statuses, '' - activated and autoactivated, or custom statuses separated by comma like 'new,activated,autoactivated,closed,deactivated,emailchanged,failedactivation'
+				'status' => 'all', // Restrict users by status, 'all' - get users with all statuses, '' - activated, autoactivated and manually activated, or custom statuses separated by comma like 'new,activated,manualactivated,autoactivated,closed,deactivated,emailchanged,failedactivation'
 			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );

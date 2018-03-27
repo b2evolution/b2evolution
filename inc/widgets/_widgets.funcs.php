@@ -487,7 +487,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'login_required', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['login_required']['wico_ID'];
-		add_basic_widget( $wico_id, 'free_html', 'core', 10, array( 'content' => '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>' ) );
+		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'login-required-'.$blog_id ) );
 		add_basic_widget( $wico_id, 'user_login', 'core', 20, array( 'title' => T_( 'Log in to your account' ) ) );
 	}
 
@@ -496,7 +496,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'access_denied', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['access_denied']['wico_ID'];
-		add_basic_widget( $wico_id, 'free_html', 'core', 10, array( 'content' => '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>' ) );
+		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'access-denied-'.$blog_id ) );
 	}
 
 
@@ -836,6 +836,7 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
 		{
 			$widget_count++;
 			$enabled = $ComponentWidget->get( 'enabled' );
+			$disabled_plugin = ( $ComponentWidget->type == 'plugin' && $ComponentWidget->get_Plugin() == false );
 
 			if( $ComponentWidget->get( 'code' ) == 'subcontainer' )
 			{
@@ -857,11 +858,18 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
 			}
 
 			// State:
-			echo '<span class="widget_state">'
-					.'<a href="#" onclick="return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' );">'
+			echo '<span class="widget_state">';
+			if( $disabled_plugin )
+			{	// If widget's plugin is disabled:
+				echo get_icon( 'warning', 'imgtag', array( 'title' => T_('Inactive / Uninstalled plugin') ) );
+			}
+			else
+			{	// If this is a normal widget or widget's plugin is enabled:
+				echo '<a href="#" onclick="return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' );">'
 						.get_icon( ( $enabled ? 'bullet_green' : 'bullet_empty_grey' ), 'imgtag', array( 'title' => ( $enabled ? T_('The widget is enabled.') : T_('The widget is disabled.') ) ) )
-					.'</a>'
-				.'</span>';
+					.'</a>';
+			}
+			echo '</span>';
 
 			// Name:
 			$ComponentWidget->init_display( array() );
@@ -916,13 +924,21 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
 			}
 
 			// Actions:
-			echo '<span class="widget_actions">'
+			echo '<span class="widget_actions">';
+			if( $disabled_plugin )
+			{	// If widget's plugin is disabled:
+				// Display a space same as the enable/disable icons:
+				echo action_icon( '', 'deactivate', '#', NULL, NULL, NULL, array( 'style' => 'visibility:hidden', 'class' => 'toggle_action' ) );
+			}
+			else
+			{	// If this is a normal widget or widget's plugin is enabled:
 					// Enable/Disable:
-					.action_icon( ( $enabled ? T_('Disable this widget!') : T_('Enable this widget!') ),
+					echo action_icon( ( $enabled ? T_('Disable this widget!') : T_('Enable this widget!') ),
 							( $enabled ? 'deactivate' : 'activate' ),
 							regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ), NULL, NULL, NULL,
 							array( 'onclick' => 'return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => 'toggle_action' )
 						);
+			}
 					// Edit:
 					if( $mode != 'customizer' )
 					{	// Don't display on customizer mode:
