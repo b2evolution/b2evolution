@@ -9369,13 +9369,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13015, 'Upgrading general settings table...' ) )
-	{	// part of 7.0.0-alpha
-		$DB->query( 'ALTER TABLE T_settings
-			MODIFY set_name VARCHAR(50) COLLATE ascii_general_ci NOT NULL' );
-		upg_task_end();
-	}
-
 	if( upg_task_start( 13020, 'Install default site skin...' ) )
 	{	// part of 7.0.0-alpha
 		load_funcs( 'skins/_skin.funcs.php' );
