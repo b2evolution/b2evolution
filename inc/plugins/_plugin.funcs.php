@@ -384,14 +384,12 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 			$Form->radio_input( $input_name, $set_value, $options, $set_label, $params );
 			break;
-
+			
 		case 'select_input':
 			
 			$has_array_type = true;
 			$has_color_field = false;
-
 			$k_nb = 0;
-
 			$l_parname = $parname;
 
 			if( substr_count( $parname, '[' ) % 2 )
@@ -403,7 +401,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$remove_button = format_to_output( action_icon( T_('Remove'), 'minus',
 					regenerate_url( 'action', array( 'action=del_settings_set&amp;set_path='.$parname.'[0]'.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param( 'user_ID' ) : '' ), 'plugin_ID='.$Obj->ID ) ),
 					T_('Remove'), 5, 3,
-					array( 'onclick' => "var remove_item = jQuery(this).closest(\'.form-group\'), remove_item_id = remove_item.prop(\'id\'); $(\'.\'+remove_item_id+\'\').each(function(){ $(this).remove()});remove_item.remove(); return false;", 'style' => 'padding:10px 10px' )
+					array( 'onclick' => 'remove_button(this); return false;', 'style' => 'padding:10px 10px' )
 				), 'htmlspecialchars' );
 
 			/**** Start (Display of saved entries): ****/
@@ -491,6 +489,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			echo '</div>';
 
 			echo '<script type="text/javascript">
+			var remove_button = function(e) {var remove_item = jQuery(e).closest(\'.form-group\'),remove_item_id = remove_item.prop(\'id\'); $(\'.\'+remove_item_id+\'\').each(function(){ $(this).remove()});remove_item.remove(); return false;}
 			jQuery( document ).ready( function()
 			{
 				var removeButton =  jQuery( "<span>" ).html( "'.$remove_button.'" ).text();
@@ -703,7 +702,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				T_('Add'), 5, 3,
 				// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
 				array( 'onclick'=> "
-					var oThis = this, k_nb = $('#".$parname."_add_new').children('.form-group').length; 
+					var oThis = this, k_nb = $('#{$parname}_add_new').children('.form-group').length; 
 					
  					$js
 
@@ -728,7 +727,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 						}
 						else
 						{	// Create a new span element for error message
-							jQuery( '#$parname' ).next().after( '<span style=\'padding: 0px 15px;\' class=\'field_error\'>' + message + '</span>' );
+						
+							var err = $('<span>').css({'padding':'0px 15px'}).addClass('field_error').html(message);
+							
+							jQuery( '#$parname' ).next().after( err );
+							
 						}
 					};
 
@@ -748,15 +751,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 						k_nb: k_nb,
 						entry_name: entry_name,
 						entry_type: entry_type
-						".( isset( $Blog ) ? ',blog: '.$Blog->ID : '' )."
-						".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
+						".( isset( $Blog ) ? ', blog: '.$Blog->ID : '' )."
+						".( $set_type == 'UserSettings' ? ', user_ID: '.get_param( 'user_ID' ) : '' )."
 					},
-					function( r, status )
+					function( data, status )
 					{
-						var html = jQuery.parseHTML( r, document, true ),
-						controls = jQuery(html).find('.controls'),
-						removeButton = jQuery.parseHTML( '".$remove_button."', document, true );
-
+						var html = jQuery.parseHTML( data, document, true ),
+						controls = jQuery(html).find('.controls');
+						var removeButton = jQuery.parseHTML( '$remove_button', document, true );
 						switch( entry_type )
 						{
 							case 'checkbox':
@@ -772,7 +774,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								$(removeButton).css('vertical-align','middle'); // align
 								break;
 						}
-
 						if( controls.children('div').length > 0 )
 						{	// this should target checkboxes
 							controls.children().last().append(removeButton)
@@ -781,8 +782,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 						{
 							controls.append(removeButton);	
 						}
-
-						var container = jQuery('#".$parname."_add_new');
+						var container = jQuery('#{$parname}_add_new');
 						if( container.children('.form-group').length === 0 )
 						{
 							container.append(html);
