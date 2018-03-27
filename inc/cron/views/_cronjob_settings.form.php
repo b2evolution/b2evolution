@@ -58,6 +58,31 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 				// Prune recycled comments:
 				$Form->text_input( 'auto_empty_trash', $Settings->get( 'auto_empty_trash' ), 5, T_('Prune recycled comments after'), T_('days').'.' );
 				break;
+
+			case 'cleanup-scheduled-jobs':
+				// Clean up scheduled jobs older than a threshold:
+				$Form->text_input( 'cleanup_jobs_threshold', $Settings->get( 'cleanup_jobs_threshold' ), 5, T_('Cleanup scheduled jobs threshold'), T_('days').'. '.T_('The scheduled jobs older than number of entered days will be removed.') );
+				break;
+
+			case 'send-non-activated-account-reminders':
+				// Send reminders about non-activated accounts:
+				$Form->duration_input( 'activate_account_reminder_threshold', $Settings->get( 'activate_account_reminder_threshold' ), T_('Account activation reminder threshold'), 'days', 'minutes', array( 'note' => T_('A user may receive Account activation reminder if the account was created at least the selected period ago.') ) );
+				break;
+
+			case 'send-unmoderated-comments-reminders':
+				// Send reminders about comments awaiting moderation:
+				$Form->duration_input( 'comment_moderation_reminder_threshold', $Settings->get( 'comment_moderation_reminder_threshold' ), T_('Comment moderation reminder threshold'), 'days', 'minutes', array( 'note' => T_('A moderator user may receive Comment moderation reminder if there are comments awaiting moderation which were created at least the selected period ago.') ) );
+				break;
+
+			case 'send-unmoderated-posts-reminders':
+				// Send reminders about posts awaiting moderation:
+				$Form->duration_input( 'post_moderation_reminder_threshold', $Settings->get( 'post_moderation_reminder_threshold' ), T_('Post moderation reminder threshold'), 'days', 'minutes', array( 'note' => T_('A moderator user may receive Post moderation reminder if there are posts awaiting moderation which were created at least the selected period ago.') ) );
+				break;
+
+			case 'send-unread-messages-reminders':
+				// Send reminders about unread messages:
+				$Form->duration_input( 'unread_messsage_reminder_threshold', $Settings->get( 'unread_messsage_reminder_threshold' ), T_('Unread private messages reminder threshold'), 'days', 'minutes', array( 'note' => T_('A user may receive unread message reminder if it has unread private messages at least as old as the selected period.') ) );
+				break;
 		}
 
 	$Form->end_fieldset();

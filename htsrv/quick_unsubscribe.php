@@ -10,7 +10,7 @@ if( empty( $params ) )
 	$params = array();
 }
 
-global $UserSettings;
+global $UserSettings, $Settings;
 
 param( 'type', 'string', true );
 param( 'user_ID', 'integer', true );
@@ -572,8 +572,7 @@ switch( $type )
 
 	case 'cmt_moderation_reminder':
 		// unsubscribe from comment moderation reminder notifications
-		global $comment_moderation_reminder_threshold;
-		$type_str = $notification_prefix.': '.sprintf( T_('comments are awaiting moderation for more than %s.'), seconds_to_period( $comment_moderation_reminder_threshold ) );
+		$type_str = $notification_prefix.': '.sprintf( T_('comments are awaiting moderation for more than %s.'), seconds_to_period( $Settings->get( 'comment_moderation_reminder_threshold' ) ) );
 		break;
 
 	case 'comment_moderator':
@@ -594,8 +593,7 @@ switch( $type )
 
 	case 'pst_moderation_reminder':
 		// unsubscribe from post moderation reminder notifications
-		global $post_moderation_reminder_threshold;
-		$type_str = $notification_prefix.': '.sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $post_moderation_reminder_threshold ) );
+		$type_str = $notification_prefix.': '.sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $Settings->get( 'post_moderation_reminder_threshold' ) ) );
 		break;
 
 	case 'pst_stale_alert':
@@ -615,8 +613,7 @@ switch( $type )
 
 	case 'unread_msg':
 		// unsubscribe from unread messages reminder
-		global $unread_messsage_reminder_threshold;
-		$type_str = $notification_prefix.': '.sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $unread_messsage_reminder_threshold ) );
+		$type_str = $notification_prefix.': '.sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_messsage_reminder_threshold' ) ) );
 		break;
 
 	case 'new_msg':
@@ -626,8 +623,7 @@ switch( $type )
 
 	case 'account_activation':
 		// unsubscribe from account activation reminder
-		global $activate_account_reminder_threshold;
-		$type_str = $notification_prefix.': '.sprintf( T_('my account was deactivated or is not activated for more than %s.'), seconds_to_period( $activate_account_reminder_threshold ) );
+		$type_str = $notification_prefix.': '.sprintf( T_('my account was deactivated or is not activated for more than %s.'), seconds_to_period( $Settings->get( 'activate_account_reminder_threshold' ) ) );
 		break;
 
 	case 'newsletter':

@@ -226,6 +226,31 @@ switch( $action )
 					param( 'auto_empty_trash', 'integer', $Settings->get_default( 'auto_empty_trash' ), false, false, true, false );
 					$Settings->set( 'auto_empty_trash', get_param( 'auto_empty_trash' ) );
 					break;
+
+				case 'cleanup-scheduled-jobs':
+					// Clean up scheduled jobs older than a threshold:
+					$Settings->set( 'cleanup_jobs_threshold', param( 'cleanup_jobs_threshold', 'integer', 0 ) );
+					break;
+
+				case 'send-non-activated-account-reminders':
+					// Send reminders about non-activated accounts:
+					$Settings->set( 'activate_account_reminder_threshold', param_duration( 'activate_account_reminder_threshold' ) );
+					break;
+
+				case 'send-unmoderated-comments-reminders':
+					// Send reminders about comments awaiting moderation:
+					$Settings->set( 'comment_moderation_reminder_threshold', param_duration( 'comment_moderation_reminder_threshold' ) );
+					break;
+
+				case 'send-unmoderated-posts-reminders':
+					// Send reminders about posts awaiting moderation:
+					$Settings->set( 'post_moderation_reminder_threshold', param_duration( 'post_moderation_reminder_threshold' ) );
+					break;
+
+				case 'send-unread-messages-reminders':
+					// Send reminders about unread messages:
+					$Settings->set( 'unread_messsage_reminder_threshold', param_duration( 'unread_messsage_reminder_threshold' ) );
+					break;
 			}
 		}
 
