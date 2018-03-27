@@ -389,7 +389,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 			$has_array_type = true;
 			$has_color_field = false;
+
 			$k_nb = 0;
+
 			$l_parname = $parname;
 
 			if( substr_count( $parname, '[' ) % 2 )
@@ -405,7 +407,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				), 'htmlspecialchars' );
 
 			/**** Start (Display of saved entries): ****/
-			echo '<div id="'.$parname.'_add_new">';
+			echo '<div id="'.$parname.'_disp">';
 			
 				if( is_array( $set_value ) )
 				{
@@ -459,6 +461,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 									// RECURSE:$parname.'['.$current_multiple_par_entry_name.$input_name.']['.$k.']'
 									//pre_dump( $parname.'['.$sv.']['.$current_multiple_par_entry_name.']['.$input_name.']' );
 									autoform_display_field( $parname.'['.$sv.']['.$current_multiple_par_entry_name.']['.$input_name.']', $input_meta, $Form, $set_type, $Obj, $set_target, $l_value );
+									
+									$k_nb++;
 								}
 								$Form->end_line();
 							}
@@ -477,6 +481,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 														   $parmeta['entries'][ $set_value_entry_name ], 
 														   $Form, $set_type, $Obj, $set_target, $sv_data[ $set_value_entry_name ] );
 									
+									$k_nb++;
+									
 								}
 								
 								
@@ -487,18 +493,253 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				
 			
 			echo '</div>';
+ 
+			$set_path = $parname.'[0]';
+			
+			$parmeta_entries = json_encode( $parmeta['entries'] );
+			
+			$max_number = ( isset( $parmeta['max_number'] ) ? $parmeta['max_number'] : 0 );
+			
 
-			echo '<script type="text/javascript">
-			var remove_button = function(e) {var remove_item = jQuery(e).closest(\'.form-group\'),remove_item_id = remove_item.prop(\'id\'); $(\'.\'+remove_item_id+\'\').each(function(){ $(this).remove()});remove_item.remove(); return false;}
+			$js = '';
+			
+			
+			$disable_add = false;
+			
+			// Overall max_number is defined and saved number is equal or bigger than max_number then disable the add button
+			if( $max_number > 0 && $max_number <= ($k_nb) )
+			{
+				$disable_add = true;
+			}
+				
+			
+			$use_single_button = false;
+			
+			
+			if( ! isset( $parmeta['entries'] ) )
+			{
+				break;
+			}
+			
+			if( count( $parmeta['entries'] ) == 1 )
+			{
+				$val = array_keys($parmeta['entries'])[0];
+				
+				$js .= "var entry_name = '$val';";
+				
+				$use_single_button = true;
+			}
+			else
+			{
+				$js .= "var entry_name = jQuery('#$parname option:selected').val();";
+			
+			}
+			
+			$js .= "var action_msg_container = jQuery( '#".$parname."_action_messages' ); action_msg_container.children().remove();"."\n\r";
+
+			
+			/*
+			*	param_prefix: is defined in Form Class: "ffield_"
+			*	$parname: get from $Obj->get_param_prefix().$parname
+			*	instance: use a fake placeholder "_#_"
+			*	We need to restrict the amount of items added if the param "max_number" is defined
+			*	this can only be done vie JavaScript because of dynamic calls that inserts (or removes)
+			*	items before it is actully saved in $DB.
+			* 	
+			*	logic: 	create array of current items "input_name", 
+			*			extract from "(.form-group).prop('id')" 
+			*			build occurrance array, check against "parmeta_entries[entry_name].max_number"
+			*/
+			$js .= "var parmeta_entries = $parmeta_entries;";
+				
+			$js .= "if( typeof parmeta_entries[entry_name] !== 'undefined' ){
+						var entry_type = parmeta_entries[entry_name].type, 
+						entry_max = ( parmeta_entries[entry_name].max_number !== 'undefined' ) ? parmeta_entries[entry_name].max_number:0;
+					}
+					else
+					{
+						entry_type = '';
+						entry_max = 0;
+						
+					}";
+			
+			// Get param_prefix used:
+			$js .= "var param_prefix = 'ffield_".$Obj->get_param_prefix().$parname."_#_';";
+			// Create an array with all used input types:
+			$js .= "var disp_entries = $('#".$parname."_disp').children('.form-group').map(function () {"; 
+			// Strip param_prefix from the string: 
+			$js .= "var r = $(this).prop('id').substring(param_prefix.length);";
+			
+			// Isolate and return the input type from the remaining string:
+			$js .= "return r.substring(1, r.length-1);"; 
+			// End of map
+			$js .= "}).get();";
+			// Create function to build new array with type occurrence {input_name:occurrences}:	
+			$js .= "Array.prototype.occurrence  = function () { var occurrence = {}; this.map( function (a){ if (!(a in this)) { this[a] = 1; } else { this[a] += 1; } return a; }, occurrence );  return occurrence; };";	
+			
+			// Build new array with type occurrence {input_name:occurrences}:
+			$js .= "var disp_entries = disp_entries.occurrence();";
+			
+			$js .= "
+			if( entry_max > 0 )
+			{
+				// Did the user reach maximum amount of entries allowed?
+				if( disp_entries[entry_name] >= entry_max )
+				{";	
+			
+				// Send a messsage to the user, else it might seem like there is no response on the click action? 
+					
+				$js .= 'action_msg_container.html( \'<div class="action_messages container-fluid"><ul><li><div class="alert alert-dismissible alert-danger fade in">'.TS_('You already added the maximum number of items for this type!').'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div></li></ul></div>\' ); 
+				
+					//Already added the maximum number of items for this type!
+					return false;
+				}
+				//Sure, let\'s add this type!
+			
+			}';
+			
+			echo "<script type='text/javascript'>
+			
+				var input_select_add = function(e) {
+				
+				var k_nb = $('#{$parname}_disp').children('.form-group').length; 
+					
+ 					$js
+
+					if( entry_type == '' )
+					{	// Mark select element of field types as error
+						field_type_error( '".TS_('Please select a field type.')."' );
+						// We should stop the ajax request without entry_type
+						return false;
+					}
+					else
+					{	// Remove an error class from the field
+						field_type_error_clear();
+					}
+
+					function field_type_error( message )
+					{	// Add an error message for the 'field of type' select
+						jQuery( '#$parname' ).addClass( 'field_error' );
+						var span_error = jQuery( '#$parname' ).siblings( 'span.field_error' );
+						if( span_error.length > 0 )
+						{	// Replace a content of the existing span element
+							span_error.html( message );
+						}
+						else
+						{	// Create a new span element for error message
+						
+							var err = $('<span>').css({'padding':'0px 15px'}).addClass('field_error').html(message);
+							
+							jQuery( '#$parname' ).next().after( err );
+							
+						}
+					};
+
+					function field_type_error_clear()
+					{	// Remove an error style from the 'field of type' select
+						jQuery( '#$parname' ).removeClass( 'field_error' )
+						.siblings( 'span.field_error' ).remove();
+					};
+
+					jQuery.get('".get_htsrv_url()."async.php',
+					{
+						action: 'add_plugin_sett_selected',
+						plugin_ID: '{$Obj->ID}',
+						set_type: '$set_type',
+						set_path: '$set_path',
+						parname: '$parname',
+						k_nb: k_nb,
+						entry_name: entry_name,
+						entry_type: entry_type
+						".( isset( $Blog ) ? ', blog: '.$Blog->ID : '' )."
+						".( $set_type == 'UserSettings' ? ', user_ID: '.get_param( 'user_ID' ) : '' )."
+					},
+					function( data, status )
+					{
+						var html = jQuery.parseHTML( data, document, true ),
+						
+						controls = jQuery(html).find('.controls');
+				
+						var removeButton = $('<div>').html('$remove_button').text();
+						
+						switch( entry_type )
+						{
+							case 'checkbox':
+								$(removeButton).css('vertical-align','top'); // align
+								break;
+							case 'radio':
+								$(removeButton).css('vertical-align','bottom'); // align
+								break;
+							case 'checklist':
+								$(removeButton).css('display','block'); // align
+								break;
+							default:
+								$(removeButton).css('vertical-align','middle'); // align
+								break;
+						}
+
+						if( controls.children('div').length > 0 )
+						{	// this should target checkboxes
+							controls.children().last().append(removeButton)
+						}
+						else
+						{
+							controls.append(removeButton);	
+						}
+
+						var container = jQuery('#{$parname}_disp');
+						if( container.children('.form-group').length === 0 )
+						{
+							container.append(html);
+						}
+						else
+						{
+							container.children('.form-group').last().after(html);
+						}
+						".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
+						validate_entries();
+					} );
+				}
+				
+				var validate_entries = function() {
+				
+					var max_items_container = $('#{$parname}_max_items'), select_input_add = $('#{$parname}_add_new'), select_input = $('#{$parname}');
+
+					var k_nb = $('#{$parname}_disp').children('.form-group').length;
+					
+					if( k_nb < $max_number )
+					{
+						max_items_container.css({'display':'none'});
+						select_input_add.css({'display':''});
+						select_input.css({'display':''});
+
+					} 
+					else 
+					{
+						max_items_container.css({'display':''});
+						select_input_add.css({'display':'none'});
+						select_input.css({'display':'none'});
+					}
+
+				};
+			
+				var remove_button = function(e) {
+				
+				var remove_item = jQuery(e).closest('.form-group'),remove_item_id = remove_item.prop('id'); $('.'+remove_item_id).each(function(){ $(this).remove()});remove_item.remove(); 
+				validate_entries();
+
+			}
+				
 			jQuery( document ).ready( function()
 			{
-				var removeButton =  jQuery( "<span>" ).html( "'.$remove_button.'" ).text();
-				jQuery( "#'.$parname.'_add_new" ).children( ".form-group" ).each( function()
+				var removeButton = jQuery( '<span>' ).html( '$remove_button' ).text();
+				
+				jQuery( '#{$parname}_disp' ).children( '.form-group' ).each( function()
 				{
-					jQuery( this ).find( ".controls" ).append( removeButton );
+					jQuery( this ).find( '.controls' ).append( removeButton );
 				} );
 			} );
-			</script>';
+			</script>";
 			/****  End (Display of saved entries). ****/
 			
 			
@@ -532,19 +773,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				}
 			}
 
-			if( ! isset( $parmeta['entries'] ) )
-			{
-				break;
-			}
 
 			$options = array();
 			$field_options = '';
-			$use_single_button = false;
-
-			if( count( $parmeta['entries'] ) == 1 )
-			{
-				$use_single_button = true;
-			}
 
 			if( ! $use_single_button )
 			{
@@ -555,6 +786,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 
 			$entry_field_name = '';
+			
 			foreach( $parmeta['entries'] as $index => $entry )
 			{
 				if( isset( $entry['type'] ) )
@@ -625,191 +857,36 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$button_add_field = '';
 			$user_ID = $set_type == 'UserSettings' ? $set_target->ID : '';
 
-			$parmeta_entries = format_to_output( json_encode( $parmeta['entries'] ), 'htmlspecialchars' );
-
-		
-			$js = '';
-			$js .= "var entry_name = ( '$use_single_button' ) ? $entry_field_name : jQuery('#$parname option:selected').val(),";
-			$js .= "action_msg_container = jQuery( '#".$parname."_action_messages' ); action_msg_container.children().remove();";
-
-			
-			/*
-			*	param_prefix: is defined in Form Class: "ffield_"
-			*	$parname: get from $Obj->get_param_prefix().$parname
-			*	instance: use a fake placeholder "_#_"
-			*	We need to restrict the amount of items added if the param "max_number" is defined
-			*	this can only be done vie JavaScript because of dynamic calls that inserts (or removes)
-			*	items before it is actully saved in $DB.
-			* 	
-			*	logic: 	create array of current items "input_name", 
-			*			extract from "(.form-group).prop('id')" 
-			*			build occurrance array, check against "parmeta_entries[entry_name].max_number"
-			*/
-			$js .= "var parmeta_entries = $parmeta_entries;";
-				
-			$js .= "if( typeof parmeta_entries[entry_name] !== 'undefined' )
-					{
-						var entry_type = parmeta_entries[entry_name].type, 
-						entry_max = ( parmeta_entries[entry_name].max_number !== 'undefined' ) ? parmeta_entries[entry_name].max_number:0;
-					}
-					else
-					{
-						entry_type = '';entry_max = 0;
-						
-					}";
-			
-			// Get param_prefix used:
-			$js .= "var param_prefix = 'ffield_".$Obj->get_param_prefix().$parname."_#_';";
-			// Create an array with all used input types:
-			$js .= "var disp_entries = $('#".$parname."_add_new').children('.form-group').map(function () {"; 
-			// Strip param_prefix from the string: 
-			$js .= "var r = $(this).prop('id').substring(param_prefix.length);";
-			
-			// Isolate and return the input type from the remaining string:
-			$js .= "return r.substring(1, r.length-1);"; 
-			// End of map
-			$js .= "}).get();";
-			// Create function to build new array with type occurrence {input_name:occurrences}:	
-			$js .= "Array.prototype.occurrence  = function () { var occurrence = {}; this.map( function (a){ if (!(a in this)) { this[a] = 1; } else { this[a] += 1; } return a; }, occurrence );  return occurrence; };";	
-			
-			// Build new array with type occurrence {input_name:occurrences}:
-			$js .= "var disp_entries = disp_entries.occurrence();";
-			
-			$js .= "
-			if( entry_max > 0 )
-			{
-				// Did the user reach maximum amount of entries allowed?
-				if( disp_entries[entry_name] >= entry_max )
-				{";	
-			
-				// Send a messsage to the user, else it might seem like there is no response on the click action? 
-					
-				$js .= format_to_output( 'action_msg_container.html( \'<div class="action_messages container-fluid"><ul><li><div class="alert alert-dismissible alert-danger fade in">'.TS_('You already added the maximum number of items for this type!').'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div></li></ul></div>\' ); 
-				
-					//Already added the maximum number of items for this type!
-					return false;
-				}
-				//Sure, let\'s add this type!
-			
-			}', 'htmlspecialchars' );
-			
 			global $Blog;
- 
-			$set_path = $parname.'[0]';
 
 			$button_add_field .= action_icon( T_('Add'), 'add',
 				regenerate_url( 'action', array( 'action=add_settings_set1', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param( 'user_ID' ) : '' ), 'plugin_ID='.$Obj->ID ) ),
 				T_('Add'), 5, 3,
 				// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
-				array( 'onclick'=> "
-					var oThis = this, k_nb = $('#{$parname}_add_new').children('.form-group').length; 
-					
- 					$js
-
-					if( entry_type == '' )
-					{	// Mark select element of field types as error
-						field_type_error( '".TS_('Please select a field type.')."' );
-						// We should stop the ajax request without entry_type
-						return false;
-					}
-					else
-					{	// Remove an error class from the field
-						field_type_error_clear();
-					}
-
-					function field_type_error( message )
-					{	// Add an error message for the 'field of type' select
-						jQuery( '#$parname' ).addClass( 'field_error' );
-						var span_error = jQuery( '#$parname' ).siblings( 'span.field_error' );
-						if( span_error.length > 0 )
-						{	// Replace a content of the existing span element
-							span_error.html( message );
-						}
-						else
-						{	// Create a new span element for error message
-						
-							var err = $('<span>').css({'padding':'0px 15px'}).addClass('field_error').html(message);
-							
-							jQuery( '#$parname' ).next().after( err );
-							
-						}
-					};
-
-					function field_type_error_clear()
-					{	// Remove an error style from the 'field of type' select
-						jQuery( '#$parname' ).removeClass( 'field_error' )
-						.siblings( 'span.field_error' ).remove();
-					};
-
-					jQuery.get('".get_htsrv_url()."async.php',
-					{
-						action: 'add_plugin_sett_selected',
-						plugin_ID: '{$Obj->ID}',
-						set_type: '$set_type',
-						set_path: '$set_path',
-						parname: '$parname',
-						k_nb: k_nb,
-						entry_name: entry_name,
-						entry_type: entry_type
-						".( isset( $Blog ) ? ', blog: '.$Blog->ID : '' )."
-						".( $set_type == 'UserSettings' ? ', user_ID: '.get_param( 'user_ID' ) : '' )."
-					},
-					function( data, status )
-					{
-						var html = jQuery.parseHTML( data, document, true ),
-						controls = jQuery(html).find('.controls');
-						var removeButton = jQuery.parseHTML( '$remove_button', document, true );
-						switch( entry_type )
-						{
-							case 'checkbox':
-								$(removeButton).css('vertical-align','top'); // align
-								break;
-							case 'radio':
-								$(removeButton).css('vertical-align','bottom'); // align
-								break;
-							case 'checklist':
-								$(removeButton).css('display','block'); // align
-								break;
-							default:
-								$(removeButton).css('vertical-align','middle'); // align
-								break;
-						}
-						if( controls.children('div').length > 0 )
-						{	// this should target checkboxes
-							controls.children().last().append(removeButton)
-						}
-						else
-						{
-							controls.append(removeButton);	
-						}
-						var container = jQuery('#{$parname}_add_new');
-						if( container.children('.form-group').length === 0 )
-						{
-							container.append(html);
-						}
-						else
-						{
-							container.children('.form-group').last().after(html);
-						}
-						".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
-					} );
-					return false;",
+				array( 
+					'id' => $parname.'_add_new',
+					'style' => ($disable_add)?'display:none':'',
+					'onclick'=> "input_select_add(this); return false;",
 					'class'=> "btn btn-default",
 				) );
+			
 
 			$field_params = array(
-					'field_suffix' => $button_add_field.( empty( $params['note'] ) ? '' : '<br /><span class="notes">'.$params['note'].'</span>' ),
-					'id'           => $parname
+					'field_suffix' => $button_add_field.'<span id="'.$parname.'_max_items"  class="btn btn-default" style="'.(($disable_add)?'':'display:none').'">'.T_('Maximum items added').'</span>'.( empty( $params['note'] ) ? '' : '<br /><span class="notes">'.$params['note'].'</span>' ),
+					'id'           => $parname,
+					'style' => ($disable_add)?'display:none':'' 
 				);
-
+			
+			
 			if( $use_single_button )
 			{
-				$Form->info_field( $set_label, '', $field_params );
+				$Form->info_field( $set_label, '<span id="'.$parname.'" style="'.(($disable_add)?'display:none':'').'" class="btn btn-default hoverlink">'.$label.'</span>', $field_params );
 			}
 			else
 			{
 				$Form->select_input_options( $field_name, $field_options, $field_label, '', $field_params );
 			}
+			
 			break;
 
 		case 'array':
