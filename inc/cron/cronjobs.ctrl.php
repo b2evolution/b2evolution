@@ -198,10 +198,11 @@ switch( $action )
 			// Max execution time:
 			$Settings->set( 'cjob_timeout_'.$cron_job_key, param_duration( 'cjob_timeout_'.$cron_job_key ) );
 
-			// Additional settings:
+			// Additional settings per cron job:
 			switch( $cron_job_key )
 			{
 				case 'send-email-campaign':
+					// Send a chunk of x emails for the campaign:
 					if( $current_User->check_perm( 'emails', 'edit' ) )
 					{	// Allow to edit email cron setting "Chunk Size" only if user has a permission:
 						$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
@@ -212,6 +213,18 @@ switch( $action )
 
 					// Delay between chunks in case all remaining recipients have reached max # of emails for the current day:
 					$Settings->set( 'email_campaign_cron_limited', param_duration( 'email_campaign_cron_limited' ) );
+					break;
+
+				case 'prune-old-hits-and-sessions':
+					// Prune old hits & sessions (includes OPTIMIZE):
+					param( 'auto_prune_stats', 'integer', $Settings->get_default( 'auto_prune_stats' ), false, false, true, false );
+					$Settings->set( 'auto_prune_stats', get_param( 'auto_prune_stats' ) );
+					break;
+
+				case 'prune-recycled-comments':
+					// Prune recycled comments:
+					param( 'auto_empty_trash', 'integer', $Settings->get_default( 'auto_empty_trash' ), false, false, true, false );
+					$Settings->set( 'auto_empty_trash', get_param( 'auto_empty_trash' ) );
 					break;
 			}
 		}

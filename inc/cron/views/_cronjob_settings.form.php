@@ -32,10 +32,11 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 
 		$Form->duration_input( 'cjob_timeout_'.$cron_job_key, $Settings->get( 'cjob_timeout_'.$cron_job_key ), T_('Max execution time'), 'days', 'minutes', array( 'note' => T_( 'Leave empty for no limit' ) ) );
 
-		// Additional settings:
+		// Additional settings per cron job:
 		switch( $cron_job_key )
 		{
 			case 'send-email-campaign':
+				// Send a chunk of x emails for the campaign:
 				if( $current_User->check_perm( 'emails', 'edit' ) )
 				{	// Allow to edit email cron settings only if user has a permission:
 					$Form->text_input( 'email_campaign_chunk_size', $Settings->get( 'email_campaign_chunk_size' ), 5, T_('Chunk Size'), T_('emails at a time'), array( 'maxlength' => 10 ) );
@@ -46,6 +47,16 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 				}
 				$Form->duration_input( 'email_campaign_cron_repeat', $Settings->get( 'email_campaign_cron_repeat' ), T_('Delay between chunks'), 'days', 'minutes', array( 'note' => T_('timing between scheduled job runs') ) );
 				$Form->duration_input( 'email_campaign_cron_limited', $Settings->get( 'email_campaign_cron_limited' ), T_('Delay in case all remaining recipients have reached max # of emails for the current day'), 'days', 'minutes', array( 'note' => T_('timing between scheduled job runs') ) );
+				break;
+
+			case 'prune-old-hits-and-sessions':
+				// Prune old hits & sessions (includes OPTIMIZE):
+				$Form->text_input( 'auto_prune_stats', $Settings->get( 'auto_prune_stats' ), 5, T_('Keep detailed hitlog for'), T_('days. How many days of hits & sessions do you want to keep in the database for stats?') );
+				break;
+
+			case 'prune-recycled-comments':
+				// Prune recycled comments:
+				$Form->text_input( 'auto_empty_trash', $Settings->get( 'auto_empty_trash' ), 5, T_('Prune recycled comments after'), T_('days').'.' );
 				break;
 		}
 
