@@ -3769,6 +3769,7 @@ function get_user_statuses( $null_option_name = '' )
 	$user_statuses = array(
 			'new'              => T_( 'New' ),
 			'activated'        => T_( 'Activated by email' ),
+			'manualactivated'  => T_( 'Manually activated' ),
 			'autoactivated'    => T_( 'Autoactivated' ),
 			'emailchanged'     => T_( 'Email changed' ),
 			'deactivated'      => T_( 'Deactivated email' ),
@@ -3798,6 +3799,7 @@ function get_user_status_icons( $display_text = false )
 {
 	$user_status_icons = array(
 			'activated'        => get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'Account has been activated by email' ) ) ),
+			'manualactivated'  => get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'Account has been manually activated' ) ) ),
 			'autoactivated'    => get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'Account has been automatically activated' ) ) ),
 			'new'              => get_icon( 'bullet_blue', 'imgtag', array( 'title' => T_( 'New account' ) ) ),
 			'deactivated'      => get_icon( 'bullet_blue', 'imgtag', array( 'title' => T_( 'Deactivated account' ) ) ),
@@ -3809,6 +3811,7 @@ function get_user_status_icons( $display_text = false )
 	if( $display_text )
 	{
 		$user_status_icons['activated']        .= ' '.T_( 'Activated' );
+		$user_status_icons['manualactivated']  .= ' '.T_( 'Manually activated' );
 		$user_status_icons['autoactivated']    .= ' '.T_( 'Autoactivated' );
 		$user_status_icons['new']              .= ' '.T_( 'New' );
 		$user_status_icons['deactivated']      .= ' '.T_( 'Deactivated' );

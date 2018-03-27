@@ -1671,7 +1671,7 @@ class RestApi
 		$user_logins = array();
 		foreach( $users as $User )
 		{
-			if( $can_view_all_users || in_array( $User->get( 'status' ), array( 'activated', 'autoactivated' ) ) )
+			if( $can_view_all_users || in_array( $User->get( 'status' ), array( 'activated', 'autoactivated', 'manualactivated' ) ) )
 			{	// Allow to see this user only if current User has a permission to see users with current status:
 				$user_logins[] = $User->get( 'login' );
 			}
@@ -1693,7 +1693,7 @@ class RestApi
 		global $DB;
 
 		$params = array_merge( array(
-				'sql_where' => 'user_status IN ( "activated", "autoactivated" )',
+				'sql_where' => 'user_status IN ( "activated", "autoactivated", "manualactivated" )',
 				'sql_mask'  => '$login$%',
 				'sql_limit' => 0,
 			), $params );

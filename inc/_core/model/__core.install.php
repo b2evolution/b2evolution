@@ -82,7 +82,7 @@ $schema_queries = array(
 			user_pass_driver VARCHAR(16) NOT NULL default 'evo\$md5',
 			user_grp_ID int(4) NOT NULL default 1,
 			user_email varchar(255) COLLATE ascii_general_ci NOT NULL,
-			user_status enum( 'activated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
+			user_status enum( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
 			user_avatar_file_ID int(10) unsigned default NULL,
 			user_firstname varchar(50) NULL,
 			user_lastname varchar(50) NULL,
