@@ -235,6 +235,26 @@ switch( $action )
 				case 'send-non-activated-account-reminders':
 					// Send reminders about non-activated accounts:
 					$Settings->set( 'activate_account_reminder_threshold', param_duration( 'activate_account_reminder_threshold' ) );
+					// Account activation reminder settings:
+					$reminder_config = array();
+					$reminder_config_num = param( 'activate_account_reminder_config_num', 'integer', 0 );
+					for( $c = 0; $c <= $reminder_config_num; $c++ )
+					{
+						$reminder_config_value = param_duration( 'activate_account_reminder_config_'.$c );
+						if( $reminder_config_value > 0 )
+						{	// Store only a selected reminder:
+							$reminder_config[ $c ] = $reminder_config_value;
+						}
+					}
+					if( count( $reminder_config ) < 2 )
+					{	// If no reminder has been selected:
+						param_error( 'activate_account_reminder_config_0', T_('Please select at least one reminder for account activation reminder after subscription.') );
+					}
+					if( ! isset( $reminder_config[ $reminder_config_num ] ) )
+					{	// If "Mark as failed" is not selected:
+						param_error( 'activate_account_reminder_config_'.$reminder_config_num, T_('Please select account activation reminder threshold to mark as failed after subscription.') );
+					}
+					$Settings->set( 'activate_account_reminder_config', implode( ',', $reminder_config ) );
 					break;
 
 				case 'send-unmoderated-comments-reminders':
@@ -252,6 +272,11 @@ switch( $action )
 					$Settings->set( 'unread_messsage_reminder_threshold', param_duration( 'unread_messsage_reminder_threshold' ) );
 					break;
 			}
+		}
+
+		if( param_errors_detected() )
+		{	// Don't store settings if errors:
+			break;
 		}
 
 		// Update settings:

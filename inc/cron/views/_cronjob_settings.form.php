@@ -67,6 +67,27 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 			case 'send-non-activated-account-reminders':
 				// Send reminders about non-activated accounts:
 				$Form->duration_input( 'activate_account_reminder_threshold', $Settings->get( 'activate_account_reminder_threshold' ), T_('Account activation reminder threshold'), 'days', 'minutes', array( 'note' => T_('A user may receive Account activation reminder if the account was created at least the selected period ago.') ) );
+				// Convert the setting to array because it is used as array but stored as values separated by comma:
+				$activate_account_reminder_config = explode( ',', $Settings->get( 'activate_account_reminder_config' ) );
+				$config_count = count( $activate_account_reminder_config );
+				foreach( $activate_account_reminder_config as $c => $activate_account_reminder_config_value )
+				{
+					$reminder_config_label = sprintf( T_('Reminder #%d'), $c + 1 );
+					$reminder_config_params = array(
+							'note'             => T_('After subscription'),
+							'none_title_label' => T_('Don\'t send'),
+						);
+					if( $c == $config_count - 1 )
+					{	// Last option is used for failed activation threshold:
+						$Form->duration_input( 'activate_account_reminder_config_'.$c, 0, $reminder_config_label, '', '', $reminder_config_params );
+						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $activate_account_reminder_config[ $c ], T_('Mark as failed'), '', '', $reminder_config_params );
+					}
+					else
+					{	// Not last options for reminders:
+						$Form->duration_input( 'activate_account_reminder_config_'.$c, $activate_account_reminder_config[ $c ], $reminder_config_label, '', '', $reminder_config_params );
+					}
+				}
+				$Form->hidden( 'activate_account_reminder_config_num', $config_count );
 				break;
 
 			case 'send-unmoderated-comments-reminders':

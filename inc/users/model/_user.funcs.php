@@ -3006,7 +3006,7 @@ function check_usertags( $user_ID, $test_tags = array(), $type = 'has_any' )
  */
 function get_account_activation_info( $edited_User )
 {
-	global $Settings, $UserSettings, $servertimenow, $activate_account_reminder_config;
+	global $Settings, $UserSettings, $servertimenow;
 
 	$field_label = T_('Latest account activation email');
 	$can_be_validated = $edited_User->check_status( 'can_be_validated' );
@@ -3053,6 +3053,9 @@ function get_account_activation_info( $edited_User )
 	{ // When validation process is secure, then account activation email is not known, and this was already added as a note into the 'Last account activation email' field
 		return $result;
 	}
+
+	// Convert the setting to array because it is used as array but stored as values separated by comma:
+	$activate_account_reminder_config = explode( ',', $Settings->get( 'activate_account_reminder_config' ) );
 
 	$field_label = T_('Next account activation reminder');
 	$number_of_max_reminders = ( count( $activate_account_reminder_config ) - 1 );

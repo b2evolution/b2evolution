@@ -1776,14 +1776,18 @@ class Form extends Widget
 
 		$this->handle_common_params( $field_params, $field_prefix, $field_label );
 
-		$periods_values = array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 50 );
+		$periods_values = array();
+		for( $p = 1; $p <= 60; $p++ )
+		{
+			$periods_values[] = $p;
+		}
 		$periods = array(
-			array( 'name' => 'second', 'title' => T_('second(s)'), 'seconds' => 1,        'size' => 1 ), // 1 seconds
-			array( 'name' => 'minute', 'title' => T_('minute(s)'), 'seconds' => 50,       'size' => 60 ), // 50 seconds
-			array( 'name' => 'hour',   'title' => T_('hour(s)'),   'seconds' => 3000,     'size' => 3600 ), // 50 minutes
-			array( 'name' => 'day',    'title' => T_('day(s)'),    'seconds' => 72000,    'size' => 86400 ), // 20 hours
-			array( 'name' => 'month',  'title' => T_('month(s)'),  'seconds' => 2160000,  'size' => 2592000 ), // 25 days
-			array( 'name' => 'year',   'title' => T_('year(s)'),   'seconds' => 25920000, 'size' => 31536000 ), // 10 months
+			array( 'name' => 'second', 'title' => T_('second(s)'), 'seconds' => 1 ), // 1 second
+			array( 'name' => 'minute', 'title' => T_('minute(s)'), 'seconds' => 60 ), // 60 seconds
+			array( 'name' => 'hour',   'title' => T_('hour(s)'),   'seconds' => 3600 ), // 60 minutes
+			array( 'name' => 'day',    'title' => T_('day(s)'),    'seconds' => 86400 ), // 24 hours
+			array( 'name' => 'month',  'title' => T_('month(s)'),  'seconds' => 2592000 ), // 30 days
+			array( 'name' => 'year',   'title' => T_('year(s)'),   'seconds' => 31536000 ), // 365 days
 		);
 
 		$r = $this->begin_field();
@@ -1794,23 +1798,13 @@ class Form extends Widget
 		if( !empty( $duration ) )
 		{
 			$periods_count = count( $periods );
-			for( $p = 0; $p <= $periods_count; $p++ )
+			for( $p = $periods_count - 1; $p >= 0; $p-- )
 			{
-				$period = $periods[ $p < $periods_count ? $p : $periods_count - 1 ];
-				if( ( $p == 0 && $duration <= $period['seconds'] ) ||
-				    ( $p == $periods_count && $duration > $period['seconds'] ) ||
-				    ( $p > 0 && $duration > $periods[ $p - 1 ]['seconds'] && $duration <= $period['seconds'] ) )
+				$period = $periods[ $p ];
+				$duration_value = ( $duration / $period['seconds'] );
+				if( $duration_value >= 1 && ( $duration % $period['seconds'] ) == 0 )
 				{
-					$period = $periods[ $p > 0 ? $p - 1 : 0 ];
-					$duration_value = floor( $duration / $period['size'] );
-					foreach( $periods_values as $v => $value )
-					{
-						if( $duration_value <= $value )
-						{
-							$current_value = $value;
-							break;
-						}
-					}
+					$current_value = $duration_value;
 					$current_period = $period['name'];
 					break;
 				}
