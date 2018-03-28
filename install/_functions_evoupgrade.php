@@ -9338,7 +9338,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12760 ) )
+	if( upg_task_start( 12760, 'Upgrading email campaign table...' ) )
 	{ // part of 6.10.1-stable
 		db_upgrade_cols( 'T_email__campaign', array(
 			'ADD' => array(
@@ -9386,6 +9386,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				ecmp_like_count = a.like_count,
 				ecmp_dislike_count = a.dislike_count,
 				ecmp_unsub_clicks = a.unsub_clicks' );
+
+		upg_task_end();
 	}
 
 	/*
