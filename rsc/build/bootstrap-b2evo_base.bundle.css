@@ -4690,5 +4690,5 @@ div.message_toolbars {
 .disp_access_requires_login .evo_widget.widget_core_user_login {
   min-width: 290px;
   max-width: 400px;
-  margin: 1.5em auto auto;
+  margin: 10px auto;
 }
