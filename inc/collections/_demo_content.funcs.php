@@ -1112,7 +1112,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	{
 		// =======================================================================================================
 		case 'main':
-			$post_count = 13;
+			$post_count = 15;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1266,13 +1266,29 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 <p>A content block can be included in several places.</p>'),
 						$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Content Block' );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+						$now, $cat_home_b2evo, array(), 'published', '#', 'login-required-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
+						$now, $cat_home_b2evo, array(), 'published', '#', 'access-denied-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
 			}
 			break;
 
 		// =======================================================================================================
 		case 'std':
 		case 'blog_a':
-			$post_count = 11;
+			$post_count = 13;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1504,11 +1520,30 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				$edit_File->link_to_Object( $LinkOwner );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
+
+			if( is_available_item_type( $blog_ID, 'Content Block' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+						$now, $cat_bg, array(), 'published', '#', 'login-required-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
+						$now, $cat_bg, array(), 'published', '#', 'access-denied-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+			}
 			break;
 
 		// =======================================================================================================
 		case 'blog_b':
-			$post_count = 11;
+			$post_count = 13;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1673,11 +1708,30 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				// $edited_Item->insert_update_tags( 'update' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
+
+			if( is_available_item_type( $blog_ID, 'Content Block' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+						$now, $cat_ann_b, array(), 'published', '#', 'login-required-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
+						$now, $cat_ann_b, array(), 'published', '#', 'access-denied-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+			}
 			break;
 
 		// =======================================================================================================
 		case 'photo':
-			$post_count = 3;
+			$post_count = 5;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1756,11 +1810,30 @@ a school bus stop where you wouldn\'t really expect it!
 					$item_IDs[] = array( $edited_Item->ID, $now );
 				}
 			}
+
+			if( is_available_item_type( $blog_ID, 'Content Block' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+						$now, $cat_photo_album, array(), 'published', '#', 'login-required-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
+						$now, $cat_photo_album, array(), 'published', '#', 'access-denied-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+			}
 			break;
 
 		// =======================================================================================================
 		case 'forum':
-			$post_count = 9;
+			$post_count = 11;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			$mary_demo_user = get_demo_user( 'mary' );
@@ -1929,11 +2002,30 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				$edited_Item->insert( $user_1, T_('Markdown examples'), get_filler_text( 'markdown_examples_content'), $now, $cat_forums_news );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
+
+			if( is_available_item_type( $blog_ID, 'Content Block' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+						$now, $cat_forums_bg, array(), 'published', '#', 'login-required-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
+						$now, $cat_forums_bg, array(), 'published', '#', 'access-denied-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+			}
 			break;
 
 		// =======================================================================================================
 		case 'manual':
-			$post_count = 15;
+			$post_count = 17;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -2393,11 +2485,30 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('Markdown examples'), get_filler_text( 'markdown_examples_content'), $now, $cat_manual_userguide );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
+
+			if( is_available_item_type( $blog_ID, 'Content Block' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+						$now, $cat_manual_getstarted, array(), 'published', '#', 'login-required-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
+						$now, $cat_manual_getstarted, array(), 'published', '#', 'access-denied-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+			}
 			break;
 
 		// =======================================================================================================
 		case 'group':
-			$post_count = 20;
+			$post_count = 22;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -2485,6 +2596,25 @@ Hello
 						$m = 0;
 					}
 				}
+			}
+
+			if( is_available_item_type( $blog_ID, 'Content Block' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+						$now, $cat_group_features, array(), 'published', '#', 'login-required-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
+						$now, $cat_group_features, array(), 'published', '#', 'access-denied-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
 			}
 			break;
 

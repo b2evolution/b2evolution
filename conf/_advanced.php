@@ -730,34 +730,6 @@ $activate_account_reminder_config = array( 86400/* one day */, 129600/* 1.5 days
 
 
 /**
- * Account activation reminder threshold given in seconds.
- * A user may receive Account activation reminder if the account was created at least x ( = threshold value defined below ) seconds ago.
- */
-$activate_account_reminder_threshold = 86400; // 24 hours
-
-
-/**
- * Comment moderation reminder threshold given in seconds.
- * A moderator user may receive Comment moderation reminder if there are comments awaiting moderation which were created at least x ( = threshold value defined below ) seconds ago.
- */
-$comment_moderation_reminder_threshold = 86400; // 24 hours
-
-
-/**
- * Post moderation reminder threshold given in seconds.
- * A moderator user may receive Post moderation reminder if there are posts awaiting moderation which were created at least x ( = threshold value defined below ) seconds ago.
- */
-$post_moderation_reminder_threshold = 86400; // 24 hours
-
-
-/**
- * Unread private messages reminder threshold given in seconds.
- * A user may receive unread message reminder if it has unread private messages at least as old as this threshold value.
- */
-$unread_messsage_reminder_threshold = 86400; // 24 hours
-
-
-/**
  * Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
  * The array below is in x => y format.
  * The values of this array must be ascendant.
@@ -771,13 +743,6 @@ $unread_message_reminder_delay = array(
 	730 => 120 // 365 to 730 days -> 120 days spacing
 	// more => "The user has not logged in for x days, so we will not send him notifications any more".
 );
-
-
-/**
- * Cleanup scheduled jobs threshold given in days.
- * The scheduled jobs older than x ( = threshold value ) days will be removed
- */
-$cleanup_jobs_threshold = 45;
 
 
 /**
