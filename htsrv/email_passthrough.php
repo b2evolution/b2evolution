@@ -86,7 +86,7 @@ switch( $type )
 								{
 									$update_values[] = 'ecmp_like_count = ecmp_like_count + 1';
 									if( $send_data['csnd_like'] == '-1' )
-									{
+									{ // email previously disliked, we need to decrease the dislike count
 										$update_values[] = 'ecmp_dislike_count = ecmp_dislike_count - 1';
 									}
 								}
@@ -111,7 +111,7 @@ switch( $type )
 								{
 									$update_values[] = 'ecmp_dislike_count = ecmp_dislike_count + 1';
 									if( $send_data['csnd_like']  == '1' )
-									{
+									{ // email previously liked, we need to decrease the like count
 										$update_values[] = 'ecmp_like_count = ecmp_like_count - 1';
 									}
 								}

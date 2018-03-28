@@ -179,6 +179,13 @@ function skip_campaign_user( $campaign_ID, $user_ID )
 }
 
 
+/**
+ * Check if campaign email is opened
+ *
+ * @param integer Email log ID
+ * @param array Associative array of campaign email send data
+ * @return mixed NULL if the email log record does not exist, true if email is considered open, false otherwise
+ */
 function is_unopened_campaign_mail( $email_log_ID, & $send_data = NULL )
 {
 	global $DB;
@@ -187,7 +194,8 @@ function is_unopened_campaign_mail( $email_log_ID, & $send_data = NULL )
 
 	if( $send_data )
 	{
-		return empty( $send_data['csnd_last_open_ts'] ) &&
+		// Unsubscribe clicks do not "open" emails
+		return empty( $send_data['csnd_last_open_ts'] ) && // image load
 				empty( $send_data['csnd_last_click_ts'] ) &&
 				empty( $send_data['csnd_like'] ) &&
 				empty( $send_data['csnd_cta1'] ) &&

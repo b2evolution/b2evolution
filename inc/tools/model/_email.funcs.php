@@ -438,7 +438,7 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 		// Check if mail is not yet opened
 		$unopened_mail = is_unopened_campaign_mail( $emlog_ID, $send_data );
 		if( empty( $send_data[$campaign_time_field] ) && ! empty( $send_data['csnd_camp_ID'] ) )
-		{ // First image load/click, update appropriate counter
+		{ // First image load/click, update appropriate campaign counters
 			$DB->query( 'UPDATE T_email__campaign SET '.$campaign_count_field.' = '.$campaign_count_field.' + 1'.
 					( $unopened_mail ? ', ecmp_open_count = ecmp_open_count + 1' : '' ). // unopened mail, increment open count
 					' WHERE ecmp_ID = '.$DB->quote( $send_data['csnd_camp_ID'] ) );
