@@ -489,7 +489,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 	$users_array = $DB->get_results('
 					SELECT user_ID
 					  FROM T_users
-					  WHERE user_status = "activated" OR user_status= "autoactivated"
+					  WHERE user_status IN ( "activated", "autoactivated", "manualactivated" )
 					  LIMIT 10'
 					, ARRAY_A );
 

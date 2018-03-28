@@ -51,6 +51,12 @@ class GeneralSettings extends AbstractSettings
 		'auto_prune_stats' => '15',         // days (T_hitlog and T_sessions)
 		'auto_empty_trash' => '15',         // days (How many days to keep recycled comments)
 
+		'cleanup_jobs_threshold' => 45, // days (Cleanup scheduled jobs threshold)
+		'activate_account_reminder_threshold' => 86400, // seconds (Account activation reminder threshold)
+		'comment_moderation_reminder_threshold' => 86400, // seconds (Comment moderation reminder threshold)
+		'post_moderation_reminder_threshold' => 86400, // seconds (Post moderation reminder threshold)
+		'unread_messsage_reminder_threshold' => 86400, // seconds (Unread private messages reminder threshold)
+
 		'email_service' => 'mail', // Preferred email service: 'mail', 'smtp'
 		'force_email_sending' => '0', // Force email sending
 

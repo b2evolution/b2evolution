@@ -198,10 +198,11 @@ switch( $action )
 			// Max execution time:
 			$Settings->set( 'cjob_timeout_'.$cron_job_key, param_duration( 'cjob_timeout_'.$cron_job_key ) );
 
-			// Additional settings:
+			// Additional settings per cron job:
 			switch( $cron_job_key )
 			{
 				case 'send-email-campaign':
+					// Send a chunk of x emails for the campaign:
 					if( $current_User->check_perm( 'emails', 'edit' ) )
 					{	// Allow to edit email cron setting "Chunk Size" only if user has a permission:
 						$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
@@ -212,6 +213,43 @@ switch( $action )
 
 					// Delay between chunks in case all remaining recipients have reached max # of emails for the current day:
 					$Settings->set( 'email_campaign_cron_limited', param_duration( 'email_campaign_cron_limited' ) );
+					break;
+
+				case 'prune-old-hits-and-sessions':
+					// Prune old hits & sessions (includes OPTIMIZE):
+					param( 'auto_prune_stats', 'integer', $Settings->get_default( 'auto_prune_stats' ), false, false, true, false );
+					$Settings->set( 'auto_prune_stats', get_param( 'auto_prune_stats' ) );
+					break;
+
+				case 'prune-recycled-comments':
+					// Prune recycled comments:
+					param( 'auto_empty_trash', 'integer', $Settings->get_default( 'auto_empty_trash' ), false, false, true, false );
+					$Settings->set( 'auto_empty_trash', get_param( 'auto_empty_trash' ) );
+					break;
+
+				case 'cleanup-scheduled-jobs':
+					// Clean up scheduled jobs older than a threshold:
+					$Settings->set( 'cleanup_jobs_threshold', param( 'cleanup_jobs_threshold', 'integer', 0 ) );
+					break;
+
+				case 'send-non-activated-account-reminders':
+					// Send reminders about non-activated accounts:
+					$Settings->set( 'activate_account_reminder_threshold', param_duration( 'activate_account_reminder_threshold' ) );
+					break;
+
+				case 'send-unmoderated-comments-reminders':
+					// Send reminders about comments awaiting moderation:
+					$Settings->set( 'comment_moderation_reminder_threshold', param_duration( 'comment_moderation_reminder_threshold' ) );
+					break;
+
+				case 'send-unmoderated-posts-reminders':
+					// Send reminders about posts awaiting moderation:
+					$Settings->set( 'post_moderation_reminder_threshold', param_duration( 'post_moderation_reminder_threshold' ) );
+					break;
+
+				case 'send-unread-messages-reminders':
+					// Send reminders about unread messages:
+					$Settings->set( 'unread_messsage_reminder_threshold', param_duration( 'unread_messsage_reminder_threshold' ) );
 					break;
 			}
 		}

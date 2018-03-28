@@ -3724,7 +3724,7 @@ function user_get_notification_sender( $user_ID, $setting )
 	if( $User = & $UserCache->get_by_ID( $user_ID ) )
 	{
 		if( $User->check_status( 'is_validated' ) )
-		{	// User is Activated or Autoactivated
+		{	// User is Activated or Autoactivated or Manually activated
 			global $UserSettings;
 			if( $UserSettings->get( $setting_name, $user_ID ) == '' )
 			{	// The user's setting is not defined yet
@@ -4006,7 +4006,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'private_message_new':
 				// 'notify_messages' - "I receive a private message."
 			case 'private_messages_unread_reminder':
-				// 'notify_unread_messages' - "I have unread private messages for more than X seconds."(X = $unread_messsage_reminder_threshold)
+				// 'notify_unread_messages' - "I have unread private messages for more than X seconds."(X = $Settings->get( 'unread_messsage_reminder_threshold' ))
 			case 'comment_new':
 				// 'notify_published_comments' - "a comment is published on one of my posts.",
 				// 'notify_comment_moderation' - "a comment is posted and I have permissions to moderate it.",
@@ -4015,16 +4015,16 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'comment_spam':
 				// 'notify_spam_cmt_moderation' - "a comment is reported as spam and I have permissions to moderate it."
 			case 'comments_unmoderated_reminder':
-				// 'send_cmt_moderation_reminder' - "comments are awaiting moderation for more than X seconds."(X = $comment_moderation_reminder_threshold)
+				// 'send_cmt_moderation_reminder' - "comments are awaiting moderation for more than X seconds."(X = $Settings->get( 'comment_moderation_reminder_threshold' ))
 			case 'post_new':
 				// 'notify_post_moderation' - "a post is created and I have permissions to moderate it."
 				// 'notify_edit_pst_moderation' - "a post is modified and I have permissions to moderate it."
 			case 'posts_unmoderated_reminder':
-				// 'send_pst_moderation_reminder' - "posts are awaiting moderation for more than X seconds."(X = $post_moderation_reminder_threshold)
+				// 'send_pst_moderation_reminder' - "posts are awaiting moderation for more than X seconds."(X = $Settings->get( 'post_moderation_reminder_threshold' ))
 			case 'posts_stale_alert':
 				// 'send_pst_stale_alert' - "there are stale posts and I have permission to moderate them."
 			case 'account_activate':
-				// 'send_activation_reminder' - "my account was deactivated or is not activated for more than X seconds."(X - $activate_account_reminder_threshold)
+				// 'send_activation_reminder' - "my account was deactivated or is not activated for more than X seconds."(X - $Settings->get( 'activate_account_reminder_threshold' ))
 			case 'account_new':
 				// 'notify_new_user_registration' - "a new user has registered."
 			case 'account_activated':

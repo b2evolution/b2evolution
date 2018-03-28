@@ -3775,7 +3775,7 @@ class Comment extends DataObject
 		{	// Get the notify users for NORMAL comments:
 
 			// Send only for active users:
-			$active_users_condition = 'AND user_status IN ( "activated", "autoactivated" )';
+			$active_users_condition = 'AND user_status IN ( "activated", "autoactivated", "manualactivated" )';
 
 			$except_condition = '';
 			if( ! empty( $already_notified_user_IDs ) )
@@ -3947,7 +3947,7 @@ class Comment extends DataObject
 			// Check if the users would like to receive notifications about new meta comments:
 			$meta_SQL->WHERE_and( 'uset_value = "1"'.( $Settings->get( 'def_notify_meta_comments' ) ? ' OR uset_value IS NULL' : '' ) );
 			// Check if users are activated:
-			$meta_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+			$meta_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 			// Check if the users have permission to edit this Item:
 			$users_with_item_edit_perms = '( user_ID = '.$DB->quote( $comment_item_Blog->owner_user_ID ).' )';
 			$users_with_item_edit_perms .= ' OR ( grp_perm_blogs = "editall" )';

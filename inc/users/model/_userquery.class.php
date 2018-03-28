@@ -277,7 +277,7 @@ class UserQuery extends SQL
 
 
 	/**
-	 * Restrict to user status, currenlty activated also means autoactivated users
+	 * Restrict to user status, currently activated also means auto and manually activated users
 	 *
 	 * @param string user status ( 'activated', 'deactivated', 'new', 'emailchanged', 'failedactivation', 'closed' )
 	 * @param boolean set true to include users only with the given status, or set false to exclude users with the given status
@@ -293,15 +293,8 @@ class UserQuery extends SQL
 		}
 
 		if( $status == 'activated' && !$exactly )
-		{ // Activated and Autoactivated users
-			if( $include )
-			{
-				$this->WHERE_and( 'user_status = '.$DB->quote( 'activated' ).' OR user_status = '.$DB->quote( 'autoactivated' ) );
-			}
-			else
-			{
-				$this->WHERE_and( 'user_status <> '.$DB->quote( 'activated' ).' AND user_status <> '.$DB->quote( 'autoactivated' ) );
-			}
+		{	// Activated, Manually activated, Autoactivated users:
+			$this->WHERE_and( 'user_status '.( $include ? 'IN' : 'NOT IN' ).' ( '.$DB->quote( array( 'activated', 'autoactivated', 'manualactivated' ) ).' )' );
 		}
 		else
 		{ // Other status check

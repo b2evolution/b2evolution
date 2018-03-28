@@ -9332,7 +9332,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end( false );
 	}
 
-	if( upg_task_start( 12750 ) )
+	if( upg_task_start( 12750, 'Upgrading users table...' ) )
+	{	// part of 6.10.1-stable
+		db_modify_col( 'T_users', 'user_status', "enum( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new'" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12760 ) )
 	{ // part of 6.10.1-stable
 		db_upgrade_cols( 'T_email__campaign', array(
 			'ADD' => array(
@@ -9381,7 +9387,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				ecmp_dislike_count = a.dislike_count,
 				ecmp_unsub_clicks = a.unsub_clicks' );
 	}
-
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
