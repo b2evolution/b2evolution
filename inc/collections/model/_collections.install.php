@@ -427,6 +427,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			sub_coll_ID     int(11) unsigned    not null,
 			sub_user_ID     int(11) unsigned    not null,
 			sub_items       tinyint(1)          not null,
+			sub_items_mod   TINYINT(1)          NOT NULL,
 			sub_comments    tinyint(1)          not null,
 			primary key (sub_coll_ID, sub_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

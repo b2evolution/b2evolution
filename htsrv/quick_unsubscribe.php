@@ -27,7 +27,7 @@ if( empty( $edited_User ) )
 {	// User not found:
 	$error_msg = T_( 'The user you are trying to unsubscribe does not seem to exist. You may already have deleted your account.' );
 }
-elseif( $key != md5( $user_ID.$edited_User->get( 'unsubscribe_key' ) ) ) 	// Security check
+elseif( $key == md5( $user_ID.$edited_User->get( 'unsubscribe_key' ) ) ) 	// Security check
 {
 	$error_msg = T_('Invalid unsubscribe link!');
 }
@@ -59,32 +59,37 @@ elseif( $confirmed )
 						$subscription_name = ( ( $type == 'coll_comment' ) ? 'sub_comments' : 'sub_items' );
 
 						// Get previous setting
-						$sub_values = $DB->get_row( 'SELECT sub_items, sub_comments FROM T_subscriptions WHERE sub_coll_ID = '.$coll_ID.' AND sub_user_ID = '.$user_ID, ARRAY_A );
+						$sub_values = $DB->get_row( 'SELECT sub_items, sub_items_mod, sub_comments FROM T_subscriptions WHERE sub_coll_ID = '.$coll_ID.' AND sub_user_ID = '.$user_ID, ARRAY_A );
 
 						$Blog = & $BlogCache->get_by_ID( $coll_ID );
 
 						if( $Blog->get( 'advanced_perms' )
-								&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) || ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
+								&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) ||
+								     ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) ||
+								     ( $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ) )
 								&& $edited_User->check_perm( 'blog_ismember', 'view', true, $coll_ID ) )
 						{ // opt-out collection
 							if( $subscription_name == 'sub_items' )
 							{
 								$sub_items_value = 0;
+								$sub_items_mod_value = empty( $sub_values ) ? 1 : $sub_values['sub_items_mod'];
 								$sub_comments_value = empty( $sub_values ) ? 1 : $sub_values['sub_comments'];
 							}
 							elseif( $subscription_name == 'sub_comments' )
 							{
 								$sub_items_value = empty( $sub_values ) ? 1 : $sub_values['sub_items'];
+								$sub_items_mod_value = empty( $sub_values ) ? 1 : $sub_values['sub_items_mod'];
 								$sub_comments_value = 0;
 							}
 							else
-							{
+							{ // should be impossible to go here
 								$sub_items_value = 0;
+								$sub_items_mod_value = 0;
 								$sub_comments_value = 0;
 							}
 
-							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-									VALUES ( '.$coll_ID.', '.$user_ID.', '.$sub_items_value.', '.$sub_comments_value.' )' );
+							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
+									VALUES ( '.$coll_ID.', '.$user_ID.', '.$sub_items_value.', '.$sub_items_mod_value.', '.$sub_comments_value.' )' );
 						}
 						else
 						{
@@ -299,32 +304,37 @@ elseif( $confirmed )
 						$subscription_name = ( ( $type == 'coll_comment' ) ? 'sub_comments' : 'sub_items' );
 
 						// Get previous setting
-						$sub_values = $DB->get_row( 'SELECT sub_items, sub_comments FROM T_subscriptions WHERE sub_coll_ID = '.$coll_ID.' AND sub_user_ID = '.$user_ID, ARRAY_A );
+						$sub_values = $DB->get_row( 'SELECT sub_items, sub_items_mod, sub_comments FROM T_subscriptions WHERE sub_coll_ID = '.$coll_ID.' AND sub_user_ID = '.$user_ID, ARRAY_A );
 
 						$Blog = & $BlogCache->get_by_ID( $coll_ID );
 
 						if( $Blog->get( 'advanced_perms' )
-								&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) || ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
+								&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) ||
+								     ( $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ) ||
+								     ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
 								&& $edited_User->check_perm( 'blog_ismember', 'view', true, $coll_ID ) )
 						{ // opt-out collection
 							if( $subscription_name == 'sub_items' )
 							{
 								$sub_items_value = 1;
+								$sub_items_mod_value = empty( $sub_values ) ? 1 : $sub_values['sub_items_mod'];
 								$sub_comments_value = empty( $sub_values ) ? 1 : $sub_values['sub_comments'];
 							}
 							elseif( $subscription_name == 'sub_comments' )
 							{
 								$sub_items_value = empty( $sub_values ) ? 1 : $sub_values['sub_items'];
+								$sub_items_mod_value = empty( $sub_values ) ? 1 : $sub_values['sub_items_mod'];
 								$sub_comments_value = 1;
 							}
 							else
 							{ // should be impossible to go here
 								$sub_items_value = $sub_values['sub_items'];
+								$sub_items_mod_value = $sub_values['sub_items_mod'];
 								$sub_comments_value = $sub_values['sub_comments'];
 							}
 
-							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-									VALUES ( '.$coll_ID.', '.$user_ID.', '.$sub_items_value.', '.$sub_comments_value.' )' );
+							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
+									VALUES ( '.$coll_ID.', '.$user_ID.', '.$sub_items_value.', '.$sub_items_mod_value.', '.$sub_comments_value.' )' );
 						}
 						else
 						{

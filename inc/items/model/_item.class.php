@@ -2735,6 +2735,7 @@ class Item extends ItemLight
 							'usertags' => isset( $user_tags ) ? $user_tags : NULL,
 							'subscribe_post' => 0,
 							'subscribe_comment' => 0,
+							'subscribe_post_mod' => 0,
 							'button_class' => 'btn-primary',
 							'inline' => 1
 						);
@@ -7285,6 +7286,10 @@ class Item extends ItemLight
 		{
 			$notify_condition = '( uset_value IS NULL OR ( '.$notify_condition.' ) )';
 		}
+		if( ! $is_new_item && $this->Blog->get_setting( 'allow_item_mod_subscriptions' ) )
+		{	// Notify moderators which selected to be notified per collection (if it is enabled by collection setting):
+			$notify_condition = '( sub_items_mod = 1 OR ( '.$notify_condition.' ) )';
+		}
 
 		// Select user_ids with the corresponding item edit permission on this item's blog
 		$SQL = new SQL();
@@ -7295,6 +7300,7 @@ class Item extends ItemLight
 		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND user_grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$this->blog_ID.' )' );
 		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_moderation_setting_name.'"' );
 		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
+		$SQL->FROM_add( 'LEFT JOIN T_subscriptions ON sub_coll_ID = blog_ID AND sub_user_ID = user_ID' );
 		$SQL->WHERE( $notify_condition );
 		$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 		$SQL->WHERE_and( '( bloguser_perm_edit IS NOT NULL AND bloguser_perm_edit <> "no" AND bloguser_perm_edit <> "own" )
