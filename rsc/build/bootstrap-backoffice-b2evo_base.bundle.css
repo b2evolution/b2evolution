@@ -2988,6 +2988,12 @@ div.message_toolbars {
 .disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body {
   padding: 0;
 }
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body:before,
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .evo_post__full_text.clearfix:before,
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body:after,
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .evo_post__full_text.clearfix:after {
+  display: block;
+}
 .disp_access_requires_login .evo_widget.widget_core_user_login {
   min-width: 290px;
   max-width: 400px;
