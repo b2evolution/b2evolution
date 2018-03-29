@@ -33,8 +33,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param mixed Value to really use (used for recursion into array type settings)
  */
 function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
-{
-	
+{	
 	global $debug;
 	static $has_array_type;
 
@@ -194,9 +193,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		}
 	}
 
-	
-			
-	
+
 	if( isset($use_value) )
 	{
 		$set_value = $use_value;
@@ -278,8 +275,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	{
 		$set_value = $value_from_request;
 	}
-	
-	
 
 	switch( $parmeta['type'] )
 	{
@@ -384,14 +379,12 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 			$Form->radio_input( $input_name, $set_value, $options, $set_label, $params );
 			break;
-			
+
 		case 'select_input':
 			
 			$has_array_type = true;
 			$has_color_field = false;
-
 			$k_nb = 0;
-
 			$l_parname = $parname;
 
 			if( substr_count( $parname, '[' ) % 2 )
@@ -433,8 +426,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 							{
 								foreach( $input_names as $input_name )
 								{
-
-
 									if( isset( $sv_data[ $entry_name.$input_name ] ) )
 									{
 										$current_multiple_par_entry_name = $entry_name;
@@ -442,30 +433,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 									}
 								}
 							}
-
+							// handle this as an independent type
 							if( isset( $parmeta['entries'][ $current_multiple_par_entry_name ]['inputs'] ) )
-							{
-								$entry_meta = $parmeta['entries'][ $current_multiple_par_entry_name ];
-								$Form->begin_line( $entry_meta['label'], $input_name );
-
-								foreach( $entry_meta['inputs'] as $input_name => $input_meta )
-								{
-									if( isset( $sv_data[ $current_multiple_par_entry_name.$input_name ] ) )
-									{	// Use a saved value:
-										$l_value = $sv_data[ $current_multiple_par_entry_name.$input_name ];
-									}
-									else
-									{	// Use default value if it is defined:
-										$l_value = isset( $input_meta['defaultvalue'] ) ? $input_meta['defaultvalue'] : NULL;
-									}
-									// RECURSE:$parname.'['.$current_multiple_par_entry_name.$input_name.']['.$k.']'
-									//pre_dump( $parname.'['.$sv.']['.$current_multiple_par_entry_name.']['.$input_name.']' );
-									autoform_display_field( $parname.'['.$sv.']['.$current_multiple_par_entry_name.']['.$input_name.']', $input_meta, $Form, $set_type, $Obj, $set_target, $l_value );
-									
-									$k_nb++;
-								}
-								$Form->end_line();
+							{ 
+								$l_parmeta = array( 
+													'label' 		=> $parmeta['entries'][ $current_multiple_par_entry_name ]['label'], 
+													'type' 			=> 'input_group', 
+													'inputs' 		=> $parmeta['entries'][ $current_multiple_par_entry_name ]['inputs'] 
+												);
+								
+								autoform_display_field( $parname.'['.$sv.']['.$current_multiple_par_entry_name.']', $l_parmeta, $Form, $set_type, $Obj, $set_target, NULL );
 							}
+							
 						}
 						else
 						{	
@@ -476,22 +455,16 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								
 								if( isset( $parmeta['entries'][ $set_value_entry_name ] ) )
 								{
-									
 									autoform_display_field( $parname.'['.$sv.']['.$set_value_entry_name.']', 
 														   $parmeta['entries'][ $set_value_entry_name ], 
 														   $Form, $set_type, $Obj, $set_target, $sv_data[ $set_value_entry_name ] );
-									
-									$k_nb++;
-									
+									$k_nb++;	
 								}
-								
-								
 							}
 						}
 					}
 				}
 				
-			
 			echo '</div>';
  
 			$set_path = $parname.'[0]';
@@ -500,9 +473,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 			$max_number = ( isset( $parmeta['max_number'] ) ? $parmeta['max_number'] : 0 );
 			
-
 			$js = '';
-			
 			
 			$disable_add = false;
 			
@@ -511,10 +482,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			{
 				$disable_add = true;
 			}
-				
 			
 			$use_single_button = false;
-			
 			
 			if( ! isset( $parmeta['entries'] ) )
 			{
@@ -552,9 +521,41 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			*/
 			$js .= "var parmeta_entries = $parmeta_entries;";
 				
-			$js .= "if( typeof parmeta_entries[entry_name] !== 'undefined' ){
-						var entry_type = parmeta_entries[entry_name].type, 
-						entry_max = ( parmeta_entries[entry_name].max_number !== 'undefined' ) ? parmeta_entries[entry_name].max_number:0;
+			$js .= "if( typeof parmeta_entries[entry_name] !== 'undefined' )
+					{
+					
+						var entry_type = ( typeof parmeta_entries[entry_name].type !== 'undefined' ) ? parmeta_entries[entry_name].type : '',
+							has_color_field = false, 
+							entry_max = ( parmeta_entries[entry_name].max_number !== 'undefined' ) ? parmeta_entries[entry_name].max_number:0;
+						
+						if( entry_type !== 'undefined' )
+						{
+							if( entry_type === 'color' )
+							{
+								has_color_field = true;
+							}
+
+						}	
+						if( typeof parmeta_entries[entry_name].inputs !== 'undefined' )
+						{
+						
+							var inputs = parmeta_entries[entry_name].inputs;
+							
+							$.each( inputs, function( key, value ) {
+							
+								if( typeof inputs[key].type !== 'undefined' )
+								{
+									if( inputs[key].type === 'color' )
+									{
+										has_color_field = true;
+									}
+									 
+								}
+
+							});
+
+						}
+						
 					}
 					else
 					{
@@ -696,7 +697,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 						{
 							container.children('.form-group').last().after(html);
 						}
-						".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
+						if( has_color_field === true )
+						{
+							evo_initialize_colorpicker_inputs();
+						}
+						
 						validate_entries();
 					} );
 				}
@@ -1023,7 +1028,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				global $Blog;
 				$set_path = $parname.'['.$k_nb.']';
 
-				echo '<div id="'.$parname.'_add_new">';
+				echo '<div id="'.$parname.'_disp">';
 				echo action_icon(
 					sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
 					'add',
@@ -1042,7 +1047,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
 							},
 							function(r, status) {
-								jQuery('#".$parname."_add_new').replaceWith(r);
+								jQuery('#".$parname."_disp').replaceWith(r);
 								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
 							}
 						);
@@ -1064,6 +1069,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		case 'float':
 		case 'integer':
+			
+			
 		case 'text':
 			// Default: "text input"
 			if( isset($parmeta['size']) )
@@ -1131,24 +1138,26 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'input_group':
+			
 			if( ! empty( $parmeta['inputs'] ) && is_array( $parmeta['inputs'] ) )
 			{
 				$Form->begin_line( $parmeta['label'], $input_name );
 				foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
 				{
-					$l_parmeta['group'] = $parname; // inject group
-
-					// ac> This will produce a bug as it will always use a defined defaultvalue
-					// it should be checking for a value, if no value, check for default value
-					$use_value = isset( $l_parmeta['defaultvalue'] ) ? $l_parmeta['defaultvalue'] : NULL;
-
-					autoform_display_field( $l_parname, $l_parmeta, $Form, $set_type, $Obj, $set_target, $use_value );
+					$l_parmeta['group'] = $parname; // inject group	
+					
+					/*
+					*	TODO: > Default values will NOT be loaded for dynamic types!
+					*/
+					
+					// RECURSE:
+					autoform_display_field( $l_parname, $l_parmeta, $Form, $set_type, $Obj, $set_target, $use_value );	
+					
 				}
 				$Form->end_line();
 			}
 			break;
-
-
+			
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
 	}
