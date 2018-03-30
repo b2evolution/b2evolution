@@ -65,7 +65,7 @@ class EmailCampaign extends DataObject
 
 	var $send_ctsk_ID;
 
-	var $auto_send = 'no';
+	var $welcone = 0;
 
 	var $sequence;
 
@@ -115,7 +115,7 @@ class EmailCampaign extends DataObject
 			$this->renderers = $db_row->ecmp_renderers;
 			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
-			$this->auto_send = $db_row->ecmp_auto_send;
+			$this->welcome = $db_row->ecmp_welcome;
 			$this->user_tag_sendskip = $db_row->ecmp_user_tag_sendskip;
 			$this->user_tag_sendsuccess = $db_row->ecmp_user_tag_sendsuccess;
 			$this->user_tag = $db_row->ecmp_user_tag;
@@ -615,6 +615,10 @@ class EmailCampaign extends DataObject
 			param_string_not_empty( 'ecmp_enlt_ID', T_('Please select a list.') );
 			$this->newsletter_is_changed = ( get_param( 'ecmp_enlt_ID' ) != $this->get( 'enlt_ID' ) );
 			$this->set_from_Request( 'enlt_ID' );
+			if( $this->newsletter_is_changed )
+			{	// If the list/newsletter has been changed, the welcome flag must be automatically be lost:
+				$this->set( 'welcome', 0 );
+			}
 		}
 
 		if( param( 'ecmp_name', 'string', NULL ) !== NULL )
@@ -658,11 +662,6 @@ class EmailCampaign extends DataObject
 		if( param( 'ecmp_email_text', 'html', NULL ) !== NULL )
 		{	// Save original message:
 			$this->set_from_Request( 'email_text' );
-		}
-
-		if( param( 'ecmp_auto_send', 'string', NULL ) !== NULL )
-		{	// Auto send:
-			$this->set_from_Request( 'auto_send' );
 		}
 
 		if( param( 'ecmp_user_tag_sendskip', 'string', NULL ) !== NULL )
@@ -809,7 +808,7 @@ class EmailCampaign extends DataObject
 			global $DB, $mail_log_insert_ID;
 
 			// Force email sending to not activated users if email campaign is configurated to auto sending (e-g to send email on auto subscription on registration):
-			$force_on_non_activated = ( $this->get( 'auto_send' ) == 'subscription' );
+			$force_on_non_activated = ( $this->get( 'welcome' ) == 1 );
 			$result = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, $force_on_non_activated, array(), $email_address );
 			if( $result )
 			{	// Update last sending data for newsletter per user:
@@ -1250,28 +1249,6 @@ class EmailCampaign extends DataObject
 		$this->dbupdate();
 
 		return true;
-	}
-
-
-	/**
-	 * Get title of sending method
-	 *
-	 * @return string
-	 */
-	function get_sending_title()
-	{
-		$titles = array(
-				'no'           => T_('Manual'),
-				'subscription' => T_('At subscription'),
-			);
-
-		if( isset( $titles[ $this->get( 'auto_send' ) ] ) )
-		{
-			return $titles[ $this->get( 'auto_send' ) ];
-		}
-
-		// Unknown sending method
-		return $this->get( 'auto_send' );
 	}
 
 

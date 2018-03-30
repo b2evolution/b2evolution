@@ -9400,6 +9400,26 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12770, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_email__campaign', 'ecmp_welcome', 'TINYINT(1) NOT NULL DEFAULT 0 AFTER ecmp_auto_send' );
+		$SQL = new SQL( 'Find only single of welcome email campaign per list/newsletter' );
+		$SQL->SELECT( 'ecmp_ID' );
+		$SQL->FROM( 'T_email__campaign' );
+		$SQL->WHERE( 'ecmp_auto_send = "subscription"' );
+		$SQL->GROUP_BY( 'ecmp_enlt_ID' );
+		$SQL->ORDER_BY( 'ecmp_ID' );
+		$welcome_campaigns = $DB->get_col( $SQL );
+		if( count( $welcome_campaigns ) > 0 )
+		{	// Convert "At subscription" email campaigns to "Welcome":
+			$DB->query( 'UPDATE T_email__campaign
+				  SET ecmp_welcome = 1
+				WHERE ecmp_ID IN ( '.$DB->quote( $welcome_campaigns ).' )' );
+		}
+		db_drop_col( 'T_email__campaign', 'ecmp_auto_send' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -7761,14 +7761,9 @@ class User extends DataObject
 
 		if( count( $new_subscriptions ) )
 		{	// User is really subscribing to new newsletters:
-			$SQL = new SQL( 'Get email campaigns(of lists #'.implode( ',', $new_subscriptions ).') which must be sent at subscription' );
-			$SQL->SELECT( '*' );
-			$SQL->FROM( 'T_email__campaign' );
-			$SQL->WHERE( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' )' );
-			$SQL->WHERE_and( 'ecmp_auto_send = "subscription"' );
 			$EmailCampaignCache = & get_EmailCampaignCache();
 			$EmailCampaignCache->clear();
-			$EmailCampaignCache->load_by_sql( $SQL );
+			$EmailCampaignCache->load_where( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' ) AND ecmp_welcome = 1' );
 
 			foreach( $EmailCampaignCache->cache as $EmailCampaign )
 			{	// Send an email of the campaign at subscription:
