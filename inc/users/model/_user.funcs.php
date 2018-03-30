@@ -3042,8 +3042,8 @@ function get_account_activation_info( $edited_User )
 		return $result;
 	}
 
-	// Convert the setting to array because it is used as array but stored as values separated by comma:
-	$activate_account_reminder_config = explode( ',', $Settings->get( 'activate_account_reminder_config' ) );
+	// Get array of account activation reminder settings:
+	$activate_account_reminder_config = $Settings->get( 'activate_account_reminder_config' );
 
 	$field_label = T_('Next account activation reminder');
 	$number_of_max_reminders = ( count( $activate_account_reminder_config ) - 1 );

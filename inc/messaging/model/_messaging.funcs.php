@@ -1624,7 +1624,7 @@ function get_first_unread_message_date( $user_ID )
  */
 function get_next_reminder_info( $user_ID )
 {
-	global $Settings, $UserSettings, $DB, $servertimenow, $unread_message_reminder_delay;
+	global $Settings, $UserSettings, $DB, $servertimenow;
 
 	if( ! $UserSettings->get( 'notify_unread_messages', $user_ID ) )
 	{ // The user doesn't want to recive unread messages reminders
@@ -1636,6 +1636,9 @@ function get_next_reminder_info( $user_ID )
 	{ // The user doesn't have unread messages
 		return T_('This user doesn\'t have unread messages.');
 	}
+
+	// Get array of the unread private messages reminder delay settings:
+	$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
 
 	// We assume that reminder is not delayed because of the user was not logged in since too many days
 	$reminder_is_delayed = false;
@@ -1690,7 +1693,7 @@ function get_next_reminder_info( $user_ID )
 	}
 	elseif( empty( $last_unread_messages_reminder ) )
 	{ // The user didn't get unread messages reminder emails before
-		$note = sprintf( T_('The user has never received a notification yet, so the first notification is sent with %s delay'), seconds_to_period( $Settings->get( 'unread_messsage_reminder_threshold' ) ) );
+		$note = sprintf( T_('The user has never received a notification yet, so the first notification is sent with %s delay'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) );
 	}
 	else
 	{ // Reminder is not delayed

@@ -714,22 +714,6 @@ $enabled_password_drivers = array(
 
 
 /**
- * Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
- * The array below is in x => y format.
- * The values of this array must be ascendant.
- */
-$unread_message_reminder_delay = array(
-	10  => 3,  // less than 10 days -> 3 days spacing
-	30  => 6,  // 10 to 30 days -> 6 days spacing
-	90  => 15, // 30 to 90 days -> 15 days spacing
-	180 => 30, // 90 to 180 days -> 30 days spacing
-	365 => 60, // 180 to 365 days -> 60 days spacing
-	730 => 120 // 365 to 730 days -> 120 days spacing
-	// more => "The user has not logged in for x days, so we will not send him notifications any more".
-);
-
-
-/**
  * Enable a workaround to allow accessing posts with URL titles ending with
  * a dash (workaround for old bug).
  *

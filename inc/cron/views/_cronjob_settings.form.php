@@ -67,10 +67,10 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 			case 'send-non-activated-account-reminders':
 				// Send reminders about non-activated accounts:
 				$Form->duration_input( 'activate_account_reminder_threshold', $Settings->get( 'activate_account_reminder_threshold' ), T_('Account activation reminder threshold'), 'days', 'minutes', array( 'note' => T_('A user may receive Account activation reminder if the account was created at least the selected period ago.') ) );
-				// Convert the setting to array because it is used as array but stored as values separated by comma:
-				$activate_account_reminder_config = explode( ',', $Settings->get( 'activate_account_reminder_config' ) );
+				// Get array of account activation reminder settings:
+				$activate_account_reminder_config = $Settings->get( 'activate_account_reminder_config' );
 				$config_count = count( $activate_account_reminder_config );
-				foreach( $activate_account_reminder_config as $c => $activate_account_reminder_config_value )
+				foreach( $activate_account_reminder_config as $c => $config_value )
 				{
 					$reminder_config_label = sprintf( T_('Reminder #%d'), $c + 1 );
 					$reminder_config_params = array(
@@ -80,11 +80,11 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 					if( $c == $config_count - 1 )
 					{	// Last option is used for failed activation threshold:
 						$Form->duration_input( 'activate_account_reminder_config_'.$c, 0, $reminder_config_label, '', '', $reminder_config_params );
-						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $activate_account_reminder_config[ $c ], T_('Mark as failed'), '', '', $reminder_config_params );
+						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $config_value, T_('Mark as failed'), '', '', $reminder_config_params );
 					}
 					else
 					{	// Not last options for reminders:
-						$Form->duration_input( 'activate_account_reminder_config_'.$c, $activate_account_reminder_config[ $c ], $reminder_config_label, '', '', $reminder_config_params );
+						$Form->duration_input( 'activate_account_reminder_config_'.$c, $config_value, $reminder_config_label, '', '', $reminder_config_params );
 					}
 				}
 				$Form->hidden( 'activate_account_reminder_config_num', $config_count );
@@ -102,7 +102,33 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 
 			case 'send-unread-messages-reminders':
 				// Send reminders about unread messages:
-				$Form->duration_input( 'unread_messsage_reminder_threshold', $Settings->get( 'unread_messsage_reminder_threshold' ), T_('Unread private messages reminder threshold'), 'days', 'minutes', array( 'note' => T_('A user may receive unread message reminder if it has unread private messages at least as old as the selected period.') ) );
+				$Form->duration_input( 'unread_message_reminder_threshold', $Settings->get( 'unread_message_reminder_threshold' ), T_('Unread private messages reminder threshold'), 'days', 'minutes', array( 'note' => T_('A user may receive unread message reminder if it has unread private messages at least as old as the selected period.') ) );
+				// Get array of the unread private messages reminder delay settings:
+				$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
+				$config_count = count( $unread_message_reminder_delay );
+				$d = 1;
+				foreach( $unread_message_reminder_delay as $delay_day => $delay_spacing )
+				{
+					$n = ( $d == $config_count ? 2 : 1 );
+					for( $i = 0; $i < $n; $i++ )
+					{
+						$Form->begin_line( sprintf( T_('Reminder #%d'), $d ) );
+							$Form->text_input( 'unread_message_reminder_delay_day_'.$d, $i == 0 ? $delay_day : '', 3,
+								/* TRANS: Full string is "Reminder #1: if user was not logged in last X days then sent every X days"*/T_('if user was not logged in last'), '', array(
+									'input_suffix' => ' '.T_('days'),
+									'maxlength'    => 10,
+								) );
+							$Form->text_input( 'unread_message_reminder_delay_spacing_'.$d, $i == 0 ? $delay_spacing : '', 3,
+								/* TRANS: Full string is "Reminder #1: if user was not logged in last X days then sent every X days"*/T_('then sent every'), '', array(
+									'input_suffix' => ' '.T_('days'),
+									'note'         => T_('Leave empty to don\'t use this reminder option.'),
+									'maxlength'    => 5,
+								) );
+						$Form->end_line();
+						$d++;
+					}
+				}
+				$Form->hidden( 'unread_message_reminder_delay_num', $d );
 				break;
 		}
 

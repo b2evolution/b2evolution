@@ -48,8 +48,6 @@ global $Collection, $Blog;
  */
 global $DB;
 
-global $unread_message_reminder_delay;
-
 // Default params:
 $default_params = array(
 		'skin_form_params'     => array(),
@@ -412,7 +410,8 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	if( $has_messaging_perm )
 	{ // show messaging notification settings only if messaging is available for edited user
 		$notify_options[ T_('Messaging') ][] = array( 'edited_user_notify_messages', 1, T_('I receive a private message.'),  $UserSettings->get( 'notify_messages', $edited_User->ID ), $disabled );
-		$notify_options[ T_('Messaging') ][] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_messsage_reminder_threshold' ) ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
+		$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
+		$notify_options[ T_('Messaging') ][] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
 	}
 	if( $edited_User->check_role( 'post_owner' ) )
 	{ // user has at least one post or user has right to create new post

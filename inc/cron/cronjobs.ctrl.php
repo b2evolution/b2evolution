@@ -269,7 +269,44 @@ switch( $action )
 
 				case 'send-unread-messages-reminders':
 					// Send reminders about unread messages:
-					$Settings->set( 'unread_messsage_reminder_threshold', param_duration( 'unread_messsage_reminder_threshold' ) );
+					$Settings->set( 'unread_message_reminder_threshold', param_duration( 'unread_message_reminder_threshold' ) );
+					// Unread private messages reminder settings:
+					$reminder_delay = array();
+					$reminder_delay_num = param( 'unread_message_reminder_delay_num', 'integer', 0 );
+					$i = 1;
+					$prev_reminder_delay_day = 0;
+					$prev_reminder_delay_spacing = 0;
+					for( $d = 1; $d <= $reminder_delay_num; $d++ )
+					{
+						$reminder_delay_day = param( 'unread_message_reminder_delay_day_'.$d, 'integer', 0 );
+						$reminder_delay_spacing = param( 'unread_message_reminder_delay_spacing_'.$d, 'integer', 0 );
+						if( $reminder_delay_day > 0 || $reminder_delay_spacing > 0 )
+						{	// Store only a filled reminder:
+							if( empty( $reminder_delay_day ) )
+							{	// If one field is not filled:
+								param_error( 'unread_message_reminder_delay_day_'.$i, sprintf( T_('Please fill two fields of the unread private messages reminder #%d.'), $i ) );
+								$reminder_delay_day = 0;
+							}
+							elseif( $prev_reminder_delay_day >= $reminder_delay_day )
+							{	// If current value is less than previous:
+								param_error( 'unread_message_reminder_delay_day_'.$i, sprintf( T_('The values of the unread private messages reminder must be ascendant.'), $i ) );
+							}
+							if( empty( $reminder_delay_spacing ) )
+							{	// If one field is not filled:
+								param_error( 'unread_message_reminder_delay_spacing_'.$i, sprintf( T_('Please fill two fields of the unread private messages reminder #%d.'), $i ) );
+								$reminder_delay_spacing = 0;
+							}
+							elseif( $prev_reminder_delay_spacing >= $reminder_delay_spacing )
+							{	// If current value is less than previous:
+								param_error( 'unread_message_reminder_delay_spacing_'.$i, sprintf( T_('The values of the unread private messages reminder must be ascendant.'), $i ) );
+							}
+							$reminder_delay[] = $reminder_delay_day.':'.$reminder_delay_spacing;
+							$prev_reminder_delay_day = $reminder_delay_day;
+							$prev_reminder_delay_spacing = $reminder_delay_spacing;
+							$i++;
+						}
+					}
+					$Settings->set( 'unread_message_reminder_delay', implode( ',', $reminder_delay ) );
 					break;
 			}
 		}

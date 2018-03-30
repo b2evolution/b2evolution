@@ -623,7 +623,7 @@ switch( $type )
 
 	case 'unread_msg':
 		// unsubscribe from unread messages reminder
-		$type_str = $notification_prefix.': '.sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_messsage_reminder_threshold' ) ) );
+		$type_str = $notification_prefix.': '.sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) );
 		break;
 
 	case 'new_msg':

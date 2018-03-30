@@ -26,8 +26,8 @@ if( empty( $UserSettings ) )
 // This will be a precondition to get less users from db, but this will be checked again with check_status() in the send_easy_validate_emails() function
 $status_condition = '( user_status = "new" OR user_status = "emailchanged" OR user_status = "deactivated" )';
 
-// Convert the setting to array because it is used as array but stored as values separated by comma:
-$activate_account_reminder_config = explode( ',', $Settings->get( 'activate_account_reminder_config' ) );
+// Get array of account activation reminder settings:
+$activate_account_reminder_config = $Settings->get( 'activate_account_reminder_config' );
 
 // Set configuration details from $activate_account_reminder_config array
 $number_of_max_reminders = ( count( $activate_account_reminder_config ) - 1 );
