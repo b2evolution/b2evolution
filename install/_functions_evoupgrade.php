@@ -9349,10 +9349,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 			// We're going to need some environment in order to init item type cache and create item:
 			load_class( 'items/model/_item.class.php', 'Item' );
+			$use_temp_settings_object = false;
 			if( ! is_object( $Settings ) )
-			{	// Create Settings object:
+			{	// Create temporary Settings object WITHOUT version checking:
 				load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
-				$Settings = new GeneralSettings();
+				$Settings = new GeneralSettings( false );
+				$use_temp_settings_object = true;
 			}
 			if( ! is_object( $Plugins ) )
 			{	// Create Plugins object:
@@ -9375,6 +9377,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					date( 'Y-m-d H:i:s' ), $cat_ID, array(), 'published', '#', 'access-denied-'.$coll_ID, '', 'open', array( 'default' ), $content_block_ityp_ID );
 				add_basic_widget_12740( $coll_ID, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => $widget_Item->get( 'urltitle' ) ) );
 				task_end();
+			}
+
+			if( $use_temp_settings_object )
+			{	// Reset the temporary Settings object because it is used WITHOUT version checking,
+				// Some code below may be required in normal Settings object WITH version checking:
+				$Settings = false;
 			}
 		}
 

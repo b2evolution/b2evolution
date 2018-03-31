@@ -346,8 +346,9 @@ C message size exceeds',
 	 *
 	 * Because the {@link $DB DB object} itself creates a connection when it gets
 	 * created "Error selecting database" occurs before we can check for it here.
+	 * @param boolean TRUE to check current DB version
 	 */
-	function __construct()
+	function __construct( $check_version = true )
 	{
 		global $new_db_version, $DB, $demo_mode, $instance_name, $basehost;
 
@@ -360,7 +361,7 @@ C message size exceeds',
 		parent::__construct( 'T_settings', array( 'set_name' ), 'set_value', 0 );
 
 		// check DB version:
-		if( $this->get( 'db_version' ) != $new_db_version )
+		if( $check_version && $this->get( 'db_version' ) != $new_db_version )
 		{ // Database is not up to date:
 			if( $DB->last_error )
 			{
