@@ -415,6 +415,35 @@ function db_drop_foreign_key( $table, $field_name, $reference_table, $reference_
 	db_delta_foreign_keys( $foreign_key_fields, $table, true, 'drop' );
 }
 
+
+/**
+ * Upgrade DB columns from utf8_general_ci to utf8mb4_unicode_ci
+ *
+ * @param array Key is table name, Value is array of columns which should be converted
+ */
+function db_convert_cols_to_utf8mb4( $table_columns )
+{
+	global $DB;
+
+	foreach( $table_columns as $table => $columns )
+	{
+		$columns = $DB->get_results( 'SHOW FULL COLUMNS FROM `'.$table.'` WHERE field IN ( "'.implode( '", "', $columns ).'" )' );
+		$col_definitions = array();
+		foreach( $columns as $col )
+		{	// Update a column character set explicitly to utf8mb4:
+			$col_definition = $col->Field.
+				' '.$col->Type.' COLLATE utf8mb4_unicode_ci'.
+				( ( $col->Null == 'NO' ) ? ' NOT' : '' ).' NULL'.
+				( isset( $col->Default ) ? ' DEFAULT "'.$col->Default.'"' : '' ).
+				( isset( $col->Extra ) ? ' '.$col->Extra : '' ).
+				( isset( $col->Comment ) ? ' COMMENT "'.$col->Comment.'"' : '' );
+			$col_definitions[] = 'MODIFY '.$col_definition;
+		}
+		$DB->query( 'ALTER TABLE `'.$table.'` '.implode( ', ', $col_definitions ) );
+	}
+}
+
+
 /**
  * Converts languages in a given table into according locales
  *
@@ -9704,8 +9733,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_index( 'T_users__organization', 'org_name', 'org_name(191)', 'UNIQUE' );
 		db_add_index( 'T_users__tag', 'utag_name', 'utag_name(191)', 'UNIQUE' );
 
-		// These columns must be updated from utf8_general_ci to utf8mb4_unicode_ci:
-		$tables = array(
+		// Convert the columns from utf8_general_ci to utf8mb4_unicode_ci:
+		db_convert_cols_to_utf8mb4( array(
 			'T_antispam__keyword'          => array( 'askw_string' ),
 			'T_automation__automation'     => array( 'autm_name' ),
 			'T_automation__step'           => array( 'step_label', 'step_info' ),
@@ -9768,26 +9797,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'T_users__user_org'            => array( 'uorg_role' ),
 			'T_widget__container'          => array( 'wico_name' ),
 			'T_widget__widget'             => array( 'wi_params' ),
-		);
+		) );
 
-		// Run updating:
-		foreach( $tables as $table => $columns )
-		{
-			$columns = $DB->get_results( 'SHOW FULL COLUMNS FROM `'.$table.'` WHERE field IN ( "'.implode( '", "', $columns ).'" )' );
-			$col_definitions = array();
-			foreach( $columns as $col )
-			{	// Update a column character set explicitly to utf8mb4:
-				$col_definition = $col->Field.
-					' '.$col->Type.' COLLATE utf8mb4_unicode_ci'.
-					( ( $col->Null == 'NO' ) ? ' NOT' : '' ).' NULL'.
-					( isset( $col->Default ) ? ' DEFAULT "'.$col->Default.'"' : '' ).
-					( isset( $col->Extra ) ? ' '.$col->Extra : '' ).
-					( isset( $col->Comment ) ? ' COMMENT "'.$col->Comment.'"' : '' );
-				$col_definitions[] = 'MODIFY '.$col_definition;
-			}
-			$DB->query( 'ALTER TABLE `'.$table.'` '.implode( ', ', $col_definitions ) );
-		}
+		upg_task_end();
+	}
 
+	if( upg_task_start( 13140, 'Converting columns to utf8mb4...' ) )
+	{	// part of 7.0.0-alpha
+		db_convert_cols_to_utf8mb4( array(
+			'T_email__campaign' => array( 'ecmp_name', 'ecmp_user_tag_sendskip', 'ecmp_user_tag_sendsuccess' ),
+		) );
 		upg_task_end();
 	}
 
