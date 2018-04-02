@@ -1277,8 +1277,8 @@ class EmailCampaign extends DataObject
 		{
 			// Cut prefix "ecmp_" of each field:
 			$source_field_name = substr( $source_field_name, 5 );
-			if( $source_field_name == 'ID' )
-			{	// Skip field ID:
+			if( $source_field_name == 'ID' || $source_field_name == 'welcome' )
+			{	// Skip fields ID and "welcome":
 				continue;
 			}
 			if( isset( $this->$source_field_name ) )
