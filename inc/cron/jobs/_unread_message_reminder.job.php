@@ -6,10 +6,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $DB, $UserSettings, $Settings;
 
-global $servertimenow, $unread_message_reminder_delay, $unread_messsage_reminder_threshold;
+global $servertimenow;
+
+// Get array of the unread private messages reminder delay settings:
+$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
 
 // New unread messages reminder may be sent to a user if it has at least one unread message which is older then the given threshold date
-$threshold_date = date2mysql( $servertimenow - $unread_messsage_reminder_threshold );
+$threshold_date = date2mysql( $servertimenow - $Settings->get( 'unread_message_reminder_threshold' ) );
 // New unread messages reminder should be sent to a user if the last one was sent at least x days ago, where x depends from the configuration
 // Get the minimum delay value from the configuration array
 $minimum_delay = array_values( $unread_message_reminder_delay );

@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $DB, $Settings, $UserSettings;
 
-global $servertimenow, $comment_moderation_reminder_threshold;
+global $servertimenow;
 
 // Check if UserSettings exists because it must be initialized before email sending
 if( empty( $UserSettings ) )
@@ -18,7 +18,7 @@ if( empty( $UserSettings ) )
 }
 
 // Only those blogs are selected for moderation where we can find at least one comment awaiting moderation which is older then the threshold date defined below
-$threshold_date = date2mysql( $servertimenow - $comment_moderation_reminder_threshold );
+$threshold_date = date2mysql( $servertimenow - $Settings->get( 'comment_moderation_reminder_threshold' ) );
 
 // Statuses defined in this array should be notified. This should be configurable, but this is the default value.
 $notify_statuses = get_visibility_statuses( 'moderation' );
@@ -34,7 +34,7 @@ $moderation_blogs = $DB->get_col( $SQL->get() );
 
 if( empty( $moderation_blogs ) )
 { // There are no blogs where exists draft comments older then the threshold ( 24 hours by default )
-	cron_log_append( sprintf( T_('No comments have been awaiting moderation for more than %s.'), seconds_to_period( $comment_moderation_reminder_threshold ) ) );
+	cron_log_append( sprintf( T_('No comments have been awaiting moderation for more than %s.'), seconds_to_period( $Settings->get( 'comment_moderation_reminder_threshold' ) ) ) );
 	return 1;
 }
 

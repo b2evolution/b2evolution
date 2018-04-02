@@ -2680,12 +2680,12 @@ function get_user_isubscription( $user_ID, $item_ID )
  *
  * @param integer user ID
  * @param integer blog ID
- * @return object with properties sub_items and sub_comments. Each property value is true if user is subscribed and false otherwise
+ * @return object with properties sub_items, sub_items_mod and sub_comments. Each property value is true if user is subscribed and false otherwise
  */
 function get_user_subscription( $user_ID, $blog )
 {
 	global $DB;
-	$result = $DB->get_row( 'SELECT sub_items, sub_comments
+	$result = $DB->get_row( 'SELECT sub_items, sub_items_mod, sub_comments
 								FROM T_subscriptions
 								WHERE sub_user_ID = '.$user_ID.' AND sub_coll_ID = '.$blog );
 	return $result;
@@ -2721,36 +2721,24 @@ function set_user_isubscription( $user_ID, $item_ID, $value )
  * @param integer value 0 for unsubscribe and 1 for subscribe to new posts
  * @param integer value 0 for unsubscribe and 1 for subscribe to new comments
  */
-function set_user_subscription( $user_ID, $blog, $items = NULL, $comments = NULL )
+function set_user_subscription( $user_ID, $blog, $items = NULL, $comments = NULL, $items_mod = NULL )
 {
 	global $DB;
 	$sub = get_user_subscription( $user_ID, $blog ); // Get default values
 
-	if( ( $items < 0 ) || ( $items > 1 ) || ( $comments < 0 ) || ( $comments > 1 ) )
-	{
+	if( ( $items < 0 ) || ( $items > 1 ) ||
+	    ( $items_mod < 0 ) || ( $items_mod > 1 ) || 
+	    ( $comments < 0 ) || ( $comments > 1 ) )
+	{	// Skip wrong values:
 		return false;
 	}
 
-	if( ! is_null( $items ) )
-	{
-		$sub_items = $items;
-	}
-	else
-	{
-		$sub_items = $sub ? $sub->sub_items : 0;
-	}
+	$sub_items = ( $items === NULL ? ( $sub ? $sub->sub_items : 0 ) : $items );
+	$sub_items_mod = ( $items_mod === NULL ? ( $sub ? $sub->sub_items_mod : 0 ) : $items_mod );
+	$sub_comments = ( $comments === NULL ? ( $sub ? $sub->sub_comments : 0 ) : $comments );
 
-	if( ! is_null( $comments ) )
-	{
-		$sub_comments = $comments;
-	}
-	else
-	{
-		$sub_comments = $sub ? $sub->sub_comments : 0;
-	}
-
-	return $DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-			VALUES ( '.$blog.', '.$user_ID.', '.$sub_items.', '.$sub_comments.' )' );
+	return $DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
+			VALUES ( '.$blog.', '.$user_ID.', '.$sub_items.', '.$sub_items_mod.', '.$sub_comments.' )' );
 }
 
 
@@ -3018,7 +3006,7 @@ function check_usertags( $user_ID, $test_tags = array(), $type = 'has_any' )
  */
 function get_account_activation_info( $edited_User )
 {
-	global $Settings, $UserSettings, $servertimenow, $activate_account_reminder_config;
+	global $Settings, $UserSettings, $servertimenow;
 
 	$field_label = T_('Latest account activation email');
 	$can_be_validated = $edited_User->check_status( 'can_be_validated' );
@@ -3065,6 +3053,9 @@ function get_account_activation_info( $edited_User )
 	{ // When validation process is secure, then account activation email is not known, and this was already added as a note into the 'Last account activation email' field
 		return $result;
 	}
+
+	// Get array of account activation reminder settings:
+	$activate_account_reminder_config = $Settings->get( 'activate_account_reminder_config' );
 
 	$field_label = T_('Next account activation reminder');
 	$number_of_max_reminders = ( count( $activate_account_reminder_config ) - 1 );

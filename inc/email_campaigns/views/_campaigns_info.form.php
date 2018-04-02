@@ -34,10 +34,6 @@ $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-c
 	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ) ) );
 	$Form->info( T_('Last sent manually'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ) ) : T_('Not sent yet') );
 	$Form->info( T_('Last sent automatically'), $edited_EmailCampaign->get( 'auto_sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'auto_sent_ts' ) ) : T_('Not sent yet') );
-	$Form->radio_input( 'ecmp_auto_send', $edited_EmailCampaign->get( 'auto_send' ), array(
-			array( 'value' => 'no',           'label' => T_('No (Manual sending only)') ),
-			array( 'value' => 'subscription', 'label' =>  T_('At subscription') ),
-		), T_('Auto send'), array( 'lines' => true ) );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('List recipients') );
