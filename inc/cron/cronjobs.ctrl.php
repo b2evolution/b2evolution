@@ -272,11 +272,10 @@ switch( $action )
 					$Settings->set( 'unread_message_reminder_threshold', param_duration( 'unread_message_reminder_threshold' ) );
 					// Unread private messages reminder settings:
 					$reminder_delay = array();
-					$reminder_delay_num = param( 'unread_message_reminder_delay_num', 'integer', 0 );
 					$i = 1;
 					$prev_reminder_delay_day = 0;
 					$prev_reminder_delay_spacing = 0;
-					for( $d = 1; $d <= $reminder_delay_num; $d++ )
+					for( $d = 1; $d <= 10; $d++ )
 					{
 						$reminder_delay_day = param( 'unread_message_reminder_delay_day_'.$d, 'integer', 0 );
 						$reminder_delay_spacing = param( 'unread_message_reminder_delay_spacing_'.$d, 'integer', 0 );
@@ -305,6 +304,12 @@ switch( $action )
 							$prev_reminder_delay_spacing = $reminder_delay_spacing;
 							$i++;
 						}
+					}
+					if( empty( $reminder_delay ) )
+					{	// If no reminder has been selected:
+						param_error( 'unread_message_reminder_delay_day_1', T_('Please select at least one reminder for unread private messages.') );
+						// Set one empty reminder in order to display all 10 reminders on the error form:
+						$reminder_delay[] = '0:0';
 					}
 					$Settings->set( 'unread_message_reminder_delay', implode( ',', $reminder_delay ) );
 					break;

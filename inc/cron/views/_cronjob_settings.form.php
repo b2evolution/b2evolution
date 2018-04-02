@@ -109,7 +109,7 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 				$d = 1;
 				foreach( $unread_message_reminder_delay as $delay_day => $delay_spacing )
 				{
-					$n = ( $d == $config_count ? 2 : 1 );
+					$n = ( $d == $config_count ? ( 11 -  $config_count ) : 1 );
 					for( $i = 0; $i < $n; $i++ )
 					{
 						$Form->begin_line( sprintf( T_('Reminder #%d'), $d ) );
@@ -128,7 +128,6 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 						$d++;
 					}
 				}
-				$Form->hidden( 'unread_message_reminder_delay_num', $d );
 				break;
 		}
 

@@ -59,16 +59,12 @@ class GeneralSettings extends AbstractSettings
 		'unread_message_reminder_threshold' => 86400, // seconds (Unread private messages reminder threshold)
 		'unread_message_reminder_delay' => // Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
 			// The values below are in x:y format.
-			'10:3,'.    // less than 10 days -> 3 days spacing
-			'30:6,'.    //  10 to   30 days ->   6 days spacing
-			'60:10,'.   //  30 to   60 days ->  10 days spacing
-			'90:15,'.   //  60 to   90 days ->  15 days spacing
-			'120:25,'.  //  90 to  120 days ->  25 days spacing
-			'180:30,'.  // 120 to  180 days ->  30 days spacing
-			'240:45,'.  // 180 to  240 days ->  45 days spacing
-			'365:60,'.  // 240 to  365 days ->  60 days spacing
-			'730:120,'. // 365 to  730 days -> 120 days spacing
-			'1825:365', // 730 to 1825 days -> 365 days spacing
+			'10:3,'.   // less than 10 days -> 3 days spacing
+			'30:6,'.   //  10 to  30 days ->   6 days spacing
+			'90:15,'.  //  30 to  90 days ->  15 days spacing
+			'180:30,'. //  90 to 180 days ->  30 days spacing
+			'365:60,'. // 180 to 365 days ->  60 days spacing
+			'730:120', // 365 to 730 days -> 120 days spacing
 			// more => "The user has not logged in for x days, so we will not send him notifications any more".
 
 		'email_service' => 'mail', // Preferred email service: 'mail', 'smtp'
