@@ -27,7 +27,7 @@ if( empty( $edited_User ) )
 {	// User not found:
 	$error_msg = T_( 'The user you are trying to unsubscribe does not seem to exist. You may already have deleted your account.' );
 }
-elseif( $key == md5( $user_ID.$edited_User->get( 'unsubscribe_key' ) ) ) 	// Security check
+elseif( $key != md5( $user_ID.$edited_User->get( 'unsubscribe_key' ) ) ) 	// Security check
 {
 	$error_msg = T_('Invalid unsubscribe link!');
 }
