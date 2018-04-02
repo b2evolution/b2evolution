@@ -10,6 +10,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $Session, $admin_url;
+
 // ---------------------------- EMAIL HEADER INCLUDED HERE ----------------------------
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
@@ -55,8 +57,15 @@ if( ! empty( $params['message'] ) )
 
 echo "\n\n-- \n";
 
-// show sender IP address
-echo sprintf( T_( 'This message was typed by a user connecting from this IP address: %s.' ), implode( ', ', get_ip_list( false, true ) ) )."\n\n";
+if( ! empty( $recipient_User ) && $recipient_User->check_perm( 'stats', 'view' ) )
+{
+	$session_ID = $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID='.$Session->ID;
+}
+else
+{
+	$session_ID = $Session->ID;
+}
+echo sprintf( T_('Session ID').': %s', $session_ID );
 
 // show sender email address
 echo sprintf( T_( 'By replying, your email will go directly to %s.' ), $params['sender_address'] );
