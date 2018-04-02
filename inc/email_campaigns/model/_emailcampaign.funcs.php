@@ -522,7 +522,7 @@ function campaign_results_block( $params = array() )
  *
  * @param integer Email Campaign ID
  * @param integer TRUE/1 if this is a welcome Email Campaign
- * @return string 
+ * @return string
  */
 function campaign_td_welcome( $ecmp_ID, $ecmp_welcome )
 {
