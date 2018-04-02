@@ -106,11 +106,13 @@ if( $params['notify_type'] == 'moderator' )
 	{	// about new item:
 		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new posts, click here' );
 		$unsubscribe_type = 'post_moderator';
+		$unsubscribe_params = '';
 	}
 	else
 	{	// about updated item:
 		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated posts, click here' );
 		$unsubscribe_type = 'post_moderator_edit';
+		$unsubscribe_params = '&amp;coll_ID='.$Item->get_blog_ID();
 	}
 	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' ).'<br />'
 			.$unsubscribe_text.': '

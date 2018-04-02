@@ -180,8 +180,31 @@ elseif( $confirmed )
 
 				case 'post_moderator_edit':
 					// unsubscribe from updated post moderation notifications:
-					$UserSettings->set( 'notify_edit_pst_moderation', '0', $edited_User->ID );
-					$UserSettings->dbupdate();
+					$notify_edit_pst_moderation = $UserSettings->get( 'notify_edit_pst_moderation', $edited_User->ID );
+					if( $notify_edit_pst_moderation )
+					{	// Unsubscribe from ALL collections:
+						$UserSettings->set( 'notify_edit_pst_moderation', '0', $edited_User->ID );
+						$UserSettings->dbupdate();
+						// Additional form params in order to know user was unsubscribed from ALL collections:
+						$hidden_form_params = array( 'subs_edit_pst_type' => 'all' );
+					}
+					elseif( ! empty( $coll_ID ) )
+					{	// Unsubscribe ONLY from the selected collection:
+						$SQL = new SQL( 'Get user subscription per collection for post modifications' );
+						$SQL->SELECT( 'sub_items_mod' );
+						$SQL->FROM( 'T_subscriptions' );
+						$SQL->WHERE( 'sub_coll_ID = '.$DB->quote( $coll_ID ) );
+						$SQL->WHERE_and( 'sub_user_ID = '.$DB->quote( $user_ID ) );
+						if( $DB->get_var( $SQL ) === '1' )
+						{	// If user is really subscribed on the selected collection:
+							$DB->query( 'UPDATE T_subscriptions
+								  SET sub_items_mod = 0
+								WHERE sub_user_ID = '.$DB->quote( $user_ID ).'
+								  AND sub_coll_ID = '.$DB->quote( $coll_ID ) );
+							// Additional form params in order to know user was unsubscribed from single collection:
+							$hidden_form_params = array( 'subs_edit_pst_type' => 'coll' );
+						}
+					}
 					break;
 
 				case 'unread_msg':
@@ -424,9 +447,28 @@ elseif( $confirmed )
 					break;
 
 				case 'post_moderator_edit':
-					// unsubscribe from updated post moderation notifications:
-					$UserSettings->set( 'notify_edit_pst_moderation', '1', $edited_User->ID );
-					$UserSettings->dbupdate();
+					// resubscribe to updated post moderation notifications:
+					$subs_edit_pst_type = param( 'subs_edit_pst_type', 'string', 'all' );
+					if( $subs_edit_pst_type == 'all' )
+					{	// If user was unsubscribed from ALL collections we should subsribe to ALL collecitons as well:
+						$UserSettings->set( 'notify_edit_pst_moderation', '1', $edited_User->ID );
+						$UserSettings->dbupdate();
+					}
+					elseif( ! empty( $coll_ID ) )
+					{	// If user was unsubscribed from SINGLE collection we should subsribe ONLY to that collection:
+						$SQL = new SQL( 'Get user subscription per collection for post modifications' );
+						$SQL->SELECT( 'sub_items_mod' );
+						$SQL->FROM( 'T_subscriptions' );
+						$SQL->WHERE( 'sub_coll_ID = '.$DB->quote( $coll_ID ) );
+						$SQL->WHERE_and( 'sub_user_ID = '.$DB->quote( $user_ID ) );
+						if( $DB->get_var( $SQL ) === '0' )
+						{	// If user is really unsubscribed from the selected collection:
+							$DB->query( 'UPDATE T_subscriptions
+								  SET sub_items_mod = 1
+								WHERE sub_user_ID = '.$DB->quote( $user_ID ).'
+								  AND sub_coll_ID = '.$DB->quote( $coll_ID ) );
+						}
+					}
 					break;
 
 				case 'unread_msg':
@@ -794,6 +836,13 @@ else
 	$Form->hidden( 'coll_ID', $coll_ID );
 	$Form->hidden( 'post_ID', $post_ID );
 	$Form->hidden( 'confirmed', 1 );
+	if( ! empty( $hidden_form_params ) && is_array( $hidden_form_params ) )
+	{	// Set additional hidden params from the array:
+		foreach( $hidden_form_params as $hidden_form_param_key => $hidden_form_param_value )
+		{
+			$Form->hidden( $hidden_form_param_key, $hidden_form_param_value );
+		}
+	}
 
 	if( $type == 'newsletter' && ! empty( $newsletter_ID ) )
 	{
