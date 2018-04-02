@@ -10271,8 +10271,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_index( 'T_users__organization', 'org_name', 'org_name(191)', 'UNIQUE' );
 		db_add_index( 'T_users__tag', 'utag_name', 'utag_name(191)', 'UNIQUE' );
 
-		// These columns must be updated from utf8_general_ci to utf8mb4_unicode_ci:
-		$tables = array(
+		// Convert the columns from utf8_general_ci to utf8mb4_unicode_ci:
+		db_convert_cols_to_utf8mb4( array(
 			'T_antispam__keyword'          => array( 'askw_string' ),
 			'T_automation__automation'     => array( 'autm_name' ),
 			'T_automation__step'           => array( 'step_label', 'step_info' ),
@@ -10335,25 +10335,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'T_users__user_org'            => array( 'uorg_role' ),
 			'T_widget__container'          => array( 'wico_name' ),
 			'T_widget__widget'             => array( 'wi_params' ),
-		);
-
-		// Run updating:
-		foreach( $tables as $table => $columns )
-		{
-			$columns = $DB->get_results( 'SHOW FULL COLUMNS FROM `'.$table.'` WHERE field IN ( "'.implode( '", "', $columns ).'" )' );
-			$col_definitions = array();
-			foreach( $columns as $col )
-			{	// Update a column character set explicitly to utf8mb4:
-				$col_definition = $col->Field.
-					' '.$col->Type.' COLLATE utf8mb4_unicode_ci'.
-					( ( $col->Null == 'NO' ) ? ' NOT' : '' ).' NULL'.
-					( isset( $col->Default ) ? ' DEFAULT "'.$col->Default.'"' : '' ).
-					( isset( $col->Extra ) ? ' '.$col->Extra : '' ).
-					( isset( $col->Comment ) ? ' COMMENT "'.$col->Comment.'"' : '' );
-				$col_definitions[] = 'MODIFY '.$col_definition;
-			}
-			$DB->query( 'ALTER TABLE `'.$table.'` '.implode( ', ', $col_definitions ) );
-		}
+		) );
 
 		upg_task_end();
 	}
@@ -10413,6 +10395,177 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{ // part of 6.10.1-stable
 		db_add_col( 'T_email__campaign', 'ecmp_email_defaultdest', 'VARCHAR(255) NULL AFTER ecmp_email_title' );
 		$DB->query( 'UPDATE T_email__campaign SET ecmp_email_defaultdest = '.$DB->quote( $baseurl ) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14395, 'Creating default item type "Content Block"...' ) )//copy of 12735
+	{	// part of 6.10.1-stable
+		$SQL = new SQL( 'Check at least one item type with usage "content-block" for existence' );
+		$SQL->SELECT( 'ityp_ID' );
+		$SQL->FROM( 'T_items__type' );
+		$SQL->WHERE( 'ityp_usage = "content-block"' );
+		$SQL->LIMIT( 1 );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Create one default content block item type:
+			$r = $DB->query( 'INSERT INTO T_items__type ( ityp_name, ityp_usage, ityp_allow_breaks, ityp_allow_featured, ityp_use_comments )
+					VALUES ( '.$DB->quote( 'Content Block' ).', '.$DB->quote( 'content-block' ).', 0, 0, 0 )' );
+			if( $r && $DB->insert_id > 0 )
+			{	// Enable new created item type for all collections:
+				$DB->query( 'INSERT INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID )
+					SELECT '.$DB->insert_id.', blog_ID
+					  FROM T_blogs' );
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14400 ) )//copy of 12740
+	{	// part of 6.10.1-stable
+
+		/* ---- Install basic widgets for containers "Login Required" and "Access Denied": ---- START */
+		global $basic_widgets_insert_sql_rows;
+		$basic_widgets_insert_sql_rows = array();
+
+		/**
+		 * Add a widget to global array in order to insert it in DB by single SQL query later
+		 *
+		 * @param integer Blog ID
+		 * @param string Container name
+		 * @param string Type
+		 * @param string Code
+		 * @param integer Order
+		 * @param array|string|NULL Widget params
+		 * @param integer 1 - enabled, 0 - disabled
+		 */
+		function add_basic_widget_12740( $blog_ID, $container_name, $code, $type, $order, $params = NULL, $enabled = 1 )
+		{
+			global $basic_widgets_insert_sql_rows, $DB;
+
+			if( is_null( $params ) )
+			{ // NULL
+				$params = 'NULL';
+			}
+			elseif( is_array( $params ) )
+			{ // array
+				$params = $DB->quote( serialize( $params ) );
+			}
+			else
+			{ // string
+				$params = $DB->quote( $params );
+			}
+
+			$basic_widgets_insert_sql_rows[] = '( '
+				.$blog_ID.', '
+				.$DB->quote( $container_name ).', '
+				.$order.', '
+				.$enabled.', '
+				.$DB->quote( $type ).', '
+				.$DB->quote( $code ).', '
+				.$params.' )';
+		}
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'blog_ID, cat_ID' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->FROM_add( 'LEFT JOIN T_categories ON cat_blog_ID = blog_ID AND cat_meta = 0' );
+		$SQL->ORDER_BY( 'blog_ID, cat_ID DESC' );
+		$collections = $DB->get_assoc( $SQL );
+		if( count( $collections ) > 0 )
+		{	// If at least one collection exists:
+			$SQL = new SQL( 'Get first item type with usage "content-block"' );
+			$SQL->SELECT( 'ityp_ID' );
+			$SQL->FROM( 'T_items__type' );
+			$SQL->WHERE( 'ityp_usage = "content-block"' );
+			$SQL->ORDER_BY( 'ityp_ID' );
+			$SQL->LIMIT( 1 );
+			$content_block_ityp_ID = intval( $DB->get_var( $SQL ) );
+
+			// We're going to need some environment in order to init item type cache and create item:
+			load_class( 'items/model/_item.class.php', 'Item' );
+			$use_temp_settings_object = false;
+			if( ! is_object( $Settings ) )
+			{	// Create temporary Settings object WITHOUT version checking:
+				load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+				$Settings = new GeneralSettings( false );
+				$use_temp_settings_object = true;
+			}
+			if( ! is_object( $Plugins ) )
+			{	// Create Plugins object:
+				load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+				$Plugins = new Plugins();
+			}
+
+			foreach( $collections as $coll_ID => $cat_ID )
+			{
+				task_begin( 'Installing default "Login Required" and "Access Denied" widgets for collection #'.$coll_ID.'... ' );
+				/* Login Required */
+				$widget_Item = new Item();
+				$widget_Item->insert( 1, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+					date( 'Y-m-d H:i:s' ), $cat_ID, array(), 'published', '#', 'login-required-'.$coll_ID, '', 'open', array( 'default' ), $content_block_ityp_ID );
+				add_basic_widget_12740( $coll_ID, 'Login Required', 'content_block', 'core', 10, array( 'item_slug' => $widget_Item->get( 'urltitle' ) ) );
+				add_basic_widget_12740( $coll_ID, 'Login Required', 'user_login', 'core', 20, array( 'title' => T_( 'Log in to your account' ) ) );
+				/* Access Denied */
+				$widget_Item = new Item();
+				$widget_Item->insert( 1, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
+					date( 'Y-m-d H:i:s' ), $cat_ID, array(), 'published', '#', 'access-denied-'.$coll_ID, '', 'open', array( 'default' ), $content_block_ityp_ID );
+				add_basic_widget_12740( $coll_ID, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => $widget_Item->get( 'urltitle' ) ) );
+				task_end();
+			}
+
+			if( $use_temp_settings_object )
+			{	// Reset the temporary Settings object because it is used WITHOUT version checking,
+				// Some code below may be required in normal Settings object WITH version checking:
+				$Settings = false;
+			}
+		}
+
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+		/* ---- Install basic widgets for containers "Login Required" and "Access Denied": ---- END */
+
+		upg_task_end( false );
+	}
+
+	if( upg_task_start( 14410, 'Upgrading users table...' ) )//copy of 12750
+	{	// part of 6.10.1-stable
+		db_modify_col( 'T_users', 'user_status', "enum( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new'" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14420, 'Upgrading users table...' ) )//copy of 12760
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_subscriptions', 'sub_items_mod', 'TINYINT(1) NOT NULL AFTER sub_items' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14430, 'Upgrading email campaigns table...' ) )//copy of 12770
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_email__campaign', 'ecmp_welcome', 'TINYINT(1) NOT NULL DEFAULT 0 AFTER ecmp_auto_send' );
+		$SQL = new SQL( 'Find only single of welcome email campaign per list/newsletter' );
+		$SQL->SELECT( 'ecmp_ID' );
+		$SQL->FROM( 'T_email__campaign' );
+		$SQL->WHERE( 'ecmp_auto_send = "subscription"' );
+		$SQL->GROUP_BY( 'ecmp_enlt_ID' );
+		$SQL->ORDER_BY( 'ecmp_ID' );
+		$welcome_campaigns = $DB->get_col( $SQL );
+		if( count( $welcome_campaigns ) > 0 )
+		{	// Convert "At subscription" email campaigns to "Welcome":
+			$DB->query( 'UPDATE T_email__campaign
+				  SET ecmp_welcome = 1
+				WHERE ecmp_ID IN ( '.$DB->quote( $welcome_campaigns ).' )' );
+		}
+		db_drop_col( 'T_email__campaign', 'ecmp_auto_send' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14440, 'Converting columns to utf8mb4...' ) )//copy of 13140
+	{	// part of 7.0.0-alpha
+		db_convert_cols_to_utf8mb4( array(
+			'T_email__campaign' => array( 'ecmp_name', 'ecmp_user_tag_sendskip', 'ecmp_user_tag_sendsuccess' ),
+		) );
 		upg_task_end();
 	}
 	/****************************************************************************
