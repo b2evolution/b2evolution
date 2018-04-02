@@ -99,7 +99,7 @@ class UserList extends DataObjectList2
 				'keywords'            => NULL,    // string, Search words
 				'gender'              => NULL,    // string: 'M', 'F', 'O', 'MF', 'MO', 'FO' or 'MFO'
 				'status_activated'    => NULL,    // string: 'activated'
-				'account_status'      => NULL,    // string: 'new', 'activated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
+				'account_status'      => NULL,    // string: 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
 				'registered_min'      => NULL,    // date: Registered date from
 				'registered_max'      => NULL,    // date: Registered date to
 				'reported'            => NULL,    // integer: 1 to show only reported users

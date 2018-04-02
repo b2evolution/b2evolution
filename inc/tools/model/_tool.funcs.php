@@ -779,7 +779,7 @@ function tool_create_sample_campaigns( $num_campaigns, $campaign_lists, $send_ca
 	$DB->log_queries = false;
 
 	// Load all users IDs:
-	$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users WHERE user_status IN ( "activated", "autoactivated" )' );
+	$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users WHERE user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 
 	// Load all selected lists in cache:
 	$NewsletterCache = & get_NewsletterCache();

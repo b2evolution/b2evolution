@@ -200,7 +200,7 @@ class UserCache extends DataObjectCache
 			}
 			// a user with matched password was found
 			$first_matched_index = $index;
-			if( ( $row->user_status == 'activated' ) || ( $row->user_status == 'autoactivated' ) )
+			if( ( $row->user_status == 'activated' ) || ( $row->user_status == 'autoactivated' ) || ( $row->user_status == 'manualactivated' ) )
 			{ // an activated user was found, break from the iteration
 				$User = new User( $row );
 				break;

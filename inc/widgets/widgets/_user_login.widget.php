@@ -233,8 +233,16 @@ class user_login_Widget extends ComponentWidget
 
 			$redirect_to = $Settings->get( 'redirect_to_after_login' );
 			if( empty( $redirect_to ) )
-			{
-				$redirect_to = regenerate_url( '', '', '', '&' );
+			{	// Set redirect URL if it is not set in general settings:
+				global $disp;
+				if( $disp == 'access_requires_login' )
+				{	// Use a collection main page for disp "access_requires_login":
+					$redirect_to = $Blog->get( 'url' );
+				}
+				else
+				{	// Use a current page URL after log in action:
+					$redirect_to = regenerate_url( '', '', '', '&' );
+				}
 			}
 
 			$this->disp_title();

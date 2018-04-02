@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $DB, $UserSettings, $Settings;
 
-global $servertimenow, $baseurl, $activate_account_reminder_config, $activate_account_reminder_threshold;
+global $servertimenow, $baseurl;
 
 if( $Settings->get( 'validation_process' ) != 'easy' )
 {
@@ -25,6 +25,9 @@ if( empty( $UserSettings ) )
 // Only users with "new", "emailchanged" OR "deactivated" statuses may receive activation reminders
 // This will be a precondition to get less users from db, but this will be checked again with check_status() in the send_easy_validate_emails() function
 $status_condition = '( user_status = "new" OR user_status = "emailchanged" OR user_status = "deactivated" )';
+
+// Get array of account activation reminder settings:
+$activate_account_reminder_config = $Settings->get( 'activate_account_reminder_config' );
 
 // Set configuration details from $activate_account_reminder_config array
 $number_of_max_reminders = ( count( $activate_account_reminder_config ) - 1 );
@@ -56,7 +59,7 @@ $SQL->WHERE_and( 'LENGTH(TRIM(user_email)) > 0' );
 // check that user email is not blocked
 $SQL->WHERE_and( 'user_email NOT IN ( SELECT emadr_address FROM T_email__address WHERE '.get_mail_blocked_condition().' )' );
 // check that user was created more than x ( = confugred activate account reminder threshold ) seconds ago!
-$threshold_date = date2mysql( $servertimenow - $activate_account_reminder_threshold );
+$threshold_date = date2mysql( $servertimenow - $Settings->get( 'activate_account_reminder_threshold' ) );
 $SQL->WHERE_and( 'user_created_datetime < '.$DB->quote( $threshold_date ) );
 // check how many reminders was sent to the user and when => send reminders only if required
 $SQL->WHERE_and( implode( ' OR ', $reminder_delay_conditions ) );

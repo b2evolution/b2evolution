@@ -51,6 +51,7 @@ $registration_ask_locale = $Settings->get('registration_ask_locale');
 // Check what subscriptions should be activated (It can be used for quick registration by widget)
 $auto_subscribe_posts = false;
 $auto_subscribe_comments = false;
+$auto_subscribe_posts_mod = false;
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
 $email = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
@@ -154,6 +155,7 @@ switch( $action )
 				$user_tags = param( 'usertags', 'string', NULL );
 				$subscribe_posts = param( 'subscribe_post', 'integer', true );
 				$subscribe_comments = param( 'subscribe_comment', 'integer', true );
+				$subscribe_posts_mod = param( 'subscribe_post_mod', 'integer', true );
 				$newsletters = param( 'newsletters', 'string', true );
 				$newsletters = explode( ',', $newsletters );
 				$widget_newsletters = array();
@@ -184,6 +186,7 @@ switch( $action )
 				$ask_lastname = $user_register_Widget->disp_params['ask_lastname'];
 				$subscribe_posts = $user_register_Widget->disp_params['subscribe_post'];
 				$subscribe_comments = $user_register_Widget->disp_params['subscribe_comment'];
+				$subscribe_posts_mod = $user_register_Widget->disp_params['subscribe_post_mod'];
 				$widget_newsletters = $user_register_Widget->disp_params['newsletters'];
 				$user_tags = $user_register_Widget->disp_params['usertags'];
 				$widget_redirect_to = trim( $user_register_Widget->disp_params['redirect_to'] );
@@ -204,8 +207,9 @@ switch( $action )
 			$registration_require_lastname = ( $ask_lastname == 'required' );
 
 			// Check what subscriptions should be activated by current widget
-			$auto_subscribe_posts = ! empty( $subscribe_posts  );
+			$auto_subscribe_posts = ! empty( $subscribe_posts );
 			$auto_subscribe_comments = ! empty( $subscribe_comments );
+			$auto_subscribe_posts_mod = ! empty( $subscribe_posts_mod );
 		}
 
 		if( ! $is_quick )
@@ -463,10 +467,10 @@ switch( $action )
 		$UserSettings->dbupdate();
 
 		// Auto subscribe new user to current collection posts/comments:
-		if( $auto_subscribe_posts || $auto_subscribe_comments )
+		if( $auto_subscribe_posts || $auto_subscribe_comments || $auto_subscribe_posts_mod )
 		{ // If at least one option is enabled
-			$DB->query( 'REPLACE INTO T_subscriptions ( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-					VALUES ( '.$DB->quote( $Blog->ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
+			$DB->query( 'REPLACE INTO T_subscriptions ( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
+					VALUES ( '.$DB->quote( $Blog->ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_posts_mod ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
 		}
 
 		// Get user domain status:

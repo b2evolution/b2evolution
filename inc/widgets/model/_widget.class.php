@@ -295,12 +295,20 @@ class ComponentWidget extends DataObject
 		{	// Plugin widget:
 			$widget_Plugin = & $this->get_Plugin();
 
-			if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+			if( $widget_Plugin )
 			{
-				return $widget_Plugin->get_widget_icon().' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
-			}
+				if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+				{
+					return $widget_Plugin->get_widget_icon().' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+				}
 
-			return $widget_Plugin->get_widget_icon().' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+				return $widget_Plugin->get_widget_icon().' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+			}
+			else
+			{
+				$icon = '<span class="label label-info evo_widget_icon"><span class="fa fa-warning"></span></span>';
+				return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+			}
 		}
 
 		// Normal widget:
@@ -551,7 +559,7 @@ class ComponentWidget extends DataObject
 	{
 		$params = $this->get_param_definitions( NULL );
 
-		if( isset( $params[$parname] ) || 
+		if( isset( $params[$parname] ) ||
 		    ( $group !== NULL && isset( $params[ $group ]['inputs'][ substr( $parname, strlen( $group ) ) ] ) ) )
 		{ // This is a widget specific param:
 			// Make sure param_array is loaded before set the param value

@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url;
+global $admin_url, $Session;
 
 // Default params:
 $params = array_merge( array(
@@ -29,6 +29,7 @@ $params = array_merge( array(
 $Comment = $params['Comment'];
 $Collection = $Blog = $params['Blog'];
 $Item = $params['Item'];
+$recipient_User = & $params['recipient_User'];
 
 $UserCache = & get_UserCache();
 $voter_User = & $UserCache->get_by_ID( $params['voter_ID'] );
@@ -46,11 +47,13 @@ if( $params['notify_full'] )
 		// Mail bloat: .' ( '.str_replace('&amp;', '&', $Item->get_permanent_url( '', '', '&' ))." )\n";
 		// TODO: fp> We MAY want to force short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
-	$ip_list = $Comment->author_IP;
-	$user_domain = gethostbyaddr( $Comment->author_IP );
-	if( $user_domain != $Comment->author_IP )
-	{	// Add host name after author IP address:
-		$ip_list .= ', '.$user_domain;
+	if( ! empty( $recipient_User ) && $recipient_User->check_perm( 'stats', 'view' ) )
+	{
+		$session_ID = $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID='.$Session->ID;
+	}
+	else
+	{
+		$session_ID = $Session->ID;
 	}
 
 	if( $Comment->get_author_User() )
@@ -59,7 +62,7 @@ if( $params['notify_full'] )
 	}
 	else
 	{	// Comment from visitor:
-		$notify_message .= T_('Author').": $Comment->author (IP: $ip_list)\n";
+		$notify_message .= T_('Author').": $Comment->author (".T_('Session ID').": $session_ID)\n";
 		$notify_message .= T_('Email').": $Comment->author_email\n";
 		$notify_message .= T_('Url').": $Comment->author_url\n";
 	}
