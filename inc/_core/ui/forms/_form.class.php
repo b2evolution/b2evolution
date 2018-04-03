@@ -1776,14 +1776,18 @@ class Form extends Widget
 
 		$this->handle_common_params( $field_params, $field_prefix, $field_label );
 
-		$periods_values = array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 50 );
+		$periods_values = array();
+		for( $p = 1; $p <= 60; $p++ )
+		{
+			$periods_values[] = $p;
+		}
 		$periods = array(
-			array( 'name' => 'second', 'title' => T_('second(s)'), 'seconds' => 1,        'size' => 1 ), // 1 seconds
-			array( 'name' => 'minute', 'title' => T_('minute(s)'), 'seconds' => 50,       'size' => 60 ), // 50 seconds
-			array( 'name' => 'hour',   'title' => T_('hour(s)'),   'seconds' => 3000,     'size' => 3600 ), // 50 minutes
-			array( 'name' => 'day',    'title' => T_('day(s)'),    'seconds' => 72000,    'size' => 86400 ), // 20 hours
-			array( 'name' => 'month',  'title' => T_('month(s)'),  'seconds' => 2160000,  'size' => 2592000 ), // 25 days
-			array( 'name' => 'year',   'title' => T_('year(s)'),   'seconds' => 25920000, 'size' => 31536000 ), // 10 months
+			array( 'name' => 'second', 'title' => T_('second(s)'), 'seconds' => 1 ), // 1 second
+			array( 'name' => 'minute', 'title' => T_('minute(s)'), 'seconds' => 60 ), // 60 seconds
+			array( 'name' => 'hour',   'title' => T_('hour(s)'),   'seconds' => 3600 ), // 60 minutes
+			array( 'name' => 'day',    'title' => T_('day(s)'),    'seconds' => 86400 ), // 24 hours
+			array( 'name' => 'month',  'title' => T_('month(s)'),  'seconds' => 2592000 ), // 30 days
+			array( 'name' => 'year',   'title' => T_('year(s)'),   'seconds' => 31536000 ), // 365 days
 		);
 
 		$r = $this->begin_field();
@@ -1794,23 +1798,13 @@ class Form extends Widget
 		if( !empty( $duration ) )
 		{
 			$periods_count = count( $periods );
-			for( $p = 0; $p <= $periods_count; $p++ )
+			for( $p = $periods_count - 1; $p >= 0; $p-- )
 			{
-				$period = $periods[ $p < $periods_count ? $p : $periods_count - 1 ];
-				if( ( $p == 0 && $duration <= $period['seconds'] ) ||
-				    ( $p == $periods_count && $duration > $period['seconds'] ) ||
-				    ( $p > 0 && $duration > $periods[ $p - 1 ]['seconds'] && $duration <= $period['seconds'] ) )
+				$period = $periods[ $p ];
+				$duration_value = ( $duration / $period['seconds'] );
+				if( $duration_value >= 1 && ( $duration % $period['seconds'] ) == 0 )
 				{
-					$period = $periods[ $p > 0 ? $p - 1 : 0 ];
-					$duration_value = floor( $duration / $period['size'] );
-					foreach( $periods_values as $v => $value )
-					{
-						if( $duration_value <= $value )
-						{
-							$current_value = $value;
-							break;
-						}
-					}
+					$current_value = $duration_value;
 					$current_period = $period['name'];
 					break;
 				}
@@ -3837,6 +3831,16 @@ class Form extends Widget
 	}
 
 
+	/**
+	 * Generate a file select field
+	 *
+	 * @param string The name of the input field
+	 * @param string Initial value
+	 * @param string Label displayed with the field
+	 * @param string "help" note
+	 * @param array Extended attributes/params
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
 	function fileselect( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
 	{
 		global $thumbnail_sizes, $file_select_js_initialized;
@@ -4111,6 +4115,72 @@ class Form extends Widget
 
 			$file_select_js_initialized = true;
 			return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Generate a tag text input
+	 */
+	function usertag_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $tag_input_js_initialized;
+
+		$field_params = array_merge( array(
+			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 100%">',
+			'input_suffix' => '</div>',
+		), $field_params );
+
+		$save_output = $this->output;
+		$this->output = false;
+
+		$r = $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params );	// TEMP: Note already in params
+
+		if( ! isset( $tag_input_js_initialized ) )
+		{
+			$r .= '<script type="text/javascript">
+						function init_autocomplete_tags( selector )
+						{
+							var tags = jQuery( selector ).val();
+							var tags_json = new Array();
+							if( tags.length > 0 )
+							{ // Get tags from <input>
+								tags = tags.split( \',\' );
+								for( var t in tags )
+								{
+									tags_json.push( { id: tags[t], name: tags[t] } );
+								}
+							}
+
+							jQuery( selector ).tokenInput( \''.get_restapi_url().'usertags\',
+							{
+								theme: \'facebook\',
+								queryParam: \'s\',
+								propertyToSearch: \'name\',
+								tokenValue: \'name\',
+								preventDuplicates: true,
+								prePopulate: tags_json,
+								hintText: \''.TS_('Type in a tag').'\',
+								noResultsText: \''.TS_('No results').'\',
+								searchingText: \''.TS_('Searching...').'\',
+								jsonContainer: \'tags\',
+							} );
+						}
+						</script>';
+			$tag_input_js_initialized = true;
+		}
+
+		$r .= '<script type="text/javascript">
+					jQuery( document ).ready( function()
+					{
+						jQuery( "#'.format_to_js( $field_name ).'" ).hide();
+						init_autocomplete_tags( "#'.format_to_js( $field_name ).'" );'.
+						get_prevent_key_enter_js( '#token-input-'.$field_name ).'
+					} );
+					</script>';
+
+		$this->output = $save_output;
+
+		return $this->display_or_return( $r );
 	}
 
 

@@ -102,6 +102,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 					),
 					'usertags' => array(
 						'label' => T_('On subscription, tag user with'),
+						'type' => 'usertag',
 						'size' => 30,
 						'maxlength' => 255,
 					),

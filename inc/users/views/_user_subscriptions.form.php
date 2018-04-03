@@ -48,8 +48,6 @@ global $Collection, $Blog;
  */
 global $DB;
 
-global $unread_message_reminder_delay;
-
 // Default params:
 $default_params = array(
 		'skin_form_params'     => array(),
@@ -226,11 +224,12 @@ if( $notifications_mode != 'off' )
 			// Get those blogs for which we have already subscriptions (for this user)
 			$sql = 'SELECT blog_ID, blog_shortname,
 								MAX( IF( sub_items IS NULL, IF( opt.cset_name = "opt_out_subscription", 1, 0 ), sub_items ) ) AS sub_items,
+								MAX( IF( sub_items_mod IS NULL, IF( opt.cset_name = "opt_out_items_mod_subscription", 1, 0 ), sub_items_mod ) ) AS sub_items_mod,
 								MAX( IF( sub_comments IS NULL, IF( opt.cset_name = "opt_out_comment_subscription", 1, 0 ), sub_comments ) ) AS sub_comments
 							FROM T_blogs
 							LEFT JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_subscriptions" )
 							LEFT JOIN T_coll_settings AS subc ON ( subc.cset_coll_ID = blog_ID AND subc.cset_name = "allow_comment_subscriptions" )
-							LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name IN ( "opt_out_subscription", "opt_out_comment_subscription" ) )
+							LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name IN ( "opt_out_subscription", "opt_out_comment_subscription", "opt_out_items_mod_subscription" ) )
 							LEFT JOIN T_subscriptions ON ( sub_coll_ID = blog_ID AND sub_user_ID = '.$edited_User->ID.' )
 							LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
 							LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
@@ -252,7 +251,8 @@ if( $notifications_mode != 'off' )
 					continue;
 				}
 				if( ! ( $sub_Blog->get_setting( 'allow_subscriptions' ) && $blog_sub->sub_items ) &&
-						! ( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) && $blog_sub->sub_comments ) )
+						! ( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) && $blog_sub->sub_comments ) &&
+						! ( $sub_Blog->get_setting( 'allow_item_mod_subscriptions' ) && $blog_sub->sub_items ) )
 				{	// Skip because the collection doesn't allow any subscription:
 					continue;
 				}
@@ -274,6 +274,10 @@ if( $notifications_mode != 'off' )
 				if( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) )
 				{	// If subscription is allowed for new comments:
 					$subscriptions[] = array( 'sub_comments_'.$sub_Blog->ID, '1', T_('Notify me of any new comment in this collection'), $blog_sub->sub_comments );
+				}
+				if( $sub_Blog->get_setting( 'allow_item_mod_subscriptions' ) )
+				{	// If subscription is allowed for modified posts:
+					$subscriptions[] = array( 'sub_items_mod_'.$sub_Blog->ID, '1', T_('Notify me when:').' '.T_('a post is modified and I have permissions to moderate it.'), $blog_sub->sub_items_mod );
 				}
 				$Form->checklist( $subscriptions, 'subscriptions', $sub_Blog->dget( 'shortname', 'htmlbody' ) );
 			}
@@ -406,7 +410,8 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	if( $has_messaging_perm )
 	{ // show messaging notification settings only if messaging is available for edited user
 		$notify_options[ T_('Messaging') ][] = array( 'edited_user_notify_messages', 1, T_('I receive a private message.'),  $UserSettings->get( 'notify_messages', $edited_User->ID ), $disabled );
-		$notify_options[ T_('Messaging') ][] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_messsage_reminder_threshold' ) ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
+		$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
+		$notify_options[ T_('Messaging') ][] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
 	}
 	if( $edited_User->check_role( 'post_owner' ) )
 	{ // user has at least one post or user has right to create new post

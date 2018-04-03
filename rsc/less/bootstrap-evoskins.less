@@ -1040,6 +1040,13 @@ div.edit_toolbars, div.message_toolbars {
 			.panel-body {
 				padding: 0;
 			}
+			.panel-body, .evo_post__full_text.clearfix {
+				&:before, &:after {
+					// Change this from default bootstrap value "table", in order to
+					// avoid double space of 10px margin between <p> and login form:
+					display: block;
+				}
+			}
 		}
 		&.widget_core_user_login {
 			min-width: 290px;

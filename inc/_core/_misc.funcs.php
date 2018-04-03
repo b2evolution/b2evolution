@@ -4006,7 +4006,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'private_message_new':
 				// 'notify_messages' - "I receive a private message."
 			case 'private_messages_unread_reminder':
-				// 'notify_unread_messages' - "I have unread private messages for more than X seconds."(X = $Settings->get( 'unread_messsage_reminder_threshold' ))
+				// 'notify_unread_messages' - "I have unread private messages for more than X seconds."(X = $Settings->get( 'unread_message_reminder_threshold' ))
 			case 'comment_new':
 				// 'notify_published_comments' - "a comment is published on one of my posts.",
 				// 'notify_comment_moderation' - "a comment is posted and I have permissions to moderate it.",

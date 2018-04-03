@@ -714,38 +714,6 @@ $enabled_password_drivers = array(
 
 
 /**
- * Account activation reminder settings.
- * Each element of the array is given in seconds
- * Assume that the number of element in the array below is n then the following must be followed:
- * n must be greater then 1; n - 1 will be the max number of account activation reminder emails.
- * The first element of the array ( in position 0 ) shows the time in seconds when the firs reminder email must be sent after the new user was registered, or the user status was changed to new, deactivated or emailchanged status
- * Each element between the postion [1 -> (n - 1)) shows the time in seconds when the next reminder email must be sent after the previous one
- * The last element of the array shows when an account status will be set to 'failedactivation' if it was not activated after the last reminder email. This value must be the highest value of the array!
- *
- * E.g. $activate_account_reminder_config = array( 86400, 129600, 388800, 604800 ); = array( 1 day, 1.5 days, 4.5 days, 7 days )
- * At most 3 reminder will be sent, the first 1 day after the registration or deactivation, the seond in 1.5 days after the first one, and the third one after 2.5 days after the second one.
- * 7 days after the last reminder email the account status will be set to 'failedactivation' and no more reminder will be sent.
- */
-$activate_account_reminder_config = array( 86400/* one day */, 129600/* 1.5 days */, 388800/* 4.5 days */, 604800/* 7 days */ );
-
-
-/**
- * Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
- * The array below is in x => y format.
- * The values of this array must be ascendant.
- */
-$unread_message_reminder_delay = array(
-	10  => 3,  // less than 10 days -> 3 days spacing
-	30  => 6,  // 10 to 30 days -> 6 days spacing
-	90  => 15, // 30 to 90 days -> 15 days spacing
-	180 => 30, // 90 to 180 days -> 30 days spacing
-	365 => 60, // 180 to 365 days -> 60 days spacing
-	730 => 120 // 365 to 730 days -> 120 days spacing
-	// more => "The user has not logged in for x days, so we will not send him notifications any more".
-);
-
-
-/**
  * Enable a workaround to allow accessing posts with URL titles ending with
  * a dash (workaround for old bug).
  *

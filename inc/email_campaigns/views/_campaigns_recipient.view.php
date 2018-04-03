@@ -21,7 +21,7 @@ echo '<div class="well">';
 // Create result set:
 $SQL = new SQL();
 $SQL->SELECT( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_name, ecmp_email_title, ecmp_email_defaultdest, ecmp_email_html, ecmp_email_text,
-	ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
+	ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_welcome,
 	ecmp_user_tag_sendskip, ecmp_user_tag_sendsuccess,
 	ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
 	enlt_ID, enlt_name,

@@ -522,7 +522,7 @@ class Plugin
 	 *        'min_count': minimum count of sets (optional, default is no restriction)
 	 *	   'fileselect': opens a modal window to select file. The following can be set for this type:
 	 *        'root': default root
-	 *		  'path': default path
+	 *        'path': default path
 	 *        'thumbnail_size': thumbnail size
 	 *        'max_file_num': maximum number of files
 	 *        'initialize_with': initial value
@@ -530,6 +530,7 @@ class Plugin
 	 *        'inputs': an array of setting parameters
 	 *     'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
 	 *     'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
+	 *     'usertag': an input field to enter user tags
 	 * 'note' (gets displayed as a note to the param field),
 	 * 'info': Text for param with type 'info'
 	 * 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)

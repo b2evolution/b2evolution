@@ -155,6 +155,7 @@ class user_register_Widget extends ComponentWidget
 				),
 				'usertags' => array(
 					'label' => T_('Tag user with'),
+					'type' => 'usertag',
 					'size' => 30,
 					'maxlength' => 255,
 				),
@@ -173,6 +174,12 @@ class user_register_Widget extends ComponentWidget
 				'subscribe_comment' => array(
 					'label' => '',
 					'note' => T_('check to auto subscribe new user to current collection comments'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+				),
+				'subscribe_post_mod' => array(
+					'label' => '',
+					'note' => T_('check to auto subscribe new user to current collection when a post is modified and it has permissions to moderate it'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
@@ -289,6 +296,7 @@ class user_register_Widget extends ComponentWidget
 			$Form->hidden( 'ask_lastname', $this->disp_params['ask_lastname'] );
 			$Form->hidden( 'usertags', $this->disp_params['usertags'] );
 			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe_post'] );
+			$Form->hidden( 'subscribe_post_mod', $this->disp_params['subscribe_post_mod'] );
 			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe_comment'] );
 
 			$newsletters = array();
