@@ -9428,7 +9428,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12780, 'Upgrading users table...' ) )
+	if( upg_task_start( 12780, 'Upgrading cron logs table...' ) )
 	{	// part of 6.10.1-stable
 		db_modify_col( 'T_cron__log', 'clog_messages', 'MEDIUMTEXT' );
 		upg_task_end();
