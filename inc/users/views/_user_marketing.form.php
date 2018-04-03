@@ -59,14 +59,10 @@ $Form->hidden( 'edited_user_login', $edited_User->login );
 
 $Form->begin_fieldset( T_('Tags').get_manual_link('user-marketing-tags') );
 
-	$Form->text_input( 'edited_user_tags', param( 'edited_user_tags', 'string', $user_tags ), 40, T_('Tags'), '', array(
+	$Form->usertag_input( 'edited_user_tags', param( 'edited_user_tags', 'string', $user_tags ), 40, T_('Tags'), '', array(
 		'maxlength' => 255,
 		'style'     => 'width: 100%;',
-		'input_prefix' => '<div class="input-group user_admin_tags" style="width: 100%">',
-		'input_suffix' => '</div>',
 	) );
-	// Initialize JS to auto complete user tags fields:
-	echo_user_autocomplete_tags_js( '#edited_user_tags' );
 
 $Form->end_fieldset(); // user tags
 

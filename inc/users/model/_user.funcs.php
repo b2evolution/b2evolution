@@ -2715,7 +2715,7 @@ function set_user_subscription( $user_ID, $blog, $items = NULL, $comments = NULL
 	$sub = get_user_subscription( $user_ID, $blog ); // Get default values
 
 	if( ( $items < 0 ) || ( $items > 1 ) ||
-	    ( $items_mod < 0 ) || ( $items_mod > 1 ) || 
+	    ( $items_mod < 0 ) || ( $items_mod > 1 ) ||
 	    ( $comments < 0 ) || ( $comments > 1 ) )
 	{	// Skip wrong values:
 		return false;
@@ -3482,17 +3482,15 @@ function callback_filter_userlist( & $Form )
 		}
 	}
 	$Form->begin_line( T_('Has all these tags'), 'user_tag' );
-		$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
+		$Form->usertag_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
 			'maxlength' => 255,
 			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
 			'input_suffix'=> '</div>'	) );
-		$Form->text_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
+		$Form->usertag_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
 			'maxlength' => 255,
 			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
 			'input_suffix'=> '</div>'	) );
 	$Form->end_line();
-	// Initialize JS to auto complete user tags fields:
-	echo_user_autocomplete_tags_js( '#user_tag, #not_user_tag' );
 
 	if( is_admin_page() )
 	{
@@ -4698,60 +4696,6 @@ function echo_userlist_tags_js()
 
 
 /**
- * JavaScript to initialize auto complete user tags
- *
- * @param String Selectors of JavaScript object
- */
-function echo_user_autocomplete_tags_js( $js_selectors )
-{
-?>
-	<script type="text/javascript">
-	function init_autocomplete_user_tags( selectors )
-	{
-		jQuery( selectors ).each( function()
-		{
-			var tags = jQuery( this ).val();
-			var tags_json = new Array();
-			if( tags.length > 0 )
-			{	// Get tags from <input>:
-				tags = tags.split( ',' );
-				for( var t in tags )
-				{
-					tags_json.push( { id: tags[t], name: tags[t] } );
-				}
-			}
-
-			jQuery( this ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
-			{
-				theme: 'facebook',
-				queryParam: 's',
-				propertyToSearch: 'name',
-				tokenValue: 'name',
-				preventDuplicates: true,
-				prePopulate: tags_json,
-				hintText: '<?php echo TS_('Type in a tag') ?>',
-				noResultsText: '<?php echo TS_('No results') ?>',
-				searchingText: '<?php echo TS_('Searching...') ?>',
-				jsonContainer: 'tags',
-			} );
-		} );
-	}
-
-	jQuery( document ).ready( function()
-	{
-		jQuery( '<?php echo $js_selectors; ?>' ).hide();
-		init_autocomplete_user_tags( '<?php echo $js_selectors; ?>' );
-		<?php
-			// Don't submit a form by Enter when user is editing the tags:
-			echo get_prevent_key_enter_js( str_replace( '#', '#token-input-', $js_selectors ) );
-		?>
-	} );
-	</script>
-<?php
-}
-
-
-/**
  * Display user report form
  *
  * @param array Params
@@ -4835,8 +4779,6 @@ function user_report_form( $params = array() )
 		echo '<p><a href="'.$params['cancel_url'].'" class="btn btn-warning">'.T_('Cancel Report').'</a></p>';
 	}
 }
-
-
 
 
 /**

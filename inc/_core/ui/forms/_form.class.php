@@ -3831,6 +3831,16 @@ class Form extends Widget
 	}
 
 
+	/**
+	 * Generate a file select field
+	 *
+	 * @param string The name of the input field
+	 * @param string Initial value
+	 * @param string Label displayed with the field
+	 * @param string "help" note
+	 * @param array Extended attributes/params
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
 	function fileselect( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
 	{
 		global $thumbnail_sizes, $file_select_js_initialized;
@@ -4105,6 +4115,72 @@ class Form extends Widget
 
 			$file_select_js_initialized = true;
 			return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Generate a tag text input
+	 */
+	function usertag_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $tag_input_js_initialized;
+
+		$field_params = array_merge( array(
+			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 100%">',
+			'input_suffix' => '</div>',
+		), $field_params );
+
+		$save_output = $this->output;
+		$this->output = false;
+
+		$r = $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params );	// TEMP: Note already in params
+
+		if( ! isset( $tag_input_js_initialized ) )
+		{
+			$r .= '<script type="text/javascript">
+						function init_autocomplete_tags( selector )
+						{
+							var tags = jQuery( selector ).val();
+							var tags_json = new Array();
+							if( tags.length > 0 )
+							{ // Get tags from <input>
+								tags = tags.split( \',\' );
+								for( var t in tags )
+								{
+									tags_json.push( { id: tags[t], name: tags[t] } );
+								}
+							}
+
+							jQuery( selector ).tokenInput( \''.get_restapi_url().'usertags\',
+							{
+								theme: \'facebook\',
+								queryParam: \'s\',
+								propertyToSearch: \'name\',
+								tokenValue: \'name\',
+								preventDuplicates: true,
+								prePopulate: tags_json,
+								hintText: \''.TS_('Type in a tag').'\',
+								noResultsText: \''.TS_('No results').'\',
+								searchingText: \''.TS_('Searching...').'\',
+								jsonContainer: \'tags\',
+							} );
+						}
+						</script>';
+			$tag_input_js_initialized = true;
+		}
+
+		$r .= '<script type="text/javascript">
+					jQuery( document ).ready( function()
+					{
+						jQuery( "#'.format_to_js( $field_name ).'" ).hide();
+						init_autocomplete_tags( "#'.format_to_js( $field_name ).'" );'.
+						get_prevent_key_enter_js( '#token-input-'.$field_name ).'
+					} );
+					</script>';
+
+		$this->output = $save_output;
+
+		return $this->display_or_return( $r );
 	}
 
 
