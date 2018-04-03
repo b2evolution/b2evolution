@@ -1201,11 +1201,19 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 		{
 			foreach( $value as $vk => $vv )
 			{
-				if( ! isset( $vv[$mk] ) )
-					continue;
-
-				if( ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.']', $vv[$mk], $mv ) )
-				{
+				if( isset( $mv['type'] ) && $mv['type'] == 'input_group' &&
+				    ! empty( $mv['inputs'] ) && is_array( $mv['inputs'] ) )
+				{	// Validate each input field of the setting with type "input_group":
+					foreach( $mv['inputs'] as $k => $v )
+					{
+						if( isset( $vv[ $mk.$k ] ) && ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.$k.']', $vv[ $mk.$k ], $v ) )
+						{	// If at least one setting of the grouped inputs has an error:
+							$r = false;
+						}
+					}
+				}
+				elseif( isset( $vv[ $mk ] ) && ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.']', $vv[ $mk ], $mv ) )
+				{	// If single setting has an error:
 					$r = false;
 				}
 			}
