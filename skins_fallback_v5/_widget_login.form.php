@@ -12,14 +12,21 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $baseurl, $dummy_fields;
+global $baseurl, $dummy_fields, $PageCache;
 
 /**
  * @var object user_login_Widget
  */
 $Widget = !empty( $this ) ? $this : false;
 
-$ajax_form_enabled = ( !empty( $Blog ) && ( $Blog->get_ajax_form_enabled() ) );
+if( empty( $PageCache ) || ! $PageCache->is_collecting )
+{	// In this case we can display the login form because we will NOT be caching an incorrect CRUMB in the pagecache:
+	$ajax_form_enabled = true;
+}
+else
+{	// In this case we canNOT display the login form because we WOULD be caching an incorrect CRUMB in the pagecache:
+	$ajax_form_enabled = ( ! empty( $Blog ) && ( $Blog->get_ajax_form_enabled() ) );
+}
 
 $Form = new Form( get_login_url( $source, $redirect_to ), 'login_form', 'post' );
 
