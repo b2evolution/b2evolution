@@ -2425,6 +2425,7 @@ function display_login_form( $params )
 			'reqID' => '',
 			'sessID' => '',
 			'transmit_hashed_password' => false,
+			'get_widget_login_hidden_fields' => false,
 			'display_abort_link'  => true,
 			'abort_link_position' => 'above_form', // 'above_form', 'form_title'
 			'abort_link_text'     => T_('Abort login!'),

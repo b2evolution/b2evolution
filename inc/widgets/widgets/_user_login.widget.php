@@ -234,6 +234,8 @@ class user_login_Widget extends ComponentWidget
 			'display_reg_link'      => $this->get_param( 'register_link_show' ),
 			'reg_link_text'         => $this->get_param( 'register_link_text' ),
 			'reg_link_class'        => $this->get_param( 'register_link_class' ),
+			'transmit_hashed_password'       => true,
+			'get_widget_login_hidden_fields' => true,
 		);
 		require skin_template_path( '_login.disp.php' );
 
