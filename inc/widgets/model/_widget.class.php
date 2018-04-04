@@ -429,15 +429,9 @@ class ComponentWidget extends DataObject
 					$setting_name = trim( $setting_name, ']' );
 					if( isset( $setting_value[ $setting_name ] ) )
 					{
-						$setting_value = $setting_value[ $setting_name ];
-					}
-					else
-					{
-						$setting_value = NULL;
-						break;
+						return	$setting_value = $setting_value[ $setting_name ];
 					}
 				}
-				return $setting_value;
 			}
 		}
 		elseif( isset( $this->param_array[ $parname ] ) )
