@@ -273,11 +273,13 @@ class EmailCampaign extends DataObject
 	 * Get recipient user IDs of this campaign
 	 *
 	 * @param string Type of users:
-	 *   'all'     - All active users which accept newsletter of this campaign
-	 *   'filter'  - Filtered active users which accept newsletter of this campaign
-	 *   'receive' - Users which already received email newsletter
-	 *   'skipped' - Users which will not receive email newsletter
-	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
+	 *   'all'         - All active users which accept newsletter of this campaign
+	 *   'filter'      - Filtered active users which accept newsletter of this campaign
+	 *   'receive'     - Users which already received email newsletter
+	 *   'skipped'     - Users which will not receive email newsletter
+	 *   'skipped_tag' - Users which will not receive email newsletter because of they are restricted by user tag
+	 *   'error'       - Users which got an error during receiving email newsletter
+	 *   'wait'        - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
 	 *   Use same keys with prefix 'unsub_' for users are NOT subscribed to Newsletter of this Email Campaign,
 	 *   Use same keys with prefix 'full_' for users which are linked with this Email Campaign somehow,
 	 * @return array user IDs
@@ -807,9 +809,20 @@ class EmailCampaign extends DataObject
 		{	// Send a newsletter to real user:
 			global $DB, $mail_log_insert_ID;
 
-			// Force email sending to not activated users if email campaign is configurated to auto sending (e-g to send email on auto subscription on registration):
-			$force_on_non_activated = ( $this->get( 'welcome' ) == 1 );
-			$result = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, $force_on_non_activated, array(), $email_address );
+			if( in_array( $user_ID, $this->get_recipients( 'full_receive' ) ) ||
+			    in_array( $user_ID, $this->get_recipients( 'full_skipped' ) ) ||
+			    in_array( $user_ID, $this->get_recipients( 'full_skipped_tag' ) ) ||
+			    check_usertags( $user_ID, explode( ',', $this->get( 'user_tag_sendskip' ) ), 'has_any' ) ) // check this separately for new subscribed users which receive email at subscription
+			{	// Skip this user because it either already received this email or it is skipped manually or by user tag:
+				$result = false;
+			}
+			else
+			{	// Try to send email campaign to the user only if he is really waiting this:
+				// Force email sending to not activated users if email campaign is configurated to auto sending (e-g to send email on auto subscription on registration):
+				$force_on_non_activated = ( $this->get( 'welcome' ) == 1 );
+				$result = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, $force_on_non_activated, array(), $email_address );
+			}
+
 			if( $result )
 			{	// Update last sending data for newsletter per user:
 				$DB->query( 'UPDATE T_email__newsletter_subscription
@@ -877,9 +890,10 @@ class EmailCampaign extends DataObject
 			$user_IDs = $this->get_recipients( 'wait' );
 		}
 		else
-		{	// Exclude users which already received this email campaign to avoid double sending even with forcing user IDs:
-			$receive_user_IDs = $this->get_recipients( 'receive' );
-			$user_IDs = array_diff( $user_IDs, $receive_user_IDs );
+		{	// Exclude users(which already received this email campaign or skipped manually or skipped by user tag) to avoid double sending even with forcing user IDs:
+			$user_IDs = array_diff( $user_IDs, $this->get_recipients( 'full_receive' ) );
+			$user_IDs = array_diff( $user_IDs, $this->get_recipients( 'full_skipped' ) );
+			$user_IDs = array_diff( $user_IDs, $this->get_recipients( 'full_skipped_tag' ) );
 		}
 
 		if( empty( $user_IDs ) )
