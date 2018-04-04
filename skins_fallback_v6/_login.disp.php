@@ -62,9 +62,16 @@ $params = array_merge( array(
 		'display_abort_link'       => true,
 		'abort_link_position'      => 'above_form',
 		'abort_link_text'          => T_('Abort login!'),
-		'display_reg_link'         => false,
 		'display_form_messages'    => false,
 		'login_form_footer'        => true,
+		'login_button_text'        => T_('Log in!'),
+		'login_button_class'       => 'btn btn-success btn-lg',
+		'display_lostpass_link'    => true,
+		'lostpass_link_text'       => T_('Lost your password?'),
+		'lostpass_link_class'      => '',
+		'display_reg_link'         => false,
+		'reg_link_text'            => T_('Register').' &raquo;',
+		'reg_link_class'           => 'btn btn-primary btn-lg pull-right',
 	), $params );
 
 $login_form_params = array(
@@ -91,6 +98,14 @@ $login_form_params = array(
 	'abort_link_position'      => $params['abort_link_position'],
 	'abort_link_text'          => $params['abort_link_text'],
 	'display_reg_link'         => $params['display_reg_link'],
+	'login_button_text'        => $params['login_button_text'],
+	'login_button_class'       => $params['login_button_class'],
+	'display_lostpass_link'    => $params['display_lostpass_link'],
+	'lostpass_link_text'       => $params['lostpass_link_text'],
+	'lostpass_link_class'      => $params['lostpass_link_class'],
+	'display_reg_link'         => $params['display_reg_link'],
+	'reg_link_text'            => $params['reg_link_text'],
+	'reg_link_class'           => $params['reg_link_class'],
 );
 
 echo str_replace( '$form_class$', $params['login_page_class'], $params['login_page_before'] );

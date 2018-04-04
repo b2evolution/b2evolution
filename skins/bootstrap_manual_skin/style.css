@@ -153,6 +153,7 @@ div.bSideItem h4 {
 }
 .evo_panel__login {
   max-width: 400px;
+  min-width: auto;
 }
 .evo_panel__lostpass {
   max-width: 480px;
