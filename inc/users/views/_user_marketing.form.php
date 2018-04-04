@@ -120,6 +120,118 @@ $Results->cols[] = array(
 
 $Results->display();
 
+// Display email campaigns
+$campaign_SQL = new SQL( 'Get email campaigns for the edited Uer #'.$edited_User->ID );
+$campaign_SQL->SELECT( 'ecmp_ID, ecmp_name, csnd_last_sent_ts, csnd_last_open_ts, csnd_last_click_ts, csnd_cta1, csnd_cta2, csnd_cta3, csnd_like, csnd_status, enls_subscribed' );
+$campaign_SQL->FROM( 'T_email__campaign' );
+$campaign_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = '.$edited_User->ID.' AND enls_enlt_ID = ecmp_enlt_ID' );
+$campaign_SQL->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID' );
+$campaign_SQL->WHERE( 'csnd_user_ID = '.$edited_User->ID );
+
+$campaign_Results = new Results( $campaign_SQL->get(), 'ucamp_', 'D' );
+$Results->Cache = & get_EmailCampaignCache();
+$campaign_Results->title = T_('Email campaigns').get_manual_link( 'email-campaign-recipients' );
+
+$campaign_Results->cols[] = array(
+	'th' => T_('ID'),
+	'order' => 'ecmp_ID',
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'right',
+	'td' => '$ecmp_ID$',
+);
+
+$campaign_Results->cols[] = array(
+	'th' => T_('Campaign name'),
+	'order' => 'ecmp_name',
+	'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_name$</b></a>',
+);
+
+
+$campaign_Results->cols[] = array(
+		'th' => T_('List Status'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'nowrap',
+		'order' => 'enls_user_ID',
+		'td' => '~conditional( #enls_subscribed# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
+	);
+
+$campaign_Results->cols[] = array(
+		'th' => T_('Campaign Status'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'center nowrap',
+		'order' => 'csnd_status',
+		'td' => '%user_td_campaign_status( #csnd_status# )%'
+	);
+
+$campaign_Results->cols[] = array(
+		'th' => T_('Send date'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'timestamp compact_data',
+		'order' => 'csnd_last_sent_ts',
+		'default_dir' => 'D',
+		'td' => '%user_td_emlog_date( #csnd_last_sent_ts# )%',
+	);
+
+$campaign_Results->cols[] = array(
+	'th' => T_('Last opened'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'timestamp compact_data',
+	'order' => 'csnd_last_open_ts',
+	'default_dir' => 'D',
+	'td' => '%user_td_emlog_date( #csnd_last_open_ts# )%',
+);
+
+$campaign_Results->cols[] = array(
+	'th' => T_('Last clicked'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'timestamp compact_data',
+	'order' => 'csnd_last_click_ts',
+	'default_dir' => 'D',
+	'td' => '%user_td_emlog_date( #csnd_last_click_ts# )%',
+);
+
+$campaign_Results->cols[] = array(
+	'th' => /* TRANS: Call To Action 1*/ T_('CTA1'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'center',
+	'order' => 'csnd_cta1',
+	'td' => '%user_td_cta( #csnd_cta1# )%'
+);
+
+$campaign_Results->cols[] = array(
+	'th' => /* TRANS: Call To Action 2*/ T_('CTA2'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'center',
+	'order' => 'csnd_cta2',
+	'td' => '%user_td_cta( #csnd_cta2# )%'
+);
+
+$campaign_Results->cols[] = array(
+	'th' => /* TRANS: Call To Action 3*/ T_('CTA3'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'center',
+	'order' => 'csnd_cta3',
+	'td' => '%user_td_cta( #csnd_cta3# )%'
+);
+
+$campaign_Results->cols[] = array(
+	'th' => T_('Liked'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'center',
+	'order' => 'csnd_like',
+	'td' => '%user_td_liked_email( #csnd_like# )%'
+);
+
+$campaign_Results->cols[] = array(
+	'th' => T_('Actions'),
+	'th_class' => 'small',
+	'td_class' => 'shrinkwrap small',
+	'td' => '%user_td_campaign_actions( #ecmp_ID#, '.$edited_User->ID.', #csnd_status# )%'
+);
+
+$campaign_Results->display();
+
+
 // End payload block:
 $this->disp_payload_end();
 ?>

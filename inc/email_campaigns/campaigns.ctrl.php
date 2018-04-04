@@ -430,23 +430,32 @@ switch( $action )
 		break;
 
 	case 'queue':
-		param( 'ecmp_ID', 'integer', NULL );
-		param( 'user_ID', 'integer', NULL );
-
-		queue_campaign_user( $ecmp_ID, $user_ID );
-
-		// Set this var to display again the same form where we can review and send campaign
-		$action = 'edit';
-		break;
-
 	case 'skip':
 		param( 'ecmp_ID', 'integer', NULL );
 		param( 'user_ID', 'integer', NULL );
+		param( 'redirect_to', 'url' );
+		$redirect_to = str_replace( '&amp;', '&', $redirect_to );
 
-		skip_campaign_user( $ecmp_ID, $user_ID );
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		if( $action == 'queue' )
+		{
+			queue_campaign_user( $ecmp_ID, $user_ID );
+		}
+		elseif( $action == 'skip' )
+		{
+			skip_campaign_user( $ecmp_ID, $user_ID );
+		}
+
+		if( ! empty( $redirect_to ) )
+		{
+			header_redirect( $redirect_to );
+		}
 
 		// Set this var to display again the same form where we can review and send campaign
 		$action = 'edit';
+		$tab = 'recipient';
 		break;
 }
 
