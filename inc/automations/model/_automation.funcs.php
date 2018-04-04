@@ -245,7 +245,7 @@ function step_get_result_titles()
 		),
 		'send_campaign' => array(
 			'YES'   => 'Email SENT',
-			'NO'    => 'Email was ALREADY sent',
+			'NO'    => 'Skipped: %s',
 			'ERROR' => 'ERROR: Email cannot be sent: %s',
 		),
 		'notify_owner' => array(
