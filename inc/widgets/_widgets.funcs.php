@@ -226,6 +226,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			}
 			// User login widget
 			add_basic_widget( $blog_id, 'Sidebar', 'user_login', 'core', 10 );
+			add_basic_widget( $blog_id, 'Sidebar', 'user_greetings', 'core', 15 );
 		}
 		if( ( !$initial_install || $blog_id != $blog_forums_ID ) && $kind != 'forum' )
 		{ // Don't install these Sidebar widgets for blog 'Forums'
@@ -383,7 +384,11 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 	/* Login Required */
 	add_basic_widget( $blog_id, 'Login Required', 'content_block', 'core', 10, array( 'item_slug' => 'login-required-'.$blog_id ) );
-	add_basic_widget( $blog_id, 'Login Required', 'user_login', 'core', 20, array( 'title' => T_( 'Log in to your account' ) ) );
+	add_basic_widget( $blog_id, 'Login Required', 'user_login', 'core', 20, array(
+			'title'               => T_( 'Log in to your account' ),
+			'login_button_class'  => 'btn btn-success btn-lg',
+			'register_link_class' => 'btn btn-primary btn-lg pull-right',
+		) );
 
 
 	/* Access Denied */
