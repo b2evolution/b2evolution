@@ -6133,8 +6133,8 @@ function users_results( & $UserList, $params = array() )
 				'th' => T_('List Status'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'nowrap',
-				'order' => 'enls_user_ID',
-				'td' => '~conditional( #enls_user_ID# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
+				'order' => 'enls_subscribed',
+				'td' => '~conditional( #enls_subscribed# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
 			);
 	}
 
@@ -6859,9 +6859,10 @@ function user_td_campaign_actions( $campaign_ID, $user_ID, $csnd_status )
 
 	if( $current_User->can_moderate_user( $user_ID ) )
 	{ // Current user can moderate this user
-		$r .= action_icon( T_('Queue again'), 'rewind', regenerate_url( 'ctrl,action,filter', 'ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient' ),
+		$redirect_to = rawurlencode( regenerate_url() );
+		$r .= action_icon( T_('Queue again'), 'rewind', $admin_url.'?ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;'.url_crumb('campaign').'&amp;redirect_to='.$redirect_to,
 				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'ready_to_send', 'ready_to_resend' ) )  ? ' invisible' : '' ) ) );
-		$r .= action_icon( T_('Skip'), 'forward', regenerate_url( 'ctrl,action,filter', 'ctrl=campaigns&amp;action=skip&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient' ),
+		$r .= action_icon( T_('Skip'), 'forward', $admin_url.'?ctrl=campaigns&amp;action=skip&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;'.url_crumb('campaign').'&amp;redirect_to='.$redirect_to,
 				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'sent', 'send_error', 'skipped' ) ) ? ' invisible' : '' ) ) );
 	}
 	else

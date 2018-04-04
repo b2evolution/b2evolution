@@ -665,7 +665,7 @@ class UserQuery extends SQL
 		$this->SELECT_add( ', csnd_last_sent_ts, enls_user_ID, csnd_last_open_ts, csnd_last_click_ts, csnd_like, csnd_cta1, csnd_cta2, csnd_cta3' );
 
 		// Get subscription status:
-		$this->SELECT_add( ', enls_user_ID' );
+		$this->SELECT_add( ', enls_subscribed' );
 		$this->FROM_add( 'LEFT JOIN T_email__campaign ON ecmp_ID = csnd_camp_ID' );
 		$this->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_enlt_ID = ecmp_enlt_ID AND enls_user_ID = user_ID AND enls_subscribed = 1' );
 

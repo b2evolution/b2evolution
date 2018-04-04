@@ -492,6 +492,17 @@ class AutomationStep extends DataObject
 						if( in_array( $user_ID, $step_EmailCampaign->get_recipients( 'full_receive' ) ) )
 						{	// If user already received this email:
 							$step_result = 'NO';
+							$additional_result_message = 'Email was ALREADY sent';
+						}
+						elseif( in_array( $user_ID, $step_EmailCampaign->get_recipients( 'full_skipped' ) ) )
+						{	// If user is marked to be manually skipped:
+							$step_result = 'NO';
+							$additional_result_message = 'Manually skipped';
+						}
+						elseif( in_array( $user_ID, $step_EmailCampaign->get_recipients( 'full_skipped_tag' ) ) )
+						{	// If user has user tag that should be skipped:
+							$step_result = 'NO';
+							$additional_result_message = 'User has skipped user tag';
 						}
 						elseif( ( $user_subscribed_newsletter_ID = $Automation->is_user_subscribed( $user_ID ) ) &&
 						        $step_EmailCampaign->send_email( $user_ID, '', '', 'auto', $user_subscribed_newsletter_ID, $Automation->ID ) )
