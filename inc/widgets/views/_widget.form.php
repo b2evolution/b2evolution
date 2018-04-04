@@ -79,7 +79,7 @@ $Form->end_fieldset();
 		{	// Flag to know fieldset is ended by widget params config:
 			$opened_fieldsets--;
 		}
-		elseif( $opened_fieldsets == 0 )
+		elseif( isset( $l_meta['layout'] ) && ! in_array( $l_meta['layout'], array( 'html' ) ) && $opened_fieldsets == 0 )
 		{	// Start default fieldset if it is not defined in widget params config:
 			$fieldset_name = 'settings_layout_start';
 			$fieldset_meta = array(
