@@ -398,9 +398,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					T_('Remove'), 5, 3,
 					array( 'onclick' => 'remove_button(this); return false;', 'style' => 'padding:10px 10px' )
 				), 'htmlspecialchars' );
+			
+			$id = str_replace( array( '[', ']' ), array('_', ''), $parname );
 
 			/**** Start (Display of saved entries): ****/
-			echo '<div id="'.$parname.'_disp">';
+			echo '<div id="'.$id.'_disp">';
 			
 				if( is_array( $set_value ) )
 				{
@@ -455,6 +457,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								
 								if( isset( $parmeta['entries'][ $set_value_entry_name ] ) )
 								{
+									
 									autoform_display_field( $parname.'['.$sv.']['.$set_value_entry_name.']', 
 														   $parmeta['entries'][ $set_value_entry_name ], 
 														   $Form, $set_type, $Obj, $set_target, $sv_data[ $set_value_entry_name ] );
@@ -500,11 +503,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 			else
 			{
-				$js .= "var entry_name = jQuery('#$parname option:selected').val();";
+				$js .= "var entry_name = jQuery('#$id option:selected').val();";
 			
 			}
 			
-			$js .= "var action_msg_container = jQuery( '#".$parname."_action_messages' ); action_msg_container.children().remove();"."\n\r";
+			$js .= "var action_msg_container = jQuery( '#".$id."_action_messages' ); action_msg_container.children().remove();"."\n\r";
 
 			
 			/*
@@ -565,9 +568,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					}";
 			
 			// Get param_prefix used:
-			$js .= "var param_prefix = 'ffield_".$Obj->get_param_prefix().$parname."_#_';";
+			$js .= "var param_prefix = 'ffield_".$Obj->get_param_prefix().$id."_#_';";
 			// Create an array with all used input types:
-			$js .= "var disp_entries = $('#".$parname."_disp').children('.form-group').map(function () {"; 
+			$js .= "var disp_entries = $('#".$id."_disp').children('.form-group').map(function () {"; 
 			// Strip param_prefix from the string: 
 			$js .= "var r = $(this).prop('id').substring(param_prefix.length);";
 			
@@ -603,7 +606,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 				var input_select_add = function(e) {
 				
-				var k_nb = $('#{$parname}_disp').children('.form-group').length; 
+				var k_nb = $('#{$id}_disp').children('.form-group').length; 
 					
  					$js
 
@@ -620,8 +623,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 					function field_type_error( message )
 					{	// Add an error message for the 'field of type' select
-						jQuery( '#$parname' ).addClass( 'field_error' );
-						var span_error = jQuery( '#$parname' ).siblings( 'span.field_error' );
+						jQuery( '#$id' ).addClass( 'field_error' );
+						var span_error = jQuery( '#$id' ).siblings( 'span.field_error' );
 						if( span_error.length > 0 )
 						{	// Replace a content of the existing span element
 							span_error.html( message );
@@ -631,14 +634,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 						
 							var err = $('<span>').css({'padding':'0px 15px'}).addClass('field_error').html(message);
 							
-							jQuery( '#$parname' ).next().after( err );
+							jQuery( '#$id' ).next().after( err );
 							
 						}
 					};
 
 					function field_type_error_clear()
 					{	// Remove an error style from the 'field of type' select
-						jQuery( '#$parname' ).removeClass( 'field_error' )
+						jQuery( '#$id' ).removeClass( 'field_error' )
 						.siblings( 'span.field_error' ).remove();
 					};
 
@@ -657,6 +660,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					},
 					function( data, status )
 					{
+					
 						var html = jQuery.parseHTML( data, document, true ),
 						
 						controls = jQuery(html).find('.controls');
@@ -688,7 +692,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 							controls.append(removeButton);	
 						}
 
-						var container = jQuery('#{$parname}_disp');
+						var container = jQuery('#{$id}_disp');
+						
 						if( container.children('.form-group').length === 0 )
 						{
 							container.append(html);
@@ -708,9 +713,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				
 				var validate_entries = function() {
 				
-					var max_items_container = $('#{$parname}_max_items'), select_input_add = $('#{$parname}_add_new'), select_input = $('#{$parname}');
+					var max_items_container = $('#{$id}_max_items'), select_input_add = $('#{$id}_add_new'), select_input = $('#{$id}');
 
-					var k_nb = $('#{$parname}_disp').children('.form-group').length;
+					var k_nb = $('#{$id}_disp').children('.form-group').length;
 					
 					if( k_nb < $max_number )
 					{
@@ -730,7 +735,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 				var remove_button = function(e) {
 				
-				var remove_item = jQuery(e).closest('.form-group'),remove_item_id = remove_item.prop('id'); $('.'+remove_item_id).each(function(){ $(this).remove()});remove_item.remove(); 
+				var remove_item = jQuery(e).closest('.form-group'),remove_item_id = remove_item.prop('id'); 
+				$('.'+remove_item_id).each(function(){ $(this).remove()});remove_item.remove(); 
 				validate_entries();
 
 			}
@@ -739,7 +745,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			{
 				var removeButton = jQuery( '<span>' ).html( '$remove_button' ).text();
 				
-				jQuery( '#{$parname}_disp' ).children( '.form-group' ).each( function()
+				jQuery( '#{$id}_disp' ).children( '.form-group' ).each( function()
 				{
 					jQuery( this ).find( '.controls' ).append( removeButton );
 				} );
@@ -749,7 +755,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 			
 			/**** Start (Display of action messages): ****/
-			echo '<div id="'.$parname.'_action_messages"></div>';
+			echo '<div id="'.$id.'_action_messages"></div>';
 			/****  End (Display of action messages). ****/
 
 			// Count Entries, if it contain only one then instead of a dropdown list, simply use a button?
@@ -869,7 +875,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				T_('Add'), 5, 3,
 				// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
 				array( 
-					'id' => $parname.'_add_new',
+					'id' => $id.'_add_new',
 					'style' => ($disable_add)?'display:none':'',
 					'onclick'=> "input_select_add(this); return false;",
 					'class'=> "btn btn-default",
@@ -877,15 +883,15 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 
 			$field_params = array(
-					'field_suffix' => $button_add_field.'<span id="'.$parname.'_max_items"  class="btn btn-default" style="'.(($disable_add)?'':'display:none').'">'.T_('Maximum items added').'</span>'.( empty( $params['note'] ) ? '' : '<br /><span class="notes">'.$params['note'].'</span>' ),
-					'id'           => $parname,
+					'field_suffix' => $button_add_field.'<span id="'.$id.'_max_items"  class="btn btn-default" style="'.(($disable_add)?'':'display:none').'">'.T_('Maximum items added').'</span>'.( empty( $params['note'] ) ? '' : '<br /><span class="notes">'.$params['note'].'</span>' ),
+					'id'           => $id,
 					'style' => ($disable_add)?'display:none':'' 
 				);
 			
 			
 			if( $use_single_button )
 			{
-				$Form->info_field( $set_label, '<span id="'.$parname.'" style="'.(($disable_add)?'display:none':'').'" class="btn btn-default hoverlink">'.$label.'</span>', $field_params );
+				$Form->info_field( $set_label, '<span id="'.$id.'" style="'.(($disable_add)?'display:none':'').'" class="btn btn-default hoverlink">'.$label.'</span>', $field_params );
 			}
 			else
 			{
