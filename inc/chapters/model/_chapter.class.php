@@ -87,7 +87,7 @@ class Chapter extends DataObject
 
 	/**
 	 * Category image
- 	 */
+	 */
 	var $image_file_ID;
 
 	/**
@@ -99,7 +99,7 @@ class Chapter extends DataObject
 	 * Constructor
 	 *
 	 * @param table Database row
- 	 * @param integer|NULL subset to use for new object
+	 * @param integer|NULL subset to use for new object
 	 */
 	function __construct( $db_row = NULL, $subset_ID = NULL )
 	{
@@ -845,7 +845,7 @@ class Chapter extends DataObject
 	{
 		switch( $parname )
 		{
- 			case 'parent_ID':
+			case 'parent_ID':
 				return $this->set_param( $parname, 'string', $parvalue, true );
 
 			case 'image_file_ID':
