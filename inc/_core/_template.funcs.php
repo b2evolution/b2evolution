@@ -2425,10 +2425,18 @@ function display_login_form( $params )
 			'reqID' => '',
 			'sessID' => '',
 			'transmit_hashed_password' => false,
+			'get_widget_login_hidden_fields' => false,
 			'display_abort_link'  => true,
 			'abort_link_position' => 'above_form', // 'above_form', 'form_title'
 			'abort_link_text'     => T_('Abort login!'),
-			'display_reg_link'    => false, // Display registration link after login button
+			'login_button_text'     => T_('Log in!'),
+			'login_button_class'    => 'btn btn-success btn-lg',
+			'display_lostpass_link' => true,
+			'lostpass_link_text'    => T_('Lost your password?'),
+			'lostpass_link_class'   => '',
+			'display_reg_link'      => false, // Display registration link after login button
+			'reg_link_text'         => T_('Register').' &raquo;',
+			'reg_link_class'        => 'btn btn-primary btn-lg pull-right',
 		), $params );
 
 	$inskin = $params['inskin'];
@@ -2556,32 +2564,41 @@ function display_login_form( $params )
 					array( 'maxlength' => 255, 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
 	}
 
-	$lost_password_url = get_lostpassword_url( $redirect_to, '&amp;', $return_to );
-	if( ! empty( $login ) )
-	{
-		$lost_password_url = url_add_param( $lost_password_url, $dummy_fields['login'].'='.rawurlencode( $login ) );
+	if( $params['display_lostpass_link'] )
+	{	// Display a lost password link:
+		$lost_password_url = get_lostpassword_url( $redirect_to, '&amp;', $return_to );
+		if( ! empty( $login ) )
+		{	// Append login to the lost password form url:
+			$lost_password_url = url_add_param( $lost_password_url, $dummy_fields['login'].'='.rawurlencode( $login ) );
+		}
+		$lost_password_link = '<a href="'.$lost_password_url.'"'
+			.( empty( $params['lostpass_link_text'] ) ? '' : ' class="'.format_to_output( $params['lostpass_link_class'], 'htmlattr' ).'"' ).'>'
+			.$params['lostpass_link_text'].'</a>';
 	}
-	$pwd_note = '<a href="'.$lost_password_url.'">'.T_('Lost your password?').'</a>';
+	else
+	{	// Don't display a lost password link:
+		$lost_password_link = '';
+	}
 
 	if( $inskin )
 	{
 		$Form->begin_field();
-		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, T_('Password'), array( 'note' => $pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'required' => true ) );
+		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, T_('Password'), array( 'note' => $lost_password_link, 'maxlength' => 70, 'class' => 'input_text', 'required' => true ) );
 		$Form->end_field();
 	}
 	else
 	{
-		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, '', array( 'placeholder' => T_('Password'), 'note' => $pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'input_required' => 'required' ) );
+		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, '', array( 'placeholder' => T_('Password'), 'note' => $lost_password_link, 'maxlength' => 70, 'class' => 'input_text', 'input_required' => 'required' ) );
 	}
 
 	// Allow a plugin to add fields/payload
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
 	// Display registration link after login button
-	$register_link = $params['display_reg_link'] ? get_user_register_link( '', '', T_('Register').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, $source, 'btn btn-primary btn-lg pull-right' ) : '';
+	$register_link = $params['display_reg_link'] ? get_user_register_link( '', '', $params['reg_link_text'], '#', true /*disp_when_logged_in*/, $redirect_to, $source, $params['reg_link_class'] ) : '';
 
 	// Submit button(s):
-	$submit_buttons = array( array( 'name' => 'login_action[login]', 'value' => T_('Log in!'), 'class' => 'btn-success btn-lg', 'input_suffix' => $register_link ) );
+	$submit_buttons = array( array( 'name' => 'login_action[login]', 'value' => $params['login_button_text'], 'class' => $params['login_button_class'], 'input_suffix' => $register_link ) );
 
 	$Form->buttons_input( $submit_buttons );
 
