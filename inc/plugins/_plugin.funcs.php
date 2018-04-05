@@ -402,6 +402,47 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$id = str_replace( array( '[', ']' ), array('_', ''), $parname );
 
 			/**** Start (Display of saved entries): ****/
+			
+			if( isset( $parmeta['use_fieldset'] ) && $parmeta['use_fieldset'] == true )
+			{
+				$disp_whole_set = true;
+				$disp_arrays = $set_value;
+				$fieldset_title = $set_label;
+				
+				$fieldset_title .= ' '.T_( 'Items' );
+				
+				if( $debug )
+				{
+					$fieldset_title .= ' [debug: '.$parname.']';
+				}
+				$fieldset_params = array();
+				
+					// Unique ID of fieldset to store in user  settings or in user per collection settings:
+				$fieldset_id = $fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $id.'_fieldset';
+				//$fieldset_params['style'] = ( $k_nb > 0 ) ? 'display: block;' : 'display: none;';
+				
+				if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
+				{	// Enable folding for the fieldset:
+					$fieldset_params['fold'] = $parmeta['fold'];
+					if( isset( $parmeta['deny_fold'] ) )
+					{	// TRUE to don't allow fold the block and keep it opened always on page loading:
+						$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
+					}
+					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $id.'_fieldset';
+				}
+				
+				$Form->switch_layout( 'fieldset' );
+				
+				$Form->begin_fieldset( $fieldset_title, $fieldset_params );
+				
+				/*
+				*	Leave a message for the user when there arn't any items added yet
+				*/
+				echo '<div id="'.$id.'_empty">';
+				$Form->info( '', T_('No items added yet') );
+				echo '</div>';
+				
+			}
 			echo '<div id="'.$id.'_disp">';
 			
 				if( is_array( $set_value ) )
@@ -713,9 +754,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				
 				var validate_entries = function() {
 				
-					var max_items_container = $('#{$id}_max_items'), select_input_add = $('#{$id}_add_new'), select_input = $('#{$id}');
+					var max_items_container = $('#{$id}_max_items'), select_input_add = $('#{$id}_add_new'), select_input = $('#{$id}'), select_input_empty = $('#{$id}_empty');
 
 					var k_nb = $('#{$id}_disp').children('.form-group').length;
+					
+					( k_nb > 0 ) ? select_input_empty.css({'display':'none'}):select_input_empty.css({'display':''});
 					
 					if( k_nb < $max_number )
 					{
@@ -751,13 +794,15 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				} );
 			} );
 			</script>";
-			/****  End (Display of saved entries). ****/
 			
 			
 			/**** Start (Display of action messages): ****/
 			echo '<div id="'.$id.'_action_messages"></div>';
 			/****  End (Display of action messages). ****/
 
+			/****  End (Display of saved entries). ****/
+			
+			
 			// Count Entries, if it contain only one then instead of a dropdown list, simply use a button?
 
 			// Check if a color field is among the entries:
@@ -807,6 +852,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					{	// Use default label:
 						switch( $entry['type'] )
 						{
+							case 'select':
+								$label = 'Select';
+								break;
 							case 'integer':
 								$label = 'Number input';
 								break;
@@ -836,6 +884,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								break;
 							case 'password':
 								$label = 'Password input';
+								break;
+							case 'info':
+								$label = 'Info';
 								break;
 							case 'color':
 								$label = 'Color input';
@@ -898,7 +949,27 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$Form->select_input_options( $field_name, $field_options, $field_label, '', $field_params );
 			}
 			
+			if( isset( $parmeta['use_fieldset'] ) && $parmeta['use_fieldset'] == true )
+			{
+
+				$Form->end_fieldset();
+				
+				$Form->switch_layout( NULL );
+				
+				if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
+				{
+					/*
+					*	In case this item exists inside another dynamaic call javascript for enabling folding must be initialized again
+					*	@see https://github.com/b2evolution/b2evolution/pull/74/files
+					*	@see http://forums.b2evolution.net/bug-6-9-x-foldable-plugin-skin-widget
+					*/
+					init_fieldset_folding_js();
+				}
+			}
+			
+			
 			break;
+
 
 		case 'array':
 		case 'array:integer':
