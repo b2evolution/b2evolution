@@ -188,7 +188,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	$post_urltitle = '';
 	if( ! empty( $requested_404_title ) )
 	{ // Set title & urltitle for new post
-		$post_title = str_replace( ' ', '%20', ucwords( str_replace( '-', ' ', $requested_404_title ) ) );
+		$post_title = ucwords( str_replace( '-', ' ', $requested_404_title ) );
 		$post_urltitle = $requested_404_title;
 	}
 

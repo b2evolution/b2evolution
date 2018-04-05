@@ -636,6 +636,9 @@ switch( $action )
 		if( empty( $edited_Item ) )
 		{ // Create new Item object
 			$edited_Item = new Item();
+			// Prefill data from url:
+			$edited_Item->set( 'title', param( 'post_title', 'string' ) );
+			$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
 		}
 
 		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
