@@ -1671,7 +1671,7 @@ class RestApi
 		$user_logins = array();
 		foreach( $users as $User )
 		{
-			if( $can_view_all_users || in_array( $User->get( 'status' ), array( 'activated', 'autoactivated' ) ) )
+			if( $can_view_all_users || in_array( $User->get( 'status' ), array( 'activated', 'autoactivated', 'manualactivated' ) ) )
 			{	// Allow to see this user only if current User has a permission to see users with current status:
 				$user_logins[] = $User->get( 'login' );
 			}
@@ -1693,7 +1693,7 @@ class RestApi
 		global $DB;
 
 		$params = array_merge( array(
-				'sql_where' => 'user_status IN ( "activated", "autoactivated" )',
+				'sql_where' => 'user_status IN ( "activated", "autoactivated", "manualactivated" )',
 				'sql_mask'  => '$login$%',
 				'sql_limit' => 0,
 			), $params );
@@ -1815,6 +1815,65 @@ class RestApi
 
 
 	/**** MODULE TAGS ---- END ****/
+
+	/**** MODULE USER TAGS ---- START ****/
+
+
+	/**
+	 * Call module to prepare request for user tags
+	 */
+	private function module_usertags()
+	{
+		global $DB;
+
+		$term = param( 's', 'string' );
+
+		if( substr( $term, 0, 1 ) == '-' )
+		{	// Prevent chars '-' in first position:
+			$term = preg_replace( '/^-+/', '', $term );
+		}
+
+		// Deny to use a comma in tag names:
+		$term = str_replace( ',', ' ', $term );
+
+		$term_is_new_tag = true;
+
+		$tags = array();
+
+		$tags_SQL = new SQL();
+		$tags_SQL->SELECT( 'utag_name AS id, utag_name AS name' );
+		$tags_SQL->FROM( 'T_users__tag' );
+		/* Yura: Here I added "COLLATE utf8_general_ci" because:
+		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
+		 * It also allows to find "ee" when we type in "éè" and otherwise.
+		 */
+		$tags_SQL->WHERE( 'utag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$tags_SQL->ORDER_BY( 'utag_name' );
+		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
+
+		// Check if current term is not an existing tag:
+		foreach( $tags as $tag )
+		{
+			/* Yura: I have added "utf8_strtolower()" below in condition in order to:
+			 * When we enter new tag 'testA' and the tag 'testa' already exists
+			 * then we suggest only 'testa' instead of 'testA'.
+			 */
+			if( utf8_strtolower( $tag['name'] ) == utf8_strtolower( $term ) )
+			{ // Current term is an existing tag
+				$term_is_new_tag = false;
+			}
+		}
+
+		if( $term_is_new_tag && ! empty( $term ) )
+		{	// Add current term in the beginning of the tags list:
+			array_unshift( $tags, array( 'id' => $term, 'name' => $term ) );
+		}
+
+		$this->add_response( 'tags', $tags );
+	}
+
+
+	/**** MODULE USER TAGS ---- END ****/
 
 	/**** MODULE POLLS ---- START ****/
 

@@ -265,6 +265,9 @@ function install_newdb()
 	}
 
 	evo_flush();
+	create_default_newsletters();
+
+	evo_flush();
 	create_default_email_campaigns();
 
 	// Update the progress bar status
@@ -764,6 +767,16 @@ function install_basic_plugins( $old_db_version = 0 )
 	if( $old_db_version < 11730 )
 	{
 		install_plugin( 'custom_tags_plugin', true );
+	}
+
+	if( $old_db_version < 11760 )
+	{
+		install_plugin( 'polls_plugin' );
+	}
+
+	if( $old_db_version < 12580 )
+	{
+		install_plugin( 'email_elements_plugin' );
 	}
 }
 

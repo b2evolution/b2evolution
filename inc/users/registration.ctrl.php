@@ -51,10 +51,9 @@ switch ( $action )
 		param( 'notify_meta_comments', 'integer', 0 );
 		param( 'notify_post_moderation', 'integer', 0 );
 		param( 'notify_edit_pst_moderation', 'integer', 0 );
-		param( 'newsletter_news', 'integer', 0 );
-		param( 'newsletter_ads', 'integer', 0 );
+		param( 'def_newsletters', 'array:integer', array() );
 		param_integer_range( 'notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.') );
-		param_integer_range( 'newsletter_limit', 0, 999, T_('Newsletter limit must be between %d and %d.') );
+		param_integer_range( 'newsletter_limit', 0, 999, T_('List limit must be between %d and %d.') );
 
 		// UPDATE account activation by email
 		param( 'newusers_mustvalidate', 'integer', 0 );
@@ -72,10 +71,17 @@ switch ( $action )
 		}
 
 		$after_registration = param( 'after_registration', 'string', 'return_to_original' );
-		if( $after_registration != 'return_to_original' )
+		$after_registration_slug = param( 'specific_after_registration_slug', 'string', '' );
+		switch( $after_registration )
 		{
-			$after_registration = param( 'specific_after_registration_url', 'url', NULL );
-			param_check_url( 'specific_after_registration_url', 'http-https' );
+			case 'specific_url':
+				$after_registration = param( 'specific_after_registration_url', 'url', NULL );
+				param_check_url( 'specific_after_registration_url', 'http-https' );
+				break;
+
+			case 'specific_slug':
+				param_check_not_empty( 'specific_after_registration_slug', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Go to specific slug') ) );
+				break;
 		}
 
 		param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimum password length must be between %d and %d.') );
@@ -89,6 +95,7 @@ switch ( $action )
 		param( 'js_passwd_hashing', 'integer', 0 );
 		param( 'passwd_special', 'integer', 0 );
 		param( 'strict_logins', 'integer', 0 );
+		param( 'registration_after_quick', 'string', '' );
 		param( 'registration_require_country', 'integer', 0 );
 		param( 'registration_require_firstname', 'integer', 0 );
 		param( 'registration_ask_locale', 'integer', 0 );
@@ -131,8 +138,7 @@ switch ( $action )
 					 array( 'def_notify_meta_comments', $notify_meta_comments ),
 					 array( 'def_notify_post_moderation', $notify_post_moderation ),
 					 array( 'def_notify_edit_pst_moderation', $notify_edit_pst_moderation ),
-					 array( 'def_newsletter_news', $newsletter_news ),
-					 array( 'def_newsletter_ads', $newsletter_ads ),
+					 array( 'def_newsletters', implode( ',', $def_newsletters ) ),
 					 array( 'def_notification_email_limit', $notification_email_limit ),
 					 array( 'def_newsletter_limit', $newsletter_limit ),
 					 array( 'newusers_mustvalidate', $newusers_mustvalidate ),
@@ -143,12 +149,14 @@ switch ( $action )
 					 array( 'after_email_validation', $after_email_validation ),
 					 array( 'pass_after_quick_reg', $pass_after_quick_reg ),
 					 array( 'after_registration', $after_registration ),
+					 array( 'after_registration_slug', $after_registration_slug ),
 					 array( 'user_minpwdlen', $user_minpwdlen ),
 					 array( 'js_passwd_hashing', $js_passwd_hashing ),
 					 array( 'http_auth_require', $http_auth_require ),
 					 array( 'http_auth_accept', $http_auth_accept ),
 					 array( 'passwd_special', $passwd_special ),
 					 array( 'strict_logins', $strict_logins ),
+					 array( 'registration_after_quick', $registration_after_quick ),
 					 array( 'registration_require_country', $registration_require_country ),
 					 array( 'registration_require_firstname', $registration_require_firstname ),
 					 array( 'registration_ask_locale', $registration_ask_locale ),

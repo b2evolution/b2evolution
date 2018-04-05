@@ -133,42 +133,6 @@ body.pictured div#debug_info.debug {
     margin-bottom: 0;
   }
 }
-.widget_core_user_login #login_form .form-group {
-  margin: 0;
-}
-.widget_core_user_login #login_form label {
-  text-align: left;
-  width: 160px;
-  padding-left: 0;
-}
-.widget_core_user_login #login_form .controls {
-  padding: 0;
-  width: 100%;
-}
-.widget_core_user_login #login_form .form_text_input.form-control {
-  width: 100%;
-}
-.widget_core_user_login .submit {
-  font-size: 12px;
-}
-.widget_core_user_login .field_login_btn .panel {
-  margin: 0;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-}
-.widget_core_user_login .field_login_btn .panel .panel-body {
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 0;
-}
-.widget_core_user_login .field_login_btn .panel .panel-body #submit_login_form {
-  margin-right: 10px;
-}
-.widget_core_user_login .register_link {
-  display: block;
-  padding-top: 10px;
-}
 .widget_core_user_register #register_form .form-group {
   margin: 0;
 }
@@ -197,9 +161,6 @@ body.pictured div#debug_info.debug {
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 0;
-}
-.widget_core_user_register .field_register_btn .panel .panel-body #submit_login_form {
-  margin-right: 10px;
 }
 ul.profile_tabs {
   margin: 0 2ex 2ex;
@@ -319,6 +280,7 @@ div.bSideItem h4 {
 }
 .evo_panel__login {
   max-width: 400px;
+  min-width: auto;
 }
 .evo_panel__lostpass {
   max-width: 480px;
@@ -466,4 +428,14 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
 .slide_button_wrap #slide_button:hover {
   cursor: pointer;
   opacity: 0.9;
+}
+.evo_content_block .evo_comment .evo_comment_footer .action_btn_group {
+  float: right;
+}
+.evo_content_block .evo_comment .comment_edit_btn {
+  margin-right: 5px;
+}
+.evo_content_block .evo_comment .btn-group > .btn.first-child {
+  border-top-left-radius: 3px !important;
+  border-bottom-left-radius: 3px !important;
 }

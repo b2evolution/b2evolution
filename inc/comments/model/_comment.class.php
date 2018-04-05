@@ -164,6 +164,13 @@ class Comment extends DataObject
 	var $in_reply_to_cmt_ID;
 
 	/**
+	 * Parent Comment
+	 *
+	 * @var object
+	 */
+	var $parent_Comment;
+
+	/**
 	 * Voting result of all votes in system helpfulness
 	 *
 	 * @var integer
@@ -382,6 +389,51 @@ class Comment extends DataObject
 		}
 
 		return $this->Item;
+	}
+
+
+	/**
+	 * Get the Item this comment relates to
+	 *
+	 * @return Item
+	 */
+	function & get_parent_Comment()
+	{
+		if( ! isset( $this->parent_Comment ) )
+		{
+			$CommentCache = & get_CommentCache();
+			$this->parent_Comment = & $CommentCache->get_by_ID( $this->in_reply_to_cmt_ID, false, false );
+		}
+
+		return $this->parent_Comment;
+	}
+
+
+	/**
+	 * Fix parent Comment to top possible Comment from the same Item/Post
+	 */
+	function set_correct_parent_comment()
+	{
+		if( empty( $this->in_reply_to_cmt_ID ) )
+		{	// Nothing to fix because this comment has no parent Comment:
+			return;
+		}
+
+		// Use NULL to set comment in root if no found a proper top parent comment:
+		$correct_in_reply_to_cmt_ID = NULL;
+
+		$parent_Comment = & $this->get_parent_Comment();
+		while( $parent_Comment )
+		{
+			if( $parent_Comment->get( 'item_ID' ) == $this->get( 'item_ID' ) )
+			{	// This comment is located in same new created Item then we should use this as parent:
+				$correct_in_reply_to_cmt_ID = $parent_Comment->ID;
+				break;
+			}
+			$parent_Comment = & $parent_Comment->get_parent_Comment();
+		}
+
+		$this->set( 'in_reply_to_cmt_ID', $correct_in_reply_to_cmt_ID, true );
 	}
 
 
@@ -2278,6 +2330,11 @@ class Comment extends DataObject
 			), $params
 		);
 
+		if( $params['text'] == '#' )
+		{
+			$params['text'] = $action_icon;
+		}
+
 		echo $this->get_moderation_link( $params );
 		return true;
 	}
@@ -2836,13 +2893,13 @@ class Comment extends DataObject
 
 				if( empty( $this->ID ) )
 				{ // PREVIEW mode
-					$r = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by ').$this->get_author_name(), $image_link_rel, $params['image_class'], '', '', '#' );
+					$r = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by').' '.$this->get_author_name(), $image_link_rel, $params['image_class'], '', '', '#' );
 				}
 				else
 				{
 					$r = $Link->get_tag( array_merge( array(
 						'image_link_to'    => $image_link_to,
-						'image_link_title' => T_('Posted by ').$this->get_author_name(),
+						'image_link_title' => T_('Posted by').' '.$this->get_author_name(),
 						'image_link_rel'   => $image_link_rel,
 					), $params ) );
 				}
@@ -3718,7 +3775,7 @@ class Comment extends DataObject
 		{	// Get the notify users for NORMAL comments:
 
 			// Send only for active users:
-			$active_users_condition = 'AND user_status IN ( "activated", "autoactivated" )';
+			$active_users_condition = 'AND user_status IN ( "activated", "autoactivated", "manualactivated" )';
 
 			$except_condition = '';
 			if( ! empty( $already_notified_user_IDs ) )
@@ -3890,7 +3947,7 @@ class Comment extends DataObject
 			// Check if the users would like to receive notifications about new meta comments:
 			$meta_SQL->WHERE_and( 'uset_value = "1"'.( $Settings->get( 'def_notify_meta_comments' ) ? ' OR uset_value IS NULL' : '' ) );
 			// Check if users are activated:
-			$meta_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+			$meta_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 			// Check if the users have permission to edit this Item:
 			$users_with_item_edit_perms = '( user_ID = '.$DB->quote( $comment_item_Blog->owner_user_ID ).' )';
 			$users_with_item_edit_perms .= ' OR ( grp_perm_blogs = "editall" )';
@@ -4764,7 +4821,7 @@ class Comment extends DataObject
 		}
 
 		// Restrict status to max allowed for item collection:
-		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->get( 'status' ) );
+		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->get( 'status' ), $comment_Item );
 		if( empty( $item_restricted_status ) )
 		{	// If max allowed status is not detected because for example current User has no perm to item status,
 			// then use current status of the Item in order to restrict max comment status below:
@@ -4866,7 +4923,7 @@ class Comment extends DataObject
 				// Get max allowed for item collection:
 				$comment_Item = & $this->get_Item();
 				$item_Blog = & $comment_Item->get_Blog();
-				$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status );
+				$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status, $comment_Item );
 
 				// Get all visibility status titles:
 				$visibility_statuses = get_visibility_statuses();

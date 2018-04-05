@@ -176,6 +176,8 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' ) );
 
+	$Form->checkbox( 'post_anonymous', $edited_Blog->get_setting( 'post_anonymous' ), T_('New posts by anonymous users'), T_('Check to allow anonymous users to create new posts (useful for Forums). NOTE: a user account will be automatically created when they post.') );
+
 	// Get max allowed visibility status:
 	$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
 
@@ -195,13 +197,22 @@ $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' 
 				'title_format'     => 'notes-string',
 				'exclude_statuses' => $exclude_statuses,
 			) );
-		$Form->info( T_('Default status'), $default_status_field, T_('Default status for new posts') );
+		$Form->info( T_('Default status for new posts in backoffice'), $default_status_field, T_('Typically Draft if you want to make sure you don\'t publish by mistake.') );
 		$Form->hidden( 'default_post_status', $edited_Blog->get_setting('default_post_status') );
+		$default_status_field_anon = get_status_dropdown_button( array(
+				'name'             => 'default_post_status_anon',
+				'value'            => $edited_Blog->get_setting( 'default_post_status_anon' ),
+				'title_format'     => 'notes-string',
+				'exclude_statuses' => $exclude_statuses,
+			) );
+		$Form->info( T_('Default status for new anonymous posts'), $default_status_field_anon, T_('Typically Review if you want to prevent Spam.') );
+		$Form->hidden( 'default_post_status_anon', $edited_Blog->get_setting( 'default_post_status_anon' ) );
 		echo_form_dropdown_js();
 	}
 	else
 	{	// Use standard select element for other skins:
-		$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting('default_post_status'), get_visibility_statuses( 'notes-string', $exclude_statuses ), T_('Default status'), T_('Default status for new posts') );
+		$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting( 'default_post_status' ), get_visibility_statuses( 'notes-string', $exclude_statuses ), T_('Default status for new posts in backoffice'), T_('Typically Draft if you want to make sure you don\'t publish by mistake.') );
+		$Form->select_input_array( 'default_post_status_anon', $edited_Blog->get_setting( 'default_post_status_anon' ), get_visibility_statuses( 'notes-string', $exclude_statuses ), T_('Default status for new anonymous posts'), T_('Typically Review if you want to prevent Spam.') );
 	}
 
 	// Moderation statuses setting:
@@ -278,8 +289,11 @@ $Form->end_fieldset();
 if( $notifications_mode != 'off' )
 {
 	$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'item-subscriptions' ) );
-		$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post.') );
-		$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+		$Form->checklist( array(
+				array( 'allow_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new post.'), $edited_Blog->get_setting( 'allow_subscriptions' ) ),
+				array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $edited_Blog->get_setting( 'allow_item_subscriptions' ) ),
+				array( 'allow_item_mod_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications when post is modified and user has a permissions to moderate it.' ), $edited_Blog->get_setting( 'allow_item_mod_subscriptions' ) ),
+			), 'allow_coll_subscriptions', T_('Email subscriptions') );
 	$Form->end_fieldset();
 }
 

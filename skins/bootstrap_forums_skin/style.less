@@ -67,11 +67,29 @@ ol.breadcrumb {
 	}
 }
 
+.fa.icon_new {
+	text-align: center;
+	background: #FFF;
+	border: 2px solid #FF6600;
+	.border-radius(50%);
+	width: 21px;
+	height: 21px;
+	line-height: 18px;
+	font-size: 12px;
+	&.big {
+		width: 28px;
+		height: 28px;
+		line-height: 25px;
+		font-size: 16px;
+	}
+}
+
 // Forums table list
 .forums_list {
 	//Disp=posts pagination
 	.comments_link__pagination {
-			text-align: center;
+		text-align: center;
+		margin-bottom: 15px;
 		.post_button {
 			float: left;
 			vertical-align: top;
@@ -80,7 +98,6 @@ ol.breadcrumb {
 			display: inline-block;
 			vertical-align: top;
 			margin: 0 auto;
-			margin-left: -76px;
 		}
 	}
 	box-shadow: none;
@@ -174,6 +191,12 @@ ol.breadcrumb {
 		float: left;
 		.fa.fa-comments {
 			color: #000000;
+			&.updated {
+				color: #990000;
+			}
+			&.new {
+				color: #FF6600;
+			}
 		}
 		.fa.fa-comments:hover {
 			color: inherit;
@@ -396,6 +419,15 @@ ol.breadcrumb {
 .legend-item {
 	margin: 0px 5px 12px 5px;
 	display: inline-block;
+	.fa.fa-comments {
+		color: #000000;
+		&.updated {
+			color: #990000;
+		}
+		&.new {
+			color: #FF6600;
+		}
+	}
 }
 ul.legend {
 	list-style: none;
@@ -467,6 +499,7 @@ ul.legend {
 }
 .evo_panel__login {
 	max-width: 400px;
+	min-width: auto;
 }
 .evo_panel__lostpass {
 	max-width: 480px;
@@ -692,6 +725,41 @@ main .widget_core_coll_search_form {
 aside .widget_core_coll_search_form {
 	div.compact_search_form input.search_field {
 		width: 100%;
+	}
+}
+
+// Register widget form
+.widget_core_user_register {
+	#register_form {
+		.form-group {
+			margin: 0;
+		}
+		label {
+			text-align: left;
+			width: 160px;
+			padding-left: 0;
+		}
+		.controls {
+			padding: 0;
+			width: 100%;
+		}
+		.form_text_input.form-control {
+			width: 100%;
+		}
+	}
+
+	.field_register_btn {
+		.panel {
+			margin: 0;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			.panel-body {
+				padding-left: 0;
+				padding-right: 0;
+				padding-bottom: 0;
+			}
+		}
 	}
 }
 
@@ -1161,7 +1229,11 @@ a.to_top {
 }
 
 // Fix styles for message that appears instead of a button to post when user must activate account:
-.comments_link__pagination .alert {
+.alert.alert-item-new {
 	margin: 0;
-	text-align: left;
+}
+
+// Wrapper for form to create new post by anonymous user:
+.panel.evo_item_new_form {
+	margin-bottom: 0;
 }

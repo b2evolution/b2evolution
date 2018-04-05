@@ -95,6 +95,7 @@ class UserSettings extends AbstractSettings
 		'notify_reported_account' => 1, // Notify admin user when an account has been reported by another user
 		'notify_changed_account' => 1, // Notify admin user when an account has been changed
 		'notify_cronjob_error' => 1, // Notify admin user when a scheduled task ends with an error or timeout
+		'notify_automation_owner' => 1, // Notify automation owner user when step is executed
 
 		'account_close_ts' => NULL, // It will be the date when the account was closed. Until the account is not closed this will be NULL.
 		'account_close_reason' => NULL, // It will be the reason why the account was closed. Until the account is not closed this will be NULL.
@@ -139,11 +140,8 @@ class UserSettings extends AbstractSettings
 		'enable_PM' => 1,
 		'enable_email' => 1,
 
-		'newsletter_news' => 1, // Send news
-		'newsletter_ads'  => 0, // Send ADs
-
 		'notification_email_limit' => 3, // How many notification email is allowed per day for this user
-		'newsletter_limit' => 1, // How many newsletter email is allowed per day for this user
+		'newsletter_limit' => 3, // How many newsletter email is allowed per day for this user
 	);
 
 

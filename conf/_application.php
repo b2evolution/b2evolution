@@ -15,13 +15,13 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '6.9.6-stable';
+$app_version = '6.10.1-stable';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2018-01-03';
+$app_date = '2018-04-04';
 
 /**
  * Long version string for checking differences
@@ -31,24 +31,24 @@ $app_version_long = $app_version.'-'.$app_date;
 /**
  * This is used to check if the database is up to date.
  *
- * This will be incrememented by 10 with each change in {@link upgrade_b2evo_tables()}
+ * This will be incremented by 10 with each change in {@link upgrade_b2evo_tables()}
  * in order to leave space for maintenance releases.
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 12365;
+$new_db_version = 12790;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
  * @global array
  */
-$required_php_version = array( 'application' => '5.2' );
+$required_php_version = array( 'application' => '5.4' );
 
 /**
  * Minimum MYSQL version required for b2evolution to function properly. It will contain each module own minimum MYSQL version as well.
  * @global array
  */
-$required_mysql_version = array( 'application' => '5.0.3' );
+$required_mysql_version = array( 'application' => '5.1' );
 
 /**
  * Is displayed on the login screen:

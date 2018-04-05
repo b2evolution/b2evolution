@@ -918,6 +918,12 @@ class Skin extends DataObject
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
 
+		// Convert array values into string for DB storage
+		if( is_array( $parvalue ) )
+		{
+			$parvalue = serialize( $parvalue );
+		}
+
 		$Blog->set_setting( $blog_setting_name, $parvalue );
 	}
 
@@ -1244,6 +1250,8 @@ class Skin extends DataObject
 					// Specific features for disp=userprefs:
 				case 'disp_subs':
 					// Specific features for disp=subs:
+				case 'disp_register_finish':
+					// Specific features for disp=register_finish:
 
 					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
@@ -1609,7 +1617,7 @@ var downloadInterval = setInterval( function()
 							'fieldend'       => "</div>\n\n",
 							'labelclass'     => 'control-label col-sm-3',
 							'labelstart'     => '',
-							'labelend'       => "\n",
+							'labelend'       => '',
 							'labelempty'     => '<label class="control-label col-sm-3"></label>',
 							'inputstart'     => '<div class="controls col-sm-9">',
 							'inputend'       => "</div>\n",

@@ -6,12 +6,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $Messages, $UserSettings;
 
 // Get the ID of the email campaign we are supposed notify:
 if( empty( $job_params['ecmp_ID'] ) )
 {
-	$result_message = 'No ecmp_ID parameter received.'; // No trans.
+	cron_log_append( 'No ecmp_ID parameter received.', 'error' ); // No trans.
 	return 3;
 }
 
@@ -22,15 +21,14 @@ $EmailCampaignCache = & get_EmailCampaignCache();
 $EmailCampaign = & $EmailCampaignCache->get_by_ID( $ecmp_ID );
 
 // Send newsletters:
-$EmailCampaign->send_all_emails();
+$EmailCampaign->send_all_emails( 'cron_job' );
 
 // Create a scheduled job to send newsletters to next chunk of waiting users:
 $EmailCampaign->create_cron_job( true );
 
-$result_message = $Messages->get_string( '', '', "\n" );
 if( empty( $result_message ) )
 {
-	$result_message = T_('Done').'.';
+	cron_log_append( T_('Done').'.' );
 }
 
 return 1; /* ok */

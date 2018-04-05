@@ -53,7 +53,7 @@ if( isset($filter['off']) )
 }
 
 // Check permission:
-$current_User->check_perm( 'options', 'view', true );
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'spamblacklist', 'view', true );
 
 
@@ -534,6 +534,7 @@ if( $display_mode != 'js' )
 			// Set an url for manual page:
 			if( $action == 'iprange_new' || $action == 'iprange_edit' )
 			{
+				init_tokeninput_js();
 				$AdminUI->set_page_manual_link( 'ip-range-editing' );
 			}
 			else
@@ -574,6 +575,11 @@ if( $display_mode != 'js' )
 	{
 		$AdminUI->append_path_level( $tab3 );
 	}
+}
+
+if( in_array( $action, array( 'iprange_edit' ) ) )
+{ // Initialize date picker
+	init_datepicker_js();
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

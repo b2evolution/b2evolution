@@ -58,6 +58,10 @@ ul, ol {
 	font-weight: normal;
 }
 
+p.margin-top {
+	margin: 10px 0 0 0;
+}
+
 // Use yellow color on hover table rows intead of grey standard color:
 .table-hover > tbody > tr:hover {
 	background-color: #ffc;
@@ -211,13 +215,9 @@ a.btn.action_icon {
 	}
 	// Table on the edit post form where Title/Language  & Advanced Properties are located
 	.compose_layout {
-		margin-bottom: 15px;
 		td {
-			padding: 0 2px 2px 0;
+			padding: 0 2px 15px 0;
 			vertical-align: middle;
-		}
-		tr:last-child td {
-			padding-bottom: 0;
 		}
 		th.label, td.label {
 			display: table-cell;
@@ -310,6 +310,20 @@ a.btn.action_icon {
 		}
 	}
 }
+// Vertical alignment for recipient field on contact form:
+.evo_msgform_recipient {
+	label.control-label, div.controls {
+		float: none;
+		display: inline-block;
+		vertical-align: middle;
+		padding-top: 0;
+	}
+	a.login {
+		white-space: normal;
+		text-align: center;
+		display: inline-block;
+	}
+}
 // Fix password fields and indicator on register forms
 #register_form {
 	div#ffield_m {
@@ -394,6 +408,10 @@ form ul.token-input-list-facebook {
 			margin: 0 4px 4px 0;
 		}
 	}
+}
+// Fix z-index to make it visible inside bootstrap modal window:
+body.modal-open div.token-input-dropdown-facebook {
+	z-index: 10002;
 }
 
 // Results table
@@ -1007,6 +1025,33 @@ div.edit_toolbars, div.message_toolbars {
 		}
 		&.collapsed:before {
 			content: '\f0da';
+		}
+	}
+}
+
+// Widgets of container "Login Required" on disp=access_requires_login:
+.disp_access_requires_login {
+	.evo_widget {
+		&.widget_core_content_block.panel {
+			background: none;
+			border: none;
+			box-shadow: none;
+			margin: 0;
+			.panel-body {
+				padding: 0;
+			}
+			.panel-body, .evo_post__full_text.clearfix {
+				&:before, &:after {
+					// Change this from default bootstrap value "table", in order to
+					// avoid double space of 10px margin between <p> and login form:
+					display: block;
+				}
+			}
+		}
+		&.widget_core_user_login {
+			min-width: 290px;
+			max-width: 400px;
+			margin: 10px auto;
 		}
 	}
 }

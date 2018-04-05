@@ -51,17 +51,14 @@ if( function_exists('spl_autoload_register') )
 }
 else
 {
-	// PHP<5.1.2: Use the fallback method.
-	function __autoload( $classname )
-	{
-		return evocms_autoload_class($classname);
-	}
+	// PHP<5.1.2: Use the fallback method. Function in a separate file as by simply adding it here would generate deprecated warning
+	load_funcs( '_core/fallback/_autoload.funcs.php' );
 }
 
 
 /**
  * In PHP4, this immediately loaded the class. In PHP5, it's smarter than that:
- * It only registers the class & file name so that PHP can later load the class 
+ * It only registers the class & file name so that PHP can later load the class
  * IF and ONLY IF the class is actually needed during execution.
  */
 function load_class( $class_path, $classname )

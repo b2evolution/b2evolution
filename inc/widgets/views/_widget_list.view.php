@@ -122,6 +122,12 @@ function display_container( $container, $legend_suffix = '' )
 			$widget_count++;
 			$enabled = $ComponentWidget->get( 'enabled' );
 
+			$disabled_plugin = false;
+			if( $ComponentWidget->type == 'plugin' && $ComponentWidget->get_Plugin() == false )
+			{
+				$disabled_plugin = true;
+			}
+
 			$fadeout_id = $Session->get( 'fadeout_id' );
 			if( isset($fadeout_id) && $ComponentWidget->ID == $fadeout_id )
 			{
@@ -136,11 +142,17 @@ function display_container( $container, $legend_suffix = '' )
 			$Table->display_line_start( false, $fadeout );
 
 			$Table->display_col_start();
-			echo '<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" />';
+			echo '<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" '.( $disabled_plugin ? 'disabled="disabled" ' : '' ).'/>';
 			$Table->display_col_end();
 
 			$Table->display_col_start();
-			if ( $enabled )
+			if( $disabled_plugin )
+			{
+				echo '<span class="plugin_is_disabled">';
+				echo get_icon( 'warning', 'imgtag', array( 'title' => T_('Inactive / Uninstalled plugin') ) );
+				echo '</span>';
+			}
+			elseif( $enabled )
 			{
 				// Indicator for the JS UI:
 				echo '<span class="widget_is_enabled">';
@@ -211,7 +223,11 @@ function display_container( $container, $legend_suffix = '' )
 
 			// Actions
 			$Table->display_col_start();
-			if ( $enabled )
+			if( $disabled_plugin )
+			{
+				echo action_icon( T_( 'Disable this widget!' ), 'deactivate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ), NULL, NULL, NULL, array( 'style' => 'visibility: hidden' ) );
+			}
+			elseif( $enabled )
 			{
 				echo action_icon( T_( 'Disable this widget!' ), 'deactivate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}

@@ -43,7 +43,7 @@
 	// Important for hiding "Slide down" arrow behind this div
 	position: relative;
 	z-index: 1;
-	
+
 	width: 100%;
 	p {
 		margin-top: 10px;
@@ -168,50 +168,6 @@ body.pictured {
 	}
 }
 
-// Login widget form
-.widget_core_user_login {
-	#login_form {
-		.form-group {
-			margin: 0;
-		}
-		label {
-			text-align: left;
-			width: 160px;
-			padding-left: 0;
-		}
-		.controls {
-			padding: 0;
-			width: 100%;
-		}
-		.form_text_input.form-control {
-			width: 100%;
-		}
-	}
-	.submit {
-		font-size: 12px;
-	}
-	.field_login_btn {
-		.panel {
-			margin: 0;
-			border: none;
-			border-radius: 0;
-			box-shadow: none;
-			.panel-body {
-				padding-left: 0;
-				padding-right: 0;
-				padding-bottom: 0;
-				#submit_login_form {
-					margin-right: 10px;
-				}
-			}
-		}
-	}
-	.register_link {
-		display: block;
-		padding-top: 10px;
-	}
-}
-
 // Register widget form
 .widget_core_user_register {
 	#register_form {
@@ -244,9 +200,6 @@ body.pictured {
 				padding-left: 0;
 				padding-right: 0;
 				padding-bottom: 0;
-				#submit_login_form {
-					margin-right: 10px;
-				}
 			}
 		}
 	}
@@ -384,6 +337,7 @@ div.bSideItem {
 }
 .evo_panel__login {
 	max-width: 400px;
+	min-width: auto;
 }
 .evo_panel__lostpass {
 	max-width: 480px;
@@ -544,11 +498,30 @@ body.pictured .secondary_area .widget_core_org_members {
 		text-align: center;
 		opacity: 0.5;
 		transition: 0.1s all;
-		position:relative; 
+		position:relative;
 		left:-50%;
 		&:hover {
 			cursor: pointer;
 			opacity: 0.9;
 		}
+	}
+}
+
+// Comment footer
+.evo_content_block .evo_comment {
+	.evo_comment_footer {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
 	}
 }

@@ -103,7 +103,7 @@ if( !empty( $template_action ) )
 			// Prune old hits & sessions
 			load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
 			$result = Hitlist::dbprune( false ); // will prune once per day, according to Settings
-			print_log( $result['message'], $result['result'] );
+			print_log( nl2br( $result['message'] ), $result['result'] );
 			break;
 
 		case 'recreate_itemslugs':

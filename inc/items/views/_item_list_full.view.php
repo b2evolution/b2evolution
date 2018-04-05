@@ -258,6 +258,16 @@ while( $Item = & $ItemList->get_item() )
 							'after_image_legend'  => '</figcaption>',
 							'after_image'         => '</figure>',
 							'image_size'          => 'fit-320x320',
+							'before_gallery'      => '<div class="evo_post_gallery">',
+							'after_gallery'       => '</div>',
+							'gallery_table_start' => '',
+							'gallery_table_end'   => '',
+							'gallery_row_start'   => '',
+							'gallery_row_end'     => '',
+							'gallery_cell_start'  => '<div class="evo_post_gallery__image">',
+							'gallery_cell_end'    => '</div>',
+							'gallery_image_limit' => 1000,
+							'gallery_link_rel'    => 'lightbox[p'.$Item->ID.']',
 						) );
 					$Item->more_link();
 					$Item->content_extension( array(

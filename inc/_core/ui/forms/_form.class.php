@@ -913,8 +913,8 @@ class Form extends Widget
 			$folding_icon = get_fieldset_folding_icon( $field_params['id'], $field_params );
 			if( ! $field_params['deny_fold'] && is_logged_in() )
 			{ // Only loggedin users can fold fieldset
-				global $UserSettings, $Collection, $Blog;
-				if( empty( $Blog ) )
+				global $UserSettings, $Collection, $Blog, $ctrl;
+				if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
 				{ // Get user setting value
 					$value = intval( $UserSettings->get( 'fold_'.$field_params['id'] ) );
 				}
@@ -1089,10 +1089,12 @@ class Form extends Widget
 	 * @param integer max length of the value (if 0 field_size will be used!)
 	 * @param string the CSS class to use
 	 * @param string input type (only 'text' or 'password' makes sense)
+	 * @param string 'Uppercase'
+	 * @param string placeholder text
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
-											$field_maxlength = 0, $field_class = '', $inputtype = 'text', $force_to = '' )
+											$field_maxlength = 0, $field_class = '', $inputtype = 'text', $force_to = '', $placeholder = '' )
 	{
 		$field_params = array();
 
@@ -1111,6 +1113,10 @@ class Form extends Widget
 		if( $force_to !== '' )
 		{
 			$field_params['force_to'] = $force_to;
+		}
+		if( $placeholder !== '' )
+		{
+			$field_params['placeholder'] = $placeholder;
 		}
 
 		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_note, $field_params );
@@ -1324,7 +1330,7 @@ class Form extends Widget
 				'size' => 20,
 				'autocapitalize' => 'off',
 				'autocorrect' => 'off',
-				'status' => 'all', // Restrict users by status, 'all' - get users with all statuses, '' - activated and autoactivated, or custom statuses separated by comma like 'new,activated,autoactivated,closed,deactivated,emailchanged,failedactivation'
+				'status' => 'all', // Restrict users by status, 'all' - get users with all statuses, '' - activated, autoactivated and manually activated, or custom statuses separated by comma like 'new,activated,manualactivated,autoactivated,closed,deactivated,emailchanged,failedactivation'
 			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
@@ -1376,6 +1382,63 @@ class Form extends Widget
 
 
 	/**
+	 * Callback for preg_replace_callback in date_input
+	 */
+	private static function _date_input_format_callback( $matches )
+	{
+		if( $matches[1] == "\\" ) return "\\".$matches[0]; // leave escaped
+		switch( $matches[2] )
+		{
+			case "d": return "dd"; // day, 01-31
+			case "j": return "d"; // day, 1-31
+			case "l": return "EE"; // weekday (name)
+			case "D": return "E"; // weekday (abbr)
+			case "S": return "";
+
+			case "e": return ""; // weekday letter, not supported
+
+			case "m": return "MM"; // month, 01-12
+			case "n": return "M"; // month, 1-12
+			case "F": return "MMM"; // full month name; "name or abbr" in date.js
+			case "M": return "NNN"; // month name abbr
+
+			case "y": return "yy"; // year, 00-99
+			case "Y": return "yyyy"; // year, XXXX
+			default:
+				return $matches[0];
+		}
+	}
+
+
+	/**
+	 * Callback for preg_replace_callback in date_input
+	 */
+	private static function _date_input_length_callback( $matches )
+	{
+		if( $matches[1] == "\\" ) return "\\".$matches[0]; // leave escaped
+		switch( $matches[2] )
+		{
+			case "d": return "nn"; // day, 01-31(2)
+			case "j": return "nn"; // day, 1-31(2)
+			case "l": return "XXXXXXXXX"; // weekday (name) - Wednesday(9)
+			case "D": return "XXX"; // weekday (abbr)(3)
+			case "S": return "";
+
+			case "e": return ""; // weekday letter, not supported
+
+			case "m": return "nn"; // month, 01-12(2)
+			case "n": return "nn"; // month, 1-12(2)
+			case "F": return "XXXXXXXXX"; // full month name; "name or abbr" in date.js - September(9)
+			case "M": return "XXX"; // month name abbr(3)
+
+			case "y": return "nn"; // year, 00-99(2)
+			case "Y": return "nnnn"; // year, 1970 to 2038(4)
+			default:
+				return "_"; // (1)
+		}
+	}
+
+	/**
 	 * Builds a date input field.
 	 *
 	 * @param string the name of the input field
@@ -1404,52 +1467,10 @@ class Form extends Widget
 
 		// Convert PHP date format to JS library date format:
 		// NOTE: when editing/extending this here, you probably also have to adjust param_check_date()!
-		$js_date_format = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
-			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
-			switch( $m[2] )
-			{
-				case "d": return "dd"; // day, 01-31
-				case "j": return "d"; // day, 1-31
-				case "l": return "EE"; // weekday (name)
-				case "D": return "E"; // weekday (abbr)
-				case "S": return "";
-
-				case "e": return ""; // weekday letter, not supported
-
-				case "m": return "MM"; // month, 01-12
-				case "n": return "M"; // month, 1-12
-				case "F": return "MMM"; // full month name; "name or abbr" in date.js
-				case "M": return "NNN"; // month name abbr
-
-				case "y": return "yy"; // year, 00-99
-				case "Y": return "yyyy"; // year, XXXX
-				default:
-					return $m[0];
-			}' ), $date_format );
+		$js_date_format = preg_replace_callback( '~(\\\)?(\w)~', array( 'Form', '_date_input_format_callback' ), $date_format );
 
 		// Get max length of each date component
-		$js_date_length = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
-			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
-			switch( $m[2] )
-			{
-				case "d": return "nn"; // day, 01-31(2)
-				case "j": return "nn"; // day, 1-31(2)
-				case "l": return "XXXXXXXXX"; // weekday (name) - Wednesday(9)
-				case "D": return "XXX"; // weekday (abbr)(3)
-				case "S": return "";
-
-				case "e": return ""; // weekday letter, not supported
-
-				case "m": return "nn"; // month, 01-12(2)
-				case "n": return "nn"; // month, 1-12(2)
-				case "F": return "XXXXXXXXX"; // full month name; "name or abbr" in date.js - September(9)
-				case "M": return "XXX"; // month name abbr(3)
-
-				case "y": return "nn"; // year, 00-99(2)
-				case "Y": return "nnnn"; // year, 1970 to 2038(4)
-				default:
-					return "_"; // (1)
-			}' ), $date_format );
+		$js_date_length = preg_replace_callback( '~(\\\)?(\w)~', array( 'Form', '_date_input_length_callback' ), $date_format );
 
 		$field_params['type'] = 'text';
 
@@ -1746,16 +1767,27 @@ class Form extends Widget
 	 */
 	function duration_input( $field_prefix, $duration, $field_label, $from_subfield = 'days', $to_subfield = 'minutes', $field_params = array() )
 	{
+		$field_params = array_merge( array(
+				'allow_none_value' => true,
+				'none_value_label' => '---',
+				'allow_none_title' => true,
+				'none_title_label' => '---',
+			), $field_params );
+
 		$this->handle_common_params( $field_params, $field_prefix, $field_label );
 
-		$periods_values = array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 50 );
+		$periods_values = array();
+		for( $p = 1; $p <= 60; $p++ )
+		{
+			$periods_values[] = $p;
+		}
 		$periods = array(
-			array( 'name' => 'second', 'title' => T_('second(s)'), 'seconds' => 1,        'size' => 1 ), // 1 seconds
-			array( 'name' => 'minute', 'title' => T_('minute(s)'), 'seconds' => 50,       'size' => 60 ), // 50 seconds
-			array( 'name' => 'hour',   'title' => T_('hour(s)'),   'seconds' => 3000,     'size' => 3600 ), // 50 minutes
-			array( 'name' => 'day',    'title' => T_('day(s)'),    'seconds' => 72000,    'size' => 86400 ), // 20 hours
-			array( 'name' => 'month',  'title' => T_('month(s)'),  'seconds' => 2160000,  'size' => 2592000 ), // 25 days
-			array( 'name' => 'year',   'title' => T_('year(s)'),   'seconds' => 25920000, 'size' => 31536000 ), // 10 months
+			array( 'name' => 'second', 'title' => T_('second(s)'), 'seconds' => 1 ), // 1 second
+			array( 'name' => 'minute', 'title' => T_('minute(s)'), 'seconds' => 60 ), // 60 seconds
+			array( 'name' => 'hour',   'title' => T_('hour(s)'),   'seconds' => 3600 ), // 60 minutes
+			array( 'name' => 'day',    'title' => T_('day(s)'),    'seconds' => 86400 ), // 24 hours
+			array( 'name' => 'month',  'title' => T_('month(s)'),  'seconds' => 2592000 ), // 30 days
+			array( 'name' => 'year',   'title' => T_('year(s)'),   'seconds' => 31536000 ), // 365 days
 		);
 
 		$r = $this->begin_field();
@@ -1766,23 +1798,13 @@ class Form extends Widget
 		if( !empty( $duration ) )
 		{
 			$periods_count = count( $periods );
-			for( $p = 0; $p <= $periods_count; $p++ )
+			for( $p = $periods_count - 1; $p >= 0; $p-- )
 			{
-				$period = $periods[ $p < $periods_count ? $p : $periods_count - 1 ];
-				if( ( $p == 0 && $duration <= $period['seconds'] ) ||
-				    ( $p == $periods_count && $duration > $period['seconds'] ) ||
-				    ( $p > 0 && $duration > $periods[ $p - 1 ]['seconds'] && $duration <= $period['seconds'] ) )
+				$period = $periods[ $p ];
+				$duration_value = ( $duration / $period['seconds'] );
+				if( $duration_value >= 1 && ( $duration % $period['seconds'] ) == 0 )
 				{
-					$period = $periods[ $p > 0 ? $p - 1 : 0 ];
-					$duration_value = floor( $duration / $period['size'] );
-					foreach( $periods_values as $v => $value )
-					{
-						if( $duration_value <= $value )
-						{
-							$current_value = $value;
-							break;
-						}
-					}
+					$current_value = $duration_value;
 					$current_period = $period['name'];
 					break;
 				}
@@ -1798,7 +1820,10 @@ class Form extends Widget
 
 		// Display <select> with periods values
 		$r .= "\n".'<select name="'.$field_prefix.'_value" id="'.Form::get_valid_id( $field_prefix ).'_value"'.$field_class.'>';
-		$r .= '<option value="0"'.( 0 == $current_value ? ' selected="selected"' : '' ).">---</option>\n";
+		if( $field_params['allow_none_value'] )
+		{	// Allow null value:
+			$r .= '<option value="0"'.( 0 == $current_value ? ' selected="selected"' : '' ).'>'.$field_params['none_value_label'].'</option>'."\n";
+		}
 		foreach( $periods_values as $period_value )
 		{
 			$r .= '<option value="'.$period_value.'"'.( $current_value == $period_value ? ' selected="selected"' : '' ).'>'.$period_value."</option>\n";
@@ -1807,7 +1832,10 @@ class Form extends Widget
 
 		// Display <select> with periods titles
 		$r .= "\n".'<select name="'.$field_prefix.'_name" id="'.Form::get_valid_id( $field_prefix ).'_name"'.$field_class.'>';
-		$r .= '<option value="0"'.( '' == $current_period ? ' selected="selected"' : '' ).">---</option>\n";
+		if( $field_params['allow_none_title'] )
+		{	// Allow none period name:
+			$r .= '<option value="0"'.( '' == $current_period ? ' selected="selected"' : '' ).'>'.$field_params['none_title_label'].'</option>'."\n";
+		}
 		foreach( $periods as $period )
 		{
 			$r .= '<option value="'.$period['name'].'"'.( $current_period == $period['name'] ? ' selected="selected"' : '' ).'>'.$period['title']."</option>\n";
@@ -2968,13 +2996,20 @@ class Form extends Widget
 	 * @param integer
 	 * @param string
 	 * @param boolean
+	 * @param string Placeholder text
 	 */
-	function textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '', $required = false )
+	function textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '', $required = false, $placeholder = '' )
 	{
 		$field_params = array(
 			'note' => $field_note,
 			'cols' => $field_cols,
 			'class' => $field_class);
+
+		if( $placeholder != '' )
+		{
+			$field_params['placeholder'] = $placeholder;
+		}
+
 		if( $required )
 		{ // Set required only for case TRUE, because in the following code we have a condition "isset($required)" instead of "$required == true"
 			$field_params['required'] = $required;
@@ -3353,7 +3388,7 @@ class Form extends Widget
 	 */
 	function add_crumb( $crumb_name )
 	{
-		$this->hidden( 'crumb_'.$crumb_name, get_crumb($crumb_name) );
+		$this->hidden( 'crumb_'.$crumb_name, get_crumb( $crumb_name ) );
 	}
 
 
@@ -3797,6 +3832,16 @@ class Form extends Widget
 	}
 
 
+	/**
+	 * Generate a file select field
+	 *
+	 * @param string The name of the input field
+	 * @param string Initial value
+	 * @param string Label displayed with the field
+	 * @param string "help" note
+	 * @param array Extended attributes/params
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
 	function fileselect( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
 	{
 		global $thumbnail_sizes, $file_select_js_initialized;
@@ -4071,6 +4116,72 @@ class Form extends Widget
 
 			$file_select_js_initialized = true;
 			return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Generate a tag text input
+	 */
+	function usertag_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $tag_input_js_initialized;
+
+		$field_params = array_merge( array(
+			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 100%">',
+			'input_suffix' => '</div>',
+		), $field_params );
+
+		$save_output = $this->output;
+		$this->output = false;
+
+		$r = $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params );	// TEMP: Note already in params
+
+		if( ! isset( $tag_input_js_initialized ) )
+		{
+			$r .= '<script type="text/javascript">
+						function init_autocomplete_tags( selector )
+						{
+							var tags = jQuery( selector ).val();
+							var tags_json = new Array();
+							if( tags.length > 0 )
+							{ // Get tags from <input>
+								tags = tags.split( \',\' );
+								for( var t in tags )
+								{
+									tags_json.push( { id: tags[t], name: tags[t] } );
+								}
+							}
+
+							jQuery( selector ).tokenInput( \''.get_restapi_url().'usertags\',
+							{
+								theme: \'facebook\',
+								queryParam: \'s\',
+								propertyToSearch: \'name\',
+								tokenValue: \'name\',
+								preventDuplicates: true,
+								prePopulate: tags_json,
+								hintText: \''.TS_('Type in a tag').'\',
+								noResultsText: \''.TS_('No results').'\',
+								searchingText: \''.TS_('Searching...').'\',
+								jsonContainer: \'tags\',
+							} );
+						}
+						</script>';
+			$tag_input_js_initialized = true;
+		}
+
+		$r .= '<script type="text/javascript">
+					jQuery( document ).ready( function()
+					{
+						jQuery( "#'.format_to_js( $field_name ).'" ).hide();
+						init_autocomplete_tags( "#'.format_to_js( $field_name ).'" );'.
+						get_prevent_key_enter_js( '#token-input-'.$field_name ).'
+					} );
+					</script>';
+
+		$this->output = $save_output;
+
+		return $this->display_or_return( $r );
 	}
 
 
@@ -4555,13 +4666,15 @@ class Form extends Widget
 	{
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
-		echo $this->begin_field( $field_name, $field_label, false, $field_type );
+		$r = $this->begin_field( $field_name, $field_label, false, $field_type );
 
 		// Switch layout to keep all fields in one line:
 		$this->switch_layout( 'none' );
 
 		// Set TRUE to mark all calls of the next fields as lined:
 		$this->is_lined_fields = true;
+
+		return $this->display_or_return( $r );
 	}
 
 
@@ -4576,9 +4689,11 @@ class Form extends Widget
 	{
 		$this->handle_common_params( $field_params );
 
+		$r = '';
+
 		if( !is_null( $suffix_text ) )
 		{ // Display a suffix:
-			echo $suffix_text;
+			$r .= $suffix_text;
 		}
 
 		// Stop "lined" mode:
@@ -4588,7 +4703,9 @@ class Form extends Widget
 		$this->switch_layout( NULL );
 
 		// End field:
-		echo $this->end_field( $field_type );
+		$r .= $this->end_field( $field_type );
+
+		return $this->display_or_return( $r );
 	}
 }
 

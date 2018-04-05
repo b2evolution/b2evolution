@@ -19,8 +19,9 @@ if( ! defined( 'EVO_MAIN_INIT' ) ) die( 'Please, do not access this page directl
  * Draw the canvas bars chart.
  *
  * @param array Chart bars data
+ * @param string Javascript callback function to execute after rendering
  */
-function CanvasBarsChart( $chart )
+function CanvasBarsChart( $chart, $init_js_callback = NULL )
 {
 ?>
 <div id="canvasbarschart" style="height:<?php echo $chart['canvas_bg']['height']; ?>px;width:<?php echo $chart['canvas_bg']['width']; ?>px;margin:auto auto 35px;"></div>
@@ -34,7 +35,7 @@ jQuery( window ).load( function()
 	foreach( $chart['chart_data'] as $i => $data )
 	{
 		if( $i > 0 )
-		{ 
+		{
 			// Legend label
 			$jqplot_legend[] = $data[0];
 			// Data
@@ -76,7 +77,7 @@ jQuery( window ).load( function()
 	} );
 
 	var data = [<?php echo implode( ',', $jqplot_data ); ?>];
-	jQuery.jqplot( 'canvasbarschart', data, {
+	var plot = jQuery.jqplot( 'canvasbarschart', data, {
 		seriesColors: [ '#<?php echo implode( '\', \'#', $chart[ 'series_color' ] ); ?>' ],
 		stackSeries: true,
 		animate: !$.jqplot.use_excanvas,
@@ -151,6 +152,15 @@ jQuery( window ).load( function()
 		}
 		<?php } ?>
 	} );
+
+	jQuery( '#canvasbarschart' ).data( 'plot', plot );
+
+	<?php
+	if( ! empty( $init_js_callback ) )
+	{
+		echo 'window["'.$init_js_callback.'"]();';
+	}
+	?>
 
 	// Highlight legend
 	jQuery( '#canvasbarschart' ).bind( 'jqplotDataHighlight', function( ev, seriesIndex, pointIndex, data )

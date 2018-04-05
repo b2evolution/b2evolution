@@ -610,7 +610,7 @@ class Blog extends DataObject
 						$default_in_bloglist = 'never';
 				}
 			}
-			$this->set( 'in_bloglist', $default_in_bloglist );
+			$this->set( 'in_bloglist', param( 'blog_in_bloglist' ), $default_in_bloglist );
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
@@ -852,7 +852,10 @@ class Blog extends DataObject
 
 			$this->set_setting( 'editing_goto_blog', param( 'editing_goto_blog', 'string', NULL ) );
 
+			$this->set_setting( 'post_anonymous', param( 'post_anonymous', 'integer', 0 ) );
+
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
+			$this->set_setting( 'default_post_status_anon', param( 'default_post_status_anon', 'string', NULL ) );
 
 			param( 'old_content_alert', 'integer', NULL );
 			param_check_range( 'old_content_alert', 1, 12, T_('Stale content alert must be configured with a number of months.').'(1 - 12)', false );
@@ -938,6 +941,7 @@ class Blog extends DataObject
 				// Subscriptions:
 				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_mod_subscriptions', param( 'allow_item_mod_subscriptions', 'integer', 0 ) );
 			}
 
 			// Voting options:
@@ -980,6 +984,8 @@ class Blog extends DataObject
 			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
 			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
 			$this->set_setting( 'msgform_recipient_label', param( 'msgform_recipient_label', 'string' ) );
+			$this->set_setting( 'msgform_display_avatar', param( 'msgform_display_avatar', 'integer', 0 ) );
+			$this->set_setting( 'msgform_avatar_size', param( 'msgform_avatar_size', 'string' ) );
 			$this->set_setting( 'msgform_user_name', param( 'msgform_user_name', 'string' ) );
 			$this->set_setting( 'msgform_require_name', param( 'msgform_require_name', 'integer', 0 ) );
 			$this->set_setting( 'msgform_subject_list', param( 'msgform_subject_list', 'text' ) );
@@ -1060,6 +1066,8 @@ class Blog extends DataObject
 				$this->set_setting( 'opt_out_comment_subscription', param( 'opt_out_comment_subscription', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'opt_out_item_subscription', param( 'opt_out_item_subscription', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_mod_subscriptions', param( 'allow_item_mod_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_item_mod_subscription', param( 'opt_out_item_mod_subscription', 'integer', 0 ) );
 			}
 
 			// Sitemaps:
@@ -2325,9 +2333,10 @@ class Blog extends DataObject
 	 * @todo make default a Blog param
 	 *
 	 * @param string status to start with. Empty to use default.
+	 * @param object Permission object: Item or Comment
 	 * @return string authorized status; NULL if none
 	 */
-	function get_allowed_item_status( $status = NULL )
+	function get_allowed_item_status( $status = NULL, $perm_target = NULL )
 	{
 		global $current_User;
 
@@ -2342,7 +2351,7 @@ class Blog extends DataObject
 		}
 
 		// Get max allowed visibility status:
-		$max_allowed_status = get_highest_publish_status( 'post', $this->ID, false );
+		$max_allowed_status = get_highest_publish_status( 'post', $this->ID, false, '', $perm_target );
 
 		$visibility_statuses = get_visibility_statuses();
 		$status_is_allowed = false;
@@ -2726,6 +2735,10 @@ class Blog extends DataObject
 				$params['url_suffix'] .= '#subs';
 				break;
 
+			case 'register_finishurl':
+				$disp_param = 'register_finish';
+				break;
+
 			case 'userurl':
 				$disp_param = 'user';
 				break;
@@ -2882,7 +2895,7 @@ class Blog extends DataObject
 		if( ! empty( $disp_param ) )
 		{ // Get url depending on value of param 'disp'
 			$this_Blog = & $this;
-			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'visits' ) ) )
+			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits' ) ) )
 			{ // Check if we can use this blog for messaging actions or we should use spec blog
 				if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
 				{ // Use special blog for messaging actions if it is defined in general settings
@@ -4337,8 +4350,10 @@ class Blog extends DataObject
 	{
 		$url = '';
 
-		if( is_logged_in( false ) )
-		{	// Only logged in and activated users can write a Post
+		if( is_logged_in( false ) ||
+		    ( ! is_logged_in() && $this->get_setting( 'post_anonymous' ) ) )
+		{	// Only logged in and activated users can write a Post,
+			// Or anonymous user can post if it is allowed with collection setting:
 			global $current_User;
 
 			$ChapterCache = & get_ChapterCache();
@@ -4347,7 +4362,7 @@ class Blog extends DataObject
 			{ // This category is locked, don't allow to create new post with this cat
 				return '';
 			}
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
+			if( ! is_logged_in() || $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
 			{	// We have permission to add a post with at least one status:
 				if( $this->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
 				{	// We have a mode 'In-skin editing' for the current Blog
@@ -4357,9 +4372,9 @@ class Blog extends DataObject
 					{	// Link to create a Item with predefined category
 						$cat_url_param = '&amp;cat='.$cat_ID;
 					}
-					$url = url_add_param( $this->get( 'url' ), 'disp=edit'.$cat_url_param );
+					$url = url_add_param( $this->get( 'url' ), ( is_logged_in() ? 'disp=edit' : 'disp=anonpost' ).$cat_url_param );
 				}
-				elseif( $current_User->check_perm( 'admin', 'restricted' ) )
+				elseif( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) )
 				{	// Edit a post from Back-office
 					global $admin_url;
 					$url = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$this->ID;
@@ -4884,7 +4899,7 @@ class Blog extends DataObject
 			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s3 ON s3.uset_user_ID = user_ID AND s3.uset_name = "notify_spam_cmt_moderation"' );
 			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
-			$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+			$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )
 				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
 				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );
@@ -5136,6 +5151,47 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get recipient link on disp=msgform
+	 *
+	 * @return string
+	 */
+	function get_msgform_recipient_link()
+	{
+		$recipient_link = '';
+
+		if( get_param( 'recipient_id' ) > 0 )
+		{	// Get recipient identity link for registered user:
+			$UserCache = & get_UserCache();
+			$recipient_User = & $UserCache->get_by_ID( get_param( 'recipient_id' ) );
+
+			if( $this->get_setting( 'msgform_display_avatar' ) )
+			{	// Display recipient name with avatar:
+				$recipient_link_params = array(
+						'link_text'   => 'avatar_name',
+						'thumb_size'  => $this->get_setting( 'msgform_avatar_size' ),
+						'thumb_class' => 'avatar_before_login_middle',
+					);
+			}
+			else
+			{	// Display only recipient name:
+				$recipient_link_params = array( 'link_text' => 'auto' );
+			}
+			$recipient_link = $recipient_User->get_identity_link( $recipient_link_params );
+		}
+		elseif( get_param( 'comment_id' ) > 0 )
+		{	// Get login name for anonymous user:
+			$CommentCache = & get_CommentCache();
+			$Comment = & $CommentCache->get_by_ID( get_param( 'comment_id' ) );
+			// Set a gender class for anonymous user if the setting is enabled:
+			$gender_class = check_setting( 'gender_colored' ) ? ' nogender' : '';
+			$recipient_link = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$Comment->ID.'">'.$Comment->get_author_name().'</span>';
+		}
+
+		return $recipient_link;
+	}
+
+
+	/**
 	 * Get additional fields on disp=msgform
 	 *
 	 * @return array
@@ -5286,6 +5342,36 @@ class Blog extends DataObject
 				$field_params['style'] = 'max-width:90%';
 				$Form->text_input( $field_name, $field_value, ( $UserField->get( 'type' ) == 'url' ? 80 : 40 ), $userfield_icon.$UserField->get( 'name' ), '', $field_params );
 		}
+	}
+
+
+	/**
+	 * Get default item type object
+	 *
+	 * @return object ItemType
+	 */
+	function & get_default_ItemType()
+	{
+		if( ! isset( $this->default_ItemType ) )
+		{	// Initialize default item type object for this collection:
+			$ItemTypeCache = & get_ItemTypeCache();
+			$this->default_ItemType = & $ItemTypeCache->get_by_ID( $this->get_setting( 'default_post_type' ), false, false );
+		}
+
+		return $this->default_ItemType;
+	}
+
+
+	/**
+	 * Get name of default item type
+	 *
+	 * @return string Name of default ItemType object
+	 */
+	function get_default_item_type_name()
+	{
+		$default_ItemType = $this->get_default_ItemType();
+
+		return $default_ItemType ? $default_ItemType->get_name() : T_('Post');
 	}
 }
 
