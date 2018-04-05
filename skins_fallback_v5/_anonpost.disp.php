@@ -16,9 +16,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 if( $Blog->get_ajax_form_enabled() )
 {	// Load form by AJAX if it is allowed by collection setting:
 	display_ajax_form( array(
-			'action' => 'get_item_form',
-			'blog'   => $Blog->ID,
-			'cat'    => get_param( 'cat' ),
+			'action'        => 'get_item_form',
+			'blog'          => $Blog->ID,
+			'cat'           => get_param( 'cat' ),
+			'post_title'    => param( 'post_title', 'string' ),
+			'post_urltitle' => param( 'post_urltitle', 'string' ),
 		) );
 }
 else

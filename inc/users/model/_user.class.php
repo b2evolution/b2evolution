@@ -59,7 +59,7 @@ class User extends DataObject
 	/**
 	 * User account status
 	 *
-	 * 'new', 'activated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
+	 * 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
 	 *
 	 * @var string
 	 */
@@ -1467,6 +1467,7 @@ class User extends DataObject
 					$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
 
 					$sub_items    = 1;
+					$sub_items_mod = 1;
 					$sub_comments = 0; // We normally subscribe to new posts only
 
 					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
@@ -1484,8 +1485,8 @@ class User extends DataObject
 								$sub_comments = 1;
 							}
 
-							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-								VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
+							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
+								VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_items_mod ).', '.$DB->quote( $sub_comments ).' )' );
 
 							$Messages->add( T_('Subscriptions have been changed.'), 'success' );
 						}
@@ -1621,10 +1622,11 @@ class User extends DataObject
 							// Get checkbox values:
 							$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
 							$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
+							$sub_items_mod = param( 'sub_items_mod_'.$loop_blog_ID, 'integer', 0 );
 
 							if( $sub_items || $sub_comments )
 							{	// We have a subscription for this blog
-								$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
+								$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_items_mod, $sub_comments )";
 							}
 							else
 							{	// No subscription here:
@@ -1633,12 +1635,15 @@ class User extends DataObject
 								$Blog = & $BlogCache->get_by_ID( $loop_blog_ID );
 
 								if( $Blog->get( 'advanced_perms' )
-										&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) || ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
+										&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) ||
+										     ( $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ) ||
+										     ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
 										&& $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
 								{
 									$opt_item = $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ? $sub_items : 0;
+									$opt_item_mod = $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ? $sub_items : 0;
 									$opt_comment = $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ? $sub_comments : 0;
-									$opt_out_values[] = "( $loop_blog_ID, $this->ID, $opt_item, $opt_comment )";
+									$opt_out_values[] = "( $loop_blog_ID, $this->ID, $opt_item, $opt_item_mod, $opt_comment )";
 								}
 								else
 								{
@@ -1651,13 +1656,13 @@ class User extends DataObject
 					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
 					if( count( $subscription_values ) )
 					{	// We need to record values:
-						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
 													VALUES '.implode( ', ', $subscription_values ) );
 					}
 
 					if( count( $opt_out_values ) )
 					{
-						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
 													VALUES '.implode( ', ', $opt_out_values ) );
 					}
 
@@ -3636,13 +3641,13 @@ class User extends DataObject
 				{ // even anonymous users can see users profile, or user wants to check his own profile
 					return true;
 				}
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_view_users':
 				if( $Settings->get( 'allow_anonymous_user_list' ) )
 				{ // even anonymous users can see users list
 					return true;
 				}
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_view_comments':
 			case 'can_view_contacts':
 			case 'can_view_messages':
@@ -3652,13 +3657,13 @@ class User extends DataObject
 			case 'can_edit_post':
 			case 'can_edit_comment':
 			case 'can_edit_contacts':
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_report_user':
 				if( ! empty( $target ) )
 				{
 					$UserCache = & get_UserCache();
 					$target_User = & $UserCache->get_by_ID( $target );
-					return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) )
+					return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) )
 							&& ( ! empty( $target_User ) && ( $target_User->get( 'level' ) <= $this->get( 'level' ) ) );
 				}
 				return false;
@@ -5508,7 +5513,7 @@ class User extends DataObject
 			}
 			else
 			{
-				$new_status_is_active = ( $new_status == 'activated' || $new_status == 'autoactivated' );
+				$new_status_is_active = ( $new_status == 'activated' || $new_status == 'autoactivated' || $new_status == 'manualactivated' );
 				$old_status_is_not_active = false;
 				if( $this->check_status( 'can_be_validated' ) && $new_status_is_active )
 				{ // User was activated
@@ -7756,14 +7761,9 @@ class User extends DataObject
 
 		if( count( $new_subscriptions ) )
 		{	// User is really subscribing to new newsletters:
-			$SQL = new SQL( 'Get email campaigns(of lists #'.implode( ',', $new_subscriptions ).') which must be sent at subscription' );
-			$SQL->SELECT( '*' );
-			$SQL->FROM( 'T_email__campaign' );
-			$SQL->WHERE( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' )' );
-			$SQL->WHERE_and( 'ecmp_auto_send = "subscription"' );
 			$EmailCampaignCache = & get_EmailCampaignCache();
 			$EmailCampaignCache->clear();
-			$EmailCampaignCache->load_by_sql( $SQL );
+			$EmailCampaignCache->load_where( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' ) AND ecmp_welcome = 1' );
 
 			foreach( $EmailCampaignCache->cache as $EmailCampaign )
 			{	// Send an email of the campaign at subscription:

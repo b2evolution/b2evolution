@@ -2735,6 +2735,7 @@ class Item extends ItemLight
 							'usertags' => isset( $user_tags ) ? $user_tags : NULL,
 							'subscribe_post' => 0,
 							'subscribe_comment' => 0,
+							'subscribe_post_mod' => 0,
 							'button_class' => 'btn-primary',
 							'inline' => 1
 						);
@@ -5305,7 +5306,7 @@ class Item extends ItemLight
 
 		$curr_status_permvalue = get_status_permvalue( $this->status );
 		// get the current User highest publish status for this item Blog
-		list( $highest_status, $publish_text ) = get_highest_publish_status( 'post', $this->get_blog_ID() );
+		list( $highest_status, $publish_text ) = get_highest_publish_status( 'post', $this->get_blog_ID(), true, '', $this );
 		// Get binary value of the highest available status
 		$highest_status_permvalue = get_status_permvalue( $highest_status );
 		if( $curr_status_permvalue >= $highest_status_permvalue || ( $highest_status_permvalue <= get_status_permvalue( 'private' ) ) )
@@ -6234,14 +6235,14 @@ class Item extends ItemLight
 		$post_url = '',
 		$post_comment_status = 'open',
 		$post_renderers = array('default'),
-		$item_type_name = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type
+		$item_type_name_or_ID = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type OR integer to use post type by ID
 		$item_st_ID = NULL,
 		$post_order = NULL )
 	{
 		global $DB, $query, $UserCache;
 		global $default_locale;
 
-		if( $item_type_name == '#' )
+		if( $item_type_name_or_ID == '#' )
 		{	// Try to set default post type ID from blog setting:
 			$ChapterCache = & get_ChapterCache();
 			if( $Chapter = & $ChapterCache->get_by_ID( $main_cat_ID, false, false ) &&
@@ -6253,7 +6254,11 @@ class Item extends ItemLight
 		else
 		{	// Try to get item type by requested name:
 			$ItemTypeCache = & get_ItemTypeCache();
-			if( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name, false, false ) )
+			if( is_int( $item_type_name_or_ID ) && $ItemType = & $ItemTypeCache->get_by_ID( $item_type_name_or_ID, false, false ) )
+			{	// Item type exists in DB by requested ID, Use it:
+				$item_typ_ID = $ItemType->ID;
+			}
+			elseif( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name_or_ID, false, false ) )
 			{	// Item type exists in DB by requested name, Use it:
 				$item_typ_ID = $ItemType->ID;
 			}
@@ -7281,6 +7286,10 @@ class Item extends ItemLight
 		{
 			$notify_condition = '( uset_value IS NULL OR ( '.$notify_condition.' ) )';
 		}
+		if( ! $is_new_item && $this->Blog->get_setting( 'allow_item_mod_subscriptions' ) )
+		{	// Notify moderators which selected to be notified per collection (if it is enabled by collection setting):
+			$notify_condition = '( sub_items_mod = 1 OR ( '.$notify_condition.' ) )';
+		}
 
 		// Select user_ids with the corresponding item edit permission on this item's blog
 		$SQL = new SQL();
@@ -7291,8 +7300,9 @@ class Item extends ItemLight
 		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND user_grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$this->blog_ID.' )' );
 		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_moderation_setting_name.'"' );
 		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
+		$SQL->FROM_add( 'LEFT JOIN T_subscriptions ON sub_coll_ID = blog_ID AND sub_user_ID = user_ID' );
 		$SQL->WHERE( $notify_condition );
-		$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+		$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 		$SQL->WHERE_and( '( bloguser_perm_edit IS NOT NULL AND bloguser_perm_edit <> "no" AND bloguser_perm_edit <> "own" )
 				OR ( bloggroup_perm_edit IS NOT NULL AND bloggroup_perm_edit <> "no" AND bloggroup_perm_edit <> "own" )
 				OR ( grp_perm_blogs = "editall" ) OR ( user_ID = blog_owner_user_ID )' );
@@ -7524,7 +7534,7 @@ class Item extends ItemLight
 					INNER JOIN T_users ON user_ID = sub_user_ID
 					WHERE sub_coll_ID = '.$this->get_blog_ID().'
 					AND sub_items <> 0
-					AND user_status IN ( "activated", "autoactivated" )
+					AND user_status IN ( "activated", "autoactivated", "manualactivated" )
 
 					UNION
 
@@ -7540,7 +7550,7 @@ class Item extends ItemLight
 						AND opt.cset_value = 1
 						AND NOT user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
-						AND user_status IN ( "activated", "autoactivated" )
+						AND user_status IN ( "activated", "autoactivated", "manualactivated" )
 
 					UNION
 
@@ -7557,7 +7567,7 @@ class Item extends ItemLight
 						AND opt.cset_value = 1
 						AND NOT sug_user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
-						AND user_status IN ( "activated", "autoactivated" )
+						AND user_status IN ( "activated", "autoactivated", "manualactivated" )
 
 					UNION
 
@@ -7573,7 +7583,7 @@ class Item extends ItemLight
 						AND opt.cset_value = 1
 						AND NOT bloguser_user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
-						AND user_status IN ( "activated", "autoactivated" )
+						AND user_status IN ( "activated", "autoactivated", "manualactivated" )
 				) AS users
 				WHERE NOT user_ID IS NULL';
 
@@ -9387,7 +9397,7 @@ class Item extends ItemLight
 		$current_status = $this->get( 'status' );
 
 		// Checks if the requested item status can be used by current user and if not, get max allowed item status of the collection
-		$restricted_status = $item_Blog->get_allowed_item_status( $current_status );
+		$restricted_status = $item_Blog->get_allowed_item_status( $current_status, $this );
 
 		if( $update_status )
 		{	// Update status to new restricted value:

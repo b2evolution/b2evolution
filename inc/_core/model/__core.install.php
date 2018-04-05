@@ -82,7 +82,7 @@ $schema_queries = array(
 			user_pass_driver VARCHAR(16) NOT NULL default 'evo\$md5',
 			user_grp_ID int(4) NOT NULL default 1,
 			user_email varchar(255) COLLATE ascii_general_ci NOT NULL,
-			user_status enum( 'activated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
+			user_status enum( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
 			user_avatar_file_ID int(10) unsigned default NULL,
 			user_firstname varchar(50) NULL,
 			user_lastname varchar(50) NULL,
@@ -373,7 +373,7 @@ $schema_queries = array(
 			clog_realstart_datetime   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			clog_realstop_datetime    TIMESTAMP NULL,
 			clog_status               enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started',
-			clog_messages             text,
+			clog_messages             MEDIUMTEXT,
 			clog_actions_num          INT UNSIGNED NULL,
 			PRIMARY KEY (clog_ctsk_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -552,7 +552,7 @@ $schema_queries = array(
 			ecmp_renderers            VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			ecmp_use_wysiwyg          TINYINT(1) NOT NULL DEFAULT 0,
 			ecmp_send_ctsk_ID         INT(10) UNSIGNED NULL DEFAULT NULL,
-			ecmp_auto_send            ENUM('no', 'subscription') COLLATE ascii_general_ci NOT NULL DEFAULT 'no',
+			ecmp_welcome              TINYINT(1) NOT NULL DEFAULT 0,
 			ecmp_user_tag_sendskip    VARCHAR(255) NULL,
 			ecmp_user_tag_sendsuccess VARCHAR(255) NULL,
 			ecmp_user_tag             VARCHAR(255) NULL,

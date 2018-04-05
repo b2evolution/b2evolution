@@ -2907,37 +2907,38 @@ div.container_menu_top div.widget_core_coll_search_form {
 div.container_menu_top input.search_field {
   width: 160px;
 }
-.widget_core_user_login #login_form,
 .widget_core_user_register #register_form {
   margin-top: 5px;
 }
-.widget_core_user_login fieldset,
 .widget_core_user_register fieldset {
   border: none;
   padding: 0;
   margin: 0;
 }
-.widget_core_user_login .field_login_btn,
 .widget_core_user_register .field_register_btn {
   margin: 5px 0;
 }
-.widget_core_user_login #ffield_pwd {
-  margin-top: 5px;
-}
-.widget_core_user_login .input_text,
 .widget_core_user_register .input_text {
   width: 96%;
 }
-.widget_core_user_login .register_link {
-  font-weight: bold;
+.widget_core_user_login .control-buttons {
+  width: 100%;
+  padding: 0;
+  margin-bottom: -15px;
 }
-.widget_core_user_login .greeting,
-.widget_core_user_login .avatar {
+.widget_core_user_greetings .greeting,
+.widget_core_user_greetings .avatar {
   vertical-align: middle;
 }
-.widget_core_user_login .user_group,
-.widget_core_user_login .user_level {
+.widget_core_user_greetings .user_group,
+.widget_core_user_greetings .user_level {
   color: #999;
+}
+.widget_core_user_greetings p {
+  margin: 10px 0;
+}
+.widget_core_user_greetings .panel-body p:last-child {
+  margin: 10px 0 0;
 }
 div.widget_core_coll_item_list.nobullets ul,
 div.widget_core_coll_item_list.nobullets ul li,
@@ -3364,9 +3365,6 @@ form#comment_edit {
 .attachment_list.results .table-bordered {
   border: none;
   margin: 0;
-}
-input.btn-lg {
-  font-size: 120%;
 }
 #download_timer_js,
 #download_info_nojs {
@@ -4678,17 +4676,23 @@ div.message_toolbars {
 .accordion-caret .accordion-toggler.collapsed:before {
   content: '\f0da';
 }
-.disp_access_requires_login .evo_widget.widget_core_free_html.panel {
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel {
   background: none;
   border: none;
   box-shadow: none;
   margin: 0;
 }
-.disp_access_requires_login .evo_widget.widget_core_free_html.panel .panel-body {
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body {
   padding: 0;
+}
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body:before,
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .evo_post__full_text.clearfix:before,
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body:after,
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .evo_post__full_text.clearfix:after {
+  display: block;
 }
 .disp_access_requires_login .evo_widget.widget_core_user_login {
   min-width: 290px;
   max-width: 400px;
-  margin: 1.5em auto auto;
+  margin: 10px auto;
 }

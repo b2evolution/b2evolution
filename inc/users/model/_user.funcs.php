@@ -2668,12 +2668,12 @@ function get_user_isubscription( $user_ID, $item_ID )
  *
  * @param integer user ID
  * @param integer blog ID
- * @return object with properties sub_items and sub_comments. Each property value is true if user is subscribed and false otherwise
+ * @return object with properties sub_items, sub_items_mod and sub_comments. Each property value is true if user is subscribed and false otherwise
  */
 function get_user_subscription( $user_ID, $blog )
 {
 	global $DB;
-	$result = $DB->get_row( 'SELECT sub_items, sub_comments
+	$result = $DB->get_row( 'SELECT sub_items, sub_items_mod, sub_comments
 								FROM T_subscriptions
 								WHERE sub_user_ID = '.$user_ID.' AND sub_coll_ID = '.$blog );
 	return $result;
@@ -2709,36 +2709,24 @@ function set_user_isubscription( $user_ID, $item_ID, $value )
  * @param integer value 0 for unsubscribe and 1 for subscribe to new posts
  * @param integer value 0 for unsubscribe and 1 for subscribe to new comments
  */
-function set_user_subscription( $user_ID, $blog, $items = NULL, $comments = NULL )
+function set_user_subscription( $user_ID, $blog, $items = NULL, $comments = NULL, $items_mod = NULL )
 {
 	global $DB;
 	$sub = get_user_subscription( $user_ID, $blog ); // Get default values
 
-	if( ( $items < 0 ) || ( $items > 1 ) || ( $comments < 0 ) || ( $comments > 1 ) )
-	{
+	if( ( $items < 0 ) || ( $items > 1 ) ||
+	    ( $items_mod < 0 ) || ( $items_mod > 1 ) ||
+	    ( $comments < 0 ) || ( $comments > 1 ) )
+	{	// Skip wrong values:
 		return false;
 	}
 
-	if( ! is_null( $items ) )
-	{
-		$sub_items = $items;
-	}
-	else
-	{
-		$sub_items = $sub ? $sub->sub_items : 0;
-	}
+	$sub_items = ( $items === NULL ? ( $sub ? $sub->sub_items : 0 ) : $items );
+	$sub_items_mod = ( $items_mod === NULL ? ( $sub ? $sub->sub_items_mod : 0 ) : $items_mod );
+	$sub_comments = ( $comments === NULL ? ( $sub ? $sub->sub_comments : 0 ) : $comments );
 
-	if( ! is_null( $comments ) )
-	{
-		$sub_comments = $comments;
-	}
-	else
-	{
-		$sub_comments = $sub ? $sub->sub_comments : 0;
-	}
-
-	return $DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-			VALUES ( '.$blog.', '.$user_ID.', '.$sub_items.', '.$sub_comments.' )' );
+	return $DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
+			VALUES ( '.$blog.', '.$user_ID.', '.$sub_items.', '.$sub_items_mod.', '.$sub_comments.' )' );
 }
 
 
@@ -3006,7 +2994,7 @@ function check_usertags( $user_ID, $test_tags = array(), $type = 'has_any' )
  */
 function get_account_activation_info( $edited_User )
 {
-	global $Settings, $UserSettings, $servertimenow, $activate_account_reminder_config;
+	global $Settings, $UserSettings, $servertimenow;
 
 	$field_label = T_('Latest account activation email');
 	$can_be_validated = $edited_User->check_status( 'can_be_validated' );
@@ -3053,6 +3041,9 @@ function get_account_activation_info( $edited_User )
 	{ // When validation process is secure, then account activation email is not known, and this was already added as a note into the 'Last account activation email' field
 		return $result;
 	}
+
+	// Get array of account activation reminder settings:
+	$activate_account_reminder_config = $Settings->get( 'activate_account_reminder_config' );
 
 	$field_label = T_('Next account activation reminder');
 	$number_of_max_reminders = ( count( $activate_account_reminder_config ) - 1 );
@@ -3491,17 +3482,15 @@ function callback_filter_userlist( & $Form )
 		}
 	}
 	$Form->begin_line( T_('Has all these tags'), 'user_tag' );
-		$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
+		$Form->usertag_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
 			'maxlength' => 255,
 			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
 			'input_suffix'=> '</div>'	) );
-		$Form->text_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
+		$Form->usertag_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
 			'maxlength' => 255,
 			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
 			'input_suffix'=> '</div>'	) );
 	$Form->end_line();
-	// Initialize JS to auto complete user tags fields:
-	echo_user_autocomplete_tags_js( '#user_tag, #not_user_tag' );
 
 	if( is_admin_page() )
 	{
@@ -3769,6 +3758,7 @@ function get_user_statuses( $null_option_name = '' )
 	$user_statuses = array(
 			'new'              => T_( 'New' ),
 			'activated'        => T_( 'Activated by email' ),
+			'manualactivated'  => T_( 'Manually activated' ),
 			'autoactivated'    => T_( 'Autoactivated' ),
 			'emailchanged'     => T_( 'Email changed' ),
 			'deactivated'      => T_( 'Deactivated email' ),
@@ -3798,6 +3788,7 @@ function get_user_status_icons( $display_text = false )
 {
 	$user_status_icons = array(
 			'activated'        => get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'Account has been activated by email' ) ) ),
+			'manualactivated'  => get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'Account has been manually activated' ) ) ),
 			'autoactivated'    => get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'Account has been automatically activated' ) ) ),
 			'new'              => get_icon( 'bullet_blue', 'imgtag', array( 'title' => T_( 'New account' ) ) ),
 			'deactivated'      => get_icon( 'bullet_blue', 'imgtag', array( 'title' => T_( 'Deactivated account' ) ) ),
@@ -3809,6 +3800,7 @@ function get_user_status_icons( $display_text = false )
 	if( $display_text )
 	{
 		$user_status_icons['activated']        .= ' '.T_( 'Activated' );
+		$user_status_icons['manualactivated']  .= ' '.T_( 'Manually activated' );
 		$user_status_icons['autoactivated']    .= ' '.T_( 'Autoactivated' );
 		$user_status_icons['new']              .= ' '.T_( 'New' );
 		$user_status_icons['deactivated']      .= ' '.T_( 'Deactivated' );
@@ -4704,60 +4696,6 @@ function echo_userlist_tags_js()
 
 
 /**
- * JavaScript to initialize auto complete user tags
- *
- * @param String Selectors of JavaScript object
- */
-function echo_user_autocomplete_tags_js( $js_selectors )
-{
-?>
-	<script type="text/javascript">
-	function init_autocomplete_user_tags( selectors )
-	{
-		jQuery( selectors ).each( function()
-		{
-			var tags = jQuery( this ).val();
-			var tags_json = new Array();
-			if( tags.length > 0 )
-			{	// Get tags from <input>:
-				tags = tags.split( ',' );
-				for( var t in tags )
-				{
-					tags_json.push( { id: tags[t], name: tags[t] } );
-				}
-			}
-
-			jQuery( this ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
-			{
-				theme: 'facebook',
-				queryParam: 's',
-				propertyToSearch: 'name',
-				tokenValue: 'name',
-				preventDuplicates: true,
-				prePopulate: tags_json,
-				hintText: '<?php echo TS_('Type in a tag') ?>',
-				noResultsText: '<?php echo TS_('No results') ?>',
-				searchingText: '<?php echo TS_('Searching...') ?>',
-				jsonContainer: 'tags',
-			} );
-		} );
-	}
-
-	jQuery( document ).ready( function()
-	{
-		jQuery( '<?php echo $js_selectors; ?>' ).hide();
-		init_autocomplete_user_tags( '<?php echo $js_selectors; ?>' );
-		<?php
-			// Don't submit a form by Enter when user is editing the tags:
-			echo get_prevent_key_enter_js( str_replace( '#', '#token-input-', $js_selectors ) );
-		?>
-	} );
-	</script>
-<?php
-}
-
-
-/**
  * Display user report form
  *
  * @param array Params
@@ -4841,8 +4779,6 @@ function user_report_form( $params = array() )
 		echo '<p><a href="'.$params['cancel_url'].'" class="btn btn-warning">'.T_('Cancel Report').'</a></p>';
 	}
 }
-
-
 
 
 /**
@@ -6197,8 +6133,8 @@ function users_results( & $UserList, $params = array() )
 				'th' => T_('List Status'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'nowrap',
-				'order' => 'enls_user_ID',
-				'td' => '~conditional( #enls_user_ID# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
+				'order' => 'enls_subscribed',
+				'td' => '~conditional( #enls_subscribed# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
 			);
 	}
 
@@ -6923,9 +6859,10 @@ function user_td_campaign_actions( $campaign_ID, $user_ID, $csnd_status )
 
 	if( $current_User->can_moderate_user( $user_ID ) )
 	{ // Current user can moderate this user
-		$r .= action_icon( T_('Queue again'), 'rewind', regenerate_url( 'ctrl,action,filter', 'ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient' ),
+		$redirect_to = rawurlencode( regenerate_url() );
+		$r .= action_icon( T_('Queue again'), 'rewind', $admin_url.'?ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;'.url_crumb('campaign').'&amp;redirect_to='.$redirect_to,
 				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'ready_to_send', 'ready_to_resend' ) )  ? ' invisible' : '' ) ) );
-		$r .= action_icon( T_('Skip'), 'forward', regenerate_url( 'ctrl,action,filter', 'ctrl=campaigns&amp;action=skip&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient' ),
+		$r .= action_icon( T_('Skip'), 'forward', $admin_url.'?ctrl=campaigns&amp;action=skip&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;'.url_crumb('campaign').'&amp;redirect_to='.$redirect_to,
 				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'sent', 'send_error', 'skipped' ) ) ? ' invisible' : '' ) ) );
 	}
 	else

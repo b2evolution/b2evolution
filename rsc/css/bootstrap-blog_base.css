@@ -897,37 +897,38 @@ div.container_menu_top div.widget_core_coll_search_form {
 div.container_menu_top input.search_field {
   width: 160px;
 }
-.widget_core_user_login #login_form,
 .widget_core_user_register #register_form {
   margin-top: 5px;
 }
-.widget_core_user_login fieldset,
 .widget_core_user_register fieldset {
   border: none;
   padding: 0;
   margin: 0;
 }
-.widget_core_user_login .field_login_btn,
 .widget_core_user_register .field_register_btn {
   margin: 5px 0;
 }
-.widget_core_user_login #ffield_pwd {
-  margin-top: 5px;
-}
-.widget_core_user_login .input_text,
 .widget_core_user_register .input_text {
   width: 96%;
 }
-.widget_core_user_login .register_link {
-  font-weight: bold;
+.widget_core_user_login .control-buttons {
+  width: 100%;
+  padding: 0;
+  margin-bottom: -15px;
 }
-.widget_core_user_login .greeting,
-.widget_core_user_login .avatar {
+.widget_core_user_greetings .greeting,
+.widget_core_user_greetings .avatar {
   vertical-align: middle;
 }
-.widget_core_user_login .user_group,
-.widget_core_user_login .user_level {
+.widget_core_user_greetings .user_group,
+.widget_core_user_greetings .user_level {
   color: #999;
+}
+.widget_core_user_greetings p {
+  margin: 10px 0;
+}
+.widget_core_user_greetings .panel-body p:last-child {
+  margin: 10px 0 0;
 }
 div.widget_core_coll_item_list.nobullets ul,
 div.widget_core_coll_item_list.nobullets ul li,
@@ -1351,9 +1352,6 @@ form#comment_edit {
   border: none;
   margin: 0;
 }
-input.btn-lg {
-  font-size: 120%;
-}
 #download_timer_js,
 #download_info_nojs {
   font-size: 84%;
@@ -1528,7 +1526,6 @@ input.btn-lg {
   margin: 0 1em 1em 0;
 }
 .evo_item_workflow_form .evo_item_workflow_form__fields {
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;

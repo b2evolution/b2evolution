@@ -285,7 +285,7 @@ function campaign_results_block( $params = array() )
 	// Create result set:
 	$SQL = new SQL();
 	$SQL->SELECT( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_name, ecmp_email_title, ecmp_email_defaultdest, ecmp_email_html, ecmp_email_text,
-		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
+		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_welcome,
 		ecmp_user_tag_sendskip, ecmp_user_tag_sendsuccess,
 		ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
 		enlt_ID, enlt_name,
@@ -394,11 +394,11 @@ function campaign_results_block( $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Sending'),
-			'order' => 'ecmp_auto_send',
+			'th' => T_('Welcome'),
+			'order' => 'ecmp_welcome',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'nowrap',
-			'td' => '%{Obj}->get_sending_title()%',
+			'td_class' => 'center',
+			'td' => '%campaign_td_welcome( #ecmp_ID#, #ecmp_welcome# )%',
 		);
 
 	$Results->cols[] = array(
@@ -508,11 +508,43 @@ function campaign_results_block( $params = array() )
 			'td' => action_icon( T_('Edit this email campaign...'), 'properties', $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$' )
 				.( $current_User->check_perm( 'emails', 'edit' ) ?
 				// Display an action icon to delete newsletter if current User has a perm:
-				action_icon( T_('Duplicate this email campaign...'), 'copy', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=copy' ) )
-				.action_icon( T_('Delete this email campaign!'), 'delete', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=delete&amp;'.url_crumb('campaign') ) ) : '' )
+				action_icon( T_('Duplicate this email campaign...'), 'copy', $admin_url.'?ctrl=campaigns&amp;action=copy&amp;ecmp_ID=$ecmp_ID$' )
+				.action_icon( T_('Delete this email campaign!'), 'delete', $admin_url.'?ctrl=campaigns&amp;action=delete&amp;ecmp_ID=$ecmp_ID$&amp;'.url_crumb( 'campaign' ) ) : '' )
 		);
 
 	// Display results:
-	$Results->display();
+	$Results->display( NULL, 'session' );
+}
+
+
+/**
+ * Helper function to display a welcome status of email campaign in list
+ *
+ * @param integer Email Campaign ID
+ * @param integer TRUE/1 if this is a welcome Email Campaign
+ * @return string
+ */
+function campaign_td_welcome( $ecmp_ID, $ecmp_welcome )
+{
+	global $current_User;
+
+	if( $ecmp_welcome )
+	{	// If newsletter is active:
+		$welcome_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => htmlspecialchars( T_('The email campaign is used as "Welcome" for its list.') ) ) );
+	}
+	else
+	{	// If newsletter is NOT active:
+		$welcome_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => htmlspecialchars( T_('The email campaign is not used as "Welcome" for its list.') ) ) );
+	}
+
+	if( $current_User->check_perm( 'emails', 'edit' ) )
+	{	// Make icon toggle welcome status if current User has a perm to edit this:
+		global $admin_url, $ctrl;
+		$url_param = $ctrl == 'newsletters' ? '&amp;from='.$ctrl : '';
+		$welcome_icon = '<a href="'.$admin_url.'?ctrl=campaigns&amp;action='.( $ecmp_welcome ? 'disable_welcome' : 'enable_welcome' )
+			.'&amp;ecmp_ID='.$ecmp_ID.$url_param.'&amp;'.url_crumb( 'campaign' ).'">'.$welcome_icon.'</a>';
+	}
+
+	return $welcome_icon;
 }
 ?>

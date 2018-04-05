@@ -1045,6 +1045,13 @@ function skin_init( $disp )
 		case 'access_requires_login':
 			global $login_mode;
 
+			if( is_logged_in() )
+			{	// Don't display this page for already logged in user:
+				global $Blog;
+				header_redirect( $Blog->get( 'url' ) );
+				// Exit here.
+			}
+
 			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
 			{	// Require HTTP authentication:
 				header( 'WWW-Authenticate: Basic realm="b2evolution"' );

@@ -141,7 +141,6 @@ class UserQuery extends SQL
 					) AS subscribed_lists on subscribed_lists.enls_user_ID = user_ID' );
 		}
 
-		$this->WHERE( 'user_ID IS NOT NULL' );
 		if( $params['grouped'] )
 		{ // Group by user group
 			$this->GROUP_BY( 'user_ID, grp_ID' );
@@ -278,7 +277,7 @@ class UserQuery extends SQL
 
 
 	/**
-	 * Restrict to user status, currenlty activated also means autoactivated users
+	 * Restrict to user status, currently activated also means auto and manually activated users
 	 *
 	 * @param string user status ( 'activated', 'deactivated', 'new', 'emailchanged', 'failedactivation', 'closed' )
 	 * @param boolean set true to include users only with the given status, or set false to exclude users with the given status
@@ -294,15 +293,8 @@ class UserQuery extends SQL
 		}
 
 		if( $status == 'activated' && !$exactly )
-		{ // Activated and Autoactivated users
-			if( $include )
-			{
-				$this->WHERE_and( 'user_status = '.$DB->quote( 'activated' ).' OR user_status = '.$DB->quote( 'autoactivated' ) );
-			}
-			else
-			{
-				$this->WHERE_and( 'user_status <> '.$DB->quote( 'activated' ).' AND user_status <> '.$DB->quote( 'autoactivated' ) );
-			}
+		{	// Activated, Manually activated, Autoactivated users:
+			$this->WHERE_and( 'user_status '.( $include ? 'IN' : 'NOT IN' ).' ( '.$DB->quote( array( 'activated', 'autoactivated', 'manualactivated' ) ).' )' );
 		}
 		else
 		{ // Other status check
@@ -673,7 +665,7 @@ class UserQuery extends SQL
 		$this->SELECT_add( ', csnd_last_sent_ts, enls_user_ID, csnd_last_open_ts, csnd_last_click_ts, csnd_like, csnd_cta1, csnd_cta2, csnd_cta3' );
 
 		// Get subscription status:
-		$this->SELECT_add( ', enls_user_ID' );
+		$this->SELECT_add( ', enls_subscribed' );
 		$this->FROM_add( 'LEFT JOIN T_email__campaign ON ecmp_ID = csnd_camp_ID' );
 		$this->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_enlt_ID = ecmp_enlt_ID AND enls_user_ID = user_ID AND enls_subscribed = 1' );
 

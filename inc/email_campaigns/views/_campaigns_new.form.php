@@ -28,6 +28,10 @@ if( $action == 'copy' )
 {
 	global $edited_EmailCampaign;
 	$fieldset_title = T_('Duplicate campaign').get_manual_link( 'duplicating-an-email-campaign' );
+	if( empty( $enlt_ID ) )
+	{ // No list specified, use list of original campaign
+		$enlt_ID = $edited_EmailCampaign->enlt_ID;
+	}
 }
 else
 {

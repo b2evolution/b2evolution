@@ -241,6 +241,45 @@ switch( $action )
 		}
 		break;
 
+	case 'enable_welcome':
+	case 'disable_welcome':
+		// Set/Unset welcome email campaign:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		param( 'from', 'string', '' );
+
+		// Make sure we got an ecmp_ID:
+		param( 'ecmp_ID', 'integer', true );
+
+		$edited_EmailCampaign->set( 'welcome', ( $action == 'enable_welcome' ? 1 : 0 ) );
+		if( $edited_EmailCampaign->dbupdate() && $action == 'enable_welcome' )
+		{	// If email campaign has been set as "Welcome" we should other campaign of its list set to not "Welcome":
+			$DB->query( 'UPDATE T_email__campaign
+				  SET ecmp_welcome = 0
+				WHERE ecmp_enlt_ID = '.$DB->quote( $edited_EmailCampaign->get( 'enlt_ID' ) ).'
+				  AND ecmp_welcome = 1
+				  AND ecmp_ID != '.$DB->quote( $edited_EmailCampaign->ID ) );
+		}
+
+		$Messages->add( ( $action == 'enable_welcome' ?
+			T_('The email campaign has been set as "Welcome" to its list.') :
+			T_('The email campaign has been unset as "Welcome" from its list.') ), 'success' );
+
+		// We want to highlight the reduced Step on list display:
+		$Session->set( 'fadeout_array', array( 'ecmp_ID' => array( $ecmp_ID ) ) );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $from == 'newsletters'
+			? $admin_url.'?ctrl=newsletters&action=edit&tab=campaigns&enlt_ID='.$edited_EmailCampaign->get( 'enlt_ID' )
+			: $admin_url.'?ctrl=campaigns', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
 	case 'delete':
 		// Delete Email Campaign...
 
@@ -391,23 +430,32 @@ switch( $action )
 		break;
 
 	case 'queue':
-		param( 'ecmp_ID', 'integer', NULL );
-		param( 'user_ID', 'integer', NULL );
-
-		queue_campaign_user( $ecmp_ID, $user_ID );
-
-		// Set this var to display again the same form where we can review and send campaign
-		$action = 'edit';
-		break;
-
 	case 'skip':
 		param( 'ecmp_ID', 'integer', NULL );
 		param( 'user_ID', 'integer', NULL );
+		param( 'redirect_to', 'url' );
+		$redirect_to = str_replace( '&amp;', '&', $redirect_to );
 
-		skip_campaign_user( $ecmp_ID, $user_ID );
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		if( $action == 'queue' )
+		{
+			queue_campaign_user( $ecmp_ID, $user_ID );
+		}
+		elseif( $action == 'skip' )
+		{
+			skip_campaign_user( $ecmp_ID, $user_ID );
+		}
+
+		if( ! empty( $redirect_to ) )
+		{
+			header_redirect( $redirect_to );
+		}
 
 		// Set this var to display again the same form where we can review and send campaign
 		$action = 'edit';
+		$tab = 'recipient';
 		break;
 }
 
