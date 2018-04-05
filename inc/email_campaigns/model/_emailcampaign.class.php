@@ -1095,16 +1095,23 @@ class EmailCampaign extends DataObject
 					'send_error'      => 'error',
 					'skipped'         => 'skipped',
 				);
-			$this->users['all'][] = $user_ID;
-			if( isset( $statuses_keys[ $status ] ) )
+			if( ! in_array( $user_ID, $this->users['all'] ) )
+			{
+				$this->users['all'][] = $user_ID;
+			}
+			if( isset( $statuses_keys[ $status ] ) && ! in_array( $user_ID, $this->users['filter'] ) )
 			{	// Add user ID to filtered array:
 				$this->users['filter'][] = $user_ID;
 			}
+
 			foreach( $statuses_keys as $email_status => $array_key )
 			{
 				if( $email_status == $status )
 				{	// Add user ID to proper cache array:
-					$this->users[ $array_key ][] = $user_ID;
+					if( ! in_array( $user_ID, $this->users[ $array_key ] ) )
+					{
+						$this->users[ $array_key ][] = $user_ID;
+					}
 				}
 				elseif( ( $unset_user_ID_key = array_search( $user_ID, $this->users[ $array_key ] ) ) !== false )
 				{	// Remove user ID from previous status cache array:
