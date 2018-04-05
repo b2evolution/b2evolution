@@ -26,7 +26,7 @@ else
 		// Find what steps should be executed immediately:
 		$automation_user_states = $Automation->get_user_states();
 
-		cron_log_append( "\n".'<b>Automation #'.$Automation->ID.'</b>('.$Automation->get( 'name' ).'): '.count( $automation_user_states ).' users are ready to execute a new step (delay between steps has been reached)' );
+		cron_log_append( "\n".'<b>Automation #'.$Automation->ID.'</b>('.$Automation->get( 'name' ).'): '.count( $automation_user_states ).' users are ready to execute a new step (delay between steps has been reached)'.get_cron_log_time() );
 
 		// Preload all required steps by single query into cache:
 		$AutomationStepCache->load_list( $automation_user_states );
@@ -38,11 +38,11 @@ else
 				// Execute Step action for given User:
 				$step_log_message = $AutomationStep->execute_action( $automation_user_ID );
 				// Append a step log message to cron job log and count this as action:
-				cron_log_action_end( "\n".$step_log_message );
+				cron_log_action_end( $step_log_message );
 			}
 		}
 
-		cron_log_append( "\n".'All users successfully processed in <b>Automation #'.$Automation->ID.'</b>' );
+		cron_log_append( 'All users successfully processed in <b>Automation #'.$Automation->ID.'</b>' );
 	}
 
 	cron_log_append( "\n".'All automations successfully processed' );

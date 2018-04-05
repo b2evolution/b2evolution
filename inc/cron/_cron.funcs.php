@@ -132,7 +132,7 @@ function cron_log_append( $message, $type = NULL, $nl = "\n" )
  */
 function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
 {
-	global $cron_log_actions_num, $Timer;
+	global $cron_log_actions_num;
 
 	if( ! isset( $cron_log_actions_num ) )
 	{	// Initialize a var to count cron log actions:
@@ -142,11 +142,25 @@ function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
 	// Mark this as separate action:
 	$cron_log_actions_num++;
 
-	// Log time:
-	$message .= '<p class="note">Action #'.$cron_log_actions_num.' Finished. Elapsed time since beginning of task: '.$Timer->get_duration( 'cron_exec' ).' seconds</p>';
-
 	// Append cron log:
-	cron_log_append( $message, $type, $nl );
+	cron_log_append( $message.get_cron_log_time( $cron_log_actions_num ), $type, $nl );
+}
+
+
+/**
+ * Get a time of cron log
+ *
+ * @param integer A number of cron log action
+ * @return string Cron log time
+ */
+function get_cron_log_time( $action_num = NULL )
+{
+	global $Timer;
+
+	return '<p class="note">'
+			.( $action_num === NULL ? '' : 'Action #'.$action_num.' Finished. ' )
+			.'Elapsed time since beginning of task: '.$Timer->get_duration( 'cron_exec' ).' seconds'
+		.'</p>';
 }
 
 
