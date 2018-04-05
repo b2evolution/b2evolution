@@ -3978,20 +3978,19 @@ class Plugin
 
 
 	/**
-	 * Get a coll default param value of this Plugin
+	 * Get default value of plugin setting
 	 *
 	 * @param string Setting name
-	 * @param string Blog type
+	 * @param array Config array of plugin settings
 	 * @param string Input group name
-	 * @return string Setting value
+	 * @return mixed Default value
 	 */
-	function get_coll_default_setting( $parname, $blog_type = 'std', $group = NULL )
+	function get_default_setting( $parname, $params, $group = NULL )
 	{
-		$tmp_params = array( 'for_editing' => true, 'blog_type' => $blog_type );
-		$params = $this->get_coll_setting_definitions( $tmp_params );
 		if( $group === NULL )
 		{	// Get default value from sinple field:
-			if( isset( $params[$parname]['type'] ) && $params[$parname]['type'] == 'checklist' )
+			if( isset( $params[$parname]['type'] ) && $params[$parname]['type'] == 'checklist' &&
+			    ! empty( $params[$parname]['options'] ) && is_array( $params[$parname]['options'] ) )
 			{	// Get default values for checklist:
 				$param_defaults = array();
 				foreach( $params[$parname]['options'] as $param_option )
@@ -4002,7 +4001,7 @@ class Plugin
 			}
 			elseif( isset( $params[$parname]['defaultvalue'] ) )
 			{	// We have a default value:
-				return $params[$parname]['defaultvalue'] ;
+				return $params[$parname]['defaultvalue'];
 			}
 		}
 		else
@@ -4015,6 +4014,23 @@ class Plugin
 		}
 
 		return NULL;
+	}
+
+
+	/**
+	 * Get a coll default param value of this Plugin
+	 *
+	 * @param string Setting name
+	 * @param string Blog type
+	 * @param string Input group name
+	 * @return string Setting value
+	 */
+	function get_coll_default_setting( $parname, $blog_type = 'std', $group = NULL )
+	{
+		$tmp_params = array( 'for_editing' => true, 'blog_type' => $blog_type );
+		$params = $this->get_coll_setting_definitions( $tmp_params );
+
+		return $this->get_default_setting( $parname, $params, $group );
 	}
 
 
@@ -4099,23 +4115,8 @@ class Plugin
 		// Try default values:
 		$tmp_params = array( 'for_editing' => true );
 		$params = $this->get_msg_setting_definitions( $tmp_params );
-		if( $group === NULL )
-		{	// Get default value from sinple field:
-			if( isset( $params[$parname]['defaultvalue'] ) )
-			{	// We have a default value:
-				return $params[$parname]['defaultvalue'] ;
-			}
-		}
-		else
-		{	// Get default value from input group field:
-			$parname = substr( $parname, strlen( $group ) );
-			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
-			{	// We have a default value:
-				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
-			}
-		}
 
-		return NULL;
+		return $this->get_default_setting( $parname, $params, $group );
 	}
 
 	/**
@@ -4144,23 +4145,8 @@ class Plugin
 		// Try default values:
 		$tmp_params = array( 'for_editing' => true );
 		$params = $this->get_email_setting_definitions( $tmp_params );
-		if( $group === NULL )
-		{	// Get default value from sinple field:
-			if( isset( $params[$parname]['defaultvalue'] ) )
-			{	// We have a default value:
-				return $params[$parname]['defaultvalue'] ;
-			}
-		}
-		else
-		{	// Get default value from input group field:
-			$parname = substr( $parname, strlen( $group ) );
-			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
-			{	// We have a default value:
-				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
-			}
-		}
 
-		return NULL;
+		return $this->get_default_setting( $parname, $params, $group );
 	}
 
 
