@@ -92,19 +92,6 @@ class user_login_Widget extends ComponentWidget
 					'size' => 40,
 					'defaultvalue' => T_('User log in'),
 				),
-				// Log in
-				'login_button_text' => array(
-					'label' => T_('Login button'),
-					'size' => 30,
-					'note' => T_('Link text to display'),
-					'type' => 'text',
-					'defaultvalue' => T_('Log in!'),
-				),
-				'login_button_class' => array(
-					'label' => T_('Login button class'),
-					'size' => 40,
-					'defaultvalue' => 'btn btn-success',
-				),
 				// Password
 				'password_link_show' => array(
 					'label' => T_('Password recovery link'),
@@ -122,6 +109,19 @@ class user_login_Widget extends ComponentWidget
 					'label' => T_('Password recovery link class'),
 					'size' => 40,
 					'defaultvalue' => '',
+				),
+				// Log in
+				'login_button_text' => array(
+					'label' => T_('Login button'),
+					'size' => 30,
+					'note' => T_('Link text to display'),
+					'type' => 'text',
+					'defaultvalue' => T_('Log in!'),
+				),
+				'login_button_class' => array(
+					'label' => T_('Login button class'),
+					'size' => 40,
+					'defaultvalue' => 'btn btn-success',
 				),
 				// Register
 				'register_link_show' => array(
