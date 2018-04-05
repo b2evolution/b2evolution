@@ -7762,6 +7762,7 @@ function get_fieldset_folding_icon( $id, $params = array() )
 }
 
 
+
 /**
  * Output JavaScript code to collapse/expand fieldset
  */
@@ -7774,79 +7775,113 @@ function echo_fieldset_folding_js()
 
 ?>
 <script type="text/javascript">
-jQuery( 'span[id^=icon_folding_], span[id^=title_folding_]' ).click( function()
-{
-	var is_icon = jQuery( this ).attr( 'id' ).match( /^icon_folding_/ );
-	var wrapper_obj = jQuery( this ).closest( '.fieldset_wrapper' );
-	var value_obj = is_icon ? jQuery( this ).prev() : jQuery( this ).prev().prev();
+	
+	
+ var init_fieldset_folding_js = function()
+ {
+	 
+	jQuery( 'span[id^=icon_folding_], span[id^=title_folding_]' ).click( function(e)
+	{
 
-	if( wrapper_obj.length == 0 || value_obj.length == 0 )
-	{ // Invalid layout
-		return false;
-	}
+		var is_icon = jQuery( this ).attr( 'id' ).match( /^icon_folding_/ );
+		var wrapper_obj = jQuery( this ).closest( '.fieldset_wrapper' );
+		var value_obj = is_icon ? jQuery( this ).prev() : jQuery( this ).prev().prev();
 
-	if( value_obj.val() == '1' )
-	{ // Collapse
-		wrapper_obj.removeClass( 'folded' );
-		value_obj.val( '0' );
-	}
-	else
-	{ // Expand
-		wrapper_obj.addClass( 'folded' );
-		value_obj.val( '1' );
-	}
+		if( wrapper_obj.length == 0 || value_obj.length == 0 )
+		{ // Invalid layout
+			return false;
+		}
 
-	// Change icon image
-	var clickimg = is_icon ? jQuery( this ) : jQuery( this ).prev();
-	if( clickimg.hasClass( 'fa' ) || clickimg.hasClass( 'glyphicon' ) )
-	{ // Fontawesome icon | Glyph bootstrap icon
-		if( clickimg.data( 'toggle' ) != '' )
-		{ // This icon has a class name to toggle
-			var icon_prefix = ( clickimg.hasClass( 'fa' ) ? 'fa' : 'glyphicon' );
-			if( clickimg.data( 'toggle-orig-class' ) == undefined )
-			{ // Store original class name in data
-				clickimg.data( 'toggle-orig-class', clickimg.attr( 'class' ).replace( new RegExp( '^'+icon_prefix+' (.+)$', 'g' ), '$1' ) );
-			}
-			if( clickimg.hasClass( clickimg.data( 'toggle-orig-class' ) ) )
-			{ // Replace original class name with exnpanded
-				clickimg.removeClass( clickimg.data( 'toggle-orig-class' ) )
-					.addClass( icon_prefix + '-' + clickimg.data( 'toggle' ) );
-			}
-			else
-			{ // Revert back original class
-				clickimg.removeClass( icon_prefix + '-' + clickimg.data( 'toggle' ) )
-					.addClass( clickimg.data( 'toggle-orig-class' ) );
+		if( value_obj.val() == '1' )
+		{ // Collapse
+			wrapper_obj.removeClass( 'folded' );
+			value_obj.val( '0' );
+		}
+		else
+		{ // Expand
+			wrapper_obj.addClass( 'folded' );
+			value_obj.val( '1' );
+		}
+
+		// Change icon image
+		var clickimg = is_icon ? jQuery( this ) : jQuery( this ).prev();
+		if( clickimg.hasClass( 'fa' ) || clickimg.hasClass( 'glyphicon' ) )
+		{ // Fontawesome icon | Glyph bootstrap icon
+			if( clickimg.data( 'toggle' ) != '' )
+			{ // This icon has a class name to toggle
+				var icon_prefix = ( clickimg.hasClass( 'fa' ) ? 'fa' : 'glyphicon' );
+				if( clickimg.data( 'toggle-orig-class' ) == undefined )
+				{ // Store original class name in data
+					clickimg.data( 'toggle-orig-class', clickimg.attr( 'class' ).replace( new RegExp( '^'+icon_prefix+' (.+)$', 'g' ), '$1' ) );
+				}
+				if( clickimg.hasClass( clickimg.data( 'toggle-orig-class' ) ) )
+				{ // Replace original class name with exnpanded
+					clickimg.removeClass( clickimg.data( 'toggle-orig-class' ) )
+						.addClass( icon_prefix + '-' + clickimg.data( 'toggle' ) );
+				}
+				else
+				{ // Revert back original class
+					clickimg.removeClass( icon_prefix + '-' + clickimg.data( 'toggle' ) )
+						.addClass( clickimg.data( 'toggle-orig-class' ) );
+				}
 			}
 		}
-	}
-	else
-	{ // Sprite icon
-		var icon_bg_pos = clickimg.css( 'background-position' );
-		clickimg.css( 'background-position', clickimg.data( 'xy' ) );
-		clickimg.data( 'xy', icon_bg_pos );
+		else
+		{ // Sprite icon
+			var icon_bg_pos = clickimg.css( 'background-position' );
+			clickimg.css( 'background-position', clickimg.data( 'xy' ) );
+			clickimg.data( 'xy', icon_bg_pos );
+		}
+
+		// Toggle title
+		var title = clickimg.attr( 'title' );
+		clickimg.attr( 'title', clickimg.data( 'title' ) );
+		clickimg.data( 'title', title );
+		
+		
+		e.stopPropagation();
+		e.preventDefault();
+		
+		// This does the trick:
+		e.stopImmediatePropagation();
+		
+	} );
+
+	jQuery( 'input[type=hidden][id^=folding_value_]' ).each( function()
+	{ // Check each feildset is folded correctly after refresh a page
+		var wrapper_obj = jQuery( this ).closest( '.fieldset_wrapper' );
+		if( jQuery( this ).val() == '1' )
+		{ // Collapse
+			wrapper_obj.addClass( 'folded' );
+		}
+		else
+		{ // Expand
+			wrapper_obj.removeClass( 'folded' );
+		}
+	} );
+
+	// Expand all fieldsets that have the fields with error
+	jQuery( '.field_error' ).closest( '.fieldset_wrapper.folded' ).find( 'span[id^=icon_folding_]' ).click();
+ };
+	
+	
+	init_fieldset_folding_js();
+</script>
+<?php
+}
+
+function init_fieldset_folding_js()
+{
+	if( ! is_logged_in() )
+	{ // Only loggedin users can fold fieldset
+		return;
 	}
 
-	// Toggle title
-	var title = clickimg.attr( 'title' );
-	clickimg.attr( 'title', clickimg.data( 'title' ) );
-	clickimg.data( 'title', title );
-} );
-
-jQuery( 'input[type=hidden][id^=folding_value_]' ).each( function()
-{ // Check each feildset is folded correctly after refresh a page
-	var wrapper_obj = jQuery( this ).closest( '.fieldset_wrapper' );
-	if( jQuery( this ).val() == '1' )
-	{ // Collapse
-		wrapper_obj.addClass( 'folded' );
-	}
-	else
-	{ // Expand
-		wrapper_obj.removeClass( 'folded' );
-	}
-} );
-
-// Expand all fieldsets that have the fields with error
-jQuery( '.field_error' ).closest( '.fieldset_wrapper.folded' ).find( 'span[id^=icon_folding_]' ).click();
+?>
+<script type="text/javascript">
+	
+	init_fieldset_folding_js();
+	
 </script>
 <?php
 }
