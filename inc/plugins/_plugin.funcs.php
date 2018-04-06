@@ -394,6 +394,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 			else
 			{ // display all values hold in this set:
+				$k_nb = 0;
 				$disp_whole_set = true;
 				$disp_arrays = $set_value;
 				$fieldset_title = $set_label;
@@ -410,7 +411,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 						$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
 					}
 					// Unique ID of fieldset to store in user  settings or in user per collection settings:
-					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
+					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname.'_'.$k_nb;
 				}
 				$Form->begin_fieldset( $fieldset_title, $fieldset_params );
 
@@ -418,7 +419,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				{
 					echo '<p class="notes">'.$params['note'].'</p>';
 				}
-				$k_nb = 0;
 			}
 
 			// check if a color field is among the entries
