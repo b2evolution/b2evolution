@@ -65,29 +65,28 @@ else
 {
 	$session_ID = $Session->ID;
 }
-echo sprintf( T_('Session ID').': %s', $session_ID );
+echo sprintf( T_('Session ID').': %s', $session_ID ) . "\n";
 
 // show sender email address
 echo sprintf( T_( 'By replying, your email will go directly to %s.' ), $params['sender_address'] );
 
 // show additional message info
-if( !empty( $Blog ) )
-{
-	if( !empty( $params['comment_id'] ) )
-	{
-		echo "\n\n".T_('Message sent from your comment:') . "\n"
-			.url_add_param( $Blog->get('url'), 'p='.$params['post_id'].'#'.$params['comment_id'], '&' );
-	}
-	elseif( !empty( $params['post_id'] ) )
-	{
-		echo "\n\n".T_('Message sent from your post:') . "\n"
-			.url_add_param( $Blog->get('url'), 'p='.$params['post_id'], '&' );
-	}
-	else
-	{
-		echo "\n\n".sprintf( T_('Message sent through the contact form on %s.'), $Blog->get('shortname') ). "\n";
+$CommentCache = & get_CommentCache();
+$ItemCache = & get_ItemCache();
 
-	}
+if( !empty( $params['comment_id'] ) && ( $Comment = & $CommentCache->get_by_ID( $params['comment_id'], false, false ) ) )
+{
+	echo "\n\n".T_('Message sent from your comment:') . "\n"
+		.$Comment->get_permanent_url();
+}
+elseif( !empty( $params['post_id'] ) && ( $Item = & $ItemCache->get_by_ID( $params['post_id'], false, false ) ) )
+{
+	echo "\n\n".T_('Message sent from your post:') . "\n"
+		.$Item->get_permanent_url();
+}
+elseif( ! empty( $Blog ) )
+{
+	echo "\n\n".sprintf( T_('Message sent through the contact form on %s.'), $Blog->get('shortname') ). "\n";
 }
 
 if( ! empty( $recipient_User ) )
