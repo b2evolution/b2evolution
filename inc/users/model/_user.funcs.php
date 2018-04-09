@@ -3354,6 +3354,8 @@ function callback_filter_userlist( & $Form )
 	global $Settings, $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
 	global $registered_min, $registered_max;
 
+	$filters = array();
+
 	$Form->hidden( 'filter', 'new' );
 
 	if( ! is_admin_page() && ! empty( $Blog ) && $Blog->get_setting( 'allow_access' ) == 'members' )
@@ -3481,16 +3483,20 @@ function callback_filter_userlist( & $Form )
 			$Form->end_line();
 		}
 	}
-	$Form->begin_line( T_('Has all these tags'), 'user_tag' );
-		$Form->usertag_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
-			'maxlength' => 255,
-			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
-			'input_suffix'=> '</div>'	) );
-		$Form->usertag_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
-			'maxlength' => 255,
-			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
-			'input_suffix'=> '</div>'	) );
-	$Form->end_line();
+
+	if( is_admin_page() )
+	{	// Filter by user tags only on back-office:
+		$Form->begin_line( T_('Has all these tags'), 'user_tag' );
+			$Form->usertag_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
+				'maxlength' => 255,
+				'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
+				'input_suffix'=> '</div>'	) );
+			$Form->usertag_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
+				'maxlength' => 255,
+				'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
+				'input_suffix'=> '</div>'	) );
+		$Form->end_line();
+	}
 
 	if( is_admin_page() )
 	{
@@ -3514,37 +3520,30 @@ function callback_filter_userlist( & $Form )
 	}
 	echo '<br />';
 
-	$criteria_types = param( 'criteria_type', 'array:integer' );
-	$criteria_values = param( 'criteria_value', 'array:string' );
-
-	if( count( $criteria_types ) == 0 )
-	{	// Init one criteria fieldset for first time
-		$criteria_types[] = '';
-		$criteria_values[] = '';
-	}
-
-	foreach( $criteria_types as $c => $type )
-	{
-		$value = trim( strip_tags( $criteria_values[$c] ) );
-		if( $value == '' && count( $criteria_types ) > 1 && $c > 0 )
-		{	// Don't display empty field again after filter request
-			continue;
-		}
-
-		if( $c > 0 )
-		{	// Separator between criterias
-			echo '<br />';
-		}
-		$Form->output = false;
-		$criteria_input = $Form->text( 'criteria_value[]', $value, 17, '', '', 50 );
-		$criteria_input .= get_icon( 'add', 'imgtag', array( 'rel' => 'add_criteria' ) );
-		$Form->output = true;
-
-		global $user_fields_empty_name;
-		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
-
-		$Form->select( 'criteria_type[]', $type, 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
-	}
+	// Specific criteria:
+	$Form->output = false;
+	global $user_fields_empty_name;
+	$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
+	$criteria_input = $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
+	$criteria_input = $Form->select( 'criteria_type[]', '', 'callback_options_user_new_fields', '', $criteria_input );
+	$Form->output = true;
+	$filters['criteria'] = array(
+			'label' => T_('Specific criteria'),
+			'operators' => 'contains,not_contains',
+			'input' => 'function( rule, input_name ) { return \''.format_to_js( $criteria_input ).'\'; }',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+			'valueGetter' => 'function( rule )
+				{
+					return rule.$el.find(".rule-value-container [name^=criteria_type]").val()
+						+ ":" + rule.$el.find(".rule-value-container [name^=criteria_value]").val();
+				}',
+			'valueSetter' => 'function( rule, value )
+				{
+					var val = value.split( ":" );
+					rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
+					rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[1] ).trigger( "change" );
+				}'
+		);
 
 	if( user_region_visible() )
 	{	// JS functions for AJAX loading of regions, subregions & cities
@@ -3633,6 +3632,8 @@ function load_cities( country_ID, region_ID, subregion_ID )
 </script>
 <?php
 	}
+
+	return $filters;
 }
 
 

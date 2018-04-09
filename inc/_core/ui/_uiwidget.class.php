@@ -547,7 +547,12 @@ class Table extends Widget
 			}
 
 			$func = $this->{$area_name}['callback'];
-			$func( $this->Form );
+			$filter_fields = $func( $this->Form );
+
+			if( ! empty( $filter_fields ) && is_array( $filter_fields ) )
+			{	// Display filters:
+				$this->display_filter_fields( $this->Form, $filter_fields );
+			}
 
 			if( $create_new_form )
 			{ // We do not already have a form surrounding the whole result list:
@@ -559,6 +564,139 @@ class Table extends Widget
 		echo '</div>';
 
 		echo $this->params['filters_end'];
+	}
+
+
+	/**
+	 * Display filter fields
+	 *
+	 * @param array Filters
+	 */
+	function display_filter_fields( & $Form, $filter_fields )
+	{
+		echo '<div id="evo_results_filters"></div>';
+		$Form->hidden( 'filter_query', '' );
+
+		$js_filters = array();
+		foreach( $filter_fields as $field_ID => $params )
+		{
+			$js_filter = array( 'id:\''.$field_ID.'\'' );
+
+			if( ! isset( $params['operators'] ) )
+			{	// Use default operator if it is not defined:
+				$params['operators'] = '=';
+			}
+
+			foreach( $params as $param_name => $param_value )
+			{
+				switch( $param_name )
+				{
+					case 'operators':
+						// Convert operators to proper format:
+						if( ! empty( $param_value ) )
+						{
+							$operators = explode( ',', $param_value );
+							foreach( $operators as $o => $operator )
+							{	// Replace aliases with corrent name which is used in jQuery QueryBuilder plugin:
+								switch( $operator )
+								{
+									case '=':
+										$operators[ $o ] = 'equal';
+										break;
+									case '!=':
+									case '<>':
+										$operators[ $o ] = 'not_equal';
+										break;
+								}
+							}
+							$param_value = '[\''.implode( '\',\'', $operators ).'\']';
+						}
+						break;
+
+					case 'input':
+					case 'valueGetter':
+					case 'valueSetter':
+						if( strpos( $param_value, 'function' ) === 0 )
+						{	// Don't convert these param to string if it is a function:
+							break;
+						}
+
+					default:
+						if( is_array( $param_value ) )
+						{	// Array param:
+							$param_values = array();
+							foreach( $param_value as $sub_param_name => $sub_param_value )
+							{
+								$param_values[] = $sub_param_name.':'.( $sub_param_value == 'true' ? 'true' : '\''.format_to_js( $sub_param_value ).'\'' );
+							}
+							$param_value = '{'.implode( ',', $param_values ).'}';
+						}
+						else
+						{	// String param:
+							$param_value = '\''.format_to_js( $param_value ).'\'';
+						}
+				}
+
+				$js_filter[] = $param_name.':'.$param_value;
+			}
+			$js_filters[] = '{'.implode( ',', $js_filter ).'}';
+		}
+
+		// Prefill the filter fields from request:
+		$js_filter_values = param( 'filter_query', 'string' );
+		if( ! empty( $js_filter_values ) )
+		{
+			$js_filter_values = 'rules: '.$js_filter_values;
+		}
+?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( '#evo_results_filters' ).queryBuilder(
+	{
+		allow_empty: true,
+		display_empty_filter: true,
+		plugins: ['bt-tooltip-errors'],
+		icons: {
+			add_group: 'fa fa-plus-circle',
+			add_rule: 'fa fa-plus',
+			remove_group: 'fa fa-close',
+			remove_rule: 'fa fa-close',
+			error: 'fa fa-warning',
+		},
+		lang: {
+			operators: {
+				equal: '=',
+				not_equal: '&#8800;',
+				less: '<',
+				less_or_equal: '&#8804;',
+				greater: '>',
+				greater_or_equal: '&#8805;',
+				'contains': '<?php echo TS_('contains'); ?>',
+				'not_contains': '<?php echo TS_('doesn\'t contain'); ?>',
+			}
+		},
+		filters: [<?php echo implode( ',', $js_filters ); ?>],
+		<?php echo $js_filter_values; ?>
+	} );
+
+	// Prepare form before submitting:
+	jQuery( '#evo_results_filters' ).closest( 'form' ).on( 'submit', function()
+	{
+		// Convert filter fields to JSON format:
+		var result = jQuery( '#evo_results_filters' ).queryBuilder( 'getRules', { allow_invalid: true } );
+		if( result === null )
+		{	// Stop submitting on wrong SQL:
+			return false;
+		}
+		else
+		{	// Set query rules to hidden field before submitting:
+			jQuery( 'input[name=filter_query]' ).val( JSON.stringify( result ) );
+		}
+	} );
+} );
+</script>
+<?php
 	}
 
 

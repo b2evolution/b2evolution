@@ -15,13 +15,13 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '_core/model/db/_sql.class.php', 'SQL' );
+load_class( '_core/model/db/_filtersql.class.php', 'FilterSQL' );
 
 /**
  * UserQuery: help constructing queries on Users
  * @package evocore
  */
-class UserQuery extends SQL
+class UserQuery extends FilterSQL
 {
 	/**
 	 * Fields of users table to search by keywords
@@ -507,46 +507,6 @@ class UserQuery extends SQL
 
 
 	/**
-	 * Restrict with user fields
-	 *
-	 * @param array User fields
-	 */
-	function where_userfields( $userfields )
-	{
-		global $DB;
-
-		if( empty( $userfields ) )
-		{
-			return;
-		}
-
-		$criteria_where_clauses = array();
-		foreach( $userfields as $field )
-		{
-			$type = (int)$field['type'];
-			$value = trim( strip_tags( $field['value'] ) );
-			if( $type > 0 && $value != '' )
-			{	// Filter by Specific criteria
-				$words = explode( ' ', $value );
-				if( count( $words ) > 0 )
-				{
-					foreach( $words as $word )
-					{
-						$criteria_where_clauses[] = 'uf_ufdf_ID = "'.$DB->escape($type).'" AND uf_varchar LIKE "%'.$DB->escape($word).'%"';
-					}
-				}
-			}
-		}
-
-		if( count( $criteria_where_clauses ) > 0 )
-		{	// Some creteria is defined
-			$this->FROM_add( ' LEFT JOIN T_users__fields ON uf_user_ID = user_ID' );
-			$this->WHERE_and( ' ( ( '.implode( ' ) OR ( ', $criteria_where_clauses ).' ) ) ' );
-		}
-	}
-
-
-	/**
 	 * Restrict with user group level
 	 *
 	 * @param integer Minimum group level
@@ -838,6 +798,73 @@ class UserQuery extends SQL
 					GROUP BY pans_user_ID
 				) AS poll_answers ON poll_answers.pans_user_ID = user_ID' );
 		}
+	}
+
+
+	/**
+	 * Restrict with user fields (Specific criteria)
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_criteria( $value, $operator )
+	{
+		if( ! preg_match( '#^(\d+):(.+)$#', $value, $m ) )
+		{	// Skip wrong value:
+			return;
+		}
+
+		$user_field_def_ID = intval( $m[1] );
+		$user_field_value = trim( strip_tags( $m[2] ) );
+		if( $user_field_def_ID <= 0 || $user_field_value == '' )
+		{	// Skip wrong value:
+			return;
+		}
+
+		global $DB;
+
+		switch( $operator )
+		{
+			case 'contains':
+				$word_operator = 'LIKE';
+				$field_condition_start = 'uf_ufdf_ID = '.$DB->quote( $user_field_def_ID );
+				$field_condition_end = '';
+				break;
+
+			case 'not_contains':
+				$word_operator = 'NOT LIKE';
+				$field_condition_start = '( uf_ufdf_ID = '.$DB->quote( $user_field_def_ID );
+				// This condition selects users which have no the requested field in DB, i.e. thier requested field has no the requested value:
+				$field_condition_end = ' ) OR ( SELECT COUNT( uf_ID ) FROM yb_users__fields WHERE uf_user_ID = user_ID AND uf_ufdf_ID = '.$DB->quote( $user_field_def_ID ).' ) = 0';
+				break;
+
+			default:
+				debug_die( 'Unknown operator "'.$operator.'" for user searching by specific criteria' );
+		}
+
+		$word_sql_conditions = array();
+		$words = explode( ' ', $user_field_value );
+		foreach( $words as $word )
+		{	// Find each word separately:
+			$word_sql_conditions[] = 'uf_varchar '.$word_operator.' '.$DB->quote( '%'.$word.'%' );
+		}
+
+		// Join table for columns uf_ufdf_ID and uf_varchar:
+		$this->FROM_add( 'LEFT JOIN T_users__fields ON uf_user_ID = user_ID' );
+
+		// Build SQL condition for specific criteria:
+		$criteria_sql_condition = '( '.$field_condition_start.' AND ';
+		if( count( $word_sql_conditions ) > 1 )
+		{
+			$criteria_sql_condition .= '( '.implode( ' OR ', $word_sql_conditions ).' )';
+		}
+		else
+		{
+			$criteria_sql_condition .= $word_sql_conditions[0];
+		}
+		$criteria_sql_condition .= $field_condition_end.' )';
+
+		return $criteria_sql_condition;
 	}
 }
 
