@@ -372,6 +372,7 @@ $booststrap_install_form_params = array(
 		'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-4 col-sm-8">',
 		'buttonsend'     => "</div></div>\n\n",
 		'note_format'    => ' <span class="help-inline text-muted small">%s</span>',
+		'bottom_note_format' => ' <div><span class="help-inline text-muted small">%s</span></div>',
 		// - checkbox
 		'fieldstart_checkbox'    => '<div class="form-group" $ID$>'."\n",
 		'fieldend_checkbox'      => "</div>\n\n",
