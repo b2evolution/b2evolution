@@ -3633,6 +3633,22 @@ function load_cities( country_ID, region_ID, subregion_ID )
 <?php
 	}
 
+	if( $current_User->check_perm( 'users', 'moderate' ) )
+	{	// If current user can moderate other users:
+
+		// User last seen:
+		$filters['lastseen'] = array(
+				'label' => T_('User last seen'),
+				'type'  => 'date',
+			);
+
+		// Registration source:
+		$filters['source'] = array(
+				'label' => T_('Registration source'),
+				'operators' => 'contains,not_contains',
+			);
+	}
+
 	return $filters;
 }
 

@@ -385,7 +385,7 @@ class UserList extends DataObjectList2
 		/**
 		 * Filter query
 		 */
-		$this->filters['filter_query'] = param( 'filter_query', 'string', $this->default_filters['filter_query'], true );
+		$this->filters['filter_query'] = param_condition( 'filter_query', $this->default_filters['filter_query'], true );
 
 		/*
 		 * Restrict by user IDs

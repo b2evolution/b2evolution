@@ -125,5 +125,78 @@ class FilterSQL extends SQL
 
 		return empty( $sql_conditions ) ? '' : implode( ' '.$query->condition.' ', $sql_conditions );
 	}
+
+
+	/**
+	 * Get SQL condition for "WHERE" clause
+	 *
+	 * @param string Field name in DB
+	 * @param string Value
+	 * @param string Operator in format of jQuery plugin QueryBuilder
+	 * @return string
+	 */
+	function get_where_condition( $field_name, $value, $operator )
+	{
+		global $DB;
+
+		$value_prefix = '';
+		$value_suffix = '';
+
+		switch( $operator )
+		{
+			case 'equal':
+				$sql_operator = '=';
+				break;
+			case 'not_equal':
+				$sql_operator = '!=';
+				break;
+			case 'less':
+				$sql_operator = '<';
+				break;
+			case 'less_or_equal':
+				$sql_operator = '<=';
+				break;
+			case 'greater':
+				$sql_operator = '>';
+				break;
+			case 'greater_or_equal':
+				$sql_operator = '>=';
+				break;
+			case 'between':
+				$sql_operator = array( 'BETWEEN', 'AND' );
+				break;
+			case 'not_between':
+				$sql_operator = array( 'NOT BETWEEN', 'AND' );
+				break;
+			case 'contains':
+				$sql_operator = 'LIKE';
+				$value_prefix = '%';
+				$value_suffix = '%';
+				break;
+			case 'not_contains':
+				$sql_operator = 'NOT LIKE';
+				$value_prefix = '%';
+				$value_suffix = '%';
+				break;
+			default:
+				debug_die( 'Unknown filter condition operator "'.$operator.'" for the field "'.$field_name.'"' );
+		}
+
+		// Build SQL condition from given operator and value:
+		$sql_where_condition = $field_name;
+		if( is_array( $sql_operator ) )
+		{	// Multiple operators and values:
+			foreach( $sql_operator as $i => $sql_operator_item )
+			{
+				$sql_where_condition .= ' '.$sql_operator_item.' '.$DB->quote( $value_prefix.$value[ $i ].$value_suffix );
+			}
+		}
+		else
+		{	// Single operator and value:
+			$sql_where_condition .= ' '.$sql_operator.' '.$DB->quote( $value_prefix.$value.$value_suffix );
+		}
+
+		return $sql_where_condition;
+	}
 }
 ?>

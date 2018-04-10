@@ -866,6 +866,30 @@ class UserQuery extends FilterSQL
 
 		return $criteria_sql_condition;
 	}
+
+
+	/**
+	 * Restrict with user last seen date
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_lastseen( $value, $operator )
+	{
+		return $this->get_where_condition( 'DATE( user_lastseen_ts )', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user last seen date
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_source( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_source', $value, $operator );
+	}
 }
 
 ?>

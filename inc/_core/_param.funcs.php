@@ -2824,4 +2824,115 @@ function is_safe_filepath( $filepath )
 	return true;
 }
 
+
+/**
+ * Set a condition parameter
+ *
+ * @param string Param name
+ * @param string Default value or TRUE if user input required
+ * @param boolean Do we need to memorize this to regenerate the URL for this page?
+ * @return string Validated and formatted value of condition param which is ready to be stored in DB
+ */
+function param_condition( $var, $default = '', $memorize = false )
+{
+	$condition = param( $var, 'string', $default, $memorize );
+
+	// Format condition to database format:
+	$condition = param_format_condition( $condition, 'db' );
+
+	// Update condition param with validated and formatted value:
+	set_param( $var, $condition );
+
+	return $condition;
+}
+
+
+/**
+ * Format JSON object to/from DB format
+ * Used recursively to find all sub grouped conditions
+ *
+ * @param object|string JSON object of condition param
+ * @param string Format action: 'db' - to database format, 'js' - from database to JavaScript format
+ * @return object 
+ */
+function param_format_condition( $condition, $action )
+{
+	$is_encoded = ! is_object( $condition );
+
+	if( $is_encoded )
+	{	// If source param is an encoded string, we should decode it firstly before formatting:
+		$condition = json_decode( $condition );
+
+		if( $condition === NULL || ! isset( $condition->valid ) || $condition->valid !== true )
+		{	// Wrong condition object:
+			return $action == 'db' ? '' : 'null';
+		}
+	}
+
+	if( empty( $condition->rules ) )
+	{	// No rules, Skip it:
+		return $condition;
+	}
+
+	foreach( $condition->rules as $r => $rule )
+	{
+		if( isset( $rule->rules ) && is_array( $rule->rules ) )
+		{	// This is a group of conditions, Run this function recursively:
+			$condition->rules[ $r ] = param_format_condition( $rule, $action );
+		}
+		else
+		{	// This is a single field, Format condition only for this field:
+			if( is_array( $rule->value ) )
+			{	// Field with multiple values like 'between'(field BETWEEN value_1 AND value_2):
+				foreach( $rule->value as $v => $rule_value )
+				{
+					$rule->value[ $v ] = param_format_condition_rule( $rule_value, $rule->type, $action );
+				}
+			}
+			else
+			{	// Field with single value like 'equal'(field = value):
+				$rule->value = param_format_condition_rule( $rule->value, $rule->type, $action );
+			}
+			$condition->rules[ $r ] = $rule;
+		}
+	}
+
+	if( $is_encoded )
+	{	// If the source param has been passed here as encoded we should return it in the same format:
+		$condition = json_encode( $condition );
+	}
+
+	return $condition;
+}
+
+
+/**
+ * Format rule value to/from DB format
+ *
+ * @param string Rule value
+ * @param string Rule type
+ * @param string Format action: 'db' - to database format, 'js' - from database to JavaScript format
+ */
+function param_format_condition_rule( $rule_value, $rule_type, $action )
+{
+	switch( $rule_type )
+	{
+		case 'date':
+			switch( $action )
+			{
+				case 'db':
+					// To database format:
+					$formatted_date = format_input_date_to_iso( $rule_value );
+					return $formatted_date ? $formatted_date : $rule_value;
+
+				case 'js':
+					// To JavaScript format:
+					return mysql2date( locale_input_datefmt(), $rule_value );
+			}
+			break;
+	}
+
+	return $rule_value;
+}
+
 ?>
