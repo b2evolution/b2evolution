@@ -3484,17 +3484,17 @@ function callback_filter_userlist( & $Form )
 		}
 	}
 
-	if( is_admin_page() )
-	{	// Filter by user tags only on back-office:
+	if( is_admin_page() && $current_User->check_perm( 'users', 'moderate' ) )
+	{	// Filter by user tags only on back-office and if current user can moderate other users:
 		$Form->begin_line( T_('Has all these tags'), 'user_tag' );
 			$Form->usertag_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
 				'maxlength' => 255,
 				'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
-				'input_suffix'=> '</div>'	) );
+				'input_suffix'=> '</div>' ) );
 			$Form->usertag_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
 				'maxlength' => 255,
 				'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
-				'input_suffix'=> '</div>'	) );
+				'input_suffix'=> '</div>' ) );
 		$Form->end_line();
 	}
 
