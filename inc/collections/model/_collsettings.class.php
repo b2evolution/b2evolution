@@ -167,6 +167,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_comment_subscriptions' => 1, // Allow email subscriptions for new comment by default
 			'allow_item_subscriptions' => 1,    // Allow email subscriptions for a specific post by default
 			'use_workflow' => 0,						// Don't use workflow by default
+			'use_deadline' => 1,						// Use deadline for workflow by default
 			'aggregate_coll_IDs' => '',
 			'blog_footer_text' => 'This collection &copy;$year$ by $owner$',
 			'max_footer_credits' => 3,

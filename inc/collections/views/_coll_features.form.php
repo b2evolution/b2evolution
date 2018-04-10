@@ -31,6 +31,15 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
+$Form->begin_fieldset( T_('Workflow').get_manual_link( 'coll-workflow-settings' ) );
+
+	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
+
+	$Form->checkbox( 'blog_use_deadline', $edited_Blog->get_setting( 'use_deadline' ), T_('Options'), T_('Use deadline.'), '', 1, ! $edited_Blog->get_setting( 'use_workflow' ) );
+
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 
 	// Display the 3 orderby fields with order direction
@@ -373,4 +382,9 @@ function disable_selected_orderby_options()
 		}
 	} );
 }
+
+jQuery( 'input[name=blog_use_workflow]' ).click( function()
+{	// Disable setting "Use deadline" when setting "Use workflow" is unchecked:
+	jQuery( 'input[name=blog_use_deadline]' ).prop( 'disabled', ! jQuery( this ).is( ':checked' ) );
+} );
 </script>
