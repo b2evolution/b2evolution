@@ -485,6 +485,7 @@ switch( $action )
 				'country'     => $new_User->get( 'ctry_ID' ),
 				'reg_country' => $new_User->get( 'reg_ctry_ID' ),
 				'reg_domain'  => $user_domain.' ('.$dom_status.')',
+				'user_domain' => $user_domain,
 				'firstname'   => $firstname,
 				'lastname'    => $lastname,
 				'fullname'    => $new_User->get( 'fullname' ),

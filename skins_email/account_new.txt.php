@@ -21,6 +21,7 @@ $params = array_merge( array(
 		'country'     => '',
 		'reg_country' => '',
 		'reg_domain'  => '',
+		'user_domain' => '',
 		'fullname'    => '',
 		'gender'      => '',
 		'locale'      => '',
@@ -54,7 +55,8 @@ if( $params['reg_country'] > 0 )
 
 if( ! empty( $params['reg_domain'] ) )
 {	// Domain field is entered:
-	echo T_('Registration Domain').": ".$params['reg_domain']."\n";
+	echo T_('Registration Domain').": ".$params['reg_domain'].
+			( ! empty( $params['user_domain'] ) ? ' '.$admin_url.'?ctrl=antispam&tab3=tools&tool=whois&query='.$params['user_domain'] : '' )."\n";
 }
 
 if( $params['country'] > 0 )

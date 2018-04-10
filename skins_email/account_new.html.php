@@ -21,6 +21,7 @@ $params = array_merge( array(
 		'country'     => '',
 		'reg_country' => '',
 		'reg_domain'  => '',
+		'user_domain' => '',
 		'fullname '   => '',
 		'gender'      => '',
 		'locale'      => '',
@@ -54,7 +55,10 @@ if( $params['reg_country'] > 0 )
 
 if( ! empty( $params['reg_domain'] ) )
 {	// Domain field is entered:
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['reg_domain'].'</td></tr>'."\n";
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').':</th>'.
+			'<td'.emailskin_style( 'table.email_table td' ).'>'.$params['reg_domain'].
+			( ! empty( $params['user_domain'] ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&tab3=tools&tool=whois&query='.$params['user_domain'], 'WHOIS', 'div.buttons a+a.button_gray' ) : '' ).
+			'</td></tr>'."\n";
 }
 
 if( $params['country'] > 0 )
