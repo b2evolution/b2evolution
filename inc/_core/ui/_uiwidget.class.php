@@ -696,6 +696,9 @@ jQuery( document ).ready( function()
 			remove_rule: 'fa fa-close',
 			error: 'fa fa-warning',
 		},
+		operators: [
+			{ type: 'blank', optgroup: 'custom', nb_inputs: 1, multiple: false, apply_to: ['string'] }
+		],
 		lang: {
 			operators: {
 				equal: '=',
@@ -708,6 +711,7 @@ jQuery( document ).ready( function()
 				not_between: '<?php echo TS_('not between'); ?>',
 				contains: '<?php echo TS_('contains'); ?>',
 				not_contains: '<?php echo TS_('doesn\'t contain'); ?>',
+				blank: ' ',
 			}
 		},
 		filters: [<?php echo implode( ',', $js_filters ); ?>],

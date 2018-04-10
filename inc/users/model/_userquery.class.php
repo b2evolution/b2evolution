@@ -809,21 +809,22 @@ class UserQuery extends FilterSQL
 	 */
 	function filter_field_criteria( $value, $operator )
 	{
-		if( ! preg_match( '#^(\d+):(.+)$#', $value, $m ) )
+		if( ! preg_match( '#^(\d+):(contains|not_contains):(.+)$#', $value, $m ) )
 		{	// Skip wrong value:
 			return;
 		}
 
 		$user_field_def_ID = intval( $m[1] );
-		$user_field_value = trim( strip_tags( $m[2] ) );
-		if( $user_field_def_ID <= 0 || $user_field_value == '' )
+		$user_field_operator = trim( strip_tags( $m[2] ) );
+		$user_field_value = trim( strip_tags( $m[3] ) );
+		if( $user_field_def_ID <= 0 || $user_field_value == '' || $user_field_operator == '' )
 		{	// Skip wrong value:
 			return;
 		}
 
 		global $DB;
 
-		switch( $operator )
+		switch( $user_field_operator )
 		{
 			case 'contains':
 				$word_operator = 'LIKE';
@@ -839,7 +840,7 @@ class UserQuery extends FilterSQL
 				break;
 
 			default:
-				debug_die( 'Unknown operator "'.$operator.'" for user searching by specific criteria' );
+				debug_die( 'Unknown operator "'.$user_field_operator.'" for user searching by specific criteria' );
 		}
 
 		$word_sql_conditions = array();
