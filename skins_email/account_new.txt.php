@@ -56,7 +56,7 @@ if( $params['reg_country'] > 0 )
 if( ! empty( $params['reg_domain'] ) )
 {	// Domain field is entered:
 	echo T_('Registration Domain').": ".$params['reg_domain'].
-			( ! empty( $params['user_domain'] ) ? ' '.$admin_url.'?ctrl=antispam&tab3=tools&tool=whois&query='.$params['user_domain'] : '' )."\n";
+			( ! empty( $params['user_domain'] ) ? ' '.$admin_url.'?ctrl=antispam&action=whois&query='.$params['user_domain'] : '' )."\n";
 }
 
 if( $params['country'] > 0 )

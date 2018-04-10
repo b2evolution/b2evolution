@@ -13,21 +13,21 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$query = param( 'query', 'string' );
+global $template_action;
 
+$query = param( 'query', 'string', NULL );
 
-if( empty( $query ) )
+if( empty( $template_action ) )
 {
 	$Form = new Form( NULL, '', 'get' );
 
-	$Form->hidden( 'tab3', 'tools' );
-	$Form->hidden( 'tool', 'whois' );
+	$Form->hidden( 'action', 'whois' );
 	$Form->hidden_ctrl();
 
 	$Form->begin_form( 'fform' );
 
 	$Form->begin_fieldset( T_('Check domain registration (WHOIS)...') );
-	$Form->text_input( 'query', '0.0.0.0', 50, T_('Enter IP address or domain to query'), '', array( 'maxlength' => 255 ) );
+	$Form->text_input( 'query', $query, 50, T_('Enter IP address or domain to query'), '', array( 'maxlength' => 255, 'required' => true ) );
 	$Form->end_fieldset();
 
 	$Form->end_form( array( array( 'submit', '', T_( 'Submit' ), 'SaveButton' ) ) );
