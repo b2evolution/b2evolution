@@ -439,6 +439,10 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 		$notify_options[ T_('Posts') ][] = array( 'edited_user_send_pst_moderation_reminder', 1, sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $Settings->get( 'post_moderation_reminder_threshold' ) ) ), $UserSettings->get( 'send_pst_moderation_reminder', $edited_User->ID ), $disabled );
 		$notify_options[ T_('Posts') ][] = array( 'edited_user_send_pst_stale_alert', 1, T_('there are stale posts and I have permission to moderate them.'), $UserSettings->get( 'send_pst_stale_alert', $edited_User->ID ), $disabled );
 	}
+	if( $edited_User->check_role( 'member' ) )
+	{ // user is member of at least one collection
+		$notify_options[ T_('Posts') ][] = array( 'edited_user_notify_post_assignment', 1, T_('a post was assigned to me.'), $UserSettings->get( 'notify_post_assignment', $edited_User->ID ), $disabled );
+	}
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ // current User is an administrator
 		$notify_options[ T_('My account') ][] = array( 'edited_user_send_activation_reminder', 1, sprintf( T_('my account was deactivated or is not activated for more than %s.').get_admin_badge( 'user' ), seconds_to_period( $Settings->get( 'activate_account_reminder_threshold' ) ) ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ) );
