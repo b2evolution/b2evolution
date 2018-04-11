@@ -584,7 +584,6 @@ class shortlinks_plugin extends Plugin
 		{	// Suggest to create new post from given word:
 			$before_wikiword = '<a'
 				.' href="#"'
-				.' title="'.format_to_output( T_('Create').'...', 'htmlattr' ).'"'
 				.' class="'.$class.'evo_shortlink_broken"'
 				// Add these data attributes in order to display this link only for user who can really create a post:
 				.' data-function="create_post" data-coll="'.$blog.'">';
@@ -630,7 +629,7 @@ class shortlinks_plugin extends Plugin
 		// display the source link but replace the source URL with new generated,
 		// because it may be different between back- and front-office and also between
 		// anonymous and logged in users (disp=edit vs disp=anonpost):
-		return preg_replace( '# href="[^"]+"#i', ' href="'.$new_post_url.'"', $matches[0] );
+		return preg_replace( '# href="[^"]+"#i', ' href="'.$new_post_url.'" title="'.format_to_output( T_('Create').'...', 'htmlattr' ).'"', $matches[0] );
 	}
 
 
