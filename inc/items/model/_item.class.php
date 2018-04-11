@@ -851,8 +851,9 @@ class Item extends ItemLight
 			}
 
 			// DEADLINE:
-			if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL )
-			{
+			if( $item_Blog->get_setting( 'use_deadline' ) &&
+			    param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL )
+			{	// Update deadline only when it is enabled for item's collection:
 				param_time( 'item_deadline_time', '', false, false, true, true );
 				$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
 				$this->set( 'datedeadline', trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) ), true );

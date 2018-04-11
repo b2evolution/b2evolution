@@ -60,7 +60,7 @@ if( ! empty( $user_domain ) )
 	$dom_status_titles = stats_dom_status_titles();
 	$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
 	echo T_('Registration Domain').": ".$user_domain.' ('.$dom_status.')'.
-			( ! empty( $user_domain ) ? ' '.$admin_url.'?ctrl=antispam&tab3=tools&tool=whois&query='.$user_domain : '' )."\n";
+			( ! empty( $user_domain ) ? ' '.$admin_url.'?ctrl=antispam&action=whois&query='.$user_domain : '' )."\n";
 }
 
 if( $activated_User->ctry_ID > 0 )

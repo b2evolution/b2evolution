@@ -647,15 +647,18 @@ $Form->begin_form( '', '', $params );
 
 			echo ' '; // allow wrapping!
 
-			$Form->begin_line( T_('Deadline'), 'item_deadline' );
+			if( $Blog->get_setting( 'use_deadline' ) )
+			{	// Display deadline fields only if it is enabled for collection:
+				$Form->begin_line( T_('Deadline'), 'item_deadline' );
 
-				$datedeadline = $edited_Item->get( 'datedeadline' );
-				$Form->date( 'item_deadline', $datedeadline, '' );
+					$datedeadline = $edited_Item->get( 'datedeadline' );
+					$Form->date( 'item_deadline', $datedeadline, '' );
 
-				$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
-				$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+					$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+					$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
 
-			$Form->end_line();
+				$Form->end_line();
+			}
 
 			$Form->switch_layout( NULL );
 			echo '</div>';

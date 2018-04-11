@@ -459,6 +459,21 @@ switch( $action )
 			$delete_bankruptcy_blogs = true;
 		}
 		break;
+
+	case 'whois':
+		$tab = '';
+		$tab3 = 'tools';
+		$tool = 'whois';
+		$query = param( 'query', 'string', NULL );
+		if( empty( $query ) )
+		{
+			param_error( 'query', T_('You must specify an IP address or domain to query') );
+		}
+		else
+		{
+			$template_action = 'whois';
+		}
+		break;
 }
 
 if( $display_mode != 'js' )

@@ -65,7 +65,7 @@ if( ! empty( $user_domain ) )
 	$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').': </th>'.
 			'<td'.emailskin_style( 'table.email_table td' ).'>'.$user_domain.' ('.$dom_status.')'.
-			( ! empty( $user_domain ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&tab3=tools&tool=whois&query='.$user_domain, 'WHOIS', 'div.buttons a+a.button_gray' ) : '' ).
+			( ! empty( $user_domain ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&action=whois&query='.$user_domain, 'WHOIS', 'div.buttons a+a.button_gray' ) : '' ).
 			'</td></tr>'."\n";
 }
 

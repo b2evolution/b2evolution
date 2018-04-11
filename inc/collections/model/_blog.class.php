@@ -828,11 +828,6 @@ class Blog extends DataObject
 			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
 		}
 
-		if( in_array( 'authors', $groups ) )
-		{ // we want to load the workflow & permissions params
-			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
-		}
-
 		if( in_array( 'home', $groups ) )
 		{ // we want to load the front page params:
 			$front_disp = param( 'front_disp', 'string', '' );
@@ -848,6 +843,12 @@ class Blog extends DataObject
 
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the posts related features:
+			$this->set_setting( 'use_workflow', param( 'blog_use_workflow', 'integer', 0 ) );
+			if( get_param( 'blog_use_workflow' ) )
+			{	// Update deadline setting only when workflow is enabled:
+				$this->set_setting( 'use_deadline', param( 'blog_use_deadline', 'integer', 0 ) );
+			}
+
 			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'string', NULL ) );
 
 			$this->set_setting( 'editing_goto_blog', param( 'editing_goto_blog', 'string', NULL ) );

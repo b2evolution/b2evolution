@@ -549,8 +549,8 @@ class Table extends Widget
 			$func = $this->{$area_name}['callback'];
 			$filter_fields = $func( $this->Form );
 
-			if( ! empty( $filter_fields ) && is_array( $filter_fields ) )
-			{	// Display filters:
+			if( is_admin_page() && ! empty( $filter_fields ) && is_array( $filter_fields ) )
+			{	// Display filters only in back-office because they require JavaScript plugin QueryBuilder:
 				$this->display_filter_fields( $this->Form, $filter_fields );
 			}
 
@@ -582,6 +582,24 @@ class Table extends Widget
 		{
 			$js_filter = array( 'id:\''.$field_ID.'\'' );
 
+			if( isset( $params['type'] ) )
+			{	// Set default params depending on field type:
+				switch( $params['type'] )
+				{
+					case 'date':
+						$params['operators'] = '=,!=,>,>=,<,<=,between,not_between';
+						$params['plugin'] = 'datepicker';
+						$params['plugin_config'] = array(
+							'dateFormat'  => jquery_datepicker_datefmt(),
+							'monthNames'  => jquery_datepicker_month_names(),
+							'dayNamesMin' => jquery_datepicker_day_names(),
+							'firstDay'    => locale_startofweek(),
+						);
+						$params['validation'] = array( 'format' => strtoupper( jquery_datepicker_datefmt() ) );
+						break;
+				}
+			}
+
 			if( ! isset( $params['operators'] ) )
 			{	// Use default operator if it is not defined:
 				$params['operators'] = '=';
@@ -607,6 +625,18 @@ class Table extends Widget
 									case '<>':
 										$operators[ $o ] = 'not_equal';
 										break;
+									case '<':
+										$operators[ $o ] = 'less';
+										break;
+									case '<=':
+										$operators[ $o ] = 'less_or_equal';
+										break;
+									case '>':
+										$operators[ $o ] = 'greater';
+										break;
+									case '>=':
+										$operators[ $o ] = 'greater_or_equal';
+										break;
 								}
 							}
 							$param_value = '[\''.implode( '\',\'', $operators ).'\']';
@@ -627,7 +657,16 @@ class Table extends Widget
 							$param_values = array();
 							foreach( $param_value as $sub_param_name => $sub_param_value )
 							{
-								$param_values[] = $sub_param_name.':'.( $sub_param_value == 'true' ? 'true' : '\''.format_to_js( $sub_param_value ).'\'' );
+								if( $sub_param_value == 'true' || $sub_param_value == 'false' ||
+								    strpos( $sub_param_value, '[' ) === 0 )
+								{	// This is a not string value:
+									$sub_param_value = $sub_param_value;
+								}
+								else
+								{	// This is a string value:
+									$sub_param_value = '\''.format_to_js( $sub_param_value ).'\'';
+								}
+								$param_values[] = $sub_param_name.':'.$sub_param_value;
 							}
 							$param_value = '{'.implode( ',', $param_values ).'}';
 						}
@@ -640,13 +679,6 @@ class Table extends Widget
 				$js_filter[] = $param_name.':'.$param_value;
 			}
 			$js_filters[] = '{'.implode( ',', $js_filter ).'}';
-		}
-
-		// Prefill the filter fields from request:
-		$js_filter_values = param( 'filter_query', 'string' );
-		if( ! empty( $js_filter_values ) )
-		{
-			$js_filter_values = 'rules: '.$js_filter_values;
 		}
 ?>
 <script type="text/javascript">
@@ -664,6 +696,9 @@ jQuery( document ).ready( function()
 			remove_rule: 'fa fa-close',
 			error: 'fa fa-warning',
 		},
+		operators: [
+			{ type: 'blank', optgroup: 'custom', nb_inputs: 1, multiple: false, apply_to: ['string'] }
+		],
 		lang: {
 			operators: {
 				equal: '=',
@@ -672,12 +707,15 @@ jQuery( document ).ready( function()
 				less_or_equal: '&#8804;',
 				greater: '>',
 				greater_or_equal: '&#8805;',
-				'contains': '<?php echo TS_('contains'); ?>',
-				'not_contains': '<?php echo TS_('doesn\'t contain'); ?>',
+				between: '<?php echo TS_('between'); ?>',
+				not_between: '<?php echo TS_('not between'); ?>',
+				contains: '<?php echo TS_('contains'); ?>',
+				not_contains: '<?php echo TS_('doesn\'t contain'); ?>',
+				blank: ' ',
 			}
 		},
 		filters: [<?php echo implode( ',', $js_filters ); ?>],
-		<?php echo $js_filter_values; ?>
+		rules: <?php echo param_format_condition( param_condition( 'filter_query' ), 'js' ); ?>,
 	} );
 
 	// Prepare form before submitting:

@@ -3522,26 +3522,31 @@ function callback_filter_userlist( & $Form )
 
 	// Specific criteria:
 	$Form->output = false;
+	$Form->switch_layout( 'none' );
 	global $user_fields_empty_name;
 	$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
-	$criteria_input = $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
-	$criteria_input = $Form->select( 'criteria_type[]', '', 'callback_options_user_new_fields', '', $criteria_input );
+	$criteria_input = $Form->select_input_array( 'criteria_operator[]', '', array( 'contains' => T_('contains'), 'not_contains' => T_('doesn\'t contain') ), '' );
+	$criteria_input .= $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
+	$criteria_input = $Form->select_input( 'criteria_type[]', '', 'callback_options_user_new_fields', '', array( 'field_suffix' => $criteria_input ) );
+	$Form->switch_layout( NULL );
 	$Form->output = true;
 	$filters['criteria'] = array(
 			'label' => T_('Specific criteria'),
-			'operators' => 'contains,not_contains',
+			'operators' => 'blank',
 			'input' => 'function( rule, input_name ) { return \''.format_to_js( $criteria_input ).'\'; }',
 			'validation' => array( 'allow_empty_value' => 'true' ),
 			'valueGetter' => 'function( rule )
 				{
 					return rule.$el.find(".rule-value-container [name^=criteria_type]").val()
+						+ ":" + rule.$el.find(".rule-value-container [name^=criteria_operator]").val()
 						+ ":" + rule.$el.find(".rule-value-container [name^=criteria_value]").val();
 				}',
 			'valueSetter' => 'function( rule, value )
 				{
 					var val = value.split( ":" );
 					rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
-					rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[1] ).trigger( "change" );
+					rule.$el.find( ".rule-value-container [name^=criteria_operator]" ).val( val[1] ).trigger( "change" );
+					rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[2] ).trigger( "change" );
 				}'
 		);
 
@@ -3631,6 +3636,22 @@ function load_cities( country_ID, region_ID, subregion_ID )
 }
 </script>
 <?php
+	}
+
+	if( $current_User->check_perm( 'users', 'moderate' ) )
+	{	// If current user can moderate other users:
+
+		// User last seen:
+		$filters['lastseen'] = array(
+				'label' => T_('User last seen'),
+				'type'  => 'date',
+			);
+
+		// Registration source:
+		$filters['source'] = array(
+				'label' => T_('Registration source'),
+				'operators' => 'contains,not_contains',
+			);
 	}
 
 	return $filters;

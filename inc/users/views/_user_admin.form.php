@@ -375,7 +375,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 	$Form->begin_line( T_('Account registered on'), NULL, 'info' );
 		$Form->info_field( '', mysql2localedatetime( $edited_User->dget('datecreated') ), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
 		$Form->info_field( '<b class="evo_label_inline">'.T_('From IP').': </b>',
-			$user_ip_address.( empty( $user_ip_address ) ? '' : ' <a href="'.$admin_url.'?ctrl=antispam&amp;tab3=tools&amp;tool=whois&amp;query='.$user_ip_address.'" class="btn btn-info middle" onclick="return get_whois_info(\''.$user_ip_address.'\');">'.get_icon( 'magnifier' ).'</a>' ) );
+			$user_ip_address.( empty( $user_ip_address ) ? '' : ' <a href="'.$admin_url.'?ctrl=antispam&amp;action=whois&amp;query='.$user_ip_address.'" class="btn btn-info middle" onclick="return get_whois_info(\''.$user_ip_address.'\');">'.get_icon( 'magnifier' ).'</a>' ) );
 	$Form->end_line( NULL, 'info' );
 
 	if( $current_User->check_perm( 'spamblacklist', 'view' ) )
