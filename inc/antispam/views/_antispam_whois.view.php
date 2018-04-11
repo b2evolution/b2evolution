@@ -1,13 +1,13 @@
 <?php
 /**
- * This file implements the UI for image resizing tool
+ * This file implements the UI for WHOIS query tool
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2017 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -46,6 +46,4 @@ else
 	echo '<a href="'.regenerate_url( 'query' ).'" class="btn btn-primary">'.T_('Check another domain registration').'</a>';
 	echo '</div>';
 }
-
-
 ?>
