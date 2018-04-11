@@ -791,7 +791,15 @@ while( $Item = & $ItemList->get_item() )
 
 				if( $Blog->get_setting( 'use_deadline' ) )
 				{	// Display deadline fields only if it is enabled for collection:
-					$Form->date( 'item_deadline', $Item->get('datedeadline'), T_('Deadline') );
+					$Form->begin_line( T_('Deadline'), 'item_deadline' );
+
+						$datedeadline = $Item->get( 'datedeadline' );
+						$Form->date( 'item_deadline', $datedeadline, '' );
+
+						$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+						$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+
+					$Form->end_line();
 				}
 
 				$Form->button( array( 'submit', 'actionArray[update_workflow]', T_('Update'), 'SaveButton' ) );

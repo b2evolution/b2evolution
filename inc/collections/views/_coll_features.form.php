@@ -31,14 +31,6 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Workflow').get_manual_link( 'coll-workflow-settings' ) );
-
-	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
-
-	$Form->checkbox( 'blog_use_deadline', $edited_Blog->get_setting( 'use_deadline' ), T_('Options'), T_('Use deadline.'), '', 1, ! $edited_Blog->get_setting( 'use_workflow' ) );
-
-$Form->end_fieldset();
-
 
 $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 
@@ -308,6 +300,14 @@ if( $notifications_mode != 'off' )
 
 $Form->begin_fieldset( T_('Aggregation').get_admin_badge().get_manual_link('collection_aggregation_settings') );
 	$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Collections to aggregate'), T_('List collection IDs separated by \',\', \'*\' for all collections or leave empty for current collection.').'<br />'.T_('Note: Current collection is always part of the aggregation.'), 255 );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Workflow').get_manual_link( 'coll-workflow-settings' ) );
+
+	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
+
+	$Form->checkbox( 'blog_use_deadline', $edited_Blog->get_setting( 'use_deadline' ), T_('Options'), T_('Use deadline.'), '', 1, ! $edited_Blog->get_setting( 'use_workflow' ) );
+
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
