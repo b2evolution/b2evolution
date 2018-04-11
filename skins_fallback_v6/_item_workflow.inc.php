@@ -17,6 +17,7 @@ global $disp;
 
 if( ( $disp == 'single' || $disp == 'page' ) &&
     isset( $Item ) && $Item->ID > 0 &&
+    ! $Item->can_meta_comment() && // If user can write meta comment then we display the workflow form in the meta comment form instead of here
     is_logged_in() &&
     $Blog->get_setting( 'use_workflow' ) &&
     $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
@@ -56,7 +57,9 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 
 	$ItemStatusCache = & get_ItemStatusCache();
 	$ItemStatusCache->load_all();
-	$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true ), T_('Task status') );
+	$ItemTypeCache = & get_ItemTypeCache();
+	$current_ItemType = & $Item->get_ItemType();
+	$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
 
 	if( $Blog->get_setting( 'use_deadline' ) )
 	{	// Display deadline fields only if it is enabled for collection:
