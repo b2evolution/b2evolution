@@ -20,6 +20,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Plugins;
 
+// JS code for fieldset folding:
+echo_fieldset_folding_js();
+
 $Form = new Form( NULL, 'msg_settings_renderers' );
 
 $Form->begin_form( 'fform', '' );
@@ -71,5 +74,8 @@ if( !empty( $plugins_settings_content ) )
 $Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 $Form->end_form();
+
+// Init JS for fieldset folding:
+init_fieldset_folding_js();
 
 ?>

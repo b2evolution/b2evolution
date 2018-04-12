@@ -9,20 +9,39 @@ This version should not be installed on a production server.
 
 This branch contains support for a feature not available in the Official Branch:
 
-Fixes for dynamic types: array:array:string
-Support for new dynamic type: select_input
-Support for nested dynamic types
+- Fixes for dynamic types: array:array:string
+- Support for new dynamic type: select_input
+- Support for nested dynamic types
 
 # Configurations:
 
-type			= 'select_input'
-max_number		= 4
-use_fieldset 	= true | false 
-fold			= true | false
+- type			= select_input
+- max_number	= 4
+- use_fieldset 	= true
+- false 
+- fold			= true
+- false
 
 # Supports:
 
-'select' | 'integer' | 'html_input' | 'html_textarea' | 'textarea' | 'text' | 'checkbox' | 'checklist' | 'radio' | 'fileselect' | 'password' | 'info' | 'color' | 'input_group'
+- 'select'
+- 'integer'
+- 'html_input'
+- 'html_textarea'
+- 'textarea'
+- 'text'
+- 'checkbox'
+- 'checklist'
+- 'radio'
+- 'fileselect'
+- 'password'
+- 'info'
+- 'color'
+- 'input_group'
+
+# Issues:
+
+- Skin Settings Not Supported yet
 
 ## A complete engine for your website !
 

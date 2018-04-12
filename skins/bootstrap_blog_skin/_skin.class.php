@@ -109,7 +109,195 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		global $app_version;
 		$r = array_merge( array(
+			
+			
+
+
+					'input_item_1' => array(
+					'label' 		=> T_('Select Input'),
+					'note' 			=> T_('Your note'),
+					'multiple' 		=> true, 
+					'max_number' 	=> 4,
+					'use_fieldset' 	=> true, 
+					'fold' 			=> true, 
+					'type' 			=> 'select_input',
+					'entries' 		=> array(
+
+									'_vagtables' => array(
+										'label' 		=> T_('Vegtables'),
+										'type' 			=> 'input_group',
+										'inputs' 		=> array(
+
+
+														'_value' => array(
+																			'label' => T_('Value'),
+																			'defaultvalue' => '',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+														'_label' => array(
+																			'label' => T_('Label'),
+																			'defaultvalue' => '',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+
+								)),
+									'_fruits' => array(
+										'label' 		=> T_('Fruits'),
+										'type' 			=> 'input_group',
+										'inputs' 		=> array(
+
+
+														'_value' => array(
+																			'label' => T_('Value'),
+																			'defaultvalue' => '',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+														'_label' => array(
+																			'label' => T_('Label'),
+																			'defaultvalue' => '',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+
+								)),
+
+
+
+
+			)),
+
+
+
+
+							'plugin_sets'	=> array(
+												'label'			=> T_('Dynamic Fields'),
+												'note'			=> T_('Click to add another field item'),
+												// limited by array:array:string therefore html_textarea won't work
+												'type'			=> version_compare( $app_version, '6.6.5', '>' ) ? 'array:array:string' : 'array',
+												'max_number'		=> 3,
+												'fold' => true,
+												'entries'		=> array(
+
+
+
+
+					'input_item_1' => array(
+					'label' 		=> T_('Select Input'),
+					'note' 			=> T_('Your note'),
+					'multiple' 		=> true, 
+					'max_number' 	=> 4,
+					'use_fieldset' 	=> true, 
+					'fold' 			=> true, 
+					'type' 			=> 'select_input',
+					'entries' 		=> array(
+
+									'_color' => array(
+										'label' 		=> T_('Color'),
+										'type' 			=> 'input_group',
+										'inputs' 		=> array(
+
+
+														'_value' => array(
+																			'label' => T_('Color'),
+																			'defaultvalue' => '#444444',
+																			'type' => 'color',
+																			//'allow_empty' => false,
+																		),
+														'_label' => array(
+																			'label' => T_('Color'),
+																			'defaultvalue' => '#444444',
+																			'type' => 'color',
+																			//'allow_empty' => false,
+																		),
+
+								)),
+									'_vagtables' => array(
+										'label' 		=> T_('Vegtables'),
+										'type' 			=> 'input_group',
+										'inputs' 		=> array(
+
+
+														'_value' => array(
+																			'label' => T_('Value'),
+																			'defaultvalue' => '',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+														'_label' => array(
+																			'label' => T_('Label'),
+																			'defaultvalue' => '',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+
+								)),
+									'_fruits' => array(
+										'label' 		=> T_('Fruits'),
+										'type' 			=> 'input_group',
+										'inputs' 		=> array(
+
+
+														'_value' => array(
+																			'label' => T_('Value'),
+																			'defaultvalue' => '',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+														'_label' => array(
+																			'label' => T_('Label'),
+																			'defaultvalue' => '',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+
+								)),
+
+
+
+
+			)),
+
+
+
+
+					'input_item_3' => array(
+					'label' 		=> T_('Select Input'),
+					'note' 			=> T_('Your note'),
+					'multiple' 		=> true, 
+					'max_number' 	=> 4,
+					'use_fieldset' 	=> false, 
+					'fold' 			=> true, 
+					'type' 			=> 'select_input',
+					'entries' 		=> array(
+
+									'_vagtables' => array(
+										'label' 		=> T_('Vegtables'),
+										'type' 			=> 'input_group',
+										'inputs' 		=> array(
+
+
+														'_value' => array(
+																			'label' => T_('Value'),
+																			'defaultvalue' => '',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+														'_label' => array(
+																			'label' => T_('Label'),
+																			'defaultvalue' => '',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+								)),
+			)),
+	)),
+
+				
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')

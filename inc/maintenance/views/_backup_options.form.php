@@ -27,6 +27,9 @@ global $backup_paths, $backup_tables, $backup_path, $backup_exclude_folders;
  */
 $current_Backup = new Backup();
 
+// Fieldset folding
+echo_fieldset_folding_js();
+
 $Form->begin_fieldset( T_( 'Advanced backup options' ), array( 'id' => 'upgrade_backup_options', 'fold' => true ) );
 
 echo '<div id="clickdiv_backup_options">';
@@ -99,6 +102,6 @@ echo '</div>';
 
 $Form->end_fieldset();
 
-// Fieldset folding
-echo_fieldset_folding_js();
+// Init JS for fieldset folding:
+init_fieldset_folding_js();
 ?>

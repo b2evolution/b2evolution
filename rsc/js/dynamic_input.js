@@ -71,14 +71,14 @@ $.extend(InputSupport.prototype, {
 					
 					if( e.max_number !== 0 && i >= e.max_number  )
 					{ 
-						html = jQuery.parseHTML('<div class="alert alert-warning" id="ajax-running"><button type="button" class="close" data-dismiss="alert">x</button>' + e.max_msg + '</div>');
+						html = jQuery.parseHTML('<div class="alert alert-warning" id="max-messages"><button type="button" class="close" data-dismiss="alert">x</button>' + e.max_msg + '</div>');
 
 						jQuery(html).disableSelection();
 
 						$container.after(html);
 
-						$("#ajax-running").fadeTo(2000, 500).slideUp(500, function(){
-						$("#ajax-running").slideUp(500).remove();});
+						$("#max-messages").fadeTo(2000, 500).slideUp(500, function(){
+						$("#max-messages").slideUp(500);}).remove();
 						
 					}
 
@@ -141,7 +141,7 @@ ajax_call(e);
 						if($('#updating-'+x).length > 0 ){continue;}
 						html = jQuery.parseHTML( '<span id="updating-'+x+'" class="text-success" style="margin-left:15px;">Updated...</span>' );
 						jQuery( '#'+e.parname + '_'+x+'_title' ).after(html);
-						$('#updating-'+x).fadeTo(2000, 500).slideUp(500, function(){$('#updating-'+x).slideUp(500).remove();});	
+						$('#updating-'+x).fadeTo(2000, 500).slideUp(500, function(){$('#updating-'+x).slideUp(500);}).remove();	
 					}
 			},
 								  

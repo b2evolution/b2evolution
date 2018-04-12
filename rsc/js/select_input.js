@@ -129,10 +129,10 @@ $.extend(SelectInput.prototype, {
 								
 								var action_msg_container = jQuery( '#' + e.id + '_action_messages' );
 								
-								action_msg_container.html('<div class="alert alert-info" id="max_items_msg_' + this.id + '"><button type="button" class="close" data-dismiss="alert">x</button>' + e.max_msg + '</div>').disableSelection();
+								action_msg_container.html('<div class="alert alert-info" id="max_items_msg_' + e.id + '"><button type="button" class="close" data-dismiss="alert">x</button>' + e.max_msg + '</div>').disableSelection();
 								
-								$("#max_items_msg_" + this.id).fadeTo(4000, 500).slideUp(500, function(){
-    							$("#max_items_msg_" + this.id).slideUp(500).remove();});
+								$("#max_items_msg_" + e.id).fadeTo(4000, 500).slideUp(500, function(){
+    							$("#max_items_msg_" + e.id).slideUp(500).remove();});
 								
 								max_items_container.css({'display':''});
 								select_input_add.css({'display':'none'});

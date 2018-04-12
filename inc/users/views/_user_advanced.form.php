@@ -86,6 +86,9 @@ user_prevnext_links( array(
 	) );
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
+// Enable JS for fieldset folding:
+echo_fieldset_folding_js();
+
 $Form = new Form( NULL, 'user_checkchanges' );
 
 $Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
@@ -254,6 +257,6 @@ $Form->end_form();
 // End payload block:
 $this->disp_payload_end();
 
-// Enable JS for fieldset folding:
-echo_fieldset_folding_js();
+// Init JS for fieldset folding:
+init_fieldset_folding_js();
 ?>

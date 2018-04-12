@@ -34,6 +34,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
 {	
 	global $debug;
+	global $Blog;
 	static $has_array_type;
 	
 	if( ! is_array( $parmeta ) )

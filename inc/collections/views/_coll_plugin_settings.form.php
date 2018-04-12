@@ -28,6 +28,9 @@ global $Plugins;
 global $current_User, $admin_url;
 $plugin_group = param( 'plugin_group', 'string', 'rendering' );
 
+// Enable JS for fieldset folding:
+echo_fieldset_folding_js();
+
 $Form = new Form( NULL, 'plugin_settings_checkchanges', 'post', 'accordion' );
 
 // PluginUserSettings
@@ -133,6 +136,6 @@ else
 	$Form->end_form();
 }
 
-// Enable JS for fieldset folding:
-echo_fieldset_folding_js();
+// Init JS for fieldset folding:
+init_fieldset_folding_js();
 ?>
