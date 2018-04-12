@@ -99,27 +99,26 @@ $ItemList->cols[] = array(
 						'extra' => array( 'rel' => '#post_ID#', 'data-post-type' => '#post_ityp_ID#', 'format_to_output' => false )
 					);
 
-
-/**
- * Deadline
- */
-function deadline( $date )
-{
-	$timestamp = mysql2timestamp( $date );
-
-	if( $timestamp <= 0 )
+if( $Blog->get_setting( 'use_deadline' ) )
+{	// Display deadline column only when it is enabled for collection:
+	function deadline( $date )
 	{
-		return '&nbsp;';	// IE needs that crap in order to display cell border :/
-	}
+		$timestamp = mysql2timestamp( $date );
 
-	return mysql2localedate( $date );
-}
-$ItemList->cols[] = array(
+		if( $timestamp <= 0 )
+		{
+			return '&nbsp;';	// IE needs that crap in order to display cell border :/
+		}
+
+		return mysql2localedate( $date );
+	}
+	$ItemList->cols[] = array(
 						'th' => T_('Deadline'),
 						'order' => 'post_datedeadline',
 						'td_class' => 'shrinkwrap tskst_$post_pst_ID$',
 						'td' => '%deadline( #post_datedeadline# )%',
 					);
+}
 
 
 $ItemList->cols[] = array(

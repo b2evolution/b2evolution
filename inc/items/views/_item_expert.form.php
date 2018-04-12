@@ -640,22 +640,24 @@ $Form->begin_form( '', '', $params );
 
 			$ItemStatusCache = & get_ItemStatusCache();
 			$ItemStatusCache->load_all();
-
 			$ItemTypeCache = & get_ItemTypeCache();
-			$current_ItemType = $ItemTypeCache->get_by_ID( $edited_Item->ityp_ID );
+			$current_ItemType = & $edited_Item->get_ItemType();
 			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
 
 			echo ' '; // allow wrapping!
 
-			$Form->begin_line( T_('Deadline'), 'item_deadline' );
+			if( $Blog->get_setting( 'use_deadline' ) )
+			{	// Display deadline fields only if it is enabled for collection:
+				$Form->begin_line( T_('Deadline'), 'item_deadline' );
 
-				$datedeadline = $edited_Item->get( 'datedeadline' );
-				$Form->date( 'item_deadline', $datedeadline, '' );
+					$datedeadline = $edited_Item->get( 'datedeadline' );
+					$Form->date( 'item_deadline', $datedeadline, '' );
 
-				$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
-				$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+					$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+					$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
 
-			$Form->end_line();
+				$Form->end_line();
+			}
 
 			$Form->switch_layout( NULL );
 			echo '</div>';

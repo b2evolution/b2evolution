@@ -59,6 +59,7 @@ class Form extends Widget
 	 *
 	 * - 'note': The note associated with the field.
 	 * - 'note_format': The format of the note. %s gets replaced by the note.
+	 * - 'bottom_note_format': The format of the note. %s gets replaced by the note.
 	 * - 'label': The label for the field.
 	 * - 'required': is the element required to be filled/checked? This will add a visual hint (boolean; default: false)
 	 *
@@ -258,6 +259,7 @@ class Form extends Widget
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend'        => '</div>',
 				);
 				$layout = 'fieldset';
@@ -310,6 +312,7 @@ class Form extends Widget
 					$this->customstart    = $template['customstart'];
 					$this->customend      = $template['customend'];
 					$this->note_format    = $template['note_format'];
+					$this->bottom_note_format = $template['bottom_note_format'];
 					$this->formend        = $template['formend'];
 					// Additional params depending on field type:
 					$template = array_merge( array(
@@ -421,6 +424,7 @@ class Form extends Widget
 					$this->customstart    = '<tr><td colspan="2" class="custom_content">';
 					$this->customend      = "</td></tr>\n";
 					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->bottom_note_format = ' <div><span class="notes">%s</span></div>';
 					$this->formend        = "</table>\n";
 					// Additional params depending on field type:
 					// - checkbox
@@ -468,6 +472,7 @@ class Form extends Widget
 					$this->customstart    = '<div class="custom_content">';
 					$this->customend      = "</div>\n";
 					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->bottom_note_format = ' <div><span class="notes">%s</span></div>';
 					$this->formend        = '</div>';
 					// Additional params depending on field type:
 					// - checkbox
@@ -516,6 +521,7 @@ class Form extends Widget
 					$this->customstart    = '';
 					$this->customend      = "\n";
 					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->bottom_note_format    = ' <div><span class="notes">%s</span></div>';
 					$this->formend        = '';
 					// Additional params depending on field type:
 					// - checkbox
@@ -564,6 +570,7 @@ class Form extends Widget
 					$this->customstart    = '';
 					$this->customend      = '';
 					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->bottom_note_format = ' <div><span class="notes">%s</span></div>';
 					$this->formend        = '';
 					// Additional params depending on field type:
 					// - checkbox
@@ -613,6 +620,7 @@ class Form extends Widget
 					$this->customstart    = '';
 					$this->customend      = "\n";
 					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->bottom_note_format = ' <div><span class="notes">%s</span></div>';
 					$this->formend        = '';
 					// Additional params depending on field type:
 					// - checkbox
@@ -666,6 +674,7 @@ class Form extends Widget
 	 *    customstart
 	 *    customend
 	 *    note_format
+	 *    bottom_note_format
 	 *    formend
 	 */
 	function switch_template_parts( $parts )
@@ -806,6 +815,11 @@ class Form extends Widget
 				$this->_common_params['note_format'] = str_replace( 'class="', 'class="oneline ', $this->_common_params['note_format'] );
 			}
 			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
+		}
+
+		if( !empty($this->_common_params['bottom_note'] ) )
+		{
+			$r .= sprintf( $this->_common_params['bottom_note_format'], $this->_common_params['bottom_note'] );
 		}
 
 		if( isset($this->_common_params['field_suffix']) )
@@ -1217,6 +1231,7 @@ class Form extends Widget
 
 		$field_params = array_merge( array(
 				'note_format' => ' <small class="notes">%s</small>',
+				'bottom_note_format' => ' <div><small class="notes">%s</small></div>',
 			), $field_params );
 
 		if( isset($field_params['format_info']) )
@@ -1266,6 +1281,11 @@ class Form extends Widget
 		if( !empty($this->_common_params['note']) )
 		{ // We have a note
 			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
+		}
+
+		if( !empty($this->_common_params['bottom_note']) )
+		{
+			$r .= sprintf( $this->_common_params['bottom_note_format'], $this->_common_params['bottom_note'] );
 		}
 
 		if( isset($this->_common_params['field_suffix']) )
@@ -3827,6 +3847,16 @@ class Form extends Widget
 	}
 
 
+	/**
+	 * Generate a file select field
+	 *
+	 * @param string The name of the input field
+	 * @param string Initial value
+	 * @param string Label displayed with the field
+	 * @param string "help" note
+	 * @param array Extended attributes/params
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
 	function fileselect( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
 	{
 		global $thumbnail_sizes, $file_select_js_initialized;
@@ -4104,6 +4134,72 @@ class Form extends Widget
 
 			$file_select_js_initialized = true;
 			return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Generate a tag text input
+	 */
+	function usertag_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $tag_input_js_initialized;
+
+		$field_params = array_merge( array(
+			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 100%">',
+			'input_suffix' => '</div>',
+		), $field_params );
+
+		$save_output = $this->output;
+		$this->output = false;
+
+		$r = $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params );	// TEMP: Note already in params
+
+		if( ! isset( $tag_input_js_initialized ) )
+		{
+			$r .= '<script type="text/javascript">
+						function init_autocomplete_tags( selector )
+						{
+							var tags = jQuery( selector ).val();
+							var tags_json = new Array();
+							if( tags.length > 0 )
+							{ // Get tags from <input>
+								tags = tags.split( \',\' );
+								for( var t in tags )
+								{
+									tags_json.push( { id: tags[t], name: tags[t] } );
+								}
+							}
+
+							jQuery( selector ).tokenInput( \''.get_restapi_url().'usertags\',
+							{
+								theme: \'facebook\',
+								queryParam: \'s\',
+								propertyToSearch: \'name\',
+								tokenValue: \'name\',
+								preventDuplicates: true,
+								prePopulate: tags_json,
+								hintText: \''.TS_('Type in a tag').'\',
+								noResultsText: \''.TS_('No results').'\',
+								searchingText: \''.TS_('Searching...').'\',
+								jsonContainer: \'tags\',
+							} );
+						}
+						</script>';
+			$tag_input_js_initialized = true;
+		}
+
+		$r .= '<script type="text/javascript">
+					jQuery( document ).ready( function()
+					{
+						jQuery( "#'.format_to_js( $field_name ).'" ).hide();
+						init_autocomplete_tags( "#'.format_to_js( $field_name ).'" );'.
+						get_prevent_key_enter_js( '#token-input-'.$field_name ).'
+					} );
+					</script>';
+
+		$this->output = $save_output;
+
+		return $this->display_or_return( $r );
 	}
 
 
@@ -4405,6 +4501,16 @@ class Form extends Widget
 			$this->_common_params['note'] = NULL;
 		}
 
+		if( isset($field_params['bottom_note']) )
+		{
+			$this->_common_params['bottom_note'] = $field_params['bottom_note'];
+			unset($field_params['bottom_note']); // no HTML attribute
+		}
+		else
+		{
+			$this->_common_params['bottom_note'] = NULL;
+		}
+
 		if( isset($field_params['note_format']) )
 		{
 			$this->_common_params['note_format'] = $field_params['note_format'];
@@ -4413,6 +4519,16 @@ class Form extends Widget
 		else
 		{
 			$this->_common_params['note_format'] = $this->note_format;
+		}
+
+		if( isset($field_params['bottom_note_format']) )
+		{
+			$this->_common_params['bottom_note_format'] = $field_params['bottom_note_format'];
+			unset($field_params['bottom_note_format']); // no HTML attribute
+		}
+		else
+		{
+			$this->_common_params['bottom_note_format'] = $this->bottom_note_format;
 		}
 
 		if( isset($field_params['label']) )

@@ -143,6 +143,7 @@ $core_componentwidget_defs = array(
 			'user_avatars',
 			'org_members',
 			'user_login',
+			'user_greetings',
 			'user_register',
 			'newsletter_subscription',
 			'user_tools',

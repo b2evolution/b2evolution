@@ -9457,6 +9457,57 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12780, 'Upgrading cron logs table...' ) )
+	{	// part of 6.10.1-stable
+		db_modify_col( 'T_cron__log', 'clog_messages', 'MEDIUMTEXT' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12790, 'Upgrading for widgets "User log in"...' ) )
+	{	// part of 6.10.1-stable
+		$SQL = new SQL( 'Get widgets "User log in" to upgrade' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_sco_name, wi_order, wi_params' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->WHERE( 'wi_code = "user_login"' );
+		$login_widgets = $DB->get_results( $SQL );
+		foreach( $login_widgets as $login_widget )
+		{
+			$login_widget_params = @unserialize( $login_widget->wi_params );
+			if( ! $login_widget_params )
+			{
+				$login_widget_params = array();
+			}
+
+			if( $login_widget->wi_sco_name == 'Login Required' )
+			{	// Make form buttons larger only for login widgets of the container "Login Required":
+				$login_widget_params['login_button_class'] = 'btn btn-success btn-lg';
+				$login_widget_params['register_link_class'] = 'btn btn-primary btn-lg pull-right';
+				$DB->query( 'UPDATE T_widget
+					  SET wi_params = '.$DB->quote( serialize( $login_widget_params ) ).'
+					WHERE wi_ID = '.$DB->quote( $login_widget->wi_ID ) );
+			}
+			else
+			{	// Add greetings widget after each login widget from any other container:
+				// Firstly we should increase an order of next widgets to avoid error of unique order column:
+				$DB->query( 'UPDATE T_widget
+					  SET wi_order = wi_order + 1
+					WHERE wi_coll_ID = '.$DB->quote( $login_widget->wi_coll_ID ).'
+					  AND wi_sco_name = '.$DB->quote( $login_widget->wi_sco_name ).'
+					  AND wi_order > '.$DB->quote( $login_widget->wi_order ).'
+					ORDER BY wi_order DESC' );
+				// Insert the widget:
+				$login_widget_params['title'] = '';
+				$DB->query( 'INSERT INTO T_widget ( wi_coll_ID, wi_sco_name, wi_order, wi_code, wi_params )
+					VALUES ( '.$DB->quote( $login_widget->wi_coll_ID ).', '
+					.$DB->quote( $login_widget->wi_sco_name ).', '
+					.$DB->quote( $login_widget->wi_order + 1 ).', '
+					.'"user_greetings", '
+					.$DB->quote( serialize( $login_widget_params ) ).' )' );
+			}
+		}
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

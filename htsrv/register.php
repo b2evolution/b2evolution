@@ -111,11 +111,8 @@ switch( $action )
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
 
-		// Make sure email is valid first and that it only contains ASCII characters
-		if( ! is_email( $email )  )
-		{
-			param_error( $dummy_fields['email'], T_('The email address is invalid.') );
-		}
+		// Check email:
+		param_check_new_user_email( $dummy_fields['email'], $email );
 
 		if( $is_quick || $is_inline )
 		{	// We will need the following parameter for the session data that will be set later:
@@ -190,14 +187,6 @@ switch( $action )
 				$widget_newsletters = $user_register_Widget->disp_params['newsletters'];
 				$user_tags = $user_register_Widget->disp_params['usertags'];
 				$widget_redirect_to = trim( $user_register_Widget->disp_params['redirect_to'] );
-			}
-
-			if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $email ) ) ) )
-			{ // Don't allow the duplicate emails
-				$Messages->add( sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
-					'href="'.$Blog->get( 'loginurl' ).'"',
-					'href="'.$Blog->get( 'lostpasswordurl' ).'"' ), 'warning' );
-				break;
 			}
 
 			// Check what fields should be required by current widget
@@ -485,6 +474,7 @@ switch( $action )
 				'country'     => $new_User->get( 'ctry_ID' ),
 				'reg_country' => $new_User->get( 'reg_ctry_ID' ),
 				'reg_domain'  => $user_domain.' ('.$dom_status.')',
+				'user_domain' => $user_domain,
 				'firstname'   => $firstname,
 				'lastname'    => $lastname,
 				'fullname'    => $new_User->get( 'fullname' ),

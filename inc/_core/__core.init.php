@@ -709,6 +709,7 @@ class _core_Module extends Module
 			'comment_moderation_notif' => $def_notification,
 			'post_subscription_notif' => $def_notification,
 			'post_moderation_notif' => $def_notification,
+			'post_assignment_notif' => $def_notification,
 			'cross_country_allow_profiles' => $cross_country_settings_default,
 			'cross_country_allow_contact' => $cross_country_settings_default,
 			'perm_orgs' => $permorgs,
@@ -853,6 +854,9 @@ class _core_Module extends Module
 				),
 			'post_moderation_notif' => array_merge(
 				array( 'label' => T_( 'Post moderation notifications' ) ), $notifications_array
+				),
+			'post_assignment_notif' => array_merge(
+				array( 'label' => T_( 'Post assignment notifications' ) ), $notifications_array
 				),
 			'cross_country_allow_profiles' => array(
 				'label' => T_('Users'),

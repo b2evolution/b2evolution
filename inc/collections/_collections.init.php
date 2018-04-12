@@ -1414,7 +1414,6 @@ class collections_Module extends Module
 
 				// Email:
 				$user_email = param( $dummy_fields['email'], 'string' );
-				param_check_email( $dummy_fields['email'], true );
 
 				// Stop a request from the blocked IP addresses or Domains
 				antispam_block_request();
@@ -1433,12 +1432,8 @@ class collections_Module extends Module
 				// Set default status:
 				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status_anon' ) );
 
-				if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $user_email ) ) ) )
-				{	// Don't allow the duplicate emails for users:
-					$Messages->add_to_group( sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
-						'href="'.$item_Blog->get( 'loginurl' ).'"',
-						'href="'.$item_Blog->get( 'lostpasswordurl' ).'"' ), 'error', T_('Validation errors:') );
-				}
+				// Check email:
+				param_check_new_user_email( $dummy_fields['email'], $user_email, $item_Blog );
 
 				// Set item properties from submitted form:
 				$new_Item->load_from_Request( false, true );

@@ -73,6 +73,7 @@ $login_form_params = array(
 	'customstart'    => '<div class="custom_content">',
 	'customend'      => "</div>\n",
 	'note_format'    => ' <span class="help-inline">%s</span>',
+	'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 	// Additional params depending on field type:
 	// - checkbox
 	'inputclass_checkbox'    => '',

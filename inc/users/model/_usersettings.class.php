@@ -21,7 +21,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'settings/model/_abstractsettings.class.php', 'AbstractSettings' );
 
 /**
- * Class to handle the settings for users, and any user name-value pair which is not frequently used 
+ * Class to handle the settings for users, and any user name-value pair which is not frequently used
  *
  * @package evocore
  */
@@ -135,6 +135,7 @@ class UserSettings extends AbstractSettings
 		'notify_spam_cmt_moderation' => 1, // Notify when comment is reported as spam and the user has right to moderate that comment
 		'notify_post_moderation' => 1, // Notify when a new post is awaiting moderation and the user has right to moderate that post
 		'notify_edit_pst_moderation' => 1, // Notify when a edited post is awaiting moderation and the user has right to moderate that post
+		'notify_post_assignment' => 1, // Notify user when a post is assigned to the user
 		'notify_meta_comments' => 1, // Notify user when a META comment is published in a post where user can sees meta comments
 
 		'enable_PM' => 1,
@@ -298,7 +299,7 @@ class UserSettings extends AbstractSettings
 
 	/**
 	 * Reset a user settings to the default values
-	 * 
+	 *
 	 * @param integer user ID
 	 * @param boolean set to true to save modifications
 	 */

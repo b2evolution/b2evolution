@@ -2727,7 +2727,7 @@ function set_user_subscription( $user_ID, $blog, $items = NULL, $comments = NULL
 	$sub = get_user_subscription( $user_ID, $blog ); // Get default values
 
 	if( ( $items < 0 ) || ( $items > 1 ) ||
-	    ( $items_mod < 0 ) || ( $items_mod > 1 ) || 
+	    ( $items_mod < 0 ) || ( $items_mod > 1 ) ||
 	    ( $comments < 0 ) || ( $comments > 1 ) )
 	{	// Skip wrong values:
 		return false;
@@ -3366,6 +3366,8 @@ function callback_filter_userlist( & $Form )
 	global $Settings, $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
 	global $registered_min, $registered_max;
 
+	$filters = array();
+
 	$Form->hidden( 'filter', 'new' );
 
 	if( ! is_admin_page() && ! empty( $Blog ) && $Blog->get_setting( 'allow_access' ) == 'members' )
@@ -3493,18 +3495,20 @@ function callback_filter_userlist( & $Form )
 			$Form->end_line();
 		}
 	}
-	$Form->begin_line( T_('Has all these tags'), 'user_tag' );
-		$Form->text_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
-			'maxlength' => 255,
-			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
-			'input_suffix'=> '</div>'	) );
-		$Form->text_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
-			'maxlength' => 255,
-			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
-			'input_suffix'=> '</div>'	) );
-	$Form->end_line();
-	// Initialize JS to auto complete user tags fields:
-	echo_user_autocomplete_tags_js( '#user_tag, #not_user_tag' );
+
+	if( is_admin_page() && $current_User->check_perm( 'users', 'moderate' ) )
+	{	// Filter by user tags only on back-office and if current user can moderate other users:
+		$Form->begin_line( T_('Has all these tags'), 'user_tag' );
+			$Form->usertag_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
+				'maxlength' => 255,
+				'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
+				'input_suffix'=> '</div>' ) );
+			$Form->usertag_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
+				'maxlength' => 255,
+				'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
+				'input_suffix'=> '</div>' ) );
+		$Form->end_line();
+	}
 
 	if( is_admin_page() )
 	{
@@ -3528,37 +3532,35 @@ function callback_filter_userlist( & $Form )
 	}
 	echo '<br />';
 
-	$criteria_types = param( 'criteria_type', 'array:integer' );
-	$criteria_values = param( 'criteria_value', 'array:string' );
-
-	if( count( $criteria_types ) == 0 )
-	{	// Init one criteria fieldset for first time
-		$criteria_types[] = '';
-		$criteria_values[] = '';
-	}
-
-	foreach( $criteria_types as $c => $type )
-	{
-		$value = trim( strip_tags( $criteria_values[$c] ) );
-		if( $value == '' && count( $criteria_types ) > 1 && $c > 0 )
-		{	// Don't display empty field again after filter request
-			continue;
-		}
-
-		if( $c > 0 )
-		{	// Separator between criterias
-			echo '<br />';
-		}
-		$Form->output = false;
-		$criteria_input = $Form->text( 'criteria_value[]', $value, 17, '', '', 50 );
-		$criteria_input .= get_icon( 'add', 'imgtag', array( 'rel' => 'add_criteria' ) );
-		$Form->output = true;
-
-		global $user_fields_empty_name;
-		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
-
-		$Form->select( 'criteria_type[]', $type, 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
-	}
+	// Specific criteria:
+	$Form->output = false;
+	$Form->switch_layout( 'none' );
+	global $user_fields_empty_name;
+	$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
+	$criteria_input = $Form->select_input_array( 'criteria_operator[]', '', array( 'contains' => T_('contains'), 'not_contains' => T_('doesn\'t contain') ), '' );
+	$criteria_input .= $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
+	$criteria_input = $Form->select_input( 'criteria_type[]', '', 'callback_options_user_new_fields', '', array( 'field_suffix' => $criteria_input ) );
+	$Form->switch_layout( NULL );
+	$Form->output = true;
+	$filters['criteria'] = array(
+			'label' => T_('Specific criteria'),
+			'operators' => 'blank',
+			'input' => 'function( rule, input_name ) { return \''.format_to_js( $criteria_input ).'\'; }',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+			'valueGetter' => 'function( rule )
+				{
+					return rule.$el.find(".rule-value-container [name^=criteria_type]").val()
+						+ ":" + rule.$el.find(".rule-value-container [name^=criteria_operator]").val()
+						+ ":" + rule.$el.find(".rule-value-container [name^=criteria_value]").val();
+				}',
+			'valueSetter' => 'function( rule, value )
+				{
+					var val = value.split( ":" );
+					rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
+					rule.$el.find( ".rule-value-container [name^=criteria_operator]" ).val( val[1] ).trigger( "change" );
+					rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[2] ).trigger( "change" );
+				}'
+		);
 
 	if( user_region_visible() )
 	{	// JS functions for AJAX loading of regions, subregions & cities
@@ -3647,6 +3649,24 @@ function load_cities( country_ID, region_ID, subregion_ID )
 </script>
 <?php
 	}
+
+	if( $current_User->check_perm( 'users', 'moderate' ) )
+	{	// If current user can moderate other users:
+
+		// User last seen:
+		$filters['lastseen'] = array(
+				'label' => T_('User last seen'),
+				'type'  => 'date',
+			);
+
+		// Registration source:
+		$filters['source'] = array(
+				'label' => T_('Registration source'),
+				'operators' => 'contains,not_contains',
+			);
+	}
+
+	return $filters;
 }
 
 
@@ -4710,60 +4730,6 @@ function echo_userlist_tags_js()
 
 
 /**
- * JavaScript to initialize auto complete user tags
- *
- * @param String Selectors of JavaScript object
- */
-function echo_user_autocomplete_tags_js( $js_selectors )
-{
-?>
-	<script type="text/javascript">
-	function init_autocomplete_user_tags( selectors )
-	{
-		jQuery( selectors ).each( function()
-		{
-			var tags = jQuery( this ).val();
-			var tags_json = new Array();
-			if( tags.length > 0 )
-			{	// Get tags from <input>:
-				tags = tags.split( ',' );
-				for( var t in tags )
-				{
-					tags_json.push( { id: tags[t], name: tags[t] } );
-				}
-			}
-
-			jQuery( this ).tokenInput( '<?php echo get_restapi_url().'usertags' ?>',
-			{
-				theme: 'facebook',
-				queryParam: 's',
-				propertyToSearch: 'name',
-				tokenValue: 'name',
-				preventDuplicates: true,
-				prePopulate: tags_json,
-				hintText: '<?php echo TS_('Type in a tag') ?>',
-				noResultsText: '<?php echo TS_('No results') ?>',
-				searchingText: '<?php echo TS_('Searching...') ?>',
-				jsonContainer: 'tags',
-			} );
-		} );
-	}
-
-	jQuery( document ).ready( function()
-	{
-		jQuery( '<?php echo $js_selectors; ?>' ).hide();
-		init_autocomplete_user_tags( '<?php echo $js_selectors; ?>' );
-		<?php
-			// Don't submit a form by Enter when user is editing the tags:
-			echo get_prevent_key_enter_js( str_replace( '#', '#token-input-', $js_selectors ) );
-		?>
-	} );
-	</script>
-<?php
-}
-
-
-/**
  * Display user report form
  *
  * @param array Params
@@ -4847,8 +4813,6 @@ function user_report_form( $params = array() )
 		echo '<p><a href="'.$params['cancel_url'].'" class="btn btn-warning">'.T_('Cancel Report').'</a></p>';
 	}
 }
-
-
 
 
 /**
@@ -6203,8 +6167,8 @@ function users_results( & $UserList, $params = array() )
 				'th' => T_('List Status'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'nowrap',
-				'order' => 'enls_user_ID',
-				'td' => '~conditional( #enls_user_ID# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
+				'order' => 'enls_subscribed',
+				'td' => '~conditional( #enls_subscribed# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
 			);
 	}
 
@@ -6929,9 +6893,10 @@ function user_td_campaign_actions( $campaign_ID, $user_ID, $csnd_status )
 
 	if( $current_User->can_moderate_user( $user_ID ) )
 	{ // Current user can moderate this user
-		$r .= action_icon( T_('Queue again'), 'rewind', regenerate_url( 'ctrl,action,filter', 'ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient' ),
+		$redirect_to = rawurlencode( regenerate_url() );
+		$r .= action_icon( T_('Queue again'), 'rewind', $admin_url.'?ctrl=campaigns&amp;action=queue&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;'.url_crumb('campaign').'&amp;redirect_to='.$redirect_to,
 				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'ready_to_send', 'ready_to_resend' ) )  ? ' invisible' : '' ) ) );
-		$r .= action_icon( T_('Skip'), 'forward', regenerate_url( 'ctrl,action,filter', 'ctrl=campaigns&amp;action=skip&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;tab=recipient' ),
+		$r .= action_icon( T_('Skip'), 'forward', $admin_url.'?ctrl=campaigns&amp;action=skip&amp;ecmp_ID='.$campaign_ID.'&amp;user_ID='.$user_ID.'&amp;'.url_crumb('campaign').'&amp;redirect_to='.$redirect_to,
 				NULL, NULL, NULL, array( 'class' => 'action_icon'.( in_array( $csnd_status, array( 'sent', 'send_error', 'skipped' ) ) ? ' invisible' : '' ) ) );
 	}
 	else

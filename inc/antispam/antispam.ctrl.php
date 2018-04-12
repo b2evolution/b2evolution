@@ -459,6 +459,21 @@ switch( $action )
 			$delete_bankruptcy_blogs = true;
 		}
 		break;
+
+	case 'whois':
+		$tab = '';
+		$tab3 = 'tools';
+		$tool = 'whois';
+		$query = param( 'query', 'string', NULL );
+		if( empty( $query ) )
+		{
+			param_error( 'query', T_('You must specify an IP address or domain to query') );
+		}
+		else
+		{
+			$template_action = 'whois';
+		}
+		break;
 }
 
 if( $display_mode != 'js' )
@@ -607,6 +622,10 @@ switch( $tab3 )
 			case 'bankruptcy':
 				$comment_status = param( 'comment_status', 'string', 'draft' );
 				$AdminUI->disp_view( 'antispam/views/_antispam_tools_bankruptcy.view.php' );
+				break;
+
+			case 'whois';
+				$AdminUI->disp_view( 'antispam/views/_antispam_whois.view.php' );
 				break;
 
 			default:

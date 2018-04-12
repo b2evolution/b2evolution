@@ -55,7 +55,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			widget_container( 'page_top', array(
 					// The following params will be used as defaults for widgets included in this container:
 					'container_display_if_empty' => true, // Display container anyway even if no widget
-					'container_start'     => '<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
+					'container_start'     => '<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
 					'container_end'       => '</div></div>',
 					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
@@ -74,7 +74,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			widget_container( 'header', array(
 					// The following params will be used as defaults for widgets included in this container:
 					'container_display_if_empty' => true, // Display container anyway even if no widget
-					'container_start'   => '<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
+					'container_start'   => '<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
 					'container_end'     => '</div></div>',
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
@@ -181,7 +181,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	$post_urltitle = '';
 	if( ! empty( $requested_404_title ) )
 	{ // Set title & urltitle for new post
-		$post_title = str_replace( ' ', '%20', ucwords( str_replace( '-', ' ', $requested_404_title ) ) );
+		$post_title = ucwords( str_replace( '-', ' ', $requested_404_title ) );
 		$post_urltitle = $requested_404_title;
 	}
 

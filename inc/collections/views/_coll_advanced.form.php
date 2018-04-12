@@ -35,11 +35,6 @@ $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 
-$Form->begin_fieldset( T_('Workflow').get_manual_link('coll-workflow-settings') );
-	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
-$Form->end_fieldset();
-
-
 $Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_new_post') );
 	if( $edited_Blog->get_setting( 'allow_access' ) == 'users' )
 	{

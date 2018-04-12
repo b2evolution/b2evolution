@@ -2576,12 +2576,10 @@ a.btn.action_icon.hoverlink {
 .form-inline .form-control.large {
   width: 97%;
 }
-.form-inline .form-group,
-.form-inline #criteria_type_A2 {
+.form-inline .form-group {
   margin-top: 2px;
 }
-.form-inline .form-group.large,
-.form-inline #criteria_type_A2.large {
+.form-inline .form-group.large {
   width: 100%;
 }
 .evo_msgform_recipient label.control-label,
