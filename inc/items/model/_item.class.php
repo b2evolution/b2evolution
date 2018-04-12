@@ -994,6 +994,7 @@ class Item extends ItemLight
 		modules_call_method( 'update_item_settings', array( 'edited_Item' => $this ) );
 
 		// RENDERERS:
+		$item_Blog = & $this->get_Blog();
 		if( is_admin_page() || $item_Blog->get_setting( 'in_skin_editing_renderers' ) )
 		{	// If text renderers are allowed to update from front-office:
 			if( param( 'renderers_displayed', 'integer', 0 ) )
@@ -1175,7 +1176,12 @@ class Item extends ItemLight
 			{	// Update deadline only when it is enabled for item's collection:
 				param_time( 'item_deadline_time', '', false, false, true, true );
 				$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
-				$this->set( 'datedeadline', trim( form_date( get_param( 'item_deadline' ), $item_deadline_time.':00' ) ), true );
+				$item_deadline_datetime = trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) );
+				if( ! empty( $item_deadline_datetime ) )
+				{	// Append seconds because they are not entered on the form but they are stored in the DB field "post_datedeadline" as date format "YYYY-mm-dd HH:ii:ss":
+					$item_deadline_datetime .= ':00';
+				}
+				$this->set( 'datedeadline', $item_deadline_datetime, true );
 			}
 
 			// Return TRUE when no errors and ata least one workflow property has been changed:
@@ -7442,9 +7448,16 @@ class Item extends ItemLight
 	}
 
 
+	/**
+	 * Send "post assignment" notifications for user who have been assigned to this post and would like to receive these notifications.
+	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
+	 * @return array the notified user ids
+	 */
 	function send_assignment_notification( $executed_by_userid = NULL, $is_new_item = false )
 	{
-		global $current_User, $Messages, $UserSettings, $Debuglog;
+		global $current_User, $Messages, $UserSettings;
 
 		if( $executed_by_userid === NULL && is_logged_in() )
 		{	// Use current user by default:
@@ -7475,7 +7488,7 @@ class Item extends ItemLight
 
 				locale_temp_switch( $assigned_User->locale );
 
-				/* TRANS: Subject of the mail to send on new posts to assigned user. First %s is blog name, the second %s is the item's title. */
+				/* TRANS: Subject of the mail to send on assignment of posts to a user. First %s is blog name, the second %s is the item's title. */
 				$subject = T_('[%s] Post assignment: "%s"');
 				$subject = sprintf( $subject, $this->Blog->get('shortname'), $this->get('title') );
 
@@ -7493,7 +7506,7 @@ class Item extends ItemLight
 				return $notified_user_IDs;
 			}
 			else
-			{
+			{ // No valid assigned user or the user does not want to receive post assignment notifications
 				return NULL;
 			}
 		}

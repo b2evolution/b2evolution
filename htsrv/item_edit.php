@@ -288,7 +288,13 @@ switch( $action )
 		}
 
 		// UPDATE POST IN DB:
-		$edited_Item->dbupdate();
+		if( $edited_Item->dbupdate() )
+		{
+			if( $edited_Item->assigned_to_new_user && ! empty( $edited_Item->assigned_user_ID ) )
+			{ // Send post assignment notification
+				$edited_Item->send_assignment_notification();
+			}
+		}
 
 		// post post-publishing operations:
 		param( 'trackback_url', 'string' );
@@ -358,6 +364,11 @@ switch( $action )
 			if( $edited_Item->dbupdate() )
 			{	// Display a message on success result:
 				$Messages->add( T_('The workflow properties have been updated.'), 'success' );
+
+				if( $edited_Item->assigned_to_new_user && ! empty( $edited_Item->assigned_user_ID ) )
+				{ // Send post assignment notification
+					$edited_Item->send_assignment_notification();
+				}
 			}
 		}
 

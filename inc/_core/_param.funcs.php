@@ -918,6 +918,57 @@ function check_is_email( $email )
 
 
 /**
+ * Check email for new registering user
+ *
+ * @param string Email param name
+ * @param string Email param value
+ * @param object Collection
+ * @return boolean TRUE on success email address for new user
+ */
+function param_check_new_user_email( $var, $value = NULL, $link_Blog = NULL )
+{
+	global $DB;
+
+	if( $value === NULL )
+	{	// Try to get email value:
+		$value = param( $var, 'string' );
+	}
+
+	if( ! param_check_not_empty( $var, sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Email') ) ) )
+	{	// Email address cannot be empty for new registering user:
+		return false;
+	}
+
+	// Make sure email is valid first and that it only contains ASCII characters
+	if( $error_message = check_is_email( $value ) )
+	{
+		param_error( $var, $error_message );
+		return false;
+	}
+
+	$SQL = new SQL( 'Check if already registered user has the same email address on new user registration' );
+	$SQL->SELECT( 'user_ID' );
+	$SQL->FROM( 'T_users' );
+	$SQL->WHERE( 'user_email = '.$DB->quote( utf8_strtolower( $value ) ) );
+	$SQL->LIMIT( 1 );
+	if( $DB->get_var( $SQL ) )
+	{	// Don't allow the duplicate emails:
+		if( $link_Blog === NULL )
+		{
+			global $Blog;
+			$link_Blog = $Blog;
+		}
+		param_error( $var, sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
+			'href="'.( $link_Blog === NULL ? get_login_url( '' ) : $link_Blog->get( 'loginurl' ) ).'"',
+			'href="'.( $link_Blog === NULL ? get_lostpassword_url() : $link_Blog->get( 'lostpasswordurl' ) ).'"' ) );
+		return false;
+	}
+
+	return true;
+}
+
+
+/**
  * Check if the value is a valid login (in terms of allowed chars)
  *
  * @param string param name
