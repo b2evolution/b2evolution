@@ -5321,6 +5321,22 @@ class User extends DataObject
 			$update_success = true;
 			if( $is_new_user )
 			{
+				// Find and inform administrator about other users with same email address on creating new user from back-office:
+				$SQL = new SQL( 'Find other users with same email as new created user' );
+				$SQL->SELECT( 'user_login' );
+				$SQL->FROM( 'T_users' );
+				$SQL->WHERE( 'user_email = '.$DB->quote( $this->get( 'email' ) ) );
+				$SQL->WHERE_and( 'user_ID != '.$DB->quote( $this->ID ) );
+				$same_email_logins = $DB->get_col( $SQL );
+				if( ! empty( $same_email_logins ) )
+				{	// If at least one user exists with same email address:
+					foreach( $same_email_logins as $l => $same_email_login )
+					{	// Display a login as link to account profile page:
+						$same_email_logins[ $l ] = get_user_identity_link( $same_email_login );
+					}
+					$Messages->add( sprintf( T_('WARNING: the user was created but it shares the same email address as: %s.'), implode( ', ', $same_email_logins ) ), 'warning' );
+				}
+
 				$Messages->add( T_('New user has been created.'), 'success' );
 				report_user_create( $this );
 			}

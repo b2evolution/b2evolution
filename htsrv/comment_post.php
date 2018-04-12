@@ -167,6 +167,11 @@ if( $action != 'preview' && $commented_Item->load_workflow_from_Request() )
 	{	// Display a message on success result:
 		$Messages->add( T_('The workflow properties have been updated.'), 'success' );
 		$workflow_is_updated = true;
+
+		if( $commented_Item->assigned_to_new_user && ! empty( $commented_Item->assigned_user_ID ) )
+		{ // Send post assignment notification
+			$commented_Item->send_assignment_notification();
+		}
 	}
 }
 
