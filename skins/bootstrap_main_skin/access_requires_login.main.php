@@ -55,7 +55,7 @@ if( $bg_File && $bg_File->exists() )
 
 <header class="row">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
+	<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8">
 		<?php
 		if( $Skin->show_container_when_access_denied( 'page_top' ) )
 		{ // Display 'Page Top' widget container
@@ -80,7 +80,7 @@ if( $bg_File && $bg_File->exists() )
 		<?php } ?>
 	</div><!-- .col -->
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
+	<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<?php
 		if( $Skin->show_container_when_access_denied( 'header' ) )
 		{ // Display 'Header' widget container
