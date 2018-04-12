@@ -994,6 +994,7 @@ class Item extends ItemLight
 		modules_call_method( 'update_item_settings', array( 'edited_Item' => $this ) );
 
 		// RENDERERS:
+		$item_Blog = & $this->get_Blog();
 		if( is_admin_page() || $item_Blog->get_setting( 'in_skin_editing_renderers' ) )
 		{	// If text renderers are allowed to update from front-office:
 			if( param( 'renderers_displayed', 'integer', 0 ) )
