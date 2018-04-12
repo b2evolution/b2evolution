@@ -1176,7 +1176,12 @@ class Item extends ItemLight
 			{	// Update deadline only when it is enabled for item's collection:
 				param_time( 'item_deadline_time', '', false, false, true, true );
 				$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
-				$this->set( 'datedeadline', trim( form_date( get_param( 'item_deadline' ), $item_deadline_time.':00' ) ), true );
+				$item_deadline_datetime = trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) );
+				if( ! empty( $item_deadline_datetime ) )
+				{	// Append seconds because they are not entered on the form but they are stored in the DB field "post_datedeadline" as date format "YYYY-mm-dd HH:ii:ss":
+					$item_deadline_datetime .= ':00';
+				}
+				$this->set( 'datedeadline', $item_deadline_datetime, true );
 			}
 
 			// Return TRUE when no errors and ata least one workflow property has been changed:
