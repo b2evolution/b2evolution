@@ -136,12 +136,21 @@ ajax_call(e);
 					InputSupport.prototype.rebuild_index(e);
 					
 					i = InputSupport.prototype.get_set_count(e.parname);
+					
+					function update_message(x)
+					{
+						var m = 'updating', u = '.updated';
+						html = jQuery.parseHTML( '<span class="updated text-success" style="margin-left:15px;">Updated...</span>' );
+						var el = jQuery( '#'+e.parname + '_'+x+'_title' );
+						if(!el.hasClass(m)){el.after(html);}
+						el.addClass(m);
+						$(u).fadeTo(2000, 500).slideUp(500, function(){$(u).slideUp(500).remove();el.removeClass(m);});
+					}
 					for(var x = 0; x < i; x++)
 					{
-						if($('#updating-'+x).length > 0 ){continue;}
-						html = jQuery.parseHTML( '<span id="updating-'+x+'" class="text-success" style="margin-left:15px;">Updated...</span>' );
-						jQuery( '#'+e.parname + '_'+x+'_title' ).after(html);
-						$('#updating-'+x).fadeTo(2000, 500).slideUp(500, function(){$('#updating-'+x).slideUp(500);}).remove();	
+						
+						update_message(x);
+							
 					}
 			},
 								  
