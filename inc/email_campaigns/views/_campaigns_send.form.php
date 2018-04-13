@@ -40,7 +40,7 @@ if( !empty( $template_action ) && $template_action == 'send_campaign' )
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( sprintf( T_('Review message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'creating-an-email-campaign' ) );
+$Form->begin_fieldset( sprintf( T_('Review message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'campaign-review-panel' ) );
 	$Form->info( T_('Email title'), $edited_EmailCampaign->get( 'email_title' ) );
 	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ) ) );
 	$Form->info( T_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ) ) : T_('Not sent yet') );
@@ -57,11 +57,22 @@ echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	echo '</div>';
 
 	echo '<div class="floatright" style="width:49%">';
-	echo '<p><b>'.T_('Plain-text message').':</b></p>';
-	$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_plaintext' ), 'include_greeting' => false, 'add_email_tracking' => false ), $current_User );
-	$text_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $text_mail_template );
-	$text_mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $text_mail_template );
-	echo '<div style="font-family:monospace;overflow:auto">'.nl2br( $text_mail_template ).'</div>';
+	echo '<p>';
+		echo '<b>'.T_('Plain-text message').':</b> &nbsp; ';
+		$Form->switch_layout( 'none' );
+		$Form->radio( 'ecmp_sync_plaintext', $edited_EmailCampaign->get( 'sync_plaintext' ), array(
+				array( 1, T_('Keep in sync with HTML') ),
+				array( 0, T_('Edit separately') ),
+			), '' );
+		$Form->button( array(
+				'value' => T_('Edit'),
+				'class' => 'btn btn-info btn-sm'.( $edited_EmailCampaign->get( 'sync_plaintext' ) ? ' hidden' : '' ),
+				'name'  => 'actionArray[save_sync_plaintext]',
+				'id'    => 'ecmp_edit_plaintext_button',
+			) );
+		$Form->switch_layout( NULL );
+	echo '</p>';
+	echo '<div style="font-family:monospace;overflow:auto" id="ecmp_plaintext_block">'.$edited_EmailCampaign->get( 'plaintext_template_preview' ).'</div>';
 	echo '</div>';
 echo '</div>';
 $Form->end_fieldset();
@@ -130,3 +141,39 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 
 $Form->end_form();
 ?>
+<script type="text/javascript">
+jQuery( '[name=ecmp_sync_plaintext]' ).click( function()
+{
+	if( jQuery( this ).val() == 1 )
+	{	// Keep in sync with HTML:
+		if( ! confirm( '<?php echo TS_('WARNING: if you continue, all manual edits you made to the plain-text version will be lost.'); ?>' ) )
+		{	// Don't continue to sync with HTML if it has not been confirmed:
+			return false;
+		}
+		jQuery( '#ecmp_edit_plaintext_button, .ecmp_plaintext_tab' ).addClass( 'hidden' );
+	}
+	else
+	{	// Edit separately:
+		jQuery( '#ecmp_edit_plaintext_button, .ecmp_plaintext_tab' ).removeClass( 'hidden' );
+	}
+	// Update plain-text mode:
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo $admin_url; ?>',
+		data:
+		{
+			'ctrl': 'campaigns',
+			'action': 'save_sync_plaintext',
+			'display_mode': 'js',
+			'ecmp_ID': <?php echo $edited_EmailCampaign->ID; ?>,
+			'ecmp_sync_plaintext': jQuery( this ).val(),
+			'crumb_campaign': '<?php echo get_crumb( 'campaign' ); ?>',
+		},
+		success: function( result )
+		{
+			jQuery( '#ecmp_plaintext_block' ).html( result );
+		}
+	} );
+} );
+</script>

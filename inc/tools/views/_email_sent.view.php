@@ -82,7 +82,7 @@ function filter_email_sent( & $Form )
 
 	$Form->date_input( 'datestartinput', $datestart, T_('From date') );
 	$Form->date_input( 'datestopinput', $datestop, T_('To date') );
-	$Form->text_input( 'email', $email, 40, T_('Email') );
+	$Form->email_input( 'email', $email, 40, T_('Email') );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_email_sent',

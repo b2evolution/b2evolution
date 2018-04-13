@@ -145,7 +145,7 @@ if( $new_user_creating )
 	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
 
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
-	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
+	$Form->email_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), array( 'maxlength' => 255, 'required' => true, 'note' => $email_fieldnote ) );
 	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ) );
 
 	$Form->end_fieldset();
