@@ -362,3 +362,22 @@ function addSpinner( button )
 	button.addClass( 'btn-spinner' );
 	button.css( 'width', '+=24px' );
 }
+
+
+/**
+ * Set custom validity of field based on input value length
+ * @param obj Input field
+ * @param integer mininum input value length
+ * @param string message to display if input value does not meet minimum length
+ */
+function checkInputLength( input, minLength, message )
+{
+	if( input.value.length < minLength )
+	{
+		input.setCustomValidity( message );
+	}
+	else
+	{
+		input.setCustomValidity( '' );
+	}
+}

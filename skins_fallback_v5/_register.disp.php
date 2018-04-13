@@ -176,9 +176,10 @@ $Form->password_input( $dummy_fields[ 'pass2' ], '', 18, '',
 	);
 
 // Email
-$Form->text_input( $dummy_fields['email'], $email, 50, T_('Email'), '<br />'.T_('We respect your privacy. Your email will remain strictly confidential.'),
+$Form->email_input( $dummy_fields['email'], $email, 50, T_('Email'),
 	array(
 			'placeholder' => $params['register_use_placeholders'] ? T_('Email address') : '',
+			'bottom_note' => T_('We respect your privacy. Your email will remain strictly confidential.'),
 			'maxlength'   => 255,
 			'class'       => 'input_text wide_input',
 			'required'    => true,

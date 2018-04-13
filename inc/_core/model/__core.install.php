@@ -557,6 +557,7 @@ $schema_queries = array(
 			ecmp_email_html           TEXT NULL COLLATE utf8mb4_unicode_ci,
 			ecmp_email_text           TEXT NULL COLLATE utf8mb4_unicode_ci,
 			ecmp_email_plaintext      TEXT NULL COLLATE utf8mb4_unicode_ci,
+			ecmp_sync_plaintext       TINYINT(1) NOT NULL DEFAULT 1,
 			ecmp_sent_ts              TIMESTAMP NULL,
 			ecmp_auto_sent_ts         TIMESTAMP NULL,
 			ecmp_renderers            VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."

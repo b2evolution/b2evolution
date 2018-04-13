@@ -42,6 +42,9 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 {
 	global $admin_url, $current_User;
 
+	$EmailCampaignCache = & get_EmailCampaignCache();
+	$EmailCampaign = & $EmailCampaignCache->get_by_ID( $campaign_ID );
+
 	$modes = array();
 
 	$edit_url = $admin_url.'?ctrl=campaigns'.$glue.'action=edit'.$glue.'ecmp_ID='.$campaign_ID;
@@ -64,6 +67,17 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
 		$modes['compose']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'compose'} );";
+	}
+
+	$url = $edit_url.$glue.'tab=plaintext';
+	$modes['plaintext'] = array(
+		'text'  => T_('Plain-text version'),
+		'href'  => $url,
+		'class' => 'ecmp_plaintext_tab'.( $EmailCampaign->get( 'sync_plaintext' ) ? ' hidden' : '' ),
+	);
+	if( $current_User->check_perm( 'emails', 'edit' ) )
+	{ // User must has a permission to edit emails
+		$modes['plaintext']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'plaintext'} );";
 	}
 
 	$url = $edit_url.$glue.'tab=send';
@@ -103,25 +117,35 @@ function get_campaign_tab_url( $current_tab, $campaign_ID, $type = 'current', $g
 {
 	$modes = get_campaign_edit_modes( $campaign_ID, $glue );
 
+	$EmailCampaignCache = & get_EmailCampaignCache();
+	$EmailCampaign = & $EmailCampaignCache->get_by_ID( $campaign_ID );
+
 	switch( $type )
 	{
 		case 'current':
 			// Get URL of current tab
 			if( !empty( $modes[ $current_tab ] ) )
 			{
-				return $modes[ $current_tab ]['href'];
+				if( $current_tab == 'plaintext' && $EmailCampaign->get( 'sync_plaintext' ) )
+				{	// Don't allow tab plaintext when it is not enabled:
+					return $modes['compose']['href'];
+				}
+				else
+				{
+					return $modes[ $current_tab ]['href'];
+				}
 			}
 			break;
 
 		case 'next':
 		default:
-			// Get URL of next tab
+			// Get URL of next tab:
 			$this_tab = false;
 			foreach( $modes as $tab_name => $tab_info )
 			{
 				if( $this_tab )
 				{ // We find URL for next tab
-					return $tab_info['href'];
+					return ( $tab_name == 'plaintext' && $EmailCampaign->get( 'sync_plaintext' ) ) ? $modes['send']['href'] : $tab_info['href'];
 				}
 				if( $tab_name == $current_tab )
 				{ // The next tab will be what we find
@@ -285,7 +309,7 @@ function campaign_results_block( $params = array() )
 	// Create result set:
 	$SQL = new SQL();
 	$SQL->SELECT( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_name, ecmp_email_title, ecmp_email_defaultdest, ecmp_email_html, ecmp_email_text,
-		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_welcome,
+		ecmp_email_plaintext, ecmp_sync_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_welcome,
 		ecmp_user_tag_sendskip, ecmp_user_tag_sendsuccess,
 		ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
 		enlt_ID, enlt_name,
@@ -530,11 +554,11 @@ function campaign_td_welcome( $ecmp_ID, $ecmp_welcome )
 
 	if( $ecmp_welcome )
 	{	// If newsletter is active:
-		$welcome_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => htmlspecialchars( T_('The email campaign is used as "Welcome" for its list.') ) ) );
+		$welcome_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The email campaign is used as "Welcome" for its list.') ) );
 	}
 	else
 	{	// If newsletter is NOT active:
-		$welcome_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => htmlspecialchars( T_('The email campaign is not used as "Welcome" for its list.') ) ) );
+		$welcome_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The email campaign is not used as "Welcome" for its list.') ) );
 	}
 
 	if( $current_User->check_perm( 'emails', 'edit' ) )

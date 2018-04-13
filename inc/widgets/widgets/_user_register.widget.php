@@ -347,7 +347,7 @@ class user_register_Widget extends ComponentWidget
 
 		// E-mail
 		$email_value = isset( $widget_param_input_values[ $dummy_fields['email'] ] ) ? $widget_param_input_values[ $dummy_fields['email'] ] : '';
-		$Form->text_input( $dummy_fields['email'], $email_value, 50, T_('Your email'), '', array( 'maxlength' => 255, 'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ), 'required' => true, 'input_required' => 'required' ) );
+		$Form->email_input( $dummy_fields['email'], $email_value, 50, T_('Your email'), array( 'maxlength' => 255, 'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ), 'required' => true, 'input_required' => 'required' ) );
 
 		// Submit button
 		$Form->begin_fieldset( '', array( 'class' => 'fieldset field_register_btn' ) );

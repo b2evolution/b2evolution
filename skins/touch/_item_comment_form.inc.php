@@ -237,7 +237,10 @@ function validateCommentForm(form)
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
 		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '', 100, 'bComment' );
 
-		$Form->text( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), 255, 'bComment' );
+		$Form->email_input( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), array(
+			'bottom_note' => T_('Your email address will <strong>not</strong> be revealed on this site.'),
+			'maxlength'   => 255,
+			'class'       => 'bComment' ) );
 
 		$Item->load_Blog();
 		if( $Item->Blog->get_setting( 'allow_anon_url' ) )
