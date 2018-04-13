@@ -12,15 +12,14 @@ This branch contains support for a feature not available in the Official Branch:
 - Fixes for dynamic types: array:array:string
 - Support for new dynamic type: select_input
 - Support for nested dynamic types
+- Fixes for input_group for Skin | Widget | Messages | Email | Plugins | Collections
 
 # Configurations:
 
 - type			= select_input
 - max_number	= 4
-- use_fieldset 	= true
-- false 
-- fold			= true
-- false
+- use_fieldset 	= true / false 
+- fold			= true / false
 
 # Supports:
 
@@ -38,10 +37,6 @@ This branch contains support for a feature not available in the Official Branch:
 - 'info'
 - 'color'
 - 'input_group'
-
-# Issues:
-
-- Skin Settings Not Supported yet
 
 ## A complete engine for your website !
 
