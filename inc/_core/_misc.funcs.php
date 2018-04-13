@@ -4608,6 +4608,11 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 		$link_attribs['class'] .= ' hoverlink';
 	}
 
+	// Format title attribute because it may contains the unexpected chars from translatable strings:
+	if( isset( $link_attribs['title'] ) )
+	{
+		$link_attribs['title'] = format_to_output( $link_attribs['title'], 'htmlattr' );
+	}
 
 	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
 	return '<a'.get_field_attribs_as_string( $link_attribs, false ).'>'.$a_body.'</a>';
@@ -4842,6 +4847,16 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 				}
 
+				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
+				if( isset( $params['title'] ) )
+				{
+					$params['title'] = format_to_output( $params['title'], 'htmlattr' );
+				}
+				if( isset( $params['alt'] ) )
+				{
+					$params['alt'] = format_to_output( $params['alt'], 'htmlattr' );
+				}
+
 				if( isset( $icon['size-'.$icon_param_name] ) )
 				{ // Set a size for icon only for current type
 					if( isset( $icon['size-'.$icon_param_name][0] ) )
@@ -4921,6 +4936,16 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 				}
 
+				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
+				if( isset( $params['title'] ) )
+				{
+					$params['title'] = format_to_output( $params['title'], 'htmlattr' );
+				}
+				if( isset( $params['alt'] ) )
+				{
+					$params['alt'] = format_to_output( $params['alt'], 'htmlattr' );
+				}
+
 				if( isset( $params['class'] ) )
 				{	// Get class from params
 					$params['class'] = 'icon '.$params['class'];
@@ -4974,6 +4999,12 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					{ // $iconKey as alt-tag
 						$params['alt'] = $iconKey;
 					}
+				}
+
+				// Format alt attribute because it may contains the unexpected chars from translatable strings:
+				if( isset( $params['alt'] ) )
+				{
+					$params['alt'] = format_to_output( $params['alt'], 'htmlattr' );
 				}
 
 				// Add all the attributes:

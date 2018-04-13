@@ -69,7 +69,7 @@ $Form->begin_fieldset( T_( 'Email envelope' ).get_manual_link( 'email-notificati
 	}
 
 	// Display settings input fields
-	$Form->text_input( 'notification_sender_email', $Settings->get( 'notification_sender_email' ), 50, T_( 'Sender email address' ), $notification_sender_email_note, array( 'maxlength' => 127, 'required' => true ) );
+	$Form->email_input( 'notification_sender_email', $Settings->get( 'notification_sender_email' ), 50, T_( 'Sender email address' ), array( 'maxlength' => 127, 'required' => true, 'note' => $notification_sender_email_note ) );
 	$Form->text_input( 'notification_sender_name', $Settings->get( 'notification_sender_name' ), 50, T_( 'Sender name' ), $notification_sender_name_note, array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_return_path', $Settings->get( 'notification_return_path' ), 50, T_( 'Return path' ), '', array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_short_name', $Settings->get( 'notification_short_name' ), 50, T_( 'Short site name' ), T_('Shared with site settings'), array( 'maxlength' => 127, 'required' => true ) );

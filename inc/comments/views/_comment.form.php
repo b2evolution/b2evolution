@@ -128,7 +128,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		else
 		{	// This is not a member comment
 			$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, T_('Author'), '', array( 'maxlength' => 100, 'style' => 'width:100%' ) );
-			$Form->text_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
+			$Form->email_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), array( 'maxlength' => 255, 'style' => 'width:100%' ) );
 			$Form->checkbox( 'comment_allow_msgform', $edited_Comment->allow_msgform, T_('Allow contact'), T_('If checked, the comment author can be contacted through a form that will send him en email.') );
 			$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
 		}
