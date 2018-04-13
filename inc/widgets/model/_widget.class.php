@@ -426,6 +426,17 @@ class ComponentWidget extends DataObject
 			if( isset( $this->param_array[ $setting_names[0] ] ) )
 			{
 				$setting_value = $this->param_array[ $setting_names[0] ];
+				
+				if( isset( $params[ $setting_names[0] ] ) && isset( $setting_names[1] ) )
+				{
+
+					if( is_numeric(trim( $setting_names[1], ']' )) && isset( $params[ $setting_names[0] ]['entries'] ))
+					{
+
+						$params = $params[ $setting_names[0] ]['entries'];
+					}
+				}
+				
 				unset( $setting_names[0] );
 				foreach( $setting_names as $setting_name )
 				{
@@ -436,6 +447,7 @@ class ComponentWidget extends DataObject
 					}
 					else
 					{
+						
 						if( isset( $setting_names[2] ) )
 						{
 							$parname = substr( trim( $setting_names[2], ']' ), strlen( $group ) );

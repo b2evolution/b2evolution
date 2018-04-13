@@ -4010,13 +4010,34 @@ class Plugin
 			
 			if( strpos( $parname, '[' ) !== false )
 			{
+
+				// strip out all the iterations
+				$parname = str_replace( ']', '', preg_replace('/\[\d\]/', '', $parname ) );
+				
+				//create array
 				$setting_names = explode( '[', $parname );
-
-				if( isset( $setting_names[2] ) )
+				
+				/* 
+				* match $params level to $parname
+				*/ 
+				for( $i = 0; $i < count( $setting_names ) - 1; $i++ )
 				{
-					$parname = substr( trim( $setting_names[2], ']' ), strlen( $group ) );
+					if( isset( $params[ $setting_names[$i] ] ) )
+					{
+						if( isset( $params[ $setting_names[$i] ]['entries'] ) )
+						{
+							
+							$params = $params[ $setting_names[$i] ]['entries'];
 
+						}
+						
+					}
 				}
+
+				$pos_last_bracket = strrpos($parname, '[');
+				$parname = substr( str_replace( '[', '', substr($parname, $pos_last_bracket) ), strlen( $group ) );
+				
+				
 			}
 			else
 			{
@@ -4025,6 +4046,8 @@ class Plugin
 				$parname = substr( $parname, strlen( $group ) );
 			}
 			
+				
+			//pre_dump($parname, $params[$group]['inputs']);
 			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
 			{	// We have a default value:
 				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
