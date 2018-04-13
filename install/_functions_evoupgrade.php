@@ -9479,6 +9479,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12800, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_email__campaign', 'ecmp_sync_plaintext', 'TINYINT(1) NOT NULL DEFAULT 1 AFTER ecmp_email_plaintext' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
