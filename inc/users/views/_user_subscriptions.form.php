@@ -125,7 +125,7 @@ $Form->begin_fieldset( T_('Receiving emails').( is_admin_page() ? get_manual_lin
 
 	if( $action != 'view' )
 	{ // We can edit the values:
-		$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email address'), $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
+		$Form->email_input( 'edited_user_email', $edited_User->email, 30, T_('Email address'), array( 'maxlength' => 255, 'required' => true, 'note' => $email_fieldnote ) );
 		$disabled = false;
 	}
 	else

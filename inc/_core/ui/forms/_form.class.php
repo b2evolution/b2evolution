@@ -1206,6 +1206,26 @@ class Form extends Widget
 
 
 	/**
+	 * Builds an email input field.
+	 *
+	 * Calls the text_input() method with type == 'email'.
+	 *
+	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value
+	 * @param integer Size of the input field
+	 * @param string Label displayed in front of the field
+	 * @param string Extended attributes, see {@link text_input()}.
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function email_input( $field_name, $field_value, $field_size, $field_label, $field_params = array() )
+	{
+		$field_params['type'] = 'email';
+
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params );	// TEMP: Note already in params
+	}
+
+
+	/**
 	 * Builds a file input field
 	 *
 	 * @param string the field name
@@ -4611,6 +4631,8 @@ class Form extends Widget
 			{
 				$field_params['class'] = isset( $field_params['class'] ) ? $field_params['class'].' field_required' : 'field_required';
 			}
+			// add "required" attribute
+			$field_params['required'] = '';
 		}
 
 		// Error handling:

@@ -50,7 +50,7 @@ $Form->inputend = '</td></tr>';
 
 $Form->text_input( $dummy_fields['name'], ( isset( $new_Item->temp_user_name ) ? $new_Item->temp_user_name : '' ), 40, T_('Name'), '', array( 'maxlength' => 100, 'required' => true, 'style' => 'width:auto' ) );
 
-$Form->text_input( $dummy_fields['email'], ( isset( $new_Item->temp_user_email ) ? $new_Item->temp_user_email : '' ), 40, T_('Email'), T_('Your email address will <strong>not</strong> be revealed on this site.'), array( 'maxlength' => 255, 'required' => true, 'style' => 'width:auto' ) );
+$Form->email_input( $dummy_fields['email'], ( isset( $new_Item->temp_user_email ) ? $new_Item->temp_user_email : '' ), 40, T_('Email'), array( 'maxlength' => 255, 'required' => true, 'style' => 'width:auto', 'note' => T_('Your email address will <strong>not</strong> be revealed on this site.') ) );
 
 // Title input:
 $use_title = $new_Item->get_type_setting( 'use_title' );

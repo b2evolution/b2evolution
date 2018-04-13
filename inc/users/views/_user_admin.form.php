@@ -143,7 +143,7 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 
 	$Form->begin_line( T_('Email') );
 		$email_fieldnote = '<a href="mailto:'.$edited_User->get( 'email' ).'" class="'.button_class().'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
-		$Form->text_input( 'edited_user_email', $edited_User->get( 'email' ), 30, '', $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
+		$Form->email_input( 'edited_user_email', $edited_User->get( 'email' ), 30, '', array( 'maxlength' => 255, 'required' => true, 'note' => $email_fieldnote ) );
 
 		$email_status = $edited_User->get_email_status();
 		$email_status_icon = '<div id="email_status_icon" class="status_icon">'.emadr_get_status_icon( $email_status ).'</div>';
@@ -174,7 +174,7 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 	{
 		$notifcation_sender_email_note = get_icon( 'warning_yellow' ).' '.T_('This is different from the new sender address which is currently:').' '.$default_notification_sender_email;
 	}
-	$Form->text_input( 'notification_sender_email', $notifcation_sender_email, 50, T_( 'Sender email address' ), $notifcation_sender_email_note );
+	$Form->email_input( 'notification_sender_email', $notifcation_sender_email, 50, T_( 'Sender email address' ), array( 'note' => $notifcation_sender_email_note ) );
 
 	// Display notification sender name setting
 	$default_notification_sender_name = $Settings->get( 'notification_sender_name' );
