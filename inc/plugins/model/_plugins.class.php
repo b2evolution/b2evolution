@@ -2346,6 +2346,7 @@ class Plugins
 				global $current_User;
 				if( is_logged_in() && $current_User->check_perm( 'admin', 'normal' ) )
 				{
+					global $admin_url;
 					switch( $setting_name )
 					{
 						case 'msg_apply_rendering':
