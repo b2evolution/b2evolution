@@ -401,8 +401,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$disp_arrays = $set_value;
 				$fieldset_title = $set_label;
 				
-				$fieldset_title .= ' '.T_( 'Items' );
-				
 				if( $debug )
 				{
 					$fieldset_title .= ' [debug: '.$parname.']';
