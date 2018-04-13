@@ -160,6 +160,21 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'comment' );
 
+$workflow_is_updated = false;
+if( $action != 'preview' && $commented_Item->load_workflow_from_Request() )
+{	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
+	if( $commented_Item->dbupdate() )
+	{	// Display a message on success result:
+		$Messages->add( T_('The workflow properties have been updated.'), 'success' );
+		$workflow_is_updated = true;
+
+		if( $commented_Item->assigned_to_new_user && ! empty( $commented_Item->assigned_user_ID ) )
+		{ // Send post assignment notification
+			$commented_Item->send_assignment_notification();
+		}
+	}
+}
+
 $comments_email_is_detected = false;
 
 if( $User )
@@ -355,8 +370,10 @@ if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( 
 	}
 }
 
-if( empty( $comment ) && $checked_attachments_count == 0 )
-{ // comment should not be empty!
+$is_empty_comment = ( empty( $comment ) && $checked_attachments_count == 0 );
+if( $is_empty_comment && ! $workflow_is_updated )
+{	// Comment text should not be empty!
+	// (exception if at least one file has been attached or if at least one workflow properties has been updated)
 	$Messages->add_to_group( T_('Please do not send empty comments.'), 'error', T_('Validation errors:') );
 }
 
@@ -368,11 +385,11 @@ $Plugins->trigger_event('BeforeCommentFormInsert', array(
 	'is_preview' => ($action == 'preview'),
 	'action' => & $action ) );
 
-
-/*
- * Display error messages:
- */
-if( $Messages->has_errors() && $action != 'preview' )
+// Redirect and:
+// Display error messages for the comment form OR
+// Display success message when workflow has been updated but comment text has not been filled:
+if( ( $Messages->has_errors() && $action != 'preview' ) ||
+    ( $workflow_is_updated && $is_empty_comment ) )
 {
 	$Comment->set( 'preview_attachments', $preview_attachments );
 	$Comment->set( 'checked_attachments', $checked_attachments );

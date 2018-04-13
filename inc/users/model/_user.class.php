@@ -1561,6 +1561,10 @@ class User extends DataObject
 					$UserSettings->set( 'send_pst_moderation_reminder', param( 'edited_user_send_pst_moderation_reminder', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_stale_alert', param( 'edited_user_send_pst_stale_alert', 'integer', 0 ), $this->ID );
 				}
+				if( $this->check_role( 'member' ) )
+				{
+					$UserSettings->set( 'notify_post_assignment', param( 'edited_user_notify_post_assignment', 'integer', 0 ), $this->ID );
+				}
 				if( $current_User->check_perm( 'users', 'edit' ) )
 				{
 					$UserSettings->set( 'send_activation_reminder', param( 'edited_user_send_activation_reminder', 'integer', 0 ), $this->ID );
@@ -5317,6 +5321,22 @@ class User extends DataObject
 			$update_success = true;
 			if( $is_new_user )
 			{
+				// Find and inform administrator about other users with same email address on creating new user from back-office:
+				$SQL = new SQL( 'Find other users with same email as new created user' );
+				$SQL->SELECT( 'user_login' );
+				$SQL->FROM( 'T_users' );
+				$SQL->WHERE( 'user_email = '.$DB->quote( $this->get( 'email' ) ) );
+				$SQL->WHERE_and( 'user_ID != '.$DB->quote( $this->ID ) );
+				$same_email_logins = $DB->get_col( $SQL );
+				if( ! empty( $same_email_logins ) )
+				{	// If at least one user exists with same email address:
+					foreach( $same_email_logins as $l => $same_email_login )
+					{	// Display a login as link to account profile page:
+						$same_email_logins[ $l ] = get_user_identity_link( $same_email_login );
+					}
+					$Messages->add( sprintf( T_('WARNING: the user was created but it shares the same email address as: %s.'), implode( ', ', $same_email_logins ) ), 'warning' );
+				}
+
 				$Messages->add( T_('New user has been created.'), 'success' );
 				report_user_create( $this );
 			}

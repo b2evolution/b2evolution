@@ -182,6 +182,7 @@ class shortlinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
+		$this->render_type = 'email';
 		$this->link_types = $this->get_email_setting( 'link_types' );
 
 		return $this->render_content( $content );
@@ -310,7 +311,7 @@ class shortlinks_plugin extends Plugin
 					}
 					else
 					{	// Replace WikiWord with broken link if Item and Chapter are not found:
-						$replace_links[] = $this->get_broken_link( $WikiWord, $wiki_word, $WikiWord );
+						$replace_links[] = $this->get_broken_link( $wiki_word, $WikiWord );
 					}
 				}
 			}
@@ -545,7 +546,7 @@ class shortlinks_plugin extends Plugin
 			}
 			else
 			{	// Display a link to suggest to create new post from wiki word:
-				return $this->get_broken_link( $WikiWord, $this->current_wiki_word, ( empty( $custom_link_text ) ? $link_text : $custom_link_text ), $custom_link_class );
+				return $this->get_broken_link( $this->current_wiki_word, ( empty( $custom_link_text ) ? $link_text : $custom_link_text ), $custom_link_class );
 			}
 		}
 	}
@@ -554,15 +555,20 @@ class shortlinks_plugin extends Plugin
 	/**
 	 * Get HTML code for broken link
 	 *
-	 * @param string Post title
 	 * @param string Post slug
 	 * @param string Link/Span text
 	 * @param string Link/Span class
 	 * @return string
 	 */
-	function get_broken_link( $post_title, $post_slug, $text, $class = '' )
+	function get_broken_link( $post_slug, $text, $class = '' )
 	{
 		global $blog, $admin_url, $evo_charset;
+
+		if( isset( $this->render_type ) && $this->render_type == 'email' )
+		{	// Don't render broken link for Email Campaign because it is impossible
+			// to check user permission when content will be viewed on email inbox:
+			return $text;
+		}
 
 		// Add regexp modifier 'u' to work with UTF-8 strings correctly:
 		$regexp_modifier = ( $evo_charset == 'utf-8' ) ? 'u' : '';
@@ -572,17 +578,12 @@ class shortlinks_plugin extends Plugin
 		if( is_numeric( $post_slug ) && ! is_numeric( $text ) )
 		{	// Try to use custom text if it is provided instead of post ID to suggest a link to create new post:
 			$post_slug = preg_replace( array( '*([^\p{Lu}#_])([\p{Lu}#])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1-$2', utf8_strtolower( $text ) );
-			$post_title = $text;
 		}
 
 		if( isset( $blog ) && ! is_numeric( $post_slug ) )
 		{	// Suggest to create new post from given word:
-			$post_title = preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1 $2', $post_title );
-			$post_title = ucfirst( str_replace( '-', ' ', $post_title ) );
-
 			$before_wikiword = '<a'
-				.' href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.urlencode( $post_title ).'&amp;post_urltitle='.urlencode( $post_slug ).'"'
-				.' title="'.format_to_output( T_('Create').'...', 'htmlattr' ).'"'
+				.' href="#"'
 				.' class="'.$class.'evo_shortlink_broken"'
 				// Add these data attributes in order to display this link only for user who can really create a post:
 				.' data-function="create_post" data-coll="'.$blog.'">';
@@ -628,7 +629,7 @@ class shortlinks_plugin extends Plugin
 		// display the source link but replace the source URL with new generated,
 		// because it may be different between back- and front-office and also between
 		// anonymous and logged in users (disp=edit vs disp=anonpost):
-		return preg_replace( '# href="[^"]+"#i', ' href="'.$new_post_url.'"', $matches[0] );
+		return preg_replace( '# href="[^"]+"#i', ' href="'.$new_post_url.'" title="'.format_to_output( T_('Create').'...', 'htmlattr' ).'"', $matches[0] );
 	}
 
 

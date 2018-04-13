@@ -288,7 +288,13 @@ switch( $action )
 		}
 
 		// UPDATE POST IN DB:
-		$edited_Item->dbupdate();
+		if( $edited_Item->dbupdate() )
+		{
+			if( $edited_Item->assigned_to_new_user && ! empty( $edited_Item->assigned_user_ID ) )
+			{ // Send post assignment notification
+				$edited_Item->send_assignment_notification();
+			}
+		}
 
 		// post post-publishing operations:
 		param( 'trackback_url', 'string' );
@@ -344,29 +350,25 @@ switch( $action )
 	case 'update_workflow':
 		// Update workflow properties from disp=single:
 
-		$current_User->check_perm( 'blog_can_be_assignee', 'edit', true, $Blog->ID );
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
 
-		if( $Blog->get_setting( 'use_workflow' ) )
-		{ // Only if the workflow is enabled on collection
-			param( 'item_st_ID', 'integer', NULL );
-			$edited_Item->set_from_Request( 'pst_ID', 'item_st_ID', true );
+		$item_Blog = & $edited_Item->get_Blog();
 
-			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
-			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
-			$edited_Item->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		$current_User->check_perm( 'blog_can_be_assignee', 'edit', true, $item_Blog->ID );
 
-			param( 'item_priority', 'integer', NULL );
-			$edited_Item->set_from_Request( 'priority', 'item_priority', true );
-
-			param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL );
-			param_time( 'item_deadline_time', '', false, false, true, true );
-			$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
-			$edited_Item->set( 'datedeadline', trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) ), true );
-
-			// UPDATE POST IN DB:
+		if( $edited_Item->load_workflow_from_Request() )
+		{	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
 			if( $edited_Item->dbupdate() )
-			{ // Display a message on success result:
+			{	// Display a message on success result:
 				$Messages->add( T_('The workflow properties have been updated.'), 'success' );
+
+				if( $edited_Item->assigned_to_new_user && ! empty( $edited_Item->assigned_user_ID ) )
+				{ // Send post assignment notification
+					$edited_Item->send_assignment_notification();
+				}
 			}
 		}
 

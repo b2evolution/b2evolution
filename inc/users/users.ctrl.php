@@ -500,6 +500,8 @@ if( $tab == 'stats' )
 else
 {	// Users list
 	init_tokeninput_js();
+	// Load jQuery QueryBuilder plugin files for user list filters:
+	init_querybuilder_js( 'rsc_url' );
 
 	switch( $tab3 )
 	{

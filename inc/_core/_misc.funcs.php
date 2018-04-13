@@ -4019,6 +4019,8 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'post_new':
 				// 'notify_post_moderation' - "a post is created and I have permissions to moderate it."
 				// 'notify_edit_pst_moderation' - "a post is modified and I have permissions to moderate it."
+			case 'post_assignment':
+				// 'notify_post_assignment' - "a post was assigned to me."
 			case 'posts_unmoderated_reminder':
 				// 'send_pst_moderation_reminder' - "posts are awaiting moderation for more than X seconds."(X = $Settings->get( 'post_moderation_reminder_threshold' ))
 			case 'posts_stale_alert':

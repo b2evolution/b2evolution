@@ -1832,6 +1832,7 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
 	global $current_locale;
 
 	require_js( '#jquery#', $relative_to ); // dependency
+	require_css( '#jqueryUI_css#', $relative_to ); // dependency for date picker
 	require_js( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
 	require_js( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
 	require_js( 'jquery/query-builder/moment.js', $relative_to ); // dependency

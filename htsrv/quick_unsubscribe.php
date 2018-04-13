@@ -178,6 +178,12 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
+				case 'post_assignment':
+					// unsubscribe from new post moderation notifications:
+					$UserSettings->set( 'notify_post_assignment', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				case 'post_moderator_edit':
 					// unsubscribe from updated post moderation notifications:
 					$notify_edit_pst_moderation = $UserSettings->get( 'notify_edit_pst_moderation', $edited_User->ID );
@@ -314,10 +320,10 @@ elseif( $confirmed )
 			{
 				case 'coll_comment':
 				case 'coll_post':
-					// unsubscribe from blog
+					// resubscribe from blog
 					if( $coll_ID == 0 )
 					{
-						$error_msg = T_('Invalid unsubscribe link!');
+						$error_msg = T_('Invalid resubscribe link!');
 					}
 					else
 					{
@@ -368,10 +374,10 @@ elseif( $confirmed )
 					break;
 
 				case 'post':
-					// unsubscribe from a specific post
+					// resubscribe from a specific post
 					if( $post_ID == 0 )
 					{
-						$error_msg = T_('Invalid unsubscribe link!');
+						$error_msg = T_('Invalid resubscribe link!');
 					}
 					else
 					{
@@ -398,51 +404,57 @@ elseif( $confirmed )
 					break;
 
 				case 'creator':
-					// unsubscribe from the user own posts
+					// resubscribe from the user own posts
 					$UserSettings->set( 'notify_published_comments', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'cmt_moderation_reminder':
-					// unsubscribe from comment moderation reminder notifications
+					// resubscribe from comment moderation reminder notifications
 					$UserSettings->set( 'send_cmt_moderation_reminder', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'comment_moderator':
-				case 'moderator': // Note: This was not chaned to 'comment_moderator' to make sure old emails unsubscribe link are also work
-					// unsubscribe from new comment may need moderation notifications:
+				case 'moderator': // Note: This was not chaned to 'comment_moderator' to make sure old emails subscribe link are also work
+					// resubscribe from new comment may need moderation notifications:
 					$UserSettings->set( 'notify_comment_moderation', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'comment_moderator_edit':
-					// unsubscribe from updated comment may need moderation notifications:
+					// resubscribe from updated comment may need moderation notifications:
 					$UserSettings->set( 'notify_edit_cmt_moderation', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'comment_moderator_spam':
-					// unsubscribe from spam comment may need moderation notifications:
+					// resubscribe from spam comment may need moderation notifications:
 					$UserSettings->set( 'notify_spam_cmt_moderation', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'pst_moderation_reminder':
-					// unsubscribe from post moderation reminder notifications
+					// resubscribe from post moderation reminder notifications
 					$UserSettings->set( 'send_pst_moderation_reminder', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'pst_stale_alert':
-					// unsubscribe from stale posts alert notifications:
+					// resubscribe from stale posts alert notifications:
 					$UserSettings->set( 'send_pst_stale_alert', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'post_moderator':
-					// unsubscribe from new post moderation notifications:
+					// resubscribe from new post moderation notifications:
 					$UserSettings->set( 'notify_post_moderation', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'post_assignment':
+					// resubscribe from post assignment notifications:
+					$UserSettings->set( 'notify_post_assignment', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
@@ -472,25 +484,25 @@ elseif( $confirmed )
 					break;
 
 				case 'unread_msg':
-					// unsubscribe from unread messages reminder
+					// resubscribe from unread messages reminder
 					$UserSettings->set( 'notify_unread_messages', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'new_msg':
-					// unsubscribe from new messages notification
+					// resubscribe from new messages notification
 					$UserSettings->set( 'notify_messages', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'account_activation':
-					// unsubscribe from account activation reminder
+					// resubscribe from account activation reminder
 					$UserSettings->set( 'send_activation_reminder', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'newsletter':
-					// unsubscribe from newsletter
+					// resubscribe from newsletter
 
 					// Use first newsletter by default for old unsubscribe url when we had only one static newsletter,
 					//    which was upgraded to Newsletter with ID = 1
@@ -503,62 +515,62 @@ elseif( $confirmed )
 					break;
 
 				case 'user_registration':
-					// unsubscribe from new user registration notifications
+					// resubscribe from new user registration notifications
 					$UserSettings->set( 'notify_new_user_registration', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'account_activated':
-					// unsubscribe from account activated notifications
+					// resubscribe from account activated notifications
 					$UserSettings->set( 'notify_activated_account', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'account_closed':
-					// unsubscribe from account closed notifications
+					// resubscribe from account closed notifications
 					$UserSettings->set( 'notify_closed_account', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'account_reported':
-					// unsubscribe from account reported notifications
+					// resubscribe from account reported notifications
 					$UserSettings->set( 'notify_reported_account', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'account_changed':
-					// unsubscribe from account changed notifications
+					// resubscribe from account changed notifications
 					$UserSettings->set( 'notify_changed_account', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'msgform':
-					// turn off allow emails through b2evo message forms
+					// turn on allow emails through b2evo message forms
 					$UserSettings->set( 'enable_email', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'cronjob_error':
-					// unsubscribe from cron job error notifications
+					// resubscribe from cron job error notifications
 					$UserSettings->set( 'notify_cronjob_error', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'automation_owner_notification':
-					// unsubscribe from automation step owner notifications:
+					// resubscribe from automation step owner notifications:
 					$UserSettings->set( 'notify_automation_owner', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'meta_comment':
-					// unsubscribe from meta comment notifications
+					// resubscribe from meta comment notifications
 					$UserSettings->set( 'notify_meta_comments', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				default:
 					// DEFENSIVE programming:
-					$error_msg = 'Unhandled unsubscribe type.';
+					$error_msg = 'Unhandled resubscribe type.';
 			}
 
 			if( ! isset( $error_msg ) )
@@ -656,6 +668,11 @@ switch( $type )
 	case 'post_moderator':
 		// unsubscribe from new post moderation notifications:
 		$type_str = $notification_prefix.': '.T_('a post is created and I have permissions to moderate it.');
+		break;
+
+	case 'post_assignment':
+		// unsubscribe from post assignment notifications:
+		$type_str = $notification_prefix.': '.T_('a post was assigned to me.');
 		break;
 
 	case 'post_moderator_edit':
@@ -770,6 +787,7 @@ $unsubscribe_form_params = array(
 	'customstart'    => '<div class="custom_content">',
 	'customend'      => "</div>\n",
 	'note_format'    => ' <span class="help-inline">%s</span>',
+	'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 	// Additional params depending on field type:
 	// - checkbox
 	'inputclass_checkbox'    => '',

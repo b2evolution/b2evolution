@@ -126,7 +126,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'item_priority', $edited_Item->priority );
 			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
 			$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-			$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+			if( $Blog->get_setting( 'use_deadline' ) )
+			{	// If deadline is enabled for collection:
+				$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+			}
 		}
 		$Form->hidden( 'trackback_url', $trackback_url );
 		$Form->hidden( 'item_featured', $edited_Item->featured );
