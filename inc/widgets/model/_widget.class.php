@@ -417,6 +417,9 @@ class ComponentWidget extends DataObject
 	{
 		$this->load_param_array();
 
+		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
+		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
+		
 		if( strpos( $parname, '[' ) !== false )
 		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
 			$setting_names = explode( '[', $parname );
@@ -433,6 +436,51 @@ class ComponentWidget extends DataObject
 					}
 					else
 					{
+						if( isset( $setting_names[2] ) )
+						{
+							$parname = substr( trim( $setting_names[2], ']' ), strlen( $group ) );
+						}
+						
+						if( isset( $params[ $group ]['type'] ) )
+						{
+							$type = $params[ $group ]['type'];
+							
+							switch($type)
+							{
+								case 'input_group':
+
+									if( ! empty( $params[ $group ]['inputs'] ) &&
+									isset( $params[ $group ]['inputs'][ $parname ] ))
+									{
+										return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
+									}
+
+									break;
+								case 'fileselect':
+									if([ $parname ]['type'] == 'fileselect' &&
+								! empty( $params[ $parname ]['initialize_with'] ) &&
+								$default_File = & get_file_by_abspath( $params[ $parname ]['initialize_with'], true ) )
+									{// Get default value for fileselect
+										return $default_File->ID;
+									}
+									break;
+								case 'checklist':
+										if(! empty( $params[ $parname ]['options'] ) )
+										{ // Get default values for checkbox list:
+											$options = array();
+											foreach( $params[ $parname ]['options'] as $option )
+											{
+												if( isset( $option[2] ) )
+												{ // Set default value only if it is defined by skin:
+													$options[ $option[0] ] = $option[2];
+												}
+											}
+											return $options;
+										}
+									break;	
+								}	
+						}
+						
 						$setting_value = NULL;
 						break;
 					}
@@ -446,8 +494,6 @@ class ComponentWidget extends DataObject
 		}
 
 		// Try default values:
-		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
-		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
 
 		if( $group === NULL )
 		{	// Get param from simple field:
@@ -465,7 +511,7 @@ class ComponentWidget extends DataObject
 				$parname = trim( $setting_names[2], ']' );
 			}
 			
-			$parname = substr( $parname, utf8_strlen( $group ) );
+			$parname = substr( $parname, strlen( $group ) );
 			
 			// Get param from group field:
 			//$parname = substr( $parname, strlen( $group ) );

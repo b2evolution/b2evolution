@@ -72,7 +72,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 			$parname = substr( $group, 0, strlen( $group ) - 1 ).$parname.']';
 			//$parname = substr( $group, 0, strlen( $group ) - 1 ).']['.$parname.']';
-			//$group = str_replace( array( '[', ']' ), array('', ''), substr( $group, strrpos($parname, '['), strlen( $group ) - 1 ) );
+			$group = str_replace( array( '[', ']' ), array('', ''), substr( $group, strrpos($parname, '['), strlen( $group ) - 1 ) );
 			
 		}
 		else

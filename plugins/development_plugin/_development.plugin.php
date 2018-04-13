@@ -194,13 +194,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
+																			'defaultvalue' => 'value1',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
+																			'defaultvalue' => 'label1',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
