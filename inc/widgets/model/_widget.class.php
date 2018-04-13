@@ -429,15 +429,9 @@ class ComponentWidget extends DataObject
 					$setting_name = trim( $setting_name, ']' );
 					if( isset( $setting_value[ $setting_name ] ) )
 					{
-						$setting_value = $setting_value[ $setting_name ];
-					}
-					else
-					{
-						$setting_value = NULL;
-						break;
+						return	$setting_value = $setting_value[ $setting_name ];
 					}
 				}
-				return $setting_value;
 			}
 		}
 		elseif( isset( $this->param_array[ $parname ] ) )
@@ -457,7 +451,45 @@ class ComponentWidget extends DataObject
 			}
 		}
 		else
-		{	// Get param from group field:
+		{
+			
+	 		if( strpos( $parname, '[' ) !== false )
+			{
+				$parname = str_replace( ']', '', $parname );
+				
+				$setting_names = explode( '[', $parname );
+
+				if( isset( $params[ $setting_names[0] ] ) )
+				{
+					$setting_value = $params[ $setting_names[0] ];
+
+					unset( $setting_names[0] );
+
+					foreach( $setting_names as $setting_key => $setting_name )
+					{	
+						// Remove array entry if its value is numeric because it represent iterations not relevant
+						if( is_numeric( $setting_name ) ) unset($setting_names[$setting_key]);
+
+					}
+
+					// Sort and restart the array at 0
+					$setting_names = array_values($setting_names);
+
+				}
+				
+				if( isset($setting_names[0])  &&  isset($setting_names[1]) && isset( $setting_value['entries'][ $setting_names[0] ]['inputs'][ $setting_names[1] ]['defaultvalue'] ) )
+				{
+					$setting_value = $setting_value['entries'][ $setting_names[0] ]['inputs'][ $setting_names[1] ]['defaultvalue'];
+				}
+				else
+				{
+					$setting_value = NULL;
+				}
+
+				return $setting_value;
+
+			}		
+			// Get param from group field:
 			$parname = substr( $parname, strlen( $group ) );
 			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
 			{	// We have a default value:

@@ -66,7 +66,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		if( substr( $group, -1 ) === ']' )
 		{	// If group name is in array format like "edit_plugin_1_set_sample_sets[0][group_name]",
 			// then param name must be like "edit_plugin_1_set_sample_sets[0][group_name_param_name]":
-			$parname = substr( $group, 0, strlen( $group ) - 1 ).$parname.']';
+			//$parname = substr( $group, 0, strlen( $group ) - 1 ).$parname.']';
+			$parname = substr( $group, 0, strlen( $group ) - 1 ).']['.$parname.']';
 		}
 		else
 		{	// If group name is simple like "group_name",
@@ -421,13 +422,27 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$k_nb = 0;
 			}
 
-			// check if a color field is among the entries
+			// Check if a color field is among the entries:
 			foreach( $parmeta['entries'] as $entry )
 			{
-				if( isset( $entry['type'] ) && $entry['type'] == 'color' )
+				if( isset( $entry['inputs'] ) )
 				{
-					$has_color_field = true;
-					break;
+					foreach( $entry['inputs'] as $input_entry )
+					{
+						if( isset( $input_entry['type'] ) && $input_entry['type'] == 'color' )
+						{
+							$has_color_field = true;
+							break;
+						}
+					}
+				}
+				else
+				{
+					if( isset( $entry['type'] ) && $entry['type'] == 'color' )
+					{
+						$has_color_field = true;
+						break;
+					}
 				}
 			}
 
