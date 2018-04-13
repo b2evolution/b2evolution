@@ -185,7 +185,27 @@ class development_plugin extends Plugin
 		global $app_version;
 		
 		return array(
+			
+	'_vagtables' => array(
+										'label' 		=> T_('Vegtables'),
+										'type' 			=> 'input_group',
+										'inputs' 		=> array(
 
+
+														'_value' => array(
+																			'label' => T_('Value'),
+																			'defaultvalue' => 'value',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+														'_label' => array(
+																			'label' => T_('Label'),
+																			'defaultvalue' => 'label',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+								)),
+			
 
 	'info_1' => array(
 						'label' => T_('Following'),
@@ -211,13 +231,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -231,13 +251,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -294,13 +314,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -314,13 +334,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -357,13 +377,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -437,13 +457,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -457,13 +477,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -501,13 +521,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),

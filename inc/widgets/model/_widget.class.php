@@ -457,8 +457,18 @@ class ComponentWidget extends DataObject
 			}
 		}
 		else
-		{	// Get param from group field:
-			$parname = substr( $parname, strlen( $group ) );
+		{
+			$setting_names = explode( '[', $parname );
+			
+			if( isset( $setting_names[2] ) )
+			{
+				$parname = trim( $setting_names[2], ']' );
+			}
+			
+			$parname = substr( $parname, utf8_strlen( $group ) );
+			
+			// Get param from group field:
+			//$parname = substr( $parname, strlen( $group ) );
 			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
 			{	// We have a default value:
 				return $params[$group]['inputs'][$parname]['defaultvalue'] ;

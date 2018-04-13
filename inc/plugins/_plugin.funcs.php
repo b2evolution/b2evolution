@@ -69,14 +69,19 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		if( substr( $group, -1 ) === ']' )
 		{	// If group name is in array format like "edit_plugin_1_set_sample_sets[0][group_name]",
 			// then param name must be like "edit_plugin_1_set_sample_sets[0][group_name_param_name]":
+			
 			$parname = substr( $group, 0, strlen( $group ) - 1 ).$parname.']';
 			//$parname = substr( $group, 0, strlen( $group ) - 1 ).']['.$parname.']';
+			//$group = str_replace( array( '[', ']' ), array('', ''), substr( $group, strrpos($parname, '['), strlen( $group ) - 1 ) );
+			
 		}
 		else
 		{	// If group name is simple like "group_name",
 			// then param name must be like "group_name_param_name"
 			$parname = $group.$parname;
 		}
+		
+		
 	}
 	else
 	{
@@ -216,6 +221,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				break;
 
 			case 'Skin':
+				// $group causes some funky, NULL seems to resolve it
 				$set_value = $Obj->get_setting( $parname, $group );
 				$error_value = NULL;
 				break;

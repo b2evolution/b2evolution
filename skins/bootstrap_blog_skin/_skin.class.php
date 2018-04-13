@@ -113,6 +113,25 @@ class bootstrap_blog_Skin extends Skin
 		$r = array_merge( array(
 			
 			
+	'_vagtables' => array(
+										'label' 		=> T_('Vegtables'),
+										'type' 			=> 'input_group',
+										'inputs' 		=> array(
+
+
+														'_value' => array(
+																			'label' => T_('Value'),
+																			'defaultvalue' => 'value',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+														'_label' => array(
+																			'label' => T_('Label'),
+																			'defaultvalue' => 'label',
+																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+								)),
 
 
 					'input_item_1' => array(
@@ -133,13 +152,13 @@ class bootstrap_blog_Skin extends Skin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -153,13 +172,13 @@ class bootstrap_blog_Skin extends Skin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -224,13 +243,13 @@ class bootstrap_blog_Skin extends Skin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -244,13 +263,13 @@ class bootstrap_blog_Skin extends Skin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -281,15 +300,16 @@ class bootstrap_blog_Skin extends Skin
 										'inputs' 		=> array(
 
 
+											
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => '',
+																			'defaultvalue' => 'label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),

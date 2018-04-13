@@ -789,22 +789,41 @@ class Skin extends DataObject
 		 */
 		global $Collection, $Blog;
 
-		if( ! empty( $group ) )
-		{ // $parname is prefixed with $group, we'll remove the group prefix
-			$parname = substr( $parname, strlen( $group ) );
+		// Name of the setting in the blog settings:
+		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+
+		if( strpos( $blog_setting_name, '[' ) !== false )
+		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+			$setting_names = explode( '[', $blog_setting_name );
+			$value = $Blog->get_setting( $setting_names[0] );
+			
+			unset( $setting_names[0] );
+			foreach( $setting_names as $setting_name )
+			{
+				$setting_name = trim( $setting_name, ']' );
+				if( isset( $value[ $setting_name ] ) )
+				{
+					$value = $value[ $setting_name ];
+				}
+				else
+				{
+					$value = NULL;
+					break;
+				}
+			}
+		}
+		else
+		{	// Get normal(not array) setting value:
+			$value = $Blog->get_setting( $blog_setting_name );
 		}
 
-		// Name of the setting in the blog settings:
-		$blog_setting_name = 'skin'.$this->ID.'_'.$group.$parname;
-
-		$value = $Blog->get_setting( $blog_setting_name );
-
+		
 		if( ! is_null( $value ) )
 		{	// We have a value for this param:
 			return $value;
 		}
-
-		return $this->get_setting_default_value( $group.$parname, $group );
+		
+		return $this->get_setting_default_value( $parname, $group );
 	}
 
 
@@ -819,43 +838,110 @@ class Skin extends DataObject
 	{
 		if( ! empty ( $group ) )
 		{
-			$parname = substr( $parname, strlen( $group ) );
+			//$parname = substr( $parname, strlen( $group ) );
 		}
 
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
+		
 		if( isset( $params[ $parname ]['defaultvalue'] ) )
 		{ // We have a default value:
 			return $params[ $parname ]['defaultvalue'] ;
 		}
-		elseif( isset( $params[ $parname ]['type'] ) &&
-		        $params[ $parname ]['type'] == 'checklist' &&
-		        ! empty( $params[ $parname ]['options'] ) )
-		{ // Get default values for checkbox list:
-			$options = array();
-			foreach( $params[ $parname ]['options'] as $option )
-			{
-				if( isset( $option[2] ) )
-				{ // Set default value only if it is defined by skin:
-					$options[ $option[0] ] = $option[2];
-				}
-			}
-			return $options;
-		}
-		elseif( isset( $params[ $parname ]['type'] ) &&
-						$params[ $parname ]['type'] == 'fileselect' &&
+		elseif( isset( $params[ $parname ]['type'] ) )
+		{
+			$type = $params[ $parname ]['type'];
+					
+					switch($type)
+					{
+						case 'input_group':
+							
+							if( ! empty( $params[ $group ]['inputs'] ) &&
+							isset( $params[ $group ]['inputs'][ $parname ] ))
+							{
+								return $params[ $parname ]['inputs'][ $group ]['defaultvalue'];
+							}
+							
+							break;
+						case 'fileselect':
+							if([ $parname ]['type'] == 'fileselect' &&
 						! empty( $params[ $parname ]['initialize_with'] ) &&
 						$default_File = & get_file_by_abspath( $params[ $parname ]['initialize_with'], true ) )
-		{ // Get default value for fileselect
-			return $default_File->ID;
+							{// Get default value for fileselect
+								return $default_File->ID;
+							}
+							break;
+						case 'checklist':
+								if(! empty( $params[ $parname ]['options'] ) )
+								{ // Get default values for checkbox list:
+									$options = array();
+									foreach( $params[ $parname ]['options'] as $option )
+									{
+										if( isset( $option[2] ) )
+										{ // Set default value only if it is defined by skin:
+											$options[ $option[0] ] = $option[2];
+										}
+									}
+									return $options;
+								}
+							break;	
+						}	
 		}
-		elseif( ! empty( $group ) &&
-						isset( $params[ $group ]['type'] ) &&
-						$params[ $group ]['type'] == 'input_group' &&
-						! empty( $params[ $group ]['inputs'] ) &&
-						isset( $params[ $group ]['inputs'][ $parname ] ) )
+		else//( isset( $params['entries'] ) )
 		{
-			return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
+			
+			$setting_names = explode( '[', $parname );
+			
+			if( isset( $setting_names[2] ) )
+			{
+				$parname = trim( $setting_names[2], ']' );
+	
+			}
+			
+			if( isset( $params[$setting_names[0]]['entries'] ) )
+			{	
+				if( isset( $params[$setting_names[0]]['entries'][$group]['type'] ) )
+				{
+					$type = $params[$setting_names[0]]['entries'][$group]['type'];
+					
+					switch($type)
+					{
+						case 'input_group':
+							if( isset( $params[$setting_names[0]]['entries'][$group]['inputs']) )
+							{	
+								if( isset( $params[ $setting_names[0] ]['entries'][ $group ]['inputs'][ $parname ]['defaultvalue'] ) )
+								{
+									return $params[ $setting_names[0] ]['entries'][ $group ]['inputs'][ $parname ]['defaultvalue'] ;
+								}
+							}
+							
+							break;
+						case 'fileselect':
+							if( ! empty( $params[ $setting_names[0] ]['entries'][ $group ]['inputs'][ $parname ]['initialize_with'] ) && $default_File = & get_file_by_abspath( $params[ $setting_names[0] ]['entries'][ $group ]['inputs'][ $parname ]['initialize_with'], true ) )
+							{
+								return $default_File->ID;
+							}
+							break;
+						case 'checklist':
+							if( ! empty( $params[ $setting_names[0] ]['entries'][ $group ]['inputs'][ $parname ]['options'] ) )
+							{
+								$options = array();
+								foreach( $params[ $parname ]['options'] as $option )
+								{
+									if( isset( $option[2] ) )
+									{ // Set default value only if it is defined by skin:
+										$options[ $option[0] ] = $option[2];
+									}
+								}
+								return $options;
+							}
+							break;
+					}
+					
+				}
+				   
+			}
+			
 		}
 
 		return NULL;
