@@ -554,11 +554,11 @@ function campaign_td_welcome( $ecmp_ID, $ecmp_welcome )
 
 	if( $ecmp_welcome )
 	{	// If newsletter is active:
-		$welcome_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => htmlspecialchars( T_('The email campaign is used as "Welcome" for its list.') ) ) );
+		$welcome_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The email campaign is used as "Welcome" for its list.') ) );
 	}
 	else
 	{	// If newsletter is NOT active:
-		$welcome_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => htmlspecialchars( T_('The email campaign is not used as "Welcome" for its list.') ) ) );
+		$welcome_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The email campaign is not used as "Welcome" for its list.') ) );
 	}
 
 	if( $current_User->check_perm( 'emails', 'edit' ) )
