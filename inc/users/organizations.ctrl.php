@@ -297,6 +297,11 @@ if( $display_mode != 'js')
 	$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
 	$AdminUI->breadcrumbpath_add( T_('Organizations'), '?ctrl=organizations' );
 
+	if( $action == 'edit' )
+	{	// Load jQuery QueryBuilder plugin files for user list filters:
+		init_querybuilder_js( 'rsc_url' );
+	}
+
 	if( $action == 'new' || $action == 'edit' || $action == 'add_user' )
 	{
 		// Set an url for manual page:

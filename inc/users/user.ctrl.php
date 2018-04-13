@@ -915,6 +915,8 @@ if( $display_mode != 'js')
 		case 'visits':
 			// Initialize user tag input
 			init_tokeninput_js();
+			// Load jQuery QueryBuilder plugin files for user list filters:
+			init_querybuilder_js( 'rsc_url' );
 			$AdminUI->breadcrumbpath_add( T_('Visits'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
 			// Set an url for manual page:

@@ -595,6 +595,8 @@ if( $display_mode != 'js' )
 if( in_array( $action, array( 'iprange_edit' ) ) )
 { // Initialize date picker
 	init_datepicker_js();
+	// Load jQuery QueryBuilder plugin files for user list filters:
+	init_querybuilder_js( 'rsc_url' );
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
