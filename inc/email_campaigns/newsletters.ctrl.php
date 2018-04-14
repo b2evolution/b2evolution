@@ -285,6 +285,8 @@ switch( $action )
 				init_datepicker_js();
 				// Initialize user tag input
 				init_tokeninput_js();
+				// Load jQuery QueryBuilder plugin files for user list filters:
+				init_querybuilder_js( 'rsc_url' );
 				$AdminUI->set_page_manual_link( 'email-list-subscribers' );
 				$AdminUI->set_path( 'email', 'newsletters', 'subscribers' );
 				break;

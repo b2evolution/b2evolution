@@ -533,6 +533,11 @@ switch( $action )
 		break;
 }
 
+if( $tab == 'recipient' )
+{	// Load jQuery QueryBuilder plugin files for user list filters:
+	init_querybuilder_js( 'rsc_url' );
+}
+
 
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=campaigns' );
