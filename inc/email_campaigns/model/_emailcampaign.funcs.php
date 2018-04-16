@@ -56,7 +56,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 	);
 	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
-		$modes['info']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'info'} );";
+		$modes['info']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'info'} );";
 	}
 
 	$url = $edit_url.$glue.'tab=compose';
@@ -66,7 +66,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 	);
 	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
-		$modes['compose']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'compose'} );";
+		$modes['compose']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'compose'} );";
 	}
 
 	$url = $edit_url.$glue.'tab=plaintext';
@@ -77,7 +77,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 	);
 	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
-		$modes['plaintext']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'plaintext'} );";
+		$modes['plaintext']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'plaintext'} );";
 	}
 
 	$url = $edit_url.$glue.'tab=send';
@@ -87,7 +87,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 	);
 	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
-		$modes['send']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'send'} );";
+		$modes['send']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'send'} );";
 	}
 
 	$url = $edit_url.$glue.'tab=recipient'.$glue.'filter=new';
@@ -97,7 +97,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 	);
 	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
-		$modes['recipient']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'recipient'} );";
+		$modes['recipient']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'recipient'} );";
 	}
 
 	return $modes;
