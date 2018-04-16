@@ -1321,6 +1321,10 @@ class collections_Module extends Module
 				// Set item properties from submitted form:
 				$new_Item->load_from_Request( false, true );
 
+				// Use default item/post type of the collection:
+				$default_item_type_ID = $item_Blog->get_setting( 'default_post_type' );
+				$new_Item->set( 'ityp_ID', ( empty( $default_item_type_ID ) ? 1 /* Post */ : $default_item_type_ID ) );
+
 				// Call plugin event for additional checking, e-g captcha:
 				$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $new_Item ) );
 
