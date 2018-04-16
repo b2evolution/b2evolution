@@ -160,7 +160,8 @@ $current_charset = $evo_charset;
 init_charsets( $current_charset );
 
 // Check minimum memory limit for successful using:
-if( system_check_memory_limit() < get_php_bytes_size( '48M' ) )
+$memory_limit = system_check_memory_limit();
+if( $memory_limit != -1 && $memory_limit < get_php_bytes_size( '48M' ) )
 { // Deny to use on server with small memory limit size:
 	$install_memory_limit_allow = false;
 	if( $action != 'localeinfo' )
