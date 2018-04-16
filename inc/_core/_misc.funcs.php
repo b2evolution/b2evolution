@@ -7698,7 +7698,7 @@ function echo_fieldset_folding_js()
 
 ?>
 <script type="text/javascript">
-jQuery( 'span[id^=icon_folding_], span[id^=title_folding_]' ).click( function()
+jQuery( document ).on( 'click', 'span[id^=icon_folding_], span[id^=title_folding_]', function()
 {
 	var is_icon = jQuery( this ).attr( 'id' ).match( /^icon_folding_/ );
 	var wrapper_obj = jQuery( this ).closest( '.fieldset_wrapper' );
