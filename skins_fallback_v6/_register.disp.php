@@ -146,7 +146,7 @@ $Form->text_input( $dummy_fields['login'], $login, 22, /* TRANS: noun */ T_('Log
 			'maxlength'    => 20,
 			'class'        => 'input_text',
 			'required'     => true,
-			'input_suffix' => ' <span id="login_status"></span>',
+			'input_suffix' => ' <span id="login_status"></span><span class="help-inline"><div id="login_status_msg" class="red"></div></span>',
 			'style'        => 'width:'.( $params['register_field_width'] - 2 ).'px',
 		)
 	);
