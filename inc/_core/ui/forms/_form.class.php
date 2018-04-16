@@ -312,7 +312,7 @@ class Form extends Widget
 					$this->customstart    = $template['customstart'];
 					$this->customend      = $template['customend'];
 					$this->note_format    = $template['note_format'];
-					$this->bottom_note_format = $template['bottom_note_format'];
+					$this->bottom_note_format = isset( $template['bottom_note_format'] ) ? $template['bottom_note_format'] : '<br />'.$template['note_format'];
 					$this->formend        = $template['formend'];
 					// Additional params depending on field type:
 					$template = array_merge( array(
