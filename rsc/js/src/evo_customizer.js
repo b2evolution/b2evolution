@@ -20,7 +20,7 @@ jQuery( document ).on( 'ready', function()
 	jQuery( '#evo_customizer__backoffice' ).on( 'load', function()
 	{	// If iframe with settings has been loaded
 		var backoffice_content = jQuery( this ).contents();
-		backoffice_content.find( 'form' ).attr( 'target', 'evo_customizer__updater' );
+		backoffice_content.find( 'form:not([target])' ).attr( 'target', 'evo_customizer__updater' );
 		if( backoffice_content.find( '.evo_customizer__buttons' ).length )
 		{	// Set proper bottom margin because buttons block has a fixed position at the bottom:
 			backoffice_content.find( 'body' ).css( 'margin-bottom', backoffice_content.find( '.evo_customizer__buttons' ).outerHeight() - 1 );
@@ -39,10 +39,15 @@ jQuery( document ).on( 'ready', function()
 		{	// Remove messages wrapper completely if it had only successful messages:
 			messages_wrapper.closest( '.action_messages' ).remove();
 		}
+		var error_accordion_toggler = backoffice_content.find( 'input.field_error' ).closest( '.panel-collapse' );
+		if( error_accordion_toggler.length )
+		{	// Expand accordion collapsed block if it has at least one field with error:
+			error_accordion_toggler.collapse( 'show' );
+		}
 
 		// Set proper space before form after top tabs:
 		var tabs_height = backoffice_content.find( '.evo_customizer__tabs' ).outerHeight();
-		backoffice_content.find( '.evo_customizer__content' ).css( 'margin-top', tabs_height + 'px' );
+		backoffice_content.find( '#customizer_wrapper' ).css( 'padding-top', tabs_height + 'px' );
 
 		backoffice_content.find( '.evo_customizer__tabs a' ).click( function()
 		{	// Check to enable/disable designer mode between switching skin and widgets menu entries:
@@ -67,9 +72,12 @@ jQuery( document ).on( 'ready', function()
 
 		backoffice_content.find( 'form' ).submit( function()
 		{	// Disable a submit button when form is starting to be submitted:
-			var button = jQuery( this ).find( 'input[type=submit]' );
-			button.prop( 'disabled', true );
-			button.after( '<div id="evo_customizer__form_loader"></div>' );
+			if( jQuery( this ).data( 'orig-submit' ) != '1' )
+			{
+				var button = jQuery( this ).find( 'input[type=submit]' );
+				button.prop( 'disabled', true );
+				button.after( '<div id="evo_customizer__form_loader"></div>' );
+			}
 		} );
 	} );
 
@@ -85,7 +93,10 @@ jQuery( document ).on( 'ready', function()
 		// OR if the settings iframe has the error message from previous updating:
 			jQuery( '#evo_customizer__backoffice' ).contents().find( '.alert' ).length )
 		{	// Update settings/back-office iframe with new content what we have in updater iframe currently:
-			jQuery( '#evo_customizer__backoffice' ).contents().find( 'form' ).removeAttr( 'target' ).submit();
+			var form = jQuery( '#evo_customizer__backoffice' ).contents().find( 'form' );
+			form.removeAttr( 'target' ).data( 'orig-submit', '1' );
+			form.find( 'input[type=submit]' ).prop( 'disabled', false ).removeAttr( 'disabled' ).next().remove();
+			form.submit();
 		}
 	} );
 

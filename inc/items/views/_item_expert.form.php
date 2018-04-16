@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -640,22 +640,24 @@ $Form->begin_form( '', '', $params );
 
 			$ItemStatusCache = & get_ItemStatusCache();
 			$ItemStatusCache->load_all();
-
 			$ItemTypeCache = & get_ItemTypeCache();
-			$current_ItemType = $ItemTypeCache->get_by_ID( $edited_Item->ityp_ID );
+			$current_ItemType = & $edited_Item->get_ItemType();
 			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
 
 			echo ' '; // allow wrapping!
 
-			$Form->begin_line( T_('Deadline'), 'item_deadline' );
+			if( $Blog->get_setting( 'use_deadline' ) )
+			{	// Display deadline fields only if it is enabled for collection:
+				$Form->begin_line( T_('Deadline'), 'item_deadline' );
 
-				$datedeadline = $edited_Item->get( 'datedeadline' );
-				$Form->date( 'item_deadline', $datedeadline, '' );
+					$datedeadline = $edited_Item->get( 'datedeadline' );
+					$Form->date( 'item_deadline', $datedeadline, '' );
 
-				$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
-				$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+					$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+					$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
 
-			$Form->end_line();
+				$Form->end_line();
+			}
 
 			$Form->switch_layout( NULL );
 			echo '</div>';
@@ -710,15 +712,20 @@ $Form->begin_form( '', '', $params );
 	echo '</td></tr>';
 
 	if( $current_User->check_perm( 'users', 'edit' ) )
-	{
+	{	// If current User has full access to edit other users,
+		// Display item's owner:
 		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
-		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.').'<br/>' );
+		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.') );
 		$Form->hidden( 'item_owner_login_displayed', 1 );
+		echo '</td></tr>';
+		// Display a checkbox to create new user:
+		echo '<tr><td></td><td>';
+		echo '<label class="ffield_item_create_user"><input type="checkbox" name="item_create_user" value="1"'.( get_param( 'item_create_user' ) ? ' checked="checked"' : '' ).' /> '.T_('Create new user').'</label>';
 		echo '</td></tr>';
 	}
 
 	if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
-	{ // Dispaly Latitude & Longitude settings
+	{	// Display Latitude & Longitude settings:
 		$field_required = ( $edited_Item->get_type_setting( 'use_coordinates' ) == 'required' ) ? $required_star : '';
 		echo '<tr><td>'.$field_required.'<strong>'.T_('Latitude').':</strong></td><td>';
 		$Form->text( 'item_latitude', $edited_Item->get_setting( 'latitude' ), 10, '' );

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -181,10 +181,13 @@ function init_inskin_editing()
 
 		load_class( 'items/model/_item.class.php', 'Item' );
 		$edited_Item = new Item();
-		$def_status = get_highest_publish_status( 'post', $Blog->ID, false );
+		$def_status = get_highest_publish_status( 'post', $Blog->ID, false, '', $edited_Item );
 		$edited_Item->set( 'status', $def_status );
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
-		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
+		$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
+		// Prefill data from url:
+		$edited_Item->set( 'title', param( 'post_title', 'string' ) );
+		$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
 
 		// Set default locations from current user
 		$edited_Item->set_creator_location( 'country' );
@@ -243,12 +246,13 @@ function init_inskin_editing()
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
  * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
+ * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts
  * @return Item
  */
-function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false )
+function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false, $load_featured = false )
 {
 	global $Collection, $Blog, $cat;
-	global $disp, $disp_detail, $MainList, $FeaturedList;
+	global $disp, $disp_detail, $MainList, $FeaturedList, $featured_list_type;
 	global $featured_displayed_item_IDs;
 
 	if( $disp != $restrict_disp || !isset($MainList) )
@@ -256,6 +260,14 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 		$Item = NULL;
 		return $Item;
 	}
+
+	if( $featured_list_type != $load_featured )
+	{	// Reset a featured list if previous request was to load another type:
+		$FeaturedList = NULL;
+	}
+
+	// Save current list type in global var:
+	$featured_list_type = $load_featured;
 
 	if( !isset( $FeaturedList ) )
 	{	// Don't repeat if we've done this already -- Initialize the featured list only first time this function is called in a skin:
@@ -319,7 +331,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		$FeaturedList->set_filters( array(
 				'coll_IDs' => $coll_IDs,
-				'itemtype_usage' => $restrict_to_types_usage,
+				'itemtype_usage' => $restrict_to_types_usage.( $load_featured ? ',*featured*' : '' ),
 			), false /* Do NOT memorize!! */ );
 		// pre_dump( $FeaturedList->filters );
 		// Run the query:
@@ -328,24 +340,22 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		// SECOND: If no Intro, try to find an Featured post:
 
-		if( isset($Blog) )
-		{
-			if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
-				&& isset($Blog)
-				&& $Blog->get_setting('disp_featured_above_list') )
-			{ // No Intro page was found, try to find a featured post instead:
+		if( ! $load_featured && // Don't try to load featured posts twice,
+		    $FeaturedList->result_num_rows == 0 && // If no intro post has been load above,
+		    $restrict_disp != 'front' && // Exclude front page,
+		    $Blog->get_setting( 'disp_featured_above_list' ) ) // If the collection setting "Featured post above list" is enabled.
+		{	// No Intro page was found, try to find a featured post instead:
 
-				$FeaturedList->reset();
+			$FeaturedList->reset();
 
-				$FeaturedList->set_filters( array(
-						'coll_IDs' => $coll_IDs,
-						'featured' => 1,  // Featured posts only
-						// Types will already be reset to defaults here
-					), false /* Do NOT memorize!! */ );
+			$FeaturedList->set_filters( array(
+					'coll_IDs' => $coll_IDs,
+					'featured' => 1,  // Featured posts only
+					// Types will already be reset to defaults here
+				), false /* Do NOT memorize!! */ );
 
-				// Run the query:
-				$FeaturedList->query();
-			}
+			// Run the query:
+			$FeaturedList->query();
 		}
 	}
 
@@ -383,11 +393,12 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
  * @param string The name of the post ID column
  * @param string The name of the DB table to use
  * @param NULL|string The post locale or NULL if there is no specific locale.
+ * @param NULL|string The name of the DB table to use in the message
  * @return string validated url title
  */
 function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
 									$dbSlugFieldName = 'post_urltitle', $dbIDname = 'post_ID',
-									$dbtable = 'T_items__item', $post_locale = NULL )
+									$dbtable = 'T_items__item', $post_locale = NULL, $msg_dbtable = NULL )
 {
 	global $DB, $Messages;
 
@@ -516,7 +527,38 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	if( !empty($orig_title) && $urltitle != $orig_title )
 	{
-		$Messages->add( sprintf(T_('Warning: the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'note' );
+		$msg_table = ! empty( $msg_dbtable ) ? $msg_dbtable : $dbtable;
+		switch( $msg_table )
+		{
+			case 'T_items__item':
+				// post_urltitle
+				$field_type = T_('Post');
+				break;
+
+			case 'T_categories':
+				// cat_urlname
+				$field_type = T_('Category');
+				break;
+
+			case 'T_blogs':
+				// blog_urlname
+				$field_type = T_('Collection');
+				break;
+
+			case 'T_slug':
+				// slug_title
+				$field_type = T_('Slug');
+				break;
+		}
+
+		if( isset( $field_type ) )
+		{
+			$Messages->add_to_group( sprintf( /* TRANS: First %s gets replaced by field type, 2nd %s by title, 3rd %s by urltitle */ T_('URL slug for %s &laquo;%s&raquo; has been changed to &laquo;%s&raquo;.'), $field_type, $title, $urltitle ), 'note', T_('Warning: URL slugs changed:' ) );
+		}
+		else
+		{
+			$Messages->add_to_group( sprintf( T_('URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'note', T_('Warning: URL slugs changed:' ) );
+		}
 	}
 
 	return $urltitle;
@@ -868,7 +910,7 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 			$where[] = $allowed_statuses_cond;
 		}
 	}
-	elseif( count( $show_statuses ) )
+	elseif( is_array( $show_statuses ) && count( $show_statuses ) )
 	{ // we are not filtering so all status are allowed, add allowed statuses condition
 		$where[] = $dbprefix.'status IN ( \''.implode( '\',\'', $show_statuses ).'\' )';
 	}
@@ -1859,7 +1901,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	global $Collection, $Blog, $current_User, $UserSettings;
 	global $next_action, $highest_publish_status; // needs to be passed out for echo_publishnowbutton_js( $action )
 
-	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID );
+	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID, true, '', $edited_Item );
 	if( ! isset( $edited_Item->status ) )
 	{
 		$edited_Item->status = $highest_publish_status;
@@ -1880,7 +1922,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		echo '<span class="edit_actions_text">'.T_('Visibility').get_manual_link( 'visibility-status' ).': </span>';
 
 		// Get those statuses which are not allowed for the current User to create posts in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
 		// Get allowed visibility statuses
 		$status_options = get_visibility_statuses( '', $exclude_statuses );
 
@@ -1967,7 +2009,7 @@ function echo_item_status_buttons( $Form, $edited_Item )
 	global $next_action, $action, $Collection, $Blog;
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
@@ -3311,7 +3353,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  */
 function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $inlist_order = NULL, $display_meta_title = false, $reply_level = 0 )
 {
-	global $current_User, $localtimenow;
+	global $current_User, $localtimenow, $item_id;
 
 	$Item = & $Comment->get_Item();
 	$Collection = $Blog = & $Item->get_Blog();
@@ -3374,6 +3416,11 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 					'text'   => '#text#'
 				) );
 			echo '</div>';
+		}
+
+		if( ! empty( $item_id ) && $Comment->ID > 0 && ! $Comment->is_meta() )
+		{	// Display checkbox to select normal existing comments for action only on view item page:
+			echo '<input type="checkbox" name="selected_comments[]" value="'.$Comment->ID.'" /> ';
 		}
 
 		echo '<span class="bDate">';
@@ -3502,6 +3549,11 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 		$Comment->status();
 		echo '</span>';
 		echo '</div>';
+
+		if( ! empty( $item_id ) && $Comment->ID > 0 && ! $Comment->is_meta() )
+		{	// Display checkbox to select normal existing comments for action only on view item page:
+			echo '<input type="checkbox" name="selected_comments[]" value="'.$Comment->ID.'" /> ';
+		}
 
 		echo '<span class="bDate">';
 		$Comment->date();
@@ -3938,16 +3990,17 @@ function set_session_Item( $Item )
  * Get object Item from Session
  *
  * @param integer Item ID
+ * @param boolean TRUE - to force a creating of new Item if it is not saved in Session yet
  * @return object Item
  */
-function get_session_Item( $item_ID = 0 )
+function get_session_Item( $item_ID = 0, $force_new = false )
 {
 	global $Session;
 
 	$edited_items = $Session->get( 'edited_items' );
 
-	if( isset( $edited_items[ $item_ID ] ) && is_object( $edited_items[ $item_ID ] ) )
-	{
+	if( isset( $edited_items[ $item_ID ] ) && ( $edited_items[ $item_ID ] instanceof Item ) )
+	{	// Get Item from Session:
 		$edited_Item = $edited_items[ $item_ID ];
 
 		// Reload main Chapter
@@ -3957,6 +4010,17 @@ function get_session_Item( $item_ID = 0 )
 		// Reload Post Type
 		$edited_Item->ItemType = NULL;
 		$edited_Item->get_ItemType();
+
+		return $edited_Item;
+	}
+	elseif( $force_new )
+	{	// Force to create new Item:
+		load_class( 'items/model/_item.class.php', 'Item' );
+		$edited_Item = new Item();
+		$edited_Item->set( 'main_cat_ID', get_param( 'cat' ) );
+		// Prefill data from url:
+		$edited_Item->set( 'title', param( 'post_title', 'string' ) );
+		$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
 
 		return $edited_Item;
 	}
@@ -4313,7 +4377,7 @@ function items_created_results_block( $params = array() )
 	$created_items_Results->no_results_text = $params['results_no_text'];
 
 	// Get a count of the post which current user can delete
-	$deleted_posts_created_count = count( $edited_User->get_deleted_posts( 'created' ) );
+	$deleted_posts_created_count = $edited_User->get_deleted_posts2( 'created', true );
 	if( ( $created_items_Results->get_total_rows() > 0 ) && ( $deleted_posts_created_count > 0 ) )
 	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one item created by user
 		$created_items_Results->global_icon( sprintf( T_('Delete all post created by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_posts_created&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
@@ -4395,6 +4459,8 @@ function items_edited_results_block( $params = array() )
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
 
+	/*
+	// erhsatingin > This query can be quite slow with very large datasets
 	$edited_versions_SQL = new SQL();
 	$edited_versions_SQL->SELECT( 'DISTINCT( iver_itm_ID )' );
 	$edited_versions_SQL->FROM( 'T_items__version' );
@@ -4405,6 +4471,16 @@ function items_edited_results_block( $params = array() )
 	$SQL->FROM( 'T_items__item ' );
 	$SQL->WHERE( '( ( post_lastedit_user_ID = '.$DB->quote( $edited_User->ID ).' ) OR ( post_ID IN ( '.$edited_versions_SQL->get().' ) ) )' );
 	$SQL->WHERE_and( 'post_creator_user_ID != '.$DB->quote( $edited_User->ID ) );
+	*/
+
+	// erhsatingin > still slow but faster than above query
+	$SQL = new SQL();
+	$SQL->SELECT( '*' );
+	$SQL->FROM( 'T_items__item' );
+	$SQL->FROM_add( 'LEFT JOIN ( SELECT iver_itm_ID, COUNT(*) AS counter FROM T_items__version WHERE iver_edit_user_ID = '
+			.$DB->quote( $edited_User->ID ).' GROUP BY iver_itm_ID ) AS a ON a.iver_itm_ID = post_ID' );
+	$SQL->WHERE( '( post_lastedit_user_ID = '.$DB->quote( $edited_User->ID ).' OR a.counter IS NOT NULL )' );
+	$SQL->WHERE_and( 'post_creator_user_ID != '.$DB->quote( $edited_User->ID ) );
 
 	// Create result set:
 	$edited_items_Results = new Results( $SQL->get(), $params['results_param_prefix'], 'D' );
@@ -4413,7 +4489,7 @@ function items_edited_results_block( $params = array() )
 	$edited_items_Results->no_results_text = $params['results_no_text'];
 
 	// Get a count of the post which current user can delete
-	$deleted_posts_edited_count = count( $edited_User->get_deleted_posts( 'edited' ) );
+	$deleted_posts_edited_count = $edited_User->get_deleted_posts2( 'edited', true );
 	if( ( $edited_items_Results->get_total_rows() > 0 ) && ( $deleted_posts_edited_count > 0 ) )
 	{	// Display actino icon to delete all records if at least one record exists & current user can delete at least one item created by user
 		$edited_items_Results->global_icon( sprintf( T_('Delete all post edited by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_posts_edited&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
@@ -4924,7 +5000,7 @@ function item_row_status( $Item, $index )
 	$blog_ID = $Item->Blog->ID;
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create', $Item->status ), array( 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create', $Item->status, '', $Item ), array( 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( '', $exclude_statuses );
 

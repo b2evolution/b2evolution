@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -43,6 +43,7 @@ if( $notifications_mode != 'off' )
 		$allow_subscriptions = $edited_Blog->get_setting( 'allow_subscriptions' );
 		$allow_comment_subscriptions = $edited_Blog->get_setting( 'allow_comment_subscriptions' );
 		$allow_item_subscriptions = $edited_Blog->get_setting( 'allow_item_subscriptions' );
+		$allow_item_mod_subscriptions = $edited_Blog->get_setting( 'allow_item_mod_subscriptions' );
 		$advanced_perms = $edited_Blog->get( 'advanced_perms' );
 		$subscription_checkboxes[] = array( 'allow_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new post.'), $allow_subscriptions );
 		$subscription_checkboxes[] = array( 'opt_out_subscription', 1, T_('Consider collection members to be subscribed for each new post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_subscription' ), $allow_subscriptions == 0 || $advanced_perms == 0 );
@@ -50,59 +51,27 @@ if( $notifications_mode != 'off' )
 		$subscription_checkboxes[] = array( 'opt_out_comment_subscription', 1, T_('Consider collection members to be subscribed for each new comment unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_comment_subscription' ), $allow_comment_subscriptions == 0 || $advanced_perms == 0 );
 		$subscription_checkboxes[] = array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $allow_item_subscriptions );
 		$subscription_checkboxes[] = array( 'opt_out_item_subscription', 1, T_('Consider collection members to be subscribed for comments on a post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_item_subscription' ), $allow_item_subscriptions == 0 || $advanced_perms == 0 );
+		$subscription_checkboxes[] = array( 'allow_item_mod_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications when post is modified and user has a permissions to moderate it.' ), $allow_item_mod_subscriptions );
+		$subscription_checkboxes[] = array( 'opt_out_item_mod_subscription', 1, T_('Consider collection members to be subscribed for each modified post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_item_mod_subscription' ), $allow_item_mod_subscriptions == 0 || $advanced_perms == 0 );
 		$Form->checklist( $subscription_checkboxes, 'subscriptions', T_('Email subscriptions') );
 		// TODO: checkbox 'Enable RSS/Atom feeds'
 		// TODO2: which feeds (skins)?
 	$Form->end_fieldset();
 	?>
 	<script type="text/javascript">
-		var advancedPerms = <?php echo $advanced_perms ? 'true' : 'false';?>;
-		var allowSubscriptions = jQuery( 'input[name=allow_subscriptions]' );
-		var allowCommentSubscriptions = jQuery( 'input[name=allow_comment_subscriptions]' );
-		var allowItemSubscriptions = jQuery( 'input[name=allow_item_subscriptions]' );
-		var optOutSubscription = jQuery( 'input[name=opt_out_subscription]' );
-		var optOutCommentSubscription = jQuery( 'input[name=opt_out_comment_subscription]' );
-		var optOutItemSubscription = jQuery( 'input[name=opt_out_item_subscription]' );
-
-		allowSubscriptions.on( 'click', function( event )
+		jQuery( 'input[name=allow_subscriptions], input[name=allow_comment_subscriptions], input[name=allow_item_subscriptions], input[name=allow_item_mod_subscriptions]' ).on( 'click', function()
+		{
+			var opt_out_object = jQuery( 'input[name=opt_out_' + jQuery( this ).attr( 'name' ).replace( /^allow_/, '' ).replace( /subscriptions$/, 'subscription' ) + ']' );
+			if( <?php echo $advanced_perms ? 'true' : 'false'; ?> && jQuery( this ).is( ':checked' ) )
 			{
-				if( allowSubscriptions.is( ':checked' ) && advancedPerms )
-				{
-					optOutSubscription.removeAttr( 'disabled' );
-				}
-				else
-				{
-					optOutSubscription.attr( 'disabled', true );
-					optOutSubscription.removeAttr( 'checked' );
-				}
-			});
-
-		allowCommentSubscriptions.on( 'click', function( event )
+				opt_out_object.prop( 'disabled', false );
+			}
+			else
 			{
-				if( allowCommentSubscriptions.is( ':checked' ) && advancedPerms )
-				{
-					optOutCommentSubscription.removeAttr( 'disabled' );
-				}
-				else
-				{
-					optOutCommentSubscription.attr( 'disabled', true );
-					optOutCommentSubscription.removeAttr( 'checked' );
-				}
-			});
-
-		allowItemSubscriptions.on( 'click', function( event )
-			{
-				if( allowItemSubscriptions.is( ':checked' ) && advancedPerms )
-				{
-					optOutItemSubscription.removeAttr( 'disabled' );
-				}
-				else
-				{
-					optOutItemSubscription.attr( 'disabled', true );
-					optOutItemSubscription.removeAttr( 'checked' );
-				}
-			});
-
+				opt_out_object.prop( 'disabled', true );
+				opt_out_object.prop( 'checked', false );
+			}
+		} );
 	</script>
 	<?php
 }

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  *
  * @package admin
@@ -53,7 +53,7 @@ if( isset($filter['off']) )
 }
 
 // Check permission:
-$current_User->check_perm( 'options', 'view', true );
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'spamblacklist', 'view', true );
 
 
@@ -459,6 +459,21 @@ switch( $action )
 			$delete_bankruptcy_blogs = true;
 		}
 		break;
+
+	case 'whois':
+		$tab = '';
+		$tab3 = 'tools';
+		$tool = 'whois';
+		$query = param( 'query', 'string', NULL );
+		if( empty( $query ) )
+		{
+			param_error( 'query', T_('You must specify an IP address or domain to query') );
+		}
+		else
+		{
+			$template_action = 'whois';
+		}
+		break;
 }
 
 if( $display_mode != 'js' )
@@ -535,6 +550,7 @@ if( $display_mode != 'js' )
 			// Set an url for manual page:
 			if( $action == 'iprange_new' || $action == 'iprange_edit' )
 			{
+				init_tokeninput_js();
 				$AdminUI->set_page_manual_link( 'ip-range-editing' );
 			}
 			else
@@ -577,6 +593,11 @@ if( $display_mode != 'js' )
 	}
 }
 
+if( in_array( $action, array( 'iprange_edit' ) ) )
+{ // Initialize date picker
+	init_datepicker_js();
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -601,6 +622,10 @@ switch( $tab3 )
 			case 'bankruptcy':
 				$comment_status = param( 'comment_status', 'string', 'draft' );
 				$AdminUI->disp_view( 'antispam/views/_antispam_tools_bankruptcy.view.php' );
+				break;
+
+			case 'whois';
+				$AdminUI->disp_view( 'antispam/views/_antispam_whois.view.php' );
 				break;
 
 			default:

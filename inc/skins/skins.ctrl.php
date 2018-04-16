@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -28,6 +28,11 @@ if( $action != 'reset_coll' )
 {	// Check permission to display site options:
 	// (exception for reset collection skin settings where we should check permission to edit collection properties)
 	$current_User->check_perm( 'options', 'view', true );
+}
+
+if( $tab == 'system' )
+{	// Check minimum permission:
+	$current_User->check_perm( 'admin', 'normal', true );
 }
 
 param( 'redirect_to', 'url', $admin_url.'?ctrl=skins&tab='.$tab.( isset( $blog ) ? '&blog='.$blog : '' ) );
@@ -91,6 +96,8 @@ switch( $action )
 			// Set new installed skins for the selected collection:
 			$edited_Blog->set( $skin_type.'_skin_ID', $edited_Skin->ID );
 			$edited_Blog->dbupdate();
+			// Re-scan and create widget containers from new switched skin if they don't exist for the edited collection:
+			$edited_Blog->db_save_main_containers();
 
 			$Messages->add( T_('The blog skin has been changed.')
 								.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
@@ -138,6 +145,46 @@ switch( $action )
 			// Replace a mask by value. Used for install skin on creating of new blog
 			$redirect_to = str_replace( '$skin_ID$', $edited_Skin->ID, $redirect_to );
 		}
+
+		// PREVENT RELOAD & Switch to list mode:
+		header_redirect( $redirect_to );
+		break;
+
+	case 'upgrade':
+	case 'downgrade':
+		param( 'skin_folder', 'string', true );
+		// Check validity of requested skin name:
+		if( preg_match( '~([^-A-Za-z0-9._]|\.\.)~', $skin_folder ) )
+		{
+			debug_die( 'The requested skin name is invalid.' );
+		}
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'skin' );
+
+		// Check permission to edit:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		$SkinCache = & get_SkinCache();
+
+		$new_Skin = & $SkinCache->new_obj( NULL, $skin_folder );
+		$edited_Skin = & $SkinCache->get_by_class( $new_Skin->class );
+		$edited_Skin->set( 'folder', $new_Skin->folder );
+		$edited_Skin->dbupdate();
+
+		if( $action == 'upgrade' )
+		{
+			$Messages->add( T_('Skin has been upgraded to a later version.'), 'success' );
+		}
+		else
+		{
+			$Messages->add( T_('Skin has been downgraded to an earlier version.'), 'success' );
+		}
+
+		$new_installed_skin_IDs = array( $edited_Skin->ID );
+
+		// We want to highlight the edited object on next list display:
+		$Session->set( 'fadeout_array', array( 'skin_ID' => $new_installed_skin_IDs ) );
 
 		// PREVENT RELOAD & Switch to list mode:
 		header_redirect( $redirect_to );

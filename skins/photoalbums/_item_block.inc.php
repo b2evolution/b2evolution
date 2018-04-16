@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage photoalbums
@@ -134,25 +134,25 @@ function change_position_nav()
 
 	if( nav_size )
 	{ // Navigation bar
-		if( !$nav.hasClass( 'fixed' ) && jQuery( window ).scrollTop() > $nav.offset().top - nav_top )
+		if( !$nav_album.hasClass( 'fixed' ) && jQuery( window ).scrollTop() > $nav_album.offset().top - nav_top )
 		{ // Make nav as fixed if we scroll down
-			$nav.before( $navSpacer );
-			$nav.addClass( 'fixed' ).css( 'top', nav_top + 'px' );
+			$nav_album.before( $navSpacer );
+			$nav_album.addClass( 'fixed' ).css( 'top', nav_top + 'px' );
 		}
-		else if( $nav.hasClass( 'fixed' ) && jQuery( window ).scrollTop() < $navSpacer.offset().top - nav_top )
+		else if( $nav_album.hasClass( 'fixed' ) && jQuery( window ).scrollTop() < $navSpacer.offset().top - nav_top )
 		{ // Remove 'fixed' class from nav if we scroll to the top of page
-			$nav.removeClass( 'fixed' ).css( 'top', '' );
+			$nav_album.removeClass( 'fixed' ).css( 'top', '' );
 			$navSpacer.remove();
 		}
 	}
 }
 
-var $nav = jQuery( '.nav_album' );
-var nav_size = $nav.size();
-var nav_top = <?php echo ( show_toolbar() ? 23 : 0 ) ; ?>;
+var $nav_album = jQuery( '.nav_album' );
+var nav_size = $nav_album.size();
+var nav_top = <?php echo ( show_toolbar() ? 27 : 0 ) ; ?>;
 var $navSpacer = $( '<div />', {
 		'class':  'nav_album_spacer',
-		'height': $nav.outerHeight( true ),
+		'height': $nav_album.outerHeight( true ),
 	} );
 
 jQuery( window ).resize( function()

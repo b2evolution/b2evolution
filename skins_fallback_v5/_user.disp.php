@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -353,6 +353,8 @@ echo '<div class="profile_column_right">';
 	$group_ID = 0;
 	foreach( $User->userfields as $userfield )
 	{
+		userfield_prepare( $userfield );
+
 		if( $group_ID != $userfield->ufgp_ID )
 		{ // Start new group
 			if( $group_ID > 0 )
@@ -360,11 +362,6 @@ echo '<div class="profile_column_right">';
 				$profileForm->end_fieldset();
 			}
 			$profileForm->begin_fieldset( $userfield->ufgp_name, array( 'id' => 'fieldset_user_fields' ) );
-		}
-
-		if( $userfield->ufdf_type == 'text' )
-		{ // convert textarea values
-			$userfield->uf_varchar = nl2br( $userfield->uf_varchar );
 		}
 
 		$userfield_icon = '';

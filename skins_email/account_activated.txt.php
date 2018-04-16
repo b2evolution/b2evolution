@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -59,7 +59,8 @@ if( ! empty( $user_domain ) )
 	$Domain = & get_Domain_by_subdomain( $user_domain );
 	$dom_status_titles = stats_dom_status_titles();
 	$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
-	echo T_('Registration Domain').": ".$user_domain.' ('.$dom_status.')'."\n";
+	echo T_('Registration Domain').": ".$user_domain.' ('.$dom_status.')'.
+			( ! empty( $user_domain ) ? ' '.$admin_url.'?ctrl=antispam&action=whois&query='.$user_domain : '' )."\n";
 }
 
 if( $activated_User->ctry_ID > 0 )

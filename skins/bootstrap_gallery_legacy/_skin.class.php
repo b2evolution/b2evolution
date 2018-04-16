@@ -122,6 +122,8 @@ class bootstrap_gallery_legacy_Skin extends Skin
 				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
 				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
 				'404_page'                  => array( NT_('404 Page'), 130 ),
+				'login_required'            => array( NT_('Login Required'), 140 ),
+				'access_denied'             => array( NT_('Access Denied'), 150 ),
 			);
 	}
 
@@ -145,7 +147,8 @@ class bootstrap_gallery_legacy_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max comment image height'),
-						'note' => 'px. ' . T_('Set maximum height for comment images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for comment images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',

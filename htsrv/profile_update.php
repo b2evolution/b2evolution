@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -293,19 +293,24 @@ elseif( ! param_errors_detected() )
 	switch( $action )
 	{
 		case 'update':
-			if( isset( $current_User->previous_pass_driver ) &&
+			if( $user_tab == 'register_finish' )
+			{	// After submitting quick data we should redirect user to page like after registration:
+				$redirect_to = get_redirect_after_registration();
+			}
+			elseif( isset( $current_User->previous_pass_driver ) &&
 			    $current_User->previous_pass_driver == 'nopass' &&
 			    $current_User->previous_pass_driver != $current_User->get( 'pass_driver' ) )
 			{	// Redirect to page as we use after email validation if current user set password first time, e-g after email capture/quick registration:
 				$redirect_to = redirect_after_account_activation();
 			}
-			elseif( $current_User->has_avatar() )
-			{ // Redirect to display user page
-				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&' ) );
-			}
-			else
-			{ // Redirect to upload avatar
+			elseif( ! $current_User->has_avatar() )
+			{	// Redirect to upload avatar if it is not uploaded yet:
 				$redirect_to = get_user_avatar_url();
+			}
+
+			if( empty( $redirect_to ) )
+			{	// Redirect to display user page for cases when redirect param cannot be defined above by some reason:
+				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&' ) );
 			}
 			break;
 		case 'upload_avatar':

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -217,6 +217,8 @@ class Link extends DataObject
 				'image_desc'          => '#',
 				'image_size_x'        => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
 				'tag_size'            => NULL,
+				'image_style'         => '',
+				'add_loadimg'         => true,
 			), $params );
 
 		return $File->get_tag( $params['before_image'],
@@ -233,7 +235,9 @@ class Link extends DataObject
 				$params['image_desc'],
 				'link_'.$this->ID,
 				$params['image_size_x'],
-				$params['tag_size'] );
+				$params['tag_size'],
+				$params['image_style'],
+				$params['add_loadimg'] );
 	}
 
 

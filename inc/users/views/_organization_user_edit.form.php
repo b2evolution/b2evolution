@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -51,6 +51,15 @@ $Form->begin_form( 'fform' );
 	else
 	{	// Otherwise display info field with role value:
 		$Form->info_field( T_('Role'), $org_data[$org_ID]['role'] );
+	}
+
+	if( ( $edited_Organization->owner_user_ID == $current_User->ID ) || ( $edited_Organization->perm_priority == 'owner and member' && $org_data[$org_ID]['accepted'] ) )
+	{	// Display edit field if current user has a permission to edit role:
+		$Form->text_input( 'priority', $org_data[$org_ID]['priority'], 10, T_('Priority'), '', array( 'type' => 'number', 'min' => -2147483648, 'max' => 2147483647 ) );
+	}
+	else
+	{	// Otherwise display info field with role value:
+		$Form->info_field( T_('Priority'), $org_data[$org_ID]['priority'] );
 	}
 
 $buttons = array();

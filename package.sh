@@ -7,6 +7,7 @@ rm -f readme.md
 rm -f readme.template.html
 rm -f .bower.json
 rm -f .gitmodules
+rm -f .gitignore
 echo Removing test skins
 rm -rf skins/clean1_skin
 rm -rf skins/horizon_blog_skin

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -94,11 +94,13 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	$plugin_settings = $loop_Plugin->get_coll_setting_definitions( $tmp_params );
 	if( is_array($plugin_settings) )
 	{
+		$Form->switch_layout( 'fieldset' );
 		foreach( $plugin_settings as $l_name => $l_meta )
 		{
 			// Display form field for this setting:
 			autoform_display_field( $l_name, $l_meta, $Form, 'CollSettings', $loop_Plugin, $Blog );
 		}
+		$Form->switch_layout( NULL );
 	}
 
 	$has_contents = strlen( ob_get_contents() );
@@ -131,4 +133,6 @@ else
 	$Form->end_form();
 }
 
+// Enable JS for fieldset folding:
+echo_fieldset_folding_js();
 ?>

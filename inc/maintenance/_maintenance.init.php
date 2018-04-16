@@ -19,12 +19,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for maintenance module to function properly
  */
-$required_php_version[ 'maintenance' ] = '5.2';
+$required_php_version[ 'maintenance' ] = '5.4';
 
 /**
  * Minimum MYSQL version required for maintenance module to function properly
  */
-$required_mysql_version[ 'maintenance' ] = '5.0.3';
+$required_mysql_version[ 'maintenance' ] = '5.1';
 
 $ctrl_mappings['backup'] = 'maintenance/backup.ctrl.php';
 $ctrl_mappings['upgrade'] = 'maintenance/upgrade.ctrl.php';
@@ -168,7 +168,7 @@ class maintenance_Module extends Module
 			return;
 		}
 
-		if( $current_User->check_perm( 'perm_maintenance', 'backup' ) )
+		if( $current_User->check_perm( 'maintenance', 'backup' ) )
 		{
 			// Display Backup tab in System -> Maintenance menu
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
@@ -178,7 +178,7 @@ class maintenance_Module extends Module
 							) );
 		}
 
-		if( $current_User->check_perm( 'perm_maintenance', 'upgrade' ) )
+		if( $current_User->check_perm( 'maintenance', 'upgrade' ) )
 		{
 			// Display Updates tab in System -> Maintenance menu
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -286,6 +286,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				}
 				// User login widget
 				add_basic_widget( $wico_id, 'user_login', 'core', 10 );
+				add_basic_widget( $wico_id, 'user_greetings', 'core', 15 );
 			}
 			if( ( ! $initial_install || $blog_id != $blog_forums_ID ) && $kind != 'forum' )
 			{ // Don't install these Sidebar widgets for blog 'Forums'
@@ -480,6 +481,28 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		add_basic_widget( $wico_id, 'page_404_not_found', 'core', 10 );
 		add_basic_widget( $wico_id, 'coll_search_form', 'core', 20 );
 		add_basic_widget( $wico_id, 'coll_tag_cloud', 'core', 30 );
+	}
+
+
+	/* Login Required */
+	if( array_key_exists( 'login_required', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['login_required']['wico_ID'];
+		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'login-required-'.$blog_id ) );
+		add_basic_widget( $wico_id, 'user_login', 'core', 20, array(
+				'title'               => T_( 'Log in to your account' ),
+				'login_button_class'  => 'btn btn-success btn-lg',
+				'register_link_class' => 'btn btn-primary btn-lg pull-right',
+			) );
+		
+	}
+
+
+	/* Access Denied */
+	if( array_key_exists( 'access_denied', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['access_denied']['wico_ID'];
+		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'access-denied-'.$blog_id ) );
 	}
 
 
@@ -706,4 +729,423 @@ function & get_widget_container( $coll_ID, $container_fieldset_id )
 	return $WidgetContainer;
 }
 
+
+/**
+ * @param string Title of the container. This gets passed to T_()!
+ * @param boolean Is included in collection skin
+ * @param array Params
+ */
+function display_container( $WidgetContainer, $is_included = true, $params = array() )
+{
+	global $Collection, $Blog, $admin_url, $embedded_containers, $mode;
+	global $Session;
+
+	$params = array_merge( array(
+			'table_layout'  => NULL, // Possible values: 'accordion_table', NULL(for default 'Results')
+			'group_id'      => NULL,
+			'group_item_id' => NULL,
+		), $params );
+
+	$Table = new Table( $params['table_layout'] );
+
+	// Table ID - fp> needs to be handled cleanly by Table object
+	if( isset( $WidgetContainer->ID ) && ( $WidgetContainer->ID > 0 ) )
+	{
+		$widget_container_id = 'wico_ID_'.$WidgetContainer->ID;
+		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_ID='.$WidgetContainer->ID.'&amp;container='.$widget_container_id );
+		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;'.url_crumb('widget_container') );
+	}
+	else
+	{
+		$wico_code = $WidgetContainer->get( 'code' );
+		$widget_container_id = 'wico_code_'.$wico_code;
+		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_code='.$wico_code.'&amp;container='.$widget_container_id );
+		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_code='.$wico_code.'&amp;'.url_crumb('widget_container') );
+	}
+
+	if( $mode == 'customizer' )
+	{
+		$destroy_container_url .= '&amp;mode='.$mode;
+	}
+
+	if( ! $is_included )
+	{	// Allow to destroy sub-container when it is not included into the selected skin:
+		$Table->global_icon( T_('Destroy sub-container'), 'delete', $destroy_container_url, T_('Destroy sub-container'), $mode == 'customizer' ? 0 : 3, $mode == 'customizer' ? 0 : 4 );
+	}
+
+	$widget_container_name = T_( $WidgetContainer->get( 'name' ) );
+	if( $mode == 'customizer' )
+	{	// Customizer mode:
+		$Table->title = '<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span>';
+		if( ! empty( $WidgetContainer->ID ) )
+		{	// Link to edit current widget container:
+			$Table->global_icon( T_('Edit widget container'), 'edit', $admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;mode='.$mode, T_('Edit widget container'), 0, 0 );
+		}
+	}
+	else
+	{	// Normal/back-office mode:
+		if( ! empty( $WidgetContainer->ID ) )
+		{
+			$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.( $mode == 'customizer' ? '&amp;mode='.$mode : '' ).'">'.$widget_container_name.'</a>';
+		}
+		$Table->title = '<span class="dimmed">'.$WidgetContainer->get( 'order' ).'</span> '
+			.'<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span> '
+			.'<span class="dimmed">'.$WidgetContainer->get( 'code' ).'</span>';
+
+		$add_widget_link_params = array( 'class' => 'action_icon btn-primary' );
+		if( $mode == 'customizer' )
+		{	// Set special url to add new widget on customizer mode:
+			$add_widget_url = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container='.urlencode( $WidgetContainer->get( 'name' ) ).'&container_code='.urlencode( $WidgetContainer->get( 'code' ) ).'&mode=customizer';
+		}
+		else
+		{	// Add id for link to initialize JS code of opening modal window only for not customizer mode,
+			// because in customizer mode we should open this as simple link in the same left customizer panel:
+			$add_widget_link_params['id'] = 'add_new_'.$widget_container_id;
+		}
+		$Table->global_icon( T_('Add a widget...'), 'new', $add_widget_url, /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, $add_widget_link_params );
+	}
+
+	if( $params['table_layout'] == 'accordion_table' )
+	{	// Set ID for current widget container for proper work of accordion style:
+		$params['group_item_id'] = 'container_'.$widget_container_id;
+	}
+
+	$Table->display_init( array_merge( array(
+			'list_start' => '<div class="panel panel-default">',
+			'list_end'   => '</div>',
+		), $params ) );
+
+	$Table->display_list_start();
+
+	// TITLE / COLUMN HEADERS:
+	$Table->display_head();
+
+	if( $params['table_layout'] == 'accordion_table' )
+	{	// Start of accordion body of current item:
+		$is_selected_widget_container = empty( $params['selected_wico_ID'] ) || empty( $WidgetContainer ) || $WidgetContainer->ID != $params['selected_wico_ID'];
+		echo '<div id="'.$params['group_item_id'].'" class="panel-collapse '.( $is_selected_widget_container ? 'collapse' : '' ).'">';
+	}
+
+	// BODY START:
+	echo '<ul id="container_'.$widget_container_id.'" class="widget_container">';
+
+	/**
+	 * @var WidgetCache
+	 */
+	$WidgetCache = & get_WidgetCache();
+	$Widget_array = & $WidgetCache->get_by_container_ID( $WidgetContainer->ID );
+
+	if( ! empty( $Widget_array ) )
+	{
+		$widget_count = 0;
+		foreach( $Widget_array as $ComponentWidget )
+		{
+			$widget_count++;
+			$enabled = $ComponentWidget->get( 'enabled' );
+			$disabled_plugin = ( $ComponentWidget->type == 'plugin' && $ComponentWidget->get_Plugin() == false );
+
+			if( $ComponentWidget->get( 'code' ) == 'subcontainer' )
+			{
+				$container_code = $ComponentWidget->get_param( 'container' );
+				if( ! isset( $embedded_containers[$container_code] ) ) {
+					$embedded_containers[$container_code] = true;
+				}
+			}
+
+			// START Widget row:
+			echo '<li id="wi_ID_'.$ComponentWidget->ID.'" class="draggable_widget">';
+
+			// Checkbox:
+			if( $mode != 'customizer' )
+			{	// Don't display on customizer mode:
+				echo '<span class="widget_checkbox'.( $enabled ? ' widget_checkbox_enabled' : '' ).'">'
+						.'<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" />'
+					.'</span>';
+			}
+
+			// State:
+			echo '<span class="widget_state">';
+			if( $disabled_plugin )
+			{	// If widget's plugin is disabled:
+				echo get_icon( 'warning', 'imgtag', array( 'title' => T_('Inactive / Uninstalled plugin') ) );
+			}
+			else
+			{	// If this is a normal widget or widget's plugin is enabled:
+				echo '<a href="#" onclick="return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' );">'
+						.get_icon( ( $enabled ? 'bullet_green' : 'bullet_empty_grey' ), 'imgtag', array( 'title' => ( $enabled ? T_('The widget is enabled.') : T_('The widget is disabled.') ) ) )
+					.'</a>';
+			}
+			echo '</span>';
+
+			// Name:
+			$ComponentWidget->init_display( array() );
+			echo '<span class="widget_title">'
+					.'<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID.( $mode == 'customizer' ? '&amp;mode=customizer' : '' ) ).'" class="widget_name"'
+						.( $mode == 'customizer' ? '' : ' onclick="return editWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )"' )
+						.'>'
+						.$ComponentWidget->get_desc_for_list()
+					.'</a> '
+					.$ComponentWidget->get_help_link()
+				.'</span>';
+
+			// Cache:
+			if( $mode != 'customizer' )
+			{	// Don't display on customizer mode:
+				echo'<span class="widget_cache_status">';
+				$widget_cache_status = $ComponentWidget->get_cache_status( true );
+				switch( $widget_cache_status )
+				{
+					case 'disallowed':
+						echo get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ), 'rel' => $widget_cache_status ) );
+						break;
+
+					case 'denied':
+						echo action_icon( T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ),
+							'block_cache_denied',
+							$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching', NULL, NULL, NULL,
+							array( 'rel' => $widget_cache_status ) );
+						break;
+
+					case 'enabled':
+						echo action_icon( T_( 'Caching is enabled. Click to disable.' ),
+							'block_cache_on',
+							regenerate_url( 'blog', 'action=cache_disable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
+							array(
+									'rel'     => $widget_cache_status,
+									'onclick' => 'return toggleCacheWidget( \'wi_ID_'.$ComponentWidget->ID.'\', \'disable\' )',
+								) );
+						break;
+
+					case 'disabled':
+						echo action_icon( T_( 'Caching is disabled. Click to enable.' ),
+							'block_cache_off',
+							regenerate_url( 'blog', 'action=cache_enable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
+							array(
+									'rel'     => $widget_cache_status,
+									'onclick' => 'return toggleCacheWidget( \'wi_ID_'.$ComponentWidget->ID.'\', \'enable\' )',
+								) );
+						break;
+				}
+				echo '</span>';
+			}
+
+			// Actions:
+			echo '<span class="widget_actions">';
+			if( $disabled_plugin )
+			{	// If widget's plugin is disabled:
+				// Display a space same as the enable/disable icons:
+				echo action_icon( '', 'deactivate', '#', NULL, NULL, NULL, array( 'style' => 'visibility:hidden', 'class' => 'toggle_action' ) );
+			}
+			else
+			{	// If this is a normal widget or widget's plugin is enabled:
+					// Enable/Disable:
+					echo action_icon( ( $enabled ? T_('Disable this widget!') : T_('Enable this widget!') ),
+							( $enabled ? 'deactivate' : 'activate' ),
+							regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ), NULL, NULL, NULL,
+							array( 'onclick' => 'return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => 'toggle_action' )
+						);
+			}
+					// Edit:
+					if( $mode != 'customizer' )
+					{	// Don't display on customizer mode:
+						echo action_icon( T_('Edit widget settings!'),
+							'edit',
+							regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ), NULL, NULL, NULL,
+							array( 'onclick' => 'return editWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
+						);
+					}
+					// Remove:
+					echo action_icon( T_('Remove this widget!'),
+							'delete',
+							regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
+							array( 'onclick' => 'return deleteWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
+						)
+				.'</span>';
+
+			// END Widget row:
+			echo '</li>';
+		}
+	}
+
+	// BODY END:
+	echo '</ul>';
+
+	if( $params['table_layout'] == 'accordion_table' )
+	{	// End of accordion body of current item:
+		echo '</div>';
+	}
+
+	$Table->display_list_end();
+}
+
+
+/**
+ * Display containers
+ *
+ * @param string Skin type: 'normal', 'mobile', 'tablet'
+ * @param boolean TRUE to display main containers, FALSE - sub containers
+ * @param array Params
+ */
+function display_containers( $skin_type, $main = true, $params = array() )
+{
+	global $Blog, $blog_container_list, $skins_container_list, $embedded_containers;
+
+	// Display containers for current skin:
+	$displayed_containers = array();
+	$ordered_containers = array();
+	$embedded_containers = array();
+	$WidgetContainerCache = & get_WidgetContainerCache();
+	foreach( $skins_container_list as $container_code => $container_data )
+	{
+		$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
+		if( ! $WidgetContainer )
+		{
+			$WidgetContainer = new WidgetContainer();
+			$WidgetContainer->set( 'code', $container_code );
+			$WidgetContainer->set( 'name', $container_data[0] );
+			$WidgetContainer->set( 'coll_ID', $Blog->ID );
+			$WidgetContainer->set( 'order', 0 );
+		}
+		if( $WidgetContainer->get( 'skin_type' ) != $skin_type ||
+		    ( $main && ! $WidgetContainer->get( 'main' ) ) ||
+		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
+		{	// Skip this container because another type is requested:
+			continue;
+		}
+
+		$ordered_containers[] = array( $WidgetContainer, true );
+		if( $WidgetContainer->ID > 0 )
+		{ // Container exists in the database
+			$displayed_containers[$container_code] = $WidgetContainer->ID;
+		}
+	}
+
+	// Display embedded containers
+	reset( $embedded_containers );
+	while( count( $embedded_containers ) > 0 )
+	{
+		// Get the first item key, and remove the first item from the array
+		$container_code = key( $embedded_containers );
+		array_shift( $embedded_containers );
+		if( isset( $displayed_containers[$container_code] ) )
+		{ // This container was already displayed
+			continue;
+		}
+
+		if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code ) )
+		{ // Confirmed that it is part of the blog's containers in the database
+			if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
+			    ( ! $main && $WidgetContainer->get( 'main' ) ) )
+			{	// Skip this container because another type is requested:
+				continue;
+			}
+			$ordered_containers[] = array( $WidgetContainer, true );
+			$displayed_containers[$container_code] = $WidgetContainer->ID;
+		}
+	}
+
+	// Display other blog containers which are not in the current skin
+	foreach( $blog_container_list as $container_ID )
+	{
+		if( in_array( $container_ID, $displayed_containers ) )
+		{
+			continue;
+		}
+
+		$WidgetContainer = & $WidgetContainerCache->get_by_ID( $container_ID );
+		if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
+		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
+		{	// Skip this container because another type is requested:
+			continue;
+		}
+		$ordered_containers[] = array( $WidgetContainer, false );
+	}
+
+	// Sort widget containers by order and name:
+	usort( $ordered_containers, 'callback_sort_widget_containers' );
+
+	// Display the ordered containers:
+	foreach( $ordered_containers as $container_data )
+	{
+		$WidgetContainer = & $container_data[0];
+		// Is included in collection skin?
+		$is_included = $container_data[1];
+		// Display a container with widgets:
+		display_container( $WidgetContainer, $is_included, $params  );
+	}
+}
+
+
+/**
+ * Callback function to sort widget containers array by fields order and name
+ *
+ * @param array Widget data
+ * @param array Widget data
+ */
+function callback_sort_widget_containers( $a, $b )
+{
+	if( $a[0]->get( 'order' ) == $b[0]->get( 'order' ) )
+	{	// Sort by name if orders are equal:
+		return strnatcmp( $a[0]->get( 'name' ), $b[0]->get( 'name' ) );
+	}
+	else
+	{	// Sort by order if they are different:
+		return $a[0]->get( 'order' ) > $b[0]->get( 'order' );
+	}
+}
+
+
+/**
+ * Display action buttons to work with sereral widgets in list
+ *
+ * @param object Form
+ */
+function display_widgets_action_buttons( & $Form )
+{
+	echo '<span class="btn-group">';
+	$Form->button( array(
+			'value' => get_icon( 'check_all' ).' '.T_('Check All'),
+			'id'    => 'widget_button_check_all',
+			'tag'   => 'button',
+			'type'  => 'button'
+		) );
+	$Form->button( array(
+			'value' => get_icon( 'uncheck_all' ).' '.T_('Uncheck All'),
+			'id'    => 'widget_button_uncheck_all',
+			'tag'   => 'button',
+			'type'  => 'button'
+		) );
+	echo '</span>';
+
+	echo '<span class="btn-group">';
+	$Form->button( array(
+			'value' => get_icon( 'check_all' ).' '.get_icon( 'bullet_green' ).' '.T_('Check Active'),
+			'id'    => 'widget_button_check_active',
+			'tag'   => 'button',
+			'type'  => 'button'
+		) );
+	$Form->button( array(
+			'value' => get_icon( 'check_all' ).' '.get_icon( 'bullet_empty_grey' ).' '.T_('Check Inactive'),
+			'id'    => 'widget_button_check_inactive',
+			'tag'   => 'button',
+			'type'  => 'button'
+		) );
+	echo '</span>';
+
+	echo ' '.T_('With checked do:');
+	echo '<span class="btn-group">';
+	$Form->button( array(
+			'value' => get_icon( 'bullet_green' ).' '.T_('Activate'),
+			'name'  => 'actionArray[activate]',
+			'tag'   => 'button',
+			'type'  => 'submit'
+		) );
+	$Form->button( array(
+			'value' => get_icon( 'bullet_empty_grey' ).' '.T_('Deactivate'),
+			'name'  => 'actionArray[deactivate]',
+			'tag'   => 'button',
+			'type'  => 'submit'
+		) );
+	echo '</span>';
+}
 ?>

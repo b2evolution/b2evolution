@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -36,7 +36,7 @@ if( $mode == 'customizer' )
 
 $Form = new Form( NULL, 'widget_checkchanges' );
 
-if( ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
+if( ( $display_mode == 'normal' && empty( $mode ) ) || ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
 {	// Display a link to close form (Don't display this link on bootstrap skin, because it already has an icon to close a modal window)
 	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
 }
@@ -66,7 +66,7 @@ $Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
 
 // Display properties:
 $Form->begin_fieldset( T_('Widget info'), array( 'id' => 'widget_info' ) );
-	$Form->info( T_('Widget type'), '<span class="badge badge-info">'.$edited_ComponentWidget->get_icon().'</span> '.$edited_ComponentWidget->get_name() );
+	$Form->info( T_('Widget type'), $edited_ComponentWidget->get_icon().' '.$edited_ComponentWidget->get_name() );
 	$Form->info( T_('Description'), $edited_ComponentWidget->get_desc() );
 $Form->end_fieldset();
 
@@ -175,6 +175,9 @@ if( $mode == 'customizer' )
 {	// End of customizer content:
 	echo '</div>';
 }
+
+// Enable JS for fieldset folding:
+echo_fieldset_folding_js();
 
 if( $display_mode == 'js' )
 {	// Reset previous and Initialize new bozo validator for each new opened widget edit form in popup window,

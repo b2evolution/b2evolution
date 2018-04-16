@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -27,11 +27,19 @@ class Poll extends DataObject
 {
 	var $owner_user_ID;
 	var $question_text;
+	var $max_answers;
 
 	/**
 	 * @var array PollOption objects
 	 */
 	var $poll_options;
+
+	/**
+	 * @var array with keys:
+	 *       - 'votes' - a number of votes of this Poll from all voters,
+	 *       - 'voters' - a number of users which voted on at least one option of this poll.
+	 */
+	var $vote_nums = NULL;
 
 	/**
 	 * Constructor
@@ -48,6 +56,7 @@ class Poll extends DataObject
 			$this->ID = $db_row->pqst_ID;
 			$this->owner_user_ID = $db_row->pqst_owner_user_ID;
 			$this->question_text = $db_row->pqst_question_text;
+			$this->max_answers = $db_row->pqst_max_answers;
 		}
 		else
 		{	// Set default poll data for new poll:
@@ -55,6 +64,7 @@ class Poll extends DataObject
 			{
 				global $current_User;
 				$this->set( 'owner_user_ID', $current_User->ID );
+				$this->set( 'max_answers', 1 );
 			}
 		}
 	}
@@ -113,6 +123,36 @@ class Poll extends DataObject
 		param( 'pqst_question_text', 'string', false );
 		param_check_not_empty( 'pqst_question_text', T_('Please enter the text for the poll\'s question.') );
 		$this->set_from_Request( 'question_text' );
+
+		// Maximum number of answers:
+		$pqst_max_answers = param( 'pqst_max_answers', 'integer', 1 );
+		if( empty( $this->ID ) )
+		{
+			$options = array();
+			$answer_options = param( 'answer_options', 'array:string', array() );
+			foreach( $answer_options as $answer_option_text )
+			{
+				if( empty( $answer_option_text ) )
+				{	// Skip empty option:
+					continue;
+				}
+
+				$options[] = $answer_option_text;
+			}
+		}
+		else
+		{
+			$options = $this->get_poll_options();
+		}
+
+		if( $pqst_max_answers > count( $options ) )
+		{
+			param_error( 'pqst_max_answers', T_('Maximum allowed answers must not exceed total number of answer options.') );
+		}
+		else
+		{
+			$this->set_from_Request( 'max_answers' );
+		}
 
 		return ! param_errors_detected();
 	}
@@ -194,6 +234,42 @@ class Poll extends DataObject
 
 
 	/**
+	 * Get numbers of votes and voters for this Poll
+	 *
+	 * @param string|NULL NULL - to return an array of all possible numbers,
+	 *                    'votes' - to return a number of votes of this Poll from all voters,
+	 *                    'voters' - to return a number of users which voted on at least one option of this poll.
+	 * @return array|integer Depends on param $type
+	 */
+	function get_vote_nums( $type = NULL )
+	{
+		global $DB;
+
+		if( $this->vote_nums === NULL )
+		{	// Get from DB once and store in cache array:
+			$nums_SQL = new SQL( 'Get a count of votes and voters for the edited poll #'.$this->ID );
+			$nums_SQL->SELECT( 'COUNT( pans_pqst_ID ) AS votes, COUNT( DISTINCT pans_user_ID ) AS voters' );
+			$nums_SQL->FROM( 'T_polls__answer' );
+			$nums_SQL->WHERE( 'pans_pqst_ID = '.$this->ID );
+			$this->vote_nums = $DB->get_row( $nums_SQL, ARRAY_A );
+		}
+
+		if( $type === NULL )
+		{	// Get all numbers:
+			return $this->vote_nums;
+		}
+		else
+		{	// Get a specific number:
+			if( ! isset( $this->vote_nums[ $type ] ) )
+			{
+				debug_die( 'Wrong param type "'.$type.'" for Poll::get_vote_nums()' );
+			}
+			return $this->vote_nums[ $type ];
+		}
+	}
+
+
+	/**
 	 * Get all options of this poll
 	 *
 	 * @return array PollOption objects
@@ -209,21 +285,17 @@ class Poll extends DataObject
 		{	// Get options from DB only first time, and store them in cache array:
 			global $DB;
 
-			// Get an options count of the edited poll which has at least one answer:
-			$count_SQL = new SQL( 'Get an options count of this poll which has at least one answer' );
-			$count_SQL->SELECT( 'COUNT( pans_ID )' );
-			$count_SQL->FROM( 'T_polls__answer' );
-			$count_SQL->WHERE( 'pans_pqst_ID = '.$this->ID );
-			$poll_options_count = $DB->get_var( $count_SQL );
-			if( $poll_options_count == 0 )
+			// Get numbers of votes and voters for the edited poll:
+			$poll_voters_num = $this->get_vote_nums( 'voters' );
+			if( $poll_voters_num == 0 )
 			{	// To don't devide by zero
-				$poll_options_count = 1;
+				$poll_voters_num = 1;
 			}
 
 			$SQL = new SQL( 'Get all options of this poll' );
 			$SQL->SELECT( 'popt_ID AS ID, popt_pqst_ID AS pqst_ID, popt_option_text AS option_text,' );
-			//$SQL->SELECT_add( 'COUNT( pans_ID ) AS answers_count,' );
-			$SQL->SELECT_add( 'ROUND( COUNT( pans_ID ) / '.$poll_options_count.' * 100 ) AS percent' );
+			//$SQL->SELECT_add( 'COUNT( * ) AS answers_count,' );
+			$SQL->SELECT_add( 'ROUND( COUNT( pans_pqst_ID ) / '.$poll_voters_num.' * 100 ) AS percent' );
 			$SQL->FROM( 'T_polls__option' );
 			$SQL->FROM_add( 'LEFT JOIN T_polls__answer ON pans_popt_ID = popt_ID' );
 			$SQL->WHERE( 'popt_pqst_ID = '.$this->ID );
@@ -281,9 +353,27 @@ class Poll extends DataObject
 		$poll_option_SQL->FROM( 'T_polls__answer' );
 		$poll_option_SQL->WHERE( 'pans_pqst_ID = '.$this->ID );
 		$poll_option_SQL->WHERE_and( 'pans_user_ID = '.$current_User->ID );
-		$poll_option_ID = $DB->get_var( $poll_option_SQL );
+		$poll_option_IDs = $DB->get_col( $poll_option_SQL );
 
-		return empty( $poll_option_ID ) ? false : $poll_option_ID;
+		return empty( $poll_option_IDs ) ? false : $poll_option_IDs;
+	}
+
+
+	/**
+	 * Clears all votes of the current user
+	 */
+	function clear_user_votes()
+	{
+		if( empty( $this->ID ) || ! is_logged_in() )
+		{ // User must be logged in and poll question must exists in DB
+			return false;
+		}
+
+		global $DB, $current_User;
+
+		$DB->query( 'DELETE FROM T_polls__answer WHERE pans_user_ID = '.$current_User->ID.' AND pans_pqst_ID = '.$this->ID );
+
+		return true;
 	}
 }
 

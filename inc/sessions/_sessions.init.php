@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -17,12 +17,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for sessions module to function properly
  */
-$required_php_version[ 'sessions' ] = '5.2';
+$required_php_version[ 'sessions' ] = '5.4';
 
 /**
  * Minimum MYSQL version required for sessions module to function properly
  */
-$required_mysql_version[ 'sessions' ] = '5.0.3';
+$required_mysql_version[ 'sessions' ] = '5.1';
 
 /**
  * Aliases for table names:

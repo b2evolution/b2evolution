@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -21,6 +21,7 @@ $params = array_merge( array(
 		'country'     => '',
 		'reg_country' => '',
 		'reg_domain'  => '',
+		'user_domain' => '',
 		'fullname'    => '',
 		'gender'      => '',
 		'locale'      => '',
@@ -54,7 +55,8 @@ if( $params['reg_country'] > 0 )
 
 if( ! empty( $params['reg_domain'] ) )
 {	// Domain field is entered:
-	echo T_('Registration Domain').": ".$params['reg_domain']."\n";
+	echo T_('Registration Domain').": ".$params['reg_domain'].
+			( ! empty( $params['user_domain'] ) ? ' '.$admin_url.'?ctrl=antispam&action=whois&query='.$params['user_domain'] : '' )."\n";
 }
 
 if( $params['country'] > 0 )

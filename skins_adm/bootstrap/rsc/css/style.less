@@ -3,7 +3,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -66,6 +66,16 @@ td.shrinkwrap {
 	border: none;
 	padding: 0;
 	margin: 0;
+}
+
+// Fix vertical alignment for radio with text inputs:
+div.radio.radio-input label {
+	input[type=radio] {
+		margin-top: 10px;
+	}
+	input[type=text].form_text_input {
+		vertical-align: middle;
+	}
 }
 
 // A colored status icon before <select>
@@ -645,6 +655,16 @@ fieldset ul {
 	font-weight: normal;
 }
 
+// Form elements on user edit page
+.user_admin_tags {
+	width: 500px;
+	max-width: 100%;
+	ul.token-input-list-facebook {
+		width: 100%;
+		max-width: 100%;
+	}
+}
+
 // Form elements on item edit page
 #item_locations {
 	label {
@@ -1009,6 +1029,18 @@ h2.user_title::first-line {
 	}
 }
 
+#itemform_extra {
+	#ffield_item_owner_login .help-inline {
+		display: inline-block;
+		vertical-align: middle;
+		margin-top: 10px;
+	}
+	label.ffield_item_create_user {
+		padding: 0;
+		font-weight: normal;
+	}
+}
+
 // Loader animation
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
@@ -1124,6 +1156,13 @@ div.available_widgets {
 	#available_widgets_inner {
 		top: 87px;
 	}
+}
+
+// Widget icon:
+.evo_widget_icon {
+	display: inline-block;
+	min-width: 22px;
+	padding: .2em;
 }
 
 // Table to select a collection type
@@ -1682,6 +1721,7 @@ table.diff {
 
 // Skin Customizer Mode:
 #customizer_wrapper {
+	padding-top: 140px;
 	.page-content {
 		margin: 0;
 		padding: 0;
@@ -1690,7 +1730,9 @@ table.diff {
 		margin-bottom: 0;
 	}
 	form {
-		> .panel-group > .panel, > div.fieldset_wrapper > fieldset > .panel {
+		> .panel-group > .panel,
+		> fieldset > .panel-group > .panel,
+		> div.fieldset_wrapper > fieldset > .panel {
 			border-top: none;
 			border-left: none;
 			border-right: none;
@@ -1716,9 +1758,6 @@ table.diff {
 			padding: 0;
 		}
 	}
-	.evo_customizer__tabs + .evo_customizer__content {
-		margin-top: 140px;
-	}
 	.evo_customizer__available_widgets {
 		padding: 15px;
 		ul {
@@ -1737,7 +1776,46 @@ table.diff {
 		display: none;
 	}
 	.controls .help-inline {
-		display: block;
+		display: inline-block;
+	}
+	.file_select_item {
+		margin: 0;
+		.item_actions {
+			margin: 0;
+			display: block;
+			width: 100%;
+			text-align: center;
+			.btn {
+				margin-right: 3px;
+			}
+			.btn:last-child {
+				margin-right: 0;
+			}
+		}
+	}
+	#current_widgets {
+		.panel {
+			border-top: none;
+			border-left: none;
+			border-right: none;
+			border-radius: 0;
+			margin-bottom: 0;
+		}
+		h4 + .panel, .panel:first-child {
+			border-top: 1px solid #ddd;
+		}
+		> p {
+			margin: 10px 5px;
+		}
+		.panel_heading_action_icons a.action_icon span.fa {
+			margin: 0;
+		}
+		.panel-group {
+			margin: 0;
+			> h4 {
+				margin: 10px;
+			}
+		}
 	}
 }
 .evo_customizer__tabs {
@@ -1777,9 +1855,6 @@ table.diff {
 		position: absolute;
 		top: 13px;
 		right: 12px;
-		.btn {
-			margin-right: 3px;
-		}
 		.fa-backward {
 			top: 1px;
 			right: 1px;
@@ -1798,5 +1873,11 @@ table.diff {
 	.form-group, .control-buttons {
 		margin: 0;
 		padding: 0;
+	}
+	&.evo_customizer__buttons_widget_actions {
+		padding: 10px;
+		.btn-group {
+			margin: 0;
+		}
 	}
 }

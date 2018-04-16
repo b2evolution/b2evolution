@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -101,15 +101,17 @@ if( $params['notify_type'] == 'moderator' )
 	{	// about new item:
 		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new posts, click here' );
 		$unsubscribe_type = 'post_moderator';
+		$unsubscribe_params = '';
 	}
 	else
 	{	// about updated item:
 		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated posts, click here' );
 		$unsubscribe_type = 'post_moderator_edit';
+		$unsubscribe_params = '&amp;coll_ID='.$Item->get_blog_ID();
 	}
 	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' )."\n";
 	$params['unsubscribe_text'] .= $unsubscribe_text.': '
-			.get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$';
+			.get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.$unsubscribe_params.'&user_ID=$user_ID$&key=$unsubscribe_key$';
 }
 else
 { // subscription email

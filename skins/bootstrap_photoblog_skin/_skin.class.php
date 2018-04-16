@@ -125,6 +125,8 @@ class bootstrap_photoblog_Skin extends Skin
 				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
 				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
 				'404_page'                  => array( NT_('404 Page'), 130 ),
+				'login_required'            => array( NT_('Login Required'), 140 ),
+				'access_denied'             => array( NT_('Access Denied'), 150 ),
 			);
 	}
 
@@ -159,7 +161,8 @@ class bootstrap_photoblog_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
@@ -465,10 +468,15 @@ class bootstrap_photoblog_Skin extends Skin
 		// Page link color
 		if ( $page_link_color = $this->get_setting( 'page_link_color' ) ) {
 			$custom_css .= 'a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+			// Pagination links:
+			$custom_css .= '.pagination > li > a, .pagination > li > span { color: '.$page_link_color."; }\n";
+			$custom_css .= '.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus { background-color: '.$page_link_color.'; border-color: '.$page_link_color."; }\n";
 		}
 		// Page link hover color
 		if ( $page_link_h_color = $this->get_setting( 'page_link_h_color' ) ) {
 			$custom_css .= 'a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+			// Pagination links:
+			$custom_css .= '.pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus { color: '.$page_link_h_color."; }\n";
 		}
 		// Posts background color
 		if ( $well_color = $this->get_setting( 'well_color' ) ) {

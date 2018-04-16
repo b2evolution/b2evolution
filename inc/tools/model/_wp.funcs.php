@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -51,7 +51,7 @@ function wpxml_get_import_data( $XML_file_path )
 		if( unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
 		{	// If ZIP archive is unpacked successfully:
 
-			// 
+			//
 			$XML_file_path = false;
 
 			// Find valid XML file in ZIP package:
@@ -321,11 +321,12 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	/* Import authors */
 	$authors = array();
 	$authors_IDs = array();
+	$authors_links = array();
 	if( isset( $xml_data['authors'] ) && count( $xml_data['authors'] ) > 0 )
 	{
 		global $Settings, $UserSettings;
 
-		echo T_('Importing the users... ');
+		echo '<p><b>'.T_('Importing the users...').' </b>';
 		evo_flush();
 
 		// Get existing users
@@ -338,8 +339,10 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		foreach( $xml_data['authors'] as $author )
 		{
 			// Replace unauthorized chars of username:
-			$author_login = preg_replace( '/([^a-z0-9_])/i', '_', $author['author_login'] );
+			$author_login = preg_replace( '/([^a-z0-9_\-\.])/i', '_', $author['author_login'] );
 			$author_login = utf8_substr( utf8_strtolower( $author_login ), 0, 20 );
+
+			echo '<p>'.sprintf( T_('Importing user: %s'), '#'.$author['author_id'].' - "'.$author_login.'"' ).'... ';
 
 			if( empty( $existing_users[ $author_login ] ) )
 			{	// Insert new user into DB if User doesn't exist with current login name
@@ -381,8 +384,8 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$User->set( 'firstname', $author['author_first_name'] );
 				$User->set( 'lastname', $author['author_last_name'] );
 				$User->set( 'pass', $author['author_pass'] );
-				$User->set( 'salt', '' );
-				$User->set( 'pass_driver', 'evo$md5' );
+				$User->set( 'salt', $author['author_salt'] );
+				$User->set( 'pass_driver', $author['author_pass_driver'] );
 				$User->set_Group( $UserGroup );
 				$User->set( 'status', !empty( $author['author_status'] ) ? $author['author_status'] : 'autoactivated' );
 				$User->set( 'nickname', $author['author_nickname'] );
@@ -428,27 +431,47 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				{
 					$UserSettings->set( 'created_fromIPv4', ip2int( $author['author_created_fromIPv4'] ), $user_ID );
 				}
+
+				if( ! empty( $author['links'] ) )
+				{	// Store user attachments in array to link them below after importing files:
+					$authors_links[ $user_ID ] = array();
+					foreach( $author['links'] as $link )
+					{
+						if( isset( $author['author_avatar_file_ID'] ) &&
+						    $link['link_file_ID'] == $author['author_avatar_file_ID'] )
+						{	// Mark this link as main avatar in order to update this with new inserted file ID below:
+							$link['is_main_avatar'] = true;
+						}
+						$authors_links[ $user_ID ][ $link['link_file_ID'] ] = $link;
+					}
+				}
+
 				$authors_count++;
+				echo '<span class="text-success">'.T_('OK').'.</span>';
 			}
 			else
 			{	// Get ID of existing user
 				$user_ID = $existing_users[ $author_login ];
+				echo '<span class="text-warning">'.sprintf( T_('Skip because user already exists with same login and ID #%d.'), intval( $user_ID ) ).'</span>';
 			}
 			// Save user ID of current author
 			$authors[ $author_login ] = (string) $user_ID;
 			$authors_IDs[ $author['author_id'] ] = (string) $user_ID;
+
+			echo '</p>';
+			evo_flush();
 		}
 
 		$UserSettings->dbupdate();
 
-		echo sprintf( T_('%d records'), $authors_count ).'<br />';
+		echo '<b>'.sprintf( T_('%d records'), $authors_count ).'</b></p>';
 	}
 
 	/* Import files, Copy them all to media folder */
 	$files = array();
 	if( isset( $xml_data['files'] ) && count( $xml_data['files'] ) > 0 )
 	{
-		echo T_('Importing the files... ');
+		echo '<p><b>'.T_('Importing the files...').' </b>';
 		evo_flush();
 
 		if( ! $attached_files_path || ! file_exists( $attached_files_path ) )
@@ -458,6 +481,8 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		else
 		{	// Try to import files from the selected subfolder:
 			$files_count = 0;
+
+			$UserCache = & get_UserCache();
 
 			foreach( $xml_data['files'] as $file )
 			{
@@ -472,8 +497,13 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						// User's files
 						if( isset( $authors_IDs[ $file['file_root_ID'] ] ) )
 						{ // If owner of this file exists in our DB
+							$wp_user_ID = $file['file_root_ID'];
 							$file['file_root_ID'] = $authors_IDs[ $file['file_root_ID'] ];
 							break;
+						}
+						else
+						{
+							unset( $wp_user_ID );
 						}
 						// Otherwise we should upload this file into blog's folder:
 
@@ -505,11 +535,32 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						}
 					}
 
+					if( $file['file_root_type'] == 'user' &&
+					    isset( $authors_links[ $file['file_root_ID'] ], $authors_links[ $file['file_root_ID'] ][ $file['file_ID'] ] ) &&
+					    ( $User = & $UserCache->get_by_ID( $file['file_root_ID'], false, false ) ) )
+					{	// Link file to User:
+						$link = $authors_links[ $file['file_root_ID'] ][ $file['file_ID'] ];
+						$LinkOwner = new LinkUser( $User );
+						if( ! empty( $link['is_main_avatar'] ) )
+						{	// Update if current file is main avatar for the User:
+							$User->set( 'avatar_file_ID', $File->ID );
+							$User->dbupdate();
+						}
+						if( $File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] ) )
+						{	// If file has been linked to the post:
+							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to User %s.'), '<code>'.$File->_adfp_full_path.'</code>', $User->get_identity_link() ).'</p>';
+						}
+						else
+						{	// If file could not be linked to the post:
+							echo '<p class="text-warning">'.sprintf( T_('File %s could not be linked to User %s.'), '<code>'.$File->_adfp_full_path.'</code>', $User->get_identity_link() ).'</p>';
+						}
+					}
+
 					$files_count++;
 				}
 			}
 
-			echo sprintf( T_('%d records'), $files_count ).'<br />';
+			echo '<b>'.sprintf( T_('%d records'), $files_count ).'</b></p>';
 		}
 	}
 
@@ -526,7 +577,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 	if( isset( $xml_data['categories'] ) && count( $xml_data['categories'] ) > 0 )
 	{
-		echo T_('Importing the categories... ');
+		echo '<p><b>'.T_('Importing the categories...').' </b>';
 		evo_flush();
 
 		load_funcs( 'locales/_charset.funcs.php' );
@@ -556,7 +607,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			}
 		}
 
-		echo sprintf( T_('%d records'), $categories_count ).'<br />';
+		echo '<b>'.sprintf( T_('%d records'), $categories_count ).'</b></p>';
 	}
 
 	if( empty( $category_default ) )
@@ -581,7 +632,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	$tags = array();
 	if( isset( $xml_data['tags'] ) && count( $xml_data['tags'] ) > 0 )
 	{
-		echo T_('Importing the tags... ');
+		echo '<p><b>'.T_('Importing the tags...').' </b>';
 		evo_flush();
 
 		// Get existing tags
@@ -604,7 +655,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$tags_count++;
 			}
 		}
-		echo sprintf( T_('%d records'), $tags_count ).'<br />';
+		echo '<b>'.sprintf( T_('%d records'), $tags_count ).'</b></p>';
 	}
 
 
@@ -643,7 +694,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		$SQL->ORDER_BY( 'ityp_ID' );
 		$post_types = $DB->get_assoc( $SQL->get() );
 
-		echo T_('Importing the files from attachment posts... ');
+		echo '<p><b>'.T_('Importing the files from attachment posts...').' </b>';
 		evo_flush();
 
 		$attachment_IDs = array();
@@ -726,12 +777,13 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			}
 
 			echo '</p>';
+			evo_flush();
 			$attachments_count++;
 		}
 
-		echo sprintf( T_('%d records'), $attachments_count ).'<br />';
+		echo '<b>'.sprintf( T_('%d records'), $attachments_count ).'</b></p>';
 
-		echo T_('Importing the posts... ');
+		echo '<p><b>'.T_('Importing the posts...').' </b>';
 		evo_flush();
 
 		$posts_count = 0;
@@ -972,6 +1024,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			}
 
 			echo '</p>';
+			evo_flush();
 			$posts_count++;
 		}
 
@@ -985,14 +1038,14 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			}
 		}
 
-		echo sprintf( T_('%d records'), $posts_count ).'<br />';
+		echo '<b>'.sprintf( T_('%d records'), $posts_count ).'</b></p>';
 	}
 
 
 	/* Import comments */
 	if( !empty( $comments ) )
 	{
-		echo T_('Importing the comments... ');
+		echo '<p><b>'.T_('Importing the comments...').' </b>';
 		evo_flush();
 
 		$comments_count = 0;
@@ -1073,7 +1126,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			}
 		}
 
-		echo sprintf( T_('%d records'), $comments_count ).'<br />';
+		echo '<b>'.sprintf( T_('%d records'), $comments_count ).'</b></p>';
 	}
 
 	if( ! empty( $ZIP_folder_path ) && file_exists( $ZIP_folder_path ) )
@@ -1081,7 +1134,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		rmdir_r( $ZIP_folder_path );
 	}
 
-	echo '<br /><p class="text-success">'.T_('Import complete.').'</p>';
+	echo '<p class="text-success">'.T_('Import complete.').'</p>';
 
 	$DB->commit();
 }
@@ -1155,7 +1208,7 @@ function wpxml_parser( $file )
 		$a = $author_arr->children( $namespaces['wp'] );
 		$ae = $author_arr->children( $namespaces['evo'] );
 		$login = (string) $a->author_login;
-		$authors[$login] = array(
+		$author = array(
 			'author_id'                   => (int) $a->author_id,
 			'author_login'                => $login,
 			'author_email'                => (string) $a->author_email,
@@ -1163,6 +1216,8 @@ function wpxml_parser( $file )
 			'author_first_name'           => wpxml_convert_value( $a->author_first_name ),
 			'author_last_name'            => wpxml_convert_value( $a->author_last_name ),
 			'author_pass'                 => (string) $ae->author_pass,
+			'author_salt'                 => isset( $ae->author_salt ) ? (string) $ae->author_salt : '',
+			'author_pass_driver'          => isset( $ae->author_pass_driver ) ? (string) $ae->author_pass_driver : 'evo$md5',
 			'author_group'                => (string) $ae->author_group,
 			'author_status'               => (string) $ae->author_status,
 			'author_nickname'             => wpxml_convert_value( $ae->author_nickname ),
@@ -1182,7 +1237,28 @@ function wpxml_parser( $file )
 			'author_lastseen_ts'          => (string) $ae->author_lastseen_ts,
 			'author_created_fromIPv4'     => (string) $ae->author_created_fromIPv4,
 			'author_profileupdate_date'   => (string) $ae->author_profileupdate_date,
+			'author_avatar_file_ID'       => (int) $ae->author_avatar_file_ID,
 		);
+
+		foreach( $ae->link as $link )
+		{	// Get the links:
+			$author['links'][] = array(
+				'link_ID'               => (int) $link->link_ID,
+				'link_datecreated'      => (string) $link->link_datecreated,
+				'link_datemodified'     => (string) $link->link_datemodified,
+				'link_creator_user_ID'  => (int) $link->link_creator_user_ID,
+				'link_lastedit_user_ID' => (int) $link->link_lastedit_user_ID,
+				'link_itm_ID'           => (int) $link->link_itm_ID,
+				'link_cmt_ID'           => (int) $link->link_cmt_ID,
+				'link_usr_ID'           => (int) $link->link_usr_ID,
+				'link_file_ID'          => (int) $link->link_file_ID,
+				'link_ltype_ID'         => (int) $link->link_ltype_ID,
+				'link_position'         => (string) $link->link_position,
+				'link_order'            => (int) $link->link_order,
+			);
+		}
+
+		$authors[ $login ] = $author;
 	}
 
 	// Get files
@@ -1366,8 +1442,6 @@ function wpxml_parser( $file )
 
 		foreach( $evo->link as $link )
 		{ // Get the links
-			$evo_link = $link->children( $namespaces['evo'] );
-
 			$post['links'][] = array(
 				'link_ID'               => (int) $link->link_ID,
 				'link_datecreated'      => (string) $link->link_datecreated,
@@ -1576,7 +1650,7 @@ function wp_get_regional_data( $country_code, $region, $subregion, $city )
 
 /**
  * Get available files to import from the folder /media/import/
- * 
+ *
  * @return array Files
  */
 function wpxml_get_import_files()

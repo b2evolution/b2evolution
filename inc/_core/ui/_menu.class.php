@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -273,6 +273,22 @@ class Menu extends Widget
 					continue;
 				}
 
+				if( ! empty( $loop_details['entries'] ) )
+				{ // Has sub-entries, check if any sub-entry can be displayed
+					$has_entry = false;
+					foreach( $loop_details['entries'] as $entry_key => $entry_details )
+					{
+						if( !empty( $entry_details ) )
+						{ // Menu has non-empty entry
+							$has_entry = true;
+							break;
+						}
+					}
+					if( ! $has_entry )
+					{
+						continue;
+					}
+				}
 
 				// Menu entry
 				if( isset( $loop_details['href'] ) )
@@ -467,7 +483,7 @@ class Menu extends Widget
 
 	/**
 	 * Check if menu is empty or contains at least one entry
-	 * 
+	 *
 	 * @return boolean true if the menu is not empty | false otherwise
 	 */
 	function has_entires()

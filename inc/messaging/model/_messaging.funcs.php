@@ -1624,7 +1624,7 @@ function get_first_unread_message_date( $user_ID )
  */
 function get_next_reminder_info( $user_ID )
 {
-	global $UserSettings, $DB, $servertimenow, $unread_message_reminder_delay, $unread_messsage_reminder_threshold;
+	global $Settings, $UserSettings, $DB, $servertimenow;
 
 	if( ! $UserSettings->get( 'notify_unread_messages', $user_ID ) )
 	{ // The user doesn't want to recive unread messages reminders
@@ -1636,6 +1636,9 @@ function get_next_reminder_info( $user_ID )
 	{ // The user doesn't have unread messages
 		return T_('This user doesn\'t have unread messages.');
 	}
+
+	// Get array of the unread private messages reminder delay settings:
+	$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
 
 	// We assume that reminder is not delayed because of the user was not logged in since too many days
 	$reminder_is_delayed = false;
@@ -1690,7 +1693,7 @@ function get_next_reminder_info( $user_ID )
 	}
 	elseif( empty( $last_unread_messages_reminder ) )
 	{ // The user didn't get unread messages reminder emails before
-		$note = sprintf( T_('The user has never received a notification yet, so the first notification is sent with %s delay'), seconds_to_period( $unread_messsage_reminder_threshold ) );
+		$note = sprintf( T_('The user has never received a notification yet, so the first notification is sent with %s delay'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) );
 	}
 	else
 	{ // Reminder is not delayed
@@ -1890,6 +1893,41 @@ function get_thread_prevnext_links( $current_thread_ID, $params = array() )
 	$r .= $params['after'];
 
 	return $r;
+}
+
+
+/**
+ * Get preferred contact methods on disp=msgform
+ *
+ * @param object Recipient User
+ * @return array
+ */
+function get_msgform_contact_methods( $recipient_User = NULL )
+{
+	global $Blog;
+
+	$contact_methods = array();
+
+	if( $recipient_User !== NULL )
+	{	// Check what contact methods are allowed between recipient and current users:
+		if( $recipient_User->get_msgform_possibility( NULL, 'PM' ) == 'PM' )
+		{	// PM method is allowed:
+			$contact_methods['pm'] = T_('Private Message on this Site');
+		}
+		if( $recipient_User->get_msgform_possibility( NULL, 'email' ) == 'email' )
+		{	// Email method is allowed:
+			$contact_methods['email'] = T_('Email');
+		}
+	}
+
+	// Get additional user fields which are defined for current collection:
+	$msgform_additional_fields = $Blog->get_msgform_additional_fields();
+	foreach( $msgform_additional_fields as $additional_Userfield )
+	{
+		$contact_methods[ $additional_Userfield->ID ] = $additional_Userfield->get_name();
+	}
+
+	return $contact_methods;
 }
 
 

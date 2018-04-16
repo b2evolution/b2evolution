@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -15,13 +15,13 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '_core/model/db/_sql.class.php', 'SQL' );
+load_class( '_core/model/db/_filtersql.class.php', 'FilterSQL' );
 
 /**
  * UserQuery: help constructing queries on Users
  * @package evocore
  */
-class UserQuery extends SQL
+class UserQuery extends FilterSQL
 {
 	/**
 	 * Fields of users table to search by keywords
@@ -47,15 +47,17 @@ class UserQuery extends SQL
 
 		// Params to build query
 		$params = array_merge( array(
-				'join_group'     => true,
-				'join_sec_groups'=> false,
-				'join_session'   => false,
-				'join_country'   => true,
-				'join_region'    => false,
-				'join_subregion' => false,
-				'join_city'      => true,
-				'join_colls'     => true,
-				'grouped'        => false,
+				'join_group'       => true,
+				'join_sec_groups'  => false,
+				'join_session'     => false,
+				'join_country'     => true,
+				'join_region'      => false,
+				'join_subregion'   => false,
+				'join_city'        => true,
+				'join_colls'       => true,
+				'join_lists'       => false,
+				'join_user_tags'   => false,
+				'grouped'          => false,
 			), $params );
 
 		$this->SELECT( 'user_ID, user_login, user_nickname, user_lastname, user_firstname, user_gender, user_source, user_created_datetime, user_profileupdate_date, user_lastseen_ts, user_level, user_status, user_avatar_file_ID, user_email, user_url, user_age_min, user_age_max, user_pass, user_salt, user_pass_driver, user_locale, user_unsubscribe_key, user_reg_ctry_ID, user_ctry_ID, user_rgn_ID, user_subrg_ID, user_city_ID, user_grp_ID' );
@@ -119,7 +121,26 @@ class UserQuery extends SQL
 			}
 		}
 
-		$this->WHERE( 'user_ID IS NOT NULL' );
+		if( $params['join_user_tags'] )
+		{
+			$this->SELECT_add( ', user_tags' );
+			$this->FROM_add( 'LEFT JOIN (
+						SELECT uutg_user_ID, GROUP_CONCAT( uutg_emtag_ID ) AS user_tags, COUNT(*) AS user_tag_count
+						FROM T_users__usertag
+						GROUP BY uutg_user_ID
+					) AS user_tags ON user_tags.uutg_user_ID = user_ID' );
+		}
+
+		if( $params['join_lists'] )
+		{ // subscribed_list contains comma-separated list of newsletter IDs, "negative" IDs are unsubscribed to newsletter lists
+			$this->SELECT_add( ', subscribed_list' );
+			$this->FROM_add( 'LEFT JOIN (
+						SELECT enls_user_ID, GROUP_CONCAT( IF( enls_subscribed = 1, enls_enlt_ID, CONCAT( "-", enls_enlt_ID ) ) ) AS subscribed_list, COUNT(*) AS subscribed_list_count
+						FROM T_email__newsletter_subscription
+						GROUP BY enls_user_ID
+					) AS subscribed_lists on subscribed_lists.enls_user_ID = user_ID' );
+		}
+
 		if( $params['grouped'] )
 		{ // Group by user group
 			$this->GROUP_BY( 'user_ID, grp_ID' );
@@ -256,7 +277,7 @@ class UserQuery extends SQL
 
 
 	/**
-	 * Restrict to user status, currenlty activated also means autoactivated users
+	 * Restrict to user status, currently activated also means auto and manually activated users
 	 *
 	 * @param string user status ( 'activated', 'deactivated', 'new', 'emailchanged', 'failedactivation', 'closed' )
 	 * @param boolean set true to include users only with the given status, or set false to exclude users with the given status
@@ -272,21 +293,43 @@ class UserQuery extends SQL
 		}
 
 		if( $status == 'activated' && !$exactly )
-		{ // Activated and Autoactivated users
-			if( $include )
-			{
-				$this->WHERE_and( 'user_status = '.$DB->quote( 'activated' ).' OR user_status = '.$DB->quote( 'autoactivated' ) );
-			}
-			else
-			{
-				$this->WHERE_and( 'user_status <> '.$DB->quote( 'activated' ).' AND user_status <> '.$DB->quote( 'autoactivated' ) );
-			}
+		{	// Activated, Manually activated, Autoactivated users:
+			$this->WHERE_and( 'user_status '.( $include ? 'IN' : 'NOT IN' ).' ( '.$DB->quote( array( 'activated', 'autoactivated', 'manualactivated' ) ).' )' );
 		}
 		else
 		{ // Other status check
 			// init compare, which depends if we want to include or exclude users with the given status
 			$compare = $include ? ' = ' : ' <> ';
 			$this->WHERE_and( 'user_status'.$compare.$DB->quote( $status ) );
+		}
+
+		return;
+	}
+
+
+	/**
+	 * Restrict to user registration date
+	 *
+	 * @param date Registration from date
+	 * @param date Registration to date
+	 */
+	function where_registered_date( $min_date = NULL, $max_date = NULL )
+	{
+		global $DB;
+
+		if( empty( $min_date ) && empty( $max_date ) )
+		{
+			return;
+		}
+
+		if( ! empty( $min_date ) )
+		{
+			$this->WHERE_and( 'DATE(user_created_datetime) >= '.$DB->quote( $min_date ) );
+		}
+
+		if( ! empty( $max_date ) )
+		{
+			$this->WHERE_and( 'DATE(user_created_datetime) <= '.$DB->quote( $max_date ) );
 		}
 
 		return;
@@ -332,6 +375,45 @@ class UserQuery extends SQL
 			$this->FROM_add( ' LEFT JOIN T_users__usersettings as custom_sender_name ON custom_sender_name.uset_user_ID = user_ID AND custom_sender_name.uset_name = "notification_sender_name"' );
 			$this->WHERE_and( 'custom_sender_name.uset_value IS NOT NULL AND custom_sender_name.uset_value <> '.$DB->quote( $Settings->get( 'notification_sender_name' ) ) );
 		}
+	}
+
+
+	/**
+	 * Restrict to users with tag
+	 *
+	 * @param string User should have all of these tags
+	 * @param string User should not have any of these tags
+	 */
+	function where_tag( $user_tag = NULL, $not_user_tag = NULL)
+	{
+		global $DB;
+
+		if( empty( $user_tag ) && empty( $not_user_tag ) )
+		{
+			return;
+		}
+
+		$tags = array_unique( array_map( 'trim', explode( ',', $user_tag ) ) );
+		$not_tags = array_unique( array_map( 'trim', explode( ',', $not_user_tag ) ) );
+		$all_tags = array_merge( $tags, $not_tags );
+
+		$this->FROM_add( 'LEFT JOIN (
+					SELECT uutg_user_ID,
+						GROUP_CONCAT( DISTINCT IF( utag_name IN ('.$DB->quote( $tags ).'), utag_name, NULL ) ORDER BY utag_name ) AS tags,
+						GROUP_CONCAT( DISTINCT IF( utag_name IN ('.$DB->quote( $not_tags ).'), utag_name, NULL ) ) AS not_tags
+					FROM T_users__tag
+					LEFT JOIN T_users__usertag ON uutg_emtag_ID = utag_ID
+					WHERE utag_name IN ('.$DB->quote( $all_tags ).')
+					GROUP BY uutg_user_ID
+				) AS tags
+				ON tags.uutg_user_ID = user_ID' );
+
+		if( ! empty( $user_tag ) )
+		{
+			sort( $tags );
+			$this->WHERE_and( 'tags.tags = '.$DB->quote( implode( ',', array_unique( $tags ) ) ) );
+		}
+		$this->WHERE_and( 'tags.not_tags IS NULL' );
 	}
 
 
@@ -425,46 +507,6 @@ class UserQuery extends SQL
 
 
 	/**
-	 * Restrict with user fields
-	 *
-	 * @param array User fields
-	 */
-	function where_userfields( $userfields )
-	{
-		global $DB;
-
-		if( empty( $userfields ) )
-		{
-			return;
-		}
-
-		$criteria_where_clauses = array();
-		foreach( $userfields as $field )
-		{
-			$type = (int)$field['type'];
-			$value = trim( strip_tags( $field['value'] ) );
-			if( $type > 0 && $value != '' )
-			{	// Filter by Specific criteria
-				$words = explode( ' ', $value );
-				if( count( $words ) > 0 )
-				{
-					foreach( $words as $word )
-					{
-						$criteria_where_clauses[] = 'uf_ufdf_ID = "'.$DB->escape($type).'" AND uf_varchar LIKE "%'.$DB->escape($word).'%"';
-					}
-				}
-			}
-		}
-
-		if( count( $criteria_where_clauses ) > 0 )
-		{	// Some creteria is defined
-			$this->FROM_add( ' LEFT JOIN T_users__fields ON uf_user_ID = user_ID' );
-			$this->WHERE_and( ' ( ( '.implode( ' ) OR ( ', $criteria_where_clauses ).' ) ) ' );
-		}
-	}
-
-
-	/**
 	 * Restrict with user group level
 	 *
 	 * @param integer Minimum group level
@@ -506,8 +548,136 @@ class UserQuery extends SQL
 		}
 
 		// Join Organization table
-		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role' );
+		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role, uorg_priority' );
 		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
+	}
+
+
+	/**
+	 * Select by newsletter ID
+	 *
+	 * @param integer Newsletter ID
+	 * @param boolean|NULL TRUE - only users with active subscription, FALSE - only unsubscribed users, NULL - both
+	 */
+	function where_newsletter( $newsletter_ID, $is_subscribed = true )
+	{
+		global $DB;
+
+		$newsletter_ID = intval( $newsletter_ID );
+
+		if( empty( $newsletter_ID ) )
+		{
+			return;
+		}
+
+		$restrict_is_subscribed = '';
+		if( $is_subscribed !== NULL )
+		{	// Get only subscribed or unsubscribed users:
+			$restrict_is_subscribed = ' AND enls_subscribed = '.( $is_subscribed ? '1' : '0' );
+		}
+
+		$this->SELECT_add( ', enls_last_sent_manual_ts, enls_last_open_ts, enls_last_click_ts, enls_send_count, enls_subscribed, enls_subscribed_ts, enls_unsubscribed_ts, enls_enlt_ID' );
+		$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ).$restrict_is_subscribed );
+	}
+
+
+	/**
+	 * Select by not subscribed newsletter ID
+	 *
+	 * @param integer Newsletter ID
+	 */
+	function where_not_newsletter( $not_newsletter_ID )
+	{
+		global $DB;
+
+		$not_newsletter_ID = intval( $not_newsletter_ID );
+
+		if( empty( $not_newsletter_ID ) )
+		{
+			return;
+		}
+
+		$this->WHERE( 'user_ID NOT IN ( SELECT noenls.enls_user_ID FROM T_email__newsletter_subscription AS noenls WHERE noenls.enls_enlt_ID = '.$DB->quote( $not_newsletter_ID ).' AND noenls.enls_subscribed = 1 )' );
+	}
+
+
+	/**
+	 * Select by Email Campaign ID
+	 *
+	 * @param integer Email Campaign ID
+	 * @param string Recipient type of email campaign: 'filter', 'receive', 'wait'
+	 */
+	function where_email_campaign( $ecmp_ID, $recipient_type = '', $recipient_action = '' )
+	{
+		global $DB;
+
+		$ecmp_ID = intval( $ecmp_ID );
+
+		if( empty( $ecmp_ID ) )
+		{
+			return;
+		}
+
+		$this->SELECT_add( ', csnd_status' );
+		$this->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_user_ID = user_ID AND csnd_camp_ID = '.$DB->quote( $ecmp_ID ) );
+
+		// Get email log date and time:
+		$this->SELECT_add( ', csnd_last_sent_ts, enls_user_ID, csnd_last_open_ts, csnd_last_click_ts, csnd_like, csnd_cta1, csnd_cta2, csnd_cta3' );
+
+		// Get subscription status:
+		$this->SELECT_add( ', enls_subscribed' );
+		$this->FROM_add( 'LEFT JOIN T_email__campaign ON ecmp_ID = csnd_camp_ID' );
+		$this->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_enlt_ID = ecmp_enlt_ID AND enls_user_ID = user_ID AND enls_subscribed = 1' );
+
+		switch( $recipient_type )
+		{
+			case 'ready_to_send':
+				// Get recipients which have already received this newsletter:
+				$this->WHERE_and( 'csnd_status IN ( "ready_to_send", "ready_to_resend" )' );
+				break;
+
+			case 'sent':
+			case 'send_error':
+			case 'skipped':
+				// Get recipients which have already received this newsletter:
+				$this->WHERE_and( 'csnd_status = "'.$recipient_type.'"' );
+				break;
+		}
+
+		switch( $recipient_action )
+		{
+			case 'img_loaded':
+				$this->WHERE_and( 'csnd_last_open_ts IS NOT NULL' );
+				break;
+
+			case 'link_clicked':
+				$this->WHERE_and( 'csnd_last_click_ts IS NOT NULL' );
+				break;
+
+			case 'cta1':
+				$this->WHERE_and( 'csnd_cta1 = 1' );
+				break;
+
+			case 'cta2':
+				$this->WHERE_and( 'csnd_cta2 = 1' );
+				break;
+
+			case 'cta3':
+				$this->WHERE_and( 'csnd_cta3 = 1' );
+				break;
+
+			case 'liked':
+				$this->WHERE_and( 'csnd_like = 1' );
+				break;
+
+			case 'disliked':
+				$this->WHERE_and( 'csnd_cta1 = -1' );
+				break;
+
+			case 'clicked_unsubsubcribe':
+				$this->WHERE_and( 'clicked_unsubscribe = 1' );
+				break;
+		}
 	}
 
 
@@ -583,6 +753,144 @@ class UserQuery extends SQL
 		$this->WHERE_and( 'user_level <= '.$DB->quote( $user_level_max ) );
 	}
 
+
+	/**
+	 * Restrict to users with duplicate emails
+	 */
+	function where_duplicate_email()
+	{
+		$this->SELECT_add( ', email_user_count' );
+		$this->FROM_add( 'LEFT JOIN ( SELECT user_email AS dup_email, COUNT(*) AS email_user_count FROM T_users GROUP BY user_email ) AS dup_emails ON dup_emails.dup_email = T_users.user_email' );
+		$this->WHERE_and( 'email_user_count > 1' );
+	}
+
+
+	/**
+	 * Restrict to users who voted for poll option
+	 *
+	 * @param integer Poll option ID
+	 */
+	function where_poll_answered( $poll_ID = NULL, $poll_option_ID = NULL )
+	{
+		global $DB;
+
+		if( empty( $poll_ID ) && empty( $poll_option_ID ) )
+		{ // No poll answered filter
+			return;
+		}
+
+		if( ! empty( $poll_option_ID ) )
+		{
+			$join_array = array( 'pans_user_ID = user_ID', 'pans_popt_ID = '.$DB->quote( $poll_option_ID ) );
+
+			if( ! empty( $poll_ID ) )
+			{
+				array_unshift( $join_array, 'pans_pqst_ID = '.$DB->quote( $poll_ID ) );
+			}
+			$this->FROM_add( 'INNER JOIN T_polls__answer ON '.implode( ' AND ', $join_array ) );
+		}
+		else
+		{
+			$this->FROM_add( 'INNER JOIN (
+					SELECT pans_user_ID
+					FROM T_polls__answer
+					WHERE pans_pqst_ID = '.$DB->quote( $poll_ID ).'
+					GROUP BY pans_user_ID
+				) AS poll_answers ON poll_answers.pans_user_ID = user_ID' );
+		}
+	}
+
+
+	/**
+	 * Restrict with user fields (Specific criteria)
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_criteria( $value, $operator )
+	{
+		if( ! preg_match( '#^(\d+):(contains|not_contains):(.+)$#', $value, $m ) )
+		{	// Skip wrong value:
+			return;
+		}
+
+		$user_field_def_ID = intval( $m[1] );
+		$user_field_operator = trim( strip_tags( $m[2] ) );
+		$user_field_value = trim( strip_tags( $m[3] ) );
+		if( $user_field_def_ID <= 0 || $user_field_value == '' || $user_field_operator == '' )
+		{	// Skip wrong value:
+			return;
+		}
+
+		global $DB;
+
+		switch( $user_field_operator )
+		{
+			case 'contains':
+				$word_operator = 'LIKE';
+				$field_condition_start = 'uf_ufdf_ID = '.$DB->quote( $user_field_def_ID );
+				$field_condition_end = '';
+				break;
+
+			case 'not_contains':
+				$word_operator = 'NOT LIKE';
+				$field_condition_start = '( uf_ufdf_ID = '.$DB->quote( $user_field_def_ID );
+				// This condition selects users which have no the requested field in DB, i.e. thier requested field has no the requested value:
+				$field_condition_end = ' ) OR ( SELECT COUNT( uf_ID ) FROM yb_users__fields WHERE uf_user_ID = user_ID AND uf_ufdf_ID = '.$DB->quote( $user_field_def_ID ).' ) = 0';
+				break;
+
+			default:
+				debug_die( 'Unknown operator "'.$user_field_operator.'" for user searching by specific criteria' );
+		}
+
+		$word_sql_conditions = array();
+		$words = explode( ' ', $user_field_value );
+		foreach( $words as $word )
+		{	// Find each word separately:
+			$word_sql_conditions[] = 'uf_varchar '.$word_operator.' '.$DB->quote( '%'.$word.'%' );
+		}
+
+		// Join table for columns uf_ufdf_ID and uf_varchar:
+		$this->FROM_add( 'LEFT JOIN T_users__fields ON uf_user_ID = user_ID' );
+
+		// Build SQL condition for specific criteria:
+		$criteria_sql_condition = '( '.$field_condition_start.' AND ';
+		if( count( $word_sql_conditions ) > 1 )
+		{
+			$criteria_sql_condition .= '( '.implode( ' OR ', $word_sql_conditions ).' )';
+		}
+		else
+		{
+			$criteria_sql_condition .= $word_sql_conditions[0];
+		}
+		$criteria_sql_condition .= $field_condition_end.' )';
+
+		return $criteria_sql_condition;
+	}
+
+
+	/**
+	 * Restrict with user last seen date
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_lastseen( $value, $operator )
+	{
+		return $this->get_where_condition( 'DATE( user_lastseen_ts )', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user last seen date
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_source( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_source', $value, $operator );
+	}
 }
 
 ?>

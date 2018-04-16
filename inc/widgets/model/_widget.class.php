@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -279,7 +279,7 @@ class ComponentWidget extends DataObject
 			return '';
 		}
 
-		return '<span class="fa fa-'.$this->icon.'"></span>';
+		return '<span class="label label-info evo_widget_icon"><span class="fa fa-'.$this->icon.'"></span></span>';
 	}
 
 
@@ -294,14 +294,21 @@ class ComponentWidget extends DataObject
 		if( $this->type == 'plugin' )
 		{	// Plugin widget:
 			$widget_Plugin = & $this->get_Plugin();
-			$icon = '<span class="fa fa-'.$widget_Plugin->widget_icon.'"></span>';
 
-			if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+			if( $widget_Plugin )
 			{
-				return $icon.' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
-			}
+				if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+				{
+					return $widget_Plugin->get_widget_icon().' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+				}
 
-			return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+				return $widget_Plugin->get_widget_icon().' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+			}
+			else
+			{
+				$icon = '<span class="label label-info evo_widget_icon"><span class="fa fa-warning"></span></span>';
+				return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+			}
 		}
 
 		// Normal widget:
@@ -552,7 +559,7 @@ class ComponentWidget extends DataObject
 	{
 		$params = $this->get_param_definitions( NULL );
 
-		if( isset( $params[$parname] ) || 
+		if( isset( $params[$parname] ) ||
 		    ( $group !== NULL && isset( $params[ $group ]['inputs'][ substr( $parname, strlen( $group ) ) ] ) ) )
 		{ // This is a widget specific param:
 			// Make sure param_array is loaded before set the param value
@@ -1498,12 +1505,28 @@ class ComponentWidget extends DataObject
 				$message = 'Widget "'.$this->get_name().'" is hidden because there is nothing to display.';
 			}
 
-			echo $this->disp_params['block_start'];
-			$this->disp_title();
-			echo $this->disp_params['block_body_start'];
-			echo $message;
-			echo $this->disp_params['block_body_end'];
-			echo $this->disp_params['block_end'];
+			if( preg_match( '#class="[^"]*evo_widget[^"]*"#i', $this->disp_params['block_start'].$this->disp_params['block_body_start'] ) )
+			{	// If standard widget wrappers have special style class "evo_widget" we can use it:
+				echo $this->disp_params['block_start'];
+				$this->disp_title();
+				echo $this->disp_params['block_body_start'];
+				echo $message;
+				echo $this->disp_params['block_body_end'];
+				echo $this->disp_params['block_end'];
+			}
+			else
+			{	// Otherwise we should use more wrappers to design widgets correctly, e-g for Menu container:
+				echo $this->disp_params['block_start'];
+				$this->disp_title();
+				echo $this->disp_params['block_body_start'];
+				echo $this->get_layout_start();
+				echo $this->get_layout_item_start();
+				echo '<a href="#">(...)</a>';
+				echo $this->get_layout_item_end();
+				echo $this->get_layout_end();
+				echo $this->disp_params['block_body_end'];
+				echo $this->disp_params['block_end'];
+			}
 		}
 	}
 }

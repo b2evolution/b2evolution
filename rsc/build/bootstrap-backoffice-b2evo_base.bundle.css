@@ -316,6 +316,11 @@ span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
   background-image: url(../img/ajax-loader/777.gif);
 }
+input.loader_img {
+  background: url(../img/ajax-loader/fff.gif) no-repeat;
+  background-size: 1.5em;
+  background-position: right 5px center;
+}
 .evo_rest_api_loading {
   position: relative;
   min-width: 64px;
@@ -1472,6 +1477,7 @@ div.dev-blocks--belowtoolbar {
   background: #666;
   color: #FFF;
   font-size: 11px;
+  line-height: 1.42857143;
   text-align: left;
   white-space: nowrap;
 }
@@ -1490,14 +1496,25 @@ div.dev-blocks--belowtoolbar {
   padding: 1px 5px;
   cursor: pointer;
   font-size: 18px;
+  line-height: 1.42857143;
 }
-.evo_designer.evo_designer__container {
+.evo_designer.evo_designer__widget.evo_widget__outside .evo_designer__title,
+.evo_designer.evo_designer__widget.evo_widget__outside .evo_designer__actions {
+  left: -3px;
+}
+.evo_designer.evo_designer__container,
+.evo_designer.evo_designer__subcontainer_active,
+.evo_designer.evo_designer__subcontainer_inactive {
   border-color: #DDD;
 }
-.evo_designer.evo_designer__container > div {
+.evo_designer.evo_designer__container > div,
+.evo_designer.evo_designer__subcontainer_active > div,
+.evo_designer.evo_designer__subcontainer_inactive > div {
   height: 100%;
 }
-.evo_designer.evo_designer__container .evo_designer__title {
+.evo_designer.evo_designer__container .evo_designer__title,
+.evo_designer.evo_designer__subcontainer_active .evo_designer__title,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__title {
   top: auto;
   left: auto;
   bottom: -19px;
@@ -1507,7 +1524,9 @@ div.dev-blocks--belowtoolbar {
   color: #333;
   text-align: right;
 }
-.evo_designer.evo_designer__container .evo_designer__actions {
+.evo_designer.evo_designer__container .evo_designer__actions,
+.evo_designer.evo_designer__subcontainer_active .evo_designer__actions,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__actions {
   top: auto;
   left: auto;
   bottom: 0;
@@ -1515,8 +1534,34 @@ div.dev-blocks--belowtoolbar {
   background: #DDD;
   border-radius: 4px 4px 0 0;
 }
-.evo_designer.evo_designer__container .evo_designer__actions .evo_designer__action {
+.evo_designer.evo_designer__container .evo_designer__actions .evo_designer__action,
+.evo_designer.evo_designer__subcontainer_active .evo_designer__actions .evo_designer__action,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__actions .evo_designer__action {
   color: #333 !important;
+}
+.evo_designer.evo_designer__subcontainer_active,
+.evo_designer.evo_designer__subcontainer_inactive {
+  border-color: #00F;
+}
+.evo_designer.evo_designer__subcontainer_active .evo_designer__title,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__title,
+.evo_designer.evo_designer__subcontainer_active .evo_designer__actions,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__actions {
+  background: #00F;
+  color: #FFF;
+}
+.evo_designer.evo_designer__subcontainer_active .evo_designer__title .evo_designer__action,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__title .evo_designer__action,
+.evo_designer.evo_designer__subcontainer_active .evo_designer__actions .evo_designer__action,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__actions .evo_designer__action {
+  color: #FFF !important;
+}
+.evo_designer.evo_designer__subcontainer_inactive {
+  border-color: #99F;
+}
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__title,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__actions {
+  background: #99F;
 }
 .evo_designer.evo_designer__status_process {
   border-color: #F60;
@@ -1539,12 +1584,12 @@ div.dev-blocks--belowtoolbar {
 .evo_designer.evo_designer__status_failed .evo_designer__actions {
   background: #E00;
 }
-.evo_container[data-name],
+.evo_container[data-code],
 .evo_widget[data-id] {
   min-width: 5px;
   min-height: 5px;
 }
-.evo_container[data-name] {
+.evo_container[data-code] {
   z-index: 10000;
 }
 .evo_designer__container {
@@ -2247,7 +2292,7 @@ div.codeblock > p {
 }
 div.videoblock {
   text-align: center;
-  margin: auto;
+  margin: 1ex auto;
   overflow: auto;
   position: relative;
   max-width: 100%;
@@ -2320,6 +2365,9 @@ ol {
 }
 .text-normal {
   font-weight: normal;
+}
+p.margin-top {
+  margin: 10px 0 0 0;
 }
 .table-hover > tbody > tr:hover {
   background-color: #ffc;
@@ -2447,15 +2495,9 @@ a.btn.action_icon.hoverlink {
   vertical-align: top;
   margin-left: 7px;
 }
-.form-horizontal .compose_layout {
-  margin-bottom: 15px;
-}
 .form-horizontal .compose_layout td {
-  padding: 0 2px 2px 0;
+  padding: 0 2px 15px 0;
   vertical-align: middle;
-}
-.form-horizontal .compose_layout tr:last-child td {
-  padding-bottom: 0;
 }
 .form-horizontal .compose_layout th.label,
 .form-horizontal .compose_layout td.label {
@@ -2534,13 +2576,23 @@ a.btn.action_icon.hoverlink {
 .form-inline .form-control.large {
   width: 97%;
 }
-.form-inline .form-group,
-.form-inline #criteria_type_A2 {
+.form-inline .form-group {
   margin-top: 2px;
 }
-.form-inline .form-group.large,
-.form-inline #criteria_type_A2.large {
+.form-inline .form-group.large {
   width: 100%;
+}
+.evo_msgform_recipient label.control-label,
+.evo_msgform_recipient div.controls {
+  float: none;
+  display: inline-block;
+  vertical-align: middle;
+  padding-top: 0;
+}
+.evo_msgform_recipient a.login {
+  white-space: normal;
+  text-align: center;
+  display: inline-block;
 }
 #register_form div#ffield_m {
   margin-bottom: 4px;
@@ -2621,6 +2673,9 @@ form ul.token-input-list-facebook li.token-input-input-token-facebook {
   -o-border-radius: 4px;
   border-radius: 4px;
   margin: 0 4px 4px 0;
+}
+body.modal-open div.token-input-dropdown-facebook {
+  z-index: 10002;
 }
 div.results {
   margin-top: 0;
@@ -3170,4 +3225,24 @@ div.message_toolbars {
 }
 .accordion-caret .accordion-toggler.collapsed:before {
   content: '\f0da';
+}
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel {
+  background: none;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+}
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body {
+  padding: 0;
+}
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body:before,
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .evo_post__full_text.clearfix:before,
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body:after,
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .evo_post__full_text.clearfix:after {
+  display: block;
+}
+.disp_access_requires_login .evo_widget.widget_core_user_login {
+  min-width: 290px;
+  max-width: 400px;
+  margin: 10px auto;
 }

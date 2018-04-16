@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -63,7 +63,10 @@ if( ! empty( $user_domain ) )
 	$Domain = & get_Domain_by_subdomain( $user_domain );
 	$dom_status_titles = stats_dom_status_titles();
 	$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$user_domain.' ('.$dom_status.')'.'</td></tr>'."\n";
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').': </th>'.
+			'<td'.emailskin_style( 'table.email_table td' ).'>'.$user_domain.' ('.$dom_status.')'.
+			( ! empty( $user_domain ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&action=whois&query='.$user_domain, 'WHOIS', 'div.buttons a+a.button_gray' ) : '' ).
+			'</td></tr>'."\n";
 }
 
 if( $activated_User->ctry_ID > 0 )

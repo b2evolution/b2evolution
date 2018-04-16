@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -17,271 +17,9 @@ global $Collection, $Blog, $Skin, $admin_url;
 
 global $container_Widget_array;
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
-{
-	echo '<div class="pull-right" style="margin-bottom:10px">';
-		echo action_icon( T_('Add a new container!'), 'add',
-					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default' ) );
-		echo action_icon( T_('Scan skins for containers'), 'reload',
-					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Scan skins for containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
-	echo '</div>';
-}
-
 // Load widgets for current collection:
 $WidgetCache = & get_WidgetCache();
 $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID, false, get_param( 'skin_type' ) );
-
-/**
- * @param string Title of the container. This gets passed to T_()!
- * @param boolean Is included in collection skin
- */
-function display_container( $WidgetContainer, $is_included = true )
-{
-	global $Collection, $Blog, $admin_url, $embedded_containers;
-	global $Session;
-
-	$Table = new Table();
-
-	// Table ID - fp> needs to be handled cleanly by Table object
-	if( isset( $WidgetContainer->ID ) && ( $WidgetContainer->ID > 0 ) )
-	{
-		$widget_container_id = 'wico_ID_'.$WidgetContainer->ID;
-		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_ID='.$WidgetContainer->ID.'&amp;container='.$widget_container_id );
-		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;'.url_crumb('widget_container') );
-	}
-	else
-	{
-		$wico_code = $WidgetContainer->get( 'code' );
-		$widget_container_id = 'wico_code_'.$wico_code;
-		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_code='.$wico_code.'&amp;container='.$widget_container_id );
-		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_code='.$wico_code );
-	}
-
-	$widget_container_name = T_( $WidgetContainer->get( 'name' ) );
-	if( ! empty( $WidgetContainer->ID ) )
-	{
-		$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.'">'.$widget_container_name.'</a>';
-	}
-	$Table->title = '<span class="dimmed">'.$WidgetContainer->get( 'order' ).'</span> '
-		.'<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span> '
-		.'<span class="dimmed">'.$WidgetContainer->get( 'code' ).'</span>';
-
-	if( ! $is_included )
-	{	// Allow to destroy sub-container when it is not included into the selected skin:
-		$Table->global_icon( T_('Destroy sub-container'), 'delete', $destroy_container_url, T_('Destroy sub-container'), 3, 4 );
-	}
-	$Table->global_icon( T_('Add a widget...'), 'new', $add_widget_url, /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$widget_container_id, 'class' => 'action_icon btn-primary' ) );
-
-	$Table->display_init( array(
-			'list_start' => '<div class="panel panel-default">',
-			'list_end'   => '</div>',
-		) );
-
-	$Table->display_list_start();
-
-	// TITLE / COLUMN HEADERS:
-	$Table->display_head();
-
-	// BODY START:
-	echo '<ul id="container_'.$widget_container_id.'" class="widget_container">';
-
-	/**
-	 * @var WidgetCache
-	 */
-	$WidgetCache = & get_WidgetCache();
-	$Widget_array = & $WidgetCache->get_by_container_ID( $WidgetContainer->ID );
-
-	if( ! empty( $Widget_array ) )
-	{
-		$widget_count = 0;
-		foreach( $Widget_array as $ComponentWidget )
-		{
-			$widget_count++;
-			$enabled = $ComponentWidget->get( 'enabled' );
-
-			if( $ComponentWidget->get( 'code' ) == 'subcontainer' )
-			{
-				$container_code = $ComponentWidget->get_param( 'container' );
-				if( ! isset( $embedded_containers[$container_code] ) ) {
-					$embedded_containers[$container_code] = true;
-				}
-			}
-
-			// START Widget row:
-			echo '<li id="wi_ID_'.$ComponentWidget->ID.'" class="draggable_widget">';
-
-			// Checkbox:
-			echo '<span class="widget_checkbox'.( $enabled ? ' widget_checkbox_enabled' : '' ).'">'
-					.'<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" />'
-				.'</span>';
-
-			// State:
-			echo '<span class="widget_state">'
-					.'<a href="#" onclick="return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' );">'
-						.get_icon( ( $enabled ? 'bullet_green' : 'bullet_empty_grey' ), 'imgtag', array( 'title' => ( $enabled ? T_('The widget is enabled.') : T_('The widget is disabled.') ) ) )
-					.'</a>'
-				.'</span>';
-
-			// Name:
-			$ComponentWidget->init_display( array() );
-			echo '<span class="widget_title">'
-					.'<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ).'" class="widget_name" onclick="return editWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )">'
-						.$ComponentWidget->get_desc_for_list()
-					.'</a> '
-					.$ComponentWidget->get_help_link()
-				.'</span>';
-
-			// Cache:
-			echo'<span class="widget_cache_status">';
-			$widget_cache_status = $ComponentWidget->get_cache_status( true );
-			switch( $widget_cache_status )
-			{
-				case 'disallowed':
-					echo get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ), 'rel' => $widget_cache_status ) );
-					break;
-
-				case 'denied':
-					echo action_icon( T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ),
-						'block_cache_denied',
-						$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching', NULL, NULL, NULL,
-						array( 'rel' => $widget_cache_status ) );
-					break;
-
-				case 'enabled':
-					echo action_icon( T_( 'Caching is enabled. Click to disable.' ),
-						'block_cache_on',
-						regenerate_url( 'blog', 'action=cache_disable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
-						array(
-								'rel'     => $widget_cache_status,
-								'onclick' => 'return toggleCacheWidget( \'wi_ID_'.$ComponentWidget->ID.'\', \'disable\' )',
-							) );
-					break;
-
-				case 'disabled':
-					echo action_icon( T_( 'Caching is disabled. Click to enable.' ),
-						'block_cache_off',
-						regenerate_url( 'blog', 'action=cache_enable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
-						array(
-								'rel'     => $widget_cache_status,
-								'onclick' => 'return toggleCacheWidget( \'wi_ID_'.$ComponentWidget->ID.'\', \'enable\' )',
-							) );
-					break;
-			}
-			echo '</span>';
-
-			// Actions:
-			echo '<span class="widget_actions">'
-					// Enable/Disable:
-					.action_icon( ( $enabled ? T_('Disable this widget!') : T_('Enable this widget!') ),
-							( $enabled ? 'deactivate' : 'activate' ),
-							regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ), NULL, NULL, NULL,
-							array( 'onclick' => 'return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => 'toggle_action' )
-						)
-					// Edit:
-					.action_icon( T_('Edit widget settings!'),
-							'edit',
-							regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ), NULL, NULL, NULL,
-							array( 'onclick' => 'return editWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
-						)
-					// Remove:
-					.action_icon( T_('Remove this widget!'),
-							'delete',
-							regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
-							array( 'onclick' => 'return deleteWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
-						)
-				.'</span>';
-
-			// END Widget row:
-			echo '</li>';
-		}
-	}
-
-	// BODY END:
-	echo '</ul>';
-
-	$Table->display_list_end();
-}
-
-
-/**
- * Display containers
- *
- * @param string Skin type: 'normal', 'mobile', 'tablet'
- * @param boolean TRUE to display main containers, FALSE - sub containers
- */
-function display_containers( $skin_type, $main = true )
-{
-	global $Blog, $blog_container_list, $skins_container_list, $embedded_containers;
-
-	// Display containers for current skin:
-	$displayed_containers = array();
-	$embedded_containers = array();
-	$WidgetContainerCache = & get_WidgetContainerCache();
-	foreach( $skins_container_list as $container_code => $container_data )
-	{
-		$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
-		if( ! $WidgetContainer )
-		{
-			$WidgetContainer = new WidgetContainer();
-			$WidgetContainer->set( 'code', $container_code );
-			$WidgetContainer->set( 'name', $container_data[0] );
-			$WidgetContainer->set( 'coll_ID', $Blog->ID );
-		}
-		if( $WidgetContainer->get( 'skin_type' ) != $skin_type ||
-		    ( $main && ! $WidgetContainer->get( 'main' ) ) ||
-		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
-		{	// Skip this container because another type is requested:
-			continue;
-		}
-
-		display_container( $WidgetContainer );
-		if( $WidgetContainer->ID > 0 )
-		{ // Container exists in the database
-			$displayed_containers[$container_code] = $WidgetContainer->ID;
-		}
-	}
-
-	// Display embedded containers
-	reset( $embedded_containers );
-	while( count( $embedded_containers ) > 0 )
-	{
-		// Get the first item key, and remove the first item from the array
-		$container_code = key( $embedded_containers );
-		array_shift( $embedded_containers );
-		if( isset( $displayed_containers[$container_code] ) )
-		{ // This container was already displayed
-			continue;
-		}
-
-		if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code ) )
-		{ // Confirmed that it is part of the blog's containers in the database
-			if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
-			    ( ! $main && $WidgetContainer->get( 'main' ) ) )
-			{	// Skip this container because another type is requested:
-				continue;
-			}
-			display_container( $WidgetContainer );
-			$displayed_containers[$container_code] = $WidgetContainer->ID;
-		}
-	}
-
-	// Display other blog containers which are not in the current skin
-	foreach( $blog_container_list as $container_ID )
-	{
-		if( in_array( $container_ID, $displayed_containers ) )
-		{
-			continue;
-		}
-
-		$WidgetContainer = & $WidgetContainerCache->get_by_ID( $container_ID );
-		if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
-		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
-		{	// Skip this container because another type is requested:
-			continue;
-		}
-		display_container( $WidgetContainer, false );
-	}
-}
 
 $Form = new Form( $admin_url.'?ctrl=widgets&blog='.$Blog->ID );
 
@@ -295,62 +33,33 @@ echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at rememberin
 echo '<div class="row">';
 
 echo '<div class="col-md-6 col-sm-12">';
-display_containers( get_param( 'skin_type' ), true );
+	echo '<h4 class="pull-left">'.T_('Skin Containers').'</h4>';
+	if( $current_User->check_perm( 'options', 'edit', false ) )
+	{	// Display a button to scan skin for widgets if current User has a permission:
+		echo action_icon( T_('Scan skin'), 'reload',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;skin_type='.get_param( 'skin_type' ).'&amp;'.url_crumb('widget'), T_('Scan skin'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info pull-right' ) );
+	}
+	echo '<div class="clearfix"></div>';
+	display_containers( get_param( 'skin_type' ), true );
 echo '</div>';
 
 echo '<div class="col-md-6 col-sm-12">';
-display_containers( get_param( 'skin_type' ), false );
+	echo '<h4 class="pull-left">'.T_('Sub-Containers').'</h4>';
+	if( $current_User->check_perm( 'options', 'edit', false ) )
+	{	// Display a button to add new sub-container if current User has a permission:
+		echo action_icon( T_('Add container'), 'add',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+	}
+	echo '<div class="clearfix"></div>';
+	display_containers( get_param( 'skin_type' ), false );
 echo '</div>';
 
 echo '</div>';
 
 echo '</fieldset>'."\n";
 
-echo '<span class="btn-group">';
-$Form->button( array(
-		'value' => get_icon( 'check_all' ).' '.T_('Check All'),
-		'id'    => 'widget_button_check_all',
-		'tag'   => 'button',
-		'type'  => 'button'
-	) );
-$Form->button( array(
-		'value' => get_icon( 'uncheck_all' ).' '.T_('Uncheck All'),
-		'id'    => 'widget_button_uncheck_all',
-		'tag'   => 'button',
-		'type'  => 'button'
-	) );
-echo '</span>';
-
-echo '<span class="btn-group">';
-$Form->button( array(
-		'value' => get_icon( 'check_all' ).' '.get_icon( 'bullet_green' ).' '.T_('Check Active'),
-		'id'    => 'widget_button_check_active',
-		'tag'   => 'button',
-		'type'  => 'button'
-	) );
-$Form->button( array(
-		'value' => get_icon( 'check_all' ).' '.get_icon( 'bullet_empty_grey' ).' '.T_('Check Inactive'),
-		'id'    => 'widget_button_check_inactive',
-		'tag'   => 'button',
-		'type'  => 'button'
-	) );
-echo '</span>';
-
-echo ' '.T_('With checked do:');
-echo '<span class="btn-group">';
-$Form->button( array(
-		'value' => get_icon( 'bullet_green' ).' '.T_('Activate'),
-		'name'  => 'actionArray[activate]',
-		'tag'   => 'button',
-		'type'  => 'submit'
-	) );
-$Form->button( array(
-		'value' => get_icon( 'bullet_empty_grey' ).' '.T_('Deactivate'),
-		'name'  => 'actionArray[deactivate]',
-		'tag'   => 'button',
-		'type'  => 'submit'
-	) );
-echo '</span>';
+// Display action buttons for widgets list:
+display_widgets_action_buttons( $Form );
 
 $Form->end_form();
 

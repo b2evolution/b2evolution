@@ -92,6 +92,8 @@ if( ! is_null( $user_ID ) )
 			$Messages->add( T_('Visit tracking is not enabled.') );
 			header_redirect( '?ctrl=users&user_tab=profile&user_ID='.$current_User->ID, 403 );
 		}
+
+		$user_tags = implode( ', ', $edited_User->get_usertags() );
 	}
 }
 elseif( $action != 'new' )
@@ -372,6 +374,9 @@ if( !$Messages->has_errors() )
 				}
 				 */
 
+				// Update the folding states for current user:
+				save_fieldset_folding_values();
+
 				if( $UserSettings->dbupdate() )
 				{
 					$Messages->add( T_('User feature settings have been changed.'), 'success');
@@ -443,7 +448,19 @@ if( !$Messages->has_errors() )
 						$user_tab = 'profile';
 					}
 				}
-				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&user_tab='.$user_tab, '', '&' ), 303 );
+
+				if( isset( $current_User->previous_pass_driver ) &&
+						$current_User->previous_pass_driver == 'nopass' &&
+						$current_User->previous_pass_driver != $current_User->get( 'pass_driver' ) )
+				{	// Redirect to page as we use after email validation if current user set password first time, e-g after email capture/quick registration:
+					$redirect_to = redirect_after_account_activation();
+				}
+				else
+				{
+					$redirect_to = regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&user_tab='.$user_tab, '', '&' );
+				}
+
+				header_redirect( $redirect_to, 303 );
 			}
 			break;
 
@@ -737,6 +754,115 @@ if( !$Messages->has_errors() )
 			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
+
+		case 'add_automation':
+			// Add user to automation:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $edited_User->ID, true );
+
+			param( 'autm_ID', 'integer', true );
+
+			$AutomationCache = & get_AutomationCache();
+			$user_Automation = & $AutomationCache->get_by_ID( $autm_ID, false, false );
+			$automation_title = ( $user_Automation ? '"'.$user_Automation->get( 'name' ).'"' : '#'.$autm_ID );
+
+			// A new automation for the User:
+			$first_step_SQL = new SQL( 'Get first step of automation' );
+			$first_step_SQL->SELECT( 'step_ID' );
+			$first_step_SQL->FROM( 'T_automation__step' );
+			$first_step_SQL->WHERE( 'step_autm_ID = autm_ID' );
+			$first_step_SQL->ORDER_BY( 'step_order ASC' );
+			$first_step_SQL->LIMIT( 1 );
+			$automation_SQL = new SQL( 'Get automation data ot insert user state' );
+			$automation_SQL->SELECT( 'DISTINCT autm_ID, '.$edited_User->ID.', ( '.$first_step_SQL->get().' ), '.$DB->quote( date2mysql( $servertimenow ) ) );
+			$automation_SQL->FROM( 'T_automation__automation' );
+			$automation_SQL->FROM_add( 'LEFT JOIN T_automation__user_state ON aust_autm_ID = autm_ID AND aust_user_ID = '.$edited_User->ID );
+			$automation_SQL->WHERE_and( 'aust_autm_ID IS NULL' );// Exclude already added automation user states
+			$automation_SQL->WHERE_and( 'autm_ID = '.$DB->quote( $autm_ID ) );
+			$r = $DB->query( 'INSERT INTO T_automation__user_state ( aust_autm_ID, aust_user_ID, aust_next_step_ID, aust_next_exec_ts ) '.$automation_SQL->get(),
+				'Insert new Automation #'.$autm_ID.' for user #'.$edited_User->ID );
+
+			if( $r )
+			{	// Display message if user has been removed from selected automation really:
+				$Messages->add( sprintf( T_('The user %s has been added to automation %s.'), '"'.$edited_User->dget( 'login' ).'"', $automation_title ), 'success' );
+			}
+			else
+			{
+				// NOTE: Don't translate this message because this case should not be in normal, display only for debug:
+				$Messages->add( sprintf( 'The user %s was already added to automation %s.', '"'.$edited_User->dget( 'login' ).'"', $automation_title ), 'warning' );
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=user&user_tab=marketing&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
+		case 'remove_automation':
+			// Remove user from automation:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $edited_User->ID, true );
+
+			param( 'autm_ID', 'integer', true );
+
+			$AutomationCache = & get_AutomationCache();
+			$user_Automation = & $AutomationCache->get_by_ID( $autm_ID, false, false );
+			$automation_title = ( $user_Automation ? '"'.$user_Automation->get( 'name' ).'"' : '#'.$autm_ID );
+
+			$r = $DB->query( 'DELETE FROM T_automation__user_state
+				WHERE aust_user_ID = '.$DB->quote( $edited_User->ID ).'
+				  AND aust_autm_ID = '.$DB->quote( $autm_ID ) );
+
+			if( $r )
+			{	// Display message if user has been removed from selected automation really:
+				$Messages->add( sprintf( T_('The user %s has been removed from automation %s.'), '"'.$edited_User->dget( 'login' ).'"', $automation_title ), 'success' );
+			}
+			else
+			{
+				// NOTE: Don't translate this message because this case should not be in normal, display only for debug:
+				$Messages->add( sprintf( 'The user %s is not detected in automation %s.', '"'.$edited_User->dget( 'login' ).'"', $automation_title ), 'warning' );
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=user&user_tab=marketing&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
+		case 'export':
+			// Export user to XML/ZIP file:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $edited_User->ID, true );
+
+			// Do not append Debuglog to XML file!
+			$debug = false;
+
+			// Do not append Debug JSlog to XML file!
+			$debug_jslog = false;
+
+			param( 'options', 'array', array() );
+
+			// Set option to enable export for user:
+			$options['user'] = true;
+
+			// Export collection data:
+			load_funcs( 'export/model/_export.funcs.php' );
+			export_xml( array(
+					'user_ID' => $edited_User->ID,
+					'options' => $options,
+				) );
+			break;
+		
 	}
 }
 
@@ -801,12 +927,23 @@ if( $display_mode != 'js')
 			$AdminUI->set_page_manual_link( 'user-preferences-tab' );
 			break;
 		case 'subs':
-			$AdminUI->breadcrumbpath_add( T_('Notifications'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			$AdminUI->breadcrumbpath_add( T_('Emails'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-notifications-tab' );
 			break;
+		case 'marketing':
+			$AdminUI->breadcrumbpath_add( T_('Marketing'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-marketing-tab' );
+
+			// Initialize user tag input
+			init_tokeninput_js();
+			break;
 		case 'visits':
+			// Initialize user tag input
+			init_tokeninput_js();
 			$AdminUI->breadcrumbpath_add( T_('Visits'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
 			// Set an url for manual page:
@@ -842,6 +979,12 @@ if( $display_mode != 'js')
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-activity-tab' );
 			break;
+		case 'export':
+			$AdminUI->breadcrumbpath_add( T_('Export'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-export-xml-zip' );
+			break;
 	}
 
 	// Display messages depending on user email status
@@ -851,7 +994,7 @@ if( $display_mode != 'js')
 	$AdminUI->disp_html_head();
 
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-	$AdminUI->disp_body_top();
+	$AdminUI->disp_body_top( true, array( 'display_menu3' => false ) );
 }
 
 /*
@@ -919,6 +1062,16 @@ switch( $action )
 				$AdminUI->disp_payload_begin();
 				$AdminUI->disp_view( 'users/views/_user_profile_visits.view.php' );
 				$AdminUI->disp_payload_end();
+				break;
+			case 'marketing':
+				// Display user marketing form:
+				load_funcs( 'automations/model/_automation.funcs.php' );
+				memorize_param( 'user_ID', 'integer', 0 );
+				$AdminUI->disp_view( 'users/views/_user_marketing.form.php' );
+				if( $display_mode != 'js' )
+				{ // Init JS for form to add user to automation:
+					echo_user_automation_js();
+				}
 				break;
 			case 'advanced':
 				// Display user advanced form:
@@ -1002,6 +1155,10 @@ switch( $action )
 				$AdminUI->disp_view( 'users/views/_user_activity.view.php' );
 				$AdminUI->disp_payload_end();
 				break;
+			case 'export':
+				// Display user export form:
+				$AdminUI->disp_view( 'users/views/_user_export.form.php' );
+				break;
 
 			case 'deldata':
 				if( $display_mode == 'js')
@@ -1048,6 +1205,25 @@ switch( $action )
 				$content_width = param( 'content_width', 'integer' );
 				$content_height = param( 'content_height', 'integer' );
 				$AdminUI->disp_view( 'users/views/_user_crop.form.php' );
+				if( $display_mode != 'js')
+				{
+					$AdminUI->disp_payload_end();
+				}
+				break;
+
+			case 'automation':
+				if( $display_mode == 'js')
+				{ // Do not append Debuglog & Debug JSlog to response!
+					$debug = false;
+					$debug_jslog = false;
+				}
+
+				if( $display_mode != 'js')
+				{
+					$AdminUI->disp_payload_begin();
+				}
+				$user_tab = param( 'user_tab_from', 'string', 'marketing' );
+				$AdminUI->disp_view( 'users/views/_user_automation.form.php' );
 				if( $display_mode != 'js')
 				{
 					$AdminUI->disp_payload_end();

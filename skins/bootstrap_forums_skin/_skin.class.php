@@ -129,6 +129,8 @@ class bootstrap_forums_Skin extends Skin
 				'user_profile_left'          => array( NT_('User Profile - Left'), 110 ),
 				'user_profile_right'         => array( NT_('User Profile - Right'), 120 ),
 				'404_page'                   => array( NT_('404 Page'), 130 ),
+				'login_required'             => array( NT_('Login Required'), 140 ),
+				'access_denied'              => array( NT_('Access Denied'), 150 ),
 			);
 	}
 
@@ -170,7 +172,8 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -400,40 +403,6 @@ class bootstrap_forums_Skin extends Skin
 			init_autocomplete_login_js( 'blog', 'typeahead' );
 			// Initialize date picker for _item_expert.form.php
 			init_datepicker_js( 'blog' );
-		}
-
-		// Add custom CSS:
-		$custom_css = '';
-
-
-		// If sidebar == true + col-lg
-		if( $layout = $this->get_setting( 'layout_general' ) != 'no_sidebar' )
-		{
-			$custom_css = "@media screen and (min-width: 1200px) {
-				.forums_list .ft_date {
-					white-space: normal;
-					margin-top: 3px;
-				}
-				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full,
-				.disp_single .evo_comment .panel-body .evo_comment_text p,
-				.disp_single .post_tags,
-				.disp_single .evo_voting_panel,
-				.disp_single .evo_seen_by
-				{
-					padding-left: 15px;
-				}
-				\n
-			}";
-		}
-
-		if( ! empty( $custom_css ) )
-		{ // Function for custom_css:
-		$custom_css = '<style type="text/css">
-<!--
-'.$custom_css.'
--->
-		</style>';
-		add_headline( $custom_css );
 		}
 	}
 

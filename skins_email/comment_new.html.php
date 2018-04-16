@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $Collection, $Blog;
+global $admin_url, $Collection, $Blog, $Session;
 
 // Default params:
 $params = array_merge( array(
@@ -48,23 +48,26 @@ $notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$a
 
 if( $params['notify_full'] )
 { // Long format notification:
-	$ip_list = implode( ', ', get_linked_ip_list( array( $Comment->author_IP ), $recipient_User ) );
-	$user_domain = gethostbyaddr( $Comment->author_IP );
-	if( $user_domain != $Comment->author_IP )
-	{ // Add host name after author IP address
-		$ip_list .= ', '.$user_domain;
+	if( ! empty( $recipient_User ) && $recipient_User->check_perm( 'stats', 'view' ) )
+	{
+		$session_ID = '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID='.$Session->ID.'">'.$Session->ID.'</a>';
 	}
+	else
+	{
+		$session_ID = $Session->ID;
+	}
+
 	switch( $Comment->type )
 	{
 		case 'trackback':
-			$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Trackback IP').': '.$ip_list."</p>\n";
+			$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Session ID').': '.$session_ID."</p>\n";
 			$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Url').': '.get_link_tag( $Comment->author_url, '', '.a' )."</p>\n";
 			break;
 
 		default:
 			if( ! $Comment->get_author_User() )
 			{ // Comment from visitor:
-				$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Commenter IP').': '.$ip_list."</p>\n";
+				$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Session ID').': '.$session_ID."</p>\n";
 				$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Email').': '.$Comment->author_email."</p>\n";
 				$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Url').': '.get_link_tag( $Comment->author_url, '', '.a' )."</p>\n";
 			}

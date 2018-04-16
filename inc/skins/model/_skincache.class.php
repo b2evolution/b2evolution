@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -33,6 +33,7 @@ class SkinCache extends DataObjectCache
 	 * @var array
 	 */
 	var $cache_by_folder = array();
+	var $cache_by_class = array();
 
 	var $loaded_types = array();
 
@@ -56,6 +57,7 @@ class SkinCache extends DataObjectCache
 	function add( $Skin )
 	{
 		$this->cache_by_folder[ $Skin->folder ] = $Skin;
+		$this->cache_by_class[ $Skin->class ] = $Skin;
 
 		return parent::add( $Skin );
 	}
@@ -87,6 +89,36 @@ class SkinCache extends DataObjectCache
 				SELECT *
 				  FROM $this->dbtablename
 				 WHERE skin_folder = ".$DB->quote($req_folder);
+		$row = $DB->get_row( $sql );
+
+		if( empty( $row ) )
+		{ // Requested object does not exist
+			if( $halt_on_error ) debug_die( "Requested $this->objtype does not exist!" );
+			$r = false;
+			return $r;
+		}
+
+		$Skin = new Skin( $row ); // COPY!
+		$this->add( $Skin );
+
+		return $Skin;
+	}
+
+	function & get_by_class( $req_class, $halt_on_error = true )
+	{
+		global $DB, $Debuglog;
+
+		if( isset( $this->cache_by_class[$req_class] ) )
+		{
+			return $this->cache_by_class[$req_class];
+		}
+
+		// Load just the requested object:
+		$Debuglog->add( "Loading <strong>$this->objtype( $req_class )</strong> into cache", 'dataobjects' );
+		$sql = "
+				SELECT *
+					FROM $this->dbtablename
+					WHERE skin_class = ".$DB->quote( $req_class );
 		$row = $DB->get_row( $sql );
 
 		if( empty( $row ) )
@@ -144,19 +176,21 @@ class SkinCache extends DataObjectCache
 	 */
 	function & new_obj( $row = NULL, $skin_folder = NULL )
 	{
-		if( is_null($skin_folder) )
+		if( is_null( $skin_folder ) )
 		{	// This happens when using the default skin
 			$skin_folder = $row->skin_folder;
 		}
+
+		list( $base_skin, $skin_version ) = get_skin_folder_base_version( $skin_folder );
 
 		// Check if we have a custom class derived from Skin:
 		if( skin_file_exists( $skin_folder, '_skin.class.php' ) )
 		{
 			global $skins_path;
 			require_once( $skins_path.$skin_folder.'/_skin.class.php' );
-			$short_skin_folder = preg_replace( '/_skin$/', '', $skin_folder ); // Remove '_skin' suffix
+			$short_skin_folder = preg_replace( '/_skin$/', '', $base_skin ); // Remove '_skin' suffix
 			$objtype = $short_skin_folder.'_Skin';
-			if( ! class_exists($objtype) )
+			if( ! class_exists( $objtype ) )
 			{
 				debug_die( 'There seems to be a _skin.class.php file in the skin directory ['.$skin_folder.'], but it does not contain a properly named class. Expected class name is: '.$objtype );
 			}

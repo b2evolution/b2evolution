@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -734,30 +734,32 @@ class DataObject
 			if( !in_array( $restriction['fk'], $ignore ) )
 			{
 				if( $addlink )
-				{ // get linked objects and add a link
-					$link = '';
-					if( $addlink )
-					{ // get link from derived class
-						$link = $this->get_restriction_link( $restriction );
-					}
-					// without restriction => don't display the message
-					if( $link != '' )
-					{
+				{	// Get a link from derived class method:
+					$link = $this->get_restriction_link( $restriction );
+					if( ! empty( $link ) )
+					{	// Add a restriction message with a link for current table:
 						$restriction_Messages->add( $link );
 					}
-				}
-				else
-				{ // count and show how many object is connected
-					$extra_condition = ( isset( $restriction['and_condition'] ) ) ? ' AND '.$restriction['and_condition'] : '';
-					$count = $DB->get_var(
-					'SELECT COUNT(*)
-					   FROM '.$restriction['table'].'
-					  WHERE '.$restriction['fk'].' = '.$this->ID.$extra_condition,
-					0, 0, 'restriction/cascade check' );
-					if( $count )
-					{
-						$restriction_Messages->add( sprintf( $restriction['msg'], $count ), 'error' );
+					if( $link !== false )
+					{	// If this Object has no restriction in curent table, go to next table checking:
+						continue;
 					}
+					// ELSE $link === false
+					// Use standard checking below if restriciton link is not implemented for current table:
+				}
+
+				// Count and show how many object is connected:
+				$extra_condition = ( isset( $restriction['and_condition'] ) ) ? ' AND '.$restriction['and_condition'] : '';
+				// Replace a mask of $this_ID$ with value of current onject ID, useful to exclude/include current object:
+				$extra_condition = str_replace( '$this_ID$', $this->ID, $extra_condition );
+				$count = $DB->get_var(
+				'SELECT COUNT(*)
+					 FROM '.$restriction['table'].'
+					WHERE '.$restriction['fk'].' = '.$this->ID.$extra_condition,
+				0, 0, 'restriction/cascade check' );
+				if( $count )
+				{
+					$restriction_Messages->add( sprintf( $restriction['msg'], $count ), 'error' );
 				}
 			}
 		}

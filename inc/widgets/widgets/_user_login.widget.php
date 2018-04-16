@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -94,76 +94,52 @@ class user_login_Widget extends ComponentWidget
 				),
 				// Password
 				'password_link_show' => array(
-					'label' => T_( 'Password recovery link'),
-					'note' => T_( 'Show link' ),
+					'label' => T_('Password recovery link'),
+					'note' => T_('Show link'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
-				'password_link' => array(
+				'password_link_text' => array(
 					'size' => 30,
 					'note' => T_( 'Link text to display' ),
 					'type' => 'text',
-					'defaultvalue' => T_( 'Lost password?' ),
+					'defaultvalue' => T_('Lost your password?'),
+				),
+				'password_link_class' => array(
+					'label' => T_('Password recovery link class'),
+					'size' => 40,
+					'defaultvalue' => '',
+				),
+				// Log in
+				'login_button_text' => array(
+					'label' => T_('Login button'),
+					'size' => 30,
+					'note' => T_('Link text to display'),
+					'type' => 'text',
+					'defaultvalue' => T_('Log in!'),
+				),
+				'login_button_class' => array(
+					'label' => T_('Login button class'),
+					'size' => 40,
+					'defaultvalue' => 'btn btn-success',
 				),
 				// Register
 				'register_link_show' => array(
-					'label' => T_( 'Register link'),
-					'note' => T_( 'Show link' ),
+					'label' => T_('Register link'),
+					'note' => T_('Show link'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
-				'register_link' => array(
+				'register_link_text' => array(
 					'size' => 30,
-					'note' => T_( 'Link text to display' ),
+					'note' => T_('Link text to display'),
 					'type' => 'text',
-					'defaultvalue' => T_( 'No account yet? Register here &raquo;' ),
+					'defaultvalue' => T_('Register &raquo;'),
 				),
-				// Picture
-				'profile_picture_size' => array(
-					'label' => T_( 'Profile picture'),
-					'note' => '',
-					'type' => 'select',
-					'options' => get_available_thumb_sizes( T_('none') ),
-					'defaultvalue' => 'crop-top-32x32',
-				),
-				// Group
-				'group_show' => array(
-					'label' => T_( 'User group'),
-					'note' => T_( 'Show user group' ),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
-				),
-				'group_text' => array(
-					'size' => 30,
-					'note' => T_( 'Group text to display' ),
-					'type' => 'text',
-					'defaultvalue' => T_( 'Your group: $group$' ),
-				),
-				// Level
-				'level_show' => array(
-					'label' => T_( 'User level'),
-					'note' => T_( 'Show user level' ),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
-				),
-				'level_text' => array(
-					'size' => 30,
-					'note' => T_( 'Level text to display' ),
-					'type' => 'text',
-					'defaultvalue' => T_( 'Your level: $level$' ),
-				),
-				// Greeting
-				'greeting_show' => array(
-					'label' => T_( 'Greeting'),
-					'note' => T_( 'Show greeting' ),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
-				),
-				'greeting_text' => array(
-					'size' => 30,
-					'note' => T_( 'Greeting text to display' ),
-					'type' => 'text',
-					'defaultvalue' => T_( 'Hello $login$!' ),
+				'register_link_class' => array(
+					'label' => T_('Register link class'),
+					'size' => 40,
+					'defaultvalue' => 'btn btn-primary pull-right',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -200,12 +176,17 @@ class user_login_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog;
-
-		if( get_param( 'disp' ) == 'login' )
-		{	// No display a duplicate form for inskin login mode
+		if( is_logged_in() )
+		{	// Don't display because user is already logged in:
 			return false;
 		}
+
+		if( get_param( 'disp' ) == 'login' )
+		{	// Don't display a duplicate form for inskin login mode:
+			return false;
+		}
+
+		global $Collection, $Blog, $Settings;
 
 		$this->init_display( $params );
 
@@ -219,61 +200,46 @@ class user_login_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
-		if( ! is_logged_in() )
-		{ // Login form:
-			global $Settings;
+		$this->disp_title();
 
-			$source = 'user_login_widget';
+		echo $this->disp_params['block_body_start'];
 
-			$redirect_to = $Settings->get( 'redirect_to_after_login' );
-			if( empty( $redirect_to ) )
-			{
+		// Set vars for widget login form:
+		$source = 'user_login_widget';
+		$redirect_to = $Settings->get( 'redirect_to_after_login' );
+		if( empty( $redirect_to ) )
+		{	// Set redirect URL if it is not set in general settings:
+			global $disp;
+			if( $disp == 'access_requires_login' )
+			{	// Use a collection main page for disp "access_requires_login":
+				$redirect_to = $Blog->get( 'url' );
+			}
+			else
+			{	// Use a current page URL after log in action:
 				$redirect_to = regenerate_url( '', '', '', '&' );
 			}
-
-			$this->disp_title();
-
-			echo $this->disp_params['block_body_start'];
-
-			// display widget login form
-			require skin_template_path( '_widget_login.form.php' );
-
-			echo $this->disp_params['block_body_end'];
 		}
-		else
-		{ // Display a greeting text
-			global $current_User;
 
-			echo $this->disp_params['block_body_start'];
+		// Display a form to log in:
+		$params = array(
+			'display_form_messages' => false,
+			'login_form_inskin'     => false,
+			'login_form_footer'     => false,
+			'abort_link_position'   => false,
+			'login_button_text'     => $this->get_param( 'login_button_text' ),
+			'login_button_class'    => $this->get_param( 'login_button_class' ),
+			'display_lostpass_link' => $this->get_param( 'password_link_show' ),
+			'lostpass_link_text'    => $this->get_param( 'password_link_text' ),
+			'lostpass_link_class'   => $this->get_param( 'password_link_class' ),
+			'display_reg_link'      => $this->get_param( 'register_link_show' ),
+			'reg_link_text'         => $this->get_param( 'register_link_text' ),
+			'reg_link_class'        => $this->get_param( 'register_link_class' ),
+			'transmit_hashed_password'       => true,
+			'get_widget_login_hidden_fields' => true,
+		);
+		require skin_template_path( '_login.disp.php' );
 
-			if( $this->get_param('profile_picture_size') != '' )
-			{	// Display profile picture
-				echo $current_User->get_avatar_imgtag( $this->disp_params['profile_picture_size'], 'avatar', 'middle' );
-			}
-
-			if( $this->get_param('greeting_show') )
-			{	// Display greeting text
-				$user_login = $current_User->get_identity_link( array( 'link_text' => 'name', 'display_bubbletip' => false ) );
-				echo ' <strong class="greeting">'.str_replace( '$login$', $user_login, $this->get_param('greeting_text') ).'</strong>';
-			}
-
-			if( $this->get_param('group_show') )
-			{	// Display user group
-				$user_Group = $current_User->get_Group();
-				echo '<p class="user_group">'
-					.str_replace( '$group$', $user_Group->get( 'name' ), $this->get_param('group_text') )
-					.'</p>';
-			}
-
-			if( $this->get_param('level_show') )
-			{	// Display user group
-				echo '<p class="user_level">'
-					.str_replace( '$level$', $current_User->get( 'level' ), $this->get_param('level_text') )
-					.'</p>';
-			}
-
-			echo $this->disp_params['block_body_end'];
-		}
+		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 

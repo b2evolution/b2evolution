@@ -133,7 +133,9 @@ class Currency extends DataObject
 	 * Use when try to delete a currencie
 	 *
 	 * @param array restriction array
-	 * @return string link to currency's countries
+	 * @return string|boolean Message with link to objects(currency's countries),
+	 *                        Empty string if no restriction for current table,
+	 *                        FALSE - if no rule for current table
 	 */
 	function get_restriction_link( $restriction )
 	{

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -47,9 +47,6 @@ global $Collection, $Blog;
  * @var DB
  */
 global $DB;
-
-global $unread_messsage_reminder_threshold, $unread_message_reminder_delay;
-global $activate_account_reminder_threshold, $comment_moderation_reminder_threshold, $post_moderation_reminder_threshold;
 
 // Default params:
 $default_params = array(
@@ -128,7 +125,7 @@ $Form->begin_fieldset( T_('Receiving emails').( is_admin_page() ? get_manual_lin
 
 	if( $action != 'view' )
 	{ // We can edit the values:
-		$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email address'), $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
+		$Form->email_input( 'edited_user_email', $edited_User->email, 30, T_('Email address'), array( 'maxlength' => 255, 'required' => true, 'note' => $email_fieldnote ) );
 		$disabled = false;
 	}
 	else
@@ -155,7 +152,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Receiving private messages').( is_admin_page() ? get_manual_link( 'user-communications-panel' ) : '' ) );
 
 	$has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
-	$messaging_options = array(	array( 'PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
+	$messaging_options = array(	array( 'enable_PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
 	$emails_msgform = $Settings->get( 'emails_msgform' );
 
 	$email_messaging_note = '';
@@ -173,11 +170,12 @@ $Form->begin_fieldset( T_('Receiving private messages').( is_admin_page() ? get_
 	$msgform_checklist_params = $checklist_params;
 	if( $emails_msgform == 'userset' )
 	{ // user can set
-		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
+		$messaging_options[] = array( 'enable_email', 1, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
 	}
-	elseif( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) )
+	elseif( ( $emails_msgform == 'adminset' ) )
 	{ // only administrator users can set and current User is in 'Administrators' group
-		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ).get_admin_badge( 'user' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
+		$is_disabled_email_method = ( ! $current_User->check_perm( 'users', 'edit' ) );
+		$messaging_options[] = array( 'enable_email', 1, T_( 'emails through a message form that will NOT reveal my email address.' ).get_admin_badge( 'user' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $is_disabled_email_method, $email_messaging_note );
 	}
 	elseif( ! empty( $email_messaging_note ) )
 	{	// Display red message to inform user when he don't have a permission to edit the setting:
@@ -188,22 +186,30 @@ $Form->begin_fieldset( T_('Receiving private messages').( is_admin_page() ? get_
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Newsletter subscriptions').( is_admin_page() ? get_manual_link( 'user-newsletters-panel' ) : '' ) );
+$Form->begin_fieldset( T_('List subscriptions').( is_admin_page() ? get_manual_link( 'user-lists-panel' ) : '' ) );
 
-	$newsletter_options = array(
-		array( 'edited_user_newsletter_news', 1, T_( 'Send me news about this site.' ).' <span class="note">'.T_('Each message contains an easy 1 click unsubscribe link.').'</span>', $UserSettings->get( 'newsletter_news',  $edited_User->ID ) ),
-		array( 'edited_user_newsletter_ads', 1, T_( 'I want to receive ADs that may be relevant to my interests.' ), $UserSettings->get( 'newsletter_ads',  $edited_User->ID ) )
-	);
-	$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Newsletter' ), false, false, $checklist_params );
+	$NewsletterCache = & get_NewsletterCache();
+	$NewsletterCache->load_where( 'enlt_active = 1' );
+
+	if( count( $NewsletterCache->cache ) )
+	{	// If at least one newsletter is active:
+		$user_newsletter_subscriptions = $edited_User->get_newsletter_subscriptions();
+		$newsletter_options = array();
+		foreach( $NewsletterCache->cache as $Newsletter )
+		{
+			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ) );
+		}
+		$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Lists' ), false, false, $checklist_params );
+	}
 
 	// Limit newsletters:
 	if( $is_admin_page )
 	{ // Back office view
-		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('emails per day').'</b>' ) );
+		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Never send me more than' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('list emails per day, all lists combined.').'</b>' ) );
 	}
 	else
 	{ // Front office view
-		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to %s emails per day' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
+		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Never send me more than %s list emails per day, all lists combined.' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
 	}
 
 $Form->end_fieldset();
@@ -216,20 +222,24 @@ if( $notifications_mode != 'off' )
 	$Form->begin_fieldset( T_('Collection subscriptions').( is_admin_page() ? get_manual_link( 'user-coll-subscriptions-panel' ) : '' ), array( 'id' => 'subs' ) );
 
 			// Get those blogs for which we have already subscriptions (for this user)
-			$sql = 'SELECT DISTINCT blog_ID, blog_shortname,
-						MAX( IF( sub_items IS NULL, IF( opt.cset_name = "opt_out_subscription", 1, 0 ), sub_items ) ) AS sub_items,
-						MAX( IF( sub_comments IS NULL, IF( opt.cset_name = "opt_out_comment_subscription", 1, 0 ), sub_comments ) ) AS sub_comments
-					FROM T_blogs
-					INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = "1" )
-					LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name IN ( "opt_out_subscription", "opt_out_comment_subscription" ) )
-					LEFT JOIN T_subscriptions ON ( sub_coll_ID = blog_ID AND sub_user_ID = '.$edited_User->ID.' )
-					LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
-					LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
-					LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
-					LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
-					WHERE ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR sub_user_ID = '.$edited_User->ID.' )
-						AND ( sub_items <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )
-						AND ( CASE opt.cset_value WHEN 1 THEN blog_advanced_perms = 1 ELSE TRUE END )';
+			$sql = 'SELECT blog_ID, blog_shortname,
+								MAX( IF( sub_items IS NULL, IF( opt.cset_name = "opt_out_subscription", 1, 0 ), sub_items ) ) AS sub_items,
+								MAX( IF( sub_items_mod IS NULL, IF( opt.cset_name = "opt_out_items_mod_subscription", 1, 0 ), sub_items_mod ) ) AS sub_items_mod,
+								MAX( IF( sub_comments IS NULL, IF( opt.cset_name = "opt_out_comment_subscription", 1, 0 ), sub_comments ) ) AS sub_comments
+							FROM T_blogs
+							LEFT JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_subscriptions" )
+							LEFT JOIN T_coll_settings AS subc ON ( subc.cset_coll_ID = blog_ID AND subc.cset_name = "allow_comment_subscriptions" )
+							LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name IN ( "opt_out_subscription", "opt_out_comment_subscription", "opt_out_items_mod_subscription" ) )
+							LEFT JOIN T_subscriptions ON ( sub_coll_ID = blog_ID AND sub_user_ID = '.$edited_User->ID.' )
+							LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
+							LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
+							LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+							LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+							WHERE ( ( sub.cset_value = 1 OR sub.cset_value IS NULL ) OR ( subc.cset_value = 1 OR subc.cset_value IS NULL ) )
+								AND ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR sub_user_ID = '.$edited_User->ID.' )
+								AND ( sub_items <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )
+								AND ( CASE opt.cset_value WHEN 1 THEN blog_advanced_perms = 1 ELSE TRUE END )
+							GROUP BY blog_ID, blog_shortname';
 			$blog_subs = $DB->get_results( $sql );
 
 			$BlogCache = & get_BlogCache();
@@ -241,7 +251,8 @@ if( $notifications_mode != 'off' )
 					continue;
 				}
 				if( ! ( $sub_Blog->get_setting( 'allow_subscriptions' ) && $blog_sub->sub_items ) &&
-						! ( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) && $blog_sub->sub_comments ) )
+						! ( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) && $blog_sub->sub_comments ) &&
+						! ( $sub_Blog->get_setting( 'allow_item_mod_subscriptions' ) && $blog_sub->sub_items ) )
 				{	// Skip because the collection doesn't allow any subscription:
 					continue;
 				}
@@ -263,6 +274,10 @@ if( $notifications_mode != 'off' )
 				if( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) )
 				{	// If subscription is allowed for new comments:
 					$subscriptions[] = array( 'sub_comments_'.$sub_Blog->ID, '1', T_('Notify me of any new comment in this collection'), $blog_sub->sub_comments );
+				}
+				if( $sub_Blog->get_setting( 'allow_item_mod_subscriptions' ) )
+				{	// If subscription is allowed for modified posts:
+					$subscriptions[] = array( 'sub_items_mod_'.$sub_Blog->ID, '1', T_('Notify me when:').' '.T_('a post is modified and I have permissions to moderate it.'), $blog_sub->sub_items_mod );
 				}
 				$Form->checklist( $subscriptions, 'subscriptions', $sub_Blog->dget( 'shortname', 'htmlbody' ) );
 			}
@@ -299,9 +314,8 @@ if( $notifications_mode != 'off' )
 				$Form->begin_line( T_('Also available') );
 			}
 
-				$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
-				$subscribe_items_new = $Form->hidden( 'sub_items_new', 1 );
-				$subscribe_blogs_button = $Form->button( array(
+				$Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
+				$Form->button( array(
 					'name'  => 'actionArray[subscribe]',
 					'value' => T_('Subscribe to this collection'),
 					'style' => 'margin-left:10px;'
@@ -320,13 +334,6 @@ if( $notifications_mode != 'off' )
 					break;
 				}
 			}
-
-			foreach( $BlogCache->cache as $subscribe_Blog )
-			{	// These hidden fields are used only by JS to know what subscription settings are enabled for each collection:
-				$enabled_subs_settings = $subscribe_Blog->get_setting( 'allow_subscriptions' ) ? 'p' : '';
-				$enabled_subs_settings .= $subscribe_Blog->get_setting( 'allow_comment_subscriptions' ) ? 'c' : '';
-				$Form->hidden( 'coll_subs_settings_'.$subscribe_Blog->ID, $enabled_subs_settings );
-			}
 		}
 	}
 	$Form->end_fieldset();
@@ -338,14 +345,15 @@ if( $notifications_mode != 'off' )
 				FROM T_items__item
 				INNER JOIN T_categories ON cat_ID = post_main_cat_ID
 				INNER JOIN T_blogs ON blog_ID = cat_blog_ID
-				INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = "1" )
+				LEFT JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_item_subscriptions" )
 				LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name = "opt_out_item_subscription" )
 				LEFT JOIN T_items__subscriptions ON ( isub_item_ID = post_ID AND isub_user_ID = '.$edited_User->ID.' )
 				LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
 				LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
 				LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
 				LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
-				WHERE ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' )
+				WHERE ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR isub_user_ID = '.$edited_User->ID.' )
+					AND ( sub.cset_value = "1" OR sub.cset_coll_ID IS NULL )
 					AND ( isub_comments <> 0 OR isub_item_ID IS NULL )';
 		$individual_posts_subs = $DB->get_results( $sql );
 		$subs_item_IDs = array();
@@ -401,54 +409,67 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	$notify_options = array();
 	if( $has_messaging_perm )
 	{ // show messaging notification settings only if messaging is available for edited user
-		$notify_options[] = array( 'edited_user_notify_messages', 1, T_('I receive a private message.'),  $UserSettings->get( 'notify_messages', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $unread_messsage_reminder_threshold ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
+		$notify_options[ T_('Messaging') ][] = array( 'edited_user_notify_messages', 1, T_('I receive a private message.'),  $UserSettings->get( 'notify_messages', $edited_User->ID ), $disabled );
+		$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
+		$notify_options[ T_('Messaging') ][] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
 	}
 	if( $edited_User->check_role( 'post_owner' ) )
 	{ // user has at least one post or user has right to create new post
-		$notify_options[] = array( 'edited_user_notify_publ_comments', 1, T_('a comment is published on one of <strong>my</strong> posts.'), $UserSettings->get( 'notify_published_comments', $edited_User->ID ), $disabled );
+		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_publ_comments', 1, T_('a comment is published on one of <strong>my</strong> posts.'), $UserSettings->get( 'notify_published_comments', $edited_User->ID ), $disabled );
 	}
 	$is_comment_moderator = $edited_User->check_role( 'comment_moderator' );
 	if( $is_comment_moderator || $edited_User->check_role( 'comment_editor' ) )
 	{	// edited user has permission to edit other than his own comments at least in one status in one collection:
-		$notify_options[] = array( 'edited_user_notify_cmt_moderation', 1, T_('a comment is posted and I have permissions to moderate it.'), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_edit_cmt_moderation', 1, T_('a comment is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_cmt_moderation', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_spam_cmt_moderation', 1, T_('a comment is reported as spam and I have permissions to moderate it.'), $UserSettings->get( 'notify_spam_cmt_moderation', $edited_User->ID ), $disabled );
-	}
-	if( $edited_User->check_perm( 'admin', 'restricted', false ) )
-	{ // edited user has a permission to back-office
-		$notify_options[] = array( 'edited_user_notify_meta_comments', 1, T_('a meta comment is posted.'), $UserSettings->get( 'notify_meta_comments', $edited_User->ID ), $disabled );
+		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_cmt_moderation', 1, T_('a comment is posted and I have permissions to moderate it.'), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
+		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_edit_cmt_moderation', 1, T_('a comment is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_cmt_moderation', $edited_User->ID ), $disabled );
+		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_spam_cmt_moderation', 1, T_('a comment is reported as spam and I have permissions to moderate it.'), $UserSettings->get( 'notify_spam_cmt_moderation', $edited_User->ID ), $disabled );
 	}
 	if( $is_comment_moderator )
 	{ // edited user is comment moderator at least in one blog
-		$notify_options[] = array( 'edited_user_send_cmt_moderation_reminder', 1, sprintf( T_('comments are awaiting moderation for more than %s.'), seconds_to_period( $comment_moderation_reminder_threshold ) ), $UserSettings->get( 'send_cmt_moderation_reminder', $edited_User->ID ), $disabled );
+		$notify_options[ T_('Comments') ][] = array( 'edited_user_send_cmt_moderation_reminder', 1, sprintf( T_('comments are awaiting moderation for more than %s.'), seconds_to_period( $Settings->get( 'comment_moderation_reminder_threshold' ) ) ), $UserSettings->get( 'send_cmt_moderation_reminder', $edited_User->ID ), $disabled );
+	}
+	if( $edited_User->check_perm( 'admin', 'restricted', false ) )
+	{ // edited user has a permission to back-office
+		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_meta_comments', 1, T_('a meta comment is posted.'), $UserSettings->get( 'notify_meta_comments', $edited_User->ID ), $disabled );
 	}
 	if( $edited_User->check_role( 'post_moderator' ) )
 	{ // edited user is post moderator at least in one blog
-		$notify_options[] = array( 'edited_user_notify_post_moderation', 1, T_('a post is created and I have permissions to moderate it.'), $UserSettings->get( 'notify_post_moderation', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_edit_pst_moderation', 1, T_('a post is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_pst_moderation', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_send_pst_moderation_reminder', 1, sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $post_moderation_reminder_threshold ) ), $UserSettings->get( 'send_pst_moderation_reminder', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_send_pst_stale_alert', 1, T_('there are stale posts and I have permission to moderate them.'), $UserSettings->get( 'send_pst_stale_alert', $edited_User->ID ), $disabled );
+		$notify_options[ T_('Posts') ][] = array( 'edited_user_notify_post_moderation', 1, T_('a post is created and I have permissions to moderate it.'), $UserSettings->get( 'notify_post_moderation', $edited_User->ID ), $disabled );
+		$notify_options[ T_('Posts') ][] = array( 'edited_user_notify_edit_pst_moderation', 1, T_('a post is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_pst_moderation', $edited_User->ID ), $disabled );
+		$notify_options[ T_('Posts') ][] = array( 'edited_user_send_pst_moderation_reminder', 1, sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $Settings->get( 'post_moderation_reminder_threshold' ) ) ), $UserSettings->get( 'send_pst_moderation_reminder', $edited_User->ID ), $disabled );
+		$notify_options[ T_('Posts') ][] = array( 'edited_user_send_pst_stale_alert', 1, T_('there are stale posts and I have permission to moderate them.'), $UserSettings->get( 'send_pst_stale_alert', $edited_User->ID ), $disabled );
+	}
+	if( $edited_User->check_role( 'member' ) )
+	{ // user is member of at least one collection
+		$notify_options[ T_('Posts') ][] = array( 'edited_user_notify_post_assignment', 1, T_('a post was assigned to me.'), $UserSettings->get( 'notify_post_assignment', $edited_User->ID ), $disabled );
 	}
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ // current User is an administrator
-		$notify_options[] = array( 'edited_user_send_activation_reminder', 1, sprintf( T_('my account was deactivated or is not activated for more than %s.').get_admin_badge( 'user' ), seconds_to_period( $activate_account_reminder_threshold ) ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ) );
+		$notify_options[ T_('My account') ][] = array( 'edited_user_send_activation_reminder', 1, sprintf( T_('my account was deactivated or is not activated for more than %s.').get_admin_badge( 'user' ), seconds_to_period( $Settings->get( 'activate_account_reminder_threshold' ) ) ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ) );
 	}
 	if( $edited_User->check_perm( 'users', 'edit' ) )
 	{ // edited user has permission to edit all users, save notification preferences
-		$notify_options[] = array( 'edited_user_notify_new_user_registration', 1, T_( 'a new user has registered.' ), $UserSettings->get( 'notify_new_user_registration', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_activated_account', 1, T_( 'an account was activated.' ), $UserSettings->get( 'notify_activated_account', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_closed_account', 1, T_( 'an account was closed.' ), $UserSettings->get( 'notify_closed_account', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_reported_account', 1, T_( 'an account was reported.' ), $UserSettings->get( 'notify_reported_account', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_changed_account', 1, T_( 'an account was changed.' ), $UserSettings->get( 'notify_changed_account', $edited_User->ID ), $disabled );
+		$notify_options[ T_('System users') ][] = array( 'edited_user_notify_new_user_registration', 1, T_( 'a new user has registered.' ), $UserSettings->get( 'notify_new_user_registration', $edited_User->ID ), $disabled );
+		$notify_options[ T_('System users') ][] = array( 'edited_user_notify_activated_account', 1, T_( 'an account was activated.' ), $UserSettings->get( 'notify_activated_account', $edited_User->ID ), $disabled );
+		$notify_options[ T_('System users') ][] = array( 'edited_user_notify_closed_account', 1, T_( 'an account was closed.' ), $UserSettings->get( 'notify_closed_account', $edited_User->ID ), $disabled );
+		$notify_options[ T_('System users') ][] = array( 'edited_user_notify_reported_account', 1, T_( 'an account was reported.' ), $UserSettings->get( 'notify_reported_account', $edited_User->ID ), $disabled );
+		$notify_options[ T_('System users') ][] = array( 'edited_user_notify_changed_account', 1, T_( 'an account was changed.' ), $UserSettings->get( 'notify_changed_account', $edited_User->ID ), $disabled );
 	}
 	if( $edited_User->check_perm( 'options', 'edit' ) )
 	{ // edited user has permission to edit options, save notification preferences
-		$notify_options[] = array( 'edited_user_notify_cronjob_error', 1, T_( 'a scheduled task ends with an error or timeout.' ), $UserSettings->get( 'notify_cronjob_error',  $edited_User->ID ), $disabled );
+		$notify_options[ T_('System maintenance') ][] = array( 'edited_user_notify_cronjob_error', 1, T_( 'a scheduled task ends with an error or timeout.' ), $UserSettings->get( 'notify_cronjob_error',  $edited_User->ID ), $disabled );
+	}
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{	// current User is an administrator
+		$notify_options[ T_('System maintenance') ][] = array( 'edited_user_notify_automation_owner', 1, T_('one of my automations wants to notify me.'), $UserSettings->get( 'notify_automation_owner', $edited_User->ID ), $disabled );
 	}
 	if( !empty( $notify_options ) )
 	{
-		$Form->checklist( $notify_options, 'edited_user_notification', T_( 'Notify me by email whenever' ), false, false, $checklist_params );
+		$Form->checklist( array(), 'edited_user_notification', T_('Notify me by email when the following events occur'), false, false, $checklist_params );
+		foreach( $notify_options as $notify_label => $notify_checkboxes )
+		{
+			$Form->checklist( $notify_checkboxes, 'edited_user_notification', $notify_label, false, false, $checklist_params );
+		}
 	}
 
 	// Limit notifications:
@@ -472,31 +493,3 @@ if( $action != 'view' )
 }
 
 $Form->end_form();
-
-?>
-<script type="text/javascript">
-jQuery( document ).ready( function()
-{
-	jQuery( 'select#subscribe_blog' ).change( function()
-	{	// Enable/Disable collection additional subscription checkboxes depending on settings:
-		var coll_ID = jQuery( this ).val();
-		var coll_settings = jQuery( 'input[name=coll_subs_settings_' + coll_ID + ']' ).val();
-		if( coll_settings == 'pc' || coll_settings == 'p' )
-		{	// Enable if subscription is allowed for new posts:
-			jQuery( 'input[name=sub_items_new]' ).removeAttr( 'disabled' );
-		}
-		else
-		{	// Disable otherwise:
-			jQuery( 'input[name=sub_items_new]' ).attr( 'disabled', 'disabled' );
-		}
-		if( coll_settings == 'pc' || coll_settings == 'c' )
-		{ // Enable if subscription is allowed for new comments:
-			jQuery( 'input[name=sub_comments_new]' ).removeAttr( 'disabled' );
-		}
-		else
-		{	// Disable otherwise:
-			jQuery( 'input[name=sub_comments_new]' ).attr( 'disabled', 'disabled' );
-		}
-	} );
-} );
-</script>

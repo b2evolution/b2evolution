@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin-skin
@@ -168,13 +168,13 @@ class AdminUI extends AdminUI_general
 	 *
 	 * @param boolean Whether or not to display messages.
 	 */
-	function disp_body_top( $display_messages = true )
+	function disp_body_top( $display_messages = true, $params = array() )
 	{
 		global $Messages;
 
 		parent::disp_body_top( $display_messages );
 
-		parent::disp_payload_begin();
+		parent::disp_payload_begin( $params );
 
 		if( $display_messages )
 		{ // Display info & error messages:
@@ -470,6 +470,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'fieldstart_checkbox'    => '<div class="form-group form-group-sm checkbox" $ID$>'."\n",
@@ -519,6 +520,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -533,9 +535,9 @@ class AdminUI extends AdminUI_general
 					'fieldend_radio'         => "</div>\n\n",
 					'inputclass_radio'       => '',
 					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_start'    => '<div class="radio $radio_option_class$"><label>',
 					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_start'    => '<label class="radio-inline $radio_option_class$">',
 					'radio_oneline_end'      => "</label>\n",
 				);
 
@@ -567,6 +569,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -581,9 +584,9 @@ class AdminUI extends AdminUI_general
 					'fieldend_radio'         => "</div>\n\n",
 					'inputclass_radio'       => '',
 					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_start'    => '<div class="radio $radio_option_class$"><label>',
 					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_start'    => '<label class="radio-inline $radio_option_class$">',
 					'radio_oneline_end'      => "</label>\n",
 				);
 
@@ -604,6 +607,11 @@ class AdminUI extends AdminUI_general
 									 '</div>' // End of <div class="panel-body...>
 								.'</div>' // End of <div id="$group_item_id$...>
 							.'</div>'."\n", // End of <div class="panel panel-default...>
+					) );
+
+			case 'accordion_table':
+				return array_merge( $this->get_template( 'Results' ), array(
+						'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title"><a class="accordion-toggler collapsed" data-toggle="collapse" data-parent="#$group_id$" href="#$group_item_id$" aria-expanded="false" aria-controls="$group_item_id$">$title$</a></h3></div>'."\n",
 					) );
 
 			case 'linespan_form':
@@ -633,6 +641,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -649,9 +658,9 @@ class AdminUI extends AdminUI_general
 					'inputend_radio'         => "</div>\n",
 					'inputclass_radio'       => '',
 					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_start'    => '<div class="radio $radio_option_class$"><label>',
 					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_start'    => '<label class="radio-inline $radio_option_class$">',
 					'radio_oneline_end'      => "</label>\n",
 				);
 
@@ -919,7 +928,7 @@ class AdminUI extends AdminUI_general
 		}
 
 		// Buttons to collapse and hide left customizer panel:
-		echo '<div class="evo_customizer__tab_buttons">'
+		echo '<div class="evo_customizer__tab_buttons btn-group">'
 				.'<button id="evo_customizer__collapser" class="btn btn-sm btn-default"><span class="fa fa-backward"></span></button>'
 				.'<button id="evo_customizer__closer" class="btn btn-sm btn-default"><span class="fa fa-close"></span></a>'
 			.'</div>';
@@ -973,7 +982,7 @@ class AdminUI extends AdminUI_general
 		}
 
 		// Button to add new site:
-		$button_add_site = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new_site" class="btn btn-default'.( get_param( 'action' ) == 'new_site' ? ' active' : '' ).'" title="'.T_('New Site').'"><span class="fa fa-plus"></span></a>';
+		$button_add_site = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new_site" class="btn btn-default'.( get_param( 'action' ) == 'new_site' ? ' active' : '' ).'" title="'.format_to_output( T_('New Site'), 'htmlattr' ).'"><span class="fa fa-plus"></span></a>';
 
 		$collections_html = '';
 		$button_add_coll = '';
@@ -1103,7 +1112,7 @@ class AdminUI extends AdminUI_general
 			// Button to add new collection:
 			if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
 			{	// Display a button to add new collection if it is requested and current user has a permission
-				$button_add_coll = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.T_('New Collection').'"><span class="fa fa-plus"></span></a>';
+				$button_add_coll = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.format_to_output( T_('New Collection'), 'htmlattr' ).'"><span class="fa fa-plus"></span></a>';
 			}
 		}
 

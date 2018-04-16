@@ -66,6 +66,12 @@ class captcha_qstn_plugin extends Plugin
 		global $Settings;
 
 		return array(
+				'use_for_anonymous_item' => array(
+					'label' => $this->T_('Use for anonymous item forms'),
+					'defaultvalue' => 1,
+					'note' => $this->T_('Should this plugin be used for anonymous users on item forms?'),
+					'type' => 'checkbox',
+				),
 				'use_for_anonymous_comment' => array(
 					'label' => $this->T_('Use for anonymous comment forms'),
 					'defaultvalue' => 1,
@@ -452,6 +458,7 @@ class captcha_qstn_plugin extends Plugin
 				10, $this->T_('Captcha answer'), ( empty( $params['use_placeholders'] ) ? $this->T_('Please answer the question above').'.' : '' ),
 				array(
 						'placeholder' => empty( $params['use_placeholders'] ) ? '' : T_('Please answer the question above'),
+						'required'    => true,
 					)
 			);
 
@@ -468,6 +475,31 @@ class captcha_qstn_plugin extends Plugin
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * We display our captcha with comment forms.
+	 */
+	function DisplayItemFormFieldset( & $params )
+	{
+		$params['form_type'] = 'item';
+		$this->CaptchaPayload( $params );
+	}
+
+
+	/**
+	 * Validate the answer against our stored one.
+	 *
+	 * In case of error we add a message of category 'error' which prevents the item from
+	 * being posted.
+	 *
+	 * @param array Associative array of parameters.
+	 */
+	function AdminBeforeItemEditCreate( & $params )
+	{
+		$params['form_type'] = 'item';
+		$this->validate_form_by_captcha( $params );
 	}
 
 
@@ -582,6 +614,13 @@ class captcha_qstn_plugin extends Plugin
 	{
 		switch( $form_type )
 		{
+			case 'item':
+				if( !is_logged_in() )
+				{
+					return $this->Settings->get( 'use_for_anonymous_item' );
+				}
+				break;
+
 			case 'comment':
 				if( !is_logged_in() )
 				{

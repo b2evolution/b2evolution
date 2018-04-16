@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal Origin:
@@ -497,7 +497,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 	$users_array = $DB->get_results('
 					SELECT user_ID
 					  FROM T_users
-					  WHERE user_status = "activated" OR user_status= "autoactivated"
+					  WHERE user_status IN ( "activated", "autoactivated", "manualactivated" )
 					  LIMIT 10'
 					, ARRAY_A );
 
@@ -1235,6 +1235,7 @@ function get_hits_summary_mode()
  * @param string End date of hits log in format 'YYYY-mm-dd'
  * @return array Fixed hits data
  */
+// erwin> replaced with a more generic fill_empty_days() in _misc.funcs.php
 function fill_empty_hit_days( $hits_data, $start_date, $end_date )
 {
 	$fixed_hits_data = array();

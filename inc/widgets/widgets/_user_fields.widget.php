@@ -130,6 +130,8 @@ class user_fields_Widget extends ComponentWidget
 		$group_ID = 0;
 		foreach( $target_User->userfields as $userfield )
 		{
+			userfield_prepare( $userfield );
+
 			if( $group_ID != $userfield->ufgp_ID )
 			{	// If new group is starting:
 				if( $group_ID > 0 )
@@ -151,11 +153,6 @@ class user_fields_Widget extends ComponentWidget
 
 			// Start user field:
 			echo $this->disp_params['item_start'];
-
-			if( $userfield->ufdf_type == 'text' )
-			{	// Convert textarea values to html format:
-				$userfield->uf_varchar = nl2br( $userfield->uf_varchar );
-			}
 
 			$userfield_icon = '';
 			if( ! empty( $userfield->ufdf_icon_name ) )

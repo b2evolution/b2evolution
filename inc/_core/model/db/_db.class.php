@@ -16,7 +16,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://justinvincent.com}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://daniel.hahler.de}.
  *
@@ -456,6 +456,9 @@ class DB
 
 		// Force MySQL strict mode
 		$this->query( 'SET sql_mode = "TRADITIONAL"', 'Force MySQL "strict" mode (and make sure server is not configured with a weird incompatible mode)' );
+
+		// Support 4-byte chars:
+		$this->query( 'SET NAMES utf8mb4' );
 
 		if( $this->debug_profile_queries )
 		{
@@ -1297,6 +1300,15 @@ class DB
 
 
 	/**
+	 * Callback for preg_replace_callback in format_query()
+	 */
+	private static function _format_query_callback( $matches )
+	{
+		return str_replace( " ", "&nbsp;", $matches[1] );
+	}
+
+
+	/**
 	 * Format a SQL query
 	 *
 	 * @param string SQL
@@ -1358,7 +1370,7 @@ class DB
 		if( $html )
 		{ // poor man's indent
 			$sql = htmlspecialchars( $sql );
-			$sql = preg_replace_callback("~^(\s+)~m", create_function('$m', 'return str_replace(" ", "&nbsp;", $m[1]);'), $sql);
+			$sql = preg_replace_callback("~^(\s+)~m", array( 'DB', '_format_query_callback' ), $sql);
 			$sql = nl2br($sql);
 		}
 		return $sql;
@@ -1410,17 +1422,11 @@ class DB
 		{
 			$count_queries++;
 
-			$get_md5_query = create_function( '', '
-				static $r; if( isset($r) ) return $r;
-				global $query;
-				$r = md5(serialize($query))."-".rand();
-				return $r;' );
-
 			if ( $html )
 			{
 				echo '<h4>Query #'.$count_queries.': '.$query['title']."</h4>\n";
 
-				$div_id = 'db_query_sql_'.$i.'_'.$get_md5_query();
+				$div_id = 'db_query_sql_'.$i.'_'.$this->_get_md5_query();
 				if( strlen($query['sql']) > 512 )
 				{
 					$sql_short = DB::format_query( $query['sql'], true, 512 );
@@ -1523,7 +1529,7 @@ class DB
 
 					if( $html )
 					{
-						$div_id = 'db_query_explain_'.$i.'_'.$get_md5_query();
+						$div_id = 'db_query_explain_'.$i.'_'.$this->_get_md5_query();
 						echo '<div id="'.$div_id.'">';
 						echo $this->debug_get_rows_table( 100, true );
 						echo '</div>';
@@ -1542,7 +1548,7 @@ class DB
 			{
 				if( $html )
 				{
-					$div_id = 'db_query_profile_'.$i.'_'.$get_md5_query();
+					$div_id = 'db_query_profile_'.$i.'_'.$this->_get_md5_query();
 					echo '<div id="'.$div_id.'">';
 					echo $query['profile'];
 					echo '</div>';
@@ -1559,7 +1565,7 @@ class DB
 			{
 				if( $html )
 				{
-					$div_id = 'db_query_results_'.$i.'_'.$get_md5_query();
+					$div_id = 'db_query_results_'.$i.'_'.$this->_get_md5_query();
 					echo '<div id="'.$div_id.'">';
 					echo $query['results'];
 					echo '</div>';
@@ -1576,7 +1582,7 @@ class DB
 			{
 				if( $html )
 				{
-					$div_id = 'db_query_backtrace_'.$i.'_'.$get_md5_query();
+					$div_id = 'db_query_backtrace_'.$i.'_'.$this->_get_md5_query();
 					echo '<div id="'.$div_id.'">';
 					echo $query['function_trace'];
 					echo '</div>';
@@ -1615,6 +1621,21 @@ class DB
 				echo "Time difference: {$time_diff_percentage}%\n";
 			}
 		}
+	}
+
+
+	/**
+	 * Generate MD5 of query
+	 */
+	private static function _get_md5_query()
+	{
+		static $r;
+
+		if( isset( $r ) ) return $r;
+
+		global $query;
+		$r = md5( serialize( $query ) )."-".rand();
+		return $r;
 	}
 
 
