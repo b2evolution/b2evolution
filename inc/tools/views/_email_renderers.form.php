@@ -59,7 +59,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 
 	$plugins_settings_content .= ob_get_contents();
 
-	if (ob_get_length()) ob_end_clean();
+	ob_end_clean();
 }
 
 if( !empty( $plugins_settings_content ) )
@@ -77,8 +77,5 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 }
 
 $Form->end_form();
-
-// Fieldset folding
-echo_fieldset_folding_js();
 
 ?>

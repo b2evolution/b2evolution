@@ -142,7 +142,7 @@ $Plugins->trigger_event( 'WidgetEndSettingsForm', array(
 
 $Form->end_form();
 
-// Fieldset folding
+// Enable JS for fieldset folding:
 echo_fieldset_folding_js();
 
 if( $display_mode == 'js' )

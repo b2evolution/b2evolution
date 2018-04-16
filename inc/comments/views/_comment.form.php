@@ -309,9 +309,8 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 <?php
 $Form->end_form();
 
-// Fieldset folding
-echo_fieldset_folding_js();
-
 // JS code for status dropdown select button
 echo_status_dropdown_button_js( 'comment' );
+// JS code for fieldset folding:
+echo_fieldset_folding_js();
 ?>

@@ -133,6 +133,6 @@ else
 	$Form->end_form();
 }
 
-// Fieldset folding
+// Enable JS for fieldset folding:
 echo_fieldset_folding_js();
 ?>

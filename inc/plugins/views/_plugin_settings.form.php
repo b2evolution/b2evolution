@@ -29,6 +29,7 @@ global $admin_url;
 
 load_funcs('plugins/_plugin.funcs.php');
 
+
 $Form = new Form( NULL, 'pluginsettings_checkchanges' );
 
 // Restore defaults button:

@@ -254,6 +254,6 @@ $Form->end_form();
 // End payload block:
 $this->disp_payload_end();
 
-// Fieldset folding
+// Enable JS for fieldset folding:
 echo_fieldset_folding_js();
 ?>
