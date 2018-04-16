@@ -29,9 +29,6 @@ global $admin_url;
 
 load_funcs('plugins/_plugin.funcs.php');
 
-// Fieldset folding
-echo_fieldset_folding_js();
-
 $Form = new Form( NULL, 'pluginsettings_checkchanges' );
 
 // Restore defaults button:
@@ -148,6 +145,6 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 }
 $Form->end_form();
 
-// Enable JS for fieldset folding:
+// Fieldset folding
 echo_fieldset_folding_js();
 ?>

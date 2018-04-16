@@ -54,9 +54,6 @@ $creating = is_create_action( $action );
 // Used to mark the required fields (in non-standard template)
 $required_star = '<span class="label_field_required">*</span>';
 
-// Fieldset folding
-echo_fieldset_folding_js();
-
 $Form = new Form( NULL, 'item_checkchanges', 'post' );
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";
@@ -996,8 +993,8 @@ echo_onchange_goal_cat();
 // Save and restore item content field height and scroll position:
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
 
-// Init JS for fieldset folding:
-init_fieldset_folding_js();
+// Fieldset folding
+echo_fieldset_folding_js();
 // JS to post excerpt mode switching:
 ?>
 <script type="text/javascript">

@@ -22,9 +22,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Plugins;
 
-// Enable JS for fieldset folding:
-echo_fieldset_folding_js();
-
 $Form = new Form( NULL, 'email_settings_renderers' );
 
 $Form->begin_form( 'fform', '' );
@@ -81,7 +78,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 
 $Form->end_form();
 
-// Init JS for fieldset folding:
-init_fieldset_folding_js();
+// Fieldset folding
+echo_fieldset_folding_js();
 
 ?>

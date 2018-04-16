@@ -28,9 +28,6 @@ global $Plugins;
 
 global $mode, $month, $tab, $redirect_to, $comment_content;
 
-// JS code for fieldset folding:
-echo_fieldset_folding_js();
-
 $Form = new Form( NULL, 'comment_checkchanges', 'post' );
 $Form->switch_template_parts(
 	array(
@@ -312,8 +309,8 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 <?php
 $Form->end_form();
 
-// Init JS for fieldset folding:
-init_fieldset_folding_js();
+// Fieldset folding
+echo_fieldset_folding_js();
 
 // JS code for status dropdown select button
 echo_status_dropdown_button_js( 'comment' );

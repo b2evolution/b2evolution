@@ -18,9 +18,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $Collection, $Blog, $current_User, $skin_type;
 
-// Enable JS for fieldset folding:
-echo_fieldset_folding_js();
-
 $Form = new Form( NULL, 'skin_settings_checkchanges' );
 
 $Form->begin_form( 'fform' );
@@ -74,6 +71,6 @@ if( $skin_ID )
 
 $Form->end_form( $buttons );
 
-// Enable JS for fieldset folding:
+// Fieldset folding
 echo_fieldset_folding_js();
 ?>

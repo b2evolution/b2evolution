@@ -724,16 +724,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				
 				$Form->switch_layout( NULL );
 				
-				if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
-				{
-					//echo_fieldset_folding_js();
-					/*
-					*	In case this item exists inside another dynamaic call javascript for enabling folding must be initialized again
-					*	@see https://github.com/b2evolution/b2evolution/pull/74/files
-					*	@see http://forums.b2evolution.net/bug-6-9-x-foldable-plugin-skin-widget
-					*/
-					init_fieldset_folding_js();
-				}
 			}
 			break;
 

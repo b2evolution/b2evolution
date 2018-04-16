@@ -24,9 +24,6 @@ global $Collection, $Blog, $admin_url, $AdminUI, $Plugins, $display_mode;
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-// Enable JS for fieldset folding:
-echo_fieldset_folding_js();
-
 $Form = new Form( NULL, 'widget_checkchanges' );
 
 if( $display_mode != 'js' || ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
@@ -145,8 +142,8 @@ $Plugins->trigger_event( 'WidgetEndSettingsForm', array(
 
 $Form->end_form();
 
-// Init JS for fieldset folding:
-init_fieldset_folding_js();
+// Fieldset folding
+echo_fieldset_folding_js();
 
 if( $display_mode == 'js' )
 {	// Reset previous and Initialize new bozo validator for each new opened widget edit form in popup window,
