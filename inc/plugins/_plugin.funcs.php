@@ -934,7 +934,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				'js_add_link'		=> $js_add_link,
 				));
 				
-				echo "<div id=\"{$parname}_add\"></div>";echo "<script type='text/javascript'>var rebuild_index_{$parname} = new InputSupport($input_json);</script>";
+				echo "<div id=\"{$parname}_add\"></div>";echo "<script type='text/javascript'>var rebuild_index_$id = new InputSupport($input_json);</script>";
 				
 				// close the surrounding fieldset:
 				$Form->end_fieldset();

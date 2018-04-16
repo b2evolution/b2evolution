@@ -411,6 +411,26 @@ class development_plugin extends Plugin
 												'max_number'		=> 3,
 												'fold' => true,
 												'entries'		=> array(
+			
+						'plugin_sets'	=> array(
+												'label'			=> T_('Dynamic Fields'),
+												'note'			=> T_('Click to add another field item'),
+												// limited by array:array:string therefore html_textarea won't work
+												'type'			=> version_compare( $app_version, '6.6.5', '>' ) ? 'array:array:string' : 'array',
+												'max_number'		=> 3,
+												'fold' => true,
+												'entries'		=> array(
+
+
+
+
+														'_value' => array(
+																			'label' => T_('Color'),
+																			'defaultvalue' => '#444444',
+																			'type' => 'color',
+																			//'allow_empty' => false,
+																		)
+	)),
 
 
 	'info_1' => array(

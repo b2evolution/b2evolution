@@ -94,14 +94,16 @@ $.extend(InputSupport.prototype, {
 				function(r, status) 
 				{
 					if( status !== 'success' ) {return;}
-
-					jQuery('#' + e.parname + '_add_new').replaceWith(r);
+					
+					var id = e.parname.replace(/(\[|\])/g, "\\\$1");
+					
+					jQuery('#' + id + '_add_new').replaceWith(r);
 					if( e.has_color_field === true )
 					{
 						evo_initialize_colorpicker_inputs();
 					}
 					
-					$('#' + e.parname + '_add_new').delegate('.remove_'+e.id,'click',function() {
+					$('#' + id + '_add_new').delegate('.remove_'+e.id,'click',function() {
 						InputSupport.prototype.remove_button(e);
 					});
 

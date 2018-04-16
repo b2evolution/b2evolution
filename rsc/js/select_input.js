@@ -317,7 +317,8 @@ $.extend(SelectInput.prototype, {
 								
 								var html = jQuery.parseHTML( data, document, true ),
 									controls = jQuery(html).find('.controls'),
-									removeButton = $('<div>').html(e.remove_button).text();
+									removeButton = $('<div>').html(e.remove_button).text(),
+									id = e.id.replace(/(\[|\])/g, "\\\$1");
 									
 								switch( entry_type )
 								{
@@ -348,8 +349,8 @@ $.extend(SelectInput.prototype, {
 								SelectInput.prototype.remove_button(this, e);
 								});
 								
-
-								var container = jQuery('#' + e.id + '_disp');
+								
+								var container = jQuery('#' + id + '_disp');
 								
 								if( container.children('.form-group').length === 0 )
 								{
