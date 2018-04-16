@@ -469,8 +469,12 @@ if( empty($memory_limit) )
 }
 else
 {
-	init_system_check( 'PHP memory_limit', ini_get('memory_limit') );
-	if( $memory_limit < get_php_bytes_size( '256M' ) )
+	init_system_check( 'PHP memory_limit', $memory_limit == -1 ? T_('Unlimited') : ini_get('memory_limit') );
+	if( $memory_limit == -1 )
+	{
+		disp_system_check( 'ok' );
+	}
+	elseif( $memory_limit < get_php_bytes_size( '256M' ) )
 	{
 		disp_system_check( 'error', T_('The memory_limit is too low. Some features like image manipulation will fail to work.') );
 	}
