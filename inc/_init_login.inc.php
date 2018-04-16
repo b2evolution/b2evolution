@@ -511,7 +511,8 @@ if( ! empty( $login_error ) || ( $login_required && ! is_logged_in() ) )
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
 			$skin = $Skin->folder;
-			$disp = 'login';
+			$disp = param( 'disp', 'string', NULL );
+			$disp = isset($disp) ? $disp : 'login';
 			// fp> We ABSOLUTELY want to recover the previous redirect_to so that after a new login attempt that may be successful,
 			// we will finally reach our intended destination. This is paramount with emails telling people to come back to the site
 			// to read a message or sth like that. They must log in first and they may enter the wrong password multiple times.
