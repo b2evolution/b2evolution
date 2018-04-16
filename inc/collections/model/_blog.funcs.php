@@ -1825,7 +1825,7 @@ function callback_filter_collectionlist( & $Form )
  */
 function blogs_all_results_block( $params = array() )
 {
-	global $admin_url, $current_User, $DB, $Session;
+	global $admin_url, $current_User, $DB, $Session, $site_ID;
 	global $cf_name, $cf_owner, $cf_type;
 
 	// Make sure we are not missing any param:
@@ -1935,6 +1935,10 @@ function blogs_all_results_block( $params = array() )
 		$SQL->FROM_add( 'LEFT JOIN T_users ON blog_owner_user_ID = user_ID' );
 		$SQL->GROUP_BY( 'blog_ID, sec_ID' );
 		$SQL->ORDER_BY( 'sec_order, sec_name' );
+		if( ! empty( $site_ID ) )
+		{	// Restrict collections list with current site:
+			$SQL->WHERE( 'sec_site_ID = '.$DB->quote( $site_ID ) );
+		}
 	}
 	else
 	{	// Get collections without groups:
@@ -1968,7 +1972,7 @@ function blogs_all_results_block( $params = array() )
 					.'AND ( '.$colleciton_where_sql.' ) ) OR ';
 			}
 		}
-		$SQL->WHERE( $section_where_sql.$colleciton_where_sql );
+		$SQL->WHERE_and( $section_where_sql.$colleciton_where_sql );
 
 		$no_results = $params['results_no_perm_text'];
 	}

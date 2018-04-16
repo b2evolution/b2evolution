@@ -221,26 +221,32 @@ if( $notifications_mode != 'off' )
 {
 	$Form->begin_fieldset( T_('Collection subscriptions').( is_admin_page() ? get_manual_link( 'user-coll-subscriptions-panel' ) : '' ), array( 'id' => 'subs' ) );
 
-			// Get those blogs for which we have already subscriptions (for this user)
-			$sql = 'SELECT blog_ID, blog_shortname,
-								MAX( IF( sub_items IS NULL, IF( opt.cset_name = "opt_out_subscription", 1, 0 ), sub_items ) ) AS sub_items,
-								MAX( IF( sub_items_mod IS NULL, IF( opt.cset_name = "opt_out_items_mod_subscription", 1, 0 ), sub_items_mod ) ) AS sub_items_mod,
-								MAX( IF( sub_comments IS NULL, IF( opt.cset_name = "opt_out_comment_subscription", 1, 0 ), sub_comments ) ) AS sub_comments
-							FROM T_blogs
-							LEFT JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_subscriptions" )
-							LEFT JOIN T_coll_settings AS subc ON ( subc.cset_coll_ID = blog_ID AND subc.cset_name = "allow_comment_subscriptions" )
-							LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name IN ( "opt_out_subscription", "opt_out_comment_subscription", "opt_out_items_mod_subscription" ) )
-							LEFT JOIN T_subscriptions ON ( sub_coll_ID = blog_ID AND sub_user_ID = '.$edited_User->ID.' )
-							LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
-							LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
-							LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
-							LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
-							WHERE ( ( sub.cset_value = 1 OR sub.cset_value IS NULL ) OR ( subc.cset_value = 1 OR subc.cset_value IS NULL ) )
-								AND ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR sub_user_ID = '.$edited_User->ID.' )
-								AND ( sub_items <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )
-								AND ( CASE opt.cset_value WHEN 1 THEN blog_advanced_perms = 1 ELSE TRUE END )
-							GROUP BY blog_ID, blog_shortname';
-			$blog_subs = $DB->get_results( $sql );
+			// Get those collections for which we have already subscriptions (for this user)
+			$subs_SQL = new SQL( 'Get those collections for which we have already subscriptions for user #'.$edited_User->ID );
+			$subs_SQL->SELECT( 'blog_ID, blog_shortname,' );
+			$subs_SQL->SELECT_add( 'MAX( IF( sub_items IS NULL, IF( opt.cset_name = "opt_out_subscription", 1, 0 ), sub_items ) ) AS sub_items,' );
+			$subs_SQL->SELECT_add( 'MAX( IF( sub_items_mod IS NULL, IF( opt.cset_name = "opt_out_items_mod_subscription", 1, 0 ), sub_items_mod ) ) AS sub_items_mod,' );
+			$subs_SQL->SELECT_add( 'MAX( IF( sub_comments IS NULL, IF( opt.cset_name = "opt_out_comment_subscription", 1, 0 ), sub_comments ) ) AS sub_comments' );
+			$subs_SQL->FROM( 'T_blogs' );
+			$subs_SQL->FROM_add( 'LEFT JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_subscriptions" )' );
+			$subs_SQL->FROM_add( 'LEFT JOIN T_coll_settings AS subc ON ( subc.cset_coll_ID = blog_ID AND subc.cset_name = "allow_comment_subscriptions" )' );
+			$subs_SQL->FROM_add( 'LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name IN ( "opt_out_subscription", "opt_out_comment_subscription", "opt_out_items_mod_subscription" ) )' );
+			$subs_SQL->FROM_add( 'LEFT JOIN T_subscriptions ON ( sub_coll_ID = blog_ID AND sub_user_ID = '.$edited_User->ID.' )' );
+			$subs_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )' );
+			$subs_SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )' );
+			$subs_SQL->FROM_add( 'LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )' );
+			$subs_SQL->FROM_add( 'LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )' );
+			$subs_SQL->WHERE( '( ( sub.cset_value = 1 OR sub.cset_value IS NULL ) OR ( subc.cset_value = 1 OR subc.cset_value IS NULL ) )' );
+			$subs_SQL->WHERE_and( '( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR sub_user_ID = '.$edited_User->ID.' )' );
+			$subs_SQL->WHERE_and( '( sub_items <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )' );
+			$subs_SQL->WHERE_and( '( CASE opt.cset_value WHEN 1 THEN blog_advanced_perms = 1 ELSE TRUE END )' );
+			$subs_SQL->GROUP_BY( 'blog_ID, blog_shortname' );
+			if( ! is_admin_page() && isset( $Blog ) )
+			{	// Get collections only from current site on front-office:
+				$coll_Section = & $Blog->get_Section();
+				$subs_SQL->FROM_add( 'INNER JOIN T_section ON sec_ID = blog_sec_ID AND sec_site_ID = '.$coll_Section->get( 'site_ID' ) );
+			}
+			$blog_subs = $DB->get_results( $subs_SQL );
 
 			$BlogCache = & get_BlogCache();
 			$subs_blog_IDs = array();

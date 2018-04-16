@@ -78,6 +78,10 @@ class Section extends DataObject
 	 */
 	function load_from_Request()
 	{
+		// Site:
+		param( 'sec_site_ID', 'integer', true );
+		$this->set_from_Request( 'site_ID' );
+
 		// Name:
 		if( $this->ID != 1 )
 		{	// Only if not first default section:

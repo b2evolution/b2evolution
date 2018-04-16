@@ -186,6 +186,10 @@ class Blog extends DataObject
 	 */
 	var $comment_moderator_user_data;
 
+	/**
+	 * @var object Section
+	 */
+	var $Section = NULL;
 
 	/**
 	 * Constructor
@@ -5657,6 +5661,23 @@ class Blog extends DataObject
 		$default_ItemType = $this->get_default_ItemType();
 
 		return $default_ItemType ? $default_ItemType->get_name() : T_('Post');
+	}
+
+
+	/**
+	 * Get Section object of this Collection
+	 *
+	 * @return object Section
+	 */
+	function & get_Section()
+	{
+		if( $this->Section === NULL )
+		{	// Initialize Section object:
+			$SectionCache = & get_SectionCache();
+			$this->Section = $SectionCache->get_by_ID( $this->get( 'sec_ID' ) );
+		}
+
+		return $this->Section;
 	}
 }
 

@@ -473,7 +473,7 @@ class BlogCache extends DataObjectCache
 	 */
 	function load_subscription_colls( $User, $exclude_coll_IDs = NULL, $order_by = '', $order_dir = '' )
 	{
-		global $DB, $Settings, $Debuglog;
+		global $DB, $Settings, $Debuglog, $Blog;
 
 		$Debuglog->add( 'Loading <strong>'.$this->objtype.'(subscription collections)</strong> into cache', 'dataobjects' );
 
@@ -558,6 +558,12 @@ class BlogCache extends DataObjectCache
 		}
 
 		$blog_cache_SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, $this->dbprefix, $this->dbIDname ) );
+
+		if( ! is_admin_page() && isset( $Blog ) )
+		{	// Get collections only from current site on front-office:
+			$coll_Section = & $Blog->get_Section();
+			$blog_cache_SQL->FROM_add( 'INNER JOIN T_section ON sec_ID = blog_sec_ID AND sec_site_ID = '.$coll_Section->get( 'site_ID' ) );
+		}
 
 		$this->load_by_sql( $blog_cache_SQL );
 
