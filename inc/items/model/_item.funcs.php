@@ -227,7 +227,7 @@ function init_inskin_editing()
 	// Get an url for a link 'Go to advanced edit screen'
 	$advanced_edit_link = array(
 			'href'    => $admin_url.'?ctrl=items&amp;action='.$action.'&amp;'.$tab_switch_params,
-			'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'\' );',
+			'onclick' => 'return b2edit_reload( \'#item_checkchanges\', \''.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'\' );',
 		);
 
 	$form_action = get_htsrv_url().'item_edit.php';
