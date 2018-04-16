@@ -1976,7 +1976,7 @@ switch( $action )
 				$AdminUI->global_icon( T_('In-skin editing'), 'edit', $mode_inskin_url,
 						' '.T_('In-skin editing'), 4, 3, array(
 						'style' => 'margin-right: 3ex',
-						'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$mode_inskin_action.'\' );'
+						'onclick' => 'return b2edit_reload( \'#item_checkchanges\', \''.$mode_inskin_action.'\' );'
 				) );
 			}
 
