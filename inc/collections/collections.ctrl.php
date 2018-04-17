@@ -316,10 +316,6 @@ switch( $action )
 		$Settings->set( 'def_mobile_skin_ID', param( 'def_mobile_skin_ID', 'integer', 0 ) );
 		$Settings->set( 'def_tablet_skin_ID', param( 'def_tablet_skin_ID', 'integer', 0 ) );
 
-		// Comment recycle bin
-		param( 'auto_empty_trash', 'integer', $Settings->get_default('auto_empty_trash'), false, false, true, false );
-		$Settings->set( 'auto_empty_trash', get_param('auto_empty_trash') );
-
 		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
