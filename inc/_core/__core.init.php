@@ -2003,16 +2003,7 @@ class _core_Module extends Module
 			$users_entries['entries'] = array(
 					'users' => array(
 						'text' => T_('Users'),
-						'href' => '?ctrl=users',
-						'entries' => array(
-							'list' => array(
-								'text' => T_('List'),
-								'href' => '?ctrl=users' ),
-							'duplicates' => array(
-								'text' => T_('Find duplicates'),
-								'href' => '?ctrl=users&amp;tab3=duplicates' ),
-							),
-						),
+						'href' => '?ctrl=users' ),
 					'groups' => array(
 						'text' => T_('Groups'),
 						'href' => '?ctrl=groups' ),
