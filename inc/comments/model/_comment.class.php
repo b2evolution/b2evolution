@@ -131,6 +131,11 @@ class Comment extends DataObject
 	 * @var boolean
 	 */
 	var $allow_msgform;
+	/**
+	 * Does an anonymous commentator notify of replies?
+	 * @var boolean
+	 */
+	var $anon_notify;
 
 	var $nofollow;
 	/**
@@ -249,6 +254,7 @@ class Comment extends DataObject
 			$this->nofollow = $db_row->comment_nofollow;
 			$this->spam_karma = $db_row->comment_spam_karma;
 			$this->allow_msgform = $db_row->comment_allow_msgform;
+			$this->anon_notify = $db_row->comment_anon_notify;
 			$this->secret = $db_row->comment_secret;
 			$this->notif_status = $db_row->comment_notif_status;
 			$this->notif_ctsk_ID = $db_row->comment_notif_ctsk_ID;
@@ -3770,6 +3776,7 @@ class Comment extends DataObject
 		}
 
 		$notify_users = array();
+		$notify_anon_users = array();
 
 		if( ! $this->is_meta() )
 		{	// Get the notify users for NORMAL comments:
@@ -3847,7 +3854,7 @@ class Comment extends DataObject
 						) AS users
 						WHERE user_ID IS NOT NULL'.$except_condition;
 
-				$notify_list = $DB->get_results( $sql, OBJECT, 'Get list of users who want to be notified about comments of the the post #'.$comment_Item->ID );
+				$notify_list = $DB->get_results( $sql, OBJECT, 'Get list of registered users who want to be notified about comments of the the post #'.$comment_Item->ID );
 
 				// Preprocess list:
 				foreach( $notify_list as $notification )
@@ -3855,6 +3862,26 @@ class Comment extends DataObject
 					if( ! isset( $notify_users[ $notification->user_ID ] ) )
 					{	// Don't rewrite a notify type if user already is notified by other type before:
 						$notify_users[ $notification->user_ID ] = 'item_subscription';
+					}
+				}
+
+				// Find anonymous users which are subscribed on the comment's post:
+				$SQL = new SQL( 'Get list of anonymous users who want to be notified about comments of the the post #'.$comment_Item->ID );
+				$SQL->SELECT( 'DISTINCT comment_author_email, comment_author, post_locale' );
+				$SQL->FROM( 'T_comments' );
+				$SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
+				$SQL->WHERE( 'comment_item_ID = '.$comment_Item->ID );
+				$SQL->WHERE_and( 'comment_author_user_ID IS NULL' );
+				$SQL->WHERE_and( 'comment_anon_notify = 1' );
+
+				$notify_list = $DB->get_results( $SQL );
+
+				// Preprocess list:
+				foreach( $notify_list as $notification )
+				{
+					if( ! isset( $notify_anon_users[ $notification->comment_author_email ] ) )
+					{	// Don't rewrite a notify type if user already is notified by other type before:
+						$notify_anon_users[ $notification->comment_author_email ] = array( 'item_subscription', $notification->comment_author, $notification->post_locale );
 					}
 				}
 			}
@@ -4042,12 +4069,12 @@ class Comment extends DataObject
 			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note', T_('Sending notifications:') );
 		}
 
-		if( empty( $notify_users ) )
+		if( empty( $notify_users ) && empty( $notify_anon_users ) )
 		{	// No-one to notify:
 			return $notified_flags;
 		}
 
-		$this->send_email_messages( $notify_users, $is_new_comment );
+		$this->send_email_messages( $notify_users + $notify_anon_users, $is_new_comment );
 
 		return $notified_flags;
 	}
@@ -4056,7 +4083,7 @@ class Comment extends DataObject
 	/**
 	 * Send email notifications to users
 	 *
-	 * @param array Array of users which should be notified, where key is User ID and value is a notify type:
+	 * @param array Array of users which should be notified, where key is User ID or Email of anonymous user and value is a notify type:
 	 *              - 'moderator'
 	 *              - 'creator'
 	 *              - 'blog_subscription'
@@ -4066,7 +4093,7 @@ class Comment extends DataObject
 	 */
 	function send_email_messages( $notify_users, $is_new_comment = false )
 	{
-		global $debug, $Debuglog;
+		global $debug, $Debuglog, $default_locale;
 
 		$UserCache = & get_UserCache();
 
@@ -4105,24 +4132,45 @@ class Comment extends DataObject
 			$author_user_ID = NULL;
 		}
 
-		// Load all users who will be notified, becasuse another way the send_mail_to_User funtion would load them one by one:
-		$UserCache->load_list( array_keys( $notify_users ) );
+		$load_users_IDs = array();
+		foreach( $notify_users as $notify_user_ID => $notify_type )
+		{
+			if( is_integer( $notify_user_ID ) )
+			{	// Get only ID of the registered Users and skip emails of anonymous users:
+				$load_users_IDs[] = $notify_user_ID;
+			}
+		}
 
-		// Load a list with the blocked emails  in cache
-		load_blocked_emails( array_keys( $notify_users ) );
+		// Load all users who will be notified, becasuse another way the send_mail_to_User funtion would load them one by one:
+		$UserCache->load_list( $load_users_IDs );
+
+		// Load a list with the blocked emails in cache
+		load_blocked_emails( $load_users_IDs );
 
 		// Send emails:
 		foreach( $notify_users as $notify_user_ID => $notify_type )
 		{
-			// get data content
-			$notify_User = $UserCache->get_by_ID( $notify_user_ID );
-			$notify_email = $notify_User->get( 'email' );
+			if( is_array( $notify_type ) )
+			{	// Get data of anonymous user:
+				$notify_User = NULL;
+				$notify_email = $notify_user_ID;
+				$notify_user_name = $notify_type[1];
+				$notify_locale = isset( $notify_type[1] ) ? $notify_type[1] : $default_locale;
+				$notify_type = $notify_type[0];
+				$notify_full = false;
+			}
+			else
+			{	// Get data of registered user:
+				$notify_User = $UserCache->get_by_ID( $notify_user_ID );
+				$notify_email = $notify_User->get( 'email' );
+				$notify_user_Group = $notify_User->get_Group();
+				$notify_locale = $notify_User->get( 'locale' );
+				$notify_full = ( ( $notify_type == 'moderator' ) && ( $notify_user_Group->check_perm( 'comment_moderation_notif', 'full' ) )
+								|| ( $notify_user_Group->check_perm( 'comment_subscription_notif', 'full' ) ) );
+			}
 
 			// init notification setting
-			locale_temp_switch( $notify_User->get( 'locale' ) );
-			$notify_user_Group = $notify_User->get_Group();
-			$notify_full = ( ( $notify_type == 'moderator' ) && ( $notify_user_Group->check_perm( 'comment_moderation_notif', 'full' ) )
-							|| ( $notify_user_Group->check_perm( 'comment_subscription_notif', 'full' ) ) );
+			locale_temp_switch( $notify_locale );
 
 			switch( $this->type )
 			{
@@ -4200,11 +4248,17 @@ class Comment extends DataObject
 				$Debuglog->add( $mail_dump, 'notification' );
 			}
 
-			// Send the email:
-			// Note: Note activated users won't get notification email
-			send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+			if( $notify_User )
+			{	// Send the email to registered User:
+				// Note: Note activated users won't get notification email
+				send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+			}
+			else
+			{	// Send the email to anonymous user:
+				send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+			}
 
-			blocked_emails_memorize( $notify_User->email );
+			blocked_emails_memorize( $notify_email );
 
 			locale_restore_previous();
 		}
@@ -4492,6 +4546,12 @@ class Comment extends DataObject
 
 		if( $r = parent::dbinsert() )
 		{
+			if( isset( $this->user_notify ) && $this->user_notify && $this->author_user_ID > 0 )
+			{	// Subscribe user to the comment's post replies if such option has been selected on the comment submitted form:
+				global $DB;
+				$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+					VALUES ( '.$DB->quote( $this->item_ID ).', '.$DB->quote( $this->author_user_ID ).', 1 )' );
+			}
 			// Update last touched date of item if comment is created with ANY status,
 			// But update contents last updated date of item if comment is created ONLY in published status(Public, Community or Members):
 			$this->update_last_touched_date( true, $this->may_be_seen_in_frontoffice() );
