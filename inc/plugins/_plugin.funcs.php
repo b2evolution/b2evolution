@@ -1430,8 +1430,6 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 	{ // Get the value from request:
 		$l_value = param( $Obj->get_param_prefix().$parname, $l_param_type, $l_param_default );
 	
-		//pre_dump();
-		
 		// Load [ radio | checklist | checkbox ] from support type of 'select_input'
 		if( isset($parmeta['type']) && $parmeta['type'] == 'select_input' )
 		{
