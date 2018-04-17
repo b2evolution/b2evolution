@@ -423,6 +423,24 @@ class ComponentWidget extends DataObject
 		if( strpos( $parname, '[' ) !== false )
 		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
 			$setting_names = explode( '[', $parname );
+
+			/* 
+			* match $params level to $parname
+			*/ 
+			for( $i = 0; $i < count( $setting_names ) - 1; $i++ )
+			{
+				if( isset( $params[ $setting_names[$i] ] ) )
+				{
+					if( isset( $params[ $setting_names[$i] ]['entries'] ) )
+					{
+
+						$params = $params[ $setting_names[$i] ]['entries'];
+
+					}
+
+				}
+			}
+			
 			if( isset( $this->param_array[ $setting_names[0] ] ) )
 			{
 				$setting_value = $this->param_array[ $setting_names[0] ];
