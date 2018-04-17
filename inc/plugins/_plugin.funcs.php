@@ -1391,7 +1391,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 	$l_param_default = '';
 	if( isset($parmeta['type']) )
 	{
-		if( substr($parmeta['type'], 0, 6) == 'select' && ! empty($parmeta['multiple']) )
+		if( substr($parmeta['type'], 0, 6) == 'select' && ! empty($parmeta['multiple']) || ( $parmeta['type'] == 'select_input') )
 		{ // a "multiple" select:
 			$l_param_type = 'array';
 		}
